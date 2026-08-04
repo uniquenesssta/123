@@ -17,7 +17,15 @@ npm run verify:frontend
 npm run verify:rust
 node scripts/verify_protected_assets.mjs
 node scripts/verify_command_contract.mjs
+node scripts/verify_database_baseline.mjs
 npm run tauri:dev
+```
+
+PostgreSQL 数据库基线必须使用名称包含 `test` 的专用、允许彻底清空的测试数据库：
+
+```powershell
+$env:FOOTBALL_TEST_DATABASE_URL="postgres://user:password@127.0.0.1:5432/football_test"
+node scripts/run_database_baseline.mjs
 ```
 
 Windows 可使用：
@@ -28,7 +36,7 @@ Windows 可使用：
 验收平台.bat
 ```
 
-`verify:frontend` 包含公开模型边界、TypeScript、静态契约和 Vite 生产构建。`verify:rust` 包含 Cargo.lock 一致性、格式检查、Clippy 与工作区测试。`verify_protected_assets.mjs` 校验模型公开边界文件指纹、保护目录精确集合以及私有 P4/P7 资产缺席状态。`verify_command_contract.mjs` 校验前端调用、Rust 命令定义和 `generate_handler!` 注册集合一致，并拒绝缺失、重复、孤立或未授权动态命令。数据库集成测试必须连接名称包含 `test` 的专用 PostgreSQL 数据库。
+`verify:frontend` 包含公开模型边界、TypeScript、静态契约和 Vite 生产构建。`verify:rust` 包含 Cargo.lock 一致性、格式检查、Clippy 与工作区测试。`verify_protected_assets.mjs` 校验模型公开边界文件指纹、保护目录精确集合以及私有 P4/P7 资产缺席状态。`verify_command_contract.mjs` 校验前端调用、Rust 命令定义和 `generate_handler!` 注册集合一致，并拒绝缺失、重复、孤立或未授权动态命令。`verify_database_baseline.mjs` 校验 0001–0046 迁移连续性、内容指纹、SQLx 迁移入口、PostgreSQL 集成测试集合和关键不可变约束。`run_database_baseline.mjs` 在静态门禁通过后执行被忽略的 PostgreSQL 集成测试，并拒绝数据库名不含 `test` 的连接。
 
 ## 模块化重写执行记录
 
@@ -38,6 +46,8 @@ Windows 可使用：
 - R0-02 已通过 Node 语法、基准夹具、受保护文件篡改失败、禁止资产失败和 CRLF 兼容验证；完整工作树、Windows 原生和 GitHub Actions 执行受当前环境或触发条件阻塞，详见节点记录。
 - R0-03 已新增 `architecture/command-contract.json` 和 `scripts/verify_command_contract.mjs`，冻结前端 API、15 个 Rust 命令模块和 `generate_handler!` 中的 171 个公共命令；命令集合及定义映射已建立 SHA-256 门禁。
 - R0-03 已通过 Node 语法、171 命令完整合成基准及缺失、重复、孤立、动态命令负向验证；未修改公共命令、DTO、生产源码、配置、依赖或运行行为，完整工作树、Windows 和 CI 执行限制详见节点记录。
+- R0-04 已新增 `architecture/database-baseline.json`、`scripts/verify_database_baseline.mjs` 和 `scripts/run_database_baseline.mjs`，冻结 0001–0046 共 46 个迁移，迁移聚合 SHA-256 为 `d9f2eb50bacd747b7cbf08492189c2635b7c0ec2cf4c764def1d32a837f8ba93`。
+- R0-04 的迁移连续性、内容指纹、18 个 PostgreSQL 集成测试契约、不可变约束和安全执行前检已通过静态与负向验证；当前没有专用 PostgreSQL 测试库，也没有 `new-A` 的 GitHub Actions 运行，因此节点保持 `VERIFYING`，没有修改任何迁移 SQL、数据库结构、生产源码、依赖或 CI 配置。
 - 当前执行环境未建立本地 Git 工作树，用户设备上的未提交与未跟踪文件不可见；本次远端分支操作不会覆盖这些本地内容。
 
 ## 0.23.0 变更记录
@@ -94,4 +104,4 @@ API 传输与诊断契约保持历史兼容。
 
 ## 验证事实与限制
 
-本公开包生成环境已通过公开模型边界、全部 Node 静态契约、TypeScript、Cargo.lock、发布就绪、迁移哈希和 UI 截图基线检查。Vite 构建因基线内携带的 Windows `node_modules` 缺少 Linux Rollup 原生可选包，且容器无法联网重装而被环境阻塞；最终包不包含 `node_modules`，GitHub Actions 会在 Ubuntu 上执行 `npm ci` 后重新构建。当前容器没有 Rust/Cargo 与 PostgreSQL，因此不会将 Rust 编译、Tauri 启动或真实数据库验证描述为通过。完整事实记录见 `docs/public-release/model-boundary/implementation.md`。
+本公开包生成环境已通过公开模型边界、全部 Node 静态契约、TypeScript、Cargo.lock、发布就绪、迁移哈希和 UI 截图基线检查。Vite 构建因基线内携带的 Windows `node_modules` 缺少 Linux Rollup 原生可选包，且容器无法联网重装而被环境阻塞；最终包不包含 `node_modules`，GitHub Actions 会在 Ubuntu 上执行 `npm ci` 后重新构建。当前容器没有 Rust/Cargo 与 PostgreSQL，因此不会将 Rust 编译、Tauri 启动、迁移幂等或真实数据库集成验证描述为通过。完整事实记录见 `docs/public-release/model-boundary/implementation.md` 和 `docs/modular-rewrite/R00-baseline/`。
