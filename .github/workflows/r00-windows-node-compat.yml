@@ -65,23 +65,16 @@ jobs:
         shell: powershell
         run: |
           $script = "$env:GITHUB_WORKSPACE\source\scripts\windows-acceptance.ps1"
-          & powershell -NoProfile -ExecutionPolicy Bypass -File $script -Mode Automated -ProjectRoot "$env:GITHUB_WORKSPACE"
-          $automatedExit = $LASTEXITCODE
-          $latest = Get-ChildItem "$env:GITHUB_WORKSPACE\logs" -Filter "windows-acceptance-*.txt" -File |
-            Sort-Object LastWriteTime -Descending |
-            Select-Object -First 1
-          if (-not $latest) { throw "Automated did not create an acceptance log." }
-          $content = Get-Content -Raw -Encoding UTF8 $latest.FullName
-          if (-not $content.Contains("通过：前端契约、类型、截图与生产构建")) {
-            throw "Automated frontend stage did not pass. Exit code: $automatedExit"
-          }
-          if ($content.Contains("失败：前端契约、类型、截图与生产构建")) {
-            throw "Automated still failed in the frontend stage."
-          }
-          if (-not $content.Contains("开始：Rust 格式、Clippy 与工作区测试")) {
-            throw "Automated did not continue to the Rust stage."
-          }
-          Write-Host "Automated frontend stage passed and continued to Rust; overall exit code=$automatedExit"
+          $process = Start-Process -FilePath "powershell.exe" -ArgumentList @(
+            "-NoProfile",
+            "-ExecutionPolicy", "Bypass",
+            "-File", $script,
+            "-Mode", "Automated",
+            "-ProjectRoot", $env:GITHUB_WORKSPACE
+          ) -Wait -PassThru -NoNewWindow
+          $env:R0061_AUTOMATED_EXIT = [string]$process.ExitCode
+          node -e "const fs=require('node:fs');const path=require('node:path');const root=path.join(process.env.GITHUB_WORKSPACE,'logs');const files=fs.readdirSync(root).filter(x=>/^windows-acceptance-.*\.txt$/.test(x)).map(x=>({x,t:fs.statSync(path.join(root,x)).mtimeMs})).sort((a,b)=>b.t-a.t);if(!files.length)throw new Error('Automated did not create an acceptance log.');const content=fs.readFileSync(path.join(root,files[0].x),'utf8');const pass='\u901a\u8fc7\uff1a\u524d\u7aef\u5951\u7ea6\u3001\u7c7b\u578b\u3001\u622a\u56fe\u4e0e\u751f\u4ea7\u6784\u5efa';const fail='\u5931\u8d25\uff1a\u524d\u7aef\u5951\u7ea6\u3001\u7c7b\u578b\u3001\u622a\u56fe\u4e0e\u751f\u4ea7\u6784\u5efa';const rust='\u5f00\u59cb\uff1aRust \u683c\u5f0f\u3001Clippy \u4e0e\u5de5\u4f5c\u533a\u6d4b\u8bd5';if(!content.includes(pass)||content.includes(fail)||!content.includes(rust))throw new Error('Automated frontend stage did not pass and continue to Rust. Exit code='+process.env.R0061_AUTOMATED_EXIT);console.log('Automated frontend stage passed and continued to Rust; overall exit code='+process.env.R0061_AUTOMATED_EXIT);"
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 
       - name: Upload R0-06.1 evidence
         if: always()
