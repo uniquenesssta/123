@@ -114,9 +114,10 @@ function assertExactSet(actual, expected, label, failures) {
   }
 }
 
-function verifyFileFingerprint(root, entry, failures, label) {
-  const resolved = resolveRepositoryFile(root, entry.path, label);
-  const bytes = canonicalize(fs.readFileSync(resolved.absolute), entry.mode);
+function verifyFileFingerprint(root, entry, failures, label, pathOverride = null) {
+  const relativePath = pathOverride ?? entry.path;
+  const resolved = resolveRepositoryFile(root, relativePath, label);
+  const bytes = canonicalize(fs.readFileSync(resolved.absolute), entry.mode ?? "utf8-lf");
   const blobSha = gitBlobSha1(bytes);
   const fingerprint = fingerprintFromBlobSha(blobSha);
 
@@ -125,7 +126,7 @@ function verifyFileFingerprint(root, entry, failures, label) {
       `${label} Git blob 指纹变化：${resolved.relative}，期望 ${entry.git_blob_sha1}，实际 ${blobSha}`,
     );
   }
-  if (fingerprint !== entry.fingerprint_sha256) {
+  if (entry.fingerprint_sha256 && fingerprint !== entry.fingerprint_sha256) {
     failures.push(
       `${label} SHA-256 指纹变化：${resolved.relative}，期望 ${entry.fingerprint_sha256}，实际 ${fingerprint}`,
     );
@@ -175,12 +176,7 @@ function verifyIntegrationTests(root, contract, failures) {
       `PostgreSQL 忽略测试数量变化：期望 ${integration.expected_ignored_test_count}，实际 ${ignored.length}`,
     );
   }
-  assertExactSet(
-    ignored,
-    integration.expected_ignored_tests,
-    "PostgreSQL 忽略测试",
-    failures,
-  );
+  assertExactSet(ignored, integration.expected_ignored_tests, "PostgreSQL 忽略测试", failures);
   assertExactSet(all, integration.expected_ignored_tests, "PostgreSQL 全部测试", failures);
 
   const envToken = `const DATABASE_ENV: &str = "${integration.environment_variable}";`;
@@ -202,7 +198,9 @@ function verify(options) {
   const policy = contract.migration_policy;
   const migrationPattern = new RegExp(policy.filename_pattern);
   const expectedPaths = contract.migrations.map((entry) =>
-    normalizeRelativePath(entry.path),
+    normalizeRelativePath(
+      entry.path ?? `${policy.directory.replace(/\/$/, "")}/${entry.file}`,
+    ),
   );
   const actualPaths = collectMigrationFiles(options.root, policy);
   assertExactSet(actualPaths, expectedPaths, "迁移文件", failures);
@@ -238,25 +236,26 @@ function verify(options) {
     failures,
   );
   if (actualPaths.length !== policy.exact_count) {
-    failures.push(
-      `迁移数量变化：期望 ${policy.exact_count}，实际 ${actualPaths.length}`,
-    );
+    failures.push(`迁移数量变化：期望 ${policy.exact_count}，实际 ${actualPaths.length}`);
   }
 
   const verifiedMigrations = [];
   for (const entry of contract.migrations) {
-    const fileName = path.posix.basename(entry.path);
+    const relativePath = normalizeRelativePath(
+      entry.path ?? `${policy.directory.replace(/\/$/, "")}/${entry.file}`,
+    );
+    const fileName = path.posix.basename(relativePath);
     const match = migrationPattern.exec(fileName);
     const declaredVersion = match?.groups?.version
       ? Number.parseInt(match.groups.version, 10)
       : null;
     if (declaredVersion !== entry.version) {
       failures.push(
-        `迁移清单版本与文件名不一致：${entry.path}，声明 ${entry.version}，文件 ${declaredVersion}`,
+        `迁移清单版本与文件名不一致：${relativePath}，声明 ${entry.version}，文件 ${declaredVersion}`,
       );
     }
     verifiedMigrations.push(
-      verifyFileFingerprint(options.root, entry, failures, "迁移文件"),
+      verifyFileFingerprint(options.root, entry, failures, "迁移文件", relativePath),
     );
   }
 
