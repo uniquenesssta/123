@@ -1,0 +1,114 @@
+name: R0-06.2 Windows Path Contract Temporary
+
+on:
+  pull_request:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+jobs:
+  windows-path-contract:
+    runs-on: windows-latest
+    timeout-minutes: 50
+    steps:
+      - name: Preserve repository line endings
+        shell: powershell
+        run: |
+          git config --global core.autocrlf false
+          git config --global core.eol lf
+
+      - name: Checkout source
+        uses: actions/checkout@v4
+        with:
+          path: source
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: source/package-lock.json
+
+      - name: Set up Rust 1.88.0
+        uses: dtolnay/rust-toolchain@1.88.0
+
+      - name: Prepare Windows project layout
+        shell: powershell
+        run: |
+          New-Item -ItemType Directory -Force -Path "$env:GITHUB_WORKSPACE\logs" | Out-Null
+          New-Item -ItemType Directory -Force -Path "$env:GITHUB_WORKSPACE\evidence-logs" | Out-Null
+          $sourceName = -join ([char[]](0x9879, 0x76EE, 0x6E90, 0x7801))
+          $requiredSource = Join-Path $env:GITHUB_WORKSPACE $sourceName
+          New-Item -ItemType Junction -Path $requiredSource -Target "$env:GITHUB_WORKSPACE\source" | Out-Null
+          if (-not (Test-Path (Join-Path $requiredSource "package.json"))) {
+            throw "Required source directory alias was not created correctly."
+          }
+
+      - name: Verify frontend and path contract
+        shell: powershell
+        run: |
+          $sourceName = -join ([char[]](0x9879, 0x76EE, 0x6E90, 0x7801))
+          Set-Location (Join-Path $env:GITHUB_WORKSPACE $sourceName)
+          npm run setup
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          node scripts/verify-windows-path-contract.mjs
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          npm run verify:frontend
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+
+      - name: Build Windows release
+        shell: powershell
+        run: |
+          $sourceName = -join ([char[]](0x9879, 0x76EE, 0x6E90, 0x7801))
+          Set-Location (Join-Path $env:GITHUB_WORKSPACE $sourceName)
+          npm run tauri:build
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          $targetStamp = Get-Content -Raw -Encoding UTF8 ".cargo\target-location.json" | ConvertFrom-Json
+          $expectedTarget = [IO.Path]::GetFullPath((Join-Path $env:GITHUB_WORKSPACE ".cargo-target"))
+          if ([IO.Path]::GetFullPath([string]$targetStamp.target_root) -ne $expectedTarget) {
+            throw "Cargo target stamp mismatch: $($targetStamp.target_root)"
+          }
+          if (-not (Test-Path (Join-Path $expectedTarget "release") -PathType Container)) {
+            throw "Expected release directory was not created: $expectedTarget"
+          }
+
+      - name: Verify RuntimeOnly with explicit log directory
+        shell: powershell
+        run: |
+          $sourceName = -join ([char[]](0x9879, 0x76EE, 0x6E90, 0x7801))
+          $sourceRoot = Join-Path $env:GITHUB_WORKSPACE $sourceName
+          & powershell -NoProfile -ExecutionPolicy Bypass -File (Join-Path $sourceRoot "scripts\windows-acceptance.ps1") -Mode RuntimeOnly -ProjectRoot $env:GITHUB_WORKSPACE -LogDirectory ".\evidence-logs"
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+
+          $acceptanceLogs = @(Get-ChildItem "$env:GITHUB_WORKSPACE\evidence-logs" -Filter "windows-acceptance-*.txt" -File)
+          $acceptanceReports = @(Get-ChildItem "$env:GITHUB_WORKSPACE\evidence-logs" -Filter "windows-acceptance-*.json" -File)
+          $runtimeLogs = @(Get-ChildItem "$env:GITHUB_WORKSPACE\logs" -Filter "football-runtime-*.jsonl" -File)
+          if ($acceptanceLogs.Count -lt 1 -or $acceptanceReports.Count -lt 1) {
+            throw "Explicit acceptance log directory did not receive logs and report."
+          }
+          if ($runtimeLogs.Count -lt 1) {
+            throw "Runtime log was not created under the project runtime root."
+          }
+          $report = Get-Content -Raw -Encoding UTF8 ($acceptanceReports | Sort-Object LastWriteTime -Descending | Select-Object -First 1).FullName | ConvertFrom-Json
+          if ($report.status -notin @("pass", "warning")) {
+            throw "RuntimeOnly report did not pass: $($report.status)"
+          }
+          $acceptanceText = Get-Content -Raw -Encoding UTF8 ($acceptanceLogs | Sort-Object LastWriteTime -Descending | Select-Object -First 1).FullName
+          $expectedTarget = [IO.Path]::GetFullPath((Join-Path $env:GITHUB_WORKSPACE ".cargo-target"))
+          if (-not $acceptanceText.Contains("Cargo目标=$expectedTarget")) {
+            throw "Acceptance log did not record the expected Cargo target root."
+          }
+
+      - name: Upload R0-06.2 evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: r00-06-2-windows-path-contract
+          path: |
+            evidence-logs/**
+            logs/**
+            source/.cargo/target-location.json
+          if-no-files-found: error
+          retention-days: 30
