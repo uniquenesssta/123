@@ -47,7 +47,8 @@ Windows 可使用：
 - R0-03 已新增 `architecture/command-contract.json` 和 `scripts/verify_command_contract.mjs`，冻结前端 API、15 个 Rust 命令模块和 `generate_handler!` 中的 171 个公共命令；命令集合及定义映射已建立 SHA-256 门禁。
 - R0-03 已通过 Node 语法、171 命令完整合成基准及缺失、重复、孤立、动态命令负向验证；未修改公共命令、DTO、生产源码、配置、依赖或运行行为，完整工作树、Windows 和 CI 执行限制详见节点记录。
 - R0-04 已新增 `architecture/database-baseline.json`、`scripts/verify_database_baseline.mjs` 和 `scripts/run_database_baseline.mjs`，冻结 0001–0046 共 46 个迁移，迁移聚合 SHA-256 为 `d9f2eb50bacd747b7cbf08492189c2635b7c0ec2cf4c764def1d32a837f8ba93`。
-- R0-04 的迁移连续性、内容指纹、18 个 PostgreSQL 集成测试契约、不可变约束和安全执行前检已通过静态与负向验证；当前没有专用 PostgreSQL 测试库，也没有 `new-A` 的 GitHub Actions 运行，因此节点保持 `VERIFYING`，没有修改任何迁移 SQL、数据库结构、生产源码、依赖或 CI 配置。
+- 数据库公共接口、迁移集合和不可变约束继续以 `main` 基线保持。用户于 2026-08-04 明确要求将真实 PostgreSQL 迁移幂等和 18 个集成测试推迟到最终统一验证；这些未执行项不会被描述为通过。
+- R0-05 已开始执行 `npm ci`、前端验证和 Rust 基线验证。当前通过 `new-A` → `main` Draft PR 触发现有 GitHub Actions，实际结果记录于 `docs/modular-rewrite/R00-baseline/R00-05-前端与Rust基线.md`。
 - 当前执行环境未建立本地 Git 工作树，用户设备上的未提交与未跟踪文件不可见；本次远端分支操作不会覆盖这些本地内容。
 
 ## 0.23.0 变更记录
@@ -104,4 +105,4 @@ API 传输与诊断契约保持历史兼容。
 
 ## 验证事实与限制
 
-本公开包生成环境已通过公开模型边界、全部 Node 静态契约、TypeScript、Cargo.lock、发布就绪、迁移哈希和 UI 截图基线检查。Vite 构建因基线内携带的 Windows `node_modules` 缺少 Linux Rollup 原生可选包，且容器无法联网重装而被环境阻塞；最终包不包含 `node_modules`，GitHub Actions 会在 Ubuntu 上执行 `npm ci` 后重新构建。当前容器没有 Rust/Cargo 与 PostgreSQL，因此不会将 Rust 编译、Tauri 启动、迁移幂等或真实数据库集成验证描述为通过。完整事实记录见 `docs/public-release/model-boundary/implementation.md` 和 `docs/modular-rewrite/R00-baseline/`。
+本公开包生成环境已通过公开模型边界、全部 Node 静态契约、TypeScript、Cargo.lock、发布就绪、迁移哈希和 UI 截图基线检查。R0-05 正在通过 Draft PR 的 GitHub Actions 重新建立当前 `new-A` 的前端与 Rust 基线。数据库真实迁移幂等、PostgreSQL 集成测试、Tauri 启动和 Windows 实机验证仍未执行，不会描述为通过。完整事实记录见 `docs/public-release/model-boundary/implementation.md` 和 `docs/modular-rewrite/R00-baseline/`。
