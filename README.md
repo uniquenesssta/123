@@ -16,6 +16,7 @@ npm ci
 npm run verify:frontend
 npm run verify:rust
 node scripts/verify_protected_assets.mjs
+node scripts/verify_command_contract.mjs
 npm run tauri:dev
 ```
 
@@ -27,7 +28,7 @@ Windows 可使用：
 验收平台.bat
 ```
 
-`verify:frontend` 包含公开模型边界、TypeScript、静态契约和 Vite 生产构建。`verify:rust` 包含 Cargo.lock 一致性、格式检查、Clippy 与工作区测试。`verify_protected_assets.mjs` 校验模型公开边界文件指纹、保护目录精确集合以及私有 P4/P7 资产缺席状态。数据库集成测试必须连接名称包含 `test` 的专用 PostgreSQL 数据库。
+`verify:frontend` 包含公开模型边界、TypeScript、静态契约和 Vite 生产构建。`verify:rust` 包含 Cargo.lock 一致性、格式检查、Clippy 与工作区测试。`verify_protected_assets.mjs` 校验模型公开边界文件指纹、保护目录精确集合以及私有 P4/P7 资产缺席状态。`verify_command_contract.mjs` 校验前端调用、Rust 命令定义和 `generate_handler!` 注册集合一致，并拒绝缺失、重复、孤立或未授权动态命令。数据库集成测试必须连接名称包含 `test` 的专用 PostgreSQL 数据库。
 
 ## 模块化重写执行记录
 
@@ -35,6 +36,8 @@ Windows 可使用：
 - R0-01 已冻结远端分支起点并建立 `docs/modular-rewrite/R00-baseline/` 节点记录；本节点未修改源码、配置、依赖、接口、数据、模型或运行行为。
 - R0-02 已新增 `architecture/protected-assets.json` 和 `scripts/verify_protected_assets.mjs`，冻结 18 个公开模型边界及校验文件，聚合 SHA-256 为 `d2263a5ff09c8cf633a42b7bb35fffe3d42fb18648db4d12691817f51015c85c`；真实 P4/P7 私有资产继续禁止进入公开仓库。
 - R0-02 已通过 Node 语法、基准夹具、受保护文件篡改失败、禁止资产失败和 CRLF 兼容验证；完整工作树、Windows 原生和 GitHub Actions 执行受当前环境或触发条件阻塞，详见节点记录。
+- R0-03 已新增 `architecture/command-contract.json` 和 `scripts/verify_command_contract.mjs`，冻结前端 API、15 个 Rust 命令模块和 `generate_handler!` 中的 171 个公共命令；命令集合及定义映射已建立 SHA-256 门禁。
+- R0-03 已通过 Node 语法、171 命令完整合成基准及缺失、重复、孤立、动态命令负向验证；未修改公共命令、DTO、生产源码、配置、依赖或运行行为，完整工作树、Windows 和 CI 执行限制详见节点记录。
 - 当前执行环境未建立本地 Git 工作树，用户设备上的未提交与未跟踪文件不可见；本次远端分支操作不会覆盖这些本地内容。
 
 ## 0.23.0 变更记录
