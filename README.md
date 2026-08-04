@@ -48,7 +48,9 @@ Windows 可使用：
 - R0-03 已通过 Node 语法、171 命令完整合成基准及缺失、重复、孤立、动态命令负向验证；未修改公共命令、DTO、生产源码、配置、依赖或运行行为，完整工作树、Windows 和 CI 执行限制详见节点记录。
 - R0-04 已新增 `architecture/database-baseline.json`、`scripts/verify_database_baseline.mjs` 和 `scripts/run_database_baseline.mjs`，冻结 0001–0046 共 46 个迁移，迁移聚合 SHA-256 为 `d9f2eb50bacd747b7cbf08492189c2635b7c0ec2cf4c764def1d32a837f8ba93`。
 - 数据库公共接口、迁移集合和不可变约束继续以 `main` 基线保持。用户于 2026-08-04 明确要求将真实 PostgreSQL 迁移幂等和 18 个集成测试推迟到最终统一验证；这些未执行项不会被描述为通过。
-- R0-05 已开始执行 `npm ci`、前端验证和 Rust 基线验证。当前通过 `new-A` → `main` Draft PR 触发现有 GitHub Actions，实际结果记录于 `docs/modular-rewrite/R00-baseline/R00-05-前端与Rust基线.md`。
+- R0-05 已通过关闭且未合并的 Draft PR #1 触发 GitHub Actions workflow run `30910130867`。`npm ci` 通过，但存在 1 个 moderate npm audit 警告；`npm run verify:frontend` 失败于 GitHub Ubuntu Chromium 未开放调试端口，未进入 UI 截图业务断言。
+- R0-05 Rust job 已通过 Rust 1.88.0/Tauri Linux 依赖安装、公开模型边界、Cargo.lock 和 locked metadata；`cargo fmt --all -- --check` 失败，因此 Clippy 与 workspace tests 未执行。Actions 没有按 package script 单入口直接执行完整 `npm run verify:rust`。
+- R0-05 只记录现有基线，没有格式化生产源码、替换截图工具、修改依赖、弱化测试或修改 CI。详细事实见 `docs/modular-rewrite/R00-baseline/R00-05-前端与Rust基线.md`。
 - 当前执行环境未建立本地 Git 工作树，用户设备上的未提交与未跟踪文件不可见；本次远端分支操作不会覆盖这些本地内容。
 
 ## 0.23.0 变更记录
@@ -105,4 +107,4 @@ API 传输与诊断契约保持历史兼容。
 
 ## 验证事实与限制
 
-本公开包生成环境已通过公开模型边界、全部 Node 静态契约、TypeScript、Cargo.lock、发布就绪、迁移哈希和 UI 截图基线检查。R0-05 正在通过 Draft PR 的 GitHub Actions 重新建立当前 `new-A` 的前端与 Rust 基线。数据库真实迁移幂等、PostgreSQL 集成测试、Tauri 启动和 Windows 实机验证仍未执行，不会描述为通过。完整事实记录见 `docs/public-release/model-boundary/implementation.md` 和 `docs/modular-rewrite/R00-baseline/`。
+R0-05 的 GitHub Actions 已建立当前 `new-A` 的真实前端与 Rust 基线：依赖安装和多项静态门禁通过；Linux Chromium 启动与 Rust 格式检查失败；Clippy、workspace tests、数据库实跑、Tauri 启动和 Windows 实机验证仍未完成，不会描述为通过。R0-06 是下一唯一 READY 节点。完整事实记录见 `docs/public-release/model-boundary/implementation.md` 和 `docs/modular-rewrite/R00-baseline/`。
