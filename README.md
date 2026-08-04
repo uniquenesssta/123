@@ -36,7 +36,7 @@ Windows 可使用：
 验收平台.bat
 ```
 
-`verify:frontend` 包含公开模型边界、Node 调用链兼容门禁、TypeScript、静态契约、截图和 Vite 生产构建。TypeScript 与 Vite 使用当前 Node 执行包内 JavaScript CLI，不直接启动 Windows `.cmd` 包装器。`verify:rust` 包含 Cargo.lock 一致性、格式检查、Clippy 与工作区测试。`verify_protected_assets.mjs` 校验模型公开边界文件指纹、保护目录精确集合以及私有 P4/P7 资产缺席状态。`verify_command_contract.mjs` 校验前端调用、Rust 命令定义和 `generate_handler!` 注册集合一致，并拒绝缺失、重复、孤立或未授权动态命令。`verify_database_baseline.mjs` 校验 0001–0046 迁移连续性、内容指纹、SQLx 迁移入口、PostgreSQL 集成测试集合和关键不可变约束。`run_database_baseline.mjs` 在静态门禁通过后执行被忽略的 PostgreSQL 集成测试，并拒绝数据库名不含 `test` 的连接。
+`verify:frontend` 包含公开模型边界、Node 调用链兼容、Windows 路径契约、TypeScript、静态契约、截图和 Vite 生产构建。TypeScript 与 Vite 使用当前 Node 执行包内 JavaScript CLI，不直接启动 Windows `.cmd` 包装器。Windows 验收器从 `.cargo/target-location.json` 解析实际 Cargo target，并支持相对于项目根目录的 `LogDirectory`；应用 runtime 日志继续写入项目根目录 `logs`。`verify:rust` 包含 Cargo.lock 一致性、格式检查、Clippy 与工作区测试。`verify_protected_assets.mjs` 校验模型公开边界文件指纹、保护目录精确集合以及私有 P4/P7 资产缺席状态。`verify_command_contract.mjs` 校验前端调用、Rust 命令定义和 `generate_handler!` 注册集合一致，并拒绝缺失、重复、孤立或未授权动态命令。`verify_database_baseline.mjs` 校验 0001–0046 迁移连续性、内容指纹、SQLx 迁移入口、PostgreSQL 集成测试集合和关键不可变约束。`run_database_baseline.mjs` 在静态门禁通过后执行被忽略的 PostgreSQL 集成测试，并拒绝数据库名不含 `test` 的连接。
 
 ## 模块化重写执行记录
 
@@ -47,12 +47,12 @@ Windows 可使用：
 - R0-04 已新增数据库静态基线与安全执行入口，冻结 0001–0046 共 46 个迁移，聚合 SHA-256 为 `d9f2eb50bacd747b7cbf08492189c2635b7c0ec2cf4c764def1d32a837f8ba93`。真实 PostgreSQL 验证按用户要求留到最终统一验证。
 - R0-05 workflow run `30910130867` 中，Linux `npm ci` 通过；Chromium 启动失败。Rust locked metadata 通过，但 `cargo fmt --check` 失败，Clippy 与 workspace tests 未执行。
 - R0-06 workflow run `30912862564` 建立 Windows 基线。Windows release 构建和 RuntimeOnly startup 通过；startup report 为 PASS，7 条记录、3 个完成操作、0 个无效行、0 个运行时错误。
-- R0-06 精确 Automated 暴露两个 Windows Node 调用问题：目录联接下依赖安装脚本未被识别为直接执行，以及直接启动 `tsc.cmd`/`vite.cmd` 的 `spawnSync EINVAL`。
-- R0-06.1 新增 `scripts/process/execution-context.mjs`、`scripts/process/node-package-cli.mjs` 和 `scripts/verify-node-process-compatibility.mjs`，分别负责规范执行身份、Node 包 CLI 执行和专项回归验证。
-- R0-06.1 更新依赖同步和前端验证入口。Windows workflow run `30919764753` 中，`npm run setup`、依赖检查和完整 `npm run verify:frontend` 均通过；精确 Automated 的前端阶段通过并继续进入 Rust 阶段。
-- 精确 Automated 总体仍在既有 `cargo fmt --check` 处退出 1。该结果未被隐藏，也未描述为总体通过。
-- R0-06.1 证据 artifact 为 `8896665715`，SHA-256 为 `95e567f917082670390860d2671699a59a7c65018cbbb875f5f37ea05288a16d`。Draft PR #2 已关闭且未合并，临时 workflow 已删除。
-- R0-01 至 R0-06.1 未修改前端或 Rust 业务源码、依赖、锁文件、公共接口、数据库迁移、模型边界或用户可观察行为。
+- R0-06 精确 Automated 暴露 Windows Node 调用问题及验收路径契约问题。
+- R0-06.1 新增 `scripts/process/execution-context.mjs`、`scripts/process/node-package-cli.mjs` 和 `scripts/verify-node-process-compatibility.mjs`，关闭目录联接依赖同步与 `.cmd` 子进程调用缺口。Windows workflow run `30919764753` 中完整 frontend 通过，Automated 到达 Rust 阶段。
+- R0-06.2 新增 `scripts/windows/acceptance-paths.psm1` 与 `scripts/verify-windows-path-contract.mjs`，支持根入口既有 `LogDirectory` 参数，并按 Cargo target 登记文件查找 release EXE。
+- R0-06.2 Windows workflow run `30922384735` 中，完整 frontend、release 构建与 RuntimeOnly runner 均实际通过。release EXE 从项目根目录 `.cargo-target\release` 启动；startup report 为 PASS，7 条记录、3 个完成操作、0 个无效行、0 个运行时错误。
+- R0-06.2 证据 artifact 为 `8898312587`，SHA-256 为 `d6ed06066aab354686f86938ec7c55f2c1f740e11a37e42a6a1b5edbbd53df63`。临时 workflow 的 job 最终因产品验证结束后的一条辅助中文日志精确匹配未命中而显示 failure；证据文件已复核，未将 workflow 总体描述为通过。
+- R0-01 至 R0-06.2 未修改前端或 Rust 业务源码、依赖、锁文件、公共接口、数据库迁移、模型边界或用户可观察业务行为。
 - 当前执行环境未建立本地 Git 工作树，用户设备上的未提交与未跟踪文件不可见；远端分支操作不会覆盖这些本地内容。
 
 ## 0.23.0 变更记录
@@ -109,8 +109,8 @@ API 传输与诊断契约保持历史兼容。
 
 ## 验证事实与限制
 
-R0-06.1 已关闭 Windows 目录联接依赖同步和 `.cmd` 子进程调用缺口。Windows 完整 frontend 现已通过，精确 Automated 可以稳定越过前端阶段并进入 Rust 阶段。
+R0-06.1 已关闭 Windows 目录联接依赖同步和 `.cmd` 子进程调用缺口；R0-06.2 已关闭 `LogDirectory` 参数和 Cargo release 查找路径缺口。Windows 完整 frontend、release 构建与 RuntimeOnly startup 均已有真实通过证据。
 
-R00 阶段仍为 **BLOCKED**。尚未关闭的硬缺口包括：Linux Chromium 启动失败、Rust `cargo fmt --check` 失败、Clippy/workspace tests 未执行、Windows 路径与入口参数契约问题、PostgreSQL 实跑和 Windows Full 未执行、用户本机 Windows 10/11 未实机验收。另保留 1 个 moderate npm vulnerability、Vite 大 chunk 和 2 个 Rust dead-code 警告。
+R00 阶段仍为 **BLOCKED**。尚未关闭的硬缺口包括：Linux Chromium 启动失败、Rust `cargo fmt --check` 失败、Clippy/workspace tests 未执行、PostgreSQL 实跑和 Windows Full 未执行、用户本机 Windows 10/11 未实机验收。另保留 1 个 moderate npm vulnerability、Vite 大 chunk 和 2 个 Rust dead-code 警告。
 
-因此未创建 `R00-stage-completion.md`，不得进入 R1。下一唯一 READY 任务为 `R0-06.2 Windows 路径契约修复`。完整事实记录见 `docs/modular-rewrite/R00-baseline/`。
+因此未创建 `R00-stage-completion.md`，不得进入 R1。下一唯一 READY 任务为 `R0-07 Rust 格式门禁修复`。完整事实记录见 `docs/modular-rewrite/R00-baseline/`。
