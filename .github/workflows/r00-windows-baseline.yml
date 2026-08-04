@@ -13,6 +13,12 @@ jobs:
     runs-on: windows-latest
     timeout-minutes: 120
     steps:
+      - name: Preserve repository line endings
+        shell: powershell
+        run: |
+          git config --global core.autocrlf false
+          git config --global core.eol lf
+
       - name: Checkout source
         uses: actions/checkout@v4
         with:
@@ -57,7 +63,11 @@ jobs:
           "npm=$(npm --version)" | Tee-Object -FilePath $environmentLog -Append
           "rustc=$(rustc --version)" | Tee-Object -FilePath $environmentLog -Append
           "cargo=$(cargo --version)" | Tee-Object -FilePath $environmentLog -Append
+          "git_core_autocrlf=$(git config --global --get core.autocrlf)" | Tee-Object -FilePath $environmentLog -Append
+          "git_core_eol=$(git config --global --get core.eol)" | Tee-Object -FilePath $environmentLog -Append
           Set-Location "$env:GITHUB_WORKSPACE\source"
+          $actualLockHash = (Get-FileHash Cargo.lock -Algorithm SHA256).Hash.ToLowerInvariant()
+          "cargo_lock_sha256=$actualLockHash" | Tee-Object -FilePath $environmentLog -Append
           node scripts/verify-windows-acceptance.mjs *>&1 | Tee-Object -FilePath "$env:GITHUB_WORKSPACE\logs\r00-windows-contract-verification.txt"
           $code = $LASTEXITCODE
           "exit_code=$code" | Out-File -FilePath $env:GITHUB_OUTPUT -Encoding utf8 -Append
@@ -70,22 +80,24 @@ jobs:
         shell: powershell
         run: |
           $output = "$env:GITHUB_WORKSPACE\logs\r00-windows-automated-console.txt"
-          & powershell -NoProfile -ExecutionPolicy Bypass -File "$env:GITHUB_WORKSPACE\source\scripts\windows-acceptance.ps1" -Mode Automated -ProjectRoot "$env:GITHUB_WORKSPACE" *>&1 | Tee-Object -FilePath $output
-          $code = $LASTEXITCODE
-          "exit_code=$code" | Out-File -FilePath $env:GITHUB_OUTPUT -Encoding utf8 -Append
-          if ($code -ne 0) { exit $code }
+          $command = 'powershell -NoProfile -ExecutionPolicy Bypass -File "' + $env:GITHUB_WORKSPACE + '\source\scripts\windows-acceptance.ps1" -Mode Automated -ProjectRoot "' + $env:GITHUB_WORKSPACE + '" > "' + $output + '" 2>&1'
+          $process = Start-Process -FilePath "cmd.exe" -ArgumentList @("/d", "/s", "/c", $command) -Wait -PassThru -NoNewWindow
+          if (Test-Path $output) { Get-Content -Raw -Encoding Unicode $output -ErrorAction SilentlyContinue; Get-Content -Raw -Encoding UTF8 $output -ErrorAction SilentlyContinue }
+          "exit_code=$($process.ExitCode)" | Out-File -FilePath $env:GITHUB_OUTPUT -Encoding utf8 -Append
+          if ($process.ExitCode -ne 0) { exit $process.ExitCode }
 
       - name: Build Windows release independently
         id: release
         if: always()
         continue-on-error: true
         shell: powershell
-        working-directory: source
         run: |
-          npm run setup *>&1 | Tee-Object -FilePath "$env:GITHUB_WORKSPACE\logs\r00-windows-release-build.txt"
-          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
-          npm run tauri:build *>&1 | Tee-Object -FilePath "$env:GITHUB_WORKSPACE\logs\r00-windows-release-build.txt" -Append
-          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          $output = "$env:GITHUB_WORKSPACE\logs\r00-windows-release-build.txt"
+          $command = 'cd /d "' + $env:GITHUB_WORKSPACE + '\source" && npm run setup && npm run tauri:build > "' + $output + '" 2>&1'
+          $process = Start-Process -FilePath "cmd.exe" -ArgumentList @("/d", "/s", "/c", $command) -Wait -PassThru -NoNewWindow
+          if (Test-Path $output) { Get-Content -Raw -Encoding Unicode $output -ErrorAction SilentlyContinue; Get-Content -Raw -Encoding UTF8 $output -ErrorAction SilentlyContinue }
+          "exit_code=$($process.ExitCode)" | Out-File -FilePath $env:GITHUB_OUTPUT -Encoding utf8 -Append
+          if ($process.ExitCode -ne 0) { exit $process.ExitCode }
 
       - name: Run startup RuntimeOnly acceptance
         id: runtime
@@ -94,10 +106,11 @@ jobs:
         shell: powershell
         run: |
           $output = "$env:GITHUB_WORKSPACE\logs\r00-windows-runtime-only-console.txt"
-          & powershell -NoProfile -ExecutionPolicy Bypass -File "$env:GITHUB_WORKSPACE\source\scripts\windows-acceptance.ps1" -Mode RuntimeOnly -ProjectRoot "$env:GITHUB_WORKSPACE" *>&1 | Tee-Object -FilePath $output
-          $code = $LASTEXITCODE
-          "exit_code=$code" | Out-File -FilePath $env:GITHUB_OUTPUT -Encoding utf8 -Append
-          if ($code -ne 0) { exit $code }
+          $command = 'powershell -NoProfile -ExecutionPolicy Bypass -File "' + $env:GITHUB_WORKSPACE + '\source\scripts\windows-acceptance.ps1" -Mode RuntimeOnly -ProjectRoot "' + $env:GITHUB_WORKSPACE + '" > "' + $output + '" 2>&1'
+          $process = Start-Process -FilePath "cmd.exe" -ArgumentList @("/d", "/s", "/c", $command) -Wait -PassThru -NoNewWindow
+          if (Test-Path $output) { Get-Content -Raw -Encoding Unicode $output -ErrorAction SilentlyContinue; Get-Content -Raw -Encoding UTF8 $output -ErrorAction SilentlyContinue }
+          "exit_code=$($process.ExitCode)" | Out-File -FilePath $env:GITHUB_OUTPUT -Encoding utf8 -Append
+          if ($process.ExitCode -ne 0) { exit $process.ExitCode }
 
       - name: Write execution summary
         if: always()
@@ -109,6 +122,7 @@ jobs:
           "automated_outcome=${{ steps.automated.outcome }}" | Out-File -FilePath $summary -Encoding utf8 -Append
           "automated_exit_code=${{ steps.automated.outputs.exit_code }}" | Out-File -FilePath $summary -Encoding utf8 -Append
           "release_outcome=${{ steps.release.outcome }}" | Out-File -FilePath $summary -Encoding utf8 -Append
+          "release_exit_code=${{ steps.release.outputs.exit_code }}" | Out-File -FilePath $summary -Encoding utf8 -Append
           "runtime_outcome=${{ steps.runtime.outcome }}" | Out-File -FilePath $summary -Encoding utf8 -Append
           "runtime_exit_code=${{ steps.runtime.outputs.exit_code }}" | Out-File -FilePath $summary -Encoding utf8 -Append
           Get-ChildItem "$env:GITHUB_WORKSPACE\logs" -File -ErrorAction SilentlyContinue |
