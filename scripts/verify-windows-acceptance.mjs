@@ -14,6 +14,7 @@ const contract = json("contracts/windows-acceptance-contract.json");
 const pkg = json("package.json");
 const reportSchema = json(contract.report_schema_file);
 const powershell = read(contract.powershell_runner);
+const pathContract = read("scripts/windows/acceptance-paths.psm1");
 const analyzer = read(contract.runtime_analyzer);
 const launcher = readFileSync(join(root, contract.root_launcher), "utf8");
 const releasePackageVerifier = read("scripts/verify-release-package.mjs");
@@ -42,7 +43,33 @@ for (const marker of [
 check(powershell.includes("AcceptanceContract.database_safety.required_name_pattern") && powershell.includes("AcceptanceContract.minimum_versions.node"), "验收器未从机器契约读取数据库与工具链门禁");
 check(!powershell.includes("Write-AcceptanceLog \"测试数据库 URL"), "验收日志不得写入完整数据库URL");
 check(analyzer.includes("operation_completed") && analyzer.includes("forbidden_runtime_levels"), "运行日志分析器未校验完成操作或错误等级");
-check(launcher.includes("windows-acceptance.ps1") && launcher.includes("-Mode Full") && launcher.includes(".\\logs"), "根目录验收入口未启动Full模式或未使用相对日志目录");
+check(
+  launcher.includes("windows-acceptance.ps1")
+    && launcher.includes("-Mode Full")
+    && launcher.includes("-LogDirectory .\\logs"),
+  "根目录验收入口未启动Full模式或未传递相对日志目录",
+);
+check(
+  /\[string\]\$LogDirectory\s*=\s*""/.test(powershell)
+    && powershell.includes('Import-Module -Name $PathModulePath')
+    && powershell.includes("Resolve-AcceptanceLogRoot -ProjectRoot $ProjectRoot -LogDirectory $LogDirectory"),
+  "Windows验收器未声明并解析日志目录参数",
+);
+check(
+  powershell.includes("Resolve-CargoTargetRoot -SourceRoot $SourceRoot")
+    && powershell.includes("Find-AcceptanceReleaseExecutable -CargoTargetRoot $CargoTargetRoot")
+    && !powershell.includes('Join-Path $SourceRoot ".cargo-target\\release"'),
+  "Windows验收器仍使用错误的源码内 Cargo release 路径",
+);
+for (const marker of [
+  "function Resolve-AcceptanceLogRoot",
+  "function Resolve-CargoTargetRoot",
+  "function Find-AcceptanceReleaseExecutable",
+  '".cargo\\target-location.json"',
+  '"..\\.cargo-target"',
+]) {
+  check(pathContract.includes(marker), `Windows路径契约模块缺少：${marker}`);
+}
 check(pkg.scripts?.["acceptance:windows"] === "powershell -NoProfile -ExecutionPolicy Bypass -File scripts/windows-acceptance.ps1", "package.json缺少Windows验收执行命令");
 check(pkg.scripts?.["verify:windows-acceptance"] === "node scripts/verify-windows-acceptance.mjs", "package.json缺少Windows验收契约命令");
 check(pkg.scripts.build.includes("verify-frontend.mjs") && read("scripts/verify-frontend.mjs").includes("verify-windows-acceptance.mjs"), "Windows验收契约未进入正式前端门禁");
