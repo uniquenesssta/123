@@ -1,0 +1,47 @@
+name: R0-07 Rust Format Diagnostics Temporary
+
+on:
+  pull_request:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+jobs:
+  rust-format-diagnostics:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - name: Set up Rust 1.88.0 with rustfmt
+        uses: dtolnay/rust-toolchain@1.88.0
+        with:
+          components: rustfmt
+
+      - name: Capture rustfmt changes
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p r0-07-evidence/formatted
+          cargo fmt --all
+          git diff --name-only -- '*.rs' | tee r0-07-evidence/changed-rust-files.txt
+          git diff -- '*.rs' > r0-07-evidence/rustfmt.patch
+          while IFS= read -r file; do
+            [ -n "$file" ] || continue
+            mkdir -p "r0-07-evidence/formatted/$(dirname "$file")"
+            cp "$file" "r0-07-evidence/formatted/$file"
+          done < r0-07-evidence/changed-rust-files.txt
+          cargo fmt --all -- --check
+
+      - name: Upload R0-07 formatting evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: r00-07-rust-format-diagnostics
+          path: r0-07-evidence/**
+          if-no-files-found: error
+          retention-days: 30
