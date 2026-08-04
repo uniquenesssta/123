@@ -28,6 +28,10 @@ Windows 可使用：
 
 `verify:frontend` 包含公开模型边界、TypeScript、静态契约和 Vite 生产构建。`verify:rust` 包含 Cargo.lock 一致性、格式检查、Clippy 与工作区测试。数据库集成测试必须连接名称包含 `test` 的专用 PostgreSQL 数据库。
 
+## 模块化重写状态
+
+阶段 0 基线工作已经开始。当前已完成 S0-01 仓库、规则、工具链和源码规模基线；尚未修改业务源码、接口、依赖、配置、迁移或用户行为。阶段记录位于 `docs/modular-rewrite/stage-0-baseline/baseline-audit.md`，阶段 1 在阶段 0 门禁通过前保持阻塞。
+
 ## 0.23.0 变更记录
 
 - 删除真实 P4/P7 模型 crate、参数、Profile、固定比赛、模型专用契约、Schema、研究资源和验证脚本。
