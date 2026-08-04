@@ -47,7 +47,12 @@ check(pkg.scripts?.["acceptance:windows"] === "powershell -NoProfile -ExecutionP
 check(pkg.scripts?.["verify:windows-acceptance"] === "node scripts/verify-windows-acceptance.mjs", "package.json缺少Windows验收契约命令");
 check(pkg.scripts.build.includes("verify-frontend.mjs") && read("scripts/verify-frontend.mjs").includes("verify-windows-acceptance.mjs"), "Windows验收契约未进入正式前端门禁");
 check(releasePackageVerifier.includes('"验收平台.bat"'), "发布包洁净度门禁未允许验收入口");
-check(testing.includes("Windows 全链路验收") && readme.includes("Windows实机全链路验收阶段 5"), "验收说明或README维护记录缺失");
+check(
+  testing.includes("Windows 全链路验收")
+    && readme.includes("验收平台.bat")
+    && /Windows\s*实机全链路验收阶段\s*5/.test(readme),
+  "验收说明或README维护记录缺失",
+);
 
 const temporary = mkdtempSync(join(tmpdir(), "football-windows-acceptance-"));
 try {
