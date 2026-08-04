@@ -78,6 +78,7 @@
 - release EXE 从 `D:\a\123\123\.cargo-target\release\football-match-model-desktop.exe` 成功启动。
 - 证据 artifact `8898312587`，SHA-256：`d6ed06066aab354686f86938ec7c55f2c1f740e11a37e42a6a1b5edbbd53df63`。
 - 临时 workflow 的最终 job 状态为 failure，原因是所有产品验证通过后的一条中文完整日志行辅助精确匹配未命中；证据文件已复核 target、启动路径和 PASS 报告一致，未将 workflow 总体描述为通过。
+- Draft PR #3 已关闭且未合并；临时 workflow 已删除。
 
 ## 任务状态表
 
@@ -99,7 +100,7 @@
 - 新增 R0-01 至 R0-06.2 节点记录。
 - 新增职责单一的 Windows Node 执行模块、Windows 路径模块及相应专项验证器。
 - 修改仅限验证工具和文档；未修改前端或 Rust 业务源码、依赖、锁文件、公共接口、迁移 SQL、模型实现或用户可观察业务行为。
-- R0-06.2 临时 workflow 将在收尾提交删除；Draft PR #3 将关闭且不合并。
+- R0-06.2 临时 workflow 已删除；Draft PR #3 已关闭且未合并。
 
 ## 未解决问题
 
