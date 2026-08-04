@@ -33,7 +33,6 @@ if (-not (Test-Path $ContractPath)) { throw "缺少 Windows 验收契约：$Cont
 $AcceptanceContract = Get-Content -Raw -Encoding UTF8 $ContractPath | ConvertFrom-Json
 $LogRoot = Resolve-AcceptanceLogRoot -ProjectRoot $ProjectRoot -LogDirectory $LogDirectory
 $RuntimeLogRoot = Join-Path $ProjectRoot "logs"
-$CargoTargetRoot = Resolve-CargoTargetRoot -SourceRoot $SourceRoot
 New-Item -ItemType Directory -Force -Path $LogRoot | Out-Null
 New-Item -ItemType Directory -Force -Path $RuntimeLogRoot | Out-Null
 $Timestamp = Get-Date -Format "yyyyMMdd-HHmmss"
@@ -92,7 +91,7 @@ function Wait-NewRuntimeLog([datetime]$StartedAt) {
 try {
   Set-Location $SourceRoot
   Write-AcceptanceLog "Windows 全链路验收开始：模式=$Mode"
-  Write-AcceptanceLog "路径契约：验收日志=$LogRoot；Cargo目标=$CargoTargetRoot"
+  Write-AcceptanceLog "路径契约：验收日志=$LogRoot；运行日志=$RuntimeLogRoot"
   $nodeText = (& node --version)
   $npmText = (& npm --version)
   $rustText = (& rustc --version)
@@ -115,6 +114,8 @@ try {
     Invoke-Stage "Tauri Windows release 构建" "npm.cmd" @("run", "tauri:build")
   }
 
+  $CargoTargetRoot = Resolve-CargoTargetRoot -SourceRoot $SourceRoot
+  Write-AcceptanceLog "Cargo 目标目录已解析：$CargoTargetRoot"
   $exe = Find-AcceptanceReleaseExecutable -CargoTargetRoot $CargoTargetRoot
   $env:FOOTBALL_RUNTIME_ROOT = $ProjectRoot
   $env:FOOTBALL_PROJECT_ROOT = $ProjectRoot
