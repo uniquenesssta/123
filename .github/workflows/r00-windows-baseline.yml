@@ -13,27 +13,43 @@ jobs:
     runs-on: windows-latest
     timeout-minutes: 120
     steps:
-      - name: Checkout source under required project directory
+      - name: Checkout source
         uses: actions/checkout@v4
         with:
-          path: 项目源码
+          path: source
 
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
           node-version: 22
           cache: npm
-          cache-dependency-path: 项目源码/package-lock.json
+          cache-dependency-path: source/package-lock.json
 
       - name: Set up Rust 1.88.0
         uses: dtolnay/rust-toolchain@1.88.0
         with:
           components: rustfmt, clippy
 
-      - name: Record environment and verify Windows acceptance contract
+      - name: Prepare required source directory alias
         shell: powershell
         run: |
           New-Item -ItemType Directory -Force -Path "$env:GITHUB_WORKSPACE\logs" | Out-Null
+          $sourceName = -join ([char[]](0x9879, 0x76EE, 0x6E90, 0x7801))
+          $requiredSource = Join-Path $env:GITHUB_WORKSPACE $sourceName
+          if (-not (Test-Path $requiredSource)) {
+            New-Item -ItemType Junction -Path $requiredSource -Target "$env:GITHUB_WORKSPACE\source" | Out-Null
+          }
+          if (-not (Test-Path (Join-Path $requiredSource "package.json"))) {
+            throw "Required source directory alias was not created correctly."
+          }
+          "required_source=$requiredSource" | Out-File -FilePath "$env:GITHUB_WORKSPACE\logs\r00-windows-layout.txt" -Encoding utf8
+
+      - name: Record environment and verify Windows acceptance contract
+        id: contract
+        if: always()
+        continue-on-error: true
+        shell: powershell
+        run: |
           $environmentLog = "$env:GITHUB_WORKSPACE\logs\r00-windows-environment.txt"
           "runner_os=$env:RUNNER_OS" | Tee-Object -FilePath $environmentLog
           "windows_version=$([Environment]::OSVersion.VersionString)" | Tee-Object -FilePath $environmentLog -Append
@@ -41,26 +57,30 @@ jobs:
           "npm=$(npm --version)" | Tee-Object -FilePath $environmentLog -Append
           "rustc=$(rustc --version)" | Tee-Object -FilePath $environmentLog -Append
           "cargo=$(cargo --version)" | Tee-Object -FilePath $environmentLog -Append
-          Set-Location "$env:GITHUB_WORKSPACE\项目源码"
+          Set-Location "$env:GITHUB_WORKSPACE\source"
           node scripts/verify-windows-acceptance.mjs *>&1 | Tee-Object -FilePath "$env:GITHUB_WORKSPACE\logs\r00-windows-contract-verification.txt"
-          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          $code = $LASTEXITCODE
+          "exit_code=$code" | Out-File -FilePath $env:GITHUB_OUTPUT -Encoding utf8 -Append
+          if ($code -ne 0) { exit $code }
 
       - name: Run Automated Windows acceptance
         id: automated
+        if: always()
         continue-on-error: true
         shell: powershell
         run: |
           $output = "$env:GITHUB_WORKSPACE\logs\r00-windows-automated-console.txt"
-          & powershell -NoProfile -ExecutionPolicy Bypass -File "$env:GITHUB_WORKSPACE\项目源码\scripts\windows-acceptance.ps1" -Mode Automated -ProjectRoot "$env:GITHUB_WORKSPACE" *>&1 | Tee-Object -FilePath $output
+          & powershell -NoProfile -ExecutionPolicy Bypass -File "$env:GITHUB_WORKSPACE\source\scripts\windows-acceptance.ps1" -Mode Automated -ProjectRoot "$env:GITHUB_WORKSPACE" *>&1 | Tee-Object -FilePath $output
           $code = $LASTEXITCODE
           "exit_code=$code" | Out-File -FilePath $env:GITHUB_OUTPUT -Encoding utf8 -Append
           if ($code -ne 0) { exit $code }
 
       - name: Build Windows release independently
         id: release
+        if: always()
         continue-on-error: true
         shell: powershell
-        working-directory: 项目源码
+        working-directory: source
         run: |
           npm run setup *>&1 | Tee-Object -FilePath "$env:GITHUB_WORKSPACE\logs\r00-windows-release-build.txt"
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
@@ -69,12 +89,12 @@ jobs:
 
       - name: Run startup RuntimeOnly acceptance
         id: runtime
-        if: steps.release.outcome == 'success'
+        if: always() && steps.release.outcome == 'success'
         continue-on-error: true
         shell: powershell
         run: |
           $output = "$env:GITHUB_WORKSPACE\logs\r00-windows-runtime-only-console.txt"
-          & powershell -NoProfile -ExecutionPolicy Bypass -File "$env:GITHUB_WORKSPACE\项目源码\scripts\windows-acceptance.ps1" -Mode RuntimeOnly -ProjectRoot "$env:GITHUB_WORKSPACE" *>&1 | Tee-Object -FilePath $output
+          & powershell -NoProfile -ExecutionPolicy Bypass -File "$env:GITHUB_WORKSPACE\source\scripts\windows-acceptance.ps1" -Mode RuntimeOnly -ProjectRoot "$env:GITHUB_WORKSPACE" *>&1 | Tee-Object -FilePath $output
           $code = $LASTEXITCODE
           "exit_code=$code" | Out-File -FilePath $env:GITHUB_OUTPUT -Encoding utf8 -Append
           if ($code -ne 0) { exit $code }
@@ -84,7 +104,9 @@ jobs:
         shell: powershell
         run: |
           $summary = "$env:GITHUB_WORKSPACE\logs\r00-windows-step-summary.txt"
-          "automated_outcome=${{ steps.automated.outcome }}" | Out-File -FilePath $summary -Encoding utf8
+          "contract_outcome=${{ steps.contract.outcome }}" | Out-File -FilePath $summary -Encoding utf8
+          "contract_exit_code=${{ steps.contract.outputs.exit_code }}" | Out-File -FilePath $summary -Encoding utf8 -Append
+          "automated_outcome=${{ steps.automated.outcome }}" | Out-File -FilePath $summary -Encoding utf8 -Append
           "automated_exit_code=${{ steps.automated.outputs.exit_code }}" | Out-File -FilePath $summary -Encoding utf8 -Append
           "release_outcome=${{ steps.release.outcome }}" | Out-File -FilePath $summary -Encoding utf8 -Append
           "runtime_outcome=${{ steps.runtime.outcome }}" | Out-File -FilePath $summary -Encoding utf8 -Append
@@ -108,6 +130,7 @@ jobs:
         if: always()
         shell: powershell
         run: |
+          if ("${{ steps.contract.outcome }}" -ne "success") { exit 1 }
           if ("${{ steps.automated.outcome }}" -ne "success") { exit 1 }
           if ("${{ steps.release.outcome }}" -ne "success") { exit 1 }
           if ("${{ steps.runtime.outcome }}" -ne "success") { exit 1 }
