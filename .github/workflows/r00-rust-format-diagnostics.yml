@@ -1,4 +1,4 @@
-name: R0-07 Rust Format Apply Temporary
+name: R0-07 Exact Rust Verification Temporary
 
 on:
   pull_request:
@@ -6,105 +6,69 @@ on:
       - main
 
 permissions:
-  contents: write
+  contents: read
 
 jobs:
-  rust-format-apply:
+  exact-rust-verification:
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 45
     steps:
       - name: Checkout implementation branch
         uses: actions/checkout@v4
         with:
           ref: new-A
-          fetch-depth: 0
+          fetch-depth: 1
 
-      - name: Set up Rust 1.88.0 with rustfmt
-        uses: dtolnay/rust-toolchain@1.88.0
+      - name: Set up Node.js 22
+        uses: actions/setup-node@v4
         with:
-          components: rustfmt
+          node-version: 22
+          cache: npm
 
-      - name: Apply approved rustfmt change set
+      - name: Install Tauri Linux system packages
         shell: bash
         run: |
-          set -euo pipefail
+          sudo apt-get update
+          sudo apt-get install -y \
+            build-essential \
+            curl \
+            file \
+            libayatana-appindicator3-dev \
+            librsvg2-dev \
+            libssl-dev \
+            libwebkit2gtk-4.1-dev \
+            libxdo-dev \
+            wget
+
+      - name: Set up Rust 1.88.0 with rustfmt and clippy
+        uses: dtolnay/rust-toolchain@1.88.0
+        with:
+          components: rustfmt, clippy
+
+      - name: Install locked Node dependencies
+        shell: bash
+        run: npm ci
+
+      - name: Run exact npm Rust verification
+        shell: bash
+        run: |
+          set -o pipefail
           mkdir -p r0-07-evidence
-          cargo fmt --all
-          git diff --name-only -- '*.rs' | LC_ALL=C sort | tee r0-07-evidence/changed-rust-files.txt
-          git diff -- '*.rs' > r0-07-evidence/rustfmt.patch
+          set +e
+          npm run verify:rust 2>&1 | tee r0-07-evidence/verify-rust.txt
+          status=${PIPESTATUS[0]}
+          set -e
+          printf '%s\n' "$status" > r0-07-evidence/verify-rust-exit-code.txt
+          cargo fmt --all -- --check > r0-07-evidence/rustfmt-check.txt 2>&1
+          printf 'format_check=pass\n' > r0-07-evidence/summary.txt
+          printf 'verify_rust_exit_code=%s\n' "$status" >> r0-07-evidence/summary.txt
+          exit "$status"
 
-          cat > r0-07-evidence/approved-rust-files.txt <<'EOF'
-          crates/application/src/analytics.rs
-          crates/application/src/lib.rs
-          crates/application/src/match_review_package.rs
-          crates/application/src/model_shell/mod.rs
-          crates/application/src/p4_orchestration.rs
-          crates/application/src/player_catalog.rs
-          crates/application/src/postmatch.rs
-          crates/application/src/prediction.rs
-          crates/application/src/release_acceptance.rs
-          crates/application/src/rule_packages.rs
-          crates/application/src/spreadsheet.rs
-          crates/domain/src/match_event.rs
-          crates/domain/src/match_review_package.rs
-          crates/domain/src/match_review_workflow.rs
-          crates/domain/src/release_acceptance.rs
-          crates/domain/src/team_package.rs
-          crates/persistence-postgres/src/analytics.rs
-          crates/persistence-postgres/src/connection.rs
-          crates/persistence-postgres/src/lineup_chain.rs
-          crates/persistence-postgres/src/match_exchange.rs
-          crates/persistence-postgres/src/match_prediction.rs
-          crates/persistence-postgres/src/match_review_package.rs
-          crates/persistence-postgres/src/model_runs.rs
-          crates/persistence-postgres/src/monthly_workbooks.rs
-          crates/persistence-postgres/src/name_search.rs
-          crates/persistence-postgres/src/parameter_lifecycle.rs
-          crates/persistence-postgres/src/player_catalog.rs
-          crates/persistence-postgres/src/postmatch.rs
-          crates/persistence-postgres/src/release_acceptance.rs
-          crates/persistence-postgres/src/review.rs
-          crates/persistence-postgres/src/role_resolution.rs
-          crates/persistence-postgres/src/spreadsheet_exchange.rs
-          crates/persistence-postgres/src/team_force_delete.rs
-          crates/persistence-postgres/src/team_lineup_presets.rs
-          crates/persistence-postgres/tests/postgres_integration.rs
-          crates/spreadsheet-io/src/lib.rs
-          crates/spreadsheet-io/src/match_review_workbook.rs
-          crates/spreadsheet-io/src/monthly_workbook.rs
-          crates/spreadsheet-io/src/team_package.rs
-          src-tauri/src/commands.rs
-          src-tauri/src/commands/catalog.rs
-          src-tauri/src/runtime_log.rs
-          EOF
-          sed -i 's/^          //' r0-07-evidence/approved-rust-files.txt
-
-          if [ ! -s r0-07-evidence/changed-rust-files.txt ]; then
-            echo "Approved rustfmt change set is already applied."
-            cargo fmt --all -- --check
-            exit 0
-          fi
-
-          diff -u r0-07-evidence/approved-rust-files.txt r0-07-evidence/changed-rust-files.txt
-          if git diff --name-only | grep -Ev '\.rs$' >/dev/null; then
-            echo "rustfmt changed a non-Rust file." >&2
-            git diff --name-only >&2
-            exit 1
-          fi
-          git diff --check
-          cargo fmt --all -- --check
-
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          xargs -d '\n' git add -- < r0-07-evidence/changed-rust-files.txt
-          git commit -m "style(r00): apply workspace rustfmt"
-          git push origin HEAD:new-A
-
-      - name: Upload R0-07 formatting evidence
+      - name: Upload exact Rust verification evidence
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: r00-07-rust-format-apply
+          name: r00-07-exact-rust-verification
           path: r0-07-evidence/**
           if-no-files-found: error
           retention-days: 30
