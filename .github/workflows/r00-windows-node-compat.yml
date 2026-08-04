@@ -8,9 +8,50 @@ permissions:
   contents: read
 
 jobs:
-  windows-node-compatibility:
+  windows-frontend:
     runs-on: windows-latest
-    timeout-minutes: 60
+    timeout-minutes: 30
+    steps:
+      - name: Preserve repository line endings
+        shell: powershell
+        run: |
+          git config --global core.autocrlf false
+          git config --global core.eol lf
+
+      - name: Checkout source
+        uses: actions/checkout@v4
+        with:
+          path: source
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: source/package-lock.json
+
+      - name: Prepare junction path
+        shell: powershell
+        run: |
+          $sourceName = -join ([char[]](0x9879, 0x76EE, 0x6E90, 0x7801))
+          $requiredSource = Join-Path $env:GITHUB_WORKSPACE $sourceName
+          New-Item -ItemType Junction -Path $requiredSource -Target "$env:GITHUB_WORKSPACE\source" | Out-Null
+
+      - name: Verify setup and frontend through junction path
+        shell: powershell
+        run: |
+          $sourceName = -join ([char[]](0x9879, 0x76EE, 0x6E90, 0x7801))
+          Set-Location (Join-Path $env:GITHUB_WORKSPACE $sourceName)
+          npm run setup
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          node scripts/ensure-node-dependencies.mjs --check
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          npm run verify:frontend
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+
+  windows-automated:
+    runs-on: windows-latest
+    timeout-minutes: 30
     steps:
       - name: Preserve repository line endings
         shell: powershell
@@ -41,25 +82,7 @@ jobs:
           New-Item -ItemType Directory -Force -Path "$env:GITHUB_WORKSPACE\logs" | Out-Null
           $sourceName = -join ([char[]](0x9879, 0x76EE, 0x6E90, 0x7801))
           $requiredSource = Join-Path $env:GITHUB_WORKSPACE $sourceName
-          if (-not (Test-Path $requiredSource)) {
-            New-Item -ItemType Junction -Path $requiredSource -Target "$env:GITHUB_WORKSPACE\source" | Out-Null
-          }
-          if (-not (Test-Path (Join-Path $requiredSource "package.json"))) {
-            throw "Required source directory alias was not created correctly."
-          }
-
-      - name: Verify setup and frontend through junction path
-        shell: powershell
-        run: |
-          $sourceName = -join ([char[]](0x9879, 0x76EE, 0x6E90, 0x7801))
-          $requiredSource = Join-Path $env:GITHUB_WORKSPACE $sourceName
-          Set-Location $requiredSource
-          npm run setup
-          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
-          node scripts/ensure-node-dependencies.mjs --check
-          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
-          npm run verify:frontend
-          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          New-Item -ItemType Junction -Path $requiredSource -Target "$env:GITHUB_WORKSPACE\source" | Out-Null
 
       - name: Verify exact Automated reaches Rust stage
         shell: powershell
@@ -82,5 +105,5 @@ jobs:
         with:
           name: r00-06-1-windows-node-compatibility
           path: logs/**
-          if-no-files-found: warn
+          if-no-files-found: error
           retention-days: 30
