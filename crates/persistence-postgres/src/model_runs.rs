@@ -269,7 +269,9 @@ impl PostgresStore {
         .bind(reason)
         .fetch_optional(&mut *tx)
         .await?
-        .ok_or_else(|| PersistenceError::InvalidState("推演记录不存在或尚未成功完成".to_string()))?;
+        .ok_or_else(|| {
+            PersistenceError::InvalidState("推演记录不存在或尚未成功完成".to_string())
+        })?;
         write_audit_event(
             &mut tx,
             "model_run_history_hidden",
@@ -499,10 +501,9 @@ fn prepared_run_input_audit(input: &Value) -> PersistenceResult<PreparedRunInput
             "input_audit.readiness.score 必须在 0..=100 范围内".to_string(),
         ));
     }
-    let manifest = audit
-        .get("manifest")
-        .cloned()
-        .ok_or_else(|| PersistenceError::InvalidState("input_audit.manifest 不能为空".to_string()))?;
+    let manifest = audit.get("manifest").cloned().ok_or_else(|| {
+        PersistenceError::InvalidState("input_audit.manifest 不能为空".to_string())
+    })?;
     let manifest_sha256 = audit
         .get("manifest_sha256")
         .and_then(Value::as_str)

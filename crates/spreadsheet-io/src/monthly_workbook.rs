@@ -524,10 +524,7 @@ fn write_header(worksheet: &mut Worksheet, headers: &[&str]) -> Result<(), XlsxE
     Ok(())
 }
 
-fn add_monthly_validations(
-    worksheet: &mut Worksheet,
-    headers: &[&str],
-) -> Result<(), XlsxError> {
+fn add_monthly_validations(worksheet: &mut Worksheet, headers: &[&str]) -> Result<(), XlsxError> {
     for (column, header) in headers.iter().enumerate() {
         let values: Option<&[&str]> = match *header {
             "action" => Some(&["add", "update", "clear", "skip"]),
@@ -1115,7 +1112,6 @@ fn add_metadata_sheet(
     Ok(())
 }
 
-
 fn apply_default_role_alias(values: &mut Map<String, Value>) {
     if values
         .get("default_role_code")
@@ -1180,7 +1176,10 @@ fn read_monthly_workbook(
             .collect::<Vec<_>>();
         for required in sheet.headers {
             if !headers.iter().any(|header| header == required)
-                && !matches!((entity_type, *required), (SpreadsheetEntityType::PlayerPosition, "default_role_code"))
+                && !matches!(
+                    (entity_type, *required),
+                    (SpreadsheetEntityType::PlayerPosition, "default_role_code")
+                )
             {
                 return Err(SpreadsheetError::InvalidTemplate(format!(
                     "工作表 {} 缺少固定列 {}",

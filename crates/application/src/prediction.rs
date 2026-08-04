@@ -1,7 +1,9 @@
 use super::{
-    p4_default_match, p4_default_parameters, ApplicationError, ApplicationResult, ApplicationService,
-    PredictionCommand, PredictionExecution, RoutePreviewCommand, StoredMatchPredictionCommand,
+    p4_default_match, p4_default_parameters, ApplicationError, ApplicationResult,
+    ApplicationService, PredictionCommand, PredictionExecution, RoutePreviewCommand,
+    StoredMatchPredictionCommand,
 };
+use crate::model_shell::P4_MODEL_ID;
 use chrono::{DateTime, Utc};
 use football_domain::{
     CompetitionKind, MatchContext, MatchLineupChain, MatchPredictionReadiness, ModelIdentity,
@@ -10,7 +12,6 @@ use football_domain::{
     PREDICTION_INPUT_AUDIT_VERSION,
 };
 use football_model_api::{ModelOutput, ModelRequest};
-use crate::model_shell::P4_MODEL_ID;
 use football_persistence_postgres::{ModelRunListItem, PersistenceError};
 use serde_json::{json, Value};
 use sha2::{Digest, Sha256};
@@ -168,11 +169,7 @@ impl ApplicationService {
         ));
 
         let lineup_chain = match store
-            .read_match_lineup_chain_at(
-                command.match_id,
-                &command.snapshot_type,
-                assessed_at,
-            )
+            .read_match_lineup_chain_at(command.match_id, &command.snapshot_type, assessed_at)
             .await
         {
             Ok(chain) => {
@@ -243,11 +240,10 @@ impl ApplicationService {
                             scope.competition_kind.as_str()
                         )));
                     }
-                                validate_snapshot_type(&command.snapshot_type, &decision.routing)?;
-                    let model = self
-                        .registry
-                        .get(&decision.model_id)
-                        .ok_or_else(|| ApplicationError::ModelNotFound(decision.model_id.clone()))?;
+                    validate_snapshot_type(&command.snapshot_type, &decision.routing)?;
+                    let model = self.registry.get(&decision.model_id).ok_or_else(|| {
+                        ApplicationError::ModelNotFound(decision.model_id.clone())
+                    })?;
                     let context = MatchContext {
                         match_key: match_record.external_key.clone(),
                         kickoff_time: match_record.kickoff_time,
@@ -307,7 +303,10 @@ impl ApplicationService {
             Err(error) => return Err(error.into()),
         }
 
-        if lineup_chain.as_ref().is_some_and(|chain| chain.ready_for_model) {
+        if lineup_chain
+            .as_ref()
+            .is_some_and(|chain| chain.ready_for_model)
+        {
             match store
                 .prepare_match_prediction_input_at(
                     command.match_id,
@@ -396,10 +395,7 @@ impl ApplicationService {
                 route_identity.as_ref(),
             )
         });
-        let input_manifest_sha256 = input_manifest
-            .as_ref()
-            .map(sha256_value)
-            .transpose()?;
+        let input_manifest_sha256 = input_manifest.as_ref().map(sha256_value).transpose()?;
 
         Ok(MatchPredictionReadiness {
             audit_version: PREDICTION_INPUT_AUDIT_VERSION.to_string(),
@@ -426,14 +422,16 @@ impl ApplicationService {
         &self,
         command: StoredMatchPredictionCommand,
     ) -> ApplicationResult<PredictionExecution> {
-        self.execute_prediction_from_match_with_mode(command, true).await
+        self.execute_prediction_from_match_with_mode(command, true)
+            .await
     }
 
     pub async fn execute_shadow_prediction_from_match(
         &self,
         command: StoredMatchPredictionCommand,
     ) -> ApplicationResult<PredictionExecution> {
-        self.execute_prediction_from_match_with_mode(command, false).await
+        self.execute_prediction_from_match_with_mode(command, false)
+            .await
     }
 
     async fn execute_prediction_from_match_with_mode(
@@ -458,10 +456,14 @@ impl ApplicationService {
             let mode = if persist_run { "正式" } else { "影子" };
             return Err(ApplicationError::Validation(format!(
                 "赛前数据完整度门禁未允许{mode}推演（{}，{} 分）：{}",
-                readiness.level.as_str(), readiness.score, reasons
+                readiness.level.as_str(),
+                readiness.score,
+                reasons
             )));
         }
-        let model_family = normalize_model_selection(&command.model_family)?.family.to_string();
+        let model_family = normalize_model_selection(&command.model_family)?
+            .family
+            .to_string();
         let store = self.active_store().await?;
         let mut prepared = store
             .prepare_match_prediction_input_at(
@@ -669,8 +671,6 @@ fn validate_snapshot_type(snapshot_type: &str, routing: &RuleRouting) -> Applica
     Ok(())
 }
 
-
-
 fn route_identity_manifest(decision: &RouteDecision) -> Value {
     json!({
         "source": decision.source,
@@ -733,7 +733,10 @@ fn selected_lineup<'a>(
     chain: &'a football_domain::MatchLineupTeamChain,
 ) -> Option<&'a football_domain::LineupRecord> {
     let selected_id = chain.selected_lineup_id?;
-    chain.versions.iter().find(|lineup| lineup.id == selected_id)
+    chain
+        .versions
+        .iter()
+        .find(|lineup| lineup.id == selected_id)
 }
 
 fn append_unavailable_lineup_readiness_checks(
@@ -872,13 +875,21 @@ fn append_lineup_readiness_checks(
             ));
         }
         for player in starters {
-            if player.position_code.as_deref().map_or(true, |value| value.trim().is_empty()) {
+            if player
+                .position_code
+                .as_deref()
+                .map_or(true, |value| value.trim().is_empty())
+            {
                 missing_position_details.push(format!(
                     "{team_name}首发 {} 未填写实际位置",
                     player.player_name
                 ));
             }
-            if player.role_code.as_deref().map_or(true, |value| value.trim().is_empty()) {
+            if player
+                .role_code
+                .as_deref()
+                .map_or(true, |value| value.trim().is_empty())
+            {
                 missing_role_count += 1;
             } else if player.role_origin == "player_position_default" {
                 inherited_role_count += 1;
@@ -929,18 +940,17 @@ fn append_lineup_readiness_checks(
         Value::Null,
     ));
 
-    let player_detail_status = if !missing_position_details.is_empty()
-        || !unavailable_starter_details.is_empty()
-    {
-        PredictionReadinessCheckStatus::Blocked
-    } else if missing_role_count > 0
-        || missing_availability_count > 0
-        || uncertain_availability_count > 0
-    {
-        PredictionReadinessCheckStatus::Warning
-    } else {
-        PredictionReadinessCheckStatus::Passed
-    };
+    let player_detail_status =
+        if !missing_position_details.is_empty() || !unavailable_starter_details.is_empty() {
+            PredictionReadinessCheckStatus::Blocked
+        } else if missing_role_count > 0
+            || missing_availability_count > 0
+            || uncertain_availability_count > 0
+        {
+            PredictionReadinessCheckStatus::Warning
+        } else {
+            PredictionReadinessCheckStatus::Passed
+        };
     let mut player_details = missing_position_details;
     player_details.extend(unavailable_starter_details);
     if missing_role_count > 0 {
@@ -1057,9 +1067,7 @@ fn append_prepared_input_checks(
         ));
     }
     if home_history == 0 || away_history == 0 {
-        shadow_reasons.push(
-            "球队历史样本存在零覆盖，当前输入只允许进入影子推演".to_string(),
-        );
+        shadow_reasons.push("球队历史样本存在零覆盖，当前输入只允许进入影子推演".to_string());
     }
     checks.push(readiness_check(
         "team_history",
@@ -1191,7 +1199,6 @@ fn strip_runtime_prediction_input_identity(input: &mut Value) {
     }
 }
 
-
 fn verify_prepared_input_matches_readiness(
     prepared: &football_domain::PreparedMatchPredictionInput,
     readiness: &MatchPredictionReadiness,
@@ -1269,7 +1276,9 @@ fn prediction_input_audit_summary(
         .get("manifest_sha256")
         .and_then(Value::as_str)
         .filter(|value| !value.trim().is_empty())
-        .ok_or_else(|| ApplicationError::Model("input_audit.manifest_sha256 不能为空".to_string()))?;
+        .ok_or_else(|| {
+            ApplicationError::Model("input_audit.manifest_sha256 不能为空".to_string())
+        })?;
     if calculated_manifest_sha256 != manifest_sha256 {
         return Err(ApplicationError::Model(
             "赛前输入清单 SHA256 与实际清单不一致".to_string(),
@@ -1306,7 +1315,11 @@ struct ModelSelection {
 
 fn normalize_model_selection(value: &str) -> ApplicationResult<ModelSelection> {
     let normalized = value.trim().to_ascii_lowercase();
-    let normalized = if normalized.is_empty() { "p4".to_string() } else { normalized };
+    let normalized = if normalized.is_empty() {
+        "p4".to_string()
+    } else {
+        normalized
+    };
     let family = if normalized == "p4" || normalized.starts_with("p4_") {
         "p4"
     } else if normalized == "p7" || normalized.starts_with("p7_") {
@@ -1316,8 +1329,15 @@ fn normalize_model_selection(value: &str) -> ApplicationResult<ModelSelection> {
             "不支持的模型：{normalized}；请选择已注册的 P4 或 P7 模型"
         )));
     };
-    let exact_model_id = if normalized == family { None } else { Some(normalized) };
-    Ok(ModelSelection { family, exact_model_id })
+    let exact_model_id = if normalized == family {
+        None
+    } else {
+        Some(normalized)
+    };
+    Ok(ModelSelection {
+        family,
+        exact_model_id,
+    })
 }
 
 fn ensure_model_selection_registered(
@@ -1420,14 +1440,29 @@ mod tests {
         second["feature_snapshot_id"] = json!(Uuid::new_v4());
         second["sources"][0]["accessed_at"] = json!("2026-07-22T10:02:00Z");
         let quality = json!({"home": {}, "away": {}});
-        let first_manifest = build_prediction_input_manifest(&first, &quality, &match_record, "T-1h", Some(&route));
-        let second_manifest = build_prediction_input_manifest(&second, &quality, &match_record, "T-1h", Some(&route));
-        assert_eq!(sha256_value(&first_manifest).unwrap(), sha256_value(&second_manifest).unwrap());
+        let first_manifest =
+            build_prediction_input_manifest(&first, &quality, &match_record, "T-1h", Some(&route));
+        let second_manifest =
+            build_prediction_input_manifest(&second, &quality, &match_record, "T-1h", Some(&route));
+        assert_eq!(
+            sha256_value(&first_manifest).unwrap(),
+            sha256_value(&second_manifest).unwrap()
+        );
 
         let mut changed = second;
-        changed["team_a"]["lineup"]["player_contributions"][0]["effective_contribution"] = json!(72.0);
-        let changed_manifest = build_prediction_input_manifest(&changed, &quality, &match_record, "T-1h", Some(&route));
-        assert_ne!(sha256_value(&first_manifest).unwrap(), sha256_value(&changed_manifest).unwrap());
+        changed["team_a"]["lineup"]["player_contributions"][0]["effective_contribution"] =
+            json!(72.0);
+        let changed_manifest = build_prediction_input_manifest(
+            &changed,
+            &quality,
+            &match_record,
+            "T-1h",
+            Some(&route),
+        );
+        assert_ne!(
+            sha256_value(&first_manifest).unwrap(),
+            sha256_value(&changed_manifest).unwrap()
+        );
     }
 
     #[test]
@@ -1442,7 +1477,9 @@ mod tests {
                 "manifest_sha256": manifest_sha
             }
         });
-        assert!(prediction_input_audit_summary(&input, "input-hash").unwrap().is_some());
+        assert!(prediction_input_audit_summary(&input, "input-hash")
+            .unwrap()
+            .is_some());
         input["input_audit"]["manifest"]["match"] = json!("B");
         assert!(prediction_input_audit_summary(&input, "input-hash").is_err());
     }

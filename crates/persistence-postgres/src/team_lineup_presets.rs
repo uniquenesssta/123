@@ -1,7 +1,6 @@
 use crate::{
     role_resolution::{
-        metadata_with_role_resolution, resolve_default_tactical_role_in_tx,
-        resolve_tactical_role,
+        metadata_with_role_resolution, resolve_default_tactical_role_in_tx, resolve_tactical_role,
     },
     write_audit_event, PersistenceError, PersistenceResult, PostgresStore,
 };
@@ -35,7 +34,9 @@ fn parse_availability(value: Option<String>) -> PersistenceResult<Option<Availab
 
 fn validate_preset(draft: &TeamLineupPresetDraft) -> PersistenceResult<()> {
     if draft.name.trim().is_empty() {
-        return Err(PersistenceError::InvalidState("阵容预设名称不能为空".to_string()));
+        return Err(PersistenceError::InvalidState(
+            "阵容预设名称不能为空".to_string(),
+        ));
     }
     if let Some(probability) = draft.usage_probability {
         if !(0.0..=1.0).contains(&probability) {
@@ -49,7 +50,11 @@ fn validate_preset(draft: &TeamLineupPresetDraft) -> PersistenceResult<()> {
             "阵容预设至少需要 11 名球员".to_string(),
         ));
     }
-    let starter_count = draft.members.iter().filter(|member| member.is_starter).count();
+    let starter_count = draft
+        .members
+        .iter()
+        .filter(|member| member.is_starter)
+        .count();
     if starter_count != 11 {
         return Err(PersistenceError::InvalidState(format!(
             "阵容预设必须恰好包含 11 名首发，当前为 {starter_count} 名"
@@ -65,7 +70,13 @@ fn validate_preset(draft: &TeamLineupPresetDraft) -> PersistenceResult<()> {
             "阵容预设不能包含重复球员".to_string(),
         ));
     }
-    if draft.members.iter().filter(|member| member.is_captain).count() > 1 {
+    if draft
+        .members
+        .iter()
+        .filter(|member| member.is_captain)
+        .count()
+        > 1
+    {
         return Err(PersistenceError::InvalidState(
             "阵容预设最多只能设置一名队长".to_string(),
         ));
@@ -126,7 +137,11 @@ impl PostgresStore {
         verify_membership_in_tx(
             &mut tx,
             draft.team_id,
-            &draft.members.iter().map(|member| member.player_id).collect::<Vec<_>>(),
+            &draft
+                .members
+                .iter()
+                .map(|member| member.player_id)
+                .collect::<Vec<_>>(),
         )
         .await?;
 
@@ -183,7 +198,13 @@ impl PostgresStore {
             .bind(draft.usage_probability)
             .bind(draft.is_default)
             .bind(draft.source_lineup_id)
-            .bind(draft.notes.as_deref().map(str::trim).filter(|value| !value.is_empty()))
+            .bind(
+                draft
+                    .notes
+                    .as_deref()
+                    .map(str::trim)
+                    .filter(|value| !value.is_empty()),
+            )
             .bind(current_version)
             .execute(&mut *tx)
             .await?;
@@ -209,7 +230,13 @@ impl PostgresStore {
             .bind(draft.usage_probability)
             .bind(draft.is_default)
             .bind(draft.source_lineup_id)
-            .bind(draft.notes.as_deref().map(str::trim).filter(|value| !value.is_empty()))
+            .bind(
+                draft
+                    .notes
+                    .as_deref()
+                    .map(str::trim)
+                    .filter(|value| !value.is_empty()),
+            )
             .execute(&mut *tx)
             .await?;
         }
@@ -231,8 +258,7 @@ impl PostgresStore {
             .await?;
             let role_resolution =
                 resolve_tactical_role(member.role_code.as_deref(), inherited_role.as_ref());
-            let member_metadata =
-                metadata_with_role_resolution(&member.metadata, &role_resolution);
+            let member_metadata = metadata_with_role_resolution(&member.metadata, &role_resolution);
             sqlx::query(
                 r#"
                 INSERT INTO football.team_lineup_preset_members (
@@ -452,7 +478,9 @@ impl PostgresStore {
                     current_team_id: member.try_get("current_team_id")?,
                     current_team_name: member.try_get("current_team_name")?,
                     player_status: member.try_get("player_status")?,
-                    availability_status: parse_availability(member.try_get("availability_status")?)?,
+                    availability_status: parse_availability(
+                        member.try_get("availability_status")?,
+                    )?,
                     metadata: member.try_get::<Value, _>("metadata")?,
                 })
             })

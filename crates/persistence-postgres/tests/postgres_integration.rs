@@ -3,15 +3,14 @@ use football_domain::{
     CompetitionDraft, CompetitionKind, CompetitionProfile, EnqueueJobDraft, EvidenceClaimDraft,
     EvidenceConflictDraft, EvidenceVerificationState, FormationDistributionQuery,
     FormationUsageDistributionDraft, FormationUsageEntryDraft, FormationUsageListQuery, JobStatus,
-    LineupDraft, LineupPairDraft, LineupPlayerDraft, LineupType, MatchDraft, MatchResultDraft,
+    LineupDraft, LineupPairDraft, LineupPlayerDraft, LineupType, MatchDraft,
+    MatchEventRevisionStatus, MatchEventType, MatchEventVerificationStatus, MatchResultDraft,
     MatchReviewDraft, MatchReviewPackageComparison, MatchReviewPackageDiffSummary,
     MatchReviewPackagePreview, MatchReviewPackageSnapshotSummary, MatchReviewPackageSummary,
     MatchReviewPackageWorkflowAction, MatchReviewPackageWorkflowStatus,
-    MatchEventRevisionStatus, MatchEventType, MatchEventVerificationStatus,
     MatchReviewPackageWorkflowStep, MatchStatus, P4Horizon, PrematchSnapshotDraft,
-    ResearchRunDraft, RulePackageDraft, RuleRouting, RuleSourceReference,
-    SchemaVersionDraft, SeasonDraft, SnapshotFeatureDraft, SnapshotProbabilityDraft,
-    SnapshotSourceKind,
+    ResearchRunDraft, RulePackageDraft, RuleRouting, RuleSourceReference, SchemaVersionDraft,
+    SeasonDraft, SnapshotFeatureDraft, SnapshotProbabilityDraft, SnapshotSourceKind,
     SourcePolicyDefinition, SourcePolicyVersionDraft, SourceTierDefinition, SourceTierRule,
     SpreadsheetAction, SpreadsheetEntityType, SpreadsheetImportMode, SpreadsheetParsedWorkbook,
     SpreadsheetRawRow, TeamDraft, PLAYER_MONTHLY_FORMAT, TEAM_MONTHLY_FORMAT,
@@ -138,11 +137,10 @@ async fn destructive_reset_rebuilds_an_empty_migrated_database() {
             .fetch_one(&database.pool)
             .await
             .expect("读取重建后的迁移账本");
-    let position_count: i64 =
-        sqlx::query_scalar("SELECT COUNT(*)::bigint FROM football.positions")
-            .fetch_one(&database.pool)
-            .await
-            .expect("读取重建后的内置位置目录");
+    let position_count: i64 = sqlx::query_scalar("SELECT COUNT(*)::bigint FROM football.positions")
+        .fetch_one(&database.pool)
+        .await
+        .expect("读取重建后的内置位置目录");
 
     assert_eq!(team_count, 0);
     assert!(migration_count > 0);
@@ -163,15 +161,13 @@ async fn prediction_input_audit_fields_are_persisted_and_immutable() {
     let manifest_sha = "a".repeat(64);
     let input_sha = "b".repeat(64);
 
-    sqlx::query(
-        "INSERT INTO model.definitions (id, model_key, display_name) VALUES ($1, $2, $3)",
-    )
-    .bind(definition_id)
-    .bind(format!("d1-audit-{token}"))
-    .bind("D1 audit integration model")
-    .execute(&database.pool)
-    .await
-    .expect("创建 D1 测试模型定义");
+    sqlx::query("INSERT INTO model.definitions (id, model_key, display_name) VALUES ($1, $2, $3)")
+        .bind(definition_id)
+        .bind(format!("d1-audit-{token}"))
+        .bind("D1 audit integration model")
+        .execute(&database.pool)
+        .await
+        .expect("创建 D1 测试模型定义");
     sqlx::query(
         r#"
         INSERT INTO model.versions (
@@ -537,7 +533,10 @@ async fn team_package_player_team_period_subrecords_are_distinct() {
     .fetch_all(&database.pool)
     .await
     .expect("读取效力子记录身份");
-    assert_eq!(keys, vec!["algeria".to_string(), "manchester city".to_string()]);
+    assert_eq!(
+        keys,
+        vec!["algeria".to_string(), "manchester city".to_string()]
+    );
 
     let duplicate = sqlx::query(
         r#"
@@ -670,12 +669,11 @@ async fn monthly_workbook_rebinds_stale_formation_id_by_code() {
     let token = Uuid::new_v4().simple().to_string();
     let team_id = Uuid::new_v4();
     let stale_formation_id = Uuid::new_v4();
-    let expected_formation_id: Uuid = sqlx::query_scalar(
-        "SELECT id FROM football.formations WHERE code='4-2-3-1' AND is_active",
-    )
-    .fetch_one(&database.pool)
-    .await
-    .expect("读取当前数据库的 4-2-3-1 阵型ID");
+    let expected_formation_id: Uuid =
+        sqlx::query_scalar("SELECT id FROM football.formations WHERE code='4-2-3-1' AND is_active")
+            .fetch_one(&database.pool)
+            .await
+            .expect("读取当前数据库的 4-2-3-1 阵型ID");
     assert_ne!(stale_formation_id, expected_formation_id);
 
     let workbook = SpreadsheetParsedWorkbook {
@@ -912,9 +910,7 @@ async fn monthly_workbooks_preview_commit_clear_and_idempotency_are_consistent()
     let custom_formation_preview = preview
         .rows
         .iter()
-        .find(|row| {
-            row.entity_type == SpreadsheetEntityType::FormationUsage && row.row_number == 3
-        })
+        .find(|row| row.entity_type == SpreadsheetEntityType::FormationUsage && row.row_number == 3)
         .expect("自定义阵型预检行");
     assert_eq!(
         custom_formation_preview.payload["formation_code"],
@@ -1362,7 +1358,10 @@ async fn external_model_provider_artifact_is_registered_once_and_immutable() {
     .fetch_one(&database.pool)
     .await
     .expect("读取外部模型提供器制品账本");
-    assert_eq!(artifact_count, 1, "外部模型提供器制品必须幂等登记且仅保留一条");
+    assert_eq!(
+        artifact_count, 1,
+        "外部模型提供器制品必须幂等登记且仅保留一条"
+    );
 
     let mut transaction = database.pool.begin().await.expect("开启不可变性校验事务");
     let mutation = sqlx::query(
@@ -1940,20 +1939,12 @@ async fn match_scope_inference_and_lineup_pair_transaction_are_atomic() {
         .into_iter()
         .find(|item| item.code == "4-2-3-1")
         .expect("内置 4-2-3-1 阵型");
-    let home_players = create_lineup_player_drafts(
-        &database,
-        home.id,
-        kickoff,
-        &format!("pair-home-{token}"),
-    )
-    .await;
-    let mut away_players = create_lineup_player_drafts(
-        &database,
-        away.id,
-        kickoff,
-        &format!("pair-away-{token}"),
-    )
-    .await;
+    let home_players =
+        create_lineup_player_drafts(&database, home.id, kickoff, &format!("pair-home-{token}"))
+            .await;
+    let mut away_players =
+        create_lineup_player_drafts(&database, away.id, kickoff, &format!("pair-away-{token}"))
+            .await;
     let valid_away_first = away_players[0].player_id;
     away_players[0].player_id = Uuid::new_v4();
     let captured_at = kickoff - Duration::hours(5);
@@ -1995,13 +1986,12 @@ async fn match_scope_inference_and_lineup_pair_transaction_are_atomic() {
         .create_lineup_pair(&pair)
         .await
         .expect_err("客队球员外键失败时双方事务必须回滚");
-    let count_after_failure: i64 = sqlx::query_scalar(
-        "SELECT count(*)::bigint FROM football.lineups WHERE match_id=$1",
-    )
-    .bind(target.id)
-    .fetch_one(&database.pool)
-    .await
-    .expect("统计失败后的阵容数量");
+    let count_after_failure: i64 =
+        sqlx::query_scalar("SELECT count(*)::bigint FROM football.lineups WHERE match_id=$1")
+            .bind(target.id)
+            .fetch_one(&database.pool)
+            .await
+            .expect("统计失败后的阵容数量");
     assert_eq!(count_after_failure, 0, "任一侧失败后不得保留另一侧阵容");
 
     let mut valid_pair = pair;
@@ -2535,13 +2525,8 @@ async fn seed_team_lineup(
         .into_iter()
         .find(|item| item.code == "4-2-3-1")
         .expect("内置 4-2-3-1 阵型");
-    let mut players = create_lineup_player_drafts(
-        database,
-        seed.team_id,
-        seed.kickoff,
-        seed.label,
-    )
-    .await;
+    let mut players =
+        create_lineup_player_drafts(database, seed.team_id, seed.kickoff, seed.label).await;
     for (index, player) in players.iter_mut().enumerate() {
         player.is_starter = index < seed.starter_count;
         player.expected_minutes = Some(if player.is_starter { 90 } else { 20 });
@@ -2591,7 +2576,6 @@ async fn seed_team_lineup(
         .await
         .expect("回读阵容版本")
 }
-
 
 #[tokio::test]
 #[ignore = "需要专用且可写的 PostgreSQL 测试数据库；设置 FOOTBALL_TEST_DATABASE_URL 后显式运行"]
@@ -2747,7 +2731,10 @@ async fn match_review_package_workflow_capabilities_follow_persisted_transitions
         .confirm_match_review_package_workflow(package_id, Some("integration"), None)
         .await
         .expect("确认资料包");
-    assert_eq!(confirmed.status, MatchReviewPackageWorkflowStatus::Confirmed);
+    assert_eq!(
+        confirmed.status,
+        MatchReviewPackageWorkflowStatus::Confirmed
+    );
     assert!(confirmed
         .allowed_actions
         .contains(&MatchReviewPackageWorkflowAction::CommitFacts));
@@ -2835,7 +2822,10 @@ async fn match_review_package_workflow_capabilities_follow_persisted_transitions
         .await
         .expect("重复结算保持幂等")
         .expect("重复结算仍返回资料包工作流");
-    assert_eq!(settled_again.status, MatchReviewPackageWorkflowStatus::Settled);
+    assert_eq!(
+        settled_again.status,
+        MatchReviewPackageWorkflowStatus::Settled
+    );
 
     database.close().await;
 }

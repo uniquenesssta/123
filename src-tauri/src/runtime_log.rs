@@ -715,11 +715,8 @@ mod tests {
         let directory = tempdir().expect("temp directory");
         let runtime_root = directory.path().join("renamed-anywhere");
         fs::create_dir_all(&runtime_root).expect("create arbitrary runtime root");
-        let path = create_session_log(
-            &runtime_root,
-            "cccccccc-0000-0000-0000-000000000000",
-        )
-        .expect("create relative runtime log");
+        let path = create_session_log(&runtime_root, "cccccccc-0000-0000-0000-000000000000")
+            .expect("create relative runtime log");
         let logs_directory = runtime_root.join("logs");
         assert_eq!(path.parent(), Some(logs_directory.as_path()));
     }

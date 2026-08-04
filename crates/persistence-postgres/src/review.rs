@@ -5,10 +5,9 @@ use football_domain::{
     AbilityUpdateCandidateRecord, CalculatedMatchReview, MatchEventRevisionStatus,
     MatchEventSummary, MatchEventType, MatchEventVerificationStatus, MatchRecord,
     MatchResultRecord, MatchReviewDetail, MatchReviewDraft, MatchReviewEventDraft,
-    MatchReviewEventRecord, MatchReviewSummary,
-    PlayerMatchReviewRecord,
-    ReviewPlayerBaseline, ReviewPreparationData, ReviewTeamContext, ReviewableMatch,
-    SubstitutionRecord, TeamMatchReviewRecord,
+    MatchReviewEventRecord, MatchReviewSummary, PlayerMatchReviewRecord, ReviewPlayerBaseline,
+    ReviewPreparationData, ReviewTeamContext, ReviewableMatch, SubstitutionRecord,
+    TeamMatchReviewRecord,
 };
 use football_review_engine::calculate_review;
 use serde_json::{json, Value};
@@ -627,7 +626,10 @@ async fn prepare_review_in_tx(
         .filter_map(|event| event.revision_of_event_id)
         .collect::<HashSet<_>>();
     for event in &draft.events {
-        if event.team_id.is_some_and(|team_id| !valid_teams.contains(&team_id)) {
+        if event
+            .team_id
+            .is_some_and(|team_id| !valid_teams.contains(&team_id))
+        {
             return Err(PersistenceError::InvalidState(
                 "比赛事件中的球队不是本场参赛队".to_string(),
             ));
@@ -662,12 +664,11 @@ async fn prepare_review_in_tx(
     }
     if !revision_event_ids.is_empty() {
         let revision_ids = revision_event_ids.iter().copied().collect::<Vec<_>>();
-        let rows = sqlx::query(
-            "SELECT id, match_id FROM review.match_events WHERE id = ANY($1::uuid[])",
-        )
-        .bind(&revision_ids)
-        .fetch_all(&mut **tx)
-        .await?;
+        let rows =
+            sqlx::query("SELECT id, match_id FROM review.match_events WHERE id = ANY($1::uuid[])")
+                .bind(&revision_ids)
+                .fetch_all(&mut **tx)
+                .await?;
         if rows.len() != revision_event_ids.len() {
             return Err(PersistenceError::InvalidState(
                 "比赛事件 revision_of_event_id 引用了不存在的历史事件".to_string(),
@@ -1414,7 +1415,9 @@ fn summarize_match_events(events: &[MatchReviewEventRecord]) -> MatchEventSummar
         summary.total_count += 1;
         if event.revision_status.is_effective() {
             summary.effective_count += 1;
-            *counts.entry(event.event_type.as_str().to_string()).or_insert(0) += 1;
+            *counts
+                .entry(event.event_type.as_str().to_string())
+                .or_insert(0) += 1;
             summary.last_event_minute = Some(
                 summary
                     .last_event_minute
@@ -1465,8 +1468,7 @@ fn validate_review_draft(draft: &MatchReviewDraft) -> PersistenceResult<()> {
             ));
         }
     }
-    if draft.result.home_goals_extra_time.is_some()
-        != draft.result.away_goals_extra_time.is_some()
+    if draft.result.home_goals_extra_time.is_some() != draft.result.away_goals_extra_time.is_some()
     {
         return Err(PersistenceError::InvalidState(
             "主客队加时进球必须同时填写或同时留空".to_string(),
@@ -1575,7 +1577,10 @@ fn validate_review_draft(draft: &MatchReviewDraft) -> PersistenceResult<()> {
                 "比赛事件分钟必须位于 0–150".to_string(),
             ));
         }
-        if event.stoppage_minute.is_some_and(|value| !(0..=30).contains(&value)) {
+        if event
+            .stoppage_minute
+            .is_some_and(|value| !(0..=30).contains(&value))
+        {
             return Err(PersistenceError::InvalidState(
                 "比赛事件补时分钟必须位于 0–30".to_string(),
             ));
@@ -1669,7 +1674,8 @@ fn validate_review_draft(draft: &MatchReviewDraft) -> PersistenceResult<()> {
     for (_, home_score, away_score, is_extra_time) in &ordered_scores {
         if *home_score < previous_score.0 || *away_score < previous_score.1 {
             return Err(PersistenceError::InvalidState(
-                "比赛事件后的比分不能相对前序事件倒退；VAR 取消应使用 cancelled/corrected 修订状态".to_string(),
+                "比赛事件后的比分不能相对前序事件倒退；VAR 取消应使用 cancelled/corrected 修订状态"
+                    .to_string(),
             ));
         }
         previous_score = (*home_score, *away_score);
@@ -1694,8 +1700,7 @@ fn validate_review_draft(draft: &MatchReviewDraft) -> PersistenceResult<()> {
             draft.result.away_goals_extra_time,
         ) else {
             return Err(PersistenceError::InvalidState(
-                "存在加时阶段事件后比分，但正式赛果未同时填写主客队加时进球"
-                    .to_string(),
+                "存在加时阶段事件后比分，但正式赛果未同时填写主客队加时进球".to_string(),
             ));
         };
         if let Some((home_score, away_score)) = latest_overall_score {

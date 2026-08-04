@@ -27,13 +27,8 @@ impl PostgresStore {
         snapshot_type: &str,
         model_family: &str,
     ) -> PersistenceResult<PreparedMatchPredictionInput> {
-        self.prepare_match_prediction_input_at(
-            match_id,
-            snapshot_type,
-            model_family,
-            Utc::now(),
-        )
-        .await
+        self.prepare_match_prediction_input_at(match_id, snapshot_type, model_family, Utc::now())
+            .await
     }
 
     pub async fn prepare_match_prediction_input_at(
@@ -73,18 +68,10 @@ impl PostgresStore {
         )?;
         let data_cutoff_time = data_window.cutoff_time;
         let home_lineup = self
-            .preferred_pre_match_lineup(
-                match_id,
-                match_record.home_team_id,
-                data_window,
-            )
+            .preferred_pre_match_lineup(match_id, match_record.home_team_id, data_window)
             .await?;
         let away_lineup = self
-            .preferred_pre_match_lineup(
-                match_id,
-                match_record.away_team_id,
-                data_window,
-            )
+            .preferred_pre_match_lineup(match_id, match_record.away_team_id, data_window)
             .await?;
         if home_lineup.is_none() || away_lineup.is_none() {
             let chain = self
@@ -186,7 +173,10 @@ impl PostgresStore {
         team_id: Uuid,
         data_window: super::lineup_chain::LineupSnapshotWindow,
     ) -> PersistenceResult<Option<LineupRecord>> {
-        match self.preferred_lineup_id(match_id, team_id, data_window).await? {
+        match self
+            .preferred_lineup_id(match_id, team_id, data_window)
+            .await?
+        {
             Some(id) => self.read_lineup(id).await.map(Some),
             None => Ok(None),
         }

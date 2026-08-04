@@ -1,8 +1,7 @@
 use crate::{
     name_search::{push_name_search, NameSearch, NameSearchColumns},
     role_resolution::{
-        metadata_with_role_resolution, resolve_default_tactical_role_in_tx,
-        resolve_tactical_role,
+        metadata_with_role_resolution, resolve_default_tactical_role_in_tx, resolve_tactical_role,
     },
     PersistenceError, PersistenceResult, PostgresStore,
 };
@@ -11,13 +10,12 @@ use football_domain::{
     AbilityDimensionRecord, AvailabilityStatus, DataProviderDraft, DataProviderRecord,
     ExternalEntityIdDraft, ExternalEntityIdRecord, LineupDraft, LineupHistoryRemovalResult,
     LineupPairDraft, LineupPairRecord, LineupPlayerRecord, LineupRecord, LineupType, MatchDraft,
-    MatchRecord, MatchStatus, PlayerAbilityObservationDraft,
-    PlayerAbilityObservationRecord, PlayerAbilityProfile, PlayerAvailabilityDraft,
-    PlayerAvailabilityRecord, PlayerCatalogReferenceData, PlayerDetail, PlayerDraft,
-    PlayerListItem, PlayerListPage, PlayerListQuery, PlayerNameDraft, PlayerNameRecord,
-    PlayerPositionDraft, PlayerPositionRecord, PlayerRecord, PlayerStatus, PlayerTeamPeriodDraft,
-    PlayerTeamPeriodRecord, PositionReference, PreferredFoot, SeasonTeamMembershipOption, TeamDraft,
-    TeamOption, TeamRecord,
+    MatchRecord, MatchStatus, PlayerAbilityObservationDraft, PlayerAbilityObservationRecord,
+    PlayerAbilityProfile, PlayerAvailabilityDraft, PlayerAvailabilityRecord,
+    PlayerCatalogReferenceData, PlayerDetail, PlayerDraft, PlayerListItem, PlayerListPage,
+    PlayerListQuery, PlayerNameDraft, PlayerNameRecord, PlayerPositionDraft, PlayerPositionRecord,
+    PlayerRecord, PlayerStatus, PlayerTeamPeriodDraft, PlayerTeamPeriodRecord, PositionReference,
+    PreferredFoot, SeasonTeamMembershipOption, TeamDraft, TeamOption, TeamRecord,
 };
 use serde_json::{json, Value};
 use sqlx::{Postgres, QueryBuilder, Row, Transaction};
@@ -1758,7 +1756,9 @@ async fn resolve_match_scope_draft(
         .ok_or_else(|| PersistenceError::InvalidState("比赛轮次不存在".to_string()))?;
         resolved.stage_id.get_or_insert(row.try_get("stage_id")?);
         resolved.season_id.get_or_insert(row.try_get("season_id")?);
-        resolved.competition_id.get_or_insert(row.try_get("competition_id")?);
+        resolved
+            .competition_id
+            .get_or_insert(row.try_get("competition_id")?);
     } else if let Some(stage_id) = resolved.stage_id {
         let row = sqlx::query(
             r#"
@@ -1773,7 +1773,9 @@ async fn resolve_match_scope_draft(
         .await?
         .ok_or_else(|| PersistenceError::InvalidState("比赛阶段不存在".to_string()))?;
         resolved.season_id.get_or_insert(row.try_get("season_id")?);
-        resolved.competition_id.get_or_insert(row.try_get("competition_id")?);
+        resolved
+            .competition_id
+            .get_or_insert(row.try_get("competition_id")?);
     } else if let Some(season_id) = resolved.season_id {
         let competition_id = sqlx::query_scalar::<_, Uuid>(
             "SELECT competition_id FROM football.seasons WHERE id = $1",
@@ -1870,7 +1872,11 @@ fn automatic_season_identity(
 ) -> PersistenceResult<(String, NaiveDate, NaiveDate)> {
     let year = kickoff_date.year();
     if season_pattern.eq_ignore_ascii_case("cross_year") {
-        let start_year = if kickoff_date.month() >= 7 { year } else { year - 1 };
+        let start_year = if kickoff_date.month() >= 7 {
+            year
+        } else {
+            year - 1
+        };
         let end_year = start_year + 1;
         let starts_on = NaiveDate::from_ymd_opt(start_year, 7, 1)
             .ok_or_else(|| PersistenceError::InvalidState("自动赛季开始日期无效".to_string()))?;
@@ -2053,20 +2059,30 @@ fn validate_lineup_draft(draft: &LineupDraft) -> PersistenceResult<ValidatedLine
             "阵容球员数量必须位于 1–30".to_string(),
         ));
     }
-    let unique_players: HashSet<Uuid> =
-        draft.players.iter().map(|player| player.player_id).collect();
+    let unique_players: HashSet<Uuid> = draft
+        .players
+        .iter()
+        .map(|player| player.player_id)
+        .collect();
     if unique_players.len() != draft.players.len() {
         return Err(PersistenceError::InvalidState(
             "同一阵容中存在重复球员".to_string(),
         ));
     }
-    let starters = draft.players.iter().filter(|player| player.is_starter).count();
+    let starters = draft
+        .players
+        .iter()
+        .filter(|player| player.is_starter)
+        .count();
     if starters != 11 {
         return Err(PersistenceError::InvalidState(format!(
             "正式阵容必须恰好 11 名首发，当前为 {starters} 名",
         )));
     }
-    if draft.quality_score.is_some_and(|value| !(0.0..=1.0).contains(&value)) {
+    if draft
+        .quality_score
+        .is_some_and(|value| !(0.0..=1.0).contains(&value))
+    {
         return Err(PersistenceError::InvalidState(
             "阵容质量分必须位于 0–1".to_string(),
         ));
@@ -2074,13 +2090,20 @@ fn validate_lineup_draft(draft: &LineupDraft) -> PersistenceResult<ValidatedLine
     let snapshot_type =
         crate::lineup_chain::normalize_lineup_snapshot_type(&draft.snapshot_type)?.to_string();
     for player in &draft.players {
-        if player.shirt_number.is_some_and(|number| !(0..=99).contains(&number)) {
+        if player
+            .shirt_number
+            .is_some_and(|number| !(0..=99).contains(&number))
+        {
             return Err(PersistenceError::InvalidState(
                 "阵容球衣号码必须位于 0–99".to_string(),
             ));
         }
-        if player.expected_minutes.is_some_and(|minutes| !(0..=150).contains(&minutes))
-            || player.actual_minutes.is_some_and(|minutes| !(0..=150).contains(&minutes))
+        if player
+            .expected_minutes
+            .is_some_and(|minutes| !(0..=150).contains(&minutes))
+            || player
+                .actual_minutes
+                .is_some_and(|minutes| !(0..=150).contains(&minutes))
         {
             return Err(PersistenceError::InvalidState(
                 "阵容分钟数必须位于 0–150".to_string(),
@@ -2091,18 +2114,27 @@ fn validate_lineup_draft(draft: &LineupDraft) -> PersistenceResult<ValidatedLine
                 "阵容排序号不能为负数".to_string(),
             ));
         }
-        if player.bench_order.is_some_and(|value| !(1..=99).contains(&value)) {
+        if player
+            .bench_order
+            .is_some_and(|value| !(1..=99).contains(&value))
+        {
             return Err(PersistenceError::InvalidState(
                 "替补顺序必须位于 1–99".to_string(),
             ));
         }
-        if player.starting_probability.is_some_and(|value| !(0.0..=1.0).contains(&value)) {
+        if player
+            .starting_probability
+            .is_some_and(|value| !(0.0..=1.0).contains(&value))
+        {
             return Err(PersistenceError::InvalidState(
                 "首发概率必须位于 0–1".to_string(),
             ));
         }
     }
-    Ok(ValidatedLineupDraft { snapshot_type, starters })
+    Ok(ValidatedLineupDraft {
+        snapshot_type,
+        starters,
+    })
 }
 
 async fn insert_lineup_in_tx(
@@ -2247,8 +2279,7 @@ async fn insert_lineup_in_tx(
         .await?;
         let role_resolution =
             resolve_tactical_role(player.role_code.as_deref(), inherited_role.as_ref());
-        let player_metadata =
-            metadata_with_role_resolution(&player.metadata, &role_resolution);
+        let player_metadata = metadata_with_role_resolution(&player.metadata, &role_resolution);
         sqlx::query(
             r#"
             INSERT INTO football.lineup_players (

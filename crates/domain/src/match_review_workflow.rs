@@ -96,20 +96,14 @@ impl MatchReviewPackageWorkflowRecord {
         self.allowed_actions.contains(&action)
     }
 
-    pub fn blocking_reason(
-        &self,
-        action: MatchReviewPackageWorkflowAction,
-    ) -> Option<&str> {
+    pub fn blocking_reason(&self, action: MatchReviewPackageWorkflowAction) -> Option<&str> {
         self.blocking_reasons
             .iter()
             .find(|item| item.action == action)
             .map(|item| item.reason.as_str())
     }
 
-    pub fn require_action(
-        &self,
-        action: MatchReviewPackageWorkflowAction,
-    ) -> Result<(), String> {
+    pub fn require_action(&self, action: MatchReviewPackageWorkflowAction) -> Result<(), String> {
         if self.allows(action) {
             return Ok(());
         }
@@ -236,17 +230,19 @@ fn blocking_reason(
     match action {
         Action::ExportPackage => "当前资料包不能重新导出",
         Action::PreviewImport => match status {
-            Status::Confirmed | Status::FactsCommitted | Status::ReviewCreated | Status::Settled => {
-                "资料包已人工确认，不能覆盖本轮预检结果"
-            }
+            Status::Confirmed
+            | Status::FactsCommitted
+            | Status::ReviewCreated
+            | Status::Settled => "资料包已人工确认，不能覆盖本轮预检结果",
             _ => "尚未导出可供预检的资料包",
         },
         Action::ConfirmImport => match status {
             Status::Exported => "尚未导入并预检填写后的资料包",
             Status::PreviewBlocked => "预检仍有阻断错误",
-            Status::Confirmed | Status::FactsCommitted | Status::ReviewCreated | Status::Settled => {
-                "资料包已经人工确认"
-            }
+            Status::Confirmed
+            | Status::FactsCommitted
+            | Status::ReviewCreated
+            | Status::Settled => "资料包已经人工确认",
             _ => "资料包尚未通过预检",
         },
         Action::CommitFacts => match status {
@@ -259,9 +255,10 @@ fn blocking_reason(
             _ => "当前资料包不能写入赛后事实",
         },
         Action::GenerateReview => match status {
-            Status::Exported | Status::PreviewBlocked | Status::PreviewValid | Status::Confirmed => {
-                "真实赛后事实尚未写入"
-            }
+            Status::Exported
+            | Status::PreviewBlocked
+            | Status::PreviewValid
+            | Status::Confirmed => "真实赛后事实尚未写入",
             Status::ReviewCreated | Status::Settled => "正式复盘已经生成",
             _ => "当前资料包不能生成正式复盘",
         },

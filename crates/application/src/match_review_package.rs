@@ -2,13 +2,11 @@ use crate::{ApplicationError, ApplicationResult, ApplicationService};
 use chrono::Utc;
 use football_domain::{
     LineupPairDraft, LineupRecord, LineupType, MatchResultDraft, MatchResultRecord,
-    MatchReviewPackageCommitRequest, MatchReviewPackageCommitResult,
-    MatchReviewPackageComparison, MatchReviewPackageIdentityCheck,
+    MatchReviewPackageCommitRequest, MatchReviewPackageCommitResult, MatchReviewPackageComparison,
     MatchReviewPackageConfirmationRequest, MatchReviewPackageData,
-    MatchReviewPackageFactsCommitResult, MatchReviewPackagePreview,
-    MatchReviewPackageReviewResult, MatchReviewPackageSummary,
-    MatchReviewPackageSnapshotSummary, MatchReviewPackageWorkflowAction,
-    MatchReviewPackageWorkflowRecord,
+    MatchReviewPackageFactsCommitResult, MatchReviewPackageIdentityCheck,
+    MatchReviewPackagePreview, MatchReviewPackageReviewResult, MatchReviewPackageSnapshotSummary,
+    MatchReviewPackageSummary, MatchReviewPackageWorkflowAction, MatchReviewPackageWorkflowRecord,
 };
 use football_spreadsheet_io::{read_match_review_package, write_match_review_package};
 use serde_json::{json, Value};
@@ -265,11 +263,12 @@ impl ApplicationService {
     ) -> ApplicationResult<MatchReviewPackagePreview> {
         let path = validate_path(&input_path, false)?;
         let read_path = path.clone();
-        let mut preview = tokio::task::spawn_blocking(move || read_match_review_package(&read_path))
-            .await
-            .map_err(|error| {
-                ApplicationError::Validation(format!("赛后复盘资料包读取任务失败：{error}"))
-            })??;
+        let mut preview =
+            tokio::task::spawn_blocking(move || read_match_review_package(&read_path))
+                .await
+                .map_err(|error| {
+                    ApplicationError::Validation(format!("赛后复盘资料包读取任务失败：{error}"))
+                })??;
         let store = self.active_store().await?;
         let workflow = store
             .read_active_match_review_package_workflow(preview.match_id)
@@ -287,7 +286,9 @@ impl ApplicationService {
                 .push("资料包工作流中的比赛标识与文件不一致".to_string()),
             Some(_) => {}
         }
-        let current_export_data = store.match_lineup_export_data(Some(preview.match_id)).await?;
+        let current_export_data = store
+            .match_lineup_export_data(Some(preview.match_id))
+            .await?;
         let current_match = current_export_data
             .selected_match
             .clone()
@@ -361,11 +362,7 @@ impl ApplicationService {
             "客队",
             &mut preview.errors,
         );
-        validate_event_identities(
-            &preview.lineup_pair,
-            &preview.events,
-            &mut preview.errors,
-        );
+        validate_event_identities(&preview.lineup_pair, &preview.events, &mut preview.errors);
         if let Some(run_id) = preview.review.source_run_id {
             match store.read_run(run_id).await {
                 Ok(run)
@@ -380,8 +377,7 @@ impl ApplicationService {
             }
         } else {
             preview.warnings.push(
-                "资料包没有绑定成功赛前推演；可以生成复盘，但正式结算门禁不会通过"
-                    .to_string(),
+                "资料包没有绑定成功赛前推演；可以生成复盘，但正式结算门禁不会通过".to_string(),
             );
         }
         preview.ready = preview.errors.is_empty();
@@ -553,10 +549,18 @@ fn snapshot_from_lineups(
         home_player_count: home.map_or(0, |value| value.players.len() as u64),
         away_player_count: away.map_or(0, |value| value.players.len() as u64),
         home_starter_count: home.map_or(0, |value| {
-            value.players.iter().filter(|player| player.is_starter).count() as u64
+            value
+                .players
+                .iter()
+                .filter(|player| player.is_starter)
+                .count() as u64
         }),
         away_starter_count: away.map_or(0, |value| {
-            value.players.iter().filter(|player| player.is_starter).count() as u64
+            value
+                .players
+                .iter()
+                .filter(|player| player.is_starter)
+                .count() as u64
         }),
     }
 }

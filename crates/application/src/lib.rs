@@ -23,10 +23,10 @@ use football_domain::{
     RoundRecord, RouteDecision, RulePackageDraft, RulePackageSummary, SeasonRecord, StageRecord,
 };
 use football_model_api::{ModelDescriptor, ModelOutput, PredictionModel};
-use model_shell::PublicModelStub;
 use football_persistence_postgres::{
     DatabaseHealth, DatabaseStats, ModelRunListItem, PersistenceError, PostgresStore,
 };
+use model_shell::PublicModelStub;
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
 use std::collections::HashMap;

@@ -1,11 +1,8 @@
 use sqlx::{Postgres, QueryBuilder};
 
-const COMPACT_SQL_PATTERN: &str =
-    "[[:space:][:punct:]·•・，。！？：；（）【】《》“”‘’]+";
-const LATIN_FOLD_SOURCE: &str =
-    "áàâäãåāăąçćčďđéèêëēėęěíìîïīįłñńóòôöõøōőřśšúùûüūůűýÿžźż";
-const LATIN_FOLD_TARGET: &str =
-    "aaaaaaaaacccddeeeeeeeeiiiiiilnnoooooooorssuuuuuuuyyzzz";
+const COMPACT_SQL_PATTERN: &str = "[[:space:][:punct:]·•・，。！？：；（）【】《》“”‘’]+";
+const LATIN_FOLD_SOURCE: &str = "áàâäãåāăąçćčďđéèêëēėęěíìîïīįłñńóòôöõøōőřśšúùûüūůűýÿžźż";
+const LATIN_FOLD_TARGET: &str = "aaaaaaaaacccddeeeeeeeeiiiiiilnnoooooooorssuuuuuuuyyzzz";
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub(crate) struct NameSearch {

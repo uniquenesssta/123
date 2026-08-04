@@ -1193,9 +1193,8 @@ fn parameter_tuning_candidate_from_row(
     row: &sqlx::postgres::PgRow,
 ) -> PersistenceResult<ParameterTuningCandidateRecord> {
     let sample_size = row.try_get::<i64, _>("sample_size")?;
-    let sample_size = u64::try_from(sample_size).map_err(|_| {
-        PersistenceError::InvalidState("参数候选样本量不能为负数".to_string())
-    })?;
+    let sample_size = u64::try_from(sample_size)
+        .map_err(|_| PersistenceError::InvalidState("参数候选样本量不能为负数".to_string()))?;
     Ok(ParameterTuningCandidateRecord {
         id: row.try_get("id")?,
         competition_id: row.try_get("competition_id")?,

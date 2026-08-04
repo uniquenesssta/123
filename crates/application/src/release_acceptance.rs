@@ -72,9 +72,11 @@ impl ApplicationService {
         let category_summaries = summarize_categories(&checks);
         let performance = ReleaseAcceptancePerformanceSummary {
             database_latency_ms: u64::try_from(runtime.database_latency_ms).unwrap_or(u64::MAX),
-            recent_model_run_count: u64::try_from(runtime.recent_model_run_count).unwrap_or_default(),
+            recent_model_run_count: u64::try_from(runtime.recent_model_run_count)
+                .unwrap_or_default(),
             recent_model_run_p95_ms: runtime.recent_model_run_p95_ms,
-            recent_model_failure_count: u64::try_from(runtime.recent_model_failure_count).unwrap_or_default(),
+            recent_model_failure_count: u64::try_from(runtime.recent_model_failure_count)
+                .unwrap_or_default(),
             query_warning_count: u64::try_from(runtime.query_warning_count).unwrap_or_default(),
         };
         let cost = ReleaseAcceptanceCostSummary {
@@ -254,7 +256,10 @@ fn runtime_chain_checks(
             "database_migrations",
             "数据库迁移连续性",
             ReleaseAcceptanceStatus::Blocked,
-            format!("只发现 {} 条成功迁移，最低要求为 27 条。", facts.migration_count),
+            format!(
+                "只发现 {} 条成功迁移，最低要求为 27 条。",
+                facts.migration_count
+            ),
             Some("连接当前客户端并完成连续数据库迁移。"),
             json!({"migration_count": facts.migration_count, "required": 27}),
             0,
@@ -337,38 +342,90 @@ fn fixed_fixture_checks(run_id: Uuid) -> ApplicationResult<Vec<ReleaseAcceptance
     ])
 }
 
-fn performance_checks(run_id: Uuid, facts: &ReleaseAcceptanceRuntimeFacts) -> Vec<ReleaseAcceptanceCheck> {
-    let db_status = if facts.database_latency_ms > 1_500 { ReleaseAcceptanceStatus::Blocked }
-        else if facts.database_latency_ms > 500 { ReleaseAcceptanceStatus::Warning }
-        else { ReleaseAcceptanceStatus::Pass };
+fn performance_checks(
+    run_id: Uuid,
+    facts: &ReleaseAcceptanceRuntimeFacts,
+) -> Vec<ReleaseAcceptanceCheck> {
+    let db_status = if facts.database_latency_ms > 1_500 {
+        ReleaseAcceptanceStatus::Blocked
+    } else if facts.database_latency_ms > 500 {
+        ReleaseAcceptanceStatus::Warning
+    } else {
+        ReleaseAcceptanceStatus::Pass
+    };
     let run_status = match facts.recent_model_run_p95_ms {
         None => ReleaseAcceptanceStatus::Warning,
         Some(value) if value > 5_000.0 => ReleaseAcceptanceStatus::Blocked,
         Some(value) if value > 2_000.0 => ReleaseAcceptanceStatus::Warning,
         Some(_) => ReleaseAcceptanceStatus::Pass,
     };
-    let query_status = if facts.query_warning_count > 0 { ReleaseAcceptanceStatus::Warning } else { ReleaseAcceptanceStatus::Pass };
+    let query_status = if facts.query_warning_count > 0 {
+        ReleaseAcceptanceStatus::Warning
+    } else {
+        ReleaseAcceptanceStatus::Pass
+    };
     vec![
-        check(run_id, "performance", "database_latency", "数据库往返延迟", db_status,
+        check(
+            run_id,
+            "performance",
+            "database_latency",
+            "数据库往返延迟",
+            db_status,
             format!("当前数据库健康检查耗时 {} ms。", facts.database_latency_ms),
-            (db_status != ReleaseAcceptanceStatus::Pass).then_some("检查数据库磁盘、网络、连接池和长事务后重新验收。"),
-            json!({"latency_ms": facts.database_latency_ms, "warning_threshold_ms": 500, "blocked_threshold_ms": 1500}), 0),
-        check(run_id, "performance", "model_run_performance", "近期推演性能", run_status,
+            (db_status != ReleaseAcceptanceStatus::Pass)
+                .then_some("检查数据库磁盘、网络、连接池和长事务后重新验收。"),
+            json!({"latency_ms": facts.database_latency_ms, "warning_threshold_ms": 500, "blocked_threshold_ms": 1500}),
+            0,
+        ),
+        check(
+            run_id,
+            "performance",
+            "model_run_performance",
+            "近期推演性能",
+            run_status,
             match facts.recent_model_run_p95_ms {
-                Some(value) => format!("近期 {} 次推演的成功运行 P95 为 {:.1} ms，失败 {} 次。", facts.recent_model_run_count, value, facts.recent_model_failure_count),
+                Some(value) => format!(
+                    "近期 {} 次推演的成功运行 P95 为 {:.1} ms，失败 {} 次。",
+                    facts.recent_model_run_count, value, facts.recent_model_failure_count
+                ),
                 None => "当前窗口没有足够的成功推演耗时样本。".to_string(),
             },
-            (run_status != ReleaseAcceptanceStatus::Pass).then_some("在目标 Windows + PostgreSQL 环境完成多场推演后重新运行 J 验收。"),
-            json!({"run_count": facts.recent_model_run_count, "p95_ms": facts.recent_model_run_p95_ms, "failed": facts.recent_model_failure_count}), 0),
-        check(run_id, "performance", "database_query_health", "查询健康快照", query_status,
-            if facts.query_warning_count == 0 { "最近查询性能快照没有 warning/critical 项。".to_string() } else { format!("最近查询性能快照仍有 {} 项警告。", facts.query_warning_count) },
-            (query_status == ReleaseAcceptanceStatus::Warning).then_some("在分析与历史中查看表级建议，完成索引或 VACUUM/ANALYZE 后重新捕获。"),
-            json!({"warning_count": facts.query_warning_count}), 0),
+            (run_status != ReleaseAcceptanceStatus::Pass)
+                .then_some("在目标 Windows + PostgreSQL 环境完成多场推演后重新运行 J 验收。"),
+            json!({"run_count": facts.recent_model_run_count, "p95_ms": facts.recent_model_run_p95_ms, "failed": facts.recent_model_failure_count}),
+            0,
+        ),
+        check(
+            run_id,
+            "performance",
+            "database_query_health",
+            "查询健康快照",
+            query_status,
+            if facts.query_warning_count == 0 {
+                "最近查询性能快照没有 warning/critical 项。".to_string()
+            } else {
+                format!(
+                    "最近查询性能快照仍有 {} 项警告。",
+                    facts.query_warning_count
+                )
+            },
+            (query_status == ReleaseAcceptanceStatus::Warning)
+                .then_some("在分析与历史中查看表级建议，完成索引或 VACUUM/ANALYZE 后重新捕获。"),
+            json!({"warning_count": facts.query_warning_count}),
+            0,
+        ),
     ]
 }
 
-fn security_checks(run_id: Uuid, facts: &ReleaseAcceptanceRuntimeFacts) -> Vec<ReleaseAcceptanceCheck> {
-    let immutable_status = if facts.immutable_trigger_count >= 8 { ReleaseAcceptanceStatus::Pass } else { ReleaseAcceptanceStatus::Blocked };
+fn security_checks(
+    run_id: Uuid,
+    facts: &ReleaseAcceptanceRuntimeFacts,
+) -> Vec<ReleaseAcceptanceCheck> {
+    let immutable_status = if facts.immutable_trigger_count >= 8 {
+        ReleaseAcceptanceStatus::Pass
+    } else {
+        ReleaseAcceptanceStatus::Blocked
+    };
     vec![
         check(run_id, "security", "immutable_ledgers", "不可变账本触发器", immutable_status,
             format!("关键 schema 中发现 {} 个不可变保护触发器。", facts.immutable_trigger_count),
@@ -385,22 +442,43 @@ fn cost_checks(
     facts: &ReleaseAcceptanceRuntimeFacts,
     request: &ReleaseAcceptanceRequest,
 ) -> Vec<ReleaseAcceptanceCheck> {
-    let daily_exceeded = request.daily_cost_budget_usd.is_some_and(|budget| facts.latest_day_cost_usd > budget);
-    let period_exceeded = request.monthly_cost_budget_usd.is_some_and(|budget| facts.estimated_cost_usd > budget);
-    let status = if daily_exceeded || period_exceeded { ReleaseAcceptanceStatus::Blocked }
-        else if request.daily_cost_budget_usd.is_none() || request.monthly_cost_budget_usd.is_none() { ReleaseAcceptanceStatus::Warning }
-        else { ReleaseAcceptanceStatus::Pass };
-    vec![check(run_id, "cost", "openai_cost_observability", "OpenAI 成本与预算", status,
+    let daily_exceeded = request
+        .daily_cost_budget_usd
+        .is_some_and(|budget| facts.latest_day_cost_usd > budget);
+    let period_exceeded = request
+        .monthly_cost_budget_usd
+        .is_some_and(|budget| facts.estimated_cost_usd > budget);
+    let status = if daily_exceeded || period_exceeded {
+        ReleaseAcceptanceStatus::Blocked
+    } else if request.daily_cost_budget_usd.is_none() || request.monthly_cost_budget_usd.is_none() {
+        ReleaseAcceptanceStatus::Warning
+    } else {
+        ReleaseAcceptanceStatus::Pass
+    };
+    vec![check(
+        run_id,
+        "cost",
+        "openai_cost_observability",
+        "OpenAI 成本与预算",
+        status,
         if daily_exceeded || period_exceeded {
             "显式成本预算已经超限，发布验收被阻断。".to_string()
         } else if status == ReleaseAcceptanceStatus::Warning {
-            format!("{} 日窗口估算成本 ${:.4}，最新有用量日期成本 ${:.4}；至少一个预算未设置。", request.cost_window_days, facts.estimated_cost_usd, facts.latest_day_cost_usd)
+            format!(
+                "{} 日窗口估算成本 ${:.4}，最新有用量日期成本 ${:.4}；至少一个预算未设置。",
+                request.cost_window_days, facts.estimated_cost_usd, facts.latest_day_cost_usd
+            )
         } else {
-            format!("成本在显式预算内：周期 ${:.4}，最新日 ${:.4}。", facts.estimated_cost_usd, facts.latest_day_cost_usd)
+            format!(
+                "成本在显式预算内：周期 ${:.4}，最新日 ${:.4}。",
+                facts.estimated_cost_usd, facts.latest_day_cost_usd
+            )
         },
         match status {
             ReleaseAcceptanceStatus::Blocked => Some("降低调用量或调整经批准的预算后重新验收。"),
-            ReleaseAcceptanceStatus::Warning => Some("在本页设置单日与周期预算，避免只监控不设闸门。"),
+            ReleaseAcceptanceStatus::Warning => {
+                Some("在本页设置单日与周期预算，避免只监控不设闸门。")
+            }
             ReleaseAcceptanceStatus::Pass => None,
         },
         json!({
@@ -412,23 +490,49 @@ fn cost_checks(
             "latest_day_cost_usd": facts.latest_day_cost_usd,
             "daily_budget_usd": request.daily_cost_budget_usd,
             "period_budget_usd": request.monthly_cost_budget_usd
-        }), 0)]
+        }),
+        0,
+    )]
 }
 
-fn release_checks(run_id: Uuid, facts: &ReleaseAcceptanceRuntimeFacts) -> Vec<ReleaseAcceptanceCheck> {
+fn release_checks(
+    run_id: Uuid,
+    facts: &ReleaseAcceptanceRuntimeFacts,
+) -> Vec<ReleaseAcceptanceCheck> {
     let version_ok = env!("CARGO_PKG_VERSION") == "0.23.0";
     let stage_j = facts.integration_stages.iter().any(|stage| stage == "J");
-    vec![check(run_id, "release", "release_artifact_contract", "发布版本与 J 契约", if version_ok && stage_j { ReleaseAcceptanceStatus::Pass } else { ReleaseAcceptanceStatus::Blocked },
-        if version_ok && stage_j { "应用版本、J 数据库契约和发布验收 schema 已对齐至 0.23.0。" } else { "应用版本或 J 数据库契约未对齐。" },
-        (!(version_ok && stage_j)).then_some("停止打包；同步 package、Cargo、Tauri、迁移和 J 契约后重新构建。"),
-        json!({"app_version": env!("CARGO_PKG_VERSION"), "stage_j_present": stage_j, "migration_count": facts.migration_count}), 0)]
+    vec![check(
+        run_id,
+        "release",
+        "release_artifact_contract",
+        "发布版本与 J 契约",
+        if version_ok && stage_j {
+            ReleaseAcceptanceStatus::Pass
+        } else {
+            ReleaseAcceptanceStatus::Blocked
+        },
+        if version_ok && stage_j {
+            "应用版本、J 数据库契约和发布验收 schema 已对齐至 0.23.0。"
+        } else {
+            "应用版本或 J 数据库契约未对齐。"
+        },
+        (!(version_ok && stage_j))
+            .then_some("停止打包；同步 package、Cargo、Tauri、迁移和 J 契约后重新构建。"),
+        json!({"app_version": env!("CARGO_PKG_VERSION"), "stage_j_present": stage_j, "migration_count": facts.migration_count}),
+        0,
+    )]
 }
 
-fn summarize_categories(checks: &[ReleaseAcceptanceCheck]) -> Vec<ReleaseAcceptanceCategorySummary> {
+fn summarize_categories(
+    checks: &[ReleaseAcceptanceCheck],
+) -> Vec<ReleaseAcceptanceCategorySummary> {
     let mut summaries: BTreeMap<String, ReleaseAcceptanceCategorySummary> = BTreeMap::new();
     for check in checks {
-        let summary = summaries.entry(check.category.clone()).or_insert_with(|| ReleaseAcceptanceCategorySummary {
-            category: check.category.clone(), ..ReleaseAcceptanceCategorySummary::default()
+        let summary = summaries.entry(check.category.clone()).or_insert_with(|| {
+            ReleaseAcceptanceCategorySummary {
+                category: check.category.clone(),
+                ..ReleaseAcceptanceCategorySummary::default()
+            }
         });
         match check.status {
             ReleaseAcceptanceStatus::Pass => summary.passed += 1,
@@ -454,9 +558,39 @@ mod tests {
     fn category_summary_counts_each_status() {
         let run_id = Uuid::new_v4();
         let checks = vec![
-            check(run_id, "chain", "a", "a", ReleaseAcceptanceStatus::Pass, "", None, Value::Null, 0),
-            check(run_id, "chain", "b", "b", ReleaseAcceptanceStatus::Warning, "", None, Value::Null, 0),
-            check(run_id, "chain", "c", "c", ReleaseAcceptanceStatus::Blocked, "", None, Value::Null, 0),
+            check(
+                run_id,
+                "chain",
+                "a",
+                "a",
+                ReleaseAcceptanceStatus::Pass,
+                "",
+                None,
+                Value::Null,
+                0,
+            ),
+            check(
+                run_id,
+                "chain",
+                "b",
+                "b",
+                ReleaseAcceptanceStatus::Warning,
+                "",
+                None,
+                Value::Null,
+                0,
+            ),
+            check(
+                run_id,
+                "chain",
+                "c",
+                "c",
+                ReleaseAcceptanceStatus::Blocked,
+                "",
+                None,
+                Value::Null,
+                0,
+            ),
         ];
         let summary = summarize_categories(&checks);
         assert_eq!(summary[0].passed, 1);

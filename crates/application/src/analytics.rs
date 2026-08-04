@@ -5,11 +5,10 @@ use football_analysis_package::{
 use football_domain::{
     AiAnalysisPackageSummary, AiAnalysisResponsePreview, AiAnalysisSuggestionRecord,
     AiSuggestionDecisionDraft, AnalyticsOverview, AnalyticsRefreshRequest, BackgroundJob,
-    CompetitionKind, DataQualityDecisionDraft, DataQualityFinding, EnqueueJobDraft,
-    MatchContext, ModelIdentity, ParameterLifecycleReadiness,
-    ParameterLifecycleReadinessRequest, ParameterPromotionDecisionRecord,
-    ParameterPromotionRequest, ParameterReplayFixture, ParameterRollbackRequest,
-    ParameterShadowValidationRecord, ParameterShadowValidationRequest,
+    CompetitionKind, DataQualityDecisionDraft, DataQualityFinding, EnqueueJobDraft, MatchContext,
+    ModelIdentity, ParameterLifecycleReadiness, ParameterLifecycleReadinessRequest,
+    ParameterPromotionDecisionRecord, ParameterPromotionRequest, ParameterReplayFixture,
+    ParameterRollbackRequest, ParameterShadowValidationRecord, ParameterShadowValidationRequest,
     ParameterTuningCandidateRecord, ParameterTuningDecisionDraft, ParameterTuningDraft,
 };
 use football_model_api::ModelRequest;
@@ -235,9 +234,7 @@ fn lifecycle_split(fixtures: &[ParameterReplayFixture]) -> ApplicationResult<Lif
     })
 }
 
-fn validate_baseline_probabilities(
-    fixtures: &[ParameterReplayFixture],
-) -> ApplicationResult<()> {
+fn validate_baseline_probabilities(fixtures: &[ParameterReplayFixture]) -> ApplicationResult<()> {
     for fixture in fixtures {
         let probabilities = [
             fixture.baseline_home_win,
@@ -302,15 +299,23 @@ fn lifecycle_metrics(observations: &[LifecycleObservation]) -> LifecycleMetrics 
     let mut draw_bias = 0.0;
     let mut away_bias = 0.0;
     for observation in observations {
-        let probabilities = [
-            observation.home_win,
-            observation.draw,
-            observation.away_win,
-        ];
+        let probabilities = [observation.home_win, observation.draw, observation.away_win];
         let targets = [
-            if observation.actual_outcome == "home_win" { 1.0 } else { 0.0 },
-            if observation.actual_outcome == "draw" { 1.0 } else { 0.0 },
-            if observation.actual_outcome == "away_win" { 1.0 } else { 0.0 },
+            if observation.actual_outcome == "home_win" {
+                1.0
+            } else {
+                0.0
+            },
+            if observation.actual_outcome == "draw" {
+                1.0
+            } else {
+                0.0
+            },
+            if observation.actual_outcome == "away_win" {
+                1.0
+            } else {
+                0.0
+            },
         ];
         let actual_probability = match observation.actual_outcome {
             "home_win" => observation.home_win,
@@ -367,8 +372,8 @@ fn expected_calibration_error(observations: &[LifecycleObservation], bucket_coun
                 1 => observation.actual_outcome == "draw",
                 _ => observation.actual_outcome == "away_win",
             };
-            let index = ((probability * bucket_count as f64).floor() as usize)
-                .min(bucket_count - 1);
+            let index =
+                ((probability * bucket_count as f64).floor() as usize).min(bucket_count - 1);
             buckets[index].push((probability, if target { 1.0 } else { 0.0 }));
         }
         for bucket in buckets {
@@ -378,9 +383,7 @@ fn expected_calibration_error(observations: &[LifecycleObservation], bucket_coun
             let size = bucket.len() as f64;
             let predicted = bucket.iter().map(|item| item.0).sum::<f64>() / size;
             let actual = bucket.iter().map(|item| item.1).sum::<f64>() / size;
-            total += (predicted - actual).abs()
-                * size
-                / (observations.len() * 3) as f64;
+            total += (predicted - actual).abs() * size / (observations.len() * 3) as f64;
         }
     }
     total
@@ -647,8 +650,7 @@ impl ApplicationService {
         let challenger = lifecycle_metrics(&observations);
         let log_loss_delta = challenger.average_log_loss - baseline.average_log_loss;
         let brier_delta = challenger.average_brier - baseline.average_brier;
-        let ece_delta = challenger.expected_calibration_error
-            - baseline.expected_calibration_error;
+        let ece_delta = challenger.expected_calibration_error - baseline.expected_calibration_error;
         let scoreline_delta = match (
             challenger.average_scoreline_nll,
             baseline.average_scoreline_nll,

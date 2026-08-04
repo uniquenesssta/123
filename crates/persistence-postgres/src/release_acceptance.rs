@@ -1,8 +1,7 @@
 use crate::{write_audit_event, PersistenceError, PersistenceResult, PostgresStore};
 use football_domain::{
     ReleaseAcceptanceCheck, ReleaseAcceptanceRun, ReleaseAcceptanceRunSummary,
-    ReleaseAcceptanceRuntimeFacts,
-    ReleaseAcceptanceStatus,
+    ReleaseAcceptanceRuntimeFacts, ReleaseAcceptanceStatus,
 };
 use serde_json::{json, Value};
 use sqlx::{Row, Transaction};
@@ -223,7 +222,10 @@ impl PostgresStore {
         .bind(run_id)
         .fetch_all(&self.pool)
         .await?;
-        let checks = check_rows.iter().map(check_from_row).collect::<PersistenceResult<Vec<_>>>()?;
+        let checks = check_rows
+            .iter()
+            .map(check_from_row)
+            .collect::<PersistenceResult<Vec<_>>>()?;
         Ok(ReleaseAcceptanceRun {
             id: row.try_get("id")?,
             app_version: row.try_get("app_version")?,
@@ -235,9 +237,13 @@ impl PostgresStore {
             requested_by: row.try_get("requested_by")?,
             report_sha256: row.try_get("report_sha256")?,
             passed_count: u32::try_from(row.try_get::<i32, _>("passed_count")?).unwrap_or_default(),
-            warning_count: u32::try_from(row.try_get::<i32, _>("warning_count")?).unwrap_or_default(),
-            blocked_count: u32::try_from(row.try_get::<i32, _>("blocked_count")?).unwrap_or_default(),
-            category_summaries: serde_json::from_value(row.try_get::<Value, _>("category_summaries")?)?,
+            warning_count: u32::try_from(row.try_get::<i32, _>("warning_count")?)
+                .unwrap_or_default(),
+            blocked_count: u32::try_from(row.try_get::<i32, _>("blocked_count")?)
+                .unwrap_or_default(),
+            category_summaries: serde_json::from_value(
+                row.try_get::<Value, _>("category_summaries")?,
+            )?,
             performance: serde_json::from_value(row.try_get::<Value, _>("performance_summary")?)?,
             cost: serde_json::from_value(row.try_get::<Value, _>("cost_summary")?)?,
             checks,
@@ -278,11 +284,15 @@ fn parse_status(value: &str) -> PersistenceResult<ReleaseAcceptanceStatus> {
         "pass" => Ok(ReleaseAcceptanceStatus::Pass),
         "warning" => Ok(ReleaseAcceptanceStatus::Warning),
         "blocked" => Ok(ReleaseAcceptanceStatus::Blocked),
-        other => Err(PersistenceError::InvalidState(format!("未知发布验收状态：{other}"))),
+        other => Err(PersistenceError::InvalidState(format!(
+            "未知发布验收状态：{other}"
+        ))),
     }
 }
 
-fn run_summary_from_row(row: &sqlx::postgres::PgRow) -> PersistenceResult<ReleaseAcceptanceRunSummary> {
+fn run_summary_from_row(
+    row: &sqlx::postgres::PgRow,
+) -> PersistenceResult<ReleaseAcceptanceRunSummary> {
     Ok(ReleaseAcceptanceRunSummary {
         id: row.try_get("id")?,
         app_version: row.try_get("app_version")?,

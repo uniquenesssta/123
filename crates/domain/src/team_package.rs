@@ -1,6 +1,4 @@
-use crate::{
-    SpreadsheetImportCommitResult, SpreadsheetImportPreview,
-};
+use crate::{SpreadsheetImportCommitResult, SpreadsheetImportPreview};
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 
@@ -13,7 +11,6 @@ pub struct TeamPackageExportSummary {
     pub format_version: String,
     pub visible_sheet_count: u32,
 }
-
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct TeamPackagePreviewExportSummary {

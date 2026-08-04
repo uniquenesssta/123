@@ -1,7 +1,6 @@
 use crate::{
     role_resolution::{
-        metadata_with_role_resolution, resolve_default_tactical_role_in_tx,
-        resolve_tactical_role,
+        metadata_with_role_resolution, resolve_default_tactical_role_in_tx, resolve_tactical_role,
     },
     PersistenceError, PersistenceResult, PostgresStore,
 };
@@ -483,9 +482,7 @@ impl PostgresStore {
                         position_code: lineup_player.position_code.clone(),
                         role_code: lineup_player.role_code.clone(),
                         role_origin: Some(lineup_player.role_origin.clone()),
-                        role_source_position_code: lineup_player
-                            .role_source_position_code
-                            .clone(),
+                        role_source_position_code: lineup_player.role_source_position_code.clone(),
                         opponent_team_id,
                         as_of: match_record.kickoff_time,
                         data_cutoff_time: Some(Utc::now()),
@@ -872,8 +869,8 @@ async fn apply_match_exchange_row(
                     PersistenceError::InvalidState(format!("无法找到阵容：{lineup_key}"))
                 })?;
             let player_id = payload_uuid(values, "_resolved_player_id")?;
-            let (lineup_match_id, lineup_team_id, lineup_captured_at):
-                (Uuid, Uuid, DateTime<Utc>) = sqlx::query_as(
+            let (lineup_match_id, lineup_team_id, lineup_captured_at): (Uuid, Uuid, DateTime<Utc>) =
+                sqlx::query_as(
                     "SELECT match_id,team_id,captured_at FROM football.lineups WHERE id=$1",
                 )
                 .bind(lineup_id)

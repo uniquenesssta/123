@@ -8,9 +8,9 @@ use crate::{
         MatchReviewPackageActionBlocker, MatchReviewPackageWorkflowAction,
         MatchReviewPackageWorkflowStatus, MatchReviewPackageWorkflowStep,
     },
-    AiMatchPlayerContext, LineupPairDraft, LineupRecord, MatchEventRevisionStatus,
-    MatchEventType, MatchEventVerificationStatus, MatchRecord, MatchResultRecord,
-    MatchReviewDetail, MatchReviewDraft, MatchReviewSummary, TeamDetail,
+    AiMatchPlayerContext, LineupPairDraft, LineupRecord, MatchEventRevisionStatus, MatchEventType,
+    MatchEventVerificationStatus, MatchRecord, MatchResultRecord, MatchReviewDetail,
+    MatchReviewDraft, MatchReviewSummary, TeamDetail,
 };
 
 pub const MATCH_REVIEW_PACKAGE_FORMAT: &str = "football.match-review-package.v1";
@@ -280,7 +280,10 @@ mod tests {
         .expect("旧赛后资料包事件应继续反序列化");
 
         assert_eq!(event.event_type, MatchEventType::Goal);
-        assert_eq!(event.verification_status, MatchEventVerificationStatus::Unverified);
+        assert_eq!(
+            event.verification_status,
+            MatchEventVerificationStatus::Unverified
+        );
         assert_eq!(event.revision_status, MatchEventRevisionStatus::Active);
         assert_eq!(event.period, "normal_time");
         assert!(event.event_key.is_none());

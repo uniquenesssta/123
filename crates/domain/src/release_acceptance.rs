@@ -38,8 +38,12 @@ pub struct ReleaseAcceptanceRequest {
     pub requested_by: Option<String>,
 }
 
-fn default_performance_window_days() -> u32 { 30 }
-fn default_cost_window_days() -> u32 { 30 }
+fn default_performance_window_days() -> u32 {
+    30
+}
+fn default_cost_window_days() -> u32 {
+    30
+}
 
 impl Default for ReleaseAcceptanceRequest {
     fn default() -> Self {

@@ -108,9 +108,7 @@ impl PostgresStore {
         let competition_name = baseline
             .as_ref()
             .map(|value| value.competition_name.clone());
-        let competition_profile_id = baseline
-            .as_ref()
-            .map(|value| value.competition_profile_id);
+        let competition_profile_id = baseline.as_ref().map(|value| value.competition_profile_id);
         let partition_key = baseline.as_ref().map_or_else(
             || format!("unresolved:all:{}", request.snapshot_type),
             |value| {
@@ -126,9 +124,7 @@ impl PostgresStore {
             blocked_reasons.push("必须选择一个具体赛事，禁止跨赛事混合晋升".to_string());
         }
         if !h_contract_ready {
-            blocked_reasons.push(
-                "接入点 H 的赛果结算、证据队列与漂移契约尚未就绪".to_string(),
-            );
+            blocked_reasons.push("接入点 H 的赛果结算、证据队列与漂移契约尚未就绪".to_string());
         }
         if eligible_sample_count < request.minimum_sample_size {
             blocked_reasons.push(format!(
@@ -153,9 +149,7 @@ impl PostgresStore {
             minimum_sample_size: request.minimum_sample_size,
             active_model_version_id: baseline.as_ref().map(|value| value.model_version_id),
             active_parameter_set_id: baseline.as_ref().map(|value| value.parameter_set_id),
-            active_model_version: baseline
-                .as_ref()
-                .map(|value| value.model_version.clone()),
+            active_model_version: baseline.as_ref().map(|value| value.model_version.clone()),
             active_parameter_version: baseline
                 .as_ref()
                 .map(|value| value.parameter_version.clone()),
@@ -237,18 +231,15 @@ impl PostgresStore {
         })
     }
 
-
     pub async fn read_parameter_set_definition(
         &self,
         parameter_set_id: Uuid,
     ) -> PersistenceResult<Value> {
-        sqlx::query_scalar(
-            "SELECT definition FROM model.parameter_sets WHERE id = $1",
-        )
-        .bind(parameter_set_id)
-        .fetch_optional(&self.pool)
-        .await?
-        .ok_or_else(|| PersistenceError::InvalidState("参数版本不存在".to_string()))
+        sqlx::query_scalar("SELECT definition FROM model.parameter_sets WHERE id = $1")
+            .bind(parameter_set_id)
+            .fetch_optional(&self.pool)
+            .await?
+            .ok_or_else(|| PersistenceError::InvalidState("参数版本不存在".to_string()))
     }
 
     pub async fn save_parameter_tuning_candidate_with_artifacts(
@@ -557,26 +548,16 @@ impl PostgresStore {
             ));
         }
         let competition_id = required_uuid(candidate.competition_id, "候选缺少赛事范围")?;
-        let competition_profile_id = required_uuid(
-            candidate.competition_profile_id,
-            "候选缺少赛事 Profile",
-        )?;
-        let baseline_model_version_id = required_uuid(
-            candidate.baseline_model_version_id,
-            "候选缺少基线模型版本",
-        )?;
-        let baseline_parameter_set_id = required_uuid(
-            candidate.baseline_parameter_set_id,
-            "候选缺少基线参数版本",
-        )?;
-        let candidate_model_version_id = required_uuid(
-            candidate.candidate_model_version_id,
-            "候选缺少候选模型版本",
-        )?;
-        let candidate_parameter_set_id = required_uuid(
-            candidate.candidate_parameter_set_id,
-            "候选缺少候选参数版本",
-        )?;
+        let competition_profile_id =
+            required_uuid(candidate.competition_profile_id, "候选缺少赛事 Profile")?;
+        let baseline_model_version_id =
+            required_uuid(candidate.baseline_model_version_id, "候选缺少基线模型版本")?;
+        let baseline_parameter_set_id =
+            required_uuid(candidate.baseline_parameter_set_id, "候选缺少基线参数版本")?;
+        let candidate_model_version_id =
+            required_uuid(candidate.candidate_model_version_id, "候选缺少候选模型版本")?;
+        let candidate_parameter_set_id =
+            required_uuid(candidate.candidate_parameter_set_id, "候选缺少候选参数版本")?;
         let mut tx = self.pool.begin().await?;
         let bindings = sqlx::query(
             r#"
@@ -733,14 +714,10 @@ impl PostgresStore {
                 "只有已晋升且未回滚的候选可以回滚".to_string(),
             ));
         }
-        let candidate_model_version_id = required_uuid(
-            candidate.candidate_model_version_id,
-            "候选缺少候选模型版本",
-        )?;
-        let candidate_parameter_set_id = required_uuid(
-            candidate.candidate_parameter_set_id,
-            "候选缺少候选参数版本",
-        )?;
+        let candidate_model_version_id =
+            required_uuid(candidate.candidate_model_version_id, "候选缺少候选模型版本")?;
+        let candidate_parameter_set_id =
+            required_uuid(candidate.candidate_parameter_set_id, "候选缺少候选参数版本")?;
         let promotion = sqlx::query(
             r#"
             SELECT id
@@ -753,9 +730,7 @@ impl PostgresStore {
         .bind(candidate.id)
         .fetch_optional(&self.pool)
         .await?
-        .ok_or_else(|| {
-            PersistenceError::InvalidState("未找到该候选的晋升决策记录".to_string())
-        })?;
+        .ok_or_else(|| PersistenceError::InvalidState("未找到该候选的晋升决策记录".to_string()))?;
         let promotion_id: Uuid = promotion.try_get("id")?;
         let mut tx = self.pool.begin().await?;
         let changes = sqlx::query(
@@ -987,6 +962,5 @@ fn required_uuid(value: Option<Uuid>, message: &str) -> PersistenceResult<Uuid> 
 }
 
 fn non_negative_u64(value: i64, label: &str) -> PersistenceResult<u64> {
-    u64::try_from(value)
-        .map_err(|_| PersistenceError::InvalidState(format!("{label}不能为负数")))
+    u64::try_from(value).map_err(|_| PersistenceError::InvalidState(format!("{label}不能为负数")))
 }

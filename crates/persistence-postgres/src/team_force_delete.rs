@@ -16,10 +16,7 @@ impl PostgresStore {
         let label = lock_team(&mut tx, team_id).await?;
         prepare_force_delete_targets(&mut tx, team_id, &label).await?;
         let references = force_delete_counts(&mut tx, team_id).await?;
-        let total_rows = references
-            .iter()
-            .map(|item| item.count.max(0) as u64)
-            .sum();
+        let total_rows = references.iter().map(|item| item.count.max(0) as u64).sum();
         tx.rollback().await?;
 
         Ok(TeamForceDeletePreview {
@@ -56,11 +53,9 @@ impl PostgresStore {
             .map(|item| (item.relation, item.count.max(0) as u64))
             .collect::<BTreeMap<_, _>>();
 
-        sqlx::query_scalar::<_, String>(
-            "SELECT set_config('football.force_purge', 'on', true)",
-        )
-        .fetch_one(&mut *tx)
-        .await?;
+        sqlx::query_scalar::<_, String>("SELECT set_config('football.force_purge', 'on', true)")
+            .fetch_one(&mut *tx)
+            .await?;
 
         execute_force_delete(&mut tx, request.team_id).await?;
 
@@ -96,10 +91,7 @@ impl PostgresStore {
     }
 }
 
-async fn lock_team(
-    tx: &mut Transaction<'_, Postgres>,
-    team_id: Uuid,
-) -> PersistenceResult<String> {
+async fn lock_team(tx: &mut Transaction<'_, Postgres>, team_id: Uuid) -> PersistenceResult<String> {
     sqlx::query_scalar::<_, String>(
         "SELECT canonical_name FROM football.teams WHERE id=$1 FOR UPDATE",
     )
@@ -766,10 +758,7 @@ async fn force_delete_counts(
         .collect()
 }
 
-async fn temp_ids(
-    tx: &mut Transaction<'_, Postgres>,
-    table: &str,
-) -> PersistenceResult<Vec<Uuid>> {
+async fn temp_ids(tx: &mut Transaction<'_, Postgres>, table: &str) -> PersistenceResult<Vec<Uuid>> {
     let sql = format!("SELECT id FROM {table} ORDER BY id");
     Ok(sqlx::query_scalar::<_, Uuid>(&sql)
         .fetch_all(&mut **tx)

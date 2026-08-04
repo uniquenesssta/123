@@ -16,58 +16,181 @@ const KEY_ROW: usize = 2;
 const FIRST_DATA_ROW: usize = 3;
 
 const TEAM_NAME_KEYS: &[&str] = &[
-    "action", "clear_fields", "team_id", "team_name", "name_value",
-    "language_code", "is_primary", "valid_from", "valid_to", "source_urls",
-    "verified_at", "confidence", "notes",
+    "action",
+    "clear_fields",
+    "team_id",
+    "team_name",
+    "name_value",
+    "language_code",
+    "is_primary",
+    "valid_from",
+    "valid_to",
+    "source_urls",
+    "verified_at",
+    "confidence",
+    "notes",
 ];
 
 const TEAM_KEYS: &[&str] = &[
-    "action", "clear_fields", "team_id", "team_name", "short_name", "team_type",
-    "country_code", "city", "founded_year", "stadium", "is_active",
-    "profile_observed_at", "data_confidence", "window_start", "window_end",
-    "team_attack_rating", "team_midfield_rating", "team_defence_rating",
-    "team_goalkeeper_rating", "team_squad_depth_rating", "team_stability_rating",
-    "team_sample_size", "team_methodology", "build_up_style", "progression_style",
-    "attacking_width", "pressing_intensity", "defensive_block", "transition_speed",
-    "set_piece_tendency", "tactical_summary", "observation_confidence", "observed_at",
-    "source_urls", "verified_at", "notes",
+    "action",
+    "clear_fields",
+    "team_id",
+    "team_name",
+    "short_name",
+    "team_type",
+    "country_code",
+    "city",
+    "founded_year",
+    "stadium",
+    "is_active",
+    "profile_observed_at",
+    "data_confidence",
+    "window_start",
+    "window_end",
+    "team_attack_rating",
+    "team_midfield_rating",
+    "team_defence_rating",
+    "team_goalkeeper_rating",
+    "team_squad_depth_rating",
+    "team_stability_rating",
+    "team_sample_size",
+    "team_methodology",
+    "build_up_style",
+    "progression_style",
+    "attacking_width",
+    "pressing_intensity",
+    "defensive_block",
+    "transition_speed",
+    "set_piece_tendency",
+    "tactical_summary",
+    "observation_confidence",
+    "observed_at",
+    "source_urls",
+    "verified_at",
+    "notes",
 ];
 
 const PLAYER_NAME_KEYS: &[&str] = &[
-    "action", "clear_fields", "player_key", "player_id", "match_name",
-    "match_birth_date", "name_value", "language_code", "is_primary", "valid_from",
-    "valid_to", "source_urls", "verified_at", "confidence", "notes",
+    "action",
+    "clear_fields",
+    "player_key",
+    "player_id",
+    "match_name",
+    "match_birth_date",
+    "name_value",
+    "language_code",
+    "is_primary",
+    "valid_from",
+    "valid_to",
+    "source_urls",
+    "verified_at",
+    "confidence",
+    "notes",
 ];
 
 const PLAYER_KEYS: &[&str] = &[
-    "action", "clear_fields", "player_key", "player_id", "official_name", "english_name",
-    "birth_date", "nationality_code", "preferred_foot", "height_cm", "player_status",
-    "team_key", "team_id", "team_name", "squad_number", "registration_status",
-    "roster_valid_from", "roster_valid_to",
-    "club_team_key", "club_team_id", "club_team_name", "club_country_code",
-    "club_squad_number", "club_registration_status", "club_valid_from", "club_valid_to",
-    "position_code", "position_proficiency", "position_is_primary",
-    "default_role_code", "availability_status", "availability_reason",
-    "availability_valid_from", "availability_valid_to",
-    "ability_attack", "ability_defence", "ability_creation", "ability_progression",
-    "ability_finishing", "ability_physical", "ability_stamina", "ability_stability",
-    "ability_discipline", "ability_tactical_execution", "ability_versatility",
-    "ability_substitute_impact", "ability_confidence", "ability_sample_size",
-    "ability_observed_at", "ability_effective_from", "ability_effective_to",
-    "ability_calculation_version", "tag_match_readiness", "tag_form_multiplier",
-    "tag_fatigue_multiplier", "tag_position_fit", "tag_tactical_fit", "tag_chemistry_fit",
-    "tag_starting_probability", "tag_expected_minutes_share", "tag_realization_multiplier",
-    "tag_volatility", "tag_confidence", "tag_sample_size", "tag_observed_at",
-    "tag_valid_from", "tag_valid_to", "tag_source_type", "tag_calculation_version",
-    "source_urls", "verified_at", "notes",
+    "action",
+    "clear_fields",
+    "player_key",
+    "player_id",
+    "official_name",
+    "english_name",
+    "birth_date",
+    "nationality_code",
+    "preferred_foot",
+    "height_cm",
+    "player_status",
+    "team_key",
+    "team_id",
+    "team_name",
+    "squad_number",
+    "registration_status",
+    "roster_valid_from",
+    "roster_valid_to",
+    "club_team_key",
+    "club_team_id",
+    "club_team_name",
+    "club_country_code",
+    "club_squad_number",
+    "club_registration_status",
+    "club_valid_from",
+    "club_valid_to",
+    "position_code",
+    "position_proficiency",
+    "position_is_primary",
+    "default_role_code",
+    "availability_status",
+    "availability_reason",
+    "availability_valid_from",
+    "availability_valid_to",
+    "ability_attack",
+    "ability_defence",
+    "ability_creation",
+    "ability_progression",
+    "ability_finishing",
+    "ability_physical",
+    "ability_stamina",
+    "ability_stability",
+    "ability_discipline",
+    "ability_tactical_execution",
+    "ability_versatility",
+    "ability_substitute_impact",
+    "ability_confidence",
+    "ability_sample_size",
+    "ability_observed_at",
+    "ability_effective_from",
+    "ability_effective_to",
+    "ability_calculation_version",
+    "tag_match_readiness",
+    "tag_form_multiplier",
+    "tag_fatigue_multiplier",
+    "tag_position_fit",
+    "tag_tactical_fit",
+    "tag_chemistry_fit",
+    "tag_starting_probability",
+    "tag_expected_minutes_share",
+    "tag_realization_multiplier",
+    "tag_volatility",
+    "tag_confidence",
+    "tag_sample_size",
+    "tag_observed_at",
+    "tag_valid_from",
+    "tag_valid_to",
+    "tag_source_type",
+    "tag_calculation_version",
+    "source_urls",
+    "verified_at",
+    "notes",
 ];
 
 const COACH_KEYS: &[&str] = &[
-    "action", "clear_fields", "coach_id", "coach_name", "nationality_code", "coach_status",
-    "team_id", "team_name", "role", "valid_from", "valid_to", "is_interim",
-    "formation_id", "formation_code", "scope_type", "window_preset", "window_start",
-    "window_end", "observed_matches", "usage_count", "formation_familiarity",
-    "confidence", "alpha", "observed_at", "source_urls", "verified_at", "notes",
+    "action",
+    "clear_fields",
+    "coach_id",
+    "coach_name",
+    "nationality_code",
+    "coach_status",
+    "team_id",
+    "team_name",
+    "role",
+    "valid_from",
+    "valid_to",
+    "is_interim",
+    "formation_id",
+    "formation_code",
+    "scope_type",
+    "window_preset",
+    "window_start",
+    "window_end",
+    "observed_matches",
+    "usage_count",
+    "formation_familiarity",
+    "confidence",
+    "alpha",
+    "observed_at",
+    "source_urls",
+    "verified_at",
+    "notes",
 ];
 
 const ABILITY_COLUMNS: &[(&str, &str)] = &[
@@ -158,7 +281,14 @@ pub fn read_team_package_workbook(path: &Path) -> SpreadsheetResult<SpreadsheetP
 fn write_instruction_sheet(workbook: &mut Workbook) -> Result<(), XlsxError> {
     let sheet = workbook.add_worksheet();
     sheet.set_name("说明与校验")?;
-    sheet.merge_range(0, 0, 0, 6, "球队完整资料包 · P4 输入工作簿", &title_format())?;
+    sheet.merge_range(
+        0,
+        0,
+        0,
+        6,
+        "球队完整资料包 · P4 输入工作簿",
+        &title_format(),
+    )?;
     let rows = [
         ("格式版本", TEAM_PACKAGE_FORMAT),
         ("核心用途", "一次导入一支或多支球队、全部球员、主教练/历史教练、阵型分布、基础评分和动态评分，导入后直接进入现有 P4 数据链路。"),
@@ -199,7 +329,12 @@ fn write_team_sheet(workbook: &mut Workbook) -> Result<(), XlsxError> {
     write_key_row(sheet, TEAM_KEYS)?;
     write_example_row(sheet, TEAM_KEYS, "team")?;
     apply_common_sheet_layout(sheet, TEAM_KEYS)?;
-    add_validation(sheet, TEAM_KEYS, "action", &["upsert", "add", "update", "clear", "skip"])?;
+    add_validation(
+        sheet,
+        TEAM_KEYS,
+        "action",
+        &["upsert", "add", "update", "clear", "skip"],
+    )?;
     add_validation(
         sheet,
         TEAM_KEYS,
@@ -224,7 +359,12 @@ fn write_team_name_sheet(workbook: &mut Workbook) -> Result<(), XlsxError> {
     write_key_row(sheet, TEAM_NAME_KEYS)?;
     write_example_row(sheet, TEAM_NAME_KEYS, "team_name")?;
     apply_common_sheet_layout(sheet, TEAM_NAME_KEYS)?;
-    add_validation(sheet, TEAM_NAME_KEYS, "action", &["upsert", "add", "update", "clear", "skip"])?;
+    add_validation(
+        sheet,
+        TEAM_NAME_KEYS,
+        "action",
+        &["upsert", "add", "update", "clear", "skip"],
+    )?;
     add_validation(sheet, TEAM_NAME_KEYS, "is_primary", &["true", "false"])?;
     Ok(())
 }
@@ -248,12 +388,51 @@ fn write_player_sheet(workbook: &mut Workbook) -> Result<(), XlsxError> {
     write_key_row(sheet, PLAYER_KEYS)?;
     write_example_row(sheet, PLAYER_KEYS, "player")?;
     apply_common_sheet_layout(sheet, PLAYER_KEYS)?;
-    add_validation(sheet, PLAYER_KEYS, "action", &["upsert", "add", "update", "clear", "skip"])?;
-    add_validation(sheet, PLAYER_KEYS, "preferred_foot", &["right", "left", "both", "unknown"])?;
-    add_validation(sheet, PLAYER_KEYS, "player_status", &["active", "inactive", "retired", "unknown"])?;
-    add_validation(sheet, PLAYER_KEYS, "registration_status", &["registered", "loan", "trial", "unknown"])?;
-    add_validation(sheet, PLAYER_KEYS, "club_registration_status", &["registered", "loan", "trial", "unknown"])?;
-    add_validation(sheet, PLAYER_KEYS, "availability_status", &["available", "doubtful", "unavailable", "injured", "suspended", "rested", "returning", "unknown"])?;
+    add_validation(
+        sheet,
+        PLAYER_KEYS,
+        "action",
+        &["upsert", "add", "update", "clear", "skip"],
+    )?;
+    add_validation(
+        sheet,
+        PLAYER_KEYS,
+        "preferred_foot",
+        &["right", "left", "both", "unknown"],
+    )?;
+    add_validation(
+        sheet,
+        PLAYER_KEYS,
+        "player_status",
+        &["active", "inactive", "retired", "unknown"],
+    )?;
+    add_validation(
+        sheet,
+        PLAYER_KEYS,
+        "registration_status",
+        &["registered", "loan", "trial", "unknown"],
+    )?;
+    add_validation(
+        sheet,
+        PLAYER_KEYS,
+        "club_registration_status",
+        &["registered", "loan", "trial", "unknown"],
+    )?;
+    add_validation(
+        sheet,
+        PLAYER_KEYS,
+        "availability_status",
+        &[
+            "available",
+            "doubtful",
+            "unavailable",
+            "injured",
+            "suspended",
+            "rested",
+            "returning",
+            "unknown",
+        ],
+    )?;
     Ok(())
 }
 
@@ -272,7 +451,12 @@ fn write_player_name_sheet(workbook: &mut Workbook) -> Result<(), XlsxError> {
     write_key_row(sheet, PLAYER_NAME_KEYS)?;
     write_example_row(sheet, PLAYER_NAME_KEYS, "player_name")?;
     apply_common_sheet_layout(sheet, PLAYER_NAME_KEYS)?;
-    add_validation(sheet, PLAYER_NAME_KEYS, "action", &["upsert", "add", "update", "clear", "skip"])?;
+    add_validation(
+        sheet,
+        PLAYER_NAME_KEYS,
+        "action",
+        &["upsert", "add", "update", "clear", "skip"],
+    )?;
     add_validation(sheet, PLAYER_NAME_KEYS, "is_primary", &["true", "false"])?;
     Ok(())
 }
@@ -293,11 +477,55 @@ fn write_coach_sheet(workbook: &mut Workbook) -> Result<(), XlsxError> {
     write_key_row(sheet, COACH_KEYS)?;
     write_example_row(sheet, COACH_KEYS, "coach")?;
     apply_common_sheet_layout(sheet, COACH_KEYS)?;
-    add_validation(sheet, COACH_KEYS, "action", &["upsert", "add", "update", "clear", "skip"])?;
-    add_validation(sheet, COACH_KEYS, "coach_status", &["active", "inactive", "retired", "unknown"])?;
-    add_validation(sheet, COACH_KEYS, "role", &["head_coach", "interim_head_coach", "caretaker", "assistant_coach", "other"])?;
-    add_validation(sheet, COACH_KEYS, "scope_type", &["team_coach", "team", "coach", "competition_default", "system_default"])?;
-    add_validation(sheet, COACH_KEYS, "window_preset", &["custom", "last_5", "last_10", "last_20", "current_coach_term", "current_season"])?;
+    add_validation(
+        sheet,
+        COACH_KEYS,
+        "action",
+        &["upsert", "add", "update", "clear", "skip"],
+    )?;
+    add_validation(
+        sheet,
+        COACH_KEYS,
+        "coach_status",
+        &["active", "inactive", "retired", "unknown"],
+    )?;
+    add_validation(
+        sheet,
+        COACH_KEYS,
+        "role",
+        &[
+            "head_coach",
+            "interim_head_coach",
+            "caretaker",
+            "assistant_coach",
+            "other",
+        ],
+    )?;
+    add_validation(
+        sheet,
+        COACH_KEYS,
+        "scope_type",
+        &[
+            "team_coach",
+            "team",
+            "coach",
+            "competition_default",
+            "system_default",
+        ],
+    )?;
+    add_validation(
+        sheet,
+        COACH_KEYS,
+        "window_preset",
+        &[
+            "custom",
+            "last_5",
+            "last_10",
+            "last_20",
+            "current_coach_term",
+            "current_season",
+        ],
+    )?;
     Ok(())
 }
 
@@ -313,7 +541,16 @@ fn write_dictionary_sheet(
     sheet.write_string_with_format(0, 3, "范围/说明", &header_format())?;
     let mut row = 1_u32;
     for position in &references.positions {
-        write_text_row(sheet, row, &["position", &position.code, &position.name, &position.position_group])?;
+        write_text_row(
+            sheet,
+            row,
+            &[
+                "position",
+                &position.code,
+                &position.name,
+                &position.position_group,
+            ],
+        )?;
         row += 1;
     }
     for ability in &references.ability_dimensions {
@@ -321,7 +558,12 @@ fn write_dictionary_sheet(
         write_text_row(
             sheet,
             row,
-            &["ability", ability.code.as_str(), ability.name.as_str(), range.as_str()],
+            &[
+                "ability",
+                ability.code.as_str(),
+                ability.name.as_str(),
+                range.as_str(),
+            ],
         )?;
         row += 1;
     }
@@ -330,7 +572,12 @@ fn write_dictionary_sheet(
         write_text_row(
             sheet,
             row,
-            &["dynamic_tag", tag.code.as_str(), tag.name.as_str(), range.as_str()],
+            &[
+                "dynamic_tag",
+                tag.code.as_str(),
+                tag.name.as_str(),
+                range.as_str(),
+            ],
         )?;
         row += 1;
     }
@@ -349,31 +596,70 @@ fn parse_team_sheet<R: std::io::Read + std::io::Seek>(
     for (row_number, values) in read_business_rows(workbook, "球队总览", TEAM_KEYS)? {
         let action = parse_action(text(&values, "action"))?;
         if action == SpreadsheetAction::Skip {
-            output.push(raw("球队总览", row_number, SpreadsheetEntityType::Team, action, values));
+            output.push(raw(
+                "球队总览",
+                row_number,
+                SpreadsheetEntityType::Team,
+                action,
+                values,
+            ));
             continue;
         }
         let team = mapped(
             &values,
             &[
-                ("action", "action"), ("clear_fields", "clear_fields"), ("team_id", "team_id"),
-                ("team_name", "official_name"), ("short_name", "short_name"),
-                ("team_type", "team_type"), ("country_code", "country_code"), ("city", "city"),
-                ("founded_year", "founded_year"), ("stadium", "stadium"), ("is_active", "is_active"),
-                ("profile_observed_at", "profile_observed_at"), ("data_confidence", "data_confidence"),
-                ("source_urls", "source_urls"), ("verified_at", "verified_at"), ("notes", "notes"),
+                ("action", "action"),
+                ("clear_fields", "clear_fields"),
+                ("team_id", "team_id"),
+                ("team_name", "official_name"),
+                ("short_name", "short_name"),
+                ("team_type", "team_type"),
+                ("country_code", "country_code"),
+                ("city", "city"),
+                ("founded_year", "founded_year"),
+                ("stadium", "stadium"),
+                ("is_active", "is_active"),
+                ("profile_observed_at", "profile_observed_at"),
+                ("data_confidence", "data_confidence"),
+                ("source_urls", "source_urls"),
+                ("verified_at", "verified_at"),
+                ("notes", "notes"),
             ],
         );
-        output.push(raw("球队总览", row_number, SpreadsheetEntityType::Team, action, team));
+        output.push(raw(
+            "球队总览",
+            row_number,
+            SpreadsheetEntityType::Team,
+            action,
+            team,
+        ));
 
-        if any_nonempty(&values, &["team_attack_rating", "team_midfield_rating", "team_defence_rating", "team_goalkeeper_rating", "team_squad_depth_rating", "team_stability_rating"]) {
+        if any_nonempty(
+            &values,
+            &[
+                "team_attack_rating",
+                "team_midfield_rating",
+                "team_defence_rating",
+                "team_goalkeeper_rating",
+                "team_squad_depth_rating",
+                "team_stability_rating",
+            ],
+        ) {
             let mut ability = mapped(
                 &values,
                 &[
-                    ("action", "action"), ("team_id", "team_id"), ("team_name", "team_name"),
-                    ("observed_at", "observed_at"), ("window_start", "window_start"), ("window_end", "window_end"),
-                    ("team_sample_size", "sample_size"), ("team_methodology", "methodology"),
-                    ("observation_confidence", "confidence"), ("source_urls", "source_urls"),
-                    ("verified_at", "verified_at"), ("notes", "notes"),
+                    ("action", "action"),
+                    ("team_id", "team_id"),
+                    ("team_name", "team_name"),
+                    ("observed_at", "observed_at"),
+                    ("window_start", "window_start"),
+                    ("window_end", "window_end"),
+                    ("team_sample_size", "sample_size"),
+                    ("team_methodology", "methodology"),
+                    ("observation_confidence", "confidence"),
+                    ("source_urls", "source_urls"),
+                    ("verified_at", "verified_at"),
+                    ("notes", "notes"),
                 ],
             );
             for (source, target) in [
@@ -389,23 +675,57 @@ fn parse_team_sheet<R: std::io::Read + std::io::Seek>(
                     Value::String(normalized_rating_text(&values, source)?),
                 );
             }
-            output.push(raw("球队总览", row_number, SpreadsheetEntityType::TeamAbilityObservation, action, ability));
+            output.push(raw(
+                "球队总览",
+                row_number,
+                SpreadsheetEntityType::TeamAbilityObservation,
+                action,
+                ability,
+            ));
         }
-        if any_nonempty(&values, &["build_up_style", "progression_style", "attacking_width", "pressing_intensity", "defensive_block", "transition_speed", "set_piece_tendency", "tactical_summary"]) {
+        if any_nonempty(
+            &values,
+            &[
+                "build_up_style",
+                "progression_style",
+                "attacking_width",
+                "pressing_intensity",
+                "defensive_block",
+                "transition_speed",
+                "set_piece_tendency",
+                "tactical_summary",
+            ],
+        ) {
             let tactical = mapped(
                 &values,
                 &[
-                    ("action", "action"), ("team_id", "team_id"), ("team_name", "team_name"),
-                    ("window_start", "window_start"), ("window_end", "window_end"),
-                    ("build_up_style", "build_up_style"), ("progression_style", "progression_style"),
-                    ("attacking_width", "attacking_width"), ("pressing_intensity", "pressing_intensity"),
-                    ("defensive_block", "defensive_block"), ("transition_speed", "transition_speed"),
-                    ("set_piece_tendency", "set_piece_tendency"), ("tactical_summary", "tactical_summary"),
-                    ("observation_confidence", "confidence"), ("source_urls", "source_urls"),
-                    ("verified_at", "verified_at"), ("observed_at", "observed_at"), ("notes", "notes"),
+                    ("action", "action"),
+                    ("team_id", "team_id"),
+                    ("team_name", "team_name"),
+                    ("window_start", "window_start"),
+                    ("window_end", "window_end"),
+                    ("build_up_style", "build_up_style"),
+                    ("progression_style", "progression_style"),
+                    ("attacking_width", "attacking_width"),
+                    ("pressing_intensity", "pressing_intensity"),
+                    ("defensive_block", "defensive_block"),
+                    ("transition_speed", "transition_speed"),
+                    ("set_piece_tendency", "set_piece_tendency"),
+                    ("tactical_summary", "tactical_summary"),
+                    ("observation_confidence", "confidence"),
+                    ("source_urls", "source_urls"),
+                    ("verified_at", "verified_at"),
+                    ("observed_at", "observed_at"),
+                    ("notes", "notes"),
                 ],
             );
-            output.push(raw("球队总览", row_number, SpreadsheetEntityType::TeamTacticalObservation, action, tactical));
+            output.push(raw(
+                "球队总览",
+                row_number,
+                SpreadsheetEntityType::TeamTacticalObservation,
+                action,
+                tactical,
+            ));
         }
     }
     Ok(())
@@ -420,16 +740,28 @@ fn parse_team_name_sheet<R: std::io::Read + std::io::Seek>(
         let name = mapped(
             &values,
             &[
-                ("action", "action"), ("clear_fields", "clear_fields"),
-                ("team_id", "team_id"), ("team_name", "team_name"),
-                ("name_value", "name_value"), ("language_code", "language_code"),
-                ("is_primary", "is_primary"), ("valid_from", "valid_from"),
-                ("valid_to", "valid_to"), ("source_urls", "source_urls"),
-                ("verified_at", "verified_at"), ("confidence", "confidence"),
+                ("action", "action"),
+                ("clear_fields", "clear_fields"),
+                ("team_id", "team_id"),
+                ("team_name", "team_name"),
+                ("name_value", "name_value"),
+                ("language_code", "language_code"),
+                ("is_primary", "is_primary"),
+                ("valid_from", "valid_from"),
+                ("valid_to", "valid_to"),
+                ("source_urls", "source_urls"),
+                ("verified_at", "verified_at"),
+                ("confidence", "confidence"),
                 ("notes", "notes"),
             ],
         );
-        output.push(raw("球队名称", row_number, SpreadsheetEntityType::TeamName, action, name));
+        output.push(raw(
+            "球队名称",
+            row_number,
+            SpreadsheetEntityType::TeamName,
+            action,
+            name,
+        ));
     }
     Ok(())
 }
@@ -440,8 +772,7 @@ fn parse_player_sheet<R: std::io::Read + std::io::Seek>(
 ) -> SpreadsheetResult<()> {
     let mut emitted_club_teams = HashSet::new();
     for row in output.iter().filter(|row| {
-        row.entity_type == SpreadsheetEntityType::Team
-            && row.action != SpreadsheetAction::Skip
+        row.entity_type == SpreadsheetEntityType::Team && row.action != SpreadsheetAction::Skip
     }) {
         if let Some(values) = row.values.as_object() {
             emitted_club_teams.extend(team_entity_identity_aliases(values));
@@ -452,12 +783,20 @@ fn parse_player_sheet<R: std::io::Read + std::io::Seek>(
         let base = mapped(
             &values,
             &[
-                ("action", "action"), ("clear_fields", "clear_fields"), ("player_key", "player_key"),
-                ("player_id", "player_id"), ("official_name", "official_name"), ("birth_date", "birth_date"),
-                ("nationality_code", "nationality_code"), ("preferred_foot", "preferred_foot"),
-                ("height_cm", "height_cm"), ("player_status", "player_status"),
-                ("source_urls", "source_urls"), ("verified_at", "verified_at"),
-                ("ability_confidence", "confidence"), ("notes", "notes"),
+                ("action", "action"),
+                ("clear_fields", "clear_fields"),
+                ("player_key", "player_key"),
+                ("player_id", "player_id"),
+                ("official_name", "official_name"),
+                ("birth_date", "birth_date"),
+                ("nationality_code", "nationality_code"),
+                ("preferred_foot", "preferred_foot"),
+                ("height_cm", "height_cm"),
+                ("player_status", "player_status"),
+                ("source_urls", "source_urls"),
+                ("verified_at", "verified_at"),
+                ("ability_confidence", "confidence"),
+                ("notes", "notes"),
             ],
         );
         output.push(raw(
@@ -523,24 +862,27 @@ fn parse_player_sheet<R: std::io::Read + std::io::Seek>(
                     club.insert(key.into(), Value::String(value));
                 }
             }
-            push_unique_team_entity(
-                output,
-                row_number,
-                club,
-                &mut emitted_club_teams,
-            );
+            push_unique_team_entity(output, row_number, club, &mut emitted_club_teams);
             let mut club_period = mapped(
                 &values,
                 &[
-                    ("action", "action"), ("clear_fields", "clear_fields"),
-                    ("player_key", "player_key"), ("player_id", "player_id"),
-                    ("official_name", "match_name"), ("birth_date", "match_birth_date"),
-                    ("club_team_key", "team_key"), ("club_team_id", "team_id"),
-                    ("club_team_name", "team_name"), ("club_squad_number", "squad_number"),
+                    ("action", "action"),
+                    ("clear_fields", "clear_fields"),
+                    ("player_key", "player_key"),
+                    ("player_id", "player_id"),
+                    ("official_name", "match_name"),
+                    ("birth_date", "match_birth_date"),
+                    ("club_team_key", "team_key"),
+                    ("club_team_id", "team_id"),
+                    ("club_team_name", "team_name"),
+                    ("club_squad_number", "squad_number"),
                     ("club_registration_status", "registration_status"),
-                    ("club_valid_from", "valid_from"), ("club_valid_to", "valid_to"),
-                    ("source_urls", "source_urls"), ("verified_at", "verified_at"),
-                    ("ability_confidence", "confidence"), ("notes", "notes"),
+                    ("club_valid_from", "valid_from"),
+                    ("club_valid_to", "valid_to"),
+                    ("source_urls", "source_urls"),
+                    ("verified_at", "verified_at"),
+                    ("ability_confidence", "confidence"),
+                    ("notes", "notes"),
                 ],
             );
             if club_period
@@ -549,7 +891,10 @@ fn parse_player_sheet<R: std::io::Read + std::io::Seek>(
                 .unwrap_or_default()
                 .is_empty()
             {
-                club_period.insert("registration_status".into(), Value::String("registered".into()));
+                club_period.insert(
+                    "registration_status".into(),
+                    Value::String("registered".into()),
+                );
             }
             if club_period
                 .get("valid_from")
@@ -557,7 +902,15 @@ fn parse_player_sheet<R: std::io::Read + std::io::Seek>(
                 .unwrap_or_default()
                 .is_empty()
             {
-                if let Some(value) = first_date_text(&values, &["roster_valid_from", "verified_at", "ability_observed_at", "tag_observed_at"]) {
+                if let Some(value) = first_date_text(
+                    &values,
+                    &[
+                        "roster_valid_from",
+                        "verified_at",
+                        "ability_observed_at",
+                        "tag_observed_at",
+                    ],
+                ) {
                     club_period.insert("valid_from".into(), Value::String(value));
                 }
             }
@@ -573,46 +926,90 @@ fn parse_player_sheet<R: std::io::Read + std::io::Seek>(
             let mut name = mapped(
                 &values,
                 &[
-                    ("action", "action"), ("player_key", "player_key"), ("player_id", "player_id"),
-                    ("official_name", "match_name"), ("birth_date", "match_birth_date"),
-                    ("english_name", "name_value"), ("roster_valid_from", "valid_from"),
-                    ("roster_valid_to", "valid_to"), ("source_urls", "source_urls"),
-                    ("verified_at", "verified_at"), ("ability_confidence", "confidence"), ("notes", "notes"),
+                    ("action", "action"),
+                    ("player_key", "player_key"),
+                    ("player_id", "player_id"),
+                    ("official_name", "match_name"),
+                    ("birth_date", "match_birth_date"),
+                    ("english_name", "name_value"),
+                    ("roster_valid_from", "valid_from"),
+                    ("roster_valid_to", "valid_to"),
+                    ("source_urls", "source_urls"),
+                    ("verified_at", "verified_at"),
+                    ("ability_confidence", "confidence"),
+                    ("notes", "notes"),
                 ],
             );
             name.insert("language_code".into(), Value::String("en".into()));
             name.insert("is_primary".into(), Value::String("false".into()));
-            output.push(raw("球员与评分", row_number, SpreadsheetEntityType::PlayerName, action, name));
+            output.push(raw(
+                "球员与评分",
+                row_number,
+                SpreadsheetEntityType::PlayerName,
+                action,
+                name,
+            ));
         }
         if nonempty(&values, "position_code") {
             let position = mapped(
                 &values,
                 &[
-                    ("action", "action"), ("clear_fields", "clear_fields"), ("player_key", "player_key"),
-                    ("player_id", "player_id"), ("official_name", "match_name"), ("birth_date", "match_birth_date"),
-                    ("position_code", "position_code"), ("position_proficiency", "proficiency"),
-                    ("position_is_primary", "is_primary"), ("default_role_code", "default_role_code"),
+                    ("action", "action"),
+                    ("clear_fields", "clear_fields"),
+                    ("player_key", "player_key"),
+                    ("player_id", "player_id"),
+                    ("official_name", "match_name"),
+                    ("birth_date", "match_birth_date"),
+                    ("position_code", "position_code"),
+                    ("position_proficiency", "proficiency"),
+                    ("position_is_primary", "is_primary"),
+                    ("default_role_code", "default_role_code"),
                     ("roster_valid_from", "valid_from"),
-                    ("roster_valid_to", "valid_to"), ("source_urls", "source_urls"),
-                    ("verified_at", "verified_at"), ("ability_confidence", "confidence"), ("notes", "notes"),
+                    ("roster_valid_to", "valid_to"),
+                    ("source_urls", "source_urls"),
+                    ("verified_at", "verified_at"),
+                    ("ability_confidence", "confidence"),
+                    ("notes", "notes"),
                 ],
             );
-            output.push(raw("球员与评分", row_number, SpreadsheetEntityType::PlayerPosition, action, position));
+            output.push(raw(
+                "球员与评分",
+                row_number,
+                SpreadsheetEntityType::PlayerPosition,
+                action,
+                position,
+            ));
         }
         if nonempty(&values, "availability_status") {
             let availability = mapped(
                 &values,
                 &[
-                    ("action", "action"), ("clear_fields", "clear_fields"), ("player_key", "player_key"),
-                    ("player_id", "player_id"), ("official_name", "match_name"), ("birth_date", "match_birth_date"),
-                    ("team_key", "team_key"), ("team_id", "team_id"), ("team_name", "team_name"),
-                    ("availability_status", "availability_status"), ("availability_reason", "reason"),
-                    ("ability_confidence", "confidence"), ("availability_valid_from", "valid_from"),
-                    ("availability_valid_to", "valid_to"), ("source_urls", "source_urls"),
-                    ("verified_at", "verified_at"), ("notes", "notes"),
+                    ("action", "action"),
+                    ("clear_fields", "clear_fields"),
+                    ("player_key", "player_key"),
+                    ("player_id", "player_id"),
+                    ("official_name", "match_name"),
+                    ("birth_date", "match_birth_date"),
+                    ("team_key", "team_key"),
+                    ("team_id", "team_id"),
+                    ("team_name", "team_name"),
+                    ("availability_status", "availability_status"),
+                    ("availability_reason", "reason"),
+                    ("ability_confidence", "confidence"),
+                    ("availability_valid_from", "valid_from"),
+                    ("availability_valid_to", "valid_to"),
+                    ("source_urls", "source_urls"),
+                    ("verified_at", "verified_at"),
+                    ("notes", "notes"),
                 ],
             );
-            output.push(raw("球员与评分", row_number, SpreadsheetEntityType::PlayerAvailability, action, availability));
+            output.push(raw(
+                "球员与评分",
+                row_number,
+                SpreadsheetEntityType::PlayerAvailability,
+                action,
+                availability,
+            ));
         }
         for (column, dimension) in ABILITY_COLUMNS {
             if !nonempty(&values, column) {
@@ -621,18 +1018,35 @@ fn parse_player_sheet<R: std::io::Read + std::io::Seek>(
             let mut ability = mapped(
                 &values,
                 &[
-                    ("action", "action"), ("player_key", "player_key"), ("player_id", "player_id"),
-                    ("official_name", "match_name"), ("birth_date", "match_birth_date"),
-                    ("ability_confidence", "confidence"), ("ability_sample_size", "sample_size"),
-                    ("ability_observed_at", "observed_at"), ("ability_effective_from", "effective_from"),
-                    ("ability_effective_to", "effective_to"), ("ability_calculation_version", "calculation_version"),
-                    ("source_urls", "source_urls"), ("verified_at", "verified_at"), ("notes", "notes"),
+                    ("action", "action"),
+                    ("player_key", "player_key"),
+                    ("player_id", "player_id"),
+                    ("official_name", "match_name"),
+                    ("birth_date", "match_birth_date"),
+                    ("ability_confidence", "confidence"),
+                    ("ability_sample_size", "sample_size"),
+                    ("ability_observed_at", "observed_at"),
+                    ("ability_effective_from", "effective_from"),
+                    ("ability_effective_to", "effective_to"),
+                    ("ability_calculation_version", "calculation_version"),
+                    ("source_urls", "source_urls"),
+                    ("verified_at", "verified_at"),
+                    ("notes", "notes"),
                 ],
             );
             ability.insert("dimension_code".into(), Value::String((*dimension).into()));
             ability.insert("context_type".into(), Value::String("general".into()));
-            ability.insert("value".into(), Value::String(normalized_rating_text(&values, column)?));
-            output.push(raw("球员与评分", row_number, SpreadsheetEntityType::PlayerAbility, action, ability));
+            ability.insert(
+                "value".into(),
+                Value::String(normalized_rating_text(&values, column)?),
+            );
+            output.push(raw(
+                "球员与评分",
+                row_number,
+                SpreadsheetEntityType::PlayerAbility,
+                action,
+                ability,
+            ));
         }
         for (column, tag_code) in TAG_COLUMNS {
             if !nonempty(&values, column) {
@@ -641,18 +1055,36 @@ fn parse_player_sheet<R: std::io::Read + std::io::Seek>(
             let mut tag = mapped(
                 &values,
                 &[
-                    ("action", "action"), ("player_key", "player_key"), ("player_id", "player_id"),
-                    ("official_name", "match_name"), ("birth_date", "match_birth_date"),
-                    ("tag_confidence", "confidence"), ("tag_sample_size", "sample_size"),
-                    ("tag_observed_at", "observed_at"), ("tag_valid_from", "valid_from"),
-                    ("tag_valid_to", "valid_to"), ("position_code", "position_code"),
-                    ("tag_source_type", "source_type"), ("tag_calculation_version", "calculation_version"),
-                    ("source_urls", "source_urls"), ("verified_at", "verified_at"), ("notes", "notes"),
+                    ("action", "action"),
+                    ("player_key", "player_key"),
+                    ("player_id", "player_id"),
+                    ("official_name", "match_name"),
+                    ("birth_date", "match_birth_date"),
+                    ("tag_confidence", "confidence"),
+                    ("tag_sample_size", "sample_size"),
+                    ("tag_observed_at", "observed_at"),
+                    ("tag_valid_from", "valid_from"),
+                    ("tag_valid_to", "valid_to"),
+                    ("position_code", "position_code"),
+                    ("tag_source_type", "source_type"),
+                    ("tag_calculation_version", "calculation_version"),
+                    ("source_urls", "source_urls"),
+                    ("verified_at", "verified_at"),
+                    ("notes", "notes"),
                 ],
             );
             tag.insert("tag_code".into(), Value::String((*tag_code).into()));
-            tag.insert("tag_value".into(), Value::String(text(&values, column).unwrap_or_default()));
-            output.push(raw("球员与评分", row_number, SpreadsheetEntityType::PlayerDynamicTag, action, tag));
+            tag.insert(
+                "tag_value".into(),
+                Value::String(text(&values, column).unwrap_or_default()),
+            );
+            output.push(raw(
+                "球员与评分",
+                row_number,
+                SpreadsheetEntityType::PlayerDynamicTag,
+                action,
+                tag,
+            ));
         }
     }
     Ok(())
@@ -667,17 +1099,30 @@ fn parse_player_name_sheet<R: std::io::Read + std::io::Seek>(
         let name = mapped(
             &values,
             &[
-                ("action", "action"), ("clear_fields", "clear_fields"),
-                ("player_key", "player_key"), ("player_id", "player_id"),
-                ("match_name", "match_name"), ("match_birth_date", "match_birth_date"),
-                ("name_value", "name_value"), ("language_code", "language_code"),
-                ("is_primary", "is_primary"), ("valid_from", "valid_from"),
-                ("valid_to", "valid_to"), ("source_urls", "source_urls"),
-                ("verified_at", "verified_at"), ("confidence", "confidence"),
+                ("action", "action"),
+                ("clear_fields", "clear_fields"),
+                ("player_key", "player_key"),
+                ("player_id", "player_id"),
+                ("match_name", "match_name"),
+                ("match_birth_date", "match_birth_date"),
+                ("name_value", "name_value"),
+                ("language_code", "language_code"),
+                ("is_primary", "is_primary"),
+                ("valid_from", "valid_from"),
+                ("valid_to", "valid_to"),
+                ("source_urls", "source_urls"),
+                ("verified_at", "verified_at"),
+                ("confidence", "confidence"),
                 ("notes", "notes"),
             ],
         );
-        output.push(raw("球员名称", row_number, SpreadsheetEntityType::PlayerName, action, name));
+        output.push(raw(
+            "球员名称",
+            row_number,
+            SpreadsheetEntityType::PlayerName,
+            action,
+            name,
+        ));
     }
     Ok(())
 }
@@ -692,36 +1137,50 @@ fn parse_coach_sheet<R: std::io::Read + std::io::Seek>(
         let action = parse_action(text(&values, "action"))?;
         let coach_identity = text(&values, "coach_id")
             .filter(|value| !value.is_empty())
-            .unwrap_or_else(|| text(&values, "coach_name").unwrap_or_default().to_lowercase());
+            .unwrap_or_else(|| {
+                text(&values, "coach_name")
+                    .unwrap_or_default()
+                    .to_lowercase()
+            });
         if !coach_identity.is_empty() && coaches.insert(coach_identity.clone()) {
             let coach = mapped(
                 &values,
                 &[
-                    ("action", "action"), ("clear_fields", "clear_fields"), ("coach_id", "coach_id"),
-                    ("coach_name", "official_name"), ("nationality_code", "nationality_code"),
-                    ("coach_status", "coach_status"), ("source_urls", "source_urls"),
-                    ("verified_at", "verified_at"), ("confidence", "confidence"), ("notes", "notes"),
+                    ("action", "action"),
+                    ("clear_fields", "clear_fields"),
+                    ("coach_id", "coach_id"),
+                    ("coach_name", "official_name"),
+                    ("nationality_code", "nationality_code"),
+                    ("coach_status", "coach_status"),
+                    ("source_urls", "source_urls"),
+                    ("verified_at", "verified_at"),
+                    ("confidence", "confidence"),
+                    ("notes", "notes"),
                 ],
             );
-            output.push(raw("教练与阵型", row_number, SpreadsheetEntityType::Coach, action, coach));
+            output.push(raw(
+                "教练与阵型",
+                row_number,
+                SpreadsheetEntityType::Coach,
+                action,
+                coach,
+            ));
         }
         if action == SpreadsheetAction::Skip {
             continue;
         }
         let has_team = nonempty(&values, "team_id") || nonempty(&values, "team_name");
-        let derived_valid_from = text(&values, "valid_from").or_else(|| {
-            first_date_text(
-                &values,
-                &["window_start", "observed_at", "verified_at"],
-            )
-        });
+        let derived_valid_from = text(&values, "valid_from")
+            .or_else(|| first_date_text(&values, &["window_start", "observed_at", "verified_at"]));
         if has_team && !coach_identity.is_empty() && derived_valid_from.is_some() {
             let role = text(&values, "role").unwrap_or_else(|| "head_coach".to_string());
             let valid_from = derived_valid_from.unwrap_or_default();
             let period_key = format!(
                 "{}|{}|{}|{}",
-                text(&values, "team_id").unwrap_or_else(|| text(&values, "team_name").unwrap_or_default()),
-                text(&values, "coach_id").unwrap_or_else(|| text(&values, "coach_name").unwrap_or_default()),
+                text(&values, "team_id")
+                    .unwrap_or_else(|| text(&values, "team_name").unwrap_or_default()),
+                text(&values, "coach_id")
+                    .unwrap_or_else(|| text(&values, "coach_name").unwrap_or_default()),
                 role,
                 valid_from,
             );
@@ -729,11 +1188,20 @@ fn parse_coach_sheet<R: std::io::Read + std::io::Seek>(
                 let mut period = mapped(
                     &values,
                     &[
-                        ("action", "action"), ("clear_fields", "clear_fields"), ("team_id", "team_id"),
-                        ("team_name", "team_name"), ("coach_id", "coach_id"), ("coach_name", "coach_name"),
-                        ("role", "role"), ("valid_from", "valid_from"), ("valid_to", "valid_to"),
-                        ("is_interim", "is_interim"), ("confidence", "confidence"),
-                        ("source_urls", "source_urls"), ("verified_at", "verified_at"), ("notes", "notes"),
+                        ("action", "action"),
+                        ("clear_fields", "clear_fields"),
+                        ("team_id", "team_id"),
+                        ("team_name", "team_name"),
+                        ("coach_id", "coach_id"),
+                        ("coach_name", "coach_name"),
+                        ("role", "role"),
+                        ("valid_from", "valid_from"),
+                        ("valid_to", "valid_to"),
+                        ("is_interim", "is_interim"),
+                        ("confidence", "confidence"),
+                        ("source_urls", "source_urls"),
+                        ("verified_at", "verified_at"),
+                        ("notes", "notes"),
                     ],
                 );
                 if period
@@ -752,30 +1220,52 @@ fn parse_coach_sheet<R: std::io::Read + std::io::Seek>(
                 {
                     period.insert("valid_from".into(), Value::String(valid_from));
                 }
-                output.push(raw("教练与阵型", row_number, SpreadsheetEntityType::TeamCoachPeriod, action, period));
+                output.push(raw(
+                    "教练与阵型",
+                    row_number,
+                    SpreadsheetEntityType::TeamCoachPeriod,
+                    action,
+                    period,
+                ));
             }
         }
         if nonempty(&values, "formation_code") || nonempty(&values, "formation_id") {
             let formation = mapped(
                 &values,
                 &[
-                    ("action", "action"), ("scope_type", "scope_type"), ("team_id", "team_id"),
-                    ("team_name", "team_name"), ("coach_id", "coach_id"), ("coach_name", "coach_name"),
-                    ("formation_id", "formation_id"), ("formation_code", "formation_code"),
-                    ("window_preset", "window_preset"), ("window_start", "window_start"),
-                    ("window_end", "window_end"), ("observed_matches", "observed_matches"),
-                    ("usage_count", "usage_count"), ("confidence", "confidence"), ("alpha", "alpha"),
-                    ("observed_at", "observed_at"), ("source_urls", "source_urls"),
-                    ("verified_at", "verified_at"), ("notes", "notes"),
+                    ("action", "action"),
+                    ("scope_type", "scope_type"),
+                    ("team_id", "team_id"),
+                    ("team_name", "team_name"),
+                    ("coach_id", "coach_id"),
+                    ("coach_name", "coach_name"),
+                    ("formation_id", "formation_id"),
+                    ("formation_code", "formation_code"),
+                    ("window_preset", "window_preset"),
+                    ("window_start", "window_start"),
+                    ("window_end", "window_end"),
+                    ("observed_matches", "observed_matches"),
+                    ("usage_count", "usage_count"),
+                    ("confidence", "confidence"),
+                    ("alpha", "alpha"),
+                    ("observed_at", "observed_at"),
+                    ("source_urls", "source_urls"),
+                    ("verified_at", "verified_at"),
+                    ("notes", "notes"),
                     ("formation_familiarity", "formation_familiarity"),
                 ],
             );
-            output.push(raw("教练与阵型", row_number, SpreadsheetEntityType::FormationUsage, action, formation));
+            output.push(raw(
+                "教练与阵型",
+                row_number,
+                SpreadsheetEntityType::FormationUsage,
+                action,
+                formation,
+            ));
         }
     }
     Ok(())
 }
-
 
 fn apply_default_role_alias(values: &mut Map<String, Value>) {
     if values
@@ -853,7 +1343,10 @@ fn read_business_rows<R: std::io::Read + std::io::Seek>(
         if sheet_name == "球员与评分" {
             apply_default_role_alias(&mut values);
         }
-        if values.values().all(|value| value.as_str().unwrap_or_default().is_empty()) {
+        if values
+            .values()
+            .all(|value| value.as_str().unwrap_or_default().is_empty())
+        {
             continue;
         }
         rows.push(((index + FIRST_DATA_ROW + 1) as u32, values));
@@ -897,15 +1390,19 @@ fn push_unique_team_entity(
 }
 
 fn team_entity_identity_aliases(payload: &Map<String, Value>) -> Vec<String> {
-    [("team_id", "id"), ("team_key", "key"), ("official_name", "name")]
-        .into_iter()
-        .filter_map(|(field, prefix)| {
-            text(payload, field).and_then(|value| {
-                let normalized = normalized_identity_value(&value);
-                (!normalized.is_empty()).then(|| format!("{prefix}:{normalized}"))
-            })
+    [
+        ("team_id", "id"),
+        ("team_key", "key"),
+        ("official_name", "name"),
+    ]
+    .into_iter()
+    .filter_map(|(field, prefix)| {
+        text(payload, field).and_then(|value| {
+            let normalized = normalized_identity_value(&value);
+            (!normalized.is_empty()).then(|| format!("{prefix}:{normalized}"))
         })
-        .collect()
+    })
+    .collect()
 }
 
 fn normalized_identity_value(value: &str) -> String {
@@ -941,21 +1438,22 @@ fn push_unique_team_period(
 }
 
 fn team_period_identity_aliases(payload: &Map<String, Value>) -> Vec<String> {
-    [("team_id", "id"), ("team_key", "key"), ("team_name", "name")]
-        .into_iter()
-        .filter_map(|(field, prefix)| {
-            text(payload, field).and_then(|value| {
-                let normalized = normalized_identity_value(&value);
-                (!normalized.is_empty()).then(|| format!("{prefix}:{normalized}"))
-            })
+    [
+        ("team_id", "id"),
+        ("team_key", "key"),
+        ("team_name", "name"),
+    ]
+    .into_iter()
+    .filter_map(|(field, prefix)| {
+        text(payload, field).and_then(|value| {
+            let normalized = normalized_identity_value(&value);
+            (!normalized.is_empty()).then(|| format!("{prefix}:{normalized}"))
         })
-        .collect()
+    })
+    .collect()
 }
 
-fn normalized_rating_text(
-    values: &Map<String, Value>,
-    key: &str,
-) -> SpreadsheetResult<String> {
+fn normalized_rating_text(values: &Map<String, Value>, key: &str) -> SpreadsheetResult<String> {
     let Some(raw) = text(values, key) else {
         return Ok(String::new());
     };
@@ -1231,10 +1729,24 @@ fn write_example_row(sheet: &mut Worksheet, keys: &[&str], kind: &str) -> Result
 
 fn apply_common_sheet_layout(sheet: &mut Worksheet, keys: &[&str]) -> Result<(), XlsxError> {
     for (column, key) in keys.iter().enumerate() {
-        let width = if key.ends_with("_id") { 38.0 }
-        else if matches!(*key, "source_urls" | "notes" | "tactical_summary") { 30.0 }
-        else if matches!(*key, "official_name" | "team_name" | "club_team_name" | "coach_name" | "english_name" | "match_name" | "name_value") { 22.0 }
-        else { 16.0 };
+        let width = if key.ends_with("_id") {
+            38.0
+        } else if matches!(*key, "source_urls" | "notes" | "tactical_summary") {
+            30.0
+        } else if matches!(
+            *key,
+            "official_name"
+                | "team_name"
+                | "club_team_name"
+                | "coach_name"
+                | "english_name"
+                | "match_name"
+                | "name_value"
+        ) {
+            22.0
+        } else {
+            16.0
+        };
         sheet.set_column_width(column as u16, width)?;
     }
     sheet.set_freeze_panes(3, 0)?;
@@ -1266,11 +1778,23 @@ fn write_text_row(sheet: &mut Worksheet, row: u32, values: &[&str]) -> Result<()
 fn cell_text_for_key(value: &Data, key: &str) -> String {
     let date_only = matches!(
         key,
-        "birth_date" | "roster_valid_from" | "roster_valid_to" | "club_valid_from"
-            | "club_valid_to" | "availability_valid_from" | "availability_valid_to"
-            | "valid_from" | "valid_to" | "window_start" | "window_end"
+        "birth_date"
+            | "roster_valid_from"
+            | "roster_valid_to"
+            | "club_valid_from"
+            | "club_valid_to"
+            | "availability_valid_from"
+            | "availability_valid_to"
+            | "valid_from"
+            | "valid_to"
+            | "window_start"
+            | "window_end"
     );
-    let date_time = key.ends_with("_at") || matches!(key, "ability_effective_from" | "ability_effective_to" | "tag_valid_from" | "tag_valid_to");
+    let date_time = key.ends_with("_at")
+        || matches!(
+            key,
+            "ability_effective_from" | "ability_effective_to" | "tag_valid_from" | "tag_valid_to"
+        );
     match value {
         Data::DateTime(excel) if date_only => excel
             .as_datetime()
@@ -1370,7 +1894,10 @@ mod tests {
 
     #[test]
     fn action_aliases_are_normalized() {
-        assert_eq!(parse_action(None).expect("blank action"), SpreadsheetAction::Upsert);
+        assert_eq!(
+            parse_action(None).expect("blank action"),
+            SpreadsheetAction::Upsert
+        );
         assert_eq!(
             parse_action(Some("upsert".into())).expect("upsert action"),
             SpreadsheetAction::Upsert
@@ -1395,10 +1922,7 @@ mod tests {
             "team_name".to_string(),
             Value::String("Atlético Mineiro".to_string()),
         );
-        main_period.insert(
-            "squad_number".to_string(),
-            Value::String("1".to_string()),
-        );
+        main_period.insert("squad_number".to_string(), Value::String("1".to_string()));
         push_unique_team_period(
             &mut output,
             4,
@@ -1412,10 +1936,7 @@ mod tests {
             "team_name".to_string(),
             Value::String("  ATLÉTICO   MINEIRO  ".to_string()),
         );
-        club_period.insert(
-            "squad_number".to_string(),
-            Value::String("1".to_string()),
-        );
+        club_period.insert("squad_number".to_string(), Value::String("1".to_string()));
         push_unique_team_period(
             &mut output,
             4,
@@ -1531,15 +2052,12 @@ mod tests {
         workbook.save(&path).expect("save row identity workbook");
 
         let mut workbook = open_workbook_auto(&path).expect("open row identity workbook");
-        let rows = read_business_rows(&mut workbook, "球员与评分", PLAYER_KEYS)
-            .expect("read player rows");
+        let rows =
+            read_business_rows(&mut workbook, "球员与评分", PLAYER_KEYS).expect("read player rows");
         assert_eq!(rows.len(), 1);
         assert_eq!(rows[0].0, zero_based_physical_row + 1);
         assert_eq!(
-            rows[0]
-                .1
-                .get("official_name")
-                .and_then(Value::as_str),
+            rows[0].1.get("official_name").and_then(Value::as_str),
             Some("物理行号测试球员")
         );
 
@@ -1563,11 +2081,26 @@ mod tests {
         write_team_package_template(&path, &references).expect("write team package");
         let parsed = read_team_package_workbook(&path).expect("read team package");
         assert_eq!(parsed.format_version, TEAM_PACKAGE_FORMAT);
-        assert!(parsed.rows.iter().any(|row| row.entity_type == SpreadsheetEntityType::Team));
-        assert!(parsed.rows.iter().any(|row| row.entity_type == SpreadsheetEntityType::TeamName));
-        assert!(parsed.rows.iter().any(|row| row.entity_type == SpreadsheetEntityType::Player));
-        assert!(parsed.rows.iter().any(|row| row.entity_type == SpreadsheetEntityType::PlayerName));
-        assert!(parsed.rows.iter().any(|row| row.entity_type == SpreadsheetEntityType::Coach));
+        assert!(parsed
+            .rows
+            .iter()
+            .any(|row| row.entity_type == SpreadsheetEntityType::Team));
+        assert!(parsed
+            .rows
+            .iter()
+            .any(|row| row.entity_type == SpreadsheetEntityType::TeamName));
+        assert!(parsed
+            .rows
+            .iter()
+            .any(|row| row.entity_type == SpreadsheetEntityType::Player));
+        assert!(parsed
+            .rows
+            .iter()
+            .any(|row| row.entity_type == SpreadsheetEntityType::PlayerName));
+        assert!(parsed
+            .rows
+            .iter()
+            .any(|row| row.entity_type == SpreadsheetEntityType::Coach));
         let _ = fs::remove_file(path);
     }
 }

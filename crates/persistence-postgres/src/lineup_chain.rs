@@ -21,8 +21,7 @@ pub(crate) fn normalize_lineup_snapshot_type(value: &str) -> PersistenceResult<&
         "T-6h" => Ok("T-6h"),
         "T-1h" => Ok("T-1h"),
         "T-90m" => Err(PersistenceError::InvalidState(
-            "T-90m 已停止用于新阵容和新推演；请选择 T-N、T-24h、T-6h 或 T-1h"
-                .to_string(),
+            "T-90m 已停止用于新阵容和新推演；请选择 T-N、T-24h、T-6h 或 T-1h".to_string(),
         )),
         other => Err(PersistenceError::InvalidState(format!(
             "不支持的阵容时间窗口：{other}"
@@ -252,7 +251,10 @@ fn lineup_team_blocking_issues(
         ));
     }
     if let Some(window_start) = window_start {
-        if active.iter().all(|lineup| lineup.captured_at < window_start) {
+        if active
+            .iter()
+            .all(|lineup| lineup.captured_at < window_start)
+        {
             issues.push(format!(
                 "已有阵容记录均早于 {snapshot_type} 窗口起点 {}",
                 window_start.to_rfc3339()
@@ -447,7 +449,10 @@ mod tests {
 
     #[test]
     fn latest_window_uses_reference_time_before_kickoff() {
-        let kickoff = Utc.with_ymd_and_hms(2026, 7, 20, 12, 0, 0).single().unwrap();
+        let kickoff = Utc
+            .with_ymd_and_hms(2026, 7, 20, 12, 0, 0)
+            .single()
+            .unwrap();
         let reference = kickoff - Duration::hours(2);
         let window = lineup_snapshot_window_at(kickoff, "T-N", reference).unwrap();
         assert_eq!(window.start_time, None);
@@ -456,7 +461,10 @@ mod tests {
 
     #[test]
     fn fixed_window_means_within_declared_duration() {
-        let kickoff = Utc.with_ymd_and_hms(2026, 7, 20, 12, 0, 0).single().unwrap();
+        let kickoff = Utc
+            .with_ymd_and_hms(2026, 7, 20, 12, 0, 0)
+            .single()
+            .unwrap();
         let reference = kickoff - Duration::hours(2);
         let window = lineup_snapshot_window_at(kickoff, "T-6h", reference).unwrap();
         assert_eq!(window.start_time, Some(kickoff - Duration::hours(6)));
@@ -465,14 +473,20 @@ mod tests {
 
     #[test]
     fn fixed_window_rejects_requests_before_window_opens() {
-        let kickoff = Utc.with_ymd_and_hms(2026, 7, 20, 12, 0, 0).single().unwrap();
+        let kickoff = Utc
+            .with_ymd_and_hms(2026, 7, 20, 12, 0, 0)
+            .single()
+            .unwrap();
         let reference = kickoff - Duration::hours(7);
         assert!(lineup_snapshot_window_at(kickoff, "T-6h", reference).is_err());
     }
 
     #[test]
     fn latest_window_never_crosses_kickoff() {
-        let kickoff = Utc.with_ymd_and_hms(2026, 7, 20, 12, 0, 0).single().unwrap();
+        let kickoff = Utc
+            .with_ymd_and_hms(2026, 7, 20, 12, 0, 0)
+            .single()
+            .unwrap();
         let reference = kickoff + Duration::hours(2);
         let window = lineup_snapshot_window_at(kickoff, "T-N", reference).unwrap();
         assert_eq!(window.cutoff_time, kickoff - Duration::seconds(1));
@@ -480,7 +494,10 @@ mod tests {
 
     #[test]
     fn legacy_t90m_is_not_available_for_new_requests() {
-        let kickoff = Utc.with_ymd_and_hms(2026, 7, 20, 12, 0, 0).single().unwrap();
+        let kickoff = Utc
+            .with_ymd_and_hms(2026, 7, 20, 12, 0, 0)
+            .single()
+            .unwrap();
         assert!(lineup_snapshot_window_at(kickoff, "T-90m", kickoff).is_err());
     }
 }

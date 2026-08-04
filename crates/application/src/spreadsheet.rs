@@ -1,18 +1,19 @@
 use crate::{ApplicationError, ApplicationResult, ApplicationService};
+use chrono::Utc;
 use football_domain::{
-    MonthlyWorkbookExportSummary, MonthlyWorkbookKind, SpreadsheetEntityType, SpreadsheetExportSummary,
-    SpreadsheetImportCommitResult, SpreadsheetImportMode, SpreadsheetImportPreview,
-    SpreadsheetImportResolution, SpreadsheetParsedWorkbook, TeamPackageCommitRequest,
-    TeamPackageCommitResult, TeamPackageCoverage, TeamPackageExportSummary,
-    TeamPackageImportPreview, TeamPackagePreviewExportSummary, PLAYER_MONTHLY_FORMAT,
-    TEAM_MONTHLY_FORMAT, TEAM_PACKAGE_FORMAT, TEAM_PACKAGE_PREVIEW_EXPORT_FORMAT,
+    MonthlyWorkbookExportSummary, MonthlyWorkbookKind, SpreadsheetEntityType,
+    SpreadsheetExportSummary, SpreadsheetImportCommitResult, SpreadsheetImportMode,
+    SpreadsheetImportPreview, SpreadsheetImportResolution, SpreadsheetParsedWorkbook,
+    TeamPackageCommitRequest, TeamPackageCommitResult, TeamPackageCoverage,
+    TeamPackageExportSummary, TeamPackageImportPreview, TeamPackagePreviewExportSummary,
+    PLAYER_MONTHLY_FORMAT, TEAM_MONTHLY_FORMAT, TEAM_PACKAGE_FORMAT,
+    TEAM_PACKAGE_PREVIEW_EXPORT_FORMAT,
 };
 use football_spreadsheet_io::{
     read_player_catalog_workbook, read_player_monthly_workbook, read_team_monthly_workbook,
     read_team_package_workbook, write_player_monthly_export, write_player_monthly_template,
     write_team_monthly_export, write_team_monthly_template, write_team_package_template,
 };
-use chrono::Utc;
 use serde_json::json;
 use std::{collections::HashMap, path::PathBuf};
 use uuid::Uuid;
@@ -37,7 +38,6 @@ impl ApplicationService {
             visible_sheet_count: 7,
         })
     }
-
 
     pub async fn export_team_package_preview_json(
         &self,
@@ -146,7 +146,11 @@ impl ApplicationService {
         let team_preview = if team_parsed.rows.is_empty() {
             None
         } else {
-            Some(store.preview_team_monthly_import(&team_parsed, mode).await?)
+            Some(
+                store
+                    .preview_team_monthly_import(&team_parsed, mode)
+                    .await?,
+            )
         };
         let player_preview = if player_parsed.rows.is_empty() {
             None
@@ -161,7 +165,8 @@ impl ApplicationService {
                     .await?,
             )
         };
-        let coverage = team_package_coverage(&parsed, team_preview.as_ref(), player_preview.as_ref());
+        let coverage =
+            team_package_coverage(&parsed, team_preview.as_ref(), player_preview.as_ref());
         Ok(TeamPackageImportPreview {
             source_file_name: parsed.source_file_name,
             source_sha256: parsed.source_sha256,
@@ -204,16 +209,13 @@ impl ApplicationService {
             ensure_preview_committable(&preview, "球员、评分和动态状态")?;
         }
         let team_result = match request.team_batch_id {
-            Some(batch_id) => Some(
-                store
-                    .commit_team_monthly_import(batch_id)
-                    .await
-                    .map_err(|error| {
-                        ApplicationError::Validation(format!(
-                            "完整资料包球队、教练与阵型链提交失败（批次 {batch_id}）：{error}"
-                        ))
-                    })?,
-            ),
+            Some(batch_id) => Some(store.commit_team_monthly_import(batch_id).await.map_err(
+                |error| {
+                    ApplicationError::Validation(format!(
+                        "完整资料包球队、教练与阵型链提交失败（批次 {batch_id}）：{error}"
+                    ))
+                },
+            )?),
             None => None,
         };
         let player_result = match request.player_batch_id {
@@ -540,9 +542,8 @@ fn ensure_preview_committable(
     label: &str,
 ) -> ApplicationResult<()> {
     let blocking = preview.counts.conflict + preview.counts.error;
-    let ready = preview.counts.ready_add
-        + preview.counts.ready_update
-        + preview.counts.ready_end_previous;
+    let ready =
+        preview.counts.ready_add + preview.counts.ready_update + preview.counts.ready_end_previous;
     if blocking > 0 {
         return Err(ApplicationError::Validation(format!(
             "{label}预检仍有 {} 条冲突或错误，不能提交",
@@ -566,7 +567,10 @@ fn team_package_coverage(
         parsed
             .rows
             .iter()
-            .filter(|row| row.entity_type == entity_type && row.action != football_domain::SpreadsheetAction::Skip)
+            .filter(|row| {
+                row.entity_type == entity_type
+                    && row.action != football_domain::SpreadsheetAction::Skip
+            })
             .count() as u64
     };
     let team_count = count(SpreadsheetEntityType::Team);
@@ -603,16 +607,32 @@ fn team_package_coverage(
             "完整资料包预检仍有 {preview_blocking} 条冲突或错误，修复后才能正式提交"
         ));
     }
-    if team_count == 0 { blockers.push("缺少球队总览记录".to_string()); }
-    if player_count < 11 { blockers.push(format!("有效球员只有 {player_count} 人，低于 P4 阵容输入下限 11 人")); }
-    if coach_count == 0 { warnings.push("没有教练记录，阵型只能回退到球队或系统默认".to_string()); }
-    if formation_usage_count == 0 { warnings.push("没有阵型使用分布，P4 将回退未知阵型".to_string()); }
-    if team_ability_count == 0 { warnings.push("没有球队能力观察".to_string()); }
+    if team_count == 0 {
+        blockers.push("缺少球队总览记录".to_string());
+    }
+    if player_count < 11 {
+        blockers.push(format!(
+            "有效球员只有 {player_count} 人，低于 P4 阵容输入下限 11 人"
+        ));
+    }
+    if coach_count == 0 {
+        warnings.push("没有教练记录，阵型只能回退到球队或系统默认".to_string());
+    }
+    if formation_usage_count == 0 {
+        warnings.push("没有阵型使用分布，P4 将回退未知阵型".to_string());
+    }
+    if team_ability_count == 0 {
+        warnings.push("没有球队能力观察".to_string());
+    }
     if player_count > 0 && player_ability_count < player_count * 4 {
-        warnings.push(format!("球员能力观察只有 {player_ability_count} 条，建议至少每名球员填写 4 个核心维度"));
+        warnings.push(format!(
+            "球员能力观察只有 {player_ability_count} 条，建议至少每名球员填写 4 个核心维度"
+        ));
     }
     if player_count > 0 && player_dynamic_tag_count < player_count * 3 {
-        warnings.push(format!("球员动态标签只有 {player_dynamic_tag_count} 条，建议至少覆盖准备度、状态和体能"));
+        warnings.push(format!(
+            "球员动态标签只有 {player_dynamic_tag_count} 条，建议至少覆盖准备度、状态和体能"
+        ));
     }
     if player_count > 0 && player_role_count < player_count.min(11) {
         warnings.push(format!(
@@ -621,15 +641,26 @@ fn team_package_coverage(
     }
     let player_factor = (player_count.min(26) as f64 / 26.0 * 20.0).round() as u8;
     let ability_target = (player_count * 8).max(1);
-    let ability_factor = ((player_ability_count.min(ability_target) as f64 / ability_target as f64) * 25.0).round() as u8;
+    let ability_factor = ((player_ability_count.min(ability_target) as f64 / ability_target as f64)
+        * 25.0)
+        .round() as u8;
     let tag_target = (player_count * 5).max(1);
-    let tag_factor = ((player_dynamic_tag_count.min(tag_target) as f64 / tag_target as f64) * 20.0).round() as u8;
+    let tag_factor = ((player_dynamic_tag_count.min(tag_target) as f64 / tag_target as f64) * 20.0)
+        .round() as u8;
     let mut readiness_score = 0_u8;
-    if team_count > 0 { readiness_score += 15; }
+    if team_count > 0 {
+        readiness_score += 15;
+    }
     readiness_score += player_factor;
-    if coach_count > 0 { readiness_score += 8; }
-    if formation_usage_count > 0 { readiness_score += 7; }
-    if team_ability_count > 0 { readiness_score += 5; }
+    if coach_count > 0 {
+        readiness_score += 8;
+    }
+    if formation_usage_count > 0 {
+        readiness_score += 7;
+    }
+    if team_ability_count > 0 {
+        readiness_score += 5;
+    }
     readiness_score += ability_factor;
     readiness_score += tag_factor;
     readiness_score = readiness_score.min(100);
@@ -676,10 +707,7 @@ fn validate_json_path(value: &str) -> ApplicationResult<PathBuf> {
         .filter(|parent| !parent.as_os_str().is_empty())
     {
         std::fs::create_dir_all(parent).map_err(|error| {
-            ApplicationError::Validation(format!(
-                "无法创建输出目录 {}：{error}",
-                parent.display()
-            ))
+            ApplicationError::Validation(format!("无法创建输出目录 {}：{error}", parent.display()))
         })?;
     }
     Ok(path)

@@ -60,7 +60,8 @@ impl PostgresStore {
         )
         .await?;
         tx.commit().await?;
-        self.read_match_review_package_workflow(summary.package_id).await
+        self.read_match_review_package_workflow(summary.package_id)
+            .await
     }
 
     pub async fn read_active_match_review_package_workflow(
@@ -81,13 +82,14 @@ impl PostgresStore {
         &self,
         package_id: Uuid,
     ) -> PersistenceResult<MatchReviewPackageWorkflowRecord> {
-        let row = sqlx::query(&format!("{} WHERE workflow.package_id=$1", workflow_select_sql()))
-            .bind(package_id)
-            .fetch_optional(&self.pool)
-            .await?
-            .ok_or_else(|| {
-                PersistenceError::InvalidState("赛后复盘资料包工作流不存在".to_string())
-            })?;
+        let row = sqlx::query(&format!(
+            "{} WHERE workflow.package_id=$1",
+            workflow_select_sql()
+        ))
+        .bind(package_id)
+        .fetch_optional(&self.pool)
+        .await?
+        .ok_or_else(|| PersistenceError::InvalidState("赛后复盘资料包工作流不存在".to_string()))?;
         workflow_from_row(&row)
     }
 
@@ -169,7 +171,11 @@ impl PostgresStore {
             "#,
         )
         .bind(package_id)
-        .bind(confirmed_by.map(str::trim).filter(|value| !value.is_empty()))
+        .bind(
+            confirmed_by
+                .map(str::trim)
+                .filter(|value| !value.is_empty()),
+        )
         .bind(
             confirmation_note
                 .map(str::trim)
@@ -269,9 +275,7 @@ impl PostgresStore {
         .bind(package_id)
         .fetch_optional(&self.pool)
         .await?
-        .ok_or_else(|| {
-            PersistenceError::InvalidState("资料包尚无可用预检快照".to_string())
-        })?;
+        .ok_or_else(|| PersistenceError::InvalidState("资料包尚无可用预检快照".to_string()))?;
         Ok(serde_json::from_value(payload)?)
     }
 }
@@ -309,9 +313,7 @@ fn workflow_from_row(
         export_path: row.try_get("export_path")?,
         export_sha256: row.try_get("export_sha256")?,
         pre_match_snapshot: serde_json::from_value(row.try_get("pre_match_snapshot")?)?,
-        export_database_snapshot: serde_json::from_value(
-            row.try_get("export_database_snapshot")?,
-        )?,
+        export_database_snapshot: serde_json::from_value(row.try_get("export_database_snapshot")?)?,
         import_path: row.try_get("import_path")?,
         import_sha256: row.try_get("import_sha256")?,
         preview_ready: row.try_get("preview_ready")?,

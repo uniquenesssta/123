@@ -2,6 +2,7 @@ use super::{
     ApplicationError, ApplicationResult, ApplicationService, OpenAiResearchCommand,
     PredictionCommand,
 };
+use crate::model_shell::P4_MODEL_ID;
 use chrono::{Duration, Utc};
 use football_domain::{
     EnqueueJobDraft, EvidenceVerificationState, P4FreezeReadiness, P4FreezeTaskDraft,
@@ -10,7 +11,6 @@ use football_domain::{
     ResearchRunStatus, SnapshotFeatureDraft, SnapshotProbabilityDraft, SnapshotSourceKind,
     P4_FREEZE_GRACE_MINUTES, P4_ORCHESTRATION_PLANNER_VERSION, P4_RESEARCH_LEAD_MINUTES,
 };
-use crate::model_shell::P4_MODEL_ID;
 use football_persistence_postgres::PostgresStore;
 use football_research_gateway::{CancellationToken, GatewayOperation};
 use serde::Deserialize;
@@ -1137,9 +1137,7 @@ fn snapshot_probabilities(payload: &Value) -> ApplicationResult<Vec<SnapshotProb
                 .get("outcome")
                 .and_then(Value::as_object)
                 .ok_or_else(|| {
-                    ApplicationError::Validation(format!(
-                        "外部模型矩阵 {chain_key} 缺少 outcome"
-                    ))
+                    ApplicationError::Validation(format!("外部模型矩阵 {chain_key} 缺少 outcome"))
                 })?;
             let scorelines = matrix
                 .get("scorelines")

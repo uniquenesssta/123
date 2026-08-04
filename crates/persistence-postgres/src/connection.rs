@@ -100,9 +100,7 @@ impl PostgresStore {
 
         for schema in APPLICATION_SCHEMAS {
             let statement = format!("DROP SCHEMA IF EXISTS {schema} CASCADE");
-            sqlx::query(&statement)
-                .execute(&mut *transaction)
-                .await?;
+            sqlx::query(&statement).execute(&mut *transaction).await?;
         }
         sqlx::query("DROP TABLE IF EXISTS public._sqlx_migrations")
             .execute(&mut *transaction)

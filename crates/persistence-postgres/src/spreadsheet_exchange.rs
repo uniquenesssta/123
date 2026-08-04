@@ -336,8 +336,10 @@ impl PostgresStore {
                         ));
                     }
                     Some(_)
-                        if matches!(action, SpreadsheetAction::Update | SpreadsheetAction::Upsert)
-                            && import_mode == SpreadsheetImportMode::AddAndUpdate =>
+                        if matches!(
+                            action,
+                            SpreadsheetAction::Update | SpreadsheetAction::Upsert
+                        ) && import_mode == SpreadsheetImportMode::AddAndUpdate =>
                     {
                         (SpreadsheetRowStatus::ReadyUpdate, "已确认现有外部 ID 关联")
                     }
@@ -355,7 +357,9 @@ impl PostgresStore {
             ) {
                 if matches!(
                     action,
-                    SpreadsheetAction::Update | SpreadsheetAction::Upsert | SpreadsheetAction::Clear
+                    SpreadsheetAction::Update
+                        | SpreadsheetAction::Upsert
+                        | SpreadsheetAction::Clear
                 ) && import_mode == SpreadsheetImportMode::AddAndUpdate
                 {
                     (
@@ -1134,8 +1138,10 @@ fn canonical_spreadsheet_import_action(
         SpreadsheetEntityType::Team
             | SpreadsheetEntityType::Player
             | SpreadsheetEntityType::ExternalEntityId
-    ) && matches!(status, SpreadsheetRowStatus::ReadyUpdate | SpreadsheetRowStatus::Conflict)
-    {
+    ) && matches!(
+        status,
+        SpreadsheetRowStatus::ReadyUpdate | SpreadsheetRowStatus::Conflict
+    ) {
         SpreadsheetAction::Update
     } else {
         SpreadsheetAction::Add
@@ -1293,7 +1299,9 @@ async fn resolve_team_reference(
             let normalized_name = normalize_reference_name(&name);
             let package_matches = external_team_references
                 .iter()
-                .filter(|(_, package_name)| normalize_reference_name(package_name) == normalized_name)
+                .filter(|(_, package_name)| {
+                    normalize_reference_name(package_name) == normalized_name
+                })
                 .collect::<Vec<_>>();
             if package_matches.len() == 1 {
                 let (key, package_name) = package_matches[0];
@@ -1332,8 +1340,10 @@ fn validate_external_id_resolution(
                     ));
                 }
                 payload.insert(format!("_resolved_{entity_kind}_id"), json!(target_id));
-                if matches!(action, SpreadsheetAction::Update | SpreadsheetAction::Upsert)
-                    && mode == SpreadsheetImportMode::AddAndUpdate
+                if matches!(
+                    action,
+                    SpreadsheetAction::Update | SpreadsheetAction::Upsert
+                ) && mode == SpreadsheetImportMode::AddAndUpdate
                 {
                     return Ok(RowValidation {
                         status: SpreadsheetRowStatus::ReadyUpdate,
@@ -1405,9 +1415,7 @@ fn validate_external_id_resolution(
             payload.insert(format!("_deferred_{entity_kind}_name"), json!(name));
             Ok(RowValidation {
                 status: SpreadsheetRowStatus::ReadyAdd,
-                message: Some(format!(
-                    "将在完整资料包主实体提交后关联{entity_kind}"
-                )),
+                message: Some(format!("将在完整资料包主实体提交后关联{entity_kind}")),
                 payload: Value::Object(payload.clone()),
                 matched_entity_id: None,
                 conflict_candidates: Vec::new(),
@@ -1461,9 +1469,7 @@ fn apply_resolution(
             payload.insert(format!("_deferred_{prefix}_name"), json!(name));
             Ok(RowValidation {
                 status: SpreadsheetRowStatus::ReadyAdd,
-                message: Some(format!(
-                    "将在完整资料包球队链提交后按名称关联{prefix}"
-                )),
+                message: Some(format!("将在完整资料包球队链提交后按名称关联{prefix}")),
                 payload: Value::Object(payload.clone()),
                 matched_entity_id: None,
                 conflict_candidates: Vec::new(),
@@ -1495,7 +1501,8 @@ fn normalize_spreadsheet_payload(
             if text(payload, "valid_from").is_empty() {
                 let verified_at = text(payload, "verified_at");
                 if !verified_at.is_empty() {
-                    let date = parse_spreadsheet_datetime(&verified_at, "verified_at")?.date_naive();
+                    let date =
+                        parse_spreadsheet_datetime(&verified_at, "verified_at")?.date_naive();
                     payload.insert("valid_from".to_string(), Value::String(date.to_string()));
                     payload.insert(
                         "_derived_valid_from".to_string(),
@@ -1534,8 +1541,8 @@ fn canonicalize_datetime_field(
     if current.is_empty() {
         return Ok(());
     }
-    let canonical = parse_spreadsheet_datetime(&current, key)?
-        .to_rfc3339_opts(SecondsFormat::AutoSi, true);
+    let canonical =
+        parse_spreadsheet_datetime(&current, key)?.to_rfc3339_opts(SecondsFormat::AutoSi, true);
     if canonical != current {
         payload.insert(key.to_string(), Value::String(canonical));
     }
@@ -1550,8 +1557,9 @@ fn normalize_availability_status(payload: &mut Map<String, Value>) {
     let normalized = match original.trim().to_ascii_lowercase().as_str() {
         "questionable" => "doubtful".to_string(),
         "unavailable" => "unavailable".to_string(),
-        "available" | "doubtful" | "injured" | "suspended" | "rested"
-        | "returning" | "unknown" => original.trim().to_ascii_lowercase(),
+        "available" | "doubtful" | "injured" | "suspended" | "rested" | "returning" | "unknown" => {
+            original.trim().to_ascii_lowercase()
+        }
         _ => return,
     };
     if normalized != original {
@@ -1559,10 +1567,7 @@ fn normalize_availability_status(payload: &mut Map<String, Value>) {
             "_availability_status_original".to_string(),
             Value::String(original),
         );
-        payload.insert(
-            "availability_status".to_string(),
-            Value::String(normalized),
-        );
+        payload.insert("availability_status".to_string(), Value::String(normalized));
     }
 }
 
@@ -1574,16 +1579,17 @@ fn normalize_dynamic_tag_source_type(payload: &mut Map<String, Value>) {
     let normalized = match original.trim().to_ascii_lowercase().as_str() {
         "manual" | "provider" | "lineup_import" | "ai_analysis" | "match_review"
         | "calculation" => original.trim().to_ascii_lowercase(),
-        "official_web_plus_role_model" | "public_roster_initialization" | "role_model"
-        | "model" | "computed" | "derived" => "calculation".to_string(),
+        "official_web_plus_role_model"
+        | "public_roster_initialization"
+        | "role_model"
+        | "model"
+        | "computed"
+        | "derived" => "calculation".to_string(),
         "official_web" | "web" | "official_source" => "provider".to_string(),
         _ => return,
     };
     if normalized != original {
-        payload.insert(
-            "_source_type_original".to_string(),
-            Value::String(original),
-        );
+        payload.insert("_source_type_original".to_string(), Value::String(original));
         payload.insert("source_type".to_string(), Value::String(normalized));
     }
 }
@@ -1721,7 +1727,12 @@ async fn validate_reference_codes(
         let source_type = default_text(payload, "source_type", "manual");
         if !matches!(
             source_type.as_str(),
-            "manual" | "provider" | "lineup_import" | "ai_analysis" | "match_review" | "calculation"
+            "manual"
+                | "provider"
+                | "lineup_import"
+                | "ai_analysis"
+                | "match_review"
+                | "calculation"
         ) {
             return Err(PersistenceError::InvalidState(format!(
                 "动态标签来源类型不受支持：{source_type}"
@@ -1750,8 +1761,16 @@ fn validate_required_fields(
     payload: &Map<String, Value>,
 ) -> PersistenceResult<()> {
     let fields: &[&str] = match entity_type {
-        SpreadsheetEntityType::Team if matches!(action, SpreadsheetAction::Add | SpreadsheetAction::Upsert) => &["official_name"],
-        SpreadsheetEntityType::Player if matches!(action, SpreadsheetAction::Add | SpreadsheetAction::Upsert) => &["official_name"],
+        SpreadsheetEntityType::Team
+            if matches!(action, SpreadsheetAction::Add | SpreadsheetAction::Upsert) =>
+        {
+            &["official_name"]
+        }
+        SpreadsheetEntityType::Player
+            if matches!(action, SpreadsheetAction::Add | SpreadsheetAction::Upsert) =>
+        {
+            &["official_name"]
+        }
         SpreadsheetEntityType::Team | SpreadsheetEntityType::Player => &[],
         SpreadsheetEntityType::PlayerName => &["name_value"],
         SpreadsheetEntityType::PlayerPosition => &["position_code", "proficiency"],
@@ -2279,12 +2298,7 @@ async fn apply_import_row(
             let entity_id = if entity_type == "team" {
                 resolve_committed_team_id(tx, values, context).await?
             } else {
-                resolve_committed_id(
-                    values,
-                    &entity_type,
-                    context.player_keys,
-                    context.team_keys,
-                )?
+                resolve_committed_id(values, &entity_type, context.player_keys, context.team_keys)?
             };
             sqlx::query("INSERT INTO football.external_entity_ids (id,provider_id,entity_type,entity_id,external_id,metadata) VALUES ($1,$2,$3,$4,$5,$6) ON CONFLICT (provider_id,entity_type,external_id) DO UPDATE SET entity_id=EXCLUDED.entity_id, metadata=football.external_entity_ids.metadata||EXCLUDED.metadata")
                 .bind(Uuid::new_v4()).bind(provider_id).bind(&entity_type).bind(entity_id).bind(required_text(values,"external_id")?)
@@ -2453,7 +2467,9 @@ async fn resolve_optional_committed_team_id(
         || !text(values, "_deferred_team_name").is_empty()
         || !text(values, "team_name").is_empty();
     if has_reference {
-        resolve_committed_team_id(tx, values, context).await.map(Some)
+        resolve_committed_team_id(tx, values, context)
+            .await
+            .map(Some)
     } else {
         Ok(None)
     }
@@ -2860,14 +2876,14 @@ mod tests {
 
     #[test]
     fn spreadsheet_datetime_accepts_date_only_and_excel_serial() {
-        let date_only = parse_spreadsheet_datetime("2026-07-18", "observed_at")
-            .expect("date-only timestamp");
+        let date_only =
+            parse_spreadsheet_datetime("2026-07-18", "observed_at").expect("date-only timestamp");
         assert_eq!(
             date_only.to_rfc3339_opts(SecondsFormat::Secs, true),
             "2026-07-18T00:00:00Z"
         );
-        let serial = parse_spreadsheet_datetime("46221", "observed_at")
-            .expect("Excel serial timestamp");
+        let serial =
+            parse_spreadsheet_datetime("46221", "observed_at").expect("Excel serial timestamp");
         assert_eq!(serial.date_naive().to_string(), "2026-07-18");
     }
 
@@ -2937,10 +2953,7 @@ mod tests {
 
     #[test]
     fn package_team_name_can_resolve_to_deferred_external_reference() {
-        let references = HashMap::from([(
-            "ATM".to_string(),
-            "Atlético Mineiro".to_string(),
-        )]);
+        let references = HashMap::from([("ATM".to_string(), "Atlético Mineiro".to_string())]);
         let target = normalize_reference_name("  ATLÉTICO   MINEIRO ");
         let matches = references
             .iter()
@@ -2979,11 +2992,8 @@ mod tests {
         .clone();
         let error = validate_child_fields(SpreadsheetEntityType::PlayerDynamicTag, &payload)
             .expect_err("explicit non-increasing range must fail");
-        assert!(
-            error
-                .to_string()
-                .contains("动态标签失效时间必须晚于生效时间")
-        );
+        assert!(error
+            .to_string()
+            .contains("动态标签失效时间必须晚于生效时间"));
     }
 }
-

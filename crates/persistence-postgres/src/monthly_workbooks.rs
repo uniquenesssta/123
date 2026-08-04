@@ -388,7 +388,10 @@ impl PostgresStore {
             .iter()
             .filter(|row| {
                 row.entity_type == SpreadsheetEntityType::Team
-                    && matches!(row.action, SpreadsheetAction::Add | SpreadsheetAction::Upsert)
+                    && matches!(
+                        row.action,
+                        SpreadsheetAction::Add | SpreadsheetAction::Upsert
+                    )
             })
             .filter_map(|row| text(object(&row.values).ok()?, "official_name"))
             .map(|value| normalize_name(&value))
@@ -398,7 +401,10 @@ impl PostgresStore {
             .iter()
             .filter(|row| {
                 row.entity_type == SpreadsheetEntityType::Coach
-                    && matches!(row.action, SpreadsheetAction::Add | SpreadsheetAction::Upsert)
+                    && matches!(
+                        row.action,
+                        SpreadsheetAction::Add | SpreadsheetAction::Upsert
+                    )
             })
             .filter_map(|row| text(object(&row.values).ok()?, "official_name"))
             .map(|value| normalize_name(&value))
@@ -756,7 +762,9 @@ impl PostgresStore {
         }
         match raw.entity_type {
             SpreadsheetEntityType::Team => self.validate_team_row(raw.action, mode, payload).await,
-            SpreadsheetEntityType::Coach => self.validate_coach_row(raw.action, mode, payload).await,
+            SpreadsheetEntityType::Coach => {
+                self.validate_coach_row(raw.action, mode, payload).await
+            }
             SpreadsheetEntityType::TeamName => {
                 require_text(values, "name_value")?;
                 parse_bool_default(text(values, "is_primary").as_deref(), false)?;
@@ -892,12 +900,8 @@ impl PostgresStore {
         let scope = {
             let values = object(&payload)?;
             let scope = require_text(values, "scope_type")?;
-            let window_start = parse_date(
-                require_text(values, "window_start")?,
-                "window_start",
-            )?;
-            let window_end =
-                parse_date(require_text(values, "window_end")?, "window_end")?;
+            let window_start = parse_date(require_text(values, "window_start")?, "window_start")?;
+            let window_end = parse_date(require_text(values, "window_end")?, "window_end")?;
             if window_end < window_start {
                 return Ok(RowValidation::error(
                     payload,
@@ -941,10 +945,7 @@ impl PostgresStore {
             }
             let alpha = parse_f64_default(text(values, "alpha").as_deref(), 3.0, "alpha")?;
             if !alpha.is_finite() || alpha <= 0.0 {
-                return Ok(RowValidation::error(
-                    payload,
-                    "阵型观察 alpha 必须大于 0",
-                ));
+                return Ok(RowValidation::error(payload, "阵型观察 alpha 必须大于 0"));
             }
             optional_datetime(values, "observed_at")?;
             scope
@@ -996,9 +997,7 @@ impl PostgresStore {
                 }
                 RowValidation::ready_add(payload, "赛事默认阵型分布已通过预检")
             }
-            "system_default" => {
-                RowValidation::ready_add(payload, "系统默认阵型分布已通过预检")
-            }
+            "system_default" => RowValidation::ready_add(payload, "系统默认阵型分布已通过预检"),
             _ => {
                 return Ok(RowValidation::error(
                     payload,
@@ -1030,12 +1029,10 @@ impl PostgresStore {
         };
         let mut stale_id_note = None;
         if let Some(formation_id) = source_formation_id {
-            let row = sqlx::query(
-                "SELECT code,is_active FROM football.formations WHERE id=$1",
-            )
-            .bind(formation_id)
-            .fetch_optional(&self.pool)
-            .await?;
+            let row = sqlx::query("SELECT code,is_active FROM football.formations WHERE id=$1")
+                .bind(formation_id)
+                .fetch_optional(&self.pool)
+                .await?;
             match row {
                 Some(row) if row.try_get::<bool, _>("is_active")? => {
                     let code: String = row.try_get("code")?;
@@ -1051,9 +1048,7 @@ impl PostgresStore {
                     stale_id_note = Some(format!("阵型ID {formation_id} 已停用"));
                 }
                 None => {
-                    stale_id_note = Some(format!(
-                        "阵型ID {formation_id} 在当前数据库不存在"
-                    ));
+                    stale_id_note = Some(format!("阵型ID {formation_id} 在当前数据库不存在"));
                 }
             }
         }
@@ -1065,8 +1060,7 @@ impl PostgresStore {
             })
         })?;
         let code = canonical_formation_code(&raw_code);
-        object_mut(payload)?
-            .insert("formation_code".into(), Value::String(code.clone()));
+        object_mut(payload)?.insert("formation_code".into(), Value::String(code.clone()));
         let rows = sqlx::query(
             "SELECT id,is_active FROM football.formations WHERE lower(code)=lower($1) ORDER BY is_active DESC,id LIMIT 2",
         )
@@ -1226,8 +1220,8 @@ fn team_ready_add_identity(row: &SpreadsheetImportRow) -> PersistenceResult<Opti
         .unwrap_or_default()
         .trim()
         .to_ascii_uppercase();
-    let team_type = normalize_team_type(text(values, "team_type"))?
-        .unwrap_or_else(|| "club".to_string());
+    let team_type =
+        normalize_team_type(text(values, "team_type"))?.unwrap_or_else(|| "club".to_string());
     Ok(Some(format!(
         "name:{normalized_name}|country:{country}|type:{team_type}"
     )))
@@ -1263,10 +1257,7 @@ fn team_row_preference(row: &SpreadsheetImportRow) -> usize {
     explicit_sheet_bonus + populated_fields
 }
 
-fn merge_missing_team_payload_fields(
-    target: &mut Map<String, Value>,
-    source: &Map<String, Value>,
-) {
+fn merge_missing_team_payload_fields(target: &mut Map<String, Value>, source: &Map<String, Value>) {
     for (key, value) in source {
         if !payload_value_is_present(value) {
             continue;
@@ -1303,7 +1294,11 @@ async fn consolidate_duplicate_ready_add_team_rows(
             .cloned()
             .ok_or_else(|| PersistenceError::InvalidState("球队导入载荷不是对象".into()))?;
 
-        for index in indices.iter().copied().filter(|index| *index != canonical_index) {
+        for index in indices
+            .iter()
+            .copied()
+            .filter(|index| *index != canonical_index)
+        {
             let source = rows[index]
                 .payload
                 .as_object()
@@ -1322,7 +1317,11 @@ async fn consolidate_duplicate_ready_add_team_rows(
         .execute(&mut **tx)
         .await?;
 
-        for index in indices.iter().copied().filter(|index| *index != canonical_index) {
+        for index in indices
+            .iter()
+            .copied()
+            .filter(|index| *index != canonical_index)
+        {
             rows[index].status = SpreadsheetRowStatus::Skip;
             rows[index].message = Some("同一资料包重复球队行已合并并跳过".into());
             sqlx::query(
@@ -1344,9 +1343,13 @@ fn canonical_team_import_action(
     if action != SpreadsheetAction::Upsert {
         return action;
     }
-    if matches!(entity_type, SpreadsheetEntityType::Team | SpreadsheetEntityType::Coach)
-        && matches!(status, SpreadsheetRowStatus::ReadyUpdate | SpreadsheetRowStatus::Conflict)
-    {
+    if matches!(
+        entity_type,
+        SpreadsheetEntityType::Team | SpreadsheetEntityType::Coach
+    ) && matches!(
+        status,
+        SpreadsheetRowStatus::ReadyUpdate | SpreadsheetRowStatus::Conflict
+    ) {
         SpreadsheetAction::Update
     } else {
         SpreadsheetAction::Add
@@ -1368,9 +1371,7 @@ fn normalized_source_urls(values: &Map<String, Value>) -> Vec<String> {
     urls
 }
 
-fn team_ready_add_source_identity(
-    row: &SpreadsheetImportRow,
-) -> PersistenceResult<Option<String>> {
+fn team_ready_add_source_identity(row: &SpreadsheetImportRow) -> PersistenceResult<Option<String>> {
     if row.entity_type != SpreadsheetEntityType::Team
         || row.status != SpreadsheetRowStatus::ReadyAdd
     {
@@ -1385,8 +1386,8 @@ fn team_ready_add_source_identity(
         .unwrap_or_default()
         .trim()
         .to_ascii_uppercase();
-    let team_type = normalize_team_type(text(values, "team_type"))?
-        .unwrap_or_else(|| "club".to_string());
+    let team_type =
+        normalize_team_type(text(values, "team_type"))?.unwrap_or_else(|| "club".to_string());
     Ok(Some(format!(
         "source:{}|country:{country}|type:{team_type}",
         urls.join("|")
@@ -1428,7 +1429,11 @@ async fn consolidate_duplicate_ready_add_team_rows_by_source(
             .cloned()
             .ok_or_else(|| PersistenceError::InvalidState("球队导入载荷不是对象".into()))?;
 
-        for index in indices.iter().copied().filter(|index| *index != canonical_index) {
+        for index in indices
+            .iter()
+            .copied()
+            .filter(|index| *index != canonical_index)
+        {
             let source = rows[index]
                 .payload
                 .as_object()
@@ -1447,7 +1452,11 @@ async fn consolidate_duplicate_ready_add_team_rows_by_source(
         .execute(&mut **tx)
         .await?;
 
-        for index in indices.iter().copied().filter(|index| *index != canonical_index) {
+        for index in indices
+            .iter()
+            .copied()
+            .filter(|index| *index != canonical_index)
+        {
             rows[index].status = SpreadsheetRowStatus::Skip;
             rows[index].message = Some("同一资料包同来源球队行已合并并跳过".into());
             sqlx::query(
@@ -1468,11 +1477,7 @@ struct BatchTeamReference {
     source_urls: HashSet<String>,
 }
 
-fn insert_unique_reference(
-    references: &mut HashMap<String, Option<Uuid>>,
-    key: String,
-    id: Uuid,
-) {
+fn insert_unique_reference(references: &mut HashMap<String, Option<Uuid>>, key: String, id: Uuid) {
     if key.is_empty() {
         return;
     }
@@ -1507,8 +1512,8 @@ fn resolve_batch_team_reference(
     aliases: &HashMap<String, Option<Uuid>>,
     sources: &HashMap<String, Option<Uuid>>,
 ) -> PersistenceResult<Option<Uuid>> {
-    if let Some(id) = optional_uuid(values, "_resolved_team_id")?
-        .or(optional_uuid(values, "team_id")?)
+    if let Some(id) =
+        optional_uuid(values, "_resolved_team_id")?.or(optional_uuid(values, "team_id")?)
     {
         return Ok(Some(id));
     }
@@ -1612,8 +1617,7 @@ async fn bind_batch_team_references(
         if optional_uuid(values, "_resolved_team_id")?.is_some() {
             continue;
         }
-        let Some(team_id) =
-            resolve_batch_team_reference(values, &alias_index, &source_index)?
+        let Some(team_id) = resolve_batch_team_reference(values, &alias_index, &source_index)?
         else {
             continue;
         };
@@ -1676,12 +1680,11 @@ async fn preserve_current_team_canonical_alias(
     team_id: Uuid,
     metadata: &Value,
 ) -> PersistenceResult<()> {
-    let current_name = sqlx::query_scalar::<_, String>(
-        "SELECT canonical_name FROM football.teams WHERE id=$1",
-    )
-    .bind(team_id)
-    .fetch_optional(&mut **tx)
-    .await?;
+    let current_name =
+        sqlx::query_scalar::<_, String>("SELECT canonical_name FROM football.teams WHERE id=$1")
+            .bind(team_id)
+            .fetch_optional(&mut **tx)
+            .await?;
     if let Some(current_name) = current_name {
         ensure_team_name_alias(tx, team_id, &current_name, None, None, None, metadata).await?;
     }
@@ -1706,7 +1709,8 @@ async fn execute_team_monthly_row(
                 upsert_team_profile_from_values(tx, id, values, &metadata).await?;
                 ensure_team_name_alias(tx, id, &name, None, None, None, &metadata).await?;
                 if let Some(short_name) = text(values, "short_name") {
-                    ensure_team_name_alias(tx, id, &short_name, None, None, None, &metadata).await?;
+                    ensure_team_name_alias(tx, id, &short_name, None, None, None, &metadata)
+                        .await?;
                 }
                 Ok(CommitOutcome {
                     inserted: 1,
@@ -1928,8 +1932,7 @@ fn formation_record_reference(values: &Map<String, Value>) -> String {
         .or_else(|| text(values, "formation_id"))
         .map(|value| format!("id:{}", value.trim().to_ascii_lowercase()))
         .or_else(|| {
-            text(values, "formation_code")
-                .map(|value| format!("code:{}", normalize_name(&value)))
+            text(values, "formation_code").map(|value| format!("code:{}", normalize_name(&value)))
         })
         .unwrap_or_default()
 }
@@ -1960,8 +1963,8 @@ fn validate_formation_group_rows(rows: &mut [SpreadsheetImportRow]) {
                 error = Some("阵型观察载荷不是有效对象".to_string());
                 break;
             };
-            let observed = text(values, "observed_matches")
-                .and_then(|value| value.parse::<i32>().ok());
+            let observed =
+                text(values, "observed_matches").and_then(|value| value.parse::<i32>().ok());
             let usage = text(values, "usage_count").and_then(|value| value.parse::<i32>().ok());
             let Some(observed) = observed else {
                 error = Some("阵型观察场数必须是整数".to_string());
@@ -1979,8 +1982,7 @@ fn validate_formation_group_rows(rows: &mut [SpreadsheetImportRow]) {
             total_usage += usage;
 
             let formation_reference = formation_record_reference(values);
-            if !formation_reference.is_empty()
-                && !formation_references.insert(formation_reference)
+            if !formation_reference.is_empty() && !formation_references.insert(formation_reference)
             {
                 error = Some("同一阵型在观察窗口中重复".to_string());
                 break;
@@ -2141,12 +2143,11 @@ async fn resolve_or_register_import_formation_tx(
 ) -> PersistenceResult<Uuid> {
     let row_label = format!("工作表“{}”第 {} 行", row.sheet_name, row.row_number);
     if let Some(id) = optional_uuid(values, "_resolved_formation_id")? {
-        let active = sqlx::query_scalar::<_, bool>(
-            "SELECT is_active FROM football.formations WHERE id=$1",
-        )
-        .bind(id)
-        .fetch_optional(&mut **tx)
-        .await?;
+        let active =
+            sqlx::query_scalar::<_, bool>("SELECT is_active FROM football.formations WHERE id=$1")
+                .bind(id)
+                .fetch_optional(&mut **tx)
+                .await?;
         return match active {
             Some(true) => Ok(id),
             Some(false) => Err(PersistenceError::InvalidState(format!(
@@ -2159,12 +2160,11 @@ async fn resolve_or_register_import_formation_tx(
     }
 
     if let Some(id) = optional_uuid(values, "formation_id")? {
-        let active = sqlx::query_scalar::<_, bool>(
-            "SELECT is_active FROM football.formations WHERE id=$1",
-        )
-        .bind(id)
-        .fetch_optional(&mut **tx)
-        .await?;
+        let active =
+            sqlx::query_scalar::<_, bool>("SELECT is_active FROM football.formations WHERE id=$1")
+                .bind(id)
+                .fetch_optional(&mut **tx)
+                .await?;
         if matches!(active, Some(true)) {
             return Ok(id);
         }
@@ -2247,17 +2247,15 @@ async fn resolve_or_register_import_formation_tx(
         return Ok(inserted_id);
     }
 
-    sqlx::query_scalar::<_, Uuid>(
-        "SELECT id FROM football.formations WHERE code=$1 AND is_active",
-    )
-    .bind(&code)
-    .fetch_optional(&mut **tx)
-    .await?
-    .ok_or_else(|| {
-        PersistenceError::InvalidState(format!(
-            "{row_label}的自定义阵型 {code} 未能登记到阵型目录"
-        ))
-    })
+    sqlx::query_scalar::<_, Uuid>("SELECT id FROM football.formations WHERE code=$1 AND is_active")
+        .bind(&code)
+        .fetch_optional(&mut **tx)
+        .await?
+        .ok_or_else(|| {
+            PersistenceError::InvalidState(format!(
+                "{row_label}的自定义阵型 {code} 未能登记到阵型目录"
+            ))
+        })
 }
 
 async fn upsert_team_profile_from_values(
@@ -2266,8 +2264,8 @@ async fn upsert_team_profile_from_values(
     values: &Map<String, Value>,
     metadata: &Value,
 ) -> PersistenceResult<()> {
-    let team_type = normalize_team_type(text(values, "team_type"))?
-        .unwrap_or_else(|| "club".to_string());
+    let team_type =
+        normalize_team_type(text(values, "team_type"))?.unwrap_or_else(|| "club".to_string());
     sqlx::query(r#"INSERT INTO football.team_profiles (
         team_id,short_name,team_type,founded_year,city,stadium,data_confidence,notes,metadata,updated_at
     ) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,now())
@@ -2568,46 +2566,18 @@ fn normalize_team_type(value: Option<String>) -> PersistenceResult<Option<String
         .to_lowercase()
         .chars()
         .filter(|character| {
-            !character.is_whitespace()
-                && !matches!(character, '_' | '-' | '\'' | '’' | '.' | '/')
+            !character.is_whitespace() && !matches!(character, '_' | '-' | '\'' | '’' | '.' | '/')
         })
         .collect::<String>();
     let canonical = match key.as_str() {
         "club" | "clubs" | "clubteam" | "俱乐部" | "俱乐部队" => "club",
-        "national"
-        | "nationalteam"
-        | "seniornational"
-        | "seniornationalteam"
-        | "国家队"
-        | "国家代表队"
-        | "成年国家队" => "national",
-        "reserve"
-        | "reserves"
-        | "reserveteam"
-        | "bteam"
-        | "secondteam"
-        | "预备队"
-        | "二队"
+        "national" | "nationalteam" | "seniornational" | "seniornationalteam" | "国家队"
+        | "国家代表队" | "成年国家队" => "national",
+        "reserve" | "reserves" | "reserveteam" | "bteam" | "secondteam" | "预备队" | "二队"
         | "b队" => "reserve",
-        "youth"
-        | "youthteam"
-        | "academy"
-        | "academyteam"
-        | "u18"
-        | "u19"
-        | "u20"
-        | "u21"
-        | "u23"
-        | "青年队"
-        | "青训队"
-        | "梯队" => "youth",
-        "women"
-        | "womens"
-        | "womenteam"
-        | "womensteam"
-        | "female"
-        | "女足"
-        | "女子队"
+        "youth" | "youthteam" | "academy" | "academyteam" | "u18" | "u19" | "u20" | "u21"
+        | "u23" | "青年队" | "青训队" | "梯队" => "youth",
+        "women" | "womens" | "womenteam" | "womensteam" | "female" | "女足" | "女子队"
         | "女子足球队" => "women",
         "other" | "others" | "其他" | "其它" => "other",
         _ => {
@@ -2789,9 +2759,7 @@ fn canonical_date(value: String, key: &str) -> PersistenceResult<String> {
     parse_datetime(value, key).map(|date_time| date_time.date_naive().to_string())
 }
 
-fn normalize_point_observation_window_payload(
-    payload: &mut Value,
-) -> PersistenceResult<bool> {
+fn normalize_point_observation_window_payload(payload: &mut Value) -> PersistenceResult<bool> {
     let values = object_mut(payload)?;
     let current_start = text(values, "window_start");
     let current_end = text(values, "window_end");
@@ -3072,11 +3040,10 @@ mod tests {
 
     #[test]
     fn monthly_datetime_rejects_unrecognized_text_before_database_write() {
-        let error = canonical_datetime("not-a-date".into(), "verified_at")
-            .expect_err("invalid datetime");
+        let error =
+            canonical_datetime("not-a-date".into(), "verified_at").expect_err("invalid datetime");
         assert!(error.to_string().contains("Excel 日期单元格"));
     }
-
 
     #[test]
     fn point_observation_window_uses_end_for_missing_start() {
@@ -3098,8 +3065,9 @@ mod tests {
         let mut payload = json!({
             "observed_at": "2026-07-18T15:30:00Z"
         });
-        assert!(normalize_point_observation_window_payload(&mut payload)
-            .expect("derive point window"));
+        assert!(
+            normalize_point_observation_window_payload(&mut payload).expect("derive point window")
+        );
         assert_eq!(payload["window_start"], "2026-07-18");
         assert_eq!(payload["window_end"], "2026-07-18");
     }
@@ -3113,7 +3081,9 @@ mod tests {
         });
         let error = normalize_point_observation_window_payload(&mut payload)
             .expect_err("inverted point window");
-        assert!(error.to_string().contains("window_end 不能早于 window_start"));
+        assert!(error
+            .to_string()
+            .contains("window_end 不能早于 window_start"));
     }
 
     fn ready_add_team_row(sheet_name: &str, payload: Value) -> SpreadsheetImportRow {
@@ -3190,7 +3160,7 @@ mod tests {
             id: team_id,
             aliases: HashSet::from([normalize_name("米内罗竞技")]),
             source_urls: HashSet::from([
-                "https://atletico.com.br/futebol/masculino/elenco".to_string(),
+                "https://atletico.com.br/futebol/masculino/elenco".to_string()
             ]),
         }];
         let (aliases, sources) = build_batch_team_reference_indexes(&teams);

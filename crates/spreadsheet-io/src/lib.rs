@@ -245,7 +245,9 @@ const SHEETS: &[SheetSpec] = &[
         entity_type: SpreadsheetEntityType::PlayerPosition,
         headers: POSITION_HEADERS,
         required: &["position_code", "proficiency"],
-        widths: &[10.0, 16.0, 38.0, 24.0, 16.0, 16.0, 14.0, 22.0, 12.0, 14.0, 14.0],
+        widths: &[
+            10.0, 16.0, 38.0, 24.0, 16.0, 16.0, 14.0, 22.0, 12.0, 14.0, 14.0,
+        ],
         example: &[
             "skip",
             "P001",
@@ -1218,7 +1220,6 @@ fn read_format_version<R: std::io::Read + std::io::Seek>(
     Ok(value.trim().to_string())
 }
 
-
 fn apply_default_role_alias(values: &mut Map<String, Value>) {
     if values
         .get("default_role_code")
@@ -1257,7 +1258,10 @@ fn validate_headers(spec: &SheetSpec, headers: &[String]) -> SpreadsheetResult<(
         .collect::<HashMap<_, _>>();
     for header in spec.headers {
         if !index.contains_key(header)
-            && !matches!((spec.entity_type, *header), (SpreadsheetEntityType::PlayerPosition, "default_role_code"))
+            && !matches!(
+                (spec.entity_type, *header),
+                (SpreadsheetEntityType::PlayerPosition, "default_role_code")
+            )
         {
             return Err(SpreadsheetError::InvalidTemplate(format!(
                 "工作表 {} 缺少固定列 {}",

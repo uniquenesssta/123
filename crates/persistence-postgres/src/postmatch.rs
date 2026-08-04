@@ -2,7 +2,7 @@ use super::{sha256_json, write_audit_event, PersistenceError, PersistenceResult,
 use chrono::{DateTime, Utc};
 use football_analytics_engine::calculate_analytics;
 use football_domain::{
-    EvidenceScoringDecisionDraft, EvidenceScoringItemRecord, EvidenceVerdict, EvaluationSample,
+    EvaluationSample, EvidenceScoringDecisionDraft, EvidenceScoringItemRecord, EvidenceVerdict,
     PostmatchDriftFindingRecord, PostmatchDriftRunRecord, PostmatchMonitoringRequest,
     PostmatchOverview, PostmatchSettlementDraft, PostmatchSettlementReadiness,
     PostmatchSettlementRecord, ProviderScoreSnapshotRecord, POSTMATCH_MONITORING_VERSION,
@@ -104,7 +104,8 @@ impl PostgresStore {
         let horizon = required(context.horizon.clone(), "推演冻结时点缺失")?;
         let home_goals_90 = required(context.home_goals_90, "正式赛果缺失")?;
         let away_goals_90 = required(context.away_goals_90, "正式赛果缺失")?;
-        let result_finalized_at = required(context.result_finalized_at.clone(), "正式赛果时间缺失")?;
+        let result_finalized_at =
+            required(context.result_finalized_at.clone(), "正式赛果时间缺失")?;
         let fingerprint = sha256_json(&SettlementFingerprint {
             match_id: context.match_id,
             match_review_id: context.match_review_id,
@@ -231,10 +232,12 @@ impl PostgresStore {
         &self,
         limit: u32,
     ) -> PersistenceResult<Vec<PostmatchSettlementRecord>> {
-        let rows = sqlx::query(&settlement_select_sql("ORDER BY settlement.settled_at DESC, settlement.id DESC LIMIT $1"))
-            .bind(i64::from(limit.clamp(1, 500)))
-            .fetch_all(&self.pool)
-            .await?;
+        let rows = sqlx::query(&settlement_select_sql(
+            "ORDER BY settlement.settled_at DESC, settlement.id DESC LIMIT $1",
+        ))
+        .bind(i64::from(limit.clamp(1, 500)))
+        .fetch_all(&self.pool)
+        .await?;
         rows.iter().map(settlement_from_row).collect()
     }
 
@@ -313,11 +316,8 @@ impl PostgresStore {
         }
         let verification_state: String = item.try_get("verification_state")?;
         let source_tier: String = item.try_get("source_tier")?;
-        let (accuracy_score, reliability_score) = verdict_scores(
-            draft.verdict,
-            &verification_state,
-            &source_tier,
-        );
+        let (accuracy_score, reliability_score) =
+            verdict_scores(draft.verdict, &verification_state, &source_tier);
         let decision_fingerprint = sha256_json(&json!({
             "item_id": draft.item_id,
             "verdict": draft.verdict.as_str(),
@@ -373,14 +373,13 @@ impl PostgresStore {
                 "漂移基线窗口和当前窗口都不能少于 5 场".to_string(),
             ));
         }
-        let partition = self.active_postmatch_partition(request.competition_id, &request.horizon).await?;
-        self.refresh_provider_scores_for_partition(&partition).await?;
-        self.refresh_drift_for_partition(
-            &partition,
-            request.baseline_size,
-            request.current_size,
-        )
-        .await?;
+        let partition = self
+            .active_postmatch_partition(request.competition_id, &request.horizon)
+            .await?;
+        self.refresh_provider_scores_for_partition(&partition)
+            .await?;
+        self.refresh_drift_for_partition(&partition, request.baseline_size, request.current_size)
+            .await?;
         self.postmatch_overview(100).await
     }
 
@@ -390,9 +389,11 @@ impl PostgresStore {
         let provider_scores = self.list_provider_scores(limit).await?;
         let drift_runs = self.list_postmatch_drift_runs(limit).await?;
         let settlement_count = non_negative_u64(
-            sqlx::query_scalar::<_, i64>("SELECT count(*)::bigint FROM review.postmatch_settlements")
-                .fetch_one(&self.pool)
-                .await?,
+            sqlx::query_scalar::<_, i64>(
+                "SELECT count(*)::bigint FROM review.postmatch_settlements",
+            )
+            .fetch_one(&self.pool)
+            .await?,
             "赛后结算数量",
         )?;
         let pending_evidence_count = non_negative_u64(
@@ -536,11 +537,8 @@ impl PostgresStore {
                     "证据 {evidence_id} 超出冻结快照截止时间，不能进入正式评分队列"
                 )));
             }
-            let timeliness_score = calculate_timeliness_score(
-                published_at.as_ref(),
-                &retrieved_at,
-                &data_cutoff_at,
-            );
+            let timeliness_score =
+                calculate_timeliness_score(published_at.as_ref(), &retrieved_at, &data_cutoff_at);
             let item_fingerprint = sha256_json(&json!({
                 "settlement_id": settlement_id,
                 "evidence_id": evidence_id,
@@ -804,7 +802,9 @@ impl PostgresStore {
                 entry.reliability.push(value);
             }
             entry.timeliness.push(row.try_get("timeliness_score")?);
-            entry.decision_fingerprints.push(row.try_get("decision_fingerprint")?);
+            entry
+                .decision_fingerprints
+                .push(row.try_get("decision_fingerprint")?);
         }
         for (provider_id, aggregate) in groups {
             let accuracy_mean = mean(&aggregate.accuracy).unwrap_or(0.0);
@@ -813,16 +813,15 @@ impl PostgresStore {
             let weighted_score = if aggregate.accuracy.is_empty() {
                 0.0
             } else {
-                round6(
-                    accuracy_mean * 0.60
-                        + timeliness_mean * 0.15
-                        + reliability_mean * 0.25,
-                )
+                round6(accuracy_mean * 0.60 + timeliness_mean * 0.15 + reliability_mean * 0.25)
             };
             let decision_set_sha256 = sha256_json(&aggregate.decision_fingerprints)?;
             let snapshot_key = format!(
                 "{}:{}:{}:{}",
-                provider_id, partition.partition_key, decision_set_sha256, POSTMATCH_MONITORING_VERSION
+                provider_id,
+                partition.partition_key,
+                decision_set_sha256,
+                POSTMATCH_MONITORING_VERSION
             );
             sqlx::query(
                 r#"
@@ -933,9 +932,17 @@ impl PostgresStore {
         let enough = samples.len() >= baseline_size + current_size;
         let status = if !enough {
             "insufficient"
-        } else if calculation.drift.iter().any(|item| item.severity == "critical") {
+        } else if calculation
+            .drift
+            .iter()
+            .any(|item| item.severity == "critical")
+        {
             "critical"
-        } else if calculation.drift.iter().any(|item| item.severity == "warning") {
+        } else if calculation
+            .drift
+            .iter()
+            .any(|item| item.severity == "warning")
+        {
             "warning"
         } else {
             "stable"
@@ -1098,14 +1105,8 @@ impl PostgresStore {
                 parameter_version: row.try_get("parameter_version")?,
                 horizon: row.try_get("horizon")?,
                 partition_key: row.try_get("partition_key")?,
-                baseline_size: non_negative_u64(
-                    row.try_get("baseline_size")?,
-                    "漂移基线样本",
-                )?,
-                current_size: non_negative_u64(
-                    row.try_get("current_size")?,
-                    "漂移当前样本",
-                )?,
+                baseline_size: non_negative_u64(row.try_get("baseline_size")?, "漂移基线样本")?,
+                current_size: non_negative_u64(row.try_get("current_size")?, "漂移当前样本")?,
                 baseline_window: row.try_get("baseline_window")?,
                 current_window: row.try_get("current_window")?,
                 status: row.try_get("status")?,
@@ -1162,8 +1163,8 @@ fn readiness_from_context(context: &SettlementContext) -> PostmatchSettlementRea
         && context.model_version_id.is_some()
         && context.parameter_set_id.is_some()
         && context.rule_package_id.is_some();
-    let frozen_snapshot_ready = context.feature_snapshot_id.is_some()
-        && context.snapshot_cutoff_at.is_some();
+    let frozen_snapshot_ready =
+        context.feature_snapshot_id.is_some() && context.snapshot_cutoff_at.is_some();
     let snapshot_identity_ready = context.snapshot_match_id == Some(context.match_id)
         && context.snapshot_model_version_id == context.model_version_id
         && context.snapshot_parameter_set_id == context.parameter_set_id
@@ -1171,9 +1172,10 @@ fn readiness_from_context(context: &SettlementContext) -> PostmatchSettlementRea
     let real_evidence_snapshot_ready = matches!(
         context.snapshot_source_kind.as_deref(),
         Some("real" | "manual")
-    ) && context.snapshot_evidence_scope.as_deref() == Some("real");
-    let competition_profile_ready = context.competition_id.is_some()
-        && context.competition_profile_id.is_some();
+    ) && context.snapshot_evidence_scope.as_deref()
+        == Some("real");
+    let competition_profile_ready =
+        context.competition_id.is_some() && context.competition_profile_id.is_some();
     let formal_horizon_ready = context
         .horizon
         .as_deref()
@@ -1195,7 +1197,8 @@ fn readiness_from_context(context: &SettlementContext) -> PostmatchSettlementRea
         blocked_reasons.push("冻结快照与比赛、模型、参数或赛事 Profile 身份不一致".to_string());
     }
     if !real_evidence_snapshot_ready {
-        blocked_reasons.push("只有真实或人工冻结、且证据域为 real 的快照才能进入正式赛后结算".to_string());
+        blocked_reasons
+            .push("只有真实或人工冻结、且证据域为 real 的快照才能进入正式赛后结算".to_string());
     }
     if !competition_profile_ready {
         blocked_reasons.push("比赛赛事或赛事 Profile 缺失".to_string());
@@ -1272,7 +1275,9 @@ fn settlement_select_sql(suffix: &str) -> String {
     )
 }
 
-fn settlement_from_row(row: &sqlx::postgres::PgRow) -> PersistenceResult<PostmatchSettlementRecord> {
+fn settlement_from_row(
+    row: &sqlx::postgres::PgRow,
+) -> PersistenceResult<PostmatchSettlementRecord> {
     Ok(PostmatchSettlementRecord {
         id: row.try_get("id")?,
         match_id: row.try_get("match_id")?,
@@ -1299,7 +1304,10 @@ fn settlement_from_row(row: &sqlx::postgres::PgRow) -> PersistenceResult<Postmat
         settlement_version: row.try_get("settlement_version")?,
         status: row.try_get("status")?,
         evidence_item_count: non_negative_u64(row.try_get("evidence_item_count")?, "证据队列数量")?,
-        scored_evidence_count: non_negative_u64(row.try_get("scored_evidence_count")?, "已评分证据数量")?,
+        scored_evidence_count: non_negative_u64(
+            row.try_get("scored_evidence_count")?,
+            "已评分证据数量",
+        )?,
         drift_status: row.try_get("drift_status")?,
         settled_by: row.try_get("settled_by")?,
         settlement_note: row.try_get("settlement_note")?,
@@ -1308,7 +1316,9 @@ fn settlement_from_row(row: &sqlx::postgres::PgRow) -> PersistenceResult<Postmat
     })
 }
 
-fn evidence_item_from_row(row: &sqlx::postgres::PgRow) -> PersistenceResult<EvidenceScoringItemRecord> {
+fn evidence_item_from_row(
+    row: &sqlx::postgres::PgRow,
+) -> PersistenceResult<EvidenceScoringItemRecord> {
     Ok(EvidenceScoringItemRecord {
         id: row.try_get("id")?,
         settlement_id: row.try_get("settlement_id")?,
@@ -1337,7 +1347,9 @@ fn evidence_item_from_row(row: &sqlx::postgres::PgRow) -> PersistenceResult<Evid
     })
 }
 
-fn provider_score_from_row(row: &sqlx::postgres::PgRow) -> PersistenceResult<ProviderScoreSnapshotRecord> {
+fn provider_score_from_row(
+    row: &sqlx::postgres::PgRow,
+) -> PersistenceResult<ProviderScoreSnapshotRecord> {
     Ok(ProviderScoreSnapshotRecord {
         id: row.try_get("id")?,
         provider_id: row.try_get("provider_id")?,
@@ -1352,7 +1364,10 @@ fn provider_score_from_row(row: &sqlx::postgres::PgRow) -> PersistenceResult<Pro
         correct_count: non_negative_u64(row.try_get("correct_count")?, "正确证据数量")?,
         partial_count: non_negative_u64(row.try_get("partial_count")?, "部分正确证据数量")?,
         incorrect_count: non_negative_u64(row.try_get("incorrect_count")?, "错误证据数量")?,
-        not_verifiable_count: non_negative_u64(row.try_get("not_verifiable_count")?, "不可验证证据数量")?,
+        not_verifiable_count: non_negative_u64(
+            row.try_get("not_verifiable_count")?,
+            "不可验证证据数量",
+        )?,
         accuracy_mean: row.try_get("accuracy_mean")?,
         timeliness_mean: row.try_get("timeliness_mean")?,
         reliability_mean: row.try_get("reliability_mean")?,
@@ -1363,7 +1378,9 @@ fn provider_score_from_row(row: &sqlx::postgres::PgRow) -> PersistenceResult<Pro
     })
 }
 
-fn drift_finding_from_row(row: &sqlx::postgres::PgRow) -> PersistenceResult<PostmatchDriftFindingRecord> {
+fn drift_finding_from_row(
+    row: &sqlx::postgres::PgRow,
+) -> PersistenceResult<PostmatchDriftFindingRecord> {
     Ok(PostmatchDriftFindingRecord {
         metric_name: row.try_get("metric_name")?,
         baseline_mean: row.try_get("baseline_mean")?,
@@ -1431,8 +1448,8 @@ fn verdict_scores(
         "secondary" | "tier_3" | "tier3" => 0.6,
         _ => 0.5,
     };
-    let reliability = (accuracy * 0.70 + verification_quality * 0.15 + source_quality * 0.15)
-        .clamp(0.0, 1.0);
+    let reliability =
+        (accuracy * 0.70 + verification_quality * 0.15 + source_quality * 0.15).clamp(0.0, 1.0);
     (Some(round6(accuracy)), Some(round6(reliability)))
 }
 
@@ -1514,9 +1531,15 @@ mod tests {
         let cutoff = Utc.with_ymd_and_hms(2026, 1, 2, 12, 0, 0).unwrap();
         let fresh = Utc.with_ymd_and_hms(2026, 1, 2, 9, 0, 0).unwrap();
         let old = Utc.with_ymd_and_hms(2025, 12, 20, 9, 0, 0).unwrap();
-        assert_eq!(calculate_timeliness_score(Some(&fresh), &fresh, &cutoff), 1.0);
+        assert_eq!(
+            calculate_timeliness_score(Some(&fresh), &fresh, &cutoff),
+            1.0
+        );
         assert_eq!(calculate_timeliness_score(Some(&old), &old, &cutoff), 0.25);
-        assert_eq!(calculate_timeliness_score(Some(&cutoff), &cutoff, &cutoff), 1.0);
+        assert_eq!(
+            calculate_timeliness_score(Some(&cutoff), &cutoff, &cutoff),
+            1.0
+        );
     }
 
     #[test]
@@ -1525,7 +1548,8 @@ mod tests {
             verdict_scores(EvidenceVerdict::NotVerifiable, "CONFIRMED", "official"),
             (None, None)
         );
-        let (accuracy, reliability) = verdict_scores(EvidenceVerdict::Correct, "CONFIRMED", "official");
+        let (accuracy, reliability) =
+            verdict_scores(EvidenceVerdict::Correct, "CONFIRMED", "official");
         assert_eq!(accuracy, Some(1.0));
         assert_eq!(reliability, Some(1.0));
     }

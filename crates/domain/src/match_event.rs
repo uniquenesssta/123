@@ -190,14 +190,16 @@ pub struct MatchEventSummary {
     pub last_event_minute: Option<i16>,
 }
 
-
 #[cfg(test)]
 mod tests {
     use super::*;
 
     #[test]
     fn event_types_parse_and_score_semantics_are_stable() {
-        assert_eq!("goal".parse::<MatchEventType>().unwrap(), MatchEventType::Goal);
+        assert_eq!(
+            "goal".parse::<MatchEventType>().unwrap(),
+            MatchEventType::Goal
+        );
         assert_eq!(
             "second_yellow".parse::<MatchEventType>().unwrap(),
             MatchEventType::SecondYellowCard

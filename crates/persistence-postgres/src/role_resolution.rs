@@ -102,7 +102,6 @@ pub(crate) fn resolve_tactical_role(
     }
 }
 
-
 pub(crate) fn normalize_role_origin(
     role_code: Option<&str>,
     requested_origin: Option<&str>,
@@ -137,9 +136,7 @@ pub(crate) fn tactical_role_confidence(
     }
     match role_origin {
         ROLE_ORIGIN_LINEUP_OVERRIDE => 1.0,
-        ROLE_ORIGIN_PLAYER_POSITION_DEFAULT => {
-            position_proficiency.unwrap_or(0.5).clamp(0.0, 1.0)
-        }
+        ROLE_ORIGIN_PLAYER_POSITION_DEFAULT => position_proficiency.unwrap_or(0.5).clamp(0.0, 1.0),
         _ => 0.5,
     }
 }
@@ -225,11 +222,7 @@ mod tests {
             ROLE_ORIGIN_LINEUP_OVERRIDE
         );
         assert_eq!(
-            tactical_role_confidence(
-                Some("影锋"),
-                ROLE_ORIGIN_LINEUP_OVERRIDE,
-                Some(0.7),
-            ),
+            tactical_role_confidence(Some("影锋"), ROLE_ORIGIN_LINEUP_OVERRIDE, Some(0.7),),
             1.0
         );
         assert_eq!(
