@@ -2,12 +2,19 @@
   [ValidateSet("Full", "Automated", "RuntimeOnly")]
   [string]$Mode = "Full",
   [string]$ProjectRoot = "",
+  [string]$LogDirectory = "",
   [string]$TestDatabaseUrl = $env:FOOTBALL_TEST_DATABASE_URL,
   [switch]$KeepAppRunning
 )
 
 $ErrorActionPreference = "Stop"
 Set-StrictMode -Version Latest
+
+$PathModulePath = Join-Path $PSScriptRoot "windows\acceptance-paths.psm1"
+if (-not (Test-Path $PathModulePath -PathType Leaf)) {
+  throw "缺少 Windows 验收路径模块：$PathModulePath"
+}
+Import-Module -Name $PathModulePath -Force -ErrorAction Stop
 
 if ($env:OS -ne "Windows_NT") {
   throw "Windows 全链路验收只能在 Windows 10/11 开发环境执行。"
@@ -24,8 +31,11 @@ if (-not (Test-Path (Join-Path $SourceRoot "package.json"))) {
 }
 if (-not (Test-Path $ContractPath)) { throw "缺少 Windows 验收契约：$ContractPath" }
 $AcceptanceContract = Get-Content -Raw -Encoding UTF8 $ContractPath | ConvertFrom-Json
-$LogRoot = Join-Path $ProjectRoot "logs"
+$LogRoot = Resolve-AcceptanceLogRoot -ProjectRoot $ProjectRoot -LogDirectory $LogDirectory
+$RuntimeLogRoot = Join-Path $ProjectRoot "logs"
+$CargoTargetRoot = Resolve-CargoTargetRoot -SourceRoot $SourceRoot
 New-Item -ItemType Directory -Force -Path $LogRoot | Out-Null
+New-Item -ItemType Directory -Force -Path $RuntimeLogRoot | Out-Null
 $Timestamp = Get-Date -Format "yyyyMMdd-HHmmss"
 $AcceptanceLog = Join-Path $LogRoot "windows-acceptance-$Timestamp.txt"
 $AcceptanceReport = Join-Path $LogRoot "windows-acceptance-$Timestamp.json"
@@ -67,22 +77,11 @@ function Assert-TestDatabase([string]$Url) {
   }
   Write-AcceptanceLog "测试数据库安全检查通过：$databaseName（凭据未写入验收日志）"
 }
-function Find-ReleaseExecutable {
-  $candidates = @(
-    (Join-Path $SourceRoot ".cargo-target\release\football-match-model-desktop.exe"),
-    (Join-Path $SourceRoot ".cargo-target\release\足球赛事模型平台.exe")
-  )
-  foreach ($candidate in $candidates) { if (Test-Path $candidate) { return $candidate } }
-  $found = Get-ChildItem (Join-Path $SourceRoot ".cargo-target\release") -Filter "*.exe" -File -ErrorAction SilentlyContinue |
-    Where-Object { $_.Name -notmatch "^(build-script-|deps)" } | Sort-Object LastWriteTime -Descending | Select-Object -First 1
-  if ($found) { return $found.FullName }
-  throw "未找到 Tauri release 可执行文件。"
-}
 function Wait-NewRuntimeLog([datetime]$StartedAt) {
   $deadline = (Get-Date).AddSeconds(45)
   while ((Get-Date) -lt $deadline) {
     if ($script:AppProcess.HasExited) { throw "客户端启动后提前退出，退出码：$($script:AppProcess.ExitCode)" }
-    $candidate = Get-ChildItem $LogRoot -Filter "football-runtime-*.jsonl" -File -ErrorAction SilentlyContinue |
+    $candidate = Get-ChildItem $RuntimeLogRoot -Filter "football-runtime-*.jsonl" -File -ErrorAction SilentlyContinue |
       Where-Object { $_.CreationTime -ge $StartedAt.AddSeconds(-2) } | Sort-Object LastWriteTime -Descending | Select-Object -First 1
     if ($candidate -and $candidate.Length -gt 0) { return $candidate.FullName }
     Start-Sleep -Milliseconds 500
@@ -93,6 +92,7 @@ function Wait-NewRuntimeLog([datetime]$StartedAt) {
 try {
   Set-Location $SourceRoot
   Write-AcceptanceLog "Windows 全链路验收开始：模式=$Mode"
+  Write-AcceptanceLog "路径契约：验收日志=$LogRoot；Cargo目标=$CargoTargetRoot"
   $nodeText = (& node --version)
   $npmText = (& npm --version)
   $rustText = (& rustc --version)
@@ -115,7 +115,7 @@ try {
     Invoke-Stage "Tauri Windows release 构建" "npm.cmd" @("run", "tauri:build")
   }
 
-  $exe = Find-ReleaseExecutable
+  $exe = Find-AcceptanceReleaseExecutable -CargoTargetRoot $CargoTargetRoot
   $env:FOOTBALL_RUNTIME_ROOT = $ProjectRoot
   $env:FOOTBALL_PROJECT_ROOT = $ProjectRoot
   $runtimeStartedAt = Get-Date
