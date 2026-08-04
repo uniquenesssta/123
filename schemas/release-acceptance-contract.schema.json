@@ -1,0 +1,20 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "football.release-acceptance-contract.schema.v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["contract_id", "stage", "baseline_version", "release_version", "schema_version", "acceptance_mode", "required_categories", "required_runtime_checks", "ui_alignment", "immutability", "release_gates"],
+  "properties": {
+    "contract_id": {"const": "football.integration-j.release-acceptance.v1"},
+    "stage": {"const": "J"},
+    "baseline_version": {"type": "string"},
+    "release_version": {"type": "string"},
+    "schema_version": {"const": "football.release-acceptance.v1"},
+    "acceptance_mode": {"const": "public_shell_and_runtime"},
+    "required_categories": {"type": "array", "minItems": 5, "items": {"type": "string"}, "uniqueItems": true},
+    "required_runtime_checks": {"type": "array", "minItems": 10, "items": {"type": "string"}, "uniqueItems": true},
+    "ui_alignment": {"type": "object"},
+    "immutability": {"type": "object"},
+    "release_gates": {"type": "object"}
+  }
+}

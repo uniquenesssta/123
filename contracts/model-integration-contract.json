@@ -1,0 +1,12 @@
+{
+  "contract_id": "football.p4-integration-baseline.v1",
+  "contract_version": "1.0.0",
+  "stage": "A",
+  "public_shell": true,
+  "provider_kind": "external",
+  "bundled_runtime": false,
+  "bundled_parameters": false,
+  "bundled_fixtures": false,
+  "canonical_horizons": ["T-24h", "T-6h", "T-90m", "T-1h"],
+  "legacy_horizons": ["T-N"]
+}

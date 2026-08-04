@@ -1,0 +1,9 @@
+{
+  "contract_id": "football.p4-workbench-contract.v1",
+  "contract_version": "1.0.0",
+  "stage": "G",
+  "surface": "single_match_workspace",
+  "manual_conflict_policy": "append_only_before_cutoff",
+  "formal_snapshot_mutable": false,
+  "provider_required": true
+}

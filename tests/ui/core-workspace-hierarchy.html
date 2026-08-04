@@ -1,0 +1,138 @@
+<!doctype html>
+<html lang="zh-CN" data-theme="light">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Core Workspace Hierarchy</title>
+  <link rel="stylesheet" href="../../src/styles/app.css">
+  <link rel="stylesheet" href="../../src/styles/components.css">
+  <link rel="stylesheet" href="../../src/styles/layout.css">
+  <link rel="stylesheet" href="../../src/styles/entityCenter.css">
+  <link rel="stylesheet" href="../../src/styles/taskWorkspace.css">
+  <link rel="stylesheet" href="../../src/styles/coreWorkspaces.css">
+  <link rel="stylesheet" href="../../src/styles/visualSystem.css">
+  <style>
+    * { animation: none !important; transition: none !important; }
+    body { min-width: 0; overflow: hidden; background: var(--bg); }
+    .fixture-shell { height: 100vh; display: grid; grid-template-columns: 60px 154px minmax(0, 1fr); }
+    .fixture-primary { display: grid; grid-template-rows: auto 1fr auto; padding: 8px 5px; border-right: 1px solid var(--line); background: var(--panel); }
+    .fixture-logo { width: 30px; height: 30px; display: grid; place-items: center; margin: 0 auto 8px; border-radius: 8px; color: white; background: var(--accent); font-weight: 900; }
+    .fixture-primary nav { display: grid; align-content: start; gap: 2px; }
+    .fixture-primary button { min-height: 34px; display: grid; place-items: center; gap: 1px; padding: 4px 2px; border: 0; border-radius: 6px; color: var(--muted); background: transparent; font-size: 10px; }
+    .fixture-primary button span { font-size: 13px; }
+    .fixture-primary button.active { color: var(--accent); background: color-mix(in srgb, var(--accent) 10%, var(--panel)); }
+    .fixture-version { color: var(--muted-2); font-size: 9px; text-align: center; }
+    .fixture-secondary { min-width: 0; padding: 10px 7px; border-right: 1px solid var(--line); background: color-mix(in srgb, var(--panel) 96%, var(--bg)); }
+    .fixture-secondary header { padding: 0 6px 8px; }
+    .fixture-secondary header span { color: var(--muted-2); font-size: 10px; font-weight: 750; }
+    .fixture-secondary header h2 { margin: 5px 0 0; font-size: 13px; }
+    .fixture-secondary nav { display: grid; gap: 2px; }
+    .fixture-secondary button { min-height: 34px; display: flex; align-items: center; gap: 6px; padding: 5px 7px; border: 0; border-radius: 5px; color: var(--muted); background: transparent; font-size: 11px; text-align: left; }
+    .fixture-secondary button b { width: 22px; color: var(--muted-2); font-size: 10px; }
+    .fixture-secondary button.active { color: var(--accent); background: color-mix(in srgb, var(--accent) 9%, var(--panel)); }
+    .fixture-main { min-width: 0; min-height: 0; padding: 10px 12px; overflow: hidden; }
+    .fixture-stage { height: 100%; min-height: 0; display: grid; grid-template-columns: 242px minmax(0, 1fr); gap: 10px; }
+    .fixture-directory { min-height: 0; display: grid; grid-template-rows: auto auto minmax(0, 1fr); padding: 9px; }
+    .fixture-directory h3 { margin: 3px 0 0; font-size: 16px; }
+    .fixture-search { height: 32px; margin: 8px 0 6px; padding: 0 10px; border: 1px solid var(--line); border-radius: 8px; background: var(--soft); color: var(--muted); font-size: 11px; }
+    .fixture-club-list { min-height: 0; display: grid; align-content: start; gap: 2px; overflow: hidden; }
+    .fixture-club { display: grid; grid-template-columns: 28px minmax(0, 1fr) auto; align-items: center; gap: 7px; padding: 6px; border: 1px solid transparent; border-radius: 5px; }
+    .fixture-club.active { border-color: color-mix(in srgb, var(--accent) 28%, var(--line)); background: color-mix(in srgb, var(--accent) 7%, var(--panel)); }
+    .fixture-club i { width: 28px; height: 28px; display: grid; place-items: center; border-radius: 5px; background: var(--soft); color: var(--accent); font-style: normal; font-weight: 800; }
+    .fixture-club strong, .fixture-club small { display: block; }
+    .fixture-club strong { font-size: 11px; }
+    .fixture-club small { margin-top: 2px; color: var(--muted); font-size: 10px; }
+    .fixture-club b { color: var(--muted-2); font-size: 10px; }
+    .fixture-profile { min-height: 0; overflow-y: auto; padding: 0 2px 12px 0; scrollbar-width: none; }
+    .fixture-profile::-webkit-scrollbar { display: none; }
+    .fixture-overview { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 10px; padding: 8px; }
+    .fixture-overview h2 { margin: 4px 0 5px; font-size: 17px; }
+    .fixture-overview p { margin: 0; color: var(--muted); font-size: 11px; }
+    .fixture-overview .button-row { align-self: start; }
+    .fixture-stats { display: grid; grid-template-columns: repeat(4, minmax(0,1fr)); gap: 8px; margin-top: 8px; }
+    .fixture-stats div { padding: 7px 8px; border: 1px solid var(--line); border-radius: 5px; background: var(--soft); }
+    .fixture-stats span, .fixture-stats strong, .fixture-stats small { display: block; }
+    .fixture-stats span { color: var(--muted-2); font-size: 9px; }
+    .fixture-stats strong { margin-top: 4px; font-size: 13px; }
+    .fixture-stats small { margin-top: 2px; color: var(--muted); font-size: 9px; }
+    .fixture-section { padding: 10px 11px; }
+    .fixture-section h3 { margin: 0 0 7px; font-size: 14px; }
+    .fixture-grid { display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap: 8px; }
+    .fixture-field { min-height: 42px; padding: 7px 8px; border: 1px solid var(--line); border-radius: 8px; background: var(--panel); }
+    .fixture-field span, .fixture-field strong { display: block; }
+    .fixture-field span { color: var(--muted-2); font-size: 9px; }
+    .fixture-field strong { margin-top: 3px; font-size: 11px; }
+  </style>
+</head>
+<body>
+  <div class="fixture-shell">
+    <aside class="fixture-primary">
+      <div class="fixture-logo">F</div>
+      <nav aria-label="一级菜单">
+        <button><span>⌂</span>首页</button>
+        <button><span>◫</span>比赛</button>
+        <button class="active"><span>◎</span>资源</button>
+        <button><span>◇</span>模型</button>
+        <button><span>▥</span>分析</button>
+        <button><span>✦</span>AI</button>
+        <button><span>⚙</span>管理</button>
+      </nav>
+      <div class="fixture-version">0.23.0</div>
+    </aside>
+    <aside class="fixture-secondary">
+      <header><span>资源</span><h2>球队与人员</h2></header>
+      <nav aria-label="二级菜单">
+        <button class="active"><b>01</b>球队中心</button>
+        <button><b>02</b>球员中心</button>
+        <button><b>03</b>Excel 工作包</button>
+      </nav>
+    </aside>
+    <main class="fixture-main">
+      <section class="task-page core-workspace-page core-team-workspace">
+        <header class="task-page-header">
+          <div class="task-page-heading"><p class="eyebrow">球队中心</p><h1>球队资料与阵容体系</h1><p>目录、完整档案、资料工作包和新增资料保持在同一页面，深层资料通过页内导航完成。</p></div>
+          <div class="task-page-actions"><span class="task-status-chip tone-success">完整档案已打开</span><button class="secondary">刷新目录</button><button class="primary">AI 问答</button></div>
+        </header>
+        <section class="task-context-ribbon">
+          <article class="task-context-item tone-accent"><div><span>当前球队</span><strong>科林蒂安</strong><small>巴西 · 俱乐部</small></div></article>
+          <article class="task-context-item"><div><span>资料完整度</span><strong>86%</strong><small>角色与阵型已接入</small></div></article>
+          <article class="task-context-item"><div><span>当前任务</span><strong>编辑完整档案</strong><small>页面内完成，不离开球队中心</small></div></article>
+        </section>
+        <div class="core-local-navigation">
+          <nav class="workspace-section-nav" aria-label="模块功能">
+            <button class="workspace-section-nav-item"><span class="workspace-section-index">01</span><span class="workspace-section-copy"><strong>球队目录</strong><small>筛选、速览与阵容名单</small></span></button>
+            <button class="workspace-section-nav-item active"><span class="workspace-section-index">02</span><span class="workspace-section-copy"><strong>完整档案</strong><small>身份、战术、阵型与历史</small></span><b>当前</b></button>
+            <button class="workspace-section-nav-item"><span class="workspace-section-index">03</span><span class="workspace-section-copy"><strong>资料工作包</strong><small>导入、预检与导出</small></span></button>
+            <button class="workspace-section-nav-item"><span class="workspace-section-index">04</span><span class="workspace-section-copy"><strong>新增资料</strong><small>创建球队与基础档案</small></span></button>
+          </nav>
+        </div>
+        <div class="core-workspace-stage">
+          <section class="fixture-stage">
+            <aside class="panel fixture-directory">
+              <div><span class="eyebrow">球队目录</span><h3>俱乐部</h3></div>
+              <div class="fixture-search">搜索球队、国家或赛事</div>
+              <div class="fixture-club-list">
+                <div class="fixture-club active"><i>科</i><div><strong>科林蒂安</strong><small>巴西 · 圣保罗</small></div><b>32</b></div>
+                <div class="fixture-club"><i>里</i><div><strong>里莫</strong><small>巴西 · 贝伦</small></div><b>29</b></div>
+                <div class="fixture-club"><i>博</i><div><strong>博塔弗戈</strong><small>巴西 · 里约</small></div><b>31</b></div>
+                <div class="fixture-club"><i>维</i><div><strong>维多利亚</strong><small>巴西 · 萨尔瓦多</small></div><b>28</b></div>
+              </div>
+            </aside>
+            <section class="fixture-profile">
+              <nav class="workspace-anchor-nav" aria-label="球队档案"><span class="workspace-anchor-label">球队档案</span><div><button class="active">概览</button><button>基础身份</button><button>档案与战术</button><button>阵型概率</button><button>教练任期</button><button>球员履历</button><button>阵容预设</button><button>阵容历史</button><button>阵容与赛程</button></div></nav>
+              <article class="panel fixture-overview">
+                <div><span class="eyebrow">完整档案</span><h2>科林蒂安</h2><p>Sport Club Corinthians Paulista · 巴西甲级联赛</p><div class="fixture-stats"><div><span>球员</span><strong>32</strong><small>当前注册</small></div><div><span>常用阵型</span><strong>4-2-3-1</strong><small>使用率 46%</small></div><div><span>默认角色</span><strong>28 / 32</strong><small>已覆盖</small></div><div><span>最近更新</span><strong>今天</strong><small>资料包导入</small></div></div></div>
+                <div class="button-row"><button class="secondary">阵容预设</button><button class="primary">保存档案</button></div>
+              </article>
+              <div class="profile-section-stack">
+                <article class="panel fixture-section"><h3>球队基础身份</h3><div class="fixture-grid"><div class="fixture-field"><span>球队类型</span><strong>俱乐部</strong></div><div class="fixture-field"><span>所在城市</span><strong>圣保罗</strong></div><div class="fixture-field"><span>主场</span><strong>Neo Química Arena</strong></div></div></article>
+                <article class="panel fixture-section"><h3>球队档案与战术</h3><div class="fixture-grid"><div class="fixture-field"><span>主要体系</span><strong>中低位防守 / 快速转换</strong></div><div class="fixture-field"><span>默认阵型</span><strong>4-2-3-1</strong></div><div class="fixture-field"><span>资料可信度</span><strong>0.88</strong></div></div></article>
+              </div>
+            </section>
+          </section>
+        </div>
+      </section>
+    </main>
+  </div>
+</body>
+</html>

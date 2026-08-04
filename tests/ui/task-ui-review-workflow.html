@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="zh-CN" data-theme="light">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Stage B Review Workflow</title>
+  <link rel="stylesheet" href="../../src/styles/app.css">
+  <link rel="stylesheet" href="../../src/styles/components.css">
+  <link rel="stylesheet" href="../../src/styles/layout.css">
+  <link rel="stylesheet" href="../../src/styles/entityCenter.css">
+  <link rel="stylesheet" href="../../src/styles/taskWorkspace.css">
+  <link rel="stylesheet" href="../../src/styles/visualSystem.css">
+  <style>
+    * { animation: none !important; transition: none !important; }
+    body { min-width: 0; background: var(--bg); }
+    .fixture-page { min-height: 100vh; padding: 20px 24px 28px; }
+    .review-package-workspace { margin-top: 10px; }
+    .review-stage-button { cursor: default; }
+    .fixture-score { font-variant-numeric: tabular-nums; }
+  </style>
+</head>
+<body>
+  <main class="fixture-page">
+    <header class="task-page-header"><div class="task-page-heading"><p class="eyebrow">赛后复盘</p><h1>赛后事实、复盘与正式结算</h1><p>完整链路始终可见；当前步骤集中展开，阻塞原因和下一步动作保持在同一上下文。</p></div><div class="task-page-actions"><span class="task-status-chip tone-accent">复盘上下文已载入</span><button class="secondary">刷新</button></div></header>
+    <section class="task-context-ribbon"><article class="task-context-item tone-accent"><div><span>当前比赛</span><strong>法国 2–1 英格兰</strong><small>2026-07-21 · 淘汰赛</small></div></article><article class="task-context-item tone-success"><div><span>资料包状态</span><strong>预检通过</strong><small>package_id 已绑定 · SHA256 已核验</small></div></article><article class="task-context-item"><div><span>赛前快照</span><strong>P4 / P7 已冻结</strong><small>不会被赛后事实覆盖</small></div></article><article class="task-context-item tone-warning"><div><span>当前任务</span><strong>人工确认</strong><small>确认后才能写入真实事实</small></div></article></section>
+    <section class="review-package-workspace">
+      <div class="review-workflow-heading"><div><span>固定链路</span><h2>赛后事实修正、复盘与结算</h2><p>九个步骤始终保留在左侧；右侧只展开当前任务。</p></div></div>
+      <div class="review-workflow-meta"><div><span>当前资料包</span><strong>mrp_20260721_france_england</strong><small>preview_valid · 更新于 2026/7/22 13:20</small></div><div><span>文件与校验</span><strong>C:\football\review\france-england.xlsx</strong><small>下一动作：人工确认 · SHA256 7d9a1c88f6e3b71b…</small></div></div>
+      <div class="review-command-center">
+        <nav class="review-stage-rail" aria-label="赛后复盘步骤">
+          <div class="review-stage-rail-header"><span>九步工作流</span><strong>选择步骤查看详情</strong><small>业务权限由后端工作流统一返回；前端只负责展示当前步骤。</small></div>
+          <button class="review-stage-button state-done"><b>01</b><div><strong>选择比赛</strong><small>导出本轮赛后复盘资料包。</small></div><em>已完成</em></button>
+          <button class="review-stage-button state-done"><b>02</b><div><strong>导出赛后复盘资料包</strong><small>在外部补充真实比赛事实。</small></div><em>已完成</em></button>
+          <button class="review-stage-button state-done"><b>03</b><div><strong>补充真实比赛事实</strong><small>选择填写后的资料包进行预检。</small></div><em>已完成</em></button>
+          <button class="review-stage-button state-done"><b>04</b><div><strong>导入并预检</strong><small>进行人工确认。</small></div><em>已完成</em></button>
+          <button class="review-stage-button state-current active" aria-current="step"><b>05</b><div><strong>人工确认</strong><small>核对预检结果并确认。</small></div><em>当前</em></button>
+          <button class="review-stage-button state-locked"><b>06</b><div><strong>写入真实赛后事实</strong><small>资料包尚未人工确认</small></div><em>锁定</em></button>
+          <button class="review-stage-button state-locked"><b>07</b><div><strong>生成正式复盘</strong><small>真实赛后事实尚未写入</small></div><em>锁定</em></button>
+          <button class="review-stage-button state-locked"><b>08</b><div><strong>正式结算</strong><small>复盘记录尚未生成</small></div><em>锁定</em></button>
+          <button class="review-stage-button state-locked"><b>09</b><div><strong>进入分析与历史</strong><small>正式结算尚未完成</small></div><em>锁定</em></button>
+        </nav>
+        <section class="review-stage-workspace"><header><div><span>第 05 步 · 本步用途</span><h2>人工确认</h2><p>确认差异、来源和可信度；后端再次读取文件并校验 SHA256，避免预检后文件被替换。</p></div><span class="task-status-chip tone-accent">等待人工确认</span></header><dl class="review-stage-facts"><div><dt>当前状态</dt><dd>预检通过，等待人工确认</dd></div><div><dt>完成条件</dt><dd>记录确认人、确认说明和确认时间</dd></div><div><dt>阻塞原因</dt><dd>无</dd></div><div class="is-next"><dt>下一步动作</dt><dd>确认本轮资料包后写入真实赛后事实</dd></div></dl><div class="review-stage-actions"><button class="secondary">返回预检证据</button><button class="primary">人工确认本轮资料包</button></div></section>
+      </div>
+      <details class="review-preview-shell"><summary><div><span>资料包预检证据</span><strong>预检通过，可以进入人工确认</strong></div><b>通过</b></summary></details>
+    </section>
+  </main>
+</body>
+</html>

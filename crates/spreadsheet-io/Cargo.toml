@@ -1,0 +1,17 @@
+[package]
+name = "football-spreadsheet-io"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+
+[dependencies]
+calamine.workspace = true
+chrono.workspace = true
+football-domain = { path = "../domain" }
+rust_xlsxwriter.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+sha2.workspace = true
+thiserror.workspace = true
+uuid.workspace = true
+zip.workspace = true

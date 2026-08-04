@@ -1,0 +1,93 @@
+{
+  "contract_id": "football.ai-chat-contract.v3",
+  "contract_version": "3.0.0",
+  "baseline_source_version": "0.13.5",
+  "release_version": "0.14.0",
+  "stage": "H_PRE_STAGE_1",
+  "surface_name": "AI 问答",
+  "active_commands": [
+    "list_api_workspace_presets",
+    "list_api_workspace_sessions",
+    "read_api_workspace_session",
+    "send_api_workspace_message",
+    "cancel_api_workspace_request",
+    "archive_api_workspace_session"
+  ],
+  "disabled_legacy_commands": [
+    "read_api_workspace_attachments",
+    "apply_api_workspace_operation",
+    "reject_api_workspace_operation",
+    "export_api_workspace_file"
+  ],
+  "protocols": [
+    "responses",
+    "chat_completions"
+  ],
+  "request_boundary": {
+    "ordinary_text_only": true,
+    "optional_read_only_context": true,
+    "web_search_allowed": false,
+    "tools_allowed": false,
+    "tool_choice_allowed": false,
+    "structured_schema_allowed": false,
+    "attachments_allowed": false,
+    "generated_files_allowed": false,
+    "database_proposals_allowed": false,
+    "automatic_database_write_allowed": false,
+    "client_action_execution_allowed": false,
+    "token_controls_visible": false,
+    "token_usage_visible": false
+  },
+  "session_behavior": {
+    "new_search_switch_archive": true,
+    "archive_preserves_history": true,
+    "copy_answer": true,
+    "draft_preserved_during_navigation": true,
+    "request_cancel_supported": true,
+    "send_region_only_locked": true
+  },
+  "runtime_log": {
+    "subsystem": "ai_chat",
+    "allowed_fields": [
+      "request_id",
+      "session_id",
+      "profile_id",
+      "protocol",
+      "endpoint",
+      "status",
+      "provider_status",
+      "latency_ms",
+      "attempt_count",
+      "message_chars",
+      "history_messages",
+      "context_attached",
+      "response_chars",
+      "error_category",
+      "error"
+    ],
+    "prompt_body_recorded": false,
+    "schema_recorded": false,
+    "api_key_recorded": false
+  },
+  "compatibility": {
+    "historical_messages_preserved": true,
+    "historical_proposals_preserved": true,
+    "historical_generated_files_preserved": true,
+    "formal_p4_research_unchanged": true,
+    "database_migration_required": false,
+    "integration_point_h_started": false
+  },
+  "artifacts": [
+    "contracts/api-workspace-contract-v3.json",
+    "schemas/api-workspace-contract-v3.schema.json",
+    "crates/research-gateway/src/types.rs",
+    "crates/research-gateway/src/client.rs",
+    "crates/research-gateway/src/response.rs",
+    "crates/application/src/api_workspace.rs",
+    "crates/persistence-postgres/src/api_workspace.rs",
+    "src-tauri/src/commands/api_workspace.rs",
+    "src/pages/apiWorkspace.ts",
+    "src/main.ts",
+    "scripts/verify-api-workspace.mjs"
+  ]
+}

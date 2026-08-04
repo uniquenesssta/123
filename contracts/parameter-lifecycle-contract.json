@@ -1,0 +1,76 @@
+{
+  "contract_id": "football.model-parameter-lifecycle.v1",
+  "contract_version": "1.0.0",
+  "baseline_source_version": "0.20.0",
+  "release_version": "0.21.0",
+  "delivery_phase": "INTEGRATION_I_STAGE_1",
+  "integration_point_h_required": true,
+  "required_h_contract_key": "p4-postmatch-settlement",
+  "formal_partition": [
+    "model_version",
+    "competition_profile",
+    "horizon"
+  ],
+  "formal_horizons": [
+    "T-24h",
+    "T-6h",
+    "T-90m",
+    "T-1h"
+  ],
+  "candidate_generation": {
+    "concrete_competition_required": true,
+    "immutable_model_version": true,
+    "immutable_parameter_version": true,
+    "provider_owned_parameters": true
+  },
+  "shadow_validation": {
+    "baseline_binding_must_be_unchanged": true,
+    "finite_probability_gate": true,
+    "validation_records_immutable": true,
+    "synthetic_fixtures_can_promote": false
+  },
+  "promotion": {
+    "automatic_promotion": false,
+    "manual_confirmation_required": true,
+    "optimistic_concurrency_guard": true,
+    "rollback_supported": true,
+    "decision_records_immutable": true
+  },
+  "provider_state": "NOT_BUNDLED",
+  "candidate_statuses": [
+    "pending",
+    "accepted_for_backtest",
+    "rejected",
+    "shadow_running",
+    "shadow_passed",
+    "shadow_failed",
+    "promoted",
+    "rolled_back",
+    "blocked_by_h",
+    "superseded"
+  ],
+  "commands": [
+    "parameter_lifecycle_readiness",
+    "run_parameter_shadow_validation",
+    "list_parameter_shadow_validations",
+    "promote_parameter_candidate",
+    "rollback_parameter_candidate",
+    "list_parameter_promotion_decisions"
+  ],
+  "migration": "crates/persistence-postgres/migrations/0025_parameter_lifecycle.sql",
+  "artifacts": [
+    "crates/domain/src/analytics.rs",
+    "crates/application/src/analytics.rs",
+    "crates/persistence-postgres/src/parameter_lifecycle.rs",
+    "src-tauri/src/commands/analytics.rs",
+    "src/api/client.ts",
+    "src/pages/analytics.ts",
+    "src/main.ts"
+  ],
+  "compatibility": {
+    "existing_candidates_preserved": true,
+    "formal_binding_unchanged_until_manual_promotion": true,
+    "historical_runs_and_snapshots_not_rewritten": true,
+    "external_provider_required": true
+  }
+}

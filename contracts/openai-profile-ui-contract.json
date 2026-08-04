@@ -1,0 +1,66 @@
+{
+  "contract_key": "openai-profile-ui",
+  "contract_version": "1.1.0",
+  "schema_version": "football.openai-profile-ui-contract.v2",
+  "stage": "D-completion",
+  "release_version": "0.10.2",
+  "provider_scope": {
+    "supported": [
+      "openai_compatible"
+    ],
+    "official_openai_only": false,
+    "multi_provider_switching": false
+  },
+  "protocols": {
+    "supported": [
+      "responses",
+      "chat_completions"
+    ],
+    "formal_research": [
+      "responses"
+    ],
+    "connection_test_only": [
+      "chat_completions"
+    ]
+  },
+  "profile_capabilities": {
+    "multiple_profiles": true,
+    "editable": true,
+    "activatable": true,
+    "connection_test": true,
+    "delete_profile": true,
+    "clear_key": true,
+    "replace_key": true,
+    "invalidate_test_on_connection_change": true,
+    "api_example_live_parse": true,
+    "request_endpoint_override": true,
+    "model_and_token_field_replacement": true,
+    "sanitized_example_persistence": true
+  },
+  "secret_boundary": {
+    "storage": "windows_credential_manager_per_profile",
+    "plaintext_returned_to_frontend": false,
+    "local_storage": false,
+    "database": false,
+    "logs": false,
+    "api_example_redacted_before_persistence": true
+  },
+  "commands": [
+    "parse_openai_api_example",
+    "list_openai_profiles",
+    "save_openai_profile",
+    "set_active_openai_profile",
+    "delete_openai_profile",
+    "clear_openai_profile_key",
+    "test_openai_profile"
+  ],
+  "artifacts": [
+    "src/pages/openai.ts",
+    "src-tauri/src/openai_profiles.rs",
+    "src-tauri/src/commands/openai.rs",
+    "crates/research-gateway/src/api_example.rs",
+    "crates/research-gateway/src/config.rs",
+    "crates/research-gateway/src/credentials.rs",
+    "crates/research-gateway/src/client.rs"
+  ]
+}

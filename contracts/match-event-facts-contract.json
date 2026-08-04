@@ -1,0 +1,80 @@
+{
+  "contract_id": "football.match-event-facts-contract.v1",
+  "contract_version": "1.0.0",
+  "package_format": "football.match-review-package.v1",
+  "event_types": [
+    "substitution",
+    "goal",
+    "own_goal",
+    "assist",
+    "penalty_goal",
+    "penalty_missed",
+    "yellow_card",
+    "second_yellow_card",
+    "red_card",
+    "injury",
+    "var",
+    "formation_change",
+    "goalkeeper_change",
+    "other"
+  ],
+  "verification_statuses": [
+    "unverified",
+    "verified",
+    "disputed"
+  ],
+  "revision_statuses": [
+    "active",
+    "corrected",
+    "cancelled",
+    "superseded"
+  ],
+  "identity_fields": [
+    "match_id",
+    "event_key",
+    "sequence_no"
+  ],
+  "query_fields": [
+    "event_type",
+    "team_id",
+    "player_id",
+    "related_player_id",
+    "minute",
+    "stoppage_minute",
+    "period",
+    "home_score",
+    "away_score",
+    "verification_status",
+    "revision_status",
+    "source_document_id",
+    "source_package_id",
+    "revision_of_event_id"
+  ],
+  "workflow": {
+    "preview_before_commit": true,
+    "stable_event_identity": true,
+    "upsert_same_event_key": true,
+    "missing_current_events_become_superseded": true,
+    "superseded_events_hidden_from_current_queries": true,
+    "cancelled_events_remain_auditable": true,
+    "verified_requires_timestamp": true,
+    "revision_reference_same_match": true,
+    "score_snapshot_errors_block_preview": true,
+    "source_documents_protected_on_force_delete": true,
+    "extra_time_score_consistency": true
+  },
+  "database_migrations": [
+    "0042_structured_match_event_facts.sql",
+    "0043_import_row_team_period_identity.sql"
+  ],
+  "log_bug_fix": {
+    "operation": "preview_team_package_import",
+    "constraint": "import_rows_batch_sheet_row_entity_subrecord_key",
+    "entity_type": "player_team_period",
+    "subrecord_identity_priority": [
+      "team_id",
+      "team_key",
+      "team_name"
+    ]
+  }
+}

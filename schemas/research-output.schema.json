@@ -1,0 +1,82 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://football-model.local/schemas/research-output.schema.json",
+  "title": "Public Research Output",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "match_key", "data_cutoff_at", "facts", "missing_fields"],
+  "properties": {
+    "schema_version": { "const": "football.p4-research-output.v2" },
+    "match_key": { "type": "string", "minLength": 1, "maxLength": 200 },
+    "data_cutoff_at": { "type": "string", "format": "date-time" },
+    "facts": {
+      "type": "array",
+      "maxItems": 256,
+      "items": { "$ref": "#/$defs/fact" }
+    },
+    "missing_fields": {
+      "type": "array",
+      "maxItems": 31,
+      "items": { "$ref": "#/$defs/missing_field" }
+    }
+  },
+  "$defs": {
+    "nullable_string": { "type": ["string", "null"] },
+    "fact_value": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind", "text", "number", "integer", "boolean", "strings"],
+      "properties": {
+        "kind": { "type": "string", "enum": ["string", "number", "integer", "boolean", "string_list", "null"] },
+        "text": { "$ref": "#/$defs/nullable_string" },
+        "number": { "type": ["number", "null"] },
+        "integer": { "type": ["integer", "null"] },
+        "boolean": { "type": ["boolean", "null"] },
+        "strings": { "type": "array", "items": { "type": "string" } }
+      }
+    },
+    "subject": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["entity_type", "name", "external_id"],
+      "properties": {
+        "entity_type": { "type": "string", "enum": ["match", "competition", "venue", "team", "player", "coach", "official"] },
+        "name": { "type": "string", "minLength": 1, "maxLength": 200 },
+        "external_id": { "$ref": "#/$defs/nullable_string" }
+      }
+    },
+    "fact": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "fact_key", "field_key", "subject", "value", "verification_state",
+        "source_urls", "published_at", "observed_at", "effective_at", "timezone"
+      ],
+      "properties": {
+        "fact_key": { "type": "string", "minLength": 1, "maxLength": 120, "pattern": "^[A-Za-z0-9_.:-]+$" },
+        "field_key": { "type": "string", "minLength": 1, "maxLength": 100 },
+        "subject": { "$ref": "#/$defs/subject" },
+        "value": { "$ref": "#/$defs/fact_value" },
+        "verification_state": { "type": "string", "enum": ["CONFIRMED", "PROBABLE", "CONFLICT", "NOT_FOUND", "STALE", "NOT_APPLICABLE"] },
+        "source_urls": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": { "type": "string", "format": "uri", "pattern": "^https://" }
+        },
+        "published_at": { "type": ["string", "null"], "format": "date-time" },
+        "observed_at": { "type": ["string", "null"], "format": "date-time" },
+        "effective_at": { "type": ["string", "null"], "format": "date-time" },
+        "timezone": { "$ref": "#/$defs/nullable_string" }
+      }
+    },
+    "missing_field": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["field_key", "verification_state"],
+      "properties": {
+        "field_key": { "type": "string", "minLength": 1, "maxLength": 100 },
+        "verification_state": { "type": "string", "enum": ["NOT_FOUND", "STALE", "NOT_APPLICABLE"] }
+      }
+    }
+  }
+}

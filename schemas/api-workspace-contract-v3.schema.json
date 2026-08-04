@@ -1,0 +1,85 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "football.ai-chat-contract.v3",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "contract_id",
+    "contract_version",
+    "baseline_source_version",
+    "release_version",
+    "stage",
+    "surface_name",
+    "active_commands",
+    "disabled_legacy_commands",
+    "protocols",
+    "request_boundary",
+    "session_behavior",
+    "runtime_log",
+    "compatibility",
+    "artifacts"
+  ],
+  "properties": {
+    "contract_id": {
+      "const": "football.ai-chat-contract.v3"
+    },
+    "contract_version": {
+      "const": "3.0.0"
+    },
+    "baseline_source_version": {
+      "type": "string"
+    },
+    "release_version": {
+      "type": "string"
+    },
+    "stage": {
+      "const": "H_PRE_STAGE_1"
+    },
+    "surface_name": {
+      "const": "AI 问答"
+    },
+    "active_commands": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "uniqueItems": true
+    },
+    "protocols": {
+      "type": "array",
+      "items": {
+        "enum": [
+          "responses",
+          "chat_completions"
+        ]
+      },
+      "uniqueItems": true
+    },
+    "request_boundary": {
+      "type": "object"
+    },
+    "session_behavior": {
+      "type": "object"
+    },
+    "runtime_log": {
+      "type": "object"
+    },
+    "compatibility": {
+      "type": "object"
+    },
+    "artifacts": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "uniqueItems": true
+    },
+    "disabled_legacy_commands": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "uniqueItems": true
+    }
+  }
+}

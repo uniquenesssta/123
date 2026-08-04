@@ -1,0 +1,242 @@
+{
+  "contract_id": "football.public-release-readiness.v1",
+  "contract_version": "1.0.0",
+  "release_version": "0.23.0",
+  "expected_tauri_command_count": 171,
+  "migration_count": 46,
+  "first_migration": "0001_initial.sql",
+  "last_migration": "0046_player_position_default_roles.sql",
+  "migrations": [
+    {
+      "file": "0001_initial.sql",
+      "sha256": "96cbe80ac41ce1e3b9a73a2085cccf02d4cafbb4fa67f5e0b69bc52dc2675f5c"
+    },
+    {
+      "file": "0002_rule_packages_and_routing.sql",
+      "sha256": "334ca34d7797c76ac1b910a1e350d869887cb6315831ebe666e102cd4ece15ea"
+    },
+    {
+      "file": "0003_player_catalog_and_lineups.sql",
+      "sha256": "2cc4daa2706781f9ac56ed3c99a3e305ed1b4d00ddf0643c8fa25a1c086c3bba"
+    },
+    {
+      "file": "0004_spreadsheet_exchange.sql",
+      "sha256": "c3e1444e317778dc905e012cb1de2441a3566a36afc4dae09b3712e7301f8ff1"
+    },
+    {
+      "file": "0005_pre_match_foundation.sql",
+      "sha256": "a704af92a74c3acfcea189f2ee95b172d9dc54e63656d88872b465b70bd9ea73"
+    },
+    {
+      "file": "0006_match_review_workflow.sql",
+      "sha256": "2988adf198eb5fbbff18a751dff8d14f566a926c7175c1dc835ae860c8d2c750"
+    },
+    {
+      "file": "0007_analytics_ai_and_jobs.sql",
+      "sha256": "e09aab0cf76005b03ccfdd9485c5c7116e6f799234e8e2b814abb58734aa6621"
+    },
+    {
+      "file": "0008_user_workflow_and_tuning.sql",
+      "sha256": "26faa8a5fef4c857cdf36cb0c082e6aa2964aa697e6e7a8f6ac43fb1546ddc6f"
+    },
+    {
+      "file": "0009_ability_observation_cutoff.sql",
+      "sha256": "c61c0996471f3719cd791ebebf614571f5a1b2738d12533f5edac7a0aea58e68"
+    },
+    {
+      "file": "0010_repair_ability_observation_cutoff.sql",
+      "sha256": "2f980b55b9108a8a360e4f8b0cfc64965f6e323f97528a7a4547a07e30b3db21"
+    },
+    {
+      "file": "0011_pre_match_ingestion_cutoff.sql",
+      "sha256": "cd43df5a0f1b5dbeb6f4e3632d08c95381ba8bdfee911e2ab4f40ca6abc6163c"
+    },
+    {
+      "file": "0012_p4_integration_contract.sql",
+      "sha256": "7861abfa90c3c608569097e310810d529e6a16209703f6d42bf7f3d5847cd51e"
+    },
+    {
+      "file": "0013_p4_engine_artifacts.sql",
+      "sha256": "3489175abc880e98caf273fd32704a79a5adf80950b9b988308c36f8d5b1f120"
+    },
+    {
+      "file": "0014_p4_evidence_and_snapshots.sql",
+      "sha256": "8c91cc59aa492303f680d4d658d93c043c4190169280eb4f78601723bdb12845"
+    },
+    {
+      "file": "0015_p4_openai_research_gateway.sql",
+      "sha256": "fb9e1910942b6b217739993b8473086bfa36313e4a2854070bcd9f5fa6c94e7e"
+    },
+    {
+      "file": "0016_p4_fact_pipeline.sql",
+      "sha256": "da3ab899efbda5f577c258b82cfeab25d6f4db808fc2c56bd52c955678506faf"
+    },
+    {
+      "file": "0017_p4_horizon_orchestration.sql",
+      "sha256": "13b68c1f3ed1ba34f35b49e8f82afe6227ada56e35b54e1281dd173f7601d4bd"
+    },
+    {
+      "file": "0018_p4_single_match_workbench.sql",
+      "sha256": "b009ac6e5026c9d65d3d3b30d9bbddaadf4dfba726260ddc449390a150ed749e"
+    },
+    {
+      "file": "0019_api_workspace.sql",
+      "sha256": "2055835386a51928c828263b4b42bd4d1eda7c2e0288d44940a6c088124de6c6"
+    },
+    {
+      "file": "0020_team_player_management.sql",
+      "sha256": "46fb7da16927c309b314074c8e83a5bf097e8ca39e563fa0d07ec59e0bbae264"
+    },
+    {
+      "file": "0021_entity_relationships.sql",
+      "sha256": "9748a57de9b338e4ca8b81dd22f94b5d639515476fbfdc788b5fde71a0ae0a00"
+    },
+    {
+      "file": "0022_formations_and_usage.sql",
+      "sha256": "c3f00f41304612c12acbe58ac21f0a69085bb135a6a768d7f55f7f2547f751e4"
+    },
+    {
+      "file": "0023_monthly_workbooks.sql",
+      "sha256": "b0888f1423611660af66913a677067573f314eae2be7beecf0d8438cf6b10c99"
+    },
+    {
+      "file": "0024_match_lineup_chain.sql",
+      "sha256": "70934ff5b87d7a16e4f1d4f67bb8946be0208e0eb44ad99b5475f154df91f70a"
+    },
+    {
+      "file": "0025_parameter_lifecycle.sql",
+      "sha256": "cc701ad136367dd0b230c94b9b3697b58ea16ebfd0f1a52655d7dfce461b98d4"
+    },
+    {
+      "file": "0026_postmatch_settlement.sql",
+      "sha256": "ec3cee79ebd01ef388704a62c9b7d8155baaff2f409af2f11fce20acfbb7ce7f"
+    },
+    {
+      "file": "0027_release_acceptance.sql",
+      "sha256": "ff72e0b534a39d3de2b89a942ba0fa7d080fb190056742c4460f43842eef36bd"
+    },
+    {
+      "file": "0028_force_team_purge.sql",
+      "sha256": "521affb04963edbd248df01c213f88a965b0e980a977f72d62d1262e9ee2471d"
+    },
+    {
+      "file": "0029_import_row_entity_identity.sql",
+      "sha256": "5e5c051f648deb701f8c1872ba8f2e3a0c8dcef4bb2eb20794a599bf2c50adf2"
+    },
+    {
+      "file": "0030_import_row_subrecord_identity.sql",
+      "sha256": "da93ef057323e4fec40c1868e0fcb589245c389786d46c6fcfd44325df0235b0"
+    },
+    {
+      "file": "0031_p4_model_family_time_windows.sql",
+      "sha256": "e3e7aa0741d9774e1a447ba5618ef20ed96d896f05bc1bafb5653dcac86b4d15"
+    },
+    {
+      "file": "0032_model_run_history_visibility.sql",
+      "sha256": "802dcb8b048d8dff972ce1f8e3515d146eb9de7e6ed5b2e6f571c2084afda4f8"
+    },
+    {
+      "file": "0033_competition_catalog.sql",
+      "sha256": "a2b2b45dfa9151d083389ee6e5e74dad750e02be11d1c8ef6fb1e7ce733a4448"
+    },
+    {
+      "file": "0034_mainstream_competition_catalog.sql",
+      "sha256": "eaf3b8b6db647a848677fd51d71080fdbe819ca721f5aced13594e32be4103a5"
+    },
+    {
+      "file": "0035_complete_position_catalog.sql",
+      "sha256": "2700b86d4076fd7b6e550f0401f5ef189af4fd58b780d75bc5c2edab6e702a04"
+    },
+    {
+      "file": "0036_lineup_history_visibility.sql",
+      "sha256": "2a56eae5c76603c48c073fe7f5fe3cf60fd5b111db1c06d7873e01ee3a7cb1e5"
+    },
+    {
+      "file": "0037_comprehensive_competition_catalog.sql",
+      "sha256": "d1bf4925c09e093bfc6e02519a3a00e974bc83f9b5571332d3a3eae0315a8aa7"
+    },
+    {
+      "file": "0038_p4_only_production_rules.sql",
+      "sha256": "2aa6364373e6529ac08a71d1fb5e55f0447745246abca688b246abb44e91c4f1"
+    },
+    {
+      "file": "0039_restore_p7_model_catalog.sql",
+      "sha256": "fa88c156418754846071a1f7cd67bec6a8989c44c85c29cb60fc5a8faf910ef3"
+    },
+    {
+      "file": "0040_match_review_package_workflow.sql",
+      "sha256": "66d1488f0c267b34a18be0837b39965a71f1fff695a91b41a8e8a7d803077bd0"
+    },
+    {
+      "file": "0041_prediction_input_readiness.sql",
+      "sha256": "46eab964afa9860d5de52bf4349f0dde40eef39d7fd62835079fa9f7575eabf2"
+    },
+    {
+      "file": "0042_structured_match_event_facts.sql",
+      "sha256": "00ba9b992cfed29116e2961b1aabcb99f55943739c00f09d579320b73e078de7"
+    },
+    {
+      "file": "0043_import_row_team_period_identity.sql",
+      "sha256": "d337876c1947194f5023967fa0e1db63bef131181ecfa1c5720426af77405e54"
+    },
+    {
+      "file": "0044_team_package_preview_recovery.sql",
+      "sha256": "c5ceb7aefd50ba1606e6c85c041feb8b9c08a24826c5f919098ebea3add9fdce"
+    },
+    {
+      "file": "0045_team_lineup_presets.sql",
+      "sha256": "5a3bfcfb8b840283805ee55463bf9216ffcf4f8bdbdb1ad1aa25fce021753bca"
+    },
+    {
+      "file": "0046_player_position_default_roles.sql",
+      "sha256": "129e2c70a187d0ddc223de42308ac62c92e25184aa6311ea44beb62a683a414d"
+    }
+  ],
+  "required_scripts": [
+    "setup",
+    "tauri:dev",
+    "tauri:build",
+    "verify:frontend",
+    "verify:rust",
+    "verify:release",
+    "verify:all",
+    "verify:public-model-boundary",
+    "verify:release-readiness",
+    "verify:parameter-lifecycle",
+    "verify:postmatch-settlement",
+    "verify:release-acceptance"
+  ],
+  "required_root_launchers": [
+    "启动平台.bat",
+    "验证平台.bat",
+    "验收平台.bat"
+  ],
+  "required_public_boundary_files": [
+    "crates/model-api/src/lib.rs",
+    "crates/model-stub/src/lib.rs",
+    "crates/application/src/model_shell/mod.rs",
+    "contracts/model-provider-boundary-contract.json",
+    "scripts/verify-public-model-boundary.mjs",
+    ".github/workflows/ci.yml"
+  ],
+  "forbidden_release_entries": [
+    "node_modules",
+    "dist",
+    "target",
+    ".cargo-target",
+    ".git",
+    "logs",
+    "coverage",
+    ".cache",
+    ".vite",
+    "__pycache__"
+  ],
+  "forbidden_private_paths": [
+    "crates/model-p4",
+    "crates/model-p7",
+    "src-tauri/resources/defaults",
+    "docs/P4_INTEGRATION.md",
+    "docs/P7_INTEGRATION.md"
+  ],
+  "ui_scope": "existing_platform_ui_preserved_with_explicit_external_model_provider_boundary"
+}

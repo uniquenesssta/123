@@ -1,0 +1,82 @@
+{
+  "contract_id": "football.api-runtime-diagnostics-contract.v1",
+  "contract_version": "2.2.0",
+  "baseline_source_version": "0.13.5",
+  "release_version": "0.14.0",
+  "stage": "H_PRE_STAGE_1",
+  "purpose": "Provide minimal redacted diagnostics for plain-text AI Q&A while preserving the separate formal P4 research diagnostics chain.",
+  "request_compatibility": {
+    "ai_chat_protocols": [
+      "responses",
+      "chat_completions"
+    ],
+    "ai_chat_plain_text_only": true,
+    "formal_p4_structured_chain_unchanged": true
+  },
+  "runtime_log": {
+    "directory": ".\\logs",
+    "filename_pattern": "football-runtime-<utc-start>-pid<process>-<session>.jsonl",
+    "preferred_location": "runtime_root/.\\logs",
+    "fallback_location": "app_config_directory/logs",
+    "format": "json_lines",
+    "new_file_per_launch": true,
+    "session_id_per_launch": true,
+    "monotonic_sequence_per_entry": true,
+    "duplicate_window_ms": 5000,
+    "duplicate_events_summarized": true,
+    "error_events_never_deduplicated": true,
+    "api_keys_redacted": true,
+    "database_passwords_redacted": true,
+    "bearer_tokens_redacted": true,
+    "records_request_payload": false,
+    "records_provider_response": false,
+    "records_retry_attempts": false,
+    "records_generated_files": false,
+    "records_database_proposals": false,
+    "records_frontend_issue_mirror": true,
+    "encrypted_reasoning_omitted": true,
+    "prompt_bodies_summarized": false,
+    "records_web_search_requested_sent_used_and_downgraded": false,
+    "prompt_body_recorded": false,
+    "schema_recorded": false,
+    "records_protocol_endpoint_status_latency_error_text_lengths": true,
+    "runtime_root_environment": "FOOTBALL_RUNTIME_ROOT",
+    "legacy_runtime_root_environment": "FOOTBALL_PROJECT_ROOT",
+    "container_name_independent": true,
+    "operation_lifecycle_events_never_deduplicated": true
+  },
+  "file_behavior": {
+    "provider_binary_file_expected": false,
+    "generated_file_transport": "disabled_for_new_ai_chat",
+    "desktop_persists_before_export": false,
+    "historical_records_preserved": true
+  },
+  "artifacts": [
+    "contracts/api-runtime-diagnostics-contract.json",
+    "src-tauri/src/runtime_log.rs",
+    "src-tauri/src/commands/api_workspace.rs",
+    "src-tauri/src/commands/database.rs",
+    "src-tauri/src/commands/issues.rs",
+    "crates/application/src/api_workspace.rs",
+    "crates/research-gateway/src/client.rs",
+    "crates/research-gateway/tests/gateway_contract.rs",
+    "src/pages/apiWorkspace.ts",
+    "scripts/verify-api-runtime-diagnostics.mjs",
+    "src-tauri/src/commands/logging.rs",
+    "src/api/client.ts",
+    "src/main.ts"
+  ],
+  "non_goals": [
+    "Do not log API keys, bearer credentials, or database passwords.",
+    "Do not expect the provider to return arbitrary binary files.",
+    "Do not allow runtime logging failures to mutate formal P4 evidence or frozen snapshots.",
+    "Do not begin integration point H settlement, drift monitoring, evidence scoring, or parameter promotion."
+  ],
+  "compatible_transport": {
+    "responses_minimal_payload": true,
+    "chat_completions_minimal_payload": true,
+    "ordinary_text_only": true,
+    "formal_p4_research_unchanged": true,
+    "web_search_allowed": false
+  }
+}

@@ -1,0 +1,71 @@
+{
+  "api_base_url": "https://api.openai.com/v1",
+  "research_model": "gpt-5.5",
+  "extraction_model": "gpt-5.5",
+  "fallback_model": null,
+  "reasoning_effort": "medium",
+  "timeout_seconds": 180,
+  "max_retries": 3,
+  "retry_base_delay_ms": 1000,
+  "max_concurrency": 2,
+  "max_output_tokens": 12000,
+  "max_tool_calls": 12,
+  "search_context_size": "high",
+  "background_mode": false,
+  "zero_data_retention_required": false,
+  "store": false,
+  "credentials": {
+    "mode": "windows_credential_manager",
+    "credential_target": "football-match-model-platform/openai",
+    "environment_variable": "OPENAI_API_KEY",
+    "deployment_mode": "local_desktop"
+  },
+  "source_policy": {
+    "allowed_domains": [],
+    "blocked_domains": [],
+    "prohibited_fact_keys": [
+      "prediction",
+      "forecast",
+      "odds",
+      "handicap",
+      "betting",
+      "recommendation",
+      "pick",
+      "tips",
+      "盘口",
+      "赔率",
+      "预测",
+      "推荐"
+    ],
+    "prohibited_content_terms": [
+      "betting tip",
+      "best bet",
+      "recommended pick",
+      "odds suggest",
+      "盘口",
+      "赔率",
+      "投注技巧",
+      "投注建议",
+      "预测比分",
+      "推荐结果"
+    ],
+    "https_only": true
+  },
+  "budget": {
+    "daily_budget_usd": null,
+    "monthly_budget_usd": null,
+    "per_request_max_usd": null,
+    "model_pricing": {
+      "gpt-5.5": {
+        "input_usd_per_million": 5.0,
+        "cached_input_usd_per_million": 0.5,
+        "output_usd_per_million": 30.0
+      }
+    },
+    "web_search_usd_per_call": 0.01
+  },
+  "circuit_breaker": {
+    "consecutive_failure_threshold": 5,
+    "open_seconds": 60
+  }
+}

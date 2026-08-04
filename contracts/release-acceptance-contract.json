@@ -1,0 +1,53 @@
+{
+  "contract_id": "football.integration-j.release-acceptance.v1",
+  "stage": "J",
+  "baseline_version": "0.22.0",
+  "release_version": "0.23.0",
+  "schema_version": "football.release-acceptance.v1",
+  "acceptance_mode": "public_shell_and_runtime",
+  "required_categories": [
+    "chain",
+    "performance",
+    "security",
+    "cost",
+    "release"
+  ],
+  "required_runtime_checks": [
+    "integration_contracts_a_to_i",
+    "database_migrations",
+    "external_model_provider_boundary",
+    "public_model_boundary",
+    "external_model_runtime",
+    "runtime_lifecycle_evidence",
+    "model_run_performance",
+    "database_query_health",
+    "openai_cost_observability",
+    "release_artifact_contract"
+  ],
+  "ui_alignment": {
+    "reference_page": "lineups",
+    "pages": [
+      "teams",
+      "players",
+      "prediction"
+    ],
+    "layout": [
+      "module_sidebar",
+      "active_workspace_view",
+      "optional_inspector"
+    ],
+    "state_persistence": true,
+    "no_global_blocking_for_normal_actions": true
+  },
+  "immutability": {
+    "acceptance_runs": true,
+    "acceptance_checks": true,
+    "historical_contracts_unchanged": true
+  },
+  "release_gates": {
+    "blocked_check_prevents_release": true,
+    "warnings_require_visible_remediation": true,
+    "external_provider_required_for_prediction": true,
+    "automatic_parameter_promotion": false
+  }
+}

@@ -1,0 +1,92 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "football.api-workspace-contract.v1",
+  "title": "API Workspace Integration Contract",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "contract_id", "contract_version", "baseline_source_version", "release_version",
+    "stage", "purpose", "surface", "presets", "input_files", "structured_output",
+    "database_operations", "non_goals", "commands", "artifacts", "persistence",
+    "dependency_changes"
+  ],
+  "properties": {
+    "contract_id": { "const": "football.api-workspace-contract.v1" },
+    "contract_version": { "const": "1.0.0" },
+    "baseline_source_version": { "const": "0.13.0" },
+    "release_version": { "const": "0.13.1" },
+    "stage": { "const": "G_PRE_H" },
+    "purpose": { "type": "string", "minLength": 1 },
+    "surface": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["page_key", "single_page_workflow", "session_history_persisted", "profile_source", "supported_protocol"],
+      "properties": {
+        "page_key": { "const": "api_workspace" },
+        "single_page_workflow": { "const": true },
+        "session_history_persisted": { "const": true },
+        "profile_source": { "const": "existing_openai_compatible_profiles" },
+        "supported_protocol": { "const": "responses" }
+      }
+    },
+    "presets": {
+      "type": "array", "minItems": 7, "uniqueItems": true,
+      "items": { "type": "string", "minLength": 1 }
+    },
+    "input_files": {
+      "type": "object", "additionalProperties": false,
+      "required": ["supported_extensions", "max_files", "max_total_bytes", "content_is_untrusted"],
+      "properties": {
+        "supported_extensions": { "type": "array", "uniqueItems": true, "items": { "type": "string" } },
+        "max_files": { "const": 5 },
+        "max_total_bytes": { "const": 5242880 },
+        "content_is_untrusted": { "const": true }
+      }
+    },
+    "structured_output": {
+      "type": "object", "additionalProperties": false,
+      "required": ["schema_path", "schema_id", "sections"],
+      "properties": {
+        "schema_path": { "const": "schemas/api-workspace-response.schema.json" },
+        "schema_id": { "const": "football.api-workspace-response.v1" },
+        "sections": { "type": "array", "uniqueItems": true, "items": { "type": "string" } }
+      }
+    },
+    "database_operations": {
+      "type": "object", "additionalProperties": false,
+      "required": [
+        "arbitrary_sql_allowed", "automatic_apply_allowed", "explicit_user_confirmation_required",
+        "idempotency_ledger_required", "allowed_types", "primary_identity_mutation_allowed",
+        "formal_p4_evidence_bypass_allowed"
+      ],
+      "properties": {
+        "arbitrary_sql_allowed": { "const": false },
+        "automatic_apply_allowed": { "const": false },
+        "explicit_user_confirmation_required": { "const": true },
+        "idempotency_ledger_required": { "const": true },
+        "allowed_types": { "type": "array", "minItems": 5, "maxItems": 5, "uniqueItems": true, "items": { "type": "string" } },
+        "primary_identity_mutation_allowed": { "const": false },
+        "formal_p4_evidence_bypass_allowed": { "const": false }
+      }
+    },
+    "non_goals": { "type": "array", "minItems": 1, "items": { "type": "string" } },
+    "commands": { "type": "array", "minItems": 8, "maxItems": 8, "uniqueItems": true, "items": { "type": "string" } },
+    "artifacts": { "type": "array", "minItems": 1, "uniqueItems": true, "items": { "type": "string" } },
+    "persistence": {
+      "type": "object", "additionalProperties": false,
+      "required": ["schema", "tables", "messages_immutable", "generated_files_immutable", "interrupted_apply_recovery"],
+      "properties": {
+        "schema": { "const": "ai_workspace" },
+        "tables": { "type": "array", "minItems": 4, "maxItems": 4, "uniqueItems": true, "items": { "type": "string" } },
+        "messages_immutable": { "const": true },
+        "generated_files_immutable": { "const": true },
+        "interrupted_apply_recovery": { "const": "manual_review" }
+      }
+    },
+    "dependency_changes": {
+      "type": "object", "additionalProperties": false,
+      "required": ["third_party_added"],
+      "properties": { "third_party_added": { "const": false } }
+    }
+  }
+}

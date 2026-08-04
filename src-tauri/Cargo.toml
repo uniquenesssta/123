@@ -1,0 +1,33 @@
+[package]
+name = "football-match-model-desktop"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+description = "足球赛事模型平台桌面端"
+
+[lib]
+name = "football_match_model_desktop_lib"
+crate-type = ["staticlib", "cdylib", "rlib"]
+
+[build-dependencies]
+tauri-build = { version = "2", features = [] }
+
+[dependencies]
+football-application = { path = "../crates/application" }
+football-domain = { path = "../crates/domain" }
+football-persistence-postgres = { path = "../crates/persistence-postgres" }
+football-research-gateway = { path = "../crates/research-gateway" }
+hex.workspace = true
+sha2.workspace = true
+serde.workspace = true
+chrono.workspace = true
+serde_json.workspace = true
+tauri = { version = "=2.11.1", features = [] }
+tauri-plugin-dialog = "=2.7.1"
+tokio.workspace = true
+uuid.workspace = true
+zeroize.workspace = true
+
+
+[dev-dependencies]
+tempfile.workspace = true

@@ -1,0 +1,12 @@
+[package]
+name = "football-analytics-engine"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+
+[dependencies]
+chrono.workspace = true
+football-domain = { path = "../domain" }
+
+[dev-dependencies]
+uuid.workspace = true

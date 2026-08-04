@@ -1,0 +1,94 @@
+{
+  "contract_id": "football.match-lineup-chain-contract.v1",
+  "contract_version": "1.0.0",
+  "baseline_source_version": "0.17.0",
+  "release_version": "0.18.0",
+  "delivery_phase": "H_PRE_STAGE_5",
+  "integration_point_h_started": false,
+  "workbook_format": "football.match-lineup.v2",
+  "legacy_workbook_readable": "football.match-lineup.v1",
+  "commands": [
+    "read_match_lineup_chain",
+    "list_team_match_lineups"
+  ],
+  "formal_horizons": [
+    "T-24h",
+    "T-6h",
+    "T-90m",
+    "T-1h"
+  ],
+  "lineup_types": [
+    "expected",
+    "confirmed",
+    "actual"
+  ],
+  "versioning": {
+    "active_uniqueness": [
+      "match_id",
+      "team_id",
+      "snapshot_type",
+      "lineup_type"
+    ],
+    "superseded_history_preserved": true,
+    "confirmed_preferred_over_expected": true,
+    "later_horizon_preferred_within_cutoff": true,
+    "actual_never_used_for_pre_match_model": true
+  },
+  "model_gate": {
+    "exactly_11_starters": true,
+    "player_count_min": 11,
+    "player_count_max": 30,
+    "formation_id_required": true,
+    "captured_before_horizon_cutoff": true,
+    "team_membership_at_kickoff_checked": true,
+    "membership_override_audited": true,
+    "invalid_lineup_cannot_enter_freeze": true,
+    "player_uuid_and_formation_uuid_preserved": true
+  },
+  "workbook_fields": {
+    "lineup": [
+      "snapshot_type",
+      "lineup_type",
+      "formation_id",
+      "coach_id",
+      "captured_at",
+      "source_urls",
+      "quality_score"
+    ],
+    "lineup_player": [
+      "is_starter",
+      "bench_order",
+      "position_code",
+      "role_code",
+      "expected_minutes",
+      "starting_probability",
+      "availability_status",
+      "membership_override",
+      "source_urls"
+    ]
+  },
+  "ui_chain": [
+    "match",
+    "team",
+    "lineup_version",
+    "player",
+    "model_input"
+  ],
+  "compatibility": {
+    "formation_text_retained": true,
+    "legacy_lineups_backfilled_to_t_n": true,
+    "historical_lineups_preserved": true,
+    "p4_a_to_g_contracts_unchanged": true,
+    "integration_point_h_started": false
+  },
+  "artifacts": [
+    "crates/persistence-postgres/migrations/0024_match_lineup_chain.sql",
+    "crates/domain/src/lineup_chain.rs",
+    "crates/persistence-postgres/src/lineup_chain.rs",
+    "crates/persistence-postgres/src/match_exchange.rs",
+    "crates/persistence-postgres/src/match_prediction.rs",
+    "crates/spreadsheet-io/src/match_workbook.rs",
+    "src/pages/lineups.ts",
+    "src/pages/teams.ts"
+  ]
+}

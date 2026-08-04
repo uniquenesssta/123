@@ -1,0 +1,153 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "football.openai-profile-ui-contract.v2",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "contract_key",
+    "contract_version",
+    "schema_version",
+    "stage",
+    "release_version",
+    "provider_scope",
+    "protocols",
+    "profile_capabilities",
+    "secret_boundary",
+    "commands",
+    "artifacts"
+  ],
+  "properties": {
+    "contract_key": {
+      "const": "openai-profile-ui"
+    },
+    "contract_version": {
+      "const": "1.1.0"
+    },
+    "schema_version": {
+      "const": "football.openai-profile-ui-contract.v2"
+    },
+    "stage": {
+      "const": "D-completion"
+    },
+    "release_version": {
+      "const": "0.10.2"
+    },
+    "provider_scope": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "supported",
+        "official_openai_only",
+        "multi_provider_switching"
+      ],
+      "properties": {
+        "supported": {
+          "const": [
+            "openai_compatible"
+          ]
+        },
+        "official_openai_only": {
+          "const": false
+        },
+        "multi_provider_switching": {
+          "const": false
+        }
+      }
+    },
+    "protocols": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "supported",
+        "formal_research",
+        "connection_test_only"
+      ],
+      "properties": {
+        "supported": {
+          "const": [
+            "responses",
+            "chat_completions"
+          ]
+        },
+        "formal_research": {
+          "const": [
+            "responses"
+          ]
+        },
+        "connection_test_only": {
+          "const": [
+            "chat_completions"
+          ]
+        }
+      }
+    },
+    "profile_capabilities": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "boolean"
+      },
+      "required": [
+        "multiple_profiles",
+        "editable",
+        "activatable",
+        "connection_test",
+        "delete_profile",
+        "clear_key",
+        "replace_key",
+        "invalidate_test_on_connection_change",
+        "api_example_live_parse",
+        "request_endpoint_override",
+        "model_and_token_field_replacement",
+        "sanitized_example_persistence"
+      ]
+    },
+    "secret_boundary": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "storage",
+        "plaintext_returned_to_frontend",
+        "local_storage",
+        "database",
+        "logs",
+        "api_example_redacted_before_persistence"
+      ],
+      "properties": {
+        "storage": {
+          "const": "windows_credential_manager_per_profile"
+        },
+        "plaintext_returned_to_frontend": {
+          "const": false
+        },
+        "local_storage": {
+          "const": false
+        },
+        "database": {
+          "const": false
+        },
+        "logs": {
+          "const": false
+        },
+        "api_example_redacted_before_persistence": {
+          "const": true
+        }
+      }
+    },
+    "commands": {
+      "type": "array",
+      "minItems": 7,
+      "uniqueItems": true,
+      "items": {
+        "type": "string"
+      }
+    },
+    "artifacts": {
+      "type": "array",
+      "minItems": 7,
+      "uniqueItems": true,
+      "items": {
+        "type": "string"
+      }
+    }
+  }
+}

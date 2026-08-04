@@ -1,0 +1,13 @@
+[package]
+name = "football-model-stub"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+
+[dependencies]
+football-domain = { path = "../domain" }
+football-model-api = { path = "../model-api" }
+serde_json.workspace = true
+
+[dev-dependencies]
+chrono.workspace = true

@@ -1,0 +1,23 @@
+{
+  "contract_id": "football.model-provider-boundary.v1",
+  "contract_version": "1.0.0",
+  "release_version": "0.23.0",
+  "provider_kind": "external",
+  "bundled_runtime": false,
+  "bundled_parameters": false,
+  "bundled_fixtures": false,
+  "model_entries": [
+    "p4",
+    "p7"
+  ],
+  "active_time_windows": [
+    "T-N",
+    "T-24h",
+    "T-6h",
+    "T-1h"
+  ],
+  "legacy_read_only_windows": [
+    "T-90m"
+  ],
+  "failure_mode": "explicit_unavailable_error"
+}

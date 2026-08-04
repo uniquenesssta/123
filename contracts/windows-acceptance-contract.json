@@ -1,0 +1,155 @@
+{
+  "contract_id": "football.windows-end-to-end-acceptance.v1",
+  "contract_version": "1.0.0",
+  "report_schema": "football.windows-acceptance-report.v1",
+  "platform": "win32",
+  "minimum_versions": {
+    "node": "20.19.0",
+    "rust": "1.88.0"
+  },
+  "root_launcher": "验收平台.bat",
+  "powershell_runner": "scripts/windows-acceptance.ps1",
+  "runtime_analyzer": "scripts/analyze-windows-acceptance-log.mjs",
+  "automated_stages": [
+    "environment_preflight",
+    "dependency_sync",
+    "frontend_contracts_and_build",
+    "rust_fmt_clippy_tests",
+    "postgres_integration",
+    "tauri_release_build",
+    "runtime_smoke",
+    "runtime_log_analysis"
+  ],
+  "database_safety": {
+    "required_name_pattern": "(?i)(test|acceptance|qa)",
+    "forbidden_database_names": [
+      "postgres",
+      "template0",
+      "template1"
+    ]
+  },
+  "forbidden_runtime_levels": [
+    "error",
+    "critical"
+  ],
+  "profiles": {
+    "startup": {
+      "required_operation_groups": [
+        {
+          "id": "application_bootstrap",
+          "label": "客户端启动与状态载入",
+          "required": true,
+          "any_of": [
+            "bootstrap"
+          ]
+        }
+      ]
+    },
+    "full": {
+      "required_operation_groups": [
+        {
+          "id": "application_bootstrap",
+          "label": "客户端启动与状态载入",
+          "required": true,
+          "any_of": [
+            "bootstrap"
+          ]
+        },
+        {
+          "id": "team_player_import",
+          "label": "球队与球员资料预检及提交",
+          "required": true,
+          "alternatives": [
+            [
+              "preview_team_package_import",
+              "commit_team_package_import"
+            ],
+            [
+              "preview_player_catalog_import",
+              "commit_player_catalog_import"
+            ]
+          ]
+        },
+        {
+          "id": "match_and_lineups",
+          "label": "比赛与双方阵容建立",
+          "required": true,
+          "alternatives": [
+            [
+              "preview_match_lineup_import",
+              "commit_match_lineup_import"
+            ],
+            [
+              "create_match",
+              "create_lineup_pair"
+            ]
+          ]
+        },
+        {
+          "id": "prediction_readiness",
+          "label": "赛前完整度检查",
+          "required": true,
+          "any_of": [
+            "inspect_match_prediction_readiness"
+          ]
+        },
+        {
+          "id": "formal_prediction",
+          "label": "正式P4推演",
+          "required": true,
+          "any_of": [
+            "execute_prediction_from_match"
+          ]
+        },
+        {
+          "id": "prediction_history",
+          "label": "推演历史回读",
+          "required": true,
+          "any_of": [
+            "list_recent_runs",
+            "read_run"
+          ]
+        },
+        {
+          "id": "postmatch_review",
+          "label": "赛果与赛后复盘",
+          "required": true,
+          "alternatives": [
+            [
+              "generate_match_review"
+            ],
+            [
+              "commit_match_review_package"
+            ]
+          ]
+        },
+        {
+          "id": "postmatch_settlement",
+          "label": "正式赛后结算",
+          "required": false,
+          "any_of": [
+            "settle_postmatch_review"
+          ]
+        },
+        {
+          "id": "full_analysis",
+          "label": "完整分析与质量刷新",
+          "required": true,
+          "all_of": [
+            "enqueue_analysis_job",
+            "analytics_overview"
+          ]
+        },
+        {
+          "id": "release_acceptance",
+          "label": "不可变发布验收",
+          "required": true,
+          "any_of": [
+            "run_release_acceptance"
+          ]
+        }
+      ]
+    }
+  },
+  "report_schema_file": "schemas/windows-acceptance-report.schema.json"
+}

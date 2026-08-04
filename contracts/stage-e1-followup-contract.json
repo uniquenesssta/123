@@ -1,0 +1,24 @@
+{
+  "format_version": "football.stage-e1-followup-contract.v1",
+  "searchable_select": {
+    "preserve_active_query_on_refresh": true,
+    "ime_composition_supported": true,
+    "fuzzy_fields": ["visible_label", "value", "data-search"]
+  },
+  "lineup_player_picker": {
+    "bilingual_display": true,
+    "bilingual_fuzzy_search": true,
+    "submit_requires_home_starters": 11,
+    "submit_requires_away_starters": 11
+  },
+  "lineup_navigation": {
+    "player_profile_direct_open": true,
+    "team_identity_carried_by_action": true,
+    "return_to_lineup_workspace": true
+  },
+  "team_directory": {
+    "profile_action_horizontal": true,
+    "coach_name_ellipsis": true,
+    "desktop_min_width": 280
+  }
+}

@@ -1,0 +1,158 @@
+{
+  "contract_id": "football.task-ui-contract.v1",
+  "contract_version": "1.5.0",
+  "core_pages": [
+    "teams",
+    "players",
+    "lineups",
+    "prediction",
+    "review",
+    "analytics"
+  ],
+  "shared_components": [
+    "taskPageHeader",
+    "taskContextRibbon"
+  ],
+  "master_detail_pages": [
+    "teams",
+    "players",
+    "lineups",
+    "prediction"
+  ],
+  "review": {
+    "step_count": 9,
+    "rail_class": "review-stage-rail",
+    "workspace_class": "review-stage-workspace",
+    "selection_action": "select-review-workflow-step"
+  },
+  "responsive_breakpoints": [
+    1180,
+    900,
+    680
+  ],
+  "screenshot_cases": [
+    {
+      "name": "task-ui-master-detail-1366x768",
+      "fixture": "task-ui-master-detail.html",
+      "width": 1366,
+      "height": 768
+    },
+    {
+      "name": "task-ui-review-workflow-1440x900",
+      "fixture": "task-ui-review-workflow.html",
+      "width": 1440,
+      "height": 900
+    },
+    {
+      "name": "task-ui-review-workflow-900x1000",
+      "fixture": "task-ui-review-workflow.html",
+      "width": 900,
+      "height": 1000
+    },
+    {
+      "name": "task-ui-player-prefill-1920x1080",
+      "fixture": "task-ui-player-prefill.html",
+      "width": 1920,
+      "height": 1080
+    },
+    {
+      "name": "task-ui-profile-editor-1440x900",
+      "fixture": "task-ui-profile-editor.html",
+      "width": 1440,
+      "height": 900
+    },
+    {
+      "name": "core-workspace-hierarchy-1440x900",
+      "fixture": "core-workspace-hierarchy.html",
+      "width": 1440,
+      "height": 900
+    },
+    {
+      "name": "extended-workspace-hierarchy-1440x900",
+      "fixture": "extended-workspace-hierarchy.html",
+      "width": 1440,
+      "height": 900
+    },
+    {
+      "name": "core-workspace-hierarchy-1280x800",
+      "fixture": "core-workspace-hierarchy.html",
+      "width": 1280,
+      "height": 800
+    },
+    {
+      "name": "extended-workspace-hierarchy-1920x1080",
+      "fixture": "extended-workspace-hierarchy.html",
+      "width": 1920,
+      "height": 1080
+    },
+    {
+      "name": "reported-entity-workspace-1440x900",
+      "fixture": "reported-entity-workspace.html",
+      "width": 1440,
+      "height": 900
+    },
+    {
+      "name": "reported-rules-directory-1440x900",
+      "fixture": "reported-rules-directory.html",
+      "width": 1440,
+      "height": 900
+    },
+    {
+      "name": "reported-analysis-focus-1440x900",
+      "fixture": "reported-analysis-focus.html",
+      "width": 1440,
+      "height": 900
+    },
+    {
+      "name": "reported-entity-workspace-2560x1440",
+      "fixture": "reported-entity-workspace.html",
+      "width": 2560,
+      "height": 1440
+    },
+    {
+      "name": "reported-rules-directory-2560x1440",
+      "fixture": "reported-rules-directory.html",
+      "width": 2560,
+      "height": 1440
+    },
+    {
+      "name": "reported-analysis-focus-2560x1440",
+      "fixture": "reported-analysis-focus.html",
+      "width": 2560,
+      "height": 1440
+    },
+    {
+      "name": "lineup-preset-editor-1440x900",
+      "fixture": "lineup-preset-editor.html",
+      "width": 1440,
+      "height": 900
+    },
+    {
+      "name": "lineup-preset-editor-2560x1440",
+      "fixture": "lineup-preset-editor.html",
+      "width": 2560,
+      "height": 1440
+    }
+  ],
+  "player_team_prefill": {
+    "mode": "prefill",
+    "filter_editable": true,
+    "clear_all_removes_prefill": true,
+    "source_player_remains_selected": true
+  },
+  "player_navigation": {
+    "team_directory_player_target": "player_directory_with_team_prefill",
+    "team_profile_player_target": "player_profile_editor",
+    "player_directory_row_primary_action": "player_profile_editor",
+    "player_directory_row_action_count": 1,
+    "source_profile_return_target": "team_profile_editor"
+  },
+  "lineup_preset_editor": {
+    "workspace_mode": "inline_full_width",
+    "position_control": "formation_slot_select",
+    "tactical_role_control": "catalog_select_with_profile_inheritance",
+    "formation_auto_assignment": true,
+    "starter_slot_validation": "exact_11_unique_slots",
+    "member_list_scroll": "internal_stable"
+  }
+}

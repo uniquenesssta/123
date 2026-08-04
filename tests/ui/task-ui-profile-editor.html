@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="zh-CN" data-theme="light">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Profile Editor Workspace</title>
+  <link rel="stylesheet" href="../../src/styles/app.css">
+  <link rel="stylesheet" href="../../src/styles/components.css">
+  <link rel="stylesheet" href="../../src/styles/layout.css">
+  <link rel="stylesheet" href="../../src/styles/entityCenter.css">
+  <link rel="stylesheet" href="../../src/styles/taskWorkspace.css">
+  <link rel="stylesheet" href="../../src/styles/visualSystem.css">
+  <style>
+    * { animation: none !important; transition: none !important; }
+    body { min-width: 0; overflow: hidden; background: var(--bg); }
+    .fixture-shell { height: 100vh; display: grid; grid-template-columns: 180px minmax(0,1fr); }
+    .fixture-nav { padding: 18px 12px; border-right: 1px solid var(--line); background: var(--panel); }
+    .fixture-nav strong { display:block; margin-bottom:24px; font-size:16px; }
+    .fixture-nav span { display:block; margin:7px 0; padding:9px 10px; border-radius:8px; color:var(--muted); font-size:12px; }
+    .fixture-nav span.active { color:var(--accent); background:var(--accent-soft); }
+    .fixture-content { min-width:0; min-height:0; padding:18px 20px 20px; }
+    .fixture-content .entity-page { height:100%; }
+    .fixture-history { display:grid; grid-template-columns: 1.4fr 1fr 1fr auto; gap:10px; align-items:center; padding:10px 12px; border:1px solid var(--line); border-radius:8px; background:var(--panel); font-size:11px; }
+    .fixture-history span { color:var(--muted); }
+  </style>
+</head>
+<body>
+  <div class="fixture-shell">
+    <aside class="fixture-nav"><strong>足球赛事模型</strong><span>首页</span><span>比赛中心</span><span>赛事推演</span><span class="active">球队与人员</span><span>赛后复盘</span><span>分析与历史</span></aside>
+    <main class="fixture-content">
+      <section class="entity-page entity-page-players task-page">
+        <header class="task-page-header"><div class="task-page-heading"><p class="eyebrow">球队与人员</p><h1>球员浏览与管理</h1><p>完整档案在主工作区直接编辑，保存后重新读取数据库。</p></div><div class="task-page-actions"><span class="task-status-chip tone-success">正在编辑完整档案</span><button class="secondary">球员工作包</button><button class="primary">新增球员</button></div></header>
+        <section class="task-context-ribbon"><article class="task-context-item tone-success"><div><span>当前球员</span><strong>胡安·穆索</strong><small>阿根廷 · 完整档案</small></div></article><article class="task-context-item"><div><span>保存行为</span><strong>数据库回读</strong><small>空白中文名保持现有记录</small></div></article></section>
+        <section class="entity-task-workspace">
+          <header><div><span>球队与人员</span><h2>胡安·穆索 · 完整档案</h2></div><button class="secondary">返回阿根廷完整档案</button></header>
+          <div class="entity-task-body">
+            <section class="panel team-detail-panel">
+              <div class="team-detail-hero"><div><span>球员完整档案</span><h2>胡安·穆索</h2><p>Juan Musso · 阿根廷 · 门将</p></div><div class="detail-actions"><button class="secondary">AI 问答</button></div></div>
+              <details class="editor-details" open><summary>编辑基础资料</summary><p class="field-note">保存后重新读取数据库并继续显示已确认值；中文姓名留空不会覆盖已有记录。</p><div class="compact-form three-column"><label class="field"><span>正式姓名</span><input value="MUSSO Juan"></label><label class="field"><span>中文姓名</span><input value="胡安·穆索"></label><label class="field"><span>出生日期</span><input type="date" value="1994-05-06"></label><label class="field"><span>国籍</span><input value="ARG"></label><label class="field"><span>惯用脚</span><select><option selected>右脚</option></select></label><label class="field"><span>身高 cm</span><input value="191"></label></div><button class="primary">保存基础资料</button></details>
+              <details class="editor-details" open><summary>名称与别名（3）</summary><div class="history-list"><div class="fixture-history"><strong>胡安·穆索</strong><span>zh-CN · 中文姓名</span><span>2026-07-22 → 至今</span><b>已保存</b></div><div class="fixture-history"><strong>Juan Musso</strong><span>en · 别名</span><span>长期有效 → 至今</span><b>已保存</b></div><div class="fixture-history"><strong>MUSSO Juan</strong><span>正式姓名</span><span>长期有效</span><b>已保存</b></div></div><div class="compact-form three-column top-gap"><label class="field"><span>新增其他名称</span><input placeholder="英文、韩文、日文或历史名称"></label><label class="field"><span>语言</span><select><option selected>请选择语言</option></select></label><label class="check-field"><input type="checkbox"><span>设为主名称</span></label></div></details>
+            </section>
+          </div>
+        </section>
+      </section>
+    </main>
+  </div>
+</body>
+</html>

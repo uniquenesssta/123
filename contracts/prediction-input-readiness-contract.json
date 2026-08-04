@@ -1,0 +1,49 @@
+{
+  "contract_id": "football.prediction-input-readiness.v1",
+  "contract_version": "1.0.0",
+  "audit_version": "prematch-input-audit-v1",
+  "levels": [
+    "formal_ready",
+    "ready_with_warnings",
+    "shadow_only",
+    "blocked"
+  ],
+  "checks": [
+    "match_identity",
+    "data_window",
+    "home_lineup",
+    "away_lineup",
+    "starting_goalkeepers",
+    "starter_context",
+    "model_route",
+    "team_history",
+    "model_input"
+  ],
+  "authority": {
+    "backend_decides_formal_eligibility": true,
+    "frontend_only_renders_report": true,
+    "formal_execution_rechecks_input_manifest": true,
+    "run_input_identity_is_immutable": true,
+    "shadow_execution_is_non_persistent": true
+  },
+  "operations": {
+    "readiness_query": "inspect_match_prediction_readiness",
+    "formal_command": "execute_prediction_from_match",
+    "shadow_command": "execute_shadow_prediction_from_match"
+  },
+  "persistence": {
+    "migration": "0041_prediction_input_readiness.sql",
+    "run_fields": [
+      "input_audit_version",
+      "input_readiness_level",
+      "input_readiness_score",
+      "input_manifest",
+      "input_manifest_sha256"
+    ]
+  },
+  "ui": {
+    "panel_class": "prediction-readiness-panel",
+    "check_class": "prediction-readiness-check",
+    "history_audit_class": "run-input-audit"
+  }
+}

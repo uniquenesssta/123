@@ -1,0 +1,45 @@
+{
+  "format_version": "football.player-role-inheritance.v1",
+  "source": {
+    "table": "football.player_positions",
+    "field": "default_role_code",
+    "scoped_by_position": true,
+    "temporal": true
+  },
+  "resolution_priority": [
+    "lineup_override",
+    "selected_position_default",
+    "primary_position_default",
+    "missing"
+  ],
+  "propagation": [
+    "team_package_xlsx",
+    "player_monthly_xlsx",
+    "player_catalog",
+    "team_squad",
+    "lineup_preset",
+    "match_lineup",
+    "match_xlsx",
+    "ai_match_package",
+    "player_match_contribution_request",
+    "p4_prepared_input"
+  ],
+  "p4_semantics": {
+    "formula_unchanged": true,
+    "role_certainty_source": "tactical_role_confidence",
+    "lineup_override_confidence": 1.0,
+    "inherited_confidence_source": "player_position.proficiency",
+    "missing_role_score": 50,
+    "role_scoped_dynamic_tags": "metadata.role_code",
+    "direct_contribution_inherits_when_role_blank": true
+  },
+  "audit": {
+    "origin_values": [
+      "lineup_override",
+      "player_position_default",
+      "missing"
+    ],
+    "historical_as_of": "lineup.captured_at",
+    "source_position_field": "role_source_position_code"
+  }
+}

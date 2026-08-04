@@ -1,0 +1,10 @@
+{
+  "contract_id": "football.p4-fact-pipeline-contract.v1",
+  "contract_version": "1.0.0",
+  "stage": "E",
+  "research_output_schema": "football.p4-research-output.v2",
+  "entity_resolution": true,
+  "time_gate": true,
+  "conflict_resolution": true,
+  "provider_output_opaque": true
+}

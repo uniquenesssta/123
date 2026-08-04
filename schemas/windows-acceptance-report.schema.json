@@ -1,0 +1,163 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "football.windows-acceptance-report.v1",
+  "title": "Windows full-chain acceptance report",
+  "type": "object",
+  "required": [
+    "schema",
+    "contract_id",
+    "contract_version",
+    "generated_at",
+    "profile",
+    "status",
+    "source_log",
+    "entry_count",
+    "invalid_line_count",
+    "completed_operations",
+    "coverage",
+    "missing_required_groups",
+    "missing_recommended_groups",
+    "runtime_errors"
+  ],
+  "properties": {
+    "schema": {
+      "const": "football.windows-acceptance-report.v1"
+    },
+    "contract_id": {
+      "type": "string"
+    },
+    "contract_version": {
+      "type": "string"
+    },
+    "generated_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "profile": {
+      "enum": [
+        "startup",
+        "full"
+      ]
+    },
+    "status": {
+      "enum": [
+        "pass",
+        "warning",
+        "blocked"
+      ]
+    },
+    "source_log": {
+      "type": "string",
+      "minLength": 1
+    },
+    "session_ids": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "uniqueItems": true
+    },
+    "app_versions": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "uniqueItems": true
+    },
+    "entry_count": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "invalid_line_count": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "invalid_lines": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "line",
+          "error"
+        ],
+        "properties": {
+          "line": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "error": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    "completed_operations": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "uniqueItems": true
+    },
+    "coverage": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "id",
+          "label",
+          "required",
+          "passed",
+          "expected",
+          "matched"
+        ],
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "label": {
+            "type": "string"
+          },
+          "required": {
+            "type": "boolean"
+          },
+          "passed": {
+            "type": "boolean"
+          },
+          "expected": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "matched": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    "missing_required_groups": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "missing_recommended_groups": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "runtime_errors": {
+      "type": "array",
+      "items": {
+        "type": "object"
+      }
+    }
+  },
+  "additionalProperties": false
+}

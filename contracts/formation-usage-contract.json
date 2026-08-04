@@ -1,0 +1,74 @@
+{
+  "contract_id": "football.formation-usage-contract.v1",
+  "contract_version": "1.0.0",
+  "baseline_source_version": "0.15.0",
+  "release_version": "0.16.0",
+  "delivery_phase": "H_PRE_STAGE_3",
+  "integration_point_h_started": false,
+  "commands": [
+    "list_formations",
+    "save_formation_usage_distribution",
+    "list_formation_usage_distributions",
+    "resolve_formation_distribution"
+  ],
+  "builtin_formations": [
+    "4-3-3",
+    "4-2-3-1",
+    "4-4-2",
+    "4-1-4-1",
+    "4-4-1-1",
+    "4-3-1-2",
+    "4-1-2-1-2",
+    "4-2-2-2",
+    "3-4-3",
+    "3-4-2-1",
+    "3-5-2",
+    "3-5-1-1",
+    "5-3-2",
+    "5-4-1",
+    "4-5-1",
+    "UNKNOWN",
+    "CUSTOM"
+  ],
+  "observation_rules": {
+    "append_only": true,
+    "usage_count_not_above_observed_matches": true,
+    "missing_count_maps_to_unknown": true,
+    "probabilities_normalized": true,
+    "default_smoothing_alpha": 3.0,
+    "zero_sample_fallback": "UNKNOWN_100_PERCENT"
+  },
+  "resolution_priority": [
+    "actual_lineup",
+    "confirmed_lineup",
+    "team_coach",
+    "team",
+    "coach",
+    "competition_default",
+    "system_default",
+    "unknown"
+  ],
+  "window_presets": [
+    "last_5",
+    "last_10",
+    "last_20",
+    "current_season",
+    "current_coach_term",
+    "custom"
+  ],
+  "compatibility": {
+    "lineups_formation_text_retained": true,
+    "formation_id_preferred": true,
+    "historical_data_preserved": true
+  },
+  "model_input": {
+    "resolved_distribution_readable": true,
+    "source_level_auditable": true
+  },
+  "artifacts": [
+    "crates/persistence-postgres/migrations/0022_formations_and_usage.sql",
+    "crates/persistence-postgres/src/formation_catalog.rs",
+    "src/pages/teams.ts",
+    "src/pages/lineups.ts"
+  ]
+}

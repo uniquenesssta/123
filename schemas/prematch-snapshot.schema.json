@@ -1,0 +1,49 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "football.p4-prematch-snapshot.v1",
+  "title": "Public Immutable Prematch Snapshot",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "match_id", "match_key", "horizon", "data_cutoff_at", "frozen_at",
+    "model_version_id", "parameter_set_id", "competition_profile_id",
+    "schema_version_id", "schema_version", "trace_id", "idempotency_key",
+    "source_kind", "quality_score", "input_payload", "features", "probabilities"
+  ],
+  "properties": {
+    "match_id": { "type": "string", "format": "uuid" },
+    "match_key": { "type": "string", "minLength": 1 },
+    "horizon": { "enum": ["T-24h", "T-6h", "T-90m", "T-1h", "T-N"] },
+    "data_cutoff_at": { "type": "string", "format": "date-time" },
+    "frozen_at": { "type": "string", "format": "date-time" },
+    "model_version_id": { "type": "string", "format": "uuid" },
+    "parameter_set_id": { "type": "string", "format": "uuid" },
+    "competition_profile_id": { "type": "string", "format": "uuid" },
+    "research_run_id": { "type": ["string", "null"], "format": "uuid" },
+    "schema_version_id": { "type": "string", "format": "uuid" },
+    "schema_version": { "const": "football.p4-prematch-snapshot.v1" },
+    "trace_id": { "type": "string", "format": "uuid" },
+    "idempotency_key": { "type": "string", "minLength": 1, "maxLength": 240 },
+    "source_kind": { "enum": ["real", "manual", "synthetic_fixture"] },
+    "quality_score": { "type": "number", "minimum": 0, "maximum": 1 },
+    "input_payload": { "type": "object" },
+    "features": { "type": "array", "items": { "type": "object" } },
+    "probabilities": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": true,
+        "required": ["chain_key", "home_win", "draw", "away_win"],
+        "properties": {
+          "chain_key": { "type": "string", "minLength": 1 },
+          "home_win": { "type": "number", "minimum": 0, "maximum": 1 },
+          "draw": { "type": "number", "minimum": 0, "maximum": 1 },
+          "away_win": { "type": "number", "minimum": 0, "maximum": 1 },
+          "matrix_sha256": { "type": ["string", "null"] },
+          "matrix_cell_count": { "type": "integer", "minimum": 0 }
+        }
+      }
+    },
+    "metadata": { "type": "object" }
+  }
+}

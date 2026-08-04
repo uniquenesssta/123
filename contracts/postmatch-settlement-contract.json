@@ -1,0 +1,72 @@
+{
+  "contract_id": "football.model-postmatch-settlement.v1",
+  "contract_version": "1.0.0",
+  "baseline_source_version": "0.21.0",
+  "release_version": "0.22.0",
+  "delivery_phase": "INTEGRATION_H_COMPLETE",
+  "stage": "H",
+  "formal_partition": [
+    "model_version",
+    "competition_profile",
+    "parameter_version",
+    "horizon"
+  ],
+  "formal_horizons": [
+    "T-24h",
+    "T-6h",
+    "T-90m",
+    "T-1h"
+  ],
+  "settlement_gate": {
+    "official_result_required": true,
+    "finalized_review_required": true,
+    "successful_run_required": true,
+    "frozen_snapshot_required": true,
+    "settlement_records_immutable": true
+  },
+  "evidence_scoring": {
+    "manual_verdict_required": true,
+    "decision_records_immutable": true,
+    "snapshot_cutoff_enforced": true
+  },
+  "provider_scoring": {
+    "snapshots_immutable": true,
+    "provider_owned_scoring_policy": true
+  },
+  "drift_monitoring": {
+    "runs_immutable": true,
+    "evaluation_samples_immutable": true,
+    "provider_owned_thresholds": true
+  },
+  "parameter_lifecycle": {
+    "automatic_promotion": false,
+    "provider_state": "NOT_BUNDLED"
+  },
+  "commands": [
+    "postmatch_settlement_readiness",
+    "settle_postmatch_review",
+    "list_postmatch_settlements",
+    "list_evidence_scoring_items",
+    "decide_evidence_scoring_item",
+    "refresh_postmatch_monitoring",
+    "postmatch_overview"
+  ],
+  "migration": "crates/persistence-postgres/migrations/0026_postmatch_settlement.sql",
+  "artifacts": [
+    "crates/domain/src/postmatch.rs",
+    "crates/application/src/postmatch.rs",
+    "crates/persistence-postgres/src/postmatch.rs",
+    "crates/persistence-postgres/src/parameter_lifecycle.rs",
+    "src-tauri/src/commands/postmatch.rs",
+    "src/api/client.ts",
+    "src/pages/review.ts",
+    "src/pages/analytics.ts",
+    "src/main.ts"
+  ],
+  "compatibility": {
+    "existing_reviews_preserved": true,
+    "historical_runs_and_snapshots_not_rewritten": true,
+    "existing_parameter_candidates_preserved": true,
+    "external_provider_required": true
+  }
+}

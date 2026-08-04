@@ -1,0 +1,437 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "football.api-workspace-response.v2",
+  "title": "API Workspace Structured Response V2",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "answer",
+    "summary",
+    "key_points",
+    "missing_information",
+    "warnings",
+    "proposed_operations",
+    "generated_files"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "football.api-workspace-response.v2"
+    },
+    "answer": {
+      "type": "string",
+      "maxLength": 30000
+    },
+    "summary": {
+      "type": "string",
+      "maxLength": 4000
+    },
+    "key_points": {
+      "type": "array",
+      "maxItems": 30,
+      "items": {
+        "type": "string",
+        "maxLength": 1000
+      }
+    },
+    "missing_information": {
+      "type": "array",
+      "maxItems": 30,
+      "items": {
+        "type": "string",
+        "maxLength": 1000
+      }
+    },
+    "warnings": {
+      "type": "array",
+      "maxItems": 30,
+      "items": {
+        "type": "string",
+        "maxLength": 1000
+      }
+    },
+    "proposed_operations": {
+      "type": "array",
+      "maxItems": 100,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "proposal_key",
+          "operation_type",
+          "payload",
+          "rationale",
+          "confidence"
+        ],
+        "properties": {
+          "proposal_key": {
+            "type": "string",
+            "pattern": "^[a-zA-Z0-9_-]{1,64}$"
+          },
+          "operation_type": {
+            "enum": [
+              "add_player_name",
+              "assign_player_position",
+              "add_player_availability",
+              "add_player_dynamic_tag",
+              "add_player_ability_observation",
+              "add_team_name",
+              "update_team_profile"
+            ]
+          },
+          "payload": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "player_id",
+              "name",
+              "language_code",
+              "is_primary",
+              "position_code",
+              "proficiency",
+              "default_role_code",
+              "team_id",
+              "competition_id",
+              "status",
+              "reason",
+              "confidence",
+              "valid_from",
+              "valid_to",
+              "tag_code",
+              "value",
+              "label",
+              "observed_at",
+              "opponent_team_id",
+              "sample_size",
+              "source_type",
+              "calculation_version",
+              "dimension_code",
+              "context_type",
+              "context_id",
+              "effective_from",
+              "effective_to",
+              "metadata_json",
+              "source_urls",
+              "short_name",
+              "team_type",
+              "founded_year",
+              "city",
+              "stadium",
+              "head_coach",
+              "default_formation",
+              "tactical_style",
+              "attack_rating",
+              "midfield_rating",
+              "defence_rating",
+              "goalkeeper_rating",
+              "reputation",
+              "notes"
+            ],
+            "properties": {
+              "player_id": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "name": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "language_code": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "is_primary": {
+                "type": [
+                  "boolean",
+                  "null"
+                ]
+              },
+              "position_code": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "proficiency": {
+                "type": [
+                  "number",
+                  "null"
+                ]
+              },
+              "default_role_code": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "team_id": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "competition_id": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "status": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "reason": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "confidence": {
+                "type": [
+                  "number",
+                  "null"
+                ]
+              },
+              "valid_from": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "valid_to": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "tag_code": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "value": {
+                "type": [
+                  "number",
+                  "null"
+                ]
+              },
+              "label": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "observed_at": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "opponent_team_id": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "sample_size": {
+                "type": [
+                  "integer",
+                  "null"
+                ]
+              },
+              "source_type": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "calculation_version": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "dimension_code": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "context_type": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "context_id": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "effective_from": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "effective_to": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "metadata_json": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "source_urls": {
+                "type": "array",
+                "maxItems": 20,
+                "items": {
+                  "type": "string",
+                  "maxLength": 2048
+                }
+              },
+              "short_name": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "team_type": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "founded_year": {
+                "type": [
+                  "integer",
+                  "null"
+                ]
+              },
+              "city": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "stadium": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "head_coach": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "default_formation": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "tactical_style": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "attack_rating": {
+                "type": [
+                  "number",
+                  "null"
+                ]
+              },
+              "midfield_rating": {
+                "type": [
+                  "number",
+                  "null"
+                ]
+              },
+              "defence_rating": {
+                "type": [
+                  "number",
+                  "null"
+                ]
+              },
+              "goalkeeper_rating": {
+                "type": [
+                  "number",
+                  "null"
+                ]
+              },
+              "reputation": {
+                "type": [
+                  "number",
+                  "null"
+                ]
+              },
+              "notes": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              }
+            }
+          },
+          "rationale": {
+            "type": "string",
+            "maxLength": 2000
+          },
+          "confidence": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 1
+          }
+        }
+      }
+    },
+    "generated_files": {
+      "type": "array",
+      "maxItems": 10,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "filename",
+          "media_type",
+          "content"
+        ],
+        "properties": {
+          "filename": {
+            "type": "string",
+            "maxLength": 120
+          },
+          "media_type": {
+            "enum": [
+              "text/plain",
+              "text/markdown",
+              "application/json",
+              "text/csv"
+            ]
+          },
+          "content": {
+            "type": "string",
+            "maxLength": 500000
+          }
+        }
+      }
+    }
+  }
+}

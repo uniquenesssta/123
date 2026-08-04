@@ -1,0 +1,69 @@
+{
+  "contract_id": "football.team-player-management-contract.v1",
+  "contract_version": "1.0.0",
+  "baseline_source_version": "0.13.1",
+  "release_version": "0.13.2",
+  "stage": "G_PRE_H",
+  "purpose": "Promote API collaboration to primary navigation, add a team center, auto-link imported player team periods to exact teams with safe missing-team creation, and provide confirmed batch deletion for players and teams.",
+  "navigation": {
+    "api_workspace_primary": true,
+    "team_center_primary": true,
+    "player_center_primary": true
+  },
+  "team_center": {
+    "identity_and_aliases": true,
+    "profile_and_tactics": true,
+    "squad_grouped_by_position": true,
+    "availability_summary": true,
+    "recent_match_history": true,
+    "api_workspace_prefill": true,
+    "organization_model": "generic_fm_fifa_inspired_without_proprietary_data"
+  },
+  "spreadsheet_import": {
+    "player_team_period_sheet": "球队履历",
+    "exact_existing_team_match_first": true,
+    "create_missing_team_from_team_name": true,
+    "ambiguous_team_match_blocks_commit": true,
+    "audit_new_team_creation": true,
+    "preview_discloses_auto_create": true
+  },
+  "bulk_delete": {
+    "players_supported": true,
+    "teams_supported": true,
+    "explicit_confirmation_required": true,
+    "per_item_result": true,
+    "historical_match_team_delete_blocked": true,
+    "review_linked_team_delete_blocked": true,
+    "audit_required": true
+  },
+  "commands": [
+    "list_teams",
+    "read_team",
+    "update_team",
+    "add_team_name",
+    "upsert_team_profile",
+    "bulk_delete_players",
+    "bulk_delete_teams"
+  ],
+  "artifacts": [
+    "contracts/team-player-management-contract.json",
+    "crates/domain/src/lib.rs",
+    "crates/application/src/player_catalog.rs",
+    "crates/persistence-postgres/src/team_catalog.rs",
+    "crates/persistence-postgres/src/spreadsheet_exchange.rs",
+    "crates/persistence-postgres/migrations/0020_team_player_management.sql",
+    "crates/spreadsheet-io/src/lib.rs",
+    "src-tauri/src/commands/catalog.rs",
+    "src/pages/teams.ts",
+    "src/pages/players.ts",
+    "src/app/shell.ts",
+    "src/main.ts",
+    "scripts/verify-team-player-management.mjs"
+  ],
+  "non_goals": [
+    "Do not copy or import proprietary Football Manager or FIFA datasets, ratings, or schemas.",
+    "Do not automatically delete teams referenced by historical matches or reviews.",
+    "Do not bypass explicit confirmation for destructive actions.",
+    "Do not begin integration point H settlement, evidence scoring, drift monitoring, or parameter promotion."
+  ]
+}

@@ -1,0 +1,136 @@
+<!doctype html>
+<html lang="zh-CN" data-theme="light">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Extended Workspace Hierarchy</title>
+  <link rel="stylesheet" href="../../src/styles/app.css">
+  <link rel="stylesheet" href="../../src/styles/components.css">
+  <link rel="stylesheet" href="../../src/styles/layout.css">
+  <link rel="stylesheet" href="../../src/styles/entityCenter.css">
+  <link rel="stylesheet" href="../../src/styles/taskWorkspace.css">
+  <link rel="stylesheet" href="../../src/styles/coreWorkspaces.css">
+  <link rel="stylesheet" href="../../src/styles/moduleWorkspaces.css">
+  <link rel="stylesheet" href="../../src/styles/visualSystem.css">
+  <style>
+    * { animation: none !important; transition: none !important; }
+    body { min-width: 0; overflow: hidden; background: var(--bg); }
+    .fixture-shell { height: 100vh; display: grid; grid-template-columns: 60px 154px minmax(0, 1fr); }
+    .fixture-primary { display: grid; grid-template-rows: auto 1fr auto; padding: 8px 5px; border-right: 1px solid var(--line); background: var(--panel); }
+    .fixture-logo { width: 30px; height: 30px; display: grid; place-items: center; margin: 0 auto 8px; border-radius: 8px; color: white; background: var(--accent); font-weight: 900; }
+    .fixture-primary nav { display: grid; align-content: start; gap: 2px; }
+    .fixture-primary button { min-height: 34px; display: grid; place-items: center; gap: 1px; padding: 4px 2px; border: 0; border-radius: 6px; color: var(--muted); background: transparent; font-size: 10px; }
+    .fixture-primary button span { font-size: 13px; }
+    .fixture-primary button.active { color: var(--accent); background: color-mix(in srgb, var(--accent) 10%, var(--panel)); }
+    .fixture-version { color: var(--muted-2); font-size: 9px; text-align: center; }
+    .fixture-secondary { min-width: 0; padding: 10px 7px; border-right: 1px solid var(--line); background: color-mix(in srgb, var(--panel) 96%, var(--bg)); }
+    .fixture-secondary header { padding: 0 6px 8px; }
+    .fixture-secondary header span { color: var(--muted-2); font-size: 10px; font-weight: 750; }
+    .fixture-secondary header h2 { margin: 5px 0 0; font-size: 13px; }
+    .fixture-secondary nav { display: grid; gap: 2px; }
+    .fixture-secondary button { min-height: 34px; display: flex; align-items: center; gap: 6px; padding: 5px 7px; border: 0; border-radius: 5px; color: var(--muted); background: transparent; font-size: 11px; text-align: left; }
+    .fixture-secondary button b { width: 22px; color: var(--muted-2); font-size: 10px; }
+    .fixture-secondary button.active { color: var(--accent); background: color-mix(in srgb, var(--accent) 9%, var(--panel)); }
+    .fixture-main { min-width: 0; min-height: 0; padding: 10px 12px; overflow: hidden; }
+    .fixture-stage { min-height: 0; display: grid; grid-template-columns: minmax(0, 1fr) 276px; gap: 10px; }
+    .fixture-directory { min-height: 0; padding: 10px; }
+    .fixture-directory-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; margin-bottom: 12px; }
+    .fixture-directory-head h2 { margin: 4px 0 0; font-size: 13px; }
+    .fixture-search { height: 32px; min-width: 210px; display: flex; align-items: center; padding: 0 10px; border: 1px solid var(--line); border-radius: 8px; background: var(--soft); color: var(--muted); font-size: 11px; }
+    .fixture-tree { display: grid; gap: 2px; }
+    .fixture-tree-row { display: grid; grid-template-columns: 36px minmax(0, 1fr) auto; align-items: center; gap: 10px; min-height: 42px; padding: 7px 8px; border: 1px solid var(--line); border-radius: 5px; background: var(--panel); }
+    .fixture-tree-row.active { border-color: color-mix(in srgb, var(--accent) 34%, var(--line)); background: color-mix(in srgb, var(--accent) 6%, var(--panel)); }
+    .fixture-tree-row i { width: 28px; height: 28px; display: grid; place-items: center; border-radius: 5px; color: var(--accent); background: var(--soft); font-style: normal; font-size: 11px; font-weight: 800; }
+    .fixture-tree-row strong, .fixture-tree-row small { display: block; }
+    .fixture-tree-row strong { font-size: 11px; }
+    .fixture-tree-row small { margin-top: 3px; color: var(--muted); font-size: 10px; }
+    .fixture-tree-row b { color: var(--muted-2); font-size: 10px; }
+    .fixture-route-strip { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; margin-top: 8px; }
+    .fixture-route-strip div { padding: 8px; border: 1px solid var(--line); border-radius: 5px; background: var(--soft); }
+    .fixture-route-strip span, .fixture-route-strip strong, .fixture-route-strip small { display: block; }
+    .fixture-route-strip span { color: var(--muted-2); font-size: 9px; }
+    .fixture-route-strip strong { margin-top: 4px; font-size: 11px; }
+    .fixture-route-strip small { margin-top: 3px; color: var(--muted); font-size: 9px; }
+    .fixture-inspector { min-height: 0; padding: 10px; }
+    .fixture-inspector h2 { margin: 4px 0 12px; font-size: 13px; }
+    .fixture-kpis { display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: 8px; }
+    .fixture-kpis div { padding: 10px; border: 1px solid var(--line); border-radius: 8px; background: var(--soft); }
+    .fixture-kpis span, .fixture-kpis strong { display: block; }
+    .fixture-kpis span { color: var(--muted-2); font-size: 9px; }
+    .fixture-kpis strong { margin-top: 4px; font-size: 13px; }
+    .fixture-inspector-list { display: grid; gap: 8px; margin-top: 8px; }
+    .fixture-inspector-list div { padding: 10px 0; border-top: 1px solid var(--line); }
+    .fixture-inspector-list span, .fixture-inspector-list strong, .fixture-inspector-list small { display: block; }
+    .fixture-inspector-list span { color: var(--muted-2); font-size: 9px; }
+    .fixture-inspector-list strong { margin-top: 4px; font-size: 11px; }
+    .fixture-inspector-list small { margin-top: 3px; color: var(--muted); font-size: 9px; line-height: 1.45; }
+  </style>
+</head>
+<body>
+  <div class="fixture-shell">
+    <aside class="fixture-primary">
+      <div class="fixture-logo">F</div>
+      <nav aria-label="一级菜单">
+        <button><span>⌂</span>首页</button>
+        <button><span>◫</span>比赛</button>
+        <button><span>◎</span>资源</button>
+        <button class="active"><span>◇</span>模型</button>
+        <button><span>▥</span>分析</button>
+        <button><span>✦</span>AI</button>
+        <button><span>⚙</span>管理</button>
+      </nav>
+      <div class="fixture-version">0.23.0</div>
+    </aside>
+    <aside class="fixture-secondary">
+      <header><span>模型</span><h2>规则与发布</h2></header>
+      <nav aria-label="二级菜单">
+        <button class="active"><b>01</b>赛事与规则</button>
+        <button><b>02</b>发布验收</button>
+      </nav>
+    </aside>
+    <main class="fixture-main">
+      <section class="module-workspace-page model-rules-workspace">
+        <header class="task-page-header">
+          <div class="task-page-heading"><p class="eyebrow">模型规则</p><h1>赛事、结构与模型路由</h1><p>全局导航只保留业务入口，规则目录、赛事结构、模型路由和规则包均在当前页面闭环完成。</p></div>
+          <div class="task-page-actions"><span class="task-status-chip tone-success">生产规则可用</span><button class="secondary">刷新目录</button><button class="primary">导入规则包</button></div>
+        </header>
+        <section class="task-context-ribbon">
+          <article class="task-context-item tone-accent"><div><span>赛事目录</span><strong>377 项</strong><small>国家队与俱乐部已隔离</small></div></article>
+          <article class="task-context-item"><div><span>赛季 / 阶段</span><strong>42 / 96</strong><small>结构关系完整</small></div></article>
+          <article class="task-context-item tone-success"><div><span>生产路由</span><strong>18 条</strong><small>P4/P7 精确匹配</small></div></article>
+          <article class="task-context-item"><div><span>规则包</span><strong>12 个</strong><small>3 个当前生效</small></div></article>
+        </section>
+        <div class="core-local-navigation">
+          <nav class="workspace-section-nav" aria-label="页面任务">
+            <button class="workspace-section-nav-item active"><span class="workspace-section-index">01</span><span class="workspace-section-copy"><strong>赛事目录</strong><small>三级分类、搜索与规则路径</small></span><b>377</b></button>
+            <button class="workspace-section-nav-item"><span class="workspace-section-index">02</span><span class="workspace-section-copy"><strong>赛事结构</strong><small>赛事、赛季、阶段与轮次</small></span><b>42/96</b></button>
+            <button class="workspace-section-nav-item"><span class="workspace-section-index">03</span><span class="workspace-section-copy"><strong>模型路由</strong><small>作用范围与生产规则绑定</small></span><b>18</b></button>
+            <button class="workspace-section-nav-item"><span class="workspace-section-index">04</span><span class="workspace-section-copy"><strong>规则包</strong><small>导入、预检与注册</small></span><b>12</b></button>
+          </nav>
+        </div>
+        <div class="module-workspace-stage">
+          <section class="workspace-module-view active">
+            <div class="fixture-stage">
+              <main class="panel fixture-directory">
+                <div class="fixture-directory-head"><div><span class="eyebrow">赛事目录</span><h2>比赛体系与当前规则路径</h2></div><div class="fixture-search">搜索赛事、国家、赛季或阶段</div></div>
+                <nav class="workspace-section-nav workspace-task-anchor-nav" aria-label="页面深层任务">
+                  <button class="workspace-section-nav-item active"><span class="workspace-section-index">A</span><span class="workspace-section-copy"><strong>赛事身份</strong><small>创建和维护赛事目录</small></span></button>
+                  <button class="workspace-section-nav-item"><span class="workspace-section-index">B</span><span class="workspace-section-copy"><strong>赛季与阶段</strong><small>建立赛季、阶段与轮次</small></span></button>
+                </nav>
+                <div class="fixture-tree">
+                  <div class="fixture-tree-row active"><i>洲际</i><div><strong>国际足联世界杯</strong><small>国家队 · 世界 · 2026赛季</small></div><b>4阶段</b></div>
+                  <div class="fixture-tree-row"><i>欧洲</i><div><strong>欧洲冠军联赛</strong><small>俱乐部 · 欧洲 · 2026/27赛季</small></div><b>5阶段</b></div>
+                  <div class="fixture-tree-row"><i>巴西</i><div><strong>巴西甲级联赛</strong><small>俱乐部 · 巴西 · 2026赛季</small></div><b>38轮</b></div>
+                  <div class="fixture-tree-row"><i>韩国</i><div><strong>K联赛1</strong><small>俱乐部 · 韩国 · 2026赛季</small></div><b>33轮</b></div>
+                </div>
+                <div class="fixture-route-strip"><div><span>当前赛事</span><strong>国际足联世界杯</strong><small>国家队范围</small></div><div><span>生产模型</span><strong>P4 低比分概率核</strong><small>版本 2.0.0</small></div><div><span>规则路径</span><strong>赛事阶段精确绑定</strong><small>淘汰赛阶段优先</small></div></div>
+              </main>
+              <aside class="panel fixture-inspector"><span class="eyebrow">目录检查器</span><h2>国际足联世界杯</h2><div class="fixture-kpis"><div><span>赛季</span><strong>2026</strong></div><div><span>阶段</span><strong>4</strong></div><div><span>绑定</span><strong>3</strong></div><div><span>状态</span><strong>可用</strong></div></div><div class="fixture-inspector-list"><div><span>赛事类型</span><strong>国家队赛事</strong><small>与俱乐部目录严格隔离。</small></div><div><span>当前作用域</span><strong>淘汰赛阶段</strong><small>阶段规则优先于赛季和赛事默认规则。</small></div><div><span>模型血缘</span><strong>P4 / P7</strong><small>输入、规则和运行记录均可追溯。</small></div></div></aside>
+            </div>
+          </section>
+        </div>
+      </section>
+    </main>
+  </div>
+</body>
+</html>

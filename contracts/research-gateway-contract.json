@@ -1,0 +1,10 @@
+{
+  "contract_id": "football.p4-research-gateway-contract.v1",
+  "contract_version": "1.0.0",
+  "stage": "D",
+  "purpose": "Collect source-backed pre-match facts without generating predictions.",
+  "api_protocol": "responses",
+  "tool": "web_search",
+  "strict_schema": true,
+  "provider_runtime_separate": true
+}

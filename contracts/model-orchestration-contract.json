@@ -1,0 +1,10 @@
+{
+  "contract_id": "football.p4-orchestration-contract.v1",
+  "contract_version": "1.0.0",
+  "stage": "F",
+  "canonical_horizons": ["T-24h", "T-6h", "T-90m", "T-1h"],
+  "legacy_horizon": "T-N",
+  "ready_state": "READY_TO_FREEZE",
+  "formal_terminal_state": "FROZEN",
+  "provider_required": true
+}

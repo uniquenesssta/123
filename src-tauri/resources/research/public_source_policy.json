@@ -1,0 +1,21 @@
+{
+  "schema_version": "football.p4-source-policy.v1",
+  "default_tier": "unclassified",
+  "tiers": [
+    { "key": "unclassified", "rank": 100 },
+    { "key": "reliable_secondary", "rank": 250 },
+    { "key": "official_club", "rank": 400 },
+    { "key": "official_match_center", "rank": 450 },
+    { "key": "official_federation", "rank": 475 },
+    { "key": "official_competition", "rank": 500 }
+  ],
+  "domain_rules": [
+    { "domain": "fifa.com", "tier": "official_competition" },
+    { "domain": "uefa.com", "tier": "official_competition" },
+    { "domain": "the-afc.com", "tier": "official_competition" },
+    { "domain": "cafonline.com", "tier": "official_competition" },
+    { "domain": "concacaf.com", "tier": "official_competition" },
+    { "domain": "conmebol.com", "tier": "official_competition" },
+    { "domain": "oceaniafootball.com", "tier": "official_competition" }
+  ]
+}

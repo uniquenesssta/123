@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="zh-CN" data-theme="light">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Lineup Preset Editor</title>
+  <link rel="stylesheet" href="../../src/styles/app.css">
+  <link rel="stylesheet" href="../../src/styles/components.css">
+  <link rel="stylesheet" href="../../src/styles/layout.css">
+  <link rel="stylesheet" href="../../src/styles/entityCenter.css">
+  <link rel="stylesheet" href="../../src/styles/taskWorkspace.css">
+  <link rel="stylesheet" href="../../src/styles/visualSystem.css">
+  <link rel="stylesheet" href="../../src/styles/workspacePanels.css">
+  <style>
+    * { animation: none !important; transition: none !important; }
+    body { min-width: 0; overflow: hidden; background: var(--bg); }
+    .fixture-shell { height:100vh; display:grid; grid-template-columns: 60px 154px minmax(0,1fr); }
+    .fixture-primary,.fixture-secondary { border-right:1px solid var(--line); background:var(--panel); }
+    .fixture-primary { padding:10px 6px; display:grid; align-content:start; gap:8px; }
+    .fixture-primary span { display:grid; place-items:center; min-height:42px; border-radius:7px; color:var(--muted); font-size:11px; }
+    .fixture-primary span.active { color:var(--accent); background:var(--accent-soft); }
+    .fixture-secondary { padding:12px 10px; }
+    .fixture-secondary h2 { margin:0 0 4px; font-size:14px; }
+    .fixture-secondary p { margin:0 0 14px; color:var(--muted); font-size:10px; }
+    .fixture-secondary span { display:block; padding:9px 8px; border-radius:7px; font-size:12px; }
+    .fixture-secondary span.active { color:var(--accent); background:var(--accent-soft); font-weight:700; }
+    .main-content { min-width:0; min-height:0; height:100vh; }
+    .workspace-panel-root { display:block; height:100%; padding:10px 12px 12px; }
+  </style>
+</head>
+<body>
+  <div class="fixture-shell">
+    <aside class="fixture-primary"><span>首页</span><span>比赛</span><span class="active">资源</span><span>模型</span><span>分析</span><span>AI</span><span>管理</span></aside>
+    <aside class="fixture-secondary"><h2>资源</h2><p>球队、球员与工作簿</p><span>球队中心</span><span>球员中心</span><span class="active">阵容预设</span><span>Excel 工作包</span></aside>
+    <main class="main-content workspace-panel-open">
+      <div class="workspace-panel-root">
+        <section class="workspace-detail-page lineup-preset-modal">
+          <div class="workspace-detail-toolbar"><div class="workspace-detail-history"><button class="secondary compact">← 返回</button><button class="secondary compact">前进 →</button></div><button class="secondary compact">返回阵容预设</button></div>
+          <header class="workspace-detail-header"><div><span>安德莱赫特</span><h2>新建阵容预设</h2></div></header>
+          <div class="workspace-detail-body">
+            <div class="lineup-preset-editor">
+              <div class="form-grid three-column clean-form">
+                <label class="field"><span>预设名称</span><input value="联赛主力阵容"></label>
+                <label class="field"><span>阵型</span><select><option selected>4-2-3-1 · 4-2-3-1</option></select></label>
+                <label class="field"><span>教练</span><select><option selected>Fernando Diniz · 主教练</option></select></label>
+                <label class="field"><span>适用场景</span><select><option selected>联赛常规</option></select></label>
+                <label class="field"><span>使用概率（0–1）</span><input value="0.72"></label>
+                <label class="check-row"><input type="checkbox" checked><span><strong>设为默认方案</strong><small>同一球队只能有一个默认预设</small></span></label>
+                <label class="field span-3"><span>备注</span><textarea rows="2">高位压迫，双后腰保护转换。</textarea></label>
+              </div>
+              <div class="preset-member-editor-heading"><div><strong>出场人员</strong><span>首发覆盖当前阵型的 11 个战术位置；角色可直接选择或自动继承。</span></div><div class="preset-member-editor-actions"><span id="lineup-preset-member-summary" class="ready">已选 18 人 · 首发 11/11 · 替补 7</span><button class="secondary compact">按阵型自动分配</button></div></div>
+              <div class="preset-member-table-head"><span>球员</span><span>身份</span><span>战术位置</span><span>战术角色</span><span>队长</span></div>
+              <div class="preset-editor-validation ready">阵容结构有效，可以保存。</div>
+              <div class="preset-member-list">
+                <article class="preset-member-row starter"><label class="preset-member-toggle"><input type="checkbox" checked><span><strong>罗梅罗·加罗</strong><small>前腰 · #8</small></span></label><select class="preset-member-role"><option>首发</option></select><select class="preset-member-position"><option>攻击型中场（CAM）</option></select><select class="preset-member-tactical-role"><option>自动继承：组织核心</option></select><label class="preset-member-captain"><input type="radio" checked>队长</label></article>
+                <article class="preset-member-row starter"><label class="preset-member-toggle"><input type="checkbox" checked><span><strong>扎卡里亚·拉比亚德</strong><small>前腰 · #52</small></span></label><select class="preset-member-role"><option>首发</option></select><select class="preset-member-position"><option>左攻击型中场（LAM）</option></select><select class="preset-member-tactical-role"><option>内切边锋</option></select><label class="preset-member-captain"><input type="radio">队长</label></article>
+                <article class="preset-member-row starter"><label class="preset-member-toggle"><input type="checkbox" checked><span><strong>杰西·林加德</strong><small>前腰 · #77</small></span></label><select class="preset-member-role"><option>首发</option></select><select class="preset-member-position"><option>右攻击型中场（RAM）</option></select><select class="preset-member-tactical-role"><option>前场组织核心</option></select><label class="preset-member-captain"><input type="radio">队长</label></article>
+                <article class="preset-member-row starter"><label class="preset-member-toggle"><input type="checkbox" checked><span><strong>加布里埃尔·保利斯塔</strong><small>中后卫 · #3</small></span></label><select class="preset-member-role"><option>首发</option></select><select class="preset-member-position"><option>左中后卫（LCB）</option></select><select class="preset-member-tactical-role"><option>出球中卫</option></select><label class="preset-member-captain"><input type="radio">队长</label></article>
+                <article class="preset-member-row starter"><label class="preset-member-toggle"><input type="checkbox" checked><span><strong>若昂·佩德罗</strong><small>中后卫 · #4</small></span></label><select class="preset-member-role"><option>首发</option></select><select class="preset-member-position"><option>右中后卫（RCB）</option></select><select class="preset-member-tactical-role"><option>盯人中卫</option></select><label class="preset-member-captain"><input type="radio">队长</label></article>
+                <article class="preset-member-row starter"><label class="preset-member-toggle"><input type="checkbox" checked><span><strong>安德烈·卡里略</strong><small>中前卫 · #78</small></span></label><select class="preset-member-role"><option>首发</option></select><select class="preset-member-position"><option>左后腰（LDM）</option></select><select class="preset-member-tactical-role"><option>组织型后腰</option></select><label class="preset-member-captain"><input type="radio">队长</label></article>
+                <article class="preset-member-row substitute"><label class="preset-member-toggle"><input type="checkbox" checked><span><strong>马科斯·莱昂纳多</strong><small>前锋 · #29</small></span></label><select class="preset-member-role"><option>替补</option></select><select class="preset-member-position"><option>前锋（ST）</option></select><select class="preset-member-tactical-role"><option>抢点中锋</option></select><label class="preset-member-captain"><input type="radio">队长</label></article>
+                <article class="preset-member-row excluded"><label class="preset-member-toggle"><input type="checkbox"><span><strong>青年队球员</strong><small>右边锋 · #61</small></span></label><select disabled><option>替补</option></select><select disabled><option>请选择战术位置</option></select><select disabled><option>自动继承球员资料角色</option></select><label class="preset-member-captain"><input type="radio" disabled>队长</label></article>
+              </div>
+            </div>
+          </div>
+          <footer class="workspace-detail-footer"><button class="secondary">取消</button><button class="primary">保存阵容预设</button></footer>
+        </section>
+      </div>
+    </main>
+  </div>
+</body>
+</html>

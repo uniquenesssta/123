@@ -1,0 +1,10 @@
+{
+  "contract_id": "football.p4-persistence-contract.v1",
+  "contract_version": "1.0.0",
+  "stage": "C",
+  "public_shell": true,
+  "provider_output_opaque": true,
+  "immutable_evidence": true,
+  "immutable_snapshots": true,
+  "bundled_runtime": false
+}

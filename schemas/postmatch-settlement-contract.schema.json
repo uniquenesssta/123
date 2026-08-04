@@ -1,0 +1,31 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "football.model-postmatch-settlement-contract.schema.v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "contract_id", "contract_version", "baseline_source_version", "release_version",
+    "delivery_phase", "stage", "formal_partition", "formal_horizons", "settlement_gate",
+    "evidence_scoring", "provider_scoring", "drift_monitoring", "parameter_lifecycle",
+    "commands", "migration", "artifacts", "compatibility"
+  ],
+  "properties": {
+    "contract_id": { "const": "football.model-postmatch-settlement.v1" },
+    "contract_version": { "const": "1.0.0" },
+    "baseline_source_version": { "type": "string" },
+    "release_version": { "type": "string" },
+    "delivery_phase": { "type": "string" },
+    "stage": { "const": "H" },
+    "formal_partition": { "type": "array", "minItems": 4, "uniqueItems": true, "items": { "type": "string" } },
+    "formal_horizons": { "type": "array", "minItems": 4, "maxItems": 4, "uniqueItems": true, "items": { "type": "string" } },
+    "settlement_gate": { "type": "object" },
+    "evidence_scoring": { "type": "object" },
+    "provider_scoring": { "type": "object" },
+    "drift_monitoring": { "type": "object" },
+    "parameter_lifecycle": { "type": "object" },
+    "commands": { "type": "array", "minItems": 7, "maxItems": 7, "uniqueItems": true },
+    "migration": { "const": "crates/persistence-postgres/migrations/0026_postmatch_settlement.sql" },
+    "artifacts": { "type": "array", "minItems": 9, "uniqueItems": true },
+    "compatibility": { "type": "object" }
+  }
+}

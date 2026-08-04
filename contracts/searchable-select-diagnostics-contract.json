@@ -1,0 +1,38 @@
+{
+  "contract_version": "football.searchable-select-diagnostics.v1",
+  "runtime_event": "football:searchable-select-diagnostic",
+  "runtime_log_phase": "diagnostic",
+  "required_events": [
+    "query_session_started",
+    "dom_detached_during_query",
+    "query_restored_after_dom_rebuild",
+    "query_restore_failed",
+    "query_value_diverged",
+    "query_overwritten_by_selection",
+    "query_overwritten_by_sync",
+    "selection_changed_during_query",
+    "focus_lost_with_active_query"
+  ],
+  "required_context": [
+    "diagnostic_session_id",
+    "selector_id",
+    "field_label",
+    "page_path",
+    "selected_value",
+    "selected_label",
+    "input_value",
+    "query_value",
+    "open",
+    "querying",
+    "composing",
+    "input_focused",
+    "root_connected",
+    "option_count",
+    "active_element"
+  ],
+  "noise_policy": {
+    "log_each_keypress": false,
+    "log_only_session_boundaries_and_anomalies": true,
+    "runtime_duplicate_suppression": true
+  }
+}

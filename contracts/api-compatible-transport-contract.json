@@ -1,0 +1,54 @@
+{
+  "contract_id": "football.api-compatible-transport.v1",
+  "contract_version": "2.0.0",
+  "baseline_source_version": "0.13.5",
+  "release_version": "0.14.0",
+  "stage": "H_PRE_STAGE_1",
+  "api_workspace_protocols": [
+    "responses",
+    "chat_completions"
+  ],
+  "request_policy": {
+    "minimal_protocol_payload": true,
+    "responses_input": true,
+    "chat_completions_messages": true,
+    "native_json_schema_required": false,
+    "background_sent": false,
+    "store_sent": false,
+    "reasoning_sent": false,
+    "tools_sent": false,
+    "web_search_sent": false,
+    "token_limit_sent_for_ai_chat": false,
+    "automatic_tool_capability_fallback": false
+  },
+  "response_policy": {
+    "responses_output_supported": true,
+    "responses_output_text_supported": true,
+    "chat_message_content_supported": true,
+    "chat_choice_text_supported": true,
+    "ordinary_text_required": true,
+    "structured_output_required": false
+  },
+  "formal_research_boundary": {
+    "p4_responses_only": true,
+    "strict_schema_unchanged": true,
+    "web_search_source_audit_unchanged": true
+  },
+  "reference_characteristics": {
+    "base_url_plus_endpoint": true,
+    "bearer_authorization": true,
+    "model_field": true,
+    "token_limit_field_from_profile": false,
+    "temperature_not_required": true,
+    "token_limit_field_used_only_for_connection_and_formal_paths": true
+  },
+  "artifacts": [
+    "contracts/api-compatible-transport-contract.json",
+    "contracts/cargo-lock-integrity.json",
+    "crates/research-gateway/src/client.rs",
+    "crates/research-gateway/src/response.rs",
+    "crates/research-gateway/tests/gateway_contract.rs",
+    "scripts/verify-api-compatible-transport.mjs",
+    "scripts/verify-cargo-lock.mjs"
+  ]
+}

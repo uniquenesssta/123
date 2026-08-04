@@ -1,0 +1,81 @@
+{
+  "contract_id": "football.match-review-workflow.v1",
+  "contract_version": "1.0.0",
+  "release_version": "0.23.0",
+  "authority": {
+    "business_state_source": "PostgreSQL review.match_review_package_workflows",
+    "state_interpretation_source": "football-domain MatchReviewPackageWorkflowStatus",
+    "frontend_role": "render backend completed_steps, allowed_actions, blocking_reasons and next_action",
+    "frontend_must_not_rank_status_strings": true,
+    "frontend_must_not_branch_on_status_strings": true
+  },
+  "statuses": [
+    "exported",
+    "preview_blocked",
+    "preview_valid",
+    "confirmed",
+    "facts_committed",
+    "review_created",
+    "settled",
+    "superseded"
+  ],
+  "steps": [
+    "export_package",
+    "complete_external_data",
+    "preview_import",
+    "confirm_import",
+    "commit_facts",
+    "generate_review",
+    "settle_review",
+    "open_analytics"
+  ],
+  "actions": [
+    "export_package",
+    "preview_import",
+    "confirm_import",
+    "commit_facts",
+    "generate_review",
+    "inspect_settlement_readiness",
+    "settle_review",
+    "open_analytics"
+  ],
+  "workflow_record_fields": [
+    "status",
+    "completed_steps",
+    "allowed_actions",
+    "blocking_reasons",
+    "next_action"
+  ],
+  "application_guards": [
+    "preview_import",
+    "confirm_import",
+    "commit_facts",
+    "generate_review",
+    "settle_review"
+  ],
+  "compatibility": {
+    "tauri_command_names_changed": false,
+    "database_status_values_changed": false,
+    "migration_required": false,
+    "existing_history_preserved": true
+  },
+  "verification": {
+    "domain_unit_tests": true,
+    "postgres_integration_test": "match_review_package_workflow_capabilities_follow_persisted_transitions",
+    "typescript_contract_check": true,
+    "command_thinness_check": true
+  },
+  "operations": {
+    "queries": [
+      "read_match_review_package_workflow"
+    ],
+    "commands": [
+      "export_match_review_package",
+      "preview_match_review_package",
+      "confirm_match_review_package",
+      "commit_match_review_package_facts",
+      "generate_match_review_from_package",
+      "settle_postmatch_review"
+    ]
+  }
+}

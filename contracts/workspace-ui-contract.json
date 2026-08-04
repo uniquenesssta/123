@@ -1,0 +1,108 @@
+{
+  "contract_id": "football.workspace-ui-contract.v1",
+  "contract_version": "1.3.0",
+  "release_version": "0.23.0",
+  "stage": "H_PRE_STAGE_6",
+  "schema_version": 1,
+  "state_file": "workspace-state.json",
+  "maximum_open_tabs": 6,
+  "layout_modes": [
+    "detail",
+    "compare",
+    "cards"
+  ],
+  "global_navigation": [
+    "首页",
+    "比赛",
+    "资源",
+    "模型",
+    "分析",
+    "AI",
+    "管理"
+  ],
+  "persistent_state": [
+    "search",
+    "filters",
+    "selected_objects",
+    "open_tabs",
+    "active_tab",
+    "layout_mode",
+    "panel_widths",
+    "collapsed_panels",
+    "scroll_positions",
+    "draft_controls",
+    "active_section"
+  ],
+  "forbidden_state": [
+    "api_key",
+    "password",
+    "database_url",
+    "attachment_body",
+    "file_content"
+  ],
+  "modules": [
+    "teams",
+    "players",
+    "lineups",
+    "lineup_presets",
+    "workbooks",
+    "api_workspace",
+    "prediction",
+    "release"
+  ],
+  "commands": [
+    "read_workspace_state",
+    "save_workspace_state",
+    "clear_workspace_state"
+  ],
+  "expected_tauri_command_count": 149,
+  "ui_revision": 5,
+  "interaction_model": {
+    "default_layout": "fixed_module_navigation",
+    "module_sidebar_behavior": "fixed_and_persistent",
+    "module_navigation": "switch_active_detail_view",
+    "scroll_model": "right_detail_only",
+    "inspector_behavior": "overlay_drawer",
+    "bulk_actions": "contextual_selection_bar",
+    "filters": "progressive_disclosure",
+    "native_resizable_panels": false,
+    "inline_svg_icons": true,
+    "minimum_workspace_font_px": 12,
+    "global_navigation": "fixed_primary_rail_plus_contextual_secondary_menu",
+    "deeper_navigation": "implemented_inside_active_page",
+    "secondary_menu_behavior": "persistent_and_manually_collapsible"
+  },
+  "secondary_navigation": {
+    "首页": [
+      "数据总览"
+    ],
+    "比赛": [
+      "比赛中心",
+      "赛事推演",
+      "赛后复盘",
+      "推演记录"
+    ],
+    "资源": [
+      "球队中心",
+      "球员中心",
+      "阵容预设",
+      "Excel 工作包"
+    ],
+    "模型": [
+      "赛事设置",
+      "发布验收"
+    ],
+    "分析": [
+      "分析与历史"
+    ],
+    "AI": [
+      "AI 问答",
+      "兼容 API"
+    ],
+    "管理": [
+      "数据库",
+      "问题日志",
+      "系统信息"
+    ]
+  }
+}

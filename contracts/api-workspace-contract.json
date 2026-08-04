@@ -1,0 +1,107 @@
+{
+  "contract_id": "football.api-workspace-contract.v1",
+  "contract_version": "1.0.0",
+  "baseline_source_version": "0.13.0",
+  "release_version": "0.13.1",
+  "stage": "G_PRE_H",
+  "purpose": "Provide an interactive compatible-API workspace with preset questions, structured answer organization, file exchange, and confirmed typed database operations before integration point H.",
+  "surface": {
+    "page_key": "api_workspace",
+    "single_page_workflow": true,
+    "session_history_persisted": true,
+    "profile_source": "existing_openai_compatible_profiles",
+    "supported_protocol": "responses"
+  },
+  "presets": [
+    "match_research",
+    "availability_verification",
+    "lineup_player_cleanup",
+    "player_profile_completion",
+    "file_structuring",
+    "database_quality_audit",
+    "custom_analysis"
+  ],
+  "input_files": {
+    "supported_extensions": [
+      "txt",
+      "md",
+      "json",
+      "csv",
+      "tsv",
+      "xlsx"
+    ],
+    "max_files": 5,
+    "max_total_bytes": 5242880,
+    "content_is_untrusted": true
+  },
+  "structured_output": {
+    "schema_path": "schemas/api-workspace-response.schema.json",
+    "schema_id": "football.api-workspace-response.v1",
+    "sections": [
+      "answer",
+      "summary",
+      "key_points",
+      "missing_information",
+      "warnings",
+      "proposed_operations",
+      "generated_files"
+    ]
+  },
+  "database_operations": {
+    "arbitrary_sql_allowed": false,
+    "automatic_apply_allowed": false,
+    "explicit_user_confirmation_required": true,
+    "idempotency_ledger_required": true,
+    "allowed_types": [
+      "add_player_name",
+      "assign_player_position",
+      "add_player_availability",
+      "add_player_dynamic_tag",
+      "add_player_ability_observation"
+    ],
+    "primary_identity_mutation_allowed": false,
+    "formal_p4_evidence_bypass_allowed": false
+  },
+  "non_goals": [
+    "Do not start integration point H settlement, drift monitoring, evidence scoring, or parameter promotion.",
+    "Do not let model output execute SQL, shell commands, or unrestricted file writes.",
+    "Do not mutate immutable P4 research evidence or frozen snapshots."
+  ],
+  "commands": [
+    "list_api_workspace_presets",
+    "read_api_workspace_attachments",
+    "list_api_workspace_sessions",
+    "read_api_workspace_session",
+    "send_api_workspace_message",
+    "apply_api_workspace_operation",
+    "reject_api_workspace_operation",
+    "export_api_workspace_file"
+  ],
+  "artifacts": [
+    "contracts/api-workspace-contract.json",
+    "schemas/api-workspace-contract.schema.json",
+    "schemas/api-workspace-response.schema.json",
+    "crates/domain/src/api_workspace.rs",
+    "crates/application/src/api_workspace.rs",
+    "crates/persistence-postgres/src/api_workspace.rs",
+    "crates/persistence-postgres/migrations/0019_api_workspace.sql",
+    "src-tauri/src/commands/api_workspace.rs",
+    "src/pages/apiWorkspace.ts",
+    "scripts/verify-api-workspace.mjs"
+  ],
+  "persistence": {
+    "schema": "ai_workspace",
+    "tables": [
+      "sessions",
+      "messages",
+      "operation_proposals",
+      "generated_files"
+    ],
+    "messages_immutable": true,
+    "generated_files_immutable": true,
+    "interrupted_apply_recovery": "manual_review"
+  },
+  "dependency_changes": {
+    "third_party_added": false
+  }
+}

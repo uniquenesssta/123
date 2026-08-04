@@ -1,0 +1,24 @@
+{
+  "format_version": "football.team-lineup-presets.v1",
+  "persistence": {
+    "preset_table": "football.team_lineup_presets",
+    "member_table": "football.team_lineup_preset_members",
+    "exact_starters": 11,
+    "team_owned": true,
+    "active_name_unique_per_team": true,
+    "one_default_per_team": true
+  },
+  "workflow": {
+    "manage_in_team_profile": true,
+    "save_current_match_lineup": true,
+    "preview_before_apply": true,
+    "apply_as_independent_match_draft": true,
+    "duplicate_and_archive": true
+  },
+  "searchable_select": {
+    "preserve_query_across_rerender": true,
+    "restored_caret_collapsed_at_end": true,
+    "ime_supported": true,
+    "first_insert_replaces_selected_label": true
+  }
+}

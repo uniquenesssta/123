@@ -1,0 +1,92 @@
+{
+  "contract_id": "football.monthly-workbooks-contract.v1",
+  "contract_version": "1.0.0",
+  "baseline_source_version": "0.16.0",
+  "release_version": "0.17.0",
+  "delivery_phase": "H_PRE_STAGE_4",
+  "integration_point_h_started": false,
+  "formats": {
+    "team": "football.team-monthly.v1",
+    "player": "football.player-monthly.v2",
+    "legacy_player_readable": "football.player-import.v1"
+  },
+  "commands": [
+    "export_player_catalog_template",
+    "export_player_catalog_data",
+    "preview_player_catalog_import",
+    "read_player_catalog_import_preview",
+    "resolve_player_catalog_import_conflict",
+    "commit_player_catalog_import",
+    "export_team_monthly_template",
+    "export_team_monthly_data",
+    "preview_team_monthly_import",
+    "read_team_monthly_import_preview",
+    "resolve_team_monthly_import_conflict",
+    "commit_team_monthly_import"
+  ],
+  "team_sheets": [
+    "说明与校验",
+    "球队基础资料",
+    "球队别名",
+    "教练目录",
+    "教练任期",
+    "阵型使用",
+    "战术画像",
+    "球队能力观察",
+    "数据缺口",
+    "参考字典",
+    "元数据"
+  ],
+  "player_sheets": [
+    "说明与校验",
+    "球员基础资料",
+    "球员名称",
+    "球队履历",
+    "球员位置",
+    "球员可用性",
+    "能力观察",
+    "动态标签",
+    "数据缺口",
+    "参考球队",
+    "参考位置与能力维度",
+    "元数据"
+  ],
+  "import_rules": {
+    "preview_before_commit": true,
+    "single_transaction_commit": true,
+    "blank_means_no_change": true,
+    "explicit_clear_action": "clear",
+    "explicit_clear_fields_column": "clear_fields",
+    "unique_match_only": true,
+    "ambiguous_match_blocks_commit": true,
+    "same_file_hash_is_idempotent": true,
+    "source_urls_persisted": true,
+    "verified_at_persisted": true,
+    "confidence_persisted": true,
+    "historical_observations_append_only": true,
+    "unknown_team_placeholder_reuses_uuid": true
+  },
+  "status_values": [
+    "ready_add",
+    "ready_update",
+    "ready_end_previous",
+    "conflict",
+    "error",
+    "skip",
+    "imported"
+  ],
+  "compatibility": {
+    "existing_player_workbook_readable": true,
+    "match_lineup_workbook_unchanged": true,
+    "historical_import_batches_preserved": true,
+    "integration_point_h_started": false
+  },
+  "artifacts": [
+    "crates/persistence-postgres/migrations/0023_monthly_workbooks.sql",
+    "crates/domain/src/monthly_workbook.rs",
+    "crates/spreadsheet-io/src/monthly_workbook.rs",
+    "crates/persistence-postgres/src/monthly_workbooks.rs",
+    "src/pages/teams.ts",
+    "src/pages/players.ts"
+  ]
+}

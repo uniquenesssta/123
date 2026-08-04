@@ -1,0 +1,52 @@
+{
+  "contract_id": "football.global-name-search.v1",
+  "version": "1.0.0",
+  "scope": [
+    "team_directory",
+    "player_directory",
+    "coach_directory",
+    "team_selectors",
+    "entity_reference_resolution"
+  ],
+  "requirements": {
+    "canonical_names": true,
+    "localized_names": true,
+    "alternate_names": true,
+    "contains_matching": true,
+    "multi_token_and_matching": true,
+    "punctuation_insensitive": true,
+    "whitespace_insensitive": true,
+    "latin_diacritic_insensitive": true,
+    "chinese_partial_matching": true,
+    "english_partial_matching": true,
+    "automatic_pinyin_transliteration": false,
+    "edit_distance_typo_correction": false
+  },
+  "examples": [
+    {
+      "query": "索萨",
+      "names": ["Marlon Sousa", "马龙·索萨"],
+      "expected_match": true
+    },
+    {
+      "query": "Marl",
+      "names": ["Marlon Sousa", "马龙·索萨"],
+      "expected_match": true
+    },
+    {
+      "query": "马龙索萨",
+      "names": ["Marlon Sousa", "马龙·索萨"],
+      "expected_match": true
+    },
+    {
+      "query": "sao",
+      "names": ["São Paulo"],
+      "expected_match": true
+    },
+    {
+      "query": "Marlon 索萨",
+      "names": ["Marlon Sousa", "马龙·索萨"],
+      "expected_match": true
+    }
+  ]
+}

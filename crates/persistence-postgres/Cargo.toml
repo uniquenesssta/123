@@ -1,0 +1,22 @@
+[package]
+name = "football-persistence-postgres"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+
+[dependencies]
+chrono.workspace = true
+football-domain = { path = "../domain" }
+football-analytics-engine = { path = "../analytics-engine" }
+football-model-api = { path = "../model-api" }
+football-review-engine = { path = "../review-engine" }
+serde.workspace = true
+serde_json.workspace = true
+sha2.workspace = true
+hex.workspace = true
+sqlx.workspace = true
+thiserror.workspace = true
+uuid.workspace = true
+
+[dev-dependencies]
+tokio.workspace = true

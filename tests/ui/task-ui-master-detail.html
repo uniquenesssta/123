@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="zh-CN" data-theme="light">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Stage B Master Detail</title>
+  <link rel="stylesheet" href="../../src/styles/app.css">
+  <link rel="stylesheet" href="../../src/styles/components.css">
+  <link rel="stylesheet" href="../../src/styles/layout.css">
+  <link rel="stylesheet" href="../../src/styles/entityCenter.css">
+  <link rel="stylesheet" href="../../src/styles/taskWorkspace.css">
+  <link rel="stylesheet" href="../../src/styles/visualSystem.css">
+  <style>
+    * { animation: none !important; transition: none !important; }
+    body { min-width: 0; overflow: hidden; background: var(--bg); }
+    .fixture-page { height: 100vh; display: grid; grid-template-rows: auto auto minmax(0,1fr); gap: 10px; padding: 20px 22px; }
+    .fixture-page .entity-browser { --entity-directory-width: 250px; --entity-inspector-width: 300px; }
+    .fixture-page .panel { padding: 0; }
+    .fixture-directory { display: grid; grid-template-rows: auto auto minmax(0,1fr) auto; }
+    .fixture-list { min-height: 0; overflow: hidden; padding: 6px; }
+    .fixture-avatar { width: 34px; height: 34px; display: grid; place-items: center; border-radius: 10px; background: var(--soft); color: var(--accent); font-weight: 800; }
+    .fixture-table { width: 100%; border-collapse: collapse; }
+    .fixture-table th, .fixture-table td { padding: 11px 13px; border-bottom: 1px solid var(--line); text-align: left; font-size: 12px; }
+    .fixture-table th { color: var(--muted); font-size: 10px; letter-spacing: .04em; }
+    .fixture-table tr.active { background: color-mix(in srgb, var(--accent) 8%, var(--panel)); }
+    .fixture-table td strong, .fixture-table td small { display: block; }
+    .fixture-table td small { margin-top: 3px; color: var(--muted); }
+    .fixture-main { display: grid; grid-template-rows: auto auto minmax(0,1fr) auto; }
+    .fixture-inspector { display: grid; align-content: start; gap: 14px; padding: 16px !important; }
+    .fixture-inspector h3 { margin: 0; font-size: 18px; }
+    .fixture-inspector p { margin: 0; color: var(--muted); font-size: 12px; line-height: 1.55; }
+    .fixture-stat-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+    .fixture-stat-grid div { padding: 10px; border: 1px solid var(--line); border-radius: 9px; background: var(--soft); }
+    .fixture-stat-grid span, .fixture-stat-grid strong { display: block; }
+    .fixture-stat-grid span { color: var(--muted); font-size: 10px; }
+    .fixture-stat-grid strong { margin-top: 4px; font-size: 15px; }
+    @media (max-width: 1100px) { body { overflow: auto; } .fixture-page { height: auto; } }
+  </style>
+</head>
+<body>
+  <main class="fixture-page entity-page task-page">
+    <header class="task-page-header">
+      <div class="task-page-heading"><p class="eyebrow">球队与人员</p><h1>球员浏览与管理</h1><p>列表、速览与完整档案分层呈现；从球队页进入时只自动带入球队筛选。</p></div>
+      <div class="task-page-actions"><span class="task-status-chip tone-success">球队筛选已带入</span><button class="secondary">刷新</button><button class="primary">新增球员</button></div>
+    </header>
+    <section class="task-context-ribbon" aria-label="当前任务上下文">
+      <article class="task-context-item tone-accent"><div><span>当前球员</span><strong>Kylian Mbappé</strong><small>名单中保持选中 · 右侧显示速览</small></div></article>
+      <article class="task-context-item"><div><span>结果范围</span><strong>26 名球员</strong><small>第一页 · 按位置与状态筛选</small></div></article>
+    </section>
+    <section class="entity-browser player-browser master-detail-workspace inspector-open">
+      <aside class="panel entity-directory fixture-directory master-pane">
+        <div class="entity-directory-header"><div><span>球队目录</span><strong>法国国家队</strong></div><b>26</b></div>
+        <label class="entity-search"><span>⌕</span><input value="" placeholder="搜索球员"><button>筛选</button></label>
+        <div class="entity-directory-list fixture-list">
+          <div class="entity-directory-item active"><button class="entity-directory-open"><span class="fixture-avatar">KM</span><span class="entity-directory-copy"><strong>Kylian Mbappé</strong><small>前锋 · 10号</small></span><span class="entity-directory-metrics"><b>92</b><small>动态评分</small></span></button></div>
+          <div class="entity-directory-item"><button class="entity-directory-open"><span class="fixture-avatar">AD</span><span class="entity-directory-copy"><strong>Ousmane Dembélé</strong><small>边锋 · 11号</small></span><span class="entity-directory-metrics"><b>88</b><small>动态评分</small></span></button></div>
+          <div class="entity-directory-item"><button class="entity-directory-open"><span class="fixture-avatar">TC</span><span class="entity-directory-copy"><strong>Aurélien Tchouaméni</strong><small>中场 · 8号</small></span><span class="entity-directory-metrics"><b>86</b><small>动态评分</small></span></button></div>
+          <div class="entity-directory-item"><button class="entity-directory-open"><span class="fixture-avatar">WS</span><span class="entity-directory-copy"><strong>William Saliba</strong><small>后卫 · 4号</small></span><span class="entity-directory-metrics"><b>87</b><small>动态评分</small></span></button></div>
+        </div>
+        <footer class="entity-directory-footer"><span>1–4 / 26</span><button class="secondary">下一页</button></footer>
+      </aside>
+      <section class="panel entity-main fixture-main detail-pane">
+        <div class="team-resource-header"><div class="team-resource-title"><span class="fixture-avatar">FR</span><div><span>来源球队名单</span><h2>法国国家队球员目录</h2><p>单击查看速览，明确操作后再打开完整档案。</p></div></div><div class="team-resource-actions"><button class="secondary">导出工作包</button><button class="primary">打开完整档案</button></div></div>
+        <div class="team-resource-stats"><div><span>球员总数</span><strong>26</strong><small>当前球队</small></div><div><span>可用球员</span><strong>24</strong><small>2 人伤停</small></div><div><span>平均评分</span><strong>84.6</strong><small>动态评分</small></div><div><span>数据完整度</span><strong>96%</strong><small>最近核验</small></div></div>
+        <div class="entity-table-section"><div class="entity-table-toolbar"><div><strong>完整名单</strong><small>当前球员保持选中</small></div><div class="button-row"><button class="secondary">清除全部</button><button class="secondary">位置：全部</button></div></div><div style="overflow:hidden"><table class="fixture-table"><thead><tr><th>球员</th><th>位置</th><th>号码</th><th>状态</th><th>动态评分</th></tr></thead><tbody><tr class="active"><td><strong>Kylian Mbappé</strong><small>Real Madrid</small></td><td>中锋 / 左边锋</td><td>10</td><td>可用</td><td>92.1</td></tr><tr><td><strong>Ousmane Dembélé</strong><small>Paris Saint-Germain</small></td><td>右边锋</td><td>11</td><td>可用</td><td>88.4</td></tr><tr><td><strong>Aurélien Tchouaméni</strong><small>Real Madrid</small></td><td>后腰</td><td>8</td><td>可用</td><td>86.7</td></tr><tr><td><strong>William Saliba</strong><small>Arsenal</small></td><td>中后卫</td><td>4</td><td>可用</td><td>87.3</td></tr><tr><td><strong>Mike Maignan</strong><small>AC Milan</small></td><td>门将</td><td>16</td><td>观察</td><td>85.9</td></tr></tbody></table></div></div>
+        <footer class="entity-main-footer"><span>显示 5 条示例记录</span><div><button class="secondary">上一页</button><b>第 1 页</b><button class="secondary">下一页</button></div></footer>
+      </section>
+      <aside class="panel entity-inspector workspace-inspector fixture-inspector inspector-pane"><span class="eyebrow">球员速览</span><h3>Kylian Mbappé</h3><p>球队筛选已从球队页预选，用户仍可直接修改或清除。</p><div class="fixture-stat-grid"><div><span>主位置</span><strong>中锋</strong></div><div><span>惯用脚</span><strong>右脚</strong></div><div><span>预计分钟</span><strong>88</strong></div><div><span>首发概率</span><strong>96%</strong></div></div><dl class="detail-list"><div><dt>角色适配</dt><dd>核心终结点</dd></div><div><dt>体能状态</dt><dd>良好</dd></div><div><dt>数据可信度</dt><dd>0.94</dd></div></dl><button class="primary">打开完整球员档案</button></aside>
+    </section>
+  </main>
+</body>
+</html>

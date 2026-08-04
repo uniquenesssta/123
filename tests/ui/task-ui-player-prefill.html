@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="zh-CN" data-theme="light">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Player Team Prefill</title>
+  <link rel="stylesheet" href="../../src/styles/app.css">
+  <link rel="stylesheet" href="../../src/styles/components.css">
+  <link rel="stylesheet" href="../../src/styles/layout.css">
+  <link rel="stylesheet" href="../../src/styles/entityCenter.css">
+  <link rel="stylesheet" href="../../src/styles/taskWorkspace.css">
+  <link rel="stylesheet" href="../../src/styles/visualSystem.css">
+  <style>
+    * { animation: none !important; transition: none !important; }
+    body { min-width: 0; overflow: hidden; background: var(--bg); }
+    .fixture-shell { height: 100vh; display: grid; grid-template-columns: 180px minmax(0,1fr); }
+    .fixture-nav { padding: 18px 12px; border-right: 1px solid var(--line); background: var(--panel); }
+    .fixture-nav strong { display: block; margin-bottom: 24px; font-size: 16px; }
+    .fixture-nav span { display: block; margin: 7px 0; padding: 9px 10px; border-radius: 8px; color: var(--muted); font-size: 12px; }
+    .fixture-nav span.active { color: var(--accent); background: var(--accent-soft); }
+    .fixture-content { min-width: 0; min-height: 0; padding: 18px 20px 20px; }
+    .fixture-content .entity-page { height: 100%; }
+    .fixture-table-row { display: grid; grid-template-columns: 34px minmax(190px,1.5fr) 100px minmax(130px,1fr) 80px 90px 90px 88px; gap: 8px; align-items: center; min-height: 42px; padding: 0 12px; border-bottom: 1px solid var(--line); font-size: 11px; }
+    .fixture-table-row.header { min-height: 34px; color: var(--muted); background: var(--soft); font-size: 10px; }
+    .fixture-table-row.active { border-left: 3px solid var(--accent); background: var(--accent-soft); }
+    .fixture-table-row strong, .fixture-table-row small { display: block; }
+    .fixture-table-row small { color: var(--muted); font-size: 9px; }
+    .fixture-avatar { width: 28px; height: 28px; display: grid; place-items: center; border-radius: 8px; color: var(--accent); background: var(--accent-soft); font-size: 10px; font-weight: 800; }
+    .fixture-inspector { padding: 14px !important; }
+    .fixture-inspector h2 { margin: 8px 0 2px; font-size: 18px; }
+    .fixture-inspector p { margin: 0 0 14px; color: var(--muted); font-size: 11px; }
+    .fixture-facts { display: grid; grid-template-columns: repeat(3,1fr); gap: 6px; }
+    .fixture-facts div { padding: 8px; border: 1px solid var(--line); border-radius: 7px; background: var(--soft); }
+    .fixture-facts span, .fixture-facts strong { display: block; }
+    .fixture-facts span { color: var(--muted); font-size: 9px; }
+    .fixture-facts strong { margin-top: 3px; font-size: 12px; }
+  </style>
+</head>
+<body>
+  <div class="fixture-shell">
+    <aside class="fixture-nav"><strong>足球赛事模型</strong><span>首页</span><span>比赛中心</span><span>赛事推演</span><span class="active">球队与人员</span><span>赛后复盘</span><span>分析与历史</span></aside>
+    <main class="fixture-content">
+      <section class="entity-page entity-page-players task-page">
+        <header class="task-page-header">
+          <div class="task-page-heading"><p class="eyebrow">球队与人员</p><h1>球员浏览与管理</h1><p>从球队页进入时仅自动带入球队筛选，可随时修改。</p></div>
+          <div class="task-page-actions"><span class="task-status-chip tone-success">球队筛选已带入</span><div class="entity-mode-switch"><button>球队</button><button class="active">球员</button></div><button class="secondary">球员工作包</button><button class="primary">新增球员</button></div>
+        </header>
+        <section class="task-context-ribbon" aria-label="当前任务上下文">
+          <article class="task-context-item tone-success"><div><span>当前球员</span><strong>MUSSO Juan</strong><small>阿根廷 · 完整档案按需打开</small></div></article>
+          <article class="task-context-item"><div><span>名单结果</span><strong>26 名球员</strong><small>第 1 页 · 1 项筛选</small></div></article>
+        </section>
+        <section class="entity-browser player-browser master-detail-workspace inspector-open">
+          <aside class="entity-filter-panel panel master-pane">
+            <div class="entity-directory-header"><div><span>筛选器</span><strong>1 项已应用</strong></div><button class="icon-button">↻</button></div>
+            <section class="entity-filter-groups">
+              <div class="entity-filter-group"><header><span>归属范围</span><small>先确定当前球队或查看全部球员</small></header><div class="player-source-prefill"><span>从球队页带入</span><strong>阿根廷</strong><small>已自动选中，可直接修改或清除</small></div><label class="entity-filter-field"><span>当前所属球队</span><select><option selected>阿根廷</option><option>法国</option><option>不限球队</option></select></label></div>
+              <div class="entity-filter-group"><header><span>场上角色</span><small>按登记的主要位置精确筛选</small></header><label class="entity-filter-field"><span>主要位置</span><select><option>不限位置</option></select></label></div>
+              <div class="entity-filter-group"><header><span>比赛可用性</span><small>来自当前有效记录</small></header><label class="entity-filter-field"><span>当前可用状态</span><select><option>不限可用状态</option></select></label></div>
+              <div class="entity-filter-group"><header><span>档案生命周期</span><small>现役、停用和退役</small></header><label class="entity-filter-field"><span>球员档案状态</span><select><option>不限档案状态</option></select></label></div>
+            </section>
+            <div class="entity-active-filters"><b>1 项已应用</b><span>阿根廷</span></div>
+            <div class="entity-filter-actions"><button class="primary">应用筛选</button><button class="secondary">清除全部</button></div>
+          </aside>
+          <main class="entity-main panel detail-pane">
+            <div class="player-list-toolbar"><label class="entity-search wide"><span>⌕</span><input placeholder="搜索中文名、原名或别名"><button>搜索</button></label><div class="entity-list-actions"><span>26 条当前结果</span><button class="secondary">球员速览</button></div></div>
+            <div class="entity-table-wrap"><div class="fixture-table-row header"><span></span><span>球员</span><span>位置</span><span>当前球队</span><span>年龄</span><span>能力</span><span>状态</span><span>操作</span></div>
+              <div class="fixture-table-row"><span></span><span><strong>ALMADA Thiago</strong><small>ARG</small></span><span>前腰</span><span>阿根廷</span><span>25岁</span><span>81.1</span><span>可用</span><button>完整档案</button></div>
+              <div class="fixture-table-row"><span></span><span><strong>ALVAREZ Julian</strong><small>ARG</small></span><span>前锋</span><span>阿根廷</span><span>26岁</span><span>83.8</span><span>可用</span><button>完整档案</button></div>
+              <div class="fixture-table-row"><span></span><span><strong>FERNANDEZ Enzo</strong><small>ARG</small></span><span>中场</span><span>阿根廷</span><span>25岁</span><span>81.5</span><span>可用</span><button>完整档案</button></div>
+              <div class="fixture-table-row"><span></span><span><strong>MARTINEZ Lautaro</strong><small>ARG</small></span><span>前锋</span><span>阿根廷</span><span>28岁</span><span>85.5</span><span>可用</span><button>完整档案</button></div>
+              <div class="fixture-table-row"><span></span><span><strong>MESSI Lionel</strong><small>ARG</small></span><span>前锋</span><span>阿根廷</span><span>39岁</span><span>79.8</span><span>可用</span><button>完整档案</button></div>
+              <div class="fixture-table-row active"><span class="fixture-avatar">MJ</span><span><strong>MUSSO Juan</strong><small>ARG</small></span><span>门将</span><span>阿根廷</span><span>32岁</span><span>79.8</span><span>状态未知</span><button>完整档案</button></div>
+            </div>
+            <footer class="entity-main-footer"><span>点击球员查看右侧速览</span><div><button class="secondary">上一页</button><b>第 1 页</b><button class="secondary">下一页</button></div></footer>
+          </main>
+          <aside class="entity-inspector panel inspector-pane fixture-inspector"><span class="eyebrow">球员速览</span><div class="fixture-avatar">MJ</div><h2>MUSSO Juan</h2><p>ARG</p><div class="fixture-facts"><div><span>位置</span><strong>门将</strong></div><div><span>年龄</span><strong>32岁</strong></div><div><span>惯用脚</span><strong>未知</strong></div></div><button class="primary" style="margin-top:16px;width:100%">编辑完整档案</button></aside>
+        </section>
+      </section>
+    </main>
+  </div>
+</body>
+</html>

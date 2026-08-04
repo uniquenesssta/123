@@ -1,0 +1,40 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "football.p4-evidence.v1",
+  "title": "Public Evidence Claim",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "match_id", "entity_type", "field_key", "value", "verification_state",
+    "source_tier", "observed_at", "retrieved_at", "timezone",
+    "independent_source_count", "research_run_id", "schema_version",
+    "idempotency_key"
+  ],
+  "properties": {
+    "match_id": { "type": "string", "format": "uuid" },
+    "entity_type": { "type": "string", "minLength": 1 },
+    "entity_id": { "type": ["string", "null"], "format": "uuid" },
+    "field_key": { "type": "string", "minLength": 1 },
+    "value": true,
+    "verification_state": { "enum": ["CONFIRMED", "PROBABLE", "CONFLICT", "NOT_FOUND", "STALE", "NOT_APPLICABLE"] },
+    "source_tier": { "type": "string", "minLength": 1 },
+    "source_document_id": { "type": ["string", "null"], "format": "uuid" },
+    "source_url": { "type": ["string", "null"], "format": "uri" },
+    "source_title": { "type": ["string", "null"] },
+    "source_domain": { "type": ["string", "null"] },
+    "published_at": { "type": ["string", "null"], "format": "date-time" },
+    "observed_at": { "type": "string", "format": "date-time" },
+    "effective_at": { "type": ["string", "null"], "format": "date-time" },
+    "retrieved_at": { "type": "string", "format": "date-time" },
+    "timezone": { "type": "string", "minLength": 1 },
+    "independent_source_count": { "type": "integer", "minimum": 0 },
+    "conflict_group_id": { "type": ["string", "null"], "format": "uuid" },
+    "research_run_id": { "type": "string", "format": "uuid" },
+    "prompt_version_id": { "type": ["string", "null"], "format": "uuid" },
+    "prompt_version": { "type": ["string", "null"] },
+    "schema_version_id": { "type": "string", "format": "uuid" },
+    "schema_version": { "const": "football.p4-evidence.v1" },
+    "idempotency_key": { "type": "string", "minLength": 1, "maxLength": 240 },
+    "metadata": { "type": "object" }
+  }
+}

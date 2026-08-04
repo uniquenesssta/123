@@ -1,0 +1,226 @@
+/* Core business workspaces: compact third-level navigation and in-page hierarchy. */
+.core-workspace-page {
+  min-height: 0;
+  display: grid;
+  grid-template-rows: auto auto auto minmax(0, 1fr);
+  gap: 10px;
+}
+
+.core-workspace-page > .task-page-header,
+.core-workspace-page > .task-context-ribbon,
+.core-workspace-page > .core-local-navigation {
+  min-width: 0;
+}
+
+.core-local-navigation {
+  min-height: 48px;
+  display: flex;
+  align-items: stretch;
+  padding: 0 8px;
+  overflow-x: auto;
+  overflow-y: hidden;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-lg);
+  background: var(--panel);
+  scrollbar-width: none;
+}
+
+.core-local-navigation::-webkit-scrollbar { display: none; }
+
+.core-local-navigation .workspace-section-nav {
+  min-width: max-content;
+  display: flex;
+  align-items: stretch;
+  gap: 0;
+}
+
+.core-local-navigation .workspace-section-nav-item {
+  position: relative;
+  width: auto;
+  min-width: 132px;
+  min-height: 46px;
+  display: grid;
+  grid-template-columns: 24px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 13px;
+  border: 0;
+  border-radius: 0;
+  color: var(--muted);
+  background: transparent;
+  box-shadow: none;
+}
+
+.core-local-navigation .workspace-section-nav-item + .workspace-section-nav-item {
+  border-left: 1px solid color-mix(in srgb, var(--line) 72%, transparent);
+}
+
+.core-local-navigation .workspace-section-nav-item::after {
+  content: "";
+  position: absolute;
+  right: 12px;
+  bottom: 0;
+  left: 12px;
+  height: 2px;
+  border-radius: 2px 2px 0 0;
+  background: transparent;
+}
+
+.core-local-navigation .workspace-section-nav-item:hover:not(:disabled) {
+  color: var(--text-strong);
+  border-color: transparent;
+  background: color-mix(in srgb, var(--accent) 5%, var(--panel));
+}
+
+.core-local-navigation .workspace-section-nav-item.active {
+  color: var(--accent);
+  border-color: transparent;
+  background: color-mix(in srgb, var(--accent) 7%, var(--panel));
+  box-shadow: none;
+}
+
+.core-local-navigation .workspace-section-nav-item.active::after { background: var(--accent); }
+.core-local-navigation .workspace-section-nav-item:disabled { cursor: not-allowed; opacity: .42; }
+
+.core-local-navigation .workspace-section-index {
+  width: 23px;
+  height: 23px;
+  border: 0;
+  border-radius: 7px;
+  color: inherit;
+  background: color-mix(in srgb, currentColor 7%, transparent);
+  font-size: 10px;
+}
+
+.core-local-navigation .workspace-section-copy { gap: 1px; }
+.core-local-navigation .workspace-section-copy strong { font-size: 13px !important; line-height: 1.2; }
+.core-local-navigation .workspace-section-copy small { max-width: 180px; font-size: 10px; line-height: 1.2; }
+.core-local-navigation .workspace-section-nav-item > b { padding: 3px 6px; background: var(--soft); font-size: 10px; }
+
+.core-workspace-stage {
+  min-height: 0;
+  overflow: hidden;
+}
+
+.core-workspace-stage > .balanced-workspace {
+  height: 100%;
+  min-height: 0;
+  display: block;
+}
+
+.core-workspace-stage .balanced-workspace-main {
+  height: 100%;
+  min-height: 0;
+}
+
+.core-workspace-stage .workspace-module-view.active {
+  height: 100%;
+  min-height: 0;
+}
+
+.workspace-anchor-nav {
+  position: sticky;
+  top: 0;
+  z-index: 8;
+  min-height: 43px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 6px 10px;
+  margin: 0 0 12px;
+  overflow-x: auto;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: color-mix(in srgb, var(--panel) 96%, transparent);
+  backdrop-filter: blur(12px);
+  scrollbar-width: none;
+}
+
+.workspace-anchor-nav::-webkit-scrollbar { display: none; }
+.workspace-anchor-label { flex: 0 0 auto; color: var(--muted-2); font-size: 11px; font-weight: 750; }
+.workspace-anchor-nav > div { min-width: max-content; display: flex; align-items: center; gap: 4px; }
+.workspace-anchor-nav button {
+  min-height: 29px;
+  padding: 5px 9px;
+  border: 0;
+  border-radius: 7px;
+  color: var(--muted);
+  background: transparent;
+  font-size: 11px;
+  font-weight: 700;
+}
+.workspace-anchor-nav button:hover,
+.workspace-anchor-nav button.active { color: var(--accent); background: color-mix(in srgb, var(--accent) 9%, var(--soft)); }
+.workspace-anchor-target { scroll-margin-top: 56px; }
+
+.core-workspace-page .entity-task-workspace {
+  height: 100%;
+  min-height: 0;
+}
+
+.core-workspace-page .entity-task-body {
+  min-height: 0;
+  overflow-y: auto;
+  padding: 12px;
+}
+
+.core-workspace-page .entity-task-workspace > header {
+  min-height: 54px;
+  padding: 9px 13px;
+}
+
+.core-workspace-page .entity-task-workspace > header h2 { font-size: 17px; }
+.core-workspace-page .entity-task-workspace > header span { font-size: 10px; }
+
+.core-workspace-page .task-context-ribbon {
+  grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+  gap: 8px;
+}
+
+.core-workspace-page .task-context-item {
+  min-height: 50px;
+  padding: 8px 10px;
+}
+
+.core-workspace-page .task-context-item strong { font-size: 13px; }
+.core-workspace-page .task-context-item small { font-size: 10px; }
+
+.core-workspace-page .workspace-section-heading {
+  min-height: 58px;
+  margin-bottom: 9px;
+  padding: 10px 12px;
+}
+
+.core-workspace-page .workspace-section-heading h2 { font-size: 17px; }
+.core-workspace-page .workspace-section-heading p { max-width: 900px; }
+
+.profile-section-stack {
+  display: grid;
+  gap: 10px;
+}
+
+.profile-section-stack > .editor-details {
+  margin: 0;
+}
+
+.profile-section-stack > .editor-details > summary {
+  min-height: 43px;
+  display: flex;
+  align-items: center;
+}
+
+@media (max-width: 1100px) {
+  .core-local-navigation .workspace-section-nav-item { min-width: 116px; }
+  .core-local-navigation .workspace-section-copy small { display: none; }
+  .workspace-anchor-label { display: none; }
+}
+
+@media (max-width: 760px) {
+  .core-workspace-page { grid-template-rows: auto auto auto auto; overflow: visible; }
+  .core-workspace-stage { overflow: visible; }
+  .core-workspace-stage .workspace-module-view.active { height: auto; }
+  .core-local-navigation .workspace-section-nav-item { min-width: 104px; padding: 7px 10px; }
+  .core-local-navigation .workspace-section-nav-item > b { display: none; }
+  .core-workspace-page .entity-task-workspace { height: auto; }
+  .core-workspace-page .entity-task-body { overflow: visible; }
+}

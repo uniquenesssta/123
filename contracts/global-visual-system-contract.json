@@ -1,0 +1,129 @@
+{
+  "contract_id": "football.global-visual-system.v1",
+  "contract_version": "1.2.0",
+  "style_entry": "src/styles/visualSystem.css",
+  "required_tokens": [
+    "--ui-canvas",
+    "--ui-surface",
+    "--ui-border",
+    "--ui-text-strong",
+    "--ui-accent",
+    "--ui-control-height",
+    "--ui-radius-md",
+    "--ui-focus-ring",
+    "--ui-content-max",
+    "--ui-font-size",
+    "--ui-page-title-size",
+    "--ui-section-title-size",
+    "--ui-table-row-height",
+    "--ui-panel-padding",
+    "--ui-page-padding-x",
+    "--ui-page-padding-y"
+  ],
+  "required_component_groups": {
+    "shell": [
+      ".primary-rail",
+      ".secondary-sidebar",
+      ".dual-navigation .topbar",
+      ".dual-navigation .page-container"
+    ],
+    "hierarchy": [
+      ".task-page-header",
+      ".task-context-ribbon",
+      ".workspace-section-nav-item",
+      ".workspace-anchor-nav",
+      ".workspace-task-anchor-nav"
+    ],
+    "content": [
+      ".panel",
+      ".metric-card",
+      ".field input",
+      "button.primary",
+      ".table-wrap",
+      ".empty-state"
+    ],
+    "feedback": [
+      ".page-load-progress",
+      ".task-activity",
+      ".toast",
+      ".modal"
+    ]
+  },
+  "responsive_breakpoints": [
+    1280,
+    980,
+    760,
+    560
+  ],
+  "visual_viewports": [
+    {
+      "name": "core-workspace-hierarchy-1280x800",
+      "fixture": "core-workspace-hierarchy.html",
+      "width": 1280,
+      "height": 800
+    },
+    {
+      "name": "extended-workspace-hierarchy-1920x1080",
+      "fixture": "extended-workspace-hierarchy.html",
+      "width": 1920,
+      "height": 1080
+    },
+    {
+      "name": "reported-entity-workspace-2560x1440",
+      "fixture": "reported-entity-workspace.html",
+      "width": 2560,
+      "height": 1440
+    },
+    {
+      "name": "reported-rules-directory-2560x1440",
+      "fixture": "reported-rules-directory.html",
+      "width": 2560,
+      "height": 1440
+    },
+    {
+      "name": "reported-analysis-focus-2560x1440",
+      "fixture": "reported-analysis-focus.html",
+      "width": 2560,
+      "height": 1440
+    }
+  ],
+  "accessibility": {
+    "focus_visible": true,
+    "reduced_motion": true,
+    "forced_colors": true,
+    "minimum_control_height": 30
+  },
+  "density_profile": {
+    "desktop_reference": "high-density-admin",
+    "primary_rail_width": 60,
+    "secondary_sidebar_width": 154,
+    "topbar_height": 44,
+    "body_font_size": 12,
+    "page_title_size": 21,
+    "section_title_size": 14,
+    "control_height": 32,
+    "table_row_height": 36,
+    "panel_padding": 12,
+    "page_padding_x": 14,
+    "page_padding_y": 10,
+    "principles": [
+      "content-first",
+      "low-noise",
+      "dense-not-crowded",
+      "stable-alignment"
+    ]
+  },
+  "large_desktop_readability": {
+    "min_width": 1680,
+    "min_height": 900,
+    "body_font_size": 13,
+    "small_font_size": 12,
+    "extra_small_font_size": 11,
+    "page_title_size": 22,
+    "section_title_size": 15,
+    "control_height": 34,
+    "small_control_height": 29,
+    "table_row_height": 38,
+    "principle": "slightly-larger-on-2k-without-losing-density"
+  }
+}

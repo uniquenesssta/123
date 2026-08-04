@@ -1,0 +1,30 @@
+{
+  "format_version": "football.stage-e1-ui-contract.v1",
+  "scope": [
+    "global_searchable_selects",
+    "compact_match_directory",
+    "top_aligned_lineup_rows",
+    "model_selection_guidance"
+  ],
+  "searchable_selects": {
+    "default_behavior": "all_single_selects",
+    "opt_out_attribute": "data-native-select",
+    "matching": ["label", "value", "data-search", "subsequence"],
+    "keyboard": ["ArrowUp", "ArrowDown", "Enter", "Escape"],
+    "dynamic_content": true
+  },
+  "match_directory": {
+    "compact_threshold": 4,
+    "single_match_stretches": false
+  },
+  "lineup_list": {
+    "fixed_minimum_height": false,
+    "rows_start_at_top": true,
+    "scroll_after_content_limit": true
+  },
+  "model_guidance": {
+    "default_recommendation": "p4",
+    "generic_model_routes_by_competition_kind": true,
+    "specific_model_mismatch_warning": true
+  }
+}

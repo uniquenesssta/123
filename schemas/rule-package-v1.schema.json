@@ -1,0 +1,138 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://football-model.local/schemas/rule-package-v1.schema.json",
+  "title": "Football Model Rule Package v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "format_version",
+    "package_key",
+    "version",
+    "display_name",
+    "competition_profile",
+    "routing",
+    "parameters",
+    "feature_requirements",
+    "output_contract"
+  ],
+  "properties": {
+    "format_version": {
+      "const": "football.rule-package.v1"
+    },
+    "package_key": {
+      "type": "string",
+      "minLength": 1
+    },
+    "version": {
+      "type": "string",
+      "minLength": 1
+    },
+    "display_name": {
+      "type": "string",
+      "minLength": 1
+    },
+    "competition_profile": {
+      "$ref": "#/$defs/competitionProfile"
+    },
+    "routing": {
+      "$ref": "#/$defs/routing"
+    },
+    "parameters": {
+      "type": "object"
+    },
+    "feature_requirements": {
+      "type": "object"
+    },
+    "output_contract": {
+      "type": "object"
+    },
+    "source_document": {
+      "oneOf": [
+        { "type": "null" },
+        { "$ref": "#/$defs/sourceDocument" }
+      ],
+      "default": null
+    },
+    "metadata": {
+      "type": "object",
+      "default": {}
+    }
+  },
+  "$defs": {
+    "competitionKind": {
+      "type": "string",
+      "enum": [
+        "league",
+        "group_stage",
+        "knockout_single_leg",
+        "knockout_two_leg",
+        "friendly",
+        "custom"
+      ]
+    },
+    "competitionProfile": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "profile_id",
+        "name",
+        "competition_kind",
+        "normal_time_minutes",
+        "extra_time_possible",
+        "penalties_possible",
+        "two_legged",
+        "neutral_venue",
+        "metadata"
+      ],
+      "properties": {
+        "profile_id": { "type": "string", "minLength": 1 },
+        "name": { "type": "string", "minLength": 1 },
+        "competition_kind": { "$ref": "#/$defs/competitionKind" },
+        "normal_time_minutes": { "type": "integer", "minimum": 1 },
+        "extra_time_possible": { "type": "boolean" },
+        "penalties_possible": { "type": "boolean" },
+        "two_legged": { "type": "boolean" },
+        "neutral_venue": { "type": "boolean" },
+        "metadata": { "type": "object" }
+      }
+    },
+    "routing": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "model_id",
+        "model_version",
+        "parameter_version",
+        "priority",
+        "activate_as_type_default",
+        "supported_snapshot_types"
+      ],
+      "properties": {
+        "model_id": { "type": "string", "minLength": 1 },
+        "model_version": { "type": "string", "minLength": 1 },
+        "parameter_version": { "type": "string", "minLength": 1 },
+        "priority": { "type": "integer" },
+        "activate_as_type_default": { "type": "boolean" },
+        "supported_snapshot_types": {
+          "type": "array",
+          "items": { "type": "string", "minLength": 1 },
+          "uniqueItems": true
+        }
+      }
+    },
+    "sourceDocument": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["content_sha256"],
+      "properties": {
+        "title": { "type": ["string", "null"] },
+        "source_uri": { "type": ["string", "null"] },
+        "content_sha256": {
+          "type": "string",
+          "pattern": "^[A-Fa-f0-9]{64}$"
+        },
+        "notes": { "type": ["string", "null"] }
+      }
+    }
+  }
+}

@@ -1,0 +1,8 @@
+packages:
+  - "."
+
+# pnpm 11 blocks dependency build scripts unless each package is reviewed.
+# esbuild is required by Vite and is the only dependency in this project that
+# needs its install-time binary setup.
+allowBuilds:
+  esbuild: true

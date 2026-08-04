@@ -1,0 +1,65 @@
+{
+  "contract_id": "football.api-workspace-research-control.v1",
+  "contract_version": "2.0.0",
+  "baseline_source_version": "0.13.5",
+  "release_version": "0.14.0",
+  "stage": "H_PRE_STAGE_1",
+  "surface": {
+    "global_busy_overlay_during_send": false,
+    "send_button_locked_while_pending": true,
+    "primary_navigation_remains_usable": true,
+    "history_navigation_remains_usable": true,
+    "completion_persists_to_origin_session": true,
+    "concurrent_outbound_send_limit": 1,
+    "draft_input_preserved_while_pending": true,
+    "request_cancel_supported": true,
+    "session_search_switch_archive_supported": true
+  },
+  "token_visibility": {
+    "limit_controls_visible": false,
+    "usage_counters_visible": false,
+    "ai_chat_request_limit_parameter_sent": false,
+    "internal_usage_ledger_preserved": true
+  },
+  "web_search": {
+    "profile_mode_for_ai_chat": "disabled",
+    "tools_sent": false,
+    "source_include_requested": false,
+    "capability_fallback": false,
+    "online_claim_forbidden": true
+  },
+  "database_context": {
+    "team_center_uses_read_only_team_detail": true,
+    "player_center_uses_read_only_player_detail": true,
+    "generic_context_remains_bounded": true,
+    "database_proposals_forbidden": true,
+    "match_and_entity_context_can_coexist": true
+  },
+  "runtime_log": {
+    "prompt_body_recorded": false,
+    "schema_recorded": false,
+    "provider_output_recorded": false,
+    "protocol_endpoint_status_latency_error_text_lengths_retained": true,
+    "secrets_redacted": true
+  },
+  "boundaries": {
+    "arbitrary_sql_allowed": false,
+    "automatic_database_apply_allowed": false,
+    "new_database_proposals_allowed": false,
+    "new_generated_files_allowed": false,
+    "formal_p4_research_unchanged": true,
+    "integration_point_h_started": false
+  },
+  "artifacts": [
+    "contracts/api-workspace-research-control-contract.json",
+    "scripts/verify-api-workspace-research-control.mjs",
+    "crates/research-gateway/src/config.rs",
+    "crates/research-gateway/src/client.rs",
+    "crates/application/src/api_workspace.rs",
+    "src-tauri/src/commands/api_workspace.rs",
+    "src-tauri/src/runtime_log.rs",
+    "src/pages/apiWorkspace.ts",
+    "src/pages/openai.ts",
+    "src/main.ts"
+  ]
+}
