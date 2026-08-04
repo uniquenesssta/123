@@ -131,6 +131,13 @@
       "fingerprint_sha256": "9a63d24cf05559c7c5107c47d0fbc8a7c0db57e27f9331210c17e68250085e6b"
     },
     {
+      "path": "scripts/verify_protected_assets.mjs",
+      "category": "protected-assets-verifier",
+      "mode": "utf8-lf",
+      "git_blob_sha1": "10e6f920d7f087d61ed10d0daa8204995a271c54",
+      "fingerprint_sha256": "aade75bff7c51b8c53526853fb9c0794056e9ad1f4754bd8282bdefa42d92688"
+    },
+    {
       "path": "src-tauri/resources/research/public_research_prompt.txt",
       "category": "public-research-prompt",
       "mode": "utf8-lf",
@@ -236,5 +243,5 @@
       "category": "private-model-documentation"
     }
   ],
-  "aggregate_sha256": "1caf7225b5962410e4558d12eb9e4d77e022913405b40885a9c40f741620456c"
+  "aggregate_sha256": "d2263a5ff09c8cf633a42b7bb35fffe3d42fb18648db4d12691817f51015c85c"
 }
