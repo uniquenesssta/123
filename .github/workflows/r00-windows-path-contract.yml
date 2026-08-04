@@ -97,7 +97,7 @@ jobs:
           }
           $acceptanceText = Get-Content -Raw -Encoding UTF8 ($acceptanceLogs | Sort-Object LastWriteTime -Descending | Select-Object -First 1).FullName
           $expectedTarget = [IO.Path]::GetFullPath((Join-Path $env:GITHUB_WORKSPACE ".cargo-target"))
-          if (-not $acceptanceText.Contains("Cargo目标=$expectedTarget")) {
+          if (-not $acceptanceText.Contains("Cargo 目标目录已解析：$expectedTarget")) {
             throw "Acceptance log did not record the expected Cargo target root."
           }
 
