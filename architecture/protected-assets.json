@@ -1,0 +1,240 @@
+{
+  "manifest_version": "1.0.0",
+  "repository": "uniquenesssta/123",
+  "baseline": {
+    "base_branch": "main",
+    "base_commit": "db79995873460688c15abb3497bf1c61b73ffb18",
+    "implementation_branch": "new-A",
+    "scanned_head_commit": "beb00b6f723d75703e9235967c4f49f985d41c4e",
+    "recorded_at": "2026-08-04T19:25:00+08:00"
+  },
+  "fingerprint_policy": {
+    "working_tree_canonicalization": "utf8-lf",
+    "git_blob_algorithm": "sha1",
+    "file_fingerprint_algorithm": "sha256",
+    "file_fingerprint_derivation": "sha256('git-blob-sha1:' + git_blob_sha1)",
+    "aggregate_algorithm": "sha256",
+    "aggregate_derivation": "sha256(sort(path + NUL + fingerprint_sha256 + LF))",
+    "reason": "GitHub Contents exposes authoritative Git blob identities; LF canonicalization keeps verification stable on Windows and CI while still detecting content changes."
+  },
+  "protected_files": [
+    {
+      "path": ".gitignore",
+      "category": "public-boundary-policy",
+      "mode": "utf8-lf",
+      "git_blob_sha1": "c350d65ca48eb5a5a162769e1c0704dfe0749109",
+      "fingerprint_sha256": "4c99a9dc3f921bd2a051228a891568bdcd6b5d341d3ddd1605943f25840a5275"
+    },
+    {
+      "path": "Cargo.toml",
+      "category": "workspace-model-membership",
+      "mode": "utf8-lf",
+      "git_blob_sha1": "cd7276ff04d2e8b26428570bcff60dd85501aa68",
+      "fingerprint_sha256": "e0d576fdf898814bc353f52876eaa9c29b83f34f97cf673cdf3ca34de4fc5f1b"
+    },
+    {
+      "path": "contracts/model-integration-contract.json",
+      "category": "model-integration-contract",
+      "mode": "utf8-lf",
+      "git_blob_sha1": "d1b0e44ac0180e4309d3c69358a7282d59b48c22",
+      "fingerprint_sha256": "99dc811ca1399df8e6bf8f64bf51b494d97ae82e992b156fc588fadfd463fa39"
+    },
+    {
+      "path": "contracts/model-orchestration-contract.json",
+      "category": "model-orchestration-contract",
+      "mode": "utf8-lf",
+      "git_blob_sha1": "4ef989e0ab1a1652c034e22cf169976830e25ca1",
+      "fingerprint_sha256": "98dbb278fe483d804c5ab618f4797cf07ef46dec4a6c9ebfe129fa2dbb2e5c37"
+    },
+    {
+      "path": "contracts/model-persistence-contract.json",
+      "category": "model-persistence-contract",
+      "mode": "utf8-lf",
+      "git_blob_sha1": "e236654a4696141a3b0f320b2f2d8bb70735b898",
+      "fingerprint_sha256": "01259ba6f5dcefe36afc7c2ae21e07abf1c1a0fcb5dcd0a1b6c143fe712933c5"
+    },
+    {
+      "path": "contracts/model-provider-boundary-contract.json",
+      "category": "model-provider-boundary-contract",
+      "mode": "utf8-lf",
+      "git_blob_sha1": "680f3029994f82053dc9898b6df05227b7ba2418",
+      "fingerprint_sha256": "acfe3412dd8545ecd9f2370456ab1c39593abfa205129f76392a34eb06fccbfe"
+    },
+    {
+      "path": "contracts/model-workbench-contract.json",
+      "category": "model-workbench-contract",
+      "mode": "utf8-lf",
+      "git_blob_sha1": "e441c606014cb3e92dc1eaa766757215492c9505",
+      "fingerprint_sha256": "767c1ffa35aa6231eeea16aec8650ae4613a08b4e8154983e70e91b6555490be"
+    },
+    {
+      "path": "crates/application/Cargo.toml",
+      "category": "application-model-dependencies",
+      "mode": "utf8-lf",
+      "git_blob_sha1": "0fe0331b9c9fa50e106597dd01e6493341d98680",
+      "fingerprint_sha256": "cb34b05087141b7ea0d794dbc20290a33aa7bddba08888eaa8e8874efe01bb96"
+    },
+    {
+      "path": "crates/application/src/model_shell/fixtures.rs",
+      "category": "public-external-profile-fixtures",
+      "mode": "utf8-lf",
+      "git_blob_sha1": "6a93457a30611869fcb4320cf9e3f18cc8e44f55",
+      "fingerprint_sha256": "63ed6d2db73d75391d4ab093d205e875052971c31e43b731675ea499d703aa66"
+    },
+    {
+      "path": "crates/application/src/model_shell/mod.rs",
+      "category": "model-shell-public-interface",
+      "mode": "utf8-lf",
+      "git_blob_sha1": "96c66e27fea716520ea5e13369bd3ef6667da6c3",
+      "fingerprint_sha256": "ae719bcf9a08dc70fe233c86638b41d654abe8612f0223b4dea64ba764ed936d"
+    },
+    {
+      "path": "crates/model-api/Cargo.toml",
+      "category": "model-api-package",
+      "mode": "utf8-lf",
+      "git_blob_sha1": "99fdcab34ba906719b21fdffd79f2b0569aa3217",
+      "fingerprint_sha256": "6556b66fd3ae2fcb10bad57d06d55a7d54c9d83eb0f249215b3c45146a0a1322"
+    },
+    {
+      "path": "crates/model-api/src/lib.rs",
+      "category": "model-api-source",
+      "mode": "utf8-lf",
+      "git_blob_sha1": "3d4888ffee27812a7cf98049da61d26ae9ba76de",
+      "fingerprint_sha256": "66c23d763ae1757acd12bff1cc7c1a6203a27e9caaa5c60ec2bca77fa8c2990e"
+    },
+    {
+      "path": "crates/model-stub/Cargo.toml",
+      "category": "model-stub-package",
+      "mode": "utf8-lf",
+      "git_blob_sha1": "59ae3f8efccf8406ee95639909faf79aa87084ad",
+      "fingerprint_sha256": "a8a2304195ff755cca34713b575f6767b2245de037ba5fdfb8cea53e6bda62ce"
+    },
+    {
+      "path": "crates/model-stub/src/lib.rs",
+      "category": "model-stub-source",
+      "mode": "utf8-lf",
+      "git_blob_sha1": "38fcbb6ac71323a080585e63575de360e4a2a3e8",
+      "fingerprint_sha256": "3fdb85105790460c71346902b004ec504450e6005d0395c6ad6d1009784a4335"
+    },
+    {
+      "path": "schemas/research-output.schema.json",
+      "category": "public-research-output-schema",
+      "mode": "utf8-lf",
+      "git_blob_sha1": "a1d3003361a7fc370335aeb3208d070413b740be",
+      "fingerprint_sha256": "b41e54ae8204066f7ab797aaabb9cf2c1216814cac5af5a167d8a81a425708f2"
+    },
+    {
+      "path": "scripts/verify-public-model-boundary.mjs",
+      "category": "public-model-boundary-verifier",
+      "mode": "utf8-lf",
+      "git_blob_sha1": "1592768e70d35aec5e5a9e0fb46a365937da6189",
+      "fingerprint_sha256": "9a63d24cf05559c7c5107c47d0fbc8a7c0db57e27f9331210c17e68250085e6b"
+    },
+    {
+      "path": "src-tauri/resources/research/public_research_prompt.txt",
+      "category": "public-research-prompt",
+      "mode": "utf8-lf",
+      "git_blob_sha1": "e07bec286a5d5b7912e8328f8cca0b9d70f5f317",
+      "fingerprint_sha256": "4d7b248f1b666741b7ed89759a98e7f92658d9c82ebdad3b4b70d5ec8f3a5cd6"
+    }
+  ],
+  "protected_roots": [
+    {
+      "path": "crates/model-api",
+      "allowed_files": [
+        "crates/model-api/Cargo.toml",
+        "crates/model-api/src/lib.rs"
+      ]
+    },
+    {
+      "path": "crates/model-stub",
+      "allowed_files": [
+        "crates/model-stub/Cargo.toml",
+        "crates/model-stub/src/lib.rs"
+      ]
+    },
+    {
+      "path": "crates/application/src/model_shell",
+      "allowed_files": [
+        "crates/application/src/model_shell/fixtures.rs",
+        "crates/application/src/model_shell/mod.rs"
+      ]
+    }
+  ],
+  "protected_patterns": [
+    {
+      "root": "contracts",
+      "pattern": "model-*.json",
+      "allowed_files": [
+        "contracts/model-integration-contract.json",
+        "contracts/model-orchestration-contract.json",
+        "contracts/model-persistence-contract.json",
+        "contracts/model-provider-boundary-contract.json",
+        "contracts/model-workbench-contract.json"
+      ]
+    }
+  ],
+  "forbidden_paths": [
+    {
+      "pattern": "crates/model-p4/**",
+      "category": "private-model-source"
+    },
+    {
+      "pattern": "crates/model-p7/**",
+      "category": "private-model-source"
+    },
+    {
+      "pattern": "src-tauri/resources/defaults/**",
+      "category": "private-model-runtime"
+    },
+    {
+      "pattern": "src-tauri/resources/research/p4_*.json",
+      "category": "private-research-asset"
+    },
+    {
+      "pattern": "src-tauri/resources/research/p4_*.txt",
+      "category": "private-research-asset"
+    },
+    {
+      "pattern": "src-tauri/resources/research/p7_*.json",
+      "category": "private-research-asset"
+    },
+    {
+      "pattern": "src-tauri/resources/research/p7_*.txt",
+      "category": "private-research-asset"
+    },
+    {
+      "pattern": "contracts/p4-*.json",
+      "category": "private-model-contract"
+    },
+    {
+      "pattern": "contracts/p7-*.json",
+      "category": "private-model-contract"
+    },
+    {
+      "pattern": "schemas/p4-*.json",
+      "category": "private-model-schema"
+    },
+    {
+      "pattern": "schemas/p7-*.json",
+      "category": "private-model-schema"
+    },
+    {
+      "pattern": "scripts/verify-p4-*.mjs",
+      "category": "private-model-verifier"
+    },
+    {
+      "pattern": "scripts/verify-p7-*.mjs",
+      "category": "private-model-verifier"
+    },
+    {
+      "pattern": "docs/P4_INTEGRATION.md",
+      "category": "private-model-documentation"
+    },
+    {
+      "pattern": "docs/P7_INTEGRATION.md",
+      "category": "private-model-documentation"
+    }
+  ],
+  "aggregate_sha256": "1caf7225b5962410e4558d12eb9e4d77e022913405b40885a9c40f741620456c"
+}
