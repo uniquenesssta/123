@@ -1,0 +1,93 @@
+name: R0-06.1 Windows Node Compatibility Temporary
+
+on:
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  windows-node-compatibility:
+    runs-on: windows-latest
+    timeout-minutes: 60
+    steps:
+      - name: Preserve repository line endings
+        shell: powershell
+        run: |
+          git config --global core.autocrlf false
+          git config --global core.eol lf
+
+      - name: Checkout source
+        uses: actions/checkout@v4
+        with:
+          path: source
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: source/package-lock.json
+
+      - name: Set up Rust 1.88.0
+        uses: dtolnay/rust-toolchain@1.88.0
+        with:
+          components: rustfmt, clippy
+
+      - name: Prepare Windows project layout
+        shell: powershell
+        run: |
+          New-Item -ItemType Directory -Force -Path "$env:GITHUB_WORKSPACE\logs" | Out-Null
+          $sourceName = -join ([char[]](0x9879, 0x76EE, 0x6E90, 0x7801))
+          $requiredSource = Join-Path $env:GITHUB_WORKSPACE $sourceName
+          if (-not (Test-Path $requiredSource)) {
+            New-Item -ItemType Junction -Path $requiredSource -Target "$env:GITHUB_WORKSPACE\source" | Out-Null
+          }
+          if (-not (Test-Path (Join-Path $requiredSource "package.json"))) {
+            throw "Required source directory alias was not created correctly."
+          }
+
+      - name: Verify setup and frontend through junction path
+        shell: powershell
+        run: |
+          $sourceName = -join ([char[]](0x9879, 0x76EE, 0x6E90, 0x7801))
+          $requiredSource = Join-Path $env:GITHUB_WORKSPACE $sourceName
+          Set-Location $requiredSource
+          npm run setup
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          node scripts/ensure-node-dependencies.mjs --check
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          npm run verify:frontend
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+
+      - name: Verify exact Automated reaches Rust stage
+        shell: powershell
+        run: |
+          $script = "$env:GITHUB_WORKSPACE\source\scripts\windows-acceptance.ps1"
+          & powershell -NoProfile -ExecutionPolicy Bypass -File $script -Mode Automated -ProjectRoot "$env:GITHUB_WORKSPACE"
+          $automatedExit = $LASTEXITCODE
+          $latest = Get-ChildItem "$env:GITHUB_WORKSPACE\logs" -Filter "windows-acceptance-*.txt" -File |
+            Sort-Object LastWriteTime -Descending |
+            Select-Object -First 1
+          if (-not $latest) { throw "Automated did not create an acceptance log." }
+          $content = Get-Content -Raw -Encoding UTF8 $latest.FullName
+          if (-not $content.Contains("通过：前端契约、类型、截图与生产构建")) {
+            throw "Automated frontend stage did not pass. Exit code: $automatedExit"
+          }
+          if ($content.Contains("失败：前端契约、类型、截图与生产构建")) {
+            throw "Automated still failed in the frontend stage."
+          }
+          if (-not $content.Contains("开始：Rust 格式、Clippy 与工作区测试")) {
+            throw "Automated did not continue to the Rust stage."
+          }
+          Write-Host "Automated frontend stage passed and continued to Rust; overall exit code=$automatedExit"
+
+      - name: Upload R0-06.1 evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: r00-06-1-windows-node-compatibility
+          path: logs/**
+          if-no-files-found: warn
+          retention-days: 30
