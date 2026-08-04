@@ -3,6 +3,7 @@ import { spawnSync } from "node:child_process";
 import { existsSync, mkdirSync, readFileSync, renameSync, rmSync, writeFileSync } from "node:fs";
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
+import { isDirectExecution } from "./process/execution-context.mjs";
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const lockPath = join(root, "package-lock.json");
@@ -35,7 +36,13 @@ function dependenciesReady() {
 }
 function npmCommand() {
   if (process.env.npm_execpath) return { command: process.execPath, args: [process.env.npm_execpath] };
-  return { command: process.platform === "win32" ? "npm.cmd" : "npm", args: [] };
+  if (process.platform === "win32") {
+    return {
+      command: process.env.ComSpec || process.env.COMSPEC || "cmd.exe",
+      args: ["/d", "/s", "/c", "npm.cmd"],
+    };
+  }
+  return { command: "npm", args: [] };
 }
 function installDependencies() {
   const npm = npmCommand();
@@ -62,8 +69,7 @@ export function ensureNodeDependencies({ allowInstall = true } = {}) {
   installDependencies();
 }
 
-const direct = process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url);
-if (direct) {
+if (isDirectExecution(import.meta.url)) {
   try {
     const checkOnly = process.argv.includes("--check");
     ensureNodeDependencies({ allowInstall: !checkOnly });
