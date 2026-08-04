@@ -52,7 +52,10 @@ Windows 可使用：
 - R0-06.2 新增 `scripts/windows/acceptance-paths.psm1` 与 `scripts/verify-windows-path-contract.mjs`，支持根入口既有 `LogDirectory` 参数，并按 Cargo target 登记文件查找 release EXE。
 - R0-06.2 Windows workflow run `30922384735` 中，完整 frontend、release 构建与 RuntimeOnly runner 均实际通过。release EXE 从项目根目录 `.cargo-target\release` 启动；startup report 为 PASS，7 条记录、3 个完成操作、0 个无效行、0 个运行时错误。
 - R0-06.2 证据 artifact 为 `8898312587`，SHA-256 为 `d6ed06066aab354686f86938ec7c55f2c1f740e11a37e42a6a1b5edbbd53df63`。临时 workflow 的 job 最终因产品验证结束后的一条辅助中文日志精确匹配未命中而显示 failure；证据文件已复核，未将 workflow 总体描述为通过。
-- R0-01 至 R0-06.2 未修改前端或 Rust 业务源码、依赖、锁文件、公共接口、数据库迁移、模型边界或用户可观察业务行为。
+- R0-07 使用 Rust 1.88.0 rustfmt 对 42 个已诊断 Rust 文件进行纯格式规范化，实施提交为 `9e7be511ae2d97a0782fee1a2bea5e25d910d10d`；未触碰模型保护文件、依赖、锁文件、迁移或公共接口。
+- R0-07 精确 workflow run `30961535208` 中，Cargo.lock 门禁、Cargo target 准备和 `cargo fmt --all -- --check` 通过。完整 `npm run verify:rust` 随后在 16 个 Clippy 错误处以退出码 `101` 结束，workspace tests 因 fail-fast 未执行。
+- R0-07 精确验证 artifact 为 `8913160029`，SHA-256 为 `47712408cb9fbd37088f42cab92e71565b0c982d5c0492a78fb6c4ef2e53ad49`。
+- R0-01 至 R0-06.2 未修改前端或 Rust 业务源码；R0-07 仅改变 Rust 源文件排版，不改变业务逻辑、接口、数据结构或用户可观察行为。
 - 当前执行环境未建立本地 Git 工作树，用户设备上的未提交与未跟踪文件不可见；远端分支操作不会覆盖这些本地内容。
 
 ## 0.23.0 变更记录
@@ -109,8 +112,8 @@ API 传输与诊断契约保持历史兼容。
 
 ## 验证事实与限制
 
-R0-06.1 已关闭 Windows 目录联接依赖同步和 `.cmd` 子进程调用缺口；R0-06.2 已关闭 `LogDirectory` 参数和 Cargo release 查找路径缺口。Windows 完整 frontend、release 构建与 RuntimeOnly startup 均已有真实通过证据。
+R0-06.1 已关闭 Windows 目录联接依赖同步和 `.cmd` 子进程调用缺口；R0-06.2 已关闭 `LogDirectory` 参数和 Cargo release 查找路径缺口。Windows 完整 frontend、release 构建与 RuntimeOnly startup 均已有真实通过证据。R0-07 已关闭 Rust `cargo fmt --check` 阻塞，精确 `verify:rust` 现可稳定进入 Clippy。
 
-R00 阶段仍为 **BLOCKED**。尚未关闭的硬缺口包括：Linux Chromium 启动失败、Rust `cargo fmt --check` 失败、Clippy/workspace tests 未执行、PostgreSQL 实跑和 Windows Full 未执行、用户本机 Windows 10/11 未实机验收。另保留 1 个 moderate npm vulnerability、Vite 大 chunk 和 2 个 Rust dead-code 警告。
+R00 阶段仍为 **BLOCKED**。尚未关闭的硬缺口包括：Linux Chromium 启动失败、16 个 Clippy 错误、workspace tests 未执行、PostgreSQL 实跑和 Windows Full 未执行、用户本机 Windows 10/11 未实机验收。另保留 1 个 moderate npm vulnerability、Vite 大 chunk 和 2 个 Rust dead-code 警告。
 
-因此未创建 `R00-stage-completion.md`，不得进入 R1。下一唯一 READY 任务为 `R0-07 Rust 格式门禁修复`。完整事实记录见 `docs/modular-rewrite/R00-baseline/`。
+因此未创建 `R00-stage-completion.md`，不得进入 R1。下一唯一 READY 任务为 `R0-08 Rust Clippy 门禁修复`。完整事实记录见 `docs/modular-rewrite/R00-baseline/`。
