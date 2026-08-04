@@ -15,6 +15,7 @@
 npm ci
 npm run verify:frontend
 npm run verify:rust
+node scripts/verify_protected_assets.mjs
 npm run tauri:dev
 ```
 
@@ -26,12 +27,14 @@ Windows 可使用：
 验收平台.bat
 ```
 
-`verify:frontend` 包含公开模型边界、TypeScript、静态契约和 Vite 生产构建。`verify:rust` 包含 Cargo.lock 一致性、格式检查、Clippy 与工作区测试。数据库集成测试必须连接名称包含 `test` 的专用 PostgreSQL 数据库。
+`verify:frontend` 包含公开模型边界、TypeScript、静态契约和 Vite 生产构建。`verify:rust` 包含 Cargo.lock 一致性、格式检查、Clippy 与工作区测试。`verify_protected_assets.mjs` 校验模型公开边界文件指纹、保护目录精确集合以及私有 P4/P7 资产缺席状态。数据库集成测试必须连接名称包含 `test` 的专用 PostgreSQL 数据库。
 
 ## 模块化重写执行记录
 
 - `new-A` 已从 `main` 基线提交 `db79995873460688c15abb3497bf1c61b73ffb18` 建立。
 - R0-01 已冻结远端分支起点并建立 `docs/modular-rewrite/R00-baseline/` 节点记录；本节点未修改源码、配置、依赖、接口、数据、模型或运行行为。
+- R0-02 已新增 `architecture/protected-assets.json` 和 `scripts/verify_protected_assets.mjs`，冻结 18 个公开模型边界及校验文件，聚合 SHA-256 为 `d2263a5ff09c8cf633a42b7bb35fffe3d42fb18648db4d12691817f51015c85c`；真实 P4/P7 私有资产继续禁止进入公开仓库。
+- R0-02 已通过 Node 语法、基准夹具、受保护文件篡改失败、禁止资产失败和 CRLF 兼容验证；完整工作树、Windows 原生和 GitHub Actions 执行受当前环境或触发条件阻塞，详见节点记录。
 - 当前执行环境未建立本地 Git 工作树，用户设备上的未提交与未跟踪文件不可见；本次远端分支操作不会覆盖这些本地内容。
 
 ## 0.23.0 变更记录
