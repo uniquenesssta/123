@@ -2,9 +2,11 @@ import { spawnSync } from "node:child_process";
 import { existsSync } from "node:fs";
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
+import { spawnNodePackageCli } from "./process/node-package-cli.mjs";
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const nodeChecks = [
+  "verify-node-process-compatibility.mjs",
   "verify-public-model-boundary.mjs",
   "verify-global-name-search.mjs",
   "verify-search-query-state.mjs",
@@ -70,18 +72,36 @@ const nodeChecks = [
   "verify-release-readiness.mjs",
 ];
 
-function run(command, args, label) {
-  console.log(`\n[verify] ${label}`);
-  const result = spawnSync(command, args, {
-    cwd: root,
-    stdio: "inherit",
-    windowsHide: true,
-  });
+function requireSuccess(result) {
   if (result.error) {
     console.error(result.error.message);
     process.exit(1);
   }
   if (result.status !== 0) process.exit(result.status ?? 1);
+}
+
+function run(command, args, label) {
+  console.log(`\n[verify] ${label}`);
+  requireSuccess(spawnSync(command, args, {
+    cwd: root,
+    stdio: "inherit",
+    windowsHide: true,
+  }));
+}
+
+function runPackageCli(packageName, executablePath, args, label) {
+  console.log(`\n[verify] ${label}`);
+  try {
+    requireSuccess(spawnNodePackageCli({
+      root,
+      packageName,
+      executablePath,
+      args,
+    }));
+  } catch (error) {
+    console.error(error instanceof Error ? error.message : String(error));
+    process.exit(1);
+  }
 }
 
 for (const script of nodeChecks) {
@@ -93,6 +113,5 @@ for (const script of nodeChecks) {
   run(process.execPath, [path], script);
 }
 
-const binSuffix = process.platform === "win32" ? ".cmd" : "";
-run(join(root, "node_modules", ".bin", `tsc${binSuffix}`), ["--noEmit"], "TypeScript");
-run(join(root, "node_modules", ".bin", `vite${binSuffix}`), ["build"], "Vite build");
+runPackageCli("typescript", "bin/tsc", ["--noEmit"], "TypeScript");
+runPackageCli("vite", "bin/vite.js", ["build"], "Vite build");
