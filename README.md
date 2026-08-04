@@ -28,6 +28,12 @@ Windows 可使用：
 
 `verify:frontend` 包含公开模型边界、TypeScript、静态契约和 Vite 生产构建。`verify:rust` 包含 Cargo.lock 一致性、格式检查、Clippy 与工作区测试。数据库集成测试必须连接名称包含 `test` 的专用 PostgreSQL 数据库。
 
+## 模块化重写执行记录
+
+- `new-A` 已从 `main` 基线提交 `db79995873460688c15abb3497bf1c61b73ffb18` 建立。
+- R0-01 已冻结远端分支起点并建立 `docs/modular-rewrite/R00-baseline/` 节点记录；本节点未修改源码、配置、依赖、接口、数据、模型或运行行为。
+- 当前执行环境未建立本地 Git 工作树，用户设备上的未提交与未跟踪文件不可见；本次远端分支操作不会覆盖这些本地内容。
+
 ## 0.23.0 变更记录
 
 - 删除真实 P4/P7 模型 crate、参数、Profile、固定比赛、模型专用契约、Schema、研究资源和验证脚本。
