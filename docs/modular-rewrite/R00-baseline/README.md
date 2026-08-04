@@ -17,8 +17,10 @@
 - R0-06 Windows 证据提交：`2001154dff611e6326f2182d8e4a0b8aa35ca98b`
 - R0-06.1 起始提交：`b165bf5c4a658b63edb698e40b49efebf567b334`
 - R0-06.1 Windows 验证提交：`278f1093b90c5c13aed7108535329bd1dc528441`
+- R0-06.2 起始提交：`7a6b542abbe366daa829616658f8234351c1daad`
+- R0-06.2 Windows 验证提交：`4d9eb14d83e661b09e6403b0b8677e9b229dfb58`
 - 实施分支：`new-A`
-- 已完成节点：`R0-01`、`R0-02`、`R0-03`、`R0-04（数据库实跑延期）`、`R0-05`、`R0-06`、`R0-06.1`
+- 已完成节点：`R0-01`、`R0-02`、`R0-03`、`R0-04（数据库实跑延期）`、`R0-05`、`R0-06`、`R0-06.1`、`R0-06.2`
 
 ## 保护资产
 
@@ -65,6 +67,18 @@
 - 证据 artifact `8896665715`，SHA-256：`95e567f917082670390860d2671699a59a7c65018cbbb875f5f37ea05288a16d`。
 - Draft PR #2 已关闭且未合并；临时 workflow 已删除。
 
+## R0-06.2 Windows 路径契约
+
+- 新增 `scripts/windows/acceptance-paths.psm1`，独立负责验收日志、Cargo target 与 release EXE 路径解析。
+- 新增 `scripts/verify-windows-path-contract.mjs`，并纳入完整前端验证。
+- `scripts/windows-acceptance.ps1` 已声明并支持根入口既有 `LogDirectory` 参数。
+- 验收证据目录与应用 runtime 日志目录已分离；runtime JSONL 继续固定在项目根目录 `logs`。
+- Cargo target 优先读取 `.cargo/target-location.json`，缺失时按 `.cargo/config.toml` 回退到源码上级 `.cargo-target`。
+- Windows workflow run `30922384735` 中，完整 frontend、release 构建和 RuntimeOnly runner 均实际通过；startup report 为 PASS。
+- release EXE 从 `D:\a\123\123\.cargo-target\release\football-match-model-desktop.exe` 成功启动。
+- 证据 artifact `8898312587`，SHA-256：`d6ed06066aab354686f86938ec7c55f2c1f740e11a37e42a6a1b5edbbd53df63`。
+- 临时 workflow 的最终 job 状态为 failure，原因是所有产品验证通过后的一条中文完整日志行辅助精确匹配未命中；证据文件已复核 target、启动路径和 PASS 报告一致，未将 workflow 总体描述为通过。
+
 ## 任务状态表
 
 | 任务 ID | 任务名称 | 状态 | 实施记录 | 最小验证 | 阶段回归 |
@@ -76,31 +90,30 @@
 | R0-05 | 前端与 Rust 基线 | DONE | [记录](./R00-05-前端与Rust基线.md) | Linux 前端和 Rust 现有失败已冻结 | 出口缺口保留 |
 | R0-06 | Windows 基线 | DONE | [记录](./R00-06-Windows基线.md) | release 与 RuntimeOnly 通过；精确 Automated 失败已冻结 | 出口缺口保留 |
 | R0-06.1 | Windows Node 调用链修复 | DONE | [记录](./R00-06.1-Windows-Node调用链修复.md) | Windows frontend 通过；Automated 到达 Rust 阶段 | Node 调用缺口关闭 |
-| R0-06.2 | Windows 路径契约修复 | READY | 待创建 | 待执行 | 待执行 |
+| R0-06.2 | Windows 路径契约修复 | DONE | [记录](./R00-06.2-Windows-路径契约修复.md) | Windows frontend、release、RuntimeOnly 通过 | Windows 路径缺口关闭 |
+| R0-07 | Rust 格式门禁修复 | READY | 待创建 | 待执行 | 待执行 |
 
 ## 本阶段累计变化
 
 - 新增模型保护、命令契约和数据库基线清单及只读校验器。
-- 新增 R0-01 至 R0-06.1 节点记录。
-- 新增三个职责单一的 Windows Node 执行/验证模块。
-- 修改仅限验证工具和文档；未修改前端或 Rust 业务源码、依赖、锁文件、公共接口、迁移 SQL、模型实现或用户可观察行为。
-- 临时验证 workflow 均已删除，Draft PR #1/#2 均已关闭且未合并。
+- 新增 R0-01 至 R0-06.2 节点记录。
+- 新增职责单一的 Windows Node 执行模块、Windows 路径模块及相应专项验证器。
+- 修改仅限验证工具和文档；未修改前端或 Rust 业务源码、依赖、锁文件、公共接口、迁移 SQL、模型实现或用户可观察业务行为。
+- R0-06.2 临时 workflow 将在收尾提交删除；Draft PR #3 将关闭且不合并。
 
 ## 未解决问题
 
 - GitHub Ubuntu Chromium 截图进程未开放调试端口。
 - Rust `cargo fmt --check` 失败；Clippy、workspace tests 和完整 `npm run verify:rust` 尚未通过。
 - PostgreSQL 迁移幂等、不可变触发器和 18 个集成测试按用户要求延期。
-- `验收平台.bat` 传入 PowerShell runner 未声明的 `-LogDirectory`。
-- Cargo release 输出目录与 Windows release 查找器路径不一致。
 - Windows Full 和用户本机 Windows 10/11 实机验收尚未执行。
 - 1 个 moderate npm vulnerability、Vite 大 chunk 警告和 2 个 Rust dead-code 警告未处理。
 - 用户设备上的未提交或未跟踪文件不可见；远端操作未覆盖这些本地内容。
 
 ## 阶段门禁状态
 
-**BLOCKED。** Windows Node/frontend 调用链缺口已关闭，但 Windows 路径契约、Rust 完整验证、数据库实跑和 Windows Full 尚未完成，因此未创建 `R00-stage-completion.md`。
+**BLOCKED。** Windows Node/frontend 与路径契约缺口均已关闭，但 Rust 完整验证、Linux Chromium、数据库实跑和 Windows Full 尚未完成，因此未创建 `R00-stage-completion.md`。
 
 ## 下一 READY 任务
 
-`R0-06.2 Windows 路径契约修复` 是唯一 READY 任务。不得提前进入 R1。
+`R0-07 Rust 格式门禁修复` 是唯一 READY 任务。不得提前进入 R1。
