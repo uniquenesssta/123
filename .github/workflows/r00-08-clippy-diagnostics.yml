@@ -32,19 +32,19 @@ jobs:
           cp crates/persistence-postgres/src/release_acceptance.rs r0-08-evidence/source/
           {
             echo '=== validate_event_score_consistency ==='
-            rg -n -C 8 'validate_event_score_consistency' crates/spreadsheet-io/src/match_review_workbook.rs
+            grep -n -C 8 'validate_event_score_consistency' crates/spreadsheet-io/src/match_review_workbook.rs || true
             echo
             echo '=== insert_postmatch_evaluation_sample_in_tx ==='
-            rg -n -C 10 'insert_postmatch_evaluation_sample_in_tx' crates/persistence-postgres/src/postmatch.rs
+            grep -n -C 10 'insert_postmatch_evaluation_sample_in_tx' crates/persistence-postgres/src/postmatch.rs || true
             echo
             echo '=== PostmatchPartition ==='
-            rg -n -C 10 'PostmatchPartition' crates/persistence-postgres/src/postmatch.rs
+            grep -n -C 10 'PostmatchPartition' crates/persistence-postgres/src/postmatch.rs || true
             echo
             echo '=== SettlementFingerprint ==='
-            rg -n -C 8 'SettlementFingerprint' crates/persistence-postgres/src/postmatch.rs
+            grep -n -C 8 'SettlementFingerprint' crates/persistence-postgres/src/postmatch.rs || true
             echo
             echo '=== relevant test names ==='
-            rg -n 'postmatch|settlement|evidence|review_workbook|team_package' crates/spreadsheet-io crates/persistence-postgres --glob '*.rs'
+            grep -R -n -E 'postmatch|settlement|evidence|review_workbook|team_package' crates/spreadsheet-io crates/persistence-postgres --include='*.rs' || true
           } > r0-08-evidence/references.txt
 
       - name: Upload diagnostic evidence
