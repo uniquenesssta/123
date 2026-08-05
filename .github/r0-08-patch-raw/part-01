@@ -1,0 +1,255 @@
+-        "end_at": fixtures.last().map(|item| item.kickoff_time),
+-        "first_run_id": fixtures.first().map(|item| item.run_id),
+-        "last_run_id": fixtures.last().map(|item| item.run_id),
+-    })
+-}
+-
+ fn baseline_metrics(fixtures: &[ParameterReplayFixture]) -> LifecycleMetrics {
+     let observations = fixtures
+         .iter()
+--- a/crates/application/src/prediction.rs
++++ b/crates/application/src/prediction.rs
+@@ -144,8 +144,7 @@
+             Vec::new()
+         };
+         checks.push(readiness_check(
+-            "match_identity",
+-            "比赛身份",
++            ("match_identity", "比赛身份"),
+             if identity_details.is_empty() {
+                 PredictionReadinessCheckStatus::Passed
+             } else {
+@@ -175,8 +174,7 @@
+             Ok(chain) => {
+                 data_cutoff_at = Some(chain.data_cutoff_time);
+                 checks.push(readiness_check(
+-                    "data_window",
+-                    "赛前数据窗口",
++                    ("data_window", "赛前数据窗口"),
+                     PredictionReadinessCheckStatus::Passed,
+                     10,
+                     10,
+@@ -193,8 +191,7 @@
+             }
+             Err(PersistenceError::InvalidState(message)) => {
+                 checks.push(readiness_check(
+-                    "data_window",
+-                    "赛前数据窗口",
++                    ("data_window", "赛前数据窗口"),
+                     PredictionReadinessCheckStatus::Blocked,
+                     10,
+                     0,
+@@ -268,8 +265,7 @@
+                     Ok(()) => {
+                         route_identity = Some(route_identity_manifest(&decision));
+                         checks.push(readiness_check(
+-                            "model_route",
+-                            "模型与规则路由",
++                            ("model_route", "模型与规则路由"),
+                             PredictionReadinessCheckStatus::Passed,
+                             15,
+                             15,
+@@ -279,8 +275,7 @@
+                         ));
+                     }
+                     Err(error) => checks.push(readiness_check(
+-                        "model_route",
+-                        "模型与规则路由",
++                        ("model_route", "模型与规则路由"),
+                         PredictionReadinessCheckStatus::Blocked,
+                         15,
+                         0,
+@@ -291,8 +286,7 @@
+                 }
+             }
+             Err(PersistenceError::RouteNotFound) => checks.push(readiness_check(
+-                "model_route",
+-                "模型与规则路由",
++                ("model_route", "模型与规则路由"),
+                 PredictionReadinessCheckStatus::Blocked,
+                 15,
+                 0,
+@@ -708,8 +702,7 @@
+ }
+ 
+ fn readiness_check(
+-    code: &str,
+-    label: &str,
++    (code, label): (&str, &str),
+     status: PredictionReadinessCheckStatus,
+     weight: u8,
+     score: u8,
+@@ -729,9 +722,9 @@
+     }
+ }
+ 
+-fn selected_lineup<'a>(
+-    chain: &'a football_domain::MatchLineupTeamChain,
+-) -> Option<&'a football_domain::LineupRecord> {
++fn selected_lineup(
++    chain: &football_domain::MatchLineupTeamChain,
++) -> Option<&football_domain::LineupRecord> {
+     let selected_id = chain.selected_lineup_id?;
+     chain
+         .versions
+@@ -745,8 +738,7 @@
+ ) {
+     for (code, label) in [("home_lineup", "主队阵容"), ("away_lineup", "客队阵容")] {
+         checks.push(readiness_check(
+-            code,
+-            label,
++            (code, label),
+             PredictionReadinessCheckStatus::Blocked,
+             15,
+             0,
+@@ -756,8 +748,7 @@
+         ));
+     }
+     checks.push(readiness_check(
+-        "starting_goalkeepers",
+-        "首发门将",
++        ("starting_goalkeepers", "首发门将"),
+         PredictionReadinessCheckStatus::Blocked,
+         10,
+         0,
+@@ -766,8 +757,7 @@
+         Value::Null,
+     ));
+     checks.push(readiness_check(
+-        "starter_context",
+-        "首发位置、角色与状态",
++        ("starter_context", "首发位置、角色与状态"),
+         PredictionReadinessCheckStatus::Blocked,
+         10,
+         0,
+@@ -787,8 +777,7 @@
+     ] {
+         let Some(lineup) = selected_lineup(side) else {
+             checks.push(readiness_check(
+-                code,
+-                label,
++                (code, label),
+                 PredictionReadinessCheckStatus::Blocked,
+                 15,
+                 0,
+@@ -808,8 +797,7 @@
+             PredictionReadinessCheckStatus::Warning
+         };
+         checks.push(readiness_check(
+-            code,
+-            label,
++            (code, label),
+             status,
+             15,
+             if status == PredictionReadinessCheckStatus::Passed {
+@@ -878,7 +866,7 @@
+             if player
+                 .position_code
+                 .as_deref()
+-                .map_or(true, |value| value.trim().is_empty())
++                .is_none_or(|value| value.trim().is_empty())
+             {
+                 missing_position_details.push(format!(
+                     "{team_name}首发 {} 未填写实际位置",
+@@ -888,7 +876,7 @@
+             if player
+                 .role_code
+                 .as_deref()
+-                .map_or(true, |value| value.trim().is_empty())
++                .is_none_or(|value| value.trim().is_empty())
+             {
+                 missing_role_count += 1;
+             } else if player.role_origin == "player_position_default" {
+@@ -922,8 +910,7 @@
+         }
+     }
+     checks.push(readiness_check(
+-        "starting_goalkeepers",
+-        "首发门将",
++        ("starting_goalkeepers", "首发门将"),
+         if goalkeeper_details.is_empty() {
+             PredictionReadinessCheckStatus::Passed
+         } else {
+@@ -979,8 +966,7 @@
+         ));
+     }
+     checks.push(readiness_check(
+-        "starter_context",
+-        "首发位置、角色与状态",
++        ("starter_context", "首发位置、角色与状态"),
+         player_detail_status,
+         10,
+         match player_detail_status {
+@@ -1012,8 +998,7 @@
+     input_reason: &str,
+ ) {
+     checks.push(readiness_check(
+-        "team_history",
+-        "球队历史样本",
++        ("team_history", "球队历史样本"),
+         PredictionReadinessCheckStatus::Blocked,
+         10,
+         0,
+@@ -1022,8 +1007,7 @@
+         Value::Null,
+     ));
+     checks.push(readiness_check(
+-        "model_input",
+-        "模型输入构建与质量",
++        ("model_input", "模型输入构建与质量"),
+         PredictionReadinessCheckStatus::Blocked,
+         5,
+         0,
+@@ -1070,8 +1054,7 @@
+         shadow_reasons.push("球队历史样本存在零覆盖，当前输入只允许进入影子推演".to_string());
+     }
+     checks.push(readiness_check(
+-        "team_history",
+-        "球队历史样本",
++        ("team_history", "球队历史样本"),
+         history_status,
+         10,
+         if history_status == PredictionReadinessCheckStatus::Passed {
+@@ -1117,8 +1100,7 @@
+         ));
+     }
+     checks.push(readiness_check(
+-        "model_input",
+-        "模型输入构建与质量",
++        ("model_input", "模型输入构建与质量"),
+         quality_status,
+         5,
+         if quality_score >= 0.65 {
+--- a/crates/application/src/release_acceptance.rs
++++ b/crates/application/src/release_acceptance.rs
+@@ -163,9 +163,7 @@
+ 
+ fn check(
+     run_id: Uuid,
+-    category: &str,
+-    code: &str,
+-    title: &str,
++    (category, code, title): (&str, &str, &str),
+     status: ReleaseAcceptanceStatus,
+     summary: impl Into<String>,
+     remediation: Option<&str>,
+@@ -200,9 +198,7 @@
+     let contracts = if missing.is_empty() {
+         check(
+             run_id,
+-            "chain",
+-            "integration_contracts_a_to_i",
+-            "A–I 接入契约",
++            ("chain", "integration_contracts_a_to_i", "A–I 接入契约"),
+             ReleaseAcceptanceStatus::Pass,
+             "数据库已锁定 A–I 全部接入契约。",
+             None,
+@@ -212,9 +208,7 @@
+     } else {
+         check(
+             run_id,
+-            "chain",
+-            "integration_contracts_a_to_i",
+-            "A–I 接入契约",
++            ("chain", "integration_contracts_a_to_i", "A–I 接入契约"),
+             ReleaseAcceptanceStatus::Blocked,
