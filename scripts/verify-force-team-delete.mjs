@@ -80,8 +80,13 @@ const executeCommand = commands.slice(
 for (const [label, source] of [["预检", previewCommand], ["执行", executeCommand]]) {
   requireTrue(source.includes("state.service.clone()"), `强制清除${label}命令未取得拥有所有权的服务句柄`);
   requireTrue(source.includes("tauri::async_runtime::handle()"), `强制清除${label}命令未绑定Tauri运行时句柄`);
-  requireTrue(source.includes("drop(state)"), `强制清除${label}命令仍跨await持有State借用`);
-  requireTrue(source.includes("tauri::async_runtime::spawn_blocking"), `强制清除${label}命令未隔离非Send长事务Future`);
+  const blockingStart = source.indexOf("tauri::async_runtime::spawn_blocking");
+  const blockingSource = blockingStart >= 0 ? source.slice(blockingStart) : "";
+  requireTrue(source.includes("tauri::async_runtime::spawn_blocking(move ||"), `强制清除${label}命令未隔离非Send长事务Future`);
+  requireTrue(
+    blockingSource.includes("service.") && !blockingSource.includes("state."),
+    `强制清除${label}阻塞事务仍捕获State借用`,
+  );
   requireTrue(source.includes("runtime") && source.includes(".block_on("), `强制清除${label}命令未在隔离线程驱动数据库Future`);
 }
 requireTrue(application.includes("preview_force_delete_team") && application.includes("force_delete_team"), "应用服务未接入强制清除");
