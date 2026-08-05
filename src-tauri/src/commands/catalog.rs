@@ -305,6 +305,7 @@ pub async fn preview_force_delete_team(
     let team_id = parse_uuid(&team_id, "球队 ID")?;
     let service = state.service.clone();
     let runtime = tauri::async_runtime::handle();
+    drop(state);
 
     tauri::async_runtime::spawn_blocking(move || {
         runtime
@@ -322,6 +323,7 @@ pub async fn force_delete_team(
 ) -> Result<TeamForceDeleteResult, String> {
     let service = state.service.clone();
     let runtime = tauri::async_runtime::handle();
+    drop(state);
 
     tauri::async_runtime::spawn_blocking(move || {
         runtime
