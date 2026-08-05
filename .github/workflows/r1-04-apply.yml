@@ -46,6 +46,8 @@ jobs:
           $baseReplacement = "base='82d27e479da18267a0cf03d79cbcc15762adbe3a'"
           $stagedOld = "if(staged.size!==2||!staged.has('scripts/r1-04-apply.mjs')||!staged.has('.github/workflows/r1-04-apply.yml'))throw Error('unexpected R1-04 staging history');"
           $stagedReplacement = "if(staged.size!==1||!staged.has('.github/workflows/r1-04-apply.yml'))throw Error('unexpected R1-04 staging history');"
+          $uuidOld = "if(!commands.includes('pub(crate) use crate::bootstrap::AppState;'))throw Error('AppState migration failed');"
+          $uuidReplacement = "commands=commands.replace('pub(crate) use crate::bootstrap::AppState;\n','pub(crate) use crate::bootstrap::AppState;\nuse uuid::Uuid;\n');if(!commands.includes('pub(crate) use crate::bootstrap::AppState;')||!commands.includes('use uuid::Uuid;'))throw Error('AppState migration failed');"
           $architectureOld = "run(npm,['run','verify:architecture']);"
           $architectureReplacement = "run(process.execPath,['scripts/architecture/verifyModuleBoundaries.mjs']);run(process.execPath,['scripts/architecture/verifyStateOwnership.mjs']);run(process.execPath,['scripts/architecture/verifyProtectedImports.mjs']);"
           $formatOld = "run('cargo',['fmt','--all']);"
@@ -82,12 +84,12 @@ jobs:
           '@.Trim()
           $gitAddOld = "run('git',['add','README.md','architecture','docs/modular-rewrite/R01-architecture-composition/README.md','scripts/verify-command-contract.mjs','src-tauri/src/bootstrap','src-tauri/src/commands.rs','src-tauri/src/lib.rs']);"
           $gitAddReplacement = "run('git',['add','README.md','architecture','crates/application/src/model_shell/mod.rs','docs/modular-rewrite/R01-architecture-composition/README.md','scripts/verify-command-contract.mjs','src-tauri/src/bootstrap','src-tauri/src/commands.rs','src-tauri/src/lib.rs']);"
-          foreach ($anchor in @($baseOld, $stagedOld, $architectureOld, $formatOld, $protectedOld, $gitAddOld)) {
+          foreach ($anchor in @($baseOld, $stagedOld, $uuidOld, $architectureOld, $formatOld, $protectedOld, $gitAddOld)) {
             if (-not $source.Contains($anchor)) {
               throw "R1-04 apply anchor missing: $anchor"
             }
           }
-          $patched = $source.Replace($baseOld, $baseReplacement).Replace($stagedOld, $stagedReplacement).Replace($architectureOld, $architectureReplacement).Replace($formatOld, $formatReplacement).Replace($protectedOld, $protectedReplacement).Replace($gitAddOld, $gitAddReplacement)
+          $patched = $source.Replace($baseOld, $baseReplacement).Replace($stagedOld, $stagedReplacement).Replace($uuidOld, $uuidReplacement).Replace($architectureOld, $architectureReplacement).Replace($formatOld, $formatReplacement).Replace($protectedOld, $protectedReplacement).Replace($gitAddOld, $gitAddReplacement)
           $executionPath = Join-Path $env:GITHUB_WORKSPACE ".git\r1-04-apply.mjs"
           [System.IO.File]::WriteAllText($executionPath, $patched, [System.Text.UTF8Encoding]::new($false))
           node $executionPath
