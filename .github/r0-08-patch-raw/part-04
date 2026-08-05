@@ -1,0 +1,47 @@
+--- a/src-tauri/src/runtime_log.rs
++++ b/src-tauri/src/runtime_log.rs
+@@ -293,24 +293,26 @@ impl Drop for RuntimeLogStore {
+         for (sequence, duplicate) in pending {
+             let timestamp = Utc::now().to_rfc3339_opts(SecondsFormat::Millis, true);
+             let _ = self.write_entry(
+-                sequence,
+-                &timestamp,
+-                "info",
+-                "runtime_log",
+-                "duplicate_events_suppressed",
+-                duplicate.last_trace_id.as_deref(),
+-                json!({
+-                    "original_level": duplicate.level,
+-                    "original_subsystem": duplicate.subsystem,
+-                    "original_event": duplicate.event,
+-                    "original_fingerprint": duplicate.fingerprint,
+-                    "suppressed_count": duplicate.suppressed_count,
+-                    "first_trace_id": duplicate.first_trace_id,
+-                    "last_trace_id": duplicate.last_trace_id,
+-                    "first_seen_utc": duplicate.first_seen_utc,
+-                    "last_seen_utc": duplicate.last_seen_utc,
+-                    "dedup_window_ms": DUPLICATE_WINDOW.as_millis(),
+-                }),
++                RuntimeLogEntry {
++                    sequence,
++                    timestamp_utc: &timestamp,
++                    level: "info",
++                    subsystem: "runtime_log",
++                    event: "duplicate_events_suppressed",
++                    trace_id: duplicate.last_trace_id.as_deref(),
++                    details: json!({
++                        "original_level": duplicate.level,
++                        "original_subsystem": duplicate.subsystem,
++                        "original_event": duplicate.event,
++                        "original_fingerprint": duplicate.fingerprint,
++                        "suppressed_count": duplicate.suppressed_count,
++                        "first_trace_id": duplicate.first_trace_id,
++                        "last_trace_id": duplicate.last_trace_id,
++                        "first_seen_utc": duplicate.first_seen_utc,
++                        "last_seen_utc": duplicate.last_seen_utc,
++                        "dedup_window_ms": DUPLICATE_WINDOW.as_millis(),
++                    }),
++                },
+             );
+         }
+     }
