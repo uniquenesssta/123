@@ -1,0 +1,28 @@
+name: R1-02 architecture gate activation
+
+on:
+  push:
+    branches:
+      - new-B
+    paths:
+      - .github/workflows/r1-02-activate.yml
+
+permissions:
+  contents: write
+
+jobs:
+  activate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: new-B
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Activate R1-02 gates and records
+        run: python scripts/r1-02-activate.py
