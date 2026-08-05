@@ -16,7 +16,7 @@ const client = text("src/api/client.ts");
 const main = text("src/main.ts");
 const commands = text("src-tauri/src/commands/api_workspace.rs");
 const page = text("src/pages/apiWorkspace.ts");
-const desktop = text("src-tauri/src/lib.rs");
+const desktop = [text("src-tauri/src/bootstrap/command_registry.rs"), text("src-tauri/src/bootstrap/state.rs")].join("\n");
 const send = slice(commands, "pub async fn send_api_workspace_message", "pub async fn cancel_api_workspace_request");
 assert(contract.release_version === "0.14.0" && isVersionAtLeast(packageJson.version, contract.release_version), "运行诊断历史契约或当前项目版本未同步");
 assert(contract.contract_version === "2.2.0", "运行诊断契约版本未升级");

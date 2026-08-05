@@ -27,7 +27,7 @@ const prediction = text("src/pages/prediction.ts");
 const release = text("src/pages/release.ts");
 const backend = text("src-tauri/src/workspace_state.rs");
 const commands = text("src-tauri/src/commands/workspace.rs");
-const registry = text("src-tauri/src/lib.rs");
+const registry = text("src-tauri/src/bootstrap/command_registry.rs");
 const client = text("src/api/client.ts");
 const readme = readFileSync(join(root, "README.md"), "utf8");
 

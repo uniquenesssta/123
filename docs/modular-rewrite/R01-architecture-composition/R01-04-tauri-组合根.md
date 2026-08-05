@@ -134,6 +134,25 @@ R1-03 后的基线中，`crates/application/src/model_shell/mod.rs` 的排版与
 - `docs/modular-rewrite/R01-architecture-composition/README.md`
 - `scripts/verify-command-contract.mjs`
 - `scripts/verify-frontend.mjs`
+- `scripts/verify-api-runtime-diagnostics.mjs`
+- `scripts/verify-api-workspace.mjs`
+- `scripts/verify-database-reset.mjs`
+- `scripts/verify-entity-relationships.mjs`
+- `scripts/verify-force-team-delete.mjs`
+- `scripts/verify-formation-usage.mjs`
+- `scripts/verify-history-scoreline-ui.mjs`
+- `scripts/verify-match-lineup-chain.mjs`
+- `scripts/verify-match-review-package.mjs`
+- `scripts/verify-match-workflow-ui.mjs`
+- `scripts/verify-monthly-workbooks.mjs`
+- `scripts/verify-openai-profile-ui.mjs`
+- `scripts/verify-parameter-lifecycle.mjs`
+- `scripts/verify-postmatch-settlement.mjs`
+- `scripts/verify-release-acceptance.mjs`
+- `scripts/verify-stage-e2-lineup-presets.mjs`
+- `scripts/verify-team-package.mjs`
+- `scripts/verify-team-player-management.mjs`
+- `scripts/verify-workspace-ui.mjs`
 - `src-tauri/src/commands.rs`
 - `src-tauri/src/lib.rs`
 
@@ -158,6 +177,8 @@ R1-03 后的基线中，`crates/application/src/model_shell/mod.rs` 的排版与
 - 启动日志、插件、context 和启动失败提示保持不变。
 
 该专项门禁和确定性保护资产入口均已接入 `scripts/verify-frontend.mjs`。
+
+- 同步迁移 19 个既有验证器的 Tauri 注册表或状态读取路径，防止旧 `lib.rs` 硬编码产生伪失败。
 
 ## 9. 已执行验证
 
