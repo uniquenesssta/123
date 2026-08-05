@@ -23,8 +23,9 @@
 - R0-07 rustfmt 实施提交：`9e7be511ae2d97a0782fee1a2bea5e25d910d10d`
 - R0-08 起始提交：`b163597e497736dbbf73e50e4abf097b43c899fe`
 - R0-08 Clippy 实施提交：`919d62a2eaf95ade5ba1efa18924a9d578ef3f63`
+- R0-09 workspace tests 实施提交：`50daa258af8ac8e09f8e4f5f428249fe670f2dd2`
 - 实施分支：`new-A`
-- 已完成节点：`R0-01`、`R0-02`、`R0-03`、`R0-04（数据库实跑延期）`、`R0-05`、`R0-06`、`R0-06.1`、`R0-06.2`、`R0-07`、`R0-08`
+- 已完成节点：`R0-01`、`R0-02`、`R0-03`、`R0-04（数据库实跑延期）`、`R0-05`、`R0-06`、`R0-06.1`、`R0-06.2`、`R0-07`、`R0-08`、`R0-09`
 
 ## 保护资产
 
@@ -52,7 +53,8 @@
 - Rust 工具链、Tauri Linux 依赖、公开模型边界、Cargo.lock 与 locked metadata 通过。
 - R0-05 的 `cargo fmt --all -- --check` 失败已由 R0-07 关闭。
 - R0-07 冻结的 16 个 Clippy 错误已由 R0-08 关闭。
-- 精确 `npm run verify:rust` 当前可到达 workspace tests，但仍以退出码 `101` 失败。
+- R0-08 冻结的两个 workspace tests 失败已由 R0-09 关闭。
+- R0-09 中精确 `npm run verify:rust` 已以退出码 0 完成。
 
 ## Windows 基线
 
@@ -115,6 +117,19 @@
 - 精确验证 artifact `8914844238`，SHA-256：`05ee24344468b9613bf18c139ff7d3aabecb92e005f93afb1f9037ed7f21cede`。
 - 未添加 `#[allow]`、降低 `-D warnings`、删除失败测试、修改依赖或触碰模型保护区。
 
+## R0-09 Rust workspace tests 门禁
+
+- 诊断 workflow run `30967005489` 使用 `--no-fail-fast` 完整枚举失败，确认只有 OpenAI 提示词断言和表格空白行物理行号两个失败。
+- OpenAI 测试改为大小写无关地验证既有禁止概率计算契约；表格测试补齐真实模板已有的分组标题行，避免稀疏工作簿读取范围裁剪导致键列错位。
+- 最终只修改两个测试位置，共新增 2 行；未改变生产逻辑、公共接口、数据结构、配置、依赖、迁移或模型保护边界。
+- 实施提交：`50daa258af8ac8e09f8e4f5f428249fe670f2dd2`。
+- 最终 workflow run `30967448070`、job `92184375540` 全部通过。
+- 两个专项测试均 1/1 通过；`cargo test --locked --workspace --no-fail-fast` 为 185 通过、0 失败、18 忽略。
+- 精确 `npm run verify:rust` 退出码 0，Cargo.lock、rustfmt、Clippy 与 workspace tests 全部通过。
+- 最终 artifact `8915431192`，SHA-256：`a745bded71179bb6542d3a06b5c65f61cdf48845b8f88193dc7ef0ac5c8fcadc`。
+- 18 个忽略项为按用户要求延期的 PostgreSQL 集成测试；未描述为已执行。
+- Draft PR #6 已关闭且未合并；临时 workflow 和 patch 已删除。
+
 ## 任务状态表
 
 | 任务 ID | 任务名称 | 状态 | 实施记录 | 最小验证 | 阶段回归 |
@@ -129,22 +144,22 @@
 | R0-06.2 | Windows 路径契约修复 | DONE | [记录](./R00-06.2-Windows-路径契约修复.md) | Windows frontend、release、RuntimeOnly 通过 | Windows 路径缺口关闭 |
 | R0-07 | Rust 格式门禁修复 | DONE | [记录](./R00-07-Rust格式门禁修复.md) | 42 文件 rustfmt；格式检查通过 | Clippy 16 错误已冻结 |
 | R0-08 | Rust Clippy 门禁修复 | DONE | [记录](./R00-08-Rust-Clippy门禁修复.md) | 全 workspace all-targets Clippy 通过 | workspace tests 失败已冻结 |
-| R0-09 | Rust workspace tests 门禁修复 | READY | 待创建 | 待执行 | 待执行 |
+| R0-09 | Rust workspace tests 门禁修复 | DONE | [记录](./R00-09-Rust-workspace-tests门禁修复.md) | 两专项测试、185 个 workspace 测试与精确 verify:rust 通过 | Rust 完整门禁关闭 |
+| R0-10 | Linux Chromium 前端验收门禁修复 | READY | 待创建 | 待执行 | 待执行 |
 
 ## 本阶段累计变化
 
 - 新增模型保护、命令契约和数据库基线清单及只读校验器。
-- 新增 R0-01 至 R0-08 节点记录。
+- 新增 R0-01 至 R0-09 节点记录。
 - 新增职责单一的 Windows Node 执行模块、Windows 路径模块及相应专项验证器。
 - R0-07 对 42 个 Rust 文件执行纯 rustfmt 规范化。
 - R0-08 对 11 个 Rust 文件实施私有参数收束、Copy/借用修复、私有无效代码清理和测试编译补全。
-- R0-08 未修改依赖、锁文件、公共接口、迁移 SQL、模型实现、配置默认值或用户可观察数据格式。
+- R0-09 只修正两个测试契约，共新增 2 行，完整 Rust 门禁现已通过。
+- R0-08 与 R0-09 未修改依赖、锁文件、公共接口、迁移 SQL、模型实现、配置默认值或用户可观察数据格式。
 
 ## 未解决问题
 
 - GitHub Ubuntu Chromium 截图进程未开放调试端口。
-- workspace tests 至少存在两个已确认失败：OpenAI 内置提示词严格性断言、球队资料表格空白行物理行号断言。
-- 精确 workspace tests 在 `football-application` 处 fail-fast，后续测试集合尚未完整执行。
 - PostgreSQL 迁移幂等、不可变触发器和 18 个集成测试按用户要求延期。
 - Windows Full 和用户本机 Windows 10/11 实机验收尚未执行。
 - 1 个 moderate npm vulnerability 和 Vite 大 chunk 警告未处理。
@@ -152,8 +167,8 @@
 
 ## 阶段门禁状态
 
-**BLOCKED。** Windows Node/frontend 与路径契约、Rust 格式和 Clippy 门禁均已关闭，但 workspace tests、Linux Chromium、数据库实跑和 Windows Full 尚未完成，因此未创建 `R00-stage-completion.md`。
+**BLOCKED。** Windows Node/frontend 与路径契约、Rust 格式、Clippy 和 workspace tests 门禁均已关闭，但 Linux Chromium、数据库实跑和 Windows Full 尚未完成，因此未创建 `R00-stage-completion.md`。
 
 ## 下一 READY 任务
 
-`R0-09 Rust workspace tests 门禁修复` 是唯一 READY 任务。不得提前进入 R1。
+`R0-10 Linux Chromium 前端验收门禁修复` 是唯一 READY 任务。不得提前进入 R1。
