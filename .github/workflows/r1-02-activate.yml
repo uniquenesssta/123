@@ -24,38 +24,7 @@ jobs:
         with:
           node-version: 22
 
-      - name: Register scoped current feature transitions
-        shell: bash
-        run: |
-          python - <<'PY'
-          import json
-          from pathlib import Path
-
-          path = Path("architecture/module-boundaries.json")
-          contract = json.loads(path.read_text(encoding="utf-8"))
-          contract.setdefault("frontend", {})["transitional_imports"] = [
-              {
-                  "from_feature": "prediction",
-                  "importer": "src/pages/prediction.ts",
-                  "to_feature": "p4-workbench",
-                  "target": "src/pages/p4Workbench.ts",
-                  "reason": "prediction currently composes the P4 research workbench page renderer",
-                  "exit_task": "R14-06",
-              },
-              {
-                  "from_feature": "prediction",
-                  "importer": "src/pages/prediction.ts",
-                  "to_feature": "runs",
-                  "target": "src/pages/runs.ts",
-                  "reason": "prediction currently composes the run history page renderer",
-                  "exit_task": "R14-07",
-              },
-          ]
-          path.write_text(json.dumps(contract, ensure_ascii=False, indent=2) + "\n", encoding="utf-8", newline="\n")
-          PY
-
       - name: Activate R1-02 gates and records
         run: python scripts/r1-02-activate.py
 
-      # The activation workflow deletes itself after a successful guarded commit.
-      # Retry marker: all three source readers use readFileSync.
+      # CI workflow integration is committed separately through the GitHub connector.
