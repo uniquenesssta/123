@@ -36,7 +36,7 @@ R00 已按 Windows-only 目标范围完成。R1 只建立可机器验证的架�
 | 任务 ID | 任务名称 | 状态 | 实施记录 | 最小验证 | 阶段回归 |
 |---|---|---|---|---|---|
 | R1-01 | 模块边界契约 | DONE | [`R01-01-模块边界契约.md`](R01-01-模块边界契约.md) | JSON 解析、契约自检、Windows Automated 通过 | workflow run `30989439570` 通过 |
-| R1-02 | 边界验证脚本 | READY | 待创建 | 待执行 | 待执行 |
+| R1-02 | 边界验证脚本 | VERIFYING | [`R01-02-边界验证脚本.md`](R01-02-边界验证脚本.md) | `npm run verify:architecture` 通过 | Windows Automated 待最终 HEAD 验证 |
 | R1-03 | 浏览器组合根 | BLOCKED | 待创建 | 待执行 | 待执行 |
 | R1-04 | Tauri 组合根 | BLOCKED | 待创建 | 待执行 | 待执行 |
 | R1-05 | Application 组合根 | BLOCKED | 待创建 | 待执行 | 待执行 |
@@ -61,6 +61,11 @@ R00 已按 Windows-only 目标范围完成。R1 只建立可机器验证的架�
 - 公共命令契约；
 - 模型保护资产指纹。
 
+## R1-02 当前结果
+
+- 已新增模块边界、状态所有权和受保护导入三条门禁，并接入 `verify:frontend`；Windows CI 独立步骤待受控提交。
+- 当前状态为 `VERIFYING`；完整 Windows Automated 通过后才可开放 R1-03。
+
 ## 当前唯一可执行任务
 
-`R1-02 边界验证脚本`
+`R1-02 边界验证脚本：完成 CI 接入与最终 Windows 自动化门禁并关闭节点`

@@ -2,7 +2,7 @@
   "contract_id": "football.module-boundaries.v1",
   "version": "1.0.0",
   "task": "R1-01",
-  "status": "VERIFYING",
+  "status": "ACTIVE",
   "baseline": {
     "source_branch": "new-A",
     "branch": "new-B",
@@ -17,7 +17,12 @@
     "production_dependency_changes": false,
     "command_contract": "architecture/command-contract.json",
     "state_contract": "architecture/state-ownership.json",
-    "validator_task": "R1-02"
+    "validator_task": "R1-02",
+    "validators": {
+      "module_boundaries": "scripts/architecture/verifyModuleBoundaries.mjs",
+      "state_ownership": "scripts/architecture/verifyStateOwnership.mjs",
+      "protected_imports": "scripts/architecture/verifyProtectedImports.mjs"
+    }
   },
   "frontend": {
     "entry": {
@@ -54,40 +59,187 @@
       ]
     },
     "features": {
-      "analytics": {"owner": "src/pages/analytics.ts", "route": "analytics"},
-      "api-workspace": {"owner": "src/pages/apiWorkspace.ts", "route": "api_workspace"},
-      "architecture": {"owner": "src/pages/architecture.ts", "route": "architecture"},
-      "dashboard": {"owner": "src/pages/dashboard.ts", "route": "dashboard"},
-      "database": {"owner": "src/pages/database.ts", "route": "database"},
-      "lineup-presets": {"owner": "src/pages/lineupPresets.ts", "route": "lineup_presets"},
-      "lineups": {"owner": "src/pages/lineups.ts", "route": "lineups"},
-      "logs": {"owner": "src/pages/logs.ts", "route": "logs"},
-      "openai": {"owner": "src/pages/openai.ts", "route": "openai"},
-      "p4-workbench": {"owner": "src/pages/p4Workbench.ts", "route": null},
-      "players": {"owner": "src/pages/players.ts", "route": "players"},
-      "prediction": {"owner": "src/pages/prediction.ts", "route": "prediction"},
-      "release": {"owner": "src/pages/release.ts", "route": "release"},
-      "review": {"owner": "src/pages/review.ts", "route": "review"},
-      "rules": {"owner": "src/pages/rules.ts", "route": "rules"},
-      "runs": {"owner": "src/pages/runs.ts", "route": "runs"},
-      "teams": {"owner": "src/pages/teams.ts", "route": "teams"},
-      "workbooks": {"owner": "src/pages/workbooks.ts", "route": "workbooks"}
-    }
+      "analytics": {
+        "owner": "src/pages/analytics.ts",
+        "route": "analytics"
+      },
+      "api-workspace": {
+        "owner": "src/pages/apiWorkspace.ts",
+        "route": "api_workspace"
+      },
+      "architecture": {
+        "owner": "src/pages/architecture.ts",
+        "route": "architecture"
+      },
+      "dashboard": {
+        "owner": "src/pages/dashboard.ts",
+        "route": "dashboard"
+      },
+      "database": {
+        "owner": "src/pages/database.ts",
+        "route": "database"
+      },
+      "lineup-presets": {
+        "owner": "src/pages/lineupPresets.ts",
+        "route": "lineup_presets"
+      },
+      "lineups": {
+        "owner": "src/pages/lineups.ts",
+        "route": "lineups"
+      },
+      "logs": {
+        "owner": "src/pages/logs.ts",
+        "route": "logs"
+      },
+      "openai": {
+        "owner": "src/pages/openai.ts",
+        "route": "openai"
+      },
+      "p4-workbench": {
+        "owner": "src/pages/p4Workbench.ts",
+        "route": null
+      },
+      "players": {
+        "owner": "src/pages/players.ts",
+        "route": "players"
+      },
+      "prediction": {
+        "owner": "src/pages/prediction.ts",
+        "route": "prediction"
+      },
+      "release": {
+        "owner": "src/pages/release.ts",
+        "route": "release"
+      },
+      "review": {
+        "owner": "src/pages/review.ts",
+        "route": "review"
+      },
+      "rules": {
+        "owner": "src/pages/rules.ts",
+        "route": "rules"
+      },
+      "runs": {
+        "owner": "src/pages/runs.ts",
+        "route": "runs"
+      },
+      "teams": {
+        "owner": "src/pages/teams.ts",
+        "route": "teams"
+      },
+      "workbooks": {
+        "owner": "src/pages/workbooks.ts",
+        "route": "workbooks"
+      }
+    },
+    "transitional_imports": [
+      {
+        "from_feature": "prediction",
+        "importer": "src/pages/prediction.ts",
+        "to_feature": "p4-workbench",
+        "target": "src/pages/p4Workbench.ts",
+        "reason": "prediction currently composes the P4 research workbench page renderer",
+        "exit_task": "R14-06"
+      },
+      {
+        "from_feature": "prediction",
+        "importer": "src/pages/prediction.ts",
+        "to_feature": "runs",
+        "target": "src/pages/runs.ts",
+        "reason": "prediction currently composes the run history page renderer",
+        "exit_task": "R14-07"
+      }
+    ]
   },
   "rust": {
     "workspace": "Cargo.toml",
     "crates": {
-      "football-domain": {"root": "crates/domain", "role": "domain model and pure domain contracts", "allowed_workspace_dependencies": []},
-      "football-model-api": {"root": "crates/model-api", "role": "public model port and model DTO contract", "allowed_workspace_dependencies": ["football-domain"]},
-      "football-model-stub": {"root": "crates/model-stub", "role": "public external-provider model adapter stub", "allowed_workspace_dependencies": ["football-domain", "football-model-api"]},
-      "football-research-gateway": {"root": "crates/research-gateway", "role": "OpenAI-compatible research gateway, transport and credential boundary", "allowed_workspace_dependencies": []},
-      "football-analytics-engine": {"root": "crates/analytics-engine", "role": "pure analytics calculations", "allowed_workspace_dependencies": ["football-domain"]},
-      "football-analysis-package": {"root": "crates/analysis-package", "role": "AI analysis package serialization and archive I/O", "allowed_workspace_dependencies": ["football-domain"]},
-      "football-review-engine": {"root": "crates/review-engine", "role": "pure match review calculations", "allowed_workspace_dependencies": ["football-domain"]},
-      "football-spreadsheet-io": {"root": "crates/spreadsheet-io", "role": "spreadsheet import/export adapter", "allowed_workspace_dependencies": ["football-domain"]},
-      "football-persistence-postgres": {"root": "crates/persistence-postgres", "role": "PostgreSQL persistence adapter and migrations", "allowed_workspace_dependencies": ["football-domain", "football-analytics-engine", "football-model-api", "football-review-engine"]},
-      "football-application": {"root": "crates/application", "role": "application use cases, orchestration and runtime service state", "allowed_workspace_dependencies": ["football-analysis-package", "football-domain", "football-model-api", "football-model-stub", "football-research-gateway", "football-persistence-postgres", "football-spreadsheet-io"]},
-      "football-match-model-desktop": {"root": "src-tauri", "role": "Tauri composition root, command adapters and desktop-owned stores", "allowed_workspace_dependencies": ["football-application", "football-domain", "football-persistence-postgres", "football-research-gateway"]}
+      "football-domain": {
+        "root": "crates/domain",
+        "role": "domain model and pure domain contracts",
+        "allowed_workspace_dependencies": []
+      },
+      "football-model-api": {
+        "root": "crates/model-api",
+        "role": "public model port and model DTO contract",
+        "allowed_workspace_dependencies": [
+          "football-domain"
+        ]
+      },
+      "football-model-stub": {
+        "root": "crates/model-stub",
+        "role": "public external-provider model adapter stub",
+        "allowed_workspace_dependencies": [
+          "football-domain",
+          "football-model-api"
+        ]
+      },
+      "football-research-gateway": {
+        "root": "crates/research-gateway",
+        "role": "OpenAI-compatible research gateway, transport and credential boundary",
+        "allowed_workspace_dependencies": []
+      },
+      "football-analytics-engine": {
+        "root": "crates/analytics-engine",
+        "role": "pure analytics calculations",
+        "allowed_workspace_dependencies": [
+          "football-domain"
+        ]
+      },
+      "football-analysis-package": {
+        "root": "crates/analysis-package",
+        "role": "AI analysis package serialization and archive I/O",
+        "allowed_workspace_dependencies": [
+          "football-domain"
+        ]
+      },
+      "football-review-engine": {
+        "root": "crates/review-engine",
+        "role": "pure match review calculations",
+        "allowed_workspace_dependencies": [
+          "football-domain"
+        ]
+      },
+      "football-spreadsheet-io": {
+        "root": "crates/spreadsheet-io",
+        "role": "spreadsheet import/export adapter",
+        "allowed_workspace_dependencies": [
+          "football-domain"
+        ]
+      },
+      "football-persistence-postgres": {
+        "root": "crates/persistence-postgres",
+        "role": "PostgreSQL persistence adapter and migrations",
+        "allowed_workspace_dependencies": [
+          "football-domain",
+          "football-analytics-engine",
+          "football-model-api",
+          "football-review-engine"
+        ]
+      },
+      "football-application": {
+        "root": "crates/application",
+        "role": "application use cases, orchestration and runtime service state",
+        "allowed_workspace_dependencies": [
+          "football-analysis-package",
+          "football-domain",
+          "football-model-api",
+          "football-model-stub",
+          "football-research-gateway",
+          "football-persistence-postgres",
+          "football-spreadsheet-io"
+        ]
+      },
+      "football-match-model-desktop": {
+        "root": "src-tauri",
+        "role": "Tauri composition root, command adapters and desktop-owned stores",
+        "allowed_workspace_dependencies": [
+          "football-application",
+          "football-domain",
+          "football-persistence-postgres",
+          "football-research-gateway"
+        ]
+      }
     },
     "rules": {
       "domain": "football-domain has no workspace dependency",
@@ -99,16 +251,65 @@
       "cycles": "forbidden"
     },
     "ports": {
-      "PredictionModel": {"owner": "crates/model-api/src/lib.rs", "adapter": "crates/model-stub/src/lib.rs", "consumer": "crates/application/src/lib.rs::ModelRegistry"},
-      "OpenAiTransport": {"owner": "crates/research-gateway/src/client.rs", "adapter": "ReqwestTransport"},
-      "GatewayAttemptSink": {"owner": "crates/research-gateway/src/client.rs", "adapters": ["NoopAttemptSink", "application persistence sink"]},
-      "ApiKeyProvider": {"owner": "crates/research-gateway/src/credentials.rs", "adapter": "DefaultApiKeyProvider"}
+      "PredictionModel": {
+        "owner": "crates/model-api/src/lib.rs",
+        "adapter": "crates/model-stub/src/lib.rs",
+        "consumer": "crates/application/src/lib.rs::ModelRegistry"
+      },
+      "OpenAiTransport": {
+        "owner": "crates/research-gateway/src/client.rs",
+        "adapter": "ReqwestTransport"
+      },
+      "GatewayAttemptSink": {
+        "owner": "crates/research-gateway/src/client.rs",
+        "adapters": [
+          "NoopAttemptSink",
+          "application persistence sink"
+        ]
+      },
+      "ApiKeyProvider": {
+        "owner": "crates/research-gateway/src/credentials.rs",
+        "adapter": "DefaultApiKeyProvider"
+      }
     },
     "persistence": {
       "owner": "crates/persistence-postgres/src/lib.rs::PostgresStore",
       "pool_owner": "PostgresStore.pool",
       "migration_root": "migrations",
-      "adapter_modules": ["analytics", "api_workspace", "competitions", "connection", "dynamic_tags", "entity_catalog", "fact_pipeline_records", "formation_catalog", "jobs", "lineup_chain", "match_exchange", "match_prediction", "match_review_package", "model_runs", "monthly_workbooks", "name_search", "p4_orchestration", "p4_records", "p4_workbench", "parameter_lifecycle", "player_catalog", "postmatch", "release_acceptance", "research_gateway_records", "review", "role_resolution", "routing", "spreadsheet_exchange", "team_catalog", "team_features", "team_force_delete", "team_lineup_presets"]
+      "adapter_modules": [
+        "analytics",
+        "api_workspace",
+        "competitions",
+        "connection",
+        "dynamic_tags",
+        "entity_catalog",
+        "fact_pipeline_records",
+        "formation_catalog",
+        "jobs",
+        "lineup_chain",
+        "match_exchange",
+        "match_prediction",
+        "match_review_package",
+        "model_runs",
+        "monthly_workbooks",
+        "name_search",
+        "p4_orchestration",
+        "p4_records",
+        "p4_workbench",
+        "parameter_lifecycle",
+        "player_catalog",
+        "postmatch",
+        "release_acceptance",
+        "research_gateway_records",
+        "review",
+        "role_resolution",
+        "routing",
+        "spreadsheet_exchange",
+        "team_catalog",
+        "team_features",
+        "team_force_delete",
+        "team_lineup_presets"
+      ]
     },
     "tauri_host": {
       "entry": "src-tauri/src/lib.rs::run",
@@ -139,13 +340,55 @@
       "review": "src-tauri/src/commands/review.rs",
       "workspace": "src-tauri/src/commands/workspace.rs"
     },
-    "rules": ["names/parameters/returns/order frozen", "no dynamic command names", "commands delegate orchestration to football-application", "commands own no database pool/model registry/browser state"]
+    "rules": [
+      "names/parameters/returns/order frozen",
+      "no dynamic command names",
+      "commands delegate orchestration to football-application",
+      "commands own no database pool/model registry/browser state"
+    ]
   },
   "forbidden_edges": [
-    {"from": "src/**", "to": ["src-tauri/**", "crates/**", "migrations/**"]},
-    {"from": ["crates/domain/**", "crates/model-api/**"], "to": ["crates/persistence-postgres/**", "src-tauri/**"]},
-    {"from": "src-tauri/src/commands/**", "to": "new independent shared state"},
-    {"from": "public modules", "to": "private P4/P7 assets"}
+    {
+      "from": "src/**",
+      "to": [
+        "src-tauri/**",
+        "crates/**",
+        "migrations/**"
+      ]
+    },
+    {
+      "from": [
+        "crates/domain/**",
+        "crates/model-api/**"
+      ],
+      "to": [
+        "crates/persistence-postgres/**",
+        "src-tauri/**"
+      ]
+    },
+    {
+      "from": "src-tauri/src/commands/**",
+      "to": "new independent shared state"
+    },
+    {
+      "from": "public modules",
+      "to": "private P4/P7 assets"
+    }
   ],
-  "counts": {"frontend_features": 18, "workspace_members": 11, "ports": 4, "postgres_adapters": 32, "command_groups": 15, "commands": 171}
+  "counts": {
+    "frontend_features": 18,
+    "workspace_members": 11,
+    "ports": 4,
+    "postgres_adapters": 32,
+    "command_groups": 15,
+    "commands": 171
+  },
+  "transitional_edges": [
+    {
+      "from": "football-application",
+      "to": "football-persistence-postgres",
+      "reason": "existing application persistence coupling retained until the application composition task",
+      "exit_task": "R1-05"
+    }
+  ]
 }

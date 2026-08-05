@@ -2,7 +2,7 @@
   "contract_id": "football.state-ownership.v1",
   "version": "1.0.0",
   "task": "R1-01",
-  "status": "VERIFYING",
+  "status": "ACTIVE",
   "baseline": {
     "source_branch": "new-A",
     "branch": "new-B",
@@ -14,7 +14,8 @@
     "writers_use_owner_api": true,
     "readers_do_not_mutate": true,
     "parallel_or_shadow_owner": false,
-    "transition_is_non_authoritative_until_task_done": true
+    "transition_is_non_authoritative_until_task_done": true,
+    "validator": "scripts/architecture/verifyStateOwnership.mjs"
   },
   "field_guide": {
     "owner": "only current authoritative owner",
@@ -24,23 +25,230 @@
     "transition": "planned target; not current owner"
   },
   "states": [
-    {"id": "browser.lifecycle", "owner": "src/main.ts", "scope": "browser-window", "writers": ["src/main.ts"], "forbidden": ["src/pages/**", "src/components/**"], "transition": "R1-03:src/bootstrap/browserApp.ts"},
-    {"id": "browser.navigation", "owner": "src/app/navigation.ts::NavigationCoordinator", "scope": "browser-window", "writers": ["NavigationCoordinator methods"], "forbidden": ["src/pages/**", "src/api/**"], "transition": null},
-    {"id": "browser.workspace", "owner": "src/app/viewState.ts::WorkspaceStateStore", "scope": "browser-window+persistent", "writers": ["WorkspaceStateStore methods"], "forbidden": ["src/pages/**", "src/api/client.ts"], "transition": null},
-    {"id": "browser.modal-history", "owner": "src/app/modal.ts::ModalController", "scope": "browser-window", "writers": ["ModalController methods"], "forbidden": ["src/pages/**", "src/components/**"], "transition": null},
-    {"id": "browser.local-preferences", "owner": "src/main.ts localStorage keys", "scope": "browser-profile", "writers": ["src/main.ts"], "forbidden": ["src/pages/**", "src/api/**"], "transition": "later feature state adapters"},
-    {"id": "application.model-registry", "owner": "crates/application/src/lib.rs::ModelRegistry", "scope": "ApplicationService", "writers": ["ModelRegistry.register"], "forbidden": ["src-tauri/src/commands/**", "crates/persistence-postgres/**"], "transition": "R1-05:application model registry shell"},
-    {"id": "application.active-database", "owner": "crates/application/src/lib.rs::ApplicationService.database", "scope": "ApplicationService", "writers": ["football-application database use cases"], "forbidden": ["src-tauri/src/commands/**", "src/**", "crates/domain/**"], "transition": null},
-    {"id": "application.p4-worker", "owner": "crates/application/src/lib.rs::ApplicationService.p4_worker_running", "scope": "ApplicationService", "writers": ["football-application p4 orchestration"], "forbidden": ["src-tauri/src/commands/**", "src/**"], "transition": null},
-    {"id": "persistence.pg-pool", "owner": "crates/persistence-postgres/src/lib.rs::PostgresStore.pool", "scope": "PostgresStore", "writers": ["crates/persistence-postgres/src/connection.rs"], "forbidden": ["crates/application/**", "src-tauri/**", "src/**"], "transition": null},
-    {"id": "tauri.app-state", "owner": "src-tauri/src/commands.rs::AppState", "scope": "Tauri application", "writers": ["src-tauri/src/lib.rs::run.setup"], "forbidden": ["command module static state"], "transition": "R1-04:tauri state shell"},
-    {"id": "tauri.database-config-path", "owner": "AppState.config_path", "scope": "Tauri application", "writers": ["src-tauri/src/lib.rs::run.setup"], "forbidden": ["src/**", "crates/domain/**"], "transition": null},
-    {"id": "tauri.issue-log", "owner": "src-tauri/src/issue_log.rs::IssueLogStore", "scope": "Tauri application", "writers": ["src-tauri/src/commands/issues.rs"], "forbidden": ["src/**", "crates/application/**"], "transition": null},
-    {"id": "tauri.runtime-log", "owner": "src-tauri/src/runtime_log.rs::RuntimeLogStore", "scope": "Tauri session", "writers": ["src-tauri bootstrap and command adapters"], "forbidden": ["src/**", "crates/domain/**"], "transition": null},
-    {"id": "tauri.openai-profiles", "owner": "src-tauri/src/openai_profiles.rs::OpenAiProfileStore", "scope": "Tauri application", "writers": ["src-tauri/src/commands/openai.rs"], "forbidden": ["src/**", "crates/domain/**"], "transition": null},
-    {"id": "tauri.workspace-state", "owner": "src-tauri/src/workspace_state.rs::WorkspaceStateStore", "scope": "Tauri application", "writers": ["src-tauri/src/commands/workspace.rs"], "forbidden": ["src/pages/**", "crates/application/**"], "transition": null},
-    {"id": "tauri.api-requests", "owner": "AppState.api_workspace_requests", "scope": "Tauri application", "writers": ["src-tauri/src/commands/api_workspace.rs"], "forbidden": ["src/**", "module static maps"], "transition": null},
-    {"id": "os.openai-api-key", "owner": "Windows Credential Manager", "scope": "Windows user", "writers": ["research_gateway credential functions"], "forbidden": ["profile JSON", "workspace state", "logs", "localStorage"], "transition": null}
+    {
+      "id": "browser.lifecycle",
+      "owner": "src/main.ts",
+      "scope": "browser-window",
+      "writers": [
+        "src/main.ts"
+      ],
+      "forbidden": [
+        "src/pages/**",
+        "src/components/**"
+      ],
+      "transition": "R1-03:src/bootstrap/browserApp.ts"
+    },
+    {
+      "id": "browser.navigation",
+      "owner": "src/app/navigation.ts::NavigationCoordinator",
+      "scope": "browser-window",
+      "writers": [
+        "NavigationCoordinator methods"
+      ],
+      "forbidden": [
+        "src/pages/**",
+        "src/api/**"
+      ],
+      "transition": null
+    },
+    {
+      "id": "browser.workspace",
+      "owner": "src/app/viewState.ts::WorkspaceStateStore",
+      "scope": "browser-window+persistent",
+      "writers": [
+        "WorkspaceStateStore methods"
+      ],
+      "forbidden": [
+        "src/pages/**",
+        "src/api/client.ts"
+      ],
+      "transition": null
+    },
+    {
+      "id": "browser.modal-history",
+      "owner": "src/app/modal.ts::ModalController",
+      "scope": "browser-window",
+      "writers": [
+        "ModalController methods"
+      ],
+      "forbidden": [
+        "src/pages/**",
+        "src/components/**"
+      ],
+      "transition": null
+    },
+    {
+      "id": "browser.local-preferences",
+      "owner": "src/main.ts localStorage keys",
+      "scope": "browser-profile",
+      "writers": [
+        "src/main.ts"
+      ],
+      "forbidden": [
+        "src/pages/**",
+        "src/api/**"
+      ],
+      "transition": "later feature state adapters"
+    },
+    {
+      "id": "application.model-registry",
+      "owner": "crates/application/src/lib.rs::ModelRegistry",
+      "scope": "ApplicationService",
+      "writers": [
+        "ModelRegistry.register"
+      ],
+      "forbidden": [
+        "src-tauri/src/commands/**",
+        "crates/persistence-postgres/**"
+      ],
+      "transition": "R1-05:application model registry shell"
+    },
+    {
+      "id": "application.active-database",
+      "owner": "crates/application/src/lib.rs::ApplicationService.database",
+      "scope": "ApplicationService",
+      "writers": [
+        "football-application database use cases"
+      ],
+      "forbidden": [
+        "src-tauri/src/commands/**",
+        "src/**",
+        "crates/domain/**"
+      ],
+      "transition": null
+    },
+    {
+      "id": "application.p4-worker",
+      "owner": "crates/application/src/lib.rs::ApplicationService.p4_worker_running",
+      "scope": "ApplicationService",
+      "writers": [
+        "football-application p4 orchestration"
+      ],
+      "forbidden": [
+        "src-tauri/src/commands/**",
+        "src/**"
+      ],
+      "transition": null
+    },
+    {
+      "id": "persistence.pg-pool",
+      "owner": "crates/persistence-postgres/src/lib.rs::PostgresStore.pool",
+      "scope": "PostgresStore",
+      "writers": [
+        "crates/persistence-postgres/src/connection.rs"
+      ],
+      "forbidden": [
+        "crates/application/**",
+        "src-tauri/**",
+        "src/**"
+      ],
+      "transition": null
+    },
+    {
+      "id": "tauri.app-state",
+      "owner": "src-tauri/src/commands.rs::AppState",
+      "scope": "Tauri application",
+      "writers": [
+        "src-tauri/src/lib.rs::run.setup"
+      ],
+      "forbidden": [
+        "command module static state"
+      ],
+      "transition": "R1-04:tauri state shell"
+    },
+    {
+      "id": "tauri.database-config-path",
+      "owner": "AppState.config_path",
+      "scope": "Tauri application",
+      "writers": [
+        "src-tauri/src/lib.rs::run.setup"
+      ],
+      "forbidden": [
+        "src/**",
+        "crates/domain/**"
+      ],
+      "transition": null
+    },
+    {
+      "id": "tauri.issue-log",
+      "owner": "src-tauri/src/issue_log.rs::IssueLogStore",
+      "scope": "Tauri application",
+      "writers": [
+        "src-tauri/src/commands/issues.rs"
+      ],
+      "forbidden": [
+        "src/**",
+        "crates/application/**"
+      ],
+      "transition": null
+    },
+    {
+      "id": "tauri.runtime-log",
+      "owner": "src-tauri/src/runtime_log.rs::RuntimeLogStore",
+      "scope": "Tauri session",
+      "writers": [
+        "src-tauri bootstrap and command adapters"
+      ],
+      "forbidden": [
+        "src/**",
+        "crates/domain/**"
+      ],
+      "transition": null
+    },
+    {
+      "id": "tauri.openai-profiles",
+      "owner": "src-tauri/src/openai_profiles.rs::OpenAiProfileStore",
+      "scope": "Tauri application",
+      "writers": [
+        "src-tauri/src/commands/openai.rs"
+      ],
+      "forbidden": [
+        "src/**",
+        "crates/domain/**"
+      ],
+      "transition": null
+    },
+    {
+      "id": "tauri.workspace-state",
+      "owner": "src-tauri/src/workspace_state.rs::WorkspaceStateStore",
+      "scope": "Tauri application",
+      "writers": [
+        "src-tauri/src/commands/workspace.rs"
+      ],
+      "forbidden": [
+        "src/pages/**",
+        "crates/application/**"
+      ],
+      "transition": null
+    },
+    {
+      "id": "tauri.api-requests",
+      "owner": "AppState.api_workspace_requests",
+      "scope": "Tauri application",
+      "writers": [
+        "src-tauri/src/commands/api_workspace.rs"
+      ],
+      "forbidden": [
+        "src/**",
+        "module static maps"
+      ],
+      "transition": null
+    },
+    {
+      "id": "os.openai-api-key",
+      "owner": "Windows Credential Manager",
+      "scope": "Windows user",
+      "writers": [
+        "research_gateway credential functions"
+      ],
+      "forbidden": [
+        "profile JSON",
+        "workspace state",
+        "logs",
+        "localStorage"
+      ],
+      "transition": null
+    }
   ],
   "count": 17
 }
