@@ -42,11 +42,17 @@ jobs:
         shell: pwsh
         run: |
           $source = [System.IO.File]::ReadAllText("scripts/r1-04-apply.mjs", [System.Text.Encoding]::UTF8)
-          $old = "run(npm,['run','verify:architecture']);"
-          $replacement = "run(process.execPath,['scripts/architecture/verifyModuleBoundaries.mjs']);run(process.execPath,['scripts/architecture/verifyStateOwnership.mjs']);run(process.execPath,['scripts/architecture/verifyProtectedImports.mjs']);"
-          if (-not $source.Contains($old)) {
+          $architectureOld = "run(npm,['run','verify:architecture']);"
+          $architectureReplacement = "run(process.execPath,['scripts/architecture/verifyModuleBoundaries.mjs']);run(process.execPath,['scripts/architecture/verifyStateOwnership.mjs']);run(process.execPath,['scripts/architecture/verifyProtectedImports.mjs']);"
+          $formatOld = "run('cargo',['fmt','--all']);"
+          $formatReplacement = "run('rustfmt',['--edition','2021','src-tauri/src/bootstrap/mod.rs','src-tauri/src/bootstrap/application.rs','src-tauri/src/bootstrap/state.rs','src-tauri/src/bootstrap/command_registry.rs','src-tauri/src/bootstrap/error.rs','src-tauri/src/lib.rs','src-tauri/src/commands.rs']);"
+          if (-not $source.Contains($architectureOld)) {
             throw "R1-04 architecture invocation anchor missing"
           }
+          if (-not $source.Contains($formatOld)) {
+            throw "R1-04 format invocation anchor missing"
+          }
+          $patched = $source.Replace($architectureOld, $architectureReplacement).Replace($formatOld, $formatReplacement)
           $executionPath = Join-Path $env:GITHUB_WORKSPACE ".git\r1-04-apply.mjs"
-          [System.IO.File]::WriteAllText($executionPath, $source.Replace($old, $replacement), [System.Text.UTF8Encoding]::new($false))
+          [System.IO.File]::WriteAllText($executionPath, $patched, [System.Text.UTF8Encoding]::new($false))
           node $executionPath
