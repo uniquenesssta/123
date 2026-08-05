@@ -1,0 +1,61 @@
+name: R0-09 Workspace Tests Temporary
+
+on:
+  pull_request:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+jobs:
+  workspace-tests:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - name: Checkout implementation branch
+        uses: actions/checkout@v4
+        with:
+          ref: new-A
+          fetch-depth: 2
+
+      - name: Install Tauri Linux system packages
+        shell: bash
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            build-essential \
+            curl \
+            file \
+            libayatana-appindicator3-dev \
+            librsvg2-dev \
+            libssl-dev \
+            libwebkit2gtk-4.1-dev \
+            libxdo-dev \
+            wget
+
+      - name: Set up Rust 1.88.0
+        uses: dtolnay/rust-toolchain@1.88.0
+        with:
+          components: rustfmt, clippy
+
+      - name: Run all workspace tests without fail-fast
+        shell: bash
+        run: |
+          mkdir -p r0-09-evidence
+          set -o pipefail
+          set +e
+          cargo test --locked --workspace --no-fail-fast 2>&1 | tee r0-09-evidence/workspace-tests.txt
+          status=${PIPESTATUS[0]}
+          set -e
+          printf 'workspace_tests_exit_code=%s\n' "$status" > r0-09-evidence/summary.txt
+          exit 0
+
+      - name: Upload R0-09 diagnostics
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: r00-09-workspace-tests
+          path: r0-09-evidence/**
+          if-no-files-found: error
+          retention-days: 30
