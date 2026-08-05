@@ -165,8 +165,9 @@ def main() -> None:
     update_task_doc()
     (ROOT / 'scripts/r1-03-close.py').unlink()
     (ROOT / '.github/workflows/r1-03-close.yml').unlink()
-    run('npm', 'run', 'verify:architecture')
-    run('npm', 'run', 'verify:frontend')
+    npm = 'npm.cmd' if os.name == 'nt' else 'npm'
+    run(npm, 'run', 'verify:architecture')
+    run(npm, 'run', 'verify:frontend')
     changed = set(run('git', 'status', '--porcelain', capture=True).splitlines())
     expected_suffixes = {
         'README.md',
@@ -178,7 +179,7 @@ def main() -> None:
     actual = {line[3:] for line in changed}
     if actual != expected_suffixes:
         raise RuntimeError(f'unexpected close paths: {sorted(actual)}')
-    run('git', 'config', 'user.name','github-actions[bot]')
+    run('git', 'config', 'user.name', 'github-actions[bot]')
     run('git', 'config', 'user.email', '41898282+github-actions[bot]@users.noreply.github.com')
     run('git', 'add', '--all')
     run('git', 'commit', '-m', 'docs(r1): close R1-03 browser composition root')
