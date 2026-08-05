@@ -509,6 +509,7 @@ mod tests {
         assert_eq!(schema.schema_body["additionalProperties"], false);
         assert!(built_in_research_prompt()
             .content
+            .to_ascii_lowercase()
             .contains("do not calculate probabilities"));
     }
 }

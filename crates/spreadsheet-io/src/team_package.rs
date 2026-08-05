@@ -2036,6 +2036,7 @@ mod tests {
         let mut workbook = Workbook::new();
         let sheet = workbook.add_worksheet();
         sheet.set_name("球员与评分").expect("set player sheet name");
+        write_group_row(sheet, &[(0, 1, "操作")]).expect("write player group row");
         write_key_row(sheet, PLAYER_KEYS).expect("write player keys");
 
         let zero_based_physical_row = 7_u32;
