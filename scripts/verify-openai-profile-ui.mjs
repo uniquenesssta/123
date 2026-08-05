@@ -27,7 +27,8 @@ const client = read("src/api/client.ts");
 const main = read("src/main.ts");
 const shell = read("src/app/shell.ts");
 const navigation = read("src/app/navigation.ts");
-const desktop = read("src-tauri/src/lib.rs");
+const commandRegistry = read("src-tauri/src/bootstrap/command_registry.rs");
+const desktopState = read("src-tauri/src/bootstrap/state.rs");
 const commands = read("src-tauri/src/commands/openai.rs");
 const store = read("src-tauri/src/openai_profiles.rs");
 const credentials = read("crates/research-gateway/src/credentials.rs");
@@ -65,7 +66,7 @@ assert(readme.includes(`版本 **${packageJson.version}**`), "README版本不一
 for (const artifact of contract.artifacts) assert(existsSync(join(root, artifact)), `缺少兼容API配置制品：${artifact}`);
 for (const command of contract.commands) {
   assert(client.includes(`"${command}"`), `前端API未调用${command}`);
-  assert(desktop.includes(`commands::${command}`), `Tauri未注册${command}`);
+  assert(commandRegistry.includes(`commands::${command}`), `Tauri未注册${command}`);
   assert(commands.includes(`fn ${command}`), `命令源码缺少${command}`);
 }
 
@@ -81,7 +82,7 @@ assert(main.includes("parseOpenAiApiExampleNow"), "前端缺少API Example实时
 assert(main.includes("openAiApiExampleTimer"), "API Example解析未使用防抖");
 assert(client.includes("parseOpenAiApiExample"), "前端客户端缺少API Example解析命令");
 
-assert(desktop.includes("openai-profiles.json"), "配置元数据未使用独立本机文件");
+assert(desktopState.includes("openai-profiles.json"), "配置元数据未使用独立本机文件");
 assert(store.includes("credential_target(profile_id)"), "密钥未按配置档案隔离");
 assert(store.includes("api_key_mask"), "已保存密钥未返回掩码状态");
 assert(store.includes("connection_settings_changed"), "连接参数变化后未失效旧测试状态");
