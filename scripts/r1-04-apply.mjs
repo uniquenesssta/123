@@ -1,7 +1,7 @@
 import { execFileSync } from 'node:child_process';
 import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
-const root=process.cwd(), base='8db5f460f25887edac6a6bf95932de6c46164e9a';
+const root=process.cwd(), base='8db5f460f25887edac6a6bf95932de6c46164e9a', npm=process.platform==='win32'?'npm.cmd':'npm';
 const run=(c,a,capture=false)=>execFileSync(c,a,{cwd:root,encoding:'utf8',stdio:capture?['ignore','pipe','inherit']:'inherit'});
 const read=p=>readFileSync(join(root,p),'utf8');
 const write=(p,s)=>{const a=join(root,p);mkdirSync(dirname(a),{recursive:true});writeFileSync(a,s.replace(/\r\n/g,'\n'),'utf8');};
@@ -86,5 +86,5 @@ write('architecture/state-ownership.json',JSON.stringify(so,null,2)+'\n');
 write('scripts/verify-command-contract.mjs',read('scripts/verify-command-contract.mjs').replace('src-tauri/src/lib.rs','src-tauri/src/bootstrap/command_registry.rs'));
 let stage=read('docs/modular-rewrite/R01-architecture-composition/README.md');stage=stage.replace('| R1-04 | Tauri 组合根 | READY | 待创建 | 待执行 | 待执行 |','| R1-04 | Tauri 组合根 | VERIFYING | 待创建 | 最小门禁执行中 | Windows Automated 待验证 |').replace('`R1-04 Tauri 组合根`','`R1-04 Tauri 组合根：完成正式 Windows 自动化门禁并关闭节点`');write('docs/modular-rewrite/R01-architecture-composition/README.md',stage);
 let readme=read('README.md'), anchor='- R1-03 已建立 `src/bootstrap/` 浏览器组合根并切换 `index.html` 唯一入口；', at=readme.indexOf(anchor), end=readme.indexOf('\n',at);if(at<0)throw Error('README anchor missing');readme=readme.slice(0,end+1)+'- R1-04 已建立 `src-tauri/src/bootstrap/` Tauri 组合根，拆分 Builder、全局状态、171 条命令注册和启动错误映射；当前状态为 `VERIFYING`，正式 Windows Automated 通过前 R1-05 保持 `BLOCKED`。\n'+readme.slice(end+1);write('README.md',readme);
-run('cargo',['fmt','--all']);run('npm',['run','verify:architecture']);run(process.execPath,['scripts/verify_command_contract.mjs']);run(process.execPath,['scripts/verify-command-contract.mjs']);run(process.execPath,['scripts/verify_protected_assets.mjs']);run('cargo',['fmt','--all','--','--check']);run('cargo',['check','--locked','-p','football-match-model-desktop']);run('git',['diff','--check']);
+run('cargo',['fmt','--all']);run(npm,['run','verify:architecture']);run(process.execPath,['scripts/verify_command_contract.mjs']);run(process.execPath,['scripts/verify-command-contract.mjs']);run(process.execPath,['scripts/verify_protected_assets.mjs']);run('cargo',['fmt','--all','--','--check']);run('cargo',['check','--locked','-p','football-match-model-desktop']);run('git',['diff','--check']);
 run('git',['config','user.name','github-actions[bot]']);run('git',['config','user.email','41898282+github-actions[bot]@users.noreply.github.com']);run('git',['add','README.md','architecture','docs/modular-rewrite/R01-architecture-composition/README.md','scripts/verify-command-contract.mjs','src-tauri/src/bootstrap','src-tauri/src/commands.rs','src-tauri/src/lib.rs']);run('git',['commit','-m','refactor(r1): establish Tauri composition root']);run('git',['push','origin','HEAD:new-B']);
