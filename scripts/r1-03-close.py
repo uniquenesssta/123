@@ -168,7 +168,7 @@ def main() -> None:
     npm = 'npm.cmd' if os.name == 'nt' else 'npm'
     run(npm, 'run', 'verify:architecture')
     run(npm, 'run', 'verify:frontend')
-    changed = set(run('git', 'status', '--porcelain', capture=True).splitlines())
+    changed = set(run('git', '-c', 'core.quotepath=false', 'diff', '--name-only', '--no-renames', capture=True).splitlines())
     expected_suffixes = {
         'README.md',
         'docs/modular-rewrite/R01-architecture-composition/README.md',
@@ -176,14 +176,13 @@ def main() -> None:
         'scripts/r1-03-close.py',
         '.github/workflows/r1-03-close.yml',
     }
-    actual = {line[3:] for line in changed}
-    if actual != expected_suffixes:
-        raise RuntimeError(f'unexpected close paths: {sorted(actual)}')
+    if changed != expected_suffixes:
+        raise RuntimeError(f'unexpected close paths: {sorted(changed)}')
     run('git', 'config', 'user.name', 'github-actions[bot]')
     run('git', 'config', 'user.email', '41898282+github-actions[bot]@users.noreply.github.com')
     run('git', 'add', '--all')
     run('git', 'commit', '-m', 'docs(r1): close R1-03 browser composition root')
-    run('git', 'push', 'origin', 'HEAD:new-B')
+    run('git', 'push', 'origin','HEAD:new-B')
 
 
 if __name__ == '__main__':
