@@ -39,4 +39,14 @@ jobs:
         run: npm ci
 
       - name: Apply and verify R1-04
-        run: node scripts/r1-04-apply.mjs
+        shell: pwsh
+        run: |
+          $source = [System.IO.File]::ReadAllText("scripts/r1-04-apply.mjs", [System.Text.Encoding]::UTF8)
+          $old = "run(npm,['run','verify:architecture']);"
+          $replacement = "run(process.execPath,['scripts/architecture/verifyModuleBoundaries.mjs']);run(process.execPath,['scripts/architecture/verifyStateOwnership.mjs']);run(process.execPath,['scripts/architecture/verifyProtectedImports.mjs']);"
+          if (-not $source.Contains($old)) {
+            throw "R1-04 architecture invocation anchor missing"
+          }
+          $executionPath = Join-Path $env:GITHUB_WORKSPACE ".git\r1-04-apply.mjs"
+          [System.IO.File]::WriteAllText($executionPath, $source.Replace($old, $replacement), [System.Text.UTF8Encoding]::new($false))
+          node $executionPath
