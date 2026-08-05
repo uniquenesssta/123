@@ -8,9 +8,9 @@ const root = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const outerRoot = resolve(root, "..");
 const failures = [];
 const assert = (condition, message) => { if (!condition) failures.push(message); };
-const text = (path) => readFileSync(join(root, path), "utf8");
+const text = (path) => readFileSync(join(root, path), "utf8").replace(/\r\n?/g, "\n");
 const json = (path) => JSON.parse(text(path));
-const hash = (path) => createHash("sha256").update(readFileSync(join(root, path))).digest("hex");
+const hash = (path) => createHash("sha256").update(text(path), "utf8").digest("hex");
 
 const contractPath = "contracts/entity-relationship-contract.json";
 const contract = json(contractPath);
@@ -31,7 +31,7 @@ const main = text("src/main.ts");
 const teamsPage = text("src/pages/teams.ts");
 const playersPage = text("src/pages/players.ts");
 const types = text("src/types.ts");
-const readme = readFileSync(join(root, "README.md"), "utf8");
+const readme = text("README.md");
 
 assert(contract.contract_id === "football.entity-relationship-contract.v1", "阶段2实体关系契约ID错误");
 assert(contract.contract_version === "1.0.0", "阶段2实体关系契约版本错误");
