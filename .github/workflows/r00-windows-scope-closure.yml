@@ -30,7 +30,10 @@ jobs:
           mkdir -p r00-closure-evidence
           python .github/r00-windows-scope-closure.py
           git diff --check
-          { git diff --name-only; git ls-files --others --exclude-standard; } | sort -u > r00-closure-evidence/changed-files.txt
+          { git diff --name-only; git ls-files --others --exclude-standard; } \
+            | grep -v '^r00-closure-evidence/' \
+            | sort -u \
+            > r00-closure-evidence/changed-files.txt
           cat > r00-closure-evidence/expected-files.txt <<'EOF'
           README.md
           docs/modular-rewrite/R00-baseline/R00-stage-completion.md
