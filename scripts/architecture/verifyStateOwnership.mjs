@@ -1,4 +1,4 @@
-import { readText as readAbsoluteText } from "node:fs";
+import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import {
   extractRepositoryLocation,
@@ -56,7 +56,7 @@ function verifyOwnerSource(state) {
   report.check(pathExists(location), `${state.id} owner 文件不存在：${location}`);
   if (!pathExists(location)) return;
 
-  const source = readAbsoluteText(join(repositoryRoot, location), "utf8");
+  const source = readFileSync(join(repositoryRoot, location), "utf8");
   const suffix = state.owner.split("::")[1] ?? "";
   const symbol = suffix.split(".")[0].trim();
   if (symbol) report.check(source.includes(symbol), `${state.id} owner 符号未在 ${location} 中找到：${symbol}`);
