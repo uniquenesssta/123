@@ -58,3 +58,4 @@ jobs:
         run: python scripts/r1-02-activate.py
 
       # The activation workflow deletes itself after a successful guarded commit.
+      # Retry marker: all three source readers use readFileSync.
