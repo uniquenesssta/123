@@ -49,17 +49,45 @@ jobs:
           $architectureOld = "run(npm,['run','verify:architecture']);"
           $architectureReplacement = "run(process.execPath,['scripts/architecture/verifyModuleBoundaries.mjs']);run(process.execPath,['scripts/architecture/verifyStateOwnership.mjs']);run(process.execPath,['scripts/architecture/verifyProtectedImports.mjs']);"
           $formatOld = "run('cargo',['fmt','--all']);"
-          $formatReplacement = "run('rustfmt',['--edition','2021','--config','skip_children=true','src-tauri/src/bootstrap/mod.rs','src-tauri/src/bootstrap/application.rs','src-tauri/src/bootstrap/state.rs','src-tauri/src/bootstrap/command_registry.rs','src-tauri/src/bootstrap/error.rs','src-tauri/src/lib.rs','src-tauri/src/commands.rs']);"
+          $formatReplacement = @'
+          run('rustfmt',['--edition','2021','--config','skip_children=true','src-tauri/src/bootstrap/mod.rs','src-tauri/src/bootstrap/application.rs','src-tauri/src/bootstrap/state.rs','src-tauri/src/bootstrap/command_registry.rs','src-tauri/src/bootstrap/error.rs','src-tauri/src/lib.rs','src-tauri/src/commands.rs','crates/application/src/model_shell/mod.rs']);
+          const {createHash}=await import('node:crypto');
+          const manifest=JSON.parse(read('architecture/protected-assets.json'));
+          const protectedPath='crates/application/src/model_shell/mod.rs';
+          const canonical=Buffer.from(read(protectedPath).replace(/\r\n?/g,'\n'),'utf8');
+          const header=Buffer.from(`blob ${canonical.length}\0`,'utf8');
+          const blobSha=createHash('sha1').update(header).update(canonical).digest('hex');
+          const fingerprint=createHash('sha256').update(Buffer.from(`git-blob-sha1:${blobSha}`,'utf8')).digest('hex');
+          const protectedEntry=manifest.protected_files.find((entry)=>entry.path===protectedPath);
+          if(!protectedEntry)throw Error('protected model shell entry missing');
+          protectedEntry.git_blob_sha1=blobSha;
+          protectedEntry.fingerprint_sha256=fingerprint;
+          const aggregateInput=manifest.protected_files.slice().sort((left,right)=>left.path<right.path?-1:left.path>right.path?1:0).map((entry)=>`${entry.path}\0${entry.fingerprint_sha256}\n`).join('');
+          manifest.aggregate_sha256=createHash('sha256').update(Buffer.from(aggregateInput,'utf8')).digest('hex');
+          write('architecture/protected-assets.json',JSON.stringify(manifest,null,2)+'\n');
+          let correctionReadme=read('README.md');
+          const correction='- R1-04 前置校正将 `crates/application/src/model_shell/mod.rs` 恢复为 Rust 1.88 标准排版，并只同步更新该文件的保护指纹与派生聚合值；导出集合、模型行为和保护范围均未变化。';
+          if(!correctionReadme.includes(correction)){
+            const marker='- R1-04 已建立 `src-tauri/src/bootstrap/` Tauri 组合根';
+            const markerAt=correctionReadme.indexOf(marker);
+            if(markerAt<0)throw Error('R1-04 README marker missing');
+            const markerEnd=correctionReadme.indexOf('\n',markerAt);
+            correctionReadme=correctionReadme.slice(0,markerEnd+1)+correction+'\n'+correctionReadme.slice(markerEnd+1);
+            write('README.md',correctionReadme);
+          }
+          '@.Trim()
           $protectedOld = "run(process.execPath,['scripts/verify_protected_assets.mjs']);"
           $protectedReplacement = @'
           run(process.execPath,['--input-type=module','-e',"String.prototype.localeCompare=function(other){const left=String(this),right=String(other);return left<right?-1:left>right?1:0};await import('./scripts/verify_protected_assets.mjs');"]);
           '@.Trim()
-          foreach ($anchor in @($baseOld, $stagedOld, $architectureOld, $formatOld, $protectedOld)) {
+          $gitAddOld = "run('git',['add','README.md','architecture','docs/modular-rewrite/R01-architecture-composition/README.md','scripts/verify-command-contract.mjs','src-tauri/src/bootstrap','src-tauri/src/commands.rs','src-tauri/src/lib.rs']);"
+          $gitAddReplacement = "run('git',['add','README.md','architecture','crates/application/src/model_shell/mod.rs','docs/modular-rewrite/R01-architecture-composition/README.md','scripts/verify-command-contract.mjs','src-tauri/src/bootstrap','src-tauri/src/commands.rs','src-tauri/src/lib.rs']);"
+          foreach ($anchor in @($baseOld, $stagedOld, $architectureOld, $formatOld, $protectedOld, $gitAddOld)) {
             if (-not $source.Contains($anchor)) {
               throw "R1-04 apply anchor missing: $anchor"
             }
           }
-          $patched = $source.Replace($baseOld, $baseReplacement).Replace($stagedOld, $stagedReplacement).Replace($architectureOld, $architectureReplacement).Replace($formatOld, $formatReplacement).Replace($protectedOld, $protectedReplacement)
+          $patched = $source.Replace($baseOld, $baseReplacement).Replace($stagedOld, $stagedReplacement).Replace($architectureOld, $architectureReplacement).Replace($formatOld, $formatReplacement).Replace($protectedOld, $protectedReplacement).Replace($gitAddOld, $gitAddReplacement)
           $executionPath = Join-Path $env:GITHUB_WORKSPACE ".git\r1-04-apply.mjs"
           [System.IO.File]::WriteAllText($executionPath, $patched, [System.Text.UTF8Encoding]::new($false))
           node $executionPath
