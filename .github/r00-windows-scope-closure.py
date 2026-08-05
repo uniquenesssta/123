@@ -1,0 +1,184 @@
+from pathlib import Path
+
+
+def replace_exact(path: Path, old: str, new: str) -> None:
+    text = path.read_text(encoding="utf-8")
+    count = text.count(old)
+    if count != 1:
+        raise SystemExit(
+            f"Expected exactly one match in {path}, found {count}: {old[:80]!r}"
+        )
+    path.write_text(text.replace(old, new), encoding="utf-8")
+
+
+root = Path("README.md")
+replace_exact(
+    root,
+    "- R0-09 最终 artifact 为 `8915431192`，SHA-256 为 `a745bded71179bb6542d3a06b5c65f61cdf48845b8f88193dc7ef0ac5c8fcadc`；临时 workflow、patch 与 Draft PR #6 均已清理或关闭。\n",
+    "- R0-09 最终 artifact 为 `8915431192`，SHA-256 为 `a745bded71179bb6542d3a06b5c65f61cdf48845b8f88193dc7ef0ac5c8fcadc`；临时 workflow、patch 与 Draft PR #6 均已清理或关闭。\n- 用户于 2026-08-05 明确将目标平台收敛为 Windows，Linux Chromium 不再属于交付或阶段门禁；PostgreSQL 实跑、Windows Full 与用户本机实机验收统一延期到最终验收。R00 已完成并开放 R1，详见 `docs/modular-rewrite/R00-baseline/R00-stage-completion.md`。\n",
+)
+replace_exact(
+    root,
+    "R00 阶段仍为 **BLOCKED**。尚未关闭的硬缺口包括：Linux Chromium 启动失败；PostgreSQL 实跑和 Windows Full 未执行；用户本机 Windows 10/11 未实机验收。另保留 1 个 moderate npm vulnerability 和 Vite 大 chunk 警告。\n\n因此未创建 `R00-stage-completion.md`，不得进入 R1。下一唯一 READY 任务为 `R0-10 Linux Chromium 前端验收门禁修复`。完整事实记录见 `docs/modular-rewrite/R00-baseline/`。",
+    "R00 阶段已按 Windows-only 目标范围标记为 **DONE**。Linux Chromium 历史失败仅保留为非目标平台记录，不再阻塞后续重写。\n\nPostgreSQL 实跑、Windows Full 和用户本机 Windows 10/11 实机验收尚未执行，统一保留到最终验收，不得在后续阶段描述为已通过。另保留 1 个 moderate npm vulnerability 和 Vite 大 chunk 警告。\n\n已创建 `R00-stage-completion.md` 并进入 R1。下一唯一 READY 任务为 `R1-01 模块边界契约`；R1 状态见 `docs/modular-rewrite/R01-architecture-composition/README.md`。",
+)
+
+r00 = Path("docs/modular-rewrite/R00-baseline/README.md")
+replace_exact(
+    r00,
+    "- 已完成节点：`R0-01`、`R0-02`、`R0-03`、`R0-04（数据库实跑延期）`、`R0-05`、`R0-06`、`R0-06.1`、`R0-06.2`、`R0-07`、`R0-08`、`R0-09`",
+    "- 已完成节点：`R0-01`、`R0-02`、`R0-03`、`R0-04（数据库实跑延期）`、`R0-05`、`R0-06`、`R0-06.1`、`R0-06.2`、`R0-07`、`R0-08`、`R0-09`、`R00-stage-completion`",
+)
+replace_exact(
+    r00,
+    "- Linux `npm run verify:frontend` 失败于 Chromium 未开放调试端口。",
+    "- Linux `npm run verify:frontend` 曾失败于 Chromium 未开放调试端口；用户于 2026-08-05 明确取消 Linux 目标平台，该结果仅保留为历史记录，不再属于交付或阶段门禁。",
+)
+replace_exact(
+    r00,
+    "| R0-10 | Linux Chromium 前端验收门禁修复 | READY | 待创建 | 待执行 | 待执行 |",
+    "| R0-10 | Linux Chromium 前端验收门禁修复 | NOT_APPLICABLE | 不创建 | 用户取消 Linux 目标平台 | 不纳入阶段出口 |",
+)
+replace_exact(
+    r00,
+    "- R0-09 只修正两个测试契约，共新增 2 行，完整 Rust 门禁现已通过。\n",
+    "- R0-09 只修正两个测试契约，共新增 2 行，完整 Rust 门禁现已通过。\n- R00 按 Windows-only 范围完成收口；Linux 门禁取消，PostgreSQL 实跑、Windows Full 和用户本机实机验收统一转入最终验收。\n",
+)
+r00_text = r00.read_text(encoding="utf-8")
+tail_start = r00_text.index("## 未解决问题")
+new_tail = """## 最终验收保留项
+
+- PostgreSQL 迁移幂等、不可变触发器和 18 个集成测试尚未执行，按用户要求统一保留到最终验收。
+- Windows Full 和用户本机 Windows 10/11 实机验收尚未执行，统一保留到最终验收。
+- 1 个 moderate npm vulnerability 和 Vite 大 chunk 警告未处理，不阻塞 R1，但最终交付必须重新评估。
+- 用户设备上的未提交或未跟踪文件不可见；远端操作未覆盖这些本地内容。
+
+## 非目标平台记录
+
+- Linux Chromium 截图进程曾未开放调试端口。
+- 用户于 2026-08-05 明确取消 Linux 目标平台，因此不再修复、不纳入交付、不作为 R00 或后续阶段门禁。
+
+## 阶段门禁状态
+
+**DONE。** Windows Node/frontend、路径契约、Rust 格式、Clippy 和 workspace tests 门禁均已关闭。Linux 已从目标范围移除；PostgreSQL 实跑、Windows Full 和用户本机实机验收已明确延期到最终验收，不阻塞模块化重写。
+
+阶段完成记录：[`R00-stage-completion.md`](./R00-stage-completion.md)。
+
+## 下一 READY 任务
+
+`R1-01 模块边界契约` 是唯一 READY 任务。R1 阶段索引见 `../R01-architecture-composition/README.md`。
+"""
+r00.write_text(r00_text[:tail_start] + new_tail, encoding="utf-8")
+
+stage = Path("docs/modular-rewrite/R00-baseline/R00-stage-completion.md")
+stage.write_text(
+    """# R00 阶段完成记录
+
+## 完成结论
+
+R00 基线冻结与可重复验收阶段于 2026-08-05 按 Windows-only 目标范围完成，状态为 `DONE`。
+
+## 完成依据
+
+- 模型保护边界、公共命令契约和 46 个数据库迁移静态基线已冻结。
+- Windows `npm run verify:frontend` 已通过。
+- Windows release 构建与 RuntimeOnly startup 已通过，startup report 为 PASS。
+- `npm run verify:rust` 已完整通过：Cargo.lock、rustfmt、Clippy 和 workspace tests 全部通过。
+- workspace tests 结果为 185 通过、0 失败、18 忽略；18 个忽略项为延期的 PostgreSQL 集成测试。
+- R0-01 至 R0-09 均已建立独立实施记录。
+
+## 范围决策
+
+用户于 2026-08-05 明确只考虑 Windows，不再要求 Linux 支持。因此：
+
+- Linux Chromium 历史失败保留为非目标平台记录；
+- 不创建 R0-10 实施节点；
+- Linux 不再属于交付、兼容或阶段门禁范围。
+
+## 最终验收保留项
+
+以下项目尚未执行，不描述为通过，但不阻塞进入 R1：
+
+- PostgreSQL 迁移幂等、不可变触发器和 18 个集成测试；
+- Windows Full 全链路验收；
+- 用户本机 Windows 10/11 实机验收；
+- npm moderate vulnerability 与 Vite 大 chunk 警告复核。
+
+这些项目必须在最终统一验收中重新执行或明确处置。
+
+## 兼容性与保护边界
+
+- 未因阶段收口修改源码、依赖、锁文件、数据库迁移、公共接口、配置、错误语义或用户可观察行为。
+- 模型保护区继续冻结，不得在 R1 或后续阶段修改。
+- R1 仅建立架构契约与组合根空壳，不得提前迁移业务实现。
+
+## 下一阶段
+
+进入 `R1：架构契约与空壳组合根`。
+
+唯一 READY 任务：`R1-01 模块边界契约`。
+""",
+    encoding="utf-8",
+)
+
+r01 = Path("docs/modular-rewrite/R01-architecture-composition/README.md")
+r01.parent.mkdir(parents=True, exist_ok=True)
+r01.write_text(
+    """# R01 架构契约与空壳组合根：执行记录索引
+
+## 阶段状态
+
+`IN_PROGRESS`
+
+R00 已按 Windows-only 目标范围完成。R1 只建立可机器验证的架构边界和浏览器、Tauri、Application 组合根空壳，不迁移具体业务实现。
+
+## 前置基线
+
+- R00 阶段完成记录：[`../R00-baseline/R00-stage-completion.md`](../R00-baseline/R00-stage-completion.md)
+- R00 完成前分支提交：`ab812dc2cef126cc46fe9914a63815e047739d75`
+- 目标平台：Windows
+- Linux：不属于目标平台、交付或阶段门禁
+- PostgreSQL 实跑、Windows Full、用户本机 Windows 实机验收：保留到最终统一验收
+
+## 阶段范围
+
+- `architecture/module-boundaries.json`
+- `architecture/state-ownership.json`
+- `scripts/architecture/` 边界验证脚本
+- 浏览器 bootstrap 空壳
+- Tauri bootstrap/state/command registry 空壳
+- Application composition/service/model registry 空壳
+
+## 禁止范围
+
+- 不迁移具体 Feature、Domain 或 Repository 实现。
+- 不修改模型保护区。
+- 不改变 Tauri 命令名称、参数、返回类型、启动顺序、窗口行为或默认模型注册语义。
+- 不新增生产依赖。
+
+## 任务状态表
+
+| 任务 ID | 任务名称 | 状态 | 实施记录 | 最小验证 | 阶段回归 |
+|---|---|---|---|---|---|
+| R1-01 | 模块边界契约 | READY | 待创建 | 待执行 | 待执行 |
+| R1-02 | 边界验证脚本 | BLOCKED | 待创建 | 待执行 | 待执行 |
+| R1-03 | 浏览器组合根 | BLOCKED | 待创建 | 待执行 | 待执行 |
+| R1-04 | Tauri 组合根 | BLOCKED | 待创建 | 待执行 | 待执行 |
+| R1-05 | Application 组合根 | BLOCKED | 待创建 | 待执行 | 待执行 |
+
+## 阶段出口
+
+全部节点完成后必须创建 `R01-stage-completion.md`，并实际通过：
+
+- 架构边界验证；
+- `npm run verify:frontend`（Windows）；
+- `npm run verify:rust`；
+- 公共命令契约；
+- 模型保护资产指纹。
+
+## 当前唯一 READY 任务
+
+`R1-01 模块边界契约`
+""",
+    encoding="utf-8",
+)
