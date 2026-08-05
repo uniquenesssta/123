@@ -1,0 +1,255 @@
+--- a/crates/spreadsheet-io/src/match_review_workbook.rs
++++ b/crates/spreadsheet-io/src/match_review_workbook.rs
+@@ -347,12 +347,14 @@
+     )?;
+     validate_event_score_consistency(
+         &events,
+-        home_goals_90,
+-        away_goals_90,
+-        home_goals_extra_time,
+-        away_goals_extra_time,
+-        home_team_id,
+-        away_team_id,
++        EventScoreContext {
++            home_goals: home_goals_90,
++            away_goals: away_goals_90,
++            home_goals_extra_time,
++            away_goals_extra_time,
++            home_team_id,
++            away_team_id,
++        },
+         &mut errors,
+         &mut warnings,
+     );
+@@ -1570,17 +1572,29 @@
+     }
+ }
+ 
+-fn validate_event_score_consistency(
+-    events: &[MatchReviewEventDraft],
++struct EventScoreContext {
+     home_goals: i16,
+     away_goals: i16,
+     home_goals_extra_time: Option<i16>,
+     away_goals_extra_time: Option<i16>,
+     home_team_id: Uuid,
+     away_team_id: Uuid,
++}
++
++fn validate_event_score_consistency(
++    events: &[MatchReviewEventDraft],
++    context: EventScoreContext,
+     errors: &mut Vec<String>,
+     warnings: &mut Vec<String>,
+ ) {
++    let EventScoreContext {
++        home_goals,
++        away_goals,
++        home_goals_extra_time,
++        away_goals_extra_time,
++        home_team_id,
++        away_team_id,
++    } = context;
+     let effective_events = events
+         .iter()
+         .filter(|event| event.revision_status.is_effective())
+--- a/crates/spreadsheet-io/src/team_package.rs
++++ b/crates/spreadsheet-io/src/team_package.rs
+@@ -303,7 +303,7 @@
+     for (index, (label, value)) in rows.iter().enumerate() {
+         let row = (index + 1) as u32;
+         sheet.write_string_with_format(row, 0, *label, &section_format())?;
+-        sheet.merge_range(row, 1, row, 6, *value, &note_format())?;
++        sheet.merge_range(row, 1, row, 6, value, &note_format())?;
+     }
+     sheet.set_column_width(0, 18)?;
+     for column in 1..=6 {
+@@ -1671,7 +1671,7 @@
+         if start == end {
+             sheet.write_string_with_format(0, *start, *label, &group_format())?;
+         } else {
+-            sheet.merge_range(0, *start, 0, *end, *label, &group_format())?;
++            sheet.merge_range(0, *start, 0, *end, label, &group_format())?;
+         }
+     }
+     sheet.set_row_height(0, 24)?;
+@@ -1891,6 +1891,7 @@
+ #[cfg(test)]
+ mod tests {
+     use super::*;
++    use serde_json::json;
+ 
+     #[test]
+     fn action_aliases_are_normalized() {
+--- a/crates/persistence-postgres/src/postmatch.rs
++++ b/crates/persistence-postgres/src/postmatch.rs
+@@ -105,7 +105,7 @@
+         let home_goals_90 = required(context.home_goals_90, "正式赛果缺失")?;
+         let away_goals_90 = required(context.away_goals_90, "正式赛果缺失")?;
+         let result_finalized_at =
+-            required(context.result_finalized_at.clone(), "正式赛果时间缺失")?;
++            required(context.result_finalized_at, "正式赛果时间缺失")?;
+         let fingerprint = sha256_json(&SettlementFingerprint {
+             match_id: context.match_id,
+             match_review_id: context.match_review_id,
+@@ -118,7 +118,7 @@
+             horizon: &horizon,
+             home_goals_90,
+             away_goals_90,
+-            result_finalized_at: result_finalized_at.clone(),
++            result_finalized_at,
+             prediction_evaluation: &context.prediction_evaluation,
+         })?;
+         let settlement_key = format!(
+@@ -165,7 +165,7 @@
+         .bind(&horizon)
+         .bind(home_goals_90)
+         .bind(away_goals_90)
+-        .bind(&result_finalized_at)
++        .bind(result_finalized_at)
+         .bind(&fingerprint)
+         .bind(&settlement_key)
+         .bind(POSTMATCH_SETTLEMENT_VERSION)
+@@ -180,17 +180,19 @@
+                 &mut tx,
+                 id,
+                 feature_snapshot_id,
+-                required(context.snapshot_cutoff_at.clone(), "冻结快照截止时间缺失")?,
++                required(context.snapshot_cutoff_at, "冻结快照截止时间缺失")?,
+             )
+             .await?;
+             self.insert_postmatch_evaluation_sample_in_tx(
+                 &mut tx,
+                 id,
+                 &context,
+-                competition_profile_id,
+-                model_version_id,
+-                parameter_set_id,
+-                &horizon,
++                EvaluationSamplePartition {
++                    competition_profile_id,
++                    model_version_id,
++                    parameter_set_id,
++                    horizon: &horizon,
++                },
+             )
+             .await?;
+             write_audit_event(
+@@ -570,8 +572,8 @@
+             .bind(&verification_state)
+             .bind(&source_tier)
+             .bind(published_at.as_ref())
+-            .bind(&retrieved_at)
+-            .bind(&data_cutoff_at)
++            .bind(retrieved_at)
++            .bind(data_cutoff_at)
+             .bind(timeliness_score)
+             .bind(&item_fingerprint)
+             .execute(&mut **tx)
+@@ -585,11 +587,14 @@
+         tx: &mut Transaction<'_, Postgres>,
+         settlement_id: Uuid,
+         context: &SettlementContext,
+-        competition_profile_id: Uuid,
+-        model_version_id: Uuid,
+-        parameter_set_id: Uuid,
+-        horizon: &str,
++        partition: EvaluationSamplePartition<'_>,
+     ) -> PersistenceResult<()> {
++        let EvaluationSamplePartition {
++            competition_profile_id,
++            model_version_id,
++            parameter_set_id,
++            horizon,
++        } = partition;
+         let evaluation = &context.prediction_evaluation;
+         if !evaluation
+             .get("available")
+@@ -750,8 +755,7 @@
+             parameter_set_id,
+             horizon: horizon.to_string(),
+             partition_key: format!(
+-                "{}:{}:{}:{}",
+-                model_version_id, competition_profile_id, parameter_set_id, horizon
++                "{model_version_id}:{competition_profile_id}:{parameter_set_id}:{horizon}"
+             ),
+         })
+     }
+@@ -1121,6 +1125,14 @@
+ }
+ 
+ #[derive(Debug)]
++struct EvaluationSamplePartition<'a> {
++    competition_profile_id: Uuid,
++    model_version_id: Uuid,
++    parameter_set_id: Uuid,
++    horizon: &'a str,
++}
++
++#[derive(Debug)]
+ struct PostmatchPartition {
+     competition_id: Uuid,
+     competition_profile_id: Uuid,
+@@ -1402,7 +1414,7 @@
+         return 0.0;
+     }
+     let age_hours = cutoff_at
+-        .signed_duration_since(reference.clone())
++        .signed_duration_since(*reference)
+         .num_minutes()
+         .max(0) as f64
+         / 60.0;
+@@ -1456,8 +1468,8 @@
+ fn window_json(samples: &[EvaluationSample]) -> Value {
+     json!({
+         "sample_size": samples.len(),
+-        "start": samples.first().map(|item| item.kickoff_time.clone()),
+-        "end": samples.last().map(|item| item.kickoff_time.clone()),
++        "start": samples.first().map(|item| item.kickoff_time),
++        "end": samples.last().map(|item| item.kickoff_time),
+         "run_ids": samples.iter().map(|item| item.run_id).collect::<Vec<_>>(),
+     })
+ }
+--- a/crates/persistence-postgres/src/release_acceptance.rs
++++ b/crates/persistence-postgres/src/release_acceptance.rs
+@@ -140,8 +140,8 @@
+         .bind(&run.contract_version)
+         .bind(&run.fixture_version)
+         .bind(run.overall_status.as_str())
+-        .bind(&run.started_at)
+-        .bind(&run.completed_at)
++        .bind(run.started_at)
++        .bind(run.completed_at)
+         .bind(run.requested_by.as_deref())
+         .bind(&run.report_sha256)
+         .bind(i32::try_from(run.passed_count).unwrap_or(i32::MAX))
+--- a/crates/application/src/analytics.rs
++++ b/crates/application/src/analytics.rs
+@@ -161,7 +161,6 @@
+ 
+ #[derive(Debug, Clone, Copy)]
+ struct LifecycleSplit {
+-    training_end: usize,
+     validation_end: usize,
+ }
+ 
+@@ -228,10 +227,7 @@
+             "样本无法形成训练、验证和留出窗口".to_string(),
+         ));
+     }
+-    Ok(LifecycleSplit {
+-        training_end,
+-        validation_end,
+-    })
++    Ok(LifecycleSplit { validation_end })
+ }
+ 
+ fn validate_baseline_probabilities(fixtures: &[ParameterReplayFixture]) -> ApplicationResult<()> {
+@@ -266,16 +262,6 @@
+     Ok(())
+ }
+ 
+-fn lifecycle_window_json(fixtures: &[ParameterReplayFixture]) -> Value {
+-    json!({
+-        "sample_count": fixtures.len(),
+-        "start_at": fixtures.first().map(|item| item.kickoff_time),
