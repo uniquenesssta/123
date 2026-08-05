@@ -9,6 +9,7 @@ const nodeChecks = [
   "architecture/verifyModuleBoundaries.mjs",
   "architecture/verifyStateOwnership.mjs",
   "architecture/verifyProtectedImports.mjs",
+  "verify-browser-bootstrap.mjs",
   "verify-node-process-compatibility.mjs",
   "verify-windows-path-contract.mjs",
   "verify-public-model-boundary.mjs",

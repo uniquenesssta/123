@@ -37,7 +37,7 @@ R00 已按 Windows-only 目标范围完成。R1 只建立可机器验证的架�
 |---|---|---|---|---|---|
 | R1-01 | 模块边界契约 | DONE | [`R01-01-模块边界契约.md`](R01-01-模块边界契约.md) | JSON 解析、契约自检、Windows Automated 通过 | workflow run `30989439570` 通过 |
 | R1-02 | 边界验证脚本 | DONE | [`R01-02-边界验证脚本.md`](R01-02-边界验证脚本.md) | `npm run verify:architecture` 通过 | workflow run `31001470224` 通过 |
-| R1-03 | 浏览器组合根 | READY | 待创建 | 待执行 | 待执行 |
+| R1-03 | 浏览器组合根 | VERIFYING | [`R01-03-浏览器组合根.md`](R01-03-浏览器组合根.md) | 浏览器组合根专项验证通过 | Windows Automated 待最终 HEAD 验证 |
 | R1-04 | Tauri 组合根 | BLOCKED | 待创建 | 待执行 | 待执行 |
 | R1-05 | Application 组合根 | BLOCKED | 待创建 | 待执行 | 待执行 |
 
@@ -69,6 +69,12 @@ R00 已按 Windows-only 目标范围完成。R1 只建立可机器验证的架�
 - workflow run `31001470224` 在提交 `28ec363babe4f3fbccd14693d0261febdc305458` 上完整通过；artifact `8929207011` 的 SHA-256 为 `e83b2ab9c6cb705d0bfd740c798673a45dc2a4cb0b7b35ddebe844bb40b13e88`。
 - R1-02 状态为 `DONE`；R1-03 开放为 `READY`，R1-04 与 R1-05 继续 `BLOCKED`。
 
+## R1-03 当前结果
+
+- 已建立浏览器唯一入口、应用创建、模块注册和 ApplicationHandle 生命周期模块；现有 Feature 实现未迁移。
+- 浏览器入口及生命周期状态契约已切换，专项架构、TypeScript 和 Vite build 门禁通过。
+- 当前状态为 `VERIFYING`；清理临时实施文件后的正式 Windows Automated 通过后才可开放 R1-04。
+
 ## 当前唯一可执行任务
 
-`R1-03 浏览器组合根`
+`R1-03 浏览器组合根：完成最终 Windows 自动化门禁并关闭节点`

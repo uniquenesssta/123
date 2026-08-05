@@ -161,6 +161,8 @@ import type {
   ReleaseAcceptanceRunSummary,
 } from "./types";
 
+const browserLifecycleController = new AbortController();
+
 const THEME_KEY = "football-model-platform.theme";
 const DATABASE_RESET_COMPLETE_KEY = "football-model-platform.database-reset-complete";
 const ANALYSIS_PACKAGE_ID_KEY = "football-model-platform.last-analysis-package-id";
@@ -262,9 +264,7 @@ function prepareDirectPlayerDirectoryEntry(): void {
   });
 }
 
-const appRoot = document.querySelector<HTMLDivElement>("#app");
-if (!appRoot) throw new Error("缺少 #app 根节点");
-const app: HTMLDivElement = appRoot;
+let app: HTMLDivElement;
 
 let state: BootstrapResponse | null = null;
 let page: Page = "dashboard";
@@ -7965,7 +7965,7 @@ document.addEventListener("contextmenu", (event) => {
   const target = (event.target as HTMLElement).closest<HTMLElement>("[data-context-kind]");
   if (!target) return;
   showAppContextMenu(event, target);
-});
+}, { signal: browserLifecycleController.signal });
 
 document.addEventListener("keydown", (event) => {
   if (event.key === "Escape") {
@@ -7982,9 +7982,9 @@ document.addEventListener("keydown", (event) => {
   if (!action) return;
   event.preventDefault();
   document.querySelector<HTMLButtonElement>(`[data-action="${action}"]`)?.click();
-});
+}, { signal: browserLifecycleController.signal });
 
-document.addEventListener("scroll", closeAppContextMenu, true);
+document.addEventListener("scroll", closeAppContextMenu, { capture: true, signal: browserLifecycleController.signal });
 
 function filterRulesCompetitionCatalogue(): void {
   const directory = document.querySelector<HTMLElement>("[data-rules-directory]");
@@ -8105,7 +8105,7 @@ document.addEventListener("click", (event) => {
     recordClientIssue(error, `${pageTitle(page)} / ${action}`);
     toast(userFacingError(error), "error");
   });
-});
+}, { signal: browserLifecycleController.signal });
 
 function filterSelectOptions(
   selectId: string,
@@ -8164,7 +8164,7 @@ document.addEventListener("input", (event) => {
   if (target.id === "rules-competition-search" && target instanceof HTMLInputElement) {
     filterRulesCompetitionCatalogue();
   }
-});
+}, { signal: browserLifecycleController.signal });
 
 document.addEventListener("change", (event) => {
   const target = event.target as HTMLInputElement | HTMLSelectElement;
@@ -8505,11 +8505,11 @@ document.addEventListener("change", (event) => {
       return;
     }
   }
-});
+}, { signal: browserLifecycleController.signal });
 
 document.addEventListener("keydown", (event) => {
   if (event.key === "Escape") closeModal();
-});
+}, { signal: browserLifecycleController.signal });
 
 window.addEventListener("error", (event) => {
   recordClientIssue(
@@ -8517,11 +8517,11 @@ window.addEventListener("error", (event) => {
     "客户端未捕获异常",
     "critical",
   );
-});
+}, { signal: browserLifecycleController.signal });
 
 window.addEventListener("unhandledrejection", (event) => {
   recordClientIssue(event.reason, "客户端未处理的异步异常", "critical");
-});
+}, { signal: browserLifecycleController.signal });
 
 async function initializeApplication(): Promise<void> {
   await workspaceState.initialize();
@@ -8540,11 +8540,57 @@ window.addEventListener("beforeunload", () => {
     workspaceState.capture(renderedPage, currentPageRoot, true);
   }
   void workspaceState.flush();
-});
+}, { signal: browserLifecycleController.signal });
 
-bindSearchableSelectDiagnostics();
-render();
-void initializeApplication().catch((error: unknown) => {
-  recordClientIssue(error, "平台启动", "critical");
-  app.innerHTML = `<div class="fatal"><strong>平台启动失败</strong><p>${escapeHtml(userFacingError(error))}</p><small>完整错误已写入问题日志。</small></div>`;
-});
+export interface BrowserApplicationModule {
+  readonly name: "browser-application";
+  start(): Promise<void>;
+  destroy(): Promise<void>;
+}
+
+let browserApplicationCreated = false;
+
+export function createBrowserApplicationModule(
+  root: HTMLDivElement,
+): BrowserApplicationModule {
+  if (browserApplicationCreated) {
+    throw new Error("浏览器应用模块只能由组合根创建一次");
+  }
+  browserApplicationCreated = true;
+  app = root;
+  let startTask: Promise<void> | null = null;
+  let destroyed = false;
+
+  async function start(): Promise<void> {
+    if (destroyed) throw new Error("浏览器应用生命周期已结束");
+    if (startTask) return startTask;
+    startTask = (async () => {
+      bindSearchableSelectDiagnostics(browserLifecycleController.signal);
+      render();
+      try {
+        await initializeApplication();
+      } catch (error: unknown) {
+        recordClientIssue(error, "平台启动", "critical");
+        throw new Error(userFacingError(error), { cause: error });
+      }
+    })();
+    return startTask;
+  }
+
+  async function destroy(): Promise<void> {
+    if (destroyed) return;
+    destroyed = true;
+    browserLifecycleController.abort();
+    if (openAiApiExampleTimer !== null) {
+      window.clearTimeout(openAiApiExampleTimer);
+      openAiApiExampleTimer = null;
+    }
+    if (renderedPage) {
+      const currentPageRoot = app.querySelector<HTMLElement>(".page-container") ?? app;
+      workspaceState.capture(renderedPage, currentPageRoot, true);
+    }
+    await workspaceState.destroy();
+  }
+
+  return { name: "browser-application", start, destroy };
+}

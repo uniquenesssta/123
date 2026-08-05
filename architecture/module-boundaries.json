@@ -26,9 +26,10 @@
   },
   "frontend": {
     "entry": {
-      "owner": "src/main.ts",
-      "status": "legacy-composition-owner",
-      "target_task": "R1-03"
+      "owner": "src/bootstrap/main.ts",
+      "status": "active-composition-owner",
+      "implementation": "src/main.ts",
+      "target_task": null
     },
     "transport": {
       "owner": "src/api/client.ts",

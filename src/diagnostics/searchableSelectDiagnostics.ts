@@ -17,14 +17,23 @@ function isDiagnosticDetail(value: unknown): value is SearchableSelectDiagnostic
     && typeof candidate.context === "object";
 }
 
-export function bindSearchableSelectDiagnostics(): void {
-  if (bound) return;
+function handleSearchableSelectDiagnostic(event: Event): void {
+  if (!(event instanceof CustomEvent) || !isDiagnosticDetail(event.detail)) return;
+  recordFrontendDiagnostic(
+    `searchable_select_${event.detail.event}`,
+    event.detail.context,
+  );
+}
+
+export function bindSearchableSelectDiagnostics(signal?: AbortSignal): void {
+  if (bound || signal?.aborted) return;
   bound = true;
-  document.addEventListener(SEARCHABLE_SELECT_DIAGNOSTIC_EVENT, (event) => {
-    if (!(event instanceof CustomEvent) || !isDiagnosticDetail(event.detail)) return;
-    recordFrontendDiagnostic(
-      `searchable_select_${event.detail.event}`,
-      event.detail.context,
-    );
-  });
+  document.addEventListener(
+    SEARCHABLE_SELECT_DIAGNOSTIC_EVENT,
+    handleSearchableSelectDiagnostic,
+    signal ? { signal } : undefined,
+  );
+  signal?.addEventListener("abort", () => {
+    bound = false;
+  }, { once: true });
 }

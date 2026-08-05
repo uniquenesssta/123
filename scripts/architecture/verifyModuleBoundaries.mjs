@@ -22,6 +22,15 @@ report.check(contract.policy?.default === "deny-unlisted", "模块边界默认�
 report.check(contract.policy?.state_contract === "architecture/state-ownership.json", "模块边界未引用状态所有权契约");
 report.check(stateContract.contract_id === "football.state-ownership.v1", "状态所有权契约引用无效");
 
+const frontendEntry = contract.frontend?.entry ?? {};
+const frontendEntryOwner = normalizePath(frontendEntry.owner ?? "");
+report.check(Boolean(frontendEntryOwner), "前端组合根缺少 owner");
+report.check(pathExists(frontendEntryOwner), `前端组合根不存在：${frontendEntryOwner}`);
+report.check(frontendEntry.status === "active-composition-owner", `前端组合根状态无效：${frontendEntry.status}`);
+report.check(frontendEntry.target_task === null, "前端组合根已激活时 target_task 必须为空");
+const indexHtml = readFileSync(join(repositoryRoot, "index.html"), "utf8").replaceAll("\r\n", "\n");
+report.check(indexHtml.includes(`src="/${frontendEntryOwner}"`), `index.html 未指向前端组合根：${frontendEntryOwner}`);
+
 const features = contract.frontend?.features ?? {};
 const featureEntries = Object.entries(features);
 const featureOwners = new Map();

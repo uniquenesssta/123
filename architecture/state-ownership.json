@@ -27,16 +27,17 @@
   "states": [
     {
       "id": "browser.lifecycle",
-      "owner": "src/main.ts",
+      "owner": "src/bootstrap/applicationHandle.ts::ApplicationHandle",
       "scope": "browser-window",
       "writers": [
-        "src/main.ts"
+        "ApplicationHandle.start",
+        "ApplicationHandle.destroy"
       ],
       "forbidden": [
         "src/pages/**",
         "src/components/**"
       ],
-      "transition": "R1-03:src/bootstrap/browserApp.ts"
+      "transition": null
     },
     {
       "id": "browser.navigation",

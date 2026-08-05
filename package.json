@@ -12,6 +12,7 @@
     "tauri:build": "node scripts/run-tauri.mjs build",
     "verify:frontend": "node scripts/verify-frontend.mjs",
     "verify:architecture": "node scripts/architecture/verifyModuleBoundaries.mjs && node scripts/architecture/verifyStateOwnership.mjs && node scripts/architecture/verifyProtectedImports.mjs",
+    "verify:browser-bootstrap": "node scripts/verify-browser-bootstrap.mjs",
     "verify:command-contract": "node scripts/verify-command-contract.mjs",
     "verify:openai-profile-ui": "node scripts/verify-openai-profile-ui.mjs",
     "verify:api-workspace": "node scripts/verify-api-workspace.mjs",

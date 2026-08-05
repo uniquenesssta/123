@@ -234,6 +234,11 @@ export class WorkspaceStateStore<PageKey extends string> {
     if (this.saveTimer !== null) { window.clearTimeout(this.saveTimer); this.saveTimer = null; }
     await this.adapter.save(this.document);
   }
+  async destroy(): Promise<void> {
+    this.restoreSequence += 1;
+    await this.flush();
+    this.initialized = false;
+  }
 
   private setModule(page: PageKey, state: WorkspaceModuleState): void {
     this.document = { ...this.document, modules: { ...this.document.modules, [page]: normalizeModuleState(state) } };
