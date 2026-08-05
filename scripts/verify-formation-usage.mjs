@@ -1,7 +1,10 @@
 import fs from "node:fs";
 import crypto from "node:crypto";
 import { isVersionAtLeast } from "./version.mjs";
-const read = (p) => fs.readFileSync(new URL(`../${p}`, import.meta.url), "utf8");
+const read = (p) =>
+  fs
+    .readFileSync(new URL(`../${p}`, import.meta.url), "utf8")
+    .replace(/\r\n?/g, "\n");
 const contractText = read("contracts/formation-usage-contract.json");
 const contract = JSON.parse(contractText);
 const migration = read("crates/persistence-postgres/migrations/0022_formations_and_usage.sql");
@@ -18,7 +21,7 @@ const teams = read("src/pages/teams.ts");
 const lineups = read("src/pages/lineups.ts");
 const main = read("src/main.ts");
 const pkg = JSON.parse(read("package.json"));
-const hash = crypto.createHash("sha256").update(contractText).digest("hex");
+const hash = crypto.createHash("sha256").update(contractText, "utf8").digest("hex");
 const required = (ok, message) => { if (!ok) throw new Error(message); };
 required(isVersionAtLeast(pkg.version, contract.release_version), "当前项目版本早于阶段3版本0.16.0");
 required(contract.release_version === "0.16.0" && contract.integration_point_h_started === false, "阶段3契约边界错误");
