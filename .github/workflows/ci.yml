@@ -45,34 +45,10 @@ jobs:
         with:
           workspaces: 项目源码 -> ../.cargo-target
 
-      - name: Verify R1 architecture contract JSON
+      - name: Verify R1 architecture boundaries
         shell: pwsh
         working-directory: 项目源码
-        run: |
-          $module = Get-Content -Raw -Encoding UTF8 architecture/module-boundaries.json | ConvertFrom-Json
-          $state = Get-Content -Raw -Encoding UTF8 architecture/state-ownership.json | ConvertFrom-Json
-
-          if ($module.contract_id -ne "football.module-boundaries.v1") {
-            throw "Unexpected module boundary contract id."
-          }
-          if ($state.contract_id -ne "football.state-ownership.v1") {
-            throw "Unexpected state ownership contract id."
-          }
-          if ($module.policy.state_contract -ne "architecture/state-ownership.json") {
-            throw "Module contract does not reference the state ownership contract."
-          }
-
-          $featureCount = @($module.frontend.features.PSObject.Properties).Count
-          $crateCount = @($module.rust.crates.PSObject.Properties).Count
-          $stateIds = @($state.states | ForEach-Object { $_.id })
-          $uniqueStateIds = @($stateIds | Sort-Object -Unique)
-
-          if ($featureCount -ne 18) { throw "Unexpected frontend feature count: $featureCount" }
-          if ($crateCount -ne 11) { throw "Unexpected Rust workspace crate count: $crateCount" }
-          if ($stateIds.Count -ne [int]$state.count) { throw "State count does not match the declared count." }
-          if ($uniqueStateIds.Count -ne $stateIds.Count) { throw "Duplicate state ids detected." }
-
-          Write-Host "R1 architecture contract smoke check passed."
+        run: npm run verify:architecture
 
       - name: Run Windows automated acceptance
         shell: pwsh
