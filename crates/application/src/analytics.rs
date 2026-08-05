@@ -161,7 +161,6 @@ impl ApplicationService {
 
 #[derive(Debug, Clone, Copy)]
 struct LifecycleSplit {
-    training_end: usize,
     validation_end: usize,
 }
 
@@ -228,10 +227,7 @@ fn lifecycle_split(fixtures: &[ParameterReplayFixture]) -> ApplicationResult<Lif
             "样本无法形成训练、验证和留出窗口".to_string(),
         ));
     }
-    Ok(LifecycleSplit {
-        training_end,
-        validation_end,
-    })
+    Ok(LifecycleSplit { validation_end })
 }
 
 fn validate_baseline_probabilities(fixtures: &[ParameterReplayFixture]) -> ApplicationResult<()> {
@@ -264,16 +260,6 @@ fn validate_baseline_probabilities(fixtures: &[ParameterReplayFixture]) -> Appli
         }
     }
     Ok(())
-}
-
-fn lifecycle_window_json(fixtures: &[ParameterReplayFixture]) -> Value {
-    json!({
-        "sample_count": fixtures.len(),
-        "start_at": fixtures.first().map(|item| item.kickoff_time),
-        "end_at": fixtures.last().map(|item| item.kickoff_time),
-        "first_run_id": fixtures.first().map(|item| item.run_id),
-        "last_run_id": fixtures.last().map(|item| item.run_id),
-    })
 }
 
 fn baseline_metrics(fixtures: &[ParameterReplayFixture]) -> LifecycleMetrics {

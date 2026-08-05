@@ -144,8 +144,7 @@ impl ApplicationService {
             Vec::new()
         };
         checks.push(readiness_check(
-            "match_identity",
-            "比赛身份",
+            ("match_identity", "比赛身份"),
             if identity_details.is_empty() {
                 PredictionReadinessCheckStatus::Passed
             } else {
@@ -175,8 +174,7 @@ impl ApplicationService {
             Ok(chain) => {
                 data_cutoff_at = Some(chain.data_cutoff_time);
                 checks.push(readiness_check(
-                    "data_window",
-                    "赛前数据窗口",
+                    ("data_window", "赛前数据窗口"),
                     PredictionReadinessCheckStatus::Passed,
                     10,
                     10,
@@ -193,8 +191,7 @@ impl ApplicationService {
             }
             Err(PersistenceError::InvalidState(message)) => {
                 checks.push(readiness_check(
-                    "data_window",
-                    "赛前数据窗口",
+                    ("data_window", "赛前数据窗口"),
                     PredictionReadinessCheckStatus::Blocked,
                     10,
                     0,
@@ -268,8 +265,7 @@ impl ApplicationService {
                     Ok(()) => {
                         route_identity = Some(route_identity_manifest(&decision));
                         checks.push(readiness_check(
-                            "model_route",
-                            "模型与规则路由",
+                            ("model_route", "模型与规则路由"),
                             PredictionReadinessCheckStatus::Passed,
                             15,
                             15,
@@ -279,8 +275,7 @@ impl ApplicationService {
                         ));
                     }
                     Err(error) => checks.push(readiness_check(
-                        "model_route",
-                        "模型与规则路由",
+                        ("model_route", "模型与规则路由"),
                         PredictionReadinessCheckStatus::Blocked,
                         15,
                         0,
@@ -291,8 +286,7 @@ impl ApplicationService {
                 }
             }
             Err(PersistenceError::RouteNotFound) => checks.push(readiness_check(
-                "model_route",
-                "模型与规则路由",
+                ("model_route", "模型与规则路由"),
                 PredictionReadinessCheckStatus::Blocked,
                 15,
                 0,
@@ -708,8 +702,7 @@ fn verify_route_identity_matches_input_audit(
 }
 
 fn readiness_check(
-    code: &str,
-    label: &str,
+    (code, label): (&str, &str),
     status: PredictionReadinessCheckStatus,
     weight: u8,
     score: u8,
@@ -729,9 +722,9 @@ fn readiness_check(
     }
 }
 
-fn selected_lineup<'a>(
-    chain: &'a football_domain::MatchLineupTeamChain,
-) -> Option<&'a football_domain::LineupRecord> {
+fn selected_lineup(
+    chain: &football_domain::MatchLineupTeamChain,
+) -> Option<&football_domain::LineupRecord> {
     let selected_id = chain.selected_lineup_id?;
     chain
         .versions
@@ -745,8 +738,7 @@ fn append_unavailable_lineup_readiness_checks(
 ) {
     for (code, label) in [("home_lineup", "主队阵容"), ("away_lineup", "客队阵容")] {
         checks.push(readiness_check(
-            code,
-            label,
+            (code, label),
             PredictionReadinessCheckStatus::Blocked,
             15,
             0,
@@ -756,8 +748,7 @@ fn append_unavailable_lineup_readiness_checks(
         ));
     }
     checks.push(readiness_check(
-        "starting_goalkeepers",
-        "首发门将",
+        ("starting_goalkeepers", "首发门将"),
         PredictionReadinessCheckStatus::Blocked,
         10,
         0,
@@ -766,8 +757,7 @@ fn append_unavailable_lineup_readiness_checks(
         Value::Null,
     ));
     checks.push(readiness_check(
-        "starter_context",
-        "首发位置、角色与状态",
+        ("starter_context", "首发位置、角色与状态"),
         PredictionReadinessCheckStatus::Blocked,
         10,
         0,
@@ -787,8 +777,7 @@ fn append_lineup_readiness_checks(
     ] {
         let Some(lineup) = selected_lineup(side) else {
             checks.push(readiness_check(
-                code,
-                label,
+                (code, label),
                 PredictionReadinessCheckStatus::Blocked,
                 15,
                 0,
@@ -808,8 +797,7 @@ fn append_lineup_readiness_checks(
             PredictionReadinessCheckStatus::Warning
         };
         checks.push(readiness_check(
-            code,
-            label,
+            (code, label),
             status,
             15,
             if status == PredictionReadinessCheckStatus::Passed {
@@ -878,7 +866,7 @@ fn append_lineup_readiness_checks(
             if player
                 .position_code
                 .as_deref()
-                .map_or(true, |value| value.trim().is_empty())
+                .is_none_or(|value| value.trim().is_empty())
             {
                 missing_position_details.push(format!(
                     "{team_name}首发 {} 未填写实际位置",
@@ -888,7 +876,7 @@ fn append_lineup_readiness_checks(
             if player
                 .role_code
                 .as_deref()
-                .map_or(true, |value| value.trim().is_empty())
+                .is_none_or(|value| value.trim().is_empty())
             {
                 missing_role_count += 1;
             } else if player.role_origin == "player_position_default" {
@@ -922,8 +910,7 @@ fn append_lineup_readiness_checks(
         }
     }
     checks.push(readiness_check(
-        "starting_goalkeepers",
-        "首发门将",
+        ("starting_goalkeepers", "首发门将"),
         if goalkeeper_details.is_empty() {
             PredictionReadinessCheckStatus::Passed
         } else {
@@ -979,8 +966,7 @@ fn append_lineup_readiness_checks(
         ));
     }
     checks.push(readiness_check(
-        "starter_context",
-        "首发位置、角色与状态",
+        ("starter_context", "首发位置、角色与状态"),
         player_detail_status,
         10,
         match player_detail_status {
@@ -1012,8 +998,7 @@ fn append_unavailable_prepared_input_checks(
     input_reason: &str,
 ) {
     checks.push(readiness_check(
-        "team_history",
-        "球队历史样本",
+        ("team_history", "球队历史样本"),
         PredictionReadinessCheckStatus::Blocked,
         10,
         0,
@@ -1022,8 +1007,7 @@ fn append_unavailable_prepared_input_checks(
         Value::Null,
     ));
     checks.push(readiness_check(
-        "model_input",
-        "模型输入构建与质量",
+        ("model_input", "模型输入构建与质量"),
         PredictionReadinessCheckStatus::Blocked,
         5,
         0,
@@ -1070,8 +1054,7 @@ fn append_prepared_input_checks(
         shadow_reasons.push("球队历史样本存在零覆盖，当前输入只允许进入影子推演".to_string());
     }
     checks.push(readiness_check(
-        "team_history",
-        "球队历史样本",
+        ("team_history", "球队历史样本"),
         history_status,
         10,
         if history_status == PredictionReadinessCheckStatus::Passed {
@@ -1117,8 +1100,7 @@ fn append_prepared_input_checks(
         ));
     }
     checks.push(readiness_check(
-        "model_input",
-        "模型输入构建与质量",
+        ("model_input", "模型输入构建与质量"),
         quality_status,
         5,
         if quality_score >= 0.65 {

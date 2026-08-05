@@ -163,9 +163,7 @@ fn validate_budget(value: Option<f64>, label: &str) -> ApplicationResult<()> {
 
 fn check(
     run_id: Uuid,
-    category: &str,
-    code: &str,
-    title: &str,
+    (category, code, title): (&str, &str, &str),
     status: ReleaseAcceptanceStatus,
     summary: impl Into<String>,
     remediation: Option<&str>,
@@ -200,9 +198,7 @@ fn runtime_chain_checks(
     let contracts = if missing.is_empty() {
         check(
             run_id,
-            "chain",
-            "integration_contracts_a_to_i",
-            "A–I 接入契约",
+            ("chain", "integration_contracts_a_to_i", "A–I 接入契约"),
             ReleaseAcceptanceStatus::Pass,
             "数据库已锁定 A–I 全部接入契约。",
             None,
@@ -212,9 +208,7 @@ fn runtime_chain_checks(
     } else {
         check(
             run_id,
-            "chain",
-            "integration_contracts_a_to_i",
-            "A–I 接入契约",
+            ("chain", "integration_contracts_a_to_i", "A–I 接入契约"),
             ReleaseAcceptanceStatus::Blocked,
             format!("缺少接入契约：{}。", missing.join("、")),
             Some("重新执行连续数据库迁移，禁止手工跳过历史迁移。"),
@@ -224,9 +218,7 @@ fn runtime_chain_checks(
     };
     let provider_boundary = check(
         run_id,
-        "chain",
-        "external_model_provider_boundary",
-        "外部模型边界",
+        ("chain", "external_model_provider_boundary", "外部模型边界"),
         ReleaseAcceptanceStatus::Pass,
         "公开源码只注册外部模型入口，不包含预测引擎、参数或固定回归资产。",
         None,
@@ -240,9 +232,7 @@ fn runtime_chain_checks(
     let migration = if facts.migration_count >= 27 {
         check(
             run_id,
-            "chain",
-            "database_migrations",
-            "数据库迁移连续性",
+            ("chain", "database_migrations", "数据库迁移连续性"),
             ReleaseAcceptanceStatus::Pass,
             format!("已成功应用 {} 条迁移。", facts.migration_count),
             None,
@@ -252,9 +242,7 @@ fn runtime_chain_checks(
     } else {
         check(
             run_id,
-            "chain",
-            "database_migrations",
-            "数据库迁移连续性",
+            ("chain", "database_migrations", "数据库迁移连续性"),
             ReleaseAcceptanceStatus::Blocked,
             format!(
                 "只发现 {} 条成功迁移，最低要求为 27 条。",
@@ -282,9 +270,7 @@ fn runtime_chain_checks(
         migration,
         check(
             run_id,
-            "chain",
-            "runtime_lifecycle_evidence",
-            "真实闭环样本可见性",
+            ("chain", "runtime_lifecycle_evidence", "真实闭环样本可见性"),
             lifecycle,
             if lifecycle == ReleaseAcceptanceStatus::Pass {
                 "数据库中已经存在冻结快照和正式结算，可执行真实闭环复核。".to_string()
@@ -312,9 +298,7 @@ fn fixed_fixture_checks(run_id: Uuid) -> ApplicationResult<Vec<ReleaseAcceptance
     Ok(vec![
         check(
             run_id,
-            "chain",
-            "public_model_boundary",
-            "公开模型边界",
+            ("chain", "public_model_boundary", "公开模型边界"),
             ReleaseAcceptanceStatus::Pass,
             "模型源码、参数、Profile、固定比赛和回归制品未随公开仓库分发。",
             None,
@@ -327,9 +311,7 @@ fn fixed_fixture_checks(run_id: Uuid) -> ApplicationResult<Vec<ReleaseAcceptance
         ),
         check(
             run_id,
-            "chain",
-            "external_model_runtime",
-            "外部模型运行时",
+            ("chain", "external_model_runtime", "外部模型运行时"),
             ReleaseAcceptanceStatus::Warning,
             "公开仓库保留模型调用入口，但没有可执行的预测引擎。",
             Some("在私有部署中实现并接入 ModelProvider 后，再执行真实模型验收。"),
@@ -367,9 +349,7 @@ fn performance_checks(
     vec![
         check(
             run_id,
-            "performance",
-            "database_latency",
-            "数据库往返延迟",
+            ("performance", "database_latency", "数据库往返延迟"),
             db_status,
             format!("当前数据库健康检查耗时 {} ms。", facts.database_latency_ms),
             (db_status != ReleaseAcceptanceStatus::Pass)
@@ -379,9 +359,7 @@ fn performance_checks(
         ),
         check(
             run_id,
-            "performance",
-            "model_run_performance",
-            "近期推演性能",
+            ("performance", "model_run_performance", "近期推演性能"),
             run_status,
             match facts.recent_model_run_p95_ms {
                 Some(value) => format!(
@@ -397,9 +375,7 @@ fn performance_checks(
         ),
         check(
             run_id,
-            "performance",
-            "database_query_health",
-            "查询健康快照",
+            ("performance", "database_query_health", "查询健康快照"),
             query_status,
             if facts.query_warning_count == 0 {
                 "最近查询性能快照没有 warning/critical 项。".to_string()
@@ -427,11 +403,15 @@ fn security_checks(
         ReleaseAcceptanceStatus::Blocked
     };
     vec![
-        check(run_id, "security", "immutable_ledgers", "不可变账本触发器", immutable_status,
+        check(
+            run_id,
+            ("security", "immutable_ledgers", "不可变账本触发器"), immutable_status,
             format!("关键 schema 中发现 {} 个不可变保护触发器。", facts.immutable_trigger_count),
             (immutable_status == ReleaseAcceptanceStatus::Blocked).then_some("重新执行连续迁移并确认 integration、snapshot、H、I、J 账本触发器存在。"),
             json!({"immutable_trigger_count": facts.immutable_trigger_count, "minimum": 8}), 0),
-        check(run_id, "security", "credential_boundary", "API 密钥边界", ReleaseAcceptanceStatus::Pass,
+        check(
+            run_id,
+            ("security", "credential_boundary", "API 密钥边界"), ReleaseAcceptanceStatus::Pass,
             "发布契约继续要求 API Key 仅由 Rust/Windows 凭据管理器读取，工作区状态白名单拒绝 password、secret 和 credential 字段。", None,
             json!({"frontend_key_storage": false, "workspace_sensitive_field_filter": true}), 0),
     ]
@@ -457,9 +437,7 @@ fn cost_checks(
     };
     vec![check(
         run_id,
-        "cost",
-        "openai_cost_observability",
-        "OpenAI 成本与预算",
+        ("cost", "openai_cost_observability", "OpenAI 成本与预算"),
         status,
         if daily_exceeded || period_exceeded {
             "显式成本预算已经超限，发布验收被阻断。".to_string()
@@ -503,9 +481,7 @@ fn release_checks(
     let stage_j = facts.integration_stages.iter().any(|stage| stage == "J");
     vec![check(
         run_id,
-        "release",
-        "release_artifact_contract",
-        "发布版本与 J 契约",
+        ("release", "release_artifact_contract", "发布版本与 J 契约"),
         if version_ok && stage_j {
             ReleaseAcceptanceStatus::Pass
         } else {
@@ -560,9 +536,7 @@ mod tests {
         let checks = vec![
             check(
                 run_id,
-                "chain",
-                "a",
-                "a",
+                ("chain", "a", "a"),
                 ReleaseAcceptanceStatus::Pass,
                 "",
                 None,
@@ -571,9 +545,7 @@ mod tests {
             ),
             check(
                 run_id,
-                "chain",
-                "b",
-                "b",
+                ("chain", "b", "b"),
                 ReleaseAcceptanceStatus::Warning,
                 "",
                 None,
@@ -582,9 +554,7 @@ mod tests {
             ),
             check(
                 run_id,
-                "chain",
-                "c",
-                "c",
+                ("chain", "c", "c"),
                 ReleaseAcceptanceStatus::Blocked,
                 "",
                 None,

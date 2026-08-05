@@ -546,8 +546,7 @@ fn ensure_preview_committable(
         preview.counts.ready_add + preview.counts.ready_update + preview.counts.ready_end_previous;
     if blocking > 0 {
         return Err(ApplicationError::Validation(format!(
-            "{label}预检仍有 {} 条冲突或错误，不能提交",
-            blocking
+            "{label}预检仍有 {blocking} 条冲突或错误，不能提交"
         )));
     }
     if ready == 0 && preview.counts.imported == 0 {

@@ -42,6 +42,16 @@ struct DuplicateState {
     suppressed_count: u64,
 }
 
+struct RuntimeLogEntry<'a> {
+    sequence: u64,
+    timestamp_utc: &'a str,
+    level: &'a str,
+    subsystem: &'a str,
+    event: &'a str,
+    trace_id: Option<&'a str>,
+    details: Value,
+}
+
 impl RuntimeLogStore {
     pub fn discover(fallback_dir: &Path) -> Self {
         let session_id = Uuid::new_v4().to_string();
@@ -120,15 +130,15 @@ impl RuntimeLogStore {
         }
 
         state.sequence += 1;
-        self.write_entry(
-            state.sequence,
-            &now_text,
-            normalized_level,
+        self.write_entry(RuntimeLogEntry {
+            sequence: state.sequence,
+            timestamp_utc: &now_text,
+            level: normalized_level,
             subsystem,
             event,
             trace_id,
-            sanitized_details,
-        )?;
+            details: sanitized_details,
+        })?;
 
         if should_deduplicate(normalized_level, event) {
             state.duplicates.insert(
@@ -200,14 +210,14 @@ impl RuntimeLogStore {
         }
         state.sequence += 1;
         let timestamp = Utc::now().to_rfc3339_opts(SecondsFormat::Millis, true);
-        self.write_entry(
-            state.sequence,
-            &timestamp,
-            "info",
-            "runtime_log",
-            "duplicate_events_suppressed",
-            duplicate.last_trace_id.as_deref(),
-            json!({
+        self.write_entry(RuntimeLogEntry {
+            sequence: state.sequence,
+            timestamp_utc: &timestamp,
+            level: "info",
+            subsystem: "runtime_log",
+            event: "duplicate_events_suppressed",
+            trace_id: duplicate.last_trace_id.as_deref(),
+            details: json!({
                 "original_level": duplicate.level,
                 "original_subsystem": duplicate.subsystem,
                 "original_event": duplicate.event,
@@ -219,19 +229,19 @@ impl RuntimeLogStore {
                 "last_seen_utc": duplicate.last_seen_utc,
                 "dedup_window_ms": DUPLICATE_WINDOW.as_millis(),
             }),
-        )
+        })
     }
 
-    fn write_entry(
-        &self,
-        sequence: u64,
-        timestamp_utc: &str,
-        level: &str,
-        subsystem: &str,
-        event: &str,
-        trace_id: Option<&str>,
-        details: Value,
-    ) -> Result<(), String> {
+    fn write_entry(&self, entry: RuntimeLogEntry<'_>) -> Result<(), String> {
+        let RuntimeLogEntry {
+            sequence,
+            timestamp_utc,
+            level,
+            subsystem,
+            event,
+            trace_id,
+            details,
+        } = entry;
         ensure_log_file(&self.path)?;
         let entry = json!({
             "timestamp_utc": timestamp_utc,
@@ -283,14 +293,14 @@ impl Drop for RuntimeLogStore {
             .unwrap_or_default();
         for (sequence, duplicate) in pending {
             let timestamp = Utc::now().to_rfc3339_opts(SecondsFormat::Millis, true);
-            let _ = self.write_entry(
+            let _ = self.write_entry(RuntimeLogEntry {
                 sequence,
-                &timestamp,
-                "info",
-                "runtime_log",
-                "duplicate_events_suppressed",
-                duplicate.last_trace_id.as_deref(),
-                json!({
+                timestamp_utc: &timestamp,
+                level: "info",
+                subsystem: "runtime_log",
+                event: "duplicate_events_suppressed",
+                trace_id: duplicate.last_trace_id.as_deref(),
+                details: json!({
                     "original_level": duplicate.level,
                     "original_subsystem": duplicate.subsystem,
                     "original_event": duplicate.event,
@@ -302,7 +312,7 @@ impl Drop for RuntimeLogStore {
                     "last_seen_utc": duplicate.last_seen_utc,
                     "dedup_window_ms": DUPLICATE_WINDOW.as_millis(),
                 }),
-            );
+            });
         }
     }
 }

@@ -60,20 +60,34 @@ impl TestDatabase {
     }
 }
 
-async fn insert_match_event_fixture(
-    pool: &PgPool,
+struct MatchEventFixture<'a> {
     match_id: Uuid,
-    event_key: &str,
+    event_key: &'a str,
     sequence_no: i32,
-    event_type: &str,
+    event_type: &'a str,
     team_id: Option<Uuid>,
     player_id: Option<Uuid>,
     minute: i16,
     home_score: Option<i16>,
     away_score: Option<i16>,
-    verification_status: &str,
-    revision_status: &str,
-) {
+    verification_status: &'a str,
+    revision_status: &'a str,
+}
+
+async fn insert_match_event_fixture(pool: &PgPool, fixture: MatchEventFixture<'_>) {
+    let MatchEventFixture {
+        match_id,
+        event_key,
+        sequence_no,
+        event_type,
+        team_id,
+        player_id,
+        minute,
+        home_score,
+        away_score,
+        verification_status,
+        revision_status,
+    } = fixture;
     sqlx::query(
         r#"
         INSERT INTO review.match_events (
@@ -368,62 +382,70 @@ async fn structured_match_events_are_queryable_and_revision_aware() {
 
     insert_match_event_fixture(
         &database.pool,
-        match_id,
-        "goal:1",
-        1,
-        "goal",
-        Some(home_id),
-        Some(scorer_id),
-        12,
-        Some(1),
-        Some(0),
-        "verified",
-        "active",
+        MatchEventFixture {
+            match_id,
+            event_key: "goal:1",
+            sequence_no: 1,
+            event_type: "goal",
+            team_id: Some(home_id),
+            player_id: Some(scorer_id),
+            minute: 12,
+            home_score: Some(1),
+            away_score: Some(0),
+            verification_status: "verified",
+            revision_status: "active",
+        },
     )
     .await;
     insert_match_event_fixture(
         &database.pool,
-        match_id,
-        "goal:cancelled",
-        2,
-        "goal",
-        Some(home_id),
-        Some(scorer_id),
-        24,
-        Some(2),
-        Some(0),
-        "verified",
-        "cancelled",
+        MatchEventFixture {
+            match_id,
+            event_key: "goal:cancelled",
+            sequence_no: 2,
+            event_type: "goal",
+            team_id: Some(home_id),
+            player_id: Some(scorer_id),
+            minute: 24,
+            home_score: Some(2),
+            away_score: Some(0),
+            verification_status: "verified",
+            revision_status: "cancelled",
+        },
     )
     .await;
     insert_match_event_fixture(
         &database.pool,
-        match_id,
-        "card:1",
-        3,
-        "yellow_card",
-        Some(away_id),
-        Some(booked_id),
-        42,
-        None,
-        None,
-        "disputed",
-        "active",
+        MatchEventFixture {
+            match_id,
+            event_key: "card:1",
+            sequence_no: 3,
+            event_type: "yellow_card",
+            team_id: Some(away_id),
+            player_id: Some(booked_id),
+            minute: 42,
+            home_score: None,
+            away_score: None,
+            verification_status: "disputed",
+            revision_status: "active",
+        },
     )
     .await;
     insert_match_event_fixture(
         &database.pool,
-        match_id,
-        "legacy:hidden",
-        4,
-        "other",
-        None,
-        None,
-        50,
-        None,
-        None,
-        "unverified",
-        "superseded",
+        MatchEventFixture {
+            match_id,
+            event_key: "legacy:hidden",
+            sequence_no: 4,
+            event_type: "other",
+            team_id: None,
+            player_id: None,
+            minute: 50,
+            home_score: None,
+            away_score: None,
+            verification_status: "unverified",
+            revision_status: "superseded",
+        },
     )
     .await;
 

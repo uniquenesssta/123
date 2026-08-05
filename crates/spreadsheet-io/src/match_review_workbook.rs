@@ -347,12 +347,14 @@ pub fn read_match_review_package(path: &Path) -> SpreadsheetResult<MatchReviewPa
     )?;
     validate_event_score_consistency(
         &events,
-        home_goals_90,
-        away_goals_90,
-        home_goals_extra_time,
-        away_goals_extra_time,
-        home_team_id,
-        away_team_id,
+        EventScoreContext {
+            home_goals: home_goals_90,
+            away_goals: away_goals_90,
+            home_goals_extra_time,
+            away_goals_extra_time,
+            home_team_id,
+            away_team_id,
+        },
         &mut errors,
         &mut warnings,
     );
@@ -1570,17 +1572,29 @@ fn validate_substitute_events(
     }
 }
 
-fn validate_event_score_consistency(
-    events: &[MatchReviewEventDraft],
+struct EventScoreContext {
     home_goals: i16,
     away_goals: i16,
     home_goals_extra_time: Option<i16>,
     away_goals_extra_time: Option<i16>,
     home_team_id: Uuid,
     away_team_id: Uuid,
+}
+
+fn validate_event_score_consistency(
+    events: &[MatchReviewEventDraft],
+    context: EventScoreContext,
     errors: &mut Vec<String>,
     warnings: &mut Vec<String>,
 ) {
+    let EventScoreContext {
+        home_goals,
+        away_goals,
+        home_goals_extra_time,
+        away_goals_extra_time,
+        home_team_id,
+        away_team_id,
+    } = context;
     let effective_events = events
         .iter()
         .filter(|event| event.revision_status.is_effective())

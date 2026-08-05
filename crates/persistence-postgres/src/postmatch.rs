@@ -104,8 +104,7 @@ impl PostgresStore {
         let horizon = required(context.horizon.clone(), "推演冻结时点缺失")?;
         let home_goals_90 = required(context.home_goals_90, "正式赛果缺失")?;
         let away_goals_90 = required(context.away_goals_90, "正式赛果缺失")?;
-        let result_finalized_at =
-            required(context.result_finalized_at.clone(), "正式赛果时间缺失")?;
+        let result_finalized_at = required(context.result_finalized_at, "正式赛果时间缺失")?;
         let fingerprint = sha256_json(&SettlementFingerprint {
             match_id: context.match_id,
             match_review_id: context.match_review_id,
@@ -118,7 +117,7 @@ impl PostgresStore {
             horizon: &horizon,
             home_goals_90,
             away_goals_90,
-            result_finalized_at: result_finalized_at.clone(),
+            result_finalized_at,
             prediction_evaluation: &context.prediction_evaluation,
         })?;
         let settlement_key = format!(
@@ -165,7 +164,7 @@ impl PostgresStore {
         .bind(&horizon)
         .bind(home_goals_90)
         .bind(away_goals_90)
-        .bind(&result_finalized_at)
+        .bind(result_finalized_at)
         .bind(&fingerprint)
         .bind(&settlement_key)
         .bind(POSTMATCH_SETTLEMENT_VERSION)
@@ -180,17 +179,19 @@ impl PostgresStore {
                 &mut tx,
                 id,
                 feature_snapshot_id,
-                required(context.snapshot_cutoff_at.clone(), "冻结快照截止时间缺失")?,
+                required(context.snapshot_cutoff_at, "冻结快照截止时间缺失")?,
             )
             .await?;
             self.insert_postmatch_evaluation_sample_in_tx(
                 &mut tx,
                 id,
                 &context,
-                competition_profile_id,
-                model_version_id,
-                parameter_set_id,
-                &horizon,
+                EvaluationSamplePartition {
+                    competition_profile_id,
+                    model_version_id,
+                    parameter_set_id,
+                    horizon: &horizon,
+                },
             )
             .await?;
             write_audit_event(
@@ -570,8 +571,8 @@ impl PostgresStore {
             .bind(&verification_state)
             .bind(&source_tier)
             .bind(published_at.as_ref())
-            .bind(&retrieved_at)
-            .bind(&data_cutoff_at)
+            .bind(retrieved_at)
+            .bind(data_cutoff_at)
             .bind(timeliness_score)
             .bind(&item_fingerprint)
             .execute(&mut **tx)
@@ -585,11 +586,14 @@ impl PostgresStore {
         tx: &mut Transaction<'_, Postgres>,
         settlement_id: Uuid,
         context: &SettlementContext,
-        competition_profile_id: Uuid,
-        model_version_id: Uuid,
-        parameter_set_id: Uuid,
-        horizon: &str,
+        partition: EvaluationSamplePartition<'_>,
     ) -> PersistenceResult<()> {
+        let EvaluationSamplePartition {
+            competition_profile_id,
+            model_version_id,
+            parameter_set_id,
+            horizon,
+        } = partition;
         let evaluation = &context.prediction_evaluation;
         if !evaluation
             .get("available")
@@ -750,8 +754,7 @@ impl PostgresStore {
             parameter_set_id,
             horizon: horizon.to_string(),
             partition_key: format!(
-                "{}:{}:{}:{}",
-                model_version_id, competition_profile_id, parameter_set_id, horizon
+                "{model_version_id}:{competition_profile_id}:{parameter_set_id}:{horizon}"
             ),
         })
     }
@@ -1121,6 +1124,14 @@ impl PostgresStore {
 }
 
 #[derive(Debug)]
+struct EvaluationSamplePartition<'a> {
+    competition_profile_id: Uuid,
+    model_version_id: Uuid,
+    parameter_set_id: Uuid,
+    horizon: &'a str,
+}
+
+#[derive(Debug)]
 struct PostmatchPartition {
     competition_id: Uuid,
     competition_profile_id: Uuid,
@@ -1402,7 +1413,7 @@ fn calculate_timeliness_score(
         return 0.0;
     }
     let age_hours = cutoff_at
-        .signed_duration_since(reference.clone())
+        .signed_duration_since(*reference)
         .num_minutes()
         .max(0) as f64
         / 60.0;
@@ -1456,8 +1467,8 @@ fn verdict_scores(
 fn window_json(samples: &[EvaluationSample]) -> Value {
     json!({
         "sample_size": samples.len(),
-        "start": samples.first().map(|item| item.kickoff_time.clone()),
-        "end": samples.last().map(|item| item.kickoff_time.clone()),
+        "start": samples.first().map(|item| item.kickoff_time),
+        "end": samples.last().map(|item| item.kickoff_time),
         "run_ids": samples.iter().map(|item| item.run_id).collect::<Vec<_>>(),
     })
 }

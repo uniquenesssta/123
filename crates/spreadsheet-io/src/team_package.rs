@@ -303,7 +303,7 @@ fn write_instruction_sheet(workbook: &mut Workbook) -> Result<(), XlsxError> {
     for (index, (label, value)) in rows.iter().enumerate() {
         let row = (index + 1) as u32;
         sheet.write_string_with_format(row, 0, *label, &section_format())?;
-        sheet.merge_range(row, 1, row, 6, *value, &note_format())?;
+        sheet.merge_range(row, 1, row, 6, value, &note_format())?;
     }
     sheet.set_column_width(0, 18)?;
     for column in 1..=6 {
@@ -1671,7 +1671,7 @@ fn write_group_row(sheet: &mut Worksheet, groups: &[(u16, u16, &str)]) -> Result
         if start == end {
             sheet.write_string_with_format(0, *start, *label, &group_format())?;
         } else {
-            sheet.merge_range(0, *start, 0, *end, *label, &group_format())?;
+            sheet.merge_range(0, *start, 0, *end, label, &group_format())?;
         }
     }
     sheet.set_row_height(0, 24)?;
@@ -1891,6 +1891,7 @@ fn example_format() -> Format {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use serde_json::json;
 
     #[test]
     fn action_aliases_are_normalized() {
