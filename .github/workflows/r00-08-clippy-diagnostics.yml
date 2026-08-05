@@ -1,4 +1,4 @@
-name: R0-08 Clippy Apply Temporary
+name: R0-08 Secondary Clippy Diagnostics Temporary
 
 on:
   pull_request:
@@ -6,115 +6,49 @@ on:
       - main
 
 permissions:
-  contents: write
+  contents: read
 
 jobs:
-  clippy-apply:
+  secondary-diagnostics:
     runs-on: ubuntu-latest
-    timeout-minutes: 45
+    timeout-minutes: 10
     steps:
       - name: Checkout implementation branch
         uses: actions/checkout@v4
         with:
           ref: new-A
-          fetch-depth: 2
+          fetch-depth: 1
 
-      - name: Install Tauri Linux system packages
-        shell: bash
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y \
-            build-essential \
-            curl \
-            file \
-            libayatana-appindicator3-dev \
-            librsvg2-dev \
-            libssl-dev \
-            libwebkit2gtk-4.1-dev \
-            libxdo-dev \
-            wget
-
-      - name: Set up Rust 1.88.0 with rustfmt and clippy
-        uses: dtolnay/rust-toolchain@1.88.0
-        with:
-          components: rustfmt, clippy
-
-      - name: Apply exact R0-08 fixes
+      - name: Capture source and call sites
         shell: bash
         run: |
           set -euo pipefail
-          mkdir -p r0-08-evidence
-          if git apply --check .github/r0-08-clippy.patch; then
-            git apply .github/r0-08-clippy.patch
-            printf 'apply_state=applied\n' > r0-08-evidence/summary.txt
-          elif git apply --reverse --check .github/r0-08-clippy.patch; then
-            printf 'apply_state=already_applied\n' > r0-08-evidence/summary.txt
-          else
-            echo 'R0-08 patch does not match either baseline or applied state.' >&2
-            exit 1
-          fi
-          cargo fmt --all
-          git diff --check
-          git diff --name-only | sort > r0-08-evidence/changed-files.txt
-          if [[ -s r0-08-evidence/changed-files.txt ]]; then
-            cat > r0-08-evidence/expected-files.txt <<'EOF'
-          crates/persistence-postgres/src/postmatch.rs
-          crates/persistence-postgres/src/release_acceptance.rs
-          crates/spreadsheet-io/src/match_review_workbook.rs
-          crates/spreadsheet-io/src/team_package.rs
-          EOF
-            diff -u r0-08-evidence/expected-files.txt r0-08-evidence/changed-files.txt
-          fi
-          git diff --stat > r0-08-evidence/diff-stat.txt
-          git diff > r0-08-evidence/r0-08.patch
+          mkdir -p r0-08-secondary/source
+          cp crates/application/src/analytics.rs r0-08-secondary/source/
+          cp crates/application/src/prediction.rs r0-08-secondary/source/
+          cp crates/application/src/release_acceptance.rs r0-08-secondary/source/
+          cp crates/application/src/spreadsheet.rs r0-08-secondary/source/
+          cp crates/persistence-postgres/tests/postgres_integration.rs r0-08-secondary/source/
+          {
+            echo '=== insert_match_event_fixture ==='
+            grep -n -C 4 'insert_match_event_fixture' crates/persistence-postgres/tests/postgres_integration.rs || true
+            echo
+            echo '=== readiness_check ==='
+            grep -n -C 3 'readiness_check' crates/application/src/prediction.rs || true
+            echo
+            echo '=== release check helper ==='
+            grep -n -C 3 'check(' crates/application/src/release_acceptance.rs || true
+            echo
+            echo '=== lifecycle split/window ==='
+            grep -n -C 4 -E 'training_end|lifecycle_window_json|lifecycle_split' crates/application/src/analytics.rs || true
+          } > r0-08-secondary/references.txt
+          git rev-parse HEAD > r0-08-secondary/head.txt
+          git status --short > r0-08-secondary/status.txt
 
-      - name: Run full focused package tests and preserve result
-        shell: bash
-        run: |
-          set -o pipefail
-          set +e
-          cargo test --locked -p football-spreadsheet-io -p football-persistence-postgres --lib 2>&1 | tee r0-08-evidence/focused-tests.txt
-          status=${PIPESTATUS[0]}
-          set -e
-          printf 'full_focused_tests_exit_code=%s\n' "$status" >> r0-08-evidence/summary.txt
-
-      - name: Run unaffected focused test set
-        shell: bash
-        run: |
-          set -o pipefail
-          cargo test --locked -p football-persistence-postgres --lib 2>&1 | tee r0-08-evidence/persistence-tests.txt
-          cargo test --locked -p football-spreadsheet-io --lib -- --skip team_package::tests::physical_worksheet_row_number_survives_blank_rows 2>&1 | tee r0-08-evidence/spreadsheet-tests-excluding-known-failure.txt
-
-      - name: Run workspace Clippy gate
-        shell: bash
-        run: |
-          set -o pipefail
-          cargo clippy --locked --workspace --all-targets -- -D warnings 2>&1 | tee r0-08-evidence/clippy.txt
-
-      - name: Commit verified R0-08 source changes
-        shell: bash
-        run: |
-          set -euo pipefail
-          if git diff --quiet; then
-            git rev-parse HEAD > r0-08-evidence/implementation-commit.txt
-            exit 0
-          fi
-          git config user.name 'github-actions[bot]'
-          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git add \
-            crates/spreadsheet-io/src/match_review_workbook.rs \
-            crates/spreadsheet-io/src/team_package.rs \
-            crates/persistence-postgres/src/postmatch.rs \
-            crates/persistence-postgres/src/release_acceptance.rs
-          git commit -m 'fix(r00-08): close Rust clippy gate'
-          git push origin HEAD:new-A
-          git rev-parse HEAD > r0-08-evidence/implementation-commit.txt
-
-      - name: Upload R0-08 apply evidence
-        if: always()
+      - name: Upload secondary diagnostics
         uses: actions/upload-artifact@v4
         with:
-          name: r00-08-clippy-apply
-          path: r0-08-evidence/**
-          if-no-files-found: warn
+          name: r00-08-secondary-clippy-diagnostics
+          path: r0-08-secondary/**
+          if-no-files-found: error
           retention-days: 30
