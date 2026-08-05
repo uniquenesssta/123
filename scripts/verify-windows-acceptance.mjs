@@ -37,11 +37,23 @@ for (const marker of [
   'FOOTBALL_TEST_DATABASE_URL',
   'FOOTBALL_RUNTIME_ROOT',
   'FOOTBALL_PROJECT_ROOT',
+  'Start-ReleaseClient -Executable $exe',
+  'for ($attempt = 1; $attempt -le 2; $attempt++)',
+  '-RedirectStandardOutput $stdout',
+  '-RedirectStandardError $stderr',
 ]) {
   check(powershell.includes(marker), `PowerShell验收器缺少：${marker}`);
 }
 check(powershell.includes("AcceptanceContract.database_safety.required_name_pattern") && powershell.includes("AcceptanceContract.minimum_versions.node"), "验收器未从机器契约读取数据库与工具链门禁");
 check(!powershell.includes("Write-AcceptanceLog \"测试数据库 URL"), "验收日志不得写入完整数据库URL");
+check(
+  powershell.includes("function Get-RuntimeLogPaths")
+    && powershell.includes("$_.FullName -notin $ExistingPaths")
+    && powershell.includes("Wait-NewRuntimeLog -ExistingPaths $existingPaths -TimeoutSeconds 45")
+    && powershell.includes("客户端连续两次启动均未在 45 秒内生成新的运行日志")
+    && !powershell.includes("$_.CreationTime -ge $StartedAt"),
+  "运行烟测未使用路径集合识别新日志或缺少有界重试硬失败",
+);
 check(analyzer.includes("operation_completed") && analyzer.includes("forbidden_runtime_levels"), "运行日志分析器未校验完成操作或错误等级");
 check(
   launcher.includes("windows-acceptance.ps1")

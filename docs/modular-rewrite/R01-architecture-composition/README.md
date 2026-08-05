@@ -82,6 +82,7 @@ R00 已按 Windows-only 目标范围完成。R1 只建立可机器验证的架�
 - `src-tauri/src/lib.rs` 已收敛为公共薄入口；Builder、状态构造、命令注册和启动错误映射分别由 `src-tauri/src/bootstrap/` 下的具名模块承担。
 - `AppState` 已切换到 `bootstrap/state.rs` 唯一拥有；171 条 Tauri 命令的名称、顺序、参数和返回契约保持不变。
 - 已新增 Tauri 组合根专项验证和确定性保护资产验证入口，并接入完整前端验证。
+- release 启动探针与打包前后 A/B 已排除组合根和 bundle 回归；Windows Automated 现按日志路径集合识别新 session，并使用最多一次有界重试和 stdout/stderr 诊断，仍待清理后最终 HEAD 验证。
 - 专用 Windows workflow run `31027424414`、job `92379334852` 对架构、命令、保护资产、Rust 格式和桌面 crate 编译全部通过。
 - 正式实现提交为 `c73a6bd1d28435700274fef4fa115e8f97ce294e`；正式 `Public Platform CI` 尚需在清理临时文件后的最终 HEAD 上完整通过，因此状态保持 `VERIFYING`。
 - 真实 PostgreSQL、Windows Full 和用户本机 Windows 实机验收继续保留到最终统一验收。

@@ -34,6 +34,15 @@ check(
   "PowerShell 验收器未通过 Cargo 目标目录契约查找 release",
 );
 check(!runner.includes('Join-Path $SourceRoot ".cargo-target\\release"'), "仍在源码目录内查找错误的 Cargo release 路径");
+check(
+  runner.includes("function Get-RuntimeLogPaths")
+    && runner.includes("$_.FullName -notin $ExistingPaths")
+    && runner.includes("for ($attempt = 1; $attempt -le 2; $attempt++)")
+    && runner.includes("-RedirectStandardOutput $stdout")
+    && runner.includes("-RedirectStandardError $stderr")
+    && !runner.includes("$_.CreationTime -ge $StartedAt"),
+  "Windows 启动烟测未使用新文件集合、有界重试和诊断输出契约",
+);
 
 for (const marker of [
   "function Resolve-AcceptanceLogRoot",
@@ -70,4 +79,4 @@ if (failures.length) {
   failures.forEach((failure) => console.error(`- ${failure}`));
   process.exit(1);
 }
-console.log("Windows 路径契约验证通过：根入口日志参数、运行日志边界和 Cargo release 查找路径一致。");
+console.log("Windows 路径契约验证通过：根入口日志参数、运行日志边界、Cargo release 查找和有界启动观测一致。");

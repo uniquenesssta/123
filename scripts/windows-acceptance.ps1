@@ -76,16 +76,44 @@ function Assert-TestDatabase([string]$Url) {
   }
   Write-AcceptanceLog "测试数据库安全检查通过：$databaseName（凭据未写入验收日志）"
 }
-function Wait-NewRuntimeLog([datetime]$StartedAt) {
-  $deadline = (Get-Date).AddSeconds(45)
+function Get-RuntimeLogPaths {
+  return @(Get-ChildItem $RuntimeLogRoot -Filter "football-runtime-*.jsonl" -File -ErrorAction SilentlyContinue |
+    ForEach-Object { $_.FullName })
+}
+function Wait-NewRuntimeLog([string[]]$ExistingPaths, [int]$TimeoutSeconds = 45) {
+  $deadline = (Get-Date).AddSeconds($TimeoutSeconds)
   while ((Get-Date) -lt $deadline) {
+    $script:AppProcess.Refresh()
     if ($script:AppProcess.HasExited) { throw "客户端启动后提前退出，退出码：$($script:AppProcess.ExitCode)" }
     $candidate = Get-ChildItem $RuntimeLogRoot -Filter "football-runtime-*.jsonl" -File -ErrorAction SilentlyContinue |
-      Where-Object { $_.CreationTime -ge $StartedAt.AddSeconds(-2) } | Sort-Object LastWriteTime -Descending | Select-Object -First 1
-    if ($candidate -and $candidate.Length -gt 0) { return $candidate.FullName }
+      Where-Object { $_.FullName -notin $ExistingPaths -and $_.Length -gt 0 } |
+      Sort-Object LastWriteTime -Descending |
+      Select-Object -First 1
+    if ($candidate) { return $candidate.FullName }
     Start-Sleep -Milliseconds 500
   }
-  throw "客户端启动后 45 秒内没有生成新的运行日志。"
+  return $null
+}
+function Stop-ReleaseClient {
+  if ($script:AppProcess -and -not $script:AppProcess.HasExited) {
+    Stop-Process -Id $script:AppProcess.Id -Force -ErrorAction SilentlyContinue
+    $script:AppProcess.WaitForExit()
+  }
+}
+function Start-ReleaseClient([string]$Executable) {
+  for ($attempt = 1; $attempt -le 2; $attempt++) {
+    $existingPaths = @(Get-RuntimeLogPaths)
+    $diagnosticPrefix = "release-startup-attempt-$attempt-$(Get-Date -Format 'yyyyMMdd-HHmmssfff')"
+    $stdout = Join-Path $LogRoot "$diagnosticPrefix.stdout.txt"
+    $stderr = Join-Path $LogRoot "$diagnosticPrefix.stderr.txt"
+    Write-AcceptanceLog "启动 release 客户端（尝试 $attempt/2）：$Executable"
+    $script:AppProcess = Start-Process -FilePath $Executable -WorkingDirectory $SourceRoot -RedirectStandardOutput $stdout -RedirectStandardError $stderr -PassThru
+    $runtimeLog = Wait-NewRuntimeLog -ExistingPaths $existingPaths -TimeoutSeconds 45
+    if ($runtimeLog) { return $runtimeLog }
+    Write-AcceptanceLog "release 客户端尝试 $attempt/2 在 45 秒内未建立运行日志，准备执行有界重试。"
+    Stop-ReleaseClient
+  }
+  throw "客户端连续两次启动均未在 45 秒内生成新的运行日志。"
 }
 
 try {
@@ -119,10 +147,7 @@ try {
   $exe = Find-AcceptanceReleaseExecutable -CargoTargetRoot $CargoTargetRoot
   $env:FOOTBALL_RUNTIME_ROOT = $ProjectRoot
   $env:FOOTBALL_PROJECT_ROOT = $ProjectRoot
-  $runtimeStartedAt = Get-Date
-  Write-AcceptanceLog "启动 release 客户端：$exe"
-  $script:AppProcess = Start-Process -FilePath $exe -WorkingDirectory $SourceRoot -PassThru
-  $runtimeLog = Wait-NewRuntimeLog $runtimeStartedAt
+  $runtimeLog = Start-ReleaseClient -Executable $exe
   Write-AcceptanceLog "运行日志已建立：.\logs\$([IO.Path]::GetFileName($runtimeLog))"
 
   if ($Mode -eq "Full") {

@@ -205,6 +205,15 @@ R1-03 后的基线中，`crates/application/src/model_shell/mod.rs` 的排版与
 
 ## 10. 待执行验证与当前状态
 
+### Windows release 启动观测修正
+
+- 正式 Automated run `31029576871` 已通过前端、Rust 与 Tauri bundle 构建，但单次 release 启动 45 秒内未观测到 runtime log。
+- 生命周期探针 run `31032667039` 已确认公共入口、Builder、setup、状态安装和日志写入十个节点全部到达，组合根本身无启动回归。
+- A/B run `31034333416` 在相同 Windows runner 布局中验证打包前与打包后 EXE 均成功启动并建立 runtime log；两者 SHA-256 分别为 `f9f1afaaeb19ade39642be7d158be1cb17d078d14650871328e469c961bd344d` 与 `fd60ab2a04c93df558478554fa4dfe49522c686d19deb35728a4cdadb3882939`。
+- 因此未修改 Tauri 组合根或打包流程；Windows 验收器改为按启动前日志路径集合识别新 session，首次 45 秒超时后最多重启一次，并为每次尝试保留 stdout/stderr。进程提前退出仍立即失败，连续两次超时仍硬失败。
+- 该修正只影响外部启动观测与诊断，不改变产品入口、171 条命令、状态所有权、bundle 产物、依赖、迁移或模型保护资产。
+- R1-04 保持 `VERIFYING`，等待清理临时工作流后的正式 Windows Automated。
+
 清理临时实施文件后的最终 HEAD 仍需通过正式 `Public Platform CI`，重新覆盖：
 
 - 完整架构门禁；
