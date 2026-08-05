@@ -2,7 +2,10 @@ import crypto from "node:crypto";
 import fs from "node:fs";
 import { isVersionAtLeast } from "./version.mjs";
 
-const read = (path) => fs.readFileSync(new URL(`../${path}`, import.meta.url), "utf8");
+const read = (path) =>
+  fs
+    .readFileSync(new URL(`../${path}`, import.meta.url), "utf8")
+    .replace(/\r\n?/g, "\n");
 const requireTrue = (condition, message) => { if (!condition) throw new Error(message); };
 
 const contractText = read("contracts/match-lineup-chain-contract.json");
@@ -24,7 +27,7 @@ const teamsPage = read("src/pages/teams.ts");
 const main = read("src/main.ts");
 const integrationTests = read("crates/persistence-postgres/tests/postgres_integration.rs");
 const pkg = JSON.parse(read("package.json"));
-const hash = crypto.createHash("sha256").update(contractText).digest("hex");
+const hash = crypto.createHash("sha256").update(contractText, "utf8").digest("hex");
 
 requireTrue(isVersionAtLeast(pkg.version, contract.release_version), "当前项目版本早于阶段5版本0.18.0");
 requireTrue(contract.release_version === "0.18.0", "阶段5契约发布版本错误");
