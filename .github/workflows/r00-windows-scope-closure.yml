@@ -27,7 +27,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          test "$(git rev-parse HEAD~2)" = "ab812dc2cef126cc46fe9914a63815e047739d75"
+          test "$(git rev-parse HEAD~3)" = "ab812dc2cef126cc46fe9914a63815e047739d75"
           mkdir -p r00-closure-evidence
           python .github/r00-windows-scope-closure.py
           git diff --check
