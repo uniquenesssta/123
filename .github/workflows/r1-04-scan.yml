@@ -1,4 +1,4 @@
-name: R1-04 legacy verifier scan
+name: R1-04 legacy verifier migration
 
 on:
   push:
@@ -9,44 +9,156 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: read
+  contents: write
 
 jobs:
-  scan:
+  migrate:
     runs-on: windows-latest
-    timeout-minutes: 10
+    timeout-minutes: 30
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: new-B
+          fetch-depth: 0
 
-      - name: Scan legacy Tauri verifier references
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Migrate legacy verifier owners
         shell: pwsh
         run: |
-          $patterns = @(
-            'src-tauri/src/lib.rs',
-            'src-tauri/src/commands.rs',
-            'commands.rs::AppState'
+          $registryPath = 'src-tauri/src/bootstrap/command_registry.rs'
+          $legacyPath = 'src-tauri/src/lib.rs'
+          $registryOnlyFiles = @(
+            'scripts/verify-database-reset.mjs',
+            'scripts/verify-entity-relationships.mjs',
+            'scripts/verify-force-team-delete.mjs',
+            'scripts/verify-formation-usage.mjs',
+            'scripts/verify-history-scoreline-ui.mjs',
+            'scripts/verify-match-lineup-chain.mjs',
+            'scripts/verify-match-review-package.mjs',
+            'scripts/verify-match-workflow-ui.mjs',
+            'scripts/verify-monthly-workbooks.mjs',
+            'scripts/verify-parameter-lifecycle.mjs',
+            'scripts/verify-postmatch-settlement.mjs',
+            'scripts/verify-release-acceptance.mjs',
+            'scripts/verify-stage-e2-lineup-presets.mjs',
+            'scripts/verify-team-package.mjs',
+            'scripts/verify-team-player-management.mjs',
+            'scripts/verify-workspace-ui.mjs'
           )
-          $matches = Get-ChildItem -Path scripts -Recurse -File | ForEach-Object {
-            $path = $_.FullName
-            $relative = Resolve-Path -Relative $path
-            $lineNumber = 0
-            Get-Content -LiteralPath $path -Encoding UTF8 | ForEach-Object {
-              $lineNumber += 1
-              $line = $_
-              foreach ($pattern in $patterns) {
-                if ($line.Contains($pattern)) {
-                  [PSCustomObject]@{
-                    Path = $relative
-                    Line = $lineNumber
-                    Pattern = $pattern
-                    Text = $line.Trim()
-                  }
-                }
-              }
+          foreach ($relative in $registryOnlyFiles) {
+            $path = Join-Path $env:GITHUB_WORKSPACE $relative
+            $source = [System.IO.File]::ReadAllText($path, [System.Text.Encoding]::UTF8)
+            $count = ([regex]::Matches($source, [regex]::Escape($legacyPath))).Count
+            if ($count -ne 1) {
+              throw "$relative expected one legacy registration path, got $count"
             }
+            [System.IO.File]::WriteAllText(
+              $path,
+              $source.Replace($legacyPath, $registryPath),
+              [System.Text.UTF8Encoding]::new($false)
+            )
           }
-          if ($matches) {
-            $matches | Sort-Object Path, Line, Pattern | ConvertTo-Json -Depth 4
-          } else {
-            Write-Output '[]'
+
+          $runtimePath = Join-Path $env:GITHUB_WORKSPACE 'scripts/verify-api-runtime-diagnostics.mjs'
+          $runtimeSource = [System.IO.File]::ReadAllText($runtimePath, [System.Text.Encoding]::UTF8)
+          $runtimeOld = 'const desktop = text("src-tauri/src/lib.rs");'
+          $runtimeNew = 'const desktop = [text("src-tauri/src/bootstrap/command_registry.rs"), text("src-tauri/src/bootstrap/state.rs")].join("\n");'
+          if (([regex]::Matches($runtimeSource, [regex]::Escape($runtimeOld))).Count -ne 1) {
+            throw 'runtime diagnostics legacy owner anchor mismatch'
           }
+          [System.IO.File]::WriteAllText(
+            $runtimePath,
+            $runtimeSource.Replace($runtimeOld, $runtimeNew),
+            [System.Text.UTF8Encoding]::new($false)
+          )
+
+          $readmePath = Join-Path $env:GITHUB_WORKSPACE 'README.md'
+          $readme = [System.IO.File]::ReadAllText($readmePath, [System.Text.Encoding]::UTF8)
+          $readmeLine = '- R1-04 已同步迁移 19 个既有验证器读取新的 Tauri 命令注册表或状态所有者，消除旧 `lib.rs` 路径造成的伪失败；产品代码和公共契约未改变。'
+          if (-not $readme.Contains($readmeLine)) {
+            $marker = '- R1-04 前置校正将 `crates/application/src/model_shell/mod.rs` 恢复为 Rust 1.88 标准排版，并只同步更新该文件的保护指纹与派生聚合值；导出集合、模型行为和保护范围均未变化。'
+            if (-not $readme.Contains($marker)) { throw 'README R1-04 marker missing' }
+            $readme = $readme.Replace($marker, "$marker`n$readmeLine")
+            [System.IO.File]::WriteAllText($readmePath, $readme, [System.Text.UTF8Encoding]::new($false))
+          }
+
+          $recordPath = Join-Path $env:GITHUB_WORKSPACE 'docs/modular-rewrite/R01-architecture-composition/R01-04-tauri-组合根.md'
+          $record = [System.IO.File]::ReadAllText($recordPath, [System.Text.Encoding]::UTF8)
+          $recordLine = '- 同步迁移 19 个既有验证器的 Tauri 注册表或状态读取路径，防止旧 `lib.rs` 硬编码产生伪失败。'
+          if (-not $record.Contains($recordLine)) {
+            $recordMarker = '该专项门禁和确定性保护资产入口均已接入 `scripts/verify-frontend.mjs`。'
+            if (-not $record.Contains($recordMarker)) { throw 'R1-04 record marker missing' }
+            $record = $record.Replace($recordMarker, "$recordMarker`n`n$recordLine")
+          }
+          $fileListAnchor = '- `scripts/verify-frontend.mjs`'
+          $additionalFiles = @(
+            '- `scripts/verify-api-runtime-diagnostics.mjs`',
+            '- `scripts/verify-api-workspace.mjs`',
+            '- `scripts/verify-database-reset.mjs`',
+            '- `scripts/verify-entity-relationships.mjs`',
+            '- `scripts/verify-force-team-delete.mjs`',
+            '- `scripts/verify-formation-usage.mjs`',
+            '- `scripts/verify-history-scoreline-ui.mjs`',
+            '- `scripts/verify-match-lineup-chain.mjs`',
+            '- `scripts/verify-match-review-package.mjs`',
+            '- `scripts/verify-match-workflow-ui.mjs`',
+            '- `scripts/verify-monthly-workbooks.mjs`',
+            '- `scripts/verify-openai-profile-ui.mjs`',
+            '- `scripts/verify-parameter-lifecycle.mjs`',
+            '- `scripts/verify-postmatch-settlement.mjs`',
+            '- `scripts/verify-release-acceptance.mjs`',
+            '- `scripts/verify-stage-e2-lineup-presets.mjs`',
+            '- `scripts/verify-team-package.mjs`',
+            '- `scripts/verify-team-player-management.mjs`',
+            '- `scripts/verify-workspace-ui.mjs`'
+          ) -join "`n"
+          if (-not $record.Contains('- `scripts/verify-api-runtime-diagnostics.mjs`')) {
+            if (-not $record.Contains($fileListAnchor)) { throw 'R1-04 file list anchor missing' }
+            $record = $record.Replace($fileListAnchor, "$fileListAnchor`n$additionalFiles")
+          }
+          [System.IO.File]::WriteAllText($recordPath, $record, [System.Text.UTF8Encoding]::new($false))
+
+          Remove-Item -LiteralPath '.github/workflows/r1-04-scan.yml'
+
+          $checks = @(
+            'scripts/verify-api-runtime-diagnostics.mjs',
+            'scripts/verify-api-workspace.mjs',
+            'scripts/verify-database-reset.mjs',
+            'scripts/verify-entity-relationships.mjs',
+            'scripts/verify-force-team-delete.mjs',
+            'scripts/verify-formation-usage.mjs',
+            'scripts/verify-history-scoreline-ui.mjs',
+            'scripts/verify-match-lineup-chain.mjs',
+            'scripts/verify-match-review-package.mjs',
+            'scripts/verify-match-workflow-ui.mjs',
+            'scripts/verify-monthly-workbooks.mjs',
+            'scripts/verify-openai-profile-ui.mjs',
+            'scripts/verify-parameter-lifecycle.mjs',
+            'scripts/verify-postmatch-settlement.mjs',
+            'scripts/verify-release-acceptance.mjs',
+            'scripts/verify-stage-e2-lineup-presets.mjs',
+            'scripts/verify-team-package.mjs',
+            'scripts/verify-team-player-management.mjs',
+            'scripts/verify-workspace-ui.mjs'
+          )
+          foreach ($check in $checks) {
+            node $check
+            if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          }
+          npm run verify:architecture
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          git diff --check
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add README.md docs/modular-rewrite/R01-architecture-composition/R01-04-tauri-组合根.md scripts .github/workflows/r1-04-scan.yml
+          git commit -m 'test(r1): migrate Tauri verifier owners'
+          git push origin HEAD:new-B
