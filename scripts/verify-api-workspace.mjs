@@ -8,9 +8,9 @@ const root = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const outerRoot = resolve(root, "..");
 const failures = [];
 const assert = (condition, message) => { if (!condition) failures.push(message); };
-const text = (path) => readFileSync(join(root, path), "utf8");
+const text = (path) => readFileSync(join(root, path), "utf8").replace(/\r\n?/g, "\n");
 const json = (path) => JSON.parse(text(path));
-const hash = (path) => createHash("sha256").update(readFileSync(join(root, path))).digest("hex");
+const hash = (path) => createHash("sha256").update(text(path), "utf8").digest("hex");
 const slice = (source, start, end) => {
   const begin = source.indexOf(start);
   if (begin < 0) return "";
@@ -37,7 +37,7 @@ const page = text("src/pages/apiWorkspace.ts");
 const main = text("src/main.ts");
 const shell = text("src/app/shell.ts");
 const navigation = text("src/app/navigation.ts");
-const readme = readFileSync(join(root, "README.md"), "utf8");
+const readme = text("README.md");
 
 assert(v1.contract_id === "football.api-workspace-contract.v1", "历史v1契约ID被破坏");
 assert(v2.contract_id === "football.api-workspace-contract.v2", "历史v2契约ID被破坏");
