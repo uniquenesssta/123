@@ -26,3 +26,5 @@ jobs:
 
       - name: Activate R1-02 gates and records
         run: python scripts/r1-02-activate.py
+
+      # The activation workflow deletes itself after a successful guarded commit.
