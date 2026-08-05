@@ -30,6 +30,26 @@ function sleep(milliseconds) {
   return new Promise((resolve) => setTimeout(resolve, milliseconds));
 }
 
+async function readDevToolsPort(portFile, browserStderr) {
+  let lastError = null;
+  for (let attempt = 0; attempt < 150; attempt += 1) {
+    try {
+      const [portText] = fs.readFileSync(portFile, "utf8").trim().split(/\s+/);
+      const port = Number(portText);
+      if (Number.isInteger(port) && port > 0) return port;
+      lastError = new Error(`调试端口内容无效：${portText || "empty"}`);
+    } catch (error) {
+      const code = error && typeof error === "object" && "code" in error ? error.code : null;
+      if (!["EBUSY", "ENOENT", "EPERM"].includes(code)) throw error;
+      lastError = error;
+    }
+    await sleep(100);
+  }
+
+  const detail = lastError instanceof Error ? `${lastError.code ?? lastError.name}: ${lastError.message}` : String(lastError ?? "unknown");
+  throw new Error(`浏览器未开放可读调试端口（${detail}）。${browserStderr().slice(-1200)}`);
+}
+
 function requestJson({ port, path: requestPath, method = "GET" }) {
   return new Promise((resolve, reject) => {
     const request = http.request({ host: "127.0.0.1", port, path: requestPath, method }, (response) => {
@@ -203,10 +223,7 @@ export async function captureHtmlScreenshot({ browser, htmlPath, outputPath, wid
   child.stderr?.on("data", (chunk) => { stderr += chunk.toString(); });
   const portFile = path.join(profileDirectory, "DevToolsActivePort");
   try {
-    for (let attempt = 0; attempt < 150 && !fs.existsSync(portFile); attempt += 1) await sleep(100);
-    if (!fs.existsSync(portFile)) throw new Error(`浏览器未开放调试端口。${stderr.slice(-1200)}`);
-    const [portText] = fs.readFileSync(portFile, "utf8").trim().split(/\s+/);
-    const port = Number(portText);
+    const port = await readDevToolsPort(portFile, () => stderr);
     const target = await requestJson({ port, path: "/json/new?about:blank", method: "PUT" });
     const cdp = await connectCdp(target.webSocketDebuggerUrl);
     try {
