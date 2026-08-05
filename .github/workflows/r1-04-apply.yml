@@ -45,7 +45,7 @@ jobs:
           $architectureOld = "run(npm,['run','verify:architecture']);"
           $architectureReplacement = "run(process.execPath,['scripts/architecture/verifyModuleBoundaries.mjs']);run(process.execPath,['scripts/architecture/verifyStateOwnership.mjs']);run(process.execPath,['scripts/architecture/verifyProtectedImports.mjs']);"
           $formatOld = "run('cargo',['fmt','--all']);"
-          $formatReplacement = "run('rustfmt',['--edition','2021','src-tauri/src/bootstrap/mod.rs','src-tauri/src/bootstrap/application.rs','src-tauri/src/bootstrap/state.rs','src-tauri/src/bootstrap/command_registry.rs','src-tauri/src/bootstrap/error.rs','src-tauri/src/lib.rs','src-tauri/src/commands.rs']);"
+          $formatReplacement = "run('rustfmt',['--edition','2021','--config','skip_children=true','src-tauri/src/bootstrap/mod.rs','src-tauri/src/bootstrap/application.rs','src-tauri/src/bootstrap/state.rs','src-tauri/src/bootstrap/command_registry.rs','src-tauri/src/bootstrap/error.rs','src-tauri/src/lib.rs','src-tauri/src/commands.rs']);"
           if (-not $source.Contains($architectureOld)) {
             throw "R1-04 architecture invocation anchor missing"
           }
