@@ -41,100 +41,36 @@ jobs:
       - name: Inject startup probes
         shell: pwsh
         run: |
-          function Replace-ExactlyOnce([string]$Path, [string]$Old, [string]$New) {
+          function Insert-AfterLine([string]$Path, [string]$Needle, [string]$Insert) {
             $source = [System.IO.File]::ReadAllText($Path, [System.Text.Encoding]::UTF8).Replace("`r`n", "`n")
-            $count = ([regex]::Matches($source, [regex]::Escape($Old))).Count
-            if ($count -ne 1) { throw "$Path expected one probe anchor, got $count" }
-            [System.IO.File]::WriteAllText($Path, $source.Replace($Old, $New), [System.Text.UTF8Encoding]::new($false))
+            $count = ([regex]::Matches($source, [regex]::Escape($Needle))).Count
+            if ($count -ne 1) { throw "$Path expected one probe line [$Needle], got $count" }
+            [System.IO.File]::WriteAllText($Path, $source.Replace($Needle, "$Needle`n$Insert"), [System.Text.UTF8Encoding]::new($false))
           }
-
-          $mark = @'
+          function Insert-BeforeLine([string]$Path, [string]$Needle, [string]$Insert) {
+            $source = [System.IO.File]::ReadAllText($Path, [System.Text.Encoding]::UTF8).Replace("`r`n", "`n")
+            $count = ([regex]::Matches($source, [regex]::Escape($Needle))).Count
+            if ($count -ne 1) { throw "$Path expected one probe line [$Needle], got $count" }
+            [System.IO.File]::WriteAllText($Path, $source.Replace($Needle, "$Insert`n$Needle"), [System.Text.UTF8Encoding]::new($false))
+          }
+          function Marker([string]$Name) {
+            return @"
           if let Ok(root) = std::env::var("R104_PROBE_ROOT") {
-              let _ = std::fs::write(std::path::Path::new(&root).join("__FILE__"), "ok");
+              let _ = std::fs::write(std::path::Path::new(&root).join("$Name"), "ok");
           }
-          '@
-
-          Replace-ExactlyOnce 'src-tauri/src/lib.rs' @'
-          pub fn run() {
-              bootstrap::run();
+          "@.Trim()
           }
-          '@ @"
-          pub fn run() {
-          $($mark.Replace('__FILE__', '01-lib.txt'))
-              bootstrap::run();
-          }
-          "@
 
-          Replace-ExactlyOnce 'src-tauri/src/bootstrap/mod.rs' @'
-          pub(crate) fn run() {
-              application::run();
-          }
-          '@ @"
-          pub(crate) fn run() {
-          $($mark.Replace('__FILE__', '02-bootstrap.txt'))
-              application::run();
-          }
-          "@
-
-          Replace-ExactlyOnce 'src-tauri/src/bootstrap/application.rs' @'
-          pub(crate) fn run() {
-              let builder = tauri::Builder::default()
-          '@ @"
-          pub(crate) fn run() {
-          $($mark.Replace('__FILE__', '03-application.txt'))
-              let builder = tauri::Builder::default()
-          "@
-
-          Replace-ExactlyOnce 'src-tauri/src/bootstrap/application.rs' @'
-                  .setup(|app| -> Result<(), Box<dyn std::error::Error>> {
-                      state::install(app)?;
-          '@ @"
-                  .setup(|app| -> Result<(), Box<dyn std::error::Error>> {
-          $($mark.Replace('__FILE__', '05-setup-entered.txt'))
-                      state::install(app)?;
-          "@
-
-          Replace-ExactlyOnce 'src-tauri/src/bootstrap/application.rs' @'
-              error::expect_startup(command_registry::register(builder).run(tauri::generate_context!()));
-          '@ @"
-          $($mark.Replace('__FILE__', '04-before-run.txt'))
-              error::expect_startup(command_registry::register(builder).run(tauri::generate_context!()));
-          "@
-
-          Replace-ExactlyOnce 'src-tauri/src/bootstrap/state.rs' @'
-          pub(crate) fn install<R: tauri::Runtime>(app: &mut tauri::App<R>) -> Result<(), std::io::Error> {
-              let config_dir = app.path().app_config_dir().map_err(error::io_error)?;
-          '@ @"
-          pub(crate) fn install<R: tauri::Runtime>(app: &mut tauri::App<R>) -> Result<(), std::io::Error> {
-          $($mark.Replace('__FILE__', '06-state-entered.txt'))
-              let config_dir = app.path().app_config_dir().map_err(error::io_error)?;
-          $($mark.Replace('__FILE__', '07-config-dir.txt'))
-          "@
-
-          Replace-ExactlyOnce 'src-tauri/src/bootstrap/state.rs' @'
-              let runtime_log = Arc::new(RuntimeLogStore::discover(&config_dir));
-              let _ = runtime_log.record(
-          '@ @"
-              let runtime_log = Arc::new(RuntimeLogStore::discover(&config_dir));
-          $($mark.Replace('__FILE__', '08-log-store.txt'))
-              let _ = runtime_log.record(
-          "@
-
-          Replace-ExactlyOnce 'src-tauri/src/bootstrap/state.rs' @'
-              app.manage(AppState {
-          '@ @"
-          $($mark.Replace('__FILE__', '09-log-recorded.txt'))
-              app.manage(AppState {
-          "@
-
-          Replace-ExactlyOnce 'src-tauri/src/bootstrap/state.rs' @'
-              });
-              Ok(())
-          '@ @"
-              });
-          $($mark.Replace('__FILE__', '10-state-managed.txt'))
-              Ok(())
-          "@
+          Insert-AfterLine 'src-tauri/src/lib.rs' 'pub fn run() {' (Marker '01-lib.txt')
+          Insert-AfterLine 'src-tauri/src/bootstrap/mod.rs' 'pub(crate) fn run() {' (Marker '02-bootstrap.txt')
+          Insert-AfterLine 'src-tauri/src/bootstrap/application.rs' 'pub(crate) fn run() {' (Marker '03-application.txt')
+          Insert-BeforeLine 'src-tauri/src/bootstrap/application.rs' '    error::expect_startup(command_registry::register(builder).run(tauri::generate_context!()));' (Marker '04-before-run.txt')
+          Insert-AfterLine 'src-tauri/src/bootstrap/application.rs' '        .setup(|app| -> Result<(), Box<dyn std::error::Error>> {' (Marker '05-setup-entered.txt')
+          Insert-AfterLine 'src-tauri/src/bootstrap/state.rs' 'pub(crate) fn install<R: tauri::Runtime>(app: &mut tauri::App<R>) -> Result<(), std::io::Error> {' (Marker '06-state-entered.txt')
+          Insert-AfterLine 'src-tauri/src/bootstrap/state.rs' '    let config_dir = app.path().app_config_dir().map_err(error::io_error)?;' (Marker '07-config-dir.txt')
+          Insert-AfterLine 'src-tauri/src/bootstrap/state.rs' '    let runtime_log = Arc::new(RuntimeLogStore::discover(&config_dir));' (Marker '08-log-store.txt')
+          Insert-BeforeLine 'src-tauri/src/bootstrap/state.rs' '    app.manage(AppState {' (Marker '09-log-recorded.txt')
+          Insert-BeforeLine 'src-tauri/src/bootstrap/state.rs' '    Ok(())' (Marker '10-state-managed.txt')
 
           rustfmt --edition 2021 --config skip_children=true src-tauri/src/lib.rs src-tauri/src/bootstrap/mod.rs src-tauri/src/bootstrap/application.rs src-tauri/src/bootstrap/state.rs
 
@@ -150,12 +86,12 @@ jobs:
           $env:R104_PROBE_ROOT = $probeRoot
           $env:FOOTBALL_RUNTIME_ROOT = $env:GITHUB_WORKSPACE
           $env:FOOTBALL_PROJECT_ROOT = $env:GITHUB_WORKSPACE
-          $exe = Get-ChildItem -Path (Resolve-Path '..\.cargo-target') -Recurse -Filter 'football-match-model-desktop.exe' -File | Sort-Object LastWriteTime -Descending | Select-Object -First 1
-          if (-not $exe) { throw 'release executable not found' }
+          $exe = Join-Path (Resolve-Path '..\.cargo-target\release') 'football-match-model-desktop.exe'
+          if (-not (Test-Path $exe -PathType Leaf)) { throw "release executable not found: $exe" }
           $stdout = Join-Path $probeRoot 'stdout.txt'
           $stderr = Join-Path $probeRoot 'stderr.txt'
-          Write-Host "Launching $($exe.FullName)"
-          $process = Start-Process -FilePath $exe.FullName -WorkingDirectory $env:GITHUB_WORKSPACE -RedirectStandardOutput $stdout -RedirectStandardError $stderr -PassThru
+          Write-Host "Launching $exe"
+          $process = Start-Process -FilePath $exe -WorkingDirectory $env:GITHUB_WORKSPACE -RedirectStandardOutput $stdout -RedirectStandardError $stderr -PassThru
           Start-Sleep -Seconds 60
           $process.Refresh()
           Write-Host "HasExited=$($process.HasExited)"
