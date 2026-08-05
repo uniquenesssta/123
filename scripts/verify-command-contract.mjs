@@ -5,7 +5,7 @@ import { dirname, extname, resolve } from "node:path";
 const scriptDir = dirname(fileURLToPath(import.meta.url));
 const projectRoot = resolve(scriptDir, "..");
 const clientSource = readFileSync(resolve(projectRoot, "src/api/client.ts"), "utf8");
-const desktopSource = readFileSync(resolve(projectRoot, "src-tauri/src/lib.rs"), "utf8");
+const desktopSource = readFileSync(resolve(projectRoot, "src-tauri/src/bootstrap/command_registry.rs"), "utf8");
 const commandDirectory = resolve(projectRoot, "src-tauri/src/commands");
 
 function uniqueSorted(values) {

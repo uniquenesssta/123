@@ -38,7 +38,7 @@ R00 已按 Windows-only 目标范围完成。R1 只建立可机器验证的架�
 | R1-01 | 模块边界契约 | DONE | [`R01-01-模块边界契约.md`](R01-01-模块边界契约.md) | JSON 解析、契约自检、Windows Automated 通过 | workflow run `30989439570` 通过 |
 | R1-02 | 边界验证脚本 | DONE | [`R01-02-边界验证脚本.md`](R01-02-边界验证脚本.md) | `npm run verify:architecture` 通过 | workflow run `31001470224` 通过 |
 | R1-03 | 浏览器组合根 | DONE | [`R01-03-浏览器组合根.md`](R01-03-浏览器组合根.md) | 浏览器组合根专项验证通过 | workflow run `31012168809` 通过 |
-| R1-04 | Tauri 组合根 | READY | 待创建 | 待执行 | 待执行 |
+| R1-04 | Tauri 组合根 | VERIFYING | 待创建 | 最小门禁执行中 | Windows Automated 待验证 |
 | R1-05 | Application 组合根 | BLOCKED | 待创建 | 待执行 | 待执行 |
 
 ## R1-01 完成结果
@@ -79,4 +79,4 @@ R00 已按 Windows-only 目标范围完成。R1 只建立可机器验证的架�
 
 ## 当前唯一可执行任务
 
-`R1-04 Tauri 组合根`
+`R1-04 Tauri 组合根：完成正式 Windows 自动化门禁并关闭节点`

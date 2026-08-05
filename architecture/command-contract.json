@@ -34,7 +34,7 @@
       ]
     },
     "tauri_registration": {
-      "file": "src-tauri/src/lib.rs",
+      "file": "src-tauri/src/bootstrap/command_registry.rs",
       "macro": "tauri::generate_handler!"
     },
     "rust_module_root": {

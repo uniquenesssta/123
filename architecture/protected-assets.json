@@ -85,8 +85,8 @@
       "path": "crates/application/src/model_shell/mod.rs",
       "category": "model-shell-public-interface",
       "mode": "utf8-lf",
-      "git_blob_sha1": "96c66e27fea716520ea5e13369bd3ef6667da6c3",
-      "fingerprint_sha256": "ae719bcf9a08dc70fe233c86638b41d654abe8612f0223b4dea64ba764ed936d"
+      "git_blob_sha1": "93933d52039f1b910a64189f7c292610f47ce6f3",
+      "fingerprint_sha256": "47c05a5e621def716e9922a044b34139d674b17302371eda9aa421782e94e199"
     },
     {
       "path": "crates/model-api/Cargo.toml",
@@ -243,5 +243,5 @@
       "category": "private-model-documentation"
     }
   ],
-  "aggregate_sha256": "d2263a5ff09c8cf633a42b7bb35fffe3d42fb18648db4d12691817f51015c85c"
+  "aggregate_sha256": "a67bd371700ed3f9d4ed49a61e24338f9a022909ba369786e661d15336c09ef6"
 }

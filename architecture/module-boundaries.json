@@ -313,16 +313,19 @@
       ]
     },
     "tauri_host": {
-      "entry": "src-tauri/src/lib.rs::run",
-      "state": "src-tauri/src/commands.rs::AppState",
+      "public_entry": "src-tauri/src/lib.rs::run",
+      "composition_entry": "src-tauri/src/bootstrap/mod.rs::run",
+      "builder": "src-tauri/src/bootstrap/application.rs",
+      "state": "src-tauri/src/bootstrap/state.rs::AppState",
+      "command_registry": "src-tauri/src/bootstrap/command_registry.rs",
       "command_root": "src-tauri/src/commands.rs",
-      "target_task": "R1-04"
+      "target_task": null
     }
   },
   "tauri_commands": {
     "source": "architecture/command-contract.json",
     "count": 171,
-    "registration_owner": "src-tauri/src/lib.rs",
+    "registration_owner": "src-tauri/src/bootstrap/command_registry.rs",
     "frontend_owner": "src/api/client.ts",
     "groups": {
       "analytics": "src-tauri/src/commands/analytics.rs",

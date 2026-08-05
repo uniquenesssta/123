@@ -147,22 +147,22 @@
     },
     {
       "id": "tauri.app-state",
-      "owner": "src-tauri/src/commands.rs::AppState",
+      "owner": "src-tauri/src/bootstrap/state.rs::AppState",
       "scope": "Tauri application",
       "writers": [
-        "src-tauri/src/lib.rs::run.setup"
+        "src-tauri/src/bootstrap/state.rs::install"
       ],
       "forbidden": [
         "command module static state"
       ],
-      "transition": "R1-04:tauri state shell"
+      "transition": null
     },
     {
       "id": "tauri.database-config-path",
       "owner": "AppState.config_path",
       "scope": "Tauri application",
       "writers": [
-        "src-tauri/src/lib.rs::run.setup"
+        "src-tauri/src/bootstrap/state.rs::install"
       ],
       "forbidden": [
         "src/**",

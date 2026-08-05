@@ -30,27 +30,8 @@ pub use release_acceptance::*;
 pub use review::*;
 pub use workspace::*;
 
-use crate::issue_log::IssueLogStore;
-use crate::openai_profiles::OpenAiProfileStore;
-use crate::runtime_log::RuntimeLogStore;
-use crate::workspace_state::WorkspaceStateStore;
-use football_application::ApplicationService;
-use football_research_gateway::CancellationToken;
-use std::collections::HashMap;
-use std::path::PathBuf;
-use std::sync::Arc;
-use tokio::sync::Mutex;
+pub(crate) use crate::bootstrap::AppState;
 use uuid::Uuid;
-
-pub struct AppState {
-    pub service: Arc<ApplicationService>,
-    pub config_path: PathBuf,
-    pub issue_log: Arc<IssueLogStore>,
-    pub runtime_log: Arc<RuntimeLogStore>,
-    pub openai_profiles: Arc<OpenAiProfileStore>,
-    pub workspace_state: Arc<WorkspaceStateStore>,
-    pub api_workspace_requests: Arc<Mutex<HashMap<String, CancellationToken>>>,
-}
 
 pub(super) fn parse_uuid(value: &str, label: &str) -> Result<Uuid, String> {
     Uuid::parse_str(value).map_err(|error| format!("{label} 无效：{error}"))
