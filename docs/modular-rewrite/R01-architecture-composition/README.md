@@ -36,8 +36,8 @@ R00 已按 Windows-only 目标范围完成。R1 只建立可机器验证的架�
 | 任务 ID | 任务名称 | 状态 | 实施记录 | 最小验证 | 阶段回归 |
 |---|---|---|---|---|---|
 | R1-01 | 模块边界契约 | DONE | [`R01-01-模块边界契约.md`](R01-01-模块边界契约.md) | JSON 解析、契约自检、Windows Automated 通过 | workflow run `30989439570` 通过 |
-| R1-02 | 边界验证脚本 | VERIFYING | [`R01-02-边界验证脚本.md`](R01-02-边界验证脚本.md) | `npm run verify:architecture` 通过 | Windows Automated 待最终 HEAD 验证 |
-| R1-03 | 浏览器组合根 | BLOCKED | 待创建 | 待执行 | 待执行 |
+| R1-02 | 边界验证脚本 | DONE | [`R01-02-边界验证脚本.md`](R01-02-边界验证脚本.md) | `npm run verify:architecture` 通过 | workflow run `31001470224` 通过 |
+| R1-03 | 浏览器组合根 | READY | 待创建 | 待执行 | 待执行 |
 | R1-04 | Tauri 组合根 | BLOCKED | 待创建 | 待执行 | 待执行 |
 | R1-05 | Application 组合根 | BLOCKED | 待创建 | 待执行 | 待执行 |
 
@@ -61,11 +61,14 @@ R00 已按 Windows-only 目标范围完成。R1 只建立可机器验证的架�
 - 公共命令契约；
 - 模型保护资产指纹。
 
-## R1-02 当前结果
+## R1-02 完成结果
 
-- 已新增模块边界、状态所有权和受保护导入三条门禁，并接入 `verify:frontend`；Windows CI 独立步骤待受控提交。
-- 当前状态为 `VERIFYING`；完整 Windows Automated 通过后才可开放 R1-03。
+- 已新增模块边界、状态所有权和受保护导入三条仓库内门禁，共用独立的文件遍历、Import 解析、Cargo 解析和报告模块。
+- 两份 R1 架构契约状态均为 `ACTIVE`；`npm run verify:architecture`、前端聚合验证和 Windows CI 独立步骤均已接入。
+- 三条现存耦合只按精确源/目标与退出任务登记：Application→PostgreSQL 在 `R1-05` 退出，Prediction→P4 Workbench 在 `R14-06` 退出，Prediction→Runs 在 `R14-07` 退出。
+- workflow run `31001470224` 在提交 `28ec363babe4f3fbccd14693d0261febdc305458` 上完整通过；artifact `8929207011` 的 SHA-256 为 `e83b2ab9c6cb705d0bfd740c798673a45dc2a4cb0b7b35ddebe844bb40b13e88`。
+- R1-02 状态为 `DONE`；R1-03 开放为 `READY`，R1-04 与 R1-05 继续 `BLOCKED`。
 
 ## 当前唯一可执行任务
 
-`R1-02 边界验证脚本：完成 CI 接入与最终 Windows 自动化门禁并关闭节点`
+`R1-03 浏览器组合根`
