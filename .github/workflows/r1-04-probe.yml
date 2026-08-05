@@ -1,4 +1,4 @@
-name: R1-04 startup probe
+name: R1-04 release startup comparison
 
 on:
   push:
@@ -12,16 +12,19 @@ permissions:
   contents: read
 
 jobs:
-  probe:
+  compare:
     runs-on: windows-latest
     timeout-minutes: 60
     steps:
       - uses: actions/checkout@v4
+        with:
+          path: 项目源码
 
       - uses: actions/setup-node@v4
         with:
           node-version: 22
           cache: npm
+          cache-dependency-path: 项目源码/package-lock.json
 
       - uses: dtolnay/rust-toolchain@1.88.0
         with:
@@ -29,92 +32,86 @@ jobs:
 
       - uses: Swatinem/rust-cache@v2
         with:
-          workspaces: . -> ../.cargo-target
+          workspaces: 项目源码 -> ../.cargo-target
 
-      - name: Install and build frontend
+      - name: Build plain release and preserve executable
         shell: pwsh
+        working-directory: 项目源码
         run: |
           npm ci
           node node_modules/vite/bin/vite.js build
           node scripts/prepare-cargo-target.mjs
+          cargo build --locked --release -p football-match-model-desktop
+          $evidence = Join-Path $env:RUNNER_TEMP 'r104-ab'
+          New-Item -ItemType Directory -Force -Path $evidence | Out-Null
+          Copy-Item '..\.cargo-target\release\football-match-model-desktop.exe' (Join-Path $evidence 'pre-bundle.exe') -Force
 
-      - name: Inject startup probes
+      - name: Build Tauri bundles
+        shell: pwsh
+        working-directory: 项目源码
+        run: npm run tauri:build
+
+      - name: Compare startup behavior
         shell: pwsh
         run: |
-          function Insert-AfterLine([string]$Path, [string]$Needle, [string]$Insert) {
-            $source = [System.IO.File]::ReadAllText($Path, [System.Text.Encoding]::UTF8).Replace("`r`n", "`n")
-            $count = ([regex]::Matches($source, [regex]::Escape($Needle))).Count
-            if ($count -ne 1) { throw "$Path expected one probe line [$Needle], got $count" }
-            [System.IO.File]::WriteAllText($Path, $source.Replace($Needle, "$Needle`n$Insert"), [System.Text.UTF8Encoding]::new($false))
+          $sourceRoot = Join-Path $env:GITHUB_WORKSPACE '项目源码'
+          $targetRoot = Join-Path $env:GITHUB_WORKSPACE '.cargo-target'
+          $evidence = Join-Path $env:RUNNER_TEMP 'r104-ab'
+          $preBundle = Join-Path $evidence 'pre-bundle.exe'
+          $postBundle = Join-Path $targetRoot 'release\football-match-model-desktop.exe'
+
+          function Test-ReleaseExecutable([string]$Label, [string]$Executable) {
+            $runtimeRoot = Join-Path $evidence $Label
+            Remove-Item $runtimeRoot -Recurse -Force -ErrorAction SilentlyContinue
+            New-Item -ItemType Directory -Force -Path $runtimeRoot | Out-Null
+            $env:FOOTBALL_RUNTIME_ROOT = $runtimeRoot
+            $env:FOOTBALL_PROJECT_ROOT = $runtimeRoot
+            $stdout = Join-Path $runtimeRoot 'stdout.txt'
+            $stderr = Join-Path $runtimeRoot 'stderr.txt'
+            $startedAt = Get-Date
+            $process = Start-Process -FilePath $Executable -WorkingDirectory $sourceRoot -RedirectStandardOutput $stdout -RedirectStandardError $stderr -PassThru
+            $deadline = (Get-Date).AddSeconds(45)
+            $logPath = $null
+            while ((Get-Date) -lt $deadline) {
+              $process.Refresh()
+              if ($process.HasExited) { break }
+              $candidate = Get-ChildItem (Join-Path $runtimeRoot 'logs') -Filter 'football-runtime-*.jsonl' -File -ErrorAction SilentlyContinue |
+                Where-Object { $_.CreationTime -ge $startedAt.AddSeconds(-2) -and $_.Length -gt 0 } |
+                Sort-Object LastWriteTime -Descending |
+                Select-Object -First 1
+              if ($candidate) {
+                $logPath = $candidate.FullName
+                break
+              }
+              Start-Sleep -Milliseconds 500
+            }
+            $process.Refresh()
+            $result = [ordered]@{
+              label = $Label
+              executable = $Executable
+              sha256 = (Get-FileHash $Executable -Algorithm SHA256).Hash.ToLowerInvariant()
+              size_bytes = (Get-Item $Executable).Length
+              process_exited = $process.HasExited
+              exit_code = if ($process.HasExited) { $process.ExitCode } else { $null }
+              runtime_log_created = [bool]$logPath
+              runtime_log = $logPath
+            }
+            if (-not $process.HasExited) {
+              Stop-Process -Id $process.Id -Force
+              $process.WaitForExit()
+            }
+            $result | ConvertTo-Json -Depth 4 | Set-Content (Join-Path $evidence "$Label.json") -Encoding UTF8
+            Write-Host ($result | ConvertTo-Json -Depth 4)
           }
-          function Insert-BeforeLine([string]$Path, [string]$Needle, [string]$Insert) {
-            $source = [System.IO.File]::ReadAllText($Path, [System.Text.Encoding]::UTF8).Replace("`r`n", "`n")
-            $count = ([regex]::Matches($source, [regex]::Escape($Needle))).Count
-            if ($count -ne 1) { throw "$Path expected one probe line [$Needle], got $count" }
-            [System.IO.File]::WriteAllText($Path, $source.Replace($Needle, "$Insert`n$Needle"), [System.Text.UTF8Encoding]::new($false))
-          }
-          function Marker([string]$Name) {
-            return @"
-          if let Ok(root) = std::env::var("R104_PROBE_ROOT") {
-              let _ = std::fs::write(std::path::Path::new(&root).join("$Name"), "ok");
-          }
-          "@.Trim()
-          }
 
-          Insert-AfterLine 'src-tauri/src/lib.rs' 'pub fn run() {' (Marker '01-lib.txt')
-          Insert-AfterLine 'src-tauri/src/bootstrap/mod.rs' 'pub(crate) fn run() {' (Marker '02-bootstrap.txt')
-          Insert-AfterLine 'src-tauri/src/bootstrap/application.rs' 'pub(crate) fn run() {' (Marker '03-application.txt')
-          Insert-BeforeLine 'src-tauri/src/bootstrap/application.rs' '    error::expect_startup(command_registry::register(builder).run(tauri::generate_context!()));' (Marker '04-before-run.txt')
-          Insert-AfterLine 'src-tauri/src/bootstrap/application.rs' '        .setup(|app| -> Result<(), Box<dyn std::error::Error>> {' (Marker '05-setup-entered.txt')
-          Insert-AfterLine 'src-tauri/src/bootstrap/state.rs' 'pub(crate) fn install<R: tauri::Runtime>(app: &mut tauri::App<R>) -> Result<(), std::io::Error> {' (Marker '06-state-entered.txt')
-          Insert-AfterLine 'src-tauri/src/bootstrap/state.rs' '    let config_dir = app.path().app_config_dir().map_err(error::io_error)?;' (Marker '07-config-dir.txt')
-          Insert-AfterLine 'src-tauri/src/bootstrap/state.rs' '    let runtime_log = Arc::new(RuntimeLogStore::discover(&config_dir));' (Marker '08-log-store.txt')
-          Insert-BeforeLine 'src-tauri/src/bootstrap/state.rs' '    app.manage(AppState {' (Marker '09-log-recorded.txt')
-          Insert-BeforeLine 'src-tauri/src/bootstrap/state.rs' '    Ok(())' (Marker '10-state-managed.txt')
+          Test-ReleaseExecutable 'pre-bundle' $preBundle
+          Test-ReleaseExecutable 'post-bundle' $postBundle
 
-          rustfmt --edition 2021 --config skip_children=true src-tauri/src/lib.rs src-tauri/src/bootstrap/mod.rs src-tauri/src/bootstrap/application.rs src-tauri/src/bootstrap/state.rs
-
-      - name: Build release probe
-        shell: pwsh
-        run: cargo build --locked --release -p football-match-model-desktop
-
-      - name: Run and inspect startup probe
-        shell: pwsh
-        run: |
-          $probeRoot = Join-Path $env:RUNNER_TEMP 'r104-probe'
-          New-Item -ItemType Directory -Force -Path $probeRoot | Out-Null
-          $env:R104_PROBE_ROOT = $probeRoot
-          $env:FOOTBALL_RUNTIME_ROOT = $env:GITHUB_WORKSPACE
-          $env:FOOTBALL_PROJECT_ROOT = $env:GITHUB_WORKSPACE
-          $exe = Join-Path (Resolve-Path '..\.cargo-target\release') 'football-match-model-desktop.exe'
-          if (-not (Test-Path $exe -PathType Leaf)) { throw "release executable not found: $exe" }
-          $stdout = Join-Path $probeRoot 'stdout.txt'
-          $stderr = Join-Path $probeRoot 'stderr.txt'
-          Write-Host "Launching $exe"
-          $process = Start-Process -FilePath $exe -WorkingDirectory $env:GITHUB_WORKSPACE -RedirectStandardOutput $stdout -RedirectStandardError $stderr -PassThru
-          Start-Sleep -Seconds 60
-          $process.Refresh()
-          Write-Host "HasExited=$($process.HasExited)"
-          if ($process.HasExited) { Write-Host "ExitCode=$($process.ExitCode)" }
-          Write-Host '--- probe markers ---'
-          Get-ChildItem -Path $probeRoot -File | Sort-Object Name | ForEach-Object { Write-Host $_.Name }
-          Write-Host '--- stdout ---'
-          if (Test-Path $stdout) { Get-Content -Raw -Encoding UTF8 $stdout }
-          Write-Host '--- stderr ---'
-          if (Test-Path $stderr) { Get-Content -Raw -Encoding UTF8 $stderr }
-          Write-Host '--- workspace runtime logs ---'
-          Get-ChildItem -Path $env:GITHUB_WORKSPACE -Recurse -Filter 'football-runtime-*.jsonl' -File -ErrorAction SilentlyContinue | ForEach-Object { Write-Host $_.FullName }
-          Write-Host '--- appdata runtime logs ---'
-          Get-ChildItem -Path $env:APPDATA -Recurse -Filter 'football-runtime-*.jsonl' -File -ErrorAction SilentlyContinue | ForEach-Object { Write-Host $_.FullName }
-          if (-not $process.HasExited) { Stop-Process -Id $process.Id -Force }
-
-      - name: Upload probe evidence
+      - name: Upload comparison evidence
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: r1-04-startup-probe-${{ github.sha }}
-          if-no-files-found: warn
+          name: r1-04-release-startup-comparison-${{ github.sha }}
+          if-no-files-found: error
           retention-days: 3
-          path: |
-            ${{ runner.temp }}/r104-probe/**
-            **/football-runtime-*.jsonl
+          path: ${{ runner.temp }}/r104-ab/**
