@@ -46,20 +46,20 @@ jobs:
           workspaces: 项目源码 -> ../.cargo-target
 
       - name: Verify R1 architecture contract JSON
-        shell: powershell
+        shell: pwsh
         working-directory: 项目源码
         run: |
           $module = Get-Content -Raw -Encoding UTF8 architecture/module-boundaries.json | ConvertFrom-Json
           $state = Get-Content -Raw -Encoding UTF8 architecture/state-ownership.json | ConvertFrom-Json
 
           if ($module.contract_id -ne "football.module-boundaries.v1") {
-            throw "模块边界契约 ID 不匹配。"
+            throw "Unexpected module boundary contract id."
           }
           if ($state.contract_id -ne "football.state-ownership.v1") {
-            throw "状态所有权契约 ID 不匹配。"
+            throw "Unexpected state ownership contract id."
           }
           if ($module.policy.state_contract -ne "architecture/state-ownership.json") {
-            throw "模块契约未引用状态所有权契约。"
+            throw "Module contract does not reference the state ownership contract."
           }
 
           $featureCount = @($module.frontend.features.PSObject.Properties).Count
@@ -67,10 +67,10 @@ jobs:
           $stateIds = @($state.states | ForEach-Object { $_.id })
           $uniqueStateIds = @($stateIds | Sort-Object -Unique)
 
-          if ($featureCount -ne 18) { throw "前端 Feature 数量异常：$featureCount" }
-          if ($crateCount -ne 11) { throw "Rust workspace crate 数量异常：$crateCount" }
-          if ($stateIds.Count -ne [int]$state.count) { throw "状态数量与 count 字段不一致。" }
-          if ($uniqueStateIds.Count -ne $stateIds.Count) { throw "状态 ID 存在重复。" }
+          if ($featureCount -ne 18) { throw "Unexpected frontend feature count: $featureCount" }
+          if ($crateCount -ne 11) { throw "Unexpected Rust workspace crate count: $crateCount" }
+          if ($stateIds.Count -ne [int]$state.count) { throw "State count does not match the declared count." }
+          if ($uniqueStateIds.Count -ne $stateIds.Count) { throw "Duplicate state ids detected." }
 
           Write-Host "R1 architecture contract smoke check passed."
 
