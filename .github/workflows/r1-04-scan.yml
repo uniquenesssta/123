@@ -1,0 +1,52 @@
+name: R1-04 legacy verifier scan
+
+on:
+  push:
+    branches:
+      - new-B
+    paths:
+      - .github/workflows/r1-04-scan.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  scan:
+    runs-on: windows-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Scan legacy Tauri verifier references
+        shell: pwsh
+        run: |
+          $patterns = @(
+            'src-tauri/src/lib.rs',
+            'src-tauri/src/commands.rs',
+            'commands.rs::AppState'
+          )
+          $matches = Get-ChildItem -Path scripts -Recurse -File | ForEach-Object {
+            $path = $_.FullName
+            $relative = Resolve-Path -Relative $path
+            $lineNumber = 0
+            Get-Content -LiteralPath $path -Encoding UTF8 | ForEach-Object {
+              $lineNumber += 1
+              $line = $_
+              foreach ($pattern in $patterns) {
+                if ($line.Contains($pattern)) {
+                  [PSCustomObject]@{
+                    Path = $relative
+                    Line = $lineNumber
+                    Pattern = $pattern
+                    Text = $line.Trim()
+                  }
+                }
+              }
+            }
+          }
+          if ($matches) {
+            $matches | Sort-Object Path, Line, Pattern | ConvertTo-Json -Depth 4
+          } else {
+            Write-Output '[]'
+          }
