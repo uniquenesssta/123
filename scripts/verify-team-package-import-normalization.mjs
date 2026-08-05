@@ -1,7 +1,9 @@
 import fs from "node:fs";
 
 function read(path) {
-  return fs.readFileSync(new URL(`../${path}`, import.meta.url), "utf8");
+  return fs
+    .readFileSync(new URL(`../${path}`, import.meta.url), "utf8")
+    .replace(/\r\n?/g, "\n");
 }
 
 function assert(condition, message) {
