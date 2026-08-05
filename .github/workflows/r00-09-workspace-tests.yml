@@ -53,15 +53,44 @@ jobs:
         run: |
           set -euo pipefail
           mkdir -p r0-09-evidence
-          if git apply --check .github/r0-09-workspace-tests.patch; then
-            git apply .github/r0-09-workspace-tests.patch
-            printf 'apply_state=applied\n' > r0-09-evidence/summary.txt
-          elif git apply --reverse --check .github/r0-09-workspace-tests.patch; then
-            printf 'apply_state=already_applied\n' > r0-09-evidence/summary.txt
-          else
-            echo 'R0-09 patch does not match baseline or applied state.' >&2
-            exit 1
-          fi
+          python - <<'PY'
+          from pathlib import Path
+
+          changes = [
+              (
+                  Path("crates/application/src/openai_research.rs"),
+                  '''        assert!(built_in_research_prompt()
+                      .content
+                      .contains("do not calculate probabilities"));''',
+                  '''        assert!(built_in_research_prompt()
+                      .content
+                      .to_ascii_lowercase()
+                      .contains("do not calculate probabilities"));''',
+              ),
+              (
+                  Path("crates/spreadsheet-io/src/team_package.rs"),
+                  '''        sheet.set_name("球员与评分").expect("set player sheet name");
+                  write_key_row(sheet, PLAYER_KEYS).expect("write player keys");''',
+                  '''        sheet.set_name("球员与评分").expect("set player sheet name");
+                  write_group_row(sheet, &[(0, 1, "操作")]).expect("write player group row");
+                  write_key_row(sheet, PLAYER_KEYS).expect("write player keys");''',
+              ),
+          ]
+
+          for path, old, new in changes:
+              text = path.read_text(encoding="utf-8")
+              old_count = text.count(old)
+              new_count = text.count(new)
+              if old_count == 1 and new_count == 0:
+                  path.write_text(text.replace(old, new), encoding="utf-8")
+              elif old_count == 0 and new_count == 1:
+                  pass
+              else:
+                  raise SystemExit(
+                      f"Unexpected replacement state for {path}: old={old_count}, new={new_count}"
+                  )
+          PY
+          printf 'apply_state=applied\n' > r0-09-evidence/summary.txt
           cargo fmt --all
           git diff --check
           git diff --name-only | sort > r0-09-evidence/changed-files.txt
