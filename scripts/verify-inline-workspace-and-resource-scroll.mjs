@@ -3,7 +3,8 @@ import path from "node:path";
 import process from "node:process";
 
 const root = process.cwd();
-const read = (file) => fs.readFileSync(path.join(root, file), "utf8");
+const read = (file) =>
+  fs.readFileSync(path.join(root, file), "utf8").replace(/\r\n?/g, "\n");
 const requireTrue = (condition, message) => {
   if (!condition) throw new Error(message);
 };
