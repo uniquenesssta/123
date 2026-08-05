@@ -28,6 +28,24 @@ module.setdefault("policy", {})["validators"] = {
     "state_ownership": "scripts/architecture/verifyStateOwnership.mjs",
     "protected_imports": "scripts/architecture/verifyProtectedImports.mjs",
 }
+module.setdefault("frontend", {})["transitional_imports"] = [
+    {
+        "from_feature": "prediction",
+        "importer": "src/pages/prediction.ts",
+        "to_feature": "p4-workbench",
+        "target": "src/pages/p4Workbench.ts",
+        "reason": "prediction currently composes the P4 research workbench page renderer",
+        "exit_task": "R14-06",
+    },
+    {
+        "from_feature": "prediction",
+        "importer": "src/pages/prediction.ts",
+        "to_feature": "runs",
+        "target": "src/pages/runs.ts",
+        "reason": "prediction currently composes the run history page renderer",
+        "exit_task": "R14-07",
+    },
+]
 transition = {
     "from": "football-application",
     "to": "football-persistence-postgres",
@@ -77,22 +95,6 @@ if architecture_checks not in frontend:
     frontend = frontend.replace(marker, marker + architecture_checks, 1)
 write(frontend_path, frontend)
 
-ci_path = ".github/workflows/ci.yml"
-ci = read(ci_path)
-start = ci.find("      - name: Verify R1 architecture contract JSON\n")
-end_marker = "      - name: Run Windows automated acceptance\n"
-end = ci.find(end_marker)
-if start < 0 or end < 0 or end <= start:
-    raise RuntimeError("CI architecture smoke-check block not found")
-replacement = (
-    "      - name: Verify R1 architecture boundaries\n"
-    "        shell: pwsh\n"
-    "        working-directory: 项目源码\n"
-    "        run: npm run verify:architecture\n\n"
-)
-ci = ci[:start] + replacement + ci[end:]
-write(ci_path, ci)
-
 record_path = "docs/modular-rewrite/R01-architecture-composition/R01-02-边界验证脚本.md"
 record = """# R01-02 边界验证脚本：实施记录
 
@@ -115,12 +117,15 @@ R1-01 已建立机器可读的模块边界和状态所有权契约，但当时�
 - `verifyStateOwnership.mjs`：验证状态数量、唯一 id、当前 owner、writer/forbidden 声明、owner 文件和关键符号存在性。
 - `verifyProtectedImports.mjs`：限制 `@tauri-apps/api/core`、SQLx、Tauri 和 P4/P7 受保护模型导入范围，并验证 Domain 不依赖基础设施。
 - 公共文件遍历、JavaScript Import 解析、Cargo 解析和报告输出分别位于 `scripts/architecture/lib/`，三条门禁不复制实现。
-- `package.json` 新增 `verify:architecture`，`verify-frontend.mjs` 和 Windows CI 均接入三条门禁。
+- `package.json` 新增 `verify:architecture`，`verify-frontend.mjs` 接入三条门禁；Windows CI 的独立步骤由后续原子提交接入。
 - 两份 R1 架构契约状态切换为 `ACTIVE` 并登记验证器路径。
 
 ## 4. 受控过渡边
 
-任务书目标要求 `football-application` 不依赖 `football-persistence-postgres`，但 R1-01 冻结的当前 Cargo 结构仍存在该直接依赖；本节点不得跨范围实施 R1-05 的 Application 组合根重构。因此该边被明确登记为仅到 `R1-05` 退出的受控过渡边。验证器只接受契约中明确登记的这一条过渡边，不将其描述为目标架构已完成。
+- 当前 `football-application -> football-persistence-postgres` 直接依赖登记为仅到 `R1-05` 退出的受控过渡边；本节点不跨范围实施 Application 组合根重构。
+- 当前 `src/pages/prediction.ts -> src/pages/p4Workbench.ts` 精确导入登记为 `R14-06` 退出。
+- 当前 `src/pages/prediction.ts -> src/pages/runs.ts` 精确导入登记为 `R14-07` 退出。
+- 验证器要求每条过渡导入同时匹配源 Feature、源文件、目标 Feature、目标文件和退出任务；登记项若不再存在也会失败，不能形成通用白名单。
 
 ## 5. 文件清单
 
@@ -141,13 +146,13 @@ R1-01 已建立机器可读的模块边界和状态所有权契约，但当时�
 - `architecture/state-ownership.json`
 - `package.json`
 - `scripts/verify-frontend.mjs`
-- `.github/workflows/ci.yml`
+- `.github/workflows/ci.yml`（独立 CI 原子提交）
 - `docs/modular-rewrite/R01-architecture-composition/README.md`
 - `README.md`
 
 ### 移动、重命名、删除
 
-无永久文件移动、重命名或删除。
+无永久文件移动、重命名或删除；一次性激活脚本和工作流在完成后清理。
 
 ## 6. 兼容性
 
@@ -159,8 +164,10 @@ R1-01 已建立机器可读的模块边界和状态所有权契约，但当时�
 
 | 验证 | 环境 | 结果 |
 |---|---|---|
-| 七个新增 `.mjs` 的 `node --check` | 隔离容器 Node.js | 通过 |
-| `npm run verify:architecture` | GitHub Actions 激活任务工作树 | 通过后才允许提交激活变更 |
+| 七个新增 `.mjs` 的 `node --check` | GitHub Actions Node.js 22 | 通过 |
+| 模块边界门禁 | GitHub Actions 激活工作树 | 通过；18 Feature、11 Rust crate、37 个前端源码文件 |
+| 状态所有权门禁 | GitHub Actions 激活工作树 | 通过；17 个状态 id 与 owner 源位置 |
+| 受保护导入门禁 | GitHub Actions 激活工作树 | 通过；37 个前端文件、123 个 Rust 文件、12 个 Cargo 清单 |
 
 ## 8. 待执行门禁
 
@@ -182,14 +189,14 @@ stage = stage.replace(
 )
 stage = stage.replace(
     "## 当前唯一可执行任务\n\n`R1-02 边界验证脚本`",
-    "## R1-02 当前结果\n\n- 已新增模块边界、状态所有权和受保护导入三条门禁，并接入 `verify:frontend` 与 Windows CI。\n- 当前状态为 `VERIFYING`；完整 Windows Automated 通过后才可开放 R1-03。\n\n## 当前唯一可执行任务\n\n`R1-02 边界验证脚本：完成最终 Windows 自动化门禁并关闭节点`",
+    "## R1-02 当前结果\n\n- 已新增模块边界、状态所有权和受保护导入三条门禁，并接入 `verify:frontend`；Windows CI 独立步骤待受控提交。\n- 当前状态为 `VERIFYING`；完整 Windows Automated 通过后才可开放 R1-03。\n\n## 当前唯一可执行任务\n\n`R1-02 边界验证脚本：完成 CI 接入与最终 Windows 自动化门禁并关闭节点`",
 )
 write(stage_path, stage)
 
 root_readme_path = "README.md"
 root_readme = read(root_readme_path)
 r1_01_line = "- `new-B` 已从 `new-A` 提交 `36d34ba1ff73cbec575cf58594aa8c0329669496` 建立；R1-01 已创建模块边界与状态所有权契约并完成 Windows 自动化门禁，状态为 `DONE`，R1-02 已开放为 `READY`。"
-r1_02_line = "- R1-02 已新增模块边界、状态所有权和受保护导入三条仓库内门禁，接入 `npm run verify:architecture`、前端聚合验证和 Windows CI；当前等待最终 `new-B` HEAD 的 Windows Automated 结果，状态为 `VERIFYING`。"
+r1_02_line = "- R1-02 已新增模块边界、状态所有权和受保护导入三条仓库内门禁，接入 `npm run verify:architecture` 与前端聚合验证；当前等待 Windows CI 独立步骤接入和最终 `new-B` HEAD 的 Windows Automated 结果，状态为 `VERIFYING`。"
 if r1_01_line not in root_readme:
     raise RuntimeError("Root README R1-01 line not found")
 root_readme = root_readme.replace(r1_01_line, r1_01_line + "\n" + r1_02_line, 1)
@@ -207,9 +214,7 @@ for script in [
     run("node", "--check", script)
 run("npm", "run", "verify:architecture")
 
-workflow_path = ROOT / ".github/workflows/r1-02-activate.yml"
 activation_script_path = ROOT / "scripts/r1-02-activate.py"
-workflow_path.unlink()
 activation_script_path.unlink()
 
 run("git", "config", "user.name", "uniquenesssta")
@@ -222,16 +227,16 @@ required = {
     "architecture/state-ownership.json",
     "package.json",
     "scripts/verify-frontend.mjs",
-    ".github/workflows/ci.yml",
     "docs/modular-rewrite/R01-architecture-composition/R01-02-边界验证脚本.md",
     "docs/modular-rewrite/R01-architecture-composition/README.md",
     "README.md",
-    ".github/workflows/r1-02-activate.yml",
     "scripts/r1-02-activate.py",
 }
 missing = sorted(required.difference(changed))
 if missing:
     raise RuntimeError(f"Expected activation changes missing: {missing}")
+if any(path.startswith(".github/workflows/") for path in changed):
+    raise RuntimeError("Activation commit must not modify GitHub workflow files")
 
 run("git", "commit", "-m", "feat(r1): activate architecture boundary gates")
 run("git", "push", "origin", "HEAD:new-B")
