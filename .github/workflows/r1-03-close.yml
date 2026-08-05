@@ -34,4 +34,10 @@ jobs:
       - name: Verify evidence and close R1-03
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: python scripts/r1-03-close.py
+          PYTHONUTF8: "1"
+        run: |
+          $scriptPath = Resolve-Path "scripts/r1-03-close.py"
+          $script = [System.IO.File]::ReadAllText($scriptPath.Path, [System.Text.Encoding]::UTF8)
+          $script = $script.Replace("EVIDENCE_HEAG", "EVIDENCE_HEAD")
+          [System.IO.File]::WriteAllText($scriptPath.Path, $script, [System.Text.UTF8Encoding]::new($false))
+          python scripts/r1-03-close.py
