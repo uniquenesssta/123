@@ -1,0 +1,37 @@
+name: R1-03 browser composition root apply
+
+on:
+  push:
+    branches:
+      - new-B
+    paths:
+      - .github/workflows/r1-03-apply.yml
+
+permissions:
+  contents: write
+
+jobs:
+  apply:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      PYTHONUTF8: "1"
+      R1_03_BASE_SHA: "264f9ab77910b9854d3eae790a7a47642caab959"
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: new-B
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Configure commit identity
+        run: |
+          git config user.name "uniquenesssta"
+          git config user.email "uniquenesssta@live.com"
+
+      - name: Apply and verify R1-03
+        run: python scripts/r1-03-apply.py
