@@ -50,12 +50,16 @@ jobs:
           $architectureReplacement = "run(process.execPath,['scripts/architecture/verifyModuleBoundaries.mjs']);run(process.execPath,['scripts/architecture/verifyStateOwnership.mjs']);run(process.execPath,['scripts/architecture/verifyProtectedImports.mjs']);"
           $formatOld = "run('cargo',['fmt','--all']);"
           $formatReplacement = "run('rustfmt',['--edition','2021','--config','skip_children=true','src-tauri/src/bootstrap/mod.rs','src-tauri/src/bootstrap/application.rs','src-tauri/src/bootstrap/state.rs','src-tauri/src/bootstrap/command_registry.rs','src-tauri/src/bootstrap/error.rs','src-tauri/src/lib.rs','src-tauri/src/commands.rs']);"
-          foreach ($anchor in @($baseOld, $stagedOld, $architectureOld, $formatOld)) {
+          $protectedOld = "run(process.execPath,['scripts/verify_protected_assets.mjs']);"
+          $protectedReplacement = @'
+          run(process.execPath,['--input-type=module','-e',"String.prototype.localeCompare=function(other){const left=String(this),right=String(other);return left<right?-1:left>right?1:0};await import('./scripts/verify_protected_assets.mjs');"]);
+          '@.Trim()
+          foreach ($anchor in @($baseOld, $stagedOld, $architectureOld, $formatOld, $protectedOld)) {
             if (-not $source.Contains($anchor)) {
               throw "R1-04 apply anchor missing: $anchor"
             }
           }
-          $patched = $source.Replace($baseOld, $baseReplacement).Replace($stagedOld, $stagedReplacement).Replace($architectureOld, $architectureReplacement).Replace($formatOld, $formatReplacement)
+          $patched = $source.Replace($baseOld, $baseReplacement).Replace($stagedOld, $stagedReplacement).Replace($architectureOld, $architectureReplacement).Replace($formatOld, $formatReplacement).Replace($protectedOld, $protectedReplacement)
           $executionPath = Join-Path $env:GITHUB_WORKSPACE ".git\r1-04-apply.mjs"
           [System.IO.File]::WriteAllText($executionPath, $patched, [System.Text.UTF8Encoding]::new($false))
           node $executionPath
