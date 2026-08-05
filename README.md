@@ -63,6 +63,7 @@ Windows 可使用：
 - R0-09 仅修正两个测试契约，共新增 2 行；实施提交为 `50daa258af8ac8e09f8e4f5f428249fe670f2dd2`，未改变生产逻辑、公共接口、数据、配置、依赖、迁移或模型保护边界。
 - R0-09 workflow run `30967448070` 中两个专项测试、185 个 workspace 测试以及精确 `npm run verify:rust` 全部通过；18 个 PostgreSQL 集成测试保持忽略并按用户要求留到最终统一验证。
 - R0-09 最终 artifact 为 `8915431192`，SHA-256 为 `a745bded71179bb6542d3a06b5c65f61cdf48845b8f88193dc7ef0ac5c8fcadc`；临时 workflow、patch 与 Draft PR #6 均已清理或关闭。
+- 用户于 2026-08-05 明确将目标平台收敛为 Windows，Linux Chromium 不再属于交付或阶段门禁；PostgreSQL 实跑、Windows Full 与用户本机实机验收统一延期到最终验收。R00 已完成并开放 R1，详见 `docs/modular-rewrite/R00-baseline/R00-stage-completion.md`。
 - R0-01 至 R0-06.2 未修改前端或 Rust 业务源码；R0-07 只改变 Rust 排版；R0-08 仅实施行为等价的私有参数收束、Copy/借用修复、无效私有代码清理和测试编译补全；R0-09 只修改测试构造与断言。
 - 当前执行环境未建立本地 Git 工作树，用户设备上的未提交与未跟踪文件不可见；远端分支操作不会覆盖这些本地内容。
 
@@ -122,6 +123,8 @@ API 传输与诊断契约保持历史兼容。
 
 R0-06.1 已关闭 Windows 目录联接依赖同步和 `.cmd` 子进程调用缺口；R0-06.2 已关闭 `LogDirectory` 参数和 Cargo release 查找路径缺口。Windows 完整 frontend、release 构建与 RuntimeOnly startup 均已有真实通过证据。R0-07 已关闭 Rust `cargo fmt --check` 阻塞；R0-08 已关闭 workspace all-targets Clippy `-D warnings` 阻塞；R0-09 已关闭全部已枚举 workspace tests 失败，精确 `npm run verify:rust` 现已通过。
 
-R00 阶段仍为 **BLOCKED**。尚未关闭的硬缺口包括：Linux Chromium 启动失败；PostgreSQL 实跑和 Windows Full 未执行；用户本机 Windows 10/11 未实机验收。另保留 1 个 moderate npm vulnerability 和 Vite 大 chunk 警告。
+R00 阶段已按 Windows-only 目标范围标记为 **DONE**。Linux Chromium 历史失败仅保留为非目标平台记录，不再阻塞后续重写。
 
-因此未创建 `R00-stage-completion.md`，不得进入 R1。下一唯一 READY 任务为 `R0-10 Linux Chromium 前端验收门禁修复`。完整事实记录见 `docs/modular-rewrite/R00-baseline/`。
+PostgreSQL 实跑、Windows Full 和用户本机 Windows 10/11 实机验收尚未执行，统一保留到最终验收，不得在后续阶段描述为已通过。另保留 1 个 moderate npm vulnerability 和 Vite 大 chunk 警告。
+
+已创建 `R00-stage-completion.md` 并进入 R1。下一唯一 READY 任务为 `R1-01 模块边界契约`；R1 状态见 `docs/modular-rewrite/R01-architecture-composition/README.md`。

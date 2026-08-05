@@ -25,7 +25,7 @@
 - R0-08 Clippy 实施提交：`919d62a2eaf95ade5ba1efa18924a9d578ef3f63`
 - R0-09 workspace tests 实施提交：`50daa258af8ac8e09f8e4f5f428249fe670f2dd2`
 - 实施分支：`new-A`
-- 已完成节点：`R0-01`、`R0-02`、`R0-03`、`R0-04（数据库实跑延期）`、`R0-05`、`R0-06`、`R0-06.1`、`R0-06.2`、`R0-07`、`R0-08`、`R0-09`
+- 已完成节点：`R0-01`、`R0-02`、`R0-03`、`R0-04（数据库实跑延期）`、`R0-05`、`R0-06`、`R0-06.1`、`R0-06.2`、`R0-07`、`R0-08`、`R0-09`、`R00-stage-completion`
 
 ## 保护资产
 
@@ -49,7 +49,7 @@
 ## 前端与 Rust 基线
 
 - R0-05 workflow run `30910130867`：`npm ci` 通过，存在 1 个 moderate npm audit 警告。
-- Linux `npm run verify:frontend` 失败于 Chromium 未开放调试端口。
+- Linux `npm run verify:frontend` 曾失败于 Chromium 未开放调试端口；用户于 2026-08-05 明确取消 Linux 目标平台，该结果仅保留为历史记录，不再属于交付或阶段门禁。
 - Rust 工具链、Tauri Linux 依赖、公开模型边界、Cargo.lock 与 locked metadata 通过。
 - R0-05 的 `cargo fmt --all -- --check` 失败已由 R0-07 关闭。
 - R0-07 冻结的 16 个 Clippy 错误已由 R0-08 关闭。
@@ -145,7 +145,7 @@
 | R0-07 | Rust 格式门禁修复 | DONE | [记录](./R00-07-Rust格式门禁修复.md) | 42 文件 rustfmt；格式检查通过 | Clippy 16 错误已冻结 |
 | R0-08 | Rust Clippy 门禁修复 | DONE | [记录](./R00-08-Rust-Clippy门禁修复.md) | 全 workspace all-targets Clippy 通过 | workspace tests 失败已冻结 |
 | R0-09 | Rust workspace tests 门禁修复 | DONE | [记录](./R00-09-Rust-workspace-tests门禁修复.md) | 两专项测试、185 个 workspace 测试与精确 verify:rust 通过 | Rust 完整门禁关闭 |
-| R0-10 | Linux Chromium 前端验收门禁修复 | READY | 待创建 | 待执行 | 待执行 |
+| R0-10 | Linux Chromium 前端验收门禁修复 | NOT_APPLICABLE | 不创建 | 用户取消 Linux 目标平台 | 不纳入阶段出口 |
 
 ## 本阶段累计变化
 
@@ -155,20 +155,27 @@
 - R0-07 对 42 个 Rust 文件执行纯 rustfmt 规范化。
 - R0-08 对 11 个 Rust 文件实施私有参数收束、Copy/借用修复、私有无效代码清理和测试编译补全。
 - R0-09 只修正两个测试契约，共新增 2 行，完整 Rust 门禁现已通过。
+- R00 按 Windows-only 范围完成收口；Linux 门禁取消，PostgreSQL 实跑、Windows Full 和用户本机实机验收统一转入最终验收。
 - R0-08 与 R0-09 未修改依赖、锁文件、公共接口、迁移 SQL、模型实现、配置默认值或用户可观察数据格式。
 
-## 未解决问题
+## 最终验收保留项
 
-- GitHub Ubuntu Chromium 截图进程未开放调试端口。
-- PostgreSQL 迁移幂等、不可变触发器和 18 个集成测试按用户要求延期。
-- Windows Full 和用户本机 Windows 10/11 实机验收尚未执行。
-- 1 个 moderate npm vulnerability 和 Vite 大 chunk 警告未处理。
+- PostgreSQL 迁移幂等、不可变触发器和 18 个集成测试尚未执行，按用户要求统一保留到最终验收。
+- Windows Full 和用户本机 Windows 10/11 实机验收尚未执行，统一保留到最终验收。
+- 1 个 moderate npm vulnerability 和 Vite 大 chunk 警告未处理，不阻塞 R1，但最终交付必须重新评估。
 - 用户设备上的未提交或未跟踪文件不可见；远端操作未覆盖这些本地内容。
+
+## 非目标平台记录
+
+- Linux Chromium 截图进程曾未开放调试端口。
+- 用户于 2026-08-05 明确取消 Linux 目标平台，因此不再修复、不纳入交付、不作为 R00 或后续阶段门禁。
 
 ## 阶段门禁状态
 
-**BLOCKED。** Windows Node/frontend 与路径契约、Rust 格式、Clippy 和 workspace tests 门禁均已关闭，但 Linux Chromium、数据库实跑和 Windows Full 尚未完成，因此未创建 `R00-stage-completion.md`。
+**DONE。** Windows Node/frontend、路径契约、Rust 格式、Clippy 和 workspace tests 门禁均已关闭。Linux 已从目标范围移除；PostgreSQL 实跑、Windows Full 和用户本机实机验收已明确延期到最终验收，不阻塞模块化重写。
+
+阶段完成记录：[`R00-stage-completion.md`](./R00-stage-completion.md)。
 
 ## 下一 READY 任务
 
-`R0-10 Linux Chromium 前端验收门禁修复` 是唯一 READY 任务。不得提前进入 R1。
+`R1-01 模块边界契约` 是唯一 READY 任务。R1 阶段索引见 `../R01-architecture-composition/README.md`。
