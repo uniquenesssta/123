@@ -23,6 +23,7 @@ ARTIFACT_EXPIRES = '2026-08-19T14:16:31Z'
 def run(*args: str, capture: bool = False) -> str:
     result = subprocess.run(
         list(args), cwd=ROOT, check=True, text=True,
+        encoding='utf-8', errors='strict',
         stdout=subprocess.PIPE if capture else None,
     )
     return result.stdout.strip() if capture else ''
@@ -54,7 +55,7 @@ def verify_evidence() -> None:
     if staged_paths != {'scripts/r1-03-close.py', '.github/workflows/r1-03-close.yml'}:
         raise RuntimeError(f'unexpected staging paths before R1-03 close: {sorted(staged_paths)}')
     run_data = api(f'/actions/runs/{RUN_ID}')
-    if run_data.get('head_sha') != EVIDENCE_HEAD or run_data.get('conclusion') != 'success':
+    if run_data.get('head_sha') != EVIDENCE_HEAG or run_data.get('conclusion') != 'success':
         raise RuntimeError('R1-03 Windows workflow evidence is not successful for expected head')
     jobs = api(f'/actions/runs/{RUN_ID}/jobs?per_page=100').get('jobs', [])
     job = next((item for item in jobs if int(item.get('id', 0)) == JOB_ID), None)
@@ -123,7 +124,7 @@ def update_stage_index() -> None:
 
 - 已建立浏览器唯一入口、应用创建、模块注册和 `ApplicationHandle` 生命周期模块；现有 Feature 实现未迁移。
 - 浏览器入口及生命周期状态契约已切换，专项架构、TypeScript、Vite build 与正式 Windows Automated 均通过。
-- workflow run `{RUN_ID}`、Windows job `{JOB_ID}` 在提交 `{EVIDENCE_HEAD}` 上通过；artifact `{ARTIFACT_ID}` 的 SHA-256 为 `4c28e5668b8b330cbab5b54516af1d70fe9f39c8299bb640da06a5b4442667f9`。
+- workflow run `{RUN_ID}`、Windows job `{JOB_ID}` 在提交 `{EVIDENCE_HEAD}` 上通过；artifact `{ARTIFACT_ID}` 的 SHA-256 为 `4c28e5668b8b330cbab5b54516af1d70fe9f39c8299bb640da06a5b44442667f9`。
 - 真实 PostgreSQL、Windows Full 和用户本机 Windows 实机验收继续保留到最终统一验收。
 - R1-03 状态为 `DONE`；R1-04 开放为 `READY`，R1-05 继续 `BLOCKED`。
 
@@ -138,7 +139,7 @@ def update_task_doc() -> None:
     path = ROOT / 'docs/modular-rewrite/R01-architecture-composition/R01-03-浏览器组合根.md'
     text = path.read_text(encoding='utf-8')
     text = replace_once(text, '- 任务状态：`VERIFYING`', '- 任务状态：`DONE`', 'task status')
-    old = '''## 7. 待执行验证与状态
+    old = '''# 7. 待执行验证与状态
 
 - 清理临时实施工作流后的最终 `new-B` HEAD 尚需通过正式 Windows `Public Platform CI` 全链路，因此当前状态保持 `VERIFYING`。
 - 正式门禁必须重新覆盖架构、完整前端、Rust fmt/Clippy/workspace tests、Tauri Windows release、客户端启动和运行日志扫描。
@@ -182,7 +183,7 @@ def main() -> None:
     run('git', 'config', 'user.email', '41898282+github-actions[bot]@users.noreply.github.com')
     run('git', 'add', '--all')
     run('git', 'commit', '-m', 'docs(r1): close R1-03 browser composition root')
-    run('git', 'push', 'origin','HEAD:new-B')
+    run('git', 'push', 'origin', 'HEAD:new-B')
 
 
 if __name__ == '__main__':
