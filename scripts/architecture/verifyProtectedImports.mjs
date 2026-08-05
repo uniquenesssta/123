@@ -1,4 +1,4 @@
-import { readText as readAbsoluteText } from "node:fs";
+import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import { parseCargoManifest } from "./lib/cargo.mjs";
 import { isPackageImport, parseJavaScriptImports, resolveRelativeImport } from "./lib/imports.mjs";
@@ -41,7 +41,7 @@ function containsProtectedRustReference(source) {
 
 const frontendFiles = listFiles(["src"], { extensions: [".ts", ".tsx", ".js", ".jsx", ".mjs", ".cjs"] });
 for (const importer of frontendFiles) {
-  const source = readAbsoluteText(join(repositoryRoot, importer), "utf8").replaceAll("\r\n", "\n");
+  const source = readFileSync(join(repositoryRoot, importer), "utf8").replaceAll("\r\n", "\n");
   for (const specifier of parseJavaScriptImports(source)) {
     if (isPackageImport(specifier, "@tauri-apps/api/core")) {
       const allowed = importer === transportOwner || importer.startsWith("src/platform/tauri/");
@@ -61,7 +61,7 @@ for (const importer of frontendFiles) {
 
 const rustFiles = listFiles(["crates", "src-tauri"], { extensions: [".rs"] });
 for (const file of rustFiles) {
-  const source = readAbsoluteText(join(repositoryRoot, file), "utf8");
+  const source = readFileSync(join(repositoryRoot, file), "utf8");
   const usesSqlx = /(?:\buse\s+sqlx\b|\bsqlx(?:::|!))/.test(source);
   const usesTauri = /(?:\buse\s+tauri\b|\btauri(?:::|!)|#\[tauri::)/.test(source);
 
