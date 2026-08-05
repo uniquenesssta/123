@@ -41,6 +41,7 @@ Windows 可使用：
 ## 模块化重写执行记录
 
 - `new-A` 已从 `main` 基线提交 `db79995873460688c15abb3497bf1c61b73ffb18` 建立。
+- `new-B` 已从 `new-A` 提交 `36d34ba1ff73cbec575cf58594aa8c0329669496` 建立；R1-01 已创建模块边界与状态所有权契约，当前因完整工作树门禁未执行保持 `VERIFYING`，未修改业务源码、依赖、迁移、公共命令或模型保护资产。
 - R0-01 已冻结远端分支起点并建立 `docs/modular-rewrite/R00-baseline/` 节点记录。
 - R0-02 已新增 `architecture/protected-assets.json` 和 `scripts/verify_protected_assets.mjs`，冻结 18 个公开模型边界及校验文件，聚合 SHA-256 为 `d2263a5ff09c8cf633a42b7bb35fffe3d42fb18648db4d12691817f51015c85c`。
 - R0-03 已新增 `architecture/command-contract.json` 和 `scripts/verify_command_contract.mjs`，冻结 171 个公共命令、15 个 Rust 命令模块和前端调用边界。
@@ -127,4 +128,4 @@ R00 阶段已按 Windows-only 目标范围标记为 **DONE**。Linux Chromium �
 
 PostgreSQL 实跑、Windows Full 和用户本机 Windows 10/11 实机验收尚未执行，统一保留到最终验收，不得在后续阶段描述为已通过。另保留 1 个 moderate npm vulnerability 和 Vite 大 chunk 警告。
 
-已创建 `R00-stage-completion.md` 并进入 R1。下一唯一 READY 任务为 `R1-01 模块边界契约`；R1 状态见 `docs/modular-rewrite/R01-architecture-composition/README.md`。
+已创建 `R00-stage-completion.md` 并进入 R1。R1-01 已实施并处于 `VERIFYING`；R1-02 仍为 `BLOCKED`，状态见 `docs/modular-rewrite/R01-architecture-composition/README.md`。
