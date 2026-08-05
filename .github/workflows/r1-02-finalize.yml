@@ -1,0 +1,26 @@
+name: R1-02 documentation finalization
+
+on:
+  push:
+    branches:
+      - new-B
+    paths:
+      - .github/workflows/r1-02-finalize.yml
+
+permissions:
+  contents: write
+
+jobs:
+  finalize:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      PYTHONUTF8: "1"
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: new-B
+          fetch-depth: 0
+
+      - name: Close validated R1-02 records
+        run: python scripts/r1-02-finalize.py
