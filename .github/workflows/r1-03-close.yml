@@ -36,8 +36,9 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           PYTHONUTF8: "1"
         run: |
-          $scriptPath = Resolve-Path "scripts/r1-03-close.py"
-          $script = [System.IO.File]::ReadAllText($scriptPath.Path, [System.Text.Encoding]::UTF8)
+          $sourcePath = Resolve-Path "scripts/r1-03-close.py"
+          $executionPath = Join-Path $env:GITHUB_WORKSPACE ".git\r1-03-close.py"
+          $script = [System.IO.File]::ReadAllText($sourcePath.Path, [System.Text.Encoding]::UTF8)
           $script = $script.Replace("EVIDENCE_HEAG", "EVIDENCE_HEAD")
-          [System.IO.File]::WriteAllText($scriptPath.Path, $script, [System.Text.UTF8Encoding]::new($false))
-          python scripts/r1-03-close.py
+          [System.IO.File]::WriteAllText($executionPath, $script, [System.Text.UTF8Encoding]::new($false))
+          python $executionPath
