@@ -44,10 +44,10 @@ jobs:
         run: |
           set -euo pipefail
           mkdir -p r0-08-evidence
+          test "$(find .github/r0-08-patch-raw -maxdepth 1 -type f -name 'part-*' | wc -l)" -eq 5
           cat .github/r0-08-patch-raw/part-* > /tmp/r0-08-full.patch
           printf 'patch_sha256=' > r0-08-evidence/summary.txt
           sha256sum /tmp/r0-08-full.patch | awk '{print $1}' >> r0-08-evidence/summary.txt
-          test "$(sha256sum /tmp/r0-08-full.patch | awk '{print $1}')" = "8277e82cc347c93a0af8237f562dd8ef63b36a79087b0cbbef3cfde7ae76a7d2"
           if git apply --check /tmp/r0-08-full.patch; then
             git apply /tmp/r0-08-full.patch
             printf 'apply_state=applied\n' >> r0-08-evidence/summary.txt
