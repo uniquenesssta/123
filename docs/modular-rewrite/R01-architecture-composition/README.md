@@ -73,7 +73,7 @@ R00 已按 Windows-only 目标范围完成。R1 只建立可机器验证的架�
 
 - 已建立浏览器唯一入口、应用创建、模块注册和 `ApplicationHandle` 生命周期模块；现有 Feature 实现未迁移。
 - 浏览器入口及生命周期状态契约已切换，专项架构、TypeScript、Vite build 与正式 Windows Automated 均通过。
-- workflow run `31012168809`、Windows job `92326905405` 在提交 `a3b61088abaf0c9f052ecab09e040ea77bd8d344` 上通过；artifact `8933800016` 的 SHA-256 为 `4c28e5668b8b330cbab5b54516af1d70fe9f39c8299bb640da06a5b44442667f9`。
+- workflow run `31012168809`、Windows job `92326905405` 在提交 `a3b61088abaf0c9f052ecab09e040ea77bd8d344` 上通过；artifact `8933800016` 的 SHA-256 为 `4c28e5668b8b330cbab5b54516af1d70fe9f39c8299bb640da06a5b4442667f9`。
 - 真实 PostgreSQL、Windows Full 和用户本机 Windows 实机验收继续保留到最终统一验收。
 - R1-03 状态为 `DONE`；R1-04 开放为 `READY`，R1-05 继续 `BLOCKED`。
 
