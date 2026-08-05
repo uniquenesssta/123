@@ -1,4 +1,4 @@
-name: R0-08 Secondary Clippy Diagnostics Temporary
+name: R0-08 Clippy Apply Temporary
 
 on:
   pull_request:
@@ -6,49 +6,67 @@ on:
       - main
 
 permissions:
-  contents: read
+  contents: write
 
 jobs:
-  secondary-diagnostics:
+  clippy-apply:
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 45
     steps:
       - name: Checkout implementation branch
         uses: actions/checkout@v4
         with:
           ref: new-A
-          fetch-depth: 1
+          fetch-depth: 2
 
-      - name: Capture source and call sites
+      - name: Install Tauri Linux system packages
+        shell: bash
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            build-essential \
+            curl \
+            file \
+            libayatana-appindicator3-dev \
+            librsvg2-dev \
+            libssl-dev \
+            libwebkit2gtk-4.1-dev \
+            libxdo-dev \
+            wget
+
+      - name: Set up Rust 1.88.0 with rustfmt and clippy
+        uses: dtolnay/rust-toolchain@1.88.0
+        with:
+          components: rustfmt, clippy
+
+      - name: Apply exact R0-08 fixes
         shell: bash
         run: |
           set -euo pipefail
-          mkdir -p r0-08-secondary/source
-          cp crates/application/src/analytics.rs r0-08-secondary/source/
-          cp crates/application/src/prediction.rs r0-08-secondary/source/
-          cp crates/application/src/release_acceptance.rs r0-08-secondary/source/
-          cp crates/application/src/spreadsheet.rs r0-08-secondary/source/
-          cp crates/persistence-postgres/tests/postgres_integration.rs r0-08-secondary/source/
-          {
-            echo '=== insert_match_event_fixture ==='
-            grep -n -C 4 'insert_match_event_fixture' crates/persistence-postgres/tests/postgres_integration.rs || true
-            echo
-            echo '=== readiness_check ==='
-            grep -n -C 3 'readiness_check' crates/application/src/prediction.rs || true
-            echo
-            echo '=== release check helper ==='
-            grep -n -C 3 'check(' crates/application/src/release_acceptance.rs || true
-            echo
-            echo '=== lifecycle split/window ==='
-            grep -n -C 4 -E 'training_end|lifecycle_window_json|lifecycle_split' crates/application/src/analytics.rs || true
-          } > r0-08-secondary/references.txt
-          git rev-parse HEAD > r0-08-secondary/head.txt
-          git status --short > r0-08-secondary/status.txt
-
-      - name: Upload secondary diagnostics
-        uses: actions/upload-artifact@v4
-        with:
-          name: r00-08-secondary-clippy-diagnostics
-          path: r0-08-secondary/**
-          if-no-files-found: error
-          retention-days: 30
+          mkdir -p r0-08-evidence
+          cat > /tmp/r0-08-full.patch.gz.b64 <<'PATCH'
+          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
+          PATCH
+          base64 -d /tmp/r0-08-full.patch.gz.b64 | gzip -d > /tmp/r0-08-full.patch
+          if git apply --check /tmp/r0-08-full.patch; then
+            git apply /tmp/r0-08-full.patch
+            printf 'apply_state=applied\n' > r0-08-evidence/summary.txt
+          elif git apply --reverse --check /tmp/r0-08-full.patch; then
+            printf 'apply_state=already_applied\n' > r0-08-evidence/summary.txt
+          else
+            echo 'R0-08 patch does not match either baseline or applied state.' >&2
+            exit 1
+          fi
+          cargo fmt --all
+          git diff --check
+          git diff --name-only | sort > r0-08-evidence/changed-files.txt
+          if [[ -s r0-08-evidence/changed-files.txt ]]; then
+            cat > r0-08-evidence/expected-files.txt <<'EOF'
+          crates/application/src/analytics.rs
+          crates/application/src/prediction.rs
+          crates/application/src/release_acceptance.rs
+          crates/application/src/spreadsheet.rs
+          crates/persistence-postgres/src/postmatch.rs
+          crates/persistence-postgres/src/release_acceptance.rs
+          crates/persistence-postgres/tests/postgres_integration.rs
+         ×&FW2÷7&VG6†VWBÖ–ò÷7&2öÖF6…÷&Wf–Wu÷v÷&¶&öö²ç'0¢7&FW2÷7&VG6†VWBÖ–ò÷7&2÷FVÕ÷6¶vRç'0¢Tô`¢F–fb×R#Ó‚ÖWf–FVæ6RöW‡V7FVBÖf–ÆW2çG‡B#Ó‚ÖWf–FVæ6Rö6†ævVBÖf–ÆW2çG‡@¢f¢v—BF–fbÒ×7FBâ#Ó‚ÖWf–FVæ6RöF–fb×7FBçG‡@¢v—BF–fbâ#Ó‚ÖWf–FVæ6R÷#Ó‚çF6€ ¢ÒæÖS¢'VâgVÆÂfö7W6VB6¶vRFW7G2æB&W6W'fR&W7VÇ@¢6†VÆÃ¢&6€¢'Vã¢À¢6WBÖò—Vf–À¢6WB¶P¢6&vòFW7BÒÖÆö6¶VB×fö÷F&ÆÂ×7&VG6†VWBÖ–ò×fö÷F&ÆÂ×W'6—7FVæ6R×÷7Fw&W2ÒÖÆ–"#âcÂFVR#Ó‚ÖWf–FVæ6Röfö7W6VB×FW7G2çG‡@¢7FGW3ÒGµ•U5DEU5³×Ð¢6WBÖP¢&–çFbvgVÆÅöfö7W6VE÷FW7G5öW†—Eö6öFSÒW5Æâr"G7FGW2"ãâ#Ó‚ÖWf–FVæ6R÷7VÖÖ'’çG‡@ ¢ÒæÖS¢'VâVæffV7FVBfö7W6VBFW7B6W@¢6†VÆÃ¢&6€¢'Vã¢À¢6WBÖò—Vf–À¢6&vòFW7BÒÖÆö6¶VB×fö÷F&ÆÂ×W'6—7FVæ6R×÷7Fw&W2ÒÖÆ–"#âcÂFVR#Ó‚ÖWf–FVæ6R÷W'6—7FVæ6R×FW7G2çG‡@¢6&vòFW7BÒÖÆö6¶VB×fö÷F&ÆÂ×7&VG6†VWBÖ–òÒÖÆ–"ÒÒÒ×6¶—FVÕ÷6¶vS£§FW7G3£§‡—6–6Å÷v÷&·6†VWE÷&÷uöçVÖ&W%÷7W'f—fW5ö&Ææµ÷&÷w2#âcÂFVR#Ó‚ÖWf–FVæ6R÷7&VG6†VWB×FW7G2ÖW†6ÇVF–ærÖ¶æ÷vâÖf–ÇW&RçG‡@ ¢ÒæÖS¢'Vâv÷&·76R6Æ—’vFP¢6†VÆÃ¢&6€¢'Vã¢À¢6WBÖò—Vf–À¢6&vò6Æ—’ÒÖÆö6¶VBÒ×v÷&·76RÒÖÆÂ×F&vWG2ÒÒÔBv&æ–æw2#âcÂFVR#Ó‚ÖWf–FVæ6Rö6Æ—’çG‡@ ¢ÒæÖS¢6öÖÖ—BfW&–f–VB#Ó‚6÷W&6R6†ævW0¢6†VÆÃ¢&6€¢'Vã¢À¢6WBÖWVò—Vf–À¢–bv—BF–fbÒ×V–WC²F†Và¢v—B&Wb×'6R„TBâ#Ó‚ÖWf–FVæ6Rö–×ÆVÖVçFF–öâÖ6öÖÖ—BçG‡@¢W†—B ¢f¢v—B6öæf–rW6W"ææÖRvv—F‡V"Ö7F–öç5¶&÷EÒp¢v—B6öæf–rW6W"æVÖ–ÂsCƒ“ƒ#ƒ"¶v—F‡V"Ö7F–öç5¶&÷EÔW6W'2ææ÷&WÇ’æv—F‡V"æ6öÒp¢v—BFBÀ¢7&FW2öÆ–6F–öâ÷7&2öæÇ—F–72ç'2À¢7&FW2öÆ–6F–öâ÷7&2÷&VF–7F–öâç'2À¢7&FW2öÆ–6F–öâ÷7&2÷&VÆV6Uö66WFæ6Rç'2À¢7&FW2öÆ–6F–öâ÷7&2÷7&VG6†VWBç'2À¢7&FW2÷W'6—7FVæ6R×÷7Fw&W2÷7&2÷÷7FÖF6‚ç'2À¢7&FW2÷W'6—7FVæ6R×÷7Fw&W2÷7&2÷&VÆV6Uö66WFæ6Rç'2À¢7&FW2÷W'6—7FVæ6R×÷7Fw&W2÷FW7G2÷÷7Fw&W5ö–çFVw&F–öâç'2À¢7&FW2÷7&VG6†VWBÖ–ò÷7&2öÖF6…÷&Wf–Wu÷v÷&¶&öö²ç'2À¢7&FW2÷7&VG6†VWBÖ–ò÷7&2÷FVÕ÷6¶vRç'0¢v—B6öÖÖ—BÖÒvf—‚‡#Ó‚“¢6Æ÷6R'W7B6Æ—’vFRp¢v—BW6‚÷&–v–â„TC¦æWrÔ¢v—B&Wb×'6R„TBâ#Ó‚ÖWf–FVæ6Rö–×ÆVÖVçFF–öâÖ6öÖÖ—BçG‡@ ¢ÒæÖS¢WÆöB#Ó‚Ç’Wf–FVæ6P¢–c¢Çv—2‚¢W6W3¢7F–öç2÷WÆöBÖ'F–f7Dc@¢v—Fƒ ¢æÖS¢#Ó‚Ö6Æ—’ÖÇ¢Fƒ¢#Ó‚ÖWf–FVæ6Rò¢ ¢–bÖæòÖf–ÆW2Öf÷VæC¢v&à¢&WFVçF–öâÖF—3¢3  
