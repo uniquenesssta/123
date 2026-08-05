@@ -6,7 +6,7 @@ on:
       - main
 
 permissions:
-  contents: read
+  contents: write
 
 jobs:
   workspace-tests:
@@ -34,28 +34,87 @@ jobs:
             libxdo-dev \
             wget
 
+      - name: Set up Node.js 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
       - name: Set up Rust 1.88.0
         uses: dtolnay/rust-toolchain@1.88.0
         with:
           components: rustfmt, clippy
 
+      - name: Install locked Node dependencies
+        run: npm ci
+
+      - name: Apply exact R0-09 test fixes
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p r0-09-evidence
+          if git apply --check .github/r0-09-workspace-tests.patch; then
+            git apply .github/r0-09-workspace-tests.patch
+            printf 'apply_state=applied\n' > r0-09-evidence/summary.txt
+          elif git apply --reverse --check .github/r0-09-workspace-tests.patch; then
+            printf 'apply_state=already_applied\n' > r0-09-evidence/summary.txt
+          else
+            echo 'R0-09 patch does not match baseline or applied state.' >&2
+            exit 1
+          fi
+          cargo fmt --all
+          git diff --check
+          git diff --name-only | sort > r0-09-evidence/changed-files.txt
+          cat > r0-09-evidence/expected-files.txt <<'EOF'
+          crates/application/src/openai_research.rs
+          crates/spreadsheet-io/src/team_package.rs
+          EOF
+          diff -u r0-09-evidence/expected-files.txt r0-09-evidence/changed-files.txt
+          git diff --stat > r0-09-evidence/diff-stat.txt
+          git diff > r0-09-evidence/r0-09.patch
+
+      - name: Run targeted regression tests
+        shell: bash
+        run: |
+          set -o pipefail
+          cargo test --locked -p football-application openai_research::tests::built_in_gateway_is_strict_and_has_no_secret --lib 2>&1 | tee r0-09-evidence/openai-research-test.txt
+          cargo test --locked -p football-spreadsheet-io team_package::tests::physical_worksheet_row_number_survives_blank_rows --lib 2>&1 | tee r0-09-evidence/team-package-row-test.txt
+
       - name: Run all workspace tests without fail-fast
         shell: bash
         run: |
-          mkdir -p r0-09-evidence
           set -o pipefail
-          set +e
           cargo test --locked --workspace --no-fail-fast 2>&1 | tee r0-09-evidence/workspace-tests.txt
-          status=${PIPESTATUS[0]}
-          set -e
-          printf 'workspace_tests_exit_code=%s\n' "$status" > r0-09-evidence/summary.txt
-          exit 0
+          printf 'workspace_tests_exit_code=0\n' >> r0-09-evidence/summary.txt
 
-      - name: Upload R0-09 diagnostics
+      - name: Run exact Rust verification
+        shell: bash
+        run: |
+          set -o pipefail
+          npm run verify:rust 2>&1 | tee r0-09-evidence/exact-verify-rust.txt
+          printf 'exact_verify_rust_exit_code=0\n' >> r0-09-evidence/summary.txt
+
+      - name: Commit verified R0-09 changes and remove temporary assets
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add \
+            crates/application/src/openai_research.rs \
+            crates/spreadsheet-io/src/team_package.rs
+          git rm \
+            .github/r0-09-workspace-tests.patch \
+            .github/workflows/r00-09-workspace-tests.yml
+          git commit -m 'test(r00-09): close Rust workspace test gate'
+          git push origin HEAD:new-A
+          git rev-parse HEAD > r0-09-evidence/implementation-commit.txt
+
+      - name: Upload R0-09 evidence
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: r00-09-workspace-tests
+          name: r00-09-workspace-tests-final
           path: r0-09-evidence/**
           if-no-files-found: error
           retention-days: 30
