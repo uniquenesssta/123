@@ -75,9 +75,10 @@ jobs:
           Write-Host "R1 architecture contract smoke check passed."
 
       - name: Run Windows automated acceptance
-        shell: powershell
+        shell: pwsh
+        working-directory: 项目源码
         run: |
-          & ".\项目源码\scripts\windows-acceptance.ps1" `
+          & ".\scripts\windows-acceptance.ps1" `
             -Mode Automated `
             -ProjectRoot "$env:GITHUB_WORKSPACE" `
             -LogDirectory "logs"
