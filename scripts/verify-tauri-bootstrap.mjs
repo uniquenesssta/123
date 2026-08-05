@@ -99,7 +99,10 @@ check(
 check(!registry.includes("#[tauri::command]"), "command_registry.rs 只能登记命令，不能实现命令");
 
 check(error.includes('"足球赛事模型平台启动失败"'), "启动错误提示语义发生变化");
-check(error.includes("std::io::Error::other"), "启动 I/O 错误映射发生变化");
+check(
+  error.includes("io::Error::other") || error.includes("std::io::Error::other"),
+  "启动 I/O 错误映射发生变化",
+);
 check(commands.includes("pub(crate) use crate::bootstrap::AppState;"), "commands.rs 未使用组合根 AppState");
 check(!commands.includes("pub struct AppState"), "commands.rs 仍重复定义 AppState");
 check(commands.includes("use uuid::Uuid;"), "commands.rs 丢失 UUID 解析依赖");
