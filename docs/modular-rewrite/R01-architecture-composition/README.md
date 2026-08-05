@@ -38,7 +38,7 @@ R00 已按 Windows-only 目标范围完成。R1 只建立可机器验证的架�
 | R1-01 | 模块边界契约 | DONE | [`R01-01-模块边界契约.md`](R01-01-模块边界契约.md) | JSON 解析、契约自检、Windows Automated 通过 | workflow run `30989439570` 通过 |
 | R1-02 | 边界验证脚本 | DONE | [`R01-02-边界验证脚本.md`](R01-02-边界验证脚本.md) | `npm run verify:architecture` 通过 | workflow run `31001470224` 通过 |
 | R1-03 | 浏览器组合根 | DONE | [`R01-03-浏览器组合根.md`](R01-03-浏览器组合根.md) | 浏览器组合根专项验证通过 | workflow run `31012168809` 通过 |
-| R1-04 | Tauri 组合根 | VERIFYING | 待创建 | 最小门禁执行中 | Windows Automated 待验证 |
+| R1-04 | Tauri 组合根 | VERIFYING | [`R01-04-tauri-组合根.md`](R01-04-tauri-组合根.md) | 专项契约、保护资产、格式和桌面 crate 编译通过 | Windows Automated 待最终 HEAD 验证 |
 | R1-05 | Application 组合根 | BLOCKED | 待创建 | 待执行 | 待执行 |
 
 ## R1-01 完成结果
@@ -76,6 +76,15 @@ R00 已按 Windows-only 目标范围完成。R1 只建立可机器验证的架�
 - workflow run `31012168809`、Windows job `92326905405` 在提交 `a3b61088abaf0c9f052ecab09e040ea77bd8d344` 上通过；artifact `8933800016` 的 SHA-256 为 `4c28e5668b8b330cbab5b54516af1d70fe9f39c8299bb640da06a5b4442667f9`。
 - 真实 PostgreSQL、Windows Full 和用户本机 Windows 实机验收继续保留到最终统一验收。
 - R1-03 状态为 `DONE`；R1-04 开放为 `READY`，R1-05 继续 `BLOCKED`。
+
+## R1-04 当前结果
+
+- `src-tauri/src/lib.rs` 已收敛为公共薄入口；Builder、状态构造、命令注册和启动错误映射分别由 `src-tauri/src/bootstrap/` 下的具名模块承担。
+- `AppState` 已切换到 `bootstrap/state.rs` 唯一拥有；171 条 Tauri 命令的名称、顺序、参数和返回契约保持不变。
+- 已新增 Tauri 组合根专项验证和确定性保护资产验证入口，并接入完整前端验证。
+- 专用 Windows workflow run `31027424414`、job `92379334852` 对架构、命令、保护资产、Rust 格式和桌面 crate 编译全部通过。
+- 正式实现提交为 `c73a6bd1d28435700274fef4fa115e8f97ce294e`；正式 `Public Platform CI` 尚需在清理临时文件后的最终 HEAD 上完整通过，因此状态保持 `VERIFYING`。
+- 真实 PostgreSQL、Windows Full 和用户本机 Windows 实机验收继续保留到最终统一验收。
 
 ## 当前唯一可执行任务
 
