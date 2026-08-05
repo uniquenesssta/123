@@ -1,4 +1,4 @@
-import { readText } from "node:fs";
+import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import { findCycles, loadWorkspaceGraph, parseWorkspaceMembers } from "./lib/cargo.mjs";
 import { parseJavaScriptImports, resolveRelativeImport } from "./lib/imports.mjs";
@@ -51,7 +51,7 @@ const frontendFiles = listFiles(["src"], { extensions: [".ts", ".tsx", ".js", ".
 for (const importer of frontendFiles) {
   const sourceFeature = featureForPath(importer);
   if (!sourceFeature) continue;
-  const source = readText(join(repositoryRoot, importer), "utf8").replaceAll("\r\n", "\n");
+  const source = readFileSync(join(repositoryRoot, importer), "utf8").replaceAll("\r\n", "\n");
 
   for (const specifier of parseJavaScriptImports(source)) {
     const resolvedTarget = resolveRelativeImport(importer, specifier);
