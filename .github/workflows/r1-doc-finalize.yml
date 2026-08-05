@@ -21,4 +21,6 @@ jobs:
 
       - name: Record validated R1-01 closure
         shell: pwsh
-        run: ./scripts/r1-finalize-docs.ps1
+        run: |
+          git config core.quotepath false
+          ./scripts/r1-finalize-docs.ps1
