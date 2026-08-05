@@ -44,241 +44,27 @@ jobs:
         run: |
           set -euo pipefail
           mkdir -p r0-08-evidence
-          python - <<'PY'
-          from pathlib import Path
-
-          def replace(path, old, new, count=1):
-              file_path = Path(path)
-              text = file_path.read_text()
-              actual = text.count(old)
-              if actual == 0 and new in text:
-                  return False
-              if actual != count:
-                  raise SystemExit(
-                      f"{path}: expected {count} occurrences, found {actual}: {old[:100]!r}"
-                  )
-              file_path.write_text(text.replace(old, new))
-              return True
-
-          changed = False
-          changed |= replace(
-              "crates/spreadsheet-io/src/match_review_workbook.rs",
-              '''    validate_event_score_consistency(
-                  &events,
-                  home_goals_90,
-                  away_goals_90,
-                  home_goals_extra_time,
-                  away_goals_extra_time,
-                  home_team_id,
-                  away_team_id,
-                  &mut errors,
-                  &mut warnings,
-              );''',
-              '''    validate_event_score_consistency(
-                  &events,
-                  EventScoreContext {
-                      home_goals: home_goals_90,
-                      away_goals: away_goals_90,
-                      home_goals_extra_time,
-                      away_goals_extra_time,
-                      home_team_id,
-                      away_team_id,
-                  },
-                  &mut errors,
-                  &mut warnings,
-              );''',
-          )
-          changed |= replace(
-              "crates/spreadsheet-io/src/match_review_workbook.rs",
-              '''fn validate_event_score_consistency(
-              events: &[MatchReviewEventDraft],
-              home_goals: i16,
-              away_goals: i16,
-              home_goals_extra_time: Option<i16>,
-              away_goals_extra_time: Option<i16>,
-              home_team_id: Uuid,
-              away_team_id: Uuid,
-              errors: &mut Vec<String>,
-              warnings: &mut Vec<String>,
-          ) {''',
-              '''struct EventScoreContext {
-              home_goals: i16,
-              away_goals: i16,
-              home_goals_extra_time: Option<i16>,
-              away_goals_extra_time: Option<i16>,
-              home_team_id: Uuid,
-              away_team_id: Uuid,
-          }
-
-          fn validate_event_score_consistency(
-              events: &[MatchReviewEventDraft],
-              context: EventScoreContext,
-              errors: &mut Vec<String>,
-              warnings: &mut Vec<String>,
-          ) {
-              let EventScoreContext {
-                  home_goals,
-                  away_goals,
-                  home_goals_extra_time,
-                  away_goals_extra_time,
-                  home_team_id,
-                  away_team_id,
-              } = context;''',
-          )
-          changed |= replace(
-              "crates/spreadsheet-io/src/team_package.rs",
-              "sheet.merge_range(row, 1, row, 6, *value, &note_format())?;",
-              "sheet.merge_range(row, 1, row, 6, value, &note_format())?;",
-          )
-          changed |= replace(
-              "crates/spreadsheet-io/src/team_package.rs",
-              "sheet.merge_range(0, *start, 0, *end, *label, &group_format())?;",
-              "sheet.merge_range(0, *start, 0, *end, label, &group_format())?;",
-          )
-          changed |= replace(
-              "crates/persistence-postgres/src/postmatch.rs",
-              'required(context.result_finalized_at.clone(), "正式赛果时间缺失")?',
-              'required(context.result_finalized_at, "正式赛果时间缺失")?',
-          )
-          changed |= replace(
-              "crates/persistence-postgres/src/postmatch.rs",
-              "result_finalized_at: result_finalized_at.clone(),",
-              "result_finalized_at,",
-          )
-          changed |= replace(
-              "crates/persistence-postgres/src/postmatch.rs",
-              ".bind(&result_finalized_at)",
-              ".bind(result_finalized_at)",
-          )
-          changed |= replace(
-              "crates/persistence-postgres/src/postmatch.rs",
-              'required(context.snapshot_cutoff_at.clone(), "冻结快照截止时间缺失")?',
-              'required(context.snapshot_cutoff_at, "冻结快照截止时间缺失")?',
-          )
-          changed |= replace(
-              "crates/persistence-postgres/src/postmatch.rs",
-              '''            self.insert_postmatch_evaluation_sample_in_tx(
-                  &mut tx,
-                  id,
-                  &context,
-                  competition_profile_id,
-                  model_version_id,
-                  parameter_set_id,
-                  &horizon,
-              )''',
-              '''            self.insert_postmatch_evaluation_sample_in_tx(
-                  &mut tx,
-                  id,
-                  &context,
-                  EvaluationSamplePartition {
-                      competition_profile_id,
-                      model_version_id,
-                      parameter_set_id,
-                      horizon: &horizon,
-                  },
-              )''',
-          )
-          changed |= replace(
-              "crates/persistence-postgres/src/postmatch.rs",
-              ".bind(&retrieved_at)",
-              ".bind(retrieved_at)",
-          )
-          changed |= replace(
-              "crates/persistence-postgres/src/postmatch.rs",
-              ".bind(&data_cutoff_at)",
-              ".bind(data_cutoff_at)",
-          )
-          changed |= replace(
-              "crates/persistence-postgres/src/postmatch.rs",
-              '''    async fn insert_postmatch_evaluation_sample_in_tx(
-              &self,
-              tx: &mut Transaction<'_, Postgres>,
-              settlement_id: Uuid,
-              context: &SettlementContext,
-              competition_profile_id: Uuid,
-              model_version_id: Uuid,
-              parameter_set_id: Uuid,
-              horizon: &str,
-          ) -> PersistenceResult<()> {''',
-              '''    async fn insert_postmatch_evaluation_sample_in_tx(
-              &self,
-              tx: &mut Transaction<'_, Postgres>,
-              settlement_id: Uuid,
-              context: &SettlementContext,
-              partition: EvaluationSamplePartition<'_>,
-          ) -> PersistenceResult<()> {
-              let EvaluationSamplePartition {
-                  competition_profile_id,
-                  model_version_id,
-                  parameter_set_id,
-                  horizon,
-              } = partition;''',
-          )
-          changed |= replace(
-              "crates/persistence-postgres/src/postmatch.rs",
-              '''            partition_key: format!(
-                  "{}:{}:{}:{}",
-                  model_version_id, competition_profile_id, parameter_set_id, horizon
-              ),''',
-              '''            partition_key: format!(
-                  "{model_version_id}:{competition_profile_id}:{parameter_set_id}:{horizon}"
-              ),''',
-          )
-          changed |= replace(
-              "crates/persistence-postgres/src/postmatch.rs",
-              '''#[derive(Debug)]
-          struct PostmatchPartition {''',
-              '''#[derive(Debug)]
-          struct EvaluationSamplePartition<'a> {
-              competition_profile_id: Uuid,
-              model_version_id: Uuid,
-              parameter_set_id: Uuid,
-              horizon: &'a str,
-          }
-
-          #[derive(Debug)]
-          struct PostmatchPartition {''',
-          )
-          changed |= replace(
-              "crates/persistence-postgres/src/postmatch.rs",
-              ".signed_duration_since(reference.clone())",
-              ".signed_duration_since(*reference)",
-          )
-          changed |= replace(
-              "crates/persistence-postgres/src/postmatch.rs",
-              "samples.first().map(|item| item.kickoff_time.clone())",
-              "samples.first().map(|item| item.kickoff_time)",
-          )
-          changed |= replace(
-              "crates/persistence-postgres/src/postmatch.rs",
-              "samples.last().map(|item| item.kickoff_time.clone())",
-              "samples.last().map(|item| item.kickoff_time)",
-          )
-          changed |= replace(
-              "crates/persistence-postgres/src/release_acceptance.rs",
-              ".bind(&run.started_at)",
-              ".bind(run.started_at)",
-          )
-          changed |= replace(
-              "crates/persistence-postgres/src/release_acceptance.rs",
-              ".bind(&run.completed_at)",
-              ".bind(run.completed_at)",
-          )
-          Path("r0-08-evidence/apply-state.txt").write_text(
-              "changed=true\n" if changed else "changed=false\n"
-          )
-          PY
-
+          if git apply --check .github/r0-08-clippy.patch; then
+            git apply .github/r0-08-clippy.patch
+            printf 'apply_state=applied\n' > r0-08-evidence/summary.txt
+          elif git apply --reverse --check .github/r0-08-clippy.patch; then
+            printf 'apply_state=already_applied\n' > r0-08-evidence/summary.txt
+          else
+            echo 'R0-08 patch does not match either baseline or applied state.' >&2
+            exit 1
+          fi
           cargo fmt --all
           git diff --check
           git diff --name-only | sort > r0-08-evidence/changed-files.txt
-          cat > r0-08-evidence/expected-files.txt <<'EOF'
+          if [[ -s r0-08-evidence/changed-files.txt ]]; then
+            cat > r0-08-evidence/expected-files.txt <<'EOF'
           crates/persistence-postgres/src/postmatch.rs
           crates/persistence-postgres/src/release_acceptance.rs
           crates/spreadsheet-io/src/match_review_workbook.rs
           crates/spreadsheet-io/src/team_package.rs
           EOF
-          diff -u r0-08-evidence/expected-files.txt r0-08-evidence/changed-files.txt
+            diff -u r0-08-evidence/expected-files.txt r0-08-evidence/changed-files.txt
+          fi
           git diff --stat > r0-08-evidence/diff-stat.txt
           git diff > r0-08-evidence/r0-08.patch
 
@@ -299,7 +85,7 @@ jobs:
         run: |
           set -euo pipefail
           if git diff --quiet; then
-            echo 'No source changes to commit.'
+            git rev-parse HEAD > r0-08-evidence/implementation-commit.txt
             exit 0
           fi
           git config user.name 'github-actions[bot]'
