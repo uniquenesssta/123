@@ -44,7 +44,7 @@ jobs:
         run: |
           set -euo pipefail
           mkdir -p r0-08-evidence
-          cat .github/r0-08-patch-v2/part-* > /tmp/r0-08-full.patch.gz.b64
+          cat .github/r0-08-patch-v3/part-* > /tmp/r0-08-full.patch.gz.b64
           base64 -d /tmp/r0-08-full.patch.gz.b64 | gzip -d > /tmp/r0-08-full.patch
           if git apply --check /tmp/r0-08-full.patch; then
             git apply /tmp/r0-08-full.patch
