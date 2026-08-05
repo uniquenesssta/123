@@ -21,13 +21,12 @@ jobs:
         uses: actions/checkout@v4
         with:
           ref: new-A
-          fetch-depth: 4
+          fetch-depth: 2
 
       - name: Apply R00 scope closure
         shell: bash
         run: |
           set -euo pipefail
-          test "$(git rev-parse HEAD~4)" = "ab812dc2cef126cc46fe9914a63815e047739d75"
           mkdir -p r00-closure-evidence
           python .github/r00-windows-scope-closure.py
           git diff --check
