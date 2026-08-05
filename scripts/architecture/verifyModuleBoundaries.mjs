@@ -47,6 +47,35 @@ function featureForPath(filePath) {
   return { name: featureName, publicEntry: publicEntries.includes(normalized) ? normalized : null };
 }
 
+const frontendTransitions = contract.frontend?.transitional_imports ?? [];
+const observedFrontendTransitions = new Set();
+function transitionKey(transition) {
+  return [
+    transition.from_feature,
+    normalizePath(transition.importer ?? ""),
+    transition.to_feature,
+    normalizePath(transition.target ?? ""),
+  ].join("|");
+}
+
+for (const transition of frontendTransitions) {
+  report.check(Boolean(features[transition.from_feature]), `过渡导入起点 Feature 不存在：${transition.from_feature}`);
+  report.check(Boolean(features[transition.to_feature]), `过渡导入终点 Feature 不存在：${transition.to_feature}`);
+  report.check(pathExists(transition.importer ?? ""), `过渡导入 importer 不存在：${transition.importer}`);
+  report.check(pathExists(transition.target ?? ""), `过渡导入 target 不存在：${transition.target}`);
+  report.check(Boolean(transition.reason), `过渡导入缺少 reason：${transitionKey(transition)}`);
+  report.check(Boolean(transition.exit_task), `过渡导入缺少 exit_task：${transitionKey(transition)}`);
+}
+
+function isRegisteredFrontendTransition(importer, sourceFeature, targetFeature, resolvedTarget) {
+  const key = [sourceFeature, normalizePath(importer), targetFeature, normalizePath(resolvedTarget)].join("|");
+  const transition = frontendTransitions.find((candidate) => transitionKey(candidate) === key);
+  if (!transition) return false;
+  observedFrontendTransitions.add(key);
+  report.note(`保留已登记过渡导入 ${importer} -> ${resolvedTarget}，退出任务 ${transition.exit_task}`);
+  return true;
+}
+
 const frontendFiles = listFiles(["src"], { extensions: [".ts", ".tsx", ".js", ".jsx", ".mjs", ".cjs"] });
 for (const importer of frontendFiles) {
   const sourceFeature = featureForPath(importer);
@@ -59,7 +88,7 @@ for (const importer of frontendFiles) {
 
     const targetFeature = featureForPath(resolvedTarget);
     if (targetFeature && targetFeature.name !== sourceFeature.name) {
-      if (!targetFeature.publicEntry) {
+      if (!targetFeature.publicEntry && !isRegisteredFrontendTransition(importer, sourceFeature.name, targetFeature.name, resolvedTarget)) {
         report.violation(`${importer} 直接导入 Feature ${targetFeature.name} 内部文件：${specifier} -> ${resolvedTarget}`);
       }
       continue;
@@ -72,6 +101,10 @@ for (const importer of frontendFiles) {
       }
     }
   }
+}
+
+for (const transition of frontendTransitions) {
+  report.check(observedFrontendTransitions.has(transitionKey(transition)), `登记的过渡导入未在源码中出现，应删除或修正：${transitionKey(transition)}`);
 }
 
 const contractCrates = contract.rust?.crates ?? {};
