@@ -2,7 +2,10 @@ import fs from "node:fs";
 import crypto from "node:crypto";
 import { isVersionAtLeast } from "./version.mjs";
 
-const read = (path) => fs.readFileSync(new URL(`../${path}`, import.meta.url), "utf8");
+const read = (path) =>
+  fs
+    .readFileSync(new URL(`../${path}`, import.meta.url), "utf8")
+    .replace(/\r\n?/g, "\n");
 const requireTrue = (condition, message) => { if (!condition) throw new Error(message); };
 
 const contractText = read("contracts/monthly-workbooks-contract.json");
@@ -20,7 +23,7 @@ const teams = read("src/pages/teams.ts");
 const players = read("src/pages/players.ts");
 const main = read("src/main.ts");
 const pkg = JSON.parse(read("package.json"));
-const hash = crypto.createHash("sha256").update(contractText).digest("hex");
+const hash = crypto.createHash("sha256").update(contractText, "utf8").digest("hex");
 
 requireTrue(isVersionAtLeast(pkg.version, contract.release_version), "当前项目版本早于阶段4版本0.17.0");
 requireTrue(contract.release_version === "0.17.0" && contract.integration_point_h_started === false, "阶段4契约边界错误");
