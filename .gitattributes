@@ -1,0 +1,20 @@
+# Keep source, contracts, migrations, manifests, and documentation byte-stable
+# across Windows and Unix checkouts. Contract hashes are calculated from LF text.
+* text=auto eol=lf
+
+# Windows command scripts keep their native line endings.
+*.bat text eol=crlf
+*.cmd text eol=crlf
+
+# Binary assets must never be line-ending normalized.
+*.avif binary
+*.gif binary
+*.heic binary
+*.ico binary
+*.jpeg binary
+*.jpg binary
+*.pdf binary
+*.png binary
+*.webp binary
+*.xlsx binary
+*.zip binary
