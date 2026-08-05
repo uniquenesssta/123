@@ -6,6 +6,8 @@ on:
       - new-B
     paths:
       - .github/workflows/r1-03-apply.yml
+      - scripts/r1-03-apply.py
+  workflow_dispatch:
 
 permissions:
   contents: write
