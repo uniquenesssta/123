@@ -1,4 +1,4 @@
-name: R0-08 Clippy Diagnostics Temporary
+name: R0-08 Clippy Apply Temporary
 
 on:
   pull_request:
@@ -6,51 +6,318 @@ on:
       - main
 
 permissions:
-  contents: read
+  contents: write
 
 jobs:
-  clippy-diagnostics:
+  clippy-apply:
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 45
     steps:
       - name: Checkout implementation branch
         uses: actions/checkout@v4
         with:
           ref: new-A
-          fetch-depth: 1
+          fetch-depth: 2
 
-      - name: Capture exact source context
+      - name: Install Tauri Linux system packages
+        shell: bash
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            build-essential \
+            curl \
+            file \
+            libayatana-appindicator3-dev \
+            librsvg2-dev \
+            libssl-dev \
+            libwebkit2gtk-4.1-dev \
+            libxdo-dev \
+            wget
+
+      - name: Set up Rust 1.88.0 with rustfmt and clippy
+        uses: dtolnay/rust-toolchain@1.88.0
+        with:
+          components: rustfmt, clippy
+
+      - name: Apply exact R0-08 fixes
         shell: bash
         run: |
           set -euo pipefail
-          mkdir -p r0-08-evidence/source
-          git rev-parse HEAD > r0-08-evidence/head.txt
-          git status --short > r0-08-evidence/worktree-status.txt
-          cp crates/spreadsheet-io/src/match_review_workbook.rs r0-08-evidence/source/
-          cp crates/spreadsheet-io/src/team_package.rs r0-08-evidence/source/
-          cp crates/persistence-postgres/src/postmatch.rs r0-08-evidence/source/
-          cp crates/persistence-postgres/src/release_acceptance.rs r0-08-evidence/source/
-          {
-            echo '=== validate_event_score_consistency ==='
-            grep -n -C 8 'validate_event_score_consistency' crates/spreadsheet-io/src/match_review_workbook.rs || true
-            echo
-            echo '=== insert_postmatch_evaluation_sample_in_tx ==='
-            grep -n -C 10 'insert_postmatch_evaluation_sample_in_tx' crates/persistence-postgres/src/postmatch.rs || true
-            echo
-            echo '=== PostmatchPartition ==='
-            grep -n -C 10 'PostmatchPartition' crates/persistence-postgres/src/postmatch.rs || true
-            echo
-            echo '=== SettlementFingerprint ==='
-            grep -n -C 8 'SettlementFingerprint' crates/persistence-postgres/src/postmatch.rs || true
-            echo
-            echo '=== relevant test names ==='
-            grep -R -n -E 'postmatch|settlement|evidence|review_workbook|team_package' crates/spreadsheet-io crates/persistence-postgres --include='*.rs' || true
-          } > r0-08-evidence/references.txt
+          mkdir -p r0-08-evidence
+          python - <<'PY'
+          from pathlib import Path
 
-      - name: Upload diagnostic evidence
+          def replace(path, old, new, count=1):
+              file_path = Path(path)
+              text = file_path.read_text()
+              actual = text.count(old)
+              if actual == 0 and new in text:
+                  return False
+              if actual != count:
+                  raise SystemExit(
+                      f"{path}: expected {count} occurrences, found {actual}: {old[:100]!r}"
+                  )
+              file_path.write_text(text.replace(old, new))
+              return True
+
+          changed = False
+          changed |= replace(
+              "crates/spreadsheet-io/src/match_review_workbook.rs",
+              '''    validate_event_score_consistency(
+                  &events,
+                  home_goals_90,
+                  away_goals_90,
+                  home_goals_extra_time,
+                  away_goals_extra_time,
+                  home_team_id,
+                  away_team_id,
+                  &mut errors,
+                  &mut warnings,
+              );''',
+              '''    validate_event_score_consistency(
+                  &events,
+                  EventScoreContext {
+                      home_goals: home_goals_90,
+                      away_goals: away_goals_90,
+                      home_goals_extra_time,
+                      away_goals_extra_time,
+                      home_team_id,
+                      away_team_id,
+                  },
+                  &mut errors,
+                  &mut warnings,
+              );''',
+          )
+          changed |= replace(
+              "crates/spreadsheet-io/src/match_review_workbook.rs",
+              '''fn validate_event_score_consistency(
+              events: &[MatchReviewEventDraft],
+              home_goals: i16,
+              away_goals: i16,
+              home_goals_extra_time: Option<i16>,
+              away_goals_extra_time: Option<i16>,
+              home_team_id: Uuid,
+              away_team_id: Uuid,
+              errors: &mut Vec<String>,
+              warnings: &mut Vec<String>,
+          ) {''',
+              '''struct EventScoreContext {
+              home_goals: i16,
+              away_goals: i16,
+              home_goals_extra_time: Option<i16>,
+              away_goals_extra_time: Option<i16>,
+              home_team_id: Uuid,
+              away_team_id: Uuid,
+          }
+
+          fn validate_event_score_consistency(
+              events: &[MatchReviewEventDraft],
+              context: EventScoreContext,
+              errors: &mut Vec<String>,
+              warnings: &mut Vec<String>,
+          ) {
+              let EventScoreContext {
+                  home_goals,
+                  away_goals,
+                  home_goals_extra_time,
+                  away_goals_extra_time,
+                  home_team_id,
+                  away_team_id,
+              } = context;''',
+          )
+          changed |= replace(
+              "crates/spreadsheet-io/src/team_package.rs",
+              "sheet.merge_range(row, 1, row, 6, *value, &note_format())?;",
+              "sheet.merge_range(row, 1, row, 6, value, &note_format())?;",
+          )
+          changed |= replace(
+              "crates/spreadsheet-io/src/team_package.rs",
+              "sheet.merge_range(0, *start, 0, *end, *label, &group_format())?;",
+              "sheet.merge_range(0, *start, 0, *end, label, &group_format())?;",
+          )
+          changed |= replace(
+              "crates/persistence-postgres/src/postmatch.rs",
+              'required(context.result_finalized_at.clone(), "正式赛果时间缺失")?',
+              'required(context.result_finalized_at, "正式赛果时间缺失")?',
+          )
+          changed |= replace(
+              "crates/persistence-postgres/src/postmatch.rs",
+              "result_finalized_at: result_finalized_at.clone(),",
+              "result_finalized_at,",
+          )
+          changed |= replace(
+              "crates/persistence-postgres/src/postmatch.rs",
+              ".bind(&result_finalized_at)",
+              ".bind(result_finalized_at)",
+          )
+          changed |= replace(
+              "crates/persistence-postgres/src/postmatch.rs",
+              'required(context.snapshot_cutoff_at.clone(), "冻结快照截止时间缺失")?',
+              'required(context.snapshot_cutoff_at, "冻结快照截止时间缺失")?',
+          )
+          changed |= replace(
+              "crates/persistence-postgres/src/postmatch.rs",
+              '''            self.insert_postmatch_evaluation_sample_in_tx(
+                  &mut tx,
+                  id,
+                  &context,
+                  competition_profile_id,
+                  model_version_id,
+                  parameter_set_id,
+                  &horizon,
+              )''',
+              '''            self.insert_postmatch_evaluation_sample_in_tx(
+                  &mut tx,
+                  id,
+                  &context,
+                  EvaluationSamplePartition {
+                      competition_profile_id,
+                      model_version_id,
+                      parameter_set_id,
+                      horizon: &horizon,
+                  },
+              )''',
+          )
+          changed |= replace(
+              "crates/persistence-postgres/src/postmatch.rs",
+              ".bind(&retrieved_at)",
+              ".bind(retrieved_at)",
+          )
+          changed |= replace(
+              "crates/persistence-postgres/src/postmatch.rs",
+              ".bind(&data_cutoff_at)",
+              ".bind(data_cutoff_at)",
+          )
+          changed |= replace(
+              "crates/persistence-postgres/src/postmatch.rs",
+              '''    async fn insert_postmatch_evaluation_sample_in_tx(
+              &self,
+              tx: &mut Transaction<'_, Postgres>,
+              settlement_id: Uuid,
+              context: &SettlementContext,
+              competition_profile_id: Uuid,
+              model_version_id: Uuid,
+              parameter_set_id: Uuid,
+              horizon: &str,
+          ) -> PersistenceResult<()> {''',
+              '''    async fn insert_postmatch_evaluation_sample_in_tx(
+              &self,
+              tx: &mut Transaction<'_, Postgres>,
+              settlement_id: Uuid,
+              context: &SettlementContext,
+              partition: EvaluationSamplePartition<'_>,
+          ) -> PersistenceResult<()> {
+              let EvaluationSamplePartition {
+                  competition_profile_id,
+                  model_version_id,
+                  parameter_set_id,
+                  horizon,
+              } = partition;''',
+          )
+          changed |= replace(
+              "crates/persistence-postgres/src/postmatch.rs",
+              '''            partition_key: format!(
+                  "{}:{}:{}:{}",
+                  model_version_id, competition_profile_id, parameter_set_id, horizon
+              ),''',
+              '''            partition_key: format!(
+                  "{model_version_id}:{competition_profile_id}:{parameter_set_id}:{horizon}"
+              ),''',
+          )
+          changed |= replace(
+              "crates/persistence-postgres/src/postmatch.rs",
+              '''#[derive(Debug)]
+          struct PostmatchPartition {''',
+              '''#[derive(Debug)]
+          struct EvaluationSamplePartition<'a> {
+              competition_profile_id: Uuid,
+              model_version_id: Uuid,
+              parameter_set_id: Uuid,
+              horizon: &'a str,
+          }
+
+          #[derive(Debug)]
+          struct PostmatchPartition {''',
+          )
+          changed |= replace(
+              "crates/persistence-postgres/src/postmatch.rs",
+              ".signed_duration_since(reference.clone())",
+              ".signed_duration_since(*reference)",
+          )
+          changed |= replace(
+              "crates/persistence-postgres/src/postmatch.rs",
+              "samples.first().map(|item| item.kickoff_time.clone())",
+              "samples.first().map(|item| item.kickoff_time)",
+          )
+          changed |= replace(
+              "crates/persistence-postgres/src/postmatch.rs",
+              "samples.last().map(|item| item.kickoff_time.clone())",
+              "samples.last().map(|item| item.kickoff_time)",
+          )
+          changed |= replace(
+              "crates/persistence-postgres/src/release_acceptance.rs",
+              ".bind(&run.started_at)",
+              ".bind(run.started_at)",
+          )
+          changed |= replace(
+              "crates/persistence-postgres/src/release_acceptance.rs",
+              ".bind(&run.completed_at)",
+              ".bind(run.completed_at)",
+          )
+          Path("r0-08-evidence/apply-state.txt").write_text(
+              "changed=true\n" if changed else "changed=false\n"
+          )
+          PY
+
+          cargo fmt --all
+          git diff --check
+          git diff --name-only | sort > r0-08-evidence/changed-files.txt
+          cat > r0-08-evidence/expected-files.txt <<'EOF'
+          crates/persistence-postgres/src/postmatch.rs
+          crates/persistence-postgres/src/release_acceptance.rs
+          crates/spreadsheet-io/src/match_review_workbook.rs
+          crates/spreadsheet-io/src/team_package.rs
+          EOF
+          diff -u r0-08-evidence/expected-files.txt r0-08-evidence/changed-files.txt
+          git diff --stat > r0-08-evidence/diff-stat.txt
+          git diff > r0-08-evidence/r0-08.patch
+
+      - name: Run focused package tests
+        shell: bash
+        run: |
+          set -o pipefail
+          cargo test --locked -p football-spreadsheet-io -p football-persistence-postgres --lib 2>&1 | tee r0-08-evidence/focused-tests.txt
+
+      - name: Run workspace Clippy gate
+        shell: bash
+        run: |
+          set -o pipefail
+          cargo clippy --locked --workspace --all-targets -- -D warnings 2>&1 | tee r0-08-evidence/clippy.txt
+
+      - name: Commit verified R0-08 source changes
+        shell: bash
+        run: |
+          set -euo pipefail
+          if git diff --quiet; then
+            echo 'No source changes to commit.'
+            exit 0
+          fi
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add \
+            crates/spreadsheet-io/src/match_review_workbook.rs \
+            crates/spreadsheet-io/src/team_package.rs \
+            crates/persistence-postgres/src/postmatch.rs \
+            crates/persistence-postgres/src/release_acceptance.rs
+          git commit -m 'fix(r00-08): close Rust clippy gate'
+          git push origin HEAD:new-A
+          git rev-parse HEAD > r0-08-evidence/implementation-commit.txt
+
+      - name: Upload R0-08 apply evidence
+        if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: r00-08-clippy-diagnostics
+          name: r00-08-clippy-apply
           path: r0-08-evidence/**
-          if-no-files-found: error
+          if-no-files-found: warn
           retention-days: 30
