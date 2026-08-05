@@ -59,7 +59,11 @@ Windows 可使用：
 - R0-08 workflow run `30965687503` 中，持久化库测试 73/73、Tauri runtime log 专项 7/7、`cargo clippy --locked --workspace --all-targets -- -D warnings` 均通过。表格库完整测试为 11/12，通过替代验证确认除既有空白行用例外其余 11 项通过。
 - R0-08 精确 workflow run `30966064295` 中，Cargo.lock、rustfmt 和 Clippy 连续通过；workspace tests 首个失败为 `openai_research::tests::built_in_gateway_is_strict_and_has_no_secret`，因此完整 `npm run verify:rust` 以退出码 `101` 结束。
 - R0-08 最终应用 artifact 为 `8914718704`，SHA-256 为 `b8e75726c6ad53bdb4932ceb0bb3d35ff4554f306179178e6a566187723c6c60`；精确验证 artifact 为 `8914844238`，SHA-256 为 `05ee24344468b9613bf18c139ff7d3aabecb92e005f93afb1f9037ed7f21cede`。
-- R0-01 至 R0-06.2 未修改前端或 Rust 业务源码；R0-07 只改变 Rust 排版；R0-08 仅实施行为等价的私有参数收束、Copy/借用修复、无效私有代码清理和测试编译补全。
+- R0-09 先以 `--no-fail-fast` 完整扫描 workspace tests，确认失败集合只有 OpenAI 提示词大小写断言和表格稀疏测试工作簿两项。
+- R0-09 仅修正两个测试契约，共新增 2 行；实施提交为 `50daa258af8ac8e09f8e4f5f428249fe670f2dd2`，未改变生产逻辑、公共接口、数据、配置、依赖、迁移或模型保护边界。
+- R0-09 workflow run `30967448070` 中两个专项测试、185 个 workspace 测试以及精确 `npm run verify:rust` 全部通过；18 个 PostgreSQL 集成测试保持忽略并按用户要求留到最终统一验证。
+- R0-09 最终 artifact 为 `8915431192`，SHA-256 为 `a745bded71179bb6542d3a06b5c65f61cdf48845b8f88193dc7ef0ac5c8fcadc`；临时 workflow、patch 与 Draft PR #6 均已清理或关闭。
+- R0-01 至 R0-06.2 未修改前端或 Rust 业务源码；R0-07 只改变 Rust 排版；R0-08 仅实施行为等价的私有参数收束、Copy/借用修复、无效私有代码清理和测试编译补全；R0-09 只修改测试构造与断言。
 - 当前执行环境未建立本地 Git 工作树，用户设备上的未提交与未跟踪文件不可见；远端分支操作不会覆盖这些本地内容。
 
 ## 0.23.0 变更记录
@@ -116,8 +120,8 @@ API 传输与诊断契约保持历史兼容。
 
 ## 验证事实与限制
 
-R0-06.1 已关闭 Windows 目录联接依赖同步和 `.cmd` 子进程调用缺口；R0-06.2 已关闭 `LogDirectory` 参数和 Cargo release 查找路径缺口。Windows 完整 frontend、release 构建与 RuntimeOnly startup 均已有真实通过证据。R0-07 已关闭 Rust `cargo fmt --check` 阻塞；R0-08 已关闭 workspace all-targets Clippy `-D warnings` 阻塞，精确 `verify:rust` 现可进入 workspace tests。
+R0-06.1 已关闭 Windows 目录联接依赖同步和 `.cmd` 子进程调用缺口；R0-06.2 已关闭 `LogDirectory` 参数和 Cargo release 查找路径缺口。Windows 完整 frontend、release 构建与 RuntimeOnly startup 均已有真实通过证据。R0-07 已关闭 Rust `cargo fmt --check` 阻塞；R0-08 已关闭 workspace all-targets Clippy `-D warnings` 阻塞；R0-09 已关闭全部已枚举 workspace tests 失败，精确 `npm run verify:rust` 现已通过。
 
-R00 阶段仍为 **BLOCKED**。尚未关闭的硬缺口包括：workspace tests 至少存在 OpenAI 内置提示词断言失败和表格空白行物理行号测试失败；Linux Chromium 启动失败；PostgreSQL 实跑和 Windows Full 未执行；用户本机 Windows 10/11 未实机验收。另保留 1 个 moderate npm vulnerability 和 Vite 大 chunk 警告。
+R00 阶段仍为 **BLOCKED**。尚未关闭的硬缺口包括：Linux Chromium 启动失败；PostgreSQL 实跑和 Windows Full 未执行；用户本机 Windows 10/11 未实机验收。另保留 1 个 moderate npm vulnerability 和 Vite 大 chunk 警告。
 
-因此未创建 `R00-stage-completion.md`，不得进入 R1。下一唯一 READY 任务为 `R0-09 Rust workspace tests 门禁修复`。完整事实记录见 `docs/modular-rewrite/R00-baseline/`。
+因此未创建 `R00-stage-completion.md`，不得进入 R1。下一唯一 READY 任务为 `R0-10 Linux Chromium 前端验收门禁修复`。完整事实记录见 `docs/modular-rewrite/R00-baseline/`。
