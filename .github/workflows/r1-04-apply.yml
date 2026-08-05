@@ -42,17 +42,20 @@ jobs:
         shell: pwsh
         run: |
           $source = [System.IO.File]::ReadAllText("scripts/r1-04-apply.mjs", [System.Text.Encoding]::UTF8)
+          $baseOld = "base='8db5f460f25887edac6a6bf95932de6c46164e9a'"
+          $baseReplacement = "base='82d27e479da18267a0cf03d79cbcc15762adbe3a'"
+          $stagedOld = "if(staged.size!==2||!staged.has('scripts/r1-04-apply.mjs')||!staged.has('.github/workflows/r1-04-apply.yml'))throw Error('unexpected R1-04 staging history');"
+          $stagedReplacement = "if(staged.size!==1||!staged.has('.github/workflows/r1-04-apply.yml'))throw Error('unexpected R1-04 staging history');"
           $architectureOld = "run(npm,['run','verify:architecture']);"
           $architectureReplacement = "run(process.execPath,['scripts/architecture/verifyModuleBoundaries.mjs']);run(process.execPath,['scripts/architecture/verifyStateOwnership.mjs']);run(process.execPath,['scripts/architecture/verifyProtectedImports.mjs']);"
           $formatOld = "run('cargo',['fmt','--all']);"
           $formatReplacement = "run('rustfmt',['--edition','2021','--config','skip_children=true','src-tauri/src/bootstrap/mod.rs','src-tauri/src/bootstrap/application.rs','src-tauri/src/bootstrap/state.rs','src-tauri/src/bootstrap/command_registry.rs','src-tauri/src/bootstrap/error.rs','src-tauri/src/lib.rs','src-tauri/src/commands.rs']);"
-          if (-not $source.Contains($architectureOld)) {
-            throw "R1-04 architecture invocation anchor missing"
+          foreach ($anchor in @($baseOld, $stagedOld, $architectureOld, $formatOld)) {
+            if (-not $source.Contains($anchor)) {
+              throw "R1-04 apply anchor missing: $anchor"
+            }
           }
-          if (-not $source.Contains($formatOld)) {
-            throw "R1-04 format invocation anchor missing"
-          }
-          $patched = $source.Replace($architectureOld, $architectureReplacement).Replace($formatOld, $formatReplacement)
+          $patched = $source.Replace($baseOld, $baseReplacement).Replace($stagedOld, $stagedReplacement).Replace($architectureOld, $architectureReplacement).Replace($formatOld, $formatReplacement)
           $executionPath = Join-Path $env:GITHUB_WORKSPACE ".git\r1-04-apply.mjs"
           [System.IO.File]::WriteAllText($executionPath, $patched, [System.Text.UTF8Encoding]::new($false))
           node $executionPath
