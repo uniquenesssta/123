@@ -97,7 +97,7 @@ jobs:
             'crates/application/src/lib.rs',
             'crates/application/src/model_registry/mod.rs',
             'crates/application/src/model_registry/registry.rs',
-            'crates/application/src/openai_research.rs',
+             'crates/application/src/openai_research.rs',
             'crates/application/src/p4_orchestration.rs',
             'crates/application/src/p4_persistence.rs',
             'crates/application/src/p4_workbench.rs',
@@ -108,10 +108,10 @@ jobs:
             'docs/modular-rewrite/R01-architecture-composition/README.md',
             'package.json',
             'scripts/architecture/verifyProtectedImports.mjs',
-            'scripts/verify-application-composition.mjs',
+             'scripts/verify-application-composition.mjs',
             'scripts/verify-frontend.mjs'
           )
-          $changed = @(git status --porcelain | ForEach-Object {
+          $changed = @(git status --porcelain --untracked-files=all | ForEach-Object {
             if ($_.Length -lt 4) { throw "Invalid git status line: $_" }
             $_.Substring(3).Trim('"')
           })
