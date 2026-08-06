@@ -36,8 +36,8 @@ Windows 可使用：
 验收平台.bat
 ```
 
-`verify:frontend` 包含公开模型边界、Node 调用链兼容、Windows 路径契约、TypeScript、静态契约、截图和 Vite 生产构建。TypeScript 与 Vite 使用当前 Node 执行包内 JavaScript CLI，不直接启动 Windows `.cmd` 包装器。Windows 验收器从 `.cargo/target-location.json` 解析实际 Cargo target，并支持相对于项目根目录的 `LogDirectory`；应用 runtime 日志继续写入项目根目录 `logs`。`verify:rust` 包含 Cargo.lock 一致性、格式检查、Clippy 与工作区测试。`verify_protected_assets.mjs` 校验模型公开边界文件指纹、保护目录精确集合以及私有 P4/P7 资产缺席状态。`verify_command_contract.mjs` 校验前端调用、Rust 命令定义和 `generate_handler!` 注册集合一致，并拒绝缺失、重复、孤立或未授权动态命令。`verify_database_baseline.mjs` 校验 0001–0046 迁移连续性、内容指纹、SQLx 迁移入口、PostgreSQL 集成测试集合和关键不可变约束。`run_database_baseline.mjs` 在静态门禁通过后执行被忽略的 PostgreSQL 集成测试，并拒绝数据库名不含 `test` 的连接。
-`Public Platform CI` 是 Windows 自动交付门禁：对 `main`、`new-*`、`rewrite/**` 的推送、Pull Request 和手动触发执行 R1 架构契约检查及 `scripts/windows-acceptance.ps1 -Mode Automated`，并保存验收日志和 release bundle 证据。云端 Automated 不替代最终真实 PostgreSQL、Windows Full 交互和用户本机验收。
+`verify:frontend` 包含公开模型边界、Domain 类型清单漂移、Node 调用链兼容、Windows 路径契约、TypeScript、静态契约、截图和 Vite 生产构建。TypeScript 与 Vite 使用当前 Node 执行包内 JavaScript CLI，不直接启动 Windows `.cmd` 包装器。Windows 验收器从 `.cargo/target-location.json` 解析实际 Cargo target，并支持相对于项目根目录的 `LogDirectory`；应用 runtime 日志继续写入项目根目录 `logs`。`verify:architecture` 包含模块边界、状态所有权、受保护导入和 Domain 类型清单漂移门禁。`verify:rust` 包含 Cargo.lock 一致性、格式检查、Clippy 与工作区测试。`verify_protected_assets.mjs` 校验模型公开边界文件指纹、保护目录精确集合以及私有 P4/P7 资产缺席状态。`verify_command_contract.mjs` 校验前端调用、Rust 命令定义和 `generate_handler!` 注册集合一致，并拒绝缺失、重复、孤立或未授权动态命令。`verify_database_baseline.mjs` 校验 0001–0046 迁移连续性、内容指纹、SQLx 迁移入口、PostgreSQL 集成测试集合和关键不可变约束。`run_database_baseline.mjs` 在静态门禁通过后执行被忽略的 PostgreSQL 集成测试，并拒绝数据库名不含 `test` 的连接。
+`Public Platform CI` 是 Windows 自动交付门禁：对 `main`、`new-*`、`rewrite/**` 的推送、Pull Request 和手动触发执行架构契约检查及 `scripts/windows-acceptance.ps1 -Mode Automated`，并保存验收日志和 release bundle 证据。云端 Automated 不替代最终真实 PostgreSQL、Windows Full 交互和用户本机验收。
 
 ## 模块化重写执行记录
 
@@ -47,6 +47,7 @@ Windows 可使用：
 - R1-03 已建立 `src/bootstrap/` 浏览器组合根并切换 `index.html` 唯一入口；`src/main.ts` 仅保留既有业务实现并暴露受控生命周期。Windows workflow run `31012168809`、job `92326905405` 在提交 `a3b61088abaf0c9f052ecab09e040ea77bd8d344` 上通过，artifact `8933800016` 大小 `14117539` 字节，SHA-256 为 `4c28e5668b8b330cbab5b54516af1d70fe9f39c8299bb640da06a5b4442667f9`；状态为 `DONE`，R1-04 已开放为 `READY`。
 - R1-04 已建立 `src-tauri/src/bootstrap/` Tauri 组合根，拆分 Builder、全局状态、171 条命令注册和启动错误映射；状态为 `DONE`。
 - R1-05 已建立 `crates/application/src/` 下的 Application 组合根、兼容服务门面、模型注册表和持久化端口注册入口；默认模型注册与 PostgreSQL 具体导入均已收敛到唯一所有者，公共 API 和行为不变。专项、架构、前端、Rust 及正式 Windows Automated 全部通过；workflow run `31073166446`、job `92525208547` 在提交 `08803725dcd9f403ffc25552c27d2a9c0d3acd2d` 上通过，artifact `8956912712` 大小 `14117884` 字节，SHA-256 为 `495d3c5e29f2b474e97b98f89dd64b6175cc6e9496dd77681c0a567e00c60016`。状态为 `DONE`，R1 阶段已关闭。
+- R2-01 已建立可机器复算的 Domain 类型与调用链清单、目标模块归属策略和 Serde 契约测试。清单登记 365 个公共兼容类型、20 个 Domain 来源文件、139 个 Rust 扫描文件和 299 个 PostgreSQL 映射类型；生成与全量门禁 run `31077537198`、job `92538743873` 已通过。本节点未迁移或修改任何 `crates/domain/src` 生产类型，当前状态为 `VERIFYING`，R2-02 保持 `BLOCKED`，等待最终实施提交的正式 Windows Automated。
 - R1-04 前置校正将 `crates/application/src/model_shell/mod.rs` 恢复为 Rust 1.88 标准排版，并只同步更新该文件的保护指纹与派生聚合值；导出集合、模型行为和保护范围均未变化。
 - R1-04 已同步迁移 19 个既有验证器读取新的 Tauri 命令注册表或状态所有者，消除旧 `lib.rs` 路径造成的伪失败；产品代码和公共契约未改变。
 - R1-04 Windows Automated 启动烟测改为按启动前日志路径集合识别新 session，并在首次 45 秒超时时最多重启一次；每次启动保留 stdout/stderr，连续两次超时仍硬失败。打包前后 EXE 的 A/B 运行均正常，产品入口、bundle、命令和业务行为未改变。
@@ -142,4 +143,4 @@ R00 阶段已按 Windows-only 目标范围标记为 **DONE**。Linux Chromium �
 
 PostgreSQL 实跑、Windows Full 和用户本机 Windows 10/11 实机验收尚未执行，统一保留到最终验收，不得在后续阶段描述为已通过。另保留 1 个 moderate npm vulnerability 和 Vite 大 chunk 警告。
 
-已创建 `R00-stage-completion.md` 和 `R01-stage-completion.md`。R1-01 至 R1-05 状态均为 `DONE`；R1 已关闭，R2 可从已验收源码基线在独立 Atomic Task 中开始，状态见 `docs/modular-rewrite/R01-architecture-composition/README.md`。
+已创建 `R00-stage-completion.md` 和 `R01-stage-completion.md`。R1-01 至 R1-05 状态均为 `DONE`；R2-01 已完成清单生成、Serde 契约和全量门禁并处于 `VERIFYING`，正式 Windows Automated 通过前 R2-02 保持 `BLOCKED`。详细状态见 `docs/modular-rewrite/R02-domain-rewrite/README.md`。
