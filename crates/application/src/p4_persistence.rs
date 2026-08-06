@@ -1,4 +1,5 @@
 use super::{ApplicationResult, ApplicationService};
+use crate::PersistenceStore;
 use football_domain::{
     CompetitionProfileVersionDraft, CompetitionProfileVersionRecord, EvidenceClaimDraft,
     EvidenceClaimRecord, EvidenceConflictDraft, EvidenceConflictRecord, PrematchSnapshotBundle,
@@ -6,14 +7,13 @@ use football_domain::{
     ResearchRunDraft, ResearchRunEventDraft, ResearchRunRecord, SchemaVersionDraft,
     SchemaVersionRecord, P4_EVIDENCE_SCHEMA_VERSION, P4_SNAPSHOT_SCHEMA_VERSION,
 };
-use football_persistence_postgres::PostgresStore;
 use serde_json::Value;
 use uuid::Uuid;
 
 impl ApplicationService {
     pub(super) async fn register_p4_persistence_artifacts(
         &self,
-        store: &PostgresStore,
+        store: &PersistenceStore,
     ) -> ApplicationResult<()> {
         for draft in built_in_schema_versions() {
             store.register_schema_version(&draft).await?;

@@ -3,6 +3,7 @@ use super::{
     PredictionCommand,
 };
 use crate::model_shell::P4_MODEL_ID;
+use crate::PersistenceStore;
 use chrono::{Duration, Utc};
 use football_domain::{
     EnqueueJobDraft, EvidenceVerificationState, P4FreezeReadiness, P4FreezeTaskDraft,
@@ -11,7 +12,6 @@ use football_domain::{
     ResearchRunStatus, SnapshotFeatureDraft, SnapshotProbabilityDraft, SnapshotSourceKind,
     P4_FREEZE_GRACE_MINUTES, P4_ORCHESTRATION_PLANNER_VERSION, P4_RESEARCH_LEAD_MINUTES,
 };
-use football_persistence_postgres::PostgresStore;
 use football_research_gateway::{CancellationToken, GatewayOperation};
 use serde::Deserialize;
 use serde_json::{json, Map, Value};
@@ -288,7 +288,7 @@ impl ApplicationService {
 
     async fn execute_p4_orchestration_job(
         &self,
-        store: &PostgresStore,
+        store: &PersistenceStore,
         job_type: &str,
         payload: &Value,
         job_id: Uuid,
@@ -311,7 +311,7 @@ impl ApplicationService {
 
     async fn execute_p4_research_task(
         &self,
-        store: &PostgresStore,
+        store: &PersistenceStore,
         task_id: Uuid,
         job_id: Uuid,
     ) -> ApplicationResult<Value> {
@@ -526,7 +526,7 @@ impl ApplicationService {
 
     async fn execute_p4_freeze_task(
         &self,
-        store: &PostgresStore,
+        store: &PersistenceStore,
         task_id: Uuid,
         job_id: Uuid,
     ) -> ApplicationResult<Value> {
@@ -766,7 +766,7 @@ pub(crate) fn spawn_p4_orchestration_worker(service: Arc<ApplicationService>) {
 }
 
 async fn research_dynamic_context(
-    store: &PostgresStore,
+    store: &PersistenceStore,
     task: &P4FreezeTaskRecord,
 ) -> ApplicationResult<Value> {
     let context = store.p4_planning_match_context(task.match_id).await?;
@@ -795,7 +795,7 @@ async fn research_dynamic_context(
 }
 
 pub(super) async fn finalize_successful_research(
-    store: &PostgresStore,
+    store: &PersistenceStore,
     task: &P4FreezeTaskRecord,
 ) -> ApplicationResult<P4FreezeTaskRecord> {
     let readiness = store.p4_freeze_readiness(task.id).await?;
@@ -846,7 +846,7 @@ pub(super) async fn finalize_successful_research(
 }
 
 async fn block_partial_research(
-    store: &PostgresStore,
+    store: &PersistenceStore,
     task: &P4FreezeTaskRecord,
 ) -> ApplicationResult<P4FreezeTaskRecord> {
     let readiness = store.p4_freeze_readiness(task.id).await?;
@@ -867,7 +867,7 @@ async fn block_partial_research(
 }
 
 async fn transition_missed(
-    store: &PostgresStore,
+    store: &PersistenceStore,
     task: &P4FreezeTaskRecord,
     reason: &str,
     payload: Value,

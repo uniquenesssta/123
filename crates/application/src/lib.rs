@@ -1,10 +1,12 @@
 mod analytics;
 mod api_workspace;
 mod competition;
+mod composition;
 mod database;
 mod exchange;
 mod fact_pipeline;
 mod match_review_package;
+mod model_registry;
 mod model_shell;
 mod openai_research;
 mod p4_orchestration;
@@ -16,24 +18,25 @@ mod prediction;
 mod release_acceptance;
 mod review;
 mod rule_packages;
+mod service;
 mod spreadsheet;
 
 use football_domain::{
     CompetitionBindingSummary, CompetitionKind, CompetitionRecord, PredictionInputAuditSummary,
     RoundRecord, RouteDecision, RulePackageDraft, RulePackageSummary, SeasonRecord, StageRecord,
 };
-use football_model_api::{ModelDescriptor, ModelOutput, PredictionModel};
-use football_persistence_postgres::{
-    DatabaseHealth, DatabaseStats, ModelRunListItem, PersistenceError, PostgresStore,
-};
-use model_shell::PublicModelStub;
+use football_model_api::{ModelDescriptor, ModelOutput};
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
-use std::collections::HashMap;
-use std::sync::{atomic::AtomicBool, Arc};
 use thiserror::Error;
-use tokio::sync::RwLock;
 use uuid::Uuid;
+
+pub(crate) use composition::{
+    ActiveDatabase, DatabaseHealth, DatabaseOptions, DatabaseStats, ModelRunListItem,
+    PersistenceError, PersistenceStore,
+};
+pub use model_registry::ModelRegistry;
+pub use service::ApplicationService;
 
 pub use api_workspace::{
     api_workspace_preset_spec, api_workspace_preset_specs, api_workspace_presets,
@@ -154,74 +157,6 @@ pub struct PredictionExecution {
     pub output: ModelOutput,
     #[serde(default)]
     pub input_audit: Option<PredictionInputAuditSummary>,
-}
-
-struct ActiveDatabase {
-    store: PostgresStore,
-    redacted_url: String,
-}
-
-pub struct ModelRegistry {
-    models: HashMap<String, Arc<dyn PredictionModel>>,
-}
-
-impl ModelRegistry {
-    pub fn new() -> Self {
-        Self {
-            models: HashMap::new(),
-        }
-    }
-
-    pub fn register(&mut self, model: Arc<dyn PredictionModel>) {
-        self.models
-            .insert(model.descriptor().model_id.clone(), model);
-    }
-
-    pub fn get(&self, model_id: &str) -> Option<Arc<dyn PredictionModel>> {
-        self.models.get(model_id).cloned()
-    }
-
-    pub fn descriptors(&self) -> Vec<ModelDescriptor> {
-        let mut values: Vec<ModelDescriptor> = self
-            .models
-            .values()
-            .map(|model| model.descriptor())
-            .collect();
-        values.sort_by(|left, right| left.model_id.cmp(&right.model_id));
-        values
-    }
-}
-
-impl Default for ModelRegistry {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-pub struct ApplicationService {
-    registry: ModelRegistry,
-    database: RwLock<Option<ActiveDatabase>>,
-    p4_worker_running: AtomicBool,
-}
-
-impl ApplicationService {
-    pub fn new() -> Self {
-        let mut registry = ModelRegistry::new();
-        for model in PublicModelStub::built_in_models() {
-            registry.register(Arc::new(model));
-        }
-        Self {
-            registry,
-            database: RwLock::new(None),
-            p4_worker_running: AtomicBool::new(false),
-        }
-    }
-}
-
-impl Default for ApplicationService {
-    fn default() -> Self {
-        Self::new()
-    }
 }
 
 #[cfg(test)]

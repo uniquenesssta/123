@@ -1,6 +1,6 @@
 {
   "contract_id": "football.state-ownership.v1",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "task": "R1-01",
   "status": "ACTIVE",
   "baseline": {
@@ -93,7 +93,7 @@
     },
     {
       "id": "application.model-registry",
-      "owner": "crates/application/src/lib.rs::ModelRegistry",
+      "owner": "crates/application/src/model_registry/registry.rs::ModelRegistry",
       "scope": "ApplicationService",
       "writers": [
         "ModelRegistry.register"
@@ -102,11 +102,11 @@
         "src-tauri/src/commands/**",
         "crates/persistence-postgres/**"
       ],
-      "transition": "R1-05:application model registry shell"
+      "transition": null
     },
     {
       "id": "application.active-database",
-      "owner": "crates/application/src/lib.rs::ApplicationService.database",
+      "owner": "crates/application/src/service/application_service.rs::ApplicationService.database",
       "scope": "ApplicationService",
       "writers": [
         "football-application database use cases"
@@ -120,7 +120,7 @@
     },
     {
       "id": "application.p4-worker",
-      "owner": "crates/application/src/lib.rs::ApplicationService.p4_worker_running",
+      "owner": "crates/application/src/service/application_service.rs::ApplicationService.p4_worker_running",
       "scope": "ApplicationService",
       "writers": [
         "football-application p4 orchestration"
@@ -251,5 +251,6 @@
       "transition": null
     }
   ],
-  "count": 17
+  "count": 17,
+  "last_updated_task": "R1-05"
 }

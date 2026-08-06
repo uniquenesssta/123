@@ -2,13 +2,13 @@ use super::{
     p4_orchestration::finalize_successful_research, ApplicationError, ApplicationResult,
     ApplicationService,
 };
+use crate::PersistenceStore;
 use chrono::Utc;
 use football_domain::{
     P4FreezeTaskState, P4FreezeTaskTransition, P4ManualConflictDecisionKind,
     P4ManualRouteOverrideDraft, P4MatchWorkspace, P4TaskWorkspace, ResearchRunEventDraft,
     ResearchRunStatus, ResolveP4ConflictCommand,
 };
-use football_persistence_postgres::PostgresStore;
 use serde_json::{json, Value};
 use std::collections::BTreeSet;
 use uuid::Uuid;
@@ -212,7 +212,7 @@ impl ApplicationService {
 }
 
 async fn reconcile_p4_task_after_manual_decision(
-    store: &PostgresStore,
+    store: &PersistenceStore,
     task_id: Uuid,
     research_run_id: Uuid,
 ) -> ApplicationResult<()> {

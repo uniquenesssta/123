@@ -1,6 +1,6 @@
 {
   "contract_id": "football.module-boundaries.v1",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "task": "R1-01",
   "status": "ACTIVE",
   "baseline": {
@@ -249,13 +249,14 @@
       "model_port_owner": "crates/model-api",
       "public_model_adapter": "crates/model-stub",
       "protected_assets": "architecture/protected-assets.json",
-      "cycles": "forbidden"
+      "cycles": "forbidden",
+      "application_persistence_import_owner": "crates/application/src/composition/port_registry.rs"
     },
     "ports": {
       "PredictionModel": {
         "owner": "crates/model-api/src/lib.rs",
         "adapter": "crates/model-stub/src/lib.rs",
-        "consumer": "crates/application/src/lib.rs::ModelRegistry"
+        "consumer": "crates/application/src/model_registry/registry.rs::ModelRegistry"
       },
       "OpenAiTransport": {
         "owner": "crates/research-gateway/src/client.rs",
@@ -320,6 +321,14 @@
       "command_registry": "src-tauri/src/bootstrap/command_registry.rs",
       "command_root": "src-tauri/src/commands.rs",
       "target_task": null
+    },
+    "application_composition": {
+      "public_facade": "crates/application/src/service/application_service.rs::ApplicationService",
+      "composition_root": "crates/application/src/composition/application_composition.rs::ApplicationComposition",
+      "port_registry": "crates/application/src/composition/port_registry.rs::PortRegistry",
+      "model_registry": "crates/application/src/model_registry/registry.rs::ModelRegistry",
+      "persistence_adapter_import_owner": "crates/application/src/composition/port_registry.rs",
+      "concrete_dependency_policy": "composition-port-only"
     }
   },
   "tauri_commands": {
@@ -387,12 +396,6 @@
     "command_groups": 15,
     "commands": 171
   },
-  "transitional_edges": [
-    {
-      "from": "football-application",
-      "to": "football-persistence-postgres",
-      "reason": "existing application persistence coupling retained until the application composition task",
-      "exit_task": "R1-05"
-    }
-  ]
+  "transitional_edges": [],
+  "last_updated_task": "R1-05"
 }

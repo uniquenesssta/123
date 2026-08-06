@@ -1,3 +1,4 @@
+use crate::PersistenceStore;
 use crate::{ApplicationError, ApplicationResult, ApplicationService};
 use football_analysis_package::{
     read_analysis_response, response_template_bytes, write_analysis_package,
@@ -12,7 +13,6 @@ use football_domain::{
     ParameterTuningCandidateRecord, ParameterTuningDecisionDraft, ParameterTuningDraft,
 };
 use football_model_api::ModelRequest;
-use football_persistence_postgres::PostgresStore;
 use serde_json::{json, Value};
 use sha2::{Digest, Sha256};
 use std::{fs, path::Path};
@@ -766,7 +766,7 @@ impl ApplicationService {
     }
 }
 
-pub(crate) fn spawn_job_worker(store: PostgresStore) {
+pub(crate) fn spawn_job_worker(store: PersistenceStore) {
     tokio::spawn(async move {
         loop {
             let job = match store
@@ -796,7 +796,7 @@ pub(crate) fn spawn_job_worker(store: PostgresStore) {
 }
 
 async fn execute_job(
-    store: &PostgresStore,
+    store: &PersistenceStore,
     job_type: &str,
     payload: &Value,
     job_id: Uuid,

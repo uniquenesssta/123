@@ -16,6 +16,9 @@ const contract = readJson("architecture/module-boundaries.json");
 const transportOwner = normalizePath(contract.frontend?.transport?.owner ?? "");
 const persistenceRoot = normalizePath(contract.rust?.rules?.sqlx_owner ?? "crates/persistence-postgres").split("/src/")[0];
 const tauriRoot = normalizePath(contract.rust?.rules?.tauri_owner ?? "src-tauri");
+const applicationPersistenceOwner = normalizePath(
+  contract.rust?.rules?.application_persistence_import_owner ?? "",
+);
 const protectedModelTokens = [
   "football-model-p4",
   "football-model-p7",
@@ -60,8 +63,12 @@ for (const importer of frontendFiles) {
 }
 
 const rustFiles = listFiles(["crates", "src-tauri"], { extensions: [".rs"] });
+const applicationPersistenceImporters = [];
 for (const file of rustFiles) {
   const source = readFileSync(join(repositoryRoot, file), "utf8");
+  if (file.startsWith("crates/application/") && source.includes("football_persistence_postgres")) {
+    applicationPersistenceImporters.push(file);
+  }
   const usesSqlx = /(?:\buse\s+sqlx\b|\bsqlx(?:::|!))/.test(source);
   const usesTauri = /(?:\buse\s+tauri\b|\btauri(?:::|!)|#\[tauri::)/.test(source);
 
@@ -106,11 +113,42 @@ for (const dependency of domainManifest.dependencies) {
 }
 
 const applicationManifest = parseCargoManifest("crates/application/Cargo.toml");
-const applicationUsesPersistence = applicationManifest.dependencies.some((dependency) => dependency.packageName === "football-persistence-postgres");
+const applicationUsesPersistence = applicationManifest.dependencies.some(
+  (dependency) => dependency.packageName === "football-persistence-postgres",
+);
+const staleApplicationPersistenceTransition = (contract.transitional_edges ?? []).find(
+  (edge) =>
+    edge.from === "football-application" &&
+    edge.to === "football-persistence-postgres",
+);
+report.check(
+  !staleApplicationPersistenceTransition,
+  "football-application -> persistence-postgres 的 R1-05 过渡边仍未退出",
+);
 if (applicationUsesPersistence) {
-  const transition = (contract.transitional_edges ?? []).find((edge) => edge.from === "football-application" && edge.to === "football-persistence-postgres");
-  report.check(Boolean(transition), "football-application 仍依赖 persistence-postgres，但契约未登记受控过渡边");
-  if (transition) report.note(`保留已登记过渡边 football-application -> football-persistence-postgres，退出任务 ${transition.exit_task}`);
+  report.check(
+    Boolean(applicationPersistenceOwner),
+    "football-application 仍声明 persistence-postgres，但未登记组合根具体适配器导入所有者",
+  );
+  report.check(
+    applicationPersistenceImporters.length === 1 &&
+      applicationPersistenceImporters[0] === applicationPersistenceOwner,
+    `football-application 的 PostgreSQL 具体导入必须仅位于 ${applicationPersistenceOwner || "已登记组合根文件"}；当前：${applicationPersistenceImporters.join(", ") || "无"}`,
+  );
+  if (
+    applicationPersistenceOwner &&
+    applicationPersistenceImporters.length === 1 &&
+    applicationPersistenceImporters[0] === applicationPersistenceOwner
+  ) {
+    report.note(
+      `Application 持久化具体适配器导入已收敛到组合根：${applicationPersistenceOwner}`,
+    );
+  }
+} else {
+  report.check(
+    applicationPersistenceImporters.length === 0,
+    `football-application 未声明 persistence-postgres，但仍存在具体导入：${applicationPersistenceImporters.join(", ")}`,
+  );
 }
 
 report.finish(`${frontendFiles.length} 个前端文件、${rustFiles.length} 个 Rust 文件、${cargoFiles.length} 个 Cargo 清单`);

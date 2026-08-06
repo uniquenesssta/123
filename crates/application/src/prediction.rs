@@ -4,6 +4,7 @@ use super::{
     StoredMatchPredictionCommand,
 };
 use crate::model_shell::P4_MODEL_ID;
+use crate::{ModelRunListItem, PersistenceError};
 use chrono::{DateTime, Utc};
 use football_domain::{
     CompetitionKind, MatchContext, MatchLineupChain, MatchPredictionReadiness, ModelIdentity,
@@ -12,7 +13,6 @@ use football_domain::{
     PREDICTION_INPUT_AUDIT_VERSION,
 };
 use football_model_api::{ModelOutput, ModelRequest};
-use football_persistence_postgres::{ModelRunListItem, PersistenceError};
 use serde_json::{json, Value};
 use sha2::{Digest, Sha256};
 use std::time::Instant;

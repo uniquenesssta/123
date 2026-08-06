@@ -1,4 +1,4 @@
-use super::{ApplicationError, ApplicationResult, ApplicationService};
+use super::{ApplicationError, ApplicationResult, ApplicationService, PersistenceStore};
 use async_trait::async_trait;
 use chrono::{DateTime, Utc};
 use football_domain::{
@@ -39,7 +39,7 @@ fn default_operation() -> GatewayOperation {
 impl ApplicationService {
     pub(super) async fn register_openai_research_artifacts(
         &self,
-        store: &football_persistence_postgres::PostgresStore,
+        store: &PersistenceStore,
     ) -> ApplicationResult<()> {
         store
             .register_schema_version(&built_in_research_schema())
@@ -343,7 +343,7 @@ fn optional_u32(value: Option<usize>, label: &str) -> ApplicationResult<Option<u
 }
 
 struct PersistenceAttemptSink {
-    store: football_persistence_postgres::PostgresStore,
+    store: PersistenceStore,
     research_run_id: Uuid,
 }
 

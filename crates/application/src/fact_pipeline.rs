@@ -1,4 +1,5 @@
 use super::{ApplicationError, ApplicationResult, ApplicationService};
+use crate::PersistenceStore;
 use chrono::{DateTime, Utc};
 use football_domain::{
     ConflictEvaluationDraft, ConflictEvaluationStatus, EntityCandidate, EntityResolutionDraft,
@@ -75,7 +76,7 @@ struct RankedValue {
 impl ApplicationService {
     pub(super) async fn register_fact_pipeline_artifacts(
         &self,
-        store: &football_persistence_postgres::PostgresStore,
+        store: &PersistenceStore,
     ) -> ApplicationResult<()> {
         store
             .register_source_policy_version(&built_in_source_policy())
@@ -261,7 +262,7 @@ impl ApplicationService {
 }
 
 async fn process_fact_group(
-    store: &football_persistence_postgres::PostgresStore,
+    store: &PersistenceStore,
     context: &FactPipelineContext,
     registry: &EvidenceRouteRegistry,
     group: Vec<PreparedFact>,
@@ -329,7 +330,7 @@ async fn process_fact_group(
 }
 
 async fn append_fact_claims(
-    store: &football_persistence_postgres::PostgresStore,
+    store: &PersistenceStore,
     context: &FactPipelineContext,
     prepared: &PreparedFact,
     state: EvidenceVerificationState,
@@ -415,7 +416,7 @@ async fn append_fact_claims(
 }
 
 async fn process_conflict_group(
-    store: &football_persistence_postgres::PostgresStore,
+    store: &PersistenceStore,
     context: &FactPipelineContext,
     route_rule: Option<&EvidenceRouteRule>,
     persisted: Vec<PersistedFact>,
@@ -587,7 +588,7 @@ async fn process_conflict_group(
 }
 
 async fn route_non_conflicting_group(
-    store: &football_persistence_postgres::PostgresStore,
+    store: &PersistenceStore,
     context: &FactPipelineContext,
     route_rule: Option<&EvidenceRouteRule>,
     persisted: Vec<PersistedFact>,
@@ -662,7 +663,7 @@ fn resolved_route_status(
 
 #[allow(clippy::too_many_arguments)]
 async fn append_route(
-    store: &football_persistence_postgres::PostgresStore,
+    store: &PersistenceStore,
     context: &FactPipelineContext,
     route_rule: Option<&EvidenceRouteRule>,
     persisted: &[PersistedFact],
@@ -722,7 +723,7 @@ async fn append_route(
 }
 
 async fn process_missing_field(
-    store: &football_persistence_postgres::PostgresStore,
+    store: &PersistenceStore,
     context: &FactPipelineContext,
     registry: &EvidenceRouteRegistry,
     missing: &MissingField,

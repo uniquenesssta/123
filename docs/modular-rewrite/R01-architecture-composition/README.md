@@ -39,7 +39,7 @@ R00 已按 Windows-only 目标范围完成。R1 只建立可机器验证的架�
 | R1-02 | 边界验证脚本 | DONE | [`R01-02-边界验证脚本.md`](R01-02-边界验证脚本.md) | `npm run verify:architecture` 通过 | workflow run `31001470224` 通过 |
 | R1-03 | 浏览器组合根 | DONE | [`R01-03-浏览器组合根.md`](R01-03-浏览器组合根.md) | 浏览器组合根专项验证通过 | workflow run `31012168809` 通过 |
 | R1-04 | Tauri 组合根 | DONE | [`R01-04-tauri-组合根.md`](R01-04-tauri-组合根.md) | 专项契约、保护资产、格式和桌面 crate 编译通过 | workflow run `31037323146` 通过 |
-| R1-05 | Application 组合根 | READY | 待创建 | 待执行 | 待执行 |
+| R1-05 | Application 组合根 | VERIFYING | [`R01-05-application-组合根.md`](R01-05-application-组合根.md) | 专项门禁、前端和 Rust 全量验证通过 | Windows Automated 待执行 |
 
 ## R1-01 完成结果
 
@@ -88,6 +88,13 @@ R00 已按 Windows-only 目标范围完成。R1 只建立可机器验证的架�
 - 真实 PostgreSQL、Windows Full 和用户本机 Windows 实机验收继续保留到最终统一验收。
 - R1-04 状态为 `DONE`；R1-05 开放为 `READY`。
 
-## 当前唯一可执行任务
+## R1-05 当前结果
 
-`R1-05 Application 组合根`
+- 已建立 Application 组合根、兼容服务门面、模型注册表和持久化端口注册模块。
+- 默认模型注册和 PostgreSQL 具体导入分别收敛到唯一所有者；公共 Application API 和既有行为保持不变。
+- Application 专项门禁、架构门禁、完整前端验证和完整 Rust 验证已通过。
+- 正式 Windows Automated、release 客户端启动与运行日志证据待实施提交触发后确认。
+
+## 当前阶段状态
+
+`R1-05 VERIFYING`；正式 Windows Automated 通过前 R1 不关闭，也不开放 R2。

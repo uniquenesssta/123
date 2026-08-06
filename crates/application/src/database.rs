@@ -1,8 +1,8 @@
 use super::{
     default_match, default_rule_package_template, rule_packages::built_in_rule_packages,
     ActiveDatabase, ApplicationError, ApplicationResult, ApplicationService, BootstrapData,
+    DatabaseHealth, DatabaseOptions, PersistenceStore,
 };
-use football_persistence_postgres::{DatabaseHealth, DatabaseOptions, PostgresStore};
 use std::sync::Arc;
 
 impl ApplicationService {
@@ -10,7 +10,7 @@ impl ApplicationService {
         self: &Arc<Self>,
         options: DatabaseOptions,
     ) -> ApplicationResult<DatabaseHealth> {
-        let store = PostgresStore::connect(&options).await?;
+        let store = PersistenceStore::connect(&options).await?;
         store.migrate().await?;
         store.recover_interrupted_jobs().await?;
         store.recover_interrupted_api_workspace_operations().await?;
@@ -113,7 +113,7 @@ impl ApplicationService {
             default_rule_package: default_rule_package_template(),
         })
     }
-    pub(super) async fn active_store(&self) -> ApplicationResult<PostgresStore> {
+    pub(super) async fn active_store(&self) -> ApplicationResult<PersistenceStore> {
         self.database
             .read()
             .await
@@ -124,7 +124,7 @@ impl ApplicationService {
 
     async fn register_built_in_rule_packages(
         &self,
-        store: &PostgresStore,
+        store: &PersistenceStore,
     ) -> ApplicationResult<()> {
         for draft in built_in_rule_packages() {
             let model = self
