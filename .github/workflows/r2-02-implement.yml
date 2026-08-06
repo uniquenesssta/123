@@ -146,6 +146,8 @@ jobs:
 
           最终实施提交上的正式 ``Public Platform CI`` Windows Automated 尚待确认；完成前保持 ``VERIFYING``，R2-03 保持 ``BLOCKED``。
           "@.Trim()
+          $old = $old.Replace("`r`n", "`n")
+          $new = $new.Replace("`r`n", "`n")
           if (($text.Split($old).Count - 1) -ne 1) {
             throw "R2-02 validation section did not match exactly once"
           }
