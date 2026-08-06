@@ -1,0 +1,104 @@
+name: R2-01 Finalize Documentation
+
+on:
+  push:
+    branches:
+      - new-B
+
+permissions:
+  contents: write
+
+jobs:
+  finalize:
+    runs-on: windows-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+
+      - name: Close R2-01 documentation
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = "Stop"
+
+          function Replace-Exact {
+            param(
+              [Parameter(Mandatory = $true)][string]$Path,
+              [Parameter(Mandatory = $true)][string]$Old,
+              [Parameter(Mandatory = $true)][AllowEmptyString()][string]$New
+            )
+            $text = [System.IO.File]::ReadAllText($Path)
+            $count = ([regex]::Matches($text, [regex]::Escape($Old))).Count
+            if ($count -ne 1) {
+              throw "Expected exactly one match in ${Path}, found ${count}: ${Old}"
+            }
+            $updated = $text.Replace($Old, $New)
+            [System.IO.File]::WriteAllText(
+              $Path,
+              $updated,
+              [System.Text.UTF8Encoding]::new($false)
+            )
+          }
+
+          $taskPath = "docs/modular-rewrite/R02-domain-rewrite/R02-01-领域类型-and-契约清单.md"
+          Replace-Exact $taskPath '- 任务状态：`VERIFYING`' '- 任务状态：`DONE`'
+          Replace-Exact $taskPath '- 生成清单基线提交：`9e8d527dd26df3e36f00b7730da320acf216b7bc`' @'
+          - 生成清单基线提交：`9e8d527dd26df3e36f00b7730da320acf216b7bc`
+          - 最终实施提交：`2a6b9ea96a88168d6a751ebf48c2030512edaf24`
+          '@.Trim()
+
+          $pendingFormal = @'
+          正式 `Public Platform CI` Windows Automated 需要在最终 R2-01 实施提交上确认；完成前任务保持 `VERIFYING`。
+          '@.Trim()
+          $formalEvidence = @'
+          正式 `Public Platform CI` Windows Automated 已在最终实施提交上实际通过：
+
+          - Workflow run：`31078483578`。
+          - Windows job：`92541654912`。
+          - 架构边界、Domain 类型清单、完整前端、Rust 格式、Clippy、workspace tests 和 Tauri Windows release：通过。
+          - release 客户端首次启动即建立运行日志；客户端启动与状态载入：通过。
+          - 运行日志验收：`PASS`，7 条记录、0 条无效记录、3 个完成操作、0 个运行时错误。
+          - 证据 artifact：`8959079579`，名称 `windows-automated-delivery-evidence-2a6b9ea96a88168d6a751ebf48c2030512edaf24`，大小 `14118091` 字节。
+          - artifact SHA-256：`6b75cc3abe2067472476cd0e7811b9fd9ee6f689f17cbc0eb346030775d0c9e2`。
+          '@.Trim()
+          Replace-Exact $taskPath $pendingFormal $formalEvidence
+          Replace-Exact $taskPath '- 最终实施提交上的正式 Windows Automated 尚待确认。' ''
+          Replace-Exact $taskPath 'R2-02 保持 `BLOCKED`。只有最终 R2-01 实施提交的正式 Windows Automated 通过、证据写入本记录并将 R2-01 标记为 `DONE` 后，R2-02 才可改为 `READY`。' 'R2-01 已关闭，R2-02 状态改为 `READY`。本次收口未实施任何 R2-02 源码、配置或数据变更。'
+
+          $indexPath = "docs/modular-rewrite/R02-domain-rewrite/README.md"
+          Replace-Exact $indexPath '| R2-01 | 领域类型与契约清单 | VERIFYING | [`R02-01-领域类型-and-契约清单.md`](R02-01-领域类型-and-契约清单.md) | 清单、Serde、架构、前端、Rust 已通过；正式 Windows Automated 待确认 |' '| R2-01 | 领域类型与契约清单 | DONE | [`R02-01-领域类型-and-契约清单.md`](R02-01-领域类型-and-契约清单.md) | workflow run `31078483578` 通过 |'
+          Replace-Exact $indexPath '| R2-02 | Competition 与 Routing | BLOCKED | `R02-02-competition-and-routing.md` | 等待 R2-01 `DONE` |' '| R2-02 | Competition 与 Routing | READY | `R02-02-competition-and-routing.md` | R2-01 已关闭，可独立开始 |'
+          Replace-Exact $indexPath '- 生成与全量门禁 run `31077537198`、job `92538743873` 已通过；正式 Windows Automated 需在最终实施提交上确认。' '- 生成与全量门禁 run `31077537198`、job `92538743873` 已通过；正式 Windows Automated run `31078483578`、job `92541654912` 在最终实施提交 `2a6b9ea96a88168d6a751ebf48c2030512edaf24` 上通过，artifact `8959079579` 的 SHA-256 为 `6b75cc3abe2067472476cd0e7811b9fd9ee6f689f17cbc0eb346030775d0c9e2`。'
+          Replace-Exact $indexPath '`R2-01 VERIFYING`；正式 Windows Automated 通过前不开放 R2-02，也不开始任何领域类型迁移。' '`R2-01 DONE`；R2-02 已开放为 `READY`，但尚未开始任何 Competition、Routing 或领域类型迁移。'
+
+          $readmePath = "README.md"
+          $oldReadmeBullet = @'
+          - R2-01 已建立可机器复算的 Domain 类型与调用链清单、目标模块归属策略和 Serde 契约测试。清单登记 365 个公共兼容类型、20 个 Domain 来源文件、139 个 Rust 扫描文件和 299 个 PostgreSQL 映射类型；生成与全量门禁 run `31077537198`、job `92538743873` 已通过。本节点未迁移或修改任何 `crates/domain/src` 生产类型，当前状态为 `VERIFYING`，R2-02 保持 `BLOCKED`，等待最终实施提交的正式 Windows Automated。
+          '@.Trim()
+          $newReadmeBullet = @'
+          - R2-01 已建立可机器复算的 Domain 类型与调用链清单、目标模块归属策略和 Serde 契约测试。清单登记 365 个公共兼容类型、20 个 Domain 来源文件、139 个 Rust 扫描文件和 299 个 PostgreSQL 映射类型；生成与全量门禁 run `31077537198`、job `92538743873` 已通过。正式 Windows Automated run `31078483578`、job `92541654912` 在最终实施提交 `2a6b9ea96a88168d6a751ebf48c2030512edaf24` 上通过；artifact `8959079579` 大小 `14118091` 字节，SHA-256 为 `6b75cc3abe2067472476cd0e7811b9fd9ee6f689f17cbc0eb346030775d0c9e2`。本节点未迁移或修改任何 `crates/domain/src` 生产类型，状态为 `DONE`，R2-02 已开放为 `READY`。
+          '@.Trim()
+          Replace-Exact $readmePath $oldReadmeBullet $newReadmeBullet
+          Replace-Exact $readmePath '已创建 `R00-stage-completion.md` 和 `R01-stage-completion.md`。R1-01 至 R1-05 状态均为 `DONE`；R2-01 已完成清单生成、Serde 契约和全量门禁并处于 `VERIFYING`，正式 Windows Automated 通过前 R2-02 保持 `BLOCKED`。详细状态见 `docs/modular-rewrite/R02-domain-rewrite/README.md`。' '已创建 `R00-stage-completion.md` 和 `R01-stage-completion.md`。R1-01 至 R1-05 与 R2-01 状态均为 `DONE`；R2-02 已开放为 `READY`，但尚未开始。详细状态见 `docs/modular-rewrite/R02-domain-rewrite/README.md`。'
+
+      - name: Commit documentation closure
+        shell: pwsh
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git rm .github/workflows/r2-01-finalize.yml
+          git add README.md docs/modular-rewrite/R02-domain-rewrite/README.md docs/modular-rewrite/R02-domain-rewrite/R02-01-领域类型-and-契约清单.md
+          git diff --cached --check
+          $changed = git diff --cached --name-only
+          $expected = @(
+            'README.md',
+            'docs/modular-rewrite/R02-domain-rewrite/R02-01-领域类型-and-契约清单.md',
+            'docs/modular-rewrite/R02-domain-rewrite/README.md'
+          )
+          $actual = @($changed | Where-Object { $_ -ne '.github/workflows/r2-01-finalize.yml' } | Sort-Object)
+          if ((Compare-Object $expected $actual).Count -ne 0) {
+            throw "Unexpected final documentation change set: $($actual -join ', ')"
+          }
+          git commit -m "docs(r2): close R2-01 domain inventory"
+          git push origin HEAD:new-B
