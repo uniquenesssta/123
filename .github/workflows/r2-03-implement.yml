@@ -115,6 +115,12 @@ jobs:
             'const domain = read("crates/domain/src/formation/usage.rs") + read("crates/domain/src/formation/resolution.rs");' `
             "formation usage verifier domain sources"
 
+          Replace-ExactlyOnce `
+            "scripts/verify-entity-resource-center.mjs" `
+            'const domain = read("crates/domain/src/lib.rs");' `
+            'const domain = read("crates/domain/src/team/detail.rs") + read("crates/domain/src/player/listing.rs");' `
+            "entity resource center verifier domain sources"
+
       - name: Install Node dependencies
         shell: pwsh
         run: npm ci
@@ -207,6 +213,7 @@ jobs:
             'docs/modular-rewrite/R02-domain-rewrite/README.md',
             'scripts/domain-inventory/target-module-policy.mjs',
             'scripts/verify-entity-relationships.mjs',
+            'scripts/verify-entity-resource-center.mjs',
             'scripts/verify-force-team-delete.mjs',
             'scripts/verify-formation-usage.mjs',
             'scripts/verify-player-role-inheritance.mjs',
