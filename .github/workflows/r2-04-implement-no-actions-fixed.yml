@@ -1,0 +1,92 @@
+name: R2-04 Implementation No Actions Fixed
+
+on:
+  push:
+    branches:
+      - new-B
+
+permissions:
+  contents: write
+
+jobs:
+  implement:
+    if: "${{ github.event.head_commit.message == 'chore(r2): retry R2-04 no-actions workflow' }}"
+    runs-on: windows-2022
+    timeout-minutes: 120
+
+    steps:
+      - name: Manual checkout
+        shell: pwsh
+        env:
+          GH_TOKEN_VALUE: ${{ github.token }}
+        run: |
+          $ErrorActionPreference = "Stop"
+          $basic = [Convert]::ToBase64String([Text.Encoding]::ASCII.GetBytes("x-access-token:$env:GH_TOKEN_VALUE"))
+          git init .
+          git remote add origin https://github.com/uniquenesssta/123.git
+          git -c "http.https://github.com/.extraheader=AUTHORIZATION: Basic $basic" fetch --no-tags origin $env:GITHUB_SHA
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          git checkout -B new-B FETCH_HEAD
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          git config --local "http.https://github.com/.extraheader" "AUTHORIZATION: Basic $basic"
+          git config --local gc.auto 0
+
+      - name: Prepare fixed toolchains
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = "Stop"
+          node --version
+          npm --version
+          rustup toolchain install 1.88.0 --component rustfmt --component clippy --profile minimal --no-self-update
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          rustc +1.88.0 --version
+
+      - name: Execute canonical no-actions steps
+        shell: pwsh
+        env:
+          BASE_SHA: 3256454e9d76b7b442a83f25964363256257cbcc
+        run: |
+          $ErrorActionPreference = "Stop"
+          @'
+          from pathlib import Path
+          import textwrap
+
+          source = Path(".github/workflows/r2-04-implement-no-actions.yml").read_text(encoding="utf-8").replace("\r\n", "\n")
+
+          def extract(name: str, next_name: str) -> str:
+              marker = f"      - name: {name}\n"
+              boundary = f"\n      - name: {next_name}\n"
+              if source.count(marker) != 1:
+                  raise RuntimeError(f"Step {name} not found exactly once")
+              block = source.split(marker, 1)[1]
+              if block.count("        run: |\n") < 1 or block.count(boundary) != 1:
+                  raise RuntimeError(f"Step boundary mismatch for {name}")
+              return textwrap.dedent(block.split("        run: |\n", 1)[1].split(boundary, 1)[0])
+
+          apply_script = extract("Execute canonical V3 migration", "Install dependencies and verify R2-04")
+          verify_script = extract("Install dependencies and verify R2-04", "Commit R2-04 implementation")
+          commit_marker = "      - name: Commit R2-04 implementation\n"
+          commit_block = source.split(commit_marker, 1)[1]
+          commit_script = textwrap.dedent(commit_block.split("        run: |\n", 1)[1])
+          commit_script = commit_script.replace(
+              ".github/workflows/r2-04-implement-no-actions.yml",
+              ".github/workflows/r2-04-implement-no-actions.yml .github/workflows/r2-04-implement-no-actions-fixed.yml",
+              1,
+          )
+          Path("apply_step.ps1").write_text(apply_script, encoding="utf-8", newline="\n")
+          Path("verify_step.ps1").write_text(verify_script, encoding="utf-8", newline="\n")
+          Path("commit_step.ps1").write_text(commit_script, encoding="utf-8", newline="\n")
+          '@ | Set-Content extract_no_actions_steps.py -Encoding utf8
+          python extract_no_actions_steps.py
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          Remove-Item extract_no_actions_steps.py -Force
+
+          & pwsh -NoProfile -File apply_step.ps1
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          Remove-Item apply_step.ps1 -Force
+          & pwsh -NoProfile -File verify_step.ps1
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          Remove-Item verify_step.ps1 -Force
+          & pwsh -NoProfile -File commit_step.ps1
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          Remove-Item commit_step.ps1 -Force
