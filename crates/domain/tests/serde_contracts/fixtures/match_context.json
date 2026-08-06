@@ -1,0 +1,6 @@
+{
+  "match_key": "legacy-match",
+  "kickoff_time": "2026-01-02T03:04:05Z",
+  "home_team_name": "Home",
+  "away_team_name": "Away"
+}

@@ -17,10 +17,6 @@ jobs:
         with:
           fetch-depth: 2
 
-      - name: Expand deterministic implementation files
-        shell: pwsh
-        run: Expand-Archive -Path .r2-01/r2-01-files.zip -DestinationPath . -Force
-
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
@@ -63,7 +59,7 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git rm .github/workflows/r2-01-generate.yml .r2-01/r2-01-files.zip
+          git rm .github/workflows/r2-01-generate.yml
           git add architecture/domain-type-inventory.json crates/domain/tests scripts/domain-inventory scripts/generate-domain-type-inventory.mjs scripts/verify-domain-type-inventory.mjs
           git diff --cached --check
           git commit -m "rewrite(r2): generate R2-01 domain inventory baseline"

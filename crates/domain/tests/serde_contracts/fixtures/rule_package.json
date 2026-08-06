@@ -1,0 +1,16 @@
+{
+  "package_key": "external-default",
+  "version": "1",
+  "display_name": "External default",
+  "competition_profile": {
+    "profile_id": "league",
+    "name": "League",
+    "competition_kind": "league"
+  },
+  "routing": {
+    "model_id": "external.p4",
+    "model_version": "stub",
+    "parameter_version": "none"
+  },
+  "parameters": {}
+}
