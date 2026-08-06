@@ -20,6 +20,11 @@ const FILE_POLICY = new Map([
   ["release_acceptance.rs", ["release", "R2-07"]],
 ]);
 
+const DIRECTORY_POLICY = new Map([
+  ["competition", ["competition", "R2-02"]],
+  ["routing", ["routing", "R2-02"]],
+]);
+
 function rootPolicy(typeName) {
   if (["MatchContext", "PredictionSummary", "PersistedModelRun"].includes(typeName)) return ["prediction", "R2-05"];
   if (typeName === "ModelIdentity" || typeName === "RuleRouting" || typeName.startsWith("Route") || typeName.startsWith("CompetitionBinding") || typeName === "ResolvedCompetitionContext") return ["routing", "R2-02"];
@@ -34,9 +39,17 @@ function rootPolicy(typeName) {
   throw new Error("R2 目标模块策略缺少根类型：" + typeName);
 }
 
+function directoryPolicy(currentPath) {
+  const prefix = "crates/domain/src/";
+  if (!currentPath.startsWith(prefix)) return null;
+  const relative = currentPath.slice(prefix.length);
+  const directory = relative.includes("/") ? relative.split("/", 1)[0] : null;
+  return directory ? DIRECTORY_POLICY.get(directory) ?? null : null;
+}
+
 export function resolveTarget(type) {
   const fileName = type.currentPath.split("/").at(-1);
-  const policy = fileName === "lib.rs" ? rootPolicy(type.typeName) : FILE_POLICY.get(fileName);
+  const policy = directoryPolicy(type.currentPath) ?? (fileName === "lib.rs" ? rootPolicy(type.typeName) : FILE_POLICY.get(fileName));
   if (!policy) throw new Error("R2 目标模块策略缺少来源文件：" + type.currentPath);
   const [targetModule, targetTask] = policy;
   return {

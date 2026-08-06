@@ -1,3 +1,6 @@
+pub mod competition;
+pub mod routing;
+
 mod analytics;
 mod api_workspace;
 mod exchange;
@@ -17,6 +20,9 @@ mod research_gateway;
 mod review;
 mod spreadsheet;
 mod team_package;
+pub use competition::*;
+pub use routing::*;
+
 pub use analytics::*;
 pub use api_workspace::*;
 pub use exchange::*;
@@ -42,45 +48,6 @@ use serde::{Deserialize, Serialize};
 use serde_json::Value;
 use uuid::Uuid;
 
-#[derive(Debug, Clone, Copy, Serialize, Deserialize, PartialEq, Eq, Hash)]
-#[serde(rename_all = "snake_case")]
-pub enum CompetitionKind {
-    League,
-    GroupStage,
-    KnockoutSingleLeg,
-    KnockoutTwoLeg,
-    Friendly,
-    Custom,
-}
-
-impl CompetitionKind {
-    pub const ALL: [Self; 6] = [
-        Self::League,
-        Self::GroupStage,
-        Self::KnockoutSingleLeg,
-        Self::KnockoutTwoLeg,
-        Self::Friendly,
-        Self::Custom,
-    ];
-
-    pub const fn as_str(self) -> &'static str {
-        match self {
-            Self::League => "league",
-            Self::GroupStage => "group_stage",
-            Self::KnockoutSingleLeg => "knockout_single_leg",
-            Self::KnockoutTwoLeg => "knockout_two_leg",
-            Self::Friendly => "friendly",
-            Self::Custom => "custom",
-        }
-    }
-}
-
-impl Default for CompetitionKind {
-    fn default() -> Self {
-        Self::Custom
-    }
-}
-
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct MatchContext {
     pub match_key: String,
@@ -97,14 +64,6 @@ pub struct MatchContext {
     pub away_team_name: String,
     #[serde(default)]
     pub metadata: Value,
-}
-
-#[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct ModelIdentity {
-    pub model_id: String,
-    pub model_version: String,
-    pub parameter_version: String,
-    pub rule_package_version: Option<String>,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -125,302 +84,6 @@ pub struct PersistedModelRun {
     pub created_at: DateTime<Utc>,
     pub summary: PredictionSummary,
     pub output: Value,
-}
-
-#[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct CompetitionDraft {
-    pub code: String,
-    pub name: String,
-    #[serde(default)]
-    pub country_code: Option<String>,
-    #[serde(default = "default_timezone")]
-    pub timezone: String,
-    pub competition_kind: CompetitionKind,
-    #[serde(default)]
-    pub metadata: Value,
-}
-
-fn default_timezone() -> String {
-    "UTC".to_string()
-}
-
-#[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct CompetitionRecord {
-    pub id: Uuid,
-    pub code: String,
-    pub name: String,
-    pub country_code: Option<String>,
-    pub timezone: String,
-    pub competition_kind: CompetitionKind,
-    pub is_active: bool,
-    #[serde(default)]
-    pub metadata: Value,
-    pub created_at: DateTime<Utc>,
-}
-
-#[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct SeasonDraft {
-    pub competition_id: Uuid,
-    pub name: String,
-    #[serde(default)]
-    pub starts_on: Option<chrono::NaiveDate>,
-    #[serde(default)]
-    pub ends_on: Option<chrono::NaiveDate>,
-    #[serde(default = "default_season_status")]
-    pub status: String,
-    #[serde(default)]
-    pub metadata: Value,
-}
-
-fn default_season_status() -> String {
-    "planned".to_string()
-}
-
-#[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct SeasonRecord {
-    pub id: Uuid,
-    pub competition_id: Uuid,
-    pub competition_name: String,
-    pub name: String,
-    pub starts_on: Option<chrono::NaiveDate>,
-    pub ends_on: Option<chrono::NaiveDate>,
-    pub status: String,
-}
-
-#[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct StageDraft {
-    pub season_id: Uuid,
-    pub code: String,
-    pub name: String,
-    pub stage_kind: CompetitionKind,
-    #[serde(default)]
-    pub sequence_no: i32,
-    #[serde(default)]
-    pub rules: Value,
-}
-
-#[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct StageRecord {
-    pub id: Uuid,
-    pub season_id: Uuid,
-    pub season_name: String,
-    pub competition_id: Uuid,
-    pub competition_name: String,
-    pub code: String,
-    pub name: String,
-    pub stage_kind: CompetitionKind,
-    pub sequence_no: i32,
-}
-
-#[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct RoundDraft {
-    pub stage_id: Uuid,
-    pub code: String,
-    pub name: String,
-    #[serde(default)]
-    pub sequence_no: i32,
-    #[serde(default)]
-    pub starts_at: Option<DateTime<Utc>>,
-    #[serde(default)]
-    pub ends_at: Option<DateTime<Utc>>,
-}
-
-#[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct RoundRecord {
-    pub id: Uuid,
-    pub stage_id: Uuid,
-    pub stage_name: String,
-    pub code: String,
-    pub name: String,
-    pub sequence_no: i32,
-    pub starts_at: Option<DateTime<Utc>>,
-    pub ends_at: Option<DateTime<Utc>>,
-}
-
-#[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct CompetitionProfile {
-    pub profile_id: String,
-    pub name: String,
-    pub competition_kind: CompetitionKind,
-    #[serde(default = "default_normal_time")]
-    pub normal_time_minutes: u16,
-    #[serde(default)]
-    pub extra_time_possible: bool,
-    #[serde(default)]
-    pub penalties_possible: bool,
-    #[serde(default)]
-    pub two_legged: bool,
-    #[serde(default)]
-    pub neutral_venue: bool,
-    #[serde(default)]
-    pub metadata: Value,
-}
-
-fn default_normal_time() -> u16 {
-    90
-}
-
-#[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct RuleRouting {
-    pub model_id: String,
-    pub model_version: String,
-    pub parameter_version: String,
-    #[serde(default)]
-    pub priority: i32,
-    #[serde(default)]
-    pub activate_as_type_default: bool,
-    #[serde(default)]
-    pub supported_snapshot_types: Vec<String>,
-}
-
-#[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct RuleSourceReference {
-    #[serde(default)]
-    pub title: Option<String>,
-    #[serde(default)]
-    pub source_uri: Option<String>,
-    #[serde(default)]
-    pub content_sha256: Option<String>,
-    #[serde(default)]
-    pub notes: Option<String>,
-}
-
-#[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct RulePackageDraft {
-    #[serde(default = "default_rule_package_format")]
-    pub format_version: String,
-    pub package_key: String,
-    pub version: String,
-    pub display_name: String,
-    pub competition_profile: CompetitionProfile,
-    pub routing: RuleRouting,
-    pub parameters: Value,
-    #[serde(default)]
-    pub feature_requirements: Value,
-    #[serde(default)]
-    pub output_contract: Value,
-    #[serde(default)]
-    pub source_document: Option<RuleSourceReference>,
-    #[serde(default)]
-    pub metadata: Value,
-}
-
-fn default_rule_package_format() -> String {
-    "football.rule-package.v1".to_string()
-}
-
-#[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct RulePackageSummary {
-    pub id: Uuid,
-    pub format_version: String,
-    pub package_key: String,
-    pub version: String,
-    pub display_name: String,
-    pub competition_kind: CompetitionKind,
-    pub model_id: String,
-    pub model_version: String,
-    pub parameter_version: String,
-    pub priority: i32,
-    pub content_sha256: String,
-    pub status: String,
-    pub created_at: DateTime<Utc>,
-}
-
-#[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct CompetitionBindingDraft {
-    #[serde(default)]
-    pub binding_name: Option<String>,
-    #[serde(default)]
-    pub competition_id: Option<Uuid>,
-    #[serde(default)]
-    pub season_id: Option<Uuid>,
-    #[serde(default)]
-    pub stage_id: Option<Uuid>,
-    #[serde(default)]
-    pub competition_kind: Option<CompetitionKind>,
-    pub rule_package_id: Uuid,
-    #[serde(default)]
-    pub priority: i32,
-    #[serde(default)]
-    pub valid_from: Option<DateTime<Utc>>,
-    #[serde(default)]
-    pub valid_to: Option<DateTime<Utc>>,
-}
-
-#[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct CompetitionBindingSummary {
-    pub id: Uuid,
-    pub binding_name: String,
-    pub competition_id: Option<Uuid>,
-    pub competition_name: Option<String>,
-    pub season_id: Option<Uuid>,
-    pub stage_id: Option<Uuid>,
-    pub competition_kind: Option<CompetitionKind>,
-    pub rule_package_id: Uuid,
-    pub rule_package_name: String,
-    pub model_id: String,
-    pub priority: i32,
-    pub is_active: bool,
-    pub created_at: DateTime<Utc>,
-}
-
-#[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct ResolvedCompetitionContext {
-    pub competition_id: Option<Uuid>,
-    pub season_id: Option<Uuid>,
-    pub stage_id: Option<Uuid>,
-    pub competition_kind: CompetitionKind,
-}
-
-#[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct RouteRequest {
-    #[serde(default)]
-    pub competition_id: Option<Uuid>,
-    #[serde(default)]
-    pub season_id: Option<Uuid>,
-    #[serde(default)]
-    pub stage_id: Option<Uuid>,
-    pub competition_kind: CompetitionKind,
-    pub kickoff_time: DateTime<Utc>,
-    #[serde(default)]
-    pub preferred_model_family: Option<String>,
-    #[serde(default)]
-    pub preferred_model_id: Option<String>,
-    #[serde(default)]
-    pub explicit_rule_package_id: Option<Uuid>,
-}
-
-#[derive(Debug, Clone, Serialize, Deserialize)]
-#[serde(rename_all = "snake_case")]
-pub enum RouteSource {
-    ExplicitRulePackage,
-    StageBinding,
-    SeasonBinding,
-    CompetitionBinding,
-    CompetitionKindDefault,
-}
-
-#[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct RouteDecision {
-    pub source: RouteSource,
-    pub binding_id: Option<Uuid>,
-    pub rule_package_id: Uuid,
-    pub package_key: String,
-    pub package_version: String,
-    pub package_display_name: String,
-    pub model_id: String,
-    pub model_version_id: Uuid,
-    pub model_version: String,
-    pub parameter_set_id: Uuid,
-    pub parameter_version: String,
-    pub competition_profile_id: Uuid,
-    pub parameters: Value,
-    pub routing: RuleRouting,
-    pub competition_profile: CompetitionProfile,
-    pub feature_requirements: Value,
-    pub output_contract: Value,
-    pub priority: i32,
-    pub reason: Value,
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -579,13 +242,6 @@ pub struct TeamOption {
     pub country_code: Option<String>,
     #[serde(default = "default_team_type")]
     pub team_type: String,
-}
-
-#[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct SeasonTeamMembershipOption {
-    pub season_id: Uuid,
-    pub team_id: Uuid,
-    pub registration_status: String,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]

@@ -23,14 +23,14 @@
     "currentPublicExportPolicy": "root glob re-export is recorded as current debt and removed only in R2-08",
     "targetPublicExportPolicy": "explicit re-export only"
   },
-  "sourceDigest": "d497e2f6248da47cc596b2f730484ad1149fe687140119fd7145f7048cc22df8",
-  "rustUsageDigest": "e7f4370364369544539b63dfb24b687e69e4feb1da9f1ce9fe7699441199d108",
+  "sourceDigest": "7dfa08782000d49ea15c6a75c619063523c7b593d1775de229b3614e43d86b47",
+  "rustUsageDigest": "2178c5c046c4c87cae703728011cb7f6714bf92ff043e1f1ffb5effb82cc5081",
   "summary": {
     "typeCount": 365,
     "publicCompatibilityTypeCount": 365,
     "internalTypeCount": 0,
-    "domainSourceFileCount": 20,
-    "scannedRustFileCount": 139,
+    "domainSourceFileCount": 32,
+    "scannedRustFileCount": 154,
     "databaseMappedTypeCount": 299,
     "byTargetModule": {
       "ai_workspace": 16,
@@ -325,7 +325,7 @@
       "visibility": "public",
       "currentPath": "crates/domain/src/lib.rs",
       "currentModule": "football_domain",
-      "sourceLine": 1453,
+      "sourceLine": 1109,
       "derives": [
         "Clone",
         "Debug",
@@ -2866,7 +2866,7 @@
       "visibility": "public",
       "currentPath": "crates/domain/src/lib.rs",
       "currentModule": "football_domain",
-      "sourceLine": 484,
+      "sourceLine": 147,
       "derives": [
         "Clone",
         "Copy",
@@ -3068,7 +3068,7 @@
       "visibility": "public",
       "currentPath": "crates/domain/src/lib.rs",
       "currentModule": "football_domain",
-      "sourceLine": 1137,
+      "sourceLine": 793,
       "derives": [
         "Clone",
         "Debug",
@@ -3124,7 +3124,7 @@
       "visibility": "public",
       "currentPath": "crates/domain/src/lib.rs",
       "currentModule": "football_domain",
-      "sourceLine": 1144,
+      "sourceLine": 800,
       "derives": [
         "Clone",
         "Debug",
@@ -3188,7 +3188,7 @@
       "visibility": "public",
       "currentPath": "crates/domain/src/lib.rs",
       "currentModule": "football_domain",
-      "sourceLine": 1153,
+      "sourceLine": 809,
       "derives": [
         "Clone",
         "Debug",
@@ -3244,7 +3244,7 @@
       "visibility": "public",
       "currentPath": "crates/domain/src/lib.rs",
       "currentModule": "football_domain",
-      "sourceLine": 1160,
+      "sourceLine": 816,
       "derives": [
         "Clone",
         "Debug",
@@ -3628,7 +3628,7 @@
       "visibility": "public",
       "currentPath": "crates/domain/src/lib.rs",
       "currentModule": "football_domain",
-      "sourceLine": 1052,
+      "sourceLine": 708,
       "derives": [
         "Clone",
         "Debug",
@@ -3688,7 +3688,7 @@
       "visibility": "public",
       "currentPath": "crates/domain/src/lib.rs",
       "currentModule": "football_domain",
-      "sourceLine": 914,
+      "sourceLine": 570,
       "derives": [
         "Clone",
         "Debug",
@@ -3754,7 +3754,7 @@
       "visibility": "public",
       "currentPath": "crates/domain/src/lib.rs",
       "currentModule": "football_domain",
-      "sourceLine": 961,
+      "sourceLine": 617,
       "derives": [
         "Clone",
         "Debug",
@@ -3828,7 +3828,7 @@
       "visibility": "public",
       "currentPath": "crates/domain/src/lib.rs",
       "currentModule": "football_domain",
-      "sourceLine": 941,
+      "sourceLine": 597,
       "derives": [
         "Clone",
         "Debug",
@@ -3894,7 +3894,7 @@
       "visibility": "public",
       "currentPath": "crates/domain/src/lib.rs",
       "currentModule": "football_domain",
-      "sourceLine": 972,
+      "sourceLine": 628,
       "derives": [
         "Clone",
         "Debug",
@@ -3970,7 +3970,7 @@
       "visibility": "public",
       "currentPath": "crates/domain/src/lib.rs",
       "currentModule": "football_domain",
-      "sourceLine": 986,
+      "sourceLine": 642,
       "derives": [
         "Clone",
         "Debug",
@@ -4048,7 +4048,7 @@
       "visibility": "public",
       "currentPath": "crates/domain/src/lib.rs",
       "currentModule": "football_domain",
-      "sourceLine": 929,
+      "sourceLine": 585,
       "derives": [
         "Clone",
         "Debug",
@@ -4124,9 +4124,9 @@
       "typeName": "CompetitionBindingDraft",
       "kind": "struct",
       "visibility": "public",
-      "currentPath": "crates/domain/src/lib.rs",
-      "currentModule": "football_domain",
-      "sourceLine": 330,
+      "currentPath": "crates/domain/src/routing/binding.rs",
+      "currentModule": "football_domain::binding",
+      "sourceLine": 8,
       "derives": [
         "Clone",
         "Debug",
@@ -4203,10 +4203,13 @@
       "serializationName": "CompetitionBindingDraft",
       "publicCompatibilityType": true,
       "compatibilityLevel": "root_public_compatibility",
-      "currentRootExport": "root_definition",
+      "currentRootExport": "glob_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
-      "domainCallers": [],
+      "domainCallers": [
+        "crates/domain/src/routing/mod.rs",
+        "crates/domain/tests/serde_contracts/module_paths.rs"
+      ],
       "externalCallers": [
         "crates/application/src/rule_packages.rs",
         "crates/persistence-postgres/src/routing.rs",
@@ -4220,9 +4223,9 @@
       "typeName": "CompetitionBindingSummary",
       "kind": "struct",
       "visibility": "public",
-      "currentPath": "crates/domain/src/lib.rs",
-      "currentModule": "football_domain",
-      "sourceLine": 351,
+      "currentPath": "crates/domain/src/routing/binding.rs",
+      "currentModule": "football_domain::binding",
+      "sourceLine": 29,
       "derives": [
         "Clone",
         "Debug",
@@ -4299,10 +4302,13 @@
       "serializationName": "CompetitionBindingSummary",
       "publicCompatibilityType": true,
       "compatibilityLevel": "root_public_compatibility",
-      "currentRootExport": "root_definition",
+      "currentRootExport": "glob_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
-      "domainCallers": [],
+      "domainCallers": [
+        "crates/domain/src/routing/mod.rs",
+        "crates/domain/tests/serde_contracts/module_paths.rs"
+      ],
       "externalCallers": [
         "crates/application/src/lib.rs",
         "crates/application/src/rule_packages.rs",
@@ -4317,9 +4323,9 @@
       "typeName": "CompetitionDraft",
       "kind": "struct",
       "visibility": "public",
-      "currentPath": "crates/domain/src/lib.rs",
-      "currentModule": "football_domain",
-      "sourceLine": 131,
+      "currentPath": "crates/domain/src/competition/catalog.rs",
+      "currentModule": "football_domain::catalog",
+      "sourceLine": 9,
       "derives": [
         "Clone",
         "Debug",
@@ -4374,11 +4380,13 @@
       "serializationName": "CompetitionDraft",
       "publicCompatibilityType": true,
       "compatibilityLevel": "root_public_compatibility",
-      "currentRootExport": "root_definition",
+      "currentRootExport": "glob_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
-        "crates/domain/tests/serde_contracts/defaults.rs"
+        "crates/domain/src/competition/mod.rs",
+        "crates/domain/tests/serde_contracts/defaults.rs",
+        "crates/domain/tests/serde_contracts/module_paths.rs"
       ],
       "externalCallers": [
         "crates/application/src/competition.rs",
@@ -4394,9 +4402,9 @@
       "typeName": "CompetitionKind",
       "kind": "enum",
       "visibility": "public",
-      "currentPath": "crates/domain/src/lib.rs",
-      "currentModule": "football_domain",
-      "sourceLine": 47,
+      "currentPath": "crates/domain/src/competition/kind.rs",
+      "currentModule": "football_domain::kind",
+      "sourceLine": 5,
       "derives": [
         "Clone",
         "Copy",
@@ -4451,16 +4459,26 @@
       "serializationName": "CompetitionKind",
       "publicCompatibilityType": true,
       "compatibilityLevel": "root_public_compatibility",
-      "currentRootExport": "root_definition",
+      "currentRootExport": "glob_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
+        "crates/domain/src/competition/catalog.rs",
+        "crates/domain/src/competition/kind.rs",
+        "crates/domain/src/competition/mod.rs",
+        "crates/domain/src/competition/profile.rs",
+        "crates/domain/src/competition/rule_package.rs",
+        "crates/domain/src/competition/stage.rs",
         "crates/domain/src/exchange.rs",
         "crates/domain/src/lib.rs",
         "crates/domain/src/p4_orchestration.rs",
         "crates/domain/src/p4_persistence.rs",
+        "crates/domain/src/routing/binding.rs",
+        "crates/domain/src/routing/context.rs",
+        "crates/domain/src/routing/route.rs",
         "crates/domain/tests/serde_contracts/defaults.rs",
-        "crates/domain/tests/serde_contracts/enums.rs"
+        "crates/domain/tests/serde_contracts/enums.rs",
+        "crates/domain/tests/serde_contracts/module_paths.rs"
       ],
       "externalCallers": [
         "crates/application/src/analytics.rs",
@@ -4487,9 +4505,9 @@
       "typeName": "CompetitionProfile",
       "kind": "struct",
       "visibility": "public",
-      "currentPath": "crates/domain/src/lib.rs",
-      "currentModule": "football_domain",
-      "sourceLine": 241,
+      "currentPath": "crates/domain/src/competition/profile.rs",
+      "currentModule": "football_domain::profile",
+      "sourceLine": 7,
       "derives": [
         "Clone",
         "Debug",
@@ -4562,11 +4580,14 @@
       "serializationName": "CompetitionProfile",
       "publicCompatibilityType": true,
       "compatibilityLevel": "root_public_compatibility",
-      "currentRootExport": "root_definition",
+      "currentRootExport": "glob_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
-        "crates/domain/src/lib.rs"
+        "crates/domain/src/competition/mod.rs",
+        "crates/domain/src/competition/rule_package.rs",
+        "crates/domain/src/routing/route.rs",
+        "crates/domain/tests/serde_contracts/module_paths.rs"
       ],
       "externalCallers": [
         "crates/application/src/rule_packages.rs",
@@ -4715,9 +4736,9 @@
       "typeName": "CompetitionRecord",
       "kind": "struct",
       "visibility": "public",
-      "currentPath": "crates/domain/src/lib.rs",
-      "currentModule": "football_domain",
-      "sourceLine": 148,
+      "currentPath": "crates/domain/src/competition/catalog.rs",
+      "currentModule": "football_domain::catalog",
+      "sourceLine": 26,
       "derives": [
         "Clone",
         "Debug",
@@ -4780,11 +4801,13 @@
       "serializationName": "CompetitionRecord",
       "publicCompatibilityType": true,
       "compatibilityLevel": "root_public_compatibility",
-      "currentRootExport": "root_definition",
+      "currentRootExport": "glob_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
-        "crates/domain/src/exchange.rs"
+        "crates/domain/src/competition/mod.rs",
+        "crates/domain/src/exchange.rs",
+        "crates/domain/tests/serde_contracts/module_paths.rs"
       ],
       "externalCallers": [
         "crates/application/src/competition.rs",
@@ -5082,7 +5105,7 @@
       "visibility": "public",
       "currentPath": "crates/domain/src/lib.rs",
       "currentModule": "football_domain",
-      "sourceLine": 1194,
+      "sourceLine": 850,
       "derives": [
         "Clone",
         "Debug",
@@ -5150,7 +5173,7 @@
       "visibility": "public",
       "currentPath": "crates/domain/src/lib.rs",
       "currentModule": "football_domain",
-      "sourceLine": 1205,
+      "sourceLine": 861,
       "derives": [
         "Clone",
         "Debug",
@@ -5726,7 +5749,7 @@
       "visibility": "public",
       "currentPath": "crates/domain/src/lib.rs",
       "currentModule": "football_domain",
-      "sourceLine": 1125,
+      "sourceLine": 781,
       "derives": [
         "Clone",
         "Debug",
@@ -5802,7 +5825,7 @@
       "visibility": "public",
       "currentPath": "crates/domain/src/lib.rs",
       "currentModule": "football_domain",
-      "sourceLine": 1104,
+      "sourceLine": 760,
       "derives": [
         "Clone",
         "Debug",
@@ -5862,7 +5885,7 @@
       "visibility": "public",
       "currentPath": "crates/domain/src/lib.rs",
       "currentModule": "football_domain",
-      "sourceLine": 1085,
+      "sourceLine": 741,
       "derives": [
         "Clone",
         "Debug",
@@ -5952,7 +5975,7 @@
       "visibility": "public",
       "currentPath": "crates/domain/src/lib.rs",
       "currentModule": "football_domain",
-      "sourceLine": 1112,
+      "sourceLine": 768,
       "derives": [
         "Clone",
         "Debug",
@@ -6008,7 +6031,7 @@
       "visibility": "public",
       "currentPath": "crates/domain/src/lib.rs",
       "currentModule": "football_domain",
-      "sourceLine": 1119,
+      "sourceLine": 775,
       "derives": [
         "Clone",
         "Debug",
@@ -6062,7 +6085,7 @@
       "visibility": "public",
       "currentPath": "crates/domain/src/lib.rs",
       "currentModule": "football_domain",
-      "sourceLine": 1060,
+      "sourceLine": 716,
       "derives": [
         "Clone",
         "Debug",
@@ -6128,7 +6151,7 @@
       "visibility": "public",
       "currentPath": "crates/domain/src/lib.rs",
       "currentModule": "football_domain",
-      "sourceLine": 1071,
+      "sourceLine": 727,
       "derives": [
         "Clone",
         "Debug",
@@ -7704,7 +7727,7 @@
       "visibility": "public",
       "currentPath": "crates/domain/src/lib.rs",
       "currentModule": "football_domain",
-      "sourceLine": 1524,
+      "sourceLine": 1180,
       "derives": [
         "Clone",
         "Debug",
@@ -7770,7 +7793,7 @@
       "visibility": "public",
       "currentPath": "crates/domain/src/lib.rs",
       "currentModule": "football_domain",
-      "sourceLine": 1534,
+      "sourceLine": 1190,
       "derives": [
         "Clone",
         "Debug",
@@ -8048,7 +8071,7 @@
       "visibility": "public",
       "currentPath": "crates/domain/src/lib.rs",
       "currentModule": "football_domain",
-      "sourceLine": 874,
+      "sourceLine": 530,
       "derives": [
         "Clone",
         "Debug",
@@ -8123,7 +8146,7 @@
       "visibility": "public",
       "currentPath": "crates/domain/src/lib.rs",
       "currentModule": "football_domain",
-      "sourceLine": 774,
+      "sourceLine": 430,
       "derives": [
         "Clone",
         "Debug",
@@ -8206,7 +8229,7 @@
       "visibility": "public",
       "currentPath": "crates/domain/src/lib.rs",
       "currentModule": "football_domain",
-      "sourceLine": 793,
+      "sourceLine": 449,
       "derives": [
         "Clone",
         "Debug",
@@ -8323,7 +8346,7 @@
       "visibility": "public",
       "currentPath": "crates/domain/src/lib.rs",
       "currentModule": "football_domain",
-      "sourceLine": 839,
+      "sourceLine": 495,
       "derives": [
         "Clone",
         "Debug",
@@ -8429,7 +8452,7 @@
       "visibility": "public",
       "currentPath": "crates/domain/src/lib.rs",
       "currentModule": "football_domain",
-      "sourceLine": 787,
+      "sourceLine": 443,
       "derives": [
         "Clone",
         "Debug",
@@ -8482,7 +8505,7 @@
       "visibility": "public",
       "currentPath": "crates/domain/src/lib.rs",
       "currentModule": "football_domain",
-      "sourceLine": 828,
+      "sourceLine": 484,
       "derives": [
         "Clone",
         "Debug",
@@ -8554,7 +8577,7 @@
       "visibility": "public",
       "currentPath": "crates/domain/src/lib.rs",
       "currentModule": "football_domain",
-      "sourceLine": 858,
+      "sourceLine": 514,
       "derives": [
         "Clone",
         "Debug",
@@ -8696,7 +8719,7 @@
       "visibility": "public",
       "currentPath": "crates/domain/src/lib.rs",
       "currentModule": "football_domain",
-      "sourceLine": 1629,
+      "sourceLine": 1285,
       "derives": [
         "Clone",
         "Debug",
@@ -8813,7 +8836,7 @@
       "visibility": "public",
       "currentPath": "crates/domain/src/lib.rs",
       "currentModule": "football_domain",
-      "sourceLine": 1828,
+      "sourceLine": 1484,
       "derives": [
         "Clone",
         "Debug",
@@ -8869,7 +8892,7 @@
       "visibility": "public",
       "currentPath": "crates/domain/src/lib.rs",
       "currentModule": "football_domain",
-      "sourceLine": 1658,
+      "sourceLine": 1314,
       "derives": [
         "Clone",
         "Debug",
@@ -8926,7 +8949,7 @@
       "visibility": "public",
       "currentPath": "crates/domain/src/lib.rs",
       "currentModule": "football_domain",
-      "sourceLine": 1664,
+      "sourceLine": 1320,
       "derives": [
         "Clone",
         "Debug",
@@ -8978,7 +9001,7 @@
       "visibility": "public",
       "currentPath": "crates/domain/src/lib.rs",
       "currentModule": "football_domain",
-      "sourceLine": 1599,
+      "sourceLine": 1255,
       "derives": [
         "Clone",
         "Debug",
@@ -9102,7 +9125,7 @@
       "visibility": "public",
       "currentPath": "crates/domain/src/lib.rs",
       "currentModule": "football_domain",
-      "sourceLine": 1670,
+      "sourceLine": 1326,
       "derives": [
         "Clone",
         "Debug",
@@ -9218,7 +9241,7 @@
       "visibility": "public",
       "currentPath": "crates/domain/src/lib.rs",
       "currentModule": "football_domain",
-      "sourceLine": 1693,
+      "sourceLine": 1349,
       "derives": [
         "Clone",
         "Debug",
@@ -9377,7 +9400,7 @@
       "visibility": "public",
       "currentPath": "crates/domain/src/lib.rs",
       "currentModule": "football_domain",
-      "sourceLine": 540,
+      "sourceLine": 203,
       "derives": [
         "Clone",
         "Copy",
@@ -9443,7 +9466,7 @@
       "visibility": "public",
       "currentPath": "crates/domain/src/lib.rs",
       "currentModule": "football_domain",
-      "sourceLine": 85,
+      "sourceLine": 52,
       "derives": [
         "Clone",
         "Debug",
@@ -9534,7 +9557,7 @@
       "visibility": "public",
       "currentPath": "crates/domain/src/lib.rs",
       "currentModule": "football_domain",
-      "sourceLine": 1558,
+      "sourceLine": 1214,
       "derives": [
         "Clone",
         "Debug",
@@ -10473,7 +10496,7 @@
       "visibility": "public",
       "currentPath": "crates/domain/src/lib.rs",
       "currentModule": "football_domain",
-      "sourceLine": 1581,
+      "sourceLine": 1237,
       "derives": [
         "Clone",
         "Debug",
@@ -12723,7 +12746,7 @@
       "visibility": "public",
       "currentPath": "crates/domain/src/lib.rs",
       "currentModule": "football_domain",
-      "sourceLine": 512,
+      "sourceLine": 175,
       "derives": [
         "Clone",
         "Copy",
@@ -12883,9 +12906,9 @@
       "typeName": "ModelIdentity",
       "kind": "struct",
       "visibility": "public",
-      "currentPath": "crates/domain/src/lib.rs",
-      "currentModule": "football_domain",
-      "sourceLine": 103,
+      "currentPath": "crates/domain/src/routing/identity.rs",
+      "currentModule": "football_domain::identity",
+      "sourceLine": 4,
       "derives": [
         "Clone",
         "Debug",
@@ -12926,11 +12949,13 @@
       "serializationName": "ModelIdentity",
       "publicCompatibilityType": true,
       "compatibilityLevel": "root_public_compatibility",
-      "currentRootExport": "root_definition",
+      "currentRootExport": "glob_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "none_detected",
       "domainCallers": [
-        "crates/domain/src/lib.rs"
+        "crates/domain/src/lib.rs",
+        "crates/domain/src/routing/mod.rs",
+        "crates/domain/tests/serde_contracts/module_paths.rs"
       ],
       "externalCallers": [
         "crates/application/src/analytics.rs",
@@ -16202,7 +16227,7 @@
       "visibility": "public",
       "currentPath": "crates/domain/src/lib.rs",
       "currentModule": "football_domain",
-      "sourceLine": 120,
+      "sourceLine": 79,
       "derives": [
         "Clone",
         "Debug",
@@ -16323,7 +16348,7 @@
       "visibility": "public",
       "currentPath": "crates/domain/src/lib.rs",
       "currentModule": "football_domain",
-      "sourceLine": 1463,
+      "sourceLine": 1119,
       "derives": [
         "Clone",
         "Debug",
@@ -16434,7 +16459,7 @@
       "visibility": "public",
       "currentPath": "crates/domain/src/lib.rs",
       "currentModule": "football_domain",
-      "sourceLine": 1495,
+      "sourceLine": 1151,
       "derives": [
         "Clone",
         "Debug",
@@ -16532,7 +16557,7 @@
       "visibility": "public",
       "currentPath": "crates/domain/src/lib.rs",
       "currentModule": "football_domain",
-      "sourceLine": 1512,
+      "sourceLine": 1168,
       "derives": [
         "Clone",
         "Debug",
@@ -16609,7 +16634,7 @@
       "visibility": "public",
       "currentPath": "crates/domain/src/lib.rs",
       "currentModule": "football_domain",
-      "sourceLine": 1413,
+      "sourceLine": 1069,
       "derives": [
         "Clone",
         "Debug",
@@ -16708,7 +16733,7 @@
       "visibility": "public",
       "currentPath": "crates/domain/src/lib.rs",
       "currentModule": "football_domain",
-      "sourceLine": 1438,
+      "sourceLine": 1094,
       "derives": [
         "Clone",
         "Debug",
@@ -16799,7 +16824,7 @@
       "visibility": "public",
       "currentPath": "crates/domain/src/lib.rs",
       "currentModule": "football_domain",
-      "sourceLine": 1835,
+      "sourceLine": 1491,
       "derives": [
         "Clone",
         "Debug",
@@ -16885,7 +16910,7 @@
       "visibility": "public",
       "currentPath": "crates/domain/src/lib.rs",
       "currentModule": "football_domain",
-      "sourceLine": 1545,
+      "sourceLine": 1201,
       "derives": [
         "Clone",
         "Debug",
@@ -16965,7 +16990,7 @@
       "visibility": "public",
       "currentPath": "crates/domain/src/lib.rs",
       "currentModule": "football_domain",
-      "sourceLine": 1215,
+      "sourceLine": 871,
       "derives": [
         "Clone",
         "Debug",
@@ -17386,7 +17411,7 @@
       "visibility": "public",
       "currentPath": "crates/domain/src/lib.rs",
       "currentModule": "football_domain",
-      "sourceLine": 1284,
+      "sourceLine": 940,
       "derives": [
         "Clone",
         "Debug",
@@ -17522,7 +17547,7 @@
       "visibility": "public",
       "currentPath": "crates/domain/src/lib.rs",
       "currentModule": "football_domain",
-      "sourceLine": 1312,
+      "sourceLine": 968,
       "derives": [
         "Clone",
         "Debug",
@@ -17582,7 +17607,7 @@
       "visibility": "public",
       "currentPath": "crates/domain/src/lib.rs",
       "currentModule": "football_domain",
-      "sourceLine": 1245,
+      "sourceLine": 901,
       "derives": [
         "Clone",
         "Debug",
@@ -18217,7 +18242,7 @@
       "visibility": "public",
       "currentPath": "crates/domain/src/lib.rs",
       "currentModule": "football_domain",
-      "sourceLine": 1320,
+      "sourceLine": 976,
       "derives": [
         "Clone",
         "Debug",
@@ -18294,7 +18319,7 @@
       "visibility": "public",
       "currentPath": "crates/domain/src/lib.rs",
       "currentModule": "football_domain",
-      "sourceLine": 1334,
+      "sourceLine": 990,
       "derives": [
         "Clone",
         "Debug",
@@ -18539,7 +18564,7 @@
       "visibility": "public",
       "currentPath": "crates/domain/src/lib.rs",
       "currentModule": "football_domain",
-      "sourceLine": 1346,
+      "sourceLine": 1002,
       "derives": [
         "Clone",
         "Debug",
@@ -18626,7 +18651,7 @@
       "visibility": "public",
       "currentPath": "crates/domain/src/lib.rs",
       "currentModule": "football_domain",
-      "sourceLine": 1363,
+      "sourceLine": 1019,
       "derives": [
         "Clone",
         "Debug",
@@ -18714,7 +18739,7 @@
       "visibility": "public",
       "currentPath": "crates/domain/src/lib.rs",
       "currentModule": "football_domain",
-      "sourceLine": 1232,
+      "sourceLine": 888,
       "derives": [
         "Clone",
         "Debug",
@@ -18797,7 +18822,7 @@
       "visibility": "public",
       "currentPath": "crates/domain/src/lib.rs",
       "currentModule": "football_domain",
-      "sourceLine": 458,
+      "sourceLine": 121,
       "derives": [
         "Clone",
         "Copy",
@@ -18865,7 +18890,7 @@
       "visibility": "public",
       "currentPath": "crates/domain/src/lib.rs",
       "currentModule": "football_domain",
-      "sourceLine": 1378,
+      "sourceLine": 1034,
       "derives": [
         "Clone",
         "Debug",
@@ -18951,7 +18976,7 @@
       "visibility": "public",
       "currentPath": "crates/domain/src/lib.rs",
       "currentModule": "football_domain",
-      "sourceLine": 1399,
+      "sourceLine": 1055,
       "derives": [
         "Clone",
         "Debug",
@@ -19037,7 +19062,7 @@
       "visibility": "public",
       "currentPath": "crates/domain/src/lib.rs",
       "currentModule": "football_domain",
-      "sourceLine": 1849,
+      "sourceLine": 1505,
       "derives": [
         "Clone",
         "Debug",
@@ -20081,7 +20106,7 @@
       "visibility": "public",
       "currentPath": "crates/domain/src/lib.rs",
       "currentModule": "football_domain",
-      "sourceLine": 111,
+      "sourceLine": 70,
       "derives": [
         "Clone",
         "Debug",
@@ -20143,7 +20168,7 @@
       "visibility": "public",
       "currentPath": "crates/domain/src/lib.rs",
       "currentModule": "football_domain",
-      "sourceLine": 432,
+      "sourceLine": 95,
       "derives": [
         "Clone",
         "Copy",
@@ -22030,9 +22055,9 @@
       "typeName": "ResolvedCompetitionContext",
       "kind": "struct",
       "visibility": "public",
-      "currentPath": "crates/domain/src/lib.rs",
-      "currentModule": "football_domain",
-      "sourceLine": 368,
+      "currentPath": "crates/domain/src/routing/context.rs",
+      "currentModule": "football_domain::context",
+      "sourceLine": 7,
       "derives": [
         "Clone",
         "Debug",
@@ -22073,10 +22098,13 @@
       "serializationName": "ResolvedCompetitionContext",
       "publicCompatibilityType": true,
       "compatibilityLevel": "root_public_compatibility",
-      "currentRootExport": "root_definition",
+      "currentRootExport": "glob_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
-      "domainCallers": [],
+      "domainCallers": [
+        "crates/domain/src/routing/mod.rs",
+        "crates/domain/tests/serde_contracts/module_paths.rs"
+      ],
       "externalCallers": [
         "crates/application/src/prediction.rs",
         "crates/persistence-postgres/src/competitions.rs",
@@ -22093,7 +22121,7 @@
       "visibility": "public",
       "currentPath": "crates/domain/src/lib.rs",
       "currentModule": "football_domain",
-      "sourceLine": 887,
+      "sourceLine": 543,
       "derives": [
         "Clone",
         "Debug",
@@ -22546,9 +22574,9 @@
       "typeName": "RoundDraft",
       "kind": "struct",
       "visibility": "public",
-      "currentPath": "crates/domain/src/lib.rs",
-      "currentModule": "football_domain",
-      "sourceLine": 216,
+      "currentPath": "crates/domain/src/competition/round.rs",
+      "currentModule": "football_domain::round",
+      "sourceLine": 6,
       "derives": [
         "Clone",
         "Debug",
@@ -22603,10 +22631,13 @@
       "serializationName": "RoundDraft",
       "publicCompatibilityType": true,
       "compatibilityLevel": "root_public_compatibility",
-      "currentRootExport": "root_definition",
+      "currentRootExport": "glob_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
-      "domainCallers": [],
+      "domainCallers": [
+        "crates/domain/src/competition/mod.rs",
+        "crates/domain/tests/serde_contracts/module_paths.rs"
+      ],
       "externalCallers": [
         "crates/application/src/competition.rs",
         "crates/persistence-postgres/src/competitions.rs",
@@ -22620,9 +22651,9 @@
       "typeName": "RoundRecord",
       "kind": "struct",
       "visibility": "public",
-      "currentPath": "crates/domain/src/lib.rs",
-      "currentModule": "football_domain",
-      "sourceLine": 229,
+      "currentPath": "crates/domain/src/competition/round.rs",
+      "currentModule": "football_domain::round",
+      "sourceLine": 19,
       "derives": [
         "Clone",
         "Debug",
@@ -22679,10 +22710,13 @@
       "serializationName": "RoundRecord",
       "publicCompatibilityType": true,
       "compatibilityLevel": "root_public_compatibility",
-      "currentRootExport": "root_definition",
+      "currentRootExport": "glob_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
-      "domainCallers": [],
+      "domainCallers": [
+        "crates/domain/src/competition/mod.rs",
+        "crates/domain/tests/serde_contracts/module_paths.rs"
+      ],
       "externalCallers": [
         "crates/application/src/competition.rs",
         "crates/application/src/lib.rs",
@@ -22697,9 +22731,9 @@
       "typeName": "RouteDecision",
       "kind": "struct",
       "visibility": "public",
-      "currentPath": "crates/domain/src/lib.rs",
-      "currentModule": "football_domain",
-      "sourceLine": 404,
+      "currentPath": "crates/domain/src/routing/route.rs",
+      "currentModule": "football_domain::route",
+      "sourceLine": 38,
       "derives": [
         "Clone",
         "Debug",
@@ -22800,10 +22834,13 @@
       "serializationName": "RouteDecision",
       "publicCompatibilityType": true,
       "compatibilityLevel": "root_public_compatibility",
-      "currentRootExport": "root_definition",
+      "currentRootExport": "glob_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
-      "domainCallers": [],
+      "domainCallers": [
+        "crates/domain/src/routing/mod.rs",
+        "crates/domain/tests/serde_contracts/module_paths.rs"
+      ],
       "externalCallers": [
         "crates/application/src/lib.rs",
         "crates/application/src/p4_orchestration.rs",
@@ -22821,9 +22858,9 @@
       "typeName": "RouteRequest",
       "kind": "struct",
       "visibility": "public",
-      "currentPath": "crates/domain/src/lib.rs",
-      "currentModule": "football_domain",
-      "sourceLine": 376,
+      "currentPath": "crates/domain/src/routing/route.rs",
+      "currentModule": "football_domain::route",
+      "sourceLine": 10,
       "derives": [
         "Clone",
         "Debug",
@@ -22892,10 +22929,13 @@
       "serializationName": "RouteRequest",
       "publicCompatibilityType": true,
       "compatibilityLevel": "root_public_compatibility",
-      "currentRootExport": "root_definition",
+      "currentRootExport": "glob_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
-      "domainCallers": [],
+      "domainCallers": [
+        "crates/domain/src/routing/mod.rs",
+        "crates/domain/tests/serde_contracts/module_paths.rs"
+      ],
       "externalCallers": [
         "crates/application/src/p4_orchestration.rs",
         "crates/application/src/prediction.rs",
@@ -22909,9 +22949,9 @@
       "typeName": "RouteSource",
       "kind": "enum",
       "visibility": "public",
-      "currentPath": "crates/domain/src/lib.rs",
-      "currentModule": "football_domain",
-      "sourceLine": 395,
+      "currentPath": "crates/domain/src/routing/route.rs",
+      "currentModule": "football_domain::route",
+      "sourceLine": 29,
       "derives": [
         "Clone",
         "Debug",
@@ -22958,12 +22998,14 @@
       "serializationName": "RouteSource",
       "publicCompatibilityType": true,
       "compatibilityLevel": "root_public_compatibility",
-      "currentRootExport": "root_definition",
+      "currentRootExport": "glob_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
-        "crates/domain/src/lib.rs",
-        "crates/domain/tests/serde_contracts/enums.rs"
+        "crates/domain/src/routing/mod.rs",
+        "crates/domain/src/routing/route.rs",
+        "crates/domain/tests/serde_contracts/enums.rs",
+        "crates/domain/tests/serde_contracts/module_paths.rs"
       ],
       "externalCallers": [
         "crates/persistence-postgres/src/routing.rs"
@@ -22976,9 +23018,9 @@
       "typeName": "RulePackageDraft",
       "kind": "struct",
       "visibility": "public",
-      "currentPath": "crates/domain/src/lib.rs",
-      "currentModule": "football_domain",
-      "sourceLine": 289,
+      "currentPath": "crates/domain/src/competition/rule_package.rs",
+      "currentModule": "football_domain::rule_package",
+      "sourceLine": 22,
       "derives": [
         "Clone",
         "Debug",
@@ -23057,10 +23099,12 @@
       "serializationName": "RulePackageDraft",
       "publicCompatibilityType": true,
       "compatibilityLevel": "root_public_compatibility",
-      "currentRootExport": "root_definition",
+      "currentRootExport": "glob_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
+        "crates/domain/src/competition/mod.rs",
+        "crates/domain/tests/serde_contracts/module_paths.rs",
         "crates/domain/tests/serde_contracts/round_trip.rs"
       ],
       "externalCallers": [
@@ -23078,9 +23122,9 @@
       "typeName": "RulePackageSummary",
       "kind": "struct",
       "visibility": "public",
-      "currentPath": "crates/domain/src/lib.rs",
-      "currentModule": "football_domain",
-      "sourceLine": 313,
+      "currentPath": "crates/domain/src/competition/rule_package.rs",
+      "currentModule": "football_domain::rule_package",
+      "sourceLine": 46,
       "derives": [
         "Clone",
         "Debug",
@@ -23157,10 +23201,13 @@
       "serializationName": "RulePackageSummary",
       "publicCompatibilityType": true,
       "compatibilityLevel": "root_public_compatibility",
-      "currentRootExport": "root_definition",
+      "currentRootExport": "glob_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
-      "domainCallers": [],
+      "domainCallers": [
+        "crates/domain/src/competition/mod.rs",
+        "crates/domain/tests/serde_contracts/module_paths.rs"
+      ],
       "externalCallers": [
         "crates/application/src/lib.rs",
         "crates/application/src/rule_packages.rs",
@@ -23175,9 +23222,9 @@
       "typeName": "RuleRouting",
       "kind": "struct",
       "visibility": "public",
-      "currentPath": "crates/domain/src/lib.rs",
-      "currentModule": "football_domain",
-      "sourceLine": 264,
+      "currentPath": "crates/domain/src/routing/rules.rs",
+      "currentModule": "football_domain::rules",
+      "sourceLine": 4,
       "derives": [
         "Clone",
         "Debug",
@@ -23232,11 +23279,14 @@
       "serializationName": "RuleRouting",
       "publicCompatibilityType": true,
       "compatibilityLevel": "root_public_compatibility",
-      "currentRootExport": "root_definition",
+      "currentRootExport": "glob_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "none_detected",
       "domainCallers": [
-        "crates/domain/src/lib.rs"
+        "crates/domain/src/competition/rule_package.rs",
+        "crates/domain/src/routing/mod.rs",
+        "crates/domain/src/routing/route.rs",
+        "crates/domain/tests/serde_contracts/module_paths.rs"
       ],
       "externalCallers": [
         "crates/application/src/prediction.rs",
@@ -23249,9 +23299,9 @@
       "typeName": "RuleSourceReference",
       "kind": "struct",
       "visibility": "public",
-      "currentPath": "crates/domain/src/lib.rs",
-      "currentModule": "football_domain",
-      "sourceLine": 277,
+      "currentPath": "crates/domain/src/competition/rule_package.rs",
+      "currentModule": "football_domain::rule_package",
+      "sourceLine": 10,
       "derives": [
         "Clone",
         "Debug",
@@ -23300,11 +23350,13 @@
       "serializationName": "RuleSourceReference",
       "publicCompatibilityType": true,
       "compatibilityLevel": "root_public_compatibility",
-      "currentRootExport": "root_definition",
+      "currentRootExport": "glob_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "none_detected",
       "domainCallers": [
-        "crates/domain/src/lib.rs"
+        "crates/domain/src/competition/mod.rs",
+        "crates/domain/src/competition/rule_package.rs",
+        "crates/domain/tests/serde_contracts/module_paths.rs"
       ],
       "externalCallers": [
         "crates/persistence-postgres/tests/postgres_integration.rs"
@@ -23457,9 +23509,9 @@
       "typeName": "SeasonDraft",
       "kind": "struct",
       "visibility": "public",
-      "currentPath": "crates/domain/src/lib.rs",
-      "currentModule": "football_domain",
-      "sourceLine": 162,
+      "currentPath": "crates/domain/src/competition/season.rs",
+      "currentModule": "football_domain::season",
+      "sourceLine": 7,
       "derives": [
         "Clone",
         "Debug",
@@ -23509,18 +23561,20 @@
           ]
         }
       ],
-      "declarationSha256": "0e375b111006e11e4bd1570e2f4b1cfa42f4d8793de796938bcbca4ef7dba79e",
+      "declarationSha256": "6ba1fecb6a96ab1a6ddd4556a30a533c96330306b538f479a68ad529521bee44",
       "targetModule": "competition",
       "targetTask": "R2-02",
       "targetPath": "crates/domain/src/competition/",
       "serializationName": "SeasonDraft",
       "publicCompatibilityType": true,
       "compatibilityLevel": "root_public_compatibility",
-      "currentRootExport": "root_definition",
+      "currentRootExport": "glob_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
-        "crates/domain/tests/serde_contracts/defaults.rs"
+        "crates/domain/src/competition/mod.rs",
+        "crates/domain/tests/serde_contracts/defaults.rs",
+        "crates/domain/tests/serde_contracts/module_paths.rs"
       ],
       "externalCallers": [
         "crates/application/src/competition.rs",
@@ -23536,9 +23590,9 @@
       "typeName": "SeasonRecord",
       "kind": "struct",
       "visibility": "public",
-      "currentPath": "crates/domain/src/lib.rs",
-      "currentModule": "football_domain",
-      "sourceLine": 180,
+      "currentPath": "crates/domain/src/competition/season.rs",
+      "currentModule": "football_domain::season",
+      "sourceLine": 25,
       "derives": [
         "Clone",
         "Debug",
@@ -23584,17 +23638,20 @@
           "serdeAttributes": []
         }
       ],
-      "declarationSha256": "365c1bdee17565dd2d4ab4005f9912b78a2cff391d30894315534039e7f6d2a2",
+      "declarationSha256": "2e0ee1a5315099b25b2a5f1c55a8b0f69fefd1f96f3a0af5765376dd8760aa16",
       "targetModule": "competition",
       "targetTask": "R2-02",
       "targetPath": "crates/domain/src/competition/",
       "serializationName": "SeasonRecord",
       "publicCompatibilityType": true,
       "compatibilityLevel": "root_public_compatibility",
-      "currentRootExport": "root_definition",
+      "currentRootExport": "glob_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
-      "domainCallers": [],
+      "domainCallers": [
+        "crates/domain/src/competition/mod.rs",
+        "crates/domain/tests/serde_contracts/module_paths.rs"
+      ],
       "externalCallers": [
         "crates/application/src/competition.rs",
         "crates/application/src/lib.rs",
@@ -23609,9 +23666,9 @@
       "typeName": "SeasonTeamMembershipOption",
       "kind": "struct",
       "visibility": "public",
-      "currentPath": "crates/domain/src/lib.rs",
-      "currentModule": "football_domain",
-      "sourceLine": 585,
+      "currentPath": "crates/domain/src/competition/season.rs",
+      "currentModule": "football_domain::season",
+      "sourceLine": 36,
       "derives": [
         "Clone",
         "Debug",
@@ -23648,11 +23705,13 @@
       "serializationName": "SeasonTeamMembershipOption",
       "publicCompatibilityType": true,
       "compatibilityLevel": "root_public_compatibility",
-      "currentRootExport": "root_definition",
+      "currentRootExport": "glob_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
-        "crates/domain/src/lib.rs"
+        "crates/domain/src/competition/mod.rs",
+        "crates/domain/src/lib.rs",
+        "crates/domain/tests/serde_contracts/module_paths.rs"
       ],
       "externalCallers": [
         "crates/persistence-postgres/src/player_catalog.rs"
@@ -26036,9 +26095,9 @@
       "typeName": "StageDraft",
       "kind": "struct",
       "visibility": "public",
-      "currentPath": "crates/domain/src/lib.rs",
-      "currentModule": "football_domain",
-      "sourceLine": 191,
+      "currentPath": "crates/domain/src/competition/stage.rs",
+      "currentModule": "football_domain::stage",
+      "sourceLine": 8,
       "derives": [
         "Clone",
         "Debug",
@@ -26091,10 +26150,13 @@
       "serializationName": "StageDraft",
       "publicCompatibilityType": true,
       "compatibilityLevel": "root_public_compatibility",
-      "currentRootExport": "root_definition",
+      "currentRootExport": "glob_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
-      "domainCallers": [],
+      "domainCallers": [
+        "crates/domain/src/competition/mod.rs",
+        "crates/domain/tests/serde_contracts/module_paths.rs"
+      ],
       "externalCallers": [
         "crates/application/src/competition.rs",
         "crates/persistence-postgres/src/competitions.rs",
@@ -26108,9 +26170,9 @@
       "typeName": "StageRecord",
       "kind": "struct",
       "visibility": "public",
-      "currentPath": "crates/domain/src/lib.rs",
-      "currentModule": "football_domain",
-      "sourceLine": 203,
+      "currentPath": "crates/domain/src/competition/stage.rs",
+      "currentModule": "football_domain::stage",
+      "sourceLine": 20,
       "derives": [
         "Clone",
         "Debug",
@@ -26171,10 +26233,13 @@
       "serializationName": "StageRecord",
       "publicCompatibilityType": true,
       "compatibilityLevel": "root_public_compatibility",
-      "currentRootExport": "root_definition",
+      "currentRootExport": "glob_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
-      "domainCallers": [],
+      "domainCallers": [
+        "crates/domain/src/competition/mod.rs",
+        "crates/domain/tests/serde_contracts/module_paths.rs"
+      ],
       "externalCallers": [
         "crates/application/src/competition.rs",
         "crates/application/src/lib.rs",
@@ -26469,7 +26534,7 @@
       "visibility": "public",
       "currentPath": "crates/domain/src/lib.rs",
       "currentModule": "football_domain",
-      "sourceLine": 998,
+      "sourceLine": 654,
       "derives": [
         "Clone",
         "Debug",
@@ -26567,7 +26632,7 @@
       "visibility": "public",
       "currentPath": "crates/domain/src/lib.rs",
       "currentModule": "football_domain",
-      "sourceLine": 1023,
+      "sourceLine": 679,
       "derives": [
         "Clone",
         "Debug",
@@ -26653,7 +26718,7 @@
       "visibility": "public",
       "currentPath": "crates/domain/src/lib.rs",
       "currentModule": "football_domain",
-      "sourceLine": 901,
+      "sourceLine": 557,
       "derives": [
         "Clone",
         "Debug",
@@ -26735,7 +26800,7 @@
       "visibility": "public",
       "currentPath": "crates/domain/src/lib.rs",
       "currentModule": "football_domain",
-      "sourceLine": 557,
+      "sourceLine": 220,
       "derives": [
         "Clone",
         "Debug",
@@ -26798,7 +26863,7 @@
       "visibility": "public",
       "currentPath": "crates/domain/src/lib.rs",
       "currentModule": "football_domain",
-      "sourceLine": 1173,
+      "sourceLine": 829,
       "derives": [
         "Clone",
         "Debug",
@@ -26866,7 +26931,7 @@
       "visibility": "public",
       "currentPath": "crates/domain/src/lib.rs",
       "currentModule": "football_domain",
-      "sourceLine": 1167,
+      "sourceLine": 823,
       "derives": [
         "Clone",
         "Debug",
@@ -26918,7 +26983,7 @@
       "visibility": "public",
       "currentPath": "crates/domain/src/lib.rs",
       "currentModule": "football_domain",
-      "sourceLine": 1183,
+      "sourceLine": 839,
       "derives": [
         "Clone",
         "Debug",
@@ -26990,7 +27055,7 @@
       "visibility": "public",
       "currentPath": "crates/domain/src/lib.rs",
       "currentModule": "football_domain",
-      "sourceLine": 1820,
+      "sourceLine": 1476,
       "derives": [
         "Clone",
         "Debug",
@@ -27050,7 +27115,7 @@
       "visibility": "public",
       "currentPath": "crates/domain/src/lib.rs",
       "currentModule": "football_domain",
-      "sourceLine": 1744,
+      "sourceLine": 1400,
       "derives": [
         "Clone",
         "Debug",
@@ -27154,7 +27219,7 @@
       "visibility": "public",
       "currentPath": "crates/domain/src/lib.rs",
       "currentModule": "football_domain",
-      "sourceLine": 1722,
+      "sourceLine": 1378,
       "derives": [
         "Clone",
         "Debug",
@@ -27254,7 +27319,7 @@
       "visibility": "public",
       "currentPath": "crates/domain/src/lib.rs",
       "currentModule": "football_domain",
-      "sourceLine": 1771,
+      "sourceLine": 1427,
       "derives": [
         "Clone",
         "Debug",
@@ -27374,7 +27439,7 @@
       "visibility": "public",
       "currentPath": "crates/domain/src/lib.rs",
       "currentModule": "football_domain",
-      "sourceLine": 1795,
+      "sourceLine": 1451,
       "derives": [
         "Clone",
         "Debug",
@@ -27504,7 +27569,7 @@
       "visibility": "public",
       "currentPath": "crates/domain/src/lib.rs",
       "currentModule": "football_domain",
-      "sourceLine": 632,
+      "sourceLine": 288,
       "derives": [
         "Clone",
         "Debug",
@@ -27592,7 +27657,7 @@
       "visibility": "public",
       "currentPath": "crates/domain/src/lib.rs",
       "currentModule": "football_domain",
-      "sourceLine": 647,
+      "sourceLine": 303,
       "derives": [
         "Clone",
         "Debug",
@@ -27652,7 +27717,7 @@
       "visibility": "public",
       "currentPath": "crates/domain/src/lib.rs",
       "currentModule": "football_domain",
-      "sourceLine": 592,
+      "sourceLine": 248,
       "derives": [
         "Clone",
         "Debug",
@@ -28425,7 +28490,7 @@
       "visibility": "public",
       "currentPath": "crates/domain/src/lib.rs",
       "currentModule": "football_domain",
-      "sourceLine": 655,
+      "sourceLine": 311,
       "derives": [
         "Clone",
         "Debug",
@@ -28496,7 +28561,7 @@
       "visibility": "public",
       "currentPath": "crates/domain/src/lib.rs",
       "currentModule": "football_domain",
-      "sourceLine": 667,
+      "sourceLine": 323,
       "derives": [
         "Clone",
         "Debug",
@@ -28570,7 +28635,7 @@
       "visibility": "public",
       "currentPath": "crates/domain/src/lib.rs",
       "currentModule": "football_domain",
-      "sourceLine": 576,
+      "sourceLine": 239,
       "derives": [
         "Clone",
         "Debug",
@@ -29021,7 +29086,7 @@
       "visibility": "public",
       "currentPath": "crates/domain/src/lib.rs",
       "currentModule": "football_domain",
-      "sourceLine": 1037,
+      "sourceLine": 693,
       "derives": [
         "Clone",
         "Debug",
@@ -29109,7 +29174,7 @@
       "visibility": "public",
       "currentPath": "crates/domain/src/lib.rs",
       "currentModule": "football_domain",
-      "sourceLine": 678,
+      "sourceLine": 334,
       "derives": [
         "Clone",
         "Debug",
@@ -29250,7 +29315,7 @@
       "visibility": "public",
       "currentPath": "crates/domain/src/lib.rs",
       "currentModule": "football_domain",
-      "sourceLine": 726,
+      "sourceLine": 382,
       "derives": [
         "Clone",
         "Debug",
@@ -29368,7 +29433,7 @@
       "visibility": "public",
       "currentPath": "crates/domain/src/lib.rs",
       "currentModule": "football_domain",
-      "sourceLine": 762,
+      "sourceLine": 418,
       "derives": [
         "Clone",
         "Debug",
@@ -29444,7 +29509,7 @@
       "visibility": "public",
       "currentPath": "crates/domain/src/lib.rs",
       "currentModule": "football_domain",
-      "sourceLine": 566,
+      "sourceLine": 229,
       "derives": [
         "Clone",
         "Debug",
@@ -29517,7 +29582,7 @@
       "visibility": "public",
       "currentPath": "crates/domain/src/lib.rs",
       "currentModule": "football_domain",
-      "sourceLine": 748,
+      "sourceLine": 404,
       "derives": [
         "Clone",
         "Debug",
