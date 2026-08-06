@@ -38,8 +38,8 @@ R1 已完成并关闭。R2 按业务语义拆分 `crates/domain`，保持 Serde�
 
 | 任务 ID | 任务名称 | 状态 | 实施记录 | 当前门禁 |
 |---|---|---|---|---|
-| R2-01 | 领域类型与契约清单 | VERIFYING | [`R02-01-领域类型-and-契约清单.md`](R02-01-领域类型-and-契约清单.md) | 清单、Serde、架构、前端、Rust 已通过；正式 Windows Automated 待确认 |
-| R2-02 | Competition 与 Routing | BLOCKED | `R02-02-competition-and-routing.md` | 等待 R2-01 `DONE` |
+| R2-01 | 领域类型与契约清单 | DONE | [`R02-01-领域类型-and-契约清单.md`](R02-01-领域类型-and-契约清单.md) | workflow run `31078483578` 通过 |
+| R2-02 | Competition 与 Routing | READY | `R02-02-competition-and-routing.md` | R2-01 已关闭，可独立开始 |
 | R2-03 | Team / Player / Coach / Formation | BLOCKED | `R02-03-team-player-coach-and-formation.md` | 等待前置节点 |
 | R2-04 | Lineup 与 Match | BLOCKED | `R02-04-lineup-and-match.md` | 等待前置节点 |
 | R2-05 | Prediction 与 Research 外围领域 | BLOCKED | `R02-05-prediction-and-research-外围领域.md` | 等待前置节点 |
@@ -56,7 +56,7 @@ R1 已完成并关闭。R2 按业务语义拆分 `crates/domain`，保持 Serde�
 - 目标任务分布：R2-02 共 22 个，R2-03 共 72 个，R2-04 共 19 个，R2-05 共 75 个，R2-06 共 59 个，R2-07 共 118 个。
 - 已新增历史 JSON 往返、默认值、optional 语义和枚举线值契约测试，共 6 项，全部通过。
 - 本节点未移动或修改任何 `crates/domain/src` 生产类型。
-- 生成与全量门禁 run `31077537198`、job `92538743873` 已通过；正式 Windows Automated 需在最终实施提交上确认。
+- 生成与全量门禁 run `31077537198`、job `92538743873` 已通过；正式 Windows Automated run `31078483578`、job `92541654912` 在最终实施提交 `2a6b9ea96a88168d6a751ebf48c2030512edaf24` 上通过，artifact `8959079579` 的 SHA-256 为 `6b75cc3abe2067472476cd0e7811b9fd9ee6f689f17cbc0eb346030775d0c9e2`。
 
 ## 阶段出口
 
@@ -64,4 +64,4 @@ R2-01 至 R2-08 全部 `DONE` 后创建 `R02-stage-completion.md`，并实际完
 
 ## 当前阶段状态
 
-`R2-01 VERIFYING`；正式 Windows Automated 通过前不开放 R2-02，也不开始任何领域类型迁移。
+`R2-01 DONE`；R2-02 已开放为 `READY`，但尚未开始任何 Competition、Routing 或领域类型迁移。
