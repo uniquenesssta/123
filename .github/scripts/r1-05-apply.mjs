@@ -18,7 +18,7 @@ if (!match) {
 
 let source = gunzipSync(Buffer.from(match[1], "base64")).toString("utf8");
 
-function replaceOnceInPayload(search, replacement) {
+function replaceOnce(search, replacement) {
   const index = source.indexOf(search);
   if (index < 0) {
     throw new Error(`R1-05 payload anchor missing: ${search.slice(0, 80)}`);
@@ -26,33 +26,34 @@ function replaceOnceInPayload(search, replacement) {
   source = `${source.slice(0, index)}${replacement}${source.slice(index + search.length)}`;
 }
 
-replaceOnceInPayload(
+replaceOnce(
   '  "database.rs",\n  "openai_research.rs",',
   '  "database.rs",\n  "fact_pipeline.rs",\n  "openai_research.rs",',
 );
-replaceOnceInPayload(
+replaceOnce(
   'replaceAllRequired(`${applicationRoot}/database.rs`, "PostgresStore", "PersistenceStore");\n\nreplaceOnce(\n  `${applicationRoot}/openai_research.rs`,',
-  `replaceAllRequired(\`${applicationRoot}/database.rs\`, "PostgresStore", "PersistenceStore");
+  `replaceAllRequired(\`${'${applicationRoot}'}/database.rs\`, "PostgresStore", "PersistenceStore");
 
 replaceOnce(
-  \`${applicationRoot}/fact_pipeline.rs\`,
+  \`${'${applicationRoot}'}/fact_pipeline.rs\`,
   "use super::{ApplicationError, ApplicationResult, ApplicationService};",
   "use super::{ApplicationError, ApplicationResult, ApplicationService};\\nuse crate::PersistenceStore;",
 );
 replaceAllRequired(
-  \`${applicationRoot}/fact_pipeline.rs\`,
+  \`${'${applicationRoot}'}/fact_pipeline.rs\`,
   "football_persistence_postgres::PostgresStore",
   "PersistenceStore",
 );
 
 replaceOnce(
-  \`${applicationRoot}/openai_research.rs\`,`,
+  \`${'${applicationRoot}'}/openai_research.rs\`,`,
 );
 const escapedTick = "\\`";
-replaceOnceInPayload(
+replaceOnce(
   `- ${escapedTick}crates/application/src/database.rs${escapedTick}\n- ${escapedTick}crates/application/src/openai_research.rs${escapedTick}`,
   `- ${escapedTick}crates/application/src/database.rs${escapedTick}\n- ${escapedTick}crates/application/src/fact_pipeline.rs${escapedTick}\n- ${escapedTick}crates/application/src/openai_research.rs${escapedTick}`,
 );
+
 
 const temporaryScript = join(tmpdir(), `r1-05-patched-${process.pid}.mjs`);
 try {
@@ -62,10 +63,11 @@ try {
   rmSync(temporaryScript, { force: true });
 }
 
+
 const verifierPath = "scripts/architecture/verifyProtectedImports.mjs";
 let verifier = readFileSync(verifierPath, "utf8").replaceAll("\r\n", "\n");
 
-function replaceOnceInVerifier(search, replacement) {
+function replaceVerifierOnce(search, replacement) {
   const index = verifier.indexOf(search);
   if (index < 0) {
     throw new Error(`protected import verifier anchor missing: ${search.slice(0, 80)}`);
@@ -73,15 +75,15 @@ function replaceOnceInVerifier(search, replacement) {
   verifier = `${verifier.slice(0, index)}${replacement}${verifier.slice(index + search.length)}`;
 }
 
-replaceOnceInVerifier(
+replaceVerifierOnce(
   'const tauriRoot = normalizePath(contract.rust?.rules?.tauri_owner ?? "src-tauri");\n',
   'const tauriRoot = normalizePath(contract.rust?.rules?.tauri_owner ?? "src-tauri");\nconst applicationPersistenceOwner = normalizePath(\n  contract.rust?.rules?.application_persistence_import_owner ?? "",\n);\n',
 );
-replaceOnceInVerifier(
+replaceVerifierOnce(
   'const rustFiles = listFiles(["crates", "src-tauri"], { extensions: [".rs"] });\nfor (const file of rustFiles) {\n  const source = readFileSync(join(repositoryRoot, file), "utf8");\n',
   'const rustFiles = listFiles(["crates", "src-tauri"], { extensions: [".rs"] });\nconst applicationPersistenceImporters = [];\nfor (const file of rustFiles) {\n  const source = readFileSync(join(repositoryRoot, file), "utf8");\n  if (file.startsWith("crates/application/") && source.includes("football_persistence_postgres")) {\n    applicationPersistenceImporters.push(file);\n  }\n',
 );
-replaceOnceInVerifier(
+replaceVerifierOnce(
   `const applicationManifest = parseCargoManifest("crates/application/Cargo.toml");
 const applicationUsesPersistence = applicationManifest.dependencies.some((dependency) => dependency.packageName === "football-persistence-postgres");
 if (applicationUsesPersistence) {
