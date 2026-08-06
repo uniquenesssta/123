@@ -1,0 +1,50 @@
+name: R2-02 Patch Record Workflow
+
+on:
+  push:
+    branches:
+      - new-B
+
+permissions:
+  contents: write
+
+jobs:
+  patch:
+    if: "${{ github.event.head_commit.message == 'chore(r2): patch R2-02 record workflow' }}"
+    runs-on: windows-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+
+      - name: Normalize validation record matching
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = "Stop"
+          $path = ".github/workflows/r2-02-implement.yml"
+          $text = [System.IO.File]::ReadAllText($path).Replace("`r`n", "`n")
+          $old = '          "@.Trim()' + "`n" + '          if (($text.Split($old).Count - 1) -ne 1) {'
+          $new = '          "@.Trim()' + "`n" + '          $old = $old.Replace("`r`n", "`n")' + "`n" + '          $new = $new.Replace("`r`n", "`n")' + "`n" + '          if (($text.Split($old).Count - 1) -ne 1) {'
+          if (($text.Split($old).Count - 1) -ne 1) {
+            throw "R2-02 record workflow patch target did not match exactly once"
+          }
+          $text = $text.Replace($old, $new)
+          [System.IO.File]::WriteAllText($path, $text, [System.Text.UTF8Encoding]::new($false))
+
+      - name: Commit corrected implementation workflow
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = "Stop"
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git rm .github/workflows/r2-02-patch-record.yml
+          git add .github/workflows/r2-02-implement.yml
+          git diff --cached --check
+          $changed = @(git diff --cached --name-only | Sort-Object)
+          $expected = @('.github/workflows/r2-02-implement.yml', '.github/workflows/r2-02-patch-record.yml') | Sort-Object
+          if ((Compare-Object $expected $changed).Count -ne 0) {
+            throw "Unexpected R2-02 workflow patch change set"
+          }
+          git commit -m "chore(r2): bootstrap R2-02 implementation"
+          git push origin HEAD:new-B
