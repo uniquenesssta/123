@@ -18,6 +18,11 @@ if (!match) {
 
 let source = gunzipSync(Buffer.from(match[1], "base64")).toString("utf8");
 
+source = source
+  .replaceAll("model_registry/model_registry.rs", "model_registry/registry.rs")
+  .replaceAll("mod model_registry;", "mod registry;")
+  .replaceAll("pub use model_registry::ModelRegistry;", "pub use registry::ModelRegistry;");
+
 function replaceOnce(search, replacement) {
   const index = source.indexOf(search);
   if (index < 0) {
@@ -54,7 +59,6 @@ replaceOnce(
   `- ${escapedTick}crates/application/src/database.rs${escapedTick}\n- ${escapedTick}crates/application/src/fact_pipeline.rs${escapedTick}\n- ${escapedTick}crates/application/src/openai_research.rs${escapedTick}`,
 );
 
-
 const temporaryScript = join(tmpdir(), `r1-05-patched-${process.pid}.mjs`);
 try {
   writeFileSync(temporaryScript, source);
@@ -62,7 +66,6 @@ try {
 } finally {
   rmSync(temporaryScript, { force: true });
 }
-
 
 const verifierPath = "scripts/architecture/verifyProtectedImports.mjs";
 let verifier = readFileSync(verifierPath, "utf8").replaceAll("\r\n", "\n");
