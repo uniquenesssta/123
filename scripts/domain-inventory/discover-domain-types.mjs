@@ -158,8 +158,19 @@ export function discoverDomainTypes(root) {
     const original = readText(root, sourcePath);
     const source = maskTestModules(original);
     const lines = source.split("\n");
+    let moduleDepth = 0;
     for (let lineIndex = 0; lineIndex < lines.length; lineIndex += 1) {
       const line = lines[lineIndex];
+      const declarationDepth = moduleDepth;
+      const structuralLine = line
+        .replace(/\/\/.*$/, "")
+        .replace(/"(?:\\.|[^"\\])*"/g, "")
+        .replace(/'(?:\\.|[^'\\])'/g, "");
+      for (const char of structuralLine) {
+        if (char === "{") moduleDepth += 1;
+        if (char === "}") moduleDepth = Math.max(0, moduleDepth - 1);
+      }
+      if (declarationDepth !== 0) continue;
       const match = line.match(/^\s*(pub(?:\([^)]*\))?\s+)?(struct|enum|type)\s+([A-Za-z_][A-Za-z0-9_]*)\b/);
       if (!match) continue;
       const visibilityToken = (match[1] ?? "").trim();
