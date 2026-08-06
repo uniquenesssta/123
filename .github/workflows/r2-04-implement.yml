@@ -1,0 +1,766 @@
+name: R2-04 Lineup and Match Implementation
+
+on:
+  push:
+    branches:
+      - new-B
+
+permissions:
+  contents: write
+
+jobs:
+  implement:
+    if: "${{ github.event.head_commit.message == 'chore(r2): run R2-04 implementation' }}"
+    runs-on: windows-latest
+    timeout-minutes: 120
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Setup Rust 1.88.0
+        uses: dtolnay/rust-toolchain@1.88.0
+        with:
+          components: rustfmt, clippy
+
+      - name: Restore Rust build cache
+        uses: Swatinem/rust-cache@v2
+
+      - name: Apply R2-04 migration
+        shell: pwsh
+        env:
+          BASE_SHA: 3256454e9d76b7b442a83f25964363256257cbcc
+        run: |
+          $ErrorActionPreference = "Stop"
+          @'
+          from __future__ import annotations
+
+          import json
+          import os
+          from pathlib import Path
+
+          ROOT = Path.cwd()
+
+          def read(path: str) -> str:
+              return (ROOT / path).read_text(encoding="utf-8").replace("\r\n", "\n")
+
+          def write(path: str, content: str) -> None:
+              target = ROOT / path
+              target.parent.mkdir(parents=True, exist_ok=True)
+              target.write_text(content, encoding="utf-8", newline="\n")
+
+          def replace_once(text: str, old: str, new: str, label: str) -> str:
+              count = text.count(old)
+              if count != 1:
+                  raise RuntimeError(f"{label} matched {count} times")
+              return text.replace(old, new, 1)
+
+          base_sha = os.environ["BASE_SHA"]
+          trigger_sha = os.environ["GITHUB_SHA"]
+          run_id = os.environ["GITHUB_RUN_ID"]
+
+          root_readme = read("README.md")
+          if (ROOT / "docs/README.md").exists():
+              raise RuntimeError("docs/README.md already exists; refusing to overwrite")
+          docs_readme = root_readme.rstrip() + f"""
+
+          ## 记录位置
+
+          - 自 R2-04 起，根目录 `README.md` 保持空白。
+          - 项目说明、变更结果、验证结论和延期项统一记录在 `docs/README.md`。
+          - 各 Atomic Task 的详细实施记录继续保存在 `docs/modular-rewrite/` 对应阶段目录。
+
+          ## R2-04 Lineup 与 Match
+
+          - 已开始将 Lineup 16 个类型和 Match 3 个类型迁移到职责目录。
+          - 根级类型路径、Serde、数据库映射、Application、Tauri DTO、公共命令和模型保护边界保持不变。
+          - 实施 workflow run `{run_id}` 执行专项、架构、前端和 Rust 门禁；正式 Windows Automated 通过前状态为 `VERIFYING`，R2-05 保持 `BLOCKED`。
+          """
+          write("docs/README.md", docs_readme.lstrip())
+          write("README.md", "")
+
+          lib = read("crates/domain/src/lib.rs")
+          lib = replace_once(
+              lib,
+              "pub mod formation;\npub mod player;",
+              "pub mod formation;\npub mod lineup;\npub mod match_record;\npub mod player;",
+              "domain public modules",
+          )
+          lib = replace_once(lib, "mod lineup_chain;\n", "", "legacy lineup_chain module")
+          lib = replace_once(
+              lib,
+              "pub use formation::*;\npub use player::*;",
+              "pub use formation::*;\npub use lineup::*;\npub use match_record::*;\npub use player::*;",
+              "domain public reexports",
+          )
+          lib = replace_once(lib, "pub use lineup_chain::*;\n", "", "legacy lineup_chain reexport")
+          marker = "// ─────────────────────────────────────────────────────────────────────────────\n// 第三阶段：球员目录、球队归属、可用性、能力观察与阵容。\n// ─────────────────────────────────────────────────────────────────────────────\n"
+          if lib.count(marker) != 1:
+              raise RuntimeError("R2-04 root type marker mismatch")
+          lib = lib.split(marker, 1)[0].rstrip() + "\n"
+          write("crates/domain/src/lib.rs", lib)
+
+          write("crates/domain/src/lineup/mod.rs", """mod chain;
+          mod kind;
+          mod player;
+          mod preset;
+          mod snapshot;
+
+          pub use chain::*;
+          pub use kind::*;
+          pub use player::*;
+          pub use preset::*;
+          pub use snapshot::*;
+          """.replace("          ", ""))
+
+          write("crates/domain/src/lineup/kind.rs", """use serde::{Deserialize, Serialize};
+
+          #[derive(Debug, Clone, Copy, Serialize, Deserialize, PartialEq, Eq, Hash)]
+          #[serde(rename_all = "snake_case")]
+          pub enum LineupType {
+              Expected,
+              Confirmed,
+              Actual,
+          }
+
+          impl LineupType {
+              pub const fn as_str(self) -> &'static str {
+                  match self {
+                      Self::Expected => "expected",
+                      Self::Confirmed => "confirmed",
+                      Self::Actual => "actual",
+                  }
+              }
+          }
+          """.replace("          ", ""))
+
+          write("crates/domain/src/lineup/player.rs", """use crate::AvailabilityStatus;
+          use serde::{Deserialize, Serialize};
+          use uuid::Uuid;
+
+          #[derive(Debug, Clone, Serialize, Deserialize)]
+          pub struct LineupPlayerDraft {
+              pub player_id: Uuid,
+              #[serde(default)]
+              pub position_code: Option<String>,
+              #[serde(default)]
+              pub role_code: Option<String>,
+              pub is_starter: bool,
+              #[serde(default)]
+              pub shirt_number: Option<i16>,
+              #[serde(default)]
+              pub expected_minutes: Option<i16>,
+              #[serde(default)]
+              pub actual_minutes: Option<i16>,
+              #[serde(default)]
+              pub sequence_no: i16,
+              #[serde(default)]
+              pub bench_order: Option<i16>,
+              #[serde(default)]
+              pub availability_status: Option<AvailabilityStatus>,
+              #[serde(default)]
+              pub starting_probability: Option<f64>,
+              #[serde(default)]
+              pub membership_override: bool,
+              #[serde(default)]
+              pub source_urls: Vec<String>,
+              #[serde(default)]
+              pub metadata: serde_json::Value,
+          }
+
+          #[derive(Debug, Clone, Serialize, Deserialize)]
+          pub struct LineupPlayerRecord {
+              pub player_id: Uuid,
+              pub player_name: String,
+              pub position_code: Option<String>,
+              pub role_code: Option<String>,
+              #[serde(default)]
+              pub role_origin: String,
+              #[serde(default)]
+              pub role_source_position_code: Option<String>,
+              pub is_starter: bool,
+              pub shirt_number: Option<i16>,
+              pub expected_minutes: Option<i16>,
+              pub actual_minutes: Option<i16>,
+              pub sequence_no: i16,
+              pub bench_order: Option<i16>,
+              pub availability_status: Option<AvailabilityStatus>,
+              pub starting_probability: Option<f64>,
+              pub membership_override: bool,
+              pub source_urls: Vec<String>,
+              pub validation_warning: Option<String>,
+          }
+          """.replace("          ", ""))
+
+          write("crates/domain/src/lineup/snapshot.rs", """use super::{LineupPlayerDraft, LineupPlayerRecord, LineupType};
+          use chrono::{DateTime, Utc};
+          use serde::{Deserialize, Serialize};
+          use serde_json::Value;
+          use uuid::Uuid;
+
+          #[derive(Debug, Clone, Serialize, Deserialize)]
+          pub struct LineupDraft {
+              pub match_id: Uuid,
+              pub team_id: Uuid,
+              pub lineup_type: LineupType,
+              #[serde(default = "default_lineup_snapshot_type")]
+              pub snapshot_type: String,
+              #[serde(default)]
+              pub formation: Option<String>,
+              #[serde(default)]
+              pub formation_id: Option<Uuid>,
+              #[serde(default)]
+              pub coach_id: Option<Uuid>,
+              pub captured_at: DateTime<Utc>,
+              #[serde(default)]
+              pub source_document_id: Option<Uuid>,
+              #[serde(default)]
+              pub source_urls: Vec<String>,
+              #[serde(default)]
+              pub quality_score: Option<f64>,
+              #[serde(default)]
+              pub metadata: Value,
+              pub players: Vec<LineupPlayerDraft>,
+          }
+
+          fn default_lineup_snapshot_type() -> String {
+              "T-1h".to_string()
+          }
+
+          #[derive(Debug, Clone, Serialize, Deserialize)]
+          pub struct LineupPairDraft {
+              pub home: LineupDraft,
+              pub away: LineupDraft,
+          }
+
+          #[derive(Debug, Clone, Serialize, Deserialize)]
+          pub struct LineupPairRecord {
+              pub home: LineupRecord,
+              pub away: LineupRecord,
+          }
+
+          #[derive(Debug, Clone, Serialize, Deserialize)]
+          pub struct LineupRecord {
+              pub id: Uuid,
+              pub match_id: Uuid,
+              pub match_key: String,
+              pub team_id: Uuid,
+              pub team_name: String,
+              pub lineup_type: LineupType,
+              pub snapshot_type: String,
+              pub formation: Option<String>,
+              pub formation_id: Option<Uuid>,
+              pub formation_code: Option<String>,
+              pub formation_name: Option<String>,
+              pub coach_id: Option<Uuid>,
+              pub coach_name: Option<String>,
+              pub captured_at: DateTime<Utc>,
+              pub status: String,
+              pub quality_score: Option<f64>,
+              pub source_urls: Vec<String>,
+              pub supersedes_lineup_id: Option<Uuid>,
+              pub model_validation_status: String,
+              pub model_eligible: bool,
+              pub validation_errors: Vec<String>,
+              pub validation_warnings: Vec<String>,
+              pub player_count: i64,
+              pub starter_count: i64,
+              pub players: Vec<LineupPlayerRecord>,
+          }
+
+          #[derive(Debug, Clone, Serialize, Deserialize)]
+          pub struct LineupHistoryRemovalResult {
+              pub lineup_id: Uuid,
+              pub removal_mode: String,
+              pub restored_lineup_id: Option<Uuid>,
+          }
+          """.replace("          ", ""))
+
+          write("crates/domain/src/lineup/preset.rs", """use crate::AvailabilityStatus;
+          use chrono::{DateTime, Utc};
+          use serde::{Deserialize, Serialize};
+          use serde_json::Value;
+          use uuid::Uuid;
+
+          #[derive(Debug, Clone, Serialize, Deserialize)]
+          pub struct TeamLineupPresetMemberDraft {
+              pub player_id: Uuid,
+              #[serde(default)]
+              pub position_code: Option<String>,
+              #[serde(default)]
+              pub role_code: Option<String>,
+              pub is_starter: bool,
+              #[serde(default)]
+              pub shirt_number: Option<i16>,
+              #[serde(default)]
+              pub expected_minutes: Option<i16>,
+              #[serde(default)]
+              pub sequence_no: i16,
+              #[serde(default)]
+              pub bench_order: Option<i16>,
+              #[serde(default)]
+              pub is_captain: bool,
+              #[serde(default)]
+              pub metadata: Value,
+          }
+
+          #[derive(Debug, Clone, Serialize, Deserialize)]
+          pub struct TeamLineupPresetDraft {
+              #[serde(default)]
+              pub id: Option<Uuid>,
+              pub team_id: Uuid,
+              pub name: String,
+              #[serde(default)]
+              pub formation_id: Option<Uuid>,
+              #[serde(default)]
+              pub coach_id: Option<Uuid>,
+              #[serde(default = "default_lineup_preset_context")]
+              pub usage_context: String,
+              #[serde(default)]
+              pub usage_probability: Option<f64>,
+              #[serde(default)]
+              pub is_default: bool,
+              #[serde(default)]
+              pub source_lineup_id: Option<Uuid>,
+              #[serde(default)]
+              pub notes: Option<String>,
+              pub members: Vec<TeamLineupPresetMemberDraft>,
+          }
+
+          fn default_lineup_preset_context() -> String {
+              "general".to_string()
+          }
+
+          #[derive(Debug, Clone, Serialize, Deserialize)]
+          pub struct TeamLineupPresetMemberRecord {
+              pub player_id: Uuid,
+              pub player_name: String,
+              pub alternate_name: Option<String>,
+              pub position_code: Option<String>,
+              pub role_code: Option<String>,
+              #[serde(default)]
+              pub role_origin: String,
+              #[serde(default)]
+              pub role_source_position_code: Option<String>,
+              pub is_starter: bool,
+              pub shirt_number: Option<i16>,
+              pub expected_minutes: Option<i16>,
+              pub sequence_no: i16,
+              pub bench_order: Option<i16>,
+              pub is_captain: bool,
+              pub current_team_id: Option<Uuid>,
+              pub current_team_name: Option<String>,
+              pub player_status: String,
+              pub availability_status: Option<AvailabilityStatus>,
+              pub metadata: Value,
+          }
+
+          #[derive(Debug, Clone, Serialize, Deserialize)]
+          pub struct TeamLineupPresetRecord {
+              pub id: Uuid,
+              pub team_id: Uuid,
+              pub team_name: String,
+              pub name: String,
+              pub formation_id: Option<Uuid>,
+              pub formation_code: Option<String>,
+              pub formation_name: Option<String>,
+              pub coach_id: Option<Uuid>,
+              pub coach_name: Option<String>,
+              pub usage_context: String,
+              pub usage_probability: Option<f64>,
+              pub is_default: bool,
+              pub status: String,
+              pub version: i32,
+              pub source_lineup_id: Option<Uuid>,
+              pub notes: Option<String>,
+              pub starter_count: i64,
+              pub member_count: i64,
+              pub members: Vec<TeamLineupPresetMemberRecord>,
+              pub created_at: DateTime<Utc>,
+              pub updated_at: DateTime<Utc>,
+          }
+
+          #[derive(Debug, Clone, Serialize, Deserialize)]
+          pub struct TeamLineupPresetApplicationPreview {
+              pub preset: TeamLineupPresetRecord,
+              pub can_apply: bool,
+              pub blockers: Vec<String>,
+              pub warnings: Vec<String>,
+          }
+          """.replace("          ", ""))
+
+          write("crates/domain/src/lineup/chain.rs", """use super::LineupRecord;
+          use crate::match_record::MatchRecord;
+          use chrono::{DateTime, Utc};
+          use serde::{Deserialize, Serialize};
+          use uuid::Uuid;
+
+          pub const FORMAL_LINEUP_SNAPSHOT_TYPES: [&str; 4] = ["T-N", "T-24h", "T-6h", "T-1h"];
+
+          #[derive(Debug, Clone, Serialize, Deserialize)]
+          pub struct MatchLineupTeamChain {
+              pub team_id: Uuid,
+              pub team_name: String,
+              pub team_side: String,
+              pub selected_lineup_id: Option<Uuid>,
+              pub versions: Vec<LineupRecord>,
+              pub blocking_issues: Vec<String>,
+          }
+
+          #[derive(Debug, Clone, Serialize, Deserialize)]
+          pub struct MatchLineupChain {
+              pub match_record: MatchRecord,
+              pub snapshot_type: String,
+              pub data_window_start_time: Option<DateTime<Utc>>,
+              pub data_cutoff_time: DateTime<Utc>,
+              pub home: MatchLineupTeamChain,
+              pub away: MatchLineupTeamChain,
+              pub ready_for_model: bool,
+              pub blocking_issues: Vec<String>,
+          }
+
+          #[derive(Debug, Clone, Serialize, Deserialize)]
+          pub struct TeamMatchLineupHistoryItem {
+              pub match_id: Uuid,
+              pub match_key: String,
+              pub opponent_team_id: Uuid,
+              pub opponent_team_name: String,
+              pub venue_side: String,
+              pub kickoff_time: DateTime<Utc>,
+              pub lineup: LineupRecord,
+          }
+          """.replace("          ", ""))
+
+          write("crates/domain/src/match_record/mod.rs", """mod catalog;
+          mod status;
+
+          pub use catalog::*;
+          pub use status::*;
+          """.replace("          ", ""))
+
+          write("crates/domain/src/match_record/status.rs", """use serde::{Deserialize, Serialize};
+
+          #[derive(Debug, Clone, Copy, Serialize, Deserialize, PartialEq, Eq, Hash)]
+          #[serde(rename_all = "snake_case")]
+          pub enum MatchStatus {
+              Scheduled,
+              Live,
+              Finished,
+              Postponed,
+              Cancelled,
+          }
+
+          impl MatchStatus {
+              pub const fn as_str(self) -> &'static str {
+                  match self {
+                      Self::Scheduled => "scheduled",
+                      Self::Live => "live",
+                      Self::Finished => "finished",
+                      Self::Postponed => "postponed",
+                      Self::Cancelled => "cancelled",
+                  }
+              }
+          }
+
+          impl Default for MatchStatus {
+              fn default() -> Self {
+                  Self::Scheduled
+              }
+          }
+          """.replace("          ", ""))
+
+          write("crates/domain/src/match_record/catalog.rs", """use super::MatchStatus;
+          use chrono::{DateTime, Utc};
+          use serde::{Deserialize, Serialize};
+          use serde_json::Value;
+          use uuid::Uuid;
+
+          #[derive(Debug, Clone, Serialize, Deserialize)]
+          pub struct MatchDraft {
+              #[serde(default)]
+              pub external_key: String,
+              #[serde(default)]
+              pub competition_id: Option<Uuid>,
+              #[serde(default)]
+              pub season_id: Option<Uuid>,
+              #[serde(default)]
+              pub stage_id: Option<Uuid>,
+              #[serde(default)]
+              pub round_id: Option<Uuid>,
+              pub home_team_id: Uuid,
+              pub away_team_id: Uuid,
+              pub kickoff_time: DateTime<Utc>,
+              #[serde(default)]
+              pub status: MatchStatus,
+              #[serde(default)]
+              pub venue: Option<String>,
+              #[serde(default)]
+              pub metadata: Value,
+          }
+
+          #[derive(Debug, Clone, Serialize, Deserialize)]
+          pub struct MatchRecord {
+              pub id: Uuid,
+              pub external_key: String,
+              pub competition_id: Option<Uuid>,
+              pub competition_name: Option<String>,
+              pub season_id: Option<Uuid>,
+              pub stage_id: Option<Uuid>,
+              pub round_id: Option<Uuid>,
+              pub home_team_id: Uuid,
+              pub home_team_name: String,
+              pub away_team_id: Uuid,
+              pub away_team_name: String,
+              pub kickoff_time: DateTime<Utc>,
+              pub status: MatchStatus,
+              pub venue: Option<String>,
+          }
+          """.replace("          ", ""))
+
+          legacy = ROOT / "crates/domain/src/lineup_chain.rs"
+          if not legacy.exists():
+              raise RuntimeError("legacy lineup_chain.rs missing")
+          legacy.unlink()
+
+          policy = read("scripts/domain-inventory/target-module-policy.mjs")
+          policy = replace_once(
+              policy,
+              '  ["lineup_chain.rs", ["lineup", "R2-04"]],\n',
+              "",
+              "legacy lineup policy",
+          )
+          policy = replace_once(
+              policy,
+              '  ["formation", ["formation", "R2-03"]],\n  ["player", ["player", "R2-03"]],',
+              '  ["formation", ["formation", "R2-03"]],\n  ["lineup", ["lineup", "R2-04"]],\n  ["match_record", ["match_record", "R2-04"]],\n  ["player", ["player", "R2-03"]],',
+              "R2-04 directory policy",
+          )
+          write("scripts/domain-inventory/target-module-policy.mjs", policy)
+
+          progress_path = ROOT / "architecture/domain-migration-progress.json"
+          progress = json.loads(progress_path.read_text(encoding="utf-8"))
+          if progress["completedTasks"] != ["R2-02", "R2-03"]:
+              raise RuntimeError("unexpected migration progress baseline")
+          progress["completedTasks"].append("R2-04")
+          write("architecture/domain-migration-progress.json", json.dumps(progress, ensure_ascii=False, indent=2) + "\n")
+
+          module_paths = read("crates/domain/tests/serde_contracts/module_paths.rs")
+          module_paths = replace_once(
+              module_paths,
+              "use football_domain::{coach, competition, formation, player, routing, shared, team};",
+              "use football_domain::{\n    coach, competition, formation, lineup, match_record, player, routing, shared, team,\n};",
+              "module path imports",
+          )
+          module_paths += """
+
+          #[test]
+          fn r2_04_module_paths_preserve_root_type_identity() {
+              assert_same_type(None::<football_domain::MatchStatus>, None::<match_record::MatchStatus>);
+              assert_same_type(None::<football_domain::MatchDraft>, None::<match_record::MatchDraft>);
+              assert_same_type(None::<football_domain::MatchRecord>, None::<match_record::MatchRecord>);
+              assert_same_type(None::<football_domain::LineupType>, None::<lineup::LineupType>);
+              assert_same_type(None::<football_domain::LineupPlayerDraft>, None::<lineup::LineupPlayerDraft>);
+              assert_same_type(None::<football_domain::LineupPlayerRecord>, None::<lineup::LineupPlayerRecord>);
+              assert_same_type(None::<football_domain::LineupDraft>, None::<lineup::LineupDraft>);
+              assert_same_type(None::<football_domain::LineupPairDraft>, None::<lineup::LineupPairDraft>);
+              assert_same_type(None::<football_domain::LineupPairRecord>, None::<lineup::LineupPairRecord>);
+              assert_same_type(None::<football_domain::LineupRecord>, None::<lineup::LineupRecord>);
+              assert_same_type(None::<football_domain::LineupHistoryRemovalResult>, None::<lineup::LineupHistoryRemovalResult>);
+              assert_same_type(None::<football_domain::TeamLineupPresetMemberDraft>, None::<lineup::TeamLineupPresetMemberDraft>);
+              assert_same_type(None::<football_domain::TeamLineupPresetDraft>, None::<lineup::TeamLineupPresetDraft>);
+              assert_same_type(None::<football_domain::TeamLineupPresetMemberRecord>, None::<lineup::TeamLineupPresetMemberRecord>);
+              assert_same_type(None::<football_domain::TeamLineupPresetRecord>, None::<lineup::TeamLineupPresetRecord>);
+              assert_same_type(None::<football_domain::TeamLineupPresetApplicationPreview>, None::<lineup::TeamLineupPresetApplicationPreview>);
+              assert_same_type(None::<football_domain::MatchLineupTeamChain>, None::<lineup::MatchLineupTeamChain>);
+              assert_same_type(None::<football_domain::MatchLineupChain>, None::<lineup::MatchLineupChain>);
+              assert_same_type(None::<football_domain::TeamMatchLineupHistoryItem>, None::<lineup::TeamMatchLineupHistoryItem>);
+          }
+          """
+          write("crates/domain/tests/serde_contracts/module_paths.rs", module_paths)
+
+          index = read("docs/modular-rewrite/R02-domain-rewrite/README.md")
+          index = replace_once(
+              index,
+              '| R2-04 | Lineup 与 Match | READY | `R02-04-lineup-and-match.md` | 前置节点已完成，待开始 |',
+              '| R2-04 | Lineup 与 Match | VERIFYING | [`R02-04-lineup-and-match.md`](R02-04-lineup-and-match.md) | 实施 workflow run `' + run_id + '` 执行中；正式 Windows Automated 待确认 |',
+              "R2-04 task row",
+          )
+          index = replace_once(
+              index,
+              '`R2-03 DONE`；`R2-04 READY`。72 个 Team、Player、Coach、Formation 与 Shared 类型已迁移并通过正式 Windows Automated；尚未开始 R2-04。',
+              '`R2-04 VERIFYING`；`R2-05 BLOCKED`。Lineup 16 个类型与 Match 3 个类型已迁移到职责目录；正式 Windows Automated 通过前不开放 R2-05。',
+              "R2 current status",
+          )
+          index += f"""
+
+          ## R2-04 当前结果
+
+          - Lineup 16 个类型已按 kind、player、snapshot、preset、chain 拆分。
+          - Match 3 个类型已按 status、catalog 拆分。
+          - 旧 `crates/domain/src/lineup_chain.rs` 已删除，正式阵容快照常量与三类链路契约迁入 `lineup/chain.rs`。
+          - 根级公共类型名继续通过兼容 re-export 保持不变；glob 根出口债务仍由 R2-08 统一退出。
+          - `architecture/domain-migration-progress.json` 已登记 R2-04，清单门禁拒绝 19 个类型回退到目标目录之外。
+          - 实施 workflow run `{run_id}` 执行专项、架构、前端和 Rust 门禁；正式 Windows Automated 待确认。
+          - 本节点未修改数据库迁移、SQL Row、Application、Tauri DTO、模型保护资产或生产依赖。
+          """
+          write("docs/modular-rewrite/R02-domain-rewrite/README.md", index)
+
+          task_doc = f"""# R02-04 Lineup 与 Match 实施记录
+
+          - 任务状态：`VERIFYING`
+          - 前置已验证提交：`{base_sha}`
+          - 实施触发提交：`{trigger_sha}`
+          - 目标平台：Windows
+
+          ## 1. 实际问题
+
+          R2-01 清单确认 Lineup 16 个类型和 Match 3 个类型仍分散在 Domain 根文件及 `lineup_chain.rs`。比赛目录、比赛状态、阵容快照、球员条目、阵容预设和模型输入链路混在根级定义与单文件中，职责和变化原因不一致。
+
+          ## 2. 完成内容
+
+          - 新建 `lineup/`，按 kind、player、snapshot、preset、chain 拆分 16 个类型及正式快照类型常量。
+          - 新建 `match_record/`，按 status、catalog 拆分 3 个类型。
+          - 从 Domain 根文件删除 17 个原始定义、默认值函数和专属实现；删除旧 `lineup_chain.rs`，不保留转发文件或双实现。
+          - 根文件仅声明业务模块并保留兼容 re-export。
+          - 新增 19 个公共模块路径身份断言，确认新路径与既有根级路径指向同一 Rust 类型。
+          - 更新目标模块策略、迁移进度和可机器复算的 Domain 类型清单。
+          - 将根目录 README 原内容迁移至 `docs/README.md`，根 `README.md` 置为空白；后续统一在 `docs/README.md` 记录项目变更。
+
+          ## 3. 类型范围
+
+          - Match：MatchStatus, MatchDraft, MatchRecord
+          - Lineup：LineupType, LineupPlayerDraft, LineupPlayerRecord, LineupDraft, LineupPairDraft, LineupPairRecord, LineupRecord, LineupHistoryRemovalResult, TeamLineupPresetMemberDraft, TeamLineupPresetDraft, TeamLineupPresetMemberRecord, TeamLineupPresetRecord, TeamLineupPresetApplicationPreview, MatchLineupTeamChain, MatchLineupChain, TeamMatchLineupHistoryItem
+
+          ## 4. 兼容性
+
+          以下内容保持不变：
+
+          - 根级 `football_domain::TypeName` 路径和类型身份；
+          - `FORMAL_LINEUP_SNAPSHOT_TYPES` 根级导出和值；
+          - Serde 字段名、枚举 snake_case 线值、默认值、optional 语义与历史 JSON；
+          - PostgreSQL 映射、SQL Row、数据库迁移、公共命令、错误语义和日志等级；
+          - Application、Tauri DTO、前端行为、P4/P7 Schema 与模型保护边界；
+          - Cargo 与 npm 生产依赖。
+
+          新增 `football_domain::lineup::*` 与 `football_domain::match_record::*` 业务语义路径。根级 glob 出口债务仍由 R2-08 统一退出。
+
+          ## 5. 实际验证
+
+          实施 workflow run `{run_id}` 执行：
+
+          - `cargo test --locked -p football-domain --test serde_contracts`
+          - `node scripts/generate-domain-type-inventory.mjs`
+          - `node scripts/verify-domain-type-inventory.mjs`
+          - `npm run verify:architecture`
+          - `node scripts/verify-protected-assets-deterministic.mjs`
+          - `npm run verify:frontend`
+          - `npm run verify:rust`
+
+          正式 `Public Platform CI` Windows Automated 通过前保持 `VERIFYING`，R2-05 保持 `BLOCKED`。
+
+          ## 6. 未执行与延期项
+
+          - 真实 PostgreSQL 实跑保留到最终统一验收。
+          - Windows Full 交互验收和用户本机 Windows 10/11 实机验收保留到最终统一验收。
+          - 既有 moderate npm vulnerability 和 Vite 大 chunk 警告不属于本节点修改范围。
+
+          ## 7. 回退
+
+          回退到前置提交 `{base_sha}`；不保留双实现、复制文件或长期转发层。
+          """
+          write("docs/modular-rewrite/R02-domain-rewrite/R02-04-lineup-and-match.md", task_doc.lstrip())
+          '@ | Set-Content -Path r2_04_apply.py -Encoding utf8
+          python r2_04_apply.py
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          Remove-Item r2_04_apply.py -Force
+          cargo fmt --all
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+
+      - name: Install frontend dependencies
+        run: npm ci
+
+      - name: Verify targeted Serde and module path contracts
+        run: cargo test --locked -p football-domain --test serde_contracts
+
+      - name: Regenerate and verify Domain inventory
+        shell: pwsh
+        run: |
+          node scripts/generate-domain-type-inventory.mjs
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          node scripts/verify-domain-type-inventory.mjs
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+
+      - name: Verify architecture and protected assets
+        shell: pwsh
+        run: |
+          npm run verify:architecture
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          node scripts/verify-protected-assets-deterministic.mjs
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+
+      - name: Verify frontend
+        run: npm run verify:frontend
+
+      - name: Verify Rust workspace
+        run: npm run verify:rust
+
+      - name: Commit R2-04 implementation
+        shell: pwsh
+        env:
+          BASE_SHA: 3256454e9d76b7b442a83f25964363256257cbcc
+        run: |
+          $ErrorActionPreference = "Stop"
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+          $remoteHead = (git ls-remote origin refs/heads/new-B).Split("`t")[0]
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          if ($remoteHead -ne $env:GITHUB_SHA) { throw "new-B changed during R2-04 implementation" }
+
+          git rm .github/workflows/r2-04-implement.yml
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          git add -A
+          git diff --cached --check
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+
+          $expected = @(
+            "README.md",
+            "architecture/domain-migration-progress.json",
+            "architecture/domain-type-inventory.json",
+            "crates/domain/src/lib.rs",
+            "crates/domain/src/lineup/chain.rs",
+            "crates/domain/src/lineup/kind.rs",
+            "crates/domain/src/lineup/mod.rs",
+            "crates/domain/src/lineup/player.rs",
+            "crates/domain/src/lineup/preset.rs",
+            "crates/domain/src/lineup/snapshot.rs",
+            "crates/domain/src/lineup_chain.rs",
+            "crates/domain/src/match_record/catalog.rs",
+            "crates/domain/src/match_record/mod.rs",
+            "crates/domain/src/match_record/status.rs",
+            "crates/domain/tests/serde_contracts/module_paths.rs",
+            "docs/README.md",
+            "docs/modular-rewrite/R02-domain-rewrite/R02-04-lineup-and-match.md",
+            "docs/modular-rewrite/R02-domain-rewrite/README.md",
+            "scripts/domain-inventory/target-module-policy.mjs"
+          ) | Sort-Object
+          $actual = @(git diff --name-only $env:BASE_SHA | Sort-Object)
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          $difference = Compare-Object $expected $actual
+          if ($difference) {
+            $difference | Format-Table | Out-String | Write-Host
+            throw "Unexpected R2-04 change set"
+          }
+
+          git commit -m "rewrite(r2): implement R2-04 lineup and match domains"
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          git push origin HEAD:new-B
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
