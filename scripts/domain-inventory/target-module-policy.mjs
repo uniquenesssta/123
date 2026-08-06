@@ -21,8 +21,13 @@ const FILE_POLICY = new Map([
 ]);
 
 const DIRECTORY_POLICY = new Map([
+  ["coach", ["coach", "R2-03"]],
   ["competition", ["competition", "R2-02"]],
+  ["formation", ["formation", "R2-03"]],
+  ["player", ["player", "R2-03"]],
   ["routing", ["routing", "R2-02"]],
+  ["shared", ["shared", "R2-03"]],
+  ["team", ["team", "R2-03"]],
 ]);
 
 function rootPolicy(typeName) {

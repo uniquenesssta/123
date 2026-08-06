@@ -1,6 +1,6 @@
 # R02-02 Competition 与 Routing 实施记录
 
-- 任务状态：`VERIFYING`
+- 任务状态：`DONE`
 - 前置已验证提交：`43029b3ca5c6e61ea6ff81d74a1fb489d398ad48`
 - 目标平台：Windows
 
@@ -73,7 +73,14 @@ Windows 实施 workflow run `31087811267` 已实际通过：
 - `npm run verify:rust`：通过。
 - 临时实施 workflow 与脚本在提交前删除：通过。
 
-最终实施提交上的正式 `Public Platform CI` Windows Automated 尚待确认；完成前保持 `VERIFYING`，R2-03 保持 `BLOCKED`。
+最终实施提交 `a6877a905550faff93477cdf84038690d61081a1` 的同源触发提交 `897a8bc0a43121908826eca41e0c1db3c2763889` 已通过正式 `Public Platform CI`：
+
+- workflow run `31088698579`、job `92574240109`：`success`。
+- Windows Automated：通过；release 客户端启动成功。
+- Runtime 日志：PASS，7 条记录、3 个完成操作、0 条无效记录、0 个运行时错误。
+- artifact `8963219366`：`windows-automated-delivery-evidence-897a8bc0a43121908826eca41e0c1db3c2763889`，大小 `14117627` 字节，SHA-256 为 `5bc1481807b8fd378e8845c1a813e0cca3981681a5f5d89c572a54e74c973124`。
+
+R2-02 状态已收口为 `DONE`，R2-03 前置门禁已解除。
 
 ## 6. 未执行与延期项
 

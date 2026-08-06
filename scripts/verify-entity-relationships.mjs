@@ -19,7 +19,15 @@ const tauri = json("src-tauri/tauri.conf.json");
 const cargo = text("Cargo.toml");
 const cargoLock = text("Cargo.lock");
 const migration = text("crates/persistence-postgres/migrations/0021_entity_relationships.sql");
-const domain = text("crates/domain/src/lib.rs");
+const domain = [
+  "crates/domain/src/coach/catalog.rs",
+  "crates/domain/src/coach/name.rs",
+  "crates/domain/src/coach/membership.rs",
+  "crates/domain/src/team/membership.rs",
+  "crates/domain/src/shared/entity_reference.rs",
+  "crates/domain/src/shared/entity_match.rs",
+  "crates/domain/src/shared/bulk_archive.rs",
+].map(text).join("\n");
 const persistence = text("crates/persistence-postgres/src/entity_catalog.rs");
 const teamPersistence = text("crates/persistence-postgres/src/team_catalog.rs");
 const playerPersistence = text("crates/persistence-postgres/src/player_catalog.rs");

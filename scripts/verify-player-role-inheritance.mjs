@@ -21,12 +21,16 @@ requireTokens("crates/persistence-postgres/migrations/0046_player_position_defau
   "player_positions_default_role_code_check",
   "player_positions_role_lookup_idx",
 ], "数据库迁移");
-requireTokens("crates/domain/src/lib.rs", [
+requireTokens("crates/domain/src/player/position.rs", [
   "pub default_role_code: Option<String>",
-  "pub role_origin: String",
+], "球员位置领域模型");
+requireTokens("crates/domain/src/player/listing.rs", [
   "pub primary_role_code: Option<String>",
   "pub position_role_map: Value",
-], "领域模型");
+], "球员列表领域模型");
+requireTokens("crates/domain/src/lib.rs", [
+  "pub role_origin: String",
+], "阵容领域模型");
 requireTokens("crates/domain/src/exchange.rs", [
   "pub role_code: Option<String>",
   "pub role_origin: Option<String>",

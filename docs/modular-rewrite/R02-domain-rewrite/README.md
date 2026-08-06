@@ -39,8 +39,8 @@ R1 已完成并关闭。R2 按业务语义拆分 `crates/domain`，保持 Serde�
 | 任务 ID | 任务名称 | 状态 | 实施记录 | 当前门禁 |
 |---|---|---|---|---|
 | R2-01 | 领域类型与契约清单 | DONE | [`R02-01-领域类型-and-契约清单.md`](R02-01-领域类型-and-契约清单.md) | workflow run `31078483578` 通过 |
-| R2-02 | Competition 与 Routing | VERIFYING | [`R02-02-competition-and-routing.md`](R02-02-competition-and-routing.md) | 实施 run `31087811267` 已通过；正式 Windows Automated 待确认 |
-| R2-03 | Team / Player / Coach / Formation | BLOCKED | `R02-03-team-player-coach-and-formation.md` | 等待前置节点 |
+| R2-02 | Competition 与 Routing | DONE | [`R02-02-competition-and-routing.md`](R02-02-competition-and-routing.md) | workflow run `31088698579`、job `92574240109` 通过 |
+| R2-03 | Team / Player / Coach / Formation | VERIFYING | [`R02-03-team-player-coach-and-formation.md`](R02-03-team-player-coach-and-formation.md) | 实施 run `31100515822` 已通过；正式 Windows Automated 待确认 |
 | R2-04 | Lineup 与 Match | BLOCKED | `R02-04-lineup-and-match.md` | 等待前置节点 |
 | R2-05 | Prediction 与 Research 外围领域 | BLOCKED | `R02-05-prediction-and-research-外围领域.md` | 等待前置节点 |
 | R2-06 | Review 与 Postmatch | BLOCKED | `R02-06-review-and-postmatch.md` | 等待前置节点 |
@@ -64,7 +64,7 @@ R2-01 至 R2-08 全部 `DONE` 后创建 `R02-stage-completion.md`，并实际完
 
 ## 当前阶段状态
 
-`R2-02 VERIFYING`；22 个类型已迁移到 Competition 与 Routing 目录，正式 Windows Automated 通过前不开放 R2-03。
+`R2-02 DONE`；`R2-03 VERIFYING`。72 个 Team、Player、Coach、Formation 与 Shared 类型已迁移，正式 Windows Automated 通过前不开放 R2-04。
 
 
 ## R2-02 当前结果
@@ -73,4 +73,13 @@ R2-01 至 R2-08 全部 `DONE` 后创建 `R02-stage-completion.md`，并实际完
 - Routing 8 个类型已按 identity、rules、binding、context、route 拆分。
 - 根级公共类型名继续通过兼容 re-export 保持不变；glob 根出口债务仍由 R2-08 统一退出。
 - `architecture/domain-migration-progress.json` 已将 R2-02 登记为完成迁移范围，清单门禁拒绝类型回退到目标目录之外。
+- 本节点未修改数据库迁移、SQL Row、Application、Tauri DTO、模型保护资产或生产依赖。
+
+
+## R2-03 当前结果
+
+- Team 17、Player 21、Coach 9、Formation 8、Shared 17，共 72 个类型已进入职责目录。
+- 根级公共类型名通过兼容 re-export 保持不变；新增业务语义模块路径与类型身份测试。
+- `architecture/domain-migration-progress.json` 已登记 R2-03，清单门禁拒绝 72 个类型回退到目标目录之外。
+- 实施 workflow run `31100515822` 的专项、架构、前端和 Rust 门禁已通过；正式 Windows Automated 待确认。
 - 本节点未修改数据库迁移、SQL Row、Application、Tauri DTO、模型保护资产或生产依赖。

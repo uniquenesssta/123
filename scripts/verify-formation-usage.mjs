@@ -8,7 +8,7 @@ const read = (p) =>
 const contractText = read("contracts/formation-usage-contract.json");
 const contract = JSON.parse(contractText);
 const migration = read("crates/persistence-postgres/migrations/0022_formations_and_usage.sql");
-const domain = read("crates/domain/src/lib.rs");
+const domain = read("crates/domain/src/formation/usage.rs") + read("crates/domain/src/formation/resolution.rs");
 const persistence = read("crates/persistence-postgres/src/formation_catalog.rs");
 const monthlyWorkbooks = read("crates/persistence-postgres/src/monthly_workbooks.rs");
 const integrationTests = read("crates/persistence-postgres/tests/postgres_integration.rs");

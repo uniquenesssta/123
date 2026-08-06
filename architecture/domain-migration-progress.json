@@ -1,6 +1,7 @@
 {
   "schemaVersion": "football.domain-migration-progress.v1",
   "completedTasks": [
-    "R2-02"
+    "R2-02",
+    "R2-03"
   ]
 }

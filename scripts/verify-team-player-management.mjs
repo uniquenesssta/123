@@ -19,7 +19,10 @@ const tauri = json("src-tauri/tauri.conf.json");
 const workspaceCargo = text("Cargo.toml");
 const cargoLock = text("Cargo.lock");
 const migration = text("crates/persistence-postgres/migrations/0020_team_player_management.sql");
-const domain = text("crates/domain/src/lib.rs");
+const teamListingDomain = text("crates/domain/src/team/listing.rs");
+const teamProfileDomain = text("crates/domain/src/team/profile.rs");
+const teamDetailDomain = text("crates/domain/src/team/detail.rs");
+const sharedBulkDeleteDomain = text("crates/domain/src/shared/bulk_delete.rs");
 const appCatalog = text("crates/application/src/player_catalog.rs");
 const persistenceCatalog = text("crates/persistence-postgres/src/team_catalog.rs");
 const playerPersistence = text("crates/persistence-postgres/src/player_catalog.rs");
@@ -72,10 +75,10 @@ for (const command of contract.commands) {
   assert(registry.includes(`commands::${command}`), `Tauri注册表缺少${command}`);
   assert(client.includes(`"${command}"`), `前端客户端缺少${command}`);
 }
-assert(domain.includes("pub struct TeamListQuery"), "领域层缺少球队列表查询");
-assert(domain.includes("pub struct TeamProfileDraft"), "领域层缺少球队档案草稿");
-assert(domain.includes("pub struct TeamDetail"), "领域层缺少球队详情");
-assert(domain.includes("pub struct BulkDeleteResult"), "领域层缺少批量删除结果");
+assert(teamListingDomain.includes("pub struct TeamListQuery"), "领域层缺少球队列表查询");
+assert(teamProfileDomain.includes("pub struct TeamProfileDraft"), "领域层缺少球队档案草稿");
+assert(teamDetailDomain.includes("pub struct TeamDetail"), "领域层缺少球队详情");
+assert(sharedBulkDeleteDomain.includes("pub struct BulkDeleteResult"), "领域层缺少批量删除结果");
 assert(appCatalog.includes("pub async fn list_teams"), "应用层缺少球队列表入口");
 assert(appCatalog.includes("pub async fn bulk_delete_players"), "应用层缺少球员批量删除入口");
 assert(appCatalog.includes("pub async fn bulk_delete_teams"), "应用层缺少球队批量删除入口");

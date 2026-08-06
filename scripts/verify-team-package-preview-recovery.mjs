@@ -6,7 +6,7 @@ const check = (condition, message) => {
 };
 
 const exchange = read("crates/persistence-postgres/src/spreadsheet_exchange.rs");
-const domain = read("crates/domain/src/lib.rs");
+const domain = read("crates/domain/src/player/status.rs");
 const migration = read("crates/persistence-postgres/migrations/0044_team_package_preview_recovery.sql");
 const types = read("src/types.ts");
 const players = read("src/pages/players.ts");
