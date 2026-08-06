@@ -2,13 +2,14 @@
 
 ## 阶段状态
 
-`IN_PROGRESS`
+`DONE`
 
-R00 已按 Windows-only 目标范围完成。R1 只建立可机器验证的架构边界和浏览器、Tauri、Application 组合根空壳，不迁移具体业务实现。
+R00 已按 Windows-only 目标范围完成。R1 已建立可机器验证的架构边界和浏览器、Tauri、Application 组合根空壳，未迁移具体业务实现。
 
 ## 前置基线
 
 - R00 阶段完成记录：[`../R00-baseline/R00-stage-completion.md`](../R00-baseline/R00-stage-completion.md)
+- R1 阶段完成记录：[`R01-stage-completion.md`](R01-stage-completion.md)
 - R00 完成前分支提交：`ab812dc2cef126cc46fe9914a63815e047739d75`
 - `new-B` 分支起点：`new-A` 提交 `36d34ba1ff73cbec575cf58594aa8c0329669496`
 - 目标平台：Windows
@@ -39,7 +40,7 @@ R00 已按 Windows-only 目标范围完成。R1 只建立可机器验证的架�
 | R1-02 | 边界验证脚本 | DONE | [`R01-02-边界验证脚本.md`](R01-02-边界验证脚本.md) | `npm run verify:architecture` 通过 | workflow run `31001470224` 通过 |
 | R1-03 | 浏览器组合根 | DONE | [`R01-03-浏览器组合根.md`](R01-03-浏览器组合根.md) | 浏览器组合根专项验证通过 | workflow run `31012168809` 通过 |
 | R1-04 | Tauri 组合根 | DONE | [`R01-04-tauri-组合根.md`](R01-04-tauri-组合根.md) | 专项契约、保护资产、格式和桌面 crate 编译通过 | workflow run `31037323146` 通过 |
-| R1-05 | Application 组合根 | VERIFYING | [`R01-05-application-组合根.md`](R01-05-application-组合根.md) | 专项门禁、前端和 Rust 全量验证通过 | Windows Automated 待执行 |
+| R1-05 | Application 组合根 | DONE | [`R01-05-application-组合根.md`](R01-05-application-组合根.md) | 专项门禁、前端和 Rust 全量验证通过 | workflow run `31073166446` 通过 |
 
 ## R1-01 完成结果
 
@@ -53,13 +54,14 @@ R00 已按 Windows-only 目标范围完成。R1 只建立可机器验证的架�
 
 ## 阶段出口
 
-全部节点完成后必须创建 `R01-stage-completion.md`，并实际通过：
+R1 阶段出口已实际满足并记录于 [`R01-stage-completion.md`](R01-stage-completion.md)：
 
 - 架构边界验证；
 - `npm run verify:frontend`（Windows）；
 - `npm run verify:rust`；
 - 公共命令契约；
-- 模型保护资产指纹。
+- 模型保护资产指纹；
+- Windows Automated release 构建、客户端启动和运行日志扫描。
 
 ## R1-02 完成结果
 
@@ -88,13 +90,17 @@ R00 已按 Windows-only 目标范围完成。R1 只建立可机器验证的架�
 - 真实 PostgreSQL、Windows Full 和用户本机 Windows 实机验收继续保留到最终统一验收。
 - R1-04 状态为 `DONE`；R1-05 开放为 `READY`。
 
-## R1-05 当前结果
+## R1-05 完成结果
 
 - 已建立 Application 组合根、兼容服务门面、模型注册表和持久化端口注册模块。
 - 默认模型注册和 PostgreSQL 具体导入分别收敛到唯一所有者；公共 Application API 和既有行为保持不变。
 - Application 专项门禁、架构门禁、完整前端验证和完整 Rust 验证已通过。
-- 正式 Windows Automated、release 客户端启动与运行日志证据待实施提交触发后确认。
+- workflow run `31073166446`、job `92525208547` 在正式验收提交 `08803725dcd9f403ffc25552c27d2a9c0d3acd2d` 上完整通过。
+- Tauri Windows release 构建通过；release 客户端首次启动即建立日志，客户端启动与状态载入通过。
+- 运行日志验收为 PASS：7 条记录、3 个完成操作，覆盖率与错误扫描通过。
+- 证据 artifact `8956912712` 大小 `14117884` 字节，SHA-256 为 `495d3c5e29f2b474e97b98f89dd64b6175cc6e9496dd77681c0a567e00c60016`。
+- 真实 PostgreSQL、Windows Full 和用户本机 Windows 实机验收继续保留到最终统一验收。
 
 ## 当前阶段状态
 
-`R1-05 VERIFYING`；正式 Windows Automated 通过前 R1 不关闭，也不开放 R2。
+`R1 DONE`；R1-01 至 R1-05 已全部关闭，R2 可在独立 Atomic Task 中开始。

@@ -1,7 +1,10 @@
 # R01-05 Application 组合根实施记录
 
-- 任务状态：`VERIFYING`
+- 任务状态：`DONE`
 - 前置基线：`f930b81a720ff1f87bb0e63cb39c9b14c6a2a23f`
+- 实施提交：`f2df52e9fb3a2506c6991089e7d8bbdc5868e326`
+- 正式验收提交：`08803725dcd9f403ffc25552c27d2a9c0d3acd2d`
+- 正式验收源码树：`e5b93e149270168bd4626e34b5a514c8779c0d51`
 - 目标平台：Windows
 
 ## 1. 完成内容
@@ -76,12 +79,21 @@
 - `npm run verify:rust`：通过。
 - `cargo fmt --all -- --check`：通过。
 
-正式 Windows Automated、release bundle、客户端启动和运行日志扫描由实施提交触发，当前等待结果；完成前本任务保持 `VERIFYING`。
+正式 Windows Automated 已在正式验收提交上实际通过：
+
+- Workflow run：`31073166446`。
+- Windows job：`92525208547`。
+- 架构边界、完整前端验证、Rust 格式、Clippy、工作区测试和 Tauri Windows release 构建：通过。
+- release 客户端首次启动即建立运行日志；客户端启动与状态载入：通过。
+- 运行日志验收：`PASS`，共 7 条记录、3 个完成操作，覆盖率与错误扫描通过。
+- 证据 artifact：`8956912712`，名称 `windows-automated-delivery-evidence-08803725dcd9f403ffc25552c27d2a9c0d3acd2d`，大小 `14117884` 字节。
+- artifact SHA-256：`495d3c5e29f2b474e97b98f89dd64b6175cc6e9496dd77681c0a567e00c60016`。
 
 ## 8. 未执行与剩余风险
 
-- 真实 PostgreSQL 实跑、Windows Full 交互验收和用户本机 Windows 10/11 实机验收按既定阶段策略保留到最终统一验收。
-- 在正式 Windows Automated 通过并写入证据前，不将 R1-05 或 R1 阶段标记为 `DONE`。
+- 真实 PostgreSQL 实跑尚未执行；18 个需要专用可写测试数据库的集成测试保持忽略，按既定策略保留到最终统一验收。
+- Windows Full 交互验收和用户本机 Windows 10/11 实机验收尚未执行，保留到最终统一验收。
+- 上述延期项已明确登记，不阻塞 R1-05 和 R1 阶段关闭，也不得在后续阶段描述为已通过。
 
 ## 9. 回退
 
