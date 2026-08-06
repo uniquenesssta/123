@@ -10,7 +10,6 @@ permissions:
 
 jobs:
   generate:
-    if: github.event.head_commit.message == 'chore(r2): bootstrap R2-01 inventory generation'
     runs-on: windows-latest
     steps:
       - name: Checkout
