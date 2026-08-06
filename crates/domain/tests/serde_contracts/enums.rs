@@ -3,16 +3,16 @@ use football_domain::{
     RouteSource,
 };
 use serde::{de::DeserializeOwned, Serialize};
-use std::fmt::Debug;
 
 fn assert_json_name<T>(value: T, expected: &str)
 where
-    T: Serialize + DeserializeOwned + PartialEq + Debug,
+    T: Serialize + DeserializeOwned,
 {
     let serialized = serde_json::to_string(&value).expect("enum should serialize");
     assert_eq!(serialized, format!("\"{expected}\""));
     let round_trip: T = serde_json::from_str(&serialized).expect("enum should deserialize");
-    assert_eq!(round_trip, value);
+    let reserialized = serde_json::to_string(&round_trip).expect("round-tripped enum should serialize");
+    assert_eq!(reserialized, serialized);
 }
 
 #[test]
