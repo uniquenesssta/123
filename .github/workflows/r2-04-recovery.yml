@@ -3,7 +3,7 @@ name: R2-04 One-Time Recovery
 on:
   workflow_run:
     workflows:
-      - R2-04 Cancel Stale Runs
+      - Public Platform CI
     types:
       - completed
 
@@ -12,7 +12,7 @@ permissions:
 
 jobs:
   recover:
-    if: "${{ github.event.workflow_run.id == 31119579372 }}"
+    if: "${{ github.event.workflow_run.head_branch == 'agent/r2-04-recovery-pulse' }}"
     runs-on: windows-2022
     timeout-minutes: 120
 
