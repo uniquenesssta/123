@@ -116,7 +116,9 @@ jobs:
             ".github/workflows/r2-04-implement-windows-2022.yml",
             ".github/workflows/r2-04-implement-no-actions.yml",
             ".github/workflows/r2-04-implement-no-actions-fixed.yml",
-            ".github/workflows/r2-04-implement-commit-final.yml"
+            ".github/workflows/r2-04-implement-commit-final.yml",
+            ".github/workflows/r2-04-fix-validator.yml",
+            ".github/r2-04-trigger"
           )
           foreach ($path in $temporaryWorkflows) {
             if (Test-Path $path) {
@@ -176,7 +178,7 @@ jobs:
           }
 
           output = subprocess.check_output(
-              ["git", "diff", "--cached", "--name-only", base],
+              ["git", "diff", "--cached", "--no-renames", "--name-only", base],
               text=True,
               encoding="utf-8",
           ).replace("\r\n", "\n")
@@ -187,7 +189,7 @@ jobs:
               raise RuntimeError("Unexpected R2-04 staged change set")
 
           status = subprocess.check_output(
-              ["git", "diff", "--cached", "--name-status", base],
+              ["git", "diff", "--cached", "--no-renames", "--name-status", base],
               text=True,
               encoding="utf-8",
           ).replace("\r\n", "\n")
@@ -202,6 +204,10 @@ jobs:
               raise RuntimeError("docs/README.md is not the populated canonical record")
           if any(Path(".github/workflows").glob("r2-04-implement*.yml")):
               raise RuntimeError("Temporary R2-04 implementation workflow remains")
+          if Path(".github/workflows/r2-04-fix-validator.yml").exists():
+              raise RuntimeError("Temporary R2-04 validator repair workflow remains")
+          if Path(".github/r2-04-trigger").exists():
+              raise RuntimeError("Temporary R2-04 trigger remains")
           for transient in ("execute_r2_04_apply.ps1", "extract_r2_04_apply.py"):
               if Path(transient).exists():
                   raise RuntimeError(f"Transient file remains: {transient}")
