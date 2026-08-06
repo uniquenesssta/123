@@ -1,0 +1,92 @@
+name: R2-04 Validator Repair
+
+on:
+  push:
+    branches:
+      - new-B
+
+permissions:
+  contents: write
+
+jobs:
+  repair:
+    if: "${{ github.event.head_commit.message == 'chore(r2): repair R2-04 validator' }}"
+    runs-on: windows-2022
+    timeout-minutes: 15
+
+    steps:
+      - name: Manual checkout
+        shell: pwsh
+        env:
+          GH_TOKEN_VALUE: ${{ github.token }}
+        run: |
+          $ErrorActionPreference = "Stop"
+          $basic = [Convert]::ToBase64String([Text.Encoding]::ASCII.GetBytes("x-access-token:$env:GH_TOKEN_VALUE"))
+          git init .
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          git remote add origin https://github.com/uniquenesssta/123.git
+          git -c "http.https://github.com/.extraheader=AUTHORIZATION: Basic $basic" fetch --no-tags origin $env:GITHUB_SHA
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          git checkout -B new-B FETCH_HEAD
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          git config --local "http.https://github.com/.extraheader" "AUTHORIZATION: Basic $basic"
+          git config --local gc.auto 0
+
+      - name: Repair rename-aware final validation
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = "Stop"
+          @'
+          from pathlib import Path
+
+          path = Path(".github/workflows/r2-04-implement-commit-final.yml")
+          text = path.read_text(encoding="utf-8").replace("\r\n", "\n")
+          replacements = {
+              '["git", "diff", "--cached", "--name-only", base],':
+                  '["git", "diff", "--cached", "--no-renames", "--name-only", base],',
+              '["git", "diff", "--cached", "--name-status", base],':
+                  '["git", "diff", "--cached", "--no-renames", "--name-status", base],',
+          }
+          for old, new in replacements.items():
+              if text.count(old) != 1:
+                  raise RuntimeError(f"Validator contract mismatch: {old}")
+              text = text.replace(old, new, 1)
+          if text.count('"--no-renames"') != 2:
+              raise RuntimeError("Rename detection was not disabled exactly twice")
+          path.write_text(text, encoding="utf-8", newline="\n")
+          '@ | Set-Content patch_r2_04_validator.py -Encoding utf8
+          python patch_r2_04_validator.py
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          Remove-Item patch_r2_04_validator.py -Force
+
+      - name: Commit repaired validator and trigger final run
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = "Stop"
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+          $remoteHead = (git ls-remote origin refs/heads/new-B).Split("`t")[0]
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          if ($remoteHead -ne $env:GITHUB_SHA) { throw "new-B changed during validator repair" }
+
+          git add .github/workflows/r2-04-implement-commit-final.yml
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          git rm .github/workflows/r2-04-fix-validator.yml
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          git diff --cached --check
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+
+          $changed = @(git diff --cached --name-only)
+          $expected = @(
+            ".github/workflows/r2-04-fix-validator.yml",
+            ".github/workflows/r2-04-implement-commit-final.yml"
+          )
+          if (@($changed | Sort-Object) -join "`n" -ne @($expected | Sort-Object) -join "`n") {
+            throw "Unexpected validator repair change set"
+          }
+
+          git commit -m "chore(r2): finalize R2-04 implementation commit"
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          git push origin HEAD:new-B
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
