@@ -9,6 +9,7 @@ const nodeChecks = [
   "architecture/verifyModuleBoundaries.mjs",
   "architecture/verifyStateOwnership.mjs",
   "architecture/verifyProtectedImports.mjs",
+  "verify-domain-type-inventory.mjs",
   "verify-browser-bootstrap.mjs",
   "verify-tauri-bootstrap.mjs",
   "verify-application-composition.mjs",
