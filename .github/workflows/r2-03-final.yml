@@ -1,0 +1,89 @@
+name: R2-03 Final Implementation
+
+on:
+  push:
+    branches: [new-B]
+
+permissions:
+  contents: write
+
+jobs:
+  implement:
+    if: "${{ github.event.head_commit.message == 'chore(r2): finalize R2-03 implementation' }}"
+    runs-on: windows-latest
+    timeout-minutes: 120
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: package-lock.json
+      - uses: dtolnay/rust-toolchain@1.88.0
+        with:
+          components: rustfmt, clippy
+      - uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: . -> ../.cargo-target
+
+      - name: Apply digest-locked R2-03 migration
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = "Stop"
+          $parts = Get-ChildItem ".r2-03-payload/part*" | Sort-Object Name
+          if ($parts.Count -ne 6) { throw "Expected 6 payload parts, found $($parts.Count)" }
+          $base64 = ($parts | ForEach-Object { [IO.File]::ReadAllText($_.FullName) }) -join ""
+          $compressed = [Convert]::FromBase64String($base64)
+          $compressedDigest = [Convert]::ToHexString([Security.Cryptography.SHA256]::HashData($compressed)).ToLowerInvariant()
+          if ($compressedDigest -ne "baa6ae40b7d0d4d74c7a54d3dd8bc491f9962617a9758dfef31036a88c9e2a1a") { throw "Compressed payload digest mismatch: $compressedDigest" }
+          $input = [IO.MemoryStream]::new($compressed)
+          $gzip = [IO.Compression.GZipStream]::new($input, [IO.Compression.CompressionMode]::Decompress)
+          $output = [IO.MemoryStream]::new()
+          $gzip.CopyTo($output); $gzip.Dispose(); $input.Dispose()
+          $bytes = $output.ToArray(); $output.Dispose()
+          $digest = [Convert]::ToHexString([Security.Cryptography.SHA256]::HashData($bytes)).ToLowerInvariant()
+          if ($digest -ne "c1241b01d8e917fb12d993432fa029b412041bfa2a3cf3a091fcf58f02207902") { throw "Payload digest mismatch: $digest" }
+          $scriptPath = "scripts/r2-03-apply.py"
+          [IO.File]::WriteAllBytes($scriptPath, $bytes)
+          Add-Content ".git/info/exclude" "scripts/r2-03-apply.py"
+          python -m py_compile $scriptPath
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          Remove-Item "scripts/__pycache__" -Recurse -Force -ErrorAction SilentlyContinue
+          python $scriptPath
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          & ".r2-03-payload/patch-verifiers.ps1"
+
+      - name: Verify complete result
+        shell: pwsh
+        run: |
+          npm ci
+          cargo fmt --all
+          node scripts/generate-domain-type-inventory.mjs
+          cargo test --locked -p football-domain --test serde_contracts
+          npm run verify:architecture
+          node scripts/verify-protected-assets-deterministic.mjs
+          npm run verify:frontend
+          npm run verify:rust
+
+      - name: Commit verified result
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = "Stop"
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          Remove-Item "scripts/r2-03-apply.py" -Force
+          git rm .github/workflows/r2-03-implement.yml
+          git rm .github/workflows/r2-03-final.yml
+          Copy-Item ".r2-03-payload/expected-files.txt" "$env:RUNNER_TEMP/r2-03-expected-files.txt"
+          git rm -r .r2-03-payload
+          git add -A
+          git diff --cached --check
+          $base = "897a8bc0a43121908826eca41e0c1db3c2763889"
+          $expected = @(Get-Content "$env:RUNNER_TEMP/r2-03-expected-files.txt" | Where-Object { $_ } | Sort-Object)
+          $actual = @(git diff --name-only $base | Sort-Object)
+          $difference = Compare-Object $expected $actual
+          if ($difference) { $difference | Format-Table | Out-String | Write-Host; throw "Unexpected R2-03 final change set" }
+          git commit -m "rewrite(r2): implement R2-03 team player coach formation domains"
+          git push origin HEAD:new-B
