@@ -35,14 +35,20 @@ fn rule_package_defaults_and_nested_contract_round_trip() {
     assert_eq!(package.feature_requirements, Value::Null);
 
     let serialized = serde_json::to_value(package).expect("rule package should serialize");
-    assert_eq!(serialized["competition_profile"]["competition_kind"], json!("league"));
-    assert_eq!(serialized["format_version"], json!("football.rule-package.v1"));
+    assert_eq!(
+        serialized["competition_profile"]["competition_kind"],
+        json!("league")
+    );
+    assert_eq!(
+        serialized["format_version"],
+        json!("football.rule-package.v1")
+    );
 }
 
 #[test]
 fn lineup_legacy_json_keeps_default_snapshot_and_member_fields() {
-    let lineup: LineupDraft = serde_json::from_str(fixture("lineup"))
-        .expect("legacy lineup should deserialize");
+    let lineup: LineupDraft =
+        serde_json::from_str(fixture("lineup")).expect("legacy lineup should deserialize");
     assert_eq!(lineup.snapshot_type, "T-1h");
     assert_eq!(lineup.players.len(), 1);
     let player = &lineup.players[0];
