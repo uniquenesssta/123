@@ -1,0 +1,123 @@
+name: R2-04 One-Time Recovery
+
+on:
+  workflow_run:
+    workflows:
+      - Public Platform CI
+    types:
+      - completed
+
+permissions:
+  contents: write
+
+jobs:
+  recover:
+    if: "${{ github.event.workflow_run.id == 30893127717 && github.event.workflow_run.run_attempt >= 2 }}"
+    runs-on: windows-2022
+    timeout-minutes: 120
+
+    steps:
+      - name: Checkout latest new-B
+        shell: pwsh
+        env:
+          GH_TOKEN_VALUE: ${{ github.token }}
+        run: |
+          $ErrorActionPreference = "Stop"
+          $basic = [Convert]::ToBase64String([Text.Encoding]::ASCII.GetBytes("x-access-token:$env:GH_TOKEN_VALUE"))
+          git init .
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          git remote add origin https://github.com/uniquenesssta/123.git
+          git -c "http.https://github.com/.extraheader=AUTHORIZATION: Basic $basic" fetch --no-tags origin refs/heads/new-B
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          git checkout -B new-B FETCH_HEAD
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          git config --local "http.https://github.com/.extraheader" "AUTHORIZATION: Basic $basic"
+          git config --local gc.auto 0
+          $targetSha = (git rev-parse HEAD).Trim()
+          "TARGET_SHA=$targetSha" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
+          Write-Host "R2-04 target SHA: $targetSha"
+
+      - name: Prepare fixed toolchains
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = "Stop"
+          node --version
+          npm --version
+          rustup toolchain install 1.88.0 --component rustfmt --component clippy --profile minimal --no-self-update
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          rustup override set 1.88.0
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          rustc --version
+          cargo --version
+
+      - name: Execute corrected R2-04 final workflow
+        shell: pwsh
+        env:
+          BASE_SHA: 3256454e9d76b7b442a83f25964363256257cbcc
+        run: |
+          $ErrorActionPreference = "Stop"
+          @'
+          from pathlib import Path
+          import os
+          import textwrap
+
+          workflow = Path(".github/workflows/r2-04-implement-commit-final.yml")
+          source = workflow.read_text(encoding="utf-8").replace("\r\n", "\n")
+          if source.count('"--no-renames"') != 2:
+              raise RuntimeError("Corrected final validator is not present")
+
+          def extract(step_name: str, next_step: str | None) -> str:
+              marker = f"      - name: {step_name}\n"
+              if source.count(marker) != 1:
+                  raise RuntimeError(f"Step not found exactly once: {step_name}")
+              block = source.split(marker, 1)[1]
+              run_marker = "        run: |\n"
+              if block.count(run_marker) < 1:
+                  raise RuntimeError(f"Run block missing: {step_name}")
+              script = block.split(run_marker, 1)[1]
+              if next_step is not None:
+                  boundary = f"\n      - name: {next_step}\n"
+                  if script.count(boundary) != 1:
+                      raise RuntimeError(f"Step boundary mismatch: {step_name}")
+                  script = script.split(boundary, 1)[0]
+              return textwrap.dedent(script)
+
+          apply_script = extract("Apply canonical R2-04 migration", "Verify targeted and full gates")
+          verify_script = extract("Verify targeted and full gates", "Validate and commit final tree")
+          finalize_script = extract("Validate and commit final tree", None)
+          if finalize_script.count("$env:GITHUB_SHA") != 1:
+              raise RuntimeError("Final remote-head guard mismatch")
+          finalize_script = finalize_script.replace("$env:GITHUB_SHA", "$env:TARGET_SHA", 1)
+
+          target = Path(os.environ["RUNNER_TEMP"])
+          (target / "r2_04_apply.ps1").write_text(apply_script, encoding="utf-8", newline="\n")
+          (target / "r2_04_verify.ps1").write_text(verify_script, encoding="utf-8", newline="\n")
+          (target / "r2_04_finalize.ps1").write_text(finalize_script, encoding="utf-8", newline="\n")
+          '@ | Set-Content -Path $env:RUNNER_TEMP\prepare_r2_04_recovery.py -Encoding utf8
+          python $env:RUNNER_TEMP\prepare_r2_04_recovery.py
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          Remove-Item $env:RUNNER_TEMP\prepare_r2_04_recovery.py -Force
+
+          & pwsh -NoProfile -File $env:RUNNER_TEMP\r2_04_apply.ps1
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          & pwsh -NoProfile -File $env:RUNNER_TEMP\r2_04_verify.ps1
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          & pwsh -NoProfile -File $env:RUNNER_TEMP\r2_04_finalize.ps1
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+
+      - name: Remove one-time recovery workflow
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = "Stop"
+          git fetch --no-tags origin refs/heads/main
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          git checkout -B main FETCH_HEAD
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git rm .github/workflows/r2-04-recovery.yml
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          git commit -m "chore(r2): remove one-time recovery workflow"
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          git push origin HEAD:main
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
