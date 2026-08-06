@@ -11,7 +11,8 @@ where
     let serialized = serde_json::to_string(&value).expect("enum should serialize");
     assert_eq!(serialized, format!("\"{expected}\""));
     let round_trip: T = serde_json::from_str(&serialized).expect("enum should deserialize");
-    let reserialized = serde_json::to_string(&round_trip).expect("round-tripped enum should serialize");
+    let reserialized =
+        serde_json::to_string(&round_trip).expect("round-tripped enum should serialize");
     assert_eq!(reserialized, serialized);
 }
 
@@ -23,7 +24,10 @@ fn snake_case_enum_names_are_stable() {
     assert_json_name(AvailabilityStatus::Returning, "returning");
     assert_json_name(MatchStatus::Postponed, "postponed");
     assert_json_name(LineupType::Confirmed, "confirmed");
-    assert_json_name(RouteSource::CompetitionKindDefault, "competition_kind_default");
+    assert_json_name(
+        RouteSource::CompetitionKindDefault,
+        "competition_kind_default",
+    );
 }
 
 #[test]
