@@ -12,7 +12,7 @@ jobs:
   repair:
     if: "${{ github.event.head_commit.message == 'chore(r2): repair R2-04 validator' }}"
     runs-on: windows-2022
-    timeout-minutes: 15
+    timeout-minutes: 120
 
     steps:
       - name: Manual checkout
@@ -32,61 +32,82 @@ jobs:
           git config --local "http.https://github.com/.extraheader" "AUTHORIZATION: Basic $basic"
           git config --local gc.auto 0
 
-      - name: Repair rename-aware final validation
+      - name: Prepare fixed toolchains
         shell: pwsh
+        run: |
+          $ErrorActionPreference = "Stop"
+          node --version
+          npm --version
+          rustup toolchain install 1.88.0 --component rustfmt --component clippy --profile minimal --no-self-update
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          rustup override set 1.88.0
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          rustc --version
+          cargo --version
+
+      - name: Repair validator and execute final implementation
+        shell: pwsh
+        env:
+          BASE_SHA: 3256454e9d76b7b442a83f25964363256257cbcc
         run: |
           $ErrorActionPreference = "Stop"
           @'
           from pathlib import Path
+          import os
+          import textwrap
 
-          path = Path(".github/workflows/r2-04-implement-commit-final.yml")
-          text = path.read_text(encoding="utf-8").replace("\r\n", "\n")
+          workflow = Path(".github/workflows/r2-04-implement-commit-final.yml")
+          text = workflow.read_text(encoding="utf-8").replace("\r\n", "\n")
           replacements = {
               '["git", "diff", "--cached", "--name-only", base],':
                   '["git", "diff", "--cached", "--no-renames", "--name-only", base],',
               '["git", "diff", "--cached", "--name-status", base],':
                   '["git", "diff", "--cached", "--no-renames", "--name-status", base],',
+              '            ".github/workflows/r2-04-implement-commit-final.yml"\n          )':
+                  '            ".github/workflows/r2-04-implement-commit-final.yml",\n            ".github/workflows/r2-04-fix-validator.yml",\n            ".github/r2-04-trigger"\n          )',
           }
           for old, new in replacements.items():
               if text.count(old) != 1:
-                  raise RuntimeError(f"Validator contract mismatch: {old}")
+                  raise RuntimeError(f"Validator repair contract mismatch: {old}")
               text = text.replace(old, new, 1)
           if text.count('"--no-renames"') != 2:
               raise RuntimeError("Rename detection was not disabled exactly twice")
-          path.write_text(text, encoding="utf-8", newline="\n")
-          '@ | Set-Content patch_r2_04_validator.py -Encoding utf8
-          python patch_r2_04_validator.py
-          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
-          Remove-Item patch_r2_04_validator.py -Force
+          workflow.write_text(text, encoding="utf-8", newline="\n")
 
-      - name: Commit repaired validator and trigger final run
-        shell: pwsh
-        run: |
-          $ErrorActionPreference = "Stop"
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          def extract_step(step_name: str) -> str:
+              marker = f"      - name: {step_name}\n"
+              if text.count(marker) != 1:
+                  raise RuntimeError(f"Step not found exactly once: {step_name}")
+              block = text.split(marker, 1)[1]
+              run_marker = "        run: |\n"
+              if block.count(run_marker) < 1:
+                  raise RuntimeError(f"Run block missing: {step_name}")
+              script = block.split(run_marker, 1)[1]
+              boundary = "\n      - name:"
+              if boundary in script:
+                  script = script.split(boundary, 1)[0]
+              return textwrap.dedent(script)
 
-          $remoteHead = (git ls-remote origin refs/heads/new-B).Split("`t")[0]
-          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
-          if ($remoteHead -ne $env:GITHUB_SHA) { throw "new-B changed during validator repair" }
-
-          git add .github/workflows/r2-04-implement-commit-final.yml
-          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
-          git rm .github/workflows/r2-04-fix-validator.yml
-          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
-          git diff --cached --check
-          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
-
-          $changed = @(git diff --cached --name-only)
-          $expected = @(
-            ".github/workflows/r2-04-fix-validator.yml",
-            ".github/workflows/r2-04-implement-commit-final.yml"
+          temp = Path(os.environ["RUNNER_TEMP"])
+          steps = (
+              ("Apply canonical R2-04 migration", "r2_04_apply.ps1"),
+              ("Verify targeted and full gates", "r2_04_verify.ps1"),
+              ("Validate and commit final tree", "r2_04_finalize.ps1"),
           )
-          if (@($changed | Sort-Object) -join "`n" -ne @($expected | Sort-Object) -join "`n") {
-            throw "Unexpected validator repair change set"
-          }
-
-          git commit -m "chore(r2): finalize R2-04 implementation commit"
+          for step_name, filename in steps:
+              (temp / filename).write_text(
+                  extract_step(step_name),
+                  encoding="utf-8",
+                  newline="\n",
+              )
+          '@ | Set-Content -Path $env:RUNNER_TEMP\prepare_r2_04_repair.py -Encoding utf8
+          python $env:RUNNER_TEMP\prepare_r2_04_repair.py
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
-          git push origin HEAD:new-B
+          Remove-Item $env:RUNNER_TEMP\prepare_r2_04_repair.py -Force
+
+          & pwsh -NoProfile -File $env:RUNNER_TEMP\r2_04_apply.ps1
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          & pwsh -NoProfile -File $env:RUNNER_TEMP\r2_04_verify.ps1
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          & pwsh -NoProfile -File $env:RUNNER_TEMP\r2_04_finalize.ps1
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
