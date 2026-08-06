@@ -76,6 +76,16 @@ try {
   rmSync(temporaryScript, { force: true });
 }
 
+const compositionVerifierPath = "scripts/verify-application-composition.mjs";
+let compositionVerifier = readFileSync(compositionVerifierPath, "utf8");
+if (!compositionVerifier.includes("model_registry/model_registry.rs")) {
+  throw new Error("application composition verifier model registry path anchor missing");
+}
+compositionVerifier = compositionVerifier
+  .replaceAll("model_registry/model_registry.rs", "model_registry/registry.rs")
+  .replaceAll('["mod.rs", "model_registry.rs"]', '["mod.rs", "registry.rs"]');
+writeFileSync(compositionVerifierPath, compositionVerifier);
+
 const verifierPath = "scripts/architecture/verifyProtectedImports.mjs";
 let verifier = readFileSync(verifierPath, "utf8").replaceAll("\r\n", "\n");
 
