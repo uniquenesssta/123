@@ -1,0 +1,217 @@
+name: R2-04 Lineup and Match Implementation Final V2
+
+on:
+  push:
+    branches:
+      - new-B
+
+permissions:
+  contents: write
+
+jobs:
+  implement:
+    if: "${{ github.event.head_commit.message == 'chore(r2): complete R2-04 path contract migration' }}"
+    runs-on: windows-latest
+    timeout-minutes: 120
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Setup Rust 1.88.0
+        uses: dtolnay/rust-toolchain@1.88.0
+        with:
+          components: rustfmt, clippy
+
+      - name: Restore Rust build cache
+        uses: Swatinem/rust-cache@v2
+
+      - name: Apply R2-04 migration and all affected path contracts
+        shell: pwsh
+        env:
+          BASE_SHA: 3256454e9d76b7b442a83f25964363256257cbcc
+        run: |
+          $ErrorActionPreference = "Stop"
+          @'
+          from pathlib import Path
+          import textwrap
+
+          workflow = Path(".github/workflows/r2-04-implement.yml").read_text(encoding="utf-8").replace("\r\n", "\n")
+          start_marker = "          @'\n"
+          end_marker = "          '@ | Set-Content -Path r2_04_apply.py -Encoding utf8"
+          if workflow.count(start_marker) != 1 or workflow.count(end_marker) != 1:
+              raise RuntimeError("Unable to extract original R2-04 migration script")
+          script = textwrap.dedent(workflow.split(start_marker, 1)[1].split(end_marker, 1)[0])
+          old = 'lib = lib.split(marker, 1)[0].rstrip() + "\\n"'
+          new = '''lib = lib.split(marker, 1)[0].rstrip() + "\\n\\n" + """fn default_true() -> bool {
+              true
+          }
+
+          fn default_team_page_limit() -> u32 {
+              50
+          }
+
+          fn default_confidence() -> f64 {
+              1.0
+          }
+          """'''
+          if script.count(old) != 1:
+              raise RuntimeError("R2-04 helper preservation patch did not match exactly once")
+          Path("r2_04_apply.py").write_text(script.replace(old, new, 1), encoding="utf-8", newline="\n")
+          '@ | Set-Content -Path extract_r2_04.py -Encoding utf8
+          python extract_r2_04.py
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          Remove-Item extract_r2_04.py -Force
+          python r2_04_apply.py
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          Remove-Item r2_04_apply.py -Force
+
+          @'
+          from pathlib import Path
+
+          changed = []
+          for path in sorted(Path("scripts").rglob("*.mjs")):
+              original = path.read_text(encoding="utf-8").replace("\r\n", "\n")
+              updated = original.replace('"README.md"', '"docs/README.md"')
+              updated = updated.replace("'README.md'", "'docs/README.md'")
+              updated = updated.replace("../README.md", "../docs/README.md")
+              updated = updated.replace("crates/domain/src/lineup_chain.rs", "crates/domain/src/lineup/chain.rs")
+              if path.as_posix() == "scripts/verify-player-role-inheritance.mjs":
+                  old = 'requireTokens("crates/domain/src/lib.rs", [\n  "pub role_origin: String",\n], "阵容领域模型");'
+                  new = 'requireTokens("crates/domain/src/lineup/player.rs", [\n  "pub role_origin: String",\n], "阵容领域模型");'
+                  if updated.count(old) != 1:
+                      raise RuntimeError("player role verifier module path did not match exactly once")
+                  updated = updated.replace(old, new, 1)
+                  updated = updated.replace("根 README 没有本次完整变更记录", "docs README 没有本次完整变更记录")
+              if updated != original:
+                  path.write_text(updated, encoding="utf-8", newline="\n")
+                  changed.append(path.as_posix())
+
+          docs_readme = Path("docs/README.md").read_text(encoding="utf-8")
+          docs_readme += "\n- 所有读取变更记录的仓库验证器已同步使用 `docs/README.md`；根 README 不再承担验证记录职责。\n"
+          Path("docs/README.md").write_text(docs_readme, encoding="utf-8", newline="\n")
+
+          task = Path("docs/modular-rewrite/R02-domain-rewrite/R02-04-lineup-and-match.md")
+          text = task.read_text(encoding="utf-8")
+          text = text.replace(
+              "- 将根目录 README 原内容迁移至 `docs/README.md`，根 `README.md` 置为空白；后续统一在 `docs/README.md` 记录项目变更。",
+              "- 将根目录 README 原内容迁移至 `docs/README.md`，根 `README.md` 置为空白；后续统一在 `docs/README.md` 记录项目变更。\n- 同步更新仓库验证器的变更记录读取路径，并将阵容字段与链路验证指向新的职责模块。",
+          )
+          task.write_text(text, encoding="utf-8", newline="\n")
+          print("Updated validation contracts:")
+          for item in changed:
+              print(f"- {item}")
+          '@ | Set-Content -Path update_contract_paths.py -Encoding utf8
+          python update_contract_paths.py
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          Remove-Item update_contract_paths.py -Force
+          cargo fmt --all
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+
+      - name: Install frontend dependencies
+        run: npm ci
+
+      - name: Verify targeted Serde and module path contracts
+        run: cargo test --locked -p football-domain --test serde_contracts
+
+      - name: Regenerate and verify Domain inventory
+        shell: pwsh
+        run: |
+          node scripts/generate-domain-type-inventory.mjs
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          node scripts/verify-domain-type-inventory.mjs
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+
+      - name: Verify architecture and protected assets
+        shell: pwsh
+        run: |
+          npm run verify:architecture
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          node scripts/verify-protected-assets-deterministic.mjs
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+
+      - name: Verify frontend
+        run: npm run verify:frontend
+
+      - name: Verify Rust workspace
+        run: npm run verify:rust
+
+      - name: Commit R2-04 implementation
+        shell: pwsh
+        env:
+          BASE_SHA: 3256454e9d76b7b442a83f25964363256257cbcc
+        run: |
+          $ErrorActionPreference = "Stop"
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          $remoteHead = (git ls-remote origin refs/heads/new-B).Split("`t")[0]
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          if ($remoteHead -ne $env:GITHUB_SHA) { throw "new-B changed during R2-04 implementation" }
+
+          git rm .github/workflows/r2-04-implement.yml .github/workflows/r2-04-implement-retry.yml .github/workflows/r2-04-implement-final.yml .github/workflows/r2-04-implement-final-v2.yml
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          git add -A
+          git diff --cached --check
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+
+          @'
+          import subprocess
+          from pathlib import Path
+
+          base = "3256454e9d76b7b442a83f25964363256257cbcc"
+          required = {
+              "README.md", "architecture/domain-migration-progress.json", "architecture/domain-type-inventory.json",
+              "crates/domain/src/lib.rs", "crates/domain/src/lineup/chain.rs", "crates/domain/src/lineup/kind.rs",
+              "crates/domain/src/lineup/mod.rs", "crates/domain/src/lineup/player.rs", "crates/domain/src/lineup/preset.rs",
+              "crates/domain/src/lineup/snapshot.rs", "crates/domain/src/lineup_chain.rs",
+              "crates/domain/src/match_record/catalog.rs", "crates/domain/src/match_record/mod.rs",
+              "crates/domain/src/match_record/status.rs", "crates/domain/tests/serde_contracts/module_paths.rs",
+              "docs/README.md", "docs/modular-rewrite/R02-domain-rewrite/R02-04-lineup-and-match.md",
+              "docs/modular-rewrite/R02-domain-rewrite/README.md", "scripts/domain-inventory/target-module-policy.mjs",
+          }
+          def git(*args):
+              return subprocess.check_output(["git", *args], text=True, encoding="utf-8").replace("\r\n", "\n")
+
+          expected = set(required)
+          for path in [p for p in git("ls-tree", "-r", "--name-only", base, "scripts").splitlines() if p.endswith(".mjs")]:
+              original = git("show", f"{base}:{path}")
+              transformed = original.replace('"README.md"', '"docs/README.md"').replace("'README.md'", "'docs/README.md'")
+              transformed = transformed.replace("../README.md", "../docs/README.md")
+              transformed = transformed.replace("crates/domain/src/lineup_chain.rs", "crates/domain/src/lineup/chain.rs")
+              if path == "scripts/verify-player-role-inheritance.mjs":
+                  transformed = transformed.replace(
+                      'requireTokens("crates/domain/src/lib.rs", [\n  "pub role_origin: String",\n], "阵容领域模型");',
+                      'requireTokens("crates/domain/src/lineup/player.rs", [\n  "pub role_origin: String",\n], "阵容领域模型");',
+                  ).replace("根 README 没有本次完整变更记录", "docs README 没有本次完整变更记录")
+              if transformed != original:
+                  expected.add(path)
+                  current = Path(path).read_text(encoding="utf-8").replace("\r\n", "\n")
+                  if current != transformed:
+                      raise RuntimeError(f"Unexpected validation-contract change in {path}")
+
+          actual = set(git("diff", "--name-only", base).splitlines())
+          if actual != expected:
+              print("Missing:", sorted(expected - actual))
+              print("Unexpected:", sorted(actual - expected))
+              raise RuntimeError("Unexpected R2-04 change set")
+          if Path("README.md").read_bytes() != b"":
+              raise RuntimeError("Root README must be exactly empty")
+          if not Path("docs/README.md").read_text(encoding="utf-8").strip():
+              raise RuntimeError("docs/README.md must contain the canonical project record")
+          '@ | Set-Content -Path verify_r2_04_changes.py -Encoding utf8
+          python verify_r2_04_changes.py
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          Remove-Item verify_r2_04_changes.py -Force
+
+          git commit -m "rewrite(r2): implement R2-04 lineup and match domains"
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          git push origin HEAD:new-B
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
