@@ -3,7 +3,7 @@
 ## 1. 基本信息
 
 - 所属阶段：R01 架构契约与空壳组合根
-- 任务状态：`VERIFYING`
+- 任务状态：`DONE`
 - 实施分支：`new-B`
 - 开始基线：`8db5f460f25887edac6a6bf95932de6c46164e9a`
 - 正式实现提交：`c73a6bd1d28435700274fef4fa115e8f97ce294e`
@@ -203,30 +203,29 @@ R1-03 后的基线中，`crates/application/src/model_shell/mod.rs` 的排版与
 - `cargo check --locked -p football-match-model-desktop`；
 - `git diff --check`。
 
-## 10. 待执行验证与当前状态
+## 10. 最终验证与状态
 
-### Windows release 启动观测修正
+### Windows release 启动观测诊断
 
-- 正式 Automated run `31029576871` 已通过前端、Rust 与 Tauri bundle 构建，但单次 release 启动 45 秒内未观测到 runtime log。
+- 正式 Automated run `31029576871` 已通过前端、Rust 与 Tauri bundle 构建，但单次 release 启动 45 秒内未观测到 runtime log；该失败未计为通过。
 - 生命周期探针 run `31032667039` 已确认公共入口、Builder、setup、状态安装和日志写入十个节点全部到达，组合根本身无启动回归。
 - A/B run `31034333416` 在相同 Windows runner 布局中验证打包前与打包后 EXE 均成功启动并建立 runtime log；两者 SHA-256 分别为 `f9f1afaaeb19ade39642be7d158be1cb17d078d14650871328e469c961bd344d` 与 `fd60ab2a04c93df558478554fa4dfe49522c686d19deb35728a4cdadb3882939`。
 - 因此未修改 Tauri 组合根或打包流程；Windows 验收器改为按启动前日志路径集合识别新 session，首次 45 秒超时后最多重启一次，并为每次尝试保留 stdout/stderr。进程提前退出仍立即失败，连续两次超时仍硬失败。
-- 该修正只影响外部启动观测与诊断，不改变产品入口、171 条命令、状态所有权、bundle 产物、依赖、迁移或模型保护资产。
-- R1-04 保持 `VERIFYING`，等待清理临时工作流后的正式 Windows Automated。
 
-清理临时实施文件后的最终 HEAD 仍需通过正式 `Public Platform CI`，重新覆盖：
+### 清理后正式 Windows Automated
 
-- 完整架构门禁；
-- `npm run verify:frontend`；
-- Rust fmt、Clippy 和 workspace tests；
-- Tauri Windows release 构建；
-- release 客户端启动；
-- runtime 日志扫描；
-- 验证证据上传。
+- 启动观测修复提交：`379e1e1dfc4dfa7faed37c0900bcbbdd521d3f5e`。
+- 清理后同代码树验证提交：`5cb66fdedbfcaf89c86a7124f8894bdc71a533c9`。
+- workflow run：`31037323146`。
+- Windows job：`92412650719`。
+- 结论：`success`。
+- artifact：`8943939773`，名称 `windows-automated-delivery-evidence-5cb66fdedbfcaf89c86a7124f8894bdc71a533c9`，大小 `14119217` 字节，SHA-256 `7562c9137d52040627a58d9c8e104c4053b9923983a16daae08e4361e9a78f2b`，到期时间 2026-08-19T19:26:52Z。
+- Automated 报告：`status=pass`、应用版本 `0.23.0`、7 条记录、0 条无效记录、0 个运行时错误；完成操作为 `bootstrap`、`read_workspace_state`、`save_workspace_state`。
+- 前端契约、类型、截图与生产构建通过；Rust fmt、Clippy 与 workspace tests 通过；Tauri Windows release 通过；release 客户端在第 1 次尝试建立 runtime log；覆盖率与错误扫描通过。
+- stdout 与 stderr 诊断文件均为空，未触发第 2 次启动尝试。
+- 临时实施、探针、比较和 finalizer workflow 均未保留在最终交付树中。
 
-因此本节点保持 `VERIFYING`，R1-05 继续 `BLOCKED`。
-
-真实 PostgreSQL、Windows Full 交互验收和用户本机 Windows 实机验收继续保留到最终统一验收。
+R1-04 状态为 `DONE`，R1-05 开放为 `READY`。真实 PostgreSQL、Windows Full 交互验收和用户本机 Windows 实机验收继续保留到最终统一验收。
 
 ## 11. 回退
 
