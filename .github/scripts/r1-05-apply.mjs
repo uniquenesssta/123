@@ -18,10 +18,10 @@ if (!match) {
 
 let source = gunzipSync(Buffer.from(match[1], "base64")).toString("utf8");
 
-source = source
-  .replaceAll("model_registry/model_registry.rs", "model_registry/registry.rs")
-  .replaceAll("mod model_registry;", "mod registry;")
-  .replaceAll("pub use model_registry::ModelRegistry;", "pub use registry::ModelRegistry;");
+source = source.replaceAll(
+  "model_registry/model_registry.rs",
+  "model_registry/registry.rs",
+);
 
 function replaceOnce(search, replacement) {
   const index = source.indexOf(search);
@@ -30,6 +30,15 @@ function replaceOnce(search, replacement) {
   }
   source = `${source.slice(0, index)}${replacement}${source.slice(index + search.length)}`;
 }
+
+replaceOnce(
+  `mod model_registry;
+
+pub use model_registry::ModelRegistry;`,
+  `mod registry;
+
+pub use registry::ModelRegistry;`,
+);
 
 replaceOnce(
   '  "database.rs",\n  "openai_research.rs",',
