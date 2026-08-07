@@ -65,3 +65,10 @@ R2-08 之前继续保留既有根级兼容 re-export；本节点不提前处理�
 ## 6. 延期项
 
 真实 PostgreSQL、Windows Full 与用户本机 Windows 10/11 实机验收继续按既定计划保留到最终统一验收。
+
+## 7. 执行中记录
+
+- staged run `31158780693`：R2-05A Prediction 迁移、Serde 10/10、类型清单、架构与保护资产门禁通过并生成独立提交 `2cd685b8057a1bce2f75e4c7f5b56aed1bf3d142`；R2-05B Research 迁移与 Serde 11/11、类型清单、架构、保护资产、完整 frontend 通过，但完整 Rust 在 Clippy `-D warnings` 因 `prediction/orchestration/planning.rs` 两个未使用 import 停止，Research 未提交。
+- 已直接删除两个无效 import，不增加 `allow` 或放宽 Clippy。
+- recovery run `31159547810`：Prediction Serde 10/10 通过，随后类型清单因上述源文件变化后的指纹未刷新而按门禁停止；Research 未执行。
+- inventory refresh run `31159710816`：仅重新生成并验证 `architecture/domain-type-inventory.json`，成功后自清理临时 workflow；R2-05 仍为 `IMPLEMENTING`。
