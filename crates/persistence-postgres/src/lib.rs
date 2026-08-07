@@ -11,6 +11,7 @@ mod lineup_chain;
 mod match_exchange;
 mod match_prediction;
 mod match_review_package;
+mod migration_compatibility;
 mod model_runs;
 mod monthly_workbooks;
 mod name_search;
