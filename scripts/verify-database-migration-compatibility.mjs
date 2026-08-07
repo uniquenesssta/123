@@ -22,7 +22,18 @@ check(compatibility.includes("p4-software-integration") && compatibility.include
 check(compatibility.includes("COMPATIBLE_MIGRATION_VERSIONS: [i64; 11] = [12, 13, 14, 15, 16, 17, 18, 25, 26, 27, 31]"), "历史迁移兼容白名单发生变化");
 check(compatibility.includes("Sha384::digest(sql.as_bytes())"), "SQLx 迁移 checksum 未按 SHA-384 生成");
 check(compatibility.includes("UPDATE public._sqlx_migrations SET checksum=$2") && compatibility.includes("success=true"), "兼容桥没有只更新成功迁移的 checksum");
-check(compatibility.includes("golden_master_sha256") && compatibility.includes("provider_fixture_sha256"), "已知旧模型制品账本缺少公开字段兼容映射");
+check(
+  compatibility.includes("RENAME COLUMN golden_master_sha256 TO provider_fixture_sha256"),
+  "已知旧模型制品账本必须通过列重命名保留不可变记录，禁止行级复制",
+);
+check(
+  !compatibility.includes("UPDATE model.engine_artifacts SET provider_fixture_sha256"),
+  "历史兼容桥不得 UPDATE 不可变 model.engine_artifacts 记录",
+);
+check(
+  compatibility.includes("RENAME CONSTRAINT engine_artifacts_golden_master_sha256_check TO engine_artifacts_provider_fixture_sha256_check"),
+  "历史模型制品字段约束没有同步到公开字段名",
+);
 check(compatibility.includes("为保护数据，未修改迁移账本"), "未知迁移历史没有 fail-closed 保护语义");
 for (const destructive of ["DELETE FROM public._sqlx_migrations", "TRUNCATE", "DROP TABLE", "DROP SCHEMA"]) {
   check(!compatibility.includes(destructive), `历史兼容桥包含禁止的数据破坏操作：${destructive}`);
@@ -33,4 +44,4 @@ if (failures.length) {
   failures.forEach((failure) => console.error(`- ${failure}`));
   process.exit(1);
 }
-console.log("数据库历史迁移兼容验证通过：仅识别已登记旧来源、固定 11 个版本、先桥接结构再更新 SQLx SHA-384 checksum，未知历史保持 fail-closed。");
+console.log("数据库历史迁移兼容验证通过：仅识别已登记旧来源，模型制品字段通过无行更新重命名桥接，固定 11 个版本按 SQLx SHA-384 对账，未知历史保持 fail-closed。");
