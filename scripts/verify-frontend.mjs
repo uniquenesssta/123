@@ -57,6 +57,7 @@ const nodeChecks = [
   "verify-package-manager.mjs",
   "verify-cargo-target-guard.mjs",
   "verify-database-reset.mjs",
+  "verify-database-migration-compatibility.mjs",
   "verify-command-contract.mjs",
   "verify-entity-resource-center.mjs",
   "verify-team-package-localized-names.mjs",
