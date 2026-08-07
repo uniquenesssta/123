@@ -12,10 +12,6 @@ const FILE_POLICY = new Map([
   ["match_review_workflow.rs", ["review", "R2-06"]],
   ["review.rs", ["review", "R2-06"]],
   ["postmatch.rs", ["postmatch", "R2-06"]],
-  ["p4_orchestration.rs", ["prediction", "R2-05"]],
-  ["p4_persistence.rs", ["prediction", "R2-05"]],
-  ["p4_workbench.rs", ["prediction", "R2-05"]],
-  ["prediction_readiness.rs", ["prediction", "R2-05"]],
   ["release_acceptance.rs", ["release", "R2-07"]],
 ]);
 
@@ -26,6 +22,7 @@ const DIRECTORY_POLICY = new Map([
   ["lineup", ["lineup", "R2-04"]],
   ["match_record", ["match_record", "R2-04"]],
   ["player", ["player", "R2-03"]],
+  ["prediction", ["prediction", "R2-05"]],
   ["routing", ["routing", "R2-02"]],
   ["shared", ["shared", "R2-03"]],
   ["team", ["team", "R2-03"]],

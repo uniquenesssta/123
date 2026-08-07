@@ -23,14 +23,14 @@
     "currentPublicExportPolicy": "root glob re-export is recorded as current debt and removed only in R2-08",
     "targetPublicExportPolicy": "explicit re-export only"
   },
-  "sourceDigest": "62ce7a7f3512f6873b312e28d8bd9d87c01b9b323d731aab2814e8ec0d92e58c",
-  "rustUsageDigest": "bc5e6cfd804119564b81d6c4b0f9d9bc733cb45c6417da70b9ca33c180c5425a",
+  "sourceDigest": "9b0dbb3190b9efa6b8285a48980662a509815ab657fdcf2a8142dbc740a49ee3",
+  "rustUsageDigest": "4f1482e2fadbf2cf0e9952aef80376871524c3373c034cf321c4f6a94268b0a3",
   "summary": {
     "typeCount": 365,
     "publicCompatibilityTypeCount": 365,
     "internalTypeCount": 0,
-    "domainSourceFileCount": 69,
-    "scannedRustFileCount": 198,
+    "domainSourceFileCount": 79,
+    "scannedRustFileCount": 214,
     "databaseMappedTypeCount": 299,
     "byTargetModule": {
       "ai_workspace": 16,
@@ -4493,9 +4493,9 @@
         "crates/domain/src/competition/rule_package.rs",
         "crates/domain/src/competition/stage.rs",
         "crates/domain/src/exchange.rs",
-        "crates/domain/src/lib.rs",
-        "crates/domain/src/p4_orchestration.rs",
-        "crates/domain/src/p4_persistence.rs",
+        "crates/domain/src/prediction/context.rs",
+        "crates/domain/src/prediction/orchestration/planning.rs",
+        "crates/domain/src/prediction/persistence/version.rs",
         "crates/domain/src/routing/binding.rs",
         "crates/domain/src/routing/context.rs",
         "crates/domain/src/routing/route.rs",
@@ -4625,9 +4625,9 @@
       "typeName": "CompetitionProfileVersionDraft",
       "kind": "struct",
       "visibility": "public",
-      "currentPath": "crates/domain/src/p4_persistence.rs",
-      "currentModule": "football_domain::p4_persistence",
-      "sourceLine": 169,
+      "currentPath": "crates/domain/src/prediction/persistence/version.rs",
+      "currentModule": "football_domain::version",
+      "sourceLine": 50,
       "derives": [
         "Clone",
         "Debug",
@@ -4681,7 +4681,9 @@
       "currentRootExport": "glob_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
-      "domainCallers": [],
+      "domainCallers": [
+        "crates/domain/tests/serde_contracts/module_paths.rs"
+      ],
       "externalCallers": [
         "crates/application/src/p4_persistence.rs",
         "crates/persistence-postgres/src/p4_records.rs",
@@ -4696,9 +4698,9 @@
       "typeName": "CompetitionProfileVersionRecord",
       "kind": "struct",
       "visibility": "public",
-      "currentPath": "crates/domain/src/p4_persistence.rs",
-      "currentModule": "football_domain::p4_persistence",
-      "sourceLine": 180,
+      "currentPath": "crates/domain/src/prediction/persistence/version.rs",
+      "currentModule": "football_domain::version",
+      "sourceLine": 61,
       "derives": [
         "Clone",
         "Debug",
@@ -4746,7 +4748,9 @@
       "currentRootExport": "glob_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
-      "domainCallers": [],
+      "domainCallers": [
+        "crates/domain/tests/serde_contracts/module_paths.rs"
+      ],
       "externalCallers": [
         "crates/application/src/p4_persistence.rs",
         "crates/persistence-postgres/src/p4_records.rs"
@@ -6646,9 +6650,9 @@
       "typeName": "EvidenceClaimDraft",
       "kind": "struct",
       "visibility": "public",
-      "currentPath": "crates/domain/src/p4_persistence.rs",
-      "currentModule": "football_domain::p4_persistence",
-      "sourceLine": 239,
+      "currentPath": "crates/domain/src/prediction/persistence/evidence.rs",
+      "currentModule": "football_domain::evidence",
+      "sourceLine": 40,
       "derives": [
         "Clone",
         "Debug",
@@ -6800,7 +6804,9 @@
       "currentRootExport": "glob_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
-      "domainCallers": [],
+      "domainCallers": [
+        "crates/domain/tests/serde_contracts/module_paths.rs"
+      ],
       "externalCallers": [
         "crates/application/src/fact_pipeline.rs",
         "crates/application/src/p4_persistence.rs",
@@ -6815,9 +6821,9 @@
       "typeName": "EvidenceClaimRecord",
       "kind": "struct",
       "visibility": "public",
-      "currentPath": "crates/domain/src/p4_persistence.rs",
-      "currentModule": "football_domain::p4_persistence",
-      "sourceLine": 280,
+      "currentPath": "crates/domain/src/prediction/persistence/evidence.rs",
+      "currentModule": "football_domain::evidence",
+      "sourceLine": 81,
       "derives": [
         "Clone",
         "Debug",
@@ -6877,7 +6883,9 @@
       "currentRootExport": "glob_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
-      "domainCallers": [],
+      "domainCallers": [
+        "crates/domain/tests/serde_contracts/module_paths.rs"
+      ],
       "externalCallers": [
         "crates/application/src/fact_pipeline.rs",
         "crates/application/src/p4_persistence.rs",
@@ -6891,9 +6899,9 @@
       "typeName": "EvidenceConflictDraft",
       "kind": "struct",
       "visibility": "public",
-      "currentPath": "crates/domain/src/p4_persistence.rs",
-      "currentModule": "football_domain::p4_persistence",
-      "sourceLine": 292,
+      "currentPath": "crates/domain/src/prediction/persistence/evidence.rs",
+      "currentModule": "football_domain::evidence",
+      "sourceLine": 93,
       "derives": [
         "Clone",
         "Debug",
@@ -6957,7 +6965,9 @@
       "currentRootExport": "glob_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
-      "domainCallers": [],
+      "domainCallers": [
+        "crates/domain/tests/serde_contracts/module_paths.rs"
+      ],
       "externalCallers": [
         "crates/application/src/fact_pipeline.rs",
         "crates/application/src/p4_persistence.rs",
@@ -6972,9 +6982,9 @@
       "typeName": "EvidenceConflictRecord",
       "kind": "struct",
       "visibility": "public",
-      "currentPath": "crates/domain/src/p4_persistence.rs",
-      "currentModule": "football_domain::p4_persistence",
-      "sourceLine": 306,
+      "currentPath": "crates/domain/src/prediction/persistence/evidence.rs",
+      "currentModule": "football_domain::evidence",
+      "sourceLine": 107,
       "derives": [
         "Clone",
         "Debug",
@@ -7014,7 +7024,9 @@
       "currentRootExport": "glob_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
-      "domainCallers": [],
+      "domainCallers": [
+        "crates/domain/tests/serde_contracts/module_paths.rs"
+      ],
       "externalCallers": [
         "crates/application/src/p4_persistence.rs",
         "crates/persistence-postgres/src/p4_records.rs"
@@ -7677,9 +7689,9 @@
       "typeName": "EvidenceVerificationState",
       "kind": "enum",
       "visibility": "public",
-      "currentPath": "crates/domain/src/p4_persistence.rs",
-      "currentModule": "football_domain::p4_persistence",
-      "sourceLine": 45,
+      "currentPath": "crates/domain/src/prediction/persistence/evidence.rs",
+      "currentModule": "football_domain::evidence",
+      "sourceLine": 7,
       "derives": [
         "Clone",
         "Copy",
@@ -7748,7 +7760,9 @@
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
-        "crates/domain/src/p4_persistence.rs"
+        "crates/domain/src/prediction/persistence/evidence.rs",
+        "crates/domain/src/prediction/persistence/snapshot.rs",
+        "crates/domain/tests/serde_contracts/module_paths.rs"
       ],
       "externalCallers": [
         "crates/application/src/fact_pipeline.rs",
@@ -9529,9 +9543,9 @@
       "typeName": "MatchContext",
       "kind": "struct",
       "visibility": "public",
-      "currentPath": "crates/domain/src/lib.rs",
-      "currentModule": "football_domain",
-      "sourceLine": 64,
+      "currentPath": "crates/domain/src/prediction/context.rs",
+      "currentModule": "football_domain::context",
+      "sourceLine": 8,
       "derives": [
         "Clone",
         "Debug",
@@ -9602,10 +9616,11 @@
       "serializationName": "MatchContext",
       "publicCompatibilityType": true,
       "compatibilityLevel": "root_public_compatibility",
-      "currentRootExport": "root_definition",
+      "currentRootExport": "glob_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "none_detected",
       "domainCallers": [
+        "crates/domain/tests/serde_contracts/module_paths.rs",
         "crates/domain/tests/serde_contracts/round_trip.rs"
       ],
       "externalCallers": [
@@ -10442,9 +10457,9 @@
       "typeName": "MatchPredictionReadiness",
       "kind": "struct",
       "visibility": "public",
-      "currentPath": "crates/domain/src/prediction_readiness.rs",
-      "currentModule": "football_domain::prediction_readiness",
-      "sourceLine": 59,
+      "currentPath": "crates/domain/src/prediction/readiness/report.rs",
+      "currentModule": "football_domain::report",
+      "sourceLine": 22,
       "derives": [
         "Clone",
         "Debug",
@@ -10552,7 +10567,9 @@
       "currentRootExport": "glob_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "none_detected",
-      "domainCallers": [],
+      "domainCallers": [
+        "crates/domain/tests/serde_contracts/module_paths.rs"
+      ],
       "externalCallers": [
         "crates/application/src/prediction.rs",
         "src-tauri/src/commands/prediction.rs"
@@ -13026,7 +13043,7 @@
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "none_detected",
       "domainCallers": [
-        "crates/domain/src/lib.rs",
+        "crates/domain/src/prediction/result.rs",
         "crates/domain/src/routing/mod.rs",
         "crates/domain/tests/serde_contracts/module_paths.rs"
       ],
@@ -13510,9 +13527,9 @@
       "typeName": "P4ConflictWorkspaceRecord",
       "kind": "struct",
       "visibility": "public",
-      "currentPath": "crates/domain/src/p4_workbench.rs",
-      "currentModule": "football_domain::p4_workbench",
-      "sourceLine": 73,
+      "currentPath": "crates/domain/src/prediction/workbench/workspace.rs",
+      "currentModule": "football_domain::workspace",
+      "sourceLine": 71,
       "derives": [
         "Clone",
         "Debug",
@@ -13605,7 +13622,8 @@
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
-        "crates/domain/src/p4_workbench.rs"
+        "crates/domain/src/prediction/workbench/workspace.rs",
+        "crates/domain/tests/serde_contracts/module_paths.rs"
       ],
       "externalCallers": [
         "crates/persistence-postgres/src/p4_workbench.rs"
@@ -13618,9 +13636,9 @@
       "typeName": "P4EvidenceWorkspaceRecord",
       "kind": "struct",
       "visibility": "public",
-      "currentPath": "crates/domain/src/p4_workbench.rs",
-      "currentModule": "football_domain::p4_workbench",
-      "sourceLine": 45,
+      "currentPath": "crates/domain/src/prediction/workbench/workspace.rs",
+      "currentModule": "football_domain::workspace",
+      "sourceLine": 43,
       "derives": [
         "Clone",
         "Debug",
@@ -13731,7 +13749,8 @@
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
-        "crates/domain/src/p4_workbench.rs"
+        "crates/domain/src/prediction/workbench/workspace.rs",
+        "crates/domain/tests/serde_contracts/module_paths.rs"
       ],
       "externalCallers": [
         "crates/persistence-postgres/src/p4_workbench.rs"
@@ -13744,9 +13763,9 @@
       "typeName": "P4FreezeReadiness",
       "kind": "struct",
       "visibility": "public",
-      "currentPath": "crates/domain/src/p4_orchestration.rs",
-      "currentModule": "football_domain::p4_orchestration",
-      "sourceLine": 231,
+      "currentPath": "crates/domain/src/prediction/orchestration/readiness.rs",
+      "currentModule": "football_domain::readiness",
+      "sourceLine": 6,
       "derives": [
         "Clone",
         "Debug",
@@ -13811,7 +13830,8 @@
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
-        "crates/domain/src/p4_workbench.rs"
+        "crates/domain/src/prediction/workbench/workspace.rs",
+        "crates/domain/tests/serde_contracts/module_paths.rs"
       ],
       "externalCallers": [
         "crates/application/src/p4_orchestration.rs",
@@ -13826,9 +13846,9 @@
       "typeName": "P4FreezeTaskDraft",
       "kind": "struct",
       "visibility": "public",
-      "currentPath": "crates/domain/src/p4_orchestration.rs",
-      "currentModule": "football_domain::p4_orchestration",
-      "sourceLine": 166,
+      "currentPath": "crates/domain/src/prediction/orchestration/task.rs",
+      "currentModule": "football_domain::task",
+      "sourceLine": 9,
       "derives": [
         "Clone",
         "Debug",
@@ -13930,7 +13950,9 @@
       "currentRootExport": "glob_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
-      "domainCallers": [],
+      "domainCallers": [
+        "crates/domain/tests/serde_contracts/module_paths.rs"
+      ],
       "externalCallers": [
         "crates/application/src/p4_orchestration.rs",
         "crates/persistence-postgres/src/p4_orchestration.rs"
@@ -13943,9 +13965,9 @@
       "typeName": "P4FreezeTaskEventRecord",
       "kind": "struct",
       "visibility": "public",
-      "currentPath": "crates/domain/src/p4_orchestration.rs",
-      "currentModule": "football_domain::p4_orchestration",
-      "sourceLine": 220,
+      "currentPath": "crates/domain/src/prediction/orchestration/task.rs",
+      "currentModule": "football_domain::task",
+      "sourceLine": 63,
       "derives": [
         "Clone",
         "Debug",
@@ -14002,7 +14024,8 @@
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
-        "crates/domain/src/p4_workbench.rs"
+        "crates/domain/src/prediction/workbench/workspace.rs",
+        "crates/domain/tests/serde_contracts/module_paths.rs"
       ],
       "externalCallers": [
         "crates/application/src/p4_orchestration.rs",
@@ -14017,9 +14040,9 @@
       "typeName": "P4FreezeTaskRecord",
       "kind": "struct",
       "visibility": "public",
-      "currentPath": "crates/domain/src/p4_orchestration.rs",
-      "currentModule": "football_domain::p4_orchestration",
-      "sourceLine": 189,
+      "currentPath": "crates/domain/src/prediction/orchestration/task.rs",
+      "currentModule": "football_domain::task",
+      "sourceLine": 32,
       "derives": [
         "Clone",
         "Debug",
@@ -14156,7 +14179,8 @@
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
-        "crates/domain/src/p4_workbench.rs"
+        "crates/domain/src/prediction/workbench/workspace.rs",
+        "crates/domain/tests/serde_contracts/module_paths.rs"
       ],
       "externalCallers": [
         "crates/application/src/p4_orchestration.rs",
@@ -14171,9 +14195,9 @@
       "typeName": "P4FreezeTaskState",
       "kind": "enum",
       "visibility": "public",
-      "currentPath": "crates/domain/src/p4_orchestration.rs",
-      "currentModule": "football_domain::p4_orchestration",
-      "sourceLine": 13,
+      "currentPath": "crates/domain/src/prediction/orchestration/state.rs",
+      "currentModule": "football_domain::state",
+      "sourceLine": 4,
       "derives": [
         "Clone",
         "Copy",
@@ -14278,7 +14302,9 @@
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
-        "crates/domain/src/p4_orchestration.rs"
+        "crates/domain/src/prediction/orchestration/state.rs",
+        "crates/domain/src/prediction/orchestration/task.rs",
+        "crates/domain/tests/serde_contracts/module_paths.rs"
       ],
       "externalCallers": [
         "crates/application/src/p4_orchestration.rs",
@@ -14293,9 +14319,9 @@
       "typeName": "P4FreezeTaskTransition",
       "kind": "struct",
       "visibility": "public",
-      "currentPath": "crates/domain/src/p4_orchestration.rs",
-      "currentModule": "football_domain::p4_orchestration",
-      "sourceLine": 257,
+      "currentPath": "crates/domain/src/prediction/orchestration/task.rs",
+      "currentModule": "football_domain::task",
+      "sourceLine": 74,
       "derives": [
         "Clone",
         "Debug",
@@ -14375,7 +14401,9 @@
       "currentRootExport": "glob_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
-      "domainCallers": [],
+      "domainCallers": [
+        "crates/domain/tests/serde_contracts/module_paths.rs"
+      ],
       "externalCallers": [
         "crates/application/src/p4_orchestration.rs",
         "crates/application/src/p4_workbench.rs",
@@ -14389,9 +14417,9 @@
       "typeName": "P4Horizon",
       "kind": "enum",
       "visibility": "public",
-      "currentPath": "crates/domain/src/p4_persistence.rs",
-      "currentModule": "football_domain::p4_persistence",
-      "sourceLine": 13,
+      "currentPath": "crates/domain/src/prediction/horizon.rs",
+      "currentModule": "football_domain::horizon",
+      "sourceLine": 5,
       "derives": [
         "Clone",
         "Copy",
@@ -14454,8 +14482,12 @@
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
-        "crates/domain/src/p4_orchestration.rs",
-        "crates/domain/src/p4_persistence.rs"
+        "crates/domain/src/prediction/horizon.rs",
+        "crates/domain/src/prediction/orchestration/planning.rs",
+        "crates/domain/src/prediction/orchestration/task.rs",
+        "crates/domain/src/prediction/persistence/research.rs",
+        "crates/domain/src/prediction/persistence/snapshot.rs",
+        "crates/domain/tests/serde_contracts/module_paths.rs"
       ],
       "externalCallers": [
         "crates/application/src/p4_orchestration.rs",
@@ -14472,9 +14504,9 @@
       "typeName": "P4ManualConflictDecisionKind",
       "kind": "enum",
       "visibility": "public",
-      "currentPath": "crates/domain/src/p4_workbench.rs",
-      "currentModule": "football_domain::p4_workbench",
-      "sourceLine": 111,
+      "currentPath": "crates/domain/src/prediction/workbench/conflict.rs",
+      "currentModule": "football_domain::conflict",
+      "sourceLine": 8,
       "derives": [
         "Clone",
         "Copy",
@@ -14516,7 +14548,8 @@
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
-        "crates/domain/src/p4_workbench.rs"
+        "crates/domain/src/prediction/workbench/conflict.rs",
+        "crates/domain/tests/serde_contracts/module_paths.rs"
       ],
       "externalCallers": [
         "crates/application/src/p4_workbench.rs",
@@ -14530,9 +14563,9 @@
       "typeName": "P4ManualRouteOverrideDraft",
       "kind": "struct",
       "visibility": "public",
-      "currentPath": "crates/domain/src/p4_workbench.rs",
-      "currentModule": "football_domain::p4_workbench",
-      "sourceLine": 137,
+      "currentPath": "crates/domain/src/prediction/workbench/conflict.rs",
+      "currentModule": "football_domain::conflict",
+      "sourceLine": 34,
       "derives": [
         "Clone",
         "Debug",
@@ -14642,7 +14675,9 @@
       "currentRootExport": "glob_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
-      "domainCallers": [],
+      "domainCallers": [
+        "crates/domain/tests/serde_contracts/module_paths.rs"
+      ],
       "externalCallers": [
         "crates/application/src/p4_workbench.rs",
         "crates/persistence-postgres/src/p4_workbench.rs"
@@ -14655,9 +14690,9 @@
       "typeName": "P4ManualRouteOverrideRecord",
       "kind": "struct",
       "visibility": "public",
-      "currentPath": "crates/domain/src/p4_workbench.rs",
-      "currentModule": "football_domain::p4_workbench",
-      "sourceLine": 164,
+      "currentPath": "crates/domain/src/prediction/workbench/conflict.rs",
+      "currentModule": "football_domain::conflict",
+      "sourceLine": 61,
       "derives": [
         "Clone",
         "Debug",
@@ -14721,7 +14756,9 @@
       "currentRootExport": "glob_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
-      "domainCallers": [],
+      "domainCallers": [
+        "crates/domain/tests/serde_contracts/module_paths.rs"
+      ],
       "externalCallers": [
         "crates/persistence-postgres/src/p4_workbench.rs"
       ],
@@ -14733,9 +14770,9 @@
       "typeName": "P4MatchWorkspace",
       "kind": "struct",
       "visibility": "public",
-      "currentPath": "crates/domain/src/p4_workbench.rs",
-      "currentModule": "football_domain::p4_workbench",
-      "sourceLine": 13,
+      "currentPath": "crates/domain/src/prediction/workbench/workspace.rs",
+      "currentModule": "football_domain::workspace",
+      "sourceLine": 11,
       "derives": [
         "Clone",
         "Debug",
@@ -14793,7 +14830,9 @@
       "currentRootExport": "glob_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
-      "domainCallers": [],
+      "domainCallers": [
+        "crates/domain/tests/serde_contracts/module_paths.rs"
+      ],
       "externalCallers": [
         "crates/application/src/p4_workbench.rs",
         "crates/persistence-postgres/src/p4_workbench.rs",
@@ -14807,9 +14846,9 @@
       "typeName": "P4PlanningMatchContext",
       "kind": "struct",
       "visibility": "public",
-      "currentPath": "crates/domain/src/p4_orchestration.rs",
-      "currentModule": "football_domain::p4_orchestration",
-      "sourceLine": 145,
+      "currentPath": "crates/domain/src/prediction/orchestration/planning.rs",
+      "currentModule": "football_domain::planning",
+      "sourceLine": 8,
       "derives": [
         "Clone",
         "Debug",
@@ -14873,7 +14912,9 @@
       "currentRootExport": "glob_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
-      "domainCallers": [],
+      "domainCallers": [
+        "crates/domain/tests/serde_contracts/module_paths.rs"
+      ],
       "externalCallers": [
         "crates/persistence-postgres/src/p4_orchestration.rs"
       ],
@@ -14885,9 +14926,9 @@
       "typeName": "P4ResearchRunWorkspace",
       "kind": "struct",
       "visibility": "public",
-      "currentPath": "crates/domain/src/p4_workbench.rs",
-      "currentModule": "football_domain::p4_workbench",
-      "sourceLine": 25,
+      "currentPath": "crates/domain/src/prediction/workbench/workspace.rs",
+      "currentModule": "football_domain::workspace",
+      "sourceLine": 23,
       "derives": [
         "Clone",
         "Debug",
@@ -14968,7 +15009,8 @@
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
-        "crates/domain/src/p4_workbench.rs"
+        "crates/domain/src/prediction/workbench/workspace.rs",
+        "crates/domain/tests/serde_contracts/module_paths.rs"
       ],
       "externalCallers": [
         "crates/persistence-postgres/src/p4_workbench.rs"
@@ -14981,9 +15023,9 @@
       "typeName": "P4RoutedFact",
       "kind": "struct",
       "visibility": "public",
-      "currentPath": "crates/domain/src/p4_orchestration.rs",
-      "currentModule": "football_domain::p4_orchestration",
-      "sourceLine": 244,
+      "currentPath": "crates/domain/src/prediction/orchestration/readiness.rs",
+      "currentModule": "football_domain::readiness",
+      "sourceLine": 19,
       "derives": [
         "Clone",
         "Debug",
@@ -15048,7 +15090,8 @@
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
-        "crates/domain/src/p4_workbench.rs"
+        "crates/domain/src/prediction/workbench/workspace.rs",
+        "crates/domain/tests/serde_contracts/module_paths.rs"
       ],
       "externalCallers": [
         "crates/application/src/p4_orchestration.rs",
@@ -15062,9 +15105,9 @@
       "typeName": "P4TaskWorkspace",
       "kind": "struct",
       "visibility": "public",
-      "currentPath": "crates/domain/src/p4_workbench.rs",
-      "currentModule": "football_domain::p4_workbench",
-      "sourceLine": 96,
+      "currentPath": "crates/domain/src/prediction/workbench/workspace.rs",
+      "currentModule": "football_domain::workspace",
+      "sourceLine": 94,
       "derives": [
         "Clone",
         "Debug",
@@ -15128,7 +15171,9 @@
       "currentRootExport": "glob_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
-      "domainCallers": [],
+      "domainCallers": [
+        "crates/domain/tests/serde_contracts/module_paths.rs"
+      ],
       "externalCallers": [
         "crates/application/src/p4_workbench.rs",
         "crates/persistence-postgres/src/p4_workbench.rs",
@@ -16298,9 +16343,9 @@
       "typeName": "PersistedModelRun",
       "kind": "struct",
       "visibility": "public",
-      "currentPath": "crates/domain/src/lib.rs",
-      "currentModule": "football_domain",
-      "sourceLine": 91,
+      "currentPath": "crates/domain/src/prediction/result.rs",
+      "currentModule": "football_domain::result",
+      "sourceLine": 17,
       "derives": [
         "Clone",
         "Debug",
@@ -16353,10 +16398,12 @@
       "serializationName": "PersistedModelRun",
       "publicCompatibilityType": true,
       "compatibilityLevel": "root_public_compatibility",
-      "currentRootExport": "root_definition",
+      "currentRootExport": "glob_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "none_detected",
-      "domainCallers": [],
+      "domainCallers": [
+        "crates/domain/tests/serde_contracts/module_paths.rs"
+      ],
       "externalCallers": [],
       "databaseMappings": []
     },
@@ -16364,9 +16411,9 @@
       "typeName": "PlanP4HorizonsCommand",
       "kind": "struct",
       "visibility": "public",
-      "currentPath": "crates/domain/src/p4_orchestration.rs",
-      "currentModule": "football_domain::p4_orchestration",
-      "sourceLine": 158,
+      "currentPath": "crates/domain/src/prediction/orchestration/planning.rs",
+      "currentModule": "football_domain::planning",
+      "sourceLine": 21,
       "derives": [
         "Clone",
         "Debug",
@@ -16408,7 +16455,9 @@
       "currentRootExport": "glob_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "none_detected",
-      "domainCallers": [],
+      "domainCallers": [
+        "crates/domain/tests/serde_contracts/module_paths.rs"
+      ],
       "externalCallers": [
         "crates/application/src/p4_orchestration.rs",
         "src-tauri/src/commands/orchestration.rs"
@@ -19890,9 +19939,9 @@
       "typeName": "PredictionInputAuditSummary",
       "kind": "struct",
       "visibility": "public",
-      "currentPath": "crates/domain/src/prediction_readiness.rs",
-      "currentModule": "football_domain::prediction_readiness",
-      "sourceLine": 86,
+      "currentPath": "crates/domain/src/prediction/readiness/report.rs",
+      "currentModule": "football_domain::report",
+      "sourceLine": 49,
       "derives": [
         "Clone",
         "Debug",
@@ -19940,7 +19989,9 @@
       "currentRootExport": "glob_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "none_detected",
-      "domainCallers": [],
+      "domainCallers": [
+        "crates/domain/tests/serde_contracts/module_paths.rs"
+      ],
       "externalCallers": [
         "crates/application/src/lib.rs",
         "crates/application/src/prediction.rs"
@@ -19951,9 +20002,9 @@
       "typeName": "PredictionReadinessCheck",
       "kind": "struct",
       "visibility": "public",
-      "currentPath": "crates/domain/src/prediction_readiness.rs",
-      "currentModule": "football_domain::prediction_readiness",
-      "sourceLine": 45,
+      "currentPath": "crates/domain/src/prediction/readiness/report.rs",
+      "currentModule": "football_domain::report",
+      "sourceLine": 8,
       "derives": [
         "Clone",
         "Debug",
@@ -20018,7 +20069,8 @@
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "none_detected",
       "domainCallers": [
-        "crates/domain/src/prediction_readiness.rs"
+        "crates/domain/src/prediction/readiness/report.rs",
+        "crates/domain/tests/serde_contracts/module_paths.rs"
       ],
       "externalCallers": [
         "crates/application/src/prediction.rs"
@@ -20029,9 +20081,9 @@
       "typeName": "PredictionReadinessCheckStatus",
       "kind": "enum",
       "visibility": "public",
-      "currentPath": "crates/domain/src/prediction_readiness.rs",
-      "currentModule": "football_domain::prediction_readiness",
-      "sourceLine": 38,
+      "currentPath": "crates/domain/src/prediction/readiness/level.rs",
+      "currentModule": "football_domain::level",
+      "sourceLine": 33,
       "derives": [
         "Clone",
         "Copy",
@@ -20077,7 +20129,8 @@
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "none_detected",
       "domainCallers": [
-        "crates/domain/src/prediction_readiness.rs"
+        "crates/domain/src/prediction/readiness/report.rs",
+        "crates/domain/tests/serde_contracts/module_paths.rs"
       ],
       "externalCallers": [
         "crates/application/src/prediction.rs"
@@ -20088,9 +20141,9 @@
       "typeName": "PredictionReadinessLevel",
       "kind": "enum",
       "visibility": "public",
-      "currentPath": "crates/domain/src/prediction_readiness.rs",
-      "currentModule": "football_domain::prediction_readiness",
-      "sourceLine": 10,
+      "currentPath": "crates/domain/src/prediction/readiness/level.rs",
+      "currentModule": "football_domain::level",
+      "sourceLine": 5,
       "derives": [
         "Clone",
         "Copy",
@@ -20140,7 +20193,9 @@
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "none_detected",
       "domainCallers": [
-        "crates/domain/src/prediction_readiness.rs"
+        "crates/domain/src/prediction/readiness/level.rs",
+        "crates/domain/src/prediction/readiness/report.rs",
+        "crates/domain/tests/serde_contracts/module_paths.rs"
       ],
       "externalCallers": [
         "crates/application/src/prediction.rs"
@@ -20207,9 +20262,9 @@
       "typeName": "PredictionSummary",
       "kind": "struct",
       "visibility": "public",
-      "currentPath": "crates/domain/src/lib.rs",
-      "currentModule": "football_domain",
-      "sourceLine": 82,
+      "currentPath": "crates/domain/src/prediction/result.rs",
+      "currentModule": "football_domain::result",
+      "sourceLine": 8,
       "derives": [
         "Clone",
         "Debug",
@@ -20254,11 +20309,12 @@
       "serializationName": "PredictionSummary",
       "publicCompatibilityType": true,
       "compatibilityLevel": "root_public_compatibility",
-      "currentRootExport": "root_definition",
+      "currentRootExport": "glob_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "none_detected",
       "domainCallers": [
-        "crates/domain/src/lib.rs"
+        "crates/domain/src/prediction/result.rs",
+        "crates/domain/tests/serde_contracts/module_paths.rs"
       ],
       "externalCallers": [
         "crates/model-api/src/lib.rs"
@@ -20340,9 +20396,9 @@
       "typeName": "PrematchSnapshotBundle",
       "kind": "struct",
       "visibility": "public",
-      "currentPath": "crates/domain/src/p4_persistence.rs",
-      "currentModule": "football_domain::p4_persistence",
-      "sourceLine": 391,
+      "currentPath": "crates/domain/src/prediction/persistence/snapshot.rs",
+      "currentModule": "football_domain::snapshot",
+      "sourceLine": 112,
       "derives": [
         "Clone",
         "Debug",
@@ -20387,7 +20443,8 @@
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
-        "crates/domain/src/p4_workbench.rs"
+        "crates/domain/src/prediction/workbench/workspace.rs",
+        "crates/domain/tests/serde_contracts/module_paths.rs"
       ],
       "externalCallers": [
         "crates/application/src/p4_persistence.rs",
@@ -20401,9 +20458,9 @@
       "typeName": "PrematchSnapshotDraft",
       "kind": "struct",
       "visibility": "public",
-      "currentPath": "crates/domain/src/p4_persistence.rs",
-      "currentModule": "football_domain::p4_persistence",
-      "sourceLine": 350,
+      "currentPath": "crates/domain/src/prediction/persistence/snapshot.rs",
+      "currentModule": "football_domain::snapshot",
+      "sourceLine": 71,
       "derives": [
         "Clone",
         "Debug",
@@ -20511,7 +20568,9 @@
       "currentRootExport": "glob_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
-      "domainCallers": [],
+      "domainCallers": [
+        "crates/domain/tests/serde_contracts/module_paths.rs"
+      ],
       "externalCallers": [
         "crates/application/src/p4_orchestration.rs",
         "crates/application/src/p4_persistence.rs",
@@ -20526,9 +20585,9 @@
       "typeName": "PrematchSnapshotRecord",
       "kind": "struct",
       "visibility": "public",
-      "currentPath": "crates/domain/src/p4_persistence.rs",
-      "currentModule": "football_domain::p4_persistence",
-      "sourceLine": 375,
+      "currentPath": "crates/domain/src/prediction/persistence/snapshot.rs",
+      "currentModule": "football_domain::snapshot",
+      "sourceLine": 96,
       "derives": [
         "Clone",
         "Debug",
@@ -20605,7 +20664,8 @@
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
-        "crates/domain/src/p4_persistence.rs"
+        "crates/domain/src/prediction/persistence/snapshot.rs",
+        "crates/domain/tests/serde_contracts/module_paths.rs"
       ],
       "externalCallers": [
         "crates/application/src/p4_persistence.rs",
@@ -20682,9 +20742,9 @@
       "typeName": "PromptVersionDraft",
       "kind": "struct",
       "visibility": "public",
-      "currentPath": "crates/domain/src/p4_persistence.rs",
-      "currentModule": "football_domain::p4_persistence",
-      "sourceLine": 149,
+      "currentPath": "crates/domain/src/prediction/persistence/version.rs",
+      "currentModule": "football_domain::version",
+      "sourceLine": 30,
       "derives": [
         "Clone",
         "Debug",
@@ -20734,7 +20794,9 @@
       "currentRootExport": "glob_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
-      "domainCallers": [],
+      "domainCallers": [
+        "crates/domain/tests/serde_contracts/module_paths.rs"
+      ],
       "externalCallers": [
         "crates/application/src/openai_research.rs",
         "crates/application/src/p4_persistence.rs",
@@ -20748,9 +20810,9 @@
       "typeName": "PromptVersionRecord",
       "kind": "struct",
       "visibility": "public",
-      "currentPath": "crates/domain/src/p4_persistence.rs",
-      "currentModule": "football_domain::p4_persistence",
-      "sourceLine": 159,
+      "currentPath": "crates/domain/src/prediction/persistence/version.rs",
+      "currentModule": "football_domain::version",
+      "sourceLine": 40,
       "derives": [
         "Clone",
         "Debug",
@@ -20802,7 +20864,9 @@
       "currentRootExport": "glob_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
-      "domainCallers": [],
+      "domainCallers": [
+        "crates/domain/tests/serde_contracts/module_paths.rs"
+      ],
       "externalCallers": [
         "crates/application/src/p4_persistence.rs",
         "crates/persistence-postgres/src/p4_records.rs"
@@ -21816,9 +21880,9 @@
       "typeName": "ResearchRunDraft",
       "kind": "struct",
       "visibility": "public",
-      "currentPath": "crates/domain/src/p4_persistence.rs",
-      "currentModule": "football_domain::p4_persistence",
-      "sourceLine": 189,
+      "currentPath": "crates/domain/src/prediction/persistence/research.rs",
+      "currentModule": "football_domain::research",
+      "sourceLine": 32,
       "derives": [
         "Clone",
         "Debug",
@@ -21894,7 +21958,9 @@
       "currentRootExport": "glob_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
-      "domainCallers": [],
+      "domainCallers": [
+        "crates/domain/tests/serde_contracts/module_paths.rs"
+      ],
       "externalCallers": [
         "crates/application/src/p4_orchestration.rs",
         "crates/application/src/p4_persistence.rs",
@@ -21909,9 +21975,9 @@
       "typeName": "ResearchRunEventDraft",
       "kind": "struct",
       "visibility": "public",
-      "currentPath": "crates/domain/src/p4_persistence.rs",
-      "currentModule": "football_domain::p4_persistence",
-      "sourceLine": 220,
+      "currentPath": "crates/domain/src/prediction/persistence/research.rs",
+      "currentModule": "football_domain::research",
+      "sourceLine": 63,
       "derives": [
         "Clone",
         "Debug",
@@ -21987,7 +22053,9 @@
       "currentRootExport": "glob_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
-      "domainCallers": [],
+      "domainCallers": [
+        "crates/domain/tests/serde_contracts/module_paths.rs"
+      ],
       "externalCallers": [
         "crates/application/src/openai_research.rs",
         "crates/application/src/p4_persistence.rs",
@@ -22002,9 +22070,9 @@
       "typeName": "ResearchRunRecord",
       "kind": "struct",
       "visibility": "public",
-      "currentPath": "crates/domain/src/p4_persistence.rs",
-      "currentModule": "football_domain::p4_persistence",
-      "sourceLine": 207,
+      "currentPath": "crates/domain/src/prediction/persistence/research.rs",
+      "currentModule": "football_domain::research",
+      "sourceLine": 50,
       "derives": [
         "Clone",
         "Debug",
@@ -22068,7 +22136,9 @@
       "currentRootExport": "glob_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
-      "domainCallers": [],
+      "domainCallers": [
+        "crates/domain/tests/serde_contracts/module_paths.rs"
+      ],
       "externalCallers": [
         "crates/application/src/p4_persistence.rs",
         "crates/persistence-postgres/src/p4_orchestration.rs",
@@ -22083,9 +22153,9 @@
       "typeName": "ResearchRunStatus",
       "kind": "enum",
       "visibility": "public",
-      "currentPath": "crates/domain/src/p4_persistence.rs",
-      "currentModule": "football_domain::p4_persistence",
-      "sourceLine": 79,
+      "currentPath": "crates/domain/src/prediction/persistence/research.rs",
+      "currentModule": "football_domain::research",
+      "sourceLine": 9,
       "derives": [
         "Clone",
         "Copy",
@@ -22143,7 +22213,8 @@
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
-        "crates/domain/src/p4_persistence.rs"
+        "crates/domain/src/prediction/persistence/research.rs",
+        "crates/domain/tests/serde_contracts/module_paths.rs"
       ],
       "externalCallers": [
         "crates/application/src/openai_research.rs",
@@ -22312,9 +22383,9 @@
       "typeName": "ResolveP4ConflictCommand",
       "kind": "struct",
       "visibility": "public",
-      "currentPath": "crates/domain/src/p4_workbench.rs",
-      "currentModule": "football_domain::p4_workbench",
-      "sourceLine": 126,
+      "currentPath": "crates/domain/src/prediction/workbench/conflict.rs",
+      "currentModule": "football_domain::conflict",
+      "sourceLine": 23,
       "derives": [
         "Clone",
         "Debug",
@@ -22366,7 +22437,9 @@
       "currentRootExport": "glob_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "none_detected",
-      "domainCallers": [],
+      "domainCallers": [
+        "crates/domain/tests/serde_contracts/module_paths.rs"
+      ],
       "externalCallers": [
         "crates/application/src/p4_workbench.rs",
         "src-tauri/src/commands/orchestration.rs"
@@ -23474,9 +23547,9 @@
       "typeName": "SchemaVersionDraft",
       "kind": "struct",
       "visibility": "public",
-      "currentPath": "crates/domain/src/p4_persistence.rs",
-      "currentModule": "football_domain::p4_persistence",
-      "sourceLine": 127,
+      "currentPath": "crates/domain/src/prediction/persistence/version.rs",
+      "currentModule": "football_domain::version",
+      "sourceLine": 8,
       "derives": [
         "Clone",
         "Debug",
@@ -23532,7 +23605,9 @@
       "currentRootExport": "glob_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
-      "domainCallers": [],
+      "domainCallers": [
+        "crates/domain/tests/serde_contracts/module_paths.rs"
+      ],
       "externalCallers": [
         "crates/application/src/openai_research.rs",
         "crates/application/src/p4_persistence.rs",
@@ -23547,9 +23622,9 @@
       "typeName": "SchemaVersionRecord",
       "kind": "struct",
       "visibility": "public",
-      "currentPath": "crates/domain/src/p4_persistence.rs",
-      "currentModule": "football_domain::p4_persistence",
-      "sourceLine": 139,
+      "currentPath": "crates/domain/src/prediction/persistence/version.rs",
+      "currentModule": "football_domain::version",
+      "sourceLine": 20,
       "derives": [
         "Clone",
         "Debug",
@@ -23601,7 +23676,9 @@
       "currentRootExport": "glob_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
-      "domainCallers": [],
+      "domainCallers": [
+        "crates/domain/tests/serde_contracts/module_paths.rs"
+      ],
       "externalCallers": [
         "crates/application/src/p4_persistence.rs",
         "crates/persistence-postgres/src/p4_orchestration.rs",
@@ -23831,9 +23908,9 @@
       "typeName": "SnapshotFeatureDraft",
       "kind": "struct",
       "visibility": "public",
-      "currentPath": "crates/domain/src/p4_persistence.rs",
-      "currentModule": "football_domain::p4_persistence",
-      "sourceLine": 313,
+      "currentPath": "crates/domain/src/prediction/persistence/snapshot.rs",
+      "currentModule": "football_domain::snapshot",
+      "sourceLine": 34,
       "derives": [
         "Clone",
         "Debug",
@@ -23890,7 +23967,8 @@
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
-        "crates/domain/src/p4_persistence.rs"
+        "crates/domain/src/prediction/persistence/snapshot.rs",
+        "crates/domain/tests/serde_contracts/module_paths.rs"
       ],
       "externalCallers": [
         "crates/application/src/p4_orchestration.rs",
@@ -23905,9 +23983,9 @@
       "typeName": "SnapshotProbabilityDraft",
       "kind": "struct",
       "visibility": "public",
-      "currentPath": "crates/domain/src/p4_persistence.rs",
-      "currentModule": "football_domain::p4_persistence",
-      "sourceLine": 325,
+      "currentPath": "crates/domain/src/prediction/persistence/snapshot.rs",
+      "currentModule": "football_domain::snapshot",
+      "sourceLine": 46,
       "derives": [
         "Clone",
         "Debug",
@@ -23992,7 +24070,8 @@
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
-        "crates/domain/src/p4_persistence.rs"
+        "crates/domain/src/prediction/persistence/snapshot.rs",
+        "crates/domain/tests/serde_contracts/module_paths.rs"
       ],
       "externalCallers": [
         "crates/application/src/p4_orchestration.rs",
@@ -24007,9 +24086,9 @@
       "typeName": "SnapshotSourceKind",
       "kind": "enum",
       "visibility": "public",
-      "currentPath": "crates/domain/src/p4_persistence.rs",
-      "currentModule": "football_domain::p4_persistence",
-      "sourceLine": 103,
+      "currentPath": "crates/domain/src/prediction/persistence/snapshot.rs",
+      "currentModule": "football_domain::snapshot",
+      "sourceLine": 10,
       "derives": [
         "Clone",
         "Copy",
@@ -24055,7 +24134,8 @@
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
-        "crates/domain/src/p4_persistence.rs"
+        "crates/domain/src/prediction/persistence/snapshot.rs",
+        "crates/domain/tests/serde_contracts/module_paths.rs"
       ],
       "externalCallers": [
         "crates/application/src/p4_orchestration.rs",
