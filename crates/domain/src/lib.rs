@@ -41,6 +41,12 @@ pub use release_acceptance::*;
 pub use spreadsheet::*;
 pub use team_package::*;
 
-fn default_true() -> bool { true }
-fn default_team_page_limit() -> u32 { 50 }
-fn default_confidence() -> f64 { 1.0 }
+fn default_true() -> bool {
+    true
+}
+fn default_team_page_limit() -> u32 {
+    50
+}
+fn default_confidence() -> f64 {
+    1.0
+}
