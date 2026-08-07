@@ -69,21 +69,21 @@ BEGIN
         ) VALUES (
             'p4-release-acceptance', '1.0.0', '0.22.0', '0.23.0',
             'football.release-acceptance.v1',
-            '5ca32f5a6ef1e66de55fa121372da7c2d931906005aa97085d08e35330b49938', 'J',
+            '6efc001f08992097f08f16c8d6cdb38588fbaf7eced66aab09209d3e7a43df70', 'J',
             jsonb_build_object(
                 'contract_path', 'contracts/release-acceptance-contract.json',
-                'acceptance_mode', 'fixed_fixture_and_runtime',
+                'acceptance_mode', 'public_shell_and_runtime',
                 'categories', jsonb_build_array('chain','performance','security','cost','release'),
                 'immutable_reports', true,
                 'ui_reference', 'match_center',
                 'ui_aligned_pages', jsonb_build_array('teams','players','prediction'),
                 'automatic_parameter_promotion', false,
-                'p4_4_state', 'SHADOW_ONLY'
+                'external_provider_required', true
             )
         );
-    ELSIF existing_hash <> '5ca32f5a6ef1e66de55fa121372da7c2d931906005aa97085d08e35330b49938' THEN
+    ELSIF existing_hash <> '6efc001f08992097f08f16c8d6cdb38588fbaf7eced66aab09209d3e7a43df70' THEN
         RAISE EXCEPTION 'release acceptance contract hash conflict: existing %, expected %',
-            existing_hash, '5ca32f5a6ef1e66de55fa121372da7c2d931906005aa97085d08e35330b49938';
+            existing_hash, '6efc001f08992097f08f16c8d6cdb38588fbaf7eced66aab09209d3e7a43df70';
     END IF;
 END;
 $migration$;

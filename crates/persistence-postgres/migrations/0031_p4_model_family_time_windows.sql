@@ -1,5 +1,5 @@
--- P4 生产默认与赛前时间窗口语义。
--- T-90m 历史数据继续保留，但新正式链只使用 T-N / T-24h / T-6h / T-1h。
+-- Public model-provider entries and pre-match time-window semantics.
+-- T-90m historical data remains readable; new formal flows use T-N / T-24h / T-6h / T-1h.
 
 ALTER TABLE review.postmatch_settlements
     DROP CONSTRAINT IF EXISTS postmatch_settlements_horizon_check,
@@ -29,36 +29,33 @@ DECLARE
 BEGIN
     SELECT content_sha256 INTO existing_hash
     FROM platform.integration_contracts
-    WHERE contract_key = 'p4-model-family-time-windows'
-      AND contract_version = '1.1.0';
+    WHERE contract_key = 'model-provider-boundary'
+      AND contract_version = '1.0.0';
 
     IF existing_hash IS NULL THEN
         INSERT INTO platform.integration_contracts (
             contract_key, contract_version, baseline_source_version,
             release_version, schema_version, content_sha256, stage, metadata
         ) VALUES (
-            'p4-model-family-time-windows', '1.1.0', '0.23.0', '0.23.0',
-            'football.p4-model-family-time-windows-contract.v1',
-            'd36e757d7d70406231b9672793221901d3dd5953d085d6bd793ed740d46b65b4', 'J',
+            'model-provider-boundary', '1.0.0', '0.23.0', '0.23.0',
+            'football.model-provider-boundary.v1',
+            'ce4e4c13fb76d09888221181e0d8e5006de03c8445da828985949306adc0bd9e', 'J',
             jsonb_build_object(
-                'contract_path', 'contracts/p4-model-family-time-windows-contract.json',
-                'default_model_family', 'p4',
-                'selectable_model_families', jsonb_build_array('p4', 'p7'),
+                'contract_path', 'contracts/model-provider-boundary-contract.json',
+                'provider_kind', 'external',
+                'bundled_runtime', false,
+                'bundled_parameters', false,
+                'bundled_fixtures', false,
+                'selectable_model_entries', jsonb_build_array('p4', 'p7'),
                 'active_time_windows', jsonb_build_array('T-N', 'T-24h', 'T-6h', 'T-1h'),
                 'legacy_read_only_windows', jsonb_build_array('T-90m'),
-                'window_semantics', 'latest_record_within_selected_pre_match_window',
-                'p4_calculation_and_convergence_same_lineage', true,
-                'p4_base_lambda_method', 'p4_p2_time_forward_baseline_v1',
-                'p4_base_lambda_min_prior_matches', 8,
-                'p4_base_lambda_shrink_matches', 4,
-                'generic_dixon_coles_enabled', false,
-                'world_cup_knockout_rho', -0.13
+                'failure_mode', 'explicit_unavailable_error'
             )
         );
-    ELSIF existing_hash <> 'd36e757d7d70406231b9672793221901d3dd5953d085d6bd793ed740d46b65b4' THEN
-        RAISE EXCEPTION 'P4 model-family/time-window contract hash conflict: existing %, expected %',
+    ELSIF existing_hash <> 'ce4e4c13fb76d09888221181e0d8e5006de03c8445da828985949306adc0bd9e' THEN
+        RAISE EXCEPTION 'Model provider boundary contract hash conflict: existing %, expected %',
             existing_hash,
-            'd36e757d7d70406231b9672793221901d3dd5953d085d6bd793ed740d46b65b4';
+            'ce4e4c13fb76d09888221181e0d8e5006de03c8445da828985949306adc0bd9e';
     END IF;
 END;
 $migration$;

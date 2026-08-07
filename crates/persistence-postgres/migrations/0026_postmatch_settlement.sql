@@ -1,5 +1,5 @@
 -- 接入点 H：赛果结算、证据评分队列、供应商评分和正式分区漂移监控。
--- 所有正式统计继续严格隔离 model_version × competition_profile × parameter_version × horizon；P4.4 保持 SHADOW_ONLY。
+-- 所有正式统计继续严格隔离 model_version × competition_profile × parameter_version × horizon；公开仓库不捆绑模型提供器。
 
 CREATE TABLE IF NOT EXISTS review.postmatch_settlements (
     id uuid PRIMARY KEY,
@@ -418,8 +418,8 @@ BEGIN
             release_version, schema_version, content_sha256, stage, metadata
         ) VALUES (
             'p4-postmatch-settlement', '1.0.0', '0.21.0', '0.22.0',
-            'football.p4-postmatch-settlement.v1',
-            '04b791e84d6cbc93aafebe4e0701fe09d435df1aad9e01955efc7567ca58592c', 'H',
+            'football.model-postmatch-settlement.v1',
+            '9d9f4f1f5a284b6882f5c3415943033d606a5299060346bf0ddd0c7afe13051d', 'H',
             jsonb_build_object(
                 'contract_path', 'contracts/postmatch-settlement-contract.json',
                 'settlement_ready', true,
@@ -429,12 +429,12 @@ BEGIN
                 'formal_partition', 'model_version x competition_profile x parameter_version x horizon',
                 'manual_evidence_verdicts', true,
                 'automatic_parameter_promotion', false,
-                'p4_4_state', 'SHADOW_ONLY'
+                'provider_state', 'NOT_BUNDLED'
             )
         );
-    ELSIF existing_hash <> '04b791e84d6cbc93aafebe4e0701fe09d435df1aad9e01955efc7567ca58592c' THEN
+    ELSIF existing_hash <> '9d9f4f1f5a284b6882f5c3415943033d606a5299060346bf0ddd0c7afe13051d' THEN
         RAISE EXCEPTION 'postmatch settlement contract hash conflict: existing %, expected %',
-            existing_hash, '04b791e84d6cbc93aafebe4e0701fe09d435df1aad9e01955efc7567ca58592c';
+            existing_hash, '9d9f4f1f5a284b6882f5c3415943033d606a5299060346bf0ddd0c7afe13051d';
     END IF;
 END;
 $migration$;

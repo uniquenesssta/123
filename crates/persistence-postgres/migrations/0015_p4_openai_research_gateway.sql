@@ -1,6 +1,6 @@
 -- P4 接入D：OpenAI Responses API研究网关、尝试审计与Web Search引用账本。
 -- 不保存API密钥；请求载荷和原始响应均为不含Authorization头的JSON。
--- CONTRACT_SHA256 = 9a14071dbb42b480d5faa95fd0680a81a8a111caacf0126bba822f06f1bc2113
+-- CONTRACT_SHA256 = e35f951d2e1fa22746b39b6639ca9847b9590b26e0764d8f35405db98bfbfb57
 
 CREATE TABLE research.openai_attempts (
     id uuid PRIMARY KEY,
@@ -125,24 +125,24 @@ BEGIN
             '0.9.0',
             '0.10.0',
             'football.p4-research-gateway-contract.v1',
-            '9a14071dbb42b480d5faa95fd0680a81a8a111caacf0126bba822f06f1bc2113',
+            'e35f951d2e1fa22746b39b6639ca9847b9590b26e0764d8f35405db98bfbfb57',
             'D',
             jsonb_build_object(
-                'contract_path', 'contracts/p4-research-gateway-contract.json',
+                'contract_path', 'contracts/research-gateway-contract.json',
                 'api', 'responses',
                 'tool', 'web_search',
                 'strict_schema', true,
                 'secret_storage', 'windows_credential_manager_or_server_environment',
-                'p4_4_state', 'SHADOW_ONLY',
+                'provider_runtime_separate', true,
                 'entity_resolution_stage', 'E',
                 'scheduler_stage', 'F',
                 'ui_stage', 'G'
             )
         );
-    ELSIF existing_hash <> '9a14071dbb42b480d5faa95fd0680a81a8a111caacf0126bba822f06f1bc2113' THEN
+    ELSIF existing_hash <> 'e35f951d2e1fa22746b39b6639ca9847b9590b26e0764d8f35405db98bfbfb57' THEN
         RAISE EXCEPTION 'P4 research gateway contract hash conflict: existing %, expected %',
             existing_hash,
-            '9a14071dbb42b480d5faa95fd0680a81a8a111caacf0126bba822f06f1bc2113';
+            'e35f951d2e1fa22746b39b6639ca9847b9590b26e0764d8f35405db98bfbfb57';
     END IF;
 END;
 $migration$;

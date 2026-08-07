@@ -1,5 +1,5 @@
 -- 接入G：单场研究、来源、冲突处理与历史记录工作台。
--- CONTRACT_SHA256 = 03b7b520de88379a0e37e1287b7fcf13d8284db6ab4404543efe727f99e7643e
+-- CONTRACT_SHA256 = 8ffcc0634d126bcf1ad7dc21a72778c2950b4cc130b338b41dcf871f01feb337
 
 CREATE TABLE research.manual_route_overrides (
     id uuid PRIMARY KEY,
@@ -207,18 +207,18 @@ BEGIN
             '0.12.0',
             '0.13.0',
             'football.p4-workbench-contract.v1',
-            '03b7b520de88379a0e37e1287b7fcf13d8284db6ab4404543efe727f99e7643e',
+            '8ffcc0634d126bcf1ad7dc21a72778c2950b4cc130b338b41dcf871f01feb337',
             'G',
             jsonb_build_object(
-                'contract_path', 'contracts/p4-workbench-contract.json',
+                'contract_path', 'contracts/model-workbench-contract.json',
                 'surface', 'single_match_workspace',
                 'manual_conflict_policy', 'append_only_before_cutoff',
                 'formal_snapshot_mutable', false
             )
         );
-    ELSIF existing_hash <> '03b7b520de88379a0e37e1287b7fcf13d8284db6ab4404543efe727f99e7643e' THEN
+    ELSIF existing_hash <> '8ffcc0634d126bcf1ad7dc21a72778c2950b4cc130b338b41dcf871f01feb337' THEN
         RAISE EXCEPTION 'P4 workbench contract hash conflict: existing %, expected %',
-            existing_hash, '03b7b520de88379a0e37e1287b7fcf13d8284db6ab4404543efe727f99e7643e';
+            existing_hash, '8ffcc0634d126bcf1ad7dc21a72778c2950b4cc130b338b41dcf871f01feb337';
     END IF;
 END;
 $migration$;
