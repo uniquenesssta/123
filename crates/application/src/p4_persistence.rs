@@ -1,5 +1,4 @@
 use super::{ApplicationResult, ApplicationService};
-use crate::PersistenceStore;
 use football_domain::{
     CompetitionProfileVersionDraft, CompetitionProfileVersionRecord, EvidenceClaimDraft,
     EvidenceClaimRecord, EvidenceConflictDraft, EvidenceConflictRecord, PrematchSnapshotBundle,
@@ -9,6 +8,8 @@ use football_domain::{
 };
 use serde_json::Value;
 use uuid::Uuid;
+
+use crate::PersistenceStore;
 
 impl ApplicationService {
     pub(super) async fn register_p4_persistence_artifacts(
