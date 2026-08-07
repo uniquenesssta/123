@@ -1,5 +1,6 @@
 use football_domain::{
-    coach, competition, formation, lineup, match_record, player, prediction, routing, shared, team,
+    coach, competition, formation, lineup, match_record, player, prediction, research, routing,
+    shared, team,
 };
 
 fn assert_same_type<T>(_: Option<T>, _: Option<T>) {}
@@ -658,5 +659,117 @@ fn r2_05_prediction_module_paths_preserve_root_type_identity() {
     assert_same_type(
         None::<football_domain::SnapshotSourceKind>,
         None::<prediction::SnapshotSourceKind>,
+    );
+}
+
+#[test]
+fn r2_05_research_module_paths_preserve_root_type_identity() {
+    assert_same_type(
+        None::<football_domain::ConflictEvaluationDraft>,
+        None::<research::ConflictEvaluationDraft>,
+    );
+    assert_same_type(
+        None::<football_domain::ConflictEvaluationRecord>,
+        None::<research::ConflictEvaluationRecord>,
+    );
+    assert_same_type(
+        None::<football_domain::ConflictEvaluationStatus>,
+        None::<research::ConflictEvaluationStatus>,
+    );
+    assert_same_type(
+        None::<football_domain::EntityCandidate>,
+        None::<research::EntityCandidate>,
+    );
+    assert_same_type(
+        None::<football_domain::EntityResolutionDraft>,
+        None::<research::EntityResolutionDraft>,
+    );
+    assert_same_type(
+        None::<football_domain::EntityResolutionRecord>,
+        None::<research::EntityResolutionRecord>,
+    );
+    assert_same_type(
+        None::<football_domain::EntityResolutionStatus>,
+        None::<research::EntityResolutionStatus>,
+    );
+    assert_same_type(
+        None::<football_domain::EvidenceRouteDraft>,
+        None::<research::EvidenceRouteDraft>,
+    );
+    assert_same_type(
+        None::<football_domain::EvidenceRouteRecord>,
+        None::<research::EvidenceRouteRecord>,
+    );
+    assert_same_type(
+        None::<football_domain::EvidenceRouteRegistry>,
+        None::<research::EvidenceRouteRegistry>,
+    );
+    assert_same_type(
+        None::<football_domain::EvidenceRouteRule>,
+        None::<research::EvidenceRouteRule>,
+    );
+    assert_same_type(
+        None::<football_domain::EvidenceRouteStatus>,
+        None::<research::EvidenceRouteStatus>,
+    );
+    assert_same_type(
+        None::<football_domain::FactPipelineContext>,
+        None::<research::FactPipelineContext>,
+    );
+    assert_same_type(
+        None::<football_domain::FactPipelineSummary>,
+        None::<research::FactPipelineSummary>,
+    );
+    assert_same_type(
+        None::<football_domain::OpenAiAttemptDraft>,
+        None::<research::OpenAiAttemptDraft>,
+    );
+    assert_same_type(
+        None::<football_domain::OpenAiAttemptRecord>,
+        None::<research::OpenAiAttemptRecord>,
+    );
+    assert_same_type(
+        None::<football_domain::OpenAiUsageTotals>,
+        None::<research::OpenAiUsageTotals>,
+    );
+    assert_same_type(
+        None::<football_domain::SourcePolicyDefinition>,
+        None::<research::SourcePolicyDefinition>,
+    );
+    assert_same_type(
+        None::<football_domain::SourcePolicyVersionDraft>,
+        None::<research::SourcePolicyVersionDraft>,
+    );
+    assert_same_type(
+        None::<football_domain::SourcePolicyVersionRecord>,
+        None::<research::SourcePolicyVersionRecord>,
+    );
+    assert_same_type(
+        None::<football_domain::SourceTierDefinition>,
+        None::<research::SourceTierDefinition>,
+    );
+    assert_same_type(
+        None::<football_domain::SourceTierRule>,
+        None::<research::SourceTierRule>,
+    );
+    assert_same_type(
+        None::<football_domain::TimeAuditDraft>,
+        None::<research::TimeAuditDraft>,
+    );
+    assert_same_type(
+        None::<football_domain::TimeAuditRecord>,
+        None::<research::TimeAuditRecord>,
+    );
+    assert_same_type(
+        None::<football_domain::TimeAuditStatus>,
+        None::<research::TimeAuditStatus>,
+    );
+    assert_same_type(
+        None::<football_domain::WebCitationDraft>,
+        None::<research::WebCitationDraft>,
+    );
+    assert_same_type(
+        None::<football_domain::WebSourceDraft>,
+        None::<research::WebSourceDraft>,
     );
 }

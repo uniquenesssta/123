@@ -23,14 +23,14 @@
     "currentPublicExportPolicy": "root glob re-export is recorded as current debt and removed only in R2-08",
     "targetPublicExportPolicy": "explicit re-export only"
   },
-  "sourceDigest": "9b0dbb3190b9efa6b8285a48980662a509815ab657fdcf2a8142dbc740a49ee3",
-  "rustUsageDigest": "4b84ac3fe05c02cf46e000e2828d559ed4307640ae2f41b181392d9b8939c29d",
+  "sourceDigest": "0c28f1f8c8b086e1c91aaa31d367be35dac263878ad62ec74a788f4335eb87a0",
+  "rustUsageDigest": "f468b320cd58a7139726e173697aa026a1ea12994ad696d14cd13d1abe369775",
   "summary": {
     "typeCount": 365,
     "publicCompatibilityTypeCount": 365,
     "internalTypeCount": 0,
-    "domainSourceFileCount": 79,
-    "scannedRustFileCount": 214,
+    "domainSourceFileCount": 86,
+    "scannedRustFileCount": 223,
     "databaseMappedTypeCount": 299,
     "byTargetModule": {
       "ai_workspace": 16,
@@ -4850,9 +4850,9 @@
       "typeName": "ConflictEvaluationDraft",
       "kind": "struct",
       "visibility": "public",
-      "currentPath": "crates/domain/src/fact_pipeline.rs",
-      "currentModule": "football_domain::fact_pipeline",
-      "sourceLine": 275,
+      "currentPath": "crates/domain/src/research/conflict.rs",
+      "currentModule": "football_domain::conflict",
+      "sourceLine": 25,
       "derives": [
         "Clone",
         "Debug",
@@ -4932,7 +4932,9 @@
       "currentRootExport": "glob_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
-      "domainCallers": [],
+      "domainCallers": [
+        "crates/domain/tests/serde_contracts/module_paths.rs"
+      ],
       "externalCallers": [
         "crates/application/src/fact_pipeline.rs",
         "crates/persistence-postgres/src/fact_pipeline_records.rs"
@@ -4945,9 +4947,9 @@
       "typeName": "ConflictEvaluationRecord",
       "kind": "struct",
       "visibility": "public",
-      "currentPath": "crates/domain/src/fact_pipeline.rs",
-      "currentModule": "football_domain::fact_pipeline",
-      "sourceLine": 293,
+      "currentPath": "crates/domain/src/research/conflict.rs",
+      "currentModule": "football_domain::conflict",
+      "sourceLine": 43,
       "derives": [
         "Clone",
         "Debug",
@@ -4991,7 +4993,9 @@
       "currentRootExport": "glob_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
-      "domainCallers": [],
+      "domainCallers": [
+        "crates/domain/tests/serde_contracts/module_paths.rs"
+      ],
       "externalCallers": [
         "crates/persistence-postgres/src/fact_pipeline_records.rs"
       ],
@@ -5003,9 +5007,9 @@
       "typeName": "ConflictEvaluationStatus",
       "kind": "enum",
       "visibility": "public",
-      "currentPath": "crates/domain/src/fact_pipeline.rs",
-      "currentModule": "football_domain::fact_pipeline",
-      "sourceLine": 258,
+      "currentPath": "crates/domain/src/research/conflict.rs",
+      "currentModule": "football_domain::conflict",
+      "sourceLine": 8,
       "derives": [
         "Clone",
         "Copy",
@@ -5052,7 +5056,8 @@
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
-        "crates/domain/src/fact_pipeline.rs"
+        "crates/domain/src/research/conflict.rs",
+        "crates/domain/tests/serde_contracts/module_paths.rs"
       ],
       "externalCallers": [
         "crates/application/src/fact_pipeline.rs",
@@ -5705,9 +5710,9 @@
       "typeName": "EntityCandidate",
       "kind": "struct",
       "visibility": "public",
-      "currentPath": "crates/domain/src/fact_pipeline.rs",
-      "currentModule": "football_domain::fact_pipeline",
-      "sourceLine": 31,
+      "currentPath": "crates/domain/src/research/entity.rs",
+      "currentModule": "football_domain::entity",
+      "sourceLine": 26,
       "derives": [
         "Clone",
         "Debug",
@@ -5763,7 +5768,8 @@
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
-        "crates/domain/src/fact_pipeline.rs"
+        "crates/domain/src/research/entity.rs",
+        "crates/domain/tests/serde_contracts/module_paths.rs"
       ],
       "externalCallers": [
         "crates/application/src/fact_pipeline.rs",
@@ -6276,9 +6282,9 @@
       "typeName": "EntityResolutionDraft",
       "kind": "struct",
       "visibility": "public",
-      "currentPath": "crates/domain/src/fact_pipeline.rs",
-      "currentModule": "football_domain::fact_pipeline",
-      "sourceLine": 42,
+      "currentPath": "crates/domain/src/research/entity.rs",
+      "currentModule": "football_domain::entity",
+      "sourceLine": 37,
       "derives": [
         "Clone",
         "Debug",
@@ -6378,7 +6384,9 @@
       "currentRootExport": "glob_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
-      "domainCallers": [],
+      "domainCallers": [
+        "crates/domain/tests/serde_contracts/module_paths.rs"
+      ],
       "externalCallers": [
         "crates/application/src/fact_pipeline.rs",
         "crates/persistence-postgres/src/fact_pipeline_records.rs"
@@ -6391,9 +6399,9 @@
       "typeName": "EntityResolutionRecord",
       "kind": "struct",
       "visibility": "public",
-      "currentPath": "crates/domain/src/fact_pipeline.rs",
-      "currentModule": "football_domain::fact_pipeline",
-      "sourceLine": 66,
+      "currentPath": "crates/domain/src/research/entity.rs",
+      "currentModule": "football_domain::entity",
+      "sourceLine": 61,
       "derives": [
         "Clone",
         "Debug",
@@ -6441,7 +6449,9 @@
       "currentRootExport": "glob_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
-      "domainCallers": [],
+      "domainCallers": [
+        "crates/domain/tests/serde_contracts/module_paths.rs"
+      ],
       "externalCallers": [
         "crates/application/src/fact_pipeline.rs",
         "crates/persistence-postgres/src/fact_pipeline_records.rs"
@@ -6454,9 +6464,9 @@
       "typeName": "EntityResolutionStatus",
       "kind": "enum",
       "visibility": "public",
-      "currentPath": "crates/domain/src/fact_pipeline.rs",
-      "currentModule": "football_domain::fact_pipeline",
-      "sourceLine": 12,
+      "currentPath": "crates/domain/src/research/entity.rs",
+      "currentModule": "football_domain::entity",
+      "sourceLine": 7,
       "derives": [
         "Clone",
         "Copy",
@@ -6507,7 +6517,8 @@
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
-        "crates/domain/src/fact_pipeline.rs"
+        "crates/domain/src/research/entity.rs",
+        "crates/domain/tests/serde_contracts/module_paths.rs"
       ],
       "externalCallers": [
         "crates/application/src/fact_pipeline.rs",
@@ -7039,9 +7050,9 @@
       "typeName": "EvidenceRouteDraft",
       "kind": "struct",
       "visibility": "public",
-      "currentPath": "crates/domain/src/fact_pipeline.rs",
-      "currentModule": "football_domain::fact_pipeline",
-      "sourceLine": 225,
+      "currentPath": "crates/domain/src/research/routing.rs",
+      "currentModule": "football_domain::routing",
+      "sourceLine": 57,
       "derives": [
         "Clone",
         "Debug",
@@ -7141,7 +7152,9 @@
       "currentRootExport": "glob_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
-      "domainCallers": [],
+      "domainCallers": [
+        "crates/domain/tests/serde_contracts/module_paths.rs"
+      ],
       "externalCallers": [
         "crates/application/src/fact_pipeline.rs",
         "crates/persistence-postgres/src/fact_pipeline_records.rs"
@@ -7154,9 +7167,9 @@
       "typeName": "EvidenceRouteRecord",
       "kind": "struct",
       "visibility": "public",
-      "currentPath": "crates/domain/src/fact_pipeline.rs",
-      "currentModule": "football_domain::fact_pipeline",
-      "sourceLine": 249,
+      "currentPath": "crates/domain/src/research/routing.rs",
+      "currentModule": "football_domain::routing",
+      "sourceLine": 81,
       "derives": [
         "Clone",
         "Debug",
@@ -7200,7 +7213,9 @@
       "currentRootExport": "glob_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
-      "domainCallers": [],
+      "domainCallers": [
+        "crates/domain/tests/serde_contracts/module_paths.rs"
+      ],
       "externalCallers": [
         "crates/persistence-postgres/src/fact_pipeline_records.rs"
       ],
@@ -7212,9 +7227,9 @@
       "typeName": "EvidenceRouteRegistry",
       "kind": "struct",
       "visibility": "public",
-      "currentPath": "crates/domain/src/fact_pipeline.rs",
-      "currentModule": "football_domain::fact_pipeline",
-      "sourceLine": 219,
+      "currentPath": "crates/domain/src/research/routing.rs",
+      "currentModule": "football_domain::routing",
+      "sourceLine": 51,
       "derives": [
         "Clone",
         "Debug",
@@ -7252,7 +7267,9 @@
       "currentRootExport": "glob_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "none_detected",
-      "domainCallers": [],
+      "domainCallers": [
+        "crates/domain/tests/serde_contracts/module_paths.rs"
+      ],
       "externalCallers": [
         "crates/application/src/fact_pipeline.rs",
         "crates/application/src/p4_orchestration.rs"
@@ -7263,9 +7280,9 @@
       "typeName": "EvidenceRouteRule",
       "kind": "struct",
       "visibility": "public",
-      "currentPath": "crates/domain/src/fact_pipeline.rs",
-      "currentModule": "football_domain::fact_pipeline",
-      "sourceLine": 201,
+      "currentPath": "crates/domain/src/research/routing.rs",
+      "currentModule": "football_domain::routing",
+      "sourceLine": 33,
       "derives": [
         "Clone",
         "Debug",
@@ -7330,7 +7347,8 @@
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "none_detected",
       "domainCallers": [
-        "crates/domain/src/fact_pipeline.rs"
+        "crates/domain/src/research/routing.rs",
+        "crates/domain/tests/serde_contracts/module_paths.rs"
       ],
       "externalCallers": [
         "crates/application/src/fact_pipeline.rs"
@@ -7341,9 +7359,9 @@
       "typeName": "EvidenceRouteStatus",
       "kind": "enum",
       "visibility": "public",
-      "currentPath": "crates/domain/src/fact_pipeline.rs",
-      "currentModule": "football_domain::fact_pipeline",
-      "sourceLine": 176,
+      "currentPath": "crates/domain/src/research/routing.rs",
+      "currentModule": "football_domain::routing",
+      "sourceLine": 8,
       "derives": [
         "Clone",
         "Copy",
@@ -7406,7 +7424,8 @@
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
-        "crates/domain/src/fact_pipeline.rs"
+        "crates/domain/src/research/routing.rs",
+        "crates/domain/tests/serde_contracts/module_paths.rs"
       ],
       "externalCallers": [
         "crates/application/src/fact_pipeline.rs",
@@ -7924,9 +7943,9 @@
       "typeName": "FactPipelineContext",
       "kind": "struct",
       "visibility": "public",
-      "currentPath": "crates/domain/src/fact_pipeline.rs",
-      "currentModule": "football_domain::fact_pipeline",
-      "sourceLine": 301,
+      "currentPath": "crates/domain/src/research/pipeline.rs",
+      "currentModule": "football_domain::pipeline",
+      "sourceLine": 6,
       "derives": [
         "Clone",
         "Debug",
@@ -8022,7 +8041,9 @@
       "currentRootExport": "glob_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
-      "domainCallers": [],
+      "domainCallers": [
+        "crates/domain/tests/serde_contracts/module_paths.rs"
+      ],
       "externalCallers": [
         "crates/application/src/fact_pipeline.rs",
         "crates/persistence-postgres/src/fact_pipeline_records.rs"
@@ -8035,9 +8056,9 @@
       "typeName": "FactPipelineSummary",
       "kind": "struct",
       "visibility": "public",
-      "currentPath": "crates/domain/src/fact_pipeline.rs",
-      "currentModule": "football_domain::fact_pipeline",
-      "sourceLine": 322,
+      "currentPath": "crates/domain/src/research/pipeline.rs",
+      "currentModule": "football_domain::pipeline",
+      "sourceLine": 27,
       "derives": [
         "Clone",
         "Debug",
@@ -8115,7 +8136,8 @@
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "none_detected",
       "domainCallers": [
-        "crates/domain/src/fact_pipeline.rs"
+        "crates/domain/src/research/pipeline.rs",
+        "crates/domain/tests/serde_contracts/module_paths.rs"
       ],
       "externalCallers": [
         "crates/application/src/fact_pipeline.rs"
@@ -13260,9 +13282,9 @@
       "typeName": "OpenAiAttemptDraft",
       "kind": "struct",
       "visibility": "public",
-      "currentPath": "crates/domain/src/research_gateway.rs",
-      "currentModule": "football_domain::research_gateway",
-      "sourceLine": 11,
+      "currentPath": "crates/domain/src/research/gateway/attempt.rs",
+      "currentModule": "football_domain::attempt",
+      "sourceLine": 7,
       "derives": [
         "Clone",
         "Debug",
@@ -13382,7 +13404,9 @@
       "currentRootExport": "glob_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
-      "domainCallers": [],
+      "domainCallers": [
+        "crates/domain/tests/serde_contracts/module_paths.rs"
+      ],
       "externalCallers": [
         "crates/application/src/openai_research.rs",
         "crates/persistence-postgres/src/research_gateway_records.rs"
@@ -13395,9 +13419,9 @@
       "typeName": "OpenAiAttemptRecord",
       "kind": "struct",
       "visibility": "public",
-      "currentPath": "crates/domain/src/research_gateway.rs",
-      "currentModule": "football_domain::research_gateway",
-      "sourceLine": 42,
+      "currentPath": "crates/domain/src/research/gateway/attempt.rs",
+      "currentModule": "football_domain::attempt",
+      "sourceLine": 38,
       "derives": [
         "Clone",
         "Debug",
@@ -13453,7 +13477,9 @@
       "currentRootExport": "glob_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
-      "domainCallers": [],
+      "domainCallers": [
+        "crates/domain/tests/serde_contracts/module_paths.rs"
+      ],
       "externalCallers": [
         "crates/persistence-postgres/src/research_gateway_records.rs"
       ],
@@ -13465,9 +13491,9 @@
       "typeName": "OpenAiUsageTotals",
       "kind": "struct",
       "visibility": "public",
-      "currentPath": "crates/domain/src/research_gateway.rs",
-      "currentModule": "football_domain::research_gateway",
-      "sourceLine": 79,
+      "currentPath": "crates/domain/src/research/gateway/usage.rs",
+      "currentModule": "football_domain::usage",
+      "sourceLine": 4,
       "derives": [
         "Clone",
         "Debug",
@@ -13512,7 +13538,9 @@
       "currentRootExport": "glob_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
-      "domainCallers": [],
+      "domainCallers": [
+        "crates/domain/tests/serde_contracts/module_paths.rs"
+      ],
       "externalCallers": [
         "crates/application/src/api_workspace.rs",
         "crates/persistence-postgres/src/api_workspace.rs",
@@ -24149,9 +24177,9 @@
       "typeName": "SourcePolicyDefinition",
       "kind": "struct",
       "visibility": "public",
-      "currentPath": "crates/domain/src/fact_pipeline.rs",
-      "currentModule": "football_domain::fact_pipeline",
-      "sourceLine": 147,
+      "currentPath": "crates/domain/src/research/source_policy.rs",
+      "currentModule": "football_domain::source_policy",
+      "sourceLine": 19,
       "derives": [
         "Clone",
         "Debug",
@@ -24198,7 +24226,8 @@
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
-        "crates/domain/src/fact_pipeline.rs"
+        "crates/domain/src/research/source_policy.rs",
+        "crates/domain/tests/serde_contracts/module_paths.rs"
       ],
       "externalCallers": [
         "crates/application/src/fact_pipeline.rs",
@@ -24213,9 +24242,9 @@
       "typeName": "SourcePolicyVersionDraft",
       "kind": "struct",
       "visibility": "public",
-      "currentPath": "crates/domain/src/fact_pipeline.rs",
-      "currentModule": "football_domain::fact_pipeline",
-      "sourceLine": 155,
+      "currentPath": "crates/domain/src/research/source_policy.rs",
+      "currentModule": "football_domain::source_policy",
+      "sourceLine": 27,
       "derives": [
         "Clone",
         "Debug",
@@ -24267,7 +24296,9 @@
       "currentRootExport": "glob_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
-      "domainCallers": [],
+      "domainCallers": [
+        "crates/domain/tests/serde_contracts/module_paths.rs"
+      ],
       "externalCallers": [
         "crates/application/src/fact_pipeline.rs",
         "crates/persistence-postgres/src/fact_pipeline_records.rs",
@@ -24281,9 +24312,9 @@
       "typeName": "SourcePolicyVersionRecord",
       "kind": "struct",
       "visibility": "public",
-      "currentPath": "crates/domain/src/fact_pipeline.rs",
-      "currentModule": "football_domain::fact_pipeline",
-      "sourceLine": 166,
+      "currentPath": "crates/domain/src/research/source_policy.rs",
+      "currentModule": "football_domain::source_policy",
+      "sourceLine": 38,
       "derives": [
         "Clone",
         "Debug",
@@ -24331,7 +24362,9 @@
       "currentRootExport": "glob_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
-      "domainCallers": [],
+      "domainCallers": [
+        "crates/domain/tests/serde_contracts/module_paths.rs"
+      ],
       "externalCallers": [
         "crates/persistence-postgres/src/fact_pipeline_records.rs"
       ],
@@ -24343,9 +24376,9 @@
       "typeName": "SourceTierDefinition",
       "kind": "struct",
       "visibility": "public",
-      "currentPath": "crates/domain/src/fact_pipeline.rs",
-      "currentModule": "football_domain::fact_pipeline",
-      "sourceLine": 141,
+      "currentPath": "crates/domain/src/research/source_policy.rs",
+      "currentModule": "football_domain::source_policy",
+      "sourceLine": 13,
       "derives": [
         "Clone",
         "Debug",
@@ -24384,7 +24417,8 @@
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
-        "crates/domain/src/fact_pipeline.rs"
+        "crates/domain/src/research/source_policy.rs",
+        "crates/domain/tests/serde_contracts/module_paths.rs"
       ],
       "externalCallers": [
         "crates/persistence-postgres/src/fact_pipeline_records.rs",
@@ -24398,9 +24432,9 @@
       "typeName": "SourceTierRule",
       "kind": "struct",
       "visibility": "public",
-      "currentPath": "crates/domain/src/fact_pipeline.rs",
-      "currentModule": "football_domain::fact_pipeline",
-      "sourceLine": 135,
+      "currentPath": "crates/domain/src/research/source_policy.rs",
+      "currentModule": "football_domain::source_policy",
+      "sourceLine": 7,
       "derives": [
         "Clone",
         "Debug",
@@ -24439,7 +24473,8 @@
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
-        "crates/domain/src/fact_pipeline.rs"
+        "crates/domain/src/research/source_policy.rs",
+        "crates/domain/tests/serde_contracts/module_paths.rs"
       ],
       "externalCallers": [
         "crates/persistence-postgres/src/fact_pipeline_records.rs",
@@ -29997,9 +30032,9 @@
       "typeName": "TimeAuditDraft",
       "kind": "struct",
       "visibility": "public",
-      "currentPath": "crates/domain/src/fact_pipeline.rs",
-      "currentModule": "football_domain::fact_pipeline",
-      "sourceLine": 105,
+      "currentPath": "crates/domain/src/research/time_audit.rs",
+      "currentModule": "football_domain::time_audit",
+      "sourceLine": 36,
       "derives": [
         "Clone",
         "Debug",
@@ -30091,7 +30126,9 @@
       "currentRootExport": "glob_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
-      "domainCallers": [],
+      "domainCallers": [
+        "crates/domain/tests/serde_contracts/module_paths.rs"
+      ],
       "externalCallers": [
         "crates/application/src/fact_pipeline.rs",
         "crates/persistence-postgres/src/fact_pipeline_records.rs"
@@ -30104,9 +30141,9 @@
       "typeName": "TimeAuditRecord",
       "kind": "struct",
       "visibility": "public",
-      "currentPath": "crates/domain/src/fact_pipeline.rs",
-      "currentModule": "football_domain::fact_pipeline",
-      "sourceLine": 127,
+      "currentPath": "crates/domain/src/research/time_audit.rs",
+      "currentModule": "football_domain::time_audit",
+      "sourceLine": 58,
       "derives": [
         "Clone",
         "Debug",
@@ -30150,7 +30187,9 @@
       "currentRootExport": "glob_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
-      "domainCallers": [],
+      "domainCallers": [
+        "crates/domain/tests/serde_contracts/module_paths.rs"
+      ],
       "externalCallers": [
         "crates/application/src/fact_pipeline.rs",
         "crates/persistence-postgres/src/fact_pipeline_records.rs"
@@ -30163,9 +30202,9 @@
       "typeName": "TimeAuditStatus",
       "kind": "enum",
       "visibility": "public",
-      "currentPath": "crates/domain/src/fact_pipeline.rs",
-      "currentModule": "football_domain::fact_pipeline",
-      "sourceLine": 76,
+      "currentPath": "crates/domain/src/research/time_audit.rs",
+      "currentModule": "football_domain::time_audit",
+      "sourceLine": 7,
       "derives": [
         "Clone",
         "Copy",
@@ -30228,7 +30267,8 @@
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
-        "crates/domain/src/fact_pipeline.rs"
+        "crates/domain/src/research/time_audit.rs",
+        "crates/domain/tests/serde_contracts/module_paths.rs"
       ],
       "externalCallers": [
         "crates/application/src/fact_pipeline.rs",
@@ -30242,9 +30282,9 @@
       "typeName": "WebCitationDraft",
       "kind": "struct",
       "visibility": "public",
-      "currentPath": "crates/domain/src/research_gateway.rs",
-      "currentModule": "football_domain::research_gateway",
-      "sourceLine": 53,
+      "currentPath": "crates/domain/src/research/gateway/source.rs",
+      "currentModule": "football_domain::source",
+      "sourceLine": 6,
       "derives": [
         "Clone",
         "Debug",
@@ -30312,7 +30352,9 @@
       "currentRootExport": "glob_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
-      "domainCallers": [],
+      "domainCallers": [
+        "crates/domain/tests/serde_contracts/module_paths.rs"
+      ],
       "externalCallers": [
         "crates/application/src/openai_research.rs",
         "crates/persistence-postgres/src/research_gateway_records.rs"
@@ -30325,9 +30367,9 @@
       "typeName": "WebSourceDraft",
       "kind": "struct",
       "visibility": "public",
-      "currentPath": "crates/domain/src/research_gateway.rs",
-      "currentModule": "football_domain::research_gateway",
-      "sourceLine": 68,
+      "currentPath": "crates/domain/src/research/gateway/source.rs",
+      "currentModule": "football_domain::source",
+      "sourceLine": 21,
       "derives": [
         "Clone",
         "Debug",
@@ -30381,7 +30423,9 @@
       "currentRootExport": "glob_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
-      "domainCallers": [],
+      "domainCallers": [
+        "crates/domain/tests/serde_contracts/module_paths.rs"
+      ],
       "externalCallers": [
         "crates/application/src/openai_research.rs",
         "crates/persistence-postgres/src/research_gateway_records.rs"

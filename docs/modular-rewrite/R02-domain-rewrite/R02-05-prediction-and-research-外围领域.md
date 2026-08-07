@@ -1,6 +1,6 @@
 # R02-05 Prediction 与 Research 外围领域实施记录
 
-- 任务状态：`IMPLEMENTING`
+- 任务状态：`VERIFYING`
 - 前置已验证提交：`3e5812c7c0d1d626e0f5ed3a6db0295af6d6979c`
 - 目标平台：Windows
 - 类型范围：Prediction 48 + Research 27，共 75 个公共兼容类型
@@ -72,3 +72,12 @@ R2-08 之前继续保留既有根级兼容 re-export；本节点不提前处理�
 - 已直接删除两个无效 import，不增加 `allow` 或放宽 Clippy。
 - recovery run `31159547810`：Prediction Serde 10/10 通过，随后类型清单因上述源文件变化后的指纹未刷新而按门禁停止；Research 未执行。
 - inventory refresh run `31159710816`：仅重新生成并验证 `architecture/domain-type-inventory.json`，成功后自清理临时 workflow；R2-05 仍为 `IMPLEMENTING`。
+
+## 7. 实施与验证结果
+
+- R2-05A Prediction 48 个类型已由独立提交 `2cd685b8057a1bce2f75e4c7f5b56aed1bf3d142` 迁移；专项 Serde 10/10、类型清单、架构和保护资产门禁通过。
+- 首次 staged run `31158780693` 的 R2-05B Research 迁移与专项 Serde 11/11 已通过；完整 `verify:frontend` 通过，但 `verify:rust` 在 Clippy `-D warnings` 因 `prediction/orchestration/planning.rs` 两个未使用 import 失败，因此当次未提交 Research。
+- 已删除两个无效 import，不增加 `allow` 或放宽 Clippy；本次恢复 run `31159821513` 从已提交的 R2-05A 基线继续执行 Research，不重放 Prediction。
+- R2-05B Research 27 个类型已迁移并删除旧 `fact_pipeline.rs`、`research_gateway.rs`；专项契约、完整 frontend 与 Rust 回归均通过。
+- 75 个类型均位于 `prediction/` 或 `research/` 职责目录，根级公共兼容路径与类型身份保持不变。
+- 正式 Windows Automated 在最终实施源码树通过前，本节点保持 `VERIFYING`，R2-06 保持 `BLOCKED`。
