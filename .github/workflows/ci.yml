@@ -21,6 +21,8 @@ jobs:
     name: Windows automated delivery gate
     runs-on: windows-2025
     timeout-minutes: 120
+    env:
+      npm_config_cache: ${{ github.workspace }}/.npm-cache
 
     steps:
       - name: Checkout repository in acceptance layout

@@ -21,9 +21,11 @@ try {
     "直接执行检测未兼容目录联接或符号链接",
   );
 
+  const sourceRoot = join(temporary, "project");
   const packageRoot = join(temporary, "node_modules", "sample-cli", "bin");
   const cliPath = join(packageRoot, "cli.mjs");
   const outputPath = join(temporary, "args.json");
+  mkdirSync(sourceRoot, { recursive: true });
   mkdirSync(packageRoot, { recursive: true });
   writeFileSync(
     cliPath,
@@ -35,11 +37,11 @@ try {
   );
 
   check(
-    resolveNodePackageCli(temporary, "sample-cli", "bin/cli.mjs") === cliPath,
-    "本地 Node CLI 路径解析错误",
+    resolveNodePackageCli(sourceRoot, "sample-cli", "bin/cli.mjs") === cliPath,
+    "上一级 Node CLI 路径解析错误",
   );
   const success = spawnNodePackageCli({
-    root: temporary,
+    root: sourceRoot,
     packageName: "sample-cli",
     executablePath: "bin/cli.mjs",
     args: [outputPath, "alpha", "beta"],
@@ -49,7 +51,7 @@ try {
   check(readFileSync(outputPath, "utf8") === '["alpha","beta"]', "Node CLI 参数传递错误");
 
   const failure = spawnNodePackageCli({
-    root: temporary,
+    root: sourceRoot,
     packageName: "sample-cli",
     executablePath: "bin/cli.mjs",
     args: [outputPath, "--fail"],
@@ -59,7 +61,7 @@ try {
 
   let missingRejected = false;
   try {
-    resolveNodePackageCli(temporary, "sample-cli", "bin/missing.mjs");
+    resolveNodePackageCli(sourceRoot, "sample-cli", "bin/missing.mjs");
   } catch {
     missingRejected = true;
   }
@@ -73,4 +75,4 @@ if (failures.length) {
   failures.forEach((failure) => console.error(`- ${failure}`));
   process.exit(1);
 }
-console.log("Windows Node 调用链兼容验证通过：目录联接、Node CLI、参数和退出码均保持一致。");
+console.log("Windows Node 调用链兼容验证通过：目录联接、上一级 Node CLI、参数和退出码均保持一致。");

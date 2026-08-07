@@ -4,9 +4,9 @@
   "version": "0.23.0",
   "type": "module",
   "scripts": {
-    "dev": "vite --host 127.0.0.1 --port 1420",
+    "dev": "node scripts/run-vite.mjs --host 127.0.0.1 --port 1420",
     "build": "node scripts/verify-frontend.mjs",
-    "preview": "vite preview",
+    "preview": "node scripts/run-vite.mjs preview",
     "tauri": "node scripts/run-tauri.mjs",
     "tauri:dev": "node scripts/run-tauri.mjs dev",
     "tauri:build": "node scripts/run-tauri.mjs build",

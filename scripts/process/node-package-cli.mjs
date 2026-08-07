@@ -1,6 +1,7 @@
 import { spawnSync } from "node:child_process";
 import { existsSync } from "node:fs";
 import { isAbsolute, join } from "node:path";
+import { resolveNodeDependencyLayout } from "./node-dependency-layout.mjs";
 
 function safeSegments(value, label) {
   if (typeof value !== "string" || !value.trim() || isAbsolute(value)) {
@@ -16,9 +17,10 @@ function safeSegments(value, label) {
 export function resolveNodePackageCli(root, packageName, executablePath) {
   const packageSegments = safeSegments(packageName, "packageName");
   const executableSegments = safeSegments(executablePath, "executablePath");
-  const resolved = join(root, "node_modules", ...packageSegments, ...executableSegments);
+  const { nodeModulesRoot } = resolveNodeDependencyLayout(root);
+  const resolved = join(nodeModulesRoot, ...packageSegments, ...executableSegments);
   if (!existsSync(resolved)) {
-    throw new Error(`缺少本地 Node CLI：${packageName}/${executablePath}`);
+    throw new Error(`缺少上一级 Node CLI：${packageName}/${executablePath}`);
   }
   return resolved;
 }
