@@ -11,6 +11,8 @@ use football_domain::{
 };
 use serde_json::{json, Value};
 
+const BUILT_IN_RULE_PACKAGE_REVISION: &str = "public.1";
+
 impl ApplicationService {
     pub async fn register_rule_package(
         &self,
@@ -83,7 +85,7 @@ pub fn default_rule_package_template() -> RulePackageDraft {
 
 pub(super) fn built_in_rule_packages() -> Vec<RulePackageDraft> {
     vec![
-        make_public_rule_package(
+        make_built_in_rule_package(
             CompetitionKind::League,
             P4_LEAGUE_MODEL_ID,
             "p4",
@@ -92,7 +94,7 @@ pub(super) fn built_in_rule_packages() -> Vec<RulePackageDraft> {
             100,
             true,
         ),
-        make_public_rule_package(
+        make_built_in_rule_package(
             CompetitionKind::GroupStage,
             P4_GROUP_STAGE_MODEL_ID,
             "p4",
@@ -101,7 +103,7 @@ pub(super) fn built_in_rule_packages() -> Vec<RulePackageDraft> {
             100,
             true,
         ),
-        make_public_rule_package(
+        make_built_in_rule_package(
             CompetitionKind::KnockoutSingleLeg,
             P4_KNOCKOUT_SINGLE_MODEL_ID,
             "p4",
@@ -110,7 +112,7 @@ pub(super) fn built_in_rule_packages() -> Vec<RulePackageDraft> {
             100,
             true,
         ),
-        make_public_rule_package(
+        make_built_in_rule_package(
             CompetitionKind::KnockoutTwoLeg,
             P4_KNOCKOUT_TWO_LEG_MODEL_ID,
             "p4",
@@ -119,7 +121,7 @@ pub(super) fn built_in_rule_packages() -> Vec<RulePackageDraft> {
             100,
             true,
         ),
-        make_public_rule_package(
+        make_built_in_rule_package(
             CompetitionKind::Friendly,
             P4_FRIENDLY_MODEL_ID,
             "p4",
@@ -128,7 +130,7 @@ pub(super) fn built_in_rule_packages() -> Vec<RulePackageDraft> {
             100,
             true,
         ),
-        make_public_rule_package(
+        make_built_in_rule_package(
             CompetitionKind::Custom,
             P4_MODEL_ID,
             "p4",
@@ -137,7 +139,7 @@ pub(super) fn built_in_rule_packages() -> Vec<RulePackageDraft> {
             100,
             true,
         ),
-        make_public_rule_package(
+        make_built_in_rule_package(
             CompetitionKind::League,
             P7_LEAGUE_MODEL_ID,
             "p7",
@@ -146,7 +148,7 @@ pub(super) fn built_in_rule_packages() -> Vec<RulePackageDraft> {
             90,
             true,
         ),
-        make_public_rule_package(
+        make_built_in_rule_package(
             CompetitionKind::GroupStage,
             P7_GROUP_STAGE_MODEL_ID,
             "p7",
@@ -155,7 +157,7 @@ pub(super) fn built_in_rule_packages() -> Vec<RulePackageDraft> {
             90,
             true,
         ),
-        make_public_rule_package(
+        make_built_in_rule_package(
             CompetitionKind::KnockoutSingleLeg,
             P7_KNOCKOUT_SINGLE_MODEL_ID,
             "p7",
@@ -164,7 +166,7 @@ pub(super) fn built_in_rule_packages() -> Vec<RulePackageDraft> {
             90,
             true,
         ),
-        make_public_rule_package(
+        make_built_in_rule_package(
             CompetitionKind::KnockoutTwoLeg,
             P7_KNOCKOUT_TWO_LEG_MODEL_ID,
             "p7",
@@ -173,7 +175,7 @@ pub(super) fn built_in_rule_packages() -> Vec<RulePackageDraft> {
             90,
             true,
         ),
-        make_public_rule_package(
+        make_built_in_rule_package(
             CompetitionKind::Friendly,
             P7_FRIENDLY_MODEL_ID,
             "p7",
@@ -182,7 +184,7 @@ pub(super) fn built_in_rule_packages() -> Vec<RulePackageDraft> {
             90,
             true,
         ),
-        make_public_rule_package(
+        make_built_in_rule_package(
             CompetitionKind::Custom,
             P7_MODEL_ID,
             "p7",
@@ -192,6 +194,36 @@ pub(super) fn built_in_rule_packages() -> Vec<RulePackageDraft> {
             true,
         ),
     ]
+}
+
+fn make_built_in_rule_package(
+    kind: CompetitionKind,
+    model_id: &str,
+    family: &str,
+    suffix: &str,
+    display_name: &str,
+    priority: i32,
+    activate_as_type_default: bool,
+) -> RulePackageDraft {
+    let mut draft = make_public_rule_package(
+        kind,
+        model_id,
+        family,
+        suffix,
+        display_name,
+        priority,
+        activate_as_type_default,
+    );
+    draft.version = built_in_rule_package_version();
+    draft
+}
+
+fn built_in_rule_package_version() -> String {
+    format!(
+        "{}+{}",
+        env!("CARGO_PKG_VERSION"),
+        BUILT_IN_RULE_PACKAGE_REVISION
+    )
 }
 
 fn make_public_rule_package(
