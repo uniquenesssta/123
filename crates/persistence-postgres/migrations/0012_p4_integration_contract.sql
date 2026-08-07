@@ -1,5 +1,5 @@
 -- 接入A：锁定0.6.6第五阶段基线、P4语义映射和后续接入边界。
--- CONTRACT_SHA256 = 36de8454de9bbb4da3fceb3ec6c300847e21902785049774ee07001e5e582b57
+-- CONTRACT_SHA256 = b7ff6e3cc13afc8c9d6d8cac1b6b4f566fc7b7fd9f171be305fb57725e3a8371
 
 CREATE TABLE IF NOT EXISTS platform.integration_contracts (
     contract_key text NOT NULL,
@@ -57,20 +57,19 @@ BEGIN
             '0.6.6',
             '0.7.0',
             'football.p4-integration-baseline.v1',
-            '36de8454de9bbb4da3fceb3ec6c300847e21902785049774ee07001e5e582b57',
+            'b7ff6e3cc13afc8c9d6d8cac1b6b4f566fc7b7fd9f171be305fb57725e3a8371',
             'A',
             jsonb_build_object(
-                'contract_path', 'contracts/model-integration-contract.json',
-                'provider_kind', 'external',
-                'bundled_runtime', false,
+                'contract_path', 'contracts/p4-integration-baseline.json',
+                'p4_4_state', 'SHADOW_ONLY',
                 'canonical_horizons', jsonb_build_array('T-24h', 'T-6h', 'T-90m', 'T-1h'),
                 'legacy_horizons', jsonb_build_array('T-N')
             )
         );
-    ELSIF existing_hash <> '36de8454de9bbb4da3fceb3ec6c300847e21902785049774ee07001e5e582b57' THEN
+    ELSIF existing_hash <> 'b7ff6e3cc13afc8c9d6d8cac1b6b4f566fc7b7fd9f171be305fb57725e3a8371' THEN
         RAISE EXCEPTION 'P4 integration contract hash conflict: existing %, expected %',
             existing_hash,
-            '36de8454de9bbb4da3fceb3ec6c300847e21902785049774ee07001e5e582b57';
+            'b7ff6e3cc13afc8c9d6d8cac1b6b4f566fc7b7fd9f171be305fb57725e3a8371';
     END IF;
 END;
 $migration$;
