@@ -1,3 +1,4 @@
+use super::migration_compatibility::reconcile_known_legacy_migrations;
 use super::{PersistenceError, PersistenceResult, PostgresStore};
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
@@ -82,6 +83,7 @@ impl PostgresStore {
     }
 
     pub async fn migrate(&self) -> PersistenceResult<()> {
+        reconcile_known_legacy_migrations(&self.pool).await?;
         MIGRATOR.run(&self.pool).await?;
         self.ensure_runtime_schema_compatibility().await?;
         sqlx::query_scalar::<_, i64>("SELECT feature.refresh_player_ability_projections()")
