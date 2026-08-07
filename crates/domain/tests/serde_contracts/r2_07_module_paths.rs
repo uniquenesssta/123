@@ -1,0 +1,151 @@
+use football_domain::{ai_workspace, analytics, exchange, release};
+
+fn assert_same_type<T>(_: Option<T>, _: Option<T>) {}
+
+macro_rules! assert_module_types {
+    ($module:ident, [$($ty:ident),+ $(,)?]) => {
+        $(assert_same_type(None::<football_domain::$ty>, None::<$module::$ty>);)+
+    };
+}
+
+#[test]
+fn r2_07_analytics_module_paths_preserve_root_type_identity() {
+    assert_module_types!(analytics, [
+        AnalyticsRefreshRequest,
+        EvaluationSample,
+        CalibrationBucket,
+        ModelComparisonRow,
+        DriftFinding,
+        AnalyticsCalculation,
+        DataQualityFinding,
+        DataQualitySummary,
+        QueryPerformanceFinding,
+        QueryPerformanceSummary,
+        AnalyticsOverview,
+        JobStatus,
+        BackgroundJob,
+        EnqueueJobDraft,
+        AiAnalysisPackageManifest,
+        AiAnalysisPackageData,
+        AiAnalysisPackageSummary,
+        AiAnalysisSuggestionDraft,
+        AiAnalysisResponseManifest,
+        AiAnalysisResponsePreview,
+        AiAnalysisSuggestionRecord,
+        AiSuggestionDecision,
+        AiSuggestionDecisionDraft,
+        DataQualityDecision,
+        DataQualityDecisionDraft,
+        ParameterTuningDraft,
+        ParameterTuningDecision,
+        ParameterTuningDecisionDraft,
+        ParameterTuningCandidateRecord,
+        ParameterLifecycleReadinessRequest,
+        ParameterLifecycleReadiness,
+        ParameterCandidateBaseline,
+        ParameterCandidateArtifactDraft,
+        ParameterReplayFixture,
+        ParameterShadowValidationRequest,
+        ParameterShadowValidationRecord,
+        ParameterPromotionRequest,
+        ParameterRollbackRequest,
+        ParameterPromotionDecisionRecord,
+    ]);
+}
+
+#[test]
+fn r2_07_ai_workspace_module_paths_preserve_root_type_identity() {
+    assert_module_types!(ai_workspace, [
+        ApiWorkspacePreset,
+        ApiWorkspaceAttachment,
+        ApiWorkspaceSessionDraft,
+        ApiWorkspaceSessionRecord,
+        ApiWorkspaceMessageDraft,
+        ApiWorkspaceMessageRecord,
+        ApiWorkspaceOperationDraft,
+        ApiWorkspaceOperationRecord,
+        ApiWorkspaceGeneratedFileDraft,
+        ApiWorkspaceGeneratedFileRecord,
+        ApiWorkspaceGeneratedFileContent,
+        ApiWorkspaceSessionDetail,
+        ApiWorkspaceAssistantOperation,
+        ApiWorkspaceAssistantFile,
+        ApiWorkspaceAssistantOutput,
+        ApiWorkspaceApplyResult,
+    ]);
+}
+
+#[test]
+fn r2_07_exchange_module_paths_preserve_root_type_identity() {
+    assert_module_types!(exchange, [
+        PlayerDynamicTagDefinitionRecord,
+        PlayerDynamicTagDraft,
+        PlayerDynamicTagRecord,
+        PlayerMatchContributionRequest,
+        ContributionComponent,
+        PlayerMatchContribution,
+        MatchLineupExportData,
+        MatchLineupPlayerReference,
+        MatchLineupExportSummary,
+        AiMatchPackageManifest,
+        AiMatchPackageContext,
+        AiMatchPlayerContext,
+        AiMatchPackageSummary,
+        PreparedMatchPredictionInput,
+        SpreadsheetImportMode,
+        SpreadsheetAction,
+        SpreadsheetEntityType,
+        SpreadsheetRowStatus,
+        SpreadsheetRawRow,
+        SpreadsheetParsedWorkbook,
+        SpreadsheetConflictCandidate,
+        SpreadsheetImportRow,
+        SpreadsheetImportCounts,
+        SpreadsheetImportPreview,
+        SpreadsheetImportResolution,
+        SpreadsheetImportCommitResult,
+        SpreadsheetExportSummary,
+        SpreadsheetExportData,
+        SpreadsheetTeamRow,
+        SpreadsheetPlayerRow,
+        SpreadsheetPlayerNameRow,
+        SpreadsheetPlayerPositionRow,
+        SpreadsheetPlayerTeamPeriodRow,
+        SpreadsheetPlayerAbilityRow,
+        SpreadsheetPlayerAvailabilityRow,
+        SpreadsheetPlayerDynamicTagRow,
+        SpreadsheetExternalIdRow,
+        MonthlyWorkbookKind,
+        MonthlyWorkbookExportSummary,
+        MonthlyDataGapRow,
+        TeamMonthlyWorkbookData,
+        TeamMonthlyTeamRow,
+        TeamMonthlyNameRow,
+        TeamMonthlyCoachRow,
+        TeamMonthlyCoachPeriodRow,
+        TeamMonthlyFormationUsageRow,
+        TeamTacticalObservationRow,
+        TeamAbilityObservationRow,
+        TeamPackageExportSummary,
+        TeamPackagePreviewExportSummary,
+        TeamPackageCoverage,
+        TeamPackageImportPreview,
+        TeamPackageCommitRequest,
+        TeamPackageCommitResult,
+    ]);
+}
+
+#[test]
+fn r2_07_release_module_paths_preserve_root_type_identity() {
+    assert_module_types!(release, [
+        ReleaseAcceptanceStatus,
+        ReleaseAcceptanceRequest,
+        ReleaseAcceptanceCheck,
+        ReleaseAcceptanceCategorySummary,
+        ReleaseAcceptancePerformanceSummary,
+        ReleaseAcceptanceCostSummary,
+        ReleaseAcceptanceRun,
+        ReleaseAcceptanceRunSummary,
+        ReleaseAcceptanceRuntimeFacts,
+    ]);
+}

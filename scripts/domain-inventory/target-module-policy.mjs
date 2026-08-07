@@ -14,14 +14,18 @@ const FILE_POLICY = new Map([
 ]);
 
 const DIRECTORY_POLICY = new Map([
+  ["ai_workspace", ["ai_workspace", "R2-07"]],
+  ["analytics", ["analytics", "R2-07"]],
   ["coach", ["coach", "R2-03"]],
   ["competition", ["competition", "R2-02"]],
+  ["exchange", ["exchange", "R2-07"]],
   ["formation", ["formation", "R2-03"]],
   ["lineup", ["lineup", "R2-04"]],
   ["match_record", ["match_record", "R2-04"]],
   ["player", ["player", "R2-03"]],
   ["postmatch", ["postmatch", "R2-06"]],
   ["prediction", ["prediction", "R2-05"]],
+  ["release", ["release", "R2-07"]],
   ["research", ["research", "R2-05"]],
   ["review", ["review", "R2-06"]],
   ["routing", ["routing", "R2-02"]],
