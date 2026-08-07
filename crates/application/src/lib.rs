@@ -170,10 +170,12 @@ mod tests {
         let service = ApplicationService::new();
         let mut package_keys = HashSet::new();
         let mut model_ids = HashSet::new();
+        let expected_version = format!("{}+public.1", env!("CARGO_PKG_VERSION"));
 
         for draft in rule_packages::built_in_rule_packages() {
             assert!(package_keys.insert(draft.package_key.clone()));
             model_ids.insert(draft.routing.model_id.clone());
+            assert_eq!(draft.version, expected_version);
             rule_packages::validate_rule_package_shape(&draft).expect("内置规则包结构无效");
             rule_packages::validate_parameter_identity(&draft).expect("内置规则包版本无效");
             let model = service
@@ -220,6 +222,7 @@ mod tests {
         rule_packages::validate_rule_package_shape(&draft).expect("用户规则包模板结构无效");
         rule_packages::validate_parameter_identity(&draft).expect("用户规则包模板版本无效");
         assert_eq!(draft.format_version, "football.rule-package.v1");
+        assert_eq!(draft.version, env!("CARGO_PKG_VERSION"));
         assert_eq!(
             draft.competition_profile.competition_kind,
             CompetitionKind::Custom
