@@ -1,9 +1,9 @@
 # R02-06 Review 与 Postmatch 实施记录
 
-- 任务状态：`VERIFYING`
+- 任务状态：`DONE`
 - 前置门禁：R2-05 已在正式 Windows Automated run `31171082098`、job `92842834091` 通过
 - R2-06 开始基线：`b0437922f573fe4ee066e4217ac64694da71f34a`
-- 当前已验证源码提交：`81667510b3ea0009615270bfb87304e9c1e4e837`（数据库兼容桥 targeted Windows 编译/测试）
+- 最终验收源码提交：`eb8ea8972e95e6ef7332bac85fa0cd143bdbc2a8`
 - 目标平台：Windows
 - 类型范围：Review 48 + Postmatch 11，共 59 个公共兼容类型
 
@@ -55,7 +55,8 @@
 - 比赛事件解析别名、工作流状态机、阻断原因和默认行为原样迁移。
 - 历史 SQL migration 文件继续保持公开仓库冻结版本，不以改写 migration 的方式修复旧数据库。
 - `crates/persistence-postgres/src/migration_compatibility.rs` 只识别已登记的已知旧数据库来源，在 SQLx Migrator 前以事务锁执行固定 11 个版本的 checksum 兼容和已知公开字段桥接；未知历史 fail-closed，不清空数据库、不删除迁移账本、不重建用户数据。
-- 不修改 Application/Tauri 公共 DTO、公共命令、生产模型边界、P4/P7 模型实现、参数、Profile、Schema、fixture 或 Golden Master。
+- 公开重写后内容发生变化的内置规则包、P4 Schema 与研究 Prompt 使用新的不可变内容版本；旧数据库中的历史版本保留不动，不通过覆盖历史内容绕过数据库指纹保护。
+- 不修改 Application/Tauri 公共 DTO、公共命令、生产模型边界、P4/P7 模型实现、参数、Profile、fixture 或 Golden Master。
 
 ## 5. 契约测试
 
@@ -73,8 +74,8 @@
 - `node scripts/verify-protected-assets-deterministic.mjs`
 - `npm run verify:frontend`
 - `npm run verify:rust`
-- 最终源码树执行正式 `Public Platform CI` / Windows Automated
-- 用户本机 Windows 验证并行执行，作为额外实机证据；真实 PostgreSQL 与最终 Windows Full 仍按总计划保留到最终统一验收
+- Windows Automated acceptance
+- 用户本机 Windows 启动、真实 PostgreSQL 连接与运行日志复核
 
 ## 7. 实施与验证结果
 
@@ -84,7 +85,11 @@
 - recovery staged run `31173824393`、job `92851309157` 已完整通过：父级依赖准备、Rust 格式化、Domain 类型清单重新生成与验证、R2-06 Serde/模块身份契约、架构门禁、模型保护资产门禁、完整 frontend 和完整 Rust 门禁全部成功。
 - 用户 Windows 实机启动、主窗口与一级/二级导航 smoke test 已通过；同时发现断库状态进入比赛页会继续初始化未渲染的 `new-match-competition` 控件并产生 Critical。现已改为仅在赛事控件存在时初始化比赛表单，数据库连接提示状态仍正常渲染。
 - 同次实机验证发现既有数据库的 SQLx migration 12 checksum 与当前公开 migration 不一致。没有采用清库、手工改账本或恢复私有历史 migration；已增加固定来源识别的数据库兼容桥。Windows targeted run `31184278180`、job `92884819157` 已通过 Rust 1.88 格式、`football-persistence-postgres` 编译和兼容白名单/SHA-384 单元测试。
+- 兼容桥首次实机运行进一步暴露旧 `model.engine_artifacts` 的不可变 UPDATE 触发器；修复后通过列与约束重命名保留原记录，不执行行级 UPDATE，不删除历史数据。
+- 旧数据库随后暴露内置规则包及 P4 evidence / prematch snapshot / research output / research prompt 的“同版本不同内容”保护冲突；修复采用新的不可变内容版本，保留旧版本和历史内容，不削弱指纹校验。
 - R2-06 拆分后仍引用旧 Domain 根文件的 `verify-match-review-package.mjs`、`verify-stage-a-architecture.mjs`、`verify-match-event-facts.mjs` 已同步到新职责路径；参数生命周期与赛后结算验证器继续按公开 ModelProvider 边界验证，不恢复或读取私有模型资产。
 - 新增 `verify-database-migration-compatibility.mjs`，固定验证兼容桥必须在 SQLx Migrator 之前执行、只接受已知来源、只允许 11 个指定版本、使用 SHA-384、未知来源 fail-closed 且不得包含 destructive ledger/data 操作；已接入 `verify:frontend`。
-- 新增兼容模块后 Domain/调用链机器清单发生合法漂移，run `31184917841`、job `92886940938` 已重新生成并通过 `verify-domain-type-inventory`，提交 `acb349e2acac212d80bd8bb8a0b2bc3a77281365`；临时 inventory workflow 已从最终树移除。
-- 当前状态仍为 `VERIFYING`：等待包含上述修复的正式 `Public Platform CI` / Windows Automated 全量结果，以及用户使用原数据库再次连接确认 migration 12 兼容桥和断库比赛页 Critical 均不再复现；两项完成前不开放 R2-07。
+- 新增兼容模块后 Domain/调用链机器清单发生合法漂移，已按项目生成器重新生成并通过 `verify-domain-type-inventory`。
+- Windows Automated acceptance run `31200190104` 已完成并通过。
+- 用户使用原有 PostgreSQL 数据库再次连接成功；最终 runtime 日志中 `connection_error` 为空，启动与工作区读取均为正常 `info`，此前 migration、不可变规则包/Schema 冲突和 `new-match-competition` Critical 均未再复现。
+- 用户确认 R2-06 可以关闭；本节点状态更新为 `DONE`，R2-07 开放。
