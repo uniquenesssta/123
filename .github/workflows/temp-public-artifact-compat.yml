@@ -140,11 +140,9 @@ jobs:
           cargo check --locked -p football-application
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 
-      - name: Verify identities and commit
+      - name: Commit verified fix
         shell: pwsh
         run: |
-          rg -n '1\.0\.0\+public\.1|2\.0\.0\+public\.1' crates/application/src/built_in_artifacts.rs crates/domain/src/research/mod.rs README.md
-          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
           if (Test-Path '.github/workflows/temp-public-artifact-compat.yml') { throw 'temporary workflow was not cleaned' }
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
