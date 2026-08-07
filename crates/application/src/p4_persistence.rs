@@ -1,4 +1,8 @@
 use super::{ApplicationResult, ApplicationService};
+use crate::built_in_artifacts::{
+    P4_EVIDENCE_SCHEMA_ARTIFACT_VERSION, P4_EVIDENCE_SCHEMA_KEY,
+    P4_SNAPSHOT_SCHEMA_ARTIFACT_VERSION, P4_SNAPSHOT_SCHEMA_KEY,
+};
 use football_domain::{
     CompetitionProfileVersionDraft, CompetitionProfileVersionRecord, EvidenceClaimDraft,
     EvidenceClaimRecord, EvidenceConflictDraft, EvidenceConflictRecord, PrematchSnapshotBundle,
@@ -98,8 +102,8 @@ impl ApplicationService {
 fn built_in_schema_versions() -> Vec<SchemaVersionDraft> {
     vec![
         SchemaVersionDraft {
-            schema_key: "p4-evidence".to_string(),
-            version: "1.0.0".to_string(),
+            schema_key: P4_EVIDENCE_SCHEMA_KEY.to_string(),
+            version: P4_EVIDENCE_SCHEMA_ARTIFACT_VERSION.to_string(),
             schema_kind: "structured_evidence".to_string(),
             schema_body: parse_schema(include_str!("../../../schemas/evidence.schema.json")),
             description: Some("联网事实证据声明的公开结构契约".to_string()),
@@ -110,8 +114,8 @@ fn built_in_schema_versions() -> Vec<SchemaVersionDraft> {
             }),
         },
         SchemaVersionDraft {
-            schema_key: "p4-prematch-snapshot".to_string(),
-            version: "1.0.0".to_string(),
+            schema_key: P4_SNAPSHOT_SCHEMA_KEY.to_string(),
+            version: P4_SNAPSHOT_SCHEMA_ARTIFACT_VERSION.to_string(),
             schema_kind: "immutable_snapshot".to_string(),
             schema_body: parse_schema(include_str!(
                 "../../../schemas/prematch-snapshot.schema.json"
@@ -140,6 +144,10 @@ mod tests {
         let drafts = built_in_schema_versions();
         assert_eq!(drafts.len(), 2);
         assert_ne!(drafts[0].schema_key, drafts[1].schema_key);
+        assert_eq!(drafts[0].schema_key, P4_EVIDENCE_SCHEMA_KEY);
+        assert_eq!(drafts[0].version, P4_EVIDENCE_SCHEMA_ARTIFACT_VERSION);
+        assert_eq!(drafts[1].schema_key, P4_SNAPSHOT_SCHEMA_KEY);
+        assert_eq!(drafts[1].version, P4_SNAPSHOT_SCHEMA_ARTIFACT_VERSION);
         for draft in drafts {
             assert_eq!(draft.schema_body["additionalProperties"], false);
             assert!(draft.schema_body["$id"].as_str().is_some());

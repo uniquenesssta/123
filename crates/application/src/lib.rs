@@ -1,5 +1,6 @@
 mod analytics;
 mod api_workspace;
+mod built_in_artifacts;
 mod competition;
 mod composition;
 mod database;

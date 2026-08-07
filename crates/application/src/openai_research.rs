@@ -1,4 +1,8 @@
 use super::{ApplicationError, ApplicationResult, ApplicationService, PersistenceStore};
+use crate::built_in_artifacts::{
+    P4_RESEARCH_PROMPT_ARTIFACT_VERSION, P4_RESEARCH_PROMPT_KEY as RESEARCH_PROMPT_KEY,
+    P4_RESEARCH_SCHEMA_ARTIFACT_VERSION, P4_RESEARCH_SCHEMA_KEY as RESEARCH_SCHEMA_KEY,
+};
 use async_trait::async_trait;
 use chrono::{DateTime, Utc};
 use football_domain::{
@@ -16,8 +20,6 @@ use serde_json::{json, Value};
 use std::sync::Arc;
 use uuid::Uuid;
 
-const RESEARCH_SCHEMA_KEY: &str = "p4-openai-research-output";
-const RESEARCH_PROMPT_KEY: &str = "p4-openai-research-system";
 const RESEARCH_SCHEMA_NAME: &str = "p4_openai_research_output";
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -425,7 +427,7 @@ fn built_in_gateway_config() -> Result<GatewayConfig, GatewayError> {
 fn built_in_research_schema() -> SchemaVersionDraft {
     SchemaVersionDraft {
         schema_key: RESEARCH_SCHEMA_KEY.to_string(),
-        version: "2.0.0".to_string(),
+        version: P4_RESEARCH_SCHEMA_ARTIFACT_VERSION.to_string(),
         schema_kind: "openai_structured_output".to_string(),
         schema_body: serde_json::from_str(include_str!(
             "../../../schemas/research-output.schema.json"
@@ -446,7 +448,7 @@ fn built_in_research_schema() -> SchemaVersionDraft {
 fn built_in_research_prompt() -> PromptVersionDraft {
     PromptVersionDraft {
         prompt_key: RESEARCH_PROMPT_KEY.to_string(),
-        version: P4_RESEARCH_PROMPT_VERSION.to_string(),
+        version: P4_RESEARCH_PROMPT_ARTIFACT_VERSION.to_string(),
         prompt_role: "research_system".to_string(),
         content: include_str!("../../../src-tauri/resources/research/public_research_prompt.txt")
             .to_string(),
@@ -506,6 +508,11 @@ mod tests {
         assert!(!serialized.contains("sk-"));
         assert!(!serialized.contains("api_key"));
         let schema = built_in_research_schema();
+        assert_eq!(schema.version, P4_RESEARCH_SCHEMA_ARTIFACT_VERSION);
+        assert_eq!(
+            built_in_research_prompt().version,
+            P4_RESEARCH_PROMPT_ARTIFACT_VERSION
+        );
         assert_eq!(schema.schema_body["additionalProperties"], false);
         assert!(built_in_research_prompt()
             .content

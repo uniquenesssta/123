@@ -2,6 +2,12 @@ use super::{
     ApplicationError, ApplicationResult, ApplicationService, OpenAiResearchCommand,
     PredictionCommand,
 };
+use crate::built_in_artifacts::{
+    P4_RESEARCH_SCHEMA_ARTIFACT_VERSION as RESEARCH_SCHEMA_VERSION,
+    P4_RESEARCH_SCHEMA_KEY as RESEARCH_SCHEMA_KEY,
+    P4_SNAPSHOT_SCHEMA_ARTIFACT_VERSION as SNAPSHOT_SCHEMA_VERSION,
+    P4_SNAPSHOT_SCHEMA_KEY as SNAPSHOT_SCHEMA_KEY,
+};
 use crate::model_shell::P4_MODEL_ID;
 use crate::PersistenceStore;
 use chrono::{Duration, Utc};
@@ -21,10 +27,6 @@ use std::sync::{atomic::Ordering, Arc};
 use tokio::time::{sleep, Duration as TokioDuration};
 use uuid::Uuid;
 
-const RESEARCH_SCHEMA_KEY: &str = "p4-openai-research-output";
-const RESEARCH_SCHEMA_VERSION: &str = "2.0.0";
-const SNAPSHOT_SCHEMA_KEY: &str = "p4-prematch-snapshot";
-const SNAPSHOT_SCHEMA_VERSION: &str = "1.0.0";
 const P4_RESEARCH_JOB: &str = "p4_horizon_research";
 const P4_FREEZE_JOB: &str = "p4_horizon_freeze";
 const P4_WORKER_POLL_SECONDS: u64 = 30;
