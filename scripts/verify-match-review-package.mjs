@@ -2,8 +2,17 @@ import fs from "node:fs";
 const read = (path) => fs.readFileSync(new URL(`../${path}`, import.meta.url), "utf8");
 const failures = [];
 const check = (ok, message) => { if (!ok) failures.push(message); };
-const domain = read("crates/domain/src/match_review_package.rs");
-const reviewDomain = read("crates/domain/src/review.rs");
+const domain = [
+  "contract.rs",
+  "comparison.rs",
+  "preview.rs",
+  "transition.rs",
+  "workflow.rs",
+].map((file) => read(`crates/domain/src/review/package/${file}`)).join("\n");
+const reviewDomain = [
+  read("crates/domain/src/review/aggregate.rs"),
+  read("crates/domain/src/review/event/payload.rs"),
+].join("\n");
 const workbook = read("crates/spreadsheet-io/src/match_review_workbook.rs");
 const application = read("crates/application/src/match_review_package.rs");
 const persistence = read("crates/persistence-postgres/src/match_review_package.rs");
@@ -20,7 +29,7 @@ const loader = read("src/controllers/pageLoaders.ts");
 
 check(workbook.includes('let format_version = required_text(&metadata, "format_version")?.to_string();'), "赛后复盘资料包 format_version 必须转换为 String，避免 Rust E0308");
 for (const token of ["football.match-review-package.v1", "MatchReviewPackagePreview", "MatchReviewPackageWorkflowRecord", "MatchReviewPackageConfirmationRequest", "MatchReviewPackageComparison", "MatchReviewPackageIdentityCheck"]) check(domain.includes(token), `领域契约缺少 ${token}`);
-check(reviewDomain.includes("pub events: Vec<crate::MatchReviewEventDraft>"), "MatchReviewDraft 未携带结构化比赛事件");
+check(reviewDomain.includes("pub events: Vec<crate::MatchReviewEventDraft>") || reviewDomain.includes("pub events: Vec<MatchReviewEventDraft>"), "MatchReviewDraft 未携带结构化比赛事件");
 check(reviewDomain.includes("pub struct MatchReviewEventRecord") && reviewDomain.includes("pub events: Vec<MatchReviewEventRecord>"), "正式复盘详情缺少可查询事件记录");
 for (const sheet of ["说明与校验", "元数据", "比赛与赛果", "实际阵容", "换人与事件", "球员表现", "球员参考", "赛前快照", "字段字典"]) check(workbook.includes(`"${sheet}"`), `赛后复盘资料包缺少工作表：${sheet}`);
 for (const guard of ["必须恰好 11 名首发", "缺少 0–10 评分", "替补出场球员", "进球事件计数"]) check(workbook.includes(guard), `资料包预检缺少门禁：${guard}`);
