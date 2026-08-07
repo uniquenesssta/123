@@ -43,8 +43,8 @@ R1 已完成并关闭。R2 按业务语义拆分 `crates/domain`，保持 Serde�
 | R2-03 | Team / Player / Coach / Formation | DONE | [`R02-03-team-player-coach-and-formation.md`](R02-03-team-player-coach-and-formation.md) | workflow run `31110013068`、job `92645025258` 通过 |
 | R2-04 | Lineup 与 Match | DONE | [`R02-04-lineup-and-match.md`](R02-04-lineup-and-match.md) | 实施 run `31151412918`、正式 Windows Automated run `31153982572` 通过 |
 | R2-05 | Prediction 与 Research 外围领域 | DONE | [`R02-05-prediction-and-research-外围领域.md`](R02-05-prediction-and-research-外围领域.md) | 正式 Windows Automated run `31171082098`、job `92842834091` 通过 |
-| R2-06 | Review 与 Postmatch | READY | `R02-06-review-and-postmatch.md` | 前置节点已完成，可开始 |
-| R2-07 | Analytics / Exchange / AI / Release | BLOCKED | `R02-07-analytics-exchange-ai-and-release.md` | 等待前置节点 |
+| R2-06 | Review 与 Postmatch | VERIFYING | [`R02-06-review-and-postmatch.md`](R02-06-review-and-postmatch.md) | staged run `31173824393` 全量通过，等待正式 Windows Automated |
+| R2-07 | Analytics / Exchange / AI / Release | BLOCKED | `R02-07-analytics-exchange-ai-and-release.md` | 等待 R2-06 正式门禁 |
 | R2-08 | Domain 根出口收敛 | BLOCKED | `R02-08-domain-根出口收敛.md` | 等待前置节点 |
 
 ## R2-01 当前结果
@@ -64,7 +64,7 @@ R2-01 至 R2-08 全部 `DONE` 后创建 `R02-stage-completion.md`，并实际完
 
 ## 当前阶段状态
 
-`R2-05 DONE`；`R2-06 READY`。Prediction 48 个类型与 Research 27 个类型已迁移到职责目录；包含该最终源码树及外置依赖布局的 `new-B` 提交 `e328b4aa5a7737e6bb378abf8b891cd953b99f62` 已通过正式 Windows Automated run `31171082098`、job `92842834091`，artifact `8991618221` 的 SHA-256 为 `71320b8ef97e62be2fe2323327d21f4870476092ad024d7b8c2c26a4ade9dc59`。R2-06 已开放。
+`R2-05 DONE`；`R2-06 VERIFYING`。Review 48 个类型与 Postmatch 11 个类型已从 5 个根级职责混合文件迁移到 `review/` 与 `postmatch/` 职责目录；staged run `31173824393`、job `92851309157` 已在最终生成源码树上通过格式化、类型清单、Serde/模块路径、架构、保护资产、完整 frontend 与完整 Rust 门禁，并生成提交 `14ef207c754a73ae53bece3593e241d0d2ea428a`。正式 Windows Automated 通过前 R2-07 保持阻塞。
 
 ## R2-02 当前结果
 
@@ -101,3 +101,11 @@ R2-01 至 R2-08 全部 `DONE` 后创建 `R02-stage-completion.md`，并实际完
 - Prediction 独立提交为 `2cd685b8057a1bce2f75e4c7f5b56aed1bf3d142`；首次 run `31158780693` 暴露并停止于两个未使用 import，恢复 run `31159821513` 已在不放宽门禁的前提下完成 Research 与全量回归。
 - 正式 Windows Automated run `31171082098`、job `92842834091` 已通过；artifact `8991618221` 大小 `14117154` 字节，SHA-256 为 `71320b8ef97e62be2fe2323327d21f4870476092ad024d7b8c2c26a4ade9dc59`。
 - R2-05 状态为 `DONE`，R2-06 已开放。
+
+## R2-06 当前结果
+
+- Review 48 个类型与 Postmatch 11 个类型已进入业务语义职责目录，并保留根级公共兼容类型路径。
+- 已删除 `review.rs`、`match_event.rs`、`match_review_package.rs`、`match_review_workflow.rs`、`postmatch.rs` 5 个旧职责混合文件。
+- 新增 59 个类型的 `review::*` / `postmatch::*` 模块身份契约，迁移进度与目标模块策略同步登记 R2-06。
+- staged run `31173619041` 在类型清单策略缺少新目录时按硬门禁停止；仅补齐目录策略后，recovery run `31173824393`、job `92851309157` 已完整通过格式化、类型清单、Serde、架构、保护资产、frontend 与 Rust 全量门禁。
+- 当前状态为 `VERIFYING`，等待最终文档同步源码树上的正式 Windows Automated；R2-07 未开放。
