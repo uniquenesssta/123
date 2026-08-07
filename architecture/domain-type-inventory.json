@@ -24,7 +24,7 @@
     "targetPublicExportPolicy": "explicit re-export only"
   },
   "sourceDigest": "9b0dbb3190b9efa6b8285a48980662a509815ab657fdcf2a8142dbc740a49ee3",
-  "rustUsageDigest": "4f1482e2fadbf2cf0e9952aef80376871524c3373c034cf321c4f6a94268b0a3",
+  "rustUsageDigest": "4b84ac3fe05c02cf46e000e2828d559ed4307640ae2f41b181392d9b8939c29d",
   "summary": {
     "typeCount": 365,
     "publicCompatibilityTypeCount": 365,
@@ -14483,7 +14483,6 @@
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
         "crates/domain/src/prediction/horizon.rs",
-        "crates/domain/src/prediction/orchestration/planning.rs",
         "crates/domain/src/prediction/orchestration/task.rs",
         "crates/domain/src/prediction/persistence/research.rs",
         "crates/domain/src/prediction/persistence/snapshot.rs",
@@ -14848,7 +14847,7 @@
       "visibility": "public",
       "currentPath": "crates/domain/src/prediction/orchestration/planning.rs",
       "currentModule": "football_domain::planning",
-      "sourceLine": 8,
+      "sourceLine": 6,
       "derives": [
         "Clone",
         "Debug",
@@ -16413,7 +16412,7 @@
       "visibility": "public",
       "currentPath": "crates/domain/src/prediction/orchestration/planning.rs",
       "currentModule": "football_domain::planning",
-      "sourceLine": 21,
+      "sourceLine": 19,
       "derives": [
         "Clone",
         "Debug",
