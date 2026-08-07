@@ -1,6 +1,6 @@
 -- P4 接入C：证据、版本与不可变赛前快照持久化。
 -- 复用现有比赛、来源、模型、赛果与审计结构；新增缺失的版本账本和证据责任实体。
--- CONTRACT_SHA256 = 4ac7e5d496071bb67d9f43c84bdd207e8de2479c56e36bea3078b5ea2f308643
+-- CONTRACT_SHA256 = 13274c8467b68277b904c7abf512d49d853aeabcfaa7e5cd641802a3a11659d8
 
 CREATE SCHEMA IF NOT EXISTS research;
 
@@ -408,7 +408,9 @@ FOR EACH ROW EXECUTE FUNCTION platform.reject_immutable_record_mutation();
 CREATE TABLE model.snapshot_probabilities (
     snapshot_id uuid NOT NULL REFERENCES feature.snapshots(id),
     model_run_id uuid REFERENCES model.runs(id),
-    chain_key text NOT NULL CHECK (length(btrim(chain_key)) > 0),
+    chain_key text NOT NULL CHECK (chain_key IN (
+        'independent', 'core', 'full', 'shadow_mixture'
+    )),
     home_win double precision NOT NULL CHECK (home_win BETWEEN 0 AND 1),
     draw double precision NOT NULL CHECK (draw BETWEEN 0 AND 1),
     away_win double precision NOT NULL CHECK (away_win BETWEEN 0 AND 1),
@@ -421,14 +423,18 @@ CREATE TABLE model.snapshot_probabilities (
         clean_sheet_away IS NULL OR clean_sheet_away BETWEEN 0 AND 1
     ),
     matrix_sha256 text NOT NULL CHECK (matrix_sha256 ~ '^[0-9a-f]{64}$'),
-    matrix_cell_count integer NOT NULL CHECK (matrix_cell_count > 0),
+    matrix_cell_count integer NOT NULL CHECK (matrix_cell_count = 169),
     is_formal boolean NOT NULL,
     shadow_status text,
     metadata jsonb NOT NULL DEFAULT '{}'::jsonb,
     created_at timestamptz NOT NULL DEFAULT now(),
     PRIMARY KEY (snapshot_id, chain_key),
     CHECK (abs((home_win + draw + away_win) - 1.0) <= 0.000000001),
-    CHECK (shadow_status IS NULL OR length(btrim(shadow_status)) > 0)
+    CHECK ((chain_key = 'full') = is_formal),
+    CHECK (
+        (chain_key = 'shadow_mixture' AND shadow_status = 'SHADOW_ONLY')
+        OR (chain_key <> 'shadow_mixture' AND shadow_status IS NULL)
+    )
 );
 CREATE INDEX snapshot_probabilities_run_idx
     ON model.snapshot_probabilities (model_run_id)
@@ -540,20 +546,21 @@ BEGIN
         ) VALUES (
             'p4-persistence-ledger', '1.0.0', '0.8.0', '0.9.0',
             'football.p4-persistence-contract.v1',
-            '4ac7e5d496071bb67d9f43c84bdd207e8de2479c56e36bea3078b5ea2f308643',
+            '13274c8467b68277b904c7abf512d49d853aeabcfaa7e5cd641802a3a11659d8',
             'C',
             jsonb_build_object(
-                'contract_path', 'contracts/model-persistence-contract.json',
-                'provider_output_opaque', true,
-                'bundled_runtime', false,
-                'immutable_evidence', true,
-                'immutable_snapshots', true
+                'contract_path', 'contracts/p4-persistence-contract.json',
+                'feature_field_count', 31,
+                'probability_chains', jsonb_build_array(
+                    'independent', 'core', 'full', 'shadow_mixture'
+                ),
+                'p4_4_state', 'SHADOW_ONLY'
             )
         );
-    ELSIF existing_hash <> '4ac7e5d496071bb67d9f43c84bdd207e8de2479c56e36bea3078b5ea2f308643' THEN
+    ELSIF existing_hash <> '13274c8467b68277b904c7abf512d49d853aeabcfaa7e5cd641802a3a11659d8' THEN
         RAISE EXCEPTION 'P4 persistence contract hash conflict: existing %, expected %',
             existing_hash,
-            '4ac7e5d496071bb67d9f43c84bdd207e8de2479c56e36bea3078b5ea2f308643';
+            '13274c8467b68277b904c7abf512d49d853aeabcfaa7e5cd641802a3a11659d8';
     END IF;
 END;
 $migration$;

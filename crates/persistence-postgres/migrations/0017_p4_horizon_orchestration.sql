@@ -1,5 +1,5 @@
 -- 接入F：四时点任务编排、READY_TO_FREEZE状态机和自动冻结。
--- CONTRACT_SHA256 = b8577c3e80c1d4391839be4f82021018aff79f1421392f7758b8877bf1ba7d3f
+-- CONTRACT_SHA256 = f0b9cbf464da780aa27cae274a9ec305107820e932413a68c904c7bb48ae8a8e
 
 ALTER TABLE platform.jobs
     ADD COLUMN available_at timestamptz NOT NULL DEFAULT now();
@@ -137,19 +137,19 @@ BEGIN
             '0.11.0',
             '0.12.0',
             'football.p4-orchestration-contract.v1',
-            'b8577c3e80c1d4391839be4f82021018aff79f1421392f7758b8877bf1ba7d3f',
+            'f0b9cbf464da780aa27cae274a9ec305107820e932413a68c904c7bb48ae8a8e',
             'F',
             jsonb_build_object(
-                'contract_path', 'contracts/model-orchestration-contract.json',
+                'contract_path', 'contracts/p4-orchestration-contract.json',
                 'canonical_horizons', jsonb_build_array('T-24h', 'T-6h', 'T-90m', 'T-1h'),
                 'ready_state', 'READY_TO_FREEZE',
                 'formal_terminal_state', 'FROZEN',
                 'legacy_horizon', 'T-N'
             )
         );
-    ELSIF existing_hash <> 'b8577c3e80c1d4391839be4f82021018aff79f1421392f7758b8877bf1ba7d3f' THEN
+    ELSIF existing_hash <> 'f0b9cbf464da780aa27cae274a9ec305107820e932413a68c904c7bb48ae8a8e' THEN
         RAISE EXCEPTION 'P4 orchestration contract hash conflict: existing %, expected %',
-            existing_hash, 'b8577c3e80c1d4391839be4f82021018aff79f1421392f7758b8877bf1ba7d3f';
+            existing_hash, 'f0b9cbf464da780aa27cae274a9ec305107820e932413a68c904c7bb48ae8a8e';
     END IF;
 END;
 $migration$;

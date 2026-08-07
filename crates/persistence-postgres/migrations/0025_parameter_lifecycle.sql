@@ -126,8 +126,8 @@ BEGIN
             release_version, schema_version, content_sha256, stage, metadata
         ) VALUES (
             'p4-parameter-lifecycle', '1.0.0', '0.20.0', '0.21.0',
-            'football.model-parameter-lifecycle.v1',
-            '439c22ace0712e035721a1b754cac616faf77a31df7575720bc09fe2e1867e1b', 'I',
+            'football.p4-parameter-lifecycle.v1',
+            '8e53460bd59797138a7c7977c3d8379bb0704cd80ae7df30f69082adb79aa4e3', 'I',
             jsonb_build_object(
                 'contract_path', 'contracts/parameter-lifecycle-contract.json',
                 'required_h_contract_key', 'p4-postmatch-settlement',
@@ -135,12 +135,12 @@ BEGIN
                 'automatic_promotion', false,
                 'immutable_candidate_versions', true,
                 'binding_level_rollback', true,
-                'provider_state', 'NOT_BUNDLED'
+                'p4_4_state', 'SHADOW_ONLY'
             )
         );
-    ELSIF existing_hash <> '439c22ace0712e035721a1b754cac616faf77a31df7575720bc09fe2e1867e1b' THEN
+    ELSIF existing_hash <> '8e53460bd59797138a7c7977c3d8379bb0704cd80ae7df30f69082adb79aa4e3' THEN
         RAISE EXCEPTION 'parameter lifecycle contract hash conflict: existing %, expected %',
-            existing_hash, '439c22ace0712e035721a1b754cac616faf77a31df7575720bc09fe2e1867e1b';
+            existing_hash, '8e53460bd59797138a7c7977c3d8379bb0704cd80ae7df30f69082adb79aa4e3';
     END IF;
 END;
 $migration$;

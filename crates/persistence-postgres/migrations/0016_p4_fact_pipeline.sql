@@ -1,5 +1,5 @@
 -- P4 接入E：实体解析、时间审计、冲突评估与唯一证据路由。
--- CONTRACT_SHA256 = 2282e4fcd2176d89e729d4eaf2a0d68c97ce50437ef5e8a442d6a571433a26c2
+-- CONTRACT_SHA256 = a41a974b5a1d7d98acb16a167ebc5ca903d002940e62eb898324763c83cad968
 
 
 -- STALE may represent an explicitly missing/expired field with no current source.
@@ -216,10 +216,10 @@ BEGIN
             '0.10.2',
             '0.11.0',
             'football.p4-fact-pipeline-contract.v1',
-            '2282e4fcd2176d89e729d4eaf2a0d68c97ce50437ef5e8a442d6a571433a26c2',
+            'a41a974b5a1d7d98acb16a167ebc5ca903d002940e62eb898324763c83cad968',
             'E',
             jsonb_build_object(
-                'contract_path', 'contracts/fact-pipeline-contract.json',
+                'contract_path', 'contracts/p4-fact-pipeline-contract.json',
                 'research_output_schema', 'football.p4-research-output.v2',
                 'entity_resolution', true,
                 'time_gate', true,
@@ -229,10 +229,10 @@ BEGIN
                 'ui_stage', 'G'
             )
         );
-    ELSIF existing_hash <> '2282e4fcd2176d89e729d4eaf2a0d68c97ce50437ef5e8a442d6a571433a26c2' THEN
+    ELSIF existing_hash <> 'a41a974b5a1d7d98acb16a167ebc5ca903d002940e62eb898324763c83cad968' THEN
         RAISE EXCEPTION 'P4 fact pipeline contract hash conflict: existing %, expected %',
             existing_hash,
-            '2282e4fcd2176d89e729d4eaf2a0d68c97ce50437ef5e8a442d6a571433a26c2';
+            'a41a974b5a1d7d98acb16a167ebc5ca903d002940e62eb898324763c83cad968';
     END IF;
 END;
 $migration$;

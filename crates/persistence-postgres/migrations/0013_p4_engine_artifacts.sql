@@ -1,6 +1,5 @@
--- Public release boundary: immutable external model-provider artifact ledger.
--- The public repository records interface fingerprints only. It does not bundle engine source,
--- parameters, profiles, fixed fixtures, or provider-owned output topology.
+-- P4 接入B：确定性引擎、配置与 Golden Master 不可变制品账本。
+-- 运行时不读取工作簿；这里只登记可验证的机器制品指纹。
 
 CREATE TABLE IF NOT EXISTS model.engine_artifacts (
     engine_key TEXT NOT NULL,
@@ -12,11 +11,11 @@ CREATE TABLE IF NOT EXISTS model.engine_artifacts (
     profile_sha256 TEXT NOT NULL CHECK (profile_sha256 ~ '^[0-9a-f]{64}$'),
     input_schema_sha256 TEXT NOT NULL CHECK (input_schema_sha256 ~ '^[0-9a-f]{64}$'),
     output_schema_sha256 TEXT NOT NULL CHECK (output_schema_sha256 ~ '^[0-9a-f]{64}$'),
-    provider_fixture_sha256 TEXT NOT NULL CHECK (provider_fixture_sha256 ~ '^[0-9a-f]{64}$'),
+    golden_master_sha256 TEXT NOT NULL CHECK (golden_master_sha256 ~ '^[0-9a-f]{64}$'),
     engine_source_sha256 TEXT NOT NULL CHECK (engine_source_sha256 ~ '^[0-9a-f]{64}$'),
-    formal_matrix_key TEXT NOT NULL,
-    shadow_status TEXT NOT NULL,
-    matrix_cell_count INTEGER NOT NULL CHECK (matrix_cell_count >= 0),
+    formal_matrix_key TEXT NOT NULL CHECK (formal_matrix_key = 'full'),
+    shadow_status TEXT NOT NULL CHECK (shadow_status = 'SHADOW_ONLY'),
+    matrix_cell_count INTEGER NOT NULL CHECK (matrix_cell_count = 169),
     metadata JSONB NOT NULL DEFAULT '{}'::JSONB,
     locked_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     PRIMARY KEY (engine_key, artifact_version)
@@ -27,7 +26,7 @@ RETURNS TRIGGER
 LANGUAGE plpgsql
 AS $$
 BEGIN
-    RAISE EXCEPTION 'model provider artifact records are immutable; publish a new artifact_version instead';
+    RAISE EXCEPTION 'P4 engine artifact records are immutable; publish a new artifact_version instead';
 END;
 $$;
 
@@ -44,41 +43,50 @@ BEGIN
     SELECT contract_sha256
       INTO existing_contract_sha256
       FROM model.engine_artifacts
-     WHERE engine_key = 'external-model-provider'
+     WHERE engine_key = 'p4-deterministic-engine'
        AND artifact_version = '1.0.0';
 
     IF existing_contract_sha256 IS NULL THEN
         INSERT INTO model.engine_artifacts (
-            engine_key, artifact_version, release_version, contract_schema_version,
-            contract_sha256, config_sha256, profile_sha256, input_schema_sha256,
-            output_schema_sha256, provider_fixture_sha256, engine_source_sha256,
-            formal_matrix_key, shadow_status, matrix_cell_count, metadata
+            engine_key,
+            artifact_version,
+            release_version,
+            contract_schema_version,
+            contract_sha256,
+            config_sha256,
+            profile_sha256,
+            input_schema_sha256,
+            output_schema_sha256,
+            golden_master_sha256,
+            engine_source_sha256,
+            formal_matrix_key,
+            shadow_status,
+            matrix_cell_count,
+            metadata
         ) VALUES (
-            'external-model-provider',
+            'p4-deterministic-engine',
             '1.0.0',
-            '0.23.0',
-            'football.model-provider-boundary.v1',
-            'c7451f6d7a27ed8946319a346a4c7bceb13d44d51a12f26556f9f4cfca6efdb3',
-            '0e7edcb4ccbd2c913afda20d2cca0dcad48866ef27d9c28c17e1cf707ebc1dee',
-            '93e294670a9adb025821c0a3719582af12c00949915441b0df60446724bbf2c5',
-            '8ec84be05561587b02375342f5cd430b043b7444bae90723953ee3d57b9241a5',
-            'a27062d6a4b0e17e3d2257f4144f2cf96bbbb4673e43654d15d08d0b02951ef0',
-            'd87c1fc695fadc1eec3b64a68c3bed5d521c2e2f6e7b709b496c6dec25db6c3f',
-            'd451088946037da3188b4ea672ddbf05ddbd1c66b16e4889e8c9896dc52e0df7',
-            'provider-defined',
-            'NOT_BUNDLED',
-            0,
+            '0.8.0',
+            'football.p4-engine-contract.v1',
+            'd3fc2bf6244d32401ed7fdb171d78d87b3ea67b29ffa3667681641b5defdd8d3',
+            '08d0386199bd6082f8e0032c6dd58a7f1e97a6abb41a6ee3fb54fcc7490badf8',
+            '577ac989a5c293ab342ee8f76d55553937694818d32edb2b8753970d5229ca2a',
+            '5895f669e0bed21814888c7fbb072dbe06e1dc66cf77752b57e240de34b0689a',
+            'c45206b90199d12ded1d3f53bdb8e4b13b0a709bb36e6a0c1b3fc7b9ca626572',
+            'b457811435d44754f444ca4ac47a76bceec264e462a52d04d86e5cbc95423a91',
+            '73114e79c2dad1b636f12bac15c6daefe15e4857e64b66a44f4bf20d7e42d747',
+            'full',
+            'SHADOW_ONLY',
+            169,
             jsonb_build_object(
                 'stage', 'B',
-                'provider_kind', 'external',
-                'bundled_runtime', false,
-                'bundled_parameters', false,
-                'bundled_fixtures', false,
-                'output_topology', 'provider-defined'
+                'runtime_workbook_dependency', false,
+                'matrices', jsonb_build_array('independent', 'core', 'full', 'shadow_mixture'),
+                'canonical_horizons', jsonb_build_array('T-24h', 'T-6h', 'T-90m', 'T-1h')
             )
         );
-    ELSIF existing_contract_sha256 <> 'c7451f6d7a27ed8946319a346a4c7bceb13d44d51a12f26556f9f4cfca6efdb3' THEN
-        RAISE EXCEPTION 'external model provider artifact exists with a different contract hash';
+    ELSIF existing_contract_sha256 <> 'd3fc2bf6244d32401ed7fdb171d78d87b3ea67b29ffa3667681641b5defdd8d3' THEN
+        RAISE EXCEPTION 'P4 engine artifact 1.0.0 exists with a different contract hash';
     END IF;
 END;
 $$;
