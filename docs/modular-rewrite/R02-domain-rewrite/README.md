@@ -42,8 +42,8 @@ R1 已完成并关闭。R2 按业务语义拆分 `crates/domain`，保持 Serde�
 | R2-02 | Competition 与 Routing | DONE | [`R02-02-competition-and-routing.md`](R02-02-competition-and-routing.md) | workflow run `31088698579`、job `92574240109` 通过 |
 | R2-03 | Team / Player / Coach / Formation | DONE | [`R02-03-team-player-coach-and-formation.md`](R02-03-team-player-coach-and-formation.md) | workflow run `31110013068`、job `92645025258` 通过 |
 | R2-04 | Lineup 与 Match | DONE | [`R02-04-lineup-and-match.md`](R02-04-lineup-and-match.md) | 实施 run `31151412918`、正式 Windows Automated run `31153982572` 通过 |
-| R2-05 | Prediction 与 Research 外围领域 | VERIFYING | `R02-05-prediction-and-research-外围领域.md` | 前置节点已完成，可开始 |
-| R2-06 | Review 与 Postmatch | BLOCKED | `R02-06-review-and-postmatch.md` | 等待前置节点 |
+| R2-05 | Prediction 与 Research 外围领域 | DONE | [`R02-05-prediction-and-research-外围领域.md`](R02-05-prediction-and-research-外围领域.md) | 正式 Windows Automated run `31171082098`、job `92842834091` 通过 |
+| R2-06 | Review 与 Postmatch | READY | `R02-06-review-and-postmatch.md` | 前置节点已完成，可开始 |
 | R2-07 | Analytics / Exchange / AI / Release | BLOCKED | `R02-07-analytics-exchange-ai-and-release.md` | 等待前置节点 |
 | R2-08 | Domain 根出口收敛 | BLOCKED | `R02-08-domain-根出口收敛.md` | 等待前置节点 |
 
@@ -64,8 +64,7 @@ R2-01 至 R2-08 全部 `DONE` 后创建 `R02-stage-completion.md`，并实际完
 
 ## 当前阶段状态
 
-`R2-04 DONE`；`R2-05 VERIFYING`。Lineup 16 个类型与 Match 3 个类型已迁移到职责目录，并在最终实施提交 `0aafe42d7ed08f8e78d71d44ccb6f8f58c425999` 上通过正式 Windows Automated；R2-05 已开放。
-
+`R2-05 DONE`；`R2-06 READY`。Prediction 48 个类型与 Research 27 个类型已迁移到职责目录；包含该最终源码树及外置依赖布局的 `new-B` 提交 `e328b4aa5a7737e6bb378abf8b891cd953b99f62` 已通过正式 Windows Automated run `31171082098`、job `92842834091`，artifact `8991618221` 的 SHA-256 为 `71320b8ef97e62be2fe2323327d21f4870476092ad024d7b8c2c26a4ade9dc59`。R2-06 已开放。
 
 ## R2-02 当前结果
 
@@ -75,7 +74,6 @@ R2-01 至 R2-08 全部 `DONE` 后创建 `R02-stage-completion.md`，并实际完
 - `architecture/domain-migration-progress.json` 已将 R2-02 登记为完成迁移范围，清单门禁拒绝类型回退到目标目录之外。
 - 本节点未修改数据库迁移、SQL Row、Application、Tauri DTO、模型保护资产或生产依赖。
 
-
 ## R2-03 当前结果
 
 - Team 17、Player 21、Coach 9、Formation 8、Shared 17，共 72 个类型已进入职责目录。
@@ -84,7 +82,6 @@ R2-01 至 R2-08 全部 `DONE` 后创建 `R02-stage-completion.md`，并实际完
 - 实施 workflow run `31100515822` 的专项、架构、前端和 Rust 门禁已通过。
 - 正式 Windows Automated run `31110013068`、job `92645025258` 在同源码树触发提交 `594940dca4c57aabfebdd768755ec27006ecaeb5` 上通过；artifact `8972168972` 大小 `14119500` 字节，SHA-256 为 `6ef2e064638cd17b214c66bbdea5ed752a08a1f0dc32002940e0f97d094cae5f`，运行报告为 PASS，7 条记录、3 个完成操作。
 - 本节点未修改数据库迁移、SQL Row、Application、Tauri DTO、模型保护资产或生产依赖。
-
 
 ## R2-04 当前结果
 
@@ -97,10 +94,10 @@ R2-01 至 R2-08 全部 `DONE` 后创建 `R02-stage-completion.md`，并实际完
 - 正式 Windows Automated run `31153982572`、job `92789397631` 已在最终实施提交 `0aafe42d7ed08f8e78d71d44ccb6f8f58c425999` 上通过；artifact `8984980586` 大小 `14118155` 字节，SHA-256 为 `1e7224f4e7f713b0339e97fd114fa6dea2c0b2ecc9400789613fe872d660938c`。
 - 本节点未修改数据库迁移、SQL Row、Application、Tauri DTO、模型保护资产或生产依赖。
 
-
 ## R2-05 当前结果
 
 - Prediction 48 个类型已进入 `prediction/` 职责目录；Research 27 个类型已进入 `research/` 职责目录。
 - 75 个类型均保留根级公共兼容路径，并新增 `prediction::*` / `research::*` 业务语义路径身份门禁。
 - Prediction 独立提交为 `2cd685b8057a1bce2f75e4c7f5b56aed1bf3d142`；首次 run `31158780693` 暴露并停止于两个未使用 import，恢复 run `31159821513` 已在不放宽门禁的前提下完成 Research 与全量回归。
-- 正式 Windows Automated 通过前状态为 `VERIFYING`，R2-06 继续 `BLOCKED`。
+- 正式 Windows Automated run `31171082098`、job `92842834091` 已通过；artifact `8991618221` 大小 `14117154` 字节，SHA-256 为 `71320b8ef97e62be2fe2323327d21f4870476092ad024d7b8c2c26a4ade9dc59`。
+- R2-05 状态为 `DONE`，R2-06 已开放。
