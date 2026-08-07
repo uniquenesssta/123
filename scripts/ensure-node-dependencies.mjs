@@ -21,6 +21,7 @@ const npmrcPath = join(root, ".npmrc");
 const layout = resolveNodeDependencyLayout(root);
 const markerPath = layout.markerPath;
 const packageJson = JSON.parse(readFileSync(packagePath, "utf8"));
+const lockJson = JSON.parse(readFileSync(lockPath, "utf8"));
 const lockSha256 = createHash("sha256").update(readFileSync(lockPath)).digest("hex");
 const expected = {
   schema_version: 2,
@@ -29,6 +30,10 @@ const expected = {
   package_lock_sha256: lockSha256,
   tauri_cli_version: packageJson.devDependencies?.["@tauri-apps/cli"] ?? null,
 };
+const directPackageNames = [
+  ...Object.keys(packageJson.dependencies ?? {}),
+  ...Object.keys(packageJson.devDependencies ?? {}),
+];
 
 function requiredPaths(nodeModulesRoot = layout.nodeModulesRoot) {
   return [
@@ -54,8 +59,41 @@ function markerMatches(marker) {
     && marker?.tauri_cli_version === expected.tauri_cli_version;
 }
 
+function installedDirectPackagesMatch(nodeModulesRoot = layout.nodeModulesRoot) {
+  return directPackageNames.every((packageName) => {
+    const expectedVersion = lockJson.packages?.[`node_modules/${packageName}`]?.version;
+    if (!expectedVersion) return false;
+    try {
+      const installed = JSON.parse(
+        readFileSync(join(nodeModulesRoot, packageName, "package.json"), "utf8"),
+      );
+      return installed.version === expectedVersion;
+    } catch {
+      return false;
+    }
+  });
+}
+
+function dependencyFilesMatch(nodeModulesRoot = layout.nodeModulesRoot) {
+  return requiredPaths(nodeModulesRoot).every(existsSync)
+    && installedDirectPackagesMatch(nodeModulesRoot);
+}
+
 function dependenciesReady() {
-  return requiredPaths().every(existsSync) && markerMatches(readMarker());
+  return dependencyFilesMatch() && markerMatches(readMarker());
+}
+
+function writeMarker() {
+  const temp = `${markerPath}.${process.pid}.tmp`;
+  writeFileSync(temp, `${JSON.stringify(expected, null, 2)}\n`, "utf8");
+  renameSync(temp, markerPath);
+}
+
+function adoptPreparedParentDependencies() {
+  if (!existsSync(layout.nodeModulesRoot) || !dependencyFilesMatch()) return false;
+  writeMarker();
+  console.log(`已复用源码根目录上一级预置依赖：${layout.nodeModulesRoot}`);
+  return true;
 }
 
 function npmCommand() {
@@ -86,7 +124,7 @@ function installDependencies() {
   const existingMarker = readMarker();
   if (existsSync(layout.nodeModulesRoot) && !existingMarker) {
     throw new Error(
-      `源码根目录上一级已存在未登记的 node_modules，拒绝覆盖：${layout.nodeModulesRoot}`,
+      `源码根目录上一级已存在与锁文件不匹配的 node_modules，拒绝覆盖：${layout.nodeModulesRoot}`,
     );
   }
 
@@ -110,8 +148,8 @@ function installDependencies() {
     if (result.status !== 0) {
       throw new Error(`npm ci 失败，退出码：${result.status ?? "unknown"}`);
     }
-    if (!requiredPaths(stagingNodeModules).every(existsSync)) {
-      throw new Error("npm ci 完成后仍缺少 Tauri/TypeScript/Vite 执行文件");
+    if (!dependencyFilesMatch(stagingNodeModules)) {
+      throw new Error("npm ci 完成后依赖版本或 Tauri/TypeScript/Vite 执行文件与锁文件不一致");
     }
 
     if (existsSync(layout.nodeModulesRoot)) {
@@ -123,7 +161,7 @@ function installDependencies() {
       });
     }
     renameSync(stagingNodeModules, layout.nodeModulesRoot);
-    writeFileSync(markerPath, `${JSON.stringify(expected, null, 2)}\n`, "utf8");
+    writeMarker();
     removeLegacyRootDependencies();
   } finally {
     rmSync(stagingRoot, { recursive: true, force: true });
@@ -131,7 +169,7 @@ function installDependencies() {
 }
 
 export function ensureNodeDependencies({ allowInstall = true } = {}) {
-  if (dependenciesReady()) {
+  if (dependenciesReady() || adoptPreparedParentDependencies()) {
     removeLegacyRootDependencies();
     console.log(
       `前端依赖已就绪：${layout.nodeModulesRoot}；Tauri CLI ${expected.tauri_cli_version}。`,
@@ -139,7 +177,7 @@ export function ensureNodeDependencies({ allowInstall = true } = {}) {
     return;
   }
   if (!allowInstall) {
-    throw new Error("前端依赖未就绪；请运行 npm run setup");
+    throw new Error("前端依赖未就绪；请将锁定依赖放到 ../node_modules 或运行 npm run setup");
   }
   installDependencies();
 }
