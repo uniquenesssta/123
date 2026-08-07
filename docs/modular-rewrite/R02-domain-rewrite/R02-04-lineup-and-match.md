@@ -1,8 +1,9 @@
 # R02-04 Lineup 与 Match 实施记录
 
-- 任务状态：`VERIFYING`
+- 任务状态：`DONE`
 - 前置已验证提交：`3256454e9d76b7b442a83f25964363256257cbcc`
 - 实施触发提交：`42d24de5358d0e53aa8cae567eacf1179a236097`
+- 最终实施提交：`0aafe42d7ed08f8e78d71d44ccb6f8f58c425999`
 - 目标平台：Windows
 
 ## 1. 实际问题
@@ -40,7 +41,7 @@ R2-01 清单确认 Lineup 16 个类型和 Match 3 个类型仍分散在 Domain �
 
 ## 5. 实际验证
 
-实施 workflow run `31151412918` 执行：
+实施 workflow run `31151412918` 已完成并通过：
 
 - `cargo test --locked -p football-domain --test serde_contracts`
 - `node scripts/generate-domain-type-inventory.mjs`
@@ -49,8 +50,11 @@ R2-01 清单确认 Lineup 16 个类型和 Match 3 个类型仍分散在 Domain �
 - `node scripts/verify-protected-assets-deterministic.mjs`
 - `npm run verify:frontend`
 - `npm run verify:rust`
+- 最终树精确变更集、legacy 删除、README 契约、transient 清理、提交后工作树和 push 后远端 HEAD 校验。
 
-正式 `Public Platform CI` Windows Automated 通过前保持 `VERIFYING`，R2-05 保持 `BLOCKED`。
+正式 `Public Platform CI` Windows Automated run `31153982572` 已在最终实施提交 `0aafe42d7ed08f8e78d71d44ccb6f8f58c425999` 上通过；job `92789397631` 全部步骤成功。证据 artifact `8984980586` 大小 `14118155` 字节，SHA-256 为 `1e7224f4e7f713b0339e97fd114fa6dea2c0b2ecc9400789613fe872d660938c`。
+
+R2-04 已满足节点门禁并关闭；R2-05 开放为 `READY`。
 
 ## 6. 未执行与延期项
 
