@@ -169,21 +169,15 @@ async fn ensure_public_engine_artifact_shape(
         ));
     }
 
-    sqlx::query("ALTER TABLE model.engine_artifacts ADD COLUMN provider_fixture_sha256 text")
-        .execute(&mut **transaction)
-        .await?;
+    // 已知旧账本上的制品记录带有不可变 UPDATE/DELETE 触发器。
+    // 直接重命名列可原样保留每行指纹、NOT NULL 与既有 CHECK，而不会触发行级 UPDATE。
     sqlx::query(
-        "UPDATE model.engine_artifacts SET provider_fixture_sha256 = golden_master_sha256 WHERE provider_fixture_sha256 IS NULL",
-    )
-    .execute(&mut **transaction)
-    .await?;
-    sqlx::query(
-        "ALTER TABLE model.engine_artifacts ALTER COLUMN provider_fixture_sha256 SET NOT NULL",
+        "ALTER TABLE model.engine_artifacts RENAME COLUMN golden_master_sha256 TO provider_fixture_sha256",
     )
     .execute(&mut **transaction)
     .await?;
 
-    let constraint_exists: bool = sqlx::query_scalar(
+    let provider_constraint_exists: bool = sqlx::query_scalar(
         r#"
         SELECT EXISTS (
             SELECT 1
@@ -195,7 +189,29 @@ async fn ensure_public_engine_artifact_shape(
     )
     .fetch_one(&mut **transaction)
     .await?;
-    if !constraint_exists {
+    if provider_constraint_exists {
+        return Ok(());
+    }
+
+    let legacy_constraint_exists: bool = sqlx::query_scalar(
+        r#"
+        SELECT EXISTS (
+            SELECT 1
+            FROM pg_constraint
+            WHERE conrelid = 'model.engine_artifacts'::regclass
+              AND conname = 'engine_artifacts_golden_master_sha256_check'
+        )
+        "#,
+    )
+    .fetch_one(&mut **transaction)
+    .await?;
+    if legacy_constraint_exists {
+        sqlx::query(
+            "ALTER TABLE model.engine_artifacts RENAME CONSTRAINT engine_artifacts_golden_master_sha256_check TO engine_artifacts_provider_fixture_sha256_check",
+        )
+        .execute(&mut **transaction)
+        .await?;
+    } else {
         sqlx::query(
             "ALTER TABLE model.engine_artifacts ADD CONSTRAINT engine_artifacts_provider_fixture_sha256_check CHECK (provider_fixture_sha256 ~ '^[0-9a-f]{64}$')",
         )
