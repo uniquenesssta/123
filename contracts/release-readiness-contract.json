@@ -113,7 +113,7 @@
     },
     {
       "file": "0027_release_acceptance.sql",
-      "sha256": "ff72e0b534a39d3de2b89a942ba0fa7d080fb190056742c4460f43842eef36bd"
+      "sha256": "c9bddc94fee9ad3872fcc9d9369cb67af53a48d71723f8f2ca690bb0af1fa9bf"
     },
     {
       "file": "0028_force_team_purge.sql",
@@ -129,7 +129,7 @@
     },
     {
       "file": "0031_p4_model_family_time_windows.sql",
-      "sha256": "e3e7aa0741d9774e1a447ba5618ef20ed96d896f05bc1bafb5653dcac86b4d15"
+      "sha256": "368b13192aebfdc6199eaed8ab6178f5dd845fbf54ecbd5e6678be190e550c5e"
     },
     {
       "file": "0032_model_run_history_visibility.sql",

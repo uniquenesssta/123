@@ -50,11 +50,11 @@
     {"version":24,"file":"0024_match_lineup_chain.sql","git_blob_sha1":"163fd01ccf455aa032ee34cb0d196f0a9e277eeb"},
     {"version":25,"file":"0025_parameter_lifecycle.sql","git_blob_sha1":"f40ccfac1428ace5157a6064552e98c30c6d1d1e"},
     {"version":26,"file":"0026_postmatch_settlement.sql","git_blob_sha1":"3b924790c7d16effe657b12df472c60de01b3da8"},
-    {"version":27,"file":"0027_release_acceptance.sql","git_blob_sha1":"487315272beddbe6223274aaade48b95180a6a63"},
+    {"version":27,"file":"0027_release_acceptance.sql","git_blob_sha1":"1fbec342e70c11cccd235f2b25a1778ba5e1a794"},
     {"version":28,"file":"0028_force_team_purge.sql","git_blob_sha1":"6cadaf7dc905a7aba86784136b7077ee9de16ec4"},
     {"version":29,"file":"0029_import_row_entity_identity.sql","git_blob_sha1":"7e61092e1be4dd75717ab21483e611a18e8e8973"},
     {"version":30,"file":"0030_import_row_subrecord_identity.sql","git_blob_sha1":"37c6cae070b6c8488deb7562a5bb894110d897ae"},
-    {"version":31,"file":"0031_p4_model_family_time_windows.sql","git_blob_sha1":"aa0536e224dc43435b92eb20b50f897d5e246026"},
+    {"version":31,"file":"0031_p4_model_family_time_windows.sql","git_blob_sha1":"7bc64a0ca40899ea05b9db657fcd1fb1708e6067"},
     {"version":32,"file":"0032_model_run_history_visibility.sql","git_blob_sha1":"322e787e13a5a04b8bdc449f447dafdbb6ccbeb1"},
     {"version":33,"file":"0033_competition_catalog.sql","git_blob_sha1":"6b51747f9e2a274d538aa224214a7623c0cf34ff"},
     {"version":34,"file":"0034_mainstream_competition_catalog.sql","git_blob_sha1":"a0c4df179b2b771b85695826d0c1d29773165bc0"},
@@ -71,7 +71,7 @@
     {"version":45,"file":"0045_team_lineup_presets.sql","git_blob_sha1":"ba054615c3560998185efa05b16e1973e0c0c4f3"},
     {"version":46,"file":"0046_player_position_default_roles.sql","git_blob_sha1":"1e73572c11f1a075d6508de758a7a8da39e7d721"}
   ],
-  "migration_aggregate_sha256": "b4ad21c404a2cf41a8e364b576c40a578af899c5e754e81d829a459eca3ad3ea",
+  "migration_aggregate_sha256": "b1d73278e1a66e07c232228eeb7161fb5e4902c6f6ef41e8caab12bf20664edc",
   "runtime_sources": [
     {"path":"crates/persistence-postgres/Cargo.toml","git_blob_sha1":"5f83e84c41b53af3f96ebe5a95cabaade04fee1d"},
     {"path":"crates/persistence-postgres/build.rs","git_blob_sha1":"ee7c9aa50b9ac259453f5b4ce45ea5fcc1c731ad"},
