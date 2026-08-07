@@ -8,9 +8,12 @@ const contract = JSON.parse(read("contracts/match-event-facts-contract.json"));
 const failures = [];
 const check = (condition, message) => { if (!condition) failures.push(message); };
 
-const domain = read("crates/domain/src/match_event.rs");
-const packageDomain = read("crates/domain/src/match_review_package.rs");
-const reviewDomain = read("crates/domain/src/review.rs");
+const eventSemantics = read("crates/domain/src/review/event/semantics.rs");
+const eventPayload = read("crates/domain/src/review/event/payload.rs");
+const reviewAggregate = read("crates/domain/src/review/aggregate.rs");
+const domain = `${eventSemantics}\n${eventPayload}`;
+const reviewDomain = `${eventPayload}\n${reviewAggregate}`;
+const packageDomain = eventPayload;
 const persistence = read("crates/persistence-postgres/src/review.rs");
 const workbook = read("crates/spreadsheet-io/src/match_review_workbook.rs");
 const application = read("crates/application/src/match_review_package.rs");
@@ -51,7 +54,7 @@ for (const field of [
   "revision_of_event_id", "updated_at"
 ]) {
   check(migration.includes(`ADD COLUMN ${field}`), `0042 迁移缺少字段 ${field}`);
-  check(packageDomain.includes(`pub ${field}:`) || reviewDomain.includes(`pub ${field}:`), `Rust 事件 DTO 缺少字段 ${field}`);
+  check(reviewDomain.includes(`pub ${field}:`), `Rust 事件 DTO 缺少字段 ${field}`);
   check(types.includes(`${field}:`), `TypeScript 事件 DTO 缺少字段 ${field}`);
 }
 check(migration.includes("match_events_match_event_key_uidx") && migration.includes("(match_id, event_key)"), "D2 缺少比赛内稳定 event_key 唯一约束");
@@ -65,7 +68,7 @@ check(migration.includes("match_events_revision_of_idx"), "D2 缺少事件修订
 check(persistence.includes("ON CONFLICT (match_id, event_key) DO UPDATE"), "相同 event_key 没有按正式事实执行幂等更新");
 check(persistence.includes("SET revision_status = 'superseded'") && persistence.includes("NOT (event_key = ANY($2::text[]))"), "新资料包缺失的旧事件没有进入 superseded 审计状态");
 check(persistence.includes("event.revision_status <> 'superseded'"), "当前事件查询没有排除 superseded 历史版本");
-check(persistence.includes("fn summarize_match_events") && reviewDomain.includes("pub event_summary:"), "正式复盘详情缺少事件统计摘要");
+check(persistence.includes("fn summarize_match_events") && reviewAggregate.includes("pub event_summary:"), "正式复盘详情缺少事件统计摘要");
 check(persistence.includes("MatchEventType::GoalkeeperChange"), "后端门禁未覆盖门将更换事件的双球员关系");
 check(application.includes("MatchEventType::OwnGoal") && application.includes("乌龙球球员应属于事件受益球队的对手"), "应用层事件身份校验未正确处理乌龙球球队关系");
 check(persistence.includes("event.event_type == MatchEventType::OwnGoal") && persistence.includes("乌龙球球员必须属于事件受益球队的对手"), "持久化事务门禁未正确处理乌龙球球队关系");
@@ -88,10 +91,10 @@ check(workbook.includes("validate_event_score_consistency"), "赛后资料包没
 check(workbook.includes("home_goals_extra_time") && workbook.includes("最后一条加时有效事件后比分") && workbook.includes("存在加时阶段的进球或比分事件"), "资料包预检没有校验加时事件比分与正式加时赛果");
 check(workbook.includes("errors: &mut Vec<String>") && workbook.includes("最后一条 90 分钟有效事件后比分") && workbook.includes("cancelled/corrected"), "资料包预检没有在提交前阻断会被后端拒绝的事件比分错误");
 check(persistence.includes("has_extra_time_score") && persistence.includes("正式合计赛果") && persistence.includes("主客队加时进球必须同时填写或同时留空"), "持久化门禁没有校验加时比分与正式赛果");
-check(domain.includes("matches!(self, Self::Goal | Self::OwnGoal | Self::PenaltyGoal)"), "比赛事件计分语义必须使用正确的 matches! 表达式");
-check(domain.includes("!matches!(self, Self::Var | Self::Other)"), "比赛事件球队必填语义必须使用正确的 matches! 表达式");
-check(domain.includes("matches!(self, Self::Active | Self::Corrected)"), "比赛事件有效修订状态必须使用正确的 matches! 表达式");
-check(!domain.includes("matches!(Self::Goal | Self::OwnGoal | Self::PenaltyGoal, self)"), "检测到反向 matches! 表达式，Rust 将无法正确编译");
+check(eventSemantics.includes("matches!(self, Self::Goal | Self::OwnGoal | Self::PenaltyGoal)"), "比赛事件计分语义必须使用正确的 matches! 表达式");
+check(eventSemantics.includes("!matches!(self, Self::Var | Self::Other)"), "比赛事件球队必填语义必须使用正确的 matches! 表达式");
+check(eventSemantics.includes("matches!(self, Self::Active | Self::Corrected)"), "比赛事件有效修订状态必须使用正确的 matches! 表达式");
+check(!eventSemantics.includes("matches!(Self::Goal | Self::OwnGoal | Self::PenaltyGoal, self)"), "检测到反向 matches! 表达式，Rust 将无法正确编译");
 check(!integration.includes("SELECT subrecord_key\n        SELECT subrecord_key"), "球队资料包效力身份集成测试包含重复 SELECT");
 
 check(types.includes("export interface MatchEventSummary") && types.includes("event_summary: MatchEventSummary"), "前端类型缺少事件摘要");
@@ -100,7 +103,7 @@ for (const className of [".match-event-panel", ".match-event-summary", ".match-e
   check(styles.includes(className), `事件时间线缺少样式 ${className}`);
 }
 
-check(packageDomain.includes("legacy_event_payload_receives_safe_structured_defaults"), "缺少旧版赛后事件载荷兼容性测试");
+check(eventPayload.includes("legacy_event_payload_receives_safe_structured_defaults"), "缺少旧版赛后事件载荷兼容性测试");
 check(integration.includes("structured_match_events_are_queryable_and_revision_aware"), "缺少结构化比赛事件 PostgreSQL 集成测试");
 check(integration.includes("team_package_player_team_period_subrecords_are_distinct"), "缺少球队资料包效力履历唯一身份回归测试");
 check(importFix.includes("WHEN 'player_team_period'") && importFix.includes("payload ->> 'team_id'") && importFix.includes("payload ->> 'team_key'") && importFix.includes("payload ->> 'team_name'"), "0043 未按球队身份区分同一物理行的两条效力履历");
