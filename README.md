@@ -147,3 +147,9 @@ R00 阶段已按 Windows-only 目标范围标记为 **DONE**。Linux Chromium �
 PostgreSQL 实跑、Windows Full 和用户本机 Windows 10/11 实机验收尚未执行，统一保留到最终验收，不得在后续阶段描述为已通过。另保留 1 个 moderate npm vulnerability 和 Vite 大 chunk 警告。
 
 已创建 `R00-stage-completion.md` 和 `R01-stage-completion.md`。R1-01 至 R1-05、R2-01、R2-02 与 R2-03 状态均为 `DONE`；R2-04 当前为 `READY`，Windows 2025 全量门禁及最终树内容校验已实际通过，当前只待加固后的最终提交/push 链重新执行并由正式 Windows Automated 验收。详细状态见 `docs/modular-rewrite/R02-domain-rewrite/README.md`。
+
+## R2-04 Lineup 与 Match
+
+- 已开始将 Lineup 16 个类型和 Match 3 个类型迁移到职责目录。
+- 根级类型路径、Serde、数据库映射、Application、Tauri DTO、公共命令和模型保护边界保持不变。
+- 实施 workflow run `31151412918` 执行专项、架构、前端和 Rust 门禁；正式 Windows Automated 通过前状态为 `VERIFYING`，R2-05 保持 `BLOCKED`。

@@ -1,4 +1,6 @@
-use football_domain::{coach, competition, formation, player, routing, shared, team};
+use football_domain::{
+    coach, competition, formation, lineup, match_record, player, routing, shared, team,
+};
 
 fn assert_same_type<T>(_: Option<T>, _: Option<T>) {}
 
@@ -380,5 +382,85 @@ fn r2_03_module_paths_preserve_root_type_identity() {
     assert_same_type(
         None::<football_domain::ResolvedFormationDistribution>,
         None::<formation::ResolvedFormationDistribution>,
+    );
+}
+
+#[test]
+fn r2_04_module_paths_preserve_root_type_identity() {
+    assert_same_type(
+        None::<football_domain::MatchStatus>,
+        None::<match_record::MatchStatus>,
+    );
+    assert_same_type(
+        None::<football_domain::MatchDraft>,
+        None::<match_record::MatchDraft>,
+    );
+    assert_same_type(
+        None::<football_domain::MatchRecord>,
+        None::<match_record::MatchRecord>,
+    );
+    assert_same_type(
+        None::<football_domain::LineupType>,
+        None::<lineup::LineupType>,
+    );
+    assert_same_type(
+        None::<football_domain::LineupPlayerDraft>,
+        None::<lineup::LineupPlayerDraft>,
+    );
+    assert_same_type(
+        None::<football_domain::LineupPlayerRecord>,
+        None::<lineup::LineupPlayerRecord>,
+    );
+    assert_same_type(
+        None::<football_domain::LineupDraft>,
+        None::<lineup::LineupDraft>,
+    );
+    assert_same_type(
+        None::<football_domain::LineupPairDraft>,
+        None::<lineup::LineupPairDraft>,
+    );
+    assert_same_type(
+        None::<football_domain::LineupPairRecord>,
+        None::<lineup::LineupPairRecord>,
+    );
+    assert_same_type(
+        None::<football_domain::LineupRecord>,
+        None::<lineup::LineupRecord>,
+    );
+    assert_same_type(
+        None::<football_domain::LineupHistoryRemovalResult>,
+        None::<lineup::LineupHistoryRemovalResult>,
+    );
+    assert_same_type(
+        None::<football_domain::TeamLineupPresetMemberDraft>,
+        None::<lineup::TeamLineupPresetMemberDraft>,
+    );
+    assert_same_type(
+        None::<football_domain::TeamLineupPresetDraft>,
+        None::<lineup::TeamLineupPresetDraft>,
+    );
+    assert_same_type(
+        None::<football_domain::TeamLineupPresetMemberRecord>,
+        None::<lineup::TeamLineupPresetMemberRecord>,
+    );
+    assert_same_type(
+        None::<football_domain::TeamLineupPresetRecord>,
+        None::<lineup::TeamLineupPresetRecord>,
+    );
+    assert_same_type(
+        None::<football_domain::TeamLineupPresetApplicationPreview>,
+        None::<lineup::TeamLineupPresetApplicationPreview>,
+    );
+    assert_same_type(
+        None::<football_domain::MatchLineupTeamChain>,
+        None::<lineup::MatchLineupTeamChain>,
+    );
+    assert_same_type(
+        None::<football_domain::MatchLineupChain>,
+        None::<lineup::MatchLineupChain>,
+    );
+    assert_same_type(
+        None::<football_domain::TeamMatchLineupHistoryItem>,
+        None::<lineup::TeamMatchLineupHistoryItem>,
     );
 }

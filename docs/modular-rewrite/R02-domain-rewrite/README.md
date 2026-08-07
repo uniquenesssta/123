@@ -41,7 +41,7 @@ R1 已完成并关闭。R2 按业务语义拆分 `crates/domain`，保持 Serde�
 | R2-01 | 领域类型与契约清单 | DONE | [`R02-01-领域类型-and-契约清单.md`](R02-01-领域类型-and-契约清单.md) | workflow run `31078483578` 通过 |
 | R2-02 | Competition 与 Routing | DONE | [`R02-02-competition-and-routing.md`](R02-02-competition-and-routing.md) | workflow run `31088698579`、job `92574240109` 通过 |
 | R2-03 | Team / Player / Coach / Formation | DONE | [`R02-03-team-player-coach-and-formation.md`](R02-03-team-player-coach-and-formation.md) | workflow run `31110013068`、job `92645025258` 通过 |
-| R2-04 | Lineup 与 Match | READY | `R02-04-lineup-and-match.md` | 前置节点已完成，待开始 |
+| R2-04 | Lineup 与 Match | VERIFYING | [`R02-04-lineup-and-match.md`](R02-04-lineup-and-match.md) | 实施 workflow run `31151412918` 执行中；正式 Windows Automated 待确认 |
 | R2-05 | Prediction 与 Research 外围领域 | BLOCKED | `R02-05-prediction-and-research-外围领域.md` | 等待前置节点 |
 | R2-06 | Review 与 Postmatch | BLOCKED | `R02-06-review-and-postmatch.md` | 等待前置节点 |
 | R2-07 | Analytics / Exchange / AI / Release | BLOCKED | `R02-07-analytics-exchange-ai-and-release.md` | 等待前置节点 |
@@ -64,7 +64,7 @@ R2-01 至 R2-08 全部 `DONE` 后创建 `R02-stage-completion.md`，并实际完
 
 ## 当前阶段状态
 
-`R2-03 DONE`；`R2-04 READY`。72 个 Team、Player、Coach、Formation 与 Shared 类型已迁移并通过正式 Windows Automated；尚未开始 R2-04。
+`R2-04 VERIFYING`；`R2-05 BLOCKED`。Lineup 16 个类型与 Match 3 个类型已迁移到职责目录；正式 Windows Automated 通过前不开放 R2-05。
 
 
 ## R2-02 当前结果
@@ -83,4 +83,15 @@ R2-01 至 R2-08 全部 `DONE` 后创建 `R02-stage-completion.md`，并实际完
 - `architecture/domain-migration-progress.json` 已登记 R2-03，清单门禁拒绝 72 个类型回退到目标目录之外。
 - 实施 workflow run `31100515822` 的专项、架构、前端和 Rust 门禁已通过。
 - 正式 Windows Automated run `31110013068`、job `92645025258` 在同源码树触发提交 `594940dca4c57aabfebdd768755ec27006ecaeb5` 上通过；artifact `8972168972` 大小 `14119500` 字节，SHA-256 为 `6ef2e064638cd17b214c66bbdea5ed752a08a1f0dc32002940e0f97d094cae5f`，运行报告为 PASS，7 条记录、3 个完成操作。
+- 本节点未修改数据库迁移、SQL Row、Application、Tauri DTO、模型保护资产或生产依赖。
+
+
+## R2-04 当前结果
+
+- Lineup 16 个类型已按 kind、player、snapshot、preset、chain 拆分。
+- Match 3 个类型已按 status、catalog 拆分。
+- 旧 `crates/domain/src/lineup_chain.rs` 已删除，正式阵容快照常量与三类链路契约迁入 `lineup/chain.rs`。
+- 根级公共类型名继续通过兼容 re-export 保持不变；glob 根出口债务仍由 R2-08 统一退出。
+- `architecture/domain-migration-progress.json` 已登记 R2-04，清单门禁拒绝 19 个类型回退到目标目录之外。
+- 实施 workflow run `31151412918` 执行专项、架构、前端和 Rust 门禁；正式 Windows Automated 待确认。
 - 本节点未修改数据库迁移、SQL Row、Application、Tauri DTO、模型保护资产或生产依赖。

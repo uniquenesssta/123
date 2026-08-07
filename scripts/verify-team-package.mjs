@@ -4,7 +4,7 @@ const read = (path) => fs.readFileSync(new URL(`../${path}`, import.meta.url), "
 const failures = [];
 const requireTrue = (condition, message) => { if (!condition) failures.push(message); };
 
-const domain = read("crates/domain/src/team_package.rs") + read("crates/domain/src/lib.rs");
+const domain = read("crates/domain/src/team_package.rs") + (read("crates/domain/src/lib.rs") + read("crates/domain/src/lineup/kind.rs") + read("crates/domain/src/lineup/player.rs") + read("crates/domain/src/lineup/snapshot.rs") + read("crates/domain/src/lineup/preset.rs") + read("crates/domain/src/lineup/chain.rs") + read("crates/domain/src/match_record/status.rs") + read("crates/domain/src/match_record/catalog.rs"));
 const io = read("crates/spreadsheet-io/src/team_package.rs") + read("crates/spreadsheet-io/src/lib.rs");
 const application = read("crates/application/src/spreadsheet.rs");
 const persistence = read("crates/persistence-postgres/src/monthly_workbooks.rs");

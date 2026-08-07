@@ -28,7 +28,7 @@ requireTokens("crates/domain/src/player/listing.rs", [
   "pub primary_role_code: Option<String>",
   "pub position_role_map: Value",
 ], "球员列表领域模型");
-requireTokens("crates/domain/src/lib.rs", [
+requireTokens("crates/domain/src/lineup/player.rs", [
   "pub role_origin: String",
 ], "阵容领域模型");
 requireTokens("crates/domain/src/exchange.rs", [

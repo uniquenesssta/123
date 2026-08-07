@@ -11,7 +11,7 @@ const requireTrue = (condition, message) => { if (!condition) throw new Error(me
 const contractText = read("contracts/match-lineup-chain-contract.json");
 const contract = JSON.parse(contractText);
 const migration = read("crates/persistence-postgres/migrations/0024_match_lineup_chain.sql");
-const domain = read("crates/domain/src/lineup_chain.rs") + read("crates/domain/src/exchange.rs") + read("crates/domain/src/lib.rs");
+const domain = read("crates/domain/src/lineup/chain.rs") + read("crates/domain/src/exchange.rs") + (read("crates/domain/src/lib.rs") + read("crates/domain/src/lineup/kind.rs") + read("crates/domain/src/lineup/player.rs") + read("crates/domain/src/lineup/snapshot.rs") + read("crates/domain/src/lineup/preset.rs") + read("crates/domain/src/lineup/chain.rs") + read("crates/domain/src/match_record/status.rs") + read("crates/domain/src/match_record/catalog.rs"));
 const persistence = read("crates/persistence-postgres/src/lineup_chain.rs");
 const catalog = read("crates/persistence-postgres/src/player_catalog.rs");
 const exchange = read("crates/persistence-postgres/src/match_exchange.rs");

@@ -1,4 +1,5 @@
-use crate::{LineupRecord, MatchRecord};
+use super::LineupRecord;
+use crate::match_record::MatchRecord;
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;

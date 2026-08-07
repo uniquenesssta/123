@@ -23,14 +23,14 @@
     "currentPublicExportPolicy": "root glob re-export is recorded as current debt and removed only in R2-08",
     "targetPublicExportPolicy": "explicit re-export only"
   },
-  "sourceDigest": "51155669633aebde7d40b1d9fecd892b27eb785cc2035c54360c0004148ca647",
-  "rustUsageDigest": "c2a2ce8fc74c5cb548532c3f9f0a83f6c2d8989d3b10472c0fd895c84141f91e",
+  "sourceDigest": "62ce7a7f3512f6873b312e28d8bd9d87c01b9b323d731aab2814e8ec0d92e58c",
+  "rustUsageDigest": "bc5e6cfd804119564b81d6c4b0f9d9bc733cb45c6417da70b9ca33c180c5425a",
   "summary": {
     "typeCount": 365,
     "publicCompatibilityTypeCount": 365,
     "internalTypeCount": 0,
-    "domainSourceFileCount": 63,
-    "scannedRustFileCount": 190,
+    "domainSourceFileCount": 69,
+    "scannedRustFileCount": 198,
     "databaseMappedTypeCount": 299,
     "byTargetModule": {
       "ai_workspace": 16,
@@ -2935,7 +2935,8 @@
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
         "crates/domain/src/exchange.rs",
-        "crates/domain/src/lib.rs",
+        "crates/domain/src/lineup/player.rs",
+        "crates/domain/src/lineup/preset.rs",
         "crates/domain/src/player/availability.rs",
         "crates/domain/src/player/listing.rs",
         "crates/domain/src/player/status.rs",
@@ -8770,9 +8771,9 @@
       "typeName": "LineupDraft",
       "kind": "struct",
       "visibility": "public",
-      "currentPath": "crates/domain/src/lib.rs",
-      "currentModule": "football_domain",
-      "sourceLine": 233,
+      "currentPath": "crates/domain/src/lineup/snapshot.rs",
+      "currentModule": "football_domain::snapshot",
+      "sourceLine": 8,
       "derives": [
         "Clone",
         "Debug",
@@ -8865,11 +8866,12 @@
       "serializationName": "LineupDraft",
       "publicCompatibilityType": true,
       "compatibilityLevel": "root_public_compatibility",
-      "currentRootExport": "root_definition",
+      "currentRootExport": "glob_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
-        "crates/domain/src/lib.rs",
+        "crates/domain/src/lineup/snapshot.rs",
+        "crates/domain/tests/serde_contracts/module_paths.rs",
         "crates/domain/tests/serde_contracts/round_trip.rs"
       ],
       "externalCallers": [
@@ -8887,9 +8889,9 @@
       "typeName": "LineupHistoryRemovalResult",
       "kind": "struct",
       "visibility": "public",
-      "currentPath": "crates/domain/src/lib.rs",
-      "currentModule": "football_domain",
-      "sourceLine": 432,
+      "currentPath": "crates/domain/src/lineup/snapshot.rs",
+      "currentModule": "football_domain::snapshot",
+      "sourceLine": 78,
       "derives": [
         "Clone",
         "Debug",
@@ -8926,10 +8928,12 @@
       "serializationName": "LineupHistoryRemovalResult",
       "publicCompatibilityType": true,
       "compatibilityLevel": "root_public_compatibility",
-      "currentRootExport": "root_definition",
+      "currentRootExport": "glob_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
-      "domainCallers": [],
+      "domainCallers": [
+        "crates/domain/tests/serde_contracts/module_paths.rs"
+      ],
       "externalCallers": [
         "crates/application/src/player_catalog.rs",
         "crates/persistence-postgres/src/player_catalog.rs",
@@ -8943,9 +8947,9 @@
       "typeName": "LineupPairDraft",
       "kind": "struct",
       "visibility": "public",
-      "currentPath": "crates/domain/src/lib.rs",
-      "currentModule": "football_domain",
-      "sourceLine": 262,
+      "currentPath": "crates/domain/src/lineup/snapshot.rs",
+      "currentModule": "football_domain::snapshot",
+      "sourceLine": 37,
       "derives": [
         "Clone",
         "Debug",
@@ -8978,11 +8982,12 @@
       "serializationName": "LineupPairDraft",
       "publicCompatibilityType": true,
       "compatibilityLevel": "root_public_compatibility",
-      "currentRootExport": "root_definition",
+      "currentRootExport": "glob_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
-        "crates/domain/src/match_review_package.rs"
+        "crates/domain/src/match_review_package.rs",
+        "crates/domain/tests/serde_contracts/module_paths.rs"
       ],
       "externalCallers": [
         "crates/application/src/match_review_package.rs",
@@ -9000,9 +9005,9 @@
       "typeName": "LineupPairRecord",
       "kind": "struct",
       "visibility": "public",
-      "currentPath": "crates/domain/src/lib.rs",
-      "currentModule": "football_domain",
-      "sourceLine": 268,
+      "currentPath": "crates/domain/src/lineup/snapshot.rs",
+      "currentModule": "football_domain::snapshot",
+      "sourceLine": 43,
       "derives": [
         "Clone",
         "Debug",
@@ -9035,10 +9040,12 @@
       "serializationName": "LineupPairRecord",
       "publicCompatibilityType": true,
       "compatibilityLevel": "root_public_compatibility",
-      "currentRootExport": "root_definition",
+      "currentRootExport": "glob_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
-      "domainCallers": [],
+      "domainCallers": [
+        "crates/domain/tests/serde_contracts/module_paths.rs"
+      ],
       "externalCallers": [
         "crates/application/src/player_catalog.rs",
         "crates/persistence-postgres/src/player_catalog.rs",
@@ -9052,9 +9059,9 @@
       "typeName": "LineupPlayerDraft",
       "kind": "struct",
       "visibility": "public",
-      "currentPath": "crates/domain/src/lib.rs",
-      "currentModule": "football_domain",
-      "sourceLine": 203,
+      "currentPath": "crates/domain/src/lineup/player.rs",
+      "currentModule": "football_domain::player",
+      "sourceLine": 6,
       "derives": [
         "Clone",
         "Debug",
@@ -9152,18 +9159,19 @@
           ]
         }
       ],
-      "declarationSha256": "21692e903944393eae8f9b131fe4496d4b5f9cea9e48365244bfd98c0193b68c",
+      "declarationSha256": "7959d7cbecae5aaaa8984d99c3c166e3c4b25f4093de027c5f8f3bd46f23d303",
       "targetModule": "lineup",
       "targetTask": "R2-04",
       "targetPath": "crates/domain/src/lineup/",
       "serializationName": "LineupPlayerDraft",
       "publicCompatibilityType": true,
       "compatibilityLevel": "root_public_compatibility",
-      "currentRootExport": "root_definition",
+      "currentRootExport": "glob_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "none_detected",
       "domainCallers": [
-        "crates/domain/src/lib.rs"
+        "crates/domain/src/lineup/snapshot.rs",
+        "crates/domain/tests/serde_contracts/module_paths.rs"
       ],
       "externalCallers": [
         "crates/application/src/match_review_package.rs",
@@ -9176,9 +9184,9 @@
       "typeName": "LineupPlayerRecord",
       "kind": "struct",
       "visibility": "public",
-      "currentPath": "crates/domain/src/lib.rs",
-      "currentModule": "football_domain",
-      "sourceLine": 274,
+      "currentPath": "crates/domain/src/lineup/player.rs",
+      "currentModule": "football_domain::player",
+      "sourceLine": 36,
       "derives": [
         "Clone",
         "Debug",
@@ -9275,11 +9283,12 @@
       "serializationName": "LineupPlayerRecord",
       "publicCompatibilityType": true,
       "compatibilityLevel": "root_public_compatibility",
-      "currentRootExport": "root_definition",
+      "currentRootExport": "glob_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
-        "crates/domain/src/lib.rs"
+        "crates/domain/src/lineup/snapshot.rs",
+        "crates/domain/tests/serde_contracts/module_paths.rs"
       ],
       "externalCallers": [
         "crates/persistence-postgres/src/player_catalog.rs"
@@ -9292,9 +9301,9 @@
       "typeName": "LineupRecord",
       "kind": "struct",
       "visibility": "public",
-      "currentPath": "crates/domain/src/lib.rs",
-      "currentModule": "football_domain",
-      "sourceLine": 297,
+      "currentPath": "crates/domain/src/lineup/snapshot.rs",
+      "currentModule": "football_domain::snapshot",
+      "sourceLine": 49,
       "derives": [
         "Clone",
         "Debug",
@@ -9419,14 +9428,15 @@
       "serializationName": "LineupRecord",
       "publicCompatibilityType": true,
       "compatibilityLevel": "root_public_compatibility",
-      "currentRootExport": "root_definition",
+      "currentRootExport": "glob_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
         "crates/domain/src/exchange.rs",
-        "crates/domain/src/lib.rs",
-        "crates/domain/src/lineup_chain.rs",
-        "crates/domain/src/match_review_package.rs"
+        "crates/domain/src/lineup/chain.rs",
+        "crates/domain/src/lineup/snapshot.rs",
+        "crates/domain/src/match_review_package.rs",
+        "crates/domain/tests/serde_contracts/module_paths.rs"
       ],
       "externalCallers": [
         "crates/application/src/match_review_package.rs",
@@ -9451,9 +9461,9 @@
       "typeName": "LineupType",
       "kind": "enum",
       "visibility": "public",
-      "currentPath": "crates/domain/src/lib.rs",
-      "currentModule": "football_domain",
-      "sourceLine": 133,
+      "currentPath": "crates/domain/src/lineup/kind.rs",
+      "currentModule": "football_domain::kind",
+      "sourceLine": 5,
       "derives": [
         "Clone",
         "Copy",
@@ -9496,12 +9506,14 @@
       "serializationName": "LineupType",
       "publicCompatibilityType": true,
       "compatibilityLevel": "root_public_compatibility",
-      "currentRootExport": "root_definition",
+      "currentRootExport": "glob_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
-        "crates/domain/src/lib.rs",
-        "crates/domain/tests/serde_contracts/enums.rs"
+        "crates/domain/src/lineup/kind.rs",
+        "crates/domain/src/lineup/snapshot.rs",
+        "crates/domain/tests/serde_contracts/enums.rs",
+        "crates/domain/tests/serde_contracts/module_paths.rs"
       ],
       "externalCallers": [
         "crates/application/src/match_review_package.rs",
@@ -9519,7 +9531,7 @@
       "visibility": "public",
       "currentPath": "crates/domain/src/lib.rs",
       "currentModule": "football_domain",
-      "sourceLine": 62,
+      "sourceLine": 64,
       "derives": [
         "Clone",
         "Debug",
@@ -9608,9 +9620,9 @@
       "typeName": "MatchDraft",
       "kind": "struct",
       "visibility": "public",
-      "currentPath": "crates/domain/src/lib.rs",
-      "currentModule": "football_domain",
-      "sourceLine": 162,
+      "currentPath": "crates/domain/src/match_record/catalog.rs",
+      "currentModule": "football_domain::catalog",
+      "sourceLine": 8,
       "derives": [
         "Clone",
         "Debug",
@@ -9695,11 +9707,12 @@
       "serializationName": "MatchDraft",
       "publicCompatibilityType": true,
       "compatibilityLevel": "root_public_compatibility",
-      "currentRootExport": "root_definition",
+      "currentRootExport": "glob_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
-        "crates/domain/tests/serde_contracts/defaults.rs"
+        "crates/domain/tests/serde_contracts/defaults.rs",
+        "crates/domain/tests/serde_contracts/module_paths.rs"
       ],
       "externalCallers": [
         "crates/application/src/player_catalog.rs",
@@ -10046,9 +10059,9 @@
       "typeName": "MatchLineupChain",
       "kind": "struct",
       "visibility": "public",
-      "currentPath": "crates/domain/src/lineup_chain.rs",
-      "currentModule": "football_domain::lineup_chain",
-      "sourceLine": 19,
+      "currentPath": "crates/domain/src/lineup/chain.rs",
+      "currentModule": "football_domain::chain",
+      "sourceLine": 20,
       "derives": [
         "Clone",
         "Debug",
@@ -10108,7 +10121,9 @@
       "currentRootExport": "glob_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
-      "domainCallers": [],
+      "domainCallers": [
+        "crates/domain/tests/serde_contracts/module_paths.rs"
+      ],
       "externalCallers": [
         "crates/application/src/player_catalog.rs",
         "crates/application/src/prediction.rs",
@@ -10357,9 +10372,9 @@
       "typeName": "MatchLineupTeamChain",
       "kind": "struct",
       "visibility": "public",
-      "currentPath": "crates/domain/src/lineup_chain.rs",
-      "currentModule": "football_domain::lineup_chain",
-      "sourceLine": 9,
+      "currentPath": "crates/domain/src/lineup/chain.rs",
+      "currentModule": "football_domain::chain",
+      "sourceLine": 10,
       "derives": [
         "Clone",
         "Debug",
@@ -10412,7 +10427,8 @@
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
-        "crates/domain/src/lineup_chain.rs"
+        "crates/domain/src/lineup/chain.rs",
+        "crates/domain/tests/serde_contracts/module_paths.rs"
       ],
       "externalCallers": [
         "crates/application/src/prediction.rs",
@@ -10547,9 +10563,9 @@
       "typeName": "MatchRecord",
       "kind": "struct",
       "visibility": "public",
-      "currentPath": "crates/domain/src/lib.rs",
-      "currentModule": "football_domain",
-      "sourceLine": 185,
+      "currentPath": "crates/domain/src/match_record/catalog.rs",
+      "currentModule": "football_domain::catalog",
+      "sourceLine": 31,
       "derives": [
         "Clone",
         "Debug",
@@ -10630,15 +10646,16 @@
       "serializationName": "MatchRecord",
       "publicCompatibilityType": true,
       "compatibilityLevel": "root_public_compatibility",
-      "currentRootExport": "root_definition",
+      "currentRootExport": "glob_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
         "crates/domain/src/exchange.rs",
-        "crates/domain/src/lineup_chain.rs",
+        "crates/domain/src/lineup/chain.rs",
         "crates/domain/src/match_review_package.rs",
         "crates/domain/src/player/catalog.rs",
-        "crates/domain/src/review.rs"
+        "crates/domain/src/review.rs",
+        "crates/domain/tests/serde_contracts/module_paths.rs"
       ],
       "externalCallers": [
         "crates/application/src/player_catalog.rs",
@@ -12797,9 +12814,9 @@
       "typeName": "MatchStatus",
       "kind": "enum",
       "visibility": "public",
-      "currentPath": "crates/domain/src/lib.rs",
-      "currentModule": "football_domain",
-      "sourceLine": 105,
+      "currentPath": "crates/domain/src/match_record/status.rs",
+      "currentModule": "football_domain::status",
+      "sourceLine": 5,
       "derives": [
         "Clone",
         "Copy",
@@ -12850,14 +12867,16 @@
       "serializationName": "MatchStatus",
       "publicCompatibilityType": true,
       "compatibilityLevel": "root_public_compatibility",
-      "currentRootExport": "root_definition",
+      "currentRootExport": "glob_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
-        "crates/domain/src/lib.rs",
+        "crates/domain/src/match_record/catalog.rs",
+        "crates/domain/src/match_record/status.rs",
         "crates/domain/src/team/detail.rs",
         "crates/domain/tests/serde_contracts/defaults.rs",
-        "crates/domain/tests/serde_contracts/enums.rs"
+        "crates/domain/tests/serde_contracts/enums.rs",
+        "crates/domain/tests/serde_contracts/module_paths.rs"
       ],
       "externalCallers": [
         "crates/application/src/prediction.rs",
@@ -16281,7 +16300,7 @@
       "visibility": "public",
       "currentPath": "crates/domain/src/lib.rs",
       "currentModule": "football_domain",
-      "sourceLine": 89,
+      "sourceLine": 91,
       "derives": [
         "Clone",
         "Debug",
@@ -20190,7 +20209,7 @@
       "visibility": "public",
       "currentPath": "crates/domain/src/lib.rs",
       "currentModule": "football_domain",
-      "sourceLine": 80,
+      "sourceLine": 82,
       "derives": [
         "Clone",
         "Debug",
@@ -27154,9 +27173,9 @@
       "typeName": "TeamLineupPresetApplicationPreview",
       "kind": "struct",
       "visibility": "public",
-      "currentPath": "crates/domain/src/lib.rs",
-      "currentModule": "football_domain",
-      "sourceLine": 424,
+      "currentPath": "crates/domain/src/lineup/preset.rs",
+      "currentModule": "football_domain::preset",
+      "sourceLine": 106,
       "derives": [
         "Clone",
         "Debug",
@@ -27197,10 +27216,12 @@
       "serializationName": "TeamLineupPresetApplicationPreview",
       "publicCompatibilityType": true,
       "compatibilityLevel": "root_public_compatibility",
-      "currentRootExport": "root_definition",
+      "currentRootExport": "glob_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
-      "domainCallers": [],
+      "domainCallers": [
+        "crates/domain/tests/serde_contracts/module_paths.rs"
+      ],
       "externalCallers": [
         "crates/application/src/player_catalog.rs",
         "crates/persistence-postgres/src/team_lineup_presets.rs",
@@ -27214,9 +27235,9 @@
       "typeName": "TeamLineupPresetDraft",
       "kind": "struct",
       "visibility": "public",
-      "currentPath": "crates/domain/src/lib.rs",
-      "currentModule": "football_domain",
-      "sourceLine": 348,
+      "currentPath": "crates/domain/src/lineup/preset.rs",
+      "currentModule": "football_domain::preset",
+      "sourceLine": 30,
       "derives": [
         "Clone",
         "Debug",
@@ -27301,10 +27322,12 @@
       "serializationName": "TeamLineupPresetDraft",
       "publicCompatibilityType": true,
       "compatibilityLevel": "root_public_compatibility",
-      "currentRootExport": "root_definition",
+      "currentRootExport": "glob_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
-      "domainCallers": [],
+      "domainCallers": [
+        "crates/domain/tests/serde_contracts/module_paths.rs"
+      ],
       "externalCallers": [
         "crates/application/src/player_catalog.rs",
         "crates/persistence-postgres/src/team_lineup_presets.rs",
@@ -27318,9 +27341,9 @@
       "typeName": "TeamLineupPresetMemberDraft",
       "kind": "struct",
       "visibility": "public",
-      "currentPath": "crates/domain/src/lib.rs",
-      "currentModule": "football_domain",
-      "sourceLine": 326,
+      "currentPath": "crates/domain/src/lineup/preset.rs",
+      "currentModule": "football_domain::preset",
+      "sourceLine": 8,
       "derives": [
         "Clone",
         "Debug",
@@ -27401,11 +27424,12 @@
       "serializationName": "TeamLineupPresetMemberDraft",
       "publicCompatibilityType": true,
       "compatibilityLevel": "root_public_compatibility",
-      "currentRootExport": "root_definition",
+      "currentRootExport": "glob_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
-        "crates/domain/src/lib.rs"
+        "crates/domain/src/lineup/preset.rs",
+        "crates/domain/tests/serde_contracts/module_paths.rs"
       ],
       "externalCallers": [
         "crates/persistence-postgres/src/team_lineup_presets.rs"
@@ -27418,9 +27442,9 @@
       "typeName": "TeamLineupPresetMemberRecord",
       "kind": "struct",
       "visibility": "public",
-      "currentPath": "crates/domain/src/lib.rs",
-      "currentModule": "football_domain",
-      "sourceLine": 375,
+      "currentPath": "crates/domain/src/lineup/preset.rs",
+      "currentModule": "football_domain::preset",
+      "sourceLine": 57,
       "derives": [
         "Clone",
         "Debug",
@@ -27521,11 +27545,12 @@
       "serializationName": "TeamLineupPresetMemberRecord",
       "publicCompatibilityType": true,
       "compatibilityLevel": "root_public_compatibility",
-      "currentRootExport": "root_definition",
+      "currentRootExport": "glob_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
-        "crates/domain/src/lib.rs"
+        "crates/domain/src/lineup/preset.rs",
+        "crates/domain/tests/serde_contracts/module_paths.rs"
       ],
       "externalCallers": [
         "crates/persistence-postgres/src/team_lineup_presets.rs"
@@ -27538,9 +27563,9 @@
       "typeName": "TeamLineupPresetRecord",
       "kind": "struct",
       "visibility": "public",
-      "currentPath": "crates/domain/src/lib.rs",
-      "currentModule": "football_domain",
-      "sourceLine": 399,
+      "currentPath": "crates/domain/src/lineup/preset.rs",
+      "currentModule": "football_domain::preset",
+      "sourceLine": 81,
       "derives": [
         "Clone",
         "Debug",
@@ -27649,11 +27674,12 @@
       "serializationName": "TeamLineupPresetRecord",
       "publicCompatibilityType": true,
       "compatibilityLevel": "root_public_compatibility",
-      "currentRootExport": "root_definition",
+      "currentRootExport": "glob_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
-        "crates/domain/src/lib.rs"
+        "crates/domain/src/lineup/preset.rs",
+        "crates/domain/tests/serde_contracts/module_paths.rs"
       ],
       "externalCallers": [
         "crates/application/src/player_catalog.rs",
@@ -27909,9 +27935,9 @@
       "typeName": "TeamMatchLineupHistoryItem",
       "kind": "struct",
       "visibility": "public",
-      "currentPath": "crates/domain/src/lineup_chain.rs",
-      "currentModule": "football_domain::lineup_chain",
-      "sourceLine": 31,
+      "currentPath": "crates/domain/src/lineup/chain.rs",
+      "currentModule": "football_domain::chain",
+      "sourceLine": 32,
       "derives": [
         "Clone",
         "Debug",
@@ -27967,7 +27993,9 @@
       "currentRootExport": "glob_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
-      "domainCallers": [],
+      "domainCallers": [
+        "crates/domain/tests/serde_contracts/module_paths.rs"
+      ],
       "externalCallers": [
         "crates/application/src/player_catalog.rs",
         "crates/persistence-postgres/src/lineup_chain.rs",

@@ -5,7 +5,7 @@ import { fileURLToPath } from "node:url";
 const root = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const read = (path) => readFileSync(resolve(root, path), "utf8");
 
-const domain = read("crates/domain/src/lib.rs");
+const domain = (read("crates/domain/src/lib.rs") + read("crates/domain/src/lineup/kind.rs") + read("crates/domain/src/lineup/player.rs") + read("crates/domain/src/lineup/snapshot.rs") + read("crates/domain/src/lineup/preset.rs") + read("crates/domain/src/lineup/chain.rs") + read("crates/domain/src/match_record/status.rs") + read("crates/domain/src/match_record/catalog.rs"));
 const catalog = read("crates/persistence-postgres/src/player_catalog.rs");
 const connection = read("crates/persistence-postgres/src/connection.rs");
 const integration = read("crates/persistence-postgres/tests/postgres_integration.rs");

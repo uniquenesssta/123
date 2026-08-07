@@ -8,7 +8,7 @@ const check = (condition, message) => { if (!condition) failures.push(message); 
 
 const contract = JSON.parse(read("contracts/team-lineup-presets-contract.json"));
 const migration = read("crates/persistence-postgres/migrations/0045_team_lineup_presets.sql");
-const domain = read("crates/domain/src/lib.rs");
+const domain = (read("crates/domain/src/lib.rs") + read("crates/domain/src/lineup/kind.rs") + read("crates/domain/src/lineup/player.rs") + read("crates/domain/src/lineup/snapshot.rs") + read("crates/domain/src/lineup/preset.rs") + read("crates/domain/src/lineup/chain.rs") + read("crates/domain/src/match_record/status.rs") + read("crates/domain/src/match_record/catalog.rs"));
 const persistence = read("crates/persistence-postgres/src/team_lineup_presets.rs");
 const application = read("crates/application/src/player_catalog.rs");
 const commands = read("src-tauri/src/commands/catalog.rs");
