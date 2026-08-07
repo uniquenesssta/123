@@ -1,5 +1,3 @@
-use super::super::P4Horizon;
-use crate::CompetitionKind;
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
