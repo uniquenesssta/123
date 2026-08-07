@@ -44,11 +44,11 @@ pub async fn reconcile_known_legacy_migrations(pool: &PgPool) -> PersistenceResu
 async fn migration_ledger_exists(
     transaction: &mut Transaction<'_, Postgres>,
 ) -> PersistenceResult<bool> {
-    Ok(sqlx::query_scalar::<_, bool>(
-        "SELECT to_regclass('public._sqlx_migrations') IS NOT NULL",
+    Ok(
+        sqlx::query_scalar::<_, bool>("SELECT to_regclass('public._sqlx_migrations') IS NOT NULL")
+            .fetch_one(&mut **transaction)
+            .await?,
     )
-    .fetch_one(&mut **transaction)
-    .await?)
 }
 
 async fn applied_checksum(
@@ -74,11 +74,10 @@ async fn applied_checksum(
 async fn verify_known_legacy_lineage(
     transaction: &mut Transaction<'_, Postgres>,
 ) -> PersistenceResult<()> {
-    let contract_table_exists: bool = sqlx::query_scalar(
-        "SELECT to_regclass('platform.integration_contracts') IS NOT NULL",
-    )
-    .fetch_one(&mut **transaction)
-    .await?;
+    let contract_table_exists: bool =
+        sqlx::query_scalar("SELECT to_regclass('platform.integration_contracts') IS NOT NULL")
+            .fetch_one(&mut **transaction)
+            .await?;
     if !contract_table_exists {
         return Err(unknown_migration_history_error());
     }
@@ -141,8 +140,7 @@ async fn ensure_public_engine_artifact_shape(
             .await?;
     if !table_exists {
         return Err(PersistenceError::InvalidState(
-            "已识别兼容历史，但缺少 model.engine_artifacts；为保护数据，未修改迁移账本"
-                .to_string(),
+            "已识别兼容历史，但缺少 model.engine_artifacts；为保护数据，未修改迁移账本".to_string(),
         ));
     }
 
