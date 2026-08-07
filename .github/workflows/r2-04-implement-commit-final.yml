@@ -11,7 +11,7 @@ permissions:
 jobs:
   implement:
     if: "${{ github.event.head_commit.message == 'chore(r2): finalize R2-04 implementation commit' }}"
-    runs-on: windows-2022
+    runs-on: windows-2025
     timeout-minutes: 120
 
     steps:
@@ -72,6 +72,64 @@ jobs:
           & pwsh -NoProfile -File execute_r2_04_apply.ps1
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
           Remove-Item execute_r2_04_apply.ps1 -Force
+
+          @'
+          from pathlib import Path
+
+          docs = Path("docs/README.md")
+          root = Path("README.md")
+          if not docs.exists():
+              raise RuntimeError("Canonical migration did not create the temporary docs README")
+          text = docs.read_text(encoding="utf-8").replace("\r\n", "\n")
+          marker = "\n## 记录位置\n"
+          r2_marker = "\n## R2-04 Lineup 与 Match\n"
+          if marker not in text or r2_marker not in text:
+              raise RuntimeError("Temporary README migration block mismatch")
+          start = text.index(marker)
+          r2_start = text.index(r2_marker, start)
+          text = text[:start] + text[r2_start:]
+          text = text.replace(
+              "\n- 所有读取变更记录的仓库验证器已同步使用 `docs/README.md`；根 README 不再承担验证记录职责。\n",
+              "\n",
+          )
+          root.write_text(text.lstrip(), encoding="utf-8", newline="\n")
+          docs.unlink()
+
+          root_read = 'read("crates/domain/src/lib.rs")'
+          domain_read = (
+              '(read("crates/domain/src/lib.rs")'
+              ' + read("crates/domain/src/lineup/kind.rs")'
+              ' + read("crates/domain/src/lineup/player.rs")'
+              ' + read("crates/domain/src/lineup/snapshot.rs")'
+              ' + read("crates/domain/src/lineup/preset.rs")'
+              ' + read("crates/domain/src/lineup/chain.rs")'
+              ' + read("crates/domain/src/match_record/status.rs")'
+              ' + read("crates/domain/src/match_record/catalog.rs"))'
+          )
+          for path in sorted(Path("scripts").rglob("*.mjs")):
+              original = path.read_text(encoding="utf-8").replace("\r\n", "\n")
+              updated = original.replace('"docs/README.md"', '"README.md"')
+              updated = updated.replace("'docs/README.md'", "'README.md'")
+              updated = updated.replace("../docs/README.md", "../README.md")
+              updated = updated.replace("docs README 没有本次完整变更记录", "根 README 没有本次完整变更记录")
+              if updated != original:
+                  path.write_text(updated, encoding="utf-8", newline="\n")
+
+          task = Path("docs/modular-rewrite/R02-domain-rewrite/R02-04-lineup-and-match.md")
+          task_text = task.read_text(encoding="utf-8").replace("\r\n", "\n")
+          task_text = task_text.replace(
+              "- 将根目录 README 原内容迁移至 `docs/README.md`，根 `README.md` 置为空白；后续统一在 `docs/README.md` 记录项目变更。",
+              "- 根目录 `README.md` 继续作为唯一项目变更记录；R2-04 不迁移或替换 README 记录职责。",
+          )
+          task_text = task_text.replace(
+              "- 同步更新仓库验证器的记录读取路径，并让旧根 Domain 聚合检查覆盖新的 Lineup 与 Match 职责模块。",
+              "- 旧根 Domain 聚合检查已扩展覆盖新的 Lineup 与 Match 职责模块。",
+          )
+          task.write_text(task_text, encoding="utf-8", newline="\n")
+          '@ | Set-Content reconcile_r2_04_contracts.py -Encoding utf8
+          python reconcile_r2_04_contracts.py
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          Remove-Item reconcile_r2_04_contracts.py -Force
 
       - name: Verify targeted and full gates
         shell: pwsh
@@ -137,7 +195,8 @@ jobs:
           from pathlib import Path
 
           base = "3256454e9d76b7b442a83f25964363256257cbcc"
-          expected = {
+          required = {
+              ".github/workflows/ci.yml",
               "README.md",
               "architecture/domain-migration-progress.json",
               "architecture/domain-type-inventory.json",
@@ -153,62 +212,84 @@ jobs:
               "crates/domain/src/match_record/mod.rs",
               "crates/domain/src/match_record/status.rs",
               "crates/domain/tests/serde_contracts/module_paths.rs",
-              "docs/README.md",
               "docs/modular-rewrite/R02-domain-rewrite/R02-04-lineup-and-match.md",
               "docs/modular-rewrite/R02-domain-rewrite/README.md",
               "scripts/domain-inventory/target-module-policy.mjs",
-              "scripts/verify-api-workspace.mjs",
-              "scripts/verify-database-reset.mjs",
-              "scripts/verify-entity-deletion.mjs",
-              "scripts/verify-entity-relationships.mjs",
-              "scripts/verify-force-team-delete.mjs",
-              "scripts/verify-import-row-identity.mjs",
-              "scripts/verify-match-lineup-chain.mjs",
-              "scripts/verify-match-workflow-ui.mjs",
-              "scripts/verify-openai-profile-ui.mjs",
-              "scripts/verify-player-role-inheritance.mjs",
-              "scripts/verify-release-package.mjs",
-              "scripts/verify-release-readiness.mjs",
-              "scripts/verify-stage-e1-followup.mjs",
-              "scripts/verify-stage-e2-lineup-presets.mjs",
-              "scripts/verify-team-package.mjs",
-              "scripts/verify-team-player-management.mjs",
-              "scripts/verify-windows-acceptance.mjs",
-              "scripts/verify-workspace-ui.mjs",
           }
 
-          output = subprocess.check_output(
-              ["git", "diff", "--cached", "--no-renames", "--name-only", base],
-              text=True,
-              encoding="utf-8",
-          ).replace("\r\n", "\n")
+          def git(*args):
+              return subprocess.check_output(["git", *args], text=True, encoding="utf-8").replace("\r\n", "\n")
+
+          root_read = 'read("crates/domain/src/lib.rs")'
+          domain_read = (
+              '(read("crates/domain/src/lib.rs")'
+              ' + read("crates/domain/src/lineup/kind.rs")'
+              ' + read("crates/domain/src/lineup/player.rs")'
+              ' + read("crates/domain/src/lineup/snapshot.rs")'
+              ' + read("crates/domain/src/lineup/preset.rs")'
+              ' + read("crates/domain/src/lineup/chain.rs")'
+              ' + read("crates/domain/src/match_record/status.rs")'
+              ' + read("crates/domain/src/match_record/catalog.rs"))'
+          )
+          expected = set(required)
+          scripts = [
+              p for p in git("ls-tree", "-r", "--name-only", base, "scripts").splitlines()
+              if p.endswith(".mjs")
+          ]
+          for path in scripts:
+              original = git("show", f"{base}:{path}")
+              transformed = original.replace(
+                  "crates/domain/src/lineup_chain.rs",
+                  "crates/domain/src/lineup/chain.rs",
+              )
+              transformed = transformed.replace(root_read, domain_read)
+              if path == "scripts/verify-player-role-inheritance.mjs":
+                  transformed = transformed.replace(
+                      'requireTokens("crates/domain/src/lib.rs", [\n  "pub role_origin: String",\n], "阵容领域模型");',
+                      'requireTokens("crates/domain/src/lineup/player.rs", [\n  "pub role_origin: String",\n], "阵容领域模型");',
+                  )
+              if transformed != original:
+                  expected.add(path)
+                  current = Path(path).read_text(encoding="utf-8").replace("\r\n", "\n")
+                  if current != transformed:
+                      raise RuntimeError(f"Unexpected validator change: {path}")
+
+          output = git("diff", "--cached", "--no-renames", "--name-only", base)
           actual = {line for line in output.splitlines() if line}
           if actual != expected:
               print("Missing:", sorted(expected - actual))
               print("Unexpected:", sorted(actual - expected))
               raise RuntimeError("Unexpected R2-04 staged change set")
 
-          status = subprocess.check_output(
-              ["git", "diff", "--cached", "--no-renames", "--name-status", base],
-              text=True,
-              encoding="utf-8",
-          ).replace("\r\n", "\n")
-          deleted = {line.split("\t", 1)[1] for line in status.splitlines() if line.startswith("D\t")}
+          status = git("diff", "--cached", "--no-renames", "--name-status", base)
+          deleted = {
+              line.split("\t", 1)[1]
+              for line in status.splitlines()
+              if line.startswith("D\t")
+          }
           if "crates/domain/src/lineup_chain.rs" not in deleted:
               raise RuntimeError("Legacy lineup_chain.rs is not staged as deleted")
 
-          if Path("README.md").read_bytes() != b"":
-              raise RuntimeError("Root README must be exactly empty")
-          docs = Path("docs/README.md").read_text(encoding="utf-8")
-          if not docs.strip() or "R2-04 Lineup 与 Match" not in docs:
-              raise RuntimeError("docs/README.md is not the populated canonical record")
+          root_readme = Path("README.md").read_text(encoding="utf-8")
+          if "## R2-04 Lineup 与 Match" not in root_readme:
+              raise RuntimeError("Root README does not contain the R2-04 change record")
+          if Path("docs/README.md").exists():
+              raise RuntimeError("docs/README.md must not replace the canonical root README")
+          ci = Path(".github/workflows/ci.yml").read_text(encoding="utf-8")
+          if "runs-on: windows-2025" not in ci:
+              raise RuntimeError("Public Platform CI is not pinned to windows-2025")
           if any(Path(".github/workflows").glob("r2-04-implement*.yml")):
               raise RuntimeError("Temporary R2-04 implementation workflow remains")
           if Path(".github/workflows/r2-04-fix-validator.yml").exists():
               raise RuntimeError("Temporary R2-04 validator repair workflow remains")
           if Path(".github/r2-04-trigger").exists():
               raise RuntimeError("Temporary R2-04 trigger remains")
-          for transient in ("execute_r2_04_apply.ps1", "extract_r2_04_apply.py"):
+          for transient in (
+              "execute_r2_04_apply.ps1",
+              "extract_r2_04_apply.py",
+              "reconcile_r2_04_contracts.py",
+              "verify_r2_04_final_tree.py",
+          ):
               if Path(transient).exists():
                   raise RuntimeError(f"Transient file remains: {transient}")
           '@ | Set-Content verify_r2_04_final_tree.py -Encoding utf8
