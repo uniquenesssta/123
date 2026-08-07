@@ -1,3 +1,4 @@
+# retry after registering review/postmatch directory policy
 name: R2-06 Staged Migration Gate
 
 on:
