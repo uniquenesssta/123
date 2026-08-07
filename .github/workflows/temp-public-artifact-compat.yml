@@ -2,8 +2,7 @@ name: Temporary Public Artifact Compatibility Fix
 
 on:
   push:
-    branches:
-      - new-B
+    branches: [new-B]
 
 permissions:
   contents: write
@@ -18,14 +17,12 @@ jobs:
     runs-on: windows-2025
     timeout-minutes: 60
     steps:
-      - name: Checkout new-B
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
         with:
           ref: new-B
           fetch-depth: 0
 
-      - name: Setup Rust 1.88.0
-        uses: dtolnay/rust-toolchain@1.88.0
+      - uses: dtolnay/rust-toolchain@1.88.0
         with:
           components: rustfmt, clippy
 
@@ -41,14 +38,14 @@ jobs:
           def write(path, text):
               Path(path).write_bytes(text.encode('utf-8'))
 
-          def replace_exact(path, old, new, expected=1):
+          def replace(path, old, new, expected=1):
               text = read(path)
               actual = text.count(old)
               if actual != expected:
-                  raise SystemExit(f'{path}: expected {expected} occurrences, found {actual}: {old!r}')
+                  raise SystemExit(f'{path}: expected {expected}, found {actual}: {old!r}')
               write(path, text.replace(old, new))
 
-          artifact_module = '''pub(crate) const P4_EVIDENCE_SCHEMA_KEY: &str = "p4-evidence";
+          write('crates/application/src/built_in_artifacts.rs', '''pub(crate) const P4_EVIDENCE_SCHEMA_KEY: &str = "p4-evidence";
           pub(crate) const P4_EVIDENCE_SCHEMA_ARTIFACT_VERSION: &str = "1.0.0+public.1";
           pub(crate) const P4_SNAPSHOT_SCHEMA_KEY: &str = "p4-prematch-snapshot";
           pub(crate) const P4_SNAPSHOT_SCHEMA_ARTIFACT_VERSION: &str = "1.0.0+public.1";
@@ -70,144 +67,90 @@ jobs:
                   assert_eq!(P4_RESEARCH_PROMPT_ARTIFACT_VERSION, "2.0.0+public.1");
               }
           }
-          '''
-          write('crates/application/src/built_in_artifacts.rs', artifact_module)
+          ''')
 
-          replace_exact(
-              'crates/application/src/lib.rs',
+          replace('crates/application/src/lib.rs',
               'mod api_workspace;\nmod competition;',
-              'mod api_workspace;\nmod built_in_artifacts;\nmod competition;',
-          )
+              'mod api_workspace;\nmod built_in_artifacts;\nmod competition;')
 
-          replace_exact(
-              'crates/application/src/p4_persistence.rs',
+          replace('crates/application/src/p4_persistence.rs',
               'use super::{ApplicationResult, ApplicationService};\nuse football_domain::{',
-              'use super::{ApplicationResult, ApplicationService};\nuse crate::built_in_artifacts::{\n    P4_EVIDENCE_SCHEMA_ARTIFACT_VERSION, P4_EVIDENCE_SCHEMA_KEY,\n    P4_SNAPSHOT_SCHEMA_ARTIFACT_VERSION, P4_SNAPSHOT_SCHEMA_KEY,\n};\nuse football_domain::{',
-          )
-          replace_exact(
-              'crates/application/src/p4_persistence.rs',
+              'use super::{ApplicationResult, ApplicationService};\nuse crate::built_in_artifacts::{\n    P4_EVIDENCE_SCHEMA_ARTIFACT_VERSION, P4_EVIDENCE_SCHEMA_KEY,\n    P4_SNAPSHOT_SCHEMA_ARTIFACT_VERSION, P4_SNAPSHOT_SCHEMA_KEY,\n};\nuse football_domain::{')
+          replace('crates/application/src/p4_persistence.rs',
               'schema_key: "p4-evidence".to_string(),\n            version: "1.0.0".to_string(),',
-              'schema_key: P4_EVIDENCE_SCHEMA_KEY.to_string(),\n            version: P4_EVIDENCE_SCHEMA_ARTIFACT_VERSION.to_string(),',
-          )
-          replace_exact(
-              'crates/application/src/p4_persistence.rs',
+              'schema_key: P4_EVIDENCE_SCHEMA_KEY.to_string(),\n            version: P4_EVIDENCE_SCHEMA_ARTIFACT_VERSION.to_string(),')
+          replace('crates/application/src/p4_persistence.rs',
               'schema_key: "p4-prematch-snapshot".to_string(),\n            version: "1.0.0".to_string(),',
-              'schema_key: P4_SNAPSHOT_SCHEMA_KEY.to_string(),\n            version: P4_SNAPSHOT_SCHEMA_ARTIFACT_VERSION.to_string(),',
-          )
-          replace_exact(
-              'crates/application/src/p4_persistence.rs',
+              'schema_key: P4_SNAPSHOT_SCHEMA_KEY.to_string(),\n            version: P4_SNAPSHOT_SCHEMA_ARTIFACT_VERSION.to_string(),')
+          replace('crates/application/src/p4_persistence.rs',
               '        assert_ne!(drafts[0].schema_key, drafts[1].schema_key);\n        for draft in drafts {',
-              '        assert_ne!(drafts[0].schema_key, drafts[1].schema_key);\n        assert_eq!(drafts[0].schema_key, P4_EVIDENCE_SCHEMA_KEY);\n        assert_eq!(drafts[0].version, P4_EVIDENCE_SCHEMA_ARTIFACT_VERSION);\n        assert_eq!(drafts[1].schema_key, P4_SNAPSHOT_SCHEMA_KEY);\n        assert_eq!(drafts[1].version, P4_SNAPSHOT_SCHEMA_ARTIFACT_VERSION);\n        for draft in drafts {',
-          )
+              '        assert_ne!(drafts[0].schema_key, drafts[1].schema_key);\n        assert_eq!(drafts[0].schema_key, P4_EVIDENCE_SCHEMA_KEY);\n        assert_eq!(drafts[0].version, P4_EVIDENCE_SCHEMA_ARTIFACT_VERSION);\n        assert_eq!(drafts[1].schema_key, P4_SNAPSHOT_SCHEMA_KEY);\n        assert_eq!(drafts[1].version, P4_SNAPSHOT_SCHEMA_ARTIFACT_VERSION);\n        for draft in drafts {')
 
-          replace_exact(
-              'crates/application/src/openai_research.rs',
+          replace('crates/application/src/openai_research.rs',
               'use super::{ApplicationError, ApplicationResult, ApplicationService, PersistenceStore};\nuse async_trait::async_trait;',
-              'use super::{ApplicationError, ApplicationResult, ApplicationService, PersistenceStore};\nuse crate::built_in_artifacts::{\n    P4_RESEARCH_PROMPT_ARTIFACT_VERSION, P4_RESEARCH_PROMPT_KEY as RESEARCH_PROMPT_KEY,\n    P4_RESEARCH_SCHEMA_ARTIFACT_VERSION, P4_RESEARCH_SCHEMA_KEY as RESEARCH_SCHEMA_KEY,\n};\nuse async_trait::async_trait;',
-          )
-          replace_exact(
-              'crates/application/src/openai_research.rs',
-              '    SchemaVersionDraft, WebCitationDraft, WebSourceDraft, P4_RESEARCH_OUTPUT_SCHEMA_VERSION,\n    P4_RESEARCH_PROMPT_VERSION,\n',
-              '    SchemaVersionDraft, WebCitationDraft, WebSourceDraft, P4_RESEARCH_OUTPUT_SCHEMA_VERSION,\n',
-          )
-          replace_exact(
-              'crates/application/src/openai_research.rs',
-              'const RESEARCH_SCHEMA_KEY: &str = "p4-openai-research-output";\nconst RESEARCH_PROMPT_KEY: &str = "p4-openai-research-system";\n',
-              '',
-          )
-          replace_exact(
-              'crates/application/src/openai_research.rs',
+              'use super::{ApplicationError, ApplicationResult, ApplicationService, PersistenceStore};\nuse crate::built_in_artifacts::{\n    P4_RESEARCH_PROMPT_ARTIFACT_VERSION, P4_RESEARCH_PROMPT_KEY as RESEARCH_PROMPT_KEY,\n    P4_RESEARCH_SCHEMA_ARTIFACT_VERSION, P4_RESEARCH_SCHEMA_KEY as RESEARCH_SCHEMA_KEY,\n};\nuse async_trait::async_trait;')
+          replace('crates/application/src/openai_research.rs',
+              'const RESEARCH_SCHEMA_KEY: &str = "p4-openai-research-output";\nconst RESEARCH_PROMPT_KEY: &str = "p4-openai-research-system";\n', '')
+          replace('crates/application/src/openai_research.rs',
               '        version: "2.0.0".to_string(),',
-              '        version: P4_RESEARCH_SCHEMA_ARTIFACT_VERSION.to_string(),',
-          )
-          replace_exact(
-              'crates/application/src/openai_research.rs',
+              '        version: P4_RESEARCH_SCHEMA_ARTIFACT_VERSION.to_string(),')
+          replace('crates/application/src/openai_research.rs',
               '        version: P4_RESEARCH_PROMPT_VERSION.to_string(),',
-              '        version: P4_RESEARCH_PROMPT_ARTIFACT_VERSION.to_string(),',
-          )
-          replace_exact(
-              'crates/application/src/openai_research.rs',
+              '        version: P4_RESEARCH_PROMPT_ARTIFACT_VERSION.to_string(),')
+          replace('crates/application/src/openai_research.rs',
               '        let schema = built_in_research_schema();\n        assert_eq!(schema.schema_body["additionalProperties"], false);',
-              '        let schema = built_in_research_schema();\n        assert_eq!(schema.version, P4_RESEARCH_SCHEMA_ARTIFACT_VERSION);\n        assert_eq!(\n            built_in_research_prompt().version,\n            P4_RESEARCH_PROMPT_ARTIFACT_VERSION\n        );\n        assert_eq!(schema.schema_body["additionalProperties"], false);',
-          )
+              '        let schema = built_in_research_schema();\n        assert_eq!(schema.version, P4_RESEARCH_SCHEMA_ARTIFACT_VERSION);\n        assert_eq!(built_in_research_prompt().version, P4_RESEARCH_PROMPT_ARTIFACT_VERSION);\n        assert_eq!(schema.schema_body["additionalProperties"], false);')
 
-          replace_exact(
-              'crates/application/src/p4_orchestration.rs',
+          replace('crates/application/src/p4_orchestration.rs',
               'use crate::model_shell::P4_MODEL_ID;\nuse crate::PersistenceStore;',
-              'use crate::built_in_artifacts::{\n    P4_RESEARCH_SCHEMA_ARTIFACT_VERSION as RESEARCH_SCHEMA_VERSION,\n    P4_RESEARCH_SCHEMA_KEY as RESEARCH_SCHEMA_KEY,\n    P4_SNAPSHOT_SCHEMA_ARTIFACT_VERSION as SNAPSHOT_SCHEMA_VERSION,\n    P4_SNAPSHOT_SCHEMA_KEY as SNAPSHOT_SCHEMA_KEY,\n};\nuse crate::model_shell::P4_MODEL_ID;\nuse crate::PersistenceStore;',
-          )
-          replace_exact(
-              'crates/application/src/p4_orchestration.rs',
-              'const RESEARCH_SCHEMA_KEY: &str = "p4-openai-research-output";\nconst RESEARCH_SCHEMA_VERSION: &str = "2.0.0";\nconst SNAPSHOT_SCHEMA_KEY: &str = "p4-prematch-snapshot";\nconst SNAPSHOT_SCHEMA_VERSION: &str = "1.0.0";\n',
-              '',
-          )
+              'use crate::built_in_artifacts::{\n    P4_RESEARCH_SCHEMA_ARTIFACT_VERSION as RESEARCH_SCHEMA_VERSION,\n    P4_RESEARCH_SCHEMA_KEY as RESEARCH_SCHEMA_KEY,\n    P4_SNAPSHOT_SCHEMA_ARTIFACT_VERSION as SNAPSHOT_SCHEMA_VERSION,\n    P4_SNAPSHOT_SCHEMA_KEY as SNAPSHOT_SCHEMA_KEY,\n};\nuse crate::model_shell::P4_MODEL_ID;\nuse crate::PersistenceStore;')
+          replace('crates/application/src/p4_orchestration.rs',
+              'const RESEARCH_SCHEMA_KEY: &str = "p4-openai-research-output";\nconst RESEARCH_SCHEMA_VERSION: &str = "2.0.0";\nconst SNAPSHOT_SCHEMA_KEY: &str = "p4-prematch-snapshot";\nconst SNAPSHOT_SCHEMA_VERSION: &str = "1.0.0";\n', '')
 
-          replace_exact(
-              'crates/domain/src/research/mod.rs',
+          replace('crates/domain/src/research/mod.rs',
               'pub const P4_RESEARCH_PROMPT_VERSION: &str = "2.0.0";',
-              'pub const P4_RESEARCH_PROMPT_VERSION: &str = "2.0.0+public.1";',
-          )
+              'pub const P4_RESEARCH_PROMPT_VERSION: &str = "2.0.0+public.1";')
 
-          readme_path = 'README.md'
+          readme = read('README.md')
           marker = '## 0.23.0 变更记录\n\n'
-          addition = (
-              '- 公开重写后的内置 P4 evidence、prematch snapshot、research output Schema 与研究 Prompt '
-              '使用独立不可变内容版本（`1.0.0+public.1` / `2.0.0+public.1`）；旧数据库中的同名旧版本继续保留，启动时不覆盖历史内容或放宽指纹校验。\n'
-          )
-          text = read(readme_path)
-          if addition not in text:
-              if text.count(marker) != 1:
+          entry = '- 公开重写后的内置 P4 evidence、prematch snapshot、research output Schema 与研究 Prompt 使用独立不可变内容版本（`1.0.0+public.1` / `2.0.0+public.1`）；旧数据库中的同名旧版本继续保留，启动时不覆盖历史内容或放宽指纹校验。\n'
+          if entry not in readme:
+              if readme.count(marker) != 1:
                   raise SystemExit('README 0.23.0 marker missing or duplicated')
-              text = text.replace(marker, marker + addition, 1)
-              write(readme_path, text)
+              write('README.md', readme.replace(marker, marker + entry, 1))
 
           workflow = Path('.github/workflows/temp-public-artifact-compat.yml')
           if workflow.exists():
               workflow.unlink()
           '@ | python -
 
-      - name: Format Rust
-        shell: pwsh
-        run: cargo fmt --all
-
-      - name: Verify formatting
-        shell: pwsh
-        run: cargo fmt --all -- --check
-
-      - name: Verify targeted artifact tests
+      - name: Format and verify
         shell: pwsh
         run: |
+          cargo fmt --all
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          cargo fmt --all -- --check
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
           cargo test --locked -p football-application rewritten_public_artifacts_have_distinct_immutable_versions --lib
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
           cargo test --locked -p football-application built_in_persistence_schemas_are_unique_and_strict --lib
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
           cargo test --locked -p football-application built_in_gateway_is_strict_and_has_no_secret --lib
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
-
-      - name: Check application crate
-        shell: pwsh
-        run: cargo check --locked -p football-application
-
-      - name: Verify exact compatibility identities
-        shell: pwsh
-        run: |
-          $matches = rg -n '1\.0\.0\+public\.1|2\.0\.0\+public\.1' crates/application/src/built_in_artifacts.rs crates/domain/src/research/mod.rs README.md
+          cargo check --locked -p football-application
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
-          Write-Host $matches
-          if (Test-Path '.github/workflows/temp-public-artifact-compat.yml') {
-            throw 'temporary workflow was not cleaned'
-          }
 
-      - name: Commit verified fix
+      - name: Verify identities and commit
         shell: pwsh
         run: |
+          rg -n '1\.0\.0\+public\.1|2\.0\.0\+public\.1' crates/application/src/built_in_artifacts.rs crates/domain/src/research/mod.rs README.md
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          if (Test-Path '.github/workflows/temp-public-artifact-compat.yml') { throw 'temporary workflow was not cleaned' }
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
           git add crates/application/src/built_in_artifacts.rs crates/application/src/lib.rs crates/application/src/p4_persistence.rs crates/application/src/openai_research.rs crates/application/src/p4_orchestration.rs crates/domain/src/research/mod.rs README.md .github/workflows/temp-public-artifact-compat.yml
           git diff --cached --check
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
-          git diff --cached --quiet
-          if ($LASTEXITCODE -eq 0) { throw 'no compatibility changes staged' }
           git commit -m 'fix(database): version rewritten built-in artifacts immutably'
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
           git push origin HEAD:new-B
