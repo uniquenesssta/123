@@ -44,7 +44,7 @@ R1 已完成并关闭。R2 按业务语义拆分 `crates/domain`，保持 Serde�
 | R2-04 | Lineup 与 Match | DONE | [`R02-04-lineup-and-match.md`](R02-04-lineup-and-match.md) | 实施 run `31151412918`、正式 Windows Automated run `31153982572` 通过 |
 | R2-05 | Prediction 与 Research 外围领域 | DONE | [`R02-05-prediction-and-research-外围领域.md`](R02-05-prediction-and-research-外围领域.md) | 正式 Windows Automated run `31171082098`、job `92842834091` 通过 |
 | R2-06 | Review 与 Postmatch | DONE | [`R02-06-review-and-postmatch.md`](R02-06-review-and-postmatch.md) | staged 全量通过；Windows Automated run `31200190104` 与用户原库实机连接通过 |
-| R2-07 | Analytics / Exchange / AI / Release | READY | `R02-07-analytics-exchange-ai-and-release.md` | R2-06 已关闭，可开始 |
+| R2-07 | Analytics / Exchange / AI / Release | VERIFYING | [`R02-07-analytics-exchange-ai-and-release.md`](R02-07-analytics-exchange-ai-and-release.md) | 118 类型已迁移，等待 Windows 本机门禁 |
 | R2-08 | Domain 根出口收敛 | BLOCKED | `R02-08-domain-根出口收敛.md` | 等待 R2-07 |
 
 ## R2-01 当前结果
@@ -64,7 +64,7 @@ R2-01 至 R2-08 全部 `DONE` 后创建 `R02-stage-completion.md`，并实际完
 
 ## 当前阶段状态
 
-`R2-06 DONE`；`R2-07 READY`。Review 48 个类型与 Postmatch 11 个类型已从 5 个根级职责混合文件迁移到 `review/` 与 `postmatch/` 职责目录；staged run `31173824393`、job `92851309157` 已通过格式化、类型清单、Serde/模块路径、架构、保护资产、完整 frontend 与完整 Rust 门禁。后续数据库兼容链在不清库、不覆盖历史不可变资产、不放宽指纹保护的前提下完成修复；Windows Automated run `31200190104` 通过，用户在 Windows 上使用原有 PostgreSQL 数据库完成连接与运行日志复核，R2-06 正式关闭。
+`R2-06 DONE`；`R2-07 VERIFYING`。Analytics 39、Exchange 54、AI Workspace 16、Release 9 共 118 个类型已从 7 个职责混合根文件迁移到四个业务语义目录，旧文件已删除；根级公共兼容路径继续保留到 R2-08。当前等待 Windows 本机格式、类型清单、Serde、架构、frontend、Rust 与启动 smoke 门禁，R2-08 保持阻塞。
 
 ## R2-02 当前结果
 
@@ -112,3 +112,10 @@ R2-01 至 R2-08 全部 `DONE` 后创建 `R02-stage-completion.md`，并实际完
 - 原有 PostgreSQL 数据库验证暴露并修复已知历史 migration checksum、不可变 engine artifact 字段映射、内置规则包及 P4 Schema/Prompt 同版本不同内容冲突；修复均保留历史数据和不可变资产，不清库、不覆盖旧版本、不削弱 fail-closed 与内容指纹保护。
 - Windows Automated acceptance run `31200190104` 通过；用户随后使用原有 PostgreSQL 数据库连接成功，最终 runtime 日志无连接错误，启动与工作区读取正常。
 - R2-06 状态为 `DONE`，R2-07 已开放。
+
+## R2-07 当前结果
+
+- Analytics 39、Exchange 54、AI Workspace 16、Release 9，共 118 个公共兼容类型已进入职责目录。
+- 已删除 `analytics.rs`、`api_workspace.rs`、`exchange.rs`、`spreadsheet.rs`、`monthly_workbook.rs`、`team_package.rs`、`release_acceptance.rs` 7 个旧职责混合文件。
+- 新增 118 个类型的新模块路径身份契约；`architecture/domain-migration-progress.json` 已登记 R2-07，目标模块策略已登记四个新目录。
+- 当前状态为 `VERIFYING`；Windows 本机最小门禁和阶段回归通过前不开放 R2-08。
