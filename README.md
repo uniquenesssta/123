@@ -54,7 +54,8 @@ Node 开发依赖固定安装和读取自源码根目录上一级的 `../node_mo
 - R2-03 已将 Team 17、Player 21、Coach 9、Formation 8、Shared 17 共 72 个类型从 Domain 根文件迁移到职责目录；根级类型名、Serde、数据库映射、Application、Tauri DTO、模型边界和生产依赖保持不变。实施 run `31100515822` 已通过；正式 Windows Automated run `31110013068`、job `92645025258` 在与实施提交 `038ebd7096a78f7202d9c98e66e17d32701d343c` 同源码树的触发提交 `594940dca4c57aabfebdd768755ec27006ecaeb5` 上通过，artifact `8972168972` 大小 `14119500` 字节，SHA-256 为 `6ef2e064638cd17b214c66bbdea5ed752a08a1f0dc32002940e0f97d094cae5f`；运行报告为 PASS，7 条记录、3 个完成操作。状态为 `DONE`，R2-04 已开放为 `READY`。
 - R2-04 已将 Lineup 16 个类型和 Match 3 个类型迁移到职责目录并删除旧 `crates/domain/src/lineup_chain.rs`；根级公共类型路径、Serde、数据库映射、Application、Tauri DTO、公共命令、生产依赖与模型保护边界保持不变。实施 workflow run `31151412918` 已通过专项 Serde 9/9、架构、前端、Rust、Clippy、workspace tests、精确变更集、legacy 删除、README 契约、transient 清理、提交后工作树和 push 后远端 HEAD 校验，并生成最终实施提交 `0aafe42d7ed08f8e78d71d44ccb6f8f58c425999`。正式 Windows Automated run `31153982572`、job `92789397631` 已在该最终提交上通过；artifact `8984980586` 大小 `14118155` 字节，SHA-256 为 `1e7224f4e7f713b0339e97fd114fa6dea2c0b2ecc9400789613fe872d660938c`。R2-04 状态为 `DONE`，R2-05 已开放为 `READY`。
 - R2-05 已按两阶段迁移 Prediction 48 个类型与 Research 27 个类型。Prediction 独立提交 `2cd685b8057a1bce2f75e4c7f5b56aed1bf3d142` 的专项门禁通过；首次 run `31158780693` 中 Research 迁移与专项 Serde 11/11、完整 frontend 均通过，但完整 Rust 在 Clippy `-D warnings` 因 `prediction/orchestration/planning.rs` 两个未使用 import 停止，未提交 Research。已直接删除两个无效 import，不增加抑制；恢复 run `31159821513` 完成 Research 27 类型迁移、类型清单、架构、保护资产、frontend 与 Rust 全量回归。旧 6 个职责混合源文件均已删除，根级公共类型路径、Serde、数据库映射、Application、Tauri DTO、生产依赖和模型保护边界保持不变。正式 Windows Automated run `31171082098`、job `92842834091` 已在包含最终 R2-05 源码树的提交 `e328b4aa5a7737e6bb378abf8b891cd953b99f62` 上通过；artifact `8991618221` 大小 `14117154` 字节，SHA-256 为 `71320b8ef97e62be2fe2323327d21f4870476092ad024d7b8c2c26a4ade9dc59`。R2-05 状态为 `DONE`，R2-06 已开放。
-- R2-06 已将 Review 48 个类型与 Postmatch 11 个类型迁移到 `review/`、`postmatch/` 职责目录并删除 5 个旧职责混合源文件；根级公共类型路径、Serde、数据库映射、Application、Tauri DTO、公共命令、生产依赖和模型保护边界保持不变。首次 staged run `31173619041` 因类型清单策略未登记新目录按硬门禁停止；补齐 `review/` 与 `postmatch/` 的 R2-06 目录策略后，recovery staged run `31173824393`、job `92851309157` 已通过格式化、类型清单、59 类型模块身份/Serde、架构、保护资产、完整 frontend 与完整 Rust 门禁，并生成最终格式化/清单提交 `14ef207c754a73ae53bece3593e241d0d2ea428a`。当前状态为 `VERIFYING`，等待最终文档同步源码树的正式 Windows Automated，通过前不开放 R2-07。
+- R2-06 已将 Review 48 个类型与 Postmatch 11 个类型迁移到 `review/`、`postmatch/` 职责目录并删除 5 个旧职责混合源文件；根级公共类型路径、Serde、数据库映射、Application、Tauri DTO、公共命令、生产依赖和模型保护边界保持不变。staged 与 Windows Automated 验收已通过，用户随后使用原有 PostgreSQL 数据库连接成功；数据库兼容修复保留历史数据与不可变资产，不清库、不覆盖旧版本、不削弱 fail-closed 或内容指纹保护。R2-06 状态为 `DONE`。
+- R2-07 已将 Analytics 39、Exchange 54、AI Workspace 16、Release 9 共 118 个公共兼容类型迁移到 `analytics/`、`exchange/`、`ai_workspace/`、`release/` 职责目录，并删除 7 个旧职责混合根文件；根级兼容导出暂保留到 R2-08。新增 118 类型模块路径身份契约并登记 R2-07 目录归属；当前状态为 `VERIFYING`，等待 Windows 本机最小门禁与阶段回归。
 - 开发依赖布局已外置：Node 依赖固定到 `../node_modules`、npm 缓存固定到 `../.npm-cache`，Cargo 构建输出继续使用 `../.cargo-target`；仓库根目录不保存依赖目录。
 - R1-04 前置校正将 `crates/application/src/model_shell/mod.rs` 恢复为 Rust 1.88 标准排版，并只同步更新该文件的保护指纹与派生聚合值；导出集合、模型行为和保护范围均未变化。
 - R1-04 已同步迁移 19 个既有验证器读取新的 Tauri 命令注册表或状态所有者，消除旧 `lib.rs` 路径造成的伪失败；产品代码和公共契约未改变。
@@ -150,9 +151,9 @@ R0-06.1 已关闭 Windows 目录联接依赖同步和 `.cmd` 子进程调用缺�
 
 R00 阶段已按 Windows-only 目标范围标记为 **DONE**。Linux Chromium 历史失败仅保留为非目标平台记录，不再阻塞后续重写。
 
-PostgreSQL 实跑、Windows Full 和用户本机 Windows 10/11 实机验收尚未执行，统一保留到最终验收，不得在后续阶段描述为已通过。另保留 1 个 moderate npm vulnerability 和 Vite 大 chunk 警告。
+PostgreSQL 实跑、Windows Full 和用户本机 Windows 10/11 实机验收仍保留最终统一验收；R2-06 节点已额外使用原 PostgreSQL 数据库完成连接验证。另保留 1 个 moderate npm vulnerability 和 Vite 大 chunk 警告。
 
-已创建 `R00-stage-completion.md` 和 `R01-stage-completion.md`。R1-01 至 R1-05、R2-01 至 R2-05 状态均为 `DONE`；R2-06 当前为 `VERIFYING`。R2-06 的 staged 全量门禁已在 run `31173824393`、job `92851309157` 通过，正式 Windows Automated 仍待完成。详细状态见 `docs/modular-rewrite/R02-domain-rewrite/README.md`。
+已创建 `R00-stage-completion.md` 和 `R01-stage-completion.md`。R1-01 至 R1-05、R2-01 至 R2-06 状态均为 `DONE`；R2-07 当前为 `VERIFYING`。R2-07 已完成 118 个 Domain 类型的职责迁移，等待 Windows 本机门禁与阶段回归。详细状态见 `docs/modular-rewrite/R02-domain-rewrite/README.md`。
 
 ## R2-04 Lineup 与 Match
 
@@ -169,5 +170,11 @@ PostgreSQL 实跑、Windows Full 和用户本机 Windows 10/11 实机验收尚�
 ## R2-06 Review 与 Postmatch
 
 - Review 48 个类型与 Postmatch 11 个类型已迁移到 `review/`、`postmatch/` 职责目录，旧 5 个职责混合源文件已删除。
-- staged run `31173619041` 在类型清单策略缺少新目录时按门禁停止；修正目录策略后，run `31173824393`、job `92851309157` 已通过格式化、类型清单、Serde/模块身份、架构、保护资产、frontend 与 Rust 全量验证，并生成源码提交 `14ef207c754a73ae53bece3593e241d0d2ea428a`。
-- 当前状态为 `VERIFYING`；等待正式 Windows Automated，通过前 R2-07 保持阻塞。
+- staged 与 Windows Automated 验收已通过；原 PostgreSQL 数据库兼容链已在保留历史数据、不可变资产与 fail-closed 保护的前提下完成验证。
+- R2-06 状态为 `DONE`，R2-07 已开放。
+
+## R2-07 Analytics、Exchange、AI 与 Release
+
+- Analytics 39、Exchange 54、AI Workspace 16、Release 9 共 118 个公共兼容类型已迁移到职责目录，旧 7 个职责混合根文件已删除。
+- 根级公共类型路径继续通过兼容 re-export 保留；新增四个业务语义模块出口和 118 类型模块路径身份契约，R2-08 前不提前收敛根出口。
+- 当前状态为 `VERIFYING`；等待 Windows 本机格式、类型清单、Serde、架构、frontend、Rust 与启动 smoke 验证，通过前 R2-08 保持阻塞。
