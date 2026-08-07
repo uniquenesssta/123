@@ -12,8 +12,8 @@ const pascal = (value) => value
   .map((part) => part.slice(0, 1).toUpperCase() + part.slice(1))
   .join("");
 
-const domainRecord = read("crates/domain/src/match_review_package.rs");
-const domainWorkflow = read("crates/domain/src/match_review_workflow.rs");
+const domainWorkflow = read("crates/domain/src/review/package/workflow.rs");
+const domainRecord = domainWorkflow;
 const application = read("crates/application/src/match_review_package.rs");
 const postmatchApplication = read("crates/application/src/postmatch.rs");
 const persistence = read("crates/persistence-postgres/src/match_review_package.rs");
