@@ -20,14 +20,15 @@ jobs:
           ref: new-B
           fetch-depth: 0
 
-      - name: Restore canonical migrations and offline lineups guard
+      - name: Repair frozen manifests and offline lineups guard
         shell: pwsh
         run: |
           $repair = @'
           import { createHash } from "node:crypto";
           import { readFile, writeFile } from "node:fs/promises";
 
-          const canonical = new Map([
+          const migrationRoot = "crates/persistence-postgres/migrations";
+          const canonicalSha256 = new Map([
             ["0012_p4_integration_contract.sql", "9d4c6609b335146f3983b6b72ee08385b57020410e78640910f2912d54bf2d5e"],
             ["0013_p4_engine_artifacts.sql", "4d71ba851680f1477c15cbe81b67a27fa025212f8dc3b4b5c8d26bed905ee6b5"],
             ["0014_p4_evidence_and_snapshots.sql", "39a12a11da2018f3f8e92c134797dd13f24afb50908359d2164c7e98b91b60ed"],
@@ -38,43 +39,59 @@ jobs:
             ["0025_parameter_lifecycle.sql", "4a9df04c86c9c88f86635882166e7f9a11b1bdadcb21becbab9dfa0725ee2967"],
             ["0026_postmatch_settlement.sql", "f5c294c0a19d762caae4ab5dac88b6a438f41c73336d67302dc2d18ff4e767cd"],
           ]);
+          const canonicalBlobSha1 = new Map([
+            ["0012_p4_integration_contract.sql", "81c1a44df792d6d03e6de504625704f370f10390"],
+            ["0013_p4_engine_artifacts.sql", "1aeaacb41dbe9617593c9fc367cda95f94206d9d"],
+            ["0014_p4_evidence_and_snapshots.sql", "053630778d485585ee059dc19bf36256e2ae8ddf"],
+            ["0015_p4_openai_research_gateway.sql", "9429dcbd8c4dd60526b89e4f852563d596100548"],
+            ["0016_p4_fact_pipeline.sql", "bc8ad8c450b5e040b7162f6c20ca104f1057b7d3"],
+            ["0017_p4_horizon_orchestration.sql", "b27c97ed197eac713f4c010fbb07078637590959"],
+            ["0018_p4_single_match_workbench.sql", "56fab170a628d971d66648c1347334942521fe27"],
+            ["0025_parameter_lifecycle.sql", "f40ccfac1428ace5157a6064552e98c30c6d1d1e"],
+            ["0026_postmatch_settlement.sql", "3b924790c7d16effe657b12df472c60de01b3da8"],
+          ]);
 
-          const sha256 = (bytes) => createHash("sha256").update(bytes).digest("hex");
-          const migrationRoot = "crates/persistence-postgres/migrations";
-          for (const [file, expected] of canonical) {
-            const url = `https://raw.githubusercontent.com/uniquenesssta/football-model-platform/master/${migrationRoot}/${file}`;
-            const response = await fetch(url);
-            if (!response.ok) throw new Error(`无法读取历史迁移 ${file}: HTTP ${response.status}`);
-            const bytes = Buffer.from(await response.arrayBuffer());
-            const actual = sha256(bytes);
-            if (actual !== expected) throw new Error(`历史迁移 ${file} 指纹不匹配: ${actual}`);
-            await writeFile(`${migrationRoot}/${file}`, bytes);
-          }
+          const sha256 = (value) => createHash("sha256").update(value).digest("hex");
+          const canonicalize = (bytes) => Buffer.from(bytes.toString("utf8").replace(/\r\n?/g, "\n"), "utf8");
+          const gitBlobSha1 = (bytes) => {
+            const header = Buffer.from(`blob ${bytes.length}\0`, "utf8");
+            return createHash("sha1").update(header).update(bytes).digest("hex");
+          };
+          const fingerprintFromBlobSha = (blobSha) => sha256(Buffer.from(`git-blob-sha1:${blobSha}`, "utf8"));
 
-          const contractPath = "contracts/release-readiness-contract.json";
-          const contract = JSON.parse(await readFile(contractPath, "utf8"));
-          for (const item of contract.migrations) {
-            if (canonical.has(item.file)) item.sha256 = canonical.get(item.file);
+          const releasePath = "contracts/release-readiness-contract.json";
+          const release = JSON.parse(await readFile(releasePath, "utf8"));
+          for (const item of release.migrations) {
             const bytes = await readFile(`${migrationRoot}/${item.file}`);
-            const actual = sha256(bytes);
-            if (actual !== item.sha256) throw new Error(`迁移冻结清单不匹配: ${item.file} -> ${actual}`);
+            const actualSha = sha256(bytes);
+            if (canonicalSha256.has(item.file)) item.sha256 = canonicalSha256.get(item.file);
+            if (actualSha !== item.sha256) throw new Error(`发布迁移冻结清单不匹配: ${item.file} -> ${actualSha}`);
           }
-          await writeFile(contractPath, `${JSON.stringify(contract, null, 2)}\n`, "utf8");
+          await writeFile(releasePath, `${JSON.stringify(release, null, 2)}\n`, "utf8");
+
+          const baselinePath = "architecture/database-baseline.json";
+          const baseline = JSON.parse(await readFile(baselinePath, "utf8"));
+          const verified = [];
+          for (const item of baseline.migrations) {
+            const path = item.path ?? `${baseline.migration_policy.directory.replace(/\/$/, "")}/${item.file}`;
+            const bytes = canonicalize(await readFile(path));
+            const actualBlob = gitBlobSha1(bytes);
+            if (canonicalBlobSha1.has(item.file)) item.git_blob_sha1 = canonicalBlobSha1.get(item.file);
+            if (actualBlob !== item.git_blob_sha1) throw new Error(`数据库基线迁移指纹不匹配: ${item.file} -> ${actualBlob}`);
+            verified.push({ path: path.replaceAll("\\", "/"), fingerprint: fingerprintFromBlobSha(actualBlob) });
+          }
+          const aggregateInput = verified
+            .sort((left, right) => left.path.localeCompare(right.path))
+            .map((item) => `${item.path}\0${item.fingerprint}\n`)
+            .join("");
+          baseline.migration_aggregate_sha256 = sha256(Buffer.from(aggregateInput, "utf8"));
+          await writeFile(baselinePath, `${JSON.stringify(baseline, null, 2)}\n`, "utf8");
 
           const mainPath = "src/main.ts";
           let main = await readFile(mainPath, "utf8");
-          const oldBlock = `  if (page === "lineups") {
-            queueMicrotask(() => {
-              updateCompetitionHierarchy("init");
-              autoSelectMatchSeason();
-              filterMatchTeamOptions();
-              updateFormationHierarchy("home", "init");
-              updateFormationHierarchy("away", "init");
-              enhanceSearchableSelects(currentPageRoot);
-              refreshSearchableSelects(currentPageRoot);
-            });
-          }`;
-          const newBlock = `  if (page === "lineups") {
+          if (!main.includes('const matchCompetition = currentPageRoot.querySelector<HTMLSelectElement>("#new-match-competition");')) {
+            const pattern = /  if \(page === "lineups"\) \{\s*queueMicrotask\(\(\) => \{\s*updateCompetitionHierarchy\("init"\);\s*autoSelectMatchSeason\(\);\s*filterMatchTeamOptions\(\);\s*updateFormationHierarchy\("home", "init"\);\s*updateFormationHierarchy\("away", "init"\);\s*enhanceSearchableSelects\(currentPageRoot\);\s*refreshSearchableSelects\(currentPageRoot\);\s*\}\);\s*\}/;
+            const replacement = `  if (page === "lineups") {
             queueMicrotask(() => {
               const matchCompetition = currentPageRoot.querySelector<HTMLSelectElement>("#new-match-competition");
               if (matchCompetition) {
@@ -88,30 +105,42 @@ jobs:
               refreshSearchableSelects(currentPageRoot);
             });
           }`;
-          if (!main.includes(oldBlock)) throw new Error("未找到比赛页初始化块，拒绝模糊修改 src/main.ts");
-          main = main.replace(oldBlock, newBlock);
-          await writeFile(mainPath, main, "utf8");
+            if (!pattern.test(main)) throw new Error("未找到比赛页初始化块，拒绝模糊修改 src/main.ts");
+            main = main.replace(pattern, replacement);
+            await writeFile(mainPath, main, "utf8");
+          }
 
           const verifierPath = "scripts/verify-match-workflow-ui.mjs";
           let verifier = await readFile(verifierPath, "utf8");
           const verifierAnchor = `requireTrue(main.includes("filterMatchTeamOptions") && types.includes("season_team_memberships"), "赛事/赛季参赛队过滤链缺失");`;
-          const verifierAddition = `${verifierAnchor}\nrequireTrue(main.includes('const matchCompetition = currentPageRoot.querySelector<HTMLSelectElement>("#new-match-competition");') && main.includes("if (matchCompetition) {"), "数据库未连接时比赛页仍会初始化不存在的赛事控件");`;
-          if (!verifier.includes(verifierAnchor)) throw new Error("未找到比赛工作流验证锚点");
-          verifier = verifier.replace(verifierAnchor, verifierAddition);
-          await writeFile(verifierPath, verifier, "utf8");
+          const verifierGuard = `requireTrue(main.includes('const matchCompetition = currentPageRoot.querySelector<HTMLSelectElement>("#new-match-competition");') && main.includes("if (matchCompetition) {"), "数据库未连接时比赛页仍会初始化不存在的赛事控件");`;
+          if (!verifier.includes(verifierGuard)) {
+            if (!verifier.includes(verifierAnchor)) throw new Error("未找到比赛工作流验证锚点");
+            verifier = verifier.replace(verifierAnchor, `${verifierAnchor}\n${verifierGuard}`);
+            await writeFile(verifierPath, verifier, "utf8");
+          }
           '@
           $repairPath = Join-Path $env:RUNNER_TEMP 'r2-06-repair.mjs'
           Set-Content -Path $repairPath -Value $repair -Encoding utf8NoBOM
           node $repairPath
+
+      - name: Verify targeted repair gates
+        shell: pwsh
+        run: |
+          node scripts/verify-release-readiness.mjs
+          node scripts/verify_database_baseline.mjs
+          node scripts/verify-match-workflow-ui.mjs
+          node scripts/verify-match-review-package.mjs
+          node scripts/verify-stage-a-architecture.mjs
 
       - name: Commit repair to new-B
         shell: pwsh
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add crates/persistence-postgres/migrations contracts/release-readiness-contract.json src/main.ts scripts/verify-match-workflow-ui.mjs
+          git add contracts/release-readiness-contract.json architecture/database-baseline.json src/main.ts scripts/verify-match-workflow-ui.mjs
           git diff --cached --check
           if (-not (git diff --cached --quiet)) {
-            git commit -m "fix(r2-06): restore migration compatibility and offline lineups"
+            git commit -m "fix(r2-06): repair database compatibility and offline lineups"
             git push origin HEAD:new-B
           }
