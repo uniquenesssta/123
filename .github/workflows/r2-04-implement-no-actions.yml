@@ -69,6 +69,24 @@ jobs:
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
           Remove-Item execute_v3_apply.ps1 -Force
 
+          @'
+          from pathlib import Path
+
+          docs = Path("docs/README.md")
+          marker = "- 所有读取变更记录的仓库验证器已同步使用 `docs/README.md`；根 README 不再承担验证记录职责。"
+          if not docs.exists():
+              raise RuntimeError("V3 migration did not create docs/README.md")
+          text = docs.read_text(encoding="utf-8").replace("\r\n", "\n")
+          double = "\n\n" + marker + "\n"
+          single = "\n" + marker + "\n"
+          if double not in text:
+              raise RuntimeError("R2-04 README separator normalization target not found")
+          docs.write_text(text.replace(double, single, 1), encoding="utf-8", newline="\n")
+          '@ | Set-Content normalize_r2_04_readme.py -Encoding utf8
+          python normalize_r2_04_readme.py
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          Remove-Item normalize_r2_04_readme.py -Force
+
       - name: Install dependencies and verify R2-04
         shell: pwsh
         run: |
