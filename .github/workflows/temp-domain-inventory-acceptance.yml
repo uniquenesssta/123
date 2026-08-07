@@ -1,0 +1,85 @@
+name: Temporary Domain Inventory Acceptance
+
+on:
+  push:
+    branches:
+      - new-B
+
+permissions:
+  contents: write
+
+concurrency:
+  group: temp-domain-inventory-acceptance-new-B
+  cancel-in-progress: false
+
+jobs:
+  regenerate-verify-commit:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: windows-2025
+    timeout-minutes: 120
+    env:
+      npm_config_cache: ${{ github.workspace }}/.npm-cache
+    steps:
+      - name: Checkout repository in acceptance layout
+        uses: actions/checkout@v4
+        with:
+          ref: new-B
+          path: 项目源码
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: 项目源码/package-lock.json
+
+      - name: Setup Rust 1.88.0
+        uses: dtolnay/rust-toolchain@1.88.0
+        with:
+          components: rustfmt, clippy
+
+      - name: Restore Rust build cache
+        uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: 项目源码 -> ../.cargo-target
+
+      - name: Regenerate canonical domain inventory
+        shell: pwsh
+        working-directory: 项目源码
+        run: |
+          node scripts/generate-domain-type-inventory.mjs
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          Remove-Item '.github/workflows/temp-domain-inventory-acceptance.yml' -Force
+
+      - name: Verify architecture boundaries
+        shell: pwsh
+        working-directory: 项目源码
+        run: npm run verify:architecture
+
+      - name: Run Windows automated acceptance
+        shell: pwsh
+        working-directory: 项目源码
+        run: |
+          & ".\scripts\windows-acceptance.ps1" `
+            -Mode Automated `
+            -ProjectRoot "$env:GITHUB_WORKSPACE" `
+            -LogDirectory "logs"
+          if ($LASTEXITCODE -ne 0) {
+            exit $LASTEXITCODE
+          }
+
+      - name: Commit verified inventory refresh
+        shell: pwsh
+        working-directory: 项目源码
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add architecture/domain-type-inventory.json .github/workflows/temp-domain-inventory-acceptance.yml
+          git diff --cached --check
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          git diff --cached --quiet
+          if ($LASTEXITCODE -eq 0) { throw 'domain inventory did not change' }
+          git commit -m 'chore(architecture): refresh domain type inventory'
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          git push origin HEAD:new-B
