@@ -1,6 +1,6 @@
 # R02-05 Prediction 与 Research 外围领域实施记录
 
-- 任务状态：`VERIFYING`
+- 任务状态：`DONE`
 - 前置已验证提交：`3e5812c7c0d1d626e0f5ed3a6db0295af6d6979c`
 - 目标平台：Windows
 - 类型范围：Prediction 48 + Research 27，共 75 个公共兼容类型
@@ -66,18 +66,13 @@ R2-08 之前继续保留既有根级兼容 re-export；本节点不提前处理�
 
 真实 PostgreSQL、Windows Full 与用户本机 Windows 10/11 实机验收继续按既定计划保留到最终统一验收。
 
-## 7. 执行中记录
+## 7. 实施与验证结果
 
 - staged run `31158780693`：R2-05A Prediction 迁移、Serde 10/10、类型清单、架构与保护资产门禁通过并生成独立提交 `2cd685b8057a1bce2f75e4c7f5b56aed1bf3d142`；R2-05B Research 迁移与 Serde 11/11、类型清单、架构、保护资产、完整 frontend 通过，但完整 Rust 在 Clippy `-D warnings` 因 `prediction/orchestration/planning.rs` 两个未使用 import 停止，Research 未提交。
 - 已直接删除两个无效 import，不增加 `allow` 或放宽 Clippy。
 - recovery run `31159547810`：Prediction Serde 10/10 通过，随后类型清单因上述源文件变化后的指纹未刷新而按门禁停止；Research 未执行。
-- inventory refresh run `31159710816`：仅重新生成并验证 `architecture/domain-type-inventory.json`，成功后自清理临时 workflow；R2-05 仍为 `IMPLEMENTING`。
-
-## 7. 实施与验证结果
-
-- R2-05A Prediction 48 个类型已由独立提交 `2cd685b8057a1bce2f75e4c7f5b56aed1bf3d142` 迁移；专项 Serde 10/10、类型清单、架构和保护资产门禁通过。
-- 首次 staged run `31158780693` 的 R2-05B Research 迁移与专项 Serde 11/11 已通过；完整 `verify:frontend` 通过，但 `verify:rust` 在 Clippy `-D warnings` 因 `prediction/orchestration/planning.rs` 两个未使用 import 失败，因此当次未提交 Research。
-- 已删除两个无效 import，不增加 `allow` 或放宽 Clippy；本次恢复 run `31159821513` 从已提交的 R2-05A 基线继续执行 Research，不重放 Prediction。
-- R2-05B Research 27 个类型已迁移并删除旧 `fact_pipeline.rs`、`research_gateway.rs`；专项契约、完整 frontend 与 Rust 回归均通过。
+- inventory refresh run `31159710816`：仅重新生成并验证 `architecture/domain-type-inventory.json`，成功后自清理临时 workflow。
+- recovery run `31159821513`：从已验证 Prediction 基线继续完成 Research 27 类型迁移、清单刷新、架构、保护资产、完整 frontend 与 Rust 回归；旧 `fact_pipeline.rs`、`research_gateway.rs` 已删除。
 - 75 个类型均位于 `prediction/` 或 `research/` 职责目录，根级公共兼容路径与类型身份保持不变。
-- 正式 Windows Automated 在最终实施源码树通过前，本节点保持 `VERIFYING`，R2-06 保持 `BLOCKED`。
+- 正式 Windows Automated run `31171082098`、job `92842834091` 已在包含 R2-05 最终源码树的 `new-B` 提交 `e328b4aa5a7737e6bb378abf8b891cd953b99f62` 上通过；artifact `8991618221` 大小 `14117154` 字节，SHA-256 为 `71320b8ef97e62be2fe2323327d21f4870476092ad024d7b8c2c26a4ade9dc59`。
+- R2-05 状态现为 `DONE`，R2-06 已开放为 `READY`。
