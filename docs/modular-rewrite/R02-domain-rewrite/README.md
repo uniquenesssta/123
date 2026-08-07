@@ -13,7 +13,7 @@ R1 已完成并关闭。R2 按业务语义拆分 `crates/domain`，保持 Serde�
 - R2-01 生成清单基线提交：`9e8d527dd26df3e36f00b7730da320acf216b7bc`
 - 目标平台：Windows
 - Linux：不属于目标平台、交付或阶段门禁
-- 真实 PostgreSQL、Windows Full、用户本机 Windows 实机验收：保留到最终统一验收
+- 真实 PostgreSQL、Windows Full、用户本机 Windows 实机验收：保留到最终统一验收；节点内已完成的额外实机验证可作为补充证据记录
 
 ## 阶段范围
 
@@ -43,9 +43,9 @@ R1 已完成并关闭。R2 按业务语义拆分 `crates/domain`，保持 Serde�
 | R2-03 | Team / Player / Coach / Formation | DONE | [`R02-03-team-player-coach-and-formation.md`](R02-03-team-player-coach-and-formation.md) | workflow run `31110013068`、job `92645025258` 通过 |
 | R2-04 | Lineup 与 Match | DONE | [`R02-04-lineup-and-match.md`](R02-04-lineup-and-match.md) | 实施 run `31151412918`、正式 Windows Automated run `31153982572` 通过 |
 | R2-05 | Prediction 与 Research 外围领域 | DONE | [`R02-05-prediction-and-research-外围领域.md`](R02-05-prediction-and-research-外围领域.md) | 正式 Windows Automated run `31171082098`、job `92842834091` 通过 |
-| R2-06 | Review 与 Postmatch | VERIFYING | [`R02-06-review-and-postmatch.md`](R02-06-review-and-postmatch.md) | staged run `31173824393` 全量通过，等待正式 Windows Automated |
-| R2-07 | Analytics / Exchange / AI / Release | BLOCKED | `R02-07-analytics-exchange-ai-and-release.md` | 等待 R2-06 正式门禁 |
-| R2-08 | Domain 根出口收敛 | BLOCKED | `R02-08-domain-根出口收敛.md` | 等待前置节点 |
+| R2-06 | Review 与 Postmatch | DONE | [`R02-06-review-and-postmatch.md`](R02-06-review-and-postmatch.md) | staged 全量通过；Windows Automated run `31200190104` 与用户原库实机连接通过 |
+| R2-07 | Analytics / Exchange / AI / Release | READY | `R02-07-analytics-exchange-ai-and-release.md` | R2-06 已关闭，可开始 |
+| R2-08 | Domain 根出口收敛 | BLOCKED | `R02-08-domain-根出口收敛.md` | 等待 R2-07 |
 
 ## R2-01 当前结果
 
@@ -64,7 +64,7 @@ R2-01 至 R2-08 全部 `DONE` 后创建 `R02-stage-completion.md`，并实际完
 
 ## 当前阶段状态
 
-`R2-05 DONE`；`R2-06 VERIFYING`。Review 48 个类型与 Postmatch 11 个类型已从 5 个根级职责混合文件迁移到 `review/` 与 `postmatch/` 职责目录；staged run `31173824393`、job `92851309157` 已在最终生成源码树上通过格式化、类型清单、Serde/模块路径、架构、保护资产、完整 frontend 与完整 Rust 门禁，并生成提交 `14ef207c754a73ae53bece3593e241d0d2ea428a`。正式 Windows Automated 通过前 R2-07 保持阻塞。
+`R2-06 DONE`；`R2-07 READY`。Review 48 个类型与 Postmatch 11 个类型已从 5 个根级职责混合文件迁移到 `review/` 与 `postmatch/` 职责目录；staged run `31173824393`、job `92851309157` 已通过格式化、类型清单、Serde/模块路径、架构、保护资产、完整 frontend 与完整 Rust 门禁。后续数据库兼容链在不清库、不覆盖历史不可变资产、不放宽指纹保护的前提下完成修复；Windows Automated run `31200190104` 通过，用户在 Windows 上使用原有 PostgreSQL 数据库完成连接与运行日志复核，R2-06 正式关闭。
 
 ## R2-02 当前结果
 
@@ -108,4 +108,7 @@ R2-01 至 R2-08 全部 `DONE` 后创建 `R02-stage-completion.md`，并实际完
 - 已删除 `review.rs`、`match_event.rs`、`match_review_package.rs`、`match_review_workflow.rs`、`postmatch.rs` 5 个旧职责混合文件。
 - 新增 59 个类型的 `review::*` / `postmatch::*` 模块身份契约，迁移进度与目标模块策略同步登记 R2-06。
 - staged run `31173619041` 在类型清单策略缺少新目录时按硬门禁停止；仅补齐目录策略后，recovery run `31173824393`、job `92851309157` 已完整通过格式化、类型清单、Serde、架构、保护资产、frontend 与 Rust 全量门禁。
-- 当前状态为 `VERIFYING`，等待最终文档同步源码树上的正式 Windows Automated；R2-07 未开放。
+- Windows 实机 smoke test 发现并修复断库状态比赛页对未渲染 `new-match-competition` 控件的错误初始化。
+- 原有 PostgreSQL 数据库验证暴露并修复已知历史 migration checksum、不可变 engine artifact 字段映射、内置规则包及 P4 Schema/Prompt 同版本不同内容冲突；修复均保留历史数据和不可变资产，不清库、不覆盖旧版本、不削弱 fail-closed 与内容指纹保护。
+- Windows Automated acceptance run `31200190104` 通过；用户随后使用原有 PostgreSQL 数据库连接成功，最终 runtime 日志无连接错误，启动与工作区读取正常。
+- R2-06 状态为 `DONE`，R2-07 已开放。
