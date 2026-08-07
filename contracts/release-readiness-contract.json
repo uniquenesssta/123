@@ -53,31 +53,31 @@
     },
     {
       "file": "0012_p4_integration_contract.sql",
-      "sha256": "7861abfa90c3c608569097e310810d529e6a16209703f6d42bf7f3d5847cd51e"
+      "sha256": "9d4c6609b335146f3983b6b72ee08385b57020410e78640910f2912d54bf2d5e"
     },
     {
       "file": "0013_p4_engine_artifacts.sql",
-      "sha256": "3489175abc880e98caf273fd32704a79a5adf80950b9b988308c36f8d5b1f120"
+      "sha256": "4d71ba851680f1477c15cbe81b67a27fa025212f8dc3b4b5c8d26bed905ee6b5"
     },
     {
       "file": "0014_p4_evidence_and_snapshots.sql",
-      "sha256": "8c91cc59aa492303f680d4d658d93c043c4190169280eb4f78601723bdb12845"
+      "sha256": "39a12a11da2018f3f8e92c134797dd13f24afb50908359d2164c7e98b91b60ed"
     },
     {
       "file": "0015_p4_openai_research_gateway.sql",
-      "sha256": "fb9e1910942b6b217739993b8473086bfa36313e4a2854070bcd9f5fa6c94e7e"
+      "sha256": "7704536c3604e6d634a608ba9f656661840c9016a9141e0d76626e23f0bd1cfe"
     },
     {
       "file": "0016_p4_fact_pipeline.sql",
-      "sha256": "da3ab899efbda5f577c258b82cfeab25d6f4db808fc2c56bd52c955678506faf"
+      "sha256": "2fa7f376fd7743e62613af797e3fc634daca1d02b9ccf3343df4cd578fc7ba4e"
     },
     {
       "file": "0017_p4_horizon_orchestration.sql",
-      "sha256": "13b68c1f3ed1ba34f35b49e8f82afe6227ada56e35b54e1281dd173f7601d4bd"
+      "sha256": "4dbe74a98934373ad25b4e3914075b86764190a5c3baae6da9b166b054223963"
     },
     {
       "file": "0018_p4_single_match_workbench.sql",
-      "sha256": "b009ac6e5026c9d65d3d3b30d9bbddaadf4dfba726260ddc449390a150ed749e"
+      "sha256": "8f79a4305df43e80ca72a52bcbea85d2f4a71912117ea6178b8831d72d8a3bfc"
     },
     {
       "file": "0019_api_workspace.sql",
@@ -105,11 +105,11 @@
     },
     {
       "file": "0025_parameter_lifecycle.sql",
-      "sha256": "cc701ad136367dd0b230c94b9b3697b58ea16ebfd0f1a52655d7dfce461b98d4"
+      "sha256": "4a9df04c86c9c88f86635882166e7f9a11b1bdadcb21becbab9dfa0725ee2967"
     },
     {
       "file": "0026_postmatch_settlement.sql",
-      "sha256": "ec3cee79ebd01ef388704a62c9b7d8155baaff2f409af2f11fce20acfbb7ce7f"
+      "sha256": "f5c294c0a19d762caae4ab5dac88b6a438f41c73336d67302dc2d18ff4e767cd"
     },
     {
       "file": "0027_release_acceptance.sql",

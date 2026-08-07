@@ -691,16 +691,19 @@ function render(options: RenderOptions = {}): void {
   const currentPageRoot = app.querySelector<HTMLElement>(".page-container") ?? app;
   workspaceState.restore(page, currentPageRoot);
   if (page === "lineups") {
-    queueMicrotask(() => {
+  queueMicrotask(() => {
+    const matchCompetition = currentPageRoot.querySelector<HTMLSelectElement>("#new-match-competition");
+    if (matchCompetition) {
       updateCompetitionHierarchy("init");
       autoSelectMatchSeason();
       filterMatchTeamOptions();
       updateFormationHierarchy("home", "init");
       updateFormationHierarchy("away", "init");
-      enhanceSearchableSelects(currentPageRoot);
-      refreshSearchableSelects(currentPageRoot);
-    });
-  }
+    }
+    enhanceSearchableSelects(currentPageRoot);
+    refreshSearchableSelects(currentPageRoot);
+  });
+}
 }
 
 async function refresh(): Promise<void> {

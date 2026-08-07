@@ -24,68 +24,307 @@
     "aggregate_derivation": "sha256(sort(path + NUL + fingerprint_sha256 + LF))"
   },
   "migrations": [
-    {"version":1,"file":"0001_initial.sql","git_blob_sha1":"010e2d635dadf15b38d3bcaa36dda5a844d6df9a"},
-    {"version":2,"file":"0002_rule_packages_and_routing.sql","git_blob_sha1":"63d643fd72b93d65d580f513a06e2f0365b073d8"},
-    {"version":3,"file":"0003_player_catalog_and_lineups.sql","git_blob_sha1":"5a096a9469c4f31a911daf31cde144944bd12abe"},
-    {"version":4,"file":"0004_spreadsheet_exchange.sql","git_blob_sha1":"f9d1e8755b57a85e01410e1455addf728505e7b6"},
-    {"version":5,"file":"0005_pre_match_foundation.sql","git_blob_sha1":"594004af12c963207756536eb9fe67d83c437727"},
-    {"version":6,"file":"0006_match_review_workflow.sql","git_blob_sha1":"9ae01a6cb2c588061e538c41c1f844ceff86677e"},
-    {"version":7,"file":"0007_analytics_ai_and_jobs.sql","git_blob_sha1":"3f0e5ea4d8046e407f0ef63c5f728de955b25507"},
-    {"version":8,"file":"0008_user_workflow_and_tuning.sql","git_blob_sha1":"256aa71b362cd9eff725a476d2f78484b54c51cd"},
-    {"version":9,"file":"0009_ability_observation_cutoff.sql","git_blob_sha1":"49e03bd234dca2901f3d61817cf45a5b6cc6fcd7"},
-    {"version":10,"file":"0010_repair_ability_observation_cutoff.sql","git_blob_sha1":"98ea055c9062ed45f0ba2419b00b935b04212ea5"},
-    {"version":11,"file":"0011_pre_match_ingestion_cutoff.sql","git_blob_sha1":"104a3b2bcb18dd83be90f1604f4bb52483c019f6"},
-    {"version":12,"file":"0012_p4_integration_contract.sql","git_blob_sha1":"642f94b5200c6070c981582bc9b223841c7c92d9"},
-    {"version":13,"file":"0013_p4_engine_artifacts.sql","git_blob_sha1":"102898ad8e1251d679589674193dabf6a9238f25"},
-    {"version":14,"file":"0014_p4_evidence_and_snapshots.sql","git_blob_sha1":"009645dcffbedc8370e51ea040d7fa63894a8252"},
-    {"version":15,"file":"0015_p4_openai_research_gateway.sql","git_blob_sha1":"d8824552d7991c786003d48ab049883145c0e96a"},
-    {"version":16,"file":"0016_p4_fact_pipeline.sql","git_blob_sha1":"45b20c7f2c980a1f7de413aec9009a8d44cc3651"},
-    {"version":17,"file":"0017_p4_horizon_orchestration.sql","git_blob_sha1":"41d95cf4c78edc75c2175452c272aaa237910dd5"},
-    {"version":18,"file":"0018_p4_single_match_workbench.sql","git_blob_sha1":"087791a2e36876376aafbec91dda9983e0f466df"},
-    {"version":19,"file":"0019_api_workspace.sql","git_blob_sha1":"9546a0dbdf6596b23aded6dc5d08ba653450b7ad"},
-    {"version":20,"file":"0020_team_player_management.sql","git_blob_sha1":"91c9c1574e822a2901697154ac24b9c2c3dc66ec"},
-    {"version":21,"file":"0021_entity_relationships.sql","git_blob_sha1":"337dd1f205f3dea3ab63ed2a0e711f531f5c60c8"},
-    {"version":22,"file":"0022_formations_and_usage.sql","git_blob_sha1":"418b7f4055cb3447889820bd2f01bb7231f2e7f5"},
-    {"version":23,"file":"0023_monthly_workbooks.sql","git_blob_sha1":"ff801363b4a59ccde635e8ebf46a662094f5ba15"},
-    {"version":24,"file":"0024_match_lineup_chain.sql","git_blob_sha1":"163fd01ccf455aa032ee34cb0d196f0a9e277eeb"},
-    {"version":25,"file":"0025_parameter_lifecycle.sql","git_blob_sha1":"34d06913fdd0a46f16130fec59ff446ef2ab26bc"},
-    {"version":26,"file":"0026_postmatch_settlement.sql","git_blob_sha1":"5bb984364aa4d0ed446e6323c88a19680166d2d3"},
-    {"version":27,"file":"0027_release_acceptance.sql","git_blob_sha1":"487315272beddbe6223274aaade48b95180a6a63"},
-    {"version":28,"file":"0028_force_team_purge.sql","git_blob_sha1":"6cadaf7dc905a7aba86784136b7077ee9de16ec4"},
-    {"version":29,"file":"0029_import_row_entity_identity.sql","git_blob_sha1":"7e61092e1be4dd75717ab21483e611a18e8e8973"},
-    {"version":30,"file":"0030_import_row_subrecord_identity.sql","git_blob_sha1":"37c6cae070b6c8488deb7562a5bb894110d897ae"},
-    {"version":31,"file":"0031_p4_model_family_time_windows.sql","git_blob_sha1":"aa0536e224dc43435b92eb20b50f897d5e246026"},
-    {"version":32,"file":"0032_model_run_history_visibility.sql","git_blob_sha1":"322e787e13a5a04b8bdc449f447dafdbb6ccbeb1"},
-    {"version":33,"file":"0033_competition_catalog.sql","git_blob_sha1":"6b51747f9e2a274d538aa224214a7623c0cf34ff"},
-    {"version":34,"file":"0034_mainstream_competition_catalog.sql","git_blob_sha1":"a0c4df179b2b771b85695826d0c1d29773165bc0"},
-    {"version":35,"file":"0035_complete_position_catalog.sql","git_blob_sha1":"e428a377643c4d53acbf5aad52a3f3629dff502c"},
-    {"version":36,"file":"0036_lineup_history_visibility.sql","git_blob_sha1":"12d04bc8422e13216a960586bceaeb51b22a0840"},
-    {"version":37,"file":"0037_comprehensive_competition_catalog.sql","git_blob_sha1":"9970354dff428fc318b2328d14ad85b909b1e979"},
-    {"version":38,"file":"0038_p4_only_production_rules.sql","git_blob_sha1":"a0660b9d06c547c4a25dbdeefa43120ecbb8062a"},
-    {"version":39,"file":"0039_restore_p7_model_catalog.sql","git_blob_sha1":"7c48152a062da6f089ead850c8272ca0b6e9a70a"},
-    {"version":40,"file":"0040_match_review_package_workflow.sql","git_blob_sha1":"9c260736a35ff0dc767fd9014673e4cb2956673b"},
-    {"version":41,"file":"0041_prediction_input_readiness.sql","git_blob_sha1":"02b478337dac51fc0c42943a41d2045f611ac79a"},
-    {"version":42,"file":"0042_structured_match_event_facts.sql","git_blob_sha1":"4ac3a060bc1e3d03b614d4c85529dd80555bc993"},
-    {"version":43,"file":"0043_import_row_team_period_identity.sql","git_blob_sha1":"cfbd6ad714a741a121a648f58722bb6d64e389f4"},
-    {"version":44,"file":"0044_team_package_preview_recovery.sql","git_blob_sha1":"02af7e26e041849c52fb47148cc3f11b7d1fccc4"},
-    {"version":45,"file":"0045_team_lineup_presets.sql","git_blob_sha1":"ba054615c3560998185efa05b16e1973e0c0c4f3"},
-    {"version":46,"file":"0046_player_position_default_roles.sql","git_blob_sha1":"1e73572c11f1a075d6508de758a7a8da39e7d721"}
+    {
+      "version": 1,
+      "file": "0001_initial.sql",
+      "git_blob_sha1": "010e2d635dadf15b38d3bcaa36dda5a844d6df9a"
+    },
+    {
+      "version": 2,
+      "file": "0002_rule_packages_and_routing.sql",
+      "git_blob_sha1": "63d643fd72b93d65d580f513a06e2f0365b073d8"
+    },
+    {
+      "version": 3,
+      "file": "0003_player_catalog_and_lineups.sql",
+      "git_blob_sha1": "5a096a9469c4f31a911daf31cde144944bd12abe"
+    },
+    {
+      "version": 4,
+      "file": "0004_spreadsheet_exchange.sql",
+      "git_blob_sha1": "f9d1e8755b57a85e01410e1455addf728505e7b6"
+    },
+    {
+      "version": 5,
+      "file": "0005_pre_match_foundation.sql",
+      "git_blob_sha1": "594004af12c963207756536eb9fe67d83c437727"
+    },
+    {
+      "version": 6,
+      "file": "0006_match_review_workflow.sql",
+      "git_blob_sha1": "9ae01a6cb2c588061e538c41c1f844ceff86677e"
+    },
+    {
+      "version": 7,
+      "file": "0007_analytics_ai_and_jobs.sql",
+      "git_blob_sha1": "3f0e5ea4d8046e407f0ef63c5f728de955b25507"
+    },
+    {
+      "version": 8,
+      "file": "0008_user_workflow_and_tuning.sql",
+      "git_blob_sha1": "256aa71b362cd9eff725a476d2f78484b54c51cd"
+    },
+    {
+      "version": 9,
+      "file": "0009_ability_observation_cutoff.sql",
+      "git_blob_sha1": "49e03bd234dca2901f3d61817cf45a5b6cc6fcd7"
+    },
+    {
+      "version": 10,
+      "file": "0010_repair_ability_observation_cutoff.sql",
+      "git_blob_sha1": "98ea055c9062ed45f0ba2419b00b935b04212ea5"
+    },
+    {
+      "version": 11,
+      "file": "0011_pre_match_ingestion_cutoff.sql",
+      "git_blob_sha1": "104a3b2bcb18dd83be90f1604f4bb52483c019f6"
+    },
+    {
+      "version": 12,
+      "file": "0012_p4_integration_contract.sql",
+      "git_blob_sha1": "81c1a44df792d6d03e6de504625704f370f10390"
+    },
+    {
+      "version": 13,
+      "file": "0013_p4_engine_artifacts.sql",
+      "git_blob_sha1": "1aeaacb41dbe9617593c9fc367cda95f94206d9d"
+    },
+    {
+      "version": 14,
+      "file": "0014_p4_evidence_and_snapshots.sql",
+      "git_blob_sha1": "053630778d485585ee059dc19bf36256e2ae8ddf"
+    },
+    {
+      "version": 15,
+      "file": "0015_p4_openai_research_gateway.sql",
+      "git_blob_sha1": "9429dcbd8c4dd60526b89e4f852563d596100548"
+    },
+    {
+      "version": 16,
+      "file": "0016_p4_fact_pipeline.sql",
+      "git_blob_sha1": "bc8ad8c450b5e040b7162f6c20ca104f1057b7d3"
+    },
+    {
+      "version": 17,
+      "file": "0017_p4_horizon_orchestration.sql",
+      "git_blob_sha1": "b27c97ed197eac713f4c010fbb07078637590959"
+    },
+    {
+      "version": 18,
+      "file": "0018_p4_single_match_workbench.sql",
+      "git_blob_sha1": "56fab170a628d971d66648c1347334942521fe27"
+    },
+    {
+      "version": 19,
+      "file": "0019_api_workspace.sql",
+      "git_blob_sha1": "9546a0dbdf6596b23aded6dc5d08ba653450b7ad"
+    },
+    {
+      "version": 20,
+      "file": "0020_team_player_management.sql",
+      "git_blob_sha1": "91c9c1574e822a2901697154ac24b9c2c3dc66ec"
+    },
+    {
+      "version": 21,
+      "file": "0021_entity_relationships.sql",
+      "git_blob_sha1": "337dd1f205f3dea3ab63ed2a0e711f531f5c60c8"
+    },
+    {
+      "version": 22,
+      "file": "0022_formations_and_usage.sql",
+      "git_blob_sha1": "418b7f4055cb3447889820bd2f01bb7231f2e7f5"
+    },
+    {
+      "version": 23,
+      "file": "0023_monthly_workbooks.sql",
+      "git_blob_sha1": "ff801363b4a59ccde635e8ebf46a662094f5ba15"
+    },
+    {
+      "version": 24,
+      "file": "0024_match_lineup_chain.sql",
+      "git_blob_sha1": "163fd01ccf455aa032ee34cb0d196f0a9e277eeb"
+    },
+    {
+      "version": 25,
+      "file": "0025_parameter_lifecycle.sql",
+      "git_blob_sha1": "f40ccfac1428ace5157a6064552e98c30c6d1d1e"
+    },
+    {
+      "version": 26,
+      "file": "0026_postmatch_settlement.sql",
+      "git_blob_sha1": "3b924790c7d16effe657b12df472c60de01b3da8"
+    },
+    {
+      "version": 27,
+      "file": "0027_release_acceptance.sql",
+      "git_blob_sha1": "487315272beddbe6223274aaade48b95180a6a63"
+    },
+    {
+      "version": 28,
+      "file": "0028_force_team_purge.sql",
+      "git_blob_sha1": "6cadaf7dc905a7aba86784136b7077ee9de16ec4"
+    },
+    {
+      "version": 29,
+      "file": "0029_import_row_entity_identity.sql",
+      "git_blob_sha1": "7e61092e1be4dd75717ab21483e611a18e8e8973"
+    },
+    {
+      "version": 30,
+      "file": "0030_import_row_subrecord_identity.sql",
+      "git_blob_sha1": "37c6cae070b6c8488deb7562a5bb894110d897ae"
+    },
+    {
+      "version": 31,
+      "file": "0031_p4_model_family_time_windows.sql",
+      "git_blob_sha1": "aa0536e224dc43435b92eb20b50f897d5e246026"
+    },
+    {
+      "version": 32,
+      "file": "0032_model_run_history_visibility.sql",
+      "git_blob_sha1": "322e787e13a5a04b8bdc449f447dafdbb6ccbeb1"
+    },
+    {
+      "version": 33,
+      "file": "0033_competition_catalog.sql",
+      "git_blob_sha1": "6b51747f9e2a274d538aa224214a7623c0cf34ff"
+    },
+    {
+      "version": 34,
+      "file": "0034_mainstream_competition_catalog.sql",
+      "git_blob_sha1": "a0c4df179b2b771b85695826d0c1d29773165bc0"
+    },
+    {
+      "version": 35,
+      "file": "0035_complete_position_catalog.sql",
+      "git_blob_sha1": "e428a377643c4d53acbf5aad52a3f3629dff502c"
+    },
+    {
+      "version": 36,
+      "file": "0036_lineup_history_visibility.sql",
+      "git_blob_sha1": "12d04bc8422e13216a960586bceaeb51b22a0840"
+    },
+    {
+      "version": 37,
+      "file": "0037_comprehensive_competition_catalog.sql",
+      "git_blob_sha1": "9970354dff428fc318b2328d14ad85b909b1e979"
+    },
+    {
+      "version": 38,
+      "file": "0038_p4_only_production_rules.sql",
+      "git_blob_sha1": "a0660b9d06c547c4a25dbdeefa43120ecbb8062a"
+    },
+    {
+      "version": 39,
+      "file": "0039_restore_p7_model_catalog.sql",
+      "git_blob_sha1": "7c48152a062da6f089ead850c8272ca0b6e9a70a"
+    },
+    {
+      "version": 40,
+      "file": "0040_match_review_package_workflow.sql",
+      "git_blob_sha1": "9c260736a35ff0dc767fd9014673e4cb2956673b"
+    },
+    {
+      "version": 41,
+      "file": "0041_prediction_input_readiness.sql",
+      "git_blob_sha1": "02b478337dac51fc0c42943a41d2045f611ac79a"
+    },
+    {
+      "version": 42,
+      "file": "0042_structured_match_event_facts.sql",
+      "git_blob_sha1": "4ac3a060bc1e3d03b614d4c85529dd80555bc993"
+    },
+    {
+      "version": 43,
+      "file": "0043_import_row_team_period_identity.sql",
+      "git_blob_sha1": "cfbd6ad714a741a121a648f58722bb6d64e389f4"
+    },
+    {
+      "version": 44,
+      "file": "0044_team_package_preview_recovery.sql",
+      "git_blob_sha1": "02af7e26e041849c52fb47148cc3f11b7d1fccc4"
+    },
+    {
+      "version": 45,
+      "file": "0045_team_lineup_presets.sql",
+      "git_blob_sha1": "ba054615c3560998185efa05b16e1973e0c0c4f3"
+    },
+    {
+      "version": 46,
+      "file": "0046_player_position_default_roles.sql",
+      "git_blob_sha1": "1e73572c11f1a075d6508de758a7a8da39e7d721"
+    }
   ],
-  "migration_aggregate_sha256": "d9f2eb50bacd747b7cbf08492189c2635b7c0ec2cf4c764def1d32a837f8ba93",
+  "migration_aggregate_sha256": "b4ad21c404a2cf41a8e364b576c40a578af899c5e754e81d829a459eca3ad3ea",
   "runtime_sources": [
-    {"path":"crates/persistence-postgres/Cargo.toml","git_blob_sha1":"5f83e84c41b53af3f96ebe5a95cabaade04fee1d"},
-    {"path":"crates/persistence-postgres/build.rs","git_blob_sha1":"ee7c9aa50b9ac259453f5b4ce45ea5fcc1c731ad"},
-    {"path":"crates/persistence-postgres/src/connection.rs","git_blob_sha1":"638dedd30398e7c5023cff741e1c92717c933aca"},
-    {"path":"crates/persistence-postgres/tests/postgres_integration.rs","git_blob_sha1":"b378d734495c0846818e7cd06c30d93f69131231"}
+    {
+      "path": "crates/persistence-postgres/Cargo.toml",
+      "git_blob_sha1": "5f83e84c41b53af3f96ebe5a95cabaade04fee1d"
+    },
+    {
+      "path": "crates/persistence-postgres/build.rs",
+      "git_blob_sha1": "ee7c9aa50b9ac259453f5b4ce45ea5fcc1c731ad"
+    },
+    {
+      "path": "crates/persistence-postgres/src/connection.rs",
+      "git_blob_sha1": "638dedd30398e7c5023cff741e1c92717c933aca"
+    },
+    {
+      "path": "crates/persistence-postgres/tests/postgres_integration.rs",
+      "git_blob_sha1": "b378d734495c0846818e7cd06c30d93f69131231"
+    }
   ],
   "runtime_requirements": [
-    {"path":"crates/persistence-postgres/src/connection.rs","required_tokens":["static MIGRATOR: sqlx::migrate::Migrator = sqlx::migrate!(\"./migrations\");","MIGRATOR.run(&self.pool).await?","self.ensure_runtime_schema_compatibility().await?","SELECT feature.refresh_player_ability_projections()","DROP TABLE IF EXISTS public._sqlx_migrations","self.migrate().await"]},
-    {"path":"crates/persistence-postgres/tests/postgres_integration.rs","required_tokens":["const DATABASE_ENV: &str = \"FOOTBALL_TEST_DATABASE_URL\";","store.migrate().await.expect","migrations_are_idempotent_and_health_is_connected","prediction_input_audit_fields_are_persisted_and_immutable","p4_stage_e_source_policy_is_idempotent_versioned_and_immutable","p4_stage_g_manual_override_ledger_is_unique_and_immutable","external_model_provider_artifact_is_registered_once_and_immutable","p4_stage_c_writes_are_idempotent_and_frozen_history_is_immutable"]}
+    {
+      "path": "crates/persistence-postgres/src/connection.rs",
+      "required_tokens": [
+        "static MIGRATOR: sqlx::migrate::Migrator = sqlx::migrate!(\"./migrations\");",
+        "MIGRATOR.run(&self.pool).await?",
+        "self.ensure_runtime_schema_compatibility().await?",
+        "SELECT feature.refresh_player_ability_projections()",
+        "DROP TABLE IF EXISTS public._sqlx_migrations",
+        "self.migrate().await"
+      ]
+    },
+    {
+      "path": "crates/persistence-postgres/tests/postgres_integration.rs",
+      "required_tokens": [
+        "const DATABASE_ENV: &str = \"FOOTBALL_TEST_DATABASE_URL\";",
+        "store.migrate().await.expect",
+        "migrations_are_idempotent_and_health_is_connected",
+        "prediction_input_audit_fields_are_persisted_and_immutable",
+        "p4_stage_e_source_policy_is_idempotent_versioned_and_immutable",
+        "p4_stage_g_manual_override_ledger_is_unique_and_immutable",
+        "external_model_provider_artifact_is_registered_once_and_immutable",
+        "p4_stage_c_writes_are_idempotent_and_frozen_history_is_immutable"
+      ]
+    }
   ],
   "immutable_guards": [
-    {"path":"crates/persistence-postgres/migrations/0013_p4_engine_artifacts.sql","required_tokens":["model.reject_engine_artifact_mutation","engine_artifacts_immutable","BEFORE UPDATE OR DELETE ON model.engine_artifacts"]},
-    {"path":"crates/persistence-postgres/migrations/0014_p4_evidence_and_snapshots.sql","required_tokens":["platform.reject_immutable_record_mutation","feature.reject_frozen_snapshot_payload_mutation","feature.reject_frozen_snapshot_delete"]},
-    {"path":"crates/persistence-postgres/migrations/0041_prediction_input_readiness.sql","required_tokens":["model.reject_model_run_input_identity_mutation","model_runs_input_identity_immutable","BEFORE UPDATE ON model.runs"]}
+    {
+      "path": "crates/persistence-postgres/migrations/0013_p4_engine_artifacts.sql",
+      "required_tokens": [
+        "model.reject_engine_artifact_mutation",
+        "engine_artifacts_immutable",
+        "BEFORE UPDATE OR DELETE ON model.engine_artifacts"
+      ]
+    },
+    {
+      "path": "crates/persistence-postgres/migrations/0014_p4_evidence_and_snapshots.sql",
+      "required_tokens": [
+        "platform.reject_immutable_record_mutation",
+        "feature.reject_frozen_snapshot_payload_mutation",
+        "feature.reject_frozen_snapshot_delete"
+      ]
+    },
+    {
+      "path": "crates/persistence-postgres/migrations/0041_prediction_input_readiness.sql",
+      "required_tokens": [
+        "model.reject_model_run_input_identity_mutation",
+        "model_runs_input_identity_immutable",
+        "BEFORE UPDATE ON model.runs"
+      ]
+    }
   ],
   "postgres_integration": {
     "test_file": "crates/persistence-postgres/tests/postgres_integration.rs",

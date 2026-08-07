@@ -31,6 +31,7 @@ requireTrue(page.includes("new-match-competition") && page.includes("new-match-s
 requireTrue(!page.includes('data-action="create-team"') && !page.includes('data-action="create-lineup-player"'), "比赛管理仍混入球队或球员快速创建入口");
 requireTrue(main.includes("autoSelectMatchSeason") && persistence.includes("resolve_match_scope_draft"), "赛季自动匹配未覆盖前后端");
 requireTrue(main.includes("filterMatchTeamOptions") && types.includes("season_team_memberships"), "赛事/赛季参赛队过滤链缺失");
+requireTrue(main.includes('const matchCompetition = currentPageRoot.querySelector<HTMLSelectElement>("#new-match-competition");') && main.includes("if (matchCompetition) {"), "数据库未连接时比赛页仍会初始化不存在的赛事控件");
 requireTrue(main.includes("WorkflowContinuation") && main.includes("startWorkflowCompletion") && main.includes("returnToWorkflow"), "跨页面补录与返回原任务链缺失");
 requireTrue(builder.includes('data-action="complete-workflow"') && page.includes('data-action="complete-workflow"'), "缺失资料没有可操作跳转入口");
 requireTrue(styles.includes(".match-browser-layout") && styles.includes(".paired-lineup-board") && styles.includes(".workflow-continuation-banner"), "比赛中心统一视觉结构缺失");
