@@ -24,13 +24,13 @@
     "targetPublicExportPolicy": "explicit re-export only"
   },
   "sourceDigest": "217241ac243726a5ab6805a7f169e222b97e78c7c971749a5904714af673ebdd",
-  "rustUsageDigest": "e14d7741e1495df2ad71e02c73a451bd32a403dd11a3f5cfd2318b307660212e",
+  "rustUsageDigest": "b34ec233b4128b98c0fc415a2445e821a5f618775e9fa7d958d728ea19303d2a",
   "summary": {
     "typeCount": 365,
     "publicCompatibilityTypeCount": 365,
     "internalTypeCount": 0,
     "domainSourceFileCount": 129,
-    "scannedRustFileCount": 377,
+    "scannedRustFileCount": 400,
     "databaseMappedTypeCount": 299,
     "byTargetModule": {
       "ai_workspace": 16,
@@ -8525,8 +8525,11 @@
         "crates/domain/tests/serde_contracts/module_paths.rs"
       ],
       "externalCallers": [
-        "crates/application/src/player_catalog.rs",
+        "crates/application/src/composition/adapters/lineups.rs",
         "crates/application/src/ports/lineup/mod.rs",
+        "crates/application/src/services/lineups/facade.rs",
+        "crates/application/src/services/lineups/service.rs",
+        "crates/application/src/use_cases/lineups/resolve_formation_distribution/mod.rs",
         "crates/persistence-postgres/src/formation_catalog.rs",
         "crates/persistence-postgres/src/team_catalog.rs",
         "crates/persistence-postgres/tests/postgres_integration.rs",
@@ -8614,8 +8617,11 @@
         "crates/domain/tests/serde_contracts/module_paths.rs"
       ],
       "externalCallers": [
-        "crates/application/src/player_catalog.rs",
+        "crates/application/src/composition/adapters/lineups.rs",
         "crates/application/src/ports/lineup/mod.rs",
+        "crates/application/src/services/lineups/facade.rs",
+        "crates/application/src/services/lineups/service.rs",
+        "crates/application/src/use_cases/lineups/list_formations/mod.rs",
         "crates/persistence-postgres/src/formation_catalog.rs",
         "src-tauri/src/commands/catalog.rs"
       ],
@@ -8734,8 +8740,11 @@
         "crates/domain/tests/serde_contracts/module_paths.rs"
       ],
       "externalCallers": [
-        "crates/application/src/player_catalog.rs",
+        "crates/application/src/composition/adapters/lineups.rs",
         "crates/application/src/ports/lineup/mod.rs",
+        "crates/application/src/services/lineups/facade.rs",
+        "crates/application/src/services/lineups/service.rs",
+        "crates/application/src/use_cases/lineups/save_formation_usage_distribution/mod.rs",
         "crates/persistence-postgres/src/formation_catalog.rs",
         "crates/persistence-postgres/tests/postgres_integration.rs",
         "src-tauri/src/commands/catalog.rs"
@@ -8844,8 +8853,12 @@
         "crates/domain/tests/serde_contracts/module_paths.rs"
       ],
       "externalCallers": [
-        "crates/application/src/player_catalog.rs",
+        "crates/application/src/composition/adapters/lineups.rs",
         "crates/application/src/ports/lineup/mod.rs",
+        "crates/application/src/services/lineups/facade.rs",
+        "crates/application/src/services/lineups/service.rs",
+        "crates/application/src/use_cases/lineups/list_formation_usage_distributions/mod.rs",
+        "crates/application/src/use_cases/lineups/save_formation_usage_distribution/mod.rs",
         "crates/persistence-postgres/src/formation_catalog.rs",
         "src-tauri/src/commands/catalog.rs"
       ],
@@ -9046,8 +9059,11 @@
         "crates/domain/tests/serde_contracts/module_paths.rs"
       ],
       "externalCallers": [
-        "crates/application/src/player_catalog.rs",
+        "crates/application/src/composition/adapters/lineups.rs",
         "crates/application/src/ports/lineup/mod.rs",
+        "crates/application/src/services/lineups/facade.rs",
+        "crates/application/src/services/lineups/service.rs",
+        "crates/application/src/use_cases/lineups/list_formation_usage_distributions/mod.rs",
         "crates/persistence-postgres/src/formation_catalog.rs",
         "crates/persistence-postgres/src/team_catalog.rs",
         "crates/persistence-postgres/tests/postgres_integration.rs",
@@ -9240,8 +9256,11 @@
         "crates/domain/tests/serde_contracts/round_trip.rs"
       ],
       "externalCallers": [
-        "crates/application/src/player_catalog.rs",
+        "crates/application/src/composition/adapters/lineups.rs",
         "crates/application/src/ports/lineup/mod.rs",
+        "crates/application/src/services/lineups/facade.rs",
+        "crates/application/src/services/lineups/service.rs",
+        "crates/application/src/use_cases/lineups/create_lineup/mod.rs",
         "crates/persistence-postgres/src/player_catalog.rs",
         "crates/persistence-postgres/tests/postgres_integration.rs",
         "crates/spreadsheet-io/src/match_review_workbook.rs",
@@ -9302,8 +9321,11 @@
         "crates/domain/tests/serde_contracts/module_paths.rs"
       ],
       "externalCallers": [
-        "crates/application/src/player_catalog.rs",
+        "crates/application/src/composition/adapters/lineups.rs",
         "crates/application/src/ports/lineup/mod.rs",
+        "crates/application/src/services/lineups/facade.rs",
+        "crates/application/src/services/lineups/service.rs",
+        "crates/application/src/use_cases/lineups/remove_lineup_history/mod.rs",
         "crates/persistence-postgres/src/player_catalog.rs",
         "src-tauri/src/commands/catalog.rs"
       ],
@@ -9359,9 +9381,12 @@
         "crates/domain/tests/serde_contracts/module_paths.rs"
       ],
       "externalCallers": [
+        "crates/application/src/composition/adapters/lineups.rs",
         "crates/application/src/match_review_package.rs",
-        "crates/application/src/player_catalog.rs",
         "crates/application/src/ports/lineup/mod.rs",
+        "crates/application/src/services/lineups/facade.rs",
+        "crates/application/src/services/lineups/service.rs",
+        "crates/application/src/use_cases/lineups/create_lineup_pair/mod.rs",
         "crates/persistence-postgres/src/player_catalog.rs",
         "crates/persistence-postgres/tests/postgres_integration.rs",
         "crates/spreadsheet-io/src/match_review_workbook.rs",
@@ -9418,8 +9443,11 @@
         "crates/domain/tests/serde_contracts/module_paths.rs"
       ],
       "externalCallers": [
-        "crates/application/src/player_catalog.rs",
+        "crates/application/src/composition/adapters/lineups.rs",
         "crates/application/src/ports/lineup/mod.rs",
+        "crates/application/src/services/lineups/facade.rs",
+        "crates/application/src/services/lineups/service.rs",
+        "crates/application/src/use_cases/lineups/create_lineup_pair/mod.rs",
         "crates/persistence-postgres/src/player_catalog.rs",
         "src-tauri/src/commands/catalog.rs"
       ],
@@ -9815,10 +9843,15 @@
         "crates/domain/tests/serde_contracts/module_paths.rs"
       ],
       "externalCallers": [
+        "crates/application/src/composition/adapters/lineups.rs",
         "crates/application/src/match_review_package.rs",
-        "crates/application/src/player_catalog.rs",
         "crates/application/src/ports/lineup/mod.rs",
         "crates/application/src/prediction.rs",
+        "crates/application/src/services/lineups/facade.rs",
+        "crates/application/src/services/lineups/service.rs",
+        "crates/application/src/use_cases/lineups/create_lineup/mod.rs",
+        "crates/application/src/use_cases/lineups/list_lineups/mod.rs",
+        "crates/application/src/use_cases/lineups/read_lineup/mod.rs",
         "crates/persistence-postgres/src/lineup_chain.rs",
         "crates/persistence-postgres/src/match_exchange.rs",
         "crates/persistence-postgres/src/match_prediction.rs",
@@ -10096,8 +10129,11 @@
         "crates/domain/tests/serde_contracts/module_paths.rs"
       ],
       "externalCallers": [
-        "crates/application/src/player_catalog.rs",
+        "crates/application/src/composition/adapters/lineups.rs",
         "crates/application/src/ports/lineup/mod.rs",
+        "crates/application/src/services/lineups/facade.rs",
+        "crates/application/src/services/lineups/service.rs",
+        "crates/application/src/use_cases/lineups/create_match/mod.rs",
         "crates/persistence-postgres/src/player_catalog.rs",
         "crates/persistence-postgres/tests/postgres_integration.rs",
         "src-tauri/src/commands/catalog.rs"
@@ -10513,9 +10549,12 @@
         "crates/domain/tests/serde_contracts/module_paths.rs"
       ],
       "externalCallers": [
-        "crates/application/src/player_catalog.rs",
+        "crates/application/src/composition/adapters/lineups.rs",
         "crates/application/src/ports/lineup/mod.rs",
         "crates/application/src/prediction.rs",
+        "crates/application/src/services/lineups/facade.rs",
+        "crates/application/src/services/lineups/service.rs",
+        "crates/application/src/use_cases/lineups/read_match_lineup_chain/mod.rs",
         "crates/persistence-postgres/src/lineup_chain.rs",
         "src-tauri/src/commands/catalog.rs"
       ],
@@ -11063,9 +11102,12 @@
         "crates/domain/tests/serde_contracts/module_paths.rs"
       ],
       "externalCallers": [
-        "crates/application/src/player_catalog.rs",
+        "crates/application/src/composition/adapters/lineups.rs",
         "crates/application/src/ports/lineup/mod.rs",
         "crates/application/src/prediction.rs",
+        "crates/application/src/services/lineups/facade.rs",
+        "crates/application/src/services/lineups/service.rs",
+        "crates/application/src/use_cases/lineups/create_match/mod.rs",
         "crates/persistence-postgres/src/match_exchange.rs",
         "crates/persistence-postgres/src/match_prediction.rs",
         "crates/persistence-postgres/src/player_catalog.rs",
@@ -23127,8 +23169,11 @@
         "crates/domain/tests/serde_contracts/module_paths.rs"
       ],
       "externalCallers": [
-        "crates/application/src/player_catalog.rs",
+        "crates/application/src/composition/adapters/lineups.rs",
         "crates/application/src/ports/lineup/mod.rs",
+        "crates/application/src/services/lineups/facade.rs",
+        "crates/application/src/services/lineups/service.rs",
+        "crates/application/src/use_cases/lineups/resolve_formation_distribution/mod.rs",
         "crates/persistence-postgres/src/formation_catalog.rs",
         "src-tauri/src/commands/catalog.rs"
       ],
@@ -28259,8 +28304,11 @@
         "crates/domain/tests/serde_contracts/module_paths.rs"
       ],
       "externalCallers": [
-        "crates/application/src/player_catalog.rs",
+        "crates/application/src/composition/adapters/lineups.rs",
         "crates/application/src/ports/lineup/mod.rs",
+        "crates/application/src/services/lineups/facade.rs",
+        "crates/application/src/services/lineups/service.rs",
+        "crates/application/src/use_cases/lineups/preview_team_lineup_preset_application/mod.rs",
         "crates/persistence-postgres/src/team_lineup_presets.rs",
         "src-tauri/src/commands/catalog.rs"
       ],
@@ -28367,8 +28415,11 @@
         "crates/domain/tests/serde_contracts/module_paths.rs"
       ],
       "externalCallers": [
-        "crates/application/src/player_catalog.rs",
+        "crates/application/src/composition/adapters/lineups.rs",
         "crates/application/src/ports/lineup/mod.rs",
+        "crates/application/src/services/lineups/facade.rs",
+        "crates/application/src/services/lineups/service.rs",
+        "crates/application/src/use_cases/lineups/save_team_lineup_preset/mod.rs",
         "crates/persistence-postgres/src/team_lineup_presets.rs",
         "src-tauri/src/commands/catalog.rs"
       ],
@@ -28724,8 +28775,14 @@
         "crates/domain/tests/serde_contracts/module_paths.rs"
       ],
       "externalCallers": [
-        "crates/application/src/player_catalog.rs",
+        "crates/application/src/composition/adapters/lineups.rs",
         "crates/application/src/ports/lineup/mod.rs",
+        "crates/application/src/services/lineups/facade.rs",
+        "crates/application/src/services/lineups/service.rs",
+        "crates/application/src/use_cases/lineups/archive_team_lineup_preset/mod.rs",
+        "crates/application/src/use_cases/lineups/duplicate_team_lineup_preset/mod.rs",
+        "crates/application/src/use_cases/lineups/list_team_lineup_presets/mod.rs",
+        "crates/application/src/use_cases/lineups/save_team_lineup_preset/mod.rs",
         "crates/persistence-postgres/src/team_lineup_presets.rs",
         "src-tauri/src/commands/catalog.rs"
       ],
@@ -29052,8 +29109,11 @@
         "crates/domain/tests/serde_contracts/module_paths.rs"
       ],
       "externalCallers": [
-        "crates/application/src/player_catalog.rs",
+        "crates/application/src/composition/adapters/lineups.rs",
         "crates/application/src/ports/lineup/mod.rs",
+        "crates/application/src/services/lineups/facade.rs",
+        "crates/application/src/services/lineups/service.rs",
+        "crates/application/src/use_cases/lineups/list_team_match_lineups/mod.rs",
         "crates/persistence-postgres/src/lineup_chain.rs",
         "src-tauri/src/commands/catalog.rs"
       ],
