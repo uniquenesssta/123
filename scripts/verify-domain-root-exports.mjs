@@ -1,7 +1,10 @@
 import { readFileSync } from "node:fs";
 import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
-import { publicCompatibilityTypeNames } from "./domain-inventory/root-export-policy.mjs";
+import {
+  publicCompatibilityRootSymbols,
+  publicCompatibilityTypeNames,
+} from "./domain-inventory/root-export-policy.mjs";
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const inventory = JSON.parse(
@@ -37,9 +40,15 @@ for (const entry of inventory.types) {
     expectedByModule.get(entry.targetModule).push(entry.typeName);
   }
 }
-for (const names of expectedByModule.values()) {
-  names.sort();
+const rootSymbols = publicCompatibilityRootSymbols();
+for (const [moduleName, symbols] of rootSymbols) {
+  if (!expectedByModule.has(moduleName)) {
+    console.error(`公共根符号登记了未知模块：${moduleName}`);
+    process.exit(1);
+  }
+  expectedByModule.get(moduleName).push(...symbols);
 }
+for (const names of expectedByModule.values()) names.sort();
 
 const actualByModule = new Map(expectedModules.map((moduleName) => [moduleName, []]));
 for (const match of actual.matchAll(/pub\s+use\s+([a-z0-9_]+)::\{([^}]*)\};/gs)) {
@@ -54,25 +63,34 @@ for (const match of actual.matchAll(/pub\s+use\s+([a-z0-9_]+)::\{([^}]*)\};/gs))
     .filter(Boolean);
   actualByModule.get(moduleName).push(...names);
 }
+for (const match of actual.matchAll(/^pub\s+use\s+([a-z0-9_]+)::([A-Z][A-Z0-9_]*);$/gm)) {
+  const moduleName = match[1];
+  if (!actualByModule.has(moduleName)) {
+    console.error(`Domain 根出口出现未知模块：${moduleName}`);
+    process.exit(1);
+  }
+  actualByModule.get(moduleName).push(match[2]);
+}
 
 for (const moduleName of expectedModules) {
   const expected = expectedByModule.get(moduleName);
   const actualNames = actualByModule.get(moduleName).sort();
   if (JSON.stringify(actualNames) !== JSON.stringify(expected)) {
     console.error(
-      `Domain 根出口 ${moduleName} 与类型清单不一致：expected=${expected.length}; actual=${actualNames.length}`,
+      `Domain 根出口 ${moduleName} 与兼容清单不一致：expected=${expected.length}; actual=${actualNames.length}`,
     );
     process.exit(1);
   }
 }
 
 const publicTypes = publicCompatibilityTypeNames(inventory);
-const exportedTypes = [...actualByModule.values()].flat();
-if (new Set(exportedTypes).size !== publicTypes.length) {
-  console.error("Domain 根出口包含重复公共类型或遗漏公共兼容类型。");
+const symbolCount = [...rootSymbols.values()].reduce((total, names) => total + names.length, 0);
+const exportedNames = [...actualByModule.values()].flat();
+if (new Set(exportedNames).size !== publicTypes.length + symbolCount) {
+  console.error("Domain 根出口包含重复公共名称，或遗漏公共兼容类型/公共根符号。");
   process.exit(1);
 }
 
 console.log(
-  `Domain 根出口验证通过：${publicTypes.length} 个公共兼容类型全部显式 re-export，0 条 glob export。`,
+  `Domain 根出口验证通过：${publicTypes.length} 个公共兼容类型、${symbolCount} 个公共根符号全部显式 re-export，0 条 glob export。`,
 );
