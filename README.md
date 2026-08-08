@@ -57,7 +57,7 @@ Node 开发依赖固定安装和读取自源码根目录上一级的 `../node_mo
 - R2-06 已将 Review 48 个类型与 Postmatch 11 个类型迁移到 `review/`、`postmatch/` 职责目录并删除 5 个旧职责混合源文件；根级公共类型路径、Serde、数据库映射、Application、Tauri DTO、公共命令、生产依赖和模型保护边界保持不变。staged 与 Windows Automated 验收已通过，用户随后使用原有 PostgreSQL 数据库连接成功；数据库兼容修复保留历史数据与不可变资产，不清库、不覆盖旧版本、不削弱 fail-closed 或内容指纹保护。R2-06 状态为 `DONE`。
 - R2-07 已将 Analytics 39、Exchange 54、AI Workspace 16、Release 9 共 118 个公共兼容类型迁移到职责目录，并删除 7 个旧职责混合根文件；Windows 本机格式、17/17 Serde、365 类型清单与架构门禁通过，用户确认状态为 `DONE`。
 - R2-08 已将 `crates/domain/src/lib.rs` 收敛为 17 个模块声明、365 个显式公共兼容类型 re-export，并补齐 34 个既有公共根常量的显式兼容出口；根级 glob export 已清零，三个私有默认值实现迁入 `shared/defaults.rs`，确定性根出口生成/验证门禁已接入 `verify:architecture`。Windows 专项 run `31236344727` 已通过根出口、球队资料包和保护资产门禁并生成最终实现提交 `62b1f622b9c14b33dbaac850812a49c063ccb090`；用户本机阶段回归未见报错，上传 runtime 日志共 58 条且全部为 `info`，启动 `connection_error=null`，球队、阵容、分析、Postmatch 与 API 工作区读取均正常完成。R2-08 状态为 `DONE`，R2 阶段已关闭。
-- R3 已从 R2 完成提交 `7cf906b8f98ab0fdcf89f80952bc8fb9cf21801f` 建立独立分支 `new-C`。R3-01 已扫描 232 个 PostgreSQL 公开异步方法与 209 个 Application 实际调用方法，建立 15 个职责域、36 个最小 Ports 契约、统一 Port 错误和机器验证清单；R3-02 已删除旧 `crates/application/src/database.rs`，将连接、迁移、恢复、health、statistics、reset 重写到 `services/database/` 与 `use_cases/database/`，活动数据库由 `DatabaseService.session` 单一持有，Tauri reset 不再直接执行 PostgreSQL 清空。Windows 本机最小验证、完整 frontend、完整 `verify:rust` 与 `tauri:dev` 均通过；本次 runtime JSONL 48 条全部为 `info`，`bootstrap connection_error=null`，原数据库读取链正常。R3-01、R3-02 状态均为 `DONE`，R3-03 Competition / Rules Services 已开放为 `READY`。
+- R3 已从 R2 完成提交 `7cf906b8f98ab0fdcf89f80952bc8fb9cf21801f` 建立独立分支 `new-C`。R3-01 Application Ports 与 R3-02 Database Service 已完成；R3-03 已将赛事层级、规则包与赛事绑定从旧根级职责文件重写到 `services/competition/`、`services/rules/` 及对应 `use_cases/`，删除旧 `competition.rs` 与 `rule_packages.rs`，并由 `ActiveDatabase` 在组合根实现 Competition/Rules Ports。数据库初始化与 bootstrap 的相关调用已切换到 Services，公共 ApplicationService/Tauri DTO、SQL/迁移、依赖与模型保护边界保持不变。Windows 2025 严格实施验证 run `31248365735` / job `93080599447` 已通过专项、完整 architecture、确定性模型保护指纹、Application check/tests 与 diff hygiene；R3-03 当前为 `VERIFYING`，等待用户 Windows 本机完整阶段回归和非破坏性运行时烟测，R3-04 继续 `BLOCKED`。
 - 开发依赖布局已外置：Node 依赖固定到 `../node_modules`、npm 缓存固定到 `../.npm-cache`，Cargo 构建输出继续使用 `../.cargo-target`；仓库根目录不保存依赖目录。
 - R1-04 前置校正将 `crates/application/src/model_shell/mod.rs` 恢复为 Rust 1.88 标准排版，并只同步更新该文件的保护指纹与派生聚合值；导出集合、模型行为和保护范围均未变化。
 - R1-04 已同步迁移 19 个既有验证器读取新的 Tauri 命令注册表或状态所有者，消除旧 `lib.rs` 路径造成的伪失败；产品代码和公共契约未改变。
@@ -155,7 +155,7 @@ R00 阶段已按 Windows-only 目标范围标记为 **DONE**。Linux Chromium �
 
 PostgreSQL 实跑、Windows Full 和用户本机 Windows 10/11 实机验收仍保留最终统一验收；R2-06 节点已额外使用原 PostgreSQL 数据库完成连接验证。R3-02 已使用原数据库完成非破坏性 `tauri:dev` 运行时烟测，但真实 destructive reset 仍只允许在专用测试数据库执行。另保留 1 个 moderate npm vulnerability 和 Vite 大 chunk 警告。
 
-已创建 `R00-stage-completion.md`、`R01-stage-completion.md` 与 `R02-stage-completion.md`。R1、R2 阶段均已关闭；R3-01 Application Ports 与 R3-02 Database Service 状态均为 `DONE`，R3-03 Competition / Rules Services 为 `READY`。详细状态见 `docs/modular-rewrite/R03-application-services/README.md`。
+已创建 `R00-stage-completion.md`、`R01-stage-completion.md` 与 `R02-stage-completion.md`。R1、R2 阶段均已关闭；R3-01 Application Ports 与 R3-02 Database Service 状态均为 `DONE`，R3-03 Competition / Rules Services 为 `VERIFYING`，R3-04 Teams / Players Services 为 `BLOCKED`。详细状态见 `docs/modular-rewrite/R03-application-services/README.md`。
 
 ## R2-04 Lineup 与 Match
 
