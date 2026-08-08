@@ -62,6 +62,15 @@ assert(readme.includes("## 0.14.0 变更记录"), "根README缺少0.14.0变更�
 assert(readme.includes("## 0.15.0 变更记录"), "根README缺少0.15.0变更记录");
 
 for (const artifact of contract.artifacts) {
+  if (artifact === "crates/application/src/player_catalog.rs") {
+    for (const currentOwner of [
+      "crates/application/src/services/teams/facade.rs",
+      "crates/application/src/services/players/facade.rs",
+    ]) {
+      assert(existsSync(join(root, currentOwner)), `球队与球员管理当前制品不存在：${currentOwner}`);
+    }
+    continue;
+  }
   assert(existsSync(join(root, artifact)), `球队与球员管理制品不存在：${artifact}`);
 }
 const contractHash = hash(contractPath);
