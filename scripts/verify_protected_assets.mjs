@@ -292,7 +292,11 @@ function verify(options) {
   }
 
   const aggregateInput = verifiedEntries
-    .sort((left, right) => left.path.localeCompare(right.path))
+    .sort((left, right) => {
+    if (left.path < right.path) return -1;
+    if (left.path > right.path) return 1;
+    return 0;
+  })
     .map((entry) => `${entry.path}\0${entry.fingerprint_sha256}\n`)
     .join("");
   const aggregate = sha256(Buffer.from(aggregateInput, "utf8"));

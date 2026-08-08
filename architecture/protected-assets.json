@@ -134,8 +134,8 @@
       "path": "scripts/verify_protected_assets.mjs",
       "category": "protected-assets-verifier",
       "mode": "utf8-lf",
-      "git_blob_sha1": "10e6f920d7f087d61ed10d0daa8204995a271c54",
-      "fingerprint_sha256": "aade75bff7c51b8c53526853fb9c0794056e9ad1f4754bd8282bdefa42d92688"
+      "git_blob_sha1": "0b056564ff82fe974eec95b4b455692166acfe08",
+      "fingerprint_sha256": "35589051de8f051086d205c9dded9f741e09bdaf7814068f67cbbd2b7725b86f"
     },
     {
       "path": "src-tauri/resources/research/public_research_prompt.txt",
@@ -243,5 +243,5 @@
       "category": "private-model-documentation"
     }
   ],
-  "aggregate_sha256": "f4240fa25008d8ddfa95adba579dc8d8af9410b58a4a080bf7e42a1344e59364"
+  "aggregate_sha256": "eb4292a0f5616b3b9e5bad1a5cfe135000013e584a998444283efbdf9eef89d4"
 }
