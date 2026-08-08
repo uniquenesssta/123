@@ -57,7 +57,7 @@ Node 开发依赖固定安装和读取自源码根目录上一级的 `../node_mo
 - R2-06 已将 Review 48 个类型与 Postmatch 11 个类型迁移到 `review/`、`postmatch/` 职责目录并删除 5 个旧职责混合源文件；根级公共类型路径、Serde、数据库映射、Application、Tauri DTO、公共命令、生产依赖和模型保护边界保持不变。staged 与 Windows Automated 验收已通过，用户随后使用原有 PostgreSQL 数据库连接成功；数据库兼容修复保留历史数据与不可变资产，不清库、不覆盖旧版本、不削弱 fail-closed 或内容指纹保护。R2-06 状态为 `DONE`。
 - R2-07 已将 Analytics 39、Exchange 54、AI Workspace 16、Release 9 共 118 个公共兼容类型迁移到职责目录，并删除 7 个旧职责混合根文件；Windows 本机格式、17/17 Serde、365 类型清单与架构门禁通过，用户确认状态为 `DONE`。
 - R2-08 已将 `crates/domain/src/lib.rs` 收敛为 17 个模块声明、365 个显式公共兼容类型 re-export，并补齐 34 个既有公共根常量的显式兼容出口；根级 glob export 已清零，三个私有默认值实现迁入 `shared/defaults.rs`，确定性根出口生成/验证门禁已接入 `verify:architecture`。Windows 专项 run `31236344727` 已通过根出口、球队资料包和保护资产门禁并生成最终实现提交 `62b1f622b9c14b33dbaac850812a49c063ccb090`；用户本机阶段回归未见报错，上传 runtime 日志共 58 条且全部为 `info`，启动 `connection_error=null`，球队、阵容、分析、Postmatch 与 API 工作区读取均正常完成。R2-08 状态为 `DONE`，R2 阶段已关闭。
-- R3 已从 R2 完成提交 `7cf906b8f98ab0fdcf89f80952bc8fb9cf21801f` 建立独立分支 `new-C`。R3-01 已扫描 232 个 PostgreSQL 公开异步方法与 209 个 Application 实际调用方法，建立 15 个职责域的最小 Ports 契约、统一 Port 错误和机器验证清单；具体 PostgreSQL 依赖仍只允许位于组合根，当前状态 `VERIFYING`，通过 Windows 本机门禁前不开放 R3-02。
+- R3 已从 R2 完成提交 `7cf906b8f98ab0fdcf89f80952bc8fb9cf21801f` 建立独立分支 `new-C`。R3-01 已扫描 232 个 PostgreSQL 公开异步方法与 209 个 Application 实际调用方法，建立 15 个职责域、36 个最小 Ports 契约、统一 Port 错误和机器验证清单；Windows 本机 rustfmt、Application Ports、架构、`cargo check`、workspace Clippy、workspace tests 与完整 frontend 均已通过，两处 R2 拆分遗留验证器路径已修正且未改变产品行为。R3-01 状态为 `DONE`，R3-02 Database Service 已开放为 `READY`。
 - 开发依赖布局已外置：Node 依赖固定到 `../node_modules`、npm 缓存固定到 `../.npm-cache`，Cargo 构建输出继续使用 `../.cargo-target`；仓库根目录不保存依赖目录。
 - R1-04 前置校正将 `crates/application/src/model_shell/mod.rs` 恢复为 Rust 1.88 标准排版，并只同步更新该文件的保护指纹与派生聚合值；导出集合、模型行为和保护范围均未变化。
 - R1-04 已同步迁移 19 个既有验证器读取新的 Tauri 命令注册表或状态所有者，消除旧 `lib.rs` 路径造成的伪失败；产品代码和公共契约未改变。
@@ -155,7 +155,7 @@ R00 阶段已按 Windows-only 目标范围标记为 **DONE**。Linux Chromium �
 
 PostgreSQL 实跑、Windows Full 和用户本机 Windows 10/11 实机验收仍保留最终统一验收；R2-06 节点已额外使用原 PostgreSQL 数据库完成连接验证。另保留 1 个 moderate npm vulnerability 和 Vite 大 chunk 警告。
 
-已创建 `R00-stage-completion.md` 和 `R01-stage-completion.md`。R1-01 至 R1-05、R2-01 至 R2-07 状态均为 `DONE`；R2-08 当前为 `VERIFYING`。Domain 根出口已切换为 365 个显式公共兼容类型 re-export，等待 Windows 本机阶段回归后关闭 R2。详细状态见 `docs/modular-rewrite/R02-domain-rewrite/README.md`。
+已创建 `R00-stage-completion.md`、`R01-stage-completion.md` 与 `R02-stage-completion.md`。R1、R2 阶段均已关闭；R3-01 Application Ports 状态为 `DONE`，R3-02 Database Service 为 `READY`。详细状态见 `docs/modular-rewrite/R03-application-services/README.md`。
 
 ## R2-04 Lineup 与 Match
 
@@ -184,4 +184,4 @@ PostgreSQL 实跑、Windows Full 和用户本机 Windows 10/11 实机验收仍�
 
 - `crates/domain/src/lib.rs` 仅保留 17 个业务模块声明、365 个显式公共兼容类型 re-export 与 crate 内默认值兼容转发，不再承载领域定义或默认值实现。
 - 根级 `pub use module::*` 已全部删除；新增确定性生成器和静态验证器，`verify:architecture` 会拒绝 glob 回归、遗漏/重复出口和根文件业务实现。
-- 现有 `football_domain::TypeName`、Serde、数据库映射、DTO、模型保护边界和生产依赖未改变。当前状态为 `VERIFYING`，等待 Windows 本机完整阶段回归。
+- 现有 `football_domain::TypeName`、Serde、数据库映射、DTO、模型保护边界和生产依赖未改变。Windows 本机完整阶段回归已通过，R2-08 状态为 `DONE`，R2 阶段已关闭。
