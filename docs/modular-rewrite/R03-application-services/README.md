@@ -21,7 +21,7 @@ R2 已完成并关闭。R3 只重写 Application 编排与 Ports/Services/Use Ca
 | R3-02 | Database Service | DONE |
 | R3-03 | Competition / Rules Services | DONE |
 | R3-04 | Teams / Players Services | VERIFYING |
-| R3-05 | Lineups Service | BLOCKED |
+| R3-05 | Lineups Service | VERIFYING |
 | R3-06 | Prediction Service | BLOCKED |
 | R3-07 | Research Service | BLOCKED |
 | R3-08 | Review / Postmatch / Analytics Services | BLOCKED |
@@ -67,11 +67,23 @@ R3-02 已正式关闭为 `DONE`。详细记录见 [`R03-02-database-service.md`]
 
 ## R3-04 当前结果
 
-- 已将旧 `player_catalog.rs` 中 35 个球队、球员、教练与实体引用 Application 职责迁入 `services/teams/`、`services/players/` 与对应 `use_cases/`；共 43 个 Service / Use Case Rust 文件。原文件只保留 R3-05 的 19 个阵型、比赛、阵容与预设职责。
+- 已将旧 `player_catalog.rs` 中 35 个球队、球员、教练与实体引用 Application 职责迁入 `services/teams/`、`services/players/` 与对应 `use_cases/`；共 43 个 Service / Use Case Rust 文件。R3-05 已接手并删除原文件剩余的阵型、比赛、阵容与预设职责。
 - `ApplicationService` / `ApplicationComposition` 已聚合 `TeamService` 与 `PlayerService`；公共方法、Tauri 命令、DTO、SQL、迁移、生产依赖和模型边界保持兼容。
 - 6 个 Team / Player Ports 的具体适配按职责拆到 `composition/adapters/teams.rs` 与 `players.rs`；`port_registry.rs` 继续作为 Application 唯一直接导入 PostgreSQL crate 的组合根所有者。
 - 首轮 Windows 编译真实暴露球队强制删除 SQLx transaction 的 non-Send 边界；现仅在组合适配器对 preview/force-delete 使用 `spawn_blocking + Handle::block_on`，保持既有 Tauri 隔离和事务语义，没有修改 SQL 或弱化强确认。
 - Windows 2025 run `31258038424` / job `93104371481` 已通过 R3-04 专项、实体关系、球队强制清除、球队/球员管理、完整 architecture、保护资产、Application check、Application tests 33/33、workspace Clippy `-D warnings` 与 diff hygiene。
-- R3-04 当前为 `VERIFYING`，等待用户 Windows 本机完整阶段回归与非破坏性 runtime 烟测；R3-05 继续 `BLOCKED`。
+- 用户随后在 `new-C` 提供 clean 工作区、rustfmt、R3-04 专项、完整 architecture、Application check 与 33/33 Application tests 的本机通过结果，并明确授权进入 R3-05；未提供完整 frontend / Rust 与非破坏性 runtime 烟测，因此 R3-04 状态仍保持 `VERIFYING`，不虚报为 `DONE`。
 
 详细记录见 [`R03-04-teams-players-services.md`](./R03-04-teams-players-services.md)。
+
+## R3-05 当前结果
+
+- 已删除旧 `crates/application/src/player_catalog.rs`，其剩余 19 个阵型、比赛、阵容、阵容预设公开 Application 职责全部迁入 `services/lineups/` 与对应 `use_cases/lineups/`；共 23 个 Lineups Service / Use Case Rust 文件。
+- `ApplicationService` / `ApplicationComposition` 已聚合唯一 `LineupService`；19 个既有公开方法名、参数、返回类型、Tauri 调用链与错误语义保持兼容。
+- 沿用 `FormationPort`、`MatchCatalogPort`、`LineupPort`、`LineupPresetPort` 4 个既有 Ports，并由 `composition/adapters/lineups.rs` 负责具体持久化适配；Service / Use Case 不泄漏 PostgreSQL、SQLx、PgPool、PostgresStore 或 PersistenceStore。
+- 完整 Rust 编译暴露 `MatchCatalogPort::read_match` 需要调用 persistence crate 既有 `read_match_exchange`，现仅将该方法从 `pub(crate)` 提升为 `pub async fn` 以形成合法 workspace 边界；方法体、SQL、参数、返回结构和数据库行为未改。
+- 删除旧 Application owner 后确认受影响的 5 个历史验证器已改读当前权威 Teams / Players / Lineups owner，业务断言未删除或放宽；Domain inventory 已按最终源码重算，架构扫描覆盖 400 个 Rust 文件。
+- clean 实施提交 `7e3fddeafcd32cc45e293fa9a7aeb05c7c66d4ec` 的 Public Platform CI run `31260698438` / job `93110942400` 已通过 architecture 与完整 Windows Automated：frontend、17 个截图回归视口、TypeScript、Vite、完整 Rust/Clippy/workspace tests、Tauri release 构建及 release 启动日志扫描均通过。artifact `9022970030`，大小 `14242839` 字节，SHA-256 `275e17a78db9d5205d49401a1a1d20ed91f08102594d2d04c339051165beb052`。
+- R3-05 当前为 `VERIFYING`，等待用户 Windows 本机最小复核与非破坏性 runtime 烟测；R3-06 Prediction Service 继续 `BLOCKED`。
+
+详细记录见 [`R03-05-lineups-service.md`](./R03-05-lineups-service.md)。
