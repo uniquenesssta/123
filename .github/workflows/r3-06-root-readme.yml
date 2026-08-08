@@ -1,0 +1,48 @@
+name: R3-06 Root README Status
+
+on:
+  push:
+    branches:
+      - rewrite/r3-06-prediction-service
+
+permissions:
+  contents: write
+
+jobs:
+  docs:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: windows-2025
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: rewrite/r3-06-prediction-service
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Update root README
+        shell: pwsh
+        run: python scripts/r3-06-root-readme.py
+      - name: Validate documentation state
+        shell: pwsh
+        run: |
+          node scripts/verify-application-ports.mjs
+          npm run verify:architecture
+          git diff --check
+      - name: Commit clean documentation state
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git rm -f .github/workflows/r3-06-root-readme.yml
+          git rm -f scripts/r3-06-root-readme.py
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          git add -A
+          git diff --check
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          git commit -m "docs(r3): record Prediction Service progress"
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          git push origin HEAD:rewrite/r3-06-prediction-service
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
