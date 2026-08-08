@@ -3,6 +3,7 @@
 - 任务状态：`VERIFYING`
 - 分支：`new-C`
 - 开始基线：`7cf906b8f98ab0fdcf89f80952bc8fb9cf21801f`
+- 实施提交：`264a55baee0ff8fe0c33928fe8161a32367b6c84`
 - 目标平台：Windows
 
 ## 1. 目标
@@ -43,13 +44,35 @@ Port 错误通过 `PortErrorKind + PortError + PortResult<T>` 表达基础设施
 
 R3-01 只增加端口契约、清单和静态门禁，不替换当前 `ApplicationService` 调用路径，不修改数据库 migration、SQL、Serde、Tauri 命令、前端状态、模型参数/Profile/fixture 或生产依赖。现有 concrete PostgreSQL import 仍暂时只允许组合根一处。
 
-## 6. 验证要求
+## 6. 已完成验证
 
-实施树必须先通过：
+实施环境已通过：
 
 - `cargo fmt --all -- --check`
 - `node scripts/verify-application-ports.mjs`
+- `node scripts/generate-domain-type-inventory.mjs`
+- `node scripts/verify-domain-type-inventory.mjs`
 - `npm run verify:architecture`
 - `cargo check --locked -p football-application`
 
-随后由用户 Windows 本机执行阶段最小门禁；通过前任务保持 `VERIFYING`。
+其中 Application Ports 门禁结果为 15 个职责域、36 个最小 Port trait；真实调用面登记为 209/232，具体 PostgreSQL 导入仍仅位于组合根。Domain 类型清单为 365 个类型、365 个公共兼容类型、299 个 PostgreSQL 映射类型。
+
+用户 Windows 10 本机已在 `new-C`、干净工作树上再次通过：
+
+- `cargo fmt --all -- --check`
+- `node scripts/verify-application-ports.mjs`
+- `node scripts/verify-domain-type-inventory.mjs`
+- `npm run verify:architecture`
+- `cargo check --locked -p football-application`
+
+本机 `cargo check` 最终成功完成，`football-application v0.23.0` 编译检查通过。
+
+## 7. 尚未关闭的阶段回归
+
+按照 R3 原任务书，R3-01 标记 `DONE` 前仍需完成以下阶段回归：
+
+- `npm run verify:frontend`
+- `cargo clippy --locked --workspace --all-targets -- -D warnings`
+- `cargo test --locked --workspace`
+
+上述三项未提供本次 Windows 本机结果前，R3-01 保持 `VERIFYING`，R3-02 不提前开放。
