@@ -11,7 +11,9 @@ const requireTrue = (condition, message) => { if (!condition) throw new Error(me
 const contractText = read("contracts/monthly-workbooks-contract.json");
 const contract = JSON.parse(contractText);
 const migration = read("crates/persistence-postgres/migrations/0023_monthly_workbooks.sql");
-const domain = read("crates/domain/src/monthly_workbook.rs") + read("crates/domain/src/spreadsheet.rs");
+const domain =
+  read("crates/domain/src/exchange/monthly/contract.rs") +
+  read("crates/domain/src/exchange/spreadsheet/contract.rs");
 const spreadsheetIo = read("crates/spreadsheet-io/src/monthly_workbook.rs");
 const persistence = read("crates/persistence-postgres/src/monthly_workbooks.rs");
 const legacyPersistence = read("crates/persistence-postgres/src/spreadsheet_exchange.rs");
