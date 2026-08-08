@@ -69,27 +69,36 @@ R3-01 只增加端口契约、清单和静态门禁，不替换当前 `Applicati
 
 本机 `cargo check` 与完整 workspace Clippy 均成功完成。workspace tests 全部已执行到结束；普通测试全部通过，`crates/persistence-postgres/tests/postgres_integration.rs` 中 18 个需要 `FOOTBALL_TEST_DATABASE_URL` 的真实 PostgreSQL 集成测试按既有显式设计保持 `ignored`，本节点未把它们伪装成已执行。
 
-## 7. Frontend 阶段回归与修复
+## 7. Frontend 阶段回归与验证器兼容修复
 
-本机 `npm run verify:frontend` 已实际进入完整验证链，前面的架构、状态所有权、受保护导入、Domain 清单、Browser/Tauri/Application 组合根、公开模型边界、保护资产、球队/球员/阵容/工作区等专项均通过。首次失败点为：
+本机 `npm run verify:frontend` 已两次实际进入完整验证链。两次失败都发生在 R2 Domain 拆分后遗留的验证器旧读取路径，不是产品行为、Port 编译、公共契约或模型保护边界失败。
+
+第一次失败：
 
 ```text
 verify-monthly-workbooks.mjs
 ENOENT: crates/domain/src/monthly_workbook.rs
 ```
 
-该失败不是产品行为或 Port 编译错误，而是 R2-07 Domain 模块化迁移后遗留的验证器旧路径。`scripts/verify-monthly-workbooks.mjs` 仍读取已删除的 `crates/domain/src/monthly_workbook.rs` 与 `crates/domain/src/spreadsheet.rs`。
-
-已在提交 `dee553026c03193e7f4298e0e4a963693b14b893` 将该验证器切到当前唯一职责来源：
+`scripts/verify-monthly-workbooks.mjs` 原来仍读取已删除的 `crates/domain/src/monthly_workbook.rs` 与 `crates/domain/src/spreadsheet.rs`。提交 `dee553026c03193e7f4298e0e4a963693b14b893` 已将其切到当前唯一职责来源：
 
 - `crates/domain/src/exchange/monthly/contract.rs`
 - `crates/domain/src/exchange/spreadsheet/contract.rs`
 
-只修正验证器读取路径，不修改月度工作簿业务逻辑、Domain 契约、数据库、Tauri、前端、模型边界或保护资产。
+用户拉取后第二次执行 `npm run verify:frontend`，月度工作簿专项已明确通过；随后新的首个失败点为：
+
+```text
+verify-match-lineup-chain.mjs
+ENOENT: crates/domain/src/exchange.rs
+```
+
+`scripts/verify-match-lineup-chain.mjs` 仍读取已被 R2-07 删除的旧 `crates/domain/src/exchange.rs`。比赛阵容导入格式常量当前唯一来源为 `crates/domain/src/exchange/lineup.rs`，因此提交 `55aab2cf49180fbd2798846926a6ce3beca4394f` 仅将验证器读取路径切换到该职责文件。
+
+以上修复均只修正静态验证器对模块化后真实源码位置的读取，不修改月度工作簿、比赛阵容、Domain 数据结构、数据库 SQL、Tauri 命令、前端行为、模型边界或保护资产。
 
 ## 8. 剩余关闭条件
 
-当前只剩用户 Windows 本机在拉取上述验证器修复后重新执行：
+当前只剩用户 Windows 本机拉取最新 `new-C` 后重新执行：
 
 - `npm run verify:frontend`
 
