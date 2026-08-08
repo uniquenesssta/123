@@ -64,15 +64,33 @@ R3-01 只增加端口契约、清单和静态门禁，不替换当前 `Applicati
 - `node scripts/verify-domain-type-inventory.mjs`
 - `npm run verify:architecture`
 - `cargo check --locked -p football-application`
-
-本机 `cargo check` 最终成功完成，`football-application v0.23.0` 编译检查通过。
-
-## 7. 尚未关闭的阶段回归
-
-按照 R3 原任务书，R3-01 标记 `DONE` 前仍需完成以下阶段回归：
-
-- `npm run verify:frontend`
 - `cargo clippy --locked --workspace --all-targets -- -D warnings`
 - `cargo test --locked --workspace`
 
-上述三项未提供本次 Windows 本机结果前，R3-01 保持 `VERIFYING`，R3-02 不提前开放。
+本机 `cargo check` 与完整 workspace Clippy 均成功完成。workspace tests 全部已执行到结束；普通测试全部通过，`crates/persistence-postgres/tests/postgres_integration.rs` 中 18 个需要 `FOOTBALL_TEST_DATABASE_URL` 的真实 PostgreSQL 集成测试按既有显式设计保持 `ignored`，本节点未把它们伪装成已执行。
+
+## 7. Frontend 阶段回归与修复
+
+本机 `npm run verify:frontend` 已实际进入完整验证链，前面的架构、状态所有权、受保护导入、Domain 清单、Browser/Tauri/Application 组合根、公开模型边界、保护资产、球队/球员/阵容/工作区等专项均通过。首次失败点为：
+
+```text
+verify-monthly-workbooks.mjs
+ENOENT: crates/domain/src/monthly_workbook.rs
+```
+
+该失败不是产品行为或 Port 编译错误，而是 R2-07 Domain 模块化迁移后遗留的验证器旧路径。`scripts/verify-monthly-workbooks.mjs` 仍读取已删除的 `crates/domain/src/monthly_workbook.rs` 与 `crates/domain/src/spreadsheet.rs`。
+
+已在提交 `dee553026c03193e7f4298e0e4a963693b14b893` 将该验证器切到当前唯一职责来源：
+
+- `crates/domain/src/exchange/monthly/contract.rs`
+- `crates/domain/src/exchange/spreadsheet/contract.rs`
+
+只修正验证器读取路径，不修改月度工作簿业务逻辑、Domain 契约、数据库、Tauri、前端、模型边界或保护资产。
+
+## 8. 剩余关闭条件
+
+当前只剩用户 Windows 本机在拉取上述验证器修复后重新执行：
+
+- `npm run verify:frontend`
+
+该命令完整通过前，R3-01 保持 `VERIFYING`，R3-02 不提前开放。完整通过后再将本记录和阶段索引收口为 `DONE / READY`。
