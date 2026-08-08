@@ -1,0 +1,32 @@
+name: Temporary R3-04 Scan
+
+on:
+  push:
+    branches: [rewrite/r3-04-teams-players]
+    paths: [.github/workflows/temp-r3-04-scan.yml]
+
+permissions:
+  contents: read
+
+jobs:
+  scan:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: rewrite/r3-04-teams-players
+      - name: Scan application and verifier call surface
+        shell: bash
+        run: |
+          echo '=== player_catalog public methods ==='
+          python - <<'PY'
+          import re
+          from pathlib import Path
+          text = Path('crates/application/src/player_catalog.rs').read_text()
+          for name in re.findall(r'pub async fn\s+([a-zA-Z0-9_]+)', text):
+              print(name)
+          PY
+          echo '=== player_catalog path/module references ==='
+          git grep -n -E 'player_catalog(\.rs)?|mod player_catalog' -- ':!architecture/domain-type-inventory.json' || true
+          echo '=== R3-04 Application method references outside player_catalog ==='
+          git grep -n -E '(player_catalog_reference_data|create_coach|list_coaches|read_coach|add_coach_name|add_team_coach_period|list_entity_references|resolve_entity_reference|check_entity_deletion|bulk_archive_entities|create_team|list_team_options|list_teams|read_team|update_team|add_team_name|upsert_team_profile|bulk_delete_players|bulk_delete_teams|preview_force_delete_team|force_delete_team|create_data_provider|create_player|update_player|delete_player|list_players|read_player|add_player_name|assign_player_position|add_player_team_period|add_player_availability|add_player_ability_observation|add_player_dynamic_tag|calculate_player_match_contribution|add_external_entity_id)' -- src-tauri src scripts crates/application ':!crates/application/src/player_catalog.rs' | head -n 600 || true
