@@ -114,12 +114,35 @@ jobs:
           node scripts/verify-protected-assets-deterministic.mjs
           npm run verify:architecture
 
-      - name: Check and test application
+      - name: Check application
+        id: application_check
+        continue-on-error: true
         shell: pwsh
         run: |
           cargo fmt --all -- --check
-          cargo check --locked -p football-application
-          cargo test --locked -p football-application
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          $output = & cargo check --locked -p football-application 2>&1
+          $code = $LASTEXITCODE
+          $output | Tee-Object -FilePath r3-02-application-check.log
+          exit $code
+
+      - name: Upload application check log
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: r3-02-application-check
+          path: r3-02-application-check.log
+          if-no-files-found: warn
+
+      - name: Fail if application check failed
+        if: steps.application_check.outcome == 'failure'
+        shell: pwsh
+        run: exit 1
+
+      - name: Test application
+        if: steps.application_check.outcome == 'success'
+        shell: pwsh
+        run: cargo test --locked -p football-application
 
       - name: Commit validated R3-02 support updates and remove workflow
         if: success()
