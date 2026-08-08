@@ -3,7 +3,8 @@ use async_trait::async_trait;
 use chrono::{DateTime, Utc};
 use football_domain::{
     P4FreezeReadiness, P4FreezeTaskDraft, P4FreezeTaskEventRecord, P4FreezeTaskRecord,
-    P4FreezeTaskTransition, PredictionSummary, PreparedMatchPredictionInput, RouteDecision,
+    P4FreezeTaskTransition, P4MatchWorkspace, P4PlanningMatchContext, P4TaskWorkspace,
+    PredictionSummary, PreparedMatchPredictionInput, RouteDecision,
 };
 use football_model_api::{ModelOutput, ModelRequest};
 use uuid::Uuid;
@@ -70,6 +71,18 @@ pub trait ModelRunPort: Send + Sync {
 
 #[async_trait]
 pub trait PredictionWorkflowPort: Send + Sync {
+    async fn planning_match_context(&self, match_id: Uuid) -> PortResult<P4PlanningMatchContext>;
+    async fn find_freeze_task_by_idempotency(
+        &self,
+        idempotency_key: &str,
+    ) -> PortResult<Option<P4FreezeTaskRecord>>;
+    async fn list_freeze_tasks(
+        &self,
+        match_id: Option<Uuid>,
+        limit: u32,
+    ) -> PortResult<Vec<P4FreezeTaskRecord>>;
+    async fn read_match_workspace(&self, match_id: Uuid) -> PortResult<P4MatchWorkspace>;
+    async fn read_task_workspace(&self, task_id: Uuid) -> PortResult<P4TaskWorkspace>;
     async fn create_freeze_task(&self, draft: &P4FreezeTaskDraft)
         -> PortResult<P4FreezeTaskRecord>;
     async fn read_freeze_task(&self, task_id: Uuid) -> PortResult<P4FreezeTaskRecord>;

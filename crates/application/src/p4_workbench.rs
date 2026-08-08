@@ -14,28 +14,6 @@ use std::collections::BTreeSet;
 use uuid::Uuid;
 
 impl ApplicationService {
-    pub async fn read_p4_match_workspace(
-        &self,
-        match_id: Uuid,
-    ) -> ApplicationResult<P4MatchWorkspace> {
-        Ok(self
-            .active_store()
-            .await?
-            .read_p4_match_workspace(match_id)
-            .await?)
-    }
-
-    pub async fn read_p4_task_workspace(
-        &self,
-        task_id: Uuid,
-    ) -> ApplicationResult<P4TaskWorkspace> {
-        Ok(self
-            .active_store()
-            .await?
-            .read_p4_task_workspace(task_id)
-            .await?)
-    }
-
     pub async fn resolve_p4_conflict(
         &self,
         command: ResolveP4ConflictCommand,

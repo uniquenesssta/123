@@ -2,14 +2,19 @@ use crate::model_registry::ModelRegistry;
 use crate::ports::prediction::ModelRunHistoryItem;
 use crate::use_cases::prediction::{
     dry_run_default_fixture, execute_prediction, execute_prediction_from_match,
-    hide_run_from_history, inspect_match_prediction_readiness, list_recent_runs, preview_route,
-    read_run, PredictionAccess,
+    hide_run_from_history, inspect_match_prediction_readiness, list_p4_freeze_task_events,
+    list_p4_freeze_tasks, list_recent_runs, p4_freeze_readiness, plan_p4_horizons, preview_route,
+    read_p4_freeze_task, read_p4_match_workspace, read_p4_task_workspace, read_run,
+    P4PlanningAccess, PredictionAccess,
 };
 use crate::{
     ApplicationResult, PredictionCommand, PredictionExecution, RoutePreviewCommand,
     StoredMatchPredictionCommand,
 };
-use football_domain::{MatchPredictionReadiness, RouteDecision};
+use football_domain::{
+    MatchPredictionReadiness, P4FreezeReadiness, P4FreezeTaskEventRecord, P4FreezeTaskRecord,
+    P4MatchWorkspace, P4TaskWorkspace, PlanP4HorizonsCommand, RouteDecision,
+};
 use football_model_api::ModelOutput;
 use serde_json::Value;
 use uuid::Uuid;
@@ -88,6 +93,75 @@ impl PredictionService {
         reason: Option<String>,
     ) -> ApplicationResult<()> {
         hide_run_from_history::execute(port, run_id, reason).await
+    }
+
+    pub(crate) async fn plan_p4_horizons<P: P4PlanningAccess + ?Sized>(
+        &self,
+        port: &P,
+        command: PlanP4HorizonsCommand,
+    ) -> ApplicationResult<Vec<P4FreezeTaskRecord>> {
+        plan_p4_horizons::execute(port, command).await
+    }
+
+    pub(crate) async fn list_p4_freeze_tasks<
+        P: crate::ports::prediction::PredictionWorkflowPort + ?Sized,
+    >(
+        &self,
+        port: &P,
+        match_id: Option<Uuid>,
+        limit: u32,
+    ) -> ApplicationResult<Vec<P4FreezeTaskRecord>> {
+        list_p4_freeze_tasks::execute(port, match_id, limit).await
+    }
+
+    pub(crate) async fn read_p4_freeze_task<
+        P: crate::ports::prediction::PredictionWorkflowPort + ?Sized,
+    >(
+        &self,
+        port: &P,
+        task_id: Uuid,
+    ) -> ApplicationResult<P4FreezeTaskRecord> {
+        read_p4_freeze_task::execute(port, task_id).await
+    }
+
+    pub(crate) async fn list_p4_freeze_task_events<
+        P: crate::ports::prediction::PredictionWorkflowPort + ?Sized,
+    >(
+        &self,
+        port: &P,
+        task_id: Uuid,
+    ) -> ApplicationResult<Vec<P4FreezeTaskEventRecord>> {
+        list_p4_freeze_task_events::execute(port, task_id).await
+    }
+
+    pub(crate) async fn p4_freeze_readiness<
+        P: crate::ports::prediction::PredictionWorkflowPort + ?Sized,
+    >(
+        &self,
+        port: &P,
+        task_id: Uuid,
+    ) -> ApplicationResult<P4FreezeReadiness> {
+        p4_freeze_readiness::execute(port, task_id).await
+    }
+
+    pub(crate) async fn read_p4_match_workspace<
+        P: crate::ports::prediction::PredictionWorkflowPort + ?Sized,
+    >(
+        &self,
+        port: &P,
+        match_id: Uuid,
+    ) -> ApplicationResult<P4MatchWorkspace> {
+        read_p4_match_workspace::execute(port, match_id).await
+    }
+
+    pub(crate) async fn read_p4_task_workspace<
+        P: crate::ports::prediction::PredictionWorkflowPort + ?Sized,
+    >(
+        &self,
+        port: &P,
+        task_id: Uuid,
+    ) -> ApplicationResult<P4TaskWorkspace> {
+        read_p4_task_workspace::execute(port, task_id).await
     }
 
     pub(crate) async fn read_run<P: PredictionAccess + ?Sized>(

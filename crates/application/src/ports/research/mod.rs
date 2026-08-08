@@ -12,6 +12,8 @@ use uuid::Uuid;
 
 #[async_trait]
 pub trait ResearchArtifactPort: Send + Sync {
+    async fn read_schema(&self, schema_key: &str, version: &str)
+        -> PortResult<SchemaVersionRecord>;
     async fn register_schema(&self, draft: &SchemaVersionDraft) -> PortResult<SchemaVersionRecord>;
     async fn register_prompt(&self, draft: &PromptVersionDraft) -> PortResult<PromptVersionRecord>;
     async fn register_source_policy(

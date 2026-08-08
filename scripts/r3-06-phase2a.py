@@ -204,16 +204,16 @@ shared_mod.write_text(shared, encoding="utf-8", newline="\n")
 # Migrate plan_p4_horizons through existing Ports.
 plan = method_body(orch, "plan_p4_horizons")
 plan = plan.replace("let store = self.active_store().await?;", "let store = port;")
-plan = plan.replace("store.p4_planning_match_context(", "store.planning_match_context(")
-plan = plan.replace("store.read_schema_version_by_key(", "store.read_schema(")
-plan = plan.replace("store.find_p4_freeze_task_by_idempotency(", "store.find_freeze_task_by_idempotency(")
-plan = plan.replace("store.create_p4_freeze_task(", "store.create_freeze_task(")
-plan = plan.replace("store.enqueue_job(", "store.enqueue(")
-plan = plan.replace("store.transition_p4_freeze_task(&P4FreezeTaskTransition {", "store.transition_freeze_task(task.id, &P4FreezeTaskTransition {")
+plan = plan.replace(".p4_planning_match_context(", ".planning_match_context(")
+plan = plan.replace(".read_schema_version_by_key(", ".read_schema(")
+plan = plan.replace(".find_p4_freeze_task_by_idempotency(", ".find_freeze_task_by_idempotency(")
+plan = plan.replace(".create_p4_freeze_task(", ".create_freeze_task(")
+plan = plan.replace(".enqueue_job(", ".enqueue(")
+plan = plan.replace(".transition_p4_freeze_task(&P4FreezeTaskTransition {", ".transition_freeze_task(task.id, &P4FreezeTaskTransition {")
 write(
     "crates/application/src/use_cases/prediction/plan_p4_horizons/mod.rs",
-    f'''use super::super::P4PlanningAccess;
-use super::super::shared::p4_planning::{{
+    f'''use super::P4PlanningAccess;
+use super::shared::p4_planning::{{
     horizon_priority, is_p4_model, validate_existing_task_identity, validate_requested_fact_keys,
 }};
 use crate::built_in_artifacts::{{
@@ -400,8 +400,8 @@ research_path.write_text(research, encoding="utf-8", newline="\n")
 adapter_path = ROOT / "crates/application/src/composition/adapters/prediction.rs"
 adapter = adapter_path.read_text(encoding="utf-8")
 adapter = adapter.replace(
-    "        ModelRunHistoryItem, ModelRunPort, PredictionInputPort, SerializedModelRun,\n",
-    "        ModelRunHistoryItem, ModelRunPort, PredictionInputPort, PredictionWorkflowPort,\n        SerializedModelRun,\n",
+    "    prediction::{ModelRunHistoryItem, ModelRunPort, PredictionInputPort, SerializedModelRun},\n",
+    "    prediction::{\n        ModelRunHistoryItem, ModelRunPort, PredictionInputPort, PredictionWorkflowPort,\n        SerializedModelRun,\n    },\n",
 )
 adapter = adapter.replace(
     "use football_domain::{PredictionSummary, PreparedMatchPredictionInput, RouteDecision};",

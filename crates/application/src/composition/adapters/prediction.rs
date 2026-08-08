@@ -1,11 +1,18 @@
 use super::super::port_registry::{map_persistence_error, ActiveDatabase, ModelRunListItem};
 use crate::ports::{
-    prediction::{ModelRunHistoryItem, ModelRunPort, PredictionInputPort, SerializedModelRun},
+    prediction::{
+        ModelRunHistoryItem, ModelRunPort, PredictionInputPort, PredictionWorkflowPort,
+        SerializedModelRun,
+    },
     PortError, PortErrorKind, PortResult,
 };
 use async_trait::async_trait;
 use chrono::{DateTime, Utc};
-use football_domain::{PredictionSummary, PreparedMatchPredictionInput, RouteDecision};
+use football_domain::{
+    P4FreezeReadiness, P4FreezeTaskDraft, P4FreezeTaskEventRecord, P4FreezeTaskRecord,
+    P4FreezeTaskTransition, P4MatchWorkspace, P4PlanningMatchContext, P4TaskWorkspace,
+    PredictionSummary, PreparedMatchPredictionInput, RouteDecision,
+};
 use football_model_api::{ModelOutput, ModelRequest};
 use uuid::Uuid;
 
@@ -138,4 +145,100 @@ pub(crate) fn model_run_list_item_from_port(
         input_readiness_score: item.input_readiness_score,
         input_manifest_sha256: item.input_manifest_sha256,
     })
+}
+
+#[async_trait]
+impl PredictionWorkflowPort for ActiveDatabase {
+    async fn planning_match_context(&self, match_id: Uuid) -> PortResult<P4PlanningMatchContext> {
+        self.transition_store()
+            .p4_planning_match_context(match_id)
+            .await
+            .map_err(map_persistence_error)
+    }
+
+    async fn find_freeze_task_by_idempotency(
+        &self,
+        idempotency_key: &str,
+    ) -> PortResult<Option<P4FreezeTaskRecord>> {
+        self.transition_store()
+            .find_p4_freeze_task_by_idempotency(idempotency_key)
+            .await
+            .map_err(map_persistence_error)
+    }
+
+    async fn list_freeze_tasks(
+        &self,
+        match_id: Option<Uuid>,
+        limit: u32,
+    ) -> PortResult<Vec<P4FreezeTaskRecord>> {
+        self.transition_store()
+            .list_p4_freeze_tasks(match_id, limit)
+            .await
+            .map_err(map_persistence_error)
+    }
+
+    async fn create_freeze_task(
+        &self,
+        draft: &P4FreezeTaskDraft,
+    ) -> PortResult<P4FreezeTaskRecord> {
+        self.transition_store()
+            .create_p4_freeze_task(draft)
+            .await
+            .map_err(map_persistence_error)
+    }
+
+    async fn read_freeze_task(&self, task_id: Uuid) -> PortResult<P4FreezeTaskRecord> {
+        self.transition_store()
+            .read_p4_freeze_task(task_id)
+            .await
+            .map_err(map_persistence_error)
+    }
+
+    async fn list_freeze_task_events(
+        &self,
+        task_id: Uuid,
+    ) -> PortResult<Vec<P4FreezeTaskEventRecord>> {
+        self.transition_store()
+            .list_p4_freeze_task_events(task_id)
+            .await
+            .map_err(map_persistence_error)
+    }
+
+    async fn transition_freeze_task(
+        &self,
+        task_id: Uuid,
+        transition: &P4FreezeTaskTransition,
+    ) -> PortResult<P4FreezeTaskRecord> {
+        if transition.task_id != task_id {
+            return Err(PortError::new(
+                PortErrorKind::InvalidState,
+                "P4冻结任务迁移的task_id与transition不一致",
+            ));
+        }
+        self.transition_store()
+            .transition_p4_freeze_task(transition)
+            .await
+            .map_err(map_persistence_error)
+    }
+
+    async fn freeze_readiness(&self, task_id: Uuid) -> PortResult<P4FreezeReadiness> {
+        self.transition_store()
+            .p4_freeze_readiness(task_id)
+            .await
+            .map_err(map_persistence_error)
+    }
+
+    async fn read_match_workspace(&self, match_id: Uuid) -> PortResult<P4MatchWorkspace> {
+        self.transition_store()
+            .read_p4_match_workspace(match_id)
+            .await
+            .map_err(map_persistence_error)
+    }
+
+    async fn read_task_workspace(&self, task_id: Uuid) -> PortResult<P4TaskWorkspace> {
+        self.transition_store()
+            .read_p4_task_workspace(task_id)
+            .await
+            .map_err(map_persistence_error)
+    }
 }
