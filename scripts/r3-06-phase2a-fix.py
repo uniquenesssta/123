@@ -18,4 +18,23 @@ if old_target not in text or old_replacement not in text:
 text = text.replace(old_target, new_target, 1)
 text = text.replace(old_replacement, new_replacement, 1)
 
+planner_rewrites = {
+    'plan = plan.replace("store.p4_planning_match_context(", "store.planning_match_context(")':
+        'plan = plan.replace(".p4_planning_match_context(", ".planning_match_context(")',
+    'plan = plan.replace("store.read_schema_version_by_key(", "store.read_schema(")':
+        'plan = plan.replace(".read_schema_version_by_key(", ".read_schema(")',
+    'plan = plan.replace("store.find_p4_freeze_task_by_idempotency(", "store.find_freeze_task_by_idempotency(")':
+        'plan = plan.replace(".find_p4_freeze_task_by_idempotency(", ".find_freeze_task_by_idempotency(")',
+    'plan = plan.replace("store.create_p4_freeze_task(", "store.create_freeze_task(")':
+        'plan = plan.replace(".create_p4_freeze_task(", ".create_freeze_task(")',
+    'plan = plan.replace("store.enqueue_job(", "store.enqueue(")':
+        'plan = plan.replace(".enqueue_job(", ".enqueue(")',
+    'plan = plan.replace("store.transition_p4_freeze_task(&P4FreezeTaskTransition {", "store.transition_freeze_task(task.id, &P4FreezeTaskTransition {")':
+        'plan = plan.replace(".transition_p4_freeze_task(&P4FreezeTaskTransition {", ".transition_freeze_task(task.id, &P4FreezeTaskTransition {")',
+}
+for old, new in planner_rewrites.items():
+    if old not in text:
+        raise RuntimeError(f"phase2a planner rewrite template not found: {old}")
+    text = text.replace(old, new, 1)
+
 GENERATOR.write_text(text, encoding="utf-8", newline="\n")
