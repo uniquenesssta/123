@@ -62,9 +62,7 @@ impl ApplicationService {
         draft: TeamLineupPresetDraft,
     ) -> ApplicationResult<TeamLineupPresetRecord> {
         let session = self.lineup_session().await?;
-        self.lineups
-            .save_team_lineup_preset(&session, draft)
-            .await
+        self.lineups.save_team_lineup_preset(&session, draft).await
     }
     pub async fn list_team_lineup_presets(
         &self,
