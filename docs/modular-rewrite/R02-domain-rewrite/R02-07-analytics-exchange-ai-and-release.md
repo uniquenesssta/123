@@ -82,16 +82,17 @@
 
 ## 6. 当前验证状态
 
-- 源码迁移与旧文件删除已提交到 `new-B`。
-- Windows 本机最小验证、阶段回归、类型清单重新生成与最终文档收口仍待执行。
-- 任一最小验证失败时保持 `VERIFYING` 并停止进入 R2-08。
+- Windows 本机首次最小验证已执行。
+- `cargo test --locked -p football-domain --test serde_contracts`：17/17 通过，R2-07 四组模块身份契约均通过。
+- `cargo fmt --all -- --check`：首次失败，仅发现 `exchange/spreadsheet/import.rs` 与 `r2_07_module_paths.rs` 的 rustfmt 排版差异，无编译或契约失败。
+- 已按 rustfmt 输出修正上述两处排版，提交为 `982e0e87c0186c1347488dc73a2e6f83e535584e` 与 `06a75da6e8bc6c93a080d4557307d8856a8e29f7`；未修改业务逻辑、Serde、公共接口或依赖。
+- 当前等待 Windows 本机重新执行 `cargo fmt --all -- --check`；通过前保持 `VERIFYING`，不进入下一门禁。
 
 ## 7. 待完成门禁
 
-- `cargo fmt --all -- --check`
+- `cargo fmt --all -- --check`（修复后重跑）
 - `node scripts/generate-domain-type-inventory.mjs`
 - `node scripts/verify-domain-type-inventory.mjs`
-- `cargo test --locked -p football-domain --test serde_contracts`
 - `npm run verify:architecture`
 - `node scripts/verify-protected-assets-deterministic.mjs`
 - `npm run verify:frontend`
