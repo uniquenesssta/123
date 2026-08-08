@@ -38,7 +38,8 @@ R2 已完成并关闭。R3 只重写 Application 编排与 Ports/Services/Use Ca
 - `verify:application-ports` 已接入 `verify:architecture`，锁定职责目录、trait 集合和过渡导入唯一所有者。
 - 用户 Windows 本机已通过 `cargo fmt --all -- --check`、Application Ports、Domain 类型清单、完整 `verify:architecture`、`cargo check --locked -p football-application`、workspace Clippy `-D warnings` 和完整 workspace tests。
 - workspace tests 中 18 个真实 PostgreSQL 集成测试因未设置 `FOOTBALL_TEST_DATABASE_URL` 按既有显式设计保持 `ignored`；没有将其记为已执行。
-- `npm run verify:frontend` 首次在旧验证器路径 `crates/domain/src/monthly_workbook.rs` 处以 ENOENT 停止；此前专项均已通过。该路径已在提交 `dee553026c03193e7f4298e0e4a963693b14b893` 修正为 R2-07 后的 `exchange/monthly/contract.rs` 与 `exchange/spreadsheet/contract.rs`，未修改产品行为。
+- `npm run verify:frontend` 第一次在旧 `monthly_workbook.rs` 路径停止，提交 `dee553026c03193e7f4298e0e4a963693b14b893` 修复后月度工作簿专项已通过。
+- 第二次 frontend 回归继续推进到 `verify-match-lineup-chain.mjs`，其仍读取已删除的 `crates/domain/src/exchange.rs`。提交 `55aab2cf49180fbd2798846926a6ce3beca4394f` 已切换到当前唯一职责文件 `crates/domain/src/exchange/lineup.rs`；仍未修改产品行为。
 
 ## R3-01 剩余门禁
 
