@@ -1,0 +1,39 @@
+name: R3-06 Prediction Scan
+
+on:
+  push:
+    branches:
+      - rewrite/r3-06-prediction-service
+
+jobs:
+  scan:
+    runs-on: windows-2025
+    steps:
+      - uses: actions/checkout@v4
+      - name: Scan prediction surface
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          Write-Host '=== APPLICATION PUBLIC METHODS ==='
+          $files = @(
+            'crates/application/src/prediction.rs',
+            'crates/application/src/p4_orchestration.rs',
+            'crates/application/src/p4_workbench.rs',
+            'crates/application/src/p4_persistence.rs'
+          )
+          foreach ($file in $files) {
+            Write-Host "--- $file ---"
+            Select-String -Path $file -Pattern '^\s*pub(?:\([^)]*\))?\s+(?:async\s+)?fn\s+([A-Za-z0-9_]+)' | ForEach-Object { $_.Line.Trim() }
+          }
+          Write-Host '=== ACTIVE STORE / PERSISTENCE CALLS ==='
+          foreach ($file in $files) {
+            Write-Host "--- $file ---"
+            Select-String -Path $file -Pattern '\.(?<name>[A-Za-z0-9_]+)\(' -AllMatches | ForEach-Object {
+              foreach ($match in $_.Matches) { $match.Groups['name'].Value }
+            } | Sort-Object -Unique
+          }
+          Write-Host '=== TAURI ENTRY CALLS ==='
+          foreach ($file in @('src-tauri/src/commands/prediction.rs','src-tauri/src/commands/orchestration.rs','src-tauri/src/commands/catalog.rs')) {
+            Write-Host "--- $file ---"
+            Select-String -Path $file -Pattern '\.service\s*$|\.([A-Za-z0-9_]+)\(' -Context 0,2 | ForEach-Object { $_.Line.Trim() }
+          }
