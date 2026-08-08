@@ -10,7 +10,7 @@ Teams / Players Services 源码重写与实施侧 Windows 严格验证已完成�
 
 - R3-04 起点：`212723ce9e0245a37a70f23feda1f156f9ab959a`（R3-03 `DONE` 后开放 R3-04）。
 - 实施保护分支：`rewrite/r3-04-teams-players`。
-- 当前实施侧已验证源码提交：`3844aaf704b51b5c84da1a44cbd293b4711b8e2c`；清理临时 workflow 后保护分支 HEAD 为 `d1928dfd5774b9f447a9a869ae043e24ab8406f7`。
+- 实施侧已验证源码提交：`3844aaf704b51b5c84da1a44cbd293b4711b8e2c`；验证与临时 workflow 清理完成后源码树进入文档同步，并最终快进到 `new-C`。
 - 范围：球队目录/详情/编辑/名称/profile、球员目录/详情/编辑/名称/位置/球队履历、球员可用性/能力观察/动态标签/比赛贡献、教练与教练履历、实体引用与匹配、删除预检/批量归档、球队强制删除、数据提供方与外部实体 ID。
 - 排除范围：阵型、比赛、阵容、阵容预设及比赛阵容链，这些职责明确保留给 R3-05；不修改具体 PostgreSQL SQL、迁移、Tauri DTO、前端状态、模型实现或生产依赖。
 
@@ -77,7 +77,7 @@ Windows 2025 严格修复/验证 run `31258038424` / job `93104371481` 全部通
 
 已通过：
 
-- Domain 类型清单重新生成与验证：365 个类型、365 个公共兼容类型、299 个 PostgreSQL 映射类型；当前扫描 377 个 Rust 文件。
+- Domain 类型清单重新生成与验证：365 个类型、365 个公共兼容类型、299 个 PostgreSQL 映射类型，当前清单扫描 129 个来源文件；架构受保护导入检查覆盖 377 个 Rust 文件。
 - `npm run verify:teams-players-service`：43 个 Service / Use Case Rust 文件，35 个公开 Application 职责已切换 Ports，R3-05 职责保持原位。
 - `node scripts/verify-entity-relationships.mjs`。
 - `node scripts/verify-force-team-delete.mjs`。
