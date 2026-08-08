@@ -36,14 +36,14 @@ R2 已完成并关闭。R3 只重写 Application 编排与 Ports/Services/Use Ca
 - `football-model-api` 继续作为模型执行边界，不复制一套模型协议。
 - 当前 concrete PostgreSQL 导入仍由 R1 组合根暂时持有，后续 R3-02 至 R3-09 按服务迁移逐步接入适配器；R3-01 不改业务行为。
 - `verify:application-ports` 已接入 `verify:architecture`，锁定职责目录、trait 集合和过渡导入唯一所有者。
-- 用户 Windows 本机已在干净 `new-C` 工作树通过 `cargo fmt --all -- --check`、Application Ports、Domain 类型清单、完整 `verify:architecture` 和 `cargo check --locked -p football-application`。
+- 用户 Windows 本机已通过 `cargo fmt --all -- --check`、Application Ports、Domain 类型清单、完整 `verify:architecture`、`cargo check --locked -p football-application`、workspace Clippy `-D warnings` 和完整 workspace tests。
+- workspace tests 中 18 个真实 PostgreSQL 集成测试因未设置 `FOOTBALL_TEST_DATABASE_URL` 按既有显式设计保持 `ignored`；没有将其记为已执行。
+- `npm run verify:frontend` 首次在旧验证器路径 `crates/domain/src/monthly_workbook.rs` 处以 ENOENT 停止；此前专项均已通过。该路径已在提交 `dee553026c03193e7f4298e0e4a963693b14b893` 修正为 R2-07 后的 `exchange/monthly/contract.rs` 与 `exchange/spreadsheet/contract.rs`，未修改产品行为。
 
 ## R3-01 剩余门禁
 
-原任务书要求节点关闭前继续完成完整阶段回归：
+当前只剩用户 Windows 本机拉取最新 `new-C` 后重新运行：
 
 - `npm run verify:frontend`
-- `cargo clippy --locked --workspace --all-targets -- -D warnings`
-- `cargo test --locked --workspace`
 
-这三项本机结果未确认前，R3-01 保持 `VERIFYING`，R3-02 保持 `BLOCKED`。详细记录见 [`R03-01-application-ports-设计.md`](./R03-01-application-ports-设计.md)。
+完整 frontend 回归通过后，R3-01 才能改为 `DONE` 并将 R3-02 改为 `READY`。详细记录见 [`R03-01-application-ports-设计.md`](./R03-01-application-ports-设计.md)。
