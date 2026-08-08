@@ -1,0 +1,117 @@
+name: Temporary R3-01 Finalize
+
+on:
+  push:
+    branches:
+      - new-C
+
+permissions:
+  contents: write
+
+concurrency:
+  group: temp-r3-01-finalize-new-C
+  cancel-in-progress: false
+
+jobs:
+  finalize:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: windows-2025
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: new-C
+          fetch-depth: 0
+
+      - uses: dtolnay/rust-toolchain@1.88.0
+        with:
+          components: rustfmt, clippy
+
+      - name: Rebuild R3-01 implementation deterministically
+        shell: pwsh
+        run: |
+          @'
+          import subprocess
+          from pathlib import Path
+
+          def show(commit, path):
+              return subprocess.check_output(
+                  ["git", "show", f"{commit}:{path}"],
+                  text=True,
+                  encoding="utf-8",
+              )
+
+          source = show(
+              "fb90d8dc829f725365d53df0e23ebd1d4cf3c7ce",
+              ".github/workflows/temp-r3-01-ports.yml",
+          )
+          start_marker = "          @'\n"
+          end_marker = "\n          '@ | python -"
+          start = source.index(start_marker) + len(start_marker)
+          end = source.index(end_marker, start)
+          block = source[start:end]
+          script = "\n".join(
+              line[10:] if line.startswith("          ") else line
+              for line in block.splitlines()
+          )
+          exec(compile(script, "r3_01_generation.py", "exec"), {})
+
+          retry = show(
+              "a7d71ad0df3b0e681d5ebac04d6b4de21d6c9644",
+              ".github/workflows/temp-r3-01-ports.yml",
+          )
+          js_start_marker = "          @'\n          import fs from \"node:fs\";"
+          js_end_marker = "\n          '@ | Set-Content -Path 'scripts/verify-application-ports.mjs' -Encoding utf8"
+          js_start = retry.index(js_start_marker) + len("          @'\n")
+          js_end = retry.index(js_end_marker, js_start)
+          js_block = retry[js_start:js_end]
+          js = "\n".join(
+              line[10:] if line.startswith("          ") else line
+              for line in js_block.splitlines()
+          ) + "\n"
+          Path("scripts/verify-application-ports.mjs").write_text(
+              js,
+              encoding="utf-8",
+              newline="\n",
+          )
+          '@ | python -
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+
+      - name: Refresh inventories and verify R3-01
+        shell: pwsh
+        run: |
+          node --check scripts/verify-application-ports.mjs
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          cargo fmt --all
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          cargo fmt --all -- --check
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          node scripts/verify-application-ports.mjs
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          node scripts/generate-domain-type-inventory.mjs
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          node scripts/verify-domain-type-inventory.mjs
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          npm run verify:architecture
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          cargo check --locked -p football-application
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          git diff --check
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+
+      - name: Commit verified R3-01 implementation
+        shell: pwsh
+        run: |
+          Remove-Item '.github/workflows/temp-r3-port-scan.yml' -Force -ErrorAction SilentlyContinue
+          Remove-Item '.github/workflows/temp-r3-01-ports.yml' -Force -ErrorAction SilentlyContinue
+          Remove-Item '.github/workflows/temp-r3-01-finalize.yml' -Force -ErrorAction SilentlyContinue
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add crates/application/src/ports crates/application/src/lib.rs architecture/application-port-inventory.json architecture/domain-type-inventory.json scripts/verify-application-ports.mjs package.json README.md docs/modular-rewrite/R03-application-services .github/workflows/temp-r3-port-scan.yml .github/workflows/temp-r3-01-ports.yml .github/workflows/temp-r3-01-finalize.yml
+          git diff --cached --check
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          git diff --cached --quiet
+          if ($LASTEXITCODE -eq 0) { throw 'no R3-01 changes staged' }
+          git commit -m 'refactor(application): define minimal service ports'
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          git push origin HEAD:new-C
