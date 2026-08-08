@@ -53,6 +53,7 @@ const composition = read(
 );
 const portRegistry = read("crates/application/src/composition/port_registry.rs");
 const service = read("crates/application/src/service/application_service.rs");
+const databaseService = read("crates/application/src/services/database/service.rs");
 const modelRegistry = read(
   "crates/application/src/model_registry/registry.rs",
 );
@@ -105,8 +106,8 @@ check(
   "活动数据库状态未归属端口模块",
 );
 check(
-  portRegistry.includes("RwLock<Option<ActiveDatabase>>"),
-  "端口注册表未持有活动数据库槽位",
+  databaseService.includes("pub(crate) session: RwLock<Option<ActiveDatabase>>"),
+  "DatabaseService 未持有活动数据库槽位",
 );
 check(service.includes("pub struct ApplicationService"), "缺少兼容 ApplicationService 门面");
 check(
@@ -169,7 +170,7 @@ const activeDatabaseState = stateContract.states?.find(
 );
 check(
   activeDatabaseState?.owner ===
-    "crates/application/src/service/application_service.rs::ApplicationService.database",
+    "crates/application/src/services/database/service.rs::DatabaseService.session",
   "活动数据库状态所有者未切换",
 );
 const p4WorkerState = stateContract.states?.find(

@@ -1,9 +1,9 @@
+use crate::use_cases::database::{health, statistics};
 use crate::{
     composition::{database_health_from_snapshot, database_stats_from_statistics},
-    default_match, default_rule_package_template,
-    ApplicationResult, ApplicationService, BootstrapData,
+    default_match, default_rule_package_template, ApplicationResult, ApplicationService,
+    BootstrapData,
 };
-use crate::use_cases::database::{health, statistics};
 
 impl ApplicationService {
     pub async fn bootstrap(&self) -> ApplicationResult<BootstrapData> {
@@ -24,7 +24,9 @@ impl ApplicationService {
             let store = active.transition_store();
             (
                 Some(active.redacted_url().to_string()),
-                Some(database_health_from_snapshot(health::execute(&active).await?)),
+                Some(database_health_from_snapshot(
+                    health::execute(&active).await?,
+                )),
                 Some(database_stats_from_statistics(
                     statistics::execute(&active).await?,
                 )),

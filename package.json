@@ -11,7 +11,7 @@
     "tauri:dev": "node scripts/run-tauri.mjs dev",
     "tauri:build": "node scripts/run-tauri.mjs build",
     "verify:frontend": "node scripts/verify-frontend.mjs",
-    "verify:architecture": "node scripts/architecture/verifyModuleBoundaries.mjs && node scripts/architecture/verifyStateOwnership.mjs && node scripts/architecture/verifyProtectedImports.mjs && node scripts/verify-domain-type-inventory.mjs && node scripts/verify-domain-root-exports.mjs && node scripts/verify-application-ports.mjs",
+    "verify:architecture": "node scripts/architecture/verifyModuleBoundaries.mjs && node scripts/architecture/verifyStateOwnership.mjs && node scripts/architecture/verifyProtectedImports.mjs && node scripts/verify-domain-type-inventory.mjs && node scripts/verify-domain-root-exports.mjs && node scripts/verify-application-ports.mjs && node scripts/verify-database-service.mjs",
     "verify:browser-bootstrap": "node scripts/verify-browser-bootstrap.mjs",
     "verify:application-composition": "node scripts/verify-application-composition.mjs",
     "verify:domain-type-inventory": "node scripts/verify-domain-type-inventory.mjs",
@@ -87,7 +87,8 @@
     "verify:global-name-search": "node scripts/verify-global-name-search.mjs",
     "verify:search-query-state": "node scripts/verify-search-query-state.mjs",
     "verify:public-model-boundary": "node scripts/verify-public-model-boundary.mjs",
-    "verify:application-ports": "node scripts/verify-application-ports.mjs"
+    "verify:application-ports": "node scripts/verify-application-ports.mjs",
+    "verify:database-service": "node scripts/verify-database-service.mjs"
   },
   "dependencies": {
     "@tauri-apps/api": "2.11.1",

@@ -49,10 +49,7 @@ impl DatabaseService {
         Ok(PreparedDatabaseConnection { session })
     }
 
-    pub(crate) async fn activate(
-        &self,
-        prepared: PreparedDatabaseConnection,
-    ) -> PortResult<()> {
+    pub(crate) async fn activate(&self, prepared: PreparedDatabaseConnection) -> PortResult<()> {
         let previous = self.session.write().await.replace(prepared.session);
         if let Some(previous) = previous {
             previous.close().await?;

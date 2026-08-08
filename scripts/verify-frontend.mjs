@@ -13,6 +13,7 @@ const nodeChecks = [
   "verify-browser-bootstrap.mjs",
   "verify-tauri-bootstrap.mjs",
   "verify-application-composition.mjs",
+  "verify-database-service.mjs",
   "verify-node-process-compatibility.mjs",
   "verify-windows-path-contract.mjs",
   "verify-public-model-boundary.mjs",

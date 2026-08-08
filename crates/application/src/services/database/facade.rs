@@ -1,6 +1,8 @@
 use super::service::PreparedDatabaseConnection;
 use crate::{
-    composition::{database_health_from_snapshot, DatabaseHealth, DatabaseOptions, PersistenceStore},
+    composition::{
+        database_health_from_snapshot, DatabaseHealth, DatabaseOptions, PersistenceStore,
+    },
     rule_packages::built_in_rule_packages,
     ApplicationError, ApplicationResult, ApplicationService,
 };

@@ -10,7 +10,9 @@ const catalog = read("crates/persistence-postgres/src/player_catalog.rs");
 const connection = read("crates/persistence-postgres/src/connection.rs");
 const integration = read("crates/persistence-postgres/tests/postgres_integration.rs");
 const command = read("src-tauri/src/commands/database.rs");
-const applicationDatabase = read("crates/application/src/database.rs");
+const databaseFacade = read("crates/application/src/services/database/facade.rs");
+const databaseService = read("crates/application/src/services/database/service.rs");
+const resetUseCase = read("crates/application/src/use_cases/database/reset/mod.rs");
 const tauri = read("src-tauri/src/bootstrap/command_registry.rs");
 const client = read("src/api/client.ts");
 const page = read("src/pages/database.ts");
@@ -66,12 +68,18 @@ requireText(integration, "destructive_reset_rebuilds_an_empty_migrated_database"
 requireText(integration, "assert_eq!(team_count, 0)", "清空后业务数据为空断言");
 
 requireText(command, "pub async fn reset_database", "Tauri 清空命令");
-requireText(command, "confirmation.trim() != current_health.database_name", "后端数据库名称二次校验");
-requireText(command, "state.service.disconnect_database().await", "清空前停止活动数据库服务");
-requireText(command, "reset_store.reset_to_pristine().await", "执行彻底重建");
-requireText(command, "state.service.connect_database(options)", "清空后自动恢复连接");
+requireText(command, "state.service.preflight_database_reset", "后端数据库名称二次校验");
+requireText(command, ".reset_database(options, confirmation)", "Tauri 委托 Application 清空用例");
+if (command.includes("PostgresStore::connect") || command.includes("reset_store.reset_to_pristine")) {
+  throw new Error("Tauri 数据库命令不得直接连接 PostgreSQL 或执行彻底重建");
+}
+requireText(databaseService, "self.disconnect().await?", "清空前停止活动数据库服务");
+requireText(resetUseCase, "confirmation.trim() != health.database_name", "Application 清空用例数据库名称强确认");
+requireText(resetUseCase, "保存的连接配置与当前数据库不一致，已拒绝清空", "清空目标一致性门禁");
+requireText(resetUseCase, "port.reset_to_pristine().await", "通过 DatabaseLifecyclePort 执行彻底重建");
+requireText(databaseFacade, "self.connect_database(options)", "清空后自动恢复连接");
 requireText(command, "state.service.ensure_p4_orchestration_worker()", "清空后恢复P4后台工作器");
-requireText(applicationDatabase, "pub fn ensure_p4_orchestration_worker", "P4后台工作器幂等恢复入口");
+requireText(databaseFacade, "pub fn ensure_p4_orchestration_worker", "P4后台工作器幂等恢复入口");
 requireText(tauri, "commands::reset_database", "Tauri 命令注册");
 
 requireText(client, 'invoke("reset_database", { confirmation })', "前端 API 调用");
