@@ -79,7 +79,11 @@ check(adapter.includes("impl DatabaseObservabilityPort for ActiveDatabase"), "Po
 check(adapter.includes("PostgresStore as PersistenceStore"), "PostgreSQL 具体适配器入口缺失");
 
 check(facade.includes("initialize_database_contents"), "连接成功前的内置内容初始化顺序未保留");
-check(facade.includes("register_built_in_rule_packages"), "内置规则包注册链缺失");
+check(
+  facade.includes("self.rules") && facade.includes("register_built_ins"),
+  "内置规则包注册链未通过 Rules Service",
+);
+check(!facade.includes("register_built_in_rule_packages"), "Database facade 仍保留旧内置规则包注册实现");
 check(facade.includes("register_p4_persistence_artifacts"), "P4 persistence artifact 注册链缺失");
 check(facade.includes("register_openai_research_artifacts"), "research artifact 注册链缺失");
 check(bootstrap.includes("list_recent_runs(50)"), "bootstrap 最近运行读取语义发生变化");
