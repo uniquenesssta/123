@@ -11,7 +11,6 @@ mod openai_research;
 mod p4_orchestration;
 mod p4_persistence;
 mod p4_workbench;
-mod player_catalog;
 pub mod ports;
 mod postmatch;
 mod prediction;
