@@ -1,0 +1,43 @@
+name: Temporary R3-03 README Sync
+
+on:
+  push:
+    branches:
+      - new-C
+
+permissions:
+  contents: write
+
+jobs:
+  sync:
+    runs-on: windows-2025
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Update root README R3 record
+        shell: pwsh
+        run: |
+          @'
+          import fs from "node:fs";
+          const path = "README.md";
+          const text = fs.readFileSync(path, "utf8");
+          const replacement = "- R3 已从 R2 完成提交 `7cf906b8f98ab0fdcf89f80952bc8fb9cf21801f` 建立独立分支 `new-C`。R3-01 Application Ports 与 R3-02 Database Service 已完成；R3-03 已将赛事层级、规则包与赛事绑定重写到 `services/competition/`、`services/rules/` 及对应 `use_cases/`，并由组合根 Ports 适配 PostgreSQL。用户 Windows 本机最小验证、完整 frontend、完整 Rust 与 `tauri:dev` 已通过；runtime bootstrap `connection_error=null`，原数据库赛事层级与规则目录读取链正常。R3-03 验证过程中修复了公开模型边界旧路径以及保护资产聚合依赖宿主 locale 的历史问题，基础保护验证器现使用确定性 ordinal path sort，模型源码、参数、Profile 与私有资产范围未改变。当前仅等待用户本机重跑直接保护资产入口，R3-03 保持 `VERIFYING`，R3-04 继续 `BLOCKED`。";
+          const pattern = /^- R3 已从 R2 完成提交 .*$/m;
+          if (!pattern.test(text)) throw new Error("R3 README record not found");
+          const next = text.replace(pattern, replacement);
+          fs.writeFileSync(path, next, "utf8");
+          '@ | Set-Content -Encoding utf8 .tmp-r3-readme.mjs
+          node .tmp-r3-readme.mjs
+          Remove-Item .tmp-r3-readme.mjs
+      - name: Commit README and remove workflow
+        shell: pwsh
+        run: |
+          git diff --check
+          git config user.name "uniquenesssta"
+          git config user.email "uniquenesssta@live.com"
+          git add README.md
+          git commit -m "docs(r3): record R3-03 verification repairs"
+          git rm .github/workflows/temp-r3-03-readme-sync.yml
+          git commit -m "chore(r3): remove temporary README sync workflow"
+          git push origin HEAD:new-C
