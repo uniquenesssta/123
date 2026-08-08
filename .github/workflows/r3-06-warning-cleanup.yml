@@ -1,0 +1,56 @@
+name: R3-06 P4 Warning Cleanup
+
+on:
+  push:
+    branches:
+      - rewrite/r3-06-prediction-service
+
+permissions:
+  contents: write
+
+jobs:
+  cleanup:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: windows-2025
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: rewrite/r3-06-prediction-service
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - uses: dtolnay/rust-toolchain@1.88.0
+        with:
+          components: rustfmt,clippy
+      - name: Apply confirmed warning cleanup
+        shell: pwsh
+        run: python scripts/r3-06-warning-cleanup.py
+      - name: Format
+        shell: pwsh
+        run: cargo fmt --all
+      - name: Validate warning cleanup
+        shell: pwsh
+        run: |
+          node scripts/verify-application-ports.mjs
+          npm run verify:architecture
+          cargo fmt --all -- --check
+          cargo clippy --locked -p football-application --all-targets -- -D warnings
+          cargo test --locked -p football-application
+      - name: Commit clean warning cleanup
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git rm -f .github/workflows/r3-06-warning-cleanup.yml
+          git rm -f scripts/r3-06-warning-cleanup.py
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          git add -A
+          git diff --check
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          git commit -m "chore(r3): clean P4 migration warnings"
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          git push origin HEAD:rewrite/r3-06-prediction-service
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
