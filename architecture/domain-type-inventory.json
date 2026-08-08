@@ -20,7 +20,7 @@
       "externalCallers",
       "publicCompatibilityType"
     ],
-    "currentPublicExportPolicy": "root glob re-export is recorded as current debt and removed only in R2-08",
+    "currentPublicExportPolicy": "explicit re-export only",
     "targetPublicExportPolicy": "explicit re-export only"
   },
   "sourceDigest": "217241ac243726a5ab6805a7f169e222b97e78c7c971749a5904714af673ebdd",
@@ -105,7 +105,7 @@
       "serializationName": "AbilityCandidateDecision",
       "publicCompatibilityType": true,
       "compatibilityLevel": "root_public_compatibility",
-      "currentRootExport": "glob_reexport",
+      "currentRootExport": "explicit_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
@@ -171,7 +171,7 @@
       "serializationName": "AbilityCandidateDecisionDraft",
       "publicCompatibilityType": true,
       "compatibilityLevel": "root_public_compatibility",
-      "currentRootExport": "glob_reexport",
+      "currentRootExport": "explicit_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
@@ -246,7 +246,7 @@
       "serializationName": "AbilityCandidateProposal",
       "publicCompatibilityType": true,
       "compatibilityLevel": "root_public_compatibility",
-      "currentRootExport": "glob_reexport",
+      "currentRootExport": "explicit_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "none_detected",
       "domainCallers": [
@@ -311,7 +311,7 @@
       "serializationName": "AbilityCandidateStatus",
       "publicCompatibilityType": true,
       "compatibilityLevel": "root_public_compatibility",
-      "currentRootExport": "glob_reexport",
+      "currentRootExport": "explicit_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
@@ -383,7 +383,7 @@
       "serializationName": "AbilityDimensionRecord",
       "publicCompatibilityType": true,
       "compatibilityLevel": "root_public_compatibility",
-      "currentRootExport": "glob_reexport",
+      "currentRootExport": "explicit_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
@@ -505,7 +505,7 @@
       "serializationName": "AbilityUpdateCandidateRecord",
       "publicCompatibilityType": true,
       "compatibilityLevel": "root_public_compatibility",
-      "currentRootExport": "glob_reexport",
+      "currentRootExport": "explicit_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
@@ -577,7 +577,7 @@
       "serializationName": "AiAnalysisPackageData",
       "publicCompatibilityType": true,
       "compatibilityLevel": "root_public_compatibility",
-      "currentRootExport": "glob_reexport",
+      "currentRootExport": "explicit_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
@@ -651,7 +651,7 @@
       "serializationName": "AiAnalysisPackageManifest",
       "publicCompatibilityType": true,
       "compatibilityLevel": "root_public_compatibility",
-      "currentRootExport": "glob_reexport",
+      "currentRootExport": "explicit_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "none_detected",
       "domainCallers": [
@@ -714,7 +714,7 @@
       "serializationName": "AiAnalysisPackageSummary",
       "publicCompatibilityType": true,
       "compatibilityLevel": "root_public_compatibility",
-      "currentRootExport": "glob_reexport",
+      "currentRootExport": "explicit_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
@@ -786,7 +786,7 @@
       "serializationName": "AiAnalysisResponseManifest",
       "publicCompatibilityType": true,
       "compatibilityLevel": "root_public_compatibility",
-      "currentRootExport": "glob_reexport",
+      "currentRootExport": "explicit_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "none_detected",
       "domainCallers": [
@@ -846,7 +846,7 @@
       "serializationName": "AiAnalysisResponsePreview",
       "publicCompatibilityType": true,
       "compatibilityLevel": "root_public_compatibility",
-      "currentRootExport": "glob_reexport",
+      "currentRootExport": "explicit_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
@@ -932,7 +932,7 @@
       "serializationName": "AiAnalysisSuggestionDraft",
       "publicCompatibilityType": true,
       "compatibilityLevel": "root_public_compatibility",
-      "currentRootExport": "glob_reexport",
+      "currentRootExport": "explicit_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "none_detected",
       "domainCallers": [
@@ -1032,7 +1032,7 @@
       "serializationName": "AiAnalysisSuggestionRecord",
       "publicCompatibilityType": true,
       "compatibilityLevel": "root_public_compatibility",
-      "currentRootExport": "glob_reexport",
+      "currentRootExport": "explicit_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
@@ -1103,7 +1103,7 @@
       "serializationName": "AiMatchPackageContext",
       "publicCompatibilityType": true,
       "compatibilityLevel": "root_public_compatibility",
-      "currentRootExport": "glob_reexport",
+      "currentRootExport": "explicit_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
@@ -1181,7 +1181,7 @@
       "serializationName": "AiMatchPackageManifest",
       "publicCompatibilityType": true,
       "compatibilityLevel": "root_public_compatibility",
-      "currentRootExport": "glob_reexport",
+      "currentRootExport": "explicit_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "none_detected",
       "domainCallers": [
@@ -1244,7 +1244,7 @@
       "serializationName": "AiMatchPackageSummary",
       "publicCompatibilityType": true,
       "compatibilityLevel": "root_public_compatibility",
-      "currentRootExport": "glob_reexport",
+      "currentRootExport": "explicit_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "none_detected",
       "domainCallers": [
@@ -1351,7 +1351,7 @@
       "serializationName": "AiMatchPlayerContext",
       "publicCompatibilityType": true,
       "compatibilityLevel": "root_public_compatibility",
-      "currentRootExport": "glob_reexport",
+      "currentRootExport": "explicit_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
@@ -1411,7 +1411,7 @@
       "serializationName": "AiSuggestionDecision",
       "publicCompatibilityType": true,
       "compatibilityLevel": "root_public_compatibility",
-      "currentRootExport": "glob_reexport",
+      "currentRootExport": "explicit_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
@@ -1477,7 +1477,7 @@
       "serializationName": "AiSuggestionDecisionDraft",
       "publicCompatibilityType": true,
       "compatibilityLevel": "root_public_compatibility",
-      "currentRootExport": "glob_reexport",
+      "currentRootExport": "explicit_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
@@ -1564,7 +1564,7 @@
       "serializationName": "AnalyticsCalculation",
       "publicCompatibilityType": true,
       "compatibilityLevel": "root_public_compatibility",
-      "currentRootExport": "glob_reexport",
+      "currentRootExport": "explicit_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
@@ -1658,7 +1658,7 @@
       "serializationName": "AnalyticsOverview",
       "publicCompatibilityType": true,
       "compatibilityLevel": "root_public_compatibility",
-      "currentRootExport": "glob_reexport",
+      "currentRootExport": "explicit_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
@@ -1742,7 +1742,7 @@
       "serializationName": "AnalyticsRefreshRequest",
       "publicCompatibilityType": true,
       "compatibilityLevel": "root_public_compatibility",
-      "currentRootExport": "glob_reexport",
+      "currentRootExport": "explicit_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
@@ -1809,7 +1809,7 @@
       "serializationName": "ApiWorkspaceApplyResult",
       "publicCompatibilityType": true,
       "compatibilityLevel": "root_public_compatibility",
-      "currentRootExport": "glob_reexport",
+      "currentRootExport": "explicit_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "none_detected",
       "domainCallers": [
@@ -1864,7 +1864,7 @@
       "serializationName": "ApiWorkspaceAssistantFile",
       "publicCompatibilityType": true,
       "compatibilityLevel": "root_public_compatibility",
-      "currentRootExport": "glob_reexport",
+      "currentRootExport": "explicit_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "none_detected",
       "domainCallers": [
@@ -1926,7 +1926,7 @@
       "serializationName": "ApiWorkspaceAssistantOperation",
       "publicCompatibilityType": true,
       "compatibilityLevel": "root_public_compatibility",
-      "currentRootExport": "glob_reexport",
+      "currentRootExport": "explicit_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "none_detected",
       "domainCallers": [
@@ -2002,7 +2002,7 @@
       "serializationName": "ApiWorkspaceAssistantOutput",
       "publicCompatibilityType": true,
       "compatibilityLevel": "root_public_compatibility",
-      "currentRootExport": "glob_reexport",
+      "currentRootExport": "explicit_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "none_detected",
       "domainCallers": [
@@ -2067,7 +2067,7 @@
       "serializationName": "ApiWorkspaceAttachment",
       "publicCompatibilityType": true,
       "compatibilityLevel": "root_public_compatibility",
-      "currentRootExport": "glob_reexport",
+      "currentRootExport": "explicit_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "none_detected",
       "domainCallers": [
@@ -2119,7 +2119,7 @@
       "serializationName": "ApiWorkspaceGeneratedFileContent",
       "publicCompatibilityType": true,
       "compatibilityLevel": "root_public_compatibility",
-      "currentRootExport": "glob_reexport",
+      "currentRootExport": "explicit_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
@@ -2189,7 +2189,7 @@
       "serializationName": "ApiWorkspaceGeneratedFileDraft",
       "publicCompatibilityType": true,
       "compatibilityLevel": "root_public_compatibility",
-      "currentRootExport": "glob_reexport",
+      "currentRootExport": "explicit_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
@@ -2267,7 +2267,7 @@
       "serializationName": "ApiWorkspaceGeneratedFileRecord",
       "publicCompatibilityType": true,
       "compatibilityLevel": "root_public_compatibility",
-      "currentRootExport": "glob_reexport",
+      "currentRootExport": "explicit_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
@@ -2362,7 +2362,7 @@
       "serializationName": "ApiWorkspaceMessageDraft",
       "publicCompatibilityType": true,
       "compatibilityLevel": "root_public_compatibility",
-      "currentRootExport": "glob_reexport",
+      "currentRootExport": "explicit_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
@@ -2453,7 +2453,7 @@
       "serializationName": "ApiWorkspaceMessageRecord",
       "publicCompatibilityType": true,
       "compatibilityLevel": "root_public_compatibility",
-      "currentRootExport": "glob_reexport",
+      "currentRootExport": "explicit_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
@@ -2532,7 +2532,7 @@
       "serializationName": "ApiWorkspaceOperationDraft",
       "publicCompatibilityType": true,
       "compatibilityLevel": "root_public_compatibility",
-      "currentRootExport": "glob_reexport",
+      "currentRootExport": "explicit_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
@@ -2634,7 +2634,7 @@
       "serializationName": "ApiWorkspaceOperationRecord",
       "publicCompatibilityType": true,
       "compatibilityLevel": "root_public_compatibility",
-      "currentRootExport": "glob_reexport",
+      "currentRootExport": "explicit_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
@@ -2715,7 +2715,7 @@
       "serializationName": "ApiWorkspacePreset",
       "publicCompatibilityType": true,
       "compatibilityLevel": "root_public_compatibility",
-      "currentRootExport": "glob_reexport",
+      "currentRootExport": "explicit_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "none_detected",
       "domainCallers": [
@@ -2775,7 +2775,7 @@
       "serializationName": "ApiWorkspaceSessionDetail",
       "publicCompatibilityType": true,
       "compatibilityLevel": "root_public_compatibility",
-      "currentRootExport": "glob_reexport",
+      "currentRootExport": "explicit_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
@@ -2846,7 +2846,7 @@
       "serializationName": "ApiWorkspaceSessionDraft",
       "publicCompatibilityType": true,
       "compatibilityLevel": "root_public_compatibility",
-      "currentRootExport": "glob_reexport",
+      "currentRootExport": "explicit_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
@@ -2941,7 +2941,7 @@
       "serializationName": "ApiWorkspaceSessionRecord",
       "publicCompatibilityType": true,
       "compatibilityLevel": "root_public_compatibility",
-      "currentRootExport": "glob_reexport",
+      "currentRootExport": "explicit_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
@@ -3027,7 +3027,7 @@
       "serializationName": "AvailabilityStatus",
       "publicCompatibilityType": true,
       "compatibilityLevel": "root_public_compatibility",
-      "currentRootExport": "glob_reexport",
+      "currentRootExport": "explicit_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
@@ -3153,7 +3153,7 @@
       "serializationName": "BackgroundJob",
       "publicCompatibilityType": true,
       "compatibilityLevel": "root_public_compatibility",
-      "currentRootExport": "glob_reexport",
+      "currentRootExport": "explicit_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
@@ -3213,7 +3213,7 @@
       "serializationName": "BulkArchiveFailedItem",
       "publicCompatibilityType": true,
       "compatibilityLevel": "root_public_compatibility",
-      "currentRootExport": "glob_reexport",
+      "currentRootExport": "explicit_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
@@ -3279,7 +3279,7 @@
       "serializationName": "BulkArchiveResult",
       "publicCompatibilityType": true,
       "compatibilityLevel": "root_public_compatibility",
-      "currentRootExport": "glob_reexport",
+      "currentRootExport": "explicit_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
@@ -3338,7 +3338,7 @@
       "serializationName": "BulkDeleteBlockedItem",
       "publicCompatibilityType": true,
       "compatibilityLevel": "root_public_compatibility",
-      "currentRootExport": "glob_reexport",
+      "currentRootExport": "explicit_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
@@ -3396,7 +3396,7 @@
       "serializationName": "BulkDeleteResult",
       "publicCompatibilityType": true,
       "compatibilityLevel": "root_public_compatibility",
-      "currentRootExport": "glob_reexport",
+      "currentRootExport": "explicit_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
@@ -3463,7 +3463,7 @@
       "serializationName": "CalculatedMatchReview",
       "publicCompatibilityType": true,
       "compatibilityLevel": "root_public_compatibility",
-      "currentRootExport": "glob_reexport",
+      "currentRootExport": "explicit_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
@@ -3565,7 +3565,7 @@
       "serializationName": "CalculatedPlayerReview",
       "publicCompatibilityType": true,
       "compatibilityLevel": "root_public_compatibility",
-      "currentRootExport": "glob_reexport",
+      "currentRootExport": "explicit_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "none_detected",
       "domainCallers": [
@@ -3653,7 +3653,7 @@
       "serializationName": "CalculatedTeamReview",
       "publicCompatibilityType": true,
       "compatibilityLevel": "root_public_compatibility",
-      "currentRootExport": "glob_reexport",
+      "currentRootExport": "explicit_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "none_detected",
       "domainCallers": [
@@ -3733,7 +3733,7 @@
       "serializationName": "CalibrationBucket",
       "publicCompatibilityType": true,
       "compatibilityLevel": "root_public_compatibility",
-      "currentRootExport": "glob_reexport",
+      "currentRootExport": "explicit_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
@@ -3796,7 +3796,7 @@
       "serializationName": "CoachDetail",
       "publicCompatibilityType": true,
       "compatibilityLevel": "root_public_compatibility",
-      "currentRootExport": "glob_reexport",
+      "currentRootExport": "explicit_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
@@ -3865,7 +3865,7 @@
       "serializationName": "CoachDraft",
       "publicCompatibilityType": true,
       "compatibilityLevel": "root_public_compatibility",
-      "currentRootExport": "glob_reexport",
+      "currentRootExport": "explicit_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
@@ -3940,7 +3940,7 @@
       "serializationName": "CoachListItem",
       "publicCompatibilityType": true,
       "compatibilityLevel": "root_public_compatibility",
-      "currentRootExport": "glob_reexport",
+      "currentRootExport": "explicit_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
@@ -4006,7 +4006,7 @@
       "serializationName": "CoachListQuery",
       "publicCompatibilityType": true,
       "compatibilityLevel": "root_public_compatibility",
-      "currentRootExport": "glob_reexport",
+      "currentRootExport": "explicit_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
@@ -4088,7 +4088,7 @@
       "serializationName": "CoachNameDraft",
       "publicCompatibilityType": true,
       "compatibilityLevel": "root_public_compatibility",
-      "currentRootExport": "glob_reexport",
+      "currentRootExport": "explicit_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
@@ -4167,7 +4167,7 @@
       "serializationName": "CoachNameRecord",
       "publicCompatibilityType": true,
       "compatibilityLevel": "root_public_compatibility",
-      "currentRootExport": "glob_reexport",
+      "currentRootExport": "explicit_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
@@ -4247,7 +4247,7 @@
       "serializationName": "CoachRecord",
       "publicCompatibilityType": true,
       "compatibilityLevel": "root_public_compatibility",
-      "currentRootExport": "glob_reexport",
+      "currentRootExport": "explicit_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
@@ -4347,7 +4347,7 @@
       "serializationName": "CompetitionBindingDraft",
       "publicCompatibilityType": true,
       "compatibilityLevel": "root_public_compatibility",
-      "currentRootExport": "glob_reexport",
+      "currentRootExport": "explicit_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
@@ -4447,7 +4447,7 @@
       "serializationName": "CompetitionBindingSummary",
       "publicCompatibilityType": true,
       "compatibilityLevel": "root_public_compatibility",
-      "currentRootExport": "glob_reexport",
+      "currentRootExport": "explicit_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
@@ -4526,7 +4526,7 @@
       "serializationName": "CompetitionDraft",
       "publicCompatibilityType": true,
       "compatibilityLevel": "root_public_compatibility",
-      "currentRootExport": "glob_reexport",
+      "currentRootExport": "explicit_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
@@ -4606,7 +4606,7 @@
       "serializationName": "CompetitionKind",
       "publicCompatibilityType": true,
       "compatibilityLevel": "root_public_compatibility",
-      "currentRootExport": "glob_reexport",
+      "currentRootExport": "explicit_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
@@ -4728,7 +4728,7 @@
       "serializationName": "CompetitionProfile",
       "publicCompatibilityType": true,
       "compatibilityLevel": "root_public_compatibility",
-      "currentRootExport": "glob_reexport",
+      "currentRootExport": "explicit_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
@@ -4804,7 +4804,7 @@
       "serializationName": "CompetitionProfileVersionDraft",
       "publicCompatibilityType": true,
       "compatibilityLevel": "root_public_compatibility",
-      "currentRootExport": "glob_reexport",
+      "currentRootExport": "explicit_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
@@ -4872,7 +4872,7 @@
       "serializationName": "CompetitionProfileVersionRecord",
       "publicCompatibilityType": true,
       "compatibilityLevel": "root_public_compatibility",
-      "currentRootExport": "glob_reexport",
+      "currentRootExport": "explicit_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
@@ -4956,7 +4956,7 @@
       "serializationName": "CompetitionRecord",
       "publicCompatibilityType": true,
       "compatibilityLevel": "root_public_compatibility",
-      "currentRootExport": "glob_reexport",
+      "currentRootExport": "explicit_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
@@ -5059,7 +5059,7 @@
       "serializationName": "ConflictEvaluationDraft",
       "publicCompatibilityType": true,
       "compatibilityLevel": "root_public_compatibility",
-      "currentRootExport": "glob_reexport",
+      "currentRootExport": "explicit_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
@@ -5121,7 +5121,7 @@
       "serializationName": "ConflictEvaluationRecord",
       "publicCompatibilityType": true,
       "compatibilityLevel": "root_public_compatibility",
-      "currentRootExport": "glob_reexport",
+      "currentRootExport": "explicit_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
@@ -5184,7 +5184,7 @@
       "serializationName": "ConflictEvaluationStatus",
       "publicCompatibilityType": true,
       "compatibilityLevel": "root_public_compatibility",
-      "currentRootExport": "glob_reexport",
+      "currentRootExport": "explicit_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
@@ -5251,7 +5251,7 @@
       "serializationName": "ContributionComponent",
       "publicCompatibilityType": true,
       "compatibilityLevel": "root_public_compatibility",
-      "currentRootExport": "glob_reexport",
+      "currentRootExport": "explicit_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
@@ -5321,7 +5321,7 @@
       "serializationName": "DataProviderDraft",
       "publicCompatibilityType": true,
       "compatibilityLevel": "root_public_compatibility",
-      "currentRootExport": "glob_reexport",
+      "currentRootExport": "explicit_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
@@ -5392,7 +5392,7 @@
       "serializationName": "DataProviderRecord",
       "publicCompatibilityType": true,
       "compatibilityLevel": "root_public_compatibility",
-      "currentRootExport": "glob_reexport",
+      "currentRootExport": "explicit_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
@@ -5453,7 +5453,7 @@
       "serializationName": "DataQualityDecision",
       "publicCompatibilityType": true,
       "compatibilityLevel": "root_public_compatibility",
-      "currentRootExport": "glob_reexport",
+      "currentRootExport": "explicit_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "none_detected",
       "domainCallers": [
@@ -5509,7 +5509,7 @@
       "serializationName": "DataQualityDecisionDraft",
       "publicCompatibilityType": true,
       "compatibilityLevel": "root_public_compatibility",
-      "currentRootExport": "glob_reexport",
+      "currentRootExport": "explicit_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
@@ -5600,7 +5600,7 @@
       "serializationName": "DataQualityFinding",
       "publicCompatibilityType": true,
       "compatibilityLevel": "root_public_compatibility",
-      "currentRootExport": "glob_reexport",
+      "currentRootExport": "explicit_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
@@ -5676,7 +5676,7 @@
       "serializationName": "DataQualitySummary",
       "publicCompatibilityType": true,
       "compatibilityLevel": "root_public_compatibility",
-      "currentRootExport": "glob_reexport",
+      "currentRootExport": "explicit_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
@@ -5758,7 +5758,7 @@
       "serializationName": "DriftFinding",
       "publicCompatibilityType": true,
       "compatibilityLevel": "root_public_compatibility",
-      "currentRootExport": "glob_reexport",
+      "currentRootExport": "explicit_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
@@ -5839,7 +5839,7 @@
       "serializationName": "EnqueueJobDraft",
       "publicCompatibilityType": true,
       "compatibilityLevel": "root_public_compatibility",
-      "currentRootExport": "glob_reexport",
+      "currentRootExport": "explicit_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
@@ -5915,7 +5915,7 @@
       "serializationName": "EntityCandidate",
       "publicCompatibilityType": true,
       "compatibilityLevel": "root_public_compatibility",
-      "currentRootExport": "glob_reexport",
+      "currentRootExport": "explicit_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
@@ -5994,7 +5994,7 @@
       "serializationName": "EntityDeletionCheck",
       "publicCompatibilityType": true,
       "compatibilityLevel": "root_public_compatibility",
-      "currentRootExport": "glob_reexport",
+      "currentRootExport": "explicit_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
@@ -6057,7 +6057,7 @@
       "serializationName": "EntityMatchCandidate",
       "publicCompatibilityType": true,
       "compatibilityLevel": "root_public_compatibility",
-      "currentRootExport": "glob_reexport",
+      "currentRootExport": "explicit_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
@@ -6149,7 +6149,7 @@
       "serializationName": "EntityMatchRequest",
       "publicCompatibilityType": true,
       "compatibilityLevel": "root_public_compatibility",
-      "currentRootExport": "glob_reexport",
+      "currentRootExport": "explicit_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
@@ -6208,7 +6208,7 @@
       "serializationName": "EntityMatchResult",
       "publicCompatibilityType": true,
       "compatibilityLevel": "root_public_compatibility",
-      "currentRootExport": "glob_reexport",
+      "currentRootExport": "explicit_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
@@ -6263,7 +6263,7 @@
       "serializationName": "EntityReferenceCount",
       "publicCompatibilityType": true,
       "compatibilityLevel": "root_public_compatibility",
-      "currentRootExport": "glob_reexport",
+      "currentRootExport": "explicit_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
@@ -6334,7 +6334,7 @@
       "serializationName": "EntityReferenceQuery",
       "publicCompatibilityType": true,
       "compatibilityLevel": "root_public_compatibility",
-      "currentRootExport": "glob_reexport",
+      "currentRootExport": "explicit_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
@@ -6421,7 +6421,7 @@
       "serializationName": "EntityReferenceRecord",
       "publicCompatibilityType": true,
       "compatibilityLevel": "root_public_compatibility",
-      "currentRootExport": "glob_reexport",
+      "currentRootExport": "explicit_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
@@ -6540,7 +6540,7 @@
       "serializationName": "EntityResolutionDraft",
       "publicCompatibilityType": true,
       "compatibilityLevel": "root_public_compatibility",
-      "currentRootExport": "glob_reexport",
+      "currentRootExport": "explicit_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
@@ -6606,7 +6606,7 @@
       "serializationName": "EntityResolutionRecord",
       "publicCompatibilityType": true,
       "compatibilityLevel": "root_public_compatibility",
-      "currentRootExport": "glob_reexport",
+      "currentRootExport": "explicit_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
@@ -6674,7 +6674,7 @@
       "serializationName": "EntityResolutionStatus",
       "publicCompatibilityType": true,
       "compatibilityLevel": "root_public_compatibility",
-      "currentRootExport": "glob_reexport",
+      "currentRootExport": "explicit_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
@@ -6805,7 +6805,7 @@
       "serializationName": "EvaluationSample",
       "publicCompatibilityType": true,
       "compatibilityLevel": "root_public_compatibility",
-      "currentRootExport": "glob_reexport",
+      "currentRootExport": "explicit_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
@@ -6977,7 +6977,7 @@
       "serializationName": "EvidenceClaimDraft",
       "publicCompatibilityType": true,
       "compatibilityLevel": "root_public_compatibility",
-      "currentRootExport": "glob_reexport",
+      "currentRootExport": "explicit_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
@@ -7057,7 +7057,7 @@
       "serializationName": "EvidenceClaimRecord",
       "publicCompatibilityType": true,
       "compatibilityLevel": "root_public_compatibility",
-      "currentRootExport": "glob_reexport",
+      "currentRootExport": "explicit_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
@@ -7140,7 +7140,7 @@
       "serializationName": "EvidenceConflictDraft",
       "publicCompatibilityType": true,
       "compatibilityLevel": "root_public_compatibility",
-      "currentRootExport": "glob_reexport",
+      "currentRootExport": "explicit_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
@@ -7200,7 +7200,7 @@
       "serializationName": "EvidenceConflictRecord",
       "publicCompatibilityType": true,
       "compatibilityLevel": "root_public_compatibility",
-      "currentRootExport": "glob_reexport",
+      "currentRootExport": "explicit_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
@@ -7318,7 +7318,7 @@
       "serializationName": "EvidenceRouteDraft",
       "publicCompatibilityType": true,
       "compatibilityLevel": "root_public_compatibility",
-      "currentRootExport": "glob_reexport",
+      "currentRootExport": "explicit_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
@@ -7380,7 +7380,7 @@
       "serializationName": "EvidenceRouteRecord",
       "publicCompatibilityType": true,
       "compatibilityLevel": "root_public_compatibility",
-      "currentRootExport": "glob_reexport",
+      "currentRootExport": "explicit_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
@@ -7435,7 +7435,7 @@
       "serializationName": "EvidenceRouteRegistry",
       "publicCompatibilityType": true,
       "compatibilityLevel": "root_public_compatibility",
-      "currentRootExport": "glob_reexport",
+      "currentRootExport": "explicit_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "none_detected",
       "domainCallers": [
@@ -7515,7 +7515,7 @@
       "serializationName": "EvidenceRouteRule",
       "publicCompatibilityType": true,
       "compatibilityLevel": "root_public_compatibility",
-      "currentRootExport": "glob_reexport",
+      "currentRootExport": "explicit_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "none_detected",
       "domainCallers": [
@@ -7593,7 +7593,7 @@
       "serializationName": "EvidenceRouteStatus",
       "publicCompatibilityType": true,
       "compatibilityLevel": "root_public_compatibility",
-      "currentRootExport": "glob_reexport",
+      "currentRootExport": "explicit_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
@@ -7658,7 +7658,7 @@
       "serializationName": "EvidenceScoringDecisionDraft",
       "publicCompatibilityType": true,
       "compatibilityLevel": "root_public_compatibility",
-      "currentRootExport": "glob_reexport",
+      "currentRootExport": "explicit_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
@@ -7801,7 +7801,7 @@
       "serializationName": "EvidenceScoringItemRecord",
       "publicCompatibilityType": true,
       "compatibilityLevel": "root_public_compatibility",
-      "currentRootExport": "glob_reexport",
+      "currentRootExport": "explicit_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
@@ -7870,7 +7870,7 @@
       "serializationName": "EvidenceVerdict",
       "publicCompatibilityType": true,
       "compatibilityLevel": "root_public_compatibility",
-      "currentRootExport": "glob_reexport",
+      "currentRootExport": "explicit_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
@@ -7956,7 +7956,7 @@
       "serializationName": "EvidenceVerificationState",
       "publicCompatibilityType": true,
       "compatibilityLevel": "root_public_compatibility",
-      "currentRootExport": "glob_reexport",
+      "currentRootExport": "explicit_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
@@ -8028,7 +8028,7 @@
       "serializationName": "ExternalEntityIdDraft",
       "publicCompatibilityType": true,
       "compatibilityLevel": "root_public_compatibility",
-      "currentRootExport": "glob_reexport",
+      "currentRootExport": "explicit_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
@@ -8103,7 +8103,7 @@
       "serializationName": "ExternalEntityIdRecord",
       "publicCompatibilityType": true,
       "compatibilityLevel": "root_public_compatibility",
-      "currentRootExport": "glob_reexport",
+      "currentRootExport": "explicit_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
@@ -8222,7 +8222,7 @@
       "serializationName": "FactPipelineContext",
       "publicCompatibilityType": true,
       "compatibilityLevel": "root_public_compatibility",
-      "currentRootExport": "glob_reexport",
+      "currentRootExport": "explicit_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
@@ -8317,7 +8317,7 @@
       "serializationName": "FactPipelineSummary",
       "publicCompatibilityType": true,
       "compatibilityLevel": "root_public_compatibility",
-      "currentRootExport": "glob_reexport",
+      "currentRootExport": "explicit_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "none_detected",
       "domainCallers": [
@@ -8389,7 +8389,7 @@
       "serializationName": "FormationDistributionQuery",
       "publicCompatibilityType": true,
       "compatibilityLevel": "root_public_compatibility",
-      "currentRootExport": "glob_reexport",
+      "currentRootExport": "explicit_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
@@ -8475,7 +8475,7 @@
       "serializationName": "FormationRecord",
       "publicCompatibilityType": true,
       "compatibilityLevel": "root_public_compatibility",
-      "currentRootExport": "glob_reexport",
+      "currentRootExport": "explicit_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
@@ -8596,7 +8596,7 @@
       "serializationName": "FormationUsageDistributionDraft",
       "publicCompatibilityType": true,
       "compatibilityLevel": "root_public_compatibility",
-      "currentRootExport": "glob_reexport",
+      "currentRootExport": "explicit_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
@@ -8704,7 +8704,7 @@
       "serializationName": "FormationUsageDistributionRecord",
       "publicCompatibilityType": true,
       "compatibilityLevel": "root_public_compatibility",
-      "currentRootExport": "glob_reexport",
+      "currentRootExport": "explicit_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
@@ -8760,7 +8760,7 @@
       "serializationName": "FormationUsageEntryDraft",
       "publicCompatibilityType": true,
       "compatibilityLevel": "root_public_compatibility",
-      "currentRootExport": "glob_reexport",
+      "currentRootExport": "explicit_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
@@ -8835,7 +8835,7 @@
       "serializationName": "FormationUsageEntryRecord",
       "publicCompatibilityType": true,
       "compatibilityLevel": "root_public_compatibility",
-      "currentRootExport": "glob_reexport",
+      "currentRootExport": "explicit_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
@@ -8906,7 +8906,7 @@
       "serializationName": "FormationUsageListQuery",
       "publicCompatibilityType": true,
       "compatibilityLevel": "root_public_compatibility",
-      "currentRootExport": "glob_reexport",
+      "currentRootExport": "explicit_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
@@ -8981,7 +8981,7 @@
       "serializationName": "JobStatus",
       "publicCompatibilityType": true,
       "compatibilityLevel": "root_public_compatibility",
-      "currentRootExport": "glob_reexport",
+      "currentRootExport": "explicit_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
@@ -9097,7 +9097,7 @@
       "serializationName": "LineupDraft",
       "publicCompatibilityType": true,
       "compatibilityLevel": "root_public_compatibility",
-      "currentRootExport": "glob_reexport",
+      "currentRootExport": "explicit_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
@@ -9160,7 +9160,7 @@
       "serializationName": "LineupHistoryRemovalResult",
       "publicCompatibilityType": true,
       "compatibilityLevel": "root_public_compatibility",
-      "currentRootExport": "glob_reexport",
+      "currentRootExport": "explicit_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
@@ -9215,7 +9215,7 @@
       "serializationName": "LineupPairDraft",
       "publicCompatibilityType": true,
       "compatibilityLevel": "root_public_compatibility",
-      "currentRootExport": "glob_reexport",
+      "currentRootExport": "explicit_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
@@ -9274,7 +9274,7 @@
       "serializationName": "LineupPairRecord",
       "publicCompatibilityType": true,
       "compatibilityLevel": "root_public_compatibility",
-      "currentRootExport": "glob_reexport",
+      "currentRootExport": "explicit_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
@@ -9401,7 +9401,7 @@
       "serializationName": "LineupPlayerDraft",
       "publicCompatibilityType": true,
       "compatibilityLevel": "root_public_compatibility",
-      "currentRootExport": "glob_reexport",
+      "currentRootExport": "explicit_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "none_detected",
       "domainCallers": [
@@ -9519,7 +9519,7 @@
       "serializationName": "LineupPlayerRecord",
       "publicCompatibilityType": true,
       "compatibilityLevel": "root_public_compatibility",
-      "currentRootExport": "glob_reexport",
+      "currentRootExport": "explicit_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
@@ -9665,7 +9665,7 @@
       "serializationName": "LineupRecord",
       "publicCompatibilityType": true,
       "compatibilityLevel": "root_public_compatibility",
-      "currentRootExport": "glob_reexport",
+      "currentRootExport": "explicit_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
@@ -9745,7 +9745,7 @@
       "serializationName": "LineupType",
       "publicCompatibilityType": true,
       "compatibilityLevel": "root_public_compatibility",
-      "currentRootExport": "glob_reexport",
+      "currentRootExport": "explicit_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
@@ -9842,7 +9842,7 @@
       "serializationName": "MatchContext",
       "publicCompatibilityType": true,
       "compatibilityLevel": "root_public_compatibility",
-      "currentRootExport": "glob_reexport",
+      "currentRootExport": "explicit_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "none_detected",
       "domainCallers": [
@@ -9949,7 +9949,7 @@
       "serializationName": "MatchDraft",
       "publicCompatibilityType": true,
       "compatibilityLevel": "root_public_compatibility",
-      "currentRootExport": "glob_reexport",
+      "currentRootExport": "explicit_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
@@ -10021,7 +10021,7 @@
       "serializationName": "MatchEventRevisionStatus",
       "publicCompatibilityType": true,
       "compatibilityLevel": "root_public_compatibility",
-      "currentRootExport": "glob_reexport",
+      "currentRootExport": "explicit_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
@@ -10107,7 +10107,7 @@
       "serializationName": "MatchEventSummary",
       "publicCompatibilityType": true,
       "compatibilityLevel": "root_public_compatibility",
-      "currentRootExport": "glob_reexport",
+      "currentRootExport": "explicit_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
@@ -10216,7 +10216,7 @@
       "serializationName": "MatchEventType",
       "publicCompatibilityType": true,
       "compatibilityLevel": "root_public_compatibility",
-      "currentRootExport": "glob_reexport",
+      "currentRootExport": "explicit_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
@@ -10285,7 +10285,7 @@
       "serializationName": "MatchEventVerificationStatus",
       "publicCompatibilityType": true,
       "compatibilityLevel": "root_public_compatibility",
-      "currentRootExport": "glob_reexport",
+      "currentRootExport": "explicit_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
@@ -10366,7 +10366,7 @@
       "serializationName": "MatchLineupChain",
       "publicCompatibilityType": true,
       "compatibilityLevel": "root_public_compatibility",
-      "currentRootExport": "glob_reexport",
+      "currentRootExport": "explicit_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
@@ -10462,7 +10462,7 @@
       "serializationName": "MatchLineupExportData",
       "publicCompatibilityType": true,
       "compatibilityLevel": "root_public_compatibility",
-      "currentRootExport": "glob_reexport",
+      "currentRootExport": "explicit_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
@@ -10524,7 +10524,7 @@
       "serializationName": "MatchLineupExportSummary",
       "publicCompatibilityType": true,
       "compatibilityLevel": "root_public_compatibility",
-      "currentRootExport": "glob_reexport",
+      "currentRootExport": "explicit_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "none_detected",
       "domainCallers": [
@@ -10610,7 +10610,7 @@
       "serializationName": "MatchLineupPlayerReference",
       "publicCompatibilityType": true,
       "compatibilityLevel": "root_public_compatibility",
-      "currentRootExport": "glob_reexport",
+      "currentRootExport": "explicit_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
@@ -10680,7 +10680,7 @@
       "serializationName": "MatchLineupTeamChain",
       "publicCompatibilityType": true,
       "compatibilityLevel": "root_public_compatibility",
-      "currentRootExport": "glob_reexport",
+      "currentRootExport": "explicit_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
@@ -10807,7 +10807,7 @@
       "serializationName": "MatchPredictionReadiness",
       "publicCompatibilityType": true,
       "compatibilityLevel": "root_public_compatibility",
-      "currentRootExport": "glob_reexport",
+      "currentRootExport": "explicit_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "none_detected",
       "domainCallers": [
@@ -10907,7 +10907,7 @@
       "serializationName": "MatchRecord",
       "publicCompatibilityType": true,
       "compatibilityLevel": "root_public_compatibility",
-      "currentRootExport": "glob_reexport",
+      "currentRootExport": "explicit_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
@@ -11023,7 +11023,7 @@
       "serializationName": "MatchResultDraft",
       "publicCompatibilityType": true,
       "compatibilityLevel": "root_public_compatibility",
-      "currentRootExport": "glob_reexport",
+      "currentRootExport": "explicit_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "none_detected",
       "domainCallers": [
@@ -11105,7 +11105,7 @@
       "serializationName": "MatchResultRecord",
       "publicCompatibilityType": true,
       "compatibilityLevel": "root_public_compatibility",
-      "currentRootExport": "glob_reexport",
+      "currentRootExport": "explicit_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
@@ -11186,7 +11186,7 @@
       "serializationName": "MatchReviewDetail",
       "publicCompatibilityType": true,
       "compatibilityLevel": "root_public_compatibility",
-      "currentRootExport": "glob_reexport",
+      "currentRootExport": "explicit_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
@@ -11282,7 +11282,7 @@
       "serializationName": "MatchReviewDraft",
       "publicCompatibilityType": true,
       "compatibilityLevel": "root_public_compatibility",
-      "currentRootExport": "glob_reexport",
+      "currentRootExport": "explicit_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
@@ -11454,7 +11454,7 @@
       "serializationName": "MatchReviewEventDraft",
       "publicCompatibilityType": true,
       "compatibilityLevel": "root_public_compatibility",
-      "currentRootExport": "glob_reexport",
+      "currentRootExport": "explicit_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
@@ -11616,7 +11616,7 @@
       "serializationName": "MatchReviewEventRecord",
       "publicCompatibilityType": true,
       "compatibilityLevel": "root_public_compatibility",
-      "currentRootExport": "glob_reexport",
+      "currentRootExport": "explicit_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
@@ -11672,7 +11672,7 @@
       "serializationName": "MatchReviewPackageActionBlocker",
       "publicCompatibilityType": true,
       "compatibilityLevel": "root_public_compatibility",
-      "currentRootExport": "glob_reexport",
+      "currentRootExport": "explicit_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "none_detected",
       "domainCallers": [
@@ -11730,7 +11730,7 @@
       "serializationName": "MatchReviewPackageCommitRequest",
       "publicCompatibilityType": true,
       "compatibilityLevel": "root_public_compatibility",
-      "currentRootExport": "glob_reexport",
+      "currentRootExport": "explicit_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "none_detected",
       "domainCallers": [
@@ -11786,7 +11786,7 @@
       "serializationName": "MatchReviewPackageCommitResult",
       "publicCompatibilityType": true,
       "compatibilityLevel": "root_public_compatibility",
-      "currentRootExport": "glob_reexport",
+      "currentRootExport": "explicit_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "none_detected",
       "domainCallers": [
@@ -11855,7 +11855,7 @@
       "serializationName": "MatchReviewPackageComparison",
       "publicCompatibilityType": true,
       "compatibilityLevel": "root_public_compatibility",
-      "currentRootExport": "glob_reexport",
+      "currentRootExport": "explicit_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "none_detected",
       "domainCallers": [
@@ -11917,7 +11917,7 @@
       "serializationName": "MatchReviewPackageConfirmationRequest",
       "publicCompatibilityType": true,
       "compatibilityLevel": "root_public_compatibility",
-      "currentRootExport": "glob_reexport",
+      "currentRootExport": "explicit_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "none_detected",
       "domainCallers": [
@@ -12011,7 +12011,7 @@
       "serializationName": "MatchReviewPackageData",
       "publicCompatibilityType": true,
       "compatibilityLevel": "root_public_compatibility",
-      "currentRootExport": "glob_reexport",
+      "currentRootExport": "explicit_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "none_detected",
       "domainCallers": [
@@ -12092,7 +12092,7 @@
       "serializationName": "MatchReviewPackageDiffSummary",
       "publicCompatibilityType": true,
       "compatibilityLevel": "root_public_compatibility",
-      "currentRootExport": "glob_reexport",
+      "currentRootExport": "explicit_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "none_detected",
       "domainCallers": [
@@ -12149,7 +12149,7 @@
       "serializationName": "MatchReviewPackageFactsCommitResult",
       "publicCompatibilityType": true,
       "compatibilityLevel": "root_public_compatibility",
-      "currentRootExport": "glob_reexport",
+      "currentRootExport": "explicit_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "none_detected",
       "domainCallers": [
@@ -12218,7 +12218,7 @@
       "serializationName": "MatchReviewPackageIdentityCheck",
       "publicCompatibilityType": true,
       "compatibilityLevel": "root_public_compatibility",
-      "currentRootExport": "glob_reexport",
+      "currentRootExport": "explicit_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "none_detected",
       "domainCallers": [
@@ -12362,7 +12362,7 @@
       "serializationName": "MatchReviewPackagePreview",
       "publicCompatibilityType": true,
       "compatibilityLevel": "root_public_compatibility",
-      "currentRootExport": "glob_reexport",
+      "currentRootExport": "explicit_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
@@ -12421,7 +12421,7 @@
       "serializationName": "MatchReviewPackageReviewResult",
       "publicCompatibilityType": true,
       "compatibilityLevel": "root_public_compatibility",
-      "currentRootExport": "glob_reexport",
+      "currentRootExport": "explicit_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "none_detected",
       "domainCallers": [
@@ -12502,7 +12502,7 @@
       "serializationName": "MatchReviewPackageSnapshotSummary",
       "publicCompatibilityType": true,
       "compatibilityLevel": "root_public_compatibility",
-      "currentRootExport": "glob_reexport",
+      "currentRootExport": "explicit_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "none_detected",
       "domainCallers": [
@@ -12585,7 +12585,7 @@
       "serializationName": "MatchReviewPackageSummary",
       "publicCompatibilityType": true,
       "compatibilityLevel": "root_public_compatibility",
-      "currentRootExport": "glob_reexport",
+      "currentRootExport": "explicit_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
@@ -12671,7 +12671,7 @@
       "serializationName": "MatchReviewPackageWorkflowAction",
       "publicCompatibilityType": true,
       "compatibilityLevel": "root_public_compatibility",
-      "currentRootExport": "glob_reexport",
+      "currentRootExport": "explicit_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "none_detected",
       "domainCallers": [
@@ -12831,7 +12831,7 @@
       "serializationName": "MatchReviewPackageWorkflowRecord",
       "publicCompatibilityType": true,
       "compatibilityLevel": "root_public_compatibility",
-      "currentRootExport": "glob_reexport",
+      "currentRootExport": "explicit_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
@@ -12918,7 +12918,7 @@
       "serializationName": "MatchReviewPackageWorkflowStatus",
       "publicCompatibilityType": true,
       "compatibilityLevel": "root_public_compatibility",
-      "currentRootExport": "glob_reexport",
+      "currentRootExport": "explicit_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
@@ -13004,7 +13004,7 @@
       "serializationName": "MatchReviewPackageWorkflowStep",
       "publicCompatibilityType": true,
       "compatibilityLevel": "root_public_compatibility",
-      "currentRootExport": "glob_reexport",
+      "currentRootExport": "explicit_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "none_detected",
       "domainCallers": [
@@ -13112,7 +13112,7 @@
       "serializationName": "MatchReviewSummary",
       "publicCompatibilityType": true,
       "compatibilityLevel": "root_public_compatibility",
-      "currentRootExport": "glob_reexport",
+      "currentRootExport": "explicit_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
@@ -13188,7 +13188,7 @@
       "serializationName": "MatchStatus",
       "publicCompatibilityType": true,
       "compatibilityLevel": "root_public_compatibility",
-      "currentRootExport": "glob_reexport",
+      "currentRootExport": "explicit_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
@@ -13286,7 +13286,7 @@
       "serializationName": "ModelComparisonRow",
       "publicCompatibilityType": true,
       "compatibilityLevel": "root_public_compatibility",
-      "currentRootExport": "glob_reexport",
+      "currentRootExport": "explicit_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "none_detected",
       "domainCallers": [
@@ -13346,7 +13346,7 @@
       "serializationName": "ModelIdentity",
       "publicCompatibilityType": true,
       "compatibilityLevel": "root_public_compatibility",
-      "currentRootExport": "glob_reexport",
+      "currentRootExport": "explicit_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "none_detected",
       "domainCallers": [
@@ -13426,7 +13426,7 @@
       "serializationName": "MonthlyDataGapRow",
       "publicCompatibilityType": true,
       "compatibilityLevel": "root_public_compatibility",
-      "currentRootExport": "glob_reexport",
+      "currentRootExport": "explicit_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
@@ -13501,7 +13501,7 @@
       "serializationName": "MonthlyWorkbookExportSummary",
       "publicCompatibilityType": true,
       "compatibilityLevel": "root_public_compatibility",
-      "currentRootExport": "glob_reexport",
+      "currentRootExport": "explicit_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "none_detected",
       "domainCallers": [
@@ -13558,7 +13558,7 @@
       "serializationName": "MonthlyWorkbookKind",
       "publicCompatibilityType": true,
       "compatibilityLevel": "root_public_compatibility",
-      "currentRootExport": "glob_reexport",
+      "currentRootExport": "explicit_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "none_detected",
       "domainCallers": [
@@ -13694,7 +13694,7 @@
       "serializationName": "OpenAiAttemptDraft",
       "publicCompatibilityType": true,
       "compatibilityLevel": "root_public_compatibility",
-      "currentRootExport": "glob_reexport",
+      "currentRootExport": "explicit_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
@@ -13768,7 +13768,7 @@
       "serializationName": "OpenAiAttemptRecord",
       "publicCompatibilityType": true,
       "compatibilityLevel": "root_public_compatibility",
-      "currentRootExport": "glob_reexport",
+      "currentRootExport": "explicit_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
@@ -13830,7 +13830,7 @@
       "serializationName": "OpenAiUsageTotals",
       "publicCompatibilityType": true,
       "compatibilityLevel": "root_public_compatibility",
-      "currentRootExport": "glob_reexport",
+      "currentRootExport": "explicit_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
@@ -13942,7 +13942,7 @@
       "serializationName": "P4ConflictWorkspaceRecord",
       "publicCompatibilityType": true,
       "compatibilityLevel": "root_public_compatibility",
-      "currentRootExport": "glob_reexport",
+      "currentRootExport": "explicit_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
@@ -14070,7 +14070,7 @@
       "serializationName": "P4EvidenceWorkspaceRecord",
       "publicCompatibilityType": true,
       "compatibilityLevel": "root_public_compatibility",
-      "currentRootExport": "glob_reexport",
+      "currentRootExport": "explicit_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
@@ -14152,7 +14152,7 @@
       "serializationName": "P4FreezeReadiness",
       "publicCompatibilityType": true,
       "compatibilityLevel": "root_public_compatibility",
-      "currentRootExport": "glob_reexport",
+      "currentRootExport": "explicit_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
@@ -14274,7 +14274,7 @@
       "serializationName": "P4FreezeTaskDraft",
       "publicCompatibilityType": true,
       "compatibilityLevel": "root_public_compatibility",
-      "currentRootExport": "glob_reexport",
+      "currentRootExport": "explicit_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
@@ -14348,7 +14348,7 @@
       "serializationName": "P4FreezeTaskEventRecord",
       "publicCompatibilityType": true,
       "compatibilityLevel": "root_public_compatibility",
-      "currentRootExport": "glob_reexport",
+      "currentRootExport": "explicit_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
@@ -14504,7 +14504,7 @@
       "serializationName": "P4FreezeTaskRecord",
       "publicCompatibilityType": true,
       "compatibilityLevel": "root_public_compatibility",
-      "currentRootExport": "glob_reexport",
+      "currentRootExport": "explicit_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
@@ -14628,7 +14628,7 @@
       "serializationName": "P4FreezeTaskState",
       "publicCompatibilityType": true,
       "compatibilityLevel": "root_public_compatibility",
-      "currentRootExport": "glob_reexport",
+      "currentRootExport": "explicit_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
@@ -14729,7 +14729,7 @@
       "serializationName": "P4FreezeTaskTransition",
       "publicCompatibilityType": true,
       "compatibilityLevel": "root_public_compatibility",
-      "currentRootExport": "glob_reexport",
+      "currentRootExport": "explicit_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
@@ -14810,7 +14810,7 @@
       "serializationName": "P4Horizon",
       "publicCompatibilityType": true,
       "compatibilityLevel": "root_public_compatibility",
-      "currentRootExport": "glob_reexport",
+      "currentRootExport": "explicit_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
@@ -14876,7 +14876,7 @@
       "serializationName": "P4ManualConflictDecisionKind",
       "publicCompatibilityType": true,
       "compatibilityLevel": "root_public_compatibility",
-      "currentRootExport": "glob_reexport",
+      "currentRootExport": "explicit_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
@@ -15005,7 +15005,7 @@
       "serializationName": "P4ManualRouteOverrideDraft",
       "publicCompatibilityType": true,
       "compatibilityLevel": "root_public_compatibility",
-      "currentRootExport": "glob_reexport",
+      "currentRootExport": "explicit_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
@@ -15087,7 +15087,7 @@
       "serializationName": "P4ManualRouteOverrideRecord",
       "publicCompatibilityType": true,
       "compatibilityLevel": "root_public_compatibility",
-      "currentRootExport": "glob_reexport",
+      "currentRootExport": "explicit_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
@@ -15162,7 +15162,7 @@
       "serializationName": "P4MatchWorkspace",
       "publicCompatibilityType": true,
       "compatibilityLevel": "root_public_compatibility",
-      "currentRootExport": "glob_reexport",
+      "currentRootExport": "explicit_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
@@ -15245,7 +15245,7 @@
       "serializationName": "P4PlanningMatchContext",
       "publicCompatibilityType": true,
       "compatibilityLevel": "root_public_compatibility",
-      "currentRootExport": "glob_reexport",
+      "currentRootExport": "explicit_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
@@ -15342,7 +15342,7 @@
       "serializationName": "P4ResearchRunWorkspace",
       "publicCompatibilityType": true,
       "compatibilityLevel": "root_public_compatibility",
-      "currentRootExport": "glob_reexport",
+      "currentRootExport": "explicit_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
@@ -15424,7 +15424,7 @@
       "serializationName": "P4RoutedFact",
       "publicCompatibilityType": true,
       "compatibilityLevel": "root_public_compatibility",
-      "currentRootExport": "glob_reexport",
+      "currentRootExport": "explicit_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
@@ -15507,7 +15507,7 @@
       "serializationName": "P4TaskWorkspace",
       "publicCompatibilityType": true,
       "compatibilityLevel": "root_public_compatibility",
-      "currentRootExport": "glob_reexport",
+      "currentRootExport": "explicit_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
@@ -15586,7 +15586,7 @@
       "serializationName": "ParameterCandidateArtifactDraft",
       "publicCompatibilityType": true,
       "compatibilityLevel": "root_public_compatibility",
-      "currentRootExport": "glob_reexport",
+      "currentRootExport": "explicit_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
@@ -15691,7 +15691,7 @@
       "serializationName": "ParameterCandidateBaseline",
       "publicCompatibilityType": true,
       "compatibilityLevel": "root_public_compatibility",
-      "currentRootExport": "glob_reexport",
+      "currentRootExport": "explicit_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
@@ -15805,7 +15805,7 @@
       "serializationName": "ParameterLifecycleReadiness",
       "publicCompatibilityType": true,
       "compatibilityLevel": "root_public_compatibility",
-      "currentRootExport": "glob_reexport",
+      "currentRootExport": "explicit_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
@@ -15868,7 +15868,7 @@
       "serializationName": "ParameterLifecycleReadinessRequest",
       "publicCompatibilityType": true,
       "compatibilityLevel": "root_public_compatibility",
-      "currentRootExport": "glob_reexport",
+      "currentRootExport": "explicit_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
@@ -15947,7 +15947,7 @@
       "serializationName": "ParameterPromotionDecisionRecord",
       "publicCompatibilityType": true,
       "compatibilityLevel": "root_public_compatibility",
-      "currentRootExport": "glob_reexport",
+      "currentRootExport": "explicit_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
@@ -16008,7 +16008,7 @@
       "serializationName": "ParameterPromotionRequest",
       "publicCompatibilityType": true,
       "compatibilityLevel": "root_public_compatibility",
-      "currentRootExport": "glob_reexport",
+      "currentRootExport": "explicit_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
@@ -16143,7 +16143,7 @@
       "serializationName": "ParameterReplayFixture",
       "publicCompatibilityType": true,
       "compatibilityLevel": "root_public_compatibility",
-      "currentRootExport": "glob_reexport",
+      "currentRootExport": "explicit_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
@@ -16203,7 +16203,7 @@
       "serializationName": "ParameterRollbackRequest",
       "publicCompatibilityType": true,
       "compatibilityLevel": "root_public_compatibility",
-      "currentRootExport": "glob_reexport",
+      "currentRootExport": "explicit_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
@@ -16294,7 +16294,7 @@
       "serializationName": "ParameterShadowValidationRecord",
       "publicCompatibilityType": true,
       "compatibilityLevel": "root_public_compatibility",
-      "currentRootExport": "glob_reexport",
+      "currentRootExport": "explicit_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
@@ -16345,7 +16345,7 @@
       "serializationName": "ParameterShadowValidationRequest",
       "publicCompatibilityType": true,
       "compatibilityLevel": "root_public_compatibility",
-      "currentRootExport": "glob_reexport",
+      "currentRootExport": "explicit_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "none_detected",
       "domainCallers": [
@@ -16509,7 +16509,7 @@
       "serializationName": "ParameterTuningCandidateRecord",
       "publicCompatibilityType": true,
       "compatibilityLevel": "root_public_compatibility",
-      "currentRootExport": "glob_reexport",
+      "currentRootExport": "explicit_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
@@ -16571,7 +16571,7 @@
       "serializationName": "ParameterTuningDecision",
       "publicCompatibilityType": true,
       "compatibilityLevel": "root_public_compatibility",
-      "currentRootExport": "glob_reexport",
+      "currentRootExport": "explicit_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
@@ -16631,7 +16631,7 @@
       "serializationName": "ParameterTuningDecisionDraft",
       "publicCompatibilityType": true,
       "compatibilityLevel": "root_public_compatibility",
-      "currentRootExport": "glob_reexport",
+      "currentRootExport": "explicit_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
@@ -16706,7 +16706,7 @@
       "serializationName": "ParameterTuningDraft",
       "publicCompatibilityType": true,
       "compatibilityLevel": "root_public_compatibility",
-      "currentRootExport": "glob_reexport",
+      "currentRootExport": "explicit_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "none_detected",
       "domainCallers": [
@@ -16778,7 +16778,7 @@
       "serializationName": "PersistedModelRun",
       "publicCompatibilityType": true,
       "compatibilityLevel": "root_public_compatibility",
-      "currentRootExport": "glob_reexport",
+      "currentRootExport": "explicit_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "none_detected",
       "domainCallers": [
@@ -16833,7 +16833,7 @@
       "serializationName": "PlanP4HorizonsCommand",
       "publicCompatibilityType": true,
       "compatibilityLevel": "root_public_compatibility",
-      "currentRootExport": "glob_reexport",
+      "currentRootExport": "explicit_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "none_detected",
       "domainCallers": [
@@ -16943,7 +16943,7 @@
       "serializationName": "PlayerAbilityObservationDraft",
       "publicCompatibilityType": true,
       "compatibilityLevel": "root_public_compatibility",
-      "currentRootExport": "glob_reexport",
+      "currentRootExport": "explicit_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
@@ -17043,7 +17043,7 @@
       "serializationName": "PlayerAbilityObservationRecord",
       "publicCompatibilityType": true,
       "compatibilityLevel": "root_public_compatibility",
-      "currentRootExport": "glob_reexport",
+      "currentRootExport": "explicit_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
@@ -17123,7 +17123,7 @@
       "serializationName": "PlayerAbilityProfile",
       "publicCompatibilityType": true,
       "compatibilityLevel": "root_public_compatibility",
-      "currentRootExport": "glob_reexport",
+      "currentRootExport": "explicit_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
@@ -17224,7 +17224,7 @@
       "serializationName": "PlayerAvailabilityDraft",
       "publicCompatibilityType": true,
       "compatibilityLevel": "root_public_compatibility",
-      "currentRootExport": "glob_reexport",
+      "currentRootExport": "explicit_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
@@ -17316,7 +17316,7 @@
       "serializationName": "PlayerAvailabilityRecord",
       "publicCompatibilityType": true,
       "compatibilityLevel": "root_public_compatibility",
-      "currentRootExport": "glob_reexport",
+      "currentRootExport": "explicit_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
@@ -17404,7 +17404,7 @@
       "serializationName": "PlayerCatalogReferenceData",
       "publicCompatibilityType": true,
       "compatibilityLevel": "root_public_compatibility",
-      "currentRootExport": "glob_reexport",
+      "currentRootExport": "explicit_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
@@ -17490,7 +17490,7 @@
       "serializationName": "PlayerDetail",
       "publicCompatibilityType": true,
       "compatibilityLevel": "root_public_compatibility",
-      "currentRootExport": "glob_reexport",
+      "currentRootExport": "explicit_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
@@ -17577,7 +17577,7 @@
       "serializationName": "PlayerDraft",
       "publicCompatibilityType": true,
       "compatibilityLevel": "root_public_compatibility",
-      "currentRootExport": "glob_reexport",
+      "currentRootExport": "explicit_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
@@ -17661,7 +17661,7 @@
       "serializationName": "PlayerDynamicTagDefinitionRecord",
       "publicCompatibilityType": true,
       "compatibilityLevel": "root_public_compatibility",
-      "currentRootExport": "glob_reexport",
+      "currentRootExport": "explicit_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
@@ -17790,7 +17790,7 @@
       "serializationName": "PlayerDynamicTagDraft",
       "publicCompatibilityType": true,
       "compatibilityLevel": "root_public_compatibility",
-      "currentRootExport": "glob_reexport",
+      "currentRootExport": "explicit_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
@@ -17918,7 +17918,7 @@
       "serializationName": "PlayerDynamicTagRecord",
       "publicCompatibilityType": true,
       "compatibilityLevel": "root_public_compatibility",
-      "currentRootExport": "glob_reexport",
+      "currentRootExport": "explicit_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
@@ -18061,7 +18061,7 @@
       "serializationName": "PlayerListItem",
       "publicCompatibilityType": true,
       "compatibilityLevel": "root_public_compatibility",
-      "currentRootExport": "glob_reexport",
+      "currentRootExport": "explicit_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
@@ -18123,7 +18123,7 @@
       "serializationName": "PlayerListPage",
       "publicCompatibilityType": true,
       "compatibilityLevel": "root_public_compatibility",
-      "currentRootExport": "glob_reexport",
+      "currentRootExport": "explicit_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
@@ -18218,7 +18218,7 @@
       "serializationName": "PlayerListQuery",
       "publicCompatibilityType": true,
       "compatibilityLevel": "root_public_compatibility",
-      "currentRootExport": "glob_reexport",
+      "currentRootExport": "explicit_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
@@ -18349,7 +18349,7 @@
       "serializationName": "PlayerMatchContribution",
       "publicCompatibilityType": true,
       "compatibilityLevel": "root_public_compatibility",
-      "currentRootExport": "glob_reexport",
+      "currentRootExport": "explicit_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
@@ -18461,7 +18461,7 @@
       "serializationName": "PlayerMatchContributionRequest",
       "publicCompatibilityType": true,
       "compatibilityLevel": "root_public_compatibility",
-      "currentRootExport": "glob_reexport",
+      "currentRootExport": "explicit_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
@@ -18564,7 +18564,7 @@
       "serializationName": "PlayerMatchObservationDraft",
       "publicCompatibilityType": true,
       "compatibilityLevel": "root_public_compatibility",
-      "currentRootExport": "glob_reexport",
+      "currentRootExport": "explicit_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "none_detected",
       "domainCallers": [
@@ -18664,7 +18664,7 @@
       "serializationName": "PlayerMatchObservationRecord",
       "publicCompatibilityType": true,
       "compatibilityLevel": "root_public_compatibility",
-      "currentRootExport": "glob_reexport",
+      "currentRootExport": "explicit_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "none_detected",
       "domainCallers": [
@@ -18773,7 +18773,7 @@
       "serializationName": "PlayerMatchReviewRecord",
       "publicCompatibilityType": true,
       "compatibilityLevel": "root_public_compatibility",
-      "currentRootExport": "glob_reexport",
+      "currentRootExport": "explicit_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
@@ -18851,7 +18851,7 @@
       "serializationName": "PlayerNameDraft",
       "publicCompatibilityType": true,
       "compatibilityLevel": "root_public_compatibility",
-      "currentRootExport": "glob_reexport",
+      "currentRootExport": "explicit_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
@@ -18931,7 +18931,7 @@
       "serializationName": "PlayerNameRecord",
       "publicCompatibilityType": true,
       "compatibilityLevel": "root_public_compatibility",
-      "currentRootExport": "glob_reexport",
+      "currentRootExport": "explicit_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
@@ -19100,7 +19100,7 @@
       "serializationName": "PlayerPerformanceMetrics",
       "publicCompatibilityType": true,
       "compatibilityLevel": "root_public_compatibility",
-      "currentRootExport": "glob_reexport",
+      "currentRootExport": "explicit_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
@@ -19191,7 +19191,7 @@
       "serializationName": "PlayerPositionDraft",
       "publicCompatibilityType": true,
       "compatibilityLevel": "root_public_compatibility",
-      "currentRootExport": "glob_reexport",
+      "currentRootExport": "explicit_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
@@ -19281,7 +19281,7 @@
       "serializationName": "PlayerPositionRecord",
       "publicCompatibilityType": true,
       "compatibilityLevel": "root_public_compatibility",
-      "currentRootExport": "glob_reexport",
+      "currentRootExport": "explicit_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
@@ -19365,7 +19365,7 @@
       "serializationName": "PlayerRecord",
       "publicCompatibilityType": true,
       "compatibilityLevel": "root_public_compatibility",
-      "currentRootExport": "glob_reexport",
+      "currentRootExport": "explicit_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
@@ -19436,7 +19436,7 @@
       "serializationName": "PlayerStatus",
       "publicCompatibilityType": true,
       "compatibilityLevel": "root_public_compatibility",
-      "currentRootExport": "glob_reexport",
+      "currentRootExport": "explicit_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
@@ -19528,7 +19528,7 @@
       "serializationName": "PlayerTeamPeriodDraft",
       "publicCompatibilityType": true,
       "compatibilityLevel": "root_public_compatibility",
-      "currentRootExport": "glob_reexport",
+      "currentRootExport": "explicit_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
@@ -19615,7 +19615,7 @@
       "serializationName": "PlayerTeamPeriodRecord",
       "publicCompatibilityType": true,
       "compatibilityLevel": "root_public_compatibility",
-      "currentRootExport": "glob_reexport",
+      "currentRootExport": "explicit_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
@@ -19679,7 +19679,7 @@
       "serializationName": "PositionReference",
       "publicCompatibilityType": true,
       "compatibilityLevel": "root_public_compatibility",
-      "currentRootExport": "glob_reexport",
+      "currentRootExport": "explicit_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
@@ -19754,7 +19754,7 @@
       "serializationName": "PostmatchDriftFindingRecord",
       "publicCompatibilityType": true,
       "compatibilityLevel": "root_public_compatibility",
-      "currentRootExport": "glob_reexport",
+      "currentRootExport": "explicit_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
@@ -19876,7 +19876,7 @@
       "serializationName": "PostmatchDriftRunRecord",
       "publicCompatibilityType": true,
       "compatibilityLevel": "root_public_compatibility",
-      "currentRootExport": "glob_reexport",
+      "currentRootExport": "explicit_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
@@ -19942,7 +19942,7 @@
       "serializationName": "PostmatchMonitoringRequest",
       "publicCompatibilityType": true,
       "compatibilityLevel": "root_public_compatibility",
-      "currentRootExport": "glob_reexport",
+      "currentRootExport": "explicit_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
@@ -20017,7 +20017,7 @@
       "serializationName": "PostmatchOverview",
       "publicCompatibilityType": true,
       "compatibilityLevel": "root_public_compatibility",
-      "currentRootExport": "glob_reexport",
+      "currentRootExport": "explicit_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
@@ -20080,7 +20080,7 @@
       "serializationName": "PostmatchSettlementDraft",
       "publicCompatibilityType": true,
       "compatibilityLevel": "root_public_compatibility",
-      "currentRootExport": "glob_reexport",
+      "currentRootExport": "explicit_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
@@ -20191,7 +20191,7 @@
       "serializationName": "PostmatchSettlementReadiness",
       "publicCompatibilityType": true,
       "compatibilityLevel": "root_public_compatibility",
-      "currentRootExport": "glob_reexport",
+      "currentRootExport": "explicit_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
@@ -20362,7 +20362,7 @@
       "serializationName": "PostmatchSettlementRecord",
       "publicCompatibilityType": true,
       "compatibilityLevel": "root_public_compatibility",
-      "currentRootExport": "glob_reexport",
+      "currentRootExport": "explicit_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
@@ -20430,7 +20430,7 @@
       "serializationName": "PredictionInputAuditSummary",
       "publicCompatibilityType": true,
       "compatibilityLevel": "root_public_compatibility",
-      "currentRootExport": "glob_reexport",
+      "currentRootExport": "explicit_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "none_detected",
       "domainCallers": [
@@ -20510,7 +20510,7 @@
       "serializationName": "PredictionReadinessCheck",
       "publicCompatibilityType": true,
       "compatibilityLevel": "root_public_compatibility",
-      "currentRootExport": "glob_reexport",
+      "currentRootExport": "explicit_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "none_detected",
       "domainCallers": [
@@ -20571,7 +20571,7 @@
       "serializationName": "PredictionReadinessCheckStatus",
       "publicCompatibilityType": true,
       "compatibilityLevel": "root_public_compatibility",
-      "currentRootExport": "glob_reexport",
+      "currentRootExport": "explicit_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "none_detected",
       "domainCallers": [
@@ -20636,7 +20636,7 @@
       "serializationName": "PredictionReadinessLevel",
       "publicCompatibilityType": true,
       "compatibilityLevel": "root_public_compatibility",
-      "currentRootExport": "glob_reexport",
+      "currentRootExport": "explicit_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "none_detected",
       "domainCallers": [
@@ -20693,7 +20693,7 @@
       "serializationName": "PredictionReviewContext",
       "publicCompatibilityType": true,
       "compatibilityLevel": "root_public_compatibility",
-      "currentRootExport": "glob_reexport",
+      "currentRootExport": "explicit_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
@@ -20759,7 +20759,7 @@
       "serializationName": "PredictionSummary",
       "publicCompatibilityType": true,
       "compatibilityLevel": "root_public_compatibility",
-      "currentRootExport": "glob_reexport",
+      "currentRootExport": "explicit_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "none_detected",
       "domainCallers": [
@@ -20825,7 +20825,7 @@
       "serializationName": "PreferredFoot",
       "publicCompatibilityType": true,
       "compatibilityLevel": "root_public_compatibility",
-      "currentRootExport": "glob_reexport",
+      "currentRootExport": "explicit_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
@@ -20891,7 +20891,7 @@
       "serializationName": "PrematchSnapshotBundle",
       "publicCompatibilityType": true,
       "compatibilityLevel": "root_public_compatibility",
-      "currentRootExport": "glob_reexport",
+      "currentRootExport": "explicit_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
@@ -21018,7 +21018,7 @@
       "serializationName": "PrematchSnapshotDraft",
       "publicCompatibilityType": true,
       "compatibilityLevel": "root_public_compatibility",
-      "currentRootExport": "glob_reexport",
+      "currentRootExport": "explicit_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
@@ -21114,7 +21114,7 @@
       "serializationName": "PrematchSnapshotRecord",
       "publicCompatibilityType": true,
       "compatibilityLevel": "root_public_compatibility",
-      "currentRootExport": "glob_reexport",
+      "currentRootExport": "explicit_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
@@ -21181,7 +21181,7 @@
       "serializationName": "PreparedMatchPredictionInput",
       "publicCompatibilityType": true,
       "compatibilityLevel": "root_public_compatibility",
-      "currentRootExport": "glob_reexport",
+      "currentRootExport": "explicit_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
@@ -21249,7 +21249,7 @@
       "serializationName": "PromptVersionDraft",
       "publicCompatibilityType": true,
       "compatibilityLevel": "root_public_compatibility",
-      "currentRootExport": "glob_reexport",
+      "currentRootExport": "explicit_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
@@ -21320,7 +21320,7 @@
       "serializationName": "PromptVersionRecord",
       "publicCompatibilityType": true,
       "compatibilityLevel": "root_public_compatibility",
-      "currentRootExport": "glob_reexport",
+      "currentRootExport": "explicit_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
@@ -21450,7 +21450,7 @@
       "serializationName": "ProviderScoreSnapshotRecord",
       "publicCompatibilityType": true,
       "compatibilityLevel": "root_public_compatibility",
-      "currentRootExport": "glob_reexport",
+      "currentRootExport": "explicit_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
@@ -21536,7 +21536,7 @@
       "serializationName": "QueryPerformanceFinding",
       "publicCompatibilityType": true,
       "compatibilityLevel": "root_public_compatibility",
-      "currentRootExport": "glob_reexport",
+      "currentRootExport": "explicit_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
@@ -21594,7 +21594,7 @@
       "serializationName": "QueryPerformanceSummary",
       "publicCompatibilityType": true,
       "compatibilityLevel": "root_public_compatibility",
-      "currentRootExport": "glob_reexport",
+      "currentRootExport": "explicit_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
@@ -21657,7 +21657,7 @@
       "serializationName": "ReleaseAcceptanceCategorySummary",
       "publicCompatibilityType": true,
       "compatibilityLevel": "root_public_compatibility",
-      "currentRootExport": "glob_reexport",
+      "currentRootExport": "explicit_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "none_detected",
       "domainCallers": [
@@ -21745,7 +21745,7 @@
       "serializationName": "ReleaseAcceptanceCheck",
       "publicCompatibilityType": true,
       "compatibilityLevel": "root_public_compatibility",
-      "currentRootExport": "glob_reexport",
+      "currentRootExport": "explicit_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
@@ -21825,7 +21825,7 @@
       "serializationName": "ReleaseAcceptanceCostSummary",
       "publicCompatibilityType": true,
       "compatibilityLevel": "root_public_compatibility",
-      "currentRootExport": "glob_reexport",
+      "currentRootExport": "explicit_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "none_detected",
       "domainCallers": [
@@ -21890,7 +21890,7 @@
       "serializationName": "ReleaseAcceptancePerformanceSummary",
       "publicCompatibilityType": true,
       "compatibilityLevel": "root_public_compatibility",
-      "currentRootExport": "glob_reexport",
+      "currentRootExport": "explicit_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "none_detected",
       "domainCallers": [
@@ -21964,7 +21964,7 @@
       "serializationName": "ReleaseAcceptanceRequest",
       "publicCompatibilityType": true,
       "compatibilityLevel": "root_public_compatibility",
-      "currentRootExport": "glob_reexport",
+      "currentRootExport": "explicit_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "none_detected",
       "domainCallers": [
@@ -22073,7 +22073,7 @@
       "serializationName": "ReleaseAcceptanceRun",
       "publicCompatibilityType": true,
       "compatibilityLevel": "root_public_compatibility",
-      "currentRootExport": "glob_reexport",
+      "currentRootExport": "explicit_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
@@ -22156,7 +22156,7 @@
       "serializationName": "ReleaseAcceptanceRunSummary",
       "publicCompatibilityType": true,
       "compatibilityLevel": "root_public_compatibility",
-      "currentRootExport": "glob_reexport",
+      "currentRootExport": "explicit_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
@@ -22284,7 +22284,7 @@
       "serializationName": "ReleaseAcceptanceRuntimeFacts",
       "publicCompatibilityType": true,
       "compatibilityLevel": "root_public_compatibility",
-      "currentRootExport": "glob_reexport",
+      "currentRootExport": "explicit_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
@@ -22347,7 +22347,7 @@
       "serializationName": "ReleaseAcceptanceStatus",
       "publicCompatibilityType": true,
       "compatibilityLevel": "root_public_compatibility",
-      "currentRootExport": "glob_reexport",
+      "currentRootExport": "explicit_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
@@ -22444,7 +22444,7 @@
       "serializationName": "ResearchRunDraft",
       "publicCompatibilityType": true,
       "compatibilityLevel": "root_public_compatibility",
-      "currentRootExport": "glob_reexport",
+      "currentRootExport": "explicit_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
@@ -22540,7 +22540,7 @@
       "serializationName": "ResearchRunEventDraft",
       "publicCompatibilityType": true,
       "compatibilityLevel": "root_public_compatibility",
-      "currentRootExport": "glob_reexport",
+      "currentRootExport": "explicit_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
@@ -22624,7 +22624,7 @@
       "serializationName": "ResearchRunRecord",
       "publicCompatibilityType": true,
       "compatibilityLevel": "root_public_compatibility",
-      "currentRootExport": "glob_reexport",
+      "currentRootExport": "explicit_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
@@ -22701,7 +22701,7 @@
       "serializationName": "ResearchRunStatus",
       "publicCompatibilityType": true,
       "compatibilityLevel": "root_public_compatibility",
-      "currentRootExport": "glob_reexport",
+      "currentRootExport": "explicit_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
@@ -22768,7 +22768,7 @@
       "serializationName": "ResolvedCompetitionContext",
       "publicCompatibilityType": true,
       "compatibilityLevel": "root_public_compatibility",
-      "currentRootExport": "glob_reexport",
+      "currentRootExport": "explicit_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
@@ -22857,7 +22857,7 @@
       "serializationName": "ResolvedFormationDistribution",
       "publicCompatibilityType": true,
       "compatibilityLevel": "root_public_compatibility",
-      "currentRootExport": "glob_reexport",
+      "currentRootExport": "explicit_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
@@ -22929,7 +22929,7 @@
       "serializationName": "ResolveP4ConflictCommand",
       "publicCompatibilityType": true,
       "compatibilityLevel": "root_public_compatibility",
-      "currentRootExport": "glob_reexport",
+      "currentRootExport": "explicit_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "none_detected",
       "domainCallers": [
@@ -22993,7 +22993,7 @@
       "serializationName": "ReviewableMatch",
       "publicCompatibilityType": true,
       "compatibilityLevel": "root_public_compatibility",
-      "currentRootExport": "glob_reexport",
+      "currentRootExport": "explicit_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
@@ -23108,7 +23108,7 @@
       "serializationName": "ReviewPlayerBaseline",
       "publicCompatibilityType": true,
       "compatibilityLevel": "root_public_compatibility",
-      "currentRootExport": "glob_reexport",
+      "currentRootExport": "explicit_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
@@ -23183,7 +23183,7 @@
       "serializationName": "ReviewPreparationData",
       "publicCompatibilityType": true,
       "compatibilityLevel": "root_public_compatibility",
-      "currentRootExport": "glob_reexport",
+      "currentRootExport": "explicit_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
@@ -23241,7 +23241,7 @@
       "serializationName": "ReviewTeamContext",
       "publicCompatibilityType": true,
       "compatibilityLevel": "root_public_compatibility",
-      "currentRootExport": "glob_reexport",
+      "currentRootExport": "explicit_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
@@ -23317,7 +23317,7 @@
       "serializationName": "RoundDraft",
       "publicCompatibilityType": true,
       "compatibilityLevel": "root_public_compatibility",
-      "currentRootExport": "glob_reexport",
+      "currentRootExport": "explicit_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
@@ -23397,7 +23397,7 @@
       "serializationName": "RoundRecord",
       "publicCompatibilityType": true,
       "compatibilityLevel": "root_public_compatibility",
-      "currentRootExport": "glob_reexport",
+      "currentRootExport": "explicit_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
@@ -23522,7 +23522,7 @@
       "serializationName": "RouteDecision",
       "publicCompatibilityType": true,
       "compatibilityLevel": "root_public_compatibility",
-      "currentRootExport": "glob_reexport",
+      "currentRootExport": "explicit_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
@@ -23618,7 +23618,7 @@
       "serializationName": "RouteRequest",
       "publicCompatibilityType": true,
       "compatibilityLevel": "root_public_compatibility",
-      "currentRootExport": "glob_reexport",
+      "currentRootExport": "explicit_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
@@ -23688,7 +23688,7 @@
       "serializationName": "RouteSource",
       "publicCompatibilityType": true,
       "compatibilityLevel": "root_public_compatibility",
-      "currentRootExport": "glob_reexport",
+      "currentRootExport": "explicit_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
@@ -23790,7 +23790,7 @@
       "serializationName": "RulePackageDraft",
       "publicCompatibilityType": true,
       "compatibilityLevel": "root_public_compatibility",
-      "currentRootExport": "glob_reexport",
+      "currentRootExport": "explicit_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
@@ -23893,7 +23893,7 @@
       "serializationName": "RulePackageSummary",
       "publicCompatibilityType": true,
       "compatibilityLevel": "root_public_compatibility",
-      "currentRootExport": "glob_reexport",
+      "currentRootExport": "explicit_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
@@ -23972,7 +23972,7 @@
       "serializationName": "RuleRouting",
       "publicCompatibilityType": true,
       "compatibilityLevel": "root_public_compatibility",
-      "currentRootExport": "glob_reexport",
+      "currentRootExport": "explicit_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "none_detected",
       "domainCallers": [
@@ -24044,7 +24044,7 @@
       "serializationName": "RuleSourceReference",
       "publicCompatibilityType": true,
       "compatibilityLevel": "root_public_compatibility",
-      "currentRootExport": "glob_reexport",
+      "currentRootExport": "explicit_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "none_detected",
       "domainCallers": [
@@ -24117,7 +24117,7 @@
       "serializationName": "SchemaVersionDraft",
       "publicCompatibilityType": true,
       "compatibilityLevel": "root_public_compatibility",
-      "currentRootExport": "glob_reexport",
+      "currentRootExport": "explicit_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
@@ -24189,7 +24189,7 @@
       "serializationName": "SchemaVersionRecord",
       "publicCompatibilityType": true,
       "compatibilityLevel": "root_public_compatibility",
-      "currentRootExport": "glob_reexport",
+      "currentRootExport": "explicit_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
@@ -24269,7 +24269,7 @@
       "serializationName": "SeasonDraft",
       "publicCompatibilityType": true,
       "compatibilityLevel": "root_public_compatibility",
-      "currentRootExport": "glob_reexport",
+      "currentRootExport": "explicit_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
@@ -24347,7 +24347,7 @@
       "serializationName": "SeasonRecord",
       "publicCompatibilityType": true,
       "compatibilityLevel": "root_public_compatibility",
-      "currentRootExport": "glob_reexport",
+      "currentRootExport": "explicit_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
@@ -24408,7 +24408,7 @@
       "serializationName": "SeasonTeamMembershipOption",
       "publicCompatibilityType": true,
       "compatibilityLevel": "root_public_compatibility",
-      "currentRootExport": "glob_reexport",
+      "currentRootExport": "explicit_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
@@ -24483,7 +24483,7 @@
       "serializationName": "SnapshotFeatureDraft",
       "publicCompatibilityType": true,
       "compatibilityLevel": "root_public_compatibility",
-      "currentRootExport": "glob_reexport",
+      "currentRootExport": "explicit_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
@@ -24587,7 +24587,7 @@
       "serializationName": "SnapshotProbabilityDraft",
       "publicCompatibilityType": true,
       "compatibilityLevel": "root_public_compatibility",
-      "currentRootExport": "glob_reexport",
+      "currentRootExport": "explicit_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
@@ -24652,7 +24652,7 @@
       "serializationName": "SnapshotSourceKind",
       "publicCompatibilityType": true,
       "compatibilityLevel": "root_public_compatibility",
-      "currentRootExport": "glob_reexport",
+      "currentRootExport": "explicit_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
@@ -24718,7 +24718,7 @@
       "serializationName": "SourcePolicyDefinition",
       "publicCompatibilityType": true,
       "compatibilityLevel": "root_public_compatibility",
-      "currentRootExport": "glob_reexport",
+      "currentRootExport": "explicit_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
@@ -24790,7 +24790,7 @@
       "serializationName": "SourcePolicyVersionDraft",
       "publicCompatibilityType": true,
       "compatibilityLevel": "root_public_compatibility",
-      "currentRootExport": "glob_reexport",
+      "currentRootExport": "explicit_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
@@ -24857,7 +24857,7 @@
       "serializationName": "SourcePolicyVersionRecord",
       "publicCompatibilityType": true,
       "compatibilityLevel": "root_public_compatibility",
-      "currentRootExport": "glob_reexport",
+      "currentRootExport": "explicit_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
@@ -24912,7 +24912,7 @@
       "serializationName": "SourceTierDefinition",
       "publicCompatibilityType": true,
       "compatibilityLevel": "root_public_compatibility",
-      "currentRootExport": "glob_reexport",
+      "currentRootExport": "explicit_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
@@ -24969,7 +24969,7 @@
       "serializationName": "SourceTierRule",
       "publicCompatibilityType": true,
       "compatibilityLevel": "root_public_compatibility",
-      "currentRootExport": "glob_reexport",
+      "currentRootExport": "explicit_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
@@ -25041,7 +25041,7 @@
       "serializationName": "SpreadsheetAction",
       "publicCompatibilityType": true,
       "compatibilityLevel": "root_public_compatibility",
-      "currentRootExport": "glob_reexport",
+      "currentRootExport": "explicit_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
@@ -25112,7 +25112,7 @@
       "serializationName": "SpreadsheetConflictCandidate",
       "publicCompatibilityType": true,
       "compatibilityLevel": "root_public_compatibility",
-      "currentRootExport": "glob_reexport",
+      "currentRootExport": "explicit_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
@@ -25243,7 +25243,7 @@
       "serializationName": "SpreadsheetEntityType",
       "publicCompatibilityType": true,
       "compatibilityLevel": "root_public_compatibility",
-      "currentRootExport": "glob_reexport",
+      "currentRootExport": "explicit_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
@@ -25337,7 +25337,7 @@
       "serializationName": "SpreadsheetExportData",
       "publicCompatibilityType": true,
       "compatibilityLevel": "root_public_compatibility",
-      "currentRootExport": "glob_reexport",
+      "currentRootExport": "explicit_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
@@ -25400,7 +25400,7 @@
       "serializationName": "SpreadsheetExportSummary",
       "publicCompatibilityType": true,
       "compatibilityLevel": "root_public_compatibility",
-      "currentRootExport": "glob_reexport",
+      "currentRootExport": "explicit_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "none_detected",
       "domainCallers": [
@@ -25464,7 +25464,7 @@
       "serializationName": "SpreadsheetExternalIdRow",
       "publicCompatibilityType": true,
       "compatibilityLevel": "root_public_compatibility",
-      "currentRootExport": "glob_reexport",
+      "currentRootExport": "explicit_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
@@ -25538,7 +25538,7 @@
       "serializationName": "SpreadsheetImportCommitResult",
       "publicCompatibilityType": true,
       "compatibilityLevel": "root_public_compatibility",
-      "currentRootExport": "glob_reexport",
+      "currentRootExport": "explicit_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
@@ -25624,7 +25624,7 @@
       "serializationName": "SpreadsheetImportCounts",
       "publicCompatibilityType": true,
       "compatibilityLevel": "root_public_compatibility",
-      "currentRootExport": "glob_reexport",
+      "currentRootExport": "explicit_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
@@ -25688,7 +25688,7 @@
       "serializationName": "SpreadsheetImportMode",
       "publicCompatibilityType": true,
       "compatibilityLevel": "root_public_compatibility",
-      "currentRootExport": "glob_reexport",
+      "currentRootExport": "explicit_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
@@ -25771,7 +25771,7 @@
       "serializationName": "SpreadsheetImportPreview",
       "publicCompatibilityType": true,
       "compatibilityLevel": "root_public_compatibility",
-      "currentRootExport": "glob_reexport",
+      "currentRootExport": "explicit_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
@@ -25840,7 +25840,7 @@
       "serializationName": "SpreadsheetImportResolution",
       "publicCompatibilityType": true,
       "compatibilityLevel": "root_public_compatibility",
-      "currentRootExport": "glob_reexport",
+      "currentRootExport": "explicit_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
@@ -25938,7 +25938,7 @@
       "serializationName": "SpreadsheetImportRow",
       "publicCompatibilityType": true,
       "compatibilityLevel": "root_public_compatibility",
-      "currentRootExport": "glob_reexport",
+      "currentRootExport": "explicit_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
@@ -26004,7 +26004,7 @@
       "serializationName": "SpreadsheetParsedWorkbook",
       "publicCompatibilityType": true,
       "compatibilityLevel": "root_public_compatibility",
-      "currentRootExport": "glob_reexport",
+      "currentRootExport": "explicit_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
@@ -26111,7 +26111,7 @@
       "serializationName": "SpreadsheetPlayerAbilityRow",
       "publicCompatibilityType": true,
       "compatibilityLevel": "root_public_compatibility",
-      "currentRootExport": "glob_reexport",
+      "currentRootExport": "explicit_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
@@ -26201,7 +26201,7 @@
       "serializationName": "SpreadsheetPlayerAvailabilityRow",
       "publicCompatibilityType": true,
       "compatibilityLevel": "root_public_compatibility",
-      "currentRootExport": "glob_reexport",
+      "currentRootExport": "explicit_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
@@ -26311,7 +26311,7 @@
       "serializationName": "SpreadsheetPlayerDynamicTagRow",
       "publicCompatibilityType": true,
       "compatibilityLevel": "root_public_compatibility",
-      "currentRootExport": "glob_reexport",
+      "currentRootExport": "explicit_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
@@ -26389,7 +26389,7 @@
       "serializationName": "SpreadsheetPlayerNameRow",
       "publicCompatibilityType": true,
       "compatibilityLevel": "root_public_compatibility",
-      "currentRootExport": "glob_reexport",
+      "currentRootExport": "explicit_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
@@ -26473,7 +26473,7 @@
       "serializationName": "SpreadsheetPlayerPositionRow",
       "publicCompatibilityType": true,
       "compatibilityLevel": "root_public_compatibility",
-      "currentRootExport": "glob_reexport",
+      "currentRootExport": "explicit_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
@@ -26547,7 +26547,7 @@
       "serializationName": "SpreadsheetPlayerRow",
       "publicCompatibilityType": true,
       "compatibilityLevel": "root_public_compatibility",
-      "currentRootExport": "glob_reexport",
+      "currentRootExport": "explicit_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
@@ -26633,7 +26633,7 @@
       "serializationName": "SpreadsheetPlayerTeamPeriodRow",
       "publicCompatibilityType": true,
       "compatibilityLevel": "root_public_compatibility",
-      "currentRootExport": "glob_reexport",
+      "currentRootExport": "explicit_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
@@ -26699,7 +26699,7 @@
       "serializationName": "SpreadsheetRawRow",
       "publicCompatibilityType": true,
       "compatibilityLevel": "root_public_compatibility",
-      "currentRootExport": "glob_reexport",
+      "currentRootExport": "explicit_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
@@ -26785,7 +26785,7 @@
       "serializationName": "SpreadsheetRowStatus",
       "publicCompatibilityType": true,
       "compatibilityLevel": "root_public_compatibility",
-      "currentRootExport": "glob_reexport",
+      "currentRootExport": "explicit_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
@@ -26852,7 +26852,7 @@
       "serializationName": "SpreadsheetTeamRow",
       "publicCompatibilityType": true,
       "compatibilityLevel": "root_public_compatibility",
-      "currentRootExport": "glob_reexport",
+      "currentRootExport": "explicit_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
@@ -26926,7 +26926,7 @@
       "serializationName": "StageDraft",
       "publicCompatibilityType": true,
       "compatibilityLevel": "root_public_compatibility",
-      "currentRootExport": "glob_reexport",
+      "currentRootExport": "explicit_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
@@ -27010,7 +27010,7 @@
       "serializationName": "StageRecord",
       "publicCompatibilityType": true,
       "compatibilityLevel": "root_public_compatibility",
-      "currentRootExport": "glob_reexport",
+      "currentRootExport": "explicit_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
@@ -27103,7 +27103,7 @@
       "serializationName": "SubstitutionDraft",
       "publicCompatibilityType": true,
       "compatibilityLevel": "root_public_compatibility",
-      "currentRootExport": "glob_reexport",
+      "currentRootExport": "explicit_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "none_detected",
       "domainCallers": [
@@ -27191,7 +27191,7 @@
       "serializationName": "SubstitutionRecord",
       "publicCompatibilityType": true,
       "compatibilityLevel": "root_public_compatibility",
-      "currentRootExport": "glob_reexport",
+      "currentRootExport": "explicit_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
@@ -27298,7 +27298,7 @@
       "serializationName": "TeamAbilityObservationRow",
       "publicCompatibilityType": true,
       "compatibilityLevel": "root_public_compatibility",
-      "currentRootExport": "glob_reexport",
+      "currentRootExport": "explicit_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
@@ -27398,7 +27398,7 @@
       "serializationName": "TeamCoachPeriodDraft",
       "publicCompatibilityType": true,
       "compatibilityLevel": "root_public_compatibility",
-      "currentRootExport": "glob_reexport",
+      "currentRootExport": "explicit_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
@@ -27485,7 +27485,7 @@
       "serializationName": "TeamCoachPeriodRecord",
       "publicCompatibilityType": true,
       "compatibilityLevel": "root_public_compatibility",
-      "currentRootExport": "glob_reexport",
+      "currentRootExport": "explicit_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
@@ -27570,7 +27570,7 @@
       "serializationName": "TeamDetail",
       "publicCompatibilityType": true,
       "compatibilityLevel": "root_public_compatibility",
-      "currentRootExport": "glob_reexport",
+      "currentRootExport": "explicit_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
@@ -27634,7 +27634,7 @@
       "serializationName": "TeamDraft",
       "publicCompatibilityType": true,
       "compatibilityLevel": "root_public_compatibility",
-      "currentRootExport": "glob_reexport",
+      "currentRootExport": "explicit_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
@@ -27708,7 +27708,7 @@
       "serializationName": "TeamForceDeletePreview",
       "publicCompatibilityType": true,
       "compatibilityLevel": "root_public_compatibility",
-      "currentRootExport": "glob_reexport",
+      "currentRootExport": "explicit_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
@@ -27763,7 +27763,7 @@
       "serializationName": "TeamForceDeleteRequest",
       "publicCompatibilityType": true,
       "compatibilityLevel": "root_public_compatibility",
-      "currentRootExport": "glob_reexport",
+      "currentRootExport": "explicit_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
@@ -27838,7 +27838,7 @@
       "serializationName": "TeamForceDeleteResult",
       "publicCompatibilityType": true,
       "compatibilityLevel": "root_public_compatibility",
-      "currentRootExport": "glob_reexport",
+      "currentRootExport": "explicit_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
@@ -27901,7 +27901,7 @@
       "serializationName": "TeamLineupPresetApplicationPreview",
       "publicCompatibilityType": true,
       "compatibilityLevel": "root_public_compatibility",
-      "currentRootExport": "glob_reexport",
+      "currentRootExport": "explicit_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
@@ -28008,7 +28008,7 @@
       "serializationName": "TeamLineupPresetDraft",
       "publicCompatibilityType": true,
       "compatibilityLevel": "root_public_compatibility",
-      "currentRootExport": "glob_reexport",
+      "currentRootExport": "explicit_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
@@ -28111,7 +28111,7 @@
       "serializationName": "TeamLineupPresetMemberDraft",
       "publicCompatibilityType": true,
       "compatibilityLevel": "root_public_compatibility",
-      "currentRootExport": "glob_reexport",
+      "currentRootExport": "explicit_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
@@ -28233,7 +28233,7 @@
       "serializationName": "TeamLineupPresetMemberRecord",
       "publicCompatibilityType": true,
       "compatibilityLevel": "root_public_compatibility",
-      "currentRootExport": "glob_reexport",
+      "currentRootExport": "explicit_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
@@ -28363,7 +28363,7 @@
       "serializationName": "TeamLineupPresetRecord",
       "publicCompatibilityType": true,
       "compatibilityLevel": "root_public_compatibility",
-      "currentRootExport": "glob_reexport",
+      "currentRootExport": "explicit_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
@@ -28455,7 +28455,7 @@
       "serializationName": "TeamListItem",
       "publicCompatibilityType": true,
       "compatibilityLevel": "root_public_compatibility",
-      "currentRootExport": "glob_reexport",
+      "currentRootExport": "explicit_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
@@ -28517,7 +28517,7 @@
       "serializationName": "TeamListPage",
       "publicCompatibilityType": true,
       "compatibilityLevel": "root_public_compatibility",
-      "currentRootExport": "glob_reexport",
+      "currentRootExport": "explicit_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
@@ -28606,7 +28606,7 @@
       "serializationName": "TeamListQuery",
       "publicCompatibilityType": true,
       "compatibilityLevel": "root_public_compatibility",
-      "currentRootExport": "glob_reexport",
+      "currentRootExport": "explicit_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
@@ -28683,7 +28683,7 @@
       "serializationName": "TeamMatchLineupHistoryItem",
       "publicCompatibilityType": true,
       "compatibilityLevel": "root_public_compatibility",
-      "currentRootExport": "glob_reexport",
+      "currentRootExport": "explicit_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
@@ -28786,7 +28786,7 @@
       "serializationName": "TeamMatchReviewRecord",
       "publicCompatibilityType": true,
       "compatibilityLevel": "root_public_compatibility",
-      "currentRootExport": "glob_reexport",
+      "currentRootExport": "explicit_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
@@ -28872,7 +28872,7 @@
       "serializationName": "TeamMonthlyCoachPeriodRow",
       "publicCompatibilityType": true,
       "compatibilityLevel": "root_public_compatibility",
-      "currentRootExport": "glob_reexport",
+      "currentRootExport": "explicit_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
@@ -28938,7 +28938,7 @@
       "serializationName": "TeamMonthlyCoachRow",
       "publicCompatibilityType": true,
       "compatibilityLevel": "root_public_compatibility",
-      "currentRootExport": "glob_reexport",
+      "currentRootExport": "explicit_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
@@ -29060,7 +29060,7 @@
       "serializationName": "TeamMonthlyFormationUsageRow",
       "publicCompatibilityType": true,
       "compatibilityLevel": "root_public_compatibility",
-      "currentRootExport": "glob_reexport",
+      "currentRootExport": "explicit_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
@@ -29134,7 +29134,7 @@
       "serializationName": "TeamMonthlyNameRow",
       "publicCompatibilityType": true,
       "compatibilityLevel": "root_public_compatibility",
-      "currentRootExport": "glob_reexport",
+      "currentRootExport": "explicit_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
@@ -29232,7 +29232,7 @@
       "serializationName": "TeamMonthlyTeamRow",
       "publicCompatibilityType": true,
       "compatibilityLevel": "root_public_compatibility",
-      "currentRootExport": "glob_reexport",
+      "currentRootExport": "explicit_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
@@ -29311,7 +29311,7 @@
       "serializationName": "TeamMonthlyWorkbookData",
       "publicCompatibilityType": true,
       "compatibilityLevel": "root_public_compatibility",
-      "currentRootExport": "glob_reexport",
+      "currentRootExport": "explicit_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
@@ -29383,7 +29383,7 @@
       "serializationName": "TeamNameDraft",
       "publicCompatibilityType": true,
       "compatibilityLevel": "root_public_compatibility",
-      "currentRootExport": "glob_reexport",
+      "currentRootExport": "explicit_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
@@ -29459,7 +29459,7 @@
       "serializationName": "TeamNameRecord",
       "publicCompatibilityType": true,
       "compatibilityLevel": "root_public_compatibility",
-      "currentRootExport": "glob_reexport",
+      "currentRootExport": "explicit_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
@@ -29525,7 +29525,7 @@
       "serializationName": "TeamOption",
       "publicCompatibilityType": true,
       "compatibilityLevel": "root_public_compatibility",
-      "currentRootExport": "glob_reexport",
+      "currentRootExport": "explicit_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
@@ -29586,7 +29586,7 @@
       "serializationName": "TeamPackageCommitRequest",
       "publicCompatibilityType": true,
       "compatibilityLevel": "root_public_compatibility",
-      "currentRootExport": "glob_reexport",
+      "currentRootExport": "explicit_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "none_detected",
       "domainCallers": [
@@ -29658,7 +29658,7 @@
       "serializationName": "TeamPackageCommitResult",
       "publicCompatibilityType": true,
       "compatibilityLevel": "root_public_compatibility",
-      "currentRootExport": "glob_reexport",
+      "currentRootExport": "explicit_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "none_detected",
       "domainCallers": [
@@ -29757,7 +29757,7 @@
       "serializationName": "TeamPackageCoverage",
       "publicCompatibilityType": true,
       "compatibilityLevel": "root_public_compatibility",
-      "currentRootExport": "glob_reexport",
+      "currentRootExport": "explicit_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "none_detected",
       "domainCallers": [
@@ -29813,7 +29813,7 @@
       "serializationName": "TeamPackageExportSummary",
       "publicCompatibilityType": true,
       "compatibilityLevel": "root_public_compatibility",
-      "currentRootExport": "glob_reexport",
+      "currentRootExport": "explicit_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "none_detected",
       "domainCallers": [
@@ -29877,7 +29877,7 @@
       "serializationName": "TeamPackageImportPreview",
       "publicCompatibilityType": true,
       "compatibilityLevel": "root_public_compatibility",
-      "currentRootExport": "glob_reexport",
+      "currentRootExport": "explicit_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "none_detected",
       "domainCallers": [
@@ -29933,7 +29933,7 @@
       "serializationName": "TeamPackagePreviewExportSummary",
       "publicCompatibilityType": true,
       "compatibilityLevel": "root_public_compatibility",
-      "currentRootExport": "glob_reexport",
+      "currentRootExport": "explicit_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "none_detected",
       "domainCallers": [
@@ -30021,7 +30021,7 @@
       "serializationName": "TeamPlayerPeriodRecord",
       "publicCompatibilityType": true,
       "compatibilityLevel": "root_public_compatibility",
-      "currentRootExport": "glob_reexport",
+      "currentRootExport": "explicit_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
@@ -30163,7 +30163,7 @@
       "serializationName": "TeamProfileDraft",
       "publicCompatibilityType": true,
       "compatibilityLevel": "root_public_compatibility",
-      "currentRootExport": "glob_reexport",
+      "currentRootExport": "explicit_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
@@ -30283,7 +30283,7 @@
       "serializationName": "TeamProfileRecord",
       "publicCompatibilityType": true,
       "compatibilityLevel": "root_public_compatibility",
-      "currentRootExport": "glob_reexport",
+      "currentRootExport": "explicit_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
@@ -30363,7 +30363,7 @@
       "serializationName": "TeamRecentMatch",
       "publicCompatibilityType": true,
       "compatibilityLevel": "root_public_compatibility",
-      "currentRootExport": "glob_reexport",
+      "currentRootExport": "explicit_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
@@ -30433,7 +30433,7 @@
       "serializationName": "TeamRecord",
       "publicCompatibilityType": true,
       "compatibilityLevel": "root_public_compatibility",
-      "currentRootExport": "glob_reexport",
+      "currentRootExport": "explicit_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
@@ -30522,7 +30522,7 @@
       "serializationName": "TeamSquadPlayer",
       "publicCompatibilityType": true,
       "compatibilityLevel": "root_public_compatibility",
-      "currentRootExport": "glob_reexport",
+      "currentRootExport": "explicit_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
@@ -30636,7 +30636,7 @@
       "serializationName": "TeamTacticalObservationRow",
       "publicCompatibilityType": true,
       "compatibilityLevel": "root_public_compatibility",
-      "currentRootExport": "glob_reexport",
+      "currentRootExport": "explicit_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
@@ -30746,7 +30746,7 @@
       "serializationName": "TimeAuditDraft",
       "publicCompatibilityType": true,
       "compatibilityLevel": "root_public_compatibility",
-      "currentRootExport": "glob_reexport",
+      "currentRootExport": "explicit_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
@@ -30808,7 +30808,7 @@
       "serializationName": "TimeAuditRecord",
       "publicCompatibilityType": true,
       "compatibilityLevel": "root_public_compatibility",
-      "currentRootExport": "glob_reexport",
+      "currentRootExport": "explicit_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
@@ -30888,7 +30888,7 @@
       "serializationName": "TimeAuditStatus",
       "publicCompatibilityType": true,
       "compatibilityLevel": "root_public_compatibility",
-      "currentRootExport": "glob_reexport",
+      "currentRootExport": "explicit_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
@@ -30975,7 +30975,7 @@
       "serializationName": "WebCitationDraft",
       "publicCompatibilityType": true,
       "compatibilityLevel": "root_public_compatibility",
-      "currentRootExport": "glob_reexport",
+      "currentRootExport": "explicit_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
@@ -31047,7 +31047,7 @@
       "serializationName": "WebSourceDraft",
       "publicCompatibilityType": true,
       "compatibilityLevel": "root_public_compatibility",
-      "currentRootExport": "glob_reexport",
+      "currentRootExport": "explicit_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
