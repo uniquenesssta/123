@@ -3,7 +3,6 @@ use crate::{
     composition::{
         database_health_from_snapshot, DatabaseHealth, DatabaseOptions, PersistenceStore,
     },
-    rule_packages::built_in_rule_packages,
     ApplicationError, ApplicationResult, ApplicationService,
 };
 use std::sync::Arc;
@@ -84,38 +83,11 @@ impl ApplicationService {
         &self,
         prepared: &PreparedDatabaseConnection,
     ) -> ApplicationResult<()> {
+        self.rules
+            .register_built_ins(&self.registry, prepared.session())
+            .await?;
         let store = prepared.transition_store();
-        self.register_built_in_rule_packages(&store).await?;
         self.register_p4_persistence_artifacts(&store).await?;
         self.register_openai_research_artifacts(&store).await
-    }
-
-    async fn register_built_in_rule_packages(
-        &self,
-        store: &PersistenceStore,
-    ) -> ApplicationResult<()> {
-        for draft in built_in_rule_packages() {
-            let model = self
-                .registry
-                .get(&draft.routing.model_id)
-                .ok_or_else(|| ApplicationError::ModelNotFound(draft.routing.model_id.clone()))?;
-            model
-                .validate_parameters(&draft.parameters)
-                .map_err(|error| ApplicationError::Model(error.to_string()))?;
-            let summary = store
-                .register_rule_package(&model.descriptor(), &draft)
-                .await?;
-            if draft.routing.activate_as_type_default {
-                store
-                    .ensure_type_default_binding(
-                        summary.id,
-                        draft.competition_profile.competition_kind,
-                        draft.routing.priority,
-                        &format!("内置默认 · {}", draft.display_name),
-                    )
-                    .await?;
-            }
-        }
-        Ok(())
     }
 }

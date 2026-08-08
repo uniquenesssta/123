@@ -11,6 +11,10 @@ pub(crate) struct PreparedDatabaseConnection {
 }
 
 impl PreparedDatabaseConnection {
+    pub(crate) fn session(&self) -> &ActiveDatabase {
+        &self.session
+    }
+
     pub(crate) fn transition_store(&self) -> PersistenceStore {
         self.session.transition_store()
     }

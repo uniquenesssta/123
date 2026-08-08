@@ -1,7 +1,6 @@
 mod analytics;
 mod api_workspace;
 mod built_in_artifacts;
-mod competition;
 mod composition;
 mod exchange;
 mod fact_pipeline;
@@ -18,7 +17,6 @@ mod postmatch;
 mod prediction;
 mod release_acceptance;
 mod review;
-mod rule_packages;
 mod service;
 mod services;
 mod spreadsheet;
@@ -47,7 +45,7 @@ pub use api_workspace::{
 pub use fact_pipeline::ProcessResearchEvidenceCommand;
 pub use model_shell::{default_match, default_parameters, p4_default_match, p4_default_parameters};
 pub use openai_research::OpenAiResearchCommand;
-pub use rule_packages::default_rule_package_template;
+pub use use_cases::rules::package_factory::default_rule_package_template;
 
 #[derive(Debug, Error)]
 pub enum ApplicationError {
@@ -167,37 +165,6 @@ pub struct PredictionExecution {
 mod tests {
     use super::*;
     use serde_json::json;
-    use std::collections::HashSet;
-
-    #[test]
-    fn built_in_rule_packages_are_unique_and_valid() {
-        let service = ApplicationService::new();
-        let mut package_keys = HashSet::new();
-        let mut model_ids = HashSet::new();
-        let expected_version = format!("{}+public.1", env!("CARGO_PKG_VERSION"));
-
-        for draft in rule_packages::built_in_rule_packages() {
-            assert!(package_keys.insert(draft.package_key.clone()));
-            model_ids.insert(draft.routing.model_id.clone());
-            assert_eq!(draft.version, expected_version);
-            rule_packages::validate_rule_package_shape(&draft).expect("内置规则包结构无效");
-            rule_packages::validate_parameter_identity(&draft).expect("内置规则包版本无效");
-            let model = service
-                .registry
-                .get(&draft.routing.model_id)
-                .expect("内置规则包引用了未注册模型");
-            assert!(model
-                .descriptor()
-                .supported_competitions
-                .contains(&draft.competition_profile.competition_kind));
-            model
-                .validate_parameters(&draft.parameters)
-                .expect("内置规则包参数无效");
-        }
-
-        assert_eq!(package_keys.len(), CompetitionKind::ALL.len() * 2);
-        assert_eq!(model_ids.len(), CompetitionKind::ALL.len() * 2);
-    }
 
     #[test]
     fn public_model_entries_are_external_provider_stubs() {
@@ -217,19 +184,6 @@ mod tests {
         assert_eq!(
             normalized.get("match_id").and_then(Value::as_str),
             Some("SIM-20260720-TEAM-A-TEAM-B")
-        );
-    }
-
-    #[test]
-    fn user_rule_package_template_is_self_consistent() {
-        let draft = default_rule_package_template();
-        rule_packages::validate_rule_package_shape(&draft).expect("用户规则包模板结构无效");
-        rule_packages::validate_parameter_identity(&draft).expect("用户规则包版本无效");
-        assert_eq!(draft.format_version, "football.rule-package.v1");
-        assert_eq!(draft.version, env!("CARGO_PKG_VERSION"));
-        assert_eq!(
-            draft.competition_profile.competition_kind,
-            CompetitionKind::Custom
         );
     }
 }

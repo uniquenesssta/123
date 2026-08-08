@@ -4,13 +4,22 @@ pub(crate) use football_persistence_postgres::{
 };
 
 use crate::ports::{
+    competition::CompetitionHierarchyPort,
     database::{
         DatabaseHealthSnapshot, DatabaseLifecyclePort, DatabaseObservabilityPort,
         DatabaseStatistics,
     },
+    rules::{RulePackagePort, RuleRoutingPort},
     PortError, PortErrorKind, PortResult,
 };
 use async_trait::async_trait;
+use football_domain::{
+    CompetitionBindingDraft, CompetitionBindingSummary, CompetitionDraft, CompetitionKind,
+    CompetitionRecord, RoundDraft, RoundRecord, RouteDecision, RouteRequest, RulePackageDraft,
+    RulePackageSummary, SeasonDraft, SeasonRecord, StageDraft, StageRecord,
+};
+use football_model_api::ModelDescriptor;
+use uuid::Uuid;
 
 #[derive(Clone)]
 pub(crate) struct ActiveDatabase {
@@ -156,5 +165,133 @@ impl DatabaseObservabilityPort for ActiveDatabase {
             active_lineups: statistics.active_lineups,
             large_counts_are_estimates: statistics.large_counts_are_estimates,
         })
+    }
+}
+
+#[async_trait]
+impl CompetitionHierarchyPort for ActiveDatabase {
+    async fn create_competition(&self, draft: &CompetitionDraft) -> PortResult<CompetitionRecord> {
+        self.store
+            .create_competition(draft)
+            .await
+            .map_err(map_persistence_error)
+    }
+
+    async fn delete_competition(&self, competition_id: Uuid) -> PortResult<()> {
+        self.store
+            .delete_competition(competition_id)
+            .await
+            .map_err(map_persistence_error)
+    }
+
+    async fn list_competitions(&self) -> PortResult<Vec<CompetitionRecord>> {
+        self.store
+            .list_competitions()
+            .await
+            .map_err(map_persistence_error)
+    }
+
+    async fn create_season(&self, draft: &SeasonDraft) -> PortResult<SeasonRecord> {
+        self.store
+            .create_season(draft)
+            .await
+            .map_err(map_persistence_error)
+    }
+
+    async fn list_seasons(&self) -> PortResult<Vec<SeasonRecord>> {
+        self.store
+            .list_seasons()
+            .await
+            .map_err(map_persistence_error)
+    }
+
+    async fn create_stage(&self, draft: &StageDraft) -> PortResult<StageRecord> {
+        self.store
+            .create_stage(draft)
+            .await
+            .map_err(map_persistence_error)
+    }
+
+    async fn list_stages(&self) -> PortResult<Vec<StageRecord>> {
+        self.store
+            .list_stages()
+            .await
+            .map_err(map_persistence_error)
+    }
+
+    async fn create_round(&self, draft: &RoundDraft) -> PortResult<RoundRecord> {
+        self.store
+            .create_round(draft)
+            .await
+            .map_err(map_persistence_error)
+    }
+
+    async fn list_rounds(&self) -> PortResult<Vec<RoundRecord>> {
+        self.store
+            .list_rounds()
+            .await
+            .map_err(map_persistence_error)
+    }
+}
+
+#[async_trait]
+impl RulePackagePort for ActiveDatabase {
+    async fn register_rule_package(
+        &self,
+        descriptor: &ModelDescriptor,
+        draft: &RulePackageDraft,
+    ) -> PortResult<RulePackageSummary> {
+        self.store
+            .register_rule_package(descriptor, draft)
+            .await
+            .map_err(map_persistence_error)
+    }
+
+    async fn list_rule_packages(&self) -> PortResult<Vec<RulePackageSummary>> {
+        self.store
+            .list_rule_packages()
+            .await
+            .map_err(map_persistence_error)
+    }
+}
+
+#[async_trait]
+impl RuleRoutingPort for ActiveDatabase {
+    async fn create_competition_binding(
+        &self,
+        draft: &CompetitionBindingDraft,
+    ) -> PortResult<CompetitionBindingSummary> {
+        self.store
+            .create_competition_binding(draft)
+            .await
+            .map_err(map_persistence_error)
+    }
+
+    async fn list_competition_bindings(&self) -> PortResult<Vec<CompetitionBindingSummary>> {
+        self.store
+            .list_competition_bindings()
+            .await
+            .map_err(map_persistence_error)
+    }
+
+    async fn ensure_type_default_binding(
+        &self,
+        rule_package_id: Uuid,
+        competition_kind: CompetitionKind,
+        priority: i32,
+        label: &str,
+    ) -> PortResult<()> {
+        self.store
+            .ensure_type_default_binding(rule_package_id, competition_kind, priority, label)
+            .await
+            .map(|_| ())
+            .map_err(map_persistence_error)
+    }
+
+    async fn resolve_route(&self, request: &RouteRequest) -> PortResult<RouteDecision> {
+        self.store
+            .resolve_route(request)
+            .await
+            .map_err(map_persistence_error)
     }
 }

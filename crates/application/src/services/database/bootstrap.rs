@@ -21,6 +21,8 @@ impl ApplicationService {
             competition_bindings,
             recent_runs,
         ) = if let Some(active) = active_database {
+            let hierarchy = self.competition.load_hierarchy(&active).await?;
+            let rules = self.rules.load_catalog(&active).await?;
             let store = active.transition_store();
             (
                 Some(active.redacted_url().to_string()),
@@ -30,12 +32,12 @@ impl ApplicationService {
                 Some(database_stats_from_statistics(
                     statistics::execute(&active).await?,
                 )),
-                store.list_competitions().await?,
-                store.list_seasons().await?,
-                store.list_stages().await?,
-                store.list_rounds().await?,
-                store.list_rule_packages().await?,
-                store.list_competition_bindings().await?,
+                hierarchy.competitions,
+                hierarchy.seasons,
+                hierarchy.stages,
+                hierarchy.rounds,
+                rules.rule_packages,
+                rules.competition_bindings,
                 store.list_recent_runs(50).await?,
             )
         } else {
