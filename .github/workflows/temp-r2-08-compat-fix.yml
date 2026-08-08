@@ -27,21 +27,9 @@ jobs:
         with:
           components: rustfmt
 
-      - name: Generate complete explicit root and deterministic protected hash
+      - name: Generate and verify complete explicit root
         shell: pwsh
         run: |
-          @'
-          from pathlib import Path
-          path = Path('scripts/verify_protected_assets.mjs')
-          text = path.read_text(encoding='utf-8')
-          old = '.sort((left, right) => left.path.localeCompare(right.path))'
-          new = '.sort((left, right) => (left.path < right.path ? -1 : left.path > right.path ? 1 : 0))'
-          if text.count(old) != 1:
-              raise SystemExit('protected asset locale-dependent aggregate sort not found exactly once')
-          path.write_text(text.replace(old, new), encoding='utf-8', newline='\n')
-          '@ | python -
-          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
-
           node scripts/generate-domain-root-exports.mjs
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
           cargo fmt --all
@@ -50,7 +38,7 @@ jobs:
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
           node scripts/verify-team-package.mjs
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
-          node scripts/verify_protected_assets.mjs
+          node scripts/verify-protected-assets-deterministic.mjs
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 
       - name: Commit verified generated tree
@@ -59,7 +47,7 @@ jobs:
           Remove-Item '.github/workflows/temp-r2-08-compat-fix.yml' -Force
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git add crates/domain/src/lib.rs scripts/verify_protected_assets.mjs .github/workflows/temp-r2-08-compat-fix.yml
+          git add crates/domain/src/lib.rs .github/workflows/temp-r2-08-compat-fix.yml
           git diff --cached --check
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
           git diff --cached --quiet
