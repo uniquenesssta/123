@@ -1,0 +1,278 @@
+name: Temporary R3-04 Repair
+
+on:
+  push:
+    branches:
+      - rewrite/r3-04-teams-players
+    paths:
+      - .github/workflows/temp-r3-04-repair.yml
+
+permissions:
+  contents: write
+
+jobs:
+  repair:
+    runs-on: windows-2025
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: rewrite/r3-04-teams-players
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+      - uses: dtolnay/rust-toolchain@1.88.0
+        with:
+          components: rustfmt,clippy
+      - name: Extract R3-04 persistence adapters and bridge non-Send force delete
+        shell: pwsh
+        run: |
+          @'
+          from pathlib import Path
+
+          def write(path, content):
+              p = Path(path)
+              p.parent.mkdir(parents=True, exist_ok=True)
+              p.write_text(content.strip() + "\n", encoding="utf-8", newline="\n")
+
+          registry_path = Path("crates/application/src/composition/port_registry.rs")
+          registry = registry_path.read_text(encoding="utf-8")
+          marker = "#[async_trait]\nimpl TeamCatalogPort for ActiveDatabase"
+          if marker not in registry:
+              raise SystemExit("R3-04 adapter marker missing")
+          registry = registry[:registry.index(marker)].rstrip() + "\n"
+          registry = registry.replace(
+              "    player::{CoachCatalogPort, EntityReferencePort, PlayerCatalogPort, PlayerSignalPort},\n"
+              "    rules::{RulePackagePort, RuleRoutingPort},\n"
+              "    team::{TeamCatalogPort, TeamLifecyclePort},\n",
+              "    rules::{RulePackagePort, RuleRoutingPort},\n",
+          )
+          start = registry.index("use football_domain::{")
+          end = registry.index("};", start) + 2
+          registry = registry[:start] + '''use football_domain::{
+              CompetitionBindingDraft, CompetitionBindingSummary, CompetitionDraft, CompetitionKind,
+              CompetitionRecord, RoundDraft, RoundRecord, RouteDecision, RouteRequest, RulePackageDraft,
+              RulePackageSummary, SeasonDraft, SeasonRecord, StageDraft, StageRecord,
+          };''' + registry[end:]
+          registry = registry.replace("fn map_persistence_error(error: PersistenceError) -> PortError {", "pub(super) fn map_persistence_error(error: PersistenceError) -> PortError {")
+          registry_path.write_text(registry, encoding="utf-8", newline="\n")
+
+          write("crates/application/src/composition/adapters/mod.rs", '''mod players;
+          mod teams;''')
+
+          write("crates/application/src/composition/adapters/teams.rs", r'''
+          use super::super::port_registry::{map_persistence_error, ActiveDatabase, PersistenceError};
+          use crate::ports::{
+              team::{TeamCatalogPort, TeamLifecyclePort},
+              PortError, PortErrorKind, PortResult,
+          };
+          use async_trait::async_trait;
+          use football_domain::{
+              BulkDeleteResult, TeamDetail, TeamDraft, TeamForceDeletePreview, TeamForceDeleteRequest,
+              TeamForceDeleteResult, TeamListPage, TeamListQuery, TeamNameDraft, TeamNameRecord,
+              TeamOption, TeamProfileDraft, TeamProfileRecord, TeamRecord,
+          };
+          use uuid::Uuid;
+
+          #[async_trait]
+          impl TeamCatalogPort for ActiveDatabase {
+              async fn create_team(&self, draft: &TeamDraft) -> PortResult<TeamRecord> {
+                  self.transition_store().create_team(draft).await.map_err(map_persistence_error)
+              }
+              async fn list_team_options(&self, search: Option<&str>, limit: u32) -> PortResult<Vec<TeamOption>> {
+                  self.transition_store().list_team_options(search, limit).await.map_err(map_persistence_error)
+              }
+              async fn list_teams(&self, query: &TeamListQuery) -> PortResult<TeamListPage> {
+                  self.transition_store().list_teams(query).await.map_err(map_persistence_error)
+              }
+              async fn read_team(&self, team_id: Uuid) -> PortResult<TeamDetail> {
+                  self.transition_store().read_team(team_id).await.map_err(map_persistence_error)
+              }
+              async fn update_team(&self, team_id: Uuid, draft: &TeamDraft) -> PortResult<TeamRecord> {
+                  self.transition_store().update_team(team_id, draft).await.map_err(map_persistence_error)
+              }
+              async fn add_team_name(&self, draft: &TeamNameDraft) -> PortResult<TeamNameRecord> {
+                  self.transition_store().add_team_name(draft).await.map_err(map_persistence_error)
+              }
+              async fn upsert_team_profile(&self, team_id: Uuid, draft: &TeamProfileDraft) -> PortResult<TeamProfileRecord> {
+                  self.transition_store().upsert_team_profile(team_id, draft).await.map_err(map_persistence_error)
+              }
+          }
+
+          async fn run_non_send_persistence<T, F>(label: &'static str, operation: F) -> PortResult<T>
+          where
+              T: Send + 'static,
+              F: FnOnce() -> Result<T, PersistenceError> + Send + 'static,
+          {
+              tokio::task::spawn_blocking(operation)
+                  .await
+                  .map_err(|error| {
+                      PortError::new(
+                          PortErrorKind::Infrastructure,
+                          format!("{label}后台任务执行失败：{error}"),
+                      )
+                  })?
+                  .map_err(map_persistence_error)
+          }
+
+          #[async_trait]
+          impl TeamLifecyclePort for ActiveDatabase {
+              async fn bulk_delete_teams(&self, team_ids: &[Uuid]) -> PortResult<BulkDeleteResult> {
+                  self.transition_store().bulk_delete_teams(team_ids).await.map_err(map_persistence_error)
+              }
+
+              async fn preview_force_delete_team(&self, team_id: Uuid) -> PortResult<TeamForceDeletePreview> {
+                  let store = self.transition_store();
+                  let runtime = tokio::runtime::Handle::current();
+                  run_non_send_persistence("球队强制删除预检", move || {
+                      runtime.block_on(store.preview_force_delete_team(team_id))
+                  })
+                  .await
+              }
+
+              async fn force_delete_team(&self, request: &TeamForceDeleteRequest) -> PortResult<TeamForceDeleteResult> {
+                  let store = self.transition_store();
+                  let runtime = tokio::runtime::Handle::current();
+                  let request = request.clone();
+                  run_non_send_persistence("球队强制删除", move || {
+                      runtime.block_on(store.force_delete_team(&request))
+                  })
+                  .await
+              }
+          }
+          ''')
+
+          write("crates/application/src/composition/adapters/players.rs", r'''
+          use super::super::port_registry::{map_persistence_error, ActiveDatabase};
+          use crate::ports::{
+              player::{CoachCatalogPort, EntityReferencePort, PlayerCatalogPort, PlayerSignalPort},
+              PortResult,
+          };
+          use async_trait::async_trait;
+          use football_domain::{
+              BulkArchiveResult, BulkDeleteResult, CoachDetail, CoachDraft, CoachListItem,
+              CoachListQuery, CoachNameDraft, CoachNameRecord, CoachRecord, DataProviderDraft,
+              DataProviderRecord, EntityDeletionCheck, EntityMatchRequest, EntityMatchResult,
+              EntityReferenceQuery, EntityReferenceRecord, ExternalEntityIdDraft, ExternalEntityIdRecord,
+              PlayerAbilityObservationDraft, PlayerAbilityObservationRecord, PlayerAvailabilityDraft,
+              PlayerAvailabilityRecord, PlayerCatalogReferenceData, PlayerDetail, PlayerDraft,
+              PlayerDynamicTagDraft, PlayerDynamicTagRecord, PlayerListPage, PlayerListQuery,
+              PlayerMatchContribution, PlayerMatchContributionRequest, PlayerNameDraft, PlayerNameRecord,
+              PlayerPositionDraft, PlayerPositionRecord, PlayerRecord, PlayerTeamPeriodDraft,
+              PlayerTeamPeriodRecord, TeamCoachPeriodDraft, TeamCoachPeriodRecord,
+          };
+          use uuid::Uuid;
+
+          #[async_trait]
+          impl PlayerCatalogPort for ActiveDatabase {
+              async fn reference_data(&self) -> PortResult<PlayerCatalogReferenceData> { self.transition_store().player_catalog_reference_data().await.map_err(map_persistence_error) }
+              async fn create_player(&self, draft: &PlayerDraft) -> PortResult<PlayerRecord> { self.transition_store().create_player(draft).await.map_err(map_persistence_error) }
+              async fn update_player(&self, player_id: Uuid, draft: &PlayerDraft) -> PortResult<PlayerRecord> { self.transition_store().update_player(player_id, draft).await.map_err(map_persistence_error) }
+              async fn delete_player(&self, player_id: Uuid) -> PortResult<()> { self.transition_store().delete_player(player_id).await.map_err(map_persistence_error) }
+              async fn bulk_delete_players(&self, player_ids: &[Uuid]) -> PortResult<BulkDeleteResult> { self.transition_store().bulk_delete_players(player_ids).await.map_err(map_persistence_error) }
+              async fn list_players(&self, query: &PlayerListQuery) -> PortResult<PlayerListPage> { self.transition_store().list_players(query).await.map_err(map_persistence_error) }
+              async fn read_player(&self, player_id: Uuid) -> PortResult<PlayerDetail> { self.transition_store().read_player(player_id).await.map_err(map_persistence_error) }
+              async fn add_player_name(&self, draft: &PlayerNameDraft) -> PortResult<PlayerNameRecord> { self.transition_store().add_player_name(draft).await.map_err(map_persistence_error) }
+              async fn assign_player_position(&self, draft: &PlayerPositionDraft) -> PortResult<PlayerPositionRecord> { self.transition_store().assign_player_position(draft).await.map_err(map_persistence_error) }
+              async fn add_player_team_period(&self, draft: &PlayerTeamPeriodDraft) -> PortResult<PlayerTeamPeriodRecord> { self.transition_store().add_player_team_period(draft).await.map_err(map_persistence_error) }
+          }
+
+          #[async_trait]
+          impl PlayerSignalPort for ActiveDatabase {
+              async fn add_availability(&self, draft: &PlayerAvailabilityDraft) -> PortResult<PlayerAvailabilityRecord> { self.transition_store().add_player_availability(draft).await.map_err(map_persistence_error) }
+              async fn add_ability_observation(&self, draft: &PlayerAbilityObservationDraft) -> PortResult<PlayerAbilityObservationRecord> { self.transition_store().add_player_ability_observation(draft).await.map_err(map_persistence_error) }
+              async fn add_dynamic_tag(&self, draft: &PlayerDynamicTagDraft) -> PortResult<PlayerDynamicTagRecord> { self.transition_store().add_player_dynamic_tag(draft).await.map_err(map_persistence_error) }
+              async fn calculate_match_contribution(&self, request: &PlayerMatchContributionRequest) -> PortResult<PlayerMatchContribution> { self.transition_store().calculate_player_match_contribution(request).await.map_err(map_persistence_error) }
+          }
+
+          #[async_trait]
+          impl CoachCatalogPort for ActiveDatabase {
+              async fn create_coach(&self, draft: &CoachDraft) -> PortResult<CoachRecord> { self.transition_store().create_coach(draft).await.map_err(map_persistence_error) }
+              async fn list_coaches(&self, query: &CoachListQuery) -> PortResult<Vec<CoachListItem>> { self.transition_store().list_coaches(query).await.map_err(map_persistence_error) }
+              async fn read_coach(&self, coach_id: Uuid) -> PortResult<CoachDetail> { self.transition_store().read_coach(coach_id).await.map_err(map_persistence_error) }
+              async fn add_coach_name(&self, draft: &CoachNameDraft) -> PortResult<CoachNameRecord> { self.transition_store().add_coach_name(draft).await.map_err(map_persistence_error) }
+              async fn add_team_coach_period(&self, draft: &TeamCoachPeriodDraft) -> PortResult<TeamCoachPeriodRecord> { self.transition_store().add_team_coach_period(draft).await.map_err(map_persistence_error) }
+          }
+
+          #[async_trait]
+          impl EntityReferencePort for ActiveDatabase {
+              async fn list_references(&self, query: &EntityReferenceQuery) -> PortResult<Vec<EntityReferenceRecord>> { self.transition_store().list_entity_references(query).await.map_err(map_persistence_error) }
+              async fn resolve_reference(&self, request: &EntityMatchRequest) -> PortResult<EntityMatchResult> { self.transition_store().resolve_entity_reference(request).await.map_err(map_persistence_error) }
+              async fn check_deletion(&self, entity_type: &str, entity_id: Uuid) -> PortResult<EntityDeletionCheck> { self.transition_store().check_entity_deletion(entity_type, entity_id).await.map_err(map_persistence_error) }
+              async fn bulk_archive(&self, entity_type: &str, entity_ids: &[Uuid]) -> PortResult<BulkArchiveResult> { self.transition_store().bulk_archive_entities(entity_type, entity_ids).await.map_err(map_persistence_error) }
+              async fn create_data_provider(&self, draft: &DataProviderDraft) -> PortResult<DataProviderRecord> { self.transition_store().create_data_provider(draft).await.map_err(map_persistence_error) }
+              async fn add_external_id(&self, draft: &ExternalEntityIdDraft) -> PortResult<ExternalEntityIdRecord> { self.transition_store().add_external_entity_id(draft).await.map_err(map_persistence_error) }
+          }
+          ''')
+
+          composition = Path("crates/application/src/composition/mod.rs")
+          text = composition.read_text(encoding="utf-8")
+          if "mod adapters;" not in text:
+              text = "mod adapters;\n" + text
+          composition.write_text(text, encoding="utf-8", newline="\n")
+
+          verifier = Path("scripts/verify-teams-players-service.mjs")
+          text = verifier.read_text(encoding="utf-8")
+          text = text.replace(
+              '"crates/application/src/services/players/facade.rs", ...teamMethods',
+              '"crates/application/src/services/players/facade.rs","crates/application/src/composition/adapters/mod.rs","crates/application/src/composition/adapters/teams.rs","crates/application/src/composition/adapters/players.rs", ...teamMethods',
+          )
+          old = 'const teamFacade=read("crates/application/src/services/teams/facade.rs"); const playerFacade=read("crates/application/src/services/players/facade.rs"); const app=read("crates/application/src/service/application_service.rs"); const composition=read("crates/application/src/composition/application_composition.rs"); const registry=read("crates/application/src/composition/port_registry.rs");'
+          new = old + ' const teamAdapter=read("crates/application/src/composition/adapters/teams.rs"); const playerAdapter=read("crates/application/src/composition/adapters/players.rs"); const adapters=teamAdapter+"\\n"+playerAdapter;'
+          if old not in text:
+              raise SystemExit("R3-04 verifier owner declaration not found")
+          text = text.replace(old, new)
+          old_check = 'for (const implName of ["impl TeamCatalogPort for ActiveDatabase","impl TeamLifecyclePort for ActiveDatabase","impl PlayerCatalogPort for ActiveDatabase","impl PlayerSignalPort for ActiveDatabase","impl CoachCatalogPort for ActiveDatabase","impl EntityReferencePort for ActiveDatabase"]) check(registry.includes(implName), `组合根适配器缺少：${implName}`);'
+          new_check = 'for (const implName of ["impl TeamCatalogPort for ActiveDatabase","impl TeamLifecyclePort for ActiveDatabase","impl PlayerCatalogPort for ActiveDatabase","impl PlayerSignalPort for ActiveDatabase","impl CoachCatalogPort for ActiveDatabase","impl EntityReferencePort for ActiveDatabase"]) check(adapters.includes(implName), `组合根职责适配器缺少：${implName}`); check(!registry.includes("impl TeamCatalogPort for ActiveDatabase") && !registry.includes("impl PlayerCatalogPort for ActiveDatabase"), "R3-04 具体适配实现重新堆叠到 port_registry.rs"); check(teamAdapter.includes("tokio::task::spawn_blocking") && teamAdapter.includes("runtime.block_on(store.force_delete_team"), "force-delete 非 Send 持久化边界未在组合适配器显式桥接");'
+          if old_check not in text:
+              raise SystemExit("R3-04 verifier adapter assertion not found")
+          text = text.replace(old_check, new_check)
+          verifier.write_text(text, encoding="utf-8", newline="\n")
+          '@ | Set-Content -LiteralPath $env:RUNNER_TEMP\r304-repair.py -Encoding utf8
+          python $env:RUNNER_TEMP\r304-repair.py
+      - name: Format Rust
+        shell: pwsh
+        run: cargo fmt --all
+      - name: Refresh domain inventory
+        shell: pwsh
+        run: node scripts/generate-domain-type-inventory.mjs
+      - name: Verify R3-04 service boundary
+        shell: pwsh
+        run: npm run verify:teams-players-service
+      - name: Verify affected entity relationships
+        shell: pwsh
+        run: node scripts/verify-entity-relationships.mjs
+      - name: Verify force delete contract
+        shell: pwsh
+        run: node scripts/verify-force-team-delete.mjs
+      - name: Verify team player management contract
+        shell: pwsh
+        run: node scripts/verify-team-player-management.mjs
+      - name: Verify architecture
+        shell: pwsh
+        run: npm run verify:architecture
+      - name: Verify protected assets
+        shell: pwsh
+        run: node scripts/verify-protected-assets-deterministic.mjs
+      - name: Check Application compilation
+        shell: pwsh
+        run: cargo check --locked -p football-application
+      - name: Test Application
+        shell: pwsh
+        run: cargo test --locked -p football-application
+      - name: Workspace Clippy
+        shell: pwsh
+        run: cargo clippy --locked --workspace --all-targets -- -D warnings
+      - name: Diff hygiene
+        shell: pwsh
+        run: git diff --check
+      - name: Commit verified repair and remove temporary workflow
+        shell: pwsh
+        run: |
+          git config user.name uniquenesssta
+          git config user.email uniquenesssta@live.com
+          git add crates/application/src/composition scripts/verify-teams-players-service.mjs architecture/domain-type-inventory.json
+          git commit -m "fix(application): adapt team lifecycle persistence boundary"
+          git rm .github/workflows/temp-r3-04-repair.yml
+          git commit -m "chore(r3): remove temporary R3-04 repair workflow"
+          git push origin HEAD:rewrite/r3-04-teams-players
