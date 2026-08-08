@@ -1,0 +1,135 @@
+name: Temporary R3-02 Validate
+
+on:
+  push:
+    branches:
+      - new-C
+
+permissions:
+  contents: write
+
+jobs:
+  validate:
+    runs-on: windows-2025
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: new-C
+          fetch-depth: 0
+
+      - name: Patch R3-02 contracts and verifiers
+        shell: pwsh
+        run: |
+          $script = @'
+          from pathlib import Path
+          import json
+
+          def replace_once(path, old, new):
+              p = Path(path)
+              text = p.read_text(encoding="utf-8")
+              if old not in text:
+                  raise SystemExit(f"replacement precondition missing in {path}: {old[:120]!r}")
+              p.write_text(text.replace(old, new, 1), encoding="utf-8", newline="\n")
+
+          state = Path("architecture/state-ownership.json")
+          state_text = state.read_text(encoding="utf-8")
+          state_text = state_text.replace(
+              "crates/application/src/service/application_service.rs::ApplicationService.database",
+              "crates/application/src/services/database/service.rs::DatabaseService.session",
+          )
+          state_text = state_text.replace('"last_updated_task": "R1-05"', '"last_updated_task": "R3-02"')
+          state.write_text(state_text, encoding="utf-8", newline="\n")
+
+          package_path = Path("package.json")
+          package = json.loads(package_path.read_text(encoding="utf-8"))
+          package["scripts"]["verify:database-service"] = "node scripts/verify-database-service.mjs"
+          architecture = package["scripts"]["verify:architecture"]
+          if "verify-database-service.mjs" not in architecture:
+              package["scripts"]["verify:architecture"] = architecture + " && node scripts/verify-database-service.mjs"
+          package_path.write_text(json.dumps(package, ensure_ascii=False, indent=2) + "\n", encoding="utf-8", newline="\n")
+
+          replace_once(
+              "scripts/verify-frontend.mjs",
+              '  "verify-application-composition.mjs",\n',
+              '  "verify-application-composition.mjs",\n  "verify-database-service.mjs",\n',
+          )
+
+          replace_once(
+              "scripts/verify-application-composition.mjs",
+              'const service = read("crates/application/src/service/application_service.rs");\n',
+              'const service = read("crates/application/src/service/application_service.rs");\nconst databaseService = read("crates/application/src/services/database/service.rs");\n',
+          )
+          replace_once(
+              "scripts/verify-application-composition.mjs",
+              'check(\n  portRegistry.includes("RwLock<Option<ActiveDatabase>>"),\n  "端口注册表未持有活动数据库槽位",\n);',
+              'check(\n  databaseService.includes("pub(crate) session: RwLock<Option<ActiveDatabase>>"),\n  "DatabaseService 未持有活动数据库槽位",\n);',
+          )
+          replace_once(
+              "scripts/verify-application-composition.mjs",
+              '"crates/application/src/service/application_service.rs::ApplicationService.database"',
+              '"crates/application/src/services/database/service.rs::DatabaseService.session"',
+          )
+
+          replace_once(
+              "scripts/verify-database-reset.mjs",
+              'const applicationDatabase = read("crates/application/src/database.rs");',
+              'const databaseFacade = read("crates/application/src/services/database/facade.rs");\nconst databaseService = read("crates/application/src/services/database/service.rs");\nconst resetUseCase = read("crates/application/src/use_cases/database/reset/mod.rs");',
+          )
+          old_reset_checks = '''requireText(command, "confirmation.trim() != current_health.database_name", "后端数据库名称二次校验");
+          requireText(command, "state.service.disconnect_database().await", "清空前停止活动数据库服务");
+          requireText(command, "reset_store.reset_to_pristine().await", "执行彻底重建");
+          requireText(command, "state.service.connect_database(options)", "清空后自动恢复连接");
+          requireText(command, "state.service.ensure_p4_orchestration_worker()", "清空后恢复P4后台工作器");
+          requireText(applicationDatabase, "pub fn ensure_p4_orchestration_worker", "P4后台工作器幂等恢复入口");'''
+          new_reset_checks = '''requireText(command, "state.service.preflight_database_reset", "后端数据库名称二次校验");
+          requireText(command, ".reset_database(options, confirmation)", "Tauri 委托 Application 清空用例");
+          if (command.includes("PostgresStore::connect") || command.includes("reset_store.reset_to_pristine")) {
+            throw new Error("Tauri 数据库命令不得直接连接 PostgreSQL 或执行彻底重建");
+          }
+          requireText(databaseService, "self.disconnect().await?", "清空前停止活动数据库服务");
+          requireText(resetUseCase, "confirmation.trim() != health.database_name", "Application 清空用例数据库名称强确认");
+          requireText(resetUseCase, "保存的连接配置与当前数据库不一致，已拒绝清空", "清空目标一致性门禁");
+          requireText(resetUseCase, "port.reset_to_pristine().await", "通过 DatabaseLifecyclePort 执行彻底重建");
+          requireText(databaseFacade, "self.connect_database(options)", "清空后自动恢复连接");
+          requireText(command, "state.service.ensure_p4_orchestration_worker()", "清空后恢复P4后台工作器");
+          requireText(databaseFacade, "pub fn ensure_p4_orchestration_worker", "P4后台工作器幂等恢复入口");'''
+          replace_once("scripts/verify-database-reset.mjs", old_reset_checks, new_reset_checks)
+          '@
+          $script | python -
+
+      - name: Format and refresh generated inventory
+        shell: pwsh
+        run: |
+          cargo fmt --all
+          node scripts/generate-domain-type-inventory.mjs
+
+      - name: Verify R3-02 architecture
+        shell: pwsh
+        run: |
+          node scripts/verify-application-ports.mjs
+          node scripts/verify-application-composition.mjs
+          node scripts/verify-database-service.mjs
+          node scripts/verify-database-reset.mjs
+          node scripts/verify-domain-type-inventory.mjs
+          node scripts/verify-protected-assets-deterministic.mjs
+          npm run verify:architecture
+
+      - name: Check and test application
+        shell: pwsh
+        run: |
+          cargo fmt --all -- --check
+          cargo check --locked -p football-application
+          cargo test --locked -p football-application
+
+      - name: Commit validated R3-02 support updates and remove workflow
+        if: success()
+        shell: pwsh
+        run: |
+          git config user.name "uniquenesssta"
+          git config user.email "uniquenesssta@live.com"
+          Remove-Item ".github/workflows/tmp-r3-02-validate.yml"
+          git add -A
+          if (-not (git diff --cached --quiet)) {
+            git commit -m "refactor(application): establish database service use cases"
+            git push origin HEAD:new-C
+          }
