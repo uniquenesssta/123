@@ -35,8 +35,7 @@ use thiserror::Error;
 use uuid::Uuid;
 
 pub(crate) use composition::{
-    ActiveDatabase, DatabaseHealth, DatabaseOptions, DatabaseStats, ModelRunListItem,
-    PersistenceError, PersistenceStore,
+    DatabaseHealth, DatabaseStats, ModelRunListItem, PersistenceError, PersistenceStore,
 };
 pub use model_registry::ModelRegistry;
 pub use service::ApplicationService;
