@@ -12,8 +12,8 @@ use crate::{ApplicationError, ApplicationResult};
 use chrono::{Duration, Utc};
 use football_domain::{
     EnqueueJobDraft, P4FreezeTaskDraft, P4FreezeTaskRecord, P4FreezeTaskState,
-    P4FreezeTaskTransition, P4Horizon, PlanP4HorizonsCommand, RouteRequest,
-    P4_FREEZE_GRACE_MINUTES, P4_ORCHESTRATION_PLANNER_VERSION, P4_RESEARCH_LEAD_MINUTES,
+    P4FreezeTaskTransition, P4Horizon, PlanP4HorizonsCommand, P4_FREEZE_GRACE_MINUTES,
+    P4_ORCHESTRATION_PLANNER_VERSION, P4_RESEARCH_LEAD_MINUTES,
 };
 use serde_json::{json, Value};
 use uuid::Uuid;

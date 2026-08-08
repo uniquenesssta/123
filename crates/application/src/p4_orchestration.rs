@@ -3,23 +3,17 @@ use super::{
     PredictionCommand,
 };
 use crate::built_in_artifacts::{
-    P4_RESEARCH_SCHEMA_ARTIFACT_VERSION as RESEARCH_SCHEMA_VERSION,
-    P4_RESEARCH_SCHEMA_KEY as RESEARCH_SCHEMA_KEY,
     P4_SNAPSHOT_SCHEMA_ARTIFACT_VERSION as SNAPSHOT_SCHEMA_VERSION,
     P4_SNAPSHOT_SCHEMA_KEY as SNAPSHOT_SCHEMA_KEY,
 };
-use crate::model_shell::P4_MODEL_ID;
-use crate::use_cases::prediction::shared::p4_planning::{
-    canonical_fact_keys, horizon_priority, is_p4_model,
-};
+use crate::use_cases::prediction::shared::p4_planning::{canonical_fact_keys, horizon_priority};
 use crate::PersistenceStore;
-use chrono::{Duration, Utc};
+use chrono::Utc;
 use football_domain::{
-    EnqueueJobDraft, EvidenceVerificationState, P4FreezeReadiness, P4FreezeTaskDraft,
-    P4FreezeTaskEventRecord, P4FreezeTaskRecord, P4FreezeTaskState, P4FreezeTaskTransition,
-    P4Horizon, P4RoutedFact, PlanP4HorizonsCommand, PrematchSnapshotDraft, ResearchRunDraft,
-    ResearchRunStatus, SnapshotFeatureDraft, SnapshotProbabilityDraft, SnapshotSourceKind,
-    P4_FREEZE_GRACE_MINUTES, P4_ORCHESTRATION_PLANNER_VERSION, P4_RESEARCH_LEAD_MINUTES,
+    EnqueueJobDraft, EvidenceVerificationState, P4FreezeReadiness, P4FreezeTaskRecord,
+    P4FreezeTaskState, P4FreezeTaskTransition, P4RoutedFact, PrematchSnapshotDraft,
+    ResearchRunDraft, ResearchRunStatus, SnapshotFeatureDraft, SnapshotProbabilityDraft,
+    SnapshotSourceKind, P4_ORCHESTRATION_PLANNER_VERSION,
 };
 use football_research_gateway::{CancellationToken, GatewayOperation};
 use serde::Deserialize;
@@ -937,6 +931,8 @@ fn sha256_value(value: &Value) -> ApplicationResult<String> {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::use_cases::prediction::shared::p4_planning::is_p4_model;
+    use football_domain::P4Horizon;
 
     #[test]
     fn formal_fact_set_has_twenty_nine_unique_fields() {
