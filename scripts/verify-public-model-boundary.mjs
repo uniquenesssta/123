@@ -72,7 +72,7 @@ assert(api.includes("Unavailable(String)"), "模型 API 缺少显式不可用错
 assert(stub.includes("external-provider"), "公开 Stub 未声明外部提供器边界");
 
 const sensitiveFiles = [
-  "crates/application/src/rule_packages.rs",
+  "crates/application/src/use_cases/rules/package_factory/mod.rs",
   "crates/application/src/release_acceptance.rs",
   "crates/application/src/model_shell/fixtures.rs",
   "crates/model-stub/src/lib.rs",
