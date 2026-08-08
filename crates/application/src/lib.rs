@@ -3,7 +3,6 @@ mod api_workspace;
 mod built_in_artifacts;
 mod competition;
 mod composition;
-mod database;
 mod exchange;
 mod fact_pipeline;
 mod match_review_package;
@@ -21,7 +20,9 @@ mod release_acceptance;
 mod review;
 mod rule_packages;
 mod service;
+mod services;
 mod spreadsheet;
+mod use_cases;
 
 use football_domain::{
     CompetitionBindingSummary, CompetitionKind, CompetitionRecord, PredictionInputAuditSummary,
@@ -61,6 +62,8 @@ pub enum ApplicationError {
     Validation(String),
     #[error(transparent)]
     Persistence(#[from] PersistenceError),
+    #[error(transparent)]
+    Port(#[from] ports::PortError),
     #[error("模型执行失败：{0}")]
     Model(String),
     #[error("Excel 处理失败：{0}")]
@@ -222,7 +225,7 @@ mod tests {
     fn user_rule_package_template_is_self_consistent() {
         let draft = default_rule_package_template();
         rule_packages::validate_rule_package_shape(&draft).expect("用户规则包模板结构无效");
-        rule_packages::validate_parameter_identity(&draft).expect("用户规则包模板版本无效");
+        rule_packages::validate_parameter_identity(&draft).expect("用户规则包版本无效");
         assert_eq!(draft.format_version, "football.rule-package.v1");
         assert_eq!(draft.version, env!("CARGO_PKG_VERSION"));
         assert_eq!(
