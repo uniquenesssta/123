@@ -1,11 +1,11 @@
-use crate::composition::{ActiveDatabase, ApplicationComposition};
+use crate::composition::ApplicationComposition;
 use crate::model_registry::ModelRegistry;
+use crate::services::database::DatabaseService;
 use std::sync::atomic::AtomicBool;
-use tokio::sync::RwLock;
 
 pub struct ApplicationService {
     pub(crate) registry: ModelRegistry,
-    pub(crate) database: RwLock<Option<ActiveDatabase>>,
+    pub(crate) database: DatabaseService,
     pub(crate) p4_worker_running: AtomicBool,
 }
 
