@@ -44,8 +44,8 @@ R1 已完成并关闭。R2 按业务语义拆分 `crates/domain`，保持 Serde�
 | R2-04 | Lineup 与 Match | DONE | [`R02-04-lineup-and-match.md`](R02-04-lineup-and-match.md) | 实施 run `31151412918`、正式 Windows Automated run `31153982572` 通过 |
 | R2-05 | Prediction 与 Research 外围领域 | DONE | [`R02-05-prediction-and-research-外围领域.md`](R02-05-prediction-and-research-外围领域.md) | 正式 Windows Automated run `31171082098`、job `92842834091` 通过 |
 | R2-06 | Review 与 Postmatch | DONE | [`R02-06-review-and-postmatch.md`](R02-06-review-and-postmatch.md) | staged 全量通过；Windows Automated run `31200190104` 与用户原库实机连接通过 |
-| R2-07 | Analytics / Exchange / AI / Release | VERIFYING | [`R02-07-analytics-exchange-ai-and-release.md`](R02-07-analytics-exchange-ai-and-release.md) | 118 类型已迁移，等待 Windows 本机门禁 |
-| R2-08 | Domain 根出口收敛 | BLOCKED | `R02-08-domain-根出口收敛.md` | 等待 R2-07 |
+| R2-07 | Analytics / Exchange / AI / Release | DONE | [`R02-07-analytics-exchange-ai-and-release.md`](R02-07-analytics-exchange-ai-and-release.md) | Windows 本机 fmt、Serde、类型清单与架构门禁通过；用户确认关闭 |
+| R2-08 | Domain 根出口收敛 | IN_PROGRESS | [`R02-08-domain-根出口收敛.md`](R02-08-domain-根出口收敛.md) | R2-07 已关闭，开始显式根出口收敛 |
 
 ## R2-01 当前结果
 
@@ -64,7 +64,7 @@ R2-01 至 R2-08 全部 `DONE` 后创建 `R02-stage-completion.md`，并实际完
 
 ## 当前阶段状态
 
-`R2-06 DONE`；`R2-07 VERIFYING`。Analytics 39、Exchange 54、AI Workspace 16、Release 9 共 118 个类型已从 7 个职责混合根文件迁移到四个业务语义目录，旧文件已删除；根级公共兼容路径继续保留到 R2-08。当前等待 Windows 本机格式、类型清单、Serde、架构、frontend、Rust 与启动 smoke 门禁，R2-08 保持阻塞。
+`R2-07 DONE`；`R2-08 IN_PROGRESS`。Analytics 39、Exchange 54、AI Workspace 16、Release 9 共 118 个类型已完成职责迁移；Windows 本机 `cargo fmt --check`、17/17 Serde 契约、365 类型清单及架构门禁通过。R2-08 现在只收敛 `crates/domain/src/lib.rs`：根文件必须仅声明模块并显式 re-export 公共兼容类型，不再承载定义或 glob 根出口。
 
 ## R2-02 当前结果
 
@@ -118,4 +118,6 @@ R2-01 至 R2-08 全部 `DONE` 后创建 `R02-stage-completion.md`，并实际完
 - Analytics 39、Exchange 54、AI Workspace 16、Release 9，共 118 个公共兼容类型已进入职责目录。
 - 已删除 `analytics.rs`、`api_workspace.rs`、`exchange.rs`、`spreadsheet.rs`、`monthly_workbook.rs`、`team_package.rs`、`release_acceptance.rs` 7 个旧职责混合文件。
 - 新增 118 个类型的新模块路径身份契约；`architecture/domain-migration-progress.json` 已登记 R2-07，目标模块策略已登记四个新目录。
-- 当前状态为 `VERIFYING`；Windows 本机最小门禁和阶段回归通过前不开放 R2-08。
+- Windows 本机最终最小门禁：`cargo fmt --all -- --check` 通过；Serde 契约 17/17 通过；类型清单重新生成 365 个类型、129 个来源文件；类型清单验证与 `npm run verify:architecture` 全部通过。
+- 用户明确确认 R2-07 可标记 `DONE`；未在该轮单独重跑的 protected-assets、完整 frontend/Rust 和 Tauri smoke 继续由 R2-08 与 R2 阶段出口统一覆盖。
+- R2-07 状态为 `DONE`，R2-08 已开始。
