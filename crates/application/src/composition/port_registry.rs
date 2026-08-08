@@ -15,8 +15,9 @@ use crate::ports::{
 use async_trait::async_trait;
 use football_domain::{
     CompetitionBindingDraft, CompetitionBindingSummary, CompetitionDraft, CompetitionKind,
-    CompetitionRecord, RoundDraft, RoundRecord, RouteDecision, RouteRequest, RulePackageDraft,
-    RulePackageSummary, SeasonDraft, SeasonRecord, StageDraft, StageRecord,
+    CompetitionRecord, ResolvedCompetitionContext, RoundDraft, RoundRecord, RouteDecision,
+    RouteRequest, RulePackageDraft, RulePackageSummary, SeasonDraft, SeasonRecord, StageDraft,
+    StageRecord,
 };
 use football_model_api::ModelDescriptor;
 use uuid::Uuid;
@@ -285,6 +286,19 @@ impl RuleRoutingPort for ActiveDatabase {
             .ensure_type_default_binding(rule_package_id, competition_kind, priority, label)
             .await
             .map(|_| ())
+            .map_err(map_persistence_error)
+    }
+
+    async fn resolve_competition_context(
+        &self,
+        competition_id: Option<Uuid>,
+        season_id: Option<Uuid>,
+        stage_id: Option<Uuid>,
+        competition_kind: CompetitionKind,
+    ) -> PortResult<ResolvedCompetitionContext> {
+        self.store
+            .resolve_competition_context(competition_id, season_id, stage_id, competition_kind)
+            .await
             .map_err(map_persistence_error)
     }
 

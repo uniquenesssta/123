@@ -2,7 +2,7 @@ use crate::composition::ApplicationComposition;
 use crate::model_registry::ModelRegistry;
 use crate::services::{
     competition::CompetitionService, database::DatabaseService, lineups::LineupService,
-    players::PlayerService, rules::RulesService, teams::TeamService,
+    players::PlayerService, prediction::PredictionService, rules::RulesService, teams::TeamService,
 };
 use std::sync::atomic::AtomicBool;
 pub struct ApplicationService {
@@ -13,12 +13,22 @@ pub struct ApplicationService {
     pub(crate) teams: TeamService,
     pub(crate) players: PlayerService,
     pub(crate) lineups: LineupService,
+    pub(crate) prediction: PredictionService,
     pub(crate) p4_worker_running: AtomicBool,
 }
 impl ApplicationService {
     pub fn new() -> Self {
-        let (registry, database, competition, rules, teams, players, lineups, p4_worker_running) =
-            ApplicationComposition::new().into_parts();
+        let (
+            registry,
+            database,
+            competition,
+            rules,
+            teams,
+            players,
+            lineups,
+            prediction,
+            p4_worker_running,
+        ) = ApplicationComposition::new().into_parts();
         Self {
             registry,
             database,
@@ -27,6 +37,7 @@ impl ApplicationService {
             teams,
             players,
             lineups,
+            prediction,
             p4_worker_running,
         }
     }

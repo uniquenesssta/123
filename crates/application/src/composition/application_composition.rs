@@ -3,7 +3,7 @@ use crate::model_registry::ModelRegistry;
 use crate::model_shell::PublicModelStub;
 use crate::services::{
     competition::CompetitionService, database::DatabaseService, lineups::LineupService,
-    players::PlayerService, rules::RulesService, teams::TeamService,
+    players::PlayerService, prediction::PredictionService, rules::RulesService, teams::TeamService,
 };
 use std::sync::{atomic::AtomicBool, Arc};
 pub(crate) struct ApplicationComposition {
@@ -14,6 +14,7 @@ pub(crate) struct ApplicationComposition {
     teams: TeamService,
     players: PlayerService,
     lineups: LineupService,
+    prediction: PredictionService,
     p4_worker_running: AtomicBool,
 }
 impl ApplicationComposition {
@@ -31,6 +32,7 @@ impl ApplicationComposition {
             teams: TeamService::new(),
             players: PlayerService::new(),
             lineups: LineupService::new(),
+            prediction: PredictionService::new(),
             p4_worker_running: AtomicBool::new(false),
         }
     }
@@ -44,6 +46,7 @@ impl ApplicationComposition {
         TeamService,
         PlayerService,
         LineupService,
+        PredictionService,
         AtomicBool,
     ) {
         (
@@ -54,6 +57,7 @@ impl ApplicationComposition {
             self.teams,
             self.players,
             self.lineups,
+            self.prediction,
             self.p4_worker_running,
         )
     }

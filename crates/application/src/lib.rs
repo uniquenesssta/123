@@ -13,7 +13,6 @@ mod p4_persistence;
 mod p4_workbench;
 pub mod ports;
 mod postmatch;
-mod prediction;
 mod release_acceptance;
 mod review;
 mod service;
@@ -178,8 +177,11 @@ mod tests {
     #[test]
     fn generated_match_key_is_written_back_to_manual_input() {
         let input = json!({"kickoff_time": "2026-07-20T12:00:00Z"});
-        let normalized = prediction::ensure_match_input_id(input, "SIM-20260720-TEAM-A-TEAM-B")
-            .expect("手工输入应能补齐比赛键");
+        let normalized = use_cases::prediction::shared::routing::ensure_match_input_id(
+            input,
+            "SIM-20260720-TEAM-A-TEAM-B",
+        )
+        .expect("手工输入应能补齐比赛键");
         assert_eq!(
             normalized.get("match_id").and_then(Value::as_str),
             Some("SIM-20260720-TEAM-A-TEAM-B")

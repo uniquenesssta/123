@@ -1,8 +1,8 @@
 use crate::ports::PortResult;
 use async_trait::async_trait;
 use football_domain::{
-    CompetitionBindingDraft, CompetitionBindingSummary, CompetitionKind, RouteDecision,
-    RouteRequest, RulePackageDraft, RulePackageSummary,
+    CompetitionBindingDraft, CompetitionBindingSummary, CompetitionKind,
+    ResolvedCompetitionContext, RouteDecision, RouteRequest, RulePackageDraft, RulePackageSummary,
 };
 use football_model_api::ModelDescriptor;
 use uuid::Uuid;
@@ -31,5 +31,12 @@ pub trait RuleRoutingPort: Send + Sync {
         priority: i32,
         label: &str,
     ) -> PortResult<()>;
+    async fn resolve_competition_context(
+        &self,
+        competition_id: Option<Uuid>,
+        season_id: Option<Uuid>,
+        stage_id: Option<Uuid>,
+        competition_kind: CompetitionKind,
+    ) -> PortResult<ResolvedCompetitionContext>;
     async fn resolve_route(&self, request: &RouteRequest) -> PortResult<RouteDecision>;
 }

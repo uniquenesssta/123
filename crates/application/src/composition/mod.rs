@@ -8,3 +8,5 @@ pub(crate) use port_registry::{
     DatabaseOptions, DatabaseStats, ModelRunListItem, PersistenceError, PersistenceStore,
     PortRegistry,
 };
+
+pub(crate) use adapters::model_run_list_item_from_port;
