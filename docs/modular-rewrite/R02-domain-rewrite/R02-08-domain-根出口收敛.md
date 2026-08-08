@@ -1,9 +1,9 @@
 # R02-08 Domain 根出口收敛实施记录
 
-- 任务状态：`VERIFYING`
+- 任务状态：`DONE`
 - 前置门禁：R2-07 已由用户确认关闭为 `DONE`
 - R2-08 开始基线：`4f93297049d773985dbdf0f077a68fc003d6b7d6`
-- 当前实现树：`4ef8d8ecc90bac4c39da7449de7ed2fa6de2fa5a`
+- 最终实现提交：`62b1f622b9c14b33dbaac850812a49c063ccb090`
 - 目标平台：Windows
 - 主要目标文件：`crates/domain/src/lib.rs`
 
@@ -16,6 +16,7 @@
 - `crates/domain/src/lib.rs` 保留 17 个业务模块公开声明。
 - 原 17 条 `pub use <module>::*;` 根级 glob re-export 已全部替换为按业务模块分组的显式 `pub use module::{Type...};`。
 - 365 个 `publicCompatibilityType` 全部继续保留 `football_domain::TypeName` 根级公共路径。
+- 为保持历史根 API，额外登记并显式 re-export 34 个既有公共常量/格式版本符号；公共根兼容不再依赖 glob export。
 - `default_true`、`default_team_page_limit`、`default_confidence` 三个私有默认值实现已迁入 `shared/defaults.rs`；根文件只保留 crate 内显式兼容 re-export，不承载实现。
 - 新增 `scripts/domain-inventory/root-export-policy.mjs`，从 Domain 类型清单确定唯一模块归属和显式出口集合。
 - 新增 `scripts/generate-domain-root-exports.mjs`，可确定性生成根出口。
@@ -39,7 +40,7 @@
 
 ## 5. 当前验证状态
 
-源码切换和确定性静态门禁已经完成，当前进入 Windows 本机最小验证。仍需执行格式、根出口门禁、Serde、类型清单和架构验证；通过后再运行 protected assets、完整 frontend、完整 Rust 与 Tauri smoke。任一硬门禁失败即保持 `VERIFYING`。
+源码切换、确定性静态门禁和 Windows 本机阶段回归均已完成。Windows 专项 run `31236344727` 通过根出口、球队资料包和确定性保护资产门禁，并生成最终实现提交 `62b1f622b9c14b33dbaac850812a49c063ccb090`。用户按阶段回归执行后反馈未见报错；上传 runtime 日志 58 条记录全部为 `info`，`bootstrap` 的 `connection_error` 为 `null`，球队、阵容、分析、Postmatch 与 API 工作区读取均正常完成。R2-08 关闭为 `DONE`。
 
 ## 6. 完成标准
 
@@ -50,3 +51,5 @@
 - Domain 清单与根出口静态门禁通过。
 - Windows 最小验证与阶段回归通过。
 - 根 README、阶段 README 与本记录同步实际结果。
+
+以上完成标准均已满足；专用可清空 PostgreSQL 测试库基线和私有模型固定回归仍按阶段既有策略保留到最终统一验收，不在本节点伪报为已通过。

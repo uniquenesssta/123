@@ -2,7 +2,7 @@
 
 ## 阶段状态
 
-`IN_PROGRESS`
+`DONE`
 
 R1 已完成并关闭。R2 按业务语义拆分 `crates/domain`，保持 Serde、数据库映射、公共导出和模型边界兼容；每个节点必须独立实施、验证和回退。
 
@@ -45,7 +45,7 @@ R1 已完成并关闭。R2 按业务语义拆分 `crates/domain`，保持 Serde�
 | R2-05 | Prediction 与 Research 外围领域 | DONE | [`R02-05-prediction-and-research-外围领域.md`](R02-05-prediction-and-research-外围领域.md) | 正式 Windows Automated run `31171082098`、job `92842834091` 通过 |
 | R2-06 | Review 与 Postmatch | DONE | [`R02-06-review-and-postmatch.md`](R02-06-review-and-postmatch.md) | staged 全量通过；Windows Automated run `31200190104` 与用户原库实机连接通过 |
 | R2-07 | Analytics / Exchange / AI / Release | DONE | [`R02-07-analytics-exchange-ai-and-release.md`](R02-07-analytics-exchange-ai-and-release.md) | Windows 本机 fmt、Serde、类型清单与架构门禁通过；用户确认关闭 |
-| R2-08 | Domain 根出口收敛 | IN_PROGRESS | [`R02-08-domain-根出口收敛.md`](R02-08-domain-根出口收敛.md) | R2-07 已关闭，开始显式根出口收敛 |
+| R2-08 | Domain 根出口收敛 | DONE | [`R02-08-domain-根出口收敛.md`](R02-08-domain-根出口收敛.md) | Windows 专项 run `31236344727` 与用户本机阶段回归通过 |
 
 ## R2-01 当前结果
 
@@ -60,11 +60,11 @@ R1 已完成并关闭。R2 按业务语义拆分 `crates/domain`，保持 Serde�
 
 ## 阶段出口
 
-R2-01 至 R2-08 全部 `DONE` 后创建 `R02-stage-completion.md`，并实际完成阶段规定的 Domain、Serde、workspace、模型保护及最终延期验收记录。当前不得创建阶段完成记录。
+R2-01 至 R2-08 已全部 `DONE`；阶段完成记录见 [`R02-stage-completion.md`](R02-stage-completion.md)。Domain、Serde、workspace 与模型公开保护门禁已完成，真实原有 PostgreSQL 运行路径已由用户本机验证；专用可清空测试库基线与私有模型固定回归继续按既定策略留待最终统一验收。
 
 ## 当前阶段状态
 
-`R2-07 DONE`；`R2-08 IN_PROGRESS`。Analytics 39、Exchange 54、AI Workspace 16、Release 9 共 118 个类型已完成职责迁移；Windows 本机 `cargo fmt --check`、17/17 Serde 契约、365 类型清单及架构门禁通过。R2-08 现在只收敛 `crates/domain/src/lib.rs`：根文件必须仅声明模块并显式 re-export 公共兼容类型，不再承载定义或 glob 根出口。
+`R2 DONE`。R2-01 至 R2-08 已完成 Domain 业务职责拆分和根出口收敛；最终根文件仅保留 17 个模块声明、365 个显式公共兼容类型出口、34 个既有公共根常量出口及 3 个 crate 内默认值兼容出口，不再承载领域定义、构造器、业务逻辑或公共 glob re-export。Windows 专项 run `31236344727` 通过，用户本机阶段回归未见报错，runtime 日志 58/58 为 `info` 且数据库启动连接错误为空。
 
 ## R2-02 当前结果
 
@@ -121,3 +121,15 @@ R2-01 至 R2-08 全部 `DONE` 后创建 `R02-stage-completion.md`，并实际完
 - Windows 本机最终最小门禁：`cargo fmt --all -- --check` 通过；Serde 契约 17/17 通过；类型清单重新生成 365 个类型、129 个来源文件；类型清单验证与 `npm run verify:architecture` 全部通过。
 - 用户明确确认 R2-07 可标记 `DONE`；未在该轮单独重跑的 protected-assets、完整 frontend/Rust 和 Tauri smoke 继续由 R2-08 与 R2 阶段出口统一覆盖。
 - R2-07 状态为 `DONE`，R2-08 已开始。
+
+
+## R2-08 当前结果
+
+- `crates/domain/src/lib.rs` 已收敛为 17 个业务模块声明和确定性的显式公共出口。
+- 365 个公共兼容类型继续保留 `football_domain::TypeName` 根路径；原根级 glob re-export 为 0。
+- 为保持既有根 API，额外显式登记并 re-export 34 个公共常量/格式版本符号；生成器与验证器共同锁定该兼容集合。
+- `default_true`、`default_team_page_limit`、`default_confidence` 实现已迁至 `shared/defaults.rs`，根文件仅保留 crate 内兼容出口。
+- `verify-team-package.mjs` 已跟随新的 `exchange/team_package/` 职责路径；保护资产验证继续使用冻结 verifier，本体与 18 个保护资产指纹未变。
+- Windows 专项 run `31236344727` 通过根出口、球队资料包、确定性保护资产验证，并生成最终实现提交 `62b1f622b9c14b33dbaac850812a49c063ccb090`。
+- 用户本机阶段回归未见报错；runtime 日志 `football-runtime-20260808T031048.796Z-pid28528-5d6458a8.jsonl` 共 58 条记录，全部为 `info`，`bootstrap` 返回 `connection_error=null`，并实际完成球队、阵容、分析、Postmatch 和 API 工作区读取。
+- R2-08 状态为 `DONE`，R2 阶段正式关闭。
