@@ -31,10 +31,19 @@ R2 已完成并关闭。R3 只重写 Application 编排与 Ports/Services/Use Ca
 ## R3-01 当前结果
 
 - 已从真实源码扫描 PostgreSQL `232` 个公开异步方法，其中 `209` 个当前被 Application 调用；Application 对具体 PostgreSQL crate 的直接导入仍只有 `composition/port_registry.rs` 一处。
-- 已建立 15 个 Port 职责域和最小能力 trait，不建立万能 Repository。
+- 已建立 15 个 Port 职责域和 36 个最小能力 trait，不建立万能 Repository。
 - Ports 只使用 Domain、Application、自有 DTO、`football-model-api` 与标准基础类型；禁止 SQL Row、SQLx、PgPool、PostgresStore、PersistenceError 和裸 JSON Value 穿透。
 - `football-model-api` 继续作为模型执行边界，不复制一套模型协议。
 - 当前 concrete PostgreSQL 导入仍由 R1 组合根暂时持有，后续 R3-02 至 R3-09 按服务迁移逐步接入适配器；R3-01 不改业务行为。
 - `verify:application-ports` 已接入 `verify:architecture`，锁定职责目录、trait 集合和过渡导入唯一所有者。
+- 用户 Windows 本机已在干净 `new-C` 工作树通过 `cargo fmt --all -- --check`、Application Ports、Domain 类型清单、完整 `verify:architecture` 和 `cargo check --locked -p football-application`。
 
-R3-01 完整 Windows 本机门禁通过前保持 `VERIFYING`，不得提前开放 R3-02。
+## R3-01 剩余门禁
+
+原任务书要求节点关闭前继续完成完整阶段回归：
+
+- `npm run verify:frontend`
+- `cargo clippy --locked --workspace --all-targets -- -D warnings`
+- `cargo test --locked --workspace`
+
+这三项本机结果未确认前，R3-01 保持 `VERIFYING`，R3-02 保持 `BLOCKED`。详细记录见 [`R03-01-application-ports-设计.md`](./R03-01-application-ports-设计.md)。
