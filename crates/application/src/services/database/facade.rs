@@ -71,7 +71,7 @@ impl ApplicationService {
         self.connect_database(options).await
     }
 
-    pub(super) async fn active_store(&self) -> ApplicationResult<PersistenceStore> {
+    pub(crate) async fn active_store(&self) -> ApplicationResult<PersistenceStore> {
         self.database
             .active_store()
             .await
