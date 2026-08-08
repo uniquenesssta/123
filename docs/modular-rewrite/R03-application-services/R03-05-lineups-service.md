@@ -2,9 +2,9 @@
 
 ## 状态
 
-`VERIFYING`
+`DONE`
 
-Lineups Service 源码重写与实施侧 Windows Automated 全链路验证已完成。用户已用 R3-04 基线完成最小本机验证并明确授权进入 R3-05；R3-04 不因此自动改为 `DONE`。R3-05 仍等待用户 Windows 本机最小复核与非破坏性运行时烟测，因此本节点当前保持 `VERIFYING`，R3-06 不提前开放。
+Lineups Service 源码重写、实施侧 Windows Automated 与用户 Windows 本机最终验证均已完成。用户本机已完成完整 frontend / Rust 回归与非破坏性运行时烟测；R3-05 正式关闭为 `DONE`，R3-06 Prediction Service 开放为 `READY`。R3-04 的历史状态独立保留，不因本节点关闭被自动改写。
 
 ## 基线与范围
 
@@ -99,32 +99,32 @@ CI evidence artifact：`9022970030`，大小 `14242839` 字节，SHA-256 `275e17
 
 Automated 模式不配置真实专用 PostgreSQL 测试库，因此需要 `FOOTBALL_TEST_DATABASE_URL` 的 ignored PostgreSQL 集成测试没有被描述为已执行。Vite 继续保留既有大 chunk warning；npm 安装阶段显示既有依赖审计告警，本节点未修改依赖或门禁。
 
-## 尚未完成
+## 用户 Windows 本机最终验证
 
-仍需用户 Windows 本机作为 R3-05 最终节点验收依据：
+用户在 `rewrite/r3-05-lineups-service` 最终分支完成并提供以下实际结果：
 
-```powershell
-git status --short
-git pull --ff-only origin rewrite/r3-05-lineups-service
-cargo fmt --all -- --check
-npm run verify:lineups-service
-npm run verify:architecture
-cargo check --locked -p football-application
-cargo test --locked -p football-application
-```
+- `git status --short`：空输出，工作区 clean；
+- `cargo fmt --all -- --check`：通过；
+- `npm run verify:lineups-service`：23 个 Service / Use Case Rust 文件、19 个公开 Application 职责、4 个既有 Ports 与旧 `player_catalog` 退出全部通过；
+- `npm run verify:architecture`：模块边界、状态所有权、受保护导入、Domain inventory、Domain 根出口、Application Ports、Database、Competition/Rules、Teams/Players、Lineups 全部通过；
+- `cargo check --locked -p football-application`：通过；
+- `cargo test --locked -p football-application`：33/33 通过；
+- `npm run verify:frontend`：全部静态业务契约、TypeScript、Vite production build 与 17 个截图回归视口通过；仅保留既有 Vite 大 chunk warning；
+- `npm run verify:rust`：Cargo.lock、rustfmt、workspace Clippy `-D warnings` 与 workspace tests 全部通过；18 个真实 PostgreSQL 集成测试因未设置专用 `FOOTBALL_TEST_DATABASE_URL` 按安全设计保持 `ignored`；
+- `npm run tauri:dev`：Tauri 2.11.4 / Vite / Rust 桌面端成功启动。
 
-建议随后运行完整：
+上传 runtime JSONL 共 280 条记录，其中 274 条 `info`、6 条 `error`。逐条复核后：
 
-```powershell
-npm run verify:frontend
-npm run verify:rust
-npm run tauri:dev
-```
+- 2 条 `请输入预设名称`：阵容预设空名称输入校验；
+- 1 条 `请先选择球员`：阵容编辑输入校验；
+- 3 条与 `execute_shadow_prediction_from_match` 相关：公开源码未分发 `p4_knockout_90` 模型运行时的既有明确失败语义。
 
-运行时只做非破坏性阵型、比赛、阵容、阵容预设读取/创建链烟测；用户原数据库不得执行删除、reset 或其他破坏性操作。若要运行真实 PostgreSQL ignored 集成测试，只能使用符合项目安全契约的专用测试数据库。
+上述 6 条均不是 R3-05 回归。运行时实际完成两次 `save_team_lineup_preset`，多次 `preview_team_lineup_preset_application` 均返回 `can_apply=true` 且无 blockers/warnings；`create_lineup_pair` 成功后 `list_lineups` 从 0 条变为 2 条，`read_match_lineup_chain` 从双方“尚未创建任何阵容版本”变为 `blocking_issues=[]`、`ready_for_model=true`。`bootstrap` 返回 `connection_error=null`。未发现 Lineups 持久化、SQL、migration、panic、数据库连接或兼容性错误。
+
+因此 R3-05 的主路径、预设写入/读取、预设应用预检、双方阵容原子创建、比赛阵容链与推演输入衔接均已有用户原环境非破坏性证据。
 
 ## 回退与下一步
 
-R3-05 可回退到起点 `906e47c6a782f04159ffac4084dbf117fae67179`。不得恢复把 Teams / Players / Lineups 再堆叠回单一 `player_catalog.rs` 的结构，也不得提前迁移 R3-06 Prediction 职责。
+R3-05 可回退到起点 `906e47c6a782f04159ffac4084dbf117fae67179`。不得恢复把 Teams / Players / Lineups 再堆叠回单一 `player_catalog.rs` 的结构，也不得把 Prediction 职责重新混入 Lineups Service。
 
-状态保持 `VERIFYING`。用户本机复核与非破坏性 runtime 烟测通过并明确关闭本节点后，才将 R3-05 标记为 `DONE` 并开放 R3-06 Prediction Service。
+R3-05 状态为 `DONE`。R3-06 Prediction Service 已开放为 `READY`。
