@@ -107,7 +107,8 @@ impl DatabaseLifecyclePort for ActiveDatabase {
         self.store
             .recover_interrupted_api_workspace_operations()
             .await
-            .map_err(map_persistence_error)
+            .map_err(map_persistence_error)?;
+        Ok(())
     }
 
     async fn reset_to_pristine(&self) -> PortResult<()> {
