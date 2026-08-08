@@ -1,6 +1,16 @@
 import fs from "node:fs";
 
 const read = (path) => fs.readFileSync(new URL(`../${path}`, import.meta.url), "utf8");
+const readRustTree = (directory) => {
+  const visit = (directoryUrl) => fs.readdirSync(directoryUrl, { withFileTypes: true })
+    .map((entry) => {
+      const entryUrl = new URL(`${entry.name}${entry.isDirectory() ? "/" : ""}`, directoryUrl);
+      if (entry.isDirectory()) return visit(entryUrl);
+      return entry.name.endsWith(".rs") ? fs.readFileSync(entryUrl, "utf8") : "";
+    })
+    .join("\n");
+  return visit(new URL(`../${directory}/`, import.meta.url));
+};
 const failures = [];
 const requireTrue = (condition, message) => { if (!condition) failures.push(message); };
 
@@ -14,7 +24,7 @@ const client = read("src/api/client.ts");
 const predictionCommand = read("src-tauri/src/commands/prediction.rs");
 const catalogCommand = read("src-tauri/src/commands/catalog.rs");
 const registry = read("src-tauri/src/bootstrap/command_registry.rs");
-const applicationPrediction = read("crates/application/src/prediction.rs");
+const applicationPrediction = readRustTree("crates/application/src/services/prediction") + readRustTree("crates/application/src/use_cases/prediction");
 const applicationCatalog = read("crates/application/src/services/lineups/facade.rs");
 const modelPersistence = read("crates/persistence-postgres/src/model_runs.rs");
 const catalogPersistence = read("crates/persistence-postgres/src/player_catalog.rs");
