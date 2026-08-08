@@ -10,6 +10,7 @@ const catalog = read("crates/persistence-postgres/src/player_catalog.rs");
 const connection = read("crates/persistence-postgres/src/connection.rs");
 const integration = read("crates/persistence-postgres/tests/postgres_integration.rs");
 const command = read("src-tauri/src/commands/database.rs");
+const compactCommand = command.replace(/\s+/g, "");
 const databaseFacade = read("crates/application/src/services/database/facade.rs");
 const databaseService = read("crates/application/src/services/database/service.rs");
 const resetUseCase = read("crates/application/src/use_cases/database/reset/mod.rs");
@@ -68,8 +69,8 @@ requireText(integration, "destructive_reset_rebuilds_an_empty_migrated_database"
 requireText(integration, "assert_eq!(team_count, 0)", "清空后业务数据为空断言");
 
 requireText(command, "pub async fn reset_database", "Tauri 清空命令");
-requireText(command, "state.service.preflight_database_reset", "后端数据库名称二次校验");
-requireText(command, ".reset_database(options, confirmation)", "Tauri 委托 Application 清空用例");
+requireText(compactCommand, "state.service.preflight_database_reset(&options,&confirmation)", "后端数据库名称二次校验");
+requireText(compactCommand, ".reset_database(options,confirmation)", "Tauri 委托 Application 清空用例");
 if (command.includes("PostgresStore::connect") || command.includes("reset_store.reset_to_pristine")) {
   throw new Error("Tauri 数据库命令不得直接连接 PostgreSQL 或执行彻底重建");
 }
