@@ -1,9 +1,10 @@
 # R02-07 Analytics、Exchange、AI 与 Release 实施记录
 
-- 任务状态：`VERIFYING`
+- 任务状态：`DONE`
 - 前置门禁：R2-06 已关闭为 `DONE`
 - R2-07 开始基线：`582bc078b7e12d8eda38820f44696953d7c11d29`
 - 首次迁移提交：`90867616972275849b705e620b830619378df0b8`
+- 格式修复提交：`982e0e87c0186c1347488dc73a2e6f83e535584e`、`06a75da6e8bc6c93a080d4557307d8856a8e29f7`
 - 目标平台：Windows
 - 类型范围：Analytics 39 + Exchange 54 + AI Workspace 16 + Release 9，共 118 个公共兼容类型
 
@@ -68,7 +69,7 @@
 
 ## 4. 兼容边界
 
-- 根级 `football_domain::TypeName` 继续保留；R2-08 前不提前收敛根级兼容 re-export。
+- 根级 `football_domain::TypeName` 在本节点继续保留；显式根出口由 R2-08 统一收敛。
 - 新增 `football_domain::analytics::*`、`exchange::*`、`ai_workspace::*`、`release::*` 业务语义路径。
 - Serde 字段名、snake_case 枚举值、默认值、optional 语义和历史 JSON 不改。
 - 常量字符串、格式版本、默认数值和状态映射原样迁移。
@@ -80,23 +81,18 @@
 
 `architecture/domain-migration-progress.json` 已登记 `R2-07`；目标模块策略新增 `analytics/`、`exchange/`、`ai_workspace/`、`release/` 的 R2-07 唯一归属。
 
-## 6. 当前验证状态
+## 6. Windows 本机验证结果
 
-- Windows 本机首次最小验证已执行。
-- `cargo test --locked -p football-domain --test serde_contracts`：17/17 通过，R2-07 四组模块身份契约均通过。
-- `cargo fmt --all -- --check`：首次失败，仅发现 `exchange/spreadsheet/import.rs` 与 `r2_07_module_paths.rs` 的 rustfmt 排版差异，无编译或契约失败。
-- 已按 rustfmt 输出修正上述两处排版，提交为 `982e0e87c0186c1347488dc73a2e6f83e535584e` 与 `06a75da6e8bc6c93a080d4557307d8856a8e29f7`；未修改业务逻辑、Serde、公共接口或依赖。
-- 当前等待 Windows 本机重新执行 `cargo fmt --all -- --check`；通过前保持 `VERIFYING`，不进入下一门禁。
+- `cargo test --locked -p football-domain --test serde_contracts`：17/17 通过；R2-07 四组模块身份契约均通过。
+- `cargo fmt --all -- --check`：格式修复后重新执行，无输出并以成功状态返回。
+- `node scripts/generate-domain-type-inventory.mjs`：生成 365 个类型、129 个来源文件。
+- `node scripts/verify-domain-type-inventory.mjs`：365 个类型、365 个公共兼容类型、299 个 PostgreSQL 映射类型全部通过；完成迁移任务覆盖 R2-02 至 R2-07。
+- `npm run verify:architecture`：模块边界、状态所有权、受保护导入和 Domain 类型清单全部通过；报告覆盖 18 个 Feature、11 个 Rust crate、42 个前端源码文件、283 个 Rust 文件和 12 个 Cargo 清单。
+- 本轮未单独重跑 `verify-protected-assets-deterministic`、完整 `verify:frontend`、完整 `verify:rust` 与 `tauri:dev`；用户明确批准 R2-07 关闭并进入 R2-08，这些全量门禁继续由 R2-08 与 R2 阶段出口统一覆盖。
 
-## 7. 待完成门禁
+## 7. 完成结论
 
-- `cargo fmt --all -- --check`（修复后重跑）
-- `node scripts/generate-domain-type-inventory.mjs`
-- `node scripts/verify-domain-type-inventory.mjs`
-- `npm run verify:architecture`
-- `node scripts/verify-protected-assets-deterministic.mjs`
-- `npm run verify:frontend`
-- `npm run verify:rust`
-- Windows `npm run tauri:dev` 启动与关键页面 smoke test
-
-当前不得标记为 `DONE`。
+- 118 个目标类型均已进入唯一业务语义目录，7 个旧职责混合源文件已删除。
+- 根级公共兼容类型身份、Serde 与架构门禁均在 Windows 本机验证通过。
+- 用户于本轮明确确认 `R2-07 DONE` 并授权开始 R2-08。
+- R2-07 正式关闭；下一任务为 `R2-08 Domain 根出口收敛`。
