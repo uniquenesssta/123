@@ -23,14 +23,14 @@
     "currentPublicExportPolicy": "root glob re-export is recorded as current debt and removed only in R2-08",
     "targetPublicExportPolicy": "explicit re-export only"
   },
-  "sourceDigest": "529d7460ddcca00fae78195e96550d6226cf59546f45b9a6bceeef818f3c3458",
-  "rustUsageDigest": "e142e15233ffab7974929a44046d68b3fc102435c127884608fb350028a05188",
+  "sourceDigest": "217241ac243726a5ab6805a7f169e222b97e78c7c971749a5904714af673ebdd",
+  "rustUsageDigest": "f115257ca70af82c2daa70465734feba4f4d50b4bca5351a0de4892690596c4f",
   "summary": {
     "typeCount": 365,
     "publicCompatibilityTypeCount": 365,
     "internalTypeCount": 0,
-    "domainSourceFileCount": 101,
-    "scannedRustFileCount": 245,
+    "domainSourceFileCount": 129,
+    "scannedRustFileCount": 284,
     "databaseMappedTypeCount": 299,
     "byTargetModule": {
       "ai_workspace": 16,
@@ -109,6 +109,7 @@
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
+        "crates/domain/src/lib.rs",
         "crates/domain/src/review/ability_candidate.rs",
         "crates/domain/tests/serde_contracts/r2_06_module_paths.rs"
       ],
@@ -174,6 +175,7 @@
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
+        "crates/domain/src/lib.rs",
         "crates/domain/tests/serde_contracts/r2_06_module_paths.rs"
       ],
       "externalCallers": [
@@ -248,6 +250,7 @@
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "none_detected",
       "domainCallers": [
+        "crates/domain/src/lib.rs",
         "crates/domain/src/review/calculation.rs",
         "crates/domain/tests/serde_contracts/r2_06_module_paths.rs"
       ],
@@ -312,6 +315,7 @@
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
+        "crates/domain/src/lib.rs",
         "crates/domain/src/review/ability_candidate.rs",
         "crates/domain/tests/serde_contracts/r2_06_module_paths.rs"
       ],
@@ -383,6 +387,7 @@
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
+        "crates/domain/src/lib.rs",
         "crates/domain/src/player/catalog.rs",
         "crates/domain/tests/serde_contracts/module_paths.rs"
       ],
@@ -504,6 +509,7 @@
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
+        "crates/domain/src/lib.rs",
         "crates/domain/src/review/aggregate.rs",
         "crates/domain/tests/serde_contracts/r2_06_module_paths.rs"
       ],
@@ -520,9 +526,9 @@
       "typeName": "AiAnalysisPackageData",
       "kind": "struct",
       "visibility": "public",
-      "currentPath": "crates/domain/src/analytics.rs",
-      "currentModule": "football_domain::analytics",
-      "sourceLine": 264,
+      "currentPath": "crates/domain/src/analytics/ai_analysis/package.rs",
+      "currentModule": "football_domain::package",
+      "sourceLine": 22,
       "derives": [
         "Clone",
         "Debug",
@@ -574,7 +580,10 @@
       "currentRootExport": "glob_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
-      "domainCallers": [],
+      "domainCallers": [
+        "crates/domain/src/lib.rs",
+        "crates/domain/tests/serde_contracts/r2_07_module_paths.rs"
+      ],
       "externalCallers": [
         "crates/analysis-package/src/lib.rs",
         "crates/persistence-postgres/src/analytics.rs"
@@ -587,9 +596,9 @@
       "typeName": "AiAnalysisPackageManifest",
       "kind": "struct",
       "visibility": "public",
-      "currentPath": "crates/domain/src/analytics.rs",
-      "currentModule": "football_domain::analytics",
-      "sourceLine": 253,
+      "currentPath": "crates/domain/src/analytics/ai_analysis/package.rs",
+      "currentModule": "football_domain::package",
+      "sourceLine": 11,
       "derives": [
         "Clone",
         "Debug",
@@ -645,7 +654,10 @@
       "currentRootExport": "glob_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "none_detected",
-      "domainCallers": [],
+      "domainCallers": [
+        "crates/domain/src/lib.rs",
+        "crates/domain/tests/serde_contracts/r2_07_module_paths.rs"
+      ],
       "externalCallers": [
         "crates/analysis-package/src/lib.rs"
       ],
@@ -655,9 +667,9 @@
       "typeName": "AiAnalysisPackageSummary",
       "kind": "struct",
       "visibility": "public",
-      "currentPath": "crates/domain/src/analytics.rs",
-      "currentModule": "football_domain::analytics",
-      "sourceLine": 274,
+      "currentPath": "crates/domain/src/analytics/ai_analysis/package.rs",
+      "currentModule": "football_domain::package",
+      "sourceLine": 32,
       "derives": [
         "Clone",
         "Debug",
@@ -705,7 +717,10 @@
       "currentRootExport": "glob_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
-      "domainCallers": [],
+      "domainCallers": [
+        "crates/domain/src/lib.rs",
+        "crates/domain/tests/serde_contracts/r2_07_module_paths.rs"
+      ],
       "externalCallers": [
         "crates/analysis-package/src/lib.rs",
         "crates/application/src/analytics.rs",
@@ -720,9 +735,9 @@
       "typeName": "AiAnalysisResponseManifest",
       "kind": "struct",
       "visibility": "public",
-      "currentPath": "crates/domain/src/analytics.rs",
-      "currentModule": "football_domain::analytics",
-      "sourceLine": 300,
+      "currentPath": "crates/domain/src/analytics/ai_analysis/response.rs",
+      "currentModule": "football_domain::response",
+      "sourceLine": 26,
       "derives": [
         "Clone",
         "Debug",
@@ -775,7 +790,9 @@
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "none_detected",
       "domainCallers": [
-        "crates/domain/src/analytics.rs"
+        "crates/domain/src/analytics/ai_analysis/response.rs",
+        "crates/domain/src/lib.rs",
+        "crates/domain/tests/serde_contracts/r2_07_module_paths.rs"
       ],
       "externalCallers": [
         "crates/analysis-package/src/lib.rs"
@@ -786,9 +803,9 @@
       "typeName": "AiAnalysisResponsePreview",
       "kind": "struct",
       "visibility": "public",
-      "currentPath": "crates/domain/src/analytics.rs",
-      "currentModule": "football_domain::analytics",
-      "sourceLine": 310,
+      "currentPath": "crates/domain/src/analytics/ai_analysis/response.rs",
+      "currentModule": "football_domain::response",
+      "sourceLine": 36,
       "derives": [
         "Clone",
         "Debug",
@@ -832,7 +849,10 @@
       "currentRootExport": "glob_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
-      "domainCallers": [],
+      "domainCallers": [
+        "crates/domain/src/lib.rs",
+        "crates/domain/tests/serde_contracts/r2_07_module_paths.rs"
+      ],
       "externalCallers": [
         "crates/analysis-package/src/lib.rs",
         "crates/application/src/analytics.rs",
@@ -847,9 +867,9 @@
       "typeName": "AiAnalysisSuggestionDraft",
       "kind": "struct",
       "visibility": "public",
-      "currentPath": "crates/domain/src/analytics.rs",
-      "currentModule": "football_domain::analytics",
-      "sourceLine": 284,
+      "currentPath": "crates/domain/src/analytics/ai_analysis/response.rs",
+      "currentModule": "football_domain::response",
+      "sourceLine": 10,
       "derives": [
         "Clone",
         "Debug",
@@ -916,7 +936,9 @@
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "none_detected",
       "domainCallers": [
-        "crates/domain/src/analytics.rs"
+        "crates/domain/src/analytics/ai_analysis/response.rs",
+        "crates/domain/src/lib.rs",
+        "crates/domain/tests/serde_contracts/r2_07_module_paths.rs"
       ],
       "externalCallers": [
         "crates/analysis-package/src/lib.rs"
@@ -927,9 +949,9 @@
       "typeName": "AiAnalysisSuggestionRecord",
       "kind": "struct",
       "visibility": "public",
-      "currentPath": "crates/domain/src/analytics.rs",
-      "currentModule": "football_domain::analytics",
-      "sourceLine": 318,
+      "currentPath": "crates/domain/src/analytics/ai_analysis/response.rs",
+      "currentModule": "football_domain::response",
+      "sourceLine": 44,
       "derives": [
         "Clone",
         "Debug",
@@ -1013,7 +1035,10 @@
       "currentRootExport": "glob_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
-      "domainCallers": [],
+      "domainCallers": [
+        "crates/domain/src/lib.rs",
+        "crates/domain/tests/serde_contracts/r2_07_module_paths.rs"
+      ],
       "externalCallers": [
         "crates/application/src/analytics.rs",
         "crates/persistence-postgres/src/analytics.rs",
@@ -1027,9 +1052,9 @@
       "typeName": "AiMatchPackageContext",
       "kind": "struct",
       "visibility": "public",
-      "currentPath": "crates/domain/src/exchange.rs",
-      "currentModule": "football_domain::exchange",
-      "sourceLine": 206,
+      "currentPath": "crates/domain/src/exchange/ai_match.rs",
+      "currentModule": "football_domain::ai_match",
+      "sourceLine": 24,
       "derives": [
         "Clone",
         "Debug",
@@ -1081,7 +1106,10 @@
       "currentRootExport": "glob_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
-      "domainCallers": [],
+      "domainCallers": [
+        "crates/domain/src/lib.rs",
+        "crates/domain/tests/serde_contracts/r2_07_module_paths.rs"
+      ],
       "externalCallers": [
         "crates/persistence-postgres/src/match_exchange.rs",
         "crates/spreadsheet-io/src/ai_package.rs"
@@ -1094,9 +1122,9 @@
       "typeName": "AiMatchPackageManifest",
       "kind": "struct",
       "visibility": "public",
-      "currentPath": "crates/domain/src/exchange.rs",
-      "currentModule": "football_domain::exchange",
-      "sourceLine": 194,
+      "currentPath": "crates/domain/src/exchange/ai_match.rs",
+      "currentModule": "football_domain::ai_match",
+      "sourceLine": 12,
       "derives": [
         "Clone",
         "Debug",
@@ -1156,7 +1184,10 @@
       "currentRootExport": "glob_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "none_detected",
-      "domainCallers": [],
+      "domainCallers": [
+        "crates/domain/src/lib.rs",
+        "crates/domain/tests/serde_contracts/r2_07_module_paths.rs"
+      ],
       "externalCallers": [
         "crates/spreadsheet-io/src/ai_package.rs"
       ],
@@ -1166,9 +1197,9 @@
       "typeName": "AiMatchPackageSummary",
       "kind": "struct",
       "visibility": "public",
-      "currentPath": "crates/domain/src/exchange.rs",
-      "currentModule": "football_domain::exchange",
-      "sourceLine": 238,
+      "currentPath": "crates/domain/src/exchange/ai_match.rs",
+      "currentModule": "football_domain::ai_match",
+      "sourceLine": 56,
       "derives": [
         "Clone",
         "Debug",
@@ -1216,7 +1247,10 @@
       "currentRootExport": "glob_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "none_detected",
-      "domainCallers": [],
+      "domainCallers": [
+        "crates/domain/src/lib.rs",
+        "crates/domain/tests/serde_contracts/r2_07_module_paths.rs"
+      ],
       "externalCallers": [
         "crates/application/src/exchange.rs",
         "crates/spreadsheet-io/src/ai_package.rs",
@@ -1228,9 +1262,9 @@
       "typeName": "AiMatchPlayerContext",
       "kind": "struct",
       "visibility": "public",
-      "currentPath": "crates/domain/src/exchange.rs",
-      "currentModule": "football_domain::exchange",
-      "sourceLine": 216,
+      "currentPath": "crates/domain/src/exchange/ai_match.rs",
+      "currentModule": "football_domain::ai_match",
+      "sourceLine": 34,
       "derives": [
         "Clone",
         "Debug",
@@ -1321,8 +1355,10 @@
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
-        "crates/domain/src/exchange.rs",
-        "crates/domain/src/review/package/contract.rs"
+        "crates/domain/src/exchange/ai_match.rs",
+        "crates/domain/src/lib.rs",
+        "crates/domain/src/review/package/contract.rs",
+        "crates/domain/tests/serde_contracts/r2_07_module_paths.rs"
       ],
       "externalCallers": [
         "crates/persistence-postgres/src/match_exchange.rs"
@@ -1335,9 +1371,9 @@
       "typeName": "AiSuggestionDecision",
       "kind": "enum",
       "visibility": "public",
-      "currentPath": "crates/domain/src/analytics.rs",
-      "currentModule": "football_domain::analytics",
-      "sourceLine": 337,
+      "currentPath": "crates/domain/src/analytics/ai_analysis/response.rs",
+      "currentModule": "football_domain::response",
+      "sourceLine": 63,
       "derives": [
         "Clone",
         "Copy",
@@ -1379,7 +1415,9 @@
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
-        "crates/domain/src/analytics.rs"
+        "crates/domain/src/analytics/ai_analysis/response.rs",
+        "crates/domain/src/lib.rs",
+        "crates/domain/tests/serde_contracts/r2_07_module_paths.rs"
       ],
       "externalCallers": [
         "crates/persistence-postgres/src/analytics.rs"
@@ -1392,9 +1430,9 @@
       "typeName": "AiSuggestionDecisionDraft",
       "kind": "struct",
       "visibility": "public",
-      "currentPath": "crates/domain/src/analytics.rs",
-      "currentModule": "football_domain::analytics",
-      "sourceLine": 343,
+      "currentPath": "crates/domain/src/analytics/ai_analysis/response.rs",
+      "currentModule": "football_domain::response",
+      "sourceLine": 69,
       "derives": [
         "Clone",
         "Debug",
@@ -1442,7 +1480,10 @@
       "currentRootExport": "glob_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
-      "domainCallers": [],
+      "domainCallers": [
+        "crates/domain/src/lib.rs",
+        "crates/domain/tests/serde_contracts/r2_07_module_paths.rs"
+      ],
       "externalCallers": [
         "crates/application/src/analytics.rs",
         "crates/persistence-postgres/src/analytics.rs",
@@ -1456,9 +1497,9 @@
       "typeName": "AnalyticsCalculation",
       "kind": "struct",
       "visibility": "public",
-      "currentPath": "crates/domain/src/analytics.rs",
-      "currentModule": "football_domain::analytics",
-      "sourceLine": 115,
+      "currentPath": "crates/domain/src/analytics/calculation.rs",
+      "currentModule": "football_domain::calculation",
+      "sourceLine": 117,
       "derives": [
         "Clone",
         "Debug",
@@ -1526,7 +1567,10 @@
       "currentRootExport": "glob_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
-      "domainCallers": [],
+      "domainCallers": [
+        "crates/domain/src/lib.rs",
+        "crates/domain/tests/serde_contracts/r2_07_module_paths.rs"
+      ],
       "externalCallers": [
         "crates/analytics-engine/src/lib.rs",
         "crates/persistence-postgres/src/analytics.rs"
@@ -1539,9 +1583,9 @@
       "typeName": "AnalyticsOverview",
       "kind": "struct",
       "visibility": "public",
-      "currentPath": "crates/domain/src/analytics.rs",
-      "currentModule": "football_domain::analytics",
-      "sourceLine": 176,
+      "currentPath": "crates/domain/src/analytics/calculation.rs",
+      "currentModule": "football_domain::calculation",
+      "sourceLine": 131,
       "derives": [
         "Clone",
         "Debug",
@@ -1618,7 +1662,9 @@
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
-        "crates/domain/src/analytics.rs"
+        "crates/domain/src/analytics/ai_analysis/package.rs",
+        "crates/domain/src/lib.rs",
+        "crates/domain/tests/serde_contracts/r2_07_module_paths.rs"
       ],
       "externalCallers": [
         "crates/application/src/analytics.rs",
@@ -1633,8 +1679,8 @@
       "typeName": "AnalyticsRefreshRequest",
       "kind": "struct",
       "visibility": "public",
-      "currentPath": "crates/domain/src/analytics.rs",
-      "currentModule": "football_domain::analytics",
+      "currentPath": "crates/domain/src/analytics/calculation.rs",
+      "currentModule": "football_domain::calculation",
       "sourceLine": 11,
       "derives": [
         "Clone",
@@ -1700,7 +1746,9 @@
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
-        "crates/domain/src/analytics.rs"
+        "crates/domain/src/analytics/calculation.rs",
+        "crates/domain/src/lib.rs",
+        "crates/domain/tests/serde_contracts/r2_07_module_paths.rs"
       ],
       "externalCallers": [
         "crates/application/src/analytics.rs",
@@ -1714,9 +1762,9 @@
       "typeName": "ApiWorkspaceApplyResult",
       "kind": "struct",
       "visibility": "public",
-      "currentPath": "crates/domain/src/api_workspace.rs",
-      "currentModule": "football_domain::api_workspace",
-      "sourceLine": 187,
+      "currentPath": "crates/domain/src/ai_workspace/operation.rs",
+      "currentModule": "football_domain::operation",
+      "sourceLine": 37,
       "derives": [
         "Clone",
         "Debug",
@@ -1764,7 +1812,10 @@
       "currentRootExport": "glob_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "none_detected",
-      "domainCallers": [],
+      "domainCallers": [
+        "crates/domain/src/lib.rs",
+        "crates/domain/tests/serde_contracts/r2_07_module_paths.rs"
+      ],
       "externalCallers": [
         "crates/application/src/api_workspace.rs"
       ],
@@ -1774,9 +1825,9 @@
       "typeName": "ApiWorkspaceAssistantFile",
       "kind": "struct",
       "visibility": "public",
-      "currentPath": "crates/domain/src/api_workspace.rs",
-      "currentModule": "football_domain::api_workspace",
-      "sourceLine": 167,
+      "currentPath": "crates/domain/src/ai_workspace/assistant.rs",
+      "currentModule": "football_domain::assistant",
+      "sourceLine": 16,
       "derives": [
         "Clone",
         "Debug",
@@ -1817,7 +1868,9 @@
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "none_detected",
       "domainCallers": [
-        "crates/domain/src/api_workspace.rs"
+        "crates/domain/src/ai_workspace/assistant.rs",
+        "crates/domain/src/lib.rs",
+        "crates/domain/tests/serde_contracts/r2_07_module_paths.rs"
       ],
       "externalCallers": [],
       "databaseMappings": []
@@ -1826,9 +1879,9 @@
       "typeName": "ApiWorkspaceAssistantOperation",
       "kind": "struct",
       "visibility": "public",
-      "currentPath": "crates/domain/src/api_workspace.rs",
-      "currentModule": "football_domain::api_workspace",
-      "sourceLine": 158,
+      "currentPath": "crates/domain/src/ai_workspace/assistant.rs",
+      "currentModule": "football_domain::assistant",
+      "sourceLine": 7,
       "derives": [
         "Clone",
         "Debug",
@@ -1877,7 +1930,9 @@
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "none_detected",
       "domainCallers": [
-        "crates/domain/src/api_workspace.rs"
+        "crates/domain/src/ai_workspace/assistant.rs",
+        "crates/domain/src/lib.rs",
+        "crates/domain/tests/serde_contracts/r2_07_module_paths.rs"
       ],
       "externalCallers": [],
       "databaseMappings": []
@@ -1886,9 +1941,9 @@
       "typeName": "ApiWorkspaceAssistantOutput",
       "kind": "struct",
       "visibility": "public",
-      "currentPath": "crates/domain/src/api_workspace.rs",
-      "currentModule": "football_domain::api_workspace",
-      "sourceLine": 175,
+      "currentPath": "crates/domain/src/ai_workspace/assistant.rs",
+      "currentModule": "football_domain::assistant",
+      "sourceLine": 24,
       "derives": [
         "Clone",
         "Debug",
@@ -1950,7 +2005,10 @@
       "currentRootExport": "glob_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "none_detected",
-      "domainCallers": [],
+      "domainCallers": [
+        "crates/domain/src/lib.rs",
+        "crates/domain/tests/serde_contracts/r2_07_module_paths.rs"
+      ],
       "externalCallers": [],
       "databaseMappings": []
     },
@@ -1958,9 +2016,9 @@
       "typeName": "ApiWorkspaceAttachment",
       "kind": "struct",
       "visibility": "public",
-      "currentPath": "crates/domain/src/api_workspace.rs",
-      "currentModule": "football_domain::api_workspace",
-      "sourceLine": 21,
+      "currentPath": "crates/domain/src/ai_workspace/attachment.rs",
+      "currentModule": "football_domain::attachment",
+      "sourceLine": 4,
       "derives": [
         "Clone",
         "Debug",
@@ -2012,7 +2070,10 @@
       "currentRootExport": "glob_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "none_detected",
-      "domainCallers": [],
+      "domainCallers": [
+        "crates/domain/src/lib.rs",
+        "crates/domain/tests/serde_contracts/r2_07_module_paths.rs"
+      ],
       "externalCallers": [
         "crates/application/src/api_workspace.rs",
         "src-tauri/src/commands/api_workspace.rs"
@@ -2023,9 +2084,9 @@
       "typeName": "ApiWorkspaceGeneratedFileContent",
       "kind": "struct",
       "visibility": "public",
-      "currentPath": "crates/domain/src/api_workspace.rs",
-      "currentModule": "football_domain::api_workspace",
-      "sourceLine": 144,
+      "currentPath": "crates/domain/src/ai_workspace/file.rs",
+      "currentModule": "football_domain::file",
+      "sourceLine": 28,
       "derives": [
         "Clone",
         "Debug",
@@ -2061,7 +2122,10 @@
       "currentRootExport": "glob_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
-      "domainCallers": [],
+      "domainCallers": [
+        "crates/domain/src/lib.rs",
+        "crates/domain/tests/serde_contracts/r2_07_module_paths.rs"
+      ],
       "externalCallers": [
         "crates/application/src/api_workspace.rs",
         "crates/persistence-postgres/src/api_workspace.rs"
@@ -2074,9 +2138,9 @@
       "typeName": "ApiWorkspaceGeneratedFileDraft",
       "kind": "struct",
       "visibility": "public",
-      "currentPath": "crates/domain/src/api_workspace.rs",
-      "currentModule": "football_domain::api_workspace",
-      "sourceLine": 122,
+      "currentPath": "crates/domain/src/ai_workspace/file.rs",
+      "currentModule": "football_domain::file",
+      "sourceLine": 6,
       "derives": [
         "Clone",
         "Debug",
@@ -2128,7 +2192,10 @@
       "currentRootExport": "glob_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
-      "domainCallers": [],
+      "domainCallers": [
+        "crates/domain/src/lib.rs",
+        "crates/domain/tests/serde_contracts/r2_07_module_paths.rs"
+      ],
       "externalCallers": [
         "crates/application/src/api_workspace.rs",
         "crates/persistence-postgres/src/api_workspace.rs"
@@ -2141,9 +2208,9 @@
       "typeName": "ApiWorkspaceGeneratedFileRecord",
       "kind": "struct",
       "visibility": "public",
-      "currentPath": "crates/domain/src/api_workspace.rs",
-      "currentModule": "football_domain::api_workspace",
-      "sourceLine": 132,
+      "currentPath": "crates/domain/src/ai_workspace/file.rs",
+      "currentModule": "football_domain::file",
+      "sourceLine": 16,
       "derives": [
         "Clone",
         "Debug",
@@ -2204,7 +2271,10 @@
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
-        "crates/domain/src/api_workspace.rs"
+        "crates/domain/src/ai_workspace/file.rs",
+        "crates/domain/src/ai_workspace/session.rs",
+        "crates/domain/src/lib.rs",
+        "crates/domain/tests/serde_contracts/r2_07_module_paths.rs"
       ],
       "externalCallers": [
         "crates/persistence-postgres/src/api_workspace.rs"
@@ -2217,9 +2287,9 @@
       "typeName": "ApiWorkspaceMessageDraft",
       "kind": "struct",
       "visibility": "public",
-      "currentPath": "crates/domain/src/api_workspace.rs",
-      "currentModule": "football_domain::api_workspace",
-      "sourceLine": 58,
+      "currentPath": "crates/domain/src/ai_workspace/message.rs",
+      "currentModule": "football_domain::message",
+      "sourceLine": 7,
       "derives": [
         "Clone",
         "Debug",
@@ -2295,7 +2365,10 @@
       "currentRootExport": "glob_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
-      "domainCallers": [],
+      "domainCallers": [
+        "crates/domain/src/lib.rs",
+        "crates/domain/tests/serde_contracts/r2_07_module_paths.rs"
+      ],
       "externalCallers": [
         "crates/application/src/api_workspace.rs",
         "crates/persistence-postgres/src/api_workspace.rs",
@@ -2309,9 +2382,9 @@
       "typeName": "ApiWorkspaceMessageRecord",
       "kind": "struct",
       "visibility": "public",
-      "currentPath": "crates/domain/src/api_workspace.rs",
-      "currentModule": "football_domain::api_workspace",
-      "sourceLine": 77,
+      "currentPath": "crates/domain/src/ai_workspace/message.rs",
+      "currentModule": "football_domain::message",
+      "sourceLine": 26,
       "derives": [
         "Clone",
         "Debug",
@@ -2384,7 +2457,9 @@
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
-        "crates/domain/src/api_workspace.rs"
+        "crates/domain/src/ai_workspace/session.rs",
+        "crates/domain/src/lib.rs",
+        "crates/domain/tests/serde_contracts/r2_07_module_paths.rs"
       ],
       "externalCallers": [
         "crates/application/src/api_workspace.rs",
@@ -2398,9 +2473,9 @@
       "typeName": "ApiWorkspaceOperationDraft",
       "kind": "struct",
       "visibility": "public",
-      "currentPath": "crates/domain/src/api_workspace.rs",
-      "currentModule": "football_domain::api_workspace",
-      "sourceLine": 92,
+      "currentPath": "crates/domain/src/ai_workspace/operation.rs",
+      "currentModule": "football_domain::operation",
+      "sourceLine": 7,
       "derives": [
         "Clone",
         "Debug",
@@ -2460,7 +2535,10 @@
       "currentRootExport": "glob_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
-      "domainCallers": [],
+      "domainCallers": [
+        "crates/domain/src/lib.rs",
+        "crates/domain/tests/serde_contracts/r2_07_module_paths.rs"
+      ],
       "externalCallers": [
         "crates/application/src/api_workspace.rs",
         "crates/persistence-postgres/src/api_workspace.rs"
@@ -2473,9 +2551,9 @@
       "typeName": "ApiWorkspaceOperationRecord",
       "kind": "struct",
       "visibility": "public",
-      "currentPath": "crates/domain/src/api_workspace.rs",
-      "currentModule": "football_domain::api_workspace",
-      "sourceLine": 104,
+      "currentPath": "crates/domain/src/ai_workspace/operation.rs",
+      "currentModule": "football_domain::operation",
+      "sourceLine": 19,
       "derives": [
         "Clone",
         "Debug",
@@ -2560,7 +2638,9 @@
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
-        "crates/domain/src/api_workspace.rs"
+        "crates/domain/src/ai_workspace/session.rs",
+        "crates/domain/src/lib.rs",
+        "crates/domain/tests/serde_contracts/r2_07_module_paths.rs"
       ],
       "externalCallers": [
         "crates/application/src/api_workspace.rs",
@@ -2574,9 +2654,9 @@
       "typeName": "ApiWorkspacePreset",
       "kind": "struct",
       "visibility": "public",
-      "currentPath": "crates/domain/src/api_workspace.rs",
-      "currentModule": "football_domain::api_workspace",
-      "sourceLine": 9,
+      "currentPath": "crates/domain/src/ai_workspace/preset.rs",
+      "currentModule": "football_domain::preset",
+      "sourceLine": 4,
       "derives": [
         "Clone",
         "Debug",
@@ -2638,7 +2718,10 @@
       "currentRootExport": "glob_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "none_detected",
-      "domainCallers": [],
+      "domainCallers": [
+        "crates/domain/src/lib.rs",
+        "crates/domain/tests/serde_contracts/r2_07_module_paths.rs"
+      ],
       "externalCallers": [
         "crates/application/src/api_workspace.rs",
         "src-tauri/src/commands/api_workspace.rs"
@@ -2649,9 +2732,9 @@
       "typeName": "ApiWorkspaceSessionDetail",
       "kind": "struct",
       "visibility": "public",
-      "currentPath": "crates/domain/src/api_workspace.rs",
-      "currentModule": "football_domain::api_workspace",
-      "sourceLine": 150,
+      "currentPath": "crates/domain/src/ai_workspace/session.rs",
+      "currentModule": "football_domain::session",
+      "sourceLine": 38,
       "derives": [
         "Clone",
         "Debug",
@@ -2695,7 +2778,10 @@
       "currentRootExport": "glob_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
-      "domainCallers": [],
+      "domainCallers": [
+        "crates/domain/src/lib.rs",
+        "crates/domain/tests/serde_contracts/r2_07_module_paths.rs"
+      ],
       "externalCallers": [
         "crates/application/src/api_workspace.rs",
         "crates/persistence-postgres/src/api_workspace.rs",
@@ -2709,9 +2795,9 @@
       "typeName": "ApiWorkspaceSessionDraft",
       "kind": "struct",
       "visibility": "public",
-      "currentPath": "crates/domain/src/api_workspace.rs",
-      "currentModule": "football_domain::api_workspace",
-      "sourceLine": 31,
+      "currentPath": "crates/domain/src/ai_workspace/session.rs",
+      "currentModule": "football_domain::session",
+      "sourceLine": 11,
       "derives": [
         "Clone",
         "Debug",
@@ -2763,7 +2849,10 @@
       "currentRootExport": "glob_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
-      "domainCallers": [],
+      "domainCallers": [
+        "crates/domain/src/lib.rs",
+        "crates/domain/tests/serde_contracts/r2_07_module_paths.rs"
+      ],
       "externalCallers": [
         "crates/application/src/api_workspace.rs",
         "crates/persistence-postgres/src/api_workspace.rs",
@@ -2777,9 +2866,9 @@
       "typeName": "ApiWorkspaceSessionRecord",
       "kind": "struct",
       "visibility": "public",
-      "currentPath": "crates/domain/src/api_workspace.rs",
-      "currentModule": "football_domain::api_workspace",
-      "sourceLine": 42,
+      "currentPath": "crates/domain/src/ai_workspace/session.rs",
+      "currentModule": "football_domain::session",
+      "sourceLine": 22,
       "derives": [
         "Clone",
         "Debug",
@@ -2856,7 +2945,9 @@
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
-        "crates/domain/src/api_workspace.rs"
+        "crates/domain/src/ai_workspace/session.rs",
+        "crates/domain/src/lib.rs",
+        "crates/domain/tests/serde_contracts/r2_07_module_paths.rs"
       ],
       "externalCallers": [
         "crates/application/src/api_workspace.rs",
@@ -2940,7 +3031,8 @@
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
-        "crates/domain/src/exchange.rs",
+        "crates/domain/src/exchange/lineup.rs",
+        "crates/domain/src/lib.rs",
         "crates/domain/src/lineup/player.rs",
         "crates/domain/src/lineup/preset.rs",
         "crates/domain/src/player/availability.rs",
@@ -2970,9 +3062,9 @@
       "typeName": "BackgroundJob",
       "kind": "struct",
       "visibility": "public",
-      "currentPath": "crates/domain/src/analytics.rs",
-      "currentModule": "football_domain::analytics",
-      "sourceLine": 214,
+      "currentPath": "crates/domain/src/analytics/job.rs",
+      "currentModule": "football_domain::job",
+      "sourceLine": 29,
       "derives": [
         "Clone",
         "Debug",
@@ -3064,7 +3156,10 @@
       "currentRootExport": "glob_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
-      "domainCallers": [],
+      "domainCallers": [
+        "crates/domain/src/lib.rs",
+        "crates/domain/tests/serde_contracts/r2_07_module_paths.rs"
+      ],
       "externalCallers": [
         "crates/application/src/analytics.rs",
         "crates/persistence-postgres/src/jobs.rs",
@@ -3122,6 +3217,7 @@
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
+        "crates/domain/src/lib.rs",
         "crates/domain/src/shared/bulk_archive.rs",
         "crates/domain/tests/serde_contracts/module_paths.rs"
       ],
@@ -3187,6 +3283,7 @@
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
+        "crates/domain/src/lib.rs",
         "crates/domain/tests/serde_contracts/module_paths.rs"
       ],
       "externalCallers": [
@@ -3245,6 +3342,7 @@
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
+        "crates/domain/src/lib.rs",
         "crates/domain/src/shared/bulk_delete.rs",
         "crates/domain/tests/serde_contracts/module_paths.rs"
       ],
@@ -3302,6 +3400,7 @@
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
+        "crates/domain/src/lib.rs",
         "crates/domain/tests/serde_contracts/module_paths.rs"
       ],
       "externalCallers": [
@@ -3368,6 +3467,7 @@
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
+        "crates/domain/src/lib.rs",
         "crates/domain/tests/serde_contracts/r2_06_module_paths.rs"
       ],
       "externalCallers": [
@@ -3469,6 +3569,7 @@
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "none_detected",
       "domainCallers": [
+        "crates/domain/src/lib.rs",
         "crates/domain/src/review/calculation.rs",
         "crates/domain/tests/serde_contracts/r2_06_module_paths.rs"
       ],
@@ -3556,6 +3657,7 @@
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "none_detected",
       "domainCallers": [
+        "crates/domain/src/lib.rs",
         "crates/domain/src/review/calculation.rs",
         "crates/domain/tests/serde_contracts/r2_06_module_paths.rs"
       ],
@@ -3568,9 +3670,9 @@
       "typeName": "CalibrationBucket",
       "kind": "struct",
       "visibility": "public",
-      "currentPath": "crates/domain/src/analytics.rs",
-      "currentModule": "football_domain::analytics",
-      "sourceLine": 75,
+      "currentPath": "crates/domain/src/analytics/calculation.rs",
+      "currentModule": "football_domain::calculation",
+      "sourceLine": 77,
       "derives": [
         "Clone",
         "Debug",
@@ -3635,7 +3737,9 @@
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
-        "crates/domain/src/analytics.rs"
+        "crates/domain/src/analytics/calculation.rs",
+        "crates/domain/src/lib.rs",
+        "crates/domain/tests/serde_contracts/r2_07_module_paths.rs"
       ],
       "externalCallers": [
         "crates/analytics-engine/src/lib.rs",
@@ -3696,6 +3800,7 @@
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
+        "crates/domain/src/lib.rs",
         "crates/domain/tests/serde_contracts/module_paths.rs"
       ],
       "externalCallers": [
@@ -3764,6 +3869,7 @@
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
+        "crates/domain/src/lib.rs",
         "crates/domain/tests/serde_contracts/module_paths.rs"
       ],
       "externalCallers": [
@@ -3838,7 +3944,8 @@
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
-        "crates/domain/src/exchange.rs",
+        "crates/domain/src/exchange/lineup.rs",
+        "crates/domain/src/lib.rs",
         "crates/domain/tests/serde_contracts/module_paths.rs"
       ],
       "externalCallers": [
@@ -3904,6 +4011,7 @@
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
         "crates/domain/src/coach/listing.rs",
+        "crates/domain/src/lib.rs",
         "crates/domain/tests/serde_contracts/module_paths.rs"
       ],
       "externalCallers": [
@@ -3984,6 +4092,7 @@
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
+        "crates/domain/src/lib.rs",
         "crates/domain/tests/serde_contracts/module_paths.rs"
       ],
       "externalCallers": [
@@ -4063,6 +4172,7 @@
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
         "crates/domain/src/coach/detail.rs",
+        "crates/domain/src/lib.rs",
         "crates/domain/tests/serde_contracts/module_paths.rs"
       ],
       "externalCallers": [
@@ -4142,6 +4252,7 @@
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
         "crates/domain/src/coach/detail.rs",
+        "crates/domain/src/lib.rs",
         "crates/domain/tests/serde_contracts/module_paths.rs"
       ],
       "externalCallers": [
@@ -4240,6 +4351,7 @@
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
+        "crates/domain/src/lib.rs",
         "crates/domain/src/routing/mod.rs",
         "crates/domain/tests/serde_contracts/module_paths.rs"
       ],
@@ -4339,6 +4451,7 @@
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
+        "crates/domain/src/lib.rs",
         "crates/domain/src/routing/mod.rs",
         "crates/domain/tests/serde_contracts/module_paths.rs"
       ],
@@ -4418,6 +4531,7 @@
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
         "crates/domain/src/competition/mod.rs",
+        "crates/domain/src/lib.rs",
         "crates/domain/tests/serde_contracts/defaults.rs",
         "crates/domain/tests/serde_contracts/module_paths.rs"
       ],
@@ -4502,7 +4616,8 @@
         "crates/domain/src/competition/profile.rs",
         "crates/domain/src/competition/rule_package.rs",
         "crates/domain/src/competition/stage.rs",
-        "crates/domain/src/exchange.rs",
+        "crates/domain/src/exchange/prediction_input.rs",
+        "crates/domain/src/lib.rs",
         "crates/domain/src/prediction/context.rs",
         "crates/domain/src/prediction/orchestration/planning.rs",
         "crates/domain/src/prediction/persistence/version.rs",
@@ -4619,6 +4734,7 @@
       "domainCallers": [
         "crates/domain/src/competition/mod.rs",
         "crates/domain/src/competition/rule_package.rs",
+        "crates/domain/src/lib.rs",
         "crates/domain/src/routing/route.rs",
         "crates/domain/tests/serde_contracts/module_paths.rs"
       ],
@@ -4692,6 +4808,7 @@
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
+        "crates/domain/src/lib.rs",
         "crates/domain/tests/serde_contracts/module_paths.rs"
       ],
       "externalCallers": [
@@ -4759,6 +4876,7 @@
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
+        "crates/domain/src/lib.rs",
         "crates/domain/tests/serde_contracts/module_paths.rs"
       ],
       "externalCallers": [
@@ -4843,7 +4961,9 @@
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
         "crates/domain/src/competition/mod.rs",
-        "crates/domain/src/exchange.rs",
+        "crates/domain/src/exchange/ai_match.rs",
+        "crates/domain/src/exchange/lineup.rs",
+        "crates/domain/src/lib.rs",
         "crates/domain/tests/serde_contracts/module_paths.rs"
       ],
       "externalCallers": [
@@ -4943,6 +5063,7 @@
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
+        "crates/domain/src/lib.rs",
         "crates/domain/tests/serde_contracts/module_paths.rs"
       ],
       "externalCallers": [
@@ -5004,6 +5125,7 @@
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
+        "crates/domain/src/lib.rs",
         "crates/domain/tests/serde_contracts/module_paths.rs"
       ],
       "externalCallers": [
@@ -5066,6 +5188,7 @@
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
+        "crates/domain/src/lib.rs",
         "crates/domain/src/research/conflict.rs",
         "crates/domain/tests/serde_contracts/module_paths.rs"
       ],
@@ -5081,9 +5204,9 @@
       "typeName": "ContributionComponent",
       "kind": "struct",
       "visibility": "public",
-      "currentPath": "crates/domain/src/exchange.rs",
-      "currentModule": "football_domain::exchange",
-      "sourceLine": 117,
+      "currentPath": "crates/domain/src/exchange/contribution.rs",
+      "currentModule": "football_domain::contribution",
+      "sourceLine": 36,
       "derives": [
         "Clone",
         "Debug",
@@ -5132,7 +5255,9 @@
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
-        "crates/domain/src/exchange.rs"
+        "crates/domain/src/exchange/contribution.rs",
+        "crates/domain/src/lib.rs",
+        "crates/domain/tests/serde_contracts/r2_07_module_paths.rs"
       ],
       "externalCallers": [
         "crates/persistence-postgres/src/dynamic_tags.rs"
@@ -5200,6 +5325,7 @@
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
+        "crates/domain/src/lib.rs",
         "crates/domain/tests/serde_contracts/module_paths.rs"
       ],
       "externalCallers": [
@@ -5270,6 +5396,7 @@
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
+        "crates/domain/src/lib.rs",
         "crates/domain/src/player/catalog.rs",
         "crates/domain/tests/serde_contracts/module_paths.rs"
       ],
@@ -5286,9 +5413,9 @@
       "typeName": "DataQualityDecision",
       "kind": "enum",
       "visibility": "public",
-      "currentPath": "crates/domain/src/analytics.rs",
-      "currentModule": "football_domain::analytics",
-      "sourceLine": 354,
+      "currentPath": "crates/domain/src/analytics/quality.rs",
+      "currentModule": "football_domain::quality",
+      "sourceLine": 34,
       "derives": [
         "Clone",
         "Copy",
@@ -5330,7 +5457,9 @@
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "none_detected",
       "domainCallers": [
-        "crates/domain/src/analytics.rs"
+        "crates/domain/src/analytics/quality.rs",
+        "crates/domain/src/lib.rs",
+        "crates/domain/tests/serde_contracts/r2_07_module_paths.rs"
       ],
       "externalCallers": [],
       "databaseMappings": []
@@ -5339,9 +5468,9 @@
       "typeName": "DataQualityDecisionDraft",
       "kind": "struct",
       "visibility": "public",
-      "currentPath": "crates/domain/src/analytics.rs",
-      "currentModule": "football_domain::analytics",
-      "sourceLine": 369,
+      "currentPath": "crates/domain/src/analytics/quality.rs",
+      "currentModule": "football_domain::quality",
+      "sourceLine": 49,
       "derives": [
         "Clone",
         "Debug",
@@ -5383,7 +5512,10 @@
       "currentRootExport": "glob_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
-      "domainCallers": [],
+      "domainCallers": [
+        "crates/domain/src/lib.rs",
+        "crates/domain/tests/serde_contracts/r2_07_module_paths.rs"
+      ],
       "externalCallers": [
         "crates/application/src/analytics.rs",
         "crates/persistence-postgres/src/analytics.rs",
@@ -5397,9 +5529,9 @@
       "typeName": "DataQualityFinding",
       "kind": "struct",
       "visibility": "public",
-      "currentPath": "crates/domain/src/analytics.rs",
-      "currentModule": "football_domain::analytics",
-      "sourceLine": 129,
+      "currentPath": "crates/domain/src/analytics/quality.rs",
+      "currentModule": "football_domain::quality",
+      "sourceLine": 7,
       "derives": [
         "Clone",
         "Debug",
@@ -5472,7 +5604,9 @@
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
-        "crates/domain/src/analytics.rs"
+        "crates/domain/src/analytics/quality.rs",
+        "crates/domain/src/lib.rs",
+        "crates/domain/tests/serde_contracts/r2_07_module_paths.rs"
       ],
       "externalCallers": [
         "crates/application/src/analytics.rs",
@@ -5487,9 +5621,9 @@
       "typeName": "DataQualitySummary",
       "kind": "struct",
       "visibility": "public",
-      "currentPath": "crates/domain/src/analytics.rs",
-      "currentModule": "football_domain::analytics",
-      "sourceLine": 144,
+      "currentPath": "crates/domain/src/analytics/quality.rs",
+      "currentModule": "football_domain::quality",
+      "sourceLine": 22,
       "derives": [
         "Clone",
         "Debug",
@@ -5546,7 +5680,9 @@
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
-        "crates/domain/src/analytics.rs"
+        "crates/domain/src/analytics/calculation.rs",
+        "crates/domain/src/lib.rs",
+        "crates/domain/tests/serde_contracts/r2_07_module_paths.rs"
       ],
       "externalCallers": [
         "crates/persistence-postgres/src/analytics.rs"
@@ -5559,9 +5695,9 @@
       "typeName": "DriftFinding",
       "kind": "struct",
       "visibility": "public",
-      "currentPath": "crates/domain/src/analytics.rs",
-      "currentModule": "football_domain::analytics",
-      "sourceLine": 102,
+      "currentPath": "crates/domain/src/analytics/calculation.rs",
+      "currentModule": "football_domain::calculation",
+      "sourceLine": 104,
       "derives": [
         "Clone",
         "Debug",
@@ -5626,7 +5762,9 @@
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
-        "crates/domain/src/analytics.rs"
+        "crates/domain/src/analytics/calculation.rs",
+        "crates/domain/src/lib.rs",
+        "crates/domain/tests/serde_contracts/r2_07_module_paths.rs"
       ],
       "externalCallers": [
         "crates/analytics-engine/src/lib.rs",
@@ -5640,9 +5778,9 @@
       "typeName": "EnqueueJobDraft",
       "kind": "struct",
       "visibility": "public",
-      "currentPath": "crates/domain/src/analytics.rs",
-      "currentModule": "football_domain::analytics",
-      "sourceLine": 234,
+      "currentPath": "crates/domain/src/analytics/job.rs",
+      "currentModule": "football_domain::job",
+      "sourceLine": 49,
       "derives": [
         "Clone",
         "Debug",
@@ -5704,7 +5842,10 @@
       "currentRootExport": "glob_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
-      "domainCallers": [],
+      "domainCallers": [
+        "crates/domain/src/lib.rs",
+        "crates/domain/tests/serde_contracts/r2_07_module_paths.rs"
+      ],
       "externalCallers": [
         "crates/application/src/analytics.rs",
         "crates/application/src/p4_orchestration.rs",
@@ -5778,6 +5919,7 @@
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
+        "crates/domain/src/lib.rs",
         "crates/domain/src/research/entity.rs",
         "crates/domain/tests/serde_contracts/module_paths.rs"
       ],
@@ -5856,6 +5998,7 @@
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
+        "crates/domain/src/lib.rs",
         "crates/domain/tests/serde_contracts/module_paths.rs"
       ],
       "externalCallers": [
@@ -5918,6 +6061,7 @@
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
+        "crates/domain/src/lib.rs",
         "crates/domain/src/shared/entity_match.rs",
         "crates/domain/tests/serde_contracts/module_paths.rs"
       ],
@@ -6009,6 +6153,7 @@
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
+        "crates/domain/src/lib.rs",
         "crates/domain/tests/serde_contracts/module_paths.rs"
       ],
       "externalCallers": [
@@ -6067,6 +6212,7 @@
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
+        "crates/domain/src/lib.rs",
         "crates/domain/tests/serde_contracts/module_paths.rs"
       ],
       "externalCallers": [
@@ -6121,6 +6267,7 @@
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
+        "crates/domain/src/lib.rs",
         "crates/domain/src/shared/entity_reference.rs",
         "crates/domain/src/team/deletion.rs",
         "crates/domain/tests/serde_contracts/module_paths.rs"
@@ -6191,6 +6338,7 @@
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
+        "crates/domain/src/lib.rs",
         "crates/domain/tests/serde_contracts/module_paths.rs"
       ],
       "externalCallers": [
@@ -6277,6 +6425,7 @@
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
+        "crates/domain/src/lib.rs",
         "crates/domain/tests/serde_contracts/module_paths.rs"
       ],
       "externalCallers": [
@@ -6395,6 +6544,7 @@
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
+        "crates/domain/src/lib.rs",
         "crates/domain/tests/serde_contracts/module_paths.rs"
       ],
       "externalCallers": [
@@ -6460,6 +6610,7 @@
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
+        "crates/domain/src/lib.rs",
         "crates/domain/tests/serde_contracts/module_paths.rs"
       ],
       "externalCallers": [
@@ -6527,6 +6678,7 @@
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
+        "crates/domain/src/lib.rs",
         "crates/domain/src/research/entity.rs",
         "crates/domain/tests/serde_contracts/module_paths.rs"
       ],
@@ -6542,9 +6694,9 @@
       "typeName": "EvaluationSample",
       "kind": "struct",
       "visibility": "public",
-      "currentPath": "crates/domain/src/analytics.rs",
-      "currentModule": "football_domain::analytics",
-      "sourceLine": 50,
+      "currentPath": "crates/domain/src/analytics/calculation.rs",
+      "currentModule": "football_domain::calculation",
+      "sourceLine": 52,
       "derives": [
         "Clone",
         "Debug",
@@ -6656,7 +6808,10 @@
       "currentRootExport": "glob_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
-      "domainCallers": [],
+      "domainCallers": [
+        "crates/domain/src/lib.rs",
+        "crates/domain/tests/serde_contracts/r2_07_module_paths.rs"
+      ],
       "externalCallers": [
         "crates/analytics-engine/src/lib.rs",
         "crates/persistence-postgres/src/analytics.rs",
@@ -6826,6 +6981,7 @@
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
+        "crates/domain/src/lib.rs",
         "crates/domain/tests/serde_contracts/module_paths.rs"
       ],
       "externalCallers": [
@@ -6905,6 +7061,7 @@
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
+        "crates/domain/src/lib.rs",
         "crates/domain/tests/serde_contracts/module_paths.rs"
       ],
       "externalCallers": [
@@ -6987,6 +7144,7 @@
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
+        "crates/domain/src/lib.rs",
         "crates/domain/tests/serde_contracts/module_paths.rs"
       ],
       "externalCallers": [
@@ -7046,6 +7204,7 @@
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
+        "crates/domain/src/lib.rs",
         "crates/domain/tests/serde_contracts/module_paths.rs"
       ],
       "externalCallers": [
@@ -7163,6 +7322,7 @@
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
+        "crates/domain/src/lib.rs",
         "crates/domain/tests/serde_contracts/module_paths.rs"
       ],
       "externalCallers": [
@@ -7224,6 +7384,7 @@
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
+        "crates/domain/src/lib.rs",
         "crates/domain/tests/serde_contracts/module_paths.rs"
       ],
       "externalCallers": [
@@ -7278,6 +7439,7 @@
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "none_detected",
       "domainCallers": [
+        "crates/domain/src/lib.rs",
         "crates/domain/tests/serde_contracts/module_paths.rs"
       ],
       "externalCallers": [
@@ -7357,6 +7519,7 @@
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "none_detected",
       "domainCallers": [
+        "crates/domain/src/lib.rs",
         "crates/domain/src/research/routing.rs",
         "crates/domain/tests/serde_contracts/module_paths.rs"
       ],
@@ -7434,6 +7597,7 @@
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
+        "crates/domain/src/lib.rs",
         "crates/domain/src/research/routing.rs",
         "crates/domain/tests/serde_contracts/module_paths.rs"
       ],
@@ -7498,6 +7662,7 @@
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
+        "crates/domain/src/lib.rs",
         "crates/domain/tests/serde_contracts/r2_06_module_paths.rs"
       ],
       "externalCallers": [
@@ -7640,6 +7805,7 @@
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
+        "crates/domain/src/lib.rs",
         "crates/domain/src/postmatch/overview.rs",
         "crates/domain/tests/serde_contracts/r2_06_module_paths.rs"
       ],
@@ -7708,6 +7874,7 @@
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
+        "crates/domain/src/lib.rs",
         "crates/domain/src/postmatch/evidence.rs",
         "crates/domain/tests/serde_contracts/r2_06_module_paths.rs"
       ],
@@ -7793,6 +7960,7 @@
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
+        "crates/domain/src/lib.rs",
         "crates/domain/src/prediction/persistence/evidence.rs",
         "crates/domain/src/prediction/persistence/snapshot.rs",
         "crates/domain/tests/serde_contracts/module_paths.rs"
@@ -7864,6 +8032,7 @@
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
+        "crates/domain/src/lib.rs",
         "crates/domain/tests/serde_contracts/module_paths.rs"
       ],
       "externalCallers": [
@@ -7939,6 +8108,7 @@
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
         "crates/domain/src/coach/detail.rs",
+        "crates/domain/src/lib.rs",
         "crates/domain/src/player/detail.rs",
         "crates/domain/tests/serde_contracts/module_paths.rs"
       ],
@@ -8056,6 +8226,7 @@
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
+        "crates/domain/src/lib.rs",
         "crates/domain/tests/serde_contracts/module_paths.rs"
       ],
       "externalCallers": [
@@ -8150,6 +8321,7 @@
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "none_detected",
       "domainCallers": [
+        "crates/domain/src/lib.rs",
         "crates/domain/src/research/pipeline.rs",
         "crates/domain/tests/serde_contracts/module_paths.rs"
       ],
@@ -8221,6 +8393,7 @@
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
+        "crates/domain/src/lib.rs",
         "crates/domain/tests/serde_contracts/module_paths.rs"
       ],
       "externalCallers": [
@@ -8306,7 +8479,8 @@
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
-        "crates/domain/src/exchange.rs",
+        "crates/domain/src/exchange/lineup.rs",
+        "crates/domain/src/lib.rs",
         "crates/domain/src/player/catalog.rs",
         "crates/domain/tests/serde_contracts/module_paths.rs"
       ],
@@ -8426,6 +8600,7 @@
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
+        "crates/domain/src/lib.rs",
         "crates/domain/tests/serde_contracts/module_paths.rs"
       ],
       "externalCallers": [
@@ -8533,6 +8708,7 @@
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
+        "crates/domain/src/lib.rs",
         "crates/domain/src/team/detail.rs",
         "crates/domain/tests/serde_contracts/module_paths.rs"
       ],
@@ -8589,6 +8765,7 @@
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
         "crates/domain/src/formation/usage.rs",
+        "crates/domain/src/lib.rs",
         "crates/domain/tests/serde_contracts/module_paths.rs"
       ],
       "externalCallers": [
@@ -8664,6 +8841,7 @@
       "domainCallers": [
         "crates/domain/src/formation/resolution.rs",
         "crates/domain/src/formation/usage.rs",
+        "crates/domain/src/lib.rs",
         "crates/domain/tests/serde_contracts/module_paths.rs"
       ],
       "externalCallers": [
@@ -8732,6 +8910,7 @@
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
+        "crates/domain/src/lib.rs",
         "crates/domain/tests/serde_contracts/module_paths.rs"
       ],
       "externalCallers": [
@@ -8750,9 +8929,9 @@
       "typeName": "JobStatus",
       "kind": "enum",
       "visibility": "public",
-      "currentPath": "crates/domain/src/analytics.rs",
-      "currentModule": "football_domain::analytics",
-      "sourceLine": 193,
+      "currentPath": "crates/domain/src/analytics/job.rs",
+      "currentModule": "football_domain::job",
+      "sourceLine": 8,
       "derives": [
         "Clone",
         "Copy",
@@ -8806,7 +8985,9 @@
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
-        "crates/domain/src/analytics.rs"
+        "crates/domain/src/analytics/job.rs",
+        "crates/domain/src/lib.rs",
+        "crates/domain/tests/serde_contracts/r2_07_module_paths.rs"
       ],
       "externalCallers": [
         "crates/persistence-postgres/src/jobs.rs",
@@ -8920,6 +9101,7 @@
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
+        "crates/domain/src/lib.rs",
         "crates/domain/src/lineup/snapshot.rs",
         "crates/domain/tests/serde_contracts/module_paths.rs",
         "crates/domain/tests/serde_contracts/round_trip.rs"
@@ -8982,6 +9164,7 @@
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
+        "crates/domain/src/lib.rs",
         "crates/domain/tests/serde_contracts/module_paths.rs"
       ],
       "externalCallers": [
@@ -9036,6 +9219,7 @@
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
+        "crates/domain/src/lib.rs",
         "crates/domain/src/review/package/preview.rs",
         "crates/domain/tests/serde_contracts/module_paths.rs"
       ],
@@ -9094,6 +9278,7 @@
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
+        "crates/domain/src/lib.rs",
         "crates/domain/tests/serde_contracts/module_paths.rs"
       ],
       "externalCallers": [
@@ -9220,6 +9405,7 @@
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "none_detected",
       "domainCallers": [
+        "crates/domain/src/lib.rs",
         "crates/domain/src/lineup/snapshot.rs",
         "crates/domain/tests/serde_contracts/module_paths.rs"
       ],
@@ -9337,6 +9523,7 @@
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
+        "crates/domain/src/lib.rs",
         "crates/domain/src/lineup/snapshot.rs",
         "crates/domain/tests/serde_contracts/module_paths.rs"
       ],
@@ -9482,7 +9669,9 @@
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
-        "crates/domain/src/exchange.rs",
+        "crates/domain/src/exchange/ai_match.rs",
+        "crates/domain/src/exchange/lineup.rs",
+        "crates/domain/src/lib.rs",
         "crates/domain/src/lineup/chain.rs",
         "crates/domain/src/lineup/snapshot.rs",
         "crates/domain/src/review/package/contract.rs",
@@ -9560,6 +9749,7 @@
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
+        "crates/domain/src/lib.rs",
         "crates/domain/src/lineup/kind.rs",
         "crates/domain/src/lineup/snapshot.rs",
         "crates/domain/tests/serde_contracts/enums.rs",
@@ -9656,6 +9846,7 @@
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "none_detected",
       "domainCallers": [
+        "crates/domain/src/lib.rs",
         "crates/domain/tests/serde_contracts/module_paths.rs",
         "crates/domain/tests/serde_contracts/round_trip.rs"
       ],
@@ -9762,6 +9953,7 @@
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
+        "crates/domain/src/lib.rs",
         "crates/domain/tests/serde_contracts/defaults.rs",
         "crates/domain/tests/serde_contracts/module_paths.rs"
       ],
@@ -9833,6 +10025,7 @@
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
+        "crates/domain/src/lib.rs",
         "crates/domain/src/review/event/payload.rs",
         "crates/domain/src/review/event/semantics.rs",
         "crates/domain/tests/serde_contracts/r2_06_module_paths.rs"
@@ -9918,6 +10111,7 @@
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
+        "crates/domain/src/lib.rs",
         "crates/domain/src/review/aggregate.rs",
         "crates/domain/tests/serde_contracts/r2_06_module_paths.rs"
       ],
@@ -10026,6 +10220,7 @@
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
+        "crates/domain/src/lib.rs",
         "crates/domain/src/review/event/payload.rs",
         "crates/domain/src/review/event/semantics.rs",
         "crates/domain/tests/serde_contracts/r2_06_module_paths.rs"
@@ -10094,6 +10289,7 @@
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
+        "crates/domain/src/lib.rs",
         "crates/domain/src/review/event/payload.rs",
         "crates/domain/src/review/event/semantics.rs",
         "crates/domain/tests/serde_contracts/r2_06_module_paths.rs"
@@ -10174,6 +10370,7 @@
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
+        "crates/domain/src/lib.rs",
         "crates/domain/tests/serde_contracts/module_paths.rs"
       ],
       "externalCallers": [
@@ -10190,9 +10387,9 @@
       "typeName": "MatchLineupExportData",
       "kind": "struct",
       "visibility": "public",
-      "currentPath": "crates/domain/src/exchange.rs",
-      "currentModule": "football_domain::exchange",
-      "sourceLine": 153,
+      "currentPath": "crates/domain/src/exchange/lineup.rs",
+      "currentModule": "football_domain::lineup",
+      "sourceLine": 8,
       "derives": [
         "Clone",
         "Debug",
@@ -10258,7 +10455,7 @@
           ]
         }
       ],
-      "declarationSha256": "98af74fc783b289affbe8ba271727ddb23874444b2375ff33fe1a644e7c7d2ea",
+      "declarationSha256": "6cd96078b62b06e0599fea3f085c66ab1d3430e6d942740f1eb9edeab8e2ebf2",
       "targetModule": "exchange",
       "targetTask": "R2-07",
       "targetPath": "crates/domain/src/exchange/",
@@ -10268,7 +10465,10 @@
       "currentRootExport": "glob_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
-      "domainCallers": [],
+      "domainCallers": [
+        "crates/domain/src/lib.rs",
+        "crates/domain/tests/serde_contracts/r2_07_module_paths.rs"
+      ],
       "externalCallers": [
         "crates/persistence-postgres/src/match_exchange.rs",
         "crates/spreadsheet-io/src/match_workbook.rs"
@@ -10281,9 +10481,9 @@
       "typeName": "MatchLineupExportSummary",
       "kind": "struct",
       "visibility": "public",
-      "currentPath": "crates/domain/src/exchange.rs",
-      "currentModule": "football_domain::exchange",
-      "sourceLine": 186,
+      "currentPath": "crates/domain/src/exchange/lineup.rs",
+      "currentModule": "football_domain::lineup",
+      "sourceLine": 41,
       "derives": [
         "Clone",
         "Debug",
@@ -10327,7 +10527,10 @@
       "currentRootExport": "glob_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "none_detected",
-      "domainCallers": [],
+      "domainCallers": [
+        "crates/domain/src/lib.rs",
+        "crates/domain/tests/serde_contracts/r2_07_module_paths.rs"
+      ],
       "externalCallers": [
         "crates/application/src/exchange.rs",
         "src-tauri/src/commands/exchange.rs"
@@ -10338,9 +10541,9 @@
       "typeName": "MatchLineupPlayerReference",
       "kind": "struct",
       "visibility": "public",
-      "currentPath": "crates/domain/src/exchange.rs",
-      "currentModule": "football_domain::exchange",
-      "sourceLine": 171,
+      "currentPath": "crates/domain/src/exchange/lineup.rs",
+      "currentModule": "football_domain::lineup",
+      "sourceLine": 26,
       "derives": [
         "Clone",
         "Debug",
@@ -10411,7 +10614,9 @@
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
-        "crates/domain/src/exchange.rs"
+        "crates/domain/src/exchange/lineup.rs",
+        "crates/domain/src/lib.rs",
+        "crates/domain/tests/serde_contracts/r2_07_module_paths.rs"
       ],
       "externalCallers": [
         "crates/persistence-postgres/src/match_exchange.rs"
@@ -10479,6 +10684,7 @@
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
+        "crates/domain/src/lib.rs",
         "crates/domain/src/lineup/chain.rs",
         "crates/domain/tests/serde_contracts/module_paths.rs"
       ],
@@ -10605,6 +10811,7 @@
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "none_detected",
       "domainCallers": [
+        "crates/domain/src/lib.rs",
         "crates/domain/tests/serde_contracts/module_paths.rs"
       ],
       "externalCallers": [
@@ -10704,7 +10911,10 @@
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
-        "crates/domain/src/exchange.rs",
+        "crates/domain/src/exchange/ai_match.rs",
+        "crates/domain/src/exchange/lineup.rs",
+        "crates/domain/src/exchange/prediction_input.rs",
+        "crates/domain/src/lib.rs",
         "crates/domain/src/lineup/chain.rs",
         "crates/domain/src/player/catalog.rs",
         "crates/domain/src/review/package/contract.rs",
@@ -10817,6 +11027,7 @@
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "none_detected",
       "domainCallers": [
+        "crates/domain/src/lib.rs",
         "crates/domain/src/review/aggregate.rs",
         "crates/domain/tests/serde_contracts/r2_06_module_paths.rs"
       ],
@@ -10898,6 +11109,7 @@
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
+        "crates/domain/src/lib.rs",
         "crates/domain/src/review/aggregate.rs",
         "crates/domain/src/review/package/contract.rs",
         "crates/domain/src/review/preparation.rs",
@@ -10978,6 +11190,7 @@
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
+        "crates/domain/src/lib.rs",
         "crates/domain/src/review/package/transition.rs",
         "crates/domain/tests/serde_contracts/r2_06_module_paths.rs"
       ],
@@ -11073,6 +11286,7 @@
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
+        "crates/domain/src/lib.rs",
         "crates/domain/src/review/package/preview.rs",
         "crates/domain/tests/serde_contracts/r2_06_module_paths.rs"
       ],
@@ -11244,6 +11458,7 @@
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
+        "crates/domain/src/lib.rs",
         "crates/domain/src/review/aggregate.rs",
         "crates/domain/src/review/event/payload.rs",
         "crates/domain/src/review/package/preview.rs",
@@ -11405,6 +11620,7 @@
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
+        "crates/domain/src/lib.rs",
         "crates/domain/src/review/aggregate.rs",
         "crates/domain/tests/serde_contracts/r2_06_module_paths.rs"
       ],
@@ -11460,6 +11676,7 @@
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "none_detected",
       "domainCallers": [
+        "crates/domain/src/lib.rs",
         "crates/domain/src/review/package/workflow.rs",
         "crates/domain/tests/serde_contracts/r2_06_module_paths.rs"
       ],
@@ -11517,6 +11734,7 @@
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "none_detected",
       "domainCallers": [
+        "crates/domain/src/lib.rs",
         "crates/domain/tests/serde_contracts/r2_06_module_paths.rs"
       ],
       "externalCallers": [
@@ -11572,6 +11790,7 @@
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "none_detected",
       "domainCallers": [
+        "crates/domain/src/lib.rs",
         "crates/domain/tests/serde_contracts/r2_06_module_paths.rs"
       ],
       "externalCallers": [
@@ -11640,6 +11859,7 @@
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "none_detected",
       "domainCallers": [
+        "crates/domain/src/lib.rs",
         "crates/domain/src/review/package/preview.rs",
         "crates/domain/tests/serde_contracts/r2_06_module_paths.rs"
       ],
@@ -11701,6 +11921,7 @@
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "none_detected",
       "domainCallers": [
+        "crates/domain/src/lib.rs",
         "crates/domain/tests/serde_contracts/r2_06_module_paths.rs"
       ],
       "externalCallers": [
@@ -11794,6 +12015,7 @@
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "none_detected",
       "domainCallers": [
+        "crates/domain/src/lib.rs",
         "crates/domain/tests/serde_contracts/r2_06_module_paths.rs"
       ],
       "externalCallers": [
@@ -11874,6 +12096,7 @@
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "none_detected",
       "domainCallers": [
+        "crates/domain/src/lib.rs",
         "crates/domain/src/review/package/preview.rs",
         "crates/domain/tests/serde_contracts/r2_06_module_paths.rs"
       ],
@@ -11930,6 +12153,7 @@
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "none_detected",
       "domainCallers": [
+        "crates/domain/src/lib.rs",
         "crates/domain/tests/serde_contracts/r2_06_module_paths.rs"
       ],
       "externalCallers": [
@@ -11998,6 +12222,7 @@
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "none_detected",
       "domainCallers": [
+        "crates/domain/src/lib.rs",
         "crates/domain/src/review/package/comparison.rs",
         "crates/domain/tests/serde_contracts/r2_06_module_paths.rs"
       ],
@@ -12141,6 +12366,7 @@
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
+        "crates/domain/src/lib.rs",
         "crates/domain/src/review/package/transition.rs",
         "crates/domain/src/review/package/workflow.rs",
         "crates/domain/tests/serde_contracts/r2_06_module_paths.rs"
@@ -12199,6 +12425,7 @@
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "none_detected",
       "domainCallers": [
+        "crates/domain/src/lib.rs",
         "crates/domain/tests/serde_contracts/r2_06_module_paths.rs"
       ],
       "externalCallers": [
@@ -12279,6 +12506,7 @@
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "none_detected",
       "domainCallers": [
+        "crates/domain/src/lib.rs",
         "crates/domain/src/review/package/comparison.rs",
         "crates/domain/src/review/package/contract.rs",
         "crates/domain/src/review/package/workflow.rs",
@@ -12361,6 +12589,7 @@
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
+        "crates/domain/src/lib.rs",
         "crates/domain/tests/serde_contracts/r2_06_module_paths.rs"
       ],
       "externalCallers": [
@@ -12446,6 +12675,7 @@
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "none_detected",
       "domainCallers": [
+        "crates/domain/src/lib.rs",
         "crates/domain/src/review/package/workflow.rs",
         "crates/domain/tests/serde_contracts/r2_06_module_paths.rs"
       ],
@@ -12605,6 +12835,7 @@
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
+        "crates/domain/src/lib.rs",
         "crates/domain/src/review/package/transition.rs",
         "crates/domain/src/review/package/workflow.rs",
         "crates/domain/tests/serde_contracts/r2_06_module_paths.rs"
@@ -12691,6 +12922,7 @@
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
+        "crates/domain/src/lib.rs",
         "crates/domain/src/review/package/workflow.rs",
         "crates/domain/tests/serde_contracts/r2_06_module_paths.rs"
       ],
@@ -12776,6 +13008,7 @@
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "none_detected",
       "domainCallers": [
+        "crates/domain/src/lib.rs",
         "crates/domain/src/review/package/workflow.rs",
         "crates/domain/tests/serde_contracts/r2_06_module_paths.rs"
       ],
@@ -12883,6 +13116,7 @@
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
+        "crates/domain/src/lib.rs",
         "crates/domain/src/review/aggregate.rs",
         "crates/domain/src/review/package/contract.rs",
         "crates/domain/src/review/preparation.rs",
@@ -12958,6 +13192,7 @@
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
+        "crates/domain/src/lib.rs",
         "crates/domain/src/match_record/catalog.rs",
         "crates/domain/src/match_record/status.rs",
         "crates/domain/src/team/detail.rs",
@@ -12984,9 +13219,9 @@
       "typeName": "ModelComparisonRow",
       "kind": "struct",
       "visibility": "public",
-      "currentPath": "crates/domain/src/analytics.rs",
-      "currentModule": "football_domain::analytics",
-      "sourceLine": 88,
+      "currentPath": "crates/domain/src/analytics/calculation.rs",
+      "currentModule": "football_domain::calculation",
+      "sourceLine": 90,
       "derives": [
         "Clone",
         "Debug",
@@ -13055,7 +13290,9 @@
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "none_detected",
       "domainCallers": [
-        "crates/domain/src/analytics.rs"
+        "crates/domain/src/analytics/calculation.rs",
+        "crates/domain/src/lib.rs",
+        "crates/domain/tests/serde_contracts/r2_07_module_paths.rs"
       ],
       "externalCallers": [
         "crates/analytics-engine/src/lib.rs"
@@ -13113,6 +13350,7 @@
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "none_detected",
       "domainCallers": [
+        "crates/domain/src/lib.rs",
         "crates/domain/src/prediction/result.rs",
         "crates/domain/src/routing/mod.rs",
         "crates/domain/tests/serde_contracts/module_paths.rs"
@@ -13129,9 +13367,9 @@
       "typeName": "MonthlyDataGapRow",
       "kind": "struct",
       "visibility": "public",
-      "currentPath": "crates/domain/src/monthly_workbook.rs",
-      "currentModule": "football_domain::monthly_workbook",
-      "sourceLine": 37,
+      "currentPath": "crates/domain/src/exchange/monthly/contract.rs",
+      "currentModule": "football_domain::contract",
+      "sourceLine": 36,
       "derives": [
         "Clone",
         "Debug",
@@ -13192,7 +13430,9 @@
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
-        "crates/domain/src/monthly_workbook.rs"
+        "crates/domain/src/exchange/monthly/team.rs",
+        "crates/domain/src/lib.rs",
+        "crates/domain/tests/serde_contracts/r2_07_module_paths.rs"
       ],
       "externalCallers": [
         "crates/persistence-postgres/src/monthly_workbooks.rs",
@@ -13206,9 +13446,9 @@
       "typeName": "MonthlyWorkbookExportSummary",
       "kind": "struct",
       "visibility": "public",
-      "currentPath": "crates/domain/src/monthly_workbook.rs",
-      "currentModule": "football_domain::monthly_workbook",
-      "sourceLine": 26,
+      "currentPath": "crates/domain/src/exchange/monthly/contract.rs",
+      "currentModule": "football_domain::contract",
+      "sourceLine": 25,
       "derives": [
         "Clone",
         "Debug",
@@ -13264,7 +13504,10 @@
       "currentRootExport": "glob_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "none_detected",
-      "domainCallers": [],
+      "domainCallers": [
+        "crates/domain/src/lib.rs",
+        "crates/domain/tests/serde_contracts/r2_07_module_paths.rs"
+      ],
       "externalCallers": [
         "crates/application/src/spreadsheet.rs",
         "src-tauri/src/commands/exchange.rs"
@@ -13275,9 +13518,9 @@
       "typeName": "MonthlyWorkbookKind",
       "kind": "enum",
       "visibility": "public",
-      "currentPath": "crates/domain/src/monthly_workbook.rs",
-      "currentModule": "football_domain::monthly_workbook",
-      "sourceLine": 11,
+      "currentPath": "crates/domain/src/exchange/monthly/contract.rs",
+      "currentModule": "football_domain::contract",
+      "sourceLine": 10,
       "derives": [
         "Clone",
         "Copy",
@@ -13319,7 +13562,9 @@
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "none_detected",
       "domainCallers": [
-        "crates/domain/src/monthly_workbook.rs"
+        "crates/domain/src/exchange/monthly/contract.rs",
+        "crates/domain/src/lib.rs",
+        "crates/domain/tests/serde_contracts/r2_07_module_paths.rs"
       ],
       "externalCallers": [
         "crates/application/src/spreadsheet.rs"
@@ -13453,6 +13698,7 @@
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
+        "crates/domain/src/lib.rs",
         "crates/domain/tests/serde_contracts/module_paths.rs"
       ],
       "externalCallers": [
@@ -13526,6 +13772,7 @@
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
+        "crates/domain/src/lib.rs",
         "crates/domain/tests/serde_contracts/module_paths.rs"
       ],
       "externalCallers": [
@@ -13587,6 +13834,7 @@
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
+        "crates/domain/src/lib.rs",
         "crates/domain/tests/serde_contracts/module_paths.rs"
       ],
       "externalCallers": [
@@ -13698,6 +13946,7 @@
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
+        "crates/domain/src/lib.rs",
         "crates/domain/src/prediction/workbench/workspace.rs",
         "crates/domain/tests/serde_contracts/module_paths.rs"
       ],
@@ -13825,6 +14074,7 @@
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
+        "crates/domain/src/lib.rs",
         "crates/domain/src/prediction/workbench/workspace.rs",
         "crates/domain/tests/serde_contracts/module_paths.rs"
       ],
@@ -13906,6 +14156,7 @@
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
+        "crates/domain/src/lib.rs",
         "crates/domain/src/prediction/workbench/workspace.rs",
         "crates/domain/tests/serde_contracts/module_paths.rs"
       ],
@@ -14027,6 +14278,7 @@
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
+        "crates/domain/src/lib.rs",
         "crates/domain/tests/serde_contracts/module_paths.rs"
       ],
       "externalCallers": [
@@ -14100,6 +14352,7 @@
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
+        "crates/domain/src/lib.rs",
         "crates/domain/src/prediction/workbench/workspace.rs",
         "crates/domain/tests/serde_contracts/module_paths.rs"
       ],
@@ -14255,6 +14508,7 @@
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
+        "crates/domain/src/lib.rs",
         "crates/domain/src/prediction/workbench/workspace.rs",
         "crates/domain/tests/serde_contracts/module_paths.rs"
       ],
@@ -14378,6 +14632,7 @@
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
+        "crates/domain/src/lib.rs",
         "crates/domain/src/prediction/orchestration/state.rs",
         "crates/domain/src/prediction/orchestration/task.rs",
         "crates/domain/tests/serde_contracts/module_paths.rs"
@@ -14478,6 +14733,7 @@
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
+        "crates/domain/src/lib.rs",
         "crates/domain/tests/serde_contracts/module_paths.rs"
       ],
       "externalCallers": [
@@ -14558,6 +14814,7 @@
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
+        "crates/domain/src/lib.rs",
         "crates/domain/src/prediction/horizon.rs",
         "crates/domain/src/prediction/orchestration/task.rs",
         "crates/domain/src/prediction/persistence/research.rs",
@@ -14623,6 +14880,7 @@
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
+        "crates/domain/src/lib.rs",
         "crates/domain/src/prediction/workbench/conflict.rs",
         "crates/domain/tests/serde_contracts/module_paths.rs"
       ],
@@ -14751,6 +15009,7 @@
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
+        "crates/domain/src/lib.rs",
         "crates/domain/tests/serde_contracts/module_paths.rs"
       ],
       "externalCallers": [
@@ -14832,6 +15091,7 @@
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
+        "crates/domain/src/lib.rs",
         "crates/domain/tests/serde_contracts/module_paths.rs"
       ],
       "externalCallers": [
@@ -14906,6 +15166,7 @@
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
+        "crates/domain/src/lib.rs",
         "crates/domain/tests/serde_contracts/module_paths.rs"
       ],
       "externalCallers": [
@@ -14988,6 +15249,7 @@
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
+        "crates/domain/src/lib.rs",
         "crates/domain/tests/serde_contracts/module_paths.rs"
       ],
       "externalCallers": [
@@ -15084,6 +15346,7 @@
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
+        "crates/domain/src/lib.rs",
         "crates/domain/src/prediction/workbench/workspace.rs",
         "crates/domain/tests/serde_contracts/module_paths.rs"
       ],
@@ -15165,6 +15428,7 @@
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
+        "crates/domain/src/lib.rs",
         "crates/domain/src/prediction/workbench/workspace.rs",
         "crates/domain/tests/serde_contracts/module_paths.rs"
       ],
@@ -15247,6 +15511,7 @@
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
+        "crates/domain/src/lib.rs",
         "crates/domain/tests/serde_contracts/module_paths.rs"
       ],
       "externalCallers": [
@@ -15262,9 +15527,9 @@
       "typeName": "ParameterCandidateArtifactDraft",
       "kind": "struct",
       "visibility": "public",
-      "currentPath": "crates/domain/src/analytics.rs",
-      "currentModule": "football_domain::analytics",
-      "sourceLine": 499,
+      "currentPath": "crates/domain/src/analytics/parameter/readiness.rs",
+      "currentModule": "football_domain::readiness",
+      "sourceLine": 61,
       "derives": [
         "Clone",
         "Debug",
@@ -15324,7 +15589,10 @@
       "currentRootExport": "glob_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
-      "domainCallers": [],
+      "domainCallers": [
+        "crates/domain/src/lib.rs",
+        "crates/domain/tests/serde_contracts/r2_07_module_paths.rs"
+      ],
       "externalCallers": [
         "crates/persistence-postgres/src/parameter_lifecycle.rs"
       ],
@@ -15336,9 +15604,9 @@
       "typeName": "ParameterCandidateBaseline",
       "kind": "struct",
       "visibility": "public",
-      "currentPath": "crates/domain/src/analytics.rs",
-      "currentModule": "football_domain::analytics",
-      "sourceLine": 480,
+      "currentPath": "crates/domain/src/analytics/parameter/readiness.rs",
+      "currentModule": "football_domain::readiness",
+      "sourceLine": 42,
       "derives": [
         "Clone",
         "Debug",
@@ -15427,7 +15695,9 @@
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
-        "crates/domain/src/analytics.rs"
+        "crates/domain/src/analytics/parameter/readiness.rs",
+        "crates/domain/src/lib.rs",
+        "crates/domain/tests/serde_contracts/r2_07_module_paths.rs"
       ],
       "externalCallers": [
         "crates/persistence-postgres/src/parameter_lifecycle.rs"
@@ -15440,9 +15710,9 @@
       "typeName": "ParameterLifecycleReadiness",
       "kind": "struct",
       "visibility": "public",
-      "currentPath": "crates/domain/src/analytics.rs",
-      "currentModule": "football_domain::analytics",
-      "sourceLine": 459,
+      "currentPath": "crates/domain/src/analytics/parameter/readiness.rs",
+      "currentModule": "football_domain::readiness",
+      "sourceLine": 21,
       "derives": [
         "Clone",
         "Debug",
@@ -15538,7 +15808,10 @@
       "currentRootExport": "glob_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
-      "domainCallers": [],
+      "domainCallers": [
+        "crates/domain/src/lib.rs",
+        "crates/domain/tests/serde_contracts/r2_07_module_paths.rs"
+      ],
       "externalCallers": [
         "crates/application/src/analytics.rs",
         "crates/persistence-postgres/src/parameter_lifecycle.rs",
@@ -15552,9 +15825,9 @@
       "typeName": "ParameterLifecycleReadinessRequest",
       "kind": "struct",
       "visibility": "public",
-      "currentPath": "crates/domain/src/analytics.rs",
-      "currentModule": "football_domain::analytics",
-      "sourceLine": 446,
+      "currentPath": "crates/domain/src/analytics/parameter/readiness.rs",
+      "currentModule": "football_domain::readiness",
+      "sourceLine": 8,
       "derives": [
         "Clone",
         "Debug",
@@ -15598,7 +15871,10 @@
       "currentRootExport": "glob_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
-      "domainCallers": [],
+      "domainCallers": [
+        "crates/domain/src/lib.rs",
+        "crates/domain/tests/serde_contracts/r2_07_module_paths.rs"
+      ],
       "externalCallers": [
         "crates/application/src/analytics.rs",
         "crates/persistence-postgres/src/parameter_lifecycle.rs",
@@ -15612,9 +15888,9 @@
       "typeName": "ParameterPromotionDecisionRecord",
       "kind": "struct",
       "visibility": "public",
-      "currentPath": "crates/domain/src/analytics.rs",
-      "currentModule": "football_domain::analytics",
-      "sourceLine": 573,
+      "currentPath": "crates/domain/src/analytics/parameter/promotion.rs",
+      "currentModule": "football_domain::promotion",
+      "sourceLine": 23,
       "derives": [
         "Clone",
         "Debug",
@@ -15674,7 +15950,10 @@
       "currentRootExport": "glob_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
-      "domainCallers": [],
+      "domainCallers": [
+        "crates/domain/src/lib.rs",
+        "crates/domain/tests/serde_contracts/r2_07_module_paths.rs"
+      ],
       "externalCallers": [
         "crates/application/src/analytics.rs",
         "crates/persistence-postgres/src/parameter_lifecycle.rs",
@@ -15688,9 +15967,9 @@
       "typeName": "ParameterPromotionRequest",
       "kind": "struct",
       "visibility": "public",
-      "currentPath": "crates/domain/src/analytics.rs",
-      "currentModule": "football_domain::analytics",
-      "sourceLine": 557,
+      "currentPath": "crates/domain/src/analytics/parameter/promotion.rs",
+      "currentModule": "football_domain::promotion",
+      "sourceLine": 7,
       "derives": [
         "Clone",
         "Debug",
@@ -15732,7 +16011,10 @@
       "currentRootExport": "glob_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
-      "domainCallers": [],
+      "domainCallers": [
+        "crates/domain/src/lib.rs",
+        "crates/domain/tests/serde_contracts/r2_07_module_paths.rs"
+      ],
       "externalCallers": [
         "crates/application/src/analytics.rs",
         "crates/persistence-postgres/src/parameter_lifecycle.rs",
@@ -15746,9 +16028,9 @@
       "typeName": "ParameterReplayFixture",
       "kind": "struct",
       "visibility": "public",
-      "currentPath": "crates/domain/src/analytics.rs",
-      "currentModule": "football_domain::analytics",
-      "sourceLine": 511,
+      "currentPath": "crates/domain/src/analytics/parameter/validation.rs",
+      "currentModule": "football_domain::validation",
+      "sourceLine": 7,
       "derives": [
         "Clone",
         "Debug",
@@ -15864,7 +16146,10 @@
       "currentRootExport": "glob_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
-      "domainCallers": [],
+      "domainCallers": [
+        "crates/domain/src/lib.rs",
+        "crates/domain/tests/serde_contracts/r2_07_module_paths.rs"
+      ],
       "externalCallers": [
         "crates/application/src/analytics.rs",
         "crates/persistence-postgres/src/parameter_lifecycle.rs"
@@ -15877,9 +16162,9 @@
       "typeName": "ParameterRollbackRequest",
       "kind": "struct",
       "visibility": "public",
-      "currentPath": "crates/domain/src/analytics.rs",
-      "currentModule": "football_domain::analytics",
-      "sourceLine": 565,
+      "currentPath": "crates/domain/src/analytics/parameter/promotion.rs",
+      "currentModule": "football_domain::promotion",
+      "sourceLine": 15,
       "derives": [
         "Clone",
         "Debug",
@@ -15921,7 +16206,10 @@
       "currentRootExport": "glob_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
-      "domainCallers": [],
+      "domainCallers": [
+        "crates/domain/src/lib.rs",
+        "crates/domain/tests/serde_contracts/r2_07_module_paths.rs"
+      ],
       "externalCallers": [
         "crates/application/src/analytics.rs",
         "crates/persistence-postgres/src/parameter_lifecycle.rs",
@@ -15935,9 +16223,9 @@
       "typeName": "ParameterShadowValidationRecord",
       "kind": "struct",
       "visibility": "public",
-      "currentPath": "crates/domain/src/analytics.rs",
-      "currentModule": "football_domain::analytics",
-      "sourceLine": 542,
+      "currentPath": "crates/domain/src/analytics/parameter/validation.rs",
+      "currentModule": "football_domain::validation",
+      "sourceLine": 38,
       "derives": [
         "Clone",
         "Debug",
@@ -16009,7 +16297,10 @@
       "currentRootExport": "glob_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
-      "domainCallers": [],
+      "domainCallers": [
+        "crates/domain/src/lib.rs",
+        "crates/domain/tests/serde_contracts/r2_07_module_paths.rs"
+      ],
       "externalCallers": [
         "crates/application/src/analytics.rs",
         "crates/persistence-postgres/src/parameter_lifecycle.rs",
@@ -16023,9 +16314,9 @@
       "typeName": "ParameterShadowValidationRequest",
       "kind": "struct",
       "visibility": "public",
-      "currentPath": "crates/domain/src/analytics.rs",
-      "currentModule": "football_domain::analytics",
-      "sourceLine": 537,
+      "currentPath": "crates/domain/src/analytics/parameter/validation.rs",
+      "currentModule": "football_domain::validation",
+      "sourceLine": 33,
       "derives": [
         "Clone",
         "Debug",
@@ -16057,7 +16348,10 @@
       "currentRootExport": "glob_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "none_detected",
-      "domainCallers": [],
+      "domainCallers": [
+        "crates/domain/src/lib.rs",
+        "crates/domain/tests/serde_contracts/r2_07_module_paths.rs"
+      ],
       "externalCallers": [
         "crates/application/src/analytics.rs",
         "src-tauri/src/commands/analytics.rs"
@@ -16068,9 +16362,9 @@
       "typeName": "ParameterTuningCandidateRecord",
       "kind": "struct",
       "visibility": "public",
-      "currentPath": "crates/domain/src/analytics.rs",
-      "currentModule": "football_domain::analytics",
-      "sourceLine": 412,
+      "currentPath": "crates/domain/src/analytics/parameter/tuning.rs",
+      "currentModule": "football_domain::tuning",
+      "sourceLine": 47,
       "derives": [
         "Clone",
         "Debug",
@@ -16218,7 +16512,10 @@
       "currentRootExport": "glob_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
-      "domainCallers": [],
+      "domainCallers": [
+        "crates/domain/src/lib.rs",
+        "crates/domain/tests/serde_contracts/r2_07_module_paths.rs"
+      ],
       "externalCallers": [
         "crates/application/src/analytics.rs",
         "crates/persistence-postgres/src/analytics.rs",
@@ -16234,9 +16531,9 @@
       "typeName": "ParameterTuningDecision",
       "kind": "enum",
       "visibility": "public",
-      "currentPath": "crates/domain/src/analytics.rs",
-      "currentModule": "football_domain::analytics",
-      "sourceLine": 398,
+      "currentPath": "crates/domain/src/analytics/parameter/tuning.rs",
+      "currentModule": "football_domain::tuning",
+      "sourceLine": 33,
       "derives": [
         "Clone",
         "Copy",
@@ -16278,7 +16575,9 @@
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
-        "crates/domain/src/analytics.rs"
+        "crates/domain/src/analytics/parameter/tuning.rs",
+        "crates/domain/src/lib.rs",
+        "crates/domain/tests/serde_contracts/r2_07_module_paths.rs"
       ],
       "externalCallers": [
         "crates/persistence-postgres/src/analytics.rs"
@@ -16291,9 +16590,9 @@
       "typeName": "ParameterTuningDecisionDraft",
       "kind": "struct",
       "visibility": "public",
-      "currentPath": "crates/domain/src/analytics.rs",
-      "currentModule": "football_domain::analytics",
-      "sourceLine": 404,
+      "currentPath": "crates/domain/src/analytics/parameter/tuning.rs",
+      "currentModule": "football_domain::tuning",
+      "sourceLine": 39,
       "derives": [
         "Clone",
         "Debug",
@@ -16335,7 +16634,10 @@
       "currentRootExport": "glob_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
-      "domainCallers": [],
+      "domainCallers": [
+        "crates/domain/src/lib.rs",
+        "crates/domain/tests/serde_contracts/r2_07_module_paths.rs"
+      ],
       "externalCallers": [
         "crates/application/src/analytics.rs",
         "crates/persistence-postgres/src/analytics.rs",
@@ -16349,9 +16651,9 @@
       "typeName": "ParameterTuningDraft",
       "kind": "struct",
       "visibility": "public",
-      "currentPath": "crates/domain/src/analytics.rs",
-      "currentModule": "football_domain::analytics",
-      "sourceLine": 377,
+      "currentPath": "crates/domain/src/analytics/parameter/tuning.rs",
+      "currentModule": "football_domain::tuning",
+      "sourceLine": 7,
       "derives": [
         "Clone",
         "Debug",
@@ -16407,7 +16709,10 @@
       "currentRootExport": "glob_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "none_detected",
-      "domainCallers": [],
+      "domainCallers": [
+        "crates/domain/src/lib.rs",
+        "crates/domain/tests/serde_contracts/r2_07_module_paths.rs"
+      ],
       "externalCallers": [
         "crates/application/src/analytics.rs",
         "src-tauri/src/commands/analytics.rs"
@@ -16477,6 +16782,7 @@
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "none_detected",
       "domainCallers": [
+        "crates/domain/src/lib.rs",
         "crates/domain/tests/serde_contracts/module_paths.rs"
       ],
       "externalCallers": [],
@@ -16531,6 +16837,7 @@
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "none_detected",
       "domainCallers": [
+        "crates/domain/src/lib.rs",
         "crates/domain/tests/serde_contracts/module_paths.rs"
       ],
       "externalCallers": [
@@ -16640,6 +16947,7 @@
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
+        "crates/domain/src/lib.rs",
         "crates/domain/tests/serde_contracts/module_paths.rs"
       ],
       "externalCallers": [
@@ -16739,6 +17047,7 @@
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
+        "crates/domain/src/lib.rs",
         "crates/domain/src/player/detail.rs",
         "crates/domain/tests/serde_contracts/module_paths.rs"
       ],
@@ -16818,7 +17127,8 @@
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
-        "crates/domain/src/exchange.rs",
+        "crates/domain/src/exchange/ai_match.rs",
+        "crates/domain/src/lib.rs",
         "crates/domain/src/player/detail.rs",
         "crates/domain/tests/serde_contracts/module_paths.rs"
       ],
@@ -16918,6 +17228,7 @@
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
+        "crates/domain/src/lib.rs",
         "crates/domain/tests/serde_contracts/module_paths.rs"
       ],
       "externalCallers": [
@@ -17009,7 +17320,8 @@
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
-        "crates/domain/src/exchange.rs",
+        "crates/domain/src/exchange/ai_match.rs",
+        "crates/domain/src/lib.rs",
         "crates/domain/src/player/detail.rs",
         "crates/domain/tests/serde_contracts/module_paths.rs"
       ],
@@ -17096,6 +17408,7 @@
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
+        "crates/domain/src/lib.rs",
         "crates/domain/tests/serde_contracts/module_paths.rs"
       ],
       "externalCallers": [
@@ -17181,6 +17494,7 @@
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
+        "crates/domain/src/lib.rs",
         "crates/domain/tests/serde_contracts/module_paths.rs"
       ],
       "externalCallers": [
@@ -17267,6 +17581,7 @@
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
+        "crates/domain/src/lib.rs",
         "crates/domain/tests/serde_contracts/defaults.rs",
         "crates/domain/tests/serde_contracts/module_paths.rs"
       ],
@@ -17283,9 +17598,9 @@
       "typeName": "PlayerDynamicTagDefinitionRecord",
       "kind": "struct",
       "visibility": "public",
-      "currentPath": "crates/domain/src/exchange.rs",
-      "currentModule": "football_domain::exchange",
-      "sourceLine": 11,
+      "currentPath": "crates/domain/src/exchange/dynamic_tag.rs",
+      "currentModule": "football_domain::dynamic_tag",
+      "sourceLine": 7,
       "derives": [
         "Clone",
         "Debug",
@@ -17350,8 +17665,10 @@
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
-        "crates/domain/src/exchange.rs",
-        "crates/domain/src/player/catalog.rs"
+        "crates/domain/src/exchange/lineup.rs",
+        "crates/domain/src/lib.rs",
+        "crates/domain/src/player/catalog.rs",
+        "crates/domain/tests/serde_contracts/r2_07_module_paths.rs"
       ],
       "externalCallers": [
         "crates/persistence-postgres/src/dynamic_tags.rs"
@@ -17364,9 +17681,9 @@
       "typeName": "PlayerDynamicTagDraft",
       "kind": "struct",
       "visibility": "public",
-      "currentPath": "crates/domain/src/exchange.rs",
-      "currentModule": "football_domain::exchange",
-      "sourceLine": 24,
+      "currentPath": "crates/domain/src/exchange/dynamic_tag.rs",
+      "currentModule": "football_domain::dynamic_tag",
+      "sourceLine": 20,
       "derives": [
         "Clone",
         "Debug",
@@ -17476,7 +17793,10 @@
       "currentRootExport": "glob_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
-      "domainCallers": [],
+      "domainCallers": [
+        "crates/domain/src/lib.rs",
+        "crates/domain/tests/serde_contracts/r2_07_module_paths.rs"
+      ],
       "externalCallers": [
         "crates/application/src/api_workspace.rs",
         "crates/application/src/player_catalog.rs",
@@ -17491,9 +17811,9 @@
       "typeName": "PlayerDynamicTagRecord",
       "kind": "struct",
       "visibility": "public",
-      "currentPath": "crates/domain/src/exchange.rs",
-      "currentModule": "football_domain::exchange",
-      "sourceLine": 65,
+      "currentPath": "crates/domain/src/exchange/dynamic_tag.rs",
+      "currentModule": "football_domain::dynamic_tag",
+      "sourceLine": 61,
       "derives": [
         "Clone",
         "Debug",
@@ -17602,8 +17922,12 @@
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
-        "crates/domain/src/exchange.rs",
-        "crates/domain/src/player/detail.rs"
+        "crates/domain/src/exchange/ai_match.rs",
+        "crates/domain/src/exchange/contribution.rs",
+        "crates/domain/src/exchange/lineup.rs",
+        "crates/domain/src/lib.rs",
+        "crates/domain/src/player/detail.rs",
+        "crates/domain/tests/serde_contracts/r2_07_module_paths.rs"
       ],
       "externalCallers": [
         "crates/application/src/player_catalog.rs",
@@ -17741,6 +18065,7 @@
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
+        "crates/domain/src/lib.rs",
         "crates/domain/src/player/listing.rs",
         "crates/domain/tests/serde_contracts/module_paths.rs"
       ],
@@ -17802,6 +18127,7 @@
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
+        "crates/domain/src/lib.rs",
         "crates/domain/tests/serde_contracts/module_paths.rs"
       ],
       "externalCallers": [
@@ -17896,6 +18222,7 @@
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
+        "crates/domain/src/lib.rs",
         "crates/domain/src/player/listing.rs",
         "crates/domain/tests/serde_contracts/module_paths.rs"
       ],
@@ -17913,9 +18240,9 @@
       "typeName": "PlayerMatchContribution",
       "kind": "struct",
       "visibility": "public",
-      "currentPath": "crates/domain/src/exchange.rs",
-      "currentModule": "football_domain::exchange",
-      "sourceLine": 126,
+      "currentPath": "crates/domain/src/exchange/contribution.rs",
+      "currentModule": "football_domain::contribution",
+      "sourceLine": 45,
       "derives": [
         "Clone",
         "Debug",
@@ -18026,7 +18353,9 @@
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
-        "crates/domain/src/exchange.rs"
+        "crates/domain/src/exchange/ai_match.rs",
+        "crates/domain/src/lib.rs",
+        "crates/domain/tests/serde_contracts/r2_07_module_paths.rs"
       ],
       "externalCallers": [
         "crates/application/src/player_catalog.rs",
@@ -18043,9 +18372,9 @@
       "typeName": "PlayerMatchContributionRequest",
       "kind": "struct",
       "visibility": "public",
-      "currentPath": "crates/domain/src/exchange.rs",
-      "currentModule": "football_domain::exchange",
-      "sourceLine": 93,
+      "currentPath": "crates/domain/src/exchange/contribution.rs",
+      "currentModule": "football_domain::contribution",
+      "sourceLine": 12,
       "derives": [
         "Clone",
         "Debug",
@@ -18135,7 +18464,10 @@
       "currentRootExport": "glob_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
-      "domainCallers": [],
+      "domainCallers": [
+        "crates/domain/src/lib.rs",
+        "crates/domain/tests/serde_contracts/r2_07_module_paths.rs"
+      ],
       "externalCallers": [
         "crates/application/src/player_catalog.rs",
         "crates/persistence-postgres/src/dynamic_tags.rs",
@@ -18236,6 +18568,7 @@
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "none_detected",
       "domainCallers": [
+        "crates/domain/src/lib.rs",
         "crates/domain/src/review/aggregate.rs",
         "crates/domain/tests/serde_contracts/r2_06_module_paths.rs"
       ],
@@ -18335,6 +18668,7 @@
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "none_detected",
       "domainCallers": [
+        "crates/domain/src/lib.rs",
         "crates/domain/tests/serde_contracts/r2_06_module_paths.rs"
       ],
       "externalCallers": [],
@@ -18443,6 +18777,7 @@
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
+        "crates/domain/src/lib.rs",
         "crates/domain/src/review/aggregate.rs",
         "crates/domain/tests/serde_contracts/r2_06_module_paths.rs"
       ],
@@ -18520,6 +18855,7 @@
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
+        "crates/domain/src/lib.rs",
         "crates/domain/tests/serde_contracts/module_paths.rs"
       ],
       "externalCallers": [
@@ -18599,6 +18935,7 @@
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
+        "crates/domain/src/lib.rs",
         "crates/domain/src/player/detail.rs",
         "crates/domain/tests/serde_contracts/module_paths.rs"
       ],
@@ -18767,6 +19104,7 @@
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
+        "crates/domain/src/lib.rs",
         "crates/domain/src/review/observation.rs",
         "crates/domain/src/review/preparation.rs",
         "crates/domain/tests/serde_contracts/r2_06_module_paths.rs"
@@ -18857,6 +19195,7 @@
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
+        "crates/domain/src/lib.rs",
         "crates/domain/tests/serde_contracts/module_paths.rs"
       ],
       "externalCallers": [
@@ -18946,6 +19285,7 @@
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
+        "crates/domain/src/lib.rs",
         "crates/domain/src/player/detail.rs",
         "crates/domain/tests/serde_contracts/module_paths.rs"
       ],
@@ -19029,7 +19369,8 @@
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
-        "crates/domain/src/exchange.rs",
+        "crates/domain/src/exchange/ai_match.rs",
+        "crates/domain/src/lib.rs",
         "crates/domain/src/player/detail.rs",
         "crates/domain/tests/serde_contracts/module_paths.rs"
       ],
@@ -19099,6 +19440,7 @@
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
+        "crates/domain/src/lib.rs",
         "crates/domain/src/player/catalog.rs",
         "crates/domain/src/player/listing.rs",
         "crates/domain/src/player/status.rs",
@@ -19190,6 +19532,7 @@
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
+        "crates/domain/src/lib.rs",
         "crates/domain/tests/serde_contracts/module_paths.rs"
       ],
       "externalCallers": [
@@ -19276,6 +19619,7 @@
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
+        "crates/domain/src/lib.rs",
         "crates/domain/src/player/detail.rs",
         "crates/domain/tests/serde_contracts/module_paths.rs"
       ],
@@ -19339,7 +19683,8 @@
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
-        "crates/domain/src/exchange.rs",
+        "crates/domain/src/exchange/lineup.rs",
+        "crates/domain/src/lib.rs",
         "crates/domain/src/player/catalog.rs",
         "crates/domain/tests/serde_contracts/module_paths.rs"
       ],
@@ -19413,6 +19758,7 @@
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
+        "crates/domain/src/lib.rs",
         "crates/domain/src/postmatch/monitoring.rs",
         "crates/domain/tests/serde_contracts/r2_06_module_paths.rs"
       ],
@@ -19534,6 +19880,7 @@
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
+        "crates/domain/src/lib.rs",
         "crates/domain/src/postmatch/overview.rs",
         "crates/domain/tests/serde_contracts/r2_06_module_paths.rs"
       ],
@@ -19599,6 +19946,7 @@
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
+        "crates/domain/src/lib.rs",
         "crates/domain/tests/serde_contracts/r2_06_module_paths.rs"
       ],
       "externalCallers": [
@@ -19673,6 +20021,7 @@
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
+        "crates/domain/src/lib.rs",
         "crates/domain/tests/serde_contracts/r2_06_module_paths.rs"
       ],
       "externalCallers": [
@@ -19735,6 +20084,7 @@
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
+        "crates/domain/src/lib.rs",
         "crates/domain/tests/serde_contracts/r2_06_module_paths.rs"
       ],
       "externalCallers": [
@@ -19845,6 +20195,7 @@
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
+        "crates/domain/src/lib.rs",
         "crates/domain/tests/serde_contracts/r2_06_module_paths.rs"
       ],
       "externalCallers": [
@@ -20015,6 +20366,7 @@
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
+        "crates/domain/src/lib.rs",
         "crates/domain/src/postmatch/overview.rs",
         "crates/domain/tests/serde_contracts/r2_06_module_paths.rs"
       ],
@@ -20082,6 +20434,7 @@
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "none_detected",
       "domainCallers": [
+        "crates/domain/src/lib.rs",
         "crates/domain/tests/serde_contracts/module_paths.rs"
       ],
       "externalCallers": [
@@ -20161,6 +20514,7 @@
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "none_detected",
       "domainCallers": [
+        "crates/domain/src/lib.rs",
         "crates/domain/src/prediction/readiness/report.rs",
         "crates/domain/tests/serde_contracts/module_paths.rs"
       ],
@@ -20221,6 +20575,7 @@
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "none_detected",
       "domainCallers": [
+        "crates/domain/src/lib.rs",
         "crates/domain/src/prediction/readiness/report.rs",
         "crates/domain/tests/serde_contracts/module_paths.rs"
       ],
@@ -20285,6 +20640,7 @@
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "none_detected",
       "domainCallers": [
+        "crates/domain/src/lib.rs",
         "crates/domain/src/prediction/readiness/level.rs",
         "crates/domain/src/prediction/readiness/report.rs",
         "crates/domain/tests/serde_contracts/module_paths.rs"
@@ -20341,6 +20697,7 @@
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
+        "crates/domain/src/lib.rs",
         "crates/domain/src/review/preparation.rs",
         "crates/domain/tests/serde_contracts/r2_06_module_paths.rs"
       ],
@@ -20406,6 +20763,7 @@
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "none_detected",
       "domainCallers": [
+        "crates/domain/src/lib.rs",
         "crates/domain/src/prediction/result.rs",
         "crates/domain/tests/serde_contracts/module_paths.rs"
       ],
@@ -20471,6 +20829,7 @@
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
+        "crates/domain/src/lib.rs",
         "crates/domain/src/player/catalog.rs",
         "crates/domain/src/player/listing.rs",
         "crates/domain/src/player/status.rs",
@@ -20536,6 +20895,7 @@
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
+        "crates/domain/src/lib.rs",
         "crates/domain/src/prediction/workbench/workspace.rs",
         "crates/domain/tests/serde_contracts/module_paths.rs"
       ],
@@ -20662,6 +21022,7 @@
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
+        "crates/domain/src/lib.rs",
         "crates/domain/tests/serde_contracts/module_paths.rs"
       ],
       "externalCallers": [
@@ -20757,6 +21118,7 @@
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
+        "crates/domain/src/lib.rs",
         "crates/domain/src/prediction/persistence/snapshot.rs",
         "crates/domain/tests/serde_contracts/module_paths.rs"
       ],
@@ -20772,9 +21134,9 @@
       "typeName": "PreparedMatchPredictionInput",
       "kind": "struct",
       "visibility": "public",
-      "currentPath": "crates/domain/src/exchange.rs",
-      "currentModule": "football_domain::exchange",
-      "sourceLine": 247,
+      "currentPath": "crates/domain/src/exchange/prediction_input.rs",
+      "currentModule": "football_domain::prediction_input",
+      "sourceLine": 5,
       "derives": [
         "Clone",
         "Debug",
@@ -20822,7 +21184,10 @@
       "currentRootExport": "glob_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
-      "domainCallers": [],
+      "domainCallers": [
+        "crates/domain/src/lib.rs",
+        "crates/domain/tests/serde_contracts/r2_07_module_paths.rs"
+      ],
       "externalCallers": [
         "crates/application/src/prediction.rs",
         "crates/persistence-postgres/src/match_prediction.rs"
@@ -20888,6 +21253,7 @@
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
+        "crates/domain/src/lib.rs",
         "crates/domain/tests/serde_contracts/module_paths.rs"
       ],
       "externalCallers": [
@@ -20958,6 +21324,7 @@
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
+        "crates/domain/src/lib.rs",
         "crates/domain/tests/serde_contracts/module_paths.rs"
       ],
       "externalCallers": [
@@ -21087,6 +21454,7 @@
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
+        "crates/domain/src/lib.rs",
         "crates/domain/src/postmatch/overview.rs",
         "crates/domain/tests/serde_contracts/r2_06_module_paths.rs"
       ],
@@ -21101,9 +21469,9 @@
       "typeName": "QueryPerformanceFinding",
       "kind": "struct",
       "visibility": "public",
-      "currentPath": "crates/domain/src/analytics.rs",
-      "currentModule": "football_domain::analytics",
-      "sourceLine": 155,
+      "currentPath": "crates/domain/src/analytics/query_performance.rs",
+      "currentModule": "football_domain::query_performance",
+      "sourceLine": 5,
       "derives": [
         "Clone",
         "Debug",
@@ -21172,7 +21540,9 @@
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
-        "crates/domain/src/analytics.rs"
+        "crates/domain/src/analytics/query_performance.rs",
+        "crates/domain/src/lib.rs",
+        "crates/domain/tests/serde_contracts/r2_07_module_paths.rs"
       ],
       "externalCallers": [
         "crates/persistence-postgres/src/analytics.rs"
@@ -21185,9 +21555,9 @@
       "typeName": "QueryPerformanceSummary",
       "kind": "struct",
       "visibility": "public",
-      "currentPath": "crates/domain/src/analytics.rs",
-      "currentModule": "football_domain::analytics",
-      "sourceLine": 169,
+      "currentPath": "crates/domain/src/analytics/query_performance.rs",
+      "currentModule": "football_domain::query_performance",
+      "sourceLine": 19,
       "derives": [
         "Clone",
         "Debug",
@@ -21228,7 +21598,9 @@
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
-        "crates/domain/src/analytics.rs"
+        "crates/domain/src/analytics/calculation.rs",
+        "crates/domain/src/lib.rs",
+        "crates/domain/tests/serde_contracts/r2_07_module_paths.rs"
       ],
       "externalCallers": [
         "crates/persistence-postgres/src/analytics.rs"
@@ -21241,9 +21613,9 @@
       "typeName": "ReleaseAcceptanceCategorySummary",
       "kind": "struct",
       "visibility": "public",
-      "currentPath": "crates/domain/src/release_acceptance.rs",
-      "currentModule": "football_domain::release_acceptance",
-      "sourceLine": 76,
+      "currentPath": "crates/domain/src/release/check.rs",
+      "currentModule": "football_domain::check",
+      "sourceLine": 23,
       "derives": [
         "Clone",
         "Debug",
@@ -21289,7 +21661,9 @@
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "none_detected",
       "domainCallers": [
-        "crates/domain/src/release_acceptance.rs"
+        "crates/domain/src/lib.rs",
+        "crates/domain/src/release/run.rs",
+        "crates/domain/tests/serde_contracts/r2_07_module_paths.rs"
       ],
       "externalCallers": [
         "crates/application/src/release_acceptance.rs"
@@ -21300,9 +21674,9 @@
       "typeName": "ReleaseAcceptanceCheck",
       "kind": "struct",
       "visibility": "public",
-      "currentPath": "crates/domain/src/release_acceptance.rs",
-      "currentModule": "football_domain::release_acceptance",
-      "sourceLine": 61,
+      "currentPath": "crates/domain/src/release/check.rs",
+      "currentModule": "football_domain::check",
+      "sourceLine": 8,
       "derives": [
         "Clone",
         "Debug",
@@ -21375,7 +21749,9 @@
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
-        "crates/domain/src/release_acceptance.rs"
+        "crates/domain/src/lib.rs",
+        "crates/domain/src/release/run.rs",
+        "crates/domain/tests/serde_contracts/r2_07_module_paths.rs"
       ],
       "externalCallers": [
         "crates/application/src/release_acceptance.rs",
@@ -21389,9 +21765,9 @@
       "typeName": "ReleaseAcceptanceCostSummary",
       "kind": "struct",
       "visibility": "public",
-      "currentPath": "crates/domain/src/release_acceptance.rs",
-      "currentModule": "football_domain::release_acceptance",
-      "sourceLine": 93,
+      "currentPath": "crates/domain/src/release/metrics.rs",
+      "currentModule": "football_domain::metrics",
+      "sourceLine": 13,
       "derives": [
         "Clone",
         "Debug",
@@ -21453,7 +21829,9 @@
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "none_detected",
       "domainCallers": [
-        "crates/domain/src/release_acceptance.rs"
+        "crates/domain/src/lib.rs",
+        "crates/domain/src/release/run.rs",
+        "crates/domain/tests/serde_contracts/r2_07_module_paths.rs"
       ],
       "externalCallers": [
         "crates/application/src/release_acceptance.rs"
@@ -21464,9 +21842,9 @@
       "typeName": "ReleaseAcceptancePerformanceSummary",
       "kind": "struct",
       "visibility": "public",
-      "currentPath": "crates/domain/src/release_acceptance.rs",
-      "currentModule": "football_domain::release_acceptance",
-      "sourceLine": 84,
+      "currentPath": "crates/domain/src/release/metrics.rs",
+      "currentModule": "football_domain::metrics",
+      "sourceLine": 4,
       "derives": [
         "Clone",
         "Debug",
@@ -21516,7 +21894,9 @@
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "none_detected",
       "domainCallers": [
-        "crates/domain/src/release_acceptance.rs"
+        "crates/domain/src/lib.rs",
+        "crates/domain/src/release/run.rs",
+        "crates/domain/tests/serde_contracts/r2_07_module_paths.rs"
       ],
       "externalCallers": [
         "crates/application/src/release_acceptance.rs"
@@ -21527,9 +21907,9 @@
       "typeName": "ReleaseAcceptanceRequest",
       "kind": "struct",
       "visibility": "public",
-      "currentPath": "crates/domain/src/release_acceptance.rs",
-      "currentModule": "football_domain::release_acceptance",
-      "sourceLine": 28,
+      "currentPath": "crates/domain/src/release/request.rs",
+      "currentModule": "football_domain::request",
+      "sourceLine": 4,
       "derives": [
         "Clone",
         "Debug",
@@ -21588,7 +21968,9 @@
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "none_detected",
       "domainCallers": [
-        "crates/domain/src/release_acceptance.rs"
+        "crates/domain/src/lib.rs",
+        "crates/domain/src/release/request.rs",
+        "crates/domain/tests/serde_contracts/r2_07_module_paths.rs"
       ],
       "externalCallers": [
         "crates/application/src/release_acceptance.rs",
@@ -21600,9 +21982,9 @@
       "typeName": "ReleaseAcceptanceRun",
       "kind": "struct",
       "visibility": "public",
-      "currentPath": "crates/domain/src/release_acceptance.rs",
-      "currentModule": "football_domain::release_acceptance",
-      "sourceLine": 105,
+      "currentPath": "crates/domain/src/release/run.rs",
+      "currentModule": "football_domain::run",
+      "sourceLine": 10,
       "derives": [
         "Clone",
         "Debug",
@@ -21694,7 +22076,10 @@
       "currentRootExport": "glob_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
-      "domainCallers": [],
+      "domainCallers": [
+        "crates/domain/src/lib.rs",
+        "crates/domain/tests/serde_contracts/r2_07_module_paths.rs"
+      ],
       "externalCallers": [
         "crates/application/src/release_acceptance.rs",
         "crates/persistence-postgres/src/release_acceptance.rs",
@@ -21708,9 +22093,9 @@
       "typeName": "ReleaseAcceptanceRunSummary",
       "kind": "struct",
       "visibility": "public",
-      "currentPath": "crates/domain/src/release_acceptance.rs",
-      "currentModule": "football_domain::release_acceptance",
-      "sourceLine": 125,
+      "currentPath": "crates/domain/src/release/run.rs",
+      "currentModule": "football_domain::run",
+      "sourceLine": 30,
       "derives": [
         "Clone",
         "Debug",
@@ -21774,7 +22159,10 @@
       "currentRootExport": "glob_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
-      "domainCallers": [],
+      "domainCallers": [
+        "crates/domain/src/lib.rs",
+        "crates/domain/tests/serde_contracts/r2_07_module_paths.rs"
+      ],
       "externalCallers": [
         "crates/application/src/release_acceptance.rs",
         "crates/persistence-postgres/src/release_acceptance.rs",
@@ -21788,9 +22176,9 @@
       "typeName": "ReleaseAcceptanceRuntimeFacts",
       "kind": "struct",
       "visibility": "public",
-      "currentPath": "crates/domain/src/release_acceptance.rs",
-      "currentModule": "football_domain::release_acceptance",
-      "sourceLine": 138,
+      "currentPath": "crates/domain/src/release/runtime.rs",
+      "currentModule": "football_domain::runtime",
+      "sourceLine": 4,
       "derives": [
         "Clone",
         "Debug",
@@ -21899,7 +22287,10 @@
       "currentRootExport": "glob_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
-      "domainCallers": [],
+      "domainCallers": [
+        "crates/domain/src/lib.rs",
+        "crates/domain/tests/serde_contracts/r2_07_module_paths.rs"
+      ],
       "externalCallers": [
         "crates/application/src/release_acceptance.rs",
         "crates/persistence-postgres/src/release_acceptance.rs"
@@ -21912,9 +22303,9 @@
       "typeName": "ReleaseAcceptanceStatus",
       "kind": "enum",
       "visibility": "public",
-      "currentPath": "crates/domain/src/release_acceptance.rs",
-      "currentModule": "football_domain::release_acceptance",
-      "sourceLine": 11,
+      "currentPath": "crates/domain/src/release/contract.rs",
+      "currentModule": "football_domain::contract",
+      "sourceLine": 8,
       "derives": [
         "Clone",
         "Copy",
@@ -21960,7 +22351,11 @@
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
-        "crates/domain/src/release_acceptance.rs"
+        "crates/domain/src/lib.rs",
+        "crates/domain/src/release/check.rs",
+        "crates/domain/src/release/contract.rs",
+        "crates/domain/src/release/run.rs",
+        "crates/domain/tests/serde_contracts/r2_07_module_paths.rs"
       ],
       "externalCallers": [
         "crates/application/src/release_acceptance.rs",
@@ -22053,6 +22448,7 @@
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
+        "crates/domain/src/lib.rs",
         "crates/domain/tests/serde_contracts/module_paths.rs"
       ],
       "externalCallers": [
@@ -22148,6 +22544,7 @@
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
+        "crates/domain/src/lib.rs",
         "crates/domain/tests/serde_contracts/module_paths.rs"
       ],
       "externalCallers": [
@@ -22231,6 +22628,7 @@
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
+        "crates/domain/src/lib.rs",
         "crates/domain/tests/serde_contracts/module_paths.rs"
       ],
       "externalCallers": [
@@ -22307,6 +22705,7 @@
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
+        "crates/domain/src/lib.rs",
         "crates/domain/src/prediction/persistence/research.rs",
         "crates/domain/tests/serde_contracts/module_paths.rs"
       ],
@@ -22373,6 +22772,7 @@
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
+        "crates/domain/src/lib.rs",
         "crates/domain/src/routing/mod.rs",
         "crates/domain/tests/serde_contracts/module_paths.rs"
       ],
@@ -22461,6 +22861,7 @@
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
+        "crates/domain/src/lib.rs",
         "crates/domain/src/team/detail.rs",
         "crates/domain/tests/serde_contracts/module_paths.rs"
       ],
@@ -22532,6 +22933,7 @@
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "none_detected",
       "domainCallers": [
+        "crates/domain/src/lib.rs",
         "crates/domain/tests/serde_contracts/module_paths.rs"
       ],
       "externalCallers": [
@@ -22595,6 +22997,7 @@
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
+        "crates/domain/src/lib.rs",
         "crates/domain/tests/serde_contracts/r2_06_module_paths.rs"
       ],
       "externalCallers": [
@@ -22709,6 +23112,7 @@
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
+        "crates/domain/src/lib.rs",
         "crates/domain/src/review/preparation.rs",
         "crates/domain/tests/serde_contracts/r2_06_module_paths.rs"
       ],
@@ -22783,6 +23187,7 @@
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
+        "crates/domain/src/lib.rs",
         "crates/domain/tests/serde_contracts/r2_06_module_paths.rs"
       ],
       "externalCallers": [
@@ -22840,6 +23245,7 @@
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
+        "crates/domain/src/lib.rs",
         "crates/domain/src/review/preparation.rs",
         "crates/domain/tests/serde_contracts/r2_06_module_paths.rs"
       ],
@@ -22916,6 +23322,7 @@
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
         "crates/domain/src/competition/mod.rs",
+        "crates/domain/src/lib.rs",
         "crates/domain/tests/serde_contracts/module_paths.rs"
       ],
       "externalCallers": [
@@ -22995,6 +23402,7 @@
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
         "crates/domain/src/competition/mod.rs",
+        "crates/domain/src/lib.rs",
         "crates/domain/tests/serde_contracts/module_paths.rs"
       ],
       "externalCallers": [
@@ -23118,6 +23526,7 @@
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
+        "crates/domain/src/lib.rs",
         "crates/domain/src/routing/mod.rs",
         "crates/domain/tests/serde_contracts/module_paths.rs"
       ],
@@ -23213,6 +23622,7 @@
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
+        "crates/domain/src/lib.rs",
         "crates/domain/src/routing/mod.rs",
         "crates/domain/tests/serde_contracts/module_paths.rs"
       ],
@@ -23282,6 +23692,7 @@
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
+        "crates/domain/src/lib.rs",
         "crates/domain/src/routing/mod.rs",
         "crates/domain/src/routing/route.rs",
         "crates/domain/tests/serde_contracts/enums.rs",
@@ -23384,6 +23795,7 @@
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
         "crates/domain/src/competition/mod.rs",
+        "crates/domain/src/lib.rs",
         "crates/domain/tests/serde_contracts/module_paths.rs",
         "crates/domain/tests/serde_contracts/round_trip.rs"
       ],
@@ -23486,6 +23898,7 @@
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
         "crates/domain/src/competition/mod.rs",
+        "crates/domain/src/lib.rs",
         "crates/domain/tests/serde_contracts/module_paths.rs"
       ],
       "externalCallers": [
@@ -23564,6 +23977,7 @@
       "databaseMapping": "none_detected",
       "domainCallers": [
         "crates/domain/src/competition/rule_package.rs",
+        "crates/domain/src/lib.rs",
         "crates/domain/src/routing/mod.rs",
         "crates/domain/src/routing/route.rs",
         "crates/domain/tests/serde_contracts/module_paths.rs"
@@ -23636,6 +24050,7 @@
       "domainCallers": [
         "crates/domain/src/competition/mod.rs",
         "crates/domain/src/competition/rule_package.rs",
+        "crates/domain/src/lib.rs",
         "crates/domain/tests/serde_contracts/module_paths.rs"
       ],
       "externalCallers": [
@@ -23706,6 +24121,7 @@
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
+        "crates/domain/src/lib.rs",
         "crates/domain/tests/serde_contracts/module_paths.rs"
       ],
       "externalCallers": [
@@ -23777,6 +24193,7 @@
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
+        "crates/domain/src/lib.rs",
         "crates/domain/tests/serde_contracts/module_paths.rs"
       ],
       "externalCallers": [
@@ -23857,6 +24274,7 @@
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
         "crates/domain/src/competition/mod.rs",
+        "crates/domain/src/lib.rs",
         "crates/domain/tests/serde_contracts/defaults.rs",
         "crates/domain/tests/serde_contracts/module_paths.rs"
       ],
@@ -23934,6 +24352,7 @@
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
         "crates/domain/src/competition/mod.rs",
+        "crates/domain/src/lib.rs",
         "crates/domain/tests/serde_contracts/module_paths.rs"
       ],
       "externalCallers": [
@@ -23994,6 +24413,7 @@
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
         "crates/domain/src/competition/mod.rs",
+        "crates/domain/src/lib.rs",
         "crates/domain/src/player/catalog.rs",
         "crates/domain/tests/serde_contracts/module_paths.rs"
       ],
@@ -24067,6 +24487,7 @@
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
+        "crates/domain/src/lib.rs",
         "crates/domain/src/prediction/persistence/snapshot.rs",
         "crates/domain/tests/serde_contracts/module_paths.rs"
       ],
@@ -24170,6 +24591,7 @@
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
+        "crates/domain/src/lib.rs",
         "crates/domain/src/prediction/persistence/snapshot.rs",
         "crates/domain/tests/serde_contracts/module_paths.rs"
       ],
@@ -24234,6 +24656,7 @@
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
+        "crates/domain/src/lib.rs",
         "crates/domain/src/prediction/persistence/snapshot.rs",
         "crates/domain/tests/serde_contracts/module_paths.rs"
       ],
@@ -24299,6 +24722,7 @@
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
+        "crates/domain/src/lib.rs",
         "crates/domain/src/research/source_policy.rs",
         "crates/domain/tests/serde_contracts/module_paths.rs"
       ],
@@ -24370,6 +24794,7 @@
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
+        "crates/domain/src/lib.rs",
         "crates/domain/tests/serde_contracts/module_paths.rs"
       ],
       "externalCallers": [
@@ -24436,6 +24861,7 @@
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
+        "crates/domain/src/lib.rs",
         "crates/domain/tests/serde_contracts/module_paths.rs"
       ],
       "externalCallers": [
@@ -24490,6 +24916,7 @@
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
+        "crates/domain/src/lib.rs",
         "crates/domain/src/research/source_policy.rs",
         "crates/domain/tests/serde_contracts/module_paths.rs"
       ],
@@ -24546,6 +24973,7 @@
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
+        "crates/domain/src/lib.rs",
         "crates/domain/src/research/source_policy.rs",
         "crates/domain/tests/serde_contracts/module_paths.rs"
       ],
@@ -24561,9 +24989,9 @@
       "typeName": "SpreadsheetAction",
       "kind": "enum",
       "visibility": "public",
-      "currentPath": "crates/domain/src/spreadsheet.rs",
-      "currentModule": "football_domain::spreadsheet",
-      "sourceLine": 23,
+      "currentPath": "crates/domain/src/exchange/spreadsheet/contract.rs",
+      "currentModule": "football_domain::contract",
+      "sourceLine": 20,
       "derives": [
         "Clone",
         "Copy",
@@ -24617,7 +25045,10 @@
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
-        "crates/domain/src/spreadsheet.rs"
+        "crates/domain/src/exchange/spreadsheet/contract.rs",
+        "crates/domain/src/exchange/spreadsheet/import.rs",
+        "crates/domain/src/lib.rs",
+        "crates/domain/tests/serde_contracts/r2_07_module_paths.rs"
       ],
       "externalCallers": [
         "crates/application/src/spreadsheet.rs",
@@ -24640,9 +25071,9 @@
       "typeName": "SpreadsheetConflictCandidate",
       "kind": "struct",
       "visibility": "public",
-      "currentPath": "crates/domain/src/spreadsheet.rs",
-      "currentModule": "football_domain::spreadsheet",
-      "sourceLine": 144,
+      "currentPath": "crates/domain/src/exchange/spreadsheet/import.rs",
+      "currentModule": "football_domain::import",
+      "sourceLine": 28,
       "derives": [
         "Clone",
         "Debug",
@@ -24685,7 +25116,9 @@
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
-        "crates/domain/src/spreadsheet.rs"
+        "crates/domain/src/exchange/spreadsheet/import.rs",
+        "crates/domain/src/lib.rs",
+        "crates/domain/tests/serde_contracts/r2_07_module_paths.rs"
       ],
       "externalCallers": [
         "crates/persistence-postgres/src/match_exchange.rs",
@@ -24702,9 +25135,9 @@
       "typeName": "SpreadsheetEntityType",
       "kind": "enum",
       "visibility": "public",
-      "currentPath": "crates/domain/src/spreadsheet.rs",
-      "currentModule": "football_domain::spreadsheet",
-      "sourceLine": 45,
+      "currentPath": "crates/domain/src/exchange/spreadsheet/contract.rs",
+      "currentModule": "football_domain::contract",
+      "sourceLine": 42,
       "derives": [
         "Clone",
         "Copy",
@@ -24814,7 +25247,10 @@
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
-        "crates/domain/src/spreadsheet.rs"
+        "crates/domain/src/exchange/spreadsheet/contract.rs",
+        "crates/domain/src/exchange/spreadsheet/import.rs",
+        "crates/domain/src/lib.rs",
+        "crates/domain/tests/serde_contracts/r2_07_module_paths.rs"
       ],
       "externalCallers": [
         "crates/application/src/spreadsheet.rs",
@@ -24837,9 +25273,9 @@
       "typeName": "SpreadsheetExportData",
       "kind": "struct",
       "visibility": "public",
-      "currentPath": "crates/domain/src/spreadsheet.rs",
-      "currentModule": "football_domain::spreadsheet",
-      "sourceLine": 220,
+      "currentPath": "crates/domain/src/exchange/spreadsheet/export.rs",
+      "currentModule": "football_domain::export",
+      "sourceLine": 14,
       "derives": [
         "Clone",
         "Debug",
@@ -24904,7 +25340,10 @@
       "currentRootExport": "glob_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
-      "domainCallers": [],
+      "domainCallers": [
+        "crates/domain/src/lib.rs",
+        "crates/domain/tests/serde_contracts/r2_07_module_paths.rs"
+      ],
       "externalCallers": [
         "crates/persistence-postgres/src/spreadsheet_exchange.rs",
         "crates/spreadsheet-io/src/lib.rs",
@@ -24918,9 +25357,9 @@
       "typeName": "SpreadsheetExportSummary",
       "kind": "struct",
       "visibility": "public",
-      "currentPath": "crates/domain/src/spreadsheet.rs",
-      "currentModule": "football_domain::spreadsheet",
-      "sourceLine": 212,
+      "currentPath": "crates/domain/src/exchange/spreadsheet/export.rs",
+      "currentModule": "football_domain::export",
+      "sourceLine": 6,
       "derives": [
         "Clone",
         "Debug",
@@ -24964,7 +25403,10 @@
       "currentRootExport": "glob_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "none_detected",
-      "domainCallers": [],
+      "domainCallers": [
+        "crates/domain/src/lib.rs",
+        "crates/domain/tests/serde_contracts/r2_07_module_paths.rs"
+      ],
       "externalCallers": [
         "crates/application/src/spreadsheet.rs",
         "src-tauri/src/commands/exchange.rs"
@@ -24975,9 +25417,9 @@
       "typeName": "SpreadsheetExternalIdRow",
       "kind": "struct",
       "visibility": "public",
-      "currentPath": "crates/domain/src/spreadsheet.rs",
-      "currentModule": "football_domain::spreadsheet",
-      "sourceLine": 344,
+      "currentPath": "crates/domain/src/exchange/spreadsheet/export.rs",
+      "currentModule": "football_domain::export",
+      "sourceLine": 138,
       "derives": [
         "Clone",
         "Debug",
@@ -25026,7 +25468,9 @@
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
-        "crates/domain/src/spreadsheet.rs"
+        "crates/domain/src/exchange/spreadsheet/export.rs",
+        "crates/domain/src/lib.rs",
+        "crates/domain/tests/serde_contracts/r2_07_module_paths.rs"
       ],
       "externalCallers": [
         "crates/persistence-postgres/src/spreadsheet_exchange.rs"
@@ -25039,9 +25483,9 @@
       "typeName": "SpreadsheetImportCommitResult",
       "kind": "struct",
       "visibility": "public",
-      "currentPath": "crates/domain/src/spreadsheet.rs",
-      "currentModule": "football_domain::spreadsheet",
-      "sourceLine": 201,
+      "currentPath": "crates/domain/src/exchange/spreadsheet/import.rs",
+      "currentModule": "football_domain::import",
+      "sourceLine": 85,
       "derives": [
         "Clone",
         "Debug",
@@ -25098,7 +25542,9 @@
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
-        "crates/domain/src/team_package.rs"
+        "crates/domain/src/exchange/team_package/import.rs",
+        "crates/domain/src/lib.rs",
+        "crates/domain/tests/serde_contracts/r2_07_module_paths.rs"
       ],
       "externalCallers": [
         "crates/application/src/exchange.rs",
@@ -25118,9 +25564,9 @@
       "typeName": "SpreadsheetImportCounts",
       "kind": "struct",
       "visibility": "public",
-      "currentPath": "crates/domain/src/spreadsheet.rs",
-      "currentModule": "football_domain::spreadsheet",
-      "sourceLine": 169,
+      "currentPath": "crates/domain/src/exchange/spreadsheet/import.rs",
+      "currentModule": "football_domain::import",
+      "sourceLine": 53,
       "derives": [
         "Clone",
         "Debug",
@@ -25182,7 +25628,9 @@
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
-        "crates/domain/src/spreadsheet.rs"
+        "crates/domain/src/exchange/spreadsheet/import.rs",
+        "crates/domain/src/lib.rs",
+        "crates/domain/tests/serde_contracts/r2_07_module_paths.rs"
       ],
       "externalCallers": [
         "crates/application/src/spreadsheet.rs",
@@ -25200,9 +25648,9 @@
       "typeName": "SpreadsheetImportMode",
       "kind": "enum",
       "visibility": "public",
-      "currentPath": "crates/domain/src/spreadsheet.rs",
-      "currentModule": "football_domain::spreadsheet",
-      "sourceLine": 10,
+      "currentPath": "crates/domain/src/exchange/spreadsheet/contract.rs",
+      "currentModule": "football_domain::contract",
+      "sourceLine": 7,
       "derives": [
         "Clone",
         "Copy",
@@ -25244,7 +25692,10 @@
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
-        "crates/domain/src/spreadsheet.rs"
+        "crates/domain/src/exchange/spreadsheet/contract.rs",
+        "crates/domain/src/exchange/spreadsheet/import.rs",
+        "crates/domain/src/lib.rs",
+        "crates/domain/tests/serde_contracts/r2_07_module_paths.rs"
       ],
       "externalCallers": [
         "crates/application/src/exchange.rs",
@@ -25265,9 +25716,9 @@
       "typeName": "SpreadsheetImportPreview",
       "kind": "struct",
       "visibility": "public",
-      "currentPath": "crates/domain/src/spreadsheet.rs",
-      "currentModule": "football_domain::spreadsheet",
-      "sourceLine": 181,
+      "currentPath": "crates/domain/src/exchange/spreadsheet/import.rs",
+      "currentModule": "football_domain::import",
+      "sourceLine": 65,
       "derives": [
         "Clone",
         "Debug",
@@ -25324,7 +25775,9 @@
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
-        "crates/domain/src/team_package.rs"
+        "crates/domain/src/exchange/team_package/import.rs",
+        "crates/domain/src/lib.rs",
+        "crates/domain/tests/serde_contracts/r2_07_module_paths.rs"
       ],
       "externalCallers": [
         "crates/application/src/exchange.rs",
@@ -25344,9 +25797,9 @@
       "typeName": "SpreadsheetImportResolution",
       "kind": "struct",
       "visibility": "public",
-      "currentPath": "crates/domain/src/spreadsheet.rs",
-      "currentModule": "football_domain::spreadsheet",
-      "sourceLine": 192,
+      "currentPath": "crates/domain/src/exchange/spreadsheet/import.rs",
+      "currentModule": "football_domain::import",
+      "sourceLine": 76,
       "derives": [
         "Clone",
         "Debug",
@@ -25390,7 +25843,10 @@
       "currentRootExport": "glob_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
-      "domainCallers": [],
+      "domainCallers": [
+        "crates/domain/src/lib.rs",
+        "crates/domain/tests/serde_contracts/r2_07_module_paths.rs"
+      ],
       "externalCallers": [
         "crates/application/src/exchange.rs",
         "crates/application/src/spreadsheet.rs",
@@ -25409,9 +25865,9 @@
       "typeName": "SpreadsheetImportRow",
       "kind": "struct",
       "visibility": "public",
-      "currentPath": "crates/domain/src/spreadsheet.rs",
-      "currentModule": "football_domain::spreadsheet",
-      "sourceLine": 152,
+      "currentPath": "crates/domain/src/exchange/spreadsheet/import.rs",
+      "currentModule": "football_domain::import",
+      "sourceLine": 36,
       "derives": [
         "Clone",
         "Debug",
@@ -25486,7 +25942,9 @@
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
-        "crates/domain/src/spreadsheet.rs"
+        "crates/domain/src/exchange/spreadsheet/import.rs",
+        "crates/domain/src/lib.rs",
+        "crates/domain/tests/serde_contracts/r2_07_module_paths.rs"
       ],
       "externalCallers": [
         "crates/persistence-postgres/src/match_exchange.rs",
@@ -25503,9 +25961,9 @@
       "typeName": "SpreadsheetParsedWorkbook",
       "kind": "struct",
       "visibility": "public",
-      "currentPath": "crates/domain/src/spreadsheet.rs",
-      "currentModule": "football_domain::spreadsheet",
-      "sourceLine": 136,
+      "currentPath": "crates/domain/src/exchange/spreadsheet/import.rs",
+      "currentModule": "football_domain::import",
+      "sourceLine": 20,
       "derives": [
         "Clone",
         "Debug",
@@ -25549,7 +26007,10 @@
       "currentRootExport": "glob_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
-      "domainCallers": [],
+      "domainCallers": [
+        "crates/domain/src/lib.rs",
+        "crates/domain/tests/serde_contracts/r2_07_module_paths.rs"
+      ],
       "externalCallers": [
         "crates/application/src/spreadsheet.rs",
         "crates/persistence-postgres/src/match_exchange.rs",
@@ -25571,9 +26032,9 @@
       "typeName": "SpreadsheetPlayerAbilityRow",
       "kind": "struct",
       "visibility": "public",
-      "currentPath": "crates/domain/src/spreadsheet.rs",
-      "currentModule": "football_domain::spreadsheet",
-      "sourceLine": 292,
+      "currentPath": "crates/domain/src/exchange/spreadsheet/export.rs",
+      "currentModule": "football_domain::export",
+      "sourceLine": 86,
       "derives": [
         "Clone",
         "Debug",
@@ -25654,7 +26115,9 @@
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
-        "crates/domain/src/spreadsheet.rs"
+        "crates/domain/src/exchange/spreadsheet/export.rs",
+        "crates/domain/src/lib.rs",
+        "crates/domain/tests/serde_contracts/r2_07_module_paths.rs"
       ],
       "externalCallers": [
         "crates/persistence-postgres/src/spreadsheet_exchange.rs"
@@ -25667,9 +26130,9 @@
       "typeName": "SpreadsheetPlayerAvailabilityRow",
       "kind": "struct",
       "visibility": "public",
-      "currentPath": "crates/domain/src/spreadsheet.rs",
-      "currentModule": "football_domain::spreadsheet",
-      "sourceLine": 309,
+      "currentPath": "crates/domain/src/exchange/spreadsheet/export.rs",
+      "currentModule": "football_domain::export",
+      "sourceLine": 103,
       "derives": [
         "Clone",
         "Debug",
@@ -25742,7 +26205,9 @@
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
-        "crates/domain/src/spreadsheet.rs"
+        "crates/domain/src/exchange/spreadsheet/export.rs",
+        "crates/domain/src/lib.rs",
+        "crates/domain/tests/serde_contracts/r2_07_module_paths.rs"
       ],
       "externalCallers": [
         "crates/persistence-postgres/src/spreadsheet_exchange.rs"
@@ -25755,9 +26220,9 @@
       "typeName": "SpreadsheetPlayerDynamicTagRow",
       "kind": "struct",
       "visibility": "public",
-      "currentPath": "crates/domain/src/spreadsheet.rs",
-      "currentModule": "football_domain::spreadsheet",
-      "sourceLine": 324,
+      "currentPath": "crates/domain/src/exchange/spreadsheet/export.rs",
+      "currentModule": "football_domain::export",
+      "sourceLine": 118,
       "derives": [
         "Clone",
         "Debug",
@@ -25850,7 +26315,9 @@
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
-        "crates/domain/src/spreadsheet.rs"
+        "crates/domain/src/exchange/spreadsheet/export.rs",
+        "crates/domain/src/lib.rs",
+        "crates/domain/tests/serde_contracts/r2_07_module_paths.rs"
       ],
       "externalCallers": [
         "crates/persistence-postgres/src/spreadsheet_exchange.rs"
@@ -25863,9 +26330,9 @@
       "typeName": "SpreadsheetPlayerNameRow",
       "kind": "struct",
       "visibility": "public",
-      "currentPath": "crates/domain/src/spreadsheet.rs",
-      "currentModule": "football_domain::spreadsheet",
-      "sourceLine": 252,
+      "currentPath": "crates/domain/src/exchange/spreadsheet/export.rs",
+      "currentModule": "football_domain::export",
+      "sourceLine": 46,
       "derives": [
         "Clone",
         "Debug",
@@ -25926,7 +26393,9 @@
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
-        "crates/domain/src/spreadsheet.rs"
+        "crates/domain/src/exchange/spreadsheet/export.rs",
+        "crates/domain/src/lib.rs",
+        "crates/domain/tests/serde_contracts/r2_07_module_paths.rs"
       ],
       "externalCallers": [
         "crates/persistence-postgres/src/spreadsheet_exchange.rs"
@@ -25939,9 +26408,9 @@
       "typeName": "SpreadsheetPlayerPositionRow",
       "kind": "struct",
       "visibility": "public",
-      "currentPath": "crates/domain/src/spreadsheet.rs",
-      "currentModule": "football_domain::spreadsheet",
-      "sourceLine": 264,
+      "currentPath": "crates/domain/src/exchange/spreadsheet/export.rs",
+      "currentModule": "football_domain::export",
+      "sourceLine": 58,
       "derives": [
         "Clone",
         "Debug",
@@ -26008,7 +26477,9 @@
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
-        "crates/domain/src/spreadsheet.rs"
+        "crates/domain/src/exchange/spreadsheet/export.rs",
+        "crates/domain/src/lib.rs",
+        "crates/domain/tests/serde_contracts/r2_07_module_paths.rs"
       ],
       "externalCallers": [
         "crates/persistence-postgres/src/spreadsheet_exchange.rs"
@@ -26021,9 +26492,9 @@
       "typeName": "SpreadsheetPlayerRow",
       "kind": "struct",
       "visibility": "public",
-      "currentPath": "crates/domain/src/spreadsheet.rs",
-      "currentModule": "football_domain::spreadsheet",
-      "sourceLine": 241,
+      "currentPath": "crates/domain/src/exchange/spreadsheet/export.rs",
+      "currentModule": "football_domain::export",
+      "sourceLine": 35,
       "derives": [
         "Clone",
         "Debug",
@@ -26080,7 +26551,9 @@
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
-        "crates/domain/src/spreadsheet.rs"
+        "crates/domain/src/exchange/spreadsheet/export.rs",
+        "crates/domain/src/lib.rs",
+        "crates/domain/tests/serde_contracts/r2_07_module_paths.rs"
       ],
       "externalCallers": [
         "crates/persistence-postgres/src/spreadsheet_exchange.rs"
@@ -26093,9 +26566,9 @@
       "typeName": "SpreadsheetPlayerTeamPeriodRow",
       "kind": "struct",
       "visibility": "public",
-      "currentPath": "crates/domain/src/spreadsheet.rs",
-      "currentModule": "football_domain::spreadsheet",
-      "sourceLine": 278,
+      "currentPath": "crates/domain/src/exchange/spreadsheet/export.rs",
+      "currentModule": "football_domain::export",
+      "sourceLine": 72,
       "derives": [
         "Clone",
         "Debug",
@@ -26164,7 +26637,9 @@
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
-        "crates/domain/src/spreadsheet.rs"
+        "crates/domain/src/exchange/spreadsheet/export.rs",
+        "crates/domain/src/lib.rs",
+        "crates/domain/tests/serde_contracts/r2_07_module_paths.rs"
       ],
       "externalCallers": [
         "crates/persistence-postgres/src/spreadsheet_exchange.rs"
@@ -26177,9 +26652,9 @@
       "typeName": "SpreadsheetRawRow",
       "kind": "struct",
       "visibility": "public",
-      "currentPath": "crates/domain/src/spreadsheet.rs",
-      "currentModule": "football_domain::spreadsheet",
-      "sourceLine": 127,
+      "currentPath": "crates/domain/src/exchange/spreadsheet/import.rs",
+      "currentModule": "football_domain::import",
+      "sourceLine": 11,
       "derives": [
         "Clone",
         "Debug",
@@ -26228,7 +26703,9 @@
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
-        "crates/domain/src/spreadsheet.rs"
+        "crates/domain/src/exchange/spreadsheet/import.rs",
+        "crates/domain/src/lib.rs",
+        "crates/domain/tests/serde_contracts/r2_07_module_paths.rs"
       ],
       "externalCallers": [
         "crates/persistence-postgres/src/monthly_workbooks.rs",
@@ -26248,9 +26725,9 @@
       "typeName": "SpreadsheetRowStatus",
       "kind": "enum",
       "visibility": "public",
-      "currentPath": "crates/domain/src/spreadsheet.rs",
-      "currentModule": "football_domain::spreadsheet",
-      "sourceLine": 95,
+      "currentPath": "crates/domain/src/exchange/spreadsheet/contract.rs",
+      "currentModule": "football_domain::contract",
+      "sourceLine": 92,
       "derives": [
         "Clone",
         "Copy",
@@ -26312,7 +26789,10 @@
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
-        "crates/domain/src/spreadsheet.rs"
+        "crates/domain/src/exchange/spreadsheet/contract.rs",
+        "crates/domain/src/exchange/spreadsheet/import.rs",
+        "crates/domain/src/lib.rs",
+        "crates/domain/tests/serde_contracts/r2_07_module_paths.rs"
       ],
       "externalCallers": [
         "crates/persistence-postgres/src/match_exchange.rs",
@@ -26329,9 +26809,9 @@
       "typeName": "SpreadsheetTeamRow",
       "kind": "struct",
       "visibility": "public",
-      "currentPath": "crates/domain/src/spreadsheet.rs",
-      "currentModule": "football_domain::spreadsheet",
-      "sourceLine": 233,
+      "currentPath": "crates/domain/src/exchange/spreadsheet/export.rs",
+      "currentModule": "football_domain::export",
+      "sourceLine": 27,
       "derives": [
         "Clone",
         "Debug",
@@ -26376,7 +26856,9 @@
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
-        "crates/domain/src/spreadsheet.rs"
+        "crates/domain/src/exchange/spreadsheet/export.rs",
+        "crates/domain/src/lib.rs",
+        "crates/domain/tests/serde_contracts/r2_07_module_paths.rs"
       ],
       "externalCallers": [
         "crates/persistence-postgres/src/spreadsheet_exchange.rs"
@@ -26449,6 +26931,7 @@
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
         "crates/domain/src/competition/mod.rs",
+        "crates/domain/src/lib.rs",
         "crates/domain/tests/serde_contracts/module_paths.rs"
       ],
       "externalCallers": [
@@ -26532,6 +27015,7 @@
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
         "crates/domain/src/competition/mod.rs",
+        "crates/domain/src/lib.rs",
         "crates/domain/tests/serde_contracts/module_paths.rs"
       ],
       "externalCallers": [
@@ -26623,6 +27107,7 @@
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "none_detected",
       "domainCallers": [
+        "crates/domain/src/lib.rs",
         "crates/domain/src/review/aggregate.rs",
         "crates/domain/tests/serde_contracts/r2_06_module_paths.rs"
       ],
@@ -26710,6 +27195,7 @@
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
+        "crates/domain/src/lib.rs",
         "crates/domain/src/review/aggregate.rs",
         "crates/domain/src/review/preparation.rs",
         "crates/domain/tests/serde_contracts/r2_06_module_paths.rs"
@@ -26725,9 +27211,9 @@
       "typeName": "TeamAbilityObservationRow",
       "kind": "struct",
       "visibility": "public",
-      "currentPath": "crates/domain/src/monthly_workbook.rs",
-      "currentModule": "football_domain::monthly_workbook",
-      "sourceLine": 156,
+      "currentPath": "crates/domain/src/exchange/monthly/team.rs",
+      "currentModule": "football_domain::team",
+      "sourceLine": 116,
       "derives": [
         "Clone",
         "Debug",
@@ -26816,7 +27302,9 @@
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
-        "crates/domain/src/monthly_workbook.rs"
+        "crates/domain/src/exchange/monthly/team.rs",
+        "crates/domain/src/lib.rs",
+        "crates/domain/tests/serde_contracts/r2_07_module_paths.rs"
       ],
       "externalCallers": [
         "crates/persistence-postgres/src/monthly_workbooks.rs"
@@ -26914,6 +27402,7 @@
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
+        "crates/domain/src/lib.rs",
         "crates/domain/tests/serde_contracts/module_paths.rs"
       ],
       "externalCallers": [
@@ -27001,6 +27490,7 @@
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
         "crates/domain/src/coach/detail.rs",
+        "crates/domain/src/lib.rs",
         "crates/domain/src/team/detail.rs",
         "crates/domain/tests/serde_contracts/module_paths.rs"
       ],
@@ -27084,6 +27574,7 @@
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
+        "crates/domain/src/lib.rs",
         "crates/domain/src/review/package/contract.rs",
         "crates/domain/tests/serde_contracts/module_paths.rs"
       ],
@@ -27147,6 +27638,7 @@
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
+        "crates/domain/src/lib.rs",
         "crates/domain/tests/serde_contracts/module_paths.rs"
       ],
       "externalCallers": [
@@ -27220,6 +27712,7 @@
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
+        "crates/domain/src/lib.rs",
         "crates/domain/tests/serde_contracts/module_paths.rs"
       ],
       "externalCallers": [
@@ -27274,6 +27767,7 @@
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
+        "crates/domain/src/lib.rs",
         "crates/domain/tests/serde_contracts/module_paths.rs"
       ],
       "externalCallers": [
@@ -27348,6 +27842,7 @@
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
+        "crates/domain/src/lib.rs",
         "crates/domain/tests/serde_contracts/module_paths.rs"
       ],
       "externalCallers": [
@@ -27410,6 +27905,7 @@
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
+        "crates/domain/src/lib.rs",
         "crates/domain/tests/serde_contracts/module_paths.rs"
       ],
       "externalCallers": [
@@ -27516,6 +28012,7 @@
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
+        "crates/domain/src/lib.rs",
         "crates/domain/tests/serde_contracts/module_paths.rs"
       ],
       "externalCallers": [
@@ -27618,6 +28115,7 @@
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
+        "crates/domain/src/lib.rs",
         "crates/domain/src/lineup/preset.rs",
         "crates/domain/tests/serde_contracts/module_paths.rs"
       ],
@@ -27739,6 +28237,7 @@
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
+        "crates/domain/src/lib.rs",
         "crates/domain/src/lineup/preset.rs",
         "crates/domain/tests/serde_contracts/module_paths.rs"
       ],
@@ -27868,6 +28367,7 @@
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
+        "crates/domain/src/lib.rs",
         "crates/domain/src/lineup/preset.rs",
         "crates/domain/tests/serde_contracts/module_paths.rs"
       ],
@@ -27959,6 +28459,7 @@
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
+        "crates/domain/src/lib.rs",
         "crates/domain/src/team/listing.rs",
         "crates/domain/tests/serde_contracts/module_paths.rs"
       ],
@@ -28020,6 +28521,7 @@
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
+        "crates/domain/src/lib.rs",
         "crates/domain/tests/serde_contracts/module_paths.rs"
       ],
       "externalCallers": [
@@ -28108,6 +28610,7 @@
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
+        "crates/domain/src/lib.rs",
         "crates/domain/src/team/listing.rs",
         "crates/domain/tests/serde_contracts/defaults.rs",
         "crates/domain/tests/serde_contracts/module_paths.rs"
@@ -28184,6 +28687,7 @@
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
+        "crates/domain/src/lib.rs",
         "crates/domain/tests/serde_contracts/module_paths.rs"
       ],
       "externalCallers": [
@@ -28286,6 +28790,7 @@
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
+        "crates/domain/src/lib.rs",
         "crates/domain/src/review/aggregate.rs",
         "crates/domain/tests/serde_contracts/r2_06_module_paths.rs"
       ],
@@ -28300,9 +28805,9 @@
       "typeName": "TeamMonthlyCoachPeriodRow",
       "kind": "struct",
       "visibility": "public",
-      "currentPath": "crates/domain/src/monthly_workbook.rs",
-      "currentModule": "football_domain::monthly_workbook",
-      "sourceLine": 98,
+      "currentPath": "crates/domain/src/exchange/monthly/team.rs",
+      "currentModule": "football_domain::team",
+      "sourceLine": 58,
       "derives": [
         "Clone",
         "Debug",
@@ -28371,7 +28876,9 @@
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
-        "crates/domain/src/monthly_workbook.rs"
+        "crates/domain/src/exchange/monthly/team.rs",
+        "crates/domain/src/lib.rs",
+        "crates/domain/tests/serde_contracts/r2_07_module_paths.rs"
       ],
       "externalCallers": [
         "crates/persistence-postgres/src/monthly_workbooks.rs"
@@ -28384,9 +28891,9 @@
       "typeName": "TeamMonthlyCoachRow",
       "kind": "struct",
       "visibility": "public",
-      "currentPath": "crates/domain/src/monthly_workbook.rs",
-      "currentModule": "football_domain::monthly_workbook",
-      "sourceLine": 89,
+      "currentPath": "crates/domain/src/exchange/monthly/team.rs",
+      "currentModule": "football_domain::team",
+      "sourceLine": 49,
       "derives": [
         "Clone",
         "Debug",
@@ -28435,7 +28942,9 @@
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
-        "crates/domain/src/monthly_workbook.rs"
+        "crates/domain/src/exchange/monthly/team.rs",
+        "crates/domain/src/lib.rs",
+        "crates/domain/tests/serde_contracts/r2_07_module_paths.rs"
       ],
       "externalCallers": [
         "crates/persistence-postgres/src/monthly_workbooks.rs"
@@ -28448,9 +28957,9 @@
       "typeName": "TeamMonthlyFormationUsageRow",
       "kind": "struct",
       "visibility": "public",
-      "currentPath": "crates/domain/src/monthly_workbook.rs",
-      "currentModule": "football_domain::monthly_workbook",
-      "sourceLine": 112,
+      "currentPath": "crates/domain/src/exchange/monthly/team.rs",
+      "currentModule": "football_domain::team",
+      "sourceLine": 72,
       "derives": [
         "Clone",
         "Debug",
@@ -28555,7 +29064,9 @@
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
-        "crates/domain/src/monthly_workbook.rs"
+        "crates/domain/src/exchange/monthly/team.rs",
+        "crates/domain/src/lib.rs",
+        "crates/domain/tests/serde_contracts/r2_07_module_paths.rs"
       ],
       "externalCallers": [
         "crates/persistence-postgres/src/monthly_workbooks.rs"
@@ -28568,9 +29079,9 @@
       "typeName": "TeamMonthlyNameRow",
       "kind": "struct",
       "visibility": "public",
-      "currentPath": "crates/domain/src/monthly_workbook.rs",
-      "currentModule": "football_domain::monthly_workbook",
-      "sourceLine": 78,
+      "currentPath": "crates/domain/src/exchange/monthly/team.rs",
+      "currentModule": "football_domain::team",
+      "sourceLine": 38,
       "derives": [
         "Clone",
         "Debug",
@@ -28627,7 +29138,9 @@
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
-        "crates/domain/src/monthly_workbook.rs"
+        "crates/domain/src/exchange/monthly/team.rs",
+        "crates/domain/src/lib.rs",
+        "crates/domain/tests/serde_contracts/r2_07_module_paths.rs"
       ],
       "externalCallers": [
         "crates/persistence-postgres/src/monthly_workbooks.rs"
@@ -28640,9 +29153,9 @@
       "typeName": "TeamMonthlyTeamRow",
       "kind": "struct",
       "visibility": "public",
-      "currentPath": "crates/domain/src/monthly_workbook.rs",
-      "currentModule": "football_domain::monthly_workbook",
-      "sourceLine": 61,
+      "currentPath": "crates/domain/src/exchange/monthly/team.rs",
+      "currentModule": "football_domain::team",
+      "sourceLine": 21,
       "derives": [
         "Clone",
         "Debug",
@@ -28723,7 +29236,9 @@
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
-        "crates/domain/src/monthly_workbook.rs"
+        "crates/domain/src/exchange/monthly/team.rs",
+        "crates/domain/src/lib.rs",
+        "crates/domain/tests/serde_contracts/r2_07_module_paths.rs"
       ],
       "externalCallers": [
         "crates/persistence-postgres/src/monthly_workbooks.rs"
@@ -28736,9 +29251,9 @@
       "typeName": "TeamMonthlyWorkbookData",
       "kind": "struct",
       "visibility": "public",
-      "currentPath": "crates/domain/src/monthly_workbook.rs",
-      "currentModule": "football_domain::monthly_workbook",
-      "sourceLine": 49,
+      "currentPath": "crates/domain/src/exchange/monthly/team.rs",
+      "currentModule": "football_domain::team",
+      "sourceLine": 9,
       "derives": [
         "Clone",
         "Debug",
@@ -28799,7 +29314,10 @@
       "currentRootExport": "glob_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
-      "domainCallers": [],
+      "domainCallers": [
+        "crates/domain/src/lib.rs",
+        "crates/domain/tests/serde_contracts/r2_07_module_paths.rs"
+      ],
       "externalCallers": [
         "crates/persistence-postgres/src/monthly_workbooks.rs",
         "crates/spreadsheet-io/src/monthly_workbook.rs"
@@ -28869,6 +29387,7 @@
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
+        "crates/domain/src/lib.rs",
         "crates/domain/tests/serde_contracts/module_paths.rs"
       ],
       "externalCallers": [
@@ -28944,6 +29463,7 @@
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
+        "crates/domain/src/lib.rs",
         "crates/domain/src/team/detail.rs",
         "crates/domain/tests/serde_contracts/module_paths.rs"
       ],
@@ -29009,7 +29529,8 @@
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
-        "crates/domain/src/exchange.rs",
+        "crates/domain/src/exchange/lineup.rs",
+        "crates/domain/src/lib.rs",
         "crates/domain/src/player/catalog.rs",
         "crates/domain/tests/serde_contracts/module_paths.rs"
       ],
@@ -29026,9 +29547,9 @@
       "typeName": "TeamPackageCommitRequest",
       "kind": "struct",
       "visibility": "public",
-      "currentPath": "crates/domain/src/team_package.rs",
-      "currentModule": "football_domain::team_package",
-      "sourceLine": 50,
+      "currentPath": "crates/domain/src/exchange/team_package/import.rs",
+      "currentModule": "football_domain::import",
+      "sourceLine": 34,
       "derives": [
         "Clone",
         "Debug",
@@ -29068,7 +29589,10 @@
       "currentRootExport": "glob_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "none_detected",
-      "domainCallers": [],
+      "domainCallers": [
+        "crates/domain/src/lib.rs",
+        "crates/domain/tests/serde_contracts/r2_07_module_paths.rs"
+      ],
       "externalCallers": [
         "crates/application/src/spreadsheet.rs",
         "src-tauri/src/commands/exchange.rs"
@@ -29079,9 +29603,9 @@
       "typeName": "TeamPackageCommitResult",
       "kind": "struct",
       "visibility": "public",
-      "currentPath": "crates/domain/src/team_package.rs",
-      "currentModule": "football_domain::team_package",
-      "sourceLine": 58,
+      "currentPath": "crates/domain/src/exchange/team_package/import.rs",
+      "currentModule": "football_domain::import",
+      "sourceLine": 42,
       "derives": [
         "Clone",
         "Debug",
@@ -29137,7 +29661,10 @@
       "currentRootExport": "glob_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "none_detected",
-      "domainCallers": [],
+      "domainCallers": [
+        "crates/domain/src/lib.rs",
+        "crates/domain/tests/serde_contracts/r2_07_module_paths.rs"
+      ],
       "externalCallers": [
         "crates/application/src/spreadsheet.rs",
         "src-tauri/src/commands/exchange.rs"
@@ -29148,9 +29675,9 @@
       "typeName": "TeamPackageCoverage",
       "kind": "struct",
       "visibility": "public",
-      "currentPath": "crates/domain/src/team_package.rs",
-      "currentModule": "football_domain::team_package",
-      "sourceLine": 23,
+      "currentPath": "crates/domain/src/exchange/team_package/import.rs",
+      "currentModule": "football_domain::import",
+      "sourceLine": 7,
       "derives": [
         "Clone",
         "Debug",
@@ -29234,7 +29761,9 @@
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "none_detected",
       "domainCallers": [
-        "crates/domain/src/team_package.rs"
+        "crates/domain/src/exchange/team_package/import.rs",
+        "crates/domain/src/lib.rs",
+        "crates/domain/tests/serde_contracts/r2_07_module_paths.rs"
       ],
       "externalCallers": [
         "crates/application/src/spreadsheet.rs"
@@ -29245,9 +29774,9 @@
       "typeName": "TeamPackageExportSummary",
       "kind": "struct",
       "visibility": "public",
-      "currentPath": "crates/domain/src/team_package.rs",
-      "currentModule": "football_domain::team_package",
-      "sourceLine": 9,
+      "currentPath": "crates/domain/src/exchange/team_package/export.rs",
+      "currentModule": "football_domain::export",
+      "sourceLine": 7,
       "derives": [
         "Clone",
         "Debug",
@@ -29287,7 +29816,10 @@
       "currentRootExport": "glob_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "none_detected",
-      "domainCallers": [],
+      "domainCallers": [
+        "crates/domain/src/lib.rs",
+        "crates/domain/tests/serde_contracts/r2_07_module_paths.rs"
+      ],
       "externalCallers": [
         "crates/application/src/spreadsheet.rs",
         "src-tauri/src/commands/exchange.rs"
@@ -29298,9 +29830,9 @@
       "typeName": "TeamPackageImportPreview",
       "kind": "struct",
       "visibility": "public",
-      "currentPath": "crates/domain/src/team_package.rs",
-      "currentModule": "football_domain::team_package",
-      "sourceLine": 41,
+      "currentPath": "crates/domain/src/exchange/team_package/import.rs",
+      "currentModule": "football_domain::import",
+      "sourceLine": 25,
       "derives": [
         "Clone",
         "Debug",
@@ -29348,7 +29880,10 @@
       "currentRootExport": "glob_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "none_detected",
-      "domainCallers": [],
+      "domainCallers": [
+        "crates/domain/src/lib.rs",
+        "crates/domain/tests/serde_contracts/r2_07_module_paths.rs"
+      ],
       "externalCallers": [
         "crates/application/src/spreadsheet.rs",
         "src-tauri/src/commands/exchange.rs"
@@ -29359,9 +29894,9 @@
       "typeName": "TeamPackagePreviewExportSummary",
       "kind": "struct",
       "visibility": "public",
-      "currentPath": "crates/domain/src/team_package.rs",
-      "currentModule": "football_domain::team_package",
-      "sourceLine": 16,
+      "currentPath": "crates/domain/src/exchange/team_package/export.rs",
+      "currentModule": "football_domain::export",
+      "sourceLine": 14,
       "derives": [
         "Clone",
         "Debug",
@@ -29401,7 +29936,10 @@
       "currentRootExport": "glob_reexport",
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "none_detected",
-      "domainCallers": [],
+      "domainCallers": [
+        "crates/domain/src/lib.rs",
+        "crates/domain/tests/serde_contracts/r2_07_module_paths.rs"
+      ],
       "externalCallers": [
         "crates/application/src/spreadsheet.rs",
         "src-tauri/src/commands/exchange.rs"
@@ -29487,6 +30025,7 @@
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
+        "crates/domain/src/lib.rs",
         "crates/domain/src/team/detail.rs",
         "crates/domain/tests/serde_contracts/module_paths.rs"
       ],
@@ -29628,6 +30167,7 @@
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
+        "crates/domain/src/lib.rs",
         "crates/domain/tests/serde_contracts/module_paths.rs"
       ],
       "externalCallers": [
@@ -29747,6 +30287,7 @@
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
+        "crates/domain/src/lib.rs",
         "crates/domain/src/team/detail.rs",
         "crates/domain/tests/serde_contracts/module_paths.rs"
       ],
@@ -29826,6 +30367,7 @@
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
+        "crates/domain/src/lib.rs",
         "crates/domain/src/team/detail.rs",
         "crates/domain/tests/serde_contracts/module_paths.rs"
       ],
@@ -29895,6 +30437,7 @@
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
+        "crates/domain/src/lib.rs",
         "crates/domain/src/team/detail.rs",
         "crates/domain/tests/serde_contracts/module_paths.rs"
       ],
@@ -29983,6 +30526,7 @@
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
+        "crates/domain/src/lib.rs",
         "crates/domain/src/team/detail.rs",
         "crates/domain/tests/serde_contracts/module_paths.rs"
       ],
@@ -29997,9 +30541,9 @@
       "typeName": "TeamTacticalObservationRow",
       "kind": "struct",
       "visibility": "public",
-      "currentPath": "crates/domain/src/monthly_workbook.rs",
-      "currentModule": "football_domain::monthly_workbook",
-      "sourceLine": 135,
+      "currentPath": "crates/domain/src/exchange/monthly/team.rs",
+      "currentModule": "football_domain::team",
+      "sourceLine": 95,
       "derives": [
         "Clone",
         "Debug",
@@ -30096,7 +30640,9 @@
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
-        "crates/domain/src/monthly_workbook.rs"
+        "crates/domain/src/exchange/monthly/team.rs",
+        "crates/domain/src/lib.rs",
+        "crates/domain/tests/serde_contracts/r2_07_module_paths.rs"
       ],
       "externalCallers": [
         "crates/persistence-postgres/src/monthly_workbooks.rs"
@@ -30204,6 +30750,7 @@
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
+        "crates/domain/src/lib.rs",
         "crates/domain/tests/serde_contracts/module_paths.rs"
       ],
       "externalCallers": [
@@ -30265,6 +30812,7 @@
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
+        "crates/domain/src/lib.rs",
         "crates/domain/tests/serde_contracts/module_paths.rs"
       ],
       "externalCallers": [
@@ -30344,6 +30892,7 @@
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
+        "crates/domain/src/lib.rs",
         "crates/domain/src/research/time_audit.rs",
         "crates/domain/tests/serde_contracts/module_paths.rs"
       ],
@@ -30430,6 +30979,7 @@
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
+        "crates/domain/src/lib.rs",
         "crates/domain/tests/serde_contracts/module_paths.rs"
       ],
       "externalCallers": [
@@ -30501,6 +31051,7 @@
       "targetRootExport": "explicit_reexport",
       "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
+        "crates/domain/src/lib.rs",
         "crates/domain/tests/serde_contracts/module_paths.rs"
       ],
       "externalCallers": [
