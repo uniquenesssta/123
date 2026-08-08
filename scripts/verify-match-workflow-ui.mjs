@@ -1,6 +1,16 @@
 import fs from "node:fs";
 
 const read = (path) => fs.readFileSync(new URL(`../${path}`, import.meta.url), "utf8");
+const readRustTree = (directory) => {
+  const visit = (directoryUrl) => fs.readdirSync(directoryUrl, { withFileTypes: true })
+    .map((entry) => {
+      const entryUrl = new URL(`${entry.name}${entry.isDirectory() ? "/" : ""}`, directoryUrl);
+      if (entry.isDirectory()) return visit(entryUrl);
+      return entry.name.endsWith(".rs") ? fs.readFileSync(entryUrl, "utf8") : "";
+    })
+    .join("\n");
+  return visit(new URL(`../${directory}/`, import.meta.url));
+};
 const requireTrue = (condition, message) => {
   if (!condition) throw new Error(message);
 };
@@ -17,7 +27,7 @@ const application = read("crates/application/src/services/lineups/facade.rs");
 const command = read("src-tauri/src/commands/catalog.rs");
 const registry = read("src-tauri/src/bootstrap/command_registry.rs");
 const prediction = read("src/pages/prediction.ts");
-const predictionApplication = read("crates/application/src/prediction.rs");
+const predictionApplication = readRustTree("crates/application/src/services/prediction") + readRustTree("crates/application/src/use_cases/prediction");
 const integrationTests = read("crates/persistence-postgres/tests/postgres_integration.rs");
 
 requireTrue(types.includes("interface LineupPairDraft") && domain.includes("struct LineupPairDraft"), "双方阵容原子提交契约缺失");
