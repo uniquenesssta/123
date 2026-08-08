@@ -1,40 +1,45 @@
 # R02-08 Domain 根出口收敛实施记录
 
-- 任务状态：`IN_PROGRESS`
+- 任务状态：`VERIFYING`
 - 前置门禁：R2-07 已由用户确认关闭为 `DONE`
 - R2-08 开始基线：`4f93297049d773985dbdf0f077a68fc003d6b7d6`
+- 当前实现树：`4ef8d8ecc90bac4c39da7449de7ed2fa6de2fa5a`
 - 目标平台：Windows
-- 目标文件：`crates/domain/src/lib.rs`
+- 主要目标文件：`crates/domain/src/lib.rs`
 
 ## 1. 目标
 
 将 Domain 根文件收敛为唯一公共组合出口：只声明业务模块并显式 re-export 已登记公共兼容类型；删除根文件中的默认值实现和 glob 根出口，同时保持 `football_domain::TypeName` 公共路径兼容。
 
-## 2. 当前基线
+## 2. 实际实施
 
-- `crates/domain/src/lib.rs` 当前声明 17 个业务模块。
-- 根文件仍使用 17 条 `pub use <module>::*;` glob re-export。
-- 根文件仍直接定义 `default_true`、`default_team_page_limit`、`default_confidence` 三个私有默认值函数。
-- `architecture/domain-type-inventory.json` 登记 365 个公共兼容类型，目标公共出口策略为 `explicit re-export only`。
+- `crates/domain/src/lib.rs` 保留 17 个业务模块公开声明。
+- 原 17 条 `pub use <module>::*;` 根级 glob re-export 已全部替换为按业务模块分组的显式 `pub use module::{Type...};`。
+- 365 个 `publicCompatibilityType` 全部继续保留 `football_domain::TypeName` 根级公共路径。
+- `default_true`、`default_team_page_limit`、`default_confidence` 三个私有默认值实现已迁入 `shared/defaults.rs`；根文件只保留 crate 内显式兼容 re-export，不承载实现。
+- 新增 `scripts/domain-inventory/root-export-policy.mjs`，从 Domain 类型清单确定唯一模块归属和显式出口集合。
+- 新增 `scripts/generate-domain-root-exports.mjs`，可确定性生成根出口。
+- 新增 `scripts/verify-domain-root-exports.mjs`，拒绝根级 glob re-export、根文件领域定义/实现、未知模块、重复类型、遗漏类型和与清单不一致的显式出口。
+- `npm run verify:architecture` 已接入根出口静态门禁，并新增 `verify:domain-root-exports` 独立命令。
+- `inventory-document.mjs` 现在从真实 `lib.rs` 推导当前根出口策略，不再永久把历史 glob 债务写死到清单。
 
-## 3. 实施范围
+## 3. 生成与静态验证结果
 
-- 将 365 个公共兼容类型按唯一 `targetModule` 生成显式根级 `pub use module::{...};` 列表。
-- 保持 17 个业务模块公开声明不变。
-- 将三个根级默认值函数迁入 `shared/defaults.rs`；根文件只保留 crate 内显式兼容 re-export，不继续承载实现。
-- 增加根出口静态门禁：拒绝 `pub use ...::*` 回归，并验证根级显式公共类型集合与 Domain 清单一致。
-- 重新生成 Domain 类型清单，确保 R2-08 后来源文件、调用方和摘要与真实源码树一致。
+- 临时 Windows 生成 run `31235159425` 成功：显式生成 365 个根级公共兼容类型，rustfmt 后重新生成类型清单，`verify-domain-type-inventory` 与 `verify-domain-root-exports` 均通过，并自动删除临时 workflow。
+- 最新 `architecture/domain-type-inventory.json`：365 个类型、365 个公共兼容类型、299 个 PostgreSQL 映射类型、129 个 Domain 来源文件、284 个 Rust 扫描文件。
+- 清单中的 `currentPublicExportPolicy` 与 `targetPublicExportPolicy` 现在均为 `explicit re-export only`。
+- 临时生成/同步 workflow 已从最终源码树删除，不作为长期项目文件。
 
 ## 4. 兼容边界
 
-- 不删除任何已登记公共兼容类型。
-- 不改变根级 `football_domain::TypeName` 路径。
-- 不改变模块语义路径、Serde、数据库映射、DTO、配置、错误语义或日志。
-- 不修改模型实现、模型保护资产、PostgreSQL migration 或生产依赖。
+- 未删除任何已登记公共兼容类型。
+- 未改变根级 `football_domain::TypeName` 路径。
+- 未改变模块语义路径、Serde、数据库映射、DTO、配置、错误语义或日志。
+- 未修改模型实现、模型保护资产、PostgreSQL migration 或生产依赖。
 
 ## 5. 当前验证状态
 
-尚未进入最小验证。完成源码切换后由 Windows 本机依次执行格式、Serde、类型清单、架构、protected assets、frontend、Rust 与 Tauri smoke；任一硬门禁失败即保持本任务未完成。
+源码切换和确定性静态门禁已经完成，当前进入 Windows 本机最小验证。仍需执行格式、根出口门禁、Serde、类型清单和架构验证；通过后再运行 protected assets、完整 frontend、完整 Rust 与 Tauri smoke。任一硬门禁失败即保持 `VERIFYING`。
 
 ## 6. 完成标准
 
