@@ -26,7 +26,9 @@ jobs:
           components: rustfmt
       - name: Generate phase 1 modules
         shell: pwsh
-        run: python scripts/r3-06-phase1.py
+        run: |
+          python scripts/r3-06-phase1.py
+          Add-Content -Path crates/application/src/composition/mod.rs -Value "`npub(crate) use adapters::prediction::model_run_list_item_from_port;"
       - name: Format and refresh inventory
         shell: pwsh
         run: |
