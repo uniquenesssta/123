@@ -2,7 +2,7 @@ use super::AppState;
 use crate::config::DesktopConfig;
 use crate::issue_log::IssueLogDraft;
 use football_application::BootstrapData;
-use football_persistence_postgres::{DatabaseHealth, DatabaseOptions, PostgresStore};
+use football_persistence_postgres::{DatabaseHealth, DatabaseOptions};
 use serde::Serialize;
 use tauri::State;
 
@@ -141,19 +141,11 @@ pub async fn reset_database(
         .database
         .ok_or_else(|| "尚未保存数据库连接，无法执行彻底清空".to_string())?;
 
-    let verification_store = PostgresStore::connect(&options)
+    let current_health = state
+        .service
+        .preflight_database_reset(&options, &confirmation)
         .await
         .map_err(|error| error.to_string())?;
-    let current_health_result = verification_store.health().await;
-    verification_store.close().await;
-    let current_health = current_health_result.map_err(|error| error.to_string())?;
-
-    if confirmation.trim() != current_health.database_name {
-        return Err(format!(
-            "确认名称不匹配。请输入当前数据库名称：{}",
-            current_health.database_name
-        ));
-    }
 
     let _ = state.runtime_log.record(
         "warning",
@@ -163,55 +155,27 @@ pub async fn reset_database(
         serde_json::json!({"database_name": current_health.database_name.as_str()}),
     );
 
-    state.service.disconnect_database().await;
-    let reset_store = match PostgresStore::connect(&options).await {
-        Ok(store) => store,
-        Err(error) => {
-            let message = error.to_string();
-            let _ = state.service.connect_database(options).await;
-            return Err(message);
-        }
-    };
-
-    let configured_health = match reset_store.health().await {
-        Ok(health) => health,
-        Err(error) => {
-            let message = error.to_string();
-            reset_store.close().await;
-            let _ = state.service.connect_database(options).await;
-            return Err(message);
-        }
-    };
-    if configured_health.database_name != current_health.database_name {
-        reset_store.close().await;
-        let _ = state.service.connect_database(options).await;
-        return Err("保存的连接配置与当前数据库不一致，已拒绝清空".to_string());
-    }
-
-    if let Err(error) = reset_store.reset_to_pristine().await {
-        let message = error.to_string();
-        let _ = reset_store.migrate().await;
-        reset_store.close().await;
-        let _ = state.service.connect_database(options.clone()).await;
-        let _ = state.runtime_log.record(
-            "critical",
-            "database",
-            "destructive_reset_failed",
-            None,
-            serde_json::json!({
-                "database_name": current_health.database_name.as_str(),
-                "error": message.as_str(),
-            }),
-        );
-        return Err(format!("彻底清空数据库失败：{message}"));
-    }
-    reset_store.close().await;
-
     let health = state
         .service
-        .connect_database(options)
+        .reset_database(options, confirmation)
         .await
-        .map_err(|error| error.to_string())?;
+        .map_err(|error| {
+            let message = error.to_string();
+            if message.starts_with("彻底清空数据库失败：") {
+                let _ = state.runtime_log.record(
+                    "critical",
+                    "database",
+                    "destructive_reset_failed",
+                    None,
+                    serde_json::json!({
+                        "database_name": current_health.database_name.as_str(),
+                        "error": message.as_str(),
+                    }),
+                );
+            }
+            message
+        })?;
+
     tokio::task::yield_now().await;
     state.service.ensure_p4_orchestration_worker();
     let _ = state.runtime_log.record(
