@@ -34,9 +34,9 @@ jobs:
         run: |
           node scripts/generate-domain-root-exports.mjs
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
-          node scripts/generate-domain-type-inventory.mjs
-          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
           cargo fmt --all
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          node scripts/generate-domain-type-inventory.mjs
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
           node scripts/verify-domain-type-inventory.mjs
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
