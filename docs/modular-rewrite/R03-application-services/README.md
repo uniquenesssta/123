@@ -21,8 +21,8 @@ R2 已完成并关闭。R3 只重写 Application 编排与 Ports/Services/Use Ca
 | R3-02 | Database Service | DONE |
 | R3-03 | Competition / Rules Services | DONE |
 | R3-04 | Teams / Players Services | VERIFYING |
-| R3-05 | Lineups Service | VERIFYING |
-| R3-06 | Prediction Service | BLOCKED |
+| R3-05 | Lineups Service | DONE |
+| R3-06 | Prediction Service | READY |
 | R3-07 | Research Service | BLOCKED |
 | R3-08 | Review / Postmatch / Analytics Services | BLOCKED |
 | R3-09 | Exchange / AI / Release Services | BLOCKED |
@@ -76,7 +76,7 @@ R3-02 已正式关闭为 `DONE`。详细记录见 [`R03-02-database-service.md`]
 
 详细记录见 [`R03-04-teams-players-services.md`](./R03-04-teams-players-services.md)。
 
-## R3-05 当前结果
+## R3-05 完成结果
 
 - 已删除旧 `crates/application/src/player_catalog.rs`，其剩余 19 个阵型、比赛、阵容、阵容预设公开 Application 职责全部迁入 `services/lineups/` 与对应 `use_cases/lineups/`；共 23 个 Lineups Service / Use Case Rust 文件。
 - `ApplicationService` / `ApplicationComposition` 已聚合唯一 `LineupService`；19 个既有公开方法名、参数、返回类型、Tauri 调用链与错误语义保持兼容。
@@ -84,6 +84,8 @@ R3-02 已正式关闭为 `DONE`。详细记录见 [`R03-02-database-service.md`]
 - 完整 Rust 编译暴露 `MatchCatalogPort::read_match` 需要调用 persistence crate 既有 `read_match_exchange`，现仅将该方法从 `pub(crate)` 提升为 `pub async fn` 以形成合法 workspace 边界；方法体、SQL、参数、返回结构和数据库行为未改。
 - 删除旧 Application owner 后确认受影响的 5 个历史验证器已改读当前权威 Teams / Players / Lineups owner，业务断言未删除或放宽；Domain inventory 已按最终源码重算，架构扫描覆盖 400 个 Rust 文件。
 - clean 实施提交 `7e3fddeafcd32cc45e293fa9a7aeb05c7c66d4ec` 的 Public Platform CI run `31260698438` / job `93110942400` 已通过 architecture 与完整 Windows Automated：frontend、17 个截图回归视口、TypeScript、Vite、完整 Rust/Clippy/workspace tests、Tauri release 构建及 release 启动日志扫描均通过。artifact `9022970030`，大小 `14242839` 字节，SHA-256 `275e17a78db9d5205d49401a1a1d20ed91f08102594d2d04c339051165beb052`。
-- R3-05 当前为 `VERIFYING`，等待用户 Windows 本机最小复核与非破坏性 runtime 烟测；R3-06 Prediction Service 继续 `BLOCKED`。
+- 用户 Windows 本机在最终分支 HEAD 上通过 clean 工作区、rustfmt、R3-05 专项、完整 architecture、Application check/tests 33/33、完整 `verify:frontend`、完整 `verify:rust` 与 `tauri:dev`。workspace tests 无失败；18 个需要专用 `FOOTBALL_TEST_DATABASE_URL` 的 PostgreSQL 集成测试按安全设计保持 `ignored`，未记为已执行。
+- 本机 runtime JSONL 共 280 条：274 条 `info`、6 条 `error`。其中 2 条为阵容预设名称为空、1 条为未选择球员的预期输入校验；另外 3 条为公开源码未分发 P4 模型运行时的预期失败。`bootstrap.connection_error=null`；两次预设保存成功，多次预设应用预检均 `can_apply=true`，`create_lineup_pair` 成功后 `list_lineups` 从 0 条变为 2 条，`read_match_lineup_chain` 从双方阵容缺失转为 `blocking_issues=[]`、`ready_for_model=true`。未发现 Lineups 持久化、SQL、migration、panic、连接或兼容性错误。
+- R3-05 已正式关闭为 `DONE`；R3-06 Prediction Service 开放为 `READY`。
 
 详细记录见 [`R03-05-lineups-service.md`](./R03-05-lineups-service.md)。
