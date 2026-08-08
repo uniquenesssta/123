@@ -52,11 +52,9 @@ text = re.sub(
     text,
 )
 text = text.replace("let store = self.active_store().await?;", "let store = port;")
-text = text.replace(
-    "use super::shared::routing::{",
-    "use super::shared::routing::{normalize_model_selection,",
-    1,
-)
+normalize_import = "use super::shared::routing::normalize_model_selection;\n"
+if normalize_import not in text:
+    text = normalize_import + text
 if "self." in text:
     raise RuntimeError("stored-match use case still contains ApplicationService self access")
 write(rel, text)
@@ -134,24 +132,24 @@ rel = "crates/application/src/use_cases/prediction/shared/routing.rs"
 text = read(rel).replace("use uuid::Uuid;\n", "")
 write(rel, text)
 
-# The adapter stays private to composition, but its conversion helper is re-exported by adapters.
+# Export the adapter conversion through the composition root using two explicit crate-private hops.
 rel = "crates/application/src/composition/adapters/mod.rs"
 text = read(rel)
-if "pub(crate) use prediction::model_run_list_item_from_port;" not in text:
-    text = text.rstrip() + "\n\npub(crate) use prediction::model_run_list_item_from_port;\n"
+adapter_export = "pub(crate) use prediction::model_run_list_item_from_port;"
+if adapter_export not in text:
+    text = text.rstrip() + "\n\n" + adapter_export + "\n"
 write(rel, text)
 
 rel = "crates/application/src/composition/mod.rs"
 text = read(rel)
-text = text.replace(
-    "pub(crate) use adapters::prediction::model_run_list_item_from_port;",
-    "pub(crate) use adapters::model_run_list_item_from_port;",
-)
+composition_export = "pub(crate) use adapters::model_run_list_item_from_port;"
+if composition_export not in text:
+    text = text.rstrip() + "\n\n" + composition_export + "\n"
 write(rel, text)
 
-# Avoid a formatting-only leading blank line in the extracted unit-test owner.
+# Extracted unit tests must have no pre-module leading blank/indentation.
 rel = "crates/application/src/use_cases/prediction/tests.rs"
-text = read(rel).lstrip("\r\n")
+text = read(rel).lstrip()
 write(rel, text)
 
 print("R3-06 phase 1 deterministic fixes applied")
