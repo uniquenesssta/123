@@ -668,10 +668,7 @@ impl PostgresStore {
         Ok(lineups)
     }
 
-    pub(crate) async fn read_match_exchange(
-        &self,
-        match_id: Uuid,
-    ) -> PersistenceResult<MatchRecord> {
+    pub async fn read_match_exchange(&self, match_id: Uuid) -> PersistenceResult<MatchRecord> {
         let row = sqlx::query(
             r#"SELECT match.id,match.external_key,match.competition_id,competition.name AS competition_name,
                       match.season_id,match.stage_id,match.round_id,match.home_team_id,
