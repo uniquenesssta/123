@@ -1,7 +1,5 @@
 use super::identifiers::compact_key_part;
-use crate::{
-    ports::competition::CompetitionHierarchyPort, ApplicationError, ApplicationResult,
-};
+use crate::{ports::competition::CompetitionHierarchyPort, ApplicationError, ApplicationResult};
 use football_domain::{CompetitionKind, StageDraft, StageRecord};
 
 pub(crate) async fn execute<P>(port: &P, mut draft: StageDraft) -> ApplicationResult<StageRecord>

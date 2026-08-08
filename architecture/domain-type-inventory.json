@@ -24,13 +24,13 @@
     "targetPublicExportPolicy": "explicit re-export only"
   },
   "sourceDigest": "217241ac243726a5ab6805a7f169e222b97e78c7c971749a5904714af673ebdd",
-  "rustUsageDigest": "9c33917445e430b0b21eb28be76923046cd6d3a104e6b051402beb998e2998a6",
+  "rustUsageDigest": "b327f5af6b52a6a0d9f9223781e6060971a4f3cc021c1f1073d9540fbc56c367",
   "summary": {
     "typeCount": 365,
     "publicCompatibilityTypeCount": 365,
     "internalTypeCount": 0,
     "domainSourceFileCount": 129,
-    "scannedRustFileCount": 312,
+    "scannedRustFileCount": 331,
     "databaseMappedTypeCount": 299,
     "byTargetModule": {
       "ai_workspace": 16,
@@ -4383,8 +4383,11 @@
         "crates/domain/tests/serde_contracts/module_paths.rs"
       ],
       "externalCallers": [
+        "crates/application/src/composition/port_registry.rs",
         "crates/application/src/ports/rules/mod.rs",
-        "crates/application/src/rule_packages.rs",
+        "crates/application/src/services/rules/facade.rs",
+        "crates/application/src/services/rules/service.rs",
+        "crates/application/src/use_cases/rules/create_binding/mod.rs",
         "crates/persistence-postgres/src/routing.rs",
         "src-tauri/src/commands/competition.rs"
       ],
@@ -4484,9 +4487,13 @@
         "crates/domain/tests/serde_contracts/module_paths.rs"
       ],
       "externalCallers": [
+        "crates/application/src/composition/port_registry.rs",
         "crates/application/src/lib.rs",
         "crates/application/src/ports/rules/mod.rs",
-        "crates/application/src/rule_packages.rs",
+        "crates/application/src/services/rules/facade.rs",
+        "crates/application/src/services/rules/service.rs",
+        "crates/application/src/use_cases/rules/create_binding/mod.rs",
+        "crates/application/src/use_cases/rules/load_catalog/mod.rs",
         "crates/persistence-postgres/src/routing.rs",
         "src-tauri/src/commands/competition.rs"
       ],
@@ -4565,8 +4572,11 @@
         "crates/domain/tests/serde_contracts/module_paths.rs"
       ],
       "externalCallers": [
-        "crates/application/src/competition.rs",
+        "crates/application/src/composition/port_registry.rs",
         "crates/application/src/ports/competition/mod.rs",
+        "crates/application/src/services/competition/facade.rs",
+        "crates/application/src/services/competition/service.rs",
+        "crates/application/src/use_cases/competition/create_competition/mod.rs",
         "crates/persistence-postgres/src/competitions.rs",
         "crates/persistence-postgres/tests/postgres_integration.rs",
         "src-tauri/src/commands/competition.rs"
@@ -4660,11 +4670,13 @@
       ],
       "externalCallers": [
         "crates/application/src/analytics.rs",
-        "crates/application/src/competition.rs",
+        "crates/application/src/composition/port_registry.rs",
         "crates/application/src/lib.rs",
         "crates/application/src/ports/rules/mod.rs",
         "crates/application/src/prediction.rs",
-        "crates/application/src/rule_packages.rs",
+        "crates/application/src/use_cases/competition/create_competition/mod.rs",
+        "crates/application/src/use_cases/competition/create_stage/mod.rs",
+        "crates/application/src/use_cases/rules/package_factory/mod.rs",
         "crates/model-api/src/lib.rs",
         "crates/model-stub/src/lib.rs",
         "crates/persistence-postgres/src/competitions.rs",
@@ -4770,7 +4782,7 @@
         "crates/domain/tests/serde_contracts/module_paths.rs"
       ],
       "externalCallers": [
-        "crates/application/src/rule_packages.rs",
+        "crates/application/src/use_cases/rules/package_factory/mod.rs",
         "crates/persistence-postgres/src/routing.rs",
         "crates/persistence-postgres/tests/postgres_integration.rs"
       ],
@@ -4998,9 +5010,13 @@
         "crates/domain/tests/serde_contracts/module_paths.rs"
       ],
       "externalCallers": [
-        "crates/application/src/competition.rs",
+        "crates/application/src/composition/port_registry.rs",
         "crates/application/src/lib.rs",
         "crates/application/src/ports/competition/mod.rs",
+        "crates/application/src/services/competition/facade.rs",
+        "crates/application/src/services/competition/service.rs",
+        "crates/application/src/use_cases/competition/create_competition/mod.rs",
+        "crates/application/src/use_cases/competition/load_hierarchy/mod.rs",
         "crates/persistence-postgres/src/competitions.rs",
         "src-tauri/src/commands/competition.rs"
       ],
@@ -23453,8 +23469,12 @@
         "crates/domain/tests/serde_contracts/module_paths.rs"
       ],
       "externalCallers": [
-        "crates/application/src/competition.rs",
+        "crates/application/src/composition/port_registry.rs",
         "crates/application/src/ports/competition/mod.rs",
+        "crates/application/src/services/competition/facade.rs",
+        "crates/application/src/services/competition/service.rs",
+        "crates/application/src/use_cases/competition/create_competition/mod.rs",
+        "crates/application/src/use_cases/competition/create_round/mod.rs",
         "crates/persistence-postgres/src/competitions.rs",
         "src-tauri/src/commands/competition.rs"
       ],
@@ -23534,9 +23554,14 @@
         "crates/domain/tests/serde_contracts/module_paths.rs"
       ],
       "externalCallers": [
-        "crates/application/src/competition.rs",
+        "crates/application/src/composition/port_registry.rs",
         "crates/application/src/lib.rs",
         "crates/application/src/ports/competition/mod.rs",
+        "crates/application/src/services/competition/facade.rs",
+        "crates/application/src/services/competition/service.rs",
+        "crates/application/src/use_cases/competition/create_competition/mod.rs",
+        "crates/application/src/use_cases/competition/create_round/mod.rs",
+        "crates/application/src/use_cases/competition/load_hierarchy/mod.rs",
         "crates/persistence-postgres/src/competitions.rs",
         "src-tauri/src/commands/competition.rs"
       ],
@@ -23660,6 +23685,7 @@
         "crates/domain/tests/serde_contracts/module_paths.rs"
       ],
       "externalCallers": [
+        "crates/application/src/composition/port_registry.rs",
         "crates/application/src/lib.rs",
         "crates/application/src/p4_orchestration.rs",
         "crates/application/src/ports/prediction/mod.rs",
@@ -23758,6 +23784,7 @@
         "crates/domain/tests/serde_contracts/module_paths.rs"
       ],
       "externalCallers": [
+        "crates/application/src/composition/port_registry.rs",
         "crates/application/src/p4_orchestration.rs",
         "crates/application/src/ports/rules/mod.rs",
         "crates/application/src/prediction.rs",
@@ -23932,9 +23959,14 @@
         "crates/domain/tests/serde_contracts/round_trip.rs"
       ],
       "externalCallers": [
+        "crates/application/src/composition/port_registry.rs",
         "crates/application/src/lib.rs",
         "crates/application/src/ports/rules/mod.rs",
-        "crates/application/src/rule_packages.rs",
+        "crates/application/src/services/rules/facade.rs",
+        "crates/application/src/services/rules/service.rs",
+        "crates/application/src/use_cases/rules/package_factory/mod.rs",
+        "crates/application/src/use_cases/rules/package_validation/mod.rs",
+        "crates/application/src/use_cases/rules/register_package/mod.rs",
         "crates/persistence-postgres/src/routing.rs",
         "crates/persistence-postgres/tests/postgres_integration.rs",
         "src-tauri/src/commands/competition.rs"
@@ -24035,9 +24067,13 @@
         "crates/domain/tests/serde_contracts/module_paths.rs"
       ],
       "externalCallers": [
+        "crates/application/src/composition/port_registry.rs",
         "crates/application/src/lib.rs",
         "crates/application/src/ports/rules/mod.rs",
-        "crates/application/src/rule_packages.rs",
+        "crates/application/src/services/rules/facade.rs",
+        "crates/application/src/services/rules/service.rs",
+        "crates/application/src/use_cases/rules/load_catalog/mod.rs",
+        "crates/application/src/use_cases/rules/register_package/mod.rs",
         "crates/persistence-postgres/src/routing.rs",
         "src-tauri/src/commands/competition.rs"
       ],
@@ -24118,7 +24154,7 @@
       ],
       "externalCallers": [
         "crates/application/src/prediction.rs",
-        "crates/application/src/rule_packages.rs",
+        "crates/application/src/use_cases/rules/package_factory/mod.rs",
         "crates/persistence-postgres/tests/postgres_integration.rs"
       ],
       "databaseMappings": []
@@ -24415,8 +24451,12 @@
         "crates/domain/tests/serde_contracts/module_paths.rs"
       ],
       "externalCallers": [
-        "crates/application/src/competition.rs",
+        "crates/application/src/composition/port_registry.rs",
         "crates/application/src/ports/competition/mod.rs",
+        "crates/application/src/services/competition/facade.rs",
+        "crates/application/src/services/competition/service.rs",
+        "crates/application/src/use_cases/competition/create_competition/mod.rs",
+        "crates/application/src/use_cases/competition/create_season/mod.rs",
         "crates/persistence-postgres/src/competitions.rs",
         "crates/persistence-postgres/tests/postgres_integration.rs",
         "src-tauri/src/commands/competition.rs"
@@ -24493,9 +24533,14 @@
         "crates/domain/tests/serde_contracts/module_paths.rs"
       ],
       "externalCallers": [
-        "crates/application/src/competition.rs",
+        "crates/application/src/composition/port_registry.rs",
         "crates/application/src/lib.rs",
         "crates/application/src/ports/competition/mod.rs",
+        "crates/application/src/services/competition/facade.rs",
+        "crates/application/src/services/competition/service.rs",
+        "crates/application/src/use_cases/competition/create_competition/mod.rs",
+        "crates/application/src/use_cases/competition/create_season/mod.rs",
+        "crates/application/src/use_cases/competition/load_hierarchy/mod.rs",
         "crates/persistence-postgres/src/competitions.rs",
         "src-tauri/src/commands/competition.rs"
       ],
@@ -27080,8 +27125,12 @@
         "crates/domain/tests/serde_contracts/module_paths.rs"
       ],
       "externalCallers": [
-        "crates/application/src/competition.rs",
+        "crates/application/src/composition/port_registry.rs",
         "crates/application/src/ports/competition/mod.rs",
+        "crates/application/src/services/competition/facade.rs",
+        "crates/application/src/services/competition/service.rs",
+        "crates/application/src/use_cases/competition/create_competition/mod.rs",
+        "crates/application/src/use_cases/competition/create_stage/mod.rs",
         "crates/persistence-postgres/src/competitions.rs",
         "src-tauri/src/commands/competition.rs"
       ],
@@ -27165,9 +27214,14 @@
         "crates/domain/tests/serde_contracts/module_paths.rs"
       ],
       "externalCallers": [
-        "crates/application/src/competition.rs",
+        "crates/application/src/composition/port_registry.rs",
         "crates/application/src/lib.rs",
         "crates/application/src/ports/competition/mod.rs",
+        "crates/application/src/services/competition/facade.rs",
+        "crates/application/src/services/competition/service.rs",
+        "crates/application/src/use_cases/competition/create_competition/mod.rs",
+        "crates/application/src/use_cases/competition/create_stage/mod.rs",
+        "crates/application/src/use_cases/competition/load_hierarchy/mod.rs",
         "crates/persistence-postgres/src/competitions.rs",
         "src-tauri/src/commands/competition.rs"
       ],

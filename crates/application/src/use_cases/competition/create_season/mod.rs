@@ -1,6 +1,4 @@
-use crate::{
-    ports::competition::CompetitionHierarchyPort, ApplicationError, ApplicationResult,
-};
+use crate::{ports::competition::CompetitionHierarchyPort, ApplicationError, ApplicationResult};
 use football_domain::{SeasonDraft, SeasonRecord};
 
 pub(crate) async fn execute<P>(port: &P, draft: SeasonDraft) -> ApplicationResult<SeasonRecord>

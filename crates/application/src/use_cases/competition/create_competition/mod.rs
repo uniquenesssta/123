@@ -1,7 +1,5 @@
 use super::identifiers::compact_key_part;
-use crate::{
-    ports::competition::CompetitionHierarchyPort, ApplicationError, ApplicationResult,
-};
+use crate::{ports::competition::CompetitionHierarchyPort, ApplicationError, ApplicationResult};
 use football_domain::{CompetitionDraft, CompetitionRecord};
 use uuid::Uuid;
 
@@ -52,7 +50,10 @@ mod tests {
     struct FakeCompetitionPort;
 
     fn unused<T>() -> PortResult<T> {
-        Err(PortError::new(PortErrorKind::Unavailable, "unused fake port method"))
+        Err(PortError::new(
+            PortErrorKind::Unavailable,
+            "unused fake port method",
+        ))
     }
 
     #[async_trait]
