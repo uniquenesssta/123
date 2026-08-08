@@ -18,8 +18,8 @@ R2 已完成并关闭。R3 只重写 Application 编排与 Ports/Services/Use Ca
 | 任务 | 范围 | 状态 |
 |---|---|---|
 | R3-01 | Application Ports 设计 | DONE |
-| R3-02 | Database Service | VERIFYING |
-| R3-03 | Competition / Rules Services | BLOCKED |
+| R3-02 | Database Service | DONE |
+| R3-03 | Competition / Rules Services | READY |
 | R3-04 | Teams / Players Services | BLOCKED |
 | R3-05 | Lineups Service | BLOCKED |
 | R3-06 | Prediction Service | BLOCKED |
@@ -40,12 +40,14 @@ R2 已完成并关闭。R3 只重写 Application 编排与 Ports/Services/Use Ca
 
 R3-01 已正式关闭为 `DONE`，详细记录见 [`R03-01-application-ports-设计.md`](./R03-01-application-ports-设计.md)。
 
-## R3-02 当前结果
+## R3-02 完成结果
 
 - 已删除旧 `crates/application/src/database.rs`，连接、迁移、恢复、health、statistics、reset 分别进入 `services/database/` 与 `use_cases/database/`，活动数据库状态由 `DatabaseService.session` 唯一持有。
-- Tauri 数据库清空命令已改为委托 Application Database Service；具体 `PostgresStore` 生命周期与观测适配仍只位于 `composition/port_registry.rs`，Service / Use Case 不直接写 SQL 或依赖 SQLx。
-- 第一轮编译暴露并修复两个真实兼容问题：嵌套模块导致 `active_store` crate 内可见范围缩小，以及 interrupted API workspace recovery 的 `u64` 返回值未归一为 `()`；同时删除两个无调用的 crate-private 根别名，没有增加 lint 抑制或降低门禁。
-- 实施侧 Windows run `31244006019` / job `93069490517` 已通过 Database Service 专项、reset 契约、Application Ports、Domain 清单、确定性保护资产、完整 `verify:architecture`、`cargo fmt --check`、`cargo check -p football-application` 和 `cargo test -p football-application`；成功生成实现支持提交 `cd754f79456b96b3e66ac45b119f61609346e06d`，临时 workflow 已删除。
-- Windows 本机最小验证、完整 frontend、workspace Clippy/tests 与 `tauri:dev` 数据库运行时烟测尚未完成，因此 R3-02 保持 `VERIFYING`，R3-03 不开放。
+- Tauri 数据库清空命令只委托 Application Database Service；具体 `PostgresStore` 生命周期与观测适配仍只位于 `composition/port_registry.rs`，Service / Use Case 不直接写 SQL 或依赖 SQLx。
+- 实施期修复了 `active_store` 嵌套模块可见性、恢复数量返回值归一以及 reset 验证器对 rustfmt 链式调用的误判；没有增加 lint 抑制、跳过检查或放宽数据库强确认。
+- 实施侧 Windows run `31244006019` / job `93069490517` 已通过 Database Service 专项、reset 契约、Application Ports、Domain 清单、确定性保护资产、完整 `verify:architecture`、`cargo fmt --check`、Application check/tests。
+- 用户 Windows 本机已通过最小验证、完整 `npm run verify:frontend`、完整 `npm run verify:rust`；Application 单测 30/30 通过，workspace tests 无失败，18 个真实 PostgreSQL 集成测试因未设置专用 `FOOTBALL_TEST_DATABASE_URL` 继续安全保持 `ignored`。
+- `npm run tauri:dev` 运行时烟测成功；上传 runtime JSONL 共 48 条且全部为 `info`，`bootstrap` 的 `connection_error=null`，原数据库上的教练、阵型、球队、阵容、Analytics 与 Postmatch 读取链均完成，没有迁移、连接、panic、error 或 critical。
+- 本次 runtime log 实际写入 `F:\FOODBALL\logs`；从源码目录执行 `Get-ChildItem .\logs` 找不到目录是当前 runtime root discovery 的既有路径行为，不属于 Database Service 回归，本节点未修改运行日志目录策略。
 
-详细记录见 [`R03-02-database-service.md`](./R03-02-database-service.md)。
+R3-02 已正式关闭为 `DONE`，R3-03 Competition / Rules Services 当前为 `READY`。详细记录见 [`R03-02-database-service.md`](./R03-02-database-service.md)。
