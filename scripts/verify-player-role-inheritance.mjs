@@ -31,7 +31,7 @@ requireTokens("crates/domain/src/player/listing.rs", [
 requireTokens("crates/domain/src/lineup/player.rs", [
   "pub role_origin: String",
 ], "阵容领域模型");
-requireTokens("crates/domain/src/exchange.rs", [
+requireTokens("crates/domain/src/exchange/contribution.rs", [
   "pub role_code: Option<String>",
   "pub role_origin: Option<String>",
   "pub role_source_position_code: Option<String>",
@@ -39,8 +39,13 @@ requireTokens("crates/domain/src/exchange.rs", [
   "pub tactical_role_origin: String",
   "pub tactical_role_source_position_code: Option<String>",
   "pub tactical_role_confidence: f64",
+], "交换模型：比赛贡献");
+requireTokens("crates/domain/src/exchange/ai_match.rs", [
+  "pub tactical_role_code: Option<String>",
+  "pub tactical_role_origin: String",
+  "pub tactical_role_source_position_code: Option<String>",
   "pub lineup_status: String",
-], "交换模型");
+], "交换模型：AI 比赛包");
 requireTokens("crates/persistence-postgres/src/role_resolution.rs", [
   "resolve_default_tactical_role_in_tx",
   "resolve_tactical_role",
