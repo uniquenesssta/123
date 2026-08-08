@@ -28,7 +28,7 @@ jobs:
         shell: pwsh
         run: |
           python scripts/r3-06-phase1.py
-          Add-Content -Path crates/application/src/composition/mod.rs -Value "`npub(crate) use adapters::prediction::model_run_list_item_from_port;"
+          python scripts/r3-06-phase1-fix.py
       - name: Format and refresh inventory
         shell: pwsh
         run: |
@@ -50,6 +50,7 @@ jobs:
           git rm .github/workflows/r3-06-scan.yml
           git rm .github/workflows/r3-06-phase1.yml
           git rm scripts/r3-06-phase1.py
+          git rm scripts/r3-06-phase1-fix.py
           git add -A
           git diff --check
           git commit -m "refactor(r3): migrate prediction core service"
