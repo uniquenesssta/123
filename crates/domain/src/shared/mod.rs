@@ -2,6 +2,7 @@ mod ability;
 mod bulk_archive;
 mod bulk_delete;
 mod data_provider;
+pub(crate) mod defaults;
 mod entity_match;
 mod entity_reference;
 mod position;
