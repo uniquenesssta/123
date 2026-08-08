@@ -23,7 +23,10 @@ const teamListingDomain = text("crates/domain/src/team/listing.rs");
 const teamProfileDomain = text("crates/domain/src/team/profile.rs");
 const teamDetailDomain = text("crates/domain/src/team/detail.rs");
 const sharedBulkDeleteDomain = text("crates/domain/src/shared/bulk_delete.rs");
-const appCatalog = text("crates/application/src/player_catalog.rs");
+const appCatalog = [
+  text("crates/application/src/services/teams/facade.rs"),
+  text("crates/application/src/services/players/facade.rs"),
+].join("\n");
 const persistenceCatalog = text("crates/persistence-postgres/src/team_catalog.rs");
 const playerPersistence = text("crates/persistence-postgres/src/player_catalog.rs");
 const spreadsheetPersistence = text("crates/persistence-postgres/src/spreadsheet_exchange.rs");

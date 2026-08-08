@@ -31,7 +31,10 @@ const domain = [
 const persistence = text("crates/persistence-postgres/src/entity_catalog.rs");
 const teamPersistence = text("crates/persistence-postgres/src/team_catalog.rs");
 const playerPersistence = text("crates/persistence-postgres/src/player_catalog.rs");
-const application = text("crates/application/src/player_catalog.rs");
+const application = [
+  text("crates/application/src/services/players/facade.rs"),
+  text("crates/application/src/services/players/service.rs"),
+].join("\n");
 const commands = text("src-tauri/src/commands/catalog.rs");
 const registry = text("src-tauri/src/bootstrap/command_registry.rs");
 const client = text("src/api/client.ts");

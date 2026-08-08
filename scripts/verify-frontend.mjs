@@ -15,6 +15,7 @@ const nodeChecks = [
   "verify-application-composition.mjs",
   "verify-database-service.mjs",
   "verify-competition-rules-service.mjs",
+  "verify-teams-players-service.mjs",
   "verify-node-process-compatibility.mjs",
   "verify-windows-path-contract.mjs",
   "verify-public-model-boundary.mjs",

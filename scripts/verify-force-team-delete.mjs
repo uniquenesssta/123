@@ -8,7 +8,10 @@ const migration = read("crates/persistence-postgres/migrations/0028_force_team_p
 const persistence = read("crates/persistence-postgres/src/team_force_delete.rs");
 const persistenceLib = read("crates/persistence-postgres/src/lib.rs");
 const domain = read("crates/domain/src/team/deletion.rs");
-const application = read("crates/application/src/player_catalog.rs");
+const application = [
+  read("crates/application/src/services/teams/facade.rs"),
+  read("crates/application/src/services/teams/service.rs"),
+].join("\n");
 const commands = read("src-tauri/src/commands/catalog.rs");
 const registry = read("src-tauri/src/bootstrap/command_registry.rs");
 const client = read("src/api/client.ts");
