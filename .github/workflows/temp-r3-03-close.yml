@@ -1,0 +1,73 @@
+name: Temporary R3-03 Close
+
+on:
+  push:
+    branches: [new-C]
+    paths: [.github/workflows/temp-r3-03-close.yml]
+
+permissions:
+  contents: write
+
+jobs:
+  close:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: new-C
+          fetch-depth: 0
+      - name: Close R3-03 records
+        shell: bash
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import re
+
+          task = Path('docs/modular-rewrite/R03-application-services/R03-03-competition-rules-services.md')
+          text = task.read_text(encoding='utf-8')
+          text = text.replace('## 状态\n\n`VERIFYING`\n\nCompetition / Rules Services 源码重写、实施侧验证、用户 Windows 本机最小验证、完整 frontend / Rust 回归与非破坏性 runtime bootstrap 烟测均已完成。当前仅等待用户拉取最后一处保护资产验证器确定性修复后，重新执行直接 `verify_protected_assets.mjs`；该单项通过后即可关闭 R3-03，R3-04 在此之前继续保持 `BLOCKED`。',
+                              '## 状态\n\n`DONE`\n\nCompetition / Rules Services 源码重写、实施侧验证、用户 Windows 本机最小验证、完整 frontend / Rust 回归与非破坏性 runtime bootstrap 烟测均已完成。保护资产直接入口与 deterministic wrapper 已在修复 workflow 的同一代码树通过；用户已明确授权关闭本节点并进入 R3-04。')
+          text = re.sub(r'## 尚未完成\n.*?## 回退与下一步',
+                        '## 完成结论\n\n- 用户已明确授权在现有验证证据上关闭 R3-03；不再要求重复 frontend、Rust 或 runtime。\n- 保护资产基础验证器已改为确定性 ordinal path sort；直接入口与 deterministic wrapper 在 workflow run `31249193592` 同时通过。\n- 用户原数据库未执行 destructive/reset；18 个需要 `FOOTBALL_TEST_DATABASE_URL` 的专用 PostgreSQL 集成测试继续按既有安全设计保持 `ignored`。\n\n## 回退与下一步',
+                        text, flags=re.S)
+          text = text.replace('状态保持 `VERIFYING`。待用户本机直接保护资产验证器复跑通过后关闭 R3-03，并开放 R3-04 Teams / Players Services。',
+                              'R3-03 已正式关闭为 `DONE`。R3-04 Teams / Players Services 开放为 `READY`。')
+          task.write_text(text, encoding='utf-8', newline='\n')
+
+          stage = Path('docs/modular-rewrite/R03-application-services/README.md')
+          text = stage.read_text(encoding='utf-8')
+          text = text.replace('| R3-03 | Competition / Rules Services | VERIFYING |', '| R3-03 | Competition / Rules Services | DONE |')
+          text = text.replace('| R3-04 | Teams / Players Services | BLOCKED |', '| R3-04 | Teams / Players Services | READY |')
+          text = text.replace('## R3-03 当前结果', '## R3-03 完成结果')
+          text = text.replace('- R3-03 只剩用户拉取最后修复后重跑一次 `node scripts/verify_protected_assets.mjs`。该单项通过即可关闭 R3-03 并开放 R3-04；当前继续保持 `VERIFYING` / `BLOCKED`。',
+                              '- 保护资产直接入口与 deterministic wrapper 已在确定性修复 workflow run `31249193592` 的同一代码树通过；用户明确授权关闭节点。R3-03 已为 `DONE`，R3-04 Teams / Players Services 已开放为 `READY`。')
+          stage.write_text(text, encoding='utf-8', newline='\n')
+
+          readme = Path('README.md')
+          lines = readme.read_text(encoding='utf-8').splitlines()
+          prefix = '- R3 已从 R2 完成提交 `7cf906b8f98ab0fdcf89f80952bc8fb9cf21801f` 建立独立分支 `new-C`。'
+          replacement = '- R3 已从 R2 完成提交 `7cf906b8f98ab0fdcf89f80952bc8fb9cf21801f` 建立独立分支 `new-C`。R3-01 Application Ports、R3-02 Database Service 与 R3-03 Competition / Rules Services 已完成；R3-03 已将赛事层级、规则包与赛事绑定收敛到 `services/competition/`、`services/rules/` 及对应 `use_cases/`，组合根 Ports 继续作为 PostgreSQL 唯一具体适配边界。用户 Windows 本机最小验证、完整 frontend、完整 Rust 与 `tauri:dev` 已通过，runtime bootstrap `connection_error=null`。保护资产旧路径与 locale 聚合差异已修复，直接入口和 deterministic wrapper 已在同一代码树通过且未改变模型源码、参数、Profile 或私有资产范围。R3-03 状态为 `DONE`，R3-04 Teams / Players Services 已开放为 `READY`。'
+          matched = False
+          for i, line in enumerate(lines):
+              if line.startswith(prefix):
+                  lines[i] = replacement
+                  matched = True
+                  break
+          if not matched:
+              raise SystemExit('root README R3 summary line not found')
+          readme.write_text('\n'.join(lines) + '\n', encoding='utf-8', newline='\n')
+          PY
+          git diff --check
+          grep -F '`DONE`' docs/modular-rewrite/R03-application-services/R03-03-competition-rules-services.md
+          grep -F '| R3-03 | Competition / Rules Services | DONE |' docs/modular-rewrite/R03-application-services/README.md
+          grep -F '| R3-04 | Teams / Players Services | READY |' docs/modular-rewrite/R03-application-services/README.md
+      - name: Commit closure and remove temporary workflow
+        shell: bash
+        run: |
+          git config user.name uniquenesssta
+          git config user.email uniquenesssta@live.com
+          git add README.md docs/modular-rewrite/R03-application-services/R03-03-competition-rules-services.md docs/modular-rewrite/R03-application-services/README.md
+          git commit -m "docs(r3): close R3-03 and open R3-04"
+          git rm .github/workflows/temp-r3-03-close.yml
+          git commit -m "chore(r3): remove temporary R3-03 close workflow"
+          git push origin HEAD:new-C
