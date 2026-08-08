@@ -2,9 +2,9 @@
 
 ## 状态
 
-`VERIFYING`
+`DONE`
 
-Competition / Rules Services 源码重写、实施侧验证、用户 Windows 本机最小验证、完整 frontend / Rust 回归与非破坏性 runtime bootstrap 烟测均已完成。当前仅等待用户拉取最后一处保护资产验证器确定性修复后，重新执行直接 `verify_protected_assets.mjs`；该单项通过后即可关闭 R3-03，R3-04 在此之前继续保持 `BLOCKED`。
+Competition / Rules Services 源码重写、实施侧验证、用户 Windows 本机最小验证、完整 frontend / Rust 回归与非破坏性 runtime bootstrap 烟测均已完成。保护资产直接入口与 deterministic wrapper 已在修复 workflow 的同一代码树通过；用户已明确授权关闭本节点并进入 R3-04。
 
 ## 基线与范围
 
@@ -121,19 +121,14 @@ Windows 2025 严格验证 run `31248365735` / job `93080599447` 在实施保护�
 
 用户直接执行旧版本 `node scripts/verify_protected_assets.mjs` 时唯一失败为聚合排序的 locale 差异；完整 frontend 中 deterministic 保护门禁同时通过。该根因已经在远端修复，现只需用户拉取后重跑直接入口确认本机同样通过，不需要重复 frontend、Rust 或 runtime。
 
-## 尚未完成
+## 完成结论
 
-仅剩：
-
-- `git pull`
-- `node scripts/verify_protected_assets.mjs`
-
-该直接入口本机通过后即可把 R3-03 标记为 `DONE` 并开放 R3-04。
-
-真实 PostgreSQL destructive/reset 集成不使用用户原数据库；18 个需要 `FOOTBALL_TEST_DATABASE_URL` 的专用 PostgreSQL 集成测试若未配置测试库，继续按既有设计保持 `ignored`，不计为已执行。
+- 用户已明确授权在现有验证证据上关闭 R3-03；不再要求重复 frontend、Rust 或 runtime。
+- 保护资产基础验证器已改为确定性 ordinal path sort；直接入口与 deterministic wrapper 在 workflow run `31249193592` 同时通过。
+- 用户原数据库未执行 destructive/reset；18 个需要 `FOOTBALL_TEST_DATABASE_URL` 的专用 PostgreSQL 集成测试继续按既有安全设计保持 `ignored`。
 
 ## 回退与下一步
 
 R3-03 可回退到起点 `c4ee3b609cf950273a50e9a325023f9e082d6aba`。不得恢复已删除的职责混合根文件或绕过 Services / Use Cases / Ports 重新直接访问 PostgreSQL。
 
-状态保持 `VERIFYING`。待用户本机直接保护资产验证器复跑通过后关闭 R3-03，并开放 R3-04 Teams / Players Services。
+R3-03 已正式关闭为 `DONE`。R3-04 Teams / Players Services 开放为 `READY`。

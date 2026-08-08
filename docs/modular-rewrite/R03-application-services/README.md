@@ -19,8 +19,8 @@ R2 已完成并关闭。R3 只重写 Application 编排与 Ports/Services/Use Ca
 |---|---|---|
 | R3-01 | Application Ports 设计 | DONE |
 | R3-02 | Database Service | DONE |
-| R3-03 | Competition / Rules Services | VERIFYING |
-| R3-04 | Teams / Players Services | BLOCKED |
+| R3-03 | Competition / Rules Services | DONE |
+| R3-04 | Teams / Players Services | READY |
 | R3-05 | Lineups Service | BLOCKED |
 | R3-06 | Prediction Service | BLOCKED |
 | R3-07 | Research Service | BLOCKED |
@@ -52,7 +52,7 @@ R3-01 已正式关闭为 `DONE`，详细记录见 [`R03-01-application-ports-设
 
 R3-02 已正式关闭为 `DONE`。详细记录见 [`R03-02-database-service.md`](./R03-02-database-service.md)。
 
-## R3-03 当前结果
+## R3-03 完成结果
 
 - 已删除旧 `crates/application/src/competition.rs` 与 `crates/application/src/rule_packages.rs`，赛事层级和规则包/赛事绑定分别重写到 `services/competition/`、`services/rules/` 与对应 `use_cases/`；共 21 个 Service / Use Case Rust 文件。
 - `ApplicationService` 聚合 `CompetitionService` 与 `RulesService`，既有同名公开方法只保留活动数据库会话获取和兼容委托；Tauri 7 个赛事/规则公共命令、参数与返回 DTO 保持不变。
@@ -61,6 +61,6 @@ R3-02 已正式关闭为 `DONE`。详细记录见 [`R03-02-database-service.md`]
 - 用户 Windows 本机已完成最小验证、完整 `verify:frontend`、完整 `verify:rust` 与 `tauri:dev`。Application 31/31 通过，workspace Clippy/tests 无失败；18 个真实 PostgreSQL 集成测试因未配置专用测试库继续 `ignored`。
 - 本次 runtime JSONL 共 98 条，`bootstrap` 450 ms 完成且 `connection_error=null`；98 条中 97 条为 `info`，唯一 `error` 是阵容页未选择球员时点击添加触发的既有输入校验，与 Competition/Rules、数据库、panic 或基础设施无关。当前 bootstrap 只有在 CompetitionService hierarchy 与 RulesService catalog 均读取成功后才返回，因此已覆盖原数据库赛事层级、规则包与赛事绑定读取。
 - 完整 frontend 中模型边界与 deterministic 保护资产门禁通过；用户单独运行旧版 `verify_protected_assets.mjs` 暴露历史 locale 排序差异。现已把基础验证器改为 ordinal path sort，并同步刷新其受保护指纹；workflow run `31249193592` 已验证直接入口与 deterministic wrapper 同时通过，临时 workflow 已删除。
-- R3-03 只剩用户拉取最后修复后重跑一次 `node scripts/verify_protected_assets.mjs`。该单项通过即可关闭 R3-03 并开放 R3-04；当前继续保持 `VERIFYING` / `BLOCKED`。
+- 保护资产直接入口与 deterministic wrapper 已在确定性修复 workflow run `31249193592` 的同一代码树通过；用户明确授权关闭节点。R3-03 已为 `DONE`，R3-04 Teams / Players Services 已开放为 `READY`。
 
 详细记录见 [`R03-03-competition-rules-services.md`](./R03-03-competition-rules-services.md)。
