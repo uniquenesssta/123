@@ -119,7 +119,7 @@ for (const [file, tokens, label] of [
   ["src/pages/review.ts", ["role_source_position_code", "资料继承"], "复盘角色来源 UI"],
 ]) requireTokens(file, tokens, label);
 
-const predictionReadiness = read("crates/application/src/prediction.rs");
+const predictionReadiness = read("crates/application/src/use_cases/prediction/shared/readiness_checks.rs");
 for (const token of ["missing_role_count", "inherited_role_count", "overridden_role_count", "球员位置默认角色"]) {
   check(predictionReadiness.includes(token), `推演完整度缺少：${token}`);
 }
