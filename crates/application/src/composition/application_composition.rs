@@ -1,12 +1,12 @@
-use super::{ActiveDatabase, PortRegistry};
+use super::PortRegistry;
 use crate::model_registry::ModelRegistry;
 use crate::model_shell::PublicModelStub;
+use crate::services::database::DatabaseService;
 use std::sync::{atomic::AtomicBool, Arc};
-use tokio::sync::RwLock;
 
 pub(crate) struct ApplicationComposition {
     registry: ModelRegistry,
-    ports: PortRegistry,
+    database: DatabaseService,
     p4_worker_running: AtomicBool,
 }
 
@@ -16,19 +16,16 @@ impl ApplicationComposition {
         for model in PublicModelStub::built_in_models() {
             registry.register(Arc::new(model));
         }
+        let database = DatabaseService::new(PortRegistry::new());
 
         Self {
             registry,
-            ports: PortRegistry::new(),
+            database,
             p4_worker_running: AtomicBool::new(false),
         }
     }
 
-    pub(crate) fn into_parts(self) -> (ModelRegistry, RwLock<Option<ActiveDatabase>>, AtomicBool) {
-        (
-            self.registry,
-            self.ports.into_database(),
-            self.p4_worker_running,
-        )
+    pub(crate) fn into_parts(self) -> (ModelRegistry, DatabaseService, AtomicBool) {
+        (self.registry, self.database, self.p4_worker_running)
     }
 }
