@@ -19,7 +19,7 @@ R2 已完成并关闭。R3 只重写 Application 编排与 Ports/Services/Use Ca
 |---|---|---|
 | R3-01 | Application Ports 设计 | DONE |
 | R3-02 | Database Service | DONE |
-| R3-03 | Competition / Rules Services | READY |
+| R3-03 | Competition / Rules Services | VERIFYING |
 | R3-04 | Teams / Players Services | BLOCKED |
 | R3-05 | Lineups Service | BLOCKED |
 | R3-06 | Prediction Service | BLOCKED |
@@ -50,4 +50,16 @@ R3-01 已正式关闭为 `DONE`，详细记录见 [`R03-01-application-ports-设
 - `npm run tauri:dev` 运行时烟测成功；上传 runtime JSONL 共 48 条且全部为 `info`，`bootstrap` 的 `connection_error=null`，原数据库上的教练、阵型、球队、阵容、Analytics 与 Postmatch 读取链均完成，没有迁移、连接、panic、error 或 critical。
 - 本次 runtime log 实际写入 `F:\FOODBALL\logs`；从源码目录执行 `Get-ChildItem .\logs` 找不到目录是当前 runtime root discovery 的既有路径行为，不属于 Database Service 回归，本节点未修改运行日志目录策略。
 
-R3-02 已正式关闭为 `DONE`，R3-03 Competition / Rules Services 当前为 `READY`。详细记录见 [`R03-02-database-service.md`](./R03-02-database-service.md)。
+R3-02 已正式关闭为 `DONE`。详细记录见 [`R03-02-database-service.md`](./R03-02-database-service.md)。
+
+## R3-03 当前结果
+
+- 已删除旧 `crates/application/src/competition.rs` 与 `crates/application/src/rule_packages.rs`，赛事层级和规则包/赛事绑定分别重写到 `services/competition/`、`services/rules/` 与对应 `use_cases/`；共 21 个 Service / Use Case Rust 文件。
+- `ApplicationService` 聚合 `CompetitionService` 与 `RulesService`，既有同名公开方法只保留活动数据库会话获取和兼容委托；Tauri 7 个赛事/规则公共命令、参数与返回 DTO 保持不变。
+- `ActiveDatabase` 在组合根实现 `CompetitionHierarchyPort`、`RulePackagePort`、`RuleRoutingPort`；具体 PostgreSQL 仍只位于 `composition/port_registry.rs`，未修改 SQL、迁移、Schema、依赖或模型保护资产。
+- 数据库连接后的内置规则包注册已通过 RulesService；bootstrap 的赛事层级、规则包与绑定读取已通过 Competition/Rules Services。Prediction 路由预览与模型调用仍留给 R3-06，没有提前迁移。
+- 新增 `verify:competition-rules-service` 并接入 architecture/frontend；R3-02 Database Service 验证器同步跟随新的 RulesService 初始化边界，没有降低生命周期、reset 或 PostgreSQL 隔离门禁。
+- Windows 2025 严格实施验证 run `31248365735` / job `93080599447` 已通过 rustfmt、365 类型清单、R3-03 专项、完整 architecture、确定性模型保护指纹、Application check/tests 与 `git diff --check`；实施保护分支已同步到提交 `fc93103fb4327bbafea7b800984a971f5bf1f328`，临时 workflow 已删除。
+- 用户 Windows 本机最小验证、完整 frontend、完整 Rust 与 `tauri:dev` 非破坏性赛事/规则运行时烟测尚未完成，因此 R3-03 保持 `VERIFYING`，R3-04 继续 `BLOCKED`。
+
+详细记录见 [`R03-03-competition-rules-services.md`](./R03-03-competition-rules-services.md)。
