@@ -22,7 +22,7 @@ R2 已完成并关闭。R3 只重写 Application 编排与 Ports/Services/Use Ca
 | R3-03 | Competition / Rules Services | DONE |
 | R3-04 | Teams / Players Services | VERIFYING |
 | R3-05 | Lineups Service | DONE |
-| R3-06 | Prediction Service | READY |
+| R3-06 | Prediction Service | IN_PROGRESS |
 | R3-07 | Research Service | BLOCKED |
 | R3-08 | Review / Postmatch / Analytics Services | BLOCKED |
 | R3-09 | Exchange / AI / Release Services | BLOCKED |
@@ -86,6 +86,15 @@ R3-02 已正式关闭为 `DONE`。详细记录见 [`R03-02-database-service.md`]
 - clean 实施提交 `7e3fddeafcd32cc45e293fa9a7aeb05c7c66d4ec` 的 Public Platform CI run `31260698438` / job `93110942400` 已通过 architecture 与完整 Windows Automated：frontend、17 个截图回归视口、TypeScript、Vite、完整 Rust/Clippy/workspace tests、Tauri release 构建及 release 启动日志扫描均通过。artifact `9022970030`，大小 `14242839` 字节，SHA-256 `275e17a78db9d5205d49401a1a1d20ed91f08102594d2d04c339051165beb052`。
 - 用户 Windows 本机在最终分支 HEAD 上通过 clean 工作区、rustfmt、R3-05 专项、完整 architecture、Application check/tests 33/33、完整 `verify:frontend`、完整 `verify:rust` 与 `tauri:dev`。workspace tests 无失败；18 个需要专用 `FOOTBALL_TEST_DATABASE_URL` 的 PostgreSQL 集成测试按安全设计保持 `ignored`，未记为已执行。
 - 本机 runtime JSONL 共 280 条：274 条 `info`、6 条 `error`。其中 2 条为阵容预设名称为空、1 条为未选择球员的预期输入校验；另外 3 条为公开源码未分发 P4 模型运行时的预期失败。`bootstrap.connection_error=null`；两次预设保存成功，多次预设应用预检均 `can_apply=true`，`create_lineup_pair` 成功后 `list_lineups` 从 0 条变为 2 条，`read_match_lineup_chain` 从双方阵容缺失转为 `blocking_issues=[]`、`ready_for_model=true`。未发现 Lineups 持久化、SQL、migration、panic、连接或兼容性错误。
-- R3-05 已正式关闭为 `DONE`；R3-06 Prediction Service 开放为 `READY`。
+- R3-05 已正式关闭为 `DONE`；R3-06 Prediction Service 已进入 `IN_PROGRESS`。
 
 详细记录见 [`R03-05-lineups-service.md`](./R03-05-lineups-service.md)。
+
+## R3-06 当前结果
+
+- Atomic Task 1 已将 Prediction Core 的推演执行、比赛 readiness、stored-match formal/shadow execution、route preview、dry-run 与运行历史职责迁入 `services/prediction/`、`use_cases/prediction/`；旧 `crates/application/src/prediction.rs` 已删除。ApplicationService / Tauri 既有公开方法和返回语义保持兼容，模型调用继续只经过 `football-model-api`。
+- Atomic Task 2A 已迁移 P4 horizon planning、freeze task list/read/events、freeze readiness、match/task workspace 只读职责；`resolve_p4_conflict`、联网 Research、Evidence/Fact 写入和 Research artifact 写入仍属于 R3-07，未提前混入 Prediction Service。
+- 2A Windows hard gate run `31266144950` / job `93124468057` 已通过 Application Ports、完整 architecture、rustfmt、Application check 与 Application tests 33/33。
+- 删除旧 Prediction 单文件后确认 3 个历史 frontend 验证器仍引用旧 owner，现已分别改读 readiness owner 或递归扫描当前完整 Prediction Service / Use Case 模块树；没有删除、跳过或放宽原有业务断言。
+- 迁移后编译器确认的 unused imports 已直接清理；run `31266871976` / job `93126329974` 已通过 `cargo clippy --locked -p football-application --all-targets -- -D warnings`、Application Ports、architecture、rustfmt 与 Application tests。测试专用 `P4Horizon` / `is_p4_model` 已收敛至 `#[cfg(test)]`。
+- 2A 与 warning-cleanup 的临时 workflow / Python 脚本均已删除。当前仍等待最终状态提交上的完整 Public Platform CI；在该硬门禁通过前，R3-06 保持 `IN_PROGRESS`，R3-07 保持 `BLOCKED`。
