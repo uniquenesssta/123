@@ -1,0 +1,51 @@
+name: Temporary R3-04 Validate
+
+on:
+  push:
+    branches:
+      - rewrite/r3-04-teams-players
+    paths:
+      - .github/workflows/temp-r3-04-validate.yml
+
+permissions:
+  contents: write
+
+jobs:
+  validate:
+    runs-on: windows-2025
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: rewrite/r3-04-teams-players
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+      - uses: dtolnay/rust-toolchain@1.88.0
+        with:
+          components: rustfmt,clippy
+      - name: Prepare Cargo target
+        shell: pwsh
+        run: node scripts/prepare-cargo-target.mjs
+      - name: Verify R3-04 architecture and affected contracts
+        shell: pwsh
+        run: |
+          npm run verify:teams-players-service
+          node scripts/verify-entity-relationships.mjs
+          node scripts/verify-force-team-delete.mjs
+          node scripts/verify-team-player-management.mjs
+          npm run verify:architecture
+          node scripts/verify-protected-assets-deterministic.mjs
+          cargo fmt --all -- --check
+          cargo check --locked -p football-application
+          cargo test --locked -p football-application
+          cargo clippy --locked --workspace --all-targets -- -D warnings
+          git diff --check
+      - name: Remove temporary validation workflow
+        shell: pwsh
+        run: |
+          git config user.name uniquenesssta
+          git config user.email uniquenesssta@live.com
+          git rm .github/workflows/temp-r3-04-validate.yml
+          git commit -m "chore(r3): remove temporary R3-04 validation workflow"
+          git push origin HEAD:rewrite/r3-04-teams-players
