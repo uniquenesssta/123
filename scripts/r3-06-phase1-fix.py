@@ -2,7 +2,6 @@ from pathlib import Path
 import re
 
 ROOT = Path(__file__).resolve().parents[1]
-BASE = ROOT / "crates/application/src/use_cases/prediction"
 
 
 def read(rel: str) -> str:
@@ -11,14 +10,6 @@ def read(rel: str) -> str:
 
 def write(rel: str, text: str) -> None:
     (ROOT / rel).write_text(text, encoding="utf-8", newline="\n")
-
-
-def patch(rel: str, fn) -> None:
-    text = read(rel)
-    updated = fn(text)
-    if updated == text:
-        raise RuntimeError(f"no change applied to {rel}")
-    write(rel, updated)
 
 
 # Direct children of use_cases::prediction only need one super hop.
@@ -37,17 +28,6 @@ for rel in [
 # Preserve the legacy formal/shadow contract exactly: formal persists, shadow does not.
 rel = "crates/application/src/use_cases/prediction/execute_prediction_from_match/mod.rs"
 text = read(rel)
-text = text.replace(
-    "execute_with_mode(port, registry, command, false).await",
-    "execute_with_mode(port, registry, command, true).await",
-    1,
-)
-text = text.replace(
-    "execute_with_mode(port, registry, command, true).await",
-    "execute_with_mode(port, registry, command, false).await",
-    1,
-)
-# The two sequential replacements above can touch the same text; force wrapper values by function block.
 text = re.sub(
     r"(pub\(crate\) async fn execute_formal[\s\S]*?execute_with_mode\(port, registry, command, )(?:true|false)(\)\.await\n\})",
     r"\g<1>true\2",
@@ -72,6 +52,11 @@ text = re.sub(
     text,
 )
 text = text.replace("let store = self.active_store().await?;", "let store = port;")
+text = text.replace(
+    "use super::shared::routing::{",
+    "use super::shared::routing::{normalize_model_selection,",
+    1,
+)
 if "self." in text:
     raise RuntimeError("stored-match use case still contains ApplicationService self access")
 write(rel, text)
@@ -135,12 +120,38 @@ if "self." in text:
     raise RuntimeError("core prediction use case still contains ApplicationService self access")
 write(rel, text)
 
-# Export the adapter conversion at the composition boundary, not from the facade implementation.
+# Shared audit uses the same frozen audit contract constant as the legacy owner.
+rel = "crates/application/src/use_cases/prediction/shared/audit.rs"
+text = read(rel)
+text = text.replace(
+    "use football_domain::{MatchPredictionReadiness, PredictionInputAuditSummary};",
+    "use football_domain::{\n    MatchPredictionReadiness, PredictionInputAuditSummary, PREDICTION_INPUT_AUDIT_VERSION,\n};",
+)
+write(rel, text)
+
+# Shared routing no longer needs Uuid after extraction.
+rel = "crates/application/src/use_cases/prediction/shared/routing.rs"
+text = read(rel).replace("use uuid::Uuid;\n", "")
+write(rel, text)
+
+# The adapter stays private to composition, but its conversion helper is re-exported by adapters.
+rel = "crates/application/src/composition/adapters/mod.rs"
+text = read(rel)
+if "pub(crate) use prediction::model_run_list_item_from_port;" not in text:
+    text = text.rstrip() + "\n\npub(crate) use prediction::model_run_list_item_from_port;\n"
+write(rel, text)
+
 rel = "crates/application/src/composition/mod.rs"
 text = read(rel)
-export = "pub(crate) use adapters::prediction::model_run_list_item_from_port;"
-if export not in text:
-    text = text.rstrip() + "\n\n" + export + "\n"
+text = text.replace(
+    "pub(crate) use adapters::prediction::model_run_list_item_from_port;",
+    "pub(crate) use adapters::model_run_list_item_from_port;",
+)
+write(rel, text)
+
+# Avoid a formatting-only leading blank line in the extracted unit-test owner.
+rel = "crates/application/src/use_cases/prediction/tests.rs"
+text = read(rel).lstrip("\r\n")
 write(rel, text)
 
 print("R3-06 phase 1 deterministic fixes applied")
