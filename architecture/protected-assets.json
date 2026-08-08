@@ -127,8 +127,8 @@
       "path": "scripts/verify-public-model-boundary.mjs",
       "category": "public-model-boundary-verifier",
       "mode": "utf8-lf",
-      "git_blob_sha1": "1592768e70d35aec5e5a9e0fb46a365937da6189",
-      "fingerprint_sha256": "9a63d24cf05559c7c5107c47d0fbc8a7c0db57e27f9331210c17e68250085e6b"
+      "git_blob_sha1": "a2628f1bfca38ad786ff3913c2db317e98d3f6a1",
+      "fingerprint_sha256": "120fd4070e2cdf445602593fdac5717d5e57142f5db9931f635a10d94b011a4b"
     },
     {
       "path": "scripts/verify_protected_assets.mjs",
@@ -243,5 +243,5 @@
       "category": "private-model-documentation"
     }
   ],
-  "aggregate_sha256": "a67bd371700ed3f9d4ed49a61e24338f9a022909ba369786e661d15336c09ef6"
+  "aggregate_sha256": "f4240fa25008d8ddfa95adba579dc8d8af9410b58a4a080bf7e42a1344e59364"
 }
