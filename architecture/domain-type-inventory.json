@@ -24,7 +24,7 @@
     "targetPublicExportPolicy": "explicit re-export only"
   },
   "sourceDigest": "217241ac243726a5ab6805a7f169e222b97e78c7c971749a5904714af673ebdd",
-  "rustUsageDigest": "21ae8d20b590425afc902eb859ac9e2a3004b513c337fcc505b466afd9557dbb",
+  "rustUsageDigest": "215df773928d1bc73294ea1fec5ec1acae561d536c6708b860b01ed1e0532ce6",
   "summary": {
     "typeCount": 365,
     "publicCompatibilityTypeCount": 365,
@@ -14493,7 +14493,6 @@
       ],
       "externalCallers": [
         "crates/application/src/composition/adapters/prediction.rs",
-        "crates/application/src/p4_orchestration.rs",
         "crates/application/src/ports/prediction/mod.rs",
         "crates/application/src/use_cases/prediction/plan_p4_horizons/mod.rs",
         "crates/persistence-postgres/src/p4_orchestration.rs"
@@ -14571,7 +14570,6 @@
       ],
       "externalCallers": [
         "crates/application/src/composition/adapters/prediction.rs",
-        "crates/application/src/p4_orchestration.rs",
         "crates/application/src/ports/prediction/mod.rs",
         "crates/application/src/services/prediction/facade.rs",
         "crates/application/src/services/prediction/service.rs",
@@ -15403,7 +15401,6 @@
       ],
       "externalCallers": [
         "crates/application/src/composition/adapters/prediction.rs",
-        "crates/application/src/p4_workbench.rs",
         "crates/application/src/ports/prediction/mod.rs",
         "crates/application/src/services/prediction/facade.rs",
         "crates/application/src/services/prediction/service.rs",
@@ -17092,7 +17089,6 @@
         "crates/domain/tests/serde_contracts/module_paths.rs"
       ],
       "externalCallers": [
-        "crates/application/src/p4_orchestration.rs",
         "crates/application/src/services/prediction/facade.rs",
         "crates/application/src/services/prediction/service.rs",
         "crates/application/src/use_cases/prediction/plan_p4_horizons/mod.rs",
