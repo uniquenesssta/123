@@ -20,7 +20,7 @@ R2 已完成并关闭。R3 只重写 Application 编排与 Ports/Services/Use Ca
 | R3-01 | Application Ports 设计 | DONE |
 | R3-02 | Database Service | DONE |
 | R3-03 | Competition / Rules Services | DONE |
-| R3-04 | Teams / Players Services | READY |
+| R3-04 | Teams / Players Services | VERIFYING |
 | R3-05 | Lineups Service | BLOCKED |
 | R3-06 | Prediction Service | BLOCKED |
 | R3-07 | Research Service | BLOCKED |
@@ -64,3 +64,14 @@ R3-02 已正式关闭为 `DONE`。详细记录见 [`R03-02-database-service.md`]
 - 保护资产直接入口与 deterministic wrapper 已在确定性修复 workflow run `31249193592` 的同一代码树通过；用户明确授权关闭节点。R3-03 已为 `DONE`，R3-04 Teams / Players Services 已开放为 `READY`。
 
 详细记录见 [`R03-03-competition-rules-services.md`](./R03-03-competition-rules-services.md)。
+
+## R3-04 当前结果
+
+- 已将旧 `player_catalog.rs` 中 35 个球队、球员、教练与实体引用 Application 职责迁入 `services/teams/`、`services/players/` 与对应 `use_cases/`；共 43 个 Service / Use Case Rust 文件。原文件只保留 R3-05 的 19 个阵型、比赛、阵容与预设职责。
+- `ApplicationService` / `ApplicationComposition` 已聚合 `TeamService` 与 `PlayerService`；公共方法、Tauri 命令、DTO、SQL、迁移、生产依赖和模型边界保持兼容。
+- 6 个 Team / Player Ports 的具体适配按职责拆到 `composition/adapters/teams.rs` 与 `players.rs`；`port_registry.rs` 继续作为 Application 唯一直接导入 PostgreSQL crate 的组合根所有者。
+- 首轮 Windows 编译真实暴露球队强制删除 SQLx transaction 的 non-Send 边界；现仅在组合适配器对 preview/force-delete 使用 `spawn_blocking + Handle::block_on`，保持既有 Tauri 隔离和事务语义，没有修改 SQL 或弱化强确认。
+- Windows 2025 run `31258038424` / job `93104371481` 已通过 R3-04 专项、实体关系、球队强制清除、球队/球员管理、完整 architecture、保护资产、Application check、Application tests 33/33、workspace Clippy `-D warnings` 与 diff hygiene。
+- R3-04 当前为 `VERIFYING`，等待用户 Windows 本机完整阶段回归与非破坏性 runtime 烟测；R3-05 继续 `BLOCKED`。
+
+详细记录见 [`R03-04-teams-players-services.md`](./R03-04-teams-players-services.md)。
