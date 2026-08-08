@@ -4,7 +4,7 @@
 
 `VERIFYING`
 
-Competition / Rules Services 源码重写与实施侧专项验证已完成；节点仍等待用户 Windows 本机最小验证、完整阶段回归与非破坏性运行时烟测，因此不得标记为 `DONE`，R3-04 继续保持 `BLOCKED`。
+Competition / Rules Services 源码重写、实施侧验证、用户 Windows 本机最小验证、完整 frontend / Rust 回归与非破坏性 runtime bootstrap 烟测均已完成。当前仅等待用户拉取最后一处保护资产验证器确定性修复后，重新执行直接 `verify_protected_assets.mjs`；该单项通过后即可关闭 R3-03，R3-04 在此之前继续保持 `BLOCKED`。
 
 ## 基线与范围
 
@@ -12,7 +12,7 @@ Competition / Rules Services 源码重写与实施侧专项验证已完成；节
 - R3-03 起点：`c4ee3b609cf950273a50e9a325023f9e082d6aba`（R3-02 `DONE` 后开放 R3-03）
 - 首个完整重写提交：`889a543416979d9461600c24ae84f140551727aa`
 - 验证器兼容修复：`4c0f63c35b874b2f02a7dd6398abfd97f55a902b`
-- 当前实施侧已验证提交：`fc93103fb4327bbafea7b800984a971f5bf1f328`
+- 保护资产验证器确定性修复最终提交：`36e80f7c6209e4b0a8f3e7854147dcbd919df332`
 - 任务范围：赛事层级、规则包、赛事绑定及 bootstrap / 数据库初始化中的相关 Application 编排。
 - 排除范围：具体 PostgreSQL SQL、迁移、Prediction 路由预览/模型调用、Teams/Players、Tauri DTO、前端状态、模型实现。
 
@@ -71,7 +71,7 @@ Bootstrap 的赛事、赛季、阶段、轮次读取改为 CompetitionService；
 
 `src-tauri/src/commands/competition.rs` 的 7 个既有公共命令名称、参数、返回 DTO 和委托方法保持不变：赛事创建/删除、赛季、阶段、轮次、规则包注册、赛事绑定创建。
 
-未修改公共 ApplicationService 方法名、Serde 数据结构、数据库 Schema、配置、生产依赖、Cargo.lock 或模型保护资产。
+未修改公共 ApplicationService 方法名、Serde 数据结构、数据库 Schema、配置、生产依赖、Cargo.lock 或模型实现与私有资产范围。
 
 ## 专项门禁
 
@@ -84,6 +84,8 @@ Bootstrap 的赛事、赛季、阶段、轮次读取改为 CompetitionService；
 门禁锁定目标目录、旧根文件删除、ApplicationService/组合根服务聚合、3 个 Ports 适配、bootstrap/初始化委托边界、Service/Use Case 无具体 PostgreSQL 泄漏、Tauri 7 条公共调用链以及验证入口。
 
 R3-03 同步更新了 R3-02 Database Service 验证器：旧验证器原先硬编码要求已被 R3-03 正确替代的 `register_built_in_rule_packages` 字面量，现改为验证 `RulesService::register_built_ins` 新边界并明确拒绝旧实现；没有删除 R3-02 的生命周期、reset、安全确认或 PostgreSQL 隔离门禁。
+
+公开模型边界验证器原先仍读取已删除的 `crates/application/src/rule_packages.rs`，现已跟随唯一职责 owner 改读 `use_cases/rules/package_factory/mod.rs`。随后用户直接执行 `verify_protected_assets.mjs` 暴露其聚合排序依赖宿主 locale 的历史缺陷；已把基础验证器自身改为 ordinal path sort，使直接入口与 deterministic wrapper 使用同一确定性语义，并同步刷新该验证器自身的受保护指纹与派生聚合值。没有修改模型源码、参数、Profile、私有资产范围或放宽保护门禁。
 
 ## 实施侧验证
 
@@ -100,16 +102,33 @@ Windows 2025 严格验证 run `31248365735` / job `93080599447` 在实施保护�
 - `cargo test --locked -p football-application`
 - `git diff --check`
 
-实施期首先发现 Domain inventory 因新增 Rust 文件需要确定性重算；随后旧 R3-02 验证器对内置规则包注册实现名称存在过时字面量假设。两处均修正根因后重新执行严格门禁；没有跳过、弱化或屏蔽失败。
+保护资产确定性修复 workflow run `31249193592` 进一步验证：直接 `verify_protected_assets.mjs` 与 deterministic wrapper 均在同一代码树通过，临时 workflow 已自删除。
+
+## 用户 Windows 本机验证
+
+用户本机已通过：
+
+- 工作区干净、`cargo fmt --all -- --check`；
+- `npm run verify:competition-rules-service`；
+- `npm run verify:architecture`；
+- `cargo check --locked -p football-application`；
+- `cargo test --locked -p football-application`：31/31；
+- 完整 `npm run verify:frontend`：全部静态门禁、17 个截图视口、TypeScript 与 Vite production build 通过；Vite 仅保留既有大 chunk warning；
+- 完整 `npm run verify:rust`：workspace Clippy `-D warnings` 与 workspace tests 无失败；18 个真实 PostgreSQL 集成测试因未配置专用 `FOOTBALL_TEST_DATABASE_URL` 按既有设计保持 `ignored`；
+- `npm run tauri:dev` 正常编译并启动原数据库。
+
+本次 runtime JSONL 共 98 条：97 条 `info`，1 条前端用户动作 `error` 为阵容页在未选择球员时点击添加而返回“请先选择球员”，属于既有输入校验，不是数据库、Competition/Rules Service、panic 或基础设施失败。`bootstrap` 在 450 ms 内完成且 `connection_error=null`；当前 bootstrap 实现只有在 CompetitionService `load_hierarchy` 与 RulesService `load_catalog` 均成功后才会返回，因此该运行已经覆盖原数据库赛事层级、规则包与赛事绑定读取边界。
+
+用户直接执行旧版本 `node scripts/verify_protected_assets.mjs` 时唯一失败为聚合排序的 locale 差异；完整 frontend 中 deterministic 保护门禁同时通过。该根因已经在远端修复，现只需用户拉取后重跑直接入口确认本机同样通过，不需要重复 frontend、Rust 或 runtime。
 
 ## 尚未完成
 
-仍需以用户 Windows 本机为本节点验收依据：
+仅剩：
 
-- R3-03 最小验证复跑；
-- 完整 `npm run verify:frontend`；
-- 完整 `npm run verify:rust`（workspace Clippy `-D warnings` + workspace tests）；
-- `npm run tauri:dev` 非破坏性赛事/规则页与原数据库 bootstrap 烟测。
+- `git pull`
+- `node scripts/verify_protected_assets.mjs`
+
+该直接入口本机通过后即可把 R3-03 标记为 `DONE` 并开放 R3-04。
 
 真实 PostgreSQL destructive/reset 集成不使用用户原数据库；18 个需要 `FOOTBALL_TEST_DATABASE_URL` 的专用 PostgreSQL 集成测试若未配置测试库，继续按既有设计保持 `ignored`，不计为已执行。
 
@@ -117,4 +136,4 @@ Windows 2025 严格验证 run `31248365735` / job `93080599447` 在实施保护�
 
 R3-03 可回退到起点 `c4ee3b609cf950273a50e9a325023f9e082d6aba`。不得恢复已删除的职责混合根文件或绕过 Services / Use Cases / Ports 重新直接访问 PostgreSQL。
 
-状态保持 `VERIFYING`。只有用户 Windows 本机阶段回归和运行时烟测全部通过后，才能将 R3-03 标记为 `DONE` 并开放 R3-04 Teams / Players Services。
+状态保持 `VERIFYING`。待用户本机直接保护资产验证器复跑通过后关闭 R3-03，并开放 R3-04 Teams / Players Services。
