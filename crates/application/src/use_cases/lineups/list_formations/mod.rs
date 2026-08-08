@@ -1,6 +1,9 @@
 use crate::{ports::lineup::FormationPort, ApplicationResult};
 use football_domain::FormationRecord;
-pub(crate) async fn execute<P>(port: &P, active_only: bool) -> ApplicationResult<Vec<FormationRecord>>
+pub(crate) async fn execute<P>(
+    port: &P,
+    active_only: bool,
+) -> ApplicationResult<Vec<FormationRecord>>
 where
     P: FormationPort + ?Sized,
 {
