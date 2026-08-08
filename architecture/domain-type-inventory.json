@@ -24,13 +24,13 @@
     "targetPublicExportPolicy": "explicit re-export only"
   },
   "sourceDigest": "217241ac243726a5ab6805a7f169e222b97e78c7c971749a5904714af673ebdd",
-  "rustUsageDigest": "98e4121bfb62f519acd34cd7955d6ca7772295a7ecac10fde2e4b4fc84008e7d",
+  "rustUsageDigest": "57c686a077a1c2f86f7b756570a6532e52f3867b774081f59accbc70eea6b7a4",
   "summary": {
     "typeCount": 365,
     "publicCompatibilityTypeCount": 365,
     "internalTypeCount": 0,
     "domainSourceFileCount": 129,
-    "scannedRustFileCount": 284,
+    "scannedRustFileCount": 301,
     "databaseMappedTypeCount": 299,
     "byTargetModule": {
       "ai_workspace": 16,
@@ -179,6 +179,7 @@
         "crates/domain/tests/serde_contracts/r2_06_module_paths.rs"
       ],
       "externalCallers": [
+        "crates/application/src/ports/review/mod.rs",
         "crates/application/src/review.rs",
         "crates/persistence-postgres/src/review.rs",
         "src-tauri/src/commands/review.rs"
@@ -514,6 +515,7 @@
         "crates/domain/tests/serde_contracts/r2_06_module_paths.rs"
       ],
       "externalCallers": [
+        "crates/application/src/ports/review/mod.rs",
         "crates/application/src/review.rs",
         "crates/persistence-postgres/src/review.rs",
         "src-tauri/src/commands/review.rs"
@@ -586,6 +588,7 @@
       ],
       "externalCallers": [
         "crates/analysis-package/src/lib.rs",
+        "crates/application/src/ports/analytics/mod.rs",
         "crates/persistence-postgres/src/analytics.rs"
       ],
       "databaseMappings": [
@@ -1041,6 +1044,7 @@
       ],
       "externalCallers": [
         "crates/application/src/analytics.rs",
+        "crates/application/src/ports/analytics/mod.rs",
         "crates/persistence-postgres/src/analytics.rs",
         "src-tauri/src/commands/analytics.rs"
       ],
@@ -1668,6 +1672,7 @@
       ],
       "externalCallers": [
         "crates/application/src/analytics.rs",
+        "crates/application/src/ports/analytics/mod.rs",
         "crates/persistence-postgres/src/analytics.rs",
         "src-tauri/src/commands/analytics.rs"
       ],
@@ -1752,6 +1757,7 @@
       ],
       "externalCallers": [
         "crates/application/src/analytics.rs",
+        "crates/application/src/ports/analytics/mod.rs",
         "crates/persistence-postgres/src/analytics.rs"
       ],
       "databaseMappings": [
@@ -1872,7 +1878,9 @@
         "crates/domain/src/lib.rs",
         "crates/domain/tests/serde_contracts/r2_07_module_paths.rs"
       ],
-      "externalCallers": [],
+      "externalCallers": [
+        "crates/application/src/ports/ai_workspace/mod.rs"
+      ],
       "databaseMappings": []
     },
     {
@@ -2128,6 +2136,7 @@
       ],
       "externalCallers": [
         "crates/application/src/api_workspace.rs",
+        "crates/application/src/ports/ai_workspace/mod.rs",
         "crates/persistence-postgres/src/api_workspace.rs"
       ],
       "databaseMappings": [
@@ -2371,6 +2380,7 @@
       ],
       "externalCallers": [
         "crates/application/src/api_workspace.rs",
+        "crates/application/src/ports/ai_workspace/mod.rs",
         "crates/persistence-postgres/src/api_workspace.rs",
         "src-tauri/src/commands/api_workspace.rs"
       ],
@@ -2463,6 +2473,7 @@
       ],
       "externalCallers": [
         "crates/application/src/api_workspace.rs",
+        "crates/application/src/ports/ai_workspace/mod.rs",
         "crates/persistence-postgres/src/api_workspace.rs"
       ],
       "databaseMappings": [
@@ -2541,6 +2552,7 @@
       ],
       "externalCallers": [
         "crates/application/src/api_workspace.rs",
+        "crates/application/src/ports/ai_workspace/mod.rs",
         "crates/persistence-postgres/src/api_workspace.rs"
       ],
       "databaseMappings": [
@@ -2644,6 +2656,7 @@
       ],
       "externalCallers": [
         "crates/application/src/api_workspace.rs",
+        "crates/application/src/ports/ai_workspace/mod.rs",
         "crates/persistence-postgres/src/api_workspace.rs"
       ],
       "databaseMappings": [
@@ -2784,6 +2797,7 @@
       ],
       "externalCallers": [
         "crates/application/src/api_workspace.rs",
+        "crates/application/src/ports/ai_workspace/mod.rs",
         "crates/persistence-postgres/src/api_workspace.rs",
         "src-tauri/src/commands/api_workspace.rs"
       ],
@@ -2855,6 +2869,7 @@
       ],
       "externalCallers": [
         "crates/application/src/api_workspace.rs",
+        "crates/application/src/ports/ai_workspace/mod.rs",
         "crates/persistence-postgres/src/api_workspace.rs",
         "src-tauri/src/commands/api_workspace.rs"
       ],
@@ -2951,6 +2966,7 @@
       ],
       "externalCallers": [
         "crates/application/src/api_workspace.rs",
+        "crates/application/src/ports/ai_workspace/mod.rs",
         "crates/persistence-postgres/src/api_workspace.rs",
         "src-tauri/src/commands/api_workspace.rs"
       ],
@@ -3162,6 +3178,7 @@
       ],
       "externalCallers": [
         "crates/application/src/analytics.rs",
+        "crates/application/src/ports/analytics/mod.rs",
         "crates/persistence-postgres/src/jobs.rs",
         "src-tauri/src/commands/analytics.rs",
         "src-tauri/src/commands/issues.rs"
@@ -3288,6 +3305,7 @@
       ],
       "externalCallers": [
         "crates/application/src/player_catalog.rs",
+        "crates/application/src/ports/player/mod.rs",
         "crates/persistence-postgres/src/entity_catalog.rs",
         "src-tauri/src/commands/catalog.rs"
       ],
@@ -3405,6 +3423,8 @@
       ],
       "externalCallers": [
         "crates/application/src/player_catalog.rs",
+        "crates/application/src/ports/player/mod.rs",
+        "crates/application/src/ports/team/mod.rs",
         "crates/persistence-postgres/src/team_catalog.rs",
         "src-tauri/src/commands/catalog.rs"
       ],
@@ -3805,6 +3825,7 @@
       ],
       "externalCallers": [
         "crates/application/src/player_catalog.rs",
+        "crates/application/src/ports/player/mod.rs",
         "crates/persistence-postgres/src/entity_catalog.rs",
         "src-tauri/src/commands/catalog.rs"
       ],
@@ -3874,6 +3895,7 @@
       ],
       "externalCallers": [
         "crates/application/src/player_catalog.rs",
+        "crates/application/src/ports/player/mod.rs",
         "crates/persistence-postgres/src/entity_catalog.rs",
         "src-tauri/src/commands/catalog.rs"
       ],
@@ -3950,6 +3972,7 @@
       ],
       "externalCallers": [
         "crates/application/src/player_catalog.rs",
+        "crates/application/src/ports/player/mod.rs",
         "crates/persistence-postgres/src/entity_catalog.rs",
         "src-tauri/src/commands/catalog.rs"
       ],
@@ -4016,6 +4039,7 @@
       ],
       "externalCallers": [
         "crates/application/src/player_catalog.rs",
+        "crates/application/src/ports/player/mod.rs",
         "crates/persistence-postgres/src/entity_catalog.rs",
         "crates/persistence-postgres/src/match_exchange.rs",
         "src-tauri/src/commands/catalog.rs"
@@ -4097,6 +4121,7 @@
       ],
       "externalCallers": [
         "crates/application/src/player_catalog.rs",
+        "crates/application/src/ports/player/mod.rs",
         "crates/persistence-postgres/src/entity_catalog.rs",
         "src-tauri/src/commands/catalog.rs"
       ],
@@ -4177,6 +4202,7 @@
       ],
       "externalCallers": [
         "crates/application/src/player_catalog.rs",
+        "crates/application/src/ports/player/mod.rs",
         "crates/persistence-postgres/src/entity_catalog.rs",
         "src-tauri/src/commands/catalog.rs"
       ],
@@ -4257,6 +4283,7 @@
       ],
       "externalCallers": [
         "crates/application/src/player_catalog.rs",
+        "crates/application/src/ports/player/mod.rs",
         "crates/persistence-postgres/src/entity_catalog.rs",
         "src-tauri/src/commands/catalog.rs"
       ],
@@ -4356,6 +4383,7 @@
         "crates/domain/tests/serde_contracts/module_paths.rs"
       ],
       "externalCallers": [
+        "crates/application/src/ports/rules/mod.rs",
         "crates/application/src/rule_packages.rs",
         "crates/persistence-postgres/src/routing.rs",
         "src-tauri/src/commands/competition.rs"
@@ -4457,6 +4485,7 @@
       ],
       "externalCallers": [
         "crates/application/src/lib.rs",
+        "crates/application/src/ports/rules/mod.rs",
         "crates/application/src/rule_packages.rs",
         "crates/persistence-postgres/src/routing.rs",
         "src-tauri/src/commands/competition.rs"
@@ -4537,6 +4566,7 @@
       ],
       "externalCallers": [
         "crates/application/src/competition.rs",
+        "crates/application/src/ports/competition/mod.rs",
         "crates/persistence-postgres/src/competitions.rs",
         "crates/persistence-postgres/tests/postgres_integration.rs",
         "src-tauri/src/commands/competition.rs"
@@ -4632,6 +4662,7 @@
         "crates/application/src/analytics.rs",
         "crates/application/src/competition.rs",
         "crates/application/src/lib.rs",
+        "crates/application/src/ports/rules/mod.rs",
         "crates/application/src/prediction.rs",
         "crates/application/src/rule_packages.rs",
         "crates/model-api/src/lib.rs",
@@ -4969,6 +5000,7 @@
       "externalCallers": [
         "crates/application/src/competition.rs",
         "crates/application/src/lib.rs",
+        "crates/application/src/ports/competition/mod.rs",
         "crates/persistence-postgres/src/competitions.rs",
         "src-tauri/src/commands/competition.rs"
       ],
@@ -5068,6 +5100,7 @@
       ],
       "externalCallers": [
         "crates/application/src/fact_pipeline.rs",
+        "crates/application/src/ports/research/mod.rs",
         "crates/persistence-postgres/src/fact_pipeline_records.rs"
       ],
       "databaseMappings": [
@@ -5129,6 +5162,7 @@
         "crates/domain/tests/serde_contracts/module_paths.rs"
       ],
       "externalCallers": [
+        "crates/application/src/ports/research/mod.rs",
         "crates/persistence-postgres/src/fact_pipeline_records.rs"
       ],
       "databaseMappings": [
@@ -5330,6 +5364,7 @@
       ],
       "externalCallers": [
         "crates/application/src/player_catalog.rs",
+        "crates/application/src/ports/player/mod.rs",
         "crates/persistence-postgres/src/player_catalog.rs",
         "src-tauri/src/commands/catalog.rs"
       ],
@@ -5402,6 +5437,7 @@
       ],
       "externalCallers": [
         "crates/application/src/player_catalog.rs",
+        "crates/application/src/ports/player/mod.rs",
         "crates/persistence-postgres/src/player_catalog.rs",
         "src-tauri/src/commands/catalog.rs"
       ],
@@ -5518,6 +5554,7 @@
       ],
       "externalCallers": [
         "crates/application/src/analytics.rs",
+        "crates/application/src/ports/analytics/mod.rs",
         "crates/persistence-postgres/src/analytics.rs",
         "src-tauri/src/commands/analytics.rs"
       ],
@@ -5610,6 +5647,7 @@
       ],
       "externalCallers": [
         "crates/application/src/analytics.rs",
+        "crates/application/src/ports/analytics/mod.rs",
         "crates/persistence-postgres/src/analytics.rs",
         "src-tauri/src/commands/analytics.rs"
       ],
@@ -5849,6 +5887,7 @@
       "externalCallers": [
         "crates/application/src/analytics.rs",
         "crates/application/src/p4_orchestration.rs",
+        "crates/application/src/ports/analytics/mod.rs",
         "crates/persistence-postgres/src/jobs.rs",
         "crates/persistence-postgres/tests/postgres_integration.rs",
         "src-tauri/src/commands/analytics.rs"
@@ -6003,6 +6042,7 @@
       ],
       "externalCallers": [
         "crates/application/src/player_catalog.rs",
+        "crates/application/src/ports/player/mod.rs",
         "crates/persistence-postgres/src/entity_catalog.rs",
         "src-tauri/src/commands/catalog.rs"
       ],
@@ -6158,6 +6198,8 @@
       ],
       "externalCallers": [
         "crates/application/src/player_catalog.rs",
+        "crates/application/src/ports/player/mod.rs",
+        "crates/application/src/ports/research/mod.rs",
         "crates/persistence-postgres/src/entity_catalog.rs",
         "src-tauri/src/commands/catalog.rs"
       ],
@@ -6217,6 +6259,7 @@
       ],
       "externalCallers": [
         "crates/application/src/player_catalog.rs",
+        "crates/application/src/ports/player/mod.rs",
         "crates/persistence-postgres/src/entity_catalog.rs",
         "src-tauri/src/commands/catalog.rs"
       ],
@@ -6343,6 +6386,7 @@
       ],
       "externalCallers": [
         "crates/application/src/player_catalog.rs",
+        "crates/application/src/ports/player/mod.rs",
         "crates/persistence-postgres/src/entity_catalog.rs",
         "src-tauri/src/commands/catalog.rs"
       ],
@@ -6430,6 +6474,7 @@
       ],
       "externalCallers": [
         "crates/application/src/player_catalog.rs",
+        "crates/application/src/ports/player/mod.rs",
         "crates/persistence-postgres/src/entity_catalog.rs",
         "src-tauri/src/commands/catalog.rs"
       ],
@@ -6549,6 +6594,7 @@
       ],
       "externalCallers": [
         "crates/application/src/fact_pipeline.rs",
+        "crates/application/src/ports/research/mod.rs",
         "crates/persistence-postgres/src/fact_pipeline_records.rs"
       ],
       "databaseMappings": [
@@ -6615,6 +6661,7 @@
       ],
       "externalCallers": [
         "crates/application/src/fact_pipeline.rs",
+        "crates/application/src/ports/research/mod.rs",
         "crates/persistence-postgres/src/fact_pipeline_records.rs"
       ],
       "databaseMappings": [
@@ -7327,6 +7374,7 @@
       ],
       "externalCallers": [
         "crates/application/src/fact_pipeline.rs",
+        "crates/application/src/ports/research/mod.rs",
         "crates/persistence-postgres/src/fact_pipeline_records.rs"
       ],
       "databaseMappings": [
@@ -7388,6 +7436,7 @@
         "crates/domain/tests/serde_contracts/module_paths.rs"
       ],
       "externalCallers": [
+        "crates/application/src/ports/research/mod.rs",
         "crates/persistence-postgres/src/fact_pipeline_records.rs"
       ],
       "databaseMappings": [
@@ -7666,6 +7715,7 @@
         "crates/domain/tests/serde_contracts/r2_06_module_paths.rs"
       ],
       "externalCallers": [
+        "crates/application/src/ports/postmatch/mod.rs",
         "crates/application/src/postmatch.rs",
         "crates/persistence-postgres/src/postmatch.rs",
         "src-tauri/src/commands/postmatch.rs"
@@ -7810,6 +7860,7 @@
         "crates/domain/tests/serde_contracts/r2_06_module_paths.rs"
       ],
       "externalCallers": [
+        "crates/application/src/ports/postmatch/mod.rs",
         "crates/application/src/postmatch.rs",
         "crates/persistence-postgres/src/postmatch.rs",
         "src-tauri/src/commands/postmatch.rs"
@@ -8037,6 +8088,7 @@
       ],
       "externalCallers": [
         "crates/application/src/player_catalog.rs",
+        "crates/application/src/ports/player/mod.rs",
         "crates/persistence-postgres/src/player_catalog.rs",
         "src-tauri/src/commands/catalog.rs"
       ],
@@ -8114,6 +8166,7 @@
       ],
       "externalCallers": [
         "crates/application/src/player_catalog.rs",
+        "crates/application/src/ports/player/mod.rs",
         "crates/persistence-postgres/src/entity_catalog.rs",
         "crates/persistence-postgres/src/player_catalog.rs",
         "src-tauri/src/commands/catalog.rs"
@@ -8231,6 +8284,7 @@
       ],
       "externalCallers": [
         "crates/application/src/fact_pipeline.rs",
+        "crates/application/src/ports/research/mod.rs",
         "crates/persistence-postgres/src/fact_pipeline_records.rs"
       ],
       "databaseMappings": [
@@ -8398,6 +8452,7 @@
       ],
       "externalCallers": [
         "crates/application/src/player_catalog.rs",
+        "crates/application/src/ports/lineup/mod.rs",
         "crates/persistence-postgres/src/formation_catalog.rs",
         "crates/persistence-postgres/src/team_catalog.rs",
         "crates/persistence-postgres/tests/postgres_integration.rs",
@@ -8486,6 +8541,7 @@
       ],
       "externalCallers": [
         "crates/application/src/player_catalog.rs",
+        "crates/application/src/ports/lineup/mod.rs",
         "crates/persistence-postgres/src/formation_catalog.rs",
         "src-tauri/src/commands/catalog.rs"
       ],
@@ -8605,6 +8661,7 @@
       ],
       "externalCallers": [
         "crates/application/src/player_catalog.rs",
+        "crates/application/src/ports/lineup/mod.rs",
         "crates/persistence-postgres/src/formation_catalog.rs",
         "crates/persistence-postgres/tests/postgres_integration.rs",
         "src-tauri/src/commands/catalog.rs"
@@ -8714,6 +8771,7 @@
       ],
       "externalCallers": [
         "crates/application/src/player_catalog.rs",
+        "crates/application/src/ports/lineup/mod.rs",
         "crates/persistence-postgres/src/formation_catalog.rs",
         "src-tauri/src/commands/catalog.rs"
       ],
@@ -8915,6 +8973,7 @@
       ],
       "externalCallers": [
         "crates/application/src/player_catalog.rs",
+        "crates/application/src/ports/lineup/mod.rs",
         "crates/persistence-postgres/src/formation_catalog.rs",
         "crates/persistence-postgres/src/team_catalog.rs",
         "crates/persistence-postgres/tests/postgres_integration.rs",
@@ -9108,6 +9167,7 @@
       ],
       "externalCallers": [
         "crates/application/src/player_catalog.rs",
+        "crates/application/src/ports/lineup/mod.rs",
         "crates/persistence-postgres/src/player_catalog.rs",
         "crates/persistence-postgres/tests/postgres_integration.rs",
         "crates/spreadsheet-io/src/match_review_workbook.rs",
@@ -9169,6 +9229,7 @@
       ],
       "externalCallers": [
         "crates/application/src/player_catalog.rs",
+        "crates/application/src/ports/lineup/mod.rs",
         "crates/persistence-postgres/src/player_catalog.rs",
         "src-tauri/src/commands/catalog.rs"
       ],
@@ -9226,6 +9287,7 @@
       "externalCallers": [
         "crates/application/src/match_review_package.rs",
         "crates/application/src/player_catalog.rs",
+        "crates/application/src/ports/lineup/mod.rs",
         "crates/persistence-postgres/src/player_catalog.rs",
         "crates/persistence-postgres/tests/postgres_integration.rs",
         "crates/spreadsheet-io/src/match_review_workbook.rs",
@@ -9283,6 +9345,7 @@
       ],
       "externalCallers": [
         "crates/application/src/player_catalog.rs",
+        "crates/application/src/ports/lineup/mod.rs",
         "crates/persistence-postgres/src/player_catalog.rs",
         "src-tauri/src/commands/catalog.rs"
       ],
@@ -9680,6 +9743,7 @@
       "externalCallers": [
         "crates/application/src/match_review_package.rs",
         "crates/application/src/player_catalog.rs",
+        "crates/application/src/ports/lineup/mod.rs",
         "crates/application/src/prediction.rs",
         "crates/persistence-postgres/src/lineup_chain.rs",
         "crates/persistence-postgres/src/match_exchange.rs",
@@ -9959,6 +10023,7 @@
       ],
       "externalCallers": [
         "crates/application/src/player_catalog.rs",
+        "crates/application/src/ports/lineup/mod.rs",
         "crates/persistence-postgres/src/player_catalog.rs",
         "crates/persistence-postgres/tests/postgres_integration.rs",
         "src-tauri/src/commands/catalog.rs"
@@ -10375,6 +10440,7 @@
       ],
       "externalCallers": [
         "crates/application/src/player_catalog.rs",
+        "crates/application/src/ports/lineup/mod.rs",
         "crates/application/src/prediction.rs",
         "crates/persistence-postgres/src/lineup_chain.rs",
         "src-tauri/src/commands/catalog.rs"
@@ -10470,6 +10536,7 @@
         "crates/domain/tests/serde_contracts/r2_07_module_paths.rs"
       ],
       "externalCallers": [
+        "crates/application/src/ports/exchange/mod.rs",
         "crates/persistence-postgres/src/match_exchange.rs",
         "crates/spreadsheet-io/src/match_workbook.rs"
       ],
@@ -10923,6 +10990,7 @@
       ],
       "externalCallers": [
         "crates/application/src/player_catalog.rs",
+        "crates/application/src/ports/lineup/mod.rs",
         "crates/application/src/prediction.rs",
         "crates/persistence-postgres/src/match_exchange.rs",
         "crates/persistence-postgres/src/match_prediction.rs",
@@ -11195,6 +11263,7 @@
         "crates/domain/tests/serde_contracts/r2_06_module_paths.rs"
       ],
       "externalCallers": [
+        "crates/application/src/ports/review/mod.rs",
         "crates/application/src/review.rs",
         "crates/persistence-postgres/src/review.rs",
         "src-tauri/src/commands/review.rs"
@@ -11739,6 +11808,7 @@
       ],
       "externalCallers": [
         "crates/application/src/match_review_package.rs",
+        "crates/application/src/ports/review/mod.rs",
         "src-tauri/src/commands/postmatch.rs"
       ],
       "databaseMappings": []
@@ -11795,6 +11865,7 @@
       ],
       "externalCallers": [
         "crates/application/src/match_review_package.rs",
+        "crates/application/src/ports/review/mod.rs",
         "src-tauri/src/commands/postmatch.rs"
       ],
       "databaseMappings": []
@@ -11926,6 +11997,7 @@
       ],
       "externalCallers": [
         "crates/application/src/match_review_package.rs",
+        "crates/application/src/ports/review/mod.rs",
         "src-tauri/src/commands/postmatch.rs"
       ],
       "databaseMappings": []
@@ -12373,6 +12445,7 @@
       ],
       "externalCallers": [
         "crates/application/src/match_review_package.rs",
+        "crates/application/src/ports/review/mod.rs",
         "crates/persistence-postgres/src/match_review_package.rs",
         "crates/persistence-postgres/tests/postgres_integration.rs",
         "crates/spreadsheet-io/src/match_review_workbook.rs",
@@ -12842,6 +12915,7 @@
       ],
       "externalCallers": [
         "crates/application/src/match_review_package.rs",
+        "crates/application/src/ports/review/mod.rs",
         "crates/persistence-postgres/src/match_review_package.rs",
         "src-tauri/src/commands/postmatch.rs"
       ],
@@ -13123,6 +13197,7 @@
         "crates/domain/tests/serde_contracts/r2_06_module_paths.rs"
       ],
       "externalCallers": [
+        "crates/application/src/ports/review/mod.rs",
         "crates/application/src/review.rs",
         "crates/persistence-postgres/src/review.rs",
         "src-tauri/src/commands/review.rs"
@@ -13703,6 +13778,7 @@
       ],
       "externalCallers": [
         "crates/application/src/openai_research.rs",
+        "crates/application/src/ports/research/mod.rs",
         "crates/persistence-postgres/src/research_gateway_records.rs"
       ],
       "databaseMappings": [
@@ -13776,6 +13852,7 @@
         "crates/domain/tests/serde_contracts/module_paths.rs"
       ],
       "externalCallers": [
+        "crates/application/src/ports/research/mod.rs",
         "crates/persistence-postgres/src/research_gateway_records.rs"
       ],
       "databaseMappings": [
@@ -13839,6 +13916,7 @@
       ],
       "externalCallers": [
         "crates/application/src/api_workspace.rs",
+        "crates/application/src/ports/research/mod.rs",
         "crates/persistence-postgres/src/api_workspace.rs",
         "crates/persistence-postgres/src/research_gateway_records.rs"
       ],
@@ -14162,6 +14240,7 @@
       ],
       "externalCallers": [
         "crates/application/src/p4_orchestration.rs",
+        "crates/application/src/ports/prediction/mod.rs",
         "crates/persistence-postgres/src/p4_orchestration.rs",
         "src-tauri/src/commands/orchestration.rs"
       ],
@@ -14283,6 +14362,7 @@
       ],
       "externalCallers": [
         "crates/application/src/p4_orchestration.rs",
+        "crates/application/src/ports/prediction/mod.rs",
         "crates/persistence-postgres/src/p4_orchestration.rs"
       ],
       "databaseMappings": [
@@ -14358,6 +14438,7 @@
       ],
       "externalCallers": [
         "crates/application/src/p4_orchestration.rs",
+        "crates/application/src/ports/prediction/mod.rs",
         "crates/persistence-postgres/src/p4_orchestration.rs",
         "src-tauri/src/commands/orchestration.rs"
       ],
@@ -14514,6 +14595,7 @@
       ],
       "externalCallers": [
         "crates/application/src/p4_orchestration.rs",
+        "crates/application/src/ports/prediction/mod.rs",
         "crates/persistence-postgres/src/p4_orchestration.rs",
         "src-tauri/src/commands/orchestration.rs"
       ],
@@ -14739,6 +14821,7 @@
       "externalCallers": [
         "crates/application/src/p4_orchestration.rs",
         "crates/application/src/p4_workbench.rs",
+        "crates/application/src/ports/prediction/mod.rs",
         "crates/persistence-postgres/src/p4_orchestration.rs"
       ],
       "databaseMappings": [
@@ -15814,6 +15897,7 @@
       ],
       "externalCallers": [
         "crates/application/src/analytics.rs",
+        "crates/application/src/ports/analytics/mod.rs",
         "crates/persistence-postgres/src/parameter_lifecycle.rs",
         "src-tauri/src/commands/analytics.rs"
       ],
@@ -15877,6 +15961,7 @@
       ],
       "externalCallers": [
         "crates/application/src/analytics.rs",
+        "crates/application/src/ports/analytics/mod.rs",
         "crates/persistence-postgres/src/parameter_lifecycle.rs",
         "src-tauri/src/commands/analytics.rs"
       ],
@@ -16017,6 +16102,7 @@
       ],
       "externalCallers": [
         "crates/application/src/analytics.rs",
+        "crates/application/src/ports/analytics/mod.rs",
         "crates/persistence-postgres/src/parameter_lifecycle.rs",
         "src-tauri/src/commands/analytics.rs"
       ],
@@ -16212,6 +16298,7 @@
       ],
       "externalCallers": [
         "crates/application/src/analytics.rs",
+        "crates/application/src/ports/analytics/mod.rs",
         "crates/persistence-postgres/src/parameter_lifecycle.rs",
         "src-tauri/src/commands/analytics.rs"
       ],
@@ -16303,6 +16390,7 @@
       ],
       "externalCallers": [
         "crates/application/src/analytics.rs",
+        "crates/application/src/ports/analytics/mod.rs",
         "crates/persistence-postgres/src/parameter_lifecycle.rs",
         "src-tauri/src/commands/analytics.rs"
       ],
@@ -16354,6 +16442,7 @@
       ],
       "externalCallers": [
         "crates/application/src/analytics.rs",
+        "crates/application/src/ports/analytics/mod.rs",
         "src-tauri/src/commands/analytics.rs"
       ],
       "databaseMappings": []
@@ -16518,6 +16607,7 @@
       ],
       "externalCallers": [
         "crates/application/src/analytics.rs",
+        "crates/application/src/ports/analytics/mod.rs",
         "crates/persistence-postgres/src/analytics.rs",
         "crates/persistence-postgres/src/parameter_lifecycle.rs",
         "src-tauri/src/commands/analytics.rs"
@@ -16953,6 +17043,7 @@
       "externalCallers": [
         "crates/application/src/api_workspace.rs",
         "crates/application/src/player_catalog.rs",
+        "crates/application/src/ports/player/mod.rs",
         "crates/persistence-postgres/src/player_catalog.rs",
         "src-tauri/src/commands/catalog.rs"
       ],
@@ -17053,6 +17144,7 @@
       ],
       "externalCallers": [
         "crates/application/src/player_catalog.rs",
+        "crates/application/src/ports/player/mod.rs",
         "crates/persistence-postgres/src/player_catalog.rs",
         "src-tauri/src/commands/catalog.rs"
       ],
@@ -17234,6 +17326,7 @@
       "externalCallers": [
         "crates/application/src/api_workspace.rs",
         "crates/application/src/player_catalog.rs",
+        "crates/application/src/ports/player/mod.rs",
         "crates/persistence-postgres/src/player_catalog.rs",
         "src-tauri/src/commands/catalog.rs"
       ],
@@ -17327,6 +17420,7 @@
       ],
       "externalCallers": [
         "crates/application/src/player_catalog.rs",
+        "crates/application/src/ports/player/mod.rs",
         "crates/persistence-postgres/src/player_catalog.rs",
         "src-tauri/src/commands/catalog.rs"
       ],
@@ -17413,6 +17507,7 @@
       ],
       "externalCallers": [
         "crates/application/src/player_catalog.rs",
+        "crates/application/src/ports/player/mod.rs",
         "crates/persistence-postgres/src/player_catalog.rs",
         "crates/spreadsheet-io/src/lib.rs",
         "crates/spreadsheet-io/src/monthly_workbook.rs",
@@ -17499,6 +17594,7 @@
       ],
       "externalCallers": [
         "crates/application/src/player_catalog.rs",
+        "crates/application/src/ports/player/mod.rs",
         "crates/persistence-postgres/src/player_catalog.rs",
         "src-tauri/src/commands/catalog.rs"
       ],
@@ -17587,6 +17683,7 @@
       ],
       "externalCallers": [
         "crates/application/src/player_catalog.rs",
+        "crates/application/src/ports/player/mod.rs",
         "crates/persistence-postgres/src/player_catalog.rs",
         "src-tauri/src/commands/catalog.rs"
       ],
@@ -17800,6 +17897,7 @@
       "externalCallers": [
         "crates/application/src/api_workspace.rs",
         "crates/application/src/player_catalog.rs",
+        "crates/application/src/ports/player/mod.rs",
         "crates/persistence-postgres/src/dynamic_tags.rs",
         "src-tauri/src/commands/catalog.rs"
       ],
@@ -17931,6 +18029,7 @@
       ],
       "externalCallers": [
         "crates/application/src/player_catalog.rs",
+        "crates/application/src/ports/player/mod.rs",
         "crates/persistence-postgres/src/dynamic_tags.rs",
         "src-tauri/src/commands/catalog.rs"
       ],
@@ -18132,6 +18231,7 @@
       ],
       "externalCallers": [
         "crates/application/src/player_catalog.rs",
+        "crates/application/src/ports/player/mod.rs",
         "crates/persistence-postgres/src/player_catalog.rs",
         "src-tauri/src/commands/catalog.rs"
       ],
@@ -18229,6 +18329,7 @@
       "externalCallers": [
         "crates/application/src/api_workspace.rs",
         "crates/application/src/player_catalog.rs",
+        "crates/application/src/ports/player/mod.rs",
         "crates/persistence-postgres/src/player_catalog.rs",
         "src-tauri/src/commands/catalog.rs"
       ],
@@ -18359,6 +18460,7 @@
       ],
       "externalCallers": [
         "crates/application/src/player_catalog.rs",
+        "crates/application/src/ports/player/mod.rs",
         "crates/persistence-postgres/src/dynamic_tags.rs",
         "crates/persistence-postgres/src/match_prediction.rs",
         "src-tauri/src/commands/catalog.rs"
@@ -18470,6 +18572,7 @@
       ],
       "externalCallers": [
         "crates/application/src/player_catalog.rs",
+        "crates/application/src/ports/player/mod.rs",
         "crates/persistence-postgres/src/dynamic_tags.rs",
         "crates/persistence-postgres/src/match_exchange.rs",
         "crates/persistence-postgres/src/match_prediction.rs",
@@ -18861,6 +18964,7 @@
       "externalCallers": [
         "crates/application/src/api_workspace.rs",
         "crates/application/src/player_catalog.rs",
+        "crates/application/src/ports/player/mod.rs",
         "crates/persistence-postgres/src/player_catalog.rs",
         "src-tauri/src/commands/catalog.rs"
       ],
@@ -18941,6 +19045,7 @@
       ],
       "externalCallers": [
         "crates/application/src/player_catalog.rs",
+        "crates/application/src/ports/player/mod.rs",
         "crates/persistence-postgres/src/player_catalog.rs",
         "src-tauri/src/commands/catalog.rs"
       ],
@@ -19201,6 +19306,7 @@
       "externalCallers": [
         "crates/application/src/api_workspace.rs",
         "crates/application/src/player_catalog.rs",
+        "crates/application/src/ports/player/mod.rs",
         "crates/persistence-postgres/src/player_catalog.rs",
         "src-tauri/src/commands/catalog.rs"
       ],
@@ -19291,6 +19397,7 @@
       ],
       "externalCallers": [
         "crates/application/src/player_catalog.rs",
+        "crates/application/src/ports/player/mod.rs",
         "crates/persistence-postgres/src/player_catalog.rs",
         "src-tauri/src/commands/catalog.rs"
       ],
@@ -19376,6 +19483,7 @@
       ],
       "externalCallers": [
         "crates/application/src/player_catalog.rs",
+        "crates/application/src/ports/player/mod.rs",
         "crates/persistence-postgres/src/player_catalog.rs",
         "src-tauri/src/commands/catalog.rs"
       ],
@@ -19537,6 +19645,7 @@
       ],
       "externalCallers": [
         "crates/application/src/player_catalog.rs",
+        "crates/application/src/ports/player/mod.rs",
         "crates/persistence-postgres/src/player_catalog.rs",
         "src-tauri/src/commands/catalog.rs"
       ],
@@ -19625,6 +19734,7 @@
       ],
       "externalCallers": [
         "crates/application/src/player_catalog.rs",
+        "crates/application/src/ports/player/mod.rs",
         "crates/persistence-postgres/src/player_catalog.rs",
         "src-tauri/src/commands/catalog.rs"
       ],
@@ -19950,6 +20060,7 @@
         "crates/domain/tests/serde_contracts/r2_06_module_paths.rs"
       ],
       "externalCallers": [
+        "crates/application/src/ports/postmatch/mod.rs",
         "crates/application/src/postmatch.rs",
         "crates/persistence-postgres/src/postmatch.rs",
         "src-tauri/src/commands/postmatch.rs"
@@ -20025,6 +20136,7 @@
         "crates/domain/tests/serde_contracts/r2_06_module_paths.rs"
       ],
       "externalCallers": [
+        "crates/application/src/ports/postmatch/mod.rs",
         "crates/application/src/postmatch.rs",
         "crates/persistence-postgres/src/postmatch.rs",
         "src-tauri/src/commands/postmatch.rs"
@@ -20088,6 +20200,7 @@
         "crates/domain/tests/serde_contracts/r2_06_module_paths.rs"
       ],
       "externalCallers": [
+        "crates/application/src/ports/postmatch/mod.rs",
         "crates/application/src/postmatch.rs",
         "crates/persistence-postgres/src/postmatch.rs",
         "src-tauri/src/commands/postmatch.rs"
@@ -20199,6 +20312,7 @@
         "crates/domain/tests/serde_contracts/r2_06_module_paths.rs"
       ],
       "externalCallers": [
+        "crates/application/src/ports/postmatch/mod.rs",
         "crates/application/src/postmatch.rs",
         "crates/persistence-postgres/src/postmatch.rs",
         "src-tauri/src/commands/postmatch.rs"
@@ -20371,6 +20485,7 @@
         "crates/domain/tests/serde_contracts/r2_06_module_paths.rs"
       ],
       "externalCallers": [
+        "crates/application/src/ports/postmatch/mod.rs",
         "crates/application/src/postmatch.rs",
         "crates/persistence-postgres/src/postmatch.rs",
         "src-tauri/src/commands/postmatch.rs"
@@ -21189,6 +21304,7 @@
         "crates/domain/tests/serde_contracts/r2_07_module_paths.rs"
       ],
       "externalCallers": [
+        "crates/application/src/ports/prediction/mod.rs",
         "crates/application/src/prediction.rs",
         "crates/persistence-postgres/src/match_prediction.rs"
       ],
@@ -21259,6 +21375,7 @@
       "externalCallers": [
         "crates/application/src/openai_research.rs",
         "crates/application/src/p4_persistence.rs",
+        "crates/application/src/ports/research/mod.rs",
         "crates/persistence-postgres/src/p4_records.rs"
       ],
       "databaseMappings": [
@@ -21329,6 +21446,7 @@
       ],
       "externalCallers": [
         "crates/application/src/p4_persistence.rs",
+        "crates/application/src/ports/research/mod.rs",
         "crates/persistence-postgres/src/p4_records.rs"
       ],
       "databaseMappings": [
@@ -21973,6 +22091,7 @@
         "crates/domain/tests/serde_contracts/r2_07_module_paths.rs"
       ],
       "externalCallers": [
+        "crates/application/src/ports/release/mod.rs",
         "crates/application/src/release_acceptance.rs",
         "src-tauri/src/commands/release_acceptance.rs"
       ],
@@ -22081,6 +22200,7 @@
         "crates/domain/tests/serde_contracts/r2_07_module_paths.rs"
       ],
       "externalCallers": [
+        "crates/application/src/ports/release/mod.rs",
         "crates/application/src/release_acceptance.rs",
         "crates/persistence-postgres/src/release_acceptance.rs",
         "src-tauri/src/commands/release_acceptance.rs"
@@ -22164,6 +22284,7 @@
         "crates/domain/tests/serde_contracts/r2_07_module_paths.rs"
       ],
       "externalCallers": [
+        "crates/application/src/ports/release/mod.rs",
         "crates/application/src/release_acceptance.rs",
         "crates/persistence-postgres/src/release_acceptance.rs",
         "src-tauri/src/commands/release_acceptance.rs"
@@ -22292,6 +22413,7 @@
         "crates/domain/tests/serde_contracts/r2_07_module_paths.rs"
       ],
       "externalCallers": [
+        "crates/application/src/ports/release/mod.rs",
         "crates/application/src/release_acceptance.rs",
         "crates/persistence-postgres/src/release_acceptance.rs"
       ],
@@ -22454,6 +22576,7 @@
       "externalCallers": [
         "crates/application/src/p4_orchestration.rs",
         "crates/application/src/p4_persistence.rs",
+        "crates/application/src/ports/research/mod.rs",
         "crates/persistence-postgres/src/p4_records.rs",
         "crates/persistence-postgres/tests/postgres_integration.rs"
       ],
@@ -22551,6 +22674,7 @@
         "crates/application/src/openai_research.rs",
         "crates/application/src/p4_persistence.rs",
         "crates/application/src/p4_workbench.rs",
+        "crates/application/src/ports/research/mod.rs",
         "crates/persistence-postgres/src/p4_records.rs"
       ],
       "databaseMappings": [
@@ -22633,6 +22757,7 @@
       ],
       "externalCallers": [
         "crates/application/src/p4_persistence.rs",
+        "crates/application/src/ports/research/mod.rs",
         "crates/persistence-postgres/src/p4_orchestration.rs",
         "crates/persistence-postgres/src/p4_records.rs"
       ],
@@ -22867,6 +22992,7 @@
       ],
       "externalCallers": [
         "crates/application/src/player_catalog.rs",
+        "crates/application/src/ports/lineup/mod.rs",
         "crates/persistence-postgres/src/formation_catalog.rs",
         "src-tauri/src/commands/catalog.rs"
       ],
@@ -23001,6 +23127,7 @@
         "crates/domain/tests/serde_contracts/r2_06_module_paths.rs"
       ],
       "externalCallers": [
+        "crates/application/src/ports/review/mod.rs",
         "crates/application/src/review.rs",
         "crates/persistence-postgres/src/review.rs",
         "src-tauri/src/commands/review.rs"
@@ -23327,6 +23454,7 @@
       ],
       "externalCallers": [
         "crates/application/src/competition.rs",
+        "crates/application/src/ports/competition/mod.rs",
         "crates/persistence-postgres/src/competitions.rs",
         "src-tauri/src/commands/competition.rs"
       ],
@@ -23408,6 +23536,7 @@
       "externalCallers": [
         "crates/application/src/competition.rs",
         "crates/application/src/lib.rs",
+        "crates/application/src/ports/competition/mod.rs",
         "crates/persistence-postgres/src/competitions.rs",
         "src-tauri/src/commands/competition.rs"
       ],
@@ -23533,6 +23662,8 @@
       "externalCallers": [
         "crates/application/src/lib.rs",
         "crates/application/src/p4_orchestration.rs",
+        "crates/application/src/ports/prediction/mod.rs",
+        "crates/application/src/ports/rules/mod.rs",
         "crates/application/src/prediction.rs",
         "crates/persistence-postgres/src/model_runs.rs",
         "crates/persistence-postgres/src/routing.rs",
@@ -23628,6 +23759,7 @@
       ],
       "externalCallers": [
         "crates/application/src/p4_orchestration.rs",
+        "crates/application/src/ports/rules/mod.rs",
         "crates/application/src/prediction.rs",
         "crates/persistence-postgres/src/routing.rs"
       ],
@@ -23801,6 +23933,7 @@
       ],
       "externalCallers": [
         "crates/application/src/lib.rs",
+        "crates/application/src/ports/rules/mod.rs",
         "crates/application/src/rule_packages.rs",
         "crates/persistence-postgres/src/routing.rs",
         "crates/persistence-postgres/tests/postgres_integration.rs",
@@ -23903,6 +24036,7 @@
       ],
       "externalCallers": [
         "crates/application/src/lib.rs",
+        "crates/application/src/ports/rules/mod.rs",
         "crates/application/src/rule_packages.rs",
         "crates/persistence-postgres/src/routing.rs",
         "src-tauri/src/commands/competition.rs"
@@ -24127,6 +24261,7 @@
       "externalCallers": [
         "crates/application/src/openai_research.rs",
         "crates/application/src/p4_persistence.rs",
+        "crates/application/src/ports/research/mod.rs",
         "crates/persistence-postgres/src/p4_records.rs",
         "crates/persistence-postgres/tests/postgres_integration.rs"
       ],
@@ -24198,6 +24333,7 @@
       ],
       "externalCallers": [
         "crates/application/src/p4_persistence.rs",
+        "crates/application/src/ports/research/mod.rs",
         "crates/persistence-postgres/src/p4_orchestration.rs",
         "crates/persistence-postgres/src/p4_records.rs"
       ],
@@ -24280,6 +24416,7 @@
       ],
       "externalCallers": [
         "crates/application/src/competition.rs",
+        "crates/application/src/ports/competition/mod.rs",
         "crates/persistence-postgres/src/competitions.rs",
         "crates/persistence-postgres/tests/postgres_integration.rs",
         "src-tauri/src/commands/competition.rs"
@@ -24358,6 +24495,7 @@
       "externalCallers": [
         "crates/application/src/competition.rs",
         "crates/application/src/lib.rs",
+        "crates/application/src/ports/competition/mod.rs",
         "crates/persistence-postgres/src/competitions.rs",
         "src-tauri/src/commands/competition.rs"
       ],
@@ -24799,6 +24937,7 @@
       ],
       "externalCallers": [
         "crates/application/src/fact_pipeline.rs",
+        "crates/application/src/ports/research/mod.rs",
         "crates/persistence-postgres/src/fact_pipeline_records.rs",
         "crates/persistence-postgres/tests/postgres_integration.rs"
       ],
@@ -24865,6 +25004,7 @@
         "crates/domain/tests/serde_contracts/module_paths.rs"
       ],
       "externalCallers": [
+        "crates/application/src/ports/research/mod.rs",
         "crates/persistence-postgres/src/fact_pipeline_records.rs"
       ],
       "databaseMappings": [
@@ -25345,6 +25485,7 @@
         "crates/domain/tests/serde_contracts/r2_07_module_paths.rs"
       ],
       "externalCallers": [
+        "crates/application/src/ports/exchange/mod.rs",
         "crates/persistence-postgres/src/spreadsheet_exchange.rs",
         "crates/spreadsheet-io/src/lib.rs",
         "crates/spreadsheet-io/src/monthly_workbook.rs"
@@ -25548,6 +25689,7 @@
       ],
       "externalCallers": [
         "crates/application/src/exchange.rs",
+        "crates/application/src/ports/exchange/mod.rs",
         "crates/application/src/spreadsheet.rs",
         "crates/persistence-postgres/src/match_exchange.rs",
         "crates/persistence-postgres/src/monthly_workbooks.rs",
@@ -25781,6 +25923,7 @@
       ],
       "externalCallers": [
         "crates/application/src/exchange.rs",
+        "crates/application/src/ports/exchange/mod.rs",
         "crates/application/src/spreadsheet.rs",
         "crates/persistence-postgres/src/match_exchange.rs",
         "crates/persistence-postgres/src/monthly_workbooks.rs",
@@ -25849,6 +25992,7 @@
       ],
       "externalCallers": [
         "crates/application/src/exchange.rs",
+        "crates/application/src/ports/exchange/mod.rs",
         "crates/application/src/spreadsheet.rs",
         "crates/persistence-postgres/src/match_exchange.rs",
         "crates/persistence-postgres/src/monthly_workbooks.rs",
@@ -26012,6 +26156,7 @@
         "crates/domain/tests/serde_contracts/r2_07_module_paths.rs"
       ],
       "externalCallers": [
+        "crates/application/src/ports/exchange/mod.rs",
         "crates/application/src/spreadsheet.rs",
         "crates/persistence-postgres/src/match_exchange.rs",
         "crates/persistence-postgres/src/monthly_workbooks.rs",
@@ -26936,6 +27081,7 @@
       ],
       "externalCallers": [
         "crates/application/src/competition.rs",
+        "crates/application/src/ports/competition/mod.rs",
         "crates/persistence-postgres/src/competitions.rs",
         "src-tauri/src/commands/competition.rs"
       ],
@@ -27021,6 +27167,7 @@
       "externalCallers": [
         "crates/application/src/competition.rs",
         "crates/application/src/lib.rs",
+        "crates/application/src/ports/competition/mod.rs",
         "crates/persistence-postgres/src/competitions.rs",
         "src-tauri/src/commands/competition.rs"
       ],
@@ -27407,6 +27554,7 @@
       ],
       "externalCallers": [
         "crates/application/src/player_catalog.rs",
+        "crates/application/src/ports/player/mod.rs",
         "crates/persistence-postgres/src/entity_catalog.rs",
         "src-tauri/src/commands/catalog.rs"
       ],
@@ -27496,6 +27644,7 @@
       ],
       "externalCallers": [
         "crates/application/src/player_catalog.rs",
+        "crates/application/src/ports/player/mod.rs",
         "crates/persistence-postgres/src/entity_catalog.rs",
         "src-tauri/src/commands/catalog.rs"
       ],
@@ -27580,6 +27729,7 @@
       ],
       "externalCallers": [
         "crates/application/src/player_catalog.rs",
+        "crates/application/src/ports/team/mod.rs",
         "crates/persistence-postgres/src/team_catalog.rs",
         "src-tauri/src/commands/catalog.rs"
       ],
@@ -27643,6 +27793,7 @@
       ],
       "externalCallers": [
         "crates/application/src/player_catalog.rs",
+        "crates/application/src/ports/team/mod.rs",
         "crates/persistence-postgres/src/player_catalog.rs",
         "crates/persistence-postgres/src/team_catalog.rs",
         "crates/persistence-postgres/tests/postgres_integration.rs",
@@ -27717,6 +27868,7 @@
       ],
       "externalCallers": [
         "crates/application/src/player_catalog.rs",
+        "crates/application/src/ports/team/mod.rs",
         "crates/persistence-postgres/src/team_force_delete.rs",
         "src-tauri/src/commands/catalog.rs"
       ],
@@ -27772,6 +27924,7 @@
       ],
       "externalCallers": [
         "crates/application/src/player_catalog.rs",
+        "crates/application/src/ports/team/mod.rs",
         "crates/persistence-postgres/src/team_force_delete.rs",
         "src-tauri/src/commands/catalog.rs"
       ],
@@ -27847,6 +28000,7 @@
       ],
       "externalCallers": [
         "crates/application/src/player_catalog.rs",
+        "crates/application/src/ports/team/mod.rs",
         "crates/persistence-postgres/src/team_force_delete.rs",
         "src-tauri/src/commands/catalog.rs"
       ],
@@ -27910,6 +28064,7 @@
       ],
       "externalCallers": [
         "crates/application/src/player_catalog.rs",
+        "crates/application/src/ports/lineup/mod.rs",
         "crates/persistence-postgres/src/team_lineup_presets.rs",
         "src-tauri/src/commands/catalog.rs"
       ],
@@ -28017,6 +28172,7 @@
       ],
       "externalCallers": [
         "crates/application/src/player_catalog.rs",
+        "crates/application/src/ports/lineup/mod.rs",
         "crates/persistence-postgres/src/team_lineup_presets.rs",
         "src-tauri/src/commands/catalog.rs"
       ],
@@ -28373,6 +28529,7 @@
       ],
       "externalCallers": [
         "crates/application/src/player_catalog.rs",
+        "crates/application/src/ports/lineup/mod.rs",
         "crates/persistence-postgres/src/team_lineup_presets.rs",
         "src-tauri/src/commands/catalog.rs"
       ],
@@ -28526,6 +28683,7 @@
       ],
       "externalCallers": [
         "crates/application/src/player_catalog.rs",
+        "crates/application/src/ports/team/mod.rs",
         "crates/persistence-postgres/src/team_catalog.rs",
         "src-tauri/src/commands/catalog.rs"
       ],
@@ -28617,6 +28775,7 @@
       ],
       "externalCallers": [
         "crates/application/src/player_catalog.rs",
+        "crates/application/src/ports/team/mod.rs",
         "crates/persistence-postgres/src/team_catalog.rs",
         "src-tauri/src/commands/catalog.rs"
       ],
@@ -28692,6 +28851,7 @@
       ],
       "externalCallers": [
         "crates/application/src/player_catalog.rs",
+        "crates/application/src/ports/lineup/mod.rs",
         "crates/persistence-postgres/src/lineup_chain.rs",
         "src-tauri/src/commands/catalog.rs"
       ],
@@ -29319,6 +29479,7 @@
         "crates/domain/tests/serde_contracts/r2_07_module_paths.rs"
       ],
       "externalCallers": [
+        "crates/application/src/ports/exchange/mod.rs",
         "crates/persistence-postgres/src/monthly_workbooks.rs",
         "crates/spreadsheet-io/src/monthly_workbook.rs"
       ],
@@ -29393,6 +29554,7 @@
       "externalCallers": [
         "crates/application/src/api_workspace.rs",
         "crates/application/src/player_catalog.rs",
+        "crates/application/src/ports/team/mod.rs",
         "crates/persistence-postgres/src/team_catalog.rs",
         "src-tauri/src/commands/catalog.rs"
       ],
@@ -29469,6 +29631,7 @@
       ],
       "externalCallers": [
         "crates/application/src/player_catalog.rs",
+        "crates/application/src/ports/team/mod.rs",
         "crates/persistence-postgres/src/team_catalog.rs",
         "src-tauri/src/commands/catalog.rs"
       ],
@@ -29536,6 +29699,7 @@
       ],
       "externalCallers": [
         "crates/application/src/player_catalog.rs",
+        "crates/application/src/ports/team/mod.rs",
         "crates/persistence-postgres/src/player_catalog.rs",
         "src-tauri/src/commands/catalog.rs"
       ],
@@ -30173,6 +30337,7 @@
       "externalCallers": [
         "crates/application/src/api_workspace.rs",
         "crates/application/src/player_catalog.rs",
+        "crates/application/src/ports/team/mod.rs",
         "crates/persistence-postgres/src/team_catalog.rs",
         "src-tauri/src/commands/catalog.rs"
       ],
@@ -30293,6 +30458,7 @@
       ],
       "externalCallers": [
         "crates/application/src/player_catalog.rs",
+        "crates/application/src/ports/team/mod.rs",
         "crates/persistence-postgres/src/team_catalog.rs",
         "src-tauri/src/commands/catalog.rs"
       ],
@@ -30443,6 +30609,7 @@
       ],
       "externalCallers": [
         "crates/application/src/player_catalog.rs",
+        "crates/application/src/ports/team/mod.rs",
         "crates/persistence-postgres/src/player_catalog.rs",
         "crates/persistence-postgres/src/team_catalog.rs",
         "crates/persistence-postgres/tests/postgres_integration.rs",
@@ -30755,6 +30922,7 @@
       ],
       "externalCallers": [
         "crates/application/src/fact_pipeline.rs",
+        "crates/application/src/ports/research/mod.rs",
         "crates/persistence-postgres/src/fact_pipeline_records.rs"
       ],
       "databaseMappings": [
@@ -30817,6 +30985,7 @@
       ],
       "externalCallers": [
         "crates/application/src/fact_pipeline.rs",
+        "crates/application/src/ports/research/mod.rs",
         "crates/persistence-postgres/src/fact_pipeline_records.rs"
       ],
       "databaseMappings": [
@@ -30984,6 +31153,7 @@
       ],
       "externalCallers": [
         "crates/application/src/openai_research.rs",
+        "crates/application/src/ports/research/mod.rs",
         "crates/persistence-postgres/src/research_gateway_records.rs"
       ],
       "databaseMappings": [
@@ -31056,6 +31226,7 @@
       ],
       "externalCallers": [
         "crates/application/src/openai_research.rs",
+        "crates/application/src/ports/research/mod.rs",
         "crates/persistence-postgres/src/research_gateway_records.rs"
       ],
       "databaseMappings": [

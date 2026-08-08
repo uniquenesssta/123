@@ -1,0 +1,135 @@
+{
+  "schemaVersion": "football.application-port-inventory.v1",
+  "stage": "R3-01",
+  "branch": "new-C",
+  "baselineCommit": "7cf906b8f98ab0fdcf89f80952bc8fb9cf21801f",
+  "sourceScan": {
+    "persistencePublicAsyncMethods": 232,
+    "applicationUsedPersistenceMethods": 209,
+    "directConcretePersistenceImports": [
+      "crates/application/src/composition/port_registry.rs"
+    ],
+    "scanWorkflowRun": 31237537087,
+    "scanWorkflowJob": 93052732745
+  },
+  "policy": {
+    "portMethodsUseSqlRows": false,
+    "universalRepositoryAllowed": false,
+    "concreteInfrastructureAllowedInPorts": false,
+    "modelExecutionBoundary": "football-model-api",
+    "transitionConcretePersistenceImportOwner": "crates/application/src/composition/port_registry.rs"
+  },
+  "domains": [
+    {
+      "name": "database",
+      "traits": [
+        "DatabaseLifecyclePort",
+        "DatabaseObservabilityPort"
+      ]
+    },
+    {
+      "name": "competition",
+      "traits": [
+        "CompetitionHierarchyPort"
+      ]
+    },
+    {
+      "name": "rules",
+      "traits": [
+        "RulePackagePort",
+        "RuleRoutingPort"
+      ]
+    },
+    {
+      "name": "team",
+      "traits": [
+        "TeamCatalogPort",
+        "TeamLifecyclePort"
+      ]
+    },
+    {
+      "name": "player",
+      "traits": [
+        "PlayerCatalogPort",
+        "PlayerSignalPort",
+        "CoachCatalogPort",
+        "EntityReferencePort"
+      ]
+    },
+    {
+      "name": "lineup",
+      "traits": [
+        "FormationPort",
+        "MatchCatalogPort",
+        "LineupPort",
+        "LineupPresetPort"
+      ]
+    },
+    {
+      "name": "prediction",
+      "traits": [
+        "PredictionInputPort",
+        "ModelRunPort",
+        "PredictionWorkflowPort"
+      ]
+    },
+    {
+      "name": "research",
+      "traits": [
+        "ResearchArtifactPort",
+        "FactPipelinePort",
+        "ResearchGatewayAuditPort"
+      ]
+    },
+    {
+      "name": "review",
+      "traits": [
+        "MatchReviewPort",
+        "MatchReviewWorkflowPort"
+      ]
+    },
+    {
+      "name": "postmatch",
+      "traits": [
+        "PostmatchSettlementPort",
+        "PostmatchMonitoringPort"
+      ]
+    },
+    {
+      "name": "analytics",
+      "traits": [
+        "AnalyticsPort",
+        "JobQueuePort",
+        "ParameterLifecyclePort"
+      ]
+    },
+    {
+      "name": "exchange",
+      "traits": [
+        "MatchLineupExchangePort",
+        "SpreadsheetExchangePort",
+        "MonthlyWorkbookPort"
+      ]
+    },
+    {
+      "name": "ai_workspace",
+      "traits": [
+        "ApiWorkspaceSessionPort",
+        "ApiWorkspaceOperationPort"
+      ]
+    },
+    {
+      "name": "release",
+      "traits": [
+        "ReleaseAcceptancePort"
+      ]
+    },
+    {
+      "name": "system",
+      "traits": [
+        "ClockPort",
+        "FileStoragePort"
+      ]
+    }
+  ]
+}
