@@ -1,0 +1,108 @@
+name: R3-05 Close Record
+
+on:
+  push:
+    branches:
+      - rewrite/r3-05-lineups-service
+
+permissions:
+  contents: write
+
+jobs:
+  close-r3-05:
+    runs-on: windows-2025
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: rewrite/r3-05-lineups-service
+          fetch-depth: 0
+
+      - name: Record R3-05 final verification
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = "Stop"
+
+          $indexPath = "docs/modular-rewrite/R03-application-services/README.md"
+          $index = Get-Content -Raw -Encoding UTF8 $indexPath
+          $index = $index.Replace('| R3-05 | Lineups Service | VERIFYING |', '| R3-05 | Lineups Service | DONE |')
+          $index = $index.Replace('| R3-06 | Prediction Service | BLOCKED |', '| R3-06 | Prediction Service | READY |')
+          $oldIndexTail = '- R3-05 当前为 `VERIFYING`，等待用户 Windows 本机最小复核与非破坏性 runtime 烟测；R3-06 Prediction Service 继续 `BLOCKED`。'
+          $newIndexTail = @'
+- 用户 Windows 本机在最终分支 HEAD 上通过 clean 工作区、rustfmt、R3-05 专项、完整 architecture、Application check/tests 33/33、完整 `verify:frontend`、完整 `verify:rust` 与 `tauri:dev`。workspace tests 无失败；18 个需要专用 `FOOTBALL_TEST_DATABASE_URL` 的 PostgreSQL 集成测试按安全设计保持 `ignored`，未记为已执行。
+- 本机 runtime JSONL 共 280 条：274 条 `info`、6 条 `error`。其中 2 条为阵容预设名称为空、1 条为未选择球员的预期输入校验；另外 3 条为公开源码未分发 P4 模型运行时的预期失败。`bootstrap.connection_error=null`；预设保存成功、预设应用预检 `can_apply=true`、`create_lineup_pair` 成功，随后 `read_match_lineup_chain` 从双方阵容缺失转为 `ready_for_model=true`。未发现 Lineups 持久化、SQL、migration、panic、连接或兼容性错误。
+- R3-05 已正式关闭为 `DONE`；R3-06 Prediction Service 开放为 `READY`。
+'@
+          if (-not $index.Contains($oldIndexTail)) { throw "R3 index closing marker not found" }
+          $index = $index.Replace($oldIndexTail, $newIndexTail.TrimEnd())
+          Set-Content -Path $indexPath -Value $index -Encoding UTF8 -NoNewline
+
+          $detailPath = "docs/modular-rewrite/R03-application-services/R03-05-lineups-service.md"
+          $detail = Get-Content -Raw -Encoding UTF8 $detailPath
+          $detail = $detail.Replace("`n`n`VERIFYING`n", "`n`n`DONE`n")
+          $oldIntro = 'Lineups Service 源码重写与实施侧 Windows Automated 全链路验证已完成。用户已用 R3-04 基线完成最小本机验证并明确授权进入 R3-05；R3-04 不因此自动改为 `DONE`。R3-05 仍等待用户 Windows 本机最小复核与非破坏性运行时烟测，因此本节点当前保持 `VERIFYING`，R3-06 不提前开放。'
+          $newIntro = 'Lineups Service 源码重写、实施侧 Windows Automated 与用户 Windows 本机最终验证均已完成。用户本机已完成完整 frontend / Rust 回归与非破坏性运行时烟测；R3-05 正式关闭为 `DONE`，R3-06 Prediction Service 开放为 `READY`。R3-04 的历史状态独立保留，不因本节点关闭被自动改写。'
+          if (-not $detail.Contains($oldIntro)) { throw "R3-05 intro marker not found" }
+          $detail = $detail.Replace($oldIntro, $newIntro)
+          $verificationSection = @'
+## 用户 Windows 本机最终验证
+
+用户在 `rewrite/r3-05-lineups-service` 最终分支完成并提供以下实际结果：
+
+- `git status --short`：空输出，工作区 clean；
+- `cargo fmt --all -- --check`：通过；
+- `npm run verify:lineups-service`：23 个 Service / Use Case Rust 文件、19 个公开 Application 职责、4 个既有 Ports 与旧 `player_catalog` 退出全部通过；
+- `npm run verify:architecture`：模块边界、状态所有权、受保护导入、Domain inventory、Domain 根出口、Application Ports、Database、Competition/Rules、Teams/Players、Lineups 全部通过；
+- `cargo check --locked -p football-application`：通过；
+- `cargo test --locked -p football-application`：33/33 通过；
+- `npm run verify:frontend`：全部静态业务契约、TypeScript、Vite production build 与 17 个截图回归视口通过；仅保留既有 Vite 大 chunk warning；
+- `npm run verify:rust`：Cargo.lock、rustfmt、workspace Clippy `-D warnings` 与 workspace tests 全部通过；18 个真实 PostgreSQL 集成测试因未设置专用 `FOOTBALL_TEST_DATABASE_URL` 按安全设计保持 `ignored`；
+- `npm run tauri:dev`：Tauri 2.11.4 / Vite / Rust 桌面端成功启动。
+
+上传 runtime JSONL 共 280 条记录，其中 274 条 `info`、6 条 `error`。逐条复核后：
+
+- 2 条 `请输入预设名称`：阵容预设空名称输入校验；
+- 1 条 `请先选择球员`：阵容编辑输入校验；
+- 3 条与 `execute_shadow_prediction_from_match` 相关：公开源码未分发 `p4_knockout_90` 模型运行时的既有明确失败语义。
+
+上述 6 条均不是 R3-05 回归。运行时实际完成两次 `save_team_lineup_preset`，多次 `preview_team_lineup_preset_application` 均返回 `can_apply=true` 且无 blockers/warnings；`create_lineup_pair` 成功后 `list_lineups` 从 0 条变为 2 条，`read_match_lineup_chain` 从双方“尚未创建任何阵容版本”变为 `blocking_issues=[]`、`ready_for_model=true`。`bootstrap` 返回 `connection_error=null`。未发现 Lineups 持久化、SQL、migration、panic、数据库连接或兼容性错误。
+
+因此 R3-05 的主路径、预设写入/读取、预设应用预检、双方阵容原子创建、比赛阵容链与推演输入衔接均已有用户原环境非破坏性证据。
+
+## 回退与下一步
+'@
+          $pattern = '(?s)## 尚未完成.*?## 回退与下一步\r?\n'
+          $updated = [regex]::Replace($detail, $pattern, $verificationSection, 1)
+          if ($updated -eq $detail) { throw "R3-05 unfinished section marker not found" }
+          $detail = $updated
+          $oldFinal = '状态保持 `VERIFYING`。用户本机复核与非破坏性 runtime 烟测通过并明确关闭本节点后，才将 R3-05 标记为 `DONE` 并开放 R3-06 Prediction Service。'
+          $newFinal = 'R3-05 状态为 `DONE`。R3-06 Prediction Service 已开放为 `READY`；后续不得把 Prediction 职责重新混入 Lineups Service，也不得恢复旧 `player_catalog.rs`。'
+          if (-not $detail.Contains($oldFinal)) { throw "R3-05 final marker not found" }
+          $detail = $detail.Replace($oldFinal, $newFinal)
+          Set-Content -Path $detailPath -Value $detail -Encoding UTF8 -NoNewline
+
+          $rootPath = "README.md"
+          $root = Get-Content -Raw -Encoding UTF8 $rootPath
+          $oldRootR3 = @'
+- R3 已从 R2 完成提交 `7cf906b8f98ab0fdcf89f80952bc8fb9cf21801f` 建立独立分支 `new-C`。R3-01 Application Ports、R3-02 Database Service、R3-03 Competition / Rules Services 均已完成。R3-04 已将 35 个球队/球员/教练/实体引用职责拆入 Teams / Players Services；用户随后提供 clean 工作区、rustfmt、R3-04 专项、architecture、Application check 与 33/33 tests 的本机通过结果并明确授权进入 R3-05，但未提供完整 frontend / Rust 与 runtime 烟测，因此 R3-04 仍为 `VERIFYING`。R3-05 已删除旧 `crates/application/src/player_catalog.rs`，将剩余 19 个阵型/比赛/阵容/阵容预设职责迁入 `services/lineups/` 与 19 个对应 Use Cases，并以 `FormationPort`、`MatchCatalogPort`、`LineupPort`、`LineupPresetPort` 4 个既有 Ports 保持公共 Application/Tauri 契约；`read_match_exchange` 仅提升 workspace 可见性以满足既有 MatchCatalogPort，SQL、参数、返回结构与数据库行为不变。clean 提交 `7e3fddeafcd32cc45e293fa9a7aeb05c7c66d4ec` 的 Public Platform CI run `31260698438` / job `93110942400` 已通过 architecture 与完整 Windows Automated，包括 frontend、17 个截图回归视口、TypeScript、Vite、完整 Rust/Clippy/workspace tests、Tauri release 构建和 release 启动日志扫描；artifact `9022970030`，SHA-256 `275e17a78db9d5205d49401a1a1d20ed91f08102594d2d04c339051165beb052`。R3-05 当前为 `VERIFYING`，等待用户 Windows 本机复核与非破坏性 runtime 烟测；R3-06 继续 `BLOCKED`。
+'@
+          $newRootR3 = @'
+- R3 已从 R2 完成提交 `7cf906b8f98ab0fdcf89f80952bc8fb9cf21801f` 建立独立分支 `new-C`。R3-01 Application Ports、R3-02 Database Service、R3-03 Competition / Rules Services 均已完成。R3-04 已将 35 个球队/球员/教练/实体引用职责拆入 Teams / Players Services，历史状态继续独立保留为 `VERIFYING`。R3-05 已删除旧 `crates/application/src/player_catalog.rs`，将剩余 19 个阵型/比赛/阵容/阵容预设职责迁入 `services/lineups/` 与 19 个对应 Use Cases，并以 `FormationPort`、`MatchCatalogPort`、`LineupPort`、`LineupPresetPort` 4 个既有 Ports 保持公共 Application/Tauri 契约；`read_match_exchange` 仅提升 workspace 可见性，SQL、参数、返回结构与数据库行为不变。clean 实施提交 `7e3fddeafcd32cc45e293fa9a7aeb05c7c66d4ec` 的 Public Platform CI run `31260698438` / job `93110942400` 已通过完整 Windows Automated；用户随后在最终分支完成 clean 工作区、rustfmt、Lineups 专项、architecture、Application 33/33、完整 frontend、完整 Rust/Clippy/workspace tests 与 `tauri:dev`。本机 runtime JSONL 共 280 条，除 3 条预期输入校验与 3 条公开模型运行时未分发的既有错误外，无 Lineups、SQL、migration、panic 或连接失败；预设保存、应用预检、双方阵容原子创建与 `ready_for_model=true` 阵容链均实际跑通。R3-05 状态为 `DONE`，R3-06 Prediction Service 已开放为 `READY`。
+'@
+          if (-not $root.Contains($oldRootR3)) { throw "Root README R3 marker not found" }
+          $root = $root.Replace($oldRootR3, $newRootR3)
+          $oldRootStatus = '已创建 `R00-stage-completion.md`、`R01-stage-completion.md` 与 `R02-stage-completion.md`。R1、R2 阶段均已关闭；R3-01 Application Ports、R3-02 Database Service、R3-03 Competition / Rules Services 状态均为 `DONE`，R3-04 Teams / Players Services 与 R3-05 Lineups Service 均为 `VERIFYING`，R3-06 Prediction Service 为 `BLOCKED`。详细状态见 `docs/modular-rewrite/R03-application-services/README.md`。'
+          $newRootStatus = '已创建 `R00-stage-completion.md`、`R01-stage-completion.md` 与 `R02-stage-completion.md`。R1、R2 阶段均已关闭；R3-01 Application Ports、R3-02 Database Service、R3-03 Competition / Rules Services 与 R3-05 Lineups Service 状态为 `DONE`，R3-04 Teams / Players Services 的历史状态仍为 `VERIFYING`，R3-06 Prediction Service 为 `READY`。详细状态见 `docs/modular-rewrite/R03-application-services/README.md`。'
+          if (-not $root.Contains($oldRootStatus)) { throw "Root README status marker not found" }
+          $root = $root.Replace($oldRootStatus, $newRootStatus)
+          Set-Content -Path $rootPath -Value $root -Encoding UTF8 -NoNewline
+
+      - name: Commit closure and remove transient workflow
+        shell: pwsh
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git rm .github/workflows/r3-05-close.yml
+          git add README.md docs/modular-rewrite/R03-application-services/README.md docs/modular-rewrite/R03-application-services/R03-05-lineups-service.md
+          git diff --check
+          git commit -m "docs(r3): close lineups service"
+          git push origin HEAD:rewrite/r3-05-lineups-service
