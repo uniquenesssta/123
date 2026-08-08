@@ -1,0 +1,50 @@
+name: Temporary R3 README Sync
+
+on:
+  push:
+    branches:
+      - new-C
+
+permissions:
+  contents: write
+
+jobs:
+  sync:
+    runs-on: windows-2025
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Sync root README status
+        shell: pwsh
+        run: |
+          $path = "README.md"
+          $text = Get-Content -Raw -Encoding utf8 $path
+
+          $oldR3 = '- R3 已从 R2 完成提交 `7cf906b8f98ab0fdcf89f80952bc8fb9cf21801f` 建立独立分支 `new-C`。R3-01 已扫描 232 个 PostgreSQL 公开异步方法与 209 个 Application 实际调用方法，建立 15 个职责域的最小 Ports 契约、统一 Port 错误和机器验证清单；具体 PostgreSQL 依赖仍只允许位于组合根，当前状态 `VERIFYING`，通过 Windows 本机门禁前不开放 R3-02。'
+          $newR3 = '- R3 已从 R2 完成提交 `7cf906b8f98ab0fdcf89f80952bc8fb9cf21801f` 建立独立分支 `new-C`。R3-01 已扫描 232 个 PostgreSQL 公开异步方法与 209 个 Application 实际调用方法，建立 15 个职责域、36 个最小 Ports 契约、统一 Port 错误和机器验证清单；Windows 本机 rustfmt、Application Ports、架构、`cargo check`、workspace Clippy、workspace tests 与完整 frontend 均已通过，两处 R2 拆分遗留验证器路径已修正且未改变产品行为。R3-01 状态为 `DONE`，R3-02 Database Service 已开放为 `READY`。'
+          if (-not $text.Contains($oldR3)) { throw "R3 README summary precondition not found" }
+          $text = $text.Replace($oldR3, $newR3)
+
+          $oldStatus = '已创建 `R00-stage-completion.md` 和 `R01-stage-completion.md`。R1-01 至 R1-05、R2-01 至 R2-07 状态均为 `DONE`；R2-08 当前为 `VERIFYING`。Domain 根出口已切换为 365 个显式公共兼容类型 re-export，等待 Windows 本机阶段回归后关闭 R2。详细状态见 `docs/modular-rewrite/R02-domain-rewrite/README.md`。'
+          $newStatus = '已创建 `R00-stage-completion.md`、`R01-stage-completion.md` 与 `R02-stage-completion.md`。R1、R2 阶段均已关闭；R3-01 Application Ports 状态为 `DONE`，R3-02 Database Service 为 `READY`。详细状态见 `docs/modular-rewrite/R03-application-services/README.md`。'
+          if (-not $text.Contains($oldStatus)) { throw "stage status README precondition not found" }
+          $text = $text.Replace($oldStatus, $newStatus)
+
+          $oldR208 = '- 现有 `football_domain::TypeName`、Serde、数据库映射、DTO、模型保护边界和生产依赖未改变。当前状态为 `VERIFYING`，等待 Windows 本机完整阶段回归。'
+          $newR208 = '- 现有 `football_domain::TypeName`、Serde、数据库映射、DTO、模型保护边界和生产依赖未改变。Windows 本机完整阶段回归已通过，R2-08 状态为 `DONE`，R2 阶段已关闭。'
+          if (-not $text.Contains($oldR208)) { throw "R2-08 README precondition not found" }
+          $text = $text.Replace($oldR208, $newR208)
+
+          [System.IO.File]::WriteAllText((Resolve-Path $path), $text, [System.Text.UTF8Encoding]::new($false))
+
+      - name: Commit README and remove temporary workflow
+        shell: pwsh
+        run: |
+          git config user.name "uniquenesssta"
+          git config user.email "uniquenesssta@live.com"
+          git add README.md
+          git commit -m "docs(r3): sync R3-01 completion summary"
+          git rm .github/workflows/tmp-r3-readme-sync.yml
+          git commit -m "chore(ci): remove temporary R3 README sync"
+          git push origin HEAD:new-C
