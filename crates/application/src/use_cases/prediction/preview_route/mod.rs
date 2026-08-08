@@ -22,7 +22,7 @@ pub(crate) async fn execute<P: PredictionAccess + ?Sized>(
         )
         .await?;
     let model_selection = normalize_model_selection(&command.model_family)?;
-    ensure_model_selection_registered(&registry, &model_selection)?;
+    ensure_model_selection_registered(registry, &model_selection)?;
     let decision = store
         .resolve_route(&RouteRequest {
             competition_id: scope.competition_id,

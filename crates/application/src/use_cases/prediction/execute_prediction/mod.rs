@@ -37,7 +37,7 @@ pub(crate) async fn execute_internal<P: PredictionAccess + ?Sized>(
         .await?;
     let mut context = match_context_from_command(&command, &scope)?;
     let model_selection = normalize_model_selection(&command.model_family)?;
-    ensure_model_selection_registered(&registry, &model_selection)?;
+    ensure_model_selection_registered(registry, &model_selection)?;
     let decision = store
         .resolve_route(&RouteRequest {
             competition_id: scope.competition_id,

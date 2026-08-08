@@ -27,7 +27,7 @@ pub(crate) async fn execute<P: PredictionAccess + ?Sized>(
 ) -> ApplicationResult<MatchPredictionReadiness> {
     let assessed_at = Utc::now();
     let model_selection = normalize_model_selection(&command.model_family)?;
-    ensure_model_selection_registered(&registry, &model_selection)?;
+    ensure_model_selection_registered(registry, &model_selection)?;
     let store = port;
     let match_record = store.read_match(command.match_id).await?;
     let mut checks = Vec::<PredictionReadinessCheck>::new();
