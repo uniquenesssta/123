@@ -35,6 +35,7 @@ pub struct DatabaseStatistics {
 pub trait DatabaseLifecyclePort: Send + Sync {
     async fn migrate(&self) -> PortResult<()>;
     async fn recover_interrupted_work(&self) -> PortResult<()>;
+    async fn reset_to_pristine(&self) -> PortResult<()>;
     async fn close(&self) -> PortResult<()>;
 }
 
