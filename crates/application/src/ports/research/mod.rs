@@ -2,7 +2,7 @@ use crate::ports::PortResult;
 use async_trait::async_trait;
 use football_domain::{
     CompetitionProfileVersionDraft, CompetitionProfileVersionRecord, ConflictEvaluationDraft,
-    ConflictEvaluationRecord, EntityMatchRequest, EntityResolutionDraft, EntityResolutionRecord,
+    ConflictEvaluationRecord, EntityCandidate, EntityResolutionDraft, EntityResolutionRecord,
     EvidenceClaimDraft, EvidenceClaimRecord, EvidenceConflictDraft, EvidenceConflictRecord,
     EvidenceRouteDraft, EvidenceRouteRecord, FactPipelineContext, OpenAiAttemptDraft,
     OpenAiAttemptRecord, OpenAiUsageTotals, PromptVersionDraft, PromptVersionRecord,
@@ -11,6 +11,9 @@ use football_domain::{
     TimeAuditRecord, WebCitationDraft, WebSourceDraft,
 };
 use uuid::Uuid;
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct SerializedConflictEventPayload(pub String);
 
 #[async_trait]
 pub trait ResearchArtifactPort: Send + Sync {
@@ -48,11 +51,15 @@ pub trait ResearchEvidenceLedgerPort: Send + Sync {
 
 #[async_trait]
 pub trait FactPipelinePort: Send + Sync {
-    async fn context(&self, match_id: Uuid) -> PortResult<FactPipelineContext>;
-    async fn resolve_entity(
+    async fn context(&self, research_run_id: Uuid) -> PortResult<FactPipelineContext>;
+    async fn find_entity_candidates(
         &self,
-        request: &EntityMatchRequest,
-    ) -> PortResult<EntityResolutionRecord>;
+        context: &FactPipelineContext,
+        entity_type: &str,
+        normalized_name: &str,
+        compact_name: &str,
+        external_id: Option<&str>,
+    ) -> PortResult<Vec<EntityCandidate>>;
     async fn append_entity_resolution(
         &self,
         draft: &EntityResolutionDraft,
@@ -62,6 +69,14 @@ pub trait FactPipelinePort: Send + Sync {
         &self,
         draft: &ConflictEvaluationDraft,
     ) -> PortResult<ConflictEvaluationRecord>;
+    async fn append_conflict_event(
+        &self,
+        conflict_id: Uuid,
+        event_type: &str,
+        actor: &str,
+        payload: &SerializedConflictEventPayload,
+        idempotency_key: &str,
+    ) -> PortResult<()>;
     async fn append_evidence_route(
         &self,
         draft: &EvidenceRouteDraft,

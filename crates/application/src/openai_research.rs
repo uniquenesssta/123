@@ -3,6 +3,7 @@ use crate::built_in_artifacts::{
     P4_RESEARCH_PROMPT_ARTIFACT_VERSION, P4_RESEARCH_PROMPT_KEY as RESEARCH_PROMPT_KEY,
     P4_RESEARCH_SCHEMA_ARTIFACT_VERSION, P4_RESEARCH_SCHEMA_KEY as RESEARCH_SCHEMA_KEY,
 };
+use crate::composition::ActiveDatabase;
 use async_trait::async_trait;
 use chrono::{DateTime, Utc};
 use football_domain::{
@@ -41,6 +42,7 @@ fn default_operation() -> GatewayOperation {
 impl ApplicationService {
     pub(super) async fn register_openai_research_artifacts(
         &self,
+        session: &ActiveDatabase,
         store: &PersistenceStore,
     ) -> ApplicationResult<()> {
         store
@@ -49,7 +51,9 @@ impl ApplicationService {
         store
             .register_prompt_version(&built_in_research_prompt())
             .await?;
-        self.register_fact_pipeline_artifacts(store).await?;
+        self.research
+            .register_fact_pipeline_artifacts(session)
+            .await?;
         Ok(())
     }
 

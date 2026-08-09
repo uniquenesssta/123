@@ -3,7 +3,6 @@ mod api_workspace;
 mod built_in_artifacts;
 mod composition;
 mod exchange;
-mod fact_pipeline;
 mod match_review_package;
 mod model_registry;
 mod model_shell;
@@ -39,9 +38,9 @@ pub use api_workspace::{
     api_workspace_preset_spec, api_workspace_preset_specs, api_workspace_presets,
     read_api_workspace_attachments, ApiWorkspacePresetSpec,
 };
-pub use fact_pipeline::ProcessResearchEvidenceCommand;
 pub use model_shell::{default_match, default_parameters, p4_default_match, p4_default_parameters};
 pub use openai_research::OpenAiResearchCommand;
+pub use use_cases::research::fact_pipeline::ProcessResearchEvidenceCommand;
 pub use use_cases::rules::package_factory::default_rule_package_template;
 
 #[derive(Debug, Error)]

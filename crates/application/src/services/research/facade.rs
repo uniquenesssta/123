@@ -1,10 +1,12 @@
 use crate::composition::ActiveDatabase;
-use crate::{ApplicationError, ApplicationResult, ApplicationService};
+use crate::{
+    ApplicationError, ApplicationResult, ApplicationService, ProcessResearchEvidenceCommand,
+};
 use football_domain::{
     CompetitionProfileVersionDraft, CompetitionProfileVersionRecord, EvidenceClaimDraft,
-    EvidenceClaimRecord, EvidenceConflictDraft, EvidenceConflictRecord, PromptVersionDraft,
-    PromptVersionRecord, ResearchRunDraft, ResearchRunEventDraft, ResearchRunRecord,
-    SchemaVersionDraft, SchemaVersionRecord,
+    EvidenceClaimRecord, EvidenceConflictDraft, EvidenceConflictRecord, FactPipelineSummary,
+    PromptVersionDraft, PromptVersionRecord, ResearchRunDraft, ResearchRunEventDraft,
+    ResearchRunRecord, SchemaVersionDraft, SchemaVersionRecord,
 };
 
 impl ApplicationService {
@@ -80,6 +82,16 @@ impl ApplicationService {
         let session = self.research_session().await?;
         self.research
             .create_p4_evidence_conflict(&session, draft)
+            .await
+    }
+
+    pub async fn process_p4_research_evidence(
+        &self,
+        command: ProcessResearchEvidenceCommand,
+    ) -> ApplicationResult<FactPipelineSummary> {
+        let session = self.research_session().await?;
+        self.research
+            .process_p4_research_evidence(&session, command)
             .await
     }
 }

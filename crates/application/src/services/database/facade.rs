@@ -90,6 +90,7 @@ impl ApplicationService {
             .register_persistence_artifacts(prepared.session())
             .await?;
         let store = prepared.transition_store();
-        self.register_openai_research_artifacts(&store).await
+        self.register_openai_research_artifacts(prepared.session(), &store)
+            .await
     }
 }
