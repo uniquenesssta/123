@@ -35,4 +35,15 @@ if text.count(old_boundary) != 1:
 text = text.replace(old_boundary, new_boundary, 1)
 prediction_verifier.write_text(text, encoding="utf-8", newline="\n")
 
-print("AT5 verifier patches applied: Research finalizer owner and Prediction/Research workbench boundary")
+decision = ROOT / "crates/application/src/use_cases/research/p4_manual_conflict/decision.rs"
+text = decision.read_text(encoding="utf-8")
+for old, new, label in [
+    ('            ""select_evidence""\n', '            r#""select_evidence""#\n', "select_evidence serialization assertion"),
+    ('            ""accept_unknown""\n', '            r#""accept_unknown""#\n', "accept_unknown serialization assertion"),
+]:
+    if text.count(old) != 1:
+        raise RuntimeError(f"AT5 decision test anchor mismatch: {label}")
+    text = text.replace(old, new, 1)
+decision.write_text(text, encoding="utf-8", newline="\n")
+
+print("AT5 patches applied: verifier ownership and exact serialization assertions")
