@@ -14,6 +14,7 @@ pub(crate) mod list_p4_freeze_task_events;
 pub(crate) mod list_p4_freeze_tasks;
 pub(crate) mod list_recent_runs;
 pub(crate) mod p4_freeze_readiness;
+pub(crate) mod p4_snapshot;
 pub(crate) mod plan_p4_horizons;
 pub(crate) mod preview_route;
 pub(crate) mod read_p4_freeze_task;

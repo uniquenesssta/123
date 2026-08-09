@@ -24,13 +24,13 @@
     "targetPublicExportPolicy": "explicit re-export only"
   },
   "sourceDigest": "217241ac243726a5ab6805a7f169e222b97e78c7c971749a5904714af673ebdd",
-  "rustUsageDigest": "09dbb962e50b4a8fa584ef7df848555da14089104fd217d67f8a93b546757612",
+  "rustUsageDigest": "3c898a3baeb7de47e3f34b09b76f2906d4a36ff71fb5fdc830c98a7033c32b51",
   "summary": {
     "typeCount": 365,
     "publicCompatibilityTypeCount": 365,
     "internalTypeCount": 0,
     "domainSourceFileCount": 129,
-    "scannedRustFileCount": 429,
+    "scannedRustFileCount": 430,
     "databaseMappedTypeCount": 299,
     "byTargetModule": {
       "ai_workspace": 16,
@@ -21247,7 +21247,11 @@
         "crates/domain/tests/serde_contracts/module_paths.rs"
       ],
       "externalCallers": [
-        "crates/application/src/p4_persistence.rs",
+        "crates/application/src/composition/adapters/prediction.rs",
+        "crates/application/src/ports/prediction/mod.rs",
+        "crates/application/src/services/prediction/facade.rs",
+        "crates/application/src/services/prediction/service.rs",
+        "crates/application/src/use_cases/prediction/p4_snapshot/mod.rs",
         "crates/persistence-postgres/src/p4_records.rs"
       ],
       "databaseMappings": [
@@ -21374,9 +21378,11 @@
       ],
       "externalCallers": [
         "crates/application/src/composition/adapters/prediction.rs",
-        "crates/application/src/p4_persistence.rs",
         "crates/application/src/ports/prediction/mod.rs",
+        "crates/application/src/services/prediction/facade.rs",
+        "crates/application/src/services/prediction/service.rs",
         "crates/application/src/use_cases/prediction/execute_p4_freeze/mod.rs",
+        "crates/application/src/use_cases/prediction/p4_snapshot/mod.rs",
         "crates/persistence-postgres/src/p4_records.rs",
         "crates/persistence-postgres/tests/postgres_integration.rs"
       ],
@@ -21473,8 +21479,10 @@
       ],
       "externalCallers": [
         "crates/application/src/composition/adapters/prediction.rs",
-        "crates/application/src/p4_persistence.rs",
         "crates/application/src/ports/prediction/mod.rs",
+        "crates/application/src/services/prediction/facade.rs",
+        "crates/application/src/services/prediction/service.rs",
+        "crates/application/src/use_cases/prediction/p4_snapshot/mod.rs",
         "crates/persistence-postgres/src/p4_records.rs"
       ],
       "databaseMappings": [

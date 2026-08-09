@@ -11,8 +11,8 @@ use chrono::{DateTime, Utc};
 use football_domain::{
     P4FreezeReadiness, P4FreezeTaskDraft, P4FreezeTaskEventRecord, P4FreezeTaskRecord,
     P4FreezeTaskTransition, P4MatchWorkspace, P4PlanningMatchContext, P4RoutedFact,
-    P4TaskWorkspace, PredictionSummary, PrematchSnapshotDraft, PrematchSnapshotRecord,
-    PreparedMatchPredictionInput, RouteDecision,
+    P4TaskWorkspace, PredictionSummary, PrematchSnapshotBundle, PrematchSnapshotDraft,
+    PrematchSnapshotRecord, PreparedMatchPredictionInput, RouteDecision,
 };
 use football_model_api::{ModelOutput, ModelRequest};
 use uuid::Uuid;
@@ -266,6 +266,13 @@ impl P4FreezeExecutionPort for ActiveDatabase {
     ) -> PortResult<PrematchSnapshotRecord> {
         self.transition_store()
             .freeze_prematch_snapshot(draft)
+            .await
+            .map_err(map_persistence_error)
+    }
+
+    async fn read_snapshot(&self, snapshot_id: Uuid) -> PortResult<PrematchSnapshotBundle> {
+        self.transition_store()
+            .read_prematch_snapshot(snapshot_id)
             .await
             .map_err(map_persistence_error)
     }

@@ -3,17 +3,15 @@ use crate::built_in_artifacts::{
     P4_EVIDENCE_SCHEMA_ARTIFACT_VERSION, P4_EVIDENCE_SCHEMA_KEY,
     P4_SNAPSHOT_SCHEMA_ARTIFACT_VERSION, P4_SNAPSHOT_SCHEMA_KEY,
 };
+use crate::PersistenceStore;
 use football_domain::{
     CompetitionProfileVersionDraft, CompetitionProfileVersionRecord, EvidenceClaimDraft,
-    EvidenceClaimRecord, EvidenceConflictDraft, EvidenceConflictRecord, PrematchSnapshotBundle,
-    PrematchSnapshotDraft, PrematchSnapshotRecord, PromptVersionDraft, PromptVersionRecord,
-    ResearchRunDraft, ResearchRunEventDraft, ResearchRunRecord, SchemaVersionDraft,
-    SchemaVersionRecord, P4_EVIDENCE_SCHEMA_VERSION, P4_SNAPSHOT_SCHEMA_VERSION,
+    EvidenceClaimRecord, EvidenceConflictDraft, EvidenceConflictRecord, PromptVersionDraft,
+    PromptVersionRecord, ResearchRunDraft, ResearchRunEventDraft, ResearchRunRecord,
+    SchemaVersionDraft, SchemaVersionRecord, P4_EVIDENCE_SCHEMA_VERSION,
+    P4_SNAPSHOT_SCHEMA_VERSION,
 };
 use serde_json::Value;
-use uuid::Uuid;
-
-use crate::PersistenceStore;
 
 impl ApplicationService {
     pub(super) async fn register_p4_persistence_artifacts(
@@ -80,22 +78,6 @@ impl ApplicationService {
     ) -> ApplicationResult<EvidenceConflictRecord> {
         let store = self.active_store().await?;
         Ok(store.create_evidence_conflict(&draft).await?)
-    }
-
-    pub async fn freeze_p4_prematch_snapshot(
-        &self,
-        draft: PrematchSnapshotDraft,
-    ) -> ApplicationResult<PrematchSnapshotRecord> {
-        let store = self.active_store().await?;
-        Ok(store.freeze_prematch_snapshot(&draft).await?)
-    }
-
-    pub async fn read_p4_prematch_snapshot(
-        &self,
-        snapshot_id: Uuid,
-    ) -> ApplicationResult<PrematchSnapshotBundle> {
-        let store = self.active_store().await?;
-        Ok(store.read_prematch_snapshot(snapshot_id).await?)
     }
 }
 

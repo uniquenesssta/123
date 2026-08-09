@@ -5,7 +5,8 @@ use crate::{
 };
 use football_domain::{
     MatchPredictionReadiness, P4FreezeReadiness, P4FreezeTaskEventRecord, P4FreezeTaskRecord,
-    P4MatchWorkspace, P4TaskWorkspace, PlanP4HorizonsCommand, RouteDecision,
+    P4MatchWorkspace, P4TaskWorkspace, PlanP4HorizonsCommand, PrematchSnapshotBundle,
+    PrematchSnapshotDraft, PrematchSnapshotRecord, RouteDecision,
 };
 use football_model_api::ModelOutput;
 use serde_json::Value;
@@ -107,6 +108,26 @@ impl ApplicationService {
         let session = self.prediction_session().await?;
         self.prediction
             .execute_p4_freeze_task(&session, &self.registry, task_id, job_id)
+            .await
+    }
+
+    pub async fn freeze_p4_prematch_snapshot(
+        &self,
+        draft: PrematchSnapshotDraft,
+    ) -> ApplicationResult<PrematchSnapshotRecord> {
+        let session = self.prediction_session().await?;
+        self.prediction
+            .freeze_p4_prematch_snapshot(&session, draft)
+            .await
+    }
+
+    pub async fn read_p4_prematch_snapshot(
+        &self,
+        snapshot_id: Uuid,
+    ) -> ApplicationResult<PrematchSnapshotBundle> {
+        let session = self.prediction_session().await?;
+        self.prediction
+            .read_p4_prematch_snapshot(&session, snapshot_id)
             .await
     }
 

@@ -4,8 +4,8 @@ use chrono::{DateTime, Utc};
 use football_domain::{
     P4FreezeReadiness, P4FreezeTaskDraft, P4FreezeTaskEventRecord, P4FreezeTaskRecord,
     P4FreezeTaskTransition, P4MatchWorkspace, P4PlanningMatchContext, P4RoutedFact,
-    P4TaskWorkspace, PredictionSummary, PrematchSnapshotDraft, PrematchSnapshotRecord,
-    PreparedMatchPredictionInput, RouteDecision,
+    P4TaskWorkspace, PredictionSummary, PrematchSnapshotBundle, PrematchSnapshotDraft,
+    PrematchSnapshotRecord, PreparedMatchPredictionInput, RouteDecision,
 };
 use football_model_api::{ModelOutput, ModelRequest};
 use uuid::Uuid;
@@ -107,4 +107,5 @@ pub trait P4FreezeExecutionPort: Send + Sync {
         &self,
         draft: &PrematchSnapshotDraft,
     ) -> PortResult<PrematchSnapshotRecord>;
+    async fn read_snapshot(&self, snapshot_id: Uuid) -> PortResult<PrematchSnapshotBundle>;
 }

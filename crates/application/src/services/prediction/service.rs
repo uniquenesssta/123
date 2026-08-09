@@ -1,10 +1,10 @@
 use crate::model_registry::ModelRegistry;
-use crate::ports::prediction::ModelRunHistoryItem;
+use crate::ports::prediction::{ModelRunHistoryItem, P4FreezeExecutionPort};
 use crate::use_cases::prediction::{
     dry_run_default_fixture, execute_p4_freeze, execute_prediction, execute_prediction_from_match,
     hide_run_from_history, inspect_match_prediction_readiness, list_p4_freeze_task_events,
-    list_p4_freeze_tasks, list_recent_runs, p4_freeze_readiness, plan_p4_horizons, preview_route,
-    read_p4_freeze_task, read_p4_match_workspace, read_p4_task_workspace, read_run,
+    list_p4_freeze_tasks, list_recent_runs, p4_freeze_readiness, p4_snapshot, plan_p4_horizons,
+    preview_route, read_p4_freeze_task, read_p4_match_workspace, read_p4_task_workspace, read_run,
     P4FreezeExecutionAccess, P4PlanningAccess, PredictionAccess,
 };
 use crate::{
@@ -13,7 +13,8 @@ use crate::{
 };
 use football_domain::{
     MatchPredictionReadiness, P4FreezeReadiness, P4FreezeTaskEventRecord, P4FreezeTaskRecord,
-    P4MatchWorkspace, P4TaskWorkspace, PlanP4HorizonsCommand, RouteDecision,
+    P4MatchWorkspace, P4TaskWorkspace, PlanP4HorizonsCommand, PrematchSnapshotBundle,
+    PrematchSnapshotDraft, PrematchSnapshotRecord, RouteDecision,
 };
 use football_model_api::ModelOutput;
 use serde_json::Value;
@@ -103,6 +104,22 @@ impl PredictionService {
         job_id: Uuid,
     ) -> ApplicationResult<Value> {
         execute_p4_freeze::execute(port, registry, task_id, job_id).await
+    }
+
+    pub(crate) async fn freeze_p4_prematch_snapshot<P: P4FreezeExecutionPort + ?Sized>(
+        &self,
+        port: &P,
+        draft: PrematchSnapshotDraft,
+    ) -> ApplicationResult<PrematchSnapshotRecord> {
+        p4_snapshot::freeze(port, draft).await
+    }
+
+    pub(crate) async fn read_p4_prematch_snapshot<P: P4FreezeExecutionPort + ?Sized>(
+        &self,
+        port: &P,
+        snapshot_id: Uuid,
+    ) -> ApplicationResult<PrematchSnapshotBundle> {
+        p4_snapshot::read(port, snapshot_id).await
     }
 
     pub(crate) async fn plan_p4_horizons<P: P4PlanningAccess + ?Sized>(
