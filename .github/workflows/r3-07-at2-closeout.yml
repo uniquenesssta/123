@@ -1,0 +1,50 @@
+name: R3-07 AT2 Closeout
+
+on:
+  push:
+    branches:
+      - rewrite/r3-07-at2-closeout
+
+permissions:
+  contents: write
+
+jobs:
+  closeout:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: windows-2025
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: rewrite/r3-07-at2-closeout
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Update AT2 closeout records
+        shell: pwsh
+        run: python scripts/r3-07-at2-closeout.py
+      - name: Verify Research Service
+        shell: pwsh
+        run: npm run verify:research-service
+      - name: Verify Application Ports
+        shell: pwsh
+        run: npm run verify:application-ports
+      - name: Verify architecture
+        shell: pwsh
+        run: npm run verify:architecture
+      - name: Commit clean AT2 closeout
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git rm -f .github/workflows/r3-07-at2-closeout.yml
+          git rm -f scripts/r3-07-at2-closeout.py
+          git add README.md docs/modular-rewrite/R03-application-services/README.md
+          git diff --cached --check
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          git commit -m "docs(r3): close Research fact pipeline task"
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          git push origin HEAD:rewrite/r3-07-at2-closeout
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
