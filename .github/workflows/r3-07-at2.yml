@@ -1,0 +1,63 @@
+name: R3-07 Fact Pipeline Migration
+
+on:
+  push:
+    branches:
+      - rewrite/r3-07-at2-staging
+
+permissions:
+  contents: write
+
+jobs:
+  migrate:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: windows-2025
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: rewrite/r3-07-at2-staging
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - uses: dtolnay/rust-toolchain@1.88.0
+        with:
+          components: rustfmt,clippy
+      - name: Generate Atomic Task 2
+        shell: pwsh
+        run: python scripts/r3-07-at2.py
+      - name: Format and refresh inventory
+        shell: pwsh
+        run: |
+          cargo fmt --all
+          node scripts/generate-domain-type-inventory.mjs
+      - name: Validate Atomic Task 2
+        shell: pwsh
+        run: |
+          npm run verify:research-service
+          npm run verify:database-service
+          npm run verify:prediction-service
+          npm run verify:application-ports
+          npm run verify:architecture
+          cargo fmt --all -- --check
+          cargo check --locked -p football-application
+          cargo test --locked -p football-application
+          cargo clippy --locked --workspace --all-targets -- -D warnings
+          cargo test --locked --workspace
+      - name: Commit clean Atomic Task 2
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git rm -f .github/workflows/r3-07-at2.yml
+          git rm -f scripts/r3-07-at2.py
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          git add -A
+          git diff --cached --check
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          git commit -m "refactor(r3): migrate Research fact pipeline"
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          git push origin HEAD:rewrite/r3-07-at2-staging
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
