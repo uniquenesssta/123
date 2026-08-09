@@ -9,7 +9,6 @@ mod model_registry;
 mod model_shell;
 mod openai_research;
 mod p4_orchestration;
-mod p4_persistence;
 mod p4_workbench;
 pub mod ports;
 mod postmatch;

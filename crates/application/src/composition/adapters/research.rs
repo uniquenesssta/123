@@ -1,10 +1,14 @@
 use super::super::port_registry::{map_persistence_error, ActiveDatabase};
-use crate::ports::{research::ResearchArtifactPort, PortResult};
+use crate::ports::{
+    research::{ResearchArtifactPort, ResearchEvidenceLedgerPort},
+    PortResult,
+};
 use async_trait::async_trait;
 use football_domain::{
-    PromptVersionDraft, PromptVersionRecord, ResearchRunDraft, ResearchRunEventDraft,
-    ResearchRunRecord, SchemaVersionDraft, SchemaVersionRecord, SourcePolicyVersionDraft,
-    SourcePolicyVersionRecord,
+    CompetitionProfileVersionDraft, CompetitionProfileVersionRecord, EvidenceClaimDraft,
+    EvidenceClaimRecord, EvidenceConflictDraft, EvidenceConflictRecord, PromptVersionDraft,
+    PromptVersionRecord, ResearchRunDraft, ResearchRunEventDraft, ResearchRunRecord,
+    SchemaVersionDraft, SchemaVersionRecord, SourcePolicyVersionDraft, SourcePolicyVersionRecord,
 };
 use uuid::Uuid;
 
@@ -45,6 +49,16 @@ impl ResearchArtifactPort for ActiveDatabase {
             .map_err(map_persistence_error)
     }
 
+    async fn register_competition_profile(
+        &self,
+        draft: &CompetitionProfileVersionDraft,
+    ) -> PortResult<CompetitionProfileVersionRecord> {
+        self.transition_store()
+            .register_competition_profile_version(draft)
+            .await
+            .map_err(map_persistence_error)
+    }
+
     async fn create_run(&self, draft: &ResearchRunDraft) -> PortResult<ResearchRunRecord> {
         self.transition_store()
             .create_research_run(draft)
@@ -59,11 +73,36 @@ impl ResearchArtifactPort for ActiveDatabase {
             .map_err(map_persistence_error)
     }
 
-    async fn record_run_event(&self, draft: &ResearchRunEventDraft) -> PortResult<()> {
+    async fn record_run_event(
+        &self,
+        draft: &ResearchRunEventDraft,
+    ) -> PortResult<ResearchRunRecord> {
         self.transition_store()
             .record_research_run_event(draft)
             .await
-            .map(|_| ())
+            .map_err(map_persistence_error)
+    }
+}
+
+#[async_trait]
+impl ResearchEvidenceLedgerPort for ActiveDatabase {
+    async fn append_evidence_claim(
+        &self,
+        draft: &EvidenceClaimDraft,
+    ) -> PortResult<EvidenceClaimRecord> {
+        self.transition_store()
+            .append_evidence_claim(draft)
+            .await
+            .map_err(map_persistence_error)
+    }
+
+    async fn create_evidence_conflict(
+        &self,
+        draft: &EvidenceConflictDraft,
+    ) -> PortResult<EvidenceConflictRecord> {
+        self.transition_store()
+            .create_evidence_conflict(draft)
+            .await
             .map_err(map_persistence_error)
     }
 }

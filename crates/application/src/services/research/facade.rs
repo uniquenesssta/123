@@ -1,0 +1,85 @@
+use crate::composition::ActiveDatabase;
+use crate::{ApplicationError, ApplicationResult, ApplicationService};
+use football_domain::{
+    CompetitionProfileVersionDraft, CompetitionProfileVersionRecord, EvidenceClaimDraft,
+    EvidenceClaimRecord, EvidenceConflictDraft, EvidenceConflictRecord, PromptVersionDraft,
+    PromptVersionRecord, ResearchRunDraft, ResearchRunEventDraft, ResearchRunRecord,
+    SchemaVersionDraft, SchemaVersionRecord,
+};
+
+impl ApplicationService {
+    async fn research_session(&self) -> ApplicationResult<ActiveDatabase> {
+        self.database
+            .active_session()
+            .await
+            .ok_or(ApplicationError::DatabaseNotConnected)
+    }
+
+    pub async fn register_p4_schema_version(
+        &self,
+        draft: SchemaVersionDraft,
+    ) -> ApplicationResult<SchemaVersionRecord> {
+        let session = self.research_session().await?;
+        self.research
+            .register_p4_schema_version(&session, draft)
+            .await
+    }
+
+    pub async fn register_p4_prompt_version(
+        &self,
+        draft: PromptVersionDraft,
+    ) -> ApplicationResult<PromptVersionRecord> {
+        let session = self.research_session().await?;
+        self.research
+            .register_p4_prompt_version(&session, draft)
+            .await
+    }
+
+    pub async fn register_p4_competition_profile_version(
+        &self,
+        draft: CompetitionProfileVersionDraft,
+    ) -> ApplicationResult<CompetitionProfileVersionRecord> {
+        let session = self.research_session().await?;
+        self.research
+            .register_p4_competition_profile_version(&session, draft)
+            .await
+    }
+
+    pub async fn create_p4_research_run(
+        &self,
+        draft: ResearchRunDraft,
+    ) -> ApplicationResult<ResearchRunRecord> {
+        let session = self.research_session().await?;
+        self.research.create_p4_research_run(&session, draft).await
+    }
+
+    pub async fn record_p4_research_run_event(
+        &self,
+        draft: ResearchRunEventDraft,
+    ) -> ApplicationResult<ResearchRunRecord> {
+        let session = self.research_session().await?;
+        self.research
+            .record_p4_research_run_event(&session, draft)
+            .await
+    }
+
+    pub async fn append_p4_evidence_claim(
+        &self,
+        draft: EvidenceClaimDraft,
+    ) -> ApplicationResult<EvidenceClaimRecord> {
+        let session = self.research_session().await?;
+        self.research
+            .append_p4_evidence_claim(&session, draft)
+            .await
+    }
+
+    pub async fn create_p4_evidence_conflict(
+        &self,
+        draft: EvidenceConflictDraft,
+    ) -> ApplicationResult<EvidenceConflictRecord> {
+        let session = self.research_session().await?;
+        self.research
+            .create_p4_evidence_conflict(&session, draft)
+            .await
+    }
+}

@@ -2,7 +2,8 @@ use crate::composition::ApplicationComposition;
 use crate::model_registry::ModelRegistry;
 use crate::services::{
     competition::CompetitionService, database::DatabaseService, lineups::LineupService,
-    players::PlayerService, prediction::PredictionService, rules::RulesService, teams::TeamService,
+    players::PlayerService, prediction::PredictionService, research::ResearchService,
+    rules::RulesService, teams::TeamService,
 };
 use std::sync::atomic::AtomicBool;
 pub struct ApplicationService {
@@ -14,6 +15,7 @@ pub struct ApplicationService {
     pub(crate) players: PlayerService,
     pub(crate) lineups: LineupService,
     pub(crate) prediction: PredictionService,
+    pub(crate) research: ResearchService,
     pub(crate) p4_worker_running: AtomicBool,
 }
 impl ApplicationService {
@@ -27,6 +29,7 @@ impl ApplicationService {
             players,
             lineups,
             prediction,
+            research,
             p4_worker_running,
         ) = ApplicationComposition::new().into_parts();
         Self {
@@ -38,6 +41,7 @@ impl ApplicationService {
             players,
             lineups,
             prediction,
+            research,
             p4_worker_running,
         }
     }

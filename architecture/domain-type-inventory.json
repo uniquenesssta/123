@@ -24,13 +24,13 @@
     "targetPublicExportPolicy": "explicit re-export only"
   },
   "sourceDigest": "217241ac243726a5ab6805a7f169e222b97e78c7c971749a5904714af673ebdd",
-  "rustUsageDigest": "3c898a3baeb7de47e3f34b09b76f2906d4a36ff71fb5fdc830c98a7033c32b51",
+  "rustUsageDigest": "778adc61c42168f974f11b4109bfcf4100084884b5957e82f9fc58a3bbfaf776",
   "summary": {
     "typeCount": 365,
     "publicCompatibilityTypeCount": 365,
     "internalTypeCount": 0,
     "domainSourceFileCount": 129,
-    "scannedRustFileCount": 430,
+    "scannedRustFileCount": 435,
     "databaseMappedTypeCount": 299,
     "byTargetModule": {
       "ai_workspace": 16,
@@ -4888,7 +4888,11 @@
         "crates/domain/tests/serde_contracts/module_paths.rs"
       ],
       "externalCallers": [
-        "crates/application/src/p4_persistence.rs",
+        "crates/application/src/composition/adapters/research.rs",
+        "crates/application/src/ports/research/mod.rs",
+        "crates/application/src/services/research/facade.rs",
+        "crates/application/src/services/research/service.rs",
+        "crates/application/src/use_cases/research/artifact_catalog.rs",
         "crates/persistence-postgres/src/p4_records.rs",
         "crates/persistence-postgres/src/routing.rs"
       ],
@@ -4956,7 +4960,11 @@
         "crates/domain/tests/serde_contracts/module_paths.rs"
       ],
       "externalCallers": [
-        "crates/application/src/p4_persistence.rs",
+        "crates/application/src/composition/adapters/research.rs",
+        "crates/application/src/ports/research/mod.rs",
+        "crates/application/src/services/research/facade.rs",
+        "crates/application/src/services/research/service.rs",
+        "crates/application/src/use_cases/research/artifact_catalog.rs",
         "crates/persistence-postgres/src/p4_records.rs"
       ],
       "databaseMappings": [
@@ -7104,8 +7112,12 @@
         "crates/domain/tests/serde_contracts/module_paths.rs"
       ],
       "externalCallers": [
+        "crates/application/src/composition/adapters/research.rs",
         "crates/application/src/fact_pipeline.rs",
-        "crates/application/src/p4_persistence.rs",
+        "crates/application/src/ports/research/mod.rs",
+        "crates/application/src/services/research/facade.rs",
+        "crates/application/src/services/research/service.rs",
+        "crates/application/src/use_cases/research/ledger.rs",
         "crates/persistence-postgres/src/p4_records.rs",
         "crates/persistence-postgres/tests/postgres_integration.rs"
       ],
@@ -7184,8 +7196,12 @@
         "crates/domain/tests/serde_contracts/module_paths.rs"
       ],
       "externalCallers": [
+        "crates/application/src/composition/adapters/research.rs",
         "crates/application/src/fact_pipeline.rs",
-        "crates/application/src/p4_persistence.rs",
+        "crates/application/src/ports/research/mod.rs",
+        "crates/application/src/services/research/facade.rs",
+        "crates/application/src/services/research/service.rs",
+        "crates/application/src/use_cases/research/ledger.rs",
         "crates/persistence-postgres/src/p4_records.rs"
       ],
       "databaseMappings": [
@@ -7267,8 +7283,12 @@
         "crates/domain/tests/serde_contracts/module_paths.rs"
       ],
       "externalCallers": [
+        "crates/application/src/composition/adapters/research.rs",
         "crates/application/src/fact_pipeline.rs",
-        "crates/application/src/p4_persistence.rs",
+        "crates/application/src/ports/research/mod.rs",
+        "crates/application/src/services/research/facade.rs",
+        "crates/application/src/services/research/service.rs",
+        "crates/application/src/use_cases/research/ledger.rs",
         "crates/persistence-postgres/src/p4_records.rs",
         "crates/persistence-postgres/tests/postgres_integration.rs"
       ],
@@ -7327,7 +7347,11 @@
         "crates/domain/tests/serde_contracts/module_paths.rs"
       ],
       "externalCallers": [
-        "crates/application/src/p4_persistence.rs",
+        "crates/application/src/composition/adapters/research.rs",
+        "crates/application/src/ports/research/mod.rs",
+        "crates/application/src/services/research/facade.rs",
+        "crates/application/src/services/research/service.rs",
+        "crates/application/src/use_cases/research/ledger.rs",
         "crates/persistence-postgres/src/p4_records.rs"
       ],
       "databaseMappings": [
@@ -21621,8 +21645,10 @@
       "externalCallers": [
         "crates/application/src/composition/adapters/research.rs",
         "crates/application/src/openai_research.rs",
-        "crates/application/src/p4_persistence.rs",
         "crates/application/src/ports/research/mod.rs",
+        "crates/application/src/services/research/facade.rs",
+        "crates/application/src/services/research/service.rs",
+        "crates/application/src/use_cases/research/artifact_catalog.rs",
         "crates/persistence-postgres/src/p4_records.rs"
       ],
       "databaseMappings": [
@@ -21693,8 +21719,10 @@
       ],
       "externalCallers": [
         "crates/application/src/composition/adapters/research.rs",
-        "crates/application/src/p4_persistence.rs",
         "crates/application/src/ports/research/mod.rs",
+        "crates/application/src/services/research/facade.rs",
+        "crates/application/src/services/research/service.rs",
+        "crates/application/src/use_cases/research/artifact_catalog.rs",
         "crates/persistence-postgres/src/p4_records.rs"
       ],
       "databaseMappings": [
@@ -22824,8 +22852,10 @@
       "externalCallers": [
         "crates/application/src/composition/adapters/research.rs",
         "crates/application/src/p4_orchestration.rs",
-        "crates/application/src/p4_persistence.rs",
         "crates/application/src/ports/research/mod.rs",
+        "crates/application/src/services/research/facade.rs",
+        "crates/application/src/services/research/service.rs",
+        "crates/application/src/use_cases/research/ledger.rs",
         "crates/persistence-postgres/src/p4_records.rs",
         "crates/persistence-postgres/tests/postgres_integration.rs"
       ],
@@ -22922,9 +22952,11 @@
       "externalCallers": [
         "crates/application/src/composition/adapters/research.rs",
         "crates/application/src/openai_research.rs",
-        "crates/application/src/p4_persistence.rs",
         "crates/application/src/p4_workbench.rs",
         "crates/application/src/ports/research/mod.rs",
+        "crates/application/src/services/research/facade.rs",
+        "crates/application/src/services/research/service.rs",
+        "crates/application/src/use_cases/research/ledger.rs",
         "crates/persistence-postgres/src/p4_records.rs"
       ],
       "databaseMappings": [
@@ -23007,8 +23039,10 @@
       ],
       "externalCallers": [
         "crates/application/src/composition/adapters/research.rs",
-        "crates/application/src/p4_persistence.rs",
         "crates/application/src/ports/research/mod.rs",
+        "crates/application/src/services/research/facade.rs",
+        "crates/application/src/services/research/service.rs",
+        "crates/application/src/use_cases/research/ledger.rs",
         "crates/persistence-postgres/src/p4_orchestration.rs",
         "crates/persistence-postgres/src/p4_records.rs"
       ],
@@ -24544,8 +24578,10 @@
       "externalCallers": [
         "crates/application/src/composition/adapters/research.rs",
         "crates/application/src/openai_research.rs",
-        "crates/application/src/p4_persistence.rs",
         "crates/application/src/ports/research/mod.rs",
+        "crates/application/src/services/research/facade.rs",
+        "crates/application/src/services/research/service.rs",
+        "crates/application/src/use_cases/research/artifact_catalog.rs",
         "crates/persistence-postgres/src/p4_records.rs",
         "crates/persistence-postgres/tests/postgres_integration.rs"
       ],
@@ -24617,8 +24653,10 @@
       ],
       "externalCallers": [
         "crates/application/src/composition/adapters/research.rs",
-        "crates/application/src/p4_persistence.rs",
         "crates/application/src/ports/research/mod.rs",
+        "crates/application/src/services/research/facade.rs",
+        "crates/application/src/services/research/service.rs",
+        "crates/application/src/use_cases/research/artifact_catalog.rs",
         "crates/persistence-postgres/src/p4_orchestration.rs",
         "crates/persistence-postgres/src/p4_records.rs"
       ],

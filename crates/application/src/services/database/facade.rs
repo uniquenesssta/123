@@ -86,8 +86,10 @@ impl ApplicationService {
         self.rules
             .register_built_ins(&self.registry, prepared.session())
             .await?;
+        self.research
+            .register_persistence_artifacts(prepared.session())
+            .await?;
         let store = prepared.transition_store();
-        self.register_p4_persistence_artifacts(&store).await?;
         self.register_openai_research_artifacts(&store).await
     }
 }

@@ -1,12 +1,14 @@
 use crate::ports::PortResult;
 use async_trait::async_trait;
 use football_domain::{
-    ConflictEvaluationDraft, ConflictEvaluationRecord, EntityMatchRequest, EntityResolutionDraft,
-    EntityResolutionRecord, EvidenceRouteDraft, EvidenceRouteRecord, FactPipelineContext,
-    OpenAiAttemptDraft, OpenAiAttemptRecord, OpenAiUsageTotals, PromptVersionDraft,
-    PromptVersionRecord, ResearchRunDraft, ResearchRunEventDraft, ResearchRunRecord,
-    SchemaVersionDraft, SchemaVersionRecord, SourcePolicyVersionDraft, SourcePolicyVersionRecord,
-    TimeAuditDraft, TimeAuditRecord, WebCitationDraft, WebSourceDraft,
+    CompetitionProfileVersionDraft, CompetitionProfileVersionRecord, ConflictEvaluationDraft,
+    ConflictEvaluationRecord, EntityMatchRequest, EntityResolutionDraft, EntityResolutionRecord,
+    EvidenceClaimDraft, EvidenceClaimRecord, EvidenceConflictDraft, EvidenceConflictRecord,
+    EvidenceRouteDraft, EvidenceRouteRecord, FactPipelineContext, OpenAiAttemptDraft,
+    OpenAiAttemptRecord, OpenAiUsageTotals, PromptVersionDraft, PromptVersionRecord,
+    ResearchRunDraft, ResearchRunEventDraft, ResearchRunRecord, SchemaVersionDraft,
+    SchemaVersionRecord, SourcePolicyVersionDraft, SourcePolicyVersionRecord, TimeAuditDraft,
+    TimeAuditRecord, WebCitationDraft, WebSourceDraft,
 };
 use uuid::Uuid;
 
@@ -20,9 +22,28 @@ pub trait ResearchArtifactPort: Send + Sync {
         &self,
         draft: &SourcePolicyVersionDraft,
     ) -> PortResult<SourcePolicyVersionRecord>;
+    async fn register_competition_profile(
+        &self,
+        draft: &CompetitionProfileVersionDraft,
+    ) -> PortResult<CompetitionProfileVersionRecord>;
     async fn create_run(&self, draft: &ResearchRunDraft) -> PortResult<ResearchRunRecord>;
     async fn read_run(&self, run_id: Uuid) -> PortResult<ResearchRunRecord>;
-    async fn record_run_event(&self, draft: &ResearchRunEventDraft) -> PortResult<()>;
+    async fn record_run_event(
+        &self,
+        draft: &ResearchRunEventDraft,
+    ) -> PortResult<ResearchRunRecord>;
+}
+
+#[async_trait]
+pub trait ResearchEvidenceLedgerPort: Send + Sync {
+    async fn append_evidence_claim(
+        &self,
+        draft: &EvidenceClaimDraft,
+    ) -> PortResult<EvidenceClaimRecord>;
+    async fn create_evidence_conflict(
+        &self,
+        draft: &EvidenceConflictDraft,
+    ) -> PortResult<EvidenceConflictRecord>;
 }
 
 #[async_trait]
