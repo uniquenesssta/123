@@ -1,20 +1,25 @@
-use crate::ports::research::{
-    ResearchArtifactPort, ResearchEvidenceLedgerPort, ResearchGatewayAuditPort,
+use crate::ports::{
+    analytics::JobQueuePort,
+    prediction::PredictionWorkflowPort,
+    research::{ResearchArtifactPort, ResearchEvidenceLedgerPort, ResearchGatewayAuditPort},
 };
 use crate::use_cases::research::{
     artifact_catalog,
     fact_pipeline::{self, FactPipelineAccess, ProcessResearchEvidenceCommand},
     ledger,
     openai_gateway::{self, OpenAiResearchCommand},
+    p4_worker::{self, P4ResearchWorkerAccess},
 };
 use crate::ApplicationResult;
 use football_domain::{
     CompetitionProfileVersionDraft, CompetitionProfileVersionRecord, EvidenceClaimDraft,
     EvidenceClaimRecord, EvidenceConflictDraft, EvidenceConflictRecord, FactPipelineSummary,
-    PromptVersionDraft, PromptVersionRecord, ResearchRunDraft, ResearchRunEventDraft,
-    ResearchRunRecord, SchemaVersionDraft, SchemaVersionRecord,
+    P4FreezeTaskRecord, PromptVersionDraft, PromptVersionRecord, ResearchRunDraft,
+    ResearchRunEventDraft, ResearchRunRecord, SchemaVersionDraft, SchemaVersionRecord,
 };
 use football_research_gateway::{CancellationToken, GatewayExecution};
+use serde_json::Value;
+use uuid::Uuid;
 
 pub(crate) struct ResearchService;
 
@@ -119,5 +124,23 @@ impl ResearchService {
             cancellation,
         )
         .await
+    }
+
+    pub(crate) async fn execute_p4_research_task(
+        &self,
+        access: P4ResearchWorkerAccess<'_>,
+        task_id: Uuid,
+        job_id: Uuid,
+    ) -> ApplicationResult<Value> {
+        p4_worker::execute(access, task_id, job_id).await
+    }
+
+    pub(crate) async fn finalize_successful_research(
+        &self,
+        workflow: &dyn PredictionWorkflowPort,
+        jobs: &dyn JobQueuePort,
+        task: &P4FreezeTaskRecord,
+    ) -> ApplicationResult<P4FreezeTaskRecord> {
+        p4_worker::finalize_successful_research(workflow, jobs, task).await
     }
 }

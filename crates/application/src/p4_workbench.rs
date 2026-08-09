@@ -1,7 +1,4 @@
-use super::{
-    p4_orchestration::finalize_successful_research, ApplicationError, ApplicationResult,
-    ApplicationService,
-};
+use super::{ApplicationError, ApplicationResult, ApplicationService};
 use crate::PersistenceStore;
 use chrono::Utc;
 use football_domain::{
@@ -46,7 +43,8 @@ impl ApplicationService {
                 && existing_evidence_ids == requested_evidence_ids
                 && conflict.manual_decision_note == note
             {
-                reconcile_p4_task_after_manual_decision(&store, task.id, research_run_id).await?;
+                reconcile_p4_task_after_manual_decision(self, &store, task.id, research_run_id)
+                    .await?;
                 return Ok(store.read_p4_task_workspace(task.id).await?);
             }
             return Err(ApplicationError::Validation(
@@ -184,12 +182,13 @@ impl ApplicationService {
             })
             .await?;
 
-        reconcile_p4_task_after_manual_decision(&store, task.id, research_run_id).await?;
+        reconcile_p4_task_after_manual_decision(self, &store, task.id, research_run_id).await?;
         Ok(store.read_p4_task_workspace(task.id).await?)
     }
 }
 
 async fn reconcile_p4_task_after_manual_decision(
+    service: &ApplicationService,
     store: &PersistenceStore,
     task_id: Uuid,
     research_run_id: Uuid,
@@ -258,7 +257,7 @@ async fn reconcile_p4_task_after_manual_decision(
                 }
             };
 
-            match finalize_successful_research(store, &recovered).await {
+            match service.finalize_p4_research_task(&recovered).await {
                 Ok(_) => return Ok(()),
                 Err(error) => {
                     let latest = store.read_p4_freeze_task(task_id).await?;

@@ -52,6 +52,10 @@ const required = [
   "crates/application/src/use_cases/research/openai_gateway/references.rs",
   "crates/application/src/use_cases/research/openai_gateway/types.rs",
   "crates/application/src/use_cases/research/openai_gateway/validation.rs",
+  "crates/application/src/use_cases/research/p4_worker/mod.rs",
+  "crates/application/src/use_cases/research/p4_worker/context.rs",
+  "crates/application/src/use_cases/research/p4_worker/execution.rs",
+  "crates/application/src/use_cases/research/p4_worker/transitions.rs",
   "crates/application/src/composition/adapters/research.rs",
   "crates/application/src/ports/research/mod.rs",
 ];
@@ -69,6 +73,10 @@ const openaiExecution = read("crates/application/src/use_cases/research/openai_g
 const openaiArtifacts = read("crates/application/src/use_cases/research/openai_gateway/artifacts.rs");
 const openaiAudit = read("crates/application/src/use_cases/research/openai_gateway/attempt_audit.rs");
 const pipeline = read("crates/application/src/use_cases/research/fact_pipeline/mod.rs");
+const p4Worker = read("crates/application/src/use_cases/research/p4_worker/execution.rs");
+const p4Transitions = read("crates/application/src/use_cases/research/p4_worker/transitions.rs");
+const p4Orchestration = read("crates/application/src/p4_orchestration.rs");
+const p4Workbench = read("crates/application/src/p4_workbench.rs");
 const lib = read("crates/application/src/lib.rs");
 const packageJson = JSON.parse(read("package.json"));
 const frontend = read("scripts/verify-frontend.mjs");
@@ -113,9 +121,22 @@ check(lib.includes("use_cases::research::fact_pipeline::ProcessResearchEvidenceC
 check(lib.includes("use_cases::research::openai_gateway::OpenAiResearchCommand"), "公共 OpenAiResearchCommand 未从新 owner 重导出");
 check(!lib.includes("mod openai_research;"), "Application 根模块仍登记旧 openai_research owner");
 check(pipeline.includes("trait FactPipelineAccess"), "Fact Pipeline 缺少 Ports 组合访问边界");
-for (const path of ["crates/application/src/p4_orchestration.rs", "crates/application/src/p4_workbench.rs"]) {
-  check(existsSync(join(root, path)), `后续 R3-07 职责被提前删除：${path}`);
+check(existsSync(join(root, "crates/application/src/p4_orchestration.rs")), "跨 Prediction/Research 的 P4 dispatcher 被提前删除");
+check(existsSync(join(root, "crates/application/src/p4_workbench.rs")), "人工冲突裁决被提前删除");
+check(service.includes("fn execute_p4_research_task"), "ResearchService 缺少 P4 Research worker 执行职责");
+check(service.includes("fn finalize_successful_research"), "ResearchService 缺少 Research 成功收口职责");
+check(facade.includes("fn execute_p4_research_task"), "Application Research facade 缺少 P4 Research worker 委托");
+check(facade.includes("fn finalize_p4_research_task"), "Application Research facade 缺少人工裁决复用的 Research 收口入口");
+check(p4Worker.includes("openai_gateway::execute_p4_openai_research"), "P4 Research worker 未复用已迁移 OpenAI Gateway");
+check(p4Worker.includes("PredictionWorkflowPort"), "P4 Research worker 未通过 PredictionWorkflowPort 管理冻结任务状态");
+check(p4Worker.includes("ResearchArtifactPort"), "P4 Research worker 未通过 ResearchArtifactPort 管理 research run");
+check(p4Transitions.includes("JobQueuePort"), "P4 Research worker 未通过 JobQueuePort 安排 freeze job");
+check(p4Orchestration.includes("self.execute_p4_research_task(payload.task_id, job_id)"), "P4 dispatcher 未委托 ResearchService 执行 Research job");
+for (const token of ["OpenAiResearchCommand", "ResearchRunDraft", "ResearchRunStatus", "research_dynamic_context", "fn finalize_successful_research", "fn block_partial_research", "fn transition_missed", "execute_p4_openai_research("]) {
+  check(!p4Orchestration.includes(token), `旧 p4_orchestration.rs 仍持有 Research worker 业务逻辑：${token}`);
 }
+check(!p4Workbench.includes("p4_orchestration::finalize_successful_research"), "人工冲突裁决仍依赖旧 P4 orchestration Research helper");
+check(p4Workbench.includes("service.finalize_p4_research_task(&recovered).await"), "人工冲突裁决未复用 ResearchService 成功收口职责");
 
 const pipelineFiles = rustFiles("crates/application/src/use_cases/research/fact_pipeline");
 check(pipelineFiles.length >= 9, `Fact Pipeline 拆分不足，当前仅 ${pipelineFiles.length} 个职责文件`);
@@ -134,4 +155,4 @@ check(packageJson.scripts?.["verify:architecture"]?.includes("verify-research-se
 check(frontend.includes('"verify-research-service.mjs"'), "verify:frontend 未接入 R3-07 门禁");
 
 if (failures.length) throw new Error(`Research Service 验证失败\n${failures.map((item) => `- ${item}`).join("\n")}`);
-console.log(`Research Service AT3 验证通过：${researchFiles.length} 个 Service/Use Case Rust 文件，9 个公开 Research API 已进入 ResearchService/Ports；Fact Pipeline 保持 ${pipelineFiles.length} 个模块，OpenAI Gateway execution 已拆入 ResearchService，旧 p4_persistence.rs / fact_pipeline.rs / openai_research.rs 均已删除。`);
+console.log(`Research Service AT4 验证通过：${researchFiles.length} 个 Service/Use Case Rust 文件；9 个公开 Research API 保持兼容，Fact Pipeline、OpenAI Gateway 与 P4 Research worker 均进入 ResearchService/Ports，根 p4_orchestration.rs 仅保留跨服务 dispatcher/worker loop，人工冲突裁决继续留给后续 Atomic Task。`);
