@@ -212,3 +212,8 @@ PostgreSQL 实跑、Windows Full 和用户本机 Windows 10/11 实机验收仍�
 - `crates/domain/src/lib.rs` 仅保留 17 个业务模块声明、365 个显式公共兼容类型 re-export 与 crate 内默认值兼容转发，不再承载领域定义或默认值实现。
 - 根级 `pub use module::*` 已全部删除；新增确定性生成器和静态验证器，`verify:architecture` 会拒绝 glob 回归、遗漏/重复出口和根文件业务实现。
 - 现有 `football_domain::TypeName`、Serde、数据库映射、DTO、模型保护边界和生产依赖未改变。Windows 本机完整阶段回归已通过，R2-08 状态为 `DONE`，R2 阶段已关闭。
+
+
+## R3-08 Review / Postmatch / Analytics Services（IN_PROGRESS）
+
+- Atomic Task 1 启动 Review Core 重写：将 `generate_match_review`、复盘列表/读取、可复盘比赛查询及能力候选查询/裁决 6 个公开 Application 职责迁入 `services/review/`、`use_cases/review/`，具体 PostgreSQL 调用仅由 `composition/adapters/review.rs` 实现 `MatchReviewPort`。公共 ApplicationService/Tauri 方法、DTO、SQL、Schema、配置、错误和用户可观察行为保持不变；Match Review Package、Postmatch、Analytics 不在本 Atomic Task 修改范围。

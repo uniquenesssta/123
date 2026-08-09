@@ -4,9 +4,10 @@ use crate::model_shell::PublicModelStub;
 use crate::services::{
     competition::CompetitionService, database::DatabaseService, lineups::LineupService,
     players::PlayerService, prediction::PredictionService, research::ResearchService,
-    rules::RulesService, teams::TeamService,
+    review::ReviewService, rules::RulesService, teams::TeamService,
 };
 use std::sync::{atomic::AtomicBool, Arc};
+
 pub(crate) struct ApplicationComposition {
     registry: ModelRegistry,
     database: DatabaseService,
@@ -17,8 +18,10 @@ pub(crate) struct ApplicationComposition {
     lineups: LineupService,
     prediction: PredictionService,
     research: ResearchService,
+    review: ReviewService,
     p4_worker_running: AtomicBool,
 }
+
 impl ApplicationComposition {
     pub(crate) fn new() -> Self {
         let mut registry = ModelRegistry::new();
@@ -36,9 +39,11 @@ impl ApplicationComposition {
             lineups: LineupService::new(),
             prediction: PredictionService::new(),
             research: ResearchService::new(),
+            review: ReviewService::new(),
             p4_worker_running: AtomicBool::new(false),
         }
     }
+
     pub(crate) fn into_parts(
         self,
     ) -> (
@@ -51,6 +56,7 @@ impl ApplicationComposition {
         LineupService,
         PredictionService,
         ResearchService,
+        ReviewService,
         AtomicBool,
     ) {
         (
@@ -63,6 +69,7 @@ impl ApplicationComposition {
             self.lineups,
             self.prediction,
             self.research,
+            self.review,
             self.p4_worker_running,
         )
     }

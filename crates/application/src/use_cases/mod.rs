@@ -4,5 +4,6 @@ pub(crate) mod lineups;
 pub(crate) mod players;
 pub(crate) mod prediction;
 pub(crate) mod research;
+pub(crate) mod review;
 pub(crate) mod rules;
 pub(crate) mod teams;

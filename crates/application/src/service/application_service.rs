@@ -3,9 +3,10 @@ use crate::model_registry::ModelRegistry;
 use crate::services::{
     competition::CompetitionService, database::DatabaseService, lineups::LineupService,
     players::PlayerService, prediction::PredictionService, research::ResearchService,
-    rules::RulesService, teams::TeamService,
+    review::ReviewService, rules::RulesService, teams::TeamService,
 };
 use std::sync::atomic::AtomicBool;
+
 pub struct ApplicationService {
     pub(crate) registry: ModelRegistry,
     pub(crate) database: DatabaseService,
@@ -16,8 +17,10 @@ pub struct ApplicationService {
     pub(crate) lineups: LineupService,
     pub(crate) prediction: PredictionService,
     pub(crate) research: ResearchService,
+    pub(crate) review: ReviewService,
     pub(crate) p4_worker_running: AtomicBool,
 }
+
 impl ApplicationService {
     pub fn new() -> Self {
         let (
@@ -30,6 +33,7 @@ impl ApplicationService {
             lineups,
             prediction,
             research,
+            review,
             p4_worker_running,
         ) = ApplicationComposition::new().into_parts();
         Self {
@@ -42,10 +46,12 @@ impl ApplicationService {
             lineups,
             prediction,
             research,
+            review,
             p4_worker_running,
         }
     }
 }
+
 impl Default for ApplicationService {
     fn default() -> Self {
         Self::new()

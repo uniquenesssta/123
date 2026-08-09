@@ -10,7 +10,6 @@ mod p4_orchestration;
 pub mod ports;
 mod postmatch;
 mod release_acceptance;
-mod review;
 mod service;
 mod services;
 mod spreadsheet;
