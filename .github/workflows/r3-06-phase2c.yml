@@ -29,7 +29,15 @@ jobs:
           workspaces: . -> ../.cargo-target
       - name: Apply Atomic Task 2C
         shell: pwsh
-        run: python scripts/r3-06-phase2c.py
+        run: |
+          python scripts/r3-06-phase2c.py
+          $path = "crates/application/src/services/prediction/service.rs"
+          $content = Get-Content -Raw -Encoding UTF8 $path
+          $old = "use crate::ports::prediction::ModelRunHistoryItem;"
+          $new = "use crate::ports::prediction::{ModelRunHistoryItem, P4FreezeExecutionPort};"
+          if (-not $content.Contains($old)) { throw "service.rs import anchor not found" }
+          $content = $content.Replace($old, $new)
+          Set-Content -Path $path -Value $content -Encoding UTF8 -NoNewline
       - name: Format and refresh derived inventory
         shell: pwsh
         run: |
