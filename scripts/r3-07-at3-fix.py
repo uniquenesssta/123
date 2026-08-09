@@ -63,12 +63,15 @@ replace_once(
     '    "use super::*;\\nuse super::artifacts::{built_in_research_prompt, built_in_research_schema};\\nuse super::gateway::built_in_gateway_config;",\n'
     '    1,\n'
     ')\n'
+    'if tests.count("../../../src-tauri") != 1:\n'
+    '    raise RuntimeError("OpenAI gateway test resource path anchor mismatch")\n'
+    'tests = tests.replace("../../../src-tauri", "../../../../../../src-tauri")\n'
     'write(\n'
     '    "crates/application/src/use_cases/research/openai_gateway/tests.rs",\n'
     '    tests,\n'
     ')\n',
-    "test helper imports",
+    "test helper imports and resource path",
 )
 
 GENERATOR.write_text(text, encoding="utf-8", newline="\n")
-print("AT3 generator patched for moved paths and sibling visibility")
+print("AT3 generator patched for moved paths, sibling visibility, and test resources")
