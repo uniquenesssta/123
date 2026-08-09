@@ -86,6 +86,7 @@ pub trait FactPipelinePort: Send + Sync {
 #[async_trait]
 pub trait ResearchGatewayAuditPort: Send + Sync {
     async fn append_attempt(&self, draft: &OpenAiAttemptDraft) -> PortResult<OpenAiAttemptRecord>;
+    async fn attempt_number_offset(&self, research_run_id: Uuid) -> PortResult<u32>;
     async fn usage_totals(&self) -> PortResult<OpenAiUsageTotals>;
     async fn append_web_references(
         &self,

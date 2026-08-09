@@ -26,6 +26,7 @@ const publicMethods = [
   "append_p4_evidence_claim",
   "create_p4_evidence_conflict",
   "process_p4_research_evidence",
+  "execute_p4_openai_research",
 ];
 const required = [
   "crates/application/src/services/research/mod.rs",
@@ -43,19 +44,30 @@ const required = [
   "crates/application/src/use_cases/research/fact_pipeline/routing.rs",
   "crates/application/src/use_cases/research/fact_pipeline/validation.rs",
   "crates/application/src/use_cases/research/fact_pipeline/types.rs",
+  "crates/application/src/use_cases/research/openai_gateway/mod.rs",
+  "crates/application/src/use_cases/research/openai_gateway/artifacts.rs",
+  "crates/application/src/use_cases/research/openai_gateway/attempt_audit.rs",
+  "crates/application/src/use_cases/research/openai_gateway/execution.rs",
+  "crates/application/src/use_cases/research/openai_gateway/gateway.rs",
+  "crates/application/src/use_cases/research/openai_gateway/references.rs",
+  "crates/application/src/use_cases/research/openai_gateway/types.rs",
+  "crates/application/src/use_cases/research/openai_gateway/validation.rs",
   "crates/application/src/composition/adapters/research.rs",
   "crates/application/src/ports/research/mod.rs",
 ];
 for (const path of required) check(existsSync(join(root, path)), `缺少 R3-07 文件：${path}`);
 check(!existsSync(join(root, "crates/application/src/p4_persistence.rs")), "旧 p4_persistence.rs 仍残留 Research owner");
 check(!existsSync(join(root, "crates/application/src/fact_pipeline.rs")), "旧 fact_pipeline.rs 仍残留 Fact Pipeline owner 或空转发层");
+check(!existsSync(join(root, "crates/application/src/openai_research.rs")), "旧 openai_research.rs 仍残留 OpenAI Research owner 或空转发层");
 
 const facade = read("crates/application/src/services/research/facade.rs");
 const service = read("crates/application/src/services/research/service.rs");
 const ports = read("crates/application/src/ports/research/mod.rs");
 const adapter = read("crates/application/src/composition/adapters/research.rs");
 const databaseFacade = read("crates/application/src/services/database/facade.rs");
-const openai = read("crates/application/src/openai_research.rs");
+const openaiExecution = read("crates/application/src/use_cases/research/openai_gateway/execution.rs");
+const openaiArtifacts = read("crates/application/src/use_cases/research/openai_gateway/artifacts.rs");
+const openaiAudit = read("crates/application/src/use_cases/research/openai_gateway/attempt_audit.rs");
 const pipeline = read("crates/application/src/use_cases/research/fact_pipeline/mod.rs");
 const lib = read("crates/application/src/lib.rs");
 const packageJson = JSON.parse(read("package.json"));
@@ -81,13 +93,27 @@ for (const token of [".fact_pipeline_context(research_run_id)", ".find_entity_ca
   check(adapter.includes(token), `Fact Pipeline adapter 未复用既有持久化能力：${token}`);
 }
 check(databaseFacade.includes(".register_persistence_artifacts(prepared.session())"), "数据库初始化未通过 ResearchService 注册内置 Research schema");
-check(openai.replaceAll(" ", "").replaceAll(String.fromCharCode(10), "").replaceAll(String.fromCharCode(13), "").replaceAll(String.fromCharCode(9), "").includes("self.research.register_fact_pipeline_artifacts(session).await?"), "OpenAI artifact 初始化未通过 ResearchService 注册 Fact Pipeline 来源策略");
-check(openai.includes("fn execute_p4_openai_research"), "后续 OpenAI Research 执行职责被提前迁移或删除");
+check(openaiArtifacts.includes("fact_pipeline::register_fact_pipeline_artifacts(port).await?"), "OpenAI artifact 初始化未继续注册 Fact Pipeline 来源策略");
+check(service.includes("fn register_openai_research_artifacts"), "ResearchService 缺少 OpenAI artifact 初始化职责");
+check(databaseFacade.replaceAll(/\s/g, "").includes("self.research.register_openai_research_artifacts(prepared.session()).await"), "数据库初始化未通过 ResearchService 注册 OpenAI Research artifacts");
+check(ports.includes("trait ResearchGatewayAuditPort"), "Research Ports 缺少 ResearchGatewayAuditPort");
+for (const capability of ["append_attempt", "attempt_number_offset", "usage_totals", "append_web_references"]) {
+  check(ports.includes(`fn ${capability}`), `ResearchGatewayAuditPort 缺少能力：${capability}`);
+}
+check(adapter.includes("impl ResearchGatewayAuditPort for ActiveDatabase"), "Research adapter 缺少 Gateway Audit 实现");
+for (const token of [".append_openai_attempt(draft)", ".openai_attempt_number_offset(research_run_id)", ".openai_usage_totals()", ".append_web_references(citations, sources)"]) {
+  check(adapter.includes(token), `Research Gateway adapter 未复用既有持久化能力：${token}`);
+}
+check(openaiExecution.includes("execute_with_sink"), "OpenAI Research 执行未保留 GatewayAttemptSink 审计链");
+check(openaiExecution.includes("fact_pipeline::process_p4_research_evidence"), "OpenAI Research 执行未衔接 Fact Pipeline");
+check(openaiAudit.includes("impl GatewayAttemptSink for PortAttemptSink"), "OpenAI attempt audit 未通过 Port-backed sink");
 check(!lib.includes("mod p4_persistence;"), "Application 根模块仍登记旧 p4_persistence owner");
 check(!lib.includes("mod fact_pipeline;"), "Application 根模块仍登记旧 fact_pipeline owner");
 check(lib.includes("use_cases::research::fact_pipeline::ProcessResearchEvidenceCommand"), "公共 ProcessResearchEvidenceCommand 未从新 owner 重导出");
+check(lib.includes("use_cases::research::openai_gateway::OpenAiResearchCommand"), "公共 OpenAiResearchCommand 未从新 owner 重导出");
+check(!lib.includes("mod openai_research;"), "Application 根模块仍登记旧 openai_research owner");
 check(pipeline.includes("trait FactPipelineAccess"), "Fact Pipeline 缺少 Ports 组合访问边界");
-for (const path of ["crates/application/src/openai_research.rs", "crates/application/src/p4_orchestration.rs", "crates/application/src/p4_workbench.rs"]) {
+for (const path of ["crates/application/src/p4_orchestration.rs", "crates/application/src/p4_workbench.rs"]) {
   check(existsSync(join(root, path)), `后续 R3-07 职责被提前删除：${path}`);
 }
 
@@ -108,4 +134,4 @@ check(packageJson.scripts?.["verify:architecture"]?.includes("verify-research-se
 check(frontend.includes('"verify-research-service.mjs"'), "verify:frontend 未接入 R3-07 门禁");
 
 if (failures.length) throw new Error(`Research Service 验证失败\n${failures.map((item) => `- ${item}`).join("\n")}`);
-console.log(`Research Service AT2 验证通过：${researchFiles.length} 个 Service/Use Case Rust 文件，8 个公开 Research API 已进入 ResearchService/Ports；Fact Pipeline 已按职责拆分为 ${pipelineFiles.length} 个模块，旧 p4_persistence.rs / fact_pipeline.rs 均已删除。`);
+console.log(`Research Service AT3 验证通过：${researchFiles.length} 个 Service/Use Case Rust 文件，9 个公开 Research API 已进入 ResearchService/Ports；Fact Pipeline 保持 ${pipelineFiles.length} 个模块，OpenAI Gateway execution 已拆入 ResearchService，旧 p4_persistence.rs / fact_pipeline.rs / openai_research.rs 均已删除。`);

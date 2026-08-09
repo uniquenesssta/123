@@ -24,13 +24,13 @@
     "targetPublicExportPolicy": "explicit re-export only"
   },
   "sourceDigest": "217241ac243726a5ab6805a7f169e222b97e78c7c971749a5904714af673ebdd",
-  "rustUsageDigest": "e07b64752801546cf6e8e2e12bf6277147785af4373567fe072b1d6582d96cf2",
+  "rustUsageDigest": "145333bda5e8115cfb731f9bb7c5acb49e7cdc74daea9c5aadf4cae8962f9172",
   "summary": {
     "typeCount": 365,
     "publicCompatibilityTypeCount": 365,
     "internalTypeCount": 0,
     "domainSourceFileCount": 129,
-    "scannedRustFileCount": 444,
+    "scannedRustFileCount": 452,
     "databaseMappedTypeCount": 299,
     "byTargetModule": {
       "ai_workspace": 16,
@@ -13969,8 +13969,10 @@
         "crates/domain/tests/serde_contracts/module_paths.rs"
       ],
       "externalCallers": [
-        "crates/application/src/openai_research.rs",
+        "crates/application/src/composition/adapters/research.rs",
         "crates/application/src/ports/research/mod.rs",
+        "crates/application/src/use_cases/research/openai_gateway/attempt_audit.rs",
+        "crates/application/src/use_cases/research/openai_gateway/mod.rs",
         "crates/persistence-postgres/src/research_gateway_records.rs"
       ],
       "databaseMappings": [
@@ -14044,6 +14046,7 @@
         "crates/domain/tests/serde_contracts/module_paths.rs"
       ],
       "externalCallers": [
+        "crates/application/src/composition/adapters/research.rs",
         "crates/application/src/ports/research/mod.rs",
         "crates/persistence-postgres/src/research_gateway_records.rs"
       ],
@@ -14108,6 +14111,7 @@
       ],
       "externalCallers": [
         "crates/application/src/api_workspace.rs",
+        "crates/application/src/composition/adapters/research.rs",
         "crates/application/src/ports/research/mod.rs",
         "crates/persistence-postgres/src/api_workspace.rs",
         "crates/persistence-postgres/src/research_gateway_records.rs"
@@ -21685,11 +21689,12 @@
       ],
       "externalCallers": [
         "crates/application/src/composition/adapters/research.rs",
-        "crates/application/src/openai_research.rs",
         "crates/application/src/ports/research/mod.rs",
         "crates/application/src/services/research/facade.rs",
         "crates/application/src/services/research/service.rs",
         "crates/application/src/use_cases/research/artifact_catalog.rs",
+        "crates/application/src/use_cases/research/openai_gateway/artifacts.rs",
+        "crates/application/src/use_cases/research/openai_gateway/mod.rs",
         "crates/persistence-postgres/src/p4_records.rs"
       ],
       "databaseMappings": [
@@ -22992,12 +22997,13 @@
       ],
       "externalCallers": [
         "crates/application/src/composition/adapters/research.rs",
-        "crates/application/src/openai_research.rs",
         "crates/application/src/p4_workbench.rs",
         "crates/application/src/ports/research/mod.rs",
         "crates/application/src/services/research/facade.rs",
         "crates/application/src/services/research/service.rs",
         "crates/application/src/use_cases/research/ledger.rs",
+        "crates/application/src/use_cases/research/openai_gateway/execution.rs",
+        "crates/application/src/use_cases/research/openai_gateway/mod.rs",
         "crates/persistence-postgres/src/p4_records.rs"
       ],
       "databaseMappings": [
@@ -23161,9 +23167,10 @@
         "crates/domain/tests/serde_contracts/module_paths.rs"
       ],
       "externalCallers": [
-        "crates/application/src/openai_research.rs",
         "crates/application/src/p4_orchestration.rs",
         "crates/application/src/p4_workbench.rs",
+        "crates/application/src/use_cases/research/openai_gateway/execution.rs",
+        "crates/application/src/use_cases/research/openai_gateway/mod.rs",
         "crates/persistence-postgres/src/p4_orchestration.rs",
         "crates/persistence-postgres/src/p4_records.rs"
       ],
@@ -24618,11 +24625,12 @@
       ],
       "externalCallers": [
         "crates/application/src/composition/adapters/research.rs",
-        "crates/application/src/openai_research.rs",
         "crates/application/src/ports/research/mod.rs",
         "crates/application/src/services/research/facade.rs",
         "crates/application/src/services/research/service.rs",
         "crates/application/src/use_cases/research/artifact_catalog.rs",
+        "crates/application/src/use_cases/research/openai_gateway/artifacts.rs",
+        "crates/application/src/use_cases/research/openai_gateway/mod.rs",
         "crates/persistence-postgres/src/p4_records.rs",
         "crates/persistence-postgres/tests/postgres_integration.rs"
       ],
@@ -31607,8 +31615,10 @@
         "crates/domain/tests/serde_contracts/module_paths.rs"
       ],
       "externalCallers": [
-        "crates/application/src/openai_research.rs",
+        "crates/application/src/composition/adapters/research.rs",
         "crates/application/src/ports/research/mod.rs",
+        "crates/application/src/use_cases/research/openai_gateway/mod.rs",
+        "crates/application/src/use_cases/research/openai_gateway/references.rs",
         "crates/persistence-postgres/src/research_gateway_records.rs"
       ],
       "databaseMappings": [
@@ -31680,8 +31690,10 @@
         "crates/domain/tests/serde_contracts/module_paths.rs"
       ],
       "externalCallers": [
-        "crates/application/src/openai_research.rs",
+        "crates/application/src/composition/adapters/research.rs",
         "crates/application/src/ports/research/mod.rs",
+        "crates/application/src/use_cases/research/openai_gateway/mod.rs",
+        "crates/application/src/use_cases/research/openai_gateway/references.rs",
         "crates/persistence-postgres/src/research_gateway_records.rs"
       ],
       "databaseMappings": [

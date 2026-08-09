@@ -1,6 +1,7 @@
 use crate::composition::ActiveDatabase;
 use crate::{
-    ApplicationError, ApplicationResult, ApplicationService, ProcessResearchEvidenceCommand,
+    ApplicationError, ApplicationResult, ApplicationService, OpenAiResearchCommand,
+    ProcessResearchEvidenceCommand,
 };
 use football_domain::{
     CompetitionProfileVersionDraft, CompetitionProfileVersionRecord, EvidenceClaimDraft,
@@ -8,6 +9,7 @@ use football_domain::{
     PromptVersionDraft, PromptVersionRecord, ResearchRunDraft, ResearchRunEventDraft,
     ResearchRunRecord, SchemaVersionDraft, SchemaVersionRecord,
 };
+use football_research_gateway::{CancellationToken, GatewayExecution};
 
 impl ApplicationService {
     async fn research_session(&self) -> ApplicationResult<ActiveDatabase> {
@@ -92,6 +94,17 @@ impl ApplicationService {
         let session = self.research_session().await?;
         self.research
             .process_p4_research_evidence(&session, command)
+            .await
+    }
+
+    pub async fn execute_p4_openai_research(
+        &self,
+        command: OpenAiResearchCommand,
+        cancellation: CancellationToken,
+    ) -> ApplicationResult<GatewayExecution> {
+        let session = self.research_session().await?;
+        self.research
+            .execute_p4_openai_research(&session, &session, &session, command, cancellation)
             .await
     }
 }

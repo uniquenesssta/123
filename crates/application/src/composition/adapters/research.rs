@@ -2,7 +2,7 @@ use super::super::port_registry::{map_persistence_error, ActiveDatabase};
 use crate::ports::{
     research::{
         FactPipelinePort, ResearchArtifactPort, ResearchEvidenceLedgerPort,
-        SerializedConflictEventPayload,
+        ResearchGatewayAuditPort, SerializedConflictEventPayload,
     },
     PortError, PortErrorKind, PortResult,
 };
@@ -11,10 +11,11 @@ use football_domain::{
     CompetitionProfileVersionDraft, CompetitionProfileVersionRecord, ConflictEvaluationDraft,
     ConflictEvaluationRecord, EntityCandidate, EntityResolutionDraft, EntityResolutionRecord,
     EvidenceClaimDraft, EvidenceClaimRecord, EvidenceConflictDraft, EvidenceConflictRecord,
-    EvidenceRouteDraft, EvidenceRouteRecord, FactPipelineContext, PromptVersionDraft,
-    PromptVersionRecord, ResearchRunDraft, ResearchRunEventDraft, ResearchRunRecord,
-    SchemaVersionDraft, SchemaVersionRecord, SourcePolicyVersionDraft, SourcePolicyVersionRecord,
-    TimeAuditDraft, TimeAuditRecord,
+    EvidenceRouteDraft, EvidenceRouteRecord, FactPipelineContext, OpenAiAttemptDraft,
+    OpenAiAttemptRecord, OpenAiUsageTotals, PromptVersionDraft, PromptVersionRecord,
+    ResearchRunDraft, ResearchRunEventDraft, ResearchRunRecord, SchemaVersionDraft,
+    SchemaVersionRecord, SourcePolicyVersionDraft, SourcePolicyVersionRecord, TimeAuditDraft,
+    TimeAuditRecord, WebCitationDraft, WebSourceDraft,
 };
 use uuid::Uuid;
 
@@ -195,6 +196,42 @@ impl FactPipelinePort for ActiveDatabase {
     ) -> PortResult<EvidenceRouteRecord> {
         self.transition_store()
             .append_evidence_route(draft)
+            .await
+            .map_err(map_persistence_error)
+    }
+}
+
+#[async_trait]
+impl ResearchGatewayAuditPort for ActiveDatabase {
+    async fn append_attempt(&self, draft: &OpenAiAttemptDraft) -> PortResult<OpenAiAttemptRecord> {
+        self.transition_store()
+            .append_openai_attempt(draft)
+            .await
+            .map_err(map_persistence_error)
+    }
+
+    async fn attempt_number_offset(&self, research_run_id: Uuid) -> PortResult<u32> {
+        self.transition_store()
+            .openai_attempt_number_offset(research_run_id)
+            .await
+            .map_err(map_persistence_error)
+    }
+
+    async fn usage_totals(&self) -> PortResult<OpenAiUsageTotals> {
+        self.transition_store()
+            .openai_usage_totals()
+            .await
+            .map_err(map_persistence_error)
+    }
+
+    async fn append_web_references(
+        &self,
+        _run_id: Uuid,
+        sources: &[WebSourceDraft],
+        citations: &[WebCitationDraft],
+    ) -> PortResult<()> {
+        self.transition_store()
+            .append_web_references(citations, sources)
             .await
             .map_err(map_persistence_error)
     }

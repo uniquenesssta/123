@@ -15,10 +15,6 @@ impl PreparedDatabaseConnection {
         &self.session
     }
 
-    pub(crate) fn transition_store(&self) -> PersistenceStore {
-        self.session.transition_store()
-    }
-
     pub(crate) async fn health(&self) -> PortResult<DatabaseHealthSnapshot> {
         health::execute(&self.session).await
     }

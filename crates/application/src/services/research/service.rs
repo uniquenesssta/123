@@ -1,8 +1,11 @@
-use crate::ports::research::{ResearchArtifactPort, ResearchEvidenceLedgerPort};
+use crate::ports::research::{
+    ResearchArtifactPort, ResearchEvidenceLedgerPort, ResearchGatewayAuditPort,
+};
 use crate::use_cases::research::{
     artifact_catalog,
     fact_pipeline::{self, FactPipelineAccess, ProcessResearchEvidenceCommand},
     ledger,
+    openai_gateway::{self, OpenAiResearchCommand},
 };
 use crate::ApplicationResult;
 use football_domain::{
@@ -11,6 +14,7 @@ use football_domain::{
     PromptVersionDraft, PromptVersionRecord, ResearchRunDraft, ResearchRunEventDraft,
     ResearchRunRecord, SchemaVersionDraft, SchemaVersionRecord,
 };
+use football_research_gateway::{CancellationToken, GatewayExecution};
 
 pub(crate) struct ResearchService;
 
@@ -84,18 +88,36 @@ impl ResearchService {
         ledger::create_evidence_conflict(port, draft).await
     }
 
-    pub(crate) async fn register_fact_pipeline_artifacts(
-        &self,
-        port: &dyn ResearchArtifactPort,
-    ) -> ApplicationResult<()> {
-        fact_pipeline::register_fact_pipeline_artifacts(port).await
-    }
-
     pub(crate) async fn process_p4_research_evidence(
         &self,
         port: &dyn FactPipelineAccess,
         command: ProcessResearchEvidenceCommand,
     ) -> ApplicationResult<FactPipelineSummary> {
         fact_pipeline::process_p4_research_evidence(port, command).await
+    }
+
+    pub(crate) async fn register_openai_research_artifacts(
+        &self,
+        port: &dyn ResearchArtifactPort,
+    ) -> ApplicationResult<()> {
+        openai_gateway::register_openai_research_artifacts(port).await
+    }
+
+    pub(crate) async fn execute_p4_openai_research(
+        &self,
+        artifacts: &dyn ResearchArtifactPort,
+        audit: &dyn ResearchGatewayAuditPort,
+        pipeline: &dyn FactPipelineAccess,
+        command: OpenAiResearchCommand,
+        cancellation: CancellationToken,
+    ) -> ApplicationResult<GatewayExecution> {
+        openai_gateway::execute_p4_openai_research(
+            artifacts,
+            audit,
+            pipeline,
+            command,
+            cancellation,
+        )
+        .await
     }
 }

@@ -6,7 +6,6 @@ mod exchange;
 mod match_review_package;
 mod model_registry;
 mod model_shell;
-mod openai_research;
 mod p4_orchestration;
 mod p4_workbench;
 pub mod ports;
@@ -39,8 +38,8 @@ pub use api_workspace::{
     read_api_workspace_attachments, ApiWorkspacePresetSpec,
 };
 pub use model_shell::{default_match, default_parameters, p4_default_match, p4_default_parameters};
-pub use openai_research::OpenAiResearchCommand;
 pub use use_cases::research::fact_pipeline::ProcessResearchEvidenceCommand;
+pub use use_cases::research::openai_gateway::OpenAiResearchCommand;
 pub use use_cases::rules::package_factory::default_rule_package_template;
 
 #[derive(Debug, Error)]
