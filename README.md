@@ -177,6 +177,7 @@ PostgreSQL 实跑、Windows Full 和用户本机 Windows 10/11 实机验收仍�
 - `verify:research-service` 已接入 `verify:architecture` 与 `verify:frontend`。Atomic Task 1 Windows hard gate run `31295528438` 只有在 Research 专项、Application Ports、完整 architecture、rustfmt、Application check/tests、workspace Clippy `-D warnings` 与 workspace tests 全部通过后才形成 clean 提交。OpenAI Research、Fact Pipeline、P4 Research worker 和人工冲突裁决留给后续 R3-07 Atomic Tasks。
 - 正式 Public Platform CI run `31295931710` 在 Database Service verifier 检出旧 `p4_persistence.rs` owner 断言；产品源码和 AT1 Rust 门禁未失败。验证器已改为检查 Database facade -> ResearchService -> Artifact Catalog -> ResearchArtifactPort 的完整内置 P4 artifact 注册链，不删除或放宽初始化断言。修复门禁 run `31296085324` 通过后才提交本记录。
 - 第二次正式 Public CI run `31296120912` 已确认 Database verifier 通过，随后 Prediction verifier 因直接读取已删除的 `p4_persistence.rs` 触发 ENOENT。该验证器已改为确认旧 owner 不存在，并直接检查 `use_cases/prediction/p4_snapshot` 继续持有两个快照职责；原 Prediction facade/service/port/adapter 与 Research conflict 边界断言均保留。修复门禁 run `31296198981` 通过后提交本记录。
+- 第三次正式 Public CI run `31296232974` 已确认旧文件读取问题消失，但发现 verifier 将 `p4_snapshot` 内部 `freeze/read` 误按公共 Application 方法名断言。已改为检查真实内部 `freeze/read` 入口及 `P4FreezeExecutionPort` 调用，同时继续由 facade/service 断言公共 `freeze_p4_prematch_snapshot/read_p4_prematch_snapshot` 契约。修复门禁 run `31296338770` 通过后提交本记录。
 
 ## R2-04 Lineup 与 Match
 

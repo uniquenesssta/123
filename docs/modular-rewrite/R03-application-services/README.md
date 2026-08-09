@@ -109,3 +109,4 @@ R3-02 已正式关闭为 `DONE`。详细记录见 [`R03-02-database-service.md`]
 - `verify:research-service` 已接入 architecture / frontend。Windows hard gate run `31295528438` 负责 Research 专项、Ports、architecture、Application check/tests、workspace Clippy/tests。OpenAI Research、Fact Pipeline、Research worker 与人工 conflict mutation 尚未迁移，R3-07 保持 `IN_PROGRESS`。
 - 正式 Public CI run `31295931710` 暴露 Database Service 验证器仍追踪旧 `register_p4_persistence_artifacts` owner；已将断言迁移到 ResearchService / Artifact Catalog / ResearchArtifactPort 权威链，保持原初始化语义门禁强度。修复门禁 run `31296085324` 通过后提交。
 - 第二次正式 Public CI run `31296120912` 在 Database verifier 通过后暴露 Prediction verifier 仍直接读取已删除 `p4_persistence.rs`；已改为验证旧 owner 缺失并检查 Prediction `p4_snapshot` use case 继续承担公开快照职责，未放宽 Prediction/Research 边界。修复门禁 run `31296198981` 通过后提交。
+- 第三次正式 Public CI run `31296232974` 发现 `p4_snapshot` 内部职责名为 `freeze/read`，并非公共 facade 方法名；验证器已改为检查真实内部入口及 Port 委托，公共 Application API 仍由 facade/service 断言。修复门禁 run `31296338770` 通过后提交。
