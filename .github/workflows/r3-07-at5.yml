@@ -34,6 +34,7 @@ jobs:
         shell: pwsh
         run: |
           cargo fmt --all
+          cargo fmt --all
           node scripts/generate-domain-type-inventory.mjs
       - name: Verify Research Service
         shell: pwsh
@@ -78,7 +79,7 @@ jobs:
           git rm -f scripts/r3-07-at5.py
           git rm -f scripts/r3-07-at5-fix.py
           git rm -f scripts/r3-07-at5-mark-gate.py
-          git add crates/application scripts/verify-research-service.mjs architecture/domain-type-inventory.json README.md docs/modular-rewrite/R03-application-services/README.md
+          git add crates/application scripts/verify-research-service.mjs scripts/verify-prediction-service.mjs architecture/domain-type-inventory.json README.md docs/modular-rewrite/R03-application-services/README.md
           git diff --cached --check
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
           git commit -m "refactor(r3): migrate P4 manual conflict"
