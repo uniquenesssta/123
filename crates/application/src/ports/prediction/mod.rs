@@ -3,8 +3,9 @@ use async_trait::async_trait;
 use chrono::{DateTime, Utc};
 use football_domain::{
     P4FreezeReadiness, P4FreezeTaskDraft, P4FreezeTaskEventRecord, P4FreezeTaskRecord,
-    P4FreezeTaskTransition, P4MatchWorkspace, P4PlanningMatchContext, P4TaskWorkspace,
-    PredictionSummary, PreparedMatchPredictionInput, RouteDecision,
+    P4FreezeTaskTransition, P4MatchWorkspace, P4PlanningMatchContext, P4RoutedFact,
+    P4TaskWorkspace, PredictionSummary, PrematchSnapshotDraft, PrematchSnapshotRecord,
+    PreparedMatchPredictionInput, RouteDecision,
 };
 use football_model_api::{ModelOutput, ModelRequest};
 use uuid::Uuid;
@@ -96,4 +97,14 @@ pub trait PredictionWorkflowPort: Send + Sync {
         transition: &P4FreezeTaskTransition,
     ) -> PortResult<P4FreezeTaskRecord>;
     async fn freeze_readiness(&self, task_id: Uuid) -> PortResult<P4FreezeReadiness>;
+}
+
+#[async_trait]
+pub trait P4FreezeExecutionPort: Send + Sync {
+    async fn find_frozen_snapshot_id(&self, task: &P4FreezeTaskRecord) -> PortResult<Option<Uuid>>;
+    async fn routed_facts(&self, task_id: Uuid) -> PortResult<Vec<P4RoutedFact>>;
+    async fn freeze_snapshot(
+        &self,
+        draft: &PrematchSnapshotDraft,
+    ) -> PortResult<PrematchSnapshotRecord>;
 }

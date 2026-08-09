@@ -1,11 +1,11 @@
 use crate::model_registry::ModelRegistry;
 use crate::ports::prediction::ModelRunHistoryItem;
 use crate::use_cases::prediction::{
-    dry_run_default_fixture, execute_prediction, execute_prediction_from_match,
+    dry_run_default_fixture, execute_p4_freeze, execute_prediction, execute_prediction_from_match,
     hide_run_from_history, inspect_match_prediction_readiness, list_p4_freeze_task_events,
     list_p4_freeze_tasks, list_recent_runs, p4_freeze_readiness, plan_p4_horizons, preview_route,
     read_p4_freeze_task, read_p4_match_workspace, read_p4_task_workspace, read_run,
-    P4PlanningAccess, PredictionAccess,
+    P4FreezeExecutionAccess, P4PlanningAccess, PredictionAccess,
 };
 use crate::{
     ApplicationResult, PredictionCommand, PredictionExecution, RoutePreviewCommand,
@@ -93,6 +93,16 @@ impl PredictionService {
         reason: Option<String>,
     ) -> ApplicationResult<()> {
         hide_run_from_history::execute(port, run_id, reason).await
+    }
+
+    pub(crate) async fn execute_p4_freeze_task<P: P4FreezeExecutionAccess + ?Sized>(
+        &self,
+        port: &P,
+        registry: &ModelRegistry,
+        task_id: Uuid,
+        job_id: Uuid,
+    ) -> ApplicationResult<Value> {
+        execute_p4_freeze::execute(port, registry, task_id, job_id).await
     }
 
     pub(crate) async fn plan_p4_horizons<P: P4PlanningAccess + ?Sized>(

@@ -1,8 +1,8 @@
 use super::super::port_registry::{map_persistence_error, ActiveDatabase, ModelRunListItem};
 use crate::ports::{
     prediction::{
-        ModelRunHistoryItem, ModelRunPort, PredictionInputPort, PredictionWorkflowPort,
-        SerializedModelRun,
+        ModelRunHistoryItem, ModelRunPort, P4FreezeExecutionPort, PredictionInputPort,
+        PredictionWorkflowPort, SerializedModelRun,
     },
     PortError, PortErrorKind, PortResult,
 };
@@ -10,8 +10,9 @@ use async_trait::async_trait;
 use chrono::{DateTime, Utc};
 use football_domain::{
     P4FreezeReadiness, P4FreezeTaskDraft, P4FreezeTaskEventRecord, P4FreezeTaskRecord,
-    P4FreezeTaskTransition, P4MatchWorkspace, P4PlanningMatchContext, P4TaskWorkspace,
-    PredictionSummary, PreparedMatchPredictionInput, RouteDecision,
+    P4FreezeTaskTransition, P4MatchWorkspace, P4PlanningMatchContext, P4RoutedFact,
+    P4TaskWorkspace, PredictionSummary, PrematchSnapshotDraft, PrematchSnapshotRecord,
+    PreparedMatchPredictionInput, RouteDecision,
 };
 use football_model_api::{ModelOutput, ModelRequest};
 use uuid::Uuid;
@@ -238,6 +239,33 @@ impl PredictionWorkflowPort for ActiveDatabase {
     async fn read_task_workspace(&self, task_id: Uuid) -> PortResult<P4TaskWorkspace> {
         self.transition_store()
             .read_p4_task_workspace(task_id)
+            .await
+            .map_err(map_persistence_error)
+    }
+}
+
+#[async_trait]
+impl P4FreezeExecutionPort for ActiveDatabase {
+    async fn find_frozen_snapshot_id(&self, task: &P4FreezeTaskRecord) -> PortResult<Option<Uuid>> {
+        self.transition_store()
+            .find_frozen_p4_snapshot_id(task)
+            .await
+            .map_err(map_persistence_error)
+    }
+
+    async fn routed_facts(&self, task_id: Uuid) -> PortResult<Vec<P4RoutedFact>> {
+        self.transition_store()
+            .p4_routed_facts(task_id)
+            .await
+            .map_err(map_persistence_error)
+    }
+
+    async fn freeze_snapshot(
+        &self,
+        draft: &PrematchSnapshotDraft,
+    ) -> PortResult<PrematchSnapshotRecord> {
+        self.transition_store()
+            .freeze_prematch_snapshot(draft)
             .await
             .map_err(map_persistence_error)
     }

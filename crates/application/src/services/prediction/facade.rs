@@ -99,6 +99,17 @@ impl ApplicationService {
         self.prediction.read_run(&session, run_id).await
     }
 
+    pub(crate) async fn execute_p4_freeze_task(
+        &self,
+        task_id: Uuid,
+        job_id: Uuid,
+    ) -> ApplicationResult<Value> {
+        let session = self.prediction_session().await?;
+        self.prediction
+            .execute_p4_freeze_task(&session, &self.registry, task_id, job_id)
+            .await
+    }
+
     pub async fn plan_p4_horizons(
         &self,
         command: PlanP4HorizonsCommand,

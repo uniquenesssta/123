@@ -70,7 +70,8 @@
       "traits": [
         "PredictionInputPort",
         "ModelRunPort",
-        "PredictionWorkflowPort"
+        "PredictionWorkflowPort",
+        "P4FreezeExecutionPort"
       ]
     },
     {

@@ -24,13 +24,13 @@
     "targetPublicExportPolicy": "explicit re-export only"
   },
   "sourceDigest": "217241ac243726a5ab6805a7f169e222b97e78c7c971749a5904714af673ebdd",
-  "rustUsageDigest": "26f0a59f239fde495e4177b9cd429ba6ac4e2dfa1fba4ab3f1c4b85c55b83c20",
+  "rustUsageDigest": "09dbb962e50b4a8fa584ef7df848555da14089104fd217d67f8a93b546757612",
   "summary": {
     "typeCount": 365,
     "publicCompatibilityTypeCount": 365,
     "internalTypeCount": 0,
     "domainSourceFileCount": 129,
-    "scannedRustFileCount": 427,
+    "scannedRustFileCount": 429,
     "databaseMappedTypeCount": 299,
     "byTargetModule": {
       "ai_workspace": 16,
@@ -8090,7 +8090,7 @@
       ],
       "externalCallers": [
         "crates/application/src/fact_pipeline.rs",
-        "crates/application/src/p4_orchestration.rs",
+        "crates/application/src/use_cases/prediction/execute_p4_freeze/snapshot_projection.rs",
         "crates/persistence-postgres/src/p4_records.rs",
         "crates/persistence-postgres/tests/postgres_integration.rs"
       ],
@@ -14367,10 +14367,10 @@
       ],
       "externalCallers": [
         "crates/application/src/composition/adapters/prediction.rs",
-        "crates/application/src/p4_orchestration.rs",
         "crates/application/src/ports/prediction/mod.rs",
         "crates/application/src/services/prediction/facade.rs",
         "crates/application/src/services/prediction/service.rs",
+        "crates/application/src/use_cases/prediction/execute_p4_freeze/snapshot_projection.rs",
         "crates/application/src/use_cases/prediction/p4_freeze_readiness/mod.rs",
         "crates/persistence-postgres/src/p4_orchestration.rs",
         "src-tauri/src/commands/orchestration.rs"
@@ -14734,6 +14734,8 @@
         "crates/application/src/ports/prediction/mod.rs",
         "crates/application/src/services/prediction/facade.rs",
         "crates/application/src/services/prediction/service.rs",
+        "crates/application/src/use_cases/prediction/execute_p4_freeze/mod.rs",
+        "crates/application/src/use_cases/prediction/execute_p4_freeze/snapshot_projection.rs",
         "crates/application/src/use_cases/prediction/list_p4_freeze_tasks/mod.rs",
         "crates/application/src/use_cases/prediction/plan_p4_horizons/mod.rs",
         "crates/application/src/use_cases/prediction/read_p4_freeze_task/mod.rs",
@@ -14864,6 +14866,7 @@
       "externalCallers": [
         "crates/application/src/p4_orchestration.rs",
         "crates/application/src/p4_workbench.rs",
+        "crates/application/src/use_cases/prediction/execute_p4_freeze/mod.rs",
         "crates/application/src/use_cases/prediction/plan_p4_horizons/mod.rs",
         "crates/persistence-postgres/src/p4_orchestration.rs"
       ],
@@ -14966,6 +14969,7 @@
         "crates/application/src/p4_orchestration.rs",
         "crates/application/src/p4_workbench.rs",
         "crates/application/src/ports/prediction/mod.rs",
+        "crates/application/src/use_cases/prediction/execute_p4_freeze/mod.rs",
         "crates/application/src/use_cases/prediction/plan_p4_horizons/mod.rs",
         "crates/persistence-postgres/src/p4_orchestration.rs"
       ],
@@ -15669,7 +15673,9 @@
         "crates/domain/tests/serde_contracts/module_paths.rs"
       ],
       "externalCallers": [
-        "crates/application/src/p4_orchestration.rs",
+        "crates/application/src/composition/adapters/prediction.rs",
+        "crates/application/src/ports/prediction/mod.rs",
+        "crates/application/src/use_cases/prediction/execute_p4_freeze/snapshot_projection.rs",
         "crates/persistence-postgres/src/p4_orchestration.rs"
       ],
       "databaseMappings": [
@@ -21367,8 +21373,10 @@
         "crates/domain/tests/serde_contracts/module_paths.rs"
       ],
       "externalCallers": [
-        "crates/application/src/p4_orchestration.rs",
+        "crates/application/src/composition/adapters/prediction.rs",
         "crates/application/src/p4_persistence.rs",
+        "crates/application/src/ports/prediction/mod.rs",
+        "crates/application/src/use_cases/prediction/execute_p4_freeze/mod.rs",
         "crates/persistence-postgres/src/p4_records.rs",
         "crates/persistence-postgres/tests/postgres_integration.rs"
       ],
@@ -21464,7 +21472,9 @@
         "crates/domain/tests/serde_contracts/module_paths.rs"
       ],
       "externalCallers": [
+        "crates/application/src/composition/adapters/prediction.rs",
         "crates/application/src/p4_persistence.rs",
+        "crates/application/src/ports/prediction/mod.rs",
         "crates/persistence-postgres/src/p4_records.rs"
       ],
       "databaseMappings": [
@@ -23910,11 +23920,11 @@
         "crates/application/src/composition/adapters/prediction.rs",
         "crates/application/src/composition/port_registry.rs",
         "crates/application/src/lib.rs",
-        "crates/application/src/p4_orchestration.rs",
         "crates/application/src/ports/prediction/mod.rs",
         "crates/application/src/ports/rules/mod.rs",
         "crates/application/src/services/prediction/facade.rs",
         "crates/application/src/services/prediction/service.rs",
+        "crates/application/src/use_cases/prediction/execute_p4_freeze/snapshot_projection.rs",
         "crates/application/src/use_cases/prediction/preview_route/mod.rs",
         "crates/application/src/use_cases/prediction/shared/p4_planning.rs",
         "crates/application/src/use_cases/prediction/shared/routing.rs",
@@ -24906,7 +24916,7 @@
         "crates/domain/tests/serde_contracts/module_paths.rs"
       ],
       "externalCallers": [
-        "crates/application/src/p4_orchestration.rs",
+        "crates/application/src/use_cases/prediction/execute_p4_freeze/snapshot_projection.rs",
         "crates/persistence-postgres/src/p4_records.rs",
         "crates/persistence-postgres/tests/postgres_integration.rs"
       ],
@@ -25010,7 +25020,7 @@
         "crates/domain/tests/serde_contracts/module_paths.rs"
       ],
       "externalCallers": [
-        "crates/application/src/p4_orchestration.rs",
+        "crates/application/src/use_cases/prediction/execute_p4_freeze/snapshot_projection.rs",
         "crates/persistence-postgres/src/p4_records.rs",
         "crates/persistence-postgres/tests/postgres_integration.rs"
       ],
@@ -25075,7 +25085,7 @@
         "crates/domain/tests/serde_contracts/module_paths.rs"
       ],
       "externalCallers": [
-        "crates/application/src/p4_orchestration.rs",
+        "crates/application/src/use_cases/prediction/execute_p4_freeze/mod.rs",
         "crates/persistence-postgres/src/p4_records.rs",
         "crates/persistence-postgres/tests/postgres_integration.rs"
       ],

@@ -1,10 +1,11 @@
 use crate::ports::{
     lineup::{LineupPort, MatchCatalogPort},
-    prediction::{ModelRunPort, PredictionInputPort},
+    prediction::{ModelRunPort, P4FreezeExecutionPort, PredictionInputPort},
     rules::RuleRoutingPort,
 };
 
 pub(crate) mod dry_run_default_fixture;
+pub(crate) mod execute_p4_freeze;
 pub(crate) mod execute_prediction;
 pub(crate) mod execute_prediction_from_match;
 pub(crate) mod hide_run_from_history;
@@ -47,5 +48,21 @@ impl<T> P4PlanningAccess for T where
         + crate::ports::rules::RuleRoutingPort
         + crate::ports::research::ResearchArtifactPort
         + crate::ports::analytics::JobQueuePort
+{
+}
+
+pub(crate) trait P4FreezeExecutionAccess:
+    PredictionAccess
+    + crate::ports::prediction::PredictionWorkflowPort
+    + P4FreezeExecutionPort
+    + crate::ports::research::ResearchArtifactPort
+{
+}
+
+impl<T> P4FreezeExecutionAccess for T where
+    T: PredictionAccess
+        + crate::ports::prediction::PredictionWorkflowPort
+        + P4FreezeExecutionPort
+        + crate::ports::research::ResearchArtifactPort
 {
 }
