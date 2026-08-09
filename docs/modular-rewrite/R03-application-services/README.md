@@ -108,3 +108,4 @@ R3-02 已正式关闭为 `DONE`。详细记录见 [`R03-02-database-service.md`]
 - Research Ports 新增 `ResearchEvidenceLedgerPort`，`ResearchArtifactPort` 补齐赛事配置版本与 run-event 返回记录能力；PostgreSQL 适配保持在 composition 层。
 - `verify:research-service` 已接入 architecture / frontend。Windows hard gate run `31295528438` 负责 Research 专项、Ports、architecture、Application check/tests、workspace Clippy/tests。OpenAI Research、Fact Pipeline、Research worker 与人工 conflict mutation 尚未迁移，R3-07 保持 `IN_PROGRESS`。
 - 正式 Public CI run `31295931710` 暴露 Database Service 验证器仍追踪旧 `register_p4_persistence_artifacts` owner；已将断言迁移到 ResearchService / Artifact Catalog / ResearchArtifactPort 权威链，保持原初始化语义门禁强度。修复门禁 run `31296085324` 通过后提交。
+- 第二次正式 Public CI run `31296120912` 在 Database verifier 通过后暴露 Prediction verifier 仍直接读取已删除 `p4_persistence.rs`；已改为验证旧 owner 缺失并检查 Prediction `p4_snapshot` use case 继续承担公开快照职责，未放宽 Prediction/Research 边界。修复门禁 run `31296198981` 通过后提交。
