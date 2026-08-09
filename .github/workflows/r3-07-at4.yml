@@ -24,6 +24,9 @@ jobs:
       - uses: dtolnay/rust-toolchain@1.88.0
         with:
           components: rustfmt,clippy
+      - name: Patch Atomic Task 4 generator
+        shell: pwsh
+        run: python scripts/r3-07-at4-fix.py
       - name: Generate Atomic Task 4
         shell: pwsh
         run: python scripts/r3-07-at4.py
@@ -70,6 +73,7 @@ jobs:
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git rm -f .github/workflows/r3-07-at4.yml
           git rm -f scripts/r3-07-at4.py
+          git rm -f scripts/r3-07-at4-fix.py
           git add crates/application scripts/verify-research-service.mjs architecture/domain-type-inventory.json README.md docs/modular-rewrite/R03-application-services/README.md
           git diff --cached --check
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
