@@ -20,11 +20,11 @@ R2 已完成并关闭。R3 只重写 Application 编排与 Ports/Services/Use Ca
 | R3-01 | Application Ports 设计 | DONE |
 | R3-02 | Database Service | DONE |
 | R3-03 | Competition / Rules Services | DONE |
-| R3-04 | Teams / Players Services | VERIFYING |
+| R3-04 | Teams / Players Services | DONE |
 | R3-05 | Lineups Service | DONE |
 | R3-06 | Prediction Service | DONE |
 | R3-07 | Research Service | DONE |
-| R3-08 | Review / Postmatch / Analytics Services | BLOCKED |
+| R3-08 | Review / Postmatch / Analytics Services | READY |
 | R3-09 | Exchange / AI / Release Services | BLOCKED |
 | R3-10 | ApplicationService 兼容门面 | BLOCKED |
 
@@ -65,14 +65,16 @@ R3-02 已正式关闭为 `DONE`。详细记录见 [`R03-02-database-service.md`]
 
 详细记录见 [`R03-03-competition-rules-services.md`](./R03-03-competition-rules-services.md)。
 
-## R3-04 当前结果
+## R3-04 完成结果
 
 - 已将旧 `player_catalog.rs` 中 35 个球队、球员、教练与实体引用 Application 职责迁入 `services/teams/`、`services/players/` 与对应 `use_cases/`；共 43 个 Service / Use Case Rust 文件。R3-05 已接手并删除原文件剩余的阵型、比赛、阵容与预设职责。
 - `ApplicationService` / `ApplicationComposition` 已聚合 `TeamService` 与 `PlayerService`；公共方法、Tauri 命令、DTO、SQL、迁移、生产依赖和模型边界保持兼容。
 - 6 个 Team / Player Ports 的具体适配按职责拆到 `composition/adapters/teams.rs` 与 `players.rs`；`port_registry.rs` 继续作为 Application 唯一直接导入 PostgreSQL crate 的组合根所有者。
 - 首轮 Windows 编译真实暴露球队强制删除 SQLx transaction 的 non-Send 边界；现仅在组合适配器对 preview/force-delete 使用 `spawn_blocking + Handle::block_on`，保持既有 Tauri 隔离和事务语义，没有修改 SQL 或弱化强确认。
 - Windows 2025 run `31258038424` / job `93104371481` 已通过 R3-04 专项、实体关系、球队强制清除、球队/球员管理、完整 architecture、保护资产、Application check、Application tests 33/33、workspace Clippy `-D warnings` 与 diff hygiene。
-- 用户随后在 `new-C` 提供 clean 工作区、rustfmt、R3-04 专项、完整 architecture、Application check 与 33/33 Application tests 的本机通过结果，并明确授权进入 R3-05；未提供完整 frontend / Rust 与非破坏性 runtime 烟测，因此 R3-04 状态仍保持 `VERIFYING`，不虚报为 `DONE`。
+- 用户在 R3-04 当时已提供 clean 工作区、rustfmt、R3-04 专项、完整 architecture、Application check 与 33/33 Application tests 的本机通过结果；后续 R3-05 在继续保留 Teams / Players 权威 owner 的累计代码树上完成完整 `npm run verify:frontend`、完整 `npm run verify:rust`、workspace Clippy/tests 与 `tauri:dev`，补齐 R3-04 原先缺失的完整 frontend / Rust 回归。
+- 2026-08-09 用户在当前累计代码树完成最终非破坏性 Windows `tauri:dev` 烟测：runtime JSONL 共 209 条且 209 条均为 `info`，无 `error`、`critical` 或 `operation_failed`；`update_team` 与 `update_player` 原值保存均完成，`list_coaches` 返回 10 条且 `read_coach` 成功，`list_entity_references` 对 team / player / coach 三类均成功返回 10 条。未执行强制删除、批量删除或数据库 reset。
+- R3-04 原始验收缺口均已有真实证据，状态正式关闭为 `DONE`；在 R3-07 已完成的前提下，R3-08 Review / Postmatch / Analytics Services 开放为 `READY`。
 
 详细记录见 [`R03-04-teams-players-services.md`](./R03-04-teams-players-services.md)。
 
@@ -114,4 +116,4 @@ R3-02 已正式关闭为 `DONE`。详细记录见 [`R03-02-database-service.md`]
 - Atomic Task 2 迁移 Fact Pipeline：删除旧 `fact_pipeline.rs`，公共 evidence processing 进入 ResearchService；Fact Pipeline 按职责拆为协调、实体、时间、来源、证据、冲突、路由、验证和共享类型模块，持久化只经 FactPipeline / Evidence Ledger / Artifact Ports。OpenAI Gateway、Research worker 与 conflict mutation 未提前迁移。
 - Atomic Task 2 已正式关闭为 `DONE`。Windows hard gate run `31298524184` 已通过 Research/Database/Prediction 专项、Application Ports、完整 architecture、rustfmt、Application check/tests、workspace Clippy `-D warnings` 与 workspace tests，并生成 clean 提交 `1fb4c7b05573ef75eb48903eea25bc8b2072c9de`。正式 Public Platform CI run `31298887231` / Windows Automated job `93208343460` 全部 SUCCESS，validation evidence upload 成功；artifact `9034165649` 大小 `14273283` 字节，SHA-256 `761fa51e8f811d9fd85bf09b5ff798b9862613d7206185993dfff227cdaf160b`。AT2 临时施工文件已清理；R3-07 保持 `IN_PROGRESS`，下一 Atomic Task 为 OpenAI Research Gateway execution。
 - Atomic Task 3 已正式关闭为 `DONE`。OpenAI Research Gateway execution 已删除旧 `openai_research.rs` 并按 artifacts / gateway / attempt audit / references / execution / validation 职责拆入 Research use cases；公共命令与错误语义保持不变，`ResearchGatewayAuditPort` 仅补齐 attempt-number offset 并由 `ActiveDatabase` 复用既有 PostgreSQL gateway records。迁移后无调用者的 Database transition-store 与 ResearchService Fact Pipeline 转发桥接已移除。Windows hard gate run `31312515543` / job `93242388772` 已通过 Research/Database/Prediction 专项、Application Ports、完整 architecture、rustfmt、Application check/tests、workspace Clippy `-D warnings` 与 workspace tests，并生成 clean 提交 `d818276bc93c1dfb8fd7c1c5fbab71a97e6cd5e2`；相同 clean tree 的验收提交 `ad12e8d8d574ee3df8c3c1e83cf7705e718d0c49` 的 Public Platform CI run `31313043256` / Windows Automated job `93243752378` 全部 SUCCESS，validation evidence upload 成功。artifact `9038223561` 大小 `14263377` 字节，SHA-256 `611f79b5b5789fce242d1429c1060415187f7f07f5253d03eb478bb7deed5bd3`。AT3 临时施工与 CI trigger 文件均已清理；R3-07 保持 `IN_PROGRESS`，下一 Atomic Task 为 P4 Research worker，manual conflict mutation 留待后续。
-- Atomic Task 4 已迁移 P4 Research worker：Research 状态机、动态上下文、OpenAI Gateway 调用、run 恢复与 freeze handoff 拆入 `use_cases/research/p4_worker/`；ResearchService 只经既有 Ports 协作。根 `p4_orchestration.rs` 收敛为跨服务 dispatcher/worker loop，Prediction freeze 仍由 PredictionService 执行；`p4_workbench.rs` 人工冲突裁决保持后续边界，只复用 ResearchService 的成功收口。AT4 已正式关闭为 `DONE`：clean implementation `89a3c68ad50f7766d6db5d214c0fa5a39c1a6c72` 的同源码树验收提交 `75e76dea9a9ab7980f64374b4f27410ee221f8f9` 已通过 Public Platform CI run `31316144230` / Windows Automated job `93251603683`，validation evidence upload 成功；artifact `9039129007` 大小 `14264776` 字节，SHA-256 `fe3ef81501cb2c7d57302f8e03e9b0753f82138d8dc54356e39fc5d0ab31f68f`。Atomic Task 5 已正式关闭为 `DONE`：人工冲突裁决已迁入 ResearchService / `use_cases/research/p4_manual_conflict/`，公共 `resolve_p4_conflict` 与全部既有人工裁决语义保持不变。Windows hard gate run `31318631427` / job `93257903560` 已通过 Research/Database/Prediction 专项、Application Ports、完整 architecture、rustfmt、Application check/tests、workspace Clippy `-D warnings` 与 workspace tests，并生成 clean implementation `c1549738041c0e6d3cb046c16fa193c47a14553f`。该 clean HEAD 的 Public Platform CI run `31319176935` / Windows Automated job `93259283555` 已整体 `SUCCESS`，validation evidence upload 成功；artifact `9039991499` 大小 `14210568` 字节，SHA-256 `e48cf0649449fc74488a60ea560a43a224c3f49fe3f9723ad1e039cc06f79d75`。AT5 临时 workflow / generator / fix / marker 已清理；R3-07 五个 Atomic Tasks 全部完成并正式关闭为 `DONE`，R3-08 仍按阶段索引保持 `BLOCKED`。
+- Atomic Task 4 已迁移 P4 Research worker：Research 状态机、动态上下文、OpenAI Gateway 调用、run 恢复与 freeze handoff 拆入 `use_cases/research/p4_worker/`；ResearchService 只经既有 Ports 协作。根 `p4_orchestration.rs` 收敛为跨服务 dispatcher/worker loop，Prediction freeze 仍由 PredictionService 执行；`p4_workbench.rs` 人工冲突裁决保持后续边界，只复用 ResearchService 的成功收口。AT4 已正式关闭为 `DONE`：clean implementation `89a3c68ad50f7766d6db5d214c0fa5a39c1a6c72` 的同源码树验收提交 `75e76dea9a9ab7980f64374b4f27410ee221f8f9` 已通过 Public Platform CI run `31316144230` / Windows Automated job `93251603683`，validation evidence upload 成功；artifact `9039129007` 大小 `14264776` 字节，SHA-256 `fe3ef81501cb2c7d57302f8e03e9b0753f82138d8dc54356e39fc5d0ab31f68f`。Atomic Task 5 已正式关闭为 `DONE`：人工冲突裁决已迁入 ResearchService / `use_cases/research/p4_manual_conflict/`，公共 `resolve_p4_conflict` 与全部既有人工裁决语义保持不变。Windows hard gate run `31318631427` / job `93257903560` 已通过 Research/Database/Prediction 专项、Application Ports、完整 architecture、rustfmt、Application check/tests、workspace Clippy `-D warnings` 与 workspace tests，并生成 clean implementation `c1549738041c0e6d3cb046c16fa193c47a14553f`。该 clean HEAD 的 Public Platform CI run `31319176935` / Windows Automated job `93259283555` 已整体 `SUCCESS`，validation evidence upload 成功；artifact `9039991499` 大小 `14210568` 字节，SHA-256 `e48cf0649449fc74488a60ea560a43a224c3f49fe3f9723ad1e039cc06f79d75`。AT5 临时 workflow / generator / fix / marker 已清理；R3-07 五个 Atomic Tasks 全部完成并正式关闭为 `DONE`，R3-08 已在 R3-04 历史验证闭环后按阶段依赖开放为 `READY`。

@@ -2,9 +2,9 @@
 
 ## 状态
 
-`VERIFYING`
+`DONE`
 
-Teams / Players Services 源码重写与实施侧 Windows 严格验证已完成；节点仍等待用户 Windows 本机最小验证、完整 frontend / Rust 回归与非破坏性运行时烟测，因此不得标记为 `DONE`，R3-05 继续保持 `BLOCKED`。
+Teams / Players Services 源码重写、实施侧 Windows 严格验证、后续累计完整 frontend / Rust 回归与用户 Windows `tauri:dev` 非破坏性运行时烟测均已完成。R3-04 正式关闭为 `DONE`；当前阶段在 R3-07 已完成的基础上开放 R3-08 Review / Postmatch / Analytics Services 为 `READY`。
 
 ## 基线与范围
 
@@ -91,19 +91,21 @@ Windows 2025 严格修复/验证 run `31258038424` / job `93104371481` 全部通
 
 首次 Windows 验证真实暴露 non-Send SQLx transaction 适配失败；该失败没有被跳过。修复后所有上述检查均以独立步骤重新执行并通过。
 
-## 尚未完成
+## 最终补充验证
 
-仍需用户 Windows 本机作为本节点验收依据：
+R3-04 原先缺失的用户 Windows 完整 frontend / Rust 与运行时证据已由后续累计代码树补齐：
 
-- R3-04 最小验证复跑；
-- 完整 `npm run verify:frontend`；
-- 完整 `npm run verify:rust`；
-- `npm run tauri:dev` 非破坏性球队、球员、教练、实体引用读取/编辑链烟测。
+- R3-05 最终分支在继续使用 R3-04 Teams / Players Services 的代码树上通过完整 `npm run verify:frontend` 与完整 `npm run verify:rust`，包含 workspace Clippy `-D warnings`、workspace tests 与 Tauri 开发态启动；因此 R3-04 的完整 frontend / Rust 回归缺口已由真实后续回归覆盖。
+- 2026-08-09 用户在当前累计代码树执行 `npm run tauri:dev` 并完成 R3-04 最小非破坏性业务烟测。runtime JSONL 共 209 条，全部 209 条为 `info`，无 `error`、`critical` 或 `operation_failed`。
+- `update_team` 原值保存成功完成；`update_player` 原值保存成功完成。
+- `list_coaches` 返回 10 条，随后 `read_coach` 成功读取教练详情。
+- `list_entity_references` 对 `team`、`player`、`coach` 三类查询均成功完成并各返回 10 条。
+- 本次实机验收未执行强制删除、批量删除或数据库 reset；18 个需要专用 `FOOTBALL_TEST_DATABASE_URL` 的真实 PostgreSQL 集成测试仍按既有安全设计保持 `ignored`，未记为已执行。
 
-用户原数据库不得执行强制删除、批量删除或 reset。18 个需要 `FOOTBALL_TEST_DATABASE_URL` 的真实 PostgreSQL 集成测试若未配置专用测试库，继续按既有安全设计保持 `ignored`，不记为已执行。
+因此 R3-04 原始完成条件已经满足。
 
 ## 回退与下一步
 
 R3-04 可回退到起点 `212723ce9e0245a37a70f23feda1f156f9ab959a`。不得恢复将球队/球员职责堆叠回 `player_catalog.rs` 的结构，也不得把 R3-05 阵型/比赛/阵容职责提前迁入本节点。
 
-状态保持 `VERIFYING`。只有用户 Windows 本机完整回归和非破坏性运行时烟测通过后，才能将 R3-04 标记为 `DONE` 并开放 R3-05 Lineups Service。
+R3-04 状态为 `DONE`。R3-05、R3-06、R3-07 均已完成；R3-08 Review / Postmatch / Analytics Services 现开放为 `READY`。
