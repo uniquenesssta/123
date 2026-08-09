@@ -7,7 +7,6 @@ mod match_review_package;
 mod model_registry;
 mod model_shell;
 mod p4_orchestration;
-mod p4_workbench;
 pub mod ports;
 mod postmatch;
 mod release_acceptance;

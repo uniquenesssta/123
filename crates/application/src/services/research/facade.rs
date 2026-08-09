@@ -1,5 +1,7 @@
 use crate::composition::ActiveDatabase;
-use crate::use_cases::research::p4_worker::P4ResearchWorkerAccess;
+use crate::use_cases::research::{
+    p4_manual_conflict::P4ManualConflictAccess, p4_worker::P4ResearchWorkerAccess,
+};
 use crate::{
     ApplicationError, ApplicationResult, ApplicationService, OpenAiResearchCommand,
     ProcessResearchEvidenceCommand,
@@ -7,8 +9,9 @@ use crate::{
 use football_domain::{
     CompetitionProfileVersionDraft, CompetitionProfileVersionRecord, EvidenceClaimDraft,
     EvidenceClaimRecord, EvidenceConflictDraft, EvidenceConflictRecord, FactPipelineSummary,
-    P4FreezeTaskRecord, PromptVersionDraft, PromptVersionRecord, ResearchRunDraft,
-    ResearchRunEventDraft, ResearchRunRecord, SchemaVersionDraft, SchemaVersionRecord,
+    P4TaskWorkspace, PromptVersionDraft, PromptVersionRecord, ResearchRunDraft,
+    ResearchRunEventDraft, ResearchRunRecord, ResolveP4ConflictCommand, SchemaVersionDraft,
+    SchemaVersionRecord,
 };
 use football_research_gateway::{CancellationToken, GatewayExecution};
 use serde_json::Value;
@@ -129,13 +132,17 @@ impl ApplicationService {
             .await
     }
 
-    pub(crate) async fn finalize_p4_research_task(
+    pub async fn resolve_p4_conflict(
         &self,
-        task: &P4FreezeTaskRecord,
-    ) -> ApplicationResult<P4FreezeTaskRecord> {
+        command: ResolveP4ConflictCommand,
+    ) -> ApplicationResult<P4TaskWorkspace> {
         let session = self.research_session().await?;
-        self.research
-            .finalize_successful_research(&session, &session, task)
-            .await
+        let access = P4ManualConflictAccess {
+            workflow: &session,
+            jobs: &session,
+            artifacts: &session,
+            manual: &session,
+        };
+        self.research.resolve_p4_conflict(access, command).await
     }
 }

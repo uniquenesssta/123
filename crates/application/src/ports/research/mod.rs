@@ -5,10 +5,11 @@ use football_domain::{
     ConflictEvaluationRecord, EntityCandidate, EntityResolutionDraft, EntityResolutionRecord,
     EvidenceClaimDraft, EvidenceClaimRecord, EvidenceConflictDraft, EvidenceConflictRecord,
     EvidenceRouteDraft, EvidenceRouteRecord, FactPipelineContext, OpenAiAttemptDraft,
-    OpenAiAttemptRecord, OpenAiUsageTotals, PromptVersionDraft, PromptVersionRecord,
-    ResearchRunDraft, ResearchRunEventDraft, ResearchRunRecord, SchemaVersionDraft,
-    SchemaVersionRecord, SourcePolicyVersionDraft, SourcePolicyVersionRecord, TimeAuditDraft,
-    TimeAuditRecord, WebCitationDraft, WebSourceDraft,
+    OpenAiAttemptRecord, OpenAiUsageTotals, P4FreezeReadiness, P4ManualRouteOverrideDraft,
+    P4ManualRouteOverrideRecord, PromptVersionDraft, PromptVersionRecord, ResearchRunDraft,
+    ResearchRunEventDraft, ResearchRunRecord, SchemaVersionDraft, SchemaVersionRecord,
+    SourcePolicyVersionDraft, SourcePolicyVersionRecord, TimeAuditDraft, TimeAuditRecord,
+    WebCitationDraft, WebSourceDraft,
 };
 use uuid::Uuid;
 
@@ -47,6 +48,15 @@ pub trait ResearchEvidenceLedgerPort: Send + Sync {
         &self,
         draft: &EvidenceConflictDraft,
     ) -> PortResult<EvidenceConflictRecord>;
+}
+
+#[async_trait]
+pub trait ResearchManualConflictPort: Send + Sync {
+    async fn append_manual_route_override(
+        &self,
+        draft: &P4ManualRouteOverrideDraft,
+    ) -> PortResult<P4ManualRouteOverrideRecord>;
+    async fn route_readiness(&self, task_id: Uuid) -> PortResult<P4FreezeReadiness>;
 }
 
 #[async_trait]

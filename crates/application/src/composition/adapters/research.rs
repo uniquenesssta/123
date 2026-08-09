@@ -2,7 +2,7 @@ use super::super::port_registry::{map_persistence_error, ActiveDatabase};
 use crate::ports::{
     research::{
         FactPipelinePort, ResearchArtifactPort, ResearchEvidenceLedgerPort,
-        ResearchGatewayAuditPort, SerializedConflictEventPayload,
+        ResearchGatewayAuditPort, ResearchManualConflictPort, SerializedConflictEventPayload,
     },
     PortError, PortErrorKind, PortResult,
 };
@@ -12,10 +12,11 @@ use football_domain::{
     ConflictEvaluationRecord, EntityCandidate, EntityResolutionDraft, EntityResolutionRecord,
     EvidenceClaimDraft, EvidenceClaimRecord, EvidenceConflictDraft, EvidenceConflictRecord,
     EvidenceRouteDraft, EvidenceRouteRecord, FactPipelineContext, OpenAiAttemptDraft,
-    OpenAiAttemptRecord, OpenAiUsageTotals, PromptVersionDraft, PromptVersionRecord,
-    ResearchRunDraft, ResearchRunEventDraft, ResearchRunRecord, SchemaVersionDraft,
-    SchemaVersionRecord, SourcePolicyVersionDraft, SourcePolicyVersionRecord, TimeAuditDraft,
-    TimeAuditRecord, WebCitationDraft, WebSourceDraft,
+    OpenAiAttemptRecord, OpenAiUsageTotals, P4FreezeReadiness, P4ManualRouteOverrideDraft,
+    P4ManualRouteOverrideRecord, PromptVersionDraft, PromptVersionRecord, ResearchRunDraft,
+    ResearchRunEventDraft, ResearchRunRecord, SchemaVersionDraft, SchemaVersionRecord,
+    SourcePolicyVersionDraft, SourcePolicyVersionRecord, TimeAuditDraft, TimeAuditRecord,
+    WebCitationDraft, WebSourceDraft,
 };
 use uuid::Uuid;
 
@@ -109,6 +110,26 @@ impl ResearchEvidenceLedgerPort for ActiveDatabase {
     ) -> PortResult<EvidenceConflictRecord> {
         self.transition_store()
             .create_evidence_conflict(draft)
+            .await
+            .map_err(map_persistence_error)
+    }
+}
+
+#[async_trait]
+impl ResearchManualConflictPort for ActiveDatabase {
+    async fn append_manual_route_override(
+        &self,
+        draft: &P4ManualRouteOverrideDraft,
+    ) -> PortResult<P4ManualRouteOverrideRecord> {
+        self.transition_store()
+            .append_p4_manual_route_override(draft)
+            .await
+            .map_err(map_persistence_error)
+    }
+
+    async fn route_readiness(&self, task_id: Uuid) -> PortResult<P4FreezeReadiness> {
+        self.transition_store()
+            .p4_route_readiness(task_id)
             .await
             .map_err(map_persistence_error)
     }

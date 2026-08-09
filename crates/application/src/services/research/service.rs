@@ -1,21 +1,21 @@
-use crate::ports::{
-    analytics::JobQueuePort,
-    prediction::PredictionWorkflowPort,
-    research::{ResearchArtifactPort, ResearchEvidenceLedgerPort, ResearchGatewayAuditPort},
+use crate::ports::research::{
+    ResearchArtifactPort, ResearchEvidenceLedgerPort, ResearchGatewayAuditPort,
 };
 use crate::use_cases::research::{
     artifact_catalog,
     fact_pipeline::{self, FactPipelineAccess, ProcessResearchEvidenceCommand},
     ledger,
     openai_gateway::{self, OpenAiResearchCommand},
+    p4_manual_conflict::{self, P4ManualConflictAccess},
     p4_worker::{self, P4ResearchWorkerAccess},
 };
 use crate::ApplicationResult;
 use football_domain::{
     CompetitionProfileVersionDraft, CompetitionProfileVersionRecord, EvidenceClaimDraft,
     EvidenceClaimRecord, EvidenceConflictDraft, EvidenceConflictRecord, FactPipelineSummary,
-    P4FreezeTaskRecord, PromptVersionDraft, PromptVersionRecord, ResearchRunDraft,
-    ResearchRunEventDraft, ResearchRunRecord, SchemaVersionDraft, SchemaVersionRecord,
+    P4TaskWorkspace, PromptVersionDraft, PromptVersionRecord, ResearchRunDraft,
+    ResearchRunEventDraft, ResearchRunRecord, ResolveP4ConflictCommand, SchemaVersionDraft,
+    SchemaVersionRecord,
 };
 use football_research_gateway::{CancellationToken, GatewayExecution};
 use serde_json::Value;
@@ -135,12 +135,11 @@ impl ResearchService {
         p4_worker::execute(access, task_id, job_id).await
     }
 
-    pub(crate) async fn finalize_successful_research(
+    pub(crate) async fn resolve_p4_conflict(
         &self,
-        workflow: &dyn PredictionWorkflowPort,
-        jobs: &dyn JobQueuePort,
-        task: &P4FreezeTaskRecord,
-    ) -> ApplicationResult<P4FreezeTaskRecord> {
-        p4_worker::finalize_successful_research(workflow, jobs, task).await
+        access: P4ManualConflictAccess<'_>,
+        command: ResolveP4ConflictCommand,
+    ) -> ApplicationResult<P4TaskWorkspace> {
+        p4_manual_conflict::resolve(access, command).await
     }
 }

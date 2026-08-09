@@ -27,6 +27,7 @@ const publicMethods = [
   "create_p4_evidence_conflict",
   "process_p4_research_evidence",
   "execute_p4_openai_research",
+  "resolve_p4_conflict",
 ];
 const required = [
   "crates/application/src/services/research/mod.rs",
@@ -56,6 +57,9 @@ const required = [
   "crates/application/src/use_cases/research/p4_worker/context.rs",
   "crates/application/src/use_cases/research/p4_worker/execution.rs",
   "crates/application/src/use_cases/research/p4_worker/transitions.rs",
+  "crates/application/src/use_cases/research/p4_manual_conflict/mod.rs",
+  "crates/application/src/use_cases/research/p4_manual_conflict/decision.rs",
+  "crates/application/src/use_cases/research/p4_manual_conflict/reconciliation.rs",
   "crates/application/src/composition/adapters/research.rs",
   "crates/application/src/ports/research/mod.rs",
 ];
@@ -63,6 +67,7 @@ for (const path of required) check(existsSync(join(root, path)), `缺少 R3-07 �
 check(!existsSync(join(root, "crates/application/src/p4_persistence.rs")), "旧 p4_persistence.rs 仍残留 Research owner");
 check(!existsSync(join(root, "crates/application/src/fact_pipeline.rs")), "旧 fact_pipeline.rs 仍残留 Fact Pipeline owner 或空转发层");
 check(!existsSync(join(root, "crates/application/src/openai_research.rs")), "旧 openai_research.rs 仍残留 OpenAI Research owner 或空转发层");
+check(!existsSync(join(root, "crates/application/src/p4_workbench.rs")), "旧 p4_workbench.rs 仍残留人工冲突裁决 owner 或空转发层");
 
 const facade = read("crates/application/src/services/research/facade.rs");
 const service = read("crates/application/src/services/research/service.rs");
@@ -75,8 +80,10 @@ const openaiAudit = read("crates/application/src/use_cases/research/openai_gatew
 const pipeline = read("crates/application/src/use_cases/research/fact_pipeline/mod.rs");
 const p4Worker = read("crates/application/src/use_cases/research/p4_worker/execution.rs");
 const p4Transitions = read("crates/application/src/use_cases/research/p4_worker/transitions.rs");
+const p4Manual = read("crates/application/src/use_cases/research/p4_manual_conflict/mod.rs");
+const p4Decision = read("crates/application/src/use_cases/research/p4_manual_conflict/decision.rs");
+const p4Reconciliation = read("crates/application/src/use_cases/research/p4_manual_conflict/reconciliation.rs");
 const p4Orchestration = read("crates/application/src/p4_orchestration.rs");
-const p4Workbench = read("crates/application/src/p4_workbench.rs");
 const lib = read("crates/application/src/lib.rs");
 const packageJson = JSON.parse(read("package.json"));
 const frontend = read("scripts/verify-frontend.mjs");
@@ -105,10 +112,18 @@ check(openaiArtifacts.includes("fact_pipeline::register_fact_pipeline_artifacts(
 check(service.includes("fn register_openai_research_artifacts"), "ResearchService 缺少 OpenAI artifact 初始化职责");
 check(databaseFacade.replaceAll(/\s/g, "").includes("self.research.register_openai_research_artifacts(prepared.session()).await"), "数据库初始化未通过 ResearchService 注册 OpenAI Research artifacts");
 check(ports.includes("trait ResearchGatewayAuditPort"), "Research Ports 缺少 ResearchGatewayAuditPort");
+check(ports.includes("trait ResearchManualConflictPort"), "Research Ports 缺少 ResearchManualConflictPort");
+for (const capability of ["append_manual_route_override", "route_readiness"]) {
+  check(ports.includes(`fn ${capability}`), `ResearchManualConflictPort 缺少能力：${capability}`);
+}
 for (const capability of ["append_attempt", "attempt_number_offset", "usage_totals", "append_web_references"]) {
   check(ports.includes(`fn ${capability}`), `ResearchGatewayAuditPort 缺少能力：${capability}`);
 }
 check(adapter.includes("impl ResearchGatewayAuditPort for ActiveDatabase"), "Research adapter 缺少 Gateway Audit 实现");
+check(adapter.includes("impl ResearchManualConflictPort for ActiveDatabase"), "Research adapter 缺少 Manual Conflict 实现");
+for (const token of [".append_p4_manual_route_override(draft)", ".p4_route_readiness(task_id)"]) {
+  check(adapter.includes(token), `Manual Conflict adapter 未复用既有持久化能力：${token}`);
+}
 for (const token of [".append_openai_attempt(draft)", ".openai_attempt_number_offset(research_run_id)", ".openai_usage_totals()", ".append_web_references(citations, sources)"]) {
   check(adapter.includes(token), `Research Gateway adapter 未复用既有持久化能力：${token}`);
 }
@@ -122,11 +137,15 @@ check(lib.includes("use_cases::research::openai_gateway::OpenAiResearchCommand")
 check(!lib.includes("mod openai_research;"), "Application 根模块仍登记旧 openai_research owner");
 check(pipeline.includes("trait FactPipelineAccess"), "Fact Pipeline 缺少 Ports 组合访问边界");
 check(existsSync(join(root, "crates/application/src/p4_orchestration.rs")), "跨 Prediction/Research 的 P4 dispatcher 被提前删除");
-check(existsSync(join(root, "crates/application/src/p4_workbench.rs")), "人工冲突裁决被提前删除");
+check(!lib.includes("mod p4_workbench;"), "Application 根模块仍登记旧 p4_workbench owner");
 check(service.includes("fn execute_p4_research_task"), "ResearchService 缺少 P4 Research worker 执行职责");
-check(service.includes("fn finalize_successful_research"), "ResearchService 缺少 Research 成功收口职责");
 check(facade.includes("fn execute_p4_research_task"), "Application Research facade 缺少 P4 Research worker 委托");
-check(facade.includes("fn finalize_p4_research_task"), "Application Research facade 缺少人工裁决复用的 Research 收口入口");
+check(service.includes("fn resolve_p4_conflict"), "ResearchService 缺少人工冲突裁决职责");
+check(facade.includes("pub async fn resolve_p4_conflict"), "Application Research facade 缺少公共人工冲突裁决入口");
+check(facade.includes("ApplicationResult<P4TaskWorkspace>"), "resolve_p4_conflict 返回契约发生变化");
+check(!service.includes("fn finalize_successful_research"), "AT5 后仍残留仅供旧 workbench 的 ResearchService finalizer 转发");
+check(!facade.includes("fn finalize_p4_research_task"), "AT5 后仍残留仅供旧 workbench 的 facade finalizer 转发");
+check(p4Transitions.includes("fn finalize_successful_research"), "P4 Research worker 丢失可复用的成功收口职责");
 check(p4Worker.includes("openai_gateway::execute_p4_openai_research"), "P4 Research worker 未复用已迁移 OpenAI Gateway");
 check(p4Worker.includes("PredictionWorkflowPort"), "P4 Research worker 未通过 PredictionWorkflowPort 管理冻结任务状态");
 check(p4Worker.includes("ResearchArtifactPort"), "P4 Research worker 未通过 ResearchArtifactPort 管理 research run");
@@ -135,8 +154,17 @@ check(p4Orchestration.includes("self.execute_p4_research_task(payload.task_id, j
 for (const token of ["OpenAiResearchCommand", "ResearchRunDraft", "ResearchRunStatus", "research_dynamic_context", "fn finalize_successful_research", "fn block_partial_research", "fn transition_missed", "execute_p4_openai_research("]) {
   check(!p4Orchestration.includes(token), `旧 p4_orchestration.rs 仍持有 Research worker 业务逻辑：${token}`);
 }
-check(!p4Workbench.includes("p4_orchestration::finalize_successful_research"), "人工冲突裁决仍依赖旧 P4 orchestration Research helper");
-check(p4Workbench.includes("service.finalize_p4_research_task(&recovered).await"), "人工冲突裁决未复用 ResearchService 成功收口职责");
+check(p4Manual.includes("P4ManualConflictAccess"), "人工冲突裁决缺少 Ports 组合访问边界");
+for (const token of ["PredictionWorkflowPort", "JobQueuePort", "ResearchArtifactPort", "ResearchManualConflictPort"]) {
+  check(p4Manual.includes(token), `人工冲突裁决访问边界缺少：${token}`);
+}
+check(p4Decision.includes("Utc"), "人工冲突裁决未保留截止时间判断");
+check(p4Decision.includes("p4-manual-conflict:{}:{}:{}"), "人工冲突裁决幂等键格式发生变化");
+check(p4Decision.includes('actor: "local_user"'), "人工冲突裁决 actor 语义发生变化");
+check(p4Decision.includes('"PROBABLE"') && p4Decision.includes('"NOT_FOUND"'), "人工冲突裁决 verification 语义发生变化");
+check(p4Reconciliation.includes("for _ in 0..4"), "人工冲突裁决并发恢复重试次数发生变化");
+check(p4Reconciliation.includes("manual-review-succeeded:{task_id}"), "人工裁决 Research run event 幂等键发生变化");
+check(p4Reconciliation.includes("p4_worker::finalize_successful_research"), "人工冲突裁决未复用 AT4 Research 成功收口");
 
 const pipelineFiles = rustFiles("crates/application/src/use_cases/research/fact_pipeline");
 check(pipelineFiles.length >= 9, `Fact Pipeline 拆分不足，当前仅 ${pipelineFiles.length} 个职责文件`);
@@ -155,4 +183,4 @@ check(packageJson.scripts?.["verify:architecture"]?.includes("verify-research-se
 check(frontend.includes('"verify-research-service.mjs"'), "verify:frontend 未接入 R3-07 门禁");
 
 if (failures.length) throw new Error(`Research Service 验证失败\n${failures.map((item) => `- ${item}`).join("\n")}`);
-console.log(`Research Service AT4 验证通过：${researchFiles.length} 个 Service/Use Case Rust 文件；9 个公开 Research API 保持兼容，Fact Pipeline、OpenAI Gateway 与 P4 Research worker 均进入 ResearchService/Ports，根 p4_orchestration.rs 仅保留跨服务 dispatcher/worker loop，人工冲突裁决继续留给后续 Atomic Task。`);
+console.log(`Research Service AT5 验证通过：${researchFiles.length} 个 Service/Use Case Rust 文件；10 个公开 Research API 保持兼容，Fact Pipeline、OpenAI Gateway、P4 Research worker 与人工冲突裁决均进入 ResearchService/Ports，根 p4_orchestration.rs 仅保留跨服务 dispatcher/worker loop，旧 p4_workbench.rs 已删除。`);
