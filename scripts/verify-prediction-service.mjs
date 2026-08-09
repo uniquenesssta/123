@@ -16,7 +16,10 @@ for(const method of publicMethods){ check(facade.includes(`fn ${method}`),`Predi
 check(ports.includes("trait P4FreezeExecutionPort"),"Prediction Ports 缺少 P4FreezeExecutionPort"); check(ports.includes("async fn freeze_snapshot("),"P4FreezeExecutionPort 缺少 freeze_snapshot"); check(ports.includes("async fn read_snapshot("),"P4FreezeExecutionPort 缺少 read_snapshot");
 check(adapter.includes("impl P4FreezeExecutionPort for ActiveDatabase"),"Prediction 组合适配器缺少 P4FreezeExecutionPort"); check(adapter.includes(".freeze_prematch_snapshot(draft)"),"Prediction 组合适配器未复用既有快照写入"); check(adapter.includes(".read_prematch_snapshot(snapshot_id)"),"Prediction 组合适配器未复用既有快照读取");
 check(useCases.includes("pub(crate) mod p4_snapshot;"),"Prediction Use Cases 未登记 P4 Snapshot 模块");
-for(const method of ["freeze_p4_prematch_snapshot","read_p4_prematch_snapshot"]) check(snapshotUseCase.includes(`fn ${method}`),`P4 Snapshot use case 缺少 Prediction 快照职责：${method}`);
+check(snapshotUseCase.includes("pub(crate) async fn freeze<"),"P4 Snapshot use case 缺少 freeze 内部职责");
+check(snapshotUseCase.includes("port.freeze_snapshot(&draft).await?"),"P4 Snapshot freeze 未通过 P4FreezeExecutionPort");
+check(snapshotUseCase.includes("pub(crate) async fn read<"),"P4 Snapshot use case 缺少 read 内部职责");
+check(snapshotUseCase.includes("port.read_snapshot(snapshot_id).await?"),"P4 Snapshot read 未通过 P4FreezeExecutionPort");
 check(!legacyOrchestration.includes("async fn execute_p4_freeze_task("),"p4_orchestration.rs 仍实现 P4 freeze execution"); check(legacyOrchestration.includes("self.execute_p4_freeze_task(payload.task_id, job_id)"),"旧混合 worker 未委托 Prediction Service 的 freeze use case");
 for(const method of ["read_p4_match_workspace","read_p4_task_workspace"]) check(!legacyWorkbench.includes(`fn ${method}`),`p4_workbench.rs 仍持有只读 Prediction workspace 职责：${method}`); check(legacyWorkbench.includes("fn resolve_p4_conflict"),"R3-07 冲突写入职责被意外移除");
 const predictionFiles=[...rustFiles("crates/application/src/services/prediction"),...rustFiles("crates/application/src/use_cases/prediction")];
