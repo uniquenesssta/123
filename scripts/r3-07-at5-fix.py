@@ -40,10 +40,21 @@ text = decision.read_text(encoding="utf-8")
 for old, new, label in [
     ('            ""select_evidence""\n', '            r#""select_evidence""#\n', "select_evidence serialization assertion"),
     ('            ""accept_unknown""\n', '            r#""accept_unknown""#\n', "accept_unknown serialization assertion"),
+    ('        draft: P4ManualRouteOverrideDraft,\n', '        draft: Box<P4ManualRouteOverrideDraft>,\n', "prepared decision boxed draft field"),
+    ('        draft: P4ManualRouteOverrideDraft {\n', '        draft: Box::new(P4ManualRouteOverrideDraft {\n', "prepared decision boxed draft construction"),
+    ('            idempotency_key: decision_key,\n        },\n    })\n', '            idempotency_key: decision_key,\n        }),\n    })\n', "prepared decision boxed draft construction close"),
 ]:
     if text.count(old) != 1:
-        raise RuntimeError(f"AT5 decision test anchor mismatch: {label}")
+        raise RuntimeError(f"AT5 decision patch anchor mismatch: {label}")
     text = text.replace(old, new, 1)
 decision.write_text(text, encoding="utf-8", newline="\n")
 
-print("AT5 patches applied: verifier ownership and exact serialization assertions")
+manual_mod = ROOT / "crates/application/src/use_cases/research/p4_manual_conflict/mod.rs"
+text = manual_mod.read_text(encoding="utf-8")
+old_call = "            access.manual.append_manual_route_override(&draft).await?;\n"
+new_call = "            access.manual.append_manual_route_override(draft.as_ref()).await?;\n"
+if text.count(old_call) != 1:
+    raise RuntimeError("AT5 boxed draft Port call anchor mismatch")
+manual_mod.write_text(text.replace(old_call, new_call, 1), encoding="utf-8", newline="\n")
+
+print("AT5 patches applied: verifier ownership, exact serialization assertions, and boxed prepared draft")
