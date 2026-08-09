@@ -35,6 +35,8 @@ const reset = read("crates/application/src/use_cases/database/reset/mod.rs");
 const ports = read("crates/application/src/ports/database/mod.rs");
 const adapter = read("crates/application/src/composition/port_registry.rs");
 const applicationService = read("crates/application/src/service/application_service.rs");
+const researchService = read("crates/application/src/services/research/service.rs");
+const researchArtifactCatalog = read("crates/application/src/use_cases/research/artifact_catalog.rs");
 const tauri = read("src-tauri/src/commands/database.rs");
 const stateOwnership = JSON.parse(read("architecture/state-ownership.json"));
 const pkg = JSON.parse(read("package.json"));
@@ -84,7 +86,21 @@ check(
   "内置规则包注册链未通过 Rules Service",
 );
 check(!facade.includes("register_built_in_rule_packages"), "Database facade 仍保留旧内置规则包注册实现");
-check(facade.includes("register_p4_persistence_artifacts"), "P4 persistence artifact 注册链缺失");
+check(
+  facade.includes("self.research") &&
+    facade.includes(".register_persistence_artifacts(prepared.session())"),
+  "P4 persistence artifact 注册链未通过 ResearchService",
+);
+check(
+  researchService.includes("register_persistence_artifacts") &&
+    researchService.includes("artifact_catalog::register_built_ins(port).await"),
+  "ResearchService 未委托 Artifact Catalog 注册内置 P4 schema",
+);
+check(
+  researchArtifactCatalog.includes("for draft in built_in_schema_versions()") &&
+    researchArtifactCatalog.includes("port.register_schema(&draft).await?"),
+  "内置 P4 schema 未通过 ResearchArtifactPort 注册",
+);
 check(facade.includes("register_openai_research_artifacts"), "research artifact 注册链缺失");
 check(bootstrap.includes("list_recent_runs(50)"), "bootstrap 最近运行读取语义发生变化");
 
@@ -107,4 +123,4 @@ if (failures.length > 0) {
   process.exit(1);
 }
 
-console.log("Database Service 验证通过：连接、迁移、健康、统计、清空均已进入 Service/Use Case/Port 边界，活动数据库由 DatabaseService 单一持有，Tauri 不再直接执行 PostgreSQL 清空流程。");
+console.log("Database Service 验证通过：连接、迁移、健康、统计、清空均已进入 Service/Use Case/Port 边界，活动数据库由 DatabaseService 单一持有，Tauri 不再直接执行 PostgreSQL 清空流程，内置 P4 artifact 初始化通过 ResearchService/ResearchArtifactPort 保持可验证链路。");
