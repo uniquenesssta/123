@@ -14,7 +14,24 @@ const reviewDomain = [
   read("crates/domain/src/review/event/payload.rs"),
 ].join("\n");
 const workbook = read("crates/spreadsheet-io/src/match_review_workbook.rs");
-const application = read("crates/application/src/match_review_package.rs");
+const applicationFacade = read("crates/application/src/services/review/facade.rs");
+const applicationService = read("crates/application/src/services/review/service.rs");
+const packageExport = read("crates/application/src/use_cases/review/package/export.rs");
+const packagePreview = read("crates/application/src/use_cases/review/package/preview.rs");
+const packageLifecycle = read("crates/application/src/use_cases/review/package/lifecycle.rs");
+const packageShared = read("crates/application/src/use_cases/review/package/shared.rs");
+const packageAdapter = read("crates/application/src/composition/adapters/review.rs");
+const packagePorts = read("crates/application/src/ports/review/package.rs");
+const application = [
+  applicationFacade,
+  applicationService,
+  packageExport,
+  packagePreview,
+  packageLifecycle,
+  packageShared,
+  packageAdapter,
+  packagePorts,
+].join("\n");
 const persistence = read("crates/persistence-postgres/src/match_review_package.rs");
 const reviewPersistence = read("crates/persistence-postgres/src/review.rs");
 const entityPersistence = read("crates/persistence-postgres/src/entity_catalog.rs");
@@ -42,19 +59,22 @@ for (const status of ["exported", "preview_blocked", "preview_valid", "confirmed
 check(migration.includes("match_review_package_one_active_per_match_uidx"), "缺少同场比赛单一活动资料包约束");
 check(migration.includes("pre_match_snapshot jsonb") && migration.includes("export_database_snapshot jsonb"), "导出时没有冻结赛前值和数据库值摘要");
 check(reviewPersistence.includes("INSERT INTO review.match_events") && reviewPersistence.includes("list_match_events"), "普通比赛事件未结构化写入并查询");
-check(entityPersistence.includes('("match_events", "SELECT count(*)::bigint FROM review.match_events') && forceDeletePersistence.includes("FROM review.match_events WHERE team_id=$1"), "结构化比赛事件未接入实体删除保护与强制清除影响集合");
+check(entityPersistence.includes('(\"match_events\", \"SELECT count(*)::bigint FROM review.match_events') && forceDeletePersistence.includes("FROM review.match_events WHERE team_id=$1"), "结构化比赛事件未接入实体删除保护与强制清除影响集合");
 for (const method of ["register_match_review_package_export", "record_match_review_package_preview", "confirm_match_review_package_workflow", "mark_match_review_package_facts_committed", "mark_match_review_package_review_created", "mark_match_review_package_settled"]) check(persistence.includes(`fn ${method}`), `持久化层缺少 ${method}`);
 
-for (const method of ["export_match_review_package", "preview_match_review_package", "read_match_review_package_workflow", "confirm_match_review_package", "commit_match_review_package_facts", "generate_match_review_from_package"]) {
-  check(application.includes(`fn ${method}`), `应用层缺少 ${method}`);
+for (const method of ["export_match_review_package", "preview_match_review_package", "read_match_review_package_workflow", "confirm_match_review_package", "commit_match_review_package_facts", "generate_match_review_from_package", "commit_match_review_package"]) {
+  check(applicationFacade.includes(`fn ${method}`), `应用层 facade 缺少 ${method}`);
+  check(applicationService.includes(`fn ${method}`), `ReviewService 缺少 ${method}`);
   check(commands.includes(`fn ${method}`), `Tauri 缺少 ${method}`);
   check(commandRegistry.includes(`commands::${method}`), `Tauri 命令注册缺少 ${method}`);
 }
-check(application.includes("register_match_review_package_export"), "导出后没有登记本轮 package_id 和 SHA256");
-check(application.includes("read_active_match_review_package_workflow") && application.includes("最近一次导出的资料包"), "预检没有严格绑定本轮导出");
-check(application.includes("validate_match_review_package(import_path") && application.includes("已确认资料包发生变化"), "确认/写入阶段没有重新读取并复检文件");
-check(application.includes("commit_match_review_facts") && application.includes("generate_match_review_from_package"), "真实事实写入与正式复盘未拆分为独立阶段");
-check(application.includes("snapshot_from_lineups") && application.includes("snapshot_from_pair") && application.includes("validate_event_identities"), "三方值对照或事件身份预检未接入后端");
+check(packageAdapter.includes("register_match_review_package_export") && packageExport.includes("register_export"), "导出后没有通过 Port 登记本轮 package_id 和 SHA256");
+check(packageAdapter.includes("read_active_match_review_package_workflow") && packagePreview.includes("最近一次导出的资料包"), "预检没有严格绑定本轮导出");
+check(packageLifecycle.includes("preview::validate(port, import_path") && packageLifecycle.includes("已确认资料包发生变化"), "确认/写入阶段没有重新读取并复检文件");
+check(packageLifecycle.includes("commit_review_facts") && packageLifecycle.includes("generate_review"), "真实事实写入与正式复盘未拆分为独立阶段");
+check(packageShared.includes("snapshot_from_lineups") && packageShared.includes("snapshot_from_pair") && packagePreview.includes("validate_event_identities"), "三方值对照或事件身份预检未接入后端");
+check(packagePorts.includes("MatchReviewPackageSourcePort") && packagePorts.includes("MatchReviewPackageStatePort") && packagePorts.includes("MatchReviewPackageFactsPort"), "资料包职责未进入明确 Port 边界");
+check(!fs.existsSync(new URL("../crates/application/src/match_review_package.rs", import.meta.url)), "旧 match_review_package.rs owner 仍存在");
 
 for (const method of ["exportMatchReviewPackage", "previewMatchReviewPackage", "readMatchReviewPackageWorkflow", "confirmMatchReviewPackage", "commitMatchReviewPackageFacts", "generateMatchReviewFromPackage"]) check(api.includes(`${method}:`), `前端 API 缺少 ${method}`);
 for (const action of ["export-match-review-package", "preview-match-review-package", "confirm-match-review-package", "commit-match-review-package-facts", "generate-match-review-from-package", "inspect-postmatch-readiness", "settle-postmatch-review"]) check(main.includes(`case "${action}"`) && page.includes(`data-action="${action}"`), `赛后复盘链路缺少动作 ${action}`);

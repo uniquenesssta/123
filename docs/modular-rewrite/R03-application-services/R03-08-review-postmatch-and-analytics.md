@@ -39,3 +39,33 @@
 
 - Review Core 6 个公开职责已完成迁移，两个正式 CI 暴露的验证缺口均已修复且未放宽门禁。
 - AT1 正式关闭为 `DONE`。下一 Atomic Task：Match Review Package，状态 `READY`；Postmatch 与 Analytics 继续保持未修改。
+
+## Atomic Task 2 — Match Review Package
+
+状态：`VERIFYING`
+
+### 已实施
+
+- 保持 `export_match_review_package`、`read_match_review_package_workflow`、`preview_match_review_package`、`confirm_match_review_package`、`commit_match_review_package_facts`、`generate_match_review_from_package`、`commit_match_review_package` 七个公共 ApplicationService/Tauri 入口及参数/返回 DTO 不变。
+- 删除旧 `crates/application/src/match_review_package.rs`，不保留转发壳；唯一 `ReviewService` 继续作为 Review / Match Review Package 应用层 owner。
+- 拆分 `use_cases/review/package/`：`export` 负责导出组装，`preview` 负责导入预检，`lifecycle` 负责确认/事实写入/正式复盘状态推进，`shared` 负责唯一共享快照与身份规则，`workbook` 负责 XLSX 路径、阻塞 I/O 与 SHA256。
+- 保留 R3-01 冻结 `MatchReviewWorkflowPort` 原签名；AT2 新增 `MatchReviewPackageSourcePort`、`MatchReviewPackageStatePort`、`MatchReviewPackageFactsPort`。`StatePort` 只负责 package 工作流状态持久化，避免与冻结 WorkflowPort 形成重复 owner。实际阵容写入复用 `LineupPort`，正式复盘生成复用 AT1 `MatchReviewPort`。
+- PostgreSQL 具体实现集中于 `composition/adapters/review.rs`；Service / Use Case 不依赖 SQLx、PostgresStore、PersistenceStore。
+- `verify:review-service` 与 `verify:match-review-package` 已更新到新 authoritative owner；九步状态机、SHA 绑定、重复复检、结构化事件、数据库约束与 Tauri/frontend 入口断言未弱化。
+
+### 验证事实
+
+- 初始 Windows hard gate `31359686297`：AT2 专项、Application Ports、施工树 architecture、Application Rust、完整 `verify:frontend`、完整 `verify:rust`、精确 scope 与 clean commit 均通过；提交后 final-tree 因 Domain inventory 未固化而失败，因此未记为 DONE。
+- fresh-checkout 诊断 `31360521486`：Review/Package verifier 与 clean tree 通过；architecture 暴露 Domain inventory 漂移，同时确认 R3-01 冻结 `MatchReviewWorkflowPort` 在 AT2 初始实现中被误删，37-Port 契约下降为 36。
+- scope 诊断 `31361978957` 明确 recovery 合法变化路径；没有越界到 Postmatch/Analytics/Tauri/PostgreSQL/Domain/模型/依赖。
+- 最终 recovery `31362128833`：冻结 WorkflowPort 恢复、AT2 状态接口改名、inventory 固化；Review/Package 专项、37-Port、完整 architecture、保护资产、Application Rust、完整 frontend/Rust、精确 scope、clean commit、clean-tree 全部 `SUCCESS`。
+
+### 未改变
+
+- `postmatch.rs`、`analytics.rs`。
+- Tauri 命令/DTO、PostgreSQL SQL/migration/Schema、Domain 契约。
+- 模型保护区、生产依赖、错误语义和用户可观察业务行为。
+
+### 后续门禁
+
+- 当前仍为 `VERIFYING`。只有 canonical `rewrite/r3-08-review-postmatch-analytics` 的 Public Platform CI、Windows Automated 与 evidence upload 成功并完成关闭记录后，AT2 才可标记 `DONE` 并开放下一 Atomic Task。

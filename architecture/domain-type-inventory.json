@@ -24,13 +24,13 @@
     "targetPublicExportPolicy": "explicit re-export only"
   },
   "sourceDigest": "217241ac243726a5ab6805a7f169e222b97e78c7c971749a5904714af673ebdd",
-  "rustUsageDigest": "d7c3b77676985e4ca4368dc7f72df29d4ed8883d954c43d662b879f180ab3c92",
+  "rustUsageDigest": "956e55bf6d80074950e262be06fcb13695bfe365f0730e9ef4caa796952eeafa",
   "summary": {
     "typeCount": 365,
     "publicCompatibilityTypeCount": 365,
     "internalTypeCount": 0,
     "domainSourceFileCount": 129,
-    "scannedRustFileCount": 468,
+    "scannedRustFileCount": 474,
     "databaseMappedTypeCount": 299,
     "byTargetModule": {
       "ai_workspace": 16,
@@ -9462,11 +9462,11 @@
       ],
       "externalCallers": [
         "crates/application/src/composition/adapters/lineups.rs",
-        "crates/application/src/match_review_package.rs",
         "crates/application/src/ports/lineup/mod.rs",
         "crates/application/src/services/lineups/facade.rs",
         "crates/application/src/services/lineups/service.rs",
         "crates/application/src/use_cases/lineups/create_lineup_pair/mod.rs",
+        "crates/application/src/use_cases/review/package/shared.rs",
         "crates/persistence-postgres/src/player_catalog.rs",
         "crates/persistence-postgres/tests/postgres_integration.rs",
         "crates/spreadsheet-io/src/match_review_workbook.rs",
@@ -9655,7 +9655,7 @@
         "crates/domain/tests/serde_contracts/module_paths.rs"
       ],
       "externalCallers": [
-        "crates/application/src/match_review_package.rs",
+        "crates/application/src/use_cases/review/package/shared.rs",
         "crates/persistence-postgres/tests/postgres_integration.rs",
         "crates/spreadsheet-io/src/match_review_workbook.rs"
       ],
@@ -9924,14 +9924,15 @@
       ],
       "externalCallers": [
         "crates/application/src/composition/adapters/lineups.rs",
-        "crates/application/src/match_review_package.rs",
         "crates/application/src/ports/lineup/mod.rs",
+        "crates/application/src/ports/review/package.rs",
         "crates/application/src/services/lineups/facade.rs",
         "crates/application/src/services/lineups/service.rs",
         "crates/application/src/use_cases/lineups/create_lineup/mod.rs",
         "crates/application/src/use_cases/lineups/list_lineups/mod.rs",
         "crates/application/src/use_cases/lineups/read_lineup/mod.rs",
         "crates/application/src/use_cases/prediction/shared/readiness_checks.rs",
+        "crates/application/src/use_cases/review/package/shared.rs",
         "crates/persistence-postgres/src/lineup_chain.rs",
         "crates/persistence-postgres/src/match_exchange.rs",
         "crates/persistence-postgres/src/match_prediction.rs",
@@ -10007,7 +10008,7 @@
         "crates/domain/tests/serde_contracts/module_paths.rs"
       ],
       "externalCallers": [
-        "crates/application/src/match_review_package.rs",
+        "crates/application/src/use_cases/review/package/shared.rs",
         "crates/persistence-postgres/src/player_catalog.rs",
         "crates/persistence-postgres/tests/postgres_integration.rs",
         "crates/spreadsheet-io/src/match_review_workbook.rs"
@@ -10483,7 +10484,7 @@
         "crates/domain/tests/serde_contracts/r2_06_module_paths.rs"
       ],
       "externalCallers": [
-        "crates/application/src/match_review_package.rs",
+        "crates/application/src/use_cases/review/package/shared.rs",
         "crates/persistence-postgres/src/review.rs",
         "crates/persistence-postgres/tests/postgres_integration.rs",
         "crates/spreadsheet-io/src/match_review_workbook.rs"
@@ -11189,6 +11190,7 @@
       "externalCallers": [
         "crates/application/src/composition/adapters/lineups.rs",
         "crates/application/src/ports/lineup/mod.rs",
+        "crates/application/src/ports/review/package.rs",
         "crates/application/src/services/lineups/facade.rs",
         "crates/application/src/services/lineups/service.rs",
         "crates/application/src/use_cases/lineups/create_match/mod.rs",
@@ -11302,7 +11304,7 @@
         "crates/domain/tests/serde_contracts/r2_06_module_paths.rs"
       ],
       "externalCallers": [
-        "crates/application/src/match_review_package.rs",
+        "crates/application/src/use_cases/review/package/shared.rs",
         "crates/persistence-postgres/tests/postgres_integration.rs",
         "crates/spreadsheet-io/src/match_review_workbook.rs"
       ],
@@ -11386,7 +11388,8 @@
         "crates/domain/tests/serde_contracts/r2_06_module_paths.rs"
       ],
       "externalCallers": [
-        "crates/application/src/match_review_package.rs",
+        "crates/application/src/ports/review/package.rs",
+        "crates/application/src/use_cases/review/package/shared.rs",
         "crates/persistence-postgres/src/review.rs"
       ],
       "databaseMappings": [
@@ -11568,6 +11571,7 @@
       "externalCallers": [
         "crates/application/src/composition/adapters/review.rs",
         "crates/application/src/ports/review/mod.rs",
+        "crates/application/src/ports/review/package.rs",
         "crates/application/src/services/review/facade.rs",
         "crates/application/src/services/review/service.rs",
         "crates/application/src/use_cases/review/generate_match_review/mod.rs",
@@ -11744,7 +11748,7 @@
         "crates/domain/tests/serde_contracts/r2_06_module_paths.rs"
       ],
       "externalCallers": [
-        "crates/application/src/match_review_package.rs",
+        "crates/application/src/use_cases/review/package/shared.rs",
         "crates/persistence-postgres/src/review.rs",
         "crates/spreadsheet-io/src/match_review_workbook.rs"
       ],
@@ -12017,8 +12021,10 @@
         "crates/domain/tests/serde_contracts/r2_06_module_paths.rs"
       ],
       "externalCallers": [
-        "crates/application/src/match_review_package.rs",
         "crates/application/src/ports/review/mod.rs",
+        "crates/application/src/services/review/facade.rs",
+        "crates/application/src/services/review/service.rs",
+        "crates/application/src/use_cases/review/package/lifecycle.rs",
         "src-tauri/src/commands/postmatch.rs"
       ],
       "databaseMappings": []
@@ -12074,8 +12080,10 @@
         "crates/domain/tests/serde_contracts/r2_06_module_paths.rs"
       ],
       "externalCallers": [
-        "crates/application/src/match_review_package.rs",
         "crates/application/src/ports/review/mod.rs",
+        "crates/application/src/services/review/facade.rs",
+        "crates/application/src/services/review/service.rs",
+        "crates/application/src/use_cases/review/package/lifecycle.rs",
         "src-tauri/src/commands/postmatch.rs"
       ],
       "databaseMappings": []
@@ -12145,7 +12153,7 @@
         "crates/domain/tests/serde_contracts/r2_06_module_paths.rs"
       ],
       "externalCallers": [
-        "crates/application/src/match_review_package.rs",
+        "crates/application/src/use_cases/review/package/preview.rs",
         "crates/persistence-postgres/tests/postgres_integration.rs",
         "crates/spreadsheet-io/src/match_review_workbook.rs"
       ],
@@ -12206,8 +12214,10 @@
         "crates/domain/tests/serde_contracts/r2_06_module_paths.rs"
       ],
       "externalCallers": [
-        "crates/application/src/match_review_package.rs",
         "crates/application/src/ports/review/mod.rs",
+        "crates/application/src/services/review/facade.rs",
+        "crates/application/src/services/review/service.rs",
+        "crates/application/src/use_cases/review/package/lifecycle.rs",
         "src-tauri/src/commands/postmatch.rs"
       ],
       "databaseMappings": []
@@ -12301,7 +12311,9 @@
         "crates/domain/tests/serde_contracts/r2_06_module_paths.rs"
       ],
       "externalCallers": [
-        "crates/application/src/match_review_package.rs",
+        "crates/application/src/composition/adapters/review.rs",
+        "crates/application/src/ports/review/package.rs",
+        "crates/application/src/use_cases/review/package/workbook.rs",
         "crates/spreadsheet-io/src/match_review_workbook.rs"
       ],
       "databaseMappings": []
@@ -12439,7 +12451,9 @@
         "crates/domain/tests/serde_contracts/r2_06_module_paths.rs"
       ],
       "externalCallers": [
-        "crates/application/src/match_review_package.rs",
+        "crates/application/src/services/review/facade.rs",
+        "crates/application/src/services/review/service.rs",
+        "crates/application/src/use_cases/review/package/lifecycle.rs",
         "src-tauri/src/commands/postmatch.rs"
       ],
       "databaseMappings": []
@@ -12509,7 +12523,7 @@
         "crates/domain/tests/serde_contracts/r2_06_module_paths.rs"
       ],
       "externalCallers": [
-        "crates/application/src/match_review_package.rs"
+        "crates/application/src/use_cases/review/package/preview.rs"
       ],
       "databaseMappings": []
     },
@@ -12654,8 +12668,14 @@
         "crates/domain/tests/serde_contracts/r2_06_module_paths.rs"
       ],
       "externalCallers": [
-        "crates/application/src/match_review_package.rs",
+        "crates/application/src/composition/adapters/review.rs",
         "crates/application/src/ports/review/mod.rs",
+        "crates/application/src/ports/review/package.rs",
+        "crates/application/src/services/review/facade.rs",
+        "crates/application/src/services/review/service.rs",
+        "crates/application/src/use_cases/review/package/preview.rs",
+        "crates/application/src/use_cases/review/package/shared.rs",
+        "crates/application/src/use_cases/review/package/workbook.rs",
         "crates/persistence-postgres/src/match_review_package.rs",
         "crates/persistence-postgres/tests/postgres_integration.rs",
         "crates/spreadsheet-io/src/match_review_workbook.rs",
@@ -12712,7 +12732,9 @@
         "crates/domain/tests/serde_contracts/r2_06_module_paths.rs"
       ],
       "externalCallers": [
-        "crates/application/src/match_review_package.rs",
+        "crates/application/src/services/review/facade.rs",
+        "crates/application/src/services/review/service.rs",
+        "crates/application/src/use_cases/review/package/lifecycle.rs",
         "src-tauri/src/commands/postmatch.rs"
       ],
       "databaseMappings": []
@@ -12796,7 +12818,7 @@
         "crates/domain/tests/serde_contracts/r2_06_module_paths.rs"
       ],
       "externalCallers": [
-        "crates/application/src/match_review_package.rs",
+        "crates/application/src/use_cases/review/package/shared.rs",
         "crates/persistence-postgres/tests/postgres_integration.rs"
       ],
       "databaseMappings": []
@@ -12876,7 +12898,11 @@
         "crates/domain/tests/serde_contracts/r2_06_module_paths.rs"
       ],
       "externalCallers": [
-        "crates/application/src/match_review_package.rs",
+        "crates/application/src/composition/adapters/review.rs",
+        "crates/application/src/ports/review/package.rs",
+        "crates/application/src/services/review/facade.rs",
+        "crates/application/src/services/review/service.rs",
+        "crates/application/src/use_cases/review/package/export.rs",
         "crates/persistence-postgres/src/match_review_package.rs",
         "crates/persistence-postgres/tests/postgres_integration.rs",
         "src-tauri/src/commands/postmatch.rs"
@@ -12963,8 +12989,9 @@
         "crates/domain/tests/serde_contracts/r2_06_module_paths.rs"
       ],
       "externalCallers": [
-        "crates/application/src/match_review_package.rs",
         "crates/application/src/postmatch.rs",
+        "crates/application/src/use_cases/review/package/lifecycle.rs",
+        "crates/application/src/use_cases/review/package/preview.rs",
         "crates/persistence-postgres/tests/postgres_integration.rs"
       ],
       "databaseMappings": []
@@ -13124,8 +13151,13 @@
         "crates/domain/tests/serde_contracts/r2_06_module_paths.rs"
       ],
       "externalCallers": [
-        "crates/application/src/match_review_package.rs",
+        "crates/application/src/composition/adapters/review.rs",
         "crates/application/src/ports/review/mod.rs",
+        "crates/application/src/ports/review/package.rs",
+        "crates/application/src/services/review/facade.rs",
+        "crates/application/src/services/review/service.rs",
+        "crates/application/src/use_cases/review/package/lifecycle.rs",
+        "crates/application/src/use_cases/review/package/shared.rs",
         "crates/persistence-postgres/src/match_review_package.rs",
         "src-tauri/src/commands/postmatch.rs"
       ],
