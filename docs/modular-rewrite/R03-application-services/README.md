@@ -132,3 +132,4 @@ R3-02 已正式关闭为 `DONE`。详细记录见 [`R03-02-database-service.md`]
 - 首次正式 Public Platform CI run `31328591975` 在 Domain 类型清单漂移门禁停止；Windows Automated 因前置门禁失败被跳过。该失败未记为通过，AT1 未进入 DONE，AT2 未启动。
 - 已确认漂移仅来自 Application Rust owner 文件集合变化，正在用既有确定性生成器刷新 `architecture/domain-type-inventory.json` 并重新执行完整门禁。
 - 第二次正式 Public Platform CI run `31349803381` 已通过 Domain inventory、Domain 根出口及 R3-01～R3-07 既有专项门禁，随后因 `verify-review-service.mjs` 自身跨行字符串语法错误停止；Windows Automated 未执行。AT1 继续保持 `VERIFYING`，当前修复只针对验证器语法并增加 Node 22 `node --check`，AT2 未启动。
+- R3-08 AT1 已正式关闭为 `DONE`：validator recovery run `31350028026` 全链 SUCCESS；正式 Public Platform CI run `31350677129` / job `93340716563` 全部 SUCCESS，artifact `9049246515`，SHA-256 `62f0bcfdb8f83ce0a715de58ee14f8a0a87b1f3192c938e841d65400b8ecb7ef`。下一 Atomic Task 为 Match Review Package，状态 `READY`；AT2 尚未实施。

@@ -221,3 +221,5 @@ PostgreSQL 实跑、Windows Full 和用户本机 Windows 10/11 实机验收仍�
 - R3-08 AT1 正式 CI 首次失败：Public Platform CI run `31328591975` 在 `verify:architecture` 的 Domain 类型清单漂移门禁停止；Review Core 业务代码、AT1 专项 hard gate 与完整 staging frontend/Rust 回归此前均已通过。根因是 Review owner 拆分新增/删除 Rust 文件后 `architecture/domain-type-inventory.json` 的源码调用面快照未同步。已按既有生成器重新计算清单，不修改 Domain 类型、Serde、数据库映射、公共接口、SQL、Tauri DTO 或模型保护区，也不放宽任何门禁。
 
 - R3-08 AT1 第二次正式 CI run `31349803381` 已确认 Domain inventory 与既有 Application 架构门禁均通过，失败点收敛为 `scripts/verify-review-service.mjs` 的跨行普通字符串语法错误；修复仅改为显式 `\n` 输出，并新增 Node 22 `node --check` 前置验证，不修改 Review Core 业务代码、公共接口、SQL、Tauri DTO、模型边界或生产依赖。
+
+- R3-08 AT1 Review Core 已正式关闭为 `DONE`：修复 Review 专项验证器语法后，Node 22 parse gate、完整 architecture、frontend/Rust 回归与正式 Public Platform CI run `31350677129` / Windows Automated job `93340716563` 全部通过；artifact `9049246515`，SHA-256 `62f0bcfdb8f83ce0a715de58ee14f8a0a87b1f3192c938e841d65400b8ecb7ef`。Review Core 业务接口、SQL、Tauri DTO、模型边界和生产依赖未改变；R3-08 下一 Atomic Task 为 Match Review Package。

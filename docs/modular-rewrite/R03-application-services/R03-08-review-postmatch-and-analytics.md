@@ -6,6 +6,8 @@
 
 ## Atomic Task 1 — Review Core
 
+状态：`DONE`
+
 ### 已实施
 
 - 将 `generate_match_review`、`list_reviewable_matches`、`list_match_reviews`、`read_match_review`、`list_ability_candidates`、`decide_ability_candidate` 六个既有公共 Application 职责迁入 `services/review/` 与 `use_cases/review/`。
@@ -23,6 +25,8 @@
 - 刷新后的正式提交 `586ad2196be7218e366cf1715fbbf69d87d91f01` 触发第二次 Public Platform CI run `31349803381`。Domain inventory、Domain 根出口、Application Ports、Database、Competition/Rules、Teams/Players、Lineups、Prediction、Research 门禁均已通过；随后 `scripts/verify-review-service.mjs` 在 Node 22 clean checkout 中因普通字符串被错误写成跨行文本而触发 `SyntaxError: Invalid or unexpected token`，Windows Automated 再次因前置架构门禁失败被跳过。
 - 第二次失败定位为 Review 专项验证器自身语法缺陷，不是 Review Core 业务实现失败。修复仅将失败输出改为显式 `\n` 拼接，并在恢复门禁增加 `node --check scripts/verify-review-service.mjs`；不删除、不放宽任何验证断言。
 
+- 第三次正式 Public Platform CI run `31350677129` / Windows Automated job `93340716563` 已整体 `SUCCESS`；architecture、Windows automated acceptance、validation evidence upload 与 post-job 均成功。artifact `9049246515`，大小 `14276530` 字节，SHA-256 `62f0bcfdb8f83ce0a715de58ee14f8a0a87b1f3192c938e841d65400b8ecb7ef`。正式修复提交 `bac0ca3c1192b8da919b409b06aa6e454ceca87e`。
+
 ### 未改变
 
 - PostgreSQL SQL、migration、Schema、数据格式。
@@ -31,7 +35,7 @@
 - `crates/model-api/`、`crates/model-p4/`、`crates/model-p7/` 与模型保护资产。
 - 生产依赖。
 
-### 后续门禁
+### AT1 关闭
 
-- 在与正式 CI 一致的 Node 22 环境先通过 Review verifier 语法检查，再通过 Review 专项、Application Ports、完整 architecture、保护资产、Application check/tests、完整 frontend 与完整 Rust。
-- 形成 clean verifier recovery commit 后重新运行 Public Platform CI；只有正式 CI 与 Windows Automated 成功并完成记录回写，AT1 才可标记 `DONE`，随后才允许进入 AT2。
+- Review Core 6 个公开职责已完成迁移，两个正式 CI 暴露的验证缺口均已修复且未放宽门禁。
+- AT1 正式关闭为 `DONE`。下一 Atomic Task：Match Review Package，状态 `READY`；Postmatch 与 Analytics 继续保持未修改。
