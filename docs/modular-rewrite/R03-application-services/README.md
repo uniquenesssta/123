@@ -123,7 +123,8 @@ R3-02 已正式关闭为 `DONE`。详细记录见 [`R03-02-database-service.md`]
 
 - Atomic Task 1 — Review Core：`DONE`。
 - Atomic Task 2 — Match Review Package：`DONE`。
-- R3-08 整体继续 `IN_PROGRESS`；Atomic Task 3 — Postmatch Service：`VERIFYING`；Analytics 尚未实施。
+- R3-08 整体继续 `IN_PROGRESS`；Atomic Task 3 — Postmatch Service：`DONE`；Atomic Task 4 — Analytics：`READY`（尚未实施）。
+- AT3 canonical 提交 `b551ac8acc4030f05d93100812b316469dc7ea83` 的 Public Platform CI run `31420385032` / Windows Automated job `93559423579` 已整体 `SUCCESS`，validation evidence upload 成功；artifact `9075930419` 大小 `14152359` 字节，SHA-256 `39fab48a3f2d62e1538276fb8f19fb811f1c72c79380de55897e12c82e39f582`。18 个需要专用 `FOOTBALL_TEST_DATABASE_URL` 的 PostgreSQL 集成测试继续按既有安全设计保持 `ignored`，未记为已执行。
 
 
 ### R3-08 Atomic Task 1 — Review Core

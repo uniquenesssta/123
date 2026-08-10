@@ -89,7 +89,7 @@
 
 ## Atomic Task 3 — Postmatch Service
 
-状态：`VERIFYING`
+状态：`DONE`
 
 ### 已实施
 
@@ -112,6 +112,9 @@
 - Windows hard gate：run `31419165233`：Postmatch 专项、Application Ports、完整 architecture、保护资产、rustfmt、Application check/tests、完整 frontend 与完整 Rust 回归均 `SUCCESS`。
 - 18 个需要专用 `FOOTBALL_TEST_DATABASE_URL` 的 PostgreSQL 集成测试未配置专用测试库时必须保持 `ignored`，不得记为已执行。
 
-### 后续门禁
+### AT3 关闭
 
-- 当前保持 `VERIFYING`。只有 AT3 hard gate 与 canonical Public Platform CI / Windows Automated / evidence upload 全部成功并完成关闭记录后，才可标记 `DONE` 并开放 Analytics Atomic Task。
+- canonical 提交 `b551ac8acc4030f05d93100812b316469dc7ea83` 的 Public Platform CI run `31420385032` / Windows Automated job `93559423579` 已整体 `SUCCESS`；architecture、完整 Windows automated acceptance 与 validation evidence upload 均成功。
+- evidence artifact `9075930419`（`windows-automated-delivery-evidence-b551ac8acc4030f05d93100812b316469dc7ea83`）大小 `14152359` 字节，SHA-256 `39fab48a3f2d62e1538276fb8f19fb811f1c72c79380de55897e12c82e39f582`。
+- 18 个需要专用 `FOOTBALL_TEST_DATABASE_URL` 的 PostgreSQL 集成测试按既有安全设计继续保持 `ignored`，未记为已执行；本 Atomic Task 未执行破坏性数据库验证。
+- AT3 Postmatch Service 正式关闭为 `DONE`。R3-08 整体继续 `IN_PROGRESS`；Atomic Task 4 — Analytics 开放为 `READY`，Analytics 源码仍未实施。
