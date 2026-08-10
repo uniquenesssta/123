@@ -14,7 +14,10 @@ const pascal = (value) => value
 
 const domainWorkflow = read("crates/domain/src/review/package/workflow.rs");
 const domainRecord = domainWorkflow;
-const application = read("crates/application/src/match_review_package.rs");
+const application = [
+  read("crates/application/src/use_cases/review/package/preview.rs"),
+  read("crates/application/src/use_cases/review/package/lifecycle.rs"),
+].join("\n");
 const postmatchApplication = read("crates/application/src/postmatch.rs");
 const persistence = read("crates/persistence-postgres/src/match_review_package.rs");
 const commands = read("src-tauri/src/commands/postmatch.rs");
