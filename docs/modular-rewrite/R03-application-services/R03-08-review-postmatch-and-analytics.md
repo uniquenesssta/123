@@ -42,7 +42,7 @@
 
 ## Atomic Task 2 — Match Review Package
 
-状态：`VERIFYING`
+状态：`DONE`
 
 ### 已实施
 
@@ -68,11 +68,21 @@
 
 ### 后续门禁
 
-- 当前仍为 `VERIFYING`。只有 canonical `rewrite/r3-08-review-postmatch-analytics` 的 Public Platform CI、Windows Automated 与 evidence upload 成功并完成关闭记录后，AT2 才可标记 `DONE` 并开放下一 Atomic Task。
+- canonical `rewrite/r3-08-review-postmatch-analytics` 提交 `23997cde7d3ba46db34fdd2e0577075555391986` 的 Public Platform CI run `31406717077`、Windows Automated job `93514736356` 与 evidence upload 已全部成功；关闭记录已同步，AT2 可正式标记 `DONE` 并开放下一 Atomic Task。
 
 ### Canonical CI 第一次失败与 Stage-A 验证器恢复
 
 - canonical run `31363234205` 的 `verify:architecture` 已通过；Windows Automated 在 frontend 聚合门禁执行 `verify-stage-a-architecture.mjs` 时因该旧验证器仍读取已删除 `match_review_package.rs` 而失败。
 - `verify-stage-a-architecture.mjs` 只迁移读取路径到 `use_cases/review/package/preview.rs` + `lifecycle.rs`；强类型工作流动作、状态权威、Tauri 薄层、前端能力 DTO、PostgreSQL 状态迁移等原断言保持。
 - canonical 发布期间连接器曾产生瞬时 README-only 异常提交；随后采用 non-force fast-forward 将完整已验证 publication tree 恢复。生产源码未受这些文档异常提交影响，异常 CI 不作为通过证据。
-- AT2 继续保持 `VERIFYING`，等待修复后的完整 frontend/Rust 与 canonical Public Platform CI。
+- 随后的 canonical run `31377744818` 再次通过 architecture，但完整 Windows acceptance 在 `verify-match-event-facts.mjs` 读取已删除的旧 `crates/application/src/match_review_package.rs` 时因 `ENOENT` 失败；该失败明确属于重构后 verifier 路径未同步，不是 Match Review Package 业务实现失败。
+- 修复提交 `23997cde7d3ba46db34fdd2e0577075555391986` 只把 `verify-match-event-facts.mjs` 的应用层读取源迁移到 `use_cases/review/package/shared.rs`；OwnGoal 身份校验及其余事件事实断言保持原样，未恢复旧 owner、未增加转发壳、未修改业务代码或公共契约。
+- PR clean CI run `31404194850` / Windows Automated job `93506381047` 已完整 `SUCCESS`；artifact `9069809674` 大小 `14156070` 字节，SHA-256 `0109171ab7791609e0c92dcdeba6797f651e1ea20175d9967a89f3bc7d256c37`。
+- canonical Public Platform CI run `31406717077` / Windows Automated job `93514736356` 同样完整 `SUCCESS`，architecture、完整 frontend、17 个截图回归视口、TypeScript/Vite、Rust fmt、workspace Clippy `-D warnings`、workspace tests、Windows release 构建、release runtime 启动与 validation evidence upload 均通过；artifact `9070811986`（`windows-automated-delivery-evidence-23997cde7d3ba46db34fdd2e0577075555391986`）大小 `14156296` 字节。
+- 18 个需要专用 `FOOTBALL_TEST_DATABASE_URL` 的 PostgreSQL 集成测试按既有安全设计保持 `ignored`，未记为已执行；本次未执行破坏性数据库验证。
+
+### AT2 关闭
+
+- Match Review Package 的 7 个公开职责已完成模块化迁移，旧 owner 已删除且未恢复兼容壳。
+- canonical Public Platform CI、Windows Automated 与 evidence upload 已满足关闭条件，验证器路径迁移未弱化任何断言。
+- AT2 正式关闭为 `DONE`。R3-08 整体继续 `IN_PROGRESS`；Postmatch 与 Analytics 仍未修改，下一 Atomic Task 可按任务书开放。
