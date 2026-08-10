@@ -24,13 +24,13 @@
     "targetPublicExportPolicy": "explicit re-export only"
   },
   "sourceDigest": "217241ac243726a5ab6805a7f169e222b97e78c7c971749a5904714af673ebdd",
-  "rustUsageDigest": "523ef4e6802efc9bc25d2a57905ff738817e3e61a02e3a8ebcded6fc18667772",
+  "rustUsageDigest": "d7c3b77676985e4ca4368dc7f72df29d4ed8883d954c43d662b879f180ab3c92",
   "summary": {
     "typeCount": 365,
     "publicCompatibilityTypeCount": 365,
     "internalTypeCount": 0,
     "domainSourceFileCount": 129,
-    "scannedRustFileCount": 458,
+    "scannedRustFileCount": 468,
     "databaseMappedTypeCount": 299,
     "byTargetModule": {
       "ai_workspace": 16,
@@ -179,8 +179,11 @@
         "crates/domain/tests/serde_contracts/r2_06_module_paths.rs"
       ],
       "externalCallers": [
+        "crates/application/src/composition/adapters/review.rs",
         "crates/application/src/ports/review/mod.rs",
-        "crates/application/src/review.rs",
+        "crates/application/src/services/review/facade.rs",
+        "crates/application/src/services/review/service.rs",
+        "crates/application/src/use_cases/review/decide_ability_candidate/mod.rs",
         "crates/persistence-postgres/src/review.rs",
         "src-tauri/src/commands/review.rs"
       ],
@@ -321,7 +324,11 @@
         "crates/domain/tests/serde_contracts/r2_06_module_paths.rs"
       ],
       "externalCallers": [
-        "crates/application/src/review.rs",
+        "crates/application/src/composition/adapters/review.rs",
+        "crates/application/src/ports/review/mod.rs",
+        "crates/application/src/services/review/facade.rs",
+        "crates/application/src/services/review/service.rs",
+        "crates/application/src/use_cases/review/list_ability_candidates/mod.rs",
         "crates/persistence-postgres/src/review.rs",
         "src-tauri/src/commands/review.rs"
       ],
@@ -515,8 +522,12 @@
         "crates/domain/tests/serde_contracts/r2_06_module_paths.rs"
       ],
       "externalCallers": [
+        "crates/application/src/composition/adapters/review.rs",
         "crates/application/src/ports/review/mod.rs",
-        "crates/application/src/review.rs",
+        "crates/application/src/services/review/facade.rs",
+        "crates/application/src/services/review/service.rs",
+        "crates/application/src/use_cases/review/decide_ability_candidate/mod.rs",
+        "crates/application/src/use_cases/review/list_ability_candidates/mod.rs",
         "crates/persistence-postgres/src/review.rs",
         "src-tauri/src/commands/review.rs"
       ],
@@ -11454,8 +11465,12 @@
         "crates/domain/tests/serde_contracts/r2_06_module_paths.rs"
       ],
       "externalCallers": [
+        "crates/application/src/composition/adapters/review.rs",
         "crates/application/src/ports/review/mod.rs",
-        "crates/application/src/review.rs",
+        "crates/application/src/services/review/facade.rs",
+        "crates/application/src/services/review/service.rs",
+        "crates/application/src/use_cases/review/generate_match_review/mod.rs",
+        "crates/application/src/use_cases/review/read_match_review/mod.rs",
         "crates/persistence-postgres/src/review.rs",
         "src-tauri/src/commands/review.rs"
       ],
@@ -11551,7 +11566,11 @@
         "crates/domain/tests/serde_contracts/r2_06_module_paths.rs"
       ],
       "externalCallers": [
-        "crates/application/src/review.rs",
+        "crates/application/src/composition/adapters/review.rs",
+        "crates/application/src/ports/review/mod.rs",
+        "crates/application/src/services/review/facade.rs",
+        "crates/application/src/services/review/service.rs",
+        "crates/application/src/use_cases/review/generate_match_review/mod.rs",
         "crates/persistence-postgres/src/review.rs",
         "crates/persistence-postgres/tests/postgres_integration.rs",
         "crates/spreadsheet-io/src/match_review_workbook.rs",
@@ -13388,8 +13407,11 @@
         "crates/domain/tests/serde_contracts/r2_06_module_paths.rs"
       ],
       "externalCallers": [
+        "crates/application/src/composition/adapters/review.rs",
         "crates/application/src/ports/review/mod.rs",
-        "crates/application/src/review.rs",
+        "crates/application/src/services/review/facade.rs",
+        "crates/application/src/services/review/service.rs",
+        "crates/application/src/use_cases/review/list_match_reviews/mod.rs",
         "crates/persistence-postgres/src/review.rs",
         "src-tauri/src/commands/review.rs"
       ],
@@ -23484,8 +23506,11 @@
         "crates/domain/tests/serde_contracts/r2_06_module_paths.rs"
       ],
       "externalCallers": [
+        "crates/application/src/composition/adapters/review.rs",
         "crates/application/src/ports/review/mod.rs",
-        "crates/application/src/review.rs",
+        "crates/application/src/services/review/facade.rs",
+        "crates/application/src/services/review/service.rs",
+        "crates/application/src/use_cases/review/list_reviewable_matches/mod.rs",
         "crates/persistence-postgres/src/review.rs",
         "src-tauri/src/commands/review.rs"
       ],

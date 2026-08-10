@@ -217,3 +217,5 @@ PostgreSQL 实跑、Windows Full 和用户本机 Windows 10/11 实机验收仍�
 ## R3-08 Review / Postmatch / Analytics Services（IN_PROGRESS）
 
 - Atomic Task 1 启动 Review Core 重写：将 `generate_match_review`、复盘列表/读取、可复盘比赛查询及能力候选查询/裁决 6 个公开 Application 职责迁入 `services/review/`、`use_cases/review/`，具体 PostgreSQL 调用仅由 `composition/adapters/review.rs` 实现 `MatchReviewPort`。公共 ApplicationService/Tauri 方法、DTO、SQL、Schema、配置、错误和用户可观察行为保持不变；Match Review Package、Postmatch、Analytics 不在本 Atomic Task 修改范围。
+
+- R3-08 AT1 正式 CI 首次失败：Public Platform CI run `31328591975` 在 `verify:architecture` 的 Domain 类型清单漂移门禁停止；Review Core 业务代码、AT1 专项 hard gate 与完整 staging frontend/Rust 回归此前均已通过。根因是 Review owner 拆分新增/删除 Rust 文件后 `architecture/domain-type-inventory.json` 的源码调用面快照未同步。已按既有生成器重新计算清单，不修改 Domain 类型、Serde、数据库映射、公共接口、SQL、Tauri DTO 或模型保护区，也不放宽任何门禁。

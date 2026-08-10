@@ -122,3 +122,12 @@ R3-02 已正式关闭为 `DONE`。详细记录见 [`R03-02-database-service.md`]
 ### R3-08 当前执行
 
 - Atomic Task 1：Review Core。仅迁移复盘生成/查询与能力候选 6 个 Application 职责；Match Review Package、Postmatch、Analytics 保持原 owner，等待后续独立 Atomic Tasks。
+
+
+### R3-08 Atomic Task 1 — Review Core
+
+- 状态：`VERIFYING`。
+- 已将 `review.rs` 的 6 个 Review Core 公共职责迁入 `services/review/` 与 `use_cases/review/`，持久化适配进入 `composition/adapters/review.rs`；旧 `crates/application/src/review.rs` 已删除。
+- Windows hard gate run `31328023642` 已通过 Review 专项、Application Ports、完整 architecture、保护资产、Application check/tests、完整 `verify:frontend`、完整 `verify:rust`、精确作用域和 clean-tree 检查。
+- 首次正式 Public Platform CI run `31328591975` 在 Domain 类型清单漂移门禁停止；Windows Automated 因前置门禁失败被跳过。该失败未记为通过，AT1 未进入 DONE，AT2 未启动。
+- 已确认漂移仅来自 Application Rust owner 文件集合变化，正在用既有确定性生成器刷新 `architecture/domain-type-inventory.json` 并重新执行完整门禁。
