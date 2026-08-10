@@ -69,3 +69,10 @@
 ### 后续门禁
 
 - 当前仍为 `VERIFYING`。只有 canonical `rewrite/r3-08-review-postmatch-analytics` 的 Public Platform CI、Windows Automated 与 evidence upload 成功并完成关闭记录后，AT2 才可标记 `DONE` 并开放下一 Atomic Task。
+
+### Canonical CI 第一次失败与 Stage-A 验证器恢复
+
+- canonical run `31363234205` 的 `verify:architecture` 已通过；Windows Automated 在 frontend 聚合门禁执行 `verify-stage-a-architecture.mjs` 时因该旧验证器仍读取已删除 `match_review_package.rs` 而失败。
+- `verify-stage-a-architecture.mjs` 只迁移读取路径到 `use_cases/review/package/preview.rs` + `lifecycle.rs`；强类型工作流动作、状态权威、Tauri 薄层、前端能力 DTO、PostgreSQL 状态迁移等原断言保持。
+- canonical 发布期间连接器曾产生瞬时 README-only 异常提交；随后采用 non-force fast-forward 将完整已验证 publication tree 恢复。生产源码未受这些文档异常提交影响，异常 CI 不作为通过证据。
+- AT2 继续保持 `VERIFYING`，等待修复后的完整 frontend/Rust 与 canonical Public Platform CI。
