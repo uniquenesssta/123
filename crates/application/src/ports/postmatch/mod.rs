@@ -14,10 +14,11 @@ pub trait PostmatchSettlementPort: Send + Sync {
         &self,
         draft: &PostmatchSettlementDraft,
     ) -> PortResult<PostmatchSettlementRecord>;
-    async fn list_settlements(&self, limit: i64) -> PortResult<Vec<PostmatchSettlementRecord>>;
+    async fn list_settlements(&self, limit: u32) -> PortResult<Vec<PostmatchSettlementRecord>>;
     async fn list_evidence_scoring_items(
         &self,
-        settlement_id: Uuid,
+        status: Option<&str>,
+        limit: u32,
     ) -> PortResult<Vec<EvidenceScoringItemRecord>>;
     async fn decide_evidence_scoring_item(
         &self,
@@ -31,5 +32,5 @@ pub trait PostmatchMonitoringPort: Send + Sync {
         &self,
         request: &PostmatchMonitoringRequest,
     ) -> PortResult<PostmatchOverview>;
-    async fn overview(&self) -> PortResult<PostmatchOverview>;
+    async fn overview(&self, limit: u32) -> PortResult<PostmatchOverview>;
 }

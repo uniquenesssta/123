@@ -18,7 +18,10 @@ const application = [
   read("crates/application/src/use_cases/review/package/preview.rs"),
   read("crates/application/src/use_cases/review/package/lifecycle.rs"),
 ].join("\n");
-const postmatchApplication = read("crates/application/src/postmatch.rs");
+const postmatchApplication = [
+  read("crates/application/src/services/postmatch/facade.rs"),
+  read("crates/application/src/use_cases/postmatch/settle_postmatch_review/mod.rs"),
+].join("\n");
 const persistence = read("crates/persistence-postgres/src/match_review_package.rs");
 const commands = read("src-tauri/src/commands/postmatch.rs");
 const apiClient = read("src/api/client.ts");

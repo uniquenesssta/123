@@ -1,6 +1,7 @@
 mod jobs;
 mod lineups;
 mod players;
+mod postmatch;
 mod prediction;
 mod research;
 mod review;

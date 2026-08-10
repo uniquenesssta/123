@@ -24,13 +24,13 @@
     "targetPublicExportPolicy": "explicit re-export only"
   },
   "sourceDigest": "217241ac243726a5ab6805a7f169e222b97e78c7c971749a5904714af673ebdd",
-  "rustUsageDigest": "956e55bf6d80074950e262be06fcb13695bfe365f0730e9ef4caa796952eeafa",
+  "rustUsageDigest": "04077e5ffe3111bebe2952d23a6f97e281adc0d88799cc6272f4c733ccf90892",
   "summary": {
     "typeCount": 365,
     "publicCompatibilityTypeCount": 365,
     "internalTypeCount": 0,
     "domainSourceFileCount": 129,
-    "scannedRustFileCount": 474,
+    "scannedRustFileCount": 485,
     "databaseMappedTypeCount": 299,
     "byTargetModule": {
       "ai_workspace": 16,
@@ -7849,8 +7849,11 @@
         "crates/domain/tests/serde_contracts/r2_06_module_paths.rs"
       ],
       "externalCallers": [
+        "crates/application/src/composition/adapters/postmatch.rs",
         "crates/application/src/ports/postmatch/mod.rs",
-        "crates/application/src/postmatch.rs",
+        "crates/application/src/services/postmatch/facade.rs",
+        "crates/application/src/services/postmatch/service.rs",
+        "crates/application/src/use_cases/postmatch/decide_evidence_scoring_item/mod.rs",
         "crates/persistence-postgres/src/postmatch.rs",
         "src-tauri/src/commands/postmatch.rs"
       ],
@@ -7994,8 +7997,12 @@
         "crates/domain/tests/serde_contracts/r2_06_module_paths.rs"
       ],
       "externalCallers": [
+        "crates/application/src/composition/adapters/postmatch.rs",
         "crates/application/src/ports/postmatch/mod.rs",
-        "crates/application/src/postmatch.rs",
+        "crates/application/src/services/postmatch/facade.rs",
+        "crates/application/src/services/postmatch/service.rs",
+        "crates/application/src/use_cases/postmatch/decide_evidence_scoring_item/mod.rs",
+        "crates/application/src/use_cases/postmatch/list_evidence_scoring_items/mod.rs",
         "crates/persistence-postgres/src/postmatch.rs",
         "src-tauri/src/commands/postmatch.rs"
       ],
@@ -12989,7 +12996,7 @@
         "crates/domain/tests/serde_contracts/r2_06_module_paths.rs"
       ],
       "externalCallers": [
-        "crates/application/src/postmatch.rs",
+        "crates/application/src/use_cases/postmatch/settle_postmatch_review/mod.rs",
         "crates/application/src/use_cases/review/package/lifecycle.rs",
         "crates/application/src/use_cases/review/package/preview.rs",
         "crates/persistence-postgres/tests/postgres_integration.rs"
@@ -13243,7 +13250,7 @@
         "crates/domain/tests/serde_contracts/r2_06_module_paths.rs"
       ],
       "externalCallers": [
-        "crates/application/src/postmatch.rs",
+        "crates/application/src/use_cases/postmatch/settle_postmatch_review/mod.rs",
         "crates/persistence-postgres/src/match_review_package.rs",
         "crates/persistence-postgres/tests/postgres_integration.rs"
       ],
@@ -20427,8 +20434,11 @@
         "crates/domain/tests/serde_contracts/r2_06_module_paths.rs"
       ],
       "externalCallers": [
+        "crates/application/src/composition/adapters/postmatch.rs",
         "crates/application/src/ports/postmatch/mod.rs",
-        "crates/application/src/postmatch.rs",
+        "crates/application/src/services/postmatch/facade.rs",
+        "crates/application/src/services/postmatch/service.rs",
+        "crates/application/src/use_cases/postmatch/refresh_postmatch_monitoring/mod.rs",
         "crates/persistence-postgres/src/postmatch.rs",
         "src-tauri/src/commands/postmatch.rs"
       ],
@@ -20503,8 +20513,12 @@
         "crates/domain/tests/serde_contracts/r2_06_module_paths.rs"
       ],
       "externalCallers": [
+        "crates/application/src/composition/adapters/postmatch.rs",
         "crates/application/src/ports/postmatch/mod.rs",
-        "crates/application/src/postmatch.rs",
+        "crates/application/src/services/postmatch/facade.rs",
+        "crates/application/src/services/postmatch/service.rs",
+        "crates/application/src/use_cases/postmatch/postmatch_overview/mod.rs",
+        "crates/application/src/use_cases/postmatch/refresh_postmatch_monitoring/mod.rs",
         "crates/persistence-postgres/src/postmatch.rs",
         "src-tauri/src/commands/postmatch.rs"
       ],
@@ -20567,8 +20581,11 @@
         "crates/domain/tests/serde_contracts/r2_06_module_paths.rs"
       ],
       "externalCallers": [
+        "crates/application/src/composition/adapters/postmatch.rs",
         "crates/application/src/ports/postmatch/mod.rs",
-        "crates/application/src/postmatch.rs",
+        "crates/application/src/services/postmatch/facade.rs",
+        "crates/application/src/services/postmatch/service.rs",
+        "crates/application/src/use_cases/postmatch/settle_postmatch_review/mod.rs",
         "crates/persistence-postgres/src/postmatch.rs",
         "src-tauri/src/commands/postmatch.rs"
       ],
@@ -20679,8 +20696,11 @@
         "crates/domain/tests/serde_contracts/r2_06_module_paths.rs"
       ],
       "externalCallers": [
+        "crates/application/src/composition/adapters/postmatch.rs",
         "crates/application/src/ports/postmatch/mod.rs",
-        "crates/application/src/postmatch.rs",
+        "crates/application/src/services/postmatch/facade.rs",
+        "crates/application/src/services/postmatch/service.rs",
+        "crates/application/src/use_cases/postmatch/postmatch_settlement_readiness/mod.rs",
         "crates/persistence-postgres/src/postmatch.rs",
         "src-tauri/src/commands/postmatch.rs"
       ],
@@ -20852,8 +20872,12 @@
         "crates/domain/tests/serde_contracts/r2_06_module_paths.rs"
       ],
       "externalCallers": [
+        "crates/application/src/composition/adapters/postmatch.rs",
         "crates/application/src/ports/postmatch/mod.rs",
-        "crates/application/src/postmatch.rs",
+        "crates/application/src/services/postmatch/facade.rs",
+        "crates/application/src/services/postmatch/service.rs",
+        "crates/application/src/use_cases/postmatch/list_postmatch_settlements/mod.rs",
+        "crates/application/src/use_cases/postmatch/settle_postmatch_review/mod.rs",
         "crates/persistence-postgres/src/postmatch.rs",
         "src-tauri/src/commands/postmatch.rs"
       ],

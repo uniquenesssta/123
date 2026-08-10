@@ -50,6 +50,16 @@ pub trait MatchReviewPackageStatePort: Send + Sync {
     async fn read_workflow(&self, package_id: Uuid)
         -> PortResult<MatchReviewPackageWorkflowRecord>;
 
+    async fn read_workflow_by_review(
+        &self,
+        review_id: Uuid,
+    ) -> PortResult<Option<MatchReviewPackageWorkflowRecord>>;
+
+    async fn mark_settled(
+        &self,
+        review_id: Uuid,
+    ) -> PortResult<Option<MatchReviewPackageWorkflowRecord>>;
+
     async fn record_preview(
         &self,
         package_id: Uuid,

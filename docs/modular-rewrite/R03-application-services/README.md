@@ -123,7 +123,7 @@ R3-02 已正式关闭为 `DONE`。详细记录见 [`R03-02-database-service.md`]
 
 - Atomic Task 1 — Review Core：`DONE`。
 - Atomic Task 2 — Match Review Package：`DONE`。
-- R3-08 整体继续 `IN_PROGRESS`；Postmatch 与 Analytics 尚未实施，下一 Atomic Task 可按任务书开放。
+- R3-08 整体继续 `IN_PROGRESS`；Atomic Task 3 — Postmatch Service：`VERIFYING`；Analytics 尚未实施。
 
 
 ### R3-08 Atomic Task 1 — Review Core
@@ -142,3 +142,11 @@ R3-02 已正式关闭为 `DONE`。详细记录见 [`R03-02-database-service.md`]
 - 初始 `31359686297` 已通过专项、Application Rust、完整 frontend/Rust 与 scope；fresh-checkout `31360521486` 暴露 Domain inventory 未固化及 R3-01 冻结 WorkflowPort 误删。最终 recovery `31362128833` 已恢复 37-Port 契约、将 AT2 低层状态接口明确为 `MatchReviewPackageStatePort`，并通过专项、完整 architecture、保护资产、Application Rust、完整 frontend/Rust、scope、clean commit 与 clean-tree。canonical 提交 `23997cde7d3ba46db34fdd2e0577075555391986` 的 Public Platform CI run `31406717077` / Windows Automated job `93514736356` 已 `SUCCESS`，AT2 已正式标记 `DONE`。
 - 在最终关闭前，canonical run `31377744818` 曾因 `verify-match-event-facts.mjs` 仍读取已删除旧 owner 而 `ENOENT` 失败；修复提交 `23997cde7d3ba46db34fdd2e0577075555391986` 只迁移 verifier 读取路径到 `use_cases/review/package/shared.rs`，原事件事实断言未弱化。PR clean CI run `31404194850` / job `93506381047` 与 canonical run `31406717077` / job `93514736356` 均完整 `SUCCESS`；canonical evidence artifact `9070811986` 大小 `14156296` 字节。18 个 PostgreSQL 集成测试因未配置专用 `FOOTBALL_TEST_DATABASE_URL` 保持 `ignored`，未记为已执行。
 - AT2 canonical run `31363234205`：architecture PASS，Windows Automated 因旧 Stage-A verifier 读取已删除 `match_review_package.rs` 失败；当时只迁移该验证器 authoritative source 路径，随后 run `31377744818` 又暴露 `verify-match-event-facts.mjs` 的第二处旧 owner 路径，并由提交 `23997cde7d3ba46db34fdd2e0577075555391986` 修复；最终 canonical run `31406717077` 全链 `SUCCESS`。
+
+### R3-08 Atomic Task 3 — Postmatch Service
+
+- 状态：`VERIFYING`。
+- 7 个 Postmatch 公共职责按独立 Use Case 迁入 `services/postmatch/`、`use_cases/postmatch/`，旧 `crates/application/src/postmatch.rs` 删除；两个既有 Postmatch Ports 对齐真实查询参数并由 `composition/adapters/postmatch.rs` 实现。
+- 结算继续复用 AT2 `MatchReviewPackageStatePort` 维护 `review_created -> settled` 状态机，没有新增重复 workflow owner；Analytics 未修改。
+- 旧 Postmatch Application owner 的全仓引用已扫描；Domain inventory 由既有确定性生成器刷新，Review Service、Stage-A 与 Postmatch Settlement verifier 仅迁移到新 authoritative owner，原门禁不弱化。
+- Windows hard gate：run `31419165233`：Postmatch 专项、Application Ports、完整 architecture、保护资产、rustfmt、Application check/tests、完整 frontend 与完整 Rust 回归均 `SUCCESS`。

@@ -86,3 +86,32 @@
 - Match Review Package 的 7 个公开职责已完成模块化迁移，旧 owner 已删除且未恢复兼容壳。
 - canonical Public Platform CI、Windows Automated 与 evidence upload 已满足关闭条件，验证器路径迁移未弱化任何断言。
 - AT2 正式关闭为 `DONE`。R3-08 整体继续 `IN_PROGRESS`；Postmatch 与 Analytics 仍未修改，下一 Atomic Task 可按任务书开放。
+
+## Atomic Task 3 — Postmatch Service
+
+状态：`VERIFYING`
+
+### 已实施
+
+- 保持 `postmatch_settlement_readiness`、`settle_postmatch_review`、`list_postmatch_settlements`、`list_evidence_scoring_items`、`decide_evidence_scoring_item`、`refresh_postmatch_monitoring`、`postmatch_overview` 七个公共 ApplicationService/Tauri 入口及参数/返回 DTO 不变。
+- 删除旧 `crates/application/src/postmatch.rs`，不保留转发壳；新增唯一 `PostmatchService`，每个公开职责进入独立 `use_cases/postmatch/<use-case>/`。
+- 继续使用 R3-01 的 `PostmatchSettlementPort` / `PostmatchMonitoringPort`，把原先与真实公共/持久化 API 不一致的 limit/status/overview 参数对齐；没有新增万能 Repository 或重复 Postmatch Port。
+- `settle_postmatch_review` 继续先检查 Match Review Package workflow 的 `SettleReview` action，再写 settlement，最后推进 package workflow 到 `settled`；状态读取/推进复用 AT2 `MatchReviewPackageStatePort`，没有第二状态 owner。
+- PostgreSQL 具体 Postmatch 调用只由 `composition/adapters/postmatch.rs` 适配；Service / Use Case 不依赖 PostgreSQL、SQLx、PostgresStore 或 PersistenceStore。
+- 全仓旧 owner 扫描确认受影响验证器为 Postmatch Settlement、Review Service 阶段保护和 Stage-A workflow 三处；均只迁移 authoritative 读取位置并保留原断言。Domain type inventory 由既有生成器刷新。
+- 新增 `verify-postmatch-service.mjs`，锁定模块边界、7 个公共入口、2 个既有 Ports、资料包状态机和 composition，并接入 `verify:architecture` 与完整 frontend 聚合验证。
+
+### 未改变
+
+- `crates/application/src/analytics.rs` 及 Analytics Service 范围。
+- PostgreSQL SQL/migration/Schema、Tauri 命令/DTO、Domain 类型与数据格式。
+- 模型保护区、生产依赖、错误语义、日志等级和用户可观察业务行为。
+
+### 验证事实
+
+- Windows hard gate：run `31419165233`：Postmatch 专项、Application Ports、完整 architecture、保护资产、rustfmt、Application check/tests、完整 frontend 与完整 Rust 回归均 `SUCCESS`。
+- 18 个需要专用 `FOOTBALL_TEST_DATABASE_URL` 的 PostgreSQL 集成测试未配置专用测试库时必须保持 `ignored`，不得记为已执行。
+
+### 后续门禁
+
+- 当前保持 `VERIFYING`。只有 AT3 hard gate 与 canonical Public Platform CI / Windows Automated / evidence upload 全部成功并完成关闭记录后，才可标记 `DONE` 并开放 Analytics Atomic Task。

@@ -220,6 +220,26 @@ impl MatchReviewPackageStatePort for ActiveDatabase {
             .map_err(map_persistence_error)
     }
 
+    async fn read_workflow_by_review(
+        &self,
+        review_id: Uuid,
+    ) -> PortResult<Option<MatchReviewPackageWorkflowRecord>> {
+        self.transition_store()
+            .read_match_review_package_workflow_by_review(review_id)
+            .await
+            .map_err(map_persistence_error)
+    }
+
+    async fn mark_settled(
+        &self,
+        review_id: Uuid,
+    ) -> PortResult<Option<MatchReviewPackageWorkflowRecord>> {
+        self.transition_store()
+            .mark_match_review_package_settled(review_id)
+            .await
+            .map_err(map_persistence_error)
+    }
+
     async fn record_preview(
         &self,
         package_id: Uuid,

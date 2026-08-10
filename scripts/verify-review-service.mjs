@@ -106,8 +106,9 @@ const composition = fs.readFileSync(path.join(root, "crates/application/src/comp
 const appService = fs.readFileSync(path.join(root, "crates/application/src/service/application_service.rs"), "utf8");
 if (!composition.includes("review: ReviewService")) failures.push("ApplicationComposition 未持有唯一 ReviewService");
 if (!appService.includes("pub(crate) review: ReviewService")) failures.push("ApplicationService 未持有 ReviewService");
-if (!fs.existsSync(path.join(root, "crates/application/src/postmatch.rs"))) failures.push("AT2 不得提前迁移 postmatch.rs");
-if (!fs.existsSync(path.join(root, "crates/application/src/analytics.rs"))) failures.push("AT2 不得提前迁移 analytics.rs");
+if (fs.existsSync(path.join(root, "crates/application/src/postmatch.rs"))) failures.push("AT3 后旧 postmatch.rs 不得恢复");
+if (!fs.existsSync(path.join(root, "crates/application/src/services/postmatch/facade.rs"))) failures.push("AT3 Postmatch facade 未建立");
+if (!fs.existsSync(path.join(root, "crates/application/src/analytics.rs"))) failures.push("AT3 不得提前迁移 analytics.rs");
 
 if (failures.length) {
   console.error("Review Service 验证失败：\n- " + failures.join("\n- "));

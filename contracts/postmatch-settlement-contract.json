@@ -54,7 +54,7 @@
   "migration": "crates/persistence-postgres/migrations/0026_postmatch_settlement.sql",
   "artifacts": [
     "crates/domain/src/postmatch.rs",
-    "crates/application/src/postmatch.rs",
+    "crates/application/src/services/postmatch/facade.rs",
     "crates/persistence-postgres/src/postmatch.rs",
     "crates/persistence-postgres/src/parameter_lifecycle.rs",
     "src-tauri/src/commands/postmatch.rs",
