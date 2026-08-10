@@ -18,8 +18,10 @@
 
 - Windows AT1 hard gate run `31328023642`：Review 专项、Application Ports、完整 architecture、模型保护资产、rustfmt、Application check/tests、完整 frontend、完整 Rust、精确作用域与 clean tree 均通过。
 - clean Review Core tree 已形成正式 Atomic commit `6059d7a79f34bb31a5b81b56a1c15af0a30db11a`。
-- 首次 Public Platform CI run `31328591975` 在 `verify:architecture` 停止，明确错误为 Domain 类型与契约清单漂移；Windows Automated 未执行，因此 AT1 仍为 `VERIFYING`。
-- 根因：Review owner 拆分改变了 Application Rust 文件/调用面，但 `architecture/domain-type-inventory.json` 仍保存拆分前的 `rustUsageDigest`、扫描文件数量及外部调用者路径。修复只重新生成该确定性清单，不改变 Domain 类型定义、Serde、数据库映射或公共契约。
+- 首次 Public Platform CI run `31328591975` 在 `verify:architecture` 停止，明确错误为 Domain 类型与契约清单漂移；Windows Automated 未执行，因此 AT1 保持 `VERIFYING`。
+- 根因：Review owner 拆分改变了 Application Rust 文件/调用面，但 `architecture/domain-type-inventory.json` 仍保存拆分前的 `rustUsageDigest`、扫描文件数量及外部调用者路径。已按既有生成器刷新清单；恢复 run `31348056577` 的 inventory、Review 专项、Application Ports、完整 architecture、保护资产、完整 frontend/Rust、scope 与 clean tree 均通过。
+- 刷新后的正式提交 `586ad2196be7218e366cf1715fbbf69d87d91f01` 触发第二次 Public Platform CI run `31349803381`。Domain inventory、Domain 根出口、Application Ports、Database、Competition/Rules、Teams/Players、Lineups、Prediction、Research 门禁均已通过；随后 `scripts/verify-review-service.mjs` 在 Node 22 clean checkout 中因普通字符串被错误写成跨行文本而触发 `SyntaxError: Invalid or unexpected token`，Windows Automated 再次因前置架构门禁失败被跳过。
+- 第二次失败定位为 Review 专项验证器自身语法缺陷，不是 Review Core 业务实现失败。修复仅将失败输出改为显式 `\n` 拼接，并在恢复门禁增加 `node --check scripts/verify-review-service.mjs`；不删除、不放宽任何验证断言。
 
 ### 未改变
 
@@ -31,5 +33,5 @@
 
 ### 后续门禁
 
-- 刷新 Domain inventory 后重新通过 Review 专项、Application Ports、完整 architecture、保护资产、完整 frontend、完整 Rust。
-- 形成 clean recovery commit 后重新运行 Public Platform CI；只有正式 CI 与 Windows Automated 成功并完成记录回写，AT1 才可标记 `DONE`，随后才允许进入 AT2。
+- 在与正式 CI 一致的 Node 22 环境先通过 Review verifier 语法检查，再通过 Review 专项、Application Ports、完整 architecture、保护资产、Application check/tests、完整 frontend 与完整 Rust。
+- 形成 clean verifier recovery commit 后重新运行 Public Platform CI；只有正式 CI 与 Windows Automated 成功并完成记录回写，AT1 才可标记 `DONE`，随后才允许进入 AT2。

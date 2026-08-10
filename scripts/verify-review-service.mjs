@@ -69,9 +69,7 @@ if (!composition.includes("review: ReviewService")) failures.push("ApplicationCo
 if (!appService.includes("pub(crate) review: ReviewService")) failures.push("ApplicationService 未持有 ReviewService");
 
 if (failures.length) {
-  console.error("Review Service 验证失败：
-- " + failures.join("
-- "));
+  console.error("Review Service 验证失败：\n- " + failures.join("\n- "));
   process.exit(1);
 }
-console.log("Review Service 验证通过：6 个 Review Core 公共职责已迁入 Service/Use Case/Port，旧 review.rs 已退出，Tauri 公共命令保持原名。 ");
+console.log("Review Service 验证通过：6 个 Review Core 公共职责已迁入 Service/Use Case/Port，旧 review.rs 已退出，Tauri 公共命令保持原名。");

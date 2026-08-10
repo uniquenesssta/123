@@ -131,3 +131,4 @@ R3-02 已正式关闭为 `DONE`。详细记录见 [`R03-02-database-service.md`]
 - Windows hard gate run `31328023642` 已通过 Review 专项、Application Ports、完整 architecture、保护资产、Application check/tests、完整 `verify:frontend`、完整 `verify:rust`、精确作用域和 clean-tree 检查。
 - 首次正式 Public Platform CI run `31328591975` 在 Domain 类型清单漂移门禁停止；Windows Automated 因前置门禁失败被跳过。该失败未记为通过，AT1 未进入 DONE，AT2 未启动。
 - 已确认漂移仅来自 Application Rust owner 文件集合变化，正在用既有确定性生成器刷新 `architecture/domain-type-inventory.json` 并重新执行完整门禁。
+- 第二次正式 Public Platform CI run `31349803381` 已通过 Domain inventory、Domain 根出口及 R3-01～R3-07 既有专项门禁，随后因 `verify-review-service.mjs` 自身跨行字符串语法错误停止；Windows Automated 未执行。AT1 继续保持 `VERIFYING`，当前修复只针对验证器语法并增加 Node 22 `node --check`，AT2 未启动。
