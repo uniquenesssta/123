@@ -48,17 +48,59 @@ jobs:
         with:
           workspaces: 项目源码 -> ../.cargo-target
 
-      - name: Refresh generated Domain inventory for AT2
+      - name: Migrate stale Spreadsheet verifier owners
         shell: pwsh
         working-directory: 项目源码
         run: |
-          node scripts/generate-domain-type-inventory.mjs
+          function Replace-Exact([string]$Path, [string]$Old, [string]$New) {
+            $content = [System.IO.File]::ReadAllText($Path)
+            if (-not $content.Contains($Old)) { throw "Expected verifier fragment missing: $Path :: $Old" }
+            [System.IO.File]::WriteAllText($Path, $content.Replace($Old, $New), [System.Text.UTF8Encoding]::new($false))
+          }
+
+          Replace-Exact "scripts/verify-formation-usage.mjs" `
+            'const spreadsheetApplication = read("crates/application/src/spreadsheet.rs");' `
+            'const spreadsheetApplication = read("crates/application/src/use_cases/exchange/preview_team_package_import/coverage.rs");'
+
+          Replace-Exact "scripts/verify-monthly-workbooks.mjs" `
+            'const application = read("crates/application/src/spreadsheet.rs");' `
+            'const application = read("crates/application/src/use_cases/exchange/preview_player_catalog_import/use_case.rs");'
+
+          Replace-Exact "scripts/verify-team-package-import-normalization.mjs" `
+            'const application = read("crates/application/src/spreadsheet.rs");' `
+            @'const application =
+  read("crates/application/src/use_cases/exchange/preview_team_package_import/package_rows.rs") +
+  read("crates/application/src/use_cases/exchange/preview_team_package_import/use_case.rs") +
+  read("crates/application/src/use_cases/exchange/commit_team_package_import/use_case.rs");'@
+          Replace-Exact "scripts/verify-team-package-import-normalization.mjs" 'collect_package_team_references' 'collect_team_references'
+          Replace-Exact "scripts/verify-team-package-import-normalization.mjs" 'preview_spreadsheet_import_with_team_references' 'preview_import_with_team_references'
+
+          Replace-Exact "scripts/verify-team-package-localized-names.mjs" `
+            'const app = read("crates/application/src/spreadsheet.rs");' `
+            'const app = read("crates/application/src/use_cases/exchange/export_team_package_template/use_case.rs");'
+
+          Replace-Exact "scripts/verify-team-package-real-import-recovery.mjs" `
+            'const application = read("crates/application/src/spreadsheet.rs");' `
+            @'const application =
+  read("crates/application/src/use_cases/exchange/commit_team_package_import/policy.rs") +
+  read("crates/application/src/use_cases/exchange/commit_team_package_import/use_case.rs");'@
+
+          Replace-Exact "scripts/verify-team-package.mjs" `
+            'const application = read("crates/application/src/spreadsheet.rs");' `
+            @'const application =
+  read("crates/application/src/services/exchange/facade/spreadsheet.rs") +
+  read("crates/application/src/use_cases/exchange/preview_team_package_import/use_case.rs") +
+  read("crates/application/src/use_cases/exchange/preview_team_package_import/coverage.rs") +
+  read("crates/application/src/use_cases/exchange/commit_team_package_import/policy.rs") +
+  read("crates/application/src/use_cases/exchange/export_team_package_preview_json/use_case.rs");'@
+          Replace-Exact "scripts/verify-team-package.mjs" 'application.includes("team_package_coverage")' 'application.includes("coverage::calculate")'
+
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add architecture/domain-type-inventory.json
+          git add scripts/verify-formation-usage.mjs scripts/verify-monthly-workbooks.mjs scripts/verify-team-package-import-normalization.mjs scripts/verify-team-package-localized-names.mjs scripts/verify-team-package-real-import-recovery.mjs scripts/verify-team-package.mjs
           git diff --cached --quiet
           if ($LASTEXITCODE -ne 0) {
-            git commit -m "chore(r3-09): refresh domain type inventory"
+            git commit -m "test(r3-09): migrate spreadsheet verifier owners"
             git push origin HEAD:agent/r3-09-at2-builder
           }
 
