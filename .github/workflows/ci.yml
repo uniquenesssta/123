@@ -66,12 +66,15 @@ jobs:
             'const application = read("crates/application/src/spreadsheet.rs");' `
             'const application = read("crates/application/src/use_cases/exchange/preview_player_catalog_import/use_case.rs");'
 
+          $normalizationApplication = @(
+            'const application =',
+            '  read("crates/application/src/use_cases/exchange/preview_team_package_import/package_rows.rs") +',
+            '  read("crates/application/src/use_cases/exchange/preview_team_package_import/use_case.rs") +',
+            '  read("crates/application/src/use_cases/exchange/commit_team_package_import/use_case.rs");'
+          ) -join "`n"
           Replace-Exact "scripts/verify-team-package-import-normalization.mjs" `
             'const application = read("crates/application/src/spreadsheet.rs");' `
-            @'const application =
-  read("crates/application/src/use_cases/exchange/preview_team_package_import/package_rows.rs") +
-  read("crates/application/src/use_cases/exchange/preview_team_package_import/use_case.rs") +
-  read("crates/application/src/use_cases/exchange/commit_team_package_import/use_case.rs");'@
+            $normalizationApplication
           Replace-Exact "scripts/verify-team-package-import-normalization.mjs" 'collect_package_team_references' 'collect_team_references'
           Replace-Exact "scripts/verify-team-package-import-normalization.mjs" 'preview_spreadsheet_import_with_team_references' 'preview_import_with_team_references'
 
@@ -79,20 +82,26 @@ jobs:
             'const app = read("crates/application/src/spreadsheet.rs");' `
             'const app = read("crates/application/src/use_cases/exchange/export_team_package_template/use_case.rs");'
 
+          $recoveryApplication = @(
+            'const application =',
+            '  read("crates/application/src/use_cases/exchange/commit_team_package_import/policy.rs") +',
+            '  read("crates/application/src/use_cases/exchange/commit_team_package_import/use_case.rs");'
+          ) -join "`n"
           Replace-Exact "scripts/verify-team-package-real-import-recovery.mjs" `
             'const application = read("crates/application/src/spreadsheet.rs");' `
-            @'const application =
-  read("crates/application/src/use_cases/exchange/commit_team_package_import/policy.rs") +
-  read("crates/application/src/use_cases/exchange/commit_team_package_import/use_case.rs");'@
+            $recoveryApplication
 
+          $teamPackageApplication = @(
+            'const application =',
+            '  read("crates/application/src/services/exchange/facade/spreadsheet.rs") +',
+            '  read("crates/application/src/use_cases/exchange/preview_team_package_import/use_case.rs") +',
+            '  read("crates/application/src/use_cases/exchange/preview_team_package_import/coverage.rs") +',
+            '  read("crates/application/src/use_cases/exchange/commit_team_package_import/policy.rs") +',
+            '  read("crates/application/src/use_cases/exchange/export_team_package_preview_json/use_case.rs");'
+          ) -join "`n"
           Replace-Exact "scripts/verify-team-package.mjs" `
             'const application = read("crates/application/src/spreadsheet.rs");' `
-            @'const application =
-  read("crates/application/src/services/exchange/facade/spreadsheet.rs") +
-  read("crates/application/src/use_cases/exchange/preview_team_package_import/use_case.rs") +
-  read("crates/application/src/use_cases/exchange/preview_team_package_import/coverage.rs") +
-  read("crates/application/src/use_cases/exchange/commit_team_package_import/policy.rs") +
-  read("crates/application/src/use_cases/exchange/export_team_package_preview_json/use_case.rs");'@
+            $teamPackageApplication
           Replace-Exact "scripts/verify-team-package.mjs" 'application.includes("team_package_coverage")' 'application.includes("coverage::calculate")'
 
           git config user.name "github-actions[bot]"
