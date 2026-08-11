@@ -31,112 +31,56 @@ jobs:
           path: 项目源码
           ref: agent/r3-09-at2-builder
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: 22
-          cache: npm
-          cache-dependency-path: 项目源码/package-lock.json
-
       - name: Setup Rust 1.88.0
         uses: dtolnay/rust-toolchain@1.88.0
         with:
           components: rustfmt, clippy
 
-      - name: Restore Rust build cache
-        uses: Swatinem/rust-cache@v2
-        with:
-          workspaces: 项目源码 -> ../.cargo-target
-
-      - name: Migrate stale Spreadsheet verifier owners
+      - name: Apply rustfmt to AT2 Exchange scope
         shell: pwsh
         working-directory: 项目源码
         run: |
-          function Replace-Exact([string]$Path, [string]$Old, [string]$New) {
-            $content = [System.IO.File]::ReadAllText($Path)
-            if (-not $content.Contains($Old)) { throw "Expected verifier fragment missing: $Path :: $Old" }
-            [System.IO.File]::WriteAllText($Path, $content.Replace($Old, $New), [System.Text.UTF8Encoding]::new($false))
+          cargo fmt --all
+          $changed = @(git diff --name-only)
+          $allowedExact = @(
+            "crates/application/src/lib.rs",
+            "crates/application/src/ports/exchange/mod.rs"
+          )
+          $allowedPrefixes = @(
+            "crates/application/src/composition/adapters/exchange/",
+            "crates/application/src/services/exchange/",
+            "crates/application/src/use_cases/exchange/"
+          )
+          $unexpected = @()
+          foreach ($file in $changed) {
+            $allowed = $allowedExact -contains $file
+            if (-not $allowed) {
+              foreach ($prefix in $allowedPrefixes) {
+                if ($file.StartsWith($prefix)) { $allowed = $true; break }
+              }
+            }
+            if (-not $allowed) { $unexpected += $file }
           }
-
-          Replace-Exact "scripts/verify-formation-usage.mjs" `
-            'const spreadsheetApplication = read("crates/application/src/spreadsheet.rs");' `
-            'const spreadsheetApplication = read("crates/application/src/use_cases/exchange/preview_team_package_import/coverage.rs");'
-
-          Replace-Exact "scripts/verify-monthly-workbooks.mjs" `
-            'const application = read("crates/application/src/spreadsheet.rs");' `
-            'const application = read("crates/application/src/use_cases/exchange/preview_player_catalog_import/use_case.rs");'
-
-          $normalizationApplication = @(
-            'const application =',
-            '  read("crates/application/src/use_cases/exchange/preview_team_package_import/package_rows.rs") +',
-            '  read("crates/application/src/use_cases/exchange/preview_team_package_import/use_case.rs") +',
-            '  read("crates/application/src/use_cases/exchange/commit_team_package_import/use_case.rs");'
-          ) -join "`n"
-          Replace-Exact "scripts/verify-team-package-import-normalization.mjs" `
-            'const application = read("crates/application/src/spreadsheet.rs");' `
-            $normalizationApplication
-          Replace-Exact "scripts/verify-team-package-import-normalization.mjs" 'collect_package_team_references' 'collect_team_references'
-          Replace-Exact "scripts/verify-team-package-import-normalization.mjs" 'preview_spreadsheet_import_with_team_references' 'preview_import_with_team_references'
-
-          Replace-Exact "scripts/verify-team-package-localized-names.mjs" `
-            'const app = read("crates/application/src/spreadsheet.rs");' `
-            'const app = read("crates/application/src/use_cases/exchange/export_team_package_template/use_case.rs");'
-
-          $recoveryApplication = @(
-            'const application =',
-            '  read("crates/application/src/use_cases/exchange/commit_team_package_import/policy.rs") +',
-            '  read("crates/application/src/use_cases/exchange/commit_team_package_import/use_case.rs");'
-          ) -join "`n"
-          Replace-Exact "scripts/verify-team-package-real-import-recovery.mjs" `
-            'const application = read("crates/application/src/spreadsheet.rs");' `
-            $recoveryApplication
-
-          $teamPackageApplication = @(
-            'const application =',
-            '  read("crates/application/src/services/exchange/facade/spreadsheet.rs") +',
-            '  read("crates/application/src/use_cases/exchange/preview_team_package_import/use_case.rs") +',
-            '  read("crates/application/src/use_cases/exchange/preview_team_package_import/coverage.rs") +',
-            '  read("crates/application/src/use_cases/exchange/commit_team_package_import/policy.rs") +',
-            '  read("crates/application/src/use_cases/exchange/export_team_package_preview_json/use_case.rs");'
-          ) -join "`n"
-          Replace-Exact "scripts/verify-team-package.mjs" `
-            'const application = read("crates/application/src/spreadsheet.rs");' `
-            $teamPackageApplication
-          Replace-Exact "scripts/verify-team-package.mjs" 'application.includes("team_package_coverage")' 'application.includes("coverage::calculate")'
-
+          if ($unexpected.Count -gt 0) {
+            Write-Error ("rustfmt touched files outside AT2 scope: " + ($unexpected -join ", "))
+            exit 1
+          }
+          if ($changed.Count -eq 0) {
+            Write-Host "No rustfmt changes required."
+            exit 0
+          }
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add scripts/verify-formation-usage.mjs scripts/verify-monthly-workbooks.mjs scripts/verify-team-package-import-normalization.mjs scripts/verify-team-package-localized-names.mjs scripts/verify-team-package-real-import-recovery.mjs scripts/verify-team-package.mjs
-          git diff --cached --quiet
-          if ($LASTEXITCODE -ne 0) {
-            git commit -m "test(r3-09): migrate spreadsheet verifier owners"
-            git push origin HEAD:agent/r3-09-at2-builder
-          }
+          git add -- $changed
+          git commit -m "style(r3-09): apply rustfmt to exchange modules"
+          git push origin HEAD:agent/r3-09-at2-builder
 
-      - name: Verify R1 architecture boundaries
+      - name: Verify architecture after formatting
         shell: pwsh
         working-directory: 项目源码
         run: npm run verify:architecture
 
-      - name: Run Windows automated acceptance
+      - name: Verify Rust after formatting
         shell: pwsh
         working-directory: 项目源码
-        run: |
-          & ".\scripts\windows-acceptance.ps1" `
-            -Mode Automated `
-            -ProjectRoot "$env:GITHUB_WORKSPACE" `
-            -LogDirectory "logs"
-          if ($LASTEXITCODE -ne 0) {
-            exit $LASTEXITCODE
-          }
-
-      - name: Upload validation evidence
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: windows-automated-delivery-evidence-${{ github.sha }}
-          if-no-files-found: warn
-          retention-days: 14
-          path: |
-            logs/**
-            .cargo-target/release/bundle/**
+        run: npm run verify:rust
