@@ -10,7 +10,7 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: read
+  contents: write
 
 concurrency:
   group: public-platform-ci-${{ github.workflow }}-${{ github.ref }}
@@ -29,6 +29,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           path: 项目源码
+          ref: agent/r3-09-at2-builder
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -47,12 +48,19 @@ jobs:
         with:
           workspaces: 项目源码 -> ../.cargo-target
 
-      - name: Capture generated Domain inventory for AT2 diagnosis
+      - name: Refresh generated Domain inventory for AT2
         shell: pwsh
         working-directory: 项目源码
         run: |
-          New-Item -ItemType Directory -Force -Path ../logs | Out-Null
-          node scripts/generate-domain-type-inventory.mjs ../logs/generated-domain-type-inventory.json
+          node scripts/generate-domain-type-inventory.mjs
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add architecture/domain-type-inventory.json
+          git diff --cached --quiet
+          if ($LASTEXITCODE -ne 0) {
+            git commit -m "chore(r3-09): refresh domain type inventory"
+            git push origin HEAD:agent/r3-09-at2-builder
+          }
 
       - name: Verify R1 architecture boundaries
         shell: pwsh
