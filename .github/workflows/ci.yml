@@ -10,7 +10,7 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: write
+  contents: read
 
 concurrency:
   group: public-platform-ci-${{ github.workflow }}-${{ github.ref }}
@@ -18,98 +18,59 @@ concurrency:
 
 jobs:
   windows-automated-delivery-gate:
-    name: Record R3-09 AT2 verification evidence
+    name: Windows automated delivery gate
     runs-on: windows-2025
-    timeout-minutes: 20
+    timeout-minutes: 120
+    env:
+      npm_config_cache: ${{ github.workspace }}/.npm-cache
 
     steps:
-      - name: Checkout AT2 builder branch
+      - name: Checkout repository in acceptance layout
         uses: actions/checkout@v4
         with:
           path: 项目源码
-          ref: agent/r3-09-at2-builder
 
-      - name: Record AT2 implementation and verified evidence
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: 项目源码/package-lock.json
+
+      - name: Setup Rust 1.88.0
+        uses: dtolnay/rust-toolchain@1.88.0
+        with:
+          components: rustfmt, clippy
+
+      - name: Restore Rust build cache
+        uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: 项目源码 -> ../.cargo-target
+
+      - name: Verify R1 architecture boundaries
+        shell: pwsh
+        working-directory: 项目源码
+        run: npm run verify:architecture
+
+      - name: Run Windows automated acceptance
         shell: pwsh
         working-directory: 项目源码
         run: |
-          function Replace-Tail([string]$Path, [string]$Marker, [string]$Replacement) {
-            $content = [System.IO.File]::ReadAllText($Path)
-            $index = $content.IndexOf($Marker)
-            if ($index -lt 0) { throw "Marker not found: $Path :: $Marker" }
-            $nextHeading = $content.IndexOf("`n## ", $index + $Marker.Length)
-            if ($nextHeading -ge 0) { throw "Expected final section but found later heading in $Path" }
-            $updated = $content.Substring(0, $index) + $Replacement.TrimEnd() + "`n"
-            [System.IO.File]::WriteAllText($Path, $updated, [System.Text.UTF8Encoding]::new($false))
-          }
-
-          function Replace-Exact([string]$Path, [string]$Old, [string]$New) {
-            $content = [System.IO.File]::ReadAllText($Path)
-            if (-not $content.Contains($Old)) { throw "Expected text not found: $Path" }
-            $updated = $content.Replace($Old, $New)
-            [System.IO.File]::WriteAllText($Path, $updated, [System.Text.UTF8Encoding]::new($false))
-          }
-
-          $rootSection = @'
-          ## R3-09 Exchange / AI Workspace / Release Services（IN_PROGRESS）
-
-          - AT1 Match Lineup / AI Match Package Exchange 已正式关闭为 `DONE`；8 个公共入口由唯一 `ExchangeService` 编排，AT1 的 canonical Public Platform CI run `31473739191` / Windows Automated job `93722595150` 已整体 `SUCCESS`。
-          - AT2 Spreadsheet Exchange 已完成源码迁移并进入 `VERIFYING`：旧 `crates/application/src/spreadsheet.rs` 已删除；16 个既有 Spreadsheet 公共入口迁入 `services/exchange/` 与独立 `use_cases/exchange/<use-case>/`，Exchange facade / service / composition adapter 按 Match Lineup 与 Spreadsheet 两条职责拆分；R3-01 `SpreadsheetExchangePort` / `MonthlyWorkbookPort` 仅补齐真实能力并由 `ActiveDatabase` 适配。AT1 + AT2 共 24 个 Exchange 公共用例继续由唯一 `ExchangeService` 编排。
-          - ApplicationService/Tauri 方法、参数、返回 DTO、Excel/JSON 格式、错误文本及错误优先级保持兼容；球队完整资料包预检 JSON 继续无需数据库连接。PostgreSQL SQL/migration/Schema、Domain 公共契约、前端产品源码、模型保护区、配置与生产依赖未改变。6 个历史 Spreadsheet 专项验证器仅迁移到新 authoritative owner，原断言未删除或放宽；Domain inventory 使用项目官方生成器按最终源码刷新。
-          - Windows hard gate run `31512091398` / job `93848182746` 已通过最终 rustfmt、官方 Domain inventory、完整 `verify:architecture`、workspace Clippy `-D warnings` 与 workspace tests；Application tests 35/35、Domain Serde 17/17、Spreadsheet IO 12/12 等均无失败。18 个需要专用 `FOOTBALL_TEST_DATABASE_URL` 的 PostgreSQL 集成测试按既有安全设计保持 `ignored`，未记为已执行。最终 clean Public Platform CI / Windows Automated 仍待恢复正式只读 workflow 后执行，因此 AT2 当前不关闭为 `DONE`；AT3 AI Workspace 与 AT4 Release 均未开始。
-          '@ -replace '(?m)^          ', ''
-          Replace-Tail "README.md" "## R3-09 Exchange / AI Workspace / Release Services（IN_PROGRESS）" $rootSection
-
-          $taskPath = "docs/modular-rewrite/R03-application-services/R03-09-exchange-ai-workspace-and-release.md"
-          $taskOld = 'AT1 已正式关闭为 `DONE`；Atomic Task 2 — Spreadsheet Exchange 已开放为 `READY`。R3-09 继续为 `IN_PROGRESS`，R3-10 继续 `BLOCKED`。'
-          $taskNew = @'
-          AT1 已正式关闭为 `DONE`；Atomic Task 2 — Spreadsheet Exchange 已进入 `VERIFYING`。R3-09 继续为 `IN_PROGRESS`，R3-10 继续 `BLOCKED`。
-
-          ## Atomic Task 2 — Spreadsheet Exchange
-
-          状态：`VERIFYING`
-
-          ### 当前实施范围
-
-          - 删除旧 `crates/application/src/spreadsheet.rs`，不保留转发壳；球队完整资料包、球员工作包、球队月度工作包共 16 个既有 ApplicationService/Tauri 入口保持原名、参数和返回 DTO。
-          - 16 个 Spreadsheet 公共职责分别迁入 `use_cases/exchange/<use-case>/` 独立目录；球队完整资料包预检进一步将行分类/球队引用解析、覆盖率计算拆为独立职责，提交可写性策略保留原有重试测试。
-          - `ExchangeService`、ApplicationService facade 与 composition adapters 按 Match Lineup / Spreadsheet 两条职责拆成子模块；AT1 + AT2 共 24 个 Exchange 公共用例继续由唯一 `ExchangeService` 编排。
-          - 最小补齐 R3-01 `SpreadsheetExchangePort` / `MonthlyWorkbookPort` 的真实 reference/export/preview/read/resolve/commit 能力；PostgreSQL 具体调用仅由 `composition/adapters/exchange/spreadsheet.rs` 的 `ActiveDatabase` 适配。
-          - Spreadsheet 路径/扩展名/文件存在性校验集中在 `file_validation/spreadsheet.rs`；球队完整资料包、球员工作包和球队月度工作包的原有错误识别顺序与错误文案保持不变。
-
-          ### 兼容边界
-
-          - 公共 ApplicationService/Tauri 方法、参数、返回 DTO、Excel/JSON 格式、导入识别顺序、错误文本与错误优先级保持不变；`export_team_package_preview_json` 继续不要求数据库连接。
-          - PostgreSQL SQL/migration/Schema、Domain 公共契约、前端产品源码、模型保护区、配置、日志等级与生产依赖保持不变。
-          - 6 个历史 Spreadsheet 专项验证器只迁移 authoritative owner 路径，原业务断言未删除、跳过或放宽；官方 Domain inventory 按最终源码重新生成。
-
-          ### 验证状态
-
-          - Windows hard gate run `31512091398` / job `93848182746`：最终 rustfmt、官方 Domain inventory、完整 `verify:architecture`、workspace Clippy `-D warnings` 与 workspace tests 均 `SUCCESS`；Exchange 专项确认 AT1 + AT2 共 24 个公共用例由唯一 `ExchangeService` 编排，Spreadsheet/Monthly Ports 与 ActiveDatabase 适配完整，旧 owners 清零且错误优先级保持。
-          - 同一 Rust 工作区回归中 Application tests 35/35、Domain tests 10/10、Domain Serde 17/17、Tauri tests 27/27、Persistence unit tests 74/74、Spreadsheet IO tests 12/12 均通过，未见测试失败。
-          - 18 个需要专用 `FOOTBALL_TEST_DATABASE_URL` 的 PostgreSQL 集成测试继续按既有安全设计保持 `ignored`，未记为已执行；未执行破坏性数据库验证。
-          - 最终 clean Public Platform CI / Windows Automated 尚待在恢复正式只读 workflow 后执行；PR #18 保持 draft 且未合并。因此 AT2 当前为 `VERIFYING`，不得提前关闭为 `DONE`；AT3 AI Workspace 与 AT4 Release 均保持 `NOT_STARTED`。
-          '@ -replace '(?m)^          ', ''
-          Replace-Exact $taskPath $taskOld $taskNew
-
-          $stagePath = "docs/modular-rewrite/R03-application-services/README.md"
-          $stageSection = @'
-          ### R3-09 当前执行
-
-          - Atomic Task 1 — Match Lineup / AI Match Package Exchange：`DONE`。
-          - Atomic Task 2 — Spreadsheet Exchange：`VERIFYING`。旧 `crates/application/src/spreadsheet.rs` 已删除，16 个 Spreadsheet 公共入口迁入唯一 `ExchangeService` 与独立 Use Cases；facade / service / adapters 已按 Match Lineup / Spreadsheet 职责拆分。
-          - Atomic Task 3 — AI Workspace：`NOT_STARTED`。
-          - Atomic Task 4 — Release：`NOT_STARTED`。
-          - AT2 Windows hard gate run `31512091398` / job `93848182746` 已通过最终 rustfmt、官方 Domain inventory、完整 architecture、workspace Clippy `-D warnings` 与 workspace tests；Application tests 35/35、Domain Serde 17/17、Spreadsheet IO 12/12 等均无失败。18 个 PostgreSQL 集成测试因未配置专用 `FOOTBALL_TEST_DATABASE_URL` 保持 `ignored`，未记为已执行。
-          - 最终 clean Public Platform CI / Windows Automated 仍待恢复正式只读 workflow 后执行；PR #18 保持 draft 且未合并，因此 AT2 尚未关闭为 `DONE`，R3-10 继续 `BLOCKED`。
-          '@ -replace '(?m)^          ', ''
-          Replace-Tail $stagePath "### R3-09 当前执行" $stageSection
-
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add README.md $taskPath $stagePath
-          git diff --cached --quiet
+          & ".\scripts\windows-acceptance.ps1" `
+            -Mode Automated `
+            -ProjectRoot "$env:GITHUB_WORKSPACE" `
+            -LogDirectory "logs"
           if ($LASTEXITCODE -ne 0) {
-            git commit -m "docs(r3-09): record AT2 spreadsheet verification"
-            git push origin HEAD:agent/r3-09-at2-builder
+            exit $LASTEXITCODE
           }
+
+      - name: Upload validation evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: windows-automated-delivery-evidence-${{ github.sha }}
+          if-no-files-found: warn
+          retention-days: 14
+          path: |
+            logs/**
+            .cargo-target/release/bundle/**
