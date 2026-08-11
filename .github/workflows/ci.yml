@@ -36,51 +36,32 @@ jobs:
         with:
           components: rustfmt, clippy
 
-      - name: Apply rustfmt to AT2 Exchange scope
+      - name: Refresh post-rustfmt Domain inventory
         shell: pwsh
         working-directory: 项目源码
         run: |
-          cargo fmt --all
+          node scripts/generate-domain-type-inventory.mjs
           $changed = @(git diff --name-only)
-          $allowedExact = @(
-            "crates/application/src/lib.rs",
-            "crates/application/src/ports/exchange/mod.rs"
-          )
-          $allowedPrefixes = @(
-            "crates/application/src/composition/adapters/exchange/",
-            "crates/application/src/services/exchange/",
-            "crates/application/src/use_cases/exchange/"
-          )
-          $unexpected = @()
           foreach ($file in $changed) {
-            $allowed = $allowedExact -contains $file
-            if (-not $allowed) {
-              foreach ($prefix in $allowedPrefixes) {
-                if ($file.StartsWith($prefix)) { $allowed = $true; break }
-              }
+            if ($file -ne "architecture/domain-type-inventory.json") {
+              Write-Error "Inventory generator touched unexpected file: $file"
+              exit 1
             }
-            if (-not $allowed) { $unexpected += $file }
           }
-          if ($unexpected.Count -gt 0) {
-            Write-Error ("rustfmt touched files outside AT2 scope: " + ($unexpected -join ", "))
-            exit 1
+          if ($changed.Count -gt 0) {
+            git config user.name "github-actions[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git add architecture/domain-type-inventory.json
+            git commit -m "chore(r3-09): refresh post-rustfmt domain inventory"
+            git push origin HEAD:agent/r3-09-at2-builder
           }
-          if ($changed.Count -eq 0) {
-            Write-Host "No rustfmt changes required."
-            exit 0
-          }
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add -- $changed
-          git commit -m "style(r3-09): apply rustfmt to exchange modules"
-          git push origin HEAD:agent/r3-09-at2-builder
 
-      - name: Verify architecture after formatting
+      - name: Verify R1 architecture boundaries
         shell: pwsh
         working-directory: 项目源码
         run: npm run verify:architecture
 
-      - name: Verify Rust after formatting
+      - name: Verify Rust workspace
         shell: pwsh
         working-directory: 项目源码
         run: npm run verify:rust
