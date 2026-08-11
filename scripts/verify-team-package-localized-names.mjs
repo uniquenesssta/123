@@ -5,7 +5,7 @@ const failures = [];
 const requireTrue = (condition, message) => { if (!condition) failures.push(message); };
 
 const io = read("crates/spreadsheet-io/src/team_package.rs");
-const app = read("crates/application/src/spreadsheet.rs");
+const app = read("crates/application/src/use_cases/exchange/export_team_package_template/use_case.rs");
 const persistence = read("crates/persistence-postgres/src/monthly_workbooks.rs");
 
 for (const sheet of ["球队名称", "球员名称"]) {

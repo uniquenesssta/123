@@ -6,7 +6,12 @@ const requireTrue = (condition, message) => { if (!condition) failures.push(mess
 
 const domain = read("crates/domain/src/exchange/team_package/export.rs") + read("crates/domain/src/exchange/team_package/import.rs") + (read("crates/domain/src/lib.rs") + read("crates/domain/src/lineup/kind.rs") + read("crates/domain/src/lineup/player.rs") + read("crates/domain/src/lineup/snapshot.rs") + read("crates/domain/src/lineup/preset.rs") + read("crates/domain/src/lineup/chain.rs") + read("crates/domain/src/match_record/status.rs") + read("crates/domain/src/match_record/catalog.rs"));
 const io = read("crates/spreadsheet-io/src/team_package.rs") + read("crates/spreadsheet-io/src/lib.rs");
-const application = read("crates/application/src/spreadsheet.rs");
+const application =
+  read("crates/application/src/services/exchange/facade/spreadsheet.rs") +
+  read("crates/application/src/use_cases/exchange/preview_team_package_import/use_case.rs") +
+  read("crates/application/src/use_cases/exchange/preview_team_package_import/coverage.rs") +
+  read("crates/application/src/use_cases/exchange/commit_team_package_import/policy.rs") +
+  read("crates/application/src/use_cases/exchange/export_team_package_preview_json/use_case.rs");
 const persistence = read("crates/persistence-postgres/src/monthly_workbooks.rs");
 const playerPersistence = read("crates/persistence-postgres/src/spreadsheet_exchange.rs");
 const commands = read("src-tauri/src/commands/exchange.rs");
@@ -44,7 +49,7 @@ requireTrue(io.includes('留空等同 upsert') && io.includes('&["upsert", "add"
 requireTrue(persistence.includes("canonical_team_import_action") && persistence.includes("upsert 已自动转换为 update"), "球队链未在预检后把 upsert 规范为 add/update");
 requireTrue(playerPersistence.includes("canonical_spreadsheet_import_action") && playerPersistence.includes("SpreadsheetAction::Upsert"), "球员链未在预检后把 upsert 规范为 add/update");
 requireTrue(application.includes("preview_team_package_import") && application.includes("TEAM_MONTHLY_FORMAT") && application.includes("PLAYER_MONTHLY_FORMAT"), "应用层未把资料包分发到现有球队与球员链路");
-requireTrue(application.includes("team_package_coverage") && application.includes("p4_input_ready") && application.includes("readiness_score"), "应用层缺少P4输入就绪度检查");
+requireTrue(application.includes("coverage::calculate") && application.includes("p4_input_ready") && application.includes("readiness_score"), "应用层缺少P4输入就绪度检查");
 requireTrue(application.includes("commit_team_package_import") && application.includes("ensure_preview_committable"), "统一提交未复用现有预检门禁");
 requireTrue(persistence.includes('"formation_familiarity"'), "阵型熟悉度未保留到持久化元数据");
 for (const command of ["export_team_package_template", "export_team_package_preview_json", "preview_team_package_import", "commit_team_package_import"]) {

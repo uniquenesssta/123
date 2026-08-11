@@ -10,14 +10,17 @@ function assert(condition, message) {
   if (!condition) throw new Error(message);
 }
 
-const application = read("crates/application/src/spreadsheet.rs");
+const application =
+  read("crates/application/src/use_cases/exchange/preview_team_package_import/package_rows.rs") +
+  read("crates/application/src/use_cases/exchange/preview_team_package_import/use_case.rs") +
+  read("crates/application/src/use_cases/exchange/commit_team_package_import/use_case.rs");
 const persistence = read("crates/persistence-postgres/src/spreadsheet_exchange.rs");
 const teamPersistence = read("crates/persistence-postgres/src/monthly_workbooks.rs");
 const template = read("crates/spreadsheet-io/src/team_package.rs");
 
 assert(
-  application.includes("collect_package_team_references") &&
-    application.includes("preview_spreadsheet_import_with_team_references") &&
+  application.includes("collect_team_references") &&
+    application.includes("preview_import_with_team_references") &&
     application.includes('get("short_name")'),
   "完整资料包预检未把球队简称映射传给球员链",
 );
