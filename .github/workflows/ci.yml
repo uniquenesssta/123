@@ -51,8 +51,8 @@ jobs:
         shell: pwsh
         working-directory: 项目源码
         run: |
-          New-Item -ItemType Directory -Force -Path logs | Out-Null
-          node scripts/generate-domain-type-inventory.mjs logs/generated-domain-type-inventory.json
+          New-Item -ItemType Directory -Force -Path ../logs | Out-Null
+          node scripts/generate-domain-type-inventory.mjs ../logs/generated-domain-type-inventory.json
 
       - name: Verify R1 architecture boundaries
         shell: pwsh
