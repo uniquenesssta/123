@@ -24,8 +24,8 @@ R2 已完成并关闭。R3 只重写 Application 编排与 Ports/Services/Use Ca
 | R3-05 | Lineups Service | DONE |
 | R3-06 | Prediction Service | DONE |
 | R3-07 | Research Service | DONE |
-| R3-08 | Review / Postmatch / Analytics Services | IN_PROGRESS |
-| R3-09 | Exchange / AI / Release Services | BLOCKED |
+| R3-08 | Review / Postmatch / Analytics Services | DONE |
+| R3-09 | Exchange / AI / Release Services | READY |
 | R3-10 | ApplicationService 兼容门面 | BLOCKED |
 
 ## R3-01 完成结果
@@ -123,7 +123,7 @@ R3-02 已正式关闭为 `DONE`。详细记录见 [`R03-02-database-service.md`]
 
 - Atomic Task 1 — Review Core：`DONE`。
 - Atomic Task 2 — Match Review Package：`DONE`。
-- R3-08 整体继续 `IN_PROGRESS`；Atomic Task 3 — Postmatch Service：`DONE`；Atomic Task 4 — Analytics：`READY`（尚未实施）。
+- R3-08 整体已关闭为 `DONE`；Atomic Task 3 — Postmatch Service：`DONE`；Atomic Task 4 — Analytics：`DONE`；R3-09 Exchange / AI Workspace / Release Services 已开放为 `READY`。
 - AT3 canonical 提交 `b551ac8acc4030f05d93100812b316469dc7ea83` 的 Public Platform CI run `31420385032` / Windows Automated job `93559423579` 已整体 `SUCCESS`，validation evidence upload 成功；artifact `9075930419` 大小 `14152359` 字节，SHA-256 `39fab48a3f2d62e1538276fb8f19fb811f1c72c79380de55897e12c82e39f582`。18 个需要专用 `FOOTBALL_TEST_DATABASE_URL` 的 PostgreSQL 集成测试继续按既有安全设计保持 `ignored`，未记为已执行。
 
 
@@ -146,8 +146,19 @@ R3-02 已正式关闭为 `DONE`。详细记录见 [`R03-02-database-service.md`]
 
 ### R3-08 Atomic Task 3 — Postmatch Service
 
-- 状态：`VERIFYING`。
+- 状态：`DONE`。
 - 7 个 Postmatch 公共职责按独立 Use Case 迁入 `services/postmatch/`、`use_cases/postmatch/`，旧 `crates/application/src/postmatch.rs` 删除；两个既有 Postmatch Ports 对齐真实查询参数并由 `composition/adapters/postmatch.rs` 实现。
 - 结算继续复用 AT2 `MatchReviewPackageStatePort` 维护 `review_created -> settled` 状态机，没有新增重复 workflow owner；Analytics 未修改。
 - 旧 Postmatch Application owner 的全仓引用已扫描；Domain inventory 由既有确定性生成器刷新，Review Service、Stage-A 与 Postmatch Settlement verifier 仅迁移到新 authoritative owner，原门禁不弱化。
 - Windows hard gate：run `31419165233`：Postmatch 专项、Application Ports、完整 architecture、保护资产、rustfmt、Application check/tests、完整 frontend 与完整 Rust 回归均 `SUCCESS`。
+- canonical 提交 `b551ac8acc4030f05d93100812b316469dc7ea83` 的 Public Platform CI run `31420385032` / Windows Automated job `93559423579` 已整体 `SUCCESS`；artifact `9075930419` 大小 `14152359` 字节，SHA-256 `39fab48a3f2d62e1538276fb8f19fb811f1c72c79380de55897e12c82e39f582`。AT3 已正式关闭为 `DONE`；该时点随后开放 Analytics AT4。
+
+
+### R3-08 Atomic Task 4 — Analytics Service
+
+- 状态：`DONE`。
+- 删除旧 `crates/application/src/analytics.rs`，建立唯一 `AnalyticsService`、三个分责 Analytics Ports、composition adapters，并将 21 个公共 Analytics 用例全部拆入独立目录；旧 owner 与聚合型 `jobs.rs` / `ai_package.rs` / Parameter Lifecycle 多用例文件不再作为公共用例 owner。
+- Stage Regression run `31461057749`：完整 frontend、workspace Rust/Clippy/tests、protected assets、最终 clean-tree 全部 `SUCCESS`。
+- clean publication commit `fcf5f3df29b477baf7e1c3aeebcf5ed6f459b8a8` 的 PR #16 CI run `31461760837` 与 canonical CI run `31463538968` / job `93691679605` 均整体 `SUCCESS`；canonical artifact `9091238488`，大小 `14092031` 字节，SHA-256 `ae08e7eeccb09f4b625885716391f88de2ad4ce3902d59608c4978bc63f29a72`。
+- 18 个需要专用 `FOOTBALL_TEST_DATABASE_URL` 的 PostgreSQL 集成测试按既有安全设计保持 `ignored`，未记为已执行；未执行破坏性数据库验证。
+- R3-08 已正式关闭为 `DONE`；下一任务 R3-09 Exchange / AI Workspace / Release Services 为 `READY`。

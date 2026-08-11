@@ -2,7 +2,7 @@
 
 ## 状态
 
-`IN_PROGRESS`
+`DONE`
 
 ## Atomic Task 1 — Review Core
 
@@ -117,4 +117,31 @@
 - canonical 提交 `b551ac8acc4030f05d93100812b316469dc7ea83` 的 Public Platform CI run `31420385032` / Windows Automated job `93559423579` 已整体 `SUCCESS`；architecture、完整 Windows automated acceptance 与 validation evidence upload 均成功。
 - evidence artifact `9075930419`（`windows-automated-delivery-evidence-b551ac8acc4030f05d93100812b316469dc7ea83`）大小 `14152359` 字节，SHA-256 `39fab48a3f2d62e1538276fb8f19fb811f1c72c79380de55897e12c82e39f582`。
 - 18 个需要专用 `FOOTBALL_TEST_DATABASE_URL` 的 PostgreSQL 集成测试按既有安全设计继续保持 `ignored`，未记为已执行；本 Atomic Task 未执行破坏性数据库验证。
-- AT3 Postmatch Service 正式关闭为 `DONE`。R3-08 整体继续 `IN_PROGRESS`；Atomic Task 4 — Analytics 开放为 `READY`，Analytics 源码仍未实施。
+- AT3 Postmatch Service 正式关闭为 `DONE`；该时点 Atomic Task 4 — Analytics 随即开放。AT4 后续已完成并通过正式验收，R3-08 的最终当前状态为 `DONE`。
+
+
+## Atomic Task 4 — Analytics Service
+
+状态：`DONE`
+
+### 已实施
+
+- 删除旧 `crates/application/src/analytics.rs`，不保留转发壳；`AnalyticsService` 成为唯一应用层 owner。
+- 21 个公共 Analytics 用例全部按独立目录落入 `use_cases/analytics/<use-case>/`；AI Analysis Package、后台任务、Data Quality 与 Parameter Lifecycle 按职责分组，公共用例不再共享聚合型 owner。
+- `AnalyticsPort`、`JobQueuePort`、`ParameterLifecyclePort` 分别承载 Analytics 数据、后台队列和参数生命周期事务边界；具体 PostgreSQL 调用只存在于 composition adapters。
+- `ApplicationService` 公共方法名、参数和返回 DTO 保持兼容；Tauri、Domain 类型、PostgreSQL SQL/migration/Schema、模型保护区与生产依赖未改变。
+- 受 owner 拆分影响的 Analytics / Parameter Lifecycle / Review verifier 与 deterministic Domain inventory 已迁移到新的 authoritative module tree，原断言未删除或放宽。
+
+### 验证事实
+
+- Stage Regression run `31461057749` 已整体 `SUCCESS`：完整 `npm run verify:frontend`、完整 `npm run verify:rust`、workspace Clippy `-D warnings`、workspace tests、模型保护资产和最终 clean-tree 均通过。
+- clean publication commit `fcf5f3df29b477baf7e1c3aeebcf5ed6f459b8a8` 相对 AT3 canonical 为单一原子实现提交，临时 AT4 workflow 不在 publication tree。
+- PR #16 Public Platform CI run `31461760837` 完整 `SUCCESS`，clean publication tree 的 Windows Automated 与 evidence upload 通过。
+- canonical Public Platform CI run `31463538968` / Windows Automated job `93691679605` 完整 `SUCCESS`；architecture、Windows automated acceptance 与 validation evidence upload 均成功。artifact `9091238488`（`windows-automated-delivery-evidence-fcf5f3df29b477baf7e1c3aeebcf5ed6f459b8a8`）大小 `14092031` 字节，SHA-256 `ae08e7eeccb09f4b625885716391f88de2ad4ce3902d59608c4978bc63f29a72`。
+- 18 个需要专用 `FOOTBALL_TEST_DATABASE_URL` 的 PostgreSQL 集成测试按既有安全设计保持 `ignored`，未记为已执行；本 Atomic Task 未执行破坏性数据库验证。
+
+### AT4 与 R3-08 关闭
+
+- Analytics 的公共职责、状态/副作用边界与持久化适配已完成模块化迁移，旧 owner 已删除且没有兼容转发壳。
+- AT1 Review Core、AT2 Match Review Package、AT3 Postmatch、AT4 Analytics 均为 `DONE`，R3-08 正式关闭为 `DONE`。
+- 根据 R3 任务书顺序，下一节点 R3-09 Exchange / AI Workspace / Release Services 开放为 `READY`。
