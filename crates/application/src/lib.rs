@@ -1,4 +1,3 @@
-mod analytics;
 mod api_workspace;
 mod built_in_artifacts;
 mod composition;
@@ -23,9 +22,7 @@ use serde_json::Value;
 use thiserror::Error;
 use uuid::Uuid;
 
-pub(crate) use composition::{
-    DatabaseHealth, DatabaseStats, ModelRunListItem, PersistenceError, PersistenceStore,
-};
+pub(crate) use composition::{DatabaseHealth, DatabaseStats, ModelRunListItem, PersistenceError};
 pub use model_registry::ModelRegistry;
 pub use service::ApplicationService;
 

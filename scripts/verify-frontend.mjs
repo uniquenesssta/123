@@ -55,6 +55,7 @@ const nodeChecks = [
   "verify-workspace-ui.mjs",
   "verify-postmatch-settlement.mjs",
   "verify-postmatch-service.mjs",
+  "verify-analytics-service.mjs",
   "verify-parameter-lifecycle.mjs",
   "verify-api-runtime-diagnostics.mjs",
   "verify-api-compatible-transport.mjs",

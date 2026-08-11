@@ -1,3 +1,4 @@
+mod analytics;
 mod jobs;
 mod lineups;
 mod players;

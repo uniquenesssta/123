@@ -1,9 +1,10 @@
 use crate::composition::ApplicationComposition;
 use crate::model_registry::ModelRegistry;
 use crate::services::{
-    competition::CompetitionService, database::DatabaseService, lineups::LineupService,
-    players::PlayerService, postmatch::PostmatchService, prediction::PredictionService,
-    research::ResearchService, review::ReviewService, rules::RulesService, teams::TeamService,
+    analytics::AnalyticsService, competition::CompetitionService, database::DatabaseService,
+    lineups::LineupService, players::PlayerService, postmatch::PostmatchService,
+    prediction::PredictionService, research::ResearchService, review::ReviewService,
+    rules::RulesService, teams::TeamService,
 };
 use std::sync::atomic::AtomicBool;
 
@@ -19,38 +20,27 @@ pub struct ApplicationService {
     pub(crate) research: ResearchService,
     pub(crate) review: ReviewService,
     pub(crate) postmatch: PostmatchService,
+    pub(crate) analytics: AnalyticsService,
     pub(crate) p4_worker_running: AtomicBool,
 }
 
 impl ApplicationService {
     pub fn new() -> Self {
-        let (
-            registry,
-            database,
-            competition,
-            rules,
-            teams,
-            players,
-            lineups,
-            prediction,
-            research,
-            review,
-            postmatch,
-            p4_worker_running,
-        ) = ApplicationComposition::new().into_parts();
+        let parts = ApplicationComposition::new().into_parts();
         Self {
-            registry,
-            database,
-            competition,
-            rules,
-            teams,
-            players,
-            lineups,
-            prediction,
-            research,
-            review,
-            postmatch,
-            p4_worker_running,
+            registry: parts.registry,
+            database: parts.database,
+            competition: parts.competition,
+            rules: parts.rules,
+            teams: parts.teams,
+            players: parts.players,
+            lineups: parts.lineups,
+            prediction: parts.prediction,
+            research: parts.research,
+            review: parts.review,
+            postmatch: parts.postmatch,
+            analytics: parts.analytics,
+            p4_worker_running: parts.p4_worker_running,
         }
     }
 }

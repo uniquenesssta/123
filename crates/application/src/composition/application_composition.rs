@@ -2,9 +2,10 @@ use super::PortRegistry;
 use crate::model_registry::ModelRegistry;
 use crate::model_shell::PublicModelStub;
 use crate::services::{
-    competition::CompetitionService, database::DatabaseService, lineups::LineupService,
-    players::PlayerService, postmatch::PostmatchService, prediction::PredictionService,
-    research::ResearchService, review::ReviewService, rules::RulesService, teams::TeamService,
+    analytics::AnalyticsService, competition::CompetitionService, database::DatabaseService,
+    lineups::LineupService, players::PlayerService, postmatch::PostmatchService,
+    prediction::PredictionService, research::ResearchService, review::ReviewService,
+    rules::RulesService, teams::TeamService,
 };
 use std::sync::{atomic::AtomicBool, Arc};
 
@@ -20,7 +21,24 @@ pub(crate) struct ApplicationComposition {
     research: ResearchService,
     review: ReviewService,
     postmatch: PostmatchService,
+    analytics: AnalyticsService,
     p4_worker_running: AtomicBool,
+}
+
+pub(crate) struct ApplicationParts {
+    pub(crate) registry: ModelRegistry,
+    pub(crate) database: DatabaseService,
+    pub(crate) competition: CompetitionService,
+    pub(crate) rules: RulesService,
+    pub(crate) teams: TeamService,
+    pub(crate) players: PlayerService,
+    pub(crate) lineups: LineupService,
+    pub(crate) prediction: PredictionService,
+    pub(crate) research: ResearchService,
+    pub(crate) review: ReviewService,
+    pub(crate) postmatch: PostmatchService,
+    pub(crate) analytics: AnalyticsService,
+    pub(crate) p4_worker_running: AtomicBool,
 }
 
 impl ApplicationComposition {
@@ -42,39 +60,26 @@ impl ApplicationComposition {
             research: ResearchService::new(),
             review: ReviewService::new(),
             postmatch: PostmatchService::new(),
+            analytics: AnalyticsService::new(),
             p4_worker_running: AtomicBool::new(false),
         }
     }
 
-    pub(crate) fn into_parts(
-        self,
-    ) -> (
-        ModelRegistry,
-        DatabaseService,
-        CompetitionService,
-        RulesService,
-        TeamService,
-        PlayerService,
-        LineupService,
-        PredictionService,
-        ResearchService,
-        ReviewService,
-        PostmatchService,
-        AtomicBool,
-    ) {
-        (
-            self.registry,
-            self.database,
-            self.competition,
-            self.rules,
-            self.teams,
-            self.players,
-            self.lineups,
-            self.prediction,
-            self.research,
-            self.review,
-            self.postmatch,
-            self.p4_worker_running,
-        )
+    pub(crate) fn into_parts(self) -> ApplicationParts {
+        ApplicationParts {
+            registry: self.registry,
+            database: self.database,
+            competition: self.competition,
+            rules: self.rules,
+            teams: self.teams,
+            players: self.players,
+            lineups: self.lineups,
+            prediction: self.prediction,
+            research: self.research,
+            review: self.review,
+            postmatch: self.postmatch,
+            analytics: self.analytics,
+            p4_worker_running: self.p4_worker_running,
+        }
     }
 }

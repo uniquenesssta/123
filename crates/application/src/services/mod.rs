@@ -1,3 +1,4 @@
+pub(crate) mod analytics;
 pub(crate) mod competition;
 pub(crate) mod database;
 pub(crate) mod lineups;

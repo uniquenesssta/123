@@ -27,8 +27,12 @@ impl ApplicationService {
         };
         self.database.activate(prepared).await?;
 
-        let store = self.active_store().await?;
-        crate::analytics::spawn_job_worker(store);
+        let session = self
+            .database
+            .active_session()
+            .await
+            .ok_or(ApplicationError::DatabaseNotConnected)?;
+        self.analytics.start_job_worker(session);
         self.ensure_p4_orchestration_worker();
         Ok(health)
     }

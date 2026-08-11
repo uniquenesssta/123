@@ -24,13 +24,13 @@
     "targetPublicExportPolicy": "explicit re-export only"
   },
   "sourceDigest": "217241ac243726a5ab6805a7f169e222b97e78c7c971749a5904714af673ebdd",
-  "rustUsageDigest": "04077e5ffe3111bebe2952d23a6f97e281adc0d88799cc6272f4c733ccf90892",
+  "rustUsageDigest": "95c81aef5f6e58478022b0cb87a805e41f3e6cfaacf3e0ee5b663786c2d81c7c",
   "summary": {
     "typeCount": 365,
     "publicCompatibilityTypeCount": 365,
     "internalTypeCount": 0,
     "domainSourceFileCount": 129,
-    "scannedRustFileCount": 485,
+    "scannedRustFileCount": 516,
     "databaseMappedTypeCount": 299,
     "byTargetModule": {
       "ai_workspace": 16,
@@ -599,6 +599,7 @@
       ],
       "externalCallers": [
         "crates/analysis-package/src/lib.rs",
+        "crates/application/src/composition/adapters/analytics.rs",
         "crates/application/src/ports/analytics/mod.rs",
         "crates/persistence-postgres/src/analytics.rs"
       ],
@@ -737,7 +738,11 @@
       ],
       "externalCallers": [
         "crates/analysis-package/src/lib.rs",
-        "crates/application/src/analytics.rs",
+        "crates/application/src/composition/adapters/analytics.rs",
+        "crates/application/src/ports/analytics/mod.rs",
+        "crates/application/src/services/analytics/facade.rs",
+        "crates/application/src/services/analytics/service.rs",
+        "crates/application/src/use_cases/analytics/ai_package/export_ai_analysis_package/mod.rs",
         "crates/persistence-postgres/src/analytics.rs",
         "src-tauri/src/commands/analytics.rs"
       ],
@@ -869,7 +874,11 @@
       ],
       "externalCallers": [
         "crates/analysis-package/src/lib.rs",
-        "crates/application/src/analytics.rs",
+        "crates/application/src/composition/adapters/analytics.rs",
+        "crates/application/src/ports/analytics/mod.rs",
+        "crates/application/src/services/analytics/facade.rs",
+        "crates/application/src/services/analytics/service.rs",
+        "crates/application/src/use_cases/analytics/ai_package/preview_ai_analysis_response/mod.rs",
         "crates/persistence-postgres/src/analytics.rs",
         "src-tauri/src/commands/analytics.rs"
       ],
@@ -1054,8 +1063,13 @@
         "crates/domain/tests/serde_contracts/r2_07_module_paths.rs"
       ],
       "externalCallers": [
-        "crates/application/src/analytics.rs",
+        "crates/application/src/composition/adapters/analytics.rs",
         "crates/application/src/ports/analytics/mod.rs",
+        "crates/application/src/services/analytics/facade.rs",
+        "crates/application/src/services/analytics/service.rs",
+        "crates/application/src/use_cases/analytics/ai_package/decide_ai_analysis_suggestion/mod.rs",
+        "crates/application/src/use_cases/analytics/ai_package/import_ai_analysis_response/mod.rs",
+        "crates/application/src/use_cases/analytics/ai_package/list_ai_analysis_suggestions/mod.rs",
         "crates/persistence-postgres/src/analytics.rs",
         "src-tauri/src/commands/analytics.rs"
       ],
@@ -1500,7 +1514,11 @@
         "crates/domain/tests/serde_contracts/r2_07_module_paths.rs"
       ],
       "externalCallers": [
-        "crates/application/src/analytics.rs",
+        "crates/application/src/composition/adapters/analytics.rs",
+        "crates/application/src/ports/analytics/mod.rs",
+        "crates/application/src/services/analytics/facade.rs",
+        "crates/application/src/services/analytics/service.rs",
+        "crates/application/src/use_cases/analytics/ai_package/decide_ai_analysis_suggestion/mod.rs",
         "crates/persistence-postgres/src/analytics.rs",
         "src-tauri/src/commands/analytics.rs"
       ],
@@ -1682,8 +1700,13 @@
         "crates/domain/tests/serde_contracts/r2_07_module_paths.rs"
       ],
       "externalCallers": [
-        "crates/application/src/analytics.rs",
+        "crates/application/src/composition/adapters/analytics.rs",
+        "crates/application/src/ports/analytics/contracts.rs",
         "crates/application/src/ports/analytics/mod.rs",
+        "crates/application/src/services/analytics/facade.rs",
+        "crates/application/src/services/analytics/service.rs",
+        "crates/application/src/use_cases/analytics/analytics_overview/mod.rs",
+        "crates/application/src/use_cases/analytics/jobs/worker.rs",
         "crates/persistence-postgres/src/analytics.rs",
         "src-tauri/src/commands/analytics.rs"
       ],
@@ -1767,8 +1790,9 @@
         "crates/domain/tests/serde_contracts/r2_07_module_paths.rs"
       ],
       "externalCallers": [
-        "crates/application/src/analytics.rs",
+        "crates/application/src/composition/adapters/analytics.rs",
         "crates/application/src/ports/analytics/mod.rs",
+        "crates/application/src/use_cases/analytics/jobs/worker.rs",
         "crates/persistence-postgres/src/analytics.rs"
       ],
       "databaseMappings": [
@@ -3188,9 +3212,14 @@
         "crates/domain/tests/serde_contracts/r2_07_module_paths.rs"
       ],
       "externalCallers": [
-        "crates/application/src/analytics.rs",
         "crates/application/src/composition/adapters/jobs.rs",
         "crates/application/src/ports/analytics/mod.rs",
+        "crates/application/src/services/analytics/facade.rs",
+        "crates/application/src/services/analytics/service.rs",
+        "crates/application/src/use_cases/analytics/jobs/cancel_background_job/mod.rs",
+        "crates/application/src/use_cases/analytics/jobs/enqueue_analysis_job/mod.rs",
+        "crates/application/src/use_cases/analytics/jobs/list_background_jobs/mod.rs",
+        "crates/application/src/use_cases/analytics/jobs/retry_background_job/mod.rs",
         "crates/persistence-postgres/src/jobs.rs",
         "src-tauri/src/commands/analytics.rs",
         "src-tauri/src/commands/issues.rs"
@@ -4712,10 +4741,10 @@
         "crates/domain/tests/serde_contracts/module_paths.rs"
       ],
       "externalCallers": [
-        "crates/application/src/analytics.rs",
         "crates/application/src/composition/port_registry.rs",
         "crates/application/src/lib.rs",
         "crates/application/src/ports/rules/mod.rs",
+        "crates/application/src/use_cases/analytics/parameter_lifecycle/metrics.rs",
         "crates/application/src/use_cases/competition/create_competition/mod.rs",
         "crates/application/src/use_cases/competition/create_stage/mod.rs",
         "crates/application/src/use_cases/prediction/dry_run_default_fixture/mod.rs",
@@ -5631,8 +5660,11 @@
         "crates/domain/tests/serde_contracts/r2_07_module_paths.rs"
       ],
       "externalCallers": [
-        "crates/application/src/analytics.rs",
+        "crates/application/src/composition/adapters/analytics.rs",
         "crates/application/src/ports/analytics/mod.rs",
+        "crates/application/src/services/analytics/facade.rs",
+        "crates/application/src/services/analytics/service.rs",
+        "crates/application/src/use_cases/analytics/decide_data_quality_finding/mod.rs",
         "crates/persistence-postgres/src/analytics.rs",
         "src-tauri/src/commands/analytics.rs"
       ],
@@ -5724,8 +5756,11 @@
         "crates/domain/tests/serde_contracts/r2_07_module_paths.rs"
       ],
       "externalCallers": [
-        "crates/application/src/analytics.rs",
+        "crates/application/src/composition/adapters/analytics.rs",
         "crates/application/src/ports/analytics/mod.rs",
+        "crates/application/src/services/analytics/facade.rs",
+        "crates/application/src/services/analytics/service.rs",
+        "crates/application/src/use_cases/analytics/decide_data_quality_finding/mod.rs",
         "crates/persistence-postgres/src/analytics.rs",
         "src-tauri/src/commands/analytics.rs"
       ],
@@ -5801,6 +5836,9 @@
         "crates/domain/tests/serde_contracts/r2_07_module_paths.rs"
       ],
       "externalCallers": [
+        "crates/application/src/composition/adapters/analytics.rs",
+        "crates/application/src/ports/analytics/contracts.rs",
+        "crates/application/src/ports/analytics/mod.rs",
         "crates/persistence-postgres/src/analytics.rs"
       ],
       "databaseMappings": [
@@ -5963,9 +6001,11 @@
         "crates/domain/tests/serde_contracts/r2_07_module_paths.rs"
       ],
       "externalCallers": [
-        "crates/application/src/analytics.rs",
         "crates/application/src/composition/adapters/jobs.rs",
         "crates/application/src/ports/analytics/mod.rs",
+        "crates/application/src/services/analytics/facade.rs",
+        "crates/application/src/services/analytics/service.rs",
+        "crates/application/src/use_cases/analytics/jobs/enqueue_analysis_job/mod.rs",
         "crates/application/src/use_cases/prediction/plan_p4_horizons/mod.rs",
         "crates/application/src/use_cases/research/p4_worker/transitions.rs",
         "crates/persistence-postgres/src/jobs.rs",
@@ -10110,7 +10150,7 @@
         "crates/domain/tests/serde_contracts/round_trip.rs"
       ],
       "externalCallers": [
-        "crates/application/src/analytics.rs",
+        "crates/application/src/use_cases/analytics/parameter_lifecycle/run_parameter_shadow_validation/mod.rs",
         "crates/application/src/use_cases/prediction/dry_run_default_fixture/mod.rs",
         "crates/application/src/use_cases/prediction/inspect_match_prediction_readiness/mod.rs",
         "crates/application/src/use_cases/prediction/shared/routing.rs",
@@ -13683,7 +13723,7 @@
         "crates/domain/tests/serde_contracts/module_paths.rs"
       ],
       "externalCallers": [
-        "crates/application/src/analytics.rs",
+        "crates/application/src/use_cases/analytics/parameter_lifecycle/run_parameter_shadow_validation/mod.rs",
         "crates/application/src/use_cases/prediction/dry_run_default_fixture/mod.rs",
         "crates/application/src/use_cases/prediction/execute_prediction/mod.rs",
         "crates/model-api/src/lib.rs",
@@ -16206,8 +16246,11 @@
         "crates/domain/tests/serde_contracts/r2_07_module_paths.rs"
       ],
       "externalCallers": [
-        "crates/application/src/analytics.rs",
+        "crates/application/src/composition/adapters/analytics.rs",
         "crates/application/src/ports/analytics/mod.rs",
+        "crates/application/src/services/analytics/facade.rs",
+        "crates/application/src/services/analytics/service.rs",
+        "crates/application/src/use_cases/analytics/parameter_lifecycle/parameter_lifecycle_readiness/mod.rs",
         "crates/persistence-postgres/src/parameter_lifecycle.rs",
         "src-tauri/src/commands/analytics.rs"
       ],
@@ -16270,8 +16313,13 @@
         "crates/domain/tests/serde_contracts/r2_07_module_paths.rs"
       ],
       "externalCallers": [
-        "crates/application/src/analytics.rs",
+        "crates/application/src/composition/adapters/analytics.rs",
         "crates/application/src/ports/analytics/mod.rs",
+        "crates/application/src/services/analytics/facade.rs",
+        "crates/application/src/services/analytics/service.rs",
+        "crates/application/src/use_cases/analytics/parameter_lifecycle/parameter_lifecycle_readiness/mod.rs",
+        "crates/application/src/use_cases/analytics/parameter_lifecycle/promote_parameter_candidate/mod.rs",
+        "crates/application/src/use_cases/analytics/parameter_lifecycle/run_parameter_shadow_validation/mod.rs",
         "crates/persistence-postgres/src/parameter_lifecycle.rs",
         "src-tauri/src/commands/analytics.rs"
       ],
@@ -16350,7 +16398,13 @@
         "crates/domain/tests/serde_contracts/r2_07_module_paths.rs"
       ],
       "externalCallers": [
-        "crates/application/src/analytics.rs",
+        "crates/application/src/composition/adapters/analytics.rs",
+        "crates/application/src/ports/analytics/mod.rs",
+        "crates/application/src/services/analytics/facade.rs",
+        "crates/application/src/services/analytics/service.rs",
+        "crates/application/src/use_cases/analytics/parameter_lifecycle/list_parameter_promotion_decisions/mod.rs",
+        "crates/application/src/use_cases/analytics/parameter_lifecycle/promote_parameter_candidate/mod.rs",
+        "crates/application/src/use_cases/analytics/parameter_lifecycle/rollback_parameter_candidate/mod.rs",
         "crates/persistence-postgres/src/parameter_lifecycle.rs",
         "src-tauri/src/commands/analytics.rs"
       ],
@@ -16411,8 +16465,11 @@
         "crates/domain/tests/serde_contracts/r2_07_module_paths.rs"
       ],
       "externalCallers": [
-        "crates/application/src/analytics.rs",
+        "crates/application/src/composition/adapters/analytics.rs",
         "crates/application/src/ports/analytics/mod.rs",
+        "crates/application/src/services/analytics/facade.rs",
+        "crates/application/src/services/analytics/service.rs",
+        "crates/application/src/use_cases/analytics/parameter_lifecycle/promote_parameter_candidate/mod.rs",
         "crates/persistence-postgres/src/parameter_lifecycle.rs",
         "src-tauri/src/commands/analytics.rs"
       ],
@@ -16547,7 +16604,9 @@
         "crates/domain/tests/serde_contracts/r2_07_module_paths.rs"
       ],
       "externalCallers": [
-        "crates/application/src/analytics.rs",
+        "crates/application/src/composition/adapters/analytics.rs",
+        "crates/application/src/ports/analytics/mod.rs",
+        "crates/application/src/use_cases/analytics/parameter_lifecycle/metrics.rs",
         "crates/persistence-postgres/src/parameter_lifecycle.rs"
       ],
       "databaseMappings": [
@@ -16607,8 +16666,11 @@
         "crates/domain/tests/serde_contracts/r2_07_module_paths.rs"
       ],
       "externalCallers": [
-        "crates/application/src/analytics.rs",
+        "crates/application/src/composition/adapters/analytics.rs",
         "crates/application/src/ports/analytics/mod.rs",
+        "crates/application/src/services/analytics/facade.rs",
+        "crates/application/src/services/analytics/service.rs",
+        "crates/application/src/use_cases/analytics/parameter_lifecycle/rollback_parameter_candidate/mod.rs",
         "crates/persistence-postgres/src/parameter_lifecycle.rs",
         "src-tauri/src/commands/analytics.rs"
       ],
@@ -16699,8 +16761,12 @@
         "crates/domain/tests/serde_contracts/r2_07_module_paths.rs"
       ],
       "externalCallers": [
-        "crates/application/src/analytics.rs",
+        "crates/application/src/composition/adapters/analytics.rs",
         "crates/application/src/ports/analytics/mod.rs",
+        "crates/application/src/services/analytics/facade.rs",
+        "crates/application/src/services/analytics/service.rs",
+        "crates/application/src/use_cases/analytics/parameter_lifecycle/list_parameter_shadow_validations/mod.rs",
+        "crates/application/src/use_cases/analytics/parameter_lifecycle/run_parameter_shadow_validation/mod.rs",
         "crates/persistence-postgres/src/parameter_lifecycle.rs",
         "src-tauri/src/commands/analytics.rs"
       ],
@@ -16751,8 +16817,9 @@
         "crates/domain/tests/serde_contracts/r2_07_module_paths.rs"
       ],
       "externalCallers": [
-        "crates/application/src/analytics.rs",
-        "crates/application/src/ports/analytics/mod.rs",
+        "crates/application/src/services/analytics/facade.rs",
+        "crates/application/src/services/analytics/service.rs",
+        "crates/application/src/use_cases/analytics/parameter_lifecycle/run_parameter_shadow_validation/mod.rs",
         "src-tauri/src/commands/analytics.rs"
       ],
       "databaseMappings": []
@@ -16916,8 +16983,14 @@
         "crates/domain/tests/serde_contracts/r2_07_module_paths.rs"
       ],
       "externalCallers": [
-        "crates/application/src/analytics.rs",
+        "crates/application/src/composition/adapters/analytics.rs",
         "crates/application/src/ports/analytics/mod.rs",
+        "crates/application/src/services/analytics/facade.rs",
+        "crates/application/src/services/analytics/service.rs",
+        "crates/application/src/use_cases/analytics/parameter_lifecycle/decide_parameter_tuning_candidate/mod.rs",
+        "crates/application/src/use_cases/analytics/parameter_lifecycle/generate_parameter_tuning_candidate/mod.rs",
+        "crates/application/src/use_cases/analytics/parameter_lifecycle/list_parameter_tuning_candidates/mod.rs",
+        "crates/application/src/use_cases/analytics/parameter_lifecycle/metrics.rs",
         "crates/persistence-postgres/src/analytics.rs",
         "crates/persistence-postgres/src/parameter_lifecycle.rs",
         "src-tauri/src/commands/analytics.rs"
@@ -17039,7 +17112,11 @@
         "crates/domain/tests/serde_contracts/r2_07_module_paths.rs"
       ],
       "externalCallers": [
-        "crates/application/src/analytics.rs",
+        "crates/application/src/composition/adapters/analytics.rs",
+        "crates/application/src/ports/analytics/mod.rs",
+        "crates/application/src/services/analytics/facade.rs",
+        "crates/application/src/services/analytics/service.rs",
+        "crates/application/src/use_cases/analytics/parameter_lifecycle/decide_parameter_tuning_candidate/mod.rs",
         "crates/persistence-postgres/src/analytics.rs",
         "src-tauri/src/commands/analytics.rs"
       ],
@@ -17114,7 +17191,9 @@
         "crates/domain/tests/serde_contracts/r2_07_module_paths.rs"
       ],
       "externalCallers": [
-        "crates/application/src/analytics.rs",
+        "crates/application/src/services/analytics/facade.rs",
+        "crates/application/src/services/analytics/service.rs",
+        "crates/application/src/use_cases/analytics/parameter_lifecycle/generate_parameter_tuning_candidate/mod.rs",
         "src-tauri/src/commands/analytics.rs"
       ],
       "databaseMappings": []
@@ -22137,6 +22216,9 @@
         "crates/domain/tests/serde_contracts/r2_07_module_paths.rs"
       ],
       "externalCallers": [
+        "crates/application/src/composition/adapters/analytics.rs",
+        "crates/application/src/ports/analytics/contracts.rs",
+        "crates/application/src/ports/analytics/mod.rs",
         "crates/persistence-postgres/src/analytics.rs"
       ],
       "databaseMappings": [

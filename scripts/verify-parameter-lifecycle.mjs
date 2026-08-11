@@ -9,7 +9,10 @@ const contractText = read("contracts/parameter-lifecycle-contract.json");
 const contract = JSON.parse(contractText);
 const schema = JSON.parse(read("schemas/parameter-lifecycle-contract.schema.json"));
 const migration = read(contract.migration);
-const application = read("crates/application/src/analytics.rs");
+const application = [
+  read("crates/application/src/services/analytics/facade.rs"),
+  read("crates/application/src/use_cases/analytics/parameter_lifecycle/run_parameter_shadow_validation/mod.rs"),
+].join("\n");
 const persistence = read("crates/persistence-postgres/src/parameter_lifecycle.rs");
 const commands = read("src-tauri/src/commands/analytics.rs");
 const registry = read("src-tauri/src/bootstrap/command_registry.rs");
