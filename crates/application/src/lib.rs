@@ -1,7 +1,6 @@
 mod api_workspace;
 mod built_in_artifacts;
 mod composition;
-mod exchange;
 mod model_registry;
 mod model_shell;
 mod p4_orchestration;

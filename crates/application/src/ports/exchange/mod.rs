@@ -1,25 +1,36 @@
 use crate::ports::PortResult;
 use async_trait::async_trait;
 use football_domain::{
-    MatchLineupExportData, SpreadsheetExportData, SpreadsheetImportCommitResult,
-    SpreadsheetImportPreview, SpreadsheetImportResolution, SpreadsheetParsedWorkbook,
-    TeamMonthlyWorkbookData,
+    AiMatchPackageContext, MatchLineupExportData, SpreadsheetExportData,
+    SpreadsheetImportCommitResult, SpreadsheetImportMode, SpreadsheetImportPreview,
+    SpreadsheetImportResolution, SpreadsheetParsedWorkbook, TeamMonthlyWorkbookData,
 };
 use uuid::Uuid;
 
 #[async_trait]
 pub trait MatchLineupExchangePort: Send + Sync {
-    async fn export_match_lineup(&self, match_id: Uuid) -> PortResult<MatchLineupExportData>;
+    async fn export_match_lineup(
+        &self,
+        match_id: Option<Uuid>,
+    ) -> PortResult<MatchLineupExportData>;
+
     async fn preview_import(
         &self,
         workbook: &SpreadsheetParsedWorkbook,
+        mode: SpreadsheetImportMode,
     ) -> PortResult<SpreadsheetImportPreview>;
+
+    async fn read_import_preview(&self, preview_id: Uuid) -> PortResult<SpreadsheetImportPreview>;
+
     async fn resolve_import_conflict(
         &self,
         preview_id: Uuid,
-        resolution: &SpreadsheetImportResolution,
+        resolution: SpreadsheetImportResolution,
     ) -> PortResult<SpreadsheetImportPreview>;
+
     async fn commit_import(&self, preview_id: Uuid) -> PortResult<SpreadsheetImportCommitResult>;
+
+    async fn ai_match_package_context(&self, match_id: Uuid) -> PortResult<AiMatchPackageContext>;
 }
 
 #[async_trait]

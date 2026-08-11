@@ -56,6 +56,7 @@ const nodeChecks = [
   "verify-postmatch-settlement.mjs",
   "verify-postmatch-service.mjs",
   "verify-analytics-service.mjs",
+  "verify-exchange-service.mjs",
   "verify-parameter-lifecycle.mjs",
   "verify-api-runtime-diagnostics.mjs",
   "verify-api-compatible-transport.mjs",

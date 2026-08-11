@@ -25,7 +25,7 @@ R2 已完成并关闭。R3 只重写 Application 编排与 Ports/Services/Use Ca
 | R3-06 | Prediction Service | DONE |
 | R3-07 | Research Service | DONE |
 | R3-08 | Review / Postmatch / Analytics Services | DONE |
-| R3-09 | Exchange / AI / Release Services | READY |
+| R3-09 | Exchange / AI / Release Services | IN_PROGRESS |
 | R3-10 | ApplicationService 兼容门面 | BLOCKED |
 
 ## R3-01 完成结果
@@ -162,3 +162,12 @@ R3-02 已正式关闭为 `DONE`。详细记录见 [`R03-02-database-service.md`]
 - clean publication commit `fcf5f3df29b477baf7e1c3aeebcf5ed6f459b8a8` 的 PR #16 CI run `31461760837` 与 canonical CI run `31463538968` / job `93691679605` 均整体 `SUCCESS`；canonical artifact `9091238488`，大小 `14092031` 字节，SHA-256 `ae08e7eeccb09f4b625885716391f88de2ad4ce3902d59608c4978bc63f29a72`。
 - 18 个需要专用 `FOOTBALL_TEST_DATABASE_URL` 的 PostgreSQL 集成测试按既有安全设计保持 `ignored`，未记为已执行；未执行破坏性数据库验证。
 - R3-08 已正式关闭为 `DONE`；下一任务 R3-09 Exchange / AI Workspace / Release Services 为 `READY`。
+
+
+### R3-09 当前执行
+
+- Atomic Task 1 — Match Lineup / AI Match Package Exchange：`VERIFYING`。
+- Atomic Task 2 — Spreadsheet Exchange：`NOT_STARTED`。
+- Atomic Task 3 — AI Workspace：`NOT_STARTED`。
+- Atomic Task 4 — Release：`NOT_STARTED`。
+- AT1 Windows hard gate run `31470329279` 已通过最小门禁与完整 frontend/Rust 阶段回归；正式 Public Platform CI 尚未执行，因此 AT1 未标记 `DONE`，R3-10 继续 `BLOCKED`。

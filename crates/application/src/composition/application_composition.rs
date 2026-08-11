@@ -3,9 +3,9 @@ use crate::model_registry::ModelRegistry;
 use crate::model_shell::PublicModelStub;
 use crate::services::{
     analytics::AnalyticsService, competition::CompetitionService, database::DatabaseService,
-    lineups::LineupService, players::PlayerService, postmatch::PostmatchService,
-    prediction::PredictionService, research::ResearchService, review::ReviewService,
-    rules::RulesService, teams::TeamService,
+    exchange::ExchangeService, lineups::LineupService, players::PlayerService,
+    postmatch::PostmatchService, prediction::PredictionService, research::ResearchService,
+    review::ReviewService, rules::RulesService, teams::TeamService,
 };
 use std::sync::{atomic::AtomicBool, Arc};
 
@@ -22,6 +22,7 @@ pub(crate) struct ApplicationComposition {
     review: ReviewService,
     postmatch: PostmatchService,
     analytics: AnalyticsService,
+    exchange: ExchangeService,
     p4_worker_running: AtomicBool,
 }
 
@@ -38,6 +39,7 @@ pub(crate) struct ApplicationParts {
     pub(crate) review: ReviewService,
     pub(crate) postmatch: PostmatchService,
     pub(crate) analytics: AnalyticsService,
+    pub(crate) exchange: ExchangeService,
     pub(crate) p4_worker_running: AtomicBool,
 }
 
@@ -61,6 +63,7 @@ impl ApplicationComposition {
             review: ReviewService::new(),
             postmatch: PostmatchService::new(),
             analytics: AnalyticsService::new(),
+            exchange: ExchangeService::new(),
             p4_worker_running: AtomicBool::new(false),
         }
     }
@@ -79,6 +82,7 @@ impl ApplicationComposition {
             review: self.review,
             postmatch: self.postmatch,
             analytics: self.analytics,
+            exchange: self.exchange,
             p4_worker_running: self.p4_worker_running,
         }
     }

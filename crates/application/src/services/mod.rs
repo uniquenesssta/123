@@ -1,6 +1,7 @@
 pub(crate) mod analytics;
 pub(crate) mod competition;
 pub(crate) mod database;
+pub(crate) mod exchange;
 pub(crate) mod lineups;
 pub(crate) mod players;
 pub(crate) mod postmatch;
