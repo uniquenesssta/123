@@ -6,7 +6,7 @@
 
 ## Atomic Task 1 — Match Lineup / AI Match Package Exchange
 
-状态：`VERIFYING`
+状态：`DONE`
 
 ### 当前实施范围
 
@@ -25,4 +25,5 @@
 
 - Windows hard gate run `31470329279`：rustfmt、官方 Domain inventory、Exchange 专项、Application Ports、Application Composition、Match Lineup chain、完整 architecture、保护资产、Application check/tests、完整 `verify:frontend` 与完整 `verify:rust` 均 `SUCCESS`。
 - 18 个需要专用 `FOOTBALL_TEST_DATABASE_URL` 的 PostgreSQL 集成测试继续按既有安全设计保持 `ignored`，未记为已执行；AT1 未执行破坏性数据库验证。
-- 当前仅进入 `VERIFYING`；clean publication tree 的正式 Public Platform CI、Windows automated acceptance 与 evidence upload 全部成功后，AT1 才能关闭为 `DONE` 并开放 Atomic Task 2。
+- clean publication commit `a1bc2cf283a5ffbd81f01950466c5c8c79a9cc1b` 的 PR #17 Public Platform CI run `31471485706` 已整体 `SUCCESS`；canonical Public Platform CI run `31473739191` / Windows Automated job `93722595150` 亦整体 `SUCCESS`，evidence artifact `9095149094` 大小 `14073911` 字节，SHA-256 `12f9e3fcca2a90c510a03295299d5c5cda9ecfa0dce844d63b3f335c04216087`。
+- AT1 已正式关闭为 `DONE`；Atomic Task 2 — Spreadsheet Exchange 已开放为 `READY`。R3-09 继续为 `IN_PROGRESS`，R3-10 继续 `BLOCKED`。

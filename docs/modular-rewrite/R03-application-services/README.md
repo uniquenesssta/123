@@ -166,8 +166,8 @@ R3-02 已正式关闭为 `DONE`。详细记录见 [`R03-02-database-service.md`]
 
 ### R3-09 当前执行
 
-- Atomic Task 1 — Match Lineup / AI Match Package Exchange：`VERIFYING`。
-- Atomic Task 2 — Spreadsheet Exchange：`NOT_STARTED`。
+- Atomic Task 1 — Match Lineup / AI Match Package Exchange：`DONE`。
+- Atomic Task 2 — Spreadsheet Exchange：`READY`。
 - Atomic Task 3 — AI Workspace：`NOT_STARTED`。
 - Atomic Task 4 — Release：`NOT_STARTED`。
-- AT1 Windows hard gate run `31470329279` 已通过最小门禁与完整 frontend/Rust 阶段回归；正式 Public Platform CI 尚未执行，因此 AT1 未标记 `DONE`，R3-10 继续 `BLOCKED`。
+- AT1 Windows hard gate run `31470329279` 已通过最小门禁与完整 frontend/Rust 阶段回归；clean publication commit `a1bc2cf283a5ffbd81f01950466c5c8c79a9cc1b` 的 canonical Public Platform CI run `31473739191` / Windows Automated job `93722595150` 已整体 `SUCCESS`，artifact `9095149094` 大小 `14073911` 字节，SHA-256 `12f9e3fcca2a90c510a03295299d5c5cda9ecfa0dce844d63b3f335c04216087`。AT1 已关闭为 `DONE`，AT2 已开放为 `READY`，R3-10 继续 `BLOCKED`。
