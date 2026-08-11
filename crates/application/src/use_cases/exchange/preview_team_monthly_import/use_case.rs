@@ -7,7 +7,11 @@ use football_domain::{SpreadsheetImportMode, SpreadsheetImportPreview};
 use football_spreadsheet_io::read_team_monthly_workbook;
 use std::future::Future;
 
-pub(crate) async fn execute<P, F>(session: F, input_path: String, mode: SpreadsheetImportMode) -> ApplicationResult<SpreadsheetImportPreview>
+pub(crate) async fn execute<P, F>(
+    session: F,
+    input_path: String,
+    mode: SpreadsheetImportMode,
+) -> ApplicationResult<SpreadsheetImportPreview>
 where
     P: MonthlyWorkbookPort,
     F: Future<Output = ApplicationResult<P>>,

@@ -7,7 +7,10 @@ use football_domain::{MonthlyWorkbookExportSummary, MonthlyWorkbookKind};
 use football_spreadsheet_io::write_team_monthly_export;
 use std::future::Future;
 
-pub(crate) async fn execute<P, F>(session: F, output_path: String) -> ApplicationResult<MonthlyWorkbookExportSummary>
+pub(crate) async fn execute<P, F>(
+    session: F,
+    output_path: String,
+) -> ApplicationResult<MonthlyWorkbookExportSummary>
 where
     P: SpreadsheetExchangePort + MonthlyWorkbookPort,
     F: Future<Output = ApplicationResult<P>>,

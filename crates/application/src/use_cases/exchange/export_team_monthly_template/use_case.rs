@@ -1,13 +1,16 @@
 use crate::{
     ports::exchange::SpreadsheetExchangePort,
-    use_cases::exchange::file_validation::spreadsheet::validate_xlsx_path,
-    ApplicationError, ApplicationResult,
+    use_cases::exchange::file_validation::spreadsheet::validate_xlsx_path, ApplicationError,
+    ApplicationResult,
 };
 use football_domain::{MonthlyWorkbookExportSummary, MonthlyWorkbookKind};
 use football_spreadsheet_io::write_team_monthly_template;
 use std::future::Future;
 
-pub(crate) async fn execute<P, F>(session: F, output_path: String) -> ApplicationResult<MonthlyWorkbookExportSummary>
+pub(crate) async fn execute<P, F>(
+    session: F,
+    output_path: String,
+) -> ApplicationResult<MonthlyWorkbookExportSummary>
 where
     P: SpreadsheetExchangePort,
     F: Future<Output = ApplicationResult<P>>,

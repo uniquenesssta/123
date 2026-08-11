@@ -1,6 +1,6 @@
 use crate::{
-    use_cases::exchange::file_validation::spreadsheet::validate_json_path,
-    ApplicationError, ApplicationResult,
+    use_cases::exchange::file_validation::spreadsheet::validate_json_path, ApplicationError,
+    ApplicationResult,
 };
 use chrono::Utc;
 use football_domain::{
@@ -54,7 +54,9 @@ pub(crate) async fn execute(
         Ok(())
     })
     .await
-    .map_err(|error| ApplicationError::Validation(format!("完整预检 JSON 导出任务失败：{error}")))??;
+    .map_err(|error| {
+        ApplicationError::Validation(format!("完整预检 JSON 导出任务失败：{error}"))
+    })??;
     Ok(TeamPackagePreviewExportSummary {
         output_path: path.to_string_lossy().to_string(),
         format_version: TEAM_PACKAGE_PREVIEW_EXPORT_FORMAT.to_string(),

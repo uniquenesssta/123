@@ -83,13 +83,11 @@ pub(super) fn calculate(
     }
     let player_factor = (player_count.min(26) as f64 / 26.0 * 20.0).round() as u8;
     let ability_target = (player_count * 8).max(1);
-    let ability_factor = ((player_ability_count.min(ability_target) as f64
-        / ability_target as f64)
+    let ability_factor = ((player_ability_count.min(ability_target) as f64 / ability_target as f64)
         * 25.0)
         .round() as u8;
     let tag_target = (player_count * 5).max(1);
-    let tag_factor = ((player_dynamic_tag_count.min(tag_target) as f64 / tag_target as f64)
-        * 20.0)
+    let tag_factor = ((player_dynamic_tag_count.min(tag_target) as f64 / tag_target as f64) * 20.0)
         .round() as u8;
     let mut readiness_score = 0_u8;
     if team_count > 0 {
