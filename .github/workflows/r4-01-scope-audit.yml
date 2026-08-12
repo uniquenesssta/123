@@ -21,17 +21,27 @@ jobs:
         run: |
           $ErrorActionPreference = 'Stop'
           $PSNativeCommandUseErrorActionPreference = $true
+          function Find-InFiles([string]$Pattern, [string[]]$Roots) {
+            $files = foreach ($root in $Roots) {
+              if (Test-Path $root -PathType Leaf) { Get-Item $root }
+              elseif (Test-Path $root) { Get-ChildItem $root -Recurse -File }
+            }
+            $files |
+              Where-Object { $_.FullName -notmatch '[\\/](node_modules|target|\.cargo-target)[\\/]' } |
+              Select-String -Pattern $Pattern -AllMatches |
+              ForEach-Object { "{0}:{1}:{2}" -f $_.Path.Replace((Get-Location).Path + '\',''), $_.LineNumber, $_.Line.Trim() }
+          }
           Write-Host '=== git status ==='
           git status --short
           Write-Host '=== persistence src files ==='
           git ls-files crates/persistence-postgres/src
           Write-Host '=== PostgresStore refs ==='
-          rg -n --glob '!target/**' --glob '!node_modules/**' 'PostgresStore' crates src-tauri scripts tests architecture
+          Find-InFiles 'PostgresStore' @('crates','src-tauri','scripts','tests','architecture')
           Write-Host '=== PersistenceError refs ==='
-          rg -n --glob '!target/**' --glob '!node_modules/**' 'PersistenceError|PersistenceResult' crates src-tauri scripts tests architecture
+          Find-InFiles 'PersistenceError|PersistenceResult' @('crates','src-tauri','scripts','tests','architecture')
           Write-Host '=== connection.rs / migration_compatibility.rs textual refs ==='
-          rg -n --glob '!target/**' --glob '!node_modules/**' 'persistence-postgres/src/connection\.rs|persistence-postgres/src/migration_compatibility\.rs|connection\.rs|migration_compatibility\.rs' scripts tests architecture docs package.json
+          Find-InFiles 'persistence-postgres/src/connection\.rs|persistence-postgres/src/migration_compatibility\.rs|connection\.rs|migration_compatibility\.rs' @('scripts','tests','architecture','docs','package.json')
           Write-Host '=== connection methods ==='
-          rg -n 'pub async fn (connect|migrate|reset_to_pristine|close|health|stats)|ensure_runtime_schema_compatibility|redact_database_url|DatabaseOptions|DatabaseHealth|DatabaseStats' crates/persistence-postgres/src crates/application src-tauri scripts tests
+          Find-InFiles 'pub async fn (connect|migrate|reset_to_pristine|close|health|stats)|ensure_runtime_schema_compatibility|redact_database_url|DatabaseOptions|DatabaseHealth|DatabaseStats' @('crates/persistence-postgres/src','crates/application','src-tauri','scripts','tests')
           Write-Host '=== protected / migration verifiers ==='
-          rg -n 'verify.*migration|migration.*verify|protected.assets|database.baseline|0001|0046' package.json scripts architecture | Select-Object -First 400
+          Find-InFiles 'verify.*migration|migration.*verify|protected.assets|database.baseline|0001|0046' @('package.json','scripts','architecture') | Select-Object -First 400
