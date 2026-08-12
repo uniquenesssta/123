@@ -8,6 +8,9 @@ use football_domain::{
 };
 use uuid::Uuid;
 
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct SerializedApiWorkspaceOperationResult(pub String);
+
 #[async_trait]
 pub trait ApiWorkspaceSessionPort: Send + Sync {
     async fn usage_totals(&self) -> PortResult<OpenAiUsageTotals>;
@@ -41,7 +44,7 @@ pub trait ApiWorkspaceOperationPort: Send + Sync {
         &self,
         operation_id: Uuid,
         status: &str,
-        result: serde_json::Value,
+        result: &SerializedApiWorkspaceOperationResult,
         error_message: Option<&str>,
     ) -> PortResult<ApiWorkspaceOperationRecord>;
     async fn reject_operation(
