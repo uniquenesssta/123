@@ -36,3 +36,4 @@ R4-01 完成前保持 `READY/VERIFYING`，只有目标职责切换为唯一 owne
 - PR #22 已合并到 `rewrite/r4-persistence-foundation`，merge commit `ed99ce3bc21da76a55de526a7f912fa363bb84a5`。
 - 最终 clean Public Platform CI run `31615930113` / job `94178594481`：`SUCCESS`；artifact `9150134498`，13,909,168 bytes，SHA-256 `6da5f1750feef5f7fc00233165dea7f7563fefa96d08f8e515a22e16fa4dd5e1`。
 - R4-01 正式关闭为 `DONE`；R4-02 开放为 `READY`，R4-03/R4-04 继续 `BLOCKED`。
+- R4-02 必须从本阶段分支当前收口基线独立开始；本收口未包含任何 R4-02 生产源码改动。
