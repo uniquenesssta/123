@@ -51,4 +51,32 @@
 - Windows hard gate run `31512091398` / job `93848182746`：最终 rustfmt、官方 Domain inventory、完整 `verify:architecture`、workspace Clippy `-D warnings` 与 workspace tests 均 `SUCCESS`；Exchange 专项确认 AT1 + AT2 共 24 个公共用例由唯一 `ExchangeService` 编排，Spreadsheet/Monthly Ports 与 ActiveDatabase 适配完整，旧 owners 清零且错误优先级保持。
 - 同一 Rust 工作区回归中 Application tests 35/35、Domain tests 10/10、Domain Serde 17/17、Tauri tests 27/27、Persistence unit tests 74/74、Spreadsheet IO tests 12/12 均通过，未见测试失败。
 - 18 个需要专用 `FOOTBALL_TEST_DATABASE_URL` 的 PostgreSQL 集成测试继续按既有安全设计保持 `ignored`，未记为已执行；未执行破坏性数据库验证。
-- 最终 clean Public Platform CI run `31513432237` / Windows Automated job `93852598090` 已在正式只读 workflow 与 clean HEAD `8719008ba63241d313fe02ce4328ee8d0a727e9d` 上整体 `SUCCESS`；architecture、完整 Windows automated acceptance 与 validation evidence upload 均成功。artifact `9110944721` 大小 `14040458` 字节，SHA-256 `f0628be97bbfb13a765da3e4799bd7e8abf549352e391cb79ef1111cb9522a9f`。AT2 正式关闭为 `DONE`；AT3 AI Workspace 开放为 `READY`，AT4 Release 保持 `NOT_STARTED`。
+- 最终 clean Public Platform CI run `31513432237` / Windows Automated job `93852598090` 已在正式只读 workflow 与 clean HEAD `8719008ba63241d313fe02ce4328ee8d0a727e9d` 上整体 `SUCCESS`；architecture、完整 Windows automated acceptance 与 validation evidence upload 均成功。artifact `9110944721` 大小 `14040458` 字节，SHA-256 `f0628be97bbfb13a765da3e4799bd7e8abf549352e391cb79ef1111cb9522a9f`。AT2 正式关闭为 `DONE`；AT3 AI Workspace 后续已完成源码迁移并进入 `VERIFYING`，AT4 Release 保持 `NOT_STARTED`。
+
+
+## Atomic Task 3 — AI Workspace
+
+状态：`VERIFYING`
+
+### 当前实施范围
+
+- 删除旧 `crates/application/src/api_workspace.rs`，不保留转发壳；12 个既有 ApplicationService AI Workspace 入口保持原名、参数和返回 DTO，并由唯一 `AiWorkspaceService` 编排。
+- 12 个公共职责分别进入 `use_cases/ai_workspace/<use-case>/`；Session、Context、Operation、Presets、Attachments 分责，Apply Operation 再拆为 orchestration、dispatch、payload 与 metadata，避免重新形成职责混合大文件。
+- 最小补齐 R3-01 `ApiWorkspaceSessionPort` / `ApiWorkspaceOperationPort` 的 usage/session/message/generated-file/operation lifecycle 能力；具体 PostgreSQL 调用仅由 `composition/adapters/ai_workspace.rs` 的 `ActiveDatabase` 适配。
+- Ports 禁止裸 JSON 的既有门禁保持不变；Operation 完成结果使用显式 `SerializedApiWorkspaceOperationResult` 穿越 Port，由组合 adapter 唯一反序列化后调用既有 persistence API。
+- `ApiWorkspacePresetSpec`、preset 查询和附件读取公共导出改由新 Use Case 模块提供，原公开名称继续由 `lib.rs` re-export。
+
+### 兼容边界
+
+- 12 个 ApplicationService 方法、preset key、错误文本、200 球员通用上下文上限、Operation claim/apply/failed/reject 生命周期、7 种既有数据库提案类型、metadata 注入字段和附件数量/大小/类型/截断/hash 语义保持不变。
+- Tauri AI Workspace 产品命令与 UI 未重构；当前“不接受新附件的 AI 问答”行为保持不变，已禁用的 apply/reject Tauri 命令没有重新暴露。
+- PostgreSQL SQL/migration/Schema、Domain 公共契约、前端产品源码、模型保护区、Release/AT4、配置、日志等级与生产依赖未改变。
+- `verify-api-workspace.mjs` 与 `verify-team-player-management.mjs` 仅迁移到新 authoritative owner，原业务断言未删除或放宽；新增 `verify-ai-workspace-service.mjs` 并接入完整 architecture/frontend 门禁。
+
+### 验证状态
+
+- Windows hard gate run `31553249625` / job `93980269528` 已整体 `SUCCESS`：Rust 1.88.0 rustfmt、官方 Domain inventory、完整 `verify:architecture`、37-Port 契约、新 AI Workspace 专项、`cargo check --locked -p football-application`、Application tests 33/33、`cargo clippy --locked -p football-application --all-targets -- -D warnings` 与 formatter scope 均通过。
+- 第一轮门禁发现 `ApiWorkspaceOperationPort` 裸 `serde_json::Value` 违反 R3-01 边界，已改用显式序列化结果类型；第二处阻塞为历史验证器仍读取已删除 owner，已只迁移 authoritative source。两项都未通过放宽、跳过或删除门禁处理。
+- 临时 hard-gate workflow 已自删除；最终源码树不保留该诊断入口。
+- 18 个需要专用 `FOOTBALL_TEST_DATABASE_URL` 的 PostgreSQL 集成测试未在本 hard gate 执行，未记为通过；未执行破坏性数据库验证。
+- PR #19 当前保持 draft 且未合并；最终 clean Public Platform CI / Windows Automated 尚待执行，因此 AT3 当前保持 `VERIFYING`，不得提前关闭为 `DONE`；AT4 Release 保持 `NOT_STARTED`。
