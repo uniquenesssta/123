@@ -133,10 +133,10 @@
     },
     {
       "id": "persistence.pg-pool",
-      "owner": "crates/persistence-postgres/src/lib.rs::PostgresStore.pool",
+      "owner": "crates/persistence-postgres/src/store/postgres_store.rs::PostgresStore.pool",
       "scope": "PostgresStore",
       "writers": [
-        "crates/persistence-postgres/src/connection.rs"
+        "crates/persistence-postgres/src/pool/create_pool.rs"
       ],
       "forbidden": [
         "crates/application/**",

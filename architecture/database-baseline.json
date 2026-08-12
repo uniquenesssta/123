@@ -75,11 +75,24 @@
   "runtime_sources": [
     {"path":"crates/persistence-postgres/Cargo.toml","git_blob_sha1":"5f83e84c41b53af3f96ebe5a95cabaade04fee1d"},
     {"path":"crates/persistence-postgres/build.rs","git_blob_sha1":"ee7c9aa50b9ac259453f5b4ce45ea5fcc1c731ad"},
-    {"path":"crates/persistence-postgres/src/connection.rs","git_blob_sha1":"638dedd30398e7c5023cff741e1c92717c933aca"},
-    {"path":"crates/persistence-postgres/tests/postgres_integration.rs","git_blob_sha1":"b378d734495c0846818e7cd06c30d93f69131231"}
+    {"path":"crates/persistence-postgres/src/error/persistence_error.rs","git_blob_sha1":"1f6dc01be9b945dce9168397490d14a415ed6ca5"},
+    {"path":"crates/persistence-postgres/src/health/database_health.rs","git_blob_sha1":"f26829a924934cff001562294ade7fe85568ac89"},
+    {"path":"crates/persistence-postgres/src/health/read_health.rs","git_blob_sha1":"68a5d1649bf0ec10b6629169eaf45c0489d85e19"},
+    {"path":"crates/persistence-postgres/src/migrations/reconcile_known_migrations.rs","git_blob_sha1":"098979c824f02a32a9e7323e176432c53e4f6f69"},
+    {"path":"crates/persistence-postgres/src/migrations/reset_to_pristine.rs","git_blob_sha1":"db9109d5a8966956e5c17d8caf5d02604cfcc8b2"},
+    {"path":"crates/persistence-postgres/src/migrations/run_migrations.rs","git_blob_sha1":"5faf4351fa509aa045e1e47228598058726afd38"},
+    {"path":"crates/persistence-postgres/src/migrations/runtime_schema.rs","git_blob_sha1":"9afdd075bd3a8cb517894d5fdb2f355efa44dee1"},
+    {"path":"crates/persistence-postgres/src/pool/create_pool.rs","git_blob_sha1":"7c97ca52e3832a3f46a760a3d9ca8a0d73934f50"},
+    {"path":"crates/persistence-postgres/src/pool/database_options.rs","git_blob_sha1":"f2dd59bd961d6c8fa9a13d4b9f8e9e081c34fbff"},
+    {"path":"crates/persistence-postgres/src/statistics/database_stats.rs","git_blob_sha1":"e6dc9979bb0bc8eef57b64088cc85d5a9e056d7e"},
+    {"path":"crates/persistence-postgres/src/statistics/read_statistics.rs","git_blob_sha1":"cf5849f972dc923d33a2cc39c1a0f3ead88a53db"},
+    {"path":"crates/persistence-postgres/src/store/postgres_store.rs","git_blob_sha1":"939445bec1e0e35ab28c25173d87e2ccf4dc79de"},
+    {"path":"crates/persistence-postgres/tests/postgres_integration.rs","git_blob_sha1":"44dcd594ac739ab341bd5009f613d5de6fd1aa1e"}
   ],
   "runtime_requirements": [
-    {"path":"crates/persistence-postgres/src/connection.rs","required_tokens":["static MIGRATOR: sqlx::migrate::Migrator = sqlx::migrate!(\"./migrations\");","MIGRATOR.run(&self.pool).await?","self.ensure_runtime_schema_compatibility().await?","SELECT feature.refresh_player_ability_projections()","DROP TABLE IF EXISTS public._sqlx_migrations","self.migrate().await"]},
+    {"path":"crates/persistence-postgres/src/migrations/run_migrations.rs","required_tokens":["static MIGRATOR: sqlx::migrate::Migrator = sqlx::migrate!(\"./migrations\");","reconcile_known_legacy_migrations(&self.pool).await?;","MIGRATOR.run(&self.pool).await?;","ensure_runtime_schema_compatibility(&self.pool).await?;","SELECT feature.refresh_player_ability_projections()"]},
+    {"path":"crates/persistence-postgres/src/migrations/reset_to_pristine.rs","required_tokens":["football-platform-destructive-reset","DROP TABLE IF EXISTS public._sqlx_migrations","self.migrate().await"]},
+    {"path":"crates/persistence-postgres/src/migrations/runtime_schema.rs","required_tokens":["football-platform-schema-compatibility","ADD COLUMN IF NOT EXISTS created_at timestamptz","ability_observations_player_cutoff_idx"]},
     {"path":"crates/persistence-postgres/tests/postgres_integration.rs","required_tokens":["const DATABASE_ENV: &str = \"FOOTBALL_TEST_DATABASE_URL\";","store.migrate().await.expect","migrations_are_idempotent_and_health_is_connected","prediction_input_audit_fields_are_persisted_and_immutable","p4_stage_e_source_policy_is_idempotent_versioned_and_immutable","p4_stage_g_manual_override_ledger_is_unique_and_immutable","external_model_provider_artifact_is_registered_once_and_immutable","p4_stage_c_writes_are_idempotent_and_frozen_history_is_immutable"]}
   ],
   "immutable_guards": [

@@ -1,4 +1,4 @@
-use super::{PersistenceError, PersistenceResult};
+use crate::{PersistenceError, PersistenceResult};
 use sha2::{Digest, Sha384};
 use sqlx::{postgres::PgPool, Postgres, Row, Transaction};
 
@@ -245,17 +245,17 @@ async fn column_exists(
 
 fn current_migration_checksum(version: i64) -> Option<Vec<u8>> {
     let sql = match version {
-        12 => include_str!("../migrations/0012_p4_integration_contract.sql"),
-        13 => include_str!("../migrations/0013_p4_engine_artifacts.sql"),
-        14 => include_str!("../migrations/0014_p4_evidence_and_snapshots.sql"),
-        15 => include_str!("../migrations/0015_p4_openai_research_gateway.sql"),
-        16 => include_str!("../migrations/0016_p4_fact_pipeline.sql"),
-        17 => include_str!("../migrations/0017_p4_horizon_orchestration.sql"),
-        18 => include_str!("../migrations/0018_p4_single_match_workbench.sql"),
-        25 => include_str!("../migrations/0025_parameter_lifecycle.sql"),
-        26 => include_str!("../migrations/0026_postmatch_settlement.sql"),
-        27 => include_str!("../migrations/0027_release_acceptance.sql"),
-        31 => include_str!("../migrations/0031_p4_model_family_time_windows.sql"),
+        12 => include_str!("../../migrations/0012_p4_integration_contract.sql"),
+        13 => include_str!("../../migrations/0013_p4_engine_artifacts.sql"),
+        14 => include_str!("../../migrations/0014_p4_evidence_and_snapshots.sql"),
+        15 => include_str!("../../migrations/0015_p4_openai_research_gateway.sql"),
+        16 => include_str!("../../migrations/0016_p4_fact_pipeline.sql"),
+        17 => include_str!("../../migrations/0017_p4_horizon_orchestration.sql"),
+        18 => include_str!("../../migrations/0018_p4_single_match_workbench.sql"),
+        25 => include_str!("../../migrations/0025_parameter_lifecycle.sql"),
+        26 => include_str!("../../migrations/0026_postmatch_settlement.sql"),
+        27 => include_str!("../../migrations/0027_release_acceptance.sql"),
+        31 => include_str!("../../migrations/0031_p4_model_family_time_windows.sql"),
         _ => return None,
     };
     Some(Sha384::digest(sql.as_bytes()).to_vec())
