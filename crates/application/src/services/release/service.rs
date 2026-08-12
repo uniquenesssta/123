@@ -1,6 +1,4 @@
-use crate::{
-    ports::release::ReleaseAcceptancePort, use_cases::release, ApplicationResult,
-};
+use crate::{ports::release::ReleaseAcceptancePort, use_cases::release, ApplicationResult};
 use football_domain::{
     ReleaseAcceptanceRequest, ReleaseAcceptanceRun, ReleaseAcceptanceRunSummary,
 };
