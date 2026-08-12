@@ -32,26 +32,39 @@ jobs:
         shell: pwsh
         run: |
           $ErrorActionPreference = 'Stop'
+          $utf8NoBom = [System.Text.UTF8Encoding]::new($false)
+
+          function Read-Text([string]$Path) {
+            return [System.IO.File]::ReadAllText($Path, [System.Text.Encoding]::UTF8)
+          }
+
+          function Write-Text([string]$Path, [string]$Content) {
+            [System.IO.File]::WriteAllText($Path, $Content, $utf8NoBom)
+          }
+
+          function Append-Text([string]$Path, [string]$Content) {
+            [System.IO.File]::AppendAllText($Path, $Content, $utf8NoBom)
+          }
 
           function Replace-ExactlyOnce([string]$Path, [string]$Pattern, [string]$Replacement) {
-            $text = Get-Content -Raw -Encoding UTF8 $Path
+            $text = Read-Text $Path
             $matches = [regex]::Matches($text, $Pattern)
             if ($matches.Count -ne 1) {
               throw "Expected exactly one match in $Path for pattern: $Pattern; found $($matches.Count)"
             }
             $next = [regex]::Replace($text, $Pattern, $Replacement, 1)
-            Set-Content -Encoding UTF8 -NoNewline $Path $next
+            Write-Text $Path $next
           }
 
           $index = 'docs/modular-rewrite/R04-persistence-foundation/README.md'
           Replace-ExactlyOnce $index '\| R4-01 \| Store / Error / Pool / migration / health / statistics \| VERIFYING \|' '| R4-01 | Store / Error / Pool / migration / health / statistics | DONE |'
           Replace-ExactlyOnce $index '\| R4-02 \| Audit 基础设施 \| BLOCKED \|' '| R4-02 | Audit 基础设施 | READY |'
-          Add-Content -Encoding UTF8 $index "`n## R4-01 收口`n`n- PR #22 已合并到 ``rewrite/r4-persistence-foundation``，merge commit ``ed99ce3bc21da76a55de526a7f912fa363bb84a5``。`n- 最终 clean Public Platform CI run ``31615930113`` / job ``94178594481``：``SUCCESS``；artifact ``9150134498``，13,909,168 bytes，SHA-256 ``6da5f1750feef5f7fc00233165dea7f7563fefa96d08f8e515a22e16fa4dd5e1``。`n- R4-01 正式关闭为 ``DONE``；R4-02 开放为 ``READY``，R4-03/R4-04 继续 ``BLOCKED``。`n"
+          Append-Text $index "`n## R4-01 收口`n`n- PR #22 已合并到 ``rewrite/r4-persistence-foundation``，merge commit ``ed99ce3bc21da76a55de526a7f912fa363bb84a5``。`n- 最终 clean Public Platform CI run ``31615930113`` / job ``94178594481``：``SUCCESS``；artifact ``9150134498``，13,909,168 bytes，SHA-256 ``6da5f1750feef5f7fc00233165dea7f7563fefa96d08f8e515a22e16fa4dd5e1``。`n- R4-01 正式关闭为 ``DONE``；R4-02 开放为 ``READY``，R4-03/R4-04 继续 ``BLOCKED``。`n"
 
           $node = 'docs/modular-rewrite/R04-persistence-foundation/R04-01-store-error-and-pool.md'
           Replace-ExactlyOnce $node '(?m)^`VERIFYING`$' '`DONE`'
           Replace-ExactlyOnce $node '(?m)^- R4-02/R4-03/R4-04 未开始。最终 clean Public Platform CI 与正式合并/收口前，本节点保持 `VERIFYING`。$' '- R4-01 已正式关闭为 `DONE`；R4-02 开放为 `READY`，R4-03/R4-04 继续 `BLOCKED`。'
-          Add-Content -Encoding UTF8 $node "`n## 正式收口`n`n- clean Public Platform CI run ``31615930113`` / Windows Automated job ``94178594481``：``SUCCESS``，architecture、完整 Windows Automated acceptance 与 evidence upload 全部通过。`n- evidence artifact ``9150134498``，13,909,168 bytes，SHA-256 ``6da5f1750feef5f7fc00233165dea7f7563fefa96d08f8e515a22e16fa4dd5e1``。`n- PR #22 已由 Draft 转 Ready 并按固定 HEAD ``9ace623684afe1b7b2bbe7f65afbaae66656ce97`` 合并；merge commit ``ed99ce3bc21da76a55de526a7f912fa363bb84a5``。`n- 18 个要求专用可写 ``FOOTBALL_TEST_DATABASE_URL`` 的 PostgreSQL 集成测试仍未执行；未执行 destructive database reset。`n"
+          Append-Text $node "`n## 正式收口`n`n- clean Public Platform CI run ``31615930113`` / Windows Automated job ``94178594481``：``SUCCESS``，architecture、完整 Windows Automated acceptance 与 evidence upload 全部通过。`n- evidence artifact ``9150134498``，13,909,168 bytes，SHA-256 ``6da5f1750feef5f7fc00233165dea7f7563fefa96d08f8e515a22e16fa4dd5e1``。`n- PR #22 已由 Draft 转 Ready 并按固定 HEAD ``9ace623684afe1b7b2bbe7f65afbaae66656ce97`` 合并；merge commit ``ed99ce3bc21da76a55de526a7f912fa363bb84a5``。`n- 18 个要求专用可写 ``FOOTBALL_TEST_DATABASE_URL`` 的 PostgreSQL 集成测试仍未执行；未执行 destructive database reset。`n"
 
           $readme = 'README.md'
           Replace-ExactlyOnce $readme '(?m)^- R4-01 已将 Persistence Store/Error/Pool/Migration/Health/Statistics.*状态为 `VERIFYING`。$' '- R4-01 已将 Persistence Store/Error/Pool/Migration/Health/Statistics 从旧 `lib.rs`/`connection.rs` 拆入职责目录；历史 0001–0046 migration SQL、公共 Persistence API、DatabaseOptions Serde、错误语义与生产依赖保持不变。严格 hard gate run `31615481637` 已通过专项、数据库基线、architecture、persistence crate check/tests/Clippy；最终 clean Public Platform CI run `31615930113` / job `94178594481` 亦为 `SUCCESS`，artifact `9150134498`，SHA-256 `6da5f1750feef5f7fc00233165dea7f7563fefa96d08f8e515a22e16fa4dd5e1`。PR #22 merge commit 为 `ed99ce3bc21da76a55de526a7f912fa363bb84a5`；18 个专用 PostgreSQL 集成测试仍未执行，未执行 destructive reset。R4-01 状态为 `DONE`，R4-02 已开放为 `READY`。'
