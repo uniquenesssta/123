@@ -1,0 +1,791 @@
+name: R4-01 Strict Hard Gate
+
+on:
+  push:
+    branches:
+      - agent/r4-01-store-error-pool
+
+permissions:
+  contents: write
+
+jobs:
+  hard-gate:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: windows-2025
+    env:
+      BASE_SHA: 4f8bc9a19fbbd9f52a36b6f94d6d819755482e8f
+    steps:
+      - name: Checkout R4-01 branch
+        uses: actions/checkout@v4
+        with:
+          ref: agent/r4-01-store-error-pool
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Setup Rust 1.88.0
+        uses: dtolnay/rust-toolchain@1.88.0
+        with:
+          components: rustfmt, clippy
+
+      - name: Transform persistence foundation
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $PSNativeCommandUseErrorActionPreference = $true
+          @'
+          from pathlib import Path
+
+          root = Path('.')
+          src = root / 'crates/persistence-postgres/src'
+          for directory in ['store', 'pool', 'error', 'migrations', 'health', 'statistics']:
+              (src / directory).mkdir(parents=True, exist_ok=True)
+
+          def write(relative, content):
+              path = root / relative
+              path.parent.mkdir(parents=True, exist_ok=True)
+              path.write_text(content.strip() + '\n', encoding='utf-8', newline='\n')
+
+          write('crates/persistence-postgres/src/error/mod.rs', r'''
+          mod persistence_error;
+
+          pub use persistence_error::{PersistenceError, PersistenceResult};
+          ''')
+
+          write('crates/persistence-postgres/src/error/persistence_error.rs', r'''
+          use thiserror::Error;
+
+          #[derive(Debug, Error)]
+          pub enum PersistenceError {
+              #[error("PostgreSQL 连接或查询失败：{0}")]
+              Sqlx(#[from] sqlx::Error),
+              #[error("数据库迁移失败：{0}")]
+              Migration(#[from] sqlx::migrate::MigrateError),
+              #[error("数据序列化失败：{0}")]
+              Serialization(#[from] serde_json::Error),
+              #[error("数据库数据不完整：{0}")]
+              InvalidState(String),
+              #[error("没有匹配到可用的赛事规则包和模型路由")]
+              RouteNotFound,
+          }
+
+          pub type PersistenceResult<T> = Result<T, PersistenceError>;
+          ''')
+
+          write('crates/persistence-postgres/src/pool/mod.rs', r'''
+          mod create_pool;
+          mod database_options;
+
+          pub(crate) use create_pool::create_pool;
+          pub use database_options::DatabaseOptions;
+          ''')
+
+          write('crates/persistence-postgres/src/pool/create_pool.rs', r'''
+          use super::DatabaseOptions;
+          use crate::PersistenceResult;
+          use sqlx::postgres::{PgPool, PgPoolOptions};
+          use std::time::Duration;
+
+          pub(crate) async fn create_pool(options: &DatabaseOptions) -> PersistenceResult<PgPool> {
+              Ok(PgPoolOptions::new()
+                  .max_connections(options.max_connections.max(1))
+                  .acquire_timeout(Duration::from_secs(options.connect_timeout_seconds.max(1)))
+                  .connect(&options.connection_url)
+                  .await?)
+          }
+          ''')
+
+          write('crates/persistence-postgres/src/pool/database_options.rs', r'''
+          use serde::{Deserialize, Serialize};
+
+          #[derive(Debug, Clone, Serialize, Deserialize)]
+          pub struct DatabaseOptions {
+              pub connection_url: String,
+              #[serde(default = "default_max_connections")]
+              pub max_connections: u32,
+              #[serde(default = "default_connect_timeout_seconds")]
+              pub connect_timeout_seconds: u64,
+          }
+
+          fn default_max_connections() -> u32 {
+              10
+          }
+
+          fn default_connect_timeout_seconds() -> u64 {
+              10
+          }
+
+          impl DatabaseOptions {
+              pub fn redacted_url(&self) -> String {
+                  redact_database_url(&self.connection_url)
+              }
+          }
+
+          fn redact_database_url(url: &str) -> String {
+              let Some(scheme_end) = url.find("://") else {
+                  return "已配置".to_string();
+              };
+              let scheme = &url[..scheme_end + 3];
+              let rest = &url[scheme_end + 3..];
+              let Some(at) = rest.rfind('@') else {
+                  return url.to_string();
+              };
+              let credentials = &rest[..at];
+              let host = &rest[at + 1..];
+              let user = credentials.split(':').next().unwrap_or("user");
+              format!("{scheme}{user}:***@{host}")
+          }
+
+          #[cfg(test)]
+          mod tests {
+              use super::*;
+
+              #[test]
+              fn database_url_redaction_hides_password() {
+                  assert_eq!(
+                      redact_database_url("postgres://football_app:secret@localhost:5432/football_model"),
+                      "postgres://football_app:***@localhost:5432/football_model"
+                  );
+              }
+          }
+          ''')
+
+          write('crates/persistence-postgres/src/store/mod.rs', r'''
+          mod postgres_store;
+
+          pub use postgres_store::PostgresStore;
+          ''')
+
+          write('crates/persistence-postgres/src/store/postgres_store.rs', r'''
+          use crate::{pool::create_pool, DatabaseOptions, PersistenceResult};
+          use sqlx::postgres::PgPool;
+
+          #[derive(Clone)]
+          pub struct PostgresStore {
+              pub(crate) pool: PgPool,
+          }
+
+          impl PostgresStore {
+              pub async fn connect(options: &DatabaseOptions) -> PersistenceResult<Self> {
+                  Ok(Self {
+                      pool: create_pool(options).await?,
+                  })
+              }
+
+              pub async fn close(&self) {
+                  self.pool.close().await;
+              }
+          }
+          ''')
+
+          write('crates/persistence-postgres/src/migrations/mod.rs', r'''
+          mod reconcile_known_migrations;
+          mod reset_to_pristine;
+          mod run_migrations;
+          mod runtime_schema;
+          ''')
+
+          old_compat = src / 'migration_compatibility.rs'
+          compat = old_compat.read_text(encoding='utf-8')
+          compat = compat.replace('use super::{PersistenceError, PersistenceResult};', 'use crate::{PersistenceError, PersistenceResult};')
+          compat = compat.replace('include_str!("../migrations/', 'include_str!("../../migrations/')
+          write('crates/persistence-postgres/src/migrations/reconcile_known_migrations.rs', compat)
+          old_compat.unlink()
+
+          write('crates/persistence-postgres/src/migrations/run_migrations.rs', r'''
+          use super::{
+              reconcile_known_migrations::reconcile_known_legacy_migrations,
+              runtime_schema::ensure_runtime_schema_compatibility,
+          };
+          use crate::{PersistenceResult, PostgresStore};
+
+          static MIGRATOR: sqlx::migrate::Migrator = sqlx::migrate!("./migrations");
+
+          impl PostgresStore {
+              pub async fn migrate(&self) -> PersistenceResult<()> {
+                  reconcile_known_legacy_migrations(&self.pool).await?;
+                  MIGRATOR.run(&self.pool).await?;
+                  ensure_runtime_schema_compatibility(&self.pool).await?;
+                  sqlx::query_scalar::<_, i64>("SELECT feature.refresh_player_ability_projections()")
+                      .fetch_one(&self.pool)
+                      .await?;
+                  Ok(())
+              }
+          }
+          ''')
+
+          write('crates/persistence-postgres/src/migrations/reset_to_pristine.rs', r'''
+          use crate::{PersistenceResult, PostgresStore};
+
+          const APPLICATION_SCHEMAS: [&str; 10] = [
+              "ai_workspace",
+              "analytics",
+              "audit",
+              "catalog",
+              "feature",
+              "football",
+              "model",
+              "platform",
+              "research",
+              "review",
+          ];
+
+          impl PostgresStore {
+              pub async fn reset_to_pristine(&self) -> PersistenceResult<()> {
+                  let mut transaction = self.pool.begin().await?;
+                  sqlx::query(
+                      "SELECT pg_advisory_xact_lock(hashtext('football-platform-destructive-reset')::bigint)",
+                  )
+                  .execute(&mut *transaction)
+                  .await?;
+
+                  for schema in APPLICATION_SCHEMAS {
+                      let statement = format!("DROP SCHEMA IF EXISTS {schema} CASCADE");
+                      sqlx::query(&statement).execute(&mut *transaction).await?;
+                  }
+                  sqlx::query("DROP TABLE IF EXISTS public._sqlx_migrations")
+                      .execute(&mut *transaction)
+                      .await?;
+                  transaction.commit().await?;
+
+                  self.migrate().await
+              }
+          }
+          ''')
+
+          write('crates/persistence-postgres/src/migrations/runtime_schema.rs', r'''
+          use crate::PersistenceResult;
+          use sqlx::postgres::PgPool;
+
+          pub(crate) async fn ensure_runtime_schema_compatibility(pool: &PgPool) -> PersistenceResult<()> {
+              let mut transaction = pool.begin().await?;
+              sqlx::query(
+                  "SELECT pg_advisory_xact_lock(hashtext('football-platform-schema-compatibility')::bigint)",
+              )
+              .execute(&mut *transaction)
+              .await?;
+
+              let observation_table_exists: bool = sqlx::query_scalar(
+                  "SELECT to_regclass('feature.player_ability_observations') IS NOT NULL",
+              )
+              .fetch_one(&mut *transaction)
+              .await?;
+              if !observation_table_exists {
+                  transaction.commit().await?;
+                  return Ok(());
+              }
+
+              let cutoff_column_ready: bool = sqlx::query_scalar(
+                  r#"
+                  SELECT EXISTS (
+                      SELECT 1
+                      FROM information_schema.columns
+                      WHERE table_schema = 'feature'
+                        AND table_name = 'player_ability_observations'
+                        AND column_name = 'created_at'
+                        AND is_nullable = 'NO'
+                        AND column_default IS NOT NULL
+                  )
+                  "#,
+              )
+              .fetch_one(&mut *transaction)
+              .await?;
+
+              if !cutoff_column_ready {
+                  sqlx::query(
+                      "ALTER TABLE feature.player_ability_observations ADD COLUMN IF NOT EXISTS created_at timestamptz",
+                  )
+                  .execute(&mut *transaction)
+                  .await?;
+                  sqlx::query(
+                      "UPDATE feature.player_ability_observations SET created_at = observed_at WHERE created_at IS NULL",
+                  )
+                  .execute(&mut *transaction)
+                  .await?;
+                  sqlx::query(
+                      "ALTER TABLE feature.player_ability_observations ALTER COLUMN created_at SET DEFAULT now()",
+                  )
+                  .execute(&mut *transaction)
+                  .await?;
+                  sqlx::query(
+                      "ALTER TABLE feature.player_ability_observations ALTER COLUMN created_at SET NOT NULL",
+                  )
+                  .execute(&mut *transaction)
+                  .await?;
+              }
+
+              sqlx::query(
+                  r#"
+                  CREATE INDEX IF NOT EXISTS ability_observations_player_cutoff_idx
+                      ON feature.player_ability_observations
+                         (player_id, created_at DESC, dimension_code, effective_from DESC)
+                  "#,
+              )
+              .execute(&mut *transaction)
+              .await?;
+
+              transaction.commit().await?;
+              Ok(())
+          }
+          ''')
+
+          write('crates/persistence-postgres/src/health/mod.rs', r'''
+          mod database_health;
+          mod read_health;
+
+          pub use database_health::DatabaseHealth;
+          ''')
+
+          write('crates/persistence-postgres/src/health/database_health.rs', r'''
+          use chrono::{DateTime, Utc};
+          use serde::{Deserialize, Serialize};
+
+          #[derive(Debug, Clone, Serialize, Deserialize)]
+          pub struct DatabaseHealth {
+              pub connected: bool,
+              pub database_name: String,
+              pub server_version: String,
+              pub migration_count: i64,
+              pub database_size_bytes: i64,
+              pub checked_at: DateTime<Utc>,
+              pub latency_ms: u128,
+          }
+          ''')
+
+          write('crates/persistence-postgres/src/health/read_health.rs', r'''
+          use super::DatabaseHealth;
+          use crate::{PersistenceError, PersistenceResult, PostgresStore};
+          use chrono::Utc;
+          use sqlx::Row;
+          use std::time::Instant;
+
+          impl PostgresStore {
+              pub async fn health(&self) -> PersistenceResult<DatabaseHealth> {
+                  let started = Instant::now();
+                  let required_schema_ready: bool = sqlx::query_scalar(
+                      r#"
+                      SELECT EXISTS (
+                          SELECT 1
+                          FROM information_schema.columns
+                          WHERE table_schema = 'feature'
+                            AND table_name = 'player_ability_observations'
+                            AND column_name = 'created_at'
+                            AND is_nullable = 'NO'
+                            AND column_default IS NOT NULL
+                      )
+                      "#,
+                  )
+                  .fetch_one(&self.pool)
+                  .await?;
+                  if !required_schema_ready {
+                      return Err(PersistenceError::InvalidState(
+                          "数据库缺少当前客户端所需的能力观察写入时点字段".to_string(),
+                      ));
+                  }
+
+                  let row = sqlx::query(
+                      r#"
+                      SELECT
+                          current_database() AS database_name,
+                          current_setting('server_version') AS server_version,
+                          pg_database_size(current_database())::bigint AS database_size_bytes
+                      "#,
+                  )
+                  .fetch_one(&self.pool)
+                  .await?;
+                  let migration_count: i64 = sqlx::query_scalar(
+                      "SELECT COUNT(*)::bigint FROM _sqlx_migrations WHERE success = true",
+                  )
+                  .fetch_one(&self.pool)
+                  .await?;
+                  Ok(DatabaseHealth {
+                      connected: true,
+                      database_name: row.try_get("database_name")?,
+                      server_version: row.try_get("server_version")?,
+                      migration_count,
+                      database_size_bytes: row.try_get("database_size_bytes")?,
+                      checked_at: Utc::now(),
+                      latency_ms: started.elapsed().as_millis(),
+                  })
+              }
+          }
+          ''')
+
+          write('crates/persistence-postgres/src/statistics/mod.rs', r'''
+          mod database_stats;
+          mod read_statistics;
+
+          pub use database_stats::DatabaseStats;
+          ''')
+
+          write('crates/persistence-postgres/src/statistics/database_stats.rs', r'''
+          use serde::{Deserialize, Serialize};
+
+          #[derive(Debug, Clone, Serialize, Deserialize)]
+          pub struct DatabaseStats {
+              pub competitions: i64,
+              pub teams: i64,
+              pub players: i64,
+              pub matches: i64,
+              pub model_runs: i64,
+              pub rule_packages: i64,
+              pub route_bindings: i64,
+              pub ability_observations: i64,
+              pub pending_ability_updates: i64,
+              pub data_providers: i64,
+              pub availability_records: i64,
+              pub active_lineups: i64,
+              pub large_counts_are_estimates: bool,
+          }
+          ''')
+
+          write('crates/persistence-postgres/src/statistics/read_statistics.rs', r'''
+          use super::DatabaseStats;
+          use crate::{PersistenceResult, PostgresStore};
+          use sqlx::Row;
+
+          impl PostgresStore {
+              pub async fn stats(&self) -> PersistenceResult<DatabaseStats> {
+                  // 巨型事实表使用 PostgreSQL 统计估算，避免每次启动都执行 COUNT(*) 全表扫描。
+                  // 小型配置表和带状态条件的工作表仍返回精确数量。
+                  let row = sqlx::query(
+                      r#"
+                      WITH table_estimates AS (
+                          SELECT
+                              COALESCE(max(n_live_tup) FILTER (
+                                  WHERE schemaname = 'football' AND relname = 'teams'
+                              ), 0)::bigint AS teams,
+                              COALESCE(max(n_live_tup) FILTER (
+                                  WHERE schemaname = 'football' AND relname = 'players'
+                              ), 0)::bigint AS players,
+                              COALESCE(max(n_live_tup) FILTER (
+                                  WHERE schemaname = 'football' AND relname = 'matches'
+                              ), 0)::bigint AS matches,
+                              COALESCE(max(n_live_tup) FILTER (
+                                  WHERE schemaname = 'model' AND relname = 'runs'
+                              ), 0)::bigint AS model_runs,
+                              COALESCE(max(n_live_tup) FILTER (
+                                  WHERE schemaname = 'feature' AND relname = 'player_ability_observations'
+                              ), 0)::bigint AS ability_observations,
+                              COALESCE(max(n_live_tup) FILTER (
+                                  WHERE schemaname = 'football' AND relname = 'player_availability'
+                              ), 0)::bigint AS availability_records
+                          FROM pg_stat_user_tables
+                      )
+                      SELECT
+                          (SELECT COUNT(*)::bigint FROM football.competitions) AS competitions,
+                          estimate.teams,
+                          estimate.players,
+                          estimate.matches,
+                          estimate.model_runs,
+                          (SELECT COUNT(*)::bigint FROM model.rule_packages) AS rule_packages,
+                          (SELECT COUNT(*)::bigint FROM model.competition_bindings WHERE is_active) AS route_bindings,
+                          estimate.ability_observations,
+                          (SELECT COUNT(*)::bigint FROM review.ability_update_candidates WHERE status = 'pending') AS pending_ability_updates,
+                          (SELECT COUNT(*)::bigint FROM catalog.data_providers WHERE is_active) AS data_providers,
+                          estimate.availability_records,
+                          (SELECT COUNT(*)::bigint FROM football.lineups WHERE status = 'active') AS active_lineups
+                      FROM table_estimates estimate
+                      "#,
+                  )
+                  .fetch_one(&self.pool)
+                  .await?;
+                  Ok(DatabaseStats {
+                      competitions: row.try_get("competitions")?,
+                      teams: row.try_get("teams")?,
+                      players: row.try_get("players")?,
+                      matches: row.try_get("matches")?,
+                      model_runs: row.try_get("model_runs")?,
+                      rule_packages: row.try_get("rule_packages")?,
+                      route_bindings: row.try_get("route_bindings")?,
+                      ability_observations: row.try_get("ability_observations")?,
+                      pending_ability_updates: row.try_get("pending_ability_updates")?,
+                      data_providers: row.try_get("data_providers")?,
+                      availability_records: row.try_get("availability_records")?,
+                      active_lineups: row.try_get("active_lineups")?,
+                      large_counts_are_estimates: true,
+                  })
+              }
+          }
+          ''')
+
+          connection = src / 'connection.rs'
+          if not connection.exists():
+              raise SystemExit('legacy connection.rs missing before transform')
+          connection.unlink()
+
+          lib = (src / 'lib.rs').read_text(encoding='utf-8')
+          lib = lib.replace('mod connection;\n', 'mod error;\nmod health;\nmod migrations;\nmod pool;\nmod statistics;\nmod store;\n')
+          lib = lib.replace('mod migration_compatibility;\n', '')
+          lib = lib.replace('pub use connection::{DatabaseHealth, DatabaseOptions, DatabaseStats};\n', 'pub use error::{PersistenceError, PersistenceResult};\npub use health::DatabaseHealth;\npub use pool::DatabaseOptions;\npub use statistics::DatabaseStats;\npub use store::PostgresStore;\n')
+          lib = lib.replace('use sqlx::postgres::PgPool;\n', '')
+          lib = lib.replace('use thiserror::Error;\n', '')
+          start = lib.index('#[derive(Debug, Error)]')
+          end = lib.index('async fn write_audit_event')
+          lib = lib[:start] + lib[end:]
+          (src / 'lib.rs').write_text(lib, encoding='utf-8', newline='\n')
+
+          # Historical verifiers: authoritative owner migration only; assertions remain fail-closed.
+          path = root / 'scripts/verify-database-migration-compatibility.mjs'
+          text = path.read_text(encoding='utf-8')
+          text = text.replace('crates/persistence-postgres/src/migration_compatibility.rs', 'crates/persistence-postgres/src/migrations/reconcile_known_migrations.rs')
+          text = text.replace('const connection = read("crates/persistence-postgres/src/connection.rs");', 'const connection = read("crates/persistence-postgres/src/migrations/run_migrations.rs");')
+          text = text.replace('check(library.includes("mod migration_compatibility;"), "PostgreSQL crate 未注册迁移兼容模块");', 'check(library.includes("mod migrations;"), "PostgreSQL crate 未注册迁移基础设施模块");')
+          path.write_text(text, encoding='utf-8', newline='\n')
+
+          path = root / 'scripts/verify-database-reset.mjs'
+          text = path.read_text(encoding='utf-8')
+          text = text.replace('const connection = read("crates/persistence-postgres/src/connection.rs");', 'const connection = read("crates/persistence-postgres/src/migrations/reset_to_pristine.rs");')
+          path.write_text(text, encoding='utf-8', newline='\n')
+
+          # Ownership contracts migrate to the new unique owners.
+          path = root / 'architecture/module-boundaries.json'
+          text = path.read_text(encoding='utf-8')
+          text = text.replace('crates/persistence-postgres/src/lib.rs::PostgresStore', 'crates/persistence-postgres/src/store/postgres_store.rs::PostgresStore')
+          text = text.replace('        "connection",\n', '        "error",\n        "health",\n        "migrations",\n        "pool",\n        "statistics",\n        "store",\n')
+          path.write_text(text, encoding='utf-8', newline='\n')
+
+          path = root / 'architecture/state-ownership.json'
+          text = path.read_text(encoding='utf-8')
+          text = text.replace('crates/persistence-postgres/src/lib.rs::PostgresStore.pool', 'crates/persistence-postgres/src/store/postgres_store.rs::PostgresStore.pool')
+          text = text.replace('"crates/persistence-postgres/src/connection.rs"', '"crates/persistence-postgres/src/pool/create_pool.rs"')
+          path.write_text(text, encoding='utf-8', newline='\n')
+
+          write('scripts/verify-persistence-foundation.mjs', r'''
+          import fs from "node:fs";
+          import path from "node:path";
+          import { fileURLToPath } from "node:url";
+
+          const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
+          const read = (relative) => fs.readFileSync(path.join(root, relative), "utf8");
+          const exists = (relative) => fs.existsSync(path.join(root, relative));
+          const failures = [];
+          const check = (condition, message) => { if (!condition) failures.push(message); };
+
+          const files = {
+            library: "crates/persistence-postgres/src/lib.rs",
+            store: "crates/persistence-postgres/src/store/postgres_store.rs",
+            pool: "crates/persistence-postgres/src/pool/create_pool.rs",
+            options: "crates/persistence-postgres/src/pool/database_options.rs",
+            error: "crates/persistence-postgres/src/error/persistence_error.rs",
+            migrations: "crates/persistence-postgres/src/migrations/run_migrations.rs",
+            compatibility: "crates/persistence-postgres/src/migrations/reconcile_known_migrations.rs",
+            reset: "crates/persistence-postgres/src/migrations/reset_to_pristine.rs",
+            runtime: "crates/persistence-postgres/src/migrations/runtime_schema.rs",
+            health: "crates/persistence-postgres/src/health/read_health.rs",
+            healthDto: "crates/persistence-postgres/src/health/database_health.rs",
+            statistics: "crates/persistence-postgres/src/statistics/read_statistics.rs",
+            statisticsDto: "crates/persistence-postgres/src/statistics/database_stats.rs",
+          };
+          for (const [label, relative] of Object.entries(files)) check(exists(relative), `R4-01 缺少 ${label} owner：${relative}`);
+          check(!exists("crates/persistence-postgres/src/connection.rs"), "旧 connection.rs 仍存在");
+          check(!exists("crates/persistence-postgres/src/migration_compatibility.rs"), "旧 migration_compatibility.rs 仍存在");
+
+          const sources = Object.fromEntries(Object.entries(files).map(([key, relative]) => [key, read(relative)]));
+          check(sources.library.includes("mod store;") && sources.library.includes("mod pool;") && sources.library.includes("mod error;") && sources.library.includes("mod migrations;") && sources.library.includes("mod health;") && sources.library.includes("mod statistics;"), "lib.rs 未显式注册 R4-01 职责模块");
+          for (const token of ["pub use error::{PersistenceError, PersistenceResult};", "pub use health::DatabaseHealth;", "pub use pool::DatabaseOptions;", "pub use statistics::DatabaseStats;", "pub use store::PostgresStore;"]) check(sources.library.includes(token), `公共兼容出口缺失：${token}`);
+
+          const allRust = fs.readdirSync(path.join(root, "crates/persistence-postgres/src"), { recursive: true, withFileTypes: true })
+            .filter((entry) => entry.isFile() && entry.name.endsWith(".rs"))
+            .map((entry) => fs.readFileSync(path.join(entry.parentPath ?? entry.path, entry.name), "utf8"));
+          check(allRust.filter((source) => /pub struct PostgresStore\s*\{/.test(source)).length === 1, "PostgresStore 必须只有一个定义 owner");
+          check(allRust.filter((source) => /pub enum PersistenceError\s*\{/.test(source)).length === 1, "PersistenceError 必须只有一个定义 owner");
+          check(allRust.filter((source) => source.includes("PgPoolOptions::new()")).length === 1, "PgPoolOptions 创建逻辑必须只有一个 owner");
+
+          check(sources.store.includes("pub(crate) pool: PgPool"), "PostgresStore.pool 未保持唯一 crate 内 pool owner");
+          check(sources.store.includes("create_pool(options).await?"), "PostgresStore::connect 未委托 pool 创建模块");
+          check(sources.pool.includes("PgPoolOptions::new()") && sources.pool.includes("max_connections(options.max_connections.max(1))") && sources.pool.includes("acquire_timeout"), "pool 创建契约发生变化");
+          check(sources.options.includes("#[serde(default = \"default_max_connections\")]") && sources.options.includes("#[serde(default = \"default_connect_timeout_seconds\")]") && sources.options.includes("pub fn redacted_url"), "DatabaseOptions 默认值或脱敏接口发生变化");
+          for (const variant of ["Sqlx(#[from] sqlx::Error)", "Migration(#[from] sqlx::migrate::MigrateError)", "Serialization(#[from] serde_json::Error)", "InvalidState(String)", "RouteNotFound"]) check(sources.error.includes(variant), `PersistenceError 兼容变体缺失：${variant}`);
+
+          const reconcile = sources.migrations.indexOf("reconcile_known_legacy_migrations(&self.pool).await?;");
+          const migrate = sources.migrations.indexOf("MIGRATOR.run(&self.pool).await?;");
+          check(reconcile >= 0 && migrate > reconcile, "历史迁移兼容必须先于 SQLx Migrator");
+          check(sources.migrations.includes("ensure_runtime_schema_compatibility(&self.pool).await?;") && sources.migrations.includes("SELECT feature.refresh_player_ability_projections()"), "migration runner 缺少 runtime compatibility 或能力投影刷新");
+          for (const schema of ["ai_workspace", "analytics", "audit", "catalog", "feature", "football", "model", "platform", "research", "review"]) check(sources.reset.includes(`\"${schema}\"`), `reset 缺少 schema：${schema}`);
+          check(sources.reset.includes("football-platform-destructive-reset") && sources.reset.includes("DROP TABLE IF EXISTS public._sqlx_migrations") && sources.reset.includes("self.migrate().await"), "destructive reset 契约发生变化");
+          check(sources.runtime.includes("football-platform-schema-compatibility") && sources.runtime.includes("ADD COLUMN IF NOT EXISTS created_at timestamptz") && sources.runtime.includes("ability_observations_player_cutoff_idx"), "runtime schema compatibility 契约发生变化");
+          check(sources.health.includes("pub async fn health") && sources.health.includes("current_database()") && sources.health.includes("数据库缺少当前客户端所需的能力观察写入时点字段"), "health 行为契约发生变化");
+          check(sources.statistics.includes("pub async fn stats") && sources.statistics.includes("pg_stat_user_tables") && sources.statistics.includes("large_counts_are_estimates: true"), "statistics 估算/精确计数策略发生变化");
+          check(sources.compatibility.includes("COMPATIBLE_MIGRATION_VERSIONS: [i64; 11] = [12, 13, 14, 15, 16, 17, 18, 25, 26, 27, 31]"), "历史迁移兼容白名单发生变化");
+
+          if (failures.length) {
+            console.error("R4-01 Persistence Foundation 验证失败：");
+            failures.forEach((failure) => console.error(`- ${failure}`));
+            process.exit(1);
+          }
+          console.log("R4-01 Persistence Foundation 验证通过：Store/Error/Pool/Migrations/Health/Statistics 已形成唯一职责 owner，公共兼容出口与数据库生命周期语义保持。");
+          ''')
+
+          package = root / 'package.json'
+          text = package.read_text(encoding='utf-8')
+          architecture_token = ' && node scripts/verify-application-service-facade.mjs"'
+          replacement = ' && node scripts/verify-application-service-facade.mjs && node scripts/verify-persistence-foundation.mjs"'
+          if replacement not in text:
+              if architecture_token not in text:
+                  raise SystemExit('verify:architecture insertion anchor missing')
+              text = text.replace(architecture_token, replacement, 1)
+          if '"verify:persistence-foundation"' not in text:
+              anchor = '    "verify:browser-bootstrap":'
+              text = text.replace(anchor, '    "verify:persistence-foundation": "node scripts/verify-persistence-foundation.mjs",\n' + anchor, 1)
+          package.write_text(text, encoding='utf-8', newline='\n')
+          '@ | Set-Content -Path r4_01_transform.py -Encoding UTF8
+          python r4_01_transform.py
+          Remove-Item r4_01_transform.py
+
+      - name: Format R4-01 Rust sources
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $PSNativeCommandUseErrorActionPreference = $true
+          npm run prepare:cargo
+          cargo fmt --all
+
+      - name: Refresh database runtime-source contract
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          @'
+          from pathlib import Path
+          import hashlib
+
+          root = Path('.')
+          contract_path = root / 'architecture/database-baseline.json'
+          text = contract_path.read_text(encoding='utf-8')
+
+          def blob_sha(relative):
+              data = (root / relative).read_text(encoding='utf-8').replace('\r\n','\n').replace('\r','\n').encode('utf-8')
+              header = f'blob {len(data)}\0'.encode('utf-8')
+              return hashlib.sha1(header + data).hexdigest()
+
+          foundation = [
+              'crates/persistence-postgres/src/error/persistence_error.rs',
+              'crates/persistence-postgres/src/health/database_health.rs',
+              'crates/persistence-postgres/src/health/read_health.rs',
+              'crates/persistence-postgres/src/migrations/reconcile_known_migrations.rs',
+              'crates/persistence-postgres/src/migrations/reset_to_pristine.rs',
+              'crates/persistence-postgres/src/migrations/run_migrations.rs',
+              'crates/persistence-postgres/src/migrations/runtime_schema.rs',
+              'crates/persistence-postgres/src/pool/create_pool.rs',
+              'crates/persistence-postgres/src/pool/database_options.rs',
+              'crates/persistence-postgres/src/statistics/database_stats.rs',
+              'crates/persistence-postgres/src/statistics/read_statistics.rs',
+              'crates/persistence-postgres/src/store/postgres_store.rs',
+          ]
+          entries = [
+              '    {"path":"crates/persistence-postgres/Cargo.toml","git_blob_sha1":"5f83e84c41b53af3f96ebe5a95cabaade04fee1d"},',
+              '    {"path":"crates/persistence-postgres/build.rs","git_blob_sha1":"ee7c9aa50b9ac259453f5b4ce45ea5fcc1c731ad"},',
+          ]
+          entries += [f'    {{"path":"{p}","git_blob_sha1":"{blob_sha(p)}"}},' for p in foundation]
+          entries += ['    {"path":"crates/persistence-postgres/tests/postgres_integration.rs","git_blob_sha1":"b378d734495c0846818e7cd06c30d93f69131231"}']
+          runtime_sources = '  "runtime_sources": [\n' + '\n'.join(entries) + '\n  ],\n'
+          start = text.index('  "runtime_sources": [')
+          end = text.index('  "runtime_requirements": [', start)
+          text = text[:start] + runtime_sources + text[end:]
+
+          old_req = '    {"path":"crates/persistence-postgres/src/connection.rs","required_tokens":["static MIGRATOR: sqlx::migrate::Migrator = sqlx::migrate!(\\"./migrations\\");","MIGRATOR.run(&self.pool).await?","self.ensure_runtime_schema_compatibility().await?","SELECT feature.refresh_player_ability_projections()","DROP TABLE IF EXISTS public._sqlx_migrations","self.migrate().await"]},\n'
+          new_req = (
+              '    {"path":"crates/persistence-postgres/src/migrations/run_migrations.rs","required_tokens":["static MIGRATOR: sqlx::migrate::Migrator = sqlx::migrate!(\\"./migrations\\");","reconcile_known_legacy_migrations(&self.pool).await?;","MIGRATOR.run(&self.pool).await?;","ensure_runtime_schema_compatibility(&self.pool).await?;","SELECT feature.refresh_player_ability_projections()"]},\n'
+              '    {"path":"crates/persistence-postgres/src/migrations/reset_to_pristine.rs","required_tokens":["football-platform-destructive-reset","DROP TABLE IF EXISTS public._sqlx_migrations","self.migrate().await"]},\n'
+              '    {"path":"crates/persistence-postgres/src/migrations/runtime_schema.rs","required_tokens":["football-platform-schema-compatibility","ADD COLUMN IF NOT EXISTS created_at timestamptz","ability_observations_player_cutoff_idx"]},\n'
+          )
+          if old_req not in text:
+              raise SystemExit('database baseline old runtime requirement missing')
+          text = text.replace(old_req, new_req, 1)
+          contract_path.write_text(text, encoding='utf-8', newline='\n')
+          '@ | Set-Content -Path r4_01_baseline.py -Encoding UTF8
+          python r4_01_baseline.py
+          Remove-Item r4_01_baseline.py
+
+      - name: Verify immutable migration and dependency scope
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $PSNativeCommandUseErrorActionPreference = $true
+          git diff --exit-code $env:BASE_SHA -- crates/persistence-postgres/migrations
+          git diff --exit-code $env:BASE_SHA -- crates/persistence-postgres/Cargo.toml Cargo.lock
+
+      - name: Verify R4-01 persistence foundation
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $PSNativeCommandUseErrorActionPreference = $true
+          npm run verify:persistence-foundation
+          node scripts/verify-database-migration-compatibility.mjs
+          node scripts/verify-database-reset.mjs
+          node scripts/verify_database_baseline.mjs
+
+      - name: Verify architecture
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $PSNativeCommandUseErrorActionPreference = $true
+          npm run verify:architecture
+
+      - name: Verify rustfmt
+        shell: pwsh
+        run: cargo fmt --all -- --check
+
+      - name: Check persistence crate
+        shell: pwsh
+        run: cargo check --locked -p football-persistence-postgres
+
+      - name: Test persistence crate
+        shell: pwsh
+        run: cargo test --locked -p football-persistence-postgres
+
+      - name: Clippy persistence crate
+        shell: pwsh
+        run: cargo clippy --locked -p football-persistence-postgres --all-targets -- -D warnings
+
+      - name: Record R4-01 implementation facts
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          @'
+          from pathlib import Path
+          import os
+
+          root = Path('.')
+          run_id = os.environ['GITHUB_RUN_ID']
+          head = os.environ['GITHUB_SHA']
+          stage = root / 'docs/modular-rewrite/R04-persistence-foundation/README.md'
+          text = stage.read_text(encoding='utf-8')
+          text = text.replace('| R4-01 | Store / Error / Pool / migration / health / statistics | READY | 待创建 `R04-01-store-error-and-pool.md` |', '| R4-01 | Store / Error / Pool / migration / health / statistics | VERIFYING | [`R04-01-store-error-and-pool.md`](./R04-01-store-error-and-pool.md) |')
+          stage.write_text(text, encoding='utf-8', newline='\n')
+
+          node = f'''# R4-01 Store / Error / Pool / Migration / Health / Statistics\n\n## 状态\n\n`VERIFYING`\n\n## 实施结果\n\n- 从 R3 最终收口基线 `f2e4841aac873f6a4812801e6be2a6524cd680c1` 进入 R4；R4 阶段分支起点为 `4f8bc9a19fbbd9f52a36b6f94d6d819755482e8f`。\n- 删除旧 `crates/persistence-postgres/src/connection.rs` 与顶层 `migration_compatibility.rs`，不保留转发壳。\n- `PostgresStore` 唯一 owner 迁入 `store/postgres_store.rs`；`PgPoolOptions` 创建唯一 owner 迁入 `pool/create_pool.rs`；`DatabaseOptions` 与 URL 脱敏进入 `pool/database_options.rs`。\n- `PersistenceError/PersistenceResult` 唯一 owner 迁入 `error/persistence_error.rs`，公共错误变体、错误文本与 `From` 转换保持。\n- migration runner、已知历史迁移兼容、destructive reset、runtime schema compatibility 分别进入 `migrations/` 独立职责文件；历史 0001–0046 migration SQL 未修改。\n- `DatabaseHealth`/`health()` 与 `DatabaseStats`/`stats()` 分别进入 `health/`、`statistics/`；统计中大型事实表估算与小表精确计数策略保持。\n- `lib.rs` 只显式组合/导出 R4-01 基础设施；Audit 与通用 mapping/hash 仍留待 R4-02/R4-03，不跨节点提前迁移。\n- `architecture/database-baseline.json` 只将 runtime authoritative source/required token 指向新模块；46 个 migration 文件、版本、git blob SHA 与 migration aggregate 均保持。module/state ownership 同步到新的 Store/Pool owner。\n\n## 验证\n\n- scope audit 首轮 run `31612508324` 因 Windows runner 缺少 `rg` 在诊断命令阶段失败，未修改生产源码；恢复 run `31612633857` 改用 PowerShell `Select-String` 后成功并完成调用面/契约扫描。\n- 严格 R4-01 hard gate run `{run_id}`：migration/dependency diff gate、Persistence Foundation 专项、历史 migration compatibility/reset、数据库静态 baseline、完整 architecture、rustfmt、`cargo check --locked -p football-persistence-postgres`、crate tests、Clippy `-D warnings` 全部在提交前通过。\n- 18 个需要专用可写 `FOOTBALL_TEST_DATABASE_URL` 的 PostgreSQL 集成测试继续保持 `ignored`，仅完成编译；没有执行 destructive database reset。\n\n## 兼容性\n\n- 公共 `PostgresStore`、`DatabaseOptions`、`DatabaseHealth`、`DatabaseStats`、`PersistenceError` 名称与根导出路径保持。\n- 未修改 Application/Tauri 公共调用签名、DatabaseOptions Serde 字段/default、错误语义、SQL migration、配置、模型资产或生产依赖。\n- R4-02/R4-03/R4-04 未开始。最终 clean Public Platform CI 与正式合并/收口前，本节点保持 `VERIFYING`。\n'''
+          (root / 'docs/modular-rewrite/R04-persistence-foundation/R04-01-store-error-and-pool.md').write_text(node, encoding='utf-8', newline='\n')
+
+          readme = root / 'README.md'
+          text = readme.read_text(encoding='utf-8')
+          line = f'- R4-01 已将 Persistence Store/Error/Pool/Migration/Health/Statistics 从旧 `lib.rs`/`connection.rs` 拆入职责目录；历史 0001–0046 migration SQL、公共 Persistence API、DatabaseOptions Serde、错误语义与生产依赖保持不变。严格 hard gate run `{run_id}` 在提交前通过专项、数据库基线、architecture、persistence crate check/tests/Clippy；18 个专用 PostgreSQL 集成测试保持 ignored，未执行 destructive reset。状态为 `VERIFYING`。\n'
+          if line not in text:
+              anchor = '- 开发依赖布局已外置：'
+              pos = text.find(anchor)
+              if pos < 0:
+                  raise SystemExit('README insertion anchor missing')
+              text = text[:pos] + line + text[pos:]
+          readme.write_text(text, encoding='utf-8', newline='\n')
+          '@ | Set-Content -Path r4_01_docs.py -Encoding UTF8
+          python r4_01_docs.py
+          Remove-Item r4_01_docs.py
+
+      - name: Final architecture check after docs
+        shell: pwsh
+        run: npm run verify:architecture
+
+      - name: Commit verified R4-01 tree and remove temporary workflows
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $PSNativeCommandUseErrorActionPreference = $true
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git rm .github/workflows/r4-01-hard-gate.yml .github/workflows/r4-01-scope-audit.yml
+          git add crates/persistence-postgres/src scripts/verify-database-migration-compatibility.mjs scripts/verify-database-reset.mjs scripts/verify-persistence-foundation.mjs package.json architecture/database-baseline.json architecture/module-boundaries.json architecture/state-ownership.json README.md docs/modular-rewrite/R04-persistence-foundation
+          git commit -m 'refactor(r4-01): modularize persistence foundation'
+          git push origin HEAD:agent/r4-01-store-error-pool
