@@ -1,0 +1,96 @@
+name: R3-09 AT2 Closeout
+
+on:
+  push:
+    branches:
+      - agent/r3-09-at2-builder
+
+permissions:
+  contents: write
+
+jobs:
+  closeout:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout AT2 branch
+        uses: actions/checkout@v4
+        with:
+          ref: agent/r3-09-at2-builder
+          fetch-depth: 0
+
+      - name: Record AT2 DONE
+        shell: bash
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+
+          def replace_exact(path, old, new, count=1):
+              p = Path(path)
+              text = p.read_text(encoding='utf-8')
+              actual = text.count(old)
+              if actual != count:
+                  raise SystemExit(f'{path}: expected {count} occurrence(s), found {actual}: {old[:120]!r}')
+              p.write_text(text.replace(old, new), encoding='utf-8', newline='\n')
+
+          # Root README: current R3 summary/status and authoritative R3-09 section.
+          replace_exact(
+              'README.md',
+              'R3-09 Exchange / AI Workspace / Release Services 已进入 `IN_PROGRESS`，AT1 Match Lineup / AI Match Package Exchange 已关闭为 `DONE`，AT2 Spreadsheet Exchange 已开放为 `READY`。',
+              'R3-09 Exchange / AI Workspace / Release Services 已进入 `IN_PROGRESS`，AT1 Match Lineup / AI Match Package Exchange 与 AT2 Spreadsheet Exchange 均已关闭为 `DONE`，AT3 AI Workspace 已开放为 `READY`。'
+          )
+          replace_exact(
+              'README.md',
+              'R3-09 Exchange / AI Workspace / Release Services 为 `IN_PROGRESS`（AT1 Match Lineup / AI Match Package Exchange 为 `DONE`，AT2 Spreadsheet Exchange 为 `READY`）。',
+              'R3-09 Exchange / AI Workspace / Release Services 为 `IN_PROGRESS`（AT1 Match Lineup / AI Match Package Exchange 与 AT2 Spreadsheet Exchange 均为 `DONE`，AT3 AI Workspace 为 `READY`，AT4 Release 为 `NOT_STARTED`）。'
+          )
+          replace_exact(
+              'README.md',
+              '- AT2 Spreadsheet Exchange 已完成源码迁移并进入 `VERIFYING`：旧 `crates/application/src/spreadsheet.rs` 已删除；16 个既有 Spreadsheet 公共入口迁入 `services/exchange/` 与独立 `use_cases/exchange/<use-case>/`，Exchange facade / service / composition adapter 按 Match Lineup 与 Spreadsheet 两条职责拆分；R3-01 `SpreadsheetExchangePort` / `MonthlyWorkbookPort` 仅补齐真实能力并由 `ActiveDatabase` 适配。AT1 + AT2 共 24 个 Exchange 公共用例继续由唯一 `ExchangeService` 编排。',
+              '- AT2 Spreadsheet Exchange 已正式关闭为 `DONE`：旧 `crates/application/src/spreadsheet.rs` 已删除；16 个既有 Spreadsheet 公共入口迁入 `services/exchange/` 与独立 `use_cases/exchange/<use-case>/`，Exchange facade / service / composition adapter 按 Match Lineup 与 Spreadsheet 两条职责拆分；R3-01 `SpreadsheetExchangePort` / `MonthlyWorkbookPort` 仅补齐真实能力并由 `ActiveDatabase` 适配。AT1 + AT2 共 24 个 Exchange 公共用例继续由唯一 `ExchangeService` 编排。'
+          )
+          replace_exact(
+              'README.md',
+              '- Windows hard gate run `31512091398` / job `93848182746` 已通过最终 rustfmt、官方 Domain inventory、完整 `verify:architecture`、workspace Clippy `-D warnings` 与 workspace tests；Application tests 35/35、Domain Serde 17/17、Spreadsheet IO 12/12 等均无失败。18 个需要专用 `FOOTBALL_TEST_DATABASE_URL` 的 PostgreSQL 集成测试按既有安全设计保持 `ignored`，未记为已执行。最终 clean Public Platform CI / Windows Automated 仍待恢复正式只读 workflow 后执行，因此 AT2 当前不关闭为 `DONE`；AT3 AI Workspace 与 AT4 Release 均未开始。',
+              '- Windows hard gate run `31512091398` / job `93848182746` 已通过最终 rustfmt、官方 Domain inventory、完整 `verify:architecture`、workspace Clippy `-D warnings` 与 workspace tests；Application tests 35/35、Domain Serde 17/17、Spreadsheet IO 12/12 等均无失败。最终 clean Public Platform CI run `31513432237` / Windows Automated job `93852598090` 在 clean HEAD `8719008ba63241d313fe02ce4328ee8d0a727e9d` 上整体 `SUCCESS`，validation evidence artifact `9110944721` 大小 `14040458` 字节，SHA-256 `f0628be97bbfb13a765da3e4799bd7e8abf549352e391cb79ef1111cb9522a9f`。18 个需要专用 `FOOTBALL_TEST_DATABASE_URL` 的 PostgreSQL 集成测试按既有安全设计保持 `ignored`，未记为已执行；未执行破坏性数据库验证。AT2 已关闭为 `DONE`，AT3 AI Workspace 开放为 `READY`，AT4 Release 保持 `NOT_STARTED`。'
+          )
+
+          # R3-09 task record.
+          task = 'docs/modular-rewrite/R03-application-services/R03-09-exchange-ai-workspace-and-release.md'
+          replace_exact(task, '状态：`VERIFYING`', '状态：`DONE`')
+          replace_exact(
+              task,
+              '- AT1 已正式关闭为 `DONE`；Atomic Task 2 — Spreadsheet Exchange 已进入 `VERIFYING`。R3-09 继续为 `IN_PROGRESS`，R3-10 继续 `BLOCKED`。',
+              '- AT1 已正式关闭为 `DONE`；Atomic Task 2 — Spreadsheet Exchange 后续亦已通过 clean Public Platform CI 并关闭为 `DONE`。R3-09 继续为 `IN_PROGRESS`，Atomic Task 3 — AI Workspace 已开放为 `READY`，R3-10 继续 `BLOCKED`。'
+          )
+          replace_exact(
+              task,
+              '- 最终 clean Public Platform CI / Windows Automated 尚待在恢复正式只读 workflow 后执行；PR #18 保持 draft 且未合并。因此 AT2 当前为 `VERIFYING`，不得提前关闭为 `DONE`；AT3 AI Workspace 与 AT4 Release 均保持 `NOT_STARTED`。',
+              '- 最终 clean Public Platform CI run `31513432237` / Windows Automated job `93852598090` 已在正式只读 workflow 与 clean HEAD `8719008ba63241d313fe02ce4328ee8d0a727e9d` 上整体 `SUCCESS`；architecture、完整 Windows automated acceptance 与 validation evidence upload 均成功。artifact `9110944721` 大小 `14040458` 字节，SHA-256 `f0628be97bbfb13a765da3e4799bd7e8abf549352e391cb79ef1111cb9522a9f`。AT2 正式关闭为 `DONE`；AT3 AI Workspace 开放为 `READY`，AT4 Release 保持 `NOT_STARTED`。'
+          )
+
+          # Stage index current execution section.
+          stage = 'docs/modular-rewrite/R03-application-services/README.md'
+          replace_exact(
+              stage,
+              '- Atomic Task 2 — Spreadsheet Exchange：`VERIFYING`。旧 `crates/application/src/spreadsheet.rs` 已删除，16 个 Spreadsheet 公共入口迁入唯一 `ExchangeService` 与独立 Use Cases；facade / service / adapters 已按 Match Lineup / Spreadsheet 职责拆分。',
+              '- Atomic Task 2 — Spreadsheet Exchange：`DONE`。旧 `crates/application/src/spreadsheet.rs` 已删除，16 个 Spreadsheet 公共入口迁入唯一 `ExchangeService` 与独立 Use Cases；facade / service / adapters 已按 Match Lineup / Spreadsheet 职责拆分。'
+          )
+          replace_exact(stage, '- Atomic Task 3 — AI Workspace：`NOT_STARTED`。', '- Atomic Task 3 — AI Workspace：`READY`。')
+          replace_exact(
+              stage,
+              '- 最终 clean Public Platform CI / Windows Automated 仍待恢复正式只读 workflow 后执行；PR #18 保持 draft 且未合并，因此 AT2 尚未关闭为 `DONE`，R3-10 继续 `BLOCKED`。',
+              '- 最终 clean Public Platform CI run `31513432237` / Windows Automated job `93852598090` 已在正式只读 workflow 与 clean HEAD `8719008ba63241d313fe02ce4328ee8d0a727e9d` 上整体 `SUCCESS`；artifact `9110944721` 大小 `14040458` 字节，SHA-256 `f0628be97bbfb13a765da3e4799bd7e8abf549352e391cb79ef1111cb9522a9f`。AT2 已关闭为 `DONE`，AT3 开放为 `READY`，R3-10 继续 `BLOCKED`。'
+          )
+          PY
+
+      - name: Remove temporary closeout workflow and commit
+        shell: bash
+        run: |
+          git rm .github/workflows/r3-09-at2-closeout.yml
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add README.md docs/modular-rewrite/R03-application-services/README.md docs/modular-rewrite/R03-application-services/R03-09-exchange-ai-workspace-and-release.md
+          git diff --cached --check
+          git commit -m "docs(r3-09): close spreadsheet exchange AT2"
+          git push origin HEAD:agent/r3-09-at2-builder
