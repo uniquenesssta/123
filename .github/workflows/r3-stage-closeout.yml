@@ -36,9 +36,9 @@ jobs:
           if '`IN_PROGRESS`' not in stage_text:
               raise SystemExit('R3 stage status marker missing')
           stage_text = stage_text.replace('`IN_PROGRESS`', '`DONE`', 1)
-          old_row = '| R3-10 | ApplicationService 兼容门面 | READY |'
+          old_row = '| R3-10 | ApplicationService 兼容门面 | VERIFYING |'
           if old_row not in stage_text:
-              raise SystemExit('R3-10 READY row missing')
+              raise SystemExit('R3-10 VERIFYING row missing')
           stage_text = stage_text.replace(old_row, '| R3-10 | ApplicationService 兼容门面 | DONE |', 1)
           section = '''\n\n## R3-10 完成结果\n\n- R3-10 已将 `ApplicationService` 收敛为纯兼容门面：旧根级 P4 orchestration owner 删除，P4 job/worker 进入独立 Service / Use Case / Port；Database lifecycle、Research 多 Port 组装和 Prediction recent-run compatibility mapping 均迁出 facade。\n- Application Ports 最终为 15 个职责域、38 个最小 trait；具体 PostgreSQL / SQLx 继续只由 composition adapter / port registry 持有。\n- AT1 strict hard gate run `31591061641` / job `94095867258` 与 AT2 strict hard gate run `31592634518` / job `94100834403` 均通过；Application tests 33/33、rustfmt、check、Clippy `-D warnings` 与完整 architecture 均为 PASS。\n- 最终 clean Public Platform CI run `31593758268` / Windows Automated job `94104353199` 在 HEAD `2ecebb9ab0076f27a20d46bc897e63c78aecae3d` 上全部通过；artifact `9140937975`，SHA-256 `a67e78ee1272d9a953432292ee284118cffcc17325a9aefedf4367cec451ee75`。\n- PR #21 已以 merge commit 方式合并，merge commit `f400740a36e29ab5cf154728c5f240ee018707c6`。R3-10 与 R3 阶段均正式关闭为 `DONE`。\n- 阶段完成记录：[`R03-stage-completion.md`](./R03-stage-completion.md)。18 个需要专用可写 `FOOTBALL_TEST_DATABASE_URL` 的 PostgreSQL 集成测试与 destructive reset 未执行，未记为通过。\n'''
           if '## R3-10 完成结果' not in stage_text:
