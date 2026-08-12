@@ -1,0 +1,73 @@
+name: R3-10 AT2 Recovery
+on:
+  push:
+    branches:
+      - agent/r3-10-application-service-facade
+permissions:
+  contents: write
+jobs:
+  at2:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: windows-2025
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: agent/r3-10-application-service-facade
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - uses: dtolnay/rust-toolchain@master
+        with:
+          toolchain: 1.88.0
+          components: rustfmt,clippy
+      - name: Execute recovered AT2 transform and strict gates
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $PSNativeCommandUseErrorActionPreference = $true
+          $raw = Get-Content -Raw -Encoding UTF8 '.github/workflows/r3-10-at2.yml'
+          $pattern = "(?s)          @'\r?\n(.*?)\r?\n          '@ \| Set-Content -Path r3_10_at2.py -Encoding UTF8"
+          $match = [regex]::Match($raw, $pattern)
+          if (-not $match.Success) { throw 'AT2 embedded source script not found' }
+          $lines = $match.Groups[1].Value -split "\r?\n"
+          $normalized = foreach ($line in $lines) {
+            if ($line.StartsWith('          ')) { $line.Substring(10) } else { $line }
+          }
+          [System.IO.File]::WriteAllText((Join-Path $PWD 'r3_10_at2.py'), ($normalized -join "`n"), [System.Text.UTF8Encoding]::new($false))
+          @'
+          from pathlib import Path
+          path=Path('r3_10_at2.py')
+          source=path.read_text(encoding='utf-8')
+          start=source.index("old='''    pub async fn list_recent_runs")
+          end=source.index("research_service='crates/application/src/services/research/service.rs'", start)
+          replacement='''text=read(prediction_facade)\nstart_method=text.index("    pub async fn list_recent_runs(")\nend_method=text.index("    pub async fn hide_run_from_history(", start_method)\nnew_method=\'\'\'    pub async fn list_recent_runs(&self, limit: i64) -> ApplicationResult<Vec<ModelRunListItem>> {\n        let session = self.prediction_session().await?;\n        compatibility::list_recent_runs(&self.prediction, &session, limit).await\n    }\n\n\'\'\'\nwrite(prediction_facade, text[:start_method] + new_method + text[end_method:])\n\n'''
+          path.write_text(source[:start]+replacement+source[end:],encoding='utf-8',newline='\n')
+          '@ | Set-Content -Path patch_at2.py -Encoding UTF8
+          python patch_at2.py
+          Remove-Item patch_at2.py
+          python r3_10_at2.py
+          Remove-Item r3_10_at2.py
+          cargo fmt --all
+          cargo fmt --all -- --check
+          node scripts/generate-domain-type-inventory.mjs
+          node scripts/verify-application-service-facade.mjs
+          node scripts/verify-database-service.mjs
+          node scripts/verify-research-service.mjs
+          node scripts/verify-prediction-service.mjs
+          node scripts/verify-application-composition.mjs
+          npm run verify:architecture
+          cargo check --locked -p football-application
+          cargo test --locked -p football-application
+          cargo clippy --locked -p football-application --all-targets -- -D warnings
+      - name: Commit fully verified AT2
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $PSNativeCommandUseErrorActionPreference = $true
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git rm .github/workflows/r3-10-at2.yml .github/workflows/r3-10-at2-runner.yml .github/workflows/r3-10-at2-recovery.yml
+          git add crates/application scripts architecture/domain-type-inventory.json package.json
+          git commit -m 'refactor(r3-10): converge application compatibility facade'
+          git push origin HEAD:agent/r3-10-application-service-facade
