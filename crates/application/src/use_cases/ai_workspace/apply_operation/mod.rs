@@ -4,7 +4,7 @@ mod payload;
 
 use crate::{
     ports::{
-        ai_workspace::ApiWorkspaceOperationPort,
+        ai_workspace::{ApiWorkspaceOperationPort, SerializedApiWorkspaceOperationResult},
         player::{PlayerCatalogPort, PlayerSignalPort},
         team::TeamCatalogPort,
     },
@@ -28,8 +28,9 @@ where
     let apply_result = dispatch::execute(&port, &operation).await;
     match apply_result {
         Ok(result) => {
+            let serialized = SerializedApiWorkspaceOperationResult(serde_json::to_string(&result)?);
             let record = port
-                .complete_operation(operation_id, "applied", result.clone(), None)
+                .complete_operation(operation_id, "applied", &serialized, None)
                 .await?;
             Ok(ApiWorkspaceApplyResult {
                 operation_id,
@@ -41,14 +42,17 @@ where
         }
         Err(error) => {
             let message = error.to_string();
+            let empty_result = json!({});
+            let serialized =
+                SerializedApiWorkspaceOperationResult(serde_json::to_string(&empty_result)?);
             let record = port
-                .complete_operation(operation_id, "failed", json!({}), Some(&message))
+                .complete_operation(operation_id, "failed", &serialized, Some(&message))
                 .await?;
             Ok(ApiWorkspaceApplyResult {
                 operation_id,
                 operation_type: record.operation_type,
                 status: record.status,
-                result: json!({}),
+                result: empty_result,
                 error_message: Some(message),
             })
         }
