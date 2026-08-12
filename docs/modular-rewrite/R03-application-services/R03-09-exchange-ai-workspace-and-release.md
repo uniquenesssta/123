@@ -81,3 +81,30 @@
 - 18 个需要专用 `FOOTBALL_TEST_DATABASE_URL` 的 PostgreSQL 集成测试未在本 hard gate 执行，未记为通过；未执行破坏性数据库验证。
 - 首次 clean PR CI run `31553692737` 的 architecture 已通过，但 Windows Automated 因历史 v3 artifact 清单仍指向已删除的 `crates/application/src/api_workspace.rs` 而失败；合同文件未修改，仅将验证器映射到新的 authoritative 模块集合。恢复 run `31553867879` / Windows Automated job `93982110497` 已整体 `SUCCESS`，architecture、完整 Windows automated acceptance 与 validation evidence upload 均通过；artifact `9125791161` 大小 `13985122` 字节，SHA-256 `f5662c9e11d1fbd9da12e39efce9b44645144fce33bf6fe674011c2b7c1af0a6`。
 - PR #19 已正式合并到阶段分支，merge commit `3d925671ccd424e25965ba9409189f32f920bc4f`。AT3 正式关闭为 `DONE`；Atomic Task 4 — Release 开放为 `READY`，R3-10 继续 `BLOCKED`。
+
+
+## Atomic Task 4 — Release
+
+状态：`VERIFYING`
+
+### 当前实施范围
+
+- 删除旧 `crates/application/src/release_acceptance.rs`，不保留转发壳；`run_release_acceptance`、`list_release_acceptance_runs`、`read_release_acceptance_run` 3 个既有 ApplicationService/Tauri 入口保持原名、参数和返回 DTO。
+- 建立唯一 `ReleaseService`；3 个公共职责分别进入 `use_cases/release/`，运行验收再按 request validation、chain/performance/security/cost/release checks、summary 与 report hash 拆分，避免重新形成职责混合大文件。
+- 最小补齐 R3-01 既有 `ReleaseAcceptancePort` 的 runtime-facts / persist / list / read 真实能力；具体 PostgreSQL 调用仅由 `composition/adapters/release.rs` 的 `ActiveDatabase` 适配。
+- `run_acceptance` 保持原有“规范请求 → 获取运行时事实 → 生成固定顺序检查 → 汇总 → SHA-256 报告哈希 → 持久化”的编排顺序；Service / Use Case 不直接依赖 PostgreSQL、SQLx 或具体 Store。
+
+### 兼容边界
+
+- performance/cost window 继续 clamp 到 1..=365；非法预算的 Validation 文案保持不变。
+- A–I 接入契约、外部模型边界、最低 27 条迁移、真实闭环样本、公开模型/外部 runtime、数据库延迟、模型运行 P95、查询健康、不可变账本触发器、凭据边界、OpenAI 成本预算和 0.23.0 + J 发布契约的状态判定、阈值、remediation 与检查顺序保持不变。
+- overall/category/performance/cost 汇总和 report SHA-256 输入字段保持不变；Release Acceptance contract/schema、Persistence SQL/migration、Tauri 命令、前端产品源码、模型保护资产、配置、日志等级和生产依赖均未改变。
+- 历史 `verify-release-acceptance.mjs` 与 `verify-public-model-boundary.mjs` 只迁移 authoritative owner 路径；原发布/保护断言未删除、跳过或放宽。
+
+### 验证状态
+
+- 最终严格 Windows hard gate run `31568170298` / job `94024298468` 已整体 `SUCCESS`：Release Service 专项、历史 Release Acceptance 契约、完整 `verify:architecture`、37-Port 契约、官方 Domain inventory、rustfmt、Application check、Application tests 33/33、Application Clippy `-D warnings` 均通过。
+- 第一轮门禁实际发现历史公开模型边界验证器仍读取已删除 owner，以及源码迁移导致 Domain inventory 漂移；前者只迁移权威读取位置，后者两次均使用官方 `generate-domain-type-inventory.mjs` 重新生成。严格分步门禁随后发现唯一 rustfmt 差异并按 rustfmt 修正；没有使用 lint 抑制、跳过测试或手工篡改 inventory。
+- 临时 hard-gate / inventory-refresh workflows 已清理；最终源码树不保留诊断入口。
+- 18 个需要专用可写 `FOOTBALL_TEST_DATABASE_URL` 的 PostgreSQL 集成测试未在本 hard gate 执行，未记为通过；未执行破坏性数据库验证。
+- PR #20 当前保持 Draft / Open / 未合并；最终 clean Public Platform CI 尚待执行，因此 AT4 当前保持 `VERIFYING`，不得提前关闭为 `DONE`；R3-09 继续 `IN_PROGRESS`，R3-10 继续 `BLOCKED`。

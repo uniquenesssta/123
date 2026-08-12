@@ -155,7 +155,7 @@ R00 阶段已按 Windows-only 目标范围标记为 **DONE**。Linux Chromium �
 
 PostgreSQL 实跑、Windows Full 和用户本机 Windows 10/11 实机验收仍保留最终统一验收；R2-06 节点已额外使用原 PostgreSQL 数据库完成连接验证。R3-02 已使用原数据库完成非破坏性 `tauri:dev` 运行时烟测，但真实 destructive reset 仍只允许在专用测试数据库执行。另保留 1 个 moderate npm vulnerability 和 Vite 大 chunk 警告。
 
-已创建 `R00-stage-completion.md`、`R01-stage-completion.md` 与 `R02-stage-completion.md`。R1、R2 阶段均已关闭；R3-01 Application Ports、R3-02 Database Service、R3-03 Competition / Rules Services、R3-05 Lineups Service 与 R3-06 Prediction Service 状态为 `DONE`，R3-04 Teams / Players Services 与 R3-07 Research Service 状态均为 `DONE`，R3-08 Review / Postmatch / Analytics Services 为 `DONE`（AT1 / AT2 / AT3 / AT4 均已关闭）；R3-09 Exchange / AI Workspace / Release Services 为 `IN_PROGRESS`（AT1 Match Lineup / AI Match Package Exchange 与 AT2 Spreadsheet Exchange 均为 `DONE`，AT3 AI Workspace 为 `DONE`，AT4 Release 为 `READY`）。详细状态见 `docs/modular-rewrite/R03-application-services/README.md`。
+已创建 `R00-stage-completion.md`、`R01-stage-completion.md` 与 `R02-stage-completion.md`。R1、R2 阶段均已关闭；R3-01 Application Ports、R3-02 Database Service、R3-03 Competition / Rules Services、R3-05 Lineups Service 与 R3-06 Prediction Service 状态为 `DONE`，R3-04 Teams / Players Services 与 R3-07 Research Service 状态均为 `DONE`，R3-08 Review / Postmatch / Analytics Services 为 `DONE`（AT1 / AT2 / AT3 / AT4 均已关闭）；R3-09 Exchange / AI Workspace / Release Services 为 `IN_PROGRESS`（AT1 Match Lineup / AI Match Package Exchange、AT2 Spreadsheet Exchange、AT3 AI Workspace 均为 `DONE`；AT4 Release 已完成源码迁移并进入 `VERIFYING`）。详细状态见 `docs/modular-rewrite/R03-application-services/README.md`。
 
 
 ## R3-06 Prediction Service（DONE）
@@ -258,3 +258,14 @@ PostgreSQL 实跑、Windows Full 和用户本机 Windows 10/11 实机验收仍�
 - AT3 AI Workspace 已完成 Application 层源码迁移并进入 `VERIFYING`：旧 `crates/application/src/api_workspace.rs` 已删除，不保留转发壳；12 个既有 ApplicationService 公共入口迁入唯一 `AiWorkspaceService` 与独立 `use_cases/ai_workspace/<use-case>/`。Session、Context、Operation、Presets、Attachments 已按职责拆分，Apply Operation 进一步拆为 orchestration / dispatch / payload / metadata；公共导出继续以原名称从 `lib.rs` 暴露。
 - R3-01 `ApiWorkspaceSessionPort` / `ApiWorkspaceOperationPort` 已按真实持久化能力补齐并由 `ActiveDatabase` 适配；第一轮架构门禁发现 Port 暴露裸 `serde_json::Value` 后，改为显式 `SerializedApiWorkspaceOperationResult` 序列化边界，由 adapter 唯一还原 JSON，没有放宽 Ports 禁止裸 JSON 的门禁。两个历史 AI Workspace 相关验证器仅迁移 authoritative owner 读取位置，原断言未删除或弱化。
 - AT3 Windows hard gate run `31553249625` / job `93980269528` 已整体 `SUCCESS`：官方 Domain inventory、完整 `verify:architecture`、37 个最小 Port trait、AI Workspace 专项、`cargo check --locked -p football-application`、Application tests 33/33、`cargo clippy --locked -p football-application --all-targets -- -D warnings` 与 formatter scope 均通过；临时 hard-gate workflow 已自删除。PostgreSQL SQL/migration/Schema、Domain 公共契约、Tauri 产品源码、前端产品源码、Release/AT4、配置与生产依赖未改变。最终 clean Public Platform CI run `31553867879` / Windows Automated job `93982110497` 已整体 `SUCCESS`；validation evidence artifact `9125791161` 大小 `13985122` 字节，SHA-256 `f5662c9e11d1fbd9da12e39efce9b44645144fce33bf6fe674011c2b7c1af0a6`。PR #19 已合并，merge commit `3d925671ccd424e25965ba9409189f32f920bc4f`；AT3 正式关闭为 `DONE`，AT4 Release 开放为 `READY`。
+
+
+## R3-09 AT4 Release Service（VERIFYING）
+
+- 已删除旧 `crates/application/src/release_acceptance.rs`，不保留转发壳；3 个既有 Release Acceptance ApplicationService/Tauri 入口继续保持原名、参数和返回 DTO，由唯一 `ReleaseService` 编排。
+- `run_release_acceptance`、`list_release_acceptance_runs`、`read_release_acceptance_run` 已迁入 `services/release/` 与 `use_cases/release/`；运行验收进一步按请求校验、chain/performance/security/cost/release 检查、汇总和报告 SHA-256 哈希拆分职责。
+- R3-01 既有 `ReleaseAcceptancePort` 已最小对齐真实 runtime-facts/persist/list/read 能力，具体 PostgreSQL 调用仅由 `composition/adapters/release.rs` 的 `ActiveDatabase` 适配；SQL、migration、Schema、Tauri 产品命令、前端产品行为、0.23.0 发布契约和生产依赖均未改变。
+- 既有窗口 clamp、预算 Validation 文案、A–I/J 门禁、27 条迁移门槛、性能阈值、8 个不可变触发器门槛、成本预算语义、检查顺序、汇总字段和报告哈希字段保持不变；历史 `verify-release-acceptance.mjs` 与公开模型边界验证器仅迁移 authoritative owner 路径，原业务/保护断言未删除或放宽。
+- 最终严格 hard gate run `31568170298` / job `94024298468` 已整体 `SUCCESS`：Release Service 专项、历史发布验收契约、完整 `verify:architecture`、官方 Domain inventory、rustfmt、`cargo check --locked -p football-application`、Application tests 33/33、`cargo clippy --locked -p football-application --all-targets -- -D warnings` 全部通过。
+- 18 个需要专用可写 `FOOTBALL_TEST_DATABASE_URL` 的 PostgreSQL 集成测试未在本 hard gate 执行，未记为通过；本 AT 未执行破坏性数据库验证。临时 hard-gate / inventory-refresh workflow 已清理。
+- PR #20 当前保持 Draft / Open / 未合并；最终 clean Public Platform CI 尚待执行，因此 AT4 当前保持 `VERIFYING`，R3-09 尚未关闭，R3-10 继续 `BLOCKED`。
