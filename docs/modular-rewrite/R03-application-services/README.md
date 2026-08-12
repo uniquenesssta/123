@@ -167,8 +167,8 @@ R3-02 已正式关闭为 `DONE`。详细记录见 [`R03-02-database-service.md`]
 ### R3-09 当前执行
 
 - Atomic Task 1 — Match Lineup / AI Match Package Exchange：`DONE`。
-- Atomic Task 2 — Spreadsheet Exchange：`VERIFYING`。旧 `crates/application/src/spreadsheet.rs` 已删除，16 个 Spreadsheet 公共入口迁入唯一 `ExchangeService` 与独立 Use Cases；facade / service / adapters 已按 Match Lineup / Spreadsheet 职责拆分。
-- Atomic Task 3 — AI Workspace：`NOT_STARTED`。
+- Atomic Task 2 — Spreadsheet Exchange：`DONE`。旧 `crates/application/src/spreadsheet.rs` 已删除，16 个 Spreadsheet 公共入口迁入唯一 `ExchangeService` 与独立 Use Cases；facade / service / adapters 已按 Match Lineup / Spreadsheet 职责拆分。
+- Atomic Task 3 — AI Workspace：`READY`。
 - Atomic Task 4 — Release：`NOT_STARTED`。
 - AT2 Windows hard gate run `31512091398` / job `93848182746` 已通过最终 rustfmt、官方 Domain inventory、完整 architecture、workspace Clippy `-D warnings` 与 workspace tests；Application tests 35/35、Domain Serde 17/17、Spreadsheet IO 12/12 等均无失败。18 个 PostgreSQL 集成测试因未配置专用 `FOOTBALL_TEST_DATABASE_URL` 保持 `ignored`，未记为已执行。
-- 最终 clean Public Platform CI / Windows Automated 仍待恢复正式只读 workflow 后执行；PR #18 保持 draft 且未合并，因此 AT2 尚未关闭为 `DONE`，R3-10 继续 `BLOCKED`。
+- 最终 clean Public Platform CI run `31513432237` / Windows Automated job `93852598090` 已在正式只读 workflow 与 clean HEAD `8719008ba63241d313fe02ce4328ee8d0a727e9d` 上整体 `SUCCESS`；artifact `9110944721` 大小 `14040458` 字节，SHA-256 `f0628be97bbfb13a765da3e4799bd7e8abf549352e391cb79ef1111cb9522a9f`。AT2 已关闭为 `DONE`，AT3 开放为 `READY`，R3-10 继续 `BLOCKED`。

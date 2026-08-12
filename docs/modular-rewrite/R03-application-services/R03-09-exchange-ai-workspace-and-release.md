@@ -26,11 +26,11 @@
 - Windows hard gate run `31470329279`：rustfmt、官方 Domain inventory、Exchange 专项、Application Ports、Application Composition、Match Lineup chain、完整 architecture、保护资产、Application check/tests、完整 `verify:frontend` 与完整 `verify:rust` 均 `SUCCESS`。
 - 18 个需要专用 `FOOTBALL_TEST_DATABASE_URL` 的 PostgreSQL 集成测试继续按既有安全设计保持 `ignored`，未记为已执行；AT1 未执行破坏性数据库验证。
 - clean publication commit `a1bc2cf283a5ffbd81f01950466c5c8c79a9cc1b` 的 PR #17 Public Platform CI run `31471485706` 已整体 `SUCCESS`；canonical Public Platform CI run `31473739191` / Windows Automated job `93722595150` 亦整体 `SUCCESS`，evidence artifact `9095149094` 大小 `14073911` 字节，SHA-256 `12f9e3fcca2a90c510a03295299d5c5cda9ecfa0dce844d63b3f335c04216087`。
-- AT1 已正式关闭为 `DONE`；Atomic Task 2 — Spreadsheet Exchange 已进入 `VERIFYING`。R3-09 继续为 `IN_PROGRESS`，R3-10 继续 `BLOCKED`。
+- AT1 已正式关闭为 `DONE`；Atomic Task 2 — Spreadsheet Exchange 后续亦已通过 clean Public Platform CI 并关闭为 `DONE`。R3-09 继续为 `IN_PROGRESS`，Atomic Task 3 — AI Workspace 已开放为 `READY`，R3-10 继续 `BLOCKED`。
 
 ## Atomic Task 2 — Spreadsheet Exchange
 
-状态：`VERIFYING`
+状态：`DONE`
 
 ### 当前实施范围
 
@@ -51,4 +51,4 @@
 - Windows hard gate run `31512091398` / job `93848182746`：最终 rustfmt、官方 Domain inventory、完整 `verify:architecture`、workspace Clippy `-D warnings` 与 workspace tests 均 `SUCCESS`；Exchange 专项确认 AT1 + AT2 共 24 个公共用例由唯一 `ExchangeService` 编排，Spreadsheet/Monthly Ports 与 ActiveDatabase 适配完整，旧 owners 清零且错误优先级保持。
 - 同一 Rust 工作区回归中 Application tests 35/35、Domain tests 10/10、Domain Serde 17/17、Tauri tests 27/27、Persistence unit tests 74/74、Spreadsheet IO tests 12/12 均通过，未见测试失败。
 - 18 个需要专用 `FOOTBALL_TEST_DATABASE_URL` 的 PostgreSQL 集成测试继续按既有安全设计保持 `ignored`，未记为已执行；未执行破坏性数据库验证。
-- 最终 clean Public Platform CI / Windows Automated 尚待在恢复正式只读 workflow 后执行；PR #18 保持 draft 且未合并。因此 AT2 当前为 `VERIFYING`，不得提前关闭为 `DONE`；AT3 AI Workspace 与 AT4 Release 均保持 `NOT_STARTED`。
+- 最终 clean Public Platform CI run `31513432237` / Windows Automated job `93852598090` 已在正式只读 workflow 与 clean HEAD `8719008ba63241d313fe02ce4328ee8d0a727e9d` 上整体 `SUCCESS`；architecture、完整 Windows automated acceptance 与 validation evidence upload 均成功。artifact `9110944721` 大小 `14040458` 字节，SHA-256 `f0628be97bbfb13a765da3e4799bd7e8abf549352e391cb79ef1111cb9522a9f`。AT2 正式关闭为 `DONE`；AT3 AI Workspace 开放为 `READY`，AT4 Release 保持 `NOT_STARTED`。
