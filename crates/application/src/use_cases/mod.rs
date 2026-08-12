@@ -1,5 +1,6 @@
 pub(crate) mod ai_workspace;
 pub(crate) mod analytics;
+pub(crate) mod application_facade;
 pub(crate) mod competition;
 pub(crate) mod database;
 pub(crate) mod exchange;

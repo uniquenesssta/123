@@ -74,6 +74,7 @@ const service = read("crates/application/src/services/research/service.rs");
 const ports = read("crates/application/src/ports/research/mod.rs");
 const adapter = read("crates/application/src/composition/adapters/research.rs");
 const databaseFacade = read("crates/application/src/services/database/facade.rs");
+const lifecycleInitialize = read("crates/application/src/use_cases/application_facade/database_lifecycle/initialize.rs");
 const openaiExecution = read("crates/application/src/use_cases/research/openai_gateway/execution.rs");
 const openaiArtifacts = read("crates/application/src/use_cases/research/openai_gateway/artifacts.rs");
 const openaiAudit = read("crates/application/src/use_cases/research/openai_gateway/attempt_audit.rs");
@@ -107,10 +108,10 @@ check(adapter.includes("impl FactPipelinePort for ActiveDatabase"), "Research ad
 for (const token of [".fact_pipeline_context(research_run_id)", ".find_entity_candidates(", ".append_entity_resolution(draft)", ".append_time_audit(draft)", ".append_conflict_evaluation(draft)", ".append_conflict_event(", ".append_evidence_route(draft)"]) {
   check(adapter.includes(token), `Fact Pipeline adapter 未复用既有持久化能力：${token}`);
 }
-check(databaseFacade.includes(".register_persistence_artifacts(prepared.session())"), "数据库初始化未通过 ResearchService 注册内置 Research schema");
+check(lifecycleInitialize.includes(".register_persistence_artifacts(session)"), "数据库初始化未通过 ResearchService 注册内置 Research schema");
 check(openaiArtifacts.includes("fact_pipeline::register_fact_pipeline_artifacts(port).await?"), "OpenAI artifact 初始化未继续注册 Fact Pipeline 来源策略");
 check(service.includes("fn register_openai_research_artifacts"), "ResearchService 缺少 OpenAI artifact 初始化职责");
-check(databaseFacade.replaceAll(/\s/g, "").includes("self.research.register_openai_research_artifacts(prepared.session()).await"), "数据库初始化未通过 ResearchService 注册 OpenAI Research artifacts");
+check(lifecycleInitialize.replaceAll(/\s/g, "").includes("application.research.register_openai_research_artifacts(session).await"), "数据库初始化未通过 ResearchService 注册 OpenAI Research artifacts");
 check(ports.includes("trait ResearchGatewayAuditPort"), "Research Ports 缺少 ResearchGatewayAuditPort");
 check(ports.includes("trait ResearchManualConflictPort"), "Research Ports 缺少 ResearchManualConflictPort");
 for (const capability of ["append_manual_route_override", "route_readiness"]) {

@@ -1,3 +1,4 @@
+pub(crate) mod compatibility;
 mod facade;
 mod service;
 

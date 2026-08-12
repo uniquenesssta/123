@@ -27,6 +27,10 @@ check(!exists("crates/application/src/database.rs"), "旧 crates/application/src
 const service = read("crates/application/src/services/database/service.rs");
 const facade = read("crates/application/src/services/database/facade.rs");
 const bootstrap = read("crates/application/src/services/database/bootstrap.rs");
+const applicationBootstrap = read("crates/application/src/use_cases/application_facade/bootstrap.rs");
+const lifecycleConnect = read("crates/application/src/use_cases/application_facade/database_lifecycle/connect.rs");
+const lifecycleInitialize = read("crates/application/src/use_cases/application_facade/database_lifecycle/initialize.rs");
+const lifecycleReset = read("crates/application/src/use_cases/application_facade/database_lifecycle/reset.rs");
 const connect = read("crates/application/src/use_cases/database/connect/mod.rs");
 const migrate = read("crates/application/src/use_cases/database/migrate/mod.rs");
 const health = read("crates/application/src/use_cases/database/health/mod.rs");
@@ -80,15 +84,16 @@ check(adapter.includes("impl DatabaseLifecyclePort for ActiveDatabase"), "Postgr
 check(adapter.includes("impl DatabaseObservabilityPort for ActiveDatabase"), "PostgreSQL adapter 未实现 DatabaseObservabilityPort");
 check(adapter.includes("PostgresStore as PersistenceStore"), "PostgreSQL 具体适配器入口缺失");
 
-check(facade.includes("initialize_database_contents"), "连接成功前的内置内容初始化顺序未保留");
+check(!facade.includes("initialize_database_contents"), "Database facade 仍持有连接初始化业务编排");
+check(lifecycleConnect.includes("initialize::execute(application, prepared.session()).await"), "连接成功前的内置内容初始化顺序未迁入 lifecycle use case");
 check(
-  facade.includes("self.rules") && facade.includes("register_built_ins"),
+  lifecycleInitialize.includes(".rules") && lifecycleInitialize.includes("register_built_ins"),
   "内置规则包注册链未通过 Rules Service",
 );
 check(!facade.includes("register_built_in_rule_packages"), "Database facade 仍保留旧内置规则包注册实现");
 check(
-  facade.includes("self.research") &&
-    facade.includes(".register_persistence_artifacts(prepared.session())"),
+  lifecycleInitialize.includes(".research") &&
+    lifecycleInitialize.includes(".register_persistence_artifacts(session)"),
   "P4 persistence artifact 注册链未通过 ResearchService",
 );
 check(
@@ -101,8 +106,10 @@ check(
     researchArtifactCatalog.includes("port.register_schema(&draft).await?"),
   "内置 P4 schema 未通过 ResearchArtifactPort 注册",
 );
-check(facade.includes("register_openai_research_artifacts"), "research artifact 注册链缺失");
-check(bootstrap.includes("list_recent_runs(50)"), "bootstrap 最近运行读取语义发生变化");
+check(lifecycleInitialize.includes("register_openai_research_artifacts"), "research artifact 注册链缺失");
+check(applicationBootstrap.includes("list_recent_runs(&application.prediction, &active, 50)"), "bootstrap 最近运行读取语义发生变化");
+check(bootstrap.includes("bootstrap::execute(self).await"), "Application bootstrap facade 未收敛为单一 use case 委托");
+check(lifecycleReset.includes("connect::execute(application, options).await"), "reset 生命周期未复用 connect use case");
 
 check(tauri.includes("preflight_database_reset"), "Tauri 清空命令未委托 Application 预检");
 check(tauri.includes(".reset_database(options, confirmation)"), "Tauri 清空命令未委托 Application reset use case");

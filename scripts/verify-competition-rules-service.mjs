@@ -54,6 +54,8 @@ const applicationService = read("crates/application/src/service/application_serv
 const composition = read("crates/application/src/composition/application_composition.rs");
 const registry = read("crates/application/src/composition/port_registry.rs");
 const bootstrap = read("crates/application/src/services/database/bootstrap.rs");
+const applicationBootstrap = read("crates/application/src/use_cases/application_facade/bootstrap.rs");
+const lifecycleInitialize = read("crates/application/src/use_cases/application_facade/database_lifecycle/initialize.rs");
 const databaseFacade = read("crates/application/src/services/database/facade.rs");
 const tauriCompetition = read("src-tauri/src/commands/competition.rs");
 const packageDefinition = JSON.parse(read("package.json"));
@@ -89,15 +91,15 @@ for (const forbidden of [
 ]) {
   check(!bootstrap.includes(forbidden), `bootstrap 仍绕过 Competition/Rules Service：${forbidden}`);
 }
-check(bootstrap.includes("self.competition.load_hierarchy(&active)"), "bootstrap 未委托 Competition Service");
-check(bootstrap.includes("self.rules.load_catalog(&active)"), "bootstrap 未委托 Rules Service");
+check(applicationBootstrap.includes("application.competition.load_hierarchy(&active)"), "bootstrap 未委托 Competition Service");
+check(applicationBootstrap.includes("application.rules.load_catalog(&active)"), "bootstrap 未委托 Rules Service");
 check(
-  databaseFacade.includes("self.rules") && databaseFacade.includes("register_built_ins"),
+  lifecycleInitialize.includes(".rules") && lifecycleInitialize.includes("register_built_ins"),
   "数据库初始化未通过 Rules Service 注册内置规则包",
 );
 check(
-  !databaseFacade.includes("store.register_rule_package") &&
-    !databaseFacade.includes("store.ensure_type_default_binding"),
+  !lifecycleInitialize.includes("store.register_rule_package") &&
+    !lifecycleInitialize.includes("store.ensure_type_default_binding"),
   "数据库初始化仍直接执行规则包持久化",
 );
 

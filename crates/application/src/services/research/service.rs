@@ -1,5 +1,10 @@
-use crate::ports::research::{
-    ResearchArtifactPort, ResearchEvidenceLedgerPort, ResearchGatewayAuditPort,
+use crate::ports::{
+    analytics::JobQueuePort,
+    prediction::PredictionWorkflowPort,
+    research::{
+        ResearchArtifactPort, ResearchEvidenceLedgerPort, ResearchGatewayAuditPort,
+        ResearchManualConflictPort,
+    },
 };
 use crate::use_cases::research::{
     artifact_catalog,
@@ -122,6 +127,42 @@ impl ResearchService {
             pipeline,
             command,
             cancellation,
+        )
+        .await
+    }
+
+    pub(crate) async fn execute_p4_openai_research_session<P>(
+        &self,
+        port: &P,
+        command: OpenAiResearchCommand,
+        cancellation: CancellationToken,
+    ) -> ApplicationResult<GatewayExecution>
+    where
+        P: ResearchArtifactPort + ResearchGatewayAuditPort + FactPipelineAccess,
+    {
+        self.execute_p4_openai_research(port, port, port, command, cancellation)
+            .await
+    }
+
+    pub(crate) async fn resolve_p4_conflict_session<P>(
+        &self,
+        port: &P,
+        command: ResolveP4ConflictCommand,
+    ) -> ApplicationResult<P4TaskWorkspace>
+    where
+        P: PredictionWorkflowPort
+            + JobQueuePort
+            + ResearchArtifactPort
+            + ResearchManualConflictPort,
+    {
+        self.resolve_p4_conflict(
+            P4ManualConflictAccess {
+                workflow: port,
+                jobs: port,
+                artifacts: port,
+                manual: port,
+            },
+            command,
         )
         .await
     }
