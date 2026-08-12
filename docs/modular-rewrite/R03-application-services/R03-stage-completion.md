@@ -36,6 +36,7 @@
 - 文档恢复验证在执行仓库既有 `npm run setup` 后通过完整 `verify:frontend`、17 个截图回归视口与完整 `verify:architecture`；历史 Database reset verifier 已迁移到当前 authoritative owner，原强确认、自动重连和 P4 worker 恢复断言未放宽。
 - 最终 clean Public Platform CI run `31593758268` / Windows Automated job `94104353199` 在 HEAD `2ecebb9ab0076f27a20d46bc897e63c78aecae3d` 上全部通过：architecture、完整 Windows Automated acceptance 与 validation evidence upload 均为 `SUCCESS`。
 - 最终 evidence artifact `9140937975`，大小 `13907479` 字节，SHA-256 `a67e78ee1272d9a953432292ee284118cffcc17325a9aefedf4367cec451ee75`。
+- 合并后阶段收口 workflow run `31608445256` / job `94153324772` 为 `SUCCESS`：canonical R3/R3-10 状态修正、仓库 Node setup、完整 `verify:frontend` 与完整 `verify:architecture` 全部通过；该临时 workflow 已在成功提交中自删除，最终 `.github/workflows` 仅保留正式 `ci.yml`。
 
 ## 4. 兼容性结论
 
