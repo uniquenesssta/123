@@ -2,7 +2,7 @@
 
 ## 状态
 
-`VERIFYING`
+`DONE`
 
 ## 实施结果
 
@@ -27,4 +27,11 @@
 
 - 公共 `PostgresStore`、`DatabaseOptions`、`DatabaseHealth`、`DatabaseStats`、`PersistenceError` 名称与根导出路径保持。
 - 未修改 Application/Tauri 公共调用签名、DatabaseOptions Serde 字段/default、错误语义、SQL migration、配置、模型资产或生产依赖。
-- R4-02/R4-03/R4-04 未开始。最终 clean Public Platform CI 与正式合并/收口前，本节点保持 `VERIFYING`。
+- R4-01 已正式关闭为 `DONE`；R4-02 开放为 `READY`，R4-03/R4-04 继续 `BLOCKED`。
+
+## 正式收口
+
+- clean Public Platform CI run `31615930113` / Windows Automated job `94178594481`：`SUCCESS`，architecture、完整 Windows Automated acceptance 与 evidence upload 全部通过。
+- evidence artifact `9150134498`，13,909,168 bytes，SHA-256 `6da5f1750feef5f7fc00233165dea7f7563fefa96d08f8e515a22e16fa4dd5e1`。
+- PR #22 已由 Draft 转 Ready 并按固定 HEAD `9ace623684afe1b7b2bbe7f65afbaae66656ce97` 合并；merge commit `ed99ce3bc21da76a55de526a7f912fa363bb84a5`。
+- 18 个要求专用可写 `FOOTBALL_TEST_DATABASE_URL` 的 PostgreSQL 集成测试仍未执行；未执行 destructive database reset。

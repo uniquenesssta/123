@@ -18,8 +18,8 @@ R3 Application Services 已完成并关闭。R4 只重写 `crates/persistence-po
 
 | 任务 | 范围 | 状态 | 记录 |
 |---|---|---|---|
-| R4-01 | Store / Error / Pool / migration / health / statistics | VERIFYING | [`R04-01-store-error-and-pool.md`](./R04-01-store-error-and-pool.md) |
-| R4-02 | Audit 基础设施 | BLOCKED | — |
+| R4-01 | Store / Error / Pool / migration / health / statistics | DONE | [`R04-01-store-error-and-pool.md`](./R04-01-store-error-and-pool.md) |
+| R4-02 | Audit 基础设施 | READY | — |
 | R4-03 | 通用 Row 映射基础规范 | BLOCKED | — |
 | R4-04 | Application Port Adapter 注册 | BLOCKED | — |
 
@@ -30,3 +30,9 @@ R3 Application Services 已完成并关闭。R4 只重写 `crates/persistence-po
 - 历史迁移 0001–0046 保持冻结；R4-01 不修改任何 migration SQL。
 
 R4-01 完成前保持 `READY/VERIFYING`，只有目标职责切换为唯一 owner、旧职责实现清理、最小验证与阶段回归实际通过、根 `README.md` 与节点记录同步后才能标记为 `DONE`。
+
+## R4-01 收口
+
+- PR #22 已合并到 `rewrite/r4-persistence-foundation`，merge commit `ed99ce3bc21da76a55de526a7f912fa363bb84a5`。
+- 最终 clean Public Platform CI run `31615930113` / job `94178594481`：`SUCCESS`；artifact `9150134498`，13,909,168 bytes，SHA-256 `6da5f1750feef5f7fc00233165dea7f7563fefa96d08f8e515a22e16fa4dd5e1`。
+- R4-01 正式关闭为 `DONE`；R4-02 开放为 `READY`，R4-03/R4-04 继续 `BLOCKED`。
