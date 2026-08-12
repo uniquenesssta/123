@@ -2,7 +2,7 @@
 
 ## 阶段状态
 
-`IN_PROGRESS`
+`DONE`
 
 R2 已完成并关闭。R3 只重写 Application 编排与 Ports/Services/Use Cases 边界，不修改具体 PostgreSQL SQL、Tauri DTO、前端状态或模型实现。
 
@@ -26,7 +26,7 @@ R2 已完成并关闭。R3 只重写 Application 编排与 Ports/Services/Use Ca
 | R3-07 | Research Service | DONE |
 | R3-08 | Review / Postmatch / Analytics Services | DONE |
 | R3-09 | Exchange / AI / Release Services | DONE |
-| R3-10 | ApplicationService 兼容门面 | VERIFYING |
+| R3-10 | ApplicationService 兼容门面 | DONE |
 
 ## R3-01 完成结果
 
@@ -192,3 +192,13 @@ R3-02 已正式关闭为 `DONE`。详细记录见 [`R03-02-database-service.md`]
 - Application Port inventory 当前为 15 个职责域 / 38 个最小 trait；`ApplicationService` 根对象不再直接持有 P4 worker 状态，旧根级 P4 owner 清零。公共 ApplicationService/Tauri 契约、SQL/migration、前端产品行为、模型实现和生产依赖保持不变。
 - R3-10 当前为 `VERIFYING`；PR #21 保持 Draft / Open / 未合并。clean Public Platform CI 与正式收口完成前，不创建 `R03-stage-completion.md`，R3 阶段继续 `IN_PROGRESS`。
 - 18 个需要专用可写 `FOOTBALL_TEST_DATABASE_URL` 的 PostgreSQL 集成测试未执行，未记为通过；未执行破坏性数据库验证。
+
+## R3-10 完成结果
+
+- R3-10 已将 `ApplicationService` 收敛为纯兼容门面：旧根级 P4 orchestration owner 删除，P4 job/worker 进入独立 Service / Use Case / Port；Database lifecycle、Research 多 Port 组装和 Prediction recent-run compatibility mapping 均迁出 facade。
+- Application Ports 最终为 15 个职责域、38 个最小 trait；具体 PostgreSQL / SQLx 继续只由 composition adapter / port registry 持有。
+- AT1 strict hard gate run `31591061641` / job `94095867258` 与 AT2 strict hard gate run `31592634518` / job `94100834403` 均通过；Application tests 33/33、rustfmt、check、Clippy `-D warnings` 与完整 architecture 均为 PASS。
+- 最终 clean Public Platform CI run `31593758268` / Windows Automated job `94104353199` 在 HEAD `2ecebb9ab0076f27a20d46bc897e63c78aecae3d` 上全部通过；artifact `9140937975`，SHA-256 `a67e78ee1272d9a953432292ee284118cffcc17325a9aefedf4367cec451ee75`。
+- PR #21 已以 merge commit 方式合并，merge commit `f400740a36e29ab5cf154728c5f240ee018707c6`。R3-10 与 R3 阶段均正式关闭为 `DONE`。
+- 阶段完成记录：[`R03-stage-completion.md`](./R03-stage-completion.md)。18 个需要专用可写 `FOOTBALL_TEST_DATABASE_URL` 的 PostgreSQL 集成测试与 destructive reset 未执行，未记为通过。
+
