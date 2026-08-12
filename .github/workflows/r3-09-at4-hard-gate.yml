@@ -7,7 +7,11 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: write
+  contents: read
+
+concurrency:
+  group: r3-09-at4-hard-gate-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   hard-gate:
@@ -20,28 +24,30 @@ jobs:
       - uses: dtolnay/rust-toolchain@1.88.0
         with:
           components: rustfmt, clippy
-      - name: Refresh deterministic Domain inventory
+      - uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: . -> ../.cargo-target
+      - name: Release service gate
         shell: pwsh
-        run: |
-          node scripts/generate-domain-type-inventory.mjs
-          if (-not (git diff --quiet -- architecture/domain-type-inventory.json)) {
-            git config user.name "github-actions[bot]"
-            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-            git add architecture/domain-type-inventory.json
-            git commit -m "chore(r3-09): refresh domain type inventory"
-            git push origin HEAD:agent/r3-09-at4-release
-          }
-      - name: Release architecture gates
+        run: node scripts/verify-release-service.mjs
+      - name: Historical release acceptance contract
         shell: pwsh
-        run: |
-          node scripts/verify-release-service.mjs
-          node scripts/verify-release-acceptance.mjs
-          npm run verify:architecture
-      - name: Application Rust gate
+        run: node scripts/verify-release-acceptance.mjs
+      - name: Full architecture gate
         shell: pwsh
-        run: |
-          node scripts/prepare-cargo-target.mjs
-          cargo fmt --all -- --check
-          cargo check --locked -p football-application
-          cargo test --locked -p football-application
-          cargo clippy --locked -p football-application --all-targets -- -D warnings
+        run: npm run verify:architecture
+      - name: Prepare Cargo target
+        shell: pwsh
+        run: node scripts/prepare-cargo-target.mjs
+      - name: Rustfmt
+        shell: pwsh
+        run: cargo fmt --all -- --check
+      - name: Application check
+        shell: pwsh
+        run: cargo check --locked -p football-application
+      - name: Application tests
+        shell: pwsh
+        run: cargo test --locked -p football-application
+      - name: Application Clippy
+        shell: pwsh
+        run: cargo clippy --locked -p football-application --all-targets -- -D warnings
