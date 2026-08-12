@@ -1,0 +1,88 @@
+name: R3 Stage Closeout
+
+on:
+  push:
+    branches:
+      - rewrite/r3-08-review-postmatch-analytics
+
+permissions:
+  contents: write
+
+jobs:
+  closeout:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: windows-2025
+    steps:
+      - name: Checkout stage branch
+        uses: actions/checkout@v4
+        with:
+          ref: rewrite/r3-08-review-postmatch-analytics
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Patch canonical closeout records
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          @'
+          from pathlib import Path
+
+          stage = Path('docs/modular-rewrite/R03-application-services/README.md')
+          stage_text = stage.read_text(encoding='utf-8')
+          if '`IN_PROGRESS`' not in stage_text:
+              raise SystemExit('R3 stage status marker missing')
+          stage_text = stage_text.replace('`IN_PROGRESS`', '`DONE`', 1)
+          old_row = '| R3-10 | ApplicationService 兼容门面 | READY |'
+          if old_row not in stage_text:
+              raise SystemExit('R3-10 READY row missing')
+          stage_text = stage_text.replace(old_row, '| R3-10 | ApplicationService 兼容门面 | DONE |', 1)
+          section = '''\n\n## R3-10 完成结果\n\n- R3-10 已将 `ApplicationService` 收敛为纯兼容门面：旧根级 P4 orchestration owner 删除，P4 job/worker 进入独立 Service / Use Case / Port；Database lifecycle、Research 多 Port 组装和 Prediction recent-run compatibility mapping 均迁出 facade。\n- Application Ports 最终为 15 个职责域、38 个最小 trait；具体 PostgreSQL / SQLx 继续只由 composition adapter / port registry 持有。\n- AT1 strict hard gate run `31591061641` / job `94095867258` 与 AT2 strict hard gate run `31592634518` / job `94100834403` 均通过；Application tests 33/33、rustfmt、check、Clippy `-D warnings` 与完整 architecture 均为 PASS。\n- 最终 clean Public Platform CI run `31593758268` / Windows Automated job `94104353199` 在 HEAD `2ecebb9ab0076f27a20d46bc897e63c78aecae3d` 上全部通过；artifact `9140937975`，SHA-256 `a67e78ee1272d9a953432292ee284118cffcc17325a9aefedf4367cec451ee75`。\n- PR #21 已以 merge commit 方式合并，merge commit `f400740a36e29ab5cf154728c5f240ee018707c6`。R3-10 与 R3 阶段均正式关闭为 `DONE`。\n- 阶段完成记录：[`R03-stage-completion.md`](./R03-stage-completion.md)。18 个需要专用可写 `FOOTBALL_TEST_DATABASE_URL` 的 PostgreSQL 集成测试与 destructive reset 未执行，未记为通过。\n'''
+          if '## R3-10 完成结果' not in stage_text:
+              stage_text = stage_text.rstrip() + section + '\n'
+          stage.write_text(stage_text, encoding='utf-8', newline='\n')
+
+          root = Path('README.md')
+          root_text = root.read_text(encoding='utf-8')
+          old = 'R3-09 Exchange / AI Workspace / Release Services 已进入 `IN_PROGRESS`，AT1 Match Lineup / AI Match Package Exchange 与 AT2 Spreadsheet Exchange 均已关闭为 `DONE`，AT3 AI Workspace 已正式关闭为 `DONE`，AT4 Release 已开放为 `READY`。'
+          new = 'R3-09 Exchange / AI Workspace / Release Services 已正式关闭为 `DONE`（AT1 Match Lineup / AI Match Package Exchange、AT2 Spreadsheet Exchange、AT3 AI Workspace、AT4 Release 均已关闭）；R3-10 ApplicationService 兼容门面已关闭为 `DONE`，R3 阶段已正式关闭，详见 `docs/modular-rewrite/R03-application-services/R03-stage-completion.md`。'
+          if old not in root_text:
+              raise SystemExit('root README stale R3 summary not found')
+          root_text = root_text.replace(old, new, 1)
+          evidence = '- R3-10 最终 clean Public Platform CI run `31593758268` / Windows Automated job `94104353199` 已全部通过，artifact `9140937975`，SHA-256 `a67e78ee1272d9a953432292ee284118cffcc17325a9aefedf4367cec451ee75`；PR #21 merge commit 为 `f400740a36e29ab5cf154728c5f240ee018707c6`。R3 最终为 15 个 Application Port 职责域、38 个最小 trait，`ApplicationService` 仅保留兼容门面；18 个专用 PostgreSQL 集成测试与 destructive reset 仍未执行。\n'
+          if evidence not in root_text:
+              anchor = '- 开发依赖布局已外置：'
+              pos = root_text.find(anchor)
+              if pos < 0:
+                  raise SystemExit('root README R3 summary insertion anchor missing')
+              root_text = root_text[:pos] + evidence + root_text[pos:]
+          root.write_text(root_text, encoding='utf-8', newline='\n')
+          '@ | Set-Content -Path r3_stage_closeout.py -Encoding UTF8
+          python r3_stage_closeout.py
+          Remove-Item r3_stage_closeout.py
+
+      - name: Setup repository Node dependencies
+        shell: pwsh
+        run: npm run setup
+
+      - name: Verify closeout tree
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $PSNativeCommandUseErrorActionPreference = $true
+          npm run verify:frontend
+          npm run verify:architecture
+
+      - name: Commit verified closeout records and remove workflow
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git rm .github/workflows/r3-stage-closeout.yml
+          git add README.md docs/modular-rewrite/R03-application-services/README.md
+          git commit -m 'docs(r3): close application services stage'
+          git push origin HEAD:rewrite/r3-08-review-postmatch-analytics
