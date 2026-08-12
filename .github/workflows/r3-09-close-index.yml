@@ -1,0 +1,37 @@
+name: R3-09 Close Index
+
+on:
+  push:
+    branches:
+      - rewrite/r3-08-review-postmatch-analytics
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  close-index:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: windows-2025
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: rewrite/r3-08-review-postmatch-analytics
+          fetch-depth: 0
+      - name: Align R3-09 current status
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $path = 'docs/modular-rewrite/R03-application-services/README.md'
+          $old = '- AT3 hard gate run `31553249625` / job `93980269528` 已通过官方 Domain inventory、完整 architecture、37-Port 契约、新 AI Workspace 专项、Application check、Application tests 33/33、Clippy `-D warnings` 与 formatter scope；临时 workflow 已自删除。Ports 裸 JSON 阻塞通过显式序列化结果边界修复，历史验证器旧 owner 仅迁移读取源，不弱化断言。最终 clean Public Platform CI run `31553867879` / Windows Automated job `93982110497` 已整体 `SUCCESS`；artifact `9125791161` 大小 `13985122` 字节，SHA-256 `f5662c9e11d1fbd9da12e39efce9b44645144fce33bf6fe674011c2b7c1af0a6`。PR #19 已合并，merge commit `3d925671ccd424e25965ba9409189f32f920bc4f`；AT3 已关闭为 `DONE`，AT4 `READY`，R3-10 继续 `BLOCKED`。'
+          $new = '- AT3 hard gate run `31553249625` / job `93980269528` 已通过官方 Domain inventory、完整 architecture、37-Port 契约、新 AI Workspace 专项、Application check、Application tests 33/33、Clippy `-D warnings` 与 formatter scope；临时 workflow 已自删除。Ports 裸 JSON 阻塞通过显式序列化结果边界修复，历史验证器旧 owner 仅迁移读取源，不弱化断言。最终 clean Public Platform CI run `31553867879` / Windows Automated job `93982110497` 已整体 `SUCCESS`；artifact `9125791161` 大小 `13985122` 字节，SHA-256 `f5662c9e11d1fbd9da12e39efce9b44645144fce33bf6fe674011c2b7c1af0a6`。PR #19 已合并，merge commit `3d925671ccd424e25965ba9409189f32f920bc4f`；AT3 已关闭为 `DONE`。AT4 后续亦已完成并合并，R3-09 已关闭为 `DONE`，R3-10 已开放为 `READY`。'
+          $content = Get-Content -Raw -Encoding UTF8 $path
+          if (-not $content.Contains($old)) { throw 'Stale AT3 current-status line not found' }
+          $updated = $content.Replace($old, $new)
+          [System.IO.File]::WriteAllText((Resolve-Path $path), $updated, [System.Text.UTF8Encoding]::new($false))
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add $path .github/workflows/r3-09-close-index.yml
+          git rm .github/workflows/r3-09-close-index.yml
+          git commit -m 'docs(r3-09): align current closeout index'
+          git push origin HEAD:rewrite/r3-08-review-postmatch-analytics
