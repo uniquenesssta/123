@@ -1,0 +1,157 @@
+name: R3-10 AT1 Recovery
+on:
+  push:
+    branches:
+      - agent/r3-10-application-service-facade
+permissions:
+  contents: write
+jobs:
+  recover:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: windows-2025
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: agent/r3-10-application-service-facade
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - uses: dtolnay/rust-toolchain@master
+        with:
+          toolchain: 1.88.0
+          components: rustfmt,clippy
+      - name: Apply AT1 with recovered boundaries
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $PSNativeCommandUseErrorActionPreference = $true
+
+          $raw = Get-Content -Raw -Encoding UTF8 '.github/workflows/r3-10-at1-build.yml'
+          $pattern = "(?s)          @'\r?\n(.*?)\r?\n          '@ \| Set-Content -Path r3_10_at1.py -Encoding UTF8"
+          $match = [regex]::Match($raw, $pattern)
+          if (-not $match.Success) { throw 'AT1 embedded source script not found' }
+          $lines = $match.Groups[1].Value -split "\r?\n"
+          $normalized = foreach ($line in $lines) {
+            if ($line.StartsWith('          ')) { $line.Substring(10) } else { $line }
+          }
+          [System.IO.File]::WriteAllText((Join-Path $PWD 'r3_10_at1.py'), ($normalized -join "`n"), [System.Text.UTF8Encoding]::new($false))
+          python r3_10_at1.py
+          Remove-Item r3_10_at1.py
+
+          @'
+          from pathlib import Path
+          import json
+
+          def read(path):
+              return Path(path).read_text(encoding='utf-8')
+
+          def write(path, content):
+              Path(path).write_text(content, encoding='utf-8', newline='\n')
+
+          def replace(path, old, new):
+              text = read(path)
+              if old not in text:
+                  raise SystemExit(f'expected recovery text missing: {path}: {old[:120]}')
+              write(path, text.replace(old, new))
+
+          database = 'crates/application/src/services/database/facade.rs'
+          replace(database, '''
+              pub fn ensure_p4_orchestration_worker(self: &Arc<Self>) {
+                  crate::p4_orchestration::spawn_p4_orchestration_worker(Arc::clone(self));
+              }
+          ''', '\n')
+
+          for path in [
+              'crates/application/src/use_cases/p4_orchestration/process_next.rs',
+              'crates/application/src/services/p4_orchestration/service.rs',
+          ]:
+              text = read(path).replace('P4OrchestrationAccess + ?Sized', 'P4OrchestrationAccess')
+              write(path, text)
+
+          prediction_validator = 'scripts/verify-prediction-service.mjs'
+          replace(
+              prediction_validator,
+              'const legacyOrchestration=read("crates/application/src/p4_orchestration.rs");',
+              'const orchestrationUseCase=read("crates/application/src/use_cases/p4_orchestration/process_next.rs");',
+          )
+          replace(
+              prediction_validator,
+              'check(!legacyOrchestration.includes("async fn execute_p4_freeze_task("),"p4_orchestration.rs 仍实现 P4 freeze execution"); check(legacyOrchestration.includes("self.execute_p4_freeze_task(payload.task_id, job_id)"),"旧混合 worker 未委托 Prediction Service 的 freeze use case");',
+              'check(!existsSync(join(root,"crates/application/src/p4_orchestration.rs")),"旧 p4_orchestration.rs owner 仍残留"); check(!orchestrationUseCase.includes("async fn execute_p4_freeze_task("),"P4 orchestration use case 不得实现 freeze execution"); check(orchestrationUseCase.includes(".execute_p4_freeze_task("),"P4 orchestration 未委托 Prediction Service 的 freeze use case");',
+          )
+
+          state_path = Path('architecture/state-ownership.json')
+          state = json.loads(state_path.read_text(encoding='utf-8'))
+          worker = next(item for item in state['states'] if item['id'] == 'application.p4-worker')
+          worker['owner'] = 'crates/application/src/services/p4_orchestration/service.rs::P4OrchestrationService.running'
+          worker['writers'] = ['crates/application/src/services/p4_orchestration/worker.rs']
+          state['last_updated_task'] = 'R3-10'
+          state_path.write_text(json.dumps(state, ensure_ascii=False, indent=2) + '\n', encoding='utf-8')
+
+          composition_validator = 'scripts/verify-application-composition.mjs'
+          replace(
+              composition_validator,
+              'const databaseService = read("crates/application/src/services/database/service.rs");',
+              'const databaseService = read("crates/application/src/services/database/service.rs");\nconst p4OrchestrationService = read("crates/application/src/services/p4_orchestration/service.rs");',
+          )
+          replace(
+              composition_validator,
+              '''check(
+            composition.includes("AtomicBool::new(false)"),
+            "P4 worker 初始状态发生变化",
+          );''',
+              '''check(
+            p4OrchestrationService.includes("AtomicBool::new(false)"),
+            "P4 worker 初始状态未归属 P4OrchestrationService",
+          );
+          check(
+            service.includes("p4_orchestration: P4OrchestrationService"),
+            "ApplicationService 未聚合 P4OrchestrationService",
+          );
+          check(
+            !service.includes("p4_worker_running"),
+            "ApplicationService 仍直接持有 P4 worker 状态",
+          );''',
+          )
+          replace(
+              composition_validator,
+              '"crates/application/src/service/application_service.rs::ApplicationService.p4_worker_running"',
+              '"crates/application/src/services/p4_orchestration/service.rs::P4OrchestrationService.running"',
+          )
+
+          inventory_path = Path('architecture/application-port-inventory.json')
+          inventory = json.loads(inventory_path.read_text(encoding='utf-8'))
+          prediction = next(item for item in inventory['domains'] if item['name'] == 'prediction')
+          if 'P4OrchestrationQueuePort' not in prediction['traits']:
+              prediction['traits'].append('P4OrchestrationQueuePort')
+          inventory_path.write_text(json.dumps(inventory, ensure_ascii=False, indent=2) + '\n', encoding='utf-8')
+          '@ | Set-Content -Path r3_10_at1_recovery.py -Encoding UTF8
+          python r3_10_at1_recovery.py
+          Remove-Item r3_10_at1_recovery.py
+
+          git grep -n -E 'crates/application/src/p4_orchestration\.rs|p4_worker_running|crate::p4_orchestration' -- scripts architecture crates/application/src; if ($LASTEXITCODE -gt 1) { exit $LASTEXITCODE }
+          $global:LASTEXITCODE = 0
+
+          cargo fmt --all
+          cargo fmt --all -- --check
+          node scripts/generate-domain-type-inventory.mjs
+          node scripts/verify-r3-06-p4-freeze.mjs
+          node scripts/verify-prediction-service.mjs
+          node scripts/verify-application-ports.mjs
+          node scripts/verify-application-composition.mjs
+          npm run verify:architecture
+          cargo check --locked -p football-application
+          cargo test --locked -p football-application
+          cargo clippy --locked -p football-application --all-targets -- -D warnings
+      - name: Commit only fully verified AT1
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $PSNativeCommandUseErrorActionPreference = $true
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git rm .github/workflows/r3-10-at1-build.yml .github/workflows/r3-10-at1-runner.yml .github/workflows/r3-10-at1-recovery.yml
+          git add crates/application scripts architecture/application-port-inventory.json architecture/domain-type-inventory.json architecture/state-ownership.json
+          git commit -m 'refactor(r3-10): extract p4 orchestration service'
+          git push origin HEAD:agent/r3-10-application-service-facade
