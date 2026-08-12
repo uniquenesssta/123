@@ -1,7 +1,10 @@
 use super::super::port_registry::{map_persistence_error, ActiveDatabase};
 use crate::ports::{
-    ai_workspace::{ApiWorkspaceOperationPort, ApiWorkspaceSessionPort},
-    PortResult,
+    ai_workspace::{
+        ApiWorkspaceOperationPort, ApiWorkspaceSessionPort,
+        SerializedApiWorkspaceOperationResult,
+    },
+    PortError, PortErrorKind, PortResult,
 };
 use async_trait::async_trait;
 use football_domain::{
@@ -10,7 +13,6 @@ use football_domain::{
     ApiWorkspaceSessionDetail, ApiWorkspaceSessionDraft, ApiWorkspaceSessionRecord,
     OpenAiUsageTotals,
 };
-use serde_json::Value;
 use uuid::Uuid;
 
 #[async_trait]
@@ -99,9 +101,15 @@ impl ApiWorkspaceOperationPort for ActiveDatabase {
         &self,
         operation_id: Uuid,
         status: &str,
-        result: Value,
+        result: &SerializedApiWorkspaceOperationResult,
         error_message: Option<&str>,
     ) -> PortResult<ApiWorkspaceOperationRecord> {
+        let result = serde_json::from_str(&result.0).map_err(|error| {
+            PortError::new(
+                PortErrorKind::Serialization,
+                format!("API workspace operation result is not valid JSON: {error}"),
+            )
+        })?;
         self.transition_store()
             .complete_api_workspace_operation(operation_id, status, result, error_message)
             .await
