@@ -107,4 +107,6 @@
 - 第一轮门禁实际发现历史公开模型边界验证器仍读取已删除 owner，以及源码迁移导致 Domain inventory 漂移；前者只迁移权威读取位置，后者两次均使用官方 `generate-domain-type-inventory.mjs` 重新生成。严格分步门禁随后发现唯一 rustfmt 差异并按 rustfmt 修正；没有使用 lint 抑制、跳过测试或手工篡改 inventory。
 - 临时 hard-gate / inventory-refresh workflows 已清理；最终源码树不保留诊断入口。
 - 18 个需要专用可写 `FOOTBALL_TEST_DATABASE_URL` 的 PostgreSQL 集成测试未在本 hard gate 执行，未记为通过；未执行破坏性数据库验证。
+- 首轮最终 clean Public Platform CI run `31568684129` / job `94025845936` 中独立 architecture 已通过，Windows Automated 在完整 frontend 的 deterministic protected-assets 门禁停止：AT4 为迁移旧 Release owner 而合法修改了受保护的 `scripts/verify-public-model-boundary.mjs` 权威扫描路径，但 `architecture/protected-assets.json` 尚未同步该验证器的新指纹；这不是 Release 业务、编译或契约失败，且该轮未被记为通过。
+- 按仓库既有 `chore(verify): refresh public-boundary fingerprint` 机制，只刷新该受保护验证器的 Git blob / fingerprint 与聚合 SHA；refresh workflow 在提交前实际执行 `verify-protected-assets-deterministic.mjs` 并通过。新 blob 为 `2e5adc250dba986b3b0441c7f26e762f8b9ef6f4`，fingerprint 为 `13f9ea8c98624e156208c836f837875f2a54104be15e6115f5e7f547d4f491e0`，聚合 SHA-256 为 `d74e0936b60c69f444a498405fed3e704b8db63b81f26b40036f772b4b6eac57`；保护文件集合、禁止私有资产规则和验证逻辑未放宽。
 - PR #20 当前保持 Draft / Open / 未合并；最终 clean Public Platform CI 尚待执行，因此 AT4 当前保持 `VERIFYING`，不得提前关闭为 `DONE`；R3-09 继续 `IN_PROGRESS`，R3-10 继续 `BLOCKED`。
