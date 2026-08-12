@@ -30,6 +30,40 @@ jobs:
           toolchain: 1.88.0
           components: rustfmt, clippy
 
+      - name: Wire AT3 validators to authoritative owners
+        shell: pwsh
+        run: |
+          @'
+          const fs = require('node:fs');
+          const pkg = JSON.parse(fs.readFileSync('package.json', 'utf8'));
+          pkg.scripts['verify:ai-workspace-service'] = 'node scripts/verify-ai-workspace-service.mjs';
+          if (!pkg.scripts['verify:architecture'].includes('verify-ai-workspace-service.mjs')) {
+            pkg.scripts['verify:architecture'] = pkg.scripts['verify:architecture'].replace(
+              'node scripts/verify-exchange-service.mjs',
+              'node scripts/verify-exchange-service.mjs && node scripts/verify-ai-workspace-service.mjs',
+            );
+          }
+          fs.writeFileSync('package.json', JSON.stringify(pkg, null, 2) + '\n');
+
+          const frontendPath = 'scripts/verify-frontend.mjs';
+          let frontend = fs.readFileSync(frontendPath, 'utf8');
+          if (!frontend.includes('"verify-ai-workspace-service.mjs"')) {
+            frontend = frontend.replace(
+              '  "verify-exchange-service.mjs",\n',
+              '  "verify-exchange-service.mjs",\n  "verify-ai-workspace-service.mjs",\n',
+            );
+          }
+          fs.writeFileSync(frontendPath, frontend);
+
+          const legacyVerifierPath = 'scripts/verify-api-workspace.mjs';
+          let legacyVerifier = fs.readFileSync(legacyVerifierPath, 'utf8');
+          legacyVerifier = legacyVerifier.replace(
+            'const application = text("crates/application/src/api_workspace.rs");',
+            'const application = text("crates/application/src/use_cases/ai_workspace/presets/mod.rs");',
+          );
+          fs.writeFileSync(legacyVerifierPath, legacyVerifier);
+          '@ | node
+
       - name: Format AT3 Rust and refresh deterministic inventory
         shell: pwsh
         run: |
@@ -83,8 +117,8 @@ jobs:
           git rm .github/workflows/r3-09-at3-hard-gate.yml
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add crates/application architecture/domain-type-inventory.json
+          git add crates/application architecture/domain-type-inventory.json package.json scripts/verify-frontend.mjs scripts/verify-api-workspace.mjs scripts/verify-ai-workspace-service.mjs
           git diff --cached --check
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
-          git commit -m "chore(r3-09): normalize AT3 source and inventory"
+          git commit -m "chore(r3-09): normalize AT3 source and validators"
           git push origin HEAD:agent/r3-09-at3-ai-workspace
