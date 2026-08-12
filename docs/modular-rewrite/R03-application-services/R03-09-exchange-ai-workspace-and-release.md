@@ -2,7 +2,7 @@
 
 ## 状态
 
-`IN_PROGRESS`
+`DONE`
 
 ## Atomic Task 1 — Match Lineup / AI Match Package Exchange
 
@@ -85,7 +85,7 @@
 
 ## Atomic Task 4 — Release
 
-状态：`VERIFYING`
+状态：`DONE`
 
 ### 当前实施范围
 
@@ -110,4 +110,4 @@
 - 首轮最终 clean Public Platform CI run `31568684129` / job `94025845936` 中独立 architecture 已通过，Windows Automated 在完整 frontend 的 deterministic protected-assets 门禁停止：AT4 为迁移旧 Release owner 而合法修改了受保护的 `scripts/verify-public-model-boundary.mjs` 权威扫描路径，但 `architecture/protected-assets.json` 尚未同步该验证器的新指纹；这不是 Release 业务、编译或契约失败，且该轮未被记为通过。
 - 按仓库既有 `chore(verify): refresh public-boundary fingerprint` 机制，只刷新该受保护验证器的 Git blob / fingerprint 与聚合 SHA；refresh workflow 在提交前实际执行 `verify-protected-assets-deterministic.mjs` 并通过。新 blob 为 `2e5adc250dba986b3b0441c7f26e762f8b9ef6f4`，fingerprint 为 `13f9ea8c98624e156208c836f837875f2a54104be15e6115f5e7f547d4f491e0`，聚合 SHA-256 为 `d74e0936b60c69f444a498405fed3e704b8db63b81f26b40036f772b4b6eac57`；保护文件集合、禁止私有资产规则和验证逻辑未放宽。
 - 恢复后的最终 clean Public Platform CI run `31569072962` / Windows Automated job `94027017727` 已在无临时 workflow 的 HEAD `316f7b055817f85e086090bebc3613c577ceae9a` 上整体 `SUCCESS`；architecture、完整 Windows automated acceptance 与 validation evidence upload 均成功。artifact `9131083580` 大小 `13994757` 字节，SHA-256 `03b34d9ba85f0cd82b2a90f6b8cd2a5db3d8a59cb323b0439a7886c2cb6a0f87`。
-- PR #20 当前保持 Draft / Open / 未合并；AT4 技术验收已经通过，但在正式合并/收口前仍保持 `VERIFYING`，不得提前关闭为 `DONE`；R3-09 继续 `IN_PROGRESS`，R3-10 继续 `BLOCKED`。
+- PR #20 已正式合并到阶段分支，merge commit `fd1b8eb2b726338ec588df7c1e8cd87ef202ff51`。AT4 正式关闭为 `DONE`；AT1–AT4 全部完成，R3-09 正式关闭为 `DONE`，R3-10 ApplicationService 兼容门面开放为 `READY`。

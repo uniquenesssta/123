@@ -155,7 +155,7 @@ R00 阶段已按 Windows-only 目标范围标记为 **DONE**。Linux Chromium �
 
 PostgreSQL 实跑、Windows Full 和用户本机 Windows 10/11 实机验收仍保留最终统一验收；R2-06 节点已额外使用原 PostgreSQL 数据库完成连接验证。R3-02 已使用原数据库完成非破坏性 `tauri:dev` 运行时烟测，但真实 destructive reset 仍只允许在专用测试数据库执行。另保留 1 个 moderate npm vulnerability 和 Vite 大 chunk 警告。
 
-已创建 `R00-stage-completion.md`、`R01-stage-completion.md` 与 `R02-stage-completion.md`。R1、R2 阶段均已关闭；R3-01 Application Ports、R3-02 Database Service、R3-03 Competition / Rules Services、R3-05 Lineups Service 与 R3-06 Prediction Service 状态为 `DONE`，R3-04 Teams / Players Services 与 R3-07 Research Service 状态均为 `DONE`，R3-08 Review / Postmatch / Analytics Services 为 `DONE`（AT1 / AT2 / AT3 / AT4 均已关闭）；R3-09 Exchange / AI Workspace / Release Services 为 `IN_PROGRESS`（AT1 Match Lineup / AI Match Package Exchange、AT2 Spreadsheet Exchange、AT3 AI Workspace 均为 `DONE`；AT4 Release 已完成源码迁移并进入 `VERIFYING`）。详细状态见 `docs/modular-rewrite/R03-application-services/README.md`。
+已创建 `R00-stage-completion.md`、`R01-stage-completion.md` 与 `R02-stage-completion.md`。R1、R2 阶段均已关闭；R3-01 Application Ports、R3-02 Database Service、R3-03 Competition / Rules Services、R3-05 Lineups Service 与 R3-06 Prediction Service 状态为 `DONE`，R3-04 Teams / Players Services 与 R3-07 Research Service 状态均为 `DONE`，R3-08 Review / Postmatch / Analytics Services 为 `DONE`（AT1 / AT2 / AT3 / AT4 均已关闭）；R3-09 Exchange / AI Workspace / Release Services 为 `DONE`（AT1 Match Lineup / AI Match Package Exchange、AT2 Spreadsheet Exchange、AT3 AI Workspace、AT4 Release 均已关闭）；R3-10 ApplicationService 兼容门面开放为 `READY`。详细状态见 `docs/modular-rewrite/R03-application-services/README.md`。
 
 
 ## R3-06 Prediction Service（DONE）
@@ -260,7 +260,7 @@ PostgreSQL 实跑、Windows Full 和用户本机 Windows 10/11 实机验收仍�
 - AT3 Windows hard gate run `31553249625` / job `93980269528` 已整体 `SUCCESS`：官方 Domain inventory、完整 `verify:architecture`、37 个最小 Port trait、AI Workspace 专项、`cargo check --locked -p football-application`、Application tests 33/33、`cargo clippy --locked -p football-application --all-targets -- -D warnings` 与 formatter scope 均通过；临时 hard-gate workflow 已自删除。PostgreSQL SQL/migration/Schema、Domain 公共契约、Tauri 产品源码、前端产品源码、Release/AT4、配置与生产依赖未改变。最终 clean Public Platform CI run `31553867879` / Windows Automated job `93982110497` 已整体 `SUCCESS`；validation evidence artifact `9125791161` 大小 `13985122` 字节，SHA-256 `f5662c9e11d1fbd9da12e39efce9b44645144fce33bf6fe674011c2b7c1af0a6`。PR #19 已合并，merge commit `3d925671ccd424e25965ba9409189f32f920bc4f`；AT3 正式关闭为 `DONE`，AT4 Release 开放为 `READY`。
 
 
-## R3-09 AT4 Release Service（VERIFYING）
+## R3-09 AT4 Release Service（DONE）
 
 - 已删除旧 `crates/application/src/release_acceptance.rs`，不保留转发壳；3 个既有 Release Acceptance ApplicationService/Tauri 入口继续保持原名、参数和返回 DTO，由唯一 `ReleaseService` 编排。
 - `run_release_acceptance`、`list_release_acceptance_runs`、`read_release_acceptance_run` 已迁入 `services/release/` 与 `use_cases/release/`；运行验收进一步按请求校验、chain/performance/security/cost/release 检查、汇总和报告 SHA-256 哈希拆分职责。
@@ -271,4 +271,4 @@ PostgreSQL 实跑、Windows Full 和用户本机 Windows 10/11 实机验收仍�
 - 首轮最终 clean Public Platform CI run `31568684129` / job `94025845936` 中独立 architecture 已通过，Windows Automated 在完整 frontend 的 deterministic protected-assets 门禁停止：AT4 为迁移旧 Release owner 而合法修改了受保护的 `scripts/verify-public-model-boundary.mjs` 权威扫描路径，但 `architecture/protected-assets.json` 尚未同步该验证器的新指纹；这不是 Release 业务、编译或契约失败，且该轮未被记为通过。
 - 按仓库既有 `chore(verify): refresh public-boundary fingerprint` 机制，只刷新该受保护验证器的 Git blob / fingerprint 与聚合 SHA；refresh workflow 在提交前实际执行 `verify-protected-assets-deterministic.mjs` 并通过。新 blob 为 `2e5adc250dba986b3b0441c7f26e762f8b9ef6f4`，fingerprint 为 `13f9ea8c98624e156208c836f837875f2a54104be15e6115f5e7f547d4f491e0`，聚合 SHA-256 为 `d74e0936b60c69f444a498405fed3e704b8db63b81f26b40036f772b4b6eac57`；保护文件集合、禁止私有资产规则和验证逻辑未放宽。
 - 恢复后的最终 clean Public Platform CI run `31569072962` / Windows Automated job `94027017727` 已在无临时 workflow 的 HEAD `316f7b055817f85e086090bebc3613c577ceae9a` 上整体 `SUCCESS`；architecture、完整 Windows automated acceptance 与 validation evidence upload 均成功。artifact `9131083580` 大小 `13994757` 字节，SHA-256 `03b34d9ba85f0cd82b2a90f6b8cd2a5db3d8a59cb323b0439a7886c2cb6a0f87`。
-- PR #20 当前保持 Draft / Open / 未合并；AT4 技术验收已经通过，但正式流程状态继续保持 `VERIFYING`，R3-09 尚未关闭，R3-10 继续 `BLOCKED`。
+- PR #20 已正式合并到阶段分支，merge commit `fd1b8eb2b726338ec588df7c1e8cd87ef202ff51`。AT4 正式关闭为 `DONE`；R3-09 四个 Atomic Task 全部关闭，R3-09 正式为 `DONE`，R3-10 ApplicationService 兼容门面开放为 `READY`。
