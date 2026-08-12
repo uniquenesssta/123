@@ -1,7 +1,4 @@
 use crate::composition::ActiveDatabase;
-use crate::use_cases::research::{
-    p4_manual_conflict::P4ManualConflictAccess, p4_worker::P4ResearchWorkerAccess,
-};
 use crate::{
     ApplicationError, ApplicationResult, ApplicationService, OpenAiResearchCommand,
     ProcessResearchEvidenceCommand,
@@ -14,8 +11,6 @@ use football_domain::{
     SchemaVersionRecord,
 };
 use football_research_gateway::{CancellationToken, GatewayExecution};
-use serde_json::Value;
-use uuid::Uuid;
 
 impl ApplicationService {
     async fn research_session(&self) -> ApplicationResult<ActiveDatabase> {
@@ -110,25 +105,7 @@ impl ApplicationService {
     ) -> ApplicationResult<GatewayExecution> {
         let session = self.research_session().await?;
         self.research
-            .execute_p4_openai_research(&session, &session, &session, command, cancellation)
-            .await
-    }
-
-    pub(crate) async fn execute_p4_research_task(
-        &self,
-        task_id: Uuid,
-        job_id: Uuid,
-    ) -> ApplicationResult<Value> {
-        let session = self.research_session().await?;
-        let access = P4ResearchWorkerAccess {
-            workflow: &session,
-            jobs: &session,
-            artifacts: &session,
-            audit: &session,
-            pipeline: &session,
-        };
-        self.research
-            .execute_p4_research_task(access, task_id, job_id)
+            .execute_p4_openai_research_session(&session, command, cancellation)
             .await
     }
 
@@ -137,12 +114,8 @@ impl ApplicationService {
         command: ResolveP4ConflictCommand,
     ) -> ApplicationResult<P4TaskWorkspace> {
         let session = self.research_session().await?;
-        let access = P4ManualConflictAccess {
-            workflow: &session,
-            jobs: &session,
-            artifacts: &session,
-            manual: &session,
-        };
-        self.research.resolve_p4_conflict(access, command).await
+        self.research
+            .resolve_p4_conflict_session(&session, command)
+            .await
     }
 }

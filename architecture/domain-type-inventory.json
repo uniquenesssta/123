@@ -24,13 +24,13 @@
     "targetPublicExportPolicy": "explicit re-export only"
   },
   "sourceDigest": "217241ac243726a5ab6805a7f169e222b97e78c7c971749a5904714af673ebdd",
-  "rustUsageDigest": "4284fc0645e01e4d8dc00b4ba44505ed261b6314befcec0216d7e5835739ab64",
+  "rustUsageDigest": "5af83b73da7a26b08b225ea70f5c4cf671c642b90317146b1004cf0cb293a930",
   "summary": {
     "typeCount": 365,
     "publicCompatibilityTypeCount": 365,
     "internalTypeCount": 0,
     "domainSourceFileCount": 129,
-    "scannedRustFileCount": 613,
+    "scannedRustFileCount": 627,
     "databaseMappedTypeCount": 299,
     "byTargetModule": {
       "ai_workspace": 16,
@@ -3254,13 +3254,16 @@
       ],
       "externalCallers": [
         "crates/application/src/composition/adapters/jobs.rs",
+        "crates/application/src/composition/adapters/prediction.rs",
         "crates/application/src/ports/analytics/mod.rs",
+        "crates/application/src/ports/prediction/mod.rs",
         "crates/application/src/services/analytics/facade.rs",
         "crates/application/src/services/analytics/service.rs",
         "crates/application/src/use_cases/analytics/jobs/cancel_background_job/mod.rs",
         "crates/application/src/use_cases/analytics/jobs/enqueue_analysis_job/mod.rs",
         "crates/application/src/use_cases/analytics/jobs/list_background_jobs/mod.rs",
         "crates/application/src/use_cases/analytics/jobs/retry_background_job/mod.rs",
+        "crates/application/src/use_cases/p4_orchestration/failure.rs",
         "crates/persistence-postgres/src/jobs.rs",
         "src-tauri/src/commands/analytics.rs",
         "src-tauri/src/commands/issues.rs"
@@ -15093,7 +15096,7 @@
         "crates/domain/tests/serde_contracts/module_paths.rs"
       ],
       "externalCallers": [
-        "crates/application/src/p4_orchestration.rs",
+        "crates/application/src/use_cases/p4_orchestration/failure.rs",
         "crates/application/src/use_cases/prediction/execute_p4_freeze/mod.rs",
         "crates/application/src/use_cases/prediction/plan_p4_horizons/mod.rs",
         "crates/application/src/use_cases/research/p4_manual_conflict/decision.rs",
@@ -15198,8 +15201,8 @@
       ],
       "externalCallers": [
         "crates/application/src/composition/adapters/prediction.rs",
-        "crates/application/src/p4_orchestration.rs",
         "crates/application/src/ports/prediction/mod.rs",
+        "crates/application/src/use_cases/p4_orchestration/failure.rs",
         "crates/application/src/use_cases/prediction/execute_p4_freeze/mod.rs",
         "crates/application/src/use_cases/prediction/plan_p4_horizons/mod.rs",
         "crates/application/src/use_cases/research/p4_manual_conflict/reconciliation.rs",
@@ -15288,7 +15291,7 @@
         "crates/domain/tests/serde_contracts/module_paths.rs"
       ],
       "externalCallers": [
-        "crates/application/src/p4_orchestration.rs",
+        "crates/application/src/services/p4_orchestration/tests.rs",
         "crates/application/src/use_cases/prediction/plan_p4_horizons/mod.rs",
         "crates/application/src/use_cases/prediction/shared/p4_planning.rs",
         "crates/persistence-postgres/src/p4_orchestration.rs",

@@ -1,4 +1,5 @@
-use crate::composition::{model_run_list_item_from_port, ActiveDatabase};
+use super::compatibility;
+use crate::composition::ActiveDatabase;
 use crate::{
     ApplicationError, ApplicationResult, ApplicationService, ModelRunListItem, PredictionCommand,
     PredictionExecution, RoutePreviewCommand, StoredMatchPredictionCommand,
@@ -76,12 +77,7 @@ impl ApplicationService {
 
     pub async fn list_recent_runs(&self, limit: i64) -> ApplicationResult<Vec<ModelRunListItem>> {
         let session = self.prediction_session().await?;
-        let items = self.prediction.list_recent_runs(&session, limit).await?;
-        items
-            .into_iter()
-            .map(model_run_list_item_from_port)
-            .collect::<Result<Vec<_>, _>>()
-            .map_err(Into::into)
+        compatibility::list_recent_runs(&self.prediction, &session, limit).await
     }
 
     pub async fn hide_run_from_history(
@@ -98,17 +94,6 @@ impl ApplicationService {
     pub async fn read_run(&self, run_id: Uuid) -> ApplicationResult<Value> {
         let session = self.prediction_session().await?;
         self.prediction.read_run(&session, run_id).await
-    }
-
-    pub(crate) async fn execute_p4_freeze_task(
-        &self,
-        task_id: Uuid,
-        job_id: Uuid,
-    ) -> ApplicationResult<Value> {
-        let session = self.prediction_session().await?;
-        self.prediction
-            .execute_p4_freeze_task(&session, &self.registry, task_id, job_id)
-            .await
     }
 
     pub async fn freeze_p4_prematch_snapshot(

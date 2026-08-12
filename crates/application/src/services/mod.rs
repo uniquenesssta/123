@@ -4,6 +4,7 @@ pub(crate) mod competition;
 pub(crate) mod database;
 pub(crate) mod exchange;
 pub(crate) mod lineups;
+pub(crate) mod p4_orchestration;
 pub(crate) mod players;
 pub(crate) mod postmatch;
 pub(crate) mod prediction;

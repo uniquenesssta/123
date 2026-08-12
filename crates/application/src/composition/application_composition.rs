@@ -4,11 +4,11 @@ use crate::model_shell::PublicModelStub;
 use crate::services::{
     ai_workspace::AiWorkspaceService, analytics::AnalyticsService, competition::CompetitionService,
     database::DatabaseService, exchange::ExchangeService, lineups::LineupService,
-    players::PlayerService, postmatch::PostmatchService, prediction::PredictionService,
-    release::ReleaseService, research::ResearchService, review::ReviewService, rules::RulesService,
-    teams::TeamService,
+    p4_orchestration::P4OrchestrationService, players::PlayerService, postmatch::PostmatchService,
+    prediction::PredictionService, release::ReleaseService, research::ResearchService,
+    review::ReviewService, rules::RulesService, teams::TeamService,
 };
-use std::sync::{atomic::AtomicBool, Arc};
+use std::sync::Arc;
 
 pub(crate) struct ApplicationComposition {
     registry: ModelRegistry,
@@ -18,6 +18,7 @@ pub(crate) struct ApplicationComposition {
     teams: TeamService,
     players: PlayerService,
     lineups: LineupService,
+    p4_orchestration: P4OrchestrationService,
     prediction: PredictionService,
     research: ResearchService,
     review: ReviewService,
@@ -26,7 +27,6 @@ pub(crate) struct ApplicationComposition {
     exchange: ExchangeService,
     ai_workspace: AiWorkspaceService,
     release: ReleaseService,
-    p4_worker_running: AtomicBool,
 }
 
 pub(crate) struct ApplicationParts {
@@ -37,6 +37,7 @@ pub(crate) struct ApplicationParts {
     pub(crate) teams: TeamService,
     pub(crate) players: PlayerService,
     pub(crate) lineups: LineupService,
+    pub(crate) p4_orchestration: P4OrchestrationService,
     pub(crate) prediction: PredictionService,
     pub(crate) research: ResearchService,
     pub(crate) review: ReviewService,
@@ -45,7 +46,6 @@ pub(crate) struct ApplicationParts {
     pub(crate) exchange: ExchangeService,
     pub(crate) ai_workspace: AiWorkspaceService,
     pub(crate) release: ReleaseService,
-    pub(crate) p4_worker_running: AtomicBool,
 }
 
 impl ApplicationComposition {
@@ -63,6 +63,7 @@ impl ApplicationComposition {
             teams: TeamService::new(),
             players: PlayerService::new(),
             lineups: LineupService::new(),
+            p4_orchestration: P4OrchestrationService::new(),
             prediction: PredictionService::new(),
             research: ResearchService::new(),
             review: ReviewService::new(),
@@ -71,7 +72,6 @@ impl ApplicationComposition {
             exchange: ExchangeService::new(),
             ai_workspace: AiWorkspaceService::new(),
             release: ReleaseService::new(),
-            p4_worker_running: AtomicBool::new(false),
         }
     }
 
@@ -84,6 +84,7 @@ impl ApplicationComposition {
             teams: self.teams,
             players: self.players,
             lineups: self.lineups,
+            p4_orchestration: self.p4_orchestration,
             prediction: self.prediction,
             research: self.research,
             review: self.review,
@@ -92,7 +93,6 @@ impl ApplicationComposition {
             exchange: self.exchange,
             ai_workspace: self.ai_workspace,
             release: self.release,
-            p4_worker_running: self.p4_worker_running,
         }
     }
 }

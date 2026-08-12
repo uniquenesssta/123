@@ -71,7 +71,8 @@
         "PredictionInputPort",
         "ModelRunPort",
         "PredictionWorkflowPort",
-        "P4FreezeExecutionPort"
+        "P4FreezeExecutionPort",
+        "P4OrchestrationQueuePort"
       ]
     },
     {

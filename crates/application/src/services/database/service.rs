@@ -1,4 +1,4 @@
-use crate::composition::{ActiveDatabase, DatabaseOptions, PersistenceStore, PortRegistry};
+use crate::composition::{ActiveDatabase, DatabaseOptions, PortRegistry};
 use crate::ports::{
     database::{DatabaseHealthSnapshot, DatabaseLifecyclePort},
     PortResult,
@@ -71,14 +71,6 @@ impl DatabaseService {
 
     pub(crate) async fn active_session(&self) -> Option<ActiveDatabase> {
         self.session.read().await.clone()
-    }
-
-    pub(crate) async fn active_store(&self) -> Option<PersistenceStore> {
-        self.session
-            .read()
-            .await
-            .as_ref()
-            .map(ActiveDatabase::transition_store)
     }
 
     pub(crate) async fn preflight_reset(

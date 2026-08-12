@@ -1,9 +1,7 @@
-use super::service::PreparedDatabaseConnection;
 use crate::{
-    composition::{
-        database_health_from_snapshot, DatabaseHealth, DatabaseOptions, PersistenceStore,
-    },
-    ApplicationError, ApplicationResult, ApplicationService,
+    composition::{database_health_from_snapshot, DatabaseHealth, DatabaseOptions},
+    use_cases::application_facade::database_lifecycle,
+    ApplicationResult, ApplicationService,
 };
 use std::sync::Arc;
 
@@ -12,33 +10,7 @@ impl ApplicationService {
         self: &Arc<Self>,
         options: DatabaseOptions,
     ) -> ApplicationResult<DatabaseHealth> {
-        let prepared = self.database.prepare_connection(&options).await?;
-        if let Err(error) = self.initialize_database_contents(&prepared).await {
-            prepared.close().await;
-            return Err(error);
-        }
-
-        let health = match prepared.health().await {
-            Ok(health) => database_health_from_snapshot(health),
-            Err(error) => {
-                prepared.close().await;
-                return Err(error.into());
-            }
-        };
-        self.database.activate(prepared).await?;
-
-        let session = self
-            .database
-            .active_session()
-            .await
-            .ok_or(ApplicationError::DatabaseNotConnected)?;
-        self.analytics.start_job_worker(session);
-        self.ensure_p4_orchestration_worker();
-        Ok(health)
-    }
-
-    pub fn ensure_p4_orchestration_worker(self: &Arc<Self>) {
-        crate::p4_orchestration::spawn_p4_orchestration_worker(Arc::clone(self));
+        database_lifecycle::connect::execute(self, options).await
     }
 
     pub async fn is_database_connected(&self) -> bool {
@@ -63,38 +35,6 @@ impl ApplicationService {
         options: DatabaseOptions,
         confirmation: String,
     ) -> ApplicationResult<DatabaseHealth> {
-        if let Err(error) = self
-            .database
-            .reset_to_pristine(&options, &confirmation)
-            .await
-        {
-            if !self.database.is_connected().await {
-                let _ = self.connect_database(options.clone()).await;
-            }
-            return Err(error.into());
-        }
-        self.connect_database(options).await
-    }
-
-    pub(crate) async fn active_store(&self) -> ApplicationResult<PersistenceStore> {
-        self.database
-            .active_store()
-            .await
-            .ok_or(ApplicationError::DatabaseNotConnected)
-    }
-
-    async fn initialize_database_contents(
-        &self,
-        prepared: &PreparedDatabaseConnection,
-    ) -> ApplicationResult<()> {
-        self.rules
-            .register_built_ins(&self.registry, prepared.session())
-            .await?;
-        self.research
-            .register_persistence_artifacts(prepared.session())
-            .await?;
-        self.research
-            .register_openai_research_artifacts(prepared.session())
-            .await
+        database_lifecycle::reset::execute(self, options, confirmation).await
     }
 }

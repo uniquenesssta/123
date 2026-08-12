@@ -2,7 +2,6 @@ mod built_in_artifacts;
 mod composition;
 mod model_registry;
 mod model_shell;
-mod p4_orchestration;
 pub mod ports;
 mod service;
 mod services;
