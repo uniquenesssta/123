@@ -15,23 +15,10 @@ jobs:
     runs-on: windows-2025
     steps:
       - uses: actions/checkout@v4
-      - name: Print direct audit write context and contract references
+      - name: Print audit helper callers
         shell: pwsh
         run: |
           $ErrorActionPreference = 'Stop'
-          $files = Get-ChildItem crates/persistence-postgres/src -Recurse -File -Filter *.rs
-          foreach ($file in $files) {
-            $lines = Get-Content $file.FullName
-            for ($i = 0; $i -lt $lines.Count; $i++) {
-              if ($lines[$i] -match 'INSERT INTO audit\.events') {
-                Write-Host "=== $($file.FullName.Replace($PWD.Path + '\','')):$($i+1) ==="
-                $start = [Math]::Max(0, $i - 5)
-                $end = [Math]::Min($lines.Count - 1, $i + 12)
-                for ($j = $start; $j -le $end; $j++) { Write-Host ("{0,5}: {1}" -f ($j+1), $lines[$j]) }
-              }
-            }
-          }
-          Write-Host '=== architecture/scripts references ==='
-          Get-ChildItem architecture,scripts -Recurse -File | Select-String -Pattern 'write_audit_event|audit\.events|sha256_json|persistence-postgres/src/lib\.rs' | ForEach-Object {
+          Get-ChildItem crates/persistence-postgres/src -Recurse -File -Filter *.rs | Select-String -Pattern 'self\.audit\(|audit_in_tx\(' | ForEach-Object {
             Write-Host ("{0}:{1}:{2}" -f $_.Path.Replace($PWD.Path + '\',''), $_.LineNumber, $_.Line.Trim())
           }
