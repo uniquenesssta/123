@@ -1,0 +1,53 @@
+name: R3-10 AT1 Runner
+on:
+  push:
+    branches:
+      - agent/r3-10-application-service-facade
+permissions:
+  contents: write
+jobs:
+  build:
+    runs-on: windows-2025
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: agent/r3-10-application-service-facade
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - uses: dtolnay/rust-toolchain@master
+        with:
+          toolchain: 1.88.0
+          components: rustfmt,clippy
+      - name: Execute extracted AT1 refactor and gates
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $raw = Get-Content -Raw -Encoding UTF8 '.github/workflows/r3-10-at1-build.yml'
+          $pattern = "(?s)          @'\r?\n(.*?)\r?\n          '@ \| Set-Content -Path r3_10_at1.py -Encoding UTF8"
+          $match = [regex]::Match($raw, $pattern)
+          if (-not $match.Success) { throw 'AT1 embedded source script not found' }
+          $lines = $match.Groups[1].Value -split "\r?\n"
+          $normalized = foreach ($line in $lines) {
+            if ($line.StartsWith('          ')) { $line.Substring(10) } else { $line }
+          }
+          [System.IO.File]::WriteAllText((Join-Path $PWD 'r3_10_at1.py'), ($normalized -join "`n"), [System.Text.UTF8Encoding]::new($false))
+          python r3_10_at1.py
+          Remove-Item r3_10_at1.py
+          cargo fmt --all
+          node scripts/generate-domain-type-inventory.mjs
+          node scripts/verify-r3-06-p4-freeze.mjs
+          npm run verify:architecture
+          cargo check --locked -p football-application
+          cargo test --locked -p football-application
+          cargo clippy --locked -p football-application --all-targets -- -D warnings
+      - name: Commit verified AT1
+        shell: pwsh
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git rm .github/workflows/r3-10-at1-build.yml .github/workflows/r3-10-at1-runner.yml
+          git add crates/application scripts architecture/domain-type-inventory.json
+          git commit -m 'refactor(r3-10): extract p4 orchestration service'
+          git push origin HEAD:agent/r3-10-application-service-facade
