@@ -56,7 +56,7 @@
 
 ## Atomic Task 3 — AI Workspace
 
-状态：`VERIFYING`
+状态：`DONE`
 
 ### 当前实施范围
 
@@ -79,4 +79,5 @@
 - 第一轮门禁发现 `ApiWorkspaceOperationPort` 裸 `serde_json::Value` 违反 R3-01 边界，已改用显式序列化结果类型；第二处阻塞为历史验证器仍读取已删除 owner，已只迁移 authoritative source。两项都未通过放宽、跳过或删除门禁处理。
 - 临时 hard-gate workflow 已自删除；最终源码树不保留该诊断入口。
 - 18 个需要专用 `FOOTBALL_TEST_DATABASE_URL` 的 PostgreSQL 集成测试未在本 hard gate 执行，未记为通过；未执行破坏性数据库验证。
-- PR #19 当前保持 draft 且未合并；最终 clean Public Platform CI / Windows Automated 尚待执行，因此 AT3 当前保持 `VERIFYING`，不得提前关闭为 `DONE`；AT4 Release 保持 `NOT_STARTED`。
+- 首次 clean PR CI run `31553692737` 的 architecture 已通过，但 Windows Automated 因历史 v3 artifact 清单仍指向已删除的 `crates/application/src/api_workspace.rs` 而失败；合同文件未修改，仅将验证器映射到新的 authoritative 模块集合。恢复 run `31553867879` / Windows Automated job `93982110497` 已整体 `SUCCESS`，architecture、完整 Windows automated acceptance 与 validation evidence upload 均通过；artifact `9125791161` 大小 `13985122` 字节，SHA-256 `f5662c9e11d1fbd9da12e39efce9b44645144fce33bf6fe674011c2b7c1af0a6`。
+- PR #19 已正式合并到阶段分支，merge commit `3d925671ccd424e25965ba9409189f32f920bc4f`。AT3 正式关闭为 `DONE`；Atomic Task 4 — Release 开放为 `READY`，R3-10 继续 `BLOCKED`。
