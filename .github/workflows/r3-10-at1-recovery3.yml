@@ -1,0 +1,154 @@
+name: R3-10 AT1 Recovery 3
+on:
+  push:
+    branches:
+      - agent/r3-10-application-service-facade
+permissions:
+  contents: write
+jobs:
+  recover:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: windows-2025
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: agent/r3-10-application-service-facade
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - uses: dtolnay/rust-toolchain@master
+        with:
+          toolchain: 1.88.0
+          components: rustfmt,clippy
+      - name: Apply AT1 final cleanup and strict gates
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $PSNativeCommandUseErrorActionPreference = $true
+
+          function Extract-Python([string]$Workflow, [string]$Target) {
+            $raw = Get-Content -Raw -Encoding UTF8 $Workflow
+            $escaped = [regex]::Escape($Target)
+            $pattern = "(?s)          @'\r?\n(.*?)\r?\n          '@ \| Set-Content -Path $escaped -Encoding UTF8"
+            $match = [regex]::Match($raw, $pattern)
+            if (-not $match.Success) { throw "Embedded source script not found: $Target" }
+            $lines = $match.Groups[1].Value -split "\r?\n"
+            $normalized = foreach ($line in $lines) {
+              if ($line.StartsWith('          ')) { $line.Substring(10) } else { $line }
+            }
+            [System.IO.File]::WriteAllText((Join-Path $PWD $Target), ($normalized -join "`n"), [System.Text.UTF8Encoding]::new($false))
+          }
+
+          Extract-Python '.github/workflows/r3-10-at1-build.yml' 'r3_10_at1.py'
+          python r3_10_at1.py
+          Remove-Item r3_10_at1.py
+
+          Extract-Python '.github/workflows/r3-10-at1-recovery2.yml' 'r3_10_at1_recovery2.py'
+          python r3_10_at1_recovery2.py
+          Remove-Item r3_10_at1_recovery2.py
+
+          @'
+          from pathlib import Path
+
+          def read(path): return Path(path).read_text(encoding='utf-8')
+          def write(path, content): Path(path).write_text(content, encoding='utf-8', newline='\n')
+          def replace(path, old, new):
+              text = read(path)
+              if old not in text: raise SystemExit(f'expected cleanup text missing: {path}: {old[:120]}')
+              write(path, text.replace(old, new))
+
+          path='crates/application/src/services/database/facade.rs'
+          replace(path, '        database_health_from_snapshot, DatabaseHealth, DatabaseOptions, PersistenceStore,\n', '        database_health_from_snapshot, DatabaseHealth, DatabaseOptions,\n')
+          replace(path, '''
+              pub(crate) async fn active_store(&self) -> ApplicationResult<PersistenceStore> {
+                  self.database
+                      .active_store()
+                      .await
+                      .ok_or(ApplicationError::DatabaseNotConnected)
+              }
+          ''', '\n')
+
+          path='crates/application/src/services/database/service.rs'
+          replace(path, 'use crate::composition::{ActiveDatabase, DatabaseOptions, PersistenceStore, PortRegistry};', 'use crate::composition::{ActiveDatabase, DatabaseOptions, PortRegistry};')
+          replace(path, '''
+              pub(crate) async fn active_store(&self) -> Option<PersistenceStore> {
+                  self.session
+                      .read()
+                      .await
+                      .as_ref()
+                      .map(ActiveDatabase::transition_store)
+              }
+          ''', '\n')
+
+          path='crates/application/src/services/prediction/facade.rs'
+          replace(path, '''
+              pub(crate) async fn execute_p4_freeze_task(
+                  &self,
+                  task_id: Uuid,
+                  job_id: Uuid,
+              ) -> ApplicationResult<Value> {
+                  let session = self.prediction_session().await?;
+                  self.prediction
+                      .execute_p4_freeze_task(&session, &self.registry, task_id, job_id)
+                      .await
+              }
+          ''', '\n')
+
+          path='crates/application/src/services/research/facade.rs'
+          replace(path, '''use crate::use_cases::research::{
+              p4_manual_conflict::P4ManualConflictAccess, p4_worker::P4ResearchWorkerAccess,
+          };''', 'use crate::use_cases::research::p4_manual_conflict::P4ManualConflictAccess;')
+          replace(path, 'use serde_json::Value;\nuse uuid::Uuid;\n', '')
+          replace(path, '''
+              pub(crate) async fn execute_p4_research_task(
+                  &self,
+                  task_id: Uuid,
+                  job_id: Uuid,
+              ) -> ApplicationResult<Value> {
+                  let session = self.research_session().await?;
+                  let access = P4ResearchWorkerAccess {
+                      workflow: &session,
+                      jobs: &session,
+                      artifacts: &session,
+                      audit: &session,
+                      pipeline: &session,
+                  };
+                  self.research
+                      .execute_p4_research_task(access, task_id, job_id)
+                      .await
+              }
+          ''', '\n')
+
+          path='scripts/verify-r3-06-p4-freeze.mjs'
+          replace(path, 'check(service.includes("execute_p4_freeze::execute") && facade.includes("execute_p4_freeze_task"), "Prediction Service/facade 未接通 freeze use case");', 'check(service.includes("execute_p4_freeze::execute") && orchestrationUseCase.includes(".execute_p4_freeze_task("), "Prediction Service/P4 orchestration 未接通 freeze use case");\ncheck(!facade.includes("fn execute_p4_freeze_task"), "ApplicationService facade 仍保留仅供 orchestration 的私有 freeze helper");')
+
+          path='scripts/verify-research-service.mjs'
+          replace(path, 'check(facade.includes("fn execute_p4_research_task"), "Application Research facade 缺少 P4 Research worker 委托");', 'check(!facade.includes("fn execute_p4_research_task"), "ApplicationService Research facade 仍保留仅供 orchestration 的私有 worker helper");')
+          '@ | Set-Content -Path r3_10_at1_cleanup.py -Encoding UTF8
+          python r3_10_at1_cleanup.py
+          Remove-Item r3_10_at1_cleanup.py
+
+          cargo fmt --all
+          cargo fmt --all -- --check
+          node scripts/generate-domain-type-inventory.mjs
+          node scripts/verify-r3-06-p4-freeze.mjs
+          node scripts/verify-prediction-service.mjs
+          node scripts/verify-research-service.mjs
+          node scripts/verify-application-ports.mjs
+          node scripts/verify-application-composition.mjs
+          npm run verify:architecture
+          cargo check --locked -p football-application
+          cargo test --locked -p football-application
+          cargo clippy --locked -p football-application --all-targets -- -D warnings
+      - name: Commit only fully verified AT1
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $PSNativeCommandUseErrorActionPreference = $true
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git rm .github/workflows/r3-10-at1-build.yml .github/workflows/r3-10-at1-runner.yml .github/workflows/r3-10-at1-recovery.yml .github/workflows/r3-10-at1-recovery2.yml .github/workflows/r3-10-at1-recovery3.yml
+          git add crates/application scripts architecture/application-port-inventory.json architecture/domain-type-inventory.json architecture/state-ownership.json
+          git commit -m 'refactor(r3-10): extract p4 orchestration service'
+          git push origin HEAD:agent/r3-10-application-service-facade
