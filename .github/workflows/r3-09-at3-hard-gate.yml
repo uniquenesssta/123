@@ -62,6 +62,18 @@ jobs:
             'const application = text("crates/application/src/use_cases/ai_workspace/presets/mod.rs");',
           );
           fs.writeFileSync(legacyVerifierPath, legacyVerifier);
+
+          const teamPlayerVerifierPath = 'scripts/verify-team-player-management.mjs';
+          let teamPlayerVerifier = fs.readFileSync(teamPlayerVerifierPath, 'utf8');
+          teamPlayerVerifier = teamPlayerVerifier.replace(
+            'const apiWorkspaceApplication = text("crates/application/src/api_workspace.rs");',
+            'const apiWorkspaceApplication = text("crates/application/src/use_cases/ai_workspace/apply_operation/dispatch.rs");',
+          );
+          teamPlayerVerifier = teamPlayerVerifier.replace(
+            'apiWorkspaceApplication.includes("let current = self.read_team(team_id).await?.profile")',
+            'apiWorkspaceApplication.includes("let current = port.read_team(team_id).await?.profile")',
+          );
+          fs.writeFileSync(teamPlayerVerifierPath, teamPlayerVerifier);
           '@ | node
 
       - name: Format AT3 Rust and refresh deterministic inventory
@@ -117,7 +129,7 @@ jobs:
           git rm .github/workflows/r3-09-at3-hard-gate.yml
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add crates/application architecture/domain-type-inventory.json package.json scripts/verify-frontend.mjs scripts/verify-api-workspace.mjs scripts/verify-ai-workspace-service.mjs
+          git add crates/application architecture/domain-type-inventory.json package.json scripts/verify-frontend.mjs scripts/verify-api-workspace.mjs scripts/verify-ai-workspace-service.mjs scripts/verify-team-player-management.mjs
           git diff --cached --check
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
           git commit -m "chore(r3-09): normalize AT3 source and validators"
