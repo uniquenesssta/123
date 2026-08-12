@@ -1,0 +1,172 @@
+name: R4-01 Recovery Strict Gate
+
+on:
+  push:
+    branches:
+      - agent/r4-01-store-error-pool
+
+permissions:
+  contents: write
+
+jobs:
+  recovery:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: windows-2025
+    env:
+      BASE_SHA: 4f8bc9a19fbbd9f52a36b6f94d6d819755482e8f
+    steps:
+      - name: Checkout R4-01 branch
+        uses: actions/checkout@v4
+        with:
+          ref: agent/r4-01-store-error-pool
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Setup Rust 1.88.0
+        uses: dtolnay/rust-toolchain@1.88.0
+        with:
+          components: rustfmt, clippy
+
+      - name: Extract and execute R4-01 source transform
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $PSNativeCommandUseErrorActionPreference = $true
+          @'
+          from pathlib import Path
+          import re
+
+          workflow = Path('.github/workflows/r4-01-hard-gate.yml').read_text(encoding='utf-8')
+
+          def extract_script(filename: str) -> str:
+              pattern = rf"(?ms)^          @'\r?\n(.*?)^          '@ \| Set-Content -Path {re.escape(filename)} -Encoding UTF8\s*$"
+              match = re.search(pattern, workflow)
+              if not match:
+                  raise SystemExit(f'embedded script not found: {filename}')
+              lines = []
+              for line in match.group(1).splitlines():
+                  lines.append(line[10:] if line.startswith('          ') else line)
+              return '\n'.join(lines) + '\n'
+
+          script = extract_script('r4_01_transform.py')
+          exec(compile(script, 'r4_01_transform.py', 'exec'), {'__name__': '__main__'})
+          '@ | Set-Content -Path r4_01_recovery_transform.py -Encoding UTF8
+          python r4_01_recovery_transform.py
+          Remove-Item r4_01_recovery_transform.py
+          npm run prepare:cargo
+          cargo fmt --all
+
+      - name: Refresh runtime-source baseline with proven R4 base blobs
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $PSNativeCommandUseErrorActionPreference = $true
+          @'
+          from pathlib import Path
+          import re
+
+          workflow = Path('.github/workflows/r4-01-hard-gate.yml').read_text(encoding='utf-8')
+          pattern = r"(?ms)^          @'\r?\n(.*?)^          '@ \| Set-Content -Path r4_01_baseline\.py -Encoding UTF8\s*$"
+          match = re.search(pattern, workflow)
+          if not match:
+              raise SystemExit('embedded baseline script not found')
+          lines = [line[10:] if line.startswith('          ') else line for line in match.group(1).splitlines()]
+          script = '\n'.join(lines) + '\n'
+          old = 'b378d734495c0846818e7cd06c30d93f69131231'
+          new = '44dcd594ac739ab341bd5009f613d5de6fd1aa1e'
+          if old not in script:
+              raise SystemExit('stale integration baseline fingerprint not found')
+          script = script.replace(old, new, 1)
+          exec(compile(script, 'r4_01_baseline.py', 'exec'), {'__name__': '__main__'})
+          '@ | Set-Content -Path r4_01_recovery_baseline.py -Encoding UTF8
+          python r4_01_recovery_baseline.py
+          Remove-Item r4_01_recovery_baseline.py
+
+      - name: Prove immutable migration dependency and integration-test scope
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $PSNativeCommandUseErrorActionPreference = $true
+          git diff --exit-code $env:BASE_SHA -- crates/persistence-postgres/migrations
+          git diff --exit-code $env:BASE_SHA -- crates/persistence-postgres/Cargo.toml crates/persistence-postgres/build.rs crates/persistence-postgres/tests/postgres_integration.rs Cargo.lock
+
+      - name: Verify R4-01 persistence foundation and frozen database contracts
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $PSNativeCommandUseErrorActionPreference = $true
+          npm run verify:persistence-foundation
+          node scripts/verify-database-migration-compatibility.mjs
+          node scripts/verify-database-reset.mjs
+          node scripts/verify_database_baseline.mjs
+
+      - name: Verify complete architecture
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $PSNativeCommandUseErrorActionPreference = $true
+          npm run verify:architecture
+
+      - name: Verify rustfmt
+        shell: pwsh
+        run: cargo fmt --all -- --check
+
+      - name: Check persistence crate
+        shell: pwsh
+        run: cargo check --locked -p football-persistence-postgres
+
+      - name: Test persistence crate
+        shell: pwsh
+        run: cargo test --locked -p football-persistence-postgres
+
+      - name: Clippy persistence crate
+        shell: pwsh
+        run: cargo clippy --locked -p football-persistence-postgres --all-targets -- -D warnings
+
+      - name: Record verified R4-01 facts
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          @'
+          from pathlib import Path
+          import os, re
+
+          workflow = Path('.github/workflows/r4-01-hard-gate.yml').read_text(encoding='utf-8')
+          pattern = r"(?ms)^          @'\r?\n(.*?)^          '@ \| Set-Content -Path r4_01_docs\.py -Encoding UTF8\s*$"
+          match = re.search(pattern, workflow)
+          if not match:
+              raise SystemExit('embedded docs script not found')
+          lines = [line[10:] if line.startswith('          ') else line for line in match.group(1).splitlines()]
+          script = '\n'.join(lines) + '\n'
+          exec(compile(script, 'r4_01_docs.py', 'exec'), {'__name__': '__main__'})
+
+          node = Path('docs/modular-rewrite/R04-persistence-foundation/R04-01-store-error-and-pool.md')
+          text = node.read_text(encoding='utf-8')
+          extra = '- 首轮 strict gate run `31613473804` 已通过 R4-01 专项、migration compatibility 与 reset 契约，但在数据库静态 baseline 发现 `postgres_integration.rs` 的 R0 runtime-source 指纹陈旧；R4 起点实际 blob 为 `44dcd594ac739ab341bd5009f613d5de6fd1aa1e`，R4-01 对该测试文件零 diff。恢复门禁通过零 diff 证明后仅刷新 runtime-source 指纹，不修改测试内容。\n'
+          marker = '## 兼容性\n'
+          if extra not in text:
+              text = text.replace(marker, extra + '\n' + marker, 1)
+          node.write_text(text, encoding='utf-8', newline='\n')
+          '@ | Set-Content -Path r4_01_recovery_docs.py -Encoding UTF8
+          python r4_01_recovery_docs.py
+          Remove-Item r4_01_recovery_docs.py
+
+      - name: Final architecture validation after README and task record
+        shell: pwsh
+        run: npm run verify:architecture
+
+      - name: Commit only fully verified R4-01 tree
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $PSNativeCommandUseErrorActionPreference = $true
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git rm .github/workflows/r4-01-recovery.yml .github/workflows/r4-01-hard-gate.yml .github/workflows/r4-01-scope-audit.yml
+          git add crates/persistence-postgres/src scripts/verify-database-migration-compatibility.mjs scripts/verify-database-reset.mjs scripts/verify-persistence-foundation.mjs package.json architecture/database-baseline.json architecture/module-boundaries.json architecture/state-ownership.json README.md docs/modular-rewrite/R04-persistence-foundation
+          git commit -m 'refactor(r4-01): modularize persistence foundation'
+          git push origin HEAD:agent/r4-01-store-error-pool
