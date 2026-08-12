@@ -1,0 +1,36 @@
+name: R3-09 AT4 Hard Gate
+
+on:
+  push:
+    branches:
+      - agent/r3-09-at4-release
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  hard-gate:
+    runs-on: windows-2025
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - uses: dtolnay/rust-toolchain@1.88.0
+        with:
+          components: rustfmt, clippy
+      - name: Release architecture gates
+        shell: pwsh
+        run: |
+          node scripts/verify-release-service.mjs
+          node scripts/verify-release-acceptance.mjs
+          npm run verify:architecture
+      - name: Application Rust gate
+        shell: pwsh
+        run: |
+          node scripts/prepare-cargo-target.mjs
+          cargo fmt --all -- --check
+          cargo check --locked -p football-application
+          cargo test --locked -p football-application
+          cargo clippy --locked -p football-application --all-targets -- -D warnings
