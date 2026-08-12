@@ -1,0 +1,37 @@
+name: R4-01 Scope Audit
+
+on:
+  push:
+    branches:
+      - agent/r4-01-store-error-pool
+
+permissions:
+  contents: read
+
+jobs:
+  audit:
+    runs-on: windows-2025
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Audit R4-01 scope
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $PSNativeCommandUseErrorActionPreference = $true
+          Write-Host '=== git status ==='
+          git status --short
+          Write-Host '=== persistence src files ==='
+          git ls-files crates/persistence-postgres/src
+          Write-Host '=== PostgresStore refs ==='
+          rg -n --glob '!target/**' --glob '!node_modules/**' 'PostgresStore' crates src-tauri scripts tests architecture
+          Write-Host '=== PersistenceError refs ==='
+          rg -n --glob '!target/**' --glob '!node_modules/**' 'PersistenceError|PersistenceResult' crates src-tauri scripts tests architecture
+          Write-Host '=== connection.rs / migration_compatibility.rs textual refs ==='
+          rg -n --glob '!target/**' --glob '!node_modules/**' 'persistence-postgres/src/connection\.rs|persistence-postgres/src/migration_compatibility\.rs|connection\.rs|migration_compatibility\.rs' scripts tests architecture docs package.json
+          Write-Host '=== connection methods ==='
+          rg -n 'pub async fn (connect|migrate|reset_to_pristine|close|health|stats)|ensure_runtime_schema_compatibility|redact_database_url|DatabaseOptions|DatabaseHealth|DatabaseStats' crates/persistence-postgres/src crates/application src-tauri scripts tests
+          Write-Host '=== protected / migration verifiers ==='
+          rg -n 'verify.*migration|migration.*verify|protected.assets|database.baseline|0001|0046' package.json scripts architecture | Select-Object -First 400
