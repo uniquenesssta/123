@@ -1,4 +1,4 @@
-use crate::{ApplicationError, ApplicationResult, ApplicationService};
+use crate::{ApplicationResult, ApplicationService};
 use football_domain::{
     AiMatchPackageSummary, MatchLineupExportSummary, SpreadsheetImportCommitResult,
     SpreadsheetImportMode, SpreadsheetImportPreview, SpreadsheetImportResolution,
@@ -6,13 +6,6 @@ use football_domain::{
 use uuid::Uuid;
 
 impl ApplicationService {
-    async fn exchange_session(&self) -> ApplicationResult<crate::composition::ActiveDatabase> {
-        self.database
-            .active_session()
-            .await
-            .ok_or(ApplicationError::DatabaseNotConnected)
-    }
-
     pub async fn export_match_lineup_template(
         &self,
         output_path: String,
@@ -21,7 +14,6 @@ impl ApplicationService {
             .export_match_lineup_template(self.exchange_session(), output_path)
             .await
     }
-
     pub async fn export_match_lineup_data(
         &self,
         output_path: String,
@@ -31,7 +23,6 @@ impl ApplicationService {
             .export_match_lineup_data(self.exchange_session(), output_path, match_id)
             .await
     }
-
     pub async fn preview_match_lineup_import(
         &self,
         input_path: String,
@@ -41,7 +32,6 @@ impl ApplicationService {
             .preview_match_lineup_import(self.exchange_session(), input_path, mode)
             .await
     }
-
     pub async fn read_match_lineup_import_preview(
         &self,
         batch_id: Uuid,
@@ -50,7 +40,6 @@ impl ApplicationService {
             .read_match_lineup_import_preview(self.exchange_session(), batch_id)
             .await
     }
-
     pub async fn resolve_match_lineup_import_conflict(
         &self,
         batch_id: Uuid,
@@ -60,7 +49,6 @@ impl ApplicationService {
             .resolve_match_lineup_import_conflict(self.exchange_session(), batch_id, resolution)
             .await
     }
-
     pub async fn commit_match_lineup_import(
         &self,
         batch_id: Uuid,
@@ -69,7 +57,6 @@ impl ApplicationService {
             .commit_match_lineup_import(self.exchange_session(), batch_id)
             .await
     }
-
     pub async fn export_ai_match_package(
         &self,
         output_path: String,
@@ -79,7 +66,6 @@ impl ApplicationService {
             .export_ai_match_package(self.exchange_session(), output_path, match_id)
             .await
     }
-
     pub async fn preview_ai_match_package(
         &self,
         input_path: String,

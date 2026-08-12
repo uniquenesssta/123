@@ -8,7 +8,6 @@ pub mod ports;
 mod release_acceptance;
 mod service;
 mod services;
-mod spreadsheet;
 mod use_cases;
 
 use football_domain::{

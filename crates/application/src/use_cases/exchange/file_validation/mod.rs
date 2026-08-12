@@ -1,3 +1,5 @@
+pub(crate) mod spreadsheet;
+
 use crate::{ApplicationError, ApplicationResult};
 use std::path::{Path, PathBuf};
 

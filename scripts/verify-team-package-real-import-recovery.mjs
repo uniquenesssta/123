@@ -5,7 +5,9 @@ const check = (condition, message) => {
   if (!condition) throw new Error(message);
 };
 
-const application = read("crates/application/src/spreadsheet.rs");
+const application =
+  read("crates/application/src/use_cases/exchange/commit_team_package_import/policy.rs") +
+  read("crates/application/src/use_cases/exchange/commit_team_package_import/use_case.rs");
 const teams = read("crates/persistence-postgres/src/monthly_workbooks.rs");
 const players = read("crates/persistence-postgres/src/spreadsheet_exchange.rs");
 

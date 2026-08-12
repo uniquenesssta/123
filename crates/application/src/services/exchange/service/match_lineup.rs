@@ -1,3 +1,4 @@
+use super::ExchangeService;
 use crate::{ports::exchange::MatchLineupExchangePort, use_cases::exchange, ApplicationResult};
 use football_domain::{
     AiMatchPackageSummary, MatchLineupExportSummary, SpreadsheetImportCommitResult,
@@ -6,13 +7,7 @@ use football_domain::{
 use std::future::Future;
 use uuid::Uuid;
 
-pub(crate) struct ExchangeService;
-
 impl ExchangeService {
-    pub(crate) fn new() -> Self {
-        Self
-    }
-
     pub(crate) async fn export_match_lineup_template<P, F>(
         &self,
         session: F,
@@ -24,7 +19,6 @@ impl ExchangeService {
     {
         exchange::export_match_lineup_template::execute(session, output_path).await
     }
-
     pub(crate) async fn export_match_lineup_data<P, F>(
         &self,
         session: F,
@@ -37,7 +31,6 @@ impl ExchangeService {
     {
         exchange::export_match_lineup_data::execute(session, output_path, match_id).await
     }
-
     pub(crate) async fn preview_match_lineup_import<P, F>(
         &self,
         session: F,
@@ -50,7 +43,6 @@ impl ExchangeService {
     {
         exchange::preview_match_lineup_import::execute(session, input_path, mode).await
     }
-
     pub(crate) async fn read_match_lineup_import_preview<P, F>(
         &self,
         session: F,
@@ -62,7 +54,6 @@ impl ExchangeService {
     {
         exchange::read_match_lineup_import_preview::execute(session, batch_id).await
     }
-
     pub(crate) async fn resolve_match_lineup_import_conflict<P, F>(
         &self,
         session: F,
@@ -75,7 +66,6 @@ impl ExchangeService {
     {
         exchange::resolve_match_lineup_import_conflict::execute(session, batch_id, resolution).await
     }
-
     pub(crate) async fn commit_match_lineup_import<P, F>(
         &self,
         session: F,
@@ -87,7 +77,6 @@ impl ExchangeService {
     {
         exchange::commit_match_lineup_import::execute(session, batch_id).await
     }
-
     pub(crate) async fn export_ai_match_package<P, F>(
         &self,
         session: F,
@@ -100,7 +89,6 @@ impl ExchangeService {
     {
         exchange::export_ai_match_package::execute(session, output_path, match_id).await
     }
-
     pub(crate) async fn preview_ai_match_package<P, F>(
         &self,
         session: F,
