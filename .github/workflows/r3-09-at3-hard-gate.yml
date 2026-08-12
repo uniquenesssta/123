@@ -1,0 +1,90 @@
+name: R3-09 AT3 Hard Gate
+
+on:
+  push:
+    branches:
+      - agent/r3-09-at3-ai-workspace
+
+permissions:
+  contents: write
+
+jobs:
+  hard-gate:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: windows-2025
+    steps:
+      - name: Checkout AT3 branch
+        uses: actions/checkout@v4
+        with:
+          ref: agent/r3-09-at3-ai-workspace
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+
+      - name: Setup Rust 1.88.0
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          toolchain: 1.88.0
+          components: rustfmt, clippy
+
+      - name: Format AT3 Rust and refresh deterministic inventory
+        shell: pwsh
+        run: |
+          cargo fmt --all
+          node scripts/generate-domain-type-inventory.mjs
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+
+      - name: Verify architecture
+        shell: pwsh
+        run: npm run verify:architecture
+
+      - name: Check Application
+        shell: pwsh
+        run: cargo check --locked -p football-application
+
+      - name: Test Application
+        shell: pwsh
+        run: cargo test --locked -p football-application
+
+      - name: Clippy Application
+        shell: pwsh
+        run: cargo clippy --locked -p football-application --all-targets -- -D warnings
+
+      - name: Validate formatter scope
+        shell: pwsh
+        run: |
+          git diff --check
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          $changed = @(git diff --name-only)
+          $unexpectedRust = @($changed | Where-Object {
+            $_ -like '*.rs' -and
+            $_ -notlike 'crates/application/src/services/ai_workspace/*' -and
+            $_ -notlike 'crates/application/src/use_cases/ai_workspace/*' -and
+            $_ -ne 'crates/application/src/ports/ai_workspace/mod.rs' -and
+            $_ -ne 'crates/application/src/composition/adapters/ai_workspace.rs' -and
+            $_ -ne 'crates/application/src/composition/adapters/mod.rs' -and
+            $_ -ne 'crates/application/src/composition/application_composition.rs' -and
+            $_ -ne 'crates/application/src/service/application_service.rs' -and
+            $_ -ne 'crates/application/src/services/mod.rs' -and
+            $_ -ne 'crates/application/src/use_cases/mod.rs' -and
+            $_ -ne 'crates/application/src/lib.rs'
+          })
+          if ($unexpectedRust.Count -gt 0) {
+            Write-Error ('rustfmt touched unrelated Rust files: ' + ($unexpectedRust -join ', '))
+            exit 1
+          }
+
+      - name: Commit deterministic formatting and remove temporary workflow
+        shell: pwsh
+        run: |
+          git rm .github/workflows/r3-09-at3-hard-gate.yml
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add crates/application architecture/domain-type-inventory.json
+          git diff --cached --check
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          git commit -m "chore(r3-09): normalize AT3 source and inventory"
+          git push origin HEAD:agent/r3-09-at3-ai-workspace
