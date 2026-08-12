@@ -2,7 +2,7 @@
 
 ## 状态
 
-`VERIFYING`
+`DONE`
 
 ## 目标与边界
 
@@ -42,16 +42,25 @@ R3-10 以 R3-09 已关闭的 Application Services 累计代码树为基线，将
 
 实施过程中若 recovery run 在源码变换、历史 owner 契约、rustfmt/Clippy 等硬门禁失败，提交步骤均被跳过；失败树未被描述或提交为通过结果。
 
-文档后的完整 `verify:frontend` 首轮发现历史 `verify-database-reset.mjs` 仍从 Database facade 读取自动重连与 P4 worker 入口；验证器现分别改读 `database_lifecycle/reset.rs` 与 `services/p4_orchestration/facade.rs`，原强确认、自动重连和 worker 幂等恢复断言保持。恢复 run 已越过该契约并通过 17 个截图回归，但临时 runner 未执行仓库 Node setup，随后因无法解析 `typescript` 停止；该环境失败未记为通过，后续先执行仓库既有 `npm run setup` 再重跑完整 frontend。
+文档后的完整 `verify:frontend` 首轮发现历史 `verify-database-reset.mjs` 仍从 Database facade 读取自动重连与 P4 worker 入口；验证器现分别改读 `database_lifecycle/reset.rs` 与 `services/p4_orchestration/facade.rs`，原强确认、自动重连和 worker 幂等恢复断言保持。恢复 run 已越过该契约并通过 17 个截图回归，但临时 runner 未执行仓库 Node setup，随后因无法解析 `typescript` 停止；该环境失败未记为通过。随后 docs recovery2 run `31593542494` / job `94103672663` 先执行仓库既有 `npm run setup`，完整 `verify:frontend`、17 个截图回归与完整 `verify:architecture` 均通过，并提交最终文档与 verifier 迁移。
 
 ## 模块规模与职责收敛
 
-相对 R3-10 基线，当前变更为 42 个文件、`+740/-389`。旧 136 行 `p4_orchestration.rs` 被删除；P4 orchestration 分布到 8 个小型职责文件。Database bootstrap 从本节点 diff 的 `+2/-69`、Database facade `+5/-65`、Prediction facade `+3/-18`、Research facade `+4/-31`；新增 application lifecycle/bootstrap use case 文件合计 155 行，Prediction compatibility 18 行，最终 facade verifier 78 行。没有把迁出的流程重新堆入单一新文件。
+PR #21 最终变更为 46 个文件、`+826/-393`。旧 136 行 `p4_orchestration.rs` 被删除；P4 orchestration 分布到 8 个小型职责文件。Database bootstrap、Database facade、Prediction facade、Research facade 的业务编排均明显收缩；新增 application lifecycle/bootstrap use case、Prediction compatibility 与 facade verifier 均按独立职责拆分，没有把迁出的流程重新堆入单一新文件。
+
+## 最终 clean 验收与收口
+
+- 最终 clean HEAD：`2ecebb9ab0076f27a20d46bc897e63c78aecae3d`。
+- Public Platform CI run `31593758268` / Windows Automated job `94104353199` 为 `SUCCESS`：architecture、完整 Windows Automated acceptance 与 validation evidence upload 全部通过。
+- evidence artifact `9140937975`，大小 `13907479` 字节，SHA-256 `a67e78ee1272d9a953432292ee284118cffcc17325a9aefedf4367cec451ee75`。
+- PR #21 已从 Draft 转为 Ready，并以 merge commit 方式合并；最终 merge commit：`f400740a36e29ab5cf154728c5f240ee018707c6`。
+- R3 阶段完成记录已创建：[`R03-stage-completion.md`](./R03-stage-completion.md)。
 
 ## 兼容性与未执行验证
 
 - 公共 ApplicationService 方法、参数、返回类型和 Tauri 调用保持不变。
 - 数据格式、持久化结构、SQL/migration、配置、日志等级、安全/权限、模型保护边界和生产依赖未改变。
-- 18 个需要专用可写 `FOOTBALL_TEST_DATABASE_URL` 的 PostgreSQL 集成测试未在 AT1/AT2 hard gate 执行，未记为通过；未执行破坏性数据库验证。
-- PR #21 当前保持 Draft / Open / 未合并。R3-10 技术实现和专项硬门禁已完成，但 clean Public Platform CI 与正式合并/收口前状态保持 `VERIFYING`。
-- `R03-stage-completion.md` 仅在 R3-10 正式关闭后创建；本节点当前不提前关闭 R3 阶段。
+- 18 个需要专用可写 `FOOTBALL_TEST_DATABASE_URL` 的 PostgreSQL 集成测试未在 AT1/AT2 hard gate 或 clean CI 中执行，未记为通过；未执行破坏性数据库验证。
+- Windows Full 最终人工交互与私有 ModelProvider 固定模型回归继续按总任务书进入最终统一验收。
+
+R3-10 已正式关闭为 `DONE`，R3 阶段同步进入正式收口。
