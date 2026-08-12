@@ -2,10 +2,10 @@ use crate::ports::PortResult;
 use async_trait::async_trait;
 use chrono::{DateTime, Utc};
 use football_domain::{
-    P4FreezeReadiness, P4FreezeTaskDraft, P4FreezeTaskEventRecord, P4FreezeTaskRecord,
-    P4FreezeTaskTransition, P4MatchWorkspace, P4PlanningMatchContext, P4RoutedFact,
-    P4TaskWorkspace, PredictionSummary, PrematchSnapshotBundle, PrematchSnapshotDraft,
-    PrematchSnapshotRecord, PreparedMatchPredictionInput, RouteDecision,
+    BackgroundJob, P4FreezeReadiness, P4FreezeTaskDraft, P4FreezeTaskEventRecord,
+    P4FreezeTaskRecord, P4FreezeTaskTransition, P4MatchWorkspace, P4PlanningMatchContext,
+    P4RoutedFact, P4TaskWorkspace, PredictionSummary, PrematchSnapshotBundle,
+    PrematchSnapshotDraft, PrematchSnapshotRecord, PreparedMatchPredictionInput, RouteDecision,
 };
 use football_model_api::{ModelOutput, ModelRequest};
 use uuid::Uuid;
@@ -37,6 +37,30 @@ pub struct ModelRunHistoryItem {
 #[derive(Debug, Clone)]
 pub struct SerializedModelRun {
     pub json: String,
+}
+
+#[derive(Debug, Clone)]
+pub struct SerializedP4OrchestrationResult(String);
+
+impl SerializedP4OrchestrationResult {
+    pub(crate) fn new(json: String) -> Self {
+        Self(json)
+    }
+
+    pub(crate) fn as_str(&self) -> &str {
+        &self.0
+    }
+}
+
+#[async_trait]
+pub trait P4OrchestrationQueuePort: Send + Sync {
+    async fn claim_next_p4_job(&self, job_types: &[&str]) -> PortResult<Option<BackgroundJob>>;
+    async fn complete_p4_job(
+        &self,
+        job_id: Uuid,
+        result: &SerializedP4OrchestrationResult,
+    ) -> PortResult<()>;
+    async fn fail_p4_job(&self, job_id: Uuid, error_message: &str) -> PortResult<()>;
 }
 
 #[async_trait]

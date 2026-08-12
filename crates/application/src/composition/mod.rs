@@ -5,8 +5,7 @@ mod port_registry;
 pub(crate) use application_composition::ApplicationComposition;
 pub(crate) use port_registry::{
     database_health_from_snapshot, database_stats_from_statistics, ActiveDatabase, DatabaseHealth,
-    DatabaseOptions, DatabaseStats, ModelRunListItem, PersistenceError, PersistenceStore,
-    PortRegistry,
+    DatabaseOptions, DatabaseStats, ModelRunListItem, PersistenceError, PortRegistry,
 };
 
 pub(crate) use adapters::model_run_list_item_from_port;

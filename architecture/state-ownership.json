@@ -120,10 +120,10 @@
     },
     {
       "id": "application.p4-worker",
-      "owner": "crates/application/src/service/application_service.rs::ApplicationService.p4_worker_running",
+      "owner": "crates/application/src/services/p4_orchestration/service.rs::P4OrchestrationService.running",
       "scope": "ApplicationService",
       "writers": [
-        "football-application p4 orchestration"
+        "crates/application/src/services/p4_orchestration/worker.rs"
       ],
       "forbidden": [
         "src-tauri/src/commands/**",

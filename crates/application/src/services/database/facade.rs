@@ -1,8 +1,6 @@
 use super::service::PreparedDatabaseConnection;
 use crate::{
-    composition::{
-        database_health_from_snapshot, DatabaseHealth, DatabaseOptions, PersistenceStore,
-    },
+    composition::{database_health_from_snapshot, DatabaseHealth, DatabaseOptions},
     ApplicationError, ApplicationResult, ApplicationService,
 };
 use std::sync::Arc;
@@ -35,10 +33,6 @@ impl ApplicationService {
         self.analytics.start_job_worker(session);
         self.ensure_p4_orchestration_worker();
         Ok(health)
-    }
-
-    pub fn ensure_p4_orchestration_worker(self: &Arc<Self>) {
-        crate::p4_orchestration::spawn_p4_orchestration_worker(Arc::clone(self));
     }
 
     pub async fn is_database_connected(&self) -> bool {
@@ -74,13 +68,6 @@ impl ApplicationService {
             return Err(error.into());
         }
         self.connect_database(options).await
-    }
-
-    pub(crate) async fn active_store(&self) -> ApplicationResult<PersistenceStore> {
-        self.database
-            .active_store()
-            .await
-            .ok_or(ApplicationError::DatabaseNotConnected)
     }
 
     async fn initialize_database_contents(

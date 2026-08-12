@@ -277,3 +277,40 @@ impl P4FreezeExecutionPort for ActiveDatabase {
             .map_err(map_persistence_error)
     }
 }
+
+#[async_trait::async_trait]
+impl crate::ports::prediction::P4OrchestrationQueuePort for ActiveDatabase {
+    async fn claim_next_p4_job(
+        &self,
+        job_types: &[&str],
+    ) -> crate::ports::PortResult<Option<football_domain::BackgroundJob>> {
+        self.transition_store()
+            .claim_next_job_by_types(job_types)
+            .await
+            .map_err(map_persistence_error)
+    }
+
+    async fn complete_p4_job(
+        &self,
+        job_id: Uuid,
+        result: &crate::ports::prediction::SerializedP4OrchestrationResult,
+    ) -> crate::ports::PortResult<()> {
+        let value = serde_json::from_str(result.as_str()).map_err(|error| {
+            crate::ports::PortError::new(
+                crate::ports::PortErrorKind::Serialization,
+                error.to_string(),
+            )
+        })?;
+        self.transition_store()
+            .complete_job(job_id, value)
+            .await
+            .map_err(map_persistence_error)
+    }
+
+    async fn fail_p4_job(&self, job_id: Uuid, error_message: &str) -> crate::ports::PortResult<()> {
+        self.transition_store()
+            .fail_job(job_id, error_message)
+            .await
+            .map_err(map_persistence_error)
+    }
+}

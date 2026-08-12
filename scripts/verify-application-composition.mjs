@@ -54,6 +54,7 @@ const composition = read(
 const portRegistry = read("crates/application/src/composition/port_registry.rs");
 const service = read("crates/application/src/service/application_service.rs");
 const databaseService = read("crates/application/src/services/database/service.rs");
+const p4OrchestrationService = read("crates/application/src/services/p4_orchestration/service.rs");
 const modelRegistry = read(
   "crates/application/src/model_registry/registry.rs",
 );
@@ -94,9 +95,11 @@ check(
 );
 check(composition.includes("PortRegistry::new()"), "组合根未构造端口注册表");
 check(
-  composition.includes("AtomicBool::new(false)"),
-  "P4 worker 初始状态发生变化",
+  p4OrchestrationService.includes("AtomicBool::new(false)"),
+  "P4 worker 初始状态未归属 P4OrchestrationService",
 );
+check(service.includes("p4_orchestration: P4OrchestrationService"), "ApplicationService 未聚合 P4OrchestrationService");
+check(!service.includes("p4_worker_running"), "ApplicationService 仍直接持有 P4 worker 状态");
 check(
   portRegistry.includes("PostgresStore as PersistenceStore"),
   "持久化适配器未通过端口注册表导入",
@@ -178,7 +181,7 @@ const p4WorkerState = stateContract.states?.find(
 );
 check(
   p4WorkerState?.owner ===
-    "crates/application/src/service/application_service.rs::ApplicationService.p4_worker_running",
+    "crates/application/src/services/p4_orchestration/service.rs::P4OrchestrationService.running",
   "P4 worker 状态所有者未切换",
 );
 check(

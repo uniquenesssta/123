@@ -83,7 +83,7 @@ const p4Transitions = read("crates/application/src/use_cases/research/p4_worker/
 const p4Manual = read("crates/application/src/use_cases/research/p4_manual_conflict/mod.rs");
 const p4Decision = read("crates/application/src/use_cases/research/p4_manual_conflict/decision.rs");
 const p4Reconciliation = read("crates/application/src/use_cases/research/p4_manual_conflict/reconciliation.rs");
-const p4Orchestration = read("crates/application/src/p4_orchestration.rs");
+const p4Orchestration = read("crates/application/src/use_cases/p4_orchestration/process_next.rs");
 const lib = read("crates/application/src/lib.rs");
 const packageJson = JSON.parse(read("package.json"));
 const frontend = read("scripts/verify-frontend.mjs");
@@ -136,10 +136,10 @@ check(lib.includes("use_cases::research::fact_pipeline::ProcessResearchEvidenceC
 check(lib.includes("use_cases::research::openai_gateway::OpenAiResearchCommand"), "公共 OpenAiResearchCommand 未从新 owner 重导出");
 check(!lib.includes("mod openai_research;"), "Application 根模块仍登记旧 openai_research owner");
 check(pipeline.includes("trait FactPipelineAccess"), "Fact Pipeline 缺少 Ports 组合访问边界");
-check(existsSync(join(root, "crates/application/src/p4_orchestration.rs")), "跨 Prediction/Research 的 P4 dispatcher 被提前删除");
+check(!existsSync(join(root, "crates/application/src/p4_orchestration.rs")), "旧跨域 P4 orchestration owner 仍残留");
 check(!lib.includes("mod p4_workbench;"), "Application 根模块仍登记旧 p4_workbench owner");
 check(service.includes("fn execute_p4_research_task"), "ResearchService 缺少 P4 Research worker 执行职责");
-check(facade.includes("fn execute_p4_research_task"), "Application Research facade 缺少 P4 Research worker 委托");
+check(!facade.includes("fn execute_p4_research_task"), "ApplicationService Research facade 仍保留仅供 orchestration 的私有 worker helper");
 check(service.includes("fn resolve_p4_conflict"), "ResearchService 缺少人工冲突裁决职责");
 check(facade.includes("pub async fn resolve_p4_conflict"), "Application Research facade 缺少公共人工冲突裁决入口");
 check(facade.includes("ApplicationResult<P4TaskWorkspace>"), "resolve_p4_conflict 返回契约发生变化");
@@ -150,9 +150,9 @@ check(p4Worker.includes("openai_gateway::execute_p4_openai_research"), "P4 Resea
 check(p4Worker.includes("PredictionWorkflowPort"), "P4 Research worker 未通过 PredictionWorkflowPort 管理冻结任务状态");
 check(p4Worker.includes("ResearchArtifactPort"), "P4 Research worker 未通过 ResearchArtifactPort 管理 research run");
 check(p4Transitions.includes("JobQueuePort"), "P4 Research worker 未通过 JobQueuePort 安排 freeze job");
-check(p4Orchestration.includes("self.execute_p4_research_task(payload.task_id, job_id)"), "P4 dispatcher 未委托 ResearchService 执行 Research job");
+check(p4Orchestration.includes(".execute_p4_research_task("), "P4 dispatcher 未委托 ResearchService 执行 Research job");
 for (const token of ["OpenAiResearchCommand", "ResearchRunDraft", "ResearchRunStatus", "research_dynamic_context", "fn finalize_successful_research", "fn block_partial_research", "fn transition_missed", "execute_p4_openai_research("]) {
-  check(!p4Orchestration.includes(token), `旧 p4_orchestration.rs 仍持有 Research worker 业务逻辑：${token}`);
+  check(!p4Orchestration.includes(token), `P4 orchestration use case 仍持有 Research worker 业务逻辑：${token}`);
 }
 check(p4Manual.includes("P4ManualConflictAccess"), "人工冲突裁决缺少 Ports 组合访问边界");
 for (const token of ["PredictionWorkflowPort", "JobQueuePort", "ResearchArtifactPort", "ResearchManualConflictPort"]) {
