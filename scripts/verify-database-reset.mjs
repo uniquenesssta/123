@@ -14,6 +14,8 @@ const compactCommand = command.replace(/\s+/g, "");
 const databaseFacade = read("crates/application/src/services/database/facade.rs");
 const databaseService = read("crates/application/src/services/database/service.rs");
 const resetUseCase = read("crates/application/src/use_cases/database/reset/mod.rs");
+const lifecycleReset = read("crates/application/src/use_cases/application_facade/database_lifecycle/reset.rs");
+const p4Facade = read("crates/application/src/services/p4_orchestration/facade.rs");
 const tauri = read("src-tauri/src/bootstrap/command_registry.rs");
 const client = read("src/api/client.ts");
 const page = read("src/pages/database.ts");
@@ -78,9 +80,9 @@ requireText(databaseService, "self.disconnect().await?", "清空前停止活动�
 requireText(resetUseCase, "confirmation.trim() != health.database_name", "Application 清空用例数据库名称强确认");
 requireText(resetUseCase, "保存的连接配置与当前数据库不一致，已拒绝清空", "清空目标一致性门禁");
 requireText(resetUseCase, "port.reset_to_pristine().await", "通过 DatabaseLifecyclePort 执行彻底重建");
-requireText(databaseFacade, "self.connect_database(options)", "清空后自动恢复连接");
+requireText(lifecycleReset, "connect::execute(application, options)", "清空后自动恢复连接");
 requireText(command, "state.service.ensure_p4_orchestration_worker()", "清空后恢复P4后台工作器");
-requireText(databaseFacade, "pub fn ensure_p4_orchestration_worker", "P4后台工作器幂等恢复入口");
+requireText(p4Facade, "pub fn ensure_p4_orchestration_worker", "P4后台工作器幂等恢复入口");
 requireText(tauri, "commands::reset_database", "Tauri 命令注册");
 
 requireText(client, 'invoke("reset_database", { confirmation })', "前端 API 调用");

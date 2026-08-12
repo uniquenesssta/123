@@ -26,7 +26,7 @@ R2 已完成并关闭。R3 只重写 Application 编排与 Ports/Services/Use Ca
 | R3-07 | Research Service | DONE |
 | R3-08 | Review / Postmatch / Analytics Services | DONE |
 | R3-09 | Exchange / AI / Release Services | DONE |
-| R3-10 | ApplicationService 兼容门面 | READY |
+| R3-10 | ApplicationService 兼容门面 | VERIFYING |
 
 ## R3-01 完成结果
 
@@ -183,3 +183,12 @@ R3-02 已正式关闭为 `DONE`。详细记录见 [`R03-02-database-service.md`]
 - 临时验证 workflow 已清理；PR #20 保持 Draft / Open / 未合并，等待最终 clean Public Platform CI 后再决定正式关闭。R3-09 继续 `IN_PROGRESS`，R3-10 继续 `BLOCKED`。
 - 首轮最终 clean Public Platform CI run `31568684129` / job `94025845936` 中独立 architecture 已通过，Windows Automated 在完整 frontend 的 deterministic protected-assets 门禁停止：AT4 为迁移旧 Release owner 而合法修改了受保护的 `scripts/verify-public-model-boundary.mjs` 权威扫描路径，但 `architecture/protected-assets.json` 尚未同步该验证器的新指纹；这不是 Release 业务、编译或契约失败，且该轮未被记为通过。
 - 按仓库既有 `chore(verify): refresh public-boundary fingerprint` 机制，只刷新该受保护验证器的 Git blob / fingerprint 与聚合 SHA；refresh workflow 在提交前实际执行 `verify-protected-assets-deterministic.mjs` 并通过。新 blob 为 `2e5adc250dba986b3b0441c7f26e762f8b9ef6f4`，fingerprint 为 `13f9ea8c98624e156208c836f837875f2a54104be15e6115f5e7f547d4f491e0`，聚合 SHA-256 为 `d74e0936b60c69f444a498405fed3e704b8db63b81f26b40036f772b4b6eac57`；保护文件集合、禁止私有资产规则和验证逻辑未放宽。
+
+
+## R3-10 当前执行
+
+- Atomic Task 1 — P4 Orchestration owner extraction：`DONE`。旧根级 `p4_orchestration.rs` 已删除，P4 job queue、worker state、dispatch/failure terminal transition 进入独立 Service / Use Case / Port；最终 hard gate run `31591061641` / job `94095867258` 全绿，提交 `2bc98df768ed36bfe9e9712b4eae9cc54f83b1c6`。
+- Atomic Task 2 — ApplicationService facade convergence：`DONE`。bootstrap/database lifecycle、Research 多 Port access assembly、Prediction recent-run compatibility mapping 已迁出兼容 facade；新增最终 `verify-application-service-facade.mjs` 门禁。最终 hard gate run `31592634518` / job `94100834403` 全绿，提交 `dd0aa8e32c8459acbbb68805b6fa099d92d17f91`。
+- Application Port inventory 当前为 15 个职责域 / 38 个最小 trait；`ApplicationService` 根对象不再直接持有 P4 worker 状态，旧根级 P4 owner 清零。公共 ApplicationService/Tauri 契约、SQL/migration、前端产品行为、模型实现和生产依赖保持不变。
+- R3-10 当前为 `VERIFYING`；PR #21 保持 Draft / Open / 未合并。clean Public Platform CI 与正式收口完成前，不创建 `R03-stage-completion.md`，R3 阶段继续 `IN_PROGRESS`。
+- 18 个需要专用可写 `FOOTBALL_TEST_DATABASE_URL` 的 PostgreSQL 集成测试未执行，未记为通过；未执行破坏性数据库验证。
