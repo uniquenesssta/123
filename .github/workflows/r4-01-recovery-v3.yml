@@ -1,4 +1,4 @@
-name: R4-01 Recovery V3 Strict Gate
+name: R4-01 Recovery V4 Strict Gate
 
 on:
   push:
@@ -9,7 +9,7 @@ permissions:
   contents: write
 
 jobs:
-  recovery-v3:
+  recovery-v4:
     if: github.actor != 'github-actions[bot]'
     runs-on: windows-2025
     env:
@@ -64,14 +64,84 @@ jobs:
           if stale not in baseline:
               raise SystemExit('stale integration runtime-source fingerprint missing')
           baseline = baseline.replace(stale, base_blob, 1)
-          Path('r4_01_v3_baseline_payload.py').write_text(baseline, encoding='utf-8', newline='\n')
-          '@ | Set-Content -Path r4_01_v3_prepare.py -Encoding UTF8
-          python r4_01_v3_prepare.py
-          Remove-Item r4_01_v3_prepare.py
+          Path('r4_01_v4_baseline_payload.py').write_text(baseline, encoding='utf-8', newline='\n')
+          '@ | Set-Content -Path r4_01_v4_prepare.py -Encoding UTF8
+          python r4_01_v4_prepare.py
+          Remove-Item r4_01_v4_prepare.py
           npm run prepare:cargo
           cargo fmt --all
-          python r4_01_v3_baseline_payload.py
-          Remove-Item r4_01_v3_baseline_payload.py
+          python r4_01_v4_baseline_payload.py
+          Remove-Item r4_01_v4_baseline_payload.py
+
+      - name: Refresh Domain inventory with official generator and prove invariants
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $PSNativeCommandUseErrorActionPreference = $true
+          Copy-Item architecture/domain-type-inventory.json r4_01_inventory_before.json
+          node scripts/generate-domain-type-inventory.mjs
+          @'
+          import json
+          from pathlib import Path
+
+          before = json.loads(Path('r4_01_inventory_before.json').read_text(encoding='utf-8'))
+          after = json.loads(Path('architecture/domain-type-inventory.json').read_text(encoding='utf-8'))
+
+          if before['schemaVersion'] != after['schemaVersion'] or before['sourceRoot'] != after['sourceRoot'] or before['contract'] != after['contract']:
+              raise SystemExit('Domain inventory schema/source/contract changed unexpectedly')
+          if before['sourceDigest'] != after['sourceDigest']:
+              raise SystemExit('Domain sourceDigest changed during Persistence-only R4-01')
+
+          invariant_summary = [
+              'typeCount',
+              'publicCompatibilityTypeCount',
+              'internalTypeCount',
+              'domainSourceFileCount',
+              'databaseMappedTypeCount',
+              'byTargetModule',
+              'byTargetTask',
+          ]
+          for key in invariant_summary:
+              if before['summary'][key] != after['summary'][key]:
+                  raise SystemExit(f'Domain inventory invariant summary changed: {key}')
+
+          expected = {
+              'typeCount': 365,
+              'publicCompatibilityTypeCount': 365,
+              'internalTypeCount': 0,
+              'domainSourceFileCount': 129,
+              'databaseMappedTypeCount': 299,
+          }
+          for key, value in expected.items():
+              if after['summary'][key] != value:
+                  raise SystemExit(f'Domain inventory expected {key}={value}, got {after["summary"][key]}')
+
+          if len(before['types']) != len(after['types']):
+              raise SystemExit('Domain type entry count changed')
+          caller_fields = {'domainCallers', 'externalCallers'}
+          caller_changes = 0
+          for old, new in zip(before['types'], after['types']):
+              if old['typeName'] != new['typeName']:
+                  raise SystemExit('Domain type ordering/name changed')
+              old_fixed = {k: v for k, v in old.items() if k not in caller_fields}
+              new_fixed = {k: v for k, v in new.items() if k not in caller_fields}
+              if old_fixed != new_fixed:
+                  raise SystemExit(f'Domain declaration/Serde/mapping metadata changed for {old["typeName"]}')
+              if old.get('domainCallers') != new.get('domainCallers') or old.get('externalCallers') != new.get('externalCallers'):
+                  caller_changes += 1
+
+          if before['summary']['scannedRustFileCount'] == after['summary']['scannedRustFileCount'] and before['rustUsageDigest'] == after['rustUsageDigest']:
+              raise SystemExit('Expected Rust usage inventory to reflect Persistence source reshaping, but no usage change was detected')
+
+          print(
+              'Domain inventory R4-01 invariants preserved: '
+              f"365 types / 365 public compatibility / 299 DB-mapped; "
+              f"scanned Rust files {before['summary']['scannedRustFileCount']} -> {after['summary']['scannedRustFileCount']}; "
+              f"caller entries changed for {caller_changes} domain types."
+          )
+          '@ | Set-Content -Path r4_01_verify_inventory.py -Encoding UTF8
+          python r4_01_verify_inventory.py
+          Remove-Item r4_01_verify_inventory.py r4_01_inventory_before.json
 
       - name: Prove immutable migration dependency and integration-test scope
         shell: pwsh
@@ -138,14 +208,14 @@ jobs:
 
           node = Path('docs/modular-rewrite/R04-persistence-foundation/R04-01-store-error-and-pool.md')
           text = node.read_text(encoding='utf-8')
-          extra = '- 首轮 strict gate run `31613473804` 在提交前已通过 R4-01 专项、migration compatibility 与 reset 契约，但数据库静态 baseline 暴露 R0 对 `postgres_integration.rs` 的 runtime-source 指纹已陈旧；R4 起点实际 blob 为 `44dcd594ac739ab341bd5009f613d5de6fd1aa1e`。恢复 gate 以 `git diff --exit-code` 证明该测试文件、build.rs、Cargo.toml、Cargo.lock 与 0001–0046 migrations 对 R4 起点均零 diff，再仅刷新 runtime-source 指纹。Recovery V1/V2 只因临时 workflow 的嵌入脚本截取错误在验证前停止，均未提交生产源码。\n'
+          extra = '- 首轮 strict gate run `31613473804` 在提交前已通过 R4-01 专项、migration compatibility 与 reset 契约，但数据库静态 baseline 暴露 R0 对 `postgres_integration.rs` 的 runtime-source 指纹已陈旧；R4 起点实际 blob 为 `44dcd594ac739ab341bd5009f613d5de6fd1aa1e`。恢复 gate 以 `git diff --exit-code` 证明该测试文件、build.rs、Cargo.toml、Cargo.lock 与 0001–0046 migrations 对 R4 起点均零 diff，再仅刷新 runtime-source 指纹。Recovery V1/V2 只因临时 workflow 的嵌入脚本截取错误在验证前停止；V3 随后通过全部数据库冻结契约，并在完整 architecture 正确发现 Domain caller inventory 需随 Persistence 路径重排重算，均未提交生产源码。V4 使用官方 `generate-domain-type-inventory.mjs` 重建并机器锁定 365 类型、365 公共兼容类型、299 PostgreSQL 映射及全部 Domain 声明/Serde/映射不变量。\n'
           marker2 = '## 兼容性\n'
           if extra not in text:
               text = text.replace(marker2, extra + '\n' + marker2, 1)
           node.write_text(text, encoding='utf-8', newline='\n')
-          '@ | Set-Content -Path r4_01_v3_docs.py -Encoding UTF8
-          python r4_01_v3_docs.py
-          Remove-Item r4_01_v3_docs.py
+          '@ | Set-Content -Path r4_01_v4_docs.py -Encoding UTF8
+          python r4_01_v4_docs.py
+          Remove-Item r4_01_v4_docs.py
 
       - name: Final architecture validation after docs
         shell: pwsh
@@ -159,6 +229,6 @@ jobs:
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
           git rm .github/workflows/r4-01-recovery-v3.yml .github/workflows/r4-01-hard-gate.yml .github/workflows/r4-01-scope-audit.yml
-          git add crates/persistence-postgres/src scripts/verify-database-migration-compatibility.mjs scripts/verify-database-reset.mjs scripts/verify-persistence-foundation.mjs package.json architecture/database-baseline.json architecture/module-boundaries.json architecture/state-ownership.json README.md docs/modular-rewrite/R04-persistence-foundation
+          git add crates/persistence-postgres/src scripts/verify-database-migration-compatibility.mjs scripts/verify-database-reset.mjs scripts/verify-persistence-foundation.mjs package.json architecture/database-baseline.json architecture/domain-type-inventory.json architecture/module-boundaries.json architecture/state-ownership.json README.md docs/modular-rewrite/R04-persistence-foundation
           git commit -m 'refactor(r4-01): modularize persistence foundation'
           git push origin HEAD:agent/r4-01-store-error-pool
