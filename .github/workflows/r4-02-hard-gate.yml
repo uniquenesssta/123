@@ -1,0 +1,456 @@
+name: R4-02 Audit Hard Gate
+
+on:
+  push:
+    branches:
+      - agent/r4-02-audit-foundation
+    paths:
+      - .github/workflows/r4-02-hard-gate.yml
+
+permissions:
+  contents: write
+
+jobs:
+  hard-gate:
+    runs-on: windows-2025
+    timeout-minutes: 120
+    steps:
+      - name: Checkout R4-02 branch
+        uses: actions/checkout@v4
+        with:
+          ref: agent/r4-02-audit-foundation
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: package-lock.json
+
+      - name: Setup Rust 1.88.0
+        uses: dtolnay/rust-toolchain@1.88.0
+        with:
+          components: rustfmt, clippy
+
+      - name: Restore Rust build cache
+        uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: . -> ../.cargo-target
+
+      - name: Apply R4-02 audit rewrite
+        shell: pwsh
+        env:
+          R4_02_BASE: e3a1e2e082e82fcb82899abfd5e8646466fcad97
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $script = @'
+          import os, re
+          from pathlib import Path
+
+          ROOT = Path('.')
+          BASE = os.environ['R4_02_BASE']
+
+          def read(path):
+              return Path(path).read_text(encoding='utf-8')
+
+          def write(path, text):
+              p = Path(path)
+              p.parent.mkdir(parents=True, exist_ok=True)
+              with p.open('w', encoding='utf-8', newline='\n') as f:
+                  f.write(text)
+
+          def replace_once(text, old, new, label):
+              count = text.count(old)
+              if count != 1:
+                  raise RuntimeError(f'{label}: expected 1 exact match, found {count}')
+              return text.replace(old, new, 1)
+
+          def remove_function(text, marker, label):
+              idx = text.find(marker)
+              if idx < 0:
+                  raise RuntimeError(f'{label}: function marker missing: {marker}')
+              start = text.rfind('\n', 0, idx) + 1
+              brace = text.find('{', idx)
+              if brace < 0:
+                  raise RuntimeError(f'{label}: opening brace missing')
+              depth = 0
+              end = None
+              for i in range(brace, len(text)):
+                  ch = text[i]
+                  if ch == '{': depth += 1
+                  elif ch == '}':
+                      depth -= 1
+                      if depth == 0:
+                          end = i + 1
+                          break
+              if end is None:
+                  raise RuntimeError(f'{label}: closing brace missing')
+              while end < len(text) and text[end] in '\r\n':
+                  end += 1
+              return text[:start] + text[end:]
+
+          # New single-responsibility Audit modules.
+          write('crates/persistence-postgres/src/audit/mod.rs', '''mod audit_event;\nmod audit_hash;\nmod audit_payload;\nmod write_audit_event;\n\npub(crate) use audit_hash::sha256_json;\npub(crate) use write_audit_event::write_audit_event;\n''')
+          write('crates/persistence-postgres/src/audit/audit_payload.rs', '''use serde_json::Value;\n\n#[derive(Debug)]\npub(super) struct AuditPayload(Value);\n\nimpl AuditPayload {\n    pub(super) fn new(value: Value) -> Self {\n        Self(value)\n    }\n\n    pub(super) fn into_value(self) -> Value {\n        self.0\n    }\n}\n''')
+          write('crates/persistence-postgres/src/audit/audit_event.rs', '''use super::audit_payload::AuditPayload;\nuse uuid::Uuid;\n\n#[derive(Debug)]\npub(super) struct AuditEntityId(Option<String>);\n\nimpl AuditEntityId {\n    pub(super) fn into_option(self) -> Option<String> {\n        self.0\n    }\n}\n\nimpl From<String> for AuditEntityId {\n    fn from(value: String) -> Self {\n        Self(Some(value))\n    }\n}\n\nimpl From<Option<String>> for AuditEntityId {\n    fn from(value: Option<String>) -> Self {\n        Self(value)\n    }\n}\n\n#[derive(Debug)]\npub(super) struct AuditEvent<'a> {\n    pub(super) id: Uuid,\n    pub(super) event_type: &'a str,\n    pub(super) entity_type: &'a str,\n    pub(super) entity_id: AuditEntityId,\n    pub(super) payload: AuditPayload,\n}\n\nimpl<'a> AuditEvent<'a> {\n    pub(super) fn new(\n        event_type: &'a str,\n        entity_type: &'a str,\n        entity_id: impl Into<AuditEntityId>,\n        payload: AuditPayload,\n    ) -> Self {\n        Self {\n            id: Uuid::new_v4(),\n            event_type,\n            entity_type,\n            entity_id: entity_id.into(),\n            payload,\n        }\n    }\n}\n''')
+          write('crates/persistence-postgres/src/audit/audit_hash.rs', '''use crate::{PersistenceResult};\nuse sha2::{Digest, Sha256};\n\npub(crate) fn sha256_json<T: serde::Serialize + ?Sized>(value: &T) -> PersistenceResult<String> {\n    let bytes = serde_json::to_vec(value)?;\n    let mut hasher = Sha256::new();\n    hasher.update(bytes);\n    Ok(hex::encode(hasher.finalize()))\n}\n''')
+          write('crates/persistence-postgres/src/audit/write_audit_event.rs', '''use super::{audit_event::AuditEvent, audit_payload::AuditPayload};\nuse crate::PersistenceResult;\nuse serde_json::Value;\nuse sqlx::{Postgres, Transaction};\n\npub(crate) async fn write_audit_event(\n    tx: &mut Transaction<'_, Postgres>,\n    event_type: &str,\n    entity_type: &str,\n    entity_id: impl Into<super::audit_event::AuditEntityId>,\n    payload: Value,\n) -> PersistenceResult<()> {\n    let event = AuditEvent::new(\n        event_type,\n        entity_type,\n        entity_id,\n        AuditPayload::new(payload),\n    );\n    sqlx::query(\n        r#"\n        INSERT INTO audit.events (id, event_type, entity_type, entity_id, payload)\n        VALUES ($1, $2, $3, $4, $5)\n        "#,\n    )\n    .bind(event.id)\n    .bind(event.event_type)\n    .bind(event.entity_type)\n    .bind(event.entity_id.into_option())\n    .bind(event.payload.into_value())\n    .execute(&mut **tx)\n    .await?;\n    Ok(())\n}\n''')
+
+          # Root lib becomes composition/re-export only for Audit; keep Competition mapping owner untouched.
+          lib_path = 'crates/persistence-postgres/src/lib.rs'
+          lib = read(lib_path)
+          lib = replace_once(lib, 'mod analytics;\n', 'mod analytics;\nmod audit;\n', 'lib audit module registration')
+          lib = replace_once(lib, 'pub use store::PostgresStore;\n\n', 'pub use store::PostgresStore;\n\npub(crate) use audit::{sha256_json, write_audit_event};\n\n', 'lib audit re-export')
+          lib = remove_function(lib, 'async fn write_audit_event(', 'root write_audit_event')
+          lib = remove_function(lib, 'fn sha256_json<', 'root sha256_json')
+          for old in ['use serde_json::Value;\n', 'use sha2::{Digest, Sha256};\n', 'use sqlx::Transaction;\n', 'use uuid::Uuid;\n']:
+              if old not in lib:
+                  raise RuntimeError(f'lib obsolete import missing: {old.strip()}')
+              lib = lib.replace(old, '', 1)
+          write(lib_path, lib)
+
+          # Generic parser for the ten concrete direct audit INSERT chains.
+          concrete_total = 0
+          event_re = re.compile(r"VALUES\s*\(\s*\$1\s*,\s*'([^']+)'\s*,\s*'([^']+)'\s*,\s*\$2\s*,\s*\$3\s*\)", re.S)
+
+          def bind_args(block):
+              args = []
+              pos = 0
+              while True:
+                  idx = block.find('.bind(', pos)
+                  if idx < 0: break
+                  i = idx + len('.bind(')
+                  depth = 1
+                  start = i
+                  in_str = False
+                  quote = ''
+                  escape = False
+                  while i < len(block):
+                      ch = block[i]
+                      if in_str:
+                          if escape:
+                              escape = False
+                          elif ch == '\\':
+                              escape = True
+                          elif ch == quote:
+                              in_str = False
+                      else:
+                          if ch in ('"', "'"):
+                              in_str = True; quote = ch
+                          elif ch == '(':
+                              depth += 1
+                          elif ch == ')':
+                              depth -= 1
+                              if depth == 0:
+                                  args.append(block[start:i].strip())
+                                  pos = i + 1
+                                  break
+                      i += 1
+                  else:
+                      raise RuntimeError('unterminated .bind() in audit block')
+              return args
+
+          direct_files = [
+              'crates/persistence-postgres/src/match_exchange.rs',
+              'crates/persistence-postgres/src/player_catalog.rs',
+              'crates/persistence-postgres/src/spreadsheet_exchange.rs',
+              'crates/persistence-postgres/src/team_catalog.rs',
+              'crates/persistence-postgres/src/team_force_delete.rs',
+          ]
+          for path in direct_files:
+              text = read(path)
+              while True:
+                  marker = text.find('INSERT INTO audit.events')
+                  if marker < 0: break
+                  start = text.rfind('sqlx::query(', 0, marker)
+                  if start < 0:
+                      raise RuntimeError(f'{path}: audit INSERT without sqlx::query start')
+                  end_marker = text.find('.await?;', marker)
+                  if end_marker < 0:
+                      raise RuntimeError(f'{path}: audit INSERT without await terminator')
+                  end = end_marker + len('.await?;')
+                  block = text[start:end]
+                  match = event_re.search(block)
+                  if not match:
+                      # Generic helpers are removed separately, not transformed here.
+                      next_marker = text.find('INSERT INTO audit.events', marker + 1)
+                      if next_marker < 0:
+                          break
+                      # Temporarily mask this marker so later concrete blocks can be found.
+                      text = text[:marker] + 'INSERT INTO audit.EVENTS_GENERIC' + text[marker + len('INSERT INTO audit.events'):]
+                      continue
+                  event_type, entity_type = match.groups()
+                  args = bind_args(block)
+                  if len(args) != 3 or args[0] != 'Uuid::new_v4()':
+                      raise RuntimeError(f'{path}: concrete audit bind shape changed: {args}')
+                  exec_match = re.search(r'\.execute\((.*?)\)\s*\.await\?;$', block, re.S)
+                  if not exec_match:
+                      raise RuntimeError(f'{path}: concrete audit executor missing')
+                  executor = re.sub(r'\s+', '', exec_match.group(1))
+                  if executor == '&mut*tx':
+                      tx_arg = '&mut tx'
+                  elif executor == '&mut**tx':
+                      tx_arg = 'tx'
+                  else:
+                      raise RuntimeError(f'{path}: unexpected concrete audit executor: {executor}')
+                  indent_start = text.rfind('\n', 0, start) + 1
+                  indent = text[indent_start:start]
+                  replacement = (
+                      f'crate::write_audit_event(\n'
+                      f'{indent}    {tx_arg},\n'
+                      f'{indent}    "{event_type}",\n'
+                      f'{indent}    "{entity_type}",\n'
+                      f'{indent}    {args[1]},\n'
+                      f'{indent}    {args[2]},\n'
+                      f'{indent}).await?;'
+                  )
+                  text = text[:start] + replacement + text[end:]
+                  concrete_total += 1
+              # restore masks for generic helper removal below
+              text = text.replace('INSERT INTO audit.EVENTS_GENERIC', 'INSERT INTO audit.events')
+              write(path, text)
+          if concrete_total != 10:
+              raise RuntimeError(f'expected 10 concrete direct audit writes, transformed {concrete_total}')
+
+          # Player create_team must make business row + audit row atomic; remove both duplicate player writers.
+          player_path = 'crates/persistence-postgres/src/player_catalog.rs'
+          player = read(player_path)
+          create_start = player.find('    pub async fn create_team(')
+          create_end = player.find('    pub async fn list_team_options(', create_start)
+          if create_start < 0 or create_end < 0:
+              raise RuntimeError('create_team function boundaries not found')
+          create = player[create_start:create_end]
+          create = replace_once(create, '        let row = sqlx::query(', '        let mut tx = self.pool.begin().await?;\n        let row = sqlx::query(', 'create_team tx start')
+          create = replace_once(create, '        .fetch_one(&self.pool)\n', '        .fetch_one(&mut *tx)\n', 'create_team tx query')
+          old_audit = '''        self.audit(\n            "team_created",\n            "team",\n            id.to_string(),\n            json!({"canonical_name": canonical_name}),\n        )\n        .await?;\n'''
+          new_audit = '''        crate::write_audit_event(\n            &mut tx,\n            "team_created",\n            "team",\n            id.to_string(),\n            json!({"canonical_name": canonical_name}),\n        )\n        .await?;\n        tx.commit().await?;\n'''
+          create = replace_once(create, old_audit, new_audit, 'create_team audit transaction')
+          player = player[:create_start] + create + player[create_end:]
+          player = remove_function(player, '    async fn audit(\n', 'player pool audit helper')
+          player = remove_function(player, 'async fn audit_in_tx(\n', 'player transaction audit helper')
+          call_count = player.count('audit_in_tx(')
+          if call_count != 6:
+              raise RuntimeError(f'expected 6 audit_in_tx callers after definition removal, found {call_count}')
+          player = player.replace('audit_in_tx(', 'crate::write_audit_event(')
+          if 'self.audit(' in player:
+              raise RuntimeError('player self.audit caller remains')
+          write(player_path, player)
+
+          # No raw audit INSERT may remain outside the new single writer.
+          offenders = []
+          for p in Path('crates/persistence-postgres/src').rglob('*.rs'):
+              if p.as_posix() == 'crates/persistence-postgres/src/audit/write_audit_event.rs':
+                  continue
+              if 'INSERT INTO audit.events' in read(p):
+                  offenders.append(p.as_posix())
+          if offenders:
+              raise RuntimeError(f'raw audit INSERT remains outside writer: {offenders}')
+
+          # Add deterministic architecture verifier and package gate.
+          verifier = r'''import fs from "node:fs";
+          import path from "node:path";
+          import { fileURLToPath } from "node:url";
+
+          const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
+          const read = (relative) => fs.readFileSync(path.join(root, relative), "utf8");
+          const exists = (relative) => fs.existsSync(path.join(root, relative));
+          const failures = [];
+          const check = (condition, message) => { if (!condition) failures.push(message); };
+
+          const files = {
+            module: "crates/persistence-postgres/src/audit/mod.rs",
+            event: "crates/persistence-postgres/src/audit/audit_event.rs",
+            payload: "crates/persistence-postgres/src/audit/audit_payload.rs",
+            hash: "crates/persistence-postgres/src/audit/audit_hash.rs",
+            writer: "crates/persistence-postgres/src/audit/write_audit_event.rs",
+            library: "crates/persistence-postgres/src/lib.rs",
+            player: "crates/persistence-postgres/src/player_catalog.rs",
+          };
+          for (const [label, relative] of Object.entries(files)) check(exists(relative), `R4-02 缺少 ${label} owner：${relative}`);
+          const sources = Object.fromEntries(Object.entries(files).map(([key, relative]) => [key, read(relative)]));
+          check(sources.library.includes("mod audit;"), "lib.rs 未注册 audit 模块");
+          check(sources.library.includes("pub(crate) use audit::{sha256_json, write_audit_event};"), "lib.rs 未保持 crate 内 Audit 兼容出口");
+          check(!sources.library.includes("INSERT INTO audit.events"), "lib.rs 仍承载 Audit SQL 实现");
+          check(!sources.library.includes("async fn write_audit_event") && !sources.library.includes("fn sha256_json<"), "lib.rs 仍承载 Audit helper 实现");
+          check(sources.module.includes("mod audit_event;") && sources.module.includes("mod audit_payload;") && sources.module.includes("mod audit_hash;") && sources.module.includes("mod write_audit_event;"), "audit/mod.rs 未显式声明全部职责文件");
+          check(sources.event.includes("struct AuditEvent") && sources.event.includes("struct AuditEntityId") && sources.event.includes("Uuid::new_v4()"), "AuditEvent/entity ID owner 不完整");
+          check(sources.payload.includes("struct AuditPayload(Value)") && sources.payload.includes("into_value"), "AuditPayload 未保持 JSON Value 原样传递");
+          for (const token of ["serde_json::to_vec(value)?", "Sha256::new()", "hasher.update(bytes)", "hex::encode(hasher.finalize())"]) check(sources.hash.includes(token), `sha256_json 算法契约缺失：${token}`);
+          for (const token of ["Transaction<'_, Postgres>", "INSERT INTO audit.events (id, event_type, entity_type, entity_id, payload)", "VALUES ($1, $2, $3, $4, $5)", ".execute(&mut **tx)", ".await?;"]) check(sources.writer.includes(token), `Audit writer 事务/错误传播契约缺失：${token}`);
+
+          const rustRoot = path.join(root, "crates/persistence-postgres/src");
+          const rustFiles = fs.readdirSync(rustRoot, { recursive: true, withFileTypes: true })
+            .filter((entry) => entry.isFile() && entry.name.endsWith(".rs"))
+            .map((entry) => path.join(entry.parentPath ?? entry.path, entry.name));
+          const rawInsertOwners = rustFiles.filter((file) => fs.readFileSync(file, "utf8").includes("INSERT INTO audit.events"));
+          check(rawInsertOwners.length === 1 && rawInsertOwners[0].replaceAll("\\", "/").endsWith("/audit/write_audit_event.rs"), `Audit INSERT 必须只有唯一 writer owner，实际：${rawInsertOwners.join(", ")}`);
+          const combined = rustFiles.map((file) => fs.readFileSync(file, "utf8")).join("\n");
+          check(!combined.includes("async fn audit_in_tx("), "旧 player audit_in_tx helper 仍存在");
+          check(!combined.includes("async fn audit(\n"), "旧 pool audit helper 仍存在");
+          check(sources.player.includes("let mut tx = self.pool.begin().await?;") && sources.player.includes('"team_created"') && sources.player.includes("tx.commit().await?;"), "create_team 未将业务写入与审计收敛到同一事务");
+
+          if (failures.length) {
+            console.error("R4-02 Audit 基础设施验证失败：");
+            failures.forEach((failure) => console.error(`- ${failure}`));
+            process.exit(1);
+          }
+          console.log("R4-02 Audit 基础设施验证通过：AuditEvent/EntityId/Payload/Hash/Writer 已形成唯一职责 owner，所有生产审计 INSERT 收敛到业务事务内统一 writer。");
+          '''
+          verifier = '\n'.join(line[10:] if line.startswith('          ') else line for line in verifier.splitlines()) + '\n'
+          write('scripts/verify-persistence-audit.mjs', verifier)
+
+          package_path = 'package.json'
+          package = read(package_path)
+          package = replace_once(
+              package,
+              ' && node scripts/verify-persistence-foundation.mjs",\n    "verify:persistence-foundation": "node scripts/verify-persistence-foundation.mjs",',
+              ' && node scripts/verify-persistence-foundation.mjs && node scripts/verify-persistence-audit.mjs",\n    "verify:persistence-foundation": "node scripts/verify-persistence-foundation.mjs",\n    "verify:persistence-audit": "node scripts/verify-persistence-audit.mjs",',
+              'package audit architecture gate',
+          )
+          write(package_path, package)
+
+          # R4 task records are factual only if this workflow reaches the commit step.
+          run_id = os.environ.get('GITHUB_RUN_ID', 'unknown')
+          node_path = 'docs/modular-rewrite/R04-persistence-foundation/R04-02-audit-基础设施.md'
+          node = f'''# R4-02 Audit 基础设施\n\n## 状态\n\n`VERIFYING`\n\n## 实施结果\n\n- 新建 `crates/persistence-postgres/src/audit/`，按 `audit_event.rs`、`audit_payload.rs`、`audit_hash.rs`、`write_audit_event.rs` 拆分事件/实体 ID、payload、SHA-256 与唯一 SQL writer；`mod.rs` 只负责显式出口。\n- 删除 `lib.rs` 中旧 `write_audit_event` 与 `sha256_json` 实现；根模块只保留 crate 内兼容 re-export，既有调用签名与 SHA-256 JSON 算法保持。\n- 迁移 Match Exchange、Player、Spreadsheet Exchange、Team Catalog、Team Force Delete 中全部直接 `INSERT INTO audit.events`；生产 Rust 的审计 INSERT 只允许存在于 `audit/write_audit_event.rs`。\n- 删除 Player Catalog 的 pool 级 `audit` 和事务级 `audit_in_tx` 重复 writer。`create_team` 改为 team row 与 `team_created` audit row 同一事务后统一 commit，消除审计失败时业务行已单独落库的非原子状态。\n- 未修改任何 0001–0046 migration SQL、数据库 schema、公共 Application/Tauri 接口、DTO、配置、模型资产或生产依赖；R4-03/R4-04 未开始。\n\n## 验证\n\n- scope audit run `31627365139` 与 detail runs `31627711449` / `31627837301` 用 PowerShell 扫描 Audit owner、直接 SQL 与 player helper 调用面，均未修改生产源码。\n- strict hard gate run `{run_id}` 在提交前执行 R4-02 Audit 专项、R4-01 Persistence Foundation、数据库冻结/历史契约、官方 Domain inventory、完整 architecture/frontend、rustfmt、Persistence check/tests 以及 workspace Clippy/tests；只有全部通过才提交本节点源码树。\n- 18 个要求专用可写 `FOOTBALL_TEST_DATABASE_URL` 的 PostgreSQL 集成测试不在本 hard gate 中执行；未执行 destructive database reset。\n\n## 兼容性与剩余风险\n\n- audit event_type、entity_type、entity_id、payload 值与 SQL 列保持；SQLx/Serde 错误继续通过既有 `PersistenceError` 转换传播，不捕获忽略。\n- `sha256_json` 仍为 `serde_json::to_vec -> SHA-256 -> hex`，不改变现有 fingerprint/hash 输出。\n- 最终 clean Public Platform CI 与正式 PR 合并前，本节点保持 `VERIFYING`；R4-03 继续 `BLOCKED`。\n'''
+          write(node_path, node)
+
+          stage_path = 'docs/modular-rewrite/R04-persistence-foundation/README.md'
+          stage = read(stage_path)
+          stage = replace_once(
+              stage,
+              '| R4-02 | Audit 基础设施 | READY | — |',
+              '| R4-02 | Audit 基础设施 | VERIFYING | [`R04-02-audit-基础设施.md`](./R04-02-audit-基础设施.md) |',
+              'stage R4-02 status',
+          )
+          write(stage_path, stage)
+
+          readme_path = 'README.md'
+          readme = read(readme_path)
+          if '- R4-02 Audit 基础设施' in readme:
+              raise RuntimeError('README already contains R4-02 summary')
+          lines = readme.splitlines()
+          insert_at = next((i + 1 for i, line in enumerate(lines) if line.startswith('- R4-01 已将 Persistence Store/Error/Pool/Migration/Health/Statistics')), None)
+          if insert_at is None:
+              raise RuntimeError('README R4-01 summary anchor missing')
+          lines.insert(insert_at, f'- R4-02 Audit 基础设施已将 AuditEvent/entity ID/payload/SHA-256/审计 SQL writer 收敛到 `crates/persistence-postgres/src/audit/`，并清理 Match Exchange、Player、Spreadsheet、Team Catalog、Team Force Delete 的重复/直写审计路径；`create_team` 的业务行与审计行改为同一事务提交。严格 hard gate run `{run_id}` 仅在专项、数据库冻结契约、architecture/frontend 与 Rust 全量回归通过后提交；18 个专用 PostgreSQL 集成测试与 destructive reset 未执行。当前状态为 `VERIFYING`。')
+          write(readme_path, '\n'.join(lines) + '\n')
+          '@
+          Set-Content -Path .tmp-r4-02-transform.py -Value $script -Encoding utf8
+          python .tmp-r4-02-transform.py
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+
+      - name: Freeze migrations dependencies protected sources
+        shell: pwsh
+        run: |
+          git diff --exit-code e3a1e2e082e82fcb82899abfd5e8646466fcad97 -- crates/persistence-postgres/migrations crates/persistence-postgres/Cargo.toml crates/persistence-postgres/build.rs crates/persistence-postgres/tests/postgres_integration.rs Cargo.toml Cargo.lock crates/domain crates/model-api crates/model-p4 crates/model-p7
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+
+      - name: Regenerate official Domain inventory
+        shell: pwsh
+        run: |
+          node scripts/generate-domain-type-inventory.mjs
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          node scripts/verify-domain-type-inventory.mjs
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+
+      - name: Run R4-02 minimum contracts
+        shell: pwsh
+        run: |
+          node scripts/verify-persistence-audit.mjs
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          npm run verify:persistence-foundation
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          node scripts/verify-database-migration-compatibility.mjs
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          node scripts/verify-force-team-delete.mjs
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          node scripts/verify-global-name-search.mjs
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          node scripts/verify_database_baseline.mjs
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+
+      - name: Format only allowed R4-02 Rust tree
+        shell: pwsh
+        run: |
+          cargo fmt --all
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          $allowed = @(
+            'crates/persistence-postgres/src/lib.rs',
+            'crates/persistence-postgres/src/audit/mod.rs',
+            'crates/persistence-postgres/src/audit/audit_event.rs',
+            'crates/persistence-postgres/src/audit/audit_payload.rs',
+            'crates/persistence-postgres/src/audit/audit_hash.rs',
+            'crates/persistence-postgres/src/audit/write_audit_event.rs',
+            'crates/persistence-postgres/src/match_exchange.rs',
+            'crates/persistence-postgres/src/player_catalog.rs',
+            'crates/persistence-postgres/src/spreadsheet_exchange.rs',
+            'crates/persistence-postgres/src/team_catalog.rs',
+            'crates/persistence-postgres/src/team_force_delete.rs'
+          )
+          $rustChanged = git diff --name-only e3a1e2e082e82fcb82899abfd5e8646466fcad97 -- '*.rs'
+          foreach ($path in $rustChanged) {
+            if ($allowed -notcontains $path) { throw "rustfmt touched out-of-scope Rust file: $path" }
+          }
+          cargo fmt --all -- --check
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+
+      - name: Verify architecture
+        shell: pwsh
+        run: |
+          npm run verify:architecture
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+
+      - name: Verify Persistence crate
+        shell: pwsh
+        run: |
+          cargo check --locked -p football-persistence-postgres
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          cargo test --locked -p football-persistence-postgres
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+
+      - name: Install Node dependencies
+        shell: pwsh
+        run: |
+          npm run setup
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+
+      - name: Verify full frontend
+        shell: pwsh
+        run: |
+          npm run verify:frontend
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+
+      - name: Verify workspace Clippy and tests
+        shell: pwsh
+        run: |
+          cargo clippy --locked --workspace --all-targets -- -D warnings
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          cargo test --locked --workspace
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+
+      - name: Recheck final contracts and diff scope
+        shell: pwsh
+        run: |
+          node scripts/verify-persistence-audit.mjs
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          npm run verify:architecture
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          git diff --exit-code e3a1e2e082e82fcb82899abfd5e8646466fcad97 -- crates/persistence-postgres/migrations crates/persistence-postgres/Cargo.toml crates/persistence-postgres/build.rs crates/persistence-postgres/tests/postgres_integration.rs Cargo.toml Cargo.lock crates/domain crates/model-api crates/model-p4 crates/model-p7
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+
+      - name: Commit verified R4-02 tree and remove temporary workflows
+        shell: pwsh
+        run: |
+          Remove-Item .tmp-r4-02-transform.py -ErrorAction SilentlyContinue
+          git rm .github/workflows/r4-02-audit-detail.yml .github/workflows/r4-02-hard-gate.yml
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add README.md package.json architecture/domain-type-inventory.json scripts/verify-persistence-audit.mjs crates/persistence-postgres/src docs/modular-rewrite/R04-persistence-foundation .github/workflows
+          git diff --cached --check
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          git commit -m 'refactor(r4-02): centralize audit infrastructure'
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          git push origin HEAD:agent/r4-02-audit-foundation
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
