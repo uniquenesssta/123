@@ -5,7 +5,8 @@ use crate::services::{
     ai_workspace::AiWorkspaceService, analytics::AnalyticsService, competition::CompetitionService,
     database::DatabaseService, exchange::ExchangeService, lineups::LineupService,
     players::PlayerService, postmatch::PostmatchService, prediction::PredictionService,
-    research::ResearchService, review::ReviewService, rules::RulesService, teams::TeamService,
+    release::ReleaseService, research::ResearchService, review::ReviewService, rules::RulesService,
+    teams::TeamService,
 };
 use std::sync::{atomic::AtomicBool, Arc};
 
@@ -24,6 +25,7 @@ pub(crate) struct ApplicationComposition {
     analytics: AnalyticsService,
     exchange: ExchangeService,
     ai_workspace: AiWorkspaceService,
+    release: ReleaseService,
     p4_worker_running: AtomicBool,
 }
 
@@ -42,6 +44,7 @@ pub(crate) struct ApplicationParts {
     pub(crate) analytics: AnalyticsService,
     pub(crate) exchange: ExchangeService,
     pub(crate) ai_workspace: AiWorkspaceService,
+    pub(crate) release: ReleaseService,
     pub(crate) p4_worker_running: AtomicBool,
 }
 
@@ -67,6 +70,7 @@ impl ApplicationComposition {
             analytics: AnalyticsService::new(),
             exchange: ExchangeService::new(),
             ai_workspace: AiWorkspaceService::new(),
+            release: ReleaseService::new(),
             p4_worker_running: AtomicBool::new(false),
         }
     }
@@ -87,6 +91,7 @@ impl ApplicationComposition {
             analytics: self.analytics,
             exchange: self.exchange,
             ai_workspace: self.ai_workspace,
+            release: self.release,
             p4_worker_running: self.p4_worker_running,
         }
     }

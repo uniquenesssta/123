@@ -4,7 +4,8 @@ use crate::services::{
     ai_workspace::AiWorkspaceService, analytics::AnalyticsService, competition::CompetitionService,
     database::DatabaseService, exchange::ExchangeService, lineups::LineupService,
     players::PlayerService, postmatch::PostmatchService, prediction::PredictionService,
-    research::ResearchService, review::ReviewService, rules::RulesService, teams::TeamService,
+    release::ReleaseService, research::ResearchService, review::ReviewService, rules::RulesService,
+    teams::TeamService,
 };
 use std::sync::atomic::AtomicBool;
 
@@ -23,6 +24,7 @@ pub struct ApplicationService {
     pub(crate) analytics: AnalyticsService,
     pub(crate) exchange: ExchangeService,
     pub(crate) ai_workspace: AiWorkspaceService,
+    pub(crate) release: ReleaseService,
     pub(crate) p4_worker_running: AtomicBool,
 }
 
@@ -44,6 +46,7 @@ impl ApplicationService {
             analytics: parts.analytics,
             exchange: parts.exchange,
             ai_workspace: parts.ai_workspace,
+            release: parts.release,
             p4_worker_running: parts.p4_worker_running,
         }
     }
