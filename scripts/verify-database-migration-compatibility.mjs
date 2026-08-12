@@ -7,11 +7,11 @@ const read = (relative) => fs.readFileSync(path.join(root, relative), "utf8");
 const failures = [];
 const check = (condition, message) => { if (!condition) failures.push(message); };
 
-const compatibility = read("crates/persistence-postgres/src/migration_compatibility.rs");
-const connection = read("crates/persistence-postgres/src/connection.rs");
+const compatibility = read("crates/persistence-postgres/src/migrations/reconcile_known_migrations.rs");
+const connection = read("crates/persistence-postgres/src/migrations/run_migrations.rs");
 const library = read("crates/persistence-postgres/src/lib.rs");
 
-check(library.includes("mod migration_compatibility;"), "PostgreSQL crate 未注册迁移兼容模块");
+check(library.includes("mod migrations;"), "PostgreSQL crate 未注册迁移基础设施模块");
 check(connection.includes("reconcile_known_legacy_migrations(&self.pool).await?;"), "数据库 migrate 未调用历史兼容桥");
 check(
   connection.indexOf("reconcile_known_legacy_migrations(&self.pool).await?;") < connection.indexOf("MIGRATOR.run(&self.pool).await?;"),

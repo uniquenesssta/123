@@ -1,17 +1,18 @@
 mod analytics;
 mod api_workspace;
 mod competitions;
-mod connection;
 mod dynamic_tags;
 mod entity_catalog;
+mod error;
 mod fact_pipeline_records;
 mod formation_catalog;
+mod health;
 mod jobs;
 mod lineup_chain;
 mod match_exchange;
 mod match_prediction;
 mod match_review_package;
-mod migration_compatibility;
+mod migrations;
 mod model_runs;
 mod monthly_workbooks;
 mod name_search;
@@ -20,6 +21,7 @@ mod p4_records;
 mod p4_workbench;
 mod parameter_lifecycle;
 mod player_catalog;
+mod pool;
 mod postmatch;
 mod release_acceptance;
 mod research_gateway_records;
@@ -27,43 +29,26 @@ mod review;
 mod role_resolution;
 mod routing;
 mod spreadsheet_exchange;
+mod statistics;
+mod store;
 mod team_catalog;
 mod team_features;
 mod team_force_delete;
 mod team_lineup_presets;
 
-pub use connection::{DatabaseHealth, DatabaseOptions, DatabaseStats};
+pub use error::{PersistenceError, PersistenceResult};
+pub use health::DatabaseHealth;
 pub use model_runs::ModelRunListItem;
+pub use pool::DatabaseOptions;
 pub use routing::ModelRegistration;
+pub use statistics::DatabaseStats;
+pub use store::PostgresStore;
 
 use football_domain::CompetitionKind;
 use serde_json::Value;
 use sha2::{Digest, Sha256};
-use sqlx::postgres::PgPool;
 use sqlx::Transaction;
-use thiserror::Error;
 use uuid::Uuid;
-
-#[derive(Debug, Error)]
-pub enum PersistenceError {
-    #[error("PostgreSQL 连接或查询失败：{0}")]
-    Sqlx(#[from] sqlx::Error),
-    #[error("数据库迁移失败：{0}")]
-    Migration(#[from] sqlx::migrate::MigrateError),
-    #[error("数据序列化失败：{0}")]
-    Serialization(#[from] serde_json::Error),
-    #[error("数据库数据不完整：{0}")]
-    InvalidState(String),
-    #[error("没有匹配到可用的赛事规则包和模型路由")]
-    RouteNotFound,
-}
-
-pub type PersistenceResult<T> = Result<T, PersistenceError>;
-
-#[derive(Clone)]
-pub struct PostgresStore {
-    pool: PgPool,
-}
 
 async fn write_audit_event(
     tx: &mut Transaction<'_, sqlx::Postgres>,
