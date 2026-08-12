@@ -1,8 +1,6 @@
 use super::AiWorkspaceService;
 use crate::{
-    ports::{
-        exchange::MatchLineupExchangePort, player::PlayerCatalogPort, team::TeamCatalogPort,
-    },
+    ports::{exchange::MatchLineupExchangePort, player::PlayerCatalogPort, team::TeamCatalogPort},
     use_cases::ai_workspace,
     ApplicationResult,
 };

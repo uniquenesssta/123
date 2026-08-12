@@ -121,47 +121,61 @@ where
         "update_team_profile" => {
             let team_id = required_uuid(&operation.payload, "team_id")?;
             let current = port.read_team(team_id).await?.profile;
-            let draft = TeamProfileDraft {
-                short_name: optional_text(&operation.payload, "short_name")
-                    .or_else(|| current.as_ref().and_then(|profile| profile.short_name.clone())),
-                team_type: optional_text(&operation.payload, "team_type")
-                    .or_else(|| current.as_ref().map(|profile| profile.team_type.clone()))
-                    .unwrap_or_else(|| "club".to_string()),
-                founded_year: optional_i16(&operation.payload, "founded_year")
-                    .or_else(|| current.as_ref().and_then(|profile| profile.founded_year)),
-                city: optional_text(&operation.payload, "city")
-                    .or_else(|| current.as_ref().and_then(|profile| profile.city.clone())),
-                stadium: optional_text(&operation.payload, "stadium")
-                    .or_else(|| current.as_ref().and_then(|profile| profile.stadium.clone())),
-                head_coach: optional_text(&operation.payload, "head_coach")
-                    .or_else(|| current.as_ref().and_then(|profile| profile.head_coach.clone())),
-                default_formation: optional_text(&operation.payload, "default_formation")
-                    .or_else(|| {
+            let draft =
+                TeamProfileDraft {
+                    short_name: optional_text(&operation.payload, "short_name").or_else(|| {
                         current
                             .as_ref()
-                            .and_then(|profile| profile.default_formation.clone())
+                            .and_then(|profile| profile.short_name.clone())
                     }),
-                tactical_style: optional_text(&operation.payload, "tactical_style")
-                    .or_else(|| current.as_ref().map(|profile| profile.tactical_style.clone()))
-                    .unwrap_or_else(|| "balanced".to_string()),
-                attack_rating: optional_f64(&operation.payload, "attack_rating")
-                    .or_else(|| current.as_ref().and_then(|profile| profile.attack_rating)),
-                midfield_rating: optional_f64(&operation.payload, "midfield_rating")
-                    .or_else(|| current.as_ref().and_then(|profile| profile.midfield_rating)),
-                defence_rating: optional_f64(&operation.payload, "defence_rating")
-                    .or_else(|| current.as_ref().and_then(|profile| profile.defence_rating)),
-                goalkeeper_rating: optional_f64(&operation.payload, "goalkeeper_rating").or_else(
-                    || current.as_ref().and_then(|profile| profile.goalkeeper_rating),
-                ),
-                reputation: optional_f64(&operation.payload, "reputation")
-                    .or_else(|| current.as_ref().and_then(|profile| profile.reputation)),
-                data_confidence: optional_f64(&operation.payload, "confidence")
-                    .or_else(|| current.as_ref().map(|profile| profile.data_confidence))
-                    .unwrap_or(operation.confidence),
-                notes: optional_text(&operation.payload, "notes")
-                    .or_else(|| current.as_ref().and_then(|profile| profile.notes.clone())),
-                metadata: operation_metadata(operation)?,
-            };
+                    team_type: optional_text(&operation.payload, "team_type")
+                        .or_else(|| current.as_ref().map(|profile| profile.team_type.clone()))
+                        .unwrap_or_else(|| "club".to_string()),
+                    founded_year: optional_i16(&operation.payload, "founded_year")
+                        .or_else(|| current.as_ref().and_then(|profile| profile.founded_year)),
+                    city: optional_text(&operation.payload, "city")
+                        .or_else(|| current.as_ref().and_then(|profile| profile.city.clone())),
+                    stadium: optional_text(&operation.payload, "stadium")
+                        .or_else(|| current.as_ref().and_then(|profile| profile.stadium.clone())),
+                    head_coach: optional_text(&operation.payload, "head_coach").or_else(|| {
+                        current
+                            .as_ref()
+                            .and_then(|profile| profile.head_coach.clone())
+                    }),
+                    default_formation: optional_text(&operation.payload, "default_formation")
+                        .or_else(|| {
+                            current
+                                .as_ref()
+                                .and_then(|profile| profile.default_formation.clone())
+                        }),
+                    tactical_style: optional_text(&operation.payload, "tactical_style")
+                        .or_else(|| {
+                            current
+                                .as_ref()
+                                .map(|profile| profile.tactical_style.clone())
+                        })
+                        .unwrap_or_else(|| "balanced".to_string()),
+                    attack_rating: optional_f64(&operation.payload, "attack_rating")
+                        .or_else(|| current.as_ref().and_then(|profile| profile.attack_rating)),
+                    midfield_rating: optional_f64(&operation.payload, "midfield_rating")
+                        .or_else(|| current.as_ref().and_then(|profile| profile.midfield_rating)),
+                    defence_rating: optional_f64(&operation.payload, "defence_rating")
+                        .or_else(|| current.as_ref().and_then(|profile| profile.defence_rating)),
+                    goalkeeper_rating: optional_f64(&operation.payload, "goalkeeper_rating")
+                        .or_else(|| {
+                            current
+                                .as_ref()
+                                .and_then(|profile| profile.goalkeeper_rating)
+                        }),
+                    reputation: optional_f64(&operation.payload, "reputation")
+                        .or_else(|| current.as_ref().and_then(|profile| profile.reputation)),
+                    data_confidence: optional_f64(&operation.payload, "confidence")
+                        .or_else(|| current.as_ref().map(|profile| profile.data_confidence))
+                        .unwrap_or(operation.confidence),
+                    notes: optional_text(&operation.payload, "notes")
+                        .or_else(|| current.as_ref().and_then(|profile| profile.notes.clone())),
+                    metadata: operation_metadata(operation)?,
+                };
             Ok(serde_json::to_value(
                 port.upsert_team_profile(team_id, &draft).await?,
             )?)

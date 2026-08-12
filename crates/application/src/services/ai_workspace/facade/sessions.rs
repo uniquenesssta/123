@@ -54,7 +54,12 @@ impl ApplicationService {
         attachments: &[ApiWorkspaceAttachment],
     ) -> ApplicationResult<ApiWorkspaceMessageRecord> {
         self.ai_workspace
-            .append_user_message(self.ai_workspace_session(), session_id, content, attachments)
+            .append_user_message(
+                self.ai_workspace_session(),
+                session_id,
+                content,
+                attachments,
+            )
             .await
     }
 

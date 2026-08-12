@@ -17,5 +17,8 @@ where
     } else {
         reason.trim()
     };
-    Ok(session.await?.reject_operation(operation_id, reason).await?)
+    Ok(session
+        .await?
+        .reject_operation(operation_id, reason)
+        .await?)
 }

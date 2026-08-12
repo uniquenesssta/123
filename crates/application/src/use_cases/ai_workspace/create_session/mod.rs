@@ -1,6 +1,5 @@
 use crate::{
-    ports::ai_workspace::ApiWorkspaceSessionPort,
-    use_cases::ai_workspace::presets,
+    ports::ai_workspace::ApiWorkspaceSessionPort, use_cases::ai_workspace::presets,
     ApplicationError, ApplicationResult,
 };
 use football_domain::{ApiWorkspaceSessionDraft, ApiWorkspaceSessionRecord};

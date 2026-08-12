@@ -14,7 +14,10 @@ use std::future::Future;
 use uuid::Uuid;
 
 impl AiWorkspaceService {
-    pub(crate) async fn usage_totals<P, F>(&self, session: F) -> ApplicationResult<OpenAiUsageTotals>
+    pub(crate) async fn usage_totals<P, F>(
+        &self,
+        session: F,
+    ) -> ApplicationResult<OpenAiUsageTotals>
     where
         P: ApiWorkspaceSessionPort + ResearchGatewayAuditPort,
         F: Future<Output = ApplicationResult<P>>,

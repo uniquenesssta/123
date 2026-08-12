@@ -1,7 +1,5 @@
 use crate::{
-    ports::{
-        exchange::MatchLineupExchangePort, player::PlayerCatalogPort, team::TeamCatalogPort,
-    },
+    ports::{exchange::MatchLineupExchangePort, player::PlayerCatalogPort, team::TeamCatalogPort},
     ApplicationError, ApplicationResult,
 };
 use football_domain::PlayerListQuery;

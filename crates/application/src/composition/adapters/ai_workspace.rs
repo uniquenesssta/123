@@ -1,8 +1,7 @@
 use super::super::port_registry::{map_persistence_error, ActiveDatabase};
 use crate::ports::{
     ai_workspace::{
-        ApiWorkspaceOperationPort, ApiWorkspaceSessionPort,
-        SerializedApiWorkspaceOperationResult,
+        ApiWorkspaceOperationPort, ApiWorkspaceSessionPort, SerializedApiWorkspaceOperationResult,
     },
     PortError, PortErrorKind, PortResult,
 };

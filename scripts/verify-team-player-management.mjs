@@ -124,8 +124,8 @@ assert(playersPage.includes("批量删除"), "球员中心缺少批量删除入�
 assert(teamsPage.includes("永久删除（无引用）"), "球队与人员工作区缺少无引用永久删除入口");
 assert(main.includes("openTeamApiWorkspace"), "球队未与AI问答联动");
 assert(main.includes("openPlayerApiWorkspace"), "球员未与AI问答联动");
-const apiWorkspaceApplication = text("crates/application/src/api_workspace.rs");
-assert(apiWorkspaceApplication.includes("let current = self.read_team(team_id).await?.profile"), "API球队档案提案未读取现有档案");
+const apiWorkspaceApplication = text("crates/application/src/use_cases/ai_workspace/apply_operation/dispatch.rs");
+assert(apiWorkspaceApplication.includes("let current = port.read_team(team_id).await?.profile"), "API球队档案提案未读取现有档案");
 assert(apiWorkspaceApplication.includes("or_else(|| current.as_ref()"), "API球队档案提案未采用增量合并");
 assert(entityStyles.includes(".entity-browser") && entityStyles.includes("@media (max-width: 1100px)") && entityStyles.includes("@media (max-width: 620px)"), "球队与球员资源中心缺少分级响应式布局");
 assert(entityStyles.includes("--shell-sidebar-expanded") && entityStyles.includes(".app-shell.dual-navigation.sidebar-collapsed"), "双层全局导航缺少展开与折叠常驻状态");

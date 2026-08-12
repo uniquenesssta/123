@@ -25,8 +25,8 @@ pub use service::ApplicationService;
 
 pub use model_shell::{default_match, default_parameters, p4_default_match, p4_default_parameters};
 pub use use_cases::ai_workspace::presets::{
-    spec as api_workspace_preset_spec, specs as api_workspace_preset_specs,
-    presets as api_workspace_presets, ApiWorkspacePresetSpec,
+    presets as api_workspace_presets, spec as api_workspace_preset_spec,
+    specs as api_workspace_preset_specs, ApiWorkspacePresetSpec,
 };
 pub use use_cases::ai_workspace::read_attachments::execute as read_api_workspace_attachments;
 pub use use_cases::research::fact_pipeline::ProcessResearchEvidenceCommand;

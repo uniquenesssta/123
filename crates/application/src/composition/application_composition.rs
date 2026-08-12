@@ -2,11 +2,10 @@ use super::PortRegistry;
 use crate::model_registry::ModelRegistry;
 use crate::model_shell::PublicModelStub;
 use crate::services::{
-    ai_workspace::AiWorkspaceService, analytics::AnalyticsService,
-    competition::CompetitionService, database::DatabaseService, exchange::ExchangeService,
-    lineups::LineupService, players::PlayerService, postmatch::PostmatchService,
-    prediction::PredictionService, research::ResearchService, review::ReviewService,
-    rules::RulesService, teams::TeamService,
+    ai_workspace::AiWorkspaceService, analytics::AnalyticsService, competition::CompetitionService,
+    database::DatabaseService, exchange::ExchangeService, lineups::LineupService,
+    players::PlayerService, postmatch::PostmatchService, prediction::PredictionService,
+    research::ResearchService, review::ReviewService, rules::RulesService, teams::TeamService,
 };
 use std::sync::{atomic::AtomicBool, Arc};
 
