@@ -391,20 +391,17 @@ impl PostgresStore {
             .execute(&mut *tx)
             .await?;
         }
-        sqlx::query(
-            r#"
-            INSERT INTO audit.events (id, event_type, entity_type, entity_id, payload)
-            VALUES ($1, 'spreadsheet_import_conflict_resolved', 'import_row', $2, $3)
-            "#,
+        crate::write_audit_event(
+            &mut tx,
+            "spreadsheet_import_conflict_resolved",
+            "import_row",
+            resolution.row_id.to_string(),
+            json!({
+                "batch_id": batch_id,
+                "selected_entity_id": resolution.selected_entity_id,
+                "skip": resolution.skip,
+            }),
         )
-        .bind(Uuid::new_v4())
-        .bind(resolution.row_id.to_string())
-        .bind(json!({
-            "batch_id": batch_id,
-            "selected_entity_id": resolution.selected_entity_id,
-            "skip": resolution.skip,
-        }))
-        .execute(&mut *tx)
         .await?;
         tx.commit().await?;
         self.read_spreadsheet_import_preview(batch_id).await
@@ -533,16 +530,13 @@ impl PostgresStore {
         .bind(finished_at)
         .execute(&mut *tx)
         .await?;
-        sqlx::query(
-            r#"
-            INSERT INTO audit.events (id, event_type, entity_type, entity_id, payload)
-            VALUES ($1, 'spreadsheet_import_committed', 'import_batch', $2, $3)
-            "#,
+        crate::write_audit_event(
+            &mut tx,
+            "spreadsheet_import_committed",
+            "import_batch",
+            batch_id.to_string(),
+            json!({"inserted": inserted, "updated": updated, "skipped": skipped}),
         )
-        .bind(Uuid::new_v4())
-        .bind(batch_id.to_string())
-        .bind(json!({"inserted": inserted, "updated": updated, "skipped": skipped}))
-        .execute(&mut *tx)
         .await?;
         tx.commit().await?;
         Ok(SpreadsheetImportCommitResult {
@@ -2353,13 +2347,13 @@ async fn resolve_or_create_import_team(
             .bind(json!({"source":"player_spreadsheet_auto_create","requires_profile_completion":true}))
             .execute(&mut **tx)
             .await?;
-            sqlx::query(
-                "INSERT INTO audit.events (id,event_type,entity_type,entity_id,payload) VALUES ($1,'team_created_from_player_import','team',$2,$3)",
+            crate::write_audit_event(
+                tx,
+                "team_created_from_player_import",
+                "team",
+                team_id.to_string(),
+                json!({"canonical_name":name,"normalized_name":normalized}),
             )
-            .bind(Uuid::new_v4())
-            .bind(team_id.to_string())
-            .bind(json!({"canonical_name":name,"normalized_name":normalized}))
-            .execute(&mut **tx)
             .await?;
             Ok(team_id)
         }

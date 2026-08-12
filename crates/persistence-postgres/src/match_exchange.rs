@@ -431,8 +431,13 @@ impl PostgresStore {
         let finished_at = Utc::now();
         sqlx::query("UPDATE catalog.import_batches SET status='succeeded',finished_at=$2,inserted_count=$3,updated_count=$4,skipped_count=$5,error_count=0 WHERE id=$1")
             .bind(batch_id).bind(finished_at).bind(inserted as i64).bind(updated as i64).bind(skipped as i64).execute(&mut *tx).await?;
-        sqlx::query("INSERT INTO audit.events(id,event_type,entity_type,entity_id,payload) VALUES($1,'match_lineup_import_committed','import_batch',$2,$3)")
-            .bind(Uuid::new_v4()).bind(batch_id.to_string()).bind(json!({"inserted":inserted,"updated":updated,"ended_previous":ended_previous,"skipped":skipped})).execute(&mut *tx).await?;
+        crate::write_audit_event(
+            &mut tx,
+            "match_lineup_import_committed",
+            "import_batch",
+            batch_id.to_string(),
+            json!({"inserted":inserted,"updated":updated,"ended_previous":ended_previous,"skipped":skipped}),
+        ).await?;
         tx.commit().await?;
         Ok(SpreadsheetImportCommitResult {
             batch_id,
