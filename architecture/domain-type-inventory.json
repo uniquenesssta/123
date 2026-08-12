@@ -24,13 +24,13 @@
     "targetPublicExportPolicy": "explicit re-export only"
   },
   "sourceDigest": "217241ac243726a5ab6805a7f169e222b97e78c7c971749a5904714af673ebdd",
-  "rustUsageDigest": "3e7ddbaca9baef1a65e6275ca6f07ef683f48ceec8e3df44f7fbb976da1e9060",
+  "rustUsageDigest": "a4a17a63e9063fb0ca32c85c90105ba8de8be4191b7c827ff6a5868108149135",
   "summary": {
     "typeCount": 365,
     "publicCompatibilityTypeCount": 365,
     "internalTypeCount": 0,
     "domainSourceFileCount": 129,
-    "scannedRustFileCount": 570,
+    "scannedRustFileCount": 597,
     "databaseMappedTypeCount": 299,
     "byTargetModule": {
       "ai_workspace": 16,
@@ -1862,7 +1862,9 @@
         "crates/domain/tests/serde_contracts/r2_07_module_paths.rs"
       ],
       "externalCallers": [
-        "crates/application/src/api_workspace.rs"
+        "crates/application/src/services/ai_workspace/facade/operations.rs",
+        "crates/application/src/services/ai_workspace/service/operations.rs",
+        "crates/application/src/use_cases/ai_workspace/apply_operation/mod.rs"
       ],
       "databaseMappings": []
     },
@@ -1917,9 +1919,7 @@
         "crates/domain/src/lib.rs",
         "crates/domain/tests/serde_contracts/r2_07_module_paths.rs"
       ],
-      "externalCallers": [
-        "crates/application/src/ports/ai_workspace/mod.rs"
-      ],
+      "externalCallers": [],
       "databaseMappings": []
     },
     {
@@ -2122,7 +2122,10 @@
         "crates/domain/tests/serde_contracts/r2_07_module_paths.rs"
       ],
       "externalCallers": [
-        "crates/application/src/api_workspace.rs",
+        "crates/application/src/services/ai_workspace/facade/sessions.rs",
+        "crates/application/src/services/ai_workspace/service/sessions.rs",
+        "crates/application/src/use_cases/ai_workspace/append_user_message/mod.rs",
+        "crates/application/src/use_cases/ai_workspace/read_attachments/mod.rs",
         "src-tauri/src/commands/api_workspace.rs"
       ],
       "databaseMappings": []
@@ -2174,8 +2177,11 @@
         "crates/domain/tests/serde_contracts/r2_07_module_paths.rs"
       ],
       "externalCallers": [
-        "crates/application/src/api_workspace.rs",
+        "crates/application/src/composition/adapters/ai_workspace.rs",
         "crates/application/src/ports/ai_workspace/mod.rs",
+        "crates/application/src/services/ai_workspace/facade/sessions.rs",
+        "crates/application/src/services/ai_workspace/service/sessions.rs",
+        "crates/application/src/use_cases/ai_workspace/read_generated_file/mod.rs",
         "crates/persistence-postgres/src/api_workspace.rs"
       ],
       "databaseMappings": [
@@ -2245,7 +2251,11 @@
         "crates/domain/tests/serde_contracts/r2_07_module_paths.rs"
       ],
       "externalCallers": [
-        "crates/application/src/api_workspace.rs",
+        "crates/application/src/composition/adapters/ai_workspace.rs",
+        "crates/application/src/ports/ai_workspace/mod.rs",
+        "crates/application/src/services/ai_workspace/facade/sessions.rs",
+        "crates/application/src/services/ai_workspace/service/sessions.rs",
+        "crates/application/src/use_cases/ai_workspace/append_assistant_bundle/mod.rs",
         "crates/persistence-postgres/src/api_workspace.rs"
       ],
       "databaseMappings": [
@@ -2418,8 +2428,12 @@
         "crates/domain/tests/serde_contracts/r2_07_module_paths.rs"
       ],
       "externalCallers": [
-        "crates/application/src/api_workspace.rs",
+        "crates/application/src/composition/adapters/ai_workspace.rs",
         "crates/application/src/ports/ai_workspace/mod.rs",
+        "crates/application/src/services/ai_workspace/facade/sessions.rs",
+        "crates/application/src/services/ai_workspace/service/sessions.rs",
+        "crates/application/src/use_cases/ai_workspace/append_assistant_bundle/mod.rs",
+        "crates/application/src/use_cases/ai_workspace/append_user_message/mod.rs",
         "crates/persistence-postgres/src/api_workspace.rs",
         "src-tauri/src/commands/api_workspace.rs"
       ],
@@ -2511,8 +2525,11 @@
         "crates/domain/tests/serde_contracts/r2_07_module_paths.rs"
       ],
       "externalCallers": [
-        "crates/application/src/api_workspace.rs",
+        "crates/application/src/composition/adapters/ai_workspace.rs",
         "crates/application/src/ports/ai_workspace/mod.rs",
+        "crates/application/src/services/ai_workspace/facade/sessions.rs",
+        "crates/application/src/services/ai_workspace/service/sessions.rs",
+        "crates/application/src/use_cases/ai_workspace/append_user_message/mod.rs",
         "crates/persistence-postgres/src/api_workspace.rs"
       ],
       "databaseMappings": [
@@ -2590,8 +2607,11 @@
         "crates/domain/tests/serde_contracts/r2_07_module_paths.rs"
       ],
       "externalCallers": [
-        "crates/application/src/api_workspace.rs",
+        "crates/application/src/composition/adapters/ai_workspace.rs",
         "crates/application/src/ports/ai_workspace/mod.rs",
+        "crates/application/src/services/ai_workspace/facade/sessions.rs",
+        "crates/application/src/services/ai_workspace/service/sessions.rs",
+        "crates/application/src/use_cases/ai_workspace/append_assistant_bundle/mod.rs",
         "crates/persistence-postgres/src/api_workspace.rs"
       ],
       "databaseMappings": [
@@ -2694,8 +2714,14 @@
         "crates/domain/tests/serde_contracts/r2_07_module_paths.rs"
       ],
       "externalCallers": [
-        "crates/application/src/api_workspace.rs",
+        "crates/application/src/composition/adapters/ai_workspace.rs",
         "crates/application/src/ports/ai_workspace/mod.rs",
+        "crates/application/src/services/ai_workspace/facade/operations.rs",
+        "crates/application/src/services/ai_workspace/service/operations.rs",
+        "crates/application/src/use_cases/ai_workspace/apply_operation/dispatch.rs",
+        "crates/application/src/use_cases/ai_workspace/apply_operation/metadata.rs",
+        "crates/application/src/use_cases/ai_workspace/read_operation/mod.rs",
+        "crates/application/src/use_cases/ai_workspace/reject_operation/mod.rs",
         "crates/persistence-postgres/src/api_workspace.rs"
       ],
       "databaseMappings": [
@@ -2775,7 +2801,7 @@
         "crates/domain/tests/serde_contracts/r2_07_module_paths.rs"
       ],
       "externalCallers": [
-        "crates/application/src/api_workspace.rs",
+        "crates/application/src/use_cases/ai_workspace/presets/mod.rs",
         "src-tauri/src/commands/api_workspace.rs"
       ],
       "databaseMappings": []
@@ -2835,8 +2861,12 @@
         "crates/domain/tests/serde_contracts/r2_07_module_paths.rs"
       ],
       "externalCallers": [
-        "crates/application/src/api_workspace.rs",
+        "crates/application/src/composition/adapters/ai_workspace.rs",
         "crates/application/src/ports/ai_workspace/mod.rs",
+        "crates/application/src/services/ai_workspace/facade/sessions.rs",
+        "crates/application/src/services/ai_workspace/service/sessions.rs",
+        "crates/application/src/use_cases/ai_workspace/append_assistant_bundle/mod.rs",
+        "crates/application/src/use_cases/ai_workspace/read_session/mod.rs",
         "crates/persistence-postgres/src/api_workspace.rs",
         "src-tauri/src/commands/api_workspace.rs"
       ],
@@ -2907,8 +2937,11 @@
         "crates/domain/tests/serde_contracts/r2_07_module_paths.rs"
       ],
       "externalCallers": [
-        "crates/application/src/api_workspace.rs",
+        "crates/application/src/composition/adapters/ai_workspace.rs",
         "crates/application/src/ports/ai_workspace/mod.rs",
+        "crates/application/src/services/ai_workspace/facade/sessions.rs",
+        "crates/application/src/services/ai_workspace/service/sessions.rs",
+        "crates/application/src/use_cases/ai_workspace/create_session/mod.rs",
         "crates/persistence-postgres/src/api_workspace.rs",
         "src-tauri/src/commands/api_workspace.rs"
       ],
@@ -3004,8 +3037,12 @@
         "crates/domain/tests/serde_contracts/r2_07_module_paths.rs"
       ],
       "externalCallers": [
-        "crates/application/src/api_workspace.rs",
+        "crates/application/src/composition/adapters/ai_workspace.rs",
         "crates/application/src/ports/ai_workspace/mod.rs",
+        "crates/application/src/services/ai_workspace/facade/sessions.rs",
+        "crates/application/src/services/ai_workspace/service/sessions.rs",
+        "crates/application/src/use_cases/ai_workspace/create_session/mod.rs",
+        "crates/application/src/use_cases/ai_workspace/list_sessions/mod.rs",
         "crates/persistence-postgres/src/api_workspace.rs",
         "src-tauri/src/commands/api_workspace.rs"
       ],
@@ -3098,7 +3135,7 @@
         "crates/domain/tests/serde_contracts/module_paths.rs"
       ],
       "externalCallers": [
-        "crates/application/src/api_workspace.rs",
+        "crates/application/src/use_cases/ai_workspace/apply_operation/payload.rs",
         "crates/application/src/use_cases/prediction/shared/readiness_checks.rs",
         "crates/persistence-postgres/src/match_exchange.rs",
         "crates/persistence-postgres/src/player_catalog.rs",
@@ -14225,9 +14262,13 @@
         "crates/domain/tests/serde_contracts/module_paths.rs"
       ],
       "externalCallers": [
-        "crates/application/src/api_workspace.rs",
+        "crates/application/src/composition/adapters/ai_workspace.rs",
         "crates/application/src/composition/adapters/research.rs",
+        "crates/application/src/ports/ai_workspace/mod.rs",
         "crates/application/src/ports/research/mod.rs",
+        "crates/application/src/services/ai_workspace/facade/sessions.rs",
+        "crates/application/src/services/ai_workspace/service/sessions.rs",
+        "crates/application/src/use_cases/ai_workspace/usage_totals/mod.rs",
         "crates/persistence-postgres/src/api_workspace.rs",
         "crates/persistence-postgres/src/research_gateway_records.rs"
       ],
@@ -17446,11 +17487,11 @@
         "crates/domain/tests/serde_contracts/module_paths.rs"
       ],
       "externalCallers": [
-        "crates/application/src/api_workspace.rs",
         "crates/application/src/composition/adapters/players.rs",
         "crates/application/src/ports/player/mod.rs",
         "crates/application/src/services/players/facade.rs",
         "crates/application/src/services/players/service.rs",
+        "crates/application/src/use_cases/ai_workspace/apply_operation/dispatch.rs",
         "crates/application/src/use_cases/players/add_player_ability_observation/mod.rs",
         "crates/persistence-postgres/src/player_catalog.rs",
         "src-tauri/src/commands/catalog.rs"
@@ -17735,11 +17776,11 @@
         "crates/domain/tests/serde_contracts/module_paths.rs"
       ],
       "externalCallers": [
-        "crates/application/src/api_workspace.rs",
         "crates/application/src/composition/adapters/players.rs",
         "crates/application/src/ports/player/mod.rs",
         "crates/application/src/services/players/facade.rs",
         "crates/application/src/services/players/service.rs",
+        "crates/application/src/use_cases/ai_workspace/apply_operation/dispatch.rs",
         "crates/application/src/use_cases/players/add_player_availability/mod.rs",
         "crates/persistence-postgres/src/player_catalog.rs",
         "src-tauri/src/commands/catalog.rs"
@@ -18324,11 +18365,11 @@
         "crates/domain/tests/serde_contracts/r2_07_module_paths.rs"
       ],
       "externalCallers": [
-        "crates/application/src/api_workspace.rs",
         "crates/application/src/composition/adapters/players.rs",
         "crates/application/src/ports/player/mod.rs",
         "crates/application/src/services/players/facade.rs",
         "crates/application/src/services/players/service.rs",
+        "crates/application/src/use_cases/ai_workspace/apply_operation/dispatch.rs",
         "crates/application/src/use_cases/players/add_player_dynamic_tag/mod.rs",
         "crates/persistence-postgres/src/dynamic_tags.rs",
         "src-tauri/src/commands/catalog.rs"
@@ -18765,11 +18806,11 @@
         "crates/domain/tests/serde_contracts/module_paths.rs"
       ],
       "externalCallers": [
-        "crates/application/src/api_workspace.rs",
         "crates/application/src/composition/adapters/players.rs",
         "crates/application/src/ports/player/mod.rs",
         "crates/application/src/services/players/facade.rs",
         "crates/application/src/services/players/service.rs",
+        "crates/application/src/use_cases/ai_workspace/context/mod.rs",
         "crates/application/src/use_cases/players/list_players/mod.rs",
         "crates/persistence-postgres/src/player_catalog.rs",
         "src-tauri/src/commands/catalog.rs"
@@ -19409,11 +19450,11 @@
         "crates/domain/tests/serde_contracts/module_paths.rs"
       ],
       "externalCallers": [
-        "crates/application/src/api_workspace.rs",
         "crates/application/src/composition/adapters/players.rs",
         "crates/application/src/ports/player/mod.rs",
         "crates/application/src/services/players/facade.rs",
         "crates/application/src/services/players/service.rs",
+        "crates/application/src/use_cases/ai_workspace/apply_operation/dispatch.rs",
         "crates/application/src/use_cases/players/add_player_name/mod.rs",
         "crates/persistence-postgres/src/player_catalog.rs",
         "src-tauri/src/commands/catalog.rs"
@@ -19757,11 +19798,11 @@
         "crates/domain/tests/serde_contracts/module_paths.rs"
       ],
       "externalCallers": [
-        "crates/application/src/api_workspace.rs",
         "crates/application/src/composition/adapters/players.rs",
         "crates/application/src/ports/player/mod.rs",
         "crates/application/src/services/players/facade.rs",
         "crates/application/src/services/players/service.rs",
+        "crates/application/src/use_cases/ai_workspace/apply_operation/dispatch.rs",
         "crates/application/src/use_cases/players/assign_player_position/mod.rs",
         "crates/persistence-postgres/src/player_catalog.rs",
         "src-tauri/src/commands/catalog.rs"
@@ -30240,11 +30281,11 @@
         "crates/domain/tests/serde_contracts/module_paths.rs"
       ],
       "externalCallers": [
-        "crates/application/src/api_workspace.rs",
         "crates/application/src/composition/adapters/teams.rs",
         "crates/application/src/ports/team/mod.rs",
         "crates/application/src/services/teams/facade.rs",
         "crates/application/src/services/teams/service.rs",
+        "crates/application/src/use_cases/ai_workspace/apply_operation/dispatch.rs",
         "crates/application/src/use_cases/teams/add_team_name/mod.rs",
         "crates/persistence-postgres/src/team_catalog.rs",
         "src-tauri/src/commands/catalog.rs"
@@ -31043,11 +31084,11 @@
         "crates/domain/tests/serde_contracts/module_paths.rs"
       ],
       "externalCallers": [
-        "crates/application/src/api_workspace.rs",
         "crates/application/src/composition/adapters/teams.rs",
         "crates/application/src/ports/team/mod.rs",
         "crates/application/src/services/teams/facade.rs",
         "crates/application/src/services/teams/service.rs",
+        "crates/application/src/use_cases/ai_workspace/apply_operation/dispatch.rs",
         "crates/application/src/use_cases/teams/upsert_team_profile/mod.rs",
         "crates/persistence-postgres/src/team_catalog.rs",
         "src-tauri/src/commands/catalog.rs"

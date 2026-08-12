@@ -1,3 +1,4 @@
+pub(crate) mod ai_workspace;
 pub(crate) mod analytics;
 pub(crate) mod competition;
 pub(crate) mod database;

@@ -2,10 +2,10 @@ use super::PortRegistry;
 use crate::model_registry::ModelRegistry;
 use crate::model_shell::PublicModelStub;
 use crate::services::{
-    analytics::AnalyticsService, competition::CompetitionService, database::DatabaseService,
-    exchange::ExchangeService, lineups::LineupService, players::PlayerService,
-    postmatch::PostmatchService, prediction::PredictionService, research::ResearchService,
-    review::ReviewService, rules::RulesService, teams::TeamService,
+    ai_workspace::AiWorkspaceService, analytics::AnalyticsService, competition::CompetitionService,
+    database::DatabaseService, exchange::ExchangeService, lineups::LineupService,
+    players::PlayerService, postmatch::PostmatchService, prediction::PredictionService,
+    research::ResearchService, review::ReviewService, rules::RulesService, teams::TeamService,
 };
 use std::sync::{atomic::AtomicBool, Arc};
 
@@ -23,6 +23,7 @@ pub(crate) struct ApplicationComposition {
     postmatch: PostmatchService,
     analytics: AnalyticsService,
     exchange: ExchangeService,
+    ai_workspace: AiWorkspaceService,
     p4_worker_running: AtomicBool,
 }
 
@@ -40,6 +41,7 @@ pub(crate) struct ApplicationParts {
     pub(crate) postmatch: PostmatchService,
     pub(crate) analytics: AnalyticsService,
     pub(crate) exchange: ExchangeService,
+    pub(crate) ai_workspace: AiWorkspaceService,
     pub(crate) p4_worker_running: AtomicBool,
 }
 
@@ -64,6 +66,7 @@ impl ApplicationComposition {
             postmatch: PostmatchService::new(),
             analytics: AnalyticsService::new(),
             exchange: ExchangeService::new(),
+            ai_workspace: AiWorkspaceService::new(),
             p4_worker_running: AtomicBool::new(false),
         }
     }
@@ -83,6 +86,7 @@ impl ApplicationComposition {
             postmatch: self.postmatch,
             analytics: self.analytics,
             exchange: self.exchange,
+            ai_workspace: self.ai_workspace,
             p4_worker_running: self.p4_worker_running,
         }
     }

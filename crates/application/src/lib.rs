@@ -1,4 +1,3 @@
-mod api_workspace;
 mod built_in_artifacts;
 mod composition;
 mod model_registry;
@@ -24,11 +23,12 @@ pub(crate) use composition::{DatabaseHealth, DatabaseStats, ModelRunListItem, Pe
 pub use model_registry::ModelRegistry;
 pub use service::ApplicationService;
 
-pub use api_workspace::{
-    api_workspace_preset_spec, api_workspace_preset_specs, api_workspace_presets,
-    read_api_workspace_attachments, ApiWorkspacePresetSpec,
-};
 pub use model_shell::{default_match, default_parameters, p4_default_match, p4_default_parameters};
+pub use use_cases::ai_workspace::presets::{
+    presets as api_workspace_presets, spec as api_workspace_preset_spec,
+    specs as api_workspace_preset_specs, ApiWorkspacePresetSpec,
+};
+pub use use_cases::ai_workspace::read_attachments::execute as read_api_workspace_attachments;
 pub use use_cases::research::fact_pipeline::ProcessResearchEvidenceCommand;
 pub use use_cases::research::openai_gateway::OpenAiResearchCommand;
 pub use use_cases::rules::package_factory::default_rule_package_template;

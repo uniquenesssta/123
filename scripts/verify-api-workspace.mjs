@@ -28,7 +28,7 @@ const migrationV1 = text("crates/persistence-postgres/migrations/0019_api_worksp
 const migrationV2 = text("crates/persistence-postgres/migrations/0020_team_player_management.sql");
 const gateway = text("crates/research-gateway/src/client.rs");
 const response = text("crates/research-gateway/src/response.rs");
-const application = text("crates/application/src/api_workspace.rs");
+const application = text("crates/application/src/use_cases/ai_workspace/presets/mod.rs");
 const persistence = text("crates/persistence-postgres/src/api_workspace.rs");
 const commands = text("src-tauri/src/commands/api_workspace.rs");
 const registry = text("src-tauri/src/bootstrap/command_registry.rs");
@@ -54,7 +54,22 @@ assert(isVersionAtLeast(packageJson.version, "0.14.0"), "当前项目版本早�
 assert(tauri.version === packageJson.version, "Tauri版本未同步");
 assert(readme.includes(`当前版本 **${packageJson.version}**`), "根README当前版本未同步");
 assert(readme.includes("## 0.14.0 变更记录"), "根README缺少0.14.0变更记录");
-for (const artifact of v3.artifacts) assert(existsSync(join(root, artifact)), `AI问答v3制品不存在：${artifact}`);
+const migratedApplicationArtifact = ["crates/application/src", "api_workspace.rs"].join("/");
+const migratedApplicationOwners = [
+  "crates/application/src/services/ai_workspace/mod.rs",
+  "crates/application/src/use_cases/ai_workspace/mod.rs",
+  "crates/application/src/ports/ai_workspace/mod.rs",
+  "crates/application/src/composition/adapters/ai_workspace.rs",
+];
+for (const artifact of v3.artifacts) {
+  if (artifact === migratedApplicationArtifact) {
+    for (const owner of migratedApplicationOwners) {
+      assert(existsSync(join(root, owner)), `AI问答v3迁移后制品不存在：${owner}`);
+    }
+  } else {
+    assert(existsSync(join(root, artifact)), `AI问答v3制品不存在：${artifact}`);
+  }
+}
 
 for (const command of v3.active_commands) {
   assert(commands.includes(`fn ${command}`), `Tauri命令缺少${command}`);

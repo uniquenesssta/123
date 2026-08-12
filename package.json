@@ -11,7 +11,7 @@
     "tauri:dev": "node scripts/run-tauri.mjs dev",
     "tauri:build": "node scripts/run-tauri.mjs build",
     "verify:frontend": "node scripts/verify-frontend.mjs",
-    "verify:architecture": "node scripts/architecture/verifyModuleBoundaries.mjs && node scripts/architecture/verifyStateOwnership.mjs && node scripts/architecture/verifyProtectedImports.mjs && node scripts/verify-domain-type-inventory.mjs && node scripts/verify-domain-root-exports.mjs && node scripts/verify-application-ports.mjs && node scripts/verify-database-service.mjs && node scripts/verify-competition-rules-service.mjs && node scripts/verify-teams-players-service.mjs && node scripts/verify-lineups-service.mjs && node scripts/verify-prediction-service.mjs && node scripts/verify-research-service.mjs && node scripts/verify-review-service.mjs && node scripts/verify-postmatch-service.mjs && node scripts/verify-analytics-service.mjs && node scripts/verify-exchange-service.mjs",
+    "verify:architecture": "node scripts/architecture/verifyModuleBoundaries.mjs && node scripts/architecture/verifyStateOwnership.mjs && node scripts/architecture/verifyProtectedImports.mjs && node scripts/verify-domain-type-inventory.mjs && node scripts/verify-domain-root-exports.mjs && node scripts/verify-application-ports.mjs && node scripts/verify-database-service.mjs && node scripts/verify-competition-rules-service.mjs && node scripts/verify-teams-players-service.mjs && node scripts/verify-lineups-service.mjs && node scripts/verify-prediction-service.mjs && node scripts/verify-research-service.mjs && node scripts/verify-review-service.mjs && node scripts/verify-postmatch-service.mjs && node scripts/verify-analytics-service.mjs && node scripts/verify-exchange-service.mjs && node scripts/verify-ai-workspace-service.mjs",
     "verify:browser-bootstrap": "node scripts/verify-browser-bootstrap.mjs",
     "verify:application-composition": "node scripts/verify-application-composition.mjs",
     "verify:domain-type-inventory": "node scripts/verify-domain-type-inventory.mjs",
@@ -97,7 +97,8 @@
     "verify:review-service": "node scripts/verify-review-service.mjs",
     "verify:postmatch-service": "node scripts/verify-postmatch-service.mjs",
     "verify:analytics-service": "node scripts/verify-analytics-service.mjs",
-    "verify:exchange-service": "node scripts/verify-exchange-service.mjs"
+    "verify:exchange-service": "node scripts/verify-exchange-service.mjs",
+    "verify:ai-workspace-service": "node scripts/verify-ai-workspace-service.mjs"
   },
   "dependencies": {
     "@tauri-apps/api": "2.11.1",

@@ -1,3 +1,4 @@
+mod ai_workspace;
 mod analytics;
 mod exchange;
 mod jobs;
