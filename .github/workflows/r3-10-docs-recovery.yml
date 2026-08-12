@@ -1,0 +1,96 @@
+name: R3-10 Docs Recovery
+on:
+  push:
+    branches:
+      - agent/r3-10-application-service-facade
+permissions:
+  contents: write
+jobs:
+  docs:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: windows-2025
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: agent/r3-10-application-service-facade
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Apply verifier migration, documentation, and full frontend gate
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $PSNativeCommandUseErrorActionPreference = $true
+          $raw = Get-Content -Raw -Encoding UTF8 '.github/workflows/r3-10-docs.yml'
+          $pattern = "(?s)          @'\r?\n(.*?)\r?\n          '@ \| Set-Content -Path r3_10_docs.py -Encoding UTF8"
+          $match = [regex]::Match($raw, $pattern)
+          if (-not $match.Success) { throw 'R3-10 documentation script not found' }
+          $lines = $match.Groups[1].Value -split "\r?\n"
+          $normalized = foreach ($line in $lines) {
+            if ($line.StartsWith('          ')) { $line.Substring(10) } else { $line }
+          }
+          [System.IO.File]::WriteAllText((Join-Path $PWD 'r3_10_docs.py'), ($normalized -join "`n"), [System.Text.UTF8Encoding]::new($false))
+          python r3_10_docs.py
+          Remove-Item r3_10_docs.py
+
+          @'
+          from pathlib import Path
+
+          verifier = Path('scripts/verify-database-reset.mjs')
+          text = verifier.read_text(encoding='utf-8')
+          old = '''const databaseFacade = read("crates/application/src/services/database/facade.rs");
+          const databaseService = read("crates/application/src/services/database/service.rs");
+          const resetUseCase = read("crates/application/src/use_cases/database/reset/mod.rs");'''
+          new = '''const databaseFacade = read("crates/application/src/services/database/facade.rs");
+          const databaseService = read("crates/application/src/services/database/service.rs");
+          const resetUseCase = read("crates/application/src/use_cases/database/reset/mod.rs");
+          const lifecycleReset = read("crates/application/src/use_cases/application_facade/database_lifecycle/reset.rs");
+          const p4Facade = read("crates/application/src/services/p4_orchestration/facade.rs");'''
+          if old not in text:
+              raise SystemExit('database reset source block missing')
+          text = text.replace(old, new)
+          old = 'requireText(databaseFacade, "self.connect_database(options)", "清空后自动恢复连接");'
+          new = 'requireText(lifecycleReset, "connect::execute(application, options)", "清空后自动恢复连接");'
+          if old not in text:
+              raise SystemExit('database reset reconnect assertion missing')
+          text = text.replace(old, new)
+          old = 'requireText(databaseFacade, "pub fn ensure_p4_orchestration_worker", "P4后台工作器幂等恢复入口");'
+          new = 'requireText(p4Facade, "pub fn ensure_p4_orchestration_worker", "P4后台工作器幂等恢复入口");'
+          if old not in text:
+              raise SystemExit('database reset P4 worker assertion missing')
+          text = text.replace(old, new)
+          verifier.write_text(text, encoding='utf-8', newline='\n')
+
+          root = Path('README.md')
+          root_text = root.read_text(encoding='utf-8')
+          anchor = '- AT2 最终严格 hard gate run `31592634518` / job `94100834403` 已整体 `SUCCESS`：新的 ApplicationService 兼容门面专项、Database/Competition-Rules/Research/Prediction/Application Composition、完整 architecture、Application check、Application tests 与 Clippy `-D warnings` 全部通过；AT2 提交为 `dd0aa8e32c8459acbbb68805b6fa099d92d17f91`。实施过程中被历史 owner 路径或源码变换精确匹配阻塞的 recovery runs 均在提交前硬停，未把失败树提交为生产结果。\n'
+          extra = '- 文档后完整 `verify:frontend` 首轮进一步发现 `verify-database-reset.mjs` 仍从 Database facade 检查自动重连与 P4 worker 入口；已仅将这两条历史断言迁到 `database_lifecycle/reset.rs` 与 `services/p4_orchestration/facade.rs`，强确认、自动重连和 worker 恢复语义未放宽。\n'
+          if anchor not in root_text:
+              raise SystemExit('root README AT2 validation anchor missing')
+          root.write_text(root_text.replace(anchor, anchor + extra, 1), encoding='utf-8', newline='\n')
+
+          task = Path('docs/modular-rewrite/R03-application-services/R03-10-application-service-facade.md')
+          task_text = task.read_text(encoding='utf-8')
+          anchor = '实施过程中若 recovery run 在源码变换、历史 owner 契约、rustfmt/Clippy 等硬门禁失败，提交步骤均被跳过；失败树未被描述或提交为通过结果。\n'
+          extra = '文档后完整 `verify:frontend` 首轮进一步发现历史 `verify-database-reset.mjs` 仍从 Database facade 读取自动重连和 P4 worker 恢复入口；验证器现分别改读 `database_lifecycle/reset.rs` 与 `services/p4_orchestration/facade.rs`，原数据库强确认、自动恢复连接和 worker 幂等恢复断言保持。该首轮失败未记为通过。\n'
+          if anchor not in task_text:
+              raise SystemExit('R3-10 task validation anchor missing')
+          task.write_text(task_text.replace(anchor, anchor + '\n' + extra, 1), encoding='utf-8', newline='\n')
+          '@ | Set-Content -Path r3_10_docs_recovery.py -Encoding UTF8
+          python r3_10_docs_recovery.py
+          Remove-Item r3_10_docs_recovery.py
+
+          npm run verify:frontend
+          npm run verify:architecture
+      - name: Commit verified documentation and verifier migration
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $PSNativeCommandUseErrorActionPreference = $true
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git rm .github/workflows/r3-10-docs.yml .github/workflows/r3-10-docs-runner.yml .github/workflows/r3-10-docs-recovery.yml
+          git add README.md docs/modular-rewrite/R03-application-services/README.md docs/modular-rewrite/R03-application-services/R03-10-application-service-facade.md scripts/verify-database-reset.mjs
+          git commit -m 'docs(r3-10): record facade convergence verification'
+          git push origin HEAD:agent/r3-10-application-service-facade
