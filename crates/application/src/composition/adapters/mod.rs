@@ -6,6 +6,7 @@ mod lineups;
 mod players;
 mod postmatch;
 mod prediction;
+mod release;
 mod research;
 mod review;
 mod teams;

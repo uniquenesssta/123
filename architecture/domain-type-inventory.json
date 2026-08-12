@@ -24,13 +24,13 @@
     "targetPublicExportPolicy": "explicit re-export only"
   },
   "sourceDigest": "217241ac243726a5ab6805a7f169e222b97e78c7c971749a5904714af673ebdd",
-  "rustUsageDigest": "a4a17a63e9063fb0ca32c85c90105ba8de8be4191b7c827ff6a5868108149135",
+  "rustUsageDigest": "4284fc0645e01e4d8dc00b4ba44505ed261b6314befcec0216d7e5835739ab64",
   "summary": {
     "typeCount": 365,
     "publicCompatibilityTypeCount": 365,
     "internalTypeCount": 0,
     "domainSourceFileCount": 129,
-    "scannedRustFileCount": 597,
+    "scannedRustFileCount": 613,
     "databaseMappedTypeCount": 299,
     "byTargetModule": {
       "ai_workspace": 16,
@@ -22339,7 +22339,7 @@
         "crates/domain/tests/serde_contracts/r2_07_module_paths.rs"
       ],
       "externalCallers": [
-        "crates/application/src/release_acceptance.rs"
+        "crates/application/src/use_cases/release/run_acceptance/summary.rs"
       ],
       "databaseMappings": []
     },
@@ -22427,7 +22427,14 @@
         "crates/domain/tests/serde_contracts/r2_07_module_paths.rs"
       ],
       "externalCallers": [
-        "crates/application/src/release_acceptance.rs",
+        "crates/application/src/use_cases/release/run_acceptance/checks/chain.rs",
+        "crates/application/src/use_cases/release/run_acceptance/checks/cost.rs",
+        "crates/application/src/use_cases/release/run_acceptance/checks/mod.rs",
+        "crates/application/src/use_cases/release/run_acceptance/checks/performance.rs",
+        "crates/application/src/use_cases/release/run_acceptance/checks/release.rs",
+        "crates/application/src/use_cases/release/run_acceptance/checks/security.rs",
+        "crates/application/src/use_cases/release/run_acceptance/report.rs",
+        "crates/application/src/use_cases/release/run_acceptance/summary.rs",
         "crates/persistence-postgres/src/release_acceptance.rs"
       ],
       "databaseMappings": [
@@ -22507,7 +22514,7 @@
         "crates/domain/tests/serde_contracts/r2_07_module_paths.rs"
       ],
       "externalCallers": [
-        "crates/application/src/release_acceptance.rs"
+        "crates/application/src/use_cases/release/run_acceptance/summary.rs"
       ],
       "databaseMappings": []
     },
@@ -22572,7 +22579,7 @@
         "crates/domain/tests/serde_contracts/r2_07_module_paths.rs"
       ],
       "externalCallers": [
-        "crates/application/src/release_acceptance.rs"
+        "crates/application/src/use_cases/release/run_acceptance/summary.rs"
       ],
       "databaseMappings": []
     },
@@ -22646,8 +22653,14 @@
         "crates/domain/tests/serde_contracts/r2_07_module_paths.rs"
       ],
       "externalCallers": [
-        "crates/application/src/ports/release/mod.rs",
-        "crates/application/src/release_acceptance.rs",
+        "crates/application/src/services/release/facade.rs",
+        "crates/application/src/services/release/service.rs",
+        "crates/application/src/use_cases/release/run_acceptance/checks/cost.rs",
+        "crates/application/src/use_cases/release/run_acceptance/checks/mod.rs",
+        "crates/application/src/use_cases/release/run_acceptance/mod.rs",
+        "crates/application/src/use_cases/release/run_acceptance/report.rs",
+        "crates/application/src/use_cases/release/run_acceptance/summary.rs",
+        "crates/application/src/use_cases/release/run_acceptance/validation.rs",
         "src-tauri/src/commands/release_acceptance.rs"
       ],
       "databaseMappings": []
@@ -22755,8 +22768,12 @@
         "crates/domain/tests/serde_contracts/r2_07_module_paths.rs"
       ],
       "externalCallers": [
+        "crates/application/src/composition/adapters/release.rs",
         "crates/application/src/ports/release/mod.rs",
-        "crates/application/src/release_acceptance.rs",
+        "crates/application/src/services/release/facade.rs",
+        "crates/application/src/services/release/service.rs",
+        "crates/application/src/use_cases/release/read_run/mod.rs",
+        "crates/application/src/use_cases/release/run_acceptance/mod.rs",
         "crates/persistence-postgres/src/release_acceptance.rs",
         "src-tauri/src/commands/release_acceptance.rs"
       ],
@@ -22839,8 +22856,11 @@
         "crates/domain/tests/serde_contracts/r2_07_module_paths.rs"
       ],
       "externalCallers": [
+        "crates/application/src/composition/adapters/release.rs",
         "crates/application/src/ports/release/mod.rs",
-        "crates/application/src/release_acceptance.rs",
+        "crates/application/src/services/release/facade.rs",
+        "crates/application/src/services/release/service.rs",
+        "crates/application/src/use_cases/release/list_runs/mod.rs",
         "crates/persistence-postgres/src/release_acceptance.rs",
         "src-tauri/src/commands/release_acceptance.rs"
       ],
@@ -22968,8 +22988,15 @@
         "crates/domain/tests/serde_contracts/r2_07_module_paths.rs"
       ],
       "externalCallers": [
+        "crates/application/src/composition/adapters/release.rs",
         "crates/application/src/ports/release/mod.rs",
-        "crates/application/src/release_acceptance.rs",
+        "crates/application/src/use_cases/release/run_acceptance/checks/chain.rs",
+        "crates/application/src/use_cases/release/run_acceptance/checks/cost.rs",
+        "crates/application/src/use_cases/release/run_acceptance/checks/mod.rs",
+        "crates/application/src/use_cases/release/run_acceptance/checks/performance.rs",
+        "crates/application/src/use_cases/release/run_acceptance/checks/release.rs",
+        "crates/application/src/use_cases/release/run_acceptance/checks/security.rs",
+        "crates/application/src/use_cases/release/run_acceptance/summary.rs",
         "crates/persistence-postgres/src/release_acceptance.rs"
       ],
       "databaseMappings": [
@@ -23035,7 +23062,13 @@
         "crates/domain/tests/serde_contracts/r2_07_module_paths.rs"
       ],
       "externalCallers": [
-        "crates/application/src/release_acceptance.rs",
+        "crates/application/src/use_cases/release/run_acceptance/checks/chain.rs",
+        "crates/application/src/use_cases/release/run_acceptance/checks/cost.rs",
+        "crates/application/src/use_cases/release/run_acceptance/checks/mod.rs",
+        "crates/application/src/use_cases/release/run_acceptance/checks/performance.rs",
+        "crates/application/src/use_cases/release/run_acceptance/checks/release.rs",
+        "crates/application/src/use_cases/release/run_acceptance/checks/security.rs",
+        "crates/application/src/use_cases/release/run_acceptance/summary.rs",
         "crates/persistence-postgres/src/release_acceptance.rs"
       ],
       "databaseMappings": [

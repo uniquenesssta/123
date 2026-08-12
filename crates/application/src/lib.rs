@@ -4,7 +4,6 @@ mod model_registry;
 mod model_shell;
 mod p4_orchestration;
 pub mod ports;
-mod release_acceptance;
 mod service;
 mod services;
 mod use_cases;

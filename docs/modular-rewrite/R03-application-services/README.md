@@ -173,3 +173,13 @@ R3-02 已正式关闭为 `DONE`。详细记录见 [`R03-02-database-service.md`]
 - AT2 Windows hard gate run `31512091398` / job `93848182746` 已通过最终 rustfmt、官方 Domain inventory、完整 architecture、workspace Clippy `-D warnings` 与 workspace tests；Application tests 35/35、Domain Serde 17/17、Spreadsheet IO 12/12 等均无失败。18 个 PostgreSQL 集成测试因未配置专用 `FOOTBALL_TEST_DATABASE_URL` 保持 `ignored`，未记为已执行。
 - 最终 clean Public Platform CI run `31513432237` / Windows Automated job `93852598090` 已在正式只读 workflow 与 clean HEAD `8719008ba63241d313fe02ce4328ee8d0a727e9d` 上整体 `SUCCESS`；artifact `9110944721` 大小 `14040458` 字节，SHA-256 `f0628be97bbfb13a765da3e4799bd7e8abf549352e391cb79ef1111cb9522a9f`。AT2 已关闭为 `DONE`。
 - AT3 hard gate run `31553249625` / job `93980269528` 已通过官方 Domain inventory、完整 architecture、37-Port 契约、新 AI Workspace 专项、Application check、Application tests 33/33、Clippy `-D warnings` 与 formatter scope；临时 workflow 已自删除。Ports 裸 JSON 阻塞通过显式序列化结果边界修复，历史验证器旧 owner 仅迁移读取源，不弱化断言。最终 clean Public Platform CI run `31553867879` / Windows Automated job `93982110497` 已整体 `SUCCESS`；artifact `9125791161` 大小 `13985122` 字节，SHA-256 `f5662c9e11d1fbd9da12e39efce9b44645144fce33bf6fe674011c2b7c1af0a6`。PR #19 已合并，merge commit `3d925671ccd424e25965ba9409189f32f920bc4f`；AT3 已关闭为 `DONE`，AT4 `READY`，R3-10 继续 `BLOCKED`。
+
+
+## R3-09 AT4 执行记录
+
+- AT4 Release 已完成源码迁移并进入 `VERIFYING`：旧 `release_acceptance.rs` owner 已删除，3 个公共入口由唯一 `ReleaseService` 编排，运行验收按校验、五组运行事实检查模块、汇总和报告哈希拆分。
+- `ReleaseAcceptancePort` 已对齐 runtime-facts / persist / list / read 真实能力并由 `ActiveDatabase` 适配；公共 ApplicationService/Tauri 契约、Persistence SQL/migration、前端产品行为、模型边界和依赖保持不变。
+- 最终严格 hard gate run `31568170298` / job `94024298468` 已 `SUCCESS`：Release 专项、历史发布契约、完整 architecture、官方 inventory、rustfmt、Application check、33/33 tests 与 Clippy `-D warnings` 全部通过。18 个专用 PostgreSQL 集成测试未执行且未记为通过。
+- 临时验证 workflow 已清理；PR #20 保持 Draft / Open / 未合并，等待最终 clean Public Platform CI 后再决定正式关闭。R3-09 继续 `IN_PROGRESS`，R3-10 继续 `BLOCKED`。
+- 首轮最终 clean Public Platform CI run `31568684129` / job `94025845936` 中独立 architecture 已通过，Windows Automated 在完整 frontend 的 deterministic protected-assets 门禁停止：AT4 为迁移旧 Release owner 而合法修改了受保护的 `scripts/verify-public-model-boundary.mjs` 权威扫描路径，但 `architecture/protected-assets.json` 尚未同步该验证器的新指纹；这不是 Release 业务、编译或契约失败，且该轮未被记为通过。
+- 按仓库既有 `chore(verify): refresh public-boundary fingerprint` 机制，只刷新该受保护验证器的 Git blob / fingerprint 与聚合 SHA；refresh workflow 在提交前实际执行 `verify-protected-assets-deterministic.mjs` 并通过。新 blob 为 `2e5adc250dba986b3b0441c7f26e762f8b9ef6f4`，fingerprint 为 `13f9ea8c98624e156208c836f837875f2a54104be15e6115f5e7f547d4f491e0`，聚合 SHA-256 为 `d74e0936b60c69f444a498405fed3e704b8db63b81f26b40036f772b4b6eac57`；保护文件集合、禁止私有资产规则和验证逻辑未放宽。
