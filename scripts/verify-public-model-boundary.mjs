@@ -73,7 +73,16 @@ assert(stub.includes("external-provider"), "公开 Stub 未声明外部提供器
 
 const sensitiveFiles = [
   "crates/application/src/use_cases/rules/package_factory/mod.rs",
-  "crates/application/src/release_acceptance.rs",
+  "crates/application/src/services/release/facade.rs",
+  "crates/application/src/services/release/service.rs",
+  "crates/application/src/use_cases/release/run_acceptance/mod.rs",
+  "crates/application/src/use_cases/release/run_acceptance/checks/chain.rs",
+  "crates/application/src/use_cases/release/run_acceptance/checks/performance.rs",
+  "crates/application/src/use_cases/release/run_acceptance/checks/security.rs",
+  "crates/application/src/use_cases/release/run_acceptance/checks/cost.rs",
+  "crates/application/src/use_cases/release/run_acceptance/checks/release.rs",
+  "crates/application/src/use_cases/release/run_acceptance/summary.rs",
+  "crates/application/src/use_cases/release/run_acceptance/report.rs",
   "crates/application/src/model_shell/fixtures.rs",
   "crates/model-stub/src/lib.rs",
   "crates/persistence-postgres/src/team_features.rs",
