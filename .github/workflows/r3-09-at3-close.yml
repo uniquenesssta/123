@@ -1,0 +1,99 @@
+name: R3-09 AT3 Close
+
+on:
+  push:
+    branches:
+      - rewrite/r3-08-review-postmatch-analytics
+
+permissions:
+  contents: write
+
+jobs:
+  close:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout stage branch
+        uses: actions/checkout@v4
+        with:
+          ref: rewrite/r3-08-review-postmatch-analytics
+          fetch-depth: 0
+
+      - name: Record AT3 DONE and open AT4
+        shell: bash
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+
+          RUN = '31553867879'
+          JOB = '93982110497'
+          ARTIFACT = '9125791161'
+          SIZE = '13985122'
+          DIGEST = 'f5662c9e11d1fbd9da12e39efce9b44645144fce33bf6fe674011c2b7c1af0a6'
+          MERGE = '3d925671ccd424e25965ba9409189f32f920bc4f'
+
+          def replace_required(path, old, new, min_count=1):
+              p = Path(path)
+              text = p.read_text(encoding='utf-8')
+              count = text.count(old)
+              if count < min_count:
+                  raise SystemExit(f'{path}: required text not found: {old[:180]!r}')
+              p.write_text(text.replace(old, new), encoding='utf-8', newline='\n')
+
+          root = Path('README.md')
+          text = root.read_text(encoding='utf-8')
+          replacements = [
+              ('AT3 AI Workspace 已完成源码迁移并进入 `VERIFYING`。', 'AT3 AI Workspace 已正式关闭为 `DONE`，AT4 Release 已开放为 `READY`。'),
+              ('AT3 AI Workspace 为 `VERIFYING`，AT4 Release 为 `NOT_STARTED`', 'AT3 AI Workspace 为 `DONE`，AT4 Release 为 `READY`'),
+              ('最终 clean Public Platform CI 尚待执行，因此 AT3 当前保持 `VERIFYING`；AT4 Release 保持 `NOT_STARTED`。',
+               f'最终 clean Public Platform CI run `{RUN}` / Windows Automated job `{JOB}` 已整体 `SUCCESS`；validation evidence artifact `{ARTIFACT}` 大小 `{SIZE}` 字节，SHA-256 `{DIGEST}`。PR #19 已合并，merge commit `{MERGE}`；AT3 正式关闭为 `DONE`，AT4 Release 开放为 `READY`。'),
+          ]
+          changed = False
+          for old, new in replacements:
+              if old in text:
+                  text = text.replace(old, new)
+                  changed = True
+          if not changed:
+              raise SystemExit('README.md: no AT3 closure marker found')
+          root.write_text(text, encoding='utf-8', newline='\n')
+
+          task = Path('docs/modular-rewrite/R03-application-services/R03-09-exchange-ai-workspace-and-release.md')
+          text = task.read_text(encoding='utf-8')
+          marker = '## Atomic Task 3 — AI Workspace\n\n状态：`VERIFYING`'
+          if marker not in text:
+              raise SystemExit('R03-09 task doc: AT3 VERIFYING marker not found')
+          text = text.replace(marker, '## Atomic Task 3 — AI Workspace\n\n状态：`DONE`', 1)
+          old_tail = '- PR #19 当前保持 draft 且未合并；最终 clean Public Platform CI / Windows Automated 尚待执行，因此 AT3 当前保持 `VERIFYING`，不得提前关闭为 `DONE`；AT4 Release 保持 `NOT_STARTED`。'
+          new_tail = (f'- 首次 clean PR CI run `31553692737` 的 architecture 已通过，但 Windows Automated 因历史 v3 artifact 清单仍指向已删除的 `crates/application/src/api_workspace.rs` 而失败；合同文件未修改，仅将验证器映射到新的 authoritative 模块集合。恢复 run `{RUN}` / Windows Automated job `{JOB}` 已整体 `SUCCESS`，architecture、完整 Windows automated acceptance 与 validation evidence upload 均通过；artifact `{ARTIFACT}` 大小 `{SIZE}` 字节，SHA-256 `{DIGEST}`。\n'
+                      f'- PR #19 已正式合并到阶段分支，merge commit `{MERGE}`。AT3 正式关闭为 `DONE`；Atomic Task 4 — Release 开放为 `READY`，R3-10 继续 `BLOCKED`。')
+          if old_tail not in text:
+              raise SystemExit('R03-09 task doc: pending validation tail not found')
+          text = text.replace(old_tail, new_tail, 1)
+          task.write_text(text, encoding='utf-8', newline='\n')
+
+          stage = Path('docs/modular-rewrite/R03-application-services/README.md')
+          text = stage.read_text(encoding='utf-8')
+          old = '- Atomic Task 3 — AI Workspace：`VERIFYING`。旧 `crates/application/src/api_workspace.rs` 已删除，12 个既有 ApplicationService 入口迁入唯一 `AiWorkspaceService` 与独立 Use Cases；Session / Context / Operation / Presets / Attachments 已分责，Apply Operation 进一步拆为 orchestration / dispatch / payload / metadata。'
+          new = '- Atomic Task 3 — AI Workspace：`DONE`。旧 `crates/application/src/api_workspace.rs` 已删除，12 个既有 ApplicationService 入口迁入唯一 `AiWorkspaceService` 与独立 Use Cases；Session / Context / Operation / Presets / Attachments 已分责，Apply Operation 进一步拆为 orchestration / dispatch / payload / metadata。'
+          if old not in text:
+              raise SystemExit('stage README: AT3 VERIFYING line not found')
+          text = text.replace(old, new, 1)
+          text = text.replace('- Atomic Task 4 — Release：`NOT_STARTED`。', '- Atomic Task 4 — Release：`READY`。', 1)
+          pending = '- AT3 hard gate run `31553249625` / job `93980269528` 已通过官方 Domain inventory、完整 architecture、37-Port 契约、新 AI Workspace 专项、Application check、Application tests 33/33、Clippy `-D warnings` 与 formatter scope；临时 workflow 已自删除。Ports 裸 JSON 阻塞通过显式序列化结果边界修复，历史验证器旧 owner 仅迁移读取源，不弱化断言。最终 clean Public Platform CI 尚待执行，因此 AT3 保持 `VERIFYING`，AT4 `NOT_STARTED`，R3-10 继续 `BLOCKED`。'
+          closed = (f'- AT3 hard gate run `31553249625` / job `93980269528` 已通过官方 Domain inventory、完整 architecture、37-Port 契约、新 AI Workspace 专项、Application check、Application tests 33/33、Clippy `-D warnings` 与 formatter scope；临时 workflow 已自删除。Ports 裸 JSON 阻塞通过显式序列化结果边界修复，历史验证器旧 owner 仅迁移读取源，不弱化断言。最终 clean Public Platform CI run `{RUN}` / Windows Automated job `{JOB}` 已整体 `SUCCESS`；artifact `{ARTIFACT}` 大小 `{SIZE}` 字节，SHA-256 `{DIGEST}`。PR #19 已合并，merge commit `{MERGE}`；AT3 已关闭为 `DONE`，AT4 `READY`，R3-10 继续 `BLOCKED`。')
+          if pending not in text:
+              raise SystemExit('stage README: AT3 pending validation line not found')
+          text = text.replace(pending, closed, 1)
+          stage.write_text(text, encoding='utf-8', newline='\n')
+          PY
+
+      - name: Remove temporary workflow and commit
+        shell: bash
+        run: |
+          git rm .github/workflows/r3-09-at3-close.yml
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add README.md docs/modular-rewrite/R03-application-services/README.md docs/modular-rewrite/R03-application-services/R03-09-exchange-ai-workspace-and-release.md
+          git diff --cached --check
+          git commit -m "docs(r3-09): close AI workspace AT3"
+          git push origin HEAD:rewrite/r3-08-review-postmatch-analytics
