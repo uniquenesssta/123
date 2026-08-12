@@ -1,0 +1,106 @@
+name: R3-10 AT2 Recovery 4
+on:
+  push:
+    branches:
+      - agent/r3-10-application-service-facade
+permissions:
+  contents: write
+jobs:
+  at2:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: windows-2025
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: agent/r3-10-application-service-facade
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - uses: dtolnay/rust-toolchain@master
+        with:
+          toolchain: 1.88.0
+          components: rustfmt,clippy
+      - name: Execute final AT2 transform and strict gates
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $PSNativeCommandUseErrorActionPreference = $true
+
+          function Extract-Python([string]$Workflow, [string]$Target) {
+            $raw = Get-Content -Raw -Encoding UTF8 $Workflow
+            $escaped = [regex]::Escape($Target)
+            $pattern = "(?s)          @'\r?\n(.*?)\r?\n          '@ \| Set-Content -Path $escaped -Encoding UTF8"
+            $match = [regex]::Match($raw, $pattern)
+            if (-not $match.Success) { throw "Embedded script not found: $Target" }
+            $lines = $match.Groups[1].Value -split "\r?\n"
+            $normalized = foreach ($line in $lines) {
+              if ($line.StartsWith('          ')) { $line.Substring(10) } else { $line }
+            }
+            [System.IO.File]::WriteAllText((Join-Path $PWD $Target), ($normalized -join "`n"), [System.Text.UTF8Encoding]::new($false))
+          }
+
+          Extract-Python '.github/workflows/r3-10-at2.yml' 'r3_10_at2.py'
+          Extract-Python '.github/workflows/r3-10-at2-recovery2.yml' 'patch_at2.py'
+          python patch_at2.py
+          Remove-Item patch_at2.py
+          python r3_10_at2.py
+          Remove-Item r3_10_at2.py
+
+          @'
+          from pathlib import Path
+
+          path = Path('scripts/verify-competition-rules-service.mjs')
+          text = path.read_text(encoding='utf-8')
+          old = '''const bootstrap = read("crates/application/src/services/database/bootstrap.rs");
+          const databaseFacade = read("crates/application/src/services/database/facade.rs");'''
+          new = '''const bootstrap = read("crates/application/src/services/database/bootstrap.rs");
+          const applicationBootstrap = read("crates/application/src/use_cases/application_facade/bootstrap.rs");
+          const lifecycleInitialize = read("crates/application/src/use_cases/application_facade/database_lifecycle/initialize.rs");
+          const databaseFacade = read("crates/application/src/services/database/facade.rs");'''
+          if old not in text:
+              raise SystemExit('competition/rules authoritative source block missing')
+          text = text.replace(old, new)
+          replacements = [
+              ('check(bootstrap.includes("self.competition.load_hierarchy(&active)"), "bootstrap 未委托 Competition Service");',
+               'check(applicationBootstrap.includes("application.competition.load_hierarchy(&active)"), "bootstrap 未委托 Competition Service");'),
+              ('check(bootstrap.includes("self.rules.load_catalog(&active)"), "bootstrap 未委托 Rules Service");',
+               'check(applicationBootstrap.includes("application.rules.load_catalog(&active)"), "bootstrap 未委托 Rules Service");'),
+              ('databaseFacade.includes("self.rules") && databaseFacade.includes("register_built_ins")',
+               'lifecycleInitialize.includes(".rules") && lifecycleInitialize.includes("register_built_ins")'),
+              ('!databaseFacade.includes("store.register_rule_package") &&\n    !databaseFacade.includes("store.ensure_type_default_binding")',
+               '!lifecycleInitialize.includes("store.register_rule_package") &&\n    !lifecycleInitialize.includes("store.ensure_type_default_binding")'),
+          ]
+          for before, after in replacements:
+              if before not in text:
+                  raise SystemExit(f'competition/rules assertion missing: {before}')
+              text = text.replace(before, after)
+          path.write_text(text, encoding='utf-8', newline='\n')
+          '@ | Set-Content -Path migrate_competition_rules.py -Encoding UTF8
+          python migrate_competition_rules.py
+          Remove-Item migrate_competition_rules.py
+
+          cargo fmt --all
+          cargo fmt --all -- --check
+          node scripts/generate-domain-type-inventory.mjs
+          node scripts/verify-application-service-facade.mjs
+          node scripts/verify-database-service.mjs
+          node scripts/verify-competition-rules-service.mjs
+          node scripts/verify-research-service.mjs
+          node scripts/verify-prediction-service.mjs
+          node scripts/verify-application-composition.mjs
+          npm run verify:architecture
+          cargo check --locked -p football-application
+          cargo test --locked -p football-application
+          cargo clippy --locked -p football-application --all-targets -- -D warnings
+      - name: Commit fully verified AT2
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $PSNativeCommandUseErrorActionPreference = $true
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git rm .github/workflows/r3-10-at2.yml .github/workflows/r3-10-at2-runner.yml .github/workflows/r3-10-at2-recovery.yml .github/workflows/r3-10-at2-recovery2.yml .github/workflows/r3-10-at2-recovery3.yml .github/workflows/r3-10-at2-recovery4.yml
+          git add crates/application scripts architecture/domain-type-inventory.json package.json
+          git commit -m 'refactor(r3-10): converge application compatibility facade'
+          git push origin HEAD:agent/r3-10-application-service-facade
