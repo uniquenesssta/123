@@ -1,0 +1,44 @@
+name: R4-01 Gate Patch
+
+on:
+  push:
+    branches:
+      - agent/r4-01-store-error-pool
+
+permissions:
+  contents: write
+
+jobs:
+  patch:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: windows-2025
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: agent/r4-01-store-error-pool
+          fetch-depth: 0
+      - name: Patch strict gate baseline proof
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $path = '.github/workflows/r4-01-hard-gate.yml'
+          $text = Get-Content -Raw -Encoding UTF8 $path
+          $old = 'entries += [''    {"path":"crates/persistence-postgres/tests/postgres_integration.rs","git_blob_sha1":"b378d734495c0846818e7cd06c30d93f69131231"}'']'
+          $new = 'entries += [''    {"path":"crates/persistence-postgres/tests/postgres_integration.rs","git_blob_sha1":"44dcd594ac739ab341bd5009f613d5de6fd1aa1e"}'']'
+          if (-not $text.Contains($old)) { throw 'stale integration fingerprint token missing' }
+          $text = $text.Replace($old, $new)
+          $scopeOld = '          git diff --exit-code $env:BASE_SHA -- crates/persistence-postgres/Cargo.toml Cargo.lock'
+          $scopeNew = "          git diff --exit-code `$env:BASE_SHA -- crates/persistence-postgres/Cargo.toml crates/persistence-postgres/build.rs crates/persistence-postgres/tests/postgres_integration.rs Cargo.lock"
+          if (-not $text.Contains($scopeOld)) { throw 'immutable scope token missing' }
+          $text = $text.Replace($scopeOld, $scopeNew)
+          Set-Content -Path $path -Value $text -Encoding UTF8
+      - name: Commit patch and self-delete
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git rm .github/workflows/r4-01-gate-patch.yml
+          git add .github/workflows/r4-01-hard-gate.yml
+          git commit -m 'ci(r4-01): prove baseline source fingerprint refresh'
+          git push origin HEAD:agent/r4-01-store-error-pool
