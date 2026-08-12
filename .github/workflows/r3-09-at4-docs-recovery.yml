@@ -1,0 +1,60 @@
+name: R3-09 AT4 Docs Recovery
+
+on:
+  push:
+    branches:
+      - agent/r3-09-at4-release
+
+permissions:
+  contents: write
+
+jobs:
+  docs:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: windows-2025
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: agent/r3-09-at4-release
+      - name: Record clean CI failure and protected fingerprint recovery
+        shell: pwsh
+        run: |
+          @'
+          from pathlib import Path
+
+          files = [
+              Path('README.md'),
+              Path('docs/modular-rewrite/R03-application-services/R03-09-exchange-ai-workspace-and-release.md'),
+              Path('docs/modular-rewrite/R03-application-services/README.md'),
+          ]
+          note = ('- 首轮最终 clean Public Platform CI run `31568684129` / job `94025845936` 中独立 architecture 已通过，'
+                  'Windows Automated 在完整 frontend 的 deterministic protected-assets 门禁停止：AT4 为迁移旧 Release owner 而合法修改了受保护的 '
+                  '`scripts/verify-public-model-boundary.mjs` 权威扫描路径，但 `architecture/protected-assets.json` 尚未同步该验证器的新指纹；'
+                  '这不是 Release 业务、编译或契约失败，且该轮未被记为通过。\n'
+                  '- 按仓库既有 `chore(verify): refresh public-boundary fingerprint` 机制，只刷新该受保护验证器的 Git blob / fingerprint 与聚合 SHA；'
+                  'refresh workflow 在提交前实际执行 `verify-protected-assets-deterministic.mjs` 并通过。新 blob 为 '
+                  '`2e5adc250dba986b3b0441c7f26e762f8b9ef6f4`，fingerprint 为 '
+                  '`13f9ea8c98624e156208c836f837875f2a54104be15e6115f5e7f547d4f491e0`，聚合 SHA-256 为 '
+                  '`d74e0936b60c69f444a498405fed3e704b8db63b81f26b40036f772b4b6eac57`；保护文件集合、禁止私有资产规则和验证逻辑未放宽。\n')
+
+          for path in files:
+              text = path.read_text(encoding='utf-8')
+              if '31568684129' in text:
+                  continue
+              if path.name == 'README.md' and '## R3-09 AT4 Release Service（VERIFYING）' in text:
+                  anchor = '- 18 个需要专用可写 `FOOTBALL_TEST_DATABASE_URL` 的 PostgreSQL 集成测试未在本 hard gate 执行，未记为通过；本 AT 未执行破坏性数据库验证。临时 hard-gate / inventory-refresh workflow 已清理。\n'
+              elif path.name == 'R03-09-exchange-ai-workspace-and-release.md':
+                  anchor = '- 18 个需要专用可写 `FOOTBALL_TEST_DATABASE_URL` 的 PostgreSQL 集成测试未在本 hard gate 执行，未记为通过；未执行破坏性数据库验证。\n'
+              else:
+                  anchor = '- 临时验证 workflow 已清理；PR #20 保持 Draft / Open / 未合并，等待最终 clean Public Platform CI 后再决定正式关闭。R3-09 继续 `IN_PROGRESS`，R3-10 继续 `BLOCKED`。\n'
+              if anchor not in text:
+                  raise SystemExit(f'anchor not found: {path}')
+              text = text.replace(anchor, anchor + note, 1)
+              path.write_text(text, encoding='utf-8')
+          '@ | python -
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add README.md docs/modular-rewrite/R03-application-services/R03-09-exchange-ai-workspace-and-release.md docs/modular-rewrite/R03-application-services/README.md
+          git rm .github/workflows/r3-09-at4-docs-recovery.yml
+          git commit -m "docs(r3-09): record protected fingerprint recovery"
+          git push origin HEAD:agent/r3-09-at4-release
