@@ -1,0 +1,28 @@
+name: R3-09 AT4 Inventory Refresh
+
+on:
+  push:
+    branches:
+      - agent/r3-09-at4-release
+
+permissions:
+  contents: write
+
+jobs:
+  refresh:
+    runs-on: windows-2025
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Refresh inventory and remove workflow
+        shell: pwsh
+        run: |
+          node scripts/generate-domain-type-inventory.mjs
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add architecture/domain-type-inventory.json
+          git rm .github/workflows/r3-09-at4-inventory-refresh.yml
+          git commit -m "chore(r3-09): refresh final domain inventory"
+          git push origin HEAD:agent/r3-09-at4-release
