@@ -54,5 +54,6 @@ R4-01 完成前保持 `READY/VERIFYING`，只有目标职责切换为唯一 owne
 - PR #24 clean Public Platform CI run `31675727990` / Windows automated delivery job `94369762967`：`SUCCESS`；PR 按固定 HEAD `202648df6aa1f9a14eb03bdcabcbd5ee0a271e56` 合并到 `rewrite/r4-persistence-foundation`，merge commit `0e5a68e09c6c06204b926f4d30c45262740d983b`。
 - 合并后 stage Public Platform CI run `31677600876` / job `94375513281`：`SUCCESS`；artifact `9172855279`（`windows-automated-delivery-evidence-0e5a68e09c6c06204b926f4d30c45262740d983b`）大小 `13909093` 字节，SHA-256 `31719ff04f00eb944c84fcd37dbbda3fa6252f7d55bc42a1a8af3d903cad3544`。
 - formal-closeout preparation runs `31679755024` 与 `31679826851` 因旧 workflow 的内嵌 Python 多行文本破坏 YAML block 缩进而在调度前失败（0 job）；run `31679847327` 已进入 helper，但因状态校验误把历史兼容段的第二个 `VERIFYING` 也计入而 fail-fast；run `31679942355` 已生成目标文档内容，但 `git diff --check` 检出 stage README 尾部新增空白行后停止。四次均未产生 closeout commit、未修改生产源码；恢复 helper 改为精确状态 marker 并规范单个 EOF 换行，最终提交前 workflow/helper 均自删除。
+- formal closeout workflow run `31680032287` 成功生成并推送文档收口提交 `56f22e0d2afab301668e6cfb8b1b447d59b58150`；该提交相对生产 merge commit 的净变化严格只有根 `README.md`、本阶段索引和 R4-03 节点记录三份文档，临时 `.github` workflow/helper 为零差异。
 - 18 个要求专用可写 `FOOTBALL_TEST_DATABASE_URL` 的 PostgreSQL 集成测试仍未执行；未执行 destructive database reset。
 - R4-03 正式关闭为 `DONE`；R4-04 开放为 `READY`。本收口未包含任何 R4-04 生产源码改动。
