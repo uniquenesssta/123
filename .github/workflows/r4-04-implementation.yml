@@ -22,6 +22,7 @@ jobs:
       R4_04_VERIFIER_FAILED_RUN: 31686951586
       R4_04_DATABASE_FINGERPRINT_FAILED_RUN: 31687122419
       R4_04_RUST_COMPILE_FAILED_RUN: 31687372054
+      R4_04_DATABASE_SERVICE_GATE_FAILED_RUN: 31687732166
       npm_config_cache: ${{ github.workspace }}/../.npm-cache
     steps:
       - name: Checkout R4-04 branch
@@ -129,6 +130,7 @@ jobs:
               'architecture/database-baseline.json',
               'architecture/domain-type-inventory.json',
               'package.json',
+              'scripts/verify-database-service.mjs',
               'scripts/verify-persistence-adapters.mjs',
               'docs/modular-rewrite/R04-persistence-foundation/R04-04-port-adapter-注册.md',
               'docs/modular-rewrite/R04-persistence-foundation/README.md'
@@ -152,6 +154,7 @@ jobs:
           python .github/r4-04-apply.py record
           python .github/r4-04-record-fix.py
           npm run verify:persistence-adapters
+          npm run verify:database-service
           node scripts/verify_database_baseline.mjs
           git diff --check
 
@@ -161,7 +164,7 @@ jobs:
           $ErrorActionPreference = 'Stop'
           $PSNativeCommandUseErrorActionPreference = $true
           git rm .github/r4-04-apply.py .github/r4-04-run.py .github/r4-04-record-fix.py .github/r4-04-sync-db-baseline.py .github/workflows/r4-04-audit.yml .github/workflows/r4-04-implementation.yml
-          git add README.md architecture/database-baseline.json architecture/domain-type-inventory.json package.json scripts/verify-persistence-adapters.mjs crates/persistence-postgres/src crates/application/src docs/modular-rewrite/R04-persistence-foundation
+          git add README.md architecture/database-baseline.json architecture/domain-type-inventory.json package.json scripts/verify-database-service.mjs scripts/verify-persistence-adapters.mjs crates/persistence-postgres/src crates/application/src docs/modular-rewrite/R04-persistence-foundation
           git diff --check --cached
 
           $untracked = @(git ls-files --others --exclude-standard)
