@@ -20,8 +20,8 @@ R3 Application Services 已完成并关闭。R4 只重写 `crates/persistence-po
 |---|---|---|---|
 | R4-01 | Store / Error / Pool / migration / health / statistics | DONE | [`R04-01-store-error-and-pool.md`](./R04-01-store-error-and-pool.md) |
 | R4-02 | Audit 基础设施 | DONE | [`R04-02-audit-基础设施.md`](./R04-02-audit-基础设施.md) |
-| R4-03 | 通用 Row 映射基础规范 | VERIFYING | [`R04-03-row-映射基础规范.md`](./R04-03-row-映射基础规范.md) |
-| R4-04 | Application Port Adapter 注册 | BLOCKED | — |
+| R4-03 | 通用 Row 映射基础规范 | DONE | [`R04-03-row-映射基础规范.md`](./R04-03-row-映射基础规范.md) |
+| R4-04 | Application Port Adapter 注册 | READY | — |
 
 ## R4-01 进入条件
 
@@ -47,9 +47,12 @@ R4-01 完成前保持 `READY/VERIFYING`，只有目标职责切换为唯一 owne
 - R4-02 正式关闭为 `DONE`；R4-03 开放为 `READY`，R4-04 继续 `BLOCKED`。
 - R4-03 必须从本阶段分支当前收口基线独立开始；本收口未包含任何 R4-03/R4-04 生产源码改动。
 
-## R4-03 实施中
+## R4-03 收口
 
-- 从 R4-02 正式收口 HEAD `3c147376cf81394984cc20850a58e866eef4280b` 独立建立 `agent/r4-03-row-mapping`。
-- run `31665585062` 因 verifier 转义错误与共享调用面漏扫停止；run `31665943169` 因临时 workflow YAML 缩进错误在调度前停止；两次均未提交生产源码。 run `31666083511` 随后通过 R4-03 最小门禁与完整 architecture，但因临时 runner 未先执行既有 `npm run setup`，frontend 在缺少已声明的 `typescript` 开发依赖时停止；workspace Clippy/tests 未执行且仍未提交生产源码。run `31666505364` 已通过全部质量、冻结范围、文档与 transient cleanup 门禁，最终仅因 npm cache 临时落在仓库根而被 clean-worktree 发布门禁拒绝，仍未提交生产源码。run `31667443481` 再次通过全部质量、范围与文档门禁，但 cleanup 在精确暂存前检查 untracked，误将本任务应新增文件视为非法项并停止，仍未提交生产源码。run `31668274055` 通过全部质量、范围、文档、精确暂存与 untracked 清理门禁，最终仅因 Git 默认 quotePath 将中文记录文件名八进制转义而误判 staged allowlist，仍未提交生产源码。
-- 恢复 run `31674700550` 已通过全部最小门禁与阶段回归。
-- R4-03 当前 `VERIFYING`；clean Public Platform CI 与 PR 合并完成前不得标记 `DONE`，R4-04 继续 `BLOCKED`。
+- 从 R4-02 正式收口 HEAD `3c147376cf81394984cc20850a58e866eef4280b` 独立建立 `agent/r4-03-row-mapping`；最终实现提交为 `202648df6aa1f9a14eb03bdcabcbd5ee0a271e56`。
+- strict hard gate run `31674700550` 已通过 R4-03 mapping 专项、R4-01/R4-02 Persistence/Audit 回归、数据库冻结与保护资产、rustfmt、Persistence check/tests、完整 architecture/frontend、workspace Clippy `-D warnings` 与 workspace tests；最终实现树严格为 15 个目标文件，临时 workflow/helper 与额外 untracked 均为 0。
+- PR #24 clean Public Platform CI run `31675727990` / Windows automated delivery job `94369762967`：`SUCCESS`；PR 按固定 HEAD `202648df6aa1f9a14eb03bdcabcbd5ee0a271e56` 合并到 `rewrite/r4-persistence-foundation`，merge commit `0e5a68e09c6c06204b926f4d30c45262740d983b`。
+- 合并后 stage Public Platform CI run `31677600876` / job `94375513281`：`SUCCESS`；artifact `9172855279`（`windows-automated-delivery-evidence-0e5a68e09c6c06204b926f4d30c45262740d983b`）大小 `13909093` 字节，SHA-256 `31719ff04f00eb944c84fcd37dbbda3fa6252f7d55bc42a1a8af3d903cad3544`。
+- formal-closeout preparation runs `31679755024` 与 `31679826851` 因旧 workflow 的内嵌 Python 多行文本破坏 YAML block 缩进而在调度前失败（0 job）；run `31679847327` 已进入 helper，但因状态校验误把历史兼容段的第二个 `VERIFYING` 也计入而 fail-fast；run `31679942355` 已生成目标文档内容，但 `git diff --check` 检出 stage README 尾部新增空白行后停止。四次均未产生 closeout commit、未修改生产源码；恢复 helper 改为精确状态 marker 并规范单个 EOF 换行，最终提交前 workflow/helper 均自删除。
+- 18 个要求专用可写 `FOOTBALL_TEST_DATABASE_URL` 的 PostgreSQL 集成测试仍未执行；未执行 destructive database reset。
+- R4-03 正式关闭为 `DONE`；R4-04 开放为 `READY`。本收口未包含任何 R4-04 生产源码改动。
