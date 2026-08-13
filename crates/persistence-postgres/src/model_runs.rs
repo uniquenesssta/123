@@ -1,4 +1,5 @@
 use super::{sha256_json, write_audit_event, PersistenceError, PersistenceResult, PostgresStore};
+use crate::mapping::{optional_uuid, required_datetime, required_uuid, to_json_value};
 use chrono::{DateTime, Utc};
 use football_domain::RouteDecision;
 use football_model_api::{ModelOutput, ModelRequest};
@@ -42,7 +43,7 @@ impl PostgresStore {
         let run_id = Uuid::new_v4();
         let input_hash = sha256_json(&request.input)?;
         let input_audit = prepared_run_input_audit(&request.input)?;
-        let summary = serde_json::to_value(&output.summary)?;
+        let summary = to_json_value(&output.summary)?;
         let database_match_id = optional_uuid(&request.input, "database_match_id")?;
         let feature_snapshot = prepared_feature_snapshot(&request.input, &request.snapshot_type)?;
         let mut feature_snapshot_id = feature_snapshot.as_ref().map(|snapshot| snapshot.id);
@@ -554,9 +555,7 @@ fn prepared_feature_snapshot(
         .ok_or_else(|| {
             PersistenceError::InvalidState("snapshot.snapshot_id 必须是 UUID 字符串".to_string())
         })?;
-    let snapshot_id = Uuid::parse_str(snapshot_id).map_err(|error| {
-        PersistenceError::InvalidState(format!("snapshot.snapshot_id 不是有效 UUID：{error}"))
-    })?;
+    let snapshot_id = required_uuid(snapshot_id, "snapshot.snapshot_id")?;
     if snapshot_id != id {
         return Err(PersistenceError::InvalidState(
             "feature_snapshot_id 与 snapshot.snapshot_id 不一致".to_string(),
@@ -602,44 +601,9 @@ fn prepared_feature_snapshot(
     }))
 }
 
-fn required_datetime(value: Option<&Value>, key: &str) -> PersistenceResult<DateTime<Utc>> {
-    let raw = value
-        .and_then(Value::as_str)
-        .ok_or_else(|| PersistenceError::InvalidState(format!("{key} 必须是 RFC3339 时间")))?;
-    DateTime::parse_from_rfc3339(raw)
-        .map(|value| value.with_timezone(&Utc))
-        .map_err(|error| PersistenceError::InvalidState(format!("{key} 时间无效：{error}")))
-}
-
-fn optional_uuid(value: &Value, key: &str) -> PersistenceResult<Option<Uuid>> {
-    let Some(raw) = value.get(key) else {
-        return Ok(None);
-    };
-    if raw.is_null() {
-        return Ok(None);
-    }
-    let raw = raw
-        .as_str()
-        .ok_or_else(|| PersistenceError::InvalidState(format!("{key} 必须是 UUID 字符串")))?
-        .trim();
-    if raw.is_empty() {
-        return Ok(None);
-    }
-    Uuid::parse_str(raw)
-        .map(Some)
-        .map_err(|error| PersistenceError::InvalidState(format!("{key} 不是有效 UUID：{error}")))
-}
-
 #[cfg(test)]
 mod tests {
     use super::*;
-
-    #[test]
-    fn optional_uuid_accepts_missing_null_and_blank_values() {
-        assert_eq!(optional_uuid(&json!({}), "id").unwrap(), None);
-        assert_eq!(optional_uuid(&json!({"id": null}), "id").unwrap(), None);
-        assert_eq!(optional_uuid(&json!({"id": "  "}), "id").unwrap(), None);
-    }
 
     #[test]
     fn prepared_input_audit_validates_manifest_hash() {
