@@ -24,9 +24,9 @@ R4-01 至 R4-04 的代码重写节点均已完成并关闭为 `DONE`：Persisten
 
 | 文件 |
 |---|
-| `"docs/modular-rewrite/R04-persistence-foundation/R04-02-audit-\345\237\272\347\241\200\350\256\276\346\226\275.md"` |
-| `"docs/modular-rewrite/R04-persistence-foundation/R04-03-row-\346\230\240\345\260\204\345\237\272\347\241\200\350\247\204\350\214\203.md"` |
-| `"docs/modular-rewrite/R04-persistence-foundation/R04-04-port-adapter-\346\263\250\345\206\214.md"` |
+| `docs/modular-rewrite/R04-persistence-foundation/R04-02-audit-基础设施.md` |
+| `docs/modular-rewrite/R04-persistence-foundation/R04-03-row-映射基础规范.md` |
+| `docs/modular-rewrite/R04-persistence-foundation/R04-04-port-adapter-注册.md` |
 | `crates/application/src/composition/adapters/competition.rs` |
 | `crates/application/src/composition/adapters/database.rs` |
 | `crates/application/src/composition/adapters/persistence_error.rs` |
@@ -242,6 +242,7 @@ R4-01 至 R4-04 的代码重写节点均已完成并关闭为 `DONE`：Persisten
 
 ## 18. 订正记录
 
+- docs-only closeout 第二次 run `31727494199` 已成功生成并发布四份收口文档到 stage commit `837d364cbddb174f794529efb4b7be76fa673f5e`；随后仅 transient helper 自清理因 runner 内临时改写 helper 导致 `git rm` 拒绝而失败，未影响 canonical stage。assistant-created helper/workflow 已随后通过 connector 提交 `dc992b7630f1559c1aaa0e10fd2a30626450d7da` / `acc9884277355410a1f960ee91c0bcc2e8f4b634` 从 helper 分支删除；canonical stage 从未包含这些 transient 文件。
 - docs-only closeout 首次 run `31727111563` 在发布前 fail-fast：scope 校验仅读取 tracked `git diff`，遗漏新建且仍 untracked 的 `R04-stage-completion.md`；stage 发布和 transient cleanup 步骤均被跳过，canonical stage 未发生变化。恢复仅将 scope 校验改为 tracked diff 与 untracked 文件的精确并集，最终允许集合仍严格为四份收口文档。
 - R4-04 节点在 hard gate、clean PR CI、squash merge 与 post-merge stage CI 全部成功后关闭为 `DONE`。
 - 阶段收口时重新按 R4 任务书检查“阶段级验证矩阵”，确认 18 个 PostgreSQL integration tests / 空库 migration / health-stats / audit integration 仍未执行；因此没有沿用“节点全部 DONE 即阶段 DONE”的简化判断，而是将 R4 stage 保持 `VERIFYING`。该订正只影响阶段状态和文档，不修改生产源码、接口、数据或验证门禁。
