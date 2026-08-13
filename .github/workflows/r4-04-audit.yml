@@ -1,0 +1,47 @@
+name: R4-04 Port Adapter Scope Audit
+
+on:
+  push:
+    branches:
+      - agent/r4-04-port-adapter-registration
+    paths:
+      - .github/workflows/r4-04-audit.yml
+
+permissions:
+  contents: read
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: agent/r4-04-port-adapter-registration
+          fetch-depth: 0
+      - name: Audit current adapter ownership
+        shell: bash
+        run: |
+          set -euo pipefail
+          echo '=== branch diff ==='
+          git -c core.quotePath=false diff --name-status b508d1ff7808b8735694cf1e57a4d603f2e973e3...HEAD
+          echo '=== concrete persistence imports in application ==='
+          grep -RIn --include='*.rs' 'football_persistence_postgres' crates/application/src || true
+          echo '=== ActiveDatabase impls ==='
+          grep -RIn --include='*.rs' -E '^impl .*Port for ActiveDatabase|^impl [A-Za-z0-9_]+ for ActiveDatabase' crates/application/src/composition || true
+          echo '=== ActiveDatabase references ==='
+          grep -RIn --include='*.rs' 'ActiveDatabase' crates/application/src || true
+          echo '=== transition_store references ==='
+          grep -RIn --include='*.rs' 'transition_store' crates/application/src || true
+          echo '=== port registry public responsibilities ==='
+          grep -nE '^(pub\(crate\)|pub\(super\)|fn |impl |#\[async_trait\])' crates/application/src/composition/port_registry.rs || true
+          echo '=== composition adapter impl targets ==='
+          grep -RIn --include='*.rs' '^impl .*Port for ' crates/application/src/composition/adapters || true
+          echo '=== registered application port traits ==='
+          find crates/application/src/ports -name '*.rs' -print0 | xargs -0 grep -hE '^pub trait ' | sed -E 's/pub trait ([A-Za-z0-9_]+).*/\1/' | sort
+          echo '=== dependency direction ==='
+          grep -n 'football-persistence-postgres' crates/application/Cargo.toml || true
+          grep -n 'football-application' crates/persistence-postgres/Cargo.toml || true
+          echo '=== redacted url usage ==='
+          grep -RIn --include='*.rs' 'redacted_url' crates/application/src crates/persistence-postgres/src || true
+          echo '=== compatibility type usage ==='
+          grep -RIn --include='*.rs' -E 'DatabaseHealth|DatabaseStats|ModelRunListItem|PersistenceError' crates/application/src/composition crates/application/src/services crates/application/src/use_cases | head -n 300 || true
