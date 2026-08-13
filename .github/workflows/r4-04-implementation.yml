@@ -18,6 +18,7 @@ jobs:
       R4_04_BASE: b508d1ff7808b8735694cf1e57a4d603f2e973e3
       R4_04_AUDIT_RUN: 31686092182
       R4_04_GENERATOR_FAILED_RUN: 31686470233
+      R4_04_GUARD_FAILED_RUN: 31686662626
       npm_config_cache: ${{ github.workspace }}/../.npm-cache
     steps:
       - name: Checkout R4-04 branch
