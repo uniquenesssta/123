@@ -59,23 +59,20 @@ impl PostgresStore {
 
         execute_force_delete(&mut tx, request.team_id).await?;
 
-        sqlx::query(
-            r#"
-            INSERT INTO audit.events (id, event_type, entity_type, entity_id, payload)
-            VALUES ($1, 'team_force_deleted', 'team_purge', $2, $3)
-            "#,
+        crate::write_audit_event(
+            &mut tx,
+            "team_force_deleted",
+            "team_purge",
+            request.team_id.to_string(),
+            json!({
+                "team_name": label,
+                "deleted_counts": &deleted_counts,
+                "deleted_match_ids": &deleted_match_ids,
+                "deleted_player_ids": &deleted_player_ids,
+                "deleted_coach_ids": &deleted_coach_ids,
+                "deleted_import_batch_ids": &deleted_import_batch_ids,
+            }),
         )
-        .bind(Uuid::new_v4())
-        .bind(request.team_id.to_string())
-        .bind(json!({
-            "team_name": label,
-            "deleted_counts": &deleted_counts,
-            "deleted_match_ids": &deleted_match_ids,
-            "deleted_player_ids": &deleted_player_ids,
-            "deleted_coach_ids": &deleted_coach_ids,
-            "deleted_import_batch_ids": &deleted_import_batch_ids,
-        }))
-        .execute(&mut *tx)
         .await?;
 
         tx.commit().await?;

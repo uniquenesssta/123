@@ -325,13 +325,13 @@ impl PostgresStore {
         .fetch_optional(&mut *tx)
         .await?
         .ok_or_else(|| PersistenceError::InvalidState("球队不存在".to_string()))?;
-        sqlx::query(
-            "INSERT INTO audit.events (id,event_type,entity_type,entity_id,payload) VALUES ($1,'team_updated','team',$2,$3)",
+        crate::write_audit_event(
+            &mut tx,
+            "team_updated",
+            "team",
+            team_id.to_string(),
+            json!({"canonical_name": name, "source": "manual"}),
         )
-        .bind(Uuid::new_v4())
-        .bind(team_id.to_string())
-        .bind(json!({"canonical_name": name, "source": "manual"}))
-        .execute(&mut *tx)
         .await?;
         tx.commit().await?;
         team_record_from_row(&row)
@@ -375,13 +375,13 @@ impl PostgresStore {
         .bind(draft.valid_to)
         .fetch_one(&mut *tx)
         .await?;
-        sqlx::query(
-            "INSERT INTO audit.events (id,event_type,entity_type,entity_id,payload) VALUES ($1,'team_name_added','team',$2,$3)",
+        crate::write_audit_event(
+            &mut tx,
+            "team_name_added",
+            "team",
+            draft.team_id.to_string(),
+            json!({"name": name, "language_code": draft.language_code, "source": "manual"}),
         )
-        .bind(Uuid::new_v4())
-        .bind(draft.team_id.to_string())
-        .bind(json!({"name": name, "language_code": draft.language_code, "source": "manual"}))
-        .execute(&mut *tx)
         .await?;
         tx.commit().await?;
         team_name_from_row(&row)
@@ -437,13 +437,13 @@ impl PostgresStore {
         .bind(&draft.metadata)
         .fetch_one(&mut *tx)
         .await?;
-        sqlx::query(
-            "INSERT INTO audit.events (id,event_type,entity_type,entity_id,payload) VALUES ($1,'team_profile_updated','team',$2,$3)",
+        crate::write_audit_event(
+            &mut tx,
+            "team_profile_updated",
+            "team",
+            team_id.to_string(),
+            json!({"source": draft.metadata.get("source").cloned().unwrap_or(json!("manual"))}),
         )
-        .bind(Uuid::new_v4())
-        .bind(team_id.to_string())
-        .bind(json!({"source": draft.metadata.get("source").cloned().unwrap_or(json!("manual"))}))
-        .execute(&mut *tx)
         .await?;
         tx.commit().await?;
         team_profile_from_row(&row)
@@ -561,13 +561,13 @@ impl PostgresStore {
             .bind(team_id)
             .execute(&mut *tx)
             .await?;
-        sqlx::query(
-            "INSERT INTO audit.events (id,event_type,entity_type,entity_id,payload) VALUES ($1,'team_deleted','team',$2,$3)",
+        crate::write_audit_event(
+            &mut tx,
+            "team_deleted",
+            "team",
+            team_id.to_string(),
+            json!({"canonical_name": team_name}),
         )
-        .bind(Uuid::new_v4())
-        .bind(team_id.to_string())
-        .bind(json!({"canonical_name": team_name}))
-        .execute(&mut *tx)
         .await?;
         tx.commit().await?;
         Ok(())

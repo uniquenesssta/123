@@ -1,5 +1,6 @@
 mod analytics;
 mod api_workspace;
+mod audit;
 mod competitions;
 mod dynamic_tags;
 mod entity_catalog;
@@ -44,34 +45,9 @@ pub use routing::ModelRegistration;
 pub use statistics::DatabaseStats;
 pub use store::PostgresStore;
 
-use football_domain::CompetitionKind;
-use serde_json::Value;
-use sha2::{Digest, Sha256};
-use sqlx::Transaction;
-use uuid::Uuid;
+pub(crate) use audit::{sha256_json, write_audit_event};
 
-async fn write_audit_event(
-    tx: &mut Transaction<'_, sqlx::Postgres>,
-    event_type: &str,
-    entity_type: &str,
-    entity_id: Option<String>,
-    payload: Value,
-) -> PersistenceResult<()> {
-    sqlx::query(
-        r#"
-        INSERT INTO audit.events (id, event_type, entity_type, entity_id, payload)
-        VALUES ($1, $2, $3, $4, $5)
-        "#,
-    )
-    .bind(Uuid::new_v4())
-    .bind(event_type)
-    .bind(entity_type)
-    .bind(entity_id)
-    .bind(payload)
-    .execute(&mut **tx)
-    .await?;
-    Ok(())
-}
+use football_domain::CompetitionKind;
 
 fn parse_competition_kind(value: &str) -> PersistenceResult<CompetitionKind> {
     match value {
@@ -85,11 +61,4 @@ fn parse_competition_kind(value: &str) -> PersistenceResult<CompetitionKind> {
             "未知赛事类型：{other}"
         ))),
     }
-}
-
-fn sha256_json<T: serde::Serialize + ?Sized>(value: &T) -> PersistenceResult<String> {
-    let bytes = serde_json::to_vec(value)?;
-    let mut hasher = Sha256::new();
-    hasher.update(bytes);
-    Ok(hex::encode(hasher.finalize()))
 }

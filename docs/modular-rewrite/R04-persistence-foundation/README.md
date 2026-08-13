@@ -19,7 +19,7 @@ R3 Application Services 已完成并关闭。R4 只重写 `crates/persistence-po
 | 任务 | 范围 | 状态 | 记录 |
 |---|---|---|---|
 | R4-01 | Store / Error / Pool / migration / health / statistics | DONE | [`R04-01-store-error-and-pool.md`](./R04-01-store-error-and-pool.md) |
-| R4-02 | Audit 基础设施 | READY | — |
+| R4-02 | Audit 基础设施 | VERIFYING | [`R04-02-audit-基础设施.md`](./R04-02-audit-基础设施.md) |
 | R4-03 | 通用 Row 映射基础规范 | BLOCKED | — |
 | R4-04 | Application Port Adapter 注册 | BLOCKED | — |
 

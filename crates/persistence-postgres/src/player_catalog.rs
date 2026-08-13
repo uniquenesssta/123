@@ -17,7 +17,7 @@ use football_domain::{
     PlayerRecord, PlayerStatus, PlayerTeamPeriodDraft, PlayerTeamPeriodRecord, PositionReference,
     PreferredFoot, SeasonTeamMembershipOption, TeamDraft, TeamOption, TeamRecord,
 };
-use serde_json::{json, Value};
+use serde_json::json;
 use sqlx::{Postgres, QueryBuilder, Row, Transaction};
 use std::collections::HashSet;
 use uuid::Uuid;
@@ -32,6 +32,7 @@ impl PostgresStore {
         }
         let normalized_name = normalize_name(canonical_name);
         let id = Uuid::new_v4();
+        let mut tx = self.pool.begin().await?;
         let row = sqlx::query(
             r#"
             INSERT INTO football.teams (
@@ -51,15 +52,17 @@ impl PostgresStore {
                 .filter(|value| !value.is_empty()),
         )
         .bind(&draft.metadata)
-        .fetch_one(&self.pool)
+        .fetch_one(&mut *tx)
         .await?;
-        self.audit(
+        crate::write_audit_event(
+            &mut tx,
             "team_created",
             "team",
             id.to_string(),
             json!({"canonical_name": canonical_name}),
         )
         .await?;
+        tx.commit().await?;
         team_record_from_row(&row)
     }
 
@@ -221,7 +224,7 @@ impl PostgresStore {
         .bind(&normalized_name)
         .execute(&mut *tx)
         .await?;
-        audit_in_tx(
+        crate::write_audit_event(
             &mut tx,
             "player_created",
             "player",
@@ -314,16 +317,13 @@ impl PostgresStore {
             .execute(&mut *tx)
             .await?;
         }
-        sqlx::query(
-            r#"
-            INSERT INTO audit.events (id, event_type, entity_type, entity_id, payload)
-            VALUES ($1, 'player_updated', 'player', $2, $3)
-            "#,
+        crate::write_audit_event(
+            &mut tx,
+            "player_updated",
+            "player",
+            player_id.to_string(),
+            json!({"canonical_name": canonical_name, "source": "manual"}),
         )
-        .bind(Uuid::new_v4())
-        .bind(player_id.to_string())
-        .bind(json!({"canonical_name": canonical_name, "source": "manual"}))
-        .execute(&mut *tx)
         .await?;
         tx.commit().await?;
         player_record_from_row(&row)
@@ -347,7 +347,7 @@ impl PostgresStore {
             .bind(player_id)
             .execute(&mut *tx)
             .await?;
-        audit_in_tx(
+        crate::write_audit_event(
             &mut tx,
             "player_deleted",
             "player",
@@ -1218,7 +1218,7 @@ impl PostgresStore {
             .bind(match_id)
             .execute(&mut *tx)
             .await?;
-        audit_in_tx(
+        crate::write_audit_event(
             &mut tx,
             "match_deleted",
             "match",
@@ -1334,7 +1334,7 @@ impl PostgresStore {
         }
         let home_id = insert_lineup_in_tx(&mut tx, &draft.home, &home_validated).await?;
         let away_id = insert_lineup_in_tx(&mut tx, &draft.away, &away_validated).await?;
-        audit_in_tx(
+        crate::write_audit_event(
             &mut tx,
             "lineup_pair_created",
             "match",
@@ -1612,7 +1612,7 @@ impl PostgresStore {
             None
         };
 
-        audit_in_tx(
+        crate::write_audit_event(
             &mut tx,
             "lineup_history_removed",
             "lineup",
@@ -1709,29 +1709,6 @@ impl PostgresStore {
         .fetch_all(&self.pool)
         .await?;
         rows.iter().map(ability_dimension_from_row).collect()
-    }
-
-    async fn audit(
-        &self,
-        event_type: &str,
-        entity_type: &str,
-        entity_id: String,
-        payload: Value,
-    ) -> PersistenceResult<()> {
-        sqlx::query(
-            r#"
-            INSERT INTO audit.events (id, event_type, entity_type, entity_id, payload)
-            VALUES ($1, $2, $3, $4, $5)
-            "#,
-        )
-        .bind(Uuid::new_v4())
-        .bind(event_type)
-        .bind(entity_type)
-        .bind(entity_id)
-        .bind(payload)
-        .execute(&self.pool)
-        .await?;
-        Ok(())
     }
 }
 
@@ -1960,29 +1937,6 @@ async fn validate_match_scope(pool: &sqlx::PgPool, draft: &MatchDraft) -> Persis
             ));
         }
     }
-    Ok(())
-}
-
-async fn audit_in_tx(
-    tx: &mut Transaction<'_, Postgres>,
-    event_type: &str,
-    entity_type: &str,
-    entity_id: String,
-    payload: Value,
-) -> PersistenceResult<()> {
-    sqlx::query(
-        r#"
-        INSERT INTO audit.events (id, event_type, entity_type, entity_id, payload)
-        VALUES ($1, $2, $3, $4, $5)
-        "#,
-    )
-    .bind(Uuid::new_v4())
-    .bind(event_type)
-    .bind(entity_type)
-    .bind(entity_id)
-    .bind(payload)
-    .execute(&mut **tx)
-    .await?;
     Ok(())
 }
 
@@ -2309,7 +2263,7 @@ async fn insert_lineup_in_tx(
         .await?;
     }
     crate::lineup_chain::refresh_lineup_validation_in_tx(tx, lineup_id).await?;
-    audit_in_tx(
+    crate::write_audit_event(
         tx,
         "lineup_created",
         "lineup",
