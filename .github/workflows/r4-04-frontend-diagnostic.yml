@@ -1,0 +1,69 @@
+name: R4-04 Frontend Diagnostic
+
+on:
+  push:
+    branches:
+      - agent/r4-04-port-adapter-registration
+    paths:
+      - .github/workflows/r4-04-frontend-diagnostic.yml
+
+permissions:
+  contents: read
+
+jobs:
+  diagnose:
+    runs-on: windows-2025
+    timeout-minutes: 45
+    env:
+      npm_config_cache: ${{ github.workspace }}/../.npm-cache
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: agent/r4-04-port-adapter-registration
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: package-lock.json
+      - uses: dtolnay/rust-toolchain@1.88.0
+        with:
+          components: rustfmt
+      - name: Recreate R4-04 candidate tree
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $PSNativeCommandUseErrorActionPreference = $true
+          python .github/r4-04-run.py
+          python .github/r4-04-migrate-verifiers.py
+          cargo fmt --all
+          python .github/r4-04-sync-db-baseline.py
+          node scripts/generate-domain-type-inventory.mjs
+          npm run setup
+      - name: Diagnose frontend prelude checks
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Continue'
+          $checks = @(
+            'scripts/verify-browser-bootstrap.mjs',
+            'scripts/verify-tauri-bootstrap.mjs',
+            'scripts/verify-application-composition.mjs',
+            'scripts/verify-database-service.mjs',
+            'scripts/verify-competition-rules-service.mjs',
+            'scripts/verify-teams-players-service.mjs',
+            'scripts/verify-lineups-service.mjs',
+            'scripts/verify-prediction-service.mjs',
+            'scripts/verify-research-service.mjs'
+          )
+          foreach ($check in $checks) {
+            $output = @(& node $check 2>&1)
+            $code = $LASTEXITCODE
+            if ($code -ne 0) {
+              $tail = @($output | Select-Object -Last 40) -join ' | '
+              $escaped = $tail.Replace('%','%25').Replace("`r",'').Replace("`n",'%0A')
+              Write-Host "::error title=R4-04 frontend diagnostic [$check]::$escaped"
+              exit $code
+            }
+            Write-Host "PASS $check"
+          }
+          Write-Host 'R4-04 frontend prelude subset passed; failure is later in verify-frontend sequence.'
