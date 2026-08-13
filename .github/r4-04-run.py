@@ -104,4 +104,13 @@ except RuntimeError as error:
     package = package.replace(old_script, new_script, 1)
     package_path.write_text(package, encoding="utf-8", newline="\n")
 
-print("R4-04 helper applied: transition forwarding normalized and package architecture gate updated without suppressing unrelated errors")
+verifier_path = ROOT / "scripts/verify-persistence-adapters.mjs"
+verifier = verifier_path.read_text(encoding="utf-8")
+old_check = 'check(portRegistry.includes("register_adapters(options).await.map_err(map_persistence_error)"), "PortRegistry must use the unique adapter registration entry");'
+new_check = 'check(/register_adapters\\(options\\)\\s*\\.await\\s*\\.map_err\\(map_persistence_error\\)/s.test(portRegistry), "PortRegistry must use the unique adapter registration entry");'
+if verifier.count(old_check) != 1:
+    raise RuntimeError(f"registration verifier format anchor expected once, found {verifier.count(old_check)}")
+verifier = verifier.replace(old_check, new_check, 1)
+verifier_path.write_text(verifier, encoding="utf-8", newline="\n")
+
+print("R4-04 helper applied: forwarding normalized, package gate updated, and registration verifier made rustfmt-format agnostic")
