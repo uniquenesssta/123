@@ -23,6 +23,8 @@ jobs:
       R4_04_DATABASE_FINGERPRINT_FAILED_RUN: 31687122419
       R4_04_RUST_COMPILE_FAILED_RUN: 31687372054
       R4_04_DATABASE_SERVICE_GATE_FAILED_RUN: 31687732166
+      R4_04_COMPETITION_GATE_FAILED_RUN: 31688354846
+      R4_04_STALE_GATE_AUDIT_RUN: 31688840100
       npm_config_cache: ${{ github.workspace }}/../.npm-cache
     steps:
       - name: Checkout R4-04 branch
@@ -58,6 +60,7 @@ jobs:
             '.github/r4-04-run.py',
             '.github/r4-04-record-fix.py',
             '.github/r4-04-sync-db-baseline.py',
+            '.github/r4-04-migrate-verifiers.py',
             '.github/workflows/r4-04-audit.yml',
             '.github/workflows/r4-04-implementation.yml'
           )
@@ -73,6 +76,7 @@ jobs:
           $ErrorActionPreference = 'Stop'
           $PSNativeCommandUseErrorActionPreference = $true
           python .github/r4-04-run.py
+          python .github/r4-04-migrate-verifiers.py
           cargo fmt --all
           python .github/r4-04-sync-db-baseline.py
           node scripts/generate-domain-type-inventory.mjs
@@ -117,6 +121,21 @@ jobs:
 
           $changed = @(git -c core.quotePath=false diff --name-only "$env:R4_04_BASE")
           $unexpected = @()
+          $allowedScripts = @(
+            'scripts/verify-ai-workspace-service.mjs',
+            'scripts/verify-analytics-service.mjs',
+            'scripts/verify-application-composition.mjs',
+            'scripts/verify-competition-rules-service.mjs',
+            'scripts/verify-database-service.mjs',
+            'scripts/verify-exchange-service.mjs',
+            'scripts/verify-lineups-service.mjs',
+            'scripts/verify-prediction-service.mjs',
+            'scripts/verify-release-service.mjs',
+            'scripts/verify-research-service.mjs',
+            'scripts/verify-review-service.mjs',
+            'scripts/verify-teams-players-service.mjs',
+            'scripts/verify-persistence-adapters.mjs'
+          )
           foreach ($file in $changed) {
             $ok = $false
             if ($file -in @(
@@ -124,17 +143,17 @@ jobs:
               '.github/r4-04-run.py',
               '.github/r4-04-record-fix.py',
               '.github/r4-04-sync-db-baseline.py',
+              '.github/r4-04-migrate-verifiers.py',
               '.github/workflows/r4-04-audit.yml',
               '.github/workflows/r4-04-implementation.yml',
               'README.md',
               'architecture/database-baseline.json',
               'architecture/domain-type-inventory.json',
               'package.json',
-              'scripts/verify-database-service.mjs',
-              'scripts/verify-persistence-adapters.mjs',
               'docs/modular-rewrite/R04-persistence-foundation/R04-04-port-adapter-注册.md',
               'docs/modular-rewrite/R04-persistence-foundation/README.md'
             )) { $ok = $true }
+            if ($file -in $allowedScripts) { $ok = $true }
             if ($file.StartsWith('crates/persistence-postgres/src/')) { $ok = $true }
             if ($file.StartsWith('crates/application/src/composition/')) { $ok = $true }
             if ($file -match '^crates/application/src/services/(analytics|prediction|release|teams|lineups|exchange|postmatch|ai_workspace|review|research|players)/') { $ok = $true }
@@ -155,6 +174,7 @@ jobs:
           python .github/r4-04-record-fix.py
           npm run verify:persistence-adapters
           npm run verify:database-service
+          npm run verify:competition-rules-service
           node scripts/verify_database_baseline.mjs
           git diff --check
 
@@ -163,8 +183,8 @@ jobs:
         run: |
           $ErrorActionPreference = 'Stop'
           $PSNativeCommandUseErrorActionPreference = $true
-          git rm .github/r4-04-apply.py .github/r4-04-run.py .github/r4-04-record-fix.py .github/r4-04-sync-db-baseline.py .github/workflows/r4-04-audit.yml .github/workflows/r4-04-implementation.yml
-          git add README.md architecture/database-baseline.json architecture/domain-type-inventory.json package.json scripts/verify-database-service.mjs scripts/verify-persistence-adapters.mjs crates/persistence-postgres/src crates/application/src docs/modular-rewrite/R04-persistence-foundation
+          git rm .github/r4-04-apply.py .github/r4-04-run.py .github/r4-04-record-fix.py .github/r4-04-sync-db-baseline.py .github/r4-04-migrate-verifiers.py .github/workflows/r4-04-audit.yml .github/workflows/r4-04-implementation.yml
+          git add README.md architecture/database-baseline.json architecture/domain-type-inventory.json package.json scripts/verify-ai-workspace-service.mjs scripts/verify-analytics-service.mjs scripts/verify-application-composition.mjs scripts/verify-competition-rules-service.mjs scripts/verify-database-service.mjs scripts/verify-exchange-service.mjs scripts/verify-lineups-service.mjs scripts/verify-prediction-service.mjs scripts/verify-release-service.mjs scripts/verify-research-service.mjs scripts/verify-review-service.mjs scripts/verify-teams-players-service.mjs scripts/verify-persistence-adapters.mjs crates/persistence-postgres/src crates/application/src docs/modular-rewrite/R04-persistence-foundation
           git diff --check --cached
 
           $untracked = @(git ls-files --others --exclude-standard)
@@ -175,8 +195,8 @@ jobs:
           if ($transient.Count -ne 0) {
             throw "R4-04 transient files remain in final staged tree: $($transient -join ', ')"
           }
-          git diff --exit-code "$env:R4_04_BASE" -- .github/r4-04-apply.py .github/r4-04-run.py .github/r4-04-record-fix.py .github/r4-04-sync-db-baseline.py .github/workflows/r4-04-audit.yml .github/workflows/r4-04-implementation.yml
-          git diff --cached --exit-code "$env:R4_04_BASE" -- .github/r4-04-apply.py .github/r4-04-run.py .github/r4-04-record-fix.py .github/r4-04-sync-db-baseline.py .github/workflows/r4-04-audit.yml .github/workflows/r4-04-implementation.yml
+          git diff --exit-code "$env:R4_04_BASE" -- .github/r4-04-apply.py .github/r4-04-run.py .github/r4-04-record-fix.py .github/r4-04-sync-db-baseline.py .github/r4-04-migrate-verifiers.py .github/workflows/r4-04-audit.yml .github/workflows/r4-04-implementation.yml
+          git diff --cached --exit-code "$env:R4_04_BASE" -- .github/r4-04-apply.py .github/r4-04-run.py .github/r4-04-record-fix.py .github/r4-04-sync-db-baseline.py .github/r4-04-migrate-verifiers.py .github/workflows/r4-04-audit.yml .github/workflows/r4-04-implementation.yml
 
       - name: Commit verified R4-04 implementation
         shell: pwsh
