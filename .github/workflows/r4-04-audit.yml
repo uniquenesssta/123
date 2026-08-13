@@ -26,6 +26,10 @@ jobs:
           git -c core.quotePath=false diff --name-status b508d1ff7808b8735694cf1e57a4d603f2e973e3...HEAD
           echo '=== concrete persistence imports in application ==='
           grep -RIn --include='*.rs' 'football_persistence_postgres' crates/application/src || true
+          echo '=== PostgresStore connect call sites ==='
+          grep -RIn --include='*.rs' -E '(PostgresStore|PersistenceStore)::connect' . --exclude-dir=.git --exclude-dir=target || true
+          echo '=== DatabaseOptions redacted URL call sites ==='
+          grep -RIn --include='*.rs' 'redacted_url()' . --exclude-dir=.git --exclude-dir=target || true
           echo '=== ActiveDatabase impls ==='
           grep -RIn --include='*.rs' -E '^impl .*Port for ActiveDatabase|^impl [A-Za-z0-9_]+ for ActiveDatabase' crates/application/src/composition || true
           echo '=== ActiveDatabase references ==='
