@@ -1,4 +1,5 @@
-use super::super::port_registry::{map_persistence_error, ActiveDatabase, ModelRunListItem};
+use super::super::port_registry::{ModelRunListItem, PersistenceStore};
+use super::map_persistence_error;
 use crate::ports::{
     prediction::{
         ModelRunHistoryItem, ModelRunPort, P4FreezeExecutionPort, PredictionInputPort,
@@ -18,15 +19,14 @@ use football_model_api::{ModelOutput, ModelRequest};
 use uuid::Uuid;
 
 #[async_trait]
-impl PredictionInputPort for ActiveDatabase {
+impl PredictionInputPort for PersistenceStore {
     async fn prepare_match_input(
         &self,
         match_id: Uuid,
         snapshot_type: &str,
         model_family: &str,
     ) -> PortResult<PreparedMatchPredictionInput> {
-        self.transition_store()
-            .prepare_match_prediction_input(match_id, snapshot_type, model_family)
+        self.prepare_match_prediction_input(match_id, snapshot_type, model_family)
             .await
             .map_err(map_persistence_error)
     }
@@ -38,20 +38,19 @@ impl PredictionInputPort for ActiveDatabase {
         model_family: &str,
         reference_time: DateTime<Utc>,
     ) -> PortResult<PreparedMatchPredictionInput> {
-        self.transition_store()
-            .prepare_match_prediction_input_at(
-                match_id,
-                snapshot_type,
-                model_family,
-                reference_time,
-            )
-            .await
-            .map_err(map_persistence_error)
+        self.prepare_match_prediction_input_at(
+            match_id,
+            snapshot_type,
+            model_family,
+            reference_time,
+        )
+        .await
+        .map_err(map_persistence_error)
     }
 }
 
 #[async_trait]
-impl ModelRunPort for ActiveDatabase {
+impl ModelRunPort for PersistenceStore {
     async fn save_successful_run(
         &self,
         decision: &RouteDecision,
@@ -59,22 +58,19 @@ impl ModelRunPort for ActiveDatabase {
         output: &ModelOutput,
         duration_ms: i64,
     ) -> PortResult<Uuid> {
-        self.transition_store()
-            .save_successful_run(decision, request, output, duration_ms)
+        self.save_successful_run(decision, request, output, duration_ms)
             .await
             .map_err(map_persistence_error)
     }
 
     async fn hide_run_from_history(&self, run_id: Uuid, reason: Option<&str>) -> PortResult<()> {
-        self.transition_store()
-            .hide_run_from_history(run_id, reason)
+        self.hide_run_from_history(run_id, reason)
             .await
             .map_err(map_persistence_error)
     }
 
     async fn list_recent_runs(&self, limit: i64) -> PortResult<Vec<ModelRunHistoryItem>> {
-        self.transition_store()
-            .list_recent_runs(limit)
+        self.list_recent_runs(limit)
             .await
             .map_err(map_persistence_error)?
             .into_iter()
@@ -110,11 +106,7 @@ impl ModelRunPort for ActiveDatabase {
     }
 
     async fn read_run_document(&self, run_id: Uuid) -> PortResult<SerializedModelRun> {
-        let value = self
-            .transition_store()
-            .read_run(run_id)
-            .await
-            .map_err(map_persistence_error)?;
+        let value = self.read_run(run_id).await.map_err(map_persistence_error)?;
         let json = serde_json::to_string(&value)
             .map_err(|error| PortError::new(PortErrorKind::Serialization, error.to_string()))?;
         Ok(SerializedModelRun { json })
@@ -149,10 +141,9 @@ pub(crate) fn model_run_list_item_from_port(
 }
 
 #[async_trait]
-impl PredictionWorkflowPort for ActiveDatabase {
+impl PredictionWorkflowPort for PersistenceStore {
     async fn planning_match_context(&self, match_id: Uuid) -> PortResult<P4PlanningMatchContext> {
-        self.transition_store()
-            .p4_planning_match_context(match_id)
+        self.p4_planning_match_context(match_id)
             .await
             .map_err(map_persistence_error)
     }
@@ -161,8 +152,7 @@ impl PredictionWorkflowPort for ActiveDatabase {
         &self,
         idempotency_key: &str,
     ) -> PortResult<Option<P4FreezeTaskRecord>> {
-        self.transition_store()
-            .find_p4_freeze_task_by_idempotency(idempotency_key)
+        self.find_p4_freeze_task_by_idempotency(idempotency_key)
             .await
             .map_err(map_persistence_error)
     }
@@ -172,8 +162,7 @@ impl PredictionWorkflowPort for ActiveDatabase {
         match_id: Option<Uuid>,
         limit: u32,
     ) -> PortResult<Vec<P4FreezeTaskRecord>> {
-        self.transition_store()
-            .list_p4_freeze_tasks(match_id, limit)
+        self.list_p4_freeze_tasks(match_id, limit)
             .await
             .map_err(map_persistence_error)
     }
@@ -182,15 +171,13 @@ impl PredictionWorkflowPort for ActiveDatabase {
         &self,
         draft: &P4FreezeTaskDraft,
     ) -> PortResult<P4FreezeTaskRecord> {
-        self.transition_store()
-            .create_p4_freeze_task(draft)
+        self.create_p4_freeze_task(draft)
             .await
             .map_err(map_persistence_error)
     }
 
     async fn read_freeze_task(&self, task_id: Uuid) -> PortResult<P4FreezeTaskRecord> {
-        self.transition_store()
-            .read_p4_freeze_task(task_id)
+        self.read_p4_freeze_task(task_id)
             .await
             .map_err(map_persistence_error)
     }
@@ -199,8 +186,7 @@ impl PredictionWorkflowPort for ActiveDatabase {
         &self,
         task_id: Uuid,
     ) -> PortResult<Vec<P4FreezeTaskEventRecord>> {
-        self.transition_store()
-            .list_p4_freeze_task_events(task_id)
+        self.list_p4_freeze_task_events(task_id)
             .await
             .map_err(map_persistence_error)
     }
@@ -216,46 +202,40 @@ impl PredictionWorkflowPort for ActiveDatabase {
                 "P4冻结任务迁移的task_id与transition不一致",
             ));
         }
-        self.transition_store()
-            .transition_p4_freeze_task(transition)
+        self.transition_p4_freeze_task(transition)
             .await
             .map_err(map_persistence_error)
     }
 
     async fn freeze_readiness(&self, task_id: Uuid) -> PortResult<P4FreezeReadiness> {
-        self.transition_store()
-            .p4_freeze_readiness(task_id)
+        self.p4_freeze_readiness(task_id)
             .await
             .map_err(map_persistence_error)
     }
 
     async fn read_match_workspace(&self, match_id: Uuid) -> PortResult<P4MatchWorkspace> {
-        self.transition_store()
-            .read_p4_match_workspace(match_id)
+        self.read_p4_match_workspace(match_id)
             .await
             .map_err(map_persistence_error)
     }
 
     async fn read_task_workspace(&self, task_id: Uuid) -> PortResult<P4TaskWorkspace> {
-        self.transition_store()
-            .read_p4_task_workspace(task_id)
+        self.read_p4_task_workspace(task_id)
             .await
             .map_err(map_persistence_error)
     }
 }
 
 #[async_trait]
-impl P4FreezeExecutionPort for ActiveDatabase {
+impl P4FreezeExecutionPort for PersistenceStore {
     async fn find_frozen_snapshot_id(&self, task: &P4FreezeTaskRecord) -> PortResult<Option<Uuid>> {
-        self.transition_store()
-            .find_frozen_p4_snapshot_id(task)
+        self.find_frozen_p4_snapshot_id(task)
             .await
             .map_err(map_persistence_error)
     }
 
     async fn routed_facts(&self, task_id: Uuid) -> PortResult<Vec<P4RoutedFact>> {
-        self.transition_store()
-            .p4_routed_facts(task_id)
+        self.p4_routed_facts(task_id)
             .await
             .map_err(map_persistence_error)
     }
@@ -264,28 +244,25 @@ impl P4FreezeExecutionPort for ActiveDatabase {
         &self,
         draft: &PrematchSnapshotDraft,
     ) -> PortResult<PrematchSnapshotRecord> {
-        self.transition_store()
-            .freeze_prematch_snapshot(draft)
+        self.freeze_prematch_snapshot(draft)
             .await
             .map_err(map_persistence_error)
     }
 
     async fn read_snapshot(&self, snapshot_id: Uuid) -> PortResult<PrematchSnapshotBundle> {
-        self.transition_store()
-            .read_prematch_snapshot(snapshot_id)
+        self.read_prematch_snapshot(snapshot_id)
             .await
             .map_err(map_persistence_error)
     }
 }
 
 #[async_trait::async_trait]
-impl crate::ports::prediction::P4OrchestrationQueuePort for ActiveDatabase {
+impl crate::ports::prediction::P4OrchestrationQueuePort for PersistenceStore {
     async fn claim_next_p4_job(
         &self,
         job_types: &[&str],
     ) -> crate::ports::PortResult<Option<football_domain::BackgroundJob>> {
-        self.transition_store()
-            .claim_next_job_by_types(job_types)
+        self.claim_next_job_by_types(job_types)
             .await
             .map_err(map_persistence_error)
     }
@@ -301,15 +278,13 @@ impl crate::ports::prediction::P4OrchestrationQueuePort for ActiveDatabase {
                 error.to_string(),
             )
         })?;
-        self.transition_store()
-            .complete_job(job_id, value)
+        self.complete_job(job_id, value)
             .await
             .map_err(map_persistence_error)
     }
 
     async fn fail_p4_job(&self, job_id: Uuid, error_message: &str) -> crate::ports::PortResult<()> {
-        self.transition_store()
-            .fail_job(job_id, error_message)
+        self.fail_job(job_id, error_message)
             .await
             .map_err(map_persistence_error)
     }

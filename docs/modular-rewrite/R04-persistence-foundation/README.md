@@ -21,7 +21,7 @@ R3 Application Services 已完成并关闭。R4 只重写 `crates/persistence-po
 | R4-01 | Store / Error / Pool / migration / health / statistics | DONE | [`R04-01-store-error-and-pool.md`](./R04-01-store-error-and-pool.md) |
 | R4-02 | Audit 基础设施 | DONE | [`R04-02-audit-基础设施.md`](./R04-02-audit-基础设施.md) |
 | R4-03 | 通用 Row 映射基础规范 | DONE | [`R04-03-row-映射基础规范.md`](./R04-03-row-映射基础规范.md) |
-| R4-04 | Application Port Adapter 注册 | READY | — |
+| R4-04 | Application Port Adapter 注册 | VERIFYING | [`R04-04-port-adapter-注册.md`](./R04-04-port-adapter-注册.md) |
 
 ## R4-01 进入条件
 
@@ -57,3 +57,10 @@ R4-01 完成前保持 `READY/VERIFYING`，只有目标职责切换为唯一 owne
 - formal closeout workflow run `31680032287` 成功生成并推送文档收口提交 `56f22e0d2afab301668e6cfb8b1b447d59b58150`；该提交相对生产 merge commit 的净变化严格只有根 `README.md`、本阶段索引和 R4-03 节点记录三份文档，临时 `.github` workflow/helper 为零差异。
 - 18 个要求专用可写 `FOOTBALL_TEST_DATABASE_URL` 的 PostgreSQL 集成测试仍未执行；未执行 destructive database reset。
 - R4-03 正式关闭为 `DONE`；R4-04 开放为 `READY`。本收口未包含任何 R4-04 生产源码改动。
+
+## R4-04 实施中
+
+- 从 R4-03 最终 canonical HEAD `b508d1ff7808b8735694cf1e57a4d603f2e973e3` 独立建立 `agent/r4-04-port-adapter-registration`。
+- scope audit run `31686092182` 确认旧入口为 `ActiveDatabase` + `transition_store`，40 个 DB-backed Application Ports 由该 wrapper 转发到 PostgresStore；Persistence -> Application 反向依赖会造成 crate cycle，因此实现采用 Application-owned trait / PostgresStore concrete target 的 Rust 合法边界。
+- hard gate run `31712193150` 已通过 R4-04 专项、R4-01/R4-02/R4-03 回归、数据库冻结、architecture/frontend 与 workspace Rust 回归。
+- R4-04 当前 `VERIFYING`；clean CI、合并及 R4 stage completion 完成前 R5-01 继续 `BLOCKED`。

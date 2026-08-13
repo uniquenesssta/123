@@ -53,6 +53,9 @@ const library = read("crates/application/src/lib.rs");
 const applicationService = read("crates/application/src/service/application_service.rs");
 const composition = read("crates/application/src/composition/application_composition.rs");
 const registry = read("crates/application/src/composition/port_registry.rs");
+const competitionAdapter = read("crates/application/src/composition/adapters/competition.rs");
+const rulesAdapter = read("crates/application/src/composition/adapters/rules.rs");
+const adapterText = `${competitionAdapter}\n${rulesAdapter}`;
 const bootstrap = read("crates/application/src/services/database/bootstrap.rs");
 const applicationBootstrap = read("crates/application/src/use_cases/application_facade/bootstrap.rs");
 const lifecycleInitialize = read("crates/application/src/use_cases/application_facade/database_lifecycle/initialize.rs");
@@ -74,12 +77,13 @@ for (const constructor of ["CompetitionService::new()", "RulesService::new()"]) 
   check(composition.includes(constructor), `组合根未构造：${constructor}`);
 }
 for (const implementation of [
-  "impl CompetitionHierarchyPort for ActiveDatabase",
-  "impl RulePackagePort for ActiveDatabase",
-  "impl RuleRoutingPort for ActiveDatabase",
+  "impl CompetitionHierarchyPort for PersistenceStore",
+  "impl RulePackagePort for PersistenceStore",
+  "impl RuleRoutingPort for PersistenceStore",
 ]) {
-  check(registry.includes(implementation), `组合根适配器缺少：${implementation}`);
+  check(adapterText.includes(implementation), `组合根具名适配器缺少：${implementation}`);
 }
+check(!registry.includes("impl CompetitionHierarchyPort") && !registry.includes("impl RulePackagePort") && !registry.includes("impl RuleRoutingPort"), "Competition/Rules Port 实现重新堆叠到 port_registry.rs");
 
 for (const forbidden of [
   "store.list_competitions()",

@@ -94,10 +94,10 @@ for (const traitName of ["AnalyticsPort", "JobQueuePort", "ParameterLifecyclePor
   const matches = ports.match(new RegExp(`\\bpub\\s+trait\\s+${traitName}\\b`, "g")) ?? [];
   check(matches.length === 1, `Analytics Port ${traitName} 数量应为 1，实际 ${matches.length}`);
 }
-check(analyticsAdapter.includes("impl AnalyticsPort for ActiveDatabase"), "Analytics adapter 缺少 AnalyticsPort");
-check(analyticsAdapter.includes("impl ParameterLifecyclePort for ActiveDatabase"), "Analytics adapter 缺少 ParameterLifecyclePort");
-check(!analyticsAdapter.includes("impl JobQueuePort for ActiveDatabase"), "Analytics adapter 重复拥有 JobQueuePort");
-check(jobsAdapter.includes("impl JobQueuePort for ActiveDatabase"), "既有 jobs adapter 未实现 JobQueuePort");
+check(analyticsAdapter.includes("impl AnalyticsPort for PersistenceStore"), "Analytics adapter 缺少 AnalyticsPort");
+check(analyticsAdapter.includes("impl ParameterLifecyclePort for PersistenceStore"), "Analytics adapter 缺少 ParameterLifecyclePort");
+check(!analyticsAdapter.includes("impl JobQueuePort for PersistenceStore"), "Analytics adapter 重复拥有 JobQueuePort");
+check(jobsAdapter.includes("impl JobQueuePort for PersistenceStore"), "既有 jobs adapter 未实现 JobQueuePort");
 check(!ports.includes("serde_json::Value"), "Analytics Port 暴露通用 JSON Value");
 check(contracts.includes("pub struct ParameterDefinition"), "缺少参数定义专用契约");
 check(contracts.includes("pub enum AnalyticsJobProgressPayload"), "缺少后台任务进度专用契约");

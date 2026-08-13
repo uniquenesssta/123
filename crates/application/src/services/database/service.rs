@@ -1,4 +1,4 @@
-use crate::composition::{ActiveDatabase, DatabaseOptions, PortRegistry};
+use crate::composition::{DatabaseOptions, DatabaseSession, PortRegistry};
 use crate::ports::{
     database::{DatabaseHealthSnapshot, DatabaseLifecyclePort},
     PortResult,
@@ -7,11 +7,11 @@ use crate::use_cases::database::{connect, health, reset};
 use tokio::sync::RwLock;
 
 pub(crate) struct PreparedDatabaseConnection {
-    session: ActiveDatabase,
+    session: DatabaseSession,
 }
 
 impl PreparedDatabaseConnection {
-    pub(crate) fn session(&self) -> &ActiveDatabase {
+    pub(crate) fn session(&self) -> &DatabaseSession {
         &self.session
     }
 
@@ -26,7 +26,7 @@ impl PreparedDatabaseConnection {
 
 pub(crate) struct DatabaseService {
     ports: PortRegistry,
-    pub(crate) session: RwLock<Option<ActiveDatabase>>,
+    pub(crate) session: RwLock<Option<DatabaseSession>>,
 }
 
 impl DatabaseService {
@@ -52,7 +52,7 @@ impl DatabaseService {
     pub(crate) async fn activate(&self, prepared: PreparedDatabaseConnection) -> PortResult<()> {
         let previous = self.session.write().await.replace(prepared.session);
         if let Some(previous) = previous {
-            previous.close().await?;
+            DatabaseLifecyclePort::close(&previous).await?;
         }
         Ok(())
     }
@@ -64,12 +64,12 @@ impl DatabaseService {
     pub(crate) async fn disconnect(&self) -> PortResult<()> {
         let active = self.session.write().await.take();
         if let Some(active) = active {
-            active.close().await?;
+            DatabaseLifecyclePort::close(&active).await?;
         }
         Ok(())
     }
 
-    pub(crate) async fn active_session(&self) -> Option<ActiveDatabase> {
+    pub(crate) async fn active_session(&self) -> Option<DatabaseSession> {
         self.session.read().await.clone()
     }
 

@@ -74,7 +74,7 @@ for (const token of [
   "async fn list_runs(&self, limit: u32)",
   "async fn read_run(&self, run_id: Uuid)",
 ]) check(ports.includes(token), `ReleaseAcceptancePort 缺少真实能力：${token}`);
-check(adapterText.includes("impl ReleaseAcceptancePort for ActiveDatabase"), "ReleaseAcceptancePort 未由 ActiveDatabase 适配");
+check(adapterText.includes("impl ReleaseAcceptancePort for PersistenceStore"), "ReleaseAcceptancePort 未由 PersistenceStore 适配");
 for (const call of [
   "release_acceptance_runtime_facts",
   "persist_release_acceptance_run",
@@ -207,4 +207,4 @@ if (failures.length) {
   console.error("Release Service 验证失败：\n- " + failures.join("\n- "));
   process.exit(1);
 }
-console.log("Release Service 验证通过：3 个公共 Release Acceptance 用例由唯一 ReleaseService 编排，检查/汇总/哈希职责拆分，ReleaseAcceptancePort 与 ActiveDatabase 适配完整且旧 owner 清零。");
+console.log("Release Service 验证通过：3 个公共 Release Acceptance 用例由唯一 ReleaseService 编排，检查/汇总/哈希职责拆分，ReleaseAcceptancePort 与 PersistenceStore 适配完整且旧 owner 清零。");

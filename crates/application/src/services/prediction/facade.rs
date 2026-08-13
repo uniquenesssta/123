@@ -1,5 +1,5 @@
 use super::compatibility;
-use crate::composition::ActiveDatabase;
+use crate::composition::DatabaseSession;
 use crate::{
     ApplicationError, ApplicationResult, ApplicationService, ModelRunListItem, PredictionCommand,
     PredictionExecution, RoutePreviewCommand, StoredMatchPredictionCommand,
@@ -14,7 +14,7 @@ use serde_json::Value;
 use uuid::Uuid;
 
 impl ApplicationService {
-    async fn prediction_session(&self) -> ApplicationResult<ActiveDatabase> {
+    async fn prediction_session(&self) -> ApplicationResult<DatabaseSession> {
         self.database
             .active_session()
             .await

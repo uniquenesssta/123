@@ -86,7 +86,7 @@
     {"path":"crates/persistence-postgres/src/pool/database_options.rs","git_blob_sha1":"f2dd59bd961d6c8fa9a13d4b9f8e9e081c34fbff"},
     {"path":"crates/persistence-postgres/src/statistics/database_stats.rs","git_blob_sha1":"e6dc9979bb0bc8eef57b64088cc85d5a9e056d7e"},
     {"path":"crates/persistence-postgres/src/statistics/read_statistics.rs","git_blob_sha1":"cf5849f972dc923d33a2cc39c1a0f3ead88a53db"},
-    {"path":"crates/persistence-postgres/src/store/postgres_store.rs","git_blob_sha1":"939445bec1e0e35ab28c25173d87e2ccf4dc79de"},
+    {"path":"crates/persistence-postgres/src/store/postgres_store.rs","git_blob_sha1":"8b3cd1939080bcaf3ac776fd22adb012c279ce32"},
     {"path":"crates/persistence-postgres/tests/postgres_integration.rs","git_blob_sha1":"44dcd594ac739ab341bd5009f613d5de6fd1aa1e"}
   ],
   "runtime_requirements": [

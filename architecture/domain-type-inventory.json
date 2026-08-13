@@ -24,13 +24,13 @@
     "targetPublicExportPolicy": "explicit re-export only"
   },
   "sourceDigest": "217241ac243726a5ab6805a7f169e222b97e78c7c971749a5904714af673ebdd",
-  "rustUsageDigest": "c4d0ecc5d2a21375295044f2d942b0cb4266dfb6d7bb59a2c91da214f7ee5b75",
+  "rustUsageDigest": "4e68b840189ca6c887eb96a7bbc3f0e3900120332b01ab7f095c5c2510b30e85",
   "summary": {
     "typeCount": 365,
     "publicCompatibilityTypeCount": 365,
     "internalTypeCount": 0,
     "domainSourceFileCount": 129,
-    "scannedRustFileCount": 655,
+    "scannedRustFileCount": 661,
     "databaseMappedTypeCount": 299,
     "byTargetModule": {
       "ai_workspace": 16,
@@ -4499,7 +4499,7 @@
         "crates/domain/tests/serde_contracts/module_paths.rs"
       ],
       "externalCallers": [
-        "crates/application/src/composition/port_registry.rs",
+        "crates/application/src/composition/adapters/rules.rs",
         "crates/application/src/ports/rules/mod.rs",
         "crates/application/src/services/rules/facade.rs",
         "crates/application/src/services/rules/service.rs",
@@ -4603,7 +4603,7 @@
         "crates/domain/tests/serde_contracts/module_paths.rs"
       ],
       "externalCallers": [
-        "crates/application/src/composition/port_registry.rs",
+        "crates/application/src/composition/adapters/rules.rs",
         "crates/application/src/lib.rs",
         "crates/application/src/ports/rules/mod.rs",
         "crates/application/src/services/rules/facade.rs",
@@ -4688,7 +4688,7 @@
         "crates/domain/tests/serde_contracts/module_paths.rs"
       ],
       "externalCallers": [
-        "crates/application/src/composition/port_registry.rs",
+        "crates/application/src/composition/adapters/competition.rs",
         "crates/application/src/ports/competition/mod.rs",
         "crates/application/src/services/competition/facade.rs",
         "crates/application/src/services/competition/service.rs",
@@ -4785,7 +4785,7 @@
         "crates/domain/tests/serde_contracts/module_paths.rs"
       ],
       "externalCallers": [
-        "crates/application/src/composition/port_registry.rs",
+        "crates/application/src/composition/adapters/rules.rs",
         "crates/application/src/lib.rs",
         "crates/application/src/ports/rules/mod.rs",
         "crates/application/src/use_cases/analytics/parameter_lifecycle/metrics.rs",
@@ -5135,7 +5135,7 @@
         "crates/domain/tests/serde_contracts/module_paths.rs"
       ],
       "externalCallers": [
-        "crates/application/src/composition/port_registry.rs",
+        "crates/application/src/composition/adapters/competition.rs",
         "crates/application/src/lib.rs",
         "crates/application/src/ports/competition/mod.rs",
         "crates/application/src/services/competition/facade.rs",
@@ -23504,7 +23504,7 @@
         "crates/domain/tests/serde_contracts/module_paths.rs"
       ],
       "externalCallers": [
-        "crates/application/src/composition/port_registry.rs",
+        "crates/application/src/composition/adapters/rules.rs",
         "crates/application/src/ports/rules/mod.rs",
         "crates/application/src/use_cases/prediction/shared/routing.rs",
         "crates/persistence-postgres/src/competitions.rs",
@@ -24066,7 +24066,7 @@
         "crates/domain/tests/serde_contracts/module_paths.rs"
       ],
       "externalCallers": [
-        "crates/application/src/composition/port_registry.rs",
+        "crates/application/src/composition/adapters/competition.rs",
         "crates/application/src/ports/competition/mod.rs",
         "crates/application/src/services/competition/facade.rs",
         "crates/application/src/services/competition/service.rs",
@@ -24151,7 +24151,7 @@
         "crates/domain/tests/serde_contracts/module_paths.rs"
       ],
       "externalCallers": [
-        "crates/application/src/composition/port_registry.rs",
+        "crates/application/src/composition/adapters/competition.rs",
         "crates/application/src/lib.rs",
         "crates/application/src/ports/competition/mod.rs",
         "crates/application/src/services/competition/facade.rs",
@@ -24283,7 +24283,7 @@
       ],
       "externalCallers": [
         "crates/application/src/composition/adapters/prediction.rs",
-        "crates/application/src/composition/port_registry.rs",
+        "crates/application/src/composition/adapters/rules.rs",
         "crates/application/src/lib.rs",
         "crates/application/src/ports/prediction/mod.rs",
         "crates/application/src/ports/rules/mod.rs",
@@ -24386,7 +24386,7 @@
         "crates/domain/tests/serde_contracts/module_paths.rs"
       ],
       "externalCallers": [
-        "crates/application/src/composition/port_registry.rs",
+        "crates/application/src/composition/adapters/rules.rs",
         "crates/application/src/ports/rules/mod.rs",
         "crates/application/src/use_cases/prediction/execute_prediction/mod.rs",
         "crates/application/src/use_cases/prediction/inspect_match_prediction_readiness/mod.rs",
@@ -24563,7 +24563,7 @@
         "crates/domain/tests/serde_contracts/round_trip.rs"
       ],
       "externalCallers": [
-        "crates/application/src/composition/port_registry.rs",
+        "crates/application/src/composition/adapters/rules.rs",
         "crates/application/src/lib.rs",
         "crates/application/src/ports/rules/mod.rs",
         "crates/application/src/services/rules/facade.rs",
@@ -24671,7 +24671,7 @@
         "crates/domain/tests/serde_contracts/module_paths.rs"
       ],
       "externalCallers": [
-        "crates/application/src/composition/port_registry.rs",
+        "crates/application/src/composition/adapters/rules.rs",
         "crates/application/src/lib.rs",
         "crates/application/src/ports/rules/mod.rs",
         "crates/application/src/services/rules/facade.rs",
@@ -25062,7 +25062,7 @@
         "crates/domain/tests/serde_contracts/module_paths.rs"
       ],
       "externalCallers": [
-        "crates/application/src/composition/port_registry.rs",
+        "crates/application/src/composition/adapters/competition.rs",
         "crates/application/src/ports/competition/mod.rs",
         "crates/application/src/services/competition/facade.rs",
         "crates/application/src/services/competition/service.rs",
@@ -25144,7 +25144,7 @@
         "crates/domain/tests/serde_contracts/module_paths.rs"
       ],
       "externalCallers": [
-        "crates/application/src/composition/port_registry.rs",
+        "crates/application/src/composition/adapters/competition.rs",
         "crates/application/src/lib.rs",
         "crates/application/src/ports/competition/mod.rs",
         "crates/application/src/services/competition/facade.rs",
@@ -27792,7 +27792,7 @@
         "crates/domain/tests/serde_contracts/module_paths.rs"
       ],
       "externalCallers": [
-        "crates/application/src/composition/port_registry.rs",
+        "crates/application/src/composition/adapters/competition.rs",
         "crates/application/src/ports/competition/mod.rs",
         "crates/application/src/services/competition/facade.rs",
         "crates/application/src/services/competition/service.rs",
@@ -27881,7 +27881,7 @@
         "crates/domain/tests/serde_contracts/module_paths.rs"
       ],
       "externalCallers": [
-        "crates/application/src/composition/port_registry.rs",
+        "crates/application/src/composition/adapters/competition.rs",
         "crates/application/src/lib.rs",
         "crates/application/src/ports/competition/mod.rs",
         "crates/application/src/services/competition/facade.rs",

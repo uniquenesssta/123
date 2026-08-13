@@ -118,7 +118,7 @@ for (const token of [
 ]) {
   check(port.includes(token), `Exchange Port 缺少真实能力：${token}`);
 }
-check(matchLineupAdapter.includes("impl MatchLineupExchangePort for ActiveDatabase"), "MatchLineupExchangePort 未由 ActiveDatabase 适配");
+check(matchLineupAdapter.includes("impl MatchLineupExchangePort for PersistenceStore"), "MatchLineupExchangePort 未由 PersistenceStore 适配");
 for (const call of [
   "match_lineup_export_data",
   "preview_match_lineup_import",
@@ -129,8 +129,8 @@ for (const call of [
 ]) {
   check(matchLineupAdapter.includes(call), `Match Lineup adapter 缺少委托：${call}`);
 }
-check(spreadsheetAdapter.includes("impl SpreadsheetExchangePort for ActiveDatabase"), "SpreadsheetExchangePort 未由 ActiveDatabase 适配");
-check(spreadsheetAdapter.includes("impl MonthlyWorkbookPort for ActiveDatabase"), "MonthlyWorkbookPort 未由 ActiveDatabase 适配");
+check(spreadsheetAdapter.includes("impl SpreadsheetExchangePort for PersistenceStore"), "SpreadsheetExchangePort 未由 PersistenceStore 适配");
+check(spreadsheetAdapter.includes("impl MonthlyWorkbookPort for PersistenceStore"), "MonthlyWorkbookPort 未由 PersistenceStore 适配");
 for (const call of [
   "player_catalog_reference_data",
   "spreadsheet_export_data",
@@ -222,4 +222,4 @@ if (failures.length) {
   console.error("Exchange Service 验证失败：\n- " + failures.join("\n- "));
   process.exit(1);
 }
-console.log("Exchange Service 验证通过：AT1 + AT2 共 24 个公共用例由唯一 ExchangeService 编排，Spreadsheet/Monthly Ports 与 ActiveDatabase 适配完整，旧 owners 清零且兼容错误优先级保持。");
+console.log("Exchange Service 验证通过：AT1 + AT2 共 24 个公共用例由唯一 ExchangeService 编排，Spreadsheet/Monthly Ports 与 PersistenceStore 适配完整，旧 owners 清零且兼容错误优先级保持。");

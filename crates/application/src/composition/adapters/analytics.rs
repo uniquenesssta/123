@@ -1,4 +1,5 @@
-use super::super::port_registry::{map_persistence_error, ActiveDatabase};
+use super::super::port_registry::PersistenceStore;
+use super::map_persistence_error;
 use crate::ports::{
     analytics::{AnalyticsPort, ParameterDefinition, ParameterLifecyclePort},
     PortResult,
@@ -16,24 +17,21 @@ use football_domain::{
 use uuid::Uuid;
 
 #[async_trait]
-impl AnalyticsPort for ActiveDatabase {
+impl AnalyticsPort for PersistenceStore {
     async fn overview(&self) -> PortResult<AnalyticsOverview> {
-        self.transition_store()
-            .analytics_overview()
+        self.analytics_overview()
             .await
             .map_err(map_persistence_error)
     }
 
     async fn refresh(&self, request: &AnalyticsRefreshRequest) -> PortResult<AnalyticsOverview> {
-        self.transition_store()
-            .refresh_analytics(request)
+        self.refresh_analytics(request)
             .await
             .map_err(map_persistence_error)
     }
 
     async fn run_data_quality_scan(&self) -> PortResult<DataQualitySummary> {
-        self.transition_store()
-            .run_data_quality_scan()
+        self.run_data_quality_scan()
             .await
             .map_err(map_persistence_error)
     }
@@ -42,29 +40,25 @@ impl AnalyticsPort for ActiveDatabase {
         &self,
         draft: &DataQualityDecisionDraft,
     ) -> PortResult<DataQualityFinding> {
-        self.transition_store()
-            .decide_data_quality_finding(draft)
+        self.decide_data_quality_finding(draft)
             .await
             .map_err(map_persistence_error)
     }
 
     async fn capture_query_performance(&self) -> PortResult<QueryPerformanceSummary> {
-        self.transition_store()
-            .capture_query_performance()
+        self.capture_query_performance()
             .await
             .map_err(map_persistence_error)
     }
 
     async fn build_ai_analysis_data(&self) -> PortResult<AiAnalysisPackageData> {
-        self.transition_store()
-            .build_ai_analysis_data()
+        self.build_ai_analysis_data()
             .await
             .map_err(map_persistence_error)
     }
 
     async fn record_ai_export(&self, summary: &AiAnalysisPackageSummary) -> PortResult<()> {
-        self.transition_store()
-            .record_ai_export(summary)
+        self.record_ai_export(summary)
             .await
             .map_err(map_persistence_error)
     }
@@ -74,8 +68,7 @@ impl AnalyticsPort for ActiveDatabase {
         input_path: &str,
         preview: &AiAnalysisResponsePreview,
     ) -> PortResult<Vec<AiAnalysisSuggestionRecord>> {
-        self.transition_store()
-            .import_ai_response(input_path, preview)
+        self.import_ai_response(input_path, preview)
             .await
             .map_err(map_persistence_error)
     }
@@ -85,8 +78,7 @@ impl AnalyticsPort for ActiveDatabase {
         status: Option<&str>,
         limit: u32,
     ) -> PortResult<Vec<AiAnalysisSuggestionRecord>> {
-        self.transition_store()
-            .list_ai_suggestions(status, limit)
+        self.list_ai_suggestions(status, limit)
             .await
             .map_err(map_persistence_error)
     }
@@ -95,21 +87,19 @@ impl AnalyticsPort for ActiveDatabase {
         &self,
         draft: &AiSuggestionDecisionDraft,
     ) -> PortResult<AiAnalysisSuggestionRecord> {
-        self.transition_store()
-            .decide_ai_suggestion(draft)
+        self.decide_ai_suggestion(draft)
             .await
             .map_err(map_persistence_error)
     }
 }
 
 #[async_trait]
-impl ParameterLifecyclePort for ActiveDatabase {
+impl ParameterLifecyclePort for PersistenceStore {
     async fn readiness(
         &self,
         request: &ParameterLifecycleReadinessRequest,
     ) -> PortResult<ParameterLifecycleReadiness> {
-        self.transition_store()
-            .parameter_lifecycle_readiness(request)
+        self.parameter_lifecycle_readiness(request)
             .await
             .map_err(map_persistence_error)
     }
@@ -118,8 +108,7 @@ impl ParameterLifecyclePort for ActiveDatabase {
         &self,
         limit: u32,
     ) -> PortResult<Vec<ParameterTuningCandidateRecord>> {
-        self.transition_store()
-            .list_parameter_tuning_candidates(limit)
+        self.list_parameter_tuning_candidates(limit)
             .await
             .map_err(map_persistence_error)
     }
@@ -128,8 +117,7 @@ impl ParameterLifecyclePort for ActiveDatabase {
         &self,
         candidate_id: Uuid,
     ) -> PortResult<ParameterTuningCandidateRecord> {
-        self.transition_store()
-            .read_parameter_tuning_candidate(candidate_id)
+        self.read_parameter_tuning_candidate(candidate_id)
             .await
             .map_err(map_persistence_error)
     }
@@ -138,8 +126,7 @@ impl ParameterLifecyclePort for ActiveDatabase {
         &self,
         draft: &ParameterTuningDecisionDraft,
     ) -> PortResult<ParameterTuningCandidateRecord> {
-        self.transition_store()
-            .decide_parameter_tuning_candidate(draft)
+        self.decide_parameter_tuning_candidate(draft)
             .await
             .map_err(map_persistence_error)
     }
@@ -152,16 +139,15 @@ impl ParameterLifecyclePort for ActiveDatabase {
         baseline_model_version_id: Uuid,
         baseline_parameter_set_id: Uuid,
     ) -> PortResult<Vec<ParameterReplayFixture>> {
-        self.transition_store()
-            .load_parameter_replay_fixtures(
-                competition_id,
-                competition_profile_id,
-                snapshot_type,
-                baseline_model_version_id,
-                baseline_parameter_set_id,
-            )
-            .await
-            .map_err(map_persistence_error)
+        self.load_parameter_replay_fixtures(
+            competition_id,
+            competition_profile_id,
+            snapshot_type,
+            baseline_model_version_id,
+            baseline_parameter_set_id,
+        )
+        .await
+        .map_err(map_persistence_error)
     }
 
     async fn read_parameter_set_definition(
@@ -169,7 +155,6 @@ impl ParameterLifecyclePort for ActiveDatabase {
         parameter_set_id: Uuid,
     ) -> PortResult<ParameterDefinition> {
         let value = self
-            .transition_store()
             .read_parameter_set_definition(parameter_set_id)
             .await
             .map_err(map_persistence_error)?;
@@ -180,8 +165,7 @@ impl ParameterLifecyclePort for ActiveDatabase {
         &self,
         record: &ParameterShadowValidationRecord,
     ) -> PortResult<ParameterShadowValidationRecord> {
-        self.transition_store()
-            .save_parameter_shadow_validation(record)
+        self.save_parameter_shadow_validation(record)
             .await
             .map_err(map_persistence_error)
     }
@@ -190,8 +174,7 @@ impl ParameterLifecyclePort for ActiveDatabase {
         &self,
         candidate_id: Uuid,
     ) -> PortResult<Vec<ParameterShadowValidationRecord>> {
-        self.transition_store()
-            .list_parameter_shadow_validations(candidate_id)
+        self.list_parameter_shadow_validations(candidate_id)
             .await
             .map_err(map_persistence_error)
     }
@@ -200,8 +183,7 @@ impl ParameterLifecyclePort for ActiveDatabase {
         &self,
         request: &ParameterPromotionRequest,
     ) -> PortResult<ParameterPromotionDecisionRecord> {
-        self.transition_store()
-            .promote_parameter_candidate(request)
+        self.promote_parameter_candidate(request)
             .await
             .map_err(map_persistence_error)
     }
@@ -210,8 +192,7 @@ impl ParameterLifecyclePort for ActiveDatabase {
         &self,
         request: &ParameterRollbackRequest,
     ) -> PortResult<ParameterPromotionDecisionRecord> {
-        self.transition_store()
-            .rollback_parameter_candidate(request)
+        self.rollback_parameter_candidate(request)
             .await
             .map_err(map_persistence_error)
     }
@@ -220,8 +201,7 @@ impl ParameterLifecyclePort for ActiveDatabase {
         &self,
         candidate_id: Uuid,
     ) -> PortResult<Vec<ParameterPromotionDecisionRecord>> {
-        self.transition_store()
-            .list_parameter_promotion_decisions(candidate_id)
+        self.list_parameter_promotion_decisions(candidate_id)
             .await
             .map_err(map_persistence_error)
     }

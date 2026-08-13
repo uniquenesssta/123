@@ -1,14 +1,20 @@
 mod ai_workspace;
 mod analytics;
+mod competition;
+mod database;
 mod exchange;
 mod jobs;
 mod lineups;
+mod persistence_error;
 mod players;
 mod postmatch;
 mod prediction;
 mod release;
 mod research;
 mod review;
+mod rules;
 mod teams;
 
+pub(crate) use database::{database_health_from_snapshot, database_stats_from_statistics};
+pub(super) use persistence_error::map_persistence_error;
 pub(crate) use prediction::model_run_list_item_from_port;

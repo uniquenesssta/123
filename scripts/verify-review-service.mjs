@@ -88,10 +88,10 @@ if (!port.includes("pub trait MatchReviewWorkflowPort")) failures.push("缺少 R
 if (!packagePort.includes("pub trait MatchReviewPackageSourcePort")) failures.push("缺少 MatchReviewPackageSourcePort");
 if (!packagePort.includes("pub trait MatchReviewPackageStatePort")) failures.push("缺少 MatchReviewPackageStatePort");
 if (!packagePort.includes("pub trait MatchReviewPackageFactsPort")) failures.push("缺少 MatchReviewPackageFactsPort");
-if (!adapter.includes("impl MatchReviewPort for ActiveDatabase")) failures.push("ActiveDatabase 未实现 MatchReviewPort");
-if (!adapter.includes("impl MatchReviewPackageSourcePort for ActiveDatabase")) failures.push("ActiveDatabase 未实现 MatchReviewPackageSourcePort");
-if (!adapter.includes("impl MatchReviewPackageStatePort for ActiveDatabase")) failures.push("ActiveDatabase 未实现 MatchReviewPackageStatePort");
-if (!adapter.includes("impl MatchReviewPackageFactsPort for ActiveDatabase")) failures.push("ActiveDatabase 未实现 MatchReviewPackageFactsPort");
+if (!adapter.includes("impl MatchReviewPort for PersistenceStore")) failures.push("PersistenceStore 未实现 MatchReviewPort");
+if (!adapter.includes("impl MatchReviewPackageSourcePort for PersistenceStore")) failures.push("PersistenceStore 未实现 MatchReviewPackageSourcePort");
+if (!adapter.includes("impl MatchReviewPackageStatePort for PersistenceStore")) failures.push("PersistenceStore 未实现 MatchReviewPackageStatePort");
+if (!adapter.includes("impl MatchReviewPackageFactsPort for PersistenceStore")) failures.push("PersistenceStore 未实现 MatchReviewPackageFactsPort");
 if (!port.includes("status: Option<AbilityCandidateStatus>")) failures.push("能力候选状态过滤未进入 Review Port");
 if (!port.includes("match_review_id: Option<Uuid>")) failures.push("能力候选复盘过滤未进入 Review Port");
 if (!facade.includes("self.database") || !facade.includes("active_session()")) failures.push("Review facade 未经 DatabaseService 活动会话取得端口实现");

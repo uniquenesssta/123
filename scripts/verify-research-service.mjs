@@ -103,8 +103,8 @@ check(!ports.includes("serde_json::Value"), "Research Ports 泄漏裸 serde_json
 for (const capability of ["find_entity_candidates", "append_entity_resolution", "append_time_audit", "append_conflict_evaluation", "append_conflict_event", "append_evidence_route"]) {
   check(ports.includes(`fn ${capability}`), `FactPipelinePort 缺少能力：${capability}`);
 }
-check(adapter.includes("impl ResearchEvidenceLedgerPort for ActiveDatabase"), "Research adapter 缺少 Evidence Ledger 实现");
-check(adapter.includes("impl FactPipelinePort for ActiveDatabase"), "Research adapter 缺少 Fact Pipeline 实现");
+check(adapter.includes("impl ResearchEvidenceLedgerPort for PersistenceStore"), "Research adapter 缺少 Evidence Ledger 实现");
+check(adapter.includes("impl FactPipelinePort for PersistenceStore"), "Research adapter 缺少 Fact Pipeline 实现");
 for (const token of [".fact_pipeline_context(research_run_id)", ".find_entity_candidates(", ".append_entity_resolution(draft)", ".append_time_audit(draft)", ".append_conflict_evaluation(draft)", ".append_conflict_event(", ".append_evidence_route(draft)"]) {
   check(adapter.includes(token), `Fact Pipeline adapter 未复用既有持久化能力：${token}`);
 }
@@ -120,8 +120,8 @@ for (const capability of ["append_manual_route_override", "route_readiness"]) {
 for (const capability of ["append_attempt", "attempt_number_offset", "usage_totals", "append_web_references"]) {
   check(ports.includes(`fn ${capability}`), `ResearchGatewayAuditPort 缺少能力：${capability}`);
 }
-check(adapter.includes("impl ResearchGatewayAuditPort for ActiveDatabase"), "Research adapter 缺少 Gateway Audit 实现");
-check(adapter.includes("impl ResearchManualConflictPort for ActiveDatabase"), "Research adapter 缺少 Manual Conflict 实现");
+check(adapter.includes("impl ResearchGatewayAuditPort for PersistenceStore"), "Research adapter 缺少 Gateway Audit 实现");
+check(adapter.includes("impl ResearchManualConflictPort for PersistenceStore"), "Research adapter 缺少 Manual Conflict 实现");
 for (const token of [".append_p4_manual_route_override(draft)", ".p4_route_readiness(task_id)"]) {
   check(adapter.includes(token), `Manual Conflict adapter 未复用既有持久化能力：${token}`);
 }

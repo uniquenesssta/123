@@ -105,11 +105,12 @@ check(
   "持久化适配器未通过端口注册表导入",
 );
 check(
-  portRegistry.includes("pub(crate) struct ActiveDatabase"),
-  "活动数据库状态未归属端口模块",
+  portRegistry.includes("use football_persistence_postgres::register_adapters;"),
+  "PostgreSQL adapter 注册入口未归属端口注册模块",
 );
+check(!portRegistry.includes("struct ActiveDatabase"), "端口注册模块仍保留 ActiveDatabase wrapper");
 check(
-  databaseService.includes("pub(crate) session: RwLock<Option<ActiveDatabase>>"),
+  databaseService.includes("pub(crate) session: RwLock<Option<DatabaseSession>>"),
   "DatabaseService 未持有活动数据库槽位",
 );
 check(service.includes("pub struct ApplicationService"), "缺少兼容 ApplicationService 门面");

@@ -11,7 +11,7 @@ use football_domain::{
 use uuid::Uuid;
 
 impl ApplicationService {
-    async fn analytics_session(&self) -> ApplicationResult<crate::composition::ActiveDatabase> {
+    async fn analytics_session(&self) -> ApplicationResult<crate::composition::DatabaseSession> {
         self.database
             .active_session()
             .await

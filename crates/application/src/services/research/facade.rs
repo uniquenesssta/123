@@ -1,4 +1,4 @@
-use crate::composition::ActiveDatabase;
+use crate::composition::DatabaseSession;
 use crate::{
     ApplicationError, ApplicationResult, ApplicationService, OpenAiResearchCommand,
     ProcessResearchEvidenceCommand,
@@ -13,7 +13,7 @@ use football_domain::{
 use football_research_gateway::{CancellationToken, GatewayExecution};
 
 impl ApplicationService {
-    async fn research_session(&self) -> ApplicationResult<ActiveDatabase> {
+    async fn research_session(&self) -> ApplicationResult<DatabaseSession> {
         self.database
             .active_session()
             .await
