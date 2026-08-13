@@ -18,6 +18,7 @@ jobs:
       R4_03_BASE: 3c147376cf81394984cc20850a58e866eef4280b
       R4_03_FAILED_RUN: 31665585062
       R4_03_YAML_FAILED_RUN: 31665943169
+      R4_03_ENV_FAILED_RUN: 31666083511
       npm_config_cache: ${{ github.workspace }}/.npm-cache
     steps:
       - name: Checkout R4-03 branch
@@ -49,7 +50,7 @@ jobs:
           $ErrorActionPreference = 'Stop'
           $PSNativeCommandUseErrorActionPreference = $true
           $changed = @(git diff --name-only "$env:R4_03_BASE...HEAD")
-          $allowed = @('.github/workflows/r4-03-implementation.yml', '.github/r4-03-apply.py')
+          $allowed = @('.github/workflows/r4-03-implementation.yml', '.github/r4-03-apply.py', '.github/r4-03-record-fix.py')
           $unexpected = @($changed | Where-Object { $_ -notin $allowed })
           if ($unexpected.Count -ne 0) {
             throw "R4-03 branch contains unexpected pre-existing changes: $($unexpected -join ', ')"
@@ -84,6 +85,7 @@ jobs:
         run: |
           $ErrorActionPreference = 'Stop'
           $PSNativeCommandUseErrorActionPreference = $true
+          npm run setup
           npm run verify:architecture
           npm run verify:frontend
           cargo clippy --locked --workspace --all-targets -- -D warnings
@@ -99,6 +101,7 @@ jobs:
           $allowed = @(
             '.github/workflows/r4-03-implementation.yml',
             '.github/r4-03-apply.py',
+            '.github/r4-03-record-fix.py',
             'README.md',
             'architecture/domain-type-inventory.json',
             'crates/persistence-postgres/src/competition_kind.rs',
@@ -127,6 +130,7 @@ jobs:
           $ErrorActionPreference = 'Stop'
           $PSNativeCommandUseErrorActionPreference = $true
           python .github/r4-03-apply.py record
+          python .github/r4-03-record-fix.py
 
       - name: Final diff and cleanup gate
         shell: pwsh
@@ -135,10 +139,10 @@ jobs:
           $PSNativeCommandUseErrorActionPreference = $true
           npm run verify:persistence-mapping
           git diff --check
-          git rm .github/workflows/r4-03-implementation.yml .github/r4-03-apply.py
+          git rm .github/workflows/r4-03-implementation.yml .github/r4-03-apply.py .github/r4-03-record-fix.py
           git diff --check
           $changed = @(git diff --name-only "$env:R4_03_BASE")
-          $transient = @($changed | Where-Object { $_ -in @('.github/workflows/r4-03-implementation.yml', '.github/r4-03-apply.py') })
+          $transient = @($changed | Where-Object { $_ -in @('.github/workflows/r4-03-implementation.yml', '.github/r4-03-apply.py', '.github/r4-03-record-fix.py') })
           if ($transient.Count -ne 0) {
             throw "R4-03 transient files remain in final diff: $($transient -join ', ')"
           }
