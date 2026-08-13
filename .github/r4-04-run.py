@@ -16,6 +16,20 @@ spec.loader.exec_module(module)
 module.apply_persistence_root()
 module.write_application_adapter_owners()
 
+error_path = ROOT / "crates/application/src/composition/adapters/persistence_error.rs"
+error_text = error_path.read_text(encoding="utf-8")
+old_visibility = "pub(super) fn map_persistence_error(error: PersistenceError) -> PortError {"
+new_visibility = "pub(in crate::composition) fn map_persistence_error(error: PersistenceError) -> PortError {"
+if error_text.count(old_visibility) != 1:
+    raise RuntimeError(
+        f"persistence error mapper visibility anchor expected once, found {error_text.count(old_visibility)}"
+    )
+error_path.write_text(
+    error_text.replace(old_visibility, new_visibility, 1),
+    encoding="utf-8",
+    newline="\n",
+)
+
 adapter_root = ROOT / "crates/application/src/composition/adapters"
 new_owners = {"database.rs", "competition.rs", "rules.rs", "persistence_error.rs"}
 for path in adapter_root.rglob("*.rs"):
@@ -82,6 +96,25 @@ mod_path.write_text(mod_text, encoding="utf-8", newline="\n")
 module.rewrite_port_registry()
 module.switch_application_sessions()
 
+service_path = ROOT / "crates/application/src/services/database/service.rs"
+service = service_path.read_text(encoding="utf-8")
+for old, new, label in [
+    (
+        "previous.close().await?;",
+        "DatabaseLifecyclePort::close(&previous).await?;",
+        "database previous-session close",
+    ),
+    (
+        "active.close().await?;",
+        "DatabaseLifecyclePort::close(&active).await?;",
+        "database active-session close",
+    ),
+]:
+    if service.count(old) != 1:
+        raise RuntimeError(f"{label} anchor expected once, found {service.count(old)}")
+    service = service.replace(old, new, 1)
+service_path.write_text(service, encoding="utf-8", newline="\n")
+
 try:
     module.write_verifier_and_package()
 except RuntimeError as error:
@@ -111,6 +144,17 @@ new_check = 'check(/register_adapters\\(options\\)\\s*\\.await\\s*\\.map_err\\(m
 if verifier.count(old_check) != 1:
     raise RuntimeError(f"registration verifier format anchor expected once, found {verifier.count(old_check)}")
 verifier = verifier.replace(old_check, new_check, 1)
+
+insert_anchor = 'check(!portRegistry.includes("PersistenceStore::connect"), "Application composition must not bypass register_adapters");\n'
+insert = insert_anchor + '''const persistenceError = read("crates/application/src/composition/adapters/persistence_error.rs");
+const databaseService = read("crates/application/src/services/database/service.rs");
+check(persistenceError.includes("pub(in crate::composition) fn map_persistence_error"), "Persistence error mapper must be visible only across the composition boundary");
+check(databaseService.includes("DatabaseLifecyclePort::close(&previous).await?;"), "Database replacement must preserve fallible lifecycle close semantics");
+check(databaseService.includes("DatabaseLifecyclePort::close(&active).await?;"), "Database disconnect must preserve fallible lifecycle close semantics");
+'''
+if verifier.count(insert_anchor) != 1:
+    raise RuntimeError(f"adapter verifier close-semantics anchor expected once, found {verifier.count(insert_anchor)}")
+verifier = verifier.replace(insert_anchor, insert, 1)
 verifier_path.write_text(verifier, encoding="utf-8", newline="\n")
 
-print("R4-04 helper applied: forwarding normalized, package gate updated, and registration verifier made rustfmt-format agnostic")
+print("R4-04 helper applied: forwarding normalized, mapper visibility constrained to composition, database close semantics preserved, and verifier made format agnostic")
