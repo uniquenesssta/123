@@ -20,6 +20,7 @@ jobs:
       R4_03_YAML_FAILED_RUN: 31665943169
       R4_03_ENV_FAILED_RUN: 31666083511
       R4_03_PUBLISH_FAILED_RUN: 31666505364
+      R4_03_CLEANUP_FAILED_RUN: 31667443481
       npm_config_cache: ${{ github.workspace }}/../.npm-cache
     steps:
       - name: Checkout R4-03 branch
@@ -140,20 +141,46 @@ jobs:
           $PSNativeCommandUseErrorActionPreference = $true
           npm run verify:persistence-mapping
           git diff --check
+          Write-Host '=== R4-03 status before cleanup ==='
+          git status --short --untracked-files=all
           if (Test-Path .npm-cache) {
             Remove-Item -Recurse -Force .npm-cache
           }
           git rm .github/workflows/r4-03-implementation.yml .github/r4-03-apply.py .github/r4-03-record-fix.py
-          git diff --check
-          $changed = @(git diff --name-only "$env:R4_03_BASE")
-          $transient = @($changed | Where-Object { $_ -in @('.github/workflows/r4-03-implementation.yml', '.github/r4-03-apply.py', '.github/r4-03-record-fix.py') })
-          if ($transient.Count -ne 0) {
-            throw "R4-03 transient files remain in final diff: $($transient -join ', ')"
-          }
+          git add README.md architecture/domain-type-inventory.json package.json scripts/verify-persistence-mapping.mjs crates/persistence-postgres/src docs/modular-rewrite/R04-persistence-foundation
+          git diff --check --cached
+          Write-Host '=== R4-03 status after exact staging ==='
+          git status --short --untracked-files=all
           $untracked = @(git ls-files --others --exclude-standard)
           if ($untracked.Count -ne 0) {
-            throw "R4-03 untracked files remain before commit: $($untracked -join ', ')"
+            $untracked | ForEach-Object { Write-Host "UNTRACKED=$_" }
+            throw "R4-03 unexpected untracked files remain after exact staging: $($untracked -join ', ')"
           }
+          $expected = @(
+            'README.md',
+            'architecture/domain-type-inventory.json',
+            'crates/persistence-postgres/src/competition_kind.rs',
+            'crates/persistence-postgres/src/lib.rs',
+            'crates/persistence-postgres/src/model_runs.rs',
+            'crates/persistence-postgres/src/mapping/invalid_state.rs',
+            'crates/persistence-postgres/src/mapping/json.rs',
+            'crates/persistence-postgres/src/mapping/mod.rs',
+            'crates/persistence-postgres/src/mapping/optional.rs',
+            'crates/persistence-postgres/src/mapping/time.rs',
+            'crates/persistence-postgres/src/mapping/uuid.rs',
+            'docs/modular-rewrite/R04-persistence-foundation/R04-03-row-映射基础规范.md',
+            'docs/modular-rewrite/R04-persistence-foundation/README.md',
+            'package.json',
+            'scripts/verify-persistence-mapping.mjs'
+          ) | Sort-Object
+          $staged = @(git diff --cached --name-only "$env:R4_03_BASE") | Sort-Object
+          Write-Host '=== R4-03 staged final diff ==='
+          $staged | ForEach-Object { Write-Host "STAGED=$_" }
+          if (($staged -join "`n") -ne ($expected -join "`n")) {
+            throw "R4-03 staged final file set mismatch. Expected: $($expected -join ', '); actual: $($staged -join ', ')"
+          }
+          git diff --exit-code "$env:R4_03_BASE" -- .github/workflows/r4-03-implementation.yml .github/r4-03-apply.py .github/r4-03-record-fix.py
+          git diff --cached --exit-code "$env:R4_03_BASE" -- .github/workflows/r4-03-implementation.yml .github/r4-03-apply.py .github/r4-03-record-fix.py
 
       - name: Commit verified R4-03 implementation
         shell: pwsh
@@ -162,7 +189,6 @@ jobs:
           $PSNativeCommandUseErrorActionPreference = $true
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add README.md architecture/domain-type-inventory.json package.json scripts/verify-persistence-mapping.mjs crates/persistence-postgres/src docs/modular-rewrite/R04-persistence-foundation
           git status --short
           git commit -m "refactor(r4-03): establish row mapping primitives"
           if (git status --porcelain) {
