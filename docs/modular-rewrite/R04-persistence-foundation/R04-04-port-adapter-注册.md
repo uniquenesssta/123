@@ -2,7 +2,7 @@
 
 ## 状态
 
-`VERIFYING`
+`DONE`
 
 ## 实施结果
 
@@ -52,10 +52,19 @@ Windows 2025 / Rust 1.88.0 / Node 22 hard gate run `31712193150` 实际执行并
 - `cargo test --locked --workspace`。
 - Cargo manifests / `Cargo.lock`、历史 migrations 对 R4-04 基线 `b508d1ff7808b8735694cf1e57a4d603f2e973e3` 零 diff。
 
+## 正式收口
+
+- final implementation hard gate run `31712193150`：`SUCCESS`；R4-04/R4-01/R4-02/R4-03 专项、数据库静态冻结、保护资产、rustfmt、Persistence/Application compile/tests、完整 architecture/frontend、workspace Clippy `-D warnings` 与 workspace tests 均通过。
+- PR #25 clean Public Platform CI run `31717901248` / Windows automated delivery job `94507174688`：`SUCCESS`；artifact `9188959652`，13,894,348 bytes，SHA-256 `477b32b66fb06ee9bfa04ead7778639f1d5658f9478a641c706416c49b70d687`。
+- 最终 PR HEAD `b808ff3cc7a43f3c68b0f024228adefb20b916cb` 的 tree 与已验证 implementation `a7f1dc852bc486dbf0b1ca4dd7db5d262950d7c8` 文件内容零差异；用户授权清理的 `.noop` 及 assistant-created marker 均不在最终 PR/stage tree。
+- PR #25 按固定 HEAD `b808ff3cc7a43f3c68b0f024228adefb20b916cb` squash merge；stage merge commit `b97587c9d20165018f80040dc2a2c098dbbec177`。
+- 合并后 canonical stage Public Platform CI run `31724131556` / job `94528167665`：`SUCCESS`；artifact `9191415520`，13,895,272 bytes，SHA-256 `3ccb37d8eab17c0e589354c10c3423579397629f9f76481b267acd0749db38cf`。
+- R4-04 节点正式关闭为 `DONE`；未提前实施 R5-01。
+
 ## 未执行与剩余风险
 
 - 18 个要求专用可写 `FOOTBALL_TEST_DATABASE_URL` 的 PostgreSQL ignored integration tests 未执行；未执行 destructive database reset。
-- 当前节点保持 `VERIFYING`，等待 clean Public Platform CI、PR 合并、合并后 stage CI 与 R4 阶段出口记录；不得提前进入 R5-01。
+- R4-04 节点已 `DONE`；但上述真实 PostgreSQL integration / destructive reset 缺口仍阻塞 R4 阶段出口，因此 R4 stage 保持 `VERIFYING`、R5-01 保持 `BLOCKED`。
 
 ## 回退点
 

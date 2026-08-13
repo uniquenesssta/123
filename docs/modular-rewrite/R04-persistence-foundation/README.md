@@ -2,7 +2,7 @@
 
 ## 阶段状态
 
-`IN_PROGRESS`
+`VERIFYING`
 
 R3 Application Services 已完成并关闭。R4 只重写 `crates/persistence-postgres/src/` 的 PostgreSQL Adapter 基础设施、错误、审计和基础映射边界；不修改具体业务 SQL，不修改历史迁移，不修改 Tauri/前端产品行为或模型保护资产。
 
@@ -21,7 +21,7 @@ R3 Application Services 已完成并关闭。R4 只重写 `crates/persistence-po
 | R4-01 | Store / Error / Pool / migration / health / statistics | DONE | [`R04-01-store-error-and-pool.md`](./R04-01-store-error-and-pool.md) |
 | R4-02 | Audit 基础设施 | DONE | [`R04-02-audit-基础设施.md`](./R04-02-audit-基础设施.md) |
 | R4-03 | 通用 Row 映射基础规范 | DONE | [`R04-03-row-映射基础规范.md`](./R04-03-row-映射基础规范.md) |
-| R4-04 | Application Port Adapter 注册 | VERIFYING | [`R04-04-port-adapter-注册.md`](./R04-04-port-adapter-注册.md) |
+| R4-04 | Application Port Adapter 注册 | DONE | [`R04-04-port-adapter-注册.md`](./R04-04-port-adapter-注册.md) |
 
 ## R4-01 进入条件
 
@@ -58,9 +58,18 @@ R4-01 完成前保持 `READY/VERIFYING`，只有目标职责切换为唯一 owne
 - 18 个要求专用可写 `FOOTBALL_TEST_DATABASE_URL` 的 PostgreSQL 集成测试仍未执行；未执行 destructive database reset。
 - R4-03 正式关闭为 `DONE`；R4-04 开放为 `READY`。本收口未包含任何 R4-04 生产源码改动。
 
-## R4-04 实施中
+## R4-04 收口
 
-- 从 R4-03 最终 canonical HEAD `b508d1ff7808b8735694cf1e57a4d603f2e973e3` 独立建立 `agent/r4-04-port-adapter-registration`。
-- scope audit run `31686092182` 确认旧入口为 `ActiveDatabase` + `transition_store`，40 个 DB-backed Application Ports 由该 wrapper 转发到 PostgresStore；Persistence -> Application 反向依赖会造成 crate cycle，因此实现采用 Application-owned trait / PostgresStore concrete target 的 Rust 合法边界。
-- hard gate run `31712193150` 已通过 R4-04 专项、R4-01/R4-02/R4-03 回归、数据库冻结、architecture/frontend 与 workspace Rust 回归。
-- R4-04 当前 `VERIFYING`；clean CI、合并及 R4 stage completion 完成前 R5-01 继续 `BLOCKED`。
+- 从 R4-03 最终 canonical HEAD `b508d1ff7808b8735694cf1e57a4d603f2e973e3` 独立实施 R4-04；scope audit run `31686092182` 确认旧入口为 `ActiveDatabase` + `transition_store`，40 个 DB-backed Application Ports 由该 wrapper 转发到 PostgresStore。
+- Windows 2025 / Rust 1.88.0 / Node 22 hard gate run `31712193150` 已通过 R4-04 专项、R4-01/R4-02/R4-03 回归、数据库静态冻结、architecture/frontend、Persistence/Application check/tests、workspace Clippy `-D warnings` 与 workspace tests；Persistence 80/80、Application 33/33 tests 通过，18 个 PostgreSQL integration tests 保持 ignored。
+- PR #25 clean Public Platform CI run `31717901248` / Windows automated delivery job `94507174688`：`SUCCESS`；artifact `9188959652`，13,894,348 bytes，SHA-256 `477b32b66fb06ee9bfa04ead7778639f1d5658f9478a641c706416c49b70d687`。最终 PR HEAD `b808ff3cc7a43f3c68b0f024228adefb20b916cb` 与已验证 implementation tree `a7f1dc852bc486dbf0b1ca4dd7db5d262950d7c8` 文件内容零差异，assistant-created `.noop` / marker 未进入最终 diff。
+- PR #25 按固定 HEAD `b808ff3cc7a43f3c68b0f024228adefb20b916cb` 以 squash merge 合并到 `rewrite/r4-persistence-foundation`；stage merge commit `b97587c9d20165018f80040dc2a2c098dbbec177`。
+- 合并后 canonical stage Public Platform CI run `31724131556` / job `94528167665`：`SUCCESS`；artifact `9191415520`（`windows-automated-delivery-evidence-b97587c9d20165018f80040dc2a2c098dbbec177`）大小 13,895,272 bytes，SHA-256 `3ccb37d8eab17c0e589354c10c3423579397629f9f76481b267acd0749db38cf`。
+- R4-04 正式关闭为 `DONE`。公共 Application Ports、Tauri command/DTO、SQL、0001–0046 migrations、配置、错误语义、模型保护资产和生产依赖均未改变。
+
+## R4 阶段出口状态
+
+- 四个 Atomic Task 均已 `DONE`，节点记录齐全；阶段完成/出口记录见 [`R04-stage-completion.md`](./R04-stage-completion.md)。
+- R4 阶段当前保持 `VERIFYING`：任务书阶段验证矩阵要求真实空库 migration、health/stats、audit integration；当前 18 个要求专用可写 `FOOTBALL_TEST_DATABASE_URL` 的 PostgreSQL integration tests 未执行，也未执行 destructive database reset。
+- Public Platform CI / 静态数据库冻结 / Rust workspace 回归不能替代上述真实 PostgreSQL stage gate，因此不得把 R4 整体标记为 `DONE`。
+- R5-01 继续 `BLOCKED`；本收口未创建或修改任何 R5 生产实现。
