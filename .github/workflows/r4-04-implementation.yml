@@ -17,6 +17,7 @@ jobs:
     env:
       R4_04_BASE: b508d1ff7808b8735694cf1e57a4d603f2e973e3
       R4_04_AUDIT_RUN: 31686092182
+      R4_04_GENERATOR_FAILED_RUN: 31686470233
       npm_config_cache: ${{ github.workspace }}/../.npm-cache
     steps:
       - name: Checkout R4-04 branch
@@ -50,6 +51,7 @@ jobs:
           $allowed = @(
             '.github/r4-04-apply.py',
             '.github/r4-04-run.py',
+            '.github/r4-04-record-fix.py',
             '.github/workflows/r4-04-audit.yml',
             '.github/workflows/r4-04-implementation.yml'
           )
@@ -113,6 +115,7 @@ jobs:
             if ($file -in @(
               '.github/r4-04-apply.py',
               '.github/r4-04-run.py',
+              '.github/r4-04-record-fix.py',
               '.github/workflows/r4-04-audit.yml',
               '.github/workflows/r4-04-implementation.yml',
               'README.md',
@@ -139,6 +142,7 @@ jobs:
           $ErrorActionPreference = 'Stop'
           $PSNativeCommandUseErrorActionPreference = $true
           python .github/r4-04-apply.py record
+          python .github/r4-04-record-fix.py
           npm run verify:persistence-adapters
           git diff --check
 
@@ -147,7 +151,7 @@ jobs:
         run: |
           $ErrorActionPreference = 'Stop'
           $PSNativeCommandUseErrorActionPreference = $true
-          git rm .github/r4-04-apply.py .github/r4-04-run.py .github/workflows/r4-04-audit.yml .github/workflows/r4-04-implementation.yml
+          git rm .github/r4-04-apply.py .github/r4-04-run.py .github/r4-04-record-fix.py .github/workflows/r4-04-audit.yml .github/workflows/r4-04-implementation.yml
           git add README.md architecture/domain-type-inventory.json package.json scripts/verify-persistence-adapters.mjs crates/persistence-postgres/src crates/application/src docs/modular-rewrite/R04-persistence-foundation
           git diff --check --cached
 
@@ -159,8 +163,8 @@ jobs:
           if ($transient.Count -ne 0) {
             throw "R4-04 transient files remain in final staged tree: $($transient -join ', ')"
           }
-          git diff --exit-code "$env:R4_04_BASE" -- .github/r4-04-apply.py .github/r4-04-run.py .github/workflows/r4-04-audit.yml .github/workflows/r4-04-implementation.yml
-          git diff --cached --exit-code "$env:R4_04_BASE" -- .github/r4-04-apply.py .github/r4-04-run.py .github/workflows/r4-04-audit.yml .github/workflows/r4-04-implementation.yml
+          git diff --exit-code "$env:R4_04_BASE" -- .github/r4-04-apply.py .github/r4-04-run.py .github/r4-04-record-fix.py .github/workflows/r4-04-audit.yml .github/workflows/r4-04-implementation.yml
+          git diff --cached --exit-code "$env:R4_04_BASE" -- .github/r4-04-apply.py .github/r4-04-run.py .github/r4-04-record-fix.py .github/workflows/r4-04-audit.yml .github/workflows/r4-04-implementation.yml
 
       - name: Commit verified R4-04 implementation
         shell: pwsh
