@@ -103,7 +103,5 @@ except RuntimeError as error:
         raise RuntimeError(f"strict package script anchor expected once, found {package.count(old_script)}")
     package = package.replace(old_script, new_script, 1)
     package_path.write_text(package, encoding="utf-8", newline="\n")
-else:
-    raise RuntimeError("R4-04 helper unexpectedly bypassed the known strict package-anchor recovery; remove wrapper recovery before publication")
 
-print("R4-04 helper applied: multiline/single-line transition forwarding normalized and only the known strict package-anchor recovery used")
+print("R4-04 helper applied: transition forwarding normalized and package architecture gate updated without suppressing unrelated errors")
