@@ -1,0 +1,177 @@
+name: R4-04 Port Adapter Implementation
+
+on:
+  push:
+    branches:
+      - agent/r4-04-port-adapter-registration
+    paths:
+      - .github/workflows/r4-04-implementation.yml
+
+permissions:
+  contents: write
+
+jobs:
+  implement-and-verify:
+    runs-on: windows-2025
+    timeout-minutes: 120
+    env:
+      R4_04_BASE: b508d1ff7808b8735694cf1e57a4d603f2e973e3
+      R4_04_AUDIT_RUN: 31686092182
+      npm_config_cache: ${{ github.workspace }}/../.npm-cache
+    steps:
+      - name: Checkout R4-04 branch
+        uses: actions/checkout@v4
+        with:
+          ref: agent/r4-04-port-adapter-registration
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: package-lock.json
+
+      - name: Setup Rust 1.88.0
+        uses: dtolnay/rust-toolchain@1.88.0
+        with:
+          components: rustfmt, clippy
+
+      - name: Restore Rust build cache
+        uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: . -> ../.cargo-target
+
+      - name: Verify protected R4-04 starting scope
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $PSNativeCommandUseErrorActionPreference = $true
+          $allowed = @(
+            '.github/r4-04-apply.py',
+            '.github/r4-04-run.py',
+            '.github/workflows/r4-04-audit.yml',
+            '.github/workflows/r4-04-implementation.yml'
+          )
+          $changed = @(git -c core.quotePath=false diff --name-only "$env:R4_04_BASE...HEAD")
+          $unexpected = @($changed | Where-Object { $_ -notin $allowed })
+          if ($unexpected.Count -ne 0) {
+            throw "R4-04 branch contains unexpected pre-existing changes: $($unexpected -join ', ')"
+          }
+
+      - name: Apply R4-04 adapter rewrite
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $PSNativeCommandUseErrorActionPreference = $true
+          python .github/r4-04-run.py
+          cargo fmt --all
+          node scripts/generate-domain-type-inventory.mjs
+
+      - name: Run R4-04 minimum gate
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $PSNativeCommandUseErrorActionPreference = $true
+          npm run verify:persistence-adapters
+          npm run verify:persistence-foundation
+          npm run verify:persistence-audit
+          npm run verify:persistence-mapping
+          node scripts/verify_database_baseline.mjs
+          node scripts/verify_protected_assets.mjs
+          cargo fmt --all -- --check
+          node scripts/prepare-cargo-target.mjs
+          cargo check --locked -p football-persistence-postgres -p football-application
+          cargo test --locked -p football-persistence-postgres
+          cargo test --locked -p football-application
+
+      - name: Run R4-04 stage regression
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $PSNativeCommandUseErrorActionPreference = $true
+          npm run setup
+          npm run verify:architecture
+          npm run verify:frontend
+          cargo clippy --locked --workspace --all-targets -- -D warnings
+          cargo test --locked --workspace
+
+      - name: Enforce R4-04 frozen boundaries
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $PSNativeCommandUseErrorActionPreference = $true
+          git diff --exit-code "$env:R4_04_BASE" -- Cargo.toml Cargo.lock crates/application/Cargo.toml crates/persistence-postgres/Cargo.toml
+          git diff --exit-code "$env:R4_04_BASE" -- crates/persistence-postgres/migrations
+          git diff --exit-code "$env:R4_04_BASE" -- crates/model-api crates/model-p4 crates/model-p7
+          git diff --exit-code "$env:R4_04_BASE" -- src src-tauri
+
+          $changed = @(git -c core.quotePath=false diff --name-only "$env:R4_04_BASE")
+          $unexpected = @()
+          foreach ($file in $changed) {
+            $ok = $false
+            if ($file -in @(
+              '.github/r4-04-apply.py',
+              '.github/r4-04-run.py',
+              '.github/workflows/r4-04-audit.yml',
+              '.github/workflows/r4-04-implementation.yml',
+              'README.md',
+              'architecture/domain-type-inventory.json',
+              'package.json',
+              'scripts/verify-persistence-adapters.mjs',
+              'docs/modular-rewrite/R04-persistence-foundation/R04-04-port-adapter-注册.md',
+              'docs/modular-rewrite/R04-persistence-foundation/README.md'
+            )) { $ok = $true }
+            if ($file.StartsWith('crates/persistence-postgres/src/')) { $ok = $true }
+            if ($file.StartsWith('crates/application/src/composition/')) { $ok = $true }
+            if ($file -match '^crates/application/src/services/(analytics|prediction|release|teams|lineups|exchange|postmatch|ai_workspace|review|research|players)/') { $ok = $true }
+            if ($file -eq 'crates/application/src/services/database/service.rs') { $ok = $true }
+            if ($file -eq 'crates/application/src/use_cases/application_facade/database_lifecycle/initialize.rs') { $ok = $true }
+            if (-not $ok) { $unexpected += $file }
+          }
+          if ($unexpected.Count -ne 0) {
+            throw "R4-04 unexpected scope: $($unexpected -join ', ')"
+          }
+
+      - name: Write R4-04 verification record
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $PSNativeCommandUseErrorActionPreference = $true
+          python .github/r4-04-apply.py record
+          npm run verify:persistence-adapters
+          git diff --check
+
+      - name: Remove transient implementation files and stage exact result
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $PSNativeCommandUseErrorActionPreference = $true
+          git rm .github/r4-04-apply.py .github/r4-04-run.py .github/workflows/r4-04-audit.yml .github/workflows/r4-04-implementation.yml
+          git add README.md architecture/domain-type-inventory.json package.json scripts/verify-persistence-adapters.mjs crates/persistence-postgres/src crates/application/src docs/modular-rewrite/R04-persistence-foundation
+          git diff --check --cached
+
+          $untracked = @(git ls-files --others --exclude-standard)
+          if ($untracked.Count -ne 0) {
+            throw "R4-04 untracked files remain: $($untracked -join ', ')"
+          }
+          $transient = @(git -c core.quotePath=false diff --cached --name-only "$env:R4_04_BASE" -- .github)
+          if ($transient.Count -ne 0) {
+            throw "R4-04 transient files remain in final staged tree: $($transient -join ', ')"
+          }
+          git diff --exit-code "$env:R4_04_BASE" -- .github/r4-04-apply.py .github/r4-04-run.py .github/workflows/r4-04-audit.yml .github/workflows/r4-04-implementation.yml
+          git diff --cached --exit-code "$env:R4_04_BASE" -- .github/r4-04-apply.py .github/r4-04-run.py .github/workflows/r4-04-audit.yml .github/workflows/r4-04-implementation.yml
+
+      - name: Commit verified R4-04 implementation
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $PSNativeCommandUseErrorActionPreference = $true
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git status --short
+          git commit -m "refactor(r4-04): register postgres port adapters"
+          if (git status --porcelain) {
+            throw 'R4-04 worktree not clean after commit'
+          }
+          git push origin HEAD:agent/r4-04-port-adapter-registration
