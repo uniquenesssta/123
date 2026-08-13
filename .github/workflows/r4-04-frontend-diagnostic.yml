@@ -13,7 +13,7 @@ permissions:
 jobs:
   diagnose:
     runs-on: windows-2025
-    timeout-minutes: 45
+    timeout-minutes: 60
     env:
       npm_config_cache: ${{ github.workspace }}/../.npm-cache
     steps:
@@ -36,34 +36,23 @@ jobs:
           $PSNativeCommandUseErrorActionPreference = $true
           python .github/r4-04-run.py
           python .github/r4-04-migrate-verifiers.py
+          python .github/r4-04-session-boundary.py
           cargo fmt --all
           python .github/r4-04-sync-db-baseline.py
           node scripts/generate-domain-type-inventory.mjs
           npm run setup
-      - name: Diagnose frontend prelude checks
+          npm run verify:persistence-adapters
+      - name: Diagnose full frontend gate
         shell: pwsh
         run: |
           $ErrorActionPreference = 'Continue'
-          $checks = @(
-            'scripts/verify-browser-bootstrap.mjs',
-            'scripts/verify-tauri-bootstrap.mjs',
-            'scripts/verify-application-composition.mjs',
-            'scripts/verify-database-service.mjs',
-            'scripts/verify-competition-rules-service.mjs',
-            'scripts/verify-teams-players-service.mjs',
-            'scripts/verify-lineups-service.mjs',
-            'scripts/verify-prediction-service.mjs',
-            'scripts/verify-research-service.mjs'
-          )
-          foreach ($check in $checks) {
-            $output = @(& node $check 2>&1)
-            $code = $LASTEXITCODE
-            if ($code -ne 0) {
-              $tail = @($output | Select-Object -Last 40) -join ' | '
-              $escaped = $tail.Replace('%','%25').Replace("`r",'').Replace("`n",'%0A')
-              Write-Host "::error title=R4-04 frontend diagnostic [$check]::$escaped"
-              exit $code
-            }
-            Write-Host "PASS $check"
+          $output = @(& npm run verify:frontend 2>&1)
+          $code = $LASTEXITCODE
+          if ($code -ne 0) {
+            $tail = @($output | Select-Object -Last 80) -join ' | '
+            $escaped = $tail.Replace('%','%25').Replace("`r",'').Replace("`n",'%0A')
+            Write-Host "::error title=R4-04 full frontend diagnostic::$escaped"
+            exit $code
           }
-          Write-Host 'R4-04 frontend prelude subset passed; failure is later in verify-frontend sequence.'
+          $output | Select-Object -Last 40 | ForEach-Object { Write-Host $_ }
+          Write-Host 'R4-04 full frontend diagnostic passed.'
