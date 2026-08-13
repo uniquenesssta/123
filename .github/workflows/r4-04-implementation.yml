@@ -21,6 +21,7 @@ jobs:
       R4_04_GUARD_FAILED_RUN: 31686662626
       R4_04_VERIFIER_FAILED_RUN: 31686951586
       R4_04_DATABASE_FINGERPRINT_FAILED_RUN: 31687122419
+      R4_04_RUST_COMPILE_FAILED_RUN: 31687372054
       npm_config_cache: ${{ github.workspace }}/../.npm-cache
     steps:
       - name: Checkout R4-04 branch
