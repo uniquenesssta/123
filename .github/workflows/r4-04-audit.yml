@@ -18,17 +18,13 @@ jobs:
         with:
           ref: agent/r4-04-port-adapter-registration
           fetch-depth: 0
-      - name: Audit stale adapter-owner validators
+      - name: Audit application session type boundary
         shell: bash
         run: |
           set -euo pipefail
-          echo '=== branch diff ==='
-          git -c core.quotePath=false diff --name-status b508d1ff7808b8735694cf1e57a4d603f2e973e3...HEAD
-          echo '=== ActiveDatabase references in verification scripts ==='
-          grep -RIn --include='*.mjs' --include='*.js' 'ActiveDatabase' scripts || true
-          echo '=== transition_store references in verification scripts ==='
-          grep -RIn --include='*.mjs' --include='*.js' 'transition_store' scripts || true
-          echo '=== port_registry impl-owner assertions ==='
-          grep -RIn --include='verify-*-service.mjs' -E 'port_registry|registry\.includes\(|impl .*Port for ' scripts || true
-          echo '=== persistence concrete-target assertions ==='
-          grep -RIn --include='*.mjs' -E 'PostgresStore as PersistenceStore|PersistenceStore|register_adapters' scripts | head -n 400 || true
+          echo '=== ActiveDatabase references outside composition ==='
+          grep -RIn --include='*.rs' 'ActiveDatabase' crates/application/src | grep -v 'crates/application/src/composition/' || true
+          echo '=== ActiveDatabase references inside composition ==='
+          grep -RIn --include='*.rs' 'ActiveDatabase' crates/application/src/composition || true
+          echo '=== verifier concrete persistence bans ==='
+          grep -RIn --include='verify-*-service.mjs' -E 'forbiddenTokens|PersistenceStore|football_persistence_postgres|PostgresStore' scripts | head -n 400 || true
