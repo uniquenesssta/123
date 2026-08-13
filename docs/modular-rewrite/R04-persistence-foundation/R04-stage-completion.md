@@ -1,15 +1,15 @@
 # R04 阶段完成 / 出口验证记录
 
-- 阶段状态：`VERIFYING`
+- 阶段状态：`DONE`
 - R4 起点：`f2e4841aac873f6a4812801e6be2a6524cd680c1`
 - R4-04 code merge commit：`b97587c9d20165018f80040dc2a2c098dbbec177`
 - 目标平台：Windows
 
 ## 1. 阶段目标与完成结论
 
-R4-01 至 R4-04 的代码重写节点均已完成并关闭为 `DONE`：Persistence Store/Error/Pool/Migration/Health/Statistics、Audit、基础 Row Mapping 与 Application Port Adapter 注册均已收敛到职责模块，旧职责 owner/转发层已按节点范围清理。
+R4-01 至 R4-04 均已 `DONE`，Store/Error/Pool/Migration/Health/Statistics、Audit、基础 Row Mapping 与 Port Adapter 注册均已收敛到职责模块。
 
-**R4 整体阶段当前不能标记为 `DONE`。** 任务书“阶段级验证矩阵”把空库 migration、health/stats integration、audit transaction integration 标为必须执行；当前无专用可写 `FOOTBALL_TEST_DATABASE_URL`，18 个 PostgreSQL integration tests 保持 ignored，且未执行 destructive database reset。静态数据库冻结、crate/workspace tests 与 Windows Automated 不替代该真实数据库门禁。因此本记录作为阶段出口验证记录存在，阶段状态保持 `VERIFYING`，R5-01 继续 `BLOCKED`。
+broad PostgreSQL diagnostic `31728096953` 在一次性测试库执行 18 个 ignored tests 为 14/18，destructive reset PASS；4 个失败未掩盖，其中 3 个是当前严格业务契约下的既有过期夹具，1 个是具体 P4 业务持久化 timestamp 精度问题（R4 明确排除范围）。随后独立 R4 stage smoke 最终 run `31729577225` / job `94546316946` 在全新空库真实完成 46 条 migration、health、stats、audit 失败回滚及成功提交，1/1 PASS。architecture dependency 与 migration freeze 亦已通过，因此 R4 整体正式 `DONE`，R5-01 成为唯一 `READY`。
 
 ## 2. 已完成节点索引
 
@@ -196,19 +196,21 @@ R4-01 至 R4-04 的代码重写节点均已完成并关闭为 `DONE`：Persisten
 - R4-04 squash merge `b97587c9d20165018f80040dc2a2c098dbbec177` 后 canonical stage Public Platform CI `31724131556` / job `94528167665`：SUCCESS；artifact `9191415520`，SHA-256 `3ccb37d8eab17c0e589354c10c3423579397629f9f76481b267acd0749db38cf`。
 - Cargo manifests / `Cargo.lock` 与历史 migrations 对节点基线保持冻结；R4 阶段总 diff 未触及 `crates/model-api/`、`crates/model-p4/`、`crates/model-p7/`。
 
+- broad PostgreSQL diagnostic `31728096953` / job `94541420957`：PostgreSQL 16 临时测试库真实执行 18 个 ignored tests，14 PASS / 4 FAIL；destructive reset PASS；4 个失败全部留档。
+- scoped `31729361081`：空库 migration、health、stats 已通过；audit probe 因 runner 使用 connection-local `set_config` 无法跨 pool connection 触发而失败，属于临时测试设计错误。
+- final scoped stage gate `31729577225` / job `94546316946`：Ubuntu 24.04 / PostgreSQL 16.14 / Rust 1.88.0，固定 stage HEAD `2380e440351e3ac6227908ddabfd63e92c49f2e9`；确认初始 schema 为空，迁移 0001–0046 共 46 条 success，health/stats PASS；故意让 `team_updated` audit INSERT 失败并验证业务 update 回滚，再验证成功路径业务 row 与且仅 1 条 audit row 同时提交。runner-only test `1 passed; 0 failed; 0 ignored`。
+- R4 阶段出口矩阵：空库 migration PASS；health/stats integration PASS；audit transaction integration PASS；architecture dependency PASS；migration freeze PASS。
+
 ## 13. 未执行验证、环境阻塞和剩余风险
 
-未执行且不得描述为通过：
+R4 任务书要求的真实 PostgreSQL 出口验证已执行，不再存在 R4 foundation 的未执行 stage gate。broad 18-test diagnostic 仍有 4 个失败，不能描述为 18/18：
 
-- 18 个要求专用可写 `FOOTBALL_TEST_DATABASE_URL` 的 PostgreSQL integration tests。
-- 空库真实 migration 0001–0046 执行链。
-- 真实 PostgreSQL health/stats integration。
-- 真实 PostgreSQL audit transaction integration。
-- destructive database reset。
+- `match_lineup_chain_versions_model_selection_and_freeze_gate_are_consistent`：旧夹具使用 10 人 confirmed 阵容，与当前 11 人严格规则冲突。
+- `match_scope_inference_and_lineup_pair_transaction_are_atomic`：旧夹具的 kickoff / T-6h 快照不在当前窗口。
+- `structured_match_events_are_queryable_and_revision_aware`：旧 `result_snapshot` 缺当前 MatchResultRecord 必填字段。
+- `p4_stage_c_writes_are_idempotent_and_frozen_history_is_immutable`：具体 P4 持久化存在 PostgreSQL timestamptz microsecond 与内存 DateTime 精确比较差异；不在 R4 总 diff，且属 R4 排除范围。
 
-原因：当前执行环境没有经确认可彻底清空的专用测试数据库；项目安全规则禁止对非 test 数据库执行破坏性验证。替代验证已完成静态 migration 指纹/连续性、SQLx 入口、crate/workspace tests、architecture 与 Windows Automated，但这些不替代任务书的真实 PostgreSQL stage gate。
-
-剩余风险：R4 的 PostgreSQL runtime integration 尚未在真实专用数据库闭环，故 R4 stage 不能进入 `DONE`，R5 不得开始。
+未修改生产规则、跳过测试或跨阶段改 P4 来“修绿”。前三项留给其业务测试/Repository 阶段更新夹具；P4 timestamp 精度问题进入对应业务持久化阶段。临时 DB/service/test/workflow 已清理，未触及用户数据库。
 
 ## 14. 根 README、阶段 README 与架构文档同步
 
@@ -227,21 +229,23 @@ R4-01 至 R4-04 的代码重写节点均已完成并关闭为 `DONE`：Persisten
 
 | 出口项 | 结论 |
 |---|---|
-| R4-01~R4-04 节点记录齐全且节点完成 | PASS |
-| Persistence 基础模块职责边界与 dependency direction | PASS |
-| 历史 migration 内容未改变 / 静态冻结 | PASS |
+| R4-01~R4-04 节点完成 | PASS |
+| Persistence 职责边界 / dependency direction | PASS |
+| migration 内容冻结 | PASS |
 | architecture/frontend/workspace Rust/Windows Automated | PASS |
-| 空库 migration 真实执行 | **BLOCKED / 未执行** |
-| health/stats PostgreSQL integration | **BLOCKED / 未执行** |
-| audit transaction PostgreSQL integration | **BLOCKED / 未执行** |
-| R4 stage 状态 | **VERIFYING，不得标记 DONE** |
+| 空库 migration 0001–0046 | PASS (`31729577225`) |
+| health/stats PostgreSQL integration | PASS (`31729577225`) |
+| audit rollback + commit integration | PASS (`31729577225`) |
+| destructive reset（临时 test DB） | PASS (`31728096953`) |
+| R4 stage | **DONE** |
 
 ## 17. 下一阶段唯一 READY 任务
 
-无。R5-01 `Competitions Repository` 是任务书中的下一任务，但在 R4 阶段真实 PostgreSQL 出口门禁补齐前继续 `BLOCKED`；本记录不创建 R5 生产实现或预迁移代码。
+R5-01 `Competitions Repository` 为唯一 `READY`；R5-02~R5-06 `BLOCKED`。R5 stage 索引已创建，但没有创建、迁移或修改任何 R5 生产实现。R5-01 必须从最终通过 canonical CI 的 R4 closeout HEAD 独立建立分支。
 
 ## 18. 订正记录
 
+- broad `31728096953` 首次实跑此前 ignored 的 18 个数据库测试，14/18；没有把跨业务 18/18 错误替代 R4 stage matrix。scoped `31729361081` 的 audit probe 仅因 runner session-local trigger 设计失败；final scoped `31729577225` 真实验证 R4 matrix 并通过，因此 R4 stage 从 `VERIFYING` 订正为 `DONE`。
 - docs-only closeout 第二次 run `31727494199` 已成功生成并发布四份收口文档到 stage commit `837d364cbddb174f794529efb4b7be76fa673f5e`；随后仅 transient helper 自清理因 runner 内临时改写 helper 导致 `git rm` 拒绝而失败，未影响 canonical stage。assistant-created helper/workflow 已随后通过 connector 提交 `dc992b7630f1559c1aaa0e10fd2a30626450d7da` / `acc9884277355410a1f960ee91c0bcc2e8f4b634` 从 helper 分支删除；canonical stage 从未包含这些 transient 文件。
 - docs-only closeout 首次 run `31727111563` 在发布前 fail-fast：scope 校验仅读取 tracked `git diff`，遗漏新建且仍 untracked 的 `R04-stage-completion.md`；stage 发布和 transient cleanup 步骤均被跳过，canonical stage 未发生变化。恢复仅将 scope 校验改为 tracked diff 与 untracked 文件的精确并集，最终允许集合仍严格为四份收口文档。
 - R4-04 节点在 hard gate、clean PR CI、squash merge 与 post-merge stage CI 全部成功后关闭为 `DONE`。

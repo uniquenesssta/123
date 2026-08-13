@@ -2,7 +2,7 @@
 
 ## 阶段状态
 
-`VERIFYING`
+`DONE`
 
 R3 Application Services 已完成并关闭。R4 只重写 `crates/persistence-postgres/src/` 的 PostgreSQL Adapter 基础设施、错误、审计和基础映射边界；不修改具体业务 SQL，不修改历史迁移，不修改 Tauri/前端产品行为或模型保护资产。
 
@@ -69,7 +69,14 @@ R4-01 完成前保持 `READY/VERIFYING`，只有目标职责切换为唯一 owne
 
 ## R4 阶段出口状态
 
-- 四个 Atomic Task 均已 `DONE`，节点记录齐全；阶段完成/出口记录见 [`R04-stage-completion.md`](./R04-stage-completion.md)。
-- R4 阶段当前保持 `VERIFYING`：任务书阶段验证矩阵要求真实空库 migration、health/stats、audit integration；当前 18 个要求专用可写 `FOOTBALL_TEST_DATABASE_URL` 的 PostgreSQL integration tests 未执行，也未执行 destructive database reset。
-- Public Platform CI / 静态数据库冻结 / Rust workspace 回归不能替代上述真实 PostgreSQL stage gate，因此不得把 R4 整体标记为 `DONE`。
-- R5-01 继续 `BLOCKED`；本收口未创建或修改任何 R5 生产实现。
+- 四个 Atomic Task 均已 `DONE`，阶段完成记录见 [`R04-stage-completion.md`](./R04-stage-completion.md)。
+'
+'- broad PostgreSQL diagnostic `31728096953` 在一次性 `postgres:16` / `football_r4_test` 上执行全部 18 个 ignored integration tests：14/18 PASS，destructive reset PASS。4 个失败未删除、跳过或放宽：3 个为当前严格业务契约下的既有过期夹具，1 个为具体 P4 业务持久化 timestamp 精度问题；相关业务路径未由 R4 修改，P4 具体业务持久化属于 R4 排除范围。
+'
+'- scoped run `31729361081` 已通过空库 migration、health、stats，但 runner 的 connection-local audit trigger 参数设计错误导致 probe 失败；未改生产源码。修正 runner-only trigger 后，final run `31729577225` / job `94546316946` `SUCCESS`：全新临时库真实完成 46 条 migration、`health()`、`stats()`、audit 失败事务整体回滚及成功事务业务 row + audit row 同时提交，1/1 PASS。
+'
+'- architecture dependency 与 migration freeze 已由 hard gate / canonical Windows CI 通过；R4 阶段出口矩阵全部 PASS，R4 正式 `DONE`。
+'
+'- 临时 PostgreSQL service、runner-only Rust test 与 transient workflows 均已清理，未进入 canonical stage，也未连接或重置用户数据库。
+'
+'- R5-01 `Competitions Repository` 为唯一 `READY`；R5-02~R5-06 `BLOCKED`。本收口未包含任何 R5 生产源码修改。

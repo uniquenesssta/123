@@ -63,8 +63,10 @@ Windows 2025 / Rust 1.88.0 / Node 22 hard gate run `31712193150` 实际执行并
 
 ## 未执行与剩余风险
 
-- 18 个要求专用可写 `FOOTBALL_TEST_DATABASE_URL` 的 PostgreSQL ignored integration tests 未执行；未执行 destructive database reset。
-- R4-04 节点已 `DONE`；但上述真实 PostgreSQL integration / destructive reset 缺口仍阻塞 R4 阶段出口，因此 R4 stage 保持 `VERIFYING`、R5-01 保持 `BLOCKED`。
+- R4-04 节点自身已 `DONE`；后续数据库阶段验证不改变其生产实现与兼容性结论。
+- broad PostgreSQL diagnostic `31728096953`：18 个 ignored integration tests 实跑 14/18 PASS，destructive reset PASS；3 个失败为既有过期业务夹具，另 1 个为 R4 排除范围内的既有 P4 timestamp 精度问题，未通过放宽生产规则追求 18/18。
+- final R4 专项 PostgreSQL stage gate `31729577225` / job `94546316946`：空库 0001–0046、health、stats、audit 失败回滚与成功事务提交均 PASS；首次 scoped `31729361081` 仅因 runner connection-local trigger 设计错误失败，未产生生产源码改动。
+- R4 stage 因真实数据库矩阵补齐而正式 `DONE`；R5-01 仅开放为 `READY`，本节点未提前实现 R5。
 
 ## 回退点
 
