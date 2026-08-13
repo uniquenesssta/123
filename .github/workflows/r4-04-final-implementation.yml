@@ -17,6 +17,7 @@ jobs:
     env:
       R4_04_BASE: b508d1ff7808b8735694cf1e57a4d603f2e973e3
       npm_config_cache: ${{ github.workspace }}/../.npm-cache
+      PYTHONDONTWRITEBYTECODE: '1'
     steps:
       - name: Checkout R4-04 branch
         uses: actions/checkout@v4
@@ -185,6 +186,9 @@ jobs:
         run: |
           $ErrorActionPreference = 'Stop'
           $PSNativeCommandUseErrorActionPreference = $true
+          if (Test-Path .github/__pycache__) {
+            Remove-Item -Recurse -Force .github/__pycache__
+          }
           git rm `
             .github/r4-04-apply.py `
             .github/r4-04-run.py `
