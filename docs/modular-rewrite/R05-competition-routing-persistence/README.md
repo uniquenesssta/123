@@ -9,7 +9,7 @@ R4 Persistence 基础设施已完成并通过阶段出口。R5 仅按 Competitio
 ## 前置基线
 
 - R4 `DONE`；完成记录：[`../R04-persistence-foundation/R04-stage-completion.md`](../R04-persistence-foundation/R04-stage-completion.md)。
-- R5-01 开始时必须从 `rewrite/r4-persistence-foundation` 最终 closeout HEAD 独立建分支。
+- R5-01 开始时必须从 `rewrite/r4-persistence-foundation` 最终 closeout HEAD 独立建分支；该 HEAD 的最终 Public Platform CI 必须先为 `SUCCESS`。
 - R3 Competition / Rules Ports 已冻结；0001–0046 migration 继续冻结。
 
 ## 任务状态
@@ -26,6 +26,7 @@ R4 Persistence 基础设施已完成并通过阶段出口。R5 仅按 Competitio
 ## R5-01 进入条件
 
 - 先读取 R5 任务书、R0 inventory 与当前 competition/routing/rule 持久化调用链。
+- 先确认当前 R4 closeout HEAD 的 canonical Public Platform CI 已完成且为 `SUCCESS`，再创建 R5-01 独立实施分支。
 - 先迁移/补齐 Competitions Repository 契约测试，再切换唯一 owner；不得提前实施 R5-02。
 
 ## 当前事实
