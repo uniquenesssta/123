@@ -48,11 +48,11 @@ closeout = """
 - strict hard gate run `31674700550` 已通过 R4-03 mapping 专项、R4-01/R4-02 Persistence/Audit 回归、数据库冻结与保护资产、rustfmt、Persistence check/tests、完整 architecture/frontend、workspace Clippy `-D warnings` 与 workspace tests；最终实现树严格为 15 个目标文件，临时 workflow/helper 与额外 untracked 均为 0。
 - PR #24 clean Public Platform CI run `31675727990` / Windows automated delivery job `94369762967`：`SUCCESS`；PR 按固定 HEAD `202648df6aa1f9a14eb03bdcabcbd5ee0a271e56` 合并到 `rewrite/r4-persistence-foundation`，merge commit `0e5a68e09c6c06204b926f4d30c45262740d983b`。
 - 合并后 stage Public Platform CI run `31677600876` / job `94375513281`：`SUCCESS`；artifact `9172855279`（`windows-automated-delivery-evidence-0e5a68e09c6c06204b926f4d30c45262740d983b`）大小 `13909093` 字节，SHA-256 `31719ff04f00eb944c84fcd37dbbda3fa6252f7d55bc42a1a8af3d903cad3544`。
-- formal-closeout preparation runs `31679755024` 与 `31679826851` 因旧 workflow 的内嵌 Python 多行文本破坏 YAML block 缩进而在调度前失败（0 job）；run `31679847327` 已进入 helper，但因状态校验误把历史兼容段的第二个 `VERIFYING` 也计入而 fail-fast。三次均未产生 closeout commit、未修改生产源码；恢复 helper 改为只精确替换 `## 状态` 下的状态值，最终提交前 workflow/helper 均自删除。
+- formal-closeout preparation runs `31679755024` 与 `31679826851` 因旧 workflow 的内嵌 Python 多行文本破坏 YAML block 缩进而在调度前失败（0 job）；run `31679847327` 已进入 helper，但因状态校验误把历史兼容段的第二个 `VERIFYING` 也计入而 fail-fast；run `31679942355` 已生成目标文档内容，但 `git diff --check` 检出 stage README 尾部新增空白行后停止。四次均未产生 closeout commit、未修改生产源码；恢复 helper 改为精确状态 marker 并规范单个 EOF 换行，最终提交前 workflow/helper 均自删除。
 - 18 个要求专用可写 `FOOTBALL_TEST_DATABASE_URL` 的 PostgreSQL 集成测试仍未执行；未执行 destructive database reset。
 - R4-03 正式关闭为 `DONE`；R4-04 开放为 `READY`。本收口未包含任何 R4-04 生产源码改动。
 """
-write(stage_path, prefix + closeout + "\n")
+write(stage_path, (prefix + closeout).rstrip() + "\n")
 
 task_path = "docs/modular-rewrite/R04-persistence-foundation/R04-03-row-映射基础规范.md"
 text = read(task_path)
@@ -80,7 +80,7 @@ formal = """
 - 最终实现提交：`202648df6aa1f9a14eb03bdcabcbd5ee0a271e56`；相对 R4-03 基线最终仅包含 15 个目标实现/验证/文档文件，临时 workflow/helper 未进入最终树。
 - PR #24 clean Public Platform CI run `31675727990` / job `94369762967`：`SUCCESS`，随后 PR 按固定 HEAD 合并；merge commit：`0e5a68e09c6c06204b926f4d30c45262740d983b`。
 - 合并后 stage Public Platform CI run `31677600876` / job `94375513281`：`SUCCESS`；validation evidence artifact `9172855279`，大小 `13909093` 字节，SHA-256 `31719ff04f00eb944c84fcd37dbbda3fa6252f7d55bc42a1a8af3d903cad3544`。
-- formal-closeout preparation runs `31679755024` / `31679826851`：旧 workflow YAML 在调度前解析失败，均为 0 job；run `31679847327`：helper 已执行但精确状态校验误按全文件 `VERIFYING` 计数，在发现 2 处后 fail-fast。三次均未修改 canonical 文档提交、未改变生产源码。恢复 helper 只匹配 `## 状态\n\n`VERIFYING``，并继续要求最终树对 `.github/workflows/r4-03-closeout.yml` 与 `.github/r4-03-closeout.py` 均为零差异。
+- formal-closeout preparation runs `31679755024` / `31679826851`：旧 workflow YAML 在调度前解析失败，均为 0 job；run `31679847327`：helper 已执行但状态校验误按全文件 `VERIFYING` 计数，在发现 2 处后 fail-fast；run `31679942355`：目标文档内容已生成，但 `git diff --check` 因 stage README 尾部新增空白行失败。四次均未产生 canonical closeout commit、未改变生产源码。恢复 helper 只匹配 `## 状态\n\n`VERIFYING``、统一单个 EOF 换行，并继续要求最终树对 `.github/workflows/r4-03-closeout.yml` 与 `.github/r4-03-closeout.py` 均为零差异。
 - 未执行项保持不变：18 个要求专用可写 `FOOTBALL_TEST_DATABASE_URL` 的 PostgreSQL 集成测试未执行；未执行 destructive database reset。
 
 """
