@@ -19,7 +19,8 @@ jobs:
       R4_03_FAILED_RUN: 31665585062
       R4_03_YAML_FAILED_RUN: 31665943169
       R4_03_ENV_FAILED_RUN: 31666083511
-      npm_config_cache: ${{ github.workspace }}/.npm-cache
+      R4_03_PUBLISH_FAILED_RUN: 31666505364
+      npm_config_cache: ${{ github.workspace }}/../.npm-cache
     steps:
       - name: Checkout R4-03 branch
         uses: actions/checkout@v4
@@ -139,12 +140,19 @@ jobs:
           $PSNativeCommandUseErrorActionPreference = $true
           npm run verify:persistence-mapping
           git diff --check
+          if (Test-Path .npm-cache) {
+            Remove-Item -Recurse -Force .npm-cache
+          }
           git rm .github/workflows/r4-03-implementation.yml .github/r4-03-apply.py .github/r4-03-record-fix.py
           git diff --check
           $changed = @(git diff --name-only "$env:R4_03_BASE")
           $transient = @($changed | Where-Object { $_ -in @('.github/workflows/r4-03-implementation.yml', '.github/r4-03-apply.py', '.github/r4-03-record-fix.py') })
           if ($transient.Count -ne 0) {
             throw "R4-03 transient files remain in final diff: $($transient -join ', ')"
+          }
+          $untracked = @(git ls-files --others --exclude-standard)
+          if ($untracked.Count -ne 0) {
+            throw "R4-03 untracked files remain before commit: $($untracked -join ', ')"
           }
 
       - name: Commit verified R4-03 implementation
