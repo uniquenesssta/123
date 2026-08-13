@@ -38,8 +38,6 @@ for relative in SIMPLE_TARGET_FILES:
     if count == 0:
         raise RuntimeError(f"{relative}: expected at least one ActiveDatabase adapter target")
     text = text.replace("for ActiveDatabase", "for PersistenceStore")
-    # Keep service/use-case concrete-persistence bans intact; only update human-readable
-    # success/error labels that describe the adapter target.
     text = text.replace("ActiveDatabase 适配", "PersistenceStore 适配")
     text = text.replace("ActiveDatabase 未实现", "PersistenceStore 未实现")
     write(relative, text)
@@ -85,16 +83,21 @@ competition = competition.replace(
 )
 write(competition_path, competition)
 
-# Database Service is already migrated by r4-04-run.py. All positive ActiveDatabase
-# adapter-target assertions in verification scripts must now be gone. Negative bans in
-# service/use-case files are intentionally retained.
 positive_remaining = []
 for path in (ROOT / "scripts").glob("verify-*.mjs"):
+    # R4-04's own verifier intentionally contains negative assertions banning the old
+    # target. Those are required protection, not stale positive owner assumptions.
+    if path.name == "verify-persistence-adapters.mjs":
+        continue
     text = path.read_text(encoding="utf-8")
     for line_no, line in enumerate(text.splitlines(), 1):
-        if "for ActiveDatabase" in line or "session: RwLock<Option<ActiveDatabase>>" in line or "pub(crate) struct ActiveDatabase" in line:
+        if (
+            "for ActiveDatabase" in line
+            or "session: RwLock<Option<ActiveDatabase>>" in line
+            or "pub(crate) struct ActiveDatabase" in line
+        ):
             positive_remaining.append(f"{path.name}:{line_no}:{line.strip()}")
 if positive_remaining:
     raise RuntimeError("stale positive ActiveDatabase verifier assumptions remain:\n" + "\n".join(positive_remaining))
 
-print("R4-04 stale verifier migration complete: 11 owner contracts moved from ActiveDatabase to PersistenceStore/named adapters; service concrete-dependency bans unchanged")
+print("R4-04 stale verifier migration complete: 11 owner contracts moved from ActiveDatabase to PersistenceStore/named adapters; intentional negative legacy-target bans and service concrete-dependency bans retained")
