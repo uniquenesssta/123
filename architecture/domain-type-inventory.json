@@ -24,13 +24,13 @@
     "targetPublicExportPolicy": "explicit re-export only"
   },
   "sourceDigest": "217241ac243726a5ab6805a7f169e222b97e78c7c971749a5904714af673ebdd",
-  "rustUsageDigest": "9ce647b966048adfed1a77cea98d2217a0e66aea79e7a701a27c1ed250667a67",
+  "rustUsageDigest": "c4d0ecc5d2a21375295044f2d942b0cb4266dfb6d7bb59a2c91da214f7ee5b75",
   "summary": {
     "typeCount": 365,
     "publicCompatibilityTypeCount": 365,
     "internalTypeCount": 0,
     "domainSourceFileCount": 129,
-    "scannedRustFileCount": 648,
+    "scannedRustFileCount": 655,
     "databaseMappedTypeCount": 299,
     "byTargetModule": {
       "ai_workspace": 16,
@@ -4796,15 +4796,15 @@
         "crates/application/src/use_cases/rules/package_factory/mod.rs",
         "crates/model-api/src/lib.rs",
         "crates/model-stub/src/lib.rs",
+        "crates/persistence-postgres/src/competition_kind.rs",
         "crates/persistence-postgres/src/competitions.rs",
-        "crates/persistence-postgres/src/lib.rs",
         "crates/persistence-postgres/src/match_prediction.rs",
         "crates/persistence-postgres/src/routing.rs",
         "crates/persistence-postgres/tests/postgres_integration.rs"
       ],
       "databaseMappings": [
+        "crates/persistence-postgres/src/competition_kind.rs",
         "crates/persistence-postgres/src/competitions.rs",
-        "crates/persistence-postgres/src/lib.rs",
         "crates/persistence-postgres/src/match_prediction.rs",
         "crates/persistence-postgres/src/routing.rs"
       ]

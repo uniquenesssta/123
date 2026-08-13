@@ -20,7 +20,7 @@ R3 Application Services 已完成并关闭。R4 只重写 `crates/persistence-po
 |---|---|---|---|
 | R4-01 | Store / Error / Pool / migration / health / statistics | DONE | [`R04-01-store-error-and-pool.md`](./R04-01-store-error-and-pool.md) |
 | R4-02 | Audit 基础设施 | DONE | [`R04-02-audit-基础设施.md`](./R04-02-audit-基础设施.md) |
-| R4-03 | 通用 Row 映射基础规范 | READY | — |
+| R4-03 | 通用 Row 映射基础规范 | VERIFYING | [`R04-03-row-映射基础规范.md`](./R04-03-row-映射基础规范.md) |
 | R4-04 | Application Port Adapter 注册 | BLOCKED | — |
 
 ## R4-01 进入条件
@@ -46,3 +46,10 @@ R4-01 完成前保持 `READY/VERIFYING`，只有目标职责切换为唯一 owne
 - 18 个要求专用可写 `FOOTBALL_TEST_DATABASE_URL` 的 PostgreSQL 集成测试仍未执行；未执行 destructive database reset。
 - R4-02 正式关闭为 `DONE`；R4-03 开放为 `READY`，R4-04 继续 `BLOCKED`。
 - R4-03 必须从本阶段分支当前收口基线独立开始；本收口未包含任何 R4-03/R4-04 生产源码改动。
+
+## R4-03 实施中
+
+- 从 R4-02 正式收口 HEAD `3c147376cf81394984cc20850a58e866eef4280b` 独立建立 `agent/r4-03-row-mapping`。
+- run `31665585062` 因 verifier 转义错误与共享调用面漏扫停止；run `31665943169` 因临时 workflow YAML 缩进错误在调度前停止；两次均未提交生产源码。 run `31666083511` 随后通过 R4-03 最小门禁与完整 architecture，但因临时 runner 未先执行既有 `npm run setup`，frontend 在缺少已声明的 `typescript` 开发依赖时停止；workspace Clippy/tests 未执行且仍未提交生产源码。run `31666505364` 已通过全部质量、冻结范围、文档与 transient cleanup 门禁，最终仅因 npm cache 临时落在仓库根而被 clean-worktree 发布门禁拒绝，仍未提交生产源码。run `31667443481` 再次通过全部质量、范围与文档门禁，但 cleanup 在精确暂存前检查 untracked，误将本任务应新增文件视为非法项并停止，仍未提交生产源码。run `31668274055` 通过全部质量、范围、文档、精确暂存与 untracked 清理门禁，最终仅因 Git 默认 quotePath 将中文记录文件名八进制转义而误判 staged allowlist，仍未提交生产源码。
+- 恢复 run `31674700550` 已通过全部最小门禁与阶段回归。
+- R4-03 当前 `VERIFYING`；clean Public Platform CI 与 PR 合并完成前不得标记 `DONE`，R4-04 继续 `BLOCKED`。
