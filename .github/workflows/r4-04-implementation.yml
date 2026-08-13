@@ -20,6 +20,7 @@ jobs:
       R4_04_GENERATOR_FAILED_RUN: 31686470233
       R4_04_GUARD_FAILED_RUN: 31686662626
       R4_04_VERIFIER_FAILED_RUN: 31686951586
+      R4_04_DATABASE_FINGERPRINT_FAILED_RUN: 31687122419
       npm_config_cache: ${{ github.workspace }}/../.npm-cache
     steps:
       - name: Checkout R4-04 branch
@@ -54,6 +55,7 @@ jobs:
             '.github/r4-04-apply.py',
             '.github/r4-04-run.py',
             '.github/r4-04-record-fix.py',
+            '.github/r4-04-sync-db-baseline.py',
             '.github/workflows/r4-04-audit.yml',
             '.github/workflows/r4-04-implementation.yml'
           )
@@ -70,6 +72,7 @@ jobs:
           $PSNativeCommandUseErrorActionPreference = $true
           python .github/r4-04-run.py
           cargo fmt --all
+          python .github/r4-04-sync-db-baseline.py
           node scripts/generate-domain-type-inventory.mjs
 
       - name: Run R4-04 minimum gate
@@ -118,9 +121,11 @@ jobs:
               '.github/r4-04-apply.py',
               '.github/r4-04-run.py',
               '.github/r4-04-record-fix.py',
+              '.github/r4-04-sync-db-baseline.py',
               '.github/workflows/r4-04-audit.yml',
               '.github/workflows/r4-04-implementation.yml',
               'README.md',
+              'architecture/database-baseline.json',
               'architecture/domain-type-inventory.json',
               'package.json',
               'scripts/verify-persistence-adapters.mjs',
@@ -146,6 +151,7 @@ jobs:
           python .github/r4-04-apply.py record
           python .github/r4-04-record-fix.py
           npm run verify:persistence-adapters
+          node scripts/verify_database_baseline.mjs
           git diff --check
 
       - name: Remove transient implementation files and stage exact result
@@ -153,8 +159,8 @@ jobs:
         run: |
           $ErrorActionPreference = 'Stop'
           $PSNativeCommandUseErrorActionPreference = $true
-          git rm .github/r4-04-apply.py .github/r4-04-run.py .github/r4-04-record-fix.py .github/workflows/r4-04-audit.yml .github/workflows/r4-04-implementation.yml
-          git add README.md architecture/domain-type-inventory.json package.json scripts/verify-persistence-adapters.mjs crates/persistence-postgres/src crates/application/src docs/modular-rewrite/R04-persistence-foundation
+          git rm .github/r4-04-apply.py .github/r4-04-run.py .github/r4-04-record-fix.py .github/r4-04-sync-db-baseline.py .github/workflows/r4-04-audit.yml .github/workflows/r4-04-implementation.yml
+          git add README.md architecture/database-baseline.json architecture/domain-type-inventory.json package.json scripts/verify-persistence-adapters.mjs crates/persistence-postgres/src crates/application/src docs/modular-rewrite/R04-persistence-foundation
           git diff --check --cached
 
           $untracked = @(git ls-files --others --exclude-standard)
@@ -165,8 +171,8 @@ jobs:
           if ($transient.Count -ne 0) {
             throw "R4-04 transient files remain in final staged tree: $($transient -join ', ')"
           }
-          git diff --exit-code "$env:R4_04_BASE" -- .github/r4-04-apply.py .github/r4-04-run.py .github/r4-04-record-fix.py .github/workflows/r4-04-audit.yml .github/workflows/r4-04-implementation.yml
-          git diff --cached --exit-code "$env:R4_04_BASE" -- .github/r4-04-apply.py .github/r4-04-run.py .github/r4-04-record-fix.py .github/workflows/r4-04-audit.yml .github/workflows/r4-04-implementation.yml
+          git diff --exit-code "$env:R4_04_BASE" -- .github/r4-04-apply.py .github/r4-04-run.py .github/r4-04-record-fix.py .github/r4-04-sync-db-baseline.py .github/workflows/r4-04-audit.yml .github/workflows/r4-04-implementation.yml
+          git diff --cached --exit-code "$env:R4_04_BASE" -- .github/r4-04-apply.py .github/r4-04-run.py .github/r4-04-record-fix.py .github/r4-04-sync-db-baseline.py .github/workflows/r4-04-audit.yml .github/workflows/r4-04-implementation.yml
 
       - name: Commit verified R4-04 implementation
         shell: pwsh
