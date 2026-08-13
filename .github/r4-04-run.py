@@ -157,4 +157,41 @@ if verifier.count(insert_anchor) != 1:
 verifier = verifier.replace(insert_anchor, insert, 1)
 verifier_path.write_text(verifier, encoding="utf-8", newline="\n")
 
-print("R4-04 helper applied: forwarding normalized, mapper visibility constrained to composition, database close semantics preserved, and verifier made format agnostic")
+# R4-04 changes the concrete database session from the transitional ActiveDatabase wrapper
+# to PostgresStore/PersistenceStore while keeping DatabaseService as the unique state owner.
+# Migrate the R3-02 static gate to the new owner locations instead of weakening/removing it.
+db_gate_path = ROOT / "scripts/verify-database-service.mjs"
+db_gate = db_gate_path.read_text(encoding="utf-8")
+db_gate = module.replace_once(
+    db_gate,
+    'const adapter = read("crates/application/src/composition/port_registry.rs");',
+    'const portRegistry = read("crates/application/src/composition/port_registry.rs");\nconst databaseAdapter = read("crates/application/src/composition/adapters/database.rs");',
+    "database service gate adapter owners",
+)
+db_gate = module.replace_once(
+    db_gate,
+    'check(service.includes("pub(crate) session: RwLock<Option<ActiveDatabase>>"), "活动数据库状态未归属 DatabaseService");',
+    'check(service.includes("pub(crate) session: RwLock<Option<PersistenceStore>>"), "活动数据库状态未归属 DatabaseService");',
+    "database service active session type",
+)
+db_gate = module.replace_once(
+    db_gate,
+    'check(!applicationService.includes("RwLock<Option<ActiveDatabase>>"), "ApplicationService 仍直接持有活动数据库槽位");',
+    'check(!applicationService.includes("RwLock<Option<PersistenceStore>>"), "ApplicationService 仍直接持有活动数据库槽位");',
+    "database service facade state guard",
+)
+db_gate = module.replace_once(
+    db_gate,
+    'check(adapter.includes("impl DatabaseLifecyclePort for ActiveDatabase"), "PostgreSQL adapter 未实现 DatabaseLifecyclePort");\ncheck(adapter.includes("impl DatabaseObservabilityPort for ActiveDatabase"), "PostgreSQL adapter 未实现 DatabaseObservabilityPort");\ncheck(adapter.includes("PostgresStore as PersistenceStore"), "PostgreSQL 具体适配器入口缺失");',
+    'check(databaseAdapter.includes("impl DatabaseLifecyclePort for PersistenceStore"), "PostgreSQL adapter 未实现 DatabaseLifecyclePort");\ncheck(databaseAdapter.includes("impl DatabaseObservabilityPort for PersistenceStore"), "PostgreSQL adapter 未实现 DatabaseObservabilityPort");\ncheck(portRegistry.includes("PostgresStore as PersistenceStore"), "PostgreSQL 具体适配器入口缺失");\ncheck(portRegistry.includes("use football_persistence_postgres::register_adapters;"), "PostgreSQL adapter 注册入口未收敛到 register_adapters");\ncheck(!portRegistry.includes("impl DatabaseLifecyclePort") && !portRegistry.includes("impl DatabaseObservabilityPort"), "port_registry.rs 仍承载数据库 Port 实现");',
+    "database service port implementation owners",
+)
+db_gate = module.replace_once(
+    db_gate,
+    'console.log("Database Service 验证通过：连接、迁移、健康、统计、清空均已进入 Service/Use Case/Port 边界，活动数据库由 DatabaseService 单一持有，Tauri 不再直接执行 PostgreSQL 清空流程，内置 P4 artifact 初始化通过 ResearchService/ResearchArtifactPort 保持可验证链路。");',
+    'console.log("Database Service 验证通过：连接、迁移、健康、统计、清空均已进入 Service/Use Case/Port 边界，活动 PostgresStore 由 DatabaseService 单一持有，Lifecycle/Observability Port 实现已迁入具名 database adapter，Tauri 不直接执行 PostgreSQL 清空流程，内置 P4 artifact 初始化通过 ResearchService/ResearchArtifactPort 保持可验证链路。");',
+    "database service gate success message",
+)
+db_gate_path.write_text(db_gate, encoding="utf-8", newline="\n")
+
+print("R4-04 helper applied: forwarding normalized, mapper visibility/close semantics preserved, and Database Service architecture gate migrated to PersistenceStore + named adapter owners")
