@@ -1,4 +1,5 @@
-use super::super::port_registry::{map_persistence_error, ActiveDatabase};
+use super::super::port_registry::PersistenceStore;
+use super::map_persistence_error;
 use crate::ports::{
     player::{CoachCatalogPort, EntityReferencePort, PlayerCatalogPort, PlayerSignalPort},
     PortResult,
@@ -19,16 +20,14 @@ use football_domain::{
 use uuid::Uuid;
 
 #[async_trait]
-impl PlayerCatalogPort for ActiveDatabase {
+impl PlayerCatalogPort for PersistenceStore {
     async fn reference_data(&self) -> PortResult<PlayerCatalogReferenceData> {
-        self.transition_store()
-            .player_catalog_reference_data()
+        self.player_catalog_reference_data()
             .await
             .map_err(map_persistence_error)
     }
     async fn create_player(&self, draft: &PlayerDraft) -> PortResult<PlayerRecord> {
-        self.transition_store()
-            .create_player(draft)
+        self.create_player(draft)
             .await
             .map_err(map_persistence_error)
     }
@@ -37,38 +36,32 @@ impl PlayerCatalogPort for ActiveDatabase {
         player_id: Uuid,
         draft: &PlayerDraft,
     ) -> PortResult<PlayerRecord> {
-        self.transition_store()
-            .update_player(player_id, draft)
+        self.update_player(player_id, draft)
             .await
             .map_err(map_persistence_error)
     }
     async fn delete_player(&self, player_id: Uuid) -> PortResult<()> {
-        self.transition_store()
-            .delete_player(player_id)
+        self.delete_player(player_id)
             .await
             .map_err(map_persistence_error)
     }
     async fn bulk_delete_players(&self, player_ids: &[Uuid]) -> PortResult<BulkDeleteResult> {
-        self.transition_store()
-            .bulk_delete_players(player_ids)
+        self.bulk_delete_players(player_ids)
             .await
             .map_err(map_persistence_error)
     }
     async fn list_players(&self, query: &PlayerListQuery) -> PortResult<PlayerListPage> {
-        self.transition_store()
-            .list_players(query)
+        self.list_players(query)
             .await
             .map_err(map_persistence_error)
     }
     async fn read_player(&self, player_id: Uuid) -> PortResult<PlayerDetail> {
-        self.transition_store()
-            .read_player(player_id)
+        self.read_player(player_id)
             .await
             .map_err(map_persistence_error)
     }
     async fn add_player_name(&self, draft: &PlayerNameDraft) -> PortResult<PlayerNameRecord> {
-        self.transition_store()
-            .add_player_name(draft)
+        self.add_player_name(draft)
             .await
             .map_err(map_persistence_error)
     }
@@ -76,8 +69,7 @@ impl PlayerCatalogPort for ActiveDatabase {
         &self,
         draft: &PlayerPositionDraft,
     ) -> PortResult<PlayerPositionRecord> {
-        self.transition_store()
-            .assign_player_position(draft)
+        self.assign_player_position(draft)
             .await
             .map_err(map_persistence_error)
     }
@@ -85,21 +77,19 @@ impl PlayerCatalogPort for ActiveDatabase {
         &self,
         draft: &PlayerTeamPeriodDraft,
     ) -> PortResult<PlayerTeamPeriodRecord> {
-        self.transition_store()
-            .add_player_team_period(draft)
+        self.add_player_team_period(draft)
             .await
             .map_err(map_persistence_error)
     }
 }
 
 #[async_trait]
-impl PlayerSignalPort for ActiveDatabase {
+impl PlayerSignalPort for PersistenceStore {
     async fn add_availability(
         &self,
         draft: &PlayerAvailabilityDraft,
     ) -> PortResult<PlayerAvailabilityRecord> {
-        self.transition_store()
-            .add_player_availability(draft)
+        self.add_player_availability(draft)
             .await
             .map_err(map_persistence_error)
     }
@@ -107,8 +97,7 @@ impl PlayerSignalPort for ActiveDatabase {
         &self,
         draft: &PlayerAbilityObservationDraft,
     ) -> PortResult<PlayerAbilityObservationRecord> {
-        self.transition_store()
-            .add_player_ability_observation(draft)
+        self.add_player_ability_observation(draft)
             .await
             .map_err(map_persistence_error)
     }
@@ -116,8 +105,7 @@ impl PlayerSignalPort for ActiveDatabase {
         &self,
         draft: &PlayerDynamicTagDraft,
     ) -> PortResult<PlayerDynamicTagRecord> {
-        self.transition_store()
-            .add_player_dynamic_tag(draft)
+        self.add_player_dynamic_tag(draft)
             .await
             .map_err(map_persistence_error)
     }
@@ -125,36 +113,31 @@ impl PlayerSignalPort for ActiveDatabase {
         &self,
         request: &PlayerMatchContributionRequest,
     ) -> PortResult<PlayerMatchContribution> {
-        self.transition_store()
-            .calculate_player_match_contribution(request)
+        self.calculate_player_match_contribution(request)
             .await
             .map_err(map_persistence_error)
     }
 }
 
 #[async_trait]
-impl CoachCatalogPort for ActiveDatabase {
+impl CoachCatalogPort for PersistenceStore {
     async fn create_coach(&self, draft: &CoachDraft) -> PortResult<CoachRecord> {
-        self.transition_store()
-            .create_coach(draft)
+        self.create_coach(draft)
             .await
             .map_err(map_persistence_error)
     }
     async fn list_coaches(&self, query: &CoachListQuery) -> PortResult<Vec<CoachListItem>> {
-        self.transition_store()
-            .list_coaches(query)
+        self.list_coaches(query)
             .await
             .map_err(map_persistence_error)
     }
     async fn read_coach(&self, coach_id: Uuid) -> PortResult<CoachDetail> {
-        self.transition_store()
-            .read_coach(coach_id)
+        self.read_coach(coach_id)
             .await
             .map_err(map_persistence_error)
     }
     async fn add_coach_name(&self, draft: &CoachNameDraft) -> PortResult<CoachNameRecord> {
-        self.transition_store()
-            .add_coach_name(draft)
+        self.add_coach_name(draft)
             .await
             .map_err(map_persistence_error)
     }
@@ -162,21 +145,19 @@ impl CoachCatalogPort for ActiveDatabase {
         &self,
         draft: &TeamCoachPeriodDraft,
     ) -> PortResult<TeamCoachPeriodRecord> {
-        self.transition_store()
-            .add_team_coach_period(draft)
+        self.add_team_coach_period(draft)
             .await
             .map_err(map_persistence_error)
     }
 }
 
 #[async_trait]
-impl EntityReferencePort for ActiveDatabase {
+impl EntityReferencePort for PersistenceStore {
     async fn list_references(
         &self,
         query: &EntityReferenceQuery,
     ) -> PortResult<Vec<EntityReferenceRecord>> {
-        self.transition_store()
-            .list_entity_references(query)
+        self.list_entity_references(query)
             .await
             .map_err(map_persistence_error)
     }
@@ -184,8 +165,7 @@ impl EntityReferencePort for ActiveDatabase {
         &self,
         request: &EntityMatchRequest,
     ) -> PortResult<EntityMatchResult> {
-        self.transition_store()
-            .resolve_entity_reference(request)
+        self.resolve_entity_reference(request)
             .await
             .map_err(map_persistence_error)
     }
@@ -194,8 +174,7 @@ impl EntityReferencePort for ActiveDatabase {
         entity_type: &str,
         entity_id: Uuid,
     ) -> PortResult<EntityDeletionCheck> {
-        self.transition_store()
-            .check_entity_deletion(entity_type, entity_id)
+        self.check_entity_deletion(entity_type, entity_id)
             .await
             .map_err(map_persistence_error)
     }
@@ -204,8 +183,7 @@ impl EntityReferencePort for ActiveDatabase {
         entity_type: &str,
         entity_ids: &[Uuid],
     ) -> PortResult<BulkArchiveResult> {
-        self.transition_store()
-            .bulk_archive_entities(entity_type, entity_ids)
+        self.bulk_archive_entities(entity_type, entity_ids)
             .await
             .map_err(map_persistence_error)
     }
@@ -213,8 +191,7 @@ impl EntityReferencePort for ActiveDatabase {
         &self,
         draft: &DataProviderDraft,
     ) -> PortResult<DataProviderRecord> {
-        self.transition_store()
-            .create_data_provider(draft)
+        self.create_data_provider(draft)
             .await
             .map_err(map_persistence_error)
     }
@@ -222,8 +199,7 @@ impl EntityReferencePort for ActiveDatabase {
         &self,
         draft: &ExternalEntityIdDraft,
     ) -> PortResult<ExternalEntityIdRecord> {
-        self.transition_store()
-            .add_external_entity_id(draft)
+        self.add_external_entity_id(draft)
             .await
             .map_err(map_persistence_error)
     }

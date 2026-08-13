@@ -37,7 +37,8 @@ const health = read("crates/application/src/use_cases/database/health/mod.rs");
 const statistics = read("crates/application/src/use_cases/database/statistics/mod.rs");
 const reset = read("crates/application/src/use_cases/database/reset/mod.rs");
 const ports = read("crates/application/src/ports/database/mod.rs");
-const adapter = read("crates/application/src/composition/port_registry.rs");
+const portRegistry = read("crates/application/src/composition/port_registry.rs");
+const databaseAdapter = read("crates/application/src/composition/adapters/database.rs");
 const applicationService = read("crates/application/src/service/application_service.rs");
 const researchService = read("crates/application/src/services/research/service.rs");
 const researchArtifactCatalog = read("crates/application/src/use_cases/research/artifact_catalog.rs");
@@ -61,12 +62,12 @@ for (const [label, source] of [
 }
 
 check(service.includes("pub(crate) struct DatabaseService"), "缺少 DatabaseService");
-check(service.includes("pub(crate) session: RwLock<Option<ActiveDatabase>>"), "活动数据库状态未归属 DatabaseService");
+check(service.includes("pub(crate) session: RwLock<Option<DatabaseSession>>"), "活动数据库状态未归属 DatabaseService");
 check(service.includes("prepare_connection"), "DatabaseService 缺少连接准备边界");
 check(service.includes("preflight_reset"), "DatabaseService 缺少清空预检边界");
 check(service.includes("reset_to_pristine"), "DatabaseService 缺少清空协调边界");
 check(applicationService.includes("database: DatabaseService"), "ApplicationService 未聚合 DatabaseService");
-check(!applicationService.includes("RwLock<Option<ActiveDatabase>>"), "ApplicationService 仍直接持有活动数据库槽位");
+check(!applicationService.includes("RwLock<Option<DatabaseSession>>"), "ApplicationService 仍直接持有活动数据库槽位");
 
 check(connect.includes("super::migrate::execute(port).await?"), "connect use case 未委托 migrate use case");
 check(connect.includes("recover_interrupted_work"), "connect use case 缺少中断任务恢复");
@@ -80,9 +81,12 @@ check(reset.includes("port.reset_to_pristine().await"), "reset use case 未通�
 check(reset.includes("reset_requires_the_same_database_before_destructive_work"), "reset use case 缺少 fake port 回归测试");
 
 check(ports.includes("async fn reset_to_pristine(&self) -> PortResult<()>;"), "DatabaseLifecyclePort 缺少清空能力");
-check(adapter.includes("impl DatabaseLifecyclePort for ActiveDatabase"), "PostgreSQL adapter 未实现 DatabaseLifecyclePort");
-check(adapter.includes("impl DatabaseObservabilityPort for ActiveDatabase"), "PostgreSQL adapter 未实现 DatabaseObservabilityPort");
-check(adapter.includes("PostgresStore as PersistenceStore"), "PostgreSQL 具体适配器入口缺失");
+check(databaseAdapter.includes("impl DatabaseLifecyclePort for PersistenceStore"), "PostgreSQL adapter 未实现 DatabaseLifecyclePort");
+check(databaseAdapter.includes("impl DatabaseObservabilityPort for PersistenceStore"), "PostgreSQL adapter 未实现 DatabaseObservabilityPort");
+check(portRegistry.includes("PostgresStore as PersistenceStore"), "PostgreSQL 具体适配器入口缺失");
+check(portRegistry.includes("pub(crate) type DatabaseSession = PersistenceStore;"), "Application DatabaseSession 边界别名缺失");
+check(portRegistry.includes("use football_persistence_postgres::register_adapters;"), "PostgreSQL adapter 注册入口未收敛到 register_adapters");
+check(!portRegistry.includes("impl DatabaseLifecyclePort") && !portRegistry.includes("impl DatabaseObservabilityPort"), "port_registry.rs 仍承载数据库 Port 实现");
 
 check(!facade.includes("initialize_database_contents"), "Database facade 仍持有连接初始化业务编排");
 check(lifecycleConnect.includes("initialize::execute(application, prepared.session()).await"), "连接成功前的内置内容初始化顺序未迁入 lifecycle use case");
@@ -130,4 +134,4 @@ if (failures.length > 0) {
   process.exit(1);
 }
 
-console.log("Database Service 验证通过：连接、迁移、健康、统计、清空均已进入 Service/Use Case/Port 边界，活动数据库由 DatabaseService 单一持有，Tauri 不再直接执行 PostgreSQL 清空流程，内置 P4 artifact 初始化通过 ResearchService/ResearchArtifactPort 保持可验证链路。");
+console.log("Database Service 验证通过：连接、迁移、健康、统计、清空均已进入 Service/Use Case/Port 边界，活动 DatabaseSession 由 DatabaseService 单一持有，Lifecycle/Observability Port 实现已迁入具名 database adapter，Tauri 不直接执行 PostgreSQL 清空流程，内置 P4 artifact 初始化通过 ResearchService/ResearchArtifactPort 保持可验证链路。");

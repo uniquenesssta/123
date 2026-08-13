@@ -1,9 +1,9 @@
-use crate::composition::ActiveDatabase;
+use crate::composition::DatabaseSession;
 use crate::{ApplicationResult, ApplicationService};
 
 pub(crate) async fn execute(
     application: &ApplicationService,
-    session: &ActiveDatabase,
+    session: &DatabaseSession,
 ) -> ApplicationResult<()> {
     application
         .rules

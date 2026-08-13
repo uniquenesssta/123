@@ -1,4 +1,5 @@
-use super::super::port_registry::{map_persistence_error, ActiveDatabase};
+use super::super::port_registry::PersistenceStore;
+use super::map_persistence_error;
 use crate::ports::{
     lineup::{FormationPort, LineupPort, LineupPresetPort, MatchCatalogPort},
     PortResult,
@@ -16,10 +17,9 @@ use football_domain::{
 use uuid::Uuid;
 
 #[async_trait]
-impl FormationPort for ActiveDatabase {
+impl FormationPort for PersistenceStore {
     async fn list_formations(&self, active_only: bool) -> PortResult<Vec<FormationRecord>> {
-        self.transition_store()
-            .list_formations(active_only)
+        self.list_formations(active_only)
             .await
             .map_err(map_persistence_error)
     }
@@ -27,8 +27,7 @@ impl FormationPort for ActiveDatabase {
         &self,
         draft: &FormationUsageDistributionDraft,
     ) -> PortResult<FormationUsageDistributionRecord> {
-        self.transition_store()
-            .save_formation_usage_distribution(draft)
+        self.save_formation_usage_distribution(draft)
             .await
             .map_err(map_persistence_error)
     }
@@ -36,8 +35,7 @@ impl FormationPort for ActiveDatabase {
         &self,
         query: &FormationUsageListQuery,
     ) -> PortResult<Vec<FormationUsageDistributionRecord>> {
-        self.transition_store()
-            .list_formation_usage_distributions(query)
+        self.list_formation_usage_distributions(query)
             .await
             .map_err(map_persistence_error)
     }
@@ -45,46 +43,40 @@ impl FormationPort for ActiveDatabase {
         &self,
         query: &FormationDistributionQuery,
     ) -> PortResult<ResolvedFormationDistribution> {
-        self.transition_store()
-            .resolve_formation_distribution(query)
+        self.resolve_formation_distribution(query)
             .await
             .map_err(map_persistence_error)
     }
 }
 
 #[async_trait]
-impl MatchCatalogPort for ActiveDatabase {
+impl MatchCatalogPort for PersistenceStore {
     async fn create_match(&self, draft: &MatchDraft) -> PortResult<MatchRecord> {
-        self.transition_store()
-            .create_match(draft)
+        self.create_match(draft)
             .await
             .map_err(map_persistence_error)
     }
     async fn delete_match(&self, match_id: Uuid) -> PortResult<()> {
-        self.transition_store()
-            .delete_match(match_id)
+        self.delete_match(match_id)
             .await
             .map_err(map_persistence_error)
     }
     async fn read_match(&self, match_id: Uuid) -> PortResult<MatchRecord> {
-        self.transition_store()
-            .read_match_exchange(match_id)
+        self.read_match_exchange(match_id)
             .await
             .map_err(map_persistence_error)
     }
 }
 
 #[async_trait]
-impl LineupPort for ActiveDatabase {
+impl LineupPort for PersistenceStore {
     async fn create_lineup(&self, draft: &LineupDraft) -> PortResult<LineupRecord> {
-        self.transition_store()
-            .create_lineup(draft)
+        self.create_lineup(draft)
             .await
             .map_err(map_persistence_error)
     }
     async fn create_lineup_pair(&self, draft: &LineupPairDraft) -> PortResult<LineupPairRecord> {
-        self.transition_store()
-            .create_lineup_pair(draft)
+        self.create_lineup_pair(draft)
             .await
             .map_err(map_persistence_error)
     }
@@ -93,14 +85,12 @@ impl LineupPort for ActiveDatabase {
         match_id: Option<Uuid>,
         limit: u32,
     ) -> PortResult<Vec<LineupRecord>> {
-        self.transition_store()
-            .list_lineups(match_id, limit)
+        self.list_lineups(match_id, limit)
             .await
             .map_err(map_persistence_error)
     }
     async fn read_lineup(&self, lineup_id: Uuid) -> PortResult<LineupRecord> {
-        self.transition_store()
-            .read_lineup(lineup_id)
+        self.read_lineup(lineup_id)
             .await
             .map_err(map_persistence_error)
     }
@@ -109,8 +99,7 @@ impl LineupPort for ActiveDatabase {
         lineup_id: Uuid,
         reason: Option<&str>,
     ) -> PortResult<LineupHistoryRemovalResult> {
-        self.transition_store()
-            .remove_lineup_history(lineup_id, reason)
+        self.remove_lineup_history(lineup_id, reason)
             .await
             .map_err(map_persistence_error)
     }
@@ -119,8 +108,7 @@ impl LineupPort for ActiveDatabase {
         match_id: Uuid,
         snapshot_type: &str,
     ) -> PortResult<MatchLineupChain> {
-        self.transition_store()
-            .read_match_lineup_chain(match_id, snapshot_type)
+        self.read_match_lineup_chain(match_id, snapshot_type)
             .await
             .map_err(map_persistence_error)
     }
@@ -130,8 +118,7 @@ impl LineupPort for ActiveDatabase {
         snapshot_type: &str,
         reference_time: DateTime<Utc>,
     ) -> PortResult<MatchLineupChain> {
-        self.transition_store()
-            .read_match_lineup_chain_at(match_id, snapshot_type, reference_time)
+        self.read_match_lineup_chain_at(match_id, snapshot_type, reference_time)
             .await
             .map_err(map_persistence_error)
     }
@@ -140,21 +127,19 @@ impl LineupPort for ActiveDatabase {
         team_id: Uuid,
         limit: u32,
     ) -> PortResult<Vec<TeamMatchLineupHistoryItem>> {
-        self.transition_store()
-            .list_team_match_lineups(team_id, limit)
+        self.list_team_match_lineups(team_id, limit)
             .await
             .map_err(map_persistence_error)
     }
 }
 
 #[async_trait]
-impl LineupPresetPort for ActiveDatabase {
+impl LineupPresetPort for PersistenceStore {
     async fn save_preset(
         &self,
         draft: &TeamLineupPresetDraft,
     ) -> PortResult<TeamLineupPresetRecord> {
-        self.transition_store()
-            .save_team_lineup_preset(draft)
+        self.save_team_lineup_preset(draft)
             .await
             .map_err(map_persistence_error)
     }
@@ -163,8 +148,7 @@ impl LineupPresetPort for ActiveDatabase {
         team_id: Uuid,
         include_archived: bool,
     ) -> PortResult<Vec<TeamLineupPresetRecord>> {
-        self.transition_store()
-            .list_team_lineup_presets(team_id, include_archived)
+        self.list_team_lineup_presets(team_id, include_archived)
             .await
             .map_err(map_persistence_error)
     }
@@ -172,8 +156,7 @@ impl LineupPresetPort for ActiveDatabase {
         &self,
         preset_id: Uuid,
     ) -> PortResult<TeamLineupPresetApplicationPreview> {
-        self.transition_store()
-            .preview_team_lineup_preset_application(preset_id)
+        self.preview_team_lineup_preset_application(preset_id)
             .await
             .map_err(map_persistence_error)
     }
@@ -182,20 +165,17 @@ impl LineupPresetPort for ActiveDatabase {
         preset_id: Uuid,
         name: &str,
     ) -> PortResult<TeamLineupPresetRecord> {
-        self.transition_store()
-            .duplicate_team_lineup_preset(preset_id, name)
+        self.duplicate_team_lineup_preset(preset_id, name)
             .await
             .map_err(map_persistence_error)
     }
     async fn archive_preset(&self, preset_id: Uuid) -> PortResult<TeamLineupPresetRecord> {
-        self.transition_store()
-            .archive_team_lineup_preset(preset_id)
+        self.archive_team_lineup_preset(preset_id)
             .await
             .map_err(map_persistence_error)
     }
     async fn delete_preset(&self, preset_id: Uuid) -> PortResult<()> {
-        self.transition_store()
-            .delete_team_lineup_preset(preset_id)
+        self.delete_team_lineup_preset(preset_id)
             .await
             .map_err(map_persistence_error)
     }

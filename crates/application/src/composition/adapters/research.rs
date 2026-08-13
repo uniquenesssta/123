@@ -1,4 +1,5 @@
-use super::super::port_registry::{map_persistence_error, ActiveDatabase};
+use super::super::port_registry::PersistenceStore;
+use super::map_persistence_error;
 use crate::ports::{
     research::{
         FactPipelinePort, ResearchArtifactPort, ResearchEvidenceLedgerPort,
@@ -21,28 +22,25 @@ use football_domain::{
 use uuid::Uuid;
 
 #[async_trait]
-impl ResearchArtifactPort for ActiveDatabase {
+impl ResearchArtifactPort for PersistenceStore {
     async fn read_schema(
         &self,
         schema_key: &str,
         version: &str,
     ) -> PortResult<SchemaVersionRecord> {
-        self.transition_store()
-            .read_schema_version_by_key(schema_key, version)
+        self.read_schema_version_by_key(schema_key, version)
             .await
             .map_err(map_persistence_error)
     }
 
     async fn register_schema(&self, draft: &SchemaVersionDraft) -> PortResult<SchemaVersionRecord> {
-        self.transition_store()
-            .register_schema_version(draft)
+        self.register_schema_version(draft)
             .await
             .map_err(map_persistence_error)
     }
 
     async fn register_prompt(&self, draft: &PromptVersionDraft) -> PortResult<PromptVersionRecord> {
-        self.transition_store()
-            .register_prompt_version(draft)
+        self.register_prompt_version(draft)
             .await
             .map_err(map_persistence_error)
     }
@@ -51,8 +49,7 @@ impl ResearchArtifactPort for ActiveDatabase {
         &self,
         draft: &SourcePolicyVersionDraft,
     ) -> PortResult<SourcePolicyVersionRecord> {
-        self.transition_store()
-            .register_source_policy_version(draft)
+        self.register_source_policy_version(draft)
             .await
             .map_err(map_persistence_error)
     }
@@ -61,22 +58,19 @@ impl ResearchArtifactPort for ActiveDatabase {
         &self,
         draft: &CompetitionProfileVersionDraft,
     ) -> PortResult<CompetitionProfileVersionRecord> {
-        self.transition_store()
-            .register_competition_profile_version(draft)
+        self.register_competition_profile_version(draft)
             .await
             .map_err(map_persistence_error)
     }
 
     async fn create_run(&self, draft: &ResearchRunDraft) -> PortResult<ResearchRunRecord> {
-        self.transition_store()
-            .create_research_run(draft)
+        self.create_research_run(draft)
             .await
             .map_err(map_persistence_error)
     }
 
     async fn read_run(&self, run_id: Uuid) -> PortResult<ResearchRunRecord> {
-        self.transition_store()
-            .read_research_run(run_id)
+        self.read_research_run(run_id)
             .await
             .map_err(map_persistence_error)
     }
@@ -85,21 +79,19 @@ impl ResearchArtifactPort for ActiveDatabase {
         &self,
         draft: &ResearchRunEventDraft,
     ) -> PortResult<ResearchRunRecord> {
-        self.transition_store()
-            .record_research_run_event(draft)
+        self.record_research_run_event(draft)
             .await
             .map_err(map_persistence_error)
     }
 }
 
 #[async_trait]
-impl ResearchEvidenceLedgerPort for ActiveDatabase {
+impl ResearchEvidenceLedgerPort for PersistenceStore {
     async fn append_evidence_claim(
         &self,
         draft: &EvidenceClaimDraft,
     ) -> PortResult<EvidenceClaimRecord> {
-        self.transition_store()
-            .append_evidence_claim(draft)
+        self.append_evidence_claim(draft)
             .await
             .map_err(map_persistence_error)
     }
@@ -108,38 +100,34 @@ impl ResearchEvidenceLedgerPort for ActiveDatabase {
         &self,
         draft: &EvidenceConflictDraft,
     ) -> PortResult<EvidenceConflictRecord> {
-        self.transition_store()
-            .create_evidence_conflict(draft)
+        self.create_evidence_conflict(draft)
             .await
             .map_err(map_persistence_error)
     }
 }
 
 #[async_trait]
-impl ResearchManualConflictPort for ActiveDatabase {
+impl ResearchManualConflictPort for PersistenceStore {
     async fn append_manual_route_override(
         &self,
         draft: &P4ManualRouteOverrideDraft,
     ) -> PortResult<P4ManualRouteOverrideRecord> {
-        self.transition_store()
-            .append_p4_manual_route_override(draft)
+        self.append_p4_manual_route_override(draft)
             .await
             .map_err(map_persistence_error)
     }
 
     async fn route_readiness(&self, task_id: Uuid) -> PortResult<P4FreezeReadiness> {
-        self.transition_store()
-            .p4_route_readiness(task_id)
+        self.p4_route_readiness(task_id)
             .await
             .map_err(map_persistence_error)
     }
 }
 
 #[async_trait]
-impl FactPipelinePort for ActiveDatabase {
+impl FactPipelinePort for PersistenceStore {
     async fn context(&self, research_run_id: Uuid) -> PortResult<FactPipelineContext> {
-        self.transition_store()
-            .fact_pipeline_context(research_run_id)
+        self.fact_pipeline_context(research_run_id)
             .await
             .map_err(map_persistence_error)
     }
@@ -152,31 +140,28 @@ impl FactPipelinePort for ActiveDatabase {
         compact_name: &str,
         external_id: Option<&str>,
     ) -> PortResult<Vec<EntityCandidate>> {
-        self.transition_store()
-            .find_entity_candidates(
-                context,
-                entity_type,
-                normalized_name,
-                compact_name,
-                external_id,
-            )
-            .await
-            .map_err(map_persistence_error)
+        self.find_entity_candidates(
+            context,
+            entity_type,
+            normalized_name,
+            compact_name,
+            external_id,
+        )
+        .await
+        .map_err(map_persistence_error)
     }
 
     async fn append_entity_resolution(
         &self,
         draft: &EntityResolutionDraft,
     ) -> PortResult<EntityResolutionRecord> {
-        self.transition_store()
-            .append_entity_resolution(draft)
+        self.append_entity_resolution(draft)
             .await
             .map_err(map_persistence_error)
     }
 
     async fn append_time_audit(&self, draft: &TimeAuditDraft) -> PortResult<TimeAuditRecord> {
-        self.transition_store()
-            .append_time_audit(draft)
+        self.append_time_audit(draft)
             .await
             .map_err(map_persistence_error)
     }
@@ -185,8 +170,7 @@ impl FactPipelinePort for ActiveDatabase {
         &self,
         draft: &ConflictEvaluationDraft,
     ) -> PortResult<ConflictEvaluationRecord> {
-        self.transition_store()
-            .append_conflict_evaluation(draft)
+        self.append_conflict_evaluation(draft)
             .await
             .map_err(map_persistence_error)
     }
@@ -205,8 +189,7 @@ impl FactPipelinePort for ActiveDatabase {
                 format!("冲突事件载荷反序列化失败：{error}"),
             )
         })?;
-        self.transition_store()
-            .append_conflict_event(conflict_id, event_type, actor, &payload, idempotency_key)
+        self.append_conflict_event(conflict_id, event_type, actor, &payload, idempotency_key)
             .await
             .map_err(map_persistence_error)
     }
@@ -215,32 +198,28 @@ impl FactPipelinePort for ActiveDatabase {
         &self,
         draft: &EvidenceRouteDraft,
     ) -> PortResult<EvidenceRouteRecord> {
-        self.transition_store()
-            .append_evidence_route(draft)
+        self.append_evidence_route(draft)
             .await
             .map_err(map_persistence_error)
     }
 }
 
 #[async_trait]
-impl ResearchGatewayAuditPort for ActiveDatabase {
+impl ResearchGatewayAuditPort for PersistenceStore {
     async fn append_attempt(&self, draft: &OpenAiAttemptDraft) -> PortResult<OpenAiAttemptRecord> {
-        self.transition_store()
-            .append_openai_attempt(draft)
+        self.append_openai_attempt(draft)
             .await
             .map_err(map_persistence_error)
     }
 
     async fn attempt_number_offset(&self, research_run_id: Uuid) -> PortResult<u32> {
-        self.transition_store()
-            .openai_attempt_number_offset(research_run_id)
+        self.openai_attempt_number_offset(research_run_id)
             .await
             .map_err(map_persistence_error)
     }
 
     async fn usage_totals(&self) -> PortResult<OpenAiUsageTotals> {
-        self.transition_store()
-            .openai_usage_totals()
+        self.openai_usage_totals()
             .await
             .map_err(map_persistence_error)
     }
@@ -251,8 +230,7 @@ impl ResearchGatewayAuditPort for ActiveDatabase {
         sources: &[WebSourceDraft],
         citations: &[WebCitationDraft],
     ) -> PortResult<()> {
-        self.transition_store()
-            .append_web_references(citations, sources)
+        self.append_web_references(citations, sources)
             .await
             .map_err(map_persistence_error)
     }

@@ -1,4 +1,5 @@
-use super::super::port_registry::{map_persistence_error, ActiveDatabase};
+use super::super::port_registry::PersistenceStore;
+use super::map_persistence_error;
 use crate::ports::{
     review::{
         MatchReviewPackageFactsPort, MatchReviewPackageSourcePort, MatchReviewPackageStatePort,
@@ -18,10 +19,9 @@ use serde_json::Value;
 use uuid::Uuid;
 
 #[async_trait]
-impl MatchReviewPort for ActiveDatabase {
+impl MatchReviewPort for PersistenceStore {
     async fn list_reviewable_matches(&self, limit: u32) -> PortResult<Vec<ReviewableMatch>> {
-        self.transition_store()
-            .list_reviewable_matches(limit)
+        self.list_reviewable_matches(limit)
             .await
             .map_err(map_persistence_error)
     }
@@ -30,22 +30,19 @@ impl MatchReviewPort for ActiveDatabase {
         &self,
         draft: &MatchReviewDraft,
     ) -> PortResult<MatchReviewDetail> {
-        self.transition_store()
-            .generate_match_review(draft)
+        self.generate_match_review(draft)
             .await
             .map_err(map_persistence_error)
     }
 
     async fn list_match_reviews(&self, limit: u32) -> PortResult<Vec<MatchReviewSummary>> {
-        self.transition_store()
-            .list_match_reviews(limit)
+        self.list_match_reviews(limit)
             .await
             .map_err(map_persistence_error)
     }
 
     async fn read_match_review(&self, review_id: Uuid) -> PortResult<MatchReviewDetail> {
-        self.transition_store()
-            .read_match_review(review_id)
+        self.read_match_review(review_id)
             .await
             .map_err(map_persistence_error)
     }
@@ -56,8 +53,7 @@ impl MatchReviewPort for ActiveDatabase {
         limit: u32,
         match_review_id: Option<Uuid>,
     ) -> PortResult<Vec<AbilityUpdateCandidateRecord>> {
-        self.transition_store()
-            .list_ability_candidates(status, limit, match_review_id)
+        self.list_ability_candidates(status, limit, match_review_id)
             .await
             .map_err(map_persistence_error)
     }
@@ -66,22 +62,21 @@ impl MatchReviewPort for ActiveDatabase {
         &self,
         draft: &AbilityCandidateDecisionDraft,
     ) -> PortResult<AbilityUpdateCandidateRecord> {
-        self.transition_store()
-            .decide_ability_candidate(draft)
+        self.decide_ability_candidate(draft)
             .await
             .map_err(map_persistence_error)
     }
 }
 
 #[async_trait]
-impl MatchReviewPackageSourcePort for ActiveDatabase {
+impl MatchReviewPackageSourcePort for PersistenceStore {
     async fn build_export_data(
         &self,
         match_id: Uuid,
         package_id: Uuid,
         exported_at: DateTime<Utc>,
     ) -> PortResult<MatchReviewPackageData> {
-        let store = self.transition_store();
+        let store = PersistenceStore::clone(self);
         let context = store
             .ai_match_package_context(match_id)
             .await
@@ -134,7 +129,7 @@ impl MatchReviewPackageSourcePort for ActiveDatabase {
         &self,
         match_id: Uuid,
     ) -> PortResult<MatchReviewPackageValidationContext> {
-        let store = self.transition_store();
+        let store = PersistenceStore::clone(self);
         let current_export_data = store
             .match_lineup_export_data(Some(match_id))
             .await
@@ -181,21 +176,17 @@ impl MatchReviewPackageSourcePort for ActiveDatabase {
     }
 
     async fn read_source_run(&self, run_id: Uuid) -> PortResult<Value> {
-        self.transition_store()
-            .read_run(run_id)
-            .await
-            .map_err(map_persistence_error)
+        self.read_run(run_id).await.map_err(map_persistence_error)
     }
 }
 
 #[async_trait]
-impl MatchReviewPackageStatePort for ActiveDatabase {
+impl MatchReviewPackageStatePort for PersistenceStore {
     async fn register_export(
         &self,
         summary: &MatchReviewPackageSummary,
     ) -> PortResult<MatchReviewPackageWorkflowRecord> {
-        self.transition_store()
-            .register_match_review_package_export(summary)
+        self.register_match_review_package_export(summary)
             .await
             .map_err(map_persistence_error)
     }
@@ -204,8 +195,7 @@ impl MatchReviewPackageStatePort for ActiveDatabase {
         &self,
         match_id: Uuid,
     ) -> PortResult<Option<MatchReviewPackageWorkflowRecord>> {
-        self.transition_store()
-            .read_active_match_review_package_workflow(match_id)
+        self.read_active_match_review_package_workflow(match_id)
             .await
             .map_err(map_persistence_error)
     }
@@ -214,8 +204,7 @@ impl MatchReviewPackageStatePort for ActiveDatabase {
         &self,
         package_id: Uuid,
     ) -> PortResult<MatchReviewPackageWorkflowRecord> {
-        self.transition_store()
-            .read_match_review_package_workflow(package_id)
+        self.read_match_review_package_workflow(package_id)
             .await
             .map_err(map_persistence_error)
     }
@@ -224,8 +213,7 @@ impl MatchReviewPackageStatePort for ActiveDatabase {
         &self,
         review_id: Uuid,
     ) -> PortResult<Option<MatchReviewPackageWorkflowRecord>> {
-        self.transition_store()
-            .read_match_review_package_workflow_by_review(review_id)
+        self.read_match_review_package_workflow_by_review(review_id)
             .await
             .map_err(map_persistence_error)
     }
@@ -234,8 +222,7 @@ impl MatchReviewPackageStatePort for ActiveDatabase {
         &self,
         review_id: Uuid,
     ) -> PortResult<Option<MatchReviewPackageWorkflowRecord>> {
-        self.transition_store()
-            .mark_match_review_package_settled(review_id)
+        self.mark_match_review_package_settled(review_id)
             .await
             .map_err(map_persistence_error)
     }
@@ -245,8 +232,7 @@ impl MatchReviewPackageStatePort for ActiveDatabase {
         package_id: Uuid,
         preview: &MatchReviewPackagePreview,
     ) -> PortResult<MatchReviewPackageWorkflowRecord> {
-        self.transition_store()
-            .record_match_review_package_preview(package_id, preview)
+        self.record_match_review_package_preview(package_id, preview)
             .await
             .map_err(map_persistence_error)
     }
@@ -257,8 +243,7 @@ impl MatchReviewPackageStatePort for ActiveDatabase {
         confirmed_by: Option<&str>,
         confirmation_note: Option<&str>,
     ) -> PortResult<MatchReviewPackageWorkflowRecord> {
-        self.transition_store()
-            .confirm_match_review_package_workflow(package_id, confirmed_by, confirmation_note)
+        self.confirm_match_review_package_workflow(package_id, confirmed_by, confirmation_note)
             .await
             .map_err(map_persistence_error)
     }
@@ -267,8 +252,7 @@ impl MatchReviewPackageStatePort for ActiveDatabase {
         &self,
         package_id: Uuid,
     ) -> PortResult<MatchReviewPackageWorkflowRecord> {
-        self.transition_store()
-            .mark_match_review_package_facts_committed(package_id)
+        self.mark_match_review_package_facts_committed(package_id)
             .await
             .map_err(map_persistence_error)
     }
@@ -278,8 +262,7 @@ impl MatchReviewPackageStatePort for ActiveDatabase {
         package_id: Uuid,
         review_id: Uuid,
     ) -> PortResult<MatchReviewPackageWorkflowRecord> {
-        self.transition_store()
-            .mark_match_review_package_review_created(package_id, review_id)
+        self.mark_match_review_package_review_created(package_id, review_id)
             .await
             .map_err(map_persistence_error)
     }
@@ -288,18 +271,16 @@ impl MatchReviewPackageStatePort for ActiveDatabase {
         &self,
         package_id: Uuid,
     ) -> PortResult<MatchReviewPackagePreview> {
-        self.transition_store()
-            .read_match_review_package_preview(package_id)
+        self.read_match_review_package_preview(package_id)
             .await
             .map_err(map_persistence_error)
     }
 }
 
 #[async_trait]
-impl MatchReviewPackageFactsPort for ActiveDatabase {
+impl MatchReviewPackageFactsPort for PersistenceStore {
     async fn commit_review_facts(&self, draft: &MatchReviewDraft) -> PortResult<()> {
-        self.transition_store()
-            .commit_match_review_facts(draft)
+        self.commit_match_review_facts(draft)
             .await
             .map(|_| ())
             .map_err(map_persistence_error)

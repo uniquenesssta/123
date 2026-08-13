@@ -1,4 +1,5 @@
-use super::super::super::port_registry::{map_persistence_error, ActiveDatabase};
+use super::super::super::port_registry::PersistenceStore;
+use super::super::map_persistence_error;
 use crate::ports::{
     exchange::{MonthlyWorkbookPort, SpreadsheetExchangePort},
     PortResult,
@@ -13,24 +14,21 @@ use std::collections::HashMap;
 use uuid::Uuid;
 
 #[async_trait]
-impl SpreadsheetExchangePort for ActiveDatabase {
+impl SpreadsheetExchangePort for PersistenceStore {
     async fn reference_data(&self) -> PortResult<PlayerCatalogReferenceData> {
-        self.transition_store()
-            .player_catalog_reference_data()
+        self.player_catalog_reference_data()
             .await
             .map_err(map_persistence_error)
     }
 
     async fn export_data(&self) -> PortResult<SpreadsheetExportData> {
-        self.transition_store()
-            .spreadsheet_export_data()
+        self.spreadsheet_export_data()
             .await
             .map_err(map_persistence_error)
     }
 
     async fn data_gaps(&self) -> PortResult<Vec<MonthlyDataGapRow>> {
-        self.transition_store()
-            .player_monthly_data_gaps()
+        self.player_monthly_data_gaps()
             .await
             .map_err(map_persistence_error)
     }
@@ -40,8 +38,7 @@ impl SpreadsheetExchangePort for ActiveDatabase {
         workbook: &SpreadsheetParsedWorkbook,
         mode: SpreadsheetImportMode,
     ) -> PortResult<SpreadsheetImportPreview> {
-        self.transition_store()
-            .preview_spreadsheet_import(workbook, mode)
+        self.preview_spreadsheet_import(workbook, mode)
             .await
             .map_err(map_persistence_error)
     }
@@ -52,19 +49,17 @@ impl SpreadsheetExchangePort for ActiveDatabase {
         mode: SpreadsheetImportMode,
         package_team_references: &HashMap<String, String>,
     ) -> PortResult<SpreadsheetImportPreview> {
-        self.transition_store()
-            .preview_spreadsheet_import_with_team_references(
-                workbook,
-                mode,
-                package_team_references,
-            )
-            .await
-            .map_err(map_persistence_error)
+        self.preview_spreadsheet_import_with_team_references(
+            workbook,
+            mode,
+            package_team_references,
+        )
+        .await
+        .map_err(map_persistence_error)
     }
 
     async fn read_import_preview(&self, preview_id: Uuid) -> PortResult<SpreadsheetImportPreview> {
-        self.transition_store()
-            .read_spreadsheet_import_preview(preview_id)
+        self.read_spreadsheet_import_preview(preview_id)
             .await
             .map_err(map_persistence_error)
     }
@@ -74,25 +69,22 @@ impl SpreadsheetExchangePort for ActiveDatabase {
         preview_id: Uuid,
         resolution: &SpreadsheetImportResolution,
     ) -> PortResult<SpreadsheetImportPreview> {
-        self.transition_store()
-            .resolve_spreadsheet_import_conflict(preview_id, resolution.clone())
+        self.resolve_spreadsheet_import_conflict(preview_id, resolution.clone())
             .await
             .map_err(map_persistence_error)
     }
 
     async fn commit_import(&self, preview_id: Uuid) -> PortResult<SpreadsheetImportCommitResult> {
-        self.transition_store()
-            .commit_spreadsheet_import(preview_id)
+        self.commit_spreadsheet_import(preview_id)
             .await
             .map_err(map_persistence_error)
     }
 }
 
 #[async_trait]
-impl MonthlyWorkbookPort for ActiveDatabase {
+impl MonthlyWorkbookPort for PersistenceStore {
     async fn export_data(&self) -> PortResult<TeamMonthlyWorkbookData> {
-        self.transition_store()
-            .team_monthly_workbook_data()
+        self.team_monthly_workbook_data()
             .await
             .map_err(map_persistence_error)
     }
@@ -102,15 +94,13 @@ impl MonthlyWorkbookPort for ActiveDatabase {
         workbook: &SpreadsheetParsedWorkbook,
         mode: SpreadsheetImportMode,
     ) -> PortResult<SpreadsheetImportPreview> {
-        self.transition_store()
-            .preview_team_monthly_import(workbook, mode)
+        self.preview_team_monthly_import(workbook, mode)
             .await
             .map_err(map_persistence_error)
     }
 
     async fn read_import_preview(&self, preview_id: Uuid) -> PortResult<SpreadsheetImportPreview> {
-        self.transition_store()
-            .read_team_monthly_import_preview(preview_id)
+        self.read_team_monthly_import_preview(preview_id)
             .await
             .map_err(map_persistence_error)
     }
@@ -120,15 +110,13 @@ impl MonthlyWorkbookPort for ActiveDatabase {
         preview_id: Uuid,
         resolution: &SpreadsheetImportResolution,
     ) -> PortResult<SpreadsheetImportPreview> {
-        self.transition_store()
-            .resolve_team_monthly_import_conflict(preview_id, resolution.clone())
+        self.resolve_team_monthly_import_conflict(preview_id, resolution.clone())
             .await
             .map_err(map_persistence_error)
     }
 
     async fn commit_import(&self, preview_id: Uuid) -> PortResult<SpreadsheetImportCommitResult> {
-        self.transition_store()
-            .commit_team_monthly_import(preview_id)
+        self.commit_team_monthly_import(preview_id)
             .await
             .map_err(map_persistence_error)
     }

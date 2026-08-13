@@ -1,3 +1,4 @@
+mod adapters;
 mod analytics;
 mod api_workspace;
 mod audit;
@@ -39,6 +40,7 @@ mod team_features;
 mod team_force_delete;
 mod team_lineup_presets;
 
+pub use adapters::register_adapters;
 pub use error::{PersistenceError, PersistenceResult};
 pub use health::DatabaseHealth;
 pub use model_runs::ModelRunListItem;

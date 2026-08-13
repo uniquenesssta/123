@@ -112,8 +112,8 @@ for (const token of [
   "async fn read_operation(",
 ]) check(ports.includes(token), `AI Workspace Port 缺少真实能力：${token}`);
 check(!ports.includes("serde_json::Value"), "AI Workspace Port 暴露裸 JSON Value");
-check(adapterText.includes("impl ApiWorkspaceSessionPort for ActiveDatabase"), "ApiWorkspaceSessionPort 未由 ActiveDatabase 适配");
-check(adapterText.includes("impl ApiWorkspaceOperationPort for ActiveDatabase"), "ApiWorkspaceOperationPort 未由 ActiveDatabase 适配");
+check(adapterText.includes("impl ApiWorkspaceSessionPort for PersistenceStore"), "ApiWorkspaceSessionPort 未由 PersistenceStore 适配");
+check(adapterText.includes("impl ApiWorkspaceOperationPort for PersistenceStore"), "ApiWorkspaceOperationPort 未由 PersistenceStore 适配");
 for (const call of [
   "api_workspace_usage_totals",
   "create_api_workspace_session",
@@ -271,4 +271,4 @@ if (failures.length) {
   console.error("AI Workspace Service 验证失败：\n- " + failures.join("\n- "));
   process.exit(1);
 }
-console.log("AI Workspace Service 验证通过：12 个 Application 用例由唯一 AiWorkspaceService 编排，Session/Context/Operation/Presets/Attachments 职责已拆分，Ports/ActiveDatabase 适配完整且旧 owner 清零。");
+console.log("AI Workspace Service 验证通过：12 个 Application 用例由唯一 AiWorkspaceService 编排，Session/Context/Operation/Presets/Attachments 职责已拆分，Ports/PersistenceStore 适配完整且旧 owner 清零。");

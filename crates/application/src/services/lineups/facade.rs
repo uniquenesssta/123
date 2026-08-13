@@ -9,7 +9,7 @@ use football_domain::{
 use uuid::Uuid;
 
 impl ApplicationService {
-    async fn lineup_session(&self) -> ApplicationResult<crate::composition::ActiveDatabase> {
+    async fn lineup_session(&self) -> ApplicationResult<crate::composition::DatabaseSession> {
         self.database
             .active_session()
             .await
