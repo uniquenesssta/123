@@ -1,0 +1,326 @@
+name: R4-03 Row Mapping Implementation
+
+on:
+  push:
+    branches:
+      - agent/r4-03-row-mapping
+    paths:
+      - .github/workflows/r4-03-implementation.yml
+
+permissions:
+  contents: write
+
+jobs:
+  implement-and-verify:
+    runs-on: windows-2025
+    timeout-minutes: 120
+    env:
+      R4_03_BASE: 3c147376cf81394984cc20850a58e866eef4280b
+      npm_config_cache: ${{ github.workspace }}/.npm-cache
+    steps:
+      - name: Checkout R4-03 branch
+        uses: actions/checkout@v4
+        with:
+          ref: agent/r4-03-row-mapping
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: package-lock.json
+
+      - name: Setup Rust 1.88.0
+        uses: dtolnay/rust-toolchain@1.88.0
+        with:
+          components: rustfmt, clippy
+
+      - name: Restore Rust build cache
+        uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: . -> ../.cargo-target
+
+      - name: Verify clean starting scope
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $changed = @(git diff --name-only "$env:R4_03_BASE...HEAD")
+          $unexpected = @($changed | Where-Object { $_ -ne '.github/workflows/r4-03-implementation.yml' })
+          if ($unexpected.Count -ne 0) {
+            throw "R4-03 branch contains unexpected pre-existing changes: $($unexpected -join ', ')"
+          }
+
+      - name: Apply R4-03 mapping rewrite
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $script = @'
+          from pathlib import Path
+
+          def read(path):
+              return Path(path).read_text(encoding='utf-8')
+
+          def write(path, text):
+              p = Path(path)
+              p.parent.mkdir(parents=True, exist_ok=True)
+              with p.open('w', encoding='utf-8', newline='\n') as f:
+                  f.write(text)
+
+          def replace_once(text, old, new, label):
+              count = text.count(old)
+              if count != 1:
+                  raise RuntimeError(f'{label}: expected 1 exact match, found {count}')
+              return text.replace(old, new, 1)
+
+          def remove_function(text, marker, label):
+              idx = text.find(marker)
+              if idx < 0:
+                  raise RuntimeError(f'{label}: marker missing: {marker}')
+              start = text.rfind('\n', 0, idx) + 1
+              prev_end = start - 1
+              if prev_end >= 0:
+                  prev_start = text.rfind('\n', 0, prev_end) + 1
+                  if text[prev_start:prev_end].strip() == '#[test]':
+                      start = prev_start
+              brace = text.find('{', idx)
+              if brace < 0:
+                  raise RuntimeError(f'{label}: opening brace missing')
+              depth = 0
+              end = None
+              for i in range(brace, len(text)):
+                  ch = text[i]
+                  if ch == '{':
+                      depth += 1
+                  elif ch == '}':
+                      depth -= 1
+                      if depth == 0:
+                          end = i + 1
+                          break
+              if end is None:
+                  raise RuntimeError(f'{label}: closing brace missing')
+              while end < len(text) and text[end] in '\r\n':
+                  end += 1
+              return text[:start] + text[end:]
+
+          write('crates/persistence-postgres/src/mapping/mod.rs', '''mod invalid_state;\nmod json;\nmod optional;\nmod time;\nmod uuid;\n\npub(crate) use invalid_state::invalid_state;\npub(crate) use json::to_json_value;\npub(crate) use time::required_datetime;\npub(crate) use uuid::{optional_uuid, required_uuid};\n''')
+
+          write('crates/persistence-postgres/src/mapping/invalid_state.rs', '''use crate::PersistenceError;\n\npub(crate) fn invalid_state(message: impl Into<String>) -> PersistenceError {\n    PersistenceError::InvalidState(message.into())\n}\n\n#[cfg(test)]\nmod tests {\n    use super::*;\n\n    #[test]\n    fn preserves_invalid_state_message() {\n        let error = invalid_state("映射状态无效");\n        assert!(matches!(error, PersistenceError::InvalidState(message) if message == "映射状态无效"));\n    }\n}\n''')
+
+          write('crates/persistence-postgres/src/mapping/optional.rs', '''use super::invalid_state::invalid_state;\nuse crate::PersistenceResult;\nuse serde_json::Value;\n\npub(super) fn optional_trimmed_text<'a>(\n    value: Option<&'a Value>,\n    key: &str,\n    expected_type: &str,\n) -> PersistenceResult<Option<&'a str>> {\n    let Some(value) = value else {\n        return Ok(None);\n    };\n    if value.is_null() {\n        return Ok(None);\n    }\n    let text = value\n        .as_str()\n        .ok_or_else(|| invalid_state(format!("{key} 必须是 {expected_type}")))?\n        .trim();\n    if text.is_empty() {\n        Ok(None)\n    } else {\n        Ok(Some(text))\n    }\n}\n\n#[cfg(test)]\nmod tests {\n    use super::*;\n    use serde_json::json;\n\n    #[test]\n    fn normalizes_missing_null_and_blank_text() {\n        assert_eq!(optional_trimmed_text(None, "id", "字符串").unwrap(), None);\n        assert_eq!(optional_trimmed_text(Some(&Value::Null), "id", "字符串").unwrap(), None);\n        let blank = json!("   ");\n        assert_eq!(optional_trimmed_text(Some(&blank), "id", "字符串").unwrap(), None);\n        let text = json!("  value  ");\n        assert_eq!(optional_trimmed_text(Some(&text), "id", "字符串").unwrap(), Some("value"));\n    }\n}\n''')
+
+          write('crates/persistence-postgres/src/mapping/uuid.rs', '''use super::{invalid_state::invalid_state, optional::optional_trimmed_text};\nuse crate::PersistenceResult;\nuse serde_json::Value;\nuse uuid::Uuid;\n\npub(crate) fn required_uuid(raw: &str, key: &str) -> PersistenceResult<Uuid> {\n    Uuid::parse_str(raw)\n        .map_err(|error| invalid_state(format!("{key} 不是有效 UUID：{error}")))\n}\n\npub(crate) fn optional_uuid(value: &Value, key: &str) -> PersistenceResult<Option<Uuid>> {\n    let Some(raw) = optional_trimmed_text(value.get(key), key, "UUID 字符串")? else {\n        return Ok(None);\n    };\n    required_uuid(raw, key).map(Some)\n}\n\n#[cfg(test)]\nmod tests {\n    use super::*;\n    use serde_json::json;\n\n    #[test]\n    fn optional_uuid_accepts_missing_null_and_blank_values() {\n        assert_eq!(optional_uuid(&json!({}), "id").unwrap(), None);\n        assert_eq!(optional_uuid(&json!({"id": null}), "id").unwrap(), None);\n        assert_eq!(optional_uuid(&json!({"id": "  "}), "id").unwrap(), None);\n    }\n\n    #[test]\n    fn optional_uuid_trims_present_values_without_changing_required_uuid_rules() {\n        let id = Uuid::new_v4();\n        assert_eq!(optional_uuid(&json!({"id": format!("  {id}  ")}), "id").unwrap(), Some(id));\n        assert!(required_uuid(&format!(" {id} "), "snapshot.snapshot_id").is_err());\n    }\n}\n''')
+
+          write('crates/persistence-postgres/src/mapping/time.rs', '''use super::invalid_state::invalid_state;\nuse crate::PersistenceResult;\nuse chrono::{DateTime, Utc};\nuse serde_json::Value;\n\npub(crate) fn required_datetime(\n    value: Option<&Value>,\n    key: &str,\n) -> PersistenceResult<DateTime<Utc>> {\n    let raw = value\n        .and_then(Value::as_str)\n        .ok_or_else(|| invalid_state(format!("{key} 必须是 RFC3339 时间")))?;\n    DateTime::parse_from_rfc3339(raw)\n        .map(|value| value.with_timezone(&Utc))\n        .map_err(|error| invalid_state(format!("{key} 时间无效：{error}")))\n}\n\n#[cfg(test)]\nmod tests {\n    use super::*;\n    use serde_json::json;\n\n    #[test]\n    fn parses_rfc3339_into_utc() {\n        let value = json!("2026-08-13T11:53:00+08:00");\n        let parsed = required_datetime(Some(&value), "snapshot.frozen_at").unwrap();\n        assert_eq!(parsed.to_rfc3339(), "2026-08-13T03:53:00+00:00");\n    }\n\n    #[test]\n    fn rejects_non_string_time_with_existing_error_semantics() {\n        let value = json!(123);\n        let error = required_datetime(Some(&value), "snapshot.frozen_at").unwrap_err();\n        assert!(matches!(error, crate::PersistenceError::InvalidState(message) if message == "snapshot.frozen_at 必须是 RFC3339 时间"));\n    }\n}\n''')
+
+          write('crates/persistence-postgres/src/mapping/json.rs', '''use crate::PersistenceResult;\nuse serde::Serialize;\nuse serde_json::Value;\n\npub(crate) fn to_json_value<T: Serialize + ?Sized>(value: &T) -> PersistenceResult<Value> {\n    Ok(serde_json::to_value(value)?)\n}\n\n#[cfg(test)]\nmod tests {\n    use super::*;\n    use serde_json::json;\n\n    #[test]\n    fn serializes_without_changing_json_shape() {\n        let value = vec!["home", "draw", "away"];\n        assert_eq!(to_json_value(&value).unwrap(), json!(["home", "draw", "away"]));\n    }\n}\n''')
+
+          lib_path = 'crates/persistence-postgres/src/lib.rs'
+          lib = read(lib_path)
+          lib = replace_once(lib, 'mod lineup_chain;\n', 'mod lineup_chain;\nmod mapping;\n', 'lib mapping module registration')
+          marker = '\nuse football_domain::CompetitionKind;\n\nfn parse_competition_kind(value: &str) -> PersistenceResult<CompetitionKind> {'
+          idx = lib.find(marker)
+          if idx < 0:
+              raise RuntimeError('lib business enum parser marker missing')
+          lib = lib[:idx].rstrip() + '\n'
+          write(lib_path, lib)
+
+          competition_path = 'crates/persistence-postgres/src/competitions.rs'
+          competition = read(competition_path)
+          competition = replace_once(
+              competition,
+              'use super::{\n    parse_competition_kind, write_audit_event, PersistenceError, PersistenceResult, PostgresStore,\n};\n',
+              'use super::{write_audit_event, PersistenceError, PersistenceResult, PostgresStore};\nuse crate::mapping::invalid_state;\n',
+              'competition imports',
+          )
+          parser = '''fn parse_competition_kind(value: &str) -> PersistenceResult<CompetitionKind> {\n    match value {\n        "league" => Ok(CompetitionKind::League),\n        "group_stage" => Ok(CompetitionKind::GroupStage),\n        "knockout_single_leg" => Ok(CompetitionKind::KnockoutSingleLeg),\n        "knockout_two_leg" => Ok(CompetitionKind::KnockoutTwoLeg),\n        "friendly" => Ok(CompetitionKind::Friendly),\n        "custom" => Ok(CompetitionKind::Custom),\n        other => Err(invalid_state(format!("未知赛事类型：{other}"))),\n    }\n}\n\n'''
+          competition = replace_once(
+              competition,
+              'fn ensure_scope_id(label: &str, supplied: Option<Uuid>, resolved: Uuid) -> PersistenceResult<()> {',
+              parser + 'fn ensure_scope_id(label: &str, supplied: Option<Uuid>, resolved: Uuid) -> PersistenceResult<()> {',
+              'competition parser ownership',
+          )
+          write(competition_path, competition)
+
+          model_runs_path = 'crates/persistence-postgres/src/model_runs.rs'
+          model_runs = read(model_runs_path)
+          model_runs = replace_once(
+              model_runs,
+              'use super::{sha256_json, write_audit_event, PersistenceError, PersistenceResult, PostgresStore};\n',
+              'use super::{sha256_json, write_audit_event, PersistenceError, PersistenceResult, PostgresStore};\nuse crate::mapping::{optional_uuid, required_datetime, required_uuid, to_json_value};\n',
+              'model_runs mapping imports',
+          )
+          model_runs = replace_once(
+              model_runs,
+              'let summary = serde_json::to_value(&output.summary)?;',
+              'let summary = to_json_value(&output.summary)?;',
+              'model_runs summary JSON mapping',
+          )
+          model_runs = replace_once(
+              model_runs,
+              '''let snapshot_id = Uuid::parse_str(snapshot_id).map_err(|error| {\n        PersistenceError::InvalidState(format!("snapshot.snapshot_id 不是有效 UUID：{error}"))\n    })?;''',
+              'let snapshot_id = required_uuid(snapshot_id, "snapshot.snapshot_id")?;',
+              'model_runs snapshot UUID mapping',
+          )
+          model_runs = remove_function(model_runs, 'fn required_datetime(', 'remove model_runs required_datetime')
+          model_runs = remove_function(model_runs, 'fn optional_uuid(', 'remove model_runs optional_uuid')
+          model_runs = remove_function(
+              model_runs,
+              'fn optional_uuid_accepts_missing_null_and_blank_values()',
+              'move optional_uuid test to mapping owner',
+          )
+          write(model_runs_path, model_runs)
+
+          verifier = r'''import fs from "node:fs";\nimport path from "node:path";\nimport { fileURLToPath } from "node:url";\n\nconst root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");\nconst read = (relative) => fs.readFileSync(path.join(root, relative), "utf8");\nconst exists = (relative) => fs.existsSync(path.join(root, relative));\nconst failures = [];\nconst check = (condition, message) => { if (!condition) failures.push(message); };\n\nconst mappingDir = "crates/persistence-postgres/src/mapping";\nconst expected = ["invalid_state.rs", "json.rs", "mod.rs", "optional.rs", "time.rs", "uuid.rs"];\ncheck(exists(mappingDir), `R4-03 缺少 mapping 目录：${mappingDir}`);\nconst actual = exists(mappingDir)\n  ? fs.readdirSync(path.join(root, mappingDir)).filter((name) => name.endsWith(".rs")).sort()\n  : [];\ncheck(JSON.stringify(actual) === JSON.stringify(expected), `mapping 目录职责文件集合不匹配，实际：${actual.join(", ")}`);\n\nconst files = Object.fromEntries(expected.map((name) => [name, read(`${mappingDir}/${name}`)]));\nconst combined = Object.values(files).join("\n");\ncheck(!combined.includes("football_domain"), "通用 mapping 不得依赖业务 Domain 类型");\ncheck(!combined.includes("sqlx::"), "通用 mapping 不得承载 SQL/查询职责");\ncheck(!exists(`${mappingDir}/mapper.rs`) && !exists(`${mappingDir}/queries.rs`), "不得建立万能 mapper.rs 或 queries.rs");\n\nfor (const token of ["mod invalid_state;", "mod json;", "mod optional;", "mod time;", "mod uuid;"]) {\n  check(files["mod.rs"].includes(token), `mapping/mod.rs 缺少显式声明：${token}`);\n}\ncheck(files["invalid_state.rs"].includes("PersistenceError::InvalidState"), "invalid_state owner 未保持既有错误类型");\nfor (const token of ["DateTime::parse_from_rfc3339(raw)", "with_timezone(&Utc)", "必须是 RFC3339 时间", "时间无效"]) {\n  check(files["time.rs"].includes(token), `time mapping 契约缺失：${token}`);\n}\nfor (const token of ["Uuid::parse_str(raw)", "optional_trimmed_text", "必须是 UUID 字符串", "不是有效 UUID"]) {\n  check(files["uuid.rs"].includes(token), `UUID mapping 契约缺失：${token}`);\n}\nfor (const token of ["value.is_null()", ".trim()", "return Ok(None)"]) {\n  check(files["optional.rs"].includes(token), `optional mapping 契约缺失：${token}`);\n}\ncheck(files["json.rs"].includes("serde_json::to_value(value)?"), "JSON mapping 未保持 Serde 错误传播");\n\nconst library = read("crates/persistence-postgres/src/lib.rs");\nconst competitions = read("crates/persistence-postgres/src/competitions.rs");\nconst modelRuns = read("crates/persistence-postgres/src/model_runs.rs");\ncheck(library.includes("mod mapping;"), "lib.rs 未注册 mapping 模块");\ncheck(!library.includes("fn parse_competition_kind"), "lib.rs 仍承载业务 CompetitionKind 映射");\ncheck(competitions.includes("fn parse_competition_kind") && competitions.includes("use crate::mapping::invalid_state;"), "CompetitionKind 映射未归还 competitions 业务 owner");\ncheck(modelRuns.includes("use crate::mapping::{optional_uuid, required_datetime, required_uuid, to_json_value};"), "model_runs 未使用 mapping 基础出口");\ncheck(!modelRuns.includes("fn required_datetime(") && !modelRuns.includes("fn optional_uuid("), "model_runs 仍保留重复标量 mapping helper");\ncheck(modelRuns.includes('required_uuid(snapshot_id, "snapshot.snapshot_id")?'), "snapshot UUID 未切换到统一 UUID mapping");\ncheck(modelRuns.includes("to_json_value(&output.summary)?"), "Model summary JSON 未切换到统一 JSON mapping");\n\nif (failures.length) {\n  console.error("R4-03 Row 映射基础规范验证失败：");\n  failures.forEach((failure) => console.error(`- ${failure}`));\n  process.exit(1);\n}\nconsole.log("R4-03 Row 映射基础规范验证通过：时间、UUID、JSON、optional、invalid-state 已有独立 owner，业务枚举保持业务归属且未建立万能 mapper。");\n'''
+          write('scripts/verify-persistence-mapping.mjs', verifier.replace('\\n', '\n'))
+
+          package_path = 'package.json'
+          package = read(package_path)
+          package = replace_once(
+              package,
+              '&& node scripts/verify-persistence-audit.mjs",\n    "verify:persistence-foundation"',
+              '&& node scripts/verify-persistence-audit.mjs && node scripts/verify-persistence-mapping.mjs",\n    "verify:persistence-foundation"',
+              'architecture mapping gate',
+          )
+          package = replace_once(
+              package,
+              '    "verify:persistence-audit": "node scripts/verify-persistence-audit.mjs",\n',
+              '    "verify:persistence-audit": "node scripts/verify-persistence-audit.mjs",\n    "verify:persistence-mapping": "node scripts/verify-persistence-mapping.mjs",\n',
+              'mapping npm script',
+          )
+          write(package_path, package)
+          '@
+          $script | python -
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+
+      - name: Format and refresh authoritative Domain inventory
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          cargo fmt --all
+          node scripts/generate-domain-type-inventory.mjs
+
+      - name: Run R4-03 minimum gate
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          npm run verify:persistence-mapping
+          npm run verify:persistence-foundation
+          npm run verify:persistence-audit
+          node scripts/verify_database_baseline.mjs
+          node scripts/verify_protected_assets.mjs
+          cargo fmt --all -- --check
+          node scripts/prepare-cargo-target.mjs
+          cargo check --locked -p football-persistence-postgres
+          cargo test --locked -p football-persistence-postgres
+
+      - name: Run R4-03 stage regression
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          npm run verify:architecture
+          npm run verify:frontend
+          cargo clippy --locked --workspace --all-targets -- -D warnings
+          cargo test --locked --workspace
+
+      - name: Enforce frozen scope
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          git diff --exit-code "$env:R4_03_BASE" -- Cargo.toml Cargo.lock crates/persistence-postgres/Cargo.toml
+          git diff --exit-code "$env:R4_03_BASE" -- crates/persistence-postgres/migrations
+          $allowed = @(
+            '.github/workflows/r4-03-implementation.yml',
+            'README.md',
+            'architecture/domain-type-inventory.json',
+            'crates/persistence-postgres/src/competitions.rs',
+            'crates/persistence-postgres/src/lib.rs',
+            'crates/persistence-postgres/src/model_runs.rs',
+            'crates/persistence-postgres/src/mapping/invalid_state.rs',
+            'crates/persistence-postgres/src/mapping/json.rs',
+            'crates/persistence-postgres/src/mapping/mod.rs',
+            'crates/persistence-postgres/src/mapping/optional.rs',
+            'crates/persistence-postgres/src/mapping/time.rs',
+            'crates/persistence-postgres/src/mapping/uuid.rs',
+            'docs/modular-rewrite/R04-persistence-foundation/R04-03-row-映射基础规范.md',
+            'docs/modular-rewrite/R04-persistence-foundation/README.md',
+            'package.json',
+            'scripts/verify-persistence-mapping.mjs'
+          )
+          $changed = @(git diff --name-only "$env:R4_03_BASE")
+          $unexpected = @($changed | Where-Object { $_ -notin $allowed })
+          if ($unexpected.Count -ne 0) {
+            throw "R4-03 unexpected scope: $($unexpected -join ', ')"
+          }
+
+      - name: Write R4-03 verification record
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $script = @'
+          import os
+          from pathlib import Path
+
+          run_id = os.environ['GITHUB_RUN_ID']
+          branch = 'agent/r4-03-row-mapping'
+          base = os.environ['R4_03_BASE']
+
+          record = f'''# R4-03 Row 映射基础规范\n\n## 状态\n\n`VERIFYING`\n\n## 实施结果\n\n- 新建 `crates/persistence-postgres/src/mapping/`，按 `time.rs`、`uuid.rs`、`json.rs`、`optional.rs`、`invalid_state.rs` 拆分基础标量映射；`mod.rs` 只负责显式出口。\n- `model_runs.rs` 原有 RFC3339 时间解析、optional UUID 解析及对应测试迁入 mapping owner；`snapshot.snapshot_id` UUID 校验与 model summary JSON 序列化切换到统一基础出口，原错误文本和 Serde/UUID 失败传播保持。\n- `CompetitionKind` 解析从根 `lib.rs` 迁回 `competitions.rs`；业务 enum 继续由业务模块拥有，通用 mapping 不依赖 `football_domain`，不建立动态万能 enum mapper。\n- 新增 `verify:persistence-mapping` 并接入 `verify:architecture`，静态拒绝 `mapper.rs`/`queries.rs`、SQLx/Domain 侵入、重复 helper 与业务枚举回流根模块。\n- 未修改 0001–0046 migration SQL、Cargo 生产依赖、公共 Application/Tauri 接口、DTO、数据库 schema、配置、模型保护资产或 R4-04 实现。\n\n## 文件清单\n\n### 新增\n\n- `crates/persistence-postgres/src/mapping/mod.rs`\n- `crates/persistence-postgres/src/mapping/time.rs`\n- `crates/persistence-postgres/src/mapping/uuid.rs`\n- `crates/persistence-postgres/src/mapping/json.rs`\n- `crates/persistence-postgres/src/mapping/optional.rs`\n- `crates/persistence-postgres/src/mapping/invalid_state.rs`\n- `scripts/verify-persistence-mapping.mjs`\n- `docs/modular-rewrite/R04-persistence-foundation/R04-03-row-映射基础规范.md`\n\n### 修改\n\n- `crates/persistence-postgres/src/lib.rs`\n- `crates/persistence-postgres/src/competitions.rs`\n- `crates/persistence-postgres/src/model_runs.rs`\n- `package.json`\n- `architecture/domain-type-inventory.json`（仅按官方生成器同步 Rust 扫描/映射来源清单）\n- `README.md`\n- `docs/modular-rewrite/R04-persistence-foundation/README.md`\n\n### 删除\n\n- 无生产文件删除。临时 R4-03 workflow 在最终实施提交前自删除，不进入最终源码树。\n\n## 验证\n\n实施 hard gate run `{run_id}` 在 Windows 2025 / Rust 1.88.0 / Node 22 上实际执行：\n\n- `npm run verify:persistence-mapping`：PASS。\n- `npm run verify:persistence-foundation`：PASS。\n- `npm run verify:persistence-audit`：PASS。\n- `node scripts/verify_database_baseline.mjs`：PASS。\n- `node scripts/verify_protected_assets.mjs`：PASS。\n- `cargo fmt --all -- --check`：PASS。\n- `cargo check --locked -p football-persistence-postgres`：PASS。\n- `cargo test --locked -p football-persistence-postgres`：PASS（需要专用 PostgreSQL 的 ignored 集成测试未执行）。\n- `npm run verify:architecture`：PASS。\n- `npm run verify:frontend`：PASS。\n- `cargo clippy --locked --workspace --all-targets -- -D warnings`：PASS。\n- `cargo test --locked --workspace`：PASS。\n- Cargo manifests / `Cargo.lock`、历史 migrations 对基线 `{base}` 零 diff：PASS。\n\n## 兼容性与剩余风险\n\n- `required_datetime` 与 `optional_uuid` 保留原调用语义、空值规则和错误文案；`required_uuid` 对必填 UUID 不新增 trim，保持 `snapshot.snapshot_id` 原有严格解析行为。\n- JSON 序列化仍通过 `serde_json::to_value` 并由既有 `PersistenceError::Serialization` 转换传播。\n- SQLx row 的原生 `try_get` 类型/NULL 错误语义未改写为其他错误类型，避免 R4-03 造成公共错误语义漂移。\n- 18 个要求专用可写 `FOOTBALL_TEST_DATABASE_URL` 的 PostgreSQL 集成测试未执行；未执行 destructive database reset。\n- 本节点保持 `VERIFYING`，等待 clean Public Platform CI 与正式 PR 合并；R4-04 继续 `BLOCKED`。\n\n## 回退点\n\n- R4-03 基线：`{base}`。\n- 实施分支：`{branch}`。\n'''
+          Path('docs/modular-rewrite/R04-persistence-foundation/R04-03-row-映射基础规范.md').write_text(record, encoding='utf-8', newline='\n')
+
+          stage_path = Path('docs/modular-rewrite/R04-persistence-foundation/README.md')
+          stage = stage_path.read_text(encoding='utf-8')
+          old = '| R4-03 | 通用 Row 映射基础规范 | READY | — |'
+          new = '| R4-03 | 通用 Row 映射基础规范 | VERIFYING | [`R04-03-row-映射基础规范.md`](./R04-03-row-映射基础规范.md) |'
+          if stage.count(old) != 1:
+              raise RuntimeError(f'R4-03 stage row expected once, found {stage.count(old)}')
+          stage = stage.replace(old, new, 1)
+          section = f'''\n\n## R4-03 实施中\n\n- 从 R4-02 正式收口 HEAD `{base}` 独立建立 `agent/r4-03-row-mapping`。\n- hard gate run `{run_id}` 已通过 mapping 专项、R4-01/R4-02 回归、数据库冻结契约、完整 architecture/frontend、rustfmt、Persistence check/tests 与 workspace Clippy/tests。\n- R4-03 当前 `VERIFYING`；clean Public Platform CI 与 PR 合并完成前不得标记 `DONE`，R4-04 继续 `BLOCKED`。\n'''
+          if '## R4-03 实施中' not in stage:
+              stage = stage.rstrip() + section + '\n'
+          stage_path.write_text(stage, encoding='utf-8', newline='\n')
+
+          readme_path = Path('README.md')
+          readme = readme_path.read_text(encoding='utf-8')
+          if '- R4-03 Row 映射基础规范' not in readme:
+              lines = readme.splitlines()
+              insert_at = None
+              for i, line in enumerate(lines):
+                  if line.startswith('- R4-02 Audit 基础设施已将'):
+                      insert_at = i + 1
+                      break
+              if insert_at is None:
+                  raise RuntimeError('root README R4-02 anchor missing')
+              lines.insert(insert_at, f'- R4-03 Row 映射基础规范已建立 `mapping/time.rs`、`uuid.rs`、`json.rs`、`optional.rs`、`invalid_state.rs` 五类基础标量职责并以 `mapping/mod.rs` 显式出口；`model_runs.rs` 的 RFC3339/optional UUID helper 已迁入唯一 owner，CompetitionKind 业务 enum parser 已从根 `lib.rs` 归还 `competitions.rs`，未建立万能动态 mapper。hard gate run `{run_id}` 已通过 mapping 专项、数据库冻结、architecture/frontend、Persistence 与 workspace Rust 回归；18 个专用 PostgreSQL 集成测试与 destructive reset 未执行。当前状态为 `VERIFYING`，等待 clean Public Platform CI 与 PR 合并，R4-04 继续 `BLOCKED`。')
+              readme = '\n'.join(lines) + '\n'
+              readme_path.write_text(readme, encoding='utf-8', newline='\n')
+          '@
+          $script | python -
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+
+      - name: Final diff and cleanup gate
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          npm run verify:persistence-mapping
+          git diff --check
+          git rm .github/workflows/r4-03-implementation.yml
+          git diff --check
+          $changed = @(git diff --name-only "$env:R4_03_BASE")
+          if ($changed -contains '.github/workflows/r4-03-implementation.yml') {
+            $status = git diff --name-status "$env:R4_03_BASE" -- .github/workflows/r4-03-implementation.yml
+            if ($status) { throw 'temporary workflow still differs from R4-03 base after cleanup' }
+          }
+
+      - name: Commit verified R4-03 implementation
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add README.md architecture/domain-type-inventory.json package.json scripts/verify-persistence-mapping.mjs crates/persistence-postgres/src docs/modular-rewrite/R04-persistence-foundation
+          git status --short
+          git commit -m "refactor(r4-03): establish row mapping primitives"
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          if (git status --porcelain) { throw 'R4-03 worktree not clean after commit' }
+          git push origin HEAD:agent/r4-03-row-mapping
