@@ -21,6 +21,7 @@ jobs:
       R4_03_ENV_FAILED_RUN: 31666083511
       R4_03_PUBLISH_FAILED_RUN: 31666505364
       R4_03_CLEANUP_FAILED_RUN: 31667443481
+      R4_03_QUOTEPATH_FAILED_RUN: 31668274055
       npm_config_cache: ${{ github.workspace }}/../.npm-cache
     steps:
       - name: Checkout R4-03 branch
@@ -173,7 +174,7 @@ jobs:
             'package.json',
             'scripts/verify-persistence-mapping.mjs'
           ) | Sort-Object
-          $staged = @(git diff --cached --name-only "$env:R4_03_BASE") | Sort-Object
+          $staged = @(git -c core.quotePath=false diff --cached --name-only "$env:R4_03_BASE") | Sort-Object
           Write-Host '=== R4-03 staged final diff ==='
           $staged | ForEach-Object { Write-Host "STAGED=$_" }
           if (($staged -join "`n") -ne ($expected -join "`n")) {
