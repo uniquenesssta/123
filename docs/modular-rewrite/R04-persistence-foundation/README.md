@@ -19,8 +19,8 @@ R3 Application Services 已完成并关闭。R4 只重写 `crates/persistence-po
 | 任务 | 范围 | 状态 | 记录 |
 |---|---|---|---|
 | R4-01 | Store / Error / Pool / migration / health / statistics | DONE | [`R04-01-store-error-and-pool.md`](./R04-01-store-error-and-pool.md) |
-| R4-02 | Audit 基础设施 | VERIFYING | [`R04-02-audit-基础设施.md`](./R04-02-audit-基础设施.md) |
-| R4-03 | 通用 Row 映射基础规范 | BLOCKED | — |
+| R4-02 | Audit 基础设施 | DONE | [`R04-02-audit-基础设施.md`](./R04-02-audit-基础设施.md) |
+| R4-03 | 通用 Row 映射基础规范 | READY | — |
 | R4-04 | Application Port Adapter 注册 | BLOCKED | — |
 
 ## R4-01 进入条件
@@ -37,3 +37,12 @@ R4-01 完成前保持 `READY/VERIFYING`，只有目标职责切换为唯一 owne
 - 最终 clean Public Platform CI run `31615930113` / job `94178594481`：`SUCCESS`；artifact `9150134498`，13,909,168 bytes，SHA-256 `6da5f1750feef5f7fc00233165dea7f7563fefa96d08f8e515a22e16fa4dd5e1`。
 - R4-01 正式关闭为 `DONE`；R4-02 开放为 `READY`，R4-03/R4-04 继续 `BLOCKED`。
 - R4-02 必须从本阶段分支当前收口基线独立开始；本收口未包含任何 R4-02 生产源码改动。
+
+## R4-02 收口
+
+- PR #23 已由 Draft 转 Ready，并按固定 HEAD `6598065e6edf671e8806fc77901d083bad910542` 合并到 `rewrite/r4-persistence-foundation`；merge commit `bc4154044f194e5b1505b4ebb308ba51d6208663`。
+- 最终 clean Public Platform CI run `31630618699` / job `94228122818`：`SUCCESS`；artifact `9155761101`，13,909,390 bytes，SHA-256 `82dbb88b6dd974ad43c2d86bfb291aca8831faa9d956212bdc04de7110d87dee`。
+- strict hard gate run `31629430245` 已通过 Audit/Persistence/数据库冻结契约、Domain inventory、architecture/frontend、rustfmt、Persistence check/tests 与 workspace Clippy/tests。
+- 18 个要求专用可写 `FOOTBALL_TEST_DATABASE_URL` 的 PostgreSQL 集成测试仍未执行；未执行 destructive database reset。
+- R4-02 正式关闭为 `DONE`；R4-03 开放为 `READY`，R4-04 继续 `BLOCKED`。
+- R4-03 必须从本阶段分支当前收口基线独立开始；本收口未包含任何 R4-03/R4-04 生产源码改动。
