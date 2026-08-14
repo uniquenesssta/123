@@ -97,9 +97,10 @@ for (const token of ["create_season", "list_seasons", "create_stage", "list_stag
   check(contract.includes(token), `R5-02 PostgreSQL contract missing ${token}`);
 }
 
+const repositoryGate = read("scripts/verify-competition-repository.mjs");
 const packageJson = JSON.parse(read("package.json"));
-check(typeof packageJson.scripts["verify:competition-hierarchy"] === "string", "package.json must expose verify:competition-hierarchy");
-check(packageJson.scripts["verify:architecture"].includes("verify-competition-hierarchy.mjs"), "verify:architecture must include the R5-02 hierarchy gate");
+check(repositoryGate.includes('import "./verify-competition-hierarchy.mjs";'), "R5-01 competition gate must chain the R5-02 hierarchy gate");
+check(packageJson.scripts["verify:architecture"].includes("verify-competition-repository.mjs"), "verify:architecture must reach the R5-02 hierarchy gate through the competition gate chain");
 
 if (failures.length) {
   console.error("R5-02 Competition Hierarchy verification failed:");
