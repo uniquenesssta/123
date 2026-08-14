@@ -24,13 +24,13 @@
     "targetPublicExportPolicy": "explicit re-export only"
   },
   "sourceDigest": "217241ac243726a5ab6805a7f169e222b97e78c7c971749a5904714af673ebdd",
-  "rustUsageDigest": "f170eec603ffac5640444f9dd0a71cad52ec7a913a0d7917f334313c612f2536",
+  "rustUsageDigest": "6f02d224ea8f2610d79c1b88a0b28106ed389d832029b3bd7397e2f948b84782",
   "summary": {
     "typeCount": 365,
     "publicCompatibilityTypeCount": 365,
     "internalTypeCount": 0,
     "domainSourceFileCount": 129,
-    "scannedRustFileCount": 676,
+    "scannedRustFileCount": 696,
     "databaseMappedTypeCount": 299,
     "byTargetModule": {
       "ai_workspace": 16,
@@ -4694,6 +4694,7 @@
         "crates/application/src/services/competition/service.rs",
         "crates/application/src/use_cases/competition/create_competition/mod.rs",
         "crates/persistence-postgres/src/adapters/competition/directory/create_competition.rs",
+        "crates/persistence-postgres/tests/competition_hierarchy_repository_contract.rs",
         "crates/persistence-postgres/tests/competitions_repository_contract.rs",
         "crates/persistence-postgres/tests/postgres_integration.rs",
         "src-tauri/src/commands/competition.rs"
@@ -4801,6 +4802,7 @@
         "crates/persistence-postgres/src/competitions.rs",
         "crates/persistence-postgres/src/match_prediction.rs",
         "crates/persistence-postgres/src/routing.rs",
+        "crates/persistence-postgres/tests/competition_hierarchy_repository_contract.rs",
         "crates/persistence-postgres/tests/competitions_repository_contract.rs",
         "crates/persistence-postgres/tests/postgres_integration.rs"
       ],
@@ -24080,11 +24082,12 @@
         "crates/application/src/services/competition/service.rs",
         "crates/application/src/use_cases/competition/create_competition/mod.rs",
         "crates/application/src/use_cases/competition/create_round/mod.rs",
-        "crates/persistence-postgres/src/competitions.rs",
+        "crates/persistence-postgres/src/adapters/competition/hierarchy/rounds/create_round.rs",
+        "crates/persistence-postgres/tests/competition_hierarchy_repository_contract.rs",
         "src-tauri/src/commands/competition.rs"
       ],
       "databaseMappings": [
-        "crates/persistence-postgres/src/competitions.rs"
+        "crates/persistence-postgres/src/adapters/competition/hierarchy/rounds/create_round.rs"
       ]
     },
     {
@@ -24167,11 +24170,17 @@
         "crates/application/src/use_cases/competition/create_competition/mod.rs",
         "crates/application/src/use_cases/competition/create_round/mod.rs",
         "crates/application/src/use_cases/competition/load_hierarchy/mod.rs",
-        "crates/persistence-postgres/src/competitions.rs",
+        "crates/persistence-postgres/src/adapters/competition/hierarchy/rounds/create_round.rs",
+        "crates/persistence-postgres/src/adapters/competition/hierarchy/rounds/list_rounds.rs",
+        "crates/persistence-postgres/src/adapters/competition/hierarchy/rounds/read_round.rs",
+        "crates/persistence-postgres/src/adapters/competition/hierarchy/rounds/record_mapper.rs",
         "src-tauri/src/commands/competition.rs"
       ],
       "databaseMappings": [
-        "crates/persistence-postgres/src/competitions.rs"
+        "crates/persistence-postgres/src/adapters/competition/hierarchy/rounds/create_round.rs",
+        "crates/persistence-postgres/src/adapters/competition/hierarchy/rounds/list_rounds.rs",
+        "crates/persistence-postgres/src/adapters/competition/hierarchy/rounds/read_round.rs",
+        "crates/persistence-postgres/src/adapters/competition/hierarchy/rounds/record_mapper.rs"
       ]
     },
     {
@@ -25076,12 +25085,13 @@
         "crates/application/src/services/competition/service.rs",
         "crates/application/src/use_cases/competition/create_competition/mod.rs",
         "crates/application/src/use_cases/competition/create_season/mod.rs",
-        "crates/persistence-postgres/src/competitions.rs",
+        "crates/persistence-postgres/src/adapters/competition/hierarchy/seasons/create_season.rs",
+        "crates/persistence-postgres/tests/competition_hierarchy_repository_contract.rs",
         "crates/persistence-postgres/tests/postgres_integration.rs",
         "src-tauri/src/commands/competition.rs"
       ],
       "databaseMappings": [
-        "crates/persistence-postgres/src/competitions.rs"
+        "crates/persistence-postgres/src/adapters/competition/hierarchy/seasons/create_season.rs"
       ]
     },
     {
@@ -25160,11 +25170,17 @@
         "crates/application/src/use_cases/competition/create_competition/mod.rs",
         "crates/application/src/use_cases/competition/create_season/mod.rs",
         "crates/application/src/use_cases/competition/load_hierarchy/mod.rs",
-        "crates/persistence-postgres/src/competitions.rs",
+        "crates/persistence-postgres/src/adapters/competition/hierarchy/seasons/create_season.rs",
+        "crates/persistence-postgres/src/adapters/competition/hierarchy/seasons/list_seasons.rs",
+        "crates/persistence-postgres/src/adapters/competition/hierarchy/seasons/read_season.rs",
+        "crates/persistence-postgres/src/adapters/competition/hierarchy/seasons/record_mapper.rs",
         "src-tauri/src/commands/competition.rs"
       ],
       "databaseMappings": [
-        "crates/persistence-postgres/src/competitions.rs"
+        "crates/persistence-postgres/src/adapters/competition/hierarchy/seasons/create_season.rs",
+        "crates/persistence-postgres/src/adapters/competition/hierarchy/seasons/list_seasons.rs",
+        "crates/persistence-postgres/src/adapters/competition/hierarchy/seasons/read_season.rs",
+        "crates/persistence-postgres/src/adapters/competition/hierarchy/seasons/record_mapper.rs"
       ]
     },
     {
@@ -27806,11 +27822,12 @@
         "crates/application/src/services/competition/service.rs",
         "crates/application/src/use_cases/competition/create_competition/mod.rs",
         "crates/application/src/use_cases/competition/create_stage/mod.rs",
-        "crates/persistence-postgres/src/competitions.rs",
+        "crates/persistence-postgres/src/adapters/competition/hierarchy/stages/create_stage.rs",
+        "crates/persistence-postgres/tests/competition_hierarchy_repository_contract.rs",
         "src-tauri/src/commands/competition.rs"
       ],
       "databaseMappings": [
-        "crates/persistence-postgres/src/competitions.rs"
+        "crates/persistence-postgres/src/adapters/competition/hierarchy/stages/create_stage.rs"
       ]
     },
     {
@@ -27897,11 +27914,17 @@
         "crates/application/src/use_cases/competition/create_competition/mod.rs",
         "crates/application/src/use_cases/competition/create_stage/mod.rs",
         "crates/application/src/use_cases/competition/load_hierarchy/mod.rs",
-        "crates/persistence-postgres/src/competitions.rs",
+        "crates/persistence-postgres/src/adapters/competition/hierarchy/stages/create_stage.rs",
+        "crates/persistence-postgres/src/adapters/competition/hierarchy/stages/list_stages.rs",
+        "crates/persistence-postgres/src/adapters/competition/hierarchy/stages/read_stage.rs",
+        "crates/persistence-postgres/src/adapters/competition/hierarchy/stages/record_mapper.rs",
         "src-tauri/src/commands/competition.rs"
       ],
       "databaseMappings": [
-        "crates/persistence-postgres/src/competitions.rs"
+        "crates/persistence-postgres/src/adapters/competition/hierarchy/stages/create_stage.rs",
+        "crates/persistence-postgres/src/adapters/competition/hierarchy/stages/list_stages.rs",
+        "crates/persistence-postgres/src/adapters/competition/hierarchy/stages/read_stage.rs",
+        "crates/persistence-postgres/src/adapters/competition/hierarchy/stages/record_mapper.rs"
       ]
     },
     {
