@@ -1,0 +1,37 @@
+name: R5-03 Domain Inventory Refresh
+
+on:
+  push:
+    branches:
+      - agent/r5-03-rule-packages
+    paths:
+      - ".github/workflows/r5-03-inventory.yml"
+
+permissions:
+  contents: write
+
+jobs:
+  refresh-inventory:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Generate and verify canonical inventory
+        shell: bash
+        run: |
+          node scripts/generate-domain-type-inventory.mjs
+          node scripts/verify-domain-type-inventory.mjs
+      - name: Commit generated inventory if changed
+        shell: bash
+        run: |
+          if git diff --quiet -- architecture/domain-type-inventory.json; then
+            echo "Inventory already current"
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add architecture/domain-type-inventory.json
+          git commit -m "chore(r5-03): refresh domain type inventory"
+          git push origin HEAD:agent/r5-03-rule-packages
