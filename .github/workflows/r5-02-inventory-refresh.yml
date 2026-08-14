@@ -35,3 +35,5 @@ jobs:
           git add architecture/domain-type-inventory.json
           git commit -m "chore(r5-02): refresh domain type inventory"
           git push origin HEAD:agent/r5-02-seasons-stages-rounds
+
+# Refreshed again after canonical rustfmt changed the Rust usage digest.
