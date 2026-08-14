@@ -1,0 +1,37 @@
+name: R5-02 Rustfmt Fix
+
+on:
+  push:
+    branches:
+      - agent/r5-02-seasons-stages-rounds
+    paths:
+      - ".github/workflows/r5-02-rustfmt-fix.yml"
+
+permissions:
+  contents: write
+
+jobs:
+  rustfmt-fix:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: dtolnay/rust-toolchain@1.88.0
+        with:
+          components: rustfmt
+      - name: Apply canonical Rust formatting
+        run: cargo fmt --all
+      - name: Commit formatting when changed
+        shell: bash
+        run: |
+          if git diff --quiet; then
+            echo "Rust sources already formatted."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add crates/persistence-postgres/src/adapters/competition/hierarchy crates/persistence-postgres/tests/competition_hierarchy_repository_contract.rs
+          git commit -m "style(r5-02): apply rustfmt"
+          git push origin HEAD:agent/r5-02-seasons-stages-rounds
