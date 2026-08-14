@@ -1,0 +1,42 @@
+name: R5-03 Format And Inventory Refresh
+
+on:
+  push:
+    branches:
+      - agent/r5-03-rule-packages
+    paths:
+      - ".github/workflows/r5-03-format-inventory.yml"
+
+permissions:
+  contents: write
+
+jobs:
+  format-inventory:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: dtolnay/rust-toolchain@1.88.0
+        with:
+          components: rustfmt
+      - name: Apply canonical rustfmt and refresh inventory
+        shell: bash
+        run: |
+          cargo fmt --all
+          node scripts/generate-domain-type-inventory.mjs
+          node scripts/verify-domain-type-inventory.mjs
+          cargo fmt --all -- --check
+      - name: Commit only canonical formatting and generated inventory
+        shell: bash
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add crates/persistence-postgres/tests/rule_package_repository_contract.rs architecture/domain-type-inventory.json
+          if git diff --cached --quiet; then
+            echo "No format or inventory changes"
+            exit 0
+          fi
+          git commit -m "chore(r5-03): apply canonical formatting and inventory"
+          git push origin HEAD:agent/r5-03-rule-packages
