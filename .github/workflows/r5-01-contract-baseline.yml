@@ -1,4 +1,4 @@
-name: R5-01 Inventory Diff
+name: R5-01 Inventory Publish
 
 on:
   push:
@@ -8,22 +8,45 @@ on:
       - ".github/workflows/r5-01-contract-baseline.yml"
 
 permissions:
-  contents: read
+  contents: write
 
 jobs:
-  inventory-diff:
+  inventory-publish:
     runs-on: ubuntu-24.04
     timeout-minutes: 15
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
       - uses: actions/setup-node@v4
         with:
           node-version: 22
-      - name: Regenerate derived Domain inventory without publishing
+      - name: Regenerate and validate reviewed derived inventory
         shell: bash
         run: |
           set -euo pipefail
           node scripts/generate-domain-type-inventory.mjs
           git diff --check -- architecture/domain-type-inventory.json
-          git diff -- architecture/domain-type-inventory.json
-          test -n "$(git diff --name-only -- architecture/domain-type-inventory.json)"
+          test "$(git diff --name-only | tr '\n' ' ')" = "architecture/domain-type-inventory.json "
+          node scripts/verify-domain-type-inventory.mjs
+          node - <<'NODE'
+          const fs = require('fs');
+          const inventory = JSON.parse(fs.readFileSync('architecture/domain-type-inventory.json', 'utf8'));
+          if (inventory.sourceDigest !== '217241ac243726a5ab6805a7f169e222b97e78c7c971749a5904714af673ebdd') throw new Error('Domain sourceDigest changed');
+          if (inventory.summary.typeCount !== 365) throw new Error('Domain typeCount changed');
+          if (inventory.summary.publicCompatibilityTypeCount !== 365) throw new Error('public compatibility count changed');
+          if (inventory.summary.internalTypeCount !== 0) throw new Error('internal type count changed');
+          if (inventory.summary.domainSourceFileCount !== 129) throw new Error('domain source file count changed');
+          if (inventory.summary.databaseMappedTypeCount !== 299) throw new Error('database mapped type count changed');
+          if (inventory.summary.scannedRustFileCount !== 676) throw new Error('unexpected scanned Rust file count');
+          NODE
+      - name: Commit only derived inventory
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add architecture/domain-type-inventory.json
+          test "$(git diff --cached --name-only | tr '\n' ' ')" = "architecture/domain-type-inventory.json "
+          git commit -m "chore(r5-01): refresh domain type inventory"
+          git push origin HEAD:agent/r5-01-competitions-repository
