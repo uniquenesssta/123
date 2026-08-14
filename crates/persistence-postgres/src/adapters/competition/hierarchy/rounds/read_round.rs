@@ -3,10 +3,7 @@ use crate::{PersistenceResult, PostgresStore};
 use football_domain::RoundRecord;
 use uuid::Uuid;
 
-pub(super) async fn read_round(
-    store: &PostgresStore,
-    id: Uuid,
-) -> PersistenceResult<RoundRecord> {
+pub(super) async fn read_round(store: &PostgresStore, id: Uuid) -> PersistenceResult<RoundRecord> {
     let row = sqlx::query_as::<_, RoundRow>(
         r#"
         SELECT

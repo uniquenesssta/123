@@ -3,10 +3,7 @@ use crate::{PersistenceResult, PostgresStore};
 use football_domain::StageRecord;
 use uuid::Uuid;
 
-pub(super) async fn read_stage(
-    store: &PostgresStore,
-    id: Uuid,
-) -> PersistenceResult<StageRecord> {
+pub(super) async fn read_stage(store: &PostgresStore, id: Uuid) -> PersistenceResult<StageRecord> {
     let row = sqlx::query_as::<_, StageRow>(
         r#"
         SELECT

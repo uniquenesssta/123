@@ -1,7 +1,5 @@
 use chrono::{DateTime, NaiveDate, Utc};
-use football_domain::{
-    CompetitionDraft, CompetitionKind, RoundDraft, SeasonDraft, StageDraft,
-};
+use football_domain::{CompetitionDraft, CompetitionKind, RoundDraft, SeasonDraft, StageDraft};
 use football_persistence_postgres::{DatabaseOptions, PostgresStore};
 use serde_json::json;
 use sqlx::{postgres::PgPoolOptions, PgPool, Row};
@@ -114,15 +112,14 @@ async fn season_stage_round_contract_is_preserved() {
     assert_eq!(hierarchy_seasons[0].id, first_season.id);
     assert_eq!(hierarchy_seasons[1].id, second_season.id);
 
-    let season_metadata: serde_json::Value = sqlx::query(
-        "SELECT metadata FROM football.seasons WHERE id = $1",
-    )
-    .bind(first_season.id)
-    .fetch_one(&database.pool)
-    .await
-    .expect("读取赛季 metadata")
-    .try_get("metadata")
-    .expect("解析赛季 metadata");
+    let season_metadata: serde_json::Value =
+        sqlx::query("SELECT metadata FROM football.seasons WHERE id = $1")
+            .bind(first_season.id)
+            .fetch_one(&database.pool)
+            .await
+            .expect("读取赛季 metadata")
+            .try_get("metadata")
+            .expect("解析赛季 metadata");
     assert_eq!(season_metadata["contract"], "r5-02");
 
     let first_stage = database
@@ -168,15 +165,14 @@ async fn season_stage_round_contract_is_preserved() {
     assert_eq!(hierarchy_stages[0].id, first_stage.id);
     assert_eq!(hierarchy_stages[1].id, second_stage.id);
 
-    let stage_rules: serde_json::Value = sqlx::query(
-        "SELECT rules FROM football.competition_stages WHERE id = $1",
-    )
-    .bind(first_stage.id)
-    .fetch_one(&database.pool)
-    .await
-    .expect("读取阶段 rules")
-    .try_get("rules")
-    .expect("解析阶段 rules");
+    let stage_rules: serde_json::Value =
+        sqlx::query("SELECT rules FROM football.competition_stages WHERE id = $1")
+            .bind(first_stage.id)
+            .fetch_one(&database.pool)
+            .await
+            .expect("读取阶段 rules")
+            .try_get("rules")
+            .expect("解析阶段 rules");
     assert_eq!(stage_rules["contract"], "r5-02");
 
     let first_round = database
@@ -209,14 +205,8 @@ async fn season_stage_round_contract_is_preserved() {
     assert_eq!(first_round.code, "R01");
     assert_eq!(first_round.name, "Round 1");
     assert_eq!(first_round.sequence_no, 1);
-    assert_eq!(
-        first_round.starts_at,
-        Some(instant("2026-08-15T12:00:00Z"))
-    );
-    assert_eq!(
-        first_round.ends_at,
-        Some(instant("2026-08-17T12:00:00Z"))
-    );
+    assert_eq!(first_round.starts_at, Some(instant("2026-08-15T12:00:00Z")));
+    assert_eq!(first_round.ends_at, Some(instant("2026-08-17T12:00:00Z")));
 
     let rounds = database.store.list_rounds().await.expect("读取轮次列表");
     let hierarchy_rounds: Vec<_> = rounds
