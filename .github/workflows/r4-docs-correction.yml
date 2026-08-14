@@ -6,6 +6,7 @@ on:
       - rewrite/r4-persistence-foundation
     paths:
       - ".github/r4-docs-correction.py"
+      - ".github/workflows/r4-docs-correction.yml"
 
 permissions:
   contents: write
@@ -24,6 +25,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
+          git config core.quotePath false
           git merge-base --is-ancestor f7bc0101a4c443e1fc6e95d2e604a7df7e073d5e HEAD
           test -f .github/r4-docs-correction.py
 
