@@ -1,0 +1,47 @@
+name: R5-02 README Sync
+
+on:
+  push:
+    branches:
+      - agent/r5-02-seasons-stages-rounds
+    paths:
+      - ".github/workflows/r5-02-readme-sync.yml"
+
+permissions:
+  contents: write
+
+jobs:
+  sync-readme:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Record R5-02 verified implementation facts
+        shell: python
+        run: |
+          from pathlib import Path
+          path = Path("README.md")
+          text = path.read_text(encoding="utf-8")
+          marker = "- R5-01 Competitions Repository"
+          if marker not in text:
+              raise SystemExit("R5-01 README anchor missing; refusing blind insertion")
+          bullet = "- R5-02 Seasons / Stages / Rounds 已将 hierarchy persistence 从旧 `crates/persistence-postgres/src/competitions.rs` 收敛到 `adapters/competition/hierarchy/{seasons,stages,rounds}/`；三类模块分别拥有 create/read/list、typed `sqlx::FromRow` Row 与 Domain Mapper，旧文件只保留 R5-05 `resolve_competition_context` / scope 校验，不保留 R5-02 转发壳。Application `CompetitionHierarchyPort`、Tauri DTO/命令、Schema、0001–0046 migration、配置/错误/日志语义、前端行为、路由算法、model identity、Cargo manifests/Cargo.lock、生产依赖与模型保护资产均未改变。旧 owner PostgreSQL contract baseline run `31793408123` 为 `SUCCESS`；第四轮节点 hard gate run `31794402789` / job `94748190282` 已通过 R5-01/R5-02 ownership、完整 architecture、模型保护、rustfmt、Persistence/Application check 与单测及新 owner PostgreSQL 16 hierarchy contract。前三轮 hard gate 的 rustfmt、inventory digest 与内部 visibility 失败均已如实记录并修复，没有弱化门禁。18 个既有 broad PostgreSQL ignored tests 与 destructive reset 未在本节点执行，未触碰用户数据库。当前状态保持 `VERIFYING`，等待 clean PR canonical CI、固定 HEAD merge 与 merged stage CI；详见 `docs/modular-rewrite/R05-competition-routing-persistence/R05-02-seasons-stages-and-rounds.md`。"
+          if "- R5-02 Seasons / Stages / Rounds" not in text:
+              lines = text.splitlines()
+              for index, line in enumerate(lines):
+                  if line.startswith(marker):
+                      lines.insert(index + 1, bullet)
+                      break
+              text = "\n".join(lines) + ("\n" if text.endswith("\n") else "")
+              path.write_text(text, encoding="utf-8")
+      - name: Commit README and remove transient helper
+        shell: bash
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add README.md
+          git rm .github/workflows/r5-02-readme-sync.yml
+          git commit -m "docs(r5-02): record hierarchy verification evidence"
+          git push origin HEAD:agent/r5-02-seasons-stages-rounds
