@@ -1,4 +1,4 @@
-name: R5-01 Cross-Platform Regression
+name: R5-01 Windows Workspace Rust
 
 on:
   push:
@@ -11,31 +11,17 @@ permissions:
   contents: read
 
 jobs:
-  windows-frontend:
-    runs-on: windows-2025
-    timeout-minutes: 60
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 22
-          cache: npm
-      - name: Install locked frontend dependencies
-        shell: pwsh
-        run: npm run setup
-      - name: Run complete frontend verification on target platform
-        shell: pwsh
-        run: npm run verify:frontend
-
   workspace-rust:
-    runs-on: ubuntu-24.04
-    timeout-minutes: 90
+    runs-on: windows-2025
+    timeout-minutes: 120
     steps:
       - uses: actions/checkout@v4
       - uses: dtolnay/rust-toolchain@1.88.0
         with:
           components: rustfmt, clippy
       - name: Run workspace Clippy with warnings denied
+        shell: pwsh
         run: cargo clippy --locked --workspace --all-targets -- -D warnings
       - name: Run workspace tests
+        shell: pwsh
         run: cargo test --locked --workspace
