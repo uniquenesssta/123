@@ -54,3 +54,5 @@ jobs:
         run: cargo test --locked -p football-application
       - name: Run frozen R5-02 PostgreSQL contract against new owner
         run: cargo test --locked -p football-persistence-postgres --test competition_hierarchy_repository_contract -- --ignored --test-threads=1
+
+# Triggered again after canonical rustfmt was applied to the R5-02 source and contract.
