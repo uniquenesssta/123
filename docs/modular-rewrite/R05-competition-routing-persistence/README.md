@@ -21,8 +21,8 @@ R4 Persistence 基础设施已完成并通过阶段出口。R5 仅按 Competitio
 |---|---|---|
 | R5-01 | Competitions Repository | DONE |
 | R5-02 | Seasons / Stages / Rounds | DONE |
-| R5-03 | Rule Packages | VERIFYING |
-| R5-04 | Competition Bindings | BLOCKED |
+| R5-03 | Rule Packages | DONE |
+| R5-04 | Competition Bindings | READY |
 | R5-05 | Route Resolution Reads | BLOCKED |
 | R5-06 | Model Run Identity Reads | BLOCKED |
 
@@ -52,10 +52,12 @@ R4 Persistence 基础设施已完成并通过阶段出口。R5 仅按 Competitio
 - owner-switch 首次 run `31810593242` 因 source helper 可见性 E0364/E0603 停止且未产生生产切换提交；repair run `31810761979` 的代码修正成功但 Action 写 workflow 被 GitHub App 权限阻止；V2 run `31810913317` / job `94801046458` 完成真实编译、专项 verifier 与生产 owner 切换并 `SUCCESS`。
 - official inventory run `31811229904` / job `94802081839` 为 `SUCCESS`；第一次 hard gate `31811298187` 在 architecture/model 通过后因新增 contract rustfmt 差异停止，后续正确跳过；format + inventory run `31811465209` / job `94802847771` 为 `SUCCESS`。
 - 第二轮 hard gate run `31811535324` / job `94803075524` 为 `SUCCESS`：R5 ownership/full architecture、模型保护、rustfmt、Persistence/Application check、Persistence tests、Application tests 与同一 Rule Package PostgreSQL 16 contract 全部通过。
+- PR #28 clean CI run `31812316772` / job `94805647551` 为 `SUCCESS`，artifact `9224448312` SHA-256 `00cf61b683b7780a354ad5e35c59438d6d26ce1a6d0c17dd86edbaaa9e9ae127`；固定 head `d087108d5cc722cc9ebecd788de6c07c1ae5dc3d` 已 squash merge 为 `3d609ace7cbe1db3a3caec18a6477fb41153cc88`。
+- merged stage CI run `31824523536` / job `94845378301` 为 `SUCCESS`，artifact `9229038667` SHA-256 `9c07c35abcd8b229b8044b0373f7ce3aecd6a03d58b1431c4f738e22131c7262`；R5-03 正式关闭为 `DONE`，R5-04 开放为 `READY`。
 
 ## 兼容与限制
 
 - Application Port、Tauri 命令/DTO、Schema、0001–0046 migration、配置、错误/日志语义、前端行为、路由算法、model identity、Cargo manifests/Cargo.lock、生产依赖和模型保护资产均未改变。
 - R5-03 未执行 destructive database reset，也未触碰用户数据库；专用 Rule Package contract 使用临时 PostgreSQL 16 测试数据库。
 - 既有 `postgres_integration.rs` 18 个 ignored broad PostgreSQL tests 未在 R5-03 执行。
-- R5-03 当前保持 `VERIFYING`；需先清理所有 transient `.github/workflows/r5-03-*`、确认最终净 diff，再完成 clean PR canonical CI、固定 HEAD merge、merged stage CI 与最终 closeout canonical CI，之后才开放 R5-04 `READY`。
+- R5-03 已正式关闭为 `DONE`，R5-04 已开放为 `READY`；本 closeout 仅更新文档，closeout HEAD 仍需通过 canonical Public Platform CI 后才作为 R5-04 起始基线。
