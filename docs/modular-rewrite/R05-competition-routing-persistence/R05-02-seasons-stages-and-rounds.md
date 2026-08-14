@@ -4,7 +4,7 @@
 
 `VERIFYING`
 
-R5-02 的生产 owner 切换已完成，当前正在执行节点 hard gate 与阶段级回归；在 clean PR CI、固定 HEAD 合并和 merged stage CI 全部成功前不得标记 `DONE`。
+R5-02 的生产 owner 切换和节点 hard gate 已完成；当前等待临时验证文件清理、最终净 diff、clean PR canonical CI、固定 HEAD 合并与 merged stage CI。在这些收口门禁全部成功前不得标记 `DONE`。
 
 ## 基线与分支
 
@@ -63,6 +63,7 @@ crates/persistence-postgres/src/adapters/competition/hierarchy/
 - 新增 `scripts/verify-competition-hierarchy.mjs`，锁定 hierarchy 唯一 owner、typed Row/Mapper、单 SQL 目的、旧 owner 清理、R5-05 保留和“不提前实施 R5-03~R5-06”。
 - 既有 `scripts/verify-competition-repository.mjs` 继续完整验证 R5-01，并通过 import 链纳入 R5-02 hierarchy gate；没有弱化或删除 R5-01 门禁。
 - `architecture/domain-type-inventory.json` 仅通过项目既有 `generate-domain-type-inventory.mjs` 生成器刷新，未手工修改指纹。
+- 第三轮 hard gate 暴露 child `mod.rs` 使用 `pub(super) use` 将仅限直接父模块可见的 helper/Row 向上级重导出，触发 Rust E0364/E0365。修复仅将这 9 个内部别名改为 module-private `use`，没有扩大可见性或改变 SQL/映射/公共接口。
 
 ## 行为兼容
 
@@ -92,15 +93,16 @@ crates/persistence-postgres/src/adapters/competition/hierarchy/
 - 首次 baseline run `31793270046` / job `94744700670`：`FAILURE`。失败发生在契约测试编译阶段，因为新测试错误使用不存在的 `CompetitionKind::Knockout`；当时尚未修改 R5-02 生产源码。
 - 将测试修正为领域已冻结的 `CompetitionKind::KnockoutTwoLeg` 后，旧 owner baseline run `31793408123`：`SUCCESS`。
 - contract 覆盖两条 Season、两条 Stage、两条 Round，冻结 trim、父子关系、类型映射、metadata/rules、时间字段和列表顺序。
-- 新 owner 上的同一 contract 正在 hard gate 中再次执行；结果未完成前本节点保持 `VERIFYING`。
+- 新 owner 上使用完全同一份 contract 在第四轮 hard gate run `31794402789` / job `94748190282` 再次执行并 `SUCCESS`。
 
 ## Domain inventory
 
 - 初次生成 workflow run `31793869960`：`SUCCESS`；Domain 类型仍为 365、公共兼容类型 365、PostgreSQL 映射类型 299，Rust 扫描文件数由 R5-01 基线 676 增至 696。
 - canonical rustfmt 改变 Rust 使用图文本后，第二轮 hard gate 正确检测到 inventory digest 漂移；随后使用同一官方生成器再次刷新，workflow run `31794157058`：`SUCCESS`。
+- visibility 修复再次改变 Rust usage digest 后，第三次 generator run `31794365962` / job `94748073290` 为 `SUCCESS`，生成 commit `476a1fa20dcdf3cef3e91904de0bf6537db8fdd8`。
 - 未绕过 `verify-domain-type-inventory.mjs`，未手工伪造摘要或指纹。
 
-## 验证记录（进行中）
+## 验证记录
 
 ### 第一轮 hard gate
 
@@ -130,13 +132,42 @@ run `31794033828` / job `94747040112`：总体 `FAILURE`。
 
 ### 第三轮 hard gate
 
-run `31794195852`：正在执行。最终结果将在本记录收口时补充。
+run `31794195852` / job `94747539204`：总体 `FAILURE`。
+
+已通过：
+
+- R5-01 + R5-02 ownership gate：`SUCCESS`。
+- 完整 `npm run verify:architecture`：`SUCCESS`。
+- public model boundary：`SUCCESS`。
+- `cargo fmt --all -- --check`：`SUCCESS`。
+
+停止点：
+
+- `cargo check --locked -p football-persistence-postgres -p football-application` 发现 hierarchy 三个 child `mod.rs` 的 9 个内部 helper/Row 使用了过宽的 `pub(super) use`，触发 E0364/E0365。
+- Persistence/Application tests 与 PostgreSQL contract 因 fail-fast 被正确跳过。
+- 只将内部 re-export 改为 module-private `use`，未改变生产行为；之后用官方 generator 刷新 domain inventory。
+
+### 第四轮 hard gate
+
+run `31794402789` / job `94748190282`：`SUCCESS`。
+
+全部通过：
+
+- R5-01 + R5-02 ownership gate。
+- 完整 `npm run verify:architecture`。
+- public model boundary。
+- `cargo fmt --all -- --check`。
+- `cargo check --locked -p football-persistence-postgres -p football-application`。
+- `cargo test --locked -p football-persistence-postgres`。
+- `cargo test --locked -p football-application`。
+- `cargo test --locked -p football-persistence-postgres --test competition_hierarchy_repository_contract -- --ignored --test-threads=1`，新 owner PostgreSQL 16 contract `PASS`。
+
+因此节点级最小验证、R5/R4 架构边界、模型保护、Persistence/Application 编译与单测、旧/新 owner PostgreSQL 契约已具有真实通过证据。
 
 ## 当前未执行项与限制
 
 - clean PR Public Platform CI 尚未执行。
 - workspace Clippy `-D warnings`、workspace tests、Windows frontend/Tauri Automated 需要由 clean PR canonical CI 对最终净 HEAD 执行。
-- R5-02 专用 PostgreSQL contract 正等待第三轮 hard gate 在新 owner 上完成。
 - 既有 `postgres_integration.rs` 18 个 ignored broad PostgreSQL tests 未在本节点执行；R5-02 不进行 destructive database reset。
 - 未对用户数据库执行写入；契约仅使用临时 PostgreSQL 16 测试数据库。
 
@@ -158,7 +189,7 @@ run `31794195852`：正在执行。最终结果将在本记录收口时补充。
 - `crates/persistence-postgres/src/competitions.rs`
 - `scripts/verify-competition-repository.mjs`
 - `architecture/domain-type-inventory.json`
-- 阶段 `README.md`（本节点实施期间同步更新）。
+- 阶段 `README.md`。
 - 根 `README.md`（收口前同步实际事实）。
 
 ### 移动/重命名
@@ -173,16 +204,15 @@ run `31794195852`：正在执行。最终结果将在本记录收口时补充。
 
 - 唯一生产入口已切换为 `adapters/competition/hierarchy/{seasons,stages,rounds}`。
 - 旧 `competitions.rs` 不再拥有任何 R5-02 CRUD/read/mapper。
-- 若本节点最终门禁无法通过，回退点为 R5-01 最终已验证 HEAD `c8f3ba0f35ccec1f2795328fe887c622a5b8a0f6`；不得手工复制旧实现形成双 owner。
+- 若后续 clean PR/合并门禁无法通过，回退点为 R5-01 最终已验证 HEAD `c8f3ba0f35ccec1f2795328fe887c622a5b8a0f6`；不得手工复制旧实现形成双 owner。
 
 ## 下一状态门禁
 
 只有在以下全部成立后才可改为 `DONE`：
 
-1. 第三轮或后续 hard gate 全部通过。
-2. transient workflow 全部清理，最终净 diff 无验证 helper。
-3. root README 与本记录/阶段索引与最终事实一致。
-4. clean PR canonical Public Platform CI 在固定 HEAD 上通过。
-5. 固定 HEAD 合并到 `rewrite/r5-competition-routing-persistence`。
-6. merged stage CI 通过。
-7. 最终 closeout HEAD 再次通过 canonical Public Platform CI，之后 R5-03 才可开放为 `READY`。
+1. transient workflow 全部清理，最终净 diff 无验证 helper。
+2. root README 与本记录/阶段索引与最终事实一致。
+3. clean PR canonical Public Platform CI 在固定 HEAD 上通过。
+4. 固定 HEAD 合并到 `rewrite/r5-competition-routing-persistence`。
+5. merged stage CI 通过。
+6. 最终 closeout HEAD 再次通过 canonical Public Platform CI，之后 R5-03 才可开放为 `READY`。
