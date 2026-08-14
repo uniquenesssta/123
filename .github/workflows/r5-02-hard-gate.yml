@@ -55,4 +55,4 @@ jobs:
       - name: Run frozen R5-02 PostgreSQL contract against new owner
         run: cargo test --locked -p football-persistence-postgres --test competition_hierarchy_repository_contract -- --ignored --test-threads=1
 
-# Triggered after canonical rustfmt and the resulting domain inventory refresh.
+# Triggered after module-private helper visibility was corrected and inventory regenerated.
