@@ -1,5 +1,6 @@
 name: R5-03 Rule Package Hard Gate
 
+# retry: 2 — after canonical rustfmt + inventory refresh
 on:
   push:
     branches:
