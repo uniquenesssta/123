@@ -1,0 +1,39 @@
+name: R5-03 Rule Package Contract Baseline
+
+on:
+  push:
+    branches:
+      - agent/r5-03-rule-packages
+    paths:
+      - "crates/persistence-postgres/tests/rule_package_repository_contract.rs"
+      - ".github/workflows/r5-03-contract-baseline.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  rule-package-contract:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: football_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres -d football_test"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    env:
+      FOOTBALL_TEST_DATABASE_URL: postgres://postgres:postgres@127.0.0.1:5432/football_test
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@1.88.0
+      - name: Run old-owner Rule Package contract
+        run: cargo test --locked -p football-persistence-postgres --test rule_package_repository_contract -- --ignored --test-threads=1
