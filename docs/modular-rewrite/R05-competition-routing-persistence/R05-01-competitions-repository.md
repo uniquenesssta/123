@@ -2,9 +2,9 @@
 
 ## 状态
 
-`VERIFYING`
+`DONE`
 
-实现、契约冻结、最小门禁、架构回归、Windows 前端与 Windows workspace Rust 回归均已完成。当前仅等待 clean Pull Request 的 Public Platform CI、合并到 `rewrite/r5-competition-routing-persistence` 以及合并后 stage CI；在这些证据完成前不标记为 `DONE`，R5-02 保持 `BLOCKED`。
+实现、契约冻结、最小门禁、架构回归、Windows 前端与 workspace Rust 回归、clean PR CI、固定 HEAD 合并及合并后 stage CI 均已完成；R5-01 正式关闭为 `DONE`，R5-02 开放为 `READY`。
 
 ## 基线与分支
 
@@ -87,7 +87,9 @@ run `31773549494` / job `94684193535`：workflow 总结为 `failure`，但失败
 - 既有 `postgres_integration.rs` 18 个 ignored PostgreSQL broad integration tests未在 R5-01 执行；本节点只显式执行新增 Competition Repository contract。
 - 未执行 destructive database reset。
 - 未在用户本机数据库执行写入；所有 PostgreSQL contract 使用临时、可写测试数据库。
-- clean PR Public Platform CI、PR merge 与 merged stage Public Platform CI 尚未完成，因此当前状态保持 `VERIFYING`。
+- PR #26 clean Public Platform CI run `31775501711` / job `94689993582` 为 `SUCCESS`；artifact `9210261462`，13,902,921 bytes，SHA-256 `83e0387d6dc2c32ebc1368cf6cd5d32df4082da992b1beb7bb6eeeb9ae42305b`。
+- PR #26 按固定 head `999949da6b3d5aeff4734b68779d3b15a890abe1` squash merge，stage merge commit `2b4668c2c0da45c9f62c1d40c4765cd730653b33`。
+- 合并后 Public Platform CI run `31777130456` / job `94694820128` 为 `SUCCESS`；artifact `9210904946`，13,901,970 bytes，SHA-256 `1303176d639550a832327c6e3e6c564f843e7eed10b673144ecd6413b7b01d31`。
 
 ## 最终净变更清单（合并前）
 
@@ -130,4 +132,4 @@ run `31773549494` / job `94684193535`：workflow 总结为 `failure`，但失败
 
 ## 下一状态门禁
 
-只有在 clean PR Public Platform CI 成功、固定 HEAD 合并到 `rewrite/r5-competition-routing-persistence`、合并后 stage Public Platform CI 成功并把证据回填本记录/README 后，R5-01 才能改为 `DONE`，随后才能将 R5-02 改为 `READY`。
+R5-01 的 clean PR CI、固定 HEAD merge 与 merged stage CI 已全部完成，节点状态为 `DONE`；R5-02 现可按任务书进入 `READY`。本次 closeout 仅修改文档，最终 stage closeout HEAD 仍需通过 canonical Public Platform CI 后才作为 R5-02 的起始基线。

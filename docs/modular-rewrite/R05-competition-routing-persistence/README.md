@@ -18,8 +18,8 @@ R4 Persistence 基础设施已完成并通过阶段出口。R5 仅按 Competitio
 
 | 任务 | 范围 | 状态 |
 |---|---|---|
-| R5-01 | Competitions Repository | VERIFYING |
-| R5-02 | Seasons / Stages / Rounds | BLOCKED |
+| R5-01 | Competitions Repository | DONE |
+| R5-02 | Seasons / Stages / Rounds | READY |
 | R5-03 | Rule Packages | BLOCKED |
 | R5-04 | Competition Bindings | BLOCKED |
 | R5-05 | Route Resolution Reads | BLOCKED |
@@ -40,4 +40,6 @@ R4 Persistence 基础设施已完成并通过阶段出口。R5 仅按 Competitio
 
 - Application Port、Tauri 命令/DTO、Schema、0001–0046 migration、配置、错误/日志语义、前端行为、路由算法、model identity、Cargo manifests/Cargo.lock、生产依赖和模型保护资产均未改变。
 - 既有 `postgres_integration.rs` 18 个 ignored broad PostgreSQL tests 未在 R5-01 执行；未执行 destructive database reset；未触碰用户数据库。
-- R5-01 仍等待 clean PR Public Platform CI、固定 HEAD 合并与合并后 stage CI，因此保持 `VERIFYING`；R5-02 在此之前继续 `BLOCKED`。
+- PR #26 clean Public Platform CI run `31775501711` / job `94689993582` 为 `SUCCESS`；固定 head `999949da6b3d5aeff4734b68779d3b15a890abe1` 已 squash merge 为 `2b4668c2c0da45c9f62c1d40c4765cd730653b33`。
+- merged stage Public Platform CI run `31777130456` / job `94694820128` 为 `SUCCESS`；artifact `9210904946`，SHA-256 `1303176d639550a832327c6e3e6c564f843e7eed10b673144ecd6413b7b01d31`。
+- R5-01 正式 `DONE`；R5-02 已开放为 `READY`，R5 stage 继续 `IN_PROGRESS`。最终文档 closeout HEAD 仍需通过 canonical Public Platform CI 后作为下一节点基线。
