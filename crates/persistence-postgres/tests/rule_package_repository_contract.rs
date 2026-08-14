@@ -143,7 +143,10 @@ async fn rule_package_repository_contract_is_preserved() {
         .expect_err("同 package_key/version 不同内容必须拒绝");
     match conflict {
         PersistenceError::InvalidState(message) => {
-            assert!(message.contains("已存在但内容不同"), "unexpected message: {message}");
+            assert!(
+                message.contains("已存在但内容不同"),
+                "unexpected message: {message}"
+            );
         }
         other => panic!("expected InvalidState, got {other:?}"),
     }
@@ -177,7 +180,11 @@ async fn rule_package_repository_contract_is_preserved() {
         .await
         .expect("固定第二条排序时间");
 
-    let packages = database.store.list_rule_packages().await.expect("读取规则包列表");
+    let packages = database
+        .store
+        .list_rule_packages()
+        .await
+        .expect("读取规则包列表");
     let package_versions: Vec<_> = packages
         .iter()
         .filter(|record| record.package_key == first_draft.package_key)
@@ -208,7 +215,9 @@ async fn rule_package_repository_contract_is_preserved() {
     let feature_requirements: Value = raw
         .try_get("feature_requirements")
         .expect("解析 feature_requirements");
-    let output_contract: Value = raw.try_get("output_contract").expect("解析 output_contract");
+    let output_contract: Value = raw
+        .try_get("output_contract")
+        .expect("解析 output_contract");
     let source_document_id: Option<Uuid> = raw
         .try_get("source_document_id")
         .expect("解析 source_document_id");
@@ -222,7 +231,10 @@ async fn rule_package_repository_contract_is_preserved() {
     assert_eq!(output_contract["schema"], "r5-03-output-contract");
     assert!(source_document_id.is_some());
     assert!(competition_profile_id.is_some());
-    assert_eq!(raw.try_get::<String, _>("status").expect("解析 status"), "active");
+    assert_eq!(
+        raw.try_get::<String, _>("status").expect("解析 status"),
+        "active"
+    );
     assert_eq!(
         raw.try_get::<String, _>("format_version")
             .expect("解析 format_version"),
@@ -259,7 +271,9 @@ async fn rule_package_repository_contract_is_preserved() {
             .expect("解析 content_sha256"),
         source_hash(&token)
     );
-    let source_metadata: Value = source_row.try_get("metadata").expect("解析 source metadata");
+    let source_metadata: Value = source_row
+        .try_get("metadata")
+        .expect("解析 source metadata");
     assert_eq!(source_metadata["package_key"], first_draft.package_key);
     assert_eq!(source_metadata["package_version"], "2.0.0");
     assert_eq!(source_metadata["title"], "R5-03 Rule Source 2.0.0");
