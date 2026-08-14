@@ -20,8 +20,9 @@ jobs:
           fetch-depth: 0
 
       - name: Record R5-02 closeout facts
-        shell: python
+        shell: bash
         run: |
+          python - <<'PY'
           from pathlib import Path
 
           detail_path = Path("docs/modular-rewrite/R05-competition-routing-persistence/R05-02-seasons-stages-and-rounds.md")
@@ -35,22 +36,27 @@ jobs:
 
           start = detail.index("## 当前未执行项与限制")
           end = detail.index("## 当前变更分类")
-          evidence = """## 未执行项与剩余风险
-
-- 既有 `postgres_integration.rs` 18 个 ignored broad PostgreSQL tests 未在 R5-02 执行；本节点未执行 destructive database reset，也未触碰用户数据库。
-- PR #27 clean Public Platform CI run `31794818136` / Windows automated delivery gate job `94749470982` 为 `SUCCESS`；artifact `9217614243`，13,911,724 bytes，SHA-256 `e1adc3016f71f1c563b9fd0d29721a9f04452cccfe5661f6bb5be52924f7601a`。
-- PR #27 按固定 clean head `89f164821e8f8157ab8a4804cf1d026a40ab8932` squash merge，stage merge commit 为 `baf307fcb733659385f83f187ee343184946ee9d`。
-- 合并后 Public Platform CI run `31796688330` / Windows automated delivery gate job `94755204665` 为 `SUCCESS`；artifact `9218314804`，13,911,443 bytes，SHA-256 `80e836c4012524ac66a21b085b86bebcd4f3fdf4661594d636050fb753f98d65`。
-- clean PR 与 merged stage 的 Windows Automated 已覆盖 canonical frontend、workspace Rust/Clippy/tests、Tauri release/runtime 验收；未使用较弱替代结果冒充 canonical 通过。
-
-"""
+          evidence = "\n".join([
+              "## 未执行项与剩余风险",
+              "",
+              "- 既有 `postgres_integration.rs` 18 个 ignored broad PostgreSQL tests 未在 R5-02 执行；本节点未执行 destructive database reset，也未触碰用户数据库。",
+              "- PR #27 clean Public Platform CI run `31794818136` / Windows automated delivery gate job `94749470982` 为 `SUCCESS`；artifact `9217614243`，13,911,724 bytes，SHA-256 `e1adc3016f71f1c563b9fd0d29721a9f04452cccfe5661f6bb5be52924f7601a`。",
+              "- PR #27 按固定 clean head `89f164821e8f8157ab8a4804cf1d026a40ab8932` squash merge，stage merge commit 为 `baf307fcb733659385f83f187ee343184946ee9d`。",
+              "- 合并后 Public Platform CI run `31796688330` / Windows automated delivery gate job `94755204665` 为 `SUCCESS`；artifact `9218314804`，13,911,443 bytes，SHA-256 `80e836c4012524ac66a21b085b86bebcd4f3fdf4661594d636050fb753f98d65`。",
+              "- clean PR 与 merged stage 的 Windows Automated 已覆盖 canonical frontend、workspace Rust/Clippy/tests、Tauri release/runtime 验收；未使用较弱替代结果冒充 canonical 通过。",
+              "",
+              "",
+          ])
           detail = detail[:start] + evidence + detail[end:]
 
           gate = detail.index("## 下一状态门禁")
-          detail = detail[:gate] + """## 下一状态门禁
-
-R5-02 的 clean PR CI、固定 HEAD merge 与 merged stage CI 已全部完成，节点状态为 `DONE`；R5-03 现可按任务书进入 `READY`。本次 closeout 仅修改文档，最终 stage closeout HEAD 仍需通过 canonical Public Platform CI 后，才可作为 R5-03 的起始基线。
-"""
+          final_gate = "\n".join([
+              "## 下一状态门禁",
+              "",
+              "R5-02 的 clean PR CI、固定 HEAD merge 与 merged stage CI 已全部完成，节点状态为 `DONE`；R5-03 现可按任务书进入 `READY`。本次 closeout 仅修改文档，最终 stage closeout HEAD 仍需通过 canonical Public Platform CI 后，才可作为 R5-03 的起始基线。",
+              "",
+          ])
+          detail = detail[:gate] + final_gate
           detail_path.write_text(detail, encoding="utf-8")
 
           stage_path = Path("docs/modular-rewrite/R05-competition-routing-persistence/README.md")
@@ -84,6 +90,7 @@ R5-02 的 clean PR CI、固定 HEAD merge 与 merged stage CI 已全部完成，
               raise SystemExit(f"expected one root R5-02 line, got {len(matches)}")
           lines[matches[0]] = replacement
           root_path.write_text("\n".join(lines) + "\n", encoding="utf-8")
+          PY
 
       - name: Commit closeout docs and remove helper
         shell: bash
