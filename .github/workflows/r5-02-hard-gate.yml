@@ -1,0 +1,56 @@
+name: R5-02 Hard Gate
+
+on:
+  push:
+    branches:
+      - agent/r5-02-seasons-stages-rounds
+    paths:
+      - ".github/workflows/r5-02-hard-gate.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  r5-02-hard-gate:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 60
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: football_r5_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd="pg_isready -U postgres -d football_r5_test"
+          --health-interval=5s
+          --health-timeout=5s
+          --health-retries=12
+    env:
+      FOOTBALL_TEST_DATABASE_URL: postgres://postgres:postgres@localhost:5432/football_r5_test
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - uses: dtolnay/rust-toolchain@1.88.0
+        with:
+          components: rustfmt, clippy
+      - name: Verify R5-01 and R5-02 architecture ownership
+        run: node scripts/verify-competition-repository.mjs
+      - name: Verify complete architecture boundaries
+        run: npm run verify:architecture
+      - name: Verify protected model boundary
+        run: node scripts/verify-public-model-boundary.mjs
+      - name: Verify formatting
+        run: cargo fmt --all -- --check
+      - name: Check persistence and application crates
+        run: cargo check --locked -p football-persistence-postgres -p football-application
+      - name: Test persistence crate
+        run: cargo test --locked -p football-persistence-postgres
+      - name: Test application crate
+        run: cargo test --locked -p football-application
+      - name: Run frozen R5-02 PostgreSQL contract against new owner
+        run: cargo test --locked -p football-persistence-postgres --test competition_hierarchy_repository_contract -- --ignored --test-threads=1
