@@ -1,0 +1,96 @@
+name: R5-02 Closeout Sync
+
+on:
+  push:
+    branches:
+      - rewrite/r5-competition-routing-persistence
+    paths:
+      - ".github/workflows/r5-02-closeout-sync.yml"
+
+permissions:
+  contents: write
+
+jobs:
+  closeout-docs:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Record R5-02 closeout facts
+        shell: python
+        run: |
+          from pathlib import Path
+
+          detail_path = Path("docs/modular-rewrite/R05-competition-routing-persistence/R05-02-seasons-stages-and-rounds.md")
+          detail = detail_path.read_text(encoding="utf-8")
+          detail = detail.replace("`VERIFYING`", "`DONE`", 1)
+          old_intro = "R5-02 的生产 owner 切换和节点 hard gate 已完成；当前等待临时验证文件清理、最终净 diff、clean PR canonical CI、固定 HEAD 合并与 merged stage CI。在这些收口门禁全部成功前不得标记 `DONE`。"
+          new_intro = "R5-02 的生产 owner 切换、契约冻结、节点 hard gate、clean PR canonical CI、固定 HEAD 合并与 merged stage CI 均已完成；R5-02 正式关闭为 `DONE`，R5-03 开放为 `READY`。本次 closeout 文档提交仍需通过 canonical Public Platform CI 后，才可作为 R5-03 的起始基线。"
+          if old_intro not in detail:
+              raise SystemExit("R5-02 detail intro anchor missing")
+          detail = detail.replace(old_intro, new_intro, 1)
+
+          start = detail.index("## 当前未执行项与限制")
+          end = detail.index("## 当前变更分类")
+          evidence = """## 未执行项与剩余风险
+
+- 既有 `postgres_integration.rs` 18 个 ignored broad PostgreSQL tests 未在 R5-02 执行；本节点未执行 destructive database reset，也未触碰用户数据库。
+- PR #27 clean Public Platform CI run `31794818136` / Windows automated delivery gate job `94749470982` 为 `SUCCESS`；artifact `9217614243`，13,911,724 bytes，SHA-256 `e1adc3016f71f1c563b9fd0d29721a9f04452cccfe5661f6bb5be52924f7601a`。
+- PR #27 按固定 clean head `89f164821e8f8157ab8a4804cf1d026a40ab8932` squash merge，stage merge commit 为 `baf307fcb733659385f83f187ee343184946ee9d`。
+- 合并后 Public Platform CI run `31796688330` / Windows automated delivery gate job `94755204665` 为 `SUCCESS`；artifact `9218314804`，13,911,443 bytes，SHA-256 `80e836c4012524ac66a21b085b86bebcd4f3fdf4661594d636050fb753f98d65`。
+- clean PR 与 merged stage 的 Windows Automated 已覆盖 canonical frontend、workspace Rust/Clippy/tests、Tauri release/runtime 验收；未使用较弱替代结果冒充 canonical 通过。
+
+"""
+          detail = detail[:start] + evidence + detail[end:]
+
+          gate = detail.index("## 下一状态门禁")
+          detail = detail[:gate] + """## 下一状态门禁
+
+R5-02 的 clean PR CI、固定 HEAD merge 与 merged stage CI 已全部完成，节点状态为 `DONE`；R5-03 现可按任务书进入 `READY`。本次 closeout 仅修改文档，最终 stage closeout HEAD 仍需通过 canonical Public Platform CI 后，才可作为 R5-03 的起始基线。
+"""
+          detail_path.write_text(detail, encoding="utf-8")
+
+          stage_path = Path("docs/modular-rewrite/R05-competition-routing-persistence/README.md")
+          stage = stage_path.read_text(encoding="utf-8")
+          stage = stage.replace("| R5-02 | Seasons / Stages / Rounds | VERIFYING |", "| R5-02 | Seasons / Stages / Rounds | DONE |", 1)
+          stage = stage.replace("| R5-03 | Rule Packages | BLOCKED |", "| R5-03 | Rule Packages | READY |", 1)
+          old_current = "- 当前仍为 `VERIFYING`；下一步仅做临时 workflow 清理、root README/净 diff、clean PR canonical CI、固定 HEAD merge 和 merged stage CI，不提前进入 R5-03。"
+          new_current = "- PR #27 clean CI run `31794818136` / job `94749470982` 为 `SUCCESS`，固定 clean head `89f164821e8f8157ab8a4804cf1d026a40ab8932` 已 squash merge 为 `baf307fcb733659385f83f187ee343184946ee9d`；merged stage CI run `31796688330` / job `94755204665` 亦为 `SUCCESS`。PR artifact `9217614243` SHA-256 `e1adc3016f71f1c563b9fd0d29721a9f04452cccfe5661f6bb5be52924f7601a`，stage artifact `9218314804` SHA-256 `80e836c4012524ac66a21b085b86bebcd4f3fdf4661594d636050fb753f98d65`。"
+          if old_current not in stage:
+              raise SystemExit("R5-02 stage current anchor missing")
+          stage = stage.replace(old_current, new_current, 1)
+          old_limit = "- 既有 `postgres_integration.rs` 18 个 ignored broad PostgreSQL tests 未在 R5-02 执行；clean PR CI、workspace Clippy/tests、Windows Automated、固定 HEAD 合并和 merged stage CI 尚待完成。"
+          new_limit = "- 既有 `postgres_integration.rs` 18 个 ignored broad PostgreSQL tests 未在 R5-02 执行；未执行 destructive database reset，未触碰用户数据库。clean PR 与 merged stage canonical Windows Automated 均已通过。"
+          if old_limit not in stage:
+              raise SystemExit("R5-02 stage limit anchor missing")
+          stage = stage.replace(old_limit, new_limit, 1)
+          old_gate = "- R5-02 只有在全部最终门禁成功、临时 workflow 清理、README/节点记录收口后才可 `DONE`；届时才开放 R5-03 `READY`。"
+          new_gate = "- R5-02 已正式关闭为 `DONE`，R5-03 已开放为 `READY`；本次 closeout 文档 HEAD 必须先通过 canonical Public Platform CI，才可作为 R5-03 的起始基线。"
+          if old_gate not in stage:
+              raise SystemExit("R5-02 stage gate anchor missing")
+          stage = stage.replace(old_gate, new_gate, 1)
+          stage_path.write_text(stage, encoding="utf-8")
+
+          root_path = Path("README.md")
+          root = root_path.read_text(encoding="utf-8")
+          prefix = "- R5-02 Seasons / Stages / Rounds "
+          replacement = "- R5-02 Seasons / Stages / Rounds 已正式关闭为 `DONE`：hierarchy persistence 从旧 `crates/persistence-postgres/src/competitions.rs` 收敛到 `adapters/competition/hierarchy/{seasons,stages,rounds}/`，Season/Stage/Round 分别拥有 create/read/list、typed `sqlx::FromRow` Row 与 Domain Mapper；旧文件仅保留 R5-05 context/scope 职责。Application `CompetitionHierarchyPort`、Tauri DTO/命令、Schema、0001–0046 migration、前端行为、路由算法、model identity、依赖与模型保护资产保持不变。旧 owner PostgreSQL contract baseline run `31793408123` 与第四轮 hard gate run `31794402789` / job `94748190282` 均 `SUCCESS`。PR #27 clean CI run `31794818136` / job `94749470982` 为 `SUCCESS`，artifact `9217614243`，SHA-256 `e1adc3016f71f1c563b9fd0d29721a9f04452cccfe5661f6bb5be52924f7601a`；固定 head `89f164821e8f8157ab8a4804cf1d026a40ab8932` 已 squash merge 为 `baf307fcb733659385f83f187ee343184946ee9d`，merged stage CI run `31796688330` / job `94755204665` 亦为 `SUCCESS`，artifact `9218314804`，SHA-256 `80e836c4012524ac66a21b085b86bebcd4f3fdf4661594d636050fb753f98d65`。18 个既有 broad PostgreSQL ignored tests 与 destructive reset 未在本节点执行，未触碰用户数据库。R5-03 已开放为 `READY`；详见 `docs/modular-rewrite/R05-competition-routing-persistence/R05-02-seasons-stages-and-rounds.md`。"
+          lines = root.splitlines()
+          matches = [i for i, line in enumerate(lines) if line.startswith(prefix)]
+          if len(matches) != 1:
+              raise SystemExit(f"expected one root R5-02 line, got {len(matches)}")
+          lines[matches[0]] = replacement
+          root_path.write_text("\n".join(lines) + "\n", encoding="utf-8")
+
+      - name: Commit closeout docs and remove helper
+        shell: bash
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add README.md docs/modular-rewrite/R05-competition-routing-persistence/README.md docs/modular-rewrite/R05-competition-routing-persistence/R05-02-seasons-stages-and-rounds.md
+          git rm .github/workflows/r5-02-closeout-sync.yml
+          git commit -m "docs(r5-02): close hierarchy persistence node"
+          git push origin HEAD:rewrite/r5-competition-routing-persistence
