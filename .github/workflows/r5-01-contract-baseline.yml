@@ -1,4 +1,4 @@
-name: R5-01 Inventory Publish
+name: R5-01 Stage Diagnostic
 
 on:
   push:
@@ -6,47 +6,69 @@ on:
       - agent/r5-01-competitions-repository
     paths:
       - ".github/workflows/r5-01-contract-baseline.yml"
+      - "scripts/verify-competition-repository.mjs"
+      - "package.json"
+      - "architecture/domain-type-inventory.json"
+      - "crates/persistence-postgres/src/adapters/competition/**"
+      - "crates/persistence-postgres/src/adapters/mod.rs"
+      - "crates/persistence-postgres/src/competitions.rs"
+      - "crates/persistence-postgres/tests/competitions_repository_contract.rs"
 
 permissions:
-  contents: write
+  contents: read
 
 jobs:
-  inventory-publish:
+  stage-diagnostic:
     runs-on: ubuntu-24.04
-    timeout-minutes: 15
+    timeout-minutes: 90
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: football_r5_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd="pg_isready -U postgres -d football_r5_test"
+          --health-interval=5s
+          --health-timeout=5s
+          --health-retries=12
+    env:
+      FOOTBALL_TEST_DATABASE_URL: postgres://postgres:postgres@localhost:5432/football_r5_test
     steps:
       - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
       - uses: actions/setup-node@v4
         with:
           node-version: 22
-      - name: Regenerate and validate reviewed derived inventory
-        shell: bash
+          cache: npm
+      - uses: dtolnay/rust-toolchain@1.88.0
+        with:
+          components: rustfmt, clippy
+      - name: Verify R5-01 ownership and R4 persistence regressions
         run: |
-          set -euo pipefail
-          node scripts/generate-domain-type-inventory.mjs
-          git diff --check -- architecture/domain-type-inventory.json
-          test "$(git diff --name-only | tr '\n' ' ')" = "architecture/domain-type-inventory.json "
-          node scripts/verify-domain-type-inventory.mjs
-          node - <<'NODE'
-          const fs = require('fs');
-          const inventory = JSON.parse(fs.readFileSync('architecture/domain-type-inventory.json', 'utf8'));
-          if (inventory.sourceDigest !== '217241ac243726a5ab6805a7f169e222b97e78c7c971749a5904714af673ebdd') throw new Error('Domain sourceDigest changed');
-          if (inventory.summary.typeCount !== 365) throw new Error('Domain typeCount changed');
-          if (inventory.summary.publicCompatibilityTypeCount !== 365) throw new Error('public compatibility count changed');
-          if (inventory.summary.internalTypeCount !== 0) throw new Error('internal type count changed');
-          if (inventory.summary.domainSourceFileCount !== 129) throw new Error('domain source file count changed');
-          if (inventory.summary.databaseMappedTypeCount !== 299) throw new Error('database mapped type count changed');
-          if (inventory.summary.scannedRustFileCount !== 676) throw new Error('unexpected scanned Rust file count');
-          NODE
-      - name: Commit only derived inventory
-        shell: bash
+          npm run verify:competition-repository
+          npm run verify:persistence-foundation
+          npm run verify:persistence-audit
+          npm run verify:persistence-mapping
+          npm run verify:persistence-adapters
+      - name: Verify frozen database and protected assets
         run: |
-          set -euo pipefail
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add architecture/domain-type-inventory.json
-          test "$(git diff --cached --name-only | tr '\n' ' ')" = "architecture/domain-type-inventory.json "
-          git commit -m "chore(r5-01): refresh domain type inventory"
-          git push origin HEAD:agent/r5-01-competitions-repository
+          node scripts/verify_database_baseline.mjs
+          node scripts/verify_protected_assets.mjs
+      - name: Verify Rust minimum gate and PostgreSQL contract
+        run: |
+          cargo fmt --all -- --check
+          cargo check --locked -p football-persistence-postgres -p football-application
+          cargo test --locked -p football-persistence-postgres
+          cargo test --locked -p football-application
+          cargo test --locked -p football-persistence-postgres --test competitions_repository_contract -- --ignored --test-threads=1
+      - name: Verify full architecture
+        run: npm run verify:architecture
+      - name: Verify frontend and workspace Rust
+        run: |
+          npm run setup
+          npm run verify:frontend
+          cargo clippy --locked --workspace --all-targets -- -D warnings
+          cargo test --locked --workspace
