@@ -4,7 +4,7 @@ use sqlx::FromRow;
 use uuid::Uuid;
 
 #[derive(Debug, FromRow)]
-pub(super) struct CompetitionRow {
+pub(in crate::adapters::competition) struct CompetitionRow {
     pub(super) id: Uuid,
     pub(super) code: String,
     pub(super) name: String,

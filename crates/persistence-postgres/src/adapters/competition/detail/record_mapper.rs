@@ -2,7 +2,9 @@ use super::CompetitionRow;
 use crate::{parse_competition_kind, PersistenceResult};
 use football_domain::CompetitionRecord;
 
-pub(super) fn map_competition_row(row: CompetitionRow) -> PersistenceResult<CompetitionRecord> {
+pub(in crate::adapters::competition) fn map_competition_row(
+    row: CompetitionRow,
+) -> PersistenceResult<CompetitionRecord> {
     Ok(CompetitionRecord {
         id: row.id,
         code: row.code,
