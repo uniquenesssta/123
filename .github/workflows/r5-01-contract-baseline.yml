@@ -1,10 +1,13 @@
-name: R5-01 Contract Baseline
+name: R5-01 Minimum Gate
 
 on:
   push:
     branches:
       - agent/r5-01-competitions-repository
     paths:
+      - "crates/persistence-postgres/src/adapters/competition/**"
+      - "crates/persistence-postgres/src/adapters/mod.rs"
+      - "crates/persistence-postgres/src/competitions.rs"
       - "crates/persistence-postgres/tests/competitions_repository_contract.rs"
       - ".github/workflows/r5-01-contract-baseline.yml"
 
@@ -12,9 +15,9 @@ permissions:
   contents: read
 
 jobs:
-  competition-contract:
+  minimum-gate:
     runs-on: ubuntu-24.04
-    timeout-minutes: 30
+    timeout-minutes: 45
     services:
       postgres:
         image: postgres:16
@@ -34,6 +37,13 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: dtolnay/rust-toolchain@1.88.0
+        with:
+          components: rustfmt
+      - name: Check Rust formatting
+        run: cargo fmt --all -- --check
+      - name: Check persistence crate
+        run: cargo check --locked -p football-persistence-postgres
+      - name: Run persistence unit tests
+        run: cargo test --locked -p football-persistence-postgres
       - name: Run frozen R5-01 competitions contract
-        shell: bash
         run: cargo test --locked -p football-persistence-postgres --test competitions_repository_contract -- --ignored --test-threads=1
