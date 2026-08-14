@@ -10,6 +10,7 @@ R4 Persistence 基础设施已完成并通过阶段出口。R5 仅按 Competitio
 
 - R4 `DONE`；完成记录：[`../R04-persistence-foundation/R04-stage-completion.md`](../R04-persistence-foundation/R04-stage-completion.md)。
 - R5-01 开始时必须从 `rewrite/r4-persistence-foundation` 最终 closeout HEAD 独立建分支；该 HEAD 的最终 Public Platform CI 必须先为 `SUCCESS`。
+- 已验证 R4 closeout evidence：HEAD `f7bc0101a4c443e1fc6e95d2e604a7df7e073d5e` 的 Public Platform CI run `31730498450` / job `94549484609` 为 `SUCCESS`；R5-01 实际开工时仍必须重新读取 `rewrite/r4-persistence-foundation` 当前最终 HEAD 后再建独立分支。
 - R3 Competition / Rules Ports 已冻结；0001–0046 migration 继续冻结。
 
 ## 任务状态

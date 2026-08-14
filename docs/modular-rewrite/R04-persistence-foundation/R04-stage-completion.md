@@ -194,6 +194,7 @@ broad PostgreSQL diagnostic `31728096953` 在一次性测试库执行 18 个 ign
 - R4-04 final hard gate `31712193150`：R4-01~04 专项、数据库静态 baseline/protected assets、rustfmt、Persistence/Application check/tests、完整 architecture/frontend、workspace Clippy `-D warnings` 与 workspace tests 全部 PASS；Persistence 80/80 unit tests、Application 33/33 tests PASS。
 - R4-04 PR #25 clean Public Platform CI `31717901248` / job `94507174688`：SUCCESS；artifact `9188959652`，SHA-256 `477b32b66fb06ee9bfa04ead7778639f1d5658f9478a641c706416c49b70d687`。
 - R4-04 squash merge `b97587c9d20165018f80040dc2a2c098dbbec177` 后 canonical stage Public Platform CI `31724131556` / job `94528167665`：SUCCESS；artifact `9191415520`，SHA-256 `3ccb37d8eab17c0e589354c10c3423579397629f9f76481b267acd0749db38cf`。
+- formal closeout HEAD `f7bc0101a4c443e1fc6e95d2e604a7df7e073d5e` 的 canonical Public Platform CI `31730498450` / job `94549484609`：SUCCESS；artifact `9193694750`，SHA-256 `231cf7729f383c655f70cc9fa35cc9588c14770ba9b5dc09b2e26b527ccdd824`。
 - Cargo manifests / `Cargo.lock` 与历史 migrations 对节点基线保持冻结；R4 阶段总 diff 未触及 `crates/model-api/`、`crates/model-p4/`、`crates/model-p7/`。
 
 - broad PostgreSQL diagnostic `31728096953` / job `94541420957`：PostgreSQL 16 临时测试库真实执行 18 个 ignored tests，14 PASS / 4 FAIL；destructive reset PASS；4 个失败全部留档。
@@ -215,7 +216,7 @@ R4 任务书要求的真实 PostgreSQL 出口验证已执行，不再存在 R4 f
 ## 14. 根 README、阶段 README 与架构文档同步
 
 - 根 `README.md` 已记录 R4-04 实际结果、CI/merge 证据与 R4 stage DB 出口阻塞。
-- 本阶段 `README.md` 已将 R4-04 标记 `DONE`、阶段标记 `VERIFYING`，并链接本记录。
+- 本阶段 `README.md` 已将 R4-04 与 R4 阶段均标记 `DONE`，并链接本记录。
 - R4-01~04 过程中已按实际 owner 变化同步 `architecture/database-baseline.json`、`domain-type-inventory.json`、`module-boundaries.json`、`state-ownership.json`；未通过 closeout 额外修改这些架构文件。
 
 ## 15. 阶段回退点与回退步骤

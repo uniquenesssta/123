@@ -67,6 +67,7 @@ Windows 2025 / Rust 1.88.0 / Node 22 hard gate run `31712193150` 实际执行并
 - broad PostgreSQL diagnostic `31728096953`：18 个 ignored integration tests 实跑 14/18 PASS，destructive reset PASS；3 个失败为既有过期业务夹具，另 1 个为 R4 排除范围内的既有 P4 timestamp 精度问题，未通过放宽生产规则追求 18/18。
 - final R4 专项 PostgreSQL stage gate `31729577225` / job `94546316946`：空库 0001–0046、health、stats、audit 失败回滚与成功事务提交均 PASS；首次 scoped `31729361081` 仅因 runner connection-local trigger 设计错误失败，未产生生产源码改动。
 - R4 stage 因真实数据库矩阵补齐而正式 `DONE`；R5-01 仅开放为 `READY`，本节点未提前实现 R5。
+- formal closeout HEAD `f7bc0101a4c443e1fc6e95d2e604a7df7e073d5e` 的 Public Platform CI run `31730498450` / job `94549484609`：`SUCCESS`；artifact `9193694750`，SHA-256 `231cf7729f383c655f70cc9fa35cc9588c14770ba9b5dc09b2e26b527ccdd824`。
 
 ## 回退点
 

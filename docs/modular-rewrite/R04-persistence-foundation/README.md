@@ -70,13 +70,15 @@ R4-01 完成前保持 `READY/VERIFYING`，只有目标职责切换为唯一 owne
 ## R4 阶段出口状态
 
 - 四个 Atomic Task 均已 `DONE`，阶段完成记录见 [`R04-stage-completion.md`](./R04-stage-completion.md)。
-'
-'- broad PostgreSQL diagnostic `31728096953` 在一次性 `postgres:16` / `football_r4_test` 上执行全部 18 个 ignored integration tests：14/18 PASS，destructive reset PASS。4 个失败未删除、跳过或放宽：3 个为当前严格业务契约下的既有过期夹具，1 个为具体 P4 业务持久化 timestamp 精度问题；相关业务路径未由 R4 修改，P4 具体业务持久化属于 R4 排除范围。
-'
-'- scoped run `31729361081` 已通过空库 migration、health、stats，但 runner 的 connection-local audit trigger 参数设计错误导致 probe 失败；未改生产源码。修正 runner-only trigger 后，final run `31729577225` / job `94546316946` `SUCCESS`：全新临时库真实完成 46 条 migration、`health()`、`stats()`、audit 失败事务整体回滚及成功事务业务 row + audit row 同时提交，1/1 PASS。
-'
-'- architecture dependency 与 migration freeze 已由 hard gate / canonical Windows CI 通过；R4 阶段出口矩阵全部 PASS，R4 正式 `DONE`。
-'
-'- 临时 PostgreSQL service、runner-only Rust test 与 transient workflows 均已清理，未进入 canonical stage，也未连接或重置用户数据库。
-'
-'- R5-01 `Competitions Repository` 为唯一 `READY`；R5-02~R5-06 `BLOCKED`。本收口未包含任何 R5 生产源码修改。
+
+- broad PostgreSQL diagnostic `31728096953` 在一次性 `postgres:16` / `football_r4_test` 上执行全部 18 个 ignored integration tests：14/18 PASS，destructive reset PASS。4 个失败未删除、跳过或放宽：3 个为当前严格业务契约下的既有过期夹具，1 个为具体 P4 业务持久化 timestamp 精度问题；相关业务路径未由 R4 修改，P4 具体业务持久化属于 R4 排除范围。
+
+- scoped run `31729361081` 已通过空库 migration、health、stats，但 runner 的 connection-local audit trigger 参数设计错误导致 probe 失败；未改生产源码。修正 runner-only trigger 后，final run `31729577225` / job `94546316946` `SUCCESS`：全新临时库真实完成 46 条 migration、`health()`、`stats()`、audit 失败事务整体回滚及成功事务业务 row + audit row 同时提交，1/1 PASS。
+
+- architecture dependency 与 migration freeze 已由 hard gate / canonical Windows CI 通过；R4 阶段出口矩阵全部 PASS，R4 正式 `DONE`。
+
+- 临时 PostgreSQL service、runner-only Rust test 与 transient workflows 均已清理，未进入 canonical stage，也未连接或重置用户数据库。
+
+- 最终 closeout HEAD `f7bc0101a4c443e1fc6e95d2e604a7df7e073d5e` 的 Public Platform CI run `31730498450` / job `94549484609`：`SUCCESS`；artifact `9193694750`，13,894,301 bytes，SHA-256 `231cf7729f383c655f70cc9fa35cc9588c14770ba9b5dc09b2e26b527ccdd824`。
+
+- R5-01 `Competitions Repository` 为唯一 `READY`；R5-02~R5-06 `BLOCKED`。本收口未包含任何 R5 生产源码修改。
