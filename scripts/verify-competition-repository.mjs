@@ -33,16 +33,15 @@ for (const relative of [
 
 check(adapterMod.includes("mod competition;"), "Persistence adapters root must register the competition module");
 const competitionMod = read(`${base}/mod.rs`);
-check(competitionMod.includes("mod detail;") && competitionMod.includes("mod directory;"), "competition/mod.rs must expose only R5-01 directory/detail responsibilities");
-check(!competitionMod.includes("hierarchy") && !competitionMod.includes("rule_packages") && !competitionMod.includes("bindings") && !competitionMod.includes("route_resolution"), "R5-01 must not pre-implement later R5 responsibilities");
+check(competitionMod.includes("mod detail;") && competitionMod.includes("mod directory;"), "competition/mod.rs must retain R5-01 directory/detail owners");
+check(competitionMod.includes("mod hierarchy;"), "competition/mod.rs must register the approved R5-02 hierarchy owner");
+check(!competitionMod.includes("rule_packages") && !competitionMod.includes("bindings") && !competitionMod.includes("route_resolution") && !competitionMod.includes("model_run_identity"), "R5-02 must not pre-implement R5-03 through R5-06 responsibilities");
 
 for (const method of ["create_competition", "read_competition", "list_competitions", "delete_competition"]) {
   check(!new RegExp(`pub\\s+async\\s+fn\\s+${method}\\b`).test(legacy), `Legacy competitions.rs still owns ${method}`);
 }
 check(!legacy.includes("competition_record_from_row"), "Legacy CompetitionRecord PgRow mapper must be removed");
-for (const futureMethod of ["resolve_competition_context", "create_season", "list_seasons", "create_stage", "list_stages", "create_round", "list_rounds"]) {
-  check(new RegExp(`(?:pub\\s+)?async\\s+fn\\s+${futureMethod}\\b`).test(legacy), `R5-01 must leave later responsibility ${futureMethod} in its current owner`);
-}
+check(new RegExp(`pub\\s+async\\s+fn\\s+resolve_competition_context\\b`).test(legacy), "R5-02 must leave R5-05 resolve_competition_context in its current owner");
 
 const row = read(`${base}/detail/record_row.rs`);
 const mapper = read(`${base}/detail/record_mapper.rs`);
@@ -86,4 +85,4 @@ if (failures.length) {
   failures.forEach((failure) => console.error(`- ${failure}`));
   process.exit(1);
 }
-console.log("R5-01 Competitions Repository verified: directory/detail own Competition CRUD, typed Row/Mapper are separated, delete SQL is purpose-split, and later R5 responsibilities remain untouched.");
+console.log("R5-01 Competitions Repository verified: directory/detail remain unique Competition CRUD owners, typed Row/Mapper and delete SQL boundaries remain intact, and only the approved R5-02 hierarchy module has been added.");
