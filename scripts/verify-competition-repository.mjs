@@ -1,3 +1,4 @@
+import "./verify-competition-hierarchy.mjs";
 import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
@@ -78,7 +79,7 @@ for (const token of ["create_competition", "read_competition", "list_competition
 
 const packageJson = JSON.parse(read("package.json"));
 check(typeof packageJson.scripts["verify:competition-repository"] === "string", "package.json must expose verify:competition-repository");
-check(packageJson.scripts["verify:architecture"].includes("verify-competition-repository.mjs"), "verify:architecture must include the R5-01 gate");
+check(packageJson.scripts["verify:architecture"].includes("verify-competition-repository.mjs"), "verify:architecture must include the R5-01/R5-02 competition gate chain");
 
 if (failures.length) {
   console.error("R5-01 Competitions Repository verification failed:");
