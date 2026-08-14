@@ -24,13 +24,13 @@
     "targetPublicExportPolicy": "explicit re-export only"
   },
   "sourceDigest": "217241ac243726a5ab6805a7f169e222b97e78c7c971749a5904714af673ebdd",
-  "rustUsageDigest": "6f02d224ea8f2610d79c1b88a0b28106ed389d832029b3bd7397e2f948b84782",
+  "rustUsageDigest": "45327daffc0872a6c2bb4236a645ff59ac3395e877053057665eb0fecbb2e227",
   "summary": {
     "typeCount": 365,
     "publicCompatibilityTypeCount": 365,
     "internalTypeCount": 0,
     "domainSourceFileCount": 129,
-    "scannedRustFileCount": 696,
+    "scannedRustFileCount": 709,
     "databaseMappedTypeCount": 299,
     "byTargetModule": {
       "ai_workspace": 16,
@@ -4804,7 +4804,8 @@
         "crates/persistence-postgres/src/routing.rs",
         "crates/persistence-postgres/tests/competition_hierarchy_repository_contract.rs",
         "crates/persistence-postgres/tests/competitions_repository_contract.rs",
-        "crates/persistence-postgres/tests/postgres_integration.rs"
+        "crates/persistence-postgres/tests/postgres_integration.rs",
+        "crates/persistence-postgres/tests/rule_package_repository_contract.rs"
       ],
       "databaseMappings": [
         "crates/persistence-postgres/src/competition_kind.rs",
@@ -4905,7 +4906,8 @@
       "externalCallers": [
         "crates/application/src/use_cases/rules/package_factory/mod.rs",
         "crates/persistence-postgres/src/routing.rs",
-        "crates/persistence-postgres/tests/postgres_integration.rs"
+        "crates/persistence-postgres/tests/postgres_integration.rs",
+        "crates/persistence-postgres/tests/rule_package_repository_contract.rs"
       ],
       "databaseMappings": [
         "crates/persistence-postgres/src/routing.rs"
@@ -4981,12 +4983,12 @@
         "crates/application/src/services/research/facade.rs",
         "crates/application/src/services/research/service.rs",
         "crates/application/src/use_cases/research/artifact_catalog.rs",
-        "crates/persistence-postgres/src/p4_records.rs",
-        "crates/persistence-postgres/src/routing.rs"
+        "crates/persistence-postgres/src/adapters/rules/packages/register_rule_package/transaction.rs",
+        "crates/persistence-postgres/src/p4_records.rs"
       ],
       "databaseMappings": [
-        "crates/persistence-postgres/src/p4_records.rs",
-        "crates/persistence-postgres/src/routing.rs"
+        "crates/persistence-postgres/src/adapters/rules/packages/register_rule_package/transaction.rs",
+        "crates/persistence-postgres/src/p4_records.rs"
       ]
     },
     {
@@ -24588,12 +24590,17 @@
         "crates/application/src/use_cases/rules/package_factory/mod.rs",
         "crates/application/src/use_cases/rules/package_validation/mod.rs",
         "crates/application/src/use_cases/rules/register_package/mod.rs",
-        "crates/persistence-postgres/src/routing.rs",
+        "crates/persistence-postgres/src/adapters/rules/packages/register_rule_package/insert_rule_package.rs",
+        "crates/persistence-postgres/src/adapters/rules/packages/register_rule_package/transaction.rs",
+        "crates/persistence-postgres/src/adapters/rules/packages/source_documents/upsert_source_document.rs",
         "crates/persistence-postgres/tests/postgres_integration.rs",
+        "crates/persistence-postgres/tests/rule_package_repository_contract.rs",
         "src-tauri/src/commands/competition.rs"
       ],
       "databaseMappings": [
-        "crates/persistence-postgres/src/routing.rs"
+        "crates/persistence-postgres/src/adapters/rules/packages/register_rule_package/insert_rule_package.rs",
+        "crates/persistence-postgres/src/adapters/rules/packages/register_rule_package/transaction.rs",
+        "crates/persistence-postgres/src/adapters/rules/packages/source_documents/upsert_source_document.rs"
       ]
     },
     {
@@ -24695,11 +24702,15 @@
         "crates/application/src/services/rules/service.rs",
         "crates/application/src/use_cases/rules/load_catalog/mod.rs",
         "crates/application/src/use_cases/rules/register_package/mod.rs",
-        "crates/persistence-postgres/src/routing.rs",
+        "crates/persistence-postgres/src/adapters/rules/packages/list_rule_packages.rs",
+        "crates/persistence-postgres/src/adapters/rules/packages/record_mapper.rs",
+        "crates/persistence-postgres/src/adapters/rules/packages/register_rule_package/transaction.rs",
         "src-tauri/src/commands/competition.rs"
       ],
       "databaseMappings": [
-        "crates/persistence-postgres/src/routing.rs"
+        "crates/persistence-postgres/src/adapters/rules/packages/list_rule_packages.rs",
+        "crates/persistence-postgres/src/adapters/rules/packages/record_mapper.rs",
+        "crates/persistence-postgres/src/adapters/rules/packages/register_rule_package/transaction.rs"
       ]
     },
     {
@@ -24776,7 +24787,8 @@
       "externalCallers": [
         "crates/application/src/use_cases/prediction/shared/routing.rs",
         "crates/application/src/use_cases/rules/package_factory/mod.rs",
-        "crates/persistence-postgres/tests/postgres_integration.rs"
+        "crates/persistence-postgres/tests/postgres_integration.rs",
+        "crates/persistence-postgres/tests/rule_package_repository_contract.rs"
       ],
       "databaseMappings": []
     },
@@ -24845,7 +24857,8 @@
         "crates/domain/tests/serde_contracts/module_paths.rs"
       ],
       "externalCallers": [
-        "crates/persistence-postgres/tests/postgres_integration.rs"
+        "crates/persistence-postgres/tests/postgres_integration.rs",
+        "crates/persistence-postgres/tests/rule_package_repository_contract.rs"
       ],
       "databaseMappings": []
     },
