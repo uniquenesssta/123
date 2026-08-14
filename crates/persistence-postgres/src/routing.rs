@@ -1,12 +1,10 @@
 use super::{
-    p4_records::register_competition_profile_in_tx, parse_competition_kind, sha256_json,
-    write_audit_event, PersistenceError, PersistenceResult, PostgresStore,
+    parse_competition_kind, sha256_json, write_audit_event, PersistenceError, PersistenceResult,
+    PostgresStore,
 };
-use chrono::Utc;
 use football_domain::{
     CompetitionBindingDraft, CompetitionBindingSummary, CompetitionKind, CompetitionProfile,
-    CompetitionProfileVersionDraft, ResolvedCompetitionContext, RouteDecision, RouteRequest,
-    RouteSource, RulePackageDraft, RulePackageSummary,
+    ResolvedCompetitionContext, RouteDecision, RouteRequest, RouteSource,
 };
 use football_model_api::ModelDescriptor;
 use serde::{Deserialize, Serialize};
@@ -39,161 +37,6 @@ impl PostgresStore {
         .await?;
         tx.commit().await?;
         Ok(registration)
-    }
-
-    pub async fn register_rule_package(
-        &self,
-        descriptor: &ModelDescriptor,
-        draft: &RulePackageDraft,
-    ) -> PersistenceResult<RulePackageSummary> {
-        let manifest = serde_json::to_value(draft)?;
-        let content_sha256 = sha256_json(&manifest)?;
-        let profile = serde_json::to_value(&draft.competition_profile)?;
-        let routing = serde_json::to_value(&draft.routing)?;
-        let mut tx = self.pool.begin().await?;
-        let source_document_id = register_rule_source_document(&mut tx, draft).await?;
-        let registration = register_model_in_tx(
-            &mut tx,
-            descriptor,
-            &draft.routing.model_version,
-            &draft.routing.parameter_version,
-            &draft.parameters,
-        )
-        .await?;
-        let competition_profile = register_competition_profile_in_tx(
-            &mut tx,
-            &CompetitionProfileVersionDraft {
-                profile_key: draft.competition_profile.profile_id.clone(),
-                version: draft.version.clone(),
-                name: draft.competition_profile.name.clone(),
-                competition_kind: draft.competition_profile.competition_kind,
-                definition: profile.clone(),
-                metadata: json!({
-                    "rule_package_key": draft.package_key,
-                    "rule_package_version": draft.version,
-                }),
-            },
-        )
-        .await?;
-
-        let generated_id = Uuid::new_v4();
-        let inserted: Option<Uuid> = sqlx::query_scalar(
-            r#"
-            INSERT INTO model.rule_packages (
-                id, package_key, version, display_name, competition_kind,
-                content_sha256, manifest, profile, routing,
-                feature_requirements, output_contract,
-                model_version_id, parameter_set_id, source_document_id, priority, format_version,
-                competition_profile_id, status
-            ) VALUES (
-                $1, $2, $3, $4, $5,
-                $6, $7, $8, $9,
-                $10, $11,
-                $12, $13, $14, $15, $16,
-                $17, 'active'
-            )
-            ON CONFLICT (package_key, version) DO NOTHING
-            RETURNING id
-            "#,
-        )
-        .bind(generated_id)
-        .bind(&draft.package_key)
-        .bind(&draft.version)
-        .bind(&draft.display_name)
-        .bind(draft.competition_profile.competition_kind.as_str())
-        .bind(&content_sha256)
-        .bind(&manifest)
-        .bind(&profile)
-        .bind(&routing)
-        .bind(&draft.feature_requirements)
-        .bind(&draft.output_contract)
-        .bind(registration.model_version_id)
-        .bind(registration.parameter_set_id)
-        .bind(source_document_id)
-        .bind(draft.routing.priority)
-        .bind(&draft.format_version)
-        .bind(competition_profile.id)
-        .fetch_optional(&mut *tx)
-        .await?;
-
-        let was_inserted = inserted.is_some();
-        let package_id = if let Some(id) = inserted {
-            id
-        } else {
-            let row = sqlx::query(
-                r#"
-                SELECT id, content_sha256, competition_profile_id
-                FROM model.rule_packages
-                WHERE package_key = $1 AND version = $2
-                "#,
-            )
-            .bind(&draft.package_key)
-            .bind(&draft.version)
-            .fetch_one(&mut *tx)
-            .await?;
-            let existing_hash: String = row.try_get("content_sha256")?;
-            if existing_hash != content_sha256 {
-                return Err(PersistenceError::InvalidState(format!(
-                    "规则包 {}@{} 已存在但内容不同；请创建新版本",
-                    draft.package_key, draft.version
-                )));
-            }
-            let id: Uuid = row.try_get("id")?;
-            let existing_profile_id: Option<Uuid> = row.try_get("competition_profile_id")?;
-            match existing_profile_id {
-                Some(existing) if existing != competition_profile.id => {
-                    return Err(PersistenceError::InvalidState(format!(
-                        "规则包 {}@{} 已绑定不同赛事Profile版本",
-                        draft.package_key, draft.version
-                    )));
-                }
-                None => {
-                    sqlx::query(
-                        "UPDATE model.rule_packages SET competition_profile_id = $2 WHERE id = $1 AND competition_profile_id IS NULL",
-                    )
-                    .bind(id)
-                    .bind(competition_profile.id)
-                    .execute(&mut *tx)
-                    .await?;
-                }
-                Some(_) => {}
-            }
-            id
-        };
-
-        if was_inserted {
-            write_audit_event(
-                &mut tx,
-                "rule_package_registered",
-                "rule_package",
-                Some(package_id.to_string()),
-                json!({
-                    "package_key": &draft.package_key,
-                    "version": &draft.version,
-                    "model_id": &draft.routing.model_id,
-                    "competition_kind": draft.competition_profile.competition_kind,
-                    "content_sha256": &content_sha256,
-                }),
-            )
-            .await?;
-        }
-        tx.commit().await?;
-
-        Ok(RulePackageSummary {
-            id: package_id,
-            format_version: draft.format_version.clone(),
-            package_key: draft.package_key.clone(),
-            version: draft.version.clone(),
-            display_name: draft.display_name.clone(),
-            competition_kind: draft.competition_profile.competition_kind,
-            model_id: draft.routing.model_id.clone(),
-            model_version: draft.routing.model_version.clone(),
-            parameter_version: draft.routing.parameter_version.clone(),
-            priority: draft.routing.priority,
-            content_sha256,
-            status: "active".to_string(),
-            created_at: Utc::now(),
-        })
     }
 
     pub async fn ensure_type_default_binding(
@@ -268,26 +111,6 @@ impl PostgresStore {
         .await?;
         tx.commit().await?;
         Ok(id)
-    }
-
-    pub async fn list_rule_packages(&self) -> PersistenceResult<Vec<RulePackageSummary>> {
-        let rows = sqlx::query(
-            r#"
-            SELECT
-                rp.id, rp.format_version, rp.package_key, rp.version, rp.display_name,
-                rp.competition_kind, d.model_key, v.version AS model_version,
-                p.parameter_version, rp.priority, rp.content_sha256,
-                rp.status, rp.created_at
-            FROM model.rule_packages rp
-            JOIN model.versions v ON v.id = rp.model_version_id
-            JOIN model.definitions d ON d.id = v.model_id
-            JOIN model.parameter_sets p ON p.id = rp.parameter_set_id
-            ORDER BY rp.created_at DESC, rp.package_key, rp.version
-            "#,
-        )
-        .fetch_all(&self.pool)
-        .await?;
-        rows.iter().map(rule_package_summary_from_row).collect()
     }
 
     pub async fn create_competition_binding(
@@ -512,48 +335,7 @@ impl PostgresStore {
     }
 }
 
-async fn register_rule_source_document(
-    tx: &mut Transaction<'_, sqlx::Postgres>,
-    draft: &RulePackageDraft,
-) -> PersistenceResult<Option<Uuid>> {
-    let Some(source) = &draft.source_document else {
-        return Ok(None);
-    };
-    let Some(content_sha256) = source
-        .content_sha256
-        .as_deref()
-        .filter(|value| !value.trim().is_empty())
-    else {
-        return Ok(None);
-    };
-
-    let generated_id = Uuid::new_v4();
-    let id: Uuid = sqlx::query_scalar(
-        r#"
-        INSERT INTO catalog.source_documents (
-            id, source_type, source_uri, content_sha256, accessed_at, metadata
-        ) VALUES ($1, 'competition_rule_standard', $2, $3, now(), $4)
-        ON CONFLICT (content_sha256) DO UPDATE SET
-            source_uri = COALESCE(catalog.source_documents.source_uri, EXCLUDED.source_uri),
-            metadata = catalog.source_documents.metadata || EXCLUDED.metadata
-        RETURNING id
-        "#,
-    )
-    .bind(generated_id)
-    .bind(source.source_uri.as_deref())
-    .bind(content_sha256)
-    .bind(json!({
-        "title": &source.title,
-        "notes": &source.notes,
-        "package_key": &draft.package_key,
-        "package_version": &draft.version,
-    }))
-    .fetch_one(&mut **tx)
-    .await?;
-    Ok(Some(id))
-}
-
-async fn register_model_in_tx(
+pub(crate) async fn register_model_in_tx(
     tx: &mut Transaction<'_, sqlx::Postgres>,
     descriptor: &ModelDescriptor,
     model_version: &str,
@@ -792,26 +574,6 @@ fn route_decision_from_row(
         output_contract: row.try_get("output_contract")?,
         priority,
         reason,
-    })
-}
-
-fn rule_package_summary_from_row(
-    row: &sqlx::postgres::PgRow,
-) -> PersistenceResult<RulePackageSummary> {
-    Ok(RulePackageSummary {
-        id: row.try_get("id")?,
-        format_version: row.try_get("format_version")?,
-        package_key: row.try_get("package_key")?,
-        version: row.try_get("version")?,
-        display_name: row.try_get("display_name")?,
-        competition_kind: parse_competition_kind(&row.try_get::<String, _>("competition_kind")?)?,
-        model_id: row.try_get("model_key")?,
-        model_version: row.try_get("model_version")?,
-        parameter_version: row.try_get("parameter_version")?,
-        priority: row.try_get("priority")?,
-        content_sha256: row.try_get("content_sha256")?,
-        status: row.try_get("status")?,
-        created_at: row.try_get("created_at")?,
     })
 }
 

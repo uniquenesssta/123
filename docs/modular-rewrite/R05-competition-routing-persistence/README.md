@@ -11,8 +11,8 @@ R4 Persistence 基础设施已完成并通过阶段出口。R5 仅按 Competitio
 - R4 `DONE`；完成记录：[`../R04-persistence-foundation/R04-stage-completion.md`](../R04-persistence-foundation/R04-stage-completion.md)。
 - R4 最终 closeout HEAD：`615dc952491d5e0e21d4979292cbf5170eedece6`。
 - 该 HEAD 的 canonical Public Platform CI run `31768264193` / Windows automated delivery gate job `94668577704` 为 `SUCCESS`。
-- R5 stage 分支 `rewrite/r5-competition-routing-persistence` 当前已完成 R5-01 closeout，R5-02 从 `c8f3ba0f35ccec1f2795328fe887c622a5b8a0f6` 精确建立。
-- R5-01 closeout HEAD canonical Public Platform CI run `31779160119` 为 `SUCCESS`。
+- R5 stage 分支 `rewrite/r5-competition-routing-persistence` 当前已完成 R5-02 closeout；R5-03 从最终验证基线 `bcd17c78dde89c999d7666fa41e7267f609c6a33` 精确建立。
+- R5-02 最终 closeout canonical Public Platform CI run `31798978218` / job `94762276340` 为 `SUCCESS`。
 - R3 Competition / Rules Ports 已冻结；0001–0046 migration 继续冻结。
 
 ## 任务状态
@@ -21,7 +21,7 @@ R4 Persistence 基础设施已完成并通过阶段出口。R5 仅按 Competitio
 |---|---|---|
 | R5-01 | Competitions Repository | DONE |
 | R5-02 | Seasons / Stages / Rounds | DONE |
-| R5-03 | Rule Packages | READY |
+| R5-03 | Rule Packages | VERIFYING |
 | R5-04 | Competition Bindings | BLOCKED |
 | R5-05 | Route Resolution Reads | BLOCKED |
 | R5-06 | Model Run Identity Reads | BLOCKED |
@@ -43,9 +43,19 @@ R4 Persistence 基础设施已完成并通过阶段出口。R5 仅按 Competitio
 - 第四轮 hard gate run `31794402789` / job `94748190282` 为 `SUCCESS`：R5-01/R5-02 ownership、完整 architecture、模型保护、rustfmt、Persistence/Application check、Persistence tests、Application tests、同一份 PostgreSQL 16 hierarchy contract 全部通过。
 - PR #27 clean CI run `31794818136` / job `94749470982` 为 `SUCCESS`，固定 clean head `89f164821e8f8157ab8a4804cf1d026a40ab8932` 已 squash merge 为 `baf307fcb733659385f83f187ee343184946ee9d`；merged stage CI run `31796688330` / job `94755204665` 亦为 `SUCCESS`。PR artifact `9217614243` SHA-256 `e1adc3016f71f1c563b9fd0d29721a9f04452cccfe5661f6bb5be52924f7601a`，stage artifact `9218314804` SHA-256 `80e836c4012524ac66a21b085b86bebcd4f3fdf4661594d636050fb753f98d65`。
 
+## R5-03 当前事实
+
+- 详细记录：[`R05-03-rule-packages.md`](R05-03-rule-packages.md)。
+- Rule Package 的 register/list、source document upsert 与 Row mapping 已从旧 `crates/persistence-postgres/src/routing.rs` 拆入 `adapters/rules/packages/`；transaction、package insert、existing conflict read、profile attach、source upsert、typed Row 与 Domain Mapper 均为独立职责文件。
+- 旧 `routing.rs` 已删除全部 R5-03 owner，不保留转发壳；R5-04 Binding、R5-05 Route Resolution 与 R5-06 Model Run Identity 仍未提前迁移。共享 `register_model_in_tx` 仅提升为 crate 内可见供 Rule Package 事务复用。
+- old owner PostgreSQL 16 contract run `31810196287` / job `94798701210` 为 `SUCCESS`；new owner 同一 contract run `31811073556` / job `94801559817` 亦为 `SUCCESS`。
+- owner-switch 首次 run `31810593242` 因 source helper 可见性 E0364/E0603 停止且未产生生产切换提交；repair run `31810761979` 的代码修正成功但 Action 写 workflow 被 GitHub App 权限阻止；V2 run `31810913317` / job `94801046458` 完成真实编译、专项 verifier 与生产 owner 切换并 `SUCCESS`。
+- official inventory run `31811229904` / job `94802081839` 为 `SUCCESS`；第一次 hard gate `31811298187` 在 architecture/model 通过后因新增 contract rustfmt 差异停止，后续正确跳过；format + inventory run `31811465209` / job `94802847771` 为 `SUCCESS`。
+- 第二轮 hard gate run `31811535324` / job `94803075524` 为 `SUCCESS`：R5 ownership/full architecture、模型保护、rustfmt、Persistence/Application check、Persistence tests、Application tests 与同一 Rule Package PostgreSQL 16 contract 全部通过。
+
 ## 兼容与限制
 
 - Application Port、Tauri 命令/DTO、Schema、0001–0046 migration、配置、错误/日志语义、前端行为、路由算法、model identity、Cargo manifests/Cargo.lock、生产依赖和模型保护资产均未改变。
-- R5-02 未执行 destructive database reset，也未触碰用户数据库；专用 hierarchy contract 使用临时 PostgreSQL 16 测试数据库。
-- 既有 `postgres_integration.rs` 18 个 ignored broad PostgreSQL tests 未在 R5-02 执行；未执行 destructive database reset，未触碰用户数据库。clean PR 与 merged stage canonical Windows Automated 均已通过。
-- R5-02 已正式关闭为 `DONE`，R5-03 已开放为 `READY`；本次 closeout 文档 HEAD 必须先通过 canonical Public Platform CI，才可作为 R5-03 的起始基线。
+- R5-03 未执行 destructive database reset，也未触碰用户数据库；专用 Rule Package contract 使用临时 PostgreSQL 16 测试数据库。
+- 既有 `postgres_integration.rs` 18 个 ignored broad PostgreSQL tests 未在 R5-03 执行。
+- R5-03 当前保持 `VERIFYING`；需先清理所有 transient `.github/workflows/r5-03-*`、确认最终净 diff，再完成 clean PR canonical CI、固定 HEAD merge、merged stage CI 与最终 closeout canonical CI，之后才开放 R5-04 `READY`。
