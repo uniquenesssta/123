@@ -103,3 +103,5 @@ if "阶段标记 `VERIFYING`" in stage_completion.read_text(encoding="utf-8"):
 if "31730498450" not in root_readme.read_text(encoding="utf-8"):
     raise SystemExit("root README missing final closeout CI")
 print("R4 docs correction prepared; final net diff is exactly five documentation files.")
+
+# Trigger update after workflow exists; no semantic change.
