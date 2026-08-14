@@ -20,8 +20,8 @@ R4 Persistence 基础设施已完成并通过阶段出口。R5 仅按 Competitio
 | 任务 | 范围 | 状态 |
 |---|---|---|
 | R5-01 | Competitions Repository | DONE |
-| R5-02 | Seasons / Stages / Rounds | VERIFYING |
-| R5-03 | Rule Packages | BLOCKED |
+| R5-02 | Seasons / Stages / Rounds | DONE |
+| R5-03 | Rule Packages | READY |
 | R5-04 | Competition Bindings | BLOCKED |
 | R5-05 | Route Resolution Reads | BLOCKED |
 | R5-06 | Model Run Identity Reads | BLOCKED |
@@ -41,11 +41,11 @@ R4 Persistence 基础设施已完成并通过阶段出口。R5 仅按 Competitio
 - 第一轮 hard gate `31793915203` 因 canonical rustfmt 停止；第二轮 `31794033828` 正确发现 rustfmt 后 domain inventory digest 漂移；第三轮 `31794195852` 在 architecture/model/rustfmt 通过后暴露内部 re-export visibility E0364/E0365。上述问题均按硬门禁修复，没有弱化检查。
 - official inventory generator 最终 refresh run `31794365962` / job `94748073290` 为 `SUCCESS`。
 - 第四轮 hard gate run `31794402789` / job `94748190282` 为 `SUCCESS`：R5-01/R5-02 ownership、完整 architecture、模型保护、rustfmt、Persistence/Application check、Persistence tests、Application tests、同一份 PostgreSQL 16 hierarchy contract 全部通过。
-- 当前仍为 `VERIFYING`；下一步仅做临时 workflow 清理、root README/净 diff、clean PR canonical CI、固定 HEAD merge 和 merged stage CI，不提前进入 R5-03。
+- PR #27 clean CI run `31794818136` / job `94749470982` 为 `SUCCESS`，固定 clean head `89f164821e8f8157ab8a4804cf1d026a40ab8932` 已 squash merge 为 `baf307fcb733659385f83f187ee343184946ee9d`；merged stage CI run `31796688330` / job `94755204665` 亦为 `SUCCESS`。PR artifact `9217614243` SHA-256 `e1adc3016f71f1c563b9fd0d29721a9f04452cccfe5661f6bb5be52924f7601a`，stage artifact `9218314804` SHA-256 `80e836c4012524ac66a21b085b86bebcd4f3fdf4661594d636050fb753f98d65`。
 
 ## 兼容与限制
 
 - Application Port、Tauri 命令/DTO、Schema、0001–0046 migration、配置、错误/日志语义、前端行为、路由算法、model identity、Cargo manifests/Cargo.lock、生产依赖和模型保护资产均未改变。
 - R5-02 未执行 destructive database reset，也未触碰用户数据库；专用 hierarchy contract 使用临时 PostgreSQL 16 测试数据库。
-- 既有 `postgres_integration.rs` 18 个 ignored broad PostgreSQL tests 未在 R5-02 执行；clean PR CI、workspace Clippy/tests、Windows Automated、固定 HEAD 合并和 merged stage CI 尚待完成。
-- R5-02 只有在全部最终门禁成功、临时 workflow 清理、README/节点记录收口后才可 `DONE`；届时才开放 R5-03 `READY`。
+- 既有 `postgres_integration.rs` 18 个 ignored broad PostgreSQL tests 未在 R5-02 执行；未执行 destructive database reset，未触碰用户数据库。clean PR 与 merged stage canonical Windows Automated 均已通过。
+- R5-02 已正式关闭为 `DONE`，R5-03 已开放为 `READY`；本次 closeout 文档 HEAD 必须先通过 canonical Public Platform CI，才可作为 R5-03 的起始基线。

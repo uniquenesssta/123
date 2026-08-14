@@ -2,9 +2,9 @@
 
 ## 状态
 
-`VERIFYING`
+`DONE`
 
-R5-02 的生产 owner 切换和节点 hard gate 已完成；当前等待临时验证文件清理、最终净 diff、clean PR canonical CI、固定 HEAD 合并与 merged stage CI。在这些收口门禁全部成功前不得标记 `DONE`。
+R5-02 的生产 owner 切换、契约冻结、节点 hard gate、clean PR canonical CI、固定 HEAD 合并与 merged stage CI 均已完成；R5-02 正式关闭为 `DONE`，R5-03 开放为 `READY`。本次 closeout 文档提交仍需通过 canonical Public Platform CI 后，才可作为 R5-03 的起始基线。
 
 ## 基线与分支
 
@@ -164,12 +164,13 @@ run `31794402789` / job `94748190282`：`SUCCESS`。
 
 因此节点级最小验证、R5/R4 架构边界、模型保护、Persistence/Application 编译与单测、旧/新 owner PostgreSQL 契约已具有真实通过证据。
 
-## 当前未执行项与限制
+## 未执行项与剩余风险
 
-- clean PR Public Platform CI 尚未执行。
-- workspace Clippy `-D warnings`、workspace tests、Windows frontend/Tauri Automated 需要由 clean PR canonical CI 对最终净 HEAD 执行。
-- 既有 `postgres_integration.rs` 18 个 ignored broad PostgreSQL tests 未在本节点执行；R5-02 不进行 destructive database reset。
-- 未对用户数据库执行写入；契约仅使用临时 PostgreSQL 16 测试数据库。
+- 既有 `postgres_integration.rs` 18 个 ignored broad PostgreSQL tests 未在 R5-02 执行；本节点未执行 destructive database reset，也未触碰用户数据库。
+- PR #27 clean Public Platform CI run `31794818136` / Windows automated delivery gate job `94749470982` 为 `SUCCESS`；artifact `9217614243`，13,911,724 bytes，SHA-256 `e1adc3016f71f1c563b9fd0d29721a9f04452cccfe5661f6bb5be52924f7601a`。
+- PR #27 按固定 clean head `89f164821e8f8157ab8a4804cf1d026a40ab8932` squash merge，stage merge commit 为 `baf307fcb733659385f83f187ee343184946ee9d`。
+- 合并后 Public Platform CI run `31796688330` / Windows automated delivery gate job `94755204665` 为 `SUCCESS`；artifact `9218314804`，13,911,443 bytes，SHA-256 `80e836c4012524ac66a21b085b86bebcd4f3fdf4661594d636050fb753f98d65`。
+- clean PR 与 merged stage 的 Windows Automated 已覆盖 canonical frontend、workspace Rust/Clippy/tests、Tauri release/runtime 验收；未使用较弱替代结果冒充 canonical 通过。
 
 ## 当前变更分类
 
@@ -208,11 +209,4 @@ run `31794402789` / job `94748190282`：`SUCCESS`。
 
 ## 下一状态门禁
 
-只有在以下全部成立后才可改为 `DONE`：
-
-1. transient workflow 全部清理，最终净 diff 无验证 helper。
-2. root README 与本记录/阶段索引与最终事实一致。
-3. clean PR canonical Public Platform CI 在固定 HEAD 上通过。
-4. 固定 HEAD 合并到 `rewrite/r5-competition-routing-persistence`。
-5. merged stage CI 通过。
-6. 最终 closeout HEAD 再次通过 canonical Public Platform CI，之后 R5-03 才可开放为 `READY`。
+R5-02 的 clean PR CI、固定 HEAD merge 与 merged stage CI 已全部完成，节点状态为 `DONE`；R5-03 现可按任务书进入 `READY`。本次 closeout 仅修改文档，最终 stage closeout HEAD 仍需通过 canonical Public Platform CI 后，才可作为 R5-03 的起始基线。
