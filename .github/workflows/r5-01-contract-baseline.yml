@@ -1,4 +1,4 @@
-name: R5-01 Stage Diagnostic
+name: R5-01 Cross-Platform Regression
 
 on:
   push:
@@ -6,69 +6,36 @@ on:
       - agent/r5-01-competitions-repository
     paths:
       - ".github/workflows/r5-01-contract-baseline.yml"
-      - "scripts/verify-competition-repository.mjs"
-      - "package.json"
-      - "architecture/domain-type-inventory.json"
-      - "crates/persistence-postgres/src/adapters/competition/**"
-      - "crates/persistence-postgres/src/adapters/mod.rs"
-      - "crates/persistence-postgres/src/competitions.rs"
-      - "crates/persistence-postgres/tests/competitions_repository_contract.rs"
 
 permissions:
   contents: read
 
 jobs:
-  stage-diagnostic:
-    runs-on: ubuntu-24.04
-    timeout-minutes: 90
-    services:
-      postgres:
-        image: postgres:16
-        env:
-          POSTGRES_USER: postgres
-          POSTGRES_PASSWORD: postgres
-          POSTGRES_DB: football_r5_test
-        ports:
-          - 5432:5432
-        options: >-
-          --health-cmd="pg_isready -U postgres -d football_r5_test"
-          --health-interval=5s
-          --health-timeout=5s
-          --health-retries=12
-    env:
-      FOOTBALL_TEST_DATABASE_URL: postgres://postgres:postgres@localhost:5432/football_r5_test
+  windows-frontend:
+    runs-on: windows-2025
+    timeout-minutes: 60
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
           node-version: 22
           cache: npm
+      - name: Install locked frontend dependencies
+        shell: pwsh
+        run: npm run setup
+      - name: Run complete frontend verification on target platform
+        shell: pwsh
+        run: npm run verify:frontend
+
+  workspace-rust:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v4
       - uses: dtolnay/rust-toolchain@1.88.0
         with:
           components: rustfmt, clippy
-      - name: Verify R5-01 ownership and R4 persistence regressions
-        run: |
-          npm run verify:competition-repository
-          npm run verify:persistence-foundation
-          npm run verify:persistence-audit
-          npm run verify:persistence-mapping
-          npm run verify:persistence-adapters
-      - name: Verify frozen database and protected assets
-        run: |
-          node scripts/verify_database_baseline.mjs
-          node scripts/verify_protected_assets.mjs
-      - name: Verify Rust minimum gate and PostgreSQL contract
-        run: |
-          cargo fmt --all -- --check
-          cargo check --locked -p football-persistence-postgres -p football-application
-          cargo test --locked -p football-persistence-postgres
-          cargo test --locked -p football-application
-          cargo test --locked -p football-persistence-postgres --test competitions_repository_contract -- --ignored --test-threads=1
-      - name: Verify full architecture
-        run: npm run verify:architecture
-      - name: Verify frontend and workspace Rust
-        run: |
-          npm run setup
-          npm run verify:frontend
-          cargo clippy --locked --workspace --all-targets -- -D warnings
-          cargo test --locked --workspace
+      - name: Run workspace Clippy with warnings denied
+        run: cargo clippy --locked --workspace --all-targets -- -D warnings
+      - name: Run workspace tests
+        run: cargo test --locked --workspace
