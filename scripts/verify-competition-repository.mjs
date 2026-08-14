@@ -1,3 +1,4 @@
+import "./verify-rule-package-repository.mjs";
 import "./verify-competition-hierarchy.mjs";
 import fs from "node:fs";
 import path from "node:path";
