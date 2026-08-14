@@ -1,103 +1,12 @@
-use super::{
-    parse_competition_kind, write_audit_event, PersistenceError, PersistenceResult, PostgresStore,
-};
+use super::{parse_competition_kind, PersistenceError, PersistenceResult, PostgresStore};
 use football_domain::{
-    CompetitionDraft, CompetitionKind, CompetitionRecord, ResolvedCompetitionContext, RoundDraft,
-    RoundRecord, SeasonDraft, SeasonRecord, StageDraft, StageRecord,
+    CompetitionKind, ResolvedCompetitionContext, RoundDraft, RoundRecord, SeasonDraft,
+    SeasonRecord, StageDraft, StageRecord,
 };
-use serde_json::json;
 use sqlx::Row;
 use uuid::Uuid;
 
 impl PostgresStore {
-    pub async fn create_competition(
-        &self,
-        draft: &CompetitionDraft,
-    ) -> PersistenceResult<CompetitionRecord> {
-        let id = Uuid::new_v4();
-        let row = sqlx::query(
-            r#"
-            INSERT INTO football.competitions (
-                id, code, name, country_code, timezone, competition_kind, metadata
-            ) VALUES ($1, $2, $3, $4, $5, $6, $7)
-            RETURNING id, code, name, country_code, timezone,
-                      competition_kind, is_active, metadata, created_at
-            "#,
-        )
-        .bind(id)
-        .bind(draft.code.trim())
-        .bind(draft.name.trim())
-        .bind(draft.country_code.as_deref())
-        .bind(draft.timezone.trim())
-        .bind(draft.competition_kind.as_str())
-        .bind(&draft.metadata)
-        .fetch_one(&self.pool)
-        .await?;
-        competition_record_from_row(&row)
-    }
-
-    pub async fn delete_competition(&self, id: Uuid) -> PersistenceResult<()> {
-        let mut tx = self.pool.begin().await?;
-        let competition_name: String = sqlx::query_scalar(
-            "SELECT name FROM football.competitions WHERE id = $1 AND is_active = true FOR UPDATE",
-        )
-        .bind(id)
-        .fetch_optional(&mut *tx)
-        .await?
-        .ok_or_else(|| PersistenceError::InvalidState("赛事不存在或已经删除".to_string()))?;
-        sqlx::query(
-            r#"
-            UPDATE football.competitions
-            SET is_active = false,
-                code = code || '-DELETED-' || left(id::text, 8),
-                metadata = metadata || jsonb_build_object(
-                    'deleted_at', now(),
-                    'original_code', code
-                ),
-                updated_at = now()
-            WHERE id = $1
-            "#,
-        )
-        .bind(id)
-        .execute(&mut *tx)
-        .await?;
-        sqlx::query("DELETE FROM football.external_entity_ids WHERE entity_type = 'competition' AND entity_id = $1")
-            .bind(id)
-            .execute(&mut *tx)
-            .await?;
-        sqlx::query(
-            "UPDATE model.competition_bindings SET is_active = false WHERE competition_id = $1",
-        )
-        .bind(id)
-        .execute(&mut *tx)
-        .await?;
-        write_audit_event(
-            &mut tx,
-            "competition_deleted",
-            "competition",
-            Some(id.to_string()),
-            json!({"name": competition_name, "deletion_mode": "soft_delete"}),
-        )
-        .await?;
-        tx.commit().await?;
-        Ok(())
-    }
-
-    pub async fn read_competition(&self, id: Uuid) -> PersistenceResult<CompetitionRecord> {
-        let row = sqlx::query(
-            r#"
-            SELECT id, code, name, country_code, timezone,
-                   competition_kind, is_active, metadata, created_at
-            FROM football.competitions
-            WHERE id = $1 AND is_active = true
-            "#,
-        )
-        .bind(id)
-        .fetch_one(&self.pool)
-        .await?;
-        competition_record_from_row(&row)
-    }
-
     pub async fn resolve_competition_context(
         &self,
         competition_id: Option<Uuid>,
@@ -182,21 +91,6 @@ impl PostgresStore {
             stage_id: None,
             competition_kind: fallback_kind,
         })
-    }
-
-    pub async fn list_competitions(&self) -> PersistenceResult<Vec<CompetitionRecord>> {
-        let rows = sqlx::query(
-            r#"
-            SELECT id, code, name, country_code, timezone,
-                   competition_kind, is_active, metadata, created_at
-            FROM football.competitions
-            WHERE is_active = true
-            ORDER BY COALESCE((metadata->>'sort_order')::integer, 999999), name, code
-            "#,
-        )
-        .fetch_all(&self.pool)
-        .await?;
-        rows.iter().map(competition_record_from_row).collect()
     }
 
     pub async fn create_season(&self, draft: &SeasonDraft) -> PersistenceResult<SeasonRecord> {
@@ -369,22 +263,6 @@ impl PostgresStore {
         .await?;
         round_record_from_row(&row)
     }
-}
-
-fn competition_record_from_row(
-    row: &sqlx::postgres::PgRow,
-) -> PersistenceResult<CompetitionRecord> {
-    Ok(CompetitionRecord {
-        id: row.try_get("id")?,
-        code: row.try_get("code")?,
-        name: row.try_get("name")?,
-        country_code: row.try_get("country_code")?,
-        timezone: row.try_get("timezone")?,
-        competition_kind: parse_competition_kind(&row.try_get::<String, _>("competition_kind")?)?,
-        is_active: row.try_get("is_active")?,
-        metadata: row.try_get("metadata")?,
-        created_at: row.try_get("created_at")?,
-    })
 }
 
 fn season_record_from_row(row: &sqlx::postgres::PgRow) -> PersistenceResult<SeasonRecord> {
