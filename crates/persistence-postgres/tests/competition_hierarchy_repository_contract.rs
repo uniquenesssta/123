@@ -143,7 +143,7 @@ async fn season_stage_round_contract_is_preserved() {
             season_id: first_season.id,
             code: "  PLAYOFF  ".to_string(),
             name: "  Playoff  ".to_string(),
-            stage_kind: CompetitionKind::Knockout,
+            stage_kind: CompetitionKind::KnockoutTwoLeg,
             sequence_no: 2,
             rules: json!({"legs": 2}),
         })
