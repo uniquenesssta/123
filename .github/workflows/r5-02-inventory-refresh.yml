@@ -36,4 +36,4 @@ jobs:
           git commit -m "chore(r5-02): refresh domain type inventory"
           git push origin HEAD:agent/r5-02-seasons-stages-rounds
 
-# Refreshed again after canonical rustfmt changed the Rust usage digest.
+# Refreshed after the module-private visibility correction changed the Rust usage digest.
