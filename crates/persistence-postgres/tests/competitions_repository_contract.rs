@@ -103,13 +103,12 @@ async fn competition_directory_and_detail_contract_is_preserved() {
         .iter()
         .any(|record| record.id == created.id));
 
-    let row = sqlx::query(
-        "SELECT code, is_active, metadata FROM football.competitions WHERE id = $1",
-    )
-    .bind(created.id)
-    .fetch_one(&database.pool)
-    .await
-    .expect("核对软删除后的数据库事实");
+    let row =
+        sqlx::query("SELECT code, is_active, metadata FROM football.competitions WHERE id = $1")
+            .bind(created.id)
+            .fetch_one(&database.pool)
+            .await
+            .expect("核对软删除后的数据库事实");
     let deleted_code: String = row.try_get("code").expect("读取软删除 code");
     let is_active: bool = row.try_get("is_active").expect("读取 is_active");
     let metadata: serde_json::Value = row.try_get("metadata").expect("读取 metadata");

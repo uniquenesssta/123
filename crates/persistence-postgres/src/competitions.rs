@@ -1,7 +1,7 @@
 use super::{parse_competition_kind, PersistenceError, PersistenceResult, PostgresStore};
 use football_domain::{
-    CompetitionKind, ResolvedCompetitionContext, RoundDraft, RoundRecord, SeasonDraft, SeasonRecord,
-    StageDraft, StageRecord,
+    CompetitionKind, ResolvedCompetitionContext, RoundDraft, RoundRecord, SeasonDraft,
+    SeasonRecord, StageDraft, StageRecord,
 };
 use sqlx::Row;
 use uuid::Uuid;
