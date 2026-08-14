@@ -1,0 +1,39 @@
+name: R5-02 Hierarchy Contract Baseline
+
+on:
+  push:
+    branches:
+      - agent/r5-02-seasons-stages-rounds
+    paths:
+      - "crates/persistence-postgres/tests/competition_hierarchy_repository_contract.rs"
+      - ".github/workflows/r5-02-hierarchy-contract-baseline.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  hierarchy-contract:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: football_r5_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd="pg_isready -U postgres -d football_r5_test"
+          --health-interval=5s
+          --health-timeout=5s
+          --health-retries=12
+    env:
+      FOOTBALL_TEST_DATABASE_URL: postgres://postgres:postgres@localhost:5432/football_r5_test
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@1.88.0
+      - name: Run frozen R5-02 hierarchy contract
+        shell: bash
+        run: cargo test --locked -p football-persistence-postgres --test competition_hierarchy_repository_contract -- --ignored --test-threads=1
