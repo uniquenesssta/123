@@ -23,7 +23,7 @@ R4 Persistence 基础设施已完成并通过阶段出口。R5 仅按 Competitio
 | R5-02 | Seasons / Stages / Rounds | DONE |
 | R5-03 | Rule Packages | DONE |
 | R5-04 | Competition Bindings | DONE |
-| R5-05 | Route Resolution Reads | READY |
+| R5-05 | Route Resolution Reads | VERIFYING |
 | R5-06 | Model Run Identity Reads | BLOCKED |
 
 ## R5-01 当前事实
@@ -68,7 +68,16 @@ R4 Persistence 基础设施已完成并通过阶段出口。R5 仅按 Competitio
 - 第二轮 stage hard gate run `31862969585` / job `94959376165` 为 `SUCCESS`：完整 architecture、public/protected model boundary、rustfmt、Persistence/Application check/tests 与同一 PostgreSQL 16 Binding contract 全部通过。
 - PR #29 clean CI run `31863321636` / job `94960259474` 为 `SUCCESS`，artifact `9241585461` SHA-256 `d61179bab3a46f4457636d411c9f09325145fa4cc3e69110d166f7814a2e4a5a`；固定 head `e63d3adbed3ddf8cce5d7486a47d2ce6cc4d9bb9` 已 squash merge 为 `eabf3939216f43dbd91839223c1e3c34c3872406`。
 - merged stage CI run `31864520861` / job `94963336422` 为 `SUCCESS`，artifact `9241894657` SHA-256 `d3b3a43eff2f2a574fd4847533bb43b20eee961086a13ad2a3f17d34848bbe4e`；R5-04 正式关闭为 `DONE`，R5-05 开放为 `READY`。
-- R5-04 当前保持 `VERIFYING`；需清理 transient workflow、完成 clean PR canonical CI、固定 HEAD merge、merged stage CI 与最终 closeout canonical CI 后，才可标记 `DONE` 并开放 R5-05 `READY`。
+
+## R5-05 当前事实
+
+- 详细记录：[`R05-05-route-resolution-reads.md`](R05-05-route-resolution-reads.md)。
+- Route Resolution / Competition Context persistence 已收敛到 `adapters/competition/route_resolution/{context,route}/`；coordinator、typed Row、Domain Mapper、Stage/Season context read、explicit package read、binding candidate read 与 scope validation 按职责拆分。
+- legacy `competitions.rs` 已删除；legacy `routing.rs` 已删除 R5-05 route owner，只保留 R5-06 model registration，且未创建 `model_run_identity/`。
+- old-owner PostgreSQL 16 contract run `31869022228` / job `94974599427` 与 owner-switch/new-owner run `31869137395` / job `94974903779` 均为 `SUCCESS`；同一 contract 冻结 hierarchy context、route specificity/fallback、有效期、模型过滤、显式包、错误与 reason 字段。
+- ownership gate run `31869503602` / job `94975820076` 与 official inventory run `31869537207` / job `94975903916` 均为 `SUCCESS`。
+- 第一轮 hard gate `31869573253` 因 R4-03 旧 mapping verifier 读取已删除 legacy path 而 fail-fast；更新 call-path 后，第二轮 run `31869727870` / job `94976380579` 为 `SUCCESS`，完整 architecture、模型保护、rustfmt、Persistence/Application check/tests 与同一 PostgreSQL contract 全部通过。
+- R5-05 当前为 `VERIFYING`，R5-06 继续 `BLOCKED`；clean PR 与合并后/final canonical Windows 门禁尚未完成。
 
 ## 兼容与限制
 
