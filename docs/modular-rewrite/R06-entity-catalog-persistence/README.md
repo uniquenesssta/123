@@ -38,10 +38,12 @@ R6 按 Teams、Players、Coaches、Formations、Abilities、Dynamic Tags、Avail
 - 第一次 ownership/inventory run `31888670048` / job `95021554565` 在 R6-01 verifier、Domain inventory、模型保护均通过后，由旧 R4-02 Audit verifier 的 legacy create-team call-path 停止；仅更新 verifier owner 路径并保持同 transaction audit 原子性检查。
 - 第二次 ownership/inventory run `31888800801` / job `95021851053` 为 `SUCCESS`：official inventory、R6-01 ownership、模型保护、完整 architecture、rustfmt、Persistence/Application check、Persistence unit tests 与同一 PostgreSQL contract 全部通过；verified HEAD `b2999e5dce982bddf2093f0596eec33a7dbd0333`。
 - 临时 baseline/owner-switch/inventory workflow 与 helper 已从当前 branch tree 清理。
+- 阶段级 hard gate 最终 run `31889555412`：Windows job `95023694944` 与 PostgreSQL/architecture job `95023694946` 均 `SUCCESS`；frontend、rustfmt、workspace Clippy `-D warnings`、workspace tests、完整 architecture、模型保护、database baseline freeze 与同一 PG16 contract 已全部实际通过。
+- hard gate 前五轮均因旧 verifier 仍绑定已迁移的 Team owner 路径而 fail-fast；仅推进 verifier call-path 到新 owner，原契约均保持。当前只剩 clean PR/merge/merged-stage canonical 门禁。
 
 ## 当前边界与剩余门禁
 
 - 公共 TeamCatalogPort、Tauri command/DTO、Schema、0001–0046 migration、配置、错误语义、用户可观察行为、模型保护资产与生产依赖未改变。
-- R6-01 仍需阶段级 frontend/workspace Clippy/workspace tests、clean PR canonical、merge 与 merged-stage canonical；因此当前只能保持 `VERIFYING`。
+- R6-01 阶段级 frontend/workspace Rust hard gate 已通过；当前仅剩 clean PR canonical、merge 与 merged-stage canonical，因此仍保持 `VERIFYING`。
 - R6-02 继续 `BLOCKED`，直到 R6-01 完整收口为 `DONE`。
 - 每个节点完成时必须创建对应 `R06-xx` 实施记录并更新本索引；R6 完成时必须创建 `R06-stage-completion.md`。

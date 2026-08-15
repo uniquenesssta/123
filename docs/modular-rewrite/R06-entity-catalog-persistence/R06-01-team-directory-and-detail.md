@@ -4,7 +4,7 @@
 
 `VERIFYING`
 
-生产 owner 已完成切换，专项 PostgreSQL 契约、R6-01 ownership gate、Domain inventory、模型保护、完整 architecture、rustfmt、Persistence/Application check 与 Persistence unit tests 已通过。当前仍需完成阶段级 frontend/workspace Rust hard gate、clean PR、merge 与 merged-stage canonical gate；在这些门禁完成前不得标记为 `DONE`。
+生产 owner 已完成切换，专项 PostgreSQL 契约、R6-01 ownership/inventory/architecture gate 与阶段级 frontend/workspace Rust hard gate 均已实际通过。当前仅剩 clean PR、merge 与 merged-stage canonical gate；在这些门禁完成前状态保持 `VERIFYING`。
 
 ## 基线与分支
 
@@ -144,7 +144,17 @@ crates/persistence-postgres/src/adapters/catalog/
 
 该 run 提交正式 ownership/inventory wiring：`b2999e5dce982bddf2093f0596eec33a7dbd0333`；临时 baseline/owner-switch/inventory workflows 与 helper 均已从当前 branch tree 清理。
 
-## 当前净变更清单（阶段级 hard gate 前）
+## 阶段级 hard gate
+
+阶段级 gate 始终 fail-fast；只有确认真实 owner 已迁移且原契约语义仍需保持时才推进 verifier call-path，没有删除检查、扩大白名单或降低门禁。
+
+前五轮失败均保留：run `31889047691` 停在旧 global-name-search owner 统计；run `31889120709` 停在旧 team-player-management detail source；run `31889255910` 停在旧 entity-relationships team-history source；run `31889343316` 停在旧 database-reset TeamRecord mapper；run `31889463684` 停在旧 entity-resource-center squad localization source。各次修复只将对应 verifier 指向 R6-01 新 owner，并保留原搜索、详情、历史、reset、localized-name 与审计契约。
+
+最终 hard gate run `31889555412` 全部 `SUCCESS`：Windows job `95023694944` 的 `npm run verify:frontend`、`cargo fmt --all -- --check`、workspace Clippy `-D warnings` 与 workspace tests 全部通过；Ubuntu job `95023694946` 的 R6-01 ownership、完整 architecture、模型保护、database baseline freeze 与同一 PostgreSQL 16 contract 全部通过。验证源码 HEAD 为 `051afcd9b08cdb57b862251ae4a66c9a6c5bd203`。
+
+因此 R6-01 的最小验证、阶段 frontend、workspace Rust、architecture、模型保护、数据库静态 baseline 与真实 PostgreSQL 16 专项契约均已有成功证据。
+
+## 当前净变更清单（clean PR 前）
 
 ### 新增
 
@@ -189,6 +199,11 @@ crates/persistence-postgres/src/adapters/catalog/
 - `crates/persistence-postgres/src/team_catalog.rs`
 - `package.json`
 - `scripts/verify-persistence-audit.mjs`
+- `scripts/verify-global-name-search.mjs`
+- `scripts/verify-team-player-management.mjs`
+- `scripts/verify-entity-relationships.mjs`
+- `scripts/verify-database-reset.mjs`
+- `scripts/verify-entity-resource-center.mjs`
 - `README.md`（本节点同步）
 - `docs/modular-rewrite/R06-entity-catalog-persistence/README.md`（本节点同步）
 
@@ -202,21 +217,19 @@ crates/persistence-postgres/src/adapters/catalog/
 
 ## 未执行项与剩余门禁
 
-当前尚未宣称以下项目通过：
+阶段级 hard gate 已全部实际通过。当前尚未宣称以下项目通过：
 
-- `npm run verify:frontend` 的阶段级回归。
-- `cargo clippy --locked --workspace --all-targets -- -D warnings`。
-- `cargo test --locked --workspace`。
 - clean PR canonical Public Platform CI。
 - squash merge 与 merged-stage canonical Public Platform CI。
 - 用户现有 PostgreSQL 数据库写入/真实数据 sample 验收。
 - Windows Full 人工交互验收。
 
-上述 hard gate 完成并补充到本记录、根 README 与阶段 README 后，R6-01 才能从 `VERIFYING` 进入 `DONE`。
+用户现有数据库与 Windows Full 不属于云端 Automated 的替代项，继续作为明确未执行事实保留；PR/merge 两项完成前，R6-01 只能保持 `VERIFYING`。
 
 ## 回退点
 
 - 节点起点：R5 final closeout `7512ee805fcba8cac3c8f334680f200d625808c0`。
 - 当前可验证 owner-switch 核心提交：`5056917bd5c0e81aaaa96d1ef70c7362ef874820`。
-- 当前 ownership/inventory verified HEAD：`b2999e5dce982bddf2093f0596eec33a7dbd0333`。
+- ownership/inventory verified HEAD：`b2999e5dce982bddf2093f0596eec33a7dbd0333`。
+- stage hard-gate verified HEAD：`051afcd9b08cdb57b862251ae4a66c9a6c5bd203`。
 - 如需回退，不复制旧 methods 形成双实现；通过 Git 回退到节点起点/最近通过门禁的原子提交并重跑 R6-01 PostgreSQL contract 与 architecture gate。
