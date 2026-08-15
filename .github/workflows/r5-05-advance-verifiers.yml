@@ -27,6 +27,14 @@ jobs:
           python - <<'PY'
           from pathlib import Path
 
+          route = Path('scripts/verify-route-resolution.mjs')
+          text = route.read_text(encoding='utf-8')
+          old_scope = 'check(scope.includes("赛事层级不一致") && scope.includes("{label}层级不一致"), "scope validation must preserve hierarchy mismatch semantics");'
+          new_scope = 'check(scope.includes("{label}层级不一致") && scope.includes("Some(Uuid::new_v4())"), "scope validation must preserve generic hierarchy mismatch semantics and mismatch coverage");'
+          if old_scope not in text:
+              raise SystemExit('R5-05 scope verifier assertion not found')
+          route.write_text(text.replace(old_scope, new_scope, 1), encoding='utf-8')
+
           repo = Path('scripts/verify-competition-repository.mjs')
           text = repo.read_text(encoding='utf-8')
           text = text.replace(
