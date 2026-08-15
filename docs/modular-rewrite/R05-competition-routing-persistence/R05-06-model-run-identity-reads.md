@@ -4,7 +4,7 @@
 
 ## 1. 节点目标与当前结论
 
-R5-06 将 Model Run Identity 读取与模型注册持久化职责从 legacy `crates/persistence-postgres/src/routing.rs` 收敛到唯一模块目录 `crates/persistence-postgres/src/adapters/competition/model_run_identity/`。当前源码、专项 PostgreSQL 16 契约与 canonical Windows 全链验证均已通过；节点仍保持 `VERIFYING`，等待文档同步、clean PR、stage merge 与 merged-stage canonical CI 完成后再关闭为 `DONE`。
+R5-06 将 Model Run Identity 读取与模型注册持久化职责从 legacy `crates/persistence-postgres/src/routing.rs` 收敛到唯一模块目录 `crates/persistence-postgres/src/adapters/competition/model_run_identity/`。当前源码、专项 PostgreSQL 16 契约与 canonical Windows 全链验证均已通过，根 README 与阶段 README 已同步；节点仍保持 `VERIFYING`，等待文档 clean HEAD canonical CI、clean PR、stage merge 与 merged-stage canonical CI 完成后再关闭为 `DONE`。
 
 ## 2. 实际影响范围
 
@@ -103,7 +103,7 @@ adapters/competition/model_run_identity/
 - Rule Package registration 已改用新 crate 内 registration boundary。
 - persistence 顶层仍显式 re-export `ModelRegistration`，保持既有公共导出契约。
 - legacy `routing.rs` 已删除。
-- 所有临时 inventory / PostgreSQL workflow 已在验证后删除，最终源码树不保留临时 gate。
+- 所有临时 inventory / PostgreSQL / docs workflow 已在验证或同步后删除，最终树不保留临时 gate。
 
 ## 11. 专项验证与真实结果
 
@@ -138,9 +138,9 @@ clean source HEAD `dc6d2baf0f6092f67200214b5b45e37c528394ad` 的 Public Platform
 
 ## 13. 未执行项与剩余风险
 
-源码/专项契约/canonical clean-source CI 已完成。当前未完成项仅为发布流程：
+源码、专项契约、clean-source canonical CI、根 README 与阶段 README 同步已完成。当前未完成项仅为发布流程：
 
-- R5-06 文档同步后的 fixed clean HEAD canonical CI；
+- 文档同步后 fixed clean HEAD canonical CI；
 - clean PR CI；
 - squash merge 到 `rewrite/r5-competition-routing-persistence`；
 - merged-stage canonical CI；
@@ -165,8 +165,8 @@ R5-06 开始前已验证基线：`7d61d0f70d39966b44e1a5cc001b34c2788ea04d`。
 - typed Row / 独立 mapper / transaction / SQL responsibility：已完成。
 - 公共接口、错误、JSON、Schema、migration、模型行为兼容：保持不变。
 - PostgreSQL 16 专项契约：通过。
-- canonical Windows 全链：通过。
-- 根 README / 阶段 README：待本轮同步。
-- PR / merged-stage gate：待执行。
+- canonical Windows clean-source 全链：通过。
+- 根 README / 阶段 README：已同步。
+- 文档 clean HEAD / PR / merged-stage gate：待执行。
 
 **当前状态：`VERIFYING`，不得标记为 `DONE`。**
