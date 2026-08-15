@@ -1,3 +1,4 @@
+# R5-05 old-owner behavior freeze; remove before clean PR.
 name: R5-05 Old Owner Contract
 
 on:
