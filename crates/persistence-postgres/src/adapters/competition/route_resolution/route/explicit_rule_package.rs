@@ -22,7 +22,7 @@ pub(super) async fn read_explicit_rule_package(
             v.version AS model_version,
             p.id AS parameter_set_id, p.parameter_version, p.definition AS parameters,
             NULL::uuid AS competition_id, NULL::uuid AS season_id,
-            NULL::uuid AS stage_id, NULL::text AS competition_kind
+            NULL::uuid AS stage_id
         FROM model.rule_packages rp
         JOIN model.versions v ON v.id = rp.model_version_id
         JOIN model.definitions d ON d.id = v.model_id
