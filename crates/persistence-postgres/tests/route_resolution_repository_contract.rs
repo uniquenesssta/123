@@ -212,16 +212,14 @@ async fn route_resolution_repository_contract_is_preserved() {
     assert_eq!(competition_context.competition_id, Some(competition.id));
     assert_eq!(competition_context.season_id, None);
     assert_eq!(competition_context.stage_id, None);
-    assert_eq!(competition_context.competition_kind, CompetitionKind::League);
+    assert_eq!(
+        competition_context.competition_kind,
+        CompetitionKind::League
+    );
 
     let season_context = database
         .store
-        .resolve_competition_context(
-            None,
-            Some(season.id),
-            None,
-            CompetitionKind::KnockoutTwoLeg,
-        )
+        .resolve_competition_context(None, Some(season.id), None, CompetitionKind::KnockoutTwoLeg)
         .await
         .expect("赛季应补全赛事与赛事类型");
     assert_eq!(season_context.competition_id, Some(competition.id));
@@ -231,12 +229,7 @@ async fn route_resolution_repository_contract_is_preserved() {
 
     let stage_context = database
         .store
-        .resolve_competition_context(
-            None,
-            None,
-            Some(stage.id),
-            CompetitionKind::KnockoutTwoLeg,
-        )
+        .resolve_competition_context(None, None, Some(stage.id), CompetitionKind::KnockoutTwoLeg)
         .await
         .expect("阶段应补全赛事、赛季与阶段类型");
     assert_eq!(stage_context.competition_id, Some(competition.id));
@@ -256,7 +249,10 @@ async fn route_resolution_repository_contract_is_preserved() {
         .expect_err("提交赛事与赛季所属赛事不一致必须拒绝");
     match competition_mismatch {
         PersistenceError::InvalidState(message) => {
-            assert!(message.contains("赛事层级不一致"), "unexpected message: {message}");
+            assert!(
+                message.contains("赛事层级不一致"),
+                "unexpected message: {message}"
+            );
         }
         other => panic!("expected InvalidState, got {other:?}"),
     }
@@ -273,19 +269,17 @@ async fn route_resolution_repository_contract_is_preserved() {
         .expect_err("提交赛季与阶段所属赛季不一致必须拒绝");
     match season_mismatch {
         PersistenceError::InvalidState(message) => {
-            assert!(message.contains("赛季层级不一致"), "unexpected message: {message}");
+            assert!(
+                message.contains("赛季层级不一致"),
+                "unexpected message: {message}"
+            );
         }
         other => panic!("expected InvalidState, got {other:?}"),
     }
 
     let default_binding_id = database
         .store
-        .ensure_type_default_binding(
-            package.id,
-            CompetitionKind::League,
-            5,
-            "R5-05 type default",
-        )
+        .ensure_type_default_binding(package.id, CompetitionKind::League, 5, "R5-05 type default")
         .await
         .expect("创建 R5-05 类型默认绑定");
     let competition_binding = database
@@ -355,10 +349,22 @@ async fn route_resolution_repository_contract_is_preserved() {
     assert_eq!(stage_route.package_display_name, package.display_name);
     assert_eq!(stage_route.model_id, descriptor.model_id);
     assert_eq!(stage_route.priority, 1);
-    assert_eq!(stage_route.parameters, json!({"contract": "r5-05", "alpha": 0.55}));
-    assert_eq!(stage_route.feature_requirements, json!({"required": ["lineup", "availability"]}));
-    assert_eq!(stage_route.output_contract, json!({"schema": "r5-05-output"}));
-    assert_eq!(stage_route.competition_profile.competition_kind, CompetitionKind::League);
+    assert_eq!(
+        stage_route.parameters,
+        json!({"contract": "r5-05", "alpha": 0.55})
+    );
+    assert_eq!(
+        stage_route.feature_requirements,
+        json!({"required": ["lineup", "availability"]})
+    );
+    assert_eq!(
+        stage_route.output_contract,
+        json!({"schema": "r5-05-output"})
+    );
+    assert_eq!(
+        stage_route.competition_profile.competition_kind,
+        CompetitionKind::League
+    );
     assert_eq!(stage_route.routing.model_id, descriptor.model_id);
     assert_eq!(stage_route.reason["source"], json!("stage_binding"));
     assert_eq!(stage_route.reason["binding_id"], json!(stage_binding.id));
@@ -366,7 +372,10 @@ async fn route_resolution_repository_contract_is_preserved() {
     assert_eq!(stage_route.reason["competition_id"], json!(competition.id));
     assert_eq!(stage_route.reason["season_id"], json!(season.id));
     assert_eq!(stage_route.reason["stage_id"], json!(stage.id));
-    assert_eq!(stage_route.reason["competition_kind"], json!(CompetitionKind::League));
+    assert_eq!(
+        stage_route.reason["competition_kind"],
+        json!(CompetitionKind::League)
+    );
     assert_eq!(stage_route.reason["preferred_model_family"], json!("p4"));
     assert_eq!(stage_route.reason["preferred_model_id"], json!(null));
     assert_eq!(stage_route.reason["priority"], json!(1));
@@ -459,11 +468,23 @@ async fn route_resolution_repository_contract_is_preserved() {
     assert_eq!(explicit_route.binding_id, None);
     assert_eq!(explicit_route.rule_package_id, package.id);
     assert_eq!(explicit_route.priority, 41);
-    assert_eq!(explicit_route.reason["source"], json!("explicit_rule_package"));
+    assert_eq!(
+        explicit_route.reason["source"],
+        json!("explicit_rule_package")
+    );
     assert_eq!(explicit_route.reason["binding_id"], json!(null));
-    assert_eq!(explicit_route.reason["competition_id"], json!(explicit_request.competition_id));
-    assert_eq!(explicit_route.reason["season_id"], json!(explicit_request.season_id));
-    assert_eq!(explicit_route.reason["stage_id"], json!(explicit_request.stage_id));
+    assert_eq!(
+        explicit_route.reason["competition_id"],
+        json!(explicit_request.competition_id)
+    );
+    assert_eq!(
+        explicit_route.reason["season_id"],
+        json!(explicit_request.season_id)
+    );
+    assert_eq!(
+        explicit_route.reason["stage_id"],
+        json!(explicit_request.stage_id)
+    );
     assert_eq!(
         explicit_route.reason["competition_kind"],
         json!(CompetitionKind::KnockoutTwoLeg)
