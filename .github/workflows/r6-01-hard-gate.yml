@@ -1,6 +1,6 @@
 name: R6-01 Stage Hard Gate
 
-# Retry after advancing the global name-search verifier to the R6-01 Team Directory owners.
+# Retry after advancing team-management detail checks to the R6-01 detail owners.
 on:
   push:
     branches:
