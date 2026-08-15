@@ -14,87 +14,18 @@ jobs:
   closeout:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout stage branch
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
         with:
           ref: rewrite/r6-entity-catalog-persistence
           fetch-depth: 0
-      - name: Record R6-01 completion and open R6-02
-        shell: bash
+      - name: Apply verified closeout
+        run: python scripts/r6-01-closeout.py
+      - name: Commit closeout
         run: |
-          python - <<'PY'
-          from pathlib import Path
-
-          node = Path('docs/modular-rewrite/R06-entity-catalog-persistence/R06-01-team-directory-and-detail.md')
-          text = node.read_text(encoding='utf-8')
-          text = text.replace('`VERIFYING`', '`DONE`', 1)
-          old = '生产 owner 已完成切换，专项 PostgreSQL 契约、R6-01 ownership/inventory/architecture gate 与阶段级 frontend/workspace Rust hard gate 均已实际通过。当前仅剩 clean PR、merge 与 merged-stage canonical gate；在这些门禁完成前状态保持 `VERIFYING`。'
-          new = '生产 owner 已完成切换；专项 PostgreSQL 契约、ownership/inventory/architecture、阶段级 frontend/workspace Rust hard gate、clean PR canonical 与 merged-stage canonical 均已实际通过。R6-01 正式收口为 `DONE`，R6-02 可进入 `READY`。'
-          if old not in text:
-              raise SystemExit('R6-01 status paragraph marker missing')
-          text = text.replace(old, new, 1)
-          marker = '因此 R6-01 的最小验证、阶段 frontend、workspace Rust、architecture、模型保护、数据库静态 baseline 与真实 PostgreSQL 16 专项契约均已有成功证据。\n\n'
-          addition = marker + '## Clean PR 与 merged-stage canonical\n\n- PR #32 以 clean head `58ec21b48b26ead4f2ee2fec15573c39a2f7ab8b` 进入 `rewrite/r6-entity-catalog-persistence`，PR canonical Public Platform CI run `31890099520` 为 `SUCCESS`。\n- PR #32 已按 squash merge 合并，最终代码 merge commit 为 `a54df5ca2695297ea5866a3efd74643239568825`。\n- merged-stage canonical Public Platform CI run `31892105125` / Windows job `95029805339` 为 `SUCCESS`；R1 architecture、Windows Automated acceptance 与 validation evidence upload 均通过。\n- merged-stage artifact `9249127034`，SHA-256 `972be4e32272e700da265f6e82ce96bc5e56aa356491bb217d6a1076e1b00087`。\n\n'
-          if marker not in text:
-              raise SystemExit('R6-01 hard gate completion marker missing')
-          text = text.replace(marker, addition, 1)
-          old_remaining = '''## 未执行项与剩余门禁
-
-阶段级 hard gate 已全部实际通过。当前尚未宣称以下项目通过：
-
-- clean PR canonical Public Platform CI。
-- squash merge 与 merged-stage canonical Public Platform CI。
-- 用户现有 PostgreSQL 数据库写入/真实数据 sample 验收。
-- Windows Full 人工交互验收。
-
-用户现有数据库与 Windows Full 不属于云端 Automated 的替代项，继续作为明确未执行事实保留；PR/merge 两项完成前，R6-01 只能保持 `VERIFYING`。'''
-          new_remaining = '''## 未执行项与剩余限制
-
-R6-01 的代码、专项契约、阶段回归、clean PR 与 merged-stage canonical 已全部通过，节点正式 `DONE`。仍未执行且不被云端 Automated 替代的外部/人工验证：
-
-- 未对用户现有 PostgreSQL 数据库执行写入或真实数据 sample 验收。
-- 未执行 Windows Full 人工交互验收。
-
-上述两项作为明确限制保留，不影响本 Atomic Task 的云端代码与契约收口结论。'''
-          if old_remaining not in text:
-              raise SystemExit('R6-01 remaining gates marker missing')
-          text = text.replace(old_remaining, new_remaining, 1)
-          rollback_marker = '- stage hard-gate verified HEAD：`051afcd9b08cdb57b862251ae4a66c9a6c5bd203`。'
-          if rollback_marker in text:
-              text = text.replace(rollback_marker, rollback_marker + '\n- R6-01 final stage merge commit：`a54df5ca2695297ea5866a3efd74643239568825`。', 1)
-          node.write_text(text, encoding='utf-8', newline='\n')
-
-          stage = Path('docs/modular-rewrite/R06-entity-catalog-persistence/README.md')
-          text = stage.read_text(encoding='utf-8')
-          text = text.replace('| R6-01 | Team Directory 与 Detail | VERIFYING |', '| R6-01 | Team Directory 与 Detail | DONE |', 1)
-          text = text.replace('| R6-02 | Team Names 与 Profiles | BLOCKED |', '| R6-02 | Team Names 与 Profiles | READY |', 1)
-          stage_marker = '- hard gate 前五轮均因旧 verifier 仍绑定已迁移的 Team owner 路径而 fail-fast；仅推进 verifier call-path 到新 owner，原契约均保持。当前只剩 clean PR/merge/merged-stage canonical 门禁。'
-          stage_replacement = '- hard gate 前五轮均因旧 verifier 仍绑定已迁移的 Team owner 路径而 fail-fast；仅推进 verifier call-path 到新 owner，原契约均保持。\n- PR #32 clean head `58ec21b48b26ead4f2ee2fec15573c39a2f7ab8b` 的 canonical run `31890099520` 为 `SUCCESS`；squash merge commit `a54df5ca2695297ea5866a3efd74643239568825`。\n- merged-stage canonical run `31892105125` / Windows job `95029805339` 为 `SUCCESS`；artifact `9249127034`，SHA-256 `972be4e32272e700da265f6e82ce96bc5e56aa356491bb217d6a1076e1b00087`。R6-01 正式 `DONE`，R6-02 开放为 `READY`。'
-          if stage_marker not in text:
-              raise SystemExit('R6 stage closeout marker missing')
-          text = text.replace(stage_marker, stage_replacement, 1)
-          old_boundary = '- R6-01 阶段级 frontend/workspace Rust hard gate 已通过；当前仅剩 clean PR canonical、merge 与 merged-stage canonical，因此仍保持 `VERIFYING`。\n- R6-02 继续 `BLOCKED`，直到 R6-01 完整收口为 `DONE`。'
-          new_boundary = '- R6-01 已完成专项契约、阶段回归、clean PR、squash merge 与 merged-stage canonical，状态为 `DONE`。\n- R6-02 Team Names 与 Profiles 为当前唯一 `READY` 节点；后续节点继续 `BLOCKED`。'
-          if old_boundary not in text:
-              raise SystemExit('R6 stage boundary marker missing')
-          text = text.replace(old_boundary, new_boundary, 1)
-          stage.write_text(text, encoding='utf-8', newline='\n')
-
-          root = Path('README.md')
-          text = root.read_text(encoding='utf-8')
-          root_marker = '- 当前节点状态仍为 `VERIFYING`；只剩 clean PR、merge 与 merged-stage canonical gate。详细记录见 `docs/modular-rewrite/R06-entity-catalog-persistence/R06-01-team-directory-and-detail.md`。'
-          root_replacement = '- clean PR canonical run `31890099520` 为 `SUCCESS`；PR #32 已 squash merge 为 `a54df5ca2695297ea5866a3efd74643239568825`。merged-stage canonical run `31892105125` / Windows job `95029805339` 为 `SUCCESS`，artifact `9249127034`，SHA-256 `972be4e32272e700da265f6e82ce96bc5e56aa356491bb217d6a1076e1b00087`。\n- R6-01 已正式关闭为 `DONE`；未对用户现有 PostgreSQL 数据库执行写入/真实数据 sample 验收，也未宣称 Windows Full 人工交互验收已完成。R6-02 Team Names 与 Profiles 已开放为 `READY`。详细记录见 `docs/modular-rewrite/R06-entity-catalog-persistence/R06-01-team-directory-and-detail.md`。'
-          if root_marker not in text:
-              raise SystemExit('root README R6-01 closeout marker missing')
-          text = text.replace(root_marker, root_replacement, 1)
-          root.write_text(text, encoding='utf-8', newline='\n')
-
-          Path('.github/workflows/r6-01-closeout.yml').unlink(missing_ok=True)
-          PY
           git status --short
-          git config user.name 'github-actions[bot]'
-          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add -A
           git diff --cached --check
-          git commit -m 'docs(r6-01): close node and open r6-02'
+          git commit -m "docs(r6-01): close node and open r6-02"
           git push origin HEAD:rewrite/r6-entity-catalog-persistence
