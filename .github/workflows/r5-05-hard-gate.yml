@@ -1,0 +1,67 @@
+name: R5-05 Stage Hard Gate
+
+on:
+  push:
+    branches:
+      - agent/r5-05-route-resolution
+    paths:
+      - ".github/workflows/r5-05-hard-gate.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  hard-gate:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 90
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: football
+          POSTGRES_PASSWORD: football
+          POSTGRES_DB: football_r505
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U football -d football_r505"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 20
+    env:
+      FOOTBALL_TEST_DATABASE_URL: postgres://football:football@127.0.0.1:5432/football_r505
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - uses: dtolnay/rust-toolchain@1.88.0
+        with:
+          components: rustfmt,clippy
+      - name: Verify R5-01 through R5-05 ownership
+        run: node scripts/verify-competition-repository.mjs
+      - name: Full architecture gate
+        run: npm run verify:architecture
+      - name: Public model boundary
+        run: npm run verify:public-model-boundary
+      - name: Protected model assets unchanged
+        shell: bash
+        run: |
+          set -euo pipefail
+          git diff --exit-code 5a159e6ebcaeee0d25d833cd48042ffc9915a713 -- crates/model-api crates/model-p4 crates/model-p7
+      - name: Canonical rustfmt
+        run: cargo fmt --all -- --check
+      - name: Compile affected crates
+        run: cargo check --locked -p football-persistence-postgres -p football-application
+      - name: Persistence tests
+        run: cargo test --locked -p football-persistence-postgres
+      - name: Application tests
+        run: cargo test --locked -p football-application
+      - name: PostgreSQL route resolution contract
+        run: >-
+          cargo test --locked -p football-persistence-postgres
+          --test route_resolution_repository_contract
+          route_resolution_repository_contract_is_preserved
+          -- --ignored --exact --nocapture
