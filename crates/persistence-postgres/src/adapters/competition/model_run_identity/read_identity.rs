@@ -40,6 +40,9 @@ mod tests {
     #[test]
     fn sql_errors_keep_persistence_sqlx_semantics() {
         let error = PersistenceError::from(sqlx::Error::RowNotFound);
-        assert!(matches!(error, PersistenceError::Sqlx(sqlx::Error::RowNotFound)));
+        assert!(matches!(
+            error,
+            PersistenceError::Sqlx(sqlx::Error::RowNotFound)
+        ));
     }
 }
