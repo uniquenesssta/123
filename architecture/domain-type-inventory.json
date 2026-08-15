@@ -24,13 +24,13 @@
     "targetPublicExportPolicy": "explicit re-export only"
   },
   "sourceDigest": "217241ac243726a5ab6805a7f169e222b97e78c7c971749a5904714af673ebdd",
-  "rustUsageDigest": "d38e5878423c0c941e2aad42a93c4f6187a1f15afeeaa0a1e5829c14302af62c",
+  "rustUsageDigest": "f159e1c2537d3861b5e30cee9ffcabae04828f26a2a51f721eef926ea6d64e46",
   "summary": {
     "typeCount": 365,
     "publicCompatibilityTypeCount": 365,
     "internalTypeCount": 0,
     "domainSourceFileCount": 129,
-    "scannedRustFileCount": 748,
+    "scannedRustFileCount": 778,
     "databaseMappedTypeCount": 299,
     "byTargetModule": {
       "ai_workspace": 16,
@@ -3137,16 +3137,16 @@
       "externalCallers": [
         "crates/application/src/use_cases/ai_workspace/apply_operation/payload.rs",
         "crates/application/src/use_cases/prediction/shared/readiness_checks.rs",
+        "crates/persistence-postgres/src/adapters/catalog/teams/detail/squad_mapper.rs",
         "crates/persistence-postgres/src/match_exchange.rs",
         "crates/persistence-postgres/src/player_catalog.rs",
-        "crates/persistence-postgres/src/team_catalog.rs",
         "crates/persistence-postgres/src/team_lineup_presets.rs",
         "crates/spreadsheet-io/src/match_review_workbook.rs"
       ],
       "databaseMappings": [
+        "crates/persistence-postgres/src/adapters/catalog/teams/detail/squad_mapper.rs",
         "crates/persistence-postgres/src/match_exchange.rs",
         "crates/persistence-postgres/src/player_catalog.rs",
-        "crates/persistence-postgres/src/team_catalog.rs",
         "crates/persistence-postgres/src/team_lineup_presets.rs"
       ]
     },
@@ -8735,14 +8735,14 @@
         "crates/application/src/services/lineups/facade.rs",
         "crates/application/src/services/lineups/service.rs",
         "crates/application/src/use_cases/lineups/resolve_formation_distribution/mod.rs",
+        "crates/persistence-postgres/src/adapters/catalog/teams/detail/read_team.rs",
         "crates/persistence-postgres/src/formation_catalog.rs",
-        "crates/persistence-postgres/src/team_catalog.rs",
         "crates/persistence-postgres/tests/postgres_integration.rs",
         "src-tauri/src/commands/catalog.rs"
       ],
       "databaseMappings": [
-        "crates/persistence-postgres/src/formation_catalog.rs",
-        "crates/persistence-postgres/src/team_catalog.rs"
+        "crates/persistence-postgres/src/adapters/catalog/teams/detail/read_team.rs",
+        "crates/persistence-postgres/src/formation_catalog.rs"
       ]
     },
     {
@@ -9269,14 +9269,14 @@
         "crates/application/src/services/lineups/facade.rs",
         "crates/application/src/services/lineups/service.rs",
         "crates/application/src/use_cases/lineups/list_formation_usage_distributions/mod.rs",
+        "crates/persistence-postgres/src/adapters/catalog/teams/detail/read_team.rs",
         "crates/persistence-postgres/src/formation_catalog.rs",
-        "crates/persistence-postgres/src/team_catalog.rs",
         "crates/persistence-postgres/tests/postgres_integration.rs",
         "src-tauri/src/commands/catalog.rs"
       ],
       "databaseMappings": [
-        "crates/persistence-postgres/src/formation_catalog.rs",
-        "crates/persistence-postgres/src/team_catalog.rs"
+        "crates/persistence-postgres/src/adapters/catalog/teams/detail/read_team.rs",
+        "crates/persistence-postgres/src/formation_catalog.rs"
       ]
     },
     {
@@ -13651,17 +13651,17 @@
       ],
       "externalCallers": [
         "crates/application/src/use_cases/prediction/tests.rs",
+        "crates/persistence-postgres/src/adapters/catalog/teams/detail/recent_match_mapper.rs",
         "crates/persistence-postgres/src/match_exchange.rs",
         "crates/persistence-postgres/src/player_catalog.rs",
         "crates/persistence-postgres/src/review.rs",
-        "crates/persistence-postgres/src/team_catalog.rs",
         "crates/persistence-postgres/tests/postgres_integration.rs"
       ],
       "databaseMappings": [
+        "crates/persistence-postgres/src/adapters/catalog/teams/detail/recent_match_mapper.rs",
         "crates/persistence-postgres/src/match_exchange.rs",
         "crates/persistence-postgres/src/player_catalog.rs",
-        "crates/persistence-postgres/src/review.rs",
-        "crates/persistence-postgres/src/team_catalog.rs"
+        "crates/persistence-postgres/src/review.rs"
       ]
     },
     {
@@ -28550,11 +28550,11 @@
         "crates/application/src/services/teams/facade.rs",
         "crates/application/src/services/teams/service.rs",
         "crates/application/src/use_cases/teams/read_team/mod.rs",
-        "crates/persistence-postgres/src/team_catalog.rs",
+        "crates/persistence-postgres/src/adapters/catalog/teams/detail/read_team.rs",
         "src-tauri/src/commands/catalog.rs"
       ],
       "databaseMappings": [
-        "crates/persistence-postgres/src/team_catalog.rs"
+        "crates/persistence-postgres/src/adapters/catalog/teams/detail/read_team.rs"
       ]
     },
     {
@@ -28618,14 +28618,15 @@
         "crates/application/src/services/teams/service.rs",
         "crates/application/src/use_cases/teams/create_team/mod.rs",
         "crates/application/src/use_cases/teams/update_team/mod.rs",
-        "crates/persistence-postgres/src/player_catalog.rs",
-        "crates/persistence-postgres/src/team_catalog.rs",
+        "crates/persistence-postgres/src/adapters/catalog/teams/directory/create_team.rs",
+        "crates/persistence-postgres/src/adapters/catalog/teams/directory/update_team.rs",
         "crates/persistence-postgres/tests/postgres_integration.rs",
+        "crates/persistence-postgres/tests/team_directory_detail_repository_contract.rs",
         "src-tauri/src/commands/catalog.rs"
       ],
       "databaseMappings": [
-        "crates/persistence-postgres/src/player_catalog.rs",
-        "crates/persistence-postgres/src/team_catalog.rs"
+        "crates/persistence-postgres/src/adapters/catalog/teams/directory/create_team.rs",
+        "crates/persistence-postgres/src/adapters/catalog/teams/directory/update_team.rs"
       ]
     },
     {
@@ -29466,10 +29467,10 @@
         "crates/domain/tests/serde_contracts/module_paths.rs"
       ],
       "externalCallers": [
-        "crates/persistence-postgres/src/team_catalog.rs"
+        "crates/persistence-postgres/src/adapters/catalog/teams/directory/list_mapper.rs"
       ],
       "databaseMappings": [
-        "crates/persistence-postgres/src/team_catalog.rs"
+        "crates/persistence-postgres/src/adapters/catalog/teams/directory/list_mapper.rs"
       ]
     },
     {
@@ -29532,11 +29533,11 @@
         "crates/application/src/services/teams/facade.rs",
         "crates/application/src/services/teams/service.rs",
         "crates/application/src/use_cases/teams/list_teams/mod.rs",
-        "crates/persistence-postgres/src/team_catalog.rs",
+        "crates/persistence-postgres/src/adapters/catalog/teams/directory/list_teams.rs",
         "src-tauri/src/commands/catalog.rs"
       ],
       "databaseMappings": [
-        "crates/persistence-postgres/src/team_catalog.rs"
+        "crates/persistence-postgres/src/adapters/catalog/teams/directory/list_teams.rs"
       ]
     },
     {
@@ -29627,11 +29628,12 @@
         "crates/application/src/services/teams/facade.rs",
         "crates/application/src/services/teams/service.rs",
         "crates/application/src/use_cases/teams/list_teams/mod.rs",
-        "crates/persistence-postgres/src/team_catalog.rs",
+        "crates/persistence-postgres/src/adapters/catalog/teams/directory/list_teams.rs",
+        "crates/persistence-postgres/tests/team_directory_detail_repository_contract.rs",
         "src-tauri/src/commands/catalog.rs"
       ],
       "databaseMappings": [
-        "crates/persistence-postgres/src/team_catalog.rs"
+        "crates/persistence-postgres/src/adapters/catalog/teams/directory/list_teams.rs"
       ]
     },
     {
@@ -30414,6 +30416,7 @@
         "crates/application/src/use_cases/ai_workspace/apply_operation/dispatch.rs",
         "crates/application/src/use_cases/teams/add_team_name/mod.rs",
         "crates/persistence-postgres/src/team_catalog.rs",
+        "crates/persistence-postgres/tests/team_directory_detail_repository_contract.rs",
         "src-tauri/src/commands/catalog.rs"
       ],
       "databaseMappings": [
@@ -30493,10 +30496,14 @@
         "crates/application/src/services/teams/facade.rs",
         "crates/application/src/services/teams/service.rs",
         "crates/application/src/use_cases/teams/add_team_name/mod.rs",
+        "crates/persistence-postgres/src/adapters/catalog/teams/detail/name_mapper.rs",
+        "crates/persistence-postgres/src/adapters/catalog/teams/detail/read_names.rs",
         "crates/persistence-postgres/src/team_catalog.rs",
         "src-tauri/src/commands/catalog.rs"
       ],
       "databaseMappings": [
+        "crates/persistence-postgres/src/adapters/catalog/teams/detail/name_mapper.rs",
+        "crates/persistence-postgres/src/adapters/catalog/teams/detail/read_names.rs",
         "crates/persistence-postgres/src/team_catalog.rs"
       ]
     },
@@ -30564,11 +30571,13 @@
         "crates/application/src/services/teams/facade.rs",
         "crates/application/src/services/teams/service.rs",
         "crates/application/src/use_cases/teams/list_team_options/mod.rs",
-        "crates/persistence-postgres/src/player_catalog.rs",
+        "crates/persistence-postgres/src/adapters/catalog/teams/directory/list_team_options.rs",
+        "crates/persistence-postgres/src/adapters/catalog/teams/directory/option_mapper.rs",
         "src-tauri/src/commands/catalog.rs"
       ],
       "databaseMappings": [
-        "crates/persistence-postgres/src/player_catalog.rs"
+        "crates/persistence-postgres/src/adapters/catalog/teams/directory/list_team_options.rs",
+        "crates/persistence-postgres/src/adapters/catalog/teams/directory/option_mapper.rs"
       ]
     },
     {
@@ -31217,6 +31226,7 @@
         "crates/application/src/use_cases/ai_workspace/apply_operation/dispatch.rs",
         "crates/application/src/use_cases/teams/upsert_team_profile/mod.rs",
         "crates/persistence-postgres/src/team_catalog.rs",
+        "crates/persistence-postgres/tests/team_directory_detail_repository_contract.rs",
         "src-tauri/src/commands/catalog.rs"
       ],
       "databaseMappings": [
@@ -31340,10 +31350,14 @@
         "crates/application/src/services/teams/facade.rs",
         "crates/application/src/services/teams/service.rs",
         "crates/application/src/use_cases/teams/upsert_team_profile/mod.rs",
+        "crates/persistence-postgres/src/adapters/catalog/teams/detail/profile_mapper.rs",
+        "crates/persistence-postgres/src/adapters/catalog/teams/detail/read_profile.rs",
         "crates/persistence-postgres/src/team_catalog.rs",
         "src-tauri/src/commands/catalog.rs"
       ],
       "databaseMappings": [
+        "crates/persistence-postgres/src/adapters/catalog/teams/detail/profile_mapper.rs",
+        "crates/persistence-postgres/src/adapters/catalog/teams/detail/read_profile.rs",
         "crates/persistence-postgres/src/team_catalog.rs"
       ]
     },
@@ -31419,10 +31433,12 @@
         "crates/domain/tests/serde_contracts/module_paths.rs"
       ],
       "externalCallers": [
-        "crates/persistence-postgres/src/team_catalog.rs"
+        "crates/persistence-postgres/src/adapters/catalog/teams/detail/read_recent_matches.rs",
+        "crates/persistence-postgres/src/adapters/catalog/teams/detail/recent_match_mapper.rs"
       ],
       "databaseMappings": [
-        "crates/persistence-postgres/src/team_catalog.rs"
+        "crates/persistence-postgres/src/adapters/catalog/teams/detail/read_recent_matches.rs",
+        "crates/persistence-postgres/src/adapters/catalog/teams/detail/recent_match_mapper.rs"
       ]
     },
     {
@@ -31495,14 +31511,18 @@
         "crates/application/src/services/teams/service.rs",
         "crates/application/src/use_cases/teams/create_team/mod.rs",
         "crates/application/src/use_cases/teams/update_team/mod.rs",
-        "crates/persistence-postgres/src/player_catalog.rs",
-        "crates/persistence-postgres/src/team_catalog.rs",
+        "crates/persistence-postgres/src/adapters/catalog/teams/detail/read_team_record.rs",
+        "crates/persistence-postgres/src/adapters/catalog/teams/detail/record_mapper.rs",
+        "crates/persistence-postgres/src/adapters/catalog/teams/directory/create_team.rs",
+        "crates/persistence-postgres/src/adapters/catalog/teams/directory/update_team.rs",
         "crates/persistence-postgres/tests/postgres_integration.rs",
         "src-tauri/src/commands/catalog.rs"
       ],
       "databaseMappings": [
-        "crates/persistence-postgres/src/player_catalog.rs",
-        "crates/persistence-postgres/src/team_catalog.rs"
+        "crates/persistence-postgres/src/adapters/catalog/teams/detail/read_team_record.rs",
+        "crates/persistence-postgres/src/adapters/catalog/teams/detail/record_mapper.rs",
+        "crates/persistence-postgres/src/adapters/catalog/teams/directory/create_team.rs",
+        "crates/persistence-postgres/src/adapters/catalog/teams/directory/update_team.rs"
       ]
     },
     {
@@ -31583,10 +31603,12 @@
         "crates/domain/tests/serde_contracts/module_paths.rs"
       ],
       "externalCallers": [
-        "crates/persistence-postgres/src/team_catalog.rs"
+        "crates/persistence-postgres/src/adapters/catalog/teams/detail/read_squad.rs",
+        "crates/persistence-postgres/src/adapters/catalog/teams/detail/squad_mapper.rs"
       ],
       "databaseMappings": [
-        "crates/persistence-postgres/src/team_catalog.rs"
+        "crates/persistence-postgres/src/adapters/catalog/teams/detail/read_squad.rs",
+        "crates/persistence-postgres/src/adapters/catalog/teams/detail/squad_mapper.rs"
       ]
     },
     {
