@@ -74,6 +74,14 @@ jobs:
                   "use super::{map_team_list_row, TeamListRow};",
                   "use super::{list_mapper::map_team_list_row, list_row::TeamListRow};",
               ),
+              directory / "list_mapper.rs": (
+                  "use super::TeamListRow;",
+                  "use super::list_row::TeamListRow;",
+              ),
+              directory / "option_mapper.rs": (
+                  "use super::TeamOptionRow;",
+                  "use super::option_row::TeamOptionRow;",
+              ),
           }
           for path, (old, new) in replacements.items():
               text = path.read_text(encoding="utf-8")
