@@ -23,8 +23,8 @@ R4 Persistence 基础设施已完成并通过阶段出口。R5 仅按 Competitio
 | R5-02 | Seasons / Stages / Rounds | DONE |
 | R5-03 | Rule Packages | DONE |
 | R5-04 | Competition Bindings | DONE |
-| R5-05 | Route Resolution Reads | VERIFYING |
-| R5-06 | Model Run Identity Reads | BLOCKED |
+| R5-05 | Route Resolution Reads | DONE |
+| R5-06 | Model Run Identity Reads | READY |
 
 ## R5-01 当前事实
 
@@ -80,7 +80,15 @@ R4 Persistence 基础设施已完成并通过阶段出口。R5 仅按 Competitio
 - PR #30 首轮 fixed clean HEAD `bc93518f8436ee5175b4fea4af3bd32441c04e1d` 的 canonical run `31870124821` / job `94977359038` 在 Windows workspace Clippy `-D warnings` 因未使用的 typed `RouteRow.competition_kind` 失败；没有合并失败 tree。
 - 修复仅删除未消费 Row 字段与冗余 SELECT 返回列，保留 `b.competition_kind` WHERE 过滤和全部 route specificity/result 语义；official inventory refresh run `31870479459` / job `94978235169` 为 `SUCCESS`。
 - Ubuntu 专项 gate `31870518531` 在 architecture/rustfmt 通过后受 runner 缺 `glib-2.0` 系统库阻塞，workspace Clippy/PG contract 未完成；同一源码的 canonical Windows run `31870519567` / job `94978336960` 为 `SUCCESS`，artifact `9243579284` SHA-256 `a728b4806b18d034a34a79142dd926734e5461ece23f04ddf577039c7a1304e4`。
-- transient helper 已清理；R5-05 当前仍为 `VERIFYING`，R5-06 继续 `BLOCKED`。最终 clean PR canonical、固定 HEAD merge、merged stage CI 与 final closeout canonical Windows 门禁仍需完成。
+- R5-05 已按 fixed clean HEAD `879dd724e9bace058d86387b04e97cbdb67843b7` 通过 PR canonical run `31873912016` / job `94986637325`，并 squash merge 为 `d6b2d692dadbe546220eb0cb533bd9d4e207d230`；merged-stage canonical run `31875035071` / job `94989384122` 同样为 `SUCCESS`。R5-05 状态关闭为 `DONE`，R5-06 开放为 `READY`；本 closeout tree 仍需 canonical Public Platform CI 成功后才作为 R5-06 有效基线。
+
+## R5-05 正式收口
+
+- 最终 clean PR HEAD：`879dd724e9bace058d86387b04e97cbdb67843b7`；changed files 29，transient workflow 已全部清理。
+- PR #30 final clean canonical run `31873912016` / Windows job `94986637325`：`SUCCESS`；artifact `9244488927`，大小 `13929542` 字节，SHA-256 `4cc15be2916477ea56a80080090c18b033c8eab1e6cfd2a4f4da948d1b24b754`。
+- PR #30 使用 expected head `879dd724e9bace058d86387b04e97cbdb67843b7` squash merge；merge commit `d6b2d692dadbe546220eb0cb533bd9d4e207d230`，父提交精确为 R5-04 最终基线 `5a159e6ebcaeee0d25d833cd48042ffc9915a713`，tree 与 final clean PR tree 一致。
+- merged-stage canonical run `31875035071` / Windows job `94989384122`：`SUCCESS`；artifact `9244773760`，大小 `13928853` 字节，SHA-256 `f342644fd91e617331060360d47513a076594aa379f1e9e9493b287e2df97b08`。
+- R5-05 现关闭为 `DONE`，R5-06 开放为 `READY`。本次 closeout 文档提交形成的新 tree 仍必须通过 canonical Public Platform CI；只有该结果为 `SUCCESS`，此 tree 才可作为 R5-06 起始基线，本记录不预先宣称该结果。
 
 ## 兼容与限制
 

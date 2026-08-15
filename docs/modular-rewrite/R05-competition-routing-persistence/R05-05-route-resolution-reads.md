@@ -2,9 +2,9 @@
 
 ## 状态
 
-`VERIFYING`
+`DONE`
 
-R5-05 的 Route Resolution / Competition Context PostgreSQL persistence owner 已完成切换，并已通过旧/new owner 同一 PostgreSQL 16 contract、R5 ownership、official Domain inventory 与节点 hard gate。当前等待 clean PR canonical CI、固定 HEAD merge、merged stage CI 与最终 closeout canonical CI；这些完成前 R5-06 保持 `BLOCKED`。
+R5-05 的 Route Resolution / Competition Context PostgreSQL persistence owner 已完成切换，并已通过旧/new owner 同一 PostgreSQL 16 contract、R5 ownership、official Domain inventory、节点 hard gate、final clean PR canonical CI 与 merged-stage canonical CI；PR #30 已按固定 expected head squash merge。R5-05 状态关闭为 `DONE`，R5-06 开放为 `READY`。本 closeout 文档 tree 仍需一次 canonical Public Platform CI 成功后才是 R5-06 的有效起始基线。
 
 ## 基线与分支
 
@@ -82,6 +82,15 @@ crates/persistence-postgres/src/adapters/competition/route_resolution/
 - 同一修复源码随后由 canonical Public Platform CI run `31870519567` / Windows job `94978336960` 完成验证并为 `SUCCESS`；artifact `9243579284`，大小 `13929568` 字节，SHA-256 `a728b4806b18d034a34a79142dd926734e5461ece23f04ddf577039c7a1304e4`。该 run 证明 Windows architecture 与完整 automated acceptance（含 workspace Clippy/tests/Tauri release/runtime）通过。
 - 上述成功 run 对修复验证有效，但当时分支仍含临时修复 workflow；临时 workflow 已在随后提交中全部删除。R5-05 仍保持 `VERIFYING`，最终 clean HEAD 必须再次通过 canonical Public Platform CI 才允许 fixed-head merge。
 
+## Merge 与 closeout 证据
+
+- final clean PR HEAD：`879dd724e9bace058d86387b04e97cbdb67843b7`；最终 permanent diff 为 29 个文件，`.github/workflows` 仅保留长期 `ci.yml`。
+- final clean PR canonical Public Platform CI run `31873912016` / Windows job `94986637325`：`SUCCESS`。artifact `9244488927`，大小 `13929542` 字节，SHA-256 `4cc15be2916477ea56a80080090c18b033c8eab1e6cfd2a4f4da948d1b24b754`。
+- PR #30 从 draft 转为 ready 后，使用 `expected_head_sha=879dd724e9bace058d86387b04e97cbdb67843b7` squash merge 成功；merge commit `d6b2d692dadbe546220eb0cb533bd9d4e207d230`，父提交为 `5a159e6ebcaeee0d25d833cd48042ffc9915a713`，tree 与 final clean PR HEAD 一致。
+- merged-stage canonical Public Platform CI run `31875035071` / Windows job `94989384122`：`SUCCESS`。artifact `9244773760`，大小 `13928853` 字节，SHA-256 `f342644fd91e617331060360d47513a076594aa379f1e9e9493b287e2df97b08`。
+- 首轮 PR canonical Clippy 失败与后续修复均已在上节如实保留；失败 tree 从未合并。Ubuntu 专项 gate 的 `glib-2.0` 环境阻塞也继续作为未完成验证记录保留。
+- R5-05 关闭为 `DONE`，R5-06 开放为 `READY`。本 closeout 文档提交产生的新 tree 必须再通过 canonical Public Platform CI；只有该 CI 成功后，最终 stage HEAD 才可作为 R5-06 的有效起始基线，本记录不预先宣称该尚未执行的结果。
+
 ## 兼容性与未变范围
 
 未修改 Domain 公共类型、Application `RuleRoutingPort`、Application/Tauri 调用面、Schema、0001–0046 migration、配置、错误/日志等级、前端行为、route algorithm/result、model identity、Cargo manifests/Cargo.lock、生产依赖与模型保护资产。
@@ -94,4 +103,4 @@ crates/persistence-postgres/src/adapters/competition/route_resolution/
 
 ## 下一状态门禁
 
-R5-05 当前为 `VERIFYING`；只有 clean PR canonical CI、固定 HEAD merge、merged stage CI 与最终 closeout canonical CI 全部成功后，才可改为 `DONE` 并将 R5-06 改为 `READY`。
+R5-05 已在 final clean PR canonical CI 与 merged-stage canonical CI 成功后关闭为 `DONE`，R5-06 已开放为 `READY`；closeout 文档 tree 仍需 canonical Public Platform CI 成功后才可作为 R5-06 的有效起始基线。
