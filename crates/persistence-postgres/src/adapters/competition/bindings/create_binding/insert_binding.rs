@@ -1,5 +1,5 @@
 use chrono::{DateTime, Utc};
-use football_domain::{CompetitionKind, ResolvedCompetitionContext};
+use football_domain::ResolvedCompetitionContext;
 use sqlx::{Postgres, Transaction};
 use uuid::Uuid;
 
@@ -51,6 +51,3 @@ pub(super) async fn insert_binding(
 
     Ok(())
 }
-
-#[allow(dead_code)]
-fn _competition_kind_type_anchor(_: CompetitionKind) {}
