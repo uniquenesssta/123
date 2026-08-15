@@ -3,7 +3,6 @@ mod analytics;
 mod api_workspace;
 mod audit;
 mod competition_kind;
-mod competitions;
 mod dynamic_tags;
 mod entity_catalog;
 mod error;
