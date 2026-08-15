@@ -1,6 +1,6 @@
 name: R6-01 Stage Hard Gate
 
-# Retry after advancing entity-relationship team-history checks to the R6-01 detail coordinator.
+# Retry after advancing database-reset TeamRecord mapping checks to the typed R6-01 mapper.
 on:
   push:
     branches:
