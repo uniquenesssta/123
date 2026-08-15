@@ -1,0 +1,46 @@
+name: R5-05 Old Owner Contract
+
+on:
+  push:
+    branches:
+      - agent/r5-05-route-resolution
+    paths:
+      - ".github/workflows/r5-05-old-owner-contract.yml"
+      - "crates/persistence-postgres/tests/route_resolution_repository_contract.rs"
+
+permissions:
+  contents: read
+
+jobs:
+  old-owner-contract:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: football
+          POSTGRES_PASSWORD: football
+          POSTGRES_DB: football_r505
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U football -d football_r505"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 20
+    env:
+      FOOTBALL_TEST_DATABASE_URL: postgres://football:football@127.0.0.1:5432/football_r505
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@1.88.0
+        with:
+          components: rustfmt
+      - name: Canonical rustfmt gate
+        run: cargo fmt --all -- --check
+      - name: Old owner PostgreSQL route resolution contract
+        run: >-
+          cargo test --locked -p football-persistence-postgres
+          --test route_resolution_repository_contract
+          route_resolution_repository_contract_is_preserved
+          -- --ignored --exact --nocapture
