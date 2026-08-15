@@ -1,0 +1,43 @@
+name: R6-02 Inventory Refresh
+
+on:
+  push:
+    branches:
+      - agent/r6-02-team-names-profiles
+    paths:
+      - .github/workflows/r6-02-inventory-refresh.yml
+
+permissions:
+  contents: write
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: agent/r6-02-team-names-profiles
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20.19.0
+      - name: Regenerate official Domain inventory
+        run: node scripts/generate-domain-type-inventory.mjs
+      - name: Commit reviewed inventory drift
+        shell: bash
+        run: |
+          changed=$(git diff --name-only)
+          echo "$changed"
+          unexpected=$(printf '%s\n' "$changed" | grep -v '^architecture/domain-type-inventory.json$' || true)
+          if [ -n "$unexpected" ]; then
+            echo "Unexpected generated changes:"
+            echo "$unexpected"
+            exit 1
+          fi
+          rm .github/workflows/r6-02-inventory-refresh.yml
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git diff --cached --check
+          git commit -m "test(r6-02): refresh domain inventory"
+          git push origin HEAD:agent/r6-02-team-names-profiles
