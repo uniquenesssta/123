@@ -1,3 +1,4 @@
+import "./verify-competition-bindings.mjs";
 import "./verify-rule-package-repository.mjs";
 import "./verify-competition-hierarchy.mjs";
 import fs from "node:fs";
@@ -37,13 +38,14 @@ check(adapterMod.includes("mod competition;"), "Persistence adapters root must r
 const competitionMod = read(`${base}/mod.rs`);
 check(competitionMod.includes("mod detail;") && competitionMod.includes("mod directory;"), "competition/mod.rs must retain R5-01 directory/detail owners");
 check(competitionMod.includes("mod hierarchy;"), "competition/mod.rs must register the approved R5-02 hierarchy owner");
-check(!competitionMod.includes("rule_packages") && !competitionMod.includes("bindings") && !competitionMod.includes("route_resolution") && !competitionMod.includes("model_run_identity"), "R5-02 must not pre-implement R5-03 through R5-06 responsibilities");
+check(competitionMod.includes("mod bindings;"), "competition/mod.rs must register the approved R5-04 Binding owner");
+check(!competitionMod.includes("route_resolution") && !competitionMod.includes("model_run_identity"), "R5-04 must not pre-implement R5-05/R5-06 responsibilities");
 
 for (const method of ["create_competition", "read_competition", "list_competitions", "delete_competition"]) {
   check(!new RegExp(`pub\\s+async\\s+fn\\s+${method}\\b`).test(legacy), `Legacy competitions.rs still owns ${method}`);
 }
 check(!legacy.includes("competition_record_from_row"), "Legacy CompetitionRecord PgRow mapper must be removed");
-check(new RegExp(`pub\\s+async\\s+fn\\s+resolve_competition_context\\b`).test(legacy), "R5-02 must leave R5-05 resolve_competition_context in its current owner");
+check(new RegExp(`pub\\s+async\\s+fn\\s+resolve_competition_context\\b`).test(legacy), "R5-04 must leave R5-05 resolve_competition_context in its current owner");
 
 const row = read(`${base}/detail/record_row.rs`);
 const mapper = read(`${base}/detail/record_mapper.rs`);
@@ -80,11 +82,11 @@ for (const token of ["create_competition", "read_competition", "list_competition
 
 const packageJson = JSON.parse(read("package.json"));
 check(typeof packageJson.scripts["verify:competition-repository"] === "string", "package.json must expose verify:competition-repository");
-check(packageJson.scripts["verify:architecture"].includes("verify-competition-repository.mjs"), "verify:architecture must include the R5-01/R5-02 competition gate chain");
+check(packageJson.scripts["verify:architecture"].includes("verify-competition-repository.mjs"), "verify:architecture must include the R5 competition gate chain");
 
 if (failures.length) {
   console.error("R5-01 Competitions Repository verification failed:");
   failures.forEach((failure) => console.error(`- ${failure}`));
   process.exit(1);
 }
-console.log("R5-01 Competitions Repository verified: directory/detail remain unique Competition CRUD owners, typed Row/Mapper and delete SQL boundaries remain intact, and only the approved R5-02 hierarchy module has been added.");
+console.log("R5-01 Competitions Repository verified: directory/detail remain unique Competition CRUD owners, typed Row/Mapper and delete SQL boundaries remain intact, with approved hierarchy and Binding modules registered without pre-implementing R5-05/R5-06.");

@@ -33,23 +33,28 @@ for (const relative of [
 check(adaptersMod.includes("mod rules;"), "Persistence adapters root must register rules");
 check(rulesMod.includes("mod packages;"), "rules adapter root must register packages");
 for (const later of ["bindings", "route_resolution", "model_run_identity"]) {
-  check(!exists(`crates/persistence-postgres/src/adapters/rules/${later}`), `R5-03 must not pre-implement ${later}`);
+  check(!exists(`crates/persistence-postgres/src/adapters/rules/${later}`), `R5-03 rules adapter must not own later responsibility ${later}`);
 }
 
 for (const method of ["register_rule_package", "list_rule_packages"]) {
-  check(!new RegExp(`pub\s+async\s+fn\s+${method}\b`).test(legacy), `Legacy routing.rs still owns ${method}`);
+  check(!new RegExp(`pub\\s+async\\s+fn\\s+${method}\\b`).test(legacy), `Legacy routing.rs still owns ${method}`);
 }
 check(!legacy.includes("register_rule_source_document"), "Legacy routing.rs still owns source-document registration");
 check(!legacy.includes("rule_package_summary_from_row"), "Legacy routing.rs still owns dynamic RulePackage mapper");
-for (const retained of [
-  "register_model",
+
+// R5-04 is now the approved next node: Binding persistence must no longer remain in routing.rs.
+for (const migrated of [
   "ensure_type_default_binding",
   "create_competition_binding",
   "list_competition_bindings",
-  "resolve_route",
   "package_route_metadata",
-  "route_decision_from_row",
-]) check(legacy.includes(retained), `R5-03 must leave later/shared routing responsibility ${retained} in routing.rs`);
+]) check(!legacy.includes(migrated), `R5-04 Binding responsibility must be removed from routing.rs: ${migrated}`);
+check(exists("crates/persistence-postgres/src/adapters/competition/bindings/mod.rs"), "R5-04 Binding owner must exist in competition adapters");
+
+// R5-05/R5-06 remain blocked and therefore must stay in the legacy routing owner.
+for (const retained of ["register_model", "resolve_route", "route_decision_from_row"]) {
+  check(legacy.includes(retained), `R5-03/R5-04 must leave later/shared routing responsibility ${retained} in routing.rs`);
+}
 check(legacy.includes("pub(crate) async fn register_model_in_tx"), "shared model registration transaction helper must remain in routing owner with crate-only visibility");
 
 const row = read(`${base}/record_row.rs`);
@@ -90,4 +95,4 @@ if (failures.length) {
   failures.forEach((failure) => console.error(`- ${failure}`));
   process.exit(1);
 }
-console.log("R5-03 Rule Package Repository verified: package registration/list/source-document persistence has one typed owner; legacy package ownership is removed; R5-04 through R5-06 responsibilities remain untouched.");
+console.log("R5-03 Rule Package Repository verified: package registration/list/source-document persistence remains uniquely owned; R5-04 Binding ownership has moved out of routing.rs while R5-05 route resolution and R5-06 model registration remain untouched.");

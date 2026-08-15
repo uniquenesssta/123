@@ -22,7 +22,7 @@ R4 Persistence 基础设施已完成并通过阶段出口。R5 仅按 Competitio
 | R5-01 | Competitions Repository | DONE |
 | R5-02 | Seasons / Stages / Rounds | DONE |
 | R5-03 | Rule Packages | DONE |
-| R5-04 | Competition Bindings | READY |
+| R5-04 | Competition Bindings | VERIFYING |
 | R5-05 | Route Resolution Reads | BLOCKED |
 | R5-06 | Model Run Identity Reads | BLOCKED |
 
@@ -55,9 +55,23 @@ R4 Persistence 基础设施已完成并通过阶段出口。R5 仅按 Competitio
 - PR #28 clean CI run `31812316772` / job `94805647551` 为 `SUCCESS`，artifact `9224448312` SHA-256 `00cf61b683b7780a354ad5e35c59438d6d26ce1a6d0c17dd86edbaaa9e9ae127`；固定 head `d087108d5cc722cc9ebecd788de6c07c1ae5dc3d` 已 squash merge 为 `3d609ace7cbe1db3a3caec18a6477fb41153cc88`。
 - merged stage CI run `31824523536` / job `94845378301` 为 `SUCCESS`，artifact `9229038667` SHA-256 `9c07c35abcd8b229b8044b0373f7ce3aecd6a03d58b1431c4f738e22131c7262`；R5-03 正式关闭为 `DONE`，R5-04 开放为 `READY`。
 
+## R5-04 当前事实
+
+- 详细记录：[`R05-04-competition-bindings.md`](R05-04-competition-bindings.md)。
+- Competition Binding persistence 已从旧 `crates/persistence-postgres/src/routing.rs` 收敛到 `adapters/competition/bindings/`；typed Row/Domain Mapper、package metadata read、list/detail、create transaction 与 type-default transaction 均按职责拆分。
+- 旧 `routing.rs` 已删除全部 R5-04 create/list/default/read/package metadata/dynamic mapper/query builder，不保留 Binding 转发壳；R5-05 `resolve_route` 与 R5-06 model registration 保持原 owner，`competitions.rs` 中 R5-05 context/scope helper 同样未迁移。
+- Domain 实际只存在 Competition / Season / Stage / CompetitionKind type-default 四种 Binding scope；本节点未新增不存在的 Round Binding 语义。
+- 旧 owner PostgreSQL 16 contract run `31862339200` / job `94957776614` 为 `SUCCESS`；new owner minimum gate run `31862713824` / job `94958748006` 使用同一 contract 并 `SUCCESS`。
+- owner switch run `31862539782` / job `94958314365` 为 `SUCCESS`，生产切换提交 `2bd703d4b1624e8b73712d1f549e5d4b0f7a80f9`。
+- official Domain inventory refresh run `31862856576` / job `94959096109` 为 `SUCCESS`，仅使用项目官方 generator/drift verifier；Domain 365、公共兼容 365、PostgreSQL mapping 299。
+- 第一轮 minimum gate `31862639885` 因 R5-03 旧 verifier 仍要求 Binding 留在 `routing.rs` 而 fail-fast；第一轮 stage hard gate `31862890012` 因 R4-03 mapping verifier 仍要求 `routing.rs` 直接调用共享 CompetitionKind parser 而 fail-fast。两处均只推进 owner/call-path 断言到 R5-04 实际边界，没有删除或弱化原架构约束。
+- 第二轮 stage hard gate run `31862969585` / job `94959376165` 为 `SUCCESS`：完整 architecture、public/protected model boundary、rustfmt、Persistence/Application check/tests 与同一 PostgreSQL 16 Binding contract 全部通过。
+- R5-04 当前保持 `VERIFYING`；需清理 transient workflow、完成 clean PR canonical CI、固定 HEAD merge、merged stage CI 与最终 closeout canonical CI 后，才可标记 `DONE` 并开放 R5-05 `READY`。
+
 ## 兼容与限制
 
 - Application Port、Tauri 命令/DTO、Schema、0001–0046 migration、配置、错误/日志语义、前端行为、路由算法、model identity、Cargo manifests/Cargo.lock、生产依赖和模型保护资产均未改变。
-- R5-03 未执行 destructive database reset，也未触碰用户数据库；专用 Rule Package contract 使用临时 PostgreSQL 16 测试数据库。
-- 既有 `postgres_integration.rs` 18 个 ignored broad PostgreSQL tests 未在 R5-03 执行。
-- R5-03 已正式关闭为 `DONE`，R5-04 已开放为 `READY`；本 closeout 仅更新文档，closeout HEAD 仍需通过 canonical Public Platform CI 后才作为 R5-04 起始基线。
+- R5-04 未执行 destructive database reset，也未触碰用户数据库；专用 Competition Binding contract 使用 GitHub Actions 临时 PostgreSQL 16 测试数据库。
+- 既有 `postgres_integration.rs` 18 个 ignored broad PostgreSQL tests 未在 R5-04 执行。
+- R5-04 未改变 Application Port、Tauri 命令/DTO、Schema、0001–0046 migration、配置、错误/日志语义、前端行为、R5-05 route algorithm/result、R5-06 model identity、Cargo manifests/Cargo.lock、生产依赖或模型保护资产。
+- R5-04 当前为 `VERIFYING`，R5-05 继续 `BLOCKED`；clean PR 与合并后 canonical Windows 交付门禁尚未完成。
