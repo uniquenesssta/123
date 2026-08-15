@@ -38,7 +38,8 @@ mod team_features;
 mod team_force_delete;
 mod team_lineup_presets;
 
-pub use adapters::{register_adapters, ModelRegistration};
+pub use adapters::register_adapters;
+pub use adapters::ModelRegistration;
 pub use error::{PersistenceError, PersistenceResult};
 pub use health::DatabaseHealth;
 pub use model_runs::ModelRunListItem;
