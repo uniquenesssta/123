@@ -20,6 +20,9 @@ const types = read("src/types.ts");
 const domain = read("crates/domain/src/team/detail.rs") + read("crates/domain/src/player/listing.rs");
 const playerPersistence = read("crates/persistence-postgres/src/player_catalog.rs");
 const teamPersistence = read("crates/persistence-postgres/src/team_catalog.rs");
+const teamSquadPersistence = read("crates/persistence-postgres/src/adapters/catalog/teams/detail/read_squad.rs");
+const teamSquadMapper = read("crates/persistence-postgres/src/adapters/catalog/teams/detail/squad_mapper.rs");
+const teamRecordMapper = read("crates/persistence-postgres/src/adapters/catalog/teams/detail/record_mapper.rs");
 const css = read("src/styles/entityCenter.css");
 
 check(main.indexOf('import "./styles/entityCenter.css";') > main.indexOf('import "./styles/layout.css";'), "资源中心样式必须最后加载，避免旧阶段样式反向覆盖");
@@ -62,8 +65,8 @@ check(footballText.includes("detailLocalizedName") && footballText.includes("has
 check(types.match(/localized_name: string \| null;/g)?.length >= 2, "前端球队阵容/球员列表缺少中文姓名字段");
 check(domain.match(/pub localized_name: Option<String>/g)?.length >= 2, "Rust领域层缺少中文姓名字段");
 check(playerPersistence.includes("localized_name.name AS localized_name") && playerPersistence.includes('localized_name: row.try_get("localized_name")?'), "球员目录中文姓名查询或映射缺失");
-check(teamPersistence.includes("localized_name.name AS localized_name") && teamPersistence.includes('localized_name: row.try_get("localized_name")?'), "球队阵容中文姓名查询或映射缺失");
-check(!teamPersistence.match(/fn team_record_from_row[\s\S]{0,500}localized_name:/), "中文姓名字段被错误写入TeamRecord映射");
+check(teamSquadPersistence.includes("localized_name.name AS localized_name") && teamSquadMapper.includes("localized_name: row.localized_name"), "球队阵容中文姓名查询或映射缺失");
+check(!teamRecordMapper.includes("localized_name:"), "中文姓名字段被错误写入TeamRecord映射");
 
 if (failures.length) {
   console.error("球队与球员资源中心专项验证失败：");
