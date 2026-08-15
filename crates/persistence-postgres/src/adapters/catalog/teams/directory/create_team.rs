@@ -1,5 +1,5 @@
 use super::super::detail::{map_team_record, TeamRecordRow};
-use super::name_policy::normalize_team_name;
+use super::super::names::normalize_team_name;
 use crate::{PersistenceError, PersistenceResult, PostgresStore};
 use football_domain::{TeamDraft, TeamRecord};
 use serde_json::json;
