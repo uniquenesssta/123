@@ -1,0 +1,48 @@
+name: R5-04 Refresh Domain Inventory
+
+on:
+  push:
+    branches:
+      - agent/r5-04-competition-bindings
+    paths:
+      - ".github/workflows/r5-04-refresh-inventory.yml"
+
+permissions:
+  contents: write
+
+jobs:
+  refresh-inventory:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: agent/r5-04-competition-bindings
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Generate and verify official Domain inventory
+        shell: bash
+        run: |
+          set -euo pipefail
+          node scripts/generate-domain-type-inventory.mjs
+          node scripts/verify-domain-type-inventory.mjs
+          python - <<'PY'
+          import subprocess
+          changed = set(subprocess.check_output(["git", "diff", "--name-only"], text=True).splitlines())
+          expected = {"architecture/domain-type-inventory.json"}
+          if changed and changed != expected:
+              raise SystemExit(f"unexpected inventory diff: {sorted(changed)}")
+          PY
+      - name: Commit inventory when changed
+        shell: bash
+        run: |
+          set -euo pipefail
+          if git diff --quiet -- architecture/domain-type-inventory.json; then
+            echo "Domain inventory already current"
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add architecture/domain-type-inventory.json
+          git commit -m "chore(r5-04): refresh domain inventory"
+          git push origin HEAD:agent/r5-04-competition-bindings
