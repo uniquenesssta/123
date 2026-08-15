@@ -19,7 +19,7 @@ pub(super) async fn read_binding_candidate(
             d.model_key, v.id AS model_version_id,
             v.version AS model_version,
             p.id AS parameter_set_id, p.parameter_version, p.definition AS parameters,
-            b.competition_id, b.season_id, b.stage_id, b.competition_kind
+            b.competition_id, b.season_id, b.stage_id
         FROM model.competition_bindings b
         JOIN model.rule_packages rp ON rp.id = b.rule_package_id
         JOIN model.versions v ON v.id = b.model_version_id
