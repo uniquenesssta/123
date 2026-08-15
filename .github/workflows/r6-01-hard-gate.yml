@@ -1,6 +1,6 @@
 name: R6-01 Stage Hard Gate
 
-# Retry after advancing database-reset TeamRecord mapping checks to the typed R6-01 mapper.
+# Retry after advancing entity-resource-center squad localization checks to the R6-01 detail owner.
 on:
   push:
     branches:
