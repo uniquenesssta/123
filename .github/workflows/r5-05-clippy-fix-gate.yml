@@ -1,3 +1,4 @@
+# Rerun after official Domain inventory refresh.
 name: R5-05 Clippy Fix Gate
 
 on:
