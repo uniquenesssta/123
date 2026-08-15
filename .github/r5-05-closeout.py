@@ -38,7 +38,7 @@ replace_once(stage_path, "| R5-05 | Route Resolution Reads | VERIFYING |", "| R5
 replace_once(stage_path, "| R5-06 | Model Run Identity Reads | BLOCKED |", "| R5-06 | Model Run Identity Reads | READY |")
 regex_once(
     stage_path,
-    r"^- R5-05 当前仍为 `VERIFYING`.*?$",
+    r"^- transient helper 已清理；R5-05 当前仍为 `VERIFYING`.*?$",
     "- R5-05 已按 fixed clean HEAD `879dd724e9bace058d86387b04e97cbdb67843b7` 通过 PR canonical run `31873912016` / job `94986637325`，并 squash merge 为 `d6b2d692dadbe546220eb0cb533bd9d4e207d230`；merged-stage canonical run `31875035071` / job `94989384122` 同样为 `SUCCESS`。R5-05 状态关闭为 `DONE`，R5-06 开放为 `READY`；本 closeout tree 仍需 canonical Public Platform CI 成功后才作为 R5-06 有效基线。",
 )
 stage_anchor = "\n## 兼容与限制\n"
@@ -72,8 +72,6 @@ record_closeout = """
 - R5-05 关闭为 `DONE`，R5-06 开放为 `READY`。本 closeout 文档提交产生的新 tree 必须再通过 canonical Public Platform CI；只有该 CI 成功后，最终 stage HEAD 才可作为 R5-06 的有效起始基线，本记录不预先宣称该尚未执行的结果。
 """
 replace_once(record_path, record_anchor, record_closeout + record_anchor)
-
-# Replace stale final status gate section with the factual closeout condition.
 regex_once(
     record_path,
     r"^R5-05 当前为 `VERIFYING`；只有 clean PR canonical CI、固定 HEAD merge、merged stage CI 与最终 closeout canonical CI 全部成功后，才可改为 `DONE` 并将 R5-06 改为 `READY`。$",
