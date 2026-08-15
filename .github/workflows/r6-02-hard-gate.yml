@@ -1,6 +1,6 @@
 name: R6-02 Stage Hard Gate
 
-# Retry after regenerating and reviewing the official Domain type inventory for the owner split.
+# Retry after advancing the entity-relationship profile projection check to the R6-02 profile owner.
 on:
   push:
     branches:
