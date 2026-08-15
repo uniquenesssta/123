@@ -1,0 +1,62 @@
+name: R6-01 Team Directory Detail Owner Switch
+
+on:
+  push:
+    branches:
+      - agent/r6-01-team-directory-detail
+    paths:
+      - .github/workflows/r6-01-owner-switch.yml
+      - scripts/r6_01_owner_switch.py
+
+permissions:
+  contents: write
+
+jobs:
+  switch-owner:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: football_r6_01_switch_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres -d football_r6_01_switch_test"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 10
+    env:
+      FOOTBALL_TEST_DATABASE_URL: postgres://postgres:postgres@127.0.0.1:5432/football_r6_01_switch_test
+    steps:
+      - name: Checkout R6-01 implementation branch
+        uses: actions/checkout@v4
+        with:
+          ref: agent/r6-01-team-directory-detail
+          fetch-depth: 0
+      - name: Setup Rust 1.88.0
+        uses: dtolnay/rust-toolchain@1.88.0
+      - name: Apply responsibility owner switch
+        run: python scripts/r6_01_owner_switch.py
+      - name: Format owner switch
+        run: cargo fmt --all
+      - name: Verify formatting
+        run: cargo fmt --all -- --check
+      - name: Check persistence and application
+        run: cargo check --locked -p football-persistence-postgres -p football-application
+      - name: Run persistence unit tests
+        run: cargo test --locked -p football-persistence-postgres --lib
+      - name: Run frozen R6-01 PostgreSQL contract on new owner
+        run: cargo test --locked -p football-persistence-postgres --test team_directory_detail_repository_contract -- --ignored --nocapture
+      - name: Commit verified owner switch
+        shell: bash
+        run: |
+          git status --short
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git diff --cached --check
+          git commit -m "refactor(r6-01): migrate team directory detail owner"
+          git push origin HEAD:agent/r6-01-team-directory-detail
