@@ -1,4 +1,5 @@
 use super::{sha256_json, write_audit_event, PersistenceError, PersistenceResult, PostgresStore};
+use crate::adapters::competition::model_run_identity::read_model_run_identity;
 use crate::mapping::{optional_uuid, required_datetime, required_uuid, to_json_value};
 use chrono::{DateTime, Utc};
 use football_domain::RouteDecision;
@@ -286,25 +287,18 @@ impl PostgresStore {
     }
 
     pub async fn read_run(&self, run_id: Uuid) -> PersistenceResult<Value> {
+        let identity = read_model_run_identity(self, run_id).await?;
         let row = sqlx::query(
             r#"
             SELECT
-                r.id, r.match_key, r.snapshot_type, r.route_reason,
+                r.match_key, r.snapshot_type, r.route_reason,
                 r.input_payload, r.output_payload, r.explanation, r.summary,
                 r.input_sha256, r.input_audit_version, r.input_readiness_level,
                 r.input_readiness_score, r.input_manifest, r.input_manifest_sha256,
                 r.feature_snapshot_id,
                 snapshot.snapshot_fingerprint AS feature_snapshot_fingerprint,
-                r.duration_ms, r.created_at, r.completed_at,
-                d.model_key, v.version AS model_version, p.parameter_version,
-                rp.id AS rule_package_id, rp.package_key,
-                rp.version AS rule_package_version, rp.display_name AS rule_package_name,
-                r.route_binding_id
+                r.duration_ms, r.created_at, r.completed_at
             FROM model.runs r
-            JOIN model.versions v ON v.id = r.model_version_id
-            JOIN model.definitions d ON d.id = v.model_id
-            JOIN model.parameter_sets p ON p.id = r.parameter_set_id
-            LEFT JOIN model.rule_packages rp ON rp.id = r.rule_package_id
             LEFT JOIN feature.snapshots snapshot ON snapshot.id = r.feature_snapshot_id
             WHERE r.id = $1
             "#,
@@ -314,17 +308,17 @@ impl PostgresStore {
         .await?;
 
         Ok(json!({
-            "id": row.try_get::<Uuid, _>("id")?,
+            "id": identity.id,
             "match_key": row.try_get::<String, _>("match_key")?,
             "snapshot_type": row.try_get::<String, _>("snapshot_type")?,
-            "model_key": row.try_get::<String, _>("model_key")?,
-            "model_version": row.try_get::<String, _>("model_version")?,
-            "parameter_version": row.try_get::<String, _>("parameter_version")?,
-            "rule_package_id": row.try_get::<Option<Uuid>, _>("rule_package_id")?,
-            "rule_package_key": row.try_get::<Option<String>, _>("package_key")?,
-            "rule_package_version": row.try_get::<Option<String>, _>("rule_package_version")?,
-            "rule_package_name": row.try_get::<Option<String>, _>("rule_package_name")?,
-            "route_binding_id": row.try_get::<Option<Uuid>, _>("route_binding_id")?,
+            "model_key": identity.model_key,
+            "model_version": identity.model_version,
+            "parameter_version": identity.parameter_version,
+            "rule_package_id": identity.rule_package_id,
+            "rule_package_key": identity.rule_package_key,
+            "rule_package_version": identity.rule_package_version,
+            "rule_package_name": identity.rule_package_name,
+            "route_binding_id": identity.route_binding_id,
             "route_reason": row.try_get::<Value, _>("route_reason")?,
             "input_sha256": row.try_get::<String, _>("input_sha256")?,
             "input_audit": {

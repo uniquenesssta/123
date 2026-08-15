@@ -1,5 +1,5 @@
 use super::{record::ModelRunIdentityRecord, record_row::ModelRunIdentityRow};
-use crate::{PersistenceError, PersistenceResult, PostgresStore};
+use crate::{PersistenceResult, PostgresStore};
 use uuid::Uuid;
 
 pub(crate) async fn read_model_run_identity(
@@ -35,7 +35,7 @@ pub(crate) async fn read_model_run_identity(
 
 #[cfg(test)]
 mod tests {
-    use super::*;
+    use crate::PersistenceError;
 
     #[test]
     fn sql_errors_keep_persistence_sqlx_semantics() {
