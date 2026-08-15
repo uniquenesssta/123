@@ -22,8 +22,8 @@ R4 Persistence 基础设施已完成并通过阶段出口。R5 仅按 Competitio
 | R5-01 | Competitions Repository | DONE |
 | R5-02 | Seasons / Stages / Rounds | DONE |
 | R5-03 | Rule Packages | DONE |
-| R5-04 | Competition Bindings | VERIFYING |
-| R5-05 | Route Resolution Reads | BLOCKED |
+| R5-04 | Competition Bindings | DONE |
+| R5-05 | Route Resolution Reads | READY |
 | R5-06 | Model Run Identity Reads | BLOCKED |
 
 ## R5-01 当前事实
@@ -66,6 +66,8 @@ R4 Persistence 基础设施已完成并通过阶段出口。R5 仅按 Competitio
 - official Domain inventory refresh run `31862856576` / job `94959096109` 为 `SUCCESS`，仅使用项目官方 generator/drift verifier；Domain 365、公共兼容 365、PostgreSQL mapping 299。
 - 第一轮 minimum gate `31862639885` 因 R5-03 旧 verifier 仍要求 Binding 留在 `routing.rs` 而 fail-fast；第一轮 stage hard gate `31862890012` 因 R4-03 mapping verifier 仍要求 `routing.rs` 直接调用共享 CompetitionKind parser 而 fail-fast。两处均只推进 owner/call-path 断言到 R5-04 实际边界，没有删除或弱化原架构约束。
 - 第二轮 stage hard gate run `31862969585` / job `94959376165` 为 `SUCCESS`：完整 architecture、public/protected model boundary、rustfmt、Persistence/Application check/tests 与同一 PostgreSQL 16 Binding contract 全部通过。
+- PR #29 clean CI run `31863321636` / job `94960259474` 为 `SUCCESS`，artifact `9241585461` SHA-256 `d61179bab3a46f4457636d411c9f09325145fa4cc3e69110d166f7814a2e4a5a`；固定 head `e63d3adbed3ddf8cce5d7486a47d2ce6cc4d9bb9` 已 squash merge 为 `eabf3939216f43dbd91839223c1e3c34c3872406`。
+- merged stage CI run `31864520861` / job `94963336422` 为 `SUCCESS`，artifact `9241894657` SHA-256 `d3b3a43eff2f2a574fd4847533bb43b20eee961086a13ad2a3f17d34848bbe4e`；R5-04 正式关闭为 `DONE`，R5-05 开放为 `READY`。
 - R5-04 当前保持 `VERIFYING`；需清理 transient workflow、完成 clean PR canonical CI、固定 HEAD merge、merged stage CI 与最终 closeout canonical CI 后，才可标记 `DONE` 并开放 R5-05 `READY`。
 
 ## 兼容与限制
@@ -74,4 +76,4 @@ R4 Persistence 基础设施已完成并通过阶段出口。R5 仅按 Competitio
 - R5-04 未执行 destructive database reset，也未触碰用户数据库；专用 Competition Binding contract 使用 GitHub Actions 临时 PostgreSQL 16 测试数据库。
 - 既有 `postgres_integration.rs` 18 个 ignored broad PostgreSQL tests 未在 R5-04 执行。
 - R5-04 未改变 Application Port、Tauri 命令/DTO、Schema、0001–0046 migration、配置、错误/日志语义、前端行为、R5-05 route algorithm/result、R5-06 model identity、Cargo manifests/Cargo.lock、生产依赖或模型保护资产。
-- R5-04 当前为 `VERIFYING`，R5-05 继续 `BLOCKED`；clean PR 与合并后 canonical Windows 交付门禁尚未完成。
+- R5-04 已正式关闭为 `DONE`，R5-05 已开放为 `READY`；本 closeout 仅更新文档，closeout HEAD 仍需通过 canonical Public Platform CI 后才作为 R5-05 起始基线。

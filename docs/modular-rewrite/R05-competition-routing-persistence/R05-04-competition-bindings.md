@@ -2,9 +2,9 @@
 
 ## 状态
 
-`VERIFYING`
+`DONE`
 
-Competition Binding PostgreSQL persistence 已完成唯一 owner 切换；旧/新 owner 同一 PostgreSQL 16 契约、R5 ownership、Domain inventory、完整 architecture、模型保护、rustfmt、Persistence/Application 编译与单测均已有真实通过证据。当前仍需完成 transient workflow 清理、最终净 diff 审计、clean PR canonical CI、固定 HEAD 合并与 merged stage CI，因此不得提前标记 `DONE`，R5-05 保持 `BLOCKED`。
+R5-04 的 Binding persistence owner 切换、旧/新 owner PostgreSQL 契约、节点 hard gate、clean PR canonical CI、固定 HEAD 合并与 merged stage CI 均已完成；R5-04 正式关闭为 `DONE`，R5-05 开放为 `READY`。本次 closeout 文档提交仍需通过 canonical Public Platform CI 后，才可作为 R5-05 的起始基线。
 
 ## 基线与分支
 
@@ -140,13 +140,21 @@ crates/persistence-postgres/src/adapters/competition/bindings/
 
 本轮 architecture 报告确认 Domain 类型仍为 365、公共兼容类型 365、PostgreSQL mapping 类型 299；受保护导入扫描 724 个 Rust 文件。
 
+## PR / 合并 / 收口证据
+
+- PR #29 clean Public Platform CI run `31863321636` / Windows automated delivery gate job `94960259474` 为 `SUCCESS`；artifact `9241585461`，13,926,621 bytes，SHA-256 `d61179bab3a46f4457636d411c9f09325145fa4cc3e69110d166f7814a2e4a5a`。
+- PR #29 固定 clean head `e63d3adbed3ddf8cce5d7486a47d2ce6cc4d9bb9` 已按 expected-head 防漂移检查 squash merge，stage merge commit 为 `eabf3939216f43dbd91839223c1e3c34c3872406`。
+- 合并后 Public Platform CI run `31864520861` / Windows automated delivery gate job `94963336422` 为 `SUCCESS`；artifact `9241894657`，13,926,222 bytes，SHA-256 `d3b3a43eff2f2a574fd4847533bb43b20eee961086a13ad2a3f17d34848bbe4e`。
+- clean PR 与 merged stage 的 Windows Automated 均覆盖 canonical architecture、frontend、workspace Rust/Clippy/tests、Tauri release/runtime 验收；未使用较弱结果替代 canonical 交付门禁。
+- 全部 transient `.github/workflows/r5-04-*` 已在 clean PR 前清理；最终 PR diff 不含临时 workflow。
+
 ## 当前未执行项与限制
 
-- clean PR canonical Public Platform CI、固定 HEAD merge、merged stage CI 与最终 closeout canonical CI 尚未执行，因此节点保持 `VERIFYING`。
+- PR #29 clean canonical CI、固定 HEAD squash merge 与 merged stage canonical CI 均已完成并记录在上方。
 - 既有 `crates/persistence-postgres/tests/postgres_integration.rs` 18 个 ignored broad PostgreSQL tests 未在 R5-04 执行。
 - 未执行 destructive database reset；R5-04 contract 只使用 GitHub Actions 临时 PostgreSQL 16 测试数据库，未触碰用户数据库。
-- Windows frontend、workspace Clippy/workspace tests、Tauri release/runtime canonical 交付验收将在 clean PR Public Platform CI 对固定 clean HEAD 执行；当前不得用 Ubuntu 节点门禁替代其结论。
-- 当前仍存在本节点 transient `.github/workflows/r5-04-*`，clean PR 前必须全部删除。
+- clean PR 与 merged stage 的 canonical Windows frontend、workspace Clippy/workspace tests、Tauri release/runtime 验收均已完成。
+- transient `.github/workflows/r5-04-*` 已全部清理；本 closeout 仅修改文档。
 
 ## 当前变更分类
 
@@ -181,4 +189,4 @@ crates/persistence-postgres/src/adapters/competition/bindings/
 
 ## 下一状态门禁
 
-R5-04 当前保持 `VERIFYING`。只有在 transient workflow 全部清理、README/阶段索引与最终净 diff 一致、clean PR canonical CI 对固定 HEAD 成功、固定 HEAD 合并到 `rewrite/r5-competition-routing-persistence`、merged stage CI 成功并完成最终 closeout canonical CI 后，才可标记 `DONE` 并开放 R5-05 `READY`。
+R5-04 的 clean PR CI、固定 HEAD merge 与 merged stage CI 已全部完成，节点状态为 `DONE`；R5-05 现可按任务书进入 `READY`。本次 closeout 仅修改文档，最终 stage closeout HEAD 仍需通过 canonical Public Platform CI 后，才可作为 R5-05 的起始基线。
