@@ -95,15 +95,13 @@ async fn model_run_identity_repository_contract_is_preserved() {
     let model_key = format!("r506_model_{token}");
     let package_key = format!("r506-package-{token}");
 
-    sqlx::query(
-        "INSERT INTO model.definitions (id, model_key, display_name) VALUES ($1, $2, $3)",
-    )
-    .bind(definition_id)
-    .bind(&model_key)
-    .bind("R5-06 Model")
-    .execute(&database.pool)
-    .await
-    .expect("创建 R5-06 model definition");
+    sqlx::query("INSERT INTO model.definitions (id, model_key, display_name) VALUES ($1, $2, $3)")
+        .bind(definition_id)
+        .bind(&model_key)
+        .bind("R5-06 Model")
+        .execute(&database.pool)
+        .await
+        .expect("创建 R5-06 model definition");
     sqlx::query(
         r#"
         INSERT INTO model.versions (
