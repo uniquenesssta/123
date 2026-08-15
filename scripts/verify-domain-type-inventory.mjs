@@ -13,15 +13,6 @@ const expectedText = JSON.stringify(committed, null, 2);
 const actualText = JSON.stringify(actual, null, 2);
 
 if (expectedText !== actualText) {
-  const changedTypes = actual.types
-    .filter((entry, index) => JSON.stringify(entry) !== JSON.stringify(committed.types[index]))
-    .map((entry) => `${entry.typeName}@${entry.currentPath}`);
-  console.error("Domain inventory diagnostic: " + JSON.stringify({
-    sourceDigest: actual.sourceDigest,
-    rustUsageDigest: actual.rustUsageDigest,
-    summary: actual.summary,
-    changedTypes,
-  }));
   console.error("Domain 类型与契约清单已漂移。请运行 node scripts/generate-domain-type-inventory.mjs 并审查变更。");
   process.exit(1);
 }
