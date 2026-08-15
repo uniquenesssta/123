@@ -2,7 +2,7 @@
 
 ## 阶段状态
 
-`IN_PROGRESS`
+`DONE`
 
 R4 Persistence 基础设施已完成并通过阶段出口。R5 仅按 Competition、Season、Stage、Round、Rule Package、Binding、Route Resolution 与 Model Run Identity 拆分 PostgreSQL Adapter；不修改模型路由算法、前端赛事页面或历史 migration。
 
@@ -11,7 +11,7 @@ R4 Persistence 基础设施已完成并通过阶段出口。R5 仅按 Competitio
 - R4 `DONE`；完成记录：[`../R04-persistence-foundation/R04-stage-completion.md`](../R04-persistence-foundation/R04-stage-completion.md)。
 - R4 最终 closeout HEAD：`615dc952491d5e0e21d4979292cbf5170eedece6`。
 - 该 HEAD 的 canonical Public Platform CI run `31768264193` / Windows automated delivery gate job `94668577704` 为 `SUCCESS`。
-- R5 stage 分支 `rewrite/r5-competition-routing-persistence` 当前已完成 R5-02 closeout；R5-03 从最终验证基线 `bcd17c78dde89c999d7666fa41e7267f609c6a33` 精确建立。
+- R5 stage 分支 `rewrite/r5-competition-routing-persistence` 已完成 R5-01～R5-06；最终 R5-06 squash merge commit 为 `acb0491003b365b3f775780d8c98ecfdf1e80104`。
 - R5-02 最终 closeout canonical Public Platform CI run `31798978218` / job `94762276340` 为 `SUCCESS`。
 - R3 Competition / Rules Ports 已冻结；0001–0046 migration 继续冻结。
 
@@ -24,7 +24,7 @@ R4 Persistence 基础设施已完成并通过阶段出口。R5 仅按 Competitio
 | R5-03 | Rule Packages | DONE |
 | R5-04 | Competition Bindings | DONE |
 | R5-05 | Route Resolution Reads | DONE |
-| R5-06 | Model Run Identity Reads | VERIFYING |
+| R5-06 | Model Run Identity Reads | DONE |
 
 ## R5-01 当前事实
 
@@ -105,5 +105,16 @@ R4 Persistence 基础设施已完成并通过阶段出口。R5 仅按 Competitio
 - `model_runs.rs::read_run` 已切换到新 identity read owner；Rule Package registration 已切换到新 registration boundary；legacy `routing.rs` 已删除且没有转发壳。
 - PostgreSQL 16 专项 run `31881761988` 的 identity contract job `95005200186` 与 Rule Package regression job `95005200191` 均 `SUCCESS`。
 - clean source HEAD `dc6d2baf0f6092f67200214b5b45e37c528394ad` 的 canonical run `31881842368` / Windows job `95005434692` 为 `SUCCESS`；artifact `9246499189`，SHA-256 `74bc2a687b8499f798c0a91a28522fa74df0237ee24d005197067b1c97a1e452`。
-- 当前仅剩文档 clean HEAD、PR/merge、merged-stage canonical CI 与 R5 阶段 closeout，因此状态保持 `VERIFYING`。
+- fixed clean HEAD `058884e82f3c584f87751dec3bb5f9b6531a151e` 的 push canonical run `31883239072` / job `95008635990` 与 PR #31 canonical run `31883703954` / job `95009730520` 均 `SUCCESS`；PR #31 squash merge `acb0491003b365b3f775780d8c98ecfdf1e80104` 后 merged-stage canonical run `31884882480` / job `95012628426` 亦 `SUCCESS`。R5-06 正式关闭为 `DONE`。
 
+
+
+## R5 阶段正式收口
+
+- R5-01～R5-06 全部 `DONE`；阶段完成记录：[`R05-stage-completion.md`](R05-stage-completion.md)。
+- R5-06 fixed clean HEAD：`058884e82f3c584f87751dec3bb5f9b6531a151e`；push canonical run `31883239072` / job `95008635990`：`SUCCESS`；artifact `9246859935`，SHA-256 `133baec479d64edd8217bb8d7c1c7f82b0171d2e6362c5d49277caf6b51413f1`。
+- PR #31 canonical run `31883703954` / job `95009730520`：`SUCCESS`；artifact `9246957428`，SHA-256 `da854dc637f59e2832f4515b4154f46a4ae88a7fb7e141ce8ee18b36c132e001`。
+- PR #31 使用 expected head `058884e82f3c584f87751dec3bb5f9b6531a151e` squash merge为 `acb0491003b365b3f775780d8c98ecfdf1e80104`。
+- merged-stage canonical run `31884882480` / Windows job `95012628426`：`SUCCESS`；artifact `9247274708`，大小 `13936932` 字节，SHA-256 `4c6b107922787a732537a83b58b005bb364ff10298146c87f0dff40f8bdf5a26`。
+- 旧 `competitions.rs` / `routing.rs` 均已删除；R5 目标 Ports 的 PostgreSQL owner 已收敛到新 Adapter，未保留双实现或临时转发层。
+- 下一阶段唯一候选入口为 R6-01；R6 源码实施须等待本阶段 closeout 文档 tree 的 canonical Public Platform CI 成功后开始。

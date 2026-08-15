@@ -50,7 +50,15 @@ Node 开发依赖固定安装和读取自源码根目录上一级的 `../node_mo
 - 公共 `ModelRegistration`、`PostgresStore::register_model`、`read_run` JSON identity 字段、错误语义、migration/Schema、配置、模型与路由算法均保持不变；未修改 `list_recent_runs`。
 - PostgreSQL 16 专项 run `31881761988`：Model Run Identity contract job `95005200186` 与 Rule Package registration regression job `95005200191` 均 `SUCCESS`。
 - clean source HEAD `dc6d2baf0f6092f67200214b5b45e37c528394ad` 的 canonical Public Platform CI run `31881842368` / Windows job `95005434692` 为 `SUCCESS`；artifact `9246499189`，SHA-256 `74bc2a687b8499f798c0a91a28522fa74df0237ee24d005197067b1c97a1e452`。
-- 当前节点状态为 `VERIFYING`；详细记录见 `docs/modular-rewrite/R05-competition-routing-persistence/R05-06-model-run-identity-reads.md`，待文档 clean HEAD、PR/merge 与 merged-stage canonical gate 通过后关闭为 `DONE`。
+- R5-06 已正式关闭为 `DONE`；fixed clean HEAD `058884e82f3c584f87751dec3bb5f9b6531a151e` 的 push canonical run `31883239072` / job `95008635990` 与 PR #31 canonical run `31883703954` / job `95009730520` 均为 `SUCCESS`。
+- PR #31 已按 fixed head squash merge 为 `acb0491003b365b3f775780d8c98ecfdf1e80104`；merged-stage canonical Public Platform CI run `31884882480` / Windows job `95012628426` 为 `SUCCESS`，artifact `9247274708`，SHA-256 `4c6b107922787a732537a83b58b005bb364ff10298146c87f0dff40f8bdf5a26`。
+- 详细节点记录：`docs/modular-rewrite/R05-competition-routing-persistence/R05-06-model-run-identity-reads.md`。
+
+### R5 阶段完成
+
+- R5-01～R5-06 均已完成并通过各自专项契约、阶段回归、clean PR 与 merged-stage canonical gate；Competition / Routing PostgreSQL persistence 已按职责收敛到 `crates/persistence-postgres/src/adapters/competition/` 与 `adapters/rules/`。
+- 旧 `crates/persistence-postgres/src/competitions.rs` 与 `crates/persistence-postgres/src/routing.rs` 已删除，不保留双实现或长期转发壳；公共 Application Port、Tauri 命令/DTO、Schema、0001–0046 migration、配置、错误语义、路由/模型算法与生产依赖保持兼容。
+- R5 阶段完成记录：`docs/modular-rewrite/R05-competition-routing-persistence/R05-stage-completion.md`。R6-01 `Team Directory 与 Detail` 为下一阶段唯一 `READY` 节点；R6 源码实施必须以本次 closeout tree 的 canonical CI 成功为进入基线。
 
 
 

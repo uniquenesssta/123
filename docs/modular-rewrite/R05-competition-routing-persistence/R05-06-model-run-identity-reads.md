@@ -1,6 +1,6 @@
 # R05-06 Model Run Identity Reads
 
-状态：`VERIFYING`
+状态：`DONE`
 
 ## 1. 节点目标与当前结论
 
@@ -169,4 +169,14 @@ R5-06 开始前已验证基线：`7d61d0f70d39966b44e1a5cc001b34c2788ea04d`。
 - 根 README / 阶段 README：已同步。
 - 文档 clean HEAD / PR / merged-stage gate：待执行。
 
-**当前状态：`VERIFYING`，不得标记为 `DONE`。**
+**当前状态：`DONE`。**
+
+
+## 17. 正式收口证据
+
+- fixed clean HEAD：`058884e82f3c584f87751dec3bb5f9b6531a151e`。
+- 文档同步后 push canonical：run `31883239072` / job `95008635990` — `SUCCESS`；artifact `9246859935`，SHA-256 `133baec479d64edd8217bb8d7c1c7f82b0171d2e6362c5d49277caf6b51413f1`。
+- PR #31 canonical：run `31883703954` / job `95009730520` — `SUCCESS`；artifact `9246957428`，SHA-256 `da854dc637f59e2832f4515b4154f46a4ae88a7fb7e141ce8ee18b36c132e001`。
+- PR #31 使用 expected head `058884e82f3c584f87751dec3bb5f9b6531a151e` squash merge；stage merge commit：`acb0491003b365b3f775780d8c98ecfdf1e80104`。
+- merged-stage canonical：run `31884882480` / Windows job `95012628426` — `SUCCESS`；artifact `9247274708`，SHA-256 `4c6b107922787a732537a83b58b005bb364ff10298146c87f0dff40f8bdf5a26`。
+- R5-06 自此正式 `DONE`；后续仅进入 R5 阶段级完成记录与 R6 基线建立，不再修改本节点生产实现。
