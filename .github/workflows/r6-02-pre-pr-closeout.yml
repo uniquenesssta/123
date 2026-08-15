@@ -1,0 +1,31 @@
+name: R6-02 Pre-PR Closeout
+
+on:
+  push:
+    branches:
+      - agent/r6-02-team-names-profiles
+    paths:
+      - .github/workflows/r6-02-pre-pr-closeout.yml
+
+permissions:
+  contents: write
+
+jobs:
+  closeout:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: agent/r6-02-team-names-profiles
+          fetch-depth: 0
+      - name: Apply R6-02 verified pre-PR record
+        run: python scripts/r6-02-pre-pr-closeout.py
+      - name: Commit clean pre-PR tree
+        run: |
+          git status --short
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git diff --cached --check
+          git commit -m "docs(r6-02): record verified pre-pr state"
+          git push origin HEAD:agent/r6-02-team-names-profiles
