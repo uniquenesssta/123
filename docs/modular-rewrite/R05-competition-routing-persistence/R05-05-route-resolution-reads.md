@@ -73,6 +73,15 @@ crates/persistence-postgres/src/adapters/competition/route_resolution/
 - R4-03 mapping gate 已推进到实际 owner：保留全部基础 scalar/JSON/optional/UUID/time mapping 约束，同时验证 R5-01/R5-03/R5-04/R5-05 继续复用共享 CompetitionKind parser，并验证 R5-05 context mapper 为 typed Row -> Domain、无 SQL/PgRow。
 - 第二轮 stage hard gate run `31869727870` / job `94976380579` 为 `SUCCESS`：R5-01～R5-05 ownership、完整 `verify:architecture`、public/protected model boundary、rustfmt、Persistence/Application check、Persistence tests、Application tests 与同一 PostgreSQL 16 Route Resolution contract 全部通过。
 
+## PR #30 canonical 验证与修复
+
+- PR #30 首轮 fixed clean HEAD `bc93518f8436ee5175b4fea4af3bd32441c04e1d` 的 Public Platform CI run `31870124821` / Windows job `94977359038` 为 `FAILURE`。architecture 已通过，失败发生在 Windows automated acceptance 的 workspace Clippy `-D warnings`：typed `RouteRow.competition_kind` 自 owner switch 后从未被 Domain mapper 或 source 判定消费，因此触发 `dead_code`。
+- 修复没有使用 `#[allow]`、没有放宽门禁，也没有改变 route algorithm/result。仅删除 `RouteRow.competition_kind` 未使用字段，以及 explicit package / binding candidate SELECT 中对应的冗余返回列；automatic candidate 的 `b.competition_kind = $4` WHERE 过滤、Stage > Season > Competition > CompetitionKind Default specificity、priority/created_at/id 排序、有效期与模型过滤均保持不变。
+- 该字段删除改变 PostgreSQL mapping usage digest 后，full architecture 正确发现 inventory drift；只使用官方 `node scripts/generate-domain-type-inventory.mjs` 刷新。run `31870479459` / job `94978235169` 为 `SUCCESS`。
+- Ubuntu 专项修复 gate run `31870518531` 在 R5 ownership、full architecture 与 canonical rustfmt 通过后，workspace Clippy 因 runner 缺少系统 `glib-2.0` / `glib-2.0.pc` 停止；PostgreSQL contract 按 fail-fast 未执行。该环境阻塞未记为源码或测试通过，也未通过安装新生产依赖绕过。
+- 同一修复源码随后由 canonical Public Platform CI run `31870519567` / Windows job `94978336960` 完成验证并为 `SUCCESS`；artifact `9243579284`，大小 `13929568` 字节，SHA-256 `a728b4806b18d034a34a79142dd926734e5461ece23f04ddf577039c7a1304e4`。该 run 证明 Windows architecture 与完整 automated acceptance（含 workspace Clippy/tests/Tauri release/runtime）通过。
+- 上述成功 run 对修复验证有效，但当时分支仍含临时修复 workflow；临时 workflow 已在随后提交中全部删除。R5-05 仍保持 `VERIFYING`，最终 clean HEAD 必须再次通过 canonical Public Platform CI 才允许 fixed-head merge。
+
 ## 兼容性与未变范围
 
 未修改 Domain 公共类型、Application `RuleRoutingPort`、Application/Tauri 调用面、Schema、0001–0046 migration、配置、错误/日志等级、前端行为、route algorithm/result、model identity、Cargo manifests/Cargo.lock、生产依赖与模型保护资产。

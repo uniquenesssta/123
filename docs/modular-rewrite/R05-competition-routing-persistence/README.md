@@ -77,7 +77,10 @@ R4 Persistence 基础设施已完成并通过阶段出口。R5 仅按 Competitio
 - old-owner PostgreSQL 16 contract run `31869022228` / job `94974599427` 与 owner-switch/new-owner run `31869137395` / job `94974903779` 均为 `SUCCESS`；同一 contract 冻结 hierarchy context、route specificity/fallback、有效期、模型过滤、显式包、错误与 reason 字段。
 - ownership gate run `31869503602` / job `94975820076` 与 official inventory run `31869537207` / job `94975903916` 均为 `SUCCESS`。
 - 第一轮 hard gate `31869573253` 因 R4-03 旧 mapping verifier 读取已删除 legacy path 而 fail-fast；更新 call-path 后，第二轮 run `31869727870` / job `94976380579` 为 `SUCCESS`，完整 architecture、模型保护、rustfmt、Persistence/Application check/tests 与同一 PostgreSQL contract 全部通过。
-- R5-05 当前为 `VERIFYING`，R5-06 继续 `BLOCKED`；clean PR 与合并后/final canonical Windows 门禁尚未完成。
+- PR #30 首轮 fixed clean HEAD `bc93518f8436ee5175b4fea4af3bd32441c04e1d` 的 canonical run `31870124821` / job `94977359038` 在 Windows workspace Clippy `-D warnings` 因未使用的 typed `RouteRow.competition_kind` 失败；没有合并失败 tree。
+- 修复仅删除未消费 Row 字段与冗余 SELECT 返回列，保留 `b.competition_kind` WHERE 过滤和全部 route specificity/result 语义；official inventory refresh run `31870479459` / job `94978235169` 为 `SUCCESS`。
+- Ubuntu 专项 gate `31870518531` 在 architecture/rustfmt 通过后受 runner 缺 `glib-2.0` 系统库阻塞，workspace Clippy/PG contract 未完成；同一源码的 canonical Windows run `31870519567` / job `94978336960` 为 `SUCCESS`，artifact `9243579284` SHA-256 `a728b4806b18d034a34a79142dd926734e5461ece23f04ddf577039c7a1304e4`。
+- transient helper 已清理；R5-05 当前仍为 `VERIFYING`，R5-06 继续 `BLOCKED`。最终 clean PR canonical、固定 HEAD merge、merged stage CI 与 final closeout canonical Windows 门禁仍需完成。
 
 ## 兼容与限制
 
