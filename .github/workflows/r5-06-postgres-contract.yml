@@ -1,5 +1,6 @@
 name: R5-06 PostgreSQL Contract
 
+# Temporary R5-06 verification gate; remove after the PostgreSQL contracts pass.
 on:
   push:
     branches:
