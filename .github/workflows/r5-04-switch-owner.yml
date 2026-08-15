@@ -1,0 +1,98 @@
+name: R5-04 Switch Binding Owner
+
+on:
+  push:
+    branches:
+      - agent/r5-04-competition-bindings
+    paths:
+      - ".github/workflows/r5-04-switch-owner.yml"
+
+permissions:
+  contents: write
+
+jobs:
+  switch-owner:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: agent/r5-04-competition-bindings
+      - uses: dtolnay/rust-toolchain@1.88.0
+        with:
+          components: rustfmt
+      - name: Remove only legacy R5-04 ownership and format Rust
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          from pathlib import Path
+
+          path = Path("crates/persistence-postgres/src/routing.rs")
+          text = path.read_text(encoding="utf-8")
+
+          text = text.replace(
+              "    parse_competition_kind, sha256_json, write_audit_event, PersistenceError, PersistenceResult,\n    PostgresStore,\n",
+              "    sha256_json, PersistenceError, PersistenceResult, PostgresStore,\n",
+              1,
+          )
+          text = text.replace(
+              "use football_domain::{\n    CompetitionBindingDraft, CompetitionBindingSummary, CompetitionKind, CompetitionProfile,\n    ResolvedCompetitionContext, RouteDecision, RouteRequest, RouteSource,\n};\n",
+              "use football_domain::{CompetitionProfile, RouteDecision, RouteRequest, RouteSource};\n",
+              1,
+          )
+
+          start = text.index("    pub async fn ensure_type_default_binding(")
+          end = text.index("    pub async fn resolve_route(", start)
+          text = text[:start] + text[end:]
+
+          start = text.index("    async fn read_binding(")
+          end = text.index("\n}\n\npub(crate) async fn register_model_in_tx", start)
+          text = text[:start] + text[end:]
+
+          start = text.index("async fn package_route_metadata(")
+          end = text.index("fn route_decision_from_row(", start)
+          text = text[:start] + text[end:]
+
+          start = text.index("fn binding_summary_from_row(")
+          text = text[:start].rstrip() + "\n"
+
+          forbidden = [
+              "ensure_type_default_binding",
+              "create_competition_binding",
+              "list_competition_bindings",
+              "read_binding",
+              "package_route_metadata",
+              "binding_summary_from_row",
+              "binding_list_query",
+          ]
+          for token in forbidden:
+              if token in text:
+                  raise SystemExit(f"legacy R5-04 owner remains: {token}")
+          for required in ["pub async fn resolve_route", "fn route_decision_from_row", "pub async fn register_model", "pub(crate) async fn register_model_in_tx"]:
+              if required not in text:
+                  raise SystemExit(f"R5-05/R5-06 owner lost: {required}")
+
+          path.write_text(text, encoding="utf-8")
+          PY
+          cargo fmt --all
+          cargo fmt --all -- --check
+      - name: Commit owner switch
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import subprocess
+          changed = set(subprocess.check_output(["git", "diff", "--name-only"], text=True).splitlines())
+          allowed = {"crates/persistence-postgres/src/routing.rs"}
+          allowed.update(
+              p for p in changed if p.startswith("crates/persistence-postgres/src/adapters/competition/bindings/") and p.endswith(".rs")
+          )
+          allowed.add("crates/persistence-postgres/tests/competition_bindings_repository_contract.rs")
+          if not changed or not changed.issubset(allowed):
+              raise SystemExit(f"unexpected owner-switch diff: {sorted(changed)}")
+          PY
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add crates/persistence-postgres/src/routing.rs crates/persistence-postgres/src/adapters/competition/bindings crates/persistence-postgres/tests/competition_bindings_repository_contract.rs
+          git commit -m "refactor(r5-04): switch competition binding owner"
+          git push origin HEAD:agent/r5-04-competition-bindings
