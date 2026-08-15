@@ -7,6 +7,7 @@ const read = (path) => readFileSync(resolve(root, path), "utf8");
 
 const domain = (read("crates/domain/src/lib.rs") + read("crates/domain/src/lineup/kind.rs") + read("crates/domain/src/lineup/player.rs") + read("crates/domain/src/lineup/snapshot.rs") + read("crates/domain/src/lineup/preset.rs") + read("crates/domain/src/lineup/chain.rs") + read("crates/domain/src/match_record/status.rs") + read("crates/domain/src/match_record/catalog.rs"));
 const catalog = read("crates/persistence-postgres/src/player_catalog.rs");
+const teamRecordMapper = read("crates/persistence-postgres/src/adapters/catalog/teams/detail/record_mapper.rs");
 const connection = read("crates/persistence-postgres/src/migrations/reset_to_pristine.rs");
 const integration = read("crates/persistence-postgres/tests/postgres_integration.rs");
 const command = read("src-tauri/src/commands/database.rs");
@@ -43,7 +44,7 @@ const playerRecord = domain.match(/pub struct PlayerRecord\s*\{([\s\S]*?)\n\}/)?
 if (/localized_name/.test(teamRecord) || /localized_name/.test(playerRecord)) {
   throw new Error("TeamRecord / PlayerRecord 不应重复承载本地化姓名；本地化姓名属于列表或别名读取模型");
 }
-const teamMapper = functionBody(catalog, "team_record_from_row");
+const teamMapper = functionBody(teamRecordMapper, "map_team_record");
 const playerMapper = functionBody(catalog, "player_record_from_row");
 if (/localized_name/.test(teamMapper) || /localized_name/.test(playerMapper)) {
   throw new Error("基础 TeamRecord / PlayerRecord 行映射仍写入不存在的 localized_name 字段");
