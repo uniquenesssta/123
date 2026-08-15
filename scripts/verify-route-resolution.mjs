@@ -12,7 +12,8 @@ const count = (source, token) => source.split(token).length - 1;
 const base = "crates/persistence-postgres/src/adapters/competition/route_resolution";
 const contextBase = `${base}/context`;
 const routeBase = `${base}/route`;
-const legacyRouting = read("crates/persistence-postgres/src/routing.rs");
+const legacyRoutingPath = "crates/persistence-postgres/src/routing.rs";
+const legacyRouting = exists(legacyRoutingPath) ? read(legacyRoutingPath) : "";
 const competitionMod = read("crates/persistence-postgres/src/adapters/competition/mod.rs");
 const lib = read("crates/persistence-postgres/src/lib.rs");
 
@@ -35,17 +36,15 @@ for (const relative of [
 ]) check(exists(relative), `Missing R5-05 owner: ${relative}`);
 
 check(competitionMod.includes("mod route_resolution;"), "competition adapter root must register route_resolution");
-check(!competitionMod.includes("model_run_identity"), "R5-05 must not pre-implement R5-06 model_run_identity owner");
+check(competitionMod.includes("model_run_identity"), "R5-05 gate must recognize the approved R5-06 model_run_identity owner");
 check(!exists("crates/persistence-postgres/src/competitions.rs"), "legacy competitions.rs must be removed after R5-05 context owner switch");
 check(!lib.includes("mod competitions;"), "lib.rs must not register removed legacy competitions.rs");
-check(!exists("crates/persistence-postgres/src/adapters/competition/model_run_identity"), "R5-05 must not create R5-06 model_run_identity directory");
+check(exists("crates/persistence-postgres/src/adapters/competition/model_run_identity"), "R5-06 model_run_identity owner must exist after the approved next-node switch");
 
 for (const token of ["pub async fn resolve_route", "route_decision_from_row", "resolve_competition_context", "ensure_scope_id"]) {
   check(!legacyRouting.includes(token), `legacy routing.rs must not own R5-05 responsibility ${token}`);
 }
-for (const token of ["pub async fn register_model", "pub(crate) async fn register_model_in_tx", "upsert_model_definition", "register_model_version", "register_parameter_set"]) {
-  check(legacyRouting.includes(token), `R5-06 model registration must remain in routing.rs: ${token}`);
-}
+check(!exists(legacyRoutingPath), "R5-06 must remove legacy routing.rs after model registration owner switch");
 
 const contextCoordinator = read(`${contextBase}/resolve_context.rs`);
 check(contextCoordinator.includes("pub async fn resolve_competition_context"), "context coordinator must own resolve_competition_context");
@@ -117,4 +116,4 @@ if (failures.length) {
   failures.forEach((failure) => console.error(`- ${failure}`));
   process.exit(1);
 }
-console.log("R5-05 Route Resolution verified: context and route reads have one typed persistence owner, legacy route/context owners are removed, and R5-06 model registration remains untouched.");
+console.log("R5-05 Route Resolution verified: context and route reads retain their unique typed persistence owners, and the approved R5-06 model identity owner has replaced legacy routing.rs.");

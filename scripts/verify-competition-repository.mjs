@@ -1,3 +1,4 @@
+import "./verify-model-run-identity.mjs";
 import "./verify-route-resolution.mjs";
 import "./verify-competition-bindings.mjs";
 import "./verify-rule-package-repository.mjs";
@@ -43,7 +44,7 @@ check(competitionMod.includes("mod detail;") && competitionMod.includes("mod dir
 check(competitionMod.includes("mod hierarchy;"), "competition/mod.rs must register the approved R5-02 hierarchy owner");
 check(competitionMod.includes("mod bindings;"), "competition/mod.rs must register the approved R5-04 Binding owner");
 check(competitionMod.includes("mod route_resolution;"), "competition/mod.rs must register the approved R5-05 route_resolution owner");
-check(!competitionMod.includes("model_run_identity"), "R5-05 must not pre-implement R5-06 model_run_identity owner");
+check(competitionMod.includes("model_run_identity"), "competition/mod.rs must register the approved R5-06 model_run_identity owner");
 
 for (const method of ["create_competition", "read_competition", "list_competitions", "delete_competition"]) {
   check(!new RegExp(`pub\\s+async\\s+fn\\s+${method}\\b`).test(legacy), `Legacy competitions.rs still owns ${method}`);
@@ -93,4 +94,4 @@ if (failures.length) {
   failures.forEach((failure) => console.error(`- ${failure}`));
   process.exit(1);
 }
-console.log("R5-01 Competitions Repository verified: directory/detail remain unique Competition CRUD owners, approved hierarchy/Binding/Route Resolution owners are registered, legacy competitions.rs is removed, and R5-06 remains blocked.");
+console.log("R5 competition persistence verified: Competition CRUD plus approved hierarchy, Rule Package, Binding, Route Resolution and Model Run Identity owners are registered, with legacy competition/routing owners removed.");

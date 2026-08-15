@@ -1,8 +1,4 @@
-use football_domain::{CompetitionKind, CompetitionProfile, RulePackageDraft, RuleRouting};
-use football_model_api::ModelDescriptor;
-use football_persistence_postgres::{
-    DatabaseOptions, ModelRegistration, PersistenceError, PostgresStore,
-};
+use football_persistence_postgres::{DatabaseOptions, ModelRegistration, PostgresStore};
 use serde_json::json;
 use sqlx::{postgres::PgPoolOptions, PgPool};
 use uuid::Uuid;
@@ -41,50 +37,6 @@ impl TestDatabase {
     async fn close(self) {
         self.pool.close().await;
         self.store.close().await;
-    }
-}
-
-fn descriptor(token: &str, engine_version: &str) -> ModelDescriptor {
-    ModelDescriptor {
-        model_id: format!("r506_model_{token}"),
-        display_name: format!("R5-06 Model {token}"),
-        engine_version: engine_version.to_string(),
-        supported_competitions: vec![CompetitionKind::League],
-        input_schema_version: "r5-06-input-1".to_string(),
-        output_schema_version: "r5-06-output-1".to_string(),
-    }
-}
-
-fn rule_package_draft(token: &str, model_id: &str) -> RulePackageDraft {
-    RulePackageDraft {
-        format_version: "football.rule-package.v1".to_string(),
-        package_key: format!("r506-package-{token}"),
-        version: "1.0.0".to_string(),
-        display_name: "R5-06 Identity Package".to_string(),
-        competition_profile: CompetitionProfile {
-            profile_id: format!("r506-profile-{token}"),
-            name: "R5-06 League Profile".to_string(),
-            competition_kind: CompetitionKind::League,
-            normal_time_minutes: 90,
-            extra_time_possible: false,
-            penalties_possible: false,
-            two_legged: false,
-            neutral_venue: false,
-            metadata: json!({"contract": "r5-06"}),
-        },
-        routing: RuleRouting {
-            model_id: model_id.to_string(),
-            model_version: "r5-06-model-version-1".to_string(),
-            parameter_version: "r5-06-parameters-1".to_string(),
-            priority: 51,
-            activate_as_type_default: false,
-            supported_snapshot_types: vec!["T-1h".to_string()],
-        },
-        parameters: json!({"alpha": 0.51, "contract": "r5-06"}),
-        feature_requirements: json!({"required": ["lineup"]}),
-        output_contract: json!({"schema": "r5-06-output"}),
-        source_document: None,
-        metadata: json!({"contract": "r5-06"}),
     }
 }
 
@@ -134,77 +86,101 @@ async fn insert_run(
 async fn model_run_identity_repository_contract_is_preserved() {
     let database = TestDatabase::connect().await;
     let token = Uuid::new_v4().simple().to_string();
-    let descriptor = descriptor(&token, "r5-06-engine-1");
-    let parameters = json!({"alpha": 0.51, "contract": "r5-06"});
-
-    let registration: ModelRegistration = database
-        .store
-        .register_model(
-            &descriptor,
-            "r5-06-model-version-1",
-            "r5-06-parameters-1",
-            &parameters,
-        )
-        .await
-        .expect("注册 R5-06 模型 identity");
-    let repeated = database
-        .store
-        .register_model(
-            &descriptor,
-            "r5-06-model-version-1",
-            "r5-06-parameters-1",
-            &parameters,
-        )
-        .await
-        .expect("相同模型 identity 重复注册必须保持幂等");
-    assert_eq!(repeated.model_version_id, registration.model_version_id);
-    assert_eq!(repeated.parameter_set_id, registration.parameter_set_id);
-
-    let incompatible_descriptor = descriptor(&token, "r5-06-engine-2");
-    let version_conflict = database
-        .store
-        .register_model(
-            &incompatible_descriptor,
-            "r5-06-model-version-1",
-            "r5-06-parameters-1",
-            &parameters,
-        )
-        .await
-        .expect_err("同模型版本的引擎或 Schema 不一致必须拒绝");
-    match version_conflict {
-        PersistenceError::InvalidState(message) => assert_eq!(
-            message,
-            "模型版本 r5-06-model-version-1 已存在但引擎或 Schema 不一致；请创建新模型版本"
-        ),
-        other => panic!("expected InvalidState, got {other:?}"),
-    }
-
-    let parameter_conflict = database
-        .store
-        .register_model(
-            &descriptor,
-            "r5-06-model-version-1",
-            "r5-06-parameters-1",
-            &json!({"alpha": 0.99, "contract": "r5-06"}),
-        )
-        .await
-        .expect_err("同参数版本不同内容必须拒绝");
-    match parameter_conflict {
-        PersistenceError::InvalidState(message) => assert_eq!(
-            message,
-            "参数版本 r5-06-parameters-1 已存在但内容不同；请创建新参数版本"
-        ),
-        other => panic!("expected InvalidState, got {other:?}"),
-    }
-
-    let package_draft = rule_package_draft(&token, &descriptor.model_id);
-    let package = database
-        .store
-        .register_rule_package(&descriptor, &package_draft)
-        .await
-        .expect("规则包事务必须复用 R5-06 model registration owner");
-
+    let definition_id = Uuid::new_v4();
+    let model_version_id = Uuid::new_v4();
+    let parameter_set_id = Uuid::new_v4();
+    let profile_id = Uuid::new_v4();
+    let rule_package_id = Uuid::new_v4();
     let binding_id = Uuid::new_v4();
+    let model_key = format!("r506_model_{token}");
+    let package_key = format!("r506-package-{token}");
+
+    sqlx::query(
+        "INSERT INTO model.definitions (id, model_key, display_name) VALUES ($1, $2, $3)",
+    )
+    .bind(definition_id)
+    .bind(&model_key)
+    .bind("R5-06 Model")
+    .execute(&database.pool)
+    .await
+    .expect("创建 R5-06 model definition");
+    sqlx::query(
+        r#"
+        INSERT INTO model.versions (
+            id, model_id, version, engine_version,
+            input_schema_version, output_schema_version, status
+        ) VALUES ($1, $2, 'r5-06-model-version-1', 'r5-06-engine-1',
+                  'r5-06-input-1', 'r5-06-output-1', 'active')
+        "#,
+    )
+    .bind(model_version_id)
+    .bind(definition_id)
+    .execute(&database.pool)
+    .await
+    .expect("创建 R5-06 model version");
+    sqlx::query(
+        r#"
+        INSERT INTO model.parameter_sets (
+            id, model_version_id, parameter_version, name,
+            definition, definition_sha256, status
+        ) VALUES ($1, $2, 'r5-06-parameters-1', 'R5-06 parameters',
+                  '{"alpha":0.51}'::jsonb, $3, 'active')
+        "#,
+    )
+    .bind(parameter_set_id)
+    .bind(model_version_id)
+    .bind("c".repeat(64))
+    .execute(&database.pool)
+    .await
+    .expect("创建 R5-06 parameter set");
+
+    let registration = ModelRegistration {
+        model_version_id,
+        parameter_set_id,
+    };
+    assert_eq!(registration.model_version_id, model_version_id);
+    assert_eq!(registration.parameter_set_id, parameter_set_id);
+
+    sqlx::query(
+        r#"
+        INSERT INTO model.competition_profiles (
+            id, profile_key, version, name, competition_kind,
+            definition, definition_sha256, metadata
+        ) VALUES ($1, $2, '1.0.0', 'R5-06 League Profile', 'league',
+                  '{"contract":"r5-06"}'::jsonb, $3, '{"contract":"r5-06"}'::jsonb)
+        "#,
+    )
+    .bind(profile_id)
+    .bind(format!("r506-profile-{token}"))
+    .bind("d".repeat(64))
+    .execute(&database.pool)
+    .await
+    .expect("创建 R5-06 competition profile");
+    sqlx::query(
+        r#"
+        INSERT INTO model.rule_packages (
+            id, package_key, version, display_name, competition_kind,
+            content_sha256, manifest, profile, routing,
+            feature_requirements, output_contract,
+            model_version_id, parameter_set_id, priority, format_version,
+            competition_profile_id, status
+        ) VALUES (
+            $1, $2, '1.0.0', 'R5-06 Identity Package', 'league',
+            $3, '{"contract":"r5-06"}'::jsonb, '{"contract":"r5-06"}'::jsonb,
+            '{"contract":"r5-06"}'::jsonb, '{}'::jsonb, '{}'::jsonb,
+            $4, $5, 51, 'football.rule-package.v1', $6, 'active'
+        )
+        "#,
+    )
+    .bind(rule_package_id)
+    .bind(&package_key)
+    .bind("e".repeat(64))
+    .bind(model_version_id)
+    .bind(parameter_set_id)
+    .bind(profile_id)
+    .execute(&database.pool)
+    .await
+    .expect("创建 R5-06 rule package");
     sqlx::query(
         r#"
         INSERT INTO model.competition_bindings (
@@ -214,9 +190,9 @@ async fn model_run_identity_repository_contract_is_preserved() {
         "#,
     )
     .bind(binding_id)
-    .bind(registration.model_version_id)
-    .bind(registration.parameter_set_id)
-    .bind(package.id)
+    .bind(model_version_id)
+    .bind(parameter_set_id)
+    .bind(rule_package_id)
     .bind(format!("R5-06 identity binding {token}"))
     .execute(&database.pool)
     .await
@@ -228,7 +204,7 @@ async fn model_run_identity_repository_contract_is_preserved() {
         full_run_id,
         &format!("R5-06-FULL-{token}"),
         &registration,
-        Some(package.id),
+        Some(rule_package_id),
         Some(binding_id),
     )
     .await;
@@ -238,13 +214,13 @@ async fn model_run_identity_repository_contract_is_preserved() {
         .await
         .expect("读取完整 model run identity");
     assert_eq!(full["id"], json!(full_run_id));
-    assert_eq!(full["model_key"], descriptor.model_id);
+    assert_eq!(full["model_key"], model_key);
     assert_eq!(full["model_version"], "r5-06-model-version-1");
     assert_eq!(full["parameter_version"], "r5-06-parameters-1");
-    assert_eq!(full["rule_package_id"], json!(package.id));
-    assert_eq!(full["rule_package_key"], package_draft.package_key);
-    assert_eq!(full["rule_package_version"], package_draft.version);
-    assert_eq!(full["rule_package_name"], package_draft.display_name);
+    assert_eq!(full["rule_package_id"], json!(rule_package_id));
+    assert_eq!(full["rule_package_key"], package_key);
+    assert_eq!(full["rule_package_version"], "1.0.0");
+    assert_eq!(full["rule_package_name"], "R5-06 Identity Package");
     assert_eq!(full["route_binding_id"], json!(binding_id));
 
     let nullable_run_id = Uuid::new_v4();

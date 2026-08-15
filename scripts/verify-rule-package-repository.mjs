@@ -10,7 +10,8 @@ const check = (condition, message) => { if (!condition) failures.push(message); 
 const count = (source, token) => source.split(token).length - 1;
 
 const base = "crates/persistence-postgres/src/adapters/rules/packages";
-const legacy = read("crates/persistence-postgres/src/routing.rs");
+const legacyPath = "crates/persistence-postgres/src/routing.rs";
+const legacy = exists(legacyPath) ? read(legacyPath) : "";
 const adaptersMod = read("crates/persistence-postgres/src/adapters/mod.rs");
 const rulesMod = read("crates/persistence-postgres/src/adapters/rules/mod.rs");
 
@@ -42,7 +43,6 @@ for (const method of ["register_rule_package", "list_rule_packages"]) {
 check(!legacy.includes("register_rule_source_document"), "Legacy routing.rs still owns source-document registration");
 check(!legacy.includes("rule_package_summary_from_row"), "Legacy routing.rs still owns dynamic RulePackage mapper");
 
-// R5-04 is now the approved next node: Binding persistence must no longer remain in routing.rs.
 for (const migrated of [
   "ensure_type_default_binding",
   "create_competition_binding",
@@ -51,12 +51,11 @@ for (const migrated of [
 ]) check(!legacy.includes(migrated), `R5-04 Binding responsibility must be removed from routing.rs: ${migrated}`);
 check(exists("crates/persistence-postgres/src/adapters/competition/bindings/mod.rs"), "R5-04 Binding owner must exist in competition adapters");
 
-// R5-05 is now approved and must be absent from legacy routing; R5-06 remains blocked.
 for (const migrated of ["resolve_route", "route_decision_from_row"]) {
   check(!legacy.includes(migrated), `R5-05 route responsibility must be removed from routing.rs: ${migrated}`);
 }
-check(legacy.includes("register_model"), "R5-06 register_model must remain in routing.rs");
-check(legacy.includes("pub(crate) async fn register_model_in_tx"), "shared model registration transaction helper must remain in routing owner with crate-only visibility");
+check(!exists(legacyPath), "R5-06 must remove legacy routing.rs after model registration owner switch");
+check(exists("crates/persistence-postgres/src/adapters/competition/model_run_identity/registration/mod.rs"), "R5-06 model registration owner must exist under model_run_identity");
 
 const row = read(`${base}/record_row.rs`);
 const mapper = read(`${base}/record_mapper.rs`);
@@ -69,6 +68,7 @@ check(count(list, "sqlx::query_as") === 1 && list.includes("ORDER BY rp.created_
 
 const transaction = read(`${base}/register_rule_package/transaction.rs`);
 check(!transaction.includes("sqlx::query") && transaction.includes("self.pool.begin().await?") && transaction.includes("tx.commit().await?") && transaction.includes("upsert_rule_source_document") && transaction.includes("register_model_in_tx") && transaction.includes("register_competition_profile_in_tx") && transaction.includes("write_audit_event"), "Rule Package transaction must orchestrate helpers/audit without embedding SQL");
+check(transaction.includes("adapters::register_model_in_tx") && !transaction.includes("routing::register_model_in_tx"), "Rule Package transaction must consume the approved R5-06 registration boundary");
 check(transaction.includes("已存在但内容不同") && transaction.includes("已绑定不同赛事Profile版本") && transaction.includes("created_at: Utc::now()"), "Rule Package transaction must preserve conflict and returned-created_at semantics");
 
 const insert = read(`${base}/register_rule_package/insert_rule_package.rs`);
@@ -96,4 +96,4 @@ if (failures.length) {
   failures.forEach((failure) => console.error(`- ${failure}`));
   process.exit(1);
 }
-console.log("R5-03 Rule Package Repository verified: package persistence remains unique, R5-04 Binding and R5-05 Route Resolution have moved to approved owners, and R5-06 model registration remains untouched.");
+console.log("R5-03 Rule Package Repository verified: package persistence remains unique and consumes the approved R5-06 model registration boundary after legacy routing removal.");
