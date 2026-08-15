@@ -43,6 +43,17 @@ Node 开发依赖固定安装和读取自源码根目录上一级的 `../node_mo
 
 ## 模块化重写执行记录
 
+### R5-06 Model Run Identity Reads
+
+- Model Run identity read 已收敛到 `crates/persistence-postgres/src/adapters/competition/model_run_identity/`，并按 typed Row、record mapper、单次 identity SELECT 拆分；`model_runs.rs::read_run` 不再直接拥有模型版本、参数版本、规则包与 binding identity JOIN。
+- R5-05 后残留在 legacy `routing.rs` 的 `ModelRegistration`、`register_model` / `register_model_in_tx` 及 definition/version/parameter-set SQL 已同步迁入 `model_run_identity/registration/`；Rule Package registration 已切换到新唯一 owner，`routing.rs` 已删除且不保留转发壳。
+- 公共 `ModelRegistration`、`PostgresStore::register_model`、`read_run` JSON identity 字段、错误语义、migration/Schema、配置、模型与路由算法均保持不变；未修改 `list_recent_runs`。
+- PostgreSQL 16 专项 run `31881761988`：Model Run Identity contract job `95005200186` 与 Rule Package registration regression job `95005200191` 均 `SUCCESS`。
+- clean source HEAD `dc6d2baf0f6092f67200214b5b45e37c528394ad` 的 canonical Public Platform CI run `31881842368` / Windows job `95005434692` 为 `SUCCESS`；artifact `9246499189`，SHA-256 `74bc2a687b8499f798c0a91a28522fa74df0237ee24d005197067b1c97a1e452`。
+- 当前节点状态为 `VERIFYING`；详细记录见 `docs/modular-rewrite/R05-competition-routing-persistence/R05-06-model-run-identity-reads.md`，待文档 clean HEAD、PR/merge 与 merged-stage canonical gate 通过后关闭为 `DONE`。
+
+
+
 - `new-A` 已从 `main` 基线提交 `db79995873460688c15abb3497bf1c61b73ffb18` 建立。
 - `new-B` 已从 `new-A` 提交 `36d34ba1ff73cbec575cf58594aa8c0329669496` 建立；R1-01 已创建模块边界与状态所有权契约并完成 Windows 自动化门禁，状态为 `DONE`，R1-02 已开放为 `READY`。
 - R1-02 已新增模块边界、状态所有权和受保护导入三条仓库内门禁，接入 `npm run verify:architecture`、前端聚合验证和 Windows CI 独立步骤；状态为 `DONE`，R1-03 已开放为 `READY`。
