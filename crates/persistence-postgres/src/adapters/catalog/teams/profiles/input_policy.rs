@@ -99,7 +99,10 @@ mod tests {
 
     #[test]
     fn trims_optional_text_and_drops_blank_values() {
-        assert_eq!(trimmed_optional_text(&Some("  Team  ".to_string())), Some("Team"));
+        assert_eq!(
+            trimmed_optional_text(&Some("  Team  ".to_string())),
+            Some("Team")
+        );
         assert_eq!(trimmed_optional_text(&Some("   ".to_string())), None);
         assert_eq!(trimmed_optional_text(&None), None);
     }
