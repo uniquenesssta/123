@@ -2,9 +2,9 @@
 
 ## 状态
 
-`VERIFYING`
+`DONE`
 
-生产 owner 已完成切换，专项 PostgreSQL 契约、R6-01 ownership/inventory/architecture gate 与阶段级 frontend/workspace Rust hard gate 均已实际通过。当前仅剩 clean PR、merge 与 merged-stage canonical gate；在这些门禁完成前状态保持 `VERIFYING`。
+生产 owner 已完成切换；专项 PostgreSQL 契约、ownership/inventory/architecture、阶段级 frontend/workspace Rust hard gate、clean PR canonical 与 merged-stage canonical 均已实际通过。R6-01 正式收口为 `DONE`，R6-02 可进入 `READY`。
 
 ## 基线与分支
 
@@ -154,6 +154,13 @@ crates/persistence-postgres/src/adapters/catalog/
 
 因此 R6-01 的最小验证、阶段 frontend、workspace Rust、architecture、模型保护、数据库静态 baseline 与真实 PostgreSQL 16 专项契约均已有成功证据。
 
+## Clean PR 与 merged-stage canonical
+
+- PR #32 以 clean head `58ec21b48b26ead4f2ee2fec15573c39a2f7ab8b` 进入 `rewrite/r6-entity-catalog-persistence`，PR canonical Public Platform CI run `31890099520` 为 `SUCCESS`。
+- PR #32 已按 squash merge 合并，最终代码 merge commit 为 `a54df5ca2695297ea5866a3efd74643239568825`。
+- merged-stage canonical Public Platform CI run `31892105125` / Windows job `95029805339` 为 `SUCCESS`；R1 architecture、Windows Automated acceptance 与 validation evidence upload 均通过。
+- merged-stage artifact `9249127034`，SHA-256 `972be4e32272e700da265f6e82ce96bc5e56aa356491bb217d6a1076e1b00087`。
+
 ## 当前净变更清单（clean PR 前）
 
 ### 新增
@@ -215,16 +222,14 @@ crates/persistence-postgres/src/adapters/catalog/
 
 无长期生产文件。所有 R6-01 临时 workflow/helper 在进入 clean hard gate 前清理，不进入最终净 diff。
 
-## 未执行项与剩余门禁
+## 未执行项与剩余限制
 
-阶段级 hard gate 已全部实际通过。当前尚未宣称以下项目通过：
+R6-01 的代码、专项契约、阶段回归、clean PR 与 merged-stage canonical 已全部通过，节点正式 `DONE`。仍未执行且不被云端 Automated 替代的外部/人工验证：
 
-- clean PR canonical Public Platform CI。
-- squash merge 与 merged-stage canonical Public Platform CI。
-- 用户现有 PostgreSQL 数据库写入/真实数据 sample 验收。
-- Windows Full 人工交互验收。
+- 未对用户现有 PostgreSQL 数据库执行写入或真实数据 sample 验收。
+- 未执行 Windows Full 人工交互验收。
 
-用户现有数据库与 Windows Full 不属于云端 Automated 的替代项，继续作为明确未执行事实保留；PR/merge 两项完成前，R6-01 只能保持 `VERIFYING`。
+上述两项作为明确限制保留，不影响本 Atomic Task 的云端代码与契约收口结论。
 
 ## 回退点
 
@@ -232,4 +237,5 @@ crates/persistence-postgres/src/adapters/catalog/
 - 当前可验证 owner-switch 核心提交：`5056917bd5c0e81aaaa96d1ef70c7362ef874820`。
 - ownership/inventory verified HEAD：`b2999e5dce982bddf2093f0596eec33a7dbd0333`。
 - stage hard-gate verified HEAD：`051afcd9b08cdb57b862251ae4a66c9a6c5bd203`。
+- R6-01 final stage merge commit：`a54df5ca2695297ea5866a3efd74643239568825`。
 - 如需回退，不复制旧 methods 形成双实现；通过 Git 回退到节点起点/最近通过门禁的原子提交并重跑 R6-01 PostgreSQL contract 与 architecture gate。

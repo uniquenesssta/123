@@ -50,7 +50,8 @@ Node 开发依赖固定安装和读取自源码根目录上一级的 `../node_mo
 - 旧 owner PostgreSQL 16 contract run `31888078703` / job `95020173411` 为 `SUCCESS`；最终 owner switch run `31888483586` / job `95021118552` 为 `SUCCESS`，生产切换提交 `5056917bd5c0e81aaaa96d1ef70c7362ef874820`。
 - ownership/inventory run `31888800801` / job `95021851053` 为 `SUCCESS`：R6-01 ownership、official Domain inventory、模型保护、完整 architecture、rustfmt、Persistence/Application check、Persistence unit tests 与同一 PostgreSQL contract 全部通过；verified HEAD `b2999e5dce982bddf2093f0596eec33a7dbd0333`。
 - 阶段级 hard gate run `31889555412` 已通过：Windows job `95023694944` 的 frontend、rustfmt、workspace Clippy `-D warnings`、workspace tests 与 Ubuntu job `95023694946` 的完整 architecture、模型保护、database baseline freeze、PostgreSQL 16 contract 均 `SUCCESS`。
-- 当前节点状态仍为 `VERIFYING`；只剩 clean PR、merge 与 merged-stage canonical gate。详细记录见 `docs/modular-rewrite/R06-entity-catalog-persistence/R06-01-team-directory-and-detail.md`。
+- clean PR canonical run `31890099520` 为 `SUCCESS`；PR #32 已 squash merge 为 `a54df5ca2695297ea5866a3efd74643239568825`。merged-stage canonical run `31892105125` / Windows job `95029805339` 为 `SUCCESS`，artifact `9249127034`，SHA-256 `972be4e32272e700da265f6e82ce96bc5e56aa356491bb217d6a1076e1b00087`。
+- R6-01 已正式关闭为 `DONE`；未对用户现有 PostgreSQL 数据库执行写入/真实数据 sample 验收，也未宣称 Windows Full 人工交互验收已完成。R6-02 Team Names 与 Profiles 已开放为 `READY`。详细记录见 `docs/modular-rewrite/R06-entity-catalog-persistence/R06-01-team-directory-and-detail.md`。
 
 
 ### R5-06 Model Run Identity Reads

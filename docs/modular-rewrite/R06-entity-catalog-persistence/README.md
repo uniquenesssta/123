@@ -17,8 +17,8 @@ R6 按 Teams、Players、Coaches、Formations、Abilities、Dynamic Tags、Avail
 
 | 任务 | 范围 | 状态 |
 |---|---|---|
-| R6-01 | Team Directory 与 Detail | VERIFYING |
-| R6-02 | Team Names 与 Profiles | BLOCKED |
+| R6-01 | Team Directory 与 Detail | DONE |
+| R6-02 | Team Names 与 Profiles | READY |
 | R6-03 | Player Directory 与 Detail | BLOCKED |
 | R6-04 | Player Names 与 Positions | BLOCKED |
 | R6-05 | Team Periods 与 Availability | BLOCKED |
@@ -39,11 +39,13 @@ R6 按 Teams、Players、Coaches、Formations、Abilities、Dynamic Tags、Avail
 - 第二次 ownership/inventory run `31888800801` / job `95021851053` 为 `SUCCESS`：official inventory、R6-01 ownership、模型保护、完整 architecture、rustfmt、Persistence/Application check、Persistence unit tests 与同一 PostgreSQL contract 全部通过；verified HEAD `b2999e5dce982bddf2093f0596eec33a7dbd0333`。
 - 临时 baseline/owner-switch/inventory workflow 与 helper 已从当前 branch tree 清理。
 - 阶段级 hard gate 最终 run `31889555412`：Windows job `95023694944` 与 PostgreSQL/architecture job `95023694946` 均 `SUCCESS`；frontend、rustfmt、workspace Clippy `-D warnings`、workspace tests、完整 architecture、模型保护、database baseline freeze 与同一 PG16 contract 已全部实际通过。
-- hard gate 前五轮均因旧 verifier 仍绑定已迁移的 Team owner 路径而 fail-fast；仅推进 verifier call-path 到新 owner，原契约均保持。当前只剩 clean PR/merge/merged-stage canonical 门禁。
+- hard gate 前五轮均因旧 verifier 仍绑定已迁移的 Team owner 路径而 fail-fast；仅推进 verifier call-path 到新 owner，原契约均保持。
+- PR #32 clean head `58ec21b48b26ead4f2ee2fec15573c39a2f7ab8b` 的 canonical run `31890099520` 为 `SUCCESS`；squash merge commit `a54df5ca2695297ea5866a3efd74643239568825`。
+- merged-stage canonical run `31892105125` / Windows job `95029805339` 为 `SUCCESS`；artifact `9249127034`，SHA-256 `972be4e32272e700da265f6e82ce96bc5e56aa356491bb217d6a1076e1b00087`。R6-01 正式 `DONE`，R6-02 开放为 `READY`。
 
 ## 当前边界与剩余门禁
 
 - 公共 TeamCatalogPort、Tauri command/DTO、Schema、0001–0046 migration、配置、错误语义、用户可观察行为、模型保护资产与生产依赖未改变。
-- R6-01 阶段级 frontend/workspace Rust hard gate 已通过；当前仅剩 clean PR canonical、merge 与 merged-stage canonical，因此仍保持 `VERIFYING`。
-- R6-02 继续 `BLOCKED`，直到 R6-01 完整收口为 `DONE`。
+- R6-01 已完成专项契约、阶段回归、clean PR、squash merge 与 merged-stage canonical，状态为 `DONE`。
+- R6-02 Team Names 与 Profiles 为当前唯一 `READY` 节点；后续节点继续 `BLOCKED`。
 - 每个节点完成时必须创建对应 `R06-xx` 实施记录并更新本索引；R6 完成时必须创建 `R06-stage-completion.md`。
