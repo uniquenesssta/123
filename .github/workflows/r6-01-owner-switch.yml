@@ -40,6 +40,64 @@ jobs:
         uses: dtolnay/rust-toolchain@1.88.0
       - name: Apply responsibility owner switch
         run: python scripts/r6_01_owner_switch.py
+      - name: Repair generated module visibility
+        shell: bash
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+
+          directory = Path("crates/persistence-postgres/src/adapters/catalog/teams/directory")
+          detail = Path("crates/persistence-postgres/src/adapters/catalog/teams/detail")
+
+          mod_path = directory / "mod.rs"
+          mod_text = mod_path.read_text(encoding="utf-8")
+          mod_text = "\n".join(
+              line for line in mod_text.splitlines()
+              if not line.startswith("pub(super) use ")
+          ) + "\n"
+          mod_path.write_text(mod_text, encoding="utf-8")
+
+          replacements = {
+              directory / "create_team.rs": (
+                  "use super::normalize_team_name;",
+                  "use super::name_policy::normalize_team_name;",
+              ),
+              directory / "update_team.rs": (
+                  "use super::normalize_team_name;",
+                  "use super::name_policy::normalize_team_name;",
+              ),
+              directory / "list_team_options.rs": (
+                  "use super::{map_team_option_row, TeamOptionRow};",
+                  "use super::{option_mapper::map_team_option_row, option_row::TeamOptionRow};",
+              ),
+              directory / "list_teams.rs": (
+                  "use super::{map_team_list_row, TeamListRow};",
+                  "use super::{list_mapper::map_team_list_row, list_row::TeamListRow};",
+              ),
+          }
+          for path, (old, new) in replacements.items():
+              text = path.read_text(encoding="utf-8")
+              if old not in text:
+                  raise SystemExit(f"missing visibility repair marker in {path}: {old}")
+              path.write_text(text.replace(old, new, 1), encoding="utf-8")
+
+          mapper = detail / "record_mapper.rs"
+          mapper_text = mapper.read_text(encoding="utf-8")
+          mapper_text = mapper_text.replace(
+              "pub(super) fn map_team_record",
+              "pub(in crate::adapters::catalog::teams) fn map_team_record",
+              1,
+          )
+          mapper.write_text(mapper_text, encoding="utf-8")
+
+          row = detail / "record_row.rs"
+          row_text = row.read_text(encoding="utf-8")
+          row_text = row_text.replace(
+              "pub(super)",
+              "pub(in crate::adapters::catalog::teams)",
+          )
+          row.write_text(row_text, encoding="utf-8")
+          PY
       - name: Format owner switch
         run: cargo fmt --all
       - name: Verify formatting
