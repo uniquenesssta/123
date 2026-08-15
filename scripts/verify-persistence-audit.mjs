@@ -15,7 +15,7 @@ const files = {
   hash: "crates/persistence-postgres/src/audit/audit_hash.rs",
   writer: "crates/persistence-postgres/src/audit/write_audit_event.rs",
   library: "crates/persistence-postgres/src/lib.rs",
-  player: "crates/persistence-postgres/src/player_catalog.rs",
+  createTeam: "crates/persistence-postgres/src/adapters/catalog/teams/directory/create_team.rs",
 };
 for (const [label, relative] of Object.entries(files)) check(exists(relative), `R4-02 缺少 ${label} owner：${relative}`);
 const sources = Object.fromEntries(Object.entries(files).map(([key, relative]) => [key, read(relative)]));
@@ -38,7 +38,11 @@ check(rawInsertOwners.length === 1 && rawInsertOwners[0].replaceAll("\\", "/").e
 const combined = rustFiles.map((file) => fs.readFileSync(file, "utf8")).join("\n");
 check(!combined.includes("async fn audit_in_tx("), "旧 player audit_in_tx helper 仍存在");
 check(!combined.includes("async fn audit(\n"), "旧 pool audit helper 仍存在");
-check(sources.player.includes("let mut tx = self.pool.begin().await?;") && sources.player.includes('"team_created"') && sources.player.includes("tx.commit().await?;"), "create_team 未将业务写入与审计收敛到同一事务");
+for (const token of ["let mut tx = self.pool.begin().await?;", "INSERT INTO football.teams", "crate::write_audit_event(", '"team_created"', "tx.commit().await?;"]) {
+  check(sources.createTeam.includes(token), `create_team 业务写入/审计事务契约缺失：${token}`);
+}
+check(sources.createTeam.indexOf("INSERT INTO football.teams") < sources.createTeam.indexOf("crate::write_audit_event("), "create_team 必须先执行球队业务写入再写审计事件");
+check(sources.createTeam.indexOf("crate::write_audit_event(") < sources.createTeam.indexOf("tx.commit().await?;"), "create_team 审计写入必须与业务写入在同一事务提交前完成");
 
 if (failures.length) {
   console.error("R4-02 Audit 基础设施验证失败：");

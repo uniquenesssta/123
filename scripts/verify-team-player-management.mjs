@@ -28,6 +28,9 @@ const appCatalog = [
   text("crates/application/src/services/players/facade.rs"),
 ].join("\n");
 const persistenceCatalog = text("crates/persistence-postgres/src/team_catalog.rs");
+const teamDetailCoordinator = text("crates/persistence-postgres/src/adapters/catalog/teams/detail/read_team.rs");
+const teamDetailProfile = text("crates/persistence-postgres/src/adapters/catalog/teams/detail/read_profile.rs");
+const teamDetailSquad = text("crates/persistence-postgres/src/adapters/catalog/teams/detail/read_squad.rs");
 const playerPersistence = text("crates/persistence-postgres/src/player_catalog.rs");
 const spreadsheetPersistence = text("crates/persistence-postgres/src/spreadsheet_exchange.rs");
 const spreadsheetIo = text("crates/spreadsheet-io/src/lib.rs");
@@ -94,8 +97,10 @@ assert(sharedBulkDeleteDomain.includes("pub struct BulkDeleteResult"), "领域�
 assert(appCatalog.includes("pub async fn list_teams"), "应用层缺少球队列表入口");
 assert(appCatalog.includes("pub async fn bulk_delete_players"), "应用层缺少球员批量删除入口");
 assert(appCatalog.includes("pub async fn bulk_delete_teams"), "应用层缺少球队批量删除入口");
-assert(persistenceCatalog.includes("FROM football.team_profiles"), "球队详情未读取球队档案");
-assert(persistenceCatalog.includes("football.player_team_periods"), "球队详情未读取当前阵容");
+assert(teamDetailCoordinator.includes("read_profile(&self.pool, team_id).await?"), "球队详情协调器未读取球队档案");
+assert(teamDetailProfile.includes("FROM football.team_profiles"), "球队详情未读取球队档案");
+assert(teamDetailCoordinator.includes("read_squad(&self.pool, team_id).await?"), "球队详情协调器未读取当前阵容");
+assert(teamDetailSquad.includes("football.player_team_periods"), "球队详情未读取当前阵容");
 assert(persistenceCatalog.includes("review.team_match_reviews"), "球队删除未保护赛后复盘历史");
 assert(persistenceCatalog.includes("football.matches WHERE home_team_id=$1 OR away_team_id=$1"), "球队删除未保护比赛历史");
 assert(persistenceCatalog.includes("team_deleted"), "球队删除缺少审计事件");
