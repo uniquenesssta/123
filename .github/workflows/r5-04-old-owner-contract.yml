@@ -41,3 +41,5 @@ jobs:
         run: cargo fmt --all -- --check
       - name: Run legacy Competition Binding PostgreSQL contract
         run: cargo test --locked -p football-persistence-postgres --test competition_bindings_repository_contract -- --ignored --test-threads=1
+
+# rerun after canonical rustfmt
