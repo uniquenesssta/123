@@ -1,5 +1,6 @@
 name: R6-01 Ownership Inventory Gate
 
+# Retry after the persistence-audit verifier was advanced to the R6-01 create_team owner.
 on:
   push:
     branches:
