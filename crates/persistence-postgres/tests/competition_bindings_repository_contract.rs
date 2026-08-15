@@ -185,7 +185,10 @@ async fn competition_binding_repository_contract_is_preserved() {
         .expect_err("空绑定范围必须拒绝");
     match empty_scope {
         PersistenceError::InvalidState(message) => {
-            assert!(message.contains("绑定范围不能为空"), "unexpected message: {message}");
+            assert!(
+                message.contains("绑定范围不能为空"),
+                "unexpected message: {message}"
+            );
         }
         other => panic!("expected InvalidState, got {other:?}"),
     }
@@ -209,7 +212,10 @@ async fn competition_binding_repository_contract_is_preserved() {
         .create_competition_binding(&invalid_dates)
         .await
         .expect_err("结束时间早于开始时间必须拒绝");
-    assert!(matches!(invalid_dates_error, PersistenceError::InvalidState(_)));
+    assert!(matches!(
+        invalid_dates_error,
+        PersistenceError::InvalidState(_)
+    ));
 
     let kind_mismatch = database
         .store
@@ -226,7 +232,10 @@ async fn competition_binding_repository_contract_is_preserved() {
         .expect_err("显式赛事类型与阶段解析类型不一致必须拒绝");
     match kind_mismatch {
         PersistenceError::InvalidState(message) => {
-            assert!(message.contains("与赛事层级解析结果"), "unexpected message: {message}");
+            assert!(
+                message.contains("与赛事层级解析结果"),
+                "unexpected message: {message}"
+            );
         }
         other => panic!("expected InvalidState, got {other:?}"),
     }
@@ -260,7 +269,10 @@ async fn competition_binding_repository_contract_is_preserved() {
         .expect_err("不同赛事类型规则包必须拒绝绑定");
     match package_mismatch {
         PersistenceError::InvalidState(message) => {
-            assert!(message.contains("不能绑定到"), "unexpected message: {message}");
+            assert!(
+                message.contains("不能绑定到"),
+                "unexpected message: {message}"
+            );
         }
         other => panic!("expected InvalidState, got {other:?}"),
     }
@@ -302,12 +314,21 @@ async fn competition_binding_repository_contract_is_preserved() {
         .expect("创建赛事绑定");
     assert_eq!(competition_binding.binding_name, "  Competition Binding  ");
     assert_eq!(competition_binding.competition_id, Some(competition.id));
-    assert_eq!(competition_binding.competition_name.as_deref(), Some(competition.name.as_str()));
+    assert_eq!(
+        competition_binding.competition_name.as_deref(),
+        Some(competition.name.as_str())
+    );
     assert_eq!(competition_binding.season_id, None);
     assert_eq!(competition_binding.stage_id, None);
-    assert_eq!(competition_binding.competition_kind, Some(CompetitionKind::League));
+    assert_eq!(
+        competition_binding.competition_kind,
+        Some(CompetitionKind::League)
+    );
     assert_eq!(competition_binding.rule_package_id, league_package.id);
-    assert_eq!(competition_binding.rule_package_name, league_package.display_name);
+    assert_eq!(
+        competition_binding.rule_package_name,
+        league_package.display_name
+    );
     assert_eq!(competition_binding.model_id, league_descriptor.model_id);
     assert_eq!(competition_binding.priority, 10);
     assert!(competition_binding.is_active);
@@ -328,7 +349,10 @@ async fn competition_binding_repository_contract_is_preserved() {
     assert_eq!(season_binding.competition_id, Some(competition.id));
     assert_eq!(season_binding.season_id, Some(season.id));
     assert_eq!(season_binding.stage_id, None);
-    assert_eq!(season_binding.competition_kind, Some(CompetitionKind::League));
+    assert_eq!(
+        season_binding.competition_kind,
+        Some(CompetitionKind::League)
+    );
     assert!(season_binding.binding_name.starts_with("赛事规则绑定-"));
 
     let stage_binding = database
@@ -347,7 +371,10 @@ async fn competition_binding_repository_contract_is_preserved() {
     assert_eq!(stage_binding.competition_id, Some(competition.id));
     assert_eq!(stage_binding.season_id, Some(season.id));
     assert_eq!(stage_binding.stage_id, Some(stage.id));
-    assert_eq!(stage_binding.competition_kind, Some(CompetitionKind::League));
+    assert_eq!(
+        stage_binding.competition_kind,
+        Some(CompetitionKind::League)
+    );
 
     let future_binding = database
         .store
@@ -401,12 +428,35 @@ async fn competition_binding_repository_contract_is_preserved() {
     .fetch_one(&database.pool)
     .await
     .expect("读取类型默认绑定原始字段");
-    assert_eq!(default_row.try_get::<String, _>("binding_name").unwrap(), "R5-04 type default");
-    assert_eq!(default_row.try_get::<Option<Uuid>, _>("competition_id").unwrap(), None);
-    assert_eq!(default_row.try_get::<Option<Uuid>, _>("season_id").unwrap(), None);
-    assert_eq!(default_row.try_get::<Option<Uuid>, _>("stage_id").unwrap(), None);
-    assert_eq!(default_row.try_get::<Option<String>, _>("competition_kind").unwrap().as_deref(), Some("league"));
-    assert_eq!(default_row.try_get::<Uuid, _>("rule_package_id").unwrap(), league_package.id);
+    assert_eq!(
+        default_row.try_get::<String, _>("binding_name").unwrap(),
+        "R5-04 type default"
+    );
+    assert_eq!(
+        default_row
+            .try_get::<Option<Uuid>, _>("competition_id")
+            .unwrap(),
+        None
+    );
+    assert_eq!(
+        default_row.try_get::<Option<Uuid>, _>("season_id").unwrap(),
+        None
+    );
+    assert_eq!(
+        default_row.try_get::<Option<Uuid>, _>("stage_id").unwrap(),
+        None
+    );
+    assert_eq!(
+        default_row
+            .try_get::<Option<String>, _>("competition_kind")
+            .unwrap()
+            .as_deref(),
+        Some("league")
+    );
+    assert_eq!(
+        default_row.try_get::<Uuid, _>("rule_package_id").unwrap(),
+        league_package.id
+    );
     assert_eq!(default_row.try_get::<i32, _>("priority").unwrap(), 5);
     assert!(default_row.try_get::<bool, _>("is_active").unwrap());
 
@@ -419,7 +469,12 @@ async fn competition_binding_repository_contract_is_preserved() {
     .expect("统计类型默认绑定审计事件");
     assert_eq!(default_audit_count, 1, "默认绑定重复调用不得重复审计");
 
-    for id in [competition_binding.id, season_binding.id, stage_binding.id, future_binding.id] {
+    for id in [
+        competition_binding.id,
+        season_binding.id,
+        stage_binding.id,
+        future_binding.id,
+    ] {
         let audit_count: i64 = sqlx::query_scalar(
             "SELECT COUNT(*) FROM audit.events WHERE event_type = 'competition_binding_created' AND entity_id = $1",
         )
