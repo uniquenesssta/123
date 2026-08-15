@@ -1,5 +1,6 @@
 name: R6-02 Owner Switch
 
+# Retry after applying the exact rustfmt output from the first fail-fast run.
 on:
   push:
     branches:
