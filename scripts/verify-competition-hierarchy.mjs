@@ -10,7 +10,9 @@ const check = (condition, message) => { if (!condition) failures.push(message); 
 const count = (source, token) => source.split(token).length - 1;
 
 const base = "crates/persistence-postgres/src/adapters/competition/hierarchy";
-const legacy = read("crates/persistence-postgres/src/competitions.rs");
+const legacyPath = "crates/persistence-postgres/src/competitions.rs";
+const legacyExists = exists(legacyPath);
+const legacy = legacyExists ? read(legacyPath) : "";
 const competitionMod = read("crates/persistence-postgres/src/adapters/competition/mod.rs");
 
 const hierarchyFiles = [
@@ -54,8 +56,9 @@ for (const method of [
 for (const mapper of ["season_record_from_row", "stage_record_from_row", "round_record_from_row"]) {
   check(!legacy.includes(mapper), `Legacy competitions.rs still owns dynamic mapper ${mapper}`);
 }
-check(new RegExp(`pub\\s+async\\s+fn\\s+resolve_competition_context\\b`).test(legacy), "R5-02 must leave R5-05 resolve_competition_context in legacy owner");
-check(legacy.includes("fn ensure_scope_id"), "R5-02 must leave R5-05 scope validation in legacy owner");
+check(!legacyExists, "R5-05 must remove legacy competitions.rs after context owner switch");
+check(exists("crates/persistence-postgres/src/adapters/competition/route_resolution/context/resolve_context.rs"), "R5-05 context coordinator must own resolve_competition_context");
+check(exists("crates/persistence-postgres/src/adapters/competition/route_resolution/context/validate_scope.rs"), "R5-05 context owner must retain scope validation");
 
 for (const [moduleName, rowName, recordName] of [
   ["seasons", "SeasonRow", "SeasonRecord"],
@@ -107,4 +110,4 @@ if (failures.length) {
   failures.forEach((failure) => console.error(`- ${failure}`));
   process.exit(1);
 }
-console.log("R5-02 Competition Hierarchy verified: seasons/stages/rounds own typed create/read/list persistence, legacy hierarchy ownership is removed, and R5-05 context resolution remains untouched.");
+console.log("R5-02 Competition Hierarchy verified: seasons/stages/rounds remain unique typed owners, legacy competitions.rs is removed, and R5-05 context resolution is owned by route_resolution/context.");

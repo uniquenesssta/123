@@ -51,10 +51,11 @@ for (const migrated of [
 ]) check(!legacy.includes(migrated), `R5-04 Binding responsibility must be removed from routing.rs: ${migrated}`);
 check(exists("crates/persistence-postgres/src/adapters/competition/bindings/mod.rs"), "R5-04 Binding owner must exist in competition adapters");
 
-// R5-05/R5-06 remain blocked and therefore must stay in the legacy routing owner.
-for (const retained of ["register_model", "resolve_route", "route_decision_from_row"]) {
-  check(legacy.includes(retained), `R5-03/R5-04 must leave later/shared routing responsibility ${retained} in routing.rs`);
+// R5-05 is now approved and must be absent from legacy routing; R5-06 remains blocked.
+for (const migrated of ["resolve_route", "route_decision_from_row"]) {
+  check(!legacy.includes(migrated), `R5-05 route responsibility must be removed from routing.rs: ${migrated}`);
 }
+check(legacy.includes("register_model"), "R5-06 register_model must remain in routing.rs");
 check(legacy.includes("pub(crate) async fn register_model_in_tx"), "shared model registration transaction helper must remain in routing owner with crate-only visibility");
 
 const row = read(`${base}/record_row.rs`);
@@ -95,4 +96,4 @@ if (failures.length) {
   failures.forEach((failure) => console.error(`- ${failure}`));
   process.exit(1);
 }
-console.log("R5-03 Rule Package Repository verified: package registration/list/source-document persistence remains uniquely owned; R5-04 Binding ownership has moved out of routing.rs while R5-05 route resolution and R5-06 model registration remain untouched.");
+console.log("R5-03 Rule Package Repository verified: package persistence remains unique, R5-04 Binding and R5-05 Route Resolution have moved to approved owners, and R5-06 model registration remains untouched.");
