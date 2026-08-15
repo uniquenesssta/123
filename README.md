@@ -43,6 +43,15 @@ Node 开发依赖固定安装和读取自源码根目录上一级的 `../node_mo
 
 ## 模块化重写执行记录
 
+### R6-01 Team Directory 与 Detail
+
+- Team `create/update/list/options/detail` persistence 已从旧 `player_catalog.rs` / `team_catalog.rs` 收敛到 `crates/persistence-postgres/src/adapters/catalog/teams/{directory,detail}/`；directory、detail coordinator、单用途 SQL reader、typed Row 与 Domain Mapper 已分责。
+- R6-02 Team Names/Profile writes 与 R6-09 deletion 继续保留原 owner，没有提前跨节点迁移；Application `TeamCatalogPort`、Tauri command/DTO、Schema、0001–0046 migration、配置、错误语义、用户可观察行为、模型保护资产与生产依赖保持不变。
+- 旧 owner PostgreSQL 16 contract run `31888078703` / job `95020173411` 为 `SUCCESS`；最终 owner switch run `31888483586` / job `95021118552` 为 `SUCCESS`，生产切换提交 `5056917bd5c0e81aaaa96d1ef70c7362ef874820`。
+- ownership/inventory run `31888800801` / job `95021851053` 为 `SUCCESS`：R6-01 ownership、official Domain inventory、模型保护、完整 architecture、rustfmt、Persistence/Application check、Persistence unit tests 与同一 PostgreSQL contract 全部通过；verified HEAD `b2999e5dce982bddf2093f0596eec33a7dbd0333`。
+- 当前节点状态为 `VERIFYING`；阶段级 frontend/workspace Clippy/workspace tests、clean PR、merge 与 merged-stage canonical gate 尚未完成。详细记录见 `docs/modular-rewrite/R06-entity-catalog-persistence/R06-01-team-directory-and-detail.md`。
+
+
 ### R5-06 Model Run Identity Reads
 
 - Model Run identity read 已收敛到 `crates/persistence-postgres/src/adapters/competition/model_run_identity/`，并按 typed Row、record mapper、单次 identity SELECT 拆分；`model_runs.rs::read_run` 不再直接拥有模型版本、参数版本、规则包与 binding identity JOIN。
