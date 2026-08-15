@@ -1,0 +1,44 @@
+name: R5-06 PostgreSQL Contract
+
+on:
+  push:
+    branches:
+      - rewrite/r5-06-model-run-identity-reads
+    paths:
+      - .github/workflows/r5-06-postgres-contract.yml
+
+jobs:
+  postgres-contract:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: football
+          POSTGRES_PASSWORD: football
+          POSTGRES_DB: football_r506_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U football -d football_r506_test"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 20
+    env:
+      FOOTBALL_TEST_DATABASE_URL: postgres://football:football@127.0.0.1:5432/football_r506_test
+    steps:
+      - name: Checkout branch
+        uses: actions/checkout@v4
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Setup Rust 1.88.0
+        uses: dtolnay/rust-toolchain@1.88.0
+      - name: Verify R5-06 ownership
+        run: node scripts/verify-model-run-identity.mjs
+      - name: Run Model Run Identity PostgreSQL contract
+        run: cargo test --locked -p football-persistence-postgres --test model_run_identity_repository_contract -- --ignored --nocapture
+      - name: Run Rule Package registration PostgreSQL regression
+        run: cargo test --locked -p football-persistence-postgres --test rule_package_repository_contract -- --ignored --nocapture
