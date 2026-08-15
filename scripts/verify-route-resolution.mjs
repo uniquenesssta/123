@@ -69,7 +69,7 @@ check(!contextRows.includes("PgRow") && !contextMapper.includes("PgRow"), "conte
 check(contextMapper.includes("parse_competition_kind"), "context mapper must reuse shared CompetitionKind parser");
 check(!contextMapper.includes("sqlx::query"), "context mapper must not own SQL");
 const scope = read(`${contextBase}/validate_scope.rs`);
-check(scope.includes("赛事层级不一致") && scope.includes("{label}层级不一致"), "scope validation must preserve hierarchy mismatch semantics");
+check(scope.includes("{label}层级不一致") && scope.includes("Some(Uuid::new_v4())"), "scope validation must preserve generic hierarchy mismatch semantics and mismatch coverage");
 check(!scope.includes("sqlx::"), "scope validation must not own SQL");
 
 const routeCoordinator = read(`${routeBase}/resolve_route.rs`);
