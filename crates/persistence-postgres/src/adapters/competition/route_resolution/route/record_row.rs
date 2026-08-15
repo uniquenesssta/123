@@ -24,5 +24,4 @@ pub(super) struct RouteRow {
     pub(super) competition_id: Option<Uuid>,
     pub(super) season_id: Option<Uuid>,
     pub(super) stage_id: Option<Uuid>,
-    pub(super) competition_kind: Option<String>,
 }
