@@ -1,0 +1,44 @@
+name: R5-04 Format Binding Contract
+
+on:
+  push:
+    branches:
+      - agent/r5-04-competition-bindings
+    paths:
+      - ".github/workflows/r5-04-format-contract.yml"
+
+permissions:
+  contents: write
+
+jobs:
+  format-contract:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: agent/r5-04-competition-bindings
+      - uses: dtolnay/rust-toolchain@1.88.0
+        with:
+          components: rustfmt
+      - name: Format only the new contract
+        shell: bash
+        run: |
+          set -euo pipefail
+          cargo fmt --all
+          python - <<'PY'
+          import subprocess
+          actual = set(subprocess.check_output(["git", "diff", "--name-only"], text=True).splitlines())
+          expected = {"crates/persistence-postgres/tests/competition_bindings_repository_contract.rs"}
+          if actual != expected:
+              raise SystemExit(f"unexpected rustfmt diff: {sorted(actual)}")
+          PY
+          cargo fmt --all -- --check
+      - name: Commit formatted contract
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add crates/persistence-postgres/tests/competition_bindings_repository_contract.rs
+          git commit -m "style(r5-04): format binding contract"
+          git push origin HEAD:agent/r5-04-competition-bindings
