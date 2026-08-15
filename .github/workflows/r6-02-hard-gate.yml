@@ -1,5 +1,6 @@
 name: R6-02 Stage Hard Gate
 
+# Retry after regenerating and reviewing the official Domain type inventory for the owner split.
 on:
   push:
     branches:
