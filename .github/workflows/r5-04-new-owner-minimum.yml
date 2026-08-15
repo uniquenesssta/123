@@ -51,3 +51,5 @@ jobs:
         run: cargo test --locked -p football-application
       - name: Run new Competition Binding PostgreSQL contract
         run: cargo test --locked -p football-persistence-postgres --test competition_bindings_repository_contract -- --ignored --test-threads=1
+
+# rerun after advancing the R5-03 boundary assertions for R5-04
