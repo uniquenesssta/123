@@ -182,7 +182,10 @@ async fn team_names_and_profiles_contract_is_preserved() {
         .expect("更新球队 profile");
     assert_eq!(second_profile.short_name.as_deref(), Some("Beta"));
     assert_eq!(second_profile.city, None);
-    assert_eq!(second_profile.head_coach.as_deref(), Some("Persisted Coach"));
+    assert_eq!(
+        second_profile.head_coach.as_deref(),
+        Some("Persisted Coach")
+    );
     assert_eq!(second_profile.metadata["first"], true);
     assert_eq!(second_profile.metadata["db_only"], true);
     assert_eq!(second_profile.metadata["second"], true);
