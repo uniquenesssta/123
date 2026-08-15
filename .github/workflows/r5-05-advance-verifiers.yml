@@ -20,7 +20,7 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 22
-      - name: Advance R5-01/R5-04 gates to R5-05 ownership state
+      - name: Advance R5 ownership gates to R5-05 state
         shell: bash
         run: |
           set -euo pipefail
@@ -97,6 +97,29 @@ jobs:
               1,
           )
           bindings.write_text(text, encoding='utf-8')
+
+          rules = Path('scripts/verify-rule-package-repository.mjs')
+          text = rules.read_text(encoding='utf-8')
+          old = '''// R5-05/R5-06 remain blocked and therefore must stay in the legacy routing owner.
+          for (const retained of ["register_model", "resolve_route", "route_decision_from_row"]) {
+            check(legacy.includes(retained), `R5-03/R5-04 must leave later/shared routing responsibility ${retained} in routing.rs`);
+          }
+          check(legacy.includes("pub(crate) async fn register_model_in_tx"), "shared model registration transaction helper must remain in routing owner with crate-only visibility");'''
+          new = '''// R5-05 is now approved and must be absent from legacy routing; R5-06 remains blocked.
+          for (const migrated of ["resolve_route", "route_decision_from_row"]) {
+            check(!legacy.includes(migrated), `R5-05 route responsibility must be removed from routing.rs: ${migrated}`);
+          }
+          check(legacy.includes("register_model"), "R5-06 register_model must remain in routing.rs");
+          check(legacy.includes("pub(crate) async fn register_model_in_tx"), "shared model registration transaction helper must remain in routing owner with crate-only visibility");'''
+          if old not in text:
+              raise SystemExit('R5-03 later-owner assertion block not found')
+          text = text.replace(old, new, 1)
+          text = text.replace(
+              'console.log("R5-03 Rule Package Repository verified: package registration/list/source-document persistence remains uniquely owned; R5-04 Binding ownership has moved out of routing.rs while R5-05 route resolution and R5-06 model registration remain untouched.");',
+              'console.log("R5-03 Rule Package Repository verified: package persistence remains unique, R5-04 Binding and R5-05 Route Resolution have moved to approved owners, and R5-06 model registration remains untouched.");',
+              1,
+          )
+          rules.write_text(text, encoding='utf-8')
           PY
           node scripts/verify-competition-repository.mjs
           git diff --check
@@ -106,6 +129,6 @@ jobs:
           set -euo pipefail
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add scripts/verify-competition-repository.mjs scripts/verify-competition-bindings.mjs scripts/verify-route-resolution.mjs
+          git add scripts/verify-competition-repository.mjs scripts/verify-competition-bindings.mjs scripts/verify-rule-package-repository.mjs scripts/verify-route-resolution.mjs
           git commit -m "arch(r5-05): advance competition ownership gates"
           git push origin HEAD:agent/r5-05-route-resolution
