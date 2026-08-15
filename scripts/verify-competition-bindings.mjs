@@ -10,7 +10,8 @@ const check = (condition, message) => { if (!condition) failures.push(message); 
 const count = (source, token) => source.split(token).length - 1;
 
 const base = "crates/persistence-postgres/src/adapters/competition/bindings";
-const legacy = read("crates/persistence-postgres/src/routing.rs");
+const legacyPath = "crates/persistence-postgres/src/routing.rs";
+const legacy = exists(legacyPath) ? read(legacyPath) : "";
 const contextOwnerExists = exists("crates/persistence-postgres/src/competitions.rs");
 const competitionMod = read("crates/persistence-postgres/src/adapters/competition/mod.rs");
 
@@ -34,7 +35,7 @@ for (const relative of [
 
 check(competitionMod.includes("mod bindings;"), "competition adapter root must register bindings");
 check(competitionMod.includes("mod route_resolution;"), "R5-04 gate must recognize the approved R5-05 route_resolution owner");
-check(!competitionMod.includes("model_run_identity"), "R5-05 must not pre-implement R5-06 model_run_identity owner");
+check(competitionMod.includes("model_run_identity"), "R5-04 gate must recognize the approved R5-06 model_run_identity owner");
 
 for (const method of ["ensure_type_default_binding", "create_competition_binding", "list_competition_bindings", "read_binding", "package_route_metadata", "binding_summary_from_row", "binding_list_query"]) {
   check(!legacy.includes(method), `Legacy routing.rs still owns R5-04 responsibility ${method}`);
@@ -42,9 +43,8 @@ for (const method of ["ensure_type_default_binding", "create_competition_binding
 for (const removed of ["pub async fn resolve_route", "fn route_decision_from_row"]) {
   check(!legacy.includes(removed), `R5-05 must remove route resolution from legacy routing.rs: ${removed}`);
 }
-for (const required of ["pub async fn register_model", "pub(crate) async fn register_model_in_tx"]) {
-  check(legacy.includes(required), `R5-05 must leave R5-06 model registration in routing.rs: ${required}`);
-}
+check(!exists(legacyPath), "R5-06 must remove legacy routing.rs after model registration owner switch");
+check(exists("crates/persistence-postgres/src/adapters/competition/model_run_identity/mod.rs"), "R5-06 model_run_identity owner must exist");
 check(!contextOwnerExists, "R5-05 must remove legacy competitions.rs after context owner switch");
 
 const row = read(`${base}/record_row.rs`);
@@ -111,4 +111,4 @@ if (failures.length) {
   failures.forEach((failure) => console.error(`- ${failure}`));
   process.exit(1);
 }
-console.log("R5-04 Competition Bindings verified: Binding persistence remains unique, R5-05 route/context has moved to its approved owner, and R5-06 model registration remains untouched.");
+console.log("R5-04 Competition Bindings verified: Binding persistence remains unique, R5-05 route/context and R5-06 model identity now reside in their approved owners.");

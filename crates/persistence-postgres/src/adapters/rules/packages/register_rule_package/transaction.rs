@@ -5,7 +5,7 @@ use super::{
     insert_rule_package::{insert_rule_package, RulePackageInsertValues},
 };
 use crate::{
-    p4_records::register_competition_profile_in_tx, routing::register_model_in_tx, sha256_json,
+    adapters::register_model_in_tx, p4_records::register_competition_profile_in_tx, sha256_json,
     write_audit_event, PersistenceError, PersistenceResult, PostgresStore,
 };
 use chrono::Utc;

@@ -24,7 +24,7 @@ R4 Persistence 基础设施已完成并通过阶段出口。R5 仅按 Competitio
 | R5-03 | Rule Packages | DONE |
 | R5-04 | Competition Bindings | DONE |
 | R5-05 | Route Resolution Reads | DONE |
-| R5-06 | Model Run Identity Reads | READY |
+| R5-06 | Model Run Identity Reads | VERIFYING |
 
 ## R5-01 当前事实
 
@@ -97,3 +97,13 @@ R4 Persistence 基础设施已完成并通过阶段出口。R5 仅按 Competitio
 - 既有 `postgres_integration.rs` 18 个 ignored broad PostgreSQL tests 未在 R5-04 执行。
 - R5-04 未改变 Application Port、Tauri 命令/DTO、Schema、0001–0046 migration、配置、错误/日志语义、前端行为、R5-05 route algorithm/result、R5-06 model identity、Cargo manifests/Cargo.lock、生产依赖或模型保护资产。
 - R5-04 已正式关闭为 `DONE`，R5-05 已开放为 `READY`；本 closeout 仅更新文档，closeout HEAD 仍需通过 canonical Public Platform CI 后才作为 R5-05 起始基线。
+
+## R5-06 当前事实
+
+- 详细记录：[`R05-06-model-run-identity-reads.md`](R05-06-model-run-identity-reads.md)。
+- Model Run identity read 与模型注册已统一收敛到 `adapters/competition/model_run_identity/`；读取采用 typed `FromRow` 与独立 mapper，registration 按 definition/version/parameter-set/transaction 拆分。
+- `model_runs.rs::read_run` 已切换到新 identity read owner；Rule Package registration 已切换到新 registration boundary；legacy `routing.rs` 已删除且没有转发壳。
+- PostgreSQL 16 专项 run `31881761988` 的 identity contract job `95005200186` 与 Rule Package regression job `95005200191` 均 `SUCCESS`。
+- clean source HEAD `dc6d2baf0f6092f67200214b5b45e37c528394ad` 的 canonical run `31881842368` / Windows job `95005434692` 为 `SUCCESS`；artifact `9246499189`，SHA-256 `74bc2a687b8499f798c0a91a28522fa74df0237ee24d005197067b1c97a1e452`。
+- 当前仅剩文档 clean HEAD、PR/merge、merged-stage canonical CI 与 R5 阶段 closeout，因此状态保持 `VERIFYING`。
+

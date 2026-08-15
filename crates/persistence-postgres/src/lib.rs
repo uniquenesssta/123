@@ -30,7 +30,6 @@ mod release_acceptance;
 mod research_gateway_records;
 mod review;
 mod role_resolution;
-mod routing;
 mod spreadsheet_exchange;
 mod statistics;
 mod store;
@@ -40,11 +39,11 @@ mod team_force_delete;
 mod team_lineup_presets;
 
 pub use adapters::register_adapters;
+pub use adapters::ModelRegistration;
 pub use error::{PersistenceError, PersistenceResult};
 pub use health::DatabaseHealth;
 pub use model_runs::ModelRunListItem;
 pub use pool::DatabaseOptions;
-pub use routing::ModelRegistration;
 pub use statistics::DatabaseStats;
 pub use store::PostgresStore;
 

@@ -1,4 +1,4 @@
-use crate::{routing::ModelRegistration, PersistenceResult};
+use crate::{adapters::ModelRegistration, PersistenceResult};
 use football_domain::RulePackageDraft;
 use serde_json::Value;
 use sqlx::{Postgres, Transaction};
