@@ -15,7 +15,7 @@ use football_domain::{
     PlayerCatalogReferenceData, PlayerDetail, PlayerDraft, PlayerListItem, PlayerListPage,
     PlayerListQuery, PlayerNameDraft, PlayerNameRecord, PlayerPositionDraft, PlayerPositionRecord,
     PlayerRecord, PlayerStatus, PlayerTeamPeriodDraft, PlayerTeamPeriodRecord, PositionReference,
-    PreferredFoot, SeasonTeamMembershipOption, TeamDraft, TeamOption, TeamRecord,
+    PreferredFoot, SeasonTeamMembershipOption,
 };
 use serde_json::json;
 use sqlx::{Postgres, QueryBuilder, Row, Transaction};
@@ -23,90 +23,6 @@ use std::collections::HashSet;
 use uuid::Uuid;
 
 impl PostgresStore {
-    pub async fn create_team(&self, draft: &TeamDraft) -> PersistenceResult<TeamRecord> {
-        let canonical_name = draft.canonical_name.trim();
-        if canonical_name.is_empty() {
-            return Err(PersistenceError::InvalidState(
-                "球队名称不能为空".to_string(),
-            ));
-        }
-        let normalized_name = normalize_name(canonical_name);
-        let id = Uuid::new_v4();
-        let mut tx = self.pool.begin().await?;
-        let row = sqlx::query(
-            r#"
-            INSERT INTO football.teams (
-                id, canonical_name, normalized_name, country_code, metadata
-            ) VALUES ($1, $2, $3, $4, $5)
-            RETURNING id, canonical_name, normalized_name, country_code, is_active, created_at
-            "#,
-        )
-        .bind(id)
-        .bind(canonical_name)
-        .bind(&normalized_name)
-        .bind(
-            draft
-                .country_code
-                .as_deref()
-                .map(str::trim)
-                .filter(|value| !value.is_empty()),
-        )
-        .bind(&draft.metadata)
-        .fetch_one(&mut *tx)
-        .await?;
-        crate::write_audit_event(
-            &mut tx,
-            "team_created",
-            "team",
-            id.to_string(),
-            json!({"canonical_name": canonical_name}),
-        )
-        .await?;
-        tx.commit().await?;
-        team_record_from_row(&row)
-    }
-
-    pub async fn list_team_options(
-        &self,
-        search: Option<&str>,
-        limit: u32,
-    ) -> PersistenceResult<Vec<TeamOption>> {
-        let safe_limit = limit.clamp(1, 500) as i64;
-        let mut builder: QueryBuilder<Postgres> = QueryBuilder::new(
-            r#"
-            SELECT football.teams.id, football.teams.canonical_name, football.teams.country_code,
-                   COALESCE(profile.team_type, 'other') AS team_type
-            FROM football.teams
-            LEFT JOIN football.team_profiles profile ON profile.team_id = football.teams.id
-            WHERE football.teams.is_active
-            "#,
-        );
-        if let Some(search) = NameSearch::parse(search) {
-            push_name_search(
-                &mut builder,
-                &search,
-                NameSearchColumns {
-                    primary_normalized: "football.teams.normalized_name",
-                    primary_display: "football.teams.canonical_name",
-                    alias_table: "football.team_names",
-                    alias_owner: "alias.team_id",
-                    owner_id: "football.teams.id",
-                    alias_normalized: "alias.normalized_name",
-                    alias_display: "alias.name",
-                },
-            );
-        }
-        builder.push(" ORDER BY football.teams.normalized_name, football.teams.id LIMIT ");
-        builder.push_bind(safe_limit);
-        builder
-            .build()
-            .fetch_all(&self.pool)
-            .await?
-            .iter()
-            .map(team_option_from_row)
-            .collect()
-    }
-
     pub async fn create_data_provider(
         &self,
         draft: &DataProviderDraft,
@@ -2290,26 +2206,6 @@ fn lineup_type(value: &str) -> PersistenceResult<LineupType> {
             "未知阵容类型：{other}"
         ))),
     }
-}
-
-fn team_record_from_row(row: &sqlx::postgres::PgRow) -> PersistenceResult<TeamRecord> {
-    Ok(TeamRecord {
-        id: row.try_get("id")?,
-        canonical_name: row.try_get("canonical_name")?,
-        normalized_name: row.try_get("normalized_name")?,
-        country_code: row.try_get("country_code")?,
-        is_active: row.try_get("is_active")?,
-        created_at: row.try_get("created_at")?,
-    })
-}
-
-fn team_option_from_row(row: &sqlx::postgres::PgRow) -> PersistenceResult<TeamOption> {
-    Ok(TeamOption {
-        id: row.try_get("id")?,
-        canonical_name: row.try_get("canonical_name")?,
-        country_code: row.try_get("country_code")?,
-        team_type: row.try_get("team_type")?,
-    })
 }
 
 fn data_provider_from_row(row: &sqlx::postgres::PgRow) -> PersistenceResult<DataProviderRecord> {

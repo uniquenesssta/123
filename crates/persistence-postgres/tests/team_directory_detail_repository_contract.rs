@@ -183,12 +183,11 @@ async fn team_directory_and_detail_contract_is_preserved() {
 
     let player_id = Uuid::new_v4();
     let localized_player_name = format!("测试球员 {token}");
-    let position_code: String = sqlx::query_scalar(
-        "SELECT code FROM football.positions ORDER BY sort_order, code LIMIT 1",
-    )
-    .fetch_one(&database.pool)
-    .await
-    .expect("读取内置位置");
+    let position_code: String =
+        sqlx::query_scalar("SELECT code FROM football.positions ORDER BY sort_order, code LIMIT 1")
+            .fetch_one(&database.pool)
+            .await
+            .expect("读取内置位置");
     sqlx::query(
         r#"
         INSERT INTO football.players (id, canonical_name, normalized_name, status)

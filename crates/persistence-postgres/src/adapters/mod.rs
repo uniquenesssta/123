@@ -1,3 +1,4 @@
+pub(crate) mod catalog;
 pub(crate) mod competition;
 mod register_adapters;
 mod rules;
