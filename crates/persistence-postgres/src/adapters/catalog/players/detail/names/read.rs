@@ -4,7 +4,7 @@ use football_domain::PlayerNameRecord;
 use sqlx::PgPool;
 use uuid::Uuid;
 
-pub(super) async fn read_names(
+pub(in crate::adapters::catalog::players::detail) async fn read_names(
     pool: &PgPool,
     player_id: Uuid,
 ) -> PersistenceResult<Vec<PlayerNameRecord>> {
