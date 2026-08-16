@@ -85,8 +85,7 @@ async fn player_directory_and_detail_contract_is_preserved() {
         r#"
         SELECT name, normalized_name, is_primary
         FROM football.player_names
-        WHERE player_id = $1
-        ORDER BY created_at, id
+        WHERE player_id = $1 AND is_primary = TRUE
         LIMIT 1
         "#,
     )
@@ -266,7 +265,7 @@ async fn player_directory_and_detail_contract_is_preserved() {
         SELECT name, is_primary
         FROM football.player_names
         WHERE player_id = $1
-        ORDER BY created_at, id
+        ORDER BY is_primary DESC, valid_from DESC NULLS LAST, name
         "#,
     )
     .bind(created.id)
