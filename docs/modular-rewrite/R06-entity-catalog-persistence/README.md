@@ -19,7 +19,7 @@ R6 按 Teams、Players、Coaches、Formations、Abilities、Dynamic Tags、Avail
 |---|---|---|
 | R6-01 | Team Directory 与 Detail | DONE |
 | R6-02 | Team Names 与 Profiles | DONE |
-| R6-03 | Player Directory 与 Detail | READY |
+| R6-03 | Player Directory 与 Detail | IN_PROGRESS |
 | R6-04 | Player Names 与 Positions | BLOCKED |
 | R6-05 | Team Periods 与 Availability | BLOCKED |
 | R6-06 | Abilities 与 Dynamic Tags | BLOCKED |
@@ -57,10 +57,17 @@ R6 按 Teams、Players、Coaches、Formations、Abilities、Dynamic Tags、Avail
 - PR #33 fixed head `f04923425f9d660f2ce1275da2b689ca681f3500` 已 squash merge 为 `334d5d86f08f5cd1adee5b23dc64d907aeb2eba2`。
 - merged-stage canonical run `31925219003` / Windows job `95111615032` 为 `SUCCESS`；artifact `9257917686`，SHA-256 `ff29c7326ed23f3736fd433f2adde3aad587f9aa17506b2eedd96e913b7f2e9d`。R6-02 正式 `DONE`，R6-03 开放为 `READY`。
 
+## R6-03 当前事实
+
+- 详细记录：[`R06-03-player-directory-and-detail.md`](R06-03-player-directory-and-detail.md)。
+- 实施分支 `agent/r6-03-player-directory-detail` 从 R6-02 最终 closeout HEAD `4ce9eb405e897beedf8b122e6794d7c9141b660e` 精确建立；该 HEAD 的 Public Platform CI run `31926475831` / Windows job `95114758145` 为 `SUCCESS`，artifact `9258046111`，SHA-256 `76ae850a02080163086f0ec504e3a7c3cfed87ba7063e378b2c168298772cf7f`。
+- 开工扫描确认 R6-03 只迁移 `create_player`、`update_player`、`list_players`、`list_player_options` 与 `read_player` 的 Directory/Detail owner；R6-04 Names/Positions、R6-05 Team Periods/Availability、R6-06 Abilities/Dynamic Tags、R6-09 deletion、R6-10 global search 不提前迁移。
+- 已新增旧 owner PostgreSQL contract `player_directory_detail_repository_contract.rs`，当前 baseline workflow 正在验证；在结果出来前不切换生产 owner。
+
 ## 当前边界与剩余门禁
 
-- 公共 TeamCatalogPort、Tauri command/DTO、Schema、0001–0046 migration、配置、错误语义、用户可观察行为、模型保护资产与生产依赖未改变。
-- R6-01 已完成专项契约、阶段回归、clean PR、squash merge 与 merged-stage canonical，状态为 `DONE`。
-- R6-02 Team Names 与 Profiles 已完成专项契约、阶段回归、clean PR、squash merge 与 merged-stage canonical，状态为 `DONE`。
-- R6-03 Player Directory 与 Detail 为当前唯一 `READY` 节点；R6-04～R6-10 继续 `BLOCKED`。
+- 公共 TeamCatalogPort / PlayerCatalogPort、Tauri command/DTO、Schema、0001–0046 migration、配置、错误语义、用户可观察行为、模型保护资产与生产依赖保持冻结。
+- R6-01 与 R6-02 均已 `DONE`。
+- R6-03 Player Directory 与 Detail 为当前唯一 `IN_PROGRESS` 节点；R6-04～R6-10 继续 `BLOCKED`。
+- R6-03 当前必须先完成旧 owner PostgreSQL contract，再进行 owner switch；最小验证、阶段回归、clean PR 与 merged-stage canonical 未完成前不得标记 `DONE`。
 - 每个节点完成时必须创建对应 `R06-xx` 实施记录并更新本索引；R6 完成时必须创建 `R06-stage-completion.md`。
