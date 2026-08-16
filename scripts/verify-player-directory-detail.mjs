@@ -43,10 +43,20 @@ for (const retained of [
   'add_player_team_period',
   'add_player_availability',
   'add_player_ability_observation',
-  'add_player_dynamic_tag',
 ]) {
   if (!legacy.includes(`pub async fn ${retained}`)) {
     throw new Error(`Later R6 owner moved prematurely or disappeared: ${retained}`);
+  }
+}
+
+const dynamicTags = read('crates/persistence-postgres/src/dynamic_tags.rs');
+for (const retained of [
+  'add_player_dynamic_tag',
+  'read_player_dynamic_tag',
+  'list_player_dynamic_tags',
+]) {
+  if (!dynamicTags.includes(`pub async fn ${retained}`)) {
+    throw new Error(`R6-03 must preserve dynamic tag owner in dynamic_tags.rs: ${retained}`);
   }
 }
 
