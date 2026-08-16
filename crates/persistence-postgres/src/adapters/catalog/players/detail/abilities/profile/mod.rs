@@ -2,4 +2,4 @@ mod mapper;
 mod read;
 mod row;
 
-pub(super) use read::read_ability_profile;
+pub(in crate::adapters::catalog::players::detail) use read::read_ability_profile;

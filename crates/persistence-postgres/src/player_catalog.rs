@@ -1,22 +1,20 @@
 use crate::{
     adapters::catalog::players::{
-        normalization::normalize_name,
-        value_mapping::{availability_status, player_status, preferred_foot},
+        normalization::normalize_name, value_mapping::availability_status,
     },
     role_resolution::{
         metadata_with_role_resolution, resolve_default_tactical_role_in_tx, resolve_tactical_role,
     },
     PersistenceError, PersistenceResult, PostgresStore,
 };
-use chrono::{Datelike, NaiveDate, Utc};
+use chrono::{Datelike, NaiveDate};
 use football_domain::{
     AbilityDimensionRecord, AvailabilityStatus, DataProviderDraft, DataProviderRecord,
     ExternalEntityIdDraft, ExternalEntityIdRecord, LineupDraft, LineupHistoryRemovalResult,
     LineupPairDraft, LineupPairRecord, LineupPlayerRecord, LineupRecord, LineupType, MatchDraft,
     MatchRecord, MatchStatus, PlayerAbilityObservationDraft, PlayerAbilityObservationRecord,
-    PlayerAbilityProfile, PlayerAvailabilityDraft, PlayerAvailabilityRecord,
-    PlayerCatalogReferenceData, PlayerDetail, PlayerNameDraft, PlayerNameRecord,
-    PlayerPositionDraft, PlayerPositionRecord, PlayerRecord, PlayerTeamPeriodDraft,
+    PlayerAvailabilityDraft, PlayerAvailabilityRecord, PlayerCatalogReferenceData, PlayerNameDraft,
+    PlayerNameRecord, PlayerPositionDraft, PlayerPositionRecord, PlayerTeamPeriodDraft,
     PlayerTeamPeriodRecord, PositionReference, SeasonTeamMembershipOption,
 };
 use serde_json::json;
@@ -115,180 +113,6 @@ impl PostgresStore {
             .await?;
         tx.commit().await?;
         Ok(())
-    }
-
-    pub async fn read_player(&self, player_id: Uuid) -> PersistenceResult<PlayerDetail> {
-        let row = sqlx::query(
-            r#"
-            SELECT
-                id, canonical_name, normalized_name, date_of_birth,
-                nationality_code, preferred_foot, height_cm, status, created_at
-            FROM football.players
-            WHERE id = $1
-            "#,
-        )
-        .bind(player_id)
-        .fetch_one(&self.pool)
-        .await?;
-        let player = player_record_from_row(&row)?;
-
-        let name_rows = sqlx::query(
-            r#"
-            SELECT id, player_id, name, normalized_name, language_code,
-                   is_primary, valid_from, valid_to
-            FROM football.player_names
-            WHERE player_id = $1
-            ORDER BY is_primary DESC, valid_from DESC NULLS LAST, name
-            "#,
-        )
-        .bind(player_id)
-        .fetch_all(&self.pool)
-        .await?;
-        let names = name_rows
-            .iter()
-            .map(player_name_from_row)
-            .collect::<PersistenceResult<Vec<_>>>()?;
-
-        let position_rows = sqlx::query(
-            r#"
-            SELECT
-                assignment.id, assignment.player_id, assignment.position_code,
-                position.name AS position_name, position.position_group,
-                assignment.proficiency, assignment.default_role_code, assignment.is_primary,
-                assignment.valid_from, assignment.valid_to
-            FROM football.player_positions assignment
-            JOIN football.positions position ON position.code = assignment.position_code
-            WHERE assignment.player_id = $1
-            ORDER BY assignment.is_primary DESC, assignment.proficiency DESC,
-                     assignment.valid_from DESC NULLS LAST
-            "#,
-        )
-        .bind(player_id)
-        .fetch_all(&self.pool)
-        .await?;
-        let positions = position_rows
-            .iter()
-            .map(player_position_from_row)
-            .collect::<PersistenceResult<Vec<_>>>()?;
-
-        let period_rows = sqlx::query(
-            r#"
-            SELECT
-                period.id, period.player_id, period.team_id,
-                team.canonical_name AS team_name,
-                period.season_id, season.name AS season_name,
-                period.squad_number, period.valid_from, period.valid_to,
-                period.registration_status
-            FROM football.player_team_periods period
-            JOIN football.teams team ON team.id = period.team_id
-            LEFT JOIN football.seasons season ON season.id = period.season_id
-            WHERE period.player_id = $1
-            ORDER BY period.valid_from DESC, period.id DESC
-            "#,
-        )
-        .bind(player_id)
-        .fetch_all(&self.pool)
-        .await?;
-        let team_periods = period_rows
-            .iter()
-            .map(player_team_period_from_row)
-            .collect::<PersistenceResult<Vec<_>>>()?;
-
-        let availability_rows = sqlx::query(
-            r#"
-            SELECT
-                availability.id, availability.player_id, availability.team_id,
-                team.canonical_name AS team_name, availability.competition_id,
-                availability.status, availability.reason, availability.confidence,
-                availability.valid_from, availability.valid_to, availability.created_at
-            FROM football.player_availability availability
-            LEFT JOIN football.teams team ON team.id = availability.team_id
-            WHERE availability.player_id = $1
-            ORDER BY availability.valid_from DESC, availability.created_at DESC
-            LIMIT 100
-            "#,
-        )
-        .bind(player_id)
-        .fetch_all(&self.pool)
-        .await?;
-        let availability = availability_rows
-            .iter()
-            .map(player_availability_from_row)
-            .collect::<PersistenceResult<Vec<_>>>()?;
-
-        let ability_profile = sqlx::query(
-            r#"
-            SELECT player_id, abilities, average_value, average_confidence,
-                   dimension_count, latest_observed_at, next_expiry_at, updated_at
-            FROM feature.player_ability_profiles
-            WHERE player_id = $1
-              AND (next_expiry_at IS NULL OR next_expiry_at >= now())
-            "#,
-        )
-        .bind(player_id)
-        .fetch_optional(&self.pool)
-        .await?
-        .as_ref()
-        .map(player_ability_profile_from_row)
-        .transpose()?;
-
-        let observation_rows = sqlx::query(
-            r#"
-            SELECT
-                observation.id, observation.player_id, observation.dimension_code,
-                dimension.name AS dimension_name, observation.context_type,
-                observation.context_id, observation.value, observation.confidence,
-                observation.sample_size, observation.observed_at,
-                observation.effective_from, observation.effective_to,
-                observation.calculation_version
-            FROM feature.player_ability_observations observation
-            JOIN feature.player_ability_dimensions dimension
-              ON dimension.code = observation.dimension_code
-            WHERE observation.player_id = $1
-            ORDER BY observation.observed_at DESC, observation.id DESC
-            LIMIT 250
-            "#,
-        )
-        .bind(player_id)
-        .fetch_all(&self.pool)
-        .await?;
-        let ability_observations = observation_rows
-            .iter()
-            .map(player_ability_observation_from_row)
-            .collect::<PersistenceResult<Vec<_>>>()?;
-
-        let dynamic_tags = self.list_player_dynamic_tags(player_id, Utc::now()).await?;
-
-        let external_rows = sqlx::query(
-            r#"
-            SELECT external.id, external.provider_id, provider.name AS provider_name,
-                   external.entity_type, external.entity_id, external.external_id,
-                   external.metadata
-            FROM football.external_entity_ids external
-            JOIN catalog.data_providers provider ON provider.id = external.provider_id
-            WHERE external.entity_type = 'player' AND external.entity_id = $1
-            ORDER BY provider.name, external.external_id
-            "#,
-        )
-        .bind(player_id)
-        .fetch_all(&self.pool)
-        .await?;
-        let external_ids = external_rows
-            .iter()
-            .map(external_entity_id_from_row)
-            .collect::<PersistenceResult<Vec<_>>>()?;
-
-        Ok(PlayerDetail {
-            player,
-            names,
-            positions,
-            team_periods,
-            availability,
-            ability_profile,
-            ability_observations,
-            dynamic_tags,
-            external_ids,
-        })
     }
 
     pub async fn add_player_name(
@@ -1819,22 +1643,6 @@ fn data_provider_from_row(row: &sqlx::postgres::PgRow) -> PersistenceResult<Data
     })
 }
 
-fn player_record_from_row(row: &sqlx::postgres::PgRow) -> PersistenceResult<PlayerRecord> {
-    let foot: String = row.try_get("preferred_foot")?;
-    let status: String = row.try_get("status")?;
-    Ok(PlayerRecord {
-        id: row.try_get("id")?,
-        canonical_name: row.try_get("canonical_name")?,
-        normalized_name: row.try_get("normalized_name")?,
-        date_of_birth: row.try_get("date_of_birth")?,
-        nationality_code: row.try_get("nationality_code")?,
-        preferred_foot: preferred_foot(&foot)?,
-        height_cm: row.try_get("height_cm")?,
-        status: player_status(&status)?,
-        created_at: row.try_get("created_at")?,
-    })
-}
-
 fn player_name_from_row(row: &sqlx::postgres::PgRow) -> PersistenceResult<PlayerNameRecord> {
     Ok(PlayerNameRecord {
         id: row.try_get("id")?,
@@ -1918,21 +1726,6 @@ fn player_ability_observation_from_row(
         effective_from: row.try_get("effective_from")?,
         effective_to: row.try_get("effective_to")?,
         calculation_version: row.try_get("calculation_version")?,
-    })
-}
-
-fn player_ability_profile_from_row(
-    row: &sqlx::postgres::PgRow,
-) -> PersistenceResult<PlayerAbilityProfile> {
-    Ok(PlayerAbilityProfile {
-        player_id: row.try_get("player_id")?,
-        abilities: row.try_get("abilities")?,
-        average_value: row.try_get("average_value")?,
-        average_confidence: row.try_get("average_confidence")?,
-        dimension_count: row.try_get("dimension_count")?,
-        latest_observed_at: row.try_get("latest_observed_at")?,
-        next_expiry_at: row.try_get("next_expiry_at")?,
-        updated_at: row.try_get("updated_at")?,
     })
 }
 
@@ -2059,6 +1852,7 @@ fn ability_dimension_from_row(
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::adapters::catalog::players::value_mapping::{player_status, preferred_foot};
     use football_domain::{PlayerStatus, PreferredFoot};
 
     #[test]

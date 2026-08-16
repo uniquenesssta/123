@@ -1,10 +1,10 @@
-use super::{
-    input_policy::validate_player_draft, record_mapper::map_player_record,
-    record_row::PlayerRecordRow,
-};
+use super::input_policy::validate_player_draft;
 use crate::{
-    adapters::catalog::players::normalization::normalize_name, PersistenceError, PersistenceResult,
-    PostgresStore,
+    adapters::catalog::players::{
+        normalization::normalize_name,
+        record::{map_player_record, PlayerRecordRow},
+    },
+    PersistenceError, PersistenceResult, PostgresStore,
 };
 use football_domain::{PlayerDraft, PlayerRecord};
 use serde_json::json;
