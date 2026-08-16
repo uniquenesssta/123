@@ -7,8 +7,7 @@ on:
       - agent/r6-03-player-directory-detail
     paths:
       - .github/workflows/r6-03-hard-gate.yml
-      - scripts/verify-player-directory-detail.mjs
-      - scripts/verify-global-name-search.mjs
+      - scripts/verify-*.mjs
       - architecture/domain-type-inventory.json
 
 permissions:
