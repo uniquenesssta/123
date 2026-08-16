@@ -7,7 +7,7 @@ on:
     paths:
       - .github/workflows/r6-03-baseline-contract.yml
 
-# Rerun after correcting contract calls to the existing public API/error variant.
+# Rerun after aligning contract-only player_names assertions with the actual schema.
 jobs:
   postgres-contract:
     runs-on: ubuntu-latest
