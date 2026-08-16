@@ -59,6 +59,10 @@ jobs:
           R6_BASE: 90f1bb08bf5a7a1580448f791dd241118ea32284
         run: python /tmp/r6_04_0.py
 
+      - name: Format migrated Rust sources
+        shell: bash
+        run: cargo fmt --all
+
       - name: Refresh official Domain inventory
         shell: bash
         run: node scripts/generate-domain-type-inventory.mjs
