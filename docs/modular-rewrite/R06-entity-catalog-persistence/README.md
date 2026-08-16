@@ -20,7 +20,7 @@ R6 按 Teams、Players、Coaches、Formations、Abilities、Dynamic Tags、Avail
 | R6-01 | Team Directory 与 Detail | DONE |
 | R6-02 | Team Names 与 Profiles | DONE |
 | R6-03 | Player Directory 与 Detail | DONE |
-| R6-04 | Player Names 与 Positions | READY |
+| R6-04 | Player Names 与 Positions | VERIFYING |
 | R6-05 | Team Periods 与 Availability | BLOCKED |
 | R6-06 | Abilities 与 Dynamic Tags | BLOCKED |
 | R6-07 | Coaches 与 Formation Usage | BLOCKED |
@@ -73,9 +73,18 @@ R6 按 Teams、Players、Coaches、Formations、Abilities、Dynamic Tags、Avail
 - merged-stage canonical run `31937248702` / Windows job `95140999446` 为 `SUCCESS`；artifact `9261315055`，SHA-256 `38bae9097b67cf743a749b90a659d70e569ce01ee1de34f563d865b91ea236c0`。R6-03 正式 `DONE`，R6-04 开放为 `READY`。
 - 用户现有 PostgreSQL 数据库真实数据写入/sample 验收与 Windows Full 人工交互验收未执行，不宣称通过。
 
+
+## R6-04 当前事实
+
+- 详细记录：[`R06-04-player-names-and-positions.md`](R06-04-player-names-and-positions.md)。
+- Player Names / Positions 写 owner 已从 `player_catalog.rs` 收敛到 `adapters/catalog/players/{names,positions}/`；输入策略、typed Row、mapper 与 SQL/事务按职责拆分。
+- Player Detail Names/Positions read 保留原读取职责，并复用新 Row/mapper owner；旧 Detail 重复 mapper/row 已删除。
+- 临时实施 gate run `31969378628` 已通过 R6-04 ownership、official Domain inventory、完整 architecture、rustfmt、Persistence unit tests、R6-04 contract 编译和 Application check。
+- 当前状态 `VERIFYING`；PG16 真实 contract、阶段 hard gate、clean PR 与 merged-stage canonical 尚未完成，R6-05 继续 `BLOCKED`。
+
 ## 当前边界与剩余门禁
 
 - 公共 TeamCatalogPort / PlayerCatalogPort、Tauri command/DTO、Schema、0001–0046 migration、配置、错误语义、用户可观察行为、模型保护资产与生产依赖保持冻结。
 - R6-01、R6-02、R6-03 均已 `DONE`。
-- R6-04 Player Names 与 Positions 为当前唯一 `READY` 节点；R6-05～R6-10 继续 `BLOCKED`。
+- R6-04 Player Names 与 Positions 为当前唯一 `VERIFYING` 节点；R6-05～R6-10 继续 `BLOCKED`。
 - 每个节点完成时必须创建对应 `R06-xx` 实施记录并更新本索引；R6 完成时必须创建 `R06-stage-completion.md`。

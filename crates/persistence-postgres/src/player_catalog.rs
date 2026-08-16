@@ -1,7 +1,5 @@
 use crate::{
-    adapters::catalog::players::{
-        normalization::normalize_name, value_mapping::availability_status,
-    },
+    adapters::catalog::players::value_mapping::availability_status,
     role_resolution::{
         metadata_with_role_resolution, resolve_default_tactical_role_in_tx, resolve_tactical_role,
     },
@@ -13,9 +11,8 @@ use football_domain::{
     ExternalEntityIdDraft, ExternalEntityIdRecord, LineupDraft, LineupHistoryRemovalResult,
     LineupPairDraft, LineupPairRecord, LineupPlayerRecord, LineupRecord, LineupType, MatchDraft,
     MatchRecord, MatchStatus, PlayerAbilityObservationDraft, PlayerAbilityObservationRecord,
-    PlayerAvailabilityDraft, PlayerAvailabilityRecord, PlayerCatalogReferenceData, PlayerNameDraft,
-    PlayerNameRecord, PlayerPositionDraft, PlayerPositionRecord, PlayerTeamPeriodDraft,
-    PlayerTeamPeriodRecord, PositionReference, SeasonTeamMembershipOption,
+    PlayerAvailabilityDraft, PlayerAvailabilityRecord, PlayerCatalogReferenceData,
+    PlayerTeamPeriodDraft, PlayerTeamPeriodRecord, PositionReference, SeasonTeamMembershipOption,
 };
 use serde_json::json;
 use sqlx::{Postgres, Row, Transaction};
@@ -113,142 +110,6 @@ impl PostgresStore {
             .await?;
         tx.commit().await?;
         Ok(())
-    }
-
-    pub async fn add_player_name(
-        &self,
-        draft: &PlayerNameDraft,
-    ) -> PersistenceResult<PlayerNameRecord> {
-        let name = draft.name.trim();
-        if name.is_empty() {
-            return Err(PersistenceError::InvalidState(
-                "球员名称不能为空".to_string(),
-            ));
-        }
-        if matches!((&draft.valid_from, &draft.valid_to), (Some(start), Some(end)) if end < start) {
-            return Err(PersistenceError::InvalidState(
-                "球员名称结束日期不能早于开始日期".to_string(),
-            ));
-        }
-        let mut tx = self.pool.begin().await?;
-        if draft.is_primary {
-            sqlx::query("UPDATE football.player_names SET is_primary = false WHERE player_id = $1")
-                .bind(draft.player_id)
-                .execute(&mut *tx)
-                .await?;
-            sqlx::query(
-                r#"
-                UPDATE football.players
-                SET canonical_name = $2, normalized_name = $3, updated_at = now()
-                WHERE id = $1
-                "#,
-            )
-            .bind(draft.player_id)
-            .bind(name)
-            .bind(normalize_name(name))
-            .execute(&mut *tx)
-            .await?;
-        }
-        let row = sqlx::query(
-            r#"
-            INSERT INTO football.player_names (
-                id, player_id, name, normalized_name, language_code,
-                is_primary, valid_from, valid_to
-            ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
-            RETURNING id, player_id, name, normalized_name, language_code,
-                      is_primary, valid_from, valid_to
-            "#,
-        )
-        .bind(Uuid::new_v4())
-        .bind(draft.player_id)
-        .bind(name)
-        .bind(normalize_name(name))
-        .bind(
-            draft
-                .language_code
-                .as_deref()
-                .map(str::trim)
-                .filter(|value| !value.is_empty()),
-        )
-        .bind(draft.is_primary)
-        .bind(draft.valid_from)
-        .bind(draft.valid_to)
-        .fetch_one(&mut *tx)
-        .await?;
-        tx.commit().await?;
-        player_name_from_row(&row)
-    }
-
-    pub async fn assign_player_position(
-        &self,
-        draft: &PlayerPositionDraft,
-    ) -> PersistenceResult<PlayerPositionRecord> {
-        if !(0.0..=1.0).contains(&draft.proficiency) {
-            return Err(PersistenceError::InvalidState(
-                "位置熟练度必须位于 0–1".to_string(),
-            ));
-        }
-        if matches!((&draft.valid_from, &draft.valid_to), (Some(start), Some(end)) if end < start) {
-            return Err(PersistenceError::InvalidState(
-                "球员位置结束日期不能早于开始日期".to_string(),
-            ));
-        }
-        if draft
-            .default_role_code
-            .as_deref()
-            .is_some_and(|value| value.trim().chars().count() > 80)
-        {
-            return Err(PersistenceError::InvalidState(
-                "默认战术角色不能超过 80 个字符".to_string(),
-            ));
-        }
-        let position_code = draft.position_code.trim().to_uppercase();
-        let mut tx = self.pool.begin().await?;
-        if draft.is_primary {
-            sqlx::query(
-                "UPDATE football.player_positions SET is_primary = false WHERE player_id = $1",
-            )
-            .bind(draft.player_id)
-            .execute(&mut *tx)
-            .await?;
-        }
-        let row = sqlx::query(
-            r#"
-            WITH inserted AS (
-                INSERT INTO football.player_positions (
-                    id, player_id, position_code, proficiency, default_role_code, is_primary,
-                    valid_from, valid_to, source_document_id
-                ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
-                RETURNING *
-            )
-            SELECT
-                inserted.id, inserted.player_id, inserted.position_code,
-                position.name AS position_name, position.position_group,
-                inserted.proficiency, inserted.default_role_code, inserted.is_primary,
-                inserted.valid_from, inserted.valid_to
-            FROM inserted
-            JOIN football.positions position ON position.code = inserted.position_code
-            "#,
-        )
-        .bind(Uuid::new_v4())
-        .bind(draft.player_id)
-        .bind(&position_code)
-        .bind(draft.proficiency)
-        .bind(
-            draft
-                .default_role_code
-                .as_deref()
-                .map(str::trim)
-                .filter(|value| !value.is_empty()),
-        )
-        .bind(draft.is_primary)
-        .bind(draft.valid_from)
-        .bind(draft.valid_to)
-        .bind(draft.source_document_id)
-        .fetch_one(&mut *tx)
-        .await?;
-        tx.commit().await?;
-        player_position_from_row(&row)
     }
 
     pub async fn add_player_team_period(
@@ -1643,36 +1504,6 @@ fn data_provider_from_row(row: &sqlx::postgres::PgRow) -> PersistenceResult<Data
     })
 }
 
-fn player_name_from_row(row: &sqlx::postgres::PgRow) -> PersistenceResult<PlayerNameRecord> {
-    Ok(PlayerNameRecord {
-        id: row.try_get("id")?,
-        player_id: row.try_get("player_id")?,
-        name: row.try_get("name")?,
-        normalized_name: row.try_get("normalized_name")?,
-        language_code: row.try_get("language_code")?,
-        is_primary: row.try_get("is_primary")?,
-        valid_from: row.try_get("valid_from")?,
-        valid_to: row.try_get("valid_to")?,
-    })
-}
-
-fn player_position_from_row(
-    row: &sqlx::postgres::PgRow,
-) -> PersistenceResult<PlayerPositionRecord> {
-    Ok(PlayerPositionRecord {
-        id: row.try_get("id")?,
-        player_id: row.try_get("player_id")?,
-        position_code: row.try_get("position_code")?,
-        position_name: row.try_get("position_name")?,
-        position_group: row.try_get("position_group")?,
-        proficiency: row.try_get("proficiency")?,
-        default_role_code: row.try_get("default_role_code")?,
-        is_primary: row.try_get("is_primary")?,
-        valid_from: row.try_get("valid_from")?,
-        valid_to: row.try_get("valid_to")?,
-    })
-}
-
 fn player_team_period_from_row(
     row: &sqlx::postgres::PgRow,
 ) -> PersistenceResult<PlayerTeamPeriodRecord> {
@@ -1852,7 +1683,10 @@ fn ability_dimension_from_row(
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::adapters::catalog::players::value_mapping::{player_status, preferred_foot};
+    use crate::adapters::catalog::players::{
+        normalization::normalize_name,
+        value_mapping::{player_status, preferred_foot},
+    };
     use football_domain::{PlayerStatus, PreferredFoot};
 
     #[test]

@@ -43,6 +43,14 @@ Node 开发依赖固定安装和读取自源码根目录上一级的 `../node_mo
 
 ## 模块化重写执行记录
 
+### R6-04 Player Names 与 Positions
+
+- Player Names / Positions 写职责已从 `crates/persistence-postgres/src/player_catalog.rs` 收敛到 `adapters/catalog/players/{names,positions}/`，输入策略、typed Row、Domain mapper 与 SQL/事务 owner 分责；Player Detail 读取继续保留在 `detail/`，并复用新的 Names/Positions Row/mapper owner。
+- `PlayerCatalogPort`、Domain DTO、Schema、0001–0046 migration、错误语义、默认战术角色/位置映射和用户可观察行为保持不变；未新增生产依赖。
+- 临时实施 gate run `31969378628` 已实际通过 R6-04 ownership verifier、official Domain inventory 生成与校验、完整 architecture、rustfmt、Persistence unit tests、R6-04 PostgreSQL contract 编译及 Application check。
+- 当前节点保持 `VERIFYING`；PostgreSQL 16 真实 contract 执行、完整阶段回归、clean PR canonical 与 merged-stage canonical 尚未执行。
+
+
 ### R6-03 Player Directory 与 Detail
 
 - Player `create/update/list/detail` persistence 已从旧 `player_catalog.rs` 收敛到 `crates/persistence-postgres/src/adapters/catalog/players/{directory,detail,record}/`；Directory、Detail coordinator、单用途读取模块、typed Row 与 Domain Mapper 已分责，旧 owner 不再承担这四项生产职责。
