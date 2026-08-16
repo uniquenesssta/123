@@ -10,6 +10,7 @@ on:
 permissions:
   contents: write
 
+# Rerun after narrowing reader visibility to the Detail coordinator and retaining later-node owners.
 jobs:
   switch-and-validate:
     runs-on: ubuntu-latest
@@ -38,6 +39,37 @@ jobs:
       - uses: dtolnay/rust-toolchain@1.88.0
       - name: Apply Detail owner switch
         run: python .github/scripts/r6_03_detail_switch.py
+      - name: Repair generated internal visibility
+        shell: python
+        run: |
+          from pathlib import Path
+          root = Path.cwd()
+          readers = [
+              "crates/persistence-postgres/src/adapters/catalog/players/detail/abilities/profile/read.rs",
+              "crates/persistence-postgres/src/adapters/catalog/players/detail/abilities/observations/read.rs",
+              "crates/persistence-postgres/src/adapters/catalog/players/detail/external_ids/read.rs",
+          ]
+          for relative in readers:
+              path = root / relative
+              text = path.read_text(encoding="utf-8")
+              if text.count("pub(super) async fn ") != 1:
+                  raise SystemExit(f"unexpected reader visibility in {relative}")
+              path.write_text(
+                  text.replace(
+                      "pub(super) async fn ",
+                      "pub(in crate::adapters::catalog::players::detail) async fn ",
+                      1,
+                  ),
+                  encoding="utf-8",
+              )
+          player = root / "crates/persistence-postgres/src/player_catalog.rs"
+          text = player.read_text(encoding="utf-8")
+          text = text.replace(
+              "use chrono::{Datelike, NaiveDate, Utc};",
+              "use chrono::{Datelike, NaiveDate};",
+              1,
+          )
+          player.write_text(text, encoding="utf-8")
       - name: Format switched Rust sources
         run: cargo fmt --all
       - name: Verify diff integrity
