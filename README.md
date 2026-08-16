@@ -43,6 +43,15 @@ Node 开发依赖固定安装和读取自源码根目录上一级的 `../node_mo
 
 ## 模块化重写执行记录
 
+### R6-03 Player Directory 与 Detail
+
+- Player `create/update/list/detail` persistence 已从旧 `player_catalog.rs` 收敛到 `crates/persistence-postgres/src/adapters/catalog/players/{directory,detail,record}/`；Directory、Detail coordinator、单用途读取模块、typed Row 与 Domain Mapper 已分责，旧 owner 不再承担这四项生产职责。
+- Dynamic Tag 保持既有独立 owner `crates/persistence-postgres/src/dynamic_tags.rs`；R6-04 Names/Positions writes、R6-05 Team Periods/Availability writes、R6-06 Abilities/Dynamic Tags writes 与 R6-09 deletion 未提前迁移。公共 `PlayerCatalogPort`、Tauri command/DTO、Domain shape、Schema、0001–0046 migration、配置、错误语义、用户可观察行为、模型保护资产与生产依赖保持不变。
+- 旧 owner PostgreSQL 16 contract run `31929515802` 为 `SUCCESS`；Player Directory owner-switch run `31929916934` 与 Player Detail owner-switch run `31930614713` 均为 `SUCCESS`。official Domain inventory refresh run `31932154320` 为 `SUCCESS`，只更新 `architecture/domain-type-inventory.json`。
+- legacy verifier 在 Global Name Search、Player Role Inheritance、Database Reset、Entity Resource Center、Stage E1 Follow-up 上依次发现 owner-path 漂移；均只将原有契约检查跟随到真实新 owner，未删除、跳过或放宽门禁。
+- 最终 stage hard gate run `31932648476`：Windows job `95129707185` 与 PostgreSQL/architecture job `95129707240` 均 `SUCCESS`；`npm run verify:frontend`、`cargo fmt --all -- --check`、workspace Clippy `-D warnings`、workspace tests、R6 ownership、完整 architecture、模型保护、database baseline 与 PostgreSQL 16 contract 全部实际通过。临时 hard-gate 与 inventory refresh workflow 已清理。
+- R6-03 当前为 `VERIFYING`：clean PR canonical、squash merge 与 merged-stage canonical 尚未完成，因此 R6-04 继续 `BLOCKED`。用户现有 PostgreSQL 数据库真实数据写入/sample 验收与 Windows Full 人工交互验收未执行。详细记录见 `docs/modular-rewrite/R06-entity-catalog-persistence/R06-03-player-directory-and-detail.md`。
+
 ### R6-02 Team Names 与 Profiles
 
 - Team Names 与 Team Profiles 写入已从旧 `team_catalog.rs` 收敛到 `crates/persistence-postgres/src/adapters/catalog/teams/{names,profiles}/`；validation/policy、typed Row、Domain Mapper 与 SQL/transaction owner 已分责，旧重复 helper/实现已删除。

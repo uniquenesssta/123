@@ -55,12 +55,13 @@ requireTokens("crates/persistence-postgres/src/role_resolution.rs", [
 ], "统一角色解析器");
 
 const playerCatalog = read("crates/persistence-postgres/src/player_catalog.rs");
+const playerDirectoryList = read("crates/persistence-postgres/src/adapters/catalog/players/directory/list_players.rs");
 check(
   /FROM football\.lineup_players player[\s\S]{0,5000}JOIN football\.lineups lineup ON lineup\.id = player\.lineup_id[\s\S]{0,5000}position\.valid_from <= lineup\.captured_at::date/.test(playerCatalog),
   "历史比赛阵容角色继承没有锁定 lineup.captured_at 时点",
 );
 check(
-  /primary_position\.default_role_code AS primary_role_code[\s\S]{0,7000}position\.valid_from <= current_date/.test(playerCatalog),
+  /primary_position\.default_role_code AS primary_role_code[\s\S]{0,7000}position\.valid_from <= current_date/.test(playerDirectoryList),
   "当前球员档案角色查询不应被历史阵容时点污染",
 );
 const presetSource = read("crates/persistence-postgres/src/team_lineup_presets.rs");
@@ -70,13 +71,15 @@ check(
     presetSource.includes("role_as_of,"),
   "同一阵容预设保存过程没有共用一致的角色审计日期",
 );
-requireTokens("crates/persistence-postgres/src/player_catalog.rs", [
+requireTokens("crates/persistence-postgres/src/adapters/catalog/players/directory/list_players.rs", [
   "position.default_role_code AS primary_role_code",
   "jsonb_object_agg(position.position_code, position.default_role_code)",
+], "当前球员目录角色持久化");
+requireTokens("crates/persistence-postgres/src/player_catalog.rs", [
   "lineup.captured_at::date",
   "role_source_position_code",
   "metadata_with_role_resolution",
-], "球员与比赛阵容持久化");
+], "历史比赛阵容角色持久化");
 requireTokens("crates/persistence-postgres/src/team_lineup_presets.rs", [
   "resolve_default_tactical_role_in_tx",
   "metadata_with_role_resolution",

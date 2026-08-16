@@ -19,7 +19,7 @@ R6 按 Teams、Players、Coaches、Formations、Abilities、Dynamic Tags、Avail
 |---|---|---|
 | R6-01 | Team Directory 与 Detail | DONE |
 | R6-02 | Team Names 与 Profiles | DONE |
-| R6-03 | Player Directory 与 Detail | READY |
+| R6-03 | Player Directory 与 Detail | VERIFYING |
 | R6-04 | Player Names 与 Positions | BLOCKED |
 | R6-05 | Team Periods 与 Availability | BLOCKED |
 | R6-06 | Abilities 与 Dynamic Tags | BLOCKED |
@@ -57,10 +57,24 @@ R6 按 Teams、Players、Coaches、Formations、Abilities、Dynamic Tags、Avail
 - PR #33 fixed head `f04923425f9d660f2ce1275da2b689ca681f3500` 已 squash merge 为 `334d5d86f08f5cd1adee5b23dc64d907aeb2eba2`。
 - merged-stage canonical run `31925219003` / Windows job `95111615032` 为 `SUCCESS`；artifact `9257917686`，SHA-256 `ff29c7326ed23f3736fd433f2adde3aad587f9aa17506b2eedd96e913b7f2e9d`。R6-02 正式 `DONE`，R6-03 开放为 `READY`。
 
+## R6-03 当前事实
+
+- 详细记录：[`R06-03-player-directory-and-detail.md`](R06-03-player-directory-and-detail.md)。
+- 实施分支 `agent/r6-03-player-directory-detail` 从 R6-02 最终 closeout HEAD `4ce9eb405e897beedf8b122e6794d7c9141b660e` 精确建立；该 HEAD 的 Public Platform CI run `31926475831` / Windows job `95114758145` 为 `SUCCESS`，artifact `9258046111`，SHA-256 `76ae850a02080163086f0ec504e3a7c3cfed87ba7063e378b2c168298772cf7f`。
+- Player `create/update/list/detail` persistence 已从旧 `player_catalog.rs` 收敛到 `adapters/catalog/players/{directory,detail,record}/`；Directory、Detail coordinator、单用途读取模块、typed Row 与 Domain Mapper 分责。
+- Dynamic Tag 保持既有独立 owner `dynamic_tags.rs`；R6-04 Names/Positions writes、R6-05 Team Periods/Availability writes、R6-06 Abilities/Dynamic Tags writes 与 R6-09 deletion 未提前迁移。
+- 旧 owner PostgreSQL 16 contract run `31929515802` 为 `SUCCESS`；Player Directory owner-switch run `31929916934` 为 `SUCCESS`；Player Detail owner-switch run `31930614713` 为 `SUCCESS`。
+- official Domain inventory refresh run `31932154320` 为 `SUCCESS`，只更新 `architecture/domain-type-inventory.json`；临时 refresh workflow 已清理。
+- hard gate 多轮 fail-fast 均来自 legacy verifier 仍指向已迁移 Player read/list/mapper owner：Global Name Search、Player Role Inheritance、Database Reset、Entity Resource Center、Stage E1 Follow-up。每次只把原断言跟随到真实新 owner，未删除、跳过或放宽契约。
+- 最终 stage hard gate run `31932648476`：Windows job `95129707185` 与 PostgreSQL/architecture job `95129707240` 均 `SUCCESS`；`npm run verify:frontend`、rustfmt、workspace Clippy `-D warnings`、workspace tests、R6-01/R6-02/R6-03 ownership、完整 architecture、模型保护、database baseline 与 PostgreSQL 16 contract 全部实际通过。
+- 临时 R6-03 hard-gate workflow 与 inventory refresh workflow 已从实施分支清理。
+- 当前状态保持 `VERIFYING`：clean PR canonical、squash merge 与 merged-stage canonical 尚未完成；在这些门禁完成前 R6-04 继续 `BLOCKED`。
+- 用户现有 PostgreSQL 数据库真实数据写入/sample 验收与 Windows Full 人工交互验收未执行，不宣称通过。
+
 ## 当前边界与剩余门禁
 
-- 公共 TeamCatalogPort、Tauri command/DTO、Schema、0001–0046 migration、配置、错误语义、用户可观察行为、模型保护资产与生产依赖未改变。
-- R6-01 已完成专项契约、阶段回归、clean PR、squash merge 与 merged-stage canonical，状态为 `DONE`。
-- R6-02 Team Names 与 Profiles 已完成专项契约、阶段回归、clean PR、squash merge 与 merged-stage canonical，状态为 `DONE`。
-- R6-03 Player Directory 与 Detail 为当前唯一 `READY` 节点；R6-04～R6-10 继续 `BLOCKED`。
+- 公共 TeamCatalogPort / PlayerCatalogPort、Tauri command/DTO、Schema、0001–0046 migration、配置、错误语义、用户可观察行为、模型保护资产与生产依赖保持冻结。
+- R6-01 与 R6-02 均已 `DONE`。
+- R6-03 Player Directory 与 Detail 为当前唯一 `VERIFYING` 节点；R6-04～R6-10 继续 `BLOCKED`。
+- R6-03 下一步是 clean PR canonical、squash merge 与 merged-stage canonical；全部完成后才能标记 `DONE` 并开放 R6-04。
 - 每个节点完成时必须创建对应 `R06-xx` 实施记录并更新本索引；R6 完成时必须创建 `R06-stage-completion.md`。
