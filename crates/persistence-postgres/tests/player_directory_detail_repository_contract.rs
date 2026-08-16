@@ -224,8 +224,14 @@ async fn player_directory_and_detail_contract_is_preserved() {
         .find(|item| item.id == created.id)
         .expect("联合过滤必须返回目标球员");
     assert_eq!(listed.current_team_id, Some(team.id));
-    assert_eq!(listed.primary_position_code.as_deref(), Some(position_code.as_str()));
-    assert_eq!(listed.availability_status, Some(AvailabilityStatus::Doubtful));
+    assert_eq!(
+        listed.primary_position_code.as_deref(),
+        Some(position_code.as_str())
+    );
+    assert_eq!(
+        listed.availability_status,
+        Some(AvailabilityStatus::Doubtful)
+    );
     assert_eq!(listed.availability_reason.as_deref(), Some("minor issue"));
 
     let cursor_error = database
@@ -250,7 +256,10 @@ async fn player_directory_and_detail_contract_is_preserved() {
         .await
         .expect("更新球员");
     assert_eq!(updated.canonical_name, format!("R6-03 Beta Player {token}"));
-    assert_eq!(updated.normalized_name, format!("r6-03 beta player {token}"));
+    assert_eq!(
+        updated.normalized_name,
+        format!("r6-03 beta player {token}")
+    );
 
     let primary_names: Vec<(String, bool)> = sqlx::query_as(
         r#"
@@ -272,13 +281,12 @@ async fn player_directory_and_detail_contract_is_preserved() {
         .iter()
         .any(|(name, primary)| name == &updated.canonical_name && *primary));
 
-    let metadata: serde_json::Value = sqlx::query_scalar(
-        "SELECT metadata FROM football.players WHERE id = $1",
-    )
-    .bind(created.id)
-    .fetch_one(&database.pool)
-    .await
-    .expect("读取 update_player metadata merge");
+    let metadata: serde_json::Value =
+        sqlx::query_scalar("SELECT metadata FROM football.players WHERE id = $1")
+            .bind(created.id)
+            .fetch_one(&database.pool)
+            .await
+            .expect("读取 update_player metadata merge");
     assert_eq!(metadata["first"], true);
     assert_eq!(metadata["second"], true);
     assert_eq!(metadata["shared"], "new");
