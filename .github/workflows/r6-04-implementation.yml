@@ -1,0 +1,986 @@
+name: R6-04 implementation gate
+
+on:
+  push:
+    branches:
+      - agent/r6-04-player-names-positions
+
+permissions:
+  contents: write
+
+jobs:
+  implement:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - name: Checkout implementation branch
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Setup Rust 1.88.0
+        uses: dtolnay/rust-toolchain@1.88.0
+        with:
+          components: rustfmt, clippy
+
+      - name: Apply R6-04 owner migration
+        shell: bash
+        env:
+          R6_BASE: 90f1bb08bf5a7a1580448f791dd241118ea32284
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import re
+          import subprocess
+          import os
+
+          root = Path.cwd()
+          base = os.environ["R6_BASE"]
+          allowed = {".github/workflows/r6-04-implementation.yml"}
+          changed = set(subprocess.check_output(["git", "diff", "--name-only", base, "HEAD"], text=True).splitlines())
+          unexpected = changed - allowed
+          if unexpected:
+              raise SystemExit(f"安全停止：R6-04 基线后存在非临时工作流改动：{sorted(unexpected)}")
+
+          def read(path):
+              return (root / path).read_text(encoding="utf-8")
+
+          def write(path, content):
+              target = root / path
+              target.parent.mkdir(parents=True, exist_ok=True)
+              target.write_text(content, encoding="utf-8", newline="\n")
+
+          player_catalog_path = "crates/persistence-postgres/src/player_catalog.rs"
+          source = read(player_catalog_path)
+          source = source.replace(
+              "    adapters::catalog::players::{\n        normalization::normalize_name, value_mapping::availability_status,\n    },\n",
+              "    adapters::catalog::players::value_mapping::availability_status,\n",
+              1,
+          )
+          source = source.replace(
+              "    PlayerAvailabilityDraft, PlayerAvailabilityRecord, PlayerCatalogReferenceData, PlayerNameDraft,\n    PlayerNameRecord, PlayerPositionDraft, PlayerPositionRecord, PlayerTeamPeriodDraft,\n",
+              "    PlayerAvailabilityDraft, PlayerAvailabilityRecord, PlayerCatalogReferenceData,\n    PlayerTeamPeriodDraft,\n",
+              1,
+          )
+          source, count = re.subn(
+              r"\n    pub async fn add_player_name\([\s\S]*?\n    pub async fn assign_player_position\(",
+              "\n    pub async fn assign_player_position(",
+              source,
+              count=1,
+          )
+          if count != 1:
+              raise SystemExit("未能唯一移除 legacy add_player_name owner")
+          source, count = re.subn(
+              r"\n    pub async fn assign_player_position\([\s\S]*?\n    pub async fn add_player_team_period\(",
+              "\n    pub async fn add_player_team_period(",
+              source,
+              count=1,
+          )
+          if count != 1:
+              raise SystemExit("未能唯一移除 legacy assign_player_position owner")
+          source, count = re.subn(
+              r"\nfn player_name_from_row\([\s\S]*?\nfn player_position_from_row\(",
+              "\nfn player_position_from_row(",
+              source,
+              count=1,
+          )
+          if count != 1:
+              raise SystemExit("未能唯一移除 legacy player_name_from_row")
+          source, count = re.subn(
+              r"\nfn player_position_from_row\([\s\S]*?\nfn player_team_period_from_row\(",
+              "\nfn player_team_period_from_row(",
+              source,
+              count=1,
+          )
+          if count != 1:
+              raise SystemExit("未能唯一移除 legacy player_position_from_row")
+          source = source.replace(
+              "    use crate::adapters::catalog::players::value_mapping::{player_status, preferred_foot};\n",
+              "    use crate::adapters::catalog::players::{\n        normalization::normalize_name,\n        value_mapping::{player_status, preferred_foot},\n    };\n",
+              1,
+          )
+          if "pub async fn add_player_name" in source or "pub async fn assign_player_position" in source:
+              raise SystemExit("legacy Player Names/Positions write owner 仍残留在 player_catalog.rs")
+          write(player_catalog_path, source)
+
+          write("crates/persistence-postgres/src/adapters/catalog/players/names/mod.rs", """mod add_player_name;
+mod input_policy;
+mod mapper;
+mod row;
+
+pub(in crate::adapters::catalog::players) use mapper::map_player_name;
+pub(in crate::adapters::catalog::players) use row::PlayerNameRow;
+""")
+          write("crates/persistence-postgres/src/adapters/catalog/players/names/input_policy.rs", """use crate::{PersistenceError, PersistenceResult};
+use football_domain::PlayerNameDraft;
+
+pub(super) struct ValidatedPlayerName<'a> {
+    pub(super) name: &'a str,
+    pub(super) language_code: Option<&'a str>,
+}
+
+pub(super) fn validate_player_name_draft(
+    draft: &PlayerNameDraft,
+) -> PersistenceResult<ValidatedPlayerName<'_>> {
+    let name = draft.name.trim();
+    if name.is_empty() {
+        return Err(PersistenceError::InvalidState(
+            "球员名称不能为空".to_string(),
+        ));
+    }
+    if matches!((&draft.valid_from, &draft.valid_to), (Some(start), Some(end)) if end < start) {
+        return Err(PersistenceError::InvalidState(
+            "球员名称结束日期不能早于开始日期".to_string(),
+        ));
+    }
+    Ok(ValidatedPlayerName {
+        name,
+        language_code: draft
+            .language_code
+            .as_deref()
+            .map(str::trim)
+            .filter(|value| !value.is_empty()),
+    })
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use chrono::NaiveDate;
+    use uuid::Uuid;
+
+    fn draft(name: &str) -> PlayerNameDraft {
+        PlayerNameDraft {
+            player_id: Uuid::nil(),
+            name: name.to_string(),
+            language_code: Some(" zh-CN ".to_string()),
+            is_primary: false,
+            valid_from: None,
+            valid_to: None,
+        }
+    }
+
+    #[test]
+    fn trims_name_and_optional_language() {
+        let validated = validate_player_name_draft(&draft("  测试 球员  ")).unwrap();
+        assert_eq!(validated.name, "测试 球员");
+        assert_eq!(validated.language_code, Some("zh-CN"));
+    }
+
+    #[test]
+    fn rejects_blank_name_and_reversed_dates() {
+        assert!(matches!(
+            validate_player_name_draft(&draft("   ")),
+            Err(PersistenceError::InvalidState(message)) if message == "球员名称不能为空"
+        ));
+        let mut value = draft("name");
+        value.valid_from = NaiveDate::from_ymd_opt(2026, 2, 2);
+        value.valid_to = NaiveDate::from_ymd_opt(2026, 2, 1);
+        assert!(matches!(
+            validate_player_name_draft(&value),
+            Err(PersistenceError::InvalidState(message)) if message == "球员名称结束日期不能早于开始日期"
+        ));
+    }
+}
+""")
+          write("crates/persistence-postgres/src/adapters/catalog/players/names/row.rs", """use chrono::NaiveDate;
+use sqlx::FromRow;
+use uuid::Uuid;
+
+#[derive(Debug, FromRow)]
+pub(in crate::adapters::catalog::players) struct PlayerNameRow {
+    pub id: Uuid,
+    pub player_id: Uuid,
+    pub name: String,
+    pub normalized_name: String,
+    pub language_code: Option<String>,
+    pub is_primary: bool,
+    pub valid_from: Option<NaiveDate>,
+    pub valid_to: Option<NaiveDate>,
+}
+""")
+          write("crates/persistence-postgres/src/adapters/catalog/players/names/mapper.rs", """use super::row::PlayerNameRow;
+use football_domain::PlayerNameRecord;
+
+pub(in crate::adapters::catalog::players) fn map_player_name(
+    row: PlayerNameRow,
+) -> PlayerNameRecord {
+    PlayerNameRecord {
+        id: row.id,
+        player_id: row.player_id,
+        name: row.name,
+        normalized_name: row.normalized_name,
+        language_code: row.language_code,
+        is_primary: row.is_primary,
+        valid_from: row.valid_from,
+        valid_to: row.valid_to,
+    }
+}
+""")
+          write("crates/persistence-postgres/src/adapters/catalog/players/names/add_player_name.rs", """use super::{
+    input_policy::validate_player_name_draft, map_player_name, row::PlayerNameRow,
+};
+use crate::{
+    adapters::catalog::players::normalization::normalize_name, PersistenceResult, PostgresStore,
+};
+use football_domain::{PlayerNameDraft, PlayerNameRecord};
+use uuid::Uuid;
+
+impl PostgresStore {
+    pub async fn add_player_name(
+        &self,
+        draft: &PlayerNameDraft,
+    ) -> PersistenceResult<PlayerNameRecord> {
+        let validated = validate_player_name_draft(draft)?;
+        let normalized_name = normalize_name(validated.name);
+        let mut tx = self.pool.begin().await?;
+        if draft.is_primary {
+            sqlx::query("UPDATE football.player_names SET is_primary = false WHERE player_id = $1")
+                .bind(draft.player_id)
+                .execute(&mut *tx)
+                .await?;
+            sqlx::query(
+                r#"
+                UPDATE football.players
+                SET canonical_name = $2, normalized_name = $3, updated_at = now()
+                WHERE id = $1
+                "#,
+            )
+            .bind(draft.player_id)
+            .bind(validated.name)
+            .bind(&normalized_name)
+            .execute(&mut *tx)
+            .await?;
+        }
+        let row = sqlx::query_as::<_, PlayerNameRow>(
+            r#"
+            INSERT INTO football.player_names (
+                id, player_id, name, normalized_name, language_code,
+                is_primary, valid_from, valid_to
+            ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+            RETURNING id, player_id, name, normalized_name, language_code,
+                      is_primary, valid_from, valid_to
+            "#,
+        )
+        .bind(Uuid::new_v4())
+        .bind(draft.player_id)
+        .bind(validated.name)
+        .bind(&normalized_name)
+        .bind(validated.language_code)
+        .bind(draft.is_primary)
+        .bind(draft.valid_from)
+        .bind(draft.valid_to)
+        .fetch_one(&mut *tx)
+        .await?;
+        tx.commit().await?;
+        Ok(map_player_name(row))
+    }
+}
+""")
+
+          write("crates/persistence-postgres/src/adapters/catalog/players/positions/mod.rs", """mod assign_player_position;
+mod input_policy;
+mod mapper;
+mod row;
+
+pub(in crate::adapters::catalog::players) use mapper::map_player_position;
+pub(in crate::adapters::catalog::players) use row::PlayerPositionRow;
+""")
+          write("crates/persistence-postgres/src/adapters/catalog/players/positions/input_policy.rs", """use crate::{PersistenceError, PersistenceResult};
+use football_domain::PlayerPositionDraft;
+
+pub(super) struct ValidatedPlayerPosition<'a> {
+    pub(super) position_code: String,
+    pub(super) default_role_code: Option<&'a str>,
+}
+
+pub(super) fn validate_player_position_draft(
+    draft: &PlayerPositionDraft,
+) -> PersistenceResult<ValidatedPlayerPosition<'_>> {
+    if !(0.0..=1.0).contains(&draft.proficiency) {
+        return Err(PersistenceError::InvalidState(
+            "位置熟练度必须位于 0–1".to_string(),
+        ));
+    }
+    if matches!((&draft.valid_from, &draft.valid_to), (Some(start), Some(end)) if end < start) {
+        return Err(PersistenceError::InvalidState(
+            "球员位置结束日期不能早于开始日期".to_string(),
+        ));
+    }
+    let default_role_code = draft
+        .default_role_code
+        .as_deref()
+        .map(str::trim)
+        .filter(|value| !value.is_empty());
+    if default_role_code.is_some_and(|value| value.chars().count() > 80) {
+        return Err(PersistenceError::InvalidState(
+            "默认战术角色不能超过 80 个字符".to_string(),
+        ));
+    }
+    Ok(ValidatedPlayerPosition {
+        position_code: draft.position_code.trim().to_uppercase(),
+        default_role_code,
+    })
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use chrono::NaiveDate;
+    use uuid::Uuid;
+
+    fn draft() -> PlayerPositionDraft {
+        PlayerPositionDraft {
+            player_id: Uuid::nil(),
+            position_code: " st ".to_string(),
+            proficiency: 0.8,
+            default_role_code: Some(" advanced-forward ".to_string()),
+            is_primary: false,
+            valid_from: None,
+            valid_to: None,
+            source_document_id: None,
+        }
+    }
+
+    #[test]
+    fn normalizes_position_code_and_role() {
+        let validated = validate_player_position_draft(&draft()).unwrap();
+        assert_eq!(validated.position_code, "ST");
+        assert_eq!(validated.default_role_code, Some("advanced-forward"));
+    }
+
+    #[test]
+    fn preserves_existing_validation_errors() {
+        let mut value = draft();
+        value.proficiency = 1.1;
+        assert!(matches!(
+            validate_player_position_draft(&value),
+            Err(PersistenceError::InvalidState(message)) if message == "位置熟练度必须位于 0–1"
+        ));
+        let mut value = draft();
+        value.valid_from = NaiveDate::from_ymd_opt(2026, 2, 2);
+        value.valid_to = NaiveDate::from_ymd_opt(2026, 2, 1);
+        assert!(matches!(
+            validate_player_position_draft(&value),
+            Err(PersistenceError::InvalidState(message)) if message == "球员位置结束日期不能早于开始日期"
+        ));
+        let mut value = draft();
+        value.default_role_code = Some("x".repeat(81));
+        assert!(matches!(
+            validate_player_position_draft(&value),
+            Err(PersistenceError::InvalidState(message)) if message == "默认战术角色不能超过 80 个字符"
+        ));
+    }
+}
+""")
+          write("crates/persistence-postgres/src/adapters/catalog/players/positions/row.rs", """use chrono::NaiveDate;
+use sqlx::FromRow;
+use uuid::Uuid;
+
+#[derive(Debug, FromRow)]
+pub(in crate::adapters::catalog::players) struct PlayerPositionRow {
+    pub id: Uuid,
+    pub player_id: Uuid,
+    pub position_code: String,
+    pub position_name: String,
+    pub position_group: String,
+    pub proficiency: f64,
+    pub default_role_code: Option<String>,
+    pub is_primary: bool,
+    pub valid_from: Option<NaiveDate>,
+    pub valid_to: Option<NaiveDate>,
+}
+""")
+          write("crates/persistence-postgres/src/adapters/catalog/players/positions/mapper.rs", """use super::row::PlayerPositionRow;
+use football_domain::PlayerPositionRecord;
+
+pub(in crate::adapters::catalog::players) fn map_player_position(
+    row: PlayerPositionRow,
+) -> PlayerPositionRecord {
+    PlayerPositionRecord {
+        id: row.id,
+        player_id: row.player_id,
+        position_code: row.position_code,
+        position_name: row.position_name,
+        position_group: row.position_group,
+        proficiency: row.proficiency,
+        default_role_code: row.default_role_code,
+        is_primary: row.is_primary,
+        valid_from: row.valid_from,
+        valid_to: row.valid_to,
+    }
+}
+""")
+          write("crates/persistence-postgres/src/adapters/catalog/players/positions/assign_player_position.rs", """use super::{
+    input_policy::validate_player_position_draft, map_player_position, row::PlayerPositionRow,
+};
+use crate::{PersistenceResult, PostgresStore};
+use football_domain::{PlayerPositionDraft, PlayerPositionRecord};
+use uuid::Uuid;
+
+impl PostgresStore {
+    pub async fn assign_player_position(
+        &self,
+        draft: &PlayerPositionDraft,
+    ) -> PersistenceResult<PlayerPositionRecord> {
+        let validated = validate_player_position_draft(draft)?;
+        let mut tx = self.pool.begin().await?;
+        if draft.is_primary {
+            sqlx::query(
+                "UPDATE football.player_positions SET is_primary = false WHERE player_id = $1",
+            )
+            .bind(draft.player_id)
+            .execute(&mut *tx)
+            .await?;
+        }
+        let row = sqlx::query_as::<_, PlayerPositionRow>(
+            r#"
+            WITH inserted AS (
+                INSERT INTO football.player_positions (
+                    id, player_id, position_code, proficiency, default_role_code, is_primary,
+                    valid_from, valid_to, source_document_id
+                ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
+                RETURNING *
+            )
+            SELECT
+                inserted.id, inserted.player_id, inserted.position_code,
+                position.name AS position_name, position.position_group,
+                inserted.proficiency, inserted.default_role_code, inserted.is_primary,
+                inserted.valid_from, inserted.valid_to
+            FROM inserted
+            JOIN football.positions position ON position.code = inserted.position_code
+            "#,
+        )
+        .bind(Uuid::new_v4())
+        .bind(draft.player_id)
+        .bind(&validated.position_code)
+        .bind(draft.proficiency)
+        .bind(validated.default_role_code)
+        .bind(draft.is_primary)
+        .bind(draft.valid_from)
+        .bind(draft.valid_to)
+        .bind(draft.source_document_id)
+        .fetch_one(&mut *tx)
+        .await?;
+        tx.commit().await?;
+        Ok(map_player_position(row))
+    }
+}
+""")
+
+          players_mod = read("crates/persistence-postgres/src/adapters/catalog/players/mod.rs")
+          expected_mod = "mod detail;\nmod directory;\npub(crate) mod normalization;\nmod record;\npub(crate) mod value_mapping;\n"
+          if players_mod != expected_mod:
+              raise SystemExit("安全停止：players/mod.rs 与已审计基线不一致")
+          write(
+              "crates/persistence-postgres/src/adapters/catalog/players/mod.rs",
+              "mod detail;\nmod directory;\nmod names;\npub(crate) mod normalization;\nmod positions;\nmod record;\npub(crate) mod value_mapping;\n",
+          )
+
+          write("crates/persistence-postgres/src/adapters/catalog/players/detail/names/mod.rs", """mod read;
+
+pub(super) use read::read_names;
+""")
+          write("crates/persistence-postgres/src/adapters/catalog/players/detail/names/read.rs", """use crate::{
+    adapters::catalog::players::names::{map_player_name, PlayerNameRow},
+    PersistenceResult,
+};
+use football_domain::PlayerNameRecord;
+use sqlx::PgPool;
+use uuid::Uuid;
+
+pub(in crate::adapters::catalog::players::detail) async fn read_names(
+    pool: &PgPool,
+    player_id: Uuid,
+) -> PersistenceResult<Vec<PlayerNameRecord>> {
+    let rows = sqlx::query_as::<_, PlayerNameRow>(
+        r#"
+        SELECT id, player_id, name, normalized_name, language_code,
+               is_primary, valid_from, valid_to
+        FROM football.player_names
+        WHERE player_id = $1
+        ORDER BY is_primary DESC, valid_from DESC NULLS LAST, name
+        "#,
+    )
+    .bind(player_id)
+    .fetch_all(pool)
+    .await?;
+    Ok(rows.into_iter().map(map_player_name).collect())
+}
+""")
+          write("crates/persistence-postgres/src/adapters/catalog/players/detail/positions/mod.rs", """mod read;
+
+pub(super) use read::read_positions;
+""")
+          write("crates/persistence-postgres/src/adapters/catalog/players/detail/positions/read.rs", """use crate::{
+    adapters::catalog::players::positions::{map_player_position, PlayerPositionRow},
+    PersistenceResult,
+};
+use football_domain::PlayerPositionRecord;
+use sqlx::PgPool;
+use uuid::Uuid;
+
+pub(in crate::adapters::catalog::players::detail) async fn read_positions(
+    pool: &PgPool,
+    player_id: Uuid,
+) -> PersistenceResult<Vec<PlayerPositionRecord>> {
+    let rows = sqlx::query_as::<_, PlayerPositionRow>(
+        r#"
+        SELECT
+            assignment.id, assignment.player_id, assignment.position_code,
+            position.name AS position_name, position.position_group,
+            assignment.proficiency, assignment.default_role_code, assignment.is_primary,
+            assignment.valid_from, assignment.valid_to
+        FROM football.player_positions assignment
+        JOIN football.positions position ON position.code = assignment.position_code
+        WHERE assignment.player_id = $1
+        ORDER BY assignment.is_primary DESC, assignment.proficiency DESC,
+                 assignment.valid_from DESC NULLS LAST
+        "#,
+    )
+    .bind(player_id)
+    .fetch_all(pool)
+    .await?;
+    Ok(rows.into_iter().map(map_player_position).collect())
+}
+""")
+          for obsolete in [
+              "crates/persistence-postgres/src/adapters/catalog/players/detail/names/mapper.rs",
+              "crates/persistence-postgres/src/adapters/catalog/players/detail/names/row.rs",
+              "crates/persistence-postgres/src/adapters/catalog/players/detail/positions/mapper.rs",
+              "crates/persistence-postgres/src/adapters/catalog/players/detail/positions/row.rs",
+          ]:
+              target = root / obsolete
+              if not target.exists():
+                  raise SystemExit(f"安全停止：待迁移文件不存在：{obsolete}")
+              target.unlink()
+
+          write("crates/persistence-postgres/tests/player_names_positions_repository_contract.rs", """use chrono::NaiveDate;
+use football_domain::{
+    PlayerDraft, PlayerNameDraft, PlayerPositionDraft, PlayerStatus, PreferredFoot,
+};
+use football_persistence_postgres::{DatabaseOptions, PersistenceError, PostgresStore};
+use serde_json::json;
+use sqlx::{postgres::PgPoolOptions, PgPool};
+use uuid::Uuid;
+
+const DATABASE_ENV: &str = "FOOTBALL_TEST_DATABASE_URL";
+
+struct TestDatabase {
+    store: PostgresStore,
+    pool: PgPool,
+}
+
+impl TestDatabase {
+    async fn connect() -> Self {
+        let connection_url = std::env::var(DATABASE_ENV).unwrap_or_else(|_| {
+            panic!(
+                "运行 R6-04 契约测试前必须设置 {DATABASE_ENV}，并指向专用、可写的 PostgreSQL 测试数据库"
+            )
+        });
+        let options = DatabaseOptions {
+            connection_url: connection_url.clone(),
+            max_connections: 4,
+            connect_timeout_seconds: 10,
+        };
+        let store = PostgresStore::connect(&options)
+            .await
+            .expect("连接 R6-04 PostgreSQL 测试数据库");
+        store.migrate().await.expect("执行数据库迁移");
+        let pool = PgPoolOptions::new()
+            .max_connections(4)
+            .connect(&connection_url)
+            .await
+            .expect("建立 R6-04 校验连接池");
+        Self { store, pool }
+    }
+
+    async fn close(self) {
+        self.pool.close().await;
+        self.store.close().await;
+    }
+}
+
+#[tokio::test]
+#[ignore = "需要专用且可写的 PostgreSQL 测试数据库；设置 FOOTBALL_TEST_DATABASE_URL 后显式运行"]
+async fn player_names_and_positions_contract_is_preserved() {
+    let database = TestDatabase::connect().await;
+    let token = Uuid::new_v4().simple().to_string();
+    let player = database
+        .store
+        .create_player(&PlayerDraft {
+            canonical_name: format!("R6-04 Player {token}"),
+            date_of_birth: None,
+            nationality_code: Some("ZZ".to_string()),
+            preferred_foot: PreferredFoot::Right,
+            height_cm: Some(180),
+            status: PlayerStatus::Active,
+            metadata: json!({"contract": "r6-04"}),
+        })
+        .await
+        .expect("创建 R6-04 contract player");
+
+    let alias = database
+        .store
+        .add_player_name(&PlayerNameDraft {
+            player_id: player.id,
+            name: format!("  测试   球员 {token}  "),
+            language_code: Some(" zh-CN ".to_string()),
+            is_primary: false,
+            valid_from: None,
+            valid_to: None,
+        })
+        .await
+        .expect("添加非主名称");
+    assert_eq!(alias.name, format!("测试   球员 {token}"));
+    assert_eq!(alias.normalized_name, format!("测试 球员 {token}"));
+    assert_eq!(alias.language_code.as_deref(), Some("zh-CN"));
+    assert!(!alias.is_primary);
+
+    let primary = database
+        .store
+        .add_player_name(&PlayerNameDraft {
+            player_id: player.id,
+            name: format!("  Primary   Name {token}  "),
+            language_code: Some(" en ".to_string()),
+            is_primary: true,
+            valid_from: None,
+            valid_to: None,
+        })
+        .await
+        .expect("切换主名称");
+    assert_eq!(primary.name, format!("Primary   Name {token}"));
+    assert_eq!(primary.normalized_name, format!("primary name {token}"));
+    assert!(primary.is_primary);
+    let player_identity: (String, String) = sqlx::query_as(
+        "SELECT canonical_name, normalized_name FROM football.players WHERE id = $1",
+    )
+    .bind(player.id)
+    .fetch_one(&database.pool)
+    .await
+    .expect("读取主名称投影");
+    assert_eq!(player_identity.0, primary.name);
+    assert_eq!(player_identity.1, primary.normalized_name);
+    let primary_name_count: i64 = sqlx::query_scalar(
+        "SELECT count(*)::bigint FROM football.player_names WHERE player_id = $1 AND is_primary",
+    )
+    .bind(player.id)
+    .fetch_one(&database.pool)
+    .await
+    .expect("统计主名称");
+    assert_eq!(primary_name_count, 1);
+
+    let blank_name = database
+        .store
+        .add_player_name(&PlayerNameDraft {
+            player_id: player.id,
+            name: "   ".to_string(),
+            language_code: None,
+            is_primary: false,
+            valid_from: None,
+            valid_to: None,
+        })
+        .await
+        .expect_err("空白名称必须失败");
+    assert!(matches!(
+        blank_name,
+        PersistenceError::InvalidState(message) if message == "球员名称不能为空"
+    ));
+    let reversed_name_dates = database
+        .store
+        .add_player_name(&PlayerNameDraft {
+            player_id: player.id,
+            name: "date-check".to_string(),
+            language_code: None,
+            is_primary: false,
+            valid_from: NaiveDate::from_ymd_opt(2026, 2, 2),
+            valid_to: NaiveDate::from_ymd_opt(2026, 2, 1),
+        })
+        .await
+        .expect_err("倒置名称日期必须失败");
+    assert!(matches!(
+        reversed_name_dates,
+        PersistenceError::InvalidState(message) if message == "球员名称结束日期不能早于开始日期"
+    ));
+
+    let positions = database
+        .store
+        .list_positions()
+        .await
+        .expect("读取内置位置目录");
+    assert!(positions.len() >= 2, "R6-04 contract 至少需要两个内置位置");
+    let first = database
+        .store
+        .assign_player_position(&PlayerPositionDraft {
+            player_id: player.id,
+            position_code: format!(" {} ", positions[0].code.to_lowercase()),
+            proficiency: 0.91,
+            default_role_code: Some(" advanced-forward ".to_string()),
+            is_primary: true,
+            valid_from: None,
+            valid_to: None,
+            source_document_id: None,
+        })
+        .await
+        .expect("写入第一主位置");
+    assert_eq!(first.position_code, positions[0].code);
+    assert_eq!(first.default_role_code.as_deref(), Some("advanced-forward"));
+    assert!(first.is_primary);
+
+    let second = database
+        .store
+        .assign_player_position(&PlayerPositionDraft {
+            player_id: player.id,
+            position_code: positions[1].code.clone(),
+            proficiency: 0.88,
+            default_role_code: None,
+            is_primary: true,
+            valid_from: None,
+            valid_to: None,
+            source_document_id: None,
+        })
+        .await
+        .expect("切换主位置");
+    assert!(second.is_primary);
+    let first_is_primary: bool = sqlx::query_scalar(
+        "SELECT is_primary FROM football.player_positions WHERE id = $1",
+    )
+    .bind(first.id)
+    .fetch_one(&database.pool)
+    .await
+    .expect("读取第一位置 primary 状态");
+    assert!(!first_is_primary);
+
+    let invalid_proficiency = database
+        .store
+        .assign_player_position(&PlayerPositionDraft {
+            player_id: player.id,
+            position_code: positions[0].code.clone(),
+            proficiency: 1.1,
+            default_role_code: None,
+            is_primary: false,
+            valid_from: None,
+            valid_to: None,
+            source_document_id: None,
+        })
+        .await
+        .expect_err("越界熟练度必须失败");
+    assert!(matches!(
+        invalid_proficiency,
+        PersistenceError::InvalidState(message) if message == "位置熟练度必须位于 0–1"
+    ));
+
+    let reversed_position_dates = database
+        .store
+        .assign_player_position(&PlayerPositionDraft {
+            player_id: player.id,
+            position_code: positions[0].code.clone(),
+            proficiency: 0.5,
+            default_role_code: None,
+            is_primary: false,
+            valid_from: NaiveDate::from_ymd_opt(2026, 2, 2),
+            valid_to: NaiveDate::from_ymd_opt(2026, 2, 1),
+            source_document_id: None,
+        })
+        .await
+        .expect_err("倒置位置日期必须失败");
+    assert!(matches!(
+        reversed_position_dates,
+        PersistenceError::InvalidState(message) if message == "球员位置结束日期不能早于开始日期"
+    ));
+
+    let oversized_role = database
+        .store
+        .assign_player_position(&PlayerPositionDraft {
+            player_id: player.id,
+            position_code: positions[0].code.clone(),
+            proficiency: 0.5,
+            default_role_code: Some("x".repeat(81)),
+            is_primary: false,
+            valid_from: None,
+            valid_to: None,
+            source_document_id: None,
+        })
+        .await
+        .expect_err("超长默认战术角色必须失败");
+    assert!(matches!(
+        oversized_role,
+        PersistenceError::InvalidState(message) if message == "默认战术角色不能超过 80 个字符"
+    ));
+
+    database.close().await;
+}
+""")
+
+          verifier = r'''import fs from "node:fs";
+import path from "node:path";
+
+const root = path.resolve(import.meta.dirname, "..");
+const read = (file) => fs.readFileSync(path.join(root, file), "utf8");
+const exists = (file) => fs.existsSync(path.join(root, file));
+const failures = [];
+const check = (condition, message) => { if (!condition) failures.push(message); };
+const requireTokens = (file, tokens, label = file) => {
+  const content = read(file);
+  for (const token of tokens) check(content.includes(token), `${label} 缺少：${token}`);
+  return content;
+};
+
+const playersMod = read("crates/persistence-postgres/src/adapters/catalog/players/mod.rs");
+const namesMod = read("crates/persistence-postgres/src/adapters/catalog/players/names/mod.rs");
+const positionsMod = read("crates/persistence-postgres/src/adapters/catalog/players/positions/mod.rs");
+const namesWrite = requireTokens("crates/persistence-postgres/src/adapters/catalog/players/names/add_player_name.rs", [
+  "pub async fn add_player_name",
+  "UPDATE football.player_names SET is_primary = false",
+  "UPDATE football.players",
+  "INSERT INTO football.player_names",
+  "query_as::<_, PlayerNameRow>",
+  "tx.commit().await?",
+], "Player Names write owner");
+const positionsWrite = requireTokens("crates/persistence-postgres/src/adapters/catalog/players/positions/assign_player_position.rs", [
+  "pub async fn assign_player_position",
+  "UPDATE football.player_positions SET is_primary = false",
+  "INSERT INTO football.player_positions",
+  "JOIN football.positions",
+  "query_as::<_, PlayerPositionRow>",
+  "tx.commit().await?",
+], "Player Positions write owner");
+const legacy = read("crates/persistence-postgres/src/player_catalog.rs");
+const namesRead = read("crates/persistence-postgres/src/adapters/catalog/players/detail/names/read.rs");
+const positionsRead = read("crates/persistence-postgres/src/adapters/catalog/players/detail/positions/read.rs");
+const port = read("crates/application/src/ports/player/mod.rs");
+const adapter = read("crates/application/src/composition/adapters/players.rs");
+
+check(playersMod.includes("mod names;") && playersMod.includes("mod positions;"), "players 模块未注册 Names/Positions owner");
+check(namesMod.includes("mod add_player_name;") && namesMod.includes("mod input_policy;") && namesMod.includes("mod mapper;") && namesMod.includes("mod row;"), "Names 目录职责拆分不完整");
+check(positionsMod.includes("mod assign_player_position;") && positionsMod.includes("mod input_policy;") && positionsMod.includes("mod mapper;") && positionsMod.includes("mod row;"), "Positions 目录职责拆分不完整");
+check(!namesMod.includes("sqlx::") && !namesMod.includes("impl PostgresStore"), "Names mod.rs 不得承载 SQL 或业务实现");
+check(!positionsMod.includes("sqlx::") && !positionsMod.includes("impl PostgresStore"), "Positions mod.rs 不得承载 SQL 或业务实现");
+check(namesWrite.includes("normalize_name(validated.name)"), "Player Names 未复用唯一名称规范化 owner");
+check(positionsWrite.includes("validate_player_position_draft(draft)?"), "Player Positions 未经过独立输入策略");
+check(!legacy.includes("pub async fn add_player_name"), "legacy player_catalog.rs 仍拥有 add_player_name");
+check(!legacy.includes("pub async fn assign_player_position"), "legacy player_catalog.rs 仍拥有 assign_player_position");
+check(!legacy.includes("fn player_name_from_row"), "legacy player_catalog.rs 仍拥有 PlayerName Row mapper");
+check(!legacy.includes("fn player_position_from_row"), "legacy player_catalog.rs 仍拥有 PlayerPosition Row mapper");
+check(namesRead.includes("players::names::{map_player_name, PlayerNameRow}"), "Player Detail Names read 未复用新 Names mapper/row owner");
+check(positionsRead.includes("players::positions::{map_player_position, PlayerPositionRow}"), "Player Detail Positions read 未复用新 Positions mapper/row owner");
+for (const obsolete of [
+  "crates/persistence-postgres/src/adapters/catalog/players/detail/names/mapper.rs",
+  "crates/persistence-postgres/src/adapters/catalog/players/detail/names/row.rs",
+  "crates/persistence-postgres/src/adapters/catalog/players/detail/positions/mapper.rs",
+  "crates/persistence-postgres/src/adapters/catalog/players/detail/positions/row.rs",
+]) check(!exists(obsolete), `旧 Detail 映射 owner 未删除：${obsolete}`);
+check(port.includes("async fn add_player_name(&self, draft: &PlayerNameDraft) -> PortResult<PlayerNameRecord>;"), "PlayerCatalogPort add_player_name 公共契约变化");
+check(port.includes("async fn assign_player_position("), "PlayerCatalogPort assign_player_position 公共契约变化");
+check(adapter.includes("self.add_player_name(draft)") && adapter.includes("self.assign_player_position(draft)"), "Application persistence adapter 未保持既有调用语义");
+check(exists("crates/persistence-postgres/tests/player_names_positions_repository_contract.rs"), "R6-04 PostgreSQL contract test 缺失");
+
+if (failures.length) {
+  console.error("R6-04 Player Names / Positions ownership verification failed:");
+  failures.forEach((failure) => console.error(`- ${failure}`));
+  process.exit(1);
+}
+console.log("R6-04 Player Names / Positions ownership verified: write owners, typed rows/mappers, detail reads and public ports remain uniquely bounded.");
+'''
+          write("scripts/verify-player-names-positions.mjs", verifier)
+
+          package_path = "package.json"
+          package = read(package_path)
+          needle = "node scripts/verify-team-names-profiles.mjs\""
+          if needle not in package:
+              raise SystemExit("package.json architecture gate 尾部与已审计基线不一致")
+          package = package.replace(
+              needle,
+              "node scripts/verify-team-names-profiles.mjs && node scripts/verify-player-names-positions.mjs\"",
+              1,
+          )
+          write(package_path, package)
+          PY
+
+      - name: Refresh official Domain inventory
+        shell: bash
+        run: node scripts/generate-domain-type-inventory.mjs
+
+      - name: Verify R6-04 ownership and Domain inventory
+        shell: bash
+        run: |
+          node scripts/verify-player-names-positions.mjs
+          node scripts/verify-domain-type-inventory.mjs
+
+      - name: Verify architecture aggregate
+        shell: bash
+        run: npm run verify:architecture
+
+      - name: Verify Rust formatting
+        shell: bash
+        run: cargo fmt --all -- --check
+
+      - name: Run persistence unit tests
+        shell: bash
+        run: cargo test --locked -p football-persistence-postgres --lib
+
+      - name: Compile R6-04 PostgreSQL contract
+        shell: bash
+        run: cargo test --locked -p football-persistence-postgres --test player_names_positions_repository_contract --no-run
+
+      - name: Check Application compatibility
+        shell: bash
+        run: cargo check --locked -p football-application
+
+      - name: Finalize R6-04 verification records
+        shell: bash
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import os
+
+          root = Path.cwd()
+          run_id = os.environ.get("GITHUB_RUN_ID", "unknown")
+
+          readme_path = root / "README.md"
+          readme = readme_path.read_text(encoding="utf-8")
+          marker = "### R6-04 Player Names 与 Positions"
+          if marker not in readme:
+              heading = "## 模块化重写执行记录\n"
+              entry = f'''\n### R6-04 Player Names 与 Positions\n\n- Player Names / Positions 写职责已从 `crates/persistence-postgres/src/player_catalog.rs` 收敛到 `adapters/catalog/players/{{names,positions}}/`，输入策略、typed Row、Domain mapper 与 SQL/事务 owner 分责；Player Detail 读取继续保留在 `detail/`，并复用新的 Names/Positions Row/mapper owner。\n- `PlayerCatalogPort`、Domain DTO、Schema、0001–0046 migration、错误语义、默认战术角色/位置映射和用户可观察行为保持不变；未新增生产依赖。\n- 临时实施 gate run `{run_id}` 已实际通过 R6-04 ownership verifier、official Domain inventory 生成与校验、完整 architecture、rustfmt、Persistence unit tests、R6-04 PostgreSQL contract 编译及 Application check。\n- 当前节点保持 `VERIFYING`；PostgreSQL 16 真实 contract 执行、完整阶段回归、clean PR canonical 与 merged-stage canonical 尚未执行。\n\n'''
+              if heading not in readme:
+                  raise SystemExit("README 缺少模块化重写执行记录标题")
+              readme = readme.replace(heading, heading + entry, 1)
+              readme_path.write_text(readme, encoding="utf-8", newline="\n")
+
+          doc = f'''# R06-04 — Player Names 与 Positions\n\n## 状态\n\n`VERIFYING`\n\n## 进入基线\n\n- R6-03：`DONE`。\n- R6-04 实施分支：`agent/r6-04-player-names-positions`。\n- 节点起点：`90f1bb08bf5a7a1580448f791dd241118ea32284`。\n\n## 已实施职责边界\n\n- `adapters/catalog/players/names/`：Player Name 输入策略、typed Row、Domain mapper 与 `add_player_name` SQL/事务唯一 owner。\n- `adapters/catalog/players/positions/`：Player Position 输入策略、typed Row、Domain mapper 与 `assign_player_position` SQL/事务唯一 owner。\n- `detail/names/read.rs` 与 `detail/positions/read.rs` 继续只承担 Player Detail 读取 SQL，并复用上层 Names/Positions Row 与 mapper；原 Detail 重复 mapper/row 已删除。\n- `player_catalog.rs` 已退出 Player Names/Positions 写职责与对应 Row mapping，不保留转发壳或双 owner。\n\n## 保持不变的契约\n\n- `PlayerCatalogPort::add_player_name` / `assign_player_position` 方法签名与 Application adapter 调用语义不变。\n- Domain `PlayerNameDraft/Record`、`PlayerPositionDraft/Record` shape 不变。\n- 名称 trim/normalize、primary name 同事务同步 `football.players`、primary position 切换、日期/熟练度/默认角色长度错误语义不变。\n- Schema、migration、配置、日志等级、默认战术角色/位置映射、历史 P4/运行引用和模型保护资产未主动修改。\n- 未新增生产依赖。\n\n## 本轮实际验证\n\n临时实施 gate run `{run_id}` 已通过：\n\n- `node scripts/verify-player-names-positions.mjs`：SUCCESS。\n- `node scripts/generate-domain-type-inventory.mjs` + `node scripts/verify-domain-type-inventory.mjs`：SUCCESS。\n- `npm run verify:architecture`：SUCCESS。\n- `cargo fmt --all -- --check`：SUCCESS。\n- `cargo test --locked -p football-persistence-postgres --lib`：SUCCESS。\n- `cargo test --locked -p football-persistence-postgres --test player_names_positions_repository_contract --no-run`：SUCCESS。\n- `cargo check --locked -p football-application`：SUCCESS。\n\n## 尚未执行\n\n- R6-04 PostgreSQL 16 ignored contract 真实执行。\n- `npm run verify:frontend`。\n- workspace Clippy `-D warnings`。\n- `cargo test --locked --workspace`。\n- clean PR canonical 与 merged-stage canonical gate。\n- 用户现有 PostgreSQL 数据真实写入/sample 验收与 Windows Full 人工交互验收。\n\n## 回退点\n\n- R6-04 节点起点：`90f1bb08bf5a7a1580448f791dd241118ea32284`。\n- 通过 Git 提交回退，不复制旧实现，不保留长期双 owner。\n'''
+          doc_path = root / "docs/modular-rewrite/R06-entity-catalog-persistence/R06-04-player-names-and-positions.md"
+          doc_path.write_text(doc, encoding="utf-8", newline="\n")
+
+          index_path = root / "docs/modular-rewrite/R06-entity-catalog-persistence/README.md"
+          index = index_path.read_text(encoding="utf-8")
+          index = index.replace("| R6-04 | Player Names 与 Positions | READY |", "| R6-04 | Player Names 与 Positions | VERIFYING |", 1)
+          section = f'''\n## R6-04 当前事实\n\n- 详细记录：[`R06-04-player-names-and-positions.md`](R06-04-player-names-and-positions.md)。\n- Player Names / Positions 写 owner 已从 `player_catalog.rs` 收敛到 `adapters/catalog/players/{{names,positions}}/`；输入策略、typed Row、mapper 与 SQL/事务按职责拆分。\n- Player Detail Names/Positions read 保留原读取职责，并复用新 Row/mapper owner；旧 Detail 重复 mapper/row 已删除。\n- 临时实施 gate run `{run_id}` 已通过 R6-04 ownership、official Domain inventory、完整 architecture、rustfmt、Persistence unit tests、R6-04 contract 编译和 Application check。\n- 当前状态 `VERIFYING`；PG16 真实 contract、阶段 hard gate、clean PR 与 merged-stage canonical 尚未完成，R6-05 继续 `BLOCKED`。\n\n'''
+          boundary = "## 当前边界与剩余门禁\n"
+          if "## R6-04 当前事实" not in index:
+              if boundary not in index:
+                  raise SystemExit("R6 阶段索引缺少当前边界标题")
+              index = index.replace(boundary, section + boundary, 1)
+          index = index.replace(
+              "- R6-04 Player Names 与 Positions 为当前唯一 `READY` 节点；R6-05～R6-10 继续 `BLOCKED`。",
+              "- R6-04 Player Names 与 Positions 为当前唯一 `VERIFYING` 节点；R6-05～R6-10 继续 `BLOCKED`。",
+              1,
+          )
+          index_path.write_text(index, encoding="utf-8", newline="\n")
+          PY
+
+      - name: Commit verified implementation
+        shell: bash
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add README.md architecture/domain-type-inventory.json package.json scripts/verify-player-names-positions.mjs crates/persistence-postgres/src/player_catalog.rs crates/persistence-postgres/src/adapters/catalog/players crates/persistence-postgres/tests/player_names_positions_repository_contract.rs docs/modular-rewrite/R06-entity-catalog-persistence
+          git diff --cached --check
+          git commit -m "refactor(r6-04): migrate player names and positions owners"
+          git push origin HEAD:agent/r6-04-player-names-positions
