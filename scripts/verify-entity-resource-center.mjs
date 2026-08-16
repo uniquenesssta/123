@@ -18,7 +18,8 @@ const competition = read("src/components/competition.ts");
 const footballText = read("src/components/footballText.ts");
 const types = read("src/types.ts");
 const domain = read("crates/domain/src/team/detail.rs") + read("crates/domain/src/player/listing.rs");
-const playerPersistence = read("crates/persistence-postgres/src/player_catalog.rs");
+const playerDirectoryList = read("crates/persistence-postgres/src/adapters/catalog/players/directory/list_players.rs");
+const playerDirectoryMapper = read("crates/persistence-postgres/src/adapters/catalog/players/directory/list_mapper.rs");
 const teamPersistence = read("crates/persistence-postgres/src/team_catalog.rs");
 const teamSquadPersistence = read("crates/persistence-postgres/src/adapters/catalog/teams/detail/read_squad.rs");
 const teamSquadMapper = read("crates/persistence-postgres/src/adapters/catalog/teams/detail/squad_mapper.rs");
@@ -64,7 +65,7 @@ check(footballText.includes('GK: "门将"') && footballText.includes('ST: "前�
 check(footballText.includes("detailLocalizedName") && footballText.includes("hasChineseText"), "中文姓名识别链缺失");
 check(types.match(/localized_name: string \| null;/g)?.length >= 2, "前端球队阵容/球员列表缺少中文姓名字段");
 check(domain.match(/pub localized_name: Option<String>/g)?.length >= 2, "Rust领域层缺少中文姓名字段");
-check(playerPersistence.includes("localized_name.name AS localized_name") && playerPersistence.includes('localized_name: row.try_get("localized_name")?'), "球员目录中文姓名查询或映射缺失");
+check(playerDirectoryList.includes("localized_name.name AS localized_name") && playerDirectoryMapper.includes("localized_name: row.localized_name"), "球员目录中文姓名查询或映射缺失");
 check(teamSquadPersistence.includes("localized_name.name AS localized_name") && teamSquadMapper.includes("localized_name: row.localized_name"), "球队阵容中文姓名查询或映射缺失");
 check(!teamRecordMapper.includes("localized_name:"), "中文姓名字段被错误写入TeamRecord映射");
 
