@@ -35,18 +35,20 @@ jobs:
           python - <<'PY'
           from pathlib import Path
           import re
-          import textwrap
 
           source = Path('.github/workflows/r6-04-implementation.yml').read_text(encoding='utf-8')
           blocks = re.findall(r"          python - <<'PY'\n(.*?)\n          PY", source, re.S)
           if len(blocks) != 2:
               raise SystemExit(f'expected 2 embedded Python blocks, got {len(blocks)}')
           for index, block in enumerate(blocks):
-              content = textwrap.dedent(block)
+              content = "\n".join(
+                  line[10:] if line.startswith("          ") else line
+                  for line in block.splitlines()
+              ) + "\n"
               if index == 0:
                   content = content.replace(
                       'allowed = {".github/workflows/r6-04-implementation.yml"}',
-                      'allowed = {".github/workflows/r6-04-implementation.yml", ".github/workflows/r6-04-runner.yml"}',
+                      'allowed = {".github/workflows/r6-04-implementation.yml", ".github/workflows/r6-04-runner.yml", ".github/r6-04-trigger.txt"}',
                   )
               Path(f'/tmp/r6_04_{index}.py').write_text(content, encoding='utf-8')
           PY
