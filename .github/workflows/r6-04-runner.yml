@@ -59,6 +59,30 @@ jobs:
           R6_BASE: 90f1bb08bf5a7a1580448f791dd241118ea32284
         run: python /tmp/r6_04_0.py
 
+      - name: Stabilize input policy unit test borrows
+        shell: bash
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+
+          patches = {
+              'crates/persistence-postgres/src/adapters/catalog/players/names/input_policy.rs': (
+                  'let validated = validate_player_name_draft(&draft("  测试 球员  ")).unwrap();',
+                  'let value = draft("  测试 球员  ");\n        let validated = validate_player_name_draft(&value).unwrap();',
+              ),
+              'crates/persistence-postgres/src/adapters/catalog/players/positions/input_policy.rs': (
+                  'let validated = validate_player_position_draft(&draft()).unwrap();',
+                  'let value = draft();\n        let validated = validate_player_position_draft(&value).unwrap();',
+              ),
+          }
+          for path, (old, new) in patches.items():
+              target = Path(path)
+              content = target.read_text(encoding='utf-8')
+              if content.count(old) != 1:
+                  raise SystemExit(f'安全停止：{path} unit-test borrow target count != 1')
+              target.write_text(content.replace(old, new, 1), encoding='utf-8', newline='\n')
+          PY
+
       - name: Format migrated Rust sources
         shell: bash
         run: cargo fmt --all
