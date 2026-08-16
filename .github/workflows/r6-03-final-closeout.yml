@@ -1,0 +1,76 @@
+name: R6-03 Final Closeout
+
+on:
+  push:
+    branches:
+      - rewrite/r6-entity-catalog-persistence
+    paths:
+      - .github/workflows/r6-03-final-closeout.yml
+
+permissions:
+  contents: write
+
+jobs:
+  closeout:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: rewrite/r6-entity-catalog-persistence
+          fetch-depth: 0
+      - name: Update R6-03 canonical records
+        shell: bash
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+
+          root = Path('README.md')
+          text = root.read_text(encoding='utf-8')
+          old = "- R6-03 当前为 `VERIFYING`：clean PR canonical、squash merge 与 merged-stage canonical 尚未完成，因此 R6-04 继续 `BLOCKED`。用户现有 PostgreSQL 数据库真实数据写入/sample 验收与 Windows Full 人工交互验收未执行。详细记录见 `docs/modular-rewrite/R06-entity-catalog-persistence/R06-03-player-directory-and-detail.md`。"
+          new = "- clean PR canonical run `31933320602` / Windows job `95131335957` 为 `SUCCESS`；artifact `9260226890`，SHA-256 `46c628502db8d9a1bd86a1459c8c7d955b13b7118eed950d292ee85f0d6bf01d`。PR #34 fixed head `b00d5cb3144bdb634b0d8f48343e7a0e3f897f5e` 已 squash merge 为 `8f285d2b3b539d0fdcfa6c02b1ee0fc801567786`。merged-stage canonical run `31937248702` / Windows job `95140999446` 为 `SUCCESS`；artifact `9261315055`，SHA-256 `38bae9097b67cf743a749b90a659d70e569ce01ee1de34f563d865b91ea236c0`。R6-03 已正式关闭为 `DONE`，R6-04 Player Names 与 Positions 开放为 `READY`。用户现有 PostgreSQL 数据库真实数据写入/sample 验收与 Windows Full 人工交互验收未执行。详细记录见 `docs/modular-rewrite/R06-entity-catalog-persistence/R06-03-player-directory-and-detail.md`。"
+          if text.count(old) != 1:
+              raise SystemExit(f'root README R6-03 status marker count={text.count(old)}')
+          root.write_text(text.replace(old, new, 1), encoding='utf-8')
+
+          stage = Path('docs/modular-rewrite/R06-entity-catalog-persistence/README.md')
+          text = stage.read_text(encoding='utf-8')
+          replacements = [
+              ('| R6-03 | Player Directory 与 Detail | VERIFYING |\n| R6-04 | Player Names 与 Positions | BLOCKED |', '| R6-03 | Player Directory 与 Detail | DONE |\n| R6-04 | Player Names 与 Positions | READY |'),
+              ('- 当前状态保持 `VERIFYING`：clean PR canonical、squash merge 与 merged-stage canonical 尚未完成；在这些门禁完成前 R6-04 继续 `BLOCKED`。', '- clean PR canonical run `31933320602` / Windows job `95131335957` 为 `SUCCESS`；artifact `9260226890`，SHA-256 `46c628502db8d9a1bd86a1459c8c7d955b13b7118eed950d292ee85f0d6bf01d`。\n- PR #34 fixed head `b00d5cb3144bdb634b0d8f48343e7a0e3f897f5e` 已 squash merge 为 `8f285d2b3b539d0fdcfa6c02b1ee0fc801567786`。\n- merged-stage canonical run `31937248702` / Windows job `95140999446` 为 `SUCCESS`；artifact `9261315055`，SHA-256 `38bae9097b67cf743a749b90a659d70e569ce01ee1de34f563d865b91ea236c0`。R6-03 正式 `DONE`，R6-04 开放为 `READY`。'),
+              ('- R6-03 Player Directory 与 Detail 为当前唯一 `VERIFYING` 节点；R6-04～R6-10 继续 `BLOCKED`。\n- R6-03 下一步是 clean PR canonical、squash merge 与 merged-stage canonical；全部完成后才能标记 `DONE` 并开放 R6-04。', '- R6-01、R6-02、R6-03 均已 `DONE`。\n- R6-04 Player Names 与 Positions 为当前唯一 `READY` 节点；R6-05～R6-10 继续 `BLOCKED`。')
+          ]
+          for old_s, new_s in replacements:
+              if text.count(old_s) != 1:
+                  raise SystemExit(f'stage README marker count={text.count(old_s)} for {old_s[:60]!r}')
+              text = text.replace(old_s, new_s, 1)
+          stage.write_text(text, encoding='utf-8')
+
+          node = Path('docs/modular-rewrite/R06-entity-catalog-persistence/R06-03-player-directory-and-detail.md')
+          text = node.read_text(encoding='utf-8')
+          if text.count('## 状态\n\n`VERIFYING`') != 1:
+              raise SystemExit('node status marker mismatch')
+          text = text.replace('## 状态\n\n`VERIFYING`', '## 状态\n\n`DONE`', 1)
+          old_section = "## 当前未执行与剩余门禁\n\n- 用户现有 PostgreSQL 数据库真实数据写入/sample 验收：未执行。\n- Windows Full 人工交互验收：未执行；现有 Windows 自动化/截图/静态门禁通过不等价于人工 Full 验收。\n- clean PR canonical、squash merge、merged-stage canonical：尚未完成，因此当前状态保持 `VERIFYING`，不得提前标记 `DONE`。"
+          new_section = "## Clean PR、合并与 merged-stage canonical\n\n- clean PR #34 fixed head `b00d5cb3144bdb634b0d8f48343e7a0e3f897f5e` 的 Public Platform CI run `31933320602` / Windows job `95131335957` 为 `SUCCESS`；artifact `9260226890`，SHA-256 `46c628502db8d9a1bd86a1459c8c7d955b13b7118eed950d292ee85f0d6bf01d`。\n- PR #34 已按 fixed head squash merge；merge commit 为 `8f285d2b3b539d0fdcfa6c02b1ee0fc801567786`。\n- merged-stage Public Platform CI run `31937248702` / Windows job `95140999446` 为 `SUCCESS`；artifact `9261315055`，SHA-256 `38bae9097b67cf743a749b90a659d70e569ce01ee1de34f563d865b91ea236c0`。\n- R6-03 自动化完成门禁已满足，节点正式 `DONE`；R6-04 Player Names 与 Positions 开放为 `READY`。\n\n## 未执行项与已知限制\n\n- 用户现有 PostgreSQL 数据库真实数据写入/sample 验收：未执行。\n- Windows Full 人工交互验收：未执行；现有 Windows Automated、截图、静态及 PostgreSQL 16 契约门禁不等价于人工 Full 验收。"
+          if text.count(old_section) != 1:
+              raise SystemExit(f'node remaining-gates section count={text.count(old_section)}')
+          node.write_text(text.replace(old_section, new_section, 1), encoding='utf-8')
+          PY
+          git diff --check
+          git diff -- README.md docs/modular-rewrite/R06-entity-catalog-persistence/README.md docs/modular-rewrite/R06-entity-catalog-persistence/R06-03-player-directory-and-detail.md
+      - name: Commit verified closeout and remove helper
+        shell: bash
+        run: |
+          git rm .github/workflows/r6-03-final-closeout.yml
+          changed="$(git status --short | awk '{print $2}')"
+          unexpected="$(printf '%s\n' "$changed" | grep -Ev '^(README.md|docs/modular-rewrite/R06-entity-catalog-persistence/README.md|docs/modular-rewrite/R06-entity-catalog-persistence/R06-03-player-directory-and-detail.md|\.github/workflows/r6-03-final-closeout.yml)$' || true)"
+          if [ -n "$unexpected" ]; then
+            echo "Unexpected closeout changes:" >&2
+            echo "$unexpected" >&2
+            exit 1
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add README.md docs/modular-rewrite/R06-entity-catalog-persistence/README.md docs/modular-rewrite/R06-entity-catalog-persistence/R06-03-player-directory-and-detail.md
+          git commit -m "docs(r6-03): close verified node"
+          git push origin HEAD:rewrite/r6-entity-catalog-persistence
