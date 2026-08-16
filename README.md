@@ -50,7 +50,7 @@ Node 开发依赖固定安装和读取自源码根目录上一级的 `../node_mo
 - 公共 `TeamCatalogPort`、Tauri command/DTO、Domain shape、Schema、0001–0046 migration、配置、错误文案、审计语义、用户可观察行为、模型保护资产与生产依赖保持不变；Profile head-coach 投影保护与 metadata merge 保持原语义。
 - 旧 owner PostgreSQL 16 baseline run `31897078340` / job `95041920033` 为 `SUCCESS`；owner-switch run `31897403363` / job `95042724731` 为 `SUCCESS`。
 - 最终阶段 hard gate run `31897727309`：Windows job `95043538718` 与 PostgreSQL/architecture job `95043538723` 均 `SUCCESS`，覆盖 frontend、rustfmt、workspace Clippy `-D warnings`、workspace tests、完整 architecture、模型保护、database baseline 与真实 PG16 contract。
-- 当前节点状态为 `VERIFYING`；clean PR canonical、squash merge 与 merged-stage canonical 尚未完成。未对用户现有 PostgreSQL 数据库执行写入/真实数据 sample 验收，也未宣称 Windows Full 人工交互验收完成。详细记录见 `docs/modular-rewrite/R06-entity-catalog-persistence/R06-02-team-names-and-profiles.md`。
+- clean PR canonical run `31898334326` / Windows job `95044999641` 为 `SUCCESS`；artifact `9250723192`，SHA-256 `15362b7164cc2ae0c7b177f4f4899b56678232595caa955d9602adea1eae2ee6`。PR #33 已按 fixed head `f04923425f9d660f2ce1275da2b689ca681f3500` squash merge 为 `334d5d86f08f5cd1adee5b23dc64d907aeb2eba2`。merged-stage canonical run `31925219003` / Windows job `95111615032` 为 `SUCCESS`；artifact `9257917686`，SHA-256 `ff29c7326ed23f3736fd433f2adde3aad587f9aa17506b2eedd96e913b7f2e9d`。R6-02 已正式关闭为 `DONE`，R6-03 Player Directory 与 Detail 开放为 `READY`。未对用户现有 PostgreSQL 数据库执行写入/真实数据 sample 验收，也未宣称 Windows Full 人工交互验收完成。详细记录见 `docs/modular-rewrite/R06-entity-catalog-persistence/R06-02-team-names-and-profiles.md`。
 
 
 ### R6-01 Team Directory 与 Detail

@@ -18,8 +18,8 @@ R6 按 Teams、Players、Coaches、Formations、Abilities、Dynamic Tags、Avail
 | 任务 | 范围 | 状态 |
 |---|---|---|
 | R6-01 | Team Directory 与 Detail | DONE |
-| R6-02 | Team Names 与 Profiles | VERIFYING |
-| R6-03 | Player Directory 与 Detail | BLOCKED |
+| R6-02 | Team Names 与 Profiles | DONE |
+| R6-03 | Player Directory 与 Detail | READY |
 | R6-04 | Player Names 与 Positions | BLOCKED |
 | R6-05 | Team Periods 与 Availability | BLOCKED |
 | R6-06 | Abilities 与 Dynamic Tags | BLOCKED |
@@ -53,12 +53,14 @@ R6 按 Teams、Players、Coaches、Formations、Abilities、Dynamic Tags、Avail
 - hard gate 首轮发现 official Domain inventory 漂移；refresh run `31897577673` / job `95043169681` 仅更新官方 inventory 并 `SUCCESS`。
 - 第二轮 hard gate 的 Windows job 发现 entity-relationship verifier 仍绑定旧 Profile owner；只推进投影保护检查源到 R6-02 新 owner，原契约未弱化。
 - 最终 hard gate run `31897727309`：Windows job `95043538718` 与 PostgreSQL/architecture job `95043538723` 均 `SUCCESS`；frontend、rustfmt、workspace Clippy `-D warnings`、workspace tests、完整 architecture、模型保护、database baseline 与 PG16 contract 均已实际通过。
-- 当前等待 clean PR canonical、squash merge 与 merged-stage canonical；R6-02 保持 `VERIFYING`，R6-03 继续 `BLOCKED`。
+- clean PR canonical run `31898334326` / Windows job `95044999641` 为 `SUCCESS`；artifact `9250723192`，SHA-256 `15362b7164cc2ae0c7b177f4f4899b56678232595caa955d9602adea1eae2ee6`。
+- PR #33 fixed head `f04923425f9d660f2ce1275da2b689ca681f3500` 已 squash merge 为 `334d5d86f08f5cd1adee5b23dc64d907aeb2eba2`。
+- merged-stage canonical run `31925219003` / Windows job `95111615032` 为 `SUCCESS`；artifact `9257917686`，SHA-256 `ff29c7326ed23f3736fd433f2adde3aad587f9aa17506b2eedd96e913b7f2e9d`。R6-02 正式 `DONE`，R6-03 开放为 `READY`。
 
 ## 当前边界与剩余门禁
 
 - 公共 TeamCatalogPort、Tauri command/DTO、Schema、0001–0046 migration、配置、错误语义、用户可观察行为、模型保护资产与生产依赖未改变。
 - R6-01 已完成专项契约、阶段回归、clean PR、squash merge 与 merged-stage canonical，状态为 `DONE`。
-- R6-02 Team Names 与 Profiles 已进入 `VERIFYING`；当前仅剩 clean PR/merge/merged-stage canonical。
-- R6-03 继续 `BLOCKED`，直到 R6-02 完整收口为 `DONE`。
+- R6-02 Team Names 与 Profiles 已完成专项契约、阶段回归、clean PR、squash merge 与 merged-stage canonical，状态为 `DONE`。
+- R6-03 Player Directory 与 Detail 为当前唯一 `READY` 节点；R6-04～R6-10 继续 `BLOCKED`。
 - 每个节点完成时必须创建对应 `R06-xx` 实施记录并更新本索引；R6 完成时必须创建 `R06-stage-completion.md`。

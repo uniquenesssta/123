@@ -2,9 +2,9 @@
 
 ## 状态
 
-`VERIFYING`
+`DONE`
 
-Team Names 与 Team Profiles 的生产写入 owner 已从旧 `team_catalog.rs` 完整切换到 `adapters/catalog/teams/{names,profiles}/`；旧重复实现已删除，R6-09 删除职责继续留在原 owner。旧 owner 基线 PostgreSQL 契约、切换后专项契约、R6-01/R6-02 ownership、完整 architecture、模型保护、database baseline、frontend、rustfmt、workspace Clippy `-D warnings` 与 workspace tests 均已有实际成功证据。当前仅剩 clean PR canonical、squash merge 与 merged-stage canonical，因此不得提前标记为 `DONE`。
+Team Names 与 Team Profiles 的生产写入 owner 已从旧 `team_catalog.rs` 完整切换到 `adapters/catalog/teams/{names,profiles}/`；旧重复实现已删除，R6-09 删除职责继续留在原 owner。旧 owner 基线 PostgreSQL 契约、切换后专项契约、R6-01/R6-02 ownership、完整 architecture、模型保护、database baseline、frontend、rustfmt、workspace Clippy `-D warnings`、workspace tests、clean PR canonical 与 merged-stage canonical 均已有实际成功证据。PR #33 已按固定 head squash merge，本节点正式 `DONE`。
 
 ## 基线与分支
 
@@ -97,7 +97,14 @@ crates/persistence-postgres/src/adapters/catalog/teams/
 - 最终 hard gate run `31897727309` 全部 `SUCCESS`：Windows job `95043538718` 的 `npm run verify:frontend`、rustfmt、workspace Clippy `-D warnings`、workspace tests 全部通过；Ubuntu job `95043538723` 的 R6-01/R6-02 ownership、完整 architecture、模型保护、database baseline 与真实 PostgreSQL 16 contract 全部通过。
 - 最终 hard-gate 验证源码 HEAD：`d9adf69892e271ef1b673aaea210c3873cbce570`。
 
-## 当前净变更清单（clean PR 前）
+### clean PR 与 merged-stage canonical
+
+- 首次 transient closeout workflow run `31926406128` / job `95114586773` 因状态 selector 同时命中两处 `VERIFYING` 而 fail-fast；该 run 未提交任何源码或文档变更。selector 收窄到状态区后重新执行，未放宽任何验证门禁。
+- clean PR fixed head：`f04923425f9d660f2ce1275da2b689ca681f3500`。Public Platform CI run `31898334326` / Windows job `95044999641`：`SUCCESS`；artifact `9250723192`，SHA-256 `15362b7164cc2ae0c7b177f4f4899b56678232595caa955d9602adea1eae2ee6`。
+- PR #33 使用 expected head `f04923425f9d660f2ce1275da2b689ca681f3500` squash merge；merge commit：`334d5d86f08f5cd1adee5b23dc64d907aeb2eba2`。
+- merged-stage Public Platform CI run `31925219003` / Windows job `95111615032`：`SUCCESS`；artifact `9257917686`，SHA-256 `ff29c7326ed23f3736fd433f2adde3aad587f9aa17506b2eedd96e913b7f2e9d`。
+
+## 最终净变更清单
 
 ### 新增
 
@@ -152,20 +159,20 @@ crates/persistence-postgres/src/adapters/catalog/teams/
 - 模型保护资产：无变化。
 - 生产依赖：无变化。
 
-## 未执行项与剩余门禁
+## 未执行项与剩余限制
 
-当前尚未宣称以下项目通过：
+R6-02 节点要求的 clean PR、squash merge 与 merged-stage canonical 已全部完成。以下外部/人工验证仍未宣称执行：
 
-- clean PR canonical Public Platform CI。
-- squash merge 与 merged-stage canonical Public Platform CI。
 - 用户现有 PostgreSQL 数据库写入/真实数据 sample 验收。
 - Windows Full 人工交互验收。
 
-前两项完成前 R6-02 只能保持 `VERIFYING`。后两项不被云端 Automated 替代，继续作为明确外部/人工限制保留。
+上述两项不被云端 Automated 替代；它们不阻塞本次纯持久化职责重写节点收口，但继续作为明确限制保留。
 
 ## 回退点
 
 - 节点起点：`d8622156b4566cbefaed52606c22af44112aeefe`。
 - owner-switch 最小验证成功 HEAD：`a99113dd9290ad168baff4ddb84ee9f40e2764b0`。
 - stage hard-gate verified HEAD：`d9adf69892e271ef1b673aaea210c3873cbce570`。
+- clean PR fixed head：`f04923425f9d660f2ce1275da2b689ca681f3500`。
+- R6-02 squash merge commit：`334d5d86f08f5cd1adee5b23dc64d907aeb2eba2`。
 - 回退使用 Git 提交恢复，不复制旧实现或保留长期兼容壳。
