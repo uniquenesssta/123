@@ -16,10 +16,10 @@ const taskCss = read("src/styles/taskWorkspace.css");
 const entityCss = read("src/styles/entityCenter.css");
 const types = read("src/types.ts");
 
-const playerPersistence = read("crates/persistence-postgres/src/player_catalog.rs");
+const playerDirectoryList = read("crates/persistence-postgres/src/adapters/catalog/players/directory/list_players.rs");
 const domain = (read("crates/domain/src/lib.rs") + read("crates/domain/src/lineup/kind.rs") + read("crates/domain/src/lineup/player.rs") + read("crates/domain/src/lineup/snapshot.rs") + read("crates/domain/src/lineup/preset.rs") + read("crates/domain/src/lineup/chain.rs") + read("crates/domain/src/match_record/status.rs") + read("crates/domain/src/match_record/catalog.rs"));
 const footballText = read("src/components/footballText.ts");
-check(playerPersistence.includes("alternate_name.name AS alternate_name") && playerPersistence.includes(") alternate_name ON true"), "球员目录后端没有返回原文/英文别名");
+check(playerDirectoryList.includes("alternate_name.name AS alternate_name") && playerDirectoryList.includes(") alternate_name ON true"), "球员目录后端没有返回原文/英文别名");
 check(domain.includes("pub alternate_name: Option<String>") && types.includes("alternate_name: string | null"), "球员双语字段没有贯通 Rust/TypeScript 契约");
 check(footballText.includes("hasChineseText(canonical)") && footballText.includes("player.alternate_name"), "球员显示名没有在中文正式名场景回退到英文别名");
 
