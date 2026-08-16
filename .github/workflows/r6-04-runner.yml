@@ -1,0 +1,102 @@
+name: R6-04 implementation runner
+
+on:
+  push:
+    branches:
+      - agent/r6-04-player-names-positions
+
+permissions:
+  contents: write
+
+jobs:
+  implement:
+    if: ${{ github.actor != 'github-actions[bot]' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - name: Checkout implementation branch
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Setup Rust 1.88.0
+        uses: dtolnay/rust-toolchain@1.88.0
+        with:
+          components: rustfmt, clippy
+
+      - name: Extract implementation scripts
+        shell: bash
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import re
+          import textwrap
+
+          source = Path('.github/workflows/r6-04-implementation.yml').read_text(encoding='utf-8')
+          blocks = re.findall(r"          python - <<'PY'\n(.*?)\n          PY", source, re.S)
+          if len(blocks) != 2:
+              raise SystemExit(f'expected 2 embedded Python blocks, got {len(blocks)}')
+          for index, block in enumerate(blocks):
+              content = textwrap.dedent(block)
+              if index == 0:
+                  content = content.replace(
+                      'allowed = {".github/workflows/r6-04-implementation.yml"}',
+                      'allowed = {".github/workflows/r6-04-implementation.yml", ".github/workflows/r6-04-runner.yml"}',
+                  )
+              Path(f'/tmp/r6_04_{index}.py').write_text(content, encoding='utf-8')
+          PY
+
+      - name: Apply R6-04 owner migration
+        shell: bash
+        env:
+          R6_BASE: 90f1bb08bf5a7a1580448f791dd241118ea32284
+        run: python /tmp/r6_04_0.py
+
+      - name: Refresh official Domain inventory
+        shell: bash
+        run: node scripts/generate-domain-type-inventory.mjs
+
+      - name: Verify R6-04 ownership and Domain inventory
+        shell: bash
+        run: |
+          node scripts/verify-player-names-positions.mjs
+          node scripts/verify-domain-type-inventory.mjs
+
+      - name: Verify architecture aggregate
+        shell: bash
+        run: npm run verify:architecture
+
+      - name: Verify Rust formatting
+        shell: bash
+        run: cargo fmt --all -- --check
+
+      - name: Run persistence unit tests
+        shell: bash
+        run: cargo test --locked -p football-persistence-postgres --lib
+
+      - name: Compile R6-04 PostgreSQL contract
+        shell: bash
+        run: cargo test --locked -p football-persistence-postgres --test player_names_positions_repository_contract --no-run
+
+      - name: Check Application compatibility
+        shell: bash
+        run: cargo check --locked -p football-application
+
+      - name: Finalize R6-04 verification records
+        shell: bash
+        run: python /tmp/r6_04_1.py
+
+      - name: Commit verified implementation
+        shell: bash
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add README.md architecture/domain-type-inventory.json package.json scripts/verify-player-names-positions.mjs crates/persistence-postgres/src/player_catalog.rs crates/persistence-postgres/src/adapters/catalog/players crates/persistence-postgres/tests/player_names_positions_repository_contract.rs docs/modular-rewrite/R06-entity-catalog-persistence
+          git diff --cached --check
+          git commit -m "refactor(r6-04): migrate player names and positions owners"
+          git push origin HEAD:agent/r6-04-player-names-positions
