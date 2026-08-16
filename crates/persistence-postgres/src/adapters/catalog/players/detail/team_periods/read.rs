@@ -4,7 +4,7 @@ use football_domain::PlayerTeamPeriodRecord;
 use sqlx::PgPool;
 use uuid::Uuid;
 
-pub(super) async fn read_team_periods(
+pub(in crate::adapters::catalog::players::detail) async fn read_team_periods(
     pool: &PgPool,
     player_id: Uuid,
 ) -> PersistenceResult<Vec<PlayerTeamPeriodRecord>> {
