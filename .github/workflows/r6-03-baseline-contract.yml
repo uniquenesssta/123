@@ -7,7 +7,7 @@ on:
     paths:
       - .github/workflows/r6-03-baseline-contract.yml
 
-# Rerun after applying the exact rustfmt output to the contract test.
+# Rerun after correcting contract calls to the existing public API/error variant.
 jobs:
   postgres-contract:
     runs-on: ubuntu-latest
