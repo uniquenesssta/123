@@ -3,7 +3,6 @@ mod list_mapper;
 mod list_row;
 mod list_team_options;
 mod list_teams;
-mod name_policy;
 mod option_mapper;
 mod option_row;
 mod update_team;

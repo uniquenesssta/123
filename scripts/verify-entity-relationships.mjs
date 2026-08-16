@@ -30,6 +30,7 @@ const domain = [
 ].map(text).join("\n");
 const persistence = text("crates/persistence-postgres/src/entity_catalog.rs");
 const teamPersistence = text("crates/persistence-postgres/src/team_catalog.rs");
+const teamProfileWrite = text("crates/persistence-postgres/src/adapters/catalog/teams/profiles/upsert_team_profile.rs");
 const teamDetailCoordinator = text("crates/persistence-postgres/src/adapters/catalog/teams/detail/read_team.rs");
 const playerPersistence = text("crates/persistence-postgres/src/player_catalog.rs");
 const application = [
@@ -106,7 +107,7 @@ assert(persistence.includes("can_permanently_delete: total == 0"), "永久删除
 assert(persistence.includes("manual_bulk_archive"), "批量归档缺少审计来源");
 for (const relation of ["player_availability", "substitutions", "dynamic_tag_opponents"]) assert(persistence.includes(`(\"${relation}\"`), `球队或球员引用检查缺少${relation}`);
 assert(teamDetailCoordinator.includes("self.list_team_player_periods(team_id).await?") && teamDetailCoordinator.includes("self.list_team_coach_periods(team_id).await?"), "球队详情未加载完整球员与教练履历");
-assert(teamPersistence.includes("head_coach=football.team_profiles.head_coach") && teamPersistence.includes(".bind(None::<&str>)"), "球队档案写入仍可能覆盖教练任期投影");
+assert(teamProfileWrite.includes("head_coach=football.team_profiles.head_coach") && teamProfileWrite.includes(".bind(None::<&str>)"), "球队档案写入仍可能覆盖教练任期投影");
 assert(teamPersistence.includes("check_entity_deletion(\"team\""), "球队永久删除未接入统一引用检查");
 assert(!teamPersistence.includes("DELETE FROM football.player_team_periods WHERE team_id=$1"), "球队永久删除仍会主动清理球员履历");
 assert(!teamPersistence.includes("UPDATE football.player_availability SET team_id=NULL WHERE team_id=$1"), "球队永久删除仍会改写历史可用性记录");

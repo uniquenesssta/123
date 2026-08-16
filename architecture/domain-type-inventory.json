@@ -24,13 +24,13 @@
     "targetPublicExportPolicy": "explicit re-export only"
   },
   "sourceDigest": "217241ac243726a5ab6805a7f169e222b97e78c7c971749a5904714af673ebdd",
-  "rustUsageDigest": "f159e1c2537d3861b5e30cee9ffcabae04828f26a2a51f721eef926ea6d64e46",
+  "rustUsageDigest": "49cb74102ce0d18e8befc121a87c961202041edea4d9a0e1ee707cc3943fc492",
   "summary": {
     "typeCount": 365,
     "publicCompatibilityTypeCount": 365,
     "internalTypeCount": 0,
     "domainSourceFileCount": 129,
-    "scannedRustFileCount": 778,
+    "scannedRustFileCount": 789,
     "databaseMappedTypeCount": 299,
     "byTargetModule": {
       "ai_workspace": 16,
@@ -28622,6 +28622,7 @@
         "crates/persistence-postgres/src/adapters/catalog/teams/directory/update_team.rs",
         "crates/persistence-postgres/tests/postgres_integration.rs",
         "crates/persistence-postgres/tests/team_directory_detail_repository_contract.rs",
+        "crates/persistence-postgres/tests/team_names_profiles_repository_contract.rs",
         "src-tauri/src/commands/catalog.rs"
       ],
       "databaseMappings": [
@@ -30415,12 +30416,15 @@
         "crates/application/src/services/teams/service.rs",
         "crates/application/src/use_cases/ai_workspace/apply_operation/dispatch.rs",
         "crates/application/src/use_cases/teams/add_team_name/mod.rs",
-        "crates/persistence-postgres/src/team_catalog.rs",
+        "crates/persistence-postgres/src/adapters/catalog/teams/names/add_team_name.rs",
+        "crates/persistence-postgres/src/adapters/catalog/teams/names/validation.rs",
         "crates/persistence-postgres/tests/team_directory_detail_repository_contract.rs",
+        "crates/persistence-postgres/tests/team_names_profiles_repository_contract.rs",
         "src-tauri/src/commands/catalog.rs"
       ],
       "databaseMappings": [
-        "crates/persistence-postgres/src/team_catalog.rs"
+        "crates/persistence-postgres/src/adapters/catalog/teams/names/add_team_name.rs",
+        "crates/persistence-postgres/src/adapters/catalog/teams/names/validation.rs"
       ]
     },
     {
@@ -30498,13 +30502,15 @@
         "crates/application/src/use_cases/teams/add_team_name/mod.rs",
         "crates/persistence-postgres/src/adapters/catalog/teams/detail/name_mapper.rs",
         "crates/persistence-postgres/src/adapters/catalog/teams/detail/read_names.rs",
-        "crates/persistence-postgres/src/team_catalog.rs",
+        "crates/persistence-postgres/src/adapters/catalog/teams/names/add_team_name.rs",
+        "crates/persistence-postgres/src/adapters/catalog/teams/names/mapper.rs",
         "src-tauri/src/commands/catalog.rs"
       ],
       "databaseMappings": [
         "crates/persistence-postgres/src/adapters/catalog/teams/detail/name_mapper.rs",
         "crates/persistence-postgres/src/adapters/catalog/teams/detail/read_names.rs",
-        "crates/persistence-postgres/src/team_catalog.rs"
+        "crates/persistence-postgres/src/adapters/catalog/teams/names/add_team_name.rs",
+        "crates/persistence-postgres/src/adapters/catalog/teams/names/mapper.rs"
       ]
     },
     {
@@ -31225,12 +31231,15 @@
         "crates/application/src/services/teams/service.rs",
         "crates/application/src/use_cases/ai_workspace/apply_operation/dispatch.rs",
         "crates/application/src/use_cases/teams/upsert_team_profile/mod.rs",
-        "crates/persistence-postgres/src/team_catalog.rs",
+        "crates/persistence-postgres/src/adapters/catalog/teams/profiles/input_policy.rs",
+        "crates/persistence-postgres/src/adapters/catalog/teams/profiles/upsert_team_profile.rs",
         "crates/persistence-postgres/tests/team_directory_detail_repository_contract.rs",
+        "crates/persistence-postgres/tests/team_names_profiles_repository_contract.rs",
         "src-tauri/src/commands/catalog.rs"
       ],
       "databaseMappings": [
-        "crates/persistence-postgres/src/team_catalog.rs"
+        "crates/persistence-postgres/src/adapters/catalog/teams/profiles/input_policy.rs",
+        "crates/persistence-postgres/src/adapters/catalog/teams/profiles/upsert_team_profile.rs"
       ]
     },
     {
@@ -31352,13 +31361,15 @@
         "crates/application/src/use_cases/teams/upsert_team_profile/mod.rs",
         "crates/persistence-postgres/src/adapters/catalog/teams/detail/profile_mapper.rs",
         "crates/persistence-postgres/src/adapters/catalog/teams/detail/read_profile.rs",
-        "crates/persistence-postgres/src/team_catalog.rs",
+        "crates/persistence-postgres/src/adapters/catalog/teams/profiles/mapper.rs",
+        "crates/persistence-postgres/src/adapters/catalog/teams/profiles/upsert_team_profile.rs",
         "src-tauri/src/commands/catalog.rs"
       ],
       "databaseMappings": [
         "crates/persistence-postgres/src/adapters/catalog/teams/detail/profile_mapper.rs",
         "crates/persistence-postgres/src/adapters/catalog/teams/detail/read_profile.rs",
-        "crates/persistence-postgres/src/team_catalog.rs"
+        "crates/persistence-postgres/src/adapters/catalog/teams/profiles/mapper.rs",
+        "crates/persistence-postgres/src/adapters/catalog/teams/profiles/upsert_team_profile.rs"
       ]
     },
     {

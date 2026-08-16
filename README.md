@@ -43,6 +43,16 @@ Node 开发依赖固定安装和读取自源码根目录上一级的 `../node_mo
 
 ## 模块化重写执行记录
 
+### R6-02 Team Names 与 Profiles
+
+- Team Names 与 Team Profiles 写入已从旧 `team_catalog.rs` 收敛到 `crates/persistence-postgres/src/adapters/catalog/teams/{names,profiles}/`；validation/policy、typed Row、Domain Mapper 与 SQL/transaction owner 已分责，旧重复 helper/实现已删除。
+- Team 名称规范化收敛到 `names/normalization.rs` 唯一 owner，R6-01 create/update 复用该规则；R6-09 删除职责继续留在 `team_catalog.rs`，未提前跨节点迁移。
+- 公共 `TeamCatalogPort`、Tauri command/DTO、Domain shape、Schema、0001–0046 migration、配置、错误文案、审计语义、用户可观察行为、模型保护资产与生产依赖保持不变；Profile head-coach 投影保护与 metadata merge 保持原语义。
+- 旧 owner PostgreSQL 16 baseline run `31897078340` / job `95041920033` 为 `SUCCESS`；owner-switch run `31897403363` / job `95042724731` 为 `SUCCESS`。
+- 最终阶段 hard gate run `31897727309`：Windows job `95043538718` 与 PostgreSQL/architecture job `95043538723` 均 `SUCCESS`，覆盖 frontend、rustfmt、workspace Clippy `-D warnings`、workspace tests、完整 architecture、模型保护、database baseline 与真实 PG16 contract。
+- 当前节点状态为 `VERIFYING`；clean PR canonical、squash merge 与 merged-stage canonical 尚未完成。未对用户现有 PostgreSQL 数据库执行写入/真实数据 sample 验收，也未宣称 Windows Full 人工交互验收完成。详细记录见 `docs/modular-rewrite/R06-entity-catalog-persistence/R06-02-team-names-and-profiles.md`。
+
+
 ### R6-01 Team Directory 与 Detail
 
 - Team `create/update/list/options/detail` persistence 已从旧 `player_catalog.rs` / `team_catalog.rs` 收敛到 `crates/persistence-postgres/src/adapters/catalog/teams/{directory,detail}/`；directory、detail coordinator、单用途 SQL reader、typed Row 与 Domain Mapper 已分责。

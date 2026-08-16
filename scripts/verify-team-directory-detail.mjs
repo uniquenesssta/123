@@ -12,6 +12,8 @@ const count = (source, token) => source.split(token).length - 1;
 const base = "crates/persistence-postgres/src/adapters/catalog/teams";
 const directory = `${base}/directory`;
 const detail = `${base}/detail`;
+const names = `${base}/names`;
+const profiles = `${base}/profiles`;
 const legacyTeam = read("crates/persistence-postgres/src/team_catalog.rs");
 const legacyPlayer = read("crates/persistence-postgres/src/player_catalog.rs");
 const adapters = read("crates/persistence-postgres/src/adapters/mod.rs");
@@ -28,7 +30,7 @@ for (const relative of [
   `${directory}/list_teams.rs`,
   `${directory}/list_row.rs`,
   `${directory}/list_mapper.rs`,
-  `${directory}/name_policy.rs`,
+  `${names}/normalization.rs`,
   `${detail}/mod.rs`,
   `${detail}/read_team.rs`,
   `${detail}/read_team_record.rs`,
@@ -54,6 +56,7 @@ const catalogMod = read("crates/persistence-postgres/src/adapters/catalog/mod.rs
 const teamsMod = read(`${base}/mod.rs`);
 check(catalogMod.includes("mod teams;") || catalogMod.includes("pub(crate) mod teams;"), "catalog/mod.rs must register teams");
 check(teamsMod.includes("mod directory;") && teamsMod.includes("mod detail;"), "teams/mod.rs must register directory/detail owners");
+check(teamsMod.includes("mod names;") && teamsMod.includes("mod profiles;"), "teams/mod.rs must retain later R6 team owner registrations");
 
 for (const method of ["list_teams", "read_team", "update_team"]) {
   check(!new RegExp(`pub\\s+async\\s+fn\\s+${method}\\b`).test(legacyTeam), `Legacy team_catalog.rs still owns ${method}`);
@@ -67,9 +70,11 @@ for (const token of ["team_record_from_row", "team_list_item_from_row", "team_sq
 for (const token of ["team_record_from_row", "team_option_from_row"]) {
   check(!legacyPlayer.includes(token), `Legacy player_catalog.rs still owns ${token}`);
 }
-check(legacyTeam.includes("pub async fn add_team_name"), "R6-01 must not migrate R6-02 team-name writes early");
-check(legacyTeam.includes("pub async fn upsert_team_profile"), "R6-01 must not migrate R6-02 profile writes early");
-check(legacyTeam.includes("pub async fn bulk_delete_teams"), "R6-01 must not migrate R6-09 deletion early");
+check(!legacyTeam.includes("pub async fn add_team_name"), "R6-02 must remove team-name write from legacy owner");
+check(!legacyTeam.includes("pub async fn upsert_team_profile"), "R6-02 must remove profile write from legacy owner");
+check(read(`${names}/add_team_name.rs`).includes("pub async fn add_team_name"), "R6-02 names owner must expose add_team_name");
+check(read(`${profiles}/upsert_team_profile.rs`).includes("pub async fn upsert_team_profile"), "R6-02 profiles owner must expose upsert_team_profile");
+check(legacyTeam.includes("pub async fn bulk_delete_teams"), "R6-01/R6-02 must not migrate R6-09 deletion early");
 
 const create = read(`${directory}/create_team.rs`);
 const update = read(`${directory}/update_team.rs`);
@@ -77,6 +82,8 @@ const options = read(`${directory}/list_team_options.rs`);
 const list = read(`${directory}/list_teams.rs`);
 check(count(create, "sqlx::query_as") === 1 && create.includes("INSERT INTO football.teams"), "create_team must own one typed INSERT purpose");
 check(count(update, "sqlx::query_as") === 1 && update.includes("UPDATE football.teams"), "update_team must own one typed UPDATE purpose");
+check(create.includes("super::super::names::normalize_team_name") && update.includes("super::super::names::normalize_team_name"), "Team create/update must use the unique names normalization owner");
+check(!exists(`${directory}/name_policy.rs`), "R6-02 must remove duplicate directory name policy");
 check(count(options, "build_query_as::<TeamOptionRow>") === 1 && options.includes("football.team_names"), "list_team_options must retain typed alias-aware search");
 check(count(list, "build_query_as::<TeamListRow>") === 1 && list.includes("football.team_coach_periods") && list.includes("football.player_availability"), "list_teams must retain typed directory aggregation");
 check(list.includes("NameSearch::parse") && options.includes("NameSearch::parse"), "Team directory searches must retain shared NameSearch policy");
@@ -114,4 +121,4 @@ if (failures.length) {
   failures.forEach((failure) => console.error(`- ${failure}`));
   process.exit(1);
 }
-console.log("R6-01 team directory/detail persistence verified: unique catalog owner, typed rows/mappers, preserved search/pagination/detail aggregation, and no early R6-02/R6-09 migration.");
+console.log("R6-01 team directory/detail persistence verified: unique catalog owner, typed rows/mappers, preserved search/pagination/detail aggregation, and R6-02 owner advancement without early R6-09 migration.");
