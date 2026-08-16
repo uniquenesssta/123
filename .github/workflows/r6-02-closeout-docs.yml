@@ -18,8 +18,14 @@ jobs:
         with:
           ref: rewrite/r6-entity-catalog-persistence
           fetch-depth: 0
+      - name: Repair transient closeout selector
+        run: >-
+          python -c 'from pathlib import Path; p=Path(".github/scripts/r6_02_closeout.py"); s=p.read_text(encoding="utf-8"); old="replace_once(NODE, \"`VERIFYING`\", \"`DONE`\")"; new="replace_once(NODE, \"## 状态\\n\\n`VERIFYING`\", \"## 状态\\n\\n`DONE`\")"; assert s.count(old) == 1, s.count(old); p.write_text(s.replace(old, new, 1), encoding="utf-8")'
       - name: Apply verified R6-02 closeout records
         run: python .github/scripts/r6_02_closeout.py
+      - name: Record transient closeout correction
+        run: >-
+          python -c 'from pathlib import Path; p=Path("docs/modular-rewrite/R06-entity-catalog-persistence/R06-02-team-names-and-profiles.md"); s=p.read_text(encoding="utf-8"); old="### clean PR 与 merged-stage canonical\n\n"; new=old+"- 首次 transient closeout workflow run `31926406128` / job `95114586773` 因状态 selector 同时命中两处 `VERIFYING` 而 fail-fast；该 run 未提交任何源码或文档变更。selector 收窄到状态区后重新执行，未放宽任何验证门禁。\n"; assert s.count(old) == 1, s.count(old); p.write_text(s.replace(old, new, 1), encoding="utf-8")'
       - name: Commit clean closeout tree
         run: |
           git config user.name "github-actions[bot]"
