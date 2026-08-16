@@ -19,8 +19,8 @@ R6 按 Teams、Players、Coaches、Formations、Abilities、Dynamic Tags、Avail
 |---|---|---|
 | R6-01 | Team Directory 与 Detail | DONE |
 | R6-02 | Team Names 与 Profiles | DONE |
-| R6-03 | Player Directory 与 Detail | VERIFYING |
-| R6-04 | Player Names 与 Positions | BLOCKED |
+| R6-03 | Player Directory 与 Detail | DONE |
+| R6-04 | Player Names 与 Positions | READY |
 | R6-05 | Team Periods 与 Availability | BLOCKED |
 | R6-06 | Abilities 与 Dynamic Tags | BLOCKED |
 | R6-07 | Coaches 与 Formation Usage | BLOCKED |
@@ -68,13 +68,15 @@ R6 按 Teams、Players、Coaches、Formations、Abilities、Dynamic Tags、Avail
 - hard gate 多轮 fail-fast 均来自 legacy verifier 仍指向已迁移 Player read/list/mapper owner：Global Name Search、Player Role Inheritance、Database Reset、Entity Resource Center、Stage E1 Follow-up。每次只把原断言跟随到真实新 owner，未删除、跳过或放宽契约。
 - 最终 stage hard gate run `31932648476`：Windows job `95129707185` 与 PostgreSQL/architecture job `95129707240` 均 `SUCCESS`；`npm run verify:frontend`、rustfmt、workspace Clippy `-D warnings`、workspace tests、R6-01/R6-02/R6-03 ownership、完整 architecture、模型保护、database baseline 与 PostgreSQL 16 contract 全部实际通过。
 - 临时 R6-03 hard-gate workflow 与 inventory refresh workflow 已从实施分支清理。
-- 当前状态保持 `VERIFYING`：clean PR canonical、squash merge 与 merged-stage canonical 尚未完成；在这些门禁完成前 R6-04 继续 `BLOCKED`。
+- clean PR canonical run `31933320602` / Windows job `95131335957` 为 `SUCCESS`；artifact `9260226890`，SHA-256 `46c628502db8d9a1bd86a1459c8c7d955b13b7118eed950d292ee85f0d6bf01d`。
+- PR #34 fixed head `b00d5cb3144bdb634b0d8f48343e7a0e3f897f5e` 已 squash merge 为 `8f285d2b3b539d0fdcfa6c02b1ee0fc801567786`。
+- merged-stage canonical run `31937248702` / Windows job `95140999446` 为 `SUCCESS`；artifact `9261315055`，SHA-256 `38bae9097b67cf743a749b90a659d70e569ce01ee1de34f563d865b91ea236c0`。R6-03 正式 `DONE`，R6-04 开放为 `READY`。
 - 用户现有 PostgreSQL 数据库真实数据写入/sample 验收与 Windows Full 人工交互验收未执行，不宣称通过。
 
 ## 当前边界与剩余门禁
 
 - 公共 TeamCatalogPort / PlayerCatalogPort、Tauri command/DTO、Schema、0001–0046 migration、配置、错误语义、用户可观察行为、模型保护资产与生产依赖保持冻结。
 - R6-01 与 R6-02 均已 `DONE`。
-- R6-03 Player Directory 与 Detail 为当前唯一 `VERIFYING` 节点；R6-04～R6-10 继续 `BLOCKED`。
-- R6-03 下一步是 clean PR canonical、squash merge 与 merged-stage canonical；全部完成后才能标记 `DONE` 并开放 R6-04。
+- R6-01、R6-02、R6-03 均已 `DONE`。
+- R6-04 Player Names 与 Positions 为当前唯一 `READY` 节点；R6-05～R6-10 继续 `BLOCKED`。
 - 每个节点完成时必须创建对应 `R06-xx` 实施记录并更新本索引；R6 完成时必须创建 `R06-stage-completion.md`。

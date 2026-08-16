@@ -2,7 +2,7 @@
 
 ## 状态
 
-`VERIFYING`
+`DONE`
 
 R6-03 从已验证的 R6-02 最终 closeout HEAD `4ce9eb405e897beedf8b122e6794d7c9141b660e` 精确建立实施分支 `agent/r6-03-player-directory-detail`。本节点只重写 Player Directory / Detail 的生产持久化 owner；R6-04 Names/Positions、R6-05 Team Periods/Availability、R6-06 Abilities/Dynamic Tags、R6-09 deletion、R6-10 global search 不提前迁移。
 
@@ -83,11 +83,17 @@ R6-03 开工时，目标职责仍集中在 `crates/persistence-postgres/src/play
 - 模型保护资产聚合 SHA-256 继续为 `d74e0936b60c69f444a498405fed3e704b8db63b81f26b40036f772b4b6eac57`。
 - 临时 `r6-03-hard-gate.yml` 已在 hard gate 成功后从实施分支删除；临时 inventory refresh workflow 也已删除。
 
-## 当前未执行与剩余门禁
+## Clean PR、合并与 merged-stage canonical
+
+- clean PR #34 fixed head `b00d5cb3144bdb634b0d8f48343e7a0e3f897f5e` 的 Public Platform CI run `31933320602` / Windows job `95131335957` 为 `SUCCESS`；artifact `9260226890`，SHA-256 `46c628502db8d9a1bd86a1459c8c7d955b13b7118eed950d292ee85f0d6bf01d`。
+- PR #34 已按 fixed head squash merge；merge commit 为 `8f285d2b3b539d0fdcfa6c02b1ee0fc801567786`。
+- merged-stage Public Platform CI run `31937248702` / Windows job `95140999446` 为 `SUCCESS`；artifact `9261315055`，SHA-256 `38bae9097b67cf743a749b90a659d70e569ce01ee1de34f563d865b91ea236c0`。
+- R6-03 自动化完成门禁已满足，节点正式 `DONE`；R6-04 Player Names 与 Positions 开放为 `READY`。
+
+## 未执行项与已知限制
 
 - 用户现有 PostgreSQL 数据库真实数据写入/sample 验收：未执行。
-- Windows Full 人工交互验收：未执行；现有 Windows 自动化/截图/静态门禁通过不等价于人工 Full 验收。
-- clean PR canonical、squash merge、merged-stage canonical：尚未完成，因此当前状态保持 `VERIFYING`，不得提前标记 `DONE`。
+- Windows Full 人工交互验收：未执行；现有 Windows Automated、截图、静态及 PostgreSQL 16 契约门禁不等价于人工 Full 验收。
 
 ## 回退点
 
