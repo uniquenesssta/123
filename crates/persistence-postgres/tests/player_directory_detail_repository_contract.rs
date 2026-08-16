@@ -158,7 +158,7 @@ async fn player_directory_and_detail_contract_is_preserved() {
 
     database
         .store
-        .add_player_position(&PlayerPositionDraft {
+        .assign_player_position(&PlayerPositionDraft {
             player_id: created.id,
             position_code: position_code.clone(),
             proficiency: 0.91,
@@ -318,7 +318,7 @@ async fn player_directory_and_detail_contract_is_preserved() {
         .expect_err("读取不存在球员必须失败");
     assert!(matches!(
         missing,
-        PersistenceError::Sql(sqlx::Error::RowNotFound)
+        PersistenceError::Sqlx(sqlx::Error::RowNotFound)
     ));
 
     database.close().await;
