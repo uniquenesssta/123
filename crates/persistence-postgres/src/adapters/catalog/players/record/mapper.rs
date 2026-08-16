@@ -5,7 +5,9 @@ use crate::{
 };
 use football_domain::PlayerRecord;
 
-pub(super) fn map_player_record(row: PlayerRecordRow) -> PersistenceResult<PlayerRecord> {
+pub(in crate::adapters::catalog::players) fn map_player_record(
+    row: PlayerRecordRow,
+) -> PersistenceResult<PlayerRecord> {
     Ok(PlayerRecord {
         id: row.id,
         canonical_name: row.canonical_name,
