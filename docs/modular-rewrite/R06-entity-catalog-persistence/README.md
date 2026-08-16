@@ -80,7 +80,8 @@ R6 按 Teams、Players、Coaches、Formations、Abilities、Dynamic Tags、Avail
 - Player Names / Positions 写 owner 已从 `player_catalog.rs` 收敛到 `adapters/catalog/players/{names,positions}/`；输入策略、typed Row、mapper 与 SQL/事务按职责拆分。
 - Player Detail Names/Positions read 保留原读取职责，并复用新 Row/mapper owner；旧 Detail 重复 mapper/row 已删除。
 - 临时实施 gate run `31969378628` 已通过 R6-04 ownership、official Domain inventory、完整 architecture、rustfmt、Persistence unit tests、R6-04 contract 编译和 Application check。
-- 当前状态 `VERIFYING`；PG16 真实 contract、阶段 hard gate、clean PR 与 merged-stage canonical 尚未完成，R6-05 继续 `BLOCKED`。
+- 阶段 hard gate run `31969619201` 整体 `SUCCESS`：Windows job `95219904073` 已通过 frontend、rustfmt、workspace Clippy `-D warnings` 与 workspace tests；PostgreSQL/architecture job `95219904082` 已通过 R6-01～R6-04 ownership、完整 architecture、模型保护/数据库迁移兼容门禁以及 R6-03/R6-04 PostgreSQL 16 真实 contracts。R6-03 verifier 只跟随 Names/Positions 新 owner 更新，未放宽原契约。临时 hard-gate workflow 已清理。
+- 当前状态 `VERIFYING`；仅剩 clean PR canonical、合并与 merged-stage canonical，R6-05 继续 `BLOCKED`。
 
 ## 当前边界与剩余门禁
 

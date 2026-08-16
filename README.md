@@ -48,7 +48,7 @@ Node 开发依赖固定安装和读取自源码根目录上一级的 `../node_mo
 - Player Names / Positions 写职责已从 `crates/persistence-postgres/src/player_catalog.rs` 收敛到 `adapters/catalog/players/{names,positions}/`，输入策略、typed Row、Domain mapper 与 SQL/事务 owner 分责；Player Detail 读取继续保留在 `detail/`，并复用新的 Names/Positions Row/mapper owner。
 - `PlayerCatalogPort`、Domain DTO、Schema、0001–0046 migration、错误语义、默认战术角色/位置映射和用户可观察行为保持不变；未新增生产依赖。
 - 临时实施 gate run `31969378628` 已实际通过 R6-04 ownership verifier、official Domain inventory 生成与校验、完整 architecture、rustfmt、Persistence unit tests、R6-04 PostgreSQL contract 编译及 Application check。
-- 当前节点保持 `VERIFYING`；PostgreSQL 16 真实 contract 执行、完整阶段回归、clean PR canonical 与 merged-stage canonical 尚未执行。
+- 阶段 hard gate run `31969619201` 已整体 `SUCCESS`：Windows job `95219904073` 的 `npm run verify:frontend`、rustfmt、workspace Clippy `-D warnings` 与 workspace tests 全部通过；PostgreSQL/architecture job `95219904082` 的 R6-01～R6-04 ownership、完整 architecture、模型保护/数据库迁移兼容门禁、R6-03 retained PG16 contract 与 R6-04 PG16 contract 全部通过。R6-03 ownership verifier 仅跟随 Names/Positions 新 owner 更新，原 R6-03 契约未删除或放宽；临时 hard-gate workflow 已清理。当前节点继续 `VERIFYING`，仅剩 clean PR canonical、合并与 merged-stage canonical 收口。
 
 
 ### R6-03 Player Directory 与 Detail

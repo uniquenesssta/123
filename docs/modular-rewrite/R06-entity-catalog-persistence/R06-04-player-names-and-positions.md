@@ -37,12 +37,17 @@
 - `cargo test --locked -p football-persistence-postgres --test player_names_positions_repository_contract --no-run`：SUCCESS。
 - `cargo check --locked -p football-application`：SUCCESS。
 
+## 阶段 hard gate
+
+- run `31969619201` 整体 `SUCCESS`。
+- Windows stage regression job `95219904073`：`npm run setup`、`npm run verify:frontend`、`cargo fmt --all -- --check`、`cargo clippy --locked --workspace --all-targets -- -D warnings`、`cargo test --locked --workspace` 全部 `SUCCESS`。
+- PostgreSQL/architecture job `95219904082`：R6-01 / R6-02 retained ownership、R6-03 ownership、R6-04 ownership、`npm run verify:architecture`、public model boundary、deterministic protected assets、database migration compatibility 全部 `SUCCESS`。
+- 同一 PostgreSQL 16 专用测试库上，R6-03 `player_directory_detail_repository_contract` 与 R6-04 `player_names_positions_repository_contract` 的 ignored tests 均真实执行并 `SUCCESS`；不是仅编译。
+- R6-04 推进后，`scripts/verify-player-directory-detail.mjs` 只把 R6-03 对 Names/Positions 的“后续 owner 尚未迁移”断言跟随到 R6-04 新 owner；R6-03 Directory/Detail、Dynamic Tag 与后续 R6-05/R6-06/R6-09 边界断言保持。
+- 临时 `.github/workflows/r6-04-hard-gate.yml` 已在成功后删除。
+
 ## 尚未执行
 
-- R6-04 PostgreSQL 16 ignored contract 真实执行。
-- `npm run verify:frontend`。
-- workspace Clippy `-D warnings`。
-- `cargo test --locked --workspace`。
 - clean PR canonical 与 merged-stage canonical gate。
 - 用户现有 PostgreSQL 数据真实写入/sample 验收与 Windows Full 人工交互验收。
 
