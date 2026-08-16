@@ -1,6 +1,7 @@
 name: R6-03 Stage Hard Gate
 
 on:
+  workflow_dispatch:
   push:
     branches:
       - agent/r6-03-player-directory-detail
