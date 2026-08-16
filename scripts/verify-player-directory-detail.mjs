@@ -38,14 +38,25 @@ for (const method of ['create_player', 'update_player', 'list_players', 'read_pl
 }
 for (const retained of [
   'delete_player',
-  'add_player_name',
-  'assign_player_position',
   'add_player_team_period',
   'add_player_availability',
   'add_player_ability_observation',
 ]) {
   if (!legacy.includes(`pub async fn ${retained}`)) {
     throw new Error(`Later R6 owner moved prematurely or disappeared: ${retained}`);
+  }
+}
+
+const r604AdvancedOwners = [
+  ['crates/persistence-postgres/src/adapters/catalog/players/names/add_player_name.rs', 'add_player_name'],
+  ['crates/persistence-postgres/src/adapters/catalog/players/positions/assign_player_position.rs', 'assign_player_position'],
+];
+for (const [relative, method] of r604AdvancedOwners) {
+  if (!exists(relative) || !read(relative).includes(`pub async fn ${method}`)) {
+    throw new Error(`R6-04 advanced owner missing for retained R6-03 boundary: ${method}`);
+  }
+  if (legacy.includes(`pub async fn ${method}`)) {
+    throw new Error(`R6-04 advanced owner still duplicated in legacy player_catalog.rs: ${method}`);
   }
 }
 
@@ -83,4 +94,4 @@ if (!catalogMod.includes('pub(crate) mod players;')) {
   throw new Error('catalog module does not register players owner');
 }
 
-console.log('R6-03 Player Directory/Detail ownership verification: PASS');
+console.log('R6-03 Player Directory/Detail ownership verification: PASS (R6-04 Names/Positions owner advancement accepted)');
