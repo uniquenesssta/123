@@ -1,0 +1,38 @@
+name: R6-03 Baseline Contract
+
+on:
+  push:
+    branches:
+      - agent/r6-03-player-directory-detail
+    paths:
+      - .github/workflows/r6-03-baseline-contract.yml
+
+jobs:
+  postgres-contract:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: football_r6_03
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres -d football_r6_03"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 10
+    env:
+      FOOTBALL_TEST_DATABASE_URL: postgres://postgres:postgres@127.0.0.1:5432/football_r6_03
+      CARGO_TARGET_DIR: ${{ github.workspace }}/../.cargo-target
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@1.88.0
+      - name: Verify rustfmt
+        run: cargo fmt --all -- --check
+      - name: Compile R6-03 contract
+        run: cargo test --locked -p football-persistence-postgres --test player_directory_detail_repository_contract --no-run
+      - name: Run legacy-owner R6-03 PostgreSQL 16 contract
+        run: cargo test --locked -p football-persistence-postgres --test player_directory_detail_repository_contract -- --ignored --nocapture
