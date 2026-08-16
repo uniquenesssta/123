@@ -3,7 +3,7 @@ use crate::{PersistenceResult, PostgresStore};
 use football_domain::PlayerAvailabilityRecord;
 use uuid::Uuid;
 
-pub(super) async fn read_availability(
+pub(in crate::adapters::catalog::players::detail) async fn read_availability(
     store: &PostgresStore,
     player_id: Uuid,
 ) -> PersistenceResult<Vec<PlayerAvailabilityRecord>> {
