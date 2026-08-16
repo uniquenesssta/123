@@ -76,7 +76,6 @@ R6 按 Teams、Players、Coaches、Formations、Abilities、Dynamic Tags、Avail
 ## 当前边界与剩余门禁
 
 - 公共 TeamCatalogPort / PlayerCatalogPort、Tauri command/DTO、Schema、0001–0046 migration、配置、错误语义、用户可观察行为、模型保护资产与生产依赖保持冻结。
-- R6-01 与 R6-02 均已 `DONE`。
 - R6-01、R6-02、R6-03 均已 `DONE`。
 - R6-04 Player Names 与 Positions 为当前唯一 `READY` 节点；R6-05～R6-10 继续 `BLOCKED`。
 - 每个节点完成时必须创建对应 `R06-xx` 实施记录并更新本索引；R6 完成时必须创建 `R06-stage-completion.md`。
