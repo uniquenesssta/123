@@ -1,5 +1,8 @@
 use crate::{
-    name_search::{push_name_search, NameSearch, NameSearchColumns},
+    adapters::catalog::players::{
+        normalization::normalize_name,
+        value_mapping::{availability_status, player_status, preferred_foot},
+    },
     role_resolution::{
         metadata_with_role_resolution, resolve_default_tactical_role_in_tx, resolve_tactical_role,
     },
@@ -12,13 +15,12 @@ use football_domain::{
     LineupPairDraft, LineupPairRecord, LineupPlayerRecord, LineupRecord, LineupType, MatchDraft,
     MatchRecord, MatchStatus, PlayerAbilityObservationDraft, PlayerAbilityObservationRecord,
     PlayerAbilityProfile, PlayerAvailabilityDraft, PlayerAvailabilityRecord,
-    PlayerCatalogReferenceData, PlayerDetail, PlayerDraft, PlayerListItem, PlayerListPage,
-    PlayerListQuery, PlayerNameDraft, PlayerNameRecord, PlayerPositionDraft, PlayerPositionRecord,
-    PlayerRecord, PlayerStatus, PlayerTeamPeriodDraft, PlayerTeamPeriodRecord, PositionReference,
-    PreferredFoot, SeasonTeamMembershipOption,
+    PlayerCatalogReferenceData, PlayerDetail, PlayerNameDraft, PlayerNameRecord,
+    PlayerPositionDraft, PlayerPositionRecord, PlayerRecord, PlayerTeamPeriodDraft,
+    PlayerTeamPeriodRecord, PositionReference, SeasonTeamMembershipOption,
 };
 use serde_json::json;
-use sqlx::{Postgres, QueryBuilder, Row, Transaction};
+use sqlx::{Postgres, Row, Transaction};
 use std::collections::HashSet;
 use uuid::Uuid;
 
@@ -81,170 +83,6 @@ impl PostgresStore {
         rows.iter().map(data_provider_from_row).collect()
     }
 
-    pub async fn create_player(&self, draft: &PlayerDraft) -> PersistenceResult<PlayerRecord> {
-        let canonical_name = draft.canonical_name.trim();
-        if canonical_name.is_empty() {
-            return Err(PersistenceError::InvalidState(
-                "球员姓名不能为空".to_string(),
-            ));
-        }
-        if let Some(height) = draft.height_cm {
-            if !(120..=230).contains(&height) {
-                return Err(PersistenceError::InvalidState(
-                    "球员身高必须位于 120–230 cm".to_string(),
-                ));
-            }
-        }
-        let normalized_name = normalize_name(canonical_name);
-        let id = Uuid::new_v4();
-        let mut tx = self.pool.begin().await?;
-        let row = sqlx::query(
-            r#"
-            INSERT INTO football.players (
-                id, canonical_name, normalized_name, date_of_birth,
-                nationality_code, preferred_foot, height_cm, status, metadata
-            ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
-            RETURNING
-                id, canonical_name, normalized_name, date_of_birth,
-                nationality_code, preferred_foot, height_cm, status, created_at
-            "#,
-        )
-        .bind(id)
-        .bind(canonical_name)
-        .bind(&normalized_name)
-        .bind(draft.date_of_birth)
-        .bind(
-            draft
-                .nationality_code
-                .as_deref()
-                .map(str::trim)
-                .filter(|value| !value.is_empty()),
-        )
-        .bind(draft.preferred_foot.as_str())
-        .bind(draft.height_cm)
-        .bind(draft.status.as_str())
-        .bind(&draft.metadata)
-        .fetch_one(&mut *tx)
-        .await?;
-
-        sqlx::query(
-            r#"
-            INSERT INTO football.player_names (
-                id, player_id, name, normalized_name, is_primary
-            ) VALUES ($1, $2, $3, $4, true)
-            "#,
-        )
-        .bind(Uuid::new_v4())
-        .bind(id)
-        .bind(canonical_name)
-        .bind(&normalized_name)
-        .execute(&mut *tx)
-        .await?;
-        crate::write_audit_event(
-            &mut tx,
-            "player_created",
-            "player",
-            id.to_string(),
-            json!({"canonical_name": canonical_name}),
-        )
-        .await?;
-        tx.commit().await?;
-        player_record_from_row(&row)
-    }
-
-    pub async fn update_player(
-        &self,
-        player_id: Uuid,
-        draft: &PlayerDraft,
-    ) -> PersistenceResult<PlayerRecord> {
-        let canonical_name = draft.canonical_name.trim();
-        if canonical_name.is_empty() {
-            return Err(PersistenceError::InvalidState(
-                "球员姓名不能为空".to_string(),
-            ));
-        }
-        if let Some(height) = draft.height_cm {
-            if !(120..=230).contains(&height) {
-                return Err(PersistenceError::InvalidState(
-                    "球员身高必须位于 120–230 cm".to_string(),
-                ));
-            }
-        }
-        let normalized_name = normalize_name(canonical_name);
-        let mut tx = self.pool.begin().await?;
-        let previous_normalized_name: String = sqlx::query_scalar(
-            "SELECT normalized_name FROM football.players WHERE id = $1 FOR UPDATE",
-        )
-        .bind(player_id)
-        .fetch_optional(&mut *tx)
-        .await?
-        .ok_or_else(|| PersistenceError::InvalidState("球员不存在".to_string()))?;
-        let row = sqlx::query(
-            r#"
-            UPDATE football.players SET
-                canonical_name = $2,
-                normalized_name = $3,
-                date_of_birth = $4,
-                nationality_code = $5,
-                preferred_foot = $6,
-                height_cm = $7,
-                status = $8,
-                metadata = metadata || $9,
-                updated_at = now()
-            WHERE id = $1
-            RETURNING id, canonical_name, normalized_name, date_of_birth,
-                      nationality_code, preferred_foot, height_cm, status, created_at
-            "#,
-        )
-        .bind(player_id)
-        .bind(canonical_name)
-        .bind(&normalized_name)
-        .bind(draft.date_of_birth)
-        .bind(
-            draft
-                .nationality_code
-                .as_deref()
-                .map(str::trim)
-                .filter(|value| !value.is_empty()),
-        )
-        .bind(draft.preferred_foot.as_str())
-        .bind(draft.height_cm)
-        .bind(draft.status.as_str())
-        .bind(&draft.metadata)
-        .fetch_optional(&mut *tx)
-        .await?
-        .ok_or_else(|| PersistenceError::InvalidState("球员不存在".to_string()))?;
-        if previous_normalized_name != normalized_name {
-            sqlx::query("UPDATE football.player_names SET is_primary = false WHERE player_id = $1")
-                .bind(player_id)
-                .execute(&mut *tx)
-                .await?;
-            sqlx::query(
-                r#"
-                INSERT INTO football.player_names (
-                    id, player_id, name, normalized_name, is_primary
-                ) VALUES ($1, $2, $3, $4, true)
-                "#,
-            )
-            .bind(Uuid::new_v4())
-            .bind(player_id)
-            .bind(canonical_name)
-            .bind(&normalized_name)
-            .execute(&mut *tx)
-            .await?;
-        }
-        crate::write_audit_event(
-            &mut tx,
-            "player_updated",
-            "player",
-            player_id.to_string(),
-            json!({"canonical_name": canonical_name, "source": "manual"}),
-        )
-        .await?;
-        tx.commit().await?;
-        player_record_from_row(&row)
-    }
-
     pub async fn delete_player(&self, player_id: Uuid) -> PersistenceResult<()> {
         let check = self.check_entity_deletion("player", player_id).await?;
         if !check.can_permanently_delete {
@@ -277,195 +115,6 @@ impl PostgresStore {
             .await?;
         tx.commit().await?;
         Ok(())
-    }
-
-    pub async fn list_players(&self, query: &PlayerListQuery) -> PersistenceResult<PlayerListPage> {
-        let limit = query.limit.clamp(1, 200);
-        if query.cursor_name.is_some() != query.cursor_id.is_some() {
-            return Err(PersistenceError::InvalidState(
-                "球员分页游标必须同时包含名称和 ID".to_string(),
-            ));
-        }
-        let mut builder: QueryBuilder<Postgres> = QueryBuilder::new(
-            r#"
-            SELECT
-                player.id,
-                player.canonical_name,
-                localized_name.name AS localized_name,
-                alternate_name.name AS alternate_name,
-                player.normalized_name,
-                player.date_of_birth,
-                player.nationality_code,
-                player.preferred_foot,
-                player.status,
-                current_team.team_id AS current_team_id,
-                current_team.team_name AS current_team_name,
-                primary_position.position_code AS primary_position_code,
-                primary_position.default_role_code AS primary_role_code,
-                COALESCE(position_roles.position_role_map, '{}'::jsonb) AS position_role_map,
-                current_availability.status AS availability_status,
-                current_availability.reason AS availability_reason,
-                current_availability.confidence AS availability_confidence,
-                current_availability.valid_to AS availability_valid_to,
-                current_availability.competition_name AS availability_competition_name,
-                ability.average_value AS ability_average,
-                ability.average_confidence AS ability_confidence,
-                COALESCE(ability.dimension_count, 0) AS ability_dimension_count
-            FROM football.players player
-            LEFT JOIN LATERAL (
-                SELECT alias.name
-                FROM football.player_names alias
-                WHERE alias.player_id = player.id
-                  AND (
-                    lower(COALESCE(alias.language_code, '')) IN ('zh-cn', 'zh-hans', 'zh')
-                    OR alias.name ~ '[一-龥]'
-                  )
-                ORDER BY
-                  CASE lower(COALESCE(alias.language_code, ''))
-                    WHEN 'zh-cn' THEN 0 WHEN 'zh-hans' THEN 1 WHEN 'zh' THEN 2 ELSE 3
-                  END,
-                  alias.is_primary DESC,
-                  alias.valid_from DESC NULLS LAST,
-                  alias.id DESC
-                LIMIT 1
-            ) localized_name ON true
-            LEFT JOIN LATERAL (
-                SELECT alias.name
-                FROM football.player_names alias
-                WHERE alias.player_id = player.id
-                  AND alias.name <> player.canonical_name
-                  AND NOT (
-                    lower(COALESCE(alias.language_code, '')) IN ('zh-cn', 'zh-hans', 'zh')
-                    OR alias.name ~ '[一-龥]'
-                  )
-                ORDER BY
-                  CASE lower(COALESCE(alias.language_code, ''))
-                    WHEN 'en' THEN 0 WHEN 'pt' THEN 1 WHEN 'es' THEN 2 ELSE 3
-                  END,
-                  alias.is_primary DESC,
-                  alias.valid_from DESC NULLS LAST,
-                  alias.id DESC
-                LIMIT 1
-            ) alternate_name ON true
-            LEFT JOIN LATERAL (
-                SELECT period.team_id, team.canonical_name AS team_name
-                FROM football.player_team_periods period
-                JOIN football.teams team ON team.id = period.team_id
-                WHERE period.player_id = player.id
-                  AND period.valid_from <= current_date
-                  AND (period.valid_to IS NULL OR period.valid_to >= current_date)
-                  AND period.registration_status IN ('registered', 'loan', 'trial')
-                ORDER BY period.valid_from DESC, period.id DESC
-                LIMIT 1
-            ) current_team ON true
-            LEFT JOIN LATERAL (
-                SELECT position.position_code, position.default_role_code
-                FROM football.player_positions position
-                WHERE position.player_id = player.id
-                  AND (position.valid_from IS NULL OR position.valid_from <= current_date)
-                  AND (position.valid_to IS NULL OR position.valid_to >= current_date)
-                ORDER BY position.is_primary DESC, position.proficiency DESC, position.position_code
-                LIMIT 1
-            ) primary_position ON true
-            LEFT JOIN LATERAL (
-                SELECT jsonb_object_agg(position.position_code, position.default_role_code)
-                       FILTER (WHERE position.default_role_code IS NOT NULL) AS position_role_map
-                FROM football.player_positions position
-                WHERE position.player_id = player.id
-                  AND (position.valid_from IS NULL OR position.valid_from <= current_date)
-                  AND (position.valid_to IS NULL OR position.valid_to >= current_date)
-            ) position_roles ON true
-            LEFT JOIN LATERAL (
-                SELECT availability.status, availability.reason, availability.confidence,
-                       availability.valid_to, competition.name AS competition_name
-                FROM football.player_availability availability
-                LEFT JOIN football.competitions competition ON competition.id = availability.competition_id
-                WHERE availability.player_id = player.id
-                  AND availability.valid_from <= now()
-                  AND (availability.valid_to IS NULL OR availability.valid_to >= now())
-                ORDER BY availability.valid_from DESC, availability.created_at DESC
-                LIMIT 1
-            ) current_availability ON true
-            LEFT JOIN feature.player_ability_profiles ability
-              ON ability.player_id = player.id
-             AND (ability.next_expiry_at IS NULL OR ability.next_expiry_at >= now())
-            WHERE 1 = 1
-            "#,
-        );
-
-        if let Some(search) = NameSearch::parse(query.search.as_deref()) {
-            push_name_search(
-                &mut builder,
-                &search,
-                NameSearchColumns {
-                    primary_normalized: "player.normalized_name",
-                    primary_display: "player.canonical_name",
-                    alias_table: "football.player_names",
-                    alias_owner: "alias.player_id",
-                    owner_id: "player.id",
-                    alias_normalized: "alias.normalized_name",
-                    alias_display: "alias.name",
-                },
-            );
-        }
-        if let Some(team_id) = query.team_id {
-            builder.push(
-                " AND EXISTS (SELECT 1 FROM football.player_team_periods filter_period WHERE filter_period.player_id = player.id AND filter_period.team_id = ",
-            );
-            builder.push_bind(team_id);
-            builder.push(" AND filter_period.valid_from <= current_date AND (filter_period.valid_to IS NULL OR filter_period.valid_to >= current_date) AND filter_period.registration_status IN ('registered', 'loan', 'trial'))");
-        }
-        if let Some(position_code) = query
-            .position_code
-            .as_deref()
-            .map(str::trim)
-            .filter(|value| !value.is_empty())
-        {
-            builder.push(" AND EXISTS (SELECT 1 FROM football.player_positions filter_position WHERE filter_position.player_id = player.id AND filter_position.position_code = ");
-            builder.push_bind(position_code.to_uppercase());
-            builder.push(" AND (filter_position.valid_from IS NULL OR filter_position.valid_from <= current_date) AND (filter_position.valid_to IS NULL OR filter_position.valid_to >= current_date))");
-        }
-        if let Some(status) = query.availability_status {
-            builder.push(" AND EXISTS (SELECT 1 FROM football.player_availability filter_availability WHERE filter_availability.player_id = player.id AND filter_availability.status = ");
-            builder.push_bind(status.as_str());
-            builder.push(" AND filter_availability.valid_from <= now() AND (filter_availability.valid_to IS NULL OR filter_availability.valid_to >= now()))");
-        }
-        if let Some(status) = query.player_status {
-            builder.push(" AND player.status = ");
-            builder.push_bind(status.as_str());
-        }
-        if let (Some(cursor_name), Some(cursor_id)) = (&query.cursor_name, query.cursor_id) {
-            builder.push(" AND (player.normalized_name, player.id) > (");
-            builder.push_bind(cursor_name);
-            builder.push(", ");
-            builder.push_bind(cursor_id);
-            builder.push(")");
-        }
-        builder.push(" ORDER BY player.normalized_name, player.id LIMIT ");
-        builder.push_bind(i64::from(limit) + 1);
-
-        let rows = builder.build().fetch_all(&self.pool).await?;
-        let has_more = rows.len() > limit as usize;
-        let mut items: Vec<PlayerListItem> = rows
-            .iter()
-            .take(limit as usize)
-            .map(player_list_item_from_row)
-            .collect::<PersistenceResult<_>>()?;
-        let (next_cursor_name, next_cursor_id) = if has_more {
-            items
-                .last()
-                .map(|item| (Some(item.normalized_name.clone()), Some(item.id)))
-                .unwrap_or((None, None))
-        } else {
-            (None, None)
-        };
-        items.shrink_to_fit();
-        Ok(PlayerListPage {
-            items,
-            next_cursor_name,
-            next_cursor_id,
-            has_more,
-        })
     }
 
     pub async fn read_player(&self, player_id: Uuid) -> PersistenceResult<PlayerDetail> {
@@ -1856,55 +1505,6 @@ async fn validate_match_scope(pool: &sqlx::PgPool, draft: &MatchDraft) -> Persis
     Ok(())
 }
 
-fn normalize_name(value: &str) -> String {
-    value
-        .trim()
-        .to_lowercase()
-        .split_whitespace()
-        .collect::<Vec<_>>()
-        .join(" ")
-}
-
-fn preferred_foot(value: &str) -> PersistenceResult<PreferredFoot> {
-    match value {
-        "left" => Ok(PreferredFoot::Left),
-        "right" => Ok(PreferredFoot::Right),
-        "both" => Ok(PreferredFoot::Both),
-        "unknown" => Ok(PreferredFoot::Unknown),
-        other => Err(PersistenceError::InvalidState(format!(
-            "未知惯用脚类型：{other}"
-        ))),
-    }
-}
-
-fn player_status(value: &str) -> PersistenceResult<PlayerStatus> {
-    match value {
-        "active" => Ok(PlayerStatus::Active),
-        "inactive" => Ok(PlayerStatus::Inactive),
-        "retired" => Ok(PlayerStatus::Retired),
-        "unknown" => Ok(PlayerStatus::Unknown),
-        other => Err(PersistenceError::InvalidState(format!(
-            "未知球员状态：{other}"
-        ))),
-    }
-}
-
-fn availability_status(value: &str) -> PersistenceResult<AvailabilityStatus> {
-    match value {
-        "available" => Ok(AvailabilityStatus::Available),
-        "doubtful" => Ok(AvailabilityStatus::Doubtful),
-        "unavailable" => Ok(AvailabilityStatus::Unavailable),
-        "injured" => Ok(AvailabilityStatus::Injured),
-        "suspended" => Ok(AvailabilityStatus::Suspended),
-        "rested" => Ok(AvailabilityStatus::Rested),
-        "returning" => Ok(AvailabilityStatus::Returning),
-        "unknown" => Ok(AvailabilityStatus::Unknown),
-        other => Err(PersistenceError::InvalidState(format!(
-            "未知球员可用性：{other}"
-        ))),
-    }
-}
-
 fn match_status(value: &str) -> PersistenceResult<MatchStatus> {
     match value {
         "scheduled" => Ok(MatchStatus::Scheduled),
@@ -2235,39 +1835,6 @@ fn player_record_from_row(row: &sqlx::postgres::PgRow) -> PersistenceResult<Play
     })
 }
 
-fn player_list_item_from_row(row: &sqlx::postgres::PgRow) -> PersistenceResult<PlayerListItem> {
-    let foot: String = row.try_get("preferred_foot")?;
-    let status: String = row.try_get("status")?;
-    let availability: Option<String> = row.try_get("availability_status")?;
-    Ok(PlayerListItem {
-        id: row.try_get("id")?,
-        canonical_name: row.try_get("canonical_name")?,
-        localized_name: row.try_get("localized_name")?,
-        alternate_name: row.try_get("alternate_name")?,
-        normalized_name: row.try_get("normalized_name")?,
-        date_of_birth: row.try_get("date_of_birth")?,
-        nationality_code: row.try_get("nationality_code")?,
-        preferred_foot: preferred_foot(&foot)?,
-        status: player_status(&status)?,
-        current_team_id: row.try_get("current_team_id")?,
-        current_team_name: row.try_get("current_team_name")?,
-        primary_position_code: row.try_get("primary_position_code")?,
-        primary_role_code: row.try_get("primary_role_code")?,
-        position_role_map: row.try_get("position_role_map")?,
-        availability_status: availability
-            .as_deref()
-            .map(availability_status)
-            .transpose()?,
-        availability_reason: row.try_get("availability_reason")?,
-        availability_confidence: row.try_get("availability_confidence")?,
-        availability_valid_to: row.try_get("availability_valid_to")?,
-        availability_competition_name: row.try_get("availability_competition_name")?,
-        ability_average: row.try_get("ability_average")?,
-        ability_confidence: row.try_get("ability_confidence")?,
-        ability_dimension_count: row.try_get("ability_dimension_count")?,
-    })
-}
-
 fn player_name_from_row(row: &sqlx::postgres::PgRow) -> PersistenceResult<PlayerNameRecord> {
     Ok(PlayerNameRecord {
         id: row.try_get("id")?,
@@ -2492,6 +2059,7 @@ fn ability_dimension_from_row(
 #[cfg(test)]
 mod tests {
     use super::*;
+    use football_domain::{PlayerStatus, PreferredFoot};
 
     #[test]
     fn normalize_name_collapses_case_and_spacing() {
