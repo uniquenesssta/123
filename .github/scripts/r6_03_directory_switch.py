@@ -30,12 +30,17 @@ text = remove_between(
 )
 
 # Shared persisted-value/name policies get one owner under adapters/catalog/players.
-text = remove_between(text, "fn normalize_name(value: &str) -> String {", "fn match_status(value: &str) -> PersistenceResult<MatchStatus> {")
-
-# Directory-specific dynamic row mappers are replaced by typed Row + pure Mapper modules.
 text = remove_between(
     text,
-    "fn player_record_from_row(row: &sqlx::postgres::PgRow) -> PersistenceResult<PlayerRecord> {",
+    "fn normalize_name(value: &str) -> String {",
+    "fn match_status(value: &str) -> PersistenceResult<MatchStatus> {",
+)
+
+# Only the list mapper moves in the Directory substage. PlayerRecord mapping must remain until
+# read_player is moved by the Detail substage.
+text = remove_between(
+    text,
+    "fn player_list_item_from_row(row: &sqlx::postgres::PgRow) -> PersistenceResult<PlayerListItem> {",
     "fn player_name_from_row(row: &sqlx::postgres::PgRow) -> PersistenceResult<PlayerNameRecord> {",
 )
 
@@ -45,12 +50,36 @@ if text.count(old_import) != 1:
     raise SystemExit("unexpected crate import layout")
 text = text.replace(old_import, new_import, 1)
 
+old_domain = (
+    "    PlayerCatalogReferenceData, PlayerDetail, PlayerDraft, PlayerListItem, PlayerListPage,\n"
+    "    PlayerListQuery, PlayerNameDraft, PlayerNameRecord, PlayerPositionDraft, PlayerPositionRecord,\n"
+    "    PlayerRecord, PlayerStatus, PlayerTeamPeriodDraft, PlayerTeamPeriodRecord, PositionReference,\n"
+    "    PreferredFoot, SeasonTeamMembershipOption,\n"
+)
+new_domain = (
+    "    PlayerCatalogReferenceData, PlayerDetail, PlayerNameDraft, PlayerNameRecord,\n"
+    "    PlayerPositionDraft, PlayerPositionRecord, PlayerRecord, PlayerTeamPeriodDraft,\n"
+    "    PlayerTeamPeriodRecord, PositionReference, SeasonTeamMembershipOption,\n"
+)
+if text.count(old_domain) != 1:
+    raise SystemExit("unexpected football_domain import layout")
+text = text.replace(old_domain, new_domain, 1)
+
 text = text.replace(
-    "    PlayerCatalogReferenceData, PlayerDetail, PlayerDraft, PlayerListItem, PlayerListPage,\n    PlayerListQuery, PlayerNameDraft, PlayerNameRecord, PlayerPositionDraft, PlayerPositionRecord,\n    PlayerRecord, PlayerStatus, PlayerTeamPeriodDraft, PlayerTeamPeriodRecord, PositionReference,\n",
-    "    PlayerCatalogReferenceData, PlayerDetail, PlayerNameDraft, PlayerNameRecord,\n    PlayerPositionDraft, PlayerPositionRecord, PlayerStatus, PlayerTeamPeriodDraft,\n    PlayerTeamPeriodRecord, PositionReference,\n",
+    "use sqlx::{Postgres, QueryBuilder, Row, Transaction};",
+    "use sqlx::{Postgres, Row, Transaction};",
     1,
 )
-text = text.replace("use sqlx::{Postgres, QueryBuilder, Row, Transaction};", "use sqlx::{Postgres, Row, Transaction};", 1)
+
+test_import = "mod tests {\n    use super::*;\n"
+if text.count(test_import) != 1:
+    raise SystemExit("unexpected player_catalog test module layout")
+text = text.replace(
+    test_import,
+    "mod tests {\n    use super::*;\n    use football_domain::{PlayerStatus, PreferredFoot};\n",
+    1,
+)
+
 PLAYER.write_text(text, encoding="utf-8")
 
 catalog = CATALOG_MOD.read_text(encoding="utf-8")
