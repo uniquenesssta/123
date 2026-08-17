@@ -41,10 +41,6 @@ jobs:
         with:
           components: rustfmt, clippy
 
-      - uses: Swatinem/rust-cache@v2
-        with:
-          workspaces: . -> ../.cargo-target
-
       - name: Setup declared Node development dependencies
         shell: pwsh
         run: npm run setup
@@ -108,10 +104,6 @@ jobs:
       - uses: dtolnay/rust-toolchain@1.88.0
         with:
           components: rustfmt, clippy
-
-      - uses: Swatinem/rust-cache@v2
-        with:
-          workspaces: . -> ../.cargo-target
 
       - name: Setup declared Node development dependencies
         shell: bash
