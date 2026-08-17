@@ -88,8 +88,8 @@ R6 按 Teams、Players、Coaches、Formations、Abilities、Dynamic Tags、Avail
 - 详细记录：[`R06-05-team-periods-and-availability.md`](R06-05-team-periods-and-availability.md)。
 - Team Periods / Availability 写 owner 已从 `player_catalog.rs` 收敛到 `adapters/catalog/players/team_periods/` 与 `adapters/catalog/availability/`；validation/input policy、typed Row、Domain mapper 与 SQL owner 分责。
 - Player Detail 的 Team Periods / Availability read 保留读取职责，并复用新的 Row/mapper owner；旧 Detail 重复 mapper/row 已删除。
-- 实施 gate run `32026919056` 只有在 R6-05/R6-03 ownership、完整 architecture、模型保护、database baseline、rustfmt、Persistence unit tests、R6-05 PostgreSQL 16 contract 真实执行与 Application check 全部成功后才会提交生产变更。
-- 当前节点保持 `VERIFYING`；R6-06 继续 `BLOCKED`，等待阶段 hard gate、clean canonical CI 与临时 workflow 清理。
+- 实施 gate run `32026919056` 已通过 R6-05/R6-03 ownership、完整 architecture、模型保护、database baseline、rustfmt、Persistence unit tests、R6-05 PostgreSQL 16 contract 真实执行与 Application check，并生成生产提交 `6925455224973b08ab697605db182135f58ef1dd`。
+- 阶段 hard gate 首轮 run `32027350874` 因临时 Windows job 缺少声明的 Node 开发依赖 fail-fast；补齐既有安装步骤后，最终 run `32027535476` 的 Windows job `95379993915` 与 PostgreSQL/architecture job `95379993984` 均 `SUCCESS`，覆盖 frontend、rustfmt、workspace Clippy `-D warnings`、workspace tests、R6 ownership、完整 architecture、模型保护/数据库迁移兼容与 R6-03/R6-04/R6-05 PostgreSQL 16 contracts。临时 workflow 在本记录提交中清理；当前节点保持 `VERIFYING`，等待 clean canonical CI，R6-06 继续 `BLOCKED`。
 
 ## 当前边界与剩余门禁
 
