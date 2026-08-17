@@ -1,4 +1,4 @@
-name: R6-06 stage hard gate
+name: R6-06 hard-gate cleanup
 
 on:
   push:
@@ -8,138 +8,65 @@ on:
       - .github/workflows/r6-06-hard-gate.yml
 
 permissions:
-  contents: read
+  contents: write
 
 jobs:
-  windows-regression:
-    name: Windows stage regression
-    runs-on: windows-2025
-    timeout-minutes: 120
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          ref: rewrite/r6-entity-catalog-persistence
-          fetch-depth: 0
-
-      - name: Verify protected R6-06 product baseline
-        shell: pwsh
-        run: |
-          git merge-base --is-ancestor 23a201d28389955747641c12717592b377687251 HEAD
-          if ($LASTEXITCODE -ne 0) { throw 'R6-06 product baseline is not an ancestor' }
-          $changed = @(git diff --name-only 23a201d28389955747641c12717592b377687251..HEAD)
-          if ($changed.Count -ne 1 -or $changed[0] -ne '.github/workflows/r6-06-hard-gate.yml') {
-            throw "Unexpected hard-gate delta: $($changed -join ', ')"
-          }
-          if (git status --short) { throw 'Checkout is not clean' }
-
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 22
-          cache: npm
-
-      - name: Select Rust 1.88 toolchain
-        shell: pwsh
-        run: |
-          rustup toolchain install 1.88.0 --profile minimal --component rustfmt --component clippy
-          if ($LASTEXITCODE -ne 0) { throw 'Rust 1.88 toolchain install failed' }
-          rustup default 1.88.0
-          if ($LASTEXITCODE -ne 0) { throw 'Rust 1.88 toolchain selection failed' }
-          rustc --version
-
-      - name: Setup declared Node development dependencies
-        shell: pwsh
-        run: npm run setup
-
-      - name: Run complete frontend stage regression
-        shell: pwsh
-        run: npm run verify:frontend
-
-      - name: Verify Rust formatting
-        shell: pwsh
-        run: cargo fmt --all -- --check
-
-      - name: Run workspace Clippy hard gate
-        shell: pwsh
-        run: cargo clippy --locked --workspace --all-targets -- -D warnings
-
-      - name: Run workspace tests
-        shell: pwsh
-        run: cargo test --locked --workspace
-
-  postgres-architecture:
-    name: PostgreSQL 16 and architecture regression
+  cleanup:
     runs-on: ubuntu-24.04
-    timeout-minutes: 120
-    services:
-      postgres:
-        image: postgres:16
-        env:
-          POSTGRES_USER: postgres
-          POSTGRES_PASSWORD: postgres
-          POSTGRES_DB: football_r6_06_hard_gate_test
-        ports:
-          - 5432:5432
-        options: >-
-          --health-cmd "pg_isready -U postgres -d football_r6_06_hard_gate_test"
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 10
-    env:
-      FOOTBALL_TEST_DATABASE_URL: postgres://postgres:postgres@127.0.0.1:5432/football_r6_06_hard_gate_test
     steps:
       - uses: actions/checkout@v4
         with:
           ref: rewrite/r6-entity-catalog-persistence
           fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Verify protected R6-06 product baseline
+      - name: Verify hard-gate baseline
         shell: bash
         run: |
           set -euo pipefail
-          git merge-base --is-ancestor 23a201d28389955747641c12717592b377687251 HEAD
-          changed="$(git diff --name-only 23a201d28389955747641c12717592b377687251..HEAD)"
+          git merge-base --is-ancestor 0dbb54c64220d019e3ebbed6e100f9621152504d HEAD
+          changed="$(git diff --name-only 0dbb54c64220d019e3ebbed6e100f9621152504d..HEAD)"
           test "$changed" = ".github/workflows/r6-06-hard-gate.yml"
           test -z "$(git status --short)"
 
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 22
-          cache: npm
-
-      - name: Select Rust 1.88 toolchain
+      - name: Record successful stage gate and remove temporary workflow
         shell: bash
         run: |
           set -euo pipefail
-          rustup toolchain install 1.88.0 --profile minimal --component rustfmt --component clippy
-          rustup default 1.88.0
-          rustc --version
+          python - <<'PY'
+          from pathlib import Path
 
-      - name: Setup declared Node development dependencies
-        shell: bash
-        run: npm run setup
+          def replace_once(path: str, old: str, new: str) -> None:
+              file = Path(path)
+              text = file.read_text(encoding="utf-8")
+              count = text.count(old)
+              if count != 1:
+                  raise SystemExit(f"{path}: expected one replacement target, found {count}")
+              file.write_text(text.replace(old, new), encoding="utf-8", newline="\n")
 
-      - name: Verify R6 ownership chain
-        shell: bash
-        run: |
-          set -euo pipefail
-          node scripts/verify-player-directory-detail.mjs
-          node scripts/verify-player-names-positions.mjs
-          node scripts/verify-player-team-periods-availability.mjs
-          node scripts/verify-player-abilities-dynamic-tags.mjs
+          replace_once(
+              "README.md",
+              "- implementation gate run `32043516067` 已实际通过 R6-06 ownership、retained R6 ownership、完整 architecture、模型保护、数据库基线、rustfmt、Persistence unit tests、Application check 与 PostgreSQL 16 contract；当前保持 `VERIFYING`，等待阶段 hard gate 与 clean canonical CI。",
+              "- implementation gate run `32043516067` 已实际通过 R6-06 ownership、retained R6 ownership、完整 architecture、模型保护、数据库基线、rustfmt、Persistence unit tests、Application check 与 PostgreSQL 16 contract；最终阶段 hard gate run `32044944449` 整体 `SUCCESS`：Windows job `95430654653` 已通过完整 frontend、rustfmt、workspace Clippy `-D warnings` 与 workspace tests，PostgreSQL/architecture job `95430654659` 已通过 R6 retained ownership、完整 architecture、模型保护/数据库基线及 R6-03～R6-06 PostgreSQL 16 contracts。历史角色继承 verifier 仅将已删除 `dynamic_tags.rs` 的检查跟随到 `dynamic_tags/contribution/{calculate,scoring}.rs` 权威 owner，原断言未删除或放宽；当前继续 `VERIFYING`，等待无临时 workflow 的 clean canonical CI。",
+          )
 
-      - name: Verify architecture and frozen assets
-        shell: bash
-        run: |
-          set -euo pipefail
-          npm run verify:architecture
-          node scripts/verify_protected_assets.mjs
-          node scripts/verify_database_baseline.mjs
+          replace_once(
+              "docs/modular-rewrite/R06-entity-catalog-persistence/R06-06-abilities-and-dynamic-tags.md",
+              "- 阶段 hard gate 与 clean canonical Public Platform CI 尚未执行，因此当前保持 `VERIFYING`。",
+              "- 阶段 hard-gate 恢复过程中，GitHub codeload `429/503` 曾在第三方 action 下载阶段 fail-fast；改为使用 runner 自带 `rustup` 后，Windows 回归进一步暴露历史 `verify-player-role-inheritance.mjs` 仍读取已删除的 `dynamic_tags.rs`。修复提交 `23a201d28389955747641c12717592b377687251` 仅将原角色继承断言跟随到 `adapters/catalog/dynamic_tags/contribution/{calculate,scoring}.rs` 权威 owner，没有删除、跳过或放宽契约。\n- 最终阶段 hard gate run `32044944449` 整体 `SUCCESS`：Windows job `95430654653` 已通过 `npm run verify:frontend`、`cargo fmt --all -- --check`、workspace Clippy `-D warnings` 与 `cargo test --locked --workspace`；PostgreSQL/architecture job `95430654659` 已通过 R6 retained ownership、完整 architecture、模型保护/数据库基线，以及 R6-03、R6-04、R6-05、R6-06 PostgreSQL 16 contracts。\n- 临时 hard-gate workflow 清理后仍需 clean canonical Public Platform CI，因此当前保持 `VERIFYING`。",
+          )
 
-      - name: Run retained R6 PostgreSQL 16 contracts
-        shell: bash
-        run: |
-          set -euo pipefail
-          cargo test --locked -p football-persistence-postgres --test player_directory_detail_repository_contract -- --ignored --nocapture
-          cargo test --locked -p football-persistence-postgres --test player_names_positions_repository_contract -- --ignored --nocapture
-          cargo test --locked -p football-persistence-postgres --test player_team_periods_availability_repository_contract -- --ignored --nocapture
-          cargo test --locked -p football-persistence-postgres --test player_abilities_dynamic_tags_repository_contract -- --ignored --nocapture
+          replace_once(
+              "docs/modular-rewrite/R06-entity-catalog-persistence/README.md",
+              "- Abilities 与 Dynamic Tags persistence 已按 dimensions / observations / definitions / tags / contribution 职责拆分，旧单文件 owner 删除；当前为 `VERIFYING`，等待阶段 hard gate 与 clean canonical CI。",
+              "- Abilities 与 Dynamic Tags persistence 已按 dimensions / observations / definitions / tags / contribution 职责拆分，旧单文件 owner 删除；implementation gate `32043516067` 与最终阶段 hard gate `32044944449` 均已 `SUCCESS`。历史角色继承 verifier 只跟随到新的 contribution owner，未弱化原断言；当前仍为 `VERIFYING`，等待无临时 workflow 的 clean canonical CI。",
+          )
+          PY
+
+          rm .github/workflows/r6-06-hard-gate.yml
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add -A
+          git diff --cached --check
+          git commit -m 'chore(r6-06): record successful stage hard gate'
+          git push origin HEAD:rewrite/r6-entity-catalog-persistence
