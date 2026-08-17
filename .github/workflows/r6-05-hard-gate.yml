@@ -12,13 +12,28 @@ permissions:
 
 jobs:
   windows-workspace:
-    runs-on: windows-latest
+    runs-on: windows-2025
     timeout-minutes: 120
+    env:
+      npm_config_cache: ${{ github.workspace }}/.npm-cache
     steps:
       - uses: actions/checkout@v4
         with:
           ref: rewrite/r6-entity-catalog-persistence
           fetch-depth: 0
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: package-lock.json
+      - name: Setup Rust 1.88.0
+        uses: dtolnay/rust-toolchain@1.88.0
+        with:
+          components: rustfmt, clippy
+      - name: Install declared Node dependencies
+        shell: pwsh
+        run: npm run setup
       - name: Frontend verification
         shell: pwsh
         run: npm run verify:frontend
