@@ -71,7 +71,6 @@ jobs:
           git diff --check
           changed="$(git status --short | awk '{print $2}' | sort)"
           expected="$(printf '%s\n' \
-            '.github/workflows/r6-04-closeout-doc-sync.yml' \
             'README.md' \
             'docs/modular-rewrite/R06-entity-catalog-persistence/R06-04-player-names-and-positions.md' \
             'docs/modular-rewrite/R06-entity-catalog-persistence/README.md' | sort)"
