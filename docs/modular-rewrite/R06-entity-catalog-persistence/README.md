@@ -102,4 +102,4 @@ R6 按 Teams、Players、Coaches、Formations、Abilities、Dynamic Tags、Avail
 ## R6-06 当前事实
 
 - 详细记录：[`R06-06-abilities-and-dynamic-tags.md`](R06-06-abilities-and-dynamic-tags.md)。
-- Abilities 与 Dynamic Tags persistence 已按 dimensions / observations / definitions / tags / contribution 职责拆分，旧单文件 owner 删除；当前为 `VERIFYING`，等待阶段 hard gate 与 clean canonical CI。
+- Abilities 与 Dynamic Tags persistence 已按 dimensions / observations / definitions / tags / contribution 职责拆分，旧单文件 owner 删除；implementation gate `32043516067` 与最终阶段 hard gate `32044944449` 均已 `SUCCESS`。历史角色继承 verifier 只跟随到新的 contribution owner，未弱化原断言；当前仍为 `VERIFYING`，等待无临时 workflow 的 clean canonical CI。
