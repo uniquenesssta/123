@@ -1,0 +1,83 @@
+name: R6-05 stage hard gate
+
+on:
+  push:
+    branches:
+      - rewrite/r6-entity-catalog-persistence
+    paths:
+      - .github/workflows/r6-05-hard-gate.yml
+
+permissions:
+  contents: read
+
+jobs:
+  windows-workspace:
+    runs-on: windows-latest
+    timeout-minutes: 120
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: rewrite/r6-entity-catalog-persistence
+          fetch-depth: 0
+      - name: Frontend verification
+        shell: pwsh
+        run: npm run verify:frontend
+      - name: Rust format
+        shell: pwsh
+        run: cargo fmt --all -- --check
+      - name: Workspace clippy
+        shell: pwsh
+        run: cargo clippy --locked --workspace --all-targets -- -D warnings
+      - name: Workspace tests
+        shell: pwsh
+        run: cargo test --locked --workspace
+
+  postgres-architecture:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: football_r605_hard_gate
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres -d football_r605_hard_gate"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 10
+    env:
+      FOOTBALL_TEST_DATABASE_URL: postgres://postgres:postgres@127.0.0.1:5432/football_r605_hard_gate
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: rewrite/r6-entity-catalog-persistence
+          fetch-depth: 0
+      - name: R6 ownership regression
+        shell: bash
+        run: |
+          set -euo pipefail
+          node scripts/verify-team-directory-detail.mjs
+          node scripts/verify-team-names-profiles.mjs
+          node scripts/verify-player-directory-detail.mjs
+          node scripts/verify-player-names-positions.mjs
+          node scripts/verify-player-team-periods-availability.mjs
+      - name: Architecture and protected compatibility
+        shell: bash
+        run: |
+          set -euo pipefail
+          npm run verify:architecture
+          node scripts/verify-public-model-boundary.mjs
+          node scripts/verify_protected_assets.mjs
+          node scripts/verify_database_baseline.mjs
+          node scripts/verify-database-migration-compatibility.mjs
+      - name: Retained PostgreSQL contracts
+        shell: bash
+        run: |
+          set -euo pipefail
+          cargo test --locked -p football-persistence-postgres --test player_directory_detail_repository_contract -- --ignored --nocapture --test-threads=1
+          cargo test --locked -p football-persistence-postgres --test player_names_positions_repository_contract -- --ignored --nocapture --test-threads=1
+          cargo test --locked -p football-persistence-postgres --test player_team_periods_availability_repository_contract -- --ignored --nocapture --test-threads=1
