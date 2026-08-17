@@ -1,4 +1,4 @@
-name: R6-06 Windows hard-gate recovery
+name: R6-06 stage hard gate
 
 on:
   push:
@@ -8,11 +8,11 @@ on:
       - .github/workflows/r6-06-hard-gate.yml
 
 permissions:
-  contents: write
+  contents: read
 
 jobs:
   windows-regression:
-    name: Windows stage regression recovery
+    name: Windows stage regression
     runs-on: windows-2025
     timeout-minutes: 120
     steps:
@@ -20,14 +20,13 @@ jobs:
         with:
           ref: rewrite/r6-entity-catalog-persistence
           fetch-depth: 0
-          token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Verify protected R6-06 product baseline
         shell: pwsh
         run: |
-          git merge-base --is-ancestor 1e63e6fa03b4ecfba38552c0f56afad9510a6324 HEAD
+          git merge-base --is-ancestor 23a201d28389955747641c12717592b377687251 HEAD
           if ($LASTEXITCODE -ne 0) { throw 'R6-06 product baseline is not an ancestor' }
-          $changed = @(git diff --name-only 1e63e6fa03b4ecfba38552c0f56afad9510a6324..HEAD)
+          $changed = @(git diff --name-only 23a201d28389955747641c12717592b377687251..HEAD)
           if ($changed.Count -ne 1 -or $changed[0] -ne '.github/workflows/r6-06-hard-gate.yml') {
             throw "Unexpected hard-gate delta: $($changed -join ', ')"
           }
@@ -38,7 +37,7 @@ jobs:
           node-version: 22
           cache: npm
 
-      - name: Select Rust 1.88 toolchain without third-party action
+      - name: Select Rust 1.88 toolchain
         shell: pwsh
         run: |
           rustup toolchain install 1.88.0 --profile minimal --component rustfmt --component clippy
@@ -46,38 +45,6 @@ jobs:
           rustup default 1.88.0
           if ($LASTEXITCODE -ne 0) { throw 'Rust 1.88 toolchain selection failed' }
           rustc --version
-
-      - name: Advance retained role-inheritance verifier to R6-06 owners
-        shell: pwsh
-        run: |
-          $path = 'scripts/verify-player-role-inheritance.mjs'
-          $text = Get-Content -Raw -Encoding UTF8 $path
-          $old = @'
-          requireTokens("crates/persistence-postgres/src/dynamic_tags.rs", [
-            "match-contribution-v2-role-context",
-            "metadata->>'role_code'",
-            "requested_role_source_position_code",
-            "resolve_tactical_role(None, inherited_role.as_ref())",
-            "tactical_role_confidence",
-            "position.proficiency",
-            "ROLE_ORIGIN_PLAYER_POSITION_DEFAULT",
-          ], "球员贡献计算");
-          '@
-          $new = @'
-          requireTokens("crates/persistence-postgres/src/adapters/catalog/dynamic_tags/contribution/scoring.rs", [
-            "match-contribution-v2-role-context",
-          ], "球员贡献计算版本");
-          requireTokens("crates/persistence-postgres/src/adapters/catalog/dynamic_tags/contribution/calculate.rs", [
-            "metadata->>'role_code'",
-            "requested_role_source_position_code",
-            "resolve_tactical_role(None, inherited_role.as_ref())",
-            "tactical_role_confidence",
-            "position.proficiency",
-            "ROLE_ORIGIN_PLAYER_POSITION_DEFAULT",
-          ], "球员贡献计算");
-          '@
-          if (-not $text.Contains($old)) { throw 'Role inheritance verifier legacy dynamic_tags owner block not found' }
-          [System.IO.File]::WriteAllText((Resolve-Path $path), $text.Replace($old, $new), [System.Text.UTF8Encoding]::new($false))
 
       - name: Setup declared Node development dependencies
         shell: pwsh
@@ -99,35 +66,80 @@ jobs:
         shell: pwsh
         run: cargo test --locked --workspace
 
-      - name: Record verified recovery and publish clean R6-06 tree
-        shell: pwsh
+  postgres-architecture:
+    name: PostgreSQL 16 and architecture regression
+    runs-on: ubuntu-24.04
+    timeout-minutes: 120
+    services:
+      postgres:
+        image: postgres:16
         env:
-          RUN_ID: ${{ github.run_id }}
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: football_r6_06_hard_gate_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres -d football_r6_06_hard_gate_test"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 10
+    env:
+      FOOTBALL_TEST_DATABASE_URL: postgres://postgres:postgres@127.0.0.1:5432/football_r6_06_hard_gate_test
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: rewrite/r6-entity-catalog-persistence
+          fetch-depth: 0
+
+      - name: Verify protected R6-06 product baseline
+        shell: bash
         run: |
-          $detailPath = 'docs/modular-rewrite/R06-entity-catalog-persistence/R06-06-abilities-and-dynamic-tags.md'
-          $detail = Get-Content -Raw -Encoding UTF8 $detailPath
-          $detail += "`n- 阶段 hard gate `32044095444` 的 PostgreSQL/architecture job `95428355157` 已实际 `SUCCESS`，覆盖 R6-03～R6-06 ownership、完整 architecture、模型保护、数据库基线与四组 retained PostgreSQL 16 contracts；同轮 Windows job 因 GitHub codeload `429/503` 在下载第三方 Rust action 时停止，未记为通过。`n- Windows recovery run `32044214808` 已绕开第三方 Rust action并进入完整 frontend，随后旧 `verify-player-role-inheritance.mjs` 仍读取已删除的 `dynamic_tags.rs` 而 fail-fast；本轮只将原角色继承断言跟随到 R6-06 `contribution/{calculate,scoring}.rs` 权威 owner。`n- Windows recovery run ``$env:RUN_ID`` 已实际通过完整 `verify:frontend`、`cargo fmt --all -- --check`、workspace Clippy `-D warnings` 与 `cargo test --locked --workspace`。阶段 hard gate 已完成，节点继续保持 `VERIFYING`，等待 clean canonical Public Platform CI。`n"
-          [System.IO.File]::WriteAllText((Resolve-Path $detailPath), $detail, [System.Text.UTF8Encoding]::new($false))
+          set -euo pipefail
+          git merge-base --is-ancestor 23a201d28389955747641c12717592b377687251 HEAD
+          changed="$(git diff --name-only 23a201d28389955747641c12717592b377687251..HEAD)"
+          test "$changed" = ".github/workflows/r6-06-hard-gate.yml"
+          test -z "$(git status --short)"
 
-          $rootPath = 'README.md'
-          $root = Get-Content -Raw -Encoding UTF8 $rootPath
-          $needle = '- 当前节点为 `VERIFYING`；implementation gate 必须实际通过 ownership/architecture/模型保护/数据库基线/Rust 与 PostgreSQL 16 contract 后才提交，阶段 hard gate 与 clean canonical CI 完成前不标记 `DONE`。'
-          $replacement = "- implementation gate run `32043516067` 已实际通过 R6-06 ownership、retained R6 ownership、完整 architecture、模型保护、数据库基线、rustfmt、Persistence unit tests、Application check 与 PostgreSQL 16 contract；阶段 PostgreSQL/architecture hard gate `32044095444` / job `95428355157` 为 `SUCCESS`。Windows 首轮受 GitHub action 下载 `429/503` 阻塞，后续又由历史角色继承 verifier 旧 owner 路径 fail-fast；仅迁移 verifier 到 R6-06 authoritative contribution owner 后，Windows recovery run ``$env:RUN_ID`` 已通过完整 frontend、rustfmt、workspace Clippy `-D warnings` 与 workspace tests。当前保持 `VERIFYING`，等待 clean canonical Public Platform CI。"
-          if (-not $root.Contains($needle)) { throw 'Root README R6-06 verification marker not found' }
-          [System.IO.File]::WriteAllText((Resolve-Path $rootPath), $root.Replace($needle, $replacement), [System.Text.UTF8Encoding]::new($false))
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
 
-          $stagePath = 'docs/modular-rewrite/R06-entity-catalog-persistence/README.md'
-          $stage = Get-Content -Raw -Encoding UTF8 $stagePath
-          $stage += "`n- R6-06 implementation gate `32043516067` 已 `SUCCESS`；阶段 PostgreSQL/architecture hard gate `32044095444` / `95428355157` 已 `SUCCESS`，Windows recovery run ``$env:RUN_ID`` 已通过 frontend、rustfmt、workspace Clippy 与 workspace tests。历史角色继承 verifier 仅跟随到新的 contribution owner，未删除或放宽原断言；R6-06 继续 `VERIFYING`，等待 clean canonical CI。`n"
-          [System.IO.File]::WriteAllText((Resolve-Path $stagePath), $stage, [System.Text.UTF8Encoding]::new($false))
+      - name: Select Rust 1.88 toolchain
+        shell: bash
+        run: |
+          set -euo pipefail
+          rustup toolchain install 1.88.0 --profile minimal --component rustfmt --component clippy
+          rustup default 1.88.0
+          rustc --version
 
-          Remove-Item '.github/workflows/r6-06-hard-gate.yml'
-          git config user.name 'github-actions[bot]'
-          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git add -A
-          git diff --cached --check
-          if ($LASTEXITCODE -ne 0) { throw 'Final R6-06 recovery diff check failed' }
-          git commit -m 'chore(r6-06): record stage hard gate recovery'
-          if ($LASTEXITCODE -ne 0) { throw 'Final R6-06 recovery commit failed' }
-          git push origin HEAD:rewrite/r6-entity-catalog-persistence
-          if ($LASTEXITCODE -ne 0) { throw 'Final R6-06 recovery push failed' }
+      - name: Setup declared Node development dependencies
+        shell: bash
+        run: npm run setup
+
+      - name: Verify R6 ownership chain
+        shell: bash
+        run: |
+          set -euo pipefail
+          node scripts/verify-player-directory-detail.mjs
+          node scripts/verify-player-names-positions.mjs
+          node scripts/verify-player-team-periods-availability.mjs
+          node scripts/verify-player-abilities-dynamic-tags.mjs
+
+      - name: Verify architecture and frozen assets
+        shell: bash
+        run: |
+          set -euo pipefail
+          npm run verify:architecture
+          node scripts/verify_protected_assets.mjs
+          node scripts/verify_database_baseline.mjs
+
+      - name: Run retained R6 PostgreSQL 16 contracts
+        shell: bash
+        run: |
+          set -euo pipefail
+          cargo test --locked -p football-persistence-postgres --test player_directory_detail_repository_contract -- --ignored --nocapture
+          cargo test --locked -p football-persistence-postgres --test player_names_positions_repository_contract -- --ignored --nocapture
+          cargo test --locked -p football-persistence-postgres --test player_team_periods_availability_repository_contract -- --ignored --nocapture
+          cargo test --locked -p football-persistence-postgres --test player_abilities_dynamic_tags_repository_contract -- --ignored --nocapture
