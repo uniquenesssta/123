@@ -138,7 +138,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          cargo test --locked -p football-persistence-postgres --test player_directory_repository_contract -- --ignored --nocapture
+          cargo test --locked -p football-persistence-postgres --test player_directory_detail_repository_contract -- --ignored --nocapture
           cargo test --locked -p football-persistence-postgres --test player_names_positions_repository_contract -- --ignored --nocapture
           cargo test --locked -p football-persistence-postgres --test player_team_periods_availability_repository_contract -- --ignored --nocapture
           cargo test --locked -p football-persistence-postgres --test player_abilities_dynamic_tags_repository_contract -- --ignored --nocapture
