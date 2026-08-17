@@ -1,0 +1,251 @@
+name: R6-05 implementation gate
+
+on:
+  push:
+    branches:
+      - rewrite/r6-entity-catalog-persistence
+    paths:
+      - .github/workflows/r6-05-implementation.yml
+
+permissions:
+  contents: write
+
+jobs:
+  implement:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: football_r605_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres -d football_r605_test"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 10
+    env:
+      FOOTBALL_TEST_DATABASE_URL: postgres://postgres:postgres@127.0.0.1:5432/football_r605_test
+      R605_BASE_SHA: 702a84dd8d702d272e0c69ff3399fce20a7e8a4b
+
+    steps:
+      - name: Checkout exact stage branch
+        uses: actions/checkout@v4
+        with:
+          ref: rewrite/r6-entity-catalog-persistence
+          fetch-depth: 0
+
+      - name: Preflight protected baseline
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$(git rev-parse HEAD^)" = "$R605_BASE_SHA"
+          test -z "$(git status --porcelain)"
+          test -f crates/persistence-postgres/src/player_catalog.rs
+          test ! -e crates/persistence-postgres/src/adapters/catalog/players/team_periods
+          test ! -e crates/persistence-postgres/src/adapters/catalog/availability
+          grep -q "pub async fn add_player_team_period" crates/persistence-postgres/src/player_catalog.rs
+          grep -q "pub async fn add_player_availability" crates/persistence-postgres/src/player_catalog.rs
+          echo "R6-05 preflight baseline: PASS"
+
+      - name: Apply R6-05 modular owner switch
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          from pathlib import Path
+          import os
+
+          root = Path('.')
+          run_id = os.environ['GITHUB_RUN_ID']
+          base_sha = os.environ['R605_BASE_SHA']
+
+          def read(path: str) -> str:
+              return (root / path).read_text(encoding='utf-8')
+
+          def write(path: str, content: str) -> None:
+              target = root / path
+              target.parent.mkdir(parents=True, exist_ok=True)
+              target.write_text(content, encoding='utf-8')
+
+          def replace_once(text: str, old: str, new: str, label: str) -> str:
+              count = text.count(old)
+              if count != 1:
+                  raise SystemExit(f'{label}: expected one match, found {count}')
+              return text.replace(old, new, 1)
+
+          player_catalog_path = 'crates/persistence-postgres/src/player_catalog.rs'
+          player_catalog = read(player_catalog_path)
+          method_start = player_catalog.index('    pub async fn add_player_team_period(')
+          method_end = player_catalog.index('    pub async fn add_player_ability_observation(', method_start)
+          player_catalog = player_catalog[:method_start] + player_catalog[method_end:]
+          mapper_start = player_catalog.index('fn player_team_period_from_row(')
+          mapper_end = player_catalog.index('fn player_ability_observation_from_row(', mapper_start)
+          player_catalog = player_catalog[:mapper_start] + player_catalog[mapper_end:]
+          player_catalog = replace_once(
+              player_catalog,
+              '    PlayerAvailabilityDraft, PlayerAvailabilityRecord, PlayerCatalogReferenceData,\n    PlayerTeamPeriodDraft, PlayerTeamPeriodRecord, PositionReference, SeasonTeamMembershipOption,\n',
+              '    PlayerCatalogReferenceData, PositionReference, SeasonTeamMembershipOption,\n',
+              'player_catalog domain imports',
+          )
+          for forbidden in [
+              'pub async fn add_player_team_period',
+              'pub async fn add_player_availability',
+              'fn player_team_period_from_row',
+              'fn player_availability_from_row',
+              'PlayerTeamPeriodDraft',
+              'PlayerAvailabilityDraft',
+          ]:
+              if forbidden in player_catalog:
+                  raise SystemExit(f'legacy player_catalog still contains {forbidden}')
+          write(player_catalog_path, player_catalog)
+
+          players_mod_path = 'crates/persistence-postgres/src/adapters/catalog/players/mod.rs'
+          players_mod = read(players_mod_path)
+          players_mod = replace_once(players_mod, 'mod record;\n', 'mod record;\nmod team_periods;\n', 'players module registration')
+          write(players_mod_path, players_mod)
+
+          catalog_mod_path = 'crates/persistence-postgres/src/adapters/catalog/mod.rs'
+          catalog_mod = read(catalog_mod_path)
+          catalog_mod = replace_once(catalog_mod, 'pub(crate) mod players;\n', 'mod availability;\npub(crate) mod players;\n', 'catalog availability registration')
+          write(catalog_mod_path, catalog_mod)
+
+          write('crates/persistence-postgres/src/adapters/catalog/players/team_periods/mod.rs', '''mod add_player_team_period;\nmod input_policy;\nmod mapper;\nmod row;\n\npub(in crate::adapters::catalog::players) use mapper::map_player_team_period;\npub(in crate::adapters::catalog::players) use row::PlayerTeamPeriodRow;\n''')
+          write('crates/persistence-postgres/src/adapters/catalog/players/team_periods/input_policy.rs', '''use crate::{PersistenceError, PersistenceResult};\nuse football_domain::PlayerTeamPeriodDraft;\n\npub(super) struct ValidatedPlayerTeamPeriodInput<'a> {\n    pub registration_status: &'a str,\n}\n\npub(super) fn validate_player_team_period_draft(\n    draft: &PlayerTeamPeriodDraft,\n) -> PersistenceResult<ValidatedPlayerTeamPeriodInput<'_>> {\n    if draft\n        .valid_to\n        .as_ref()\n        .is_some_and(|valid_to| valid_to < &draft.valid_from)\n    {\n        return Err(PersistenceError::InvalidState(\n            "球队效力结束日期不能早于开始日期".to_string(),\n        ));\n    }\n    if draft\n        .squad_number\n        .is_some_and(|number| !(0..=99).contains(&number))\n    {\n        return Err(PersistenceError::InvalidState(\n            "球衣号码必须位于 0–99".to_string(),\n        ));\n    }\n    Ok(ValidatedPlayerTeamPeriodInput {\n        registration_status: draft.registration_status.trim(),\n    })\n}\n''')
+          write('crates/persistence-postgres/src/adapters/catalog/players/team_periods/row.rs', '''use chrono::NaiveDate;\nuse sqlx::FromRow;\nuse uuid::Uuid;\n\n#[derive(Debug, FromRow)]\npub(in crate::adapters::catalog::players) struct PlayerTeamPeriodRow {\n    pub id: Uuid,\n    pub player_id: Uuid,\n    pub team_id: Uuid,\n    pub team_name: String,\n    pub season_id: Option<Uuid>,\n    pub season_name: Option<String>,\n    pub squad_number: Option<i16>,\n    pub valid_from: NaiveDate,\n    pub valid_to: Option<NaiveDate>,\n    pub registration_status: String,\n}\n''')
+          write('crates/persistence-postgres/src/adapters/catalog/players/team_periods/mapper.rs', '''use super::row::PlayerTeamPeriodRow;\nuse football_domain::PlayerTeamPeriodRecord;\n\npub(in crate::adapters::catalog::players) fn map_player_team_period(\n    row: PlayerTeamPeriodRow,\n) -> PlayerTeamPeriodRecord {\n    PlayerTeamPeriodRecord {\n        id: row.id,\n        player_id: row.player_id,\n        team_id: row.team_id,\n        team_name: row.team_name,\n        season_id: row.season_id,\n        season_name: row.season_name,\n        squad_number: row.squad_number,\n        valid_from: row.valid_from,\n        valid_to: row.valid_to,\n        registration_status: row.registration_status,\n    }\n}\n''')
+          write('crates/persistence-postgres/src/adapters/catalog/players/team_periods/add_player_team_period.rs', '''use super::{\n    input_policy::validate_player_team_period_draft, mapper::map_player_team_period,\n    row::PlayerTeamPeriodRow,\n};\nuse crate::{PersistenceResult, PostgresStore};\nuse football_domain::{PlayerTeamPeriodDraft, PlayerTeamPeriodRecord};\nuse uuid::Uuid;\n\nimpl PostgresStore {\n    pub async fn add_player_team_period(\n        &self,\n        draft: &PlayerTeamPeriodDraft,\n    ) -> PersistenceResult<PlayerTeamPeriodRecord> {\n        let validated = validate_player_team_period_draft(draft)?;\n        let row = sqlx::query_as::<_, PlayerTeamPeriodRow>(\n            r#"\n            WITH inserted AS (\n                INSERT INTO football.player_team_periods (\n                    id, player_id, team_id, season_id, squad_number,\n                    valid_from, valid_to, registration_status, source_document_id\n                ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)\n                RETURNING *\n            )\n            SELECT\n                inserted.id, inserted.player_id, inserted.team_id,\n                team.canonical_name AS team_name,\n                inserted.season_id, season.name AS season_name,\n                inserted.squad_number, inserted.valid_from, inserted.valid_to,\n                inserted.registration_status\n            FROM inserted\n            JOIN football.teams team ON team.id = inserted.team_id\n            LEFT JOIN football.seasons season ON season.id = inserted.season_id\n            "#,\n        )\n        .bind(Uuid::new_v4())\n        .bind(draft.player_id)\n        .bind(draft.team_id)\n        .bind(draft.season_id)\n        .bind(draft.squad_number)\n        .bind(draft.valid_from)\n        .bind(draft.valid_to)\n        .bind(validated.registration_status)\n        .bind(draft.source_document_id)\n        .fetch_one(&self.pool)\n        .await?;\n        Ok(map_player_team_period(row))\n    }\n}\n''')
+
+          write('crates/persistence-postgres/src/adapters/catalog/availability/mod.rs', '''mod add_player_availability;\nmod input_policy;\nmod mapper;\nmod row;\n\npub(in crate::adapters::catalog) use mapper::map_player_availability;\npub(in crate::adapters::catalog) use row::PlayerAvailabilityRow;\n''')
+          write('crates/persistence-postgres/src/adapters/catalog/availability/input_policy.rs', '''use crate::{PersistenceError, PersistenceResult};\nuse football_domain::PlayerAvailabilityDraft;\n\npub(super) struct ValidatedPlayerAvailabilityInput<'a> {\n    pub reason: Option<&'a str>,\n}\n\npub(super) fn validate_player_availability_draft(\n    draft: &PlayerAvailabilityDraft,\n) -> PersistenceResult<ValidatedPlayerAvailabilityInput<'_>> {\n    if !(0.0..=1.0).contains(&draft.confidence) {\n        return Err(PersistenceError::InvalidState(\n            "可用性可信度必须位于 0–1".to_string(),\n        ));\n    }\n    if draft\n        .valid_to\n        .as_ref()\n        .is_some_and(|valid_to| valid_to < &draft.valid_from)\n    {\n        return Err(PersistenceError::InvalidState(\n            "可用性结束时间不能早于开始时间".to_string(),\n        ));\n    }\n    Ok(ValidatedPlayerAvailabilityInput {\n        reason: draft\n            .reason\n            .as_deref()\n            .map(str::trim)\n            .filter(|value| !value.is_empty()),\n    })\n}\n''')
+          write('crates/persistence-postgres/src/adapters/catalog/availability/row.rs', '''use chrono::{DateTime, Utc};\nuse sqlx::FromRow;\nuse uuid::Uuid;\n\n#[derive(Debug, FromRow)]\npub(in crate::adapters::catalog) struct PlayerAvailabilityRow {\n    pub id: Uuid,\n    pub player_id: Uuid,\n    pub team_id: Option<Uuid>,\n    pub team_name: Option<String>,\n    pub competition_id: Option<Uuid>,\n    pub status: String,\n    pub reason: Option<String>,\n    pub confidence: f64,\n    pub valid_from: DateTime<Utc>,\n    pub valid_to: Option<DateTime<Utc>>,\n    pub created_at: DateTime<Utc>,\n}\n''')
+          write('crates/persistence-postgres/src/adapters/catalog/availability/mapper.rs', '''use super::row::PlayerAvailabilityRow;\nuse crate::{\n    adapters::catalog::players::value_mapping::availability_status, PersistenceResult,\n};\nuse football_domain::PlayerAvailabilityRecord;\n\npub(in crate::adapters::catalog) fn map_player_availability(\n    row: PlayerAvailabilityRow,\n) -> PersistenceResult<PlayerAvailabilityRecord> {\n    Ok(PlayerAvailabilityRecord {\n        id: row.id,\n        player_id: row.player_id,\n        team_id: row.team_id,\n        team_name: row.team_name,\n        competition_id: row.competition_id,\n        status: availability_status(&row.status)?,\n        reason: row.reason,\n        confidence: row.confidence,\n        valid_from: row.valid_from,\n        valid_to: row.valid_to,\n        created_at: row.created_at,\n    })\n}\n''')
+          write('crates/persistence-postgres/src/adapters/catalog/availability/add_player_availability.rs', '''use super::{\n    input_policy::validate_player_availability_draft, mapper::map_player_availability,\n    row::PlayerAvailabilityRow,\n};\nuse crate::{PersistenceResult, PostgresStore};\nuse football_domain::{PlayerAvailabilityDraft, PlayerAvailabilityRecord};\nuse uuid::Uuid;\n\nimpl PostgresStore {\n    pub async fn add_player_availability(\n        &self,\n        draft: &PlayerAvailabilityDraft,\n    ) -> PersistenceResult<PlayerAvailabilityRecord> {\n        let validated = validate_player_availability_draft(draft)?;\n        let row = sqlx::query_as::<_, PlayerAvailabilityRow>(\n            r#"\n            WITH inserted AS (\n                INSERT INTO football.player_availability (\n                    id, player_id, team_id, competition_id, status, reason,\n                    confidence, valid_from, valid_to, source_document_id, metadata\n                ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)\n                RETURNING *\n            )\n            SELECT\n                inserted.id, inserted.player_id, inserted.team_id,\n                team.canonical_name AS team_name, inserted.competition_id,\n                inserted.status, inserted.reason, inserted.confidence,\n                inserted.valid_from, inserted.valid_to, inserted.created_at\n            FROM inserted\n            LEFT JOIN football.teams team ON team.id = inserted.team_id\n            "#,\n        )\n        .bind(Uuid::new_v4())\n        .bind(draft.player_id)\n        .bind(draft.team_id)\n        .bind(draft.competition_id)\n        .bind(draft.status.as_str())\n        .bind(validated.reason)\n        .bind(draft.confidence)\n        .bind(draft.valid_from)\n        .bind(draft.valid_to)\n        .bind(draft.source_document_id)\n        .bind(&draft.metadata)\n        .fetch_one(&self.pool)\n        .await?;\n        map_player_availability(row)\n    }\n}\n''')
+
+          team_detail_mod_path = 'crates/persistence-postgres/src/adapters/catalog/players/detail/team_periods/mod.rs'
+          write(team_detail_mod_path, 'mod read;\n\npub(super) use read::read_team_periods;\n')
+          write('crates/persistence-postgres/src/adapters/catalog/players/detail/team_periods/read.rs', '''use crate::{\n    adapters::catalog::players::team_periods::{map_player_team_period, PlayerTeamPeriodRow},\n    PersistenceResult,\n};\nuse football_domain::PlayerTeamPeriodRecord;\nuse sqlx::PgPool;\nuse uuid::Uuid;\n\npub(in crate::adapters::catalog::players::detail) async fn read_team_periods(\n    pool: &PgPool,\n    player_id: Uuid,\n) -> PersistenceResult<Vec<PlayerTeamPeriodRecord>> {\n    let rows = sqlx::query_as::<_, PlayerTeamPeriodRow>(\n        r#"\n        SELECT\n            period.id, period.player_id, period.team_id,\n            team.canonical_name AS team_name,\n            period.season_id, season.name AS season_name,\n            period.squad_number, period.valid_from, period.valid_to,\n            period.registration_status\n        FROM football.player_team_periods period\n        JOIN football.teams team ON team.id = period.team_id\n        LEFT JOIN football.seasons season ON season.id = period.season_id\n        WHERE period.player_id = $1\n        ORDER BY period.valid_from DESC, period.id DESC\n        "#,\n    )\n    .bind(player_id)\n    .fetch_all(pool)\n    .await?;\n    Ok(rows.into_iter().map(map_player_team_period).collect())\n}\n''')
+
+          availability_detail_mod_path = 'crates/persistence-postgres/src/adapters/catalog/players/detail/availability/mod.rs'
+          write(availability_detail_mod_path, 'mod read;\n\npub(super) use read::read_availability;\n')
+          write('crates/persistence-postgres/src/adapters/catalog/players/detail/availability/read.rs', '''use crate::{\n    adapters::catalog::availability::{map_player_availability, PlayerAvailabilityRow},\n    PersistenceResult, PostgresStore,\n};\nuse football_domain::PlayerAvailabilityRecord;\nuse uuid::Uuid;\n\npub(in crate::adapters::catalog::players::detail) async fn read_availability(\n    store: &PostgresStore,\n    player_id: Uuid,\n) -> PersistenceResult<Vec<PlayerAvailabilityRecord>> {\n    let rows = sqlx::query_as::<_, PlayerAvailabilityRow>(\n        r#"\n        SELECT\n            availability.id, availability.player_id, availability.team_id,\n            team.canonical_name AS team_name, availability.competition_id,\n            availability.status, availability.reason, availability.confidence,\n            availability.valid_from, availability.valid_to, availability.created_at\n        FROM football.player_availability availability\n        LEFT JOIN football.teams team ON team.id = availability.team_id\n        WHERE availability.player_id = $1\n        ORDER BY availability.valid_from DESC, availability.created_at DESC\n        LIMIT 100\n        "#,\n    )\n    .bind(player_id)\n    .fetch_all(&store.pool)\n    .await?;\n    rows.into_iter().map(map_player_availability).collect()\n}\n''')
+
+          for obsolete in [
+              'crates/persistence-postgres/src/adapters/catalog/players/detail/team_periods/mapper.rs',
+              'crates/persistence-postgres/src/adapters/catalog/players/detail/team_periods/row.rs',
+              'crates/persistence-postgres/src/adapters/catalog/players/detail/availability/mapper.rs',
+              'crates/persistence-postgres/src/adapters/catalog/players/detail/availability/row.rs',
+          ]:
+              path = root / obsolete
+              if not path.exists():
+                  raise SystemExit(f'obsolete detail owner missing before R6-05 switch: {obsolete}')
+              path.unlink()
+
+          r603_path = 'scripts/verify-player-directory-detail.mjs'
+          r603 = read(r603_path)
+          r603 = replace_once(
+              r603,
+              "for (const retained of [\n  'delete_player',\n  'add_player_team_period',\n  'add_player_availability',\n  'add_player_ability_observation',\n]) {",
+              "for (const retained of [\n  'delete_player',\n  'add_player_ability_observation',\n]) {",
+              'R6-03 later-owner retained list',
+          )
+          r605_block = '''const r605AdvancedOwners = [\n  ['crates/persistence-postgres/src/adapters/catalog/players/team_periods/add_player_team_period.rs', 'add_player_team_period'],\n  ['crates/persistence-postgres/src/adapters/catalog/availability/add_player_availability.rs', 'add_player_availability'],\n];\nfor (const [relative, method] of r605AdvancedOwners) {\n  if (!exists(relative) || !read(relative).includes(`pub async fn ${method}`)) {\n    throw new Error(`R6-05 advanced owner missing for retained R6-03 boundary: ${method}`);\n  }\n  if (legacy.includes(`pub async fn ${method}`)) {\n    throw new Error(`R6-05 advanced owner still duplicated in legacy player_catalog.rs: ${method}`);\n  }\n}\n\n'''
+          marker = "const dynamicTags = read('crates/persistence-postgres/src/dynamic_tags.rs');"
+          if 'const r605AdvancedOwners' in r603:
+              raise SystemExit('R6-03 verifier already contains R6-05 advanced owner block')
+          r603 = replace_once(r603, marker, r605_block + marker, 'R6-03 advanced owner insertion')
+          r603 = replace_once(
+              r603,
+              "console.log('R6-03 Player Directory/Detail ownership verification: PASS (R6-04 Names/Positions owner advancement accepted)');",
+              "console.log('R6-03 Player Directory/Detail ownership verification: PASS (R6-04 Names/Positions and R6-05 Team Periods/Availability owner advancement accepted)');",
+              'R6-03 verifier status message',
+          )
+          write(r603_path, r603)
+
+          write('scripts/verify-player-team-periods-availability.mjs', '''import fs from "node:fs";\nimport path from "node:path";\n\nconst root = path.resolve(import.meta.dirname, "..");\nconst read = (file) => fs.readFileSync(path.join(root, file), "utf8");\nconst exists = (file) => fs.existsSync(path.join(root, file));\nconst failures = [];\nconst check = (condition, message) => { if (!condition) failures.push(message); };\nconst requireTokens = (file, tokens, label = file) => {\n  const content = read(file);\n  for (const token of tokens) check(content.includes(token), `${label} 缺少：${token}`);\n  return content;\n};\n\nconst required = [\n  "crates/persistence-postgres/src/adapters/catalog/players/team_periods/add_player_team_period.rs",\n  "crates/persistence-postgres/src/adapters/catalog/players/team_periods/input_policy.rs",\n  "crates/persistence-postgres/src/adapters/catalog/players/team_periods/mapper.rs",\n  "crates/persistence-postgres/src/adapters/catalog/players/team_periods/row.rs",\n  "crates/persistence-postgres/src/adapters/catalog/players/team_periods/mod.rs",\n  "crates/persistence-postgres/src/adapters/catalog/availability/add_player_availability.rs",\n  "crates/persistence-postgres/src/adapters/catalog/availability/input_policy.rs",\n  "crates/persistence-postgres/src/adapters/catalog/availability/mapper.rs",\n  "crates/persistence-postgres/src/adapters/catalog/availability/row.rs",\n  "crates/persistence-postgres/src/adapters/catalog/availability/mod.rs",\n  "crates/persistence-postgres/tests/player_team_periods_availability_repository_contract.rs",\n];\nfor (const file of required) check(exists(file), `R6-05 required file missing: ${file}`);\n\nconst legacy = read("crates/persistence-postgres/src/player_catalog.rs");\nconst playersMod = read("crates/persistence-postgres/src/adapters/catalog/players/mod.rs");\nconst catalogMod = read("crates/persistence-postgres/src/adapters/catalog/mod.rs");\nconst teamPeriodsMod = read("crates/persistence-postgres/src/adapters/catalog/players/team_periods/mod.rs");\nconst availabilityMod = read("crates/persistence-postgres/src/adapters/catalog/availability/mod.rs");\nconst teamPeriodsWrite = requireTokens("crates/persistence-postgres/src/adapters/catalog/players/team_periods/add_player_team_period.rs", [\n  "pub async fn add_player_team_period",\n  "validate_player_team_period_draft(draft)?",\n  "INSERT INTO football.player_team_periods",\n  "query_as::<_, PlayerTeamPeriodRow>",\n  "JOIN football.teams",\n  "LEFT JOIN football.seasons",\n], "Team Period write owner");\nconst availabilityWrite = requireTokens("crates/persistence-postgres/src/adapters/catalog/availability/add_player_availability.rs", [\n  "pub async fn add_player_availability",\n  "validate_player_availability_draft(draft)?",\n  "INSERT INTO football.player_availability",\n  "query_as::<_, PlayerAvailabilityRow>",\n  "LEFT JOIN football.teams",\n], "Availability write owner");\nconst teamPeriodsRead = read("crates/persistence-postgres/src/adapters/catalog/players/detail/team_periods/read.rs");\nconst availabilityRead = read("crates/persistence-postgres/src/adapters/catalog/players/detail/availability/read.rs");\nconst port = read("crates/application/src/ports/player/mod.rs");\nconst adapter = read("crates/application/src/composition/adapters/players.rs");\n\ncheck(playersMod.includes("mod team_periods;"), "players 模块未注册 Team Periods owner");\ncheck(catalogMod.includes("mod availability;"), "catalog 模块未注册 Availability owner");\ncheck(teamPeriodsMod.includes("mod add_player_team_period;") && teamPeriodsMod.includes("mod input_policy;") && teamPeriodsMod.includes("mod mapper;") && teamPeriodsMod.includes("mod row;"), "Team Periods 目录职责拆分不完整");\ncheck(availabilityMod.includes("mod add_player_availability;") && availabilityMod.includes("mod input_policy;") && availabilityMod.includes("mod mapper;") && availabilityMod.includes("mod row;"), "Availability 目录职责拆分不完整");\ncheck(!teamPeriodsMod.includes("sqlx::") && !teamPeriodsMod.includes("impl PostgresStore"), "Team Periods mod.rs 不得承载 SQL 或业务实现");\ncheck(!availabilityMod.includes("sqlx::") && !availabilityMod.includes("impl PostgresStore"), "Availability mod.rs 不得承载 SQL 或业务实现");\ncheck(teamPeriodsWrite.includes("validated.registration_status"), "Team Period 写 owner 未复用独立输入策略");\ncheck(availabilityWrite.includes("validated.reason"), "Availability 写 owner 未复用独立输入策略");\ncheck(!legacy.includes("pub async fn add_player_team_period"), "legacy player_catalog.rs 仍拥有 add_player_team_period");\ncheck(!legacy.includes("pub async fn add_player_availability"), "legacy player_catalog.rs 仍拥有 add_player_availability");\ncheck(!legacy.includes("fn player_team_period_from_row"), "legacy player_catalog.rs 仍拥有 Team Period Row mapper");\ncheck(!legacy.includes("fn player_availability_from_row"), "legacy player_catalog.rs 仍拥有 Availability Row mapper");\ncheck(teamPeriodsRead.includes("players::team_periods::{map_player_team_period, PlayerTeamPeriodRow}"), "Player Detail Team Period read 未复用新 Row/mapper owner");\ncheck(availabilityRead.includes("catalog::availability::{map_player_availability, PlayerAvailabilityRow}"), "Player Detail Availability read 未复用新 Row/mapper owner");\nfor (const obsolete of [\n  "crates/persistence-postgres/src/adapters/catalog/players/detail/team_periods/mapper.rs",\n  "crates/persistence-postgres/src/adapters/catalog/players/detail/team_periods/row.rs",\n  "crates/persistence-postgres/src/adapters/catalog/players/detail/availability/mapper.rs",\n  "crates/persistence-postgres/src/adapters/catalog/players/detail/availability/row.rs",\n]) check(!exists(obsolete), `旧 Detail 映射 owner 未删除：${obsolete}`);\ncheck(port.includes("async fn add_player_team_period("), "PlayerCatalogPort add_player_team_period 公共契约变化");\ncheck(port.includes("async fn add_availability("), "PlayerSignalPort add_availability 公共契约变化");\ncheck(adapter.includes("self.add_player_team_period(draft)") && adapter.includes("self.add_player_availability(draft)"), "Application persistence adapter 未保持既有调用语义");\ncheck(legacy.includes("pub async fn add_player_ability_observation"), "R6-06 Ability owner 被提前迁移或删除");\nconst dynamicTags = read("crates/persistence-postgres/src/dynamic_tags.rs");\ncheck(dynamicTags.includes("pub async fn add_player_dynamic_tag"), "R6-06 Dynamic Tag owner 被提前迁移或删除");\n\nif (failures.length) {\n  console.error("R6-05 Team Periods / Availability ownership verification failed:");\n  failures.forEach((failure) => console.error(`- ${failure}`));\n  process.exit(1);\n}\nconsole.log("R6-05 Team Periods / Availability ownership verified: write owners, input policies, typed rows/mappers, detail reads and public ports remain uniquely bounded.");\n''')
+
+          package_path = 'package.json'
+          package = read(package_path)
+          package = replace_once(
+              package,
+              ' && node scripts/verify-player-names-positions.mjs",',
+              ' && node scripts/verify-player-names-positions.mjs && node scripts/verify-player-team-periods-availability.mjs",',
+              'package architecture gate',
+          )
+          write(package_path, package)
+
+          write('crates/persistence-postgres/tests/player_team_periods_availability_repository_contract.rs', '''use chrono::{Duration, NaiveDate, Utc};\nuse football_domain::{\n    AvailabilityStatus, PlayerAvailabilityDraft, PlayerDraft, PlayerStatus,\n    PlayerTeamPeriodDraft, PreferredFoot, TeamDraft,\n};\nuse football_persistence_postgres::{DatabaseOptions, PersistenceError, PostgresStore};\nuse serde_json::json;\nuse sqlx::{postgres::PgPoolOptions, PgPool};\nuse uuid::Uuid;\n\nconst DATABASE_ENV: &str = "FOOTBALL_TEST_DATABASE_URL";\n\nstruct TestDatabase {\n    store: PostgresStore,\n    pool: PgPool,\n}\n\nimpl TestDatabase {\n    async fn connect() -> Self {\n        let connection_url = std::env::var(DATABASE_ENV).unwrap_or_else(|_| {\n            panic!(\n                "运行 R6-05 契约测试前必须设置 {DATABASE_ENV}，并指向专用、可写的 PostgreSQL 测试数据库"\n            )\n        });\n        let options = DatabaseOptions {\n            connection_url: connection_url.clone(),\n            max_connections: 4,\n            connect_timeout_seconds: 10,\n        };\n        let store = PostgresStore::connect(&options)\n            .await\n            .expect("连接 R6-05 PostgreSQL 测试数据库");\n        store.migrate().await.expect("执行数据库迁移");\n        let pool = PgPoolOptions::new()\n            .max_connections(4)\n            .connect(&connection_url)\n            .await\n            .expect("建立 R6-05 校验连接池");\n        Self { store, pool }\n    }\n\n    async fn close(self) {\n        self.pool.close().await;\n        self.store.close().await;\n    }\n}\n\n#[tokio::test]\n#[ignore = "需要专用且可写的 PostgreSQL 测试数据库；设置 FOOTBALL_TEST_DATABASE_URL 后显式运行"]\nasync fn player_team_periods_and_availability_contract_is_preserved() {\n    let database = TestDatabase::connect().await;\n    let token = Uuid::new_v4().simple().to_string();\n    let team = database\n        .store\n        .create_team(&TeamDraft {\n            canonical_name: format!("R6-05 Team {token}"),\n            country_code: Some("ZZ".to_string()),\n            metadata: json!({"contract": "r6-05"}),\n        })\n        .await\n        .expect("创建 R6-05 contract team");\n    let player = database\n        .store\n        .create_player(&PlayerDraft {\n            canonical_name: format!("R6-05 Player {token}"),\n            date_of_birth: None,\n            nationality_code: Some("ZZ".to_string()),\n            preferred_foot: PreferredFoot::Right,\n            height_cm: Some(180),\n            status: PlayerStatus::Active,\n            metadata: json!({"contract": "r6-05"}),\n        })\n        .await\n        .expect("创建 R6-05 contract player");\n\n    let valid_from = NaiveDate::from_ymd_opt(2026, 8, 1).expect("固定有效日期");\n    let period = database\n        .store\n        .add_player_team_period(&PlayerTeamPeriodDraft {\n            player_id: player.id,\n            team_id: team.id,\n            season_id: None,\n            squad_number: Some(17),\n            valid_from,\n            valid_to: Some(valid_from + Duration::days(30)),\n            registration_status: " registered ".to_string(),\n            source_document_id: None,\n        })\n        .await\n        .expect("写入球员球队效力期");\n    assert_eq!(period.player_id, player.id);\n    assert_eq!(period.team_id, team.id);\n    assert_eq!(period.team_name, team.canonical_name);\n    assert_eq!(period.squad_number, Some(17));\n    assert_eq!(period.registration_status, "registered");\n\n    let reversed_period = database\n        .store\n        .add_player_team_period(&PlayerTeamPeriodDraft {\n            player_id: player.id,\n            team_id: team.id,\n            season_id: None,\n            squad_number: Some(18),\n            valid_from: valid_from + Duration::days(2),\n            valid_to: Some(valid_from + Duration::days(1)),\n            registration_status: "registered".to_string(),\n            source_document_id: None,\n        })\n        .await\n        .expect_err("倒置效力期必须失败");\n    assert!(matches!(\n        reversed_period,\n        PersistenceError::InvalidState(message) if message == "球队效力结束日期不能早于开始日期"\n    ));\n\n    let invalid_squad_number = database\n        .store\n        .add_player_team_period(&PlayerTeamPeriodDraft {\n            player_id: player.id,\n            team_id: team.id,\n            season_id: None,\n            squad_number: Some(100),\n            valid_from,\n            valid_to: None,\n            registration_status: "registered".to_string(),\n            source_document_id: None,\n        })\n        .await\n        .expect_err("越界球衣号码必须失败");\n    assert!(matches!(\n        invalid_squad_number,\n        PersistenceError::InvalidState(message) if message == "球衣号码必须位于 0–99"\n    ));\n\n    let availability_from = Utc::now();\n    let availability = database\n        .store\n        .add_player_availability(&PlayerAvailabilityDraft {\n            player_id: player.id,\n            team_id: Some(team.id),\n            competition_id: None,\n            status: AvailabilityStatus::Injured,\n            reason: Some("  hamstring  ".to_string()),\n            confidence: 0.85,\n            valid_from: availability_from,\n            valid_to: Some(availability_from + Duration::days(5)),\n            source_document_id: None,\n            metadata: json!({"contract": "r6-05"}),\n        })\n        .await\n        .expect("写入球员可用性");\n    assert_eq!(availability.player_id, player.id);\n    assert_eq!(availability.team_id, Some(team.id));\n    assert_eq!(availability.team_name.as_deref(), Some(team.canonical_name.as_str()));\n    assert_eq!(availability.status, AvailabilityStatus::Injured);\n    assert_eq!(availability.reason.as_deref(), Some("hamstring"));\n    assert_eq!(availability.confidence, 0.85);\n\n    let invalid_confidence = database\n        .store\n        .add_player_availability(&PlayerAvailabilityDraft {\n            player_id: player.id,\n            team_id: Some(team.id),\n            competition_id: None,\n            status: AvailabilityStatus::Available,\n            reason: None,\n            confidence: 1.01,\n            valid_from: availability_from,\n            valid_to: None,\n            source_document_id: None,\n            metadata: json!({}),\n        })\n        .await\n        .expect_err("越界可用性可信度必须失败");\n    assert!(matches!(\n        invalid_confidence,\n        PersistenceError::InvalidState(message) if message == "可用性可信度必须位于 0–1"\n    ));\n\n    let reversed_availability = database\n        .store\n        .add_player_availability(&PlayerAvailabilityDraft {\n            player_id: player.id,\n            team_id: Some(team.id),\n            competition_id: None,\n            status: AvailabilityStatus::Returning,\n            reason: Some("return".to_string()),\n            confidence: 0.5,\n            valid_from: availability_from + Duration::days(2),\n            valid_to: Some(availability_from + Duration::days(1)),\n            source_document_id: None,\n            metadata: json!({}),\n        })\n        .await\n        .expect_err("倒置可用性时间必须失败");\n    assert!(matches!(\n        reversed_availability,\n        PersistenceError::InvalidState(message) if message == "可用性结束时间不能早于开始时间"\n    ));\n\n    let detail = database\n        .store\n        .read_player(player.id)\n        .await\n        .expect("读取 Player Detail");\n    assert!(detail.team_periods.iter().any(|item| item.id == period.id));\n    assert!(detail.availability.iter().any(|item| item.id == availability.id));\n\n    let stored_reason: Option<String> = sqlx::query_scalar(\n        "SELECT reason FROM football.player_availability WHERE id = $1",\n    )\n    .bind(availability.id)\n    .fetch_one(&database.pool)\n    .await\n    .expect("读取数据库可用性原因");\n    assert_eq!(stored_reason.as_deref(), Some("hamstring"));\n\n    database.close().await;\n}\n''')
+
+          root_readme_path = 'README.md'
+          root_readme = read(root_readme_path)
+          section = f'''### R6-05 Team Periods 与 Availability\n\n- Player Team Periods / Availability 写职责已从 `crates/persistence-postgres/src/player_catalog.rs` 收敛到 `adapters/catalog/players/team_periods/` 与 `adapters/catalog/availability/`；输入策略、typed Row、Domain mapper 与 SQL owner 分责，Player Detail 读取继续复用相同 Row/mapper owner。\n- `PlayerCatalogPort::add_player_team_period`、`PlayerSignalPort::add_availability`、Domain DTO、Schema、0001–0046 migration、错误语义、历史 P4/运行引用和用户可观察行为保持不变；未新增生产依赖。\n- 临时实施 gate run `{run_id}` 在提交前执行 R6-05 ownership、R6-03 retained ownership、完整 architecture、模型保护/数据库基线、rustfmt、Persistence unit tests、R6-05 PostgreSQL 16 contract 真实执行及 Application check；只有全部成功才生成本次生产提交。\n- 当前节点为 `VERIFYING`；阶段 hard gate、clean canonical CI 与临时 workflow 清理完成前不得标记 `DONE`。\n\n'''
+          root_readme = replace_once(root_readme, '## 模块化重写执行记录\n\n', '## 模块化重写执行记录\n\n' + section, 'root README R6-05 section')
+          write(root_readme_path, root_readme)
+
+          stage_readme_path = 'docs/modular-rewrite/R06-entity-catalog-persistence/README.md'
+          stage_readme = read(stage_readme_path)
+          stage_readme = replace_once(stage_readme, '| R6-05 | Team Periods 与 Availability | READY |', '| R6-05 | Team Periods 与 Availability | VERIFYING |', 'stage R6-05 status')
+          stage_section = f'''## R6-05 当前事实\n\n- 详细记录：[`R06-05-team-periods-and-availability.md`](R06-05-team-periods-and-availability.md)。\n- Team Periods / Availability 写 owner 已从 `player_catalog.rs` 收敛到 `adapters/catalog/players/team_periods/` 与 `adapters/catalog/availability/`；validation/input policy、typed Row、Domain mapper 与 SQL owner 分责。\n- Player Detail 的 Team Periods / Availability read 保留读取职责，并复用新的 Row/mapper owner；旧 Detail 重复 mapper/row 已删除。\n- 实施 gate run `{run_id}` 只有在 R6-05/R6-03 ownership、完整 architecture、模型保护、database baseline、rustfmt、Persistence unit tests、R6-05 PostgreSQL 16 contract 真实执行与 Application check 全部成功后才会提交生产变更。\n- 当前节点保持 `VERIFYING`；R6-06 继续 `BLOCKED`，等待阶段 hard gate、clean canonical CI 与临时 workflow 清理。\n\n'''
+          stage_readme = replace_once(stage_readme, '## 当前边界与剩余门禁\n', stage_section + '## 当前边界与剩余门禁\n', 'stage R6-05 facts')
+          stage_readme = replace_once(stage_readme, '- R6-05 Team Periods 与 Availability 为当前唯一 `READY` 节点；R6-06～R6-10 继续 `BLOCKED`。', '- R6-05 Team Periods 与 Availability 为当前唯一 `VERIFYING` 节点；R6-06～R6-10 继续 `BLOCKED`。', 'stage current boundary')
+          write(stage_readme_path, stage_readme)
+
+          task_record = f'''# R06-05 — Team Periods 与 Availability\n\n## 状态\n\n`VERIFYING`\n\n## 进入基线\n\n- R6-04：`DONE`。\n- 本阶段继续使用唯一分支：`rewrite/r6-entity-catalog-persistence`。\n- 节点起点：`{base_sha}`。\n\n## 已实施职责边界\n\n- `adapters/catalog/players/team_periods/`：效力期输入策略、typed Row、Domain mapper 与 `add_player_team_period` SQL 唯一 owner。\n- `adapters/catalog/availability/`：可用性输入策略、typed Row、Domain mapper 与 `add_player_availability` SQL 唯一 owner。\n- `players/detail/team_periods/read.rs` 与 `players/detail/availability/read.rs` 继续只承担 Player Detail 读取 SQL，并复用新的 Row/mapper owner。\n- `player_catalog.rs` 已退出 Team Periods / Availability 写职责和对应 Row mapping，不保留转发壳或双 owner。\n\n## 保持不变的契约\n\n- `PlayerCatalogPort::add_player_team_period` 与 `PlayerSignalPort::add_availability` 方法签名及 Application adapter 调用语义不变。\n- Domain `PlayerTeamPeriodDraft/Record`、`PlayerAvailabilityDraft/Record` shape 不变。\n- 效力期日期与球衣号码校验、registration status trim、Availability confidence/日期校验、reason trim/空值折叠及错误文案保持原语义。\n- Schema、0001–0046 migration、配置、日志等级、默认战术角色/位置映射、历史 P4/运行引用和模型保护资产未主动修改。\n- 未新增生产依赖。\n\n## 文件变更\n\n```text\n{{{{NAME_STATUS}}}}\n```\n\n## 本轮实际验证\n\n临时实施 gate run `{run_id}` 只有在以下检查全部成功后才提交生产变更：\n\n- `node scripts/verify-player-team-periods-availability.mjs`。\n- `node scripts/verify-player-directory-detail.mjs`。\n- `npm run verify:architecture`。\n- `node scripts/verify_protected_assets.mjs`。\n- `node scripts/verify_database_baseline.mjs`。\n- `cargo fmt --all -- --check`。\n- `cargo test --locked -p football-persistence-postgres --lib`。\n- `cargo test --locked -p football-persistence-postgres --test player_team_periods_availability_repository_contract --no-run`。\n- PostgreSQL 16 专用测试库真实执行 `player_team_periods_availability_repository_contract` ignored test。\n- `cargo check --locked -p football-application`。\n\n## 阶段 hard gate\n\n- 尚未执行；节点保持 `VERIFYING`。\n\n## 尚未执行\n\n- 用户现有 PostgreSQL 数据真实写入/sample 验收与 Windows Full 人工交互验收；继续保留到最终统一验收，不描述为通过。\n\n## 回退点\n\n- R6-05 节点起点：`{base_sha}`。\n- 通过 Git 提交回退，不复制旧实现，不保留长期双 owner。\n'''
+          write('docs/modular-rewrite/R06-entity-catalog-persistence/R06-05-team-periods-and-availability.md', task_record)
+          PY
+
+      - name: Format and freeze file inventory
+        shell: bash
+        run: |
+          set -euo pipefail
+          cargo fmt --all
+          git add -A
+          git diff --cached --name-status > /tmp/r605-name-status.txt
+          python - <<'PY'
+          from pathlib import Path
+          record = Path('docs/modular-rewrite/R06-entity-catalog-persistence/R06-05-team-periods-and-availability.md')
+          content = record.read_text(encoding='utf-8')
+          inventory = Path('/tmp/r605-name-status.txt').read_text(encoding='utf-8').rstrip()
+          if '{{NAME_STATUS}}' not in content:
+              raise SystemExit('R6-05 task record inventory placeholder missing')
+          record.write_text(content.replace('{{NAME_STATUS}}', inventory), encoding='utf-8')
+          PY
+          git add docs/modular-rewrite/R06-entity-catalog-persistence/R06-05-team-periods-and-availability.md
+          git diff --cached --check
+          git diff --cached --name-status
+
+      - name: R6-05 targeted ownership and architecture
+        shell: bash
+        run: |
+          set -euo pipefail
+          node scripts/verify-player-team-periods-availability.mjs
+          node scripts/verify-player-directory-detail.mjs
+          npm run verify:architecture
+          node scripts/verify_protected_assets.mjs
+          node scripts/verify_database_baseline.mjs
+          cargo fmt --all -- --check
+
+      - name: Persistence and application validation
+        shell: bash
+        run: |
+          set -euo pipefail
+          cargo test --locked -p football-persistence-postgres --lib
+          cargo test --locked -p football-persistence-postgres --test player_team_periods_availability_repository_contract --no-run
+          cargo test --locked -p football-persistence-postgres --test player_team_periods_availability_repository_contract -- --ignored --nocapture --test-threads=1
+          cargo check --locked -p football-application
+
+      - name: Commit verified R6-05 implementation
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git diff --cached --check
+          git commit -m "refactor(r6-05): modularize team periods and availability"
+          git push origin HEAD:rewrite/r6-entity-catalog-persistence
