@@ -7,11 +7,10 @@ use crate::{
 };
 use chrono::{Datelike, NaiveDate};
 use football_domain::{
-    AbilityDimensionRecord, AvailabilityStatus, DataProviderDraft, DataProviderRecord,
-    ExternalEntityIdDraft, ExternalEntityIdRecord, LineupDraft, LineupHistoryRemovalResult,
-    LineupPairDraft, LineupPairRecord, LineupPlayerRecord, LineupRecord, LineupType, MatchDraft,
-    MatchRecord, MatchStatus, PlayerAbilityObservationDraft, PlayerAbilityObservationRecord,
-    PlayerCatalogReferenceData, PositionReference, SeasonTeamMembershipOption,
+    AvailabilityStatus, DataProviderDraft, DataProviderRecord, ExternalEntityIdDraft,
+    ExternalEntityIdRecord, LineupDraft, LineupHistoryRemovalResult, LineupPairDraft,
+    LineupPairRecord, LineupPlayerRecord, LineupRecord, LineupType, MatchDraft, MatchRecord,
+    MatchStatus, PlayerCatalogReferenceData, PositionReference, SeasonTeamMembershipOption,
 };
 use serde_json::json;
 use sqlx::{Postgres, Row, Transaction};
@@ -109,77 +108,6 @@ impl PostgresStore {
             .await?;
         tx.commit().await?;
         Ok(())
-    }
-
-    pub async fn add_player_ability_observation(
-        &self,
-        draft: &PlayerAbilityObservationDraft,
-    ) -> PersistenceResult<PlayerAbilityObservationRecord> {
-        if !(0.0..=1.0).contains(&draft.confidence) || draft.sample_size < 0 {
-            return Err(PersistenceError::InvalidState(
-                "能力观察可信度或样本量无效".to_string(),
-            ));
-        }
-        if draft
-            .effective_to
-            .as_ref()
-            .is_some_and(|value| value < &draft.effective_from)
-        {
-            return Err(PersistenceError::InvalidState(
-                "能力观察失效时间不能早于生效时间".to_string(),
-            ));
-        }
-        let row = sqlx::query(
-            r#"
-            WITH dimension AS (
-                SELECT code, name, minimum_value, maximum_value
-                FROM feature.player_ability_dimensions
-                WHERE code = $2
-            ), inserted AS (
-                INSERT INTO feature.player_ability_observations (
-                    id, player_id, dimension_code, context_type, context_id,
-                    value, confidence, sample_size, observed_at,
-                    effective_from, effective_to, calculation_version,
-                    source_document_id, metadata
-                )
-                SELECT
-                    $1, $3, dimension.code, $4, $5, $6, $7, $8, $9,
-                    $10, $11, $12, $13, $14
-                FROM dimension
-                WHERE $6 BETWEEN dimension.minimum_value AND dimension.maximum_value
-                RETURNING *
-            )
-            SELECT
-                inserted.id, inserted.player_id, inserted.dimension_code,
-                dimension.name AS dimension_name, inserted.context_type,
-                inserted.context_id, inserted.value, inserted.confidence,
-                inserted.sample_size, inserted.observed_at,
-                inserted.effective_from, inserted.effective_to,
-                inserted.calculation_version
-            FROM inserted
-            JOIN dimension ON dimension.code = inserted.dimension_code
-            "#,
-        )
-        .bind(Uuid::new_v4())
-        .bind(draft.dimension_code.trim())
-        .bind(draft.player_id)
-        .bind(draft.context_type.trim())
-        .bind(draft.context_id)
-        .bind(draft.value)
-        .bind(draft.confidence)
-        .bind(draft.sample_size)
-        .bind(draft.observed_at)
-        .bind(draft.effective_from)
-        .bind(draft.effective_to)
-        .bind(draft.calculation_version.trim())
-        .bind(draft.source_document_id)
-        .bind(&draft.metadata)
-        .fetch_optional(&self.pool)
-        .await?
-        .ok_or_else(|| {
-            PersistenceError::InvalidState("能力维度不存在，或能力值超出该维度允许范围".to_string())
-        })?;
-        player_ability_observation_from_row(&row)
     }
 
     pub async fn add_external_entity_id(
@@ -833,19 +761,6 @@ impl PostgresStore {
         .await?;
         rows.iter().map(position_reference_from_row).collect()
     }
-
-    pub async fn list_ability_dimensions(&self) -> PersistenceResult<Vec<AbilityDimensionRecord>> {
-        let rows = sqlx::query(
-            r#"
-            SELECT code, name, category, minimum_value, maximum_value, description
-            FROM feature.player_ability_dimensions
-            ORDER BY category, code
-            "#,
-        )
-        .fetch_all(&self.pool)
-        .await?;
-        rows.iter().map(ability_dimension_from_row).collect()
-    }
 }
 
 async fn resolve_match_scope_draft(
@@ -1390,26 +1305,6 @@ fn data_provider_from_row(row: &sqlx::postgres::PgRow) -> PersistenceResult<Data
     })
 }
 
-fn player_ability_observation_from_row(
-    row: &sqlx::postgres::PgRow,
-) -> PersistenceResult<PlayerAbilityObservationRecord> {
-    Ok(PlayerAbilityObservationRecord {
-        id: row.try_get("id")?,
-        player_id: row.try_get("player_id")?,
-        dimension_code: row.try_get("dimension_code")?,
-        dimension_name: row.try_get("dimension_name")?,
-        context_type: row.try_get("context_type")?,
-        context_id: row.try_get("context_id")?,
-        value: row.try_get("value")?,
-        confidence: row.try_get("confidence")?,
-        sample_size: row.try_get("sample_size")?,
-        observed_at: row.try_get("observed_at")?,
-        effective_from: row.try_get("effective_from")?,
-        effective_to: row.try_get("effective_to")?,
-        calculation_version: row.try_get("calculation_version")?,
-    })
-}
-
 fn external_entity_id_from_row(
     row: &sqlx::postgres::PgRow,
 ) -> PersistenceResult<ExternalEntityIdRecord> {
@@ -1514,19 +1409,6 @@ fn position_reference_from_row(
         name: row.try_get("name")?,
         position_group: row.try_get("position_group")?,
         sort_order: row.try_get("sort_order")?,
-    })
-}
-
-fn ability_dimension_from_row(
-    row: &sqlx::postgres::PgRow,
-) -> PersistenceResult<AbilityDimensionRecord> {
-    Ok(AbilityDimensionRecord {
-        code: row.try_get("code")?,
-        name: row.try_get("name")?,
-        category: row.try_get("category")?,
-        minimum_value: row.try_get("minimum_value")?,
-        maximum_value: row.try_get("maximum_value")?,
-        description: row.try_get("description")?,
     })
 }
 

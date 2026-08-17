@@ -1,5 +1,9 @@
-use super::{mapper::map_player_ability_observation, row::PlayerAbilityObservationRow};
-use crate::PersistenceResult;
+use crate::{
+    adapters::catalog::abilities::observations::{
+        map_player_ability_observation, PlayerAbilityObservationRow,
+    },
+    PersistenceResult,
+};
 use football_domain::PlayerAbilityObservationRecord;
 use sqlx::PgPool;
 use uuid::Uuid;

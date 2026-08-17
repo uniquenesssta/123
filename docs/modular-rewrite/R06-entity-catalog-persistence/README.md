@@ -22,7 +22,7 @@ R6 按 Teams、Players、Coaches、Formations、Abilities、Dynamic Tags、Avail
 | R6-03 | Player Directory 与 Detail | DONE |
 | R6-04 | Player Names 与 Positions | DONE |
 | R6-05 | Team Periods 与 Availability | DONE |
-| R6-06 | Abilities 与 Dynamic Tags | READY |
+| R6-06 | Abilities 与 Dynamic Tags | VERIFYING |
 | R6-07 | Coaches 与 Formation Usage | BLOCKED |
 | R6-08 | Entity Matching 与 References | BLOCKED |
 | R6-09 | Archive / Delete / Force Delete | BLOCKED |
@@ -97,3 +97,9 @@ R6 按 Teams、Players、Coaches、Formations、Abilities、Dynamic Tags、Avail
 - R6-01、R6-02、R6-03、R6-04 均已 `DONE`。
 - R6-01～R6-05 均已 `DONE`；R6-06 Abilities 与 Dynamic Tags 为当前唯一 `READY` 节点，R6-07～R6-10 继续 `BLOCKED`。
 - 每个节点完成时必须创建对应 `R06-xx` 实施记录并更新本索引；R6 完成时必须创建 `R06-stage-completion.md`。
+
+
+## R6-06 当前事实
+
+- 详细记录：[`R06-06-abilities-and-dynamic-tags.md`](R06-06-abilities-and-dynamic-tags.md)。
+- Abilities 与 Dynamic Tags persistence 已按 dimensions / observations / definitions / tags / contribution 职责拆分，旧单文件 owner 删除；当前为 `VERIFYING`，等待阶段 hard gate 与 clean canonical CI。

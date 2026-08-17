@@ -75,9 +75,6 @@ for (const obsolete of [
 check(port.includes("async fn add_player_team_period("), "PlayerCatalogPort add_player_team_period 公共契约变化");
 check(port.includes("async fn add_availability("), "PlayerSignalPort add_availability 公共契约变化");
 check(adapter.includes("self.add_player_team_period(draft)") && adapter.includes("self.add_player_availability(draft)"), "Application persistence adapter 未保持既有调用语义");
-check(legacy.includes("pub async fn add_player_ability_observation"), "R6-06 Ability owner 被提前迁移或删除");
-const dynamicTags = read("crates/persistence-postgres/src/dynamic_tags.rs");
-check(dynamicTags.includes("pub async fn add_player_dynamic_tag"), "R6-06 Dynamic Tag owner 被提前迁移或删除");
 
 if (failures.length) {
   console.error("R6-05 Team Periods / Availability ownership verification failed:");

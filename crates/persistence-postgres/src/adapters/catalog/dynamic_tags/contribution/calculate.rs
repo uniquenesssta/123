@@ -1,153 +1,19 @@
+use super::scoring::{
+    availability_multiplier, component, component_from_tag, tag_value, CONTRIBUTION_VERSION,
+};
 use crate::{
+    adapters::catalog::dynamic_tags::tags::{map_player_dynamic_tag, PlayerDynamicTagRow},
     role_resolution::{
         normalize_role_origin, resolve_tactical_role, tactical_role_confidence,
         DefaultTacticalRole, ResolvedTacticalRole, ROLE_ORIGIN_PLAYER_POSITION_DEFAULT,
     },
-    PersistenceError, PersistenceResult, PostgresStore,
+    PersistenceResult, PostgresStore,
 };
-use chrono::{DateTime, Utc};
-use football_domain::{
-    ContributionComponent, PlayerDynamicTagDefinitionRecord, PlayerDynamicTagDraft,
-    PlayerDynamicTagRecord, PlayerMatchContribution, PlayerMatchContributionRequest,
-};
-use serde_json::Value;
+use football_domain::{PlayerMatchContribution, PlayerMatchContributionRequest};
 use sqlx::Row;
 use std::collections::HashMap;
-use uuid::Uuid;
-
-const CONTRIBUTION_VERSION: &str = "match-contribution-v2-role-context";
 
 impl PostgresStore {
-    pub async fn list_dynamic_tag_definitions(
-        &self,
-    ) -> PersistenceResult<Vec<PlayerDynamicTagDefinitionRecord>> {
-        let rows = sqlx::query(
-            r#"
-            SELECT code, name, category, minimum_value, maximum_value,
-                   default_value, default_ttl_hours, is_multiplier, description
-            FROM feature.player_dynamic_tag_definitions
-            ORDER BY category, code
-            "#,
-        )
-        .fetch_all(&self.pool)
-        .await?;
-        rows.iter().map(dynamic_tag_definition_from_row).collect()
-    }
-
-    pub async fn add_player_dynamic_tag(
-        &self,
-        draft: &PlayerDynamicTagDraft,
-    ) -> PersistenceResult<PlayerDynamicTagRecord> {
-        validate_dynamic_tag_draft(self, draft).await?;
-        let id = Uuid::new_v4();
-        let row = sqlx::query(
-            r#"
-            INSERT INTO feature.player_dynamic_tags (
-                id, player_id, tag_code, value, label, confidence,
-                observed_at, valid_from, valid_to, competition_id,
-                position_code, opponent_team_id, sample_size, source_type,
-                source_document_id, calculation_version, metadata
-            ) VALUES (
-                $1, $2, $3, $4, $5, $6,
-                $7, $8, $9, $10,
-                $11, $12, $13, $14,
-                $15, $16, $17
-            )
-            RETURNING id
-            "#,
-        )
-        .bind(id)
-        .bind(draft.player_id)
-        .bind(draft.tag_code.trim())
-        .bind(draft.value)
-        .bind(draft.label.as_deref())
-        .bind(draft.confidence)
-        .bind(draft.observed_at)
-        .bind(draft.valid_from)
-        .bind(draft.valid_to)
-        .bind(draft.competition_id)
-        .bind(draft.position_code.as_deref())
-        .bind(draft.opponent_team_id)
-        .bind(draft.sample_size)
-        .bind(draft.source_type.trim())
-        .bind(draft.source_document_id)
-        .bind(draft.calculation_version.trim())
-        .bind(&draft.metadata)
-        .fetch_one(&self.pool)
-        .await?;
-        let inserted_id: Uuid = row.try_get("id")?;
-        self.read_player_dynamic_tag(inserted_id).await
-    }
-
-    pub async fn read_player_dynamic_tag(
-        &self,
-        tag_id: Uuid,
-    ) -> PersistenceResult<PlayerDynamicTagRecord> {
-        let row = sqlx::query(
-            r#"
-            SELECT tag.id, tag.player_id, tag.tag_code, definition.name AS tag_name,
-                   definition.category, tag.value, tag.label, tag.confidence,
-                   tag.observed_at, tag.valid_from, tag.valid_to,
-                   tag.competition_id, competition.name AS competition_name,
-                   tag.position_code, tag.opponent_team_id,
-                   opponent.canonical_name AS opponent_team_name,
-                   tag.sample_size, tag.source_type, tag.calculation_version,
-                   tag.metadata
-            FROM feature.player_dynamic_tags tag
-            JOIN feature.player_dynamic_tag_definitions definition
-              ON definition.code = tag.tag_code
-            LEFT JOIN football.competitions competition ON competition.id = tag.competition_id
-            LEFT JOIN football.teams opponent ON opponent.id = tag.opponent_team_id
-            WHERE tag.id = $1
-            "#,
-        )
-        .bind(tag_id)
-        .fetch_one(&self.pool)
-        .await?;
-        player_dynamic_tag_from_row(&row)
-    }
-
-    pub async fn list_player_dynamic_tags(
-        &self,
-        player_id: Uuid,
-        as_of: DateTime<Utc>,
-    ) -> PersistenceResult<Vec<PlayerDynamicTagRecord>> {
-        let rows = sqlx::query(
-            r#"
-            SELECT DISTINCT ON (
-                       tag.tag_code, tag.competition_id,
-                       tag.position_code, tag.opponent_team_id
-                   )
-                   tag.id, tag.player_id, tag.tag_code,
-                   definition.name AS tag_name, definition.category,
-                   tag.value, tag.label, tag.confidence,
-                   tag.observed_at, tag.valid_from, tag.valid_to,
-                   tag.competition_id, competition.name AS competition_name,
-                   tag.position_code, tag.opponent_team_id,
-                   opponent.canonical_name AS opponent_team_name,
-                   tag.sample_size, tag.source_type,
-                   tag.calculation_version, tag.metadata
-            FROM feature.player_dynamic_tags tag
-            JOIN feature.player_dynamic_tag_definitions definition
-              ON definition.code = tag.tag_code
-            LEFT JOIN football.competitions competition ON competition.id = tag.competition_id
-            LEFT JOIN football.teams opponent ON opponent.id = tag.opponent_team_id
-            WHERE tag.player_id = $1
-              AND tag.valid_from <= $2
-              AND tag.valid_to >= $2
-            ORDER BY tag.tag_code, tag.competition_id NULLS FIRST,
-                     tag.position_code NULLS FIRST,
-                     tag.opponent_team_id NULLS FIRST,
-                     tag.observed_at DESC, tag.id DESC
-            "#,
-        )
-        .bind(player_id)
-        .bind(as_of)
-        .fetch_all(&self.pool)
-        .await?;
-        rows.iter().map(player_dynamic_tag_from_row).collect()
-    }
-
     pub async fn calculate_player_match_contribution(
         &self,
         request: &PlayerMatchContributionRequest,
@@ -314,7 +180,7 @@ impl PostgresStore {
         .fetch_optional(&self.pool)
         .await?;
 
-        let tag_rows = sqlx::query(
+        let tag_rows = sqlx::query_as::<_, PlayerDynamicTagRow>(
             r#"
             SELECT DISTINCT ON (tag.tag_code)
                    tag.id, tag.player_id, tag.tag_code,
@@ -365,9 +231,9 @@ impl PostgresStore {
         .fetch_all(&self.pool)
         .await?;
         let applied_tags = tag_rows
-            .iter()
-            .map(player_dynamic_tag_from_row)
-            .collect::<PersistenceResult<Vec<_>>>()?;
+            .into_iter()
+            .map(map_player_dynamic_tag)
+            .collect::<Vec<_>>();
         let tag_map = applied_tags
             .iter()
             .map(|tag| (tag.tag_code.as_str(), tag))
@@ -459,140 +325,5 @@ impl PostgresStore {
             applied_tags,
             calculation_version: CONTRIBUTION_VERSION.to_string(),
         })
-    }
-}
-
-async fn validate_dynamic_tag_draft(
-    store: &PostgresStore,
-    draft: &PlayerDynamicTagDraft,
-) -> PersistenceResult<()> {
-    if draft.valid_to <= draft.valid_from {
-        return Err(PersistenceError::InvalidState(
-            "动态标签失效时间必须晚于生效时间".to_string(),
-        ));
-    }
-    if !(0.0..=1.0).contains(&draft.confidence) {
-        return Err(PersistenceError::InvalidState(
-            "动态标签 confidence 必须在 0–1 之间".to_string(),
-        ));
-    }
-    if draft.sample_size < 0 {
-        return Err(PersistenceError::InvalidState(
-            "动态标签 sample_size 不能为负数".to_string(),
-        ));
-    }
-    if draft.calculation_version.trim().is_empty() {
-        return Err(PersistenceError::InvalidState(
-            "动态标签 calculation_version 不能为空".to_string(),
-        ));
-    }
-    let range = sqlx::query(
-        r#"
-        SELECT minimum_value, maximum_value
-        FROM feature.player_dynamic_tag_definitions
-        WHERE code = $1
-        "#,
-    )
-    .bind(draft.tag_code.trim())
-    .fetch_optional(&store.pool)
-    .await?
-    .ok_or_else(|| PersistenceError::InvalidState(format!("未知动态标签：{}", draft.tag_code)))?;
-    let minimum: f64 = range.try_get("minimum_value")?;
-    let maximum: f64 = range.try_get("maximum_value")?;
-    if draft.value < minimum || draft.value > maximum {
-        return Err(PersistenceError::InvalidState(format!(
-            "动态标签 {} 的值必须在 {}–{} 之间",
-            draft.tag_code, minimum, maximum
-        )));
-    }
-    Ok(())
-}
-
-fn dynamic_tag_definition_from_row(
-    row: &sqlx::postgres::PgRow,
-) -> PersistenceResult<PlayerDynamicTagDefinitionRecord> {
-    Ok(PlayerDynamicTagDefinitionRecord {
-        code: row.try_get("code")?,
-        name: row.try_get("name")?,
-        category: row.try_get("category")?,
-        minimum_value: row.try_get("minimum_value")?,
-        maximum_value: row.try_get("maximum_value")?,
-        default_value: row.try_get("default_value")?,
-        default_ttl_hours: row.try_get("default_ttl_hours")?,
-        is_multiplier: row.try_get("is_multiplier")?,
-        description: row.try_get("description")?,
-    })
-}
-
-pub(crate) fn player_dynamic_tag_from_row(
-    row: &sqlx::postgres::PgRow,
-) -> PersistenceResult<PlayerDynamicTagRecord> {
-    Ok(PlayerDynamicTagRecord {
-        id: row.try_get("id")?,
-        player_id: row.try_get("player_id")?,
-        tag_code: row.try_get("tag_code")?,
-        tag_name: row.try_get("tag_name")?,
-        category: row.try_get("category")?,
-        value: row.try_get("value")?,
-        label: row.try_get("label")?,
-        confidence: row.try_get("confidence")?,
-        observed_at: row.try_get("observed_at")?,
-        valid_from: row.try_get("valid_from")?,
-        valid_to: row.try_get("valid_to")?,
-        competition_id: row.try_get("competition_id")?,
-        competition_name: row.try_get("competition_name")?,
-        position_code: row.try_get("position_code")?,
-        opponent_team_id: row.try_get("opponent_team_id")?,
-        opponent_team_name: row.try_get("opponent_team_name")?,
-        sample_size: row.try_get("sample_size")?,
-        source_type: row.try_get("source_type")?,
-        calculation_version: row.try_get("calculation_version")?,
-        metadata: row.try_get::<Value, _>("metadata")?,
-    })
-}
-
-fn availability_multiplier(status: Option<&str>) -> f64 {
-    match status.unwrap_or("unknown") {
-        "available" => 1.0,
-        "doubtful" => 0.75,
-        "unavailable" => 0.0,
-        "injured" => 0.15,
-        "suspended" => 0.0,
-        "rested" => 0.85,
-        "returning" => 0.70,
-        _ => 0.80,
-    }
-}
-
-fn tag_value(tags: &HashMap<&str, &PlayerDynamicTagRecord>, code: &str, default: f64) -> f64 {
-    tags.get(code).map(|tag| tag.value).unwrap_or(default)
-}
-
-fn component(
-    code: &str,
-    label: &str,
-    value: f64,
-    confidence: f64,
-    source: impl Into<String>,
-) -> ContributionComponent {
-    ContributionComponent {
-        code: code.to_string(),
-        label: label.to_string(),
-        value,
-        confidence,
-        source: source.into(),
-    }
-}
-
-fn component_from_tag(
-    tags: &HashMap<&str, &PlayerDynamicTagRecord>,
-    code: &str,
-    label: &str,
-    value: f64,
-) -> ContributionComponent {
-    if let Some(tag) = tags.get(code) {
-        component(code, label, value, tag.confidence, tag.source_type.clone())
-    } else {
-        component(code, label, value, 0.5, "default")
     }
 }

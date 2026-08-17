@@ -1,7 +1,7 @@
 use super::row::PlayerAbilityObservationRow;
 use football_domain::PlayerAbilityObservationRecord;
 
-pub(super) fn map_player_ability_observation(
+pub(in crate::adapters::catalog) fn map_player_ability_observation(
     row: PlayerAbilityObservationRow,
 ) -> PlayerAbilityObservationRecord {
     PlayerAbilityObservationRecord {

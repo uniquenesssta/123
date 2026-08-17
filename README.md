@@ -43,6 +43,13 @@ Node 开发依赖固定安装和读取自源码根目录上一级的 `../node_mo
 
 ## 模块化重写执行记录
 
+### R6-06 Abilities 与 Dynamic Tags
+
+- Abilities persistence 已拆入 `adapters/catalog/abilities/{dimensions,observations}/`；Dynamic Tags 已拆入 `adapters/catalog/dynamic_tags/{definitions,tags,contribution}/`，旧 `dynamic_tags.rs` 单文件 owner 删除，Player Detail ability read 复用统一 typed Row/mapper。
+- `PlayerSignalPort`、Domain DTO、Schema、0001–0046 migration、配置、错误语义、战术角色/位置映射、模型保护资产和生产依赖保持不变。
+- implementation gate run `32043516067` 已实际通过 R6-06 ownership、retained R6 ownership、完整 architecture、模型保护、数据库基线、rustfmt、Persistence unit tests、Application check 与 PostgreSQL 16 contract；当前保持 `VERIFYING`，等待阶段 hard gate 与 clean canonical CI。
+
+
 ### R6-05 Team Periods 与 Availability
 
 - Player Team Periods / Availability 写职责已从 `crates/persistence-postgres/src/player_catalog.rs` 收敛到 `adapters/catalog/players/team_periods/` 与 `adapters/catalog/availability/`；输入策略、typed Row、Domain mapper 与 SQL owner 分责，Player Detail 读取继续复用相同 Row/mapper owner。
