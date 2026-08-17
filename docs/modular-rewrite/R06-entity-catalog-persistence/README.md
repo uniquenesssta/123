@@ -21,8 +21,8 @@ R6 按 Teams、Players、Coaches、Formations、Abilities、Dynamic Tags、Avail
 | R6-02 | Team Names 与 Profiles | DONE |
 | R6-03 | Player Directory 与 Detail | DONE |
 | R6-04 | Player Names 与 Positions | DONE |
-| R6-05 | Team Periods 与 Availability | VERIFYING |
-| R6-06 | Abilities 与 Dynamic Tags | BLOCKED |
+| R6-05 | Team Periods 与 Availability | DONE |
+| R6-06 | Abilities 与 Dynamic Tags | READY |
 | R6-07 | Coaches 与 Formation Usage | BLOCKED |
 | R6-08 | Entity Matching 与 References | BLOCKED |
 | R6-09 | Archive / Delete / Force Delete | BLOCKED |
@@ -89,11 +89,11 @@ R6 按 Teams、Players、Coaches、Formations、Abilities、Dynamic Tags、Avail
 - Team Periods / Availability 写 owner 已从 `player_catalog.rs` 收敛到 `adapters/catalog/players/team_periods/` 与 `adapters/catalog/availability/`；validation/input policy、typed Row、Domain mapper 与 SQL owner 分责。
 - Player Detail 的 Team Periods / Availability read 保留读取职责，并复用新的 Row/mapper owner；旧 Detail 重复 mapper/row 已删除。
 - 实施 gate run `32026919056` 已通过 R6-05/R6-03 ownership、完整 architecture、模型保护、database baseline、rustfmt、Persistence unit tests、R6-05 PostgreSQL 16 contract 真实执行与 Application check，并生成生产提交 `6925455224973b08ab697605db182135f58ef1dd`。
-- 阶段 hard gate 首轮 run `32027350874` 因临时 Windows job 缺少声明的 Node 开发依赖 fail-fast；补齐既有安装步骤后，最终 run `32027535476` 的 Windows job `95379993915` 与 PostgreSQL/architecture job `95379993984` 均 `SUCCESS`，覆盖 frontend、rustfmt、workspace Clippy `-D warnings`、workspace tests、R6 ownership、完整 architecture、模型保护/数据库迁移兼容与 R6-03/R6-04/R6-05 PostgreSQL 16 contracts。临时 workflow 在本记录提交中清理；当前节点保持 `VERIFYING`，等待 clean canonical CI，R6-06 继续 `BLOCKED`。
+- 阶段 hard gate 首轮 run `32027350874` 因临时 Windows job 缺少声明的 Node 开发依赖 fail-fast；补齐既有安装步骤后，最终 run `32027535476` 的 Windows job `95379993915` 与 PostgreSQL/architecture job `95379993984` 均 `SUCCESS`，覆盖 frontend、rustfmt、workspace Clippy `-D warnings`、workspace tests、R6 ownership、完整 architecture、模型保护/数据库迁移兼容与 R6-03/R6-04/R6-05 PostgreSQL 16 contracts。临时 workflow 已清理；clean canonical Public Platform CI run `32028645837` / Windows job `95383445833` 为 `SUCCESS`，artifact `9288762564`，SHA-256 `ee8f511b55c03b70c38f77c21937195fa228ca0f318c88837e7cf774c746b644`。R6-05 正式 `DONE`，R6-06 Abilities 与 Dynamic Tags 开放为 `READY`。
 
 ## 当前边界与剩余门禁
 
 - 公共 TeamCatalogPort / PlayerCatalogPort、Tauri command/DTO、Schema、0001–0046 migration、配置、错误语义、用户可观察行为、模型保护资产与生产依赖保持冻结。
 - R6-01、R6-02、R6-03、R6-04 均已 `DONE`。
-- R6-05 Team Periods 与 Availability 为当前唯一 `VERIFYING` 节点；R6-06～R6-10 继续 `BLOCKED`。
+- R6-01～R6-05 均已 `DONE`；R6-06 Abilities 与 Dynamic Tags 为当前唯一 `READY` 节点，R6-07～R6-10 继续 `BLOCKED`。
 - 每个节点完成时必须创建对应 `R06-xx` 实施记录并更新本索引；R6 完成时必须创建 `R06-stage-completion.md`。
