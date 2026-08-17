@@ -1,7 +1,9 @@
 use super::row::PlayerPositionRow;
 use football_domain::PlayerPositionRecord;
 
-pub(super) fn map_player_position(row: PlayerPositionRow) -> PlayerPositionRecord {
+pub(in crate::adapters::catalog::players) fn map_player_position(
+    row: PlayerPositionRow,
+) -> PlayerPositionRecord {
     PlayerPositionRecord {
         id: row.id,
         player_id: row.player_id,

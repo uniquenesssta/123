@@ -1,7 +1,9 @@
 use super::row::PlayerNameRow;
 use football_domain::PlayerNameRecord;
 
-pub(super) fn map_player_name(row: PlayerNameRow) -> PlayerNameRecord {
+pub(in crate::adapters::catalog::players) fn map_player_name(
+    row: PlayerNameRow,
+) -> PlayerNameRecord {
     PlayerNameRecord {
         id: row.id,
         player_id: row.player_id,
