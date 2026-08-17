@@ -23,13 +23,17 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          test "$(git rev-parse HEAD^)" = "6cf5fde3b35bd222bd22dd5bf9d74a2a9787d4dc"
+          canonical="6cf5fde3b35bd222bd22dd5bf9d74a2a9787d4dc"
+          git merge-base --is-ancestor "$canonical" HEAD
+          changed="$(git diff --name-only "$canonical"...HEAD)"
+          test "$changed" = ".github/workflows/r6-05-closeout.yml"
       - name: Record R6-05 canonical success and open R6-06
         shell: bash
         run: |
           set -euo pipefail
           python - <<'PY'
           from pathlib import Path
+          import re
 
           def replace_once(text: str, old: str, new: str, label: str) -> str:
               count = text.count(old)
@@ -37,9 +41,15 @@ jobs:
                   raise SystemExit(f"{label}: expected exactly one match, found {count}")
               return text.replace(old, new, 1)
 
+          def replace_line_regex(text: str, pattern: str, replacement: str, label: str) -> str:
+              updated, count = re.subn(pattern, replacement, text, count=1, flags=re.MULTILINE)
+              if count != 1:
+                  raise SystemExit(f"{label}: expected exactly one match, found {count}")
+              return updated
+
           detail = Path("docs/modular-rewrite/R06-entity-catalog-persistence/R06-05-team-periods-and-availability.md")
           text = detail.read_text(encoding="utf-8")
-          text = replace_once(text, "`VERIFYING`", "`DONE`", "R6-05 status")
+          text = replace_once(text, "## 状态\n\n`VERIFYING`", "## 状态\n\n`DONE`", "R6-05 status heading")
           text = replace_once(
               text,
               "- 临时 R6-05 implementation/recovery/hard-gate/closeout-prep workflows 已从分支 tree 清理；当前提交用于 clean canonical Public Platform CI，节点在该 CI 成功前继续保持 `VERIFYING`。",
@@ -52,12 +62,15 @@ jobs:
           text = stage.read_text(encoding="utf-8")
           text = replace_once(text, "| R6-05 | Team Periods 与 Availability | VERIFYING |", "| R6-05 | Team Periods 与 Availability | DONE |", "stage R6-05 row")
           text = replace_once(text, "| R6-06 | Abilities 与 Dynamic Tags | BLOCKED |", "| R6-06 | Abilities 与 Dynamic Tags | READY |", "stage R6-06 row")
-          old = "- 阶段 hard gate 首轮 run `32027350874` 因临时 Windows job 缺少声明的 Node 开发依赖 fail-fast；补齐既有安装步骤后，最终 run `32027535476` 的 Windows job `95379993915` 与 PostgreSQL/architecture job `95379993984` 均 `SUCCESS`，覆盖 frontend、rustfmt、workspace Clippy `-D warnings`、workspace tests、R6 ownership、完整 architecture、模型保护/数据库迁移兼容与 R6-03/R6-04/R6-05 PostgreSQL 16 contracts。临时 workflow 在本记录提交中清理；当前节点保持 `VERIFYING`，等待 clean canonical CI，R6-06 继续 `BLOCKED`。"
-          new = "- 阶段 hard gate 首轮 run `32027350874` 因临时 Windows job 缺少声明的 Node 开发依赖 fail-fast；补齐既有安装步骤后，最终 run `32027535476` 的 Windows job `95379993915` 与 PostgreSQL/architecture job `95379993984` 均 `SUCCESS`，覆盖 frontend、rustfmt、workspace Clippy `-D warnings`、workspace tests、R6 ownership、完整 architecture、模型保护/数据库迁移兼容与 R6-03/R6-04/R6-05 PostgreSQL 16 contracts。临时 workflow 已清理；clean canonical Public Platform CI run `32028645837` / Windows job `95383445833` 为 `SUCCESS`，artifact `9288762564`，SHA-256 `ee8f511b55c03b70c38f77c21937195fa228ca0f318c88837e7cf774c746b644`。R6-05 正式 `DONE`，R6-06 Abilities 与 Dynamic Tags 开放为 `READY`。"
-          text = replace_once(text, old, new, "stage R6-05 facts")
-          text = replace_once(
+          text = replace_line_regex(
               text,
-              "- R6-05 Team Periods 与 Availability 为当前唯一 `VERIFYING` 节点；R6-06～R6-10 继续 `BLOCKED`。",
+              r"^- 阶段 hard gate 首轮 run `32027350874` 因临时 Windows job 缺少声明的 Node 开发依赖 fail-fast；.*$",
+              "- 阶段 hard gate 首轮 run `32027350874` 因临时 Windows job 缺少声明的 Node 开发依赖 fail-fast；补齐既有安装步骤后，最终 run `32027535476` 的 Windows job `95379993915` 与 PostgreSQL/architecture job `95379993984` 均 `SUCCESS`，覆盖 frontend、rustfmt、workspace Clippy `-D warnings`、workspace tests、R6 ownership、完整 architecture、模型保护/数据库迁移兼容与 R6-03/R6-04/R6-05 PostgreSQL 16 contracts。临时 workflow 已清理；clean canonical Public Platform CI run `32028645837` / Windows job `95383445833` 为 `SUCCESS`，artifact `9288762564`，SHA-256 `ee8f511b55c03b70c38f77c21937195fa228ca0f318c88837e7cf774c746b644`。R6-05 正式 `DONE`，R6-06 Abilities 与 Dynamic Tags 开放为 `READY`。",
+              "stage R6-05 facts",
+          )
+          text = replace_line_regex(
+              text,
+              r"^- R6-05 Team Periods 与 Availability 为当前唯一 `VERIFYING` 节点；R6-06～R6-10 继续 `BLOCKED`。$",
               "- R6-01～R6-05 均已 `DONE`；R6-06 Abilities 与 Dynamic Tags 为当前唯一 `READY` 节点，R6-07～R6-10 继续 `BLOCKED`。",
               "stage current boundary",
           )
@@ -65,9 +78,12 @@ jobs:
 
           root = Path("README.md")
           text = root.read_text(encoding="utf-8")
-          old = "- 阶段 hard gate 首轮 run `32027350874` 仅因临时 Windows job 未安装声明的 Node 开发依赖而在 frontend gate fail-fast；补齐既有 `npm run setup` 环境后，最终 run `32027535476` 整体 `SUCCESS`：Windows job `95379993915` 的 frontend、rustfmt、workspace Clippy `-D warnings`、workspace tests 全部通过；PostgreSQL/architecture job `95379993984` 的 R6 ownership、完整 architecture、模型保护/数据库迁移兼容门禁及 R6-03/R6-04/R6-05 PostgreSQL 16 contracts 全部通过。当前节点保持 `VERIFYING`，等待 clean canonical CI 后关闭。"
-          new = "- 阶段 hard gate 首轮 run `32027350874` 仅因临时 Windows job 未安装声明的 Node 开发依赖而在 frontend gate fail-fast；补齐既有 `npm run setup` 环境后，最终 run `32027535476` 整体 `SUCCESS`：Windows job `95379993915` 的 frontend、rustfmt、workspace Clippy `-D warnings`、workspace tests 全部通过；PostgreSQL/architecture job `95379993984` 的 R6 ownership、完整 architecture、模型保护/数据库迁移兼容门禁及 R6-03/R6-04/R6-05 PostgreSQL 16 contracts 全部通过。临时 workflow 已清理；clean canonical Public Platform CI run `32028645837` / Windows job `95383445833` 为 `SUCCESS`，artifact `9288762564`，SHA-256 `ee8f511b55c03b70c38f77c21937195fa228ca0f318c88837e7cf774c746b644`。R6-05 已正式关闭为 `DONE`，R6-06 Abilities 与 Dynamic Tags 开放为 `READY`；用户现有 PostgreSQL 数据真实写入/sample 验收与 Windows Full 人工交互验收继续保留到最终统一验收。"
-          text = replace_once(text, old, new, "root R6-05 closeout")
+          text = replace_line_regex(
+              text,
+              r"^- 阶段 hard gate 首轮 run `32027350874` 仅因临时 Windows job 未安装声明的 Node 开发依赖而在 frontend gate fail-fast；.*当前节点保持 `VERIFYING`，等待 clean canonical CI 后关闭。$",
+              "- 阶段 hard gate 首轮 run `32027350874` 仅因临时 Windows job 未安装声明的 Node 开发依赖而在 frontend gate fail-fast；补齐既有 `npm run setup` 环境后，最终 run `32027535476` 整体 `SUCCESS`：Windows job `95379993915` 的 frontend、rustfmt、workspace Clippy `-D warnings`、workspace tests 全部通过；PostgreSQL/architecture job `95379993984` 的 R6 ownership、完整 architecture、模型保护/数据库迁移兼容门禁及 R6-03/R6-04/R6-05 PostgreSQL 16 contracts 全部通过。临时 workflow 已清理；clean canonical Public Platform CI run `32028645837` / Windows job `95383445833` 为 `SUCCESS`，artifact `9288762564`，SHA-256 `ee8f511b55c03b70c38f77c21937195fa228ca0f318c88837e7cf774c746b644`。R6-05 已正式关闭为 `DONE`，R6-06 Abilities 与 Dynamic Tags 开放为 `READY`；用户现有 PostgreSQL 数据真实写入/sample 验收与 Windows Full 人工交互验收继续保留到最终统一验收。",
+              "root R6-05 closeout",
+          )
           root.write_text(text, encoding="utf-8")
           PY
       - name: Remove temporary workflow and commit closeout
