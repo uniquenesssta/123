@@ -2,7 +2,7 @@
 
 ## 状态
 
-`VERIFYING`
+`DONE`
 
 ## 进入基线
 
@@ -46,10 +46,16 @@
 - R6-04 推进后，`scripts/verify-player-directory-detail.mjs` 只把 R6-03 对 Names/Positions 的“后续 owner 尚未迁移”断言跟随到 R6-04 新 owner；R6-03 Directory/Detail、Dynamic Tag 与后续 R6-05/R6-06/R6-09 边界断言保持。
 - 临时 `.github/workflows/r6-04-hard-gate.yml` 已在成功后删除。
 
+## 正式收口
+
+- PR #35 fixed head `9d979d627d3e2495788b4e6873ff4293f191a9d4` 的 clean canonical Public Platform CI run `31970247969` / Windows job `95221509718` 为 `SUCCESS`。
+- PR #35 已按 fixed head squash merge 到 `rewrite/r6-entity-catalog-persistence`，merge commit `40f83e72deabf6cdbd927d3460926f3419e9097d`。
+- merged-stage canonical Public Platform CI run `32019769202` / Windows job `95356807701` 为 `SUCCESS`；artifact `9285658232`，SHA-256 `0a01715e1bfe6ca2bf092e6f00c1c1e4847e74b7475cd7832f39ebd9882bc58f`。
+- R6-04 正式关闭为 `DONE`，R6-05 Team Periods 与 Availability 开放为 `READY`。
+
 ## 尚未执行
 
-- clean PR canonical 与 merged-stage canonical gate。
-- 用户现有 PostgreSQL 数据真实写入/sample 验收与 Windows Full 人工交互验收。
+- 用户现有 PostgreSQL 数据真实写入/sample 验收与 Windows Full 人工交互验收；该项继续保留到最终统一验收，不作为本节点已执行事实。
 
 ## 回退点
 

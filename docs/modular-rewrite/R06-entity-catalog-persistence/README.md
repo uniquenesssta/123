@@ -20,8 +20,8 @@ R6 按 Teams、Players、Coaches、Formations、Abilities、Dynamic Tags、Avail
 | R6-01 | Team Directory 与 Detail | DONE |
 | R6-02 | Team Names 与 Profiles | DONE |
 | R6-03 | Player Directory 与 Detail | DONE |
-| R6-04 | Player Names 与 Positions | VERIFYING |
-| R6-05 | Team Periods 与 Availability | BLOCKED |
+| R6-04 | Player Names 与 Positions | DONE |
+| R6-05 | Team Periods 与 Availability | READY |
 | R6-06 | Abilities 与 Dynamic Tags | BLOCKED |
 | R6-07 | Coaches 与 Formation Usage | BLOCKED |
 | R6-08 | Entity Matching 与 References | BLOCKED |
@@ -81,11 +81,11 @@ R6 按 Teams、Players、Coaches、Formations、Abilities、Dynamic Tags、Avail
 - Player Detail Names/Positions read 保留原读取职责，并复用新 Row/mapper owner；旧 Detail 重复 mapper/row 已删除。
 - 临时实施 gate run `31969378628` 已通过 R6-04 ownership、official Domain inventory、完整 architecture、rustfmt、Persistence unit tests、R6-04 contract 编译和 Application check。
 - 阶段 hard gate run `31969619201` 整体 `SUCCESS`：Windows job `95219904073` 已通过 frontend、rustfmt、workspace Clippy `-D warnings` 与 workspace tests；PostgreSQL/architecture job `95219904082` 已通过 R6-01～R6-04 ownership、完整 architecture、模型保护/数据库迁移兼容门禁以及 R6-03/R6-04 PostgreSQL 16 真实 contracts。R6-03 verifier 只跟随 Names/Positions 新 owner 更新，未放宽原契约。临时 hard-gate workflow 已清理。
-- 当前状态 `VERIFYING`；仅剩 clean PR canonical、合并与 merged-stage canonical，R6-05 继续 `BLOCKED`。
+- PR #35 fixed head `9d979d627d3e2495788b4e6873ff4293f191a9d4` 的 clean canonical run `31970247969` / Windows job `95221509718` 为 `SUCCESS`；已 squash merge 为 `40f83e72deabf6cdbd927d3460926f3419e9097d`。merged-stage canonical run `32019769202` / Windows job `95356807701` 为 `SUCCESS`；artifact `9285658232`，SHA-256 `0a01715e1bfe6ca2bf092e6f00c1c1e4847e74b7475cd7832f39ebd9882bc58f`。R6-04 正式 `DONE`，R6-05 开放为 `READY`。
 
 ## 当前边界与剩余门禁
 
 - 公共 TeamCatalogPort / PlayerCatalogPort、Tauri command/DTO、Schema、0001–0046 migration、配置、错误语义、用户可观察行为、模型保护资产与生产依赖保持冻结。
-- R6-01、R6-02、R6-03 均已 `DONE`。
-- R6-04 Player Names 与 Positions 为当前唯一 `VERIFYING` 节点；R6-05～R6-10 继续 `BLOCKED`。
+- R6-01、R6-02、R6-03、R6-04 均已 `DONE`。
+- R6-05 Team Periods 与 Availability 为当前唯一 `READY` 节点；R6-06～R6-10 继续 `BLOCKED`。
 - 每个节点完成时必须创建对应 `R06-xx` 实施记录并更新本索引；R6 完成时必须创建 `R06-stage-completion.md`。
