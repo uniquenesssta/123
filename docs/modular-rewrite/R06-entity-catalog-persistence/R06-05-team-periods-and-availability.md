@@ -74,7 +74,7 @@ A	scripts/verify-player-team-periods-availability.mjs
 
 - 首轮 run `32027350874`：PostgreSQL/architecture job `95379437131` 为 `SUCCESS`；Windows job `95379437125` 在 `npm run verify:frontend` 运行到 `verify-searchable-select-diagnostics.mjs` 时因临时 workflow 未安装声明的 `typescript` 开发依赖而 fail-fast。未修改生产依赖、未跳过或放宽验证。
 - 修正验证环境后，最终 run `32027535476` 整体 `SUCCESS`：Windows job `95379993915` 已通过 `npm run verify:frontend`、`cargo fmt --all -- --check`、workspace Clippy `-D warnings` 与 `cargo test --locked --workspace`；PostgreSQL/architecture job `95379993984` 已通过 R6 ownership、完整 architecture、public model/protected assets/database baseline/database migration compatibility，以及 R6-03、R6-04、R6-05 PostgreSQL 16 retained contracts。
-- 当前节点保持 `VERIFYING`，等待临时 workflow 清理后的 clean canonical Public Platform CI。
+- 临时 R6-05 implementation/recovery/hard-gate/closeout-prep workflows 已从分支 tree 清理；当前提交用于 clean canonical Public Platform CI，节点在该 CI 成功前继续保持 `VERIFYING`。
 
 ## 尚未执行
 
