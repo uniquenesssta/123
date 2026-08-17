@@ -60,3 +60,22 @@ if old_dynamic not in text:
     raise SystemExit('R6-03 dynamic tag retained block not found')
 text = text.replace(old_dynamic, new_dynamic, 1)
 path.write_text(text, encoding='utf-8')
+
+# Dynamic Tag contribution is a sibling of tags under the same dynamic_tags owner.
+# The shared typed Row and mapper remain internal to dynamic_tags, but must be visible
+# to that sibling module. Keep them narrower than crate-wide visibility.
+mapper_path = Path('crates/persistence-postgres/src/adapters/catalog/dynamic_tags/tags/mapper.rs')
+mapper = mapper_path.read_text(encoding='utf-8')
+old_mapper = 'pub(super) fn map_player_dynamic_tag(row: PlayerDynamicTagRow) -> PlayerDynamicTagRecord {'
+new_mapper = 'pub(in crate::adapters::catalog::dynamic_tags) fn map_player_dynamic_tag(row: PlayerDynamicTagRow) -> PlayerDynamicTagRecord {'
+if old_mapper not in mapper:
+    raise SystemExit('dynamic tag mapper visibility marker not found')
+mapper_path.write_text(mapper.replace(old_mapper, new_mapper, 1), encoding='utf-8')
+
+row_path = Path('crates/persistence-postgres/src/adapters/catalog/dynamic_tags/tags/row.rs')
+row = row_path.read_text(encoding='utf-8')
+old_row = 'pub(super) struct PlayerDynamicTagRow {'
+new_row = 'pub(in crate::adapters::catalog::dynamic_tags) struct PlayerDynamicTagRow {'
+if old_row not in row:
+    raise SystemExit('dynamic tag row visibility marker not found')
+row_path.write_text(row.replace(old_row, new_row, 1), encoding='utf-8')
