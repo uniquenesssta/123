@@ -1,5 +1,7 @@
-use super::{mapper::map_player_availability, row::PlayerAvailabilityRow};
-use crate::{PersistenceResult, PostgresStore};
+use crate::{
+    adapters::catalog::availability::{map_player_availability, PlayerAvailabilityRow},
+    PersistenceResult, PostgresStore,
+};
 use football_domain::PlayerAvailabilityRecord;
 use uuid::Uuid;
 

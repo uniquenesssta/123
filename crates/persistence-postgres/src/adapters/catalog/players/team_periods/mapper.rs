@@ -1,7 +1,9 @@
 use super::row::PlayerTeamPeriodRow;
 use football_domain::PlayerTeamPeriodRecord;
 
-pub(super) fn map_player_team_period(row: PlayerTeamPeriodRow) -> PlayerTeamPeriodRecord {
+pub(in crate::adapters::catalog::players) fn map_player_team_period(
+    row: PlayerTeamPeriodRow,
+) -> PlayerTeamPeriodRecord {
     PlayerTeamPeriodRecord {
         id: row.id,
         player_id: row.player_id,

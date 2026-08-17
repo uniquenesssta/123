@@ -2,7 +2,7 @@ use super::row::PlayerAvailabilityRow;
 use crate::{adapters::catalog::players::value_mapping::availability_status, PersistenceResult};
 use football_domain::PlayerAvailabilityRecord;
 
-pub(super) fn map_player_availability(
+pub(in crate::adapters::catalog) fn map_player_availability(
     row: PlayerAvailabilityRow,
 ) -> PersistenceResult<PlayerAvailabilityRecord> {
     Ok(PlayerAvailabilityRecord {

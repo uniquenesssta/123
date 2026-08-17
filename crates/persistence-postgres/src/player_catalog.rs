@@ -11,8 +11,7 @@ use football_domain::{
     ExternalEntityIdDraft, ExternalEntityIdRecord, LineupDraft, LineupHistoryRemovalResult,
     LineupPairDraft, LineupPairRecord, LineupPlayerRecord, LineupRecord, LineupType, MatchDraft,
     MatchRecord, MatchStatus, PlayerAbilityObservationDraft, PlayerAbilityObservationRecord,
-    PlayerAvailabilityDraft, PlayerAvailabilityRecord, PlayerCatalogReferenceData,
-    PlayerTeamPeriodDraft, PlayerTeamPeriodRecord, PositionReference, SeasonTeamMembershipOption,
+    PlayerCatalogReferenceData, PositionReference, SeasonTeamMembershipOption,
 };
 use serde_json::json;
 use sqlx::{Postgres, Row, Transaction};
@@ -110,119 +109,6 @@ impl PostgresStore {
             .await?;
         tx.commit().await?;
         Ok(())
-    }
-
-    pub async fn add_player_team_period(
-        &self,
-        draft: &PlayerTeamPeriodDraft,
-    ) -> PersistenceResult<PlayerTeamPeriodRecord> {
-        if draft
-            .valid_to
-            .as_ref()
-            .is_some_and(|valid_to| valid_to < &draft.valid_from)
-        {
-            return Err(PersistenceError::InvalidState(
-                "球队效力结束日期不能早于开始日期".to_string(),
-            ));
-        }
-        if draft
-            .squad_number
-            .is_some_and(|number| !(0..=99).contains(&number))
-        {
-            return Err(PersistenceError::InvalidState(
-                "球衣号码必须位于 0–99".to_string(),
-            ));
-        }
-        let row = sqlx::query(
-            r#"
-            WITH inserted AS (
-                INSERT INTO football.player_team_periods (
-                    id, player_id, team_id, season_id, squad_number,
-                    valid_from, valid_to, registration_status, source_document_id
-                ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
-                RETURNING *
-            )
-            SELECT
-                inserted.id, inserted.player_id, inserted.team_id,
-                team.canonical_name AS team_name,
-                inserted.season_id, season.name AS season_name,
-                inserted.squad_number, inserted.valid_from, inserted.valid_to,
-                inserted.registration_status
-            FROM inserted
-            JOIN football.teams team ON team.id = inserted.team_id
-            LEFT JOIN football.seasons season ON season.id = inserted.season_id
-            "#,
-        )
-        .bind(Uuid::new_v4())
-        .bind(draft.player_id)
-        .bind(draft.team_id)
-        .bind(draft.season_id)
-        .bind(draft.squad_number)
-        .bind(draft.valid_from)
-        .bind(draft.valid_to)
-        .bind(draft.registration_status.trim())
-        .bind(draft.source_document_id)
-        .fetch_one(&self.pool)
-        .await?;
-        player_team_period_from_row(&row)
-    }
-
-    pub async fn add_player_availability(
-        &self,
-        draft: &PlayerAvailabilityDraft,
-    ) -> PersistenceResult<PlayerAvailabilityRecord> {
-        if !(0.0..=1.0).contains(&draft.confidence) {
-            return Err(PersistenceError::InvalidState(
-                "可用性可信度必须位于 0–1".to_string(),
-            ));
-        }
-        if draft
-            .valid_to
-            .as_ref()
-            .is_some_and(|valid_to| valid_to < &draft.valid_from)
-        {
-            return Err(PersistenceError::InvalidState(
-                "可用性结束时间不能早于开始时间".to_string(),
-            ));
-        }
-        let row = sqlx::query(
-            r#"
-            WITH inserted AS (
-                INSERT INTO football.player_availability (
-                    id, player_id, team_id, competition_id, status, reason,
-                    confidence, valid_from, valid_to, source_document_id, metadata
-                ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
-                RETURNING *
-            )
-            SELECT
-                inserted.id, inserted.player_id, inserted.team_id,
-                team.canonical_name AS team_name, inserted.competition_id,
-                inserted.status, inserted.reason, inserted.confidence,
-                inserted.valid_from, inserted.valid_to, inserted.created_at
-            FROM inserted
-            LEFT JOIN football.teams team ON team.id = inserted.team_id
-            "#,
-        )
-        .bind(Uuid::new_v4())
-        .bind(draft.player_id)
-        .bind(draft.team_id)
-        .bind(draft.competition_id)
-        .bind(draft.status.as_str())
-        .bind(
-            draft
-                .reason
-                .as_deref()
-                .map(str::trim)
-                .filter(|value| !value.is_empty()),
-        )
-        .bind(draft.confidence)
-        .bind(draft.valid_from)
-        .bind(draft.valid_to)
-        .bind(draft.source_document_id)
-        .bind(&draft.metadata)
-        .fetch_one(&self.pool)
-        .await?;
-        player_availability_from_row(&row)
     }
 
     pub async fn add_player_ability_observation(
@@ -1501,42 +1387,6 @@ fn data_provider_from_row(row: &sqlx::postgres::PgRow) -> PersistenceResult<Data
         provider_type: row.try_get("provider_type")?,
         base_url: row.try_get("base_url")?,
         is_active: row.try_get("is_active")?,
-    })
-}
-
-fn player_team_period_from_row(
-    row: &sqlx::postgres::PgRow,
-) -> PersistenceResult<PlayerTeamPeriodRecord> {
-    Ok(PlayerTeamPeriodRecord {
-        id: row.try_get("id")?,
-        player_id: row.try_get("player_id")?,
-        team_id: row.try_get("team_id")?,
-        team_name: row.try_get("team_name")?,
-        season_id: row.try_get("season_id")?,
-        season_name: row.try_get("season_name")?,
-        squad_number: row.try_get("squad_number")?,
-        valid_from: row.try_get("valid_from")?,
-        valid_to: row.try_get("valid_to")?,
-        registration_status: row.try_get("registration_status")?,
-    })
-}
-
-fn player_availability_from_row(
-    row: &sqlx::postgres::PgRow,
-) -> PersistenceResult<PlayerAvailabilityRecord> {
-    let status: String = row.try_get("status")?;
-    Ok(PlayerAvailabilityRecord {
-        id: row.try_get("id")?,
-        player_id: row.try_get("player_id")?,
-        team_id: row.try_get("team_id")?,
-        team_name: row.try_get("team_name")?,
-        competition_id: row.try_get("competition_id")?,
-        status: availability_status(&status)?,
-        reason: row.try_get("reason")?,
-        confidence: row.try_get("confidence")?,
-        valid_from: row.try_get("valid_from")?,
-        valid_to: row.try_get("valid_to")?,
-        created_at: row.try_get("created_at")?,
     })
 }
 

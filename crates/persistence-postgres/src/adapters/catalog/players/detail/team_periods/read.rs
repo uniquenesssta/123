@@ -1,5 +1,7 @@
-use super::{mapper::map_player_team_period, row::PlayerTeamPeriodRow};
-use crate::PersistenceResult;
+use crate::{
+    adapters::catalog::players::team_periods::{map_player_team_period, PlayerTeamPeriodRow},
+    PersistenceResult,
+};
 use football_domain::PlayerTeamPeriodRecord;
 use sqlx::PgPool;
 use uuid::Uuid;

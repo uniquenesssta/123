@@ -43,6 +43,13 @@ Node 开发依赖固定安装和读取自源码根目录上一级的 `../node_mo
 
 ## 模块化重写执行记录
 
+### R6-05 Team Periods 与 Availability
+
+- Player Team Periods / Availability 写职责已从 `crates/persistence-postgres/src/player_catalog.rs` 收敛到 `adapters/catalog/players/team_periods/` 与 `adapters/catalog/availability/`；输入策略、typed Row、Domain mapper 与 SQL owner 分责，Player Detail 读取继续复用相同 Row/mapper owner。
+- `PlayerCatalogPort::add_player_team_period`、`PlayerSignalPort::add_availability`、Domain DTO、Schema、0001–0046 migration、错误语义、历史 P4/运行引用和用户可观察行为保持不变；未新增生产依赖。
+- 临时实施 gate run `32026919056` 在提交前执行 R6-05 ownership、R6-03 retained ownership、完整 architecture、模型保护/数据库基线、rustfmt、Persistence unit tests、R6-05 PostgreSQL 16 contract 真实执行及 Application check；只有全部成功才生成本次生产提交。
+- 当前节点为 `VERIFYING`；阶段 hard gate、clean canonical CI 与临时 workflow 清理完成前不得标记 `DONE`。
+
 ### R6-04 Player Names 与 Positions
 
 - Player Names / Positions 写职责已从 `crates/persistence-postgres/src/player_catalog.rs` 收敛到 `adapters/catalog/players/{names,positions}/`，输入策略、typed Row、Domain mapper 与 SQL/事务 owner 分责；Player Detail 读取继续保留在 `detail/`，并复用新的 Names/Positions Row/mapper owner。

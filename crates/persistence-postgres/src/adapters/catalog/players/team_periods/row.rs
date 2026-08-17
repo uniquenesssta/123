@@ -3,7 +3,7 @@ use sqlx::FromRow;
 use uuid::Uuid;
 
 #[derive(Debug, FromRow)]
-pub(super) struct PlayerTeamPeriodRow {
+pub(in crate::adapters::catalog::players) struct PlayerTeamPeriodRow {
     pub id: Uuid,
     pub player_id: Uuid,
     pub team_id: Uuid,
