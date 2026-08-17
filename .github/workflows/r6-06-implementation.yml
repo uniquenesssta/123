@@ -60,7 +60,7 @@ jobs:
         with:
           workspaces: . -> ../.cargo-target
 
-      - name: Apply R6-06 modular migration in checkout
+      - name: Apply R6-06 modular migration and scoped recovery
         shell: bash
         run: |
           set -euo pipefail
