@@ -1,0 +1,93 @@
+name: R6-04 closeout doc sync
+
+on:
+  push:
+    branches:
+      - rewrite/r6-entity-catalog-persistence
+    paths:
+      - .github/workflows/r6-04-closeout-doc-sync.yml
+
+permissions:
+  contents: write
+
+jobs:
+  sync-closeout:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout stage branch
+        uses: actions/checkout@v4
+        with:
+          ref: rewrite/r6-entity-catalog-persistence
+          fetch-depth: 0
+
+      - name: Patch canonical closeout records
+        shell: python
+        run: |
+          from pathlib import Path
+
+          def replace_once(path: str, old: str, new: str) -> None:
+              p = Path(path)
+              text = p.read_text(encoding="utf-8")
+              count = text.count(old)
+              if count != 1:
+                  raise SystemExit(f"{path}: expected exactly one match, got {count}")
+              p.write_text(text.replace(old, new, 1), encoding="utf-8", newline="\n")
+
+          replace_once(
+              "README.md",
+              "- 阶段 hard gate run `31969619201` 已整体 `SUCCESS`：Windows job `95219904073` 的 `npm run verify:frontend`、rustfmt、workspace Clippy `-D warnings` 与 workspace tests 全部通过；PostgreSQL/architecture job `95219904082` 的 R6-01～R6-04 ownership、完整 architecture、模型保护/数据库迁移兼容门禁、R6-03 retained PG16 contract 与 R6-04 PG16 contract 全部通过。R6-03 ownership verifier 仅跟随 Names/Positions 新 owner 更新，原 R6-03 契约未删除或放宽；临时 hard-gate workflow 已清理。当前节点继续 `VERIFYING`，仅剩 clean PR canonical、合并与 merged-stage canonical 收口。",
+              "- 阶段 hard gate run `31969619201` 已整体 `SUCCESS`：Windows job `95219904073` 的 `npm run verify:frontend`、rustfmt、workspace Clippy `-D warnings` 与 workspace tests 全部通过；PostgreSQL/architecture job `95219904082` 的 R6-01～R6-04 ownership、完整 architecture、模型保护/数据库迁移兼容门禁、R6-03 retained PG16 contract 与 R6-04 PG16 contract 全部通过。PR #35 fixed head `9d979d627d3e2495788b4e6873ff4293f191a9d4` 的 clean canonical run `31970247969` / Windows job `95221509718` 为 `SUCCESS`；PR 已 squash merge 为 `40f83e72deabf6cdbd927d3460926f3419e9097d`。merged-stage canonical run `32019769202` / Windows job `95356807701` 为 `SUCCESS`；artifact `9285658232`，SHA-256 `0a01715e1bfe6ca2bf092e6f00c1c1e4847e74b7475cd7832f39ebd9882bc58f`。R6-04 已正式关闭为 `DONE`，R6-05 Team Periods 与 Availability 开放为 `READY`。用户现有 PostgreSQL 数据真实写入/sample 验收与 Windows Full 人工交互验收仍未执行。"
+          )
+
+          replace_once(
+              "docs/modular-rewrite/R06-entity-catalog-persistence/R06-04-player-names-and-positions.md",
+              "## 状态\n\n`VERIFYING`",
+              "## 状态\n\n`DONE`"
+          )
+          replace_once(
+              "docs/modular-rewrite/R06-entity-catalog-persistence/R06-04-player-names-and-positions.md",
+              "## 尚未执行\n\n- clean PR canonical 与 merged-stage canonical gate。\n- 用户现有 PostgreSQL 数据真实写入/sample 验收与 Windows Full 人工交互验收。",
+              "## 正式收口\n\n- PR #35 fixed head `9d979d627d3e2495788b4e6873ff4293f191a9d4` 的 clean canonical Public Platform CI run `31970247969` / Windows job `95221509718` 为 `SUCCESS`。\n- PR #35 已按 fixed head squash merge 到 `rewrite/r6-entity-catalog-persistence`，merge commit `40f83e72deabf6cdbd927d3460926f3419e9097d`。\n- merged-stage canonical Public Platform CI run `32019769202` / Windows job `95356807701` 为 `SUCCESS`；artifact `9285658232`，SHA-256 `0a01715e1bfe6ca2bf092e6f00c1c1e4847e74b7475cd7832f39ebd9882bc58f`。\n- R6-04 正式关闭为 `DONE`，R6-05 Team Periods 与 Availability 开放为 `READY`。\n\n## 尚未执行\n\n- 用户现有 PostgreSQL 数据真实写入/sample 验收与 Windows Full 人工交互验收；该项继续保留到最终统一验收，不作为本节点已执行事实。"
+          )
+
+          stage = "docs/modular-rewrite/R06-entity-catalog-persistence/README.md"
+          replace_once(stage, "| R6-04 | Player Names 与 Positions | VERIFYING |", "| R6-04 | Player Names 与 Positions | DONE |")
+          replace_once(stage, "| R6-05 | Team Periods 与 Availability | BLOCKED |", "| R6-05 | Team Periods 与 Availability | READY |")
+          replace_once(
+              stage,
+              "- 当前状态 `VERIFYING`；仅剩 clean PR canonical、合并与 merged-stage canonical，R6-05 继续 `BLOCKED`。",
+              "- PR #35 fixed head `9d979d627d3e2495788b4e6873ff4293f191a9d4` 的 clean canonical run `31970247969` / Windows job `95221509718` 为 `SUCCESS`；已 squash merge 为 `40f83e72deabf6cdbd927d3460926f3419e9097d`。merged-stage canonical run `32019769202` / Windows job `95356807701` 为 `SUCCESS`；artifact `9285658232`，SHA-256 `0a01715e1bfe6ca2bf092e6f00c1c1e4847e74b7475cd7832f39ebd9882bc58f`。R6-04 正式 `DONE`，R6-05 开放为 `READY`。"
+          )
+          replace_once(
+              stage,
+              "- R6-01、R6-02、R6-03 均已 `DONE`。\n- R6-04 Player Names 与 Positions 为当前唯一 `VERIFYING` 节点；R6-05～R6-10 继续 `BLOCKED`。",
+              "- R6-01、R6-02、R6-03、R6-04 均已 `DONE`。\n- R6-05 Team Periods 与 Availability 为当前唯一 `READY` 节点；R6-06～R6-10 继续 `BLOCKED`。"
+          )
+
+      - name: Verify closeout-only scope
+        shell: bash
+        run: |
+          set -euo pipefail
+          git diff --check
+          changed="$(git status --short | awk '{print $2}' | sort)"
+          expected="$(printf '%s\n' \
+            '.github/workflows/r6-04-closeout-doc-sync.yml' \
+            'README.md' \
+            'docs/modular-rewrite/R06-entity-catalog-persistence/R06-04-player-names-and-positions.md' \
+            'docs/modular-rewrite/R06-entity-catalog-persistence/README.md' | sort)"
+          test "$changed" = "$expected"
+          grep -Fq '`DONE`' docs/modular-rewrite/R06-entity-catalog-persistence/R06-04-player-names-and-positions.md
+          grep -Fq '| R6-04 | Player Names 与 Positions | DONE |' docs/modular-rewrite/R06-entity-catalog-persistence/README.md
+          grep -Fq '| R6-05 | Team Periods 与 Availability | READY |' docs/modular-rewrite/R06-entity-catalog-persistence/README.md
+          grep -Fq 'merged-stage canonical run `32019769202`' README.md
+
+      - name: Commit closeout and remove temporary workflow
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git rm .github/workflows/r6-04-closeout-doc-sync.yml
+          git add README.md docs/modular-rewrite/R06-entity-catalog-persistence/R06-04-player-names-and-positions.md docs/modular-rewrite/R06-entity-catalog-persistence/README.md
+          git commit -m "docs(r6-04): close node and open r6-05"
+          git push origin HEAD:rewrite/r6-entity-catalog-persistence
