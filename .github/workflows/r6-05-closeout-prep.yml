@@ -1,0 +1,80 @@
+name: R6-05 closeout prep
+
+on:
+  push:
+    branches:
+      - rewrite/r6-entity-catalog-persistence
+    paths:
+      - .github/workflows/r6-05-closeout-prep.yml
+
+permissions:
+  contents: write
+
+jobs:
+  sync-and-clean:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: rewrite/r6-entity-catalog-persistence
+          fetch-depth: 0
+      - name: Verify expected hard-gate parent
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$(git rev-parse HEAD^)" = "4fbff21c298e05bc031bb491cbb47a72430f88ac"
+          test -z "$(git status --porcelain)"
+      - name: Record hard gate results
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          from pathlib import Path
+
+          def replace_once(path, old, new):
+              p = Path(path)
+              text = p.read_text(encoding='utf-8')
+              if text.count(old) != 1:
+                  raise SystemExit(f'{path}: expected exactly one replacement target, found {text.count(old)}')
+              p.write_text(text.replace(old, new, 1), encoding='utf-8')
+
+          replace_once(
+              'README.md',
+              '- 临时实施 gate run `32026919056` 在提交前执行 R6-05 ownership、R6-03 retained ownership、完整 architecture、模型保护/数据库基线、rustfmt、Persistence unit tests、R6-05 PostgreSQL 16 contract 真实执行及 Application check；只有全部成功才生成本次生产提交。\n- 当前节点为 `VERIFYING`；阶段 hard gate、clean canonical CI 与临时 workflow 清理完成前不得标记 `DONE`。',
+              '- 临时实施 gate run `32026919056` 已通过 R6-05 ownership、R6-03 retained ownership、完整 architecture、模型保护/数据库基线、rustfmt、Persistence unit tests、R6-05 PostgreSQL 16 contract 真实执行及 Application check，随后生成生产提交 `6925455224973b08ab697605db182135f58ef1dd`。\n- 阶段 hard gate 首轮 run `32027350874` 仅因临时 Windows job 未安装声明的 Node 开发依赖而在 frontend gate fail-fast；补齐既有 `npm run setup` 环境后，最终 run `32027535476` 整体 `SUCCESS`：Windows job `95379993915` 的 frontend、rustfmt、workspace Clippy `-D warnings`、workspace tests 全部通过；PostgreSQL/architecture job `95379993984` 的 R6 ownership、完整 architecture、模型保护/数据库迁移兼容门禁及 R6-03/R6-04/R6-05 PostgreSQL 16 contracts 全部通过。当前节点保持 `VERIFYING`，等待 clean canonical CI 后关闭。'
+          )
+
+          replace_once(
+              'docs/modular-rewrite/R06-entity-catalog-persistence/README.md',
+              '- 实施 gate run `32026919056` 只有在 R6-05/R6-03 ownership、完整 architecture、模型保护、database baseline、rustfmt、Persistence unit tests、R6-05 PostgreSQL 16 contract 真实执行与 Application check 全部成功后才会提交生产变更。\n- 当前节点保持 `VERIFYING`；R6-06 继续 `BLOCKED`，等待阶段 hard gate、clean canonical CI 与临时 workflow 清理。',
+              '- 实施 gate run `32026919056` 已通过 R6-05/R6-03 ownership、完整 architecture、模型保护、database baseline、rustfmt、Persistence unit tests、R6-05 PostgreSQL 16 contract 真实执行与 Application check，并生成生产提交 `6925455224973b08ab697605db182135f58ef1dd`。\n- 阶段 hard gate 首轮 run `32027350874` 因临时 Windows job 缺少声明的 Node 开发依赖 fail-fast；补齐既有安装步骤后，最终 run `32027535476` 的 Windows job `95379993915` 与 PostgreSQL/architecture job `95379993984` 均 `SUCCESS`，覆盖 frontend、rustfmt、workspace Clippy `-D warnings`、workspace tests、R6 ownership、完整 architecture、模型保护/数据库迁移兼容与 R6-03/R6-04/R6-05 PostgreSQL 16 contracts。临时 workflow 在本记录提交中清理；当前节点保持 `VERIFYING`，等待 clean canonical CI，R6-06 继续 `BLOCKED`。'
+          )
+
+          replace_once(
+              'docs/modular-rewrite/R06-entity-catalog-persistence/R06-05-team-periods-and-availability.md',
+              '## 阶段 hard gate\n\n- 尚未执行；节点保持 `VERIFYING`。',
+              '## 阶段 hard gate\n\n- 首轮 run `32027350874`：PostgreSQL/architecture job `95379437131` 为 `SUCCESS`；Windows job `95379437125` 在 `npm run verify:frontend` 运行到 `verify-searchable-select-diagnostics.mjs` 时因临时 workflow 未安装声明的 `typescript` 开发依赖而 fail-fast。未修改生产依赖、未跳过或放宽验证。\n- 修正验证环境后，最终 run `32027535476` 整体 `SUCCESS`：Windows job `95379993915` 已通过 `npm run verify:frontend`、`cargo fmt --all -- --check`、workspace Clippy `-D warnings` 与 `cargo test --locked --workspace`；PostgreSQL/architecture job `95379993984` 已通过 R6 ownership、完整 architecture、public model/protected assets/database baseline/database migration compatibility，以及 R6-03、R6-04、R6-05 PostgreSQL 16 retained contracts。\n- 当前节点保持 `VERIFYING`，等待临时 workflow 清理后的 clean canonical Public Platform CI。'
+          )
+          PY
+      - name: Remove temporary R6-05 workflows
+        shell: bash
+        run: |
+          set -euo pipefail
+          git rm \
+            .github/workflows/r6-05-implementation.yml \
+            .github/workflows/r6-05-implementation-recovery.yml \
+            .github/workflows/r6-05-hard-gate.yml \
+            .github/workflows/r6-05-closeout-prep.yml
+      - name: Commit verified documentation and cleanup
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add README.md docs/modular-rewrite/R06-entity-catalog-persistence/README.md docs/modular-rewrite/R06-entity-catalog-persistence/R06-05-team-periods-and-availability.md
+          git diff --cached --check
+          git status --short
+          git commit -m "docs(r6-05): record hard gate and clean temp workflows"
+          git push origin HEAD:rewrite/r6-entity-catalog-persistence
