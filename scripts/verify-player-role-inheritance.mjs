@@ -92,8 +92,10 @@ requireTokens("crates/persistence-postgres/src/match_exchange.rs", [
   "tactical_role_code: lineup_player.role_code.clone()",
   "lineup_status:",
 ], "比赛 Excel 与 AI 包");
-requireTokens("crates/persistence-postgres/src/dynamic_tags.rs", [
+requireTokens("crates/persistence-postgres/src/adapters/catalog/dynamic_tags/contribution/scoring.rs", [
   "match-contribution-v2-role-context",
+], "球员贡献计算版本");
+requireTokens("crates/persistence-postgres/src/adapters/catalog/dynamic_tags/contribution/calculate.rs", [
   "metadata->>'role_code'",
   "requested_role_source_position_code",
   "resolve_tactical_role(None, inherited_role.as_ref())",
