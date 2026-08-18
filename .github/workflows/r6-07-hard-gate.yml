@@ -104,6 +104,15 @@ jobs:
           node scripts/verify_database_baseline.mjs
           node scripts/run_database_baseline.mjs --dry-run
 
+      - name: Early full PostgreSQL baseline diagnostic
+        shell: bash
+        run: |
+          set +e
+          node scripts/run_database_baseline.mjs 2>&1 | tee /tmp/r6-07-db-baseline.log
+          status=${PIPESTATUS[0]}
+          tail -n 240 /tmp/r6-07-db-baseline.log > .r6-07-hard-gate-db-tail.txt
+          exit "$status"
+
       - name: Workspace Clippy
         shell: bash
         run: |
