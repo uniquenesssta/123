@@ -1,0 +1,101 @@
+name: R6-06 closeout
+
+on:
+  push:
+    branches:
+      - rewrite/r6-entity-catalog-persistence
+    paths:
+      - .github/workflows/r6-06-closeout.yml
+
+permissions:
+  contents: write
+
+jobs:
+  closeout:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: rewrite/r6-entity-catalog-persistence
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Verify clean canonical baseline
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$(git rev-parse HEAD^)" = "9fe61a55627a51862670624d53d3feec688d1973"
+          changed="$(git diff --name-only 9fe61a55627a51862670624d53d3feec688d1973..HEAD)"
+          test "$changed" = ".github/workflows/r6-06-closeout.yml"
+          test -z "$(git status --short)"
+
+      - name: Record R6-06 DONE and open R6-07
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          from pathlib import Path
+
+          def replace_exact(path: str, old: str, new: str) -> None:
+              p = Path(path)
+              text = p.read_text(encoding="utf-8")
+              count = text.count(old)
+              if count != 1:
+                  raise SystemExit(f"{path}: expected exactly one anchor, found {count}: {old[:120]!r}")
+              p.write_text(text.replace(old, new, 1), encoding="utf-8", newline="\n")
+
+          detail = "docs/modular-rewrite/R06-entity-catalog-persistence/R06-06-abilities-and-dynamic-tags.md"
+          replace_exact(
+              detail,
+              "## 状态\n\n`VERIFYING`",
+              "## 状态\n\n`DONE`",
+          )
+          replace_exact(
+              detail,
+              "- 临时 hard-gate workflow 已从 clean tree `e11a86632d6287f5f4a54848717556cafab6883c` 清理；当前提交用于触发无临时 workflow 的 clean canonical Public Platform CI，节点继续保持 `VERIFYING`。",
+              "- 临时 hard-gate workflow 已从 clean tree `e11a86632d6287f5f4a54848717556cafab6883c` 清理。clean canonical Public Platform CI run `32046081931` / Windows job `95434232104` 已在 HEAD `9fe61a55627a51862670624d53d3feec688d1973` 上整体 `SUCCESS`；architecture、Windows Automated acceptance 与 validation evidence upload 全部通过；artifact `9293689776`，SHA-256 `1c84dfa91806ef66cf632e8ce952fdc2dce5601f27b2eae521917e1b268aa5e1`。R6-06 正式关闭为 `DONE`，R6-07 Coaches 与 Formation Usage 开放为 `READY`。",
+          )
+
+          stage = "docs/modular-rewrite/R06-entity-catalog-persistence/README.md"
+          replace_exact(
+              stage,
+              "| R6-06 | Abilities 与 Dynamic Tags | VERIFYING |\n| R6-07 | Coaches 与 Formation Usage | BLOCKED |",
+              "| R6-06 | Abilities 与 Dynamic Tags | DONE |\n| R6-07 | Coaches 与 Formation Usage | READY |",
+          )
+          replace_exact(
+              stage,
+              "- R6-01～R6-05 均已 `DONE`；R6-06 Abilities 与 Dynamic Tags 为当前唯一 `READY` 节点，R6-07～R6-10 继续 `BLOCKED`。",
+              "- R6-01～R6-06 均已 `DONE`；R6-07 Coaches 与 Formation Usage 为当前唯一 `READY` 节点，R6-08～R6-10 继续 `BLOCKED`。",
+          )
+          replace_exact(
+              stage,
+              "- Abilities 与 Dynamic Tags persistence 已按 dimensions / observations / definitions / tags / contribution 职责拆分，旧单文件 owner 删除；implementation gate `32043516067` 与最终阶段 hard gate `32044944449` 均已 `SUCCESS`。历史角色继承 verifier 只跟随到新的 contribution owner，未弱化原断言；当前仍为 `VERIFYING`，等待无临时 workflow 的 clean canonical CI。",
+              "- Abilities 与 Dynamic Tags persistence 已按 dimensions / observations / definitions / tags / contribution 职责拆分，旧单文件 owner 删除；implementation gate `32043516067` 与最终阶段 hard gate `32044944449` 均已 `SUCCESS`。历史角色继承 verifier 只跟随到新的 contribution owner，未弱化原断言；clean canonical Public Platform CI run `32046081931` / Windows job `95434232104` 在 HEAD `9fe61a55627a51862670624d53d3feec688d1973` 上为 `SUCCESS`，artifact `9293689776`，SHA-256 `1c84dfa91806ef66cf632e8ce952fdc2dce5601f27b2eae521917e1b268aa5e1`。R6-06 正式 `DONE`，R6-07 开放为 `READY`。",
+          )
+
+          root = "README.md"
+          replace_exact(
+              root,
+              "- implementation gate run `32043516067` 已实际通过 R6-06 ownership、retained R6 ownership、完整 architecture、模型保护、数据库基线、rustfmt、Persistence unit tests、Application check 与 PostgreSQL 16 contract；最终阶段 hard gate run `32044944449` 整体 `SUCCESS`：Windows job `95430654653` 已通过完整 frontend、rustfmt、workspace Clippy `-D warnings` 与 workspace tests，PostgreSQL/architecture job `95430654659` 已通过 R6 retained ownership、完整 architecture、模型保护/数据库基线及 R6-03～R6-06 PostgreSQL 16 contracts。历史角色继承 verifier 仅将已删除 `dynamic_tags.rs` 的检查跟随到 `dynamic_tags/contribution/{calculate,scoring}.rs` 权威 owner，原断言未删除或放宽；当前继续 `VERIFYING`，等待无临时 workflow 的 clean canonical CI。",
+              "- implementation gate run `32043516067` 已实际通过 R6-06 ownership、retained R6 ownership、完整 architecture、模型保护、数据库基线、rustfmt、Persistence unit tests、Application check 与 PostgreSQL 16 contract；最终阶段 hard gate run `32044944449` 整体 `SUCCESS`：Windows job `95430654653` 已通过完整 frontend、rustfmt、workspace Clippy `-D warnings` 与 workspace tests，PostgreSQL/architecture job `95430654659` 已通过 R6 retained ownership、完整 architecture、模型保护/数据库基线及 R6-03～R6-06 PostgreSQL 16 contracts。历史角色继承 verifier 仅将已删除 `dynamic_tags.rs` 的检查跟随到 `dynamic_tags/contribution/{calculate,scoring}.rs` 权威 owner，原断言未删除或放宽。clean canonical Public Platform CI run `32046081931` / Windows job `95434232104` 已在 HEAD `9fe61a55627a51862670624d53d3feec688d1973` 上整体 `SUCCESS`；artifact `9293689776`，SHA-256 `1c84dfa91806ef66cf632e8ce952fdc2dce5601f27b2eae521917e1b268aa5e1`。R6-06 正式关闭为 `DONE`，R6-07 Coaches 与 Formation Usage 开放为 `READY`；用户现有 PostgreSQL 数据真实写入/sample 验收与 Windows Full 人工交互验收继续保留到最终统一验收。",
+          )
+          PY
+
+          rm .github/workflows/r6-06-closeout.yml
+          git diff --check
+
+          actual="$(git diff --name-only | sort)"
+          expected="$(printf '%s\n' '.github/workflows/r6-06-closeout.yml' 'README.md' 'docs/modular-rewrite/R06-entity-catalog-persistence/R06-06-abilities-and-dynamic-tags.md' 'docs/modular-rewrite/R06-entity-catalog-persistence/README.md' | sort)"
+          test "$actual" = "$expected"
+
+      - name: Commit final closeout tree
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add -A
+          git diff --cached --check
+          git commit -m 'docs(r6-06): close node and open r6-07'
+          git push origin HEAD:rewrite/r6-entity-catalog-persistence
