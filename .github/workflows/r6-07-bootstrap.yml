@@ -4,8 +4,6 @@ on:
   push:
     branches:
       - rewrite/r6-entity-catalog-persistence
-    paths:
-      - .github/workflows/r6-07-bootstrap.yml
 
 permissions:
   contents: write
