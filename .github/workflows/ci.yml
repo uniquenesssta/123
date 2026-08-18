@@ -74,3 +74,223 @@ jobs:
           path: |
             logs/**
             .cargo-target/release/bundle/**
+
+  r6-08-closeout:
+    name: R6-08 closeout
+    if: github.ref == 'refs/heads/rewrite/r6-entity-catalog-persistence' && github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout stage branch
+        uses: actions/checkout@v4
+        with:
+          ref: rewrite/r6-entity-catalog-persistence
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Verify final R6-08 ownership state
+        shell: bash
+        run: |
+          set -euo pipefail
+          : > /tmp/r6-08-closeout.log
+          exec > >(tee -a /tmp/r6-08-closeout.log) 2>&1
+          test "$(git rev-parse HEAD^)" = "f33665ebc7d24f80f0837f786903a76e11d78cb8"
+          git merge-base --is-ancestor a44e11aceccdb1c582636ff8d4c49f9d24529baa HEAD
+          git merge-base --is-ancestor 89dfbb101989116b5c858dbb8dc4564c50f86f9d HEAD
+          test ! -e .github/workflows/r6-08-hard-gate.yml
+          test ! -e .r6-08-hard-gate-result.json
+          test ! -e .github/workflows/r6-08-closeout.yml
+          test ! -e .r6-08
+          test ! -e .r6-08-failure.txt
+          node scripts/verify-entity-matching-references-persistence.mjs
+          node scripts/verify-coach-formation-persistence.mjs
+          node scripts/verify-entity-relationships.mjs
+          node scripts/verify-global-name-search.mjs
+          git diff --check
+
+      - name: Write final R6-08 records
+        shell: bash
+        run: |
+          set -euo pipefail
+          exec > >(tee -a /tmp/r6-08-closeout.log) 2>&1
+          python3 - <<'PY'
+          from pathlib import Path
+          import re
+
+          detail = Path("docs/modular-rewrite/R06-entity-catalog-persistence/R06-08-entity-matching-and-references.md")
+          current = detail.read_text(encoding="utf-8")
+          if "`VERIFYING`" not in current or "a44e11aceccdb1c582636ff8d4c49f9d24529baa" not in current:
+              raise SystemExit("R6-08 detail baseline mismatch")
+          detail.write_text("""# R6-08 Entity Matching 与 References
+
+## 状态
+
+`DONE`
+
+## 基线与范围
+
+- 唯一阶段分支：`rewrite/r6-entity-catalog-persistence`。
+- 节点起点：`a44e11aceccdb1c582636ff8d4c49f9d24529baa`；生产 owner-switch 提交：`89dfbb101989116b5c858dbb8dc4564c50f86f9d`。
+- 本节点只重写 Entity Matching 与 References persistence；R6-09 Archive/Delete/Force Delete 与 R6-10 Global Name Search 未提前迁移。
+
+## 实现结果
+
+- Entity Matching 收敛到 `adapters/catalog/entity_matching/`：resolve orchestration、stable-ID existence、external-ID lookup、name candidates、normalization 与 outcome 分责。
+- References 收敛到 `adapters/catalog/references/`：reference directory read/mapper/list、provider validation/read/write/mapper、external-ID validation/write/mapper 分责。
+- `resolve.rs` 与 reference `directory/list.rs` 仅编排，不直接执行 SQL；SQL I/O 集中在明确的 adapter read/write/lookup owner。
+- `entity_catalog.rs` 已移除 R6-08 matching/reference-list owner，仅保留 R6-09 deletion/archive/reference-count；`player_catalog.rs` 已移除 provider/external-ID owner。
+- R6-07 retained verifier、Entity Relationships verifier 与 Global Name Search verifier 仅跟随权威 owner 路径，原契约未删除、跳过或放宽。
+
+## 契约与兼容性
+
+- `EntityReferencePort`、Domain DTO、Schema、0001–0046 migrations、数据格式、配置、日志等级、错误语义、UI 行为均未改变。
+- Stable entity ID 优先于 trusted provider external ID，external ID 优先于 normalized name matching。
+- Team / Player / Coach canonical name 与 alias matching、country/nationality/date-of-birth disambiguation、`exact` / `no_match` / `ambiguous` 状态及 candidate score/reason 文案保持不变。
+- Reference Directory 继续复用统一 `NameSearch`，保持中文、英文、别名、重音、多关键词检索、active-only、500 上限与稳定排序语义。
+- Data Provider upsert、metadata merge、active re-enable 与 External ID upsert/metadata merge 语义不变。
+- 历史 P4/运行引用保护不变；模型保护资产未变化；无新增生产依赖。
+
+## 文件清单
+
+### 新增
+
+- `crates/persistence-postgres/src/adapters/catalog/entity_matching/existence.rs`
+- `crates/persistence-postgres/src/adapters/catalog/entity_matching/external_id.rs`
+- `crates/persistence-postgres/src/adapters/catalog/entity_matching/mod.rs`
+- `crates/persistence-postgres/src/adapters/catalog/entity_matching/name_candidates.rs`
+- `crates/persistence-postgres/src/adapters/catalog/entity_matching/normalization.rs`
+- `crates/persistence-postgres/src/adapters/catalog/entity_matching/outcome.rs`
+- `crates/persistence-postgres/src/adapters/catalog/entity_matching/resolve.rs`
+- `crates/persistence-postgres/src/adapters/catalog/references/directory/list.rs`
+- `crates/persistence-postgres/src/adapters/catalog/references/directory/mapper.rs`
+- `crates/persistence-postgres/src/adapters/catalog/references/directory/mod.rs`
+- `crates/persistence-postgres/src/adapters/catalog/references/directory/read.rs`
+- `crates/persistence-postgres/src/adapters/catalog/references/entity_type.rs`
+- `crates/persistence-postgres/src/adapters/catalog/references/external_ids/mapper.rs`
+- `crates/persistence-postgres/src/adapters/catalog/references/external_ids/mod.rs`
+- `crates/persistence-postgres/src/adapters/catalog/references/external_ids/validation.rs`
+- `crates/persistence-postgres/src/adapters/catalog/references/external_ids/write.rs`
+- `crates/persistence-postgres/src/adapters/catalog/references/mod.rs`
+- `crates/persistence-postgres/src/adapters/catalog/references/providers/mapper.rs`
+- `crates/persistence-postgres/src/adapters/catalog/references/providers/mod.rs`
+- `crates/persistence-postgres/src/adapters/catalog/references/providers/read.rs`
+- `crates/persistence-postgres/src/adapters/catalog/references/providers/validation.rs`
+- `crates/persistence-postgres/src/adapters/catalog/references/providers/write.rs`
+- `crates/persistence-postgres/tests/entity_matching_references_repository_contract.rs`
+- `docs/modular-rewrite/R06-entity-catalog-persistence/R06-08-entity-matching-and-references.md`
+- `scripts/verify-entity-matching-references-persistence.mjs`
+
+### 修改
+
+- `README.md`
+- `architecture/domain-type-inventory.json`
+- `crates/persistence-postgres/src/adapters/catalog/mod.rs`
+- `crates/persistence-postgres/src/entity_catalog.rs`
+- `crates/persistence-postgres/src/player_catalog.rs`
+- `docs/modular-rewrite/R06-entity-catalog-persistence/README.md`
+- `package.json`
+- `scripts/verify-coach-formation-persistence.mjs`
+- `scripts/verify-entity-relationships.mjs`
+- `scripts/verify-global-name-search.mjs`
+
+### 移动/重命名
+
+无。
+
+### 删除
+
+无。旧 R6-08 函数实现从 `entity_catalog.rs` / `player_catalog.rs` 内移除，但最终文件本身继续承担 R6-09 职责，因此不属于文件删除。
+
+## 验证记录
+
+- Implementation / Minimum Gate：R6-08 ownership、R6-07 retained ownership、Entity Relationships、完整 architecture、protected assets、database static baseline、rustfmt、Persistence compile/unit tests、R6-08 contract compile、Application compile 与 `git diff --check` 全部通过后形成生产提交 `89dfbb101989116b5c858dbb8dc4564c50f86f9d`。
+- 首轮阶段 hard gate run `32142895608` 在 R6-08 ownership、architecture、protected assets 与 database static baseline 均通过后，因 Ubuntu Chrome zygote 未创建 `DevToolsActivePort` 导致 `verify-task-ui-screenshots.mjs` 环境失败；该轮其后 Rust/PG 门禁被正确跳过，未宣称通过。
+- 最终 hard gate run `32143394153` 整体 `SUCCESS`：Windows job `95731216023` 通过 `npm run verify:frontend`、`cargo fmt --all -- --check`、workspace Clippy `-D warnings`、`cargo test --locked --workspace` 与 diff hygiene；PostgreSQL 16 job `95731215987` 通过 official inventory、R6-08/R6-07 retained ownership、Entity Relationships、完整 architecture、protected assets、database baseline/dry-run、R6-03～R6-08 全部真实 PostgreSQL contracts 与 final diff hygiene。
+- 临时 R6-08 hard-gate / closeout 文件均已从最终 tree 清理；本节点完成标准要求的最小验证与阶段回归均已实际通过。
+
+## 计划偏差与回退
+
+- 计划偏差仅发生在验证执行环境：Linux 截图门禁受到 Chrome zygote 环境限制，因此阶段回归改回项目既有 Windows runner；PostgreSQL contracts 保持 Ubuntu + PostgreSQL 16 service，未改变任何生产实现或测试断言。
+- 回退点：`a44e11aceccdb1c582636ff8d4c49f9d24529baa`；不得手工复制旧实现恢复。
+
+## 未执行与剩余风险
+
+- 用户现有 PostgreSQL 数据库真实 sample/write 验收未执行；本节点只验证隔离 PostgreSQL 16 测试库。
+- Windows Full 人工交互验收未执行，继续保留到最终统一验收。
+""", encoding="utf-8", newline="\n")
+
+          stage = Path("docs/modular-rewrite/R06-entity-catalog-persistence/README.md")
+          text = stage.read_text(encoding="utf-8")
+          for old, new in {
+              "| R6-08 | Entity Matching 与 References | VERIFYING |": "| R6-08 | Entity Matching 与 References | DONE |",
+              "| R6-09 | Archive / Delete / Force Delete | BLOCKED |": "| R6-09 | Archive / Delete / Force Delete | READY |",
+          }.items():
+              if text.count(old) != 1:
+                  raise SystemExit(f"stage table anchor mismatch: {old}")
+              text = text.replace(old, new, 1)
+          stage_section = """## R6-08 当前事实
+
+- 详细记录：[`R06-08-entity-matching-and-references.md`](R06-08-entity-matching-and-references.md)。
+- Entity Matching / References persistence 已完成唯一 owner 切换：matching resolve 与 reference list coordinator SQL-free，SQL I/O 收敛到具名 adapter read/write/lookup owner；R6-09 deletion/archive/reference-count 继续由原 owner 持有。
+- 生产 owner-switch 提交 `89dfbb101989116b5c858dbb8dc4564c50f86f9d` 已通过 implementation/minimum gate；首轮 hard gate `32142895608` 仅因 Ubuntu Chrome zygote 截图环境失败而停止，未放宽任何产品门禁。
+- 最终 hard gate run `32143394153` 整体 `SUCCESS`：Windows job `95731216023` 已通过 frontend、rustfmt、workspace Clippy `-D warnings` 与 workspace tests；PostgreSQL 16 job `95731215987` 已通过 official inventory、R6 retained ownership、完整 architecture、模型保护/database baseline 及 R6-03～R6-08 真实 PostgreSQL contracts。
+- 临时 gate/closeout 文件已清理。R6-08 正式 `DONE`，R6-09 Archive / Delete / Force Delete 开放为 `READY`。用户现有 PostgreSQL 数据真实 sample/write 与 Windows Full 人工交互验收继续留到最终统一验收。
+"""
+          pattern = re.compile(r"\n## R6-08 当前事实\n.*\Z", re.S)
+          if len(pattern.findall(text)) != 1:
+              raise SystemExit("R6-08 stage section anchor mismatch")
+          stage.write_text(pattern.sub("\n" + stage_section, text, count=1), encoding="utf-8", newline="\n")
+
+          root = Path("README.md")
+          text = root.read_text(encoding="utf-8")
+          root_section = """### R6-08 Entity Matching 与 References
+
+- Entity Matching persistence 已收敛到 `adapters/catalog/entity_matching/`，References persistence 已收敛到 `adapters/catalog/references/`；stable-ID/external-ID/name candidate read、reference directory、provider 与 external-ID writes 按职责拆分，协调器保持 SQL-free。`entity_catalog.rs` 继续只持有 R6-09 deletion/archive/reference-count，`player_catalog.rs` 不再持有 provider/external-ID owner。
+- `EntityReferencePort`、Domain DTO、Schema/0001–0046 migrations、数据格式、配置、错误语义、日志等级、统一 NameSearch、matching priority/candidate score/reason、历史 P4/运行引用、UI 行为和模型保护资产保持不变；无新增生产依赖。
+- 生产 owner-switch 提交 `89dfbb101989116b5c858dbb8dc4564c50f86f9d` 的 minimum gate 已通过；最终 hard gate run `32143394153` 整体 `SUCCESS`：Windows stage regression 与 PostgreSQL 16 R6-03～R6-08 contracts 全部通过。首轮 Ubuntu screenshot 环境失败 `32142895608` 已如实保留，未放宽任何测试。临时 gate/closeout 文件已清理；R6-08 正式 `DONE`，R6-09 开放为 `READY`。用户现有 PostgreSQL 数据真实 sample/write 与 Windows Full 人工验收继续保留到最终统一验收。
+
+"""
+          pattern = re.compile(r"### R6-08 Entity Matching 与 References\n.*?(?=### R6-07 Coaches 与 Formation Usage\n)", re.S)
+          if len(pattern.findall(text)) != 1:
+              raise SystemExit("root README R6-08 anchor mismatch")
+          root.write_text(pattern.sub(root_section, text, count=1), encoding="utf-8", newline="\n")
+          PY
+
+      - name: Verify, restore CI and commit closeout
+        shell: bash
+        run: |
+          set -euo pipefail
+          exec > >(tee -a /tmp/r6-08-closeout.log) 2>&1
+          node scripts/verify-entity-matching-references-persistence.mjs
+          node scripts/verify-coach-formation-persistence.mjs
+          node scripts/verify-entity-relationships.mjs
+          node scripts/verify-global-name-search.mjs
+          grep -F '| R6-08 | Entity Matching 与 References | DONE |' docs/modular-rewrite/R06-entity-catalog-persistence/README.md
+          grep -F '| R6-09 | Archive / Delete / Force Delete | READY |' docs/modular-rewrite/R06-entity-catalog-persistence/README.md
+          grep -F '`DONE`' docs/modular-rewrite/R06-entity-catalog-persistence/R06-08-entity-matching-and-references.md
+          git show HEAD^:.github/workflows/ci.yml > .github/workflows/ci.yml
+          rm -f .r6-08-closeout-failure.txt
+          git diff --check
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add -A
+          git commit -m "docs(r6-08): close node and open r6-09"
+          git push origin HEAD:rewrite/r6-entity-catalog-persistence
+
+      - name: Persist closeout failure
+        if: failure()
+        shell: bash
+        run: |
+          set -euo pipefail
+          git show HEAD^:.github/workflows/ci.yml > .github/workflows/ci.yml || true
+          {
+            printf '%s\n' 'R6-08 closeout failed.'
+            if [ -f /tmp/r6-08-closeout.log ]; then tail -n 220 /tmp/r6-08-closeout.log; fi
+          } > .r6-08-closeout-failure.txt
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add .github/workflows/ci.yml .r6-08-closeout-failure.txt
+          git commit -m "chore(r6-08): record closeout failure"
+          git push origin HEAD:rewrite/r6-entity-catalog-persistence
