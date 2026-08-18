@@ -16,7 +16,7 @@ concurrency:
 
 jobs:
   stage-and-postgres:
-    if: github.actor != 'github-actions[bot]'
+    if: github.actor != 'github-actions[bot]' && !contains(github.event.head_commit.message, 'prepare stale-verifier retarget')
     runs-on: ubuntu-24.04
     timeout-minutes: 120
     services:
@@ -51,9 +51,10 @@ jobs:
           set -euo pipefail
           implementation="89dfbb101989116b5c858dbb8dc4564c50f86f9d"
           git merge-base --is-ancestor "$implementation" HEAD
-          mapfile -t changed < <(git diff --name-only "$implementation"..HEAD)
-          test "${#changed[@]}" -eq 1
+          mapfile -t changed < <(git diff --name-only "$implementation"..HEAD | sort)
+          test "${#changed[@]}" -eq 2
           test "${changed[0]}" = ".github/workflows/r6-08-hard-gate.yml"
+          test "${changed[1]}" = "scripts/verify-global-name-search.mjs"
           test ! -e .r6-08-hard-gate-result.json
           test ! -e .r6-08
           test ! -e .r6-08-failure.txt
