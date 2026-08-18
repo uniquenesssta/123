@@ -60,19 +60,23 @@ jobs:
           python3 .r6-08/apply.py
           python3 - <<'PY'
           from pathlib import Path
+          import re
           p = Path("crates/persistence-postgres/src/adapters/catalog/references/entity_type.rs")
           text = p.read_text(encoding="utf-8")
-          old = '''        assert_eq!(
-              validate_entity_type("match").unwrap_err().to_string(),
-              "状态无效: 不支持的实体类型：match"
-          );'''
+          pattern = re.compile(
+              r'        assert_eq!\(\n'
+              r'\s*validate_entity_type\("match"\)\.unwrap_err\(\)\.to_string\(\),\n'
+              r'\s*"状态无效: 不支持的实体类型：match"\n'
+              r'\s*\);'
+          )
           new = '''        assert!(matches!(
               validate_entity_type("match"),
               Err(crate::PersistenceError::InvalidState(message)) if message == "不支持的实体类型：match"
           ));'''
-          if text.count(old) != 1:
-              raise SystemExit("R6-08 invalid-type test anchor mismatch")
-          p.write_text(text.replace(old, new, 1), encoding="utf-8", newline="\n")
+          text, count = pattern.subn(new, text, count=1)
+          if count != 1:
+              raise SystemExit(f"R6-08 invalid-type test anchor mismatch: {count}")
+          p.write_text(text, encoding="utf-8", newline="\n")
           PY
           cargo fmt --all
           node scripts/generate-domain-type-inventory.mjs
