@@ -15,6 +15,7 @@ const playerDirectoryList = read("crates/persistence-postgres/src/adapters/catal
 const teamCatalog = read("crates/persistence-postgres/src/team_catalog.rs");
 const teamDirectoryList = read("crates/persistence-postgres/src/adapters/catalog/teams/directory/list_teams.rs");
 const teamOptionList = read("crates/persistence-postgres/src/adapters/catalog/teams/directory/list_team_options.rs");
+// R6-08: entity-reference search ownership moved to the modular Reference Directory reader.
 const referenceDirectoryRead = read("crates/persistence-postgres/src/adapters/catalog/references/directory/read.rs");
 const coachDirectoryList = read("crates/persistence-postgres/src/adapters/catalog/coaches/directory/list.rs");
 const persistenceLib = read("crates/persistence-postgres/src/lib.rs");
