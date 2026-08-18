@@ -1,0 +1,159 @@
+name: R6-07 hard gate
+
+on:
+  push:
+    branches:
+      - rewrite/r6-entity-catalog-persistence
+    paths-ignore:
+      - .r6-07-hard-gate-result.json
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: r6-07-hard-gate-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  postgres-and-architecture:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 120
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: football_test
+          POSTGRES_PASSWORD: football_test
+          POSTGRES_DB: football_r6_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U football_test -d football_r6_test"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 10
+    env:
+      FOOTBALL_TEST_DATABASE_URL: postgresql://football_test:football_test@127.0.0.1:5432/football_r6_test
+      RUSTUP_TOOLCHAIN: 1.88.0
+
+    steps:
+      - name: Checkout stage branch
+        uses: actions/checkout@v4
+        with:
+          ref: rewrite/r6-entity-catalog-persistence
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Prepare Rust 1.88.0
+        shell: bash
+        run: |
+          set -euo pipefail
+          rustup toolchain install 1.88.0 --profile minimal --component rustfmt --component clippy
+          rustup default 1.88.0
+          rustc --version
+          cargo --version
+          node --version
+
+      - name: Verify formatting and diff hygiene
+        shell: bash
+        run: |
+          set -euo pipefail
+          cargo fmt --all -- --check
+          git diff --check
+
+      - name: Verify R6-07 ownership and retained compatibility
+        shell: bash
+        run: |
+          set -euo pipefail
+          node scripts/verify-coach-formation-persistence.mjs
+          node scripts/verify-formation-usage.mjs
+          node scripts/verify-global-name-search.mjs
+          node scripts/verify-entity-relationships.mjs
+          npm run verify:architecture
+
+      - name: Verify protected assets and database baseline
+        shell: bash
+        run: |
+          set -euo pipefail
+          node scripts/verify-protected-assets-deterministic.mjs
+          node scripts/verify_database_baseline.mjs
+          node scripts/run_database_baseline.mjs --dry-run
+
+      - name: Workspace Clippy
+        shell: bash
+        run: |
+          set -euo pipefail
+          cargo clippy --locked --workspace --all-targets -- -D warnings
+
+      - name: Workspace tests
+        shell: bash
+        run: |
+          set -euo pipefail
+          cargo test --locked --workspace
+
+      - name: R6-03 PostgreSQL contract
+        shell: bash
+        run: |
+          set -euo pipefail
+          cargo test --locked -p football-persistence-postgres --test player_directory_detail_repository_contract -- --ignored --test-threads=1
+
+      - name: R6-04 PostgreSQL contract
+        shell: bash
+        run: |
+          set -euo pipefail
+          cargo test --locked -p football-persistence-postgres --test player_names_positions_repository_contract -- --ignored --test-threads=1
+
+      - name: R6-05 PostgreSQL contract
+        shell: bash
+        run: |
+          set -euo pipefail
+          cargo test --locked -p football-persistence-postgres --test player_team_periods_availability_repository_contract -- --ignored --test-threads=1
+
+      - name: R6-06 PostgreSQL contract
+        shell: bash
+        run: |
+          set -euo pipefail
+          cargo test --locked -p football-persistence-postgres --test player_abilities_dynamic_tags_repository_contract -- --ignored --test-threads=1
+
+      - name: R6-07 PostgreSQL contract
+        shell: bash
+        run: |
+          set -euo pipefail
+          cargo test --locked -p football-persistence-postgres --test coach_formation_repository_contract -- --ignored --test-threads=1
+
+      - name: Formation Usage PostgreSQL integration
+        shell: bash
+        run: |
+          set -euo pipefail
+          cargo test --locked -p football-persistence-postgres --test postgres_integration formation_catalog_usage_history_and_resolution_are_consistent -- --ignored --exact --test-threads=1
+
+      - name: Full frozen PostgreSQL baseline
+        shell: bash
+        run: |
+          set -euo pipefail
+          node scripts/run_database_baseline.mjs
+
+      - name: Record hard-gate result
+        if: always()
+        shell: bash
+        env:
+          GATE_STATUS: ${{ job.status }}
+        run: |
+          set -euo pipefail
+          cat > .r6-07-hard-gate-result.json <<EOF
+          {
+            "run_id": "${GITHUB_RUN_ID}",
+            "run_attempt": "${GITHUB_RUN_ATTEMPT}",
+            "source_sha": "${GITHUB_SHA}",
+            "status": "${GATE_STATUS}"
+          }
+          EOF
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add .r6-07-hard-gate-result.json
+          if git diff --cached --quiet; then
+            exit 0
+          fi
+          git commit -m "chore(r6-07): record hard gate ${GATE_STATUS}"
+          git push origin HEAD:rewrite/r6-entity-catalog-persistence
