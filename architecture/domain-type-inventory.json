@@ -24,13 +24,13 @@
     "targetPublicExportPolicy": "explicit re-export only"
   },
   "sourceDigest": "217241ac243726a5ab6805a7f169e222b97e78c7c971749a5904714af673ebdd",
-  "rustUsageDigest": "59eb3b938e28fb29340ac72b26f959bb0809bcc05ad8ab07b254597fe05792e8",
+  "rustUsageDigest": "aa5f47d334acd91e26a36e0511208ee92de3e82b0415691f74ba74765cd5bb9f",
   "summary": {
     "typeCount": 365,
     "publicCompatibilityTypeCount": 365,
     "internalTypeCount": 0,
     "domainSourceFileCount": 129,
-    "scannedRustFileCount": 907,
+    "scannedRustFileCount": 911,
     "databaseMappedTypeCount": 299,
     "byTargetModule": {
       "ai_workspace": 16,
@@ -8974,19 +8974,23 @@
         "crates/application/src/services/lineups/facade.rs",
         "crates/application/src/services/lineups/service.rs",
         "crates/application/src/use_cases/lineups/save_formation_usage_distribution/mod.rs",
+        "crates/persistence-postgres/src/adapters/catalog/formations/usage/preparation.rs",
         "crates/persistence-postgres/src/adapters/catalog/formations/usage/save.rs",
         "crates/persistence-postgres/src/adapters/catalog/formations/usage/tests.rs",
         "crates/persistence-postgres/src/adapters/catalog/formations/usage/validation.rs",
         "crates/persistence-postgres/src/adapters/catalog/formations/usage/window.rs",
+        "crates/persistence-postgres/src/adapters/catalog/formations/usage/write.rs",
         "crates/persistence-postgres/tests/coach_formation_repository_contract.rs",
         "crates/persistence-postgres/tests/postgres_integration.rs",
         "src-tauri/src/commands/catalog.rs"
       ],
       "databaseMappings": [
+        "crates/persistence-postgres/src/adapters/catalog/formations/usage/preparation.rs",
         "crates/persistence-postgres/src/adapters/catalog/formations/usage/save.rs",
         "crates/persistence-postgres/src/adapters/catalog/formations/usage/tests.rs",
         "crates/persistence-postgres/src/adapters/catalog/formations/usage/validation.rs",
-        "crates/persistence-postgres/src/adapters/catalog/formations/usage/window.rs"
+        "crates/persistence-postgres/src/adapters/catalog/formations/usage/window.rs",
+        "crates/persistence-postgres/src/adapters/catalog/formations/usage/write.rs"
       ]
     },
     {
@@ -9231,10 +9235,12 @@
         "crates/domain/tests/serde_contracts/module_paths.rs"
       ],
       "externalCallers": [
+        "crates/persistence-postgres/src/adapters/catalog/formations/resolution/read.rs",
         "crates/persistence-postgres/src/adapters/catalog/formations/resolution/resolve.rs",
         "crates/persistence-postgres/src/adapters/catalog/formations/usage/grouping.rs"
       ],
       "databaseMappings": [
+        "crates/persistence-postgres/src/adapters/catalog/formations/resolution/read.rs",
         "crates/persistence-postgres/src/adapters/catalog/formations/resolution/resolve.rs",
         "crates/persistence-postgres/src/adapters/catalog/formations/usage/grouping.rs"
       ]
