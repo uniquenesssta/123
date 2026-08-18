@@ -8,6 +8,10 @@ on:
 permissions:
   contents: write
 
+concurrency:
+  group: r6-08-implementation
+  cancel-in-progress: true
+
 jobs:
   implement:
     if: github.actor != 'github-actions[bot]'
@@ -24,6 +28,8 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
+          : > /tmp/r6-08.log
+          exec > >(tee -a /tmp/r6-08.log) 2>&1
           base="a44e11aceccdb1c582636ff8d4c49f9d24529baa"
           git merge-base --is-ancestor "$base" HEAD
           mapfile -t changed < <(git diff --name-only "$base"..HEAD | sort)
@@ -38,6 +44,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
+          exec > >(tee -a /tmp/r6-08.log) 2>&1
           rustup toolchain install 1.88.0 --profile minimal
           rustup default 1.88.0
 
@@ -47,6 +54,7 @@ jobs:
           RUSTUP_TOOLCHAIN: 1.88.0
         run: |
           set -euo pipefail
+          exec > >(tee -a /tmp/r6-08.log) 2>&1
           python3 .r6-08/apply.py
           cargo fmt --all
           git diff --check
@@ -57,6 +65,7 @@ jobs:
           RUSTUP_TOOLCHAIN: 1.88.0
         run: |
           set -euo pipefail
+          exec > >(tee -a /tmp/r6-08.log) 2>&1
           node scripts/verify-entity-matching-references-persistence.mjs
           node scripts/verify-coach-formation-persistence.mjs
           node scripts/verify-entity-relationships.mjs
@@ -70,6 +79,7 @@ jobs:
           RUSTUP_TOOLCHAIN: 1.88.0
         run: |
           set -euo pipefail
+          exec > >(tee -a /tmp/r6-08.log) 2>&1
           cargo fmt --all -- --check
           cargo check --locked -p football-persistence-postgres
           cargo test --locked -p football-persistence-postgres --lib
@@ -81,6 +91,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
+          exec > >(tee -a /tmp/r6-08.log) 2>&1
           rm -rf .r6-08
           rm -f .github/workflows/r6-08-bootstrap.yml
           test ! -e .r6-08
@@ -91,4 +102,21 @@ jobs:
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
           git add -A
           git commit -m "refactor(r6-08): modularize entity matching and references"
+          git push origin HEAD:rewrite/r6-entity-catalog-persistence
+
+      - name: Persist failure diagnostic
+        if: failure()
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [ -f /tmp/r6-08.log ]; then
+            tail -n 260 /tmp/r6-08.log > .r6-08-failure.txt
+          else
+            printf '%s\n' 'R6-08 failed before diagnostic log initialization.' > .r6-08-failure.txt
+          fi
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add .r6-08-failure.txt
+          if git diff --cached --quiet; then exit 0; fi
+          git commit -m "chore(r6-08): record implementation gate failure"
           git push origin HEAD:rewrite/r6-entity-catalog-persistence
