@@ -1,4 +1,5 @@
 .github/workflows/r6-08-bootstrap.yml
+.r6-08-failure.txt
 .r6-08/apply.py
 info: syncing channel updates for 1.88.0-x86_64-unknown-linux-gnu
 info: latest update on 2025-06-26 for version 1.88.0 (6b00bc388 2025-06-23)
@@ -6,6 +7,7 @@ info: downloading 3 components
 
   1.88.0-x86_64-unknown-linux-gnu installed - rustc 1.88.0 (6b00bc388 2025-06-23)
 
+info: downloading component rustfmt
 info: using existing install for 1.88.0-x86_64-unknown-linux-gnu
 info: default toolchain set to 1.88.0-x86_64-unknown-linux-gnu
 
@@ -13,5 +15,17 @@ info: default toolchain set to 1.88.0-x86_64-unknown-linux-gnu
 
 info: note that the toolchain '1.88.0-x86_64-unknown-linux-gnu' is currently in use (overridden by '/home/runner/work/123/123/rust-toolchain.toml')
 R6-08 implementation payload applied
-error: 'cargo-fmt' is not installed for the toolchain '1.88.0-x86_64-unknown-linux-gnu'.
-help: run `rustup component add rustfmt` to install it
+R6-08 Entity Matching / References persistence ownership verified.
+R6-07 Coaches / Formation Usage persistence ownership verified.
+阶段2实体关系验证通过：教练历史、统一匹配、引用检查、批量归档和双向履历均已锁定。
+
+> football-match-model-platform@0.23.0 verify:architecture
+> node scripts/architecture/verifyModuleBoundaries.mjs && node scripts/architecture/verifyStateOwnership.mjs && node scripts/architecture/verifyProtectedImports.mjs && node scripts/verify-domain-type-inventory.mjs && node scripts/verify-domain-root-exports.mjs && node scripts/verify-application-ports.mjs && node scripts/verify-database-service.mjs && node scripts/verify-competition-rules-service.mjs && node scripts/verify-teams-players-service.mjs && node scripts/verify-lineups-service.mjs && node scripts/verify-prediction-service.mjs && node scripts/verify-research-service.mjs && node scripts/verify-review-service.mjs && node scripts/verify-postmatch-service.mjs && node scripts/verify-analytics-service.mjs && node scripts/verify-exchange-service.mjs && node scripts/verify-ai-workspace-service.mjs && node scripts/verify-release-service.mjs && node scripts/verify-application-service-facade.mjs && node scripts/verify-persistence-foundation.mjs && node scripts/verify-persistence-audit.mjs && node scripts/verify-persistence-mapping.mjs && node scripts/verify-persistence-adapters.mjs && node scripts/verify-competition-repository.mjs && node scripts/verify-team-directory-detail.mjs && node scripts/verify-team-names-profiles.mjs && node scripts/verify-player-names-positions.mjs && node scripts/verify-player-team-periods-availability.mjs && node scripts/verify-player-abilities-dynamic-tags.mjs && node scripts/verify-coach-formation-persistence.mjs && node scripts/verify-entity-matching-references-persistence.mjs
+
+[architecture:note] 保留已登记过渡导入 src/pages/prediction.ts -> src/pages/runs.ts，退出任务 R14-07
+[architecture:note] 保留已登记过渡导入 src/pages/prediction.ts -> src/pages/p4Workbench.ts，退出任务 R14-06
+[architecture] 模块边界验证 通过：18 个 Feature、11 个 Rust crate、42 个前端源码文件
+[architecture] 状态所有权验证 通过：17 个状态 id、唯一当前 owner 契约与 owner 源位置
+[architecture:note] Application 持久化具体适配器导入已收敛到组合根：crates/application/src/composition/port_registry.rs
+[architecture] 受保护导入验证 通过：42 个前端文件、934 个 Rust 文件、12 个 Cargo 清单
+Domain 类型与契约清单已漂移。请运行 node scripts/generate-domain-type-inventory.mjs 并审查变更。
