@@ -59,6 +59,7 @@ jobs:
           exec > >(tee -a /tmp/r6-08.log) 2>&1
           python3 .r6-08/apply.py
           cargo fmt --all
+          node scripts/generate-domain-type-inventory.mjs
           git diff --check
 
       - name: Verify R6-08 ownership and retained contracts
