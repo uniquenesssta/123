@@ -20,8 +20,17 @@ for (const name of ["create_coach","list_coaches","read_coach","add_coach_name",
 for (const name of ["list_formations","save_formation_usage_distribution","list_formation_usage_distributions","resolve_formation_distribution"]) req((all.match(new RegExp(`pub async fn ${name}\\b`, "g")) || []).length === 1, `formation owner count invalid: ${name}`);
 req(entity.includes("pub async fn list_entity_references") && entity.includes("pub async fn resolve_entity_reference") && entity.includes("pub async fn bulk_archive_entities"), "R6-08/R6-09 ownership moved early");
 req(!read(`${coachRoot}mod.rs`).includes("sqlx::") && !read(`${formationRoot}mod.rs`).includes("sqlx::"), "module export file owns SQL");
+for (const required of [
+  `${formationRoot}resolution/read.rs`,
+  `${formationRoot}usage/preparation.rs`,
+  `${formationRoot}usage/window/read.rs`,
+  `${formationRoot}usage/write.rs`,
+]) req(exists(required), `R6-07 responsibility owner missing: ${required}`);
 const usage = files.filter(p => p.includes("/formations/usage/")).map(read).join("\n");
 const resolution = read(`${formationRoot}resolution/resolve.rs`);
+const window = read(`${formationRoot}usage/window.rs`);
+const save = read(`${formationRoot}usage/save.rs`);
+req(!resolution.includes("sqlx::") && !window.includes("sqlx::") && !save.includes("sqlx::"), "formation coordinator still owns SQL");
 req(usage.includes("alpha * prior") && usage.includes("UNKNOWN_FORMATION_ID"), "formation smoothing/unknown fallback missing");
 req(!usage.includes("DELETE FROM feature.formation_usage_observations"), "formation history became destructive");
 for (const level of ["actual_lineup","confirmed_lineup","team_coach","team","coach","competition_default","system_default","unknown"]) req(resolution.includes(level), `resolution level missing: ${level}`);
