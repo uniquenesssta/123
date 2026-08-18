@@ -46,9 +46,9 @@ Node 开发依赖固定安装和读取自源码根目录上一级的 `../node_mo
 
 ### R6-08 Entity Matching 与 References
 
-- Entity Matching persistence 已收敛到 `adapters/catalog/entity_matching/`，References persistence 已收敛到 `adapters/catalog/references/`；stable-ID/external-ID/name candidate read、reference directory、provider 与 external-ID writes 均按职责拆分，协调器保持 SQL-free。`entity_catalog.rs` 继续只持有 R6-09 deletion/archive/reference-count，`player_catalog.rs` 不再持有 provider/external-ID owner。
-- `EntityReferencePort`、Domain DTO、Schema/0001–0046 migrations、数据格式、配置、错误语义、日志等级、统一 NameSearch、matching priority/candidate score/reason、历史 P4/运行引用、UI 行为和模型保护资产保持不变；无新增生产依赖。
-- 生产 owner-switch 提交 `89dfbb101989116b5c858dbb8dc4564c50f86f9d` 的 implementation/minimum gate 已通过。首轮阶段 hard gate run `32142895608` 仅因 Ubuntu Chrome zygote 截图环境失败而停止，后续门禁未被误记为通过；最终 hard gate run `32143394153` 整体 `SUCCESS`，Windows job `95731216023` 已通过 frontend、rustfmt、workspace Clippy `-D warnings` 与 workspace tests，PostgreSQL 16 job `95731215987` 已通过 official inventory、R6 retained ownership、完整 architecture、模型保护/database baseline 及 R6-03～R6-08 真实 PostgreSQL contracts。临时 gate/closeout 文件已清理；R6-08 正式 `DONE`，R6-09 开放为 `READY`。用户现有 PostgreSQL 数据真实 sample/write 与 Windows Full 人工验收继续保留到最终统一验收。
+- Entity Matching persistence 已收敛到 `adapters/catalog/entity_matching/`，References persistence 已收敛到 `adapters/catalog/references/`；stable-ID/external-ID/name candidate read、reference directory、provider 与 external-ID writes 均按职责拆分，协调器保持 SQL-free。`entity_catalog.rs` 继续只持有后续 R6-09 deletion/archive/reference-count，`player_catalog.rs` 不再持有 provider/external-ID owner。
+- `EntityReferencePort`、Domain DTO、Schema/0001–0046 migrations、配置、错误语义、统一 NameSearch、matching priority/candidate score/reason、历史 P4/运行引用和用户可观察行为保持不变；无新增生产依赖。
+- R6-08 implementation/minimum gate 通过后进入 `VERIFYING`；Stage Regression、PostgreSQL 16 真实 contract 与 clean canonical 完成前不标记 `DONE`。
 
 ### R6-07 Coaches 与 Formation Usage
 
@@ -68,7 +68,7 @@ Node 开发依赖固定安装和读取自源码根目录上一级的 `../node_mo
 - Player Team Periods / Availability 写职责已从 `crates/persistence-postgres/src/player_catalog.rs` 收敛到 `adapters/catalog/players/team_periods/` 与 `adapters/catalog/availability/`；输入策略、typed Row、Domain mapper 与 SQL owner 分责，Player Detail 读取继续复用相同 Row/mapper owner。
 - `PlayerCatalogPort::add_player_team_period`、`PlayerSignalPort::add_availability`、Domain DTO、Schema、0001–0046 migration、错误语义、历史 P4/运行引用和用户可观察行为保持不变；未新增生产依赖。
 - 临时实施 gate run `32026919056` 已通过 R6-05 ownership、R6-03 retained ownership、完整 architecture、模型保护/数据库基线、rustfmt、Persistence unit tests、R6-05 PostgreSQL 16 contract 真实执行及 Application check，随后生成生产提交 `6925455224973b08ab697605db182135f58ef1dd`。
-- 阶段 hard gate 首轮 run `32027350874` 仅因临时 Windows job 未安装声明的 Node 开发依赖而在 frontend gate fail-fast；补齐既有 `npm run setup` 环境后，最终 run `32027535476` 整体 `SUCCESS`：Windows job `95379993915` 的 frontend、rustfmt、workspace Clippy `-D warnings`、workspace tests 全部通过；PostgreSQL/architecture job `95379993984` 的 R6 ownership、完整 architecture、模型保护/数据库迁移兼容门禁及 R6-03/R6-04/R6-05 PostgreSQL 16 contracts 全部通过。临时 workflow 已清理；clean canonical Public Platform CI run `32028645837` / Windows job `95383445833` 为 `SUCCESS`，artifact `9288762564`，SHA-256 `ee8f511b55c03b70c38f77c21937195fa228ca0f318c88837e7cf774c746b644`。R6-05 正式 `DONE`，R6-06 Abilities 与 Dynamic Tags 开放为 `READY`；用户现有 PostgreSQL 数据真实写入/sample 验收与 Windows Full 人工交互验收继续保留到最终统一验收。
+- 阶段 hard gate 首轮 run `32027350874` 仅因临时 Windows job 未安装声明的 Node 开发依赖而在 frontend gate fail-fast；补齐既有 `npm run setup` 环境后，最终 run `32027535476` 整体 `SUCCESS`：Windows job `95379993915` 的 frontend、rustfmt、workspace Clippy `-D warnings`、workspace tests 全部通过；PostgreSQL/architecture job `95379993984` 的 R6 ownership、完整 architecture、模型保护/数据库迁移兼容门禁及 R6-03/R6-04/R6-05 PostgreSQL 16 contracts 全部通过。临时 workflow 已清理；clean canonical Public Platform CI run `32028645837` / Windows job `95383445833` 为 `SUCCESS`，artifact `9288762564`，SHA-256 `ee8f511b55c03b70c38f77c21937195fa228ca0f318c88837e7cf774c746b644`。R6-05 已正式关闭为 `DONE`，R6-06 Abilities 与 Dynamic Tags 开放为 `READY`；用户现有 PostgreSQL 数据真实写入/sample 验收与 Windows Full 人工交互验收继续保留到最终统一验收。
 
 ### R6-04 Player Names 与 Positions
 
@@ -85,7 +85,7 @@ Node 开发依赖固定安装和读取自源码根目录上一级的 `../node_mo
 - 旧 owner PostgreSQL 16 contract run `31929515802` 为 `SUCCESS`；Player Directory owner-switch run `31929916934` 与 Player Detail owner-switch run `31930614713` 均为 `SUCCESS`。official Domain inventory refresh run `31932154320` 为 `SUCCESS`，只更新 `architecture/domain-type-inventory.json`。
 - legacy verifier 在 Global Name Search、Player Role Inheritance、Database Reset、Entity Resource Center、Stage E1 Follow-up 上依次发现 owner-path 漂移；均只将原有契约检查跟随到真实新 owner，未删除、跳过或放宽门禁。
 - 最终 stage hard gate run `31932648476`：Windows job `95129707185` 与 PostgreSQL/architecture job `95129707240` 均 `SUCCESS`；`npm run verify:frontend`、`cargo fmt --all -- --check`、workspace Clippy `-D warnings`、workspace tests、R6 ownership、完整 architecture、模型保护、database baseline 与 PostgreSQL 16 contract 全部实际通过。临时 hard-gate 与 inventory refresh workflow 已清理。
-- clean PR canonical run `31933320602` / Windows job `95131335957` 为 `SUCCESS`；artifact `9260226890`，SHA-256 `46c628502db8d9a1bd86a1459c8c7d955b13b7118eed950d292ee85f0d6bf01d`。PR #34 fixed head `b00d5cb3144bdb634b0d8f48343e7a0e3f897f5e` 已 squash merge 为 `8f285d2b3b539d0fdcfa6c02b1ee0fc801567786`。merged-stage canonical run `31937248702` / Windows job `95140999446` 为 `SUCCESS`；artifact `9261315055`，SHA-256 `38bae9097b67cf743a749b90a659d70e569ce01ee1de34f563d865b91ea236c0`。R6-03 正式 `DONE`，R6-04 Player Names 与 Positions 开放为 `READY`。用户现有 PostgreSQL 数据库真实数据写入/sample 验收与 Windows Full 人工交互验收未执行。详细记录见 `docs/modular-rewrite/R06-entity-catalog-persistence/R06-03-player-directory-and-detail.md`。
+- clean PR canonical run `31933320602` / Windows job `95131335957` 为 `SUCCESS`；artifact `9260226890`，SHA-256 `46c628502db8d9a1bd86a1459c8c7d955b13b7118eed950d292ee85f0d6bf01d`。PR #34 fixed head `b00d5cb3144bdb634b0d8f48343e7a0e3f897f5e` 已 squash merge 为 `8f285d2b3b539d0fdcfa6c02b1ee0fc801567786`。merged-stage canonical run `31937248702` / Windows job `95140999446` 为 `SUCCESS`；artifact `9261315055`，SHA-256 `38bae9097b67cf743a749b90a659d70e569ce01ee1de34f563d865b91ea236c0`。R6-03 已正式关闭为 `DONE`，R6-04 Player Names 与 Positions 开放为 `READY`。用户现有 PostgreSQL 数据库真实数据写入/sample 验收与 Windows Full 人工交互验收未执行。详细记录见 `docs/modular-rewrite/R06-entity-catalog-persistence/R06-03-player-directory-and-detail.md`。
 
 ### R6-02 Team Names 与 Profiles
 
@@ -94,7 +94,7 @@ Node 开发依赖固定安装和读取自源码根目录上一级的 `../node_mo
 - 公共 `TeamCatalogPort`、Tauri command/DTO、Domain shape、Schema、0001–0046 migration、配置、错误文案、审计语义、用户可观察行为、模型保护资产与生产依赖保持不变；Profile head-coach 投影保护与 metadata merge 保持原语义。
 - 旧 owner PostgreSQL 16 baseline run `31897078340` / job `95041920033` 为 `SUCCESS`；owner-switch run `31897403363` / job `95042724731` 为 `SUCCESS`。
 - 最终阶段 hard gate run `31897727309`：Windows job `95043538718` 与 PostgreSQL/architecture job `95043538723` 均 `SUCCESS`，覆盖 frontend、rustfmt、workspace Clippy `-D warnings`、workspace tests、完整 architecture、模型保护、database baseline 与真实 PG16 contract。
-- clean PR canonical run `31898334326` / Windows job `95044999641` 为 `SUCCESS`；artifact `9250723192`，SHA-256 `15362b7164cc2ae0c7b177f4f4899b56678232595caa955d9602adea1eae2ee6`。PR #33 已按 fixed head `f04923425f9d660f2ce1275da2b689ca681f3500` squash merge 为 `334d5d86f08f5cd1adee5b23dc64d907aeb2eba2`。merged-stage canonical run `31925219003` / Windows job `95111615032` 为 `SUCCESS`；artifact `9257917686`，SHA-256 `ff29c7326ed23f3736fd433f2adde3aad587f9aa17506b2eedd96e913b7f2e9d`。R6-02 已正式关闭为 `DONE`，R6-03 Player Directory 与 Detail 开放为 `READY`。用户现有 PostgreSQL 数据库真实写入/sample 验收与 Windows Full 人工交互验收仍未执行。
+- clean PR canonical run `31898334326` / Windows job `95044999641` 为 `SUCCESS`；artifact `9250723192`，SHA-256 `15362b7164cc2ae0c7b177f4f4899b56678232595caa955d9602adea1eae2ee6`。PR #33 已按 fixed head `f04923425f9d660f2ce1275da2b689ca681f3500` squash merge 为 `334d5d86f08f5cd1adee5b23dc64d907aeb2eba2`。merged-stage canonical run `31925219003` / Windows job `95111615032` 为 `SUCCESS`；artifact `9257917686`，SHA-256 `ff29c7326ed23f3736fd433f2adde3aad587f9aa17506b2eedd96e913b7f2e9d`。R6-02 已正式关闭为 `DONE`，R6-03 Player Directory 与 Detail 开放为 `READY`。未对用户现有 PostgreSQL 数据库执行写入/真实数据 sample 验收，也未宣称 Windows Full 人工交互验收完成。详细记录见 `docs/modular-rewrite/R06-entity-catalog-persistence/R06-02-team-names-and-profiles.md`。
 
 
 ### R6-01 Team Directory 与 Detail
@@ -103,7 +103,7 @@ Node 开发依赖固定安装和读取自源码根目录上一级的 `../node_mo
 - R6-02 Team Names/Profile writes 与 R6-09 deletion 继续保留原 owner，没有提前跨节点迁移；Application `TeamCatalogPort`、Tauri command/DTO、Schema、0001–0046 migration、配置、错误语义、用户可观察行为、模型保护资产与生产依赖保持不变。
 - 旧 owner PostgreSQL 16 contract run `31888078703` / job `95020173411` 为 `SUCCESS`；最终 owner switch run `31888483586` / job `95021118552` 为 `SUCCESS`，生产切换提交 `5056917bd5c0e81aaaa96d1ef70c7362ef874820`。
 - ownership/inventory run `31888800801` / job `95021851053` 为 `SUCCESS`：R6-01 ownership、official Domain inventory、模型保护、完整 architecture、rustfmt、Persistence/Application check、Persistence unit tests 与同一 PostgreSQL contract 全部通过；verified HEAD `b2999e5dce982bddf2093f0596eec33a7dbd0333`。
-- 阶段级 hard gate 最终 run `31889555412` 已通过：Windows job `95023694944` 的 frontend、rustfmt、workspace Clippy `-D warnings`、workspace tests 与 Ubuntu job `95023694946` 的完整 architecture、模型保护、database baseline freeze、PostgreSQL 16 contract 均 `SUCCESS`。
+- 阶段级 hard gate run `31889555412` 已通过：Windows job `95023694944` 的 frontend、rustfmt、workspace Clippy `-D warnings`、workspace tests 与 Ubuntu job `95023694946` 的完整 architecture、模型保护、database baseline freeze、PostgreSQL 16 contract 均 `SUCCESS`。
 - clean PR canonical run `31890099520` 为 `SUCCESS`；PR #32 已 squash merge 为 `a54df5ca2695297ea5866a3efd74643239568825`。merged-stage canonical run `31892105125` / Windows job `95029805339` 为 `SUCCESS`，artifact `9249127034`，SHA-256 `972be4e32272e700da265f6e82ce96bc5e56aa356491bb217d6a1076e1b00087`。
 - R6-01 已正式关闭为 `DONE`；未对用户现有 PostgreSQL 数据库执行写入/真实数据 sample 验收，也未宣称 Windows Full 人工交互验收已完成。R6-02 Team Names 与 Profiles 已开放为 `READY`。详细记录见 `docs/modular-rewrite/R06-entity-catalog-persistence/R06-01-team-directory-and-detail.md`。
 
@@ -116,7 +116,7 @@ Node 开发依赖固定安装和读取自源码根目录上一级的 `../node_mo
 - PostgreSQL 16 专项 run `31881761988`：Model Run Identity contract job `95005200186` 与 Rule Package registration regression job `95005200191` 均 `SUCCESS`。
 - clean source HEAD `dc6d2baf0f6092f67200214b5b45e37c528394ad` 的 canonical Public Platform CI run `31881842368` / Windows job `95005434692` 为 `SUCCESS`；artifact `9246499189`，SHA-256 `74bc2a687b8499f798c0a91a28522fa74df0237ee24d005197067b1c97a1e452`。
 - R5-06 已正式关闭为 `DONE`；fixed clean HEAD `058884e82f3c584f87751dec3bb5f9b6531a151e` 的 push canonical run `31883239072` / job `95008635990` 与 PR #31 canonical run `31883703954` / job `95009730520` 均为 `SUCCESS`。
-- PR #31 已按 fixed head squash merge 为 `acb0491003b365b3f775780d8c98ecfdf1e80104`；merged-stage canonical Public Platform CI run `31884882480` / Windows job `95012628426` 为 `SUCCESS`，artifact `9247273760` SHA-256 `4c6b107922787a732537a83b58b005bb364ff10298146c87f0dff40f8bdf5a26`。
+- PR #31 已按 fixed head squash merge 为 `acb0491003b365b3f775780d8c98ecfdf1e80104`；merged-stage canonical Public Platform CI run `31884882480` / Windows job `95012628426` 为 `SUCCESS`，artifact `9247274708`，SHA-256 `4c6b107922787a732537a83b58b005bb364ff10298146c87f0dff40f8bdf5a26`。
 - 详细节点记录：`docs/modular-rewrite/R05-competition-routing-persistence/R05-06-model-run-identity-reads.md`。
 
 ### R5 阶段完成
@@ -156,7 +156,7 @@ Node 开发依赖固定安装和读取自源码根目录上一级的 `../node_mo
 - R1-04 前置校正将 `crates/application/src/model_shell/mod.rs` 恢复为 Rust 1.88 标准排版，并只同步更新该文件的保护指纹与派生聚合值；导出集合、模型行为和保护范围均未变化。
 - R1-04 已同步迁移 19 个既有验证器读取新的 Tauri 命令注册表或状态所有者，消除旧 `lib.rs` 路径造成的伪失败；产品代码和公共契约未改变。
 - R1-04 Windows Automated 启动烟测改为按启动前日志路径集合识别新 session，并在首次 45 秒超时时最多重启一次；每次启动保留 stdout/stderr，连续两次超时仍硬失败。打包前后 EXE 的 A/B 运行均正常，产品入口、bundle、命令和业务行为未改变。
-- R1-04 workflow run `31037323146`、job `92412651719` 在清理后代码树提交 `5cb66fdedbfcaf89c86a7124f8894bdc71a533c9` 上通过；artifact `8943939773` 大小 `14119217` 字节，SHA-256 为 `7562c9137d52040627a58d9c8e104c4053b9923983a16daae08e4361e9a78f2b`。Automated 报告为 PASS，7 条运行记录、0 条无效记录、0 个运行时错误，release 客户端首次启动即建立日志。
+- R1-04 workflow run `31037323146`、job `92412650719` 在清理后代码树提交 `5cb66fdedbfcaf89c86a7124f8894bdc71a533c9` 上通过；artifact `8943939773` 大小 `14119217` 字节，SHA-256 为 `7562c9137d52040627a58d9c8e104c4053b9923983a16daae08e4361e9a78f2b`。Automated 报告为 PASS，7 条运行记录、0 条无效记录、0 个运行时错误，release 客户端首次启动即建立日志。
 - R1-02 最终 workflow run `31001470224`、job `92291121763` 在提交 `28ec363babe4f3fbccd14693d0261febdc305458` 上通过；artifact `8929207011` 大小 `14117150` 字节，SHA-256 为 `e83b2ab9c6cb705d0bfd740c798673a45dc2a4cb0b7b35ddebe844bb40b13e88`，Automated 报告为 PASS，7 条运行记录、0 条无效记录、0 个运行时错误。
 - 截图启动工具仅对 Chromium `DevToolsActivePort` 的 `EBUSY`、`ENOENT`、`EPERM` 和未完成端口内容执行最长 15 秒的有界重试；其他错误立即失败，截图差异阈值与门禁强度未放宽。
 - `Public Platform CI` 现支持推送到 `main`、`new-*`、`rewrite/**`、Pull Request 和 `workflow_dispatch`，以 `windows-2025` 执行架构契约、前端、Rust、Tauri Windows release、release 客户端启动和运行日志扫描，并上传验证证据。
@@ -172,7 +172,7 @@ Node 开发依赖固定安装和读取自源码根目录上一级的 `../node_mo
 - R0-06.1 新增 `scripts/process/execution-context.mjs`、`scripts/process/node-package-cli.mjs` 和 `scripts/verify-node-process-compatibility.mjs`，关闭目录联接依赖同步与 `.cmd` 子进程调用缺口。Windows workflow run `30919764753` 中完整 frontend 通过，Automated 到达 Rust 阶段。
 - R0-06.2 新增 `scripts/windows/acceptance-paths.psm1` 与 `scripts/verify-windows-path-contract.mjs`，支持根入口既有 `LogDirectory` 参数，并按 Cargo target 登记文件查找 release EXE。
 - R0-06.2 Windows workflow run `30922384735` 中，完整 frontend、release 构建与 RuntimeOnly runner 均实际通过。release EXE 从项目根目录 `.cargo-target\release` 启动；startup report 为 PASS，7 条记录、3 个完成操作、0 个无效行、0 个运行时错误。
-- R0-06.2 证据 artifact 为 `8898312587`，SHA-256 为 `d6ed06066a5b27a58d9c8e104c4053b9923983a16daae08e4361e9a78f2b`。临时 workflow 的 job 最终因产品验证结束后的一条辅助中文日志精确匹配未命中而显示 failure；证据文件已复核，未将 workflow 总体描述为通过。
+- R0-06.2 证据 artifact 为 `8898312587`，SHA-256 为 `d6ed06066aab354686f86938ec7c55f2c1f740e11a37e42a6a1b5edbbd53df63`。临时 workflow 的 job 最终因产品验证结束后的一条辅助中文日志精确匹配未命中而显示 failure；证据文件已复核，未将 workflow 总体描述为通过。
 - R0-07 使用 Rust 1.88.0 rustfmt 对 42 个已诊断 Rust 文件进行纯格式规范化，实施提交为 `9e7be511ae2d97a0782fee1a2bea5e25d910d10d`；未触碰模型保护文件、依赖、锁文件、迁移或公共接口。
 - R0-07 精确 workflow run `30961535208` 中，Cargo.lock 门禁、Cargo target 准备和 `cargo fmt --all -- --check` 通过。完整 `npm run verify:rust` 随后在 16 个 Clippy 错误处以退出码 `101` 结束，workspace tests 因 fail-fast 未执行。
 - R0-07 精确验证 artifact 为 `8913160029`，SHA-256 为 `47712408cb9fbd37088f42cab92e71565b0c982d5c0492a78fb6c4ef2e53ad49`。
@@ -292,7 +292,7 @@ PostgreSQL 实跑、Windows Full 和用户本机 Windows 10/11 实机验收仍�
 
 ## R2-06 Review 与 Postmatch
 
-- Review 48 个类型与 Postmatch 11 个类型已迁移到 `review/`、`postmatch/` 职责目录，旧 5 个职责混合根文件已删除。
+- Review 48 个类型与 Postmatch 11 个类型已迁移到 `review/`、`postmatch/` 职责目录，旧 5 个职责混合源文件已删除。
 - staged 与 Windows Automated 验收已通过；原 PostgreSQL 数据库兼容链已在保留历史数据、不可变资产与 fail-closed 保护的前提下完成验证。
 - R2-06 状态为 `DONE`，R2-07 已开放。
 
