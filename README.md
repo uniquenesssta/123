@@ -46,10 +46,9 @@ Node 开发依赖固定安装和读取自源码根目录上一级的 `../node_mo
 
 ### R6-08 Entity Matching 与 References
 
-- Entity Matching persistence 已收敛到 `adapters/catalog/entity_matching/`，References persistence 已收敛到 `adapters/catalog/references/`；stable-ID/external-ID/name candidate read、reference directory、provider 与 external-ID writes 均按职责拆分，协调器保持 SQL-free。`entity_catalog.rs` 继续只持有后续 R6-09 deletion/archive/reference-count，`player_catalog.rs` 不再持有 provider/external-ID owner。
-- `EntityReferencePort`、Domain DTO、Schema/0001–0046 migrations、配置、错误语义、统一 NameSearch、matching priority/candidate score/reason、历史 P4/运行引用和用户可观察行为保持不变；无新增生产依赖。
-- R6-08 implementation/minimum gate 通过后进入 `VERIFYING`；Stage Regression、PostgreSQL 16 真实 contract 与 clean canonical 完成前不标记 `DONE`。
-
+- Entity Matching persistence 已收敛到 `adapters/catalog/entity_matching/`，References persistence 已收敛到 `adapters/catalog/references/`；stable-ID/external-ID/name candidate read、reference directory、provider 与 external-ID writes 均按职责拆分，协调器保持 SQL-free。`entity_catalog.rs` 继续只持有 R6-09 deletion/archive/reference-count，`player_catalog.rs` 不再持有 provider/external-ID owner。
+- `EntityReferencePort`、Domain DTO、Schema/0001–0046 migrations、数据格式、配置、错误语义、日志等级、统一 NameSearch、matching priority/candidate score/reason、历史 P4/运行引用、UI 行为和模型保护资产保持不变；无新增生产依赖。
+- 生产 owner-switch 提交 `89dfbb101989116b5c858dbb8dc4564c50f86f9d` 的 implementation/minimum gate 已通过。首轮阶段 hard gate run `32142895608` 仅因 Ubuntu Chrome zygote 截图环境失败而停止，后续门禁未被误记为通过；最终 hard gate run `32143394153` 整体 `SUCCESS`，Windows job `95731216023` 已通过 frontend、rustfmt、workspace Clippy `-D warnings` 与 workspace tests，PostgreSQL 16 job `95731215987` 已通过 official inventory、R6 retained ownership、完整 architecture、模型保护/database baseline 及 R6-03～R6-08 真实 PostgreSQL contracts。临时 gate/closeout 文件已清理；R6-08 正式 `DONE`，R6-09 开放为 `READY`。用户现有 PostgreSQL 数据真实 sample/write 与 Windows Full 人工验收继续保留到最终统一验收。
 ### R6-07 Coaches 与 Formation Usage
 
 - Coaches persistence 已收敛到 `adapters/catalog/coaches/{directory,detail,names,team_periods,mapping}/`；Formation persistence 已收敛到 `adapters/catalog/formations/{directory,usage,resolution}/`。Formation resolution/window/save 的 SQL 读取与写入进一步拆入明确 `read.rs` / `write.rs` owner，协调器保持 SQL-free；旧 `formation_catalog.rs` 删除，`entity_catalog.rs` 仅保留后续 R6-08/R6-09 职责。
