@@ -1,31 +1,260 @@
-.github/workflows/r6-08-bootstrap.yml
-.r6-08-failure.txt
-.r6-08/apply.py
-info: syncing channel updates for 1.88.0-x86_64-unknown-linux-gnu
-info: latest update on 2025-06-26 for version 1.88.0 (6b00bc388 2025-06-23)
-info: downloading 3 components
+   Compiling byteorder v1.5.0
+   Compiling bitflags v2.13.0
+   Compiling hex v0.4.3
+   Compiling home v0.5.12
+   Compiling whoami v1.6.1
+   Compiling dotenvy v0.15.7
+   Compiling sqlx-postgres v0.8.6
+    Checking football-domain v0.23.0 (/home/runner/work/123/123/crates/domain)
+   Compiling heck v0.5.0
+   Compiling sqlx-macros-core v0.8.6
+   Compiling football-persistence-postgres v0.23.0 (/home/runner/work/123/123/crates/persistence-postgres)
+   Compiling sqlx-macros v0.8.6
+    Checking sqlx v0.8.6
+    Checking football-analytics-engine v0.23.0 (/home/runner/work/123/123/crates/analytics-engine)
+    Checking football-model-api v0.23.0 (/home/runner/work/123/123/crates/model-api)
+    Checking football-review-engine v0.23.0 (/home/runner/work/123/123/crates/review-engine)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 49.58s
+   Compiling libc v0.2.186
+   Compiling cfg-if v1.0.4
+   Compiling serde_core v1.0.228
+   Compiling zerofrom v0.1.8
+   Compiling stable_deref_trait v1.2.1
+   Compiling typenum v1.20.1
+   Compiling yoke v0.8.3
+   Compiling zerovec v0.11.6
+   Compiling tinystr v0.8.3
+   Compiling generic-array v0.14.7
+   Compiling num-traits v0.2.19
+   Compiling litemap v0.8.2
+   Compiling writeable v0.6.3
+   Compiling pin-project-lite v0.2.17
+   Compiling icu_locale_core v2.2.0
+   Compiling getrandom v0.2.17
+   Compiling potential_utf v0.1.5
+   Compiling zerotrie v0.2.4
+   Compiling memchr v2.8.3
+   Compiling utf8_iter v1.0.4
+   Compiling subtle v2.6.1
+   Compiling iana-time-zone v0.1.65
+   Compiling serde v1.0.228
+   Compiling icu_provider v2.2.0
+   Compiling icu_collections v2.2.0
+   Compiling zmij v1.0.23
+   Compiling block-buffer v0.10.4
+   Compiling crypto-common v0.1.7
+   Compiling smallvec v1.15.2
+   Compiling futures-core v0.3.32
+   Compiling zeroize v1.9.0
+   Compiling itoa v1.0.18
+   Compiling digest v0.10.7
+   Compiling icu_normalizer_data v2.2.0
+   Compiling icu_properties_data v2.2.0
+   Compiling serde_json v1.0.150
+   Compiling rustls-pki-types v1.15.0
+   Compiling socket2 v0.6.4
+   Compiling mio v1.2.1
+   Compiling bytes v1.12.1
+   Compiling icu_properties v2.2.0
+   Compiling icu_normalizer v2.2.0
+   Compiling crossbeam-utils v0.8.22
+   Compiling equivalent v1.0.2
+   Compiling untrusted v0.9.0
+   Compiling once_cell v1.21.4
+   Compiling scopeguard v1.2.0
+   Compiling lock_api v0.4.14
+   Compiling ring v0.17.14
+   Compiling idna_adapter v1.2.2
+   Compiling parking_lot_core v0.9.12
+   Compiling allocator-api2 v0.2.21
+   Compiling futures-sink v0.3.32
+   Compiling percent-encoding v2.3.2
+   Compiling foldhash v0.1.5
+   Compiling parking_lot v0.12.5
+   Compiling hashbrown v0.15.5
+   Compiling form_urlencoded v1.2.2
+   Compiling thiserror v2.0.18
+   Compiling idna v1.1.0
+   Compiling zerocopy v0.8.54
+   Compiling concurrent-queue v2.5.0
+   Compiling getrandom v0.4.3
+   Compiling rustls-webpki v0.103.13
+   Compiling tracing-core v0.1.36
+   Compiling webpki-roots v1.0.8
+   Compiling log v0.4.33
+   Compiling tinyvec_macros v0.1.1
+   Compiling crc-catalog v2.5.0
+   Compiling parking v2.2.1
+   Compiling futures-task v0.3.32
+   Compiling hashbrown v0.17.1
+   Compiling slab v0.4.12
+   Compiling futures-io v0.3.32
+   Compiling cpufeatures v0.2.17
+   Compiling futures-util v0.3.32
+   Compiling sha2 v0.10.9
+   Compiling indexmap v2.14.0
+   Compiling event-listener v5.4.1
+   Compiling crc v3.4.0
+   Compiling tinyvec v1.12.0
+   Compiling tracing v0.1.44
+   Compiling webpki-roots v0.26.11
+   Compiling rustls v0.23.42
+   Compiling uuid v1.23.5
+   Compiling hashlink v0.10.0
+   Compiling url v2.5.8
+   Compiling ppv-lite86 v0.2.21
+   Compiling futures-intrusive v0.5.0
+   Compiling crossbeam-queue v0.3.13
+   Compiling either v1.16.0
+   Compiling chrono v0.4.45
+   Compiling rand_core v0.6.4
+   Compiling base64 v0.22.1
+   Compiling rand_chacha v0.3.1
+   Compiling unicode-normalization v0.1.25
+   Compiling tokio v1.52.3
+   Compiling hmac v0.12.1
+   Compiling unicode-properties v0.1.4
+   Compiling unicode-bidi v0.3.18
+   Compiling stringprep v0.1.5
+   Compiling hkdf v0.12.4
+   Compiling rand v0.8.7
+   Compiling futures-channel v0.3.32
+   Compiling md-5 v0.10.6
+   Compiling atoi v2.0.0
+   Compiling tokio-macros v2.7.0
+   Compiling dotenvy v0.15.7
+   Compiling hex v0.4.3
+   Compiling whoami v1.6.1
+   Compiling byteorder v1.5.0
+   Compiling bitflags v2.13.0
+   Compiling home v0.5.12
+   Compiling football-domain v0.23.0 (/home/runner/work/123/123/crates/domain)
+   Compiling tokio-stream v0.1.18
+   Compiling sqlx-core v0.8.6
+   Compiling sqlx-postgres v0.8.6
+   Compiling sqlx-macros-core v0.8.6
+   Compiling sqlx-macros v0.8.6
+   Compiling sqlx v0.8.6
+   Compiling football-model-api v0.23.0 (/home/runner/work/123/123/crates/model-api)
+   Compiling football-review-engine v0.23.0 (/home/runner/work/123/123/crates/review-engine)
+   Compiling football-analytics-engine v0.23.0 (/home/runner/work/123/123/crates/analytics-engine)
+   Compiling football-persistence-postgres v0.23.0 (/home/runner/work/123/123/crates/persistence-postgres)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 37.68s
+     Running unittests src/lib.rs (../.cargo-target/debug/deps/football_persistence_postgres-783fed9ccdd2a7bc)
 
-  1.88.0-x86_64-unknown-linux-gnu installed - rustc 1.88.0 (6b00bc388 2025-06-23)
+running 97 tests
+test adapters::catalog::entity_matching::normalization::tests::matching_normalization_preserves_existing_case_and_spacing_semantics ... ok
+test adapters::catalog::formations::usage::tests::scope_shape_and_bounds_stay_strict ... ok
+test adapters::catalog::players::names::input_policy::tests::rejects_blank_name_and_reversed_dates ... ok
+test adapters::catalog::formations::usage::tests::smoothed_probabilities_remain_normalized ... ok
+test adapters::catalog::players::names::input_policy::tests::trims_name_and_optional_language ... ok
+test adapters::catalog::players::normalization::tests::collapses_case_and_spacing ... ok
+test adapters::catalog::players::positions::input_policy::tests::normalizes_position_code_and_role ... ok
+test adapters::catalog::players::positions::input_policy::tests::preserves_existing_validation_errors ... ok
+test adapters::catalog::players::value_mapping::tests::persisted_values_round_trip ... ok
+test adapters::catalog::players::value_mapping::tests::unknown_values_are_rejected ... ok
+test adapters::catalog::teams::names::validation::tests::rejects_blank_name_with_existing_error_semantics ... ok
+test adapters::catalog::teams::names::mapper::tests::maps_all_team_name_fields_without_loss ... ok
+test adapters::catalog::teams::names::normalization::tests::normalizes_case_outer_whitespace_and_internal_spacing ... ok
+test adapters::catalog::references::entity_type::tests::reference_entity_type_contract_is_strict ... FAILED
+test adapters::catalog::teams::profiles::input_policy::tests::preserves_existing_profile_validation_messages ... ok
+test adapters::catalog::teams::profiles::input_policy::tests::trims_optional_text_and_drops_blank_values ... ok
+test adapters::catalog::teams::names::validation::tests::rejects_reversed_validity_range ... ok
+test adapters::catalog::teams::names::validation::tests::trims_name_and_language_code_without_changing_draft_contract ... ok
+test adapters::competition::model_run_identity::read_identity::tests::sql_errors_keep_persistence_sqlx_semantics ... ok
+test adapters::competition::route_resolution::context::validate_scope::tests::rejects_scope_mismatch ... ok
+test adapters::competition::model_run_identity::record::tests::maps_complete_model_run_identity ... ok
+test adapters::competition::model_run_identity::record::tests::preserves_nullable_rule_package_and_binding_relationships ... ok
+test fact_pipeline_records::tests::best_candidate_keeps_highest_score_per_entity ... ok
+test fact_pipeline_records::tests::source_policy_rejects_duplicate_domains_and_unknown_tiers ... ok
+test lineup_chain::tests::fixed_window_means_within_declared_duration ... ok
+test lineup_chain::tests::fixed_window_rejects_requests_before_window_opens ... ok
+test lineup_chain::tests::latest_window_uses_reference_time_before_kickoff ... ok
+test lineup_chain::tests::legacy_t90m_is_not_available_for_new_requests ... ok
+test mapping::invalid_state::tests::preserves_invalid_state_message ... ok
+test mapping::json::tests::serializes_without_changing_json_shape ... ok
+test mapping::optional::tests::normalizes_missing_null_blank_and_present_text ... ok
+test mapping::time::tests::parses_rfc3339_into_utc ... ok
+test mapping::time::tests::rejects_non_string_time_with_existing_error_semantics ... ok
+test mapping::uuid::tests::optional_uuid_accepts_missing_null_and_blank_values ... ok
+test match_prediction::tests::missing_quality_dimensions_are_not_ignored ... ok
+test mapping::uuid::tests::optional_uuid_trims_present_values_without_relaxing_required_uuid ... ok
+test model_runs::tests::prepared_input_audit_validates_manifest_hash ... ok
+test monthly_workbooks::tests::blank_is_not_a_clear_instruction ... ok
+test monthly_workbooks::tests::custom_formation_requires_ten_outfield_players ... ok
+test monthly_workbooks::tests::duplicate_package_team_payload_only_fills_missing_fields ... ok
+test monthly_workbooks::tests::duplicate_package_team_identity_matches_explicit_and_implicit_rows ... ok
+test monthly_workbooks::tests::duplicate_package_team_source_identity_matches_translated_names ... ok
+test monthly_workbooks::tests::existing_batch_payload_is_canonicalized_before_commit ... ok
+test lineup_chain::tests::latest_window_never_crosses_kickoff ... ok
+test monthly_workbooks::tests::formation_group_key_separates_blank_ids_by_team_and_coach_names ... ok
+test monthly_workbooks::tests::formation_group_preview_keeps_distinct_teams_separate ... ok
+test monthly_workbooks::tests::formation_code_normalizes_excel_unicode_before_lookup ... ok
+test monthly_workbooks::tests::formation_group_preview_rejects_aggregate_overflow ... ok
+test monthly_workbooks::tests::formation_payload_normalization_is_idempotent ... ok
+test monthly_workbooks::tests::invalid_team_type_is_rejected_before_sql_constraint ... ok
+test monthly_workbooks::tests::monthly_datetime_accepts_excel_serial_cells ... ok
+test monthly_workbooks::tests::monthly_datetime_text_is_canonicalized_before_commit ... ok
+test monthly_workbooks::tests::player_monthly_format_is_distinct_from_team_format ... ok
+test monthly_workbooks::tests::package_team_reference_uses_unique_source_when_name_changed ... ok
+test monthly_workbooks::tests::point_observation_window_rejects_inverted_range ... ok
+test monthly_workbooks::tests::point_observation_window_uses_end_for_missing_start ... ok
+test monthly_workbooks::tests::point_observation_window_uses_observed_at_when_both_dates_are_blank ... ok
+test monthly_workbooks::tests::source_urls_are_split_and_deduplicatable ... ok
+test monthly_workbooks::tests::team_type_aliases_are_normalized_before_database_write ... ok
+test name_search::tests::empty_query_is_ignored ... ok
+test name_search::tests::generated_sql_checks_primary_and_alias_names ... ok
+test name_search::tests::latin_diacritics_are_folded_for_search ... ok
+test name_search::tests::parses_chinese_and_english_partial_terms ... ok
+test monthly_workbooks::tests::monthly_datetime_rejects_unrecognized_text_before_database_write ... ok
+test name_search::tests::punctuation_free_query_can_match_compact_name ... ok
+test p4_records::tests::duplicate_provider_chain_is_rejected ... ok
+test p4_records::tests::evidence_source_is_required_for_supported_facts ... ok
+test p4_records::tests::immutable_version_identity_rejects_semantic_field_drift ... ok
+test p4_records::tests::snapshot_fingerprint_is_deterministic_and_order_independent ... ok
+test player_catalog::tests::normalize_name_collapses_case_and_spacing ... ok
+test p4_records::tests::snapshot_requires_all_31_fields_and_at_least_one_chain ... ok
+test player_catalog::tests::persisted_enums_round_trip ... ok
+test player_catalog::tests::unknown_persisted_enum_is_rejected ... ok
+test pool::database_options::tests::database_url_redaction_hides_password ... ok
+test postmatch::tests::not_verifiable_does_not_fake_accuracy ... ok
+test postmatch::tests::timeliness_is_bounded_and_rewards_fresh_sources ... ok
+test research_gateway_records::tests::attempt_validation_rejects_secrets_and_invalid_cost ... ok
+test research_gateway_records::tests::secret_validation_does_not_reject_short_sk_team_names ... ok
+test role_resolution::tests::blank_role_inherits_player_position_default ... ok
+test role_resolution::tests::contribution_role_origin_and_confidence_share_the_same_semantics ... ok
+test role_resolution::tests::explicit_same_role_keeps_inherited_lineage ... ok
+test role_resolution::tests::metadata_records_role_lineage_without_dropping_existing_fields ... ok
+test spreadsheet_exchange::tests::availability_aliases_are_normalized_without_losing_original_value ... ok
+test spreadsheet_exchange::tests::dynamic_tag_child_validation_allows_default_ttl ... ok
+test spreadsheet_exchange::tests::dynamic_tag_child_validation_rejects_non_increasing_explicit_range ... ok
+test spreadsheet_exchange::tests::dynamic_tag_source_alias_is_normalized ... ok
+test spreadsheet_exchange::tests::package_team_name_can_resolve_to_deferred_external_reference ... ok
+test spreadsheet_exchange::tests::player_team_period_derives_start_date_from_verification_time ... ok
+test spreadsheet_exchange::tests::public_roster_initialization_source_is_audited_as_calculation ... ok
+test role_resolution::tests::explicit_different_role_is_lineup_override ... ok
+test spreadsheet_exchange::tests::spreadsheet_datetime_accepts_date_only_and_excel_serial ... ok
+test team_features::tests::history_curve_rewards_better_results ... ok
+test team_features::tests::ratio_curve_is_continuous_and_centered ... ok
+test team_features::tests::venue_curve_stays_bounded ... ok
+test team_lineup_presets::tests::preset_rejects_duplicate_players ... ok
+test team_lineup_presets::tests::preset_requires_exactly_eleven_starters ... ok
+test migrations::reconcile_known_migrations::tests::compatibility_allowlist_is_exact_and_checksums_are_sha384 ... ok
 
-info: downloading component rustfmt
-info: using existing install for 1.88.0-x86_64-unknown-linux-gnu
-info: default toolchain set to 1.88.0-x86_64-unknown-linux-gnu
+failures:
 
-  1.88.0-x86_64-unknown-linux-gnu unchanged - rustc 1.88.0 (6b00bc388 2025-06-23)
+---- adapters::catalog::references::entity_type::tests::reference_entity_type_contract_is_strict stdout ----
 
-info: note that the toolchain '1.88.0-x86_64-unknown-linux-gnu' is currently in use (overridden by '/home/runner/work/123/123/rust-toolchain.toml')
-R6-08 implementation payload applied
-R6-08 Entity Matching / References persistence ownership verified.
-R6-07 Coaches / Formation Usage persistence ownership verified.
-阶段2实体关系验证通过：教练历史、统一匹配、引用检查、批量归档和双向履历均已锁定。
+thread 'adapters::catalog::references::entity_type::tests::reference_entity_type_contract_is_strict' panicked at crates/persistence-postgres/src/adapters/catalog/references/entity_type.rs:22:9:
+assertion `left == right` failed
+  left: "数据库数据不完整：不支持的实体类型：match"
+ right: "状态无效: 不支持的实体类型：match"
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
 
-> football-match-model-platform@0.23.0 verify:architecture
-> node scripts/architecture/verifyModuleBoundaries.mjs && node scripts/architecture/verifyStateOwnership.mjs && node scripts/architecture/verifyProtectedImports.mjs && node scripts/verify-domain-type-inventory.mjs && node scripts/verify-domain-root-exports.mjs && node scripts/verify-application-ports.mjs && node scripts/verify-database-service.mjs && node scripts/verify-competition-rules-service.mjs && node scripts/verify-teams-players-service.mjs && node scripts/verify-lineups-service.mjs && node scripts/verify-prediction-service.mjs && node scripts/verify-research-service.mjs && node scripts/verify-review-service.mjs && node scripts/verify-postmatch-service.mjs && node scripts/verify-analytics-service.mjs && node scripts/verify-exchange-service.mjs && node scripts/verify-ai-workspace-service.mjs && node scripts/verify-release-service.mjs && node scripts/verify-application-service-facade.mjs && node scripts/verify-persistence-foundation.mjs && node scripts/verify-persistence-audit.mjs && node scripts/verify-persistence-mapping.mjs && node scripts/verify-persistence-adapters.mjs && node scripts/verify-competition-repository.mjs && node scripts/verify-team-directory-detail.mjs && node scripts/verify-team-names-profiles.mjs && node scripts/verify-player-names-positions.mjs && node scripts/verify-player-team-periods-availability.mjs && node scripts/verify-player-abilities-dynamic-tags.mjs && node scripts/verify-coach-formation-persistence.mjs && node scripts/verify-entity-matching-references-persistence.mjs
 
-[architecture:note] 保留已登记过渡导入 src/pages/prediction.ts -> src/pages/runs.ts，退出任务 R14-07
-[architecture:note] 保留已登记过渡导入 src/pages/prediction.ts -> src/pages/p4Workbench.ts，退出任务 R14-06
-[architecture] 模块边界验证 通过：18 个 Feature、11 个 Rust crate、42 个前端源码文件
-[architecture] 状态所有权验证 通过：17 个状态 id、唯一当前 owner 契约与 owner 源位置
-[architecture:note] Application 持久化具体适配器导入已收敛到组合根：crates/application/src/composition/port_registry.rs
-[architecture] 受保护导入验证 通过：42 个前端文件、934 个 Rust 文件、12 个 Cargo 清单
-Domain 类型与契约清单已漂移。请运行 node scripts/generate-domain-type-inventory.mjs 并审查变更。
+failures:
+    adapters::catalog::references::entity_type::tests::reference_entity_type_contract_is_strict
+
+test result: FAILED. 96 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+
+error: test failed, to rerun pass `-p football-persistence-postgres --lib`
