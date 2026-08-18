@@ -6,6 +6,7 @@ on:
       - rewrite/r6-entity-catalog-persistence
     paths-ignore:
       - .r6-07-db-diagnostic-tail.txt
+      - .r6-07-db-reference-tail.txt
   workflow_dispatch:
 
 permissions:
@@ -16,7 +17,7 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  database-baseline:
+  r6-06-reference-baseline:
     runs-on: ubuntu-24.04
     timeout-minutes: 45
     services:
@@ -36,11 +37,13 @@ jobs:
     env:
       FOOTBALL_TEST_DATABASE_URL: postgresql://football_test:football_test@127.0.0.1:5432/football_r6_test
       RUSTUP_TOOLCHAIN: 1.88.0
+      R6_REFERENCE_SHA: 7bf9b90bc235bdb397d003bdd6e61458e2e425c9
 
     steps:
       - uses: actions/checkout@v4
         with:
           ref: rewrite/r6-entity-catalog-persistence
+          fetch-depth: 0
           token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Prepare Rust
@@ -50,38 +53,47 @@ jobs:
           rustup toolchain install 1.88.0 --profile minimal
           rustup default 1.88.0
 
-      - name: Run frozen PostgreSQL baseline
+      - name: Create R6-06 reference worktree
+        shell: bash
+        run: |
+          set -euo pipefail
+          git worktree add --detach /tmp/r6-reference "$R6_REFERENCE_SHA"
+
+      - name: Run frozen PostgreSQL baseline on R6-06 reference
         shell: bash
         run: |
           set +e
-          node scripts/run_database_baseline.mjs 2>&1 | tee /tmp/r6-07-db.log
+          (
+            cd /tmp/r6-reference
+            node scripts/run_database_baseline.mjs
+          ) 2>&1 | tee /tmp/r6-reference-db.log
           status=${PIPESTATUS[0]}
           {
             echo "run_id=${GITHUB_RUN_ID}"
-            echo "source_sha=${GITHUB_SHA}"
+            echo "reference_sha=${R6_REFERENCE_SHA}"
             echo "status=${status}"
-            echo "--- baseline tail ---"
-            tail -n 260 /tmp/r6-07-db.log
-          } > .r6-07-db-diagnostic-tail.txt
+            echo "--- R6-06 reference baseline tail ---"
+            tail -n 260 /tmp/r6-reference-db.log
+          } > .r6-07-db-reference-tail.txt
           exit "$status"
 
-      - name: Persist diagnostic tail
+      - name: Persist reference diagnostic tail
         if: always()
         shell: bash
         run: |
           set -euo pipefail
-          if [ ! -f .r6-07-db-diagnostic-tail.txt ]; then
-            cat > .r6-07-db-diagnostic-tail.txt <<EOF
+          if [ ! -f .r6-07-db-reference-tail.txt ]; then
+            cat > .r6-07-db-reference-tail.txt <<EOF
           run_id=${GITHUB_RUN_ID}
-          source_sha=${GITHUB_SHA}
+          reference_sha=${R6_REFERENCE_SHA}
           status=step_failed_before_log_capture
           EOF
           fi
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git add .r6-07-db-diagnostic-tail.txt
+          git add .r6-07-db-reference-tail.txt
           if git diff --cached --quiet; then
             exit 0
           fi
-          git commit -m "chore(r6-07): record database diagnostic"
+          git commit -m "chore(r6-07): record R6-06 database reference"
           git push origin HEAD:rewrite/r6-entity-catalog-persistence
