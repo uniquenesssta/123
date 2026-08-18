@@ -1,0 +1,222 @@
+name: R6-07 closeout
+
+on:
+  push:
+    branches:
+      - rewrite/r6-entity-catalog-persistence
+    paths:
+      - .github/workflows/r6-07-closeout.yml
+
+permissions:
+  contents: write
+
+jobs:
+  closeout:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: rewrite/r6-entity-catalog-persistence
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Verify closeout baseline
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$(git rev-parse HEAD^)" = "c74ffcd887ed29e41c3b2570fb818ae71680c609"
+          test ! -e .github/workflows/r6-07-hard-gate.yml
+          test ! -e .github/workflows/r6-07-final-pg-gate.yml
+          test ! -e .github/workflows/r6-07-db-diagnostic.yml
+          test ! -e .r6-07-hard-gate-result.json
+          test ! -e .r6-07-final-pg-result.json
+          test ! -e .r6-07-db-diagnostic-tail.txt
+          test ! -e .r6-07-db-reference-tail.txt
+          test ! -d .r6-07
+
+      - name: Record final R6-07 state
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          from pathlib import Path
+
+          def replace_exact(path: str, old: str, new: str) -> None:
+              p = Path(path)
+              text = p.read_text(encoding="utf-8")
+              count = text.count(old)
+              if count != 1:
+                  raise SystemExit(f"{path}: expected one anchor, found {count}: {old[:100]!r}")
+              p.write_text(text.replace(old, new, 1), encoding="utf-8", newline="\n")
+
+          detail = Path("docs/modular-rewrite/R06-entity-catalog-persistence/R06-07-coaches-and-formation-usage.md")
+          detail.write_text(r'''# R6-07 Coaches 与 Formation Usage
+
+## 状态
+
+`DONE`
+
+## 进入基线
+
+- 唯一阶段分支：`rewrite/r6-entity-catalog-persistence`。
+- 节点起点：`7bf9b90bc235bdb397d003bdd6e61458e2e425c9`（R6-06 已关闭，R6-07 为唯一 READY 节点）。
+- 本节点只重写 Coaches 与 Formation Usage persistence；R6-08 Entity Matching/References 与 R6-09 Archive/Delete/Force Delete 未提前迁移。
+
+## 实际职责边界
+
+- `adapters/catalog/coaches/directory/`：Coach 创建与目录查询；目录查询继续复用统一 `NameSearch`，保持中文、英文、别名、重音与多关键词匹配。
+- `adapters/catalog/coaches/detail/`：Coach Detail 读取聚合。
+- `adapters/catalog/coaches/names/`：Coach 名称追加事务。
+- `adapters/catalog/coaches/team_periods/`：球队-教练任期写入及双向读取。
+- `adapters/catalog/coaches/{existence,validation,normalization,mapping}/`：存在性检查、输入验证、名称规范化和 typed Row → Domain 映射。
+- `adapters/catalog/formations/directory/`：Formation 目录 SQL 与 mapper。
+- `adapters/catalog/formations/usage/`：Usage 输入验证、计数准备、概率计算、窗口策略、SQL read/write、分组与保存编排分责；`save.rs` 与 `window.rs` 不直接执行 SQL，append-only `feature.formation_usage_observations` 写入集中在 `write.rs`。
+- `adapters/catalog/formations/resolution/`：`resolve.rs` 只执行 actual/confirmed → team_coach → team → coach → competition_default → system_default → unknown 编排；SQL 读取集中在 `read.rs`。
+- 旧 `formation_catalog.rs` 已删除；`entity_catalog.rs` 已移除 Coach owner，但继续保留 R6-08/R6-09 的 matching/reference/archive/delete 职责，未形成双 owner 或临时转发层。
+
+## 契约与兼容性
+
+- `CoachCatalogPort`、`FormationPort` 方法签名与调用语义不变。
+- Domain DTO、Schema、0001–0046 migrations、配置项、默认值、错误类型/文案、日志等级、安全策略、默认战术角色/位置映射和用户可观察 UI 行为均未修改。
+- Formation Usage 继续 append-only；smoothing、UNKNOWN fallback、actual/confirmed 优先级及当前教练角色优先级保持原语义。
+- 历史 P4/运行引用未删除或级联改写。
+- 无新增生产依赖。
+
+## 文件清单
+
+### 新增
+
+- `crates/persistence-postgres/src/adapters/catalog/coaches/mod.rs`
+- `crates/persistence-postgres/src/adapters/catalog/coaches/existence.rs`
+- `crates/persistence-postgres/src/adapters/catalog/coaches/normalization.rs`
+- `crates/persistence-postgres/src/adapters/catalog/coaches/validation.rs`
+- `crates/persistence-postgres/src/adapters/catalog/coaches/detail/mod.rs`
+- `crates/persistence-postgres/src/adapters/catalog/coaches/detail/read.rs`
+- `crates/persistence-postgres/src/adapters/catalog/coaches/directory/mod.rs`
+- `crates/persistence-postgres/src/adapters/catalog/coaches/directory/create.rs`
+- `crates/persistence-postgres/src/adapters/catalog/coaches/directory/list.rs`
+- `crates/persistence-postgres/src/adapters/catalog/coaches/mapping/mod.rs`
+- `crates/persistence-postgres/src/adapters/catalog/coaches/mapping/coach.rs`
+- `crates/persistence-postgres/src/adapters/catalog/coaches/mapping/external_id.rs`
+- `crates/persistence-postgres/src/adapters/catalog/coaches/mapping/listing.rs`
+- `crates/persistence-postgres/src/adapters/catalog/coaches/mapping/name.rs`
+- `crates/persistence-postgres/src/adapters/catalog/coaches/mapping/period.rs`
+- `crates/persistence-postgres/src/adapters/catalog/coaches/names/mod.rs`
+- `crates/persistence-postgres/src/adapters/catalog/coaches/names/add.rs`
+- `crates/persistence-postgres/src/adapters/catalog/coaches/team_periods/mod.rs`
+- `crates/persistence-postgres/src/adapters/catalog/coaches/team_periods/add.rs`
+- `crates/persistence-postgres/src/adapters/catalog/coaches/team_periods/read.rs`
+- `crates/persistence-postgres/src/adapters/catalog/formations/mod.rs`
+- `crates/persistence-postgres/src/adapters/catalog/formations/constants.rs`
+- `crates/persistence-postgres/src/adapters/catalog/formations/directory/mod.rs`
+- `crates/persistence-postgres/src/adapters/catalog/formations/directory/list.rs`
+- `crates/persistence-postgres/src/adapters/catalog/formations/directory/mapper.rs`
+- `crates/persistence-postgres/src/adapters/catalog/formations/resolution/mod.rs`
+- `crates/persistence-postgres/src/adapters/catalog/formations/resolution/read.rs`
+- `crates/persistence-postgres/src/adapters/catalog/formations/resolution/resolve.rs`
+- `crates/persistence-postgres/src/adapters/catalog/formations/usage/mod.rs`
+- `crates/persistence-postgres/src/adapters/catalog/formations/usage/grouping.rs`
+- `crates/persistence-postgres/src/adapters/catalog/formations/usage/key.rs`
+- `crates/persistence-postgres/src/adapters/catalog/formations/usage/preparation.rs`
+- `crates/persistence-postgres/src/adapters/catalog/formations/usage/probability.rs`
+- `crates/persistence-postgres/src/adapters/catalog/formations/usage/read.rs`
+- `crates/persistence-postgres/src/adapters/catalog/formations/usage/save.rs`
+- `crates/persistence-postgres/src/adapters/catalog/formations/usage/tests.rs`
+- `crates/persistence-postgres/src/adapters/catalog/formations/usage/validation.rs`
+- `crates/persistence-postgres/src/adapters/catalog/formations/usage/window.rs`
+- `crates/persistence-postgres/src/adapters/catalog/formations/usage/window/read.rs`
+- `crates/persistence-postgres/src/adapters/catalog/formations/usage/write.rs`
+- `crates/persistence-postgres/tests/coach_formation_repository_contract.rs`
+- `scripts/verify-coach-formation-persistence.mjs`
+- `docs/modular-rewrite/R06-entity-catalog-persistence/R06-07-coaches-and-formation-usage.md`
+
+### 修改
+
+- `README.md`
+- `architecture/domain-type-inventory.json`
+- `crates/persistence-postgres/src/adapters/catalog/mod.rs`
+- `crates/persistence-postgres/src/entity_catalog.rs`
+- `crates/persistence-postgres/src/lib.rs`
+- `docs/modular-rewrite/R06-entity-catalog-persistence/README.md`
+- `package.json`
+- `scripts/verify-entity-relationships.mjs`
+- `scripts/verify-formation-usage.mjs`
+- `scripts/verify-global-name-search.mjs`
+
+### 移动/重命名
+
+- 无。
+
+### 删除
+
+- `crates/persistence-postgres/src/formation_catalog.rs`
+
+## 验证
+
+- Windows 本地 minimum gate：official Domain inventory 365 types / 299 PostgreSQL mapped types、完整 architecture、Persistence `cargo check`、95/95 unit tests、R6-07 PostgreSQL contract 编译、Application check、rustfmt 均实际通过。
+- Windows 本地阶段回归：`npm run verify:frontend`、TypeScript、Vite build、`cargo fmt --all -- --check`、workspace Clippy `-D warnings`、`cargo test --locked --workspace` 均实际通过；保护资产 18 个指纹一致，聚合 SHA-256 `d74e0936b60c69f444a498405fed3e704b8db63b81f26b40036f772b4b6eac57`。
+- PostgreSQL 16 final gate run `32128507369` / job `95684279881` 为 `SUCCESS`：R6-07 ownership、Formation Usage、Global Name Search、Entity Relationships、完整 architecture、模型保护、database static baseline、Persistence/Application compile、R6-03～R6-07 PostgreSQL contracts 与 `formation_catalog_usage_history_and_resolution_are_consistent` 真实执行全部通过。
+- 额外执行了超出 R6-07 完成门禁的全量 `run_database_baseline.mjs` 诊断：R6-07 tree run `32127380673` 与 R6-07 起点 `7bf9b90bc235bdb397d003bdd6e61458e2e425c9` reference run `32127587771` 均为相同的 14/18 PASS、4 FAIL；失败项为 `match_lineup_chain_versions_model_selection_and_freeze_gate_are_consistent`、`match_scope_inference_and_lineup_pair_transaction_are_atomic`、`p4_stage_c_writes_are_idempotent_and_frozen_history_is_immutable`、`structured_match_events_are_queryable_and_revision_aware`。四项在 R6-07 开始前已同样失败，且本节点未修改对应测试或其 owner，因此记录为既有、非 R6-07 回归，不通过修改/跳过/弱化测试掩盖。
+
+## 未执行与剩余风险
+
+- 用户现有 PostgreSQL 数据库真实数据 sample/write 验收未执行；继续留到最终统一验收。
+- Windows Full 人工交互验收未执行；继续留到最终统一验收。
+- 上述四个全量 PostgreSQL 历史集成测试的既有失败仍存在，未在 R6-07 越界修复；后续应在对应 Lineup/P4/Review owner 任务中处理。
+
+## 计划偏差与设计决策
+
+- 初始迁移产物曾把 Formation resolution/window/save 的 SQL 与协调编排放在同一文件；最终在收口前继续拆出 `resolution/read.rs`、`usage/window/read.rs`、`usage/preparation.rs`、`usage/write.rs`，并由 ownership verifier 明确禁止 coordinator 重新直接持有 `sqlx::`。
+- 历史 Global Name Search 与 Entity Relationships verifier 只跟随到新的 Coach owner；原数量阈值、契约断言和失败语义未降低。
+- 临时 payload/bootstrap、诊断和 hard-gate workflow/result 均已清理，不进入最终 tree。
+
+## 回退
+
+- 回退到节点起点 `7bf9b90bc235bdb397d003bdd6e61458e2e425c9`；不得通过复制旧 `formation_catalog.rs` 或恢复双 owner 进行手工回退。
+''', encoding="utf-8", newline="\n")
+
+          stage = "docs/modular-rewrite/R06-entity-catalog-persistence/README.md"
+          replace_exact(stage, "| R6-07 | Coaches 与 Formation Usage | VERIFYING |\n| R6-08 | Entity Matching 与 References | BLOCKED |", "| R6-07 | Coaches 与 Formation Usage | DONE |\n| R6-08 | Entity Matching 与 References | READY |")
+          replace_exact(stage, "- R6-01～R6-06 均已 `DONE`；R6-07 Coaches 与 Formation Usage 为当前唯一 `READY` 节点，R6-08～R6-10 继续 `BLOCKED`。", "- R6-01～R6-07 均已 `DONE`；R6-08 Entity Matching 与 References 为当前唯一 `READY` 节点，R6-09～R6-10 继续 `BLOCKED`。")
+          replace_exact(stage, "- R6-07 Coaches / Formation Usage owner switch 已进入 `VERIFYING`；R6-08～R6-10 继续 `BLOCKED`，不得提前推进。", "- R6-07 Coaches / Formation Usage 已按 directory/detail/names/team periods/mapping 与 Formation directory/usage/resolution/read-write 边界完成唯一 owner 切换；PostgreSQL 16 final gate run `32128507369` / job `95684279881` 为 `SUCCESS`，Windows 本地 frontend/rustfmt/Clippy/workspace tests 亦已通过。额外全量 PostgreSQL 诊断的 4 个失败在 R6-07 起点同样存在，已记录于节点文档且未通过放宽测试掩盖。R6-07 正式 `DONE`，R6-08 开放为 `READY`。")
+
+          root = "README.md"
+          old_root = """- Coaches persistence 已拆入 `adapters/catalog/coaches/`；Formation Directory / Usage / Resolution 已拆入 `adapters/catalog/formations/`，旧 `formation_catalog.rs` owner 删除；R6-08/R6-09 职责未提前迁移。\n- `CoachCatalogPort` / `FormationPort`、Domain DTO、Schema/migrations、配置、错误语义、Formation append-only/smoothing/UNKNOWN fallback/resolution priority 与用户可观察行为保持不变；无新增生产依赖。\n- 新增 R6-07 ownership verifier 与 PostgreSQL contract；implementation gate 成功后仍保持 `VERIFYING`，直到 Windows/PostgreSQL 16 hard gate 与 clean canonical 完成。用户现有 PostgreSQL 数据真实 sample/write 与 Windows Full 人工交互验收未执行。"""
+          new_root = """- Coaches persistence 已收敛到 `adapters/catalog/coaches/{directory,detail,names,team_periods,mapping}/`；Formation persistence 已收敛到 `adapters/catalog/formations/{directory,usage,resolution}/`。Formation resolution/window/save 的 SQL 读取/写入继续拆入明确 `read.rs` / `write.rs` owner，协调器保持 SQL-free；旧 `formation_catalog.rs` 删除，`entity_catalog.rs` 仅保留后续 R6-08/R6-09 职责。\n- `CoachCatalogPort` / `FormationPort`、Domain DTO、Schema/0001–0046 migrations、配置、错误语义、Formation append-only/smoothing/UNKNOWN fallback/resolution priority、历史 P4/运行引用和用户可观察行为保持不变；无新增生产依赖。Global Name Search / Entity Relationships / Formation Usage 历史 verifier 仅跟随新 owner，原断言未删除或放宽。\n- Windows 本地 minimum/stage regression 已实际通过完整 frontend、TypeScript/Vite、rustfmt、workspace Clippy `-D warnings`、workspace tests、95/95 Persistence unit tests、完整 architecture 与模型保护。PostgreSQL 16 final gate run `32128507369` / job `95684279881` 为 `SUCCESS`：R6-03～R6-07 contracts、Formation Usage 真实集成、database static baseline 与 Persistence/Application compile 全部通过。额外全量 PostgreSQL 诊断在当前 R6-07 tree 与节点起点 `7bf9b90bc235bdb397d003bdd6e61458e2e425c9` 均出现相同 4 个历史集成失败，确认不是 R6-07 回归，未在本节点越界修改。R6-07 正式 `DONE`，R6-08 Entity Matching 与 References 开放为 `READY`；用户现有 PostgreSQL 数据真实 sample/write 与 Windows Full 人工交互验收继续留到最终统一验收。"""
+          replace_exact(root, old_root, new_root)
+          PY
+
+          rm .github/workflows/r6-07-closeout.yml
+          git diff --check
+
+      - name: Verify final node boundaries
+        shell: bash
+        run: |
+          set -euo pipefail
+          node scripts/verify-coach-formation-persistence.mjs
+          node scripts/verify-formation-usage.mjs
+          node scripts/verify-global-name-search.mjs
+          node scripts/verify-entity-relationships.mjs
+          npm run verify:architecture
+          node scripts/verify-protected-assets-deterministic.mjs
+          test ! -e .github/workflows/r6-07-closeout.yml
+          test ! -e .github/workflows/r6-07-hard-gate.yml
+          test ! -e .github/workflows/r6-07-final-pg-gate.yml
+          test ! -e .github/workflows/r6-07-db-diagnostic.yml
+          test ! -e .r6-07-hard-gate-result.json
+          test ! -e .r6-07-final-pg-result.json
+          test ! -e .r6-07-db-diagnostic-tail.txt
+          test ! -e .r6-07-db-reference-tail.txt
+          test ! -d .r6-07
+
+      - name: Commit R6-07 closeout
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add -A
+          git diff --cached --check
+          git commit -m 'docs(r6-07): close node and open r6-08'
+          git push origin HEAD:rewrite/r6-entity-catalog-persistence
