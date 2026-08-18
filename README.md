@@ -43,6 +43,13 @@ Node 开发依赖固定安装和读取自源码根目录上一级的 `../node_mo
 
 ## 模块化重写执行记录
 
+
+### R6-08 Entity Matching 与 References
+
+- Entity Matching persistence 已收敛到 `adapters/catalog/entity_matching/`，References persistence 已收敛到 `adapters/catalog/references/`；stable-ID/external-ID/name candidate read、reference directory、provider 与 external-ID writes 均按职责拆分，协调器保持 SQL-free。`entity_catalog.rs` 继续只持有后续 R6-09 deletion/archive/reference-count，`player_catalog.rs` 不再持有 provider/external-ID owner。
+- `EntityReferencePort`、Domain DTO、Schema/0001–0046 migrations、配置、错误语义、统一 NameSearch、matching priority/candidate score/reason、历史 P4/运行引用和用户可观察行为保持不变；无新增生产依赖。
+- R6-08 implementation/minimum gate 通过后进入 `VERIFYING`；Stage Regression、PostgreSQL 16 真实 contract 与 clean canonical 完成前不标记 `DONE`。
+
 ### R6-07 Coaches 与 Formation Usage
 
 - Coaches persistence 已收敛到 `adapters/catalog/coaches/{directory,detail,names,team_periods,mapping}/`；Formation persistence 已收敛到 `adapters/catalog/formations/{directory,usage,resolution}/`。Formation resolution/window/save 的 SQL 读取与写入进一步拆入明确 `read.rs` / `write.rs` owner，协调器保持 SQL-free；旧 `formation_catalog.rs` 删除，`entity_catalog.rs` 仅保留后续 R6-08/R6-09 职责。

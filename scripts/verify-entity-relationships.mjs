@@ -33,6 +33,9 @@ const persistence = [
   text("crates/persistence-postgres/src/adapters/catalog/coaches/directory/create.rs"),
   text("crates/persistence-postgres/src/adapters/catalog/coaches/directory/list.rs"),
   text("crates/persistence-postgres/src/adapters/catalog/coaches/team_periods/add.rs"),
+  text("crates/persistence-postgres/src/adapters/catalog/entity_matching/resolve.rs"),
+  text("crates/persistence-postgres/src/adapters/catalog/entity_matching/outcome.rs"),
+  text("crates/persistence-postgres/src/adapters/catalog/references/directory/list.rs"),
 ].join("\n");
 const teamPersistence = text("crates/persistence-postgres/src/team_catalog.rs");
 const teamProfileWrite = text("crates/persistence-postgres/src/adapters/catalog/teams/profiles/upsert_team_profile.rs");

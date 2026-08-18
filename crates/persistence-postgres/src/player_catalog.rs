@@ -7,10 +7,9 @@ use crate::{
 };
 use chrono::{Datelike, NaiveDate};
 use football_domain::{
-    AvailabilityStatus, DataProviderDraft, DataProviderRecord, ExternalEntityIdDraft,
-    ExternalEntityIdRecord, LineupDraft, LineupHistoryRemovalResult, LineupPairDraft,
-    LineupPairRecord, LineupPlayerRecord, LineupRecord, LineupType, MatchDraft, MatchRecord,
-    MatchStatus, PlayerCatalogReferenceData, PositionReference, SeasonTeamMembershipOption,
+    AvailabilityStatus, LineupDraft, LineupHistoryRemovalResult, LineupPairDraft, LineupPairRecord,
+    LineupPlayerRecord, LineupRecord, LineupType, MatchDraft, MatchRecord, MatchStatus,
+    PlayerCatalogReferenceData, PositionReference, SeasonTeamMembershipOption,
 };
 use serde_json::json;
 use sqlx::{Postgres, Row, Transaction};
@@ -18,64 +17,6 @@ use std::collections::HashSet;
 use uuid::Uuid;
 
 impl PostgresStore {
-    pub async fn create_data_provider(
-        &self,
-        draft: &DataProviderDraft,
-    ) -> PersistenceResult<DataProviderRecord> {
-        let code = draft.code.trim().to_lowercase();
-        let name = draft.name.trim();
-        if code.is_empty() || name.is_empty() || draft.provider_type.trim().is_empty() {
-            return Err(PersistenceError::InvalidState(
-                "数据源代码、名称和类型不能为空".to_string(),
-            ));
-        }
-        let generated_id = Uuid::new_v4();
-        let row = sqlx::query(
-            r#"
-            INSERT INTO catalog.data_providers (
-                id, code, name, provider_type, base_url, metadata
-            ) VALUES ($1, $2, $3, $4, $5, $6)
-            ON CONFLICT (code) DO UPDATE SET
-                name = EXCLUDED.name,
-                provider_type = EXCLUDED.provider_type,
-                base_url = EXCLUDED.base_url,
-                metadata = catalog.data_providers.metadata || EXCLUDED.metadata,
-                is_active = true,
-                updated_at = now()
-            RETURNING id, code, name, provider_type, base_url, is_active
-            "#,
-        )
-        .bind(generated_id)
-        .bind(&code)
-        .bind(name)
-        .bind(draft.provider_type.trim())
-        .bind(
-            draft
-                .base_url
-                .as_deref()
-                .map(str::trim)
-                .filter(|value| !value.is_empty()),
-        )
-        .bind(&draft.metadata)
-        .fetch_one(&self.pool)
-        .await?;
-        data_provider_from_row(&row)
-    }
-
-    pub async fn list_data_providers(&self) -> PersistenceResult<Vec<DataProviderRecord>> {
-        let rows = sqlx::query(
-            r#"
-            SELECT id, code, name, provider_type, base_url, is_active
-            FROM catalog.data_providers
-            WHERE is_active
-            ORDER BY name, code
-            "#,
-        )
-        .fetch_all(&self.pool)
-        .await?;
-        rows.iter().map(data_provider_from_row).collect()
-    }
-
     pub async fn delete_player(&self, player_id: Uuid) -> PersistenceResult<()> {
         let check = self.check_entity_deletion("player", player_id).await?;
         if !check.can_permanently_delete {
@@ -108,52 +49,6 @@ impl PostgresStore {
             .await?;
         tx.commit().await?;
         Ok(())
-    }
-
-    pub async fn add_external_entity_id(
-        &self,
-        draft: &ExternalEntityIdDraft,
-    ) -> PersistenceResult<ExternalEntityIdRecord> {
-        if !matches!(
-            draft.entity_type.as_str(),
-            "competition" | "season" | "team" | "player" | "coach" | "match"
-        ) {
-            return Err(PersistenceError::InvalidState(
-                "外部 ID 实体类型无效".to_string(),
-            ));
-        }
-        if draft.external_id.trim().is_empty() {
-            return Err(PersistenceError::InvalidState(
-                "外部 ID 不能为空".to_string(),
-            ));
-        }
-        let row = sqlx::query(
-            r#"
-            WITH inserted AS (
-                INSERT INTO football.external_entity_ids (
-                    id, provider_id, entity_type, entity_id, external_id, metadata
-                ) VALUES ($1, $2, $3, $4, $5, $6)
-                ON CONFLICT (provider_id, entity_type, external_id) DO UPDATE SET
-                    entity_id = EXCLUDED.entity_id,
-                    metadata = football.external_entity_ids.metadata || EXCLUDED.metadata
-                RETURNING *
-            )
-            SELECT inserted.id, inserted.provider_id,
-                   provider.name AS provider_name, inserted.entity_type,
-                   inserted.entity_id, inserted.external_id, inserted.metadata
-            FROM inserted
-            JOIN catalog.data_providers provider ON provider.id = inserted.provider_id
-            "#,
-        )
-        .bind(Uuid::new_v4())
-        .bind(draft.provider_id)
-        .bind(draft.entity_type.trim())
-        .bind(draft.entity_id)
-        .bind(draft.external_id.trim())
-        .bind(&draft.metadata)
-        .fetch_one(&self.pool)
-        .await?;
-        external_entity_id_from_row(&row)
     }
 
     pub async fn create_match(&self, draft: &MatchDraft) -> PersistenceResult<MatchRecord> {
@@ -1292,31 +1187,6 @@ fn lineup_type(value: &str) -> PersistenceResult<LineupType> {
             "未知阵容类型：{other}"
         ))),
     }
-}
-
-fn data_provider_from_row(row: &sqlx::postgres::PgRow) -> PersistenceResult<DataProviderRecord> {
-    Ok(DataProviderRecord {
-        id: row.try_get("id")?,
-        code: row.try_get("code")?,
-        name: row.try_get("name")?,
-        provider_type: row.try_get("provider_type")?,
-        base_url: row.try_get("base_url")?,
-        is_active: row.try_get("is_active")?,
-    })
-}
-
-fn external_entity_id_from_row(
-    row: &sqlx::postgres::PgRow,
-) -> PersistenceResult<ExternalEntityIdRecord> {
-    Ok(ExternalEntityIdRecord {
-        id: row.try_get("id")?,
-        provider_id: row.try_get("provider_id")?,
-        provider_name: row.try_get("provider_name")?,
-        entity_type: row.try_get("entity_type")?,
-        entity_id: row.try_get("entity_id")?,
-        external_id: row.try_get("external_id")?,
-        metadata: row.try_get("metadata")?,
-    })
 }
 
 fn match_record_from_row(row: &sqlx::postgres::PgRow) -> PersistenceResult<MatchRecord> {
