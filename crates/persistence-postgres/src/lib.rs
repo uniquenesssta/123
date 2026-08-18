@@ -6,7 +6,6 @@ mod competition_kind;
 mod entity_catalog;
 mod error;
 mod fact_pipeline_records;
-mod formation_catalog;
 mod health;
 mod jobs;
 mod lineup_chain;

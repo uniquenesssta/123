@@ -16,6 +16,7 @@ const teamCatalog = read("crates/persistence-postgres/src/team_catalog.rs");
 const teamDirectoryList = read("crates/persistence-postgres/src/adapters/catalog/teams/directory/list_teams.rs");
 const teamOptionList = read("crates/persistence-postgres/src/adapters/catalog/teams/directory/list_team_options.rs");
 const entityCatalog = read("crates/persistence-postgres/src/entity_catalog.rs");
+const coachDirectoryList = read("crates/persistence-postgres/src/adapters/catalog/coaches/directory/list.rs");
 const persistenceLib = read("crates/persistence-postgres/src/lib.rs");
 const playerPage = read("src/pages/players.ts");
 const teamPage = read("src/pages/teams.ts");
@@ -38,7 +39,7 @@ requireTrue(helper.includes("character.is_alphanumeric()"), "名称搜索未统�
 requireTrue(helper.includes("alias.normalized_name"), "名称搜索未覆盖别名归一化字段");
 requireTrue(helper.includes("alias.name"), "名称搜索未覆盖别名原始显示字段");
 
-const searchOwners = [playerCatalog, playerDirectoryList, teamCatalog, teamDirectoryList, teamOptionList, entityCatalog];
+const searchOwners = [playerCatalog, playerDirectoryList, teamCatalog, teamDirectoryList, teamOptionList, entityCatalog, coachDirectoryList];
 const combined = searchOwners.join("\n");
 const helperUsages = (combined.match(/NameSearch::parse\(/g) ?? []).length;
 requireTrue(helperUsages >= 7, `全局名称搜索接入点不足：${helperUsages}/7`);
@@ -49,6 +50,7 @@ for (const source of searchOwners) {
 requireTrue(playerDirectoryList.includes("NameSearch::parse"), "R6-03 Player Directory list 未接入统一 NameSearch");
 requireTrue(teamDirectoryList.includes("NameSearch::parse"), "R6-01 Team Directory list 未接入统一 NameSearch");
 requireTrue(teamOptionList.includes("NameSearch::parse"), "R6-01 Team options 未接入统一 NameSearch");
+requireTrue(coachDirectoryList.includes("NameSearch::parse"), "R6-07 Coach Directory list 未接入统一 NameSearch");
 
 requireTrue(playerPage.includes("支持中文名、原名或别名的部分匹配"), "球员搜索提示未说明中英文部分匹配");
 requireTrue(teamPage.includes("支持中英文球队名称或别名的部分匹配"), "球队搜索提示未说明中英文部分匹配");

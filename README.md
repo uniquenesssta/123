@@ -43,6 +43,12 @@ Node 开发依赖固定安装和读取自源码根目录上一级的 `../node_mo
 
 ## 模块化重写执行记录
 
+### R6-07 Coaches 与 Formation Usage
+
+- Coaches persistence 已拆入 `adapters/catalog/coaches/`；Formation Directory / Usage / Resolution 已拆入 `adapters/catalog/formations/`，旧 `formation_catalog.rs` owner 删除；R6-08/R6-09 职责未提前迁移。
+- `CoachCatalogPort` / `FormationPort`、Domain DTO、Schema/migrations、配置、错误语义、Formation append-only/smoothing/UNKNOWN fallback/resolution priority 与用户可观察行为保持不变；无新增生产依赖。
+- 新增 R6-07 ownership verifier 与 PostgreSQL contract；implementation gate 成功后仍保持 `VERIFYING`，直到 Windows/PostgreSQL 16 hard gate 与 clean canonical 完成。用户现有 PostgreSQL 数据真实 sample/write 与 Windows Full 人工交互验收未执行。
+
 ### R6-06 Abilities 与 Dynamic Tags
 
 - Abilities persistence 已拆入 `adapters/catalog/abilities/{dimensions,observations}/`；Dynamic Tags 已拆入 `adapters/catalog/dynamic_tags/{definitions,tags,contribution}/`，旧 `dynamic_tags.rs` 单文件 owner 删除，Player Detail ability read 复用统一 typed Row/mapper。

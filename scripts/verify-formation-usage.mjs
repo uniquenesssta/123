@@ -9,7 +9,13 @@ const contractText = read("contracts/formation-usage-contract.json");
 const contract = JSON.parse(contractText);
 const migration = read("crates/persistence-postgres/migrations/0022_formations_and_usage.sql");
 const domain = read("crates/domain/src/formation/usage.rs") + read("crates/domain/src/formation/resolution.rs");
-const persistence = read("crates/persistence-postgres/src/formation_catalog.rs");
+const persistence = [
+  "crates/persistence-postgres/src/adapters/catalog/formations/constants.rs",
+  "crates/persistence-postgres/src/adapters/catalog/formations/usage/probability.rs",
+  "crates/persistence-postgres/src/adapters/catalog/formations/usage/save.rs",
+  "crates/persistence-postgres/src/adapters/catalog/formations/usage/read.rs",
+  "crates/persistence-postgres/src/adapters/catalog/formations/resolution/resolve.rs",
+].map(read).join("\n");
 const monthlyWorkbooks = read("crates/persistence-postgres/src/monthly_workbooks.rs");
 const integrationTests = read("crates/persistence-postgres/tests/postgres_integration.rs");
 const spreadsheetApplication = read("crates/application/src/use_cases/exchange/preview_team_package_import/coverage.rs");

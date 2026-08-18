@@ -28,7 +28,12 @@ const domain = [
   "crates/domain/src/shared/entity_match.rs",
   "crates/domain/src/shared/bulk_archive.rs",
 ].map(text).join("\n");
-const persistence = text("crates/persistence-postgres/src/entity_catalog.rs");
+const persistence = [
+  text("crates/persistence-postgres/src/entity_catalog.rs"),
+  text("crates/persistence-postgres/src/adapters/catalog/coaches/directory/create.rs"),
+  text("crates/persistence-postgres/src/adapters/catalog/coaches/directory/list.rs"),
+  text("crates/persistence-postgres/src/adapters/catalog/coaches/team_periods/add.rs"),
+].join("\n");
 const teamPersistence = text("crates/persistence-postgres/src/team_catalog.rs");
 const teamProfileWrite = text("crates/persistence-postgres/src/adapters/catalog/teams/profiles/upsert_team_profile.rs");
 const teamDetailCoordinator = text("crates/persistence-postgres/src/adapters/catalog/teams/detail/read_team.rs");
