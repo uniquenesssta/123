@@ -1,0 +1,94 @@
+name: R6-08 implementation gate
+
+on:
+  push:
+    branches:
+      - rewrite/r6-entity-catalog-persistence
+
+permissions:
+  contents: write
+
+jobs:
+  implement:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: rewrite/r6-entity-catalog-persistence
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Verify R6-08 staging baseline
+        shell: bash
+        run: |
+          set -euo pipefail
+          base="a44e11aceccdb1c582636ff8d4c49f9d24529baa"
+          git merge-base --is-ancestor "$base" HEAD
+          mapfile -t changed < <(git diff --name-only "$base"..HEAD | sort)
+          printf '%s\n' "${changed[@]}"
+          test "${#changed[@]}" -eq 2
+          test "${changed[0]}" = ".github/workflows/r6-08-bootstrap.yml"
+          test "${changed[1]}" = ".r6-08/apply.py"
+          test ! -e crates/persistence-postgres/src/adapters/catalog/entity_matching/mod.rs
+          test ! -e crates/persistence-postgres/src/adapters/catalog/references/mod.rs
+
+      - name: Prepare Rust 1.88.0
+        shell: bash
+        run: |
+          set -euo pipefail
+          rustup toolchain install 1.88.0 --profile minimal
+          rustup default 1.88.0
+
+      - name: Apply R6-08 owner switch
+        shell: bash
+        env:
+          RUSTUP_TOOLCHAIN: 1.88.0
+        run: |
+          set -euo pipefail
+          python3 .r6-08/apply.py
+          cargo fmt --all
+          git diff --check
+
+      - name: Verify R6-08 ownership and retained contracts
+        shell: bash
+        env:
+          RUSTUP_TOOLCHAIN: 1.88.0
+        run: |
+          set -euo pipefail
+          node scripts/verify-entity-matching-references-persistence.mjs
+          node scripts/verify-coach-formation-persistence.mjs
+          node scripts/verify-entity-relationships.mjs
+          npm run verify:architecture
+          node scripts/verify-protected-assets-deterministic.mjs
+          node scripts/verify_database_baseline.mjs
+
+      - name: Persistence and Application minimum gate
+        shell: bash
+        env:
+          RUSTUP_TOOLCHAIN: 1.88.0
+        run: |
+          set -euo pipefail
+          cargo fmt --all -- --check
+          cargo check --locked -p football-persistence-postgres
+          cargo test --locked -p football-persistence-postgres --lib
+          cargo test --locked -p football-persistence-postgres --test entity_matching_references_repository_contract --no-run
+          cargo check --locked -p football-application
+          git diff --check
+
+      - name: Commit verified R6-08 implementation
+        shell: bash
+        run: |
+          set -euo pipefail
+          rm -rf .r6-08
+          rm -f .github/workflows/r6-08-bootstrap.yml
+          test ! -e .r6-08
+          test ! -e .github/workflows/r6-08-bootstrap.yml
+          git diff --check
+          git status --short
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add -A
+          git commit -m "refactor(r6-08): modularize entity matching and references"
+          git push origin HEAD:rewrite/r6-entity-catalog-persistence
