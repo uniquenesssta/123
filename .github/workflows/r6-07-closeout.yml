@@ -39,154 +39,48 @@ jobs:
 
       - name: Record final R6-07 state
         shell: bash
+        env:
+          DETAIL_B64: IyBSNi0wNyBDb2FjaGVzIOS4jiBGb3JtYXRpb24gVXNhZ2UKCiMjIOeKtuaAgQoKYERPTkVgCgojIyDln7rnur/kuI7ojIPlm7QKCi0g5ZSv5LiA6Zi25q615YiG5pSv77yaYHJld3JpdGUvcjYtZW50aXR5LWNhdGFsb2ctcGVyc2lzdGVuY2Vg44CCCi0g6IqC54K56LW354K577yaYDdiZjliOTBiYzIzNWJkYjM5N2QwMDNiZGQ2ZTYxNDU4ZTJlNDI1Yzlg44CCCi0g5pys6IqC54K55LuF6YeN5YaZIENvYWNoZXMg5LiOIEZvcm1hdGlvbiBEaXJlY3RvcnkgLyBVc2FnZSAvIFJlc29sdXRpb24gcGVyc2lzdGVuY2XvvJtSNi0wOCBFbnRpdHkgTWF0Y2hpbmcgLyBSZWZlcmVuY2VzIOS4jiBSNi0wOSBBcmNoaXZlIC8gRGVsZXRlIC8gRm9yY2UgRGVsZXRlIOacquaPkOWJjei/geenu+OAggoKIyMg5a6e546w57uT5p6cCgotIENvYWNoIERpcmVjdG9yeeOAgURldGFpbOOAgU5hbWVz44CBVGVhbSBQZXJpb2Rz44CBVmFsaWRhdGlvbi9FeGlzdGVuY2UvTm9ybWFsaXphdGlvbuOAgXR5cGVkIFJvdyAvIERvbWFpbiBNYXBwaW5nIOW3suaUtuaVm+WIsCBgY3JhdGVzL3BlcnNpc3RlbmNlLXBvc3RncmVzL3NyYy9hZGFwdGVycy9jYXRhbG9nL2NvYWNoZXMvYOOAggotIEZvcm1hdGlvbiBEaXJlY3RvcnnjgIFVc2FnZeOAgVJlc29sdXRpb24g5bey5pS25pWb5YiwIGBjcmF0ZXMvcGVyc2lzdGVuY2UtcG9zdGdyZXMvc3JjL2FkYXB0ZXJzL2NhdGFsb2cvZm9ybWF0aW9ucy9g44CCCi0gRm9ybWF0aW9uIHJlc29sdXRpb24gU1FMIOivu+WPlumbhuS4reWIsCBgcmVzb2x1dGlvbi9yZWFkLnJzYO+8m1VzYWdlIOS/neWtmOWHhuWkh+OAgeeql+WPo+ivu+WPluWSjCBhcHBlbmQtb25seSDlhpnlhaXliIbliKvpm4bkuK3liLAgYHVzYWdlL3ByZXBhcmF0aW9uLnJzYOOAgWB1c2FnZS93aW5kb3cvcmVhZC5yc2DjgIFgdXNhZ2Uvd3JpdGUucnNg77yM5Y2P6LCD5Zmo5L+d5oyBIFNRTC1mcmVl44CCCi0g5penIGBjcmF0ZXMvcGVyc2lzdGVuY2UtcG9zdGdyZXMvc3JjL2Zvcm1hdGlvbl9jYXRhbG9nLnJzYCDlt7LliKDpmaTvvJtgZW50aXR5X2NhdGFsb2cucnNgIOW3suenu+mZpCBDb2FjaCBvd25lcu+8jOS9hue7p+e7reS/neeVmSBSNi0wOC9SNi0wOSBtYXRjaGluZy9yZWZlcmVuY2UvYXJjaGl2ZS9kZWxldGUg6IGM6LSj44CCCi0g5Y6G5Y+yIEdsb2JhbCBOYW1lIFNlYXJjaOOAgUVudGl0eSBSZWxhdGlvbnNoaXBzIOS4jiBGb3JtYXRpb24gVXNhZ2UgdmVyaWZpZXIg5Y+q6Lef6ZqP5Yiw5paw55qE5p2D5aiBIG93bmVy77yM5Y6f5pat6KiA44CB5pWw6YeP6ZiI5YC85ZKM5aSx6LSl6K+t5LmJ5pyq6ZmN5L2O44CCCi0g5peg5paw5aKe55Sf5Lqn5L6d6LWW44CCCgojIyDlpZHnuqbkuI7lhbzlrrnmgKcKCi0gYENvYWNoQ2F0YWxvZ1BvcnRg44CBYEZvcm1hdGlvblBvcnRgIOWFrOWFseaWueazleetvuWQjeWSjOiwg+eUqOivreS5ieS/neaMgeS4jeWPmOOAggotIERvbWFpbiBEVE/jgIFTY2hlbWHjgIEwMDAx4oCTMDA0NiBtaWdyYXRpb25z44CB6YWN572u44CB6buY6K6k5YC844CB6ZSZ6K+v57G75Z6LL+aWh+ahiOOAgeaXpeW/l+etiee6p+OAgeWuieWFqOetlueVpeOAgem7mOiupOaImOacr+inkuiJsi/kvY3nva7mmKDlsITlkoznlKjmiLflj6/op4Llr5/ooYzkuLrkv53mjIHkuI3lj5jjgIIKLSBGb3JtYXRpb24gVXNhZ2Ug57un57utIGFwcGVuZC1vbmx577ybc21vb3RoaW5n44CBVU5LTk9XTiBmYWxsYmFja+OAgWFjdHVhbC9jb25maXJtZWQg5LyY5YWI57qn5LiO5b2T5YmN5pWZ57uD6KeS6Imy5LyY5YWI57qn5L+d5oyB5Y6f6K+t5LmJ44CCCi0g5Y6G5Y+yIFA0L+i/kOihjOW8leeUqOacquWIoOmZpOOAgeaUuee7keaIlue6p+iBlOegtOWdj+OAggoKIyMg6aqM6K+B5LqL5a6eCgotIFdpbmRvd3Mg5pys5ZywIE1pbmltdW0gR2F0ZSDlt7LpgJrov4fvvJpvZmZpY2lhbCBEb21haW4gaW52ZW50b3J544CB5a6M5pW0IGFyY2hpdGVjdHVyZeOAgVBlcnNpc3RlbmNlIGBjYXJnbyBjaGVja2DjgIE5NS85NSB1bml0IHRlc3Rz44CBUjYtMDcgY29udHJhY3Qg57yW6K+R44CBQXBwbGljYXRpb24gY2hlY2vjgIFydXN0Zm1044CCCi0gV2luZG93cyDmnKzlnLAgU3RhZ2UgUmVncmVzc2lvbiDlt7LpgJrov4fvvJpgbnBtIHJ1biB2ZXJpZnk6ZnJvbnRlbmRg44CBVHlwZVNjcmlwdOOAgVZpdGUgYnVpbGTjgIFgY2FyZ28gZm10IC0tYWxsIC0tIC0tY2hlY2tg44CBd29ya3NwYWNlIENsaXBweSBgLUQgd2FybmluZ3Ng44CBYGNhcmdvIHRlc3QgLS1sb2NrZWQgLS13b3Jrc3BhY2Vg44CBYGdpdCBkaWZmIC0tY2hlY2tg44CCCi0gUjYtMDcgaGFyZC1nYXRlIHJ1biBgMzIxMjU2ODQ0MzRgIC8gam9iIGA5NTY3NTYwNTQ0N2Ag5Lit77yMb3duZXJzaGlwL2NvbXBhdGliaWxpdHnjgIHkv53miqTotYTkuqcvZGF0YWJhc2Ugc3RhdGljIGJhc2VsaW5l44CBd29ya3NwYWNlIENsaXBweeOAgXdvcmtzcGFjZSB0ZXN0c+OAgVI2LTAz772eUjYtMDcgUG9zdGdyZVNRTCBjb250cmFjdHMg5LiOIEZvcm1hdGlvbiBVc2FnZSBQb3N0Z3JlU1FMIGludGVncmF0aW9uIOWFqOmDqOmAmui/h++8m+ivpSBydW4g5LuF5Zyo6aKd5aSW55qEIGZ1bGwgZnJvemVuIFBvc3RncmVTUUwgYmFzZWxpbmUg5YGc5q2i44CCCi0gUjYtMDcgZmluYWwgUG9zdGdyZVNRTCBnYXRlIHJ1biBgMzIxMjg1MDczNjlgIC8gam9iIGA5NTY4NDI3OTg4MWAg5Li6IGBTVUNDRVNTYO+8mlI2LTA3IGFyY2hpdGVjdHVyZS9mcm96ZW4gYm91bmRhcmllc+OAgVBlcnNpc3RlbmNlL0FwcGxpY2F0aW9uIGNvbXBpbGXjgIFSNi0wM++9nlI2LTA3IFBvc3RncmVTUUwgY29udHJhY3RzIOS4jiBGb3JtYXRpb24gVXNhZ2UgUG9zdGdyZVNRTCBpbnRlZ3JhdGlvbiDlhajpg6jnnJ/lrp7pgJrov4fjgIIKLSDpop3lpJYgZnVsbCBmcm96ZW4gUG9zdGdyZVNRTCBiYXNlbGluZSDor4rmlq3vvJrlvZPliY0gUjYtMDcgdHJlZSBydW4gYDMyMTI3MzgwNjczYCDkuI7oioLngrnotbfngrkgYDdiZjliOTBiYzIzNWJkYjM5N2QwMDNiZGQ2ZTYxNDU4ZTJlNDI1YzlgIHJlZmVyZW5jZSBydW4gYDMyMTI3NTg3NzcxYCDlnYfkuLrnm7jlkIznmoQgMTQvMTggUEFTU+OAgTQgRkFJTOOAguWksei0pemhueWdh+S4uu+8mgogIC0gYG1hdGNoX2xpbmV1cF9jaGFpbl92ZXJzaW9uc19tb2RlbF9zZWxlY3Rpb25fYW5kX2ZyZWV6ZV9nYXRlX2FyZV9jb25zaXN0ZW50YAogIC0gYG1hdGNoX3Njb3BlX2luZmVyZW5jZV9hbmRfbGluZXVwX3BhaXJfdHJhbnNhY3Rpb25fYXJlX2F0b21pY2AKICAtIGBwNF9zdGFnZV9jX3dyaXRlc19hcmVfaWRlbXBvdGVudF9hbmRfZnJvemVuX2hpc3RvcnlfaXNfaW1tdXRhYmxlYAogIC0gYHN0cnVjdHVyZWRfbWF0Y2hfZXZlbnRzX2FyZV9xdWVyeWFibGVfYW5kX3JldmlzaW9uX2F3YXJlYAotIOS4iui/sCA0IOmhueWcqCBSNi0wNyDlvIDlp4vliY3lt7Lku6Xnm7jlkIzplJnor6/lpLHotKXvvIznoa7orqTkuI3mmK8gUjYtMDcg5byV5YWl77yb5pys6IqC54K55pyq5Yig6Zmk44CB6Lez6L+H44CB5pS+5a696L+Z5Lqb5rWL6K+V77yM5Lmf5pyq6LaK55WM5L+u5pS55a+55bqUIExpbmV1cC9QNC9SZXZpZXcgb3duZXLjgIIKCiMjIOacquaJp+ihjOS4juWJqeS9memjjumZqQoKLSDnlKjmiLfnjrDmnIkgUG9zdGdyZVNRTCDmlbDmja7lupPnnJ/lrp7mlbDmja4gc2FtcGxlL3dyaXRlIOmqjOaUtuacquaJp+ihjO+8jOe7p+e7reS/neeVmeWIsOacgOe7iOe7n+S4gOmqjOaUtuOAggotIFdpbmRvd3MgRnVsbCDkurrlt6XkuqTkupLpqozmlLbmnKrmiafooYzvvIznu6fnu63kv53nlZnliLDmnIDnu4jnu5/kuIDpqozmlLbjgIIKLSDkuIrov7AgNCDkuKrljoblj7IgUG9zdGdyZVNRTCDpm4bmiJDmtYvor5Xml6LmnInlpLHotKXku43lrZjlnKjvvIzlkI7nu63nlLHlr7nlupTogYzotKPoioLngrnlpITnkIbjgIIKCiMjIOa4heeQhuS4juWbnumAgAoKLSDkuLTml7YgcGF5bG9hZC9ib290c3RyYXDjgIFoYXJkLWdhdGXjgIFmaW5hbC1QR+OAgWRhdGFiYXNlLWRpYWdub3N0aWMgd29ya2Zsb3cvcmVzdWx0IOWdh+W3sua4heeQhu+8m+acgOe7iCBjbG9zZW91dCB3b3JrZmxvdyDlnKjmnKzmrKHmlLblj6Pmj5DkuqTkuK3oh6rliKDpmaTjgIIKLSDlm57pgIDngrnkuLogYDdiZjliOTBiYzIzNWJkYjM5N2QwMDNiZGQ2ZTYxNDU4ZTJlNDI1Yzlg77yb5LiN5b6X6YCa6L+H5oGi5aSN5Y+MIG93bmVyIOaIluaXpyBgZm9ybWF0aW9uX2NhdGFsb2cucnNgIOi/m+ihjOaJi+W3peWbnumAgOOAggo=
+          ROOT_SECTION_B64: IyMjIFI2LTA3IENvYWNoZXMg5LiOIEZvcm1hdGlvbiBVc2FnZQoKLSBDb2FjaGVzIHBlcnNpc3RlbmNlIOW3suaUtuaVm+WIsCBgYWRhcHRlcnMvY2F0YWxvZy9jb2FjaGVzL3tkaXJlY3RvcnksZGV0YWlsLG5hbWVzLHRlYW1fcGVyaW9kcyxtYXBwaW5nfS9g77ybRm9ybWF0aW9uIHBlcnNpc3RlbmNlIOW3suaUtuaVm+WIsCBgYWRhcHRlcnMvY2F0YWxvZy9mb3JtYXRpb25zL3tkaXJlY3RvcnksdXNhZ2UscmVzb2x1dGlvbn0vYOOAgkZvcm1hdGlvbiByZXNvbHV0aW9uL3dpbmRvdy9zYXZlIOeahCBTUUwg6K+75Y+W5LiO5YaZ5YWl6L+b5LiA5q2l5ouG5YWl5piO56GuIGByZWFkLnJzYCAvIGB3cml0ZS5yc2Agb3duZXLvvIzljY/osIPlmajkv53mjIEgU1FMLWZyZWXvvJvml6cgYGZvcm1hdGlvbl9jYXRhbG9nLnJzYCDliKDpmaTvvIxgZW50aXR5X2NhdGFsb2cucnNgIOS7heS/neeVmeWQjue7rSBSNi0wOC9SNi0wOSDogYzotKPjgIIKLSBgQ29hY2hDYXRhbG9nUG9ydGAgLyBgRm9ybWF0aW9uUG9ydGDjgIFEb21haW4gRFRP44CBU2NoZW1hLzAwMDHigJMwMDQ2IG1pZ3JhdGlvbnPjgIHphY3nva7jgIHplJnor6/or63kuYnjgIFGb3JtYXRpb24gYXBwZW5kLW9ubHkvc21vb3RoaW5nL1VOS05PV04gZmFsbGJhY2svcmVzb2x1dGlvbiBwcmlvcml0eeOAgeWOhuWPsiBQNC/ov5DooYzlvJXnlKjlkoznlKjmiLflj6/op4Llr5/ooYzkuLrkv53mjIHkuI3lj5jvvJvml6DmlrDlop7nlJ/kuqfkvp3otZbjgIJHbG9iYWwgTmFtZSBTZWFyY2ggLyBFbnRpdHkgUmVsYXRpb25zaGlwcyAvIEZvcm1hdGlvbiBVc2FnZSDljoblj7IgdmVyaWZpZXIg5LuF6Lef6ZqP5pawIG93bmVy77yM5Y6f5pat6KiA5pyq5Yig6Zmk5oiW5pS+5a6944CCCi0gV2luZG93cyDmnKzlnLAgTWluaW11bSBHYXRlIOS4jiBTdGFnZSBSZWdyZXNzaW9uIOW3suWunumZhemAmui/h+WujOaVtCBmcm9udGVuZOOAgVR5cGVTY3JpcHQvVml0ZeOAgXJ1c3RmbXTjgIF3b3Jrc3BhY2UgQ2xpcHB5IGAtRCB3YXJuaW5nc2DjgIF3b3Jrc3BhY2UgdGVzdHPjgIE5NS85NSBQZXJzaXN0ZW5jZSB1bml0IHRlc3Rz44CB5a6M5pW0IGFyY2hpdGVjdHVyZSDkuI7mqKHlnovkv53miqTjgIJSNi0wNyBoYXJkLWdhdGUgcnVuIGAzMjEyNTY4NDQzNGAg6Zmk6aKd5aSWIGZ1bGwgZnJvemVuIFBvc3RncmVTUUwgYmFzZWxpbmUg5aSW5YW25L2ZIFI2LTA3L3JldGFpbmVkIGNvbnRyYWN0c+OAgUNsaXBweS90ZXN0cyDlnYfpgJrov4fvvJtmb2N1c2VkIFBvc3RncmVTUUwgZmluYWwgZ2F0ZSBydW4gYDMyMTI4NTA3MzY5YCAvIGpvYiBgOTU2ODQyNzk4ODFgIOS4uiBgU1VDQ0VTU2DjgILpop3lpJYgZnVsbCBiYXNlbGluZSDlnKjlvZPliY0gUjYtMDcgdHJlZSBydW4gYDMyMTI3MzgwNjczYCDkuI7oioLngrnotbfngrkgcmVmZXJlbmNlIHJ1biBgMzIxMjc1ODc3NzFgIOWdh+WHuueOsOebuOWQjCAxNC8xOCBQQVNT44CBNCBGQUlM77yM56Gu6K6k5LiN5piv5pys6IqC54K55Zue5b2S77yM5pyq6YCa6L+H5pS+5a695rWL6K+V5o6p55uW44CCUjYtMDcg5q2j5byPIGBET05FYO+8jFI2LTA4IEVudGl0eSBNYXRjaGluZyDkuI4gUmVmZXJlbmNlcyDlvIDmlL7kuLogYFJFQURZYO+8m+eUqOaIt+eOsOaciSBQb3N0Z3JlU1FMIOaVsOaNruecn+WuniBzYW1wbGUvd3JpdGUg5LiOIFdpbmRvd3MgRnVsbCDkurrlt6XkuqTkupLpqozmlLbnu6fnu63nlZnliLDmnIDnu4jnu5/kuIDpqozmlLbjgIIKCg==
         run: |
           set -euo pipefail
           python3 - <<'PY'
+          import base64
+          import os
+          import re
           from pathlib import Path
 
-          def replace_exact(path: str, old: str, new: str) -> None:
-              p = Path(path)
-              text = p.read_text(encoding="utf-8")
+          def replace_once(text, old, new, label):
               count = text.count(old)
               if count != 1:
-                  raise SystemExit(f"{path}: expected one anchor, found {count}: {old[:100]!r}")
-              p.write_text(text.replace(old, new, 1), encoding="utf-8", newline="\n")
+                  raise SystemExit(f"{label}: expected 1 anchor, found {count}")
+              return text.replace(old, new, 1)
 
-          detail = Path("docs/modular-rewrite/R06-entity-catalog-persistence/R06-07-coaches-and-formation-usage.md")
-          detail.write_text(r'''# R6-07 Coaches 与 Formation Usage
+          detail_path = Path("docs/modular-rewrite/R06-entity-catalog-persistence/R06-07-coaches-and-formation-usage.md")
+          detail_text = base64.b64decode(os.environ["DETAIL_B64"]).decode("utf-8")
+          detail_path.write_text(detail_text, encoding="utf-8", newline="\n")
 
-## 状态
+          stage_path = Path("docs/modular-rewrite/R06-entity-catalog-persistence/README.md")
+          stage = stage_path.read_text(encoding="utf-8")
+          stage = replace_once(stage, "| R6-07 | Coaches 与 Formation Usage | VERIFYING |", "| R6-07 | Coaches 与 Formation Usage | DONE |", "R6-07 table")
+          stage = replace_once(stage, "| R6-08 | Entity Matching 与 References | BLOCKED |", "| R6-08 | Entity Matching 与 References | READY |", "R6-08 table")
+          stage, n = re.subn(r"(?m)^- R6-01～R6-06 均已 .*?$", "- R6-01～R6-07 均已 `DONE`；R6-08 Entity Matching 与 References 为当前唯一 `READY` 节点，R6-09～R6-10 继续 `BLOCKED`。", stage, count=1)
+          if n != 1:
+              raise SystemExit("stage current-boundary anchor mismatch")
+          stage, n = re.subn(r"(?m)^- R6-07 Coaches / Formation Usage owner switch .*?$", "- R6-07 Coaches / Formation Usage 已完成唯一 owner 切换；hard-gate run `32125684434` 的 R6-07/retained contracts、Clippy/tests 均通过，focused PostgreSQL final gate run `32128507369` / job `95684279881` 为 `SUCCESS`。额外 full PostgreSQL baseline 在当前 tree 与节点起点均为相同 14/18 PASS、4 FAIL，确认不是 R6-07 回归且未放宽测试。R6-07 正式 `DONE`，R6-08 开放为 `READY`。", stage, count=1)
+          if n != 1:
+              raise SystemExit("stage R6-07 fact anchor mismatch")
+          stage_path.write_text(stage, encoding="utf-8", newline="\n")
 
-`DONE`
-
-## 进入基线
-
-- 唯一阶段分支：`rewrite/r6-entity-catalog-persistence`。
-- 节点起点：`7bf9b90bc235bdb397d003bdd6e61458e2e425c9`（R6-06 已关闭，R6-07 为唯一 READY 节点）。
-- 本节点只重写 Coaches 与 Formation Usage persistence；R6-08 Entity Matching/References 与 R6-09 Archive/Delete/Force Delete 未提前迁移。
-
-## 实际职责边界
-
-- `adapters/catalog/coaches/directory/`：Coach 创建与目录查询；目录查询继续复用统一 `NameSearch`，保持中文、英文、别名、重音与多关键词匹配。
-- `adapters/catalog/coaches/detail/`：Coach Detail 读取聚合。
-- `adapters/catalog/coaches/names/`：Coach 名称追加事务。
-- `adapters/catalog/coaches/team_periods/`：球队-教练任期写入及双向读取。
-- `adapters/catalog/coaches/{existence,validation,normalization,mapping}/`：存在性检查、输入验证、名称规范化和 typed Row → Domain 映射。
-- `adapters/catalog/formations/directory/`：Formation 目录 SQL 与 mapper。
-- `adapters/catalog/formations/usage/`：Usage 输入验证、计数准备、概率计算、窗口策略、SQL read/write、分组与保存编排分责；`save.rs` 与 `window.rs` 不直接执行 SQL，append-only `feature.formation_usage_observations` 写入集中在 `write.rs`。
-- `adapters/catalog/formations/resolution/`：`resolve.rs` 只执行 actual/confirmed → team_coach → team → coach → competition_default → system_default → unknown 编排；SQL 读取集中在 `read.rs`。
-- 旧 `formation_catalog.rs` 已删除；`entity_catalog.rs` 已移除 Coach owner，但继续保留 R6-08/R6-09 的 matching/reference/archive/delete 职责，未形成双 owner 或临时转发层。
-
-## 契约与兼容性
-
-- `CoachCatalogPort`、`FormationPort` 方法签名与调用语义不变。
-- Domain DTO、Schema、0001–0046 migrations、配置项、默认值、错误类型/文案、日志等级、安全策略、默认战术角色/位置映射和用户可观察 UI 行为均未修改。
-- Formation Usage 继续 append-only；smoothing、UNKNOWN fallback、actual/confirmed 优先级及当前教练角色优先级保持原语义。
-- 历史 P4/运行引用未删除或级联改写。
-- 无新增生产依赖。
-
-## 文件清单
-
-### 新增
-
-- `crates/persistence-postgres/src/adapters/catalog/coaches/mod.rs`
-- `crates/persistence-postgres/src/adapters/catalog/coaches/existence.rs`
-- `crates/persistence-postgres/src/adapters/catalog/coaches/normalization.rs`
-- `crates/persistence-postgres/src/adapters/catalog/coaches/validation.rs`
-- `crates/persistence-postgres/src/adapters/catalog/coaches/detail/mod.rs`
-- `crates/persistence-postgres/src/adapters/catalog/coaches/detail/read.rs`
-- `crates/persistence-postgres/src/adapters/catalog/coaches/directory/mod.rs`
-- `crates/persistence-postgres/src/adapters/catalog/coaches/directory/create.rs`
-- `crates/persistence-postgres/src/adapters/catalog/coaches/directory/list.rs`
-- `crates/persistence-postgres/src/adapters/catalog/coaches/mapping/mod.rs`
-- `crates/persistence-postgres/src/adapters/catalog/coaches/mapping/coach.rs`
-- `crates/persistence-postgres/src/adapters/catalog/coaches/mapping/external_id.rs`
-- `crates/persistence-postgres/src/adapters/catalog/coaches/mapping/listing.rs`
-- `crates/persistence-postgres/src/adapters/catalog/coaches/mapping/name.rs`
-- `crates/persistence-postgres/src/adapters/catalog/coaches/mapping/period.rs`
-- `crates/persistence-postgres/src/adapters/catalog/coaches/names/mod.rs`
-- `crates/persistence-postgres/src/adapters/catalog/coaches/names/add.rs`
-- `crates/persistence-postgres/src/adapters/catalog/coaches/team_periods/mod.rs`
-- `crates/persistence-postgres/src/adapters/catalog/coaches/team_periods/add.rs`
-- `crates/persistence-postgres/src/adapters/catalog/coaches/team_periods/read.rs`
-- `crates/persistence-postgres/src/adapters/catalog/formations/mod.rs`
-- `crates/persistence-postgres/src/adapters/catalog/formations/constants.rs`
-- `crates/persistence-postgres/src/adapters/catalog/formations/directory/mod.rs`
-- `crates/persistence-postgres/src/adapters/catalog/formations/directory/list.rs`
-- `crates/persistence-postgres/src/adapters/catalog/formations/directory/mapper.rs`
-- `crates/persistence-postgres/src/adapters/catalog/formations/resolution/mod.rs`
-- `crates/persistence-postgres/src/adapters/catalog/formations/resolution/read.rs`
-- `crates/persistence-postgres/src/adapters/catalog/formations/resolution/resolve.rs`
-- `crates/persistence-postgres/src/adapters/catalog/formations/usage/mod.rs`
-- `crates/persistence-postgres/src/adapters/catalog/formations/usage/grouping.rs`
-- `crates/persistence-postgres/src/adapters/catalog/formations/usage/key.rs`
-- `crates/persistence-postgres/src/adapters/catalog/formations/usage/preparation.rs`
-- `crates/persistence-postgres/src/adapters/catalog/formations/usage/probability.rs`
-- `crates/persistence-postgres/src/adapters/catalog/formations/usage/read.rs`
-- `crates/persistence-postgres/src/adapters/catalog/formations/usage/save.rs`
-- `crates/persistence-postgres/src/adapters/catalog/formations/usage/tests.rs`
-- `crates/persistence-postgres/src/adapters/catalog/formations/usage/validation.rs`
-- `crates/persistence-postgres/src/adapters/catalog/formations/usage/window.rs`
-- `crates/persistence-postgres/src/adapters/catalog/formations/usage/window/read.rs`
-- `crates/persistence-postgres/src/adapters/catalog/formations/usage/write.rs`
-- `crates/persistence-postgres/tests/coach_formation_repository_contract.rs`
-- `scripts/verify-coach-formation-persistence.mjs`
-- `docs/modular-rewrite/R06-entity-catalog-persistence/R06-07-coaches-and-formation-usage.md`
-
-### 修改
-
-- `README.md`
-- `architecture/domain-type-inventory.json`
-- `crates/persistence-postgres/src/adapters/catalog/mod.rs`
-- `crates/persistence-postgres/src/entity_catalog.rs`
-- `crates/persistence-postgres/src/lib.rs`
-- `docs/modular-rewrite/R06-entity-catalog-persistence/README.md`
-- `package.json`
-- `scripts/verify-entity-relationships.mjs`
-- `scripts/verify-formation-usage.mjs`
-- `scripts/verify-global-name-search.mjs`
-
-### 移动/重命名
-
-- 无。
-
-### 删除
-
-- `crates/persistence-postgres/src/formation_catalog.rs`
-
-## 验证
-
-- Windows 本地 minimum gate：official Domain inventory 365 types / 299 PostgreSQL mapped types、完整 architecture、Persistence `cargo check`、95/95 unit tests、R6-07 PostgreSQL contract 编译、Application check、rustfmt 均实际通过。
-- Windows 本地阶段回归：`npm run verify:frontend`、TypeScript、Vite build、`cargo fmt --all -- --check`、workspace Clippy `-D warnings`、`cargo test --locked --workspace` 均实际通过；保护资产 18 个指纹一致，聚合 SHA-256 `d74e0936b60c69f444a498405fed3e704b8db63b81f26b40036f772b4b6eac57`。
-- PostgreSQL 16 final gate run `32128507369` / job `95684279881` 为 `SUCCESS`：R6-07 ownership、Formation Usage、Global Name Search、Entity Relationships、完整 architecture、模型保护、database static baseline、Persistence/Application compile、R6-03～R6-07 PostgreSQL contracts 与 `formation_catalog_usage_history_and_resolution_are_consistent` 真实执行全部通过。
-- 额外执行了超出 R6-07 完成门禁的全量 `run_database_baseline.mjs` 诊断：R6-07 tree run `32127380673` 与 R6-07 起点 `7bf9b90bc235bdb397d003bdd6e61458e2e425c9` reference run `32127587771` 均为相同的 14/18 PASS、4 FAIL；失败项为 `match_lineup_chain_versions_model_selection_and_freeze_gate_are_consistent`、`match_scope_inference_and_lineup_pair_transaction_are_atomic`、`p4_stage_c_writes_are_idempotent_and_frozen_history_is_immutable`、`structured_match_events_are_queryable_and_revision_aware`。四项在 R6-07 开始前已同样失败，且本节点未修改对应测试或其 owner，因此记录为既有、非 R6-07 回归，不通过修改/跳过/弱化测试掩盖。
-
-## 未执行与剩余风险
-
-- 用户现有 PostgreSQL 数据库真实数据 sample/write 验收未执行；继续留到最终统一验收。
-- Windows Full 人工交互验收未执行；继续留到最终统一验收。
-- 上述四个全量 PostgreSQL 历史集成测试的既有失败仍存在，未在 R6-07 越界修复；后续应在对应 Lineup/P4/Review owner 任务中处理。
-
-## 计划偏差与设计决策
-
-- 初始迁移产物曾把 Formation resolution/window/save 的 SQL 与协调编排放在同一文件；最终在收口前继续拆出 `resolution/read.rs`、`usage/window/read.rs`、`usage/preparation.rs`、`usage/write.rs`，并由 ownership verifier 明确禁止 coordinator 重新直接持有 `sqlx::`。
-- 历史 Global Name Search 与 Entity Relationships verifier 只跟随到新的 Coach owner；原数量阈值、契约断言和失败语义未降低。
-- 临时 payload/bootstrap、诊断和 hard-gate workflow/result 均已清理，不进入最终 tree。
-
-## 回退
-
-- 回退到节点起点 `7bf9b90bc235bdb397d003bdd6e61458e2e425c9`；不得通过复制旧 `formation_catalog.rs` 或恢复双 owner 进行手工回退。
-''', encoding="utf-8", newline="\n")
-
-          stage = "docs/modular-rewrite/R06-entity-catalog-persistence/README.md"
-          replace_exact(stage, "| R6-07 | Coaches 与 Formation Usage | VERIFYING |\n| R6-08 | Entity Matching 与 References | BLOCKED |", "| R6-07 | Coaches 与 Formation Usage | DONE |\n| R6-08 | Entity Matching 与 References | READY |")
-          replace_exact(stage, "- R6-01～R6-06 均已 `DONE`；R6-07 Coaches 与 Formation Usage 为当前唯一 `READY` 节点，R6-08～R6-10 继续 `BLOCKED`。", "- R6-01～R6-07 均已 `DONE`；R6-08 Entity Matching 与 References 为当前唯一 `READY` 节点，R6-09～R6-10 继续 `BLOCKED`。")
-          replace_exact(stage, "- R6-07 Coaches / Formation Usage owner switch 已进入 `VERIFYING`；R6-08～R6-10 继续 `BLOCKED`，不得提前推进。", "- R6-07 Coaches / Formation Usage 已按 directory/detail/names/team periods/mapping 与 Formation directory/usage/resolution/read-write 边界完成唯一 owner 切换；PostgreSQL 16 final gate run `32128507369` / job `95684279881` 为 `SUCCESS`，Windows 本地 frontend/rustfmt/Clippy/workspace tests 亦已通过。额外全量 PostgreSQL 诊断的 4 个失败在 R6-07 起点同样存在，已记录于节点文档且未通过放宽测试掩盖。R6-07 正式 `DONE`，R6-08 开放为 `READY`。")
-
-          root = "README.md"
-          old_root = """- Coaches persistence 已拆入 `adapters/catalog/coaches/`；Formation Directory / Usage / Resolution 已拆入 `adapters/catalog/formations/`，旧 `formation_catalog.rs` owner 删除；R6-08/R6-09 职责未提前迁移。\n- `CoachCatalogPort` / `FormationPort`、Domain DTO、Schema/migrations、配置、错误语义、Formation append-only/smoothing/UNKNOWN fallback/resolution priority 与用户可观察行为保持不变；无新增生产依赖。\n- 新增 R6-07 ownership verifier 与 PostgreSQL contract；implementation gate 成功后仍保持 `VERIFYING`，直到 Windows/PostgreSQL 16 hard gate 与 clean canonical 完成。用户现有 PostgreSQL 数据真实 sample/write 与 Windows Full 人工交互验收未执行。"""
-          new_root = """- Coaches persistence 已收敛到 `adapters/catalog/coaches/{directory,detail,names,team_periods,mapping}/`；Formation persistence 已收敛到 `adapters/catalog/formations/{directory,usage,resolution}/`。Formation resolution/window/save 的 SQL 读取/写入继续拆入明确 `read.rs` / `write.rs` owner，协调器保持 SQL-free；旧 `formation_catalog.rs` 删除，`entity_catalog.rs` 仅保留后续 R6-08/R6-09 职责。\n- `CoachCatalogPort` / `FormationPort`、Domain DTO、Schema/0001–0046 migrations、配置、错误语义、Formation append-only/smoothing/UNKNOWN fallback/resolution priority、历史 P4/运行引用和用户可观察行为保持不变；无新增生产依赖。Global Name Search / Entity Relationships / Formation Usage 历史 verifier 仅跟随新 owner，原断言未删除或放宽。\n- Windows 本地 minimum/stage regression 已实际通过完整 frontend、TypeScript/Vite、rustfmt、workspace Clippy `-D warnings`、workspace tests、95/95 Persistence unit tests、完整 architecture 与模型保护。PostgreSQL 16 final gate run `32128507369` / job `95684279881` 为 `SUCCESS`：R6-03～R6-07 contracts、Formation Usage 真实集成、database static baseline 与 Persistence/Application compile 全部通过。额外全量 PostgreSQL 诊断在当前 R6-07 tree 与节点起点 `7bf9b90bc235bdb397d003bdd6e61458e2e425c9` 均出现相同 4 个历史集成失败，确认不是 R6-07 回归，未在本节点越界修改。R6-07 正式 `DONE`，R6-08 Entity Matching 与 References 开放为 `READY`；用户现有 PostgreSQL 数据真实 sample/write 与 Windows Full 人工交互验收继续留到最终统一验收。"""
-          replace_exact(root, old_root, new_root)
+          root_path = Path("README.md")
+          root = root_path.read_text(encoding="utf-8")
+          root_section = base64.b64decode(os.environ["ROOT_SECTION_B64"]).decode("utf-8")
+          pattern = re.compile(r"### R6-07 Coaches 与 Formation Usage\n.*?(?=### R6-06 Abilities 与 Dynamic Tags)", re.S)
+          matches = pattern.findall(root)
+          if len(matches) != 1:
+              raise SystemExit(f"root R6-07 section anchor mismatch: {len(matches)}")
+          root = pattern.sub(lambda _: root_section, root, count=1)
+          root_path.write_text(root, encoding="utf-8", newline="\n")
           PY
 
           rm .github/workflows/r6-07-closeout.yml
@@ -202,6 +96,9 @@ jobs:
           node scripts/verify-entity-relationships.mjs
           npm run verify:architecture
           node scripts/verify-protected-assets-deterministic.mjs
+          grep -q '^`DONE`$' docs/modular-rewrite/R06-entity-catalog-persistence/R06-07-coaches-and-formation-usage.md
+          grep -Fq '| R6-07 | Coaches 与 Formation Usage | DONE |' docs/modular-rewrite/R06-entity-catalog-persistence/README.md
+          grep -Fq '| R6-08 | Entity Matching 与 References | READY |' docs/modular-rewrite/R06-entity-catalog-persistence/README.md
           test ! -e .github/workflows/r6-07-closeout.yml
           test ! -e .github/workflows/r6-07-hard-gate.yml
           test ! -e .github/workflows/r6-07-final-pg-gate.yml
@@ -211,6 +108,7 @@ jobs:
           test ! -e .r6-07-db-diagnostic-tail.txt
           test ! -e .r6-07-db-reference-tail.txt
           test ! -d .r6-07
+          git diff --check
 
       - name: Commit R6-07 closeout
         shell: bash
