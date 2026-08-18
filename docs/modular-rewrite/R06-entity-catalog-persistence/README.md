@@ -23,8 +23,8 @@ R6 按 Teams、Players、Coaches、Formations、Abilities、Dynamic Tags、Avail
 | R6-04 | Player Names 与 Positions | DONE |
 | R6-05 | Team Periods 与 Availability | DONE |
 | R6-06 | Abilities 与 Dynamic Tags | DONE |
-| R6-07 | Coaches 与 Formation Usage | VERIFYING |
-| R6-08 | Entity Matching 与 References | BLOCKED |
+| R6-07 | Coaches 与 Formation Usage | DONE |
+| R6-08 | Entity Matching 与 References | READY |
 | R6-09 | Archive / Delete / Force Delete | BLOCKED |
 | R6-10 | Global Name Search | BLOCKED |
 
@@ -95,7 +95,7 @@ R6 按 Teams、Players、Coaches、Formations、Abilities、Dynamic Tags、Avail
 
 - 公共 TeamCatalogPort / PlayerCatalogPort、Tauri command/DTO、Schema、0001–0046 migration、配置、错误语义、用户可观察行为、模型保护资产与生产依赖保持冻结。
 - R6-01、R6-02、R6-03、R6-04 均已 `DONE`。
-- R6-01～R6-06 均已 `DONE`；R6-07 Coaches 与 Formation Usage 为当前唯一 `READY` 节点，R6-08～R6-10 继续 `BLOCKED`。
+- R6-01～R6-07 均已 `DONE`；R6-08 Entity Matching 与 References 为当前唯一 `READY` 节点，R6-09～R6-10 继续 `BLOCKED`。
 - 每个节点完成时必须创建对应 `R06-xx` 实施记录并更新本索引；R6 完成时必须创建 `R06-stage-completion.md`。
 
 
@@ -104,4 +104,4 @@ R6 按 Teams、Players、Coaches、Formations、Abilities、Dynamic Tags、Avail
 - 详细记录：[`R06-06-abilities-and-dynamic-tags.md`](R06-06-abilities-and-dynamic-tags.md)。
 - Abilities 与 Dynamic Tags persistence 已按 dimensions / observations / definitions / tags / contribution 职责拆分，旧单文件 owner 删除；implementation gate `32043516067` 与最终阶段 hard gate `32044944449` 均已 `SUCCESS`。历史角色继承 verifier 只跟随到新的 contribution owner，未弱化原断言；clean canonical Public Platform CI run `32046081931` / Windows job `95434232104` 在 HEAD `9fe61a55627a51862670624d53d3feec688d1973` 上为 `SUCCESS`，artifact `9293689776`，SHA-256 `1c84dfa91806ef66cf632e8ce952fdc2dce5601f27b2eae521917e1b268aa5e1`。R6-06 正式 `DONE`，R6-07 开放为 `READY`。
 
-- R6-07 Coaches / Formation Usage owner switch 已进入 `VERIFYING`；R6-08～R6-10 继续 `BLOCKED`，不得提前推进。
+- R6-07 Coaches / Formation Usage 已完成唯一 owner 切换；hard-gate run `32125684434` 的 R6-07/retained contracts、Clippy/tests 均通过，focused PostgreSQL final gate run `32128507369` / job `95684279881` 为 `SUCCESS`。额外 full PostgreSQL baseline 在当前 tree 与节点起点均为相同 14/18 PASS、4 FAIL，确认不是 R6-07 回归且未放宽测试。R6-07 正式 `DONE`，R6-08 开放为 `READY`。

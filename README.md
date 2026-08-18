@@ -45,9 +45,9 @@ Node 开发依赖固定安装和读取自源码根目录上一级的 `../node_mo
 
 ### R6-07 Coaches 与 Formation Usage
 
-- Coaches persistence 已拆入 `adapters/catalog/coaches/`；Formation Directory / Usage / Resolution 已拆入 `adapters/catalog/formations/`，旧 `formation_catalog.rs` owner 删除；R6-08/R6-09 职责未提前迁移。
-- `CoachCatalogPort` / `FormationPort`、Domain DTO、Schema/migrations、配置、错误语义、Formation append-only/smoothing/UNKNOWN fallback/resolution priority 与用户可观察行为保持不变；无新增生产依赖。
-- 新增 R6-07 ownership verifier 与 PostgreSQL contract；implementation gate 成功后仍保持 `VERIFYING`，直到 Windows/PostgreSQL 16 hard gate 与 clean canonical 完成。用户现有 PostgreSQL 数据真实 sample/write 与 Windows Full 人工交互验收未执行。
+- Coaches persistence 已收敛到 `adapters/catalog/coaches/{directory,detail,names,team_periods,mapping}/`；Formation persistence 已收敛到 `adapters/catalog/formations/{directory,usage,resolution}/`。Formation resolution/window/save 的 SQL 读取与写入进一步拆入明确 `read.rs` / `write.rs` owner，协调器保持 SQL-free；旧 `formation_catalog.rs` 删除，`entity_catalog.rs` 仅保留后续 R6-08/R6-09 职责。
+- `CoachCatalogPort` / `FormationPort`、Domain DTO、Schema/0001–0046 migrations、配置、错误语义、Formation append-only/smoothing/UNKNOWN fallback/resolution priority、历史 P4/运行引用和用户可观察行为保持不变；无新增生产依赖。Global Name Search / Entity Relationships / Formation Usage 历史 verifier 仅跟随新 owner，原断言未删除或放宽。
+- Windows 本地 Minimum Gate 与 Stage Regression 已实际通过完整 frontend、TypeScript/Vite、rustfmt、workspace Clippy `-D warnings`、workspace tests、95/95 Persistence unit tests、完整 architecture 与模型保护。R6-07 hard-gate run `32125684434` 除额外 full frozen PostgreSQL baseline 外其余 R6-07/retained contracts、Clippy/tests 均通过；focused PostgreSQL final gate run `32128507369` / job `95684279881` 为 `SUCCESS`。额外 full baseline 在当前 R6-07 tree run `32127380673` 与节点起点 reference run `32127587771` 均出现相同 14/18 PASS、4 FAIL，确认不是本节点回归，未通过放宽测试掩盖。R6-07 正式 `DONE`，R6-08 Entity Matching 与 References 开放为 `READY`；用户现有 PostgreSQL 数据真实 sample/write 与 Windows Full 人工交互验收继续留到最终统一验收。
 
 ### R6-06 Abilities 与 Dynamic Tags
 
