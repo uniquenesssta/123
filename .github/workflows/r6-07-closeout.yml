@@ -25,7 +25,11 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          test "$(git rev-parse HEAD^)" = "c74ffcd887ed29e41c3b2570fb818ae71680c609"
+          base="c74ffcd887ed29e41c3b2570fb818ae71680c609"
+          git merge-base --is-ancestor "$base" HEAD
+          mapfile -t changed < <(git diff --name-only "$base"..HEAD)
+          test "${#changed[@]}" -eq 1
+          test "${changed[0]}" = ".github/workflows/r6-07-closeout.yml"
           test ! -e .github/workflows/r6-07-hard-gate.yml
           test ! -e .github/workflows/r6-07-final-pg-gate.yml
           test ! -e .github/workflows/r6-07-db-diagnostic.yml
