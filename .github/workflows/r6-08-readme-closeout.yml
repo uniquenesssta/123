@@ -1,0 +1,78 @@
+name: R6-08 targeted README closeout
+
+on:
+  push:
+    branches:
+      - rewrite/r6-entity-catalog-persistence
+
+permissions:
+  contents: write
+
+concurrency:
+  group: r6-08-targeted-readme-closeout
+  cancel-in-progress: true
+
+jobs:
+  closeout:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - name: Checkout stage branch
+        uses: actions/checkout@v4
+        with:
+          ref: rewrite/r6-entity-catalog-persistence
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Patch only R6-08 root README section
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$(git hash-object README.md)" = "92ca95ca8342a6adc2bdc9422ca2809ca60503a7"
+          grep -F '| R6-08 | Entity Matching 与 References | DONE |' docs/modular-rewrite/R06-entity-catalog-persistence/README.md
+          grep -F '| R6-09 | Archive / Delete / Force Delete | READY |' docs/modular-rewrite/R06-entity-catalog-persistence/README.md
+          grep -F '`DONE`' docs/modular-rewrite/R06-entity-catalog-persistence/R06-08-entity-matching-and-references.md
+          python3 - <<'PY'
+          from pathlib import Path
+          import re
+
+          path = Path("README.md")
+          text = path.read_text(encoding="utf-8")
+          replacement = """### R6-08 Entity Matching 与 References
+
+- Entity Matching persistence 已收敛到 `adapters/catalog/entity_matching/`，References persistence 已收敛到 `adapters/catalog/references/`；stable-ID/external-ID/name candidate read、reference directory、provider 与 external-ID writes 均按职责拆分，协调器保持 SQL-free。`entity_catalog.rs` 继续只持有 R6-09 deletion/archive/reference-count，`player_catalog.rs` 不再持有 provider/external-ID owner。
+- `EntityReferencePort`、Domain DTO、Schema/0001–0046 migrations、数据格式、配置、错误语义、日志等级、统一 NameSearch、matching priority/candidate score/reason、历史 P4/运行引用、UI 行为和模型保护资产保持不变；无新增生产依赖。
+- 生产 owner-switch 提交 `89dfbb101989116b5c858dbb8dc4564c50f86f9d` 的 implementation/minimum gate 已通过。首轮阶段 hard gate run `32142895608` 仅因 Ubuntu Chrome zygote 截图环境失败而停止，后续门禁未被误记为通过；最终 hard gate run `32143394153` 整体 `SUCCESS`，Windows job `95731216023` 已通过 frontend、rustfmt、workspace Clippy `-D warnings` 与 workspace tests，PostgreSQL 16 job `95731215987` 已通过 official inventory、R6 retained ownership、完整 architecture、模型保护/database baseline 及 R6-03～R6-08 真实 PostgreSQL contracts。临时 gate/closeout 文件已清理；R6-08 正式 `DONE`，R6-09 开放为 `READY`。用户现有 PostgreSQL 数据真实 sample/write 与 Windows Full 人工验收继续保留到最终统一验收。
+
+"""
+          pattern = re.compile(r"### R6-08 Entity Matching 与 References\n.*?(?=### R6-07 Coaches 与 Formation Usage\n)", re.S)
+          matches = pattern.findall(text)
+          if len(matches) != 1:
+              raise SystemExit(f"R6-08 README anchor mismatch: {len(matches)}")
+          updated = pattern.sub(replacement, text, count=1)
+          path.write_text(updated, encoding="utf-8", newline="\n")
+          PY
+
+      - name: Verify exact scope and commit
+        shell: bash
+        run: |
+          set -euo pipefail
+          node scripts/verify-entity-matching-references-persistence.mjs
+          node scripts/verify-global-name-search.mjs
+          git diff --check
+          mapfile -t changed < <(git status --short | sed -E 's/^.. //' | sort)
+          test "${#changed[@]}" -eq 2
+          test "${changed[0]}" = ".github/workflows/r6-08-readme-closeout.yml"
+          test "${changed[1]}" = "README.md"
+          rm .github/workflows/r6-08-readme-closeout.yml
+          git diff --check
+          mapfile -t changed < <(git status --short | sed -E 's/^.. //' | sort)
+          test "${#changed[@]}" -eq 2
+          test "${changed[0]}" = ".github/workflows/r6-08-readme-closeout.yml"
+          test "${changed[1]}" = "README.md"
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add -A
+          git commit -m "docs(r6-08): synchronize root README closeout"
+          git push origin HEAD:rewrite/r6-entity-catalog-persistence
