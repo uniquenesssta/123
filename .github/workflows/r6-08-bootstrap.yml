@@ -34,9 +34,10 @@ jobs:
           git merge-base --is-ancestor "$base" HEAD
           mapfile -t changed < <(git diff --name-only "$base"..HEAD | sort)
           printf '%s\n' "${changed[@]}"
-          test "${#changed[@]}" -eq 2
+          test "${#changed[@]}" -eq 3
           test "${changed[0]}" = ".github/workflows/r6-08-bootstrap.yml"
-          test "${changed[1]}" = ".r6-08/apply.py"
+          test "${changed[1]}" = ".r6-08-failure.txt"
+          test "${changed[2]}" = ".r6-08/apply.py"
           test ! -e crates/persistence-postgres/src/adapters/catalog/entity_matching/mod.rs
           test ! -e crates/persistence-postgres/src/adapters/catalog/references/mod.rs
 
@@ -46,6 +47,7 @@ jobs:
           set -euo pipefail
           exec > >(tee -a /tmp/r6-08.log) 2>&1
           rustup toolchain install 1.88.0 --profile minimal
+          rustup component add rustfmt --toolchain 1.88.0
           rustup default 1.88.0
 
       - name: Apply R6-08 owner switch
@@ -93,8 +95,10 @@ jobs:
           set -euo pipefail
           exec > >(tee -a /tmp/r6-08.log) 2>&1
           rm -rf .r6-08
+          rm -f .r6-08-failure.txt
           rm -f .github/workflows/r6-08-bootstrap.yml
           test ! -e .r6-08
+          test ! -e .r6-08-failure.txt
           test ! -e .github/workflows/r6-08-bootstrap.yml
           git diff --check
           git status --short
