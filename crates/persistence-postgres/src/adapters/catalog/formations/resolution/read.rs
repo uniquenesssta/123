@@ -64,15 +64,13 @@ impl PostgresStore {
         &self,
         match_id: Uuid,
     ) -> PersistenceResult<Option<Uuid>> {
-        Ok(
-            sqlx::query_scalar::<_, Option<Uuid>>(
-                "SELECT competition_id FROM football.matches WHERE id=$1",
-            )
-            .bind(match_id)
-            .fetch_optional(&self.pool)
-            .await?
-            .flatten(),
+        Ok(sqlx::query_scalar::<_, Option<Uuid>>(
+            "SELECT competition_id FROM football.matches WHERE id=$1",
         )
+        .bind(match_id)
+        .fetch_optional(&self.pool)
+        .await?
+        .flatten())
     }
 
     pub(crate) async fn read_current_head_coach_id(
