@@ -1,3 +1,5 @@
+mod read;
+
 use crate::{PersistenceError, PersistenceResult, PostgresStore};
 use chrono::{Datelike, NaiveDate, Utc};
 use football_domain::FormationUsageDistributionDraft;
@@ -32,22 +34,9 @@ impl PostgresStore {
                     "last_10" => 10_i64,
                     _ => 20_i64,
                 };
-                let dates = sqlx::query_scalar::<_, NaiveDate>(
-                    r#"
-                        SELECT fixture.kickoff_time::date
-                        FROM football.matches fixture
-                        WHERE (fixture.home_team_id=$1 OR fixture.away_team_id=$1)
-                          AND fixture.status='finished'
-                          AND fixture.kickoff_time::date <= $2
-                        ORDER BY fixture.kickoff_time DESC, fixture.id DESC
-                        LIMIT $3
-                        "#,
-                )
-                .bind(team_id)
-                .bind(today)
-                .bind(limit)
-                .fetch_all(&self.pool)
-                .await?;
+                let dates = self
+                    .read_recent_finished_match_dates(team_id, today, limit)
+                    .await?;
                 let end = dates.first().copied().ok_or_else(|| {
                     PersistenceError::InvalidState(
                         "数据库中没有可用于最近场次窗口的已结束比赛".to_string(),
@@ -63,55 +52,20 @@ impl PostgresStore {
                 let coach_id = draft.coach_id.ok_or_else(|| {
                     PersistenceError::InvalidState("当前教练任期必须选择教练".to_string())
                 })?;
-                sqlx::query_as::<_, (NaiveDate, Option<NaiveDate>)>(
-                    r#"
-                        SELECT valid_from, valid_to
-                        FROM football.team_coach_periods
-                        WHERE team_id=$1 AND coach_id=$2
-                          AND valid_from <= $3
-                        ORDER BY valid_from DESC, id DESC
-                        LIMIT 1
-                        "#,
-                )
-                .bind(team_id)
-                .bind(coach_id)
-                .bind(today)
-                .fetch_optional(&self.pool)
-                .await?
-                .map(|(start, end)| (start, end.unwrap_or(today).min(today)))
-                .ok_or_else(|| PersistenceError::InvalidState("没有找到对应的教练任期".to_string()))
+                self.read_coach_term_window(team_id, coach_id, today)
+                    .await?
+                    .map(|(start, end)| (start, end.unwrap_or(today).min(today)))
+                    .ok_or_else(|| {
+                        PersistenceError::InvalidState("没有找到对应的教练任期".to_string())
+                    })
             }
             "current_season" => {
                 let range = if let Some(competition_id) = draft.competition_id {
-                    sqlx::query_as::<_, (Option<NaiveDate>, Option<NaiveDate>)>(
-                        r#"
-                            SELECT min(kickoff_time::date), max(kickoff_time::date)
-                            FROM football.matches
-                            WHERE competition_id=$1
-                              AND extract(year from kickoff_time)=$2
-                              AND kickoff_time::date <= $3
-                            "#,
-                    )
-                    .bind(competition_id)
-                    .bind(today.year())
-                    .bind(today)
-                    .fetch_one(&self.pool)
-                    .await?
+                    self.read_competition_season_range(competition_id, today.year(), today)
+                        .await?
                 } else if let Some(team_id) = draft.team_id {
-                    sqlx::query_as::<_, (Option<NaiveDate>, Option<NaiveDate>)>(
-                        r#"
-                            SELECT min(kickoff_time::date), max(kickoff_time::date)
-                            FROM football.matches
-                            WHERE (home_team_id=$1 OR away_team_id=$1)
-                              AND extract(year from kickoff_time)=$2
-                              AND kickoff_time::date <= $3
-                            "#,
-                    )
-                    .bind(team_id)
-                    .bind(today.year())
-                    .bind(today)
-                    .fetch_one(&self.pool)
-                    .await?
+                    self.read_team_season_range(team_id, today.year(), today)
+                        .await?
                 } else {
                     (None, None)
                 };
