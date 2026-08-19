@@ -1,3 +1,4 @@
+# explicit trigger after workflow registration
 name: R6 Stage Exit Owner Cleanup
 
 on:
