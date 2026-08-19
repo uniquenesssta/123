@@ -1,0 +1,322 @@
+name: R6-09 AT1 preflight archive gate
+
+on:
+  push:
+    branches:
+      - rewrite/r6-entity-catalog-persistence
+
+permissions:
+  contents: write
+
+concurrency:
+  group: r6-09-at1
+  cancel-in-progress: true
+
+jobs:
+  implement:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 60
+    outputs:
+      sha: ${{ steps.publish.outputs.sha }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: rewrite/r6-entity-catalog-persistence
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - uses: dtolnay/rust-toolchain@1.88.0
+        with:
+          components: rustfmt, clippy
+
+      - name: Verify AT1 staging baseline
+        shell: bash
+        run: |
+          set -euo pipefail
+          base=3bc7ca89ef0341b53985246602218c2ba6fbb094
+          git merge-base --is-ancestor "$base" HEAD
+          mapfile -t changed < <(git diff --name-only "$base"..HEAD | sort)
+          expected=(
+            ".github/workflows/r6-09-at1-gate.yml"
+            "scripts/r6-09-at1-apply.py"
+          )
+          test "${#changed[@]}" -eq "${#expected[@]}"
+          for i in "${!expected[@]}"; do test "${changed[$i]}" = "${expected[$i]}"; done
+          test "$(git hash-object crates/persistence-postgres/src/entity_catalog.rs)" = "fe861d8a1f5b765dcb5baf1e334d44990dd94344"
+          test "$(git hash-object crates/persistence-postgres/src/team_catalog.rs)" = "38f48d74709c8a9673bf2ed0ba7649603f223981"
+          test "$(git hash-object crates/persistence-postgres/src/player_catalog.rs)" = "ceb8b6ae74769f8d28ca593ea3298efa0ad730c5"
+          test "$(git hash-object crates/persistence-postgres/src/team_force_delete.rs)" = "ec0fd77103c90b94a7eeef7e769c5b17b88f6915"
+
+      - name: Apply and run minimum gate
+        id: minimum
+        shell: bash
+        run: |
+          set -uo pipefail
+          failure=.r6-09-at1-failure.txt
+          tmp=.r6-09-at1-command.log
+          rm -f "$failure" "$tmp"
+          run_gate() {
+            local label="$1"; shift
+            echo "=== $label ==="
+            "$@" > >(tee "$tmp") 2>&1
+            local rc=$?
+            if [ "$rc" -ne 0 ]; then
+              {
+                echo "R6-09 AT1 minimum gate failure"
+                echo "run_id=$GITHUB_RUN_ID"
+                echo "step=$label"
+                echo "exit_code=$rc"
+                echo
+                cat "$tmp"
+              } > "$failure"
+              exit "$rc"
+            fi
+            rm -f "$tmp"
+          }
+          run_gate "apply helper" python3 scripts/r6-09-at1-apply.py
+          run_gate "cargo fmt" cargo fmt --all
+          run_gate "domain inventory generate" node scripts/generate-domain-type-inventory.mjs
+          run_gate "R6-09 ownership" node scripts/verify-entity-deletion-persistence.mjs
+          run_gate "entity deletion retained" node scripts/verify-entity-deletion.mjs
+          run_gate "entity relationships retained" node scripts/verify-entity-relationships.mjs
+          run_gate "R6-07 retained" node scripts/verify-coach-formation-persistence.mjs
+          run_gate "R6-08 retained" node scripts/verify-entity-matching-references-persistence.mjs
+          run_gate "architecture" npm run verify:architecture
+          run_gate "protected assets" node scripts/verify_protected_assets.mjs
+          run_gate "rustfmt check" cargo fmt --all -- --check
+          run_gate "persistence check" cargo check --locked -p football-persistence-postgres
+          run_gate "persistence unit" cargo test --locked -p football-persistence-postgres --lib
+          run_gate "R6-09 contract compile" cargo test --locked -p football-persistence-postgres --test entity_deletion_repository_contract --no-run
+          run_gate "application check" cargo check --locked -p football-application
+          run_gate "diff check" git diff --check
+
+      - name: Publish minimum-gate failure diagnostic
+        if: failure()
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -f .r6-09-at1-failure.txt || {
+            printf 'R6-09 AT1 failed before diagnostic capture\nrun_id=%s\n' "$GITHUB_RUN_ID" > .r6-09-at1-failure.txt
+          }
+          diagnostic="$(cat .r6-09-at1-failure.txt)"
+          git reset --hard HEAD
+          git clean -fd
+          printf '%s\n' "$diagnostic" > .r6-09-at1-failure.txt
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -f .r6-09-at1-failure.txt
+          git commit -m "ci(r6-09): record AT1 minimum gate failure"
+          git push origin HEAD:rewrite/r6-entity-catalog-persistence
+
+      - name: Record AT1 implementation
+        if: success()
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          from pathlib import Path
+
+          root = Path('README.md')
+          text = root.read_text(encoding='utf-8')
+          anchor = '### R6-08 Entity Matching 与 References\n'
+          assert text.count(anchor) == 1
+          section = '''### R6-09 Archive / Delete / Force Delete
+
+          - Atomic Task 1 已将 deletion preflight/reference-count 与 archive persistence 收敛到 `adapters/catalog/deletion/{preflight,archive}/`；协调器 SQL-free，引用统计、标签读取与归档事务由具名 I/O owner 承担。普通永久 Delete 与 Team Force Delete 暂保留原 owner，等待本节点后续 Atomic Task，未提前混改。
+          - `EntityReferencePort`、Domain DTO、Schema/0001–0046 migrations、错误语义、历史 P4/运行引用保护、无引用永久删除和 force purge 行为均未改变；无新增生产依赖。AT1 Minimum Gate 已实际通过，Stage Regression / PostgreSQL 16 真实 contract 尚待本次 workflow 后续 jobs，R6-09 整体仍为 `IN_PROGRESS`。
+
+          '''
+          root.write_text(text.replace(anchor, section + anchor, 1), encoding='utf-8', newline='\n')
+
+          stage = Path('docs/modular-rewrite/R06-entity-catalog-persistence/README.md')
+          text = stage.read_text(encoding='utf-8')
+          assert text.count('| R6-09 | Archive / Delete / Force Delete | READY |') == 1
+          text = text.replace('| R6-09 | Archive / Delete / Force Delete | READY |', '| R6-09 | Archive / Delete / Force Delete | IN_PROGRESS |', 1)
+          text = text.rstrip() + '''
+
+          ## R6-09 当前事实
+
+          - 详细记录：[`R06-09-archive-delete-and-force-delete.md`](R06-09-archive-delete-and-force-delete.md)。
+          - Atomic Task 1：Preflight / Reference Counts / Archive owner switch 已完成 Minimum Gate，节点整体继续 `IN_PROGRESS`；普通永久 Delete 与 Team Force Delete 尚未迁移，R6-10 继续 `BLOCKED`。
+          '''
+          stage.write_text(text, encoding='utf-8', newline='\n')
+
+          detail = Path('docs/modular-rewrite/R06-entity-catalog-persistence/R06-09-archive-delete-and-force-delete.md')
+          detail.write_text('''# R6-09 Archive / Delete / Force Delete
+
+          ## 状态
+
+          `IN_PROGRESS`
+
+          ## Atomic Task 1 — Preflight / Reference Counts / Archive
+
+          - 基线：`3bc7ca89ef0341b53985246602218c2ba6fbb094`。
+          - `check_entity_deletion`、team/player/coach reference counts、entity label 与 `bulk_archive_entities` 已从 `entity_catalog.rs` 迁入 `adapters/catalog/deletion/{preflight,archive}/`；`entity_catalog.rs` 仅保留 team-player-period read。
+          - 公共 Port/DTO/Schema/迁移/错误/归档行为/历史 P4 保护均未改变；普通永久 Delete 与 Force Delete 未在 AT1 修改。
+          - Minimum Gate：R6-09 AT1 ownership、历史 Entity Deletion / Entity Relationships、R6-07/R6-08 retained ownership、完整 architecture、protected assets、rustfmt、Persistence check/unit tests、R6-09 contract compile、Application check 与 diff hygiene 全部 PASS。
+          - Stage Regression 与 PostgreSQL 16 真实 contract 由本 workflow 后续独立 jobs 执行；在成功前 AT1 不关闭。
+          - 新增：`adapters/catalog/deletion/{mod.rs,ids.rs,preflight/*,archive/*}`、`entity_deletion_repository_contract.rs`、`verify-entity-deletion-persistence.mjs`、本记录。
+          - 修改：`entity_catalog.rs`、catalog `mod.rs`、相关 retained verifier、`package.json`、Domain inventory、根/阶段 README。
+          - 删除/移动：AT1 无生产文件删除；临时 workflow/helper 在提交时清理。
+          - 回退点：上述基线提交。
+          ''', encoding='utf-8', newline='\n')
+          PY
+          git rm .github/workflows/r6-09-at1-gate.yml scripts/r6-09-at1-apply.py
+          rm -f .r6-09-at1-failure.txt .r6-09-at1-command.log
+          git diff --check
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git commit -m "refactor(r6-09): modularize deletion preflight and archive"
+          git push origin HEAD:rewrite/r6-entity-catalog-persistence
+
+      - id: publish
+        if: success()
+        shell: bash
+        run: echo "sha=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
+
+  windows-stage:
+    needs: implement
+    if: needs.implement.result == 'success'
+    runs-on: windows-2025
+    timeout-minutes: 120
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ needs.implement.outputs.sha }}
+          path: 项目源码
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - uses: dtolnay/rust-toolchain@1.88.0
+        with:
+          components: rustfmt, clippy
+      - name: Stage regression
+        shell: pwsh
+        working-directory: 项目源码
+        run: |
+          npm run setup
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          npm run verify:frontend
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          cargo fmt --all -- --check
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          cargo clippy --locked --workspace --all-targets -- -D warnings
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          cargo test --locked --workspace
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          git diff --check
+
+  postgres-contract:
+    needs: implement
+    if: needs.implement.result == 'success'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: football
+          POSTGRES_PASSWORD: football
+          POSTGRES_DB: football_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U football -d football_test"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 10
+    env:
+      FOOTBALL_TEST_DATABASE_URL: postgres://football:football@127.0.0.1:5432/football_test
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ needs.implement.outputs.sha }}
+      - uses: dtolnay/rust-toolchain@1.88.0
+      - name: R6-09 PostgreSQL 16 contract
+        shell: bash
+        run: |
+          set -euo pipefail
+          cargo test --locked -p football-persistence-postgres --test entity_deletion_repository_contract -- --ignored --nocapture
+          git diff --check
+
+  record-result:
+    needs: [implement, windows-stage, postgres-contract]
+    if: always() && needs.implement.result == 'success' && needs.windows-stage.result == 'success' && needs.postgres-contract.result == 'success'
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: rewrite/r6-entity-catalog-persistence
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+      - name: Close AT1
+        shell: bash
+        env:
+          IMPLEMENT_SHA: ${{ needs.implement.outputs.sha }}
+        run: |
+          set -euo pipefail
+          test "$(git rev-parse HEAD)" = "$IMPLEMENT_SHA"
+          python3 - <<'PY'
+          import os
+          from pathlib import Path
+          run = os.environ['GITHUB_RUN_ID']
+          detail = Path('docs/modular-rewrite/R06-entity-catalog-persistence/R06-09-archive-delete-and-force-delete.md')
+          text = detail.read_text(encoding='utf-8')
+          old = '- Stage Regression 与 PostgreSQL 16 真实 contract 由本 workflow 后续独立 jobs 执行；在成功前 AT1 不关闭。'
+          new = f'- AT1 hard gate run `{run}`：Windows Stage Regression 与 PostgreSQL 16 `entity_deletion_repository_contract` 均实际 PASS；AT1 正式关闭，R6-09 继续 `IN_PROGRESS`。'
+          assert text.count(old) == 1
+          detail.write_text(text.replace(old, new, 1), encoding='utf-8', newline='\n')
+          stage = Path('docs/modular-rewrite/R06-entity-catalog-persistence/README.md')
+          text = stage.read_text(encoding='utf-8')
+          old = '- Atomic Task 1：Preflight / Reference Counts / Archive owner switch 已完成 Minimum Gate，节点整体继续 `IN_PROGRESS`；普通永久 Delete 与 Team Force Delete 尚未迁移，R6-10 继续 `BLOCKED`。'
+          new = f'- Atomic Task 1：Preflight / Reference Counts / Archive owner switch 与 hard gate run `{run}` 已 PASS；节点整体继续 `IN_PROGRESS`。普通永久 Delete 与 Team Force Delete 尚未迁移，R6-10 继续 `BLOCKED`。'
+          assert text.count(old) == 1
+          stage.write_text(text.replace(old, new, 1), encoding='utf-8', newline='\n')
+          root = Path('README.md')
+          text = root.read_text(encoding='utf-8')
+          old = '- `EntityReferencePort`、Domain DTO、Schema/0001–0046 migrations、错误语义、历史 P4/运行引用保护、无引用永久删除和 force purge 行为均未改变；无新增生产依赖。AT1 Minimum Gate 已实际通过，Stage Regression / PostgreSQL 16 真实 contract 尚待本次 workflow 后续 jobs，R6-09 整体仍为 `IN_PROGRESS`。'
+          new = f'- `EntityReferencePort`、Domain DTO、Schema/0001–0046 migrations、错误语义、历史 P4/运行引用保护、无引用永久删除和 force purge 行为均未改变；无新增生产依赖。AT1 Minimum Gate、Windows Stage Regression 与 PostgreSQL 16 contract 已在 hard gate run `{run}` 实际通过；R6-09 整体仍为 `IN_PROGRESS`。'
+          assert text.count(old) == 1
+          root.write_text(text.replace(old, new, 1), encoding='utf-8', newline='\n')
+          PY
+          git diff --check
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add README.md docs/modular-rewrite/R06-entity-catalog-persistence
+          git commit -m "docs(r6-09): close preflight archive atomic task"
+          git push origin HEAD:rewrite/r6-entity-catalog-persistence
+
+  record-failure:
+    needs: [implement, windows-stage, postgres-contract]
+    if: always() && needs.implement.result == 'success' && (needs.windows-stage.result != 'success' || needs.postgres-contract.result != 'success')
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: rewrite/r6-entity-catalog-persistence
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+      - name: Record stage failure
+        shell: bash
+        env:
+          IMPLEMENT_SHA: ${{ needs.implement.outputs.sha }}
+          WINDOWS_RESULT: ${{ needs.windows-stage.result }}
+          POSTGRES_RESULT: ${{ needs.postgres-contract.result }}
+        run: |
+          set -euo pipefail
+          test "$(git rev-parse HEAD)" = "$IMPLEMENT_SHA"
+          cat > .r6-09-at1-stage-failure.txt <<EOF
+          R6-09 AT1 stage gate failure
+          run_id=$GITHUB_RUN_ID
+          windows_stage=$WINDOWS_RESULT
+          postgres_contract=$POSTGRES_RESULT
+          EOF
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -f .r6-09-at1-stage-failure.txt
+          git commit -m "ci(r6-09): record AT1 stage gate failure"
+          git push origin HEAD:rewrite/r6-entity-catalog-persistence
