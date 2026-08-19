@@ -138,7 +138,7 @@ jobs:
               '- `EntityReferencePort`、Domain DTO、Schema/0001–0046 migrations、配置、错误语义、安全确认、历史 P4/运行引用保护、普通永久删除和 force purge 用户可观察行为均未改变；无新增生产依赖。AT1/AT2 已独立关闭。AT3 Team Force Delete 已完成 owner switch、Minimum Gate 与 focused PostgreSQL 16 contracts；完整 Windows Stage Regression / R6 retained PostgreSQL contracts 尚待本 workflow 后续 jobs，R6-09 继续 `IN_PROGRESS`。',
           )
           PY
-          rm -f scripts/r6-09-at3-apply.py
+          rm -f scripts/r6-09-at3-apply.py .r6-09-at3-failure.txt
           git diff --check
 
       - name: Publish AT3 production commit
@@ -159,6 +159,23 @@ jobs:
           git commit -m "refactor(r6-09): modularize team force deletion"
           production_sha=$(git rev-parse HEAD)
           echo "production_sha=$production_sha" >> "$GITHUB_OUTPUT"
+          git push origin HEAD:rewrite/r6-entity-catalog-persistence
+
+      - name: Record AT3 implement failure
+        if: failure()
+        shell: bash
+        run: |
+          set -euo pipefail
+          git reset --hard "$GITHUB_SHA"
+          git clean -fd
+          cat > .r6-09-at3-failure.txt <<EOF
+          run_id=$GITHUB_RUN_ID
+          trigger_sha=$GITHUB_SHA
+          EOF
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -f .r6-09-at3-failure.txt
+          git commit -m "ci(r6-09): record AT3 implement failure"
           git push origin HEAD:rewrite/r6-entity-catalog-persistence
 
   windows-stage:
@@ -310,10 +327,10 @@ jobs:
               raise SystemExit('root AT3 final anchor mismatch')
           root.write_text(text.replace(old, new, 1), encoding='utf-8', newline='\n')
           PY
-          rm -f .github/workflows/r6-09-at3.yml
+          rm -f .github/workflows/r6-09-at3.yml .r6-09-at3-failure.txt
           git diff --check
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add README.md docs/modular-rewrite/R06-entity-catalog-persistence/README.md docs/modular-rewrite/R06-entity-catalog-persistence/R06-09-archive-delete-and-force-delete.md .github/workflows/r6-09-at3.yml
+          git add README.md docs/modular-rewrite/R06-entity-catalog-persistence/README.md docs/modular-rewrite/R06-entity-catalog-persistence/R06-09-archive-delete-and-force-delete.md .github/workflows/r6-09-at3.yml .r6-09-at3-failure.txt
           git commit -m "docs(r6-09): close force-delete task"
           git push origin HEAD:rewrite/r6-entity-catalog-persistence
