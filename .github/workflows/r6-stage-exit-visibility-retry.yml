@@ -1,4 +1,4 @@
-# explicit trigger after workflow registration
+# explicit trigger after workflow registration; temporary helper removal is forced because visibility is patched in-run
 name: R6 Stage Exit Visibility Retry
 
 on:
@@ -154,7 +154,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          git rm scripts/r6-stage-exit-apply.py
+          git rm -f scripts/r6-stage-exit-apply.py
           git rm -f .r6-10-verify-success.txt || true
           git rm -f .r6-stage-exit-failure.txt || true
           git rm .github/workflows/r6-stage-exit-cleanup.yml
