@@ -1,0 +1,37 @@
+name: R6-09 AT3 failure report
+
+on:
+  workflow_run:
+    workflows:
+      - R6-09 AT3 team force delete
+    types:
+      - completed
+
+permissions:
+  contents: write
+
+jobs:
+  report:
+    if: github.event.workflow_run.conclusion != 'success' && github.event.workflow_run.actor.login != 'github-actions[bot]'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: rewrite/r6-entity-catalog-persistence
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+      - name: Record failed AT3 run
+        shell: bash
+        run: |
+          set -euo pipefail
+          cat > .r6-09-at3-failure.txt <<EOF
+          run_id=${{ github.event.workflow_run.id }}
+          conclusion=${{ github.event.workflow_run.conclusion }}
+          head_sha=${{ github.event.workflow_run.head_sha }}
+          EOF
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -f .r6-09-at3-failure.txt
+          git commit -m "ci(r6-09): record AT3 gate failure"
+          git push origin HEAD:rewrite/r6-entity-catalog-persistence
