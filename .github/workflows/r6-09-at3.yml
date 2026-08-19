@@ -58,7 +58,7 @@ jobs:
           git merge-base --is-ancestor 215fd8060685534ec994b8dd1e05d966e492e579 HEAD
           test "$(git hash-object crates/persistence-postgres/src/team_force_delete.rs)" = "ec0fd77103c90b94a7eeef7e769c5b17b88f6915"
           test "$(git hash-object crates/persistence-postgres/src/adapters/catalog/deletion/mod.rs)" = "96173619663878068fe9b0a89ed10eba7c2e3385"
-          test "$(git hash-object crates/persistence-postgres/src/lib.rs)" = "1c84895602589173ef116b688d9ab37e0d16b543"
+          test "$(git hash-object crates/persistence-postgres/src/lib.rs)" = "9fd3216b87b5dcfebff7a9d4fe08855bd8f320cf"
           test -f scripts/r6-09-at3-apply.py
           test ! -e crates/persistence-postgres/src/adapters/catalog/deletion/force_delete
           test ! -e crates/persistence-postgres/tests/team_force_delete_repository_contract.rs
@@ -304,7 +304,7 @@ jobs:
 
           root = Path('README.md')
           text = root.read_text(encoding='utf-8')
-          old = '- `EntityReferencePort`、Domain DTO、Schema/0001–0046 migrations、配置、错误语义、安全确认、历史 P4/运行引用保护、普通永久删除和 force purge 用户可观察行为均未改变；无新增生产依赖。AT1/AT2 已独立关闭。AT3 Team Force Delete 已完成 owner switch、Minimum Gate 与 focused PostgreSQL 16 contracts；完整 Windows Stage Regression / R6 retained PostgreSQL contracts 尚待本 workflow 后续 jobs，R6-09 继续 `IN_PROGRESS`。'
+          old = '- `EntityReferencePort`、Domain DTO、Schema/0001–0046 migrations、配置、错误语义、安全确认、历史 P4/运行引用保护、普通永久删除和 force purge 用户可观察行为均未改变；无新增生产依赖。AT1/AT2 已独立关闭。AT3 Team Force Delete 已完成 owner switch、Minimum Gate 与 focused PostgreSQL 16 contracts；完整 Windows Stage Regression / R6 retained PostgreSQL contracts尚待本 workflow 后续 jobs，R6-09 继续 `IN_PROGRESS`。'
           new = f'- `EntityReferencePort`、Domain DTO、Schema/0001–0046 migrations、配置、错误语义、安全确认、历史 P4/运行引用保护、普通永久删除和 force purge 用户可观察行为均未改变；无新增生产依赖。AT1/AT2/AT3 均已独立验证并关闭；AT3 生产提交 `{prod}` 的 Minimum Gate、完整 Windows Stage Regression 与 R6-01～R6-09 retained PostgreSQL 16 contracts全部通过（workflow run `{run_id}`）。R6-09 正式 `DONE`，R6-10 开放为 `READY`；用户现有 PostgreSQL 数据真实 sample/write 与 Windows Full 人工交互验收仍保留到最终统一验收。'
           if text.count(old) != 1:
               raise SystemExit('root AT3 final anchor mismatch')
