@@ -46,3 +46,4 @@ const originalSelf = execFileSync(
   { cwd: root, encoding: "utf8" },
 );
 writeFileSync(selfPath, originalSelf, "utf8");
+// R6-09 AT2 push trigger; removed automatically by the one-run hook above.
