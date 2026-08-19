@@ -41,7 +41,7 @@
     "verify:monthly-workbooks": "node scripts/verify-monthly-workbooks.mjs",
     "verify:match-lineup-chain": "node scripts/verify-match-lineup-chain.mjs",
     "verify:workspace-ui": "node scripts/verify-workspace-ui.mjs",
-    "setup": "node scripts/r6-09-at1-doc-closeout.mjs && node scripts/ensure-node-dependencies.mjs --install-only",
+    "setup": "node scripts/ensure-node-dependencies.mjs --install-only",
     "verify:release-readiness": "node scripts/verify-release-readiness.mjs",
     "verify:release-package": "node scripts/verify-release-package.mjs",
     "verify:release": "node scripts/ensure-node-dependencies.mjs --install-only && npm run verify:frontend",

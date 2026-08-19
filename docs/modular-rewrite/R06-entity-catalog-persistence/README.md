@@ -117,4 +117,4 @@ R6 按 Teams、Players、Coaches、Formations、Abilities、Dynamic Tags、Avail
 ## R6-09 当前事实
 
 - 详细记录：[`R06-09-archive-delete-and-force-delete.md`](R06-09-archive-delete-and-force-delete.md)。
-- Atomic Task 1：Preflight / Reference Counts / Archive owner switch 已完成 Minimum Gate，节点整体继续 `IN_PROGRESS`；普通永久 Delete 与 Team Force Delete 尚未迁移，R6-10 继续 `BLOCKED`。
+- Atomic Task 1：Preflight / Reference Counts / Archive 已 `DONE`。PostgreSQL 16 contract run `32219150263` / job `95967398924` 与最终 Windows Stage Regression run `32220581584` / job `95970175840` 均为 `SUCCESS`；两处 retained verifier 仅跟随新的 `deletion/preflight/references.rs` owner，原断言保持。临时 retry workflow/markers 已清理。R6-09 节点整体继续 `IN_PROGRESS`；普通永久 Delete 与 Team Force Delete 尚未迁移，R6-10 继续 `BLOCKED`。

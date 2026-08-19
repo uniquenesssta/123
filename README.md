@@ -47,7 +47,7 @@ Node 开发依赖固定安装和读取自源码根目录上一级的 `../node_mo
 ### R6-09 Archive / Delete / Force Delete
 
 - Atomic Task 1 已将 deletion preflight/reference-count 与 archive persistence 收敛到 `adapters/catalog/deletion/{preflight,archive}/`；协调器 SQL-free，引用统计、标签读取与归档事务由具名 I/O owner 承担。普通永久 Delete 与 Team Force Delete 暂保留原 owner，等待本节点后续 Atomic Task，未提前混改。
-- `EntityReferencePort`、Domain DTO、Schema/0001–0046 migrations、错误语义、历史 P4/运行引用保护、无引用永久删除和 force purge 行为均未改变；无新增生产依赖。AT1 Minimum Gate 已实际通过，Stage Regression / PostgreSQL 16 真实 contract 尚待本次 workflow 后续 jobs，R6-09 整体仍为 `IN_PROGRESS`。
+- `EntityReferencePort`、Domain DTO、Schema/0001–0046 migrations、错误语义、历史 P4/运行引用保护、无引用永久删除和 force purge 行为均未改变；无新增生产依赖。AT1 已正式 `DONE`：PostgreSQL 16 contract run `32219150263` / job `95967398924` 为 `SUCCESS`；最终 Windows Stage Regression run `32220581584` / job `95970175840` 为 `SUCCESS`，实际通过完整 frontend、rustfmt、workspace Clippy `-D warnings`、workspace tests 与 diff hygiene。两处历史 verifier 仅把已迁移的 reference-count 检查跟随到 `deletion/preflight/references.rs`，原断言未删除或放宽；临时 retry workflow/markers 已由 cleanup commit `0fa05a3b67eb21009b5a56e00cb5b365fd0e66b5` 清理。R6-09 整体继续 `IN_PROGRESS`，普通永久 Delete 与 Team Force Delete 留待后续 Atomic Task。
 
 ### R6-08 Entity Matching 与 References
 
