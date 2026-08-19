@@ -1,5 +1,6 @@
 mod name_mapper;
 mod name_row;
+mod player_periods;
 mod profile_mapper;
 mod profile_row;
 mod read_names;

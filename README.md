@@ -44,6 +44,11 @@ Node 开发依赖固定安装和读取自源码根目录上一级的 `../node_mo
 ## 模块化重写执行记录
 
 
+### R6 Stage Exit Cleanup
+
+- R6 阶段出口正在清理最后的旧 catalog persistence owner：Team Detail player-period projection、Position reference list 与 season-team membership option read 迁入 `adapters/catalog/` 对应职责目录；`entity_catalog.rs` 删除。
+- `player_catalog.rs` 仅移除上述 R6 SQL/mapper，Match/Lineup 与其 reference-data 聚合入口保持原行为并留给 R7；公共 Port/DTO、Schema、0001–0046 migrations、配置、UI、错误语义和生产依赖不变。节点保持 `VERIFYING`，等待 R6 最终 Windows + PostgreSQL 16 出口门禁。
+
 ### R6-10 Global Name Search
 
 - 统一名称搜索已收敛到 `adapters/catalog/global_search/{query,normalization,predicate}`；球队目录、球员目录、球队 selector、教练目录与 Entity Reference 只切换内部 owner，旧 `name_search.rs` 已删除。

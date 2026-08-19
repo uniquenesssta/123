@@ -201,6 +201,15 @@ async fn player_team_periods_and_availability_contract_is_preserved() {
         PersistenceError::InvalidState(message) if message == "可用性结束时间不能早于开始时间"
     ));
 
+    let team_detail = database
+        .store
+        .read_team(team.id)
+        .await
+        .expect("读取 Team Detail player periods");
+    assert!(team_detail.player_periods.iter().any(|item| {
+        item.id == period.id && item.player_id == player.id && item.team_id == team.id
+    }));
+
     let detail = database
         .store
         .read_player(player.id)

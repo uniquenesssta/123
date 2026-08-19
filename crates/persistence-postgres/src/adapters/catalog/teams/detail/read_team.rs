@@ -1,6 +1,7 @@
 use super::{
-    read_names::read_names, read_profile::read_profile, read_recent_matches::read_recent_matches,
-    read_squad::read_squad, read_team_record::read_team_record,
+    player_periods::read_player_periods, read_names::read_names, read_profile::read_profile,
+    read_recent_matches::read_recent_matches, read_squad::read_squad,
+    read_team_record::read_team_record,
 };
 use crate::{PersistenceResult, PostgresStore};
 use football_domain::{FormationDistributionQuery, FormationUsageListQuery, TeamDetail};
@@ -12,7 +13,7 @@ impl PostgresStore {
         let names = read_names(&self.pool, team_id).await?;
         let profile = read_profile(&self.pool, team_id).await?;
         let squad = read_squad(&self.pool, team_id).await?;
-        let player_periods = self.list_team_player_periods(team_id).await?;
+        let player_periods = read_player_periods(&self.pool, team_id).await?;
         let coach_periods = self.list_team_coach_periods(team_id).await?;
         let recent_matches = read_recent_matches(&self.pool, team_id).await?;
         let formation_usage = self

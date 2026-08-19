@@ -31,6 +31,14 @@ const positionsWrite = requireTokens("crates/persistence-postgres/src/adapters/c
   "query_as::<_, PlayerPositionRow>",
   "tx.commit().await?",
 ], "Player Positions write owner");
+const positionsList = requireTokens("crates/persistence-postgres/src/adapters/catalog/players/positions/list_positions.rs", [
+  "pub async fn list_positions",
+  "query_as::<_, PositionReferenceRow>",
+  "FROM football.positions",
+  "map_position_reference",
+], "Position reference read owner");
+const positionReferenceRow = read("crates/persistence-postgres/src/adapters/catalog/players/positions/reference_row.rs");
+const positionReferenceMapper = read("crates/persistence-postgres/src/adapters/catalog/players/positions/reference_mapper.rs");
 const legacy = read("crates/persistence-postgres/src/player_catalog.rs");
 const namesRead = read("crates/persistence-postgres/src/adapters/catalog/players/detail/names/read.rs");
 const positionsRead = read("crates/persistence-postgres/src/adapters/catalog/players/detail/positions/read.rs");
@@ -39,7 +47,7 @@ const adapter = read("crates/application/src/composition/adapters/players.rs");
 
 check(playersMod.includes("mod names;") && playersMod.includes("mod positions;"), "players 模块未注册 Names/Positions owner");
 check(namesMod.includes("mod add_player_name;") && namesMod.includes("mod input_policy;") && namesMod.includes("mod mapper;") && namesMod.includes("mod row;"), "Names 目录职责拆分不完整");
-check(positionsMod.includes("mod assign_player_position;") && positionsMod.includes("mod input_policy;") && positionsMod.includes("mod mapper;") && positionsMod.includes("mod row;"), "Positions 目录职责拆分不完整");
+check(positionsMod.includes("mod assign_player_position;") && positionsMod.includes("mod input_policy;") && positionsMod.includes("mod mapper;") && positionsMod.includes("mod row;") && positionsMod.includes("mod list_positions;") && positionsMod.includes("mod reference_mapper;") && positionsMod.includes("mod reference_row;"), "Positions 目录职责拆分不完整");
 check(!namesMod.includes("sqlx::") && !namesMod.includes("impl PostgresStore"), "Names mod.rs 不得承载 SQL 或业务实现");
 check(!positionsMod.includes("sqlx::") && !positionsMod.includes("impl PostgresStore"), "Positions mod.rs 不得承载 SQL 或业务实现");
 check(namesWrite.includes("normalize_name(validated.name)"), "Player Names 未复用唯一名称规范化 owner");
@@ -48,6 +56,8 @@ check(!legacy.includes("pub async fn add_player_name"), "legacy player_catalog.r
 check(!legacy.includes("pub async fn assign_player_position"), "legacy player_catalog.rs 仍拥有 assign_player_position");
 check(!legacy.includes("fn player_name_from_row"), "legacy player_catalog.rs 仍拥有 PlayerName Row mapper");
 check(!legacy.includes("fn player_position_from_row"), "legacy player_catalog.rs 仍拥有 PlayerPosition Row mapper");
+check(!legacy.includes("pub async fn list_positions") && !legacy.includes("fn position_reference_from_row"), "legacy player_catalog.rs 仍拥有 Position reference read/mapping");
+check(positionReferenceRow.includes("struct PositionReferenceRow") && positionReferenceMapper.includes("fn map_position_reference"), "Position reference Row/mapper owner 不完整");
 check(namesRead.includes("players::names::{map_player_name, PlayerNameRow}"), "Player Detail Names read 未复用新 Names mapper/row owner");
 check(positionsRead.includes("players::positions::{map_player_position, PlayerPositionRow}"), "Player Detail Positions read 未复用新 Positions mapper/row owner");
 for (const obsolete of [

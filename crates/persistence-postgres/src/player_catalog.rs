@@ -9,7 +9,7 @@ use chrono::{Datelike, NaiveDate};
 use football_domain::{
     AvailabilityStatus, LineupDraft, LineupHistoryRemovalResult, LineupPairDraft, LineupPairRecord,
     LineupPlayerRecord, LineupRecord, LineupType, MatchDraft, MatchRecord, MatchStatus,
-    PlayerCatalogReferenceData, PositionReference, SeasonTeamMembershipOption,
+    PlayerCatalogReferenceData,
 };
 use serde_json::json;
 use sqlx::{Postgres, Row, Transaction};
@@ -584,43 +584,6 @@ impl PostgresStore {
             upcoming_matches,
             managed_matches,
         })
-    }
-
-    async fn list_season_team_memberships(
-        &self,
-    ) -> PersistenceResult<Vec<SeasonTeamMembershipOption>> {
-        let rows = sqlx::query(
-            r#"
-            SELECT season_id, team_id, registration_status
-            FROM football.team_season_memberships
-            WHERE registration_status IN ('registered', 'guest')
-            ORDER BY season_id, team_id
-            "#,
-        )
-        .fetch_all(&self.pool)
-        .await?;
-        rows.iter()
-            .map(|row| {
-                Ok(SeasonTeamMembershipOption {
-                    season_id: row.try_get("season_id")?,
-                    team_id: row.try_get("team_id")?,
-                    registration_status: row.try_get("registration_status")?,
-                })
-            })
-            .collect()
-    }
-
-    pub async fn list_positions(&self) -> PersistenceResult<Vec<PositionReference>> {
-        let rows = sqlx::query(
-            r#"
-            SELECT code, name, position_group, sort_order
-            FROM football.positions
-            ORDER BY sort_order, code
-            "#,
-        )
-        .fetch_all(&self.pool)
-        .await?;
-        rows.iter().map(position_reference_from_row).collect()
     }
 }
 
@@ -1234,17 +1197,6 @@ pub(crate) fn lineup_record_from_row(
         player_count: row.try_get("player_count")?,
         starter_count: row.try_get("starter_count")?,
         players,
-    })
-}
-
-fn position_reference_from_row(
-    row: &sqlx::postgres::PgRow,
-) -> PersistenceResult<PositionReference> {
-    Ok(PositionReference {
-        code: row.try_get("code")?,
-        name: row.try_get("name")?,
-        position_group: row.try_get("position_group")?,
-        sort_order: row.try_get("sort_order")?,
     })
 }
 

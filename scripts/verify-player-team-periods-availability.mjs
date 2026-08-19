@@ -18,6 +18,14 @@ const required = [
   "crates/persistence-postgres/src/adapters/catalog/players/team_periods/mapper.rs",
   "crates/persistence-postgres/src/adapters/catalog/players/team_periods/row.rs",
   "crates/persistence-postgres/src/adapters/catalog/players/team_periods/mod.rs",
+  "crates/persistence-postgres/src/adapters/catalog/players/team_periods/season_memberships/mod.rs",
+  "crates/persistence-postgres/src/adapters/catalog/players/team_periods/season_memberships/list.rs",
+  "crates/persistence-postgres/src/adapters/catalog/players/team_periods/season_memberships/row.rs",
+  "crates/persistence-postgres/src/adapters/catalog/players/team_periods/season_memberships/mapper.rs",
+  "crates/persistence-postgres/src/adapters/catalog/teams/detail/player_periods/mod.rs",
+  "crates/persistence-postgres/src/adapters/catalog/teams/detail/player_periods/read.rs",
+  "crates/persistence-postgres/src/adapters/catalog/teams/detail/player_periods/row.rs",
+  "crates/persistence-postgres/src/adapters/catalog/teams/detail/player_periods/mapper.rs",
   "crates/persistence-postgres/src/adapters/catalog/availability/add_player_availability.rs",
   "crates/persistence-postgres/src/adapters/catalog/availability/input_policy.rs",
   "crates/persistence-postgres/src/adapters/catalog/availability/mapper.rs",
@@ -28,6 +36,10 @@ const required = [
 for (const file of required) check(exists(file), `R6-05 required file missing: ${file}`);
 
 const legacy = read("crates/persistence-postgres/src/player_catalog.rs");
+const persistenceLib = read("crates/persistence-postgres/src/lib.rs");
+const teamDetailRead = read("crates/persistence-postgres/src/adapters/catalog/teams/detail/read_team.rs");
+const teamPeriodProjection = read("crates/persistence-postgres/src/adapters/catalog/teams/detail/player_periods/read.rs");
+const seasonMembershipList = read("crates/persistence-postgres/src/adapters/catalog/players/team_periods/season_memberships/list.rs");
 const playersMod = read("crates/persistence-postgres/src/adapters/catalog/players/mod.rs");
 const catalogMod = read("crates/persistence-postgres/src/adapters/catalog/mod.rs");
 const teamPeriodsMod = read("crates/persistence-postgres/src/adapters/catalog/players/team_periods/mod.rs");
@@ -54,7 +66,7 @@ const adapter = read("crates/application/src/composition/adapters/players.rs");
 
 check(playersMod.includes("mod team_periods;"), "players 模块未注册 Team Periods owner");
 check(catalogMod.includes("mod availability;"), "catalog 模块未注册 Availability owner");
-check(teamPeriodsMod.includes("mod add_player_team_period;") && teamPeriodsMod.includes("mod input_policy;") && teamPeriodsMod.includes("mod mapper;") && teamPeriodsMod.includes("mod row;"), "Team Periods 目录职责拆分不完整");
+check(teamPeriodsMod.includes("mod add_player_team_period;") && teamPeriodsMod.includes("mod input_policy;") && teamPeriodsMod.includes("mod mapper;") && teamPeriodsMod.includes("mod row;") && teamPeriodsMod.includes("mod season_memberships;"), "Team Periods 目录职责拆分不完整");
 check(availabilityMod.includes("mod add_player_availability;") && availabilityMod.includes("mod input_policy;") && availabilityMod.includes("mod mapper;") && availabilityMod.includes("mod row;"), "Availability 目录职责拆分不完整");
 check(!teamPeriodsMod.includes("sqlx::") && !teamPeriodsMod.includes("impl PostgresStore"), "Team Periods mod.rs 不得承载 SQL 或业务实现");
 check(!availabilityMod.includes("sqlx::") && !availabilityMod.includes("impl PostgresStore"), "Availability mod.rs 不得承载 SQL 或业务实现");
@@ -64,6 +76,10 @@ check(!legacy.includes("pub async fn add_player_team_period"), "legacy player_ca
 check(!legacy.includes("pub async fn add_player_availability"), "legacy player_catalog.rs 仍拥有 add_player_availability");
 check(!legacy.includes("fn player_team_period_from_row"), "legacy player_catalog.rs 仍拥有 Team Period Row mapper");
 check(!legacy.includes("fn player_availability_from_row"), "legacy player_catalog.rs 仍拥有 Availability Row mapper");
+check(!legacy.includes("async fn list_season_team_memberships"), "legacy player_catalog.rs 仍拥有 season-team membership SQL read");
+check(!exists("crates/persistence-postgres/src/entity_catalog.rs") && !persistenceLib.includes("mod entity_catalog;"), "legacy entity_catalog.rs 仍存在");
+check(teamDetailRead.includes("player_periods::read_player_periods") && teamPeriodProjection.includes("FROM football.player_team_periods") && teamPeriodProjection.includes("TeamPlayerPeriodRow"), "Team Detail player-period projection 未切换到新 owner");
+check(seasonMembershipList.includes("FROM football.team_season_memberships") && seasonMembershipList.includes("SeasonTeamMembershipRow"), "Season-team membership option read owner 不完整");
 check(teamPeriodsRead.includes("players::team_periods::{map_player_team_period, PlayerTeamPeriodRow}"), "Player Detail Team Period read 未复用新 Row/mapper owner");
 check(availabilityRead.includes("catalog::availability::{map_player_availability, PlayerAvailabilityRow}"), "Player Detail Availability read 未复用新 Row/mapper owner");
 for (const obsolete of [

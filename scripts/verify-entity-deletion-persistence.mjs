@@ -8,7 +8,6 @@ for(const p of [
   "archive/mod.rs","archive/bulk.rs","archive/write.rs","bulk_delete.rs","safe_delete.rs","delete_write.rs",
   "force_delete/mod.rs","force_delete/operation.rs","force_delete/targets.rs","force_delete/counts.rs","force_delete/execute.rs"
 ])req(exists(root+p),`R6-09 owner missing: ${p}`);
-const entity=read("crates/persistence-postgres/src/entity_catalog.rs");
 const player=read("crates/persistence-postgres/src/player_catalog.rs");
 const lib=read("crates/persistence-postgres/src/lib.rs");
 const check=read(root+"preflight/check.rs");
@@ -21,7 +20,7 @@ const forceOperation=read(root+"force_delete/operation.rs");
 const forceTargets=read(root+"force_delete/targets.rs");
 const forceCounts=read(root+"force_delete/counts.rs");
 const forceExecute=read(root+"force_delete/execute.rs");
-for(const n of ["check_entity_deletion","bulk_archive_entities","team_reference_counts","player_reference_counts","coach_reference_counts"])req(!entity.includes(n),`legacy entity owner remains: ${n}`);
+req(!exists("crates/persistence-postgres/src/entity_catalog.rs")&&!lib.includes("mod entity_catalog;"),"legacy entity catalog owner remains");
 req(!exists("crates/persistence-postgres/src/team_catalog.rs")&&!lib.includes("mod team_catalog;"),"legacy team deletion owner remains");
 req(!player.includes("pub async fn delete_player"),"legacy player delete owner remains");
 req(check.includes("pub async fn check_entity_deletion")&&archive.includes("pub async fn bulk_archive_entities"),"AT1 owners missing");

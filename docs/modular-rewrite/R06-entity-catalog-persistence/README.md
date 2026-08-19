@@ -28,6 +28,13 @@ R6 按 Teams、Players、Coaches、Formations、Abilities、Dynamic Tags、Avail
 | R6-09 | Archive / Delete / Force Delete | DONE |
 | R6-10 | Global Name Search | DONE |
 
+## R6 阶段出口收尾
+
+- 状态：`VERIFYING`。
+- 最终审计发现旧 `entity_catalog.rs` 仍持有 Team Detail player-period projection；`player_catalog.rs` 仍持有 Position reference 与 season-team membership option 两条 R6 直接 SQL read。
+- 本次只迁移上述 R6 persistence owner；`player_catalog.rs` 的 Match/Lineup 职责明确保留给 R7，不提前跨阶段重写。
+- 完整出口门禁通过前不创建 `R06-stage-completion.md`，R6 阶段继续保持 `IN_PROGRESS`。
+
 ## R6-10 当前事实
 
 - 详细记录：[`R06-10-global-name-search.md`](R06-10-global-name-search.md)。
