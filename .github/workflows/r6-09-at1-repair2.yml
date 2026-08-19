@@ -1,0 +1,60 @@
+name: R6-09 AT1 repair archive anchor
+
+on:
+  push:
+    branches:
+      - rewrite/r6-entity-catalog-persistence
+
+permissions:
+  contents: write
+
+concurrency:
+  group: r6-09-at1-repair2
+  cancel-in-progress: true
+
+jobs:
+  repair:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: rewrite/r6-entity-catalog-persistence
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+      - name: Verify repair scope
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$(git hash-object crates/persistence-postgres/src/entity_catalog.rs)" = "fe861d8a1f5b765dcb5baf1e334d44990dd94344"
+          test "$(git hash-object scripts/r6-09-at1-apply.py)" = "6a1a6ae6bc420233afc2914986cb08aa86567a2f"
+          test -f .r6-09-at1-failure.txt
+      - name: Repair archive extraction anchor
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          from pathlib import Path
+          path = Path('scripts/r6-09-at1-apply.py')
+          text = path.read_text(encoding='utf-8')
+          old = """    '} else if self\\n    .entity_label_in_tx(&mut tx, entity_type, id)\\n    .await?',"""
+          new = """    '} else if self\\n        .entity_label_in_tx(&mut tx, entity_type, id)\\n        .await?',"""
+          if text.count(old) != 1:
+              raise SystemExit(f'archive anchor count={text.count(old)}')
+          text = text.replace(old, new, 1)
+          path.write_text(text, encoding='utf-8', newline='\n')
+          PY
+          rm -f .r6-09-at1-failure.txt
+          rm -f .github/workflows/r6-09-at1-repair2.yml
+          git diff --check
+          python3 -m py_compile scripts/r6-09-at1-apply.py
+      - name: Publish repair
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add scripts/r6-09-at1-apply.py .r6-09-at1-failure.txt .github/workflows/r6-09-at1-repair2.yml
+          git commit -m "fix(r6-09): restore archive extraction anchor"
+          git push origin HEAD:rewrite/r6-entity-catalog-persistence
