@@ -28,3 +28,12 @@
 - 旧 `team_catalog.rs` 已删除；`player_catalog.rs` 不再持有 `delete_player`。Team Force Delete 继续保留 `team_force_delete.rs`，未提前进入 AT3。
 - 公共 Port/DTO/Schema/迁移、无引用永久删除条件、错误语义、历史引用保护与用户可观察行为保持不变；无新增生产依赖。
 - AT2 生产提交 `eca85a92d30cdf83e6b9f3f1b341874a0e9fba01`：Minimum Gate、AT1/AT2 focused PostgreSQL 16 contracts、完整 Windows Stage Regression 与 R6-01～R6-09 retained PostgreSQL 16 contracts全部通过。AT2 已独立关闭；AT3 Team Force Delete 为本节点剩余职责。
+
+
+## Atomic Task 3 — Team Force Delete
+
+**状态：VERIFYING**
+
+- `preview_force_delete_team` / `force_delete_team` 已从旧 `team_force_delete.rs` 迁入 `adapters/catalog/deletion/force_delete/`，按 `operation`、`targets`、`counts`、`execute` 分责；协调器 SQL-free，目标闭包、影响统计与破坏性写入保持单一明确 owner。
+- 事务边界、完整球队名称确认、`football.force_purge` 事务本地权限、删除顺序、审计墓碑、返回的球队/球员/教练/比赛/导入批次 ID 与影响计数语义均保持不变；公共 Port/DTO/命令/API/UI、Schema/0001–0046 migrations 与配置未改变，无新增生产依赖。
+- 新增 PostgreSQL 16 contract 覆盖预检、错误确认回滚、受引用球员/球队强制清除、external-ID 清理、审计墓碑与无关 provider 保留。AT3 Minimum Gate 与 focused PostgreSQL 16 contracts 已通过；完整 Windows Stage Regression 与 R6 retained PostgreSQL contracts 尚待本 workflow 后续 jobs，在成功前 AT3/R6-09 不关闭。

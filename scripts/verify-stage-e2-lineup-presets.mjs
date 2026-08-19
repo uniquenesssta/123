@@ -21,7 +21,11 @@ const lineups = read("src/pages/lineups.ts");
 const searchable = read("src/components/searchableSelect.ts");
 const css = read("src/styles/components.css");
 const entityCatalog = read("crates/persistence-postgres/src/adapters/catalog/deletion/preflight/references.rs");
-const forceDelete = read("crates/persistence-postgres/src/team_force_delete.rs");
+const forceDelete = [
+  read("crates/persistence-postgres/src/adapters/catalog/deletion/force_delete/targets.rs"),
+  read("crates/persistence-postgres/src/adapters/catalog/deletion/force_delete/counts.rs"),
+  read("crates/persistence-postgres/src/adapters/catalog/deletion/force_delete/execute.rs"),
+].join("\n");
 
 check(contract.format_version === "football.team-lineup-presets.v1", "E2 契约版本错误");
 for (const token of [

@@ -5,8 +5,14 @@ const failures = [];
 const requireTrue = (condition, message) => { if (!condition) failures.push(message); };
 
 const migration = read("crates/persistence-postgres/migrations/0028_force_team_purge.sql");
-const persistence = read("crates/persistence-postgres/src/team_force_delete.rs");
+const forceDeleteRoot = "crates/persistence-postgres/src/adapters/catalog/deletion/force_delete/";
+const forceDeleteOperation = read(forceDeleteRoot + "operation.rs");
+const forceDeleteTargets = read(forceDeleteRoot + "targets.rs");
+const forceDeleteCounts = read(forceDeleteRoot + "counts.rs");
+const forceDeleteExecute = read(forceDeleteRoot + "execute.rs");
+const persistence = [forceDeleteOperation, forceDeleteTargets, forceDeleteCounts, forceDeleteExecute].join("\n");
 const persistenceLib = read("crates/persistence-postgres/src/lib.rs");
+const deletionMod = read("crates/persistence-postgres/src/adapters/catalog/deletion/mod.rs");
 const domain = read("crates/domain/src/team/deletion.rs");
 const application = [
   read("crates/application/src/services/teams/facade.rs"),
@@ -33,7 +39,12 @@ for (const guard of [
   requireTrue(migration.includes(guard), `强制清除迁移未受控覆盖保护函数：${guard}`);
 }
 
-requireTrue(persistenceLib.includes("mod team_force_delete;"), "持久化层未注册球队强制清除模块");
+requireTrue(!fs.existsSync(new URL("../crates/persistence-postgres/src/team_force_delete.rs", import.meta.url)), "旧球队强制清除单文件 owner 仍存在");
+requireTrue(!persistenceLib.includes("mod team_force_delete;") && deletionMod.includes("mod force_delete;"), "球队强制清除未注册到 deletion adapter owner");
+requireTrue(!forceDeleteOperation.includes("sqlx::") && !forceDeleteOperation.includes("SELECT ") && !forceDeleteOperation.includes("DELETE FROM ") && !forceDeleteOperation.includes("CREATE TEMP TABLE"), "球队强制清除 coordinator 仍直接持有 SQL");
+requireTrue(forceDeleteTargets.includes("FOR UPDATE") && forceDeleteTargets.includes("CREATE TEMP TABLE purge_matches") && forceDeleteTargets.includes("pub(super) async fn temp_ids"), "强制清除 target-set owner 不完整");
+requireTrue(forceDeleteCounts.includes("pub(super) async fn force_delete_counts") && forceDeleteCounts.includes("UNION ALL SELECT 'match_events'"), "强制清除 impact-count owner 不完整");
+requireTrue(forceDeleteExecute.includes("set_config('football.force_purge', 'on', true)") && forceDeleteExecute.includes("DELETE FROM football.teams WHERE id=$1"), "强制清除 execution owner 不完整");
 requireTrue(persistence.includes("preview_force_delete_team") && persistence.includes("force_delete_team"), "持久化层缺少预检或执行入口");
 requireTrue(persistence.includes("FOR UPDATE"), "强制清除未锁定球队主体");
 requireTrue(persistence.includes("request.confirmation_text.trim() != label"), "强制清除未要求完整球队名称确认");

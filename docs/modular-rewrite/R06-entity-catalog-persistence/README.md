@@ -117,4 +117,4 @@ R6 按 Teams、Players、Coaches、Formations、Abilities、Dynamic Tags、Avail
 ## R6-09 当前事实
 
 - 详细记录：[`R06-09-archive-delete-and-force-delete.md`](R06-09-archive-delete-and-force-delete.md)。
-- Atomic Task 1：Preflight / Reference Counts / Archive 已 `DONE` 并保留既有 PostgreSQL 16 / Windows 验收证据。Atomic Task 2：Safe Permanent Delete 生产提交 `eca85a92d30cdf83e6b9f3f1b341874a0e9fba01` 已通过 Minimum Gate、完整 Windows Stage Regression 与 R6-01～R6-09 retained PostgreSQL 16 contracts并独立关闭；Team Force Delete 尚未迁移，R6-09 继续 `IN_PROGRESS`，R6-10 继续 `BLOCKED`。
+- Atomic Task 1/2 已 `DONE` 并保留既有 PostgreSQL 16 / Windows 验收证据。Atomic Task 3：Team Force Delete 已完成模块 owner switch、Minimum Gate 与 AT1/AT2/AT3 focused PostgreSQL 16 contracts，当前等待完整 Windows Stage Regression 与 R6 retained PostgreSQL contracts；R6-09 继续 `IN_PROGRESS`，R6-10 继续 `BLOCKED`。

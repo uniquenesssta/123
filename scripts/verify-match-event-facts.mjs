@@ -23,7 +23,11 @@ const types = read("src/types.ts");
 const page = read("src/pages/review.ts");
 const styles = read("src/styles/app.css");
 const integration = read("crates/persistence-postgres/tests/postgres_integration.rs");
-const forceDelete = read("crates/persistence-postgres/src/team_force_delete.rs");
+const forceDelete = [
+  read("crates/persistence-postgres/src/adapters/catalog/deletion/force_delete/targets.rs"),
+  read("crates/persistence-postgres/src/adapters/catalog/deletion/force_delete/counts.rs"),
+  read("crates/persistence-postgres/src/adapters/catalog/deletion/force_delete/execute.rs"),
+].join("\n");
 const packageJson = JSON.parse(read("package.json"));
 const frontendVerifier = read("scripts/verify-frontend.mjs");
 

@@ -46,8 +46,8 @@ Node 开发依赖固定安装和读取自源码根目录上一级的 `../node_mo
 
 ### R6-09 Archive / Delete / Force Delete
 
-- Atomic Task 1 已将 deletion preflight/reference-count 与 archive persistence 收敛到 `adapters/catalog/deletion/{preflight,archive}/`；协调器 SQL-free，引用统计、标签读取与归档事务由具名 I/O owner 承担。普通永久 Delete 与 Team Force Delete 暂保留原 owner，等待本节点后续 Atomic Task，未提前混改。
-- `EntityReferencePort`、Domain DTO、Schema/0001–0046 migrations、错误语义、历史 P4/运行引用保护、无引用永久删除和 force purge 行为均未改变；无新增生产依赖。AT1 已正式 `DONE` 并保留 PostgreSQL 16 / Windows 成功证据。AT2 已将普通安全永久删除迁入 deletion adapter；生产提交 `eca85a92d30cdf83e6b9f3f1b341874a0e9fba01` 的 Minimum Gate、完整 Windows Stage Regression 与 R6-01～R6-09 retained PostgreSQL 16 contracts全部通过。AT1/AT2 均已独立关闭，R6-09 继续 `IN_PROGRESS`，下一 Atomic Task 为 Team Force Delete。
+- R6-09 deletion persistence 已按职责收敛：AT1 `preflight/archive`、AT2 `bulk_delete/safe_delete/delete_write`、AT3 `force_delete/{operation,targets,counts,execute}`；各协调器保持 SQL-free，引用读取、事务写入、强制清除目标闭包、影响统计与破坏性执行均由明确 I/O owner 承担。
+- `EntityReferencePort`、Domain DTO、Schema/0001–0046 migrations、配置、错误语义、安全确认、历史 P4/运行引用保护、普通永久删除和 force purge 用户可观察行为均未改变；无新增生产依赖。AT1/AT2 已独立关闭。AT3 Team Force Delete 已完成 owner switch、Minimum Gate 与 focused PostgreSQL 16 contracts；完整 Windows Stage Regression / R6 retained PostgreSQL contracts 尚待本 workflow 后续 jobs，R6-09 继续 `IN_PROGRESS`。
 
 ### R6-08 Entity Matching 与 References
 
