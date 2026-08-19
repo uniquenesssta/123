@@ -76,7 +76,30 @@ assert(cargoLock.includes(`name = "football-application"\nversion = "${packageJs
 assert(readme.includes(`当前版本 **${packageJson.version}**`), "根README当前版本未同步");
 assert(readme.includes("## 0.15.0 变更记录"), "根README缺少0.15.0变更记录");
 
-for (const artifact of contract.artifacts) assert(existsSync(join(root, artifact)), `阶段2制品不存在：${artifact}`);
+const retiredArtifactReplacements = new Map([
+  [
+    "crates/persistence-postgres/src/entity_catalog.rs",
+    [
+      "crates/persistence-postgres/src/adapters/catalog/teams/detail/player_periods/read.rs",
+      "crates/persistence-postgres/src/adapters/catalog/coaches/team_periods/add.rs",
+      "crates/persistence-postgres/src/adapters/catalog/entity_matching/resolve.rs",
+      "crates/persistence-postgres/src/adapters/catalog/references/directory/list.rs",
+      "crates/persistence-postgres/src/adapters/catalog/deletion/preflight/check.rs",
+      "crates/persistence-postgres/src/adapters/catalog/deletion/archive/bulk.rs",
+    ],
+  ],
+]);
+for (const artifact of contract.artifacts) {
+  const replacements = retiredArtifactReplacements.get(artifact);
+  if (!replacements) {
+    assert(existsSync(join(root, artifact)), `阶段2制品不存在：${artifact}`);
+    continue;
+  }
+  assert(!existsSync(join(root, artifact)), `R6阶段出口后历史制品仍未退休：${artifact}`);
+  for (const replacement of replacements) {
+    assert(existsSync(join(root, replacement)), `阶段2历史制品替代owner不存在：${replacement}`);
+  }
+}
 const contractHash = hash(contractPath);
 assert(migration.includes(`ENTITY_RELATIONSHIP_CONTRACT_SHA256 = ${contractHash}`), "0021迁移顶部契约哈希错误");
 assert(migration.includes(`'${contractHash}'`), "0021迁移登记契约哈希错误");
