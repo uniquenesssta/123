@@ -141,6 +141,7 @@ jobs:
           )
           PY
           rm -f scripts/r6-09-at3-apply.py .r6-09-at3-failure.txt
+          rm -rf scripts/__pycache__
           git diff --check
 
       - name: Publish AT3 production commit
@@ -151,12 +152,14 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add -A -- ':!.github/workflows/r6-09-at3.yml'
-          test -n "$(git diff --cached --name-only)"
-          test "$(git diff --cached --name-only | grep -c '^crates/persistence-postgres/src/team_force_delete.rs$' || true)" = "1"
-          test "$(git diff --cached --name-only | grep -c '^crates/persistence-postgres/migrations/' || true)" = "0"
-          test "$(git diff --cached --name-only | grep -c '^crates/domain/' || true)" = "0"
-          test "$(git diff --cached --name-only | grep -c '^src/' || true)" = "0"
-          test "$(git diff --cached --name-only | grep -c '^src-tauri/' || true)" = "0"
+          changed="$(git diff --cached --name-only --no-renames)"
+          test -n "$changed"
+          test "$(printf '%s\n' "$changed" | grep -c '^crates/persistence-postgres/src/team_force_delete.rs$' || true)" = "1"
+          test "$(printf '%s\n' "$changed" | grep -c '^crates/persistence-postgres/migrations/' || true)" = "0"
+          test "$(printf '%s\n' "$changed" | grep -c '^crates/domain/' || true)" = "0"
+          test "$(printf '%s\n' "$changed" | grep -c '^src/' || true)" = "0"
+          test "$(printf '%s\n' "$changed" | grep -c '^src-tauri/' || true)" = "0"
+          test "$(printf '%s\n' "$changed" | grep -c '__pycache__\|\.pyc$' || true)" = "0"
           git diff --cached --check
           git commit -m "refactor(r6-09): modularize team force deletion"
           production_sha=$(git rev-parse HEAD)
