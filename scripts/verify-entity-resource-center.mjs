@@ -20,7 +20,6 @@ const types = read("src/types.ts");
 const domain = read("crates/domain/src/team/detail.rs") + read("crates/domain/src/player/listing.rs");
 const playerDirectoryList = read("crates/persistence-postgres/src/adapters/catalog/players/directory/list_players.rs");
 const playerDirectoryMapper = read("crates/persistence-postgres/src/adapters/catalog/players/directory/list_mapper.rs");
-const teamPersistence = read("crates/persistence-postgres/src/team_catalog.rs");
 const teamSquadPersistence = read("crates/persistence-postgres/src/adapters/catalog/teams/detail/read_squad.rs");
 const teamSquadMapper = read("crates/persistence-postgres/src/adapters/catalog/teams/detail/squad_mapper.rs");
 const teamRecordMapper = read("crates/persistence-postgres/src/adapters/catalog/teams/detail/record_mapper.rs");

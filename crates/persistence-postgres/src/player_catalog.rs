@@ -17,40 +17,6 @@ use std::collections::HashSet;
 use uuid::Uuid;
 
 impl PostgresStore {
-    pub async fn delete_player(&self, player_id: Uuid) -> PersistenceResult<()> {
-        let check = self.check_entity_deletion("player", player_id).await?;
-        if !check.can_permanently_delete {
-            return Err(PersistenceError::InvalidState(check.reason));
-        }
-        let mut tx = self.pool.begin().await?;
-        let player_name: String = sqlx::query_scalar(
-            "SELECT canonical_name FROM football.players WHERE id = $1 FOR UPDATE",
-        )
-        .bind(player_id)
-        .fetch_optional(&mut *tx)
-        .await?
-        .ok_or_else(|| PersistenceError::InvalidState("球员不存在".to_string()))?;
-
-        sqlx::query("DELETE FROM football.external_entity_ids WHERE entity_type = 'player' AND entity_id = $1")
-            .bind(player_id)
-            .execute(&mut *tx)
-            .await?;
-        crate::write_audit_event(
-            &mut tx,
-            "player_deleted",
-            "player",
-            player_id.to_string(),
-            json!({"canonical_name": player_name, "reference_check": "passed"}),
-        )
-        .await?;
-        sqlx::query("DELETE FROM football.players WHERE id = $1")
-            .bind(player_id)
-            .execute(&mut *tx)
-            .await?;
-        tx.commit().await?;
-        Ok(())
-    }
-
     pub async fn create_match(&self, draft: &MatchDraft) -> PersistenceResult<MatchRecord> {
         let resolved = resolve_match_scope_draft(&self.pool, draft).await?;
         let draft = &resolved;

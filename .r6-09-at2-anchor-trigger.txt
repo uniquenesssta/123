@@ -1,2 +1,0 @@
-run_id=32223798043
-trigger_sha=c5d6fd5f6bc1680d4e9db40a7cd10a2d8cf676e3

@@ -19,3 +19,12 @@
 - 修改：`entity_catalog.rs`、catalog `mod.rs`、相关 retained verifier、`package.json`、Domain inventory、根/阶段 README。
 - 删除/移动：AT1 无生产文件删除；临时 retry workflow、failure/run marker 已由 cleanup commit `0fa05a3b67eb21009b5a56e00cb5b365fd0e66b5` 清理。
 - 回退点：上述基线提交。
+
+## Atomic Task 2 — Safe Permanent Delete
+
+**状态：VERIFYING**
+
+- `bulk_delete_teams`、`bulk_delete_players` 与 `delete_player` 已迁入 `adapters/catalog/deletion/{bulk_delete,safe_delete,delete_write}.rs`；bulk/safe-delete 协调器 SQL-free，事务、行锁、最终竞态复检、external-ID 清理与审计写入由 `delete_write.rs` 唯一持有。
+- 旧 `team_catalog.rs` 已删除；`player_catalog.rs` 不再持有 `delete_player`。Team Force Delete 继续保留 `team_force_delete.rs`，未提前进入 AT3。
+- 公共 Port/DTO/Schema/迁移、无引用永久删除条件、错误语义、历史引用保护与用户可观察行为保持不变；无新增生产依赖。
+- AT2 Minimum Gate 与 AT1/AT2 PostgreSQL 16 focused contracts 已通过；完整 Windows Stage Regression 与 retained PostgreSQL contracts 尚待本 workflow 后续 jobs，在成功前 AT2 不关闭。

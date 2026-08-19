@@ -41,10 +41,14 @@ const persistence = [
   text("crates/persistence-postgres/src/adapters/catalog/deletion/archive/bulk.rs"),
   text("crates/persistence-postgres/src/adapters/catalog/deletion/archive/write.rs"),
 ].join("\n");
-const teamPersistence = text("crates/persistence-postgres/src/team_catalog.rs");
+const deletionPersistence = [
+  text("crates/persistence-postgres/src/adapters/catalog/deletion/safe_delete.rs"),
+  text("crates/persistence-postgres/src/adapters/catalog/deletion/delete_write.rs"),
+].join("\n");
+const teamPersistence = deletionPersistence;
 const teamProfileWrite = text("crates/persistence-postgres/src/adapters/catalog/teams/profiles/upsert_team_profile.rs");
 const teamDetailCoordinator = text("crates/persistence-postgres/src/adapters/catalog/teams/detail/read_team.rs");
-const playerPersistence = text("crates/persistence-postgres/src/player_catalog.rs");
+const playerPersistence = deletionPersistence;
 const application = [
   text("crates/application/src/services/players/facade.rs"),
   text("crates/application/src/services/players/service.rs"),

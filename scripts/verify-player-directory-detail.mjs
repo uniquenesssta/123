@@ -31,17 +31,17 @@ for (const relative of required) {
 }
 
 const legacy = read('crates/persistence-postgres/src/player_catalog.rs');
+const r609Deletion = read('crates/persistence-postgres/src/adapters/catalog/deletion/safe_delete.rs');
 for (const method of ['create_player', 'update_player', 'list_players', 'read_player']) {
   if (legacy.includes(`pub async fn ${method}`)) {
     throw new Error(`R6-03 legacy owner still exposes ${method}`);
   }
 }
-for (const retained of [
-  'delete_player',
-]) {
-  if (!legacy.includes(`pub async fn ${retained}`)) {
-    throw new Error(`Later R6 owner moved prematurely or disappeared: ${retained}`);
-  }
+if (legacy.includes('pub async fn delete_player')) {
+  throw new Error('R6-09 legacy player_catalog.rs still owns delete_player');
+}
+if (!r609Deletion.includes('pub async fn delete_player')) {
+  throw new Error('R6-09 safe permanent deletion owner missing delete_player');
 }
 
 const r604AdvancedOwners = [

@@ -27,11 +27,16 @@ const appCatalog = [
   text("crates/application/src/services/teams/facade.rs"),
   text("crates/application/src/services/players/facade.rs"),
 ].join("\n");
-const persistenceCatalog = text("crates/persistence-postgres/src/team_catalog.rs");
+const deletionPersistence = [
+  text("crates/persistence-postgres/src/adapters/catalog/deletion/bulk_delete.rs"),
+  text("crates/persistence-postgres/src/adapters/catalog/deletion/safe_delete.rs"),
+  text("crates/persistence-postgres/src/adapters/catalog/deletion/delete_write.rs"),
+].join("\n");
+const persistenceCatalog = deletionPersistence;
 const teamDetailCoordinator = text("crates/persistence-postgres/src/adapters/catalog/teams/detail/read_team.rs");
 const teamDetailProfile = text("crates/persistence-postgres/src/adapters/catalog/teams/detail/read_profile.rs");
 const teamDetailSquad = text("crates/persistence-postgres/src/adapters/catalog/teams/detail/read_squad.rs");
-const playerPersistence = text("crates/persistence-postgres/src/player_catalog.rs");
+const playerPersistence = deletionPersistence;
 const spreadsheetPersistence = text("crates/persistence-postgres/src/spreadsheet_exchange.rs");
 const spreadsheetIo = text("crates/spreadsheet-io/src/lib.rs");
 const commands = text("src-tauri/src/commands/catalog.rs");
@@ -69,6 +74,16 @@ for (const artifact of contract.artifacts) {
     for (const currentOwner of [
       "crates/application/src/services/teams/facade.rs",
       "crates/application/src/services/players/facade.rs",
+    ]) {
+      assert(existsSync(join(root, currentOwner)), `球队与球员管理当前制品不存在：${currentOwner}`);
+    }
+    continue;
+  }
+  if (artifact === "crates/persistence-postgres/src/team_catalog.rs") {
+    for (const currentOwner of [
+      "crates/persistence-postgres/src/adapters/catalog/deletion/bulk_delete.rs",
+      "crates/persistence-postgres/src/adapters/catalog/deletion/safe_delete.rs",
+      "crates/persistence-postgres/src/adapters/catalog/deletion/delete_write.rs",
     ]) {
       assert(existsSync(join(root, currentOwner)), `球队与球员管理当前制品不存在：${currentOwner}`);
     }

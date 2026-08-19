@@ -31,7 +31,6 @@ mod role_resolution;
 mod spreadsheet_exchange;
 mod statistics;
 mod store;
-mod team_catalog;
 mod team_features;
 mod team_force_delete;
 mod team_lineup_presets;

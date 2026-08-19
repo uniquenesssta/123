@@ -14,7 +14,8 @@ const directory = `${base}/directory`;
 const detail = `${base}/detail`;
 const names = `${base}/names`;
 const profiles = `${base}/profiles`;
-const legacyTeam = read("crates/persistence-postgres/src/team_catalog.rs");
+const legacyTeam = exists("crates/persistence-postgres/src/team_catalog.rs") ? read("crates/persistence-postgres/src/team_catalog.rs") : "";
+const r609Deletion = read("crates/persistence-postgres/src/adapters/catalog/deletion/bulk_delete.rs");
 const legacyPlayer = read("crates/persistence-postgres/src/player_catalog.rs");
 const adapters = read("crates/persistence-postgres/src/adapters/mod.rs");
 
@@ -74,7 +75,7 @@ check(!legacyTeam.includes("pub async fn add_team_name"), "R6-02 must remove tea
 check(!legacyTeam.includes("pub async fn upsert_team_profile"), "R6-02 must remove profile write from legacy owner");
 check(read(`${names}/add_team_name.rs`).includes("pub async fn add_team_name"), "R6-02 names owner must expose add_team_name");
 check(read(`${profiles}/upsert_team_profile.rs`).includes("pub async fn upsert_team_profile"), "R6-02 profiles owner must expose upsert_team_profile");
-check(legacyTeam.includes("pub async fn bulk_delete_teams"), "R6-01/R6-02 must not migrate R6-09 deletion early");
+check(!exists("crates/persistence-postgres/src/team_catalog.rs") && r609Deletion.includes("pub async fn bulk_delete_teams"), "R6-09 permanent team deletion owner advancement missing");
 
 const create = read(`${directory}/create_team.rs`);
 const update = read(`${directory}/update_team.rs`);
@@ -121,4 +122,4 @@ if (failures.length) {
   failures.forEach((failure) => console.error(`- ${failure}`));
   process.exit(1);
 }
-console.log("R6-01 team directory/detail persistence verified: unique catalog owner, typed rows/mappers, preserved search/pagination/detail aggregation, and R6-02 owner advancement without early R6-09 migration.");
+console.log("R6-01 team directory/detail persistence verified: unique catalog owner, typed rows/mappers, preserved search/pagination/detail aggregation, and R6-02/R6-09 owner advancement.");

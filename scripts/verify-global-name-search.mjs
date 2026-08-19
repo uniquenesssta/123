@@ -12,7 +12,6 @@ const contract = JSON.parse(read("contracts/global-name-search-contract.json"));
 const helper = read("crates/persistence-postgres/src/name_search.rs");
 const playerCatalog = read("crates/persistence-postgres/src/player_catalog.rs");
 const playerDirectoryList = read("crates/persistence-postgres/src/adapters/catalog/players/directory/list_players.rs");
-const teamCatalog = read("crates/persistence-postgres/src/team_catalog.rs");
 const teamDirectoryList = read("crates/persistence-postgres/src/adapters/catalog/teams/directory/list_teams.rs");
 const teamOptionList = read("crates/persistence-postgres/src/adapters/catalog/teams/directory/list_team_options.rs");
 // R6-08: entity-reference search ownership moved to the modular Reference Directory reader.
@@ -40,7 +39,7 @@ requireTrue(helper.includes("character.is_alphanumeric()"), "名称搜索未统�
 requireTrue(helper.includes("alias.normalized_name"), "名称搜索未覆盖别名归一化字段");
 requireTrue(helper.includes("alias.name"), "名称搜索未覆盖别名原始显示字段");
 
-const searchOwners = [playerCatalog, playerDirectoryList, teamCatalog, teamDirectoryList, teamOptionList, referenceDirectoryRead, coachDirectoryList];
+const searchOwners = [playerCatalog, playerDirectoryList, teamDirectoryList, teamOptionList, referenceDirectoryRead, coachDirectoryList];
 const combined = searchOwners.join("\n");
 const helperUsages = (combined.match(/NameSearch::parse\(/g) ?? []).length;
 requireTrue(helperUsages >= 7, `全局名称搜索接入点不足：${helperUsages}/7`);

@@ -8,7 +8,10 @@ const text = (path) => readFileSync(join(root, path), "utf8");
 const failures = [];
 const requireTrue = (condition, message) => { if (!condition) failures.push(message); };
 
-const teamPersistence = text("crates/persistence-postgres/src/team_catalog.rs");
+const teamPersistence = [
+  text("crates/persistence-postgres/src/adapters/catalog/deletion/safe_delete.rs"),
+  text("crates/persistence-postgres/src/adapters/catalog/deletion/delete_write.rs"),
+].join("\n");
 const entityPersistence = [
   text("crates/persistence-postgres/src/adapters/catalog/deletion/preflight/check.rs"),
   text("crates/persistence-postgres/src/adapters/catalog/deletion/preflight/references.rs"),

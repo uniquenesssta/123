@@ -24,13 +24,13 @@
     "targetPublicExportPolicy": "explicit re-export only"
   },
   "sourceDigest": "217241ac243726a5ab6805a7f169e222b97e78c7c971749a5904714af673ebdd",
-  "rustUsageDigest": "8044ec133f648ae35eb63499f890b91ab4a9ffb15ec91e5522c6c170cc0598ae",
+  "rustUsageDigest": "f0ca2471992b2cb818b85ed46324dd6e5f51255f2af4ebdb7892d2592185396a",
   "summary": {
     "typeCount": 365,
     "publicCompatibilityTypeCount": 365,
     "internalTypeCount": 0,
     "domainSourceFileCount": 129,
-    "scannedRustFileCount": 944,
+    "scannedRustFileCount": 947,
     "databaseMappedTypeCount": 299,
     "byTargetModule": {
       "ai_workspace": 16,
@@ -3459,10 +3459,10 @@
         "crates/domain/tests/serde_contracts/module_paths.rs"
       ],
       "externalCallers": [
-        "crates/persistence-postgres/src/team_catalog.rs"
+        "crates/persistence-postgres/src/adapters/catalog/deletion/bulk_delete.rs"
       ],
       "databaseMappings": [
-        "crates/persistence-postgres/src/team_catalog.rs"
+        "crates/persistence-postgres/src/adapters/catalog/deletion/bulk_delete.rs"
       ]
     },
     {
@@ -3526,11 +3526,11 @@
         "crates/application/src/services/teams/service.rs",
         "crates/application/src/use_cases/players/bulk_delete_players/mod.rs",
         "crates/application/src/use_cases/teams/bulk_delete_teams/mod.rs",
-        "crates/persistence-postgres/src/team_catalog.rs",
+        "crates/persistence-postgres/src/adapters/catalog/deletion/bulk_delete.rs",
         "src-tauri/src/commands/catalog.rs"
       ],
       "databaseMappings": [
-        "crates/persistence-postgres/src/team_catalog.rs"
+        "crates/persistence-postgres/src/adapters/catalog/deletion/bulk_delete.rs"
       ]
     },
     {
@@ -5569,6 +5569,7 @@
         "crates/persistence-postgres/src/adapters/catalog/references/providers/validation.rs",
         "crates/persistence-postgres/src/adapters/catalog/references/providers/write.rs",
         "crates/persistence-postgres/tests/entity_matching_references_repository_contract.rs",
+        "crates/persistence-postgres/tests/entity_permanent_delete_repository_contract.rs",
         "src-tauri/src/commands/catalog.rs"
       ],
       "databaseMappings": [
@@ -8396,6 +8397,7 @@
         "crates/persistence-postgres/src/adapters/catalog/references/external_ids/validation.rs",
         "crates/persistence-postgres/src/adapters/catalog/references/external_ids/write.rs",
         "crates/persistence-postgres/tests/entity_matching_references_repository_contract.rs",
+        "crates/persistence-postgres/tests/entity_permanent_delete_repository_contract.rs",
         "src-tauri/src/commands/catalog.rs"
       ],
       "databaseMappings": [
@@ -18285,6 +18287,7 @@
         "crates/persistence-postgres/src/adapters/catalog/players/directory/update_player.rs",
         "crates/persistence-postgres/tests/entity_deletion_repository_contract.rs",
         "crates/persistence-postgres/tests/entity_matching_references_repository_contract.rs",
+        "crates/persistence-postgres/tests/entity_permanent_delete_repository_contract.rs",
         "crates/persistence-postgres/tests/player_abilities_dynamic_tags_repository_contract.rs",
         "crates/persistence-postgres/tests/player_directory_detail_repository_contract.rs",
         "crates/persistence-postgres/tests/player_names_positions_repository_contract.rs",
@@ -20239,6 +20242,7 @@
         "crates/persistence-postgres/src/player_catalog.rs",
         "crates/persistence-postgres/tests/entity_deletion_repository_contract.rs",
         "crates/persistence-postgres/tests/entity_matching_references_repository_contract.rs",
+        "crates/persistence-postgres/tests/entity_permanent_delete_repository_contract.rs",
         "crates/persistence-postgres/tests/player_abilities_dynamic_tags_repository_contract.rs",
         "crates/persistence-postgres/tests/player_directory_detail_repository_contract.rs",
         "crates/persistence-postgres/tests/player_names_positions_repository_contract.rs",
@@ -20338,6 +20342,7 @@
         "crates/persistence-postgres/src/adapters/catalog/players/team_periods/add_player_team_period.rs",
         "crates/persistence-postgres/src/adapters/catalog/players/team_periods/input_policy.rs",
         "crates/persistence-postgres/tests/entity_deletion_repository_contract.rs",
+        "crates/persistence-postgres/tests/entity_permanent_delete_repository_contract.rs",
         "crates/persistence-postgres/tests/player_directory_detail_repository_contract.rs",
         "crates/persistence-postgres/tests/player_team_periods_availability_repository_contract.rs",
         "src-tauri/src/commands/catalog.rs"
@@ -21679,6 +21684,7 @@
         "crates/persistence-postgres/src/player_catalog.rs",
         "crates/persistence-postgres/tests/entity_deletion_repository_contract.rs",
         "crates/persistence-postgres/tests/entity_matching_references_repository_contract.rs",
+        "crates/persistence-postgres/tests/entity_permanent_delete_repository_contract.rs",
         "crates/persistence-postgres/tests/player_abilities_dynamic_tags_repository_contract.rs",
         "crates/persistence-postgres/tests/player_directory_detail_repository_contract.rs",
         "crates/persistence-postgres/tests/player_names_positions_repository_contract.rs",
@@ -28792,6 +28798,7 @@
         "crates/persistence-postgres/tests/coach_formation_repository_contract.rs",
         "crates/persistence-postgres/tests/entity_deletion_repository_contract.rs",
         "crates/persistence-postgres/tests/entity_matching_references_repository_contract.rs",
+        "crates/persistence-postgres/tests/entity_permanent_delete_repository_contract.rs",
         "crates/persistence-postgres/tests/player_directory_detail_repository_contract.rs",
         "crates/persistence-postgres/tests/player_team_periods_availability_repository_contract.rs",
         "crates/persistence-postgres/tests/postgres_integration.rs",

@@ -13,7 +13,8 @@ const base = "crates/persistence-postgres/src/adapters/catalog/teams";
 const names = `${base}/names`;
 const profiles = `${base}/profiles`;
 const directory = `${base}/directory`;
-const legacy = read("crates/persistence-postgres/src/team_catalog.rs");
+const legacy = exists("crates/persistence-postgres/src/team_catalog.rs") ? read("crates/persistence-postgres/src/team_catalog.rs") : "";
+const r609Deletion = read("crates/persistence-postgres/src/adapters/catalog/deletion/bulk_delete.rs");
 const teamsMod = read(`${base}/mod.rs`);
 
 for (const relative of [
@@ -37,8 +38,8 @@ check(!legacy.includes("pub async fn upsert_team_profile"), "Legacy team_catalog
 for (const token of ["validate_team_profile", "trim_option", "normalize_name", "team_name_from_row", "team_profile_from_row"]) {
   check(!legacy.includes(token), `Legacy team_catalog.rs still owns R6-02 helper ${token}`);
 }
-check(legacy.includes("pub async fn bulk_delete_teams"), "R6-02 must not migrate R6-09 team deletion early");
-check(legacy.includes("pub async fn bulk_delete_players"), "R6-02 must not disturb existing bulk player deletion path");
+check(!exists("crates/persistence-postgres/src/team_catalog.rs"), "R6-09 must remove legacy team_catalog deletion owner");
+check(r609Deletion.includes("pub async fn bulk_delete_teams") && r609Deletion.includes("pub async fn bulk_delete_players"), "R6-09 bulk permanent deletion owner advancement missing");
 
 const addName = read(`${names}/add_team_name.rs`);
 const nameValidation = read(`${names}/validation.rs`);
