@@ -34,7 +34,7 @@ const application = [
 ].join("\n");
 const persistence = read("crates/persistence-postgres/src/match_review_package.rs");
 const reviewPersistence = read("crates/persistence-postgres/src/review.rs");
-const entityPersistence = read("crates/persistence-postgres/src/entity_catalog.rs");
+const entityPersistence = read("crates/persistence-postgres/src/adapters/catalog/deletion/preflight/references.rs");
 const forceDeletePersistence = read("crates/persistence-postgres/src/team_force_delete.rs");
 const migration = read("crates/persistence-postgres/migrations/0040_match_review_package_workflow.sql");
 const commands = read("src-tauri/src/commands/postmatch.rs");
