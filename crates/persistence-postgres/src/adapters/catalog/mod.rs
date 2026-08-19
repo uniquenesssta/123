@@ -5,6 +5,7 @@ mod deletion;
 mod dynamic_tags;
 mod entity_matching;
 mod formations;
+pub(crate) mod global_search;
 pub(crate) mod players;
 pub(crate) mod references;
 pub(crate) mod teams;

@@ -1,6 +1,6 @@
 use super::mapper::{coach_reference_from_row, player_reference_from_row, team_reference_from_row};
 use crate::{
-    name_search::{push_name_search, NameSearch, NameSearchColumns},
+    adapters::catalog::global_search::{push_name_search, NameSearch, NameSearchColumns},
     PersistenceResult,
 };
 use football_domain::{EntityReferenceQuery, EntityReferenceRecord};

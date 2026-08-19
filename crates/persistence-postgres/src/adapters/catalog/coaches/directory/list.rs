@@ -1,6 +1,6 @@
 use crate::{
     adapters::catalog::coaches::mapping::coach_list_item_from_row,
-    name_search::{push_name_search, NameSearch, NameSearchColumns},
+    adapters::catalog::global_search::{push_name_search, NameSearch, NameSearchColumns},
     PersistenceResult, PostgresStore,
 };
 use football_domain::{CoachListItem, CoachListQuery};

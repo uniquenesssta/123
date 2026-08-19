@@ -24,13 +24,13 @@
     "targetPublicExportPolicy": "explicit re-export only"
   },
   "sourceDigest": "217241ac243726a5ab6805a7f169e222b97e78c7c971749a5904714af673ebdd",
-  "rustUsageDigest": "3098dc61476b6b4339850e18d77a6c050d84b9aa387ec1a2c8ae8355f714a153",
+  "rustUsageDigest": "12ad78335bab2a93680159b66f97ca3e35fb5637dc2d8da9fc6a5482eb4d41a0",
   "summary": {
     "typeCount": 365,
     "publicCompatibilityTypeCount": 365,
     "internalTypeCount": 0,
     "domainSourceFileCount": 129,
-    "scannedRustFileCount": 952,
+    "scannedRustFileCount": 956,
     "databaseMappedTypeCount": 299,
     "byTargetModule": {
       "ai_workspace": 16,
@@ -4007,6 +4007,7 @@
         "crates/persistence-postgres/src/adapters/catalog/coaches/validation.rs",
         "crates/persistence-postgres/tests/coach_formation_repository_contract.rs",
         "crates/persistence-postgres/tests/entity_matching_references_repository_contract.rs",
+        "crates/persistence-postgres/tests/global_name_search_repository_contract.rs",
         "src-tauri/src/commands/catalog.rs"
       ],
       "databaseMappings": [
@@ -4162,6 +4163,7 @@
         "crates/persistence-postgres/src/adapters/catalog/coaches/directory/list.rs",
         "crates/persistence-postgres/src/match_exchange.rs",
         "crates/persistence-postgres/tests/coach_formation_repository_contract.rs",
+        "crates/persistence-postgres/tests/global_name_search_repository_contract.rs",
         "src-tauri/src/commands/catalog.rs"
       ],
       "databaseMappings": [
@@ -4248,6 +4250,7 @@
         "crates/persistence-postgres/src/adapters/catalog/coaches/names/add.rs",
         "crates/persistence-postgres/tests/coach_formation_repository_contract.rs",
         "crates/persistence-postgres/tests/entity_matching_references_repository_contract.rs",
+        "crates/persistence-postgres/tests/global_name_search_repository_contract.rs",
         "src-tauri/src/commands/catalog.rs"
       ],
       "databaseMappings": [
@@ -6636,6 +6639,7 @@
         "crates/persistence-postgres/src/adapters/catalog/references/directory/list.rs",
         "crates/persistence-postgres/src/adapters/catalog/references/directory/read.rs",
         "crates/persistence-postgres/tests/entity_matching_references_repository_contract.rs",
+        "crates/persistence-postgres/tests/global_name_search_repository_contract.rs",
         "src-tauri/src/commands/catalog.rs"
       ],
       "databaseMappings": [
@@ -18290,6 +18294,7 @@
         "crates/persistence-postgres/tests/entity_deletion_repository_contract.rs",
         "crates/persistence-postgres/tests/entity_matching_references_repository_contract.rs",
         "crates/persistence-postgres/tests/entity_permanent_delete_repository_contract.rs",
+        "crates/persistence-postgres/tests/global_name_search_repository_contract.rs",
         "crates/persistence-postgres/tests/player_abilities_dynamic_tags_repository_contract.rs",
         "crates/persistence-postgres/tests/player_directory_detail_repository_contract.rs",
         "crates/persistence-postgres/tests/player_names_positions_repository_contract.rs",
@@ -18970,6 +18975,7 @@
         "crates/application/src/use_cases/ai_workspace/context/mod.rs",
         "crates/application/src/use_cases/players/list_players/mod.rs",
         "crates/persistence-postgres/src/adapters/catalog/players/directory/list_players.rs",
+        "crates/persistence-postgres/tests/global_name_search_repository_contract.rs",
         "crates/persistence-postgres/tests/player_directory_detail_repository_contract.rs",
         "src-tauri/src/commands/catalog.rs"
       ],
@@ -19618,6 +19624,7 @@
         "crates/persistence-postgres/src/adapters/catalog/players/names/add_player_name.rs",
         "crates/persistence-postgres/src/adapters/catalog/players/names/input_policy.rs",
         "crates/persistence-postgres/tests/entity_matching_references_repository_contract.rs",
+        "crates/persistence-postgres/tests/global_name_search_repository_contract.rs",
         "crates/persistence-postgres/tests/player_directory_detail_repository_contract.rs",
         "crates/persistence-postgres/tests/player_names_positions_repository_contract.rs",
         "src-tauri/src/commands/catalog.rs"
@@ -20246,6 +20253,7 @@
         "crates/persistence-postgres/tests/entity_deletion_repository_contract.rs",
         "crates/persistence-postgres/tests/entity_matching_references_repository_contract.rs",
         "crates/persistence-postgres/tests/entity_permanent_delete_repository_contract.rs",
+        "crates/persistence-postgres/tests/global_name_search_repository_contract.rs",
         "crates/persistence-postgres/tests/player_abilities_dynamic_tags_repository_contract.rs",
         "crates/persistence-postgres/tests/player_directory_detail_repository_contract.rs",
         "crates/persistence-postgres/tests/player_names_positions_repository_contract.rs",
@@ -21690,6 +21698,7 @@
         "crates/persistence-postgres/tests/entity_deletion_repository_contract.rs",
         "crates/persistence-postgres/tests/entity_matching_references_repository_contract.rs",
         "crates/persistence-postgres/tests/entity_permanent_delete_repository_contract.rs",
+        "crates/persistence-postgres/tests/global_name_search_repository_contract.rs",
         "crates/persistence-postgres/tests/player_abilities_dynamic_tags_repository_contract.rs",
         "crates/persistence-postgres/tests/player_directory_detail_repository_contract.rs",
         "crates/persistence-postgres/tests/player_names_positions_repository_contract.rs",
@@ -28805,6 +28814,7 @@
         "crates/persistence-postgres/tests/entity_deletion_repository_contract.rs",
         "crates/persistence-postgres/tests/entity_matching_references_repository_contract.rs",
         "crates/persistence-postgres/tests/entity_permanent_delete_repository_contract.rs",
+        "crates/persistence-postgres/tests/global_name_search_repository_contract.rs",
         "crates/persistence-postgres/tests/player_directory_detail_repository_contract.rs",
         "crates/persistence-postgres/tests/player_team_periods_availability_repository_contract.rs",
         "crates/persistence-postgres/tests/postgres_integration.rs",
@@ -29819,6 +29829,7 @@
         "crates/application/src/services/teams/service.rs",
         "crates/application/src/use_cases/teams/list_teams/mod.rs",
         "crates/persistence-postgres/src/adapters/catalog/teams/directory/list_teams.rs",
+        "crates/persistence-postgres/tests/global_name_search_repository_contract.rs",
         "crates/persistence-postgres/tests/team_directory_detail_repository_contract.rs",
         "src-tauri/src/commands/catalog.rs"
       ],
@@ -30608,6 +30619,7 @@
         "crates/persistence-postgres/src/adapters/catalog/teams/names/add_team_name.rs",
         "crates/persistence-postgres/src/adapters/catalog/teams/names/validation.rs",
         "crates/persistence-postgres/tests/entity_matching_references_repository_contract.rs",
+        "crates/persistence-postgres/tests/global_name_search_repository_contract.rs",
         "crates/persistence-postgres/tests/team_directory_detail_repository_contract.rs",
         "crates/persistence-postgres/tests/team_names_profiles_repository_contract.rs",
         "src-tauri/src/commands/catalog.rs"

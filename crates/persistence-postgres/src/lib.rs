@@ -16,7 +16,6 @@ mod match_review_package;
 mod migrations;
 mod model_runs;
 mod monthly_workbooks;
-mod name_search;
 mod p4_orchestration;
 mod p4_records;
 mod p4_workbench;

@@ -44,6 +44,11 @@ Node 开发依赖固定安装和读取自源码根目录上一级的 `../node_mo
 ## 模块化重写执行记录
 
 
+### R6-10 Global Name Search
+
+- 统一名称搜索正迁移到 `adapters/catalog/global_search/`，按查询解析、归一化与 PostgreSQL 谓词分责；现有调用点只切换内部 owner。
+- `football.global-name-search.v1` 的中文/英文/别名/重音/标点与空白无关、多关键词 AND 与 contains 语义保持不变；公共 DTO、Schema、0001–0046 migrations、配置、UI 与生产依赖不变。implementation/minimum gate run `32249610140` 已通过，节点暂为 `VERIFYING`，等待阶段回归。
+
 ### R6-09 Archive / Delete / Force Delete
 
 - R6-09 deletion persistence 已按职责收敛：AT1 `preflight/archive`、AT2 `bulk_delete/safe_delete/delete_write`、AT3 `force_delete/{operation,targets,counts,execute}`；各协调器保持 SQL-free，引用读取、事务写入、强制清除目标闭包、影响统计与破坏性执行均由明确 I/O owner 承担。

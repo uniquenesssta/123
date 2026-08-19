@@ -9,7 +9,11 @@ const requireTrue = (condition, message) => {
 };
 
 const contract = JSON.parse(read("contracts/global-name-search-contract.json"));
-const helper = read("crates/persistence-postgres/src/name_search.rs");
+const catalogMod = read("crates/persistence-postgres/src/adapters/catalog/mod.rs");
+const globalSearchMod = read("crates/persistence-postgres/src/adapters/catalog/global_search/mod.rs");
+const queryOwner = read("crates/persistence-postgres/src/adapters/catalog/global_search/query.rs");
+const normalizationOwner = read("crates/persistence-postgres/src/adapters/catalog/global_search/normalization.rs");
+const predicateOwner = read("crates/persistence-postgres/src/adapters/catalog/global_search/predicate.rs");
 const playerCatalog = read("crates/persistence-postgres/src/player_catalog.rs");
 const playerDirectoryList = read("crates/persistence-postgres/src/adapters/catalog/players/directory/list_players.rs");
 const teamDirectoryList = read("crates/persistence-postgres/src/adapters/catalog/teams/directory/list_teams.rs");
@@ -30,28 +34,32 @@ requireTrue(contract.requirements.alternate_names, "契约未覆盖别名");
 requireTrue(contract.requirements.punctuation_insensitive, "契约未要求标点无关匹配");
 requireTrue(contract.requirements.latin_diacritic_insensitive, "契约未要求拉丁重音无关匹配");
 
-requireTrue(persistenceLib.includes("mod name_search;"), "全局名称搜索模块未注册");
-requireTrue(helper.includes("pub(crate) struct NameSearch"), "缺少统一名称搜索查询对象");
-requireTrue(helper.includes('format!("%{token}%")'), "名称搜索仍未使用包含匹配");
-requireTrue(helper.includes("regexp_replace"), "名称搜索未处理空格与标点差异");
-requireTrue(helper.includes("LATIN_FOLD_SOURCE"), "名称搜索未处理拉丁重音字符");
-requireTrue(helper.includes("character.is_alphanumeric()"), "名称搜索未统一中英文字符归一化");
-requireTrue(helper.includes("alias.normalized_name"), "名称搜索未覆盖别名归一化字段");
-requireTrue(helper.includes("alias.name"), "名称搜索未覆盖别名原始显示字段");
+requireTrue(!fs.existsSync(path.join(root, "crates/persistence-postgres/src/name_search.rs")), "旧 name_search.rs 仍存在");
+requireTrue(!persistenceLib.includes("mod name_search;"), "旧根模块入口仍存在");
+requireTrue(catalogMod.includes("pub(crate) mod global_search;"), "Catalog 未注册 Global Search 模块");
+requireTrue(globalSearchMod.includes("mod normalization;") && globalSearchMod.includes("mod predicate;") && globalSearchMod.includes("mod query;"), "Global Search 职责目录不完整");
+requireTrue(queryOwner.includes("pub(crate) struct NameSearch"), "缺少统一名称搜索查询对象");
+requireTrue(predicateOwner.includes('format!("%{token}%")'), "名称搜索仍未使用包含匹配");
+requireTrue(predicateOwner.includes("regexp_replace"), "名称搜索未处理空格与标点差异");
+requireTrue(normalizationOwner.includes("LATIN_FOLD_SOURCE"), "名称搜索未处理拉丁重音字符");
+requireTrue(normalizationOwner.includes("character.is_alphanumeric()"), "名称搜索未统一中英文字符归一化");
+requireTrue(predicateOwner.includes("columns.alias_normalized"), "名称搜索未覆盖别名归一化字段");
+requireTrue(predicateOwner.includes("columns.alias_display"), "名称搜索未覆盖别名原始显示字段");
 
 const searchOwners = [playerCatalog, playerDirectoryList, teamDirectoryList, teamOptionList, referenceDirectoryRead, coachDirectoryList];
 const combined = searchOwners.join("\n");
 const helperUsages = (combined.match(/NameSearch::parse\(/g) ?? []).length;
+requireTrue(!combined.includes("name_search::{"), "仍有调用点依赖旧 name_search owner");
 requireTrue(helperUsages >= 7, `全局名称搜索接入点不足：${helperUsages}/7`);
 for (const source of searchOwners) {
   requireTrue(!source.includes('format!("{search}%")'), "仍残留仅前缀匹配逻辑");
   requireTrue(!/normalized_name LIKE \$1 \|\| '%'/u.test(source), "实体引用仍残留仅前缀匹配SQL");
 }
-requireTrue(playerDirectoryList.includes("NameSearch::parse"), "R6-03 Player Directory list 未接入统一 NameSearch");
-requireTrue(teamDirectoryList.includes("NameSearch::parse"), "R6-01 Team Directory list 未接入统一 NameSearch");
-requireTrue(teamOptionList.includes("NameSearch::parse"), "R6-01 Team options 未接入统一 NameSearch");
-requireTrue(coachDirectoryList.includes("NameSearch::parse"), "R6-07 Coach Directory list 未接入统一 NameSearch");
-requireTrue(referenceDirectoryRead.includes("NameSearch::parse") && referenceDirectoryRead.includes("push_name_search"), "R6-08 Reference Directory 未接入统一 NameSearch");
+requireTrue(playerDirectoryList.includes("adapters::catalog::global_search") && playerDirectoryList.includes("NameSearch::parse"), "R6-03 Player Directory list 未接入新 Global Search owner");
+requireTrue(teamDirectoryList.includes("adapters::catalog::global_search") && teamDirectoryList.includes("NameSearch::parse"), "R6-01 Team Directory list 未接入新 Global Search owner");
+requireTrue(teamOptionList.includes("adapters::catalog::global_search") && teamOptionList.includes("NameSearch::parse"), "R6-01 Team options 未接入新 Global Search owner");
+requireTrue(coachDirectoryList.includes("adapters::catalog::global_search") && coachDirectoryList.includes("NameSearch::parse"), "R6-07 Coach Directory list 未接入新 Global Search owner");
+requireTrue(referenceDirectoryRead.includes("adapters::catalog::global_search") && referenceDirectoryRead.includes("NameSearch::parse") && referenceDirectoryRead.includes("push_name_search"), "R6-08 Reference Directory 未接入新 Global Search owner");
 
 requireTrue(playerPage.includes("支持中文名、原名或别名的部分匹配"), "球员搜索提示未说明中英文部分匹配");
 requireTrue(teamPage.includes("支持中英文球队名称或别名的部分匹配"), "球队搜索提示未说明中英文部分匹配");
@@ -95,4 +103,4 @@ for (const example of contract.examples) {
     `搜索示例失败：${example.query}`);
 }
 
-console.log(`全局中英文名称搜索验证通过：${helperUsages} 个后端入口已统一，${contract.examples.length} 个中英文示例匹配正确。`);
+console.log(`全局中英文名称搜索验证通过：${helperUsages} 个后端入口已统一到 catalog/global_search，${contract.examples.length} 个中英文示例匹配正确。`);

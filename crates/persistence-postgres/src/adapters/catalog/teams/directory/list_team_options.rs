@@ -1,6 +1,6 @@
 use super::{option_mapper::map_team_option_row, option_row::TeamOptionRow};
 use crate::{
-    name_search::{push_name_search, NameSearch, NameSearchColumns},
+    adapters::catalog::global_search::{push_name_search, NameSearch, NameSearchColumns},
     PersistenceResult, PostgresStore,
 };
 use football_domain::TeamOption;

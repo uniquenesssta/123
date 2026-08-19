@@ -1,6 +1,6 @@
 use super::{list_mapper::map_player_list_item, list_row::PlayerListRow};
 use crate::{
-    name_search::{push_name_search, NameSearch, NameSearchColumns},
+    adapters::catalog::global_search::{push_name_search, NameSearch, NameSearchColumns},
     PersistenceError, PersistenceResult, PostgresStore,
 };
 use football_domain::{PlayerListItem, PlayerListPage, PlayerListQuery};
