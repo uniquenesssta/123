@@ -25,8 +25,8 @@ R6 按 Teams、Players、Coaches、Formations、Abilities、Dynamic Tags、Avail
 | R6-06 | Abilities 与 Dynamic Tags | DONE |
 | R6-07 | Coaches 与 Formation Usage | DONE |
 | R6-08 | Entity Matching 与 References | DONE |
-| R6-09 | Archive / Delete / Force Delete | IN_PROGRESS |
-| R6-10 | Global Name Search | BLOCKED |
+| R6-09 | Archive / Delete / Force Delete | DONE |
+| R6-10 | Global Name Search | READY |
 
 ## R6-01 当前事实
 
@@ -117,4 +117,4 @@ R6 按 Teams、Players、Coaches、Formations、Abilities、Dynamic Tags、Avail
 ## R6-09 当前事实
 
 - 详细记录：[`R06-09-archive-delete-and-force-delete.md`](R06-09-archive-delete-and-force-delete.md)。
-- Atomic Task 1/2 已 `DONE` 并保留既有 PostgreSQL 16 / Windows 验收证据。Atomic Task 3：Team Force Delete 已完成模块 owner switch、Minimum Gate 与 AT1/AT2/AT3 focused PostgreSQL 16 contracts，当前等待完整 Windows Stage Regression 与 R6 retained PostgreSQL contracts；R6-09 继续 `IN_PROGRESS`，R6-10 继续 `BLOCKED`。
+- Atomic Task 1/2/3 均已 `DONE`。AT3 生产提交 `07a1d421a9903cc588b500aab2b9f6eb8d9a4bc7` 的 Minimum Gate、focused PostgreSQL 16 contracts、完整 Windows Stage Regression 与 R6-01～R6-09 retained PostgreSQL 16 contracts全部通过（recovery workflow run `32231046269`；Windows job `96000683932`、PostgreSQL job `96000683845` 均 `SUCCESS`）；R6-09 正式关闭，R6-10 Global Name Search 开放为 `READY`。用户现有 PostgreSQL 数据真实 sample/write 与 Windows Full 人工交互验收继续保留到最终统一验收。
