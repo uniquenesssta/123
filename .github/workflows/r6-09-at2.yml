@@ -69,6 +69,49 @@ jobs:
         run: |
           set -euo pipefail
           python3 scripts/r6-09-at2-apply.py
+          python3 - <<'PY'
+          from pathlib import Path
+
+          path = Path('scripts/verify-team-player-management.mjs')
+          text = path.read_text(encoding='utf-8')
+          old = '''for (const artifact of contract.artifacts) {
+            if (artifact === "crates/application/src/player_catalog.rs") {
+              for (const currentOwner of [
+                "crates/application/src/services/teams/facade.rs",
+                "crates/application/src/services/players/facade.rs",
+              ]) {
+                assert(existsSync(join(root, currentOwner)), `球队与球员管理当前制品不存在：${currentOwner}`);
+              }
+              continue;
+            }
+            assert(existsSync(join(root, artifact)), `球队与球员管理制品不存在：${artifact}`);
+          }'''
+          new = '''for (const artifact of contract.artifacts) {
+            if (artifact === "crates/application/src/player_catalog.rs") {
+              for (const currentOwner of [
+                "crates/application/src/services/teams/facade.rs",
+                "crates/application/src/services/players/facade.rs",
+              ]) {
+                assert(existsSync(join(root, currentOwner)), `球队与球员管理当前制品不存在：${currentOwner}`);
+              }
+              continue;
+            }
+            if (artifact === "crates/persistence-postgres/src/team_catalog.rs") {
+              for (const currentOwner of [
+                "crates/persistence-postgres/src/adapters/catalog/deletion/bulk_delete.rs",
+                "crates/persistence-postgres/src/adapters/catalog/deletion/safe_delete.rs",
+                "crates/persistence-postgres/src/adapters/catalog/deletion/delete_write.rs",
+              ]) {
+                assert(existsSync(join(root, currentOwner)), `球队与球员管理当前制品不存在：${currentOwner}`);
+              }
+              continue;
+            }
+            assert(existsSync(join(root, artifact)), `球队与球员管理制品不存在：${artifact}`);
+          }'''
+          if text.count(old) != 1:
+              raise SystemExit('verify-team-player-management artifact-owner anchor mismatch')
+          path.write_text(text.replace(old, new, 1), encoding='utf-8', newline='\n')
+          PY
           cargo fmt --all
           node scripts/generate-domain-type-inventory.mjs
           node scripts/verify-domain-type-inventory.mjs
