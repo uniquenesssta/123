@@ -1,0 +1,79 @@
+name: R6-09 AT1 repair extraction anchors
+
+on:
+  push:
+    branches:
+      - rewrite/r6-entity-catalog-persistence
+
+permissions:
+  contents: write
+
+concurrency:
+  group: r6-09-at1-repair
+  cancel-in-progress: true
+
+jobs:
+  repair:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: rewrite/r6-entity-catalog-persistence
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+      - name: Verify repair scope
+        shell: bash
+        run: |
+          set -euo pipefail
+          base=3bc7ca89ef0341b53985246602218c2ba6fbb094
+          git merge-base --is-ancestor "$base" HEAD
+          test "$(git hash-object crates/persistence-postgres/src/entity_catalog.rs)" = "fe861d8a1f5b765dcb5baf1e334d44990dd94344"
+          test "$(git hash-object crates/persistence-postgres/src/team_catalog.rs)" = "38f48d74709c8a9673bf2ed0ba7649603f223981"
+          test "$(git hash-object crates/persistence-postgres/src/player_catalog.rs)" = "ceb8b6ae74769f8d28ca593ea3298efa0ad730c5"
+          test "$(git hash-object crates/persistence-postgres/src/team_force_delete.rs)" = "ec0fd77103c90b94a7eeef7e769c5b17b88f6915"
+          test -f scripts/r6-09-at1-apply.py
+          test -f .r6-09-at1-failure.txt
+      - name: Repair helper and clean diagnostic
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          from pathlib import Path
+          path = Path('scripts/r6-09-at1-apply.py')
+          text = path.read_text(encoding='utf-8')
+          old = """label = once(label, 'async fn entity_label(', 'pub(crate) async fn entity_label(', 'label vis')
+          label = once(label, '    &self,\\n', '    pool: &sqlx::PgPool,\\n', 'label pool')
+          label = label.replace('&self.pool', 'pool')"""
+          new = """label = once(
+              label,
+              'async fn entity_label(&self, entity_type: &str, id: Uuid) -> PersistenceResult<Option<String>> {',
+              'pub(crate) async fn entity_label(pool: &sqlx::PgPool, entity_type: &str, id: Uuid) -> PersistenceResult<Option<String>> {',
+              'label signature',
+          )
+          label = label.replace('&self.pool', 'pool')"""
+          if text.count(old) != 1:
+              raise SystemExit(f'label repair anchor count={text.count(old)}')
+          text = text.replace(old, new, 1)
+          old = """    '} else if self\\n        .entity_label_in_tx(&mut tx, entity_type, id)\\n        .await?',"""
+          new = """    '} else if self\\n    .entity_label_in_tx(&mut tx, entity_type, id)\\n    .await?',"""
+          if text.count(old) != 1:
+              raise SystemExit(f'archive repair anchor count={text.count(old)}')
+          text = text.replace(old, new, 1)
+          path.write_text(text, encoding='utf-8', newline='\n')
+          PY
+          rm -f .r6-09-at1-failure.txt
+          rm -f .github/workflows/r6-09-at1-repair.yml
+          git diff --check
+          python3 -m py_compile scripts/r6-09-at1-apply.py
+      - name: Publish repair
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add scripts/r6-09-at1-apply.py .r6-09-at1-failure.txt .github/workflows/r6-09-at1-repair.yml
+          test "$(git diff --cached --name-only | sort)" = $'.github/workflows/r6-09-at1-repair.yml\n.r6-09-at1-failure.txt\nscripts/r6-09-at1-apply.py'
+          git commit -m "fix(r6-09): repair AT1 extraction anchors"
+          git push origin HEAD:rewrite/r6-entity-catalog-persistence
