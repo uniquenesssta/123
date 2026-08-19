@@ -218,12 +218,48 @@ console.log("R6-09 AT1+AT2+AT3 deletion preflight/archive/safe-delete/force-dele
 )
 write(verify_deletion_path, verify_deletion)
 
+for verifier_path, owner_name in [
+    ("scripts/verify-match-event-facts.mjs", "forceDelete"),
+    ("scripts/verify-stage-e2-lineup-presets.mjs", "forceDelete"),
+]:
+    verifier = read(verifier_path)
+    verifier = replace_once(
+        verifier,
+        f'const {owner_name} = read("crates/persistence-postgres/src/team_force_delete.rs");',
+        f'''const {owner_name} = [
+  read("crates/persistence-postgres/src/adapters/catalog/deletion/force_delete/targets.rs"),
+  read("crates/persistence-postgres/src/adapters/catalog/deletion/force_delete/counts.rs"),
+  read("crates/persistence-postgres/src/adapters/catalog/deletion/force_delete/execute.rs"),
+].join("\\n");''',
+        f"{verifier_path} force-delete owner",
+    )
+    write(verifier_path, verifier)
+
+match_review_path = "scripts/verify-match-review-package.mjs"
+match_review = read(match_review_path)
+match_review = replace_once(
+    match_review,
+    'const forceDeletePersistence = read("crates/persistence-postgres/src/team_force_delete.rs");',
+    '''const forceDeletePersistence = [
+  read("crates/persistence-postgres/src/adapters/catalog/deletion/force_delete/targets.rs"),
+  read("crates/persistence-postgres/src/adapters/catalog/deletion/force_delete/counts.rs"),
+  read("crates/persistence-postgres/src/adapters/catalog/deletion/force_delete/execute.rs"),
+].join("\\n");''',
+    "match-review package force-delete owner",
+)
+write(match_review_path, match_review)
+
 stale = []
 legacy_reference = "crates/persistence-postgres/src/team_force_delete.rs"
+allowed_legacy_literal_checks = {
+    "scripts/verify-entity-deletion-persistence.mjs",
+    "scripts/verify-force-team-delete.mjs",
+}
 for path in sorted((ROOT / "scripts").rglob("*.mjs")):
     source = path.read_text(encoding="utf-8")
-    if legacy_reference in source:
-        stale.append(path.relative_to(ROOT).as_posix())
+    relative = path.relative_to(ROOT).as_posix()
+    if legacy_reference in source and relative not in allowed_legacy_literal_checks:
+        stale.append(relative)
 need(not stale, "R6-09 AT3 stale force-delete verifier owner references remain:\n- " + "\n- ".join(stale))
 
 contract_path = "crates/persistence-postgres/tests/team_force_delete_repository_contract.rs"
