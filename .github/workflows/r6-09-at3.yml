@@ -70,6 +70,8 @@ jobs:
           python3 -m py_compile scripts/r6-09-at3-apply.py
           python3 scripts/r6-09-at3-apply.py
           cargo fmt --all
+          node scripts/generate-domain-type-inventory.mjs
+          node scripts/verify-domain-type-inventory.mjs
           git diff --check
 
       - name: AT3 minimum static gates
