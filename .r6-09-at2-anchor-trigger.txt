@@ -1,1 +1,2 @@
-trigger=R6-09-AT2-retry-after-stale-verifier-repair
+run_id=32223588273
+trigger_sha=971b62d431ff8704cc820f29032b22f586b5c60e
