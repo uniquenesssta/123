@@ -26,13 +26,13 @@ R6 按 Teams、Players、Coaches、Formations、Abilities、Dynamic Tags、Avail
 | R6-07 | Coaches 与 Formation Usage | DONE |
 | R6-08 | Entity Matching 与 References | DONE |
 | R6-09 | Archive / Delete / Force Delete | DONE |
-| R6-10 | Global Name Search | VERIFYING |
+| R6-10 | Global Name Search | DONE |
 
 ## R6-10 当前事实
 
 - 详细记录：[`R06-10-global-name-search.md`](R06-10-global-name-search.md)。
 - 旧根部 `name_search.rs` 已按 `query / normalization / predicate` 分责迁入 `adapters/catalog/global_search/`；搜索契约与 UI 不变。
-- implementation/minimum gate run `32249610140` 已通过；R6-10 保持 `VERIFYING`，等待完整 Windows 与 retained PostgreSQL 16 阶段回归。
+- production owner-switch `fbe013b96f38d3c61e7b536e1ef67a89109c57c4` 的 implementation/minimum gate run `32249610140` 已通过；stage verification run `32249902897` 的 Windows job `96058363125` 与 PostgreSQL 16 job `96058363037` 均 `SUCCESS`，R6-10 正式 `DONE`。
 
 ## R6-01 当前事实
 

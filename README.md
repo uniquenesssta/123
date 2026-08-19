@@ -46,8 +46,8 @@ Node 开发依赖固定安装和读取自源码根目录上一级的 `../node_mo
 
 ### R6-10 Global Name Search
 
-- 统一名称搜索正迁移到 `adapters/catalog/global_search/`，按查询解析、归一化与 PostgreSQL 谓词分责；现有调用点只切换内部 owner。
-- `football.global-name-search.v1` 的中文/英文/别名/重音/标点与空白无关、多关键词 AND 与 contains 语义保持不变；公共 DTO、Schema、0001–0046 migrations、配置、UI 与生产依赖不变。implementation/minimum gate run `32249610140` 已通过，节点暂为 `VERIFYING`，等待阶段回归。
+- 统一名称搜索已收敛到 `adapters/catalog/global_search/{query,normalization,predicate}`；球队目录、球员目录、球队 selector、教练目录与 Entity Reference 只切换内部 owner，旧 `name_search.rs` 已删除。
+- `football.global-name-search.v1` 的中文/英文/别名/重音/标点与空白无关、多关键词 AND、contains 与分页语义保持不变；公共 DTO、Schema、0001–0046 migrations、配置、UI、错误语义和生产依赖不变。production `fbe013b96f38d3c61e7b536e1ef67a89109c57c4` 的 minimum gate run `32249610140` 与 stage verification run `32249902897` 均通过；Windows job `96058363125`、PostgreSQL 16 job `96058363037` 均 `SUCCESS`，R6-10 正式 `DONE`。
 
 ### R6-09 Archive / Delete / Force Delete
 

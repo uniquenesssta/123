@@ -2,7 +2,7 @@
 
 ## 状态
 
-`VERIFYING`
+`DONE`
 
 ## 基线与范围
 
@@ -24,8 +24,14 @@
 ## 验证状态
 
 - implementation/minimum gate run `32249610140` 已通过：Global Search owner/contract、Persistence check、5 个 focused unit tests、模型保护、database baseline、Domain inventory、PostgreSQL 16 focused contract 与 diff scope 全部 PASS。
-- production owner-switch 后继续运行完整 Windows stage regression 与 R6-01～R6-10 retained PostgreSQL 16 contracts。
+- stage verification run `32249902897` 已通过：Windows job `96058363125` 完成 frontend、rustfmt、workspace Clippy `-D warnings`、workspace tests 与 diff hygiene；PostgreSQL 16 job `96058363037` 完成 Global Search / Domain inventory / architecture / protected assets / database baseline 门禁及 R6-01～R6-10 retained contracts。
 
 ## 回退点
 
 - 回退到源码基线 `e79f1becb1595b03f5d1ba4686363dd62fbac9e2`；不保留双实现。
+
+## 完成结论
+
+- 生产 owner-switch 提交：`fbe013b96f38d3c61e7b536e1ef67a89109c57c4`。统一名称搜索唯一生产 owner 为 `adapters/catalog/global_search/`，旧 `name_search.rs` 已删除，无双实现或转发壳。
+- implementation/minimum gate `32249610140` 与 stage verification run `32249902897` 均已实际通过，R6-10 据此关闭为 `DONE`。
+- 本节点未修改 UI。此前人工验收中，球队目录/详情和球队名称/档案写入回读由用户明确确认通过；球员项仅收到“应该OK了”，不扩大记为完整 Windows Full 人工验收。
