@@ -1,4 +1,4 @@
-# explicit trigger after workflow registration
+# retry after coach/formation verifier follows retired entity catalog owner
 name: R6 Stage Exit Owner Cleanup
 
 on:
