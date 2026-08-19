@@ -1,5 +1,0 @@
-run_id=32231967517
-trigger_sha=6cbea7b08117203b1c4d597edb0009254024bfec
-windows_stage=cancelled
-postgres_retained=cancelled
-finalize=cancelled
