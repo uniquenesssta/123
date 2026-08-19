@@ -1,0 +1,8 @@
+run_id=32275102428
+trigger_sha=9cccc0629cb657e87abb5e6e3e293b6c2df77cf1
+production=809cfb429ec31c165616e65e1b6169f928ee4dcb
+phase=failed
+windows=failure
+windows_job=96140550824
+postgres=success
+postgres_job=96140551184
