@@ -1,4 +1,4 @@
-# fresh trigger: force-remove temporary helper after all substantive gates pass
+# final recovery trigger: exact event SHA prevents stale branch checkout during self-mutating gate
 name: R6 Stage Exit Visibility Retry
 
 on:
@@ -43,7 +43,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          ref: ${{ env.R6_BRANCH }}
+          ref: ${{ github.sha }}
           fetch-depth: 0
       - uses: actions/setup-node@v4
         with:
