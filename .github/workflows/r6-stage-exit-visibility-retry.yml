@@ -1,4 +1,4 @@
-# explicit trigger after workflow registration; temporary helper removal is forced because visibility is patched in-run
+# fresh trigger: force-remove temporary helper after all substantive gates pass
 name: R6 Stage Exit Visibility Retry
 
 on:
