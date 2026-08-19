@@ -615,9 +615,42 @@ text = once(
 )
 write(path, text)
 
+path = "scripts/verify-entity-relationships.mjs"
+text = read(path)
+text = once(
+    text,
+    'const teamPersistence = text("crates/persistence-postgres/src/team_catalog.rs");',
+    'const deletionPersistence = [\n  text("crates/persistence-postgres/src/adapters/catalog/deletion/safe_delete.rs"),\n  text("crates/persistence-postgres/src/adapters/catalog/deletion/delete_write.rs"),\n].join("\\n");\nconst teamPersistence = deletionPersistence;',
+    "entity relationships team deletion owner",
+)
+text = once(
+    text,
+    'const playerPersistence = text("crates/persistence-postgres/src/player_catalog.rs");',
+    'const playerPersistence = deletionPersistence;',
+    "entity relationships player deletion owner",
+)
+write(path, text)
+
+path = "scripts/verify-global-name-search.mjs"
+text = read(path)
+text = once(
+    text,
+    'const teamCatalog = read("crates/persistence-postgres/src/team_catalog.rs");\n',
+    '',
+    "global search unused deletion owner",
+)
+text = once(
+    text,
+    'const searchOwners = [playerCatalog, playerDirectoryList, teamCatalog, teamDirectoryList, teamOptionList, referenceDirectoryRead, coachDirectoryList];',
+    'const searchOwners = [playerCatalog, playerDirectoryList, teamDirectoryList, teamOptionList, referenceDirectoryRead, coachDirectoryList];',
+    "global search owner list",
+)
+write(path, text)
+
 # Stop before any build if another historical verifier still depends on the deleted owner.
 stale = []
 allowed_team_catalog = {
+    "scripts/verify-entity-deletion-persistence.mjs",
     "scripts/verify-team-directory-detail.mjs",
     "scripts/verify-team-names-profiles.mjs",
 }
