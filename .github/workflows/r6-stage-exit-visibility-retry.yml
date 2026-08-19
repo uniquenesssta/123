@@ -1,4 +1,4 @@
-# final recovery trigger: exact event SHA prevents stale branch checkout during self-mutating gate
+# exact-SHA recovery trigger; no production logic changes in this commit
 name: R6 Stage Exit Visibility Retry
 
 on:
