@@ -217,8 +217,12 @@ label = textwrap.dedent(
         'label',
     )
 ).rstrip() + '\n'
-label = once(label, 'async fn entity_label(', 'pub(crate) async fn entity_label(', 'label vis')
-label = once(label, '    &self,\n', '    pool: &sqlx::PgPool,\n', 'label pool')
+label = once(
+    label,
+    'async fn entity_label(&self, entity_type: &str, id: Uuid) -> PersistenceResult<Option<String>> {',
+    'pub(crate) async fn entity_label(pool: &sqlx::PgPool, entity_type: &str, id: Uuid) -> PersistenceResult<Option<String>> {',
+    'label signature',
+)
 label = label.replace('&self.pool', 'pool')
 write(
     deletion / 'preflight/labels.rs',
@@ -305,7 +309,7 @@ archive_write = once(
 ).replace('self.pool.begin()', 'pool.begin()')
 archive_write = once(
     archive_write,
-    '} else if self\n        .entity_label_in_tx(&mut tx, entity_type, id)\n        .await?',
+    '} else if self\n    .entity_label_in_tx(&mut tx, entity_type, id)\n    .await?',
     '} else if entity_label_in_tx(&mut tx, entity_type, id).await?',
     'archive label tx',
 )
