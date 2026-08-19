@@ -22,9 +22,9 @@
 
 ## Atomic Task 2 — Safe Permanent Delete
 
-**状态：VERIFYING**
+**状态：DONE**
 
 - `bulk_delete_teams`、`bulk_delete_players` 与 `delete_player` 已迁入 `adapters/catalog/deletion/{bulk_delete,safe_delete,delete_write}.rs`；bulk/safe-delete 协调器 SQL-free，事务、行锁、最终竞态复检、external-ID 清理与审计写入由 `delete_write.rs` 唯一持有。
 - 旧 `team_catalog.rs` 已删除；`player_catalog.rs` 不再持有 `delete_player`。Team Force Delete 继续保留 `team_force_delete.rs`，未提前进入 AT3。
 - 公共 Port/DTO/Schema/迁移、无引用永久删除条件、错误语义、历史引用保护与用户可观察行为保持不变；无新增生产依赖。
-- AT2 Minimum Gate 与 AT1/AT2 PostgreSQL 16 focused contracts 已通过；完整 Windows Stage Regression 与 retained PostgreSQL contracts 尚待本 workflow 后续 jobs，在成功前 AT2 不关闭。
+- AT2 生产提交 `eca85a92d30cdf83e6b9f3f1b341874a0e9fba01`：Minimum Gate、AT1/AT2 focused PostgreSQL 16 contracts、完整 Windows Stage Regression 与 R6-01～R6-09 retained PostgreSQL 16 contracts全部通过。AT2 已独立关闭；AT3 Team Force Delete 为本节点剩余职责。
