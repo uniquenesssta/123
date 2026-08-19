@@ -309,7 +309,7 @@ archive_write = once(
 ).replace('self.pool.begin()', 'pool.begin()')
 archive_write = once(
     archive_write,
-    '} else if self\n    .entity_label_in_tx(&mut tx, entity_type, id)\n    .await?',
+    '} else if self\n        .entity_label_in_tx(&mut tx, entity_type, id)\n        .await?',
     '} else if entity_label_in_tx(&mut tx, entity_type, id).await?',
     'archive label tx',
 )
