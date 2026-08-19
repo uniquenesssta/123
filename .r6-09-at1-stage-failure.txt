@@ -1,4 +1,0 @@
-R6-09 AT1 stage gate failure
-run_id=32219150263
-windows_stage=failure
-postgres_contract=success
