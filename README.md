@@ -44,10 +44,10 @@ Node 开发依赖固定安装和读取自源码根目录上一级的 `../node_mo
 ## 模块化重写执行记录
 
 
-### R6 Stage Exit Cleanup
+### R6 Stage Complete
 
-- R6 阶段出口正在清理最后的旧 catalog persistence owner：Team Detail player-period projection、Position reference list 与 season-team membership option read 迁入 `adapters/catalog/` 对应职责目录；`entity_catalog.rs` 删除。
-- `player_catalog.rs` 仅移除上述 R6 SQL/mapper，Match/Lineup 与其 reference-data 聚合入口保持原行为并留给 R7；公共 Port/DTO、Schema、0001–0046 migrations、配置、UI、错误语义和生产依赖不变。节点保持 `VERIFYING`，等待 R6 最终 Windows + PostgreSQL 16 出口门禁。
+- R6-01～R6-10 与阶段出口收尾均完成；Entity Catalog persistence 已收敛到 `adapters/catalog/`，旧 `entity_catalog.rs` 删除，`player_catalog.rs` 只保留 R7 Match/Lineup 职责。阶段记录：`docs/modular-rewrite/R06-entity-catalog-persistence/R06-stage-completion.md`。
+- 最终生产代码 `809cfb429ec31c165616e65e1b6169f928ee4dcb` 经 run `32276040092` 验证：Windows job `96143592950` 官方 Automated acceptance 与 PostgreSQL 16 job `96143592734` 的 12 个 retained contracts 均 `SUCCESS`。公共契约、0001–0046 migrations、UI、模型保护资产与生产依赖保持兼容；R6 正式 `DONE`，R7 开放。
 
 ### R6-10 Global Name Search
 

@@ -2,7 +2,7 @@
 
 ## 阶段状态
 
-`IN_PROGRESS`
+`DONE`
 
 R6 按 Teams、Players、Coaches、Formations、Abilities、Dynamic Tags、Availability、Entity Matching、References、Deletion 与 Global Search 拆分 PostgreSQL Entity Catalog Adapter；不实施阵容提交、工作簿导入事务或 UI。
 
@@ -28,12 +28,11 @@ R6 按 Teams、Players、Coaches、Formations、Abilities、Dynamic Tags、Avail
 | R6-09 | Archive / Delete / Force Delete | DONE |
 | R6-10 | Global Name Search | DONE |
 
-## R6 阶段出口收尾
+## R6 阶段完成
 
-- 状态：`VERIFYING`。
-- 最终审计发现旧 `entity_catalog.rs` 仍持有 Team Detail player-period projection；`player_catalog.rs` 仍持有 Position reference 与 season-team membership option 两条 R6 直接 SQL read。
-- 本次只迁移上述 R6 persistence owner；`player_catalog.rs` 的 Match/Lineup 职责明确保留给 R7，不提前跨阶段重写。
-- 完整出口门禁通过前不创建 `R06-stage-completion.md`，R6 阶段继续保持 `IN_PROGRESS`。
+- 阶段完成记录：[`R06-stage-completion.md`](R06-stage-completion.md)。
+- 生产收尾 `809cfb429ec31c165616e65e1b6169f928ee4dcb` 已删除旧 `entity_catalog.rs` 并迁出最后三条 R6 read owner；`player_catalog.rs` 的 Match/Lineup 职责留给 R7。
+- 最终出口 run `32276040092`：Windows job `96143592950` 与 PostgreSQL 16 job `96143592734` 均 `SUCCESS`。R6 正式 `DONE`，R7 开放。
 
 ## R6-10 当前事实
 
