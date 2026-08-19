@@ -1,0 +1,319 @@
+name: R6-09 AT3 team force delete
+
+on:
+  push:
+    branches:
+      - rewrite/r6-entity-catalog-persistence
+
+permissions:
+  contents: write
+
+concurrency:
+  group: r6-09-at3
+  cancel-in-progress: true
+
+env:
+  RUSTUP_TOOLCHAIN: "1.88.0"
+
+jobs:
+  implement:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 60
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: football_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres -d football_test"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 20
+    env:
+      FOOTBALL_TEST_DATABASE_URL: postgres://postgres:postgres@127.0.0.1:5432/football_test
+    outputs:
+      production_sha: ${{ steps.publish.outputs.production_sha }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: rewrite/r6-entity-catalog-persistence
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - uses: dtolnay/rust-toolchain@1.88.0
+        with:
+          components: rustfmt, clippy
+
+      - name: Verify AT3 protected input
+        shell: bash
+        run: |
+          set -euo pipefail
+          git merge-base --is-ancestor 215fd8060685534ec994b8dd1e05d966e492e579 HEAD
+          test "$(git hash-object crates/persistence-postgres/src/team_force_delete.rs)" = "ec0fd77103c90b94a7eeef7e769c5b17b88f6915"
+          test "$(git hash-object crates/persistence-postgres/src/adapters/catalog/deletion/mod.rs)" = "96173619663878068fe9b0a89ed10eba7c2e3385"
+          test "$(git hash-object crates/persistence-postgres/src/lib.rs)" = "1c84895602589173ef116b688d9ab37e0d16b543"
+          test -f scripts/r6-09-at3-apply.py
+          test ! -e crates/persistence-postgres/src/adapters/catalog/deletion/force_delete
+          test ! -e crates/persistence-postgres/tests/team_force_delete_repository_contract.rs
+
+      - name: Apply AT3 owner switch and contract first
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 -m py_compile scripts/r6-09-at3-apply.py
+          python3 scripts/r6-09-at3-apply.py
+          cargo fmt --all
+          git diff --check
+
+      - name: AT3 minimum static gates
+        shell: bash
+        run: |
+          set -euo pipefail
+          node scripts/verify-entity-deletion-persistence.mjs
+          node scripts/verify-force-team-delete.mjs
+          node scripts/verify-entity-deletion.mjs
+          node scripts/verify-team-player-management.mjs
+          node scripts/verify-team-directory-detail.mjs
+          node scripts/verify-team-names-profiles.mjs
+          node scripts/verify-player-directory-detail.mjs
+          npm run verify:architecture
+          node scripts/verify-public-model-boundary.mjs
+          node scripts/verify-protected-assets-deterministic.mjs
+          cargo fmt --all -- --check
+          cargo check --locked -p football-persistence-postgres
+          cargo test --locked -p football-persistence-postgres --lib
+          cargo test --locked -p football-persistence-postgres --test team_force_delete_repository_contract --no-run
+          cargo check --locked -p football-application
+          git diff --check
+
+      - name: AT1 AT2 AT3 PostgreSQL 16 contracts
+        shell: bash
+        run: |
+          set -euo pipefail
+          cargo test --locked -p football-persistence-postgres --test entity_deletion_repository_contract -- --ignored --test-threads=1
+          cargo test --locked -p football-persistence-postgres --test entity_permanent_delete_repository_contract -- --ignored --test-threads=1
+          cargo test --locked -p football-persistence-postgres --test team_force_delete_repository_contract -- --ignored --test-threads=1
+
+      - name: Record AT3 verifying state
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          from pathlib import Path
+
+          def replace_once(path, old, new):
+              p = Path(path)
+              text = p.read_text(encoding='utf-8')
+              if text.count(old) != 1:
+                  raise SystemExit(f'{path}: documentation anchor mismatch')
+              p.write_text(text.replace(old, new, 1), encoding='utf-8', newline='\n')
+
+          detail = Path('docs/modular-rewrite/R06-entity-catalog-persistence/R06-09-archive-delete-and-force-delete.md')
+          text = detail.read_text(encoding='utf-8')
+          if '## Atomic Task 3 — Team Force Delete' in text:
+              raise SystemExit('AT3 detail record already exists')
+          text += '''\n\n## Atomic Task 3 — Team Force Delete\n\n**状态：VERIFYING**\n\n- `preview_force_delete_team` / `force_delete_team` 已从旧 `team_force_delete.rs` 迁入 `adapters/catalog/deletion/force_delete/`，按 `operation`、`targets`、`counts`、`execute` 分责；协调器 SQL-free，目标闭包、影响统计与破坏性写入保持单一明确 owner。\n- 事务边界、完整球队名称确认、`football.force_purge` 事务本地权限、删除顺序、审计墓碑、返回的球队/球员/教练/比赛/导入批次 ID 与影响计数语义均保持不变；公共 Port/DTO/命令/API/UI、Schema/0001–0046 migrations 与配置未改变，无新增生产依赖。\n- 新增 PostgreSQL 16 contract 覆盖预检、错误确认回滚、受引用球员/球队强制清除、external-ID 清理、审计墓碑与无关 provider 保留。AT3 Minimum Gate 与 focused PostgreSQL 16 contracts 已通过；完整 Windows Stage Regression 与 R6 retained PostgreSQL contracts 尚待本 workflow 后续 jobs，在成功前 AT3/R6-09 不关闭。\n'''
+          detail.write_text(text, encoding='utf-8', newline='\n')
+
+          replace_once(
+              'docs/modular-rewrite/R06-entity-catalog-persistence/README.md',
+              '- Atomic Task 1：Preflight / Reference Counts / Archive 已 `DONE` 并保留既有 PostgreSQL 16 / Windows 验收证据。Atomic Task 2：Safe Permanent Delete 生产提交 `eca85a92d30cdf83e6b9f3f1b341874a0e9fba01` 已通过 Minimum Gate、完整 Windows Stage Regression 与 R6-01～R6-09 retained PostgreSQL 16 contracts并独立关闭；Team Force Delete 尚未迁移，R6-09 继续 `IN_PROGRESS`，R6-10 继续 `BLOCKED`。',
+              '- Atomic Task 1/2 已 `DONE` 并保留既有 PostgreSQL 16 / Windows 验收证据。Atomic Task 3：Team Force Delete 已完成模块 owner switch、Minimum Gate 与 AT1/AT2/AT3 focused PostgreSQL 16 contracts，当前等待完整 Windows Stage Regression 与 R6 retained PostgreSQL contracts；R6-09 继续 `IN_PROGRESS`，R6-10 继续 `BLOCKED`。',
+          )
+          replace_once(
+              'README.md',
+              '- Atomic Task 1 已将 deletion preflight/reference-count 与 archive persistence 收敛到 `adapters/catalog/deletion/{preflight,archive}/`；协调器 SQL-free，引用统计、标签读取与归档事务由具名 I/O owner 承担。普通永久 Delete 与 Team Force Delete 暂保留原 owner，等待本节点后续 Atomic Task，未提前混改。',
+              '- R6-09 deletion persistence 已按职责收敛：AT1 `preflight/archive`、AT2 `bulk_delete/safe_delete/delete_write`、AT3 `force_delete/{operation,targets,counts,execute}`；各协调器保持 SQL-free，引用读取、事务写入、强制清除目标闭包、影响统计与破坏性执行均由明确 I/O owner 承担。',
+          )
+          replace_once(
+              'README.md',
+              '- `EntityReferencePort`、Domain DTO、Schema/0001–0046 migrations、错误语义、历史 P4/运行引用保护、无引用永久删除和 force purge 行为均未改变；无新增生产依赖。AT1 已正式 `DONE` 并保留 PostgreSQL 16 / Windows 成功证据。AT2 已将普通安全永久删除迁入 deletion adapter；生产提交 `eca85a92d30cdf83e6b9f3f1b341874a0e9fba01` 的 Minimum Gate、完整 Windows Stage Regression 与 R6-01～R6-09 retained PostgreSQL 16 contracts全部通过。AT1/AT2 均已独立关闭，R6-09 继续 `IN_PROGRESS`，下一 Atomic Task 为 Team Force Delete。',
+              '- `EntityReferencePort`、Domain DTO、Schema/0001–0046 migrations、配置、错误语义、安全确认、历史 P4/运行引用保护、普通永久删除和 force purge 用户可观察行为均未改变；无新增生产依赖。AT1/AT2 已独立关闭。AT3 Team Force Delete 已完成 owner switch、Minimum Gate 与 focused PostgreSQL 16 contracts；完整 Windows Stage Regression / R6 retained PostgreSQL contracts 尚待本 workflow 后续 jobs，R6-09 继续 `IN_PROGRESS`。',
+          )
+          PY
+          rm -f scripts/r6-09-at3-apply.py
+          git diff --check
+
+      - name: Publish AT3 production commit
+        id: publish
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A -- ':!.github/workflows/r6-09-at3.yml'
+          test -n "$(git diff --cached --name-only)"
+          test "$(git diff --cached --name-only | grep -c '^crates/persistence-postgres/src/team_force_delete.rs$' || true)" = "1"
+          test "$(git diff --cached --name-only | grep -c '^crates/persistence-postgres/migrations/' || true)" = "0"
+          test "$(git diff --cached --name-only | grep -c '^crates/domain/' || true)" = "0"
+          test "$(git diff --cached --name-only | grep -c '^src/' || true)" = "0"
+          test "$(git diff --cached --name-only | grep -c '^src-tauri/' || true)" = "0"
+          git diff --cached --check
+          git commit -m "refactor(r6-09): modularize team force deletion"
+          production_sha=$(git rev-parse HEAD)
+          echo "production_sha=$production_sha" >> "$GITHUB_OUTPUT"
+          git push origin HEAD:rewrite/r6-entity-catalog-persistence
+
+  windows-stage:
+    needs: implement
+    runs-on: windows-2025-vs2026
+    timeout-minutes: 75
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ needs.implement.outputs.production_sha }}
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - uses: dtolnay/rust-toolchain@1.88.0
+        with:
+          components: rustfmt, clippy
+      - name: Stage regression
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          npm run setup
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          npm run verify:frontend
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          cargo fmt --all -- --check
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          cargo clippy --locked --workspace --all-targets -- -D warnings
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          cargo test --locked --workspace
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          git diff --check
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+
+  postgres-retained:
+    needs: implement
+    runs-on: ubuntu-24.04
+    timeout-minutes: 60
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: football_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres -d football_test"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 20
+    env:
+      FOOTBALL_TEST_DATABASE_URL: postgres://postgres:postgres@127.0.0.1:5432/football_test
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ needs.implement.outputs.production_sha }}
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - uses: dtolnay/rust-toolchain@1.88.0
+        with:
+          components: rustfmt, clippy
+      - name: Frozen architecture and database baseline
+        shell: bash
+        run: |
+          set -euo pipefail
+          npm run verify:architecture
+          node scripts/verify-public-model-boundary.mjs
+          node scripts/verify-protected-assets-deterministic.mjs
+          node scripts/verify_database_baseline.mjs
+      - name: R6 retained PostgreSQL 16 contracts
+        shell: bash
+        run: |
+          set -euo pipefail
+          for contract in \
+            team_directory_detail_repository_contract \
+            team_names_profiles_repository_contract \
+            player_directory_detail_repository_contract \
+            player_names_positions_repository_contract \
+            player_team_periods_availability_repository_contract \
+            player_abilities_dynamic_tags_repository_contract \
+            coach_formation_repository_contract \
+            entity_matching_references_repository_contract \
+            entity_deletion_repository_contract \
+            entity_permanent_delete_repository_contract \
+            team_force_delete_repository_contract
+          do
+            cargo test --locked -p football-persistence-postgres --test "$contract" -- --ignored --test-threads=1
+          done
+
+  finalize:
+    if: ${{ always() && needs.implement.result == 'success' && needs.windows-stage.result == 'success' && needs.postgres-retained.result == 'success' }}
+    needs: [implement, windows-stage, postgres-retained]
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: rewrite/r6-entity-catalog-persistence
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+      - name: Close AT3 and R6-09
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          from pathlib import Path
+          prod = '${{ needs.implement.outputs.production_sha }}'
+          run_id = '${{ github.run_id }}'
+
+          detail = Path('docs/modular-rewrite/R06-entity-catalog-persistence/R06-09-archive-delete-and-force-delete.md')
+          text = detail.read_text(encoding='utf-8')
+          if text.count('**状态：VERIFYING**') != 1:
+              raise SystemExit('AT3 status anchor mismatch')
+          text = text.replace('**状态：VERIFYING**', '**状态：DONE**', 1)
+          old = '- 新增 PostgreSQL 16 contract 覆盖预检、错误确认回滚、受引用球员/球队强制清除、external-ID 清理、审计墓碑与无关 provider 保留。AT3 Minimum Gate 与 focused PostgreSQL 16 contracts 已通过；完整 Windows Stage Regression 与 R6 retained PostgreSQL contracts 尚待本 workflow 后续 jobs，在成功前 AT3/R6-09 不关闭。'
+          new = f'- AT3 生产提交 `{prod}`：Minimum Gate、AT1/AT2/AT3 focused PostgreSQL 16 contracts、完整 Windows Stage Regression 与 R6-01～R6-09 retained PostgreSQL 16 contracts全部通过（workflow run `{run_id}`）。新增 contract 实际覆盖预检、错误确认回滚、受引用球员/球队强制清除、external-ID 清理、审计墓碑与无关 provider 保留。AT3 与 R6-09 已关闭。'
+          if text.count(old) != 1:
+              raise SystemExit('AT3 detail final anchor mismatch')
+          text = text.replace(old, new, 1)
+          if text.count('`IN_PROGRESS`') != 1:
+              raise SystemExit('R6-09 task status anchor mismatch')
+          text = text.replace('`IN_PROGRESS`', '`DONE`', 1)
+          detail.write_text(text, encoding='utf-8', newline='\n')
+
+          stage = Path('docs/modular-rewrite/R06-entity-catalog-persistence/README.md')
+          text = stage.read_text(encoding='utf-8')
+          old = '- Atomic Task 1/2 已 `DONE` 并保留既有 PostgreSQL 16 / Windows 验收证据。Atomic Task 3：Team Force Delete 已完成模块 owner switch、Minimum Gate 与 AT1/AT2/AT3 focused PostgreSQL 16 contracts，当前等待完整 Windows Stage Regression 与 R6 retained PostgreSQL contracts；R6-09 继续 `IN_PROGRESS`，R6-10 继续 `BLOCKED`。'
+          new = f'- Atomic Task 1/2/3 均已 `DONE`。AT3 生产提交 `{prod}` 的 Minimum Gate、完整 Windows Stage Regression 与 R6-01～R6-09 retained PostgreSQL 16 contracts全部通过（workflow run `{run_id}`）；R6-09 正式关闭，R6-10 Global Name Search 开放为 `READY`。'
+          if text.count(old) != 1:
+              raise SystemExit('stage AT3 final anchor mismatch')
+          text = text.replace(old, new, 1)
+          if text.count('| R6-09 | Archive / Delete / Force Delete | IN_PROGRESS |') != 1:
+              raise SystemExit('stage R6-09 table anchor mismatch')
+          text = text.replace('| R6-09 | Archive / Delete / Force Delete | IN_PROGRESS |', '| R6-09 | Archive / Delete / Force Delete | DONE |', 1)
+          if text.count('| R6-10 | Global Name Search | BLOCKED |') != 1:
+              raise SystemExit('stage R6-10 table anchor mismatch')
+          text = text.replace('| R6-10 | Global Name Search | BLOCKED |', '| R6-10 | Global Name Search | READY |', 1)
+          stage.write_text(text, encoding='utf-8', newline='\n')
+
+          root = Path('README.md')
+          text = root.read_text(encoding='utf-8')
+          old = '- `EntityReferencePort`、Domain DTO、Schema/0001–0046 migrations、配置、错误语义、安全确认、历史 P4/运行引用保护、普通永久删除和 force purge 用户可观察行为均未改变；无新增生产依赖。AT1/AT2 已独立关闭。AT3 Team Force Delete 已完成 owner switch、Minimum Gate 与 focused PostgreSQL 16 contracts；完整 Windows Stage Regression / R6 retained PostgreSQL contracts 尚待本 workflow 后续 jobs，R6-09 继续 `IN_PROGRESS`。'
+          new = f'- `EntityReferencePort`、Domain DTO、Schema/0001–0046 migrations、配置、错误语义、安全确认、历史 P4/运行引用保护、普通永久删除和 force purge 用户可观察行为均未改变；无新增生产依赖。AT1/AT2/AT3 均已独立验证并关闭；AT3 生产提交 `{prod}` 的 Minimum Gate、完整 Windows Stage Regression 与 R6-01～R6-09 retained PostgreSQL 16 contracts全部通过（workflow run `{run_id}`）。R6-09 正式 `DONE`，R6-10 开放为 `READY`；用户现有 PostgreSQL 数据真实 sample/write 与 Windows Full 人工交互验收仍保留到最终统一验收。'
+          if text.count(old) != 1:
+              raise SystemExit('root AT3 final anchor mismatch')
+          root.write_text(text.replace(old, new, 1), encoding='utf-8', newline='\n')
+          PY
+          rm -f .github/workflows/r6-09-at3.yml
+          git diff --check
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add README.md docs/modular-rewrite/R06-entity-catalog-persistence/README.md docs/modular-rewrite/R06-entity-catalog-persistence/R06-09-archive-delete-and-force-delete.md .github/workflows/r6-09-at3.yml
+          git commit -m "docs(r6-09): close force-delete task"
+          git push origin HEAD:rewrite/r6-entity-catalog-persistence
