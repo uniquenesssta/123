@@ -1,0 +1,80 @@
+name: R6-09 AT1 documentation closeout
+
+on:
+  push:
+    branches:
+      - rewrite/r6-entity-catalog-persistence
+
+permissions:
+  contents: write
+
+concurrency:
+  group: r6-09-at1-doc-closeout
+  cancel-in-progress: false
+
+jobs:
+  closeout:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: rewrite/r6-entity-catalog-persistence
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+      - name: Update AT1 closeout records
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          from pathlib import Path
+
+          def replace_once(path: str, old: str, new: str) -> None:
+              p = Path(path)
+              text = p.read_text(encoding="utf-8")
+              count = text.count(old)
+              if count != 1:
+                  raise SystemExit(f"{path}: expected one closeout anchor, found {count}")
+              p.write_text(text.replace(old, new, 1), encoding="utf-8", newline="\n")
+
+          root_old = """- `EntityReferencePort`、Domain DTO、Schema/0001–0046 migrations、错误语义、历史 P4/运行引用保护、无引用永久删除和 force purge 行为均未改变；无新增生产依赖。AT1 Minimum Gate 已实际通过，Stage Regression / PostgreSQL 16 真实 contract 尚待本次 workflow 后续 jobs，R6-09 整体仍为 `IN_PROGRESS`。"""
+          root_new = """- `EntityReferencePort`、Domain DTO、Schema/0001–0046 migrations、错误语义、历史 P4/运行引用保护、无引用永久删除和 force purge 行为均未改变；无新增生产依赖。AT1 已正式 `DONE`：PostgreSQL 16 contract run `32219150263` / job `95967398924` 为 `SUCCESS`；最终 Windows Stage Regression run `32220581584` / job `95970175840` 为 `SUCCESS`，实际通过完整 frontend、rustfmt、workspace Clippy `-D warnings`、workspace tests 与 diff hygiene。两处历史 verifier 仅把已迁移的 reference-count 检查跟随到 `deletion/preflight/references.rs`，原断言未删除或放宽；临时 retry workflow/markers 已由 cleanup commit `0fa05a3b67eb21009b5a56e00cb5b365fd0e66b5` 清理。R6-09 整体继续 `IN_PROGRESS`，普通永久 Delete 与 Team Force Delete 留待后续 Atomic Task。"""
+          replace_once("README.md", root_old, root_new)
+
+          stage_old = """- Atomic Task 1：Preflight / Reference Counts / Archive owner switch 已完成 Minimum Gate，节点整体继续 `IN_PROGRESS`；普通永久 Delete 与 Team Force Delete 尚未迁移，R6-10 继续 `BLOCKED`。"""
+          stage_new = """- Atomic Task 1：Preflight / Reference Counts / Archive 已 `DONE`。PostgreSQL 16 contract run `32219150263` / job `95967398924` 与最终 Windows Stage Regression run `32220581584` / job `95970175840` 均为 `SUCCESS`；两处 retained verifier 仅跟随新的 `deletion/preflight/references.rs` owner，原断言保持。临时 retry workflow/markers 已清理。R6-09 节点整体继续 `IN_PROGRESS`；普通永久 Delete 与 Team Force Delete 尚未迁移，R6-10 继续 `BLOCKED`。"""
+          replace_once("docs/modular-rewrite/R06-entity-catalog-persistence/README.md", stage_old, stage_new)
+
+          task_path = "docs/modular-rewrite/R06-entity-catalog-persistence/R06-09-archive-delete-and-force-delete.md"
+          task_heading_old = """## Atomic Task 1 — Preflight / Reference Counts / Archive
+
+"""
+          task_heading_new = """## Atomic Task 1 — Preflight / Reference Counts / Archive
+
+**状态：DONE**
+
+"""
+          replace_once(task_path, task_heading_old, task_heading_new)
+
+          task_gate_old = """- Stage Regression 与 PostgreSQL 16 真实 contract 由本 workflow 后续独立 jobs 执行；在成功前 AT1 不关闭。"""
+          task_gate_new = """- PostgreSQL 16 真实 contract：run `32219150263` / job `95967398924` 为 `SUCCESS`。
+- Windows Stage Regression 首轮 run `32219150263` / job `95967398932` 因历史 `verify-match-review-package.mjs` 仍读取旧 `entity_catalog.rs` fail-fast；第一次 retry run `32220406479` / job `95969707027` 又发现 `verify-stage-e2-lineup-presets.mjs` 仍绑定旧 owner。两处只将原 reference-count 断言跟随到 `adapters/catalog/deletion/preflight/references.rs`，未删除、跳过或放宽门禁。
+- 最终 Windows retry run `32220581584` / job `95970175840` 为 `SUCCESS`：AT1 current-head verifier、`npm run verify:frontend`、rustfmt、workspace Clippy `-D warnings`、workspace tests 与 `git diff --check` 全部实际通过。AT1 据此关闭为 `DONE`。"""
+          replace_once(task_path, task_gate_old, task_gate_new)
+
+          task_cleanup_old = """- 删除/移动：AT1 无生产文件删除；临时 workflow/helper 在提交时清理。"""
+          task_cleanup_new = """- 删除/移动：AT1 无生产文件删除；临时 retry workflow、failure/run marker 已由 cleanup commit `0fa05a3b67eb21009b5a56e00cb5b365fd0e66b5` 清理。"""
+          replace_once(task_path, task_cleanup_old, task_cleanup_new)
+          PY
+
+          rm -f .github/workflows/r6-09-at1-doc-closeout.yml
+          git diff --check
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add README.md \
+            docs/modular-rewrite/R06-entity-catalog-persistence/README.md \
+            docs/modular-rewrite/R06-entity-catalog-persistence/R06-09-archive-delete-and-force-delete.md \
+            .github/workflows/r6-09-at1-doc-closeout.yml
+          git commit -m "docs(r6-09): close AT1 verification record"
+          git push origin HEAD:rewrite/r6-entity-catalog-persistence
