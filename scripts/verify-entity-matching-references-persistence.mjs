@@ -17,8 +17,11 @@ for (const name of ["list_entity_references", "resolve_entity_reference", "creat
 }
 for (const name of ["list_entity_references", "resolve_entity_reference"]) req(!entity.includes(`pub async fn ${name}`), `entity_catalog legacy owner remains: ${name}`);
 for (const name of ["create_data_provider", "list_data_providers", "add_external_entity_id"]) req(!player.includes(`pub async fn ${name}`), `player_catalog legacy owner remains: ${name}`);
-req(entity.includes("pub async fn check_entity_deletion") && entity.includes("pub async fn bulk_archive_entities"), "R6-09 deletion/archive moved early");
-req(entity.includes("team_reference_counts") && entity.includes("player_reference_counts") && entity.includes("coach_reference_counts"), "R6-09 reference-count owner moved early");
+const deletionCheck = read("crates/persistence-postgres/src/adapters/catalog/deletion/preflight/check.rs");
+const deletionRefs = read("crates/persistence-postgres/src/adapters/catalog/deletion/preflight/references.rs");
+const deletionArchive = read("crates/persistence-postgres/src/adapters/catalog/deletion/archive/bulk.rs");
+req(!entity.includes("pub async fn check_entity_deletion") && !entity.includes("pub async fn bulk_archive_entities") && deletionCheck.includes("pub async fn check_entity_deletion") && deletionArchive.includes("pub async fn bulk_archive_entities"), "R6-09 AT1 deletion/archive ownership invalid");
+req(!entity.includes("team_reference_counts") && deletionRefs.includes("team_reference_counts") && deletionRefs.includes("player_reference_counts") && deletionRefs.includes("coach_reference_counts"), "R6-09 AT1 reference-count ownership invalid");
 const resolve = read(`${matchingRoot}resolve.rs`);
 const list = read(`${referencesRoot}directory/list.rs`);
 req(!resolve.includes("sqlx::") && !resolve.includes("SELECT ") && !list.includes("sqlx::") && !list.includes("SELECT "), "R6-08 coordinator owns SQL");

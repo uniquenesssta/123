@@ -44,6 +44,11 @@ Node 开发依赖固定安装和读取自源码根目录上一级的 `../node_mo
 ## 模块化重写执行记录
 
 
+### R6-09 Archive / Delete / Force Delete
+
+- Atomic Task 1 已将 deletion preflight/reference-count 与 archive persistence 收敛到 `adapters/catalog/deletion/{preflight,archive}/`；协调器 SQL-free，引用统计、标签读取与归档事务由具名 I/O owner 承担。普通永久 Delete 与 Team Force Delete 暂保留原 owner，等待本节点后续 Atomic Task，未提前混改。
+- `EntityReferencePort`、Domain DTO、Schema/0001–0046 migrations、错误语义、历史 P4/运行引用保护、无引用永久删除和 force purge 行为均未改变；无新增生产依赖。AT1 Minimum Gate 已实际通过，Stage Regression / PostgreSQL 16 真实 contract 尚待本次 workflow 后续 jobs，R6-09 整体仍为 `IN_PROGRESS`。
+
 ### R6-08 Entity Matching 与 References
 
 - Entity Matching persistence 已收敛到 `adapters/catalog/entity_matching/`，References persistence 已收敛到 `adapters/catalog/references/`；stable-ID/external-ID/name candidate read、reference directory、provider 与 external-ID writes 均按职责拆分，协调器保持 SQL-free。`entity_catalog.rs` 继续只持有 R6-09 deletion/archive/reference-count，`player_catalog.rs` 不再持有 provider/external-ID owner。

@@ -1,6 +1,7 @@
 mod abilities;
 mod availability;
 mod coaches;
+mod deletion;
 mod dynamic_tags;
 mod entity_matching;
 mod formations;

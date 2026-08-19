@@ -25,7 +25,7 @@ R6 按 Teams、Players、Coaches、Formations、Abilities、Dynamic Tags、Avail
 | R6-06 | Abilities 与 Dynamic Tags | DONE |
 | R6-07 | Coaches 与 Formation Usage | DONE |
 | R6-08 | Entity Matching 与 References | DONE |
-| R6-09 | Archive / Delete / Force Delete | READY |
+| R6-09 | Archive / Delete / Force Delete | IN_PROGRESS |
 | R6-10 | Global Name Search | BLOCKED |
 
 ## R6-01 当前事实
@@ -113,3 +113,8 @@ R6 按 Teams、Players、Coaches、Formations、Abilities、Dynamic Tags、Avail
 - 生产 owner-switch 提交 `89dfbb101989116b5c858dbb8dc4564c50f86f9d` 已通过 implementation/minimum gate；首轮 hard gate `32142895608` 仅因 Ubuntu Chrome zygote 截图环境失败而停止，未放宽任何产品门禁。
 - 最终 hard gate run `32143394153` 整体 `SUCCESS`：Windows job `95731216023` 已通过 frontend、rustfmt、workspace Clippy `-D warnings` 与 workspace tests；PostgreSQL 16 job `95731215987` 已通过 official inventory、R6 retained ownership、完整 architecture、模型保护/database baseline 及 R6-03～R6-08 真实 PostgreSQL contracts。
 - 临时 gate/closeout 文件已清理。R6-08 正式 `DONE`，R6-09 Archive / Delete / Force Delete 开放为 `READY`。用户现有 PostgreSQL 数据真实 sample/write 与 Windows Full 人工交互验收继续留到最终统一验收。
+
+## R6-09 当前事实
+
+- 详细记录：[`R06-09-archive-delete-and-force-delete.md`](R06-09-archive-delete-and-force-delete.md)。
+- Atomic Task 1：Preflight / Reference Counts / Archive owner switch 已完成 Minimum Gate，节点整体继续 `IN_PROGRESS`；普通永久 Delete 与 Team Force Delete 尚未迁移，R6-10 继续 `BLOCKED`。

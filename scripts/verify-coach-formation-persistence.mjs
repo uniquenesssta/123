@@ -18,7 +18,8 @@ for (const name of ["create_coach","list_coaches","read_coach","add_coach_name",
   req(!entity.includes(`pub async fn ${name}`), `coach legacy owner remains: ${name}`);
 }
 for (const name of ["list_formations","save_formation_usage_distribution","list_formation_usage_distributions","resolve_formation_distribution"]) req((all.match(new RegExp(`pub async fn ${name}\\b`, "g")) || []).length === 1, `formation owner count invalid: ${name}`);
-req(!entity.includes("pub async fn list_entity_references") && !entity.includes("pub async fn resolve_entity_reference") && entity.includes("pub async fn bulk_archive_entities"), "R6-08 ownership switch incomplete or R6-09 ownership moved early");
+const deletionArchive = read("crates/persistence-postgres/src/adapters/catalog/deletion/archive/bulk.rs");
+req(!entity.includes("pub async fn list_entity_references") && !entity.includes("pub async fn resolve_entity_reference") && !entity.includes("pub async fn bulk_archive_entities") && deletionArchive.includes("pub async fn bulk_archive_entities"), "R6-08 retained ownership or R6-09 AT1 archive owner invalid");
 req(!read(`${coachRoot}mod.rs`).includes("sqlx::") && !read(`${formationRoot}mod.rs`).includes("sqlx::"), "module export file owns SQL");
 for (const required of [
   `${formationRoot}resolution/read.rs`,

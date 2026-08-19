@@ -24,13 +24,13 @@
     "targetPublicExportPolicy": "explicit re-export only"
   },
   "sourceDigest": "217241ac243726a5ab6805a7f169e222b97e78c7c971749a5904714af673ebdd",
-  "rustUsageDigest": "d3202d85772c23a9d410a238957d0cce370ec00a2c3f6e1d505d24364ebcb623",
+  "rustUsageDigest": "8044ec133f648ae35eb63499f890b91ab4a9ffb15ec91e5522c6c170cc0598ae",
   "summary": {
     "typeCount": 365,
     "publicCompatibilityTypeCount": 365,
     "internalTypeCount": 0,
     "domainSourceFileCount": 129,
-    "scannedRustFileCount": 934,
+    "scannedRustFileCount": 944,
     "databaseMappedTypeCount": 299,
     "byTargetModule": {
       "ai_workspace": 16,
@@ -3330,10 +3330,10 @@
         "crates/domain/tests/serde_contracts/module_paths.rs"
       ],
       "externalCallers": [
-        "crates/persistence-postgres/src/entity_catalog.rs"
+        "crates/persistence-postgres/src/adapters/catalog/deletion/archive/bulk.rs"
       ],
       "databaseMappings": [
-        "crates/persistence-postgres/src/entity_catalog.rs"
+        "crates/persistence-postgres/src/adapters/catalog/deletion/archive/bulk.rs"
       ]
     },
     {
@@ -3400,11 +3400,11 @@
         "crates/application/src/services/players/facade.rs",
         "crates/application/src/services/players/service.rs",
         "crates/application/src/use_cases/players/bulk_archive_entities/mod.rs",
-        "crates/persistence-postgres/src/entity_catalog.rs",
+        "crates/persistence-postgres/src/adapters/catalog/deletion/archive/bulk.rs",
         "src-tauri/src/commands/catalog.rs"
       ],
       "databaseMappings": [
-        "crates/persistence-postgres/src/entity_catalog.rs"
+        "crates/persistence-postgres/src/adapters/catalog/deletion/archive/bulk.rs"
       ]
     },
     {
@@ -6274,11 +6274,11 @@
         "crates/application/src/services/players/facade.rs",
         "crates/application/src/services/players/service.rs",
         "crates/application/src/use_cases/players/check_entity_deletion/mod.rs",
-        "crates/persistence-postgres/src/entity_catalog.rs",
+        "crates/persistence-postgres/src/adapters/catalog/deletion/preflight/check.rs",
         "src-tauri/src/commands/catalog.rs"
       ],
       "databaseMappings": [
-        "crates/persistence-postgres/src/entity_catalog.rs"
+        "crates/persistence-postgres/src/adapters/catalog/deletion/preflight/check.rs"
       ]
     },
     {
@@ -6557,11 +6557,11 @@
         "crates/domain/tests/serde_contracts/module_paths.rs"
       ],
       "externalCallers": [
-        "crates/persistence-postgres/src/entity_catalog.rs",
+        "crates/persistence-postgres/src/adapters/catalog/deletion/preflight/references.rs",
         "crates/persistence-postgres/src/team_force_delete.rs"
       ],
       "databaseMappings": [
-        "crates/persistence-postgres/src/entity_catalog.rs",
+        "crates/persistence-postgres/src/adapters/catalog/deletion/preflight/references.rs",
         "crates/persistence-postgres/src/team_force_delete.rs"
       ]
     },
@@ -18283,6 +18283,7 @@
         "crates/persistence-postgres/src/adapters/catalog/players/directory/create_player.rs",
         "crates/persistence-postgres/src/adapters/catalog/players/directory/input_policy.rs",
         "crates/persistence-postgres/src/adapters/catalog/players/directory/update_player.rs",
+        "crates/persistence-postgres/tests/entity_deletion_repository_contract.rs",
         "crates/persistence-postgres/tests/entity_matching_references_repository_contract.rs",
         "crates/persistence-postgres/tests/player_abilities_dynamic_tags_repository_contract.rs",
         "crates/persistence-postgres/tests/player_directory_detail_repository_contract.rs",
@@ -20236,6 +20237,7 @@
       "externalCallers": [
         "crates/persistence-postgres/src/adapters/catalog/players/value_mapping.rs",
         "crates/persistence-postgres/src/player_catalog.rs",
+        "crates/persistence-postgres/tests/entity_deletion_repository_contract.rs",
         "crates/persistence-postgres/tests/entity_matching_references_repository_contract.rs",
         "crates/persistence-postgres/tests/player_abilities_dynamic_tags_repository_contract.rs",
         "crates/persistence-postgres/tests/player_directory_detail_repository_contract.rs",
@@ -20335,6 +20337,7 @@
         "crates/application/src/use_cases/players/add_player_team_period/mod.rs",
         "crates/persistence-postgres/src/adapters/catalog/players/team_periods/add_player_team_period.rs",
         "crates/persistence-postgres/src/adapters/catalog/players/team_periods/input_policy.rs",
+        "crates/persistence-postgres/tests/entity_deletion_repository_contract.rs",
         "crates/persistence-postgres/tests/player_directory_detail_repository_contract.rs",
         "crates/persistence-postgres/tests/player_team_periods_availability_repository_contract.rs",
         "src-tauri/src/commands/catalog.rs"
@@ -21674,6 +21677,7 @@
       "externalCallers": [
         "crates/persistence-postgres/src/adapters/catalog/players/value_mapping.rs",
         "crates/persistence-postgres/src/player_catalog.rs",
+        "crates/persistence-postgres/tests/entity_deletion_repository_contract.rs",
         "crates/persistence-postgres/tests/entity_matching_references_repository_contract.rs",
         "crates/persistence-postgres/tests/player_abilities_dynamic_tags_repository_contract.rs",
         "crates/persistence-postgres/tests/player_directory_detail_repository_contract.rs",
@@ -28786,6 +28790,7 @@
         "crates/persistence-postgres/src/adapters/catalog/teams/directory/create_team.rs",
         "crates/persistence-postgres/src/adapters/catalog/teams/directory/update_team.rs",
         "crates/persistence-postgres/tests/coach_formation_repository_contract.rs",
+        "crates/persistence-postgres/tests/entity_deletion_repository_contract.rs",
         "crates/persistence-postgres/tests/entity_matching_references_repository_contract.rs",
         "crates/persistence-postgres/tests/player_directory_detail_repository_contract.rs",
         "crates/persistence-postgres/tests/player_team_periods_availability_repository_contract.rs",

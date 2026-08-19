@@ -36,6 +36,10 @@ const persistence = [
   text("crates/persistence-postgres/src/adapters/catalog/entity_matching/resolve.rs"),
   text("crates/persistence-postgres/src/adapters/catalog/entity_matching/outcome.rs"),
   text("crates/persistence-postgres/src/adapters/catalog/references/directory/list.rs"),
+  text("crates/persistence-postgres/src/adapters/catalog/deletion/preflight/check.rs"),
+  text("crates/persistence-postgres/src/adapters/catalog/deletion/preflight/references.rs"),
+  text("crates/persistence-postgres/src/adapters/catalog/deletion/archive/bulk.rs"),
+  text("crates/persistence-postgres/src/adapters/catalog/deletion/archive/write.rs"),
 ].join("\n");
 const teamPersistence = text("crates/persistence-postgres/src/team_catalog.rs");
 const teamProfileWrite = text("crates/persistence-postgres/src/adapters/catalog/teams/profiles/upsert_team_profile.rs");

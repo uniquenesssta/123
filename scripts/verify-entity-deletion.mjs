@@ -9,7 +9,12 @@ const failures = [];
 const requireTrue = (condition, message) => { if (!condition) failures.push(message); };
 
 const teamPersistence = text("crates/persistence-postgres/src/team_catalog.rs");
-const entityPersistence = text("crates/persistence-postgres/src/entity_catalog.rs");
+const entityPersistence = [
+  text("crates/persistence-postgres/src/adapters/catalog/deletion/preflight/check.rs"),
+  text("crates/persistence-postgres/src/adapters/catalog/deletion/preflight/references.rs"),
+  text("crates/persistence-postgres/src/adapters/catalog/deletion/archive/bulk.rs"),
+  text("crates/persistence-postgres/src/adapters/catalog/deletion/archive/write.rs"),
+].join("\n");
 const main = text("src/main.ts");
 const client = text("src/api/client.ts");
 const teams = text("src/pages/teams.ts");
