@@ -1,0 +1,195 @@
+name: R6 Stage Exit Visibility Retry
+
+on:
+  push:
+    branches:
+      - rewrite/r6-entity-catalog-persistence
+    paths:
+      - .github/workflows/r6-stage-exit-visibility-retry.yml
+
+permissions:
+  contents: write
+  actions: read
+
+concurrency:
+  group: r6-stage-exit-visibility-retry-${{ github.ref }}
+  cancel-in-progress: false
+
+env:
+  R6_BRANCH: rewrite/r6-entity-catalog-persistence
+  R6_BASELINE: 76cb959565a44b6e28485d4c2f880a6ed582e212
+  FOOTBALL_TEST_DATABASE_URL: postgres://postgres:postgres@127.0.0.1:5432/football_test
+
+jobs:
+  verify-and-commit:
+    name: R6 residual owner corrected minimum gate
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: football_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres -d football_test"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ env.R6_BRANCH }}
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - uses: dtolnay/rust-toolchain@1.88.0
+        with:
+          components: rustfmt, clippy
+
+      - name: Confirm protected baseline and residual owners
+        shell: bash
+        run: |
+          set -euo pipefail
+          git merge-base --is-ancestor "$R6_BASELINE" HEAD
+          test -z "$(git status --short)"
+          test -f scripts/r6-stage-exit-apply.py
+          test -f crates/persistence-postgres/src/entity_catalog.rs
+          grep -q 'pub async fn list_positions' crates/persistence-postgres/src/player_catalog.rs
+          grep -q 'async fn list_season_team_memberships' crates/persistence-postgres/src/player_catalog.rs
+
+      - name: Correct Team Detail visibility in temporary helper
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          from pathlib import Path
+          path = Path('scripts/r6-stage-exit-apply.py')
+          text = path.read_text(encoding='utf-8')
+          old_export = "pub(super) use read::read_player_periods;"
+          new_export = "pub(in crate::adapters::catalog::teams::detail) use read::read_player_periods;"
+          old_fn = "pub(super) async fn read_player_periods("
+          new_fn = "pub(in crate::adapters::catalog::teams::detail) async fn read_player_periods("
+          if old_export not in text or text.count(old_fn) < 1:
+              raise SystemExit('expected Team Detail visibility template not found')
+          text = text.replace(old_export, new_export)
+          text = text.replace(old_fn, new_fn)
+          path.write_text(text, encoding='utf-8')
+          PY
+
+      - name: Apply R6 stage-exit ownership cleanup
+        run: python scripts/r6-stage-exit-apply.py
+      - name: Format before inventory refresh
+        run: cargo fmt --all
+      - name: Refresh official Domain inventory
+        run: node scripts/generate-domain-type-inventory.mjs
+
+      - name: Verify full architecture
+        run: npm run verify:architecture
+      - name: Verify protected model assets
+        run: node scripts/verify_protected_assets.mjs
+      - name: Verify frozen database baseline
+        run: node scripts/verify_database_baseline.mjs
+      - name: Verify official Domain inventory
+        run: node scripts/verify-domain-type-inventory.mjs
+      - name: Check persistence crate
+        run: cargo check --locked -p football-persistence-postgres
+      - name: Run persistence unit tests
+        run: cargo test --locked -p football-persistence-postgres --lib
+
+      - name: PostgreSQL 16 focused R6 contracts
+        shell: bash
+        run: |
+          set -euo pipefail
+          for test_name in \
+            team_directory_detail_repository_contract \
+            player_names_positions_repository_contract \
+            player_team_periods_availability_repository_contract
+          do
+            cargo test --locked -p football-persistence-postgres --test "$test_name" -- --ignored --nocapture
+          done
+
+      - name: Verify exact production scope
+        shell: bash
+        run: |
+          set -euo pipefail
+          git diff --check
+          python - <<'PY'
+          import subprocess
+          allowed = (
+              'README.md',
+              'architecture/domain-type-inventory.json',
+              'crates/persistence-postgres/src/lib.rs',
+              'crates/persistence-postgres/src/entity_catalog.rs',
+              'crates/persistence-postgres/src/player_catalog.rs',
+              'crates/persistence-postgres/src/adapters/catalog/teams/detail/mod.rs',
+              'crates/persistence-postgres/src/adapters/catalog/teams/detail/read_team.rs',
+              'crates/persistence-postgres/src/adapters/catalog/teams/detail/player_periods/',
+              'crates/persistence-postgres/src/adapters/catalog/players/positions/mod.rs',
+              'crates/persistence-postgres/src/adapters/catalog/players/positions/list_positions.rs',
+              'crates/persistence-postgres/src/adapters/catalog/players/positions/reference_mapper.rs',
+              'crates/persistence-postgres/src/adapters/catalog/players/positions/reference_row.rs',
+              'crates/persistence-postgres/src/adapters/catalog/players/team_periods/mod.rs',
+              'crates/persistence-postgres/src/adapters/catalog/players/team_periods/season_memberships/',
+              'crates/persistence-postgres/tests/player_team_periods_availability_repository_contract.rs',
+              'scripts/r6-stage-exit-apply.py',
+              'scripts/verify-player-names-positions.mjs',
+              'scripts/verify-player-team-periods-availability.mjs',
+              'scripts/verify-entity-deletion-persistence.mjs',
+              'docs/modular-rewrite/R06-entity-catalog-persistence/README.md',
+          )
+          changed = subprocess.check_output(['git', 'diff', '--name-only'], text=True).splitlines()
+          unexpected = [p for p in changed if not any(p == a or (a.endswith('/') and p.startswith(a)) for a in allowed)]
+          if unexpected:
+              raise SystemExit('unexpected R6 stage-exit scope: ' + ', '.join(unexpected))
+          print('\n'.join(changed))
+          PY
+
+      - name: Commit verified residual owner cleanup
+        shell: bash
+        run: |
+          set -euo pipefail
+          git rm scripts/r6-stage-exit-apply.py
+          git rm -f .r6-10-verify-success.txt || true
+          git rm -f .r6-stage-exit-failure.txt || true
+          git rm .github/workflows/r6-stage-exit-cleanup.yml
+          git rm .github/workflows/r6-stage-exit-visibility-retry.yml
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git add README.md architecture/domain-type-inventory.json crates/persistence-postgres scripts/verify-player-names-positions.mjs scripts/verify-player-team-periods-availability.mjs scripts/verify-entity-deletion-persistence.mjs docs/modular-rewrite/R06-entity-catalog-persistence/README.md
+          git diff --cached --check
+          git commit -m 'refactor(r6): close residual catalog persistence owners'
+          git push origin HEAD:"$R6_BRANCH"
+
+  record-failure:
+    name: Record corrected R6 stage exit failure
+    needs: verify-and-commit
+    if: ${{ always() && needs.verify-and-commit.result == 'failure' }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ env.R6_BRANCH }}
+          fetch-depth: 0
+      - name: Save failed gate evidence
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          {
+            echo "run_id=$GITHUB_RUN_ID"
+            echo "phase=stage-exit-visibility-retry"
+            echo "head=$(git rev-parse HEAD)"
+            echo
+            gh run view "$GITHUB_RUN_ID" --log-failed 2>&1 || true
+          } > .r6-stage-exit-failure.txt
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git add .r6-stage-exit-failure.txt
+          git commit -m 'ci(r6): record corrected stage exit failure' || true
+          git push origin HEAD:"$R6_BRANCH"
