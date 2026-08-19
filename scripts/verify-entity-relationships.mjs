@@ -29,7 +29,9 @@ const domain = [
   "crates/domain/src/shared/bulk_archive.rs",
 ].map(text).join("\n");
 const persistence = [
-  text("crates/persistence-postgres/src/entity_catalog.rs"),
+  text("crates/persistence-postgres/src/adapters/catalog/teams/detail/player_periods/read.rs"),
+  text("crates/persistence-postgres/src/adapters/catalog/teams/detail/player_periods/row.rs"),
+  text("crates/persistence-postgres/src/adapters/catalog/teams/detail/player_periods/mapper.rs"),
   text("crates/persistence-postgres/src/adapters/catalog/coaches/directory/create.rs"),
   text("crates/persistence-postgres/src/adapters/catalog/coaches/directory/list.rs"),
   text("crates/persistence-postgres/src/adapters/catalog/coaches/team_periods/add.rs"),
@@ -116,13 +118,15 @@ for (const method of [
   assert(persistence.includes(method), `持久化层缺少${method}`);
   assert(application.includes(method), `应用层缺少${method}`);
 }
+assert(!existsSync(join(root, "crates/persistence-postgres/src/entity_catalog.rs")), "R6阶段出口后旧entity_catalog.rs仍存在");
+assert(persistence.includes("FROM football.player_team_periods period"), "球队详情球员履历读取未进入新catalog owner");
 assert(persistence.includes("稳定实体 ID 精确匹配"), "统一匹配缺少稳定ID优先级");
 assert(persistence.includes("受信数据源外部 ID 精确匹配"), "统一匹配缺少外部ID优先级");
 assert(persistence.includes("status: \"ambiguous\""), "统一匹配缺少歧义阻断结果");
 assert(persistence.includes("can_permanently_delete: total == 0"), "永久删除未强制执行引用统计");
 assert(persistence.includes("manual_bulk_archive"), "批量归档缺少审计来源");
 for (const relation of ["player_availability", "substitutions", "dynamic_tag_opponents"]) assert(persistence.includes(`(\"${relation}\"`), `球队或球员引用检查缺少${relation}`);
-assert(teamDetailCoordinator.includes("self.list_team_player_periods(team_id).await?") && teamDetailCoordinator.includes("self.list_team_coach_periods(team_id).await?"), "球队详情未加载完整球员与教练履历");
+assert(teamDetailCoordinator.includes("read_player_periods(&self.pool, team_id).await?") && teamDetailCoordinator.includes("self.list_team_coach_periods(team_id).await?"), "球队详情未加载完整球员与教练履历");
 assert(teamProfileWrite.includes("head_coach=football.team_profiles.head_coach") && teamProfileWrite.includes(".bind(None::<&str>)"), "球队档案写入仍可能覆盖教练任期投影");
 assert(teamPersistence.includes("check_entity_deletion(\"team\""), "球队永久删除未接入统一引用检查");
 assert(!teamPersistence.includes("DELETE FROM football.player_team_periods WHERE team_id=$1"), "球队永久删除仍会主动清理球员履历");
