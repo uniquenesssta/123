@@ -68,13 +68,14 @@ jobs:
           replace_once(task_path, task_cleanup_old, task_cleanup_new)
           PY
 
-          rm -f .github/workflows/r6-09-at1-doc-closeout.yml
+          rm -f .github/workflows/r6-09-at1-doc-closeout.yml .r6-09-doc-closeout-trigger.txt
           git diff --check
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add README.md \
             docs/modular-rewrite/R06-entity-catalog-persistence/README.md \
             docs/modular-rewrite/R06-entity-catalog-persistence/R06-09-archive-delete-and-force-delete.md \
-            .github/workflows/r6-09-at1-doc-closeout.yml
+            .github/workflows/r6-09-at1-doc-closeout.yml \
+            .r6-09-doc-closeout-trigger.txt
           git commit -m "docs(r6-09): close AT1 verification record"
           git push origin HEAD:rewrite/r6-entity-catalog-persistence
