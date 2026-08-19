@@ -11,6 +11,7 @@ on:
 
 permissions:
   contents: write
+  actions: read
 
 concurrency:
   group: r6-stage-exit-cleanup-${{ github.ref }}
@@ -149,9 +150,39 @@ jobs:
           git rm scripts/r6-stage-exit-apply.py
           git rm .github/workflows/r6-stage-exit-cleanup.yml
           git rm -f .r6-10-verify-success.txt || true
+          git rm -f .r6-stage-exit-failure.txt || true
           git config user.name github-actions[bot]
           git config user.email 41898282+github-actions[bot]@users.noreply.github.com
           git add README.md architecture/domain-type-inventory.json crates/persistence-postgres scripts/verify-player-names-positions.mjs scripts/verify-player-team-periods-availability.mjs scripts/verify-entity-deletion-persistence.mjs docs/modular-rewrite/R06-entity-catalog-persistence/README.md
           git diff --cached --check
           git commit -m 'refactor(r6): close residual catalog persistence owners'
+          git push origin HEAD:"$R6_BRANCH"
+
+  record-failure:
+    name: Record R6 stage exit failure
+    needs: cleanup
+    if: ${{ always() && needs.cleanup.result == 'failure' }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ env.R6_BRANCH }}
+          fetch-depth: 0
+      - name: Save failed gate evidence
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          {
+            echo "run_id=$GITHUB_RUN_ID"
+            echo "phase=stage-exit-owner-cleanup"
+            echo "head=$(git rev-parse HEAD)"
+            echo
+            gh run view "$GITHUB_RUN_ID" --log-failed 2>&1 || true
+          } > .r6-stage-exit-failure.txt
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git add .r6-stage-exit-failure.txt
+          git commit -m 'ci(r6): record stage exit cleanup failure' || true
           git push origin HEAD:"$R6_BRANCH"
