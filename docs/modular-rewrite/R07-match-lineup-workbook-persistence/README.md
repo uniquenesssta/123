@@ -37,7 +37,7 @@ crates/persistence-postgres/src/adapters/workbooks/
 
 | 任务 | 范围 | 状态 |
 |---|---|---|
-| R7-01 | Match Catalog | READY |
+| R7-01 | Match Catalog | VERIFYING |
 | R7-02 | Lineup Pair Transaction | BLOCKED |
 | R7-03 | Lineup Chain / History | BLOCKED |
 | R7-04 | Team Lineup Presets | BLOCKED |
@@ -69,3 +69,7 @@ crates/persistence-postgres/src/adapters/workbooks/
 - R7-01 完成时创建 [`R07-01-match-catalog.md`](R07-01-match-catalog.md)，并把 R7-02 切到 `READY`。
 - 后续节点按任务书依次创建对应记录；未完成的记录不提前创建为伪完成文件。
 - 全部 R7-01～R7-10 完成且最终出口门禁通过后才创建 `R07-stage-completion.md`。
+
+## R7-01 当前验证状态
+
+- Match Catalog owner 已切换到 `adapters/matches/catalog/`；节点保持 `VERIFYING`，等待最小门禁、真实 PostgreSQL contract 与阶段回归。

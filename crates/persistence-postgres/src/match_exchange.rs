@@ -7,11 +7,11 @@ use crate::{
 use chrono::{DateTime, NaiveDate, Utc};
 use football_domain::{
     AiMatchPackageContext, AiMatchPlayerContext, AvailabilityStatus, CoachListQuery,
-    MatchLineupExportData, MatchLineupPlayerReference, MatchRecord, MatchStatus,
-    PlayerMatchContributionRequest, SpreadsheetAction, SpreadsheetConflictCandidate,
-    SpreadsheetEntityType, SpreadsheetImportCommitResult, SpreadsheetImportCounts,
-    SpreadsheetImportMode, SpreadsheetImportPreview, SpreadsheetImportResolution,
-    SpreadsheetImportRow, SpreadsheetParsedWorkbook, SpreadsheetRowStatus,
+    MatchLineupExportData, MatchLineupPlayerReference, PlayerMatchContributionRequest,
+    SpreadsheetAction, SpreadsheetConflictCandidate, SpreadsheetEntityType,
+    SpreadsheetImportCommitResult, SpreadsheetImportCounts, SpreadsheetImportMode,
+    SpreadsheetImportPreview, SpreadsheetImportResolution, SpreadsheetImportRow,
+    SpreadsheetParsedWorkbook, SpreadsheetRowStatus,
 };
 use serde_json::{json, Map, Value};
 use sqlx::{Postgres, Row, Transaction};
@@ -37,21 +37,12 @@ struct ApplyOutcome {
 }
 
 impl PostgresStore {
-    /// Reads one managed match through the persistence crate's public read API.
-    ///
-    /// Internal exchange workflows continue to share `read_match_exchange`; callers in
-    /// other crates must use this stable boundary instead of depending on crate-private
-    /// implementation details.
-    pub async fn read_match(&self, match_id: Uuid) -> PersistenceResult<MatchRecord> {
-        self.read_match_exchange(match_id).await
-    }
-
     pub async fn match_lineup_export_data(
         &self,
         match_id: Option<Uuid>,
     ) -> PersistenceResult<MatchLineupExportData> {
         let selected_match = match match_id {
-            Some(id) => Some(self.read_match_exchange(id).await?),
+            Some(id) => Some(self.read_match(id).await?),
             None => None,
         };
         let lineups = if let Some(id) = match_id {
@@ -454,7 +445,7 @@ impl PostgresStore {
         &self,
         match_id: Uuid,
     ) -> PersistenceResult<AiMatchPackageContext> {
-        let match_record = self.read_match_exchange(match_id).await?;
+        let match_record = self.read_match(match_id).await?;
         let competition = match match_record.competition_id {
             Some(id) => self
                 .list_competitions()
@@ -671,21 +662,6 @@ impl PostgresStore {
             lineups.push(self.read_lineup(summary.id).await?);
         }
         Ok(lineups)
-    }
-
-    pub async fn read_match_exchange(&self, match_id: Uuid) -> PersistenceResult<MatchRecord> {
-        let row = sqlx::query(
-            r#"SELECT match.id,match.external_key,match.competition_id,competition.name AS competition_name,
-                      match.season_id,match.stage_id,match.round_id,match.home_team_id,
-                      home.canonical_name AS home_team_name,match.away_team_id,
-                      away.canonical_name AS away_team_name,match.kickoff_time,match.status,match.venue
-               FROM football.matches match
-               LEFT JOIN football.competitions competition ON competition.id=match.competition_id
-               JOIN football.teams home ON home.id=match.home_team_id
-               JOIN football.teams away ON away.id=match.away_team_id
-               WHERE match.id=$1"#,
-        ).bind(match_id).fetch_one(&self.pool).await?;
-        match_record_from_row(&row)
     }
 
     async fn match_player_references(
@@ -1582,32 +1558,4 @@ fn availability_from_str(value: &str) -> PersistenceResult<AvailabilityStatus> {
         "unknown" => Ok(AvailabilityStatus::Unknown),
         _ => Err(PersistenceError::InvalidState("未知可用状态".to_string())),
     }
-}
-fn match_status_from_str(value: &str) -> PersistenceResult<MatchStatus> {
-    match value {
-        "scheduled" => Ok(MatchStatus::Scheduled),
-        "live" => Ok(MatchStatus::Live),
-        "finished" => Ok(MatchStatus::Finished),
-        "postponed" => Ok(MatchStatus::Postponed),
-        "cancelled" => Ok(MatchStatus::Cancelled),
-        _ => Err(PersistenceError::InvalidState("未知比赛状态".to_string())),
-    }
-}
-pub(crate) fn match_record_from_row(row: &sqlx::postgres::PgRow) -> PersistenceResult<MatchRecord> {
-    Ok(MatchRecord {
-        id: row.try_get("id")?,
-        external_key: row.try_get("external_key")?,
-        competition_id: row.try_get("competition_id")?,
-        competition_name: row.try_get("competition_name")?,
-        season_id: row.try_get("season_id")?,
-        stage_id: row.try_get("stage_id")?,
-        round_id: row.try_get("round_id")?,
-        home_team_id: row.try_get("home_team_id")?,
-        home_team_name: row.try_get("home_team_name")?,
-        away_team_id: row.try_get("away_team_id")?,
-        away_team_name: row.try_get("away_team_name")?,
-        kickoff_time: row.try_get("kickoff_time")?,
-        status: match_status_from_str(&row.try_get::<String, _>("status")?)?,
-        venue: row.try_get("venue")?,
-    })
 }

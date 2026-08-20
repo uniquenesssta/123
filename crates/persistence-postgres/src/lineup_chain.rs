@@ -328,7 +328,7 @@ impl PostgresStore {
         reference_time: DateTime<Utc>,
     ) -> PersistenceResult<MatchLineupChain> {
         let snapshot_type = normalize_lineup_snapshot_type(snapshot_type)?.to_string();
-        let match_record = self.read_match_exchange(match_id).await?;
+        let match_record = self.read_match(match_id).await?;
         let window =
             lineup_snapshot_window_at(match_record.kickoff_time, &snapshot_type, reference_time)?;
         let summaries = self.list_lineups(Some(match_id), 500).await?;

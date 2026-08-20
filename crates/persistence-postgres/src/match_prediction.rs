@@ -58,7 +58,7 @@ impl PostgresStore {
         .bind(match_id)
         .fetch_one(&self.pool)
         .await?;
-        let match_record = super::match_exchange::match_record_from_row(&row)?;
+        let match_record = crate::adapters::matches::catalog::match_record_from_row(&row)?;
         let competition_kind = parse_kind(&row.try_get::<String, _>("effective_kind")?)?;
         let frozen_at = reference_time;
         let data_window = super::lineup_chain::lineup_snapshot_window_at(
