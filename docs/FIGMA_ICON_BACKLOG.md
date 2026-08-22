@@ -4,9 +4,13 @@
 
 ## 当前状态
 
-代码在 src/components/icons.ts 中定义 25 个 AppIcon。Figma 已覆盖 7 个对应的应用语义；以下 18 个尚未建立：
+代码在 src/components/icons.ts 中定义 25 个 AppIcon。Figma 已覆盖 8 个对应的应用语义；以下 17 个尚未建立：
 
-shield、users、sheet、chat、chart、settings、history、database、plug、info、panel-left、panel-right、refresh、reset、compare、cards、detail、more。
+users、sheet、chat、chart、settings、history、database、plug、info、panel-left、panel-right、refresh、reset、compare、cards、detail、more。
+
+## 已完成
+
+- [x] shield — `Icon/Utility/Shield`（83:259）；代码同源 SVG，24px / 1.75px round，已验证 Icon Slot 替换。
 
 ## 制作规则
 
@@ -18,4 +22,4 @@ shield、users、sheet、chat、chart、settings、history、database、plug、i
 
 ## 验收
 
-18 个图标全部成为可交换的 Icon Slot 内容，并更新组件记录。
+余下 17 个图标全部成为可交换的 Icon Slot 内容，并更新组件记录。
