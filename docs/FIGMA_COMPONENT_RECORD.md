@@ -15,7 +15,7 @@
 | Page | Node ID | Status |
 |---|---:|---|
 | 00 · Foundations | 0:1 | complete |
-| 01 · Iconography | 3:2 | complete |
+| 01 · Iconography | 3:2 | baseline complete; code-icon coverage in progress |
 | 02 · Controls | 3:3 | complete baseline |
 | 03 · Patterns | 3:4 | reserved; currently empty |
 | 04 · Screens | 3:5 | reserved; currently empty |
@@ -85,8 +85,11 @@ Utilities:
 - Icon/Utility/Check — 54:270
 - Icon/Utility/Minus — 54:280
 - Icon/Utility/Alert Circle — 54:290
+- Icon/Utility/Shield — 83:259 (code icon coverage; verified through Icon Slot)
 
 All six navigation/utility pilot families were migrated to Icon Scale and validated for direct SVG replacement violations: 0.
+
+Code icon coverage section: 83:206. Shield is the first completed P4.1 application icon; it uses the 24px stroke and icon-tone variable bindings, and passed an actual Icon Slot swap test.
 
 ## 4. Controls
 
@@ -149,7 +152,7 @@ The Figma file is intentionally not considered page-ready yet.
 
 ### Required component families
 
-- Remaining application icons: shield, users, sheet, chat, chart, settings, history, database, plug, info, panel-left, panel-right, refresh, reset, compare, cards, detail, more.
+- Remaining application icons: users, sheet, chat, chart, settings, history, database, plug, info, panel-left, panel-right, refresh, reset, compare, cards, detail, more.
 - Danger Button, Icon Button, and Loading state.
 - Extended fields: Search, Textarea, Number, Date/Datetime, Password, File Upload.
 - Searchable Combobox with open, keyboard, empty, and query-restoration states.
