@@ -173,3 +173,81 @@ The Figma file is intentionally not considered page-ready yet.
 ## 8. Cleanup record
 
 Before this record was created, the branch contained application code, Rust crates, contracts, scripts, tests, generated assets, and legacy documentation. Those files were intentionally removed from this design-system branch in the cleanup commit. The main/application branches are not changed by this cleanup.
+
+
+## 9. 锁定的后续制作顺序
+
+本节是设计系统的续作检查点。恢复工作时，不因页面紧急而跳过顺序；页面必须建立在已验证的底层组件之上。
+
+### P4.1 第一优先级：补齐应用图标库
+
+代码共定义 25 个 AppIcon；当前 Figma 已覆盖 7 个对应的应用语义，尚缺以下 18 个：
+
+shield、users、sheet、chat、chart、settings、history、database、plug、info、panel-left、panel-right、refresh、reset、compare、cards、detail、more。
+
+来源：src/components/icons.ts。
+
+完成条件：
+- 每个图标均有独立的 Figma 图标母版；
+- 接入 Icon Slot 的 16 / 20 / 24 三种尺寸；
+- 使用与已批准小图标一致的细线条与圆角细节；
+- 逐个确认语义与代码名称一致，不以相近图标替代。
+
+### P4.2 第二优先级：补齐基础依赖
+
+在扩展控件前补齐以下 token / 样式：
+
+- 桌面布局尺寸：Topbar、一级导航、二级侧栏、Inspector、Table Row；
+- Overlay / Busy 遮罩颜色；
+- Danger Action 的 Default、Hover、Pressed、Disabled 状态；
+- Dialog 专用阴影；
+- 更完整的数据数字与技术文本样式。
+
+### P4.3 第三优先级：补齐底层组件
+
+按组件族逐一完成，每一族均包含状态、尺寸、属性、图标插槽、默认值与异常状态，不能在页面内临时复制拼接。
+
+- Danger Button、Icon Button、Loading Button；
+- Search Field、Textarea、Number、Date、Datetime、Password、File Upload；
+- Searchable Combobox（不能以现有 Select 替代）；
+- Switch / Toggle；
+- Tabs / Segmented Control；
+- Data Table、Row、Cell、排序、选择、空状态、Pagination；
+- Dropdown Menu / Context Menu / Overflow Menu；
+- Dialog：普通、确认、危险确认；
+- Toast、Inline Alert、Blocking Message；
+- Accordion / Disclosure；
+- Spinner、Progress、Skeleton、Empty State；
+- Avatar：球队、球员、默认占位。
+
+每个组件族的验收：
+- 不同尺寸下文字、图标、内边距和点击区不溢出；
+- 交互状态完整且语义颜色正确；
+- 有图标的控件只嵌套 Icon Slot，不直接散放图标；
+- 可拆除元素与状态 Badge 的语义严格分离；
+- 组件属性、变体命名可被后续页面稳定引用。
+
+### P4.4 第四优先级：页面拼装前的 Patterns
+
+仅在 P4.1–P4.3 验收后制作以下模式：
+
+- PC App Shell：一级导航、二级导航、Topbar、折叠状态；
+- Page Heading、Toolbar、Filter Bar、Selection Command Bar；
+- Metric Card、Action Card、Panel；
+- Master–Detail–Inspector 工作区；
+- Workflow Stepper / Timeline；
+- AI Chat：历史侧栏、消息、附件、Composer。
+
+### P4.5 最后制作 Screens
+
+最后才拼装 17 条页面链路与 7 个导航模块。每个页面的按钮、输入与菜单必须引用已完成的组件实例；链路至少覆盖默认、加载、空、错误、禁用、确认与成功反馈（适用时）。
+
+## 10. 恢复工作流程
+
+1. 先阅读本文件，确认已锁定的顺序与已完成组件；
+2. 打开 Figma 文件并核对第 4 节列出的页面、节点和变量；
+3. 从 P4.1 开始完成缺失的 18 个应用图标；
+4. 每完成一个组件族，执行尺寸、状态、图标插槽及溢出检查，再进入下一族；
+5. P4.1–P4.4 未完成前，不开始批量页面拼装。
+
+当前下一步：P4.1，补齐 18 个代码定义但尚未建立的应用图标。
