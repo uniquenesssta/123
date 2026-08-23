@@ -9,10 +9,11 @@
 - [Switch / Toggle 组件](FIGMA_SWITCH_TOGGLE.md)
 - [Tabs / Segmented Control 组件](FIGMA_TABS_SEGMENTED_CONTROL.md)
 - [Data Table / Pagination 组件](FIGMA_DATA_TABLE_PAGINATION.md)
+- [Dropdown / Context / Overflow Menu 组件](FIGMA_DROPDOWN_CONTEXT_OVERFLOW_MENU.md)
 - [应用图标待办](FIGMA_ICON_BACKLOG.md)
 - [基础 Token 与底层组件待办](FIGMA_FOUNDATION_COMPONENT_BACKLOG.md)
 - [Patterns 与 Screens 计划](FIGMA_PATTERN_SCREEN_PLAN.md)
 
 执行顺序：图标 → 基础依赖与组件 → Patterns → Screens。
 
-当前进度：图标、基础依赖、按钮首组、扩展字段组、Searchable Combobox、Switch / Toggle、Tabs / Segmented Control 与 Data Table / Pagination 均已完成并验收；下一组为 Dropdown / Context / Overflow Menu。
+当前进度：图标、基础依赖、按钮首组、扩展字段组、Searchable Combobox、Switch / Toggle、Tabs / Segmented Control、Data Table / Pagination 与 Dropdown / Context / Overflow Menu 均已完成并验收；下一组为 Dialog（普通、确认、危险确认）。
