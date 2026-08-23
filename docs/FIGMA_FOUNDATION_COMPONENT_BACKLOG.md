@@ -91,7 +91,8 @@ Figma 记录：
 4. Searchable Combobox 与其 Option building block；
 5. Switch / Toggle 与其 Switch Control building block；
 6. Tabs / Segmented Control 与 Close Button、Item building blocks；
-7. Data Table / Pagination 与 Header Cell、Cell、Row、Page Button、Nav Button building blocks。
+7. Data Table / Pagination 与 Header Cell、Cell、Row、Page Button、Nav Button building blocks；
+8. Dropdown / Context / Overflow Menu 与 Menu Item、Separator、Note、Surface building blocks。
 
 按钮首组的组件 ID、变体 API、嵌套关系、代码约束与验收证据单独记录在 `docs/FIGMA_BUTTON_COMPONENTS.md`，本文件不重复展开。
 
@@ -142,16 +143,24 @@ Data Table / Pagination 记录见 `docs/FIGMA_DATA_TABLE_PAGINATION.md`：
 - Checkbox、Badge、Button/Secondary、Spinner、Header Cell、Table Cell、Row 与分页子组件全部保持 instance composition；
 - Controls 总计 35 个组件集、322 个变体；Light / Dark 真实球员目录截图检查 PASS。
 
+
+Dropdown / Context / Overflow Menu 记录见 `docs/FIGMA_DROPDOWN_CONTEXT_OVERFLOW_MENU.md`：
+
+- 新变量 6 个：Menu 宽度 240、gap 5、Item padding 11 × 10、Note padding-x 6、Menu radius 11；
+- 组件集：`Building Blocks/Menu Item`（`254:1755`）、`Building Blocks/Menu Separator`（`255:1762`）、`Menu/Surface`（`259:1861`）、`Dropdown Menu`（`263:1938`）、`Context Menu`（`265:1924`）、`Overflow Menu`（`267:2007`）；单组件 `Building Blocks/Menu Note`（`255:1763`）；
+- 合计 6 个组件集、40 个变体、1 个单组件；Neutral / Danger、Selection、Empty、Open/Closed 与 Run/Lineup/Match 语义闭合；
+- Button、Icon Slot、More、Chevron、Menu Item、Separator、Note 与 Surface 全部保持 instance composition；
+- Controls 总计 41 个组件集、362 个变体；hardcoded visual paints 0，placeholder 0，Light / Dark 截图检查 PASS。
+
 ### 待执行顺序
 
-1. Dropdown Menu / Context Menu / Overflow Menu；
-2. Dialog：普通、确认、危险确认；
-3. Toast、Inline Alert、Blocking Message；
-4. Accordion / Disclosure；
-5. Progress、Skeleton、Empty State；
-6. Avatar：球队、球员、默认占位。
+1. Dialog：普通、确认、危险确认；
+2. Toast、Inline Alert、Blocking Message；
+3. Accordion / Disclosure；
+4. Progress、Skeleton、Empty State；
+5. Avatar：球队、球员、默认占位。
 
-下一项固定为：`Dropdown / Context / Overflow Menu`。完成并验收底层组件前，不开始页面拼装。
+下一项固定为：`Dialog：普通 / 确认 / 危险确认`。完成并验收底层组件前，不开始页面拼装。
 ## 组件族验收
 
 - 尺寸、文字、图标、内边距、点击区均无溢出；
