@@ -14,7 +14,7 @@
 
 | Page | Node ID | Status |
 |---|---:|---|
-| 00 · Foundations | 0:1 | complete |
+| 00 · Foundations | 0:1 | complete; desktop dependency extension verified |
 | 01 · Iconography | 3:2 | application icon coverage complete and verified |
 | 02 · Controls | 3:3 | complete baseline |
 | 03 · Patterns | 3:4 | reserved; currently empty |
@@ -23,6 +23,7 @@
 Page documentation roots:
 
 - Foundations · Icon-first: 23:4
+- Desktop dependencies: 100:2
 - Iconography · Production library: 27:2
 - Code icon coverage: 83:206
 - Controls: 48:2
@@ -34,9 +35,9 @@ Page documentation roots:
 
 | Collection | ID | Modes | Count |
 |---|---|---|---:|
-| FIP Primitives | VariableCollectionId:17:2 | Value | 43 |
-| FIP Color | VariableCollectionId:17:3 | Light, Dark | 35 |
-| FIP Size | VariableCollectionId:17:4 | Value | 15 |
+| FIP Primitives | VariableCollectionId:17:2 | Value | 53 |
+| FIP Color | VariableCollectionId:17:3 | Light, Dark | 41 |
+| FIP Size | VariableCollectionId:17:4 | Value | 25 |
 | FIP Icon Scale | VariableCollectionId:35:2 | 24, 20, 16 | 3 |
 | FIP Control Scale | VariableCollectionId:46:2 | 32, 40, 48 | 10 |
 | FIP Icon Tone | VariableCollectionId:50:206 | Default, Secondary, Active, On Accent, Success, Warning, Danger, Info | 1 |
@@ -50,6 +51,11 @@ All variables have explicit scopes and WEB code syntax.
 - FIP/Body — Inter Regular, 12/18
 - FIP/Label — Inter Medium, 11/16
 - FIP/Caption — Inter Medium, 10/14
+- FIP/Data/Metric — Inter Semi Bold, 20/24
+- FIP/Data/Value — Inter Medium, 12/16
+- FIP/Data/Table — Inter Regular, 11/16
+- FIP/Technical/Code — Cascadia Mono Regular, 11/17
+- FIP/Technical/Label — Cascadia Mono Semi Bold, 10/14
 
 ### Effect styles
 
@@ -57,6 +63,18 @@ All variables have explicit scopes and WEB code syntax.
 - FIP/Elevation/Float/Light
 - FIP/Elevation/Subtle/Dark
 - FIP/Elevation/Float/Dark
+- FIP/Elevation/Dialog/Light
+- FIP/Elevation/Dialog/Dark
+
+### Desktop dependency extension audit
+
+- Documentation section: `Section · Desktop dependencies` (`100:2`).
+- Added variables: 26 total — 10 layout dimensions, 6 overlay variables, and 10 danger-state variables.
+- Final desktop dimensions follow the current high-density CSS: topbar 44, primary rail 60, secondary sidebar 154, directory 248, entity inspector 300, workspace inspector 360, table row 36, page padding 14 × 10, panel padding 12.
+- Added text styles: 5; added dialog effect styles: 2.
+- Source SHAs: `visualSystem.css` `56e44e574c4fc10667449c444d82bcf5b5e00072`; `layout.css` `f1ef772d053cf6e0b6bf377516b3f0edb2f5c4ad`; `app.css` `6cb8405159a87c4ad5cf7c02dd4c1d3d7316c214`.
+- Validation: variables 26/26; broken aliases 0; duplicate variables/styles 0; documentation nodes 97; default names 0; placeholders 0; overlap 0; overflow 0.
+- Result: PASS.
 
 ## 3. Iconography
 
@@ -180,13 +198,7 @@ When implementation starts:
 
 The Figma file is intentionally not considered page-ready yet.
 
-### Foundation extensions
-
-- Layout scale tokens for topbar, rails, sidebars, inspector, page padding, panel padding, and table row height.
-- Overlay and busy-scrim colors.
-- Danger action hover/pressed tokens.
-- Dialog elevation effect style.
-- Complete numeric/data and technical text styles.
+Foundation dependency extension P4.2 is complete and verified. Exact tokens, IDs, source SHAs, and QA evidence are maintained separately in `docs/FIGMA_FOUNDATION_COMPONENT_BACKLOG.md`.
 
 ### Required component families
 
