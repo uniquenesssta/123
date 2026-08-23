@@ -31,7 +31,7 @@ Page documentation roots:
 - Section · Badge & Tag: 48:10
 - Section · Spinner: 126:273
 - Section · Extended Fields: 142:291
-- Section · Switch & Toggle: 179:563
+- Section · Switch & Toggle: 179:563\n- Section · Tabs & Segmented Control: 199:595
 
 ## 2. Foundations
 
@@ -41,9 +41,9 @@ Page documentation roots:
 |---|---|---|---:|
 | FIP Primitives | VariableCollectionId:17:2 | Value | 53 |
 | FIP Color | VariableCollectionId:17:3 | Light, Dark | 41 |
-| FIP Size | VariableCollectionId:17:4 | Value | 30 |
+| FIP Size | VariableCollectionId:17:4 | Value | 36 |
 | FIP Icon Scale | VariableCollectionId:35:2 | 24, 20, 16 | 3 |
-| FIP Control Scale | VariableCollectionId:46:2 | 32, 40, 48 | 12 |
+| FIP Control Scale | VariableCollectionId:46:2 | 32, 40, 48 | 15 |
 | FIP Icon Tone | VariableCollectionId:50:206 | Default, Secondary, Active, On Accent, Success, Warning, Danger, Info | 1 |
 
 All variables have explicit scopes and WEB code syntax.
@@ -156,7 +156,7 @@ Utilities:
 
 ## 4. Controls
 
-Current controls state: 23 component sets, 194 variants, 278 nested Icon Slot instances, 10 nested Spinner instances, 10 nested Switch Control instances, 0 direct icon instances, 0 placeholders, and 0 component-set grid overlaps. Detailed records live in `docs/FIGMA_BUTTON_COMPONENTS.md`, `docs/FIGMA_EXTENDED_FIELDS.md`, `docs/FIGMA_SEARCHABLE_COMBOBOX.md`, and `docs/FIGMA_SWITCH_TOGGLE.md`.
+Current controls state: 28 component sets and 251 variants. The Tabs / Segmented group adds 5 sets, 57 variants, 18 nested Tabs/Item instances and 18 nested Segmented Item instances; all new nested controls remain exposed, hardcoded visual paints are 0, overflow is 0, and Light/Dark QA passes. Detailed records live in `docs/FIGMA_BUTTON_COMPONENTS.md`, `docs/FIGMA_EXTENDED_FIELDS.md`, `docs/FIGMA_SEARCHABLE_COMBOBOX.md`, `docs/FIGMA_SWITCH_TOGGLE.md`, and `docs/FIGMA_TABS_SEGMENTED_CONTROL.md`.
 
 | Component set | ID | Variants | API |
 |---|---:|---:|---|
@@ -183,6 +183,11 @@ Current controls state: 23 component sets, 194 variants, 278 nested Icon Slot in
 | Input/Searchable Combobox | 171:563 | 9 | Default/Focus/Open/Querying/Keyboard Active/Selected/Empty/Query Restored/Disabled; Label; Empty message; Show label/helper |
 | Building Blocks/Switch Control | 183:563 | 10 | Checked Off/On × State Default/Hover/Pressed/Focus/Disabled |
 | Switch/Toggle | 186:583 | 10 | Checked Off/On × State Default/Hover/Pressed/Focus/Disabled; Label; Description; Show label/description |
+| Tabs/Close Button | 202:832 | 5 | State Default/Hover/Pressed/Focus/Disabled |
+| Tabs/Item | 209:690 | 20 | Size 32/40 × Selected False/True × State Default/Hover/Pressed/Focus/Disabled; Label; Show close |
+| Tabs/Bar | 213:940 | 6 | Size 32/40 × Active 1/2/3; three exposed Tabs/Item instances |
+| Segmented Control/Item | 214:996 | 20 | Size 32/40 × Selected False/True × State Default/Hover/Pressed/Focus/Disabled; Label; Show leading; exposed Icon Slot |
+| Segmented Control | 216:1036 | 6 | Size 32/40 × Selected Detail/Compare/Cards; three exposed Item instances |
 
 ## 5. Corrections already made
 
@@ -219,6 +224,15 @@ Current controls state: 23 component sets, 194 variants, 278 nested Icon Slot in
 - Focus 视觉纠偏：原先的外层 frame 描边与 Track 之间露出背景，造成白色双线；Off/Focus（`181:575`）和 On/Focus（`182:573`）现均使用 Track OUTSIDE 描边。
 - Structure QA and Light/Dark visual QA PASS; documentation text discovered in Dark review was corrected to semantic fills. Details: `docs/FIGMA_SWITCH_TOGGLE.md`.
 
+### Tabs / Segmented Control architecture
+
+- Tabs are closeable object navigation; Segmented Control is a single-select workspace display mode. The families remain separate.
+- `Tabs/Bar` (`213:940`) composes only exposed `Tabs/Item` instances; labels use single-line ending ellipsis so long object names never displace the 24px close action.
+- `Segmented Control` (`216:1036`) composes only exposed `Segmented Control/Item` instances; inner heights 28 / 34 plus container padding 2 / 3 produce exact 32 / 40 totals.
+- The parent Selected values map directly to `detail | compare | cards`; Compare and Cards can be disabled independently when fewer than two workspace objects are open.
+- Material 3 and Simple Design System assets were audited but not imported because the compact desktop geometry, close semantics, variant API, and token model do not match FIP.
+- Five sets, 57 variants, nine tokens, hardcoded visual paints 0, overflow 0, and Light/Dark visual QA PASS. Details: `docs/FIGMA_TABS_SEGMENTED_CONTROL.md`.
+
 ### Badge and Tag semantic correction
 
 - Badge is status-only and never carries a remove action.
@@ -253,7 +267,7 @@ When implementation starts:
 
 The Figma file is intentionally not considered page-ready yet.
 
-Foundation dependency extension P4.2, the first button group, the extended-field group, Searchable Combobox, and Switch / Toggle are complete and verified. Evidence is split across `docs/FIGMA_FOUNDATION_COMPONENT_BACKLOG.md`, `docs/FIGMA_BUTTON_COMPONENTS.md`, `docs/FIGMA_EXTENDED_FIELDS.md`, `docs/FIGMA_SEARCHABLE_COMBOBOX.md`, and `docs/FIGMA_SWITCH_TOGGLE.md`.
+Foundation dependency extension P4.2, the first button group, the extended-field group, Searchable Combobox, Switch / Toggle, and Tabs / Segmented Control are complete and verified. Evidence is split across `docs/FIGMA_FOUNDATION_COMPONENT_BACKLOG.md`, `docs/FIGMA_BUTTON_COMPONENTS.md`, `docs/FIGMA_EXTENDED_FIELDS.md`, `docs/FIGMA_SEARCHABLE_COMBOBOX.md`, `docs/FIGMA_SWITCH_TOGGLE.md`, and `docs/FIGMA_TABS_SEGMENTED_CONTROL.md`.
 
 ### Required component families
 
