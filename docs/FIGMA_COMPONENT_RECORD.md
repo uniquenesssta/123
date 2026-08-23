@@ -15,7 +15,7 @@
 | Page | Node ID | Status |
 |---|---:|---|
 | 00 · Foundations | 0:1 | complete |
-| 01 · Iconography | 3:2 | baseline complete; code-icon coverage in progress |
+| 01 · Iconography | 3:2 | application icon coverage complete and verified |
 | 02 · Controls | 3:3 | complete baseline |
 | 03 · Patterns | 3:4 | reserved; currently empty |
 | 04 · Screens | 3:5 | reserved; currently empty |
@@ -24,6 +24,7 @@ Page documentation roots:
 
 - Foundations · Icon-first: 23:4
 - Iconography · Production library: 27:2
+- Code icon coverage: 83:206
 - Controls: 48:2
 - Section · Badge & Tag: 48:10
 
@@ -71,6 +72,7 @@ All variables have explicit scopes and WEB code syntax.
 ### Existing icon masters
 
 Navigation:
+
 - Icon/Navigation/Dashboard — 31:7
 - Icon/Navigation/Match Center — 39:48
 - Icon/Navigation/Prediction — 40:74
@@ -78,18 +80,53 @@ Navigation:
 - Icon/Navigation/Release Acceptance — 43:148
 - Icon/Navigation/Issue Log — 44:172
 
+Entity and communication:
+
+- Icon/Entity/Users — 88:218
+- Icon/Communication/Chat — 88:462
+
+Data:
+
+- Icon/Data/Chart — 88:482
+- Icon/Data/Database — 88:542
+
+Layout:
+
+- Icon/Layout/Panel Left — 88:602
+- Icon/Layout/Panel Right — 88:622
+- Icon/Layout/Cards — 88:706
+- Icon/Layout/Detail — 88:727
+
 Utilities:
+
 - Icon/Utility/Search — 54:208
 - Icon/Utility/Close — 54:249
 - Icon/Utility/Chevron Down — 54:260
 - Icon/Utility/Check — 54:270
 - Icon/Utility/Minus — 54:280
 - Icon/Utility/Alert Circle — 54:290
-- Icon/Utility/Shield — 83:259 (code icon coverage; verified through Icon Slot)
+- Icon/Utility/Shield — 83:259
+- Icon/Utility/Sheet — 88:442
+- Icon/Utility/Settings — 88:502
+- Icon/Utility/History — 88:522
+- Icon/Utility/Plug — 88:562
+- Icon/Utility/Info — 88:582
+- Icon/Utility/Refresh — 88:643
+- Icon/Utility/Reset — 88:664
+- Icon/Utility/Compare — 88:684
+- Icon/Utility/More — 88:747
 
-All six navigation/utility pilot families were migrated to Icon Scale and validated for direct SVG replacement violations: 0.
+### Code icon coverage audit
 
-Code icon coverage section: 83:206. Shield is the first completed P4.1 application icon; it uses the 24px stroke and icon-tone variable bindings, and passed an actual Icon Slot swap test.
+- Source: `src/components/icons.ts` on application branch `main`, source SHA `b0cef778236d596ab94ea0a6ff0083da0481d19f`.
+- AppIcon code keys covered: 25 / 25.
+- P4.1 new masters: 18 / 18.
+- Documentation layout: section 83:206, grid 83:209, 6 columns × 3 rows.
+- Binding checks: icon-tone variable 18 / 18; icon-stroke variable 18 / 18.
+- Icon Slot replacement checks: 18 / 18.
+- Geometry audit: overlap 0; grid overflow 0; card-child overflow 0.
+- Naming audit: duplicate expected names 0; unnamed masters 0.
+- Result: PASS.
 
 ## 4. Controls
 
@@ -126,7 +163,7 @@ Current baseline: 9 component sets, 77 variants, 157 nested Icon Slot instances,
 - Components use Icon Slot for nested icon anatomy.
 - Icon paths are not duplicated in controls or page instances.
 - Variant matrices remain below the 30-variant split threshold per set.
-- Every created/mutated Figma node ID is tracked in the local design-system state ledger.
+- Every created/mutated Figma node ID is tracked in the local design-system state ledger and this branch record.
 
 ## 6. Figma-to-code handoff contract
 
@@ -149,10 +186,10 @@ The Figma file is intentionally not considered page-ready yet.
 - Overlay and busy-scrim colors.
 - Danger action hover/pressed tokens.
 - Dialog elevation effect style.
+- Complete numeric/data and technical text styles.
 
 ### Required component families
 
-- Remaining application icons: users, sheet, chat, chart, settings, history, database, plug, info, panel-left, panel-right, refresh, reset, compare, cards, detail, more.
 - Danger Button, Icon Button, and Loading state.
 - Extended fields: Search, Textarea, Number, Date/Datetime, Password, File Upload.
 - Searchable Combobox with open, keyboard, empty, and query-restoration states.
