@@ -34,6 +34,7 @@ Page documentation roots:
 - Section · Switch & Toggle: 179:563
 - Section · Tabs & Segmented Control: 199:595
 - Section · Data Table & Pagination: 228:1090
+- Section · Dropdown, Context & Overflow Menu: 249:1705
 
 ## 2. Foundations
 
@@ -43,7 +44,7 @@ Page documentation roots:
 |---|---|---|---:|
 | FIP Primitives | VariableCollectionId:17:2 | Value | 53 |
 | FIP Color | VariableCollectionId:17:3 | Light, Dark | 41 |
-| FIP Size | VariableCollectionId:17:4 | Value | 39 |
+| FIP Size | VariableCollectionId:17:4 | Value | 45 |
 | FIP Icon Scale | VariableCollectionId:35:2 | 24, 20, 16 | 3 |
 | FIP Control Scale | VariableCollectionId:46:2 | 32, 40, 48 | 15 |
 | FIP Icon Tone | VariableCollectionId:50:206 | Default, Secondary, Active, On Accent, Success, Warning, Danger, Info | 1 |
@@ -158,7 +159,7 @@ Utilities:
 
 ## 4. Controls
 
-Current controls state: 35 component sets and 322 variants. The Data Table / Pagination group adds 7 sets and 71 variants; sorting, selection, Loaded / Loading / Empty, and First / Middle / Last / Busy are closed. Checkbox, Badge, Button/Secondary, Spinner and all table/pagination subcomponents remain true nested instances. Detailed records live in `docs/FIGMA_BUTTON_COMPONENTS.md`, `docs/FIGMA_EXTENDED_FIELDS.md`, `docs/FIGMA_SEARCHABLE_COMBOBOX.md`, `docs/FIGMA_SWITCH_TOGGLE.md`, `docs/FIGMA_TABS_SEGMENTED_CONTROL.md`, and `docs/FIGMA_DATA_TABLE_PAGINATION.md`.
+Current controls state: 41 component sets and 362 variants. The Dropdown / Context / Overflow Menu group adds 6 sets, 40 variants, and 1 single component; Neutral / Danger, Selection / Empty, Closed / Open, and Run / Lineup / Match semantics are closed. Buttons, Icon Slot, existing icon masters, Menu Item, Separator, Note and Menu Surface remain true nested instances. Detailed records live in the separate component files linked from `docs/README.md`, including `docs/FIGMA_DROPDOWN_CONTEXT_OVERFLOW_MENU.md`.
 
 | Component set | ID | Variants | API |
 |---|---:|---:|---|
@@ -197,6 +198,12 @@ Current controls state: 35 component sets and 322 variants. The Data Table / Pag
 | Pagination/Page Button | 239:1439 | 6 | Default/Hover/Pressed/Focus/Current/Disabled; Label |
 | Pagination/Nav Button | 240:1447 | 10 | Direction Previous/Next × State Default/Hover/Pressed/Focus/Disabled; Label |
 | Pagination | 241:1477 | 4 | State First/Middle/Last/Busy; Summary; nested Nav/Page Button and Spinner |
+| Building Blocks/Menu Item | 254:1755 | 20 | Tone Neutral/Danger × Selected False/True × State Default/Hover/Pressed/Focus/Disabled; Label; Description; Shortcut; visibility booleans; Leading Icon swap |
+| Building Blocks/Menu Separator | 255:1762 | 2 | Inset None/Leading |
+| Menu/Surface | 259:1861 | 3 | Content Actions/Selection/Empty; nested Menu Item, Separator and Note |
+| Dropdown Menu | 263:1938 | 6 | State Closed/Hover/Pressed/Focus/Open/Disabled; nested Button/Secondary and Menu Surface |
+| Context Menu | 265:1924 | 3 | Target Run/Lineup/Match; exact source action and note semantics |
+| Overflow Menu | 267:2007 | 6 | State Closed/Hover/Pressed/Focus/Open/Disabled; nested Button/Icon, More and Menu Surface |
 
 
 ## 5. Corrections already made
@@ -254,6 +261,16 @@ Current controls state: 35 component sets and 322 variants. The Data Table / Pag
 - 代码当前没有排序行为；Figma Sort 是待实现契约，必须同步 `aria-sort`。Code Connect 在可复用代码组件建立后再连接。
 - 七个 sets、71 variants；Controls 总计 35 sets、322 variants；Light / Dark 真实球员目录与状态截图 QA PASS。Details: `docs/FIGMA_DATA_TABLE_PAGINATION.md`.
 
+### Dropdown / Context / Overflow Menu architecture
+
+- `Building Blocks/Menu Item`（`254:1755`）把 Tone、Selected 与 State 分离为 20 个变体；Focus 只使用单一 1px focus stroke，Disabled 不叠加整体透明度。
+- `Menu/Surface`（`259:1861`）覆盖 Actions / Selection / Empty；Empty 不保留隐藏交互项。
+- `Dropdown Menu`（`263:1938`）和 `Overflow Menu`（`267:2007`）仅在 Open 变体组合真实 Surface；closed states 没有不可见菜单。
+- `Context Menu`（`265:1924`）直接映射代码中的 Run / Lineup / Match 行为；Run 为 neutral，Lineup / Match 为 danger，首项 Focus 对应代码打开后聚焦首按钮。
+- Surface 使用 border + Subtle elevation。旧 CSS `0 18px 50px rgba(0,0,0,.24)` 被视为待同步的旧实现，不作为新设计基准。
+- 六个 menu tokens 形成 240 / 8 / 5 / 11 的紧凑桌面几何；Menu Item 内容区宽 224，padding 为 11 × 10。
+- 六个 sets、40 variants、1 single component；Controls 总计 41 sets、362 variants；hardcoded paints 0，placeholders 0，Light / Dark visual QA PASS. Details: `docs/FIGMA_DROPDOWN_CONTEXT_OVERFLOW_MENU.md`.
+
 ### Badge and Tag semantic correction
 
 - Badge is status-only and never carries a remove action.
@@ -288,12 +305,12 @@ When implementation starts:
 
 The Figma file is intentionally not considered page-ready yet.
 
-Foundation dependency extension P4.2, the first button group, the extended-field group, Searchable Combobox, Switch / Toggle, Tabs / Segmented Control, and Data Table / Pagination are complete and verified. Evidence is split across `docs/FIGMA_FOUNDATION_COMPONENT_BACKLOG.md`, `docs/FIGMA_BUTTON_COMPONENTS.md`, `docs/FIGMA_EXTENDED_FIELDS.md`, `docs/FIGMA_SEARCHABLE_COMBOBOX.md`, `docs/FIGMA_SWITCH_TOGGLE.md`, `docs/FIGMA_TABS_SEGMENTED_CONTROL.md`, and `docs/FIGMA_DATA_TABLE_PAGINATION.md`.
+Foundation dependency extension P4.2, the first button group, the extended-field group, Searchable Combobox, Switch / Toggle, Tabs / Segmented Control, Data Table / Pagination, and Dropdown / Context / Overflow Menu are complete and verified. Evidence is split across the separate records linked from `docs/README.md`, including `docs/FIGMA_DROPDOWN_CONTEXT_OVERFLOW_MENU.md`.
 
 ### Required component families
 
-- Menu/Context Menu/Overflow Menu.
-- Dialog, Toast, Inline Alert, Disclosure.
+- Dialog: standard, confirm, and danger confirm.
+- Toast, Inline Alert, Blocking Message, and Disclosure.
 - Progress, Skeleton, Empty State.
 - Avatar for team/player entities.
 
