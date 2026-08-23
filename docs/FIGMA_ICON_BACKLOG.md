@@ -30,6 +30,15 @@
 - [x] detail — `Icon/Layout/Detail`（88:727）
 - [x] more — `Icon/Utility/More`（88:747）
 
+## 扩展字段前置图标
+
+以下 2 个不是 `AppIcon` 代码键，而是完成 Number 与 Date/Datetime 底层组件所需的最小依赖：
+
+- [x] plus — `Icon/Utility/Plus`（139:208）
+- [x] calendar — `Icon/Utility/Calendar`（139:212）
+
+文档区：`Section · Extended field icons`（139:213）；两者均为 24px / 1.75 stroke，并绑定图标尺寸、粗细与颜色变量。
+
 ## 制作规则
 
 - 每个图标有独立 Figma 图标母版。
@@ -42,7 +51,8 @@
 ## 最终验收
 
 - 代码覆盖：25 / 25。
-- 新图标母版：18 / 18。
+- 新 AppIcon 母版：18 / 18。
+- 扩展字段前置图标：2 / 2。
 - 图标色变量绑定：18 / 18。
 - 描边变量绑定：18 / 18。
 - Icon Slot 实际替换：18 / 18。
@@ -54,4 +64,4 @@
 - 未命名母版：0。
 - 结果：PASS。
 
-P4.1 已关闭。下一顺序是补齐基础依赖 token 与桌面布局尺寸，再扩展底层控件。
+P4.1 与扩展字段前置图标均已关闭；后续新增图标必须由实际底层组件依赖触发。
