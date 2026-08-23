@@ -63,8 +63,8 @@ All variables have explicit scopes and WEB code syntax.
 - FIP/Elevation/Float/Light
 - FIP/Elevation/Subtle/Dark
 - FIP/Elevation/Float/Dark
-- FIP/Elevation/Dialog/Light
-- FIP/Elevation/Dialog/Dark
+- FIP/Elevation/Dialog/Light — 0 10px 24px rgba(34,50,72,.14)
+- FIP/Elevation/Dialog/Dark — 0 12px 28px rgba(0,0,0,.26)
 
 ### Desktop dependency extension audit
 
@@ -73,6 +73,7 @@ All variables have explicit scopes and WEB code syntax.
 - Final desktop dimensions follow the current high-density CSS: topbar 44, primary rail 60, secondary sidebar 154, directory 248, entity inspector 300, workspace inspector 360, table row 36, page padding 14 × 10, panel padding 12.
 - Added text styles: 5; added dialog effect styles: 2.
 - Source SHAs: `visualSystem.css` `56e44e574c4fc10667449c444d82bcf5b5e00072`; `layout.css` `f1ef772d053cf6e0b6bf377516b3f0edb2f5c4ad`; `app.css` `6cb8405159a87c4ad5cf7c02dd4c1d3d7316c214`.
+- Design override: dialog elevation no longer follows the old source shadow values; see the correction record below.
 - Validation: variables 26/26; broken aliases 0; duplicate variables/styles 0; documentation nodes 97; default names 0; placeholders 0; overlap 0; overflow 0.
 - Result: PASS.
 
@@ -163,6 +164,14 @@ Current baseline: 9 component sets, 77 variants, 157 nested Icon Slot instances,
 | Tag | 66:411 | 10 | Style Filled/Outline × Tone Neutral/Info/Success/Warning/Danger; Label; Show remove |
 
 ## 5. Corrections already made
+
+### Dialog elevation correction
+
+- The initial code-derived shadows were rejected as too large: Light 0/26/70/22%, Dark 0/28/80/42%.
+- The existing effect style IDs were retained and updated in place.
+- Current source of truth: Light 0/10/24/14%; Dark 0/12/28/26%.
+- Documentation samples 106:5 and 106:8 remain bound to the two styles; label overflow 0; visual QA PASS.
+- This accepted Figma correction supersedes the old CSS shadow values; implementation must sync from Figma.
 
 ### Badge and Tag semantic correction
 
