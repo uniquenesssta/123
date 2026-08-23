@@ -30,6 +30,7 @@ Page documentation roots:
 - Section · Button: 48:5
 - Section · Badge & Tag: 48:10
 - Section · Spinner: 126:273
+- Section · Extended Fields: 142:291
 
 ## 2. Foundations
 
@@ -136,6 +137,8 @@ Utilities:
 - Icon/Utility/Reset — 88:664
 - Icon/Utility/Compare — 88:684
 - Icon/Utility/More — 88:747
+- Icon/Utility/Plus — 139:208
+- Icon/Utility/Calendar — 139:212
 
 ### Code icon coverage audit
 
@@ -151,7 +154,7 @@ Utilities:
 
 ## 4. Controls
 
-Current controls state: 13 component sets, 116 variants, 193 nested Icon Slot instances, 9 nested Spinner instances, 0 direct icon instances, 0 placeholders, 0 visible overflow findings. Detailed button records live in `docs/FIGMA_BUTTON_COMPONENTS.md`.
+Current controls state: 19 component sets, 160 variants, 261 nested Icon Slot instances, 17 nested Spinner instances, 0 direct icon instances, 0 placeholders, 0 visible overflow findings. Detailed button records live in `docs/FIGMA_BUTTON_COMPONENTS.md`; extended fields live in `docs/FIGMA_EXTENDED_FIELDS.md`.
 
 | Component set | ID | Variants | API |
 |---|---:|---:|---|
@@ -168,6 +171,12 @@ Current controls state: 13 component sets, 116 variants, 193 nested Icon Slot in
 | Select/Dropdown | 63:158 | 6 | Default/Hover/Focus/Open/Error/Disabled; label/value/helper/options; label/helper/leading booleans |
 | Badge | 66:410 | 10 | Style Filled/Outline × Tone Neutral/Info/Success/Warning/Danger |
 | Tag | 66:411 | 10 | Style Filled/Outline × Tone Neutral/Info/Success/Warning/Danger; Label; Show remove |
+| Input/Search Field | 142:526 | 8 | Mode Live/Submit × State Default/Focus/Filled/Disabled |
+| Input/Textarea | 143:410 | 8 | Height 96/160 × State Default/Focus/Error/Disabled |
+| Input/Number | 144:437 | 4 | State Default/Focus/Error/Disabled; Unit and stepper booleans |
+| Input/Date & Datetime | 146:488 | 8 | Type Date/Datetime × State Default/Focus/Error/Disabled |
+| Input/Password | 147:616 | 8 | Visibility Hidden/Shown × State Default/Focus/Error/Disabled |
+| Input/File Upload | 149:906 | 8 | Empty/Drag Over/Selected/Validating/Ready/Complete/Error/Disabled |
 
 ## 5. Corrections already made
 
@@ -213,11 +222,10 @@ When implementation starts:
 
 The Figma file is intentionally not considered page-ready yet.
 
-Foundation dependency extension P4.2 and the first button component group are complete and verified. Foundation evidence is in `docs/FIGMA_FOUNDATION_COMPONENT_BACKLOG.md`; button API and QA evidence is in `docs/FIGMA_BUTTON_COMPONENTS.md`.
+Foundation dependency extension P4.2, the first button group, and the extended-field group are complete and verified. Evidence is split across `docs/FIGMA_FOUNDATION_COMPONENT_BACKLOG.md`, `docs/FIGMA_BUTTON_COMPONENTS.md`, and `docs/FIGMA_EXTENDED_FIELDS.md`.
 
 ### Required component families
 
-- Extended fields: Search, Textarea, Number, Date/Datetime, Password, File Upload.
 - Searchable Combobox with open, keyboard, empty, and query-restoration states.
 - Switch/Toggle.
 - Tabs/Segmented Control.
