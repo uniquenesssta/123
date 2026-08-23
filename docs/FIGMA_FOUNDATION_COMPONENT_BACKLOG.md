@@ -87,7 +87,8 @@ Figma 记录：
 
 1. Danger Button、Icon Button、Loading Button；
 2. Spinner（作为 Loading Button 的直接依赖提前完成）；
-3. Search Field、Textarea、Number、Date/Datetime、Password、File Upload。
+3. Search Field、Textarea、Number、Date/Datetime、Password、File Upload；
+4. Searchable Combobox 与其 Option building block。
 
 按钮首组的组件 ID、变体 API、嵌套关系、代码约束与验收证据单独记录在 `docs/FIGMA_BUTTON_COMPONENTS.md`，本文件不重复展开。
 
@@ -106,20 +107,27 @@ Figma 记录：
 - 合计 6 个组件集、44 个变体；68 个 Icon Slot wrapper、72 个真实按钮实例、直接 icon master 实例 0；
 - 组件集越界 0、根级重叠 0、截图检查 PASS。
 
+Searchable Combobox 记录见 `docs/FIGMA_SEARCHABLE_COMBOBOX.md`：
+
+- 新变量：`combobox/option-height`（`VariableID:161:514`）与 `combobox/option-padding-x`（`VariableID:161:515`）；
+- 新图标：Chevron Up（`168:208`）；
+- 组件集：`Building Blocks/Combobox Option`（`163:720`）与 `Input/Searchable Combobox`（`171:563`）；
+- 合计 2 个组件集、14 个变体；Parent 内 27 个 Option 实例、9 个真实 `Button/Icon` toggle、直接 icon master 实例 0；
+- 组件集网格重叠 0、复制 Option frame 0、截图检查 PASS。
+
 ### 待执行顺序
 
-1. Searchable Combobox（不能以现有 Select 替代）；
-2. Switch / Toggle；
-3. Tabs / Segmented Control；
-4. Data Table、Row、Cell、排序、选择、空状态、Pagination；
-5. Dropdown Menu / Context Menu / Overflow Menu；
-6. Dialog：普通、确认、危险确认；
-7. Toast、Inline Alert、Blocking Message；
-8. Accordion / Disclosure；
-9. Progress、Skeleton、Empty State；
-10. Avatar：球队、球员、默认占位。
+1. Switch / Toggle；
+2. Tabs / Segmented Control；
+3. Data Table、Row、Cell、排序、选择、空状态、Pagination；
+4. Dropdown Menu / Context Menu / Overflow Menu；
+5. Dialog：普通、确认、危险确认；
+6. Toast、Inline Alert、Blocking Message；
+7. Accordion / Disclosure；
+8. Progress、Skeleton、Empty State；
+9. Avatar：球队、球员、默认占位。
 
-下一项固定为：`Searchable Combobox`。完成并验收该组件前，不开始页面拼装。
+下一项固定为：`Switch / Toggle`。完成并验收该组件前，不开始页面拼装。
 ## 组件族验收
 
 - 尺寸、文字、图标、内边距、点击区均无溢出；
