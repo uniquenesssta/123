@@ -49,9 +49,10 @@ Figma 记录：
 
 ### Dialog 阴影
 
-- `FIP/Elevation/Dialog/Light`（`S:f3fdd50cae221eac265bed3e9ad85427784b3563,`）：`0 10px 24px rgba(34,50,72,.14)`
+- `FIP/Elevation/Dialog/Light`（`S:f3fdd50cae221eac265bed3e9ad85427784b3563,`）：`0 10px 24px rgba(34,50,72,.045)`
 - `FIP/Elevation/Dialog/Dark`（`S:3d867eeafb12e9a6ff85a325e7e4a76eb487dd32,`）：`0 12px 28px rgba(0,0,0,.26)`
 - 2026-08-23 视觉纠偏：旧值 Light `0 26 70 / 22%`、Dark `0 28 80 / 42%` 扩散过大，正式作废。
+- Light 最终由用户在 Figma 中调整为 4.5% alpha，并关闭“透明区域后方显示阴影”；保留该人工调整。
 - 本项为已确认的设计覆盖；后续代码实现必须同步 Figma 新值，不得继续复制旧 CSS 阴影。
 
 ### 数据与技术文本
@@ -78,7 +79,7 @@ Figma 记录：
 - overlap 0，overflow 0；
 - 10 个尺寸卡片均为 252 × 120；
 - Foundations 全页视觉检查通过；
-- Dialog effect style 与 Light/Dark 示例绑定一致，示例文字 overflow 0；紧凑阴影视觉复核通过。
+- Dialog effect style 与 Light/Dark 示例绑定一致，示例文字 overflow 0；Light 4.5% alpha 与 transparent-area shadow disabled 复核通过。
 
 ## 底层组件
 
