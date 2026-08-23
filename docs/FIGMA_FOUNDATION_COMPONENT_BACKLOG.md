@@ -89,7 +89,7 @@ Figma 记录：
 2. Spinner（作为 Loading Button 的直接依赖提前完成）；
 3. Search Field、Textarea、Number、Date/Datetime、Password、File Upload；
 4. Searchable Combobox 与其 Option building block；
-5. Switch / Toggle 与其 Switch Control building block。
+5. Switch / Toggle 与其 Switch Control building block；\n6. Tabs / Segmented Control 与 Close Button、Item building blocks。
 
 按钮首组的组件 ID、变体 API、嵌套关系、代码约束与验收证据单独记录在 `docs/FIGMA_BUTTON_COMPONENTS.md`，本文件不重复展开。
 
@@ -124,18 +124,25 @@ Switch / Toggle 记录见 `docs/FIGMA_SWITCH_TOGGLE.md`：
 - Checked Off / On 与 Default / Hover / Pressed / Focus / Disabled 状态矩阵完整；
 - 真实 API Readonly Context 样例 2 个；hardcoded visual paints 0；overlap / overflow 0；Light / Dark 截图检查 PASS。
 
+Tabs / Segmented Control 记录见 `docs/FIGMA_TABS_SEGMENTED_CONTROL.md`：
+
+- 新变量 9 个：Tabs 宽度、关闭点击区、指示线与水平 padding；Segmented 最小宽度、容器 padding、Item padding 与 inner height；
+- 组件集：`Tabs/Close Button`（`202:832`）、`Tabs/Item`（`209:690`）、`Tabs/Bar`（`213:940`）、`Segmented Control/Item`（`214:996`）、`Segmented Control`（`216:1036`）；
+- 合计 5 个组件集、57 个变体；Parent 内 18 个 Tabs/Item 与 18 个 Segmented Item 真实实例，全部保持暴露；
+- Tabs 长名称单行省略、Segmented 总高 32 / 40、仅一个标签时 Compare / Cards 禁用；
+- hardcoded visual paints 0；overflow 0；Light / Dark 截图检查 PASS。
+
 ### 待执行顺序
 
-1. Tabs / Segmented Control；
-2. Data Table、Row、Cell、排序、选择、空状态、Pagination；
-3. Dropdown Menu / Context Menu / Overflow Menu；
-4. Dialog：普通、确认、危险确认；
-5. Toast、Inline Alert、Blocking Message；
-6. Accordion / Disclosure；
-7. Progress、Skeleton、Empty State；
-8. Avatar：球队、球员、默认占位。
+1. Data Table、Row、Cell、排序、选择、空状态、Pagination；
+2. Dropdown Menu / Context Menu / Overflow Menu；
+3. Dialog：普通、确认、危险确认；
+4. Toast、Inline Alert、Blocking Message；
+5. Accordion / Disclosure；
+6. Progress、Skeleton、Empty State；
+7. Avatar：球队、球员、默认占位。
 
-下一项固定为：`Tabs / Segmented Control`。完成并验收该组件前，不开始页面拼装。
+下一项固定为：`Data Table / Pagination`。完成并验收该组件前，不开始页面拼装。
 ## 组件族验收
 
 - 尺寸、文字、图标、内边距、点击区均无溢出；
