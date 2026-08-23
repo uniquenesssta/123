@@ -83,22 +83,36 @@ Figma 记录：
 
 ## 底层组件
 
-按顺序执行：
+### 已完成
 
 1. Danger Button、Icon Button、Loading Button；
-2. Search Field、Textarea、Number、Date、Datetime、Password、File Upload；
-3. Searchable Combobox（不能以现有 Select 替代）；
-4. Switch / Toggle；
-5. Tabs / Segmented Control；
-6. Data Table、Row、Cell、排序、选择、空状态、Pagination；
-7. Dropdown Menu / Context Menu / Overflow Menu；
-8. Dialog：普通、确认、危险确认；
-9. Toast、Inline Alert、Blocking Message；
-10. Accordion / Disclosure；
-11. Spinner、Progress、Skeleton、Empty State；
-12. Avatar：球队、球员、默认占位。
+2. Spinner（作为 Loading Button 的直接依赖提前完成）。
 
-下一项固定为：`Danger Button → Icon Button → Loading Button`。完成并验收该组前，不开始页面拼装。
+按钮首组的组件 ID、变体 API、嵌套关系、代码约束与验收证据单独记录在 `docs/FIGMA_BUTTON_COMPONENTS.md`，本文件不重复展开。
+
+完成结果：
+
+- `Button/Danger`（`119:209`）：12 变体；
+- `Button/Icon`（`123:209`）：12 变体；
+- `Spinner`（`126:294`）：6 变体；
+- `Button/Loading`（`128:343`）：9 变体；
+- 合计 4 个组件集、39 个变体，实例化检查全部通过，可见 overlap / overflow 为 0。
+
+### 待执行顺序
+
+1. Search Field、Textarea、Number、Date、Datetime、Password、File Upload；
+2. Searchable Combobox（不能以现有 Select 替代）；
+3. Switch / Toggle；
+4. Tabs / Segmented Control；
+5. Data Table、Row、Cell、排序、选择、空状态、Pagination；
+6. Dropdown Menu / Context Menu / Overflow Menu；
+7. Dialog：普通、确认、危险确认；
+8. Toast、Inline Alert、Blocking Message；
+9. Accordion / Disclosure；
+10. Progress、Skeleton、Empty State；
+11. Avatar：球队、球员、默认占位。
+
+下一项固定为：`Search Field → Textarea → Number → Date / Datetime → Password → File Upload`。完成并验收该组前，不开始页面拼装。
 
 ## 组件族验收
 
