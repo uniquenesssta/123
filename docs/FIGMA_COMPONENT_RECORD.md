@@ -63,7 +63,7 @@ All variables have explicit scopes and WEB code syntax.
 - FIP/Elevation/Float/Light
 - FIP/Elevation/Subtle/Dark
 - FIP/Elevation/Float/Dark
-- FIP/Elevation/Dialog/Light — 0 10px 24px rgba(34,50,72,.14)
+- FIP/Elevation/Dialog/Light — 0 10px 24px rgba(34,50,72,.045); transparent-area shadow disabled
 - FIP/Elevation/Dialog/Dark — 0 12px 28px rgba(0,0,0,.26)
 
 ### Desktop dependency extension audit
@@ -169,8 +169,8 @@ Current baseline: 9 component sets, 77 variants, 157 nested Icon Slot instances,
 
 - The initial code-derived shadows were rejected as too large: Light 0/26/70/22%, Dark 0/28/80/42%.
 - The existing effect style IDs were retained and updated in place.
-- Current source of truth: Light 0/10/24/14%; Dark 0/12/28/26%.
-- Documentation samples 106:5 and 106:8 remain bound to the two styles; label overflow 0; visual QA PASS.
+- Current source of truth: Light 0/10/24/4.5% with transparent-area shadow disabled; Dark 0/12/28/26%.
+- The user's direct Light style adjustment was preserved; documentation samples 106:5 and 106:8 remain bound to the two styles; label overflow 0; visual QA PASS.
 - This accepted Figma correction supersedes the old CSS shadow values; implementation must sync from Figma.
 
 ### Badge and Tag semantic correction
