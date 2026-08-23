@@ -45,7 +45,7 @@
 | Off | `181:566` | `181:569` | `181:572` | `181:575` | `181:578` |
 | On | `182:564` | `182:567` | `182:570` | `182:573` | `182:576` |
 
-Focus 只增加外轮廓，不改变开关值；Disabled 使用专用 surface/opacity 语义，不把 Hover/Pressed 伪装成 Disabled。
+Focus 不改变开关值；轮廓直接绑定在 Track 的 OUTSIDE 外沿，不再放在 40 × 24 外层 frame 上，从而避免背景从间隙透出形成白色双线。Disabled 使用专用 surface/opacity 语义，不把 Hover/Pressed 伪装成 Disabled。
 
 ## 5. Switch/Toggle
 
@@ -114,6 +114,7 @@ Focus 只增加外轮廓，不改变开关值；Disabled 使用专用 surface/op
 - placeholders：0。
 - Light 视觉 QA：PASS；Dark 视觉 QA：PASS。
 - Dark 检查中发现的 7 个文档文字节点已改为语义颜色绑定；Controls 根节点最终恢复 Light。
+- 2026-08-23 Focus 视觉纠偏：原外层 frame 描边与 Track 之间露出背景，形成错误的白色双线；Off/Focus（`181:575`）与 On/Focus（`182:573`）已改为 Track OUTSIDE 描边，复检 PASS。
 
 ## 9. 后续约束
 
