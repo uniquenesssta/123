@@ -16,7 +16,7 @@
 |---|---:|---|
 | 00 · Foundations | 0:1 | complete; desktop dependency extension verified |
 | 01 · Iconography | 3:2 | application icon coverage complete and verified |
-| 02 · Controls | 3:3 | complete baseline |
+| 02 · Controls | 3:3 | baseline plus first component extension verified |
 | 03 · Patterns | 3:4 | reserved; currently empty |
 | 04 · Screens | 3:5 | reserved; currently empty |
 
@@ -27,7 +27,9 @@ Page documentation roots:
 - Iconography · Production library: 27:2
 - Code icon coverage: 83:206
 - Controls: 48:2
+- Section · Button: 48:5
 - Section · Badge & Tag: 48:10
+- Section · Spinner: 126:273
 
 ## 2. Foundations
 
@@ -149,13 +151,17 @@ Utilities:
 
 ## 4. Controls
 
-Current baseline: 9 component sets, 77 variants, 157 nested Icon Slot instances, 0 direct icon instances, 0 placeholders, 0 overflow findings.
+Current controls state: 13 component sets, 116 variants, 193 nested Icon Slot instances, 9 nested Spinner instances, 0 direct icon instances, 0 placeholders, 0 visible overflow findings. Detailed button records live in `docs/FIGMA_BUTTON_COMPONENTS.md`.
 
 | Component set | ID | Variants | API |
 |---|---:|---:|---|
 | Button/Primary | 51:414 | 12 | Size 32/40/48 × State Default/Hover/Pressed/Disabled; Label; Show leading; Show trailing |
 | Button/Secondary | 52:2 | 12 | same API |
 | Button/Ghost | 52:255 | 12 | same API |
+| Button/Danger | 119:209 | 12 | Size 32/40/48 × State Default/Hover/Pressed/Disabled; Label; Show leading; Show trailing |
+| Button/Icon | 123:209 | 12 | square Size 32/40/48 × State Default/Hover/Pressed/Disabled; exposed Icon Slot |
+| Spinner | 126:294 | 6 | Size 16/20/24 × Tone Default/On Accent |
+| Button/Loading | 128:343 | 9 | Size 32/40/48 × Style Primary/Secondary/Danger; Label; nested Spinner |
 | Input/Text Field | 57:313 | 4 | State Default/Focus/Error/Disabled; Label; Value/placeholder; Helper; label/helper/leading/trailing/clear booleans |
 | Checkbox | 59:329 | 6 | Unchecked/Hover/Checked/Indeterminate/Disabled Unchecked/Disabled Checked |
 | Radio | 60:333 | 5 | Unchecked/Hover/Selected/Disabled Unchecked/Disabled Selected |
@@ -207,11 +213,10 @@ When implementation starts:
 
 The Figma file is intentionally not considered page-ready yet.
 
-Foundation dependency extension P4.2 is complete and verified. Exact tokens, IDs, source SHAs, and QA evidence are maintained separately in `docs/FIGMA_FOUNDATION_COMPONENT_BACKLOG.md`.
+Foundation dependency extension P4.2 and the first button component group are complete and verified. Foundation evidence is in `docs/FIGMA_FOUNDATION_COMPONENT_BACKLOG.md`; button API and QA evidence is in `docs/FIGMA_BUTTON_COMPONENTS.md`.
 
 ### Required component families
 
-- Danger Button, Icon Button, and Loading state.
 - Extended fields: Search, Textarea, Number, Date/Datetime, Password, File Upload.
 - Searchable Combobox with open, keyboard, empty, and query-restoration states.
 - Switch/Toggle.
@@ -219,7 +224,7 @@ Foundation dependency extension P4.2 is complete and verified. Exact tokens, IDs
 - Data Table, selection/sort states, Pagination.
 - Menu/Context Menu/Overflow Menu.
 - Dialog, Toast, Inline Alert, Disclosure.
-- Spinner, Progress, Skeleton, Empty State.
+- Progress, Skeleton, Empty State.
 - Avatar for team/player entities.
 
 ### Required pattern families
