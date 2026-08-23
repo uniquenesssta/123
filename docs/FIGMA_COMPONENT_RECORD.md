@@ -16,7 +16,7 @@
 |---|---:|---|
 | 00 · Foundations | 0:1 | complete; desktop dependency extension verified |
 | 01 · Iconography | 3:2 | application icon coverage complete and verified |
-| 02 · Controls | 3:3 | baseline plus first component extension verified |
+| 02 · Controls | 3:3 | baseline plus component extensions verified |
 | 03 · Patterns | 3:4 | reserved; currently empty |
 | 04 · Screens | 3:5 | reserved; currently empty |
 
@@ -42,7 +42,7 @@ Page documentation roots:
 | FIP Color | VariableCollectionId:17:3 | Light, Dark | 41 |
 | FIP Size | VariableCollectionId:17:4 | Value | 25 |
 | FIP Icon Scale | VariableCollectionId:35:2 | 24, 20, 16 | 3 |
-| FIP Control Scale | VariableCollectionId:46:2 | 32, 40, 48 | 10 |
+| FIP Control Scale | VariableCollectionId:46:2 | 32, 40, 48 | 12 |
 | FIP Icon Tone | VariableCollectionId:50:206 | Default, Secondary, Active, On Accent, Success, Warning, Danger, Info | 1 |
 
 All variables have explicit scopes and WEB code syntax.
@@ -124,6 +124,7 @@ Utilities:
 - Icon/Utility/Search — 54:208
 - Icon/Utility/Close — 54:249
 - Icon/Utility/Chevron Down — 54:260
+- Icon/Utility/Chevron Up — 168:208
 - Icon/Utility/Check — 54:270
 - Icon/Utility/Minus — 54:280
 - Icon/Utility/Alert Circle — 54:290
@@ -154,7 +155,7 @@ Utilities:
 
 ## 4. Controls
 
-Current controls state: 19 component sets, 160 variants, 261 nested Icon Slot instances, 17 nested Spinner instances, 0 direct icon instances, 0 placeholders, 0 visible overflow findings. Detailed button records live in `docs/FIGMA_BUTTON_COMPONENTS.md`; extended fields live in `docs/FIGMA_EXTENDED_FIELDS.md`.
+Current controls state: 21 component sets, 174 variants, 278 nested Icon Slot instances, 10 nested Spinner instances, 0 direct icon instances, 0 placeholders, and 0 component-set grid overlaps. Detailed records live in `docs/FIGMA_BUTTON_COMPONENTS.md`, `docs/FIGMA_EXTENDED_FIELDS.md`, and `docs/FIGMA_SEARCHABLE_COMBOBOX.md`.
 
 | Component set | ID | Variants | API |
 |---|---:|---:|---|
@@ -177,6 +178,8 @@ Current controls state: 19 component sets, 160 variants, 261 nested Icon Slot in
 | Input/Date & Datetime | 146:488 | 8 | Type Date/Datetime × State Default/Focus/Error/Disabled |
 | Input/Password | 147:616 | 8 | Visibility Hidden/Shown × State Default/Focus/Error/Disabled |
 | Input/File Upload | 149:906 | 8 | Empty/Drag Over/Selected/Validating/Ready/Complete/Error/Disabled |
+| Building Blocks/Combobox Option | 163:720 | 5 | Default/Hover/Keyboard Active/Selected/Disabled; Label |
+| Input/Searchable Combobox | 171:563 | 9 | Default/Focus/Open/Querying/Keyboard Active/Selected/Empty/Query Restored/Disabled; Label; Empty message; Show label/helper |
 
 ## 5. Corrections already made
 
@@ -187,6 +190,21 @@ Current controls state: 19 component sets, 160 variants, 261 nested Icon Slot in
 - Current source of truth: Light 0/10/24/4.5% with transparent-area shadow disabled; Dark 0/12/28/26%.
 - The user's direct Light style adjustment was preserved; documentation samples 106:5 and 106:8 remain bound to the two styles; label overflow 0; visual QA PASS.
 - This accepted Figma correction supersedes the old CSS shadow values; implementation must sync from Figma.
+
+### Search Field compact-width correction
+
+- Submit 模式 Value 使用 12px / 16px，保持单行结尾省略并横向 FILL；Live 模式继续使用 14px / 18px。
+- 修正节点：`142:431`、`142:456`、`142:481`、`142:506`。
+- Figma 不具备 CSS 容器查询，故 `Mode=Submit` 是短宽度排版契约；不把任意拉窄行为伪装成自动字体缩放。
+- Search Field 文档视觉复检 PASS。
+
+### Searchable Combobox architecture correction
+
+- `Select/Dropdown` 不足以表达查询、键盘、空结果和草稿恢复；正式组件为独立 `Input/Searchable Combobox`（`171:563`）。
+- Parent 只组合 `Building Blocks/Combobox Option` 实例；不复制 Option frame。
+- Figma 禁止覆盖实例内部的相对旋转，因此新增 `Icon/Utility/Chevron Up`（`168:208`）并通过 Icon Slot 替换；没有 detach。
+- Listbox 使用 Float elevation，不使用 Dialog elevation。
+- 结构与整组截图 QA PASS；详见 `docs/FIGMA_SEARCHABLE_COMBOBOX.md`。
 
 ### Badge and Tag semantic correction
 
@@ -222,11 +240,10 @@ When implementation starts:
 
 The Figma file is intentionally not considered page-ready yet.
 
-Foundation dependency extension P4.2, the first button group, and the extended-field group are complete and verified. Evidence is split across `docs/FIGMA_FOUNDATION_COMPONENT_BACKLOG.md`, `docs/FIGMA_BUTTON_COMPONENTS.md`, and `docs/FIGMA_EXTENDED_FIELDS.md`.
+Foundation dependency extension P4.2, the first button group, the extended-field group, and Searchable Combobox are complete and verified. Evidence is split across `docs/FIGMA_FOUNDATION_COMPONENT_BACKLOG.md`, `docs/FIGMA_BUTTON_COMPONENTS.md`, `docs/FIGMA_EXTENDED_FIELDS.md`, and `docs/FIGMA_SEARCHABLE_COMBOBOX.md`.
 
 ### Required component families
 
-- Searchable Combobox with open, keyboard, empty, and query-restoration states.
 - Switch/Toggle.
 - Tabs/Segmented Control.
 - Data Table, selection/sort states, Pagination.
