@@ -30,14 +30,15 @@
 - [x] detail — `Icon/Layout/Detail`（88:727）
 - [x] more — `Icon/Utility/More`（88:747）
 
-## 扩展字段前置图标
+## 组件前置图标
 
-以下 2 个不是 `AppIcon` 代码键，而是完成 Number 与 Date/Datetime 底层组件所需的最小依赖：
+以下 3 个不是 `AppIcon` 代码键，而是底层组件真实链路触发的最小依赖：
 
 - [x] plus — `Icon/Utility/Plus`（139:208）
 - [x] calendar — `Icon/Utility/Calendar`（139:212）
+- [x] chevron-up — `Icon/Utility/Chevron Up`（168:208）
 
-文档区：`Section · Extended field icons`（139:213）；两者均为 24px / 1.75 stroke，并绑定图标尺寸、粗细与颜色变量。
+Plus / Calendar 位于 `Section · Extended field icons`（139:213）；Chevron Up 文档卡为 `Utility · Chevron Up`（168:206）。三者均为 24px / 1.75 stroke，并绑定图标尺寸、粗细与颜色变量；Chevron Up 已加入 Icon Slot preferred swaps。
 
 ## 制作规则
 
@@ -52,7 +53,7 @@
 
 - 代码覆盖：25 / 25。
 - 新 AppIcon 母版：18 / 18。
-- 扩展字段前置图标：2 / 2。
+- 组件前置图标：3 / 3。
 - 图标色变量绑定：18 / 18。
 - 描边变量绑定：18 / 18。
 - Icon Slot 实际替换：18 / 18。
@@ -64,4 +65,4 @@
 - 未命名母版：0。
 - 结果：PASS。
 
-P4.1 与扩展字段前置图标均已关闭；后续新增图标必须由实际底层组件依赖触发。
+P4.1 与当前组件前置图标均已关闭；后续新增图标仍必须由实际底层组件依赖触发。
