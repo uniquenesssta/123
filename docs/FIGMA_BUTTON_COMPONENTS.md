@@ -70,6 +70,14 @@ Figma preserves the code intent but uses the completed semantic tokens and the l
 - Motion contract: Figma stores the static key shape; code applies `rotate(360deg)` over 800ms, linear, infinite.
 - Direct link: https://www.figma.com/design/PN0Whgu6HLWIHx4Mv6aHfu?node-id=126-294
 
+### Spinner visual correction
+
+- The first ellipse-arc attempt produced radial spokes and read like a clock rather than a progress indicator.
+- Final anatomy keeps the full Ellipse Track and replaces the Active arc with a reusable open cubic Vector path; no wedge closure and no radial spokes.
+- Final Active arc node IDs: `132:292`, `132:293`, `132:294`, `132:295`, `132:296`, `132:297`.
+- The Spinner component-set ID and Loading Button dependency IDs did not change.
+- Final Spinner and dependent Loading Button screenshots plus structure validation: PASS.
+
 ## Button/Loading
 
 - Component set: `Button/Loading`（`128:343`）
