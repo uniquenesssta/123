@@ -216,6 +216,7 @@ Current controls state: 23 component sets, 194 variants, 278 nested Icon Slot in
 - Five size tokens define the 36 × 20 track, 16 thumb, 2 padding, and 120 minimum parent width.
 - The current native-checkbox code usage remains the semantic source; implementation should use `<input type="checkbox" role="switch">` and map checked/pseudo-states to the exact Figma axes.
 - Material 3 and Simple Design System library assets were audited but not imported because their public API and token contract do not match this file.
+- Focus 视觉纠偏：原先的外层 frame 描边与 Track 之间露出背景，造成白色双线；Off/Focus（`181:575`）和 On/Focus（`182:573`）现均使用 Track OUTSIDE 描边。
 - Structure QA and Light/Dark visual QA PASS; documentation text discovered in Dark review was corrected to semantic fills. Details: `docs/FIGMA_SWITCH_TOGGLE.md`.
 
 ### Badge and Tag semantic correction
