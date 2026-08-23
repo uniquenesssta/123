@@ -88,7 +88,8 @@ Figma 记录：
 1. Danger Button、Icon Button、Loading Button；
 2. Spinner（作为 Loading Button 的直接依赖提前完成）；
 3. Search Field、Textarea、Number、Date/Datetime、Password、File Upload；
-4. Searchable Combobox 与其 Option building block。
+4. Searchable Combobox 与其 Option building block；
+5. Switch / Toggle 与其 Switch Control building block。
 
 按钮首组的组件 ID、变体 API、嵌套关系、代码约束与验收证据单独记录在 `docs/FIGMA_BUTTON_COMPONENTS.md`，本文件不重复展开。
 
@@ -115,23 +116,30 @@ Searchable Combobox 记录见 `docs/FIGMA_SEARCHABLE_COMBOBOX.md`：
 - 合计 2 个组件集、14 个变体；Parent 内 27 个 Option 实例、9 个真实 `Button/Icon` toggle、直接 icon master 实例 0；
 - 组件集网格重叠 0、复制 Option frame 0、截图检查 PASS。
 
+Switch / Toggle 记录见 `docs/FIGMA_SWITCH_TOGGLE.md`：
+
+- 新变量：`switch/track-width`（`178:563`）、`switch/track-height`（`178:564`）、`switch/thumb-size`（`178:565`）、`switch/track-padding`（`178:566`）、`switch/min-width`（`178:567`）；
+- 组件集：`Building Blocks/Switch Control`（`183:563`）与 `Switch/Toggle`（`186:583`）；
+- 合计 2 个组件集、20 个变体；Parent 内 10 个真实 Switch Control 实例，复制 Track / Thumb frame 0；
+- Checked Off / On 与 Default / Hover / Pressed / Focus / Disabled 状态矩阵完整；
+- 真实 API Readonly Context 样例 2 个；hardcoded visual paints 0；overlap / overflow 0；Light / Dark 截图检查 PASS。
+
 ### 待执行顺序
 
-1. Switch / Toggle；
-2. Tabs / Segmented Control；
-3. Data Table、Row、Cell、排序、选择、空状态、Pagination；
-4. Dropdown Menu / Context Menu / Overflow Menu；
-5. Dialog：普通、确认、危险确认；
-6. Toast、Inline Alert、Blocking Message；
-7. Accordion / Disclosure；
-8. Progress、Skeleton、Empty State；
-9. Avatar：球队、球员、默认占位。
+1. Tabs / Segmented Control；
+2. Data Table、Row、Cell、排序、选择、空状态、Pagination；
+3. Dropdown Menu / Context Menu / Overflow Menu；
+4. Dialog：普通、确认、危险确认；
+5. Toast、Inline Alert、Blocking Message；
+6. Accordion / Disclosure；
+7. Progress、Skeleton、Empty State；
+8. Avatar：球队、球员、默认占位。
 
-下一项固定为：`Switch / Toggle`。完成并验收该组件前，不开始页面拼装。
+下一项固定为：`Tabs / Segmented Control`。完成并验收该组件前，不开始页面拼装。
 ## 组件族验收
 
 - 尺寸、文字、图标、内边距、点击区均无溢出；
-- Default / Hover / Pressed / Disabled 等适用状态完整；
+- Default / Hover / Pressed / Focus / Disabled 等适用状态完整；
 - Danger 状态必须引用上述四个语义变量；
 - 图标只通过 Icon Slot 嵌套；
 - Tag 的可删除语义与 Badge 的状态语义保持分离；
