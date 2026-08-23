@@ -31,7 +31,9 @@ Page documentation roots:
 - Section · Badge & Tag: 48:10
 - Section · Spinner: 126:273
 - Section · Extended Fields: 142:291
-- Section · Switch & Toggle: 179:563\n- Section · Tabs & Segmented Control: 199:595
+- Section · Switch & Toggle: 179:563
+- Section · Tabs & Segmented Control: 199:595
+- Section · Data Table & Pagination: 228:1090
 
 ## 2. Foundations
 
@@ -41,7 +43,7 @@ Page documentation roots:
 |---|---|---|---:|
 | FIP Primitives | VariableCollectionId:17:2 | Value | 53 |
 | FIP Color | VariableCollectionId:17:3 | Light, Dark | 41 |
-| FIP Size | VariableCollectionId:17:4 | Value | 36 |
+| FIP Size | VariableCollectionId:17:4 | Value | 39 |
 | FIP Icon Scale | VariableCollectionId:35:2 | 24, 20, 16 | 3 |
 | FIP Control Scale | VariableCollectionId:46:2 | 32, 40, 48 | 15 |
 | FIP Icon Tone | VariableCollectionId:50:206 | Default, Secondary, Active, On Accent, Success, Warning, Danger, Info | 1 |
@@ -156,7 +158,7 @@ Utilities:
 
 ## 4. Controls
 
-Current controls state: 28 component sets and 251 variants. The Tabs / Segmented group adds 5 sets, 57 variants, 18 nested Tabs/Item instances and 18 nested Segmented Item instances; all new nested controls remain exposed, hardcoded visual paints are 0, overflow is 0, and Light/Dark QA passes. Detailed records live in `docs/FIGMA_BUTTON_COMPONENTS.md`, `docs/FIGMA_EXTENDED_FIELDS.md`, `docs/FIGMA_SEARCHABLE_COMBOBOX.md`, `docs/FIGMA_SWITCH_TOGGLE.md`, and `docs/FIGMA_TABS_SEGMENTED_CONTROL.md`.
+Current controls state: 35 component sets and 322 variants. The Data Table / Pagination group adds 7 sets and 71 variants; sorting, selection, Loaded / Loading / Empty, and First / Middle / Last / Busy are closed. Checkbox, Badge, Button/Secondary, Spinner and all table/pagination subcomponents remain true nested instances. Detailed records live in `docs/FIGMA_BUTTON_COMPONENTS.md`, `docs/FIGMA_EXTENDED_FIELDS.md`, `docs/FIGMA_SEARCHABLE_COMBOBOX.md`, `docs/FIGMA_SWITCH_TOGGLE.md`, `docs/FIGMA_TABS_SEGMENTED_CONTROL.md`, and `docs/FIGMA_DATA_TABLE_PAGINATION.md`.
 
 | Component set | ID | Variants | API |
 |---|---:|---:|---|
@@ -188,6 +190,14 @@ Current controls state: 28 component sets and 251 variants. The Tabs / Segmented
 | Tabs/Bar | 213:940 | 6 | Size 32/40 × Active 1/2/3; three exposed Tabs/Item instances |
 | Segmented Control/Item | 214:996 | 20 | Size 32/40 × Selected False/True × State Default/Hover/Pressed/Focus/Disabled; Label; Show leading; exposed Icon Slot |
 | Segmented Control | 216:1036 | 6 | Size 32/40 × Selected Detail/Compare/Cards; three exposed Item instances |
+| Building Blocks/Table Header Cell | 230:1170 | 24 | Type Text/Number × Sort None/Ascending/Descending × State Default/Hover/Focus/Disabled; Label |
+| Building Blocks/Table Cell | 235:1242 | 20 | Type Text/Metadata/Number/Status/Action × State Default/Hover/Selected/Disabled; Primary; Supporting |
+| Data Table/Row | 236:1331 | 4 | State Default/Hover/Selected/Disabled; nested Checkbox and Table Cell instances |
+| Data Table | 238:1663 | 3 | State Default/Loading/Empty; nested Header Cell, Row and Spinner |
+| Pagination/Page Button | 239:1439 | 6 | Default/Hover/Pressed/Focus/Current/Disabled; Label |
+| Pagination/Nav Button | 240:1447 | 10 | Direction Previous/Next × State Default/Hover/Pressed/Focus/Disabled; Label |
+| Pagination | 241:1477 | 4 | State First/Middle/Last/Busy; Summary; nested Nav/Page Button and Spinner |
+
 
 ## 5. Corrections already made
 
@@ -233,6 +243,17 @@ Current controls state: 28 component sets and 251 variants. The Tabs / Segmented
 - Material 3 and Simple Design System assets were audited but not imported because the compact desktop geometry, close semantics, variant API, and token model do not match FIP.
 - Five sets, 57 variants, nine tokens, hardcoded visual paints 0, overflow 0, and Light/Dark visual QA PASS. Details: `docs/FIGMA_TABS_SEGMENTED_CONTROL.md`.
 
+### Data Table / Pagination architecture
+
+- Header Cell（`230:1170`）分离 Type、Sort 与交互 State；默认仅 1px 底线，Focus 才显示完整焦点边框。
+- Table Cell（`235:1242`）按 Text / Metadata / Number / Status / Action 拆分；Status 与 Action 分别引用 Badge 和 Button/Secondary master。
+- Row（`236:1331`）同步 Default / Hover / Selected / Disabled；Selected 勾选 Checkbox 并显示 2px accent 左边缘。
+- Data Table（`238:1663`）覆盖 Default / Loading / Empty；Loading 保留已有行且禁用交互，不闪空。
+- Pagination（`241:1477`）与 Data Table 保持 1120px 同宽但独立；First / Last 禁用边界按钮，Busy 禁止重复翻页。
+- 新尺寸 token 为 34px header、9px cell padding-x、27px compact page control；继续复用 36px row。
+- 代码当前没有排序行为；Figma Sort 是待实现契约，必须同步 `aria-sort`。Code Connect 在可复用代码组件建立后再连接。
+- 七个 sets、71 variants；Controls 总计 35 sets、322 variants；Light / Dark 真实球员目录与状态截图 QA PASS。Details: `docs/FIGMA_DATA_TABLE_PAGINATION.md`.
+
 ### Badge and Tag semantic correction
 
 - Badge is status-only and never carries a remove action.
@@ -267,12 +288,10 @@ When implementation starts:
 
 The Figma file is intentionally not considered page-ready yet.
 
-Foundation dependency extension P4.2, the first button group, the extended-field group, Searchable Combobox, Switch / Toggle, and Tabs / Segmented Control are complete and verified. Evidence is split across `docs/FIGMA_FOUNDATION_COMPONENT_BACKLOG.md`, `docs/FIGMA_BUTTON_COMPONENTS.md`, `docs/FIGMA_EXTENDED_FIELDS.md`, `docs/FIGMA_SEARCHABLE_COMBOBOX.md`, `docs/FIGMA_SWITCH_TOGGLE.md`, and `docs/FIGMA_TABS_SEGMENTED_CONTROL.md`.
+Foundation dependency extension P4.2, the first button group, the extended-field group, Searchable Combobox, Switch / Toggle, Tabs / Segmented Control, and Data Table / Pagination are complete and verified. Evidence is split across `docs/FIGMA_FOUNDATION_COMPONENT_BACKLOG.md`, `docs/FIGMA_BUTTON_COMPONENTS.md`, `docs/FIGMA_EXTENDED_FIELDS.md`, `docs/FIGMA_SEARCHABLE_COMBOBOX.md`, `docs/FIGMA_SWITCH_TOGGLE.md`, `docs/FIGMA_TABS_SEGMENTED_CONTROL.md`, and `docs/FIGMA_DATA_TABLE_PAGINATION.md`.
 
 ### Required component families
 
-- Tabs/Segmented Control.
-- Data Table, selection/sort states, Pagination.
 - Menu/Context Menu/Overflow Menu.
 - Dialog, Toast, Inline Alert, Disclosure.
 - Progress, Skeleton, Empty State.
