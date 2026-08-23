@@ -89,7 +89,9 @@ Figma 记录：
 2. Spinner（作为 Loading Button 的直接依赖提前完成）；
 3. Search Field、Textarea、Number、Date/Datetime、Password、File Upload；
 4. Searchable Combobox 与其 Option building block；
-5. Switch / Toggle 与其 Switch Control building block；\n6. Tabs / Segmented Control 与 Close Button、Item building blocks。
+5. Switch / Toggle 与其 Switch Control building block；
+6. Tabs / Segmented Control 与 Close Button、Item building blocks；
+7. Data Table / Pagination 与 Header Cell、Cell、Row、Page Button、Nav Button building blocks。
 
 按钮首组的组件 ID、变体 API、嵌套关系、代码约束与验收证据单独记录在 `docs/FIGMA_BUTTON_COMPONENTS.md`，本文件不重复展开。
 
@@ -132,17 +134,24 @@ Tabs / Segmented Control 记录见 `docs/FIGMA_TABS_SEGMENTED_CONTROL.md`：
 - Tabs 长名称单行省略、Segmented 总高 32 / 40、仅一个标签时 Compare / Cards 禁用；
 - hardcoded visual paints 0；overflow 0；Light / Dark 截图检查 PASS。
 
+Data Table / Pagination 记录见 `docs/FIGMA_DATA_TABLE_PAGINATION.md`：
+
+- 新变量 3 个：表头高度 34、单元格横向 padding 9、分页控件高度 27；继续复用 36px table row；
+- 组件集：`Building Blocks/Table Header Cell`（`230:1170`）、`Building Blocks/Table Cell`（`235:1242`）、`Data Table/Row`（`236:1331`）、`Data Table`（`238:1663`）、`Pagination/Page Button`（`239:1439`）、`Pagination/Nav Button`（`240:1447`）、`Pagination`（`241:1477`）；
+- 合计 7 个组件集、71 个变体；排序、选择、Loaded / Loading / Empty、First / Middle / Last / Busy 状态闭合；
+- Checkbox、Badge、Button/Secondary、Spinner、Header Cell、Table Cell、Row 与分页子组件全部保持 instance composition；
+- Controls 总计 35 个组件集、322 个变体；Light / Dark 真实球员目录截图检查 PASS。
+
 ### 待执行顺序
 
-1. Data Table、Row、Cell、排序、选择、空状态、Pagination；
-2. Dropdown Menu / Context Menu / Overflow Menu；
-3. Dialog：普通、确认、危险确认；
-4. Toast、Inline Alert、Blocking Message；
-5. Accordion / Disclosure；
-6. Progress、Skeleton、Empty State；
-7. Avatar：球队、球员、默认占位。
+1. Dropdown Menu / Context Menu / Overflow Menu；
+2. Dialog：普通、确认、危险确认；
+3. Toast、Inline Alert、Blocking Message；
+4. Accordion / Disclosure；
+5. Progress、Skeleton、Empty State；
+6. Avatar：球队、球员、默认占位。
 
-下一项固定为：`Data Table / Pagination`。完成并验收该组件前，不开始页面拼装。
+下一项固定为：`Dropdown / Context / Overflow Menu`。完成并验收底层组件前，不开始页面拼装。
 ## 组件族验收
 
 - 尺寸、文字、图标、内边距、点击区均无溢出；
