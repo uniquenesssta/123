@@ -31,6 +31,7 @@ Page documentation roots:
 - Section · Badge & Tag: 48:10
 - Section · Spinner: 126:273
 - Section · Extended Fields: 142:291
+- Section · Switch & Toggle: 179:563
 
 ## 2. Foundations
 
@@ -40,7 +41,7 @@ Page documentation roots:
 |---|---|---|---:|
 | FIP Primitives | VariableCollectionId:17:2 | Value | 53 |
 | FIP Color | VariableCollectionId:17:3 | Light, Dark | 41 |
-| FIP Size | VariableCollectionId:17:4 | Value | 25 |
+| FIP Size | VariableCollectionId:17:4 | Value | 30 |
 | FIP Icon Scale | VariableCollectionId:35:2 | 24, 20, 16 | 3 |
 | FIP Control Scale | VariableCollectionId:46:2 | 32, 40, 48 | 12 |
 | FIP Icon Tone | VariableCollectionId:50:206 | Default, Secondary, Active, On Accent, Success, Warning, Danger, Info | 1 |
@@ -155,7 +156,7 @@ Utilities:
 
 ## 4. Controls
 
-Current controls state: 21 component sets, 174 variants, 278 nested Icon Slot instances, 10 nested Spinner instances, 0 direct icon instances, 0 placeholders, and 0 component-set grid overlaps. Detailed records live in `docs/FIGMA_BUTTON_COMPONENTS.md`, `docs/FIGMA_EXTENDED_FIELDS.md`, and `docs/FIGMA_SEARCHABLE_COMBOBOX.md`.
+Current controls state: 23 component sets, 194 variants, 278 nested Icon Slot instances, 10 nested Spinner instances, 10 nested Switch Control instances, 0 direct icon instances, 0 placeholders, and 0 component-set grid overlaps. Detailed records live in `docs/FIGMA_BUTTON_COMPONENTS.md`, `docs/FIGMA_EXTENDED_FIELDS.md`, `docs/FIGMA_SEARCHABLE_COMBOBOX.md`, and `docs/FIGMA_SWITCH_TOGGLE.md`.
 
 | Component set | ID | Variants | API |
 |---|---:|---:|---|
@@ -180,6 +181,8 @@ Current controls state: 21 component sets, 174 variants, 278 nested Icon Slot in
 | Input/File Upload | 149:906 | 8 | Empty/Drag Over/Selected/Validating/Ready/Complete/Error/Disabled |
 | Building Blocks/Combobox Option | 163:720 | 5 | Default/Hover/Keyboard Active/Selected/Disabled; Label |
 | Input/Searchable Combobox | 171:563 | 9 | Default/Focus/Open/Querying/Keyboard Active/Selected/Empty/Query Restored/Disabled; Label; Empty message; Show label/helper |
+| Building Blocks/Switch Control | 183:563 | 10 | Checked Off/On × State Default/Hover/Pressed/Focus/Disabled |
+| Switch/Toggle | 186:583 | 10 | Checked Off/On × State Default/Hover/Pressed/Focus/Disabled; Label; Description; Show label/description |
 
 ## 5. Corrections already made
 
@@ -205,6 +208,15 @@ Current controls state: 21 component sets, 174 variants, 278 nested Icon Slot in
 - Figma 禁止覆盖实例内部的相对旋转，因此新增 `Icon/Utility/Chevron Up`（`168:208`）并通过 Icon Slot 替换；没有 detach。
 - Listbox 使用 Float elevation，不使用 Dialog elevation。
 - 结构与整组截图 QA PASS；详见 `docs/FIGMA_SEARCHABLE_COMBOBOX.md`。
+
+### Switch / Toggle architecture correction
+
+- A binary immediate-effect setting is represented by `Switch/Toggle` (`186:583`), not by the existing Checkbox family.
+- The parent composes 10 instances of `Building Blocks/Switch Control` (`183:563`); Track and Thumb are never copied into parent variants.
+- Five size tokens define the 36 × 20 track, 16 thumb, 2 padding, and 120 minimum parent width.
+- The current native-checkbox code usage remains the semantic source; implementation should use `<input type="checkbox" role="switch">` and map checked/pseudo-states to the exact Figma axes.
+- Material 3 and Simple Design System library assets were audited but not imported because their public API and token contract do not match this file.
+- Structure QA and Light/Dark visual QA PASS; documentation text discovered in Dark review was corrected to semantic fills. Details: `docs/FIGMA_SWITCH_TOGGLE.md`.
 
 ### Badge and Tag semantic correction
 
@@ -240,11 +252,10 @@ When implementation starts:
 
 The Figma file is intentionally not considered page-ready yet.
 
-Foundation dependency extension P4.2, the first button group, the extended-field group, and Searchable Combobox are complete and verified. Evidence is split across `docs/FIGMA_FOUNDATION_COMPONENT_BACKLOG.md`, `docs/FIGMA_BUTTON_COMPONENTS.md`, `docs/FIGMA_EXTENDED_FIELDS.md`, and `docs/FIGMA_SEARCHABLE_COMBOBOX.md`.
+Foundation dependency extension P4.2, the first button group, the extended-field group, Searchable Combobox, and Switch / Toggle are complete and verified. Evidence is split across `docs/FIGMA_FOUNDATION_COMPONENT_BACKLOG.md`, `docs/FIGMA_BUTTON_COMPONENTS.md`, `docs/FIGMA_EXTENDED_FIELDS.md`, `docs/FIGMA_SEARCHABLE_COMBOBOX.md`, and `docs/FIGMA_SWITCH_TOGGLE.md`.
 
 ### Required component families
 
-- Switch/Toggle.
 - Tabs/Segmented Control.
 - Data Table, selection/sort states, Pagination.
 - Menu/Context Menu/Overflow Menu.
