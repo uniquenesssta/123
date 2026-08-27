@@ -92,7 +92,8 @@ Figma 记录：
 5. Switch / Toggle 与其 Switch Control building block；
 6. Tabs / Segmented Control 与 Close Button、Item building blocks；
 7. Data Table / Pagination 与 Header Cell、Cell、Row、Page Button、Nav Button building blocks；
-8. Dropdown / Context / Overflow Menu 与 Menu Item、Separator、Note、Surface building blocks。
+8. Dropdown / Context / Overflow Menu 与 Menu Item、Separator、Note、Surface building blocks；
+9. Dialog：普通、确认、名称校验危险确认，与 Header、Body、Facts、Actions、Modal Layer。
 
 按钮首组的组件 ID、变体 API、嵌套关系、代码约束与验收证据单独记录在 `docs/FIGMA_BUTTON_COMPONENTS.md`，本文件不重复展开。
 
@@ -152,15 +153,24 @@ Dropdown / Context / Overflow Menu 记录见 `docs/FIGMA_DROPDOWN_CONTEXT_OVERFL
 - Button、Icon Slot、More、Chevron、Menu Item、Separator、Note 与 Surface 全部保持 instance composition；
 - Controls 总计 41 个组件集、362 个变体；hardcoded visual paints 0，placeholder 0，Light / Dark 截图检查 PASS。
 
+Dialog 记录见 [FIGMA_DIALOG.md](FIGMA_DIALOG.md)：
+
+- 新增 5 个尺寸 token：Compact 480、Wide 640、Header min-height 46、Header padding-y 9、Body padding-y 11；保留用户确认的 Light 4.5% 阴影。
+- 组件集：Header（`277:2341`）、Body（`278:2354`）、Actions（`278:2630`）、Standard（`279:2795`）、Confirmation（`280:2814`）、Typed Danger（`280:3600`）；单组件 Facts（`278:2257`）与 Modal Layer（`281:2955`）。
+- 合计 6 个组件集、36 个变体、2 个单组件；275 个后代嵌套实例全部可解析。Controls 总计 47 个组件集、398 个变体。
+- 真实语义覆盖历史隐藏、阵容版本删除/归档、比赛 P4 保护与精确名称校验；Busy 禁止关闭、取消和重复提交。
+- Light / Dark、长标题/长对象名、滚动 Body 与危险操作保护截图检查 PASS；意外 overflow 0、overlap 0、hardcoded visual paints 0。
+- 13 个原型测试状态可到达，47 条 reaction 连接和 12 个禁用入口回读通过；不等同于代码中的键盘或请求流程已实现。
+- 当前代码仍是 workspace region；后续实现需补模态语义、焦点锁定/恢复、异步状态与后端保护复核。
+
 ### 待执行顺序
 
-1. Dialog：普通、确认、危险确认；
-2. Toast、Inline Alert、Blocking Message；
-3. Accordion / Disclosure；
-4. Progress、Skeleton、Empty State；
-5. Avatar：球队、球员、默认占位。
+1. Toast、Inline Alert、Blocking Message；
+2. Accordion / Disclosure；
+3. Progress、Skeleton、Empty State；
+4. Avatar：球队、球员、默认占位。
 
-下一项固定为：`Dialog：普通 / 确认 / 危险确认`。完成并验收底层组件前，不开始页面拼装。
+下一项固定为：`Toast / Inline Alert / Blocking Message`。完成并验收底层组件前，不开始页面拼装。
 ## 组件族验收
 
 - 尺寸、文字、图标、内边距、点击区均无溢出；

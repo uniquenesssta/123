@@ -35,6 +35,8 @@ Page documentation roots:
 - Section · Tabs & Segmented Control: 199:595
 - Section · Data Table & Pagination: 228:1090
 - Section · Dropdown, Context & Overflow Menu: 249:1705
+- Section · Dialog: 276:2210
+- Dialog prototype launcher: 286:3364 (13 component test frames on Controls; not product Screens)
 
 ## 2. Foundations
 
@@ -44,7 +46,7 @@ Page documentation roots:
 |---|---|---|---:|
 | FIP Primitives | VariableCollectionId:17:2 | Value | 53 |
 | FIP Color | VariableCollectionId:17:3 | Light, Dark | 41 |
-| FIP Size | VariableCollectionId:17:4 | Value | 45 |
+| FIP Size | VariableCollectionId:17:4 | Value | 50 |
 | FIP Icon Scale | VariableCollectionId:35:2 | 24, 20, 16 | 3 |
 | FIP Control Scale | VariableCollectionId:46:2 | 32, 40, 48 | 15 |
 | FIP Icon Tone | VariableCollectionId:50:206 | Default, Secondary, Active, On Accent, Success, Warning, Danger, Info | 1 |
@@ -159,7 +161,7 @@ Utilities:
 
 ## 4. Controls
 
-Current controls state: 41 component sets and 362 variants. The Dropdown / Context / Overflow Menu group adds 6 sets, 40 variants, and 1 single component; Neutral / Danger, Selection / Empty, Closed / Open, and Run / Lineup / Match semantics are closed. Buttons, Icon Slot, existing icon masters, Menu Item, Separator, Note and Menu Surface remain true nested instances. Detailed records live in the separate component files linked from `docs/README.md`, including `docs/FIGMA_DROPDOWN_CONTEXT_OVERFLOW_MENU.md`.
+Current controls state: 47 component sets and 398 variants. Dialog adds 6 sets, 36 variants and 2 single components. Standard, Neutral / Danger confirmation and exact-name destructive confirmation compose existing Header, Body, Facts, Actions, Button, Input and Icon Slot instances. This is a Figma design contract; the current application ModalController still renders a workspace region. Details: [Dialog record](FIGMA_DIALOG.md). Previous group records remain indexed in `docs/README.md`.
 
 | Component set | ID | Variants | API |
 |---|---:|---:|---|
@@ -204,7 +206,14 @@ Current controls state: 41 component sets and 362 variants. The Dropdown / Conte
 | Dropdown Menu | 263:1938 | 6 | State Closed/Hover/Pressed/Focus/Open/Disabled; nested Button/Secondary and Menu Surface |
 | Context Menu | 265:1924 | 3 | Target Run/Lineup/Match; exact source action and note semantics |
 | Overflow Menu | 267:2007 | 6 | State Closed/Hover/Pressed/Focus/Open/Disabled; nested Button/Icon, More and Menu Surface |
+| Building Blocks/Dialog Header | 277:2341 | 6 | Tone Neutral/Danger × State Default/Focus/Busy; Title; Subtitle; visibility booleans |
+| Building Blocks/Dialog Body | 278:2354 | 4 | Content Message/Facts/Form/Typed; Description; Error; visibility booleans; exposed Facts/Field |
+| Building Blocks/Dialog Actions | 278:2630 | 8 | Tone Primary/Danger × State Default/Focus/Disabled/Loading; Show cancel; exposed Cancel/Confirm |
+| Dialog/Standard | 279:2795 | 6 | Size Compact/Wide × State Default/Submitting/Error; Body content swap |
+| Dialog/Confirmation | 280:2814 | 6 | Tone Neutral/Danger × State Default/Submitting/Error; exposed Header/Body/Actions |
+| Dialog/Typed Danger | 280:3600 | 6 | State Empty/Editing/Valid/Mismatch/Submitting/Error; exposed Header/Body/Actions |
 
+Standalone components: `Building Blocks/Menu Note` (`255:1763`); `Building Blocks/Dialog Facts` (`278:2257`, up to three editable facts); `Dialog/Modal Layer` (`281:2955`, Dialog content swap). These do not add variants to the totals above.
 
 ## 5. Corrections already made
 
@@ -271,6 +280,19 @@ Current controls state: 41 component sets and 362 variants. The Dropdown / Conte
 - 六个 menu tokens 形成 240 / 8 / 5 / 11 的紧凑桌面几何；Menu Item 内容区宽 224，padding 为 11 × 10。
 - 六个 sets、40 variants、1 single component；Controls 总计 41 sets、362 variants；hardcoded paints 0，placeholders 0，Light / Dark visual QA PASS. Details: `docs/FIGMA_DROPDOWN_CONTEXT_OVERFLOW_MENU.md`.
 
+### Dialog architecture and safety contract
+
+- Six sets / 36 variants plus Facts and Modal Layer single components. All eight masters retain true nested instances; 275 descendant instances resolve to their main components (includes inherited nested icons and controls).
+- Compact / Wide widths are 480 / 640. Header minimum 46 with 9px vertical padding; Body 11px vertical padding; horizontal padding 12; Actions 8px vertical padding and existing 32px buttons.
+- The accepted Light Dialog shadow remains 4.5% alpha; Dark uses the existing 26% style. Same masters are used for both themes.
+- Neutral confirmation only hides history. Lineup versions are deleted or archived according to references. Match deletion preserves ordinary model runs/snapshots, but protected P4 lineage blocks permanent deletion.
+- Typed Danger compares `trim(input) === expectedName` before enabling the destructive action. Empty, partial and mismatched input remain disabled; submitting blocks close, cancel and repeat submit.
+- Long-body overflow is intentionally constrained to a vertically scrollable Body; Header and Actions remain visible.
+- Current `ModalController` renders a workspace `role="region"`, and `runPendingAction` closes before awaiting the action. Overlay semantics, focus trap/restore and inline pending/error persistence are implementation work, not existing code behavior. No speculative Code Connect was published.
+- Final QA: 47 sets / 398 variants; unexpected overflow 0; overlap 0; hardcoded visual paints 0; broken main-component references 0; five new scoped tokens verified. Light / Dark, source protection and long-content screenshots reviewed.
+- Prototype: 13 reachable test frames, 47 verified reaction links, 12 blocked controls. Input/server results use explicit simulation buttons; this is not an application end-to-end test.
+- Details and stable IDs: [Dialog record](FIGMA_DIALOG.md).
+
 ### Badge and Tag semantic correction
 
 - Badge is status-only and never carries a remove action.
@@ -305,12 +327,12 @@ When implementation starts:
 
 The Figma file is intentionally not considered page-ready yet.
 
-Foundation dependency extension P4.2, the first button group, the extended-field group, Searchable Combobox, Switch / Toggle, Tabs / Segmented Control, Data Table / Pagination, and Dropdown / Context / Overflow Menu are complete and verified. Evidence is split across the separate records linked from `docs/README.md`, including `docs/FIGMA_DROPDOWN_CONTEXT_OVERFLOW_MENU.md`.
+Foundation dependency extension P4.2, the first button group, the extended-field group, Searchable Combobox, Switch / Toggle, Tabs / Segmented Control, Data Table / Pagination, Dropdown / Context / Overflow Menu, and Dialog are complete and verified. Evidence is split across the separate records linked from `docs/README.md`, including `docs/FIGMA_DIALOG.md`.
 
 ### Required component families
 
-- Dialog: standard, confirm, and danger confirm.
-- Toast, Inline Alert, Blocking Message, and Disclosure.
+- Toast, Inline Alert, Blocking Message (next group).
+- Accordion / Disclosure.
 - Progress, Skeleton, Empty State.
 - Avatar for team/player entities.
 
