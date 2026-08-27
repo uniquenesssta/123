@@ -37,6 +37,8 @@ Page documentation roots:
 - Section · Dropdown, Context & Overflow Menu: 249:1705
 - Section · Dialog: 276:2210
 - Dialog prototype launcher: 286:3364 (13 component test frames on Controls; not product Screens)
+- Section · Toast / Inline Alert / Blocking Message: 298:3991
+- Feedback prototype launcher: 309:4724 (18 component test frames on Controls; not product Screens)
 
 ## 2. Foundations
 
@@ -45,8 +47,8 @@ Page documentation roots:
 | Collection | ID | Modes | Count |
 |---|---|---|---:|
 | FIP Primitives | VariableCollectionId:17:2 | Value | 53 |
-| FIP Color | VariableCollectionId:17:3 | Light, Dark | 41 |
-| FIP Size | VariableCollectionId:17:4 | Value | 50 |
+| FIP Color | VariableCollectionId:17:3 | Light, Dark | 42 |
+| FIP Size | VariableCollectionId:17:4 | Value | 57 |
 | FIP Icon Scale | VariableCollectionId:35:2 | 24, 20, 16 | 3 |
 | FIP Control Scale | VariableCollectionId:46:2 | 32, 40, 48 | 15 |
 | FIP Icon Tone | VariableCollectionId:50:206 | Default, Secondary, Active, On Accent, Success, Warning, Danger, Info | 1 |
@@ -161,7 +163,7 @@ Utilities:
 
 ## 4. Controls
 
-Current controls state: 47 component sets and 398 variants. Dialog adds 6 sets, 36 variants and 2 single components. Standard, Neutral / Danger confirmation and exact-name destructive confirmation compose existing Header, Body, Facts, Actions, Button, Input and Icon Slot instances. This is a Figma design contract; the current application ModalController still renders a workspace region. Details: [Dialog record](FIGMA_DIALOG.md). Previous group records remain indexed in `docs/README.md`.
+Current controls state: 53 component sets and 432 variants. Toast / Inline Alert / Blocking Message adds 6 sets, 34 variants and 1 Task Activity single component. It composes Feedback Content, Action and Close with existing Button, Loading Button, Icon Slot and Spinner masters. Nonmodal activity is separate from blocking recovery. This is a Figma design contract; timer identity, click targets, ARIA synchronization and recovery handlers still require application implementation. Details: [Feedback record](FIGMA_TOAST_INLINE_ALERT_BLOCKING_MESSAGE.md). Previous group records remain indexed in `docs/README.md`.
 
 | Component set | ID | Variants | API |
 |---|---:|---:|---|
@@ -212,8 +214,14 @@ Current controls state: 47 component sets and 398 variants. Dialog adds 6 sets, 
 | Dialog/Standard | 279:2795 | 6 | Size Compact/Wide × State Default/Submitting/Error; Body content swap |
 | Dialog/Confirmation | 280:2814 | 6 | Tone Neutral/Danger × State Default/Submitting/Error; exposed Header/Body/Actions |
 | Dialog/Typed Danger | 280:3600 | 6 | State Empty/Editing/Valid/Mismatch/Submitting/Error; exposed Header/Body/Actions |
+| Building Blocks/Feedback Content | 299:4040 | 4 | Tone Info/Success/Warning/Danger; Title; Description; Show title/description/leading; exposed Icon Slot |
+| Building Blocks/Feedback Action | 300:4242 | 12 | Style Primary/Secondary × State Default/Hover/Pressed/Focus/Disabled/Loading; exposed Button Label |
+| Building Blocks/Feedback Close | 301:4094 | 5 | State Default/Hover/Pressed/Focus/Disabled; nested Button/Icon |
+| Toast | 302:4210 | 4 | Tone Info/Success/Warning/Danger; Show close true; Show action false; exposed Content/Action/Close |
+| Inline Alert | 303:4259 | 4 | Tone Info/Success/Warning/Danger; Show close false; Show action false; exposed Content/Action/Close |
+| Blocking Message | 304:4348 | 5 | State Unavailable/Blocked/Error/Retrying/Fatal; exposed Content and applicable recovery Actions |
 
-Standalone components: `Building Blocks/Menu Note` (`255:1763`); `Building Blocks/Dialog Facts` (`278:2257`, up to three editable facts); `Dialog/Modal Layer` (`281:2955`, Dialog content swap). These do not add variants to the totals above.
+Standalone components: `Building Blocks/Menu Note` (`255:1763`); `Building Blocks/Dialog Facts` (`278:2257`, up to three editable facts); `Dialog/Modal Layer` (`281:2955`, Dialog content swap); `Task Activity` (`305:4208`, editable Label; host-controlled visibility). These do not add variants to the totals above.
 
 ## 5. Corrections already made
 
@@ -293,6 +301,19 @@ Standalone components: `Building Blocks/Menu Note` (`255:1763`); `Building Block
 - Prototype: 13 reachable test frames, 47 verified reaction links, 12 blocked controls. Input/server results use explicit simulation buttons; this is not an application end-to-end test.
 - Details and stable IDs: [Dialog record](FIGMA_DIALOG.md).
 
+### Toast / Inline Alert / Blocking Message architecture
+
+- Six sets / 34 variants plus Task Activity. New section `298:3991`; Controls root is 1440 × 26791. Seven scoped size variables and one semantic focus alias were added; no new raw color values.
+- Toast is max-width 380; Inline Alert is fluid; Blocking Message is max-width 480. All use 1px borders. Floating Toast and Task Activity use existing Subtle Light/Dark effects; blocking surfaces have no shadow.
+- Short Toast content is centered against the 32px close target, while long content keeps Close at the top. Recovery Actions wrap at narrow widths; the 320px long-label blocking example has no overflow.
+- Primary Focus uses a single flush outside 1px `color/border/focus-on-accent` alias, not a separated double ring. Task Activity text was changed from secondary to primary after a Light contrast result of 4.43:1; final Light/Dark values are 10.91:1 / 14.78:1.
+- Source `#busy` is a nonmodal `task-activity`, not the legacy full-screen `.busy` overlay. Closing a related Toast does not stop the task; the existing global concurrency guard remains.
+- Only Info/Success without actions may auto-dismiss after 3200ms. Warning/Danger and actionable notices persist. New notices must invalidate old timers. Inline dismissal never clears validation or readiness blockers.
+- Recovery retries only repeat safe reads/checks, never failed writes. Fatal has guidance without an invented restart button. Connection action means focusing the current page's connection form, not submitting missing credentials.
+- Final QA: 53 sets / 432 variants, 337 descendant instances in this section resolve to masters, 58 direct nested instances in the new masters. Unexpected overflow, root overlap, copied own vector paths, hardcoded own visual paints and broken aliases are all 0. Light/Dark and stress screenshots reviewed.
+- Prototype: 18 reachable test frames, 45 verified reaction links, 7 blocked controls; four inline states retain the same draft. This is explicit simulation, not an application end-to-end test.
+- Details, state IDs, source SHAs and implementation checklist: [Feedback record](FIGMA_TOAST_INLINE_ALERT_BLOCKING_MESSAGE.md).
+
 ### Badge and Tag semantic correction
 
 - Badge is status-only and never carries a remove action.
@@ -327,12 +348,11 @@ When implementation starts:
 
 The Figma file is intentionally not considered page-ready yet.
 
-Foundation dependency extension P4.2, the first button group, the extended-field group, Searchable Combobox, Switch / Toggle, Tabs / Segmented Control, Data Table / Pagination, Dropdown / Context / Overflow Menu, and Dialog are complete and verified. Evidence is split across the separate records linked from `docs/README.md`, including `docs/FIGMA_DIALOG.md`.
+Foundation dependency extension P4.2, the first button group, the extended-field group, Searchable Combobox, Switch / Toggle, Tabs / Segmented Control, Data Table / Pagination, Dropdown / Context / Overflow Menu, Dialog, and Toast / Inline Alert / Blocking Message (including Task Activity) are complete and verified. Evidence is split across the separate records linked from `docs/README.md`, including `docs/FIGMA_DIALOG.md` and `docs/FIGMA_TOAST_INLINE_ALERT_BLOCKING_MESSAGE.md`.
 
 ### Required component families
 
-- Toast, Inline Alert, Blocking Message (next group).
-- Accordion / Disclosure.
+- Accordion / Disclosure (next group).
 - Progress, Skeleton, Empty State.
 - Avatar for team/player entities.
 

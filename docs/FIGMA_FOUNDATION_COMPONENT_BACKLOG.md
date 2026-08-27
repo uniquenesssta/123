@@ -93,7 +93,8 @@ Figma 记录：
 6. Tabs / Segmented Control 与 Close Button、Item building blocks；
 7. Data Table / Pagination 与 Header Cell、Cell、Row、Page Button、Nav Button building blocks；
 8. Dropdown / Context / Overflow Menu 与 Menu Item、Separator、Note、Surface building blocks；
-9. Dialog：普通、确认、名称校验危险确认，与 Header、Body、Facts、Actions、Modal Layer。
+9. Dialog：普通、确认、名称校验危险确认，与 Header、Body、Facts、Actions、Modal Layer；
+10. Toast / Inline Alert / Blocking Message，与 Feedback Content、Action、Close、Task Activity。
 
 按钮首组的组件 ID、变体 API、嵌套关系、代码约束与验收证据单独记录在 `docs/FIGMA_BUTTON_COMPONENTS.md`，本文件不重复展开。
 
@@ -163,14 +164,25 @@ Dialog 记录见 [FIGMA_DIALOG.md](FIGMA_DIALOG.md)：
 - 13 个原型测试状态可到达，47 条 reaction 连接和 12 个禁用入口回读通过；不等同于代码中的键盘或请求流程已实现。
 - 当前代码仍是 workspace region；后续实现需补模态语义、焦点锁定/恢复、异步状态与后端保护复核。
 
+Toast / Inline Alert / Blocking Message 记录见 [FIGMA_TOAST_INLINE_ALERT_BLOCKING_MESSAGE.md](FIGMA_TOAST_INLINE_ALERT_BLOCKING_MESSAGE.md)：
+
+- 新增 7 个尺寸 token、1 个 Focus on Accent 语义颜色 alias；FIP Size 57、FIP Color 42。
+- 组件集：Content（`299:4040`）、Action（`300:4242`）、Close（`301:4094`）、Toast（`302:4210`）、Inline Alert（`303:4259`）、Blocking Message（`304:4348`）；单组件 Task Activity（`305:4208`）。
+- 合计 6 个组件集、34 个变体、1 个单组件；Controls 总计 53 个组件集、432 个变体。
+- 短暂通知、持续通知、局部错误、恢复中、启动失败和非模态任务活动分别建模；关闭提示不取消任务，也不解除保存门禁。
+- 280px Toast、300px Inline、320px Blocking 长文案与动作换行检查通过；Toast 和 Task Activity 在右下角间隔 8px 共存。
+- Light / Dark 截图与整组截图已审阅；意外 overflow 0、root overlap 0、复制自有图标路径 0、hardcoded own visual paints 0。
+- 18 个原型场景可达、45 条连接、7 个禁用入口回读通过；4 个局部错误场景的草稿值保持一致。
+- Task Activity 正文改用现有 primary token，修正 Light 4.43:1 的不足；最终 Light / Dark 为 10.91:1 / 14.78:1。
+- 当前代码需要补定时器身份检查、悬停/焦点暂停、点击区、ARIA 同步、只读恢复处理与错误脱敏；原型验证不等同于运行时已实现。
+
 ### 待执行顺序
 
-1. Toast、Inline Alert、Blocking Message；
-2. Accordion / Disclosure；
-3. Progress、Skeleton、Empty State；
-4. Avatar：球队、球员、默认占位。
+1. Accordion / Disclosure；
+2. Progress、Skeleton、Empty State；
+3. Avatar：球队、球员、默认占位。
 
-下一项固定为：`Toast / Inline Alert / Blocking Message`。完成并验收底层组件前，不开始页面拼装。
+底层组件剩余 3 组。下一项固定为：`Accordion / Disclosure`。完成并验收底层组件前，不开始页面拼装。
 ## 组件族验收
 
 - 尺寸、文字、图标、内边距、点击区均无溢出；
