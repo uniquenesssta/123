@@ -39,6 +39,9 @@ Page documentation roots:
 - Dialog prototype launcher: 286:3364 (13 component test frames on Controls; not product Screens)
 - Section · Toast / Inline Alert / Blocking Message: 298:3991
 - Feedback prototype launcher: 309:4724 (18 component test frames on Controls; not product Screens)
+- Section · Accordion & Disclosure: 320:5159
+- Accordion / Disclosure prototype launcher: 328:12469 (16 component test frames on Controls; not product Screens)
+- Current Controls root dimensions: 1440 × 30703
 
 ## 2. Foundations
 
@@ -48,7 +51,7 @@ Page documentation roots:
 |---|---|---|---:|
 | FIP Primitives | VariableCollectionId:17:2 | Value | 53 |
 | FIP Color | VariableCollectionId:17:3 | Light, Dark | 42 |
-| FIP Size | VariableCollectionId:17:4 | Value | 57 |
+| FIP Size | VariableCollectionId:17:4 | Value | 60 |
 | FIP Icon Scale | VariableCollectionId:35:2 | 24, 20, 16 | 3 |
 | FIP Control Scale | VariableCollectionId:46:2 | 32, 40, 48 | 15 |
 | FIP Icon Tone | VariableCollectionId:50:206 | Default, Secondary, Active, On Accent, Success, Warning, Danger, Info | 1 |
@@ -163,7 +166,7 @@ Utilities:
 
 ## 4. Controls
 
-Current controls state: 53 component sets and 432 variants. Toast / Inline Alert / Blocking Message adds 6 sets, 34 variants and 1 Task Activity single component. It composes Feedback Content, Action and Close with existing Button, Loading Button, Icon Slot and Spinner masters. Nonmodal activity is separate from blocking recovery. This is a Figma design contract; timer identity, click targets, ARIA synchronization and recovery handlers still require application implementation. Details: [Feedback record](FIGMA_TOAST_INLINE_ALERT_BLOCKING_MESSAGE.md). Previous group records remain indexed in `docs/README.md`.
+Current controls state: 56 component sets and 474 variants. Accordion / Disclosure adds 3 sets, 42 variants and 1 Content single component. It composes existing Icon Slot, Chevron and Badge masters; Accordion contains 36 true Disclosure Item instances. Multiple preserves current native-details semantics; Single is a new design capability. Draft persistence, keyboard/focus and initialization risks still require application implementation. Details: [Accordion / Disclosure record](FIGMA_ACCORDION_DISCLOSURE.md). Previous group records remain indexed in `docs/README.md`.
 
 | Component set | ID | Variants | API |
 |---|---:|---:|---|
@@ -220,8 +223,11 @@ Current controls state: 53 component sets and 432 variants. Toast / Inline Alert
 | Toast | 302:4210 | 4 | Tone Info/Success/Warning/Danger; Show close true; Show action false; exposed Content/Action/Close |
 | Inline Alert | 303:4259 | 4 | Tone Info/Success/Warning/Danger; Show close false; Show action false; exposed Content/Action/Close |
 | Blocking Message | 304:4348 | 5 | State Unavailable/Blocked/Error/Retrying/Fatal; exposed Content and applicable recovery Actions |
+| Building Blocks/Disclosure Trigger | 322:5430 | 10 | Expanded False/True × State Default/Hover/Pressed/Focus/Disabled; Label; Description; visibility booleans; exposed Count |
+| Disclosure | 323:5557 | 20 | Style Panel/Inline × Expanded False/True × State five states; Content instance swap; exposed Header/Content |
+| Accordion | 325:5983 | 12 | Mode Multiple/Single × legal Open combinations; three exposed Disclosure Item instances |
 
-Standalone components: `Building Blocks/Menu Note` (`255:1763`); `Building Blocks/Dialog Facts` (`278:2257`, up to three editable facts); `Dialog/Modal Layer` (`281:2955`, Dialog content swap); `Task Activity` (`305:4208`, editable Label; host-controlled visibility). These do not add variants to the totals above.
+Standalone components: `Building Blocks/Menu Note` (`255:1763`); `Building Blocks/Dialog Facts` (`278:2257`, up to three editable facts); `Dialog/Modal Layer` (`281:2955`, Dialog content swap); `Task Activity` (`305:4208`, editable Label; host-controlled visibility); `Building Blocks/Disclosure Content` (`323:5179`, editable Text). These do not add variants to the totals above.
 
 ## 5. Corrections already made
 
@@ -314,6 +320,18 @@ Standalone components: `Building Blocks/Menu Note` (`255:1763`); `Building Block
 - Prototype: 18 reachable test frames, 45 verified reaction links, 7 blocked controls; four inline states retain the same draft. This is explicit simulation, not an application end-to-end test.
 - Details, state IDs, source SHAs and implementation checklist: [Feedback record](FIGMA_TOAST_INLINE_ALERT_BLOCKING_MESSAGE.md).
 
+### Accordion / Disclosure architecture
+
+- Three sets / 42 variants plus Content single component. Section `320:5159`; Controls root 1440 × 30703. Three scoped size tokens were added: trigger minimum 34, trigger padding-y 11, group gap 7; FIP Size is now 60.
+- Trigger is 38px for a single 16px line plus 11px vertical padding. Count is an existing Badge instance with a local 0px vertical-padding override, preserving 16px height. Long titles and descriptions wrap without displacing Count or Chevron.
+- Disclosure composes Trigger and replaceable Content; Panel and Inline share the same semantics. Accordion composes 36 Disclosure instances across 12 legal combinations. Multiple is the current native-details default; Single is a design addition and allows none open.
+- Parent Expanded/State and Mode/Open are the state owners. Multiple-to-Single normalizes to the first open item before selecting a variant; do not rely on Figma's nearest-variant fallback for illegal combinations.
+- Disabled locks the header toggle only, leaving visible content readable; nested action permissions remain independent. Error content can still be expanded/collapsed without clearing business blockers.
+- Source audit risks: distinguish missing snapshot from explicitly all-closed, replace index-based fallback keys, preserve permitted drafts, exclude sensitive controls, and open hidden ancestors before anchor focus. No application changes or Code Connect files were created.
+- QA: Light/Dark, 280/300px long content, Input and Inline Alert body swaps, no overflow, default names, placeholders, copied own paths or hardcoded own visual paints. Non-disabled visible text minimum 4.789:1; Focus minimum 4.228:1 against canvas/surface.
+- Prototype: 16 reachable component test frames, 70 internal reaction links, header-only toggles, disabled headers without reactions and identical draft values across collapse/reopen. Explicit simulation, not application end-to-end verification.
+- Full APIs, stable variant IDs, source SHAs and implementation checklist: [Accordion / Disclosure record](FIGMA_ACCORDION_DISCLOSURE.md).
+
 ### Badge and Tag semantic correction
 
 - Badge is status-only and never carries a remove action.
@@ -348,12 +366,11 @@ When implementation starts:
 
 The Figma file is intentionally not considered page-ready yet.
 
-Foundation dependency extension P4.2, the first button group, the extended-field group, Searchable Combobox, Switch / Toggle, Tabs / Segmented Control, Data Table / Pagination, Dropdown / Context / Overflow Menu, Dialog, and Toast / Inline Alert / Blocking Message (including Task Activity) are complete and verified. Evidence is split across the separate records linked from `docs/README.md`, including `docs/FIGMA_DIALOG.md` and `docs/FIGMA_TOAST_INLINE_ALERT_BLOCKING_MESSAGE.md`.
+Foundation dependency extension P4.2, the first button group, the extended-field group, Searchable Combobox, Switch / Toggle, Tabs / Segmented Control, Data Table / Pagination, Dropdown / Context / Overflow Menu, Dialog, Toast / Inline Alert / Blocking Message (including Task Activity), and Accordion / Disclosure are complete and verified. Evidence is split across the separate records linked from `docs/README.md`, including `docs/FIGMA_DIALOG.md`, `docs/FIGMA_TOAST_INLINE_ALERT_BLOCKING_MESSAGE.md`, and `docs/FIGMA_ACCORDION_DISCLOSURE.md`.
 
 ### Required component families
 
-- Accordion / Disclosure (next group).
-- Progress, Skeleton, Empty State.
+- Progress, Skeleton, Empty State (next group).
 - Avatar for team/player entities.
 
 ### Required pattern families

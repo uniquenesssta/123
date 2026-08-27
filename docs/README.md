@@ -12,10 +12,11 @@
 - [Dropdown / Context / Overflow Menu 组件](FIGMA_DROPDOWN_CONTEXT_OVERFLOW_MENU.md)
 - [Dialog：普通、确认与名称校验危险确认](FIGMA_DIALOG.md)
 - [Toast / Inline Alert / Blocking Message 与 Task Activity](FIGMA_TOAST_INLINE_ALERT_BLOCKING_MESSAGE.md)
+- [Accordion / Disclosure 与展开状态恢复](FIGMA_ACCORDION_DISCLOSURE.md)
 - [应用图标待办](FIGMA_ICON_BACKLOG.md)
 - [基础 Token 与底层组件待办](FIGMA_FOUNDATION_COMPONENT_BACKLOG.md)
 - [Patterns 与 Screens 计划](FIGMA_PATTERN_SCREEN_PLAN.md)
 
 执行顺序：图标 → 基础依赖与组件 → Patterns → Screens。
 
-当前进度：图标、基础依赖、按钮首组、扩展字段组、Searchable Combobox、Switch / Toggle、Tabs / Segmented Control、Data Table / Pagination、Dropdown / Context / Overflow Menu、Dialog（普通、确认、名称校验危险确认）及 Toast / Inline Alert / Blocking Message（含 Task Activity）均已完成并验收。Controls 当前为 53 个组件集、432 个变体；底层组件剩余 3 组，下一组为 Accordion / Disclosure。
+当前进度：图标、基础依赖、按钮首组、扩展字段组、Searchable Combobox、Switch / Toggle、Tabs / Segmented Control、Data Table / Pagination、Dropdown / Context / Overflow Menu、Dialog、Toast / Inline Alert / Blocking Message（含 Task Activity）及 Accordion / Disclosure 均已完成并验收。Controls 当前为 56 个组件集、474 个变体；底层组件剩余 2 组，下一组为 Progress / Skeleton / Empty State。

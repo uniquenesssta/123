@@ -94,7 +94,8 @@ Figma 记录：
 7. Data Table / Pagination 与 Header Cell、Cell、Row、Page Button、Nav Button building blocks；
 8. Dropdown / Context / Overflow Menu 与 Menu Item、Separator、Note、Surface building blocks；
 9. Dialog：普通、确认、名称校验危险确认，与 Header、Body、Facts、Actions、Modal Layer；
-10. Toast / Inline Alert / Blocking Message，与 Feedback Content、Action、Close、Task Activity。
+10. Toast / Inline Alert / Blocking Message，与 Feedback Content、Action、Close、Task Activity；
+11. Accordion / Disclosure，与 Disclosure Trigger、Content building blocks。
 
 按钮首组的组件 ID、变体 API、嵌套关系、代码约束与验收证据单独记录在 `docs/FIGMA_BUTTON_COMPONENTS.md`，本文件不重复展开。
 
@@ -176,13 +177,23 @@ Toast / Inline Alert / Blocking Message 记录见 [FIGMA_TOAST_INLINE_ALERT_BLOC
 - Task Activity 正文改用现有 primary token，修正 Light 4.43:1 的不足；最终 Light / Dark 为 10.91:1 / 14.78:1。
 - 当前代码需要补定时器身份检查、悬停/焦点暂停、点击区、ARIA 同步、只读恢复处理与错误脱敏；原型验证不等同于运行时已实现。
 
+Accordion / Disclosure 记录见 [FIGMA_ACCORDION_DISCLOSURE.md](FIGMA_ACCORDION_DISCLOSURE.md)：
+
+- 新增 3 个尺寸 token：Trigger min-height 34、padding-y 11、Accordion gap 7；单行实际高度 38。FIP Size 60，FIP Color 保持 42。
+- 组件集：Trigger（`322:5430`）、Disclosure（`323:5557`）、Accordion（`325:5983`）；单组件 Content（`323:5179`）。
+- 合计 3 个组件集、42 个变体、1 个单组件；Controls 总计 56 个组件集、474 个变体。
+- Panel / Inline、五种交互状态、Single / Multiple 合法展开组合完整；Accordion 只引用 36 个 Disclosure Item 实例。
+- 同一母版的 Light / Dark、280px 长标题与数量、300px Input/Inline Alert 内容替换、禁用正文可读性检查通过；无溢出、默认命名或残留占位。
+- 16 个组件原型场景、70 条内部连接可达且可返回；标题单独控制 toggle，正文不误触折叠，两个禁用标题无反应；草稿值为静态模拟。
+- 非禁用可见文字最低 4.789:1；Focus 对 canvas/surface 最低 4.228:1，继续复用 1px 细线，无双圈或阴影。
+- Single 为新增设计能力；代码尚需验证初始 open 与空快照的区别、稳定 key、键盘/焦点、正文草稿及敏感字段排除。原型不等于运行时验证。
+
 ### 待执行顺序
 
-1. Accordion / Disclosure；
-2. Progress、Skeleton、Empty State；
-3. Avatar：球队、球员、默认占位。
+1. Progress、Skeleton、Empty State；
+2. Avatar：球队、球员、默认占位。
 
-底层组件剩余 3 组。下一项固定为：`Accordion / Disclosure`。完成并验收底层组件前，不开始页面拼装。
+底层组件剩余 2 组。下一项固定为：`Progress / Skeleton / Empty State`。完成并验收底层组件前，不开始页面拼装。
 ## 组件族验收
 
 - 尺寸、文字、图标、内边距、点击区均无溢出；
