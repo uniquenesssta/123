@@ -95,7 +95,8 @@ Figma 记录：
 8. Dropdown / Context / Overflow Menu 与 Menu Item、Separator、Note、Surface building blocks；
 9. Dialog：普通、确认、名称校验危险确认，与 Header、Body、Facts、Actions、Modal Layer；
 10. Toast / Inline Alert / Blocking Message，与 Feedback Content、Action、Close、Task Activity；
-11. Accordion / Disclosure，与 Disclosure Trigger、Content building blocks。
+11. Accordion / Disclosure，与 Disclosure Trigger、Content building blocks；
+12. Progress / Skeleton / Empty State，与 Skeleton Block building block。
 
 按钮首组的组件 ID、变体 API、嵌套关系、代码约束与验收证据单独记录在 `docs/FIGMA_BUTTON_COMPONENTS.md`，本文件不重复展开。
 
@@ -188,12 +189,22 @@ Accordion / Disclosure 记录见 [FIGMA_ACCORDION_DISCLOSURE.md](FIGMA_ACCORDION
 - 非禁用可见文字最低 4.789:1；Focus 对 canvas/surface 最低 4.228:1，继续复用 1px 细线，无双圈或阴影。
 - Single 为新增设计能力；代码尚需验证初始 open 与空快照的区别、稳定 key、键盘/焦点、正文草稿及敏感字段排除。原型不等于运行时验证。
 
+Progress / Skeleton / Empty State 记录见 [FIGMA_PROGRESS_SKELETON_EMPTY_STATE.md](FIGMA_PROGRESS_SKELETON_EMPTY_STATE.md)：
+
+- 新增 12 个尺寸 token；FIP Size 72，颜色、字体与效果样式不新增。
+- 组件集：Progress Bar（`340:6522`）、Skeleton Block（`341:6504`）、Skeleton（`342:6572`）、Empty State（`343:6571`）。
+- 合计 4 个组件集、26 个变体；Controls 总计 60 个组件集、500 个变体。
+- Progress 在 120px 保持 25 / 50 / 75 / 100 精确比例，Indeterminate 37.5%；代码仍接受连续 0–100。
+- Skeleton 仅用于首次载入；翻页保留旧数据样例直接引用 Data Table Loading，Skeleton 数量为 0。
+- Empty State 支持标题、说明、图标、单动作；长文案 Compact 增高到 126px，无裁切。
+- Light / Dark、真实状态、长文案与对比度检查通过；hardcoded own visual paints、own vectors、broken masters、placeholder、default names 均为 0。
+- 代码需补 Reduced Motion、稳定组件抽取和 ARIA；本轮未修改应用源码，未发布推测性 Code Connect。
+
 ### 待执行顺序
 
-1. Progress、Skeleton、Empty State；
-2. Avatar：球队、球员、默认占位。
+1. Avatar：球队、球员、默认占位。
 
-底层组件剩余 2 组。下一项固定为：`Progress / Skeleton / Empty State`。完成并验收底层组件前，不开始页面拼装。
+底层组件剩余 1 组。下一项固定为：`Avatar`。完成并验收最后一组底层组件前，不开始页面拼装。
 ## 组件族验收
 
 - 尺寸、文字、图标、内边距、点击区均无溢出；

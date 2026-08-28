@@ -41,7 +41,8 @@ Page documentation roots:
 - Feedback prototype launcher: 309:4724 (18 component test frames on Controls; not product Screens)
 - Section · Accordion & Disclosure: 320:5159
 - Accordion / Disclosure prototype launcher: 328:12469 (16 component test frames on Controls; not product Screens)
-- Current Controls root dimensions: 1440 × 30703
+- Section · Progress, Skeleton & Empty State: 337:6498
+- Current Controls root dimensions: 1440 × 33309
 
 ## 2. Foundations
 
@@ -51,7 +52,7 @@ Page documentation roots:
 |---|---|---|---:|
 | FIP Primitives | VariableCollectionId:17:2 | Value | 53 |
 | FIP Color | VariableCollectionId:17:3 | Light, Dark | 42 |
-| FIP Size | VariableCollectionId:17:4 | Value | 60 |
+| FIP Size | VariableCollectionId:17:4 | Value | 72 |
 | FIP Icon Scale | VariableCollectionId:35:2 | 24, 20, 16 | 3 |
 | FIP Control Scale | VariableCollectionId:46:2 | 32, 40, 48 | 15 |
 | FIP Icon Tone | VariableCollectionId:50:206 | Default, Secondary, Active, On Accent, Success, Warning, Danger, Info | 1 |
@@ -332,6 +333,19 @@ Standalone components: `Building Blocks/Menu Note` (`255:1763`); `Building Block
 - Prototype: 16 reachable component test frames, 70 internal reaction links, header-only toggles, disabled headers without reactions and identical draft values across collapse/reopen. Explicit simulation, not application end-to-end verification.
 - Full APIs, stable variant IDs, source SHAs and implementation checklist: [Accordion / Disclosure record](FIGMA_ACCORDION_DISCLOSURE.md).
 
+### Progress / Skeleton / Empty State architecture
+
+- Four sets / 26 variants. Section `337:6498`; Controls root 1440 × 33309. Twelve scoped size variables were added; FIP Size is now 72.
+- Progress Bar (`340:6522`) has Size Compact / Default and Value 0 / 25 / 50 / 75 / 100 / Indeterminate. Code remains continuous 0–100; Figma values are snapshots.
+- Progress internals use responsive equal segments. At 120px the ratios remain 0.25 / 0.5 / 0.75 / 1; Indeterminate is 0.375, matching the source 38% snapshot.
+- Skeleton Block (`341:6504`) provides Text / Avatar / Rectangle at two densities. Skeleton (`342:6572`) composes 48 true block instances across List / Card / Table.
+- Skeleton is first-load-only. The retained pagination example references Data Table Loading (`238:1324`) and contains no Skeleton.
+- Empty State (`343:6571`) has Compact / Default with Title, Description, Show description, Show icon and Show action. Icon Slot and Secondary Button stay exposed. Source radius 6 is normalized to the existing radius/md token at 7.
+- Light/Dark, 120px progress, 126px long-copy Empty State, first-use, no-results, unavailable and retained-data screenshots passed.
+- QA: global 60 sets / 500 variants; hardcoded own visual paints 0; own vectors 0; broken masters 0; placeholders 0; default names 0. Light progress contrast 3.780:1; Dark 6.120:1.
+- Code follow-up: add prefers-reduced-motion fallback, extract stable Progress/Skeleton/Empty State implementations, and preserve existing error and retained-data boundaries. No speculative Code Connect was published.
+- Full API, stable IDs, source SHAs and implementation checklist: [Progress / Skeleton / Empty State record](FIGMA_PROGRESS_SKELETON_EMPTY_STATE.md).
+
 ### Badge and Tag semantic correction
 
 - Badge is status-only and never carries a remove action.
@@ -366,12 +380,11 @@ When implementation starts:
 
 The Figma file is intentionally not considered page-ready yet.
 
-Foundation dependency extension P4.2, the first button group, the extended-field group, Searchable Combobox, Switch / Toggle, Tabs / Segmented Control, Data Table / Pagination, Dropdown / Context / Overflow Menu, Dialog, Toast / Inline Alert / Blocking Message (including Task Activity), and Accordion / Disclosure are complete and verified. Evidence is split across the separate records linked from `docs/README.md`, including `docs/FIGMA_DIALOG.md`, `docs/FIGMA_TOAST_INLINE_ALERT_BLOCKING_MESSAGE.md`, and `docs/FIGMA_ACCORDION_DISCLOSURE.md`.
+Foundation dependency extension P4.2, the first button group, the extended-field group, Searchable Combobox, Switch / Toggle, Tabs / Segmented Control, Data Table / Pagination, Dropdown / Context / Overflow Menu, Dialog, Toast / Inline Alert / Blocking Message (including Task Activity), Accordion / Disclosure, and Progress / Skeleton / Empty State are complete and verified. Evidence is split across the separate records linked from `docs/README.md`, including `docs/FIGMA_DIALOG.md`, `docs/FIGMA_TOAST_INLINE_ALERT_BLOCKING_MESSAGE.md`, and `docs/FIGMA_ACCORDION_DISCLOSURE.md`.
 
 ### Required component families
 
-- Progress, Skeleton, Empty State (next group).
-- Avatar for team/player entities.
+- Avatar for team/player entities (next and final foundation group).
 
 ### Required pattern families
 
