@@ -32,13 +32,18 @@
 
 ## 组件前置图标
 
-以下 3 个不是 `AppIcon` 代码键，而是底层组件真实链路触发的最小依赖：
+以下 4 个不是 `AppIcon` 代码键，而是底层组件真实链路触发的最小依赖：
 
 - [x] plus — `Icon/Utility/Plus`（139:208）
 - [x] calendar — `Icon/Utility/Calendar`（139:212）
 - [x] chevron-up — `Icon/Utility/Chevron Up`（168:208）
+- [x] person — `Icon/Entity/Person`（356:212）
 
-Plus / Calendar 位于 `Section · Extended field icons`（139:213）；Chevron Up 文档卡为 `Utility · Chevron Up`（168:206）。三者均为 24px / 1.75 stroke，并绑定图标尺寸、粗细与颜色变量；Chevron Up 已加入 Icon Slot preferred swaps。
+Plus / Calendar 位于 `Section · Extended field icons`（139:213）；Chevron Up 文档卡为 `Utility · Chevron Up`（168:206）。前三个均为 24px / 1.75 stroke，并绑定图标尺寸、粗细与颜色变量；Chevron Up 已加入 Icon Slot preferred swaps。
+
+Person 文档卡为 `356:206`，使用官方 [Lucide user-round](https://github.com/lucide-icons/lucide/blob/main/icons/user-round.svg) 的 Head / Shoulders 两条几何路径，绑定颜色与描边变量。24 / 20 / 16px、Light / Dark 六个样例已检查。Person 与复用的 Shield 加入 Icon Slot preferred swaps，保留原 13 项及默认图标，现为 15 项。完整记录见 [Avatar](FIGMA_AVATAR.md)。
+
+Iconography 当前有 34 个独立 `Icon/*` 母版。Person 尚未加入代码 AppIcon 类型，不计入 25 / 25 的代码覆盖数。
 
 ## 制作规则
 
@@ -46,14 +51,14 @@ Plus / Calendar 位于 `Section · Extended field icons`（139:213）；Chevron 
 - 通过 Icon Slot 接入 16 / 20 / 24 三种尺寸。
 - 使用已批准的细线条：24px=1.75、20px=1.5、16px=1.25。
 - 统一圆角端点与连接，保持一致视觉重心。
-- 名称与代码 AppIcon 语义一一对应，不用近似图标替代。
+- 已有 AppIcon 图标名称与代码语义一一对应；新增组件依赖单独列出，不冒充已有代码能力或使用近似图标替代。
 - 图标颜色与描边粗细绑定 Figma 变量；页面和控件不得复制 SVG 路径。
 
 ## 最终验收
 
 - 代码覆盖：25 / 25。
 - 新 AppIcon 母版：18 / 18。
-- 组件前置图标：3 / 3。
+- 组件前置图标：4 / 4。
 - 图标色变量绑定：18 / 18。
 - 描边变量绑定：18 / 18。
 - Icon Slot 实际替换：18 / 18。

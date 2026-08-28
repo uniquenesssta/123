@@ -96,7 +96,8 @@ Figma 记录：
 9. Dialog：普通、确认、名称校验危险确认，与 Header、Body、Facts、Actions、Modal Layer；
 10. Toast / Inline Alert / Blocking Message，与 Feedback Content、Action、Close、Task Activity；
 11. Accordion / Disclosure，与 Disclosure Trigger、Content building blocks；
-12. Progress / Skeleton / Empty State，与 Skeleton Block building block。
+12. Progress / Skeleton / Empty State，与 Skeleton Block building block；
+13. Avatar：球队、球员缩写与默认占位，复用 Icon Slot。
 
 按钮首组的组件 ID、变体 API、嵌套关系、代码约束与验收证据单独记录在 `docs/FIGMA_BUTTON_COMPONENTS.md`，本文件不重复展开。
 
@@ -200,11 +201,22 @@ Progress / Skeleton / Empty State 记录见 [FIGMA_PROGRESS_SKELETON_EMPTY_STATE
 - Light / Dark、真实状态、长文案与对比度检查通过；hardcoded own visual paints、own vectors、broken masters、placeholder、default names 均为 0。
 - 代码需补 Reduced Motion、稳定组件抽取和 ARIA；本轮未修改应用源码，未发布推测性 Code Connect。
 
-### 待执行顺序
+Avatar 记录见 [FIGMA_AVATAR.md](FIGMA_AVATAR.md)：
 
-1. Avatar：球队、球员、默认占位。
+- 新增 4 个尺寸 token、1 个头像文字语义 alias、3 个文字样式；FIP Size 76、FIP Color 43，变量总数 191。
+- 新图标 Person（`356:212`）；球队占位复用 Shield。两者加入 Icon Slot preferred swaps，原 13 项保留，现为 15 项。
+- 组件集 `Avatar`（`358:6798`），分区 `357:6965`；1 个组件集、6 个变体，Size 34 / 38 / 54 × Content Initials / Placeholder。
+- 每个母版暴露 1 个真实 Icon Slot；23 个使用／压力测试 Avatar 实例，81 个后代实例母版均可解析。
+- Light / Dark、宽字母与中文、248px 目录、36px 表格行、300px 速览检查通过；属性切换保留缩写与图标选择。
+- 意外 overflow、overlap、未绑定自有颜色、paint 缓存不一致、broken masters、默认命名及残留占位均为 0；文字对比度最低 Light 4.867:1 / Dark 5.225:1。
+- Controls 总计 **61 个组件集、506 个变体**。当前代码只支持缩写；默认占位与字符簇处理列为后续实现合同，本轮未修改应用源码。
 
-底层组件剩余 1 组。下一项固定为：`Avatar`。完成并验收最后一组底层组件前，不开始页面拼装。
+### 完成状态与下一阶段
+
+既定底层组件剩余 **0 组**，已全部完成并验收。
+
+下一阶段为 [Patterns](FIGMA_PATTERN_SCREEN_PLAN.md)，先做 **PC App Shell**。Patterns 与 Screens 仍为空；先完成模式，再拼装产品页面。组合时若发现新依赖，仍须先归档并验收。
+
 ## 组件族验收
 
 - 尺寸、文字、图标、内边距、点击区均无溢出；

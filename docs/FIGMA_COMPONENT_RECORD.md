@@ -16,7 +16,7 @@
 |---|---:|---|
 | 00 · Foundations | 0:1 | complete; desktop dependency extension verified |
 | 01 · Iconography | 3:2 | application icon coverage complete and verified |
-| 02 · Controls | 3:3 | baseline plus component extensions verified |
+| 02 · Controls | 3:3 | planned foundation groups complete; 61 sets / 506 variants |
 | 03 · Patterns | 3:4 | reserved; currently empty |
 | 04 · Screens | 3:5 | reserved; currently empty |
 
@@ -42,7 +42,8 @@ Page documentation roots:
 - Section · Accordion & Disclosure: 320:5159
 - Accordion / Disclosure prototype launcher: 328:12469 (16 component test frames on Controls; not product Screens)
 - Section · Progress, Skeleton & Empty State: 337:6498
-- Current Controls root dimensions: 1440 × 33309
+- Section · Avatar: 357:6965
+- Current Controls root dimensions: 1440 × 34261
 
 ## 2. Foundations
 
@@ -51,13 +52,13 @@ Page documentation roots:
 | Collection | ID | Modes | Count |
 |---|---|---|---:|
 | FIP Primitives | VariableCollectionId:17:2 | Value | 53 |
-| FIP Color | VariableCollectionId:17:3 | Light, Dark | 42 |
-| FIP Size | VariableCollectionId:17:4 | Value | 72 |
+| FIP Color | VariableCollectionId:17:3 | Light, Dark | 43 |
+| FIP Size | VariableCollectionId:17:4 | Value | 76 |
 | FIP Icon Scale | VariableCollectionId:35:2 | 24, 20, 16 | 3 |
 | FIP Control Scale | VariableCollectionId:46:2 | 32, 40, 48 | 15 |
 | FIP Icon Tone | VariableCollectionId:50:206 | Default, Secondary, Active, On Accent, Success, Warning, Danger, Info | 1 |
 
-All variables have explicit scopes and WEB code syntax.
+All 191 variables have explicit scopes and WEB code syntax. Avatar adds four scoped size variables and one semantic color alias; see [Avatar record](FIGMA_AVATAR.md).
 
 ### Text styles
 
@@ -71,6 +72,9 @@ All variables have explicit scopes and WEB code syntax.
 - FIP/Data/Table — Inter Regular, 11/16
 - FIP/Technical/Code — Cascadia Mono Regular, 11/17
 - FIP/Technical/Label — Cascadia Mono Semi Bold, 10/14
+- FIP/Avatar/Compact — Inter Extra Bold, 11/16
+- FIP/Avatar/Default — Inter Extra Bold, 12/16
+- FIP/Avatar/Large — Inter Black, 22/28
 
 ### Effect styles
 
@@ -102,6 +106,7 @@ All variables have explicit scopes and WEB code syntax.
 - Default icon: Icon/Navigation/Dashboard (31:7)
 - Locked geometry contract: 24px master grid, 20px optical area, round caps and joins
 - Scaled strokes: 24px=1.75, 20px=1.5, 16px=1.25
+- Preferred swaps: 15; Avatar adds Person and Shield while preserving all previous 13 choices and the default icon.
 
 ### Existing icon masters
 
@@ -117,6 +122,7 @@ Navigation:
 Entity and communication:
 
 - Icon/Entity/Users — 88:218
+- Icon/Entity/Person — 356:212
 - Icon/Communication/Chat — 88:462
 
 Data:
@@ -167,7 +173,7 @@ Utilities:
 
 ## 4. Controls
 
-Current controls state: 56 component sets and 474 variants. Accordion / Disclosure adds 3 sets, 42 variants and 1 Content single component. It composes existing Icon Slot, Chevron and Badge masters; Accordion contains 36 true Disclosure Item instances. Multiple preserves current native-details semantics; Single is a new design capability. Draft persistence, keyboard/focus and initialization risks still require application implementation. Details: [Accordion / Disclosure record](FIGMA_ACCORDION_DISCLOSURE.md). Previous group records remain indexed in `docs/README.md`.
+Current controls state: **61 component sets and 506 variants**. The final foundation group, Avatar, adds one set and six variants for team/player initials and neutral placeholders at 34 / 38 / 54px. All planned foundation groups are complete; Patterns and Screens remain empty. Details: [Avatar record](FIGMA_AVATAR.md). Previous group records remain indexed in `docs/README.md`; their audit totals describe the state at completion of each group.
 
 | Component set | ID | Variants | API |
 |---|---:|---:|---|
@@ -227,6 +233,11 @@ Current controls state: 56 component sets and 474 variants. Accordion / Disclosu
 | Building Blocks/Disclosure Trigger | 322:5430 | 10 | Expanded False/True × State Default/Hover/Pressed/Focus/Disabled; Label; Description; visibility booleans; exposed Count |
 | Disclosure | 323:5557 | 20 | Style Panel/Inline × Expanded False/True × State five states; Content instance swap; exposed Header/Content |
 | Accordion | 325:5983 | 12 | Mode Multiple/Single × legal Open combinations; three exposed Disclosure Item instances |
+| Progress Bar | 340:6522 | 12 | Size Compact/Default × Value 0/25/50/75/100/Indeterminate; runtime values remain continuous |
+| Building Blocks/Skeleton Block | 341:6504 | 6 | Density Compact/Default × Shape Text/Avatar/Rectangle |
+| Skeleton | 342:6572 | 6 | Density Compact/Default × Layout List/Card/Table; true Skeleton Block instances; first-load only |
+| Empty State | 343:6571 | 2 | Size Compact/Default; Title; Description; Show description/icon/action; exposed Icon Slot and Secondary Button |
+| Avatar | 358:6798 | 6 | Size Compact/Default/Large × Content Initials/Placeholder; Initials text; exposed Fallback icon via Icon Slot |
 
 Standalone components: `Building Blocks/Menu Note` (`255:1763`); `Building Blocks/Dialog Facts` (`278:2257`, up to three editable facts); `Dialog/Modal Layer` (`281:2955`, Dialog content swap); `Task Activity` (`305:4208`, editable Label; host-controlled visibility); `Building Blocks/Disclosure Content` (`323:5179`, editable Text). These do not add variants to the totals above.
 
@@ -346,6 +357,17 @@ Standalone components: `Building Blocks/Menu Note` (`255:1763`); `Building Block
 - Code follow-up: add prefers-reduced-motion fallback, extract stable Progress/Skeleton/Empty State implementations, and preserve existing error and retained-data boundaries. No speculative Code Connect was published.
 - Full API, stable IDs, source SHAs and implementation checklist: [Progress / Skeleton / Empty State record](FIGMA_PROGRESS_SKELETON_EMPTY_STATE.md).
 
+### Avatar architecture
+
+- One set / six variants. Section `357:6965`; Controls root 1440 × 34261. Four size variables, one semantic color alias and three Avatar text styles added; current totals: 191 variables and 13 text styles.
+- `Avatar` (`358:6798`) shares geometry for teams and players: 34 / 38 / 54px, radius 8, Initials / Placeholder. Each master exposes one true Icon Slot; no icon paths are copied into Avatar.
+- New `Icon/Entity/Person` (`356:212`) uses the official Lucide user-round geometry. Team placeholders reuse Shield (`83:259`). Iconography has 34 independent icon masters; code AppIcon coverage stays 25 / 25.
+- Initials stay legible on Light/Dark with a semantic text alias. Large horizontal padding is 2px so 22px Black `WW` fits completely; other sizes retain 4px padding.
+- QA: 23 Avatar usage/test instances; 81 descendant instances resolve. No unbound own paints, paint cache mismatch, unintended overflow, sibling/root overlap, broken masters, unnamed nodes or residual placeholders. Text contrast minimum Light 4.867:1 / Dark 5.225:1.
+- Content/Size switching preserves initials and the chosen fallback icon. Empty strings do not automatically switch Figma variants; the caller must select Placeholder. Avatar itself is non-interactive.
+- Current source renders initials only. Placeholder selection, grapheme-safe normalization and a stable Avatar implementation remain code follow-up; photos and image-loading states are not claimed. No application source or speculative Code Connect was changed.
+- Full API, stable IDs, source SHAs and implementation checklist: [Avatar record](FIGMA_AVATAR.md).
+
 ### Badge and Tag semantic correction
 
 - Badge is status-only and never carries a remove action.
@@ -378,13 +400,14 @@ When implementation starts:
 
 ## 7. Known next work
 
-The Figma file is intentionally not considered page-ready yet.
+The planned foundation component groups are complete. Product Patterns and Screens have not been built; the file does not yet contain finished product pages.
 
-Foundation dependency extension P4.2, the first button group, the extended-field group, Searchable Combobox, Switch / Toggle, Tabs / Segmented Control, Data Table / Pagination, Dropdown / Context / Overflow Menu, Dialog, Toast / Inline Alert / Blocking Message (including Task Activity), Accordion / Disclosure, and Progress / Skeleton / Empty State are complete and verified. Evidence is split across the separate records linked from `docs/README.md`, including `docs/FIGMA_DIALOG.md`, `docs/FIGMA_TOAST_INLINE_ALERT_BLOCKING_MESSAGE.md`, and `docs/FIGMA_ACCORDION_DISCLOSURE.md`.
+Foundation dependency extension P4.2, the first button group, the extended-field group, Searchable Combobox, Switch / Toggle, Tabs / Segmented Control, Data Table / Pagination, Dropdown / Context / Overflow Menu, Dialog, Toast / Inline Alert / Blocking Message (including Task Activity), Accordion / Disclosure, Progress / Skeleton / Empty State, and Avatar are complete and verified. Evidence is split across the separate records linked from `docs/README.md`.
 
-### Required component families
+### Foundation completion
 
-- Avatar for team/player entities (next and final foundation group).
+- Remaining planned foundation groups: **0**. Current Controls inventory: **61 sets / 506 variants**.
+- Next: **PC App Shell** in Patterns, before product Screens. New dependencies must still be recorded and validated if discovered during composition.
 
 ### Required pattern families
 
