@@ -43,7 +43,15 @@ Plus / Calendar 位于 `Section · Extended field icons`（139:213）；Chevron 
 
 Person 文档卡为 `356:206`，使用官方 [Lucide user-round](https://github.com/lucide-icons/lucide/blob/main/icons/user-round.svg) 的 Head / Shoulders 两条几何路径，绑定颜色与描边变量。24 / 20 / 16px、Light / Dark 六个样例已检查。Person 与复用的 Shield 加入 Icon Slot preferred swaps，保留原 13 项及默认图标，现为 15 项。完整记录见 [Avatar](FIGMA_AVATAR.md)。
 
-Iconography 当前有 34 个独立 `Icon/*` 母版。Person 尚未加入代码 AppIcon 类型，不计入 25 / 25 的代码覆盖数。
+Iconography 当前有 **37 个独立 Icon/* 母版**。Person 与 Shell 新依赖尚未加入代码 AppIcon 类型，不计入 25 / 25 的代码覆盖数。
+
+## Shell 模式新增依赖（2026-08-28）
+
+- [x] Arrow Left — Icon/Navigation/Arrow Left（372:235）
+- [x] Arrow Right — Icon/Navigation/Arrow Right（372:266）
+- [x] Contrast — Icon/Utility/Contrast（372:297）
+
+文档区372:226；使用官方 Lucide 几何，绑定既有 FIP 图标颜色与描边变量，经 Icon Slot 缩放。Light 的24/20/16与 Dark 样例已检查。Icon Slot 首选替换保留原15项并增加3项，合计18项。应用页面尺寸一律以 Figma 为准；不使用旧 CSS 比例。完整记录见 [PC App Shell](FIGMA_PC_APP_SHELL.md)。
 
 ## 制作规则
 
@@ -58,7 +66,7 @@ Iconography 当前有 34 个独立 `Icon/*` 母版。Person 尚未加入代码 A
 
 - 代码覆盖：25 / 25。
 - 新 AppIcon 母版：18 / 18。
-- 组件前置图标：4 / 4。
+- 底层组件前置图标：4 / 4；Shell 模式新增依赖：3 / 3。
 - 图标色变量绑定：18 / 18。
 - 描边变量绑定：18 / 18。
 - Icon Slot 实际替换：18 / 18。
@@ -70,4 +78,4 @@ Iconography 当前有 34 个独立 `Icon/*` 母版。Person 尚未加入代码 A
 - 未命名母版：0。
 - 结果：PASS。
 
-P4.1 与当前组件前置图标均已关闭；后续新增图标仍必须由实际底层组件依赖触发。
+P4.1、当前组件前置图标与 Shell 图标依赖均已关闭；后续新增图标仍必须由实际组件或模式依赖触发。

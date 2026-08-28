@@ -1,5 +1,7 @@
 # Figma Foundation & Component Backlog
 
+**设计依据（2026-08-28 用户确认）：所有视觉尺寸、比例、间距、字号和颜色均以已确认的 Figma 为准。应用源码只用于核对功能入口、交互和数据语义，不再作为视觉尺寸参考；旧记录中的源码尺寸仅是历史取证。**
+
 只记录 tokens、底层组件及其验收顺序；页面与模式不在本文件处理。
 
 ## 基础依赖状态
@@ -215,7 +217,7 @@ Avatar 记录见 [FIGMA_AVATAR.md](FIGMA_AVATAR.md)：
 
 既定底层组件剩余 **0 组**，已全部完成并验收。
 
-下一阶段为 [Patterns](FIGMA_PATTERN_SCREEN_PLAN.md)，先做 **PC App Shell**。Patterns 与 Screens 仍为空；先完成模式，再拼装产品页面。组合时若发现新依赖，仍须先归档并验收。
+[Patterns](FIGMA_PATTERN_SCREEN_PLAN.md) 的首组 **PC App Shell** 已完成：9 组 / 60 变体，详见 [独立记录](FIGMA_PC_APP_SHELL.md)。继续复用 191 个变量、13 个文字样式和 6 个效果样式，未改变 Controls 61 / 506。下一组为 Page Heading / Toolbar / Filter Bar / Selection Command Bar；Screens 仍为空。
 
 ## 组件族验收
 

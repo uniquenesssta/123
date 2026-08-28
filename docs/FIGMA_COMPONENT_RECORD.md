@@ -2,6 +2,8 @@
 
 > This branch is a design-system record branch. It intentionally contains no application source code.
 > The record is the handoff source for implementing the Figma library back into code later.
+>
+> Visual authority, confirmed 2026-08-28: approved Figma controls all dimensions, proportions, spacing, typography and colors. Application source is used only for functional/interaction/data semantics. Historical CSS observations below are not current sizing references.
 
 - Repository: uniquenesssta/123
 - Branch: ui-design-system
@@ -17,7 +19,7 @@
 | 00 · Foundations | 0:1 | complete; desktop dependency extension verified |
 | 01 · Iconography | 3:2 | application icon coverage complete and verified |
 | 02 · Controls | 3:3 | planned foundation groups complete; 61 sets / 506 variants |
-| 03 · Patterns | 3:4 | reserved; currently empty |
+| 03 · Patterns | 3:4 | PC App Shell complete; 9 sets / 60 variants; navigation and QA prototypes |
 | 04 · Screens | 3:5 | reserved; currently empty |
 
 Page documentation roots:
@@ -43,7 +45,9 @@ Page documentation roots:
 - Accordion / Disclosure prototype launcher: 328:12469 (16 component test frames on Controls; not product Screens)
 - Section · Progress, Skeleton & Empty State: 337:6498
 - Section · Avatar: 357:6965
-- Current Controls root dimensions: 1440 × 34261
+- PC App Shell pattern root: 370:2
+- Shell prototype launcher: 389:24211 (105 reachable prototype frames; not product Screens)
+- Current Controls root dimensions: 1440 × 34245 (observed at Shell start/end; preserved without editing)
 
 ## 2. Foundations
 
@@ -173,7 +177,7 @@ Utilities:
 
 ## 4. Controls
 
-Current controls state: **61 component sets and 506 variants**. The final foundation group, Avatar, adds one set and six variants for team/player initials and neutral placeholders at 34 / 38 / 54px. All planned foundation groups are complete; Patterns and Screens remain empty. Details: [Avatar record](FIGMA_AVATAR.md). Previous group records remain indexed in `docs/README.md`; their audit totals describe the state at completion of each group.
+Current controls state: **61 component sets and 506 variants**, unchanged by the Shell phase. All planned foundation groups are complete; see [Avatar record](FIGMA_AVATAR.md). Patterns now contains **PC App Shell: 9 sets / 60 variants**, two production singles and one QA-only workspace fixture. Screens remains empty. See [Shell record](FIGMA_PC_APP_SHELL.md). Previous group audit totals remain historical snapshots.
 
 | Component set | ID | Variants | API |
 |---|---:|---:|---|
@@ -368,6 +372,19 @@ Standalone components: `Building Blocks/Menu Note` (`255:1763`); `Building Block
 - Current source renders initials only. Placeholder selection, grapheme-safe normalization and a stable Avatar implementation remain code follow-up; photos and image-loading states are not claimed. No application source or speculative Code Connect was changed.
 - Full API, stable IDs, source SHAs and implementation checklist: [Avatar record](FIGMA_AVATAR.md).
 
+### PC App Shell architecture — 2026-08-28
+
+- Visual geometry comes only from approved Figma: primary60 / secondary154 / topbar44 / action32. No source CSS breakpoint or proportion is used.
+- Pattern root370:2; root set380:1366. Nine sets /60 variants plus Brand375:221 and Workspace Slot379:1087. QA-only fixture385:11899 is not a production screen.
+- All7 modules and17 routes are represented. Secondary visibility is held by an outer region, preventing nested Page changes from reopening a collapsed rail.
+- Normal navigation has68 state frames; workspace history/loading/error/reset has28; eight reset/feedback overlays and one launcher produce105 reachable prototype frames. Four resizing specimens are separate.
+- QA:16 width/theme/collapse combinations,1292 target checks,196 disabled-action checks; zero reported issues.158 active text layers across8 actual instances have minimum contrast4.533:1.
+-204 audited nested instances resolve to masters. Own unbound paints, missing text styles, default names, placeholders, duplicate set names and broken variable aliases:0.
+- Shared totals remain191 variables /13 text styles /6 effects; Dialog Light alpha.045 and transparent-area shadow=false remain unchanged. Controls61/506 and Screens empty are preserved.
+- Iconography adds Arrow Left372:235, Arrow Right372:266, Contrast372:297;37 independent icons; Icon Slot preferred swaps18.
+- Native prototype transitions and read-back geometry were checked. Browser focus, actual form/scroll persistence and asynchronous race handling require later application implementation tests. No application code or speculative Code Connect was changed.
+- APIs, route map, prototype entry and exact limitations: [PC App Shell record](FIGMA_PC_APP_SHELL.md).
+
 ### Badge and Tag semantic correction
 
 - Badge is status-only and never carries a remove action.
@@ -391,7 +408,7 @@ Standalone components: `Building Blocks/Menu Note` (`255:1763`); `Building Block
 
 When implementation starts:
 
-1. Treat this record and the Figma file as the design source of truth for component structure.
+1. Treat approved Figma as the authority for visual structure, dimensions, proportions and styles. These records document that contract; source code does not override it.
 2. Map each component set to a code component; map variant properties by the exact API names above.
 3. Reuse the existing repository token names and preserve Light/Dark semantics.
 4. Keep icons as slot/instance substitutions; do not paste SVG paths into page markup.
@@ -400,18 +417,18 @@ When implementation starts:
 
 ## 7. Known next work
 
-The planned foundation component groups are complete. Product Patterns and Screens have not been built; the file does not yet contain finished product pages.
+The planned foundation groups and the first Pattern, PC App Shell, are complete. The file does not yet contain finished product Screens.
 
 Foundation dependency extension P4.2, the first button group, the extended-field group, Searchable Combobox, Switch / Toggle, Tabs / Segmented Control, Data Table / Pagination, Dropdown / Context / Overflow Menu, Dialog, Toast / Inline Alert / Blocking Message (including Task Activity), Accordion / Disclosure, Progress / Skeleton / Empty State, and Avatar are complete and verified. Evidence is split across the separate records linked from `docs/README.md`.
 
 ### Foundation completion
 
 - Remaining planned foundation groups: **0**. Current Controls inventory: **61 sets / 506 variants**.
-- Next: **PC App Shell** in Patterns, before product Screens. New dependencies must still be recorded and validated if discovered during composition.
+- Completed Pattern: **PC App Shell**. Next: **Page Heading / Toolbar / Filter Bar / Selection Command Bar**, before product Screens. New dependencies must still be recorded and validated.
 
 ### Required pattern families
 
-- PC application shell: primary rail, secondary navigation, topbar, collapse states.
+- [x] PC application shell: primary rail, secondary navigation, topbar, collapse states.
 - Page heading, toolbar, filter bar, and selection command bar.
 - Metric cards, action cards, panels, and entity rows.
 - Master–detail–inspector workspace.
