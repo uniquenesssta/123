@@ -20,6 +20,7 @@
 - [PC App Shell：导航、顶栏与交互验收](FIGMA_PC_APP_SHELL.md)
 - [Page Heading / Toolbar / Filter Bar / Selection Command Bar](FIGMA_PAGE_HEADING_TOOLBAR_FILTER_SELECTION.md)
 - [Metric Card / Action Card / Panel](FIGMA_METRIC_ACTION_PANEL.md)
+- [Master–Detail–Inspector 与 Entity Row](FIGMA_MASTER_DETAIL_INSPECTOR.md)
 - [应用图标待办](FIGMA_ICON_BACKLOG.md)
 - [基础 Token 与底层组件待办](FIGMA_FOUNDATION_COMPONENT_BACKLOG.md)
 - [Patterns 与 Screens 计划](FIGMA_PATTERN_SCREEN_PLAN.md)
@@ -28,4 +29,4 @@
 
 当前进度：图标、基础依赖、按钮首组、扩展字段组、Searchable Combobox、Switch / Toggle、Tabs / Segmented Control、Data Table / Pagination、Dropdown / Context / Overflow Menu、Dialog、Toast / Inline Alert / Blocking Message（含 Task Activity）、Accordion / Disclosure、Progress / Skeleton / Empty State 及 Avatar 均已完成并验收。Controls 当前为 **61 个组件集、506 个变体**；既定底层组件剩余 **0 组**。
 
-Patterns 已完成三组：**PC App Shell**、**Page Heading / Toolbar / Filter Bar / Selection Command Bar**、**Metric Card / Action Card / Panel**。Patterns 当前为 **10 个组件集 / 65 个变体 / 8 个生产单组件**；第三组包含 1 个真实交互 Component Set（Action Card：5 states）与 2 个生产单组件，Light / Dark / 760px 窄宽及 Panel SLOT 替换 QA 均通过。下一组为 **Master–Detail–Inspector 工作区**。Screens 仍为空；本轮没有修改应用源码。
+Patterns 已完成四组：**PC App Shell**、**Page Heading / Toolbar / Filter Bar / Selection Command Bar**、**Metric Card / Action Card / Panel**、**Master–Detail–Inspector**。Patterns 当前为 **11 个组件集 / 75 个变体 / 9 个生产单组件**；第四组包含 Entity Row 10 个 Selected × State variants 与 SLOT 型 Master–Detail–Inspector，Light / Dark / Inspector Open / Collapsed / 760px 窄宽及三 SLOT 实际替换 QA 均通过。下一组为 **Workflow Stepper / Timeline**。Screens 仍为空；本轮没有修改应用源码。
