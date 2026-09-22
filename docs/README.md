@@ -26,4 +26,4 @@
 
 当前进度：图标、基础依赖、按钮首组、扩展字段组、Searchable Combobox、Switch / Toggle、Tabs / Segmented Control、Data Table / Pagination、Dropdown / Context / Overflow Menu、Dialog、Toast / Inline Alert / Blocking Message（含 Task Activity）、Accordion / Disclosure、Progress / Skeleton / Empty State 及 Avatar 均已完成并验收。Controls 当前为 **61 个组件集、506 个变体**；既定底层组件剩余 **0 组**。
 
-Patterns 首组 **PC App Shell** 已完成：9 个组件集、60 个变体、2 个生产单组件，另有 1 个 QA 夹具；7 个模块 / 17 个入口的双主题、展开与折叠原型已连接。下一组为 **Page Heading / Toolbar / Filter Bar / Selection Command Bar**。Screens 仍为空；本轮没有修改应用源码。
+Patterns 已完成两组：**PC App Shell**（9 个组件集、60 个变体、2 个生产单组件及 1 个 QA 组件）以及 **Page Heading / Toolbar / Filter Bar / Selection Command Bar**（4 个生产单组件，无伪造 variant）。Patterns 当前为 **9 个组件集 / 60 个变体 / 6 个生产单组件**；新组 Light / Dark / 760px 窄宽 QA 均通过。下一组为 **Metric Card / Action Card / Panel**。Screens 仍为空；本轮没有修改应用源码。
