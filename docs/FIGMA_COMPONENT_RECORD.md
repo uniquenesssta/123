@@ -19,7 +19,7 @@
 | 00 · Foundations | 0:1 | complete; desktop dependency extension verified |
 | 01 · Iconography | 3:2 | application icon coverage complete and verified |
 | 02 · Controls | 3:3 | planned foundation groups complete; 61 sets / 506 variants |
-| 03 · Patterns | 3:4 | PC App Shell complete; 9 sets / 60 variants; navigation and QA prototypes |
+| 03 · Patterns | 3:4 | PC App Shell + Page Bars complete; 9 sets / 60 variants + 6 production singles; QA verified |
 | 04 · Screens | 3:5 | reserved; currently empty |
 
 Page documentation roots:
@@ -47,6 +47,8 @@ Page documentation roots:
 - Section · Avatar: 357:6965
 - PC App Shell pattern root: 370:2
 - Shell prototype launcher: 389:24211 (105 reachable prototype frames; not product Screens)
+- Page Heading / Toolbar / Filter Bar / Selection Command Bar pattern root: 403:14581
+- Page Bars QA root: 408:15035 (Light / Dark / 760px frames; not product Screens)
 - Current Controls root dimensions: 1440 × 34245 (observed at Shell start/end; preserved without editing)
 
 ## 2. Foundations
@@ -177,7 +179,7 @@ Utilities:
 
 ## 4. Controls
 
-Current controls state: **61 component sets and 506 variants**, unchanged by the Shell phase. All planned foundation groups are complete; see [Avatar record](FIGMA_AVATAR.md). Patterns now contains **PC App Shell: 9 sets / 60 variants**, two production singles and one QA-only workspace fixture. Screens remains empty. See [Shell record](FIGMA_PC_APP_SHELL.md). Previous group audit totals remain historical snapshots.
+Current controls state: **61 component sets and 506 variants**, unchanged by the Pattern phases. All planned foundation groups are complete; see [Avatar record](FIGMA_AVATAR.md). Patterns contains **PC App Shell: 9 sets / 60 variants** plus six production standalone Pattern components after Page Heading / Toolbar / Filter Bar / Selection Command Bar; the Shell QA workspace fixture remains QA-only. Screens remains empty. See [Shell record](FIGMA_PC_APP_SHELL.md) and [Page Bars record](FIGMA_PAGE_HEADING_TOOLBAR_FILTER_SELECTION.md). Previous group audit totals remain historical snapshots.
 
 | Component set | ID | Variants | API |
 |---|---:|---:|---|
@@ -385,6 +387,20 @@ Standalone components: `Building Blocks/Menu Note` (`255:1763`); `Building Block
 - Native prototype transitions and read-back geometry were checked. Browser focus, actual form/scroll persistence and asynchronous race handling require later application implementation tests. No application code or speculative Code Connect was changed.
 - APIs, route map, prototype entry and exact limitations: [PC App Shell record](FIGMA_PC_APP_SHELL.md).
 
+### Page Heading / Toolbar / Filter Bar / Selection Command Bar architecture — 2026-09-23
+
+- Pattern documentation root: `403:14581`, 1600 × 3845. It is placed below the existing Shell root and does not overlap it.
+- Four production standalone components were added without fake variants: `Page Heading` (`404:14589`), `Toolbar` (`405:14634`), `Filter Bar` (`406:14802`) and `Selection Command Bar` (`407:14987`).
+- Page Heading exposes Eyebrow / Title / Description plus Show status / Show actions. Status is a real exposed Badge instance; page actions remain exposed Secondary / Primary Button instances.
+- Toolbar exposes optional Search, Summary, View and Local action regions. It composes the existing Submit Search Field, Segmented Control and Secondary Button; it does not own filtering or selection state.
+- Filter Bar composes up to three existing Select/Dropdown instances, up to three removable Tag instances, and existing Primary / Secondary buttons. Host pages own query state. The active-filter row uses true vertical AUTO sizing; the initial fixed-height overflow found during creation was corrected before acceptance.
+- Selection Command Bar is shown by the host only when selection count > 0. It exposes Selection / Description plus up to two Secondary actions and one Danger action. Zero selection is visibility logic, not a visual variant.
+- No new variables, text styles or effects were required. Filter Bar reuses `layout/panel/padding`, `radius/md`, `color/bg/surface`, `color/border/default`; Selection Command Bar reuses `color/bg/subtle` and `color/border/strong`.
+- QA root `408:15035` contains Light / 1120 (`408:15036`), Dark / 1120 (`408:15576`) and Light / Narrow 760 (`408:15880`) real-instance compositions. Long copy wraps without shrinking type; the narrow Filter Bar drops its third optional filter.
+- Final audit: four production components, duplicate names 0, unresolved nested main components 0, own hardcoded visible fills/strokes 0, visible QA overflow 0, Shell-root overlap 0. Shared totals remain 191 variables / 13 text styles / 6 effects and Controls 61 / 506.
+- Application source was used only to confirm semantics from `taskPageHeader`, player/team filters, result toolbars and selection actions. No CSS geometry was treated as design authority; no application source or speculative Code Connect was changed.
+- Full API and node evidence: [Page Bars record](FIGMA_PAGE_HEADING_TOOLBAR_FILTER_SELECTION.md).
+
 ### Badge and Tag semantic correction
 
 - Badge is status-only and never carries a remove action.
@@ -417,19 +433,19 @@ When implementation starts:
 
 ## 7. Known next work
 
-The planned foundation groups and the first Pattern, PC App Shell, are complete. The file does not yet contain finished product Screens.
+The planned foundation groups and the first two Pattern groups — PC App Shell and Page Heading / Toolbar / Filter Bar / Selection Command Bar — are complete. The file does not yet contain finished product Screens.
 
 Foundation dependency extension P4.2, the first button group, the extended-field group, Searchable Combobox, Switch / Toggle, Tabs / Segmented Control, Data Table / Pagination, Dropdown / Context / Overflow Menu, Dialog, Toast / Inline Alert / Blocking Message (including Task Activity), Accordion / Disclosure, Progress / Skeleton / Empty State, and Avatar are complete and verified. Evidence is split across the separate records linked from `docs/README.md`.
 
 ### Foundation completion
 
 - Remaining planned foundation groups: **0**. Current Controls inventory: **61 sets / 506 variants**.
-- Completed Pattern: **PC App Shell**. Next: **Page Heading / Toolbar / Filter Bar / Selection Command Bar**, before product Screens. New dependencies must still be recorded and validated.
+- Completed Patterns: **PC App Shell** and **Page Heading / Toolbar / Filter Bar / Selection Command Bar**. Next: **Metric Card / Action Card / Panel**, before product Screens. New dependencies must still be recorded and validated.
 
 ### Required pattern families
 
 - [x] PC application shell: primary rail, secondary navigation, topbar, collapse states.
-- Page heading, toolbar, filter bar, and selection command bar.
+- [x] Page heading, toolbar, filter bar, and selection command bar.
 - Metric cards, action cards, panels, and entity rows.
 - Master–detail–inspector workspace.
 - Workflow stepper/timeline.
