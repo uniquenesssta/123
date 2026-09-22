@@ -19,7 +19,7 @@
 | 00 · Foundations | 0:1 | complete; desktop dependency extension verified |
 | 01 · Iconography | 3:2 | application icon coverage complete and verified |
 | 02 · Controls | 3:3 | planned foundation groups complete; 61 sets / 506 variants |
-| 03 · Patterns | 3:4 | PC App Shell + Page Bars complete; 9 sets / 60 variants + 6 production singles; QA verified |
+| 03 · Patterns | 3:4 | Shell + Page Bars + Card/Panel complete; 10 sets / 65 variants + 8 production singles; QA verified |
 | 04 · Screens | 3:5 | reserved; currently empty |
 
 Page documentation roots:
@@ -49,6 +49,8 @@ Page documentation roots:
 - Shell prototype launcher: 389:24211 (105 reachable prototype frames; not product Screens)
 - Page Heading / Toolbar / Filter Bar / Selection Command Bar pattern root: 403:14581
 - Page Bars QA root: 408:15035 (Light / Dark / 760px frames; not product Screens)
+- Metric Card / Action Card / Panel pattern root: 410:15350
+- Card / Panel QA root: 413:15472 (Light / Dark / 760px frames; includes Panel SLOT replacement)
 - Current Controls root dimensions: 1440 × 34245 (observed at Shell start/end; preserved without editing)
 
 ## 2. Foundations
@@ -179,7 +181,7 @@ Utilities:
 
 ## 4. Controls
 
-Current controls state: **61 component sets and 506 variants**, unchanged by the Pattern phases. All planned foundation groups are complete; see [Avatar record](FIGMA_AVATAR.md). Patterns contains **PC App Shell: 9 sets / 60 variants** plus six production standalone Pattern components after Page Heading / Toolbar / Filter Bar / Selection Command Bar; the Shell QA workspace fixture remains QA-only. Screens remains empty. See [Shell record](FIGMA_PC_APP_SHELL.md) and [Page Bars record](FIGMA_PAGE_HEADING_TOOLBAR_FILTER_SELECTION.md). Previous group audit totals remain historical snapshots.
+Current controls state: **61 component sets and 506 variants**, unchanged by the Pattern phases. All planned foundation groups are complete; see [Avatar record](FIGMA_AVATAR.md). Patterns now contains **10 component sets / 65 variants / 8 production standalone components** after PC App Shell, Page Bars, and Metric Card / Action Card / Panel. The Shell QA workspace fixture remains QA-only. Screens remains empty. See [Shell record](FIGMA_PC_APP_SHELL.md), [Page Bars record](FIGMA_PAGE_HEADING_TOOLBAR_FILTER_SELECTION.md), and [Card / Panel record](FIGMA_METRIC_ACTION_PANEL.md). Previous group audit totals remain historical snapshots.
 
 | Component set | ID | Variants | API |
 |---|---:|---:|---|
@@ -401,6 +403,21 @@ Standalone components: `Building Blocks/Menu Note` (`255:1763`); `Building Block
 - Application source was used only to confirm semantics from `taskPageHeader`, player/team filters, result toolbars and selection actions. No CSS geometry was treated as design authority; no application source or speculative Code Connect was changed.
 - Full API and node evidence: [Page Bars record](FIGMA_PAGE_HEADING_TOOLBAR_FILTER_SELECTION.md).
 
+### Metric Card / Action Card / Panel architecture — 2026-09-23
+
+- Pattern documentation root: `410:15350`, 1600 × 3967. It is placed below Page Bars and does not overlap Page Bars or the Shell root.
+- Local design-system search found no existing Metric Card / Action Card / Panel. Material 3 and Simple Design System returned generic cards/stats/panel assets, but their token model, geometry and interaction API do not match FIP; none were imported.
+- `Metric Card` (`410:15370`) is a single read-only component: Label / Value / Note / Show note. It uses FIP Label, Data/Metric and Caption styles with existing surface, border, text, panel-padding, radius and spacing tokens. No business-tone variants were invented.
+- `Action Card` (`411:15483`) is one set / five real states: Default `411:15368`, Hover `411:15391`, Pressed `411:15414`, Focus `411:15437`, Disabled `411:15460`. API: Title / Description / Action / Show description / State. The whole card is the single action target.
+- Action Card retains real Icon Slot instances: the leading icon is exposed and defaults to the existing Chart icon; the trailing Arrow Right remains a nested Icon Slot. All 20 descendant instances resolve to masters; unresolved=0.
+- `Panel` (`412:15426`) is a single generic surface with true SLOT properties `Header actions` and `Body`, plus Eyebrow / Title / Description and Show header / Show description / Show header actions / Show divider. No detach is required for arbitrary workspace content.
+- Panel Light QA replaces Header actions with real Secondary + Primary buttons and Body with a custom Frame through the slots; read-back confirms the replacement remains inside the instance slot structure.
+- QA root `413:15472`: Light / 1120 `413:15473`, Dark / 1120 `414:15545`, Light / Narrow 760 `414:15637`. The narrow content width is 718: two 353px Metric Cards or Action Cards plus a 12px gap fit exactly; Panel is resized to 718.
+- Final audit: duplicate production names 0; Action Card variants 5/5; Panel SLOT definitions 2/2; own hardcoded visible fills/strokes 0; visible QA overflow 0; overlap with earlier pattern roots 0.
+- No new variables, text styles or effects were created. Shared totals stay 191 variables / 13 text styles / 6 effects; Controls stay 61 / 506. Patterns now total 10 sets / 65 variants / 8 production standalone components.
+- Application source was used only to confirm semantics from dashboard metrics/action cards and generic business panels. No CSS geometry was treated as Figma authority; no application source or speculative Code Connect was changed.
+- Full API and QA evidence: [Metric / Action / Panel record](FIGMA_METRIC_ACTION_PANEL.md).
+
 ### Badge and Tag semantic correction
 
 - Badge is status-only and never carries a remove action.
@@ -433,20 +450,21 @@ When implementation starts:
 
 ## 7. Known next work
 
-The planned foundation groups and the first two Pattern groups — PC App Shell and Page Heading / Toolbar / Filter Bar / Selection Command Bar — are complete. The file does not yet contain finished product Screens.
+The planned foundation groups and the first three Pattern groups — PC App Shell, Page Heading / Toolbar / Filter Bar / Selection Command Bar, and Metric Card / Action Card / Panel — are complete. The file does not yet contain finished product Screens.
 
 Foundation dependency extension P4.2, the first button group, the extended-field group, Searchable Combobox, Switch / Toggle, Tabs / Segmented Control, Data Table / Pagination, Dropdown / Context / Overflow Menu, Dialog, Toast / Inline Alert / Blocking Message (including Task Activity), Accordion / Disclosure, Progress / Skeleton / Empty State, and Avatar are complete and verified. Evidence is split across the separate records linked from `docs/README.md`.
 
 ### Foundation completion
 
 - Remaining planned foundation groups: **0**. Current Controls inventory: **61 sets / 506 variants**.
-- Completed Patterns: **PC App Shell** and **Page Heading / Toolbar / Filter Bar / Selection Command Bar**. Next: **Metric Card / Action Card / Panel**, before product Screens. New dependencies must still be recorded and validated.
+- Completed Patterns: **PC App Shell**, **Page Heading / Toolbar / Filter Bar / Selection Command Bar**, and **Metric Card / Action Card / Panel**. Next: **Master–Detail–Inspector workspace**, with Entity Row treated as a dependency of that group, before product Screens.
 
 ### Required pattern families
 
 - [x] PC application shell: primary rail, secondary navigation, topbar, collapse states.
 - [x] Page heading, toolbar, filter bar, and selection command bar.
-- Metric cards, action cards, panels, and entity rows.
+- [x] Metric cards, action cards, and panels.
+- [ ] Entity rows — planned as a dependency of Master–Detail–Inspector.
 - Master–detail–inspector workspace.
 - Workflow stepper/timeline.
 - AI chat workspace.
