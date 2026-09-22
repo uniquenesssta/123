@@ -17,7 +17,7 @@
 - [Accordion / Disclosure 与展开状态恢复](FIGMA_ACCORDION_DISCLOSURE.md)
 - [Progress / Skeleton / Empty State 与异步状态边界](FIGMA_PROGRESS_SKELETON_EMPTY_STATE.md)
 - [Avatar：球队、球员与默认占位](FIGMA_AVATAR.md)
-- [PC App Shell：导航、顶栏与交互验收](FIGMA_PC_APP_SHELL.md)
+- [PC App Shell：导航、顶栏与交互验收](FIGMA_PC_APP_SHELL.md)\n- [Page Heading / Toolbar / Filter Bar / Selection Command Bar](FIGMA_PAGE_HEADING_TOOLBAR_FILTER_SELECTION.md)
 - [应用图标待办](FIGMA_ICON_BACKLOG.md)
 - [基础 Token 与底层组件待办](FIGMA_FOUNDATION_COMPONENT_BACKLOG.md)
 - [Patterns 与 Screens 计划](FIGMA_PATTERN_SCREEN_PLAN.md)
