@@ -4,17 +4,17 @@
 
 ## 当前状态
 
-截至2026-09-23，既定底层组件剩余0组，Controls保持 **61个组件集 /506个变体**。Patterns 已完成 **PC App Shell**、**Page Heading / Toolbar / Filter Bar / Selection Command Bar**、**Metric Card / Action Card / Panel**；Screens（3:5）仍为空。
+截至2026-09-23，既定底层组件剩余0组，Controls保持 **61个组件集 /506个变体**。Patterns 已完成 **PC App Shell**、**Page Heading / Toolbar / Filter Bar / Selection Command Bar**、**Metric Card / Action Card / Panel**、**Master–Detail–Inspector**；Screens（3:5）仍为空。
 
-Patterns 当前为 **10个组件集 /65个变体 /8个生产单组件**。第三组新增 Action Card 1个 set /5个真实交互 variants，以及 Metric Card、Panel 两个生产单组件；Panel 使用 SLOT，不 detach。Light、Dark、760px 窄宽与 slot replacement QA 均通过。完整证据见 [Shell 记录](FIGMA_PC_APP_SHELL.md)、[Page Bars 记录](FIGMA_PAGE_HEADING_TOOLBAR_FILTER_SELECTION.md) 与 [Card / Panel 记录](FIGMA_METRIC_ACTION_PANEL.md)。
+Patterns 当前为 **11个组件集 /75个变体 /9个生产单组件**。第四组包含 Entity Row 1个 set /10个 Selected × State variants，以及 Master–Detail–Inspector 1个 SLOT 型生产单组件；Light、Dark、Inspector Open / Collapsed、760px 窄宽与三 SLOT 实际替换 QA 均通过。完整证据见 [Shell 记录](FIGMA_PC_APP_SHELL.md)、[Page Bars 记录](FIGMA_PAGE_HEADING_TOOLBAR_FILTER_SELECTION.md)、[Card / Panel 记录](FIGMA_METRIC_ACTION_PANEL.md) 与 [Master–Detail–Inspector 记录](FIGMA_MASTER_DETAIL_INSPECTOR.md)。
 
 ## Patterns 执行顺序
 
 - [x] PC App Shell：一级导航、二级导航、Topbar、折叠与主题保持。
 - [x] Page Heading / Toolbar / Filter Bar / Selection Command Bar。
 - [x] Metric Card / Action Card / Panel。
-- [ ] **下一组：Master–Detail–Inspector 工作区。**
-- [ ] Workflow Stepper / Timeline。
+- [x] Master–Detail–Inspector 工作区（含 Entity Row 依赖）。
+- [ ] **下一组：Workflow Stepper / Timeline。**
 - [ ] AI Chat：历史侧栏、消息、附件、Composer。
 
 依赖先归档和验收，再用于组合；不在业务页面里新增临时控件。保留各组独立记录，不合并为一份大文档。
