@@ -19,7 +19,7 @@
 | 00 · Foundations | 0:1 | complete; desktop dependency extension verified |
 | 01 · Iconography | 3:2 | application icon coverage complete and verified |
 | 02 · Controls | 3:3 | planned foundation groups complete; 61 sets / 506 variants |
-| 03 · Patterns | 3:4 | Shell + Page Bars + Card/Panel complete; 10 sets / 65 variants + 8 production singles; QA verified |
+| 03 · Patterns | 3:4 | Shell + Page Bars + Card/Panel + Master–Detail–Inspector complete; 11 sets / 75 variants + 9 production singles; QA verified |
 | 04 · Screens | 3:5 | reserved; currently empty |
 
 Page documentation roots:
@@ -51,6 +51,8 @@ Page documentation roots:
 - Page Bars QA root: 408:15035 (Light / Dark / 760px frames; not product Screens)
 - Metric Card / Action Card / Panel pattern root: 410:15350
 - Card / Panel QA root: 413:15472 (Light / Dark / 760px frames; includes Panel SLOT replacement)
+- Master–Detail–Inspector pattern root: 418:15663
+- Master–Detail–Inspector QA root: 421:15881 (Light / Dark / Open / Collapsed / 760px; all three SLOTs replaced in Light Open)
 - Current Controls root dimensions: 1440 × 34245 (observed at Shell start/end; preserved without editing)
 
 ## 2. Foundations
@@ -181,7 +183,7 @@ Utilities:
 
 ## 4. Controls
 
-Current controls state: **61 component sets and 506 variants**, unchanged by the Pattern phases. All planned foundation groups are complete; see [Avatar record](FIGMA_AVATAR.md). Patterns now contains **10 component sets / 65 variants / 8 production standalone components** after PC App Shell, Page Bars, and Metric Card / Action Card / Panel. The Shell QA workspace fixture remains QA-only. Screens remains empty. See [Shell record](FIGMA_PC_APP_SHELL.md), [Page Bars record](FIGMA_PAGE_HEADING_TOOLBAR_FILTER_SELECTION.md), and [Card / Panel record](FIGMA_METRIC_ACTION_PANEL.md). Previous group audit totals remain historical snapshots.
+Current controls state: **61 component sets and 506 variants**, unchanged by the Pattern phases. All planned foundation groups are complete; see [Avatar record](FIGMA_AVATAR.md). Patterns now contains **11 component sets / 75 variants / 9 production standalone components** after PC App Shell, Page Bars, Metric Card / Action Card / Panel, and Master–Detail–Inspector. The Shell QA workspace fixture remains QA-only. Screens remains empty. See [Shell record](FIGMA_PC_APP_SHELL.md), [Page Bars record](FIGMA_PAGE_HEADING_TOOLBAR_FILTER_SELECTION.md), [Card / Panel record](FIGMA_METRIC_ACTION_PANEL.md), and [Master–Detail–Inspector record](FIGMA_MASTER_DETAIL_INSPECTOR.md). Previous group audit totals remain historical snapshots.
 
 | Component set | ID | Variants | API |
 |---|---:|---:|---|
@@ -418,6 +420,24 @@ Standalone components: `Building Blocks/Menu Note` (`255:1763`); `Building Block
 - Application source was used only to confirm semantics from dashboard metrics/action cards and generic business panels. No CSS geometry was treated as Figma authority; no application source or speculative Code Connect was changed.
 - Full API and QA evidence: [Metric / Action / Panel record](FIGMA_METRIC_ACTION_PANEL.md).
 
+### Master–Detail–Inspector architecture — 2026-09-23
+
+- Pattern documentation root: `418:15663`, 1600 × 5507. It is placed below Card / Panel and does not overlap earlier Pattern roots.
+- Local design-system search found no FIP Entity Row or Master–Detail–Inspector. Material 3 / Simple Design System list/sidebar assets were rejected because their token model, density and navigation semantics do not match FIP entity workspaces.
+- `Entity Row` (`419:15828`) is one set / ten variants: Selected False/True × State Default/Hover/Pressed/Focus/Disabled. Width binds `layout/directory/width` 248; height is 54 from 38px Avatar plus 8px vertical padding.
+- Entity Row API: Title / Supporting / Metadata / Show supporting / Show metadata / Show status / Selected / State. Avatar and Badge remain real exposed nested instances.
+- Selected uses `color/action/accent-soft` and a 2px `color/action/accent` indicator. Unselected Default/Hover/Pressed/Focus/Disabled use surface / raised / subtle / focus / disabled semantics respectively.
+- Acceptance caught an implementation-script truthiness error where string `"False"` was treated as truthy; this temporarily put accent-soft and visible indicators on unselected variants. The set was repaired before acceptance and fully re-read: all five unselected indicator opacities are 0, all five selected are 1, and final fill/stroke bindings match the intended state map.
+- `Master–Detail–Inspector` (`420:15715`) is a single 1120 × 600 layout component with true SLOT properties Master / Detail / Inspector and Boolean `Show inspector`. Master binds `layout/directory/width` 248, Inspector binds `layout/inspector/entity-width` 300, Detail fills the remaining width, and the gutter uses `spacing/sm` 8.
+- The existing `layout/inspector/workspace-width` 360 is intentionally not turned into a fake width variant here; this group targets the entity workspace semantics verified in players/teams. Other workspace inspector contracts remain available for later Patterns.
+- QA root `421:15881`: Light Open `421:15882`, Light Collapsed `421:16162`, Dark Open `421:16236`, Narrow 760 Collapsed `421:16279`.
+- Light Open replaces all three instance SLOTs without detach: Master gets four Entity Rows, Detail gets Metric Cards + Panel, Inspector gets Avatar + Badge + facts. Read-back at 1078 inner width is Master248 + 8 + Detail514 + 8 + Inspector300.
+- Narrow 760 fixture uses 720 inner width: Master248 + 8 + Detail464; Inspector is hidden. Detail Panel body copy wraps naturally rather than shrinking type.
+- Final audit: duplicate production names 0; Entity Row variants 10/10; top-level MDI SLOT definitions 3/3; unresolved nested instances 0; own hardcoded visible fills/strokes 0; visible QA overflow 0; overlap with earlier Pattern roots 0.
+- No new variables, text styles or effects were created. Shared totals stay 191 variables / 13 text styles / 6 effects; Controls stay 61 / 506. Patterns now total 11 sets / 75 variants / 9 production standalone components.
+- Application source was used only to confirm master/detail/inspector responsibilities, selection persistence and inspector collapsed/open semantics. No CSS geometry was treated as Figma authority; no application source or speculative Code Connect was changed.
+- Full API, correction record and QA evidence: [Master–Detail–Inspector record](FIGMA_MASTER_DETAIL_INSPECTOR.md).
+
 ### Badge and Tag semantic correction
 
 - Badge is status-only and never carries a remove action.
@@ -450,22 +470,22 @@ When implementation starts:
 
 ## 7. Known next work
 
-The planned foundation groups and the first three Pattern groups — PC App Shell, Page Heading / Toolbar / Filter Bar / Selection Command Bar, and Metric Card / Action Card / Panel — are complete. The file does not yet contain finished product Screens.
+The planned foundation groups and the first four Pattern groups — PC App Shell, Page Heading / Toolbar / Filter Bar / Selection Command Bar, Metric Card / Action Card / Panel, and Master–Detail–Inspector — are complete. The file does not yet contain finished product Screens.
 
 Foundation dependency extension P4.2, the first button group, the extended-field group, Searchable Combobox, Switch / Toggle, Tabs / Segmented Control, Data Table / Pagination, Dropdown / Context / Overflow Menu, Dialog, Toast / Inline Alert / Blocking Message (including Task Activity), Accordion / Disclosure, Progress / Skeleton / Empty State, and Avatar are complete and verified. Evidence is split across the separate records linked from `docs/README.md`.
 
 ### Foundation completion
 
 - Remaining planned foundation groups: **0**. Current Controls inventory: **61 sets / 506 variants**.
-- Completed Patterns: **PC App Shell**, **Page Heading / Toolbar / Filter Bar / Selection Command Bar**, and **Metric Card / Action Card / Panel**. Next: **Master–Detail–Inspector workspace**, with Entity Row treated as a dependency of that group, before product Screens.
+- Completed Patterns: **PC App Shell**, **Page Heading / Toolbar / Filter Bar / Selection Command Bar**, **Metric Card / Action Card / Panel**, and **Master–Detail–Inspector workspace** including Entity Row. Next: **Workflow Stepper / Timeline**, before product Screens.
 
 ### Required pattern families
 
 - [x] PC application shell: primary rail, secondary navigation, topbar, collapse states.
 - [x] Page heading, toolbar, filter bar, and selection command bar.
 - [x] Metric cards, action cards, and panels.
-- [ ] Entity rows — planned as a dependency of Master–Detail–Inspector.
-- Master–detail–inspector workspace.
+- [x] Entity rows — completed as the Master–Detail–Inspector dependency.
+- [x] Master–detail–inspector workspace.
 - Workflow stepper/timeline.
 - AI chat workspace.
 
