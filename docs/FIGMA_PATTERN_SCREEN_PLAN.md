@@ -4,16 +4,16 @@
 
 ## 当前状态
 
-截至2026-09-23，既定底层组件剩余0组，Controls保持 **61个组件集 /506个变体**。Patterns 已完成 **PC App Shell** 与 **Page Heading / Toolbar / Filter Bar / Selection Command Bar**；Screens（3:5）仍为空。
+截至2026-09-23，既定底层组件剩余0组，Controls保持 **61个组件集 /506个变体**。Patterns 已完成 **PC App Shell**、**Page Heading / Toolbar / Filter Bar / Selection Command Bar**、**Metric Card / Action Card / Panel**；Screens（3:5）仍为空。
 
-Shell包含9个组件集 /60个变体、2个生产单组件及1个QA组件；第二组新增4个生产单组件且不制造无业务意义的 variant。Patterns 当前为 **9个组件集 /60个变体 /6个生产单组件**。第二组完成 Light、Dark 与760px窄宽 QA；完整证据见 [Shell 记录](FIGMA_PC_APP_SHELL.md) 与 [Page Bars 记录](FIGMA_PAGE_HEADING_TOOLBAR_FILTER_SELECTION.md)。
+Patterns 当前为 **10个组件集 /65个变体 /8个生产单组件**。第三组新增 Action Card 1个 set /5个真实交互 variants，以及 Metric Card、Panel 两个生产单组件；Panel 使用 SLOT，不 detach。Light、Dark、760px 窄宽与 slot replacement QA 均通过。完整证据见 [Shell 记录](FIGMA_PC_APP_SHELL.md)、[Page Bars 记录](FIGMA_PAGE_HEADING_TOOLBAR_FILTER_SELECTION.md) 与 [Card / Panel 记录](FIGMA_METRIC_ACTION_PANEL.md)。
 
 ## Patterns 执行顺序
 
 - [x] PC App Shell：一级导航、二级导航、Topbar、折叠与主题保持。
 - [x] Page Heading / Toolbar / Filter Bar / Selection Command Bar。
-- [ ] **下一组：Metric Card / Action Card / Panel。**
-- [ ] Master–Detail–Inspector 工作区。
+- [x] Metric Card / Action Card / Panel。
+- [ ] **下一组：Master–Detail–Inspector 工作区。**
 - [ ] Workflow Stepper / Timeline。
 - [ ] AI Chat：历史侧栏、消息、附件、Composer。
 
