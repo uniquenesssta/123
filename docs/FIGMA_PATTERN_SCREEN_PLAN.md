@@ -4,15 +4,15 @@
 
 ## 当前状态
 
-截至2026-08-28，既定底层组件剩余0组，Controls保持 **61个组件集 /506个变体**。Patterns首组 **PC App Shell** 已完成；Screens（3:5）仍为空。
+截至2026-09-23，既定底层组件剩余0组，Controls保持 **61个组件集 /506个变体**。Patterns 已完成 **PC App Shell** 与 **Page Heading / Toolbar / Filter Bar / Selection Command Bar**；Screens（3:5）仍为空。
 
-Shell包含9个组件集 /60个变体、2个生产单组件及1个QA夹具；7个模块 /17个入口的Light、Dark、展开、折叠组合与历史、重试、重置原型已连接并通过结构检查。完整证据见 [独立 Shell 记录](FIGMA_PC_APP_SHELL.md)。
+Shell包含9个组件集 /60个变体、2个生产单组件及1个QA组件；第二组新增4个生产单组件且不制造无业务意义的 variant。Patterns 当前为 **9个组件集 /60个变体 /6个生产单组件**。第二组完成 Light、Dark 与760px窄宽 QA；完整证据见 [Shell 记录](FIGMA_PC_APP_SHELL.md) 与 [Page Bars 记录](FIGMA_PAGE_HEADING_TOOLBAR_FILTER_SELECTION.md)。
 
 ## Patterns 执行顺序
 
 - [x] PC App Shell：一级导航、二级导航、Topbar、折叠与主题保持。
-- [ ] **下一组：Page Heading / Toolbar / Filter Bar / Selection Command Bar。**
-- [ ] Metric Card / Action Card / Panel。
+- [x] Page Heading / Toolbar / Filter Bar / Selection Command Bar。
+- [ ] **下一组：Metric Card / Action Card / Panel。**
 - [ ] Master–Detail–Inspector 工作区。
 - [ ] Workflow Stepper / Timeline。
 - [ ] AI Chat：历史侧栏、消息、附件、Composer。
