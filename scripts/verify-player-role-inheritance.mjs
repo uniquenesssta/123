@@ -78,8 +78,12 @@ requireTokens("crates/persistence-postgres/src/adapters/catalog/players/director
 requireTokens("crates/persistence-postgres/src/player_catalog.rs", [
   "lineup.captured_at::date",
   "role_source_position_code",
-  "metadata_with_role_resolution",
 ], "历史比赛阵容角色持久化");
+requireTokens("crates/persistence-postgres/src/adapters/lineups/pair_transaction/write.rs", [
+  "metadata_with_role_resolution",
+  "resolve_default_tactical_role_in_tx",
+  "draft.captured_at.date_naive()",
+], "阵容创建角色持久化");
 requireTokens("crates/persistence-postgres/src/team_lineup_presets.rs", [
   "resolve_default_tactical_role_in_tx",
   "metadata_with_role_resolution",

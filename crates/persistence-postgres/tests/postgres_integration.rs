@@ -2094,9 +2094,38 @@ async fn match_scope_inference_and_lineup_pair_transaction_are_atomic() {
             .await
             .expect("统计失败后的阵容数量");
     assert_eq!(count_after_failure, 0, "任一侧失败后不得保留另一侧阵容");
+    let failed_audits: i64 = sqlx::query_scalar(
+        "SELECT count(*)::bigint FROM audit.events WHERE (event_type='lineup_created' AND payload->>'match_id'=$1) OR (event_type='lineup_pair_created' AND entity_id=$1)",
+    ).bind(target.id.to_string()).fetch_one(&database.pool).await.expect("读取失败双方提交的审计残留");
+    assert_eq!(failed_audits, 0, "客队失败时主队创建审计也必须回滚");
 
     let mut valid_pair = pair;
     valid_pair.away.players[0].player_id = valid_away_first;
+    for case in 0..6 {
+        let mut invalid_pair = valid_pair.clone();
+        match case {
+            0 => invalid_pair.away.match_id = Uuid::new_v4(),
+            1 => invalid_pair.away.team_id = invalid_pair.home.team_id,
+            2 => invalid_pair.away.snapshot_type = "T-1h".into(),
+            3 => invalid_pair.away.lineup_type = LineupType::Actual,
+            4 => {
+                invalid_pair.home.team_id = away.id;
+                invalid_pair.away.team_id = home.id;
+            }
+            _ => {
+                let missing_match_id = Uuid::new_v4();
+                invalid_pair.home.match_id = missing_match_id;
+                invalid_pair.away.match_id = missing_match_id;
+            }
+        }
+        assert!(
+            matches!(
+                database.store.create_lineup_pair(&invalid_pair).await,
+                Err(PersistenceError::InvalidState(_))
+            ),
+            "错误双方身份/窗口/类型必须拒绝"
+        );
+    }
     let created = database
         .store
         .create_lineup_pair(&valid_pair)
@@ -2104,6 +2133,7 @@ async fn match_scope_inference_and_lineup_pair_transaction_are_atomic() {
         .expect("双方阵容应在一个事务中提交");
     assert_eq!(created.home.team_id, home.id);
     assert_eq!(created.away.team_id, away.id);
+    assert!(created.home.model_eligible && created.away.model_eligible);
     let count_after_success: i64 = sqlx::query_scalar(
         "SELECT count(*)::bigint FROM football.lineups WHERE match_id=$1 AND status='active'",
     )
@@ -2334,6 +2364,215 @@ async fn match_scope_inference_and_lineup_pair_transaction_are_atomic() {
             .await
             .expect("读取重复提交后的计数");
     assert_eq!(ended_count_after, 1);
+
+    // 在客队球员外键处实际阻塞：主队及其审计已经写入，但整个 pair 尚未提交。
+    let pair_audits_before: i64 = sqlx::query_scalar(
+        "SELECT count(*)::bigint FROM audit.events WHERE event_type='lineup_pair_created' AND entity_id=$1",
+    ).bind(target.id.to_string()).fetch_one(&database.pool).await.expect("记录取消前双方审计数量");
+    let created_audits_before_cancel: i64 = sqlx::query_scalar(
+        "SELECT count(*)::bigint FROM audit.events WHERE event_type='lineup_created' AND payload->>'match_id'=$1",
+    ).bind(target.id.to_string()).fetch_one(&database.pool).await.unwrap();
+    let mut blocker = database
+        .pool
+        .begin()
+        .await
+        .expect("锁定客队球员以观察提交前取消");
+    let blocker_pid: i32 = sqlx::query_scalar("SELECT pg_backend_pid()")
+        .fetch_one(&mut *blocker)
+        .await
+        .unwrap();
+    sqlx::query("SELECT id FROM football.players WHERE id=$1 FOR UPDATE")
+        .bind(valid_away_first)
+        .fetch_one(&mut *blocker)
+        .await
+        .unwrap();
+    let mut cancelled_pair = valid_pair.clone();
+    cancelled_pair.home.captured_at += Duration::minutes(40);
+    cancelled_pair.away.captured_at += Duration::minutes(40);
+    let cancel_store = database.store.clone();
+    let cancelled =
+        tokio::spawn(async move { cancel_store.create_lineup_pair(&cancelled_pair).await });
+    let observed = wait_for_lineup_lock(
+        &database.pool,
+        blocker_pid,
+        "%INSERT INTO football.lineup_players%",
+        1,
+    )
+    .await;
+    cancelled.abort();
+    let cancelled_result = cancelled.await;
+    blocker.rollback().await.expect("释放外键阻塞");
+    assert!(observed, "取消必须发生在主队写入后、客队明细外键等待期间");
+    assert!(cancelled_result
+        .expect_err("任务应在提交前取消")
+        .is_cancelled());
+    // 重新取得父锁，确认被取消的事务已经释放锁，不能靠不可见未提交行冒充回滚。
+    let mut released = database.pool.begin().await.unwrap();
+    sqlx::query("SET LOCAL lock_timeout='5s'")
+        .execute(&mut *released)
+        .await
+        .unwrap();
+    sqlx::query("SELECT id FROM football.matches WHERE id=$1 FOR UPDATE")
+        .bind(target.id)
+        .fetch_one(&mut *released)
+        .await
+        .expect("取消后父锁必须释放");
+    released.rollback().await.unwrap();
+    let after_cancel: i64 =
+        sqlx::query_scalar("SELECT count(*)::bigint FROM football.lineups WHERE match_id=$1")
+            .bind(target.id)
+            .fetch_one(&database.pool)
+            .await
+            .unwrap();
+    assert_eq!(
+        after_cancel, lineup_count_after,
+        "取消不得留下半条阵容或结束原活动版本"
+    );
+    let active_after_cancel: i64 = sqlx::query_scalar(
+        "SELECT count(*)::bigint FROM football.lineups WHERE match_id=$1 AND status='active'",
+    )
+    .bind(target.id)
+    .fetch_one(&database.pool)
+    .await
+    .unwrap();
+    assert_eq!(active_after_cancel, 2);
+    let created_audits_after_cancel: i64 = sqlx::query_scalar(
+        "SELECT count(*)::bigint FROM audit.events WHERE event_type='lineup_created' AND payload->>'match_id'=$1",
+    ).bind(target.id.to_string()).fetch_one(&database.pool).await.unwrap();
+    assert_eq!(
+        created_audits_after_cancel, created_audits_before_cancel,
+        "取消不得遗留主队创建审计"
+    );
+
+    let mut concurrent_workbook = workbook.clone();
+    concurrent_workbook.source_sha256 = format!("ledger-concurrent-{token}");
+    let concurrent_preview = database
+        .store
+        .preview_match_lineup_import(&concurrent_workbook, SpreadsheetImportMode::AddAndUpdate)
+        .await
+        .expect("预检参与并发的合法工作簿");
+    assert_eq!(concurrent_preview.counts.error, 0);
+    assert_eq!(concurrent_preview.counts.conflict, 0);
+    // 两次 pair、一次 single 和一个工作簿在共同父锁前等待。
+
+    let mut blocker = database.pool.begin().await.unwrap();
+    let blocker_pid: i32 = sqlx::query_scalar("SELECT pg_backend_pid()")
+        .fetch_one(&mut *blocker)
+        .await
+        .unwrap();
+    sqlx::query("SELECT id FROM football.matches WHERE id=$1 FOR UPDATE")
+        .bind(target.id)
+        .fetch_one(&mut *blocker)
+        .await
+        .unwrap();
+    let mut first_pair = valid_pair.clone();
+    first_pair.home.captured_at += Duration::minutes(40);
+    first_pair.away.captured_at += Duration::minutes(40);
+    let mut second_pair = first_pair.clone();
+    second_pair.home.captured_at += Duration::minutes(10);
+    second_pair.away.captured_at += Duration::minutes(10);
+    let mut single_draft = second_pair.home.clone();
+    single_draft.captured_at += Duration::minutes(10);
+    let first_store = database.store.clone();
+    let second_store = database.store.clone();
+    let single_store = database.store.clone();
+    let import_store = database.store.clone();
+    let mut first = tokio::spawn(async move { first_store.create_lineup_pair(&first_pair).await });
+    let mut second =
+        tokio::spawn(async move { second_store.create_lineup_pair(&second_pair).await });
+    let mut single = tokio::spawn(async move { single_store.create_lineup(&single_draft).await });
+    let batch_id = concurrent_preview.batch_id;
+    let mut importing =
+        tokio::spawn(async move { import_store.commit_match_lineup_import(batch_id).await });
+    let observed = wait_for_lineup_lock(
+        &database.pool,
+        blocker_pid,
+        "SELECT home_team_id, away_team_id FROM football.matches WHERE id=$1 FOR UPDATE%",
+        4,
+    )
+    .await;
+    if !observed {
+        first.abort();
+        second.abort();
+        single.abort();
+        importing.abort();
+    }
+    blocker.rollback().await.unwrap();
+    assert!(
+        observed,
+        "pair、single 与 workbook 必须在写入前等待同一比赛锁"
+    );
+    let outcomes = tokio::time::timeout(std::time::Duration::from_secs(20), async {
+        tokio::join!(&mut first, &mut second, &mut single, &mut importing)
+    })
+    .await;
+    if outcomes.is_err() {
+        first.abort();
+        second.abort();
+        single.abort();
+        importing.abort();
+    }
+    let (first, second, single, importing) = outcomes.expect("串行放行后并发阵容写入不能挂起");
+    let first = first.expect("首个并发任务完成").expect("首个双方提交成功");
+    let second = second.expect("第二并发任务完成").expect("第二双方提交成功");
+    let single = single.expect("单侧并发任务完成").expect("单侧提交成功");
+    let imported = importing
+        .expect("工作簿并发任务完成")
+        .expect("工作簿并发提交成功");
+    assert_eq!(imported.inserted_count, 12);
+    assert_eq!(imported.ended_previous_count, 1);
+    let import_ledger: (i64, i64) = sqlx::query_as(
+        "SELECT inserted_count,ended_previous_count FROM catalog.import_batches WHERE id=$1",
+    )
+    .bind(batch_id)
+    .fetch_one(&database.pool)
+    .await
+    .unwrap();
+    assert_eq!(import_ledger, (12, 1));
+    let imported_lineup_id: Uuid = sqlx::query_scalar(
+        "SELECT id FROM football.lineups WHERE match_id=$1 AND team_id=$2 AND metadata->>'source'='match_lineup_spreadsheet' AND id<>$3",
+    ).bind(target.id).bind(home.id).bind(active_home.0).fetch_one(&database.pool).await.unwrap();
+    assert_ne!(first.home.id, second.home.id);
+    assert_ne!(first.away.id, second.away.id);
+    assert_ne!(single.id, first.home.id);
+    assert_ne!(single.id, second.home.id);
+    for (team_id, new_ids) in [
+        (
+            home.id,
+            vec![first.home.id, second.home.id, single.id, imported_lineup_id],
+        ),
+        (away.id, vec![first.away.id, second.away.id]),
+    ] {
+        let active_count: i64 = sqlx::query_scalar(
+            "SELECT count(*)::bigint FROM football.lineups WHERE match_id=$1 AND team_id=$2 AND snapshot_type='T-6h' AND lineup_type='expected' AND status='active'",
+        ).bind(target.id).bind(team_id).fetch_one(&database.pool).await.unwrap();
+        assert_eq!(active_count, 1, "并发后每侧必须只有一条活动阵容");
+        let incomplete: i64 = sqlx::query_scalar(
+            "SELECT count(*)::bigint FROM football.lineups lineup WHERE lineup.id=ANY($1) AND (NOT lineup.model_eligible OR lineup.supersedes_lineup_id IS NULL OR (SELECT count(*) FROM football.lineup_players player WHERE player.lineup_id=lineup.id)<>11)",
+        ).bind(&new_ids).fetch_one(&database.pool).await.unwrap();
+        assert_eq!(incomplete, 0, "并发版本必须保留完整明细、模型门禁与前驱链");
+    }
+    let after_concurrent: i64 =
+        sqlx::query_scalar("SELECT count(*)::bigint FROM football.lineups WHERE match_id=$1")
+            .bind(target.id)
+            .fetch_one(&database.pool)
+            .await
+            .unwrap();
+    assert_eq!(after_concurrent, lineup_count_after + 6);
+    let pair_audits_after: i64 = sqlx::query_scalar(
+        "SELECT count(*)::bigint FROM audit.events WHERE event_type='lineup_pair_created' AND entity_id=$1",
+    ).bind(target.id.to_string()).fetch_one(&database.pool).await.unwrap();
+    assert_eq!(
+        pair_audits_after,
+        pair_audits_before + 2,
+        "只记录实际成功的双方提交"
+    );
+    for pair in [&first, &second] {
+        let payload: serde_json::Value = sqlx::query_scalar(
+            "SELECT payload FROM audit.events WHERE event_type='lineup_pair_created' AND entity_id=$1 AND payload->>'home_lineup_id'=$2",
+        ).bind(target.id.to_string()).bind(pair.home.id.to_string()).fetch_one(&database.pool).await.unwrap();
+        assert_eq!(payload["away_lineup_id"], json!(pair.away.id));
+    }
 
     database.close().await;
 }
@@ -3213,4 +3452,21 @@ async fn create_match(
         })
         .await
         .expect("创建测试比赛")
+}
+
+async fn wait_for_lineup_lock(
+    pool: &PgPool,
+    blocker_pid: i32,
+    query_pattern: &str,
+    expected: i64,
+) -> bool {
+    tokio::time::timeout(std::time::Duration::from_secs(10), async {
+        loop {
+            let waiting: i64 = sqlx::query_scalar(
+                "SELECT count(*)::bigint FROM pg_stat_activity WHERE $1=ANY(pg_blocking_pids(pid)) AND wait_event_type='Lock' AND ltrim(query) LIKE $2",
+            ).bind(blocker_pid).bind(query_pattern).fetch_one(pool).await.expect("观察真实阵容锁等待");
+            if waiting >= expected { return; }
+            tokio::time::sleep(std::time::Duration::from_millis(20)).await;
+        }
+    }).await.is_ok()
 }

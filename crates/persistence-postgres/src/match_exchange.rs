@@ -786,6 +786,8 @@ async fn apply_match_exchange_row(
             let team_id = payload_uuid(values, "_resolved_team_id")?;
             let lineup_type = required(values, "lineup_type")?;
             let snapshot_type = default_text(values, "snapshot_type", "T-1h");
+            let _ =
+                crate::adapters::lineups::pair_transaction::lock_match_in_tx(tx, match_id).await?;
             let supersedes_lineup_id: Option<Uuid> = sqlx::query_scalar(
                 "SELECT id FROM football.lineups WHERE match_id=$1 AND team_id=$2 AND snapshot_type=$3 AND lineup_type=$4 AND status='active' ORDER BY captured_at DESC,created_at DESC,id DESC LIMIT 1",
             )

@@ -24,14 +24,14 @@
     "targetPublicExportPolicy": "explicit re-export only"
   },
   "sourceDigest": "217241ac243726a5ab6805a7f169e222b97e78c7c971749a5904714af673ebdd",
-  "rustUsageDigest": "7289b54bf291c66a52e8df6e6763f4eb804902d284f365f6d722cf77290d479d",
+  "rustUsageDigest": "30724787d94644220bff9d8c994df89c5cff3978877bef13ecc6c681ad5afb16",
   "summary": {
     "typeCount": 365,
     "publicCompatibilityTypeCount": 365,
     "internalTypeCount": 0,
     "domainSourceFileCount": 129,
-    "scannedRustFileCount": 975,
-    "databaseMappedTypeCount": 299,
+    "scannedRustFileCount": 979,
+    "databaseMappedTypeCount": 300,
     "byTargetModule": {
       "ai_workspace": 16,
       "analytics": 39,
@@ -3142,6 +3142,7 @@
         "crates/application/src/use_cases/prediction/shared/readiness_checks.rs",
         "crates/persistence-postgres/src/adapters/catalog/players/value_mapping.rs",
         "crates/persistence-postgres/src/adapters/catalog/teams/detail/squad_mapper.rs",
+        "crates/persistence-postgres/src/adapters/lineups/pair_transaction/write.rs",
         "crates/persistence-postgres/src/match_exchange.rs",
         "crates/persistence-postgres/src/player_catalog.rs",
         "crates/persistence-postgres/src/team_lineup_presets.rs",
@@ -3152,6 +3153,7 @@
       "databaseMappings": [
         "crates/persistence-postgres/src/adapters/catalog/players/value_mapping.rs",
         "crates/persistence-postgres/src/adapters/catalog/teams/detail/squad_mapper.rs",
+        "crates/persistence-postgres/src/adapters/lineups/pair_transaction/write.rs",
         "crates/persistence-postgres/src/match_exchange.rs",
         "crates/persistence-postgres/src/player_catalog.rs",
         "crates/persistence-postgres/src/team_lineup_presets.rs"
@@ -9561,13 +9563,17 @@
         "crates/application/src/services/lineups/service.rs",
         "crates/application/src/use_cases/lineups/create_lineup/mod.rs",
         "crates/application/src/use_cases/prediction/tests.rs",
-        "crates/persistence-postgres/src/player_catalog.rs",
+        "crates/persistence-postgres/src/adapters/lineups/pair_transaction/mod.rs",
+        "crates/persistence-postgres/src/adapters/lineups/pair_transaction/validation.rs",
+        "crates/persistence-postgres/src/adapters/lineups/pair_transaction/write.rs",
         "crates/persistence-postgres/tests/postgres_integration.rs",
         "crates/spreadsheet-io/src/match_review_workbook.rs",
         "src-tauri/src/commands/catalog.rs"
       ],
       "databaseMappings": [
-        "crates/persistence-postgres/src/player_catalog.rs"
+        "crates/persistence-postgres/src/adapters/lineups/pair_transaction/mod.rs",
+        "crates/persistence-postgres/src/adapters/lineups/pair_transaction/validation.rs",
+        "crates/persistence-postgres/src/adapters/lineups/pair_transaction/write.rs"
       ]
     },
     {
@@ -9689,13 +9695,13 @@
         "crates/application/src/use_cases/lineups/create_lineup_pair/mod.rs",
         "crates/application/src/use_cases/prediction/tests.rs",
         "crates/application/src/use_cases/review/package/shared.rs",
-        "crates/persistence-postgres/src/player_catalog.rs",
+        "crates/persistence-postgres/src/adapters/lineups/pair_transaction/mod.rs",
         "crates/persistence-postgres/tests/postgres_integration.rs",
         "crates/spreadsheet-io/src/match_review_workbook.rs",
         "src-tauri/src/commands/catalog.rs"
       ],
       "databaseMappings": [
-        "crates/persistence-postgres/src/player_catalog.rs"
+        "crates/persistence-postgres/src/adapters/lineups/pair_transaction/mod.rs"
       ]
     },
     {
@@ -9751,11 +9757,11 @@
         "crates/application/src/services/lineups/service.rs",
         "crates/application/src/use_cases/lineups/create_lineup_pair/mod.rs",
         "crates/application/src/use_cases/prediction/tests.rs",
-        "crates/persistence-postgres/src/player_catalog.rs",
+        "crates/persistence-postgres/src/adapters/lineups/pair_transaction/mod.rs",
         "src-tauri/src/commands/catalog.rs"
       ],
       "databaseMappings": [
-        "crates/persistence-postgres/src/player_catalog.rs"
+        "crates/persistence-postgres/src/adapters/lineups/pair_transaction/mod.rs"
       ]
     },
     {
@@ -9871,7 +9877,7 @@
       "compatibilityLevel": "root_public_compatibility",
       "currentRootExport": "explicit_reexport",
       "targetRootExport": "explicit_reexport",
-      "databaseMapping": "none_detected",
+      "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
         "crates/domain/src/lib.rs",
         "crates/domain/src/lineup/snapshot.rs",
@@ -9879,10 +9885,13 @@
       ],
       "externalCallers": [
         "crates/application/src/use_cases/review/package/shared.rs",
+        "crates/persistence-postgres/src/adapters/lineups/pair_transaction/validation.rs",
         "crates/persistence-postgres/tests/postgres_integration.rs",
         "crates/spreadsheet-io/src/match_review_workbook.rs"
       ],
-      "databaseMappings": []
+      "databaseMappings": [
+        "crates/persistence-postgres/src/adapters/lineups/pair_transaction/validation.rs"
+      ]
     },
     {
       "typeName": "LineupPlayerRecord",
@@ -10157,6 +10166,7 @@
         "crates/application/src/use_cases/prediction/shared/readiness_checks.rs",
         "crates/application/src/use_cases/prediction/tests.rs",
         "crates/application/src/use_cases/review/package/shared.rs",
+        "crates/persistence-postgres/src/adapters/lineups/pair_transaction/mod.rs",
         "crates/persistence-postgres/src/lineup_chain.rs",
         "crates/persistence-postgres/src/match_exchange.rs",
         "crates/persistence-postgres/src/match_prediction.rs",
@@ -10166,6 +10176,7 @@
         "src-tauri/src/commands/catalog.rs"
       ],
       "databaseMappings": [
+        "crates/persistence-postgres/src/adapters/lineups/pair_transaction/mod.rs",
         "crates/persistence-postgres/src/lineup_chain.rs",
         "crates/persistence-postgres/src/match_exchange.rs",
         "crates/persistence-postgres/src/match_prediction.rs",
@@ -10233,11 +10244,13 @@
       ],
       "externalCallers": [
         "crates/application/src/use_cases/review/package/shared.rs",
+        "crates/persistence-postgres/src/adapters/lineups/pair_transaction/validation.rs",
         "crates/persistence-postgres/src/player_catalog.rs",
         "crates/persistence-postgres/tests/postgres_integration.rs",
         "crates/spreadsheet-io/src/match_review_workbook.rs"
       ],
       "databaseMappings": [
+        "crates/persistence-postgres/src/adapters/lineups/pair_transaction/validation.rs",
         "crates/persistence-postgres/src/player_catalog.rs"
       ]
     },

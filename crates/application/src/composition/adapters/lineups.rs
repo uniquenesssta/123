@@ -71,12 +71,12 @@ impl MatchCatalogPort for PersistenceStore {
 #[async_trait]
 impl LineupPort for PersistenceStore {
     async fn create_lineup(&self, draft: &LineupDraft) -> PortResult<LineupRecord> {
-        self.create_lineup(draft)
+        PersistenceStore::create_lineup(self, draft)
             .await
             .map_err(map_persistence_error)
     }
     async fn create_lineup_pair(&self, draft: &LineupPairDraft) -> PortResult<LineupPairRecord> {
-        self.create_lineup_pair(draft)
+        PersistenceStore::create_lineup_pair(self, draft)
             .await
             .map_err(map_persistence_error)
     }
