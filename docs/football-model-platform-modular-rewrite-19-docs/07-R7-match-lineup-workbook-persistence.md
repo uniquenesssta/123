@@ -5,6 +5,14 @@
 > 后续阶段：`R8`  
 > 本文档是唯一执行依据之一；必须与 `00-总体架构与前23节.md` 同时适用。
 
+## 目标平台与验证解释（2026-09-30）
+
+本阶段遵循总纲的 Windows-only 验证范围：下列各任务的编译、类型检查、Rust 单元测试、Clippy、前端构建、PostgreSQL/XLSX 客户端链路、Tauri 打包和运行验收均在 Windows 执行。Linux/macOS 验证取消，不列为待补门禁。
+
+当前 `.github/workflows/ci.yml` 已使用 `windows-2025`，没有 Linux/macOS job 或平台 matrix；本次无需删除或改写 CI。真实 PostgreSQL 与 XLSX、双方阵容事务、截止时间、actual 隔离、整批回滚和保护资产门禁保持。
+
+本文件中的初始 `BLOCKED` 模板不是实时进度。当前任务状态以 `docs/modular-rewrite/R07-match-lineup-workbook-persistence/README.md` 的执行索引和对应验证证据为准：审计基线 `985f01816060cfd05672bdc03b6771dec7b4e842` 的 R7-01 为 `VERIFYING`，R7-02～R7-10 为 `BLOCKED`。审计发现与约束调整建议已记录于该索引；本次仅落实平台范围，不实施其他建议或业务修复。
+
 ## 1. 阶段目标
 
 - 重写比赛、双方阵容、阵容链路、预设和工作簿批次账本。

@@ -43,6 +43,12 @@ Node 开发依赖固定安装和读取自源码根目录上一级的 `../node_mo
 
 ## 模块化重写执行记录
 
+### Windows 验证范围与 R7 审计
+
+- 2026-09-30 起仅要求 Windows 编译、测试、打包和运行验收；Linux/macOS 验证不再作为门禁。当前 CI 已是 Windows-only；真实 PostgreSQL/XLSX、事务与模型/迁移保护要求保留，详见总纲与 `docs/TESTING.md`。
+- R7-01 已迁移 Match Catalog，但仍为 `VERIFYING`：存在 Application 读取旧方法、Domain 调用方清单未同步、三个历史验证器路径未迁移和专项数据库测试未接入的缺口。本次只更新验证范围与审计记录，未修复业务代码、刷新清单或改变验收状态。详细证据及建议见 [`R07 执行索引`](docs/modular-rewrite/R07-match-lineup-workbook-persistence/README.md)。
+
+
 
 ### R6 Stage Complete
 
