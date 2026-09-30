@@ -1,0 +1,16 @@
+{
+  "schemaVersion": 1,
+  "runId": "footfigma-screens-runs-2026-09-30",
+  "repo": "uniquenesssta/123", "branch": "ui-design-system",
+  "fileKey": "PN0Whgu6HLWIHx4Mv6aHfu", "page": "3:5",
+  "currentScreen": "S05 runs / 运行记录", "currentRoute": "runs",
+  "phase": "in_progress_allocation_only",
+  "previousAcceptedGlobalCheckpoint": "1d2b9b78d4d7bf2e589c81e69e4fef89638c98cb",
+  "acceptedRouteCount": 4, "routeCount": 17,
+  "source": {"runs":{"path":"src/pages/runs.ts","ref":"main","blob":"c4374872117775c17570a405afe63f73842d860a"},"modal":{"path":"src/app/modal.ts","ref":"main","blob":"750bed8b30083e27c6ec5d264d51ea18636e7717"}},
+  "frames": {"List":"516:48546","Empty":"516:48713","FirstLoad":"516:48857","LoadError":"516:49001","Refreshing":"516:49145","RefreshError":"516:49289","LongList":"516:49433","RecordDetail":"516:49577","RecordMissingData":"516:49721","DetailLoading":"516:49865","DetailError":"516:50009","DatabaseRequired":"516:50153","DatabaseConnectionError":"516:50297","ListDark":"516:50441","ListCompact":"516:50585","DetailDark":"516:50878","DetailCompact":"516:51022","HiddenResultPreset":"516:51271"},
+  "completed": ["live checkpoint recovery", "runs semantics and existing FIP dependency discovery", "18 product root allocations"],
+  "pending": ["editable list/detail/database content", "hide confirmation/context and trace dialogs", "bounded prototype and existing route entry backfill", "deep and screenshot QA", "final documentation and global checkpoint"],
+  "warning": "Allocated roots are not accepted product states. Default Shell placeholders will be replaced before acceptance.",
+  "applicationSourceModified": false, "existingMastersModified": false, "newScreenMasters": 0
+}
