@@ -17,6 +17,7 @@ const nodeChecks = [
   "verify-competition-rules-service.mjs",
   "verify-teams-players-service.mjs",
   "verify-lineups-service.mjs",
+  "verify-r7-match-catalog.mjs",
   "verify-prediction-service.mjs",
   "verify-research-service.mjs",
   "verify-node-process-compatibility.mjs",

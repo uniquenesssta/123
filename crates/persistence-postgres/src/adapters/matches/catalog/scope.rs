@@ -5,7 +5,7 @@ use sqlx::Row;
 use uuid::Uuid;
 
 pub(super) async fn resolve_match_scope_draft(
-    pool: &sqlx::PgPool,
+    connection: &mut sqlx::PgConnection,
     draft: &MatchDraft,
 ) -> PersistenceResult<MatchDraft> {
     let mut resolved = draft.clone();
@@ -20,7 +20,7 @@ pub(super) async fn resolve_match_scope_draft(
             "#,
         )
         .bind(round_id)
-        .fetch_optional(pool)
+        .fetch_optional(&mut *connection)
         .await?
         .ok_or_else(|| PersistenceError::InvalidState("比赛轮次不存在".to_string()))?;
         resolved.stage_id.get_or_insert(row.try_get("stage_id")?);
@@ -38,7 +38,7 @@ pub(super) async fn resolve_match_scope_draft(
             "#,
         )
         .bind(stage_id)
-        .fetch_optional(pool)
+        .fetch_optional(&mut *connection)
         .await?
         .ok_or_else(|| PersistenceError::InvalidState("比赛阶段不存在".to_string()))?;
         resolved.season_id.get_or_insert(row.try_get("season_id")?);
@@ -50,7 +50,7 @@ pub(super) async fn resolve_match_scope_draft(
             "SELECT competition_id FROM football.seasons WHERE id = $1",
         )
         .bind(season_id)
-        .fetch_optional(pool)
+        .fetch_optional(&mut *connection)
         .await?
         .ok_or_else(|| PersistenceError::InvalidState("比赛赛季不存在".to_string()))?;
         resolved.competition_id.get_or_insert(competition_id);
@@ -66,7 +66,7 @@ pub(super) async fn resolve_match_scope_draft(
         )
         .bind(competition_id)
         .bind(resolved.kickoff_time)
-        .fetch_optional(pool)
+        .fetch_optional(&mut *connection)
         .await?
         .ok_or_else(|| PersistenceError::InvalidState("比赛赛事不存在或已停用".to_string()))?;
         let timezone: String = competition.try_get("timezone")?;
@@ -89,7 +89,7 @@ pub(super) async fn resolve_match_scope_draft(
         )
         .bind(competition_id)
         .bind(kickoff_date)
-        .fetch_optional(pool)
+        .fetch_optional(&mut *connection)
         .await?;
         if resolved.season_id.is_none() {
             let (season_name, starts_on, ends_on) =
@@ -127,7 +127,7 @@ pub(super) async fn resolve_match_scope_draft(
                 .bind(season_pattern)
                 .bind(timezone)
                 .bind(kickoff_date)
-                .fetch_one(pool)
+                .fetch_one(&mut *connection)
                 .await?,
             );
         }
@@ -165,7 +165,7 @@ fn automatic_season_identity(
 }
 
 pub(super) async fn validate_match_scope(
-    pool: &sqlx::PgPool,
+    connection: &mut sqlx::PgConnection,
     draft: &MatchDraft,
 ) -> PersistenceResult<()> {
     if let Some(round_id) = draft.round_id {
@@ -179,7 +179,7 @@ pub(super) async fn validate_match_scope(
             "#,
         )
         .bind(round_id)
-        .fetch_one(pool)
+        .fetch_one(&mut *connection)
         .await?;
         let stage_id: Uuid = row.try_get("stage_id")?;
         let season_id: Uuid = row.try_get("season_id")?;
@@ -204,7 +204,7 @@ pub(super) async fn validate_match_scope(
             "#,
         )
         .bind(stage_id)
-        .fetch_one(pool)
+        .fetch_one(&mut *connection)
         .await?;
         let season_id: Uuid = row.try_get("season_id")?;
         let competition_id: Uuid = row.try_get("competition_id")?;
@@ -221,7 +221,7 @@ pub(super) async fn validate_match_scope(
         let competition_id: Uuid =
             sqlx::query_scalar("SELECT competition_id FROM football.seasons WHERE id = $1")
                 .bind(season_id)
-                .fetch_one(pool)
+                .fetch_one(&mut *connection)
                 .await?;
         if draft
             .competition_id

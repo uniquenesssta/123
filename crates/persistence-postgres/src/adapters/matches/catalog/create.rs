@@ -8,14 +8,15 @@ use uuid::Uuid;
 
 impl PostgresStore {
     pub async fn create_match(&self, draft: &MatchDraft) -> PersistenceResult<MatchRecord> {
-        let resolved = resolve_match_scope_draft(&self.pool, draft).await?;
-        let draft = &resolved;
         if draft.home_team_id == draft.away_team_id {
             return Err(PersistenceError::InvalidState(
                 "主队和客队不能相同".to_string(),
             ));
         }
-        validate_match_scope(&self.pool, draft).await?;
+        let mut tx = self.pool.begin().await?;
+        let resolved = resolve_match_scope_draft(&mut tx, draft).await?;
+        let draft = &resolved;
+        validate_match_scope(&mut tx, draft).await?;
         let external_key = if draft.external_key.trim().is_empty() {
             let kickoff = draft.kickoff_time.format("%Y%m%dT%H%MZ");
             let home = draft.home_team_id.simple().to_string();
@@ -77,8 +78,10 @@ impl PostgresStore {
                 .filter(|value| !value.is_empty()),
         )
         .bind(&draft.metadata)
-        .fetch_one(&self.pool)
+        .fetch_one(&mut *tx)
         .await?;
-        match_record_from_row(&row)
+        let record = match_record_from_row(&row)?;
+        tx.commit().await?;
+        Ok(record)
     }
 }

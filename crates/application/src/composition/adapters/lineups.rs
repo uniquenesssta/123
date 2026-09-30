@@ -62,7 +62,7 @@ impl MatchCatalogPort for PersistenceStore {
             .map_err(map_persistence_error)
     }
     async fn read_match(&self, match_id: Uuid) -> PortResult<MatchRecord> {
-        self.read_match_exchange(match_id)
+        PersistenceStore::read_match(self, match_id)
             .await
             .map_err(map_persistence_error)
     }

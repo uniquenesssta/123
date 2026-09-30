@@ -2,7 +2,7 @@
 
 当前版本 **0.23.0**。本仓库是平台、数据库、数据准备、路由、工作台与外部模型调用入口的公开版本；真实 P4/P7 预测引擎、参数、Profile、固定比赛、私有研究提示词及模型专用固定回归资产不随仓库分发。
 
-R1–R6 累计补审覆盖 43 个任务节点。根据用户决定，R7-01 后新增 R7-02～06 审计整改，原 R7-02～10 顺延为 R7-07～15；优化拆分、验证与记录约束，沿用现有 Windows 验证和最终封包新库流程，不新增持续回归体系。当前仅调整任务书，尚未实施整改。详见 [R7 任务书](docs/football-model-platform-modular-rewrite-19-docs/07-R7-match-lineup-workbook-persistence.md) 与 [阶段索引/累计审计](docs/modular-rewrite/R07-match-lineup-workbook-persistence/README.md)。
+R1–R6 累计补审覆盖 43 个任务节点。根据用户决定，R7-01 后新增 R7-02～06 审计整改，原 R7-02～10 顺延为 R7-07～15；优化拆分、验证与记录约束，沿用现有 Windows 验证和最终封包新库流程，不新增持续回归体系。R7-01 的 A1～A7 已完成源码、现有门禁和契约测试修订，静态检查通过；Windows 编译/测试与 PostgreSQL 实跑待验，节点保持 VERIFYING。详见 [R7 任务书](docs/football-model-platform-modular-rewrite-19-docs/07-R7-match-lineup-workbook-persistence.md) 与 [阶段索引/累计审计](docs/modular-rewrite/R07-match-lineup-workbook-persistence/README.md)。
 
 ## 公开边界
 
@@ -38,12 +38,19 @@ Windows 可使用：
 验收平台.bat
 ```
 
-`verify:frontend` 包含公开模型边界、Domain 类型清单漂移、Node 调用链兼容、Windows 路径契约、TypeScript、静态契约、截图和 Vite 生产构建。TypeScript 与 Vite 使用当前 Node 执行包内 JavaScript CLI，不直接启动 Windows `.cmd` 包装器。Windows 验收器从 `.cargo/target-location.json` 解析实际 Cargo target，并支持相对于项目根目录的 `LogDirectory`；应用 runtime 日志写入运行时根目录的 `logs`，开发态 runtime root discovery 可能解析为源码根目录上一级。`verify:architecture` 包含模块边界、状态所有权、受保护导入和 Domain 类型清单漂移门禁。`verify:rust` 包含 Cargo.lock 一致性、格式检查、Clippy 与工作区测试。`verify_protected_assets.mjs` 校验模型公开边界文件指纹、保护目录精确集合以及私有 P4/P7 资产缺席状态。`verify_command_contract.mjs` 校验前端调用、Rust 命令定义和 `generate_handler!` 注册集合一致，并拒绝缺失、重复、孤立或未授权动态命令。`verify_database_baseline.mjs` 校验 0001–0046 迁移连续性、内容指纹、SQLx 迁移入口、PostgreSQL 集成测试集合和关键不可变约束。`run_database_baseline.mjs` 在静态门禁通过后执行被忽略的 PostgreSQL 集成测试，并拒绝数据库名不含 `test` 的连接。
+`verify:frontend` 包含公开模型边界、Domain 类型清单漂移、Node 调用链兼容、Windows 路径契约、TypeScript、静态契约、截图和 Vite 生产构建。TypeScript 与 Vite 使用当前 Node 执行包内 JavaScript CLI，不直接启动 Windows `.cmd` 包装器。Windows 验收器从 `.cargo/target-location.json` 解析实际 Cargo target，并支持相对于项目根目录的 `LogDirectory`；应用 runtime 日志写入运行时根目录的 `logs`，开发态 runtime root discovery 可能解析为源码根目录上一级。`verify:architecture` 包含模块边界、状态所有权、受保护导入和 Domain 类型清单漂移门禁。`verify:rust` 包含 Cargo.lock 一致性、格式检查、Clippy 与工作区测试。`verify_protected_assets.mjs` 校验模型公开边界文件指纹、保护目录精确集合以及私有 P4/P7 资产缺席状态。`verify_command_contract.mjs` 校验前端调用、Rust 命令定义和 `generate_handler!` 注册集合一致，并拒绝缺失、重复、孤立或未授权动态命令。`verify_database_baseline.mjs` 校验 0001–0046 迁移连续性、内容指纹、SQLx 迁移入口、PostgreSQL 集成测试集合和关键不可变约束。`run_database_baseline.mjs` 在静态门禁通过后依次执行已有 Match Catalog 契约与 PostgreSQL 集成测试，并拒绝数据库名不含 `test` 的连接。
 `Public Platform CI` 是 Windows 自动交付门禁：对 `main`、`new-*`、`rewrite/**` 的推送、Pull Request 和手动触发执行架构契约检查及 `scripts/windows-acceptance.ps1 -Mode Automated`，并保存验收日志和 release bundle 证据。云端 Automated 不替代最终真实 PostgreSQL、Windows Full 交互和用户本机验收。
 
 Node 开发依赖固定安装和读取自源码根目录上一级的 `../node_modules`，npm 缓存固定使用 `../.npm-cache`；仓库根目录不再保存 Node 依赖目录。Cargo target 继续使用 `../.cargo-target`。
 
 ## 模块化重写执行记录
+
+### R7-01 Match Catalog 问题修复（2026-09-30）
+
+- Application MatchCatalogPort 显式调用 Persistence 固有 `read_match`，移除已删除的方法调用并避免 trait 递归；自动赛季解析、层级校验、比赛 upsert 和返回映射共用一个事务，主客相同在事务前拒绝，后续失败回滚赛季新增/metadata 更新。
+- 官方生成器同步 Domain 使用清单：365 个 Domain 类型/声明摘要保持，Rust 扫描 966→975。Lineups Service、Match Workflow、History Scoreline 验证器改读当前 owner，保留原保护断言；已有 R7 verifier 覆盖 Application/事务并接入架构和前端门禁。
+- 已有 `match_catalog_repository_contract` 补 URL/实际数据库名双重 test 前检、失败断言后的本次夹具清理，以及 scope 冲突、赛季回滚、600 行列表上下限/状态/排序、研究引用阻止删除、AI/外部 ID 释放与单次删除审计。不可变共享 schema 和审计证据保留，不禁用触发器或清空全库。现有数据库基线与 Windows Full 接入该目标，不新增 runner/workflow；清除已完成迁移的两个一次性 R7 脚本。
+- 已通过架构聚合、受影响静态契约、迁移/保护资产/命令检查和数据库入口 dry-run/反向门禁。源码按 Rust 1.88 整理格式；未执行 Windows 编译、Clippy、Rust tests、PostgreSQL 或真实 XLSX/Full，未宣称动态通过。当前 R7-01 仍 VERIFYING、R7-02 仍 BLOCKED，验证详情见阶段索引。
 
 ### Windows 验证范围与 R7 审计
 

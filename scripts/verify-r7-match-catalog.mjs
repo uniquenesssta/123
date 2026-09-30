@@ -19,6 +19,12 @@ const list = read(`${base}/list.rs`);
 const readOwner = read(`${base}/read.rs`);
 const scope = read(`${base}/scope.rs`);
 const mapping = read(`${base}/mapping.rs`);
+const applicationAdapter = read("crates/application/src/composition/adapters/lineups.rs");
+const packageJson = JSON.parse(read("package.json"));
+const frontend = read("scripts/verify-frontend.mjs");
+const databaseRunner = read("scripts/run_database_baseline.mjs");
+const windowsAcceptance = read("scripts/windows-acceptance.ps1");
+const contract = read("crates/persistence-postgres/tests/match_catalog_repository_contract.rs");
 
 for (const file of ["mod.rs", "create.rs", "delete.rs", "list.rs", "read.rs", "scope.rs", "mapping.rs"]) {
   requireTrue(exists(`${base}/${file}`), `R7-01 缺少 Match Catalog owner 文件: ${file}`);
@@ -29,6 +35,11 @@ requireTrue(remove.includes("pub async fn delete_match") && remove.includes("res
 requireTrue(list.includes("pub async fn list_upcoming_matches") && list.includes("pub async fn list_managed_matches") && list.includes("ORDER BY fixture.kickoff_time") && list.includes("ORDER BY fixture.kickoff_time DESC"), "Match list owner/排序语义不完整");
 requireTrue(readOwner.includes("pub async fn read_match") && readOwner.includes("WHERE match.id=$1"), "read_match 未迁入唯一 owner");
 requireTrue(scope.includes("resolve_match_scope_draft") && scope.includes("validate_match_scope") && scope.includes("season_pattern") && scope.includes("competition_timezone"), "Match scope 解析/校验 owner 不完整");
+const teamValidationPosition = create.indexOf("draft.home_team_id == draft.away_team_id");
+const transactionPosition = create.indexOf("self.pool.begin()");
+requireTrue(teamValidationPosition >= 0 && transactionPosition > teamValidationPosition, "主客队校验必须先于写入事务");
+requireTrue(create.includes("resolve_match_scope_draft(&mut tx, draft)") && create.includes("validate_match_scope(&mut tx, draft)") && create.includes(".fetch_one(&mut *tx)") && create.includes("tx.commit().await?"), "赛季解析、层级校验与比赛写入未使用同一事务");
+requireTrue(!create.includes(".fetch_one(&self.pool)") && !scope.includes("PgPool") && !/\.fetch_(?:one|optional)\(pool\)/.test(scope), "Match scope 存在事务外数据库读写");
 requireTrue(mapping.includes("match_record_from_row") && mapping.includes("MatchStatus::Scheduled") && mapping.includes("MatchStatus::Cancelled"), "MatchRecord mapping owner 不完整");
 
 for (const forbidden of ["pub async fn create_match", "pub async fn delete_match", "pub async fn list_upcoming_matches", "pub async fn list_managed_matches", "resolve_match_scope_draft", "validate_match_scope", "fn match_record_from_row"]) {
@@ -42,5 +53,9 @@ requireTrue(matchPrediction.includes("adapters::matches::catalog::match_record_f
 requireTrue(!lineupChain.includes("read_match_exchange("), "lineup_chain.rs 仍依赖旧 read_match_exchange");
 requireTrue(lineupChain.includes("self.read_match("), "lineup_chain.rs 未切换到 Match Catalog read owner");
 requireTrue(playerCatalog.includes("pub async fn create_lineup") && playerCatalog.includes("pub async fn create_lineup_pair"), "R7-01 越界迁移了 Lineup owner");
+requireTrue(!applicationAdapter.includes("read_match_exchange") && applicationAdapter.includes("PersistenceStore::read_match(self, match_id)"), "Application MatchCatalogPort 未显式调用 Persistence 固有读取方法");
+requireTrue(packageJson.scripts?.["verify:architecture"]?.includes("verify-r7-match-catalog.mjs") && frontend.includes('"verify-r7-match-catalog.mjs"'), "R7-01 未接入现有架构/前端门禁");
+requireTrue(databaseRunner.includes('"match_catalog_repository_contract"') && windowsAcceptance.includes('"match_catalog_repository_contract"'), "现有数据库基线与 Windows Full 遗漏 R7-01 契约");
+requireTrue(contract.includes("PgConnectOptions") && contract.includes("get_database()") && contract.includes("current_database()") && contract.includes("cleanup_fixtures"), "R7-01 契约缺少测试库前检或 fixture 清理");
 
 console.log("R7-01 Match Catalog ownership verification passed.");

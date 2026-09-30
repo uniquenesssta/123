@@ -77,7 +77,42 @@ crates/persistence-postgres/src/adapters/workbooks/
 
 ## R7-01 当前验证状态
 
-- Match Catalog owner 已切换到 `adapters/matches/catalog/`；节点保持 `VERIFYING`，等待最小门禁、真实 PostgreSQL contract 与阶段回归。
+- Match Catalog owner 已切换到 `adapters/matches/catalog/`；A1～A7 的源码/现有门禁/契约测试修订已完成。静态检查通过，节点保持 `VERIFYING`，等待 Windows 最小门禁；PG/XLSX/Full 未运行项明确登记至最终封包新库验收。R7-02 仍 `BLOCKED`。
+
+### 2026-09-30 R7-01 修复记录（待动态验收）
+
+实施进入基线：本地 `567f4ec0cdb6401240fb9737014b0e01d745bf1b`；远端仍为 `51f746729b2f94925e6382f2ae2108cf80855af6`。沿用当前阶段分支。本记录不代替节点完成记录。
+
+| 审计项 | 本轮修订 | 验证状态 |
+|---|---|---|
+| A1 | `PersistenceStore::read_match(self, match_id)` 显式走固有公共读取方法；保留错误映射。 | 跨 crate 静态检查通过；Windows 编译待验。 |
+| A2 | 官方生成器更新使用摘要、真实调用路径和 975 个扫描文件；365 个 Domain 类型/声明摘要保持。 | Domain inventory 与架构聚合通过。 |
+| A3 | Lineups Service 改读新 read owner；Match Workflow 和 History Scoreline 的 scope/delete 检查改读新职责文件，Lineup 原检查继续读原 owner。 | 三个原失败检查均通过，未删业务断言。 |
+| A4 | 已有 R7 verifier 接入 `verify:architecture`/`verify:frontend`，覆盖 Application 读取与共享事务；无新 runner/workflow。 | 架构聚合通过；故意恢复旧方法/事务外 pool 的反向检查能拒绝，源码已恢复。 |
+| A5 | 已有 contract 覆盖层级冲突、失败无残留、600 行列表上下限/排序、研究保护、AI/外部 ID 释放和单次审计；现有数据库基线及 Windows Full 均显式执行此目标。 | 入口 dry-run 和静态检查通过；PG 真实断言未运行。 |
+| A6 | SQLx URL 解析先拒绝非 test 库，再确认 `current_database()`，均在迁移/写入前；将测试体 panic join 后清理本次 fixture。保留不可变共享 schema 和审计证据。 | 新增非数据库 guard 单测待 Windows 执行；已有 runner 的错误协议/非 test 库 dry-run 拒绝验证通过。 |
+| A7 | 主客不同校验先执行；scope 解析/自动赛季 upsert、层级校验、比赛写入/映射在一个事务，成功才提交。contract 覆盖赛季新增和既有 archived 赛季 metadata 更新回滚。 | 事务边界静态检查通过；真实 SQL 回滚待新库验证。 |
+
+清理：`scripts/r7-01-apply.py` / `r7-01-recover-callers.py` 仅用于已经完成的 owner 切换，无现有验证入口引用，已删除；回退使用进入基线/受控 revert，不重跑旧脚本覆盖修复。生产依赖、Cargo/Node 锁文件、0001～0046 migrations、Domain DTO、模型保护资产与公开命令均未修改。
+
+验证证据：架构聚合全通过；受影响 Match Workflow/History Scoreline/R7 门禁、Windows 验收器静态契约、46 个 migration 基线通过；现有数据库 runner dry-run 确认两个目标并保留失败退出码。Rust 1.88 仅用于整理源码格式，没有执行 Linux/macOS 编译或运行测试。当前环境没有 Windows 执行面或已授权专用 PG 连接；`verify-cargo-lock-sync.mjs` 因 Cargo 不在 PATH（ENOENT）未能执行，保留给 Windows 门禁，不伪造 CI/数据库结果。
+
+动态待验：Windows Application/Persistence 编译、fmt/Clippy/tests、前端构建与 Automated；`match_catalog_repository_contract` 真实 PG、既有 broad PG 基线与 XLSX/Full 登记为“最终封包新库待验”。历史四项 broad 失败和 A8 保留给 R7-06，B1～B7 按修订任务书执行，未在本轮夹带修复。
+
+引用释放的继承风险：现有删除代码尝试清空 `model.runs.match_id`，但 migration 0041 的输入身份触发器禁止该字段变更；本轮没有改该删除策略，也未用模型运行夹具证明该分支可删。后续数据库收口必须确认不可变模型历史的正确保护语义，不能通过放开历史触发器来完成删除。
+
+```mermaid
+flowchart TD
+  A["创建比赛"] --> B{"主客队不同？"}
+  B -->|"否"| C["拒绝输入"]
+  B -->|"是"| D["开启数据库事务"]
+  D --> E["解析赛季与校验层级"]
+  E -->|"成功"| F["写比赛并映射结果"]
+  E -->|"失败"| G["回滚赛季与比赛"]
+  F -->|"失败"| G
+  F -->|"成功"| H["提交事务并返回"]
+```
+
 
 
 ## 2026-09-30 用户确认的任务书调整（当前执行依据）

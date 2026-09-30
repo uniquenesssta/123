@@ -23,6 +23,7 @@ const styles = read("src/styles/components.css");
 const client = read("src/api/client.ts");
 const domain = (read("crates/domain/src/lib.rs") + read("crates/domain/src/lineup/kind.rs") + read("crates/domain/src/lineup/player.rs") + read("crates/domain/src/lineup/snapshot.rs") + read("crates/domain/src/lineup/preset.rs") + read("crates/domain/src/lineup/chain.rs") + read("crates/domain/src/match_record/status.rs") + read("crates/domain/src/match_record/catalog.rs"));
 const persistence = read("crates/persistence-postgres/src/player_catalog.rs");
+const matchScope = read("crates/persistence-postgres/src/adapters/matches/catalog/scope.rs");
 const application = read("crates/application/src/services/lineups/facade.rs");
 const command = read("src-tauri/src/commands/catalog.rs");
 const registry = read("src-tauri/src/bootstrap/command_registry.rs");
@@ -39,7 +40,7 @@ requireTrue(page.includes("主队和客队相对编排") && page.includes("paire
 requireTrue(page.includes("match-browser-layout") && page.includes("比赛目录") && page.includes("比赛详情"), "比赛左侧目录与右侧详情布局缺失");
 requireTrue(page.includes("new-match-competition") && page.includes("new-match-season") && page.includes("new-match-team-scope"), "赛事、赛季和球队体系分层选择缺失");
 requireTrue(!page.includes('data-action="create-team"') && !page.includes('data-action="create-lineup-player"'), "比赛管理仍混入球队或球员快速创建入口");
-requireTrue(main.includes("autoSelectMatchSeason") && persistence.includes("resolve_match_scope_draft"), "赛季自动匹配未覆盖前后端");
+requireTrue(main.includes("autoSelectMatchSeason") && matchScope.includes("resolve_match_scope_draft"), "赛季自动匹配未覆盖前后端");
 requireTrue(main.includes("filterMatchTeamOptions") && types.includes("season_team_memberships"), "赛事/赛季参赛队过滤链缺失");
 requireTrue(main.includes('const matchCompetition = currentPageRoot.querySelector<HTMLSelectElement>("#new-match-competition");') && main.includes("if (matchCompetition) {"), "数据库未连接时比赛页仍会初始化不存在的赛事控件");
 requireTrue(main.includes("WorkflowContinuation") && main.includes("startWorkflowCompletion") && main.includes("returnToWorkflow"), "跨页面补录与返回原任务链缺失");

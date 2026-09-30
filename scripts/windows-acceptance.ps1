@@ -137,6 +137,7 @@ try {
     Invoke-Stage "Rust 格式、Clippy 与工作区测试" "npm.cmd" @("run", "verify:rust")
     if ($Mode -eq "Full") {
       $env:FOOTBALL_TEST_DATABASE_URL = $TestDatabaseUrl
+      Invoke-Stage "Match Catalog PostgreSQL 契约" "cargo.exe" @("test", "--locked", "-p", "football-persistence-postgres", "--test", "match_catalog_repository_contract", "--", "--ignored", "--nocapture", "--test-threads=1")
       Invoke-Stage "PostgreSQL 空库迁移与忽略型集成测试" "cargo.exe" @("test", "--locked", "-p", "football-persistence-postgres", "--test", "postgres_integration", "--", "--ignored", "--nocapture")
     }
     Invoke-Stage "Tauri Windows release 构建" "npm.cmd" @("run", "tauri:build")

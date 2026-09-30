@@ -24,13 +24,13 @@
     "targetPublicExportPolicy": "explicit re-export only"
   },
   "sourceDigest": "217241ac243726a5ab6805a7f169e222b97e78c7c971749a5904714af673ebdd",
-  "rustUsageDigest": "9bd3137cea3bb9251b6a96b9ecadaa43749644f7bc3da32e305084bd64a82e09",
+  "rustUsageDigest": "e1a67fbc2efadd24fcd071b368b4083e7674df1760fa45ce52bf247021aabcb5",
   "summary": {
     "typeCount": 365,
     "publicCompatibilityTypeCount": 365,
     "internalTypeCount": 0,
     "domainSourceFileCount": 129,
-    "scannedRustFileCount": 966,
+    "scannedRustFileCount": 975,
     "databaseMappedTypeCount": 299,
     "byTargetModule": {
       "ai_workspace": 16,
@@ -10421,12 +10421,15 @@
         "crates/application/src/services/lineups/facade.rs",
         "crates/application/src/services/lineups/service.rs",
         "crates/application/src/use_cases/lineups/create_match/mod.rs",
-        "crates/persistence-postgres/src/player_catalog.rs",
+        "crates/persistence-postgres/src/adapters/matches/catalog/create.rs",
+        "crates/persistence-postgres/src/adapters/matches/catalog/scope.rs",
+        "crates/persistence-postgres/tests/match_catalog_repository_contract.rs",
         "crates/persistence-postgres/tests/postgres_integration.rs",
         "src-tauri/src/commands/catalog.rs"
       ],
       "databaseMappings": [
-        "crates/persistence-postgres/src/player_catalog.rs"
+        "crates/persistence-postgres/src/adapters/matches/catalog/create.rs",
+        "crates/persistence-postgres/src/adapters/matches/catalog/scope.rs"
       ]
     },
     {
@@ -11404,18 +11407,22 @@
         "crates/application/src/use_cases/lineups/create_match/mod.rs",
         "crates/application/src/use_cases/prediction/shared/audit.rs",
         "crates/application/src/use_cases/prediction/tests.rs",
-        "crates/persistence-postgres/src/match_exchange.rs",
+        "crates/persistence-postgres/src/adapters/matches/catalog/create.rs",
+        "crates/persistence-postgres/src/adapters/matches/catalog/list.rs",
+        "crates/persistence-postgres/src/adapters/matches/catalog/mapping.rs",
+        "crates/persistence-postgres/src/adapters/matches/catalog/read.rs",
         "crates/persistence-postgres/src/match_prediction.rs",
-        "crates/persistence-postgres/src/player_catalog.rs",
         "crates/persistence-postgres/src/review.rs",
         "crates/persistence-postgres/src/team_features.rs",
         "crates/persistence-postgres/tests/postgres_integration.rs",
         "src-tauri/src/commands/catalog.rs"
       ],
       "databaseMappings": [
-        "crates/persistence-postgres/src/match_exchange.rs",
+        "crates/persistence-postgres/src/adapters/matches/catalog/create.rs",
+        "crates/persistence-postgres/src/adapters/matches/catalog/list.rs",
+        "crates/persistence-postgres/src/adapters/matches/catalog/mapping.rs",
+        "crates/persistence-postgres/src/adapters/matches/catalog/read.rs",
         "crates/persistence-postgres/src/match_prediction.rs",
-        "crates/persistence-postgres/src/player_catalog.rs",
         "crates/persistence-postgres/src/review.rs",
         "crates/persistence-postgres/src/team_features.rs"
       ]
@@ -13731,15 +13738,14 @@
       "externalCallers": [
         "crates/application/src/use_cases/prediction/tests.rs",
         "crates/persistence-postgres/src/adapters/catalog/teams/detail/recent_match_mapper.rs",
-        "crates/persistence-postgres/src/match_exchange.rs",
-        "crates/persistence-postgres/src/player_catalog.rs",
+        "crates/persistence-postgres/src/adapters/matches/catalog/mapping.rs",
         "crates/persistence-postgres/src/review.rs",
+        "crates/persistence-postgres/tests/match_catalog_repository_contract.rs",
         "crates/persistence-postgres/tests/postgres_integration.rs"
       ],
       "databaseMappings": [
         "crates/persistence-postgres/src/adapters/catalog/teams/detail/recent_match_mapper.rs",
-        "crates/persistence-postgres/src/match_exchange.rs",
-        "crates/persistence-postgres/src/player_catalog.rs",
+        "crates/persistence-postgres/src/adapters/matches/catalog/mapping.rs",
         "crates/persistence-postgres/src/review.rs"
       ]
     },
@@ -28819,6 +28825,7 @@
         "crates/persistence-postgres/tests/entity_matching_references_repository_contract.rs",
         "crates/persistence-postgres/tests/entity_permanent_delete_repository_contract.rs",
         "crates/persistence-postgres/tests/global_name_search_repository_contract.rs",
+        "crates/persistence-postgres/tests/match_catalog_repository_contract.rs",
         "crates/persistence-postgres/tests/player_directory_detail_repository_contract.rs",
         "crates/persistence-postgres/tests/player_team_periods_availability_repository_contract.rs",
         "crates/persistence-postgres/tests/postgres_integration.rs",

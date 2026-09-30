@@ -28,6 +28,8 @@ const applicationPrediction = readRustTree("crates/application/src/services/pred
 const applicationCatalog = read("crates/application/src/services/lineups/facade.rs");
 const modelPersistence = read("crates/persistence-postgres/src/model_runs.rs");
 const catalogPersistence = read("crates/persistence-postgres/src/player_catalog.rs");
+const matchScope = read("crates/persistence-postgres/src/adapters/matches/catalog/scope.rs");
+const matchDeletion = read("crates/persistence-postgres/src/adapters/matches/catalog/delete.rs");
 const runHistoryMigration = read("crates/persistence-postgres/migrations/0032_model_run_history_visibility.sql");
 const lineupHistoryMigration = read("crates/persistence-postgres/migrations/0036_lineup_history_visibility.sql");
 const catalogMigration = [
@@ -62,8 +64,8 @@ requireTrue(lineups.includes('data-context-kind="lineup"') && lineups.includes('
 requireTrue(postgresIntegration.includes("集成测试删除未引用当前版本") && postgresIntegration.includes("集成测试归档已引用版本"), "阵容历史删除、恢复和归档缺少 PostgreSQL 集成回归");
 
 requireTrue(lineups.includes('data-context-kind="match"') && lineups.includes('data-action="request-delete-match"'), "已创建比赛缺少可见删除和右键删除入口");
-requireTrue(catalogPersistence.includes("protected_count") && catalogPersistence.includes("P4研究、冻结或正式赛后结算"), "比赛删除未保护不可变P4/赛后血缘");
-requireTrue(catalogPersistence.includes("UPDATE ai_workspace.sessions SET match_id = NULL"), "比赛删除未解除AI会话的可空比赛引用");
+requireTrue(matchDeletion.includes("protected_count") && matchDeletion.includes("P4研究、冻结或正式赛后结算"), "比赛删除未保护不可变P4/赛后血缘");
+requireTrue(matchDeletion.includes("UPDATE ai_workspace.sessions SET match_id = NULL"), "比赛删除未解除AI会话的可空比赛引用");
 requireTrue(main.includes('kind !== "run" && kind !== "match" && kind !== "lineup"') && main.includes("showAppContextMenu"), "应用右键菜单未覆盖推演、比赛和阵容历史");
 
 for (const id of ["new-match-competition-scope", "new-match-competition-region", "new-match-competition"]) {
@@ -84,7 +86,7 @@ for (const code of [
   requireTrue(catalogMigration.includes(code), `内置主流赛事目录缺少：${code}`);
 }
 requireTrue(catalogMigration.includes("season_pattern") && catalogMigration.includes("menu_region"), "赛事目录缺少赛季模式或三级菜单元数据");
-requireTrue(catalogPersistence.includes("AT TIME ZONE timezone") && catalogPersistence.includes("automatic_season_identity"), "赛季未按赛事本地时间自动判断/创建");
+requireTrue(matchScope.includes("AT TIME ZONE timezone") && matchScope.includes("automatic_season_identity"), "赛季未按赛事本地时间自动判断/创建");
 
 for (const code of ["SW", "LCB", "RCB", "LWB", "RWB", "LDM", "RDM", "LCM", "RCM", "LAM", "RAM", "SS", "CF", "LST", "RST"]) {
   requireTrue(positionMigration.includes(`'${code}'`) || positionMigration.includes(`\"${code}\"`), `完整位置目录缺少：${code}`);

@@ -47,13 +47,14 @@ const verify = spawnSync(
 );
 if (verify.status !== 0) process.exit(verify.status ?? 1);
 
-const cargoArguments = [
+const targets = ["match_catalog_repository_contract", "postgres_integration"];
+const cargoArguments = (target) => [
   "test",
   "--locked",
   "-p",
   "football-persistence-postgres",
   "--test",
-  "postgres_integration",
+  target,
   "--",
   "--ignored",
   "--test-threads=1",
@@ -61,18 +62,22 @@ const cargoArguments = [
 
 if (dryRun) {
   console.log(
-    `数据库执行前检通过：目标数据库=${databaseName}；将执行 cargo ${cargoArguments.join(" ")}`,
+    `数据库执行前检通过：目标数据库=${databaseName}；将执行 ${targets.map((target) => `cargo ${cargoArguments(target).join(" ")}`).join("；")}`,
   );
   process.exit(0);
 }
 
-const cargo = spawnSync("cargo", cargoArguments, {
-  cwd: root,
-  stdio: "inherit",
-  env: process.env,
-});
-if (cargo.error) {
-  console.error(`无法启动 cargo：${cargo.error.message}`);
-  process.exit(1);
+let exitCode = 0;
+for (const target of targets) {
+  const cargo = spawnSync("cargo", cargoArguments(target), {
+    cwd: root,
+    stdio: "inherit",
+    env: process.env,
+  });
+  if (cargo.error) {
+    console.error(`无法启动 cargo：${cargo.error.message}`);
+    process.exit(1);
+  }
+  if (cargo.status !== 0) exitCode = cargo.status ?? 1;
 }
-process.exit(cargo.status ?? 1);
+process.exit(exitCode);
