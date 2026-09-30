@@ -2,7 +2,7 @@
 
 当前版本 **0.23.0**。本仓库是平台、数据库、数据准备、路由、工作台与外部模型调用入口的公开版本；真实 P4/P7 预测引擎、参数、Profile、固定比赛、私有研究提示词及模型专用固定回归资产不随仓库分发。
 
-R1–R6 累计补审覆盖 43 个任务节点。根据用户决定，R7-01 后新增 R7-02～06 审计整改，原 R7-02～10 顺延为 R7-07～15；优化拆分、验证与记录约束，沿用现有 Windows 验证和最终封包新库流程，不新增持续回归体系。R7-01 的 A1～A7 修订已通过 Windows CI run `36678914535`，节点 DONE；R7-02 外部 ID 身份保护、R7-03 普通删除与历史引用保护均已通过 Windows CI 并为 DONE，下一项 R7-04 为 READY、尚未实施。PG/XLSX/Full 单独留到最终封包新库验收。详见 [R7 任务书](docs/football-model-platform-modular-rewrite-19-docs/07-R7-match-lineup-workbook-persistence.md) 与 [阶段索引/累计审计](docs/modular-rewrite/R07-match-lineup-workbook-persistence/README.md)。
+R1–R6 累计补审覆盖 43 个任务节点。根据用户决定，R7-01 后新增 R7-02～06 审计整改，原 R7-02～10 顺延为 R7-07～15；优化拆分、验证与记录约束，沿用现有 Windows 验证和最终封包新库流程，不新增持续回归体系。R7-01 的 A1～A7 修订已通过 Windows CI run `36678914535`，节点 DONE；R7-02 外部 ID 身份保护、R7-03 普通删除与历史引用保护均已通过 Windows CI 并为 DONE。R7-04 清单、验证入口和历史记录修订完成、当前 VERIFYING，R7-05 及以后 BLOCKED。PG/XLSX/Full 单独留到最终封包新库验收。详见 [R7 任务书](docs/football-model-platform-modular-rewrite-19-docs/07-R7-match-lineup-workbook-persistence.md) 与 [阶段索引/累计审计](docs/modular-rewrite/R07-match-lineup-workbook-persistence/README.md)。
 
 ## 公开边界
 
@@ -44,6 +44,12 @@ Windows 可使用：
 Node 开发依赖固定安装和读取自源码根目录上一级的 `../node_modules`，npm 缓存固定使用 `../.npm-cache`；仓库根目录不再保存 Node 依赖目录。Cargo target 继续使用 `../.cargo-target`。
 
 ## 模块化重写执行记录
+
+### R7-04 架构清单、验证器与执行记录对齐（2026-09-30，VERIFYING）
+
+- 原 Ports 验证器递归发现全部公开声明并与清单双向核对，补齐 5 个遗漏；19 个 Port 文件均检查禁止依赖，当前 43 个 trait 为源码扫描结果。sourceScan 验证当前文件/摘要/数量，原 209/232 调用面统计明确保留为 R3 历史基线。Analytics 私有 JSON 转换与 Review Package 既有 read_source_run JSON 返回采用明确 owner/指纹兼容登记，阻止未经登记的扩张。
+- PostgreSQL 模块清单由旧根模块名更新为 lib.rs/adapters/mod.rs 直接登记的 38 个真实 owner，拒绝缺失、额外、重复和失效路径；补接 R6-03 至现有 architecture/frontend，保留 R5 间接导入。R3-06/07 以原阶段 README 对应章节为权威详细记录，R6-09 复检表述订正并链接 R7-03 修复证据。
+- 架构、受影响静态契约及 11 项反向检查通过；Windows CI 待本次提交运行。没有改业务 Rust/公开协议/迁移/依赖/保护资产或新增 runner/workflow；真实 PG/XLSX/Full 继续最终封包新库待验。详情见 [阶段索引](docs/modular-rewrite/R07-match-lineup-workbook-persistence/README.md)。
 
 ### R7-03 普通删除与历史引用保护（2026-09-30，DONE）
 

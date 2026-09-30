@@ -29,6 +29,15 @@ This runs the public model-boundary audit, project-specific static checks, TypeS
 npm run verify:rust
 ```
 
+Application Ports 与 PostgreSQL 模块清单检查沿用 `npm run verify:architecture`；Ports 和 R6-03 Player Directory/Detail 同时位于现有 frontend 入口。Ports verifier 递归核对声明及子文件禁止依赖，`sourceScan` 表示当前 Port 文件/摘要/数量与组合根导入，R3 的持久化 209/232 统计仅保留为历史基线。需要同步已审查的 Port 源码变化时，使用原脚本：
+
+```powershell
+node scripts/verify-application-ports.mjs --refresh-source-scan
+node scripts/verify-application-ports.mjs
+```
+
+刷新仅在清单声明/依赖门禁通过后写入扫描字段，不登记未知 trait 或放宽 JSON 兼容边界；审查 Git diff 后提交。PostgreSQL owner 清单核对 `lib.rs`/`adapters/mod.rs` 的直接模块声明，R5 子检查继续经 competition verifier 间接执行。
+
 This runs formatting, Clippy with warnings denied, and workspace tests with `Cargo.lock` enforced.
 
 ## Public boundary

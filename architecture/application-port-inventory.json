@@ -1,23 +1,53 @@
 {
   "schemaVersion": "football.application-port-inventory.v1",
-  "stage": "R3-01",
-  "branch": "new-C",
-  "baselineCommit": "7cf906b8f98ab0fdcf89f80952bc8fb9cf21801f",
   "sourceScan": {
-    "persistencePublicAsyncMethods": 232,
-    "applicationUsedPersistenceMethods": 209,
+    "portSourceRoot": "crates/application/src/ports",
+    "portSourceFiles": [
+      "crates/application/src/ports/ai_workspace/mod.rs",
+      "crates/application/src/ports/analytics/contracts.rs",
+      "crates/application/src/ports/analytics/mod.rs",
+      "crates/application/src/ports/competition/mod.rs",
+      "crates/application/src/ports/database/mod.rs",
+      "crates/application/src/ports/error.rs",
+      "crates/application/src/ports/exchange/mod.rs",
+      "crates/application/src/ports/lineup/mod.rs",
+      "crates/application/src/ports/mod.rs",
+      "crates/application/src/ports/player/mod.rs",
+      "crates/application/src/ports/postmatch/mod.rs",
+      "crates/application/src/ports/prediction/mod.rs",
+      "crates/application/src/ports/release/mod.rs",
+      "crates/application/src/ports/research/mod.rs",
+      "crates/application/src/ports/review/mod.rs",
+      "crates/application/src/ports/review/package.rs",
+      "crates/application/src/ports/rules/mod.rs",
+      "crates/application/src/ports/system/mod.rs",
+      "crates/application/src/ports/team/mod.rs"
+    ],
+    "portSourceSha256": "a155a2f7e071bf7204d347db0599348b2da274fc4533171dfd9487cf6fcd44ff",
+    "publicPortTraitCount": 43,
+    "applicationRustFileCount": 376,
     "directConcretePersistenceImports": [
       "crates/application/src/composition/port_registry.rs"
-    ],
-    "scanWorkflowRun": 31237537087,
-    "scanWorkflowJob": 93052732745
+    ]
   },
   "policy": {
     "portMethodsUseSqlRows": false,
     "universalRepositoryAllowed": false,
     "concreteInfrastructureAllowedInPorts": false,
     "modelExecutionBoundary": "football-model-api",
-    "transitionConcretePersistenceImportOwner": "crates/application/src/composition/port_registry.rs"
+    "transitionConcretePersistenceImportOwner": "crates/application/src/composition/port_registry.rs",
+    "existingJsonBoundaries": [
+      {
+        "owner": "crates/application/src/ports/analytics/contracts.rs",
+        "sourceSha256": "ef0b05d4d2b73ad8d69a8ecbeb0646d2b31c9f1e6347f5399c03039ecac5c17f",
+        "reason": "R3-08 typed wrappers retain private JSON conversion; no raw Value in Analytics Port methods."
+      },
+      {
+        "owner": "crates/application/src/ports/review/package.rs",
+        "sourceSha256": "328f5eedf9fb3f8837a63d4d58da0d67b7ed44d64f883a56b2ba625d2a05a544",
+        "reason": "R3-08 existing read_source_run returns source-run JSON; preserve the public Port signature in R7-04. No additional JSON exposure is allowed without explicit review."
+      }
+    ]
   },
   "domains": [
     {
@@ -80,14 +110,19 @@
       "traits": [
         "ResearchArtifactPort",
         "FactPipelinePort",
-        "ResearchGatewayAuditPort"
+        "ResearchGatewayAuditPort",
+        "ResearchEvidenceLedgerPort",
+        "ResearchManualConflictPort"
       ]
     },
     {
       "name": "review",
       "traits": [
         "MatchReviewPort",
-        "MatchReviewWorkflowPort"
+        "MatchReviewWorkflowPort",
+        "MatchReviewPackageSourcePort",
+        "MatchReviewPackageStatePort",
+        "MatchReviewPackageFactsPort"
       ]
     },
     {
@@ -133,5 +168,20 @@
         "FileStoragePort"
       ]
     }
-  ]
+  ],
+  "baseline": {
+    "stage": "R3-01",
+    "branch": "new-C",
+    "commit": "7cf906b8f98ab0fdcf89f80952bc8fb9cf21801f",
+    "historicalPersistenceCallScan": {
+      "persistencePublicAsyncMethods": 232,
+      "applicationUsedPersistenceMethods": 209,
+      "directConcretePersistenceImports": [
+        "crates/application/src/composition/port_registry.rs"
+      ],
+      "scanWorkflowRun": 31237537087,
+      "scanWorkflowJob": 93052732745
+    }
+  },
+  "lastUpdatedTask": "R7-04"
 }

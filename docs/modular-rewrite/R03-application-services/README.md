@@ -15,6 +15,8 @@ R2 已完成并关闭。R3 只重写 Application 编排与 Ports/Services/Use Ca
 
 ## 任务状态
 
+R3-06、R3-07 的权威节点详细记录分别为本文件 [R3-06 当前结果](#r3-06-当前结果) 和 [R3-07 当前结果](#r3-07-当前结果)，包含 Atomic Task、提交、CI 与延期证据，不另复制独立节点文档。各 AT 段落中的 IN_PROGRESS/VERIFYING 是当时状态，以下最终状态表与末尾正式收口为当前阶段结果。此记录格式于 R7-04 对齐，历史 DONE 保留。
+
 | 任务 | 范围 | 状态 |
 |---|---|---|
 | R3-01 | Application Ports 设计 | DONE |
@@ -201,4 +203,3 @@ R3-02 已正式关闭为 `DONE`。详细记录见 [`R03-02-database-service.md`]
 - 最终 clean Public Platform CI run `31593758268` / Windows Automated job `94104353199` 在 HEAD `2ecebb9ab0076f27a20d46bc897e63c78aecae3d` 上全部通过；artifact `9140937975`，SHA-256 `a67e78ee1272d9a953432292ee284118cffcc17325a9aefedf4367cec451ee75`。
 - PR #21 已以 merge commit 方式合并，merge commit `f400740a36e29ab5cf154728c5f240ee018707c6`。R3-10 与 R3 阶段均正式关闭为 `DONE`。
 - 阶段完成记录：[`R03-stage-completion.md`](./R03-stage-completion.md)。18 个需要专用可写 `FOOTBALL_TEST_DATABASE_URL` 的 PostgreSQL 集成测试与 destructive reset 未执行，未记为通过。
-

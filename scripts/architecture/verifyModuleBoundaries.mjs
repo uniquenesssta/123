@@ -7,6 +7,7 @@ import {
   matchesPathPattern,
   normalizePath,
   pathExists,
+  extractRepositoryLocation,
   readJson,
   repositoryRoot,
 } from "./lib/repository.mjs";
@@ -140,6 +141,36 @@ for (const [packageName, definition] of Object.entries(contractCrates)) {
 
 report.check((graph.get("football-domain") ?? []).length === 0, "football-domain 不得依赖任何 workspace crate");
 for (const cycle of findCycles(graph)) report.violation(`检测到 Rust workspace 依赖环：${cycle.join(" -> ")}`);
+
+const persistence = contract.rust?.persistence ?? {};
+const persistenceRoot = contractCrates["football-persistence-postgres"]?.root;
+const persistenceOwner = extractRepositoryLocation(persistence.owner);
+report.check(Boolean(persistenceOwner) && pathExists(persistenceOwner), `PostgreSQL owner 不存在或位置无效：${persistence.owner}`);
+if (persistenceOwner && pathExists(persistenceOwner)) {
+  const ownerSource = readFileSync(join(repositoryRoot, persistenceOwner), "utf8");
+  report.check(persistence.owner.endsWith("::PostgresStore") && /\bpub\s+struct\s+PostgresStore\b/.test(ownerSource), "PostgreSQL owner 未指向真实 PostgresStore 声明");
+}
+report.check(persistence.adapter_module_scope === "lib-and-adapters-direct-modules", "PostgreSQL 模块清单扫描口径不正确");
+const actualAdapterOwners = [];
+for (const sourceFile of [`${persistenceRoot}/src/lib.rs`, `${persistenceRoot}/src/adapters/mod.rs`]) {
+  report.check(pathExists(sourceFile), `PostgreSQL 模块登记入口不存在：${sourceFile}`);
+  if (!pathExists(sourceFile)) continue;
+  const source = readFileSync(join(repositoryRoot, sourceFile), "utf8");
+  const parent = sourceFile.slice(0, sourceFile.lastIndexOf("/"));
+  for (const match of source.matchAll(/^\s*(?:pub(?:\([^)]*\))?\s+)?mod\s+(\w+)\s*;/gm)) {
+    const candidates = [`${parent}/${match[1]}.rs`, `${parent}/${match[1]}/mod.rs`].filter(pathExists);
+    report.check(candidates.length === 1, `PostgreSQL 模块声明必须解析到唯一 owner：${sourceFile} -> ${match[1]}`);
+    actualAdapterOwners.push(...candidates);
+  }
+}
+const registeredAdapterOwners = persistence.adapter_modules ?? [];
+report.check(new Set(registeredAdapterOwners).size === registeredAdapterOwners.length, "PostgreSQL 模块 owner 重复登记");
+for (const owner of registeredAdapterOwners) report.check(pathExists(owner), `PostgreSQL 模块 owner 不存在：${owner}`);
+report.check(
+  JSON.stringify([...registeredAdapterOwners].sort()) === JSON.stringify(actualAdapterOwners.sort()),
+  "PostgreSQL 模块 owner 集合与 lib.rs/adapters/mod.rs 声明不一致",
+);
+report.check(actualAdapterOwners.length === contract.counts?.postgres_adapters, "PostgreSQL 模块数量与 counts.postgres_adapters 不一致");
 
 const transitionalEdges = contract.transitional_edges ?? [];
 for (const edge of transitionalEdges) {

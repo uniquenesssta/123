@@ -1,7 +1,8 @@
 import fs from 'node:fs';
 import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 
-const root = process.cwd();
+const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const read = (relative) => fs.readFileSync(path.join(root, relative), 'utf8');
 const exists = (relative) => fs.existsSync(path.join(root, relative));
 
@@ -113,6 +114,14 @@ for (const token of ['read_names', 'read_positions', 'read_team_periods', 'read_
 const catalogMod = read('crates/persistence-postgres/src/adapters/catalog/mod.rs');
 if (!catalogMod.includes('pub(crate) mod players;')) {
   throw new Error('catalog module does not register players owner');
+}
+
+const packageJson = JSON.parse(read('package.json'));
+const architectureEntry = packageJson.scripts['verify:architecture'] ?? '';
+const frontendEntry = read('scripts/verify-frontend.mjs');
+if (architectureEntry.split('node scripts/verify-player-directory-detail.mjs').length !== 2
+  || frontendEntry.split('"verify-player-directory-detail.mjs"').length !== 2) {
+  throw new Error('R6-03 existing architecture/frontend entries must each run Player Directory/Detail exactly once');
 }
 
 console.log('R6-03 Player Directory/Detail ownership verification: PASS (R6-04 Names/Positions and R6-05 Team Periods/Availability owner advancement accepted)');
