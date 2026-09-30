@@ -1,0 +1,23 @@
+{
+  "schemaVersion": 1,
+  "runId": "footfigma-screens-prediction-2026-09-30",
+  "repo": "uniquenesssta/123",
+  "branch": "ui-design-system",
+  "fileKey": "PN0Whgu6HLWIHx4Mv6aHfu",
+  "page": "3:5",
+  "currentScreen": "S03 prediction / 赛事推演",
+  "phase": "in_progress",
+  "previousAcceptedScreens": ["S01 dashboard", "S02 lineups"],
+  "previousGlobalCheckpointCommit": "6aaff66b66fdcdc9f93f2fb74436b9534412f5cc",
+  "frames": {"FormalUnchecked":"487:22278"},
+  "source": {
+    "prediction":"f08d6d0fd9157b9c25297e7c7fa6468d829ad4cc",
+    "p4Workbench":"a00a61acd6922b1aff03816691a6e4423f49bbdb",
+    "runs":"c4374872117775c17570a405afe63f73842d860a"
+  },
+  "semanticBoundaries": ["External ModelProvider is not bundled", "Readiness, provider availability and actual results are independent", "Formal/readiness identity includes match, window and model", "Research manual decisions append evidence provenance; cutoff prevents edits", "Temporary simulation does not save a match"],
+  "pending": ["formal readiness/provider/request states", "P4 research, history, simulation subviews", "representative dark/compact", "bounded prototype and S01/S02 entry backfill", "deep visual QA and final documentation"],
+  "applicationSourceModified": false,
+  "existingMastersModified": false,
+  "newScreenMasters": 0
+}
