@@ -2,15 +2,119 @@
   "schemaVersion": 1,
   "runId": "footfigma-screens-runs-2026-09-30",
   "repo": "uniquenesssta/123", "branch": "ui-design-system",
-  "fileKey": "PN0Whgu6HLWIHx4Mv6aHfu", "page": "3:5",
+  "fileKey": "PN0Whgu6HLWIHx4Mv6aHfu", "page": "3:5", "stage": "Screens",
   "currentScreen": "S05 runs / 运行记录", "currentRoute": "runs",
-  "phase": "in_progress_allocation_only",
+  "phase": "accepted_visual_and_local_states", "checkpointDate": "2026-09-30", "currentExecutionFinished": true,
+  "acceptanceScope": "Editable composition, representative preset local states, selected Light/Dark/compact configurations and bounded prototype. Not every control, arbitrary input, runtime writes or full product integration.",
+  "recordPath": "docs/FIGMA_SCREEN_RUNS.md", "statePath": "docs/FIGMA_SCREEN_RUNS_STATE.json", "globalStatePath": "docs/FIGMA_SCREENS_STATE.json", "planPath": "docs/FIGMA_SCREENS_PLAN.md",
+  "recordCommit": "be3131d9342116a9e5c8b1ffa14fd0cc35bd6950",
   "previousAcceptedGlobalCheckpoint": "1d2b9b78d4d7bf2e589c81e69e4fef89638c98cb",
-  "acceptedRouteCount": 4, "routeCount": 17,
-  "source": {"runs":{"path":"src/pages/runs.ts","ref":"main","blob":"c4374872117775c17570a405afe63f73842d860a"},"modal":{"path":"src/app/modal.ts","ref":"main","blob":"750bed8b30083e27c6ec5d264d51ea18636e7717"}},
-  "frames": {"List":"516:48546","Empty":"516:48713","FirstLoad":"516:48857","LoadError":"516:49001","Refreshing":"516:49145","RefreshError":"516:49289","LongList":"516:49433","RecordDetail":"516:49577","RecordMissingData":"516:49721","DetailLoading":"516:49865","DetailError":"516:50009","DatabaseRequired":"516:50153","DatabaseConnectionError":"516:50297","ListDark":"516:50441","ListCompact":"516:50585","DetailDark":"516:50878","DetailCompact":"516:51022","HiddenResultPreset":"516:51271"},
-  "completed": ["live checkpoint recovery", "runs semantics and existing FIP dependency discovery", "18 product root allocations"],
-  "pending": ["editable list/detail/database content", "hide confirmation/context and trace dialogs", "bounded prototype and existing route entry backfill", "deep and screenshot QA", "final documentation and global checkpoint"],
-  "warning": "Allocated roots are not accepted product states. Default Shell placeholders will be replaced before acceptance.",
-  "applicationSourceModified": false, "existingMastersModified": false, "newScreenMasters": 0
+  "acceptedRouteCount": 5, "routeCount": 17, "remainingUnstartedRouteCount": 12, "fullyIntegratedRouteCount": 0,
+  "nextScreen": "S06 teams / 球队", "nextScreenStarted": false, "allPlannedPatternsComplete": true,
+  "authority": "Figma determines geometry, typography, spacing and color; application source provides functional, interaction and data semantics only.",
+  "source": {
+    "runs": {"path":"src/pages/runs.ts","ref":"main","blob":"c4374872117775c17570a405afe63f73842d860a"},
+    "modal": {"path":"src/app/modal.ts","ref":"main","blob":"750bed8b30083e27c6ec5d264d51ea18636e7717"},
+    "hideHistorySnippets": {"path":"src/main.ts","ref":"main","blob":"65bb1744a63015c56f8be8258406304535accb45","scope":"requestHideRunHistory confirmation and request-hide-run-history/context-menu excerpts; not a full main.ts audit"}
+  },
+  "frames": {
+    "List":"516:48546", "Empty":"516:48713", "FirstLoad":"516:48857", "LoadError":"516:49001", "Refreshing":"516:49145", "RefreshError":"516:49289", "LongList":"516:49433",
+    "RecordDetail":"516:49577", "RecordMissingData":"516:49721", "DetailLoading":"516:49865", "DetailError":"516:50009", "DatabaseRequired":"516:50153", "DatabaseConnectionError":"516:50297",
+    "ListDark":"516:50441", "ListCompact":"516:50585", "DetailDark":"516:50878", "DetailCompact":"516:51022", "HiddenResultPreset":"516:51271"
+  },
+  "dialogFrames": {
+    "HideA":"521:54172", "HideB":"521:54291", "HideC":"521:54348", "HideD":"521:54405", "HideE":"521:54462", "HideF":"521:54519",
+    "HideSubmittingPreset":"521:54576", "HideErrorPreset":"521:54636", "TechnicalA":"521:54693", "TechnicalF":"521:54740",
+    "RecordB":"521:54787", "RecordC":"521:54834", "RecordD":"521:54881", "RecordE":"521:54928"
+  },
+  "contextMenu": "521:54975", "reviewHub": "521:55004", "productStateFrameCount": 18, "dialogFrameCount": 14, "contextMenuFrameCount": 1, "reviewHubIsProductRoute": false,
+  "dialogBreakdown": {"identitySpecificHideConfirmations":6,"hideRequestStatePresets":2,"technicalReadOnly":2,"recordReadOnlySummaries":4},
+  "ownedStableRootCount": 34,
+  "composition": {
+    "shellSet":"380:1366", "expandedShellMaster":"380:1086", "workspaceSwap":"412:15426", "panel":"412:15426", "heading":"404:14589", "metric":"410:15370",
+    "primary":"51:2", "secondary":"52:3", "tableCell":"235:1106", "tableHeader":"230:1090", "inlineAlert":"303:4111", "password":"147:409", "number":"144:341", "confirmation":"280:2531", "contextMenuRun":"264:1893",
+    "semanticPath":["stable S05 root","PC App Shell","Main","Runs workspace","Body SLOT","S05 content","Runs viewport","Runs content"],
+    "tableNames":"Run A through Run F; Open run X and Hide run X identify targets. L1-L24 belong only to the disabled layout-stress specimen.",
+    "newScreenMasters":0, "detachedInstances":0
+  },
+  "geometry": {"desktop":[1440,900],"compact":[960,720],"desktopContentWidth":1198,"compactContentWidth":872,"primaryRailWidth":60,"secondaryRailWidth":154,"topbarHeight":44,"tableRowHeightDesktop":88,"tableRowHeightCompact":112,"compactDetailMetrics":"2x2","detailFactLabelWidth":180,"automaticResponsiveBreakpointsImplemented":false},
+  "recordSamples": {
+    "A":{"match":"首尔 FC vs 全北现代","model":"P4","window":"T-1h","readiness":"formal_ready","score":96,"topScore":"2–1","topScoreProbability":0.124,"wdl":[0.46,0.29,0.25],"fingerprint":"demo-a12…"},
+    "B":{"match":"横滨水手 vs 蔚山 HD","model":"P7","window":"T-6h","readiness":"ready_with_warnings","score":82,"topScore":"1–1","topScoreProbability":0.116,"wdl":[0.37,0.32,0.31]},
+    "C":{"match":"蔚山 HD vs 浦项制铁","model":"P4","window":"T-24h","readiness":"shadow_only","score":61,"outputMissing":true},
+    "D":{"match":"审计样本 · 未产生输出","model":"P4","window":"T-N","readiness":"blocked","score":34,"outputMissing":true,"timeFallback":"created_at"},
+    "E":{"match":"demo-match-005","readiness":"not_assessed","modelRuleAndFingerprintMissing":true,"outputMissing":true,"timeFallback":"created_at"},
+    "F":{"match":"未命名比赛","readiness":"legacy_unknown","identityAndFingerprintMissing":true,"outputMissing":true,"timeFallback":"created_at"},
+    "allValuesArePresetDemonstrations":true
+  },
+  "guards": {
+    "hideOnly":{"retained":["model run","probability matrix","feature/input snapshot","review","convergence lineage"],"doesNotDeleteMatch":true,"doesNotArchiveLineup":true,"backendWritePerformed":false},
+    "unknownIsNotZero":true,
+    "firstLoad":{"count":"—","rows":0},
+    "successfulEmpty":{"count":0,"rows":0},
+    "refreshing":{"rows":["A","B","C","D","E","F"],"retainsPreviousData":true,"refreshDisabled":true},
+    "refreshError":{"rows":["A","B","C","D","E","F"],"notMisrepresentedAsEmpty":true},
+    "hiddenResultPreset":{"rows":["B","C","D","E","F"],"visibleCount":5,"notReachedByFinalWriteConfirmation":true},
+    "databaseEmpty":{"submit":"Disabled","reactionCount":0},
+    "detailLoading":{"record":"A","doesNotDisplayPreviousRecordPayload":true},
+    "missingModelOrRule":"Shown as unrecorded rather than implying the current default was actually used; design contract, source not modified.",
+    "readinessIsNotRerunPermission":true,
+    "longList":{"rowCount":24,"purpose":"layout stress with repeated sample data","rowActionAndRefreshState":"Disabled","not24IndependentInteractiveRecordIdentities":true}
+  },
+  "prototype": {
+    "entry":"521:55004", "navigationAndOverlayLinks":216, "closeActions":41, "otherComponentOrInheritedActions":172,
+    "reachableProductStates":18, "reachableDialogs":14, "contextMenuReachableFromHub":true,
+    "incomingLinksIncludedIn216":false,
+    "incomingLinks":[
+      {"root":"466:4436","node":"I466:4437;380:1153;377:642","name":"Page/runs","to":"516:48546"},
+      {"root":"470:18992","node":"I470:18993;380:1153;377:642","name":"Page/runs","to":"516:50441"},
+      {"root":"487:22278","node":"I487:22279;380:1153;377:711","name":"Page/runs","to":"516:48546"},
+      {"root":"490:24140","node":"I490:24141;380:1153;377:711","name":"Page/runs","to":"516:50441"},
+      {"root":"505:33973","node":"I505:33974;380:1153;377:780","name":"Page/runs","to":"516:48546"},
+      {"root":"505:35345","node":"I505:35346;380:1153;377:780","name":"Page/runs","to":"516:50441"}
+    ],
+    "defaultListIdentityTargets": {
+      "A":{"open":"516:49577","hide":"521:54172"},"B":{"open":"521:54787","hide":"521:54291"},"C":{"open":"521:54834","hide":"521:54348"},"D":{"open":"521:54881","hide":"521:54405"},"E":{"open":"521:54928","hide":"521:54462"},"F":{"open":"516:49721","hide":"521:54519"}
+    },
+    "finalHideConfirmationReactionCounts":{"HideA":0,"HideB":0,"HideC":0,"HideD":0,"HideE":0,"HideF":0,"HideSubmittingPreset":0,"HideErrorPreset":0},
+    "submittingConfirmState":"Disabled",
+    "writeSuccessFailureSelection":"Independent reviewer presets, not a real or fake execution chain.",
+    "rightClickImplemented":false, "contextMenuScope":"Approved Run menu shown via Review Hub; action opens A confirmation. Actual right-click dispatch remains runtime work.",
+    "genuineReturnRoutes":["dashboard","lineups","prediction","review"],
+    "escape":"Product states navigate to Review Hub; overlays close. Reviewer exit is not request cancellation.",
+    "representativeThemeLinks":"List and A detail Light/Dark pairs; selected collapsed presets. Other state changes may return to representative Light layouts.",
+    "brokenTargets":0, "runtimeWritesPerformed":false
+  },
+  "qa": {
+    "status":"PASS", "nonHiddenNodesChecked":5311, "nonHiddenNestedInstancesChecked":1944, "ordinaryNonDisabledTextLayersMeasured":1532,
+    "unintendedOverflow":0, "intentionalVerticalScrollRegions":5, "brokenMainComponents":0, "unboundVisibleSolidPaints":0, "topLevelOverlap":0, "undersizedButtons":0,
+    "disabledControlsChecked":127, "disabledControlsWithReactions":0,
+    "minimumOrdinaryTextContrastLight":4.5048167489431785, "minimumOrdinaryTextContrastDark":6.568170274649306,
+    "scopeNote":"Deep traversal includes INSTANCE and SLOT and non-hidden content inside declared scroll containers. Final two localized labels were re-read with contained bounds and screenshot checked; no node or reaction counts changed."
+  },
+  "scrollExamples": [
+    {"root":"516:49145","width":1198,"viewportHeight":684,"contentHeight":746},
+    {"root":"516:49289","width":1198,"viewportHeight":684,"contentHeight":746},
+    {"root":"516:49433","width":1198,"viewportHeight":684,"contentHeight":2264},
+    {"root":"516:50585","width":872,"viewportHeight":504,"contentHeight":824},
+    {"root":"516:51022","width":872,"viewportHeight":504,"contentHeight":554}
+  ],
+  "visualCorrections":{"detailValueWidthCollapseFixed":true,"compactDetailMetricsReflowed":true,"localContrastRepairs":52,"inheritedDialogFactsContainersHidden":14,"passwordVisibilityLabelsLocalized":2,"globalMastersChanged":false},
+  "interruptionRecovery":{"compositionCallReportedConnectionError":true,"subsequentCanvasReadConfirmedAll18Composed":true,"noDuplicateCreationOrBlindRetry":true},
+  "screenshotsReviewed":["List","ListCompact","RecordDetail after fix","RefreshError","ListDark","HideA","DetailCompact","DatabaseConnectionError after localization"],
+  "sharedTotals":{"controlsSets":61,"controlsVariants":506,"patternSets":17,"patternVariants":125,"productionSingles":13,"variables":193,"textStyles":13,"effects":6},
+  "pendingForCurrentVisualScope":[],
+  "pending":["S06 teams and eleven other unstarted product routes","Remaining genuine route backfill and full product integration","Runtime read/hide requests, ambiguous failure reconciliation, right-click handling and arbitrary record details","Complete theme/collapse/scroll/context/focus persistence and all control interactions"],
+  "limitations":[
+    "18 product-state frames and all dialogs/menu represent one route, not multiple pages.",
+    "All match/model/probability/time/hash values are demonstration data; no database or model was queried.",
+    "Eight hide-related final confirmations have no write reaction. Hidden result, submitting and failure are independent presets.",
+    "Long-list repeated rows are layout-only with actions disabled; not independent live records.",
+    "Runtime right-click is not implemented; the context menu is inspectable from the review hub.",
+    "B-E use identity-specific read-only summaries; not arbitrary detailed backend payloads.",
+    "Representative Dark/Compact do not prove every state preserves theme, viewport, scroll, record identity or focus.",
+    "Some refresh, database, reset, visibility and navigation controls retain semantic/visual specifications without full prototype execution.",
+    "No speculative search, filter, pagination or batch operation was added beyond the reviewed source contract."
+  ],
+  "applicationSourceModified":false, "existingMastersModified":false, "sharedVariablesModified":false, "priorScreenVisualsModified":false, "priorScreenPrototypeNodesModified":6, "newScreenMasters":0
 }
