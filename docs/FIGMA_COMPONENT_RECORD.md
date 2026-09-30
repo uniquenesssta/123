@@ -11,7 +11,7 @@
 - Figma file key: PN0Whgu6HLWIHx4Mv6aHfu
 - Baseline date: 2026-08-23
 - Design direction: desktop PC data workspace; icon-first; foundations before composed screens
-- Latest accepted checkpoint: 2026-09-30, Workflow Stepper / Timeline complete; [explicit state and node ledger](FIGMA_WORKFLOW_STEPPER_TIMELINE_STATE.json). Next: AI Chat.
+- Latest accepted checkpoint: 2026-09-30, AI Chat complete; all six planned Pattern groups complete. [Explicit state and node ledger](FIGMA_AI_CHAT_STATE.json). Next: product Screens, not started.
 
 ## 1. Figma file structure
 
@@ -20,7 +20,7 @@
 | 00 · Foundations | 0:1 | complete; desktop dependency extension verified |
 | 01 · Iconography | 3:2 | application icon coverage complete and verified |
 | 02 · Controls | 3:3 | planned foundation groups complete; 61 sets / 506 variants |
-| 03 · Patterns | 3:4 | Shell + Page Bars + Card/Panel + Master–Detail–Inspector + Workflow/Timeline complete; 13 sets / 104 variants + 11 production singles |
+| 03 · Patterns | 3:4 | all six planned groups complete, including AI Chat; 17 sets / 125 variants + 13 production singles |
 | 04 · Screens | 3:5 | reserved; product Screens not started |
 
 Page documentation roots:
@@ -57,6 +57,9 @@ Page documentation roots:
 - Workflow Stepper / Timeline pattern root: 424:16193
 - Workflow / Timeline Review root: 425:16511 (six instance-only review fixtures)
 - Workflow prototype entry: 427:17420 (four explicit simulation scenes, eight verified links)
+- AI Chat pattern root: 434:17896
+- AI Chat Review root: 440:18135 (11 instance-based review fixtures, including intentional long-message scrolling)
+- AI Chat prototype entry: 444:18719 (seven preset scenes, 17 verified links; no actual API or archive writes)
 - Current Controls root dimensions: 1440 × 34245 (observed at Shell start/end; preserved without editing)
 
 ## 2. Foundations
@@ -187,7 +190,7 @@ Utilities:
 
 ## 4. Controls
 
-Current controls state: **61 component sets and 506 variants**, unchanged by the Pattern phases. All planned foundation groups are complete; see [Avatar record](FIGMA_AVATAR.md). Patterns now contains **13 component sets / 104 variants / 11 production standalone components** after PC App Shell, Page Bars, Metric Card / Action Card / Panel, Master–Detail–Inspector, and Workflow Stepper / Timeline. The Shell QA workspace fixture remains QA-only. Product Screens are not started. See [Shell record](FIGMA_PC_APP_SHELL.md), [Page Bars record](FIGMA_PAGE_HEADING_TOOLBAR_FILTER_SELECTION.md), [Card / Panel record](FIGMA_METRIC_ACTION_PANEL.md), [Master–Detail–Inspector record](FIGMA_MASTER_DETAIL_INSPECTOR.md), and [Workflow / Timeline record](FIGMA_WORKFLOW_STEPPER_TIMELINE.md). Previous group audit totals remain historical snapshots.
+Current controls state: **61 component sets and 506 variants**, unchanged by the Pattern phases. All planned foundation groups are complete; see [Avatar record](FIGMA_AVATAR.md). Patterns now contains **17 component sets / 125 variants / 13 production standalone components** after all six planned groups, including AI Chat. The Shell QA workspace fixture remains QA-only. Product Screens are not started. See [Shell record](FIGMA_PC_APP_SHELL.md), [Page Bars record](FIGMA_PAGE_HEADING_TOOLBAR_FILTER_SELECTION.md), [Card / Panel record](FIGMA_METRIC_ACTION_PANEL.md), [Master–Detail–Inspector record](FIGMA_MASTER_DETAIL_INSPECTOR.md), [Workflow / Timeline record](FIGMA_WORKFLOW_STEPPER_TIMELINE.md), and [AI Chat record](FIGMA_AI_CHAT.md). Previous group audit totals remain historical snapshots.
 
 | Component set | ID | Variants | API |
 |---|---:|---:|---|
@@ -234,7 +237,7 @@ Current controls state: **61 component sets and 506 variants**, unchanged by the
 | Overflow Menu | 267:2007 | 6 | State Closed/Hover/Pressed/Focus/Open/Disabled; nested Button/Icon, More and Menu Surface |
 | Building Blocks/Dialog Header | 277:2341 | 6 | Tone Neutral/Danger × State Default/Focus/Busy; Title; Subtitle; visibility booleans |
 | Building Blocks/Dialog Body | 278:2354 | 4 | Content Message/Facts/Form/Typed; Description; Error; visibility booleans; exposed Facts/Field |
-| Building Blocks/Dialog Actions | 278:2630 | 8 | Tone Primary/Danger × State Default/Focus/Disabled/Loading; Show cancel; exposed Cancel/Confirm |
+| Building Blocks/Dialog Actions | 278:2630 | 8 | Tone Primary/Danger × State Default/Hover/Pressed/Focus/Disabled/Loading; Show cancel; exposed Cancel/Confirm |
 | Dialog/Standard | 279:2795 | 6 | Size Compact/Wide × State Default/Submitting/Error; Body content swap |
 | Dialog/Confirmation | 280:2814 | 6 | Tone Neutral/Danger × State Default/Submitting/Error; exposed Header/Body/Actions |
 | Dialog/Typed Danger | 280:3600 | 6 | State Empty/Editing/Valid/Mismatch/Submitting/Error; exposed Header/Body/Actions |
@@ -458,6 +461,21 @@ Standalone components: `Building Blocks/Menu Note` (`255:1763`); `Building Block
 - Application semantic source: `main/src/pages/review.ts`, blob `4a18002bdd6937cec1d1d076f521dcee8e2f4b5e`. No source CSS geometry, application code or speculative Code Connect was changed.
 - Full APIs and limitations: [Workflow Stepper / Timeline](FIGMA_WORKFLOW_STEPPER_TIMELINE.md). Recovery data: [state file](FIGMA_WORKFLOW_STEPPER_TIMELINE_STATE.json).
 
+### AI Chat architecture — 2026-09-30
+
+- Documentation root `434:17896`, 1600 × 8886; Review root `440:18135`. New assets: four sets / 21 variants / two production singles. All six planned Pattern groups are now complete; totals are 17 sets / 125 variants / 13 production singles.
+- `AI Chat/History Item` (`434:18130`) separates Selected from five interaction states and keeps Open session and Archive session as separate targets. `AI Chat/Attachment` (`434:18157`) has read-only Context / Legacy File kinds, not new upload or execution features.
+- `AI Chat/Message` (`434:18225`) has User / Assistant / Pending kinds, editable plain-text Body and an Attachments SLOT. Pending belongs only to the matching session/request. Assistant Copy answer is a true Ghost Button with a stable local 80px target.
+- `AI Chat/Composer` (`436:18436`) has Empty / Ready / Sending / Error / Cancelled / Unavailable states. Send is disabled for Empty/Sending/Unavailable, while the real Textarea remains editable. Show context and Show cancel are explicit booleans; context inclusion is opt-in and cancellation requires the matching requestId.
+- `AI Chat/History Sidebar` (`438:18009`) owns a Sessions SLOT in a separate scroll viewport. `AI Chat/Workspace` (`439:18050`) owns History / Messages / Composer SLOTs and outer Show history. SLOT children are edited directly rather than illegally exposed or detached.
+- Acceptance repaired Message header clipping, shared variant TEXT defaults that overwrote request-state feedback, and a 1px Copy-answer overflow. Only new components and scoped nested overrides changed; global Controls, colors and typography remain unchanged.
+- Eleven instance-based review fixtures cover Light/Dark, 760px history-hidden layout, all component variants, explicit context opt-in, empty history, long plain text and a real long-message scroll case. Its viewport is 354px while content is 1120px; Composer remains outside the scroll viewport.
+- Seven preset AI Chat Lab scenes start at `444:18719`, with 17 verified native connections and all seven scenes reachable. Sending A has one Pending; both B scenes have none and retain B's independent draft. Error/cancel preserve A's draft. These simulations do not call APIs or archive data.
+- Deep QA: 1417 visible nodes, 351 visible nested instances, broken references 0, unintended overflow 0, unbound visible paints 0, owned text missing styles 0, top-level overlaps 0. One deliberate vertical scrolling overflow is recorded separately. Fifteen visible Disabled controls have zero reactions.
+- Ordinary non-disabled text measurement covers 579 layers: Light minimum 4.5326557047:1, Dark minimum 6.8625187908:1. Shared totals remain 193 variables / 13 text styles / 6 effects; Controls remain 61 / 506.
+- Semantic source: `main/src/pages/apiWorkspace.ts`, blob `79f4ee4e505ac9da12e6579c1a7729cdeb981bc1`. Current scope is pure-text Q&A with optional read-only context and historical audit records; no app code or speculative Code Connect was changed.
+- Full API, limitations and corrections: [AI Chat record](FIGMA_AI_CHAT.md). Current recovery data and actual-node ledger: [AI Chat state](FIGMA_AI_CHAT_STATE.json). Product Screens remain not started.
+
 ### Badge and Tag semantic correction
 
 - Badge is status-only and never carries a remove action.
@@ -490,14 +508,14 @@ When implementation starts:
 
 ## 7. Known next work
 
-The planned foundation groups and the first five Pattern groups — PC App Shell, Page Heading / Toolbar / Filter Bar / Selection Command Bar, Metric Card / Action Card / Panel, Master–Detail–Inspector, and Workflow Stepper / Timeline — are complete. The file does not yet contain finished product Screens.
+The planned foundation groups and all six Pattern groups — PC App Shell, Page Heading / Toolbar / Filter Bar / Selection Command Bar, Metric Card / Action Card / Panel, Master–Detail–Inspector, Workflow Stepper / Timeline, and AI Chat — are complete. Product Screens are not started.
 
 Foundation dependency extension P4.2, the first button group, the extended-field group, Searchable Combobox, Switch / Toggle, Tabs / Segmented Control, Data Table / Pagination, Dropdown / Context / Overflow Menu, Dialog, Toast / Inline Alert / Blocking Message (including Task Activity), Accordion / Disclosure, Progress / Skeleton / Empty State, and Avatar are complete and verified. Evidence is split across the separate records linked from `docs/README.md`.
 
 ### Foundation completion
 
 - Remaining planned foundation groups: **0**. Current Controls inventory: **61 sets / 506 variants**.
-- Completed Patterns: **PC App Shell**, **Page Heading / Toolbar / Filter Bar / Selection Command Bar**, **Metric Card / Action Card / Panel**, **Master–Detail–Inspector workspace** including Entity Row, and **Workflow Stepper / Timeline**. Next: **AI Chat: history sidebar, messages, attachments, Composer**, before product Screens.
+- Completed Patterns: **PC App Shell**, **Page Heading / Toolbar / Filter Bar / Selection Command Bar**, **Metric Card / Action Card / Panel**, **Master–Detail–Inspector workspace** including Entity Row, **Workflow Stepper / Timeline**, and **AI Chat**. Next: **product Screens**, 17 routes / 7 navigation modules; not started.
 
 ### Required pattern families
 
@@ -507,7 +525,7 @@ Foundation dependency extension P4.2, the first button group, the extended-field
 - [x] Entity rows — completed as the Master–Detail–Inspector dependency.
 - [x] Master–detail–inspector workspace.
 - [x] Workflow stepper/timeline.
-- [ ] AI chat workspace — next.
+- [x] AI chat workspace — history, messages, read-only attachments and Composer.
 
 ## 8. Cleanup record
 
