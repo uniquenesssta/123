@@ -39,8 +39,8 @@ crates/persistence-postgres/src/adapters/workbooks/
 |---|---|---|
 | R7-01 | Match Catalog | DONE |
 | R7-02 | 外部 ID 身份保护 | DONE |
-| R7-03 | 普通删除与历史引用保护 | VERIFYING |
-| R7-04 | 架构清单、验证器与执行记录对齐 | BLOCKED |
+| R7-03 | 普通删除与历史引用保护 | DONE |
+| R7-04 | 架构清单、验证器与执行记录对齐 | READY |
 | R7-05 | 关键 Application 用例验证 | BLOCKED |
 | R7-06 | 历史数据库失败与账本问题收口 | BLOCKED |
 | R7-07 | Lineup Pair Transaction | BLOCKED |
@@ -55,7 +55,7 @@ crates/persistence-postgres/src/adapters/workbooks/
 
 ## R7-02 当前验证状态
 
-进入基线：`c826dd32e3ecb84dfc732ef60c3fd3aaf4153fdf`。R7-02 已 `DONE`：精确提交 `1e4da04` 的 Windows run `36686343584` / job `109792974772` 全通过，见 [节点完成记录](R07-02-external-id-integrity.md)。PG/XLSX/Full 保持最终封包新库待验；用户已启动 R7-03，当前 VERIFYING。以下实施条目中的 Windows 待验由本段 CI 证据更新。
+进入基线：`c826dd32e3ecb84dfc732ef60c3fd3aaf4153fdf`。R7-02 已 `DONE`：精确提交 `1e4da04` 的 Windows run `36686343584` / job `109792974772` 全通过，见 [节点完成记录](R07-02-external-id-integrity.md)。PG/XLSX/Full 保持最终封包新库待验；R7-03 已 DONE，R7-04 READY。以下实施条目中的 Windows 待验由本段 CI 证据更新。
 
 - B1 已修订：直接添加与 Spreadsheet commit 共用 `references/external_ids/write.rs` 的 `write_external_entity_id`，接收调用方 PgConnection；唯一键冲突仅在 entity_id 一致时合并 metadata，无条件目标覆盖已删除。跨实体返回原有导入冲突文本，原绑定/metadata 不改。
 - 工作簿复用原批次事务并传播冲突，预检后出现竞争绑定仍会拒绝提交，此前业务行、ID、行状态、计数和成功审计一起回滚。预检/冲突裁决逻辑保留；未提前迁移 Workbook owner。
@@ -67,7 +67,7 @@ crates/persistence-postgres/src/adapters/workbooks/
 
 ## R7-03 当前验证状态
 
-进入基线：`1e4da04b6a6c892dcca4e0499e963d5f39b9746c`。当前 `VERIFYING`：首轮 Windows CI 失败的旧契约断言已修订，等待修订后的 Windows CI；R7-04 及以后仍 BLOCKED。
+进入基线：`1e4da04b6a6c892dcca4e0499e963d5f39b9746c`。当前 `DONE`：精确修订提交 `073d1557b9fb63edbdff59b851a2897f514ba8f2` 的 [Windows CI run 36695374298](https://github.com/uniquenesssta/123/actions/runs/36695374298) / job `109821951512` 全部 SUCCESS，北京时间 2026-09-30 17:47 完成，见 [节点完成记录](R07-03-safe-entity-deletion.md)。架构、前端、Rust、打包和启动烟测均通过；此前本地未获得通过证据的检查已由本次 Windows 验证补齐。真实 PG/XLSX/Full 保留最终封包新库待验，以下首轮失败和实施记录按当时状态保留。下一项 R7-04 READY、尚未实施，R7-05 及以后 BLOCKED。
 
 - 首轮精确提交 `e657a79700f0c4a0884a8dbef1a301a28e544689` 的 [Windows run 36693857568](https://github.com/uniquenesssta/123/actions/runs/36693857568) / job `109817060757`：架构步骤通过，Automated 在前端契约的 `verify-team-player-management.mjs` 失败（球队比赛/赛后复盘保护断言）；后续 TypeScript/截图/生产构建、Rust 验证、打包/启动未完成，不记 PASS。
 - 原因及修复：本轮完整保护已复用 `preflight/references.rs`，原球队管理验证器仍只在 `delete_write.rs` 等写入文件找两项 SQL，未覆盖真实共享链路。本次在原脚本分别检查 Team 写入调用事务复检、helper 调用共享 Team 计数/裁决并拒绝引用，以及 Team 计数 owner 的比赛/复盘 SQL；不新增 runner/工作流或改业务代码。临时移除事务复检、Team 共享计数调用、比赛 SQL、复盘 SQL 均实际拒绝，源码已恢复。
@@ -77,11 +77,11 @@ crates/persistence-postgres/src/adapters/workbooks/
 - Player 新增完整事务内复检；Team 原比赛/复盘两项局部检查被同一完整复检替代，16 项 Team、13 项 Player 既有关系保持（含动态标签、贡献、能力、预设成员、球队阵容预设和赛季成员）。资料/名称等原有正常级联与外部 ID 清理保持；不增加平行关系清单或改写冻结 FK/migration。
 - UI 预检仍保留展示和早期拒绝；最终事务拒绝统一沿用“存在历史或业务引用，只允许归档”。此前仅在竞争窗口可能出现的 Team 比赛/复盘专用错误被统一裁决替代，正常已引用路径、missing-entity 和 bulk 结果形态保持。
 - 已有 `entity_permanent_delete_repository_contract.rs` 保留空实体可删、外部 ID 清理、单次审计、去重 bulk 与已有效力期拒绝断言；新增实际锁观察的并发交错：Player dynamic tag、Team lineup preset 各验证先行引用提交/回滚两条路径。通过 pg_blocking_pids/锁等待确认顺序，20ms 只轮询真实条件，10s 截止，不以随机 sleep 猜顺序。断言实体/引用/原 external metadata、成功审计、重复删除保持一致；失败/超时中止测试任务，按随机 fixture token 清理并保留审计。
-- 测试 URL 通过 SQLx 前检 test 库名，并在迁移前确认 current_database；新的非数据库 guard 单测待 Windows 执行。所有新增 PG 断言均为“最终封包新库待验”，不计为实跑通过。
+- 测试 URL 通过 SQLx 前检 test 库名，并在迁移前确认 current_database；`safe_delete_rejects_non_test_database_before_connecting` 已在 Windows 实际通过。`safe_permanent_delete_contract_is_preserved` 与 `safe_delete_rechecks_concurrent_history_after_parent_lock` 均 ignored、仅编译通过，所有新增 PG 断言仍为“最终封包新库待验”，不计为实跑通过。
 - 现有 R6-09 verifier 保留 owner、预检、归档、bulk、force-delete 边界检查，新增 READ COMMITTED→排他锁→完整复检→变更顺序检查、同一连接计数/裁决与缺口关系断言。临时移除 Player/Team 复检、弱化锁、恢复 REPEATABLE READ 均实际被拒绝，源码已恢复。
 - 架构聚合、Rust 源码卫生、171 命令、18 保护资产、迁移兼容与 Windows acceptance 静态契约通过；Rust 1.88 仅用于源码格式化/检查，未执行 Linux/macOS 编译/运行验收。Domain inventory 官方生成器更新调用面，365 类型/声明摘要保持。
 - Tauri/Application/Port 直接与 bulk 调用链已核对，公开方法和返回类型无需改变。force-delete 的完整名称确认、专用执行入口、事务/墓碑审计保持，未扩展普通删除权限。R7-04 清单整改、B5/B6/A8/模型历史等后续事项未夹带修复。
-- Windows fmt/Clippy/tests/构建/打包/启动由修订后的现有 CI 验证；本节点真实 PG、已有相关 deletion/force-delete contracts 与 XLSX/Full 在最终新库实跑。没有新增 runner/test target/workflow；回退使用进入基线和受控 revert。
+- Windows fmt/Clippy/tests/构建/打包/启动已由修订后的现有 CI 验证；本节点真实 PG、已有相关 deletion/force-delete contracts 与 XLSX/Full 在最终新库实跑。没有新增 runner/test target/workflow；回退使用进入基线和受控 revert。
 
 ## R7-01 READY 边界
 
@@ -107,7 +107,7 @@ crates/persistence-postgres/src/adapters/workbooks/
 
 ## R7-01 当前验证状态
 
-- R7-01 已 `DONE`：提交 `c826dd3` 的 Windows CI run `36678914535` / job `109769864719` 全通过，详见 [节点完成记录](R07-01-match-catalog.md)。PG/XLSX/Full 保留“最终封包新库待验”。R7-02 已 DONE；用户于 2026-09-30 启动 R7-03，当前 VERIFYING；R7-04 及后续仍 BLOCKED。
+- R7-01 已 `DONE`：提交 `c826dd3` 的 Windows CI run `36678914535` / job `109769864719` 全通过，详见 [节点完成记录](R07-01-match-catalog.md)。PG/XLSX/Full 保留“最终封包新库待验”。R7-02、R7-03 已 DONE，R7-04 READY，R7-05 及后续 BLOCKED。
 - 以下修复表及审计章节保留当时验证状态；Windows 待验已由上述精确提交的 CI 证据更新，数据库未因 CI 成功转为通过。
 
 ### 2026-09-30 R7-01 修复记录（待动态验收）

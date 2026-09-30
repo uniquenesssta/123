@@ -9,7 +9,7 @@
 
 - 唯一阶段分支：`rewrite/r7-match-lineup-workbook-persistence`。
 - 规划依据：源码 `985f01816060cfd05672bdc03b6771dec7b4e842`，文档基线 `51f746729b2f94925e6382f2ae2108cf80855af6`，以及阶段 README 中 A1–A8、B1–B7 审计记录。
-- R7-01、R7-02 已完成 Windows Automated 并为 `DONE`；用户已启动 R7-03，当前 `VERIFYING`，其余节点 `BLOCKED`。数据库/XLSX/Full 单独保留最终封包新库待验，证据见阶段 README。
+- R7-01～R7-03 已完成 Windows Automated 并为 `DONE`；R7-04 为 `READY`、尚未实施，R7-05 及以后 `BLOCKED`。数据库/XLSX/Full 单独保留最终封包新库待验，证据见阶段 README。
 - 当前状态以 `docs/modular-rewrite/R07-match-lineup-workbook-persistence/README.md` 的唯一状态表为准；历史审计中的旧编号按下表映射。
 - 允许整改触及直接相关的 Application composition/Ports、catalog identity/deletion、现有 P4 时间比较和测试；不提前实施 R8/R10 的整阶段重写。
 - 不包含前端导入 UI 重写、工作簿解析器整体验证框架建设、模型内部算法/参数修改或历史 migration 改写。
@@ -94,7 +94,7 @@
 
 ## R7-03 普通删除与历史引用保护
 
-状态：`VERIFYING`，完整事务内复检与现有测试修订完成；首轮 Windows CI 的旧球队管理契约断言已修复，等待修订后的 Windows CI，证据见阶段索引。PG 最终封包新库待验。来源 B2。
+状态：`DONE`，精确提交 `073d155` 的 Windows CI run `36695374298` 全通过，完成记录见阶段索引。真实 PG 删除/并发测试仍 ignored，PG/XLSX/Full 最终封包新库待验。来源 B2。
 
 - **目标**：普通删除只允许删除没有受保护引用的实体；并发新增历史不能被过期预检放行并级联清除。
 - **范围**：`adapters/catalog/deletion/` preflight/safe_delete/delete_write/bulk_delete，以及已有 entity deletion/permanent delete/force delete contracts。
@@ -106,7 +106,7 @@
 
 ## R7-04 架构清单、验证器与执行记录对齐
 
-状态：`BLOCKED`，依赖 R7-03。来源 B3/B7；B4 仅修正现有验证入口的遗漏。
+状态：`READY`，R7-03 已 DONE；尚未实施。来源 B3/B7；B4 仅修正现有验证入口的遗漏。
 
 - **目标**：机器清单反映当前真实声明与 owner，未登记新增项不能静默通过；进度和审计编号可以追溯。
 - **范围**：`architecture/application-port-inventory.json`、`module-boundaries.json`、现有 Application/架构验证脚本及现有 package/frontend 聚合入口，相关阶段 README。
