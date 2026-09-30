@@ -4,7 +4,19 @@
 
 **设计依据（2026-08-28 用户确认）：所有视觉尺寸、比例、间距、字号和颜色均以已确认的 Figma 为准。应用源码只用于核对功能入口、交互和数据语义，不再作为视觉尺寸参考；旧记录中的源码尺寸仅是历史取证。**
 
-- [组件当前状态与 Figma 节点](FIGMA_COMPONENT_RECORD.md)
+## 当前恢复入口
+
+**2026-09-30 最新检查点：产品 Screens 已开始，S01 Dashboard / 数据总览的视觉与本页状态已验收。** 当前为 **1 / 17 条产品路由**，其余16条尚未开始。S01的15个状态画面不是15个不同页面；跨页面原型集成仍待目标页面完成。
+
+- [Screens 总计划：17条路由与下一项](FIGMA_SCREENS_PLAN.md)
+- [最新 Screens 连续性检查点与节点记录](FIGMA_SCREENS_STATE.json)
+- [S01 Dashboard：页面、状态、验收与待接线目标](FIGMA_SCREEN_DASHBOARD.md)
+
+**下一项：S02 `lineups` / 比赛中心 · 比赛与阵容，尚未开始。**
+
+## 组件与模式记录
+
+- [组件阶段记录与 Figma 节点](FIGMA_COMPONENT_RECORD.md)
 - [按钮、Spinner 与 Loading 组件](FIGMA_BUTTON_COMPONENTS.md)
 - [扩展字段组件](FIGMA_EXTENDED_FIELDS.md)
 - [Searchable Combobox 组件](FIGMA_SEARCHABLE_COMBOBOX.md)
@@ -22,23 +34,29 @@
 - [Metric Card / Action Card / Panel](FIGMA_METRIC_ACTION_PANEL.md)
 - [Master–Detail–Inspector 与 Entity Row](FIGMA_MASTER_DETAIL_INSPECTOR.md)
 - [Workflow Stepper / Timeline 与交互验收](FIGMA_WORKFLOW_STEPPER_TIMELINE.md)
-- [Workflow / Timeline 连续性检查点与节点账本](FIGMA_WORKFLOW_STEPPER_TIMELINE_STATE.json)
+- [Workflow / Timeline 历史检查点](FIGMA_WORKFLOW_STEPPER_TIMELINE_STATE.json)
 - [AI Chat：历史、消息、只读附件与 Composer](FIGMA_AI_CHAT.md)
-- [最新 AI Chat 连续性检查点与节点账本](FIGMA_AI_CHAT_STATE.json)
+- [AI Chat 历史检查点与节点账本](FIGMA_AI_CHAT_STATE.json)
 - [应用图标待办](FIGMA_ICON_BACKLOG.md)
 - [基础 Token 与底层组件待办](FIGMA_FOUNDATION_COMPONENT_BACKLOG.md)
-- [Patterns 与 Screens 计划](FIGMA_PATTERN_SCREEN_PLAN.md)
+- [Patterns 与 Screens 总阶段计划](FIGMA_PATTERN_SCREEN_PLAN.md)
 
 执行顺序：图标 → 基础依赖与组件 → Patterns → Screens。
 
-当前进度：图标、基础依赖、按钮首组、扩展字段组、Searchable Combobox、Switch / Toggle、Tabs / Segmented Control、Data Table / Pagination、Dropdown / Context / Overflow Menu、Dialog、Toast / Inline Alert / Blocking Message（含 Task Activity）、Accordion / Disclosure、Progress / Skeleton / Empty State 及 Avatar 均已完成并验收。Controls 当前为 **61 个组件集、506 个变体**；既定底层组件剩余 **0 组**。
+图标、既定底层组件及Patterns六组均已完成。Controls保持 **61个组件集 /506个变体**；Patterns保持 **17个组件集 /125个变体 /13个生产单组件**；Foundations保持 **193 variables /13 text styles /6 effects**。S01全部用现有实例组合，没有新增主组件或修改这些全局资产。
 
-**2026-09-30 最新检查点：AI Chat 已完成，Patterns 六组全部完成。** 六组为 PC App Shell、Page Heading / Toolbar / Filter Bar / Selection Command Bar、Metric Card / Action Card / Panel、Master–Detail–Inspector、Workflow Stepper / Timeline、AI Chat。
+## S01 验收摘要
 
-Patterns 当前为 **17 个组件集 / 125 个变体 / 13 个生产单组件**；Foundations 保持 **193 variables / 13 text styles / 6 effects**。AI Chat 新增4个组件集、21个变体及2个单组件，没有新增全局变量或样式。
+15个产品状态画面覆盖默认Light/Dark、桌面与紧凑侧栏展开/折叠、系统详情、数据库连接引导与失败/成功、首次加载、保留数据刷新、读取失败和已验证空数据。Review Hub仅用于验收目录，不计作产品路由。
 
-本组覆盖 Light / Dark、760px 窄宽、完整组件状态、只读上下文主动勾选、历史无匹配、长普通文本和独立滚动。7个预置原型场景、17条连接均已读回；A/B 会话隔离、取消/失败保留草稿均有明确示例。深层检查351个可见嵌套实例，非预期越界与失效引用为0；普通文字最低对比度 Light 4.53:1 / Dark 6.86:1。
+深层检查3,699个可见节点、1,422个嵌套实例，非预期越界、失效引用、未绑定可见颜色、顶层重叠均为0。47条本页与目录导航连接已核对；137条继承组件交互单独统计。134个可见Disabled控件均无反应连接。普通文字最低对比度Light 4.53:1 /Dark 6.86:1。
 
-**下一阶段：产品 Screens（17条页面链路 / 7个模块），尚未开始。** Review、AI Chat Lab 和可复用 Workspace 都不是已完成的产品页面。本轮没有修改应用源码或既有 Controls 主组件。原型是有限预置模拟，不替代真实 API、键盘焦点、权限、异步与持久化测试。
+连接错误页正常的纵向滚动单独记录，不以裁切隐藏问题。五个快捷入口的目标路由已记录，但真实跨页面连接尚未完成，不跳转到旧Pattern QA假装产品完成。
 
-换会话恢复：先读当前计划与 `FIGMA_AI_CHAT_STATE.json`，再核对 Figma 节点；旧截图、旧组的历史总数和仅有标题的 handoff 不能覆盖更新后的明确检查点。
+本轮没有修改应用源码或既有组件主节点。所有数据为演示值，连接/读取结果为预置模拟；不替代真实API、数据库连接、输入校验、键盘焦点、权限、异步与持久化测试。
+
+## 换会话恢复
+
+先读本README和 `FIGMA_SCREENS_PLAN.md`、`FIGMA_SCREENS_STATE.json`，再核对当前屏幕与实际Figma节点。旧截图、AI Chat/Workflow状态文件及组件记录中的“Screens未开始”属于先前阶段快照，不能覆盖本次最新检查点。
+
+`FIGMA_COMPONENT_RECORD.md` 的组件API与历史记录本轮保持不变；Screens当前进度以专门计划和状态文件为准。不要为了同步一个阶段状态而重写整份未变化的组件历史。
