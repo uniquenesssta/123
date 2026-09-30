@@ -6,57 +6,65 @@
 
 ## 当前恢复入口
 
-**2026-09-30 最新检查点：产品 Screens 已开始，S01 Dashboard / 数据总览的视觉与本页状态已验收。** 当前为 **1 / 17 条产品路由**，其余16条尚未开始。S01的15个状态画面不是15个不同页面；跨页面原型集成仍待目标页面完成。
+**2026-09-30 最新检查点：S02 lineups / 比赛中心·比赛与阵容的视觉、本页适用状态和有限原型已验收。** Screens当前为 **2 / 17 条产品路由**：S01 dashboard、S02 lineups；其余15条尚未开始。S02的33个状态画面、7个对话框不等于40条产品页面。
 
-- [Screens 总计划：17条路由与下一项](FIGMA_SCREENS_PLAN.md)
-- [最新 Screens 连续性检查点与节点记录](FIGMA_SCREENS_STATE.json)
-- [S01 Dashboard：页面、状态、验收与待接线目标](FIGMA_SCREEN_DASHBOARD.md)
+- [Screens总计划：17条路由与下一项](FIGMA_SCREENS_PLAN.md)
+- [最新Screens总检查点](FIGMA_SCREENS_STATE.json)
+- [S02比赛与阵容：设计、状态、原型及验收边界](FIGMA_SCREEN_LINEUPS.md)
+- [S02明确恢复状态与节点账本](FIGMA_SCREEN_LINEUPS_STATE.json)
+- [S01 Dashboard：页面与原验收记录](FIGMA_SCREEN_DASHBOARD.md)
 
-**下一项：S02 `lineups` / 比赛中心 · 比赛与阵容，尚未开始。**
+**下一项：S03 `prediction` / 赛事推演，尚未开始。**
 
 ## 组件与模式记录
 
-- [组件阶段记录与 Figma 节点](FIGMA_COMPONENT_RECORD.md)
-- [按钮、Spinner 与 Loading 组件](FIGMA_BUTTON_COMPONENTS.md)
+- [组件阶段记录与Figma节点](FIGMA_COMPONENT_RECORD.md)
+- [按钮、Spinner与Loading组件](FIGMA_BUTTON_COMPONENTS.md)
 - [扩展字段组件](FIGMA_EXTENDED_FIELDS.md)
-- [Searchable Combobox 组件](FIGMA_SEARCHABLE_COMBOBOX.md)
-- [Switch / Toggle 组件](FIGMA_SWITCH_TOGGLE.md)
-- [Tabs / Segmented Control 组件](FIGMA_TABS_SEGMENTED_CONTROL.md)
-- [Data Table / Pagination 组件](FIGMA_DATA_TABLE_PAGINATION.md)
-- [Dropdown / Context / Overflow Menu 组件](FIGMA_DROPDOWN_CONTEXT_OVERFLOW_MENU.md)
+- [Searchable Combobox组件](FIGMA_SEARCHABLE_COMBOBOX.md)
+- [Switch / Toggle组件](FIGMA_SWITCH_TOGGLE.md)
+- [Tabs / Segmented Control组件](FIGMA_TABS_SEGMENTED_CONTROL.md)
+- [Data Table / Pagination组件](FIGMA_DATA_TABLE_PAGINATION.md)
+- [Dropdown / Context / Overflow Menu组件](FIGMA_DROPDOWN_CONTEXT_OVERFLOW_MENU.md)
 - [Dialog：普通、确认与名称校验危险确认](FIGMA_DIALOG.md)
-- [Toast / Inline Alert / Blocking Message 与 Task Activity](FIGMA_TOAST_INLINE_ALERT_BLOCKING_MESSAGE.md)
-- [Accordion / Disclosure 与展开状态恢复](FIGMA_ACCORDION_DISCLOSURE.md)
-- [Progress / Skeleton / Empty State 与异步状态边界](FIGMA_PROGRESS_SKELETON_EMPTY_STATE.md)
+- [Toast / Inline Alert / Blocking Message与Task Activity](FIGMA_TOAST_INLINE_ALERT_BLOCKING_MESSAGE.md)
+- [Accordion / Disclosure与展开状态恢复](FIGMA_ACCORDION_DISCLOSURE.md)
+- [Progress / Skeleton / Empty State与异步状态边界](FIGMA_PROGRESS_SKELETON_EMPTY_STATE.md)
 - [Avatar：球队、球员与默认占位](FIGMA_AVATAR.md)
 - [PC App Shell：导航、顶栏与交互验收](FIGMA_PC_APP_SHELL.md)
 - [Page Heading / Toolbar / Filter Bar / Selection Command Bar](FIGMA_PAGE_HEADING_TOOLBAR_FILTER_SELECTION.md)
 - [Metric Card / Action Card / Panel](FIGMA_METRIC_ACTION_PANEL.md)
-- [Master–Detail–Inspector 与 Entity Row](FIGMA_MASTER_DETAIL_INSPECTOR.md)
-- [Workflow Stepper / Timeline 与交互验收](FIGMA_WORKFLOW_STEPPER_TIMELINE.md)
-- [Workflow / Timeline 历史检查点](FIGMA_WORKFLOW_STEPPER_TIMELINE_STATE.json)
-- [AI Chat：历史、消息、只读附件与 Composer](FIGMA_AI_CHAT.md)
-- [AI Chat 历史检查点与节点账本](FIGMA_AI_CHAT_STATE.json)
+- [Master–Detail–Inspector与Entity Row](FIGMA_MASTER_DETAIL_INSPECTOR.md)
+- [Workflow Stepper / Timeline与交互验收](FIGMA_WORKFLOW_STEPPER_TIMELINE.md)
+- [Workflow / Timeline历史检查点](FIGMA_WORKFLOW_STEPPER_TIMELINE_STATE.json)
+- [AI Chat：历史、消息、只读附件与Composer](FIGMA_AI_CHAT.md)
+- [AI Chat历史检查点与节点账本](FIGMA_AI_CHAT_STATE.json)
 - [应用图标待办](FIGMA_ICON_BACKLOG.md)
-- [基础 Token 与底层组件待办](FIGMA_FOUNDATION_COMPONENT_BACKLOG.md)
-- [Patterns 与 Screens 总阶段计划](FIGMA_PATTERN_SCREEN_PLAN.md)
+- [基础Token与底层组件待办](FIGMA_FOUNDATION_COMPONENT_BACKLOG.md)
+- [Patterns与Screens总阶段计划](FIGMA_PATTERN_SCREEN_PLAN.md)
 
 执行顺序：图标 → 基础依赖与组件 → Patterns → Screens。
 
-图标、既定底层组件及Patterns六组均已完成。Controls保持 **61个组件集 /506个变体**；Patterns保持 **17个组件集 /125个变体 /13个生产单组件**；Foundations保持 **193 variables /13 text styles /6 effects**。S01全部用现有实例组合，没有新增主组件或修改这些全局资产。
+图标、既定底层组件及Patterns六组均已完成。Controls保持 **61 sets /506 variants**；Patterns保持 **17 sets /125 variants /13 production singles**；Foundations保持 **193 variables /13 text styles /6 effects**。S01和S02使用现有实例组合，没有新建Screen主组件或修改全局资产。
 
-## S01 验收摘要
+## S02验收摘要
 
-15个产品状态画面覆盖默认Light/Dark、桌面与紧凑侧栏展开/折叠、系统详情、数据库连接引导与失败/成功、首次加载、保留数据刷新、读取失败和已验证空数据。Review Hub仅用于验收目录，不计作产品路由。
+五个页内区域为比赛管理、双方阵容、模型链路、版本历史、Excel工作包。双方首发11+11方可提交；缺少首发、重复提交、导入冲突与格式错误保持禁用。保存失败保留草稿，保存成功不自动解除模型链路阻断。高级设置、预设和危险确认的运行限制见独立记录。
 
-深层检查3,699个可见节点、1,422个嵌套实例，非预期越界、失效引用、未绑定可见颜色、顶层重叠均为0。47条本页与目录导航连接已核对；137条继承组件交互单独统计。134个可见Disabled控件均无反应连接。普通文字最低对比度Light 4.53:1 /Dark 6.86:1。
+33个产品状态和7个对话框可从Review Hub `478:22468` 到达。最终339条NAVIGATE/OVERLAY连接、23项CLOSE动作已回读；399个Disabled控件没有反应连接。5,544个未隐藏嵌套实例可解析；非预期越界、失效引用、未绑定solid颜色和顶层重叠为0。19处正常纵向滚动单独记录，阵容提交栏位于名单滚动区之外。
 
-连接错误页正常的纵向滚动单独记录，不以裁切隐藏问题。五个快捷入口的目标路由已记录，但真实跨页面连接尚未完成，不跳转到旧Pattern QA假装产品完成。
+2,957个普通非Disabled文字层最低对比度Light **4.5048:1** / Dark **5.6558:1**。131个局部文字颜色覆盖复用既有primary token，没有修改全局组件；截图发现的多行链路说明裁切也已修正。
 
-本轮没有修改应用源码或既有组件主节点。所有数据为演示值，连接/读取结果为预置模拟；不替代真实API、数据库连接、输入校验、键盘焦点、权限、异步与持久化测试。
+S01默认Light/Dark的比赛快捷卡与“比赛”主导航已有4条连接指向真实S02，S02有明确返回首页入口。克隆带入的60条错误旧首页主题/折叠连接已移除。全产品跨路由、全状态主题/折叠/草稿/滚动持续性仍未完成；其余产品目标不连接旧QA示例冒充完成。
+
+本轮没有修改应用源码、全局变量或既有组件主节点。数据和请求结果均为预置演示；真实输入、API、数据库事务、文件操作、权限、键盘焦点与异步竞态须在实现阶段测试。最终删除/归档确认不执行真实或伪造的成功写操作。
+
+## S01历史与当前补充
+
+S01原验收为15个状态画面、47条本页/目录连接及134个无反应的Disabled控件。该独立记录中的“尚无跨页面连接”是S01验收时的历史状态；当前S01↔S02补充以最新Screens计划和S02记录为准。
 
 ## 换会话恢复
 
-先读本README和 `FIGMA_SCREENS_PLAN.md`、`FIGMA_SCREENS_STATE.json`，再核对当前屏幕与实际Figma节点。旧截图、AI Chat/Workflow状态文件及组件记录中的“Screens未开始”属于先前阶段快照，不能覆盖本次最新检查点。
+先读本README、`FIGMA_SCREENS_PLAN.md`、`FIGMA_SCREENS_STATE.json`，再读 `FIGMA_SCREEN_LINEUPS_STATE.json` 和对应独立记录，核对实际Figma节点。S01完整旧总状态保留在提交 `7a6891c571ffa07015774ac6b572c93b12c4c315`。
 
-`FIGMA_COMPONENT_RECORD.md` 的组件API与历史记录本轮保持不变；Screens当前进度以专门计划和状态文件为准。不要为了同步一个阶段状态而重写整份未变化的组件历史。
+旧截图、AI Chat/Workflow状态和组件记录中的“Screens未开始”属于历史快照，不能覆盖最新检查点。`FIGMA_COMPONENT_RECORD.md`的组件API本轮保持不变；不要为了同步一个阶段进度而重写未变化的组件历史。
