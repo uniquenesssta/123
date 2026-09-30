@@ -1,16 +1,10 @@
 {
-  "schemaVersion": 1,
-  "runId": "footfigma-screens-players-2026-10-01",
-  "repo": "uniquenesssta/123", "branch": "ui-design-system",
-  "fileKey": "PN0Whgu6HLWIHx4Mv6aHfu", "page": "3:5",
-  "currentScreen": "S07 players / 球员", "currentRoute": "players",
-  "phase": "in_progress_semantics_verified", "currentExecutionFinished": false,
-  "previousAcceptedGlobalCheckpoint": "ac85c1b42be55bd7378b0990a3406b6da4d9d087",
-  "acceptedRouteCount": 6, "routeCount": 17,
-  "source": {"players":{"path":"src/pages/players.ts","ref":"main","blob":"b406293fd35163bcfae6266b9d083ea3b144d2e5"},"main":{"path":"src/main.ts","ref":"main","scope":"targeted source-context and player-deletion snippets only"}},
-  "authority": "Existing Figma determines visual geometry and tokens; source defines functional/data semantics only.",
-  "frames": {},
-  "pending": ["directory, filters, selection and inspector", "player identity/history/availability/ability/dynamic-tag forms", "player workbook, create and database states", "bounded prototype and identity-safe S06 entry links", "deep and screenshot QA", "accepted records and global checkpoint"],
-  "applicationSourceModified": false, "existingMastersModified": false,
-  "warning": "This is WIP, not accepted. Global accepted progress remains six routes until final QA and checkpoint."
+"schemaVersion":1,"runId":"footfigma-screens-players-2026-10-01","repo":"uniquenesssta/123","branch":"ui-design-system","fileKey":"PN0Whgu6HLWIHx4Mv6aHfu","page":"3:5","currentScreen":"S07 players / 球员","currentRoute":"players","phase":"in_progress_composition","currentExecutionFinished":false,
+"previousAcceptedGlobalCheckpoint":"ac85c1b42be55bd7378b0990a3406b6da4d9d087","acceptedRouteCount":6,"routeCount":17,
+"source":{"players":{"path":"src/pages/players.ts","ref":"main","blob":"b406293fd35163bcfae6266b9d083ea3b144d2e5"},"main":{"path":"src/main.ts","ref":"main","scope":"targeted source-context and player-deletion snippets only"}},
+"frames":{"Directory":"550:69407","Filtered":"550:69740","No Results":"550:70004","Page 2":"550:70268","Loading":"550:70532","Load Error":"550:70796","Refreshing":"550:71060","Refresh Error":"550:71324","Selection Two":"550:71588","Inspector A01":"550:71852","Inspector A02":"550:72116","Inspector Missing":"550:72380","Detail Loading":"550:72644","Detail Error":"550:72908","From Team":"550:73172","Profile Overview":"550:73436","Profile From Team":"550:73700","Identity":"550:73964","Names":"550:74228","Positions":"550:74492","Team History":"550:74756","Availability":"550:75020","Ability":"550:75284","Dynamic Tags":"550:75548","External":"550:75812","Identity Invalid":"550:76076","Observation Invalid":"550:76340","Saving":"550:76604","Save Error":"550:76868","Saved":"550:77132","Workbook Empty":"550:77396","Workbook Wrong Type":"550:77660","Workbook Conflict":"550:77924","Workbook Ready":"550:78188","Workbook No Changes":"550:78452","Workbook Writing":"550:78716","Workbook Error":"550:78980","Workbook Imported":"550:79244","Create Blank":"550:79508","Create Ready":"550:79772","Database Required":"550:80036","Directory Dark":"550:80300","Directory Compact":"550:80564","Profile Dark":"550:80913","Profile Compact":"550:81177"},
+"composedGroups":["17 directory and inspector states","17 profile and form states"],
+"pending":["11 workbook/create/database states","dialogs and bounded prototype","responsive geometry normalization including inspector-open table clipping","deep and screenshot QA","accepted documentation and global checkpoint"],
+"applicationSourceModified":false,"existingMastersModified":false,"newScreenMasters":0,
+"warning":"45 allocated roots are not45 accepted states. Two groups are composed, QA and remaining groups are pending. Do not replace accepted progress with this WIP."
 }
