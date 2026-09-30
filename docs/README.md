@@ -21,6 +21,8 @@
 - [Page Heading / Toolbar / Filter Bar / Selection Command Bar](FIGMA_PAGE_HEADING_TOOLBAR_FILTER_SELECTION.md)
 - [Metric Card / Action Card / Panel](FIGMA_METRIC_ACTION_PANEL.md)
 - [Master–Detail–Inspector 与 Entity Row](FIGMA_MASTER_DETAIL_INSPECTOR.md)
+- [Workflow Stepper / Timeline 与交互验收](FIGMA_WORKFLOW_STEPPER_TIMELINE.md)
+- [Workflow / Timeline 连续性检查点与节点账本](FIGMA_WORKFLOW_STEPPER_TIMELINE_STATE.json)
 - [应用图标待办](FIGMA_ICON_BACKLOG.md)
 - [基础 Token 与底层组件待办](FIGMA_FOUNDATION_COMPONENT_BACKLOG.md)
 - [Patterns 与 Screens 计划](FIGMA_PATTERN_SCREEN_PLAN.md)
@@ -29,4 +31,10 @@
 
 当前进度：图标、基础依赖、按钮首组、扩展字段组、Searchable Combobox、Switch / Toggle、Tabs / Segmented Control、Data Table / Pagination、Dropdown / Context / Overflow Menu、Dialog、Toast / Inline Alert / Blocking Message（含 Task Activity）、Accordion / Disclosure、Progress / Skeleton / Empty State 及 Avatar 均已完成并验收。Controls 当前为 **61 个组件集、506 个变体**；既定底层组件剩余 **0 组**。
 
-Patterns 已完成四组：**PC App Shell**、**Page Heading / Toolbar / Filter Bar / Selection Command Bar**、**Metric Card / Action Card / Panel**、**Master–Detail–Inspector**。Patterns 当前为 **11 个组件集 / 75 个变体 / 9 个生产单组件**；第四组包含 Entity Row 10 个 Selected × State variants 与 SLOT 型 Master–Detail–Inspector，Light / Dark / Inspector Open / Collapsed / 760px 窄宽及三 SLOT 实际替换 QA 均通过。下一组为 **Workflow Stepper / Timeline**。Screens 仍为空；本轮没有修改应用源码。
+**2026-09-30 检查点：** Patterns 已完成五组：**PC App Shell**、**Page Heading / Toolbar / Filter Bar / Selection Command Bar**、**Metric Card / Action Card / Panel**、**Master–Detail–Inspector**、**Workflow Stepper / Timeline**。当前为 **13 个组件集 / 104 个变体 / 11 个生产单组件**；Foundations 为 **193 variables / 13 text styles / 6 effects**。
+
+第五组新增 2 个组件集 / 29 个变体 / 2 个单组件，含九步复盘 Stepper、核验与修订独立的 Timeline、Light / Dark / 760px 窄宽与空时间线示例。4 个预置原型场景、8 条连接已读回核对；普通文字最低对比度 Light 4.53:1 / Dark 6.86:1。原型不是实际后端或键盘端到端测试；详细边界见独立记录。
+
+**下一组：AI Chat：历史侧栏、消息、附件、Composer。** Patterns 还剩这一组；产品 Screens 尚未开始。本轮没有修改应用源码或既有 Controls 主组件。
+
+换会话恢复：先读当前计划与最新状态文件，再核对 Figma 节点；旧截图、旧组的历史总数和仅有标题的 handoff 不能覆盖更新后的明确检查点。
