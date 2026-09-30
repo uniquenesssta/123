@@ -237,7 +237,7 @@ Current controls state: **61 component sets and 506 variants**, unchanged by the
 | Overflow Menu | 267:2007 | 6 | State Closed/Hover/Pressed/Focus/Open/Disabled; nested Button/Icon, More and Menu Surface |
 | Building Blocks/Dialog Header | 277:2341 | 6 | Tone Neutral/Danger × State Default/Focus/Busy; Title; Subtitle; visibility booleans |
 | Building Blocks/Dialog Body | 278:2354 | 4 | Content Message/Facts/Form/Typed; Description; Error; visibility booleans; exposed Facts/Field |
-| Building Blocks/Dialog Actions | 278:2630 | 8 | Tone Primary/Danger × State Default/Hover/Pressed/Focus/Disabled/Loading; Show cancel; exposed Cancel/Confirm |
+| Building Blocks/Dialog Actions | 278:2630 | 8 | Tone Primary/Danger × State Default/Focus/Disabled/Loading; Show cancel; exposed Cancel/Confirm |
 | Dialog/Standard | 279:2795 | 6 | Size Compact/Wide × State Default/Submitting/Error; Body content swap |
 | Dialog/Confirmation | 280:2814 | 6 | Tone Neutral/Danger × State Default/Submitting/Error; exposed Header/Body/Actions |
 | Dialog/Typed Danger | 280:3600 | 6 | State Empty/Editing/Valid/Mismatch/Submitting/Error; exposed Header/Body/Actions |
@@ -306,7 +306,7 @@ Standalone components: `Building Blocks/Menu Note` (`255:1763`); `Building Block
 
 - Header Cell（`230:1170`）分离 Type、Sort 与交互 State；默认仅 1px 底线，Focus 才显示完整焦点边框。
 - Table Cell（`235:1242`）按 Text / Metadata / Number / Status / Action 拆分；Status 与 Action 分别引用 Badge 和 Button/Secondary master。
-- Row（`236:1331`）同步 Default / Hover / Selected / Disabled；Selected 勾选 Checkbox 并显示 2px accent 左边缘。
+- Row（`236:1331`）同步 Default / Hover / Selected / Disabled；Selected 勾选 Checkbox 並显示 2px accent 左边缘。
 - Data Table（`238:1663`）覆盖 Default / Loading / Empty；Loading 保留已有行且禁用交互，不闪空。
 - Pagination（`241:1477`）与 Data Table 保持 1120px 同宽但独立；First / Last 禁用边界按钮，Busy 禁止重复翻页。
 - 新尺寸 token 为 34px header、9px cell padding-x、27px compact page control；继续复用 36px row。
@@ -415,7 +415,7 @@ Standalone components: `Building Blocks/Menu Note` (`255:1763`); `Building Block
 ### Metric Card / Action Card / Panel architecture — 2026-09-23
 
 - Pattern documentation root: `410:15350`, 1600 × 3967. It is placed below Page Bars and does not overlap Page Bars or the Shell root.
-- Local design-system search found no existing Metric Card / Action Card / Panel. Material 3 and Simple Design System returned generic cards/stats/panel assets, but their token model, geometry and interaction API do not match FIP; none were imported.
+- Local design-system search found no existing Metric Card / Action Card / Panel. Material 3 and Simple Design System returned generic cards/stats/panel assets, but their token model,geometry and interaction API do not match FIP; none were imported.
 - `Metric Card` (`410:15370`) is a single read-only component: Label / Value / Note / Show note. It uses FIP Label, Data/Metric and Caption styles with existing surface, border, text, panel-padding, radius and spacing tokens. No business-tone variants were invented.
 - `Action Card` (`411:15483`) is one set / five real states: Default `411:15368`, Hover `411:15391`, Pressed `411:15414`, Focus `411:15437`, Disabled `411:15460`. API: Title / Description / Action / Show description / State. The whole card is the single action target.
 - Action Card retains real Icon Slot instances: the leading icon is exposed and defaults to the existing Chart icon; the trailing Arrow Right remains a nested Icon Slot. All 20 descendant instances resolve to masters; unresolved=0.
