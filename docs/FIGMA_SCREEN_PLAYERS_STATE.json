@@ -1,0 +1,16 @@
+{
+  "schemaVersion": 1,
+  "runId": "footfigma-screens-players-2026-10-01",
+  "repo": "uniquenesssta/123", "branch": "ui-design-system",
+  "fileKey": "PN0Whgu6HLWIHx4Mv6aHfu", "page": "3:5",
+  "currentScreen": "S07 players / 球员", "currentRoute": "players",
+  "phase": "in_progress_semantics_verified", "currentExecutionFinished": false,
+  "previousAcceptedGlobalCheckpoint": "ac85c1b42be55bd7378b0990a3406b6da4d9d087",
+  "acceptedRouteCount": 6, "routeCount": 17,
+  "source": {"players":{"path":"src/pages/players.ts","ref":"main","blob":"b406293fd35163bcfae6266b9d083ea3b144d2e5"},"main":{"path":"src/main.ts","ref":"main","scope":"targeted source-context and player-deletion snippets only"}},
+  "authority": "Existing Figma determines visual geometry and tokens; source defines functional/data semantics only.",
+  "frames": {},
+  "pending": ["directory, filters, selection and inspector", "player identity/history/availability/ability/dynamic-tag forms", "player workbook, create and database states", "bounded prototype and identity-safe S06 entry links", "deep and screenshot QA", "accepted records and global checkpoint"],
+  "applicationSourceModified": false, "existingMastersModified": false,
+  "warning": "This is WIP, not accepted. Global accepted progress remains six routes until final QA and checkpoint."
+}
