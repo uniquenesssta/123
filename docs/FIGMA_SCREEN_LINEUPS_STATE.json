@@ -1,0 +1,21 @@
+{
+  "schemaVersion": 1,
+  "runId": "footfigma-screens-lineups-2026-09-30",
+  "repo": "uniquenesssta/123",
+  "branch": "ui-design-system",
+  "fileKey": "PN0Whgu6HLWIHx4Mv6aHfu",
+  "page": "3:5",
+  "stage": "Screens",
+  "currentScreen": "S02 lineups / 比赛与阵容",
+  "phase": "in_progress",
+  "checkpointDate": "2026-09-30",
+  "previousAcceptedScreen": "S01 dashboard",
+  "previousScreensStateCommit": "7a6891c571ffa07015774ac6b572c93b12c4c315",
+  "frames": {"MatchesLight":"466:4436","NewMatch":"466:5984","NoResults":"466:7232"},
+  "completed": ["live checkpoint recovery","source semantics","matches directory/editor/new/search-empty composition"],
+  "pending": ["paired builder, chain, history and workbook views","local request and deletion states","prototype connections including S01 lineups link","deep and visual QA","final records and index updates"],
+  "source": {"path":"src/pages/lineups.ts","ref":"main","blob":"d35d01fb28ca13b6fb5d07423d11112507ffb243"},
+  "scope": "Only S02; existing FIP components and true instances; no source CSS geometry, detach or new screen masters.",
+  "applicationSourceModified": false,
+  "globalMastersModified": false
+}
