@@ -5,7 +5,7 @@ use super::{
 use crate::{
     adapters::catalog::references::validate_entity_type, PersistenceResult, PostgresStore,
 };
-use football_domain::EntityDeletionCheck;
+use football_domain::{EntityDeletionCheck, EntityReferenceCount};
 use uuid::Uuid;
 
 impl PostgresStore {
@@ -28,26 +28,41 @@ impl PostgresStore {
                 reason: "实体不存在".to_string(),
             });
         };
+        let mut connection = self.pool.acquire().await?;
         let references = match entity_type {
-            "team" => team_reference_counts(&self.pool, entity_id).await?,
-            "player" => player_reference_counts(&self.pool, entity_id).await?,
-            "coach" => coach_reference_counts(&self.pool, entity_id).await?,
+            "team" => team_reference_counts(&mut connection, entity_id).await?,
+            "player" => player_reference_counts(&mut connection, entity_id).await?,
+            "coach" => coach_reference_counts(&mut connection, entity_id).await?,
             _ => unreachable!(),
         };
-        let total: i64 = references.iter().map(|item| item.count).sum();
-        Ok(EntityDeletionCheck {
-            entity_type: entity_type.to_string(),
+        Ok(check_from_references(
+            entity_type,
             entity_id,
             label,
-            exists: true,
-            can_permanently_delete: total == 0,
-            must_archive: total > 0,
             references,
-            reason: if total == 0 {
-                "没有历史引用，可以永久删除".to_string()
-            } else {
-                format!("存在 {total} 条历史或业务引用，只允许归档")
-            },
-        })
+        ))
+    }
+}
+
+pub(crate) fn check_from_references(
+    entity_type: &str,
+    entity_id: Uuid,
+    label: String,
+    references: Vec<EntityReferenceCount>,
+) -> EntityDeletionCheck {
+    let total: i64 = references.iter().map(|item| item.count).sum();
+    EntityDeletionCheck {
+        entity_type: entity_type.to_string(),
+        entity_id,
+        label,
+        exists: true,
+        can_permanently_delete: total == 0,
+        must_archive: total > 0,
+        references,
+        reason: if total == 0 {
+            "没有历史引用，可以永久删除".to_string()
+        } else {
+            format!("存在 {total} 条历史或业务引用，只允许归档")
+        },
     }
 }

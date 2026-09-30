@@ -2,7 +2,7 @@
 
 当前版本 **0.23.0**。本仓库是平台、数据库、数据准备、路由、工作台与外部模型调用入口的公开版本；真实 P4/P7 预测引擎、参数、Profile、固定比赛、私有研究提示词及模型专用固定回归资产不随仓库分发。
 
-R1–R6 累计补审覆盖 43 个任务节点。根据用户决定，R7-01 后新增 R7-02～06 审计整改，原 R7-02～10 顺延为 R7-07～15；优化拆分、验证与记录约束，沿用现有 Windows 验证和最终封包新库流程，不新增持续回归体系。R7-01 的 A1～A7 修订已通过 Windows CI run `36678914535`，节点 DONE；R7-02 外部 ID 身份保护代码已修订，当前 VERIFYING，PG/XLSX/Full 单独留到最终封包新库验收。详见 [R7 任务书](docs/football-model-platform-modular-rewrite-19-docs/07-R7-match-lineup-workbook-persistence.md) 与 [阶段索引/累计审计](docs/modular-rewrite/R07-match-lineup-workbook-persistence/README.md)。
+R1–R6 累计补审覆盖 43 个任务节点。根据用户决定，R7-01 后新增 R7-02～06 审计整改，原 R7-02～10 顺延为 R7-07～15；优化拆分、验证与记录约束，沿用现有 Windows 验证和最终封包新库流程，不新增持续回归体系。R7-01 的 A1～A7 修订已通过 Windows CI run `36678914535`，节点 DONE；R7-02 外部 ID 身份保护已通过 Windows CI 并为 DONE，R7-03 普通删除与历史引用保护修订完成、当前 VERIFYING，PG/XLSX/Full 单独留到最终封包新库验收。详见 [R7 任务书](docs/football-model-platform-modular-rewrite-19-docs/07-R7-match-lineup-workbook-persistence.md) 与 [阶段索引/累计审计](docs/modular-rewrite/R07-match-lineup-workbook-persistence/README.md)。
 
 ## 公开边界
 
@@ -44,6 +44,17 @@ Windows 可使用：
 Node 开发依赖固定安装和读取自源码根目录上一级的 `../node_modules`，npm 缓存固定使用 `../.npm-cache`；仓库根目录不再保存 Node 依赖目录。Cargo target 继续使用 `../.cargo-target`。
 
 ## 模块化重写执行记录
+
+### R7-03 普通删除与历史引用保护（2026-09-30，VERIFYING）
+
+- Player/Team 普通删除在同一 READ COMMITTED 事务中，取得 FOR UPDATE 锁后复用完整引用计数与裁决，再删除实体、外部 ID 并写审计。并发新增历史不会被事务外的过期预检放行；Team 两项局部复检改为完整复检，正常归档提示/bulk 结果和 force-delete 确认/墓碑保持。
+- 扩充已有 permanent-delete contract：通过实际锁等待验证 dynamic tag/lineup preset 并发提交或回滚、实体/引用/外部 ID 保持、单次审计与重复删除。现有 verifier 防止删除复检、弱化锁或陈旧隔离级别回归；无新 runner/target/workflow，迁移/依赖/公开 DTO 不变。
+- 架构及受影响静态检查通过；Windows CI 待本次提交运行，真实 PG/XLSX/Full 保留最终封包新库待验，详见 [阶段索引](docs/modular-rewrite/R07-match-lineup-workbook-persistence/README.md)。R7-04 仍 BLOCKED。
+
+### R7-02 Windows 收尾与 R7-03 启动（2026-09-30）
+
+- `1e4da04` 的 [Windows CI run 36686343584](https://github.com/uniquenesssta/123/actions/runs/36686343584) 全通过，R7-02 正式 DONE，见 [完成记录](docs/modular-rewrite/R07-match-lineup-workbook-persistence/R07-02-external-id-integrity.md)。身份/并发/导入事务 PG 测试仍 ignored，真实 PG/XLSX/Full 保留最终封包新库待验。
+- 用户已启动 R7-03，修复普通删除事务内完整引用裁决及并发保护；R7-04 及后续仍 BLOCKED。
 
 ### R7-02 外部 ID 身份保护（2026-09-30，VERIFYING）
 

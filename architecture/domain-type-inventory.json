@@ -24,7 +24,7 @@
     "targetPublicExportPolicy": "explicit re-export only"
   },
   "sourceDigest": "217241ac243726a5ab6805a7f169e222b97e78c7c971749a5904714af673ebdd",
-  "rustUsageDigest": "18e71e6216447e72fd3630ae07af61d2d4d7950dac058d9d7a2eb51e78da1e05",
+  "rustUsageDigest": "5dfebc0aa077cbb7b2617302545be6949efc6e9c2ead9ff03bf6ec6fa778395a",
   "summary": {
     "typeCount": 365,
     "publicCompatibilityTypeCount": 365,
@@ -6563,10 +6563,12 @@
       ],
       "externalCallers": [
         "crates/persistence-postgres/src/adapters/catalog/deletion/force_delete/counts.rs",
+        "crates/persistence-postgres/src/adapters/catalog/deletion/preflight/check.rs",
         "crates/persistence-postgres/src/adapters/catalog/deletion/preflight/references.rs"
       ],
       "databaseMappings": [
         "crates/persistence-postgres/src/adapters/catalog/deletion/force_delete/counts.rs",
+        "crates/persistence-postgres/src/adapters/catalog/deletion/preflight/check.rs",
         "crates/persistence-postgres/src/adapters/catalog/deletion/preflight/references.rs"
       ]
     },

@@ -3,11 +3,11 @@ use football_domain::EntityReferenceCount;
 use uuid::Uuid;
 
 pub(crate) async fn team_reference_counts(
-    pool: &sqlx::PgPool,
+    connection: &mut sqlx::PgConnection,
     id: Uuid,
 ) -> PersistenceResult<Vec<EntityReferenceCount>> {
     count_relations(
-        pool,
+        connection,
         id,
         &[
             ("matches", "SELECT count(*)::bigint FROM football.matches WHERE home_team_id=$1 OR away_team_id=$1"),
@@ -31,11 +31,11 @@ pub(crate) async fn team_reference_counts(
 }
 
 pub(crate) async fn player_reference_counts(
-    pool: &sqlx::PgPool,
+    connection: &mut sqlx::PgConnection,
     id: Uuid,
 ) -> PersistenceResult<Vec<EntityReferenceCount>> {
     count_relations(
-        pool,
+        connection,
         id,
         &[
             ("lineup_players", "SELECT count(*)::bigint FROM football.lineup_players WHERE player_id=$1"),
@@ -56,11 +56,11 @@ pub(crate) async fn player_reference_counts(
 }
 
 pub(crate) async fn coach_reference_counts(
-    pool: &sqlx::PgPool,
+    connection: &mut sqlx::PgConnection,
     id: Uuid,
 ) -> PersistenceResult<Vec<EntityReferenceCount>> {
     count_relations(
-        pool,
+        connection,
         id,
         &[
             (
@@ -77,13 +77,16 @@ pub(crate) async fn coach_reference_counts(
 }
 
 async fn count_relations(
-    pool: &sqlx::PgPool,
+    connection: &mut sqlx::PgConnection,
     id: Uuid,
     relations: &[(&str, &str)],
 ) -> PersistenceResult<Vec<EntityReferenceCount>> {
     let mut output = Vec::new();
     for (relation, query) in relations {
-        let count: i64 = sqlx::query_scalar(query).bind(id).fetch_one(pool).await?;
+        let count: i64 = sqlx::query_scalar(query)
+            .bind(id)
+            .fetch_one(&mut *connection)
+            .await?;
         if count > 0 {
             output.push(EntityReferenceCount {
                 relation: (*relation).to_string(),

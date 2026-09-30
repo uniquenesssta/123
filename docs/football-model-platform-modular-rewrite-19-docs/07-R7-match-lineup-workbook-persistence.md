@@ -9,7 +9,7 @@
 
 - 唯一阶段分支：`rewrite/r7-match-lineup-workbook-persistence`。
 - 规划依据：源码 `985f01816060cfd05672bdc03b6771dec7b4e842`，文档基线 `51f746729b2f94925e6382f2ae2108cf80855af6`，以及阶段 README 中 A1–A8、B1–B7 审计记录。
-- R7-01 已完成 Windows Automated 并为 `DONE`；用户已启动 R7-02，当前 `VERIFYING`，其余节点 `BLOCKED`。数据库/XLSX/Full 单独保留最终封包新库待验，证据见阶段 README。
+- R7-01、R7-02 已完成 Windows Automated 并为 `DONE`；用户已启动 R7-03，当前 `VERIFYING`，其余节点 `BLOCKED`。数据库/XLSX/Full 单独保留最终封包新库待验，证据见阶段 README。
 - 当前状态以 `docs/modular-rewrite/R07-match-lineup-workbook-persistence/README.md` 的唯一状态表为准；历史审计中的旧编号按下表映射。
 - 允许整改触及直接相关的 Application composition/Ports、catalog identity/deletion、现有 P4 时间比较和测试；不提前实施 R8/R10 的整阶段重写。
 - 不包含前端导入 UI 重写、工作簿解析器整体验证框架建设、模型内部算法/参数修改或历史 migration 改写。
@@ -83,7 +83,7 @@
 
 ## R7-02 外部 ID 身份保护
 
-状态：`VERIFYING`，源码及受影响静态检查完成，等待 Windows CI；PG 最终封包新库待验。来源 B1。
+状态：`DONE`，精确提交 `1e4da04` 的 Windows CI 全通过；PG/XLSX/Full 最终封包新库待验。来源 B1。
 
 - **目标**：同 provider/type/external ID 只能指向同一个稳定实体；同实体重试允许，跨实体冲突拒绝，原绑定不变。
 - **范围**：`adapters/catalog/references/external_ids/`，Players Application/Port 的直接调用链，既有 spreadsheet ID 绑定逻辑与 `entity_matching_references_repository_contract.rs`。
@@ -94,7 +94,7 @@
 
 ## R7-03 普通删除与历史引用保护
 
-状态：`BLOCKED`，依赖 R7-02。来源 B2。
+状态：`VERIFYING`，完整事务内复检与现有测试修订完成，等待 Windows CI；PG 最终封包新库待验。来源 B2。
 
 - **目标**：普通删除只允许删除没有受保护引用的实体；并发新增历史不能被过期预检放行并级联清除。
 - **范围**：`adapters/catalog/deletion/` preflight/safe_delete/delete_write/bulk_delete，以及已有 entity deletion/permanent delete/force delete contracts。
