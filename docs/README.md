@@ -23,6 +23,8 @@
 - [Master–Detail–Inspector 与 Entity Row](FIGMA_MASTER_DETAIL_INSPECTOR.md)
 - [Workflow Stepper / Timeline 与交互验收](FIGMA_WORKFLOW_STEPPER_TIMELINE.md)
 - [Workflow / Timeline 连续性检查点与节点账本](FIGMA_WORKFLOW_STEPPER_TIMELINE_STATE.json)
+- [AI Chat：历史、消息、只读附件与 Composer](FIGMA_AI_CHAT.md)
+- [最新 AI Chat 连续性检查点与节点账本](FIGMA_AI_CHAT_STATE.json)
 - [应用图标待办](FIGMA_ICON_BACKLOG.md)
 - [基础 Token 与底层组件待办](FIGMA_FOUNDATION_COMPONENT_BACKLOG.md)
 - [Patterns 与 Screens 计划](FIGMA_PATTERN_SCREEN_PLAN.md)
@@ -31,10 +33,12 @@
 
 当前进度：图标、基础依赖、按钮首组、扩展字段组、Searchable Combobox、Switch / Toggle、Tabs / Segmented Control、Data Table / Pagination、Dropdown / Context / Overflow Menu、Dialog、Toast / Inline Alert / Blocking Message（含 Task Activity）、Accordion / Disclosure、Progress / Skeleton / Empty State 及 Avatar 均已完成并验收。Controls 当前为 **61 个组件集、506 个变体**；既定底层组件剩余 **0 组**。
 
-**2026-09-30 检查点：** Patterns 已完成五组：**PC App Shell**、**Page Heading / Toolbar / Filter Bar / Selection Command Bar**、**Metric Card / Action Card / Panel**、**Master–Detail–Inspector**、**Workflow Stepper / Timeline**。当前为 **13 个组件集 / 104 个变体 / 11 个生产单组件**；Foundations 为 **193 variables / 13 text styles / 6 effects**。
+**2026-09-30 最新检查点：AI Chat 已完成，Patterns 六组全部完成。** 六组为 PC App Shell、Page Heading / Toolbar / Filter Bar / Selection Command Bar、Metric Card / Action Card / Panel、Master–Detail–Inspector、Workflow Stepper / Timeline、AI Chat。
 
-第五组新增 2 个组件集 / 29 个变体 / 2 个单组件，含九步复盘 Stepper、核验与修订独立的 Timeline、Light / Dark / 760px 窄宽与空时间线示例。4 个预置原型场景、8 条连接已读回核对；普通文字最低对比度 Light 4.53:1 / Dark 6.86:1。原型不是实际后端或键盘端到端测试；详细边界见独立记录。
+Patterns 当前为 **17 个组件集 / 125 个变体 / 13 个生产单组件**；Foundations 保持 **193 variables / 13 text styles / 6 effects**。AI Chat 新增4个组件集、21个变体及2个单组件，没有新增全局变量或样式。
 
-**下一组：AI Chat：历史侧栏、消息、附件、Composer。** Patterns 还剩这一组；产品 Screens 尚未开始。本轮没有修改应用源码或既有 Controls 主组件。
+本组覆盖 Light / Dark、760px 窄宽、完整组件状态、只读上下文主动勾选、历史无匹配、长普通文本和独立滚动。7个预置原型场景、17条连接均已读回；A/B 会话隔离、取消/失败保留草稿均有明确示例。深层检查351个可见嵌套实例，非预期越界与失效引用为0；普通文字最低对比度 Light 4.53:1 / Dark 6.86:1。
 
-换会话恢复：先读当前计划与最新状态文件，再核对 Figma 节点；旧截图、旧组的历史总数和仅有标题的 handoff 不能覆盖更新后的明确检查点。
+**下一阶段：产品 Screens（17条页面链路 / 7个模块），尚未开始。** Review、AI Chat Lab 和可复用 Workspace 都不是已完成的产品页面。本轮没有修改应用源码或既有 Controls 主组件。原型是有限预置模拟，不替代真实 API、键盘焦点、权限、异步与持久化测试。
+
+换会话恢复：先读当前计划与 `FIGMA_AI_CHAT_STATE.json`，再核对 Figma 节点；旧截图、旧组的历史总数和仅有标题的 handoff 不能覆盖更新后的明确检查点。
