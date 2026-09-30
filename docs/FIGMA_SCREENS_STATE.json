@@ -1,0 +1,32 @@
+{
+  "schemaVersion": 1,
+  "runId": "footfigma-screens-dashboard-2026-09-30",
+  "repo": "uniquenesssta/123",
+  "branch": "ui-design-system",
+  "fileKey": "PN0Whgu6HLWIHx4Mv6aHfu",
+  "page": "3:5",
+  "stage": "Screens",
+  "screensStarted": true,
+  "phase": "in_progress",
+  "currentScreen": "S01 Dashboard / 数据总览",
+  "previousCheckpoint": "docs/FIGMA_AI_CHAT_STATE.json",
+  "allPlannedPatternsComplete": true,
+  "routeCount": 17,
+  "acceptedRouteCount": 0,
+  "frames": {
+    "DefaultLight": "453:2",
+    "DefaultDark": "455:687",
+    "CompactExpanded": "455:1037",
+    "CompactCollapsed": "455:1387",
+    "SystemDetails": "455:2226"
+  },
+  "composition": "Existing PC App Shell Workspace INSTANCE_SWAP uses existing Panel with hidden header. Authored scroll frame is placed inside Panel Body SLOT. No detach or new component masters.",
+  "source": {
+    "dashboard": {"path":"src/pages/dashboard.ts","ref":"main","blob":"9b975903e1e5d7384d34f158629817858470d765"},
+    "inlineDatabaseSetup": {"path":"src/components/databaseSetup.ts","ref":"main","blob":"4972b0fa669877b63afde483b6a8b119415856a6"}
+  },
+  "pending": ["Database/loading/error/empty states", "Local prototype actions", "Deep and visual QA", "Screen plan and acceptance record"],
+  "applicationSourceModified": false,
+  "existingMastersModified": false,
+  "sharedVariablesModified": false
+}
