@@ -1,13 +1,17 @@
-use crate::{PersistenceError, PersistenceResult, PostgresStore};
+use crate::{
+    adapters::catalog::references::write_external_entity_id, PersistenceError, PersistenceResult,
+    PostgresStore,
+};
 use chrono::{DateTime, Duration, NaiveDate, NaiveDateTime, SecondsFormat, Utc};
 use football_domain::{
-    SpreadsheetAction, SpreadsheetConflictCandidate, SpreadsheetEntityType, SpreadsheetExportData,
-    SpreadsheetExternalIdRow, SpreadsheetImportCommitResult, SpreadsheetImportCounts,
-    SpreadsheetImportMode, SpreadsheetImportPreview, SpreadsheetImportResolution,
-    SpreadsheetImportRow, SpreadsheetParsedWorkbook, SpreadsheetPlayerAbilityRow,
-    SpreadsheetPlayerAvailabilityRow, SpreadsheetPlayerDynamicTagRow, SpreadsheetPlayerNameRow,
-    SpreadsheetPlayerPositionRow, SpreadsheetPlayerRow, SpreadsheetPlayerTeamPeriodRow,
-    SpreadsheetRowStatus, SpreadsheetTeamRow, PLAYER_IMPORT_FORMAT, PLAYER_MONTHLY_FORMAT,
+    ExternalEntityIdDraft, SpreadsheetAction, SpreadsheetConflictCandidate, SpreadsheetEntityType,
+    SpreadsheetExportData, SpreadsheetExternalIdRow, SpreadsheetImportCommitResult,
+    SpreadsheetImportCounts, SpreadsheetImportMode, SpreadsheetImportPreview,
+    SpreadsheetImportResolution, SpreadsheetImportRow, SpreadsheetParsedWorkbook,
+    SpreadsheetPlayerAbilityRow, SpreadsheetPlayerAvailabilityRow, SpreadsheetPlayerDynamicTagRow,
+    SpreadsheetPlayerNameRow, SpreadsheetPlayerPositionRow, SpreadsheetPlayerRow,
+    SpreadsheetPlayerTeamPeriodRow, SpreadsheetRowStatus, SpreadsheetTeamRow, PLAYER_IMPORT_FORMAT,
+    PLAYER_MONTHLY_FORMAT,
 };
 use serde_json::{json, Map, Value};
 use sqlx::{Postgres, Row, Transaction};
@@ -2294,9 +2298,17 @@ async fn apply_import_row(
             } else {
                 resolve_committed_id(values, &entity_type, context.player_keys, context.team_keys)?
             };
-            sqlx::query("INSERT INTO football.external_entity_ids (id,provider_id,entity_type,entity_id,external_id,metadata) VALUES ($1,$2,$3,$4,$5,$6) ON CONFLICT (provider_id,entity_type,external_id) DO UPDATE SET entity_id=EXCLUDED.entity_id, metadata=football.external_entity_ids.metadata||EXCLUDED.metadata")
-                .bind(Uuid::new_v4()).bind(provider_id).bind(&entity_type).bind(entity_id).bind(required_text(values,"external_id")?)
-                .bind(spreadsheet_row_metadata(values)).execute(&mut **tx).await?;
+            write_external_entity_id(
+                tx,
+                &ExternalEntityIdDraft {
+                    provider_id,
+                    entity_type,
+                    entity_id,
+                    external_id: required_text(values, "external_id")?,
+                    metadata: spreadsheet_row_metadata(values),
+                },
+            )
+            .await?;
             Ok(if status == SpreadsheetRowStatus::ReadyUpdate {
                 ApplyOutcome::Updated
             } else {

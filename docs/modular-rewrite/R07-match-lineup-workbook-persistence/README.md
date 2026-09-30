@@ -37,8 +37,8 @@ crates/persistence-postgres/src/adapters/workbooks/
 
 | 任务 | 范围 | 状态 |
 |---|---|---|
-| R7-01 | Match Catalog | VERIFYING |
-| R7-02 | 外部 ID 身份保护 | BLOCKED |
+| R7-01 | Match Catalog | DONE |
+| R7-02 | 外部 ID 身份保护 | VERIFYING |
 | R7-03 | 普通删除与历史引用保护 | BLOCKED |
 | R7-04 | 架构清单、验证器与执行记录对齐 | BLOCKED |
 | R7-05 | 关键 Application 用例验证 | BLOCKED |
@@ -52,6 +52,18 @@ crates/persistence-postgres/src/adapters/workbooks/
 | R7-13 | Monthly Workbook | BLOCKED |
 | R7-14 | Match Lineup Workbook | BLOCKED |
 | R7-15 | Row / Subrecord Identity | BLOCKED |
+
+## R7-02 当前验证状态
+
+进入基线：`c826dd32e3ecb84dfc732ef60c3fd3aaf4153fdf`。状态 `VERIFYING`；代码与受影响静态检查完成，Windows CI 待本次提交运行，R7-03 保持 BLOCKED。
+
+- B1 已修订：直接添加与 Spreadsheet commit 共用 `references/external_ids/write.rs` 的 `write_external_entity_id`，接收调用方 PgConnection；唯一键冲突仅在 entity_id 一致时合并 metadata，无条件目标覆盖已删除。跨实体返回原有导入冲突文本，原绑定/metadata 不改。
+- 工作簿复用原批次事务并传播冲突，预检后出现竞争绑定仍会拒绝提交，此前业务行、ID、行状态、计数和成功审计一起回滚。预检/冲突裁决逻辑保留；未提前迁移 Workbook owner。
+- 已有 `entity_matching_references_repository_contract.rs` 补首次绑定、同实体合并/稳定记录 ID、不同实体拒绝、Barrier 并发争用、同实体并发 metadata 合并、provider/type 隔离、直写与导入交错、批次重试与整批回滚断言。新断言需 PG，最终封包新库待验；原 R6 匹配断言保留。测试连接先检查 test 库名并确认实际库，新 fixture 在 panic 后也尝试清理，保留审计证据。
+- 现有 R6-08 verifier 加身份条件、共享 owner/导入事务检查，沿用 architecture/frontend 聚合；无新框架、test target、runner 或 workflow。Domain inventory 由原生成器更新调用面，365 类型/声明摘要不变。
+- `npm run verify:architecture`、相关导入静态检查、Rust 源码卫生、Windows acceptance 静态契约、保护资产、命令/迁移检查通过；移除条件、恢复覆盖 SQL 的反向门禁均实际拒绝，源码已恢复。源码按 Rust 1.88 格式化，未做 Linux/macOS 编译/运行验证。
+- 公开 DTO/Port/Tauri 命令、正常同实体 metadata 合并、批次返回形态、0001～0046 migrations、依赖/锁文件与模型保护资产保持。历史错误改绑行为被明确拒绝；没有自动纠正已存在的错误数据。
+- Windows fmt/Clippy/tests/构建/打包待现有 CI；PG 身份/并发/导入事务断言、真实 XLSX/Full 标记“最终封包新库待验”。待最小门禁实际通过后再关闭节点；B2～B7/A8 不在本节点修复。
 
 ## R7-01 READY 边界
 
@@ -77,7 +89,8 @@ crates/persistence-postgres/src/adapters/workbooks/
 
 ## R7-01 当前验证状态
 
-- Match Catalog owner 已切换到 `adapters/matches/catalog/`；A1～A7 的源码/现有门禁/契约测试修订已完成。静态检查通过，节点保持 `VERIFYING`，等待 Windows 最小门禁；PG/XLSX/Full 未运行项明确登记至最终封包新库验收。R7-02 仍 `BLOCKED`。
+- R7-01 已 `DONE`：提交 `c826dd3` 的 Windows CI run `36678914535` / job `109769864719` 全通过，详见 [节点完成记录](R07-01-match-catalog.md)。PG/XLSX/Full 保留“最终封包新库待验”。用户于 2026-09-30 启动 R7-02，当前 `VERIFYING`；R7-03 及后续仍 `BLOCKED`。
+- 以下修复表及审计章节保留当时验证状态；Windows 待验已由上述精确提交的 CI 证据更新，数据库未因 CI 成功转为通过。
 
 ### 2026-09-30 R7-01 修复记录（待动态验收）
 

@@ -2,7 +2,7 @@
 
 当前版本 **0.23.0**。本仓库是平台、数据库、数据准备、路由、工作台与外部模型调用入口的公开版本；真实 P4/P7 预测引擎、参数、Profile、固定比赛、私有研究提示词及模型专用固定回归资产不随仓库分发。
 
-R1–R6 累计补审覆盖 43 个任务节点。根据用户决定，R7-01 后新增 R7-02～06 审计整改，原 R7-02～10 顺延为 R7-07～15；优化拆分、验证与记录约束，沿用现有 Windows 验证和最终封包新库流程，不新增持续回归体系。R7-01 的 A1～A7 已完成源码、现有门禁和契约测试修订，静态检查通过；Windows 编译/测试与 PostgreSQL 实跑待验，节点保持 VERIFYING。详见 [R7 任务书](docs/football-model-platform-modular-rewrite-19-docs/07-R7-match-lineup-workbook-persistence.md) 与 [阶段索引/累计审计](docs/modular-rewrite/R07-match-lineup-workbook-persistence/README.md)。
+R1–R6 累计补审覆盖 43 个任务节点。根据用户决定，R7-01 后新增 R7-02～06 审计整改，原 R7-02～10 顺延为 R7-07～15；优化拆分、验证与记录约束，沿用现有 Windows 验证和最终封包新库流程，不新增持续回归体系。R7-01 的 A1～A7 修订已通过 Windows CI run `36678914535`，节点 DONE；R7-02 外部 ID 身份保护代码已修订，当前 VERIFYING，PG/XLSX/Full 单独留到最终封包新库验收。详见 [R7 任务书](docs/football-model-platform-modular-rewrite-19-docs/07-R7-match-lineup-workbook-persistence.md) 与 [阶段索引/累计审计](docs/modular-rewrite/R07-match-lineup-workbook-persistence/README.md)。
 
 ## 公开边界
 
@@ -44,6 +44,17 @@ Windows 可使用：
 Node 开发依赖固定安装和读取自源码根目录上一级的 `../node_modules`，npm 缓存固定使用 `../.npm-cache`；仓库根目录不再保存 Node 依赖目录。Cargo target 继续使用 `../.cargo-target`。
 
 ## 模块化重写执行记录
+
+### R7-02 外部 ID 身份保护（2026-09-30，VERIFYING）
+
+- 公开添加与工作簿提交共用一个原子身份写入 owner：同 provider/type/external ID 只允许同实体合并 metadata，跨实体返回冲突并保留原绑定；导入失败沿用原事务整批回滚。
+- 扩充现有 references contract，覆盖重试、竞争绑定、metadata 合并、命名空间隔离、预检后竞争与业务/批次/审计回滚；现有 verifier 防止恢复覆盖写入。没有新增框架、数据库入口或修改迁移/生产依赖。
+- 架构聚合、受影响导入/保护资产/命令/迁移静态检查与反向门禁通过；Windows CI 待本次提交运行，真实 PG/XLSX/Full 留到最终封包新库。R7-03 仍 BLOCKED，详细结果见 [阶段索引](docs/modular-rewrite/R07-match-lineup-workbook-persistence/README.md)。
+
+### R7-01 Windows 收尾与 R7-02 启动（2026-09-30）
+
+- `c826dd3` 的 [Windows CI run 36678914535](https://github.com/uniquenesssta/123/actions/runs/36678914535) 全通过：架构、前端、Rust fmt/Clippy/tests、打包及启动烟测；R7-01 标记 DONE，见 [完成记录](docs/modular-rewrite/R07-match-lineup-workbook-persistence/R07-01-match-catalog.md)。
+- PG/XLSX/Full 未实跑，继续登记最终封包新库待验。R7-02 按用户指令开始外部 ID 稳定身份整改，后续节点仍 BLOCKED。
 
 ### R7-01 Match Catalog 问题修复（2026-09-30）
 

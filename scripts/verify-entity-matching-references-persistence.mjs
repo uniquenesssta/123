@@ -43,4 +43,15 @@ req(providerValidation.includes("数据源代码、名称和类型不能为空")
 req(externalValidation.includes("外部 ID 实体类型无效") && externalValidation.includes("外部 ID 不能为空"), "external id validation errors changed");
 const port = read("crates/application/src/ports/player/mod.rs");
 for (const method of ["list_references", "resolve_reference", "check_deletion", "bulk_archive", "create_data_provider", "add_external_id"]) req(port.includes(`async fn ${method}`), `EntityReferencePort changed: ${method}`);
-console.log("R6-08 Entity Matching / References persistence ownership verified.");
+const externalWrite = read(`${referencesRoot}external_ids/write.rs`);
+const spreadsheet = read("crates/persistence-postgres/src/spreadsheet_exchange.rs");
+req(externalWrite.includes("pub(crate) async fn write_external_entity_id(") && externalWrite.includes("connection: &mut PgConnection"), "external ID transaction-aware owner missing");
+req(externalWrite.includes("WHERE football.external_entity_ids.entity_id = EXCLUDED.entity_id") && externalWrite.includes(".fetch_optional(connection)") && externalWrite.includes("禁止自动改绑"), "external ID atomic conflict rejection missing");
+req(!/SET[\s\S]*?entity_id\s*=\s*EXCLUDED\.entity_id\s*,/.test(externalWrite), "external ID target overwrite remains");
+req(externalWrite.includes("write_external_entity_id(&mut connection, draft).await"), "direct external ID entry bypasses shared owner");
+req(/write_external_entity_id\(\s*tx,[\s\S]*?\.await\?;/.test(spreadsheet), "import external ID entry lost shared transaction/error propagation");
+req(!/INSERT\s+INTO\s+football\.external_entity_ids/i.test(spreadsheet), "import retains parallel external ID writer");
+const contract = read("crates/persistence-postgres/tests/entity_matching_references_repository_contract.rs");
+for (const token of ["external_id_identity_and_import_atomicity_are_preserved", "same entity retry", "Barrier::new(2)", "tokio::join!", "late conflict preview", "rolled back id count", "success audit count", "cleanup_external_id_fixture", "SELECT current_database()"])
+  req(contract.includes(token), `external ID contract coverage missing: ${token}`);
+console.log("R6-08 Entity Matching / References ownership and R7-02 external ID integrity verified.");
