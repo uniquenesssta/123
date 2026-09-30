@@ -208,9 +208,9 @@ Current controls state: **61 component sets and 506 variants**, unchanged by the
 | Input/Textarea | 143:410 | 8 | Height 96/160 × State Default/Focus/Error/Disabled |
 | Input/Number | 144:437 | 4 | State Default/Focus/Error/Disabled; Unit and stepper booleans |
 | Input/Date & Datetime | 146:488 | 8 | Type Date/Datetime × State Default/Focus/Error/Disabled |
-| Input/Password | 147:616 | 8 | Visibility Hidden/Shown × State Default/Focus/Error/Disabled |
+| Input/Password | 147:616 | 8 | Visibility Hidden/Shown × State Default/Hover/Pressed/Focus/Disabled |
 | Input/File Upload | 149:906 | 8 | Empty/Drag Over/Selected/Validating/Ready/Complete/Error/Disabled |
-| Building Blocks/Combobox Option | 163:720 | 5 | Default/Hover/Keyboard Active/Selected/Empty/Query Restored/Disabled; Label |
+| Building Blocks/Combobox Option | 163:720 | 5 | Default/Hover/Keyboard Active/Selected/Disabled; Label |
 | Input/Searchable Combobox | 171:563 | 9 | Default/Focus/Open/Querying/Keyboard Active/Selected/Empty/Query Restored/Disabled; Label; Empty message; Show label/helper |
 | Building Blocks/Switch Control | 183:563 | 10 | Checked Off/On × State Default/Hover/Pressed/Focus/Disabled |
 | Switch/Toggle | 186:583 | 10 | Checked Off/On × State Default/Hover/Pressed/Focus/Disabled; Label; Description; Show label/description |
