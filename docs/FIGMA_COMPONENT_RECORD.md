@@ -11,6 +11,7 @@
 - Figma file key: PN0Whgu6HLWIHx4Mv6aHfu
 - Baseline date: 2026-08-23
 - Design direction: desktop PC data workspace; icon-first; foundations before composed screens
+- Latest accepted checkpoint: 2026-09-30, Workflow Stepper / Timeline complete; [explicit state and node ledger](FIGMA_WORKFLOW_STEPPER_TIMELINE_STATE.json). Next: AI Chat.
 
 ## 1. Figma file structure
 
@@ -19,8 +20,8 @@
 | 00 · Foundations | 0:1 | complete; desktop dependency extension verified |
 | 01 · Iconography | 3:2 | application icon coverage complete and verified |
 | 02 · Controls | 3:3 | planned foundation groups complete; 61 sets / 506 variants |
-| 03 · Patterns | 3:4 | Shell + Page Bars + Card/Panel + Master–Detail–Inspector complete; 11 sets / 75 variants + 9 production singles; QA verified |
-| 04 · Screens | 3:5 | reserved; currently empty |
+| 03 · Patterns | 3:4 | Shell + Page Bars + Card/Panel + Master–Detail–Inspector + Workflow/Timeline complete; 13 sets / 104 variants + 11 production singles |
+| 04 · Screens | 3:5 | reserved; product Screens not started |
 
 Page documentation roots:
 
@@ -53,6 +54,9 @@ Page documentation roots:
 - Card / Panel QA root: 413:15472 (Light / Dark / 760px frames; includes Panel SLOT replacement)
 - Master–Detail–Inspector pattern root: 418:15663
 - Master–Detail–Inspector QA root: 421:15881 (Light / Dark / Open / Collapsed / 760px; all three SLOTs replaced in Light Open)
+- Workflow Stepper / Timeline pattern root: 424:16193
+- Workflow / Timeline Review root: 425:16511 (six instance-only review fixtures)
+- Workflow prototype entry: 427:17420 (four explicit simulation scenes, eight verified links)
 - Current Controls root dimensions: 1440 × 34245 (observed at Shell start/end; preserved without editing)
 
 ## 2. Foundations
@@ -63,12 +67,12 @@ Page documentation roots:
 |---|---|---|---:|
 | FIP Primitives | VariableCollectionId:17:2 | Value | 53 |
 | FIP Color | VariableCollectionId:17:3 | Light, Dark | 43 |
-| FIP Size | VariableCollectionId:17:4 | Value | 76 |
+| FIP Size | VariableCollectionId:17:4 | Value | 78 |
 | FIP Icon Scale | VariableCollectionId:35:2 | 24, 20, 16 | 3 |
 | FIP Control Scale | VariableCollectionId:46:2 | 32, 40, 48 | 15 |
 | FIP Icon Tone | VariableCollectionId:50:206 | Default, Secondary, Active, On Accent, Success, Warning, Danger, Info | 1 |
 
-All 191 variables have explicit scopes and WEB code syntax. Avatar adds four scoped size variables and one semantic color alias; see [Avatar record](FIGMA_AVATAR.md).
+Current total: 193 variables. The prior 191-variable baseline is preserved; Workflow / Timeline adds two WIDTH_HEIGHT-scoped size variables with explicit WEB syntax. See [Workflow / Timeline record](FIGMA_WORKFLOW_STEPPER_TIMELINE.md). Avatar's earlier additions remain documented in the [Avatar record](FIGMA_AVATAR.md). Historical per-group totals below remain dated snapshots.
 
 ### Text styles
 
@@ -183,7 +187,7 @@ Utilities:
 
 ## 4. Controls
 
-Current controls state: **61 component sets and 506 variants**, unchanged by the Pattern phases. All planned foundation groups are complete; see [Avatar record](FIGMA_AVATAR.md). Patterns now contains **11 component sets / 75 variants / 9 production standalone components** after PC App Shell, Page Bars, Metric Card / Action Card / Panel, and Master–Detail–Inspector. The Shell QA workspace fixture remains QA-only. Screens remains empty. See [Shell record](FIGMA_PC_APP_SHELL.md), [Page Bars record](FIGMA_PAGE_HEADING_TOOLBAR_FILTER_SELECTION.md), [Card / Panel record](FIGMA_METRIC_ACTION_PANEL.md), and [Master–Detail–Inspector record](FIGMA_MASTER_DETAIL_INSPECTOR.md). Previous group audit totals remain historical snapshots.
+Current controls state: **61 component sets and 506 variants**, unchanged by the Pattern phases. All planned foundation groups are complete; see [Avatar record](FIGMA_AVATAR.md). Patterns now contains **13 component sets / 104 variants / 11 production standalone components** after PC App Shell, Page Bars, Metric Card / Action Card / Panel, Master–Detail–Inspector, and Workflow Stepper / Timeline. The Shell QA workspace fixture remains QA-only. Product Screens are not started. See [Shell record](FIGMA_PC_APP_SHELL.md), [Page Bars record](FIGMA_PAGE_HEADING_TOOLBAR_FILTER_SELECTION.md), [Card / Panel record](FIGMA_METRIC_ACTION_PANEL.md), [Master–Detail–Inspector record](FIGMA_MASTER_DETAIL_INSPECTOR.md), and [Workflow / Timeline record](FIGMA_WORKFLOW_STEPPER_TIMELINE.md). Previous group audit totals remain historical snapshots.
 
 | Component set | ID | Variants | API |
 |---|---:|---:|---|
@@ -206,7 +210,7 @@ Current controls state: **61 component sets and 506 variants**, unchanged by the
 | Input/Date & Datetime | 146:488 | 8 | Type Date/Datetime × State Default/Focus/Error/Disabled |
 | Input/Password | 147:616 | 8 | Visibility Hidden/Shown × State Default/Focus/Error/Disabled |
 | Input/File Upload | 149:906 | 8 | Empty/Drag Over/Selected/Validating/Ready/Complete/Error/Disabled |
-| Building Blocks/Combobox Option | 163:720 | 5 | Default/Hover/Keyboard Active/Selected/Disabled; Label |
+| Building Blocks/Combobox Option | 163:720 | 5 | Default/Hover/Keyboard Active/Selected/Empty/Query Restored/Disabled; Label |
 | Input/Searchable Combobox | 171:563 | 9 | Default/Focus/Open/Querying/Keyboard Active/Selected/Empty/Query Restored/Disabled; Label; Empty message; Show label/helper |
 | Building Blocks/Switch Control | 183:563 | 10 | Checked Off/On × State Default/Hover/Pressed/Focus/Disabled |
 | Switch/Toggle | 186:583 | 10 | Checked Off/On × State Default/Hover/Pressed/Focus/Disabled; Label; Description; Show label/description |
@@ -438,6 +442,22 @@ Standalone components: `Building Blocks/Menu Note` (`255:1763`); `Building Block
 - Application source was used only to confirm master/detail/inspector responsibilities, selection persistence and inspector collapsed/open semantics. No CSS geometry was treated as Figma authority; no application source or speculative Code Connect was changed.
 - Full API, correction record and QA evidence: [Master–Detail–Inspector record](FIGMA_MASTER_DETAIL_INSPECTOR.md).
 
+### Workflow Stepper / Timeline architecture — 2026-09-30
+
+- Documentation root `424:16193`, 1600 × 5968; Review root `425:16511`. New assets: two sets / 29 variants / two production singles. Current Patterns totals: 13 sets / 104 variants / 11 production singles.
+- `Building Blocks/Workflow Step` (`424:16593`) separates Progress Locked/Current/Done/Blocked from State Default/Hover/Pressed/Focus/Disabled; Boolean Active identifies the viewed step. Locked and Blocked can be inspected; selecting a step never grants execution permission.
+- `Workflow Stepper` (`425:16285`) has Title / Summary / Show heading and a true Steps SLOT (`425:16289`). The default composition covers the nine source-defined review steps with real component instances; long names wrap rather than disappear.
+- `Building Blocks/Timeline Item` (`424:16815`) has Verification Verified/Unverified/Disputed × Revision Original/Corrected/Cancelled. It retains both statuses, optional score and metadata, and a host-controlled final connector. Cancelled records remain readable and are excluded from effective-event calculations by the host.
+- `Timeline` (`425:16427`) has Title / Summary / Show heading and an Events SLOT (`425:16431`). The empty review replaces Events with the existing Empty State without detaching the parent.
+- Two size variables were added with WIDTH_HEIGHT scopes and explicit proposed WEB bindings: workflow rail 320 (`VariableID:424:16191`) and timeline time column 64 (`VariableID:424:16192`). FIP Size is now 78; all variables total 193. Text styles and effects stay 13 / 6.
+- Six instance-only review fixtures cover Light, Dark, 760px narrow, empty history, all 20 Workflow Step states, and all nine event-state combinations. A narrow review deliberately views completed step 2 while step 4 stays blocked.
+- Four native prototype scenes (`427:17420`, `427:17614`, `427:17806`, `427:17980`) contain eight verified links and four Disabled write controls with zero reactions. These are explicitly limited preset simulations, not a backend or keyboard end-to-end test.
+- Contrast QA found inherited Badge text as low as 3.40:1 and new secondary text around 4.43–4.47:1 on some light surfaces. Only 35 new nested Badge text layers and 34 newly owned text layers were rebound to existing primary text color; global Controls, color tokens and typography were preserved.
+- Final ordinary-text contrast across 691 visible non-disabled layers: Light minimum 4.5326557047:1; Dark minimum 6.8625187908:1. Deep bounds audit includes INSTANCE and SLOT descendants: overflow 0, unresolved references 0 across 469 visible nested instances, unbound visible solid paints 0, own text missing styles 0, and top-level overlap 0.
+- The explicit state file contains stable master/variant/review/prototype IDs, a lossless ledger of 532 actual primary node IDs, scoped overrides, QA results, and the next stage. It supplements handoffs rather than assuming an automatically named package contains the complete project.
+- Application semantic source: `main/src/pages/review.ts`, blob `4a18002bdd6937cec1d1d076f521dcee8e2f4b5e`. No source CSS geometry, application code or speculative Code Connect was changed.
+- Full APIs and limitations: [Workflow Stepper / Timeline](FIGMA_WORKFLOW_STEPPER_TIMELINE.md). Recovery data: [state file](FIGMA_WORKFLOW_STEPPER_TIMELINE_STATE.json).
+
 ### Badge and Tag semantic correction
 
 - Badge is status-only and never carries a remove action.
@@ -470,14 +490,14 @@ When implementation starts:
 
 ## 7. Known next work
 
-The planned foundation groups and the first four Pattern groups — PC App Shell, Page Heading / Toolbar / Filter Bar / Selection Command Bar, Metric Card / Action Card / Panel, and Master–Detail–Inspector — are complete. The file does not yet contain finished product Screens.
+The planned foundation groups and the first five Pattern groups — PC App Shell, Page Heading / Toolbar / Filter Bar / Selection Command Bar, Metric Card / Action Card / Panel, Master–Detail–Inspector, and Workflow Stepper / Timeline — are complete. The file does not yet contain finished product Screens.
 
 Foundation dependency extension P4.2, the first button group, the extended-field group, Searchable Combobox, Switch / Toggle, Tabs / Segmented Control, Data Table / Pagination, Dropdown / Context / Overflow Menu, Dialog, Toast / Inline Alert / Blocking Message (including Task Activity), Accordion / Disclosure, Progress / Skeleton / Empty State, and Avatar are complete and verified. Evidence is split across the separate records linked from `docs/README.md`.
 
 ### Foundation completion
 
 - Remaining planned foundation groups: **0**. Current Controls inventory: **61 sets / 506 variants**.
-- Completed Patterns: **PC App Shell**, **Page Heading / Toolbar / Filter Bar / Selection Command Bar**, **Metric Card / Action Card / Panel**, and **Master–Detail–Inspector workspace** including Entity Row. Next: **Workflow Stepper / Timeline**, before product Screens.
+- Completed Patterns: **PC App Shell**, **Page Heading / Toolbar / Filter Bar / Selection Command Bar**, **Metric Card / Action Card / Panel**, **Master–Detail–Inspector workspace** including Entity Row, and **Workflow Stepper / Timeline**. Next: **AI Chat: history sidebar, messages, attachments, Composer**, before product Screens.
 
 ### Required pattern families
 
@@ -486,8 +506,8 @@ Foundation dependency extension P4.2, the first button group, the extended-field
 - [x] Metric cards, action cards, and panels.
 - [x] Entity rows — completed as the Master–Detail–Inspector dependency.
 - [x] Master–detail–inspector workspace.
-- Workflow stepper/timeline.
-- AI chat workspace.
+- [x] Workflow stepper/timeline.
+- [ ] AI chat workspace — next.
 
 ## 8. Cleanup record
 
