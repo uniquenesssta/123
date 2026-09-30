@@ -67,7 +67,11 @@ crates/persistence-postgres/src/adapters/workbooks/
 
 ## R7-03 当前验证状态
 
-进入基线：`1e4da04b6a6c892dcca4e0499e963d5f39b9746c`。当前 `VERIFYING`：代码与静态门禁完成，等待本次 Windows CI；R7-04 及以后仍 BLOCKED。
+进入基线：`1e4da04b6a6c892dcca4e0499e963d5f39b9746c`。当前 `VERIFYING`：首轮 Windows CI 失败的旧契约断言已修订，等待修订后的 Windows CI；R7-04 及以后仍 BLOCKED。
+
+- 首轮精确提交 `e657a79700f0c4a0884a8dbef1a301a28e544689` 的 [Windows run 36693857568](https://github.com/uniquenesssta/123/actions/runs/36693857568) / job `109817060757`：架构步骤通过，Automated 在前端契约的 `verify-team-player-management.mjs` 失败（球队比赛/赛后复盘保护断言）；后续 TypeScript/截图/生产构建、Rust 验证、打包/启动未完成，不记 PASS。
+- 原因及修复：本轮完整保护已复用 `preflight/references.rs`，原球队管理验证器仍只在 `delete_write.rs` 等写入文件找两项 SQL，未覆盖真实共享链路。本次在原脚本分别检查 Team 写入调用事务复检、helper 调用共享 Team 计数/裁决并拒绝引用，以及 Team 计数 owner 的比赛/复盘 SQL；不新增 runner/工作流或改业务代码。临时移除事务复检、Team 共享计数调用、比赛 SQL、复盘 SQL 均实际拒绝，源码已恢复。
+- 修订后原球队管理契约与架构聚合通过；扩大到现有前端入口 86 项 Node 检查，80 项通过，6 项未取得本地通过证据（Node 子进程权限及截图/TypeScript 环境限制），留给 Windows CI 验证；没有将本地检查计为 Windows 实跑，也未修改截图基线或依赖锁文件。
 
 - B2 修订：Player/Team 普通删除事务在任何数据删除前显式设置 READ COMMITTED、取得实体 FOR UPDATE 锁，然后调用完整的共享引用计数和裁决。查询与 UI 预检复用原 owner；不会从 pool 另开连接做最终裁决。等待先行外键写入结束后，复检使用新的语句快照；取得锁后新增受保护外键引用会等待该事务结束。
 - Player 新增完整事务内复检；Team 原比赛/复盘两项局部检查被同一完整复检替代，16 项 Team、13 项 Player 既有关系保持（含动态标签、贡献、能力、预设成员、球队阵容预设和赛季成员）。资料/名称等原有正常级联与外部 ID 清理保持；不增加平行关系清单或改写冻结 FK/migration。
@@ -77,7 +81,7 @@ crates/persistence-postgres/src/adapters/workbooks/
 - 现有 R6-09 verifier 保留 owner、预检、归档、bulk、force-delete 边界检查，新增 READ COMMITTED→排他锁→完整复检→变更顺序检查、同一连接计数/裁决与缺口关系断言。临时移除 Player/Team 复检、弱化锁、恢复 REPEATABLE READ 均实际被拒绝，源码已恢复。
 - 架构聚合、Rust 源码卫生、171 命令、18 保护资产、迁移兼容与 Windows acceptance 静态契约通过；Rust 1.88 仅用于源码格式化/检查，未执行 Linux/macOS 编译/运行验收。Domain inventory 官方生成器更新调用面，365 类型/声明摘要保持。
 - Tauri/Application/Port 直接与 bulk 调用链已核对，公开方法和返回类型无需改变。force-delete 的完整名称确认、专用执行入口、事务/墓碑审计保持，未扩展普通删除权限。R7-04 清单整改、B5/B6/A8/模型历史等后续事项未夹带修复。
-- Windows fmt/Clippy/tests/构建/打包/启动由本次现有 CI 验证；本节点真实 PG、已有相关 deletion/force-delete contracts 与 XLSX/Full 在最终新库实跑。没有新增 runner/test target/workflow；回退使用进入基线和受控 revert。
+- Windows fmt/Clippy/tests/构建/打包/启动由修订后的现有 CI 验证；本节点真实 PG、已有相关 deletion/force-delete contracts 与 XLSX/Full 在最终新库实跑。没有新增 runner/test target/workflow；回退使用进入基线和受控 revert。
 
 ## R7-01 READY 边界
 

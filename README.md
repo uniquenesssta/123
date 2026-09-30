@@ -49,7 +49,8 @@ Node 开发依赖固定安装和读取自源码根目录上一级的 `../node_mo
 
 - Player/Team 普通删除在同一 READ COMMITTED 事务中，取得 FOR UPDATE 锁后复用完整引用计数与裁决，再删除实体、外部 ID 并写审计。并发新增历史不会被事务外的过期预检放行；Team 两项局部复检改为完整复检，正常归档提示/bulk 结果和 force-delete 确认/墓碑保持。
 - 扩充已有 permanent-delete contract：通过实际锁等待验证 dynamic tag/lineup preset 并发提交或回滚、实体/引用/外部 ID 保持、单次审计与重复删除。现有 verifier 防止删除复检、弱化锁或陈旧隔离级别回归；无新 runner/target/workflow，迁移/依赖/公开 DTO 不变。
-- 架构及受影响静态检查通过；Windows CI 待本次提交运行，真实 PG/XLSX/Full 保留最终封包新库待验，详见 [阶段索引](docs/modular-rewrite/R07-match-lineup-workbook-persistence/README.md)。R7-04 仍 BLOCKED。
+- 首轮 Windows CI [run 36693857568](https://github.com/uniquenesssta/123/actions/runs/36693857568) 在现有球队/球员管理契约失败：验证器仍要求在删除写入文件直接出现比赛/复盘 SQL，未适配共享引用 owner。本次修复原验证器，检查 Team 事务复检→共享计数/裁决→拒绝引用链路及真实比赛/复盘 SQL，四项临时破坏均被拒绝。
+- 架构及受影响静态检查通过；首轮尚未执行 Rust 编译/测试、打包/启动，等待修订后的 Windows CI。真实 PG/XLSX/Full 保留最终封包新库待验，详见 [阶段索引](docs/modular-rewrite/R07-match-lineup-workbook-persistence/README.md)。R7-03 保持 VERIFYING，R7-04 仍 BLOCKED。
 
 ### R7-02 Windows 收尾与 R7-03 启动（2026-09-30）
 

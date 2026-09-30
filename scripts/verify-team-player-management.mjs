@@ -27,10 +27,20 @@ const appCatalog = [
   text("crates/application/src/services/teams/facade.rs"),
   text("crates/application/src/services/players/facade.rs"),
 ].join("\n");
+const deleteWrite = text("crates/persistence-postgres/src/adapters/catalog/deletion/delete_write.rs");
+const teamDeleteWrite = deleteWrite.slice(
+  deleteWrite.indexOf("async fn write_team_delete("),
+  deleteWrite.indexOf("async fn ensure_no_references("),
+);
+const referenceCounts = text("crates/persistence-postgres/src/adapters/catalog/deletion/preflight/references.rs");
+const teamReferenceCounts = referenceCounts.slice(
+  referenceCounts.indexOf("async fn team_reference_counts("),
+  referenceCounts.indexOf("async fn player_reference_counts("),
+);
 const deletionPersistence = [
   text("crates/persistence-postgres/src/adapters/catalog/deletion/bulk_delete.rs"),
   text("crates/persistence-postgres/src/adapters/catalog/deletion/safe_delete.rs"),
-  text("crates/persistence-postgres/src/adapters/catalog/deletion/delete_write.rs"),
+  deleteWrite,
 ].join("\n");
 const persistenceCatalog = deletionPersistence;
 const teamDetailCoordinator = text("crates/persistence-postgres/src/adapters/catalog/teams/detail/read_team.rs");
@@ -116,8 +126,13 @@ assert(teamDetailCoordinator.includes("read_profile(&self.pool, team_id).await?"
 assert(teamDetailProfile.includes("FROM football.team_profiles"), "球队详情未读取球队档案");
 assert(teamDetailCoordinator.includes("read_squad(&self.pool, team_id).await?"), "球队详情协调器未读取当前阵容");
 assert(teamDetailSquad.includes("football.player_team_periods"), "球队详情未读取当前阵容");
-assert(persistenceCatalog.includes("review.team_match_reviews"), "球队删除未保护赛后复盘历史");
-assert(persistenceCatalog.includes("football.matches WHERE home_team_id=$1 OR away_team_id=$1"), "球队删除未保护比赛历史");
+assert(teamDeleteWrite.includes('ensure_no_references(&mut tx, "team", team_id, &team_name).await?;'), "球队删除未在事务内复检完整引用");
+assert(deleteWrite.includes('"team" => team_reference_counts(connection, entity_id).await?')
+  && deleteWrite.includes("check_from_references(entity_type, entity_id")
+  && deleteWrite.includes("if !check.can_permanently_delete")
+  && deleteWrite.includes("InvalidState(check.reason)"), "球队删除未通过共享引用裁决拒绝受保护历史");
+assert(teamReferenceCounts.includes("review.team_match_reviews WHERE team_id=$1"), "球队删除未保护赛后复盘历史");
+assert(teamReferenceCounts.includes("football.matches WHERE home_team_id=$1 OR away_team_id=$1"), "球队删除未保护比赛历史");
 assert(persistenceCatalog.includes("team_deleted"), "球队删除缺少审计事件");
 assert(playerPersistence.includes("player_deleted"), "批量球员删除必须复用已有审计删除链");
 

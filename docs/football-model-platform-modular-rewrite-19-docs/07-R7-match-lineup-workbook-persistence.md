@@ -94,7 +94,7 @@
 
 ## R7-03 普通删除与历史引用保护
 
-状态：`VERIFYING`，完整事务内复检与现有测试修订完成，等待 Windows CI；PG 最终封包新库待验。来源 B2。
+状态：`VERIFYING`，完整事务内复检与现有测试修订完成；首轮 Windows CI 的旧球队管理契约断言已修复，等待修订后的 Windows CI，证据见阶段索引。PG 最终封包新库待验。来源 B2。
 
 - **目标**：普通删除只允许删除没有受保护引用的实体；并发新增历史不能被过期预检放行并级联清除。
 - **范围**：`adapters/catalog/deletion/` preflight/safe_delete/delete_write/bulk_delete，以及已有 entity deletion/permanent delete/force delete contracts。
