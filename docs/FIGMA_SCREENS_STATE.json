@@ -1,40 +1,72 @@
 {
-  "schemaVersion":1,"runId":"footfigma-screens-review-2026-09-30",
-  "repo":"uniquenesssta/123","branch":"ui-design-system","fileKey":"PN0Whgu6HLWIHx4Mv6aHfu","page":"3:5",
-  "stage":"Screens","screensStarted":true,"phase":"in_progress","checkpointDate":"2026-09-30",
-  "currentScreen":"S04 review / 赛后复盘","currentRoute":"review","currentScreenPhase":"accepted_visual_and_local_states","currentExecutionFinished":true,
-  "acceptedRouteCount":4,"routeCount":17,"remainingUnstartedRouteCount":13,"fullyIntegratedRouteCount":0,
-  "acceptedRouteCountDefinition":"Editable visual composition, representative preset local states and bounded prototype; not every interaction, arbitrary input, runtime or complete product end-to-end acceptance.",
-  "nextScreen":"S05 runs / 运行记录","nextScreenStarted":false,"allPlannedPatternsComplete":true,
-  "authority":"Figma determines visual geometry, typography, colors and spacing. Application code supplies only functional, interaction and data semantics.",
-  "statePath":"docs/FIGMA_SCREENS_STATE.json","currentScreenStatePath":"docs/FIGMA_SCREEN_REVIEW_STATE.json","currentScreenStateBlob":"c748f1c3c69454b50b8d0846f67a3f8d201f9d7f","currentScreenStateCommit":"cd56465c8488767a6b8fab7a3a8ef57798319490",
-  "recordPath":"docs/FIGMA_SCREEN_REVIEW.md","recordCommit":"2caa3a2e8dd7b4f2589783df3117d8ae61892498","planPath":"docs/FIGMA_SCREENS_PLAN.md","screensPlanCommit":"7fdd8ec7ac6dfab35e1c72f124e733f279c78db5",
-  "indexBlobShas":{"docs/README.md":"d711a256479edb0c4fd2861dccdf3a79c403860d","docs/FIGMA_SCREENS_PLAN.md":"1ce5b22b2a1a87d128f8e4d8b37ed0a0387721e9","docs/FIGMA_PATTERN_SCREEN_PLAN.md":"073d413ee379305e5e376b0d571278da102ac249"},
-  "previousCheckpoint":{"path":"docs/FIGMA_SCREENS_STATE.json","ref":"ff60437ccd38e1ed169cbebad0b21f7d8610e128","currentScreen":"S03 prediction","retainedInGitHistory":true},
-  "acceptedScreens":{
-    "S01":{"route":"dashboard","phase":"accepted_visual_and_local_states","recordPath":"docs/FIGMA_SCREEN_DASHBOARD.md","stateSnapshotRef":"7a6891c571ffa07015774ac6b572c93b12c4c315","defaultLight":"453:2","defaultDark":"455:687","compactCollapsed":"455:1387","reviewHub":"458:7026","productStateFrameCount":15,"laterIntegration":"S02 added four default incoming links; S03 added two prediction quick actions; S04 added two review quick actions to No Selection."},
-    "S02":{"route":"lineups","phase":"accepted_visual_and_local_states","recordPath":"docs/FIGMA_SCREEN_LINEUPS.md","statePath":"docs/FIGMA_SCREEN_LINEUPS_STATE.json","defaultLight":"466:4436","defaultDark":"470:18992","builder":"467:5786","reviewHub":"478:22468","productStateFrameCount":33,"dialogFrameCount":7,"laterIntegration":"S03 added five incoming prediction links; original blocked continue remains Disabled. S04 added two Page/review links to No Selection."},
-    "S03":{"route":"prediction","phase":"accepted_visual_and_local_states","recordPath":"docs/FIGMA_SCREEN_PREDICTION.md","statePath":"docs/FIGMA_SCREEN_PREDICTION_STATE.json","defaultLight":"487:22278","defaultDark":"490:24140","research":"490:23650","reviewHub":"498:32144","productStateFrameCount":33,"dialogFrameCount":3,"laterIntegration":"S04 added two default Page/review links to No Selection; model/provider and readiness contracts remain unchanged."},
-    "S04":{"route":"review","phase":"accepted_visual_and_local_states","recordPath":"docs/FIGMA_SCREEN_REVIEW.md","statePath":"docs/FIGMA_SCREEN_REVIEW_STATE.json","defaultLight":"505:33973","defaultDark":"505:35345","noSelection":"505:34022","compact":"505:35394","results":"505:34953","reviewHub":"509:48662","productStateFrameCount":33,"dialogFrameCount":18,"dialogCountIncludesNineReadOnlyStepInstructions":true}
+  "schemaVersion": 1,
+  "runId": "footfigma-screens-runs-2026-09-30",
+  "repo": "uniquenesssta/123", "branch": "ui-design-system", "fileKey": "PN0Whgu6HLWIHx4Mv6aHfu", "page": "3:5",
+  "stage": "Screens", "screensStarted": true, "phase": "in_progress", "checkpointDate": "2026-09-30",
+  "currentScreen": "S05 runs / 运行记录", "currentRoute": "runs", "currentScreenPhase": "accepted_visual_and_local_states", "currentExecutionFinished": true,
+  "acceptedRouteCount": 5, "routeCount": 17, "remainingUnstartedRouteCount": 12, "fullyIntegratedRouteCount": 0,
+  "acceptedRouteCountDefinition": "Editable visual composition, representative preset local states and bounded prototype; not arbitrary inputs, every control, runtime operations or full product end-to-end acceptance.",
+  "nextScreen": "S06 teams / 球队", "nextScreenStarted": false, "allPlannedPatternsComplete": true,
+  "authority": "Figma determines visual geometry, typography, spacing and color; application source provides functional, interaction and data semantics only.",
+  "statePath": "docs/FIGMA_SCREENS_STATE.json", "currentScreenStatePath": "docs/FIGMA_SCREEN_RUNS_STATE.json",
+  "currentScreenStateBlob": "bc618ef967eb55981462509a6add1fc9b6898d96", "currentScreenStateCommit": "d3471b7cd41b2c3a08aadb3c5e3e03956f788363",
+  "recordPath": "docs/FIGMA_SCREEN_RUNS.md", "recordCommit": "be3131d9342116a9e5c8b1ffa14fd0cc35bd6950",
+  "planPath": "docs/FIGMA_SCREENS_PLAN.md", "screensPlanCommit": "7756a1969b9c15a4eb6b609fba0a6723262fa31c",
+  "indexBlobShas": {"docs/README.md":"2282afed57b8bf46d6b7aa29ec8547af2c8512c5","docs/FIGMA_SCREENS_PLAN.md":"e5e582ddaa04ab797cb29d80899e712897a215a4","docs/FIGMA_PATTERN_SCREEN_PLAN.md":"fa58c1c1e99e3bb64932ec2d7d5e5a45840f3e56"},
+  "previousCheckpoint": {"path":"docs/FIGMA_SCREENS_STATE.json","ref":"1d2b9b78d4d7bf2e589c81e69e4fef89638c98cb","currentScreen":"S04 review","retainedInGitHistory":true},
+  "acceptedScreens": {
+    "S01": {"route":"dashboard","phase":"accepted_visual_and_local_states","recordPath":"docs/FIGMA_SCREEN_DASHBOARD.md","stateSnapshotRef":"7a6891c571ffa07015774ac6b572c93b12c4c315","defaultLight":"453:2","defaultDark":"455:687","compactCollapsed":"455:1387","reviewHub":"458:7026","productStateFrameCount":15,"laterIntegration":"S02 added four default matches links, S03 two prediction quick actions, S04 two review quick actions to No Selection. S05 did not change S01."},
+    "S02": {"route":"lineups","phase":"accepted_visual_and_local_states","recordPath":"docs/FIGMA_SCREEN_LINEUPS.md","statePath":"docs/FIGMA_SCREEN_LINEUPS_STATE.json","defaultLight":"466:4436","defaultDark":"470:18992","builder":"467:5786","reviewHub":"478:22468","productStateFrameCount":33,"dialogFrameCount":7,"laterIntegration":"S03 added five incoming prediction links; blocked continue remains Disabled. S04 added two review links to No Selection. S05 added two Page/runs links preserving representative Light/Dark."},
+    "S03": {"route":"prediction","phase":"accepted_visual_and_local_states","recordPath":"docs/FIGMA_SCREEN_PREDICTION.md","statePath":"docs/FIGMA_SCREEN_PREDICTION_STATE.json","defaultLight":"487:22278","defaultDark":"490:24140","research":"490:23650","reviewHub":"498:32144","productStateFrameCount":33,"dialogFrameCount":3,"laterIntegration":"S04 added two review links to No Selection; S05 added two Page/runs links. Model/provider/readiness invariants unchanged."},
+    "S04": {"route":"review","phase":"accepted_visual_and_local_states","recordPath":"docs/FIGMA_SCREEN_REVIEW.md","statePath":"docs/FIGMA_SCREEN_REVIEW_STATE.json","defaultLight":"505:33973","defaultDark":"505:35345","noSelection":"505:34022","compact":"505:35394","results":"505:34953","reviewHub":"509:48662","productStateFrameCount":33,"dialogFrameCount":18,"dialogCountIncludesNineReadOnlyStepInstructions":true,"laterIntegration":"S05 added two Page/runs links to representative Light/Dark lists; no earlier workflow or write guard was changed."},
+    "S05": {"route":"runs","phase":"accepted_visual_and_local_states","recordPath":"docs/FIGMA_SCREEN_RUNS.md","statePath":"docs/FIGMA_SCREEN_RUNS_STATE.json","defaultLight":"516:48546","defaultDark":"516:50441","compact":"516:50585","detail":"516:49577","missingDetail":"516:49721","reviewHub":"521:55004","productStateFrameCount":18,"dialogFrameCount":14,"contextMenuFrameCount":1}
   },
-  "framesArePrimaryEntryPointsOnly":true,
-  "frames":{"NoSelection":"505:34022","MatchLoaded":"505:33973","PreviewReady":"505:34365","DefaultDark":"505:35345","Compact":"505:35394","ResultsEvents":"505:34953","ResultsDark":"505:35443","ResultsCompact":"505:35492","ManualEntry":"505:35051","ManualInvalid":"505:35100","HistoryList":"509:48632","DatabaseRequired":"505:35296"},
-  "allCurrentFramesListedIn":"docs/FIGMA_SCREEN_REVIEW_STATE.json","productStateFrameCount":33,"totalAcceptedProductStateFrameCount":114,"productStateCountIsNotRouteCount":true,"reviewHub":"509:48662","reviewHubIsProductRoute":false,
-  "crossRouteIntegration":{
-    "status":"partial","newIncomingLinkCount":6,
-    "incomingS01":[{"root":"453:2","control":"Navigate / review","to":"505:34022"},{"root":"455:687","control":"Navigate / review","to":"505:34022"}],
-    "incomingS02":[{"root":"466:4436","control":"Page/review","to":"505:34022"},{"root":"470:18992","control":"Page/review","to":"505:34022"}],
-    "incomingS03":[{"root":"487:22278","control":"Page/review","to":"505:34022"},{"root":"490:24140","control":"Page/review","to":"505:34022"}],
-    "entryContract":"No Selection; no automatic transfer of previous page's match, package, permission or theme. Representative Dark scenes are separately reviewed.",
-    "s04Returns":["dashboard","lineups","prediction"],"all17RoutesIntegrated":false,
-    "remainingTargets":"S05-S17 and all other state-preserving route/theme/viewport/draft combinations. Never use old Pattern QA as a product destination."
+  "framesArePrimaryEntryPointsOnly": true,
+  "frames": {"List":"516:48546","ListDark":"516:50441","ListCompact":"516:50585","RecordDetail":"516:49577","RecordMissingData":"516:49721","DetailDark":"516:50878","DetailCompact":"516:51022","RefreshError":"516:49289","LongList":"516:49433","DatabaseRequired":"516:50153","DatabaseConnectionError":"516:50297","HiddenResultPreset":"516:51271"},
+  "allCurrentFramesListedIn": "docs/FIGMA_SCREEN_RUNS_STATE.json", "productStateFrameCount": 18, "totalAcceptedProductStateFrameCount": 132, "productStateCountIsNotRouteCount": true,
+  "reviewHub": "521:55004", "reviewHubIsProductRoute": false,
+  "crossRouteIntegration": {
+    "status":"partial", "newIncomingLinkCount":6,
+    "incomingS02":[{"root":"466:4436","control":"Page/runs","to":"516:48546"},{"root":"470:18992","control":"Page/runs","to":"516:50441"}],
+    "incomingS03":[{"root":"487:22278","control":"Page/runs","to":"516:48546"},{"root":"490:24140","control":"Page/runs","to":"516:50441"}],
+    "incomingS04":[{"root":"505:33973","control":"Page/runs","to":"516:48546"},{"root":"505:35345","control":"Page/runs","to":"516:50441"}],
+    "entryContract":"Generic runs list, with named representative Light/Dark targets; does not transfer arbitrary selected run ID, filters or permissions.",
+    "s05GenuineReturns":["dashboard","lineups","prediction","review"],
+    "all17RoutesIntegrated":false, "remainingTargets":"S06-S17, other genuine target backfills and complete theme/collapse/viewport/context/scroll combinations. No old Pattern QA destination counted as a product screen."
   },
-  "qa":{"status":"PASS","scope":"S04 editable visuals, representative preset local states and bounded prototype.","nonHiddenNodesChecked":13298,"nonHiddenNestedInstancesChecked":5246,"ordinaryNonDisabledTextLayersMeasured":3189,"unintendedOverflow":0,"intentionalVerticalScrollRegions":10,"brokenMainComponents":0,"unboundVisibleSolidPaints":0,"topLevelOverlap":0,"undersizedButtons":0,"navigationAndOverlayLinks":531,"closeActions":54,"otherComponentOrInheritedActions":93,"reachableS04States":33,"reachableDialogs":18,"brokenPrototypeTargets":0,"disabledControlsChecked":256,"disabledControlsWithReactions":0,"minimumOrdinaryTextContrastLight":4.532655704725225,"minimumOrdinaryTextContrastDark":6.862518790811412,"newScreenMasters":0},
-  "invariants":{"viewStepDoesNotGrantExecution":true,"previewStaleConfirmationDisabled":true,"writeInProgressRepeatSubmitDisabled":true,"reviewGenerationDoesNotGrantSettlement":true,"settlementDoesNotAutoAcceptCandidate":true,"revisionDoesNotAutoVerifyEvent":true,"cancelledEventNotInEffectiveScore":true,"sixFinalWriteConfirmationsHaveZeroReactions":true,"runtimeWritesPerformed":false},
-  "sharedTotals":{"controlsSets":61,"controlsVariants":506,"patternSets":17,"patternVariants":125,"productionSingles":13,"variables":193,"textStyles":13,"effects":6},
-  "source":{"review":{"path":"src/pages/review.ts","ref":"main","blob":"4a18002bdd6937cec1d1d076f521dcee8e2f4b5e"},"workflow":{"path":"src/app/matchReviewWorkflow.ts","ref":"main","blob":"504730f5c136c04307d5333377021104f6c18e15"}},
-  "pendingForCurrentVisualScope":[],
-  "pending":["S05 runs and twelve other unstarted routes","Remaining genuine route target backfill and full cross-route integration","Arbitrary inputs and selectors, complete manual valid-submit matrix, player supplemental-data controls","Runtime files/SHA/preflight/confirmation/writes/settlement/candidate acceptance, transaction/race/permission handling","Keyboard/focus and complete theme/collapse/scroll/draft persistence"],
-  "limitations":["33 preset states and 18 dialogs are one route. Nine dialogs are read-only step instructions.","All teams, times, scores, fingerprints, datasets and outcomes are demonstration data.","Six final write confirmation buttons have no execution connection; no fake automatic success transitions.","File selection opens only explanatory preview; no file read/hash, database operation, settlement or ability write occurred.","Manual blank/invalid/missing-lineup examples are designed, not a complete arbitrary-input implementation.","The six generic inbound links reset to No Selection and do not preserve the originating theme/identity. Full runtime continuity remains unimplemented.","Current/Blocked visual progress is distinct from Active viewed step; older screenshots and WIP checkpoints cannot override accepted state."],
-  "applicationSourceModified":false,"existingMastersModified":false,"sharedVariablesModified":false,"priorScreenVisualsModified":false,"priorScreenPrototypeNodesModified":6,"newScreenMasters":0
+  "qa": {
+    "status":"PASS", "scope":"S05 editable visuals, representative preset states and bounded prototype; final localized label bounds and screenshot rechecked.",
+    "nonHiddenNodesChecked":5311, "nonHiddenNestedInstancesChecked":1944, "ordinaryNonDisabledTextLayersMeasured":1532,
+    "unintendedOverflow":0, "intentionalVerticalScrollRegions":5, "brokenMainComponents":0, "unboundVisibleSolidPaints":0, "topLevelOverlap":0, "undersizedButtons":0,
+    "navigationAndOverlayLinks":216, "closeActions":41, "otherComponentOrInheritedActions":172, "reachableS05States":18, "reachableDialogs":14, "contextMenuReachable":true, "brokenPrototypeTargets":0,
+    "disabledControlsChecked":127, "disabledControlsWithReactions":0, "minimumOrdinaryTextContrastLight":4.5048167489431785, "minimumOrdinaryTextContrastDark":6.568170274649306, "newScreenMasters":0
+  },
+  "invariants": {
+    "historyHideRetainsRunMatrixSnapshotReviewLineage":true, "hideDoesNotDeleteMatchOrArchiveLineup":true,
+    "unknownProbabilityIsNotZero":true, "missingModelIsNotInventedDefault":true, "readinessDoesNotGrantRerunPermission":true,
+    "sixDefaultRowsKeepIdentitySpecificOpenAndHideTargets":true, "refreshRetainsSixRows":true, "hiddenPresetHasOnlyBThroughF":true,
+    "eightHideRelatedFinalConfirmationsHaveZeroReactions":true, "emptyDatabaseCredentialSubmitDisabled":true,
+    "runtimeWritesPerformed":false, "actualRightClickImplemented":false
+  },
+  "source": {"runs":{"path":"src/pages/runs.ts","ref":"main","blob":"c4374872117775c17570a405afe63f73842d860a"},"modal":{"path":"src/app/modal.ts","ref":"main","blob":"750bed8b30083e27c6ec5d264d51ea18636e7717"}},
+  "sharedTotals": {"controlsSets":61,"controlsVariants":506,"patternSets":17,"patternVariants":125,"productionSingles":13,"variables":193,"textStyles":13,"effects":6},
+  "pendingForCurrentVisualScope": [],
+  "pending": [
+    "S06 teams and eleven other unstarted routes",
+    "Remaining genuine route targets and complete cross-route integration",
+    "Arbitrary input/selector/detail behavior; complete manual valid-submit and player supplemental fields from S04",
+    "Runtime DB/read/hide/ambiguous-error reconciliation, files/SHA/permissions/model/Worker/settlement/candidate acceptance",
+    "Real right-click dispatch, keyboard/focus, and complete theme/collapse/scroll/draft/context persistence"
+  ],
+  "limitations": [
+    "18 product states, 14 dialogs and a context menu are one route, not independent product pages.",
+    "All matches, scores, probabilities, fingerprints and outcomes are preset demonstrations.",
+    "Final hide confirmations have no write reaction; loading/error/hidden outcomes are independent reviewer-selected states.",
+    "Long-list repeated rows are layout stress only, with row actions and refresh disabled.",
+    "Readiness, source identity, results and future execution permission remain distinct.",
+    "Six new incoming links preserve only representative Light/Dark targets, not arbitrary selection or full runtime continuity.",
+    "Some refresh, database, visibility, context-menu and workspace controls are only visual/semantic specifications; not all controls are claimed interactive."
+  ],
+  "recovery": {"order":["docs/README.md","docs/FIGMA_SCREENS_PLAN.md","docs/FIGMA_SCREENS_STATE.json","docs/FIGMA_SCREEN_RUNS_STATE.json","docs/FIGMA_SCREEN_RUNS.md","actual Figma root and instance references"],"staleWipDoesNotOverrideAccepted":true,"networkFailureReadbackConfirmedAll18Composed":true,"descendantIds":"Resolve normalized SLOT virtual IDs by stable root, semantic name and actual main-component reference; do not guess."},
+  "applicationSourceModified":false, "existingMastersModified":false, "sharedVariablesModified":false, "priorScreenVisualsModified":false, "priorScreenPrototypeNodesModified":6, "newScreenMasters":0
 }
