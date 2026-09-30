@@ -4,15 +4,15 @@
 
 ## 当前状态
 
-截至 **2026-09-30**，图标与既定底层组件均完成，Controls保持 **61个组件集 /506个变体**。**Patterns 六组计划全部完成**：PC App Shell、Page Heading / Toolbar / Filter Bar / Selection Command Bar、Metric Card / Action Card / Panel、Master–Detail–Inspector、Workflow Stepper / Timeline、AI Chat。产品 Screens 尚未开始。
+截至 **2026-09-30**，图标与既定底层组件均完成，Controls保持 **61个组件集 /506个变体**。**Patterns 六组计划全部完成**：PC App Shell、Page Heading / Toolbar / Filter Bar / Selection Command Bar、Metric Card / Action Card / Panel、Master–Detail–Inspector、Workflow Stepper / Timeline、AI Chat。
 
-Patterns 当前为 **17个组件集 /125个变体 /13个生产单组件**。AI Chat 新增 History Item 10个 Selected × State variants、Attachment 2个只读 Kind variants、Message 3个有效 Kind variants、Composer 6个请求状态，以及 History Sidebar / Workspace 两个 SLOT 型单组件。Foundations 保持 **193 variables /13 text styles /6 effects**。
+**产品 Screens 已开始：S01 Dashboard / 数据总览的视觉与本页状态验收完成，1 / 17 条路由；其余16条尚未开始。** 本页15个状态画面仍只计1条路由；跨页面导航集成尚未完成，不能将本页验收称为完整产品端到端通过。
 
-AI Chat 已检查 Light、Dark、760px 窄宽、完整状态矩阵、上下文显式勾选、空历史、长文本与独立消息滚动。7个预置场景、17条原生连接、A/B 会话隔离及错误/取消草稿保留已读回；深层351个可见嵌套实例无失效引用，非预期越界0。普通文字最低对比度 Light 4.53:1 / Dark 6.86:1。本组没有修改既有 Controls 主组件或应用代码；预置原型不替代运行时异步与键盘测试。
+当前恢复入口为 [Screens状态](FIGMA_SCREENS_STATE.json)，执行顺序见 [17路由 Screens计划](FIGMA_SCREENS_PLAN.md)，本页证据见 [S01 Dashboard记录](FIGMA_SCREEN_DASHBOARD.md)。**下一项：S02 `lineups` / 比赛中心 · 比赛与阵容，尚未开始。**
 
-完整证据见 [Shell](FIGMA_PC_APP_SHELL.md)、[Page Bars](FIGMA_PAGE_HEADING_TOOLBAR_FILTER_SELECTION.md)、[Card / Panel](FIGMA_METRIC_ACTION_PANEL.md)、[Master–Detail–Inspector](FIGMA_MASTER_DETAIL_INSPECTOR.md)、[Workflow / Timeline](FIGMA_WORKFLOW_STEPPER_TIMELINE.md)、[AI Chat](FIGMA_AI_CHAT.md)。**最新恢复依据：[AI Chat 检查点](FIGMA_AI_CHAT_STATE.json)**；此前 [Workflow 检查点](FIGMA_WORKFLOW_STEPPER_TIMELINE_STATE.json) 作为历史记录保留。
+Patterns仍为 **17个组件集 /125个变体 /13个生产单组件**，Foundations仍为 **193 variables /13 text styles /6 effects**。S01只组合现有真实实例，没有新增主组件、修改应用代码或全局变量。
 
-## Patterns 执行顺序
+## Patterns 执行记录
 
 - [x] PC App Shell：一级导航、二级导航、Topbar、折叠与主题保持。
 - [x] Page Heading / Toolbar / Filter Bar / Selection Command Bar。
@@ -21,25 +21,30 @@ AI Chat 已检查 Light、Dark、760px 窄宽、完整状态矩阵、上下文�
 - [x] Workflow Stepper / Timeline。
 - [x] AI Chat：历史侧栏、消息、只读附件、Composer。
 
-依赖已按组归档；保留各组独立记录，不合并为一份大文档。恢复时以最新明确检查点及其对应画布为准，不以旧截图、旧组统计或无内容的 handoff 回退阶段。
+依赖按组归档，不合并为一份大文档。证据见 [Shell](FIGMA_PC_APP_SHELL.md)、[Page Bars](FIGMA_PAGE_HEADING_TOOLBAR_FILTER_SELECTION.md)、[Card / Panel](FIGMA_METRIC_ACTION_PANEL.md)、[Master–Detail–Inspector](FIGMA_MASTER_DETAIL_INSPECTOR.md)、[Workflow / Timeline](FIGMA_WORKFLOW_STEPPER_TIMELINE.md)、[AI Chat](FIGMA_AI_CHAT.md)。
 
-## 下一阶段：Screens
+[AI Chat检查点](FIGMA_AI_CHAT_STATE.json) 和 [Workflow检查点](FIGMA_WORKFLOW_STEPPER_TIMELINE_STATE.json) 保留为历史记录；它们的 Screens未开始字段已由本轮 Screens检查点取代。
 
-- [ ] **产品 Screens：17条页面链路 / 7个导航模块，尚未开始。**
+## 当前阶段：Screens
 
-下一次推进先读取页面范围并确定当前屏幕的语义入口、状态与组件依赖，再拼装产品页面；本次不提前创建 Screens。
+- [x] S01 `dashboard`：数据总览视觉与本页状态验收。
+- [ ] S01跨页面目标回填：lineups / prediction / review / analytics / players。
+- [ ] **S02 `lineups`：下一项，尚未开始。**
+- [ ] S03–S17：见独立Screens计划，均尚未开始。
+- [ ] 完整跨路由原型联调。
 
-当前 Shell 内容插槽、QA 预置数据、Workflow Lab、AI Chat Lab 及 AI Chat/Workspace 等可复用 Pattern 都不算已完成的产品 Screens。
+S01包含默认Light/Dark、桌面与紧凑侧栏展开/折叠、系统详情、数据库未配置/连接中/失败/成功、首次加载、保留旧数据刷新、读取失败及已验证空数据。15个产品状态画面加1个非产品Review Hub，47条自有页面导航连接；另有137条继承组件交互，不混算页面数。
 
-每个页面必须：
+最终深层检查：3,699个可见节点、1,422个可见嵌套实例；非预期越界、失效引用、未绑定可见颜色、顶层重叠均为0。679个普通非Disabled文字层最低对比度 Light 4.53:1 / Dark 6.86:1；134个可见Disabled控件均无反应连接。连接错误页2px纵向内容超出属于有意滚动，单独记录。
 
-- 只引用已完成的组件和模式实例；
-- 覆盖适用的默认、加载、空、错误、禁用、确认与成功反馈；
-- 每个按钮、输入、菜单均能追踪组件来源与交互目标；
-- 依据Figma确定视觉尺寸，不回到旧代码推导比例。
+## 页面与实现边界
 
-## 后续实现边界
+产品页面只引用已完成组件和模式；有必要的新依赖单独补缺。适用的状态、控件来源与目标必须可追踪；未完成目标不得通过连接旧QA插槽来冒充完成。
 
-本阶段只完成Figma模式与设计记录，没有修改应用代码。原型展示预置数据变化，不替代真实键盘焦点、网络竞态、表单和滚动持久化测试。
+所有Review、Pattern示例、Workflow Lab、AI Chat Lab和本轮Review Hub都不是额外产品路由。状态页计数、页面路由计数、本页原型通过、跨路由集成和真实应用测试分别记录。
 
-Workflow 的查看步骤与执行权限独立；Timeline 的核验、修订、取消及有效比分由真实数据驱动。AI Chat 保持纯文本、只读上下文主动勾选、原会话身份不变；Pending 与取消均绑定 sessionId / requestId，迟到响应不能串入其他会话或覆盖新草稿。附件只覆盖上下文与历史文件记录，不重新加入新上传、生成文件或数据库执行能力。
+本阶段没有修改应用代码。原型使用预置状态；连接、重试和加载定时跳转不执行真实后端操作，不替代键盘焦点、网络竞态、输入校验、权限、滚动与草稿持久化测试。
+
+保持既有业务边界：Workflow查看步骤与执行权限独立；Timeline核验、修订、取消和有效比分由真实数据驱动；AI Chat纯文本、只读上下文主动勾选、原会话身份不变，Pending与取消绑定sessionId/requestId；附件不扩展为上传、生成文件或数据库执行。
+
+恢复时先读本计划与 `FIGMA_SCREENS_STATE.json`，再核对当前画布。组件总记录中的阶段统计保留为历史快照，不能覆盖更新的Screens进度。
