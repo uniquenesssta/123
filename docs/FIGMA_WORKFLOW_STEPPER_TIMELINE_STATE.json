@@ -1,0 +1,82 @@
+{
+  "schemaVersion": 1,
+  "runId": "footfigma-workflow-timeline-2026-09-30",
+  "repo": "uniquenesssta/123",
+  "branch": "ui-design-system",
+  "fileKey": "PN0Whgu6HLWIHx4Mv6aHfu",
+  "page": "3:4",
+  "phase": "accepted",
+  "completedAt": "2026-09-30",
+  "completedGroup": "Workflow Stepper / Timeline",
+  "nextGroup": "AI Chat: history sidebar, messages, attachments, Composer",
+  "nextGroupStarted": false,
+  "screensStarted": false,
+  "applicationSourceModified": false,
+  "existingControlsMastersModified": false,
+  "authority": "Figma for visual geometry, typography and colors; source only for functional/interaction/data semantics.",
+  "recordPath": "docs/FIGMA_WORKFLOW_STEPPER_TIMELINE.md",
+  "statePath": "docs/FIGMA_WORKFLOW_STEPPER_TIMELINE_STATE.json",
+  "previousRoot": "418:15663",
+  "source": {"branch":"main","path":"src/pages/review.ts","sha":"4a18002bdd6937cec1d1d076f521dcee8e2f4b5e"},
+  "pending": [],
+  "root": "424:16193",
+  "sections": {"steps":"424:16196","timeline":"424:16199","parents":"424:16202","review":"424:16205"},
+  "sets": {"Workflow Step":"424:16593","Timeline Item":"424:16815"},
+  "productionComponents": {"Workflow Stepper":"425:16285","Timeline":"425:16427"},
+  "slotNodes": {"Steps":"425:16289","Events":"425:16431"},
+  "stepVariantOrder": "State Default, Hover, Pressed, Focus, Disabled; within each State: Progress Locked, Current, Done, Blocked",
+  "stepVariants": ["424:16208","424:16227","424:16247","424:16265","424:16285","424:16304","424:16324","424:16342","424:16362","424:16381","424:16401","424:16419","424:16439","424:16458","424:16478","424:16496","424:16516","424:16535","424:16555","424:16573"],
+  "timelineVariantOrder": "Revision Original, Corrected, Cancelled; within each Revision: Verification Verified, Unverified, Disputed",
+  "timelineVariants": ["424:16594","424:16618","424:16643","424:16669","424:16693","424:16718","424:16744","424:16768","424:16791"],
+  "qaRoot": "425:16511",
+  "reviewFrames": {"Light1120":"425:16512","Dark1120":"425:16706","Narrow760":"425:16712","EmptyTimeline":"425:16930","WorkflowStateMatrix":"425:17064","VerificationRevisionMatrix":"425:17357"},
+  "prototypeEntry": "427:17420",
+  "prototypeFrames": {"CurrentStep04":"427:17420","BlockedStep04":"427:17614","RevisitCompletedStep02":"427:17806","PreviewPassedConfirmPending":"427:17980"},
+  "prototypeLinks": [["427:17538","427:17614"],["427:17562","427:17980"],["I427:17618;425:16289;427:17748","427:17806"],["427:17760","427:17980"],["427:17774","427:17420"],["I427:17810;425:16289;427:17924","427:17614"],["427:17948","427:17420"],["427:18134","427:17420"]],
+  "disabledWriteControls": ["427:17576","427:17788","427:17962","427:18148"],
+  "baseline": {"patternSets":11,"patternVariants":75,"productionSingles":9,"variables":191,"textStyles":13,"effects":6},
+  "totals": {"patternSets":13,"patternVariants":104,"productionSingles":11,"variables":193,"textStyles":13,"effects":6,"controlsSets":61,"controlsVariants":506},
+  "qa": {
+    "status":"PASS",
+    "visibleNestedInstancesChecked":469,
+    "ordinaryVisibleTextLayersMeasured":691,
+    "overflow":0,
+    "brokenMainComponents":0,
+    "unboundVisibleSolidPaints":0,
+    "ownMissingTextStyles":0,
+    "topLevelOverlap":0,
+    "prototypeLinks":8,
+    "brokenPrototypeTargets":0,
+    "disabledWriteControlReactions":0,
+    "minimumOrdinaryTextContrastLight":4.532655704725225,
+    "minimumOrdinaryTextContrastDark":6.862518790811412
+  },
+  "limitations": [
+    "Preset prototype only: row 02/04 revisit paths and simulation buttons are wired, not the full nine-step backend workflow.",
+    "Real keyboard/focus/accessibility interaction, network races, persistence and execution permissions require implementation tests.",
+    "Host owns step permissions, event ordering, null-score handling, effective-event calculation and final connector visibility.",
+    "Legacy Badge typography remains inherited; no global Controls style cleanup is claimed."
+  ],
+  "designRecordCommit": "fcc3e51fa15a207b8355bf16d47f72c885f77b5a",
+  "indexBlobShas": {
+    "docs/README.md":"0e0c5717deb6e0ae144949a1a847721f25d9b2a5",
+    "docs/FIGMA_PATTERN_SCREEN_PLAN.md":"0982f682d35bc8dabc85000afaaa7f80761f0610",
+    "docs/FIGMA_COMPONENT_RECORD.md":"38ef1ecc9d070cc9d64d504a7215a04d40c0df7b"
+  },
+  "ownedPrimaryNodeCount": 532,
+  "ownedPrimaryNodeRangesEncoding": "For each prefix, expand only the listed inclusive ranges and prepend prefix + colon. The ranges encode actual read-back IDs, not inferred gaps. Includes hidden primary nodes; inherited virtual nodes are not owned masters.",
+  "ownedPrimaryNodeRanges": {
+    "424":"16193-16211,16220-16223,16225-16230,16239-16242,16245-16250,16257-16260,16263-16268,16277-16280,16283-16288,16297-16300,16302-16307,16316-16319,16322-16327,16334-16337,16340-16345,16354-16357,16360-16365,16374-16377,16379-16384,16393-16396,16399-16404,16411-16414,16417-16422,16431-16434,16437-16442,16451-16454,16456-16461,16470-16473,16476-16481,16488-16491,16494-16499,16508-16511,16514-16519,16528-16531,16533-16538,16547-16550,16553-16558,16565-16568,16571-16576,16585-16588,16591-16597,16604-16610,16613,16616-16621,16630-16636,16638,16641-16646,16655-16661,16664,16667-16672,16679-16685,16688,16691-16696,16705-16711,16713,16716-16721,16730-16736,16739,16742-16747,16755-16761,16764,16766-16771,16779-16785,16787,16789-16794,16802-16808,16811,16813-16815",
+    "425":"16285-16290,16303,16316,16329,16348,16367,16382,16397,16412,16427-16432,16451,16472,16492,16511-16515,16625,16705-16715,16825,16929-16932,17064-17069,17080-17082,17093-17095,17108-17110,17125-17127,17138-17140,17151-17153,17166-17168,17183-17185,17196-17198,17209-17211,17224-17226,17241-17243,17254-17256,17267-17269,17282-17284,17299-17301,17312-17314,17325-17327,17340-17342,17357-17362,17380-17382,17402-17404,17425-17427,17445-17447,17467-17469,17489-17491,17510-17512,17531-17533",
+    "427":"17420-17424,17534-17538,17562,17576,17613-17618,17756-17760,17774,17788,17805-17810,17944-17948,17962,17979-17984,18130-18134,18148,18165,18174"
+  },
+  "localContrastOverrides": {
+    "paintVariable":"VariableID:19:6",
+    "badgeTextNodeIds":["I424:16223;66:401","I424:16242;66:403","I424:16260;66:405","I424:16280;66:409","I424:16300;66:401","I424:16319;66:403","I424:16337;66:405","I424:16357;66:409","I424:16377;66:401","I424:16396;66:403","I424:16414;66:405","I424:16434;66:409","I424:16454;66:401","I424:16473;66:403","I424:16491;66:405","I424:16511;66:409","I424:16531;66:401","I424:16550;66:403","I424:16568;66:405","I424:16588;66:409","I424:16610;66:405","I424:16636;66:401","I424:16661;66:407","I424:16685;66:405","I424:16688;66:403","I424:16711;66:401","I424:16713;66:403","I424:16736;66:407","I424:16739;66:403","I424:16761;66:405","I424:16764;66:401","I424:16785;66:401","I424:16787;66:401","I424:16808;66:407","I424:16811;66:401"],
+    "ownTextNodeIds":["424:16195","424:16198","424:16302","424:16322","424:16340","424:16360","424:16201","424:16595","424:16617","424:16619","424:16642","424:16644","424:16668","424:16670","424:16692","424:16694","424:16717","424:16719","424:16743","424:16745","424:16767","424:16769","424:16790","424:16792","424:16814","424:16204","425:16288","425:16430","424:16207","427:18174","427:17422","427:17616","427:17808","427:17982"]
+  },
+  "newVariableDefinitions": [
+    {"id":"VariableID:424:16191","name":"layout/workflow/rail-width","value":320,"scopes":["WIDTH_HEIGHT"],"WEB":"var(--ui-workflow-rail-width)"},
+    {"id":"VariableID:424:16192","name":"layout/timeline/time-width","value":64,"scopes":["WIDTH_HEIGHT"],"WEB":"var(--ui-timeline-time-width)"}
+  ]
+}
