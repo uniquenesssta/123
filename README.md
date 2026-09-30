@@ -2,7 +2,7 @@
 
 当前版本 **0.23.0**。本仓库是平台、数据库、数据准备、路由、工作台与外部模型调用入口的公开版本；真实 P4/P7 预测引擎、参数、Profile、固定比赛、私有研究提示词及模型专用固定回归资产不随仓库分发。
 
-R1–R6 累计补审覆盖 43 个任务节点。根据用户决定，R7-01 后新增 R7-02～06 审计整改，原 R7-02～10 顺延为 R7-07～15；优化拆分、验证与记录约束，沿用现有 Windows 验证和最终封包新库流程，不新增持续回归体系。R7-01 的 A1～A7 修订已通过 Windows CI run `36678914535`，节点 DONE；R7-02 外部 ID 身份保护、R7-03 普通删除与历史引用保护均已通过 Windows CI 并为 DONE。R7-04 清单、验证入口和历史记录已通过 Windows CI run `36706905645` 并为 DONE；R7-05 新增 20 个关键 Application 行为测试，当前 VERIFYING，R7-06 及以后 BLOCKED。PG/XLSX/Full 单独留到最终封包新库验收。详见 [R7 任务书](docs/football-model-platform-modular-rewrite-19-docs/07-R7-match-lineup-workbook-persistence.md) 与 [阶段索引/累计审计](docs/modular-rewrite/R07-match-lineup-workbook-persistence/README.md)。
+R1–R6 累计补审覆盖 43 个任务节点。根据用户决定，R7-01 后新增 R7-02～06 审计整改，原 R7-02～10 顺延为 R7-07～15；优化拆分、验证与记录约束，沿用现有 Windows 验证和最终封包新库流程，不新增持续回归体系。R7-01 的 A1～A7 修订已通过 Windows CI run `36678914535`，节点 DONE；R7-02 外部 ID 身份保护、R7-03 普通删除与历史引用保护均已通过 Windows CI 并为 DONE。R7-04 清单、验证入口和历史记录已通过 Windows CI run `36706905645` 并为 DONE；R7-05 新增 20 个关键 Application 行为测试，精确 Windows CI run `36712015030` 已通过并 DONE；R7-06 修订四项历史数据库夹具/时间精度与 ended_previous 账本，当前 VERIFYING，R7-07 及以后 BLOCKED。PG/XLSX/Full 单独留到最终封包新库验收。详见 [R7 任务书](docs/football-model-platform-modular-rewrite-19-docs/07-R7-match-lineup-workbook-persistence.md) 与 [阶段索引/累计审计](docs/modular-rewrite/R07-match-lineup-workbook-persistence/README.md)。
 
 ## 公开边界
 
@@ -45,11 +45,17 @@ Node 开发依赖固定安装和读取自源码根目录上一级的 `../node_mo
 
 ## 模块化重写执行记录
 
-### R7-05 关键 Application 用例验证（2026-09-30，VERIFYING）
+### R7-06 历史数据库失败与账本问题收口（2026-09-30，VERIFYING）
+
+- 修订原 chain 的合法 11 人/缺阵型及 actual 隔离夹具、pair 的有效 T-6h 窗口、events 的完整 MatchResultRecord、P4 亚微秒比较与首建返回时间。PostgreSQL 精度下精确比较，不使用容差，原输入指纹保持；保留冻结不可变/幂等断言，补齐原四概率链夹具。
+- 导入在原事务持久化 ended_previous_count；现有 pair 测试复用真实 preview/commit，覆盖末行失败整批回滚、恢复后业务/账本/审计一致及成功批次重复拒绝无额外效果。18 项 broad 测试集合不变，不新建 target/runner/workflow/库。
+- 原验证器扩充并经三项破坏探针确认；架构及受影响静态门禁通过，runtime baseline 仅同步合法变更的 integration 指纹，365 类型不变。Windows 验收等待本轮 CI，四项历史失败和账本均“已修改、最终封包新库待验”，不记已关闭。详见 [阶段记录](docs/modular-rewrite/R07-match-lineup-workbook-persistence/README.md#r7-06-当前验证状态)。R7-07 及以后 BLOCKED。
+
+### R7-05 关键 Application 用例验证（2026-09-30，DONE）
 
 - 在现有 Prediction/P4 orchestration 单测和 Exchange 原用例内新增 20 个行为测试，验证真实编排的调用顺序、参数、正式/影子历史写入差异、错误阻断、取消/失败终态只读、已有快照恢复与重复执行、研究入队/状态登记失败的幂等键重试、损坏输入及导出失败副作用边界。
 - 共享 fake 只在 cfg(test) 构建可见，未选中 Port 调用立即失败；模型 fake 只验证编排，真实公开 provider 缺席仍断言返回错误且不保存成功历史。队列 fake 不代替数据库 exactly-once 或有效 XLSX 往返验收。
-- 生产逻辑、公开接口、Port/DTO、依赖/锁文件、迁移、模型资产与工作流保持；无新测试文件/target/框架/专项。原 Domain inventory 更新测试调用面，365 类型/声明摘要不变。架构及受影响静态检查通过，Windows fmt/Clippy/tests/构建/打包/启动待本轮 CI，不继承上轮 PASS；PG/XLSX/Full 仍最终封包新库待验。证据与覆盖边界见 [阶段索引](docs/modular-rewrite/R07-match-lineup-workbook-persistence/README.md#r7-05-当前验证状态)。R7-06 及以后 BLOCKED。
+- 生产逻辑、公开接口、Port/DTO、依赖/锁文件、迁移、模型资产与工作流保持；无新测试文件/target/框架/专项。原 Domain inventory 更新测试调用面，365 类型/声明摘要不变。架构及受影响静态检查通过，精确提交 `02e56bad` 的 [Windows CI run 36712015030](https://github.com/uniquenesssta/123/actions/runs/36712015030) 全通过，Application 实际 53 项全部通过；PG/XLSX/Full 仍最终封包新库待验。证据与覆盖边界见 [完成记录](docs/modular-rewrite/R07-match-lineup-workbook-persistence/R07-05-application-use-case-tests.md)。R7-06 VERIFYING，R7-07 及以后 BLOCKED。
 
 ### R7-04 架构清单、验证器与执行记录对齐（2026-09-30，DONE）
 

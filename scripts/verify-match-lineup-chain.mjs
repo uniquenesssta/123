@@ -92,4 +92,12 @@ requireTrue(main.includes('workspaceState.patchModule("prediction", { active_sec
 requireTrue(integrationTests.includes("match_lineup_chain_versions_model_selection_and_freeze_gate_are_consistent"), "阶段5 PostgreSQL端到端测试缺失");
 requireTrue(integrationTests.includes("assert!(!invalid_home.model_eligible)"), "无效阵容冻结门禁测试缺失");
 requireTrue(integrationTests.includes('snapshot_type: "T-N"') && integrationTests.includes("T-6h 数据窗口应读取窗口内最新 T-N 阵容"), "数据窗口最新记录 PostgreSQL 回归测试缺失");
+// R7-06：同一提交事务必须持久化结束旧版本计数，再写成功审计。
+const commitBody = exchange.slice(exchange.indexOf("pub async fn commit_match_lineup_import"), exchange.indexOf("pub async fn ai_match_package_context"));
+requireTrue(/ended_previous_count=\$5,skipped_count=\$6/.test(commitBody) && /\.bind\(ended_previous as i64\)/.test(commitBody), "比赛阵容导入账本漏写 ended_previous_count");
+const ledgerOffset = commitBody.indexOf("UPDATE catalog.import_batches SET status='succeeded'");
+const auditOffset = commitBody.indexOf('"match_lineup_import_committed"');
+const commitOffset = commitBody.indexOf("tx.commit().await?");
+requireTrue(ledgerOffset >= 0 && auditOffset > ledgerOffset && commitOffset > auditOffset && commitBody.slice(ledgerOffset, auditOffset).includes("execute(&mut *tx)"), "比赛阵容业务/计数/成功审计必须在单一提交事务内");
+requireTrue(integrationTests.includes("末行失败必须回滚替代阵容、前十个球员、账本与审计") && integrationTests.includes("committed.ended_previous_count, 1") && integrationTests.includes("audit_count_after, 1"), "比赛阵容账本失败重试/重复提交断言缺失");
 console.log("阶段5比赛、阵容与模型输入闭环契约验证通过。");

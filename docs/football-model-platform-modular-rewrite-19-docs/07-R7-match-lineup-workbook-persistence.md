@@ -9,7 +9,7 @@
 
 - 唯一阶段分支：`rewrite/r7-match-lineup-workbook-persistence`。
 - 规划依据：源码 `985f01816060cfd05672bdc03b6771dec7b4e842`，文档基线 `51f746729b2f94925e6382f2ae2108cf80855af6`，以及阶段 README 中 A1–A8、B1–B7 审计记录。
-- R7-01～R7-04 已完成 Windows Automated 并为 `DONE`；用户已启动 R7-05，20 个关键 Application 行为测试实现、当前 `VERIFYING`，R7-06 及以后 `BLOCKED`。数据库/XLSX/Full 单独保留最终封包新库待验，证据见阶段 README。
+- R7-01～R7-05 已完成精确提交的 Windows Automated 并为 `DONE`；R7-05 run `36712015030` 实际执行 53 个 Application 测试全通过。用户已启动 R7-06，历史夹具/时间与账本修订完成、当前 `VERIFYING`，R7-07 及以后 `BLOCKED`。数据库/XLSX/Full 单独保留最终封包新库待验，证据见阶段 README。
 - 当前状态以 `docs/modular-rewrite/R07-match-lineup-workbook-persistence/README.md` 的唯一状态表为准；历史审计中的旧编号按下表映射。
 - 允许整改触及直接相关的 Application composition/Ports、catalog identity/deletion、现有 P4 时间比较和测试；不提前实施 R8/R10 的整阶段重写。
 - 不包含前端导入 UI 重写、工作簿解析器整体验证框架建设、模型内部算法/参数修改或历史 migration 改写。
@@ -119,7 +119,7 @@
 
 ## R7-05 关键 Application 用例验证
 
-状态：`VERIFYING`，R7-04 已 DONE、用户已启动本项；20 个新增行为测试与使用清单更新完成，等待本轮 Windows CI，不能继承前项 33 个单测的 PASS。来源 B5。
+状态：`DONE`，精确提交 `02e56bad` 的 Windows run `36712015030` / job `109875821076` 全通过，53 个 Application 单测包含本项全部 20 个新增行为测试。完成记录见阶段目录，真实 PG/XLSX/Full 仍最终封包新库待验。来源 B5。
 
 - **目标**：验证真实的跨 Port 编排、失败与重试边界，不以 33 个已有测试的通过数代替关键流程覆盖。
 - **范围**：现有 Prediction/Research/P4 orchestration/Exchange 单测模块和对应 use cases；必要的最小测试注入边界。沿用现有 Rust 单测与 fake ports，不引入测试框架或私有模型资产。
@@ -131,7 +131,7 @@
 
 ## R7-06 历史数据库失败与账本问题收口
 
-状态：`BLOCKED`，依赖 R7-05。来源 B6/A8。位于原 R7-02 之前，不再把已知问题只写“后续处理”。
+状态：`VERIFYING`，R7-05 已 DONE、用户已启动本项；修订与现有测试断言、静态门禁完成，Windows 待本轮 CI，四项历史失败与账本仍最终封包新库待验。实现/责任路径见阶段 README。来源 B6/A8。位于原 R7-02 之前，不再把已知问题只写“后续处理”。
 
 - **范围**：现有 `postgres_integration.rs`、相关现存 P4 persistence 与 `match_exchange.rs`，已有 match-lineup/import tests。只修已确认缺陷和夹具，不提前迁移 R8/R10 整体架构。
 - **四项历史失败**：

@@ -1,4 +1,4 @@
-use chrono::{Duration, Utc};
+use chrono::{Duration, Timelike, Utc};
 use football_domain::{
     CompetitionDraft, CompetitionKind, CompetitionProfile, EnqueueJobDraft, EvidenceClaimDraft,
     EvidenceConflictDraft, EvidenceVerificationState, FormationDistributionQuery,
@@ -364,18 +364,25 @@ async fn structured_match_events_are_queryable_and_revision_aware() {
     .execute(&database.pool)
     .await
     .expect("创建 D2 正式赛果");
+    let result_snapshot = database
+        .store
+        .read_match_result(match_id)
+        .await
+        .expect("读取 D2 正式赛果")
+        .expect("正式赛果存在");
     sqlx::query(
         r#"
         INSERT INTO review.match_reviews (
             id, match_id, review_version, data_coverage, conclusions,
             status, calculation_version, result_snapshot, prediction_evaluation, finalized_at
         ) VALUES ($1,$2,$3,1.0,'{}'::jsonb,'finalized','integration-d2',
-                  '{"home_goals_90":1,"away_goals_90":0}'::jsonb,'{}'::jsonb,now())
+                  $4,'{}'::jsonb,now())
         "#,
     )
     .bind(review_id)
     .bind(match_id)
     .bind(format!("d2-{token}"))
+    .bind(serde_json::to_value(&result_snapshot).expect("序列化完整 MatchResultRecord"))
     .execute(&database.pool)
     .await
     .expect("创建 D2 正式复盘");
@@ -470,6 +477,9 @@ async fn structured_match_events_are_queryable_and_revision_aware() {
         .read_match_review(review_id)
         .await
         .expect("读取带事件摘要的正式复盘");
+    assert_eq!(detail.result.match_id, match_id);
+    assert_eq!(detail.result.home_goals_90, 1);
+    assert_eq!(detail.result.finalized_at, result_snapshot.finalized_at);
     assert_eq!(detail.event_summary.total_count, 3);
     assert_eq!(detail.event_summary.effective_count, 2);
     assert_eq!(detail.event_summary.cancelled_count, 1);
@@ -1453,7 +1463,9 @@ async fn p4_stage_c_writes_are_idempotent_and_frozen_history_is_immutable() {
         .expect("重复登记相同Schema应幂等");
     assert_eq!(schema.id, schema_retry.id);
 
-    let data_cutoff_at = kickoff - Duration::hours(24);
+    let data_cutoff_at = (kickoff - Duration::hours(24))
+        .with_nanosecond(123_456_789)
+        .unwrap();
     let trace_id = Uuid::new_v4();
     let research_draft = ResearchRunDraft {
         match_id: target.id,
@@ -1478,6 +1490,11 @@ async fn p4_stage_c_writes_are_idempotent_and_frozen_history_is_immutable() {
         .await
         .expect("相同研究任务重试应返回同一记录");
     assert_eq!(research.id, research_retry.id);
+    assert_eq!(
+        research.data_cutoff_at,
+        data_cutoff_at - Duration::nanoseconds(789),
+        "研究记录必须反映实际 SQLx 微秒落库精度"
+    );
     let mut changed_research = research_draft.clone();
     changed_research.request_payload = json!({"missing_fields": ["lineup", "injury"]});
     assert!(matches!(
@@ -1485,7 +1502,7 @@ async fn p4_stage_c_writes_are_idempotent_and_frozen_history_is_immutable() {
         Err(PersistenceError::InvalidState(_))
     ));
 
-    let claim_time = data_cutoff_at - Duration::minutes(30);
+    let claim_time = data_cutoff_at;
     let claim_a_draft = EvidenceClaimDraft {
         match_id: target.id,
         entity_type: "team".to_string(),
@@ -1624,7 +1641,7 @@ async fn p4_stage_c_writes_are_idempotent_and_frozen_history_is_immutable() {
             metadata: json!({}),
         })
         .collect::<Vec<_>>();
-    let probabilities = ["primary", "secondary"]
+    let probabilities = ["primary", "secondary", "conservative", "full"]
         .into_iter()
         .map(|chain_key| SnapshotProbabilityDraft {
             chain_key: chain_key.to_string(),
@@ -1661,6 +1678,52 @@ async fn p4_stage_c_writes_are_idempotent_and_frozen_history_is_immutable() {
         probabilities,
         metadata: json!({"integration_test": true}),
     };
+    let mut mismatched_cutoff = snapshot_draft.clone();
+    mismatched_cutoff.data_cutoff_at += Duration::microseconds(1);
+    assert!(
+        matches!(
+            database
+                .store
+                .freeze_prematch_snapshot(&mismatched_cutoff)
+                .await,
+            Err(PersistenceError::InvalidState(_))
+        ),
+        "真实 1 微秒差异不得被容差放过"
+    );
+    for field in ["published_at", "effective_at"] {
+        let mut future_claim_draft = claim_a_draft.clone();
+        future_claim_draft.idempotency_key = format!("evidence:{token}:future-{field}");
+        if field == "published_at" {
+            future_claim_draft.published_at = Some(data_cutoff_at + Duration::microseconds(1));
+        } else {
+            future_claim_draft.effective_at = Some(data_cutoff_at + Duration::microseconds(1));
+        }
+        let future_claim = database
+            .store
+            .append_evidence_claim(&future_claim_draft)
+            .await
+            .expect("保留未来证据以验证冻结时的截止门禁");
+        let mut future_snapshot = snapshot_draft.clone();
+        future_snapshot.idempotency_key = format!("snapshot:{token}:future-{field}");
+        future_snapshot.features[0].evidence_ids = vec![future_claim.id];
+        assert!(
+            matches!(
+                database
+                    .store
+                    .freeze_prematch_snapshot(&future_snapshot)
+                    .await,
+                Err(PersistenceError::InvalidState(_))
+            ),
+            "published_at/effective_at 晚于截止 1 微秒不得入冻"
+        );
+    }
+    let count_before: i64 =
+        sqlx::query_scalar("SELECT count(*)::bigint FROM feature.snapshots WHERE match_id=$1")
+            .bind(target.id)
+            .fetch_one(&database.pool)
+            .await
+            .unwrap();
+    assert_eq!(count_before, 0, "拒绝的截止时间不留下快照");
     let snapshot = database
         .store
         .freeze_prematch_snapshot(&snapshot_draft)
@@ -1674,11 +1737,27 @@ async fn p4_stage_c_writes_are_idempotent_and_frozen_history_is_immutable() {
         .expect("相同快照重试应返回同一记录");
     assert_eq!(snapshot.id, snapshot_retry.id);
     assert!(!snapshot_retry.created);
+    assert_eq!(snapshot.data_cutoff_at, research.data_cutoff_at);
+    assert_eq!(snapshot.data_cutoff_at, snapshot_retry.data_cutoff_at);
+    assert_eq!(snapshot.frozen_at, snapshot_retry.frozen_at);
+    let mut changed_snapshot = snapshot_draft.clone();
+    changed_snapshot.input_payload = json!({"tampered": true});
+    assert!(
+        matches!(
+            database
+                .store
+                .freeze_prematch_snapshot(&changed_snapshot)
+                .await,
+            Err(PersistenceError::InvalidState(_))
+        ),
+        "幂等键不能绑定不同冻结载荷"
+    );
     let bundle = database
         .store
         .read_prematch_snapshot(snapshot.id)
         .await
         .expect("读取完整不可变快照");
+    assert_eq!(bundle.snapshot.data_cutoff_at, snapshot.data_cutoff_at);
     assert_eq!(bundle.features.len(), 31);
     assert_eq!(bundle.probabilities.len(), 4);
 
@@ -1922,7 +2001,7 @@ async fn match_scope_inference_and_lineup_pair_transaction_are_atomic() {
         })
         .await
         .expect("创建双方阵容测试赛事");
-    let kickoff = Utc::now() + Duration::days(10);
+    let kickoff = Utc::now() + Duration::hours(2);
     let season = database
         .store
         .create_season(&SeasonDraft {
@@ -2078,6 +2157,184 @@ async fn match_scope_inference_and_lineup_pair_transaction_are_atomic() {
     assert!(visible.iter().all(|item| item.id != first_home_id));
     assert!(visible.iter().any(|item| item.id == latest.id));
 
+    // 复用真实预检/提交入口，覆盖 ended_previous 的业务、账本与审计事务。
+    let lineup_key = format!("ledger-{token}");
+    let mut rows = vec![SpreadsheetRawRow {
+        sheet_name: "阵容".into(),
+        row_number: 2,
+        entity_type: SpreadsheetEntityType::Lineup,
+        action: SpreadsheetAction::Add,
+        values: json!({
+            "lineup_key": lineup_key, "match_key": target.external_key,
+            "match_id": target.id.to_string(), "team_id": home.id.to_string(), "team_side": "home",
+            "lineup_type": "expected", "snapshot_type": "T-6h",
+            "formation": formation.code, "formation_id": formation.id.to_string(),
+            "captured_at": (captured_at + Duration::minutes(30)).to_rfc3339(),
+            "quality_score": "0.9"
+        }),
+    }];
+    for (index, player) in valid_pair.home.players.iter().enumerate() {
+        rows.push(SpreadsheetRawRow {
+            sheet_name: "阵容球员".into(),
+            row_number: index as u32 + 2,
+            entity_type: SpreadsheetEntityType::LineupPlayer,
+            action: SpreadsheetAction::Add,
+            values: json!({
+                "lineup_key": lineup_key, "match_key": target.external_key,
+                "match_id": target.id.to_string(), "team_id": home.id.to_string(), "team_side": "home",
+                "player_id": player.player_id.to_string(),
+                "position_code": player.position_code,
+                "is_starter": "true", "sequence_no": (index + 1).to_string(),
+                "expected_minutes": "90"
+            }),
+        });
+    }
+    let workbook = SpreadsheetParsedWorkbook {
+        format_version: "football.match-lineup.v2".into(),
+        source_file_name: format!("ledger-{token}.xlsx"),
+        source_sha256: format!("ledger-{token}"),
+        rows,
+    };
+    let preview = database
+        .store
+        .preview_match_lineup_import(&workbook, SpreadsheetImportMode::AddAndUpdate)
+        .await
+        .expect("预检合法双方事务夹具中的主队替代阵容");
+    assert_eq!(preview.counts.error, 0);
+    assert_eq!(preview.counts.conflict, 0);
+    assert_eq!(preview.rows.len(), 12);
+    let last_player_row = preview
+        .rows
+        .iter()
+        .find(|row| row.entity_type == SpreadsheetEntityType::LineupPlayer && row.row_number == 12)
+        .expect("定位最后一个球员预检行");
+    let mut invalid_payload = last_player_row.payload.clone();
+    invalid_payload["_resolved_player_id"] = json!(Uuid::new_v4());
+    sqlx::query("UPDATE catalog.import_rows SET payload=$2 WHERE id=$1")
+        .bind(last_player_row.id)
+        .bind(invalid_payload)
+        .execute(&database.pool)
+        .await
+        .expect("模拟预检后末行球员外键失效");
+    let lineup_count_before: i64 =
+        sqlx::query_scalar("SELECT count(*)::bigint FROM football.lineups WHERE match_id=$1")
+            .bind(target.id)
+            .fetch_one(&database.pool)
+            .await
+            .expect("读取导入前历史数量");
+    database
+        .store
+        .commit_match_lineup_import(preview.batch_id)
+        .await
+        .expect_err("末行失败必须回滚替代阵容、前十个球员、账本与审计");
+    let rolled_back: (String, i64, i64, i64, i64, i64, bool) = sqlx::query_as(
+        "SELECT status,inserted_count,updated_count,ended_previous_count,skipped_count,error_count,finished_at IS NULL FROM catalog.import_batches WHERE id=$1",
+    ).bind(preview.batch_id).fetch_one(&database.pool).await.expect("读取回滚后的批次账本");
+    assert_eq!(rolled_back, ("pending".into(), 0, 0, 0, 0, 0, true));
+    let imported_rows: i64 = sqlx::query_scalar(
+        "SELECT count(*)::bigint FROM catalog.import_rows WHERE batch_id=$1 AND (status='imported' OR imported_at IS NOT NULL)",
+    ).bind(preview.batch_id).fetch_one(&database.pool).await.expect("读取回滚后的行状态");
+    assert_eq!(imported_rows, 0);
+    assert_eq!(
+        database
+            .store
+            .read_lineup(latest.id)
+            .await
+            .expect("回滚恢复原阵容")
+            .status,
+        "active"
+    );
+    let count_after_rollback: i64 =
+        sqlx::query_scalar("SELECT count(*)::bigint FROM football.lineups WHERE match_id=$1")
+            .bind(target.id)
+            .fetch_one(&database.pool)
+            .await
+            .expect("读取回滚后的历史数量");
+    assert_eq!(count_after_rollback, lineup_count_before);
+    let audit_count_before: i64 = sqlx::query_scalar(
+        "SELECT count(*)::bigint FROM audit.events WHERE event_type='match_lineup_import_committed' AND entity_id=$1",
+    ).bind(preview.batch_id.to_string()).fetch_one(&database.pool).await.expect("读取回滚后的审计数量");
+    assert_eq!(audit_count_before, 0);
+
+    sqlx::query("UPDATE catalog.import_rows SET payload=$2 WHERE id=$1")
+        .bind(last_player_row.id)
+        .bind(&last_player_row.payload)
+        .execute(&database.pool)
+        .await
+        .expect("恢复合法末行后复用原批次重试");
+    let committed = database
+        .store
+        .commit_match_lineup_import(preview.batch_id)
+        .await
+        .expect("提交替代阵容并写入一致账本");
+    assert_eq!(committed.inserted_count, 12);
+    assert_eq!(committed.updated_count, 0);
+    assert_eq!(committed.ended_previous_count, 1);
+    assert_eq!(committed.skipped_count, 0);
+    assert_eq!(committed.error_count, 0);
+    let ledger: (String, i64, i64, i64, i64, i64, bool) = sqlx::query_as(
+        "SELECT status,inserted_count,updated_count,ended_previous_count,skipped_count,error_count,finished_at IS NOT NULL FROM catalog.import_batches WHERE id=$1",
+    ).bind(preview.batch_id).fetch_one(&database.pool).await.expect("读取成功批次账本");
+    assert_eq!(ledger, ("succeeded".into(), 12, 0, 1, 0, 0, true));
+    assert_eq!(
+        database
+            .store
+            .read_lineup(latest.id)
+            .await
+            .expect("读取被替代版本")
+            .status,
+        "superseded"
+    );
+    let active_home: (Uuid, bool) = sqlx::query_as(
+        "SELECT id,model_eligible FROM football.lineups WHERE match_id=$1 AND team_id=$2 AND snapshot_type='T-6h' AND lineup_type='expected' AND status='active'",
+    ).bind(target.id).bind(home.id).fetch_one(&database.pool).await.expect("读取新活动阵容");
+    assert_ne!(active_home.0, latest.id);
+    assert!(active_home.1);
+    assert_eq!(
+        database
+            .store
+            .read_lineup(active_home.0)
+            .await
+            .expect("读取导入后的完整阵容")
+            .starter_count,
+        11
+    );
+    let audit_payload: serde_json::Value = sqlx::query_scalar(
+        "SELECT payload FROM audit.events WHERE event_type='match_lineup_import_committed' AND entity_id=$1",
+    ).bind(preview.batch_id.to_string()).fetch_one(&database.pool).await.expect("读取提交审计");
+    assert_eq!(audit_payload["inserted"], json!(committed.inserted_count));
+    assert_eq!(audit_payload["updated"], json!(committed.updated_count));
+    assert_eq!(
+        audit_payload["ended_previous"],
+        json!(committed.ended_previous_count)
+    );
+    assert_eq!(audit_payload["skipped"], json!(committed.skipped_count));
+    assert!(matches!(
+        database
+            .store
+            .commit_match_lineup_import(preview.batch_id)
+            .await,
+        Err(PersistenceError::InvalidState(_))
+    ));
+    let audit_count_after: i64 = sqlx::query_scalar(
+        "SELECT count(*)::bigint FROM audit.events WHERE event_type='match_lineup_import_committed' AND entity_id=$1",
+    ).bind(preview.batch_id.to_string()).fetch_one(&database.pool).await.expect("读取重复提交后的审计数量");
+    assert_eq!(audit_count_after, 1);
+    let lineup_count_after: i64 =
+        sqlx::query_scalar("SELECT count(*)::bigint FROM football.lineups WHERE match_id=$1")
+            .bind(target.id)
+            .fetch_one(&database.pool)
+            .await
+            .expect("读取重复提交后的历史数量");
+    assert_eq!(lineup_count_after, lineup_count_before + 1);
+    let ended_count_after: i64 =
+        sqlx::query_scalar("SELECT ended_previous_count FROM catalog.import_batches WHERE id=$1")
+            .bind(preview.batch_id)
+            .fetch_one(&database.pool)
+            .await
+            .expect("读取重复提交后的计数");
+    assert_eq!(ended_count_after, 1);
+
     database.close().await;
 }
 
@@ -2214,25 +2471,93 @@ async fn match_lineup_chain_versions_model_selection_and_freeze_gate_are_consist
         Some(first_player_id.as_str())
     );
 
-    let invalid_home = seed_team_lineup(
-        &database,
-        TeamLineupSeed {
-            match_id: target.id,
-            team_id: home.id,
-            kickoff,
-            snapshot_type: "T-1h",
-            lineup_type: LineupType::Confirmed,
-            starter_count: 10,
-            label: "invalid",
-        },
-    )
-    .await;
+    let players =
+        create_lineup_player_drafts(&database, home.id, kickoff, &format!("invalid-{token}")).await;
+    let mut invalid_draft = LineupDraft {
+        match_id: target.id,
+        team_id: home.id,
+        lineup_type: LineupType::Confirmed,
+        snapshot_type: "T-1h".to_string(),
+        formation: None,
+        formation_id: None,
+        coach_id: None,
+        captured_at: kickoff - Duration::minutes(50),
+        source_document_id: None,
+        source_urls: vec![],
+        quality_score: Some(0.9),
+        metadata: json!({"integration_test": true}),
+        players,
+    };
+    invalid_draft.players[10].is_starter = false;
+    invalid_draft.players[10].bench_order = Some(1);
+    let count_before: i64 =
+        sqlx::query_scalar("SELECT count(*)::bigint FROM football.lineups WHERE match_id=$1")
+            .bind(target.id)
+            .fetch_one(&database.pool)
+            .await
+            .unwrap();
+    let rejected = database
+        .store
+        .create_lineup(&invalid_draft)
+        .await
+        .expect_err("10 名首发必须在写入前拒绝");
+    assert!(
+        matches!(rejected, PersistenceError::InvalidState(message) if message.contains("11 名首发"))
+    );
+    let count_after: i64 =
+        sqlx::query_scalar("SELECT count(*)::bigint FROM football.lineups WHERE match_id=$1")
+            .bind(target.id)
+            .fetch_one(&database.pool)
+            .await
+            .unwrap();
+    assert_eq!(count_before, count_after, "非法首发不能留下阵容行");
+    invalid_draft.players[10].is_starter = true;
+    invalid_draft.players[10].bench_order = None;
+    let invalid_home = database
+        .store
+        .create_lineup(&invalid_draft)
+        .await
+        .expect("合法 11 人可保存，缺失阵型应阻断模型冻结");
+    assert_eq!(invalid_home.starter_count, 11);
     assert!(!invalid_home.model_eligible);
     assert_eq!(invalid_home.model_validation_status, "invalid");
     assert!(invalid_home
         .validation_errors
         .iter()
-        .any(|item| item.contains("11 名首发")));
+        .any(|item| item.contains("阵型")));
+    let actual = seed_team_lineup(
+        &database,
+        TeamLineupSeed {
+            match_id: target.id,
+            team_id: away.id,
+            kickoff,
+            snapshot_type: "T-1h",
+            lineup_type: LineupType::Actual,
+            starter_count: 11,
+            label: "actual",
+        },
+    )
+    .await;
+    assert!(!actual.model_eligible, "合法实际阵容仍只用于赛后");
+    let reference = kickoff - Duration::minutes(40);
+    let blocked_chain = database
+        .store
+        .read_match_lineup_chain_at(target.id, "T-1h", reference)
+        .await
+        .unwrap();
+    assert!(!blocked_chain.ready_for_model);
+    assert!(blocked_chain.home.selected_lineup_id.is_none());
+    assert!(blocked_chain.away.selected_lineup_id.is_none());
+    assert!(
+        matches!(
+            database
+                .store
+                .prepare_match_prediction_input_at(target.id, "T-1h", "p4", reference)
+                .await,
+            Err(PersistenceError::InvalidState(_))
+        ),
+        "无有效首发或只有 actual 时必须阻断输入冻结"
+    );
 
     database.close().await;
 }

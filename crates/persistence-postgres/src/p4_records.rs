@@ -763,7 +763,7 @@ impl PostgresStore {
                 $21, $22,
                 $23, $24, $25
             )
-            RETURNING created_at
+            RETURNING created_at, data_cutoff_time, frozen_at
             "#,
         )
         .bind(id)
@@ -893,8 +893,8 @@ impl PostgresStore {
             match_id: draft.match_id,
             match_key: draft.match_key.clone(),
             horizon: draft.horizon,
-            data_cutoff_at: draft.data_cutoff_at,
-            frozen_at: draft.frozen_at,
+            data_cutoff_at: row.try_get("data_cutoff_time")?,
+            frozen_at: row.try_get("frozen_at")?,
             snapshot_fingerprint: prepared.snapshot_fingerprint,
             idempotency_key: draft.idempotency_key.clone(),
             source_kind: draft.source_kind,
@@ -1246,21 +1246,22 @@ async fn validate_snapshot_references(
     draft: &PrematchSnapshotDraft,
 ) -> PersistenceResult<()> {
     let match_row =
-        sqlx::query("SELECT external_key, kickoff_time FROM football.matches WHERE id = $1")
+        sqlx::query("SELECT external_key, $2::timestamptz < kickoff_time AS cutoff_before_kickoff FROM football.matches WHERE id = $1")
             .bind(draft.match_id)
+            .bind(draft.data_cutoff_at)
             .fetch_optional(&mut **tx)
             .await?
             .ok_or_else(|| {
                 PersistenceError::InvalidState("赛前快照引用的比赛不存在".to_string())
             })?;
     let external_key: String = match_row.try_get("external_key")?;
-    let kickoff_time: DateTime<Utc> = match_row.try_get("kickoff_time")?;
+    let cutoff_before_kickoff: bool = match_row.try_get("cutoff_before_kickoff")?;
     if external_key != draft.match_key {
         return Err(PersistenceError::InvalidState(
             "match_key与比赛稳定外部键不一致".to_string(),
         ));
     }
-    if draft.data_cutoff_at >= kickoff_time {
+    if !cutoff_before_kickoff {
         return Err(PersistenceError::InvalidState(
             "赛前快照data_cutoff_at必须早于开球时间".to_string(),
         ));
@@ -1307,18 +1308,19 @@ async fn validate_snapshot_references(
     if let Some(research_run_id) = draft.research_run_id {
         let run = sqlx::query(
             r#"
-            SELECT match_id, horizon, data_cutoff_at, trace_id
+            SELECT match_id, horizon, data_cutoff_at = $2::timestamptz AS cutoff_matches, trace_id
             FROM research.runs WHERE id = $1
             "#,
         )
         .bind(research_run_id)
+        .bind(draft.data_cutoff_at)
         .fetch_optional(&mut **tx)
         .await?
         .ok_or_else(|| PersistenceError::InvalidState("快照关联的研究任务不存在".to_string()))?;
         let run_horizon: String = run.try_get("horizon")?;
         if run.try_get::<Uuid, _>("match_id")? != draft.match_id
             || run_horizon != draft.horizon.as_str()
-            || run.try_get::<DateTime<Utc>, _>("data_cutoff_at")? != draft.data_cutoff_at
+            || !run.try_get::<bool, _>("cutoff_matches")?
             || run.try_get::<Uuid, _>("trace_id")? != draft.trace_id
         {
             return Err(PersistenceError::InvalidState(
@@ -1351,12 +1353,15 @@ async fn validate_snapshot_evidence(
     }
     let rows = sqlx::query(
         r#"
-        SELECT id, match_id, published_at, effective_at
+        SELECT id, match_id,
+               COALESCE(published_at > $2::timestamptz, false)
+               OR COALESCE(effective_at > $2::timestamptz, false) AS after_cutoff
         FROM research.evidence_claims
         WHERE id = ANY($1)
         "#,
     )
     .bind(evidence_ids.iter().copied().collect::<Vec<_>>())
+    .bind(draft.data_cutoff_at)
     .fetch_all(&mut **tx)
     .await?;
     if rows.len() != evidence_ids.len() {
@@ -1366,16 +1371,13 @@ async fn validate_snapshot_evidence(
     }
     for row in rows {
         let match_id: Uuid = row.try_get("match_id")?;
-        let published_at: Option<DateTime<Utc>> = row.try_get("published_at")?;
-        let effective_at: Option<DateTime<Utc>> = row.try_get("effective_at")?;
+        let after_cutoff: bool = row.try_get("after_cutoff")?;
         if match_id != draft.match_id {
             return Err(PersistenceError::InvalidState(
                 "快照证据必须属于同一比赛".to_string(),
             ));
         }
-        if published_at.is_some_and(|value| value > draft.data_cutoff_at)
-            || effective_at.is_some_and(|value| value > draft.data_cutoff_at)
-        {
+        if after_cutoff {
             return Err(PersistenceError::InvalidState(
                 "晚于data_cutoff_at的证据不得进入赛前快照".to_string(),
             ));
@@ -1849,6 +1851,23 @@ mod tests {
         assert_eq!(
             PreparedSnapshot::new(&first).unwrap().snapshot_fingerprint,
             PreparedSnapshot::new(&second).unwrap().snapshot_fingerprint
+        );
+    }
+
+    #[test]
+    fn snapshot_fingerprint_preserves_submicrosecond_input_identity() {
+        let mut first = snapshot();
+        first.data_cutoff_at = DateTime::parse_from_rfc3339("2026-09-30T12:00:00.123456789Z")
+            .unwrap()
+            .with_timezone(&Utc);
+        first.frozen_at = first.data_cutoff_at + Duration::seconds(1);
+        let mut changed = first.clone();
+        changed.data_cutoff_at += Duration::nanoseconds(1);
+        assert_ne!(
+            PreparedSnapshot::new(&first).unwrap().snapshot_fingerprint,
+            PreparedSnapshot::new(&changed)
+                .unwrap()
+                .snapshot_fingerprint
         );
     }
 

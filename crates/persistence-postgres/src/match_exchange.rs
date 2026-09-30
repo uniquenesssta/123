@@ -420,8 +420,8 @@ impl PostgresStore {
             crate::lineup_chain::refresh_lineup_validation_in_tx(&mut tx, lineup_id).await?;
         }
         let finished_at = Utc::now();
-        sqlx::query("UPDATE catalog.import_batches SET status='succeeded',finished_at=$2,inserted_count=$3,updated_count=$4,skipped_count=$5,error_count=0 WHERE id=$1")
-            .bind(batch_id).bind(finished_at).bind(inserted as i64).bind(updated as i64).bind(skipped as i64).execute(&mut *tx).await?;
+        sqlx::query("UPDATE catalog.import_batches SET status='succeeded',finished_at=$2,inserted_count=$3,updated_count=$4,ended_previous_count=$5,skipped_count=$6,error_count=0 WHERE id=$1")
+            .bind(batch_id).bind(finished_at).bind(inserted as i64).bind(updated as i64).bind(ended_previous as i64).bind(skipped as i64).execute(&mut *tx).await?;
         crate::write_audit_event(
             &mut tx,
             "match_lineup_import_committed",

@@ -25,5 +25,11 @@ check(!existsSync(join(root,"crates/application/src/p4_workbench.rs")),"AT5 后�
 const predictionFiles=[...rustFiles("crates/application/src/services/prediction"),...rustFiles("crates/application/src/use_cases/prediction")];
 for(const path of predictionFiles){const source=read(path); for(const token of ["football_persistence_postgres","PostgresStore","sqlx::","PgPool","PersistenceStore"]) check(!source.includes(token),`${path} 泄漏具体持久化实现：${token}`); for(const token of ["football_model_stub","model_p4","private_model"]) check(!source.includes(token),`${path} 绕过 model-api/registry 边界：${token}`);}
 check(packageJson.scripts?.["verify:prediction-service"]==="node scripts/verify-prediction-service.mjs","package.json 未登记 R3-06 专项门禁"); check(packageJson.scripts?.["verify:architecture"]?.includes("verify-prediction-service.mjs"),"verify:architecture 未接入 R3-06 门禁"); check(frontend.includes('"verify-prediction-service.mjs"'),"verify:frontend 未接入 R3-06 门禁");
+// R7-06：时间比较使用实际 SQLx/PostgreSQL 精度，载荷指纹仍保留原输入。
+const records = read("crates/persistence-postgres/src/p4_records.rs");
+check(records.includes("data_cutoff_at = $2::timestamptz AS cutoff_matches") && records.includes("$2::timestamptz < kickoff_time AS cutoff_before_kickoff"), "P4 快照引用时间必须在 PostgreSQL 精度下精确比较");
+check(records.includes("published_at > $2::timestamptz") && records.includes("effective_at > $2::timestamptz"), "P4 证据截止必须使用相同数据库时间边界");
+check(records.includes("RETURNING created_at, data_cutoff_time, frozen_at") && records.includes('data_cutoff_at: row.try_get("data_cutoff_time")?') && records.includes('frozen_at: row.try_get("frozen_at")?'), "首建快照必须返回实际落库时间");
+check(records.includes("snapshot_fingerprint_preserves_submicrosecond_input_identity"), "纳秒输入身份不能通过时间容差放宽");
 if(failures.length) throw new Error(`Prediction Service 验证失败\n${failures.map((item)=>`- ${item}`).join("\n")}`);
 console.log(`Prediction Service 验证通过：${predictionFiles.length} 个 Service/Use Case Rust 文件，18 个公开 Application 职责已进入 Prediction Service/Ports 边界，P4 freeze execution 与 snapshot persistence 均不再由旧混合 owner 直接实现。`);

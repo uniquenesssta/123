@@ -24,7 +24,7 @@
     "targetPublicExportPolicy": "explicit re-export only"
   },
   "sourceDigest": "217241ac243726a5ab6805a7f169e222b97e78c7c971749a5904714af673ebdd",
-  "rustUsageDigest": "1142c1b06b3bfec1a01e56657ae644d4a6698d06ad4f26ee980ff07f9b8eb1d9",
+  "rustUsageDigest": "7289b54bf291c66a52e8df6e6763f4eb804902d284f365f6d722cf77290d479d",
   "summary": {
     "typeCount": 365,
     "publicCompatibilityTypeCount": 365,
@@ -11629,7 +11629,8 @@
       "externalCallers": [
         "crates/application/src/ports/review/package.rs",
         "crates/application/src/use_cases/review/package/shared.rs",
-        "crates/persistence-postgres/src/review.rs"
+        "crates/persistence-postgres/src/review.rs",
+        "crates/persistence-postgres/tests/postgres_integration.rs"
       ],
       "databaseMappings": [
         "crates/persistence-postgres/src/review.rs"

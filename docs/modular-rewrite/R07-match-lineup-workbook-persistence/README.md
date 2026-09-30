@@ -41,8 +41,8 @@ crates/persistence-postgres/src/adapters/workbooks/
 | R7-02 | 外部 ID 身份保护 | DONE |
 | R7-03 | 普通删除与历史引用保护 | DONE |
 | R7-04 | 架构清单、验证器与执行记录对齐 | DONE |
-| R7-05 | 关键 Application 用例验证 | VERIFYING |
-| R7-06 | 历史数据库失败与账本问题收口 | BLOCKED |
+| R7-05 | 关键 Application 用例验证 | DONE |
+| R7-06 | 历史数据库失败与账本问题收口 | VERIFYING |
 | R7-07 | Lineup Pair Transaction | BLOCKED |
 | R7-08 | Lineup Chain / History | BLOCKED |
 | R7-09 | Team Lineup Presets | BLOCKED |
@@ -55,7 +55,7 @@ crates/persistence-postgres/src/adapters/workbooks/
 
 ## R7-02 当前验证状态
 
-进入基线：`c826dd32e3ecb84dfc732ef60c3fd3aaf4153fdf`。R7-02 已 `DONE`：精确提交 `1e4da04` 的 Windows run `36686343584` / job `109792974772` 全通过，见 [节点完成记录](R07-02-external-id-integrity.md)。PG/XLSX/Full 保持最终封包新库待验；R7-03 已 DONE，R7-04 DONE、R7-05 VERIFYING。以下实施条目中的 Windows 待验由本段 CI 证据更新。
+进入基线：`c826dd32e3ecb84dfc732ef60c3fd3aaf4153fdf`。R7-02 已 `DONE`：精确提交 `1e4da04` 的 Windows run `36686343584` / job `109792974772` 全通过，见 [节点完成记录](R07-02-external-id-integrity.md)。PG/XLSX/Full 保持最终封包新库待验；R7-03 已 DONE，R7-04/05 DONE、R7-06 VERIFYING。以下实施条目中的 Windows 待验由本段 CI 证据更新。
 
 - B1 已修订：直接添加与 Spreadsheet commit 共用 `references/external_ids/write.rs` 的 `write_external_entity_id`，接收调用方 PgConnection；唯一键冲突仅在 entity_id 一致时合并 metadata，无条件目标覆盖已删除。跨实体返回原有导入冲突文本，原绑定/metadata 不改。
 - 工作簿复用原批次事务并传播冲突，预检后出现竞争绑定仍会拒绝提交，此前业务行、ID、行状态、计数和成功审计一起回滚。预检/冲突裁决逻辑保留；未提前迁移 Workbook owner。
@@ -98,7 +98,7 @@ crates/persistence-postgres/src/adapters/workbooks/
 
 ## R7-05 当前验证状态
 
-进入基线：`9bdb84923da714843e03383db1872aecd30250a2`。用户在确认 R7-04 通过后启动本节点，当前 `VERIFYING`：20 个新增行为测试已实现，Rust 执行与 Clippy 等待本轮精确提交的 Windows CI；不能继承 R7-04 的 33-test PASS。R7-06 及以后 BLOCKED。
+进入基线：`9bdb84923da714843e03383db1872aecd30250a2`。本节点已 `DONE`：精确提交 `02e56badb508f448afa498bc9cb227065f346a6d` 的 Windows run `36712015030` / job `109875821076` 全通过，53 个 Application 单测实际通过，包含全部 20 项新增测试，见 [完成记录](R07-05-application-use-case-tests.md)。R7-06 已启动并 VERIFYING，R7-07 及以后 BLOCKED。以下保留实施时的检查与覆盖范围。
 
 | 现有模块 | 新增测试 | 真实调用与断言范围 |
 |---|---:|---|
@@ -108,9 +108,9 @@ crates/persistence-postgres/src/adapters/workbooks/
 
 共享调用记录器只在 `#[cfg(test)]` 的现有 Prediction tests 中以 crate 可见方式提供，生产构建没有此入口。每个未选中的 Port 方法直接 panic，所选方法记录顺序、参数与已成功副作用；错误注入不改变 fake 状态。研究 fake 模拟队列幂等契约，测试验证 Application 传递稳定键，不代替真实 PostgreSQL 队列去重验证。只用模型 API 的 test fake；另有真实公开注册表 unavailable 路径断言，未宣称私有模型可用或算法已验证。
 
-没有修改生产业务逻辑/公开接口/依赖/锁文件/迁移/工作流，也没有新增测试文件、target、框架或数据库专项。Domain inventory 由原生成器更新测试调用面与使用摘要，365 类型/声明摘要保持；原 application-port sourceScan 的路径/数量/指纹保持。沿用现有 Windows workspace tests（包含 football-application），预期 Application 总数为 53；实际数量和结果以本轮 CI 为准。
+没有修改生产业务逻辑/公开接口/依赖/锁文件/迁移/工作流，也没有新增测试文件、target、框架或数据库专项。Domain inventory 由原生成器更新测试调用面与使用摘要，365 类型/声明摘要保持；原 application-port sourceScan 的路径/数量/指纹保持。沿用现有 Windows workspace tests（包含 football-application），Windows CI 实际 Application 总数为 53，全部通过。
 
-架构聚合、受影响现有验证器、源码卫生、命令/迁移/保护资产与 diff 检查通过，Rust 1.88 仅用于源码格式化及语法解析。没有执行 Linux/macOS 编译或测试。Windows fmt/Clippy/tests/前端/打包/启动待 CI；新测试不依赖数据库或网络，损坏 XLSX 本地临时输入不是有效工作簿往返验收。真实 PG/有效 XLSX/Full 继续“最终封包新库待验”。未覆盖的完整 research gateway、完整模型冻结成功和真实数据库事务仍按已有后续/最终验收，不虚报本轮覆盖全部流程。CI 成功后才创建 `R07-05-application-use-case-tests.md` 并放行 R7-06；回退受控 revert 本轮测试及使用清单，保留 R7-04 完成证据。
+架构聚合、受影响现有验证器、源码卫生、命令/迁移/保护资产与 diff 检查通过，Rust 1.88 仅用于源码格式化及语法解析。没有执行 Linux/macOS 编译或测试。上述精确提交的 Windows fmt/Clippy/tests/前端/打包/启动已通过；新测试不依赖数据库或网络，损坏 XLSX 本地临时输入不是有效工作簿往返验收。真实 PG/有效 XLSX/Full 继续“最终封包新库待验”。未覆盖的完整 research gateway、完整模型冻结成功和真实数据库事务仍按已有后续/最终验收，不虚报本轮覆盖全部流程。已按成功 CI 创建 `R07-05-application-use-case-tests.md` 并放行 R7-06；回退受控 revert 本轮测试及使用清单，保留 R7-04 完成证据。
 
 ```mermaid
 flowchart TD
@@ -125,6 +125,26 @@ flowchart TD
   G -->|"无快照"| J["复核截止窗口与就绪后转 FREEZING"]
   J -->|"Port 失败"| K["返回错误，停止后续写入"]
 ```
+
+## R7-06 当前验证状态
+
+进入/回退基线：`02e56badb508f448afa498bc9cb227065f346a6d`。用户确认 R7-05 通过后启动本项，当前 `VERIFYING`：修订、原测试断言与静态检查已完成；等待本轮精确提交的 Windows Automated，不继承 R7-05 的 PASS。R7-07 及以后 BLOCKED。
+
+| 历史问题 | 实际修订与现有测试断言 | 验证状态 |
+|---|---|---|
+| chain/freeze 非法十人夹具 | 先断言 10 名首发写入失败无遗留，再构造合法 11 人但缺阵型的模型不合格版本；在明确历史时点排除未来记录及 actual，保留版本优先级、输入 UUID 与冻结拒绝。 | 已修改、最终封包新库待验 |
+| pair/scope 窗口未开启 | kickoff 改为当前后 2 小时，T-6h 记录在过去且窗口已开启；保留客队失败时双方零行、完整成功、删除恢复/归档历史断言。 | 已修改、最终封包新库待验 |
+| structured events 不完整赛果 JSON | 读取实际 MatchResultRecord 并完整序列化为 review fixture；补赛果身份/比分/完成时间断言，保留事件修订与统计。 | 已修改、最终封包新库待验 |
+| P4 亚微秒时间差异 | `p4_records.rs::validate_snapshot_references` 以绑定的 timestamptz 在数据库比较研究 cutoff 与开球边界，证据 published/effective 同精度比较；首建快照返回 RETURNING 实际时间，与读回/重试一致。夹具固定亚微秒、拒绝真实 1 微秒差异/未来证据，保留更新/删除不可变性，并补齐四条概率链以满足原四条断言。 | 已修改、最终封包新库待验 |
+| A8 ended_previous 账本遗漏 | `match_exchange.rs::commit_match_lineup_import` 在原事务 UPDATE 绑定全部计数；现有 pair 测试复用真实预检/提交入口，模拟末行外键失败，验证业务、行状态、账本、审计回滚；恢复后验证 12 插入/1 旧版本结束和三方一致；成功批次再次提交拒绝且无重复效果。 | 已修改、最终封包新库待验 |
+
+SQLx 0.8.6 的 Chrono DateTime 编码按自 2000 年起的整数微秒写入，已查询 Context7 并核对该版本官方源码。比较交由 PostgreSQL 执行，不引入手写截断/容差；原载荷指纹仍保留纳秒输入身份，现有 inline unit test 断言 1ns 不同输入的指纹不同，不放宽不可变幂等契约。模型算法、生产依赖/锁文件、公开 Port/DTO、迁移和工作流保持；新增概率链仅为公开 persistence 测试数据。
+
+现有 Match Lineup Chain 与 Prediction Service verifier 扩充账本事务和时间精度门禁，仍从原 frontend/architecture 执行。没有新增文件/target/runner/workflow/数据库。`architecture/database-baseline.json` 只同步本次合法修改的 integration runtime-source blob 指纹，沿用 R4 的先例；46 个迁移指纹/聚合、18 项 ignored 名称与数量、其他 runtime 指纹冻结，原 baseline 时间和旧 BLOCKED 环境说明仍为历史记录。Domain inventory 原生成器仅刷新实际使用面，365 个类型不变。
+
+已通过架构聚合、受影响现有脚本、源码卫生、171 命令、18 个保护资产、迁移兼容、数据库静态基线、Domain inventory、源文件 rustfmt/语法解析与 diff 检查。三项临时破坏探针均拒绝：漏账本计数、研究 cutoff 自相等绕过、首建返回原输入时间；全部恢复。没有执行 Linux/macOS 编译或测试。Windows fmt/Clippy/tests/打包/启动待本轮 CI；18 项数据库测试仍未实跑，历史失败没有标为关闭。有效 XLSX/Windows Full 继续最终封包新库待验。
+
+最终 Windows 新库沿用 `node scripts/run_database_baseline.mjs` 及既有 contracts/XLSX/Full；先确认专用可清空且名称含 test 的库。新库实跑需关闭上述四项及账本场景，保留原 18 项 broad 基线。不得将静态探针或 ignored 编译写为数据库通过。CI 成功后才创建 `R07-06-database-contract-closeout.md` 并放行 R7-07；后续 R7-10/R7-14 迁移继承本次计数和事务修复。受控回退本项时同步 runtime-source 指纹/使用清单并重跑原门禁，不独立放宽验证器。
 
 ## R7-01 READY 边界
 
@@ -150,7 +170,7 @@ flowchart TD
 
 ## R7-01 当前验证状态
 
-- R7-01 已 `DONE`：提交 `c826dd3` 的 Windows CI run `36678914535` / job `109769864719` 全通过，详见 [节点完成记录](R07-01-match-catalog.md)。PG/XLSX/Full 保留“最终封包新库待验”。R7-02、R7-03 已 DONE，R7-04 DONE，R7-05 VERIFYING，R7-06 及后续 BLOCKED。
+- R7-01 已 `DONE`：提交 `c826dd3` 的 Windows CI run `36678914535` / job `109769864719` 全通过，详见 [节点完成记录](R07-01-match-catalog.md)。PG/XLSX/Full 保留“最终封包新库待验”。R7-02、R7-03 已 DONE，R7-04/05 DONE，R7-06 VERIFYING，R7-07 及后续 BLOCKED。
 - 以下修复表及审计章节保留当时验证状态；Windows 待验已由上述精确提交的 CI 证据更新，数据库未因 CI 成功转为通过。
 
 ### 2026-09-30 R7-01 修复记录（待动态验收）
