@@ -1,0 +1,15 @@
+{
+  "schemaVersion": 1,
+  "runId": "footfigma-screens-review-2026-09-30",
+  "repo": "uniquenesssta/123", "branch": "ui-design-system",
+  "fileKey": "PN0Whgu6HLWIHx4Mv6aHfu", "page": "3:5",
+  "currentScreen": "S04 review / 赛后复盘", "currentRoute": "review", "phase": "in_progress_allocation_only",
+  "previousAcceptedGlobalCheckpoint": "ff60437ccd38e1ed169cbebad0b21f7d8610e128",
+  "acceptedRouteCount": 3, "routeCount": 17,
+  "source": {"review":{"path":"src/pages/review.ts","ref":"main","blob":"4a18002bdd6937cec1d1d076f521dcee8e2f4b5e"},"workflow":{"path":"src/app/matchReviewWorkflow.ts","ref":"main","blob":"504730f5c136c04307d5333377021104f6c18e15"}},
+  "frames": {"MatchLoaded":"505:33973","NoSelection":"505:34022","NoMatches":"505:34071","FirstLoad":"505:34120","LoadError":"505:34169","Refreshing":"505:34218","PackageExported":"505:34267","PreviewBlocked":"505:34316","PreviewReady":"505:34365","ConfirmationStale":"505:34414","FactsReady":"505:34463","FactsWriting":"505:34512","FactsWriteError":"505:34561","FactsWritten":"505:34610","ReviewGenerated":"505:34659","SettlementBlocked":"505:34708","SettlementReadyConditional":"505:34757","SettledConditional":"505:34806","LookbackExport":"505:34855","LockedSettlement":"505:34904","ResultsEvents":"505:34953","CandidatesEmpty":"505:35002","ManualEntry":"505:35051","ManualInvalid":"505:35100","ManualMissingLineups":"505:35149","HistoryEmpty":"505:35198","MatchContextChanged":"505:35247","DatabaseRequired":"505:35296","DefaultDark":"505:35345","Compact":"505:35394","ResultsDark":"505:35443","ResultsCompact":"505:35492"},
+  "completed": ["latest checkpoint/source recovery", "existing FIP component and token discovery", "32 stable root allocations"],
+  "pending": ["replace cloned S03 content with S04 editable composition", "nine-step workflow and data invariants", "manual/results/timeline/candidate views", "dialogs and bounded prototype", "deep/visual QA and final documentation"],
+  "warning": "Allocated roots are not accepted screens and still contain source-screen content until composition completes.",
+  "applicationSourceModified": false, "existingMastersModified": false, "newScreenMasters": 0
+}
