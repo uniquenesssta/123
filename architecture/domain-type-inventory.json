@@ -24,7 +24,7 @@
     "targetPublicExportPolicy": "explicit re-export only"
   },
   "sourceDigest": "217241ac243726a5ab6805a7f169e222b97e78c7c971749a5904714af673ebdd",
-  "rustUsageDigest": "5dfebc0aa077cbb7b2617302545be6949efc6e9c2ead9ff03bf6ec6fa778395a",
+  "rustUsageDigest": "1142c1b06b3bfec1a01e56657ae644d4a6698d06ad4f26ee980ff07f9b8eb1d9",
   "summary": {
     "typeCount": 365,
     "publicCompatibilityTypeCount": 365,
@@ -1144,6 +1144,7 @@
       "externalCallers": [
         "crates/application/src/composition/adapters/exchange/match_lineup.rs",
         "crates/application/src/ports/exchange/mod.rs",
+        "crates/application/src/use_cases/exchange/export_match_lineup_data/mod.rs",
         "crates/persistence-postgres/src/match_exchange.rs",
         "crates/spreadsheet-io/src/ai_package.rs"
       ],
@@ -3265,6 +3266,7 @@
         "crates/application/src/ports/prediction/mod.rs",
         "crates/application/src/services/analytics/facade.rs",
         "crates/application/src/services/analytics/service.rs",
+        "crates/application/src/services/p4_orchestration/tests.rs",
         "crates/application/src/use_cases/analytics/jobs/cancel_background_job/mod.rs",
         "crates/application/src/use_cases/analytics/jobs/enqueue_analysis_job/mod.rs",
         "crates/application/src/use_cases/analytics/jobs/list_background_jobs/mod.rs",
@@ -4525,6 +4527,7 @@
         "crates/application/src/ports/rules/mod.rs",
         "crates/application/src/services/rules/facade.rs",
         "crates/application/src/services/rules/service.rs",
+        "crates/application/src/use_cases/prediction/tests.rs",
         "crates/application/src/use_cases/rules/create_binding/mod.rs",
         "crates/persistence-postgres/src/adapters/competition/bindings/create_binding/transaction.rs",
         "crates/persistence-postgres/src/adapters/competition/bindings/create_binding/validation.rs",
@@ -4634,6 +4637,7 @@
         "crates/application/src/ports/rules/mod.rs",
         "crates/application/src/services/rules/facade.rs",
         "crates/application/src/services/rules/service.rs",
+        "crates/application/src/use_cases/prediction/tests.rs",
         "crates/application/src/use_cases/rules/create_binding/mod.rs",
         "crates/application/src/use_cases/rules/load_catalog/mod.rs",
         "crates/persistence-postgres/src/adapters/competition/bindings/create_binding/transaction.rs",
@@ -4829,6 +4833,7 @@
         "crates/application/src/use_cases/competition/create_stage/mod.rs",
         "crates/application/src/use_cases/prediction/dry_run_default_fixture/mod.rs",
         "crates/application/src/use_cases/prediction/inspect_match_prediction_readiness/mod.rs",
+        "crates/application/src/use_cases/prediction/tests.rs",
         "crates/application/src/use_cases/rules/package_factory/mod.rs",
         "crates/model-api/src/lib.rs",
         "crates/model-stub/src/lib.rs",
@@ -4946,6 +4951,7 @@
         "crates/domain/tests/serde_contracts/module_paths.rs"
       ],
       "externalCallers": [
+        "crates/application/src/use_cases/prediction/tests.rs",
         "crates/application/src/use_cases/rules/package_factory/mod.rs",
         "crates/persistence-postgres/src/adapters/competition/route_resolution/route/record_mapper.rs",
         "crates/persistence-postgres/tests/competition_bindings_repository_contract.rs",
@@ -5024,6 +5030,7 @@
       "externalCallers": [
         "crates/application/src/composition/adapters/research.rs",
         "crates/application/src/ports/research/mod.rs",
+        "crates/application/src/services/p4_orchestration/tests.rs",
         "crates/application/src/services/research/facade.rs",
         "crates/application/src/services/research/service.rs",
         "crates/application/src/use_cases/research/artifact_catalog.rs",
@@ -5096,6 +5103,7 @@
       "externalCallers": [
         "crates/application/src/composition/adapters/research.rs",
         "crates/application/src/ports/research/mod.rs",
+        "crates/application/src/services/p4_orchestration/tests.rs",
         "crates/application/src/services/research/facade.rs",
         "crates/application/src/services/research/service.rs",
         "crates/application/src/use_cases/research/artifact_catalog.rs",
@@ -6114,8 +6122,10 @@
         "crates/application/src/ports/analytics/mod.rs",
         "crates/application/src/services/analytics/facade.rs",
         "crates/application/src/services/analytics/service.rs",
+        "crates/application/src/services/p4_orchestration/tests.rs",
         "crates/application/src/use_cases/analytics/jobs/enqueue_analysis_job/mod.rs",
         "crates/application/src/use_cases/prediction/plan_p4_horizons/mod.rs",
+        "crates/application/src/use_cases/prediction/tests.rs",
         "crates/application/src/use_cases/research/p4_worker/transitions.rs",
         "crates/persistence-postgres/src/jobs.rs",
         "crates/persistence-postgres/tests/postgres_integration.rs",
@@ -9427,6 +9437,7 @@
         "crates/domain/tests/serde_contracts/r2_07_module_paths.rs"
       ],
       "externalCallers": [
+        "crates/application/src/services/p4_orchestration/tests.rs",
         "crates/persistence-postgres/src/jobs.rs",
         "crates/persistence-postgres/tests/postgres_integration.rs",
         "src-tauri/src/commands/issues.rs"
@@ -9549,6 +9560,7 @@
         "crates/application/src/services/lineups/facade.rs",
         "crates/application/src/services/lineups/service.rs",
         "crates/application/src/use_cases/lineups/create_lineup/mod.rs",
+        "crates/application/src/use_cases/prediction/tests.rs",
         "crates/persistence-postgres/src/player_catalog.rs",
         "crates/persistence-postgres/tests/postgres_integration.rs",
         "crates/spreadsheet-io/src/match_review_workbook.rs",
@@ -9614,6 +9626,7 @@
         "crates/application/src/services/lineups/facade.rs",
         "crates/application/src/services/lineups/service.rs",
         "crates/application/src/use_cases/lineups/remove_lineup_history/mod.rs",
+        "crates/application/src/use_cases/prediction/tests.rs",
         "crates/persistence-postgres/src/player_catalog.rs",
         "src-tauri/src/commands/catalog.rs"
       ],
@@ -9674,6 +9687,7 @@
         "crates/application/src/services/lineups/facade.rs",
         "crates/application/src/services/lineups/service.rs",
         "crates/application/src/use_cases/lineups/create_lineup_pair/mod.rs",
+        "crates/application/src/use_cases/prediction/tests.rs",
         "crates/application/src/use_cases/review/package/shared.rs",
         "crates/persistence-postgres/src/player_catalog.rs",
         "crates/persistence-postgres/tests/postgres_integration.rs",
@@ -9736,6 +9750,7 @@
         "crates/application/src/services/lineups/facade.rs",
         "crates/application/src/services/lineups/service.rs",
         "crates/application/src/use_cases/lineups/create_lineup_pair/mod.rs",
+        "crates/application/src/use_cases/prediction/tests.rs",
         "crates/persistence-postgres/src/player_catalog.rs",
         "src-tauri/src/commands/catalog.rs"
       ],
@@ -10140,6 +10155,7 @@
         "crates/application/src/use_cases/lineups/list_lineups/mod.rs",
         "crates/application/src/use_cases/lineups/read_lineup/mod.rs",
         "crates/application/src/use_cases/prediction/shared/readiness_checks.rs",
+        "crates/application/src/use_cases/prediction/tests.rs",
         "crates/application/src/use_cases/review/package/shared.rs",
         "crates/persistence-postgres/src/lineup_chain.rs",
         "crates/persistence-postgres/src/match_exchange.rs",
@@ -10315,6 +10331,7 @@
         "crates/application/src/use_cases/prediction/dry_run_default_fixture/mod.rs",
         "crates/application/src/use_cases/prediction/inspect_match_prediction_readiness/mod.rs",
         "crates/application/src/use_cases/prediction/shared/routing.rs",
+        "crates/application/src/use_cases/prediction/tests.rs",
         "crates/model-api/src/lib.rs",
         "crates/model-stub/src/lib.rs"
       ],
@@ -10425,6 +10442,7 @@
         "crates/application/src/services/lineups/facade.rs",
         "crates/application/src/services/lineups/service.rs",
         "crates/application/src/use_cases/lineups/create_match/mod.rs",
+        "crates/application/src/use_cases/prediction/tests.rs",
         "crates/persistence-postgres/src/adapters/matches/catalog/create.rs",
         "crates/persistence-postgres/src/adapters/matches/catalog/scope.rs",
         "crates/persistence-postgres/tests/match_catalog_repository_contract.rs",
@@ -10849,6 +10867,7 @@
         "crates/application/src/services/lineups/service.rs",
         "crates/application/src/use_cases/lineups/read_match_lineup_chain/mod.rs",
         "crates/application/src/use_cases/prediction/shared/readiness_checks.rs",
+        "crates/application/src/use_cases/prediction/tests.rs",
         "crates/persistence-postgres/src/lineup_chain.rs",
         "src-tauri/src/commands/catalog.rs"
       ],
@@ -10945,6 +10964,7 @@
       "externalCallers": [
         "crates/application/src/composition/adapters/exchange/match_lineup.rs",
         "crates/application/src/ports/exchange/mod.rs",
+        "crates/application/src/use_cases/exchange/export_match_lineup_data/mod.rs",
         "crates/persistence-postgres/src/match_exchange.rs",
         "crates/spreadsheet-io/src/match_workbook.rs"
       ],
@@ -14721,10 +14741,12 @@
         "crates/application/src/composition/adapters/research.rs",
         "crates/application/src/ports/prediction/mod.rs",
         "crates/application/src/ports/research/mod.rs",
+        "crates/application/src/services/p4_orchestration/tests.rs",
         "crates/application/src/services/prediction/facade.rs",
         "crates/application/src/services/prediction/service.rs",
         "crates/application/src/use_cases/prediction/execute_p4_freeze/snapshot_projection.rs",
         "crates/application/src/use_cases/prediction/p4_freeze_readiness/mod.rs",
+        "crates/application/src/use_cases/prediction/tests.rs",
         "crates/persistence-postgres/src/p4_orchestration.rs",
         "src-tauri/src/commands/orchestration.rs"
       ],
@@ -14847,6 +14869,7 @@
       "externalCallers": [
         "crates/application/src/composition/adapters/prediction.rs",
         "crates/application/src/ports/prediction/mod.rs",
+        "crates/application/src/services/p4_orchestration/tests.rs",
         "crates/application/src/use_cases/prediction/plan_p4_horizons/mod.rs",
         "crates/persistence-postgres/src/p4_orchestration.rs"
       ],
@@ -14924,6 +14947,7 @@
       "externalCallers": [
         "crates/application/src/composition/adapters/prediction.rs",
         "crates/application/src/ports/prediction/mod.rs",
+        "crates/application/src/services/p4_orchestration/tests.rs",
         "crates/application/src/services/prediction/facade.rs",
         "crates/application/src/services/prediction/service.rs",
         "crates/application/src/use_cases/prediction/list_p4_freeze_task_events/mod.rs",
@@ -15084,6 +15108,7 @@
       "externalCallers": [
         "crates/application/src/composition/adapters/prediction.rs",
         "crates/application/src/ports/prediction/mod.rs",
+        "crates/application/src/services/p4_orchestration/tests.rs",
         "crates/application/src/services/prediction/facade.rs",
         "crates/application/src/services/prediction/service.rs",
         "crates/application/src/use_cases/prediction/execute_p4_freeze/mod.rs",
@@ -15092,6 +15117,7 @@
         "crates/application/src/use_cases/prediction/plan_p4_horizons/mod.rs",
         "crates/application/src/use_cases/prediction/read_p4_freeze_task/mod.rs",
         "crates/application/src/use_cases/prediction/shared/p4_planning.rs",
+        "crates/application/src/use_cases/prediction/tests.rs",
         "crates/application/src/use_cases/research/p4_worker/context.rs",
         "crates/application/src/use_cases/research/p4_worker/mod.rs",
         "crates/application/src/use_cases/research/p4_worker/transitions.rs",
@@ -15219,6 +15245,7 @@
         "crates/domain/tests/serde_contracts/module_paths.rs"
       ],
       "externalCallers": [
+        "crates/application/src/services/p4_orchestration/tests.rs",
         "crates/application/src/use_cases/p4_orchestration/failure.rs",
         "crates/application/src/use_cases/prediction/execute_p4_freeze/mod.rs",
         "crates/application/src/use_cases/prediction/plan_p4_horizons/mod.rs",
@@ -15325,9 +15352,11 @@
       "externalCallers": [
         "crates/application/src/composition/adapters/prediction.rs",
         "crates/application/src/ports/prediction/mod.rs",
+        "crates/application/src/services/p4_orchestration/tests.rs",
         "crates/application/src/use_cases/p4_orchestration/failure.rs",
         "crates/application/src/use_cases/prediction/execute_p4_freeze/mod.rs",
         "crates/application/src/use_cases/prediction/plan_p4_horizons/mod.rs",
+        "crates/application/src/use_cases/prediction/tests.rs",
         "crates/application/src/use_cases/research/p4_manual_conflict/reconciliation.rs",
         "crates/application/src/use_cases/research/p4_worker/execution.rs",
         "crates/application/src/use_cases/research/p4_worker/transitions.rs",
@@ -15770,6 +15799,7 @@
       "externalCallers": [
         "crates/application/src/composition/adapters/prediction.rs",
         "crates/application/src/ports/prediction/mod.rs",
+        "crates/application/src/services/p4_orchestration/tests.rs",
         "crates/application/src/services/prediction/facade.rs",
         "crates/application/src/services/prediction/service.rs",
         "crates/application/src/use_cases/prediction/read_p4_match_workspace/mod.rs",
@@ -15857,6 +15887,7 @@
       "externalCallers": [
         "crates/application/src/composition/adapters/prediction.rs",
         "crates/application/src/ports/prediction/mod.rs",
+        "crates/application/src/services/p4_orchestration/tests.rs",
         "crates/persistence-postgres/src/p4_orchestration.rs"
       ],
       "databaseMappings": [
@@ -16039,6 +16070,7 @@
       "externalCallers": [
         "crates/application/src/composition/adapters/prediction.rs",
         "crates/application/src/ports/prediction/mod.rs",
+        "crates/application/src/services/p4_orchestration/tests.rs",
         "crates/application/src/use_cases/prediction/execute_p4_freeze/snapshot_projection.rs",
         "crates/persistence-postgres/src/p4_orchestration.rs"
       ],
@@ -16123,6 +16155,7 @@
       "externalCallers": [
         "crates/application/src/composition/adapters/prediction.rs",
         "crates/application/src/ports/prediction/mod.rs",
+        "crates/application/src/services/p4_orchestration/tests.rs",
         "crates/application/src/services/prediction/facade.rs",
         "crates/application/src/services/prediction/service.rs",
         "crates/application/src/services/research/facade.rs",
@@ -21635,6 +21668,7 @@
       "externalCallers": [
         "crates/application/src/composition/adapters/prediction.rs",
         "crates/application/src/ports/prediction/mod.rs",
+        "crates/application/src/use_cases/prediction/tests.rs",
         "crates/model-api/src/lib.rs"
       ],
       "databaseMappings": []
@@ -21780,6 +21814,7 @@
       "externalCallers": [
         "crates/application/src/composition/adapters/prediction.rs",
         "crates/application/src/ports/prediction/mod.rs",
+        "crates/application/src/services/p4_orchestration/tests.rs",
         "crates/application/src/services/prediction/facade.rs",
         "crates/application/src/services/prediction/service.rs",
         "crates/application/src/use_cases/prediction/p4_snapshot/mod.rs",
@@ -21910,6 +21945,7 @@
       "externalCallers": [
         "crates/application/src/composition/adapters/prediction.rs",
         "crates/application/src/ports/prediction/mod.rs",
+        "crates/application/src/services/p4_orchestration/tests.rs",
         "crates/application/src/services/prediction/facade.rs",
         "crates/application/src/services/prediction/service.rs",
         "crates/application/src/use_cases/prediction/execute_p4_freeze/mod.rs",
@@ -22011,6 +22047,7 @@
       "externalCallers": [
         "crates/application/src/composition/adapters/prediction.rs",
         "crates/application/src/ports/prediction/mod.rs",
+        "crates/application/src/services/p4_orchestration/tests.rs",
         "crates/application/src/services/prediction/facade.rs",
         "crates/application/src/services/prediction/service.rs",
         "crates/application/src/use_cases/prediction/p4_snapshot/mod.rs",
@@ -22083,6 +22120,7 @@
         "crates/application/src/ports/prediction/mod.rs",
         "crates/application/src/use_cases/prediction/shared/audit.rs",
         "crates/application/src/use_cases/prediction/shared/readiness_checks.rs",
+        "crates/application/src/use_cases/prediction/tests.rs",
         "crates/persistence-postgres/src/match_prediction.rs"
       ],
       "databaseMappings": [
@@ -22152,6 +22190,7 @@
       "externalCallers": [
         "crates/application/src/composition/adapters/research.rs",
         "crates/application/src/ports/research/mod.rs",
+        "crates/application/src/services/p4_orchestration/tests.rs",
         "crates/application/src/services/research/facade.rs",
         "crates/application/src/services/research/service.rs",
         "crates/application/src/use_cases/research/artifact_catalog.rs",
@@ -22228,6 +22267,7 @@
       "externalCallers": [
         "crates/application/src/composition/adapters/research.rs",
         "crates/application/src/ports/research/mod.rs",
+        "crates/application/src/services/p4_orchestration/tests.rs",
         "crates/application/src/services/research/facade.rs",
         "crates/application/src/services/research/service.rs",
         "crates/application/src/use_cases/research/artifact_catalog.rs",
@@ -23396,6 +23436,7 @@
       "externalCallers": [
         "crates/application/src/composition/adapters/research.rs",
         "crates/application/src/ports/research/mod.rs",
+        "crates/application/src/services/p4_orchestration/tests.rs",
         "crates/application/src/services/research/facade.rs",
         "crates/application/src/services/research/service.rs",
         "crates/application/src/use_cases/research/ledger.rs",
@@ -23496,6 +23537,7 @@
       "externalCallers": [
         "crates/application/src/composition/adapters/research.rs",
         "crates/application/src/ports/research/mod.rs",
+        "crates/application/src/services/p4_orchestration/tests.rs",
         "crates/application/src/services/research/facade.rs",
         "crates/application/src/services/research/service.rs",
         "crates/application/src/use_cases/research/ledger.rs",
@@ -23585,6 +23627,7 @@
       "externalCallers": [
         "crates/application/src/composition/adapters/research.rs",
         "crates/application/src/ports/research/mod.rs",
+        "crates/application/src/services/p4_orchestration/tests.rs",
         "crates/application/src/services/research/facade.rs",
         "crates/application/src/services/research/service.rs",
         "crates/application/src/use_cases/research/ledger.rs",
@@ -23736,6 +23779,7 @@
         "crates/application/src/composition/adapters/rules.rs",
         "crates/application/src/ports/rules/mod.rs",
         "crates/application/src/use_cases/prediction/shared/routing.rs",
+        "crates/application/src/use_cases/prediction/tests.rs",
         "crates/persistence-postgres/src/adapters/competition/bindings/create_binding/insert_binding.rs",
         "crates/persistence-postgres/src/adapters/competition/bindings/create_binding/transaction.rs",
         "crates/persistence-postgres/src/adapters/competition/route_resolution/context/record_mapper.rs",
@@ -24533,6 +24577,7 @@
         "crates/application/src/use_cases/prediction/preview_route/mod.rs",
         "crates/application/src/use_cases/prediction/shared/p4_planning.rs",
         "crates/application/src/use_cases/prediction/shared/routing.rs",
+        "crates/application/src/use_cases/prediction/tests.rs",
         "crates/persistence-postgres/src/adapters/competition/route_resolution/route/record_mapper.rs",
         "crates/persistence-postgres/src/adapters/competition/route_resolution/route/resolve_route.rs",
         "crates/persistence-postgres/src/model_runs.rs",
@@ -24634,6 +24679,7 @@
         "crates/application/src/use_cases/prediction/inspect_match_prediction_readiness/mod.rs",
         "crates/application/src/use_cases/prediction/plan_p4_horizons/mod.rs",
         "crates/application/src/use_cases/prediction/preview_route/mod.rs",
+        "crates/application/src/use_cases/prediction/tests.rs",
         "crates/persistence-postgres/src/adapters/competition/route_resolution/route/binding_candidate.rs",
         "crates/persistence-postgres/src/adapters/competition/route_resolution/route/record_mapper.rs",
         "crates/persistence-postgres/src/adapters/competition/route_resolution/route/resolve_route.rs",
@@ -24710,6 +24756,7 @@
         "crates/domain/tests/serde_contracts/module_paths.rs"
       ],
       "externalCallers": [
+        "crates/application/src/use_cases/prediction/tests.rs",
         "crates/persistence-postgres/src/adapters/competition/route_resolution/route/record_mapper.rs",
         "crates/persistence-postgres/src/adapters/competition/route_resolution/route/resolve_route.rs",
         "crates/persistence-postgres/tests/competition_bindings_repository_contract.rs",
@@ -25021,6 +25068,7 @@
       ],
       "externalCallers": [
         "crates/application/src/use_cases/prediction/shared/routing.rs",
+        "crates/application/src/use_cases/prediction/tests.rs",
         "crates/application/src/use_cases/rules/package_factory/mod.rs",
         "crates/persistence-postgres/tests/competition_bindings_repository_contract.rs",
         "crates/persistence-postgres/tests/postgres_integration.rs",
@@ -25168,6 +25216,7 @@
       "externalCallers": [
         "crates/application/src/composition/adapters/research.rs",
         "crates/application/src/ports/research/mod.rs",
+        "crates/application/src/services/p4_orchestration/tests.rs",
         "crates/application/src/services/research/facade.rs",
         "crates/application/src/services/research/service.rs",
         "crates/application/src/use_cases/research/artifact_catalog.rs",
@@ -25245,6 +25294,7 @@
       "externalCallers": [
         "crates/application/src/composition/adapters/research.rs",
         "crates/application/src/ports/research/mod.rs",
+        "crates/application/src/services/p4_orchestration/tests.rs",
         "crates/application/src/services/research/facade.rs",
         "crates/application/src/services/research/service.rs",
         "crates/application/src/use_cases/research/artifact_catalog.rs",
@@ -25873,6 +25923,7 @@
       "externalCallers": [
         "crates/application/src/composition/adapters/research.rs",
         "crates/application/src/ports/research/mod.rs",
+        "crates/application/src/services/p4_orchestration/tests.rs",
         "crates/application/src/use_cases/research/fact_pipeline/mod.rs",
         "crates/application/src/use_cases/research/fact_pipeline/source_policy.rs",
         "crates/persistence-postgres/src/fact_pipeline_records.rs",
@@ -25943,6 +25994,7 @@
       "externalCallers": [
         "crates/application/src/composition/adapters/research.rs",
         "crates/application/src/ports/research/mod.rs",
+        "crates/application/src/services/p4_orchestration/tests.rs",
         "crates/persistence-postgres/src/fact_pipeline_records.rs"
       ],
       "databaseMappings": [
@@ -26644,6 +26696,7 @@
         "crates/application/src/use_cases/exchange/commit_match_lineup_import/mod.rs",
         "crates/application/src/use_cases/exchange/commit_player_catalog_import/use_case.rs",
         "crates/application/src/use_cases/exchange/commit_team_monthly_import/use_case.rs",
+        "crates/application/src/use_cases/exchange/export_match_lineup_data/mod.rs",
         "crates/persistence-postgres/src/match_exchange.rs",
         "crates/persistence-postgres/src/monthly_workbooks.rs",
         "crates/persistence-postgres/src/spreadsheet_exchange.rs",
@@ -26801,6 +26854,7 @@
         "crates/application/src/services/exchange/service/match_lineup.rs",
         "crates/application/src/services/exchange/service/spreadsheet.rs",
         "crates/application/src/use_cases/exchange/commit_team_package_import/policy.rs",
+        "crates/application/src/use_cases/exchange/export_match_lineup_data/mod.rs",
         "crates/application/src/use_cases/exchange/preview_ai_match_package/mod.rs",
         "crates/application/src/use_cases/exchange/preview_match_lineup_import/mod.rs",
         "crates/application/src/use_cases/exchange/preview_player_catalog_import/use_case.rs",
@@ -26895,6 +26949,7 @@
         "crates/application/src/services/exchange/service/match_lineup.rs",
         "crates/application/src/services/exchange/service/spreadsheet.rs",
         "crates/application/src/use_cases/exchange/commit_team_package_import/policy.rs",
+        "crates/application/src/use_cases/exchange/export_match_lineup_data/mod.rs",
         "crates/application/src/use_cases/exchange/preview_ai_match_package/mod.rs",
         "crates/application/src/use_cases/exchange/preview_match_lineup_import/mod.rs",
         "crates/application/src/use_cases/exchange/preview_player_catalog_import/use_case.rs",
@@ -26979,6 +27034,7 @@
         "crates/application/src/services/exchange/facade/spreadsheet.rs",
         "crates/application/src/services/exchange/service/match_lineup.rs",
         "crates/application/src/services/exchange/service/spreadsheet.rs",
+        "crates/application/src/use_cases/exchange/export_match_lineup_data/mod.rs",
         "crates/application/src/use_cases/exchange/resolve_match_lineup_import_conflict/mod.rs",
         "crates/application/src/use_cases/exchange/resolve_player_catalog_import_conflict/use_case.rs",
         "crates/application/src/use_cases/exchange/resolve_team_monthly_import_conflict/use_case.rs",
@@ -27147,6 +27203,7 @@
         "crates/application/src/composition/adapters/exchange/match_lineup.rs",
         "crates/application/src/composition/adapters/exchange/spreadsheet.rs",
         "crates/application/src/ports/exchange/mod.rs",
+        "crates/application/src/use_cases/exchange/export_match_lineup_data/mod.rs",
         "crates/application/src/use_cases/exchange/preview_team_package_import/coverage.rs",
         "crates/application/src/use_cases/exchange/preview_team_package_import/package_rows.rs",
         "crates/application/src/use_cases/exchange/preview_team_package_import/use_case.rs",
@@ -29930,6 +29987,7 @@
         "crates/application/src/services/lineups/facade.rs",
         "crates/application/src/services/lineups/service.rs",
         "crates/application/src/use_cases/lineups/list_team_match_lineups/mod.rs",
+        "crates/application/src/use_cases/prediction/tests.rs",
         "crates/persistence-postgres/src/lineup_chain.rs",
         "src-tauri/src/commands/catalog.rs"
       ],

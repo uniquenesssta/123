@@ -9,7 +9,7 @@
 
 - 唯一阶段分支：`rewrite/r7-match-lineup-workbook-persistence`。
 - 规划依据：源码 `985f01816060cfd05672bdc03b6771dec7b4e842`，文档基线 `51f746729b2f94925e6382f2ae2108cf80855af6`，以及阶段 README 中 A1–A8、B1–B7 审计记录。
-- R7-01～R7-03 已完成 Windows Automated 并为 `DONE`；用户已启动 R7-04，清单/验证入口/历史记录修订完成、当前 `VERIFYING`，R7-05 及以后 `BLOCKED`。数据库/XLSX/Full 单独保留最终封包新库待验，证据见阶段 README。
+- R7-01～R7-04 已完成 Windows Automated 并为 `DONE`；用户已启动 R7-05，20 个关键 Application 行为测试实现、当前 `VERIFYING`，R7-06 及以后 `BLOCKED`。数据库/XLSX/Full 单独保留最终封包新库待验，证据见阶段 README。
 - 当前状态以 `docs/modular-rewrite/R07-match-lineup-workbook-persistence/README.md` 的唯一状态表为准；历史审计中的旧编号按下表映射。
 - 允许整改触及直接相关的 Application composition/Ports、catalog identity/deletion、现有 P4 时间比较和测试；不提前实施 R8/R10 的整阶段重写。
 - 不包含前端导入 UI 重写、工作簿解析器整体验证框架建设、模型内部算法/参数修改或历史 migration 改写。
@@ -106,7 +106,7 @@
 
 ## R7-04 架构清单、验证器与执行记录对齐
 
-状态：`VERIFYING`，递归声明/依赖扫描、真实模块 owner 清单、R6-03 原入口和历史记录修订已完成，等待 Windows CI，证据见阶段索引。来源 B3/B7；B4 仅修正现有验证入口的遗漏。
+状态：`DONE`，精确提交 `9bdb84923da714843e03383db1872aecd30250a2` 的 Windows run `36706905645` / job `109859181344` 全部 SUCCESS；证据见阶段索引与 `R07-04-architecture-inventory.md`。来源 B3/B7；B4 仅修正现有验证入口的遗漏。
 
 - **目标**：机器清单反映当前真实声明与 owner，未登记新增项不能静默通过；进度和审计编号可以追溯。
 - **范围**：`architecture/application-port-inventory.json`、`module-boundaries.json`、现有 Application/架构验证脚本及现有 package/frontend 聚合入口，相关阶段 README。
@@ -119,7 +119,7 @@
 
 ## R7-05 关键 Application 用例验证
 
-状态：`BLOCKED`，依赖 R7-04。来源 B5。
+状态：`VERIFYING`，R7-04 已 DONE、用户已启动本项；20 个新增行为测试与使用清单更新完成，等待本轮 Windows CI，不能继承前项 33 个单测的 PASS。来源 B5。
 
 - **目标**：验证真实的跨 Port 编排、失败与重试边界，不以 33 个已有测试的通过数代替关键流程覆盖。
 - **范围**：现有 Prediction/Research/P4 orchestration/Exchange 单测模块和对应 use cases；必要的最小测试注入边界。沿用现有 Rust 单测与 fake ports，不引入测试框架或私有模型资产。

@@ -34,7 +34,7 @@ impl<T> PredictionAccess for T where
 }
 
 #[cfg(test)]
-mod tests;
+pub(crate) mod tests;
 
 pub(crate) trait P4PlanningAccess:
     crate::ports::prediction::PredictionWorkflowPort
