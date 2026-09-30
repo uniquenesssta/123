@@ -85,12 +85,12 @@ impl LineupPort for PersistenceStore {
         match_id: Option<Uuid>,
         limit: u32,
     ) -> PortResult<Vec<LineupRecord>> {
-        self.list_lineups(match_id, limit)
+        PersistenceStore::list_lineups(self, match_id, limit)
             .await
             .map_err(map_persistence_error)
     }
     async fn read_lineup(&self, lineup_id: Uuid) -> PortResult<LineupRecord> {
-        self.read_lineup(lineup_id)
+        PersistenceStore::read_lineup(self, lineup_id)
             .await
             .map_err(map_persistence_error)
     }
@@ -99,7 +99,7 @@ impl LineupPort for PersistenceStore {
         lineup_id: Uuid,
         reason: Option<&str>,
     ) -> PortResult<LineupHistoryRemovalResult> {
-        self.remove_lineup_history(lineup_id, reason)
+        PersistenceStore::remove_lineup_history(self, lineup_id, reason)
             .await
             .map_err(map_persistence_error)
     }
@@ -108,7 +108,7 @@ impl LineupPort for PersistenceStore {
         match_id: Uuid,
         snapshot_type: &str,
     ) -> PortResult<MatchLineupChain> {
-        self.read_match_lineup_chain(match_id, snapshot_type)
+        PersistenceStore::read_match_lineup_chain(self, match_id, snapshot_type)
             .await
             .map_err(map_persistence_error)
     }
@@ -118,7 +118,7 @@ impl LineupPort for PersistenceStore {
         snapshot_type: &str,
         reference_time: DateTime<Utc>,
     ) -> PortResult<MatchLineupChain> {
-        self.read_match_lineup_chain_at(match_id, snapshot_type, reference_time)
+        PersistenceStore::read_match_lineup_chain_at(self, match_id, snapshot_type, reference_time)
             .await
             .map_err(map_persistence_error)
     }
@@ -127,7 +127,7 @@ impl LineupPort for PersistenceStore {
         team_id: Uuid,
         limit: u32,
     ) -> PortResult<Vec<TeamMatchLineupHistoryItem>> {
-        self.list_team_match_lineups(team_id, limit)
+        PersistenceStore::list_team_match_lineups(self, team_id, limit)
             .await
             .map_err(map_persistence_error)
     }

@@ -61,7 +61,7 @@ impl PostgresStore {
         let match_record = crate::adapters::matches::catalog::match_record_from_row(&row)?;
         let competition_kind = parse_kind(&row.try_get::<String, _>("effective_kind")?)?;
         let frozen_at = reference_time;
-        let data_window = super::lineup_chain::lineup_snapshot_window_at(
+        let data_window = crate::adapters::lineups::chain::lineup_snapshot_window_at(
             match_record.kickoff_time,
             snapshot_type,
             frozen_at,
@@ -171,7 +171,7 @@ impl PostgresStore {
         &self,
         match_id: Uuid,
         team_id: Uuid,
-        data_window: super::lineup_chain::LineupSnapshotWindow,
+        data_window: crate::adapters::lineups::chain::LineupSnapshotWindow,
     ) -> PersistenceResult<Option<LineupRecord>> {
         match self
             .preferred_lineup_id(match_id, team_id, data_window)

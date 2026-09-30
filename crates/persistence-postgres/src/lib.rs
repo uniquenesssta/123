@@ -7,7 +7,6 @@ mod error;
 mod fact_pipeline_records;
 mod health;
 mod jobs;
-mod lineup_chain;
 mod mapping;
 mod match_exchange;
 mod match_prediction;

@@ -43,8 +43,8 @@ crates/persistence-postgres/src/adapters/workbooks/
 | R7-04 | 架构清单、验证器与执行记录对齐 | DONE |
 | R7-05 | 关键 Application 用例验证 | DONE |
 | R7-06 | 历史数据库失败与账本问题收口 | DONE |
-| R7-07 | Lineup Pair Transaction | VERIFYING |
-| R7-08 | Lineup Chain / History | BLOCKED |
+| R7-07 | Lineup Pair Transaction | DONE |
+| R7-08 | Lineup Chain / History | VERIFYING |
 | R7-09 | Team Lineup Presets | BLOCKED |
 | R7-10 | Spreadsheet Batch Ledger | BLOCKED |
 | R7-11 | Player Workbook | BLOCKED |
@@ -55,7 +55,7 @@ crates/persistence-postgres/src/adapters/workbooks/
 
 ## R7-02 当前验证状态
 
-进入基线：`c826dd32e3ecb84dfc732ef60c3fd3aaf4153fdf`。R7-02 已 `DONE`：精确提交 `1e4da04` 的 Windows run `36686343584` / job `109792974772` 全通过，见 [节点完成记录](R07-02-external-id-integrity.md)。PG/XLSX/Full 保持最终封包新库待验；R7-03 已 DONE，R7-04～06 DONE、R7-07 VERIFYING。以下实施条目中的 Windows 待验由本段 CI 证据更新。
+进入基线：`c826dd32e3ecb84dfc732ef60c3fd3aaf4153fdf`。R7-02 已 `DONE`：精确提交 `1e4da04` 的 Windows run `36686343584` / job `109792974772` 全通过，见 [节点完成记录](R07-02-external-id-integrity.md)。PG/XLSX/Full 保持最终封包新库待验；R7-03 已 DONE，R7-04～07 DONE、R7-08 VERIFYING。以下实施条目中的 Windows 待验由本段 CI 证据更新。
 
 - B1 已修订：直接添加与 Spreadsheet commit 共用 `references/external_ids/write.rs` 的 `write_external_entity_id`，接收调用方 PgConnection；唯一键冲突仅在 entity_id 一致时合并 metadata，无条件目标覆盖已删除。跨实体返回原有导入冲突文本，原绑定/metadata 不改。
 - 工作簿复用原批次事务并传播冲突，预检后出现竞争绑定仍会拒绝提交，此前业务行、ID、行状态、计数和成功审计一起回滚。预检/冲突裁决逻辑保留；未提前迁移 Workbook owner。
@@ -98,7 +98,7 @@ crates/persistence-postgres/src/adapters/workbooks/
 
 ## R7-05 当前验证状态
 
-进入基线：`9bdb84923da714843e03383db1872aecd30250a2`。本节点已 `DONE`：精确提交 `02e56badb508f448afa498bc9cb227065f346a6d` 的 Windows run `36712015030` / job `109875821076` 全通过，53 个 Application 单测实际通过，包含全部 20 项新增测试，见 [完成记录](R07-05-application-use-case-tests.md)。R7-06 已 DONE，R7-07 已启动并 VERIFYING，R7-08 及以后 BLOCKED。以下保留实施时的检查与覆盖范围。
+进入基线：`9bdb84923da714843e03383db1872aecd30250a2`。本节点已 `DONE`：精确提交 `02e56badb508f448afa498bc9cb227065f346a6d` 的 Windows run `36712015030` / job `109875821076` 全通过，53 个 Application 单测实际通过，包含全部 20 项新增测试，见 [完成记录](R07-05-application-use-case-tests.md)。R7-06 已 DONE，R7-07 DONE，R7-08 已启动并 VERIFYING，R7-09 及以后 BLOCKED。以下保留实施时的检查与覆盖范围。
 
 | 现有模块 | 新增测试 | 真实调用与断言范围 |
 |---|---:|---|
@@ -128,7 +128,7 @@ flowchart TD
 
 ## R7-06 当前验证状态
 
-进入/回退基线：`02e56badb508f448afa498bc9cb227065f346a6d`。本节点已 `DONE`：精确提交 `4496399bd520b324360826d613113779c416c41e` 的 Windows run `36734194083` / job `109951439572` 全通过，99 个 Persistence inline 单测包含亚微秒指纹测试，53 个 Application 单测全部通过，见 [完成记录](R07-06-database-contract-closeout.md)。PG 四项失败/账本仍待新库实跑关闭；R7-07 VERIFYING，R7-08 及以后 BLOCKED。
+进入/回退基线：`02e56badb508f448afa498bc9cb227065f346a6d`。本节点已 `DONE`：精确提交 `4496399bd520b324360826d613113779c416c41e` 的 Windows run `36734194083` / job `109951439572` 全通过，99 个 Persistence inline 单测包含亚微秒指纹测试，53 个 Application 单测全部通过，见 [完成记录](R07-06-database-contract-closeout.md)。PG 四项失败/账本仍待新库实跑关闭；R7-07 DONE，R7-08 VERIFYING，R7-09 及以后 BLOCKED。
 
 | 历史问题 | 实际修订与现有测试断言 | 验证状态 |
 |---|---|---|
@@ -148,8 +148,7 @@ SQLx 0.8.6 的 Chrono DateTime 编码按自 2000 年起的整数微秒写入，�
 
 ## R7-07 当前验证状态
 
-进入/回退基线：`4496399bd520b324360826d613113779c416c41e`。用户确认 R7-06 通过后启动本项，当前 `VERIFYING`：唯一 owner 迁移、并发边界修订与现有断言已实现，等待本轮 Windows CI；不得继承 R7-06 PASS。R7-08 及以后 BLOCKED。
-
+进入/回退基线：`4496399bd520b324360826d613113779c416c41e`。本节点已 `DONE`：精确提交 `3ff21cba4ab01bc02108e8545f0ed133e25de687` 的 Windows run `36757339619` / job `110030801579` 全通过，Persistence 102 项/Application 53 项实际通过，见 [完成记录](R07-07-lineup-pair-transaction.md)。真实 PG 并发/取消/回滚仍最终封包新库待验；R7-08 VERIFYING，R7-09 及以后 BLOCKED。以下保留实施范围。
 - `create_lineup`/`create_lineup_pair` 唯一实现迁入 `adapters/lineups/pair_transaction/mod.rs`。同目录 `validation.rs` 持有原结构/数值/窗口规范化校验，`write.rs` 持有原阵容与球员写入、角色来源、旧活动版本结束、门禁刷新与单侧审计。原两个私有函数体经规范化对比保持，创建流程只增加必要共同父锁/READ COMMITTED。旧 `player_catalog.rs` 的创建与私有写入/校验删除；读取/mapper/历史删除/reference data 保留给 R7-08，不保留创建转发壳。
 - 双方保留同比赛、不同球队、同窗口/类型及准确主客身份校验；两侧和单侧审计、pair 审计在同一事务提交。单侧与双方在读取/结束旧版本前共同 `FOR UPDATE` 锁比赛行，READ COMMITTED 保证等待者之后读取已提交版本。工作簿同一版本链写入复用这个锁，不另开/提交事务，不提前迁移 R7-14 owner；R7-06 ended_previous_count 保持。缺失比赛的 single/pair 错误文本保持，工作簿未找到父行仍由原外键路径拒绝。
 - Application LineupPort 显式调用原公开 PersistenceStore 固有入口，公开 API/Port/DTO、业务值/角色规则、时间/model gate/actual 隔离、返回形态保持。已有读回仍发生在成功 commit 后；读回失败或之后取消不会撤销已提交版本。提交往返中的取消不能承诺必回滚，需要查库确认；新增取消场景明确发生在提交调用之前，不将其扩张为网络不确定提交保证。
@@ -159,7 +158,21 @@ SQLx 0.8.6 的 Chrono DateTime 编码按自 2000 年起的整数微秒写入，�
 
 已通过架构聚合、受影响既有静态检查、源码卫生、171 命令、18 保护资产、迁移兼容、数据库静态基线、Domain inventory、源文件 rustfmt/语法解析与 diff 复核。5 项临时破坏探针拒绝去掉 single 锁、弱化父锁、漏 workbook 锁、写入 helper 另行 commit、重复创建 owner，全部恢复。SQLx 0.8.6 的事务 Drop 文档通过 Context7 查询，并核对官方 tag 源码：未结束事务 start_rollback 入队，在后续连接异步调用/归还池时执行；不把“取消请求已发送”写为立即完成数据库回滚。
 
-Windows 编译/fmt/all-targets Clippy/workspace 单测/前端/release 打包/启动等待本轮精确提交 CI。真实并发/取消/失败回滚及工作簿事务均“最终封包新库待验”，沿用原 18 项 broad 与既有窗口/actual/角色、有效 XLSX、Windows Full；不执行 Linux/macOS 编译或测试。模型算法/参数/资产、生产依赖/锁文件、0001–0046 迁移及工作流冻结。成功 CI 后才创建 `R07-07-lineup-pair-transaction.md` 并开放 R7-08；受控回退本项同时恢复创建 owner/共同锁、Port 分派、清单/指纹和原验证器，不仅放宽门禁。
+上述精确提交的 Windows 编译/fmt/all-targets Clippy/workspace 单测/前端/release 打包/启动均通过。真实并发/取消/失败回滚及工作簿事务均“最终封包新库待验”，沿用原 18 项 broad 与既有窗口/actual/角色、有效 XLSX、Windows Full；不执行 Linux/macOS 编译或测试。模型算法/参数/资产、生产依赖/锁文件、0001–0046 迁移及工作流冻结。已按成功 CI 创建 `R07-07-lineup-pair-transaction.md` 并开放 R7-08；受控回退本项同时恢复创建职责/共同锁、Port 分派、清单/指纹和原验证器，不仅放宽门禁。
+
+## R7-08 当前验证状态
+
+进入/回退基线：`3ff21cba4ab01bc02108e8545f0ed133e25de687`。用户确认 R7-07 通过后启动，本项当前 `VERIFYING`；R7-09 及以后 BLOCKED。本项 Windows 结果待精确提交 CI，不继承 R7-07 PASS。
+
+- `adapters/lineups/chain/mod.rs` 唯一持有 preferred lineup、按时点链读取与阻断说明；同目录 `window.rs` 持有规范化/窗口纯规则和原五项测试，`validation.rs` 持有原调用方事务内模型门禁刷新。旧 `lineup_chain.rs` 删除，不保留转发壳。
+- `adapters/lineups/history/read.rs` 唯一持有列表、按 ID 详情及球队历史；`mapping.rs` 持有严格枚举/明细/记录映射，`removal.rs` 持有引用保护、隐藏/物理删除、前驱恢复及审计单事务。旧 `player_catalog.rs` 仅保留原 reference data 聚合和既有 catalog 纯测试。
+- 保持 active/可见/model_eligible 及 expected/confirmed 过滤、包含等时截止/起点、按 captured_at 再 confirmed 再 created_at/UUID 优先；actual 只用于赛后。历史列表继续 clamp 1..=200，链内部请求 500 仍受原 200 上限约束；按 ID 可追溯隐藏历史，列表摘要与详情球员读取语义保持。本项不引入跨查询一致快照或无界历史分页。
+- 历史删除原先只锁版本，可能与创建/导入交错；现于同一 READ COMMITTED 事务先定位比赛、取得 R7-07 共同父锁，再锁后重读版本、核验引用、删除/隐藏、恢复可见前驱与写审计。保留原错误、引用范围和删除模式；锁顺序与创建/导入一致，不另建状态或事务。
+- pair_transaction、match_exchange、match_prediction 的直接路径已切换，Application LineupPort 六个读/历史入口显式调用原固有方法；公开接口/Port/DTO 不变。旧职责及 mapper 没有双实现。
+- 原窗口测试追加 3 项边界/规范化测试，原枚举断言迁入 mapping 并覆盖全部三类。现有 broad chain 测试追加截止/起点相等与一微秒外、confirmed 同时点优先/较新 expected 优先、等时间 UUID 排序、隐藏历史详情/链/球队列表隔离、201 行夹具的两种列表 0/max limit 与链上限。原 pair 测试追加隐藏追溯/重复删除拒绝、物理删除读回失败及真实父锁观察的删除/创建并发；保留 R7-06 账本和 R7-07 取消/混合并发断言。没有新增测试文件/target/runner/workflow/数据库。
+- 现有 Lineups Service/Match Lineup Chain/Match Catalog/Player Role 验证器切换并增强唯一职责、规则、事务/锁顺序与测试证据检查；Domain 使用清单与原 integration runtime-source 指纹同步，声明/迁移/生产依赖冻结。直接模块数量由 39 变为 38：删除旧根 chain，复用已有 lineups 命名空间，不是撤回 R7-07 职责。
+
+本轮受影响原静态检查、架构聚合、源码卫生/格式/解析、Windows 验收入口静态检查、数据库/保护资产/命令冻结与差异复核均通过。五项临时破坏探针分别去父锁、放入 actual、排除等时截止、扩大 limit、暴露隐藏历史，均被原门禁拒绝并恢复；14 个原规则/读取/mapper 函数体规范化对比不变，历史删除仅增加隔离/父锁前置。Domain 365 声明及 300 项数据库映射分类保持，直接模块 38；Windows 编译/fmt/Clippy/workspace tests/前端/打包/启动等待本轮 CI，真实数据库边界/历史删除并发及有效 XLSX/Full 均“最终封包新库待验”。历史四项失败仍未实跑关闭。成功 CI 后才创建 `R07-08-lineup-chain-and-history.md` 并开放 R7-09；回退本项需一起恢复职责路径、共同锁、直接调用方、清单/指纹和原门禁。
 
 ## R7-01 READY 边界
 
@@ -185,7 +198,7 @@ Windows 编译/fmt/all-targets Clippy/workspace 单测/前端/release 打包/启
 
 ## R7-01 当前验证状态
 
-- R7-01 已 `DONE`：提交 `c826dd3` 的 Windows CI run `36678914535` / job `109769864719` 全通过，详见 [节点完成记录](R07-01-match-catalog.md)。PG/XLSX/Full 保留“最终封包新库待验”。R7-02、R7-03 已 DONE，R7-04～06 DONE，R7-07 VERIFYING，R7-08 及后续 BLOCKED。
+- R7-01 已 `DONE`：提交 `c826dd3` 的 Windows CI run `36678914535` / job `109769864719` 全通过，详见 [节点完成记录](R07-01-match-catalog.md)。PG/XLSX/Full 保留“最终封包新库待验”。R7-02、R7-03 已 DONE，R7-04～07 DONE，R7-08 VERIFYING，R7-09 及后续 BLOCKED。
 - 以下修复表及审计章节保留当时验证状态；Windows 待验已由上述精确提交的 CI 证据更新，数据库未因 CI 成功转为通过。
 
 ### 2026-09-30 R7-01 修复记录（待动态验收）

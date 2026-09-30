@@ -16,7 +16,7 @@ for(const implName of ["impl FormationPort for PersistenceStore","impl MatchCata
 for(const method of methods) { check(facade.includes(`pub async fn ${method}`),`Lineups facade 缺少公共兼容方法：${method}`); check(service.includes(`fn ${method}`),`LineupService 缺少职责：${method}`); check(tauri.includes(`.${method}(`),`Tauri Lineups 公共调用链变化：${method}`); }
 const serviceFiles=[...rustFiles("crates/application/src/services/lineups"),...rustFiles("crates/application/src/use_cases/lineups")];
 for(const path of serviceFiles){const source=read(path); for(const token of ["football_persistence_postgres","PostgresStore","sqlx::","PgPool","PersistenceStore"]) check(!source.includes(token),`${path} 泄漏具体持久化实现：${token}`);}
-for(const token of ["PersistenceStore::read_match(self, match_id)","read_match_lineup_chain_at(match_id, snapshot_type, reference_time)"]) check(adapter.includes(token),`组合适配器缺少既有内部读取能力：${token}`);
+for(const token of ["PersistenceStore::read_match(self, match_id)","PersistenceStore::read_match_lineup_chain_at(self, match_id, snapshot_type, reference_time)"]) check(adapter.includes(token),`组合适配器缺少既有内部读取能力：${token}`);
 check(persistenceMatch.includes("pub async fn read_match("),"MatchCatalogPort 读取能力未通过合法 persistence crate 公共边界暴露");
 check(packageJson.scripts?.["verify:lineups-service"]==="node scripts/verify-lineups-service.mjs","package.json 未登记 R3-05 专项门禁"); check(packageJson.scripts?.["verify:architecture"]?.includes("verify-lineups-service.mjs"),"verify:architecture 未接入 R3-05 门禁"); check(frontend.includes('"verify-lineups-service.mjs"'),"verify:frontend 未接入 R3-05 门禁");
 // R7-07：创建、双方审计及版本锁必须由唯一事务 owner 持有。
@@ -51,5 +51,40 @@ check(workbookLineup.includes("pair_transaction::lock_match_in_tx(tx, match_id)"
 check(adapter.includes("PersistenceStore::create_lineup(self, draft)") && adapter.includes("PersistenceStore::create_lineup_pair(self, draft)"), "LineupPort 必须显式分派到既有公开创建入口");
 const pairIntegration = read("crates/persistence-postgres/tests/postgres_integration.rs");
 check(pairIntegration.includes("取消必须发生在主队写入后、客队明细外键等待期间") && pairIntegration.includes("pair、single 与 workbook 必须在写入前等待同一比赛锁") && pairIntegration.includes("pg_blocking_pids(pid)"), "已有 pair 测试缺少真实锁等待、取消和混合写入并发断言");
+// R7-08：时点规则、模型门禁、读历史与历史变更各自唯一持有职责。
+const lineupBase = "crates/persistence-postgres/src/adapters/lineups";
+const chainBase = `${lineupBase}/chain`;
+const historyBase = `${lineupBase}/history`;
+for (const file of ["chain/mod.rs", "chain/window.rs", "chain/validation.rs", "history/mod.rs", "history/read.rs", "history/mapping.rs", "history/removal.rs"]) check(existsSync(join(root, lineupBase, file)), `缺少 R7-08 owner：${file}`);
+const chainOwner = read(`${chainBase}/mod.rs`);
+const windowOwner = read(`${chainBase}/window.rs`);
+const validationOwner = read(`${chainBase}/validation.rs`);
+const historyRead = read(`${historyBase}/read.rs`);
+const historyMapping = read(`${historyBase}/mapping.rs`);
+const historyRemoval = read(`${historyBase}/removal.rs`);
+check(!existsSync(join(root, "crates/persistence-postgres/src/lineup_chain.rs")), "旧 lineup_chain.rs 不得保留实现或转发壳");
+for (const [file, source] of persistenceFiles.map((file) => [file, read(file)])) check(!source.includes("crate::lineup_chain::") && !source.includes("super::lineup_chain::"), `${file} 仍依赖旧 chain 路径`);
+for (const [owner, methods] of [[`${chainBase}/mod.rs`, ["preferred_lineup_id", "read_match_lineup_chain", "read_match_lineup_chain_at"]], [`${historyBase}/read.rs`, ["list_lineups", "read_lineup", "list_team_match_lineups"]], [`${historyBase}/removal.rs`, ["remove_lineup_history"]], [`${historyBase}/mapping.rs`, ["lineup_record_from_row", "lineup_player_from_row"]], [`${chainBase}/window.rs`, ["normalize_lineup_snapshot_type", "lineup_snapshot_window", "lineup_snapshot_window_at"]], [`${chainBase}/validation.rs`, ["refresh_lineup_validation_in_tx"]]]) {
+  for (const method of methods) {
+    const declarations = persistenceFiles.filter((file) => new RegExp(`(?:pub(?:\\(crate\\))?\\s+)?(?:async\\s+)?fn\\s+${method}\\s*\\(`).test(read(file)));
+    check(declarations.length === 1 && declarations[0] === owner, `${method} 必须只有一个职责 owner`);
+  }
+}
+check(!/fn (?:list_lineups|read_lineup|remove_lineup_history|lineup_player_from_row|lineup_record_from_row)\s*\(/.test(oldCatalog) && oldCatalog.includes("pub async fn player_catalog_reference_data("), "旧 catalog 必须仅保留引用数据聚合，不残留阵容职责");
+for (const token of ["lineup.status='active'", "lineup.history_hidden_at IS NULL", "lineup.model_eligible", "lineup.lineup_type IN ('confirmed','expected')", "lineup.captured_at <= $3", "lineup.captured_at >= $4", "ORDER BY lineup.captured_at DESC", "WHEN 'confirmed' THEN 2", "lineup.created_at DESC, lineup.id DESC", "LIMIT 1"]) check(chainOwner.includes(token), `preferred lineup 规则缺少：${token}`);
+check(windowOwner.includes("reference_time.min(kickoff_time - Duration::seconds(1))") && windowOwner.includes("if cutoff_time < start_time") && windowOwner.includes('"T-90m" => Err'), "窗口边界及旧时点拒绝必须保持");
+check(validationOwner.includes('lineup_type == "actual"') && validationOwner.includes('lineup_type != "actual"') && validationOwner.includes("starter_count != 11") && validationOwner.includes("formation_id.is_none()") && !validationOwner.includes(".begin()") && !validationOwner.includes(".commit()"), "门禁校验必须复用写入事务并保持 actual/11 首发/阵型隔离");
+check(historyRead.includes("ORDER BY lineup.captured_at DESC, lineup.id DESC") && historyRead.includes("ORDER BY fixture.kickoff_time DESC, lineup.captured_at DESC, lineup.id DESC") && (historyRead.match(/limit.clamp\(1, 200\)/g) ?? []).length === 2 && (historyRead.match(/lineup.history_hidden_at IS NULL/g) ?? []).length === 2, "历史列表隐藏过滤、稳定排序与两处 limit clamp 必须保持");
+check(historyRead.includes("lineup.captured_at::date") && historyMapping.includes("availability_status") && historyMapping.includes("role_source_position_code") && historyMapping.includes("未知阵容类型"), "历史时点角色来源与严格 mapping 必须保持");
+const historyLock = historyRemoval.indexOf("pair_transaction::lock_match_in_tx");
+const historyVersionLock = historyRemoval.indexOf("FOR UPDATE");
+const historyReferences = historyRemoval.indexOf("let referenced: bool");
+const historyRestore = historyRemoval.indexOf("let restored_lineup_id");
+const historyAudit = historyRemoval.indexOf('"lineup_history_removed"');
+check(historyRemoval.includes("SET TRANSACTION ISOLATION LEVEL READ COMMITTED") && historyLock >= 0 && historyVersionLock > historyLock && historyReferences > historyVersionLock && historyRestore > historyReferences && historyAudit > historyRestore && historyRemoval.indexOf("tx.commit().await?") > historyAudit, "历史删除必须先锁比赛、重读锁版本，再检查引用/恢复/审计并单事务提交");
+check((historyRemoval.match(/self.pool.begin\(\)/g) ?? []).length === 1 && (historyRemoval.match(/tx.commit\(\)/g) ?? []).length === 1 && !historyRemoval.includes("fetch_one(&self.pool)") && !historyRemoval.includes("fetch_optional(&self.pool)"), "历史删除/恢复不能在事务外检查或另开事务");
+for (const token of ["feature.match_player_contributions", "feature.snapshots", "model.runs", "supersedes_lineup_id = $1", "history_hidden_at = now()", "status = 'superseded'", "history_hidden_at IS NULL", "ORDER BY captured_at DESC, created_at DESC, id DESC", "lineup_history_removed"]) check(historyRemoval.includes(token), `历史引用/恢复保护缺少：${token}`);
+for (const method of ["list_lineups", "read_lineup", "remove_lineup_history", "read_match_lineup_chain", "read_match_lineup_chain_at", "list_team_match_lineups"]) check(adapter.includes(`PersistenceStore::${method}(self,`), `LineupPort 未显式分派：${method}`);
+for (const token of ["历史删除与创建都必须在版本写入前等待同一父锁", "截止时点包含等时记录", "同时间 confirmed 优先于 expected", "时间较新的 expected 优先于较旧 confirmed", "窗口起点包含等时记录", "窗口前一微秒不能选择", "隐藏历史按 ID 保留明细", "等时间历史以 UUID 降序稳定排列", "list_max.len(), 200", "team_max.len(), 200"]) check(pairIntegration.includes(token), `已有 chain/history 测试缺少：${token}`);
 if(failures.length) throw new Error(`Lineups Service 验证失败\n${failures.map((item)=>`- ${item}`).join("\n")}`);
 console.log(`Lineups Service 验证通过：${serviceFiles.length} 个 Service/Use Case Rust 文件，19 个公开 Application 职责已切换 4 个既有 Ports，旧 player_catalog 所有者已退出。`);

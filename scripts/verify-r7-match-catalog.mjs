@@ -12,7 +12,8 @@ const adapters = read("crates/persistence-postgres/src/adapters/mod.rs");
 const playerCatalog = read("crates/persistence-postgres/src/player_catalog.rs");
 const exchange = read("crates/persistence-postgres/src/match_exchange.rs");
 const matchPrediction = read("crates/persistence-postgres/src/match_prediction.rs");
-const lineupChain = read("crates/persistence-postgres/src/lineup_chain.rs");
+const lineupChain = read("crates/persistence-postgres/src/adapters/lineups/chain/mod.rs");
+const lineupHistory = read("crates/persistence-postgres/src/adapters/lineups/history/read.rs") + read("crates/persistence-postgres/src/adapters/lineups/history/removal.rs");
 const create = read(`${base}/create.rs`);
 const remove = read(`${base}/delete.rs`);
 const list = read(`${base}/list.rs`);
@@ -53,7 +54,7 @@ requireTrue(matchPrediction.includes("adapters::matches::catalog::match_record_f
 requireTrue(!lineupChain.includes("read_match_exchange("), "lineup_chain.rs 仍依赖旧 read_match_exchange");
 requireTrue(lineupChain.includes("self.read_match("), "lineup_chain.rs 未切换到 Match Catalog read owner");
 requireTrue(!playerCatalog.includes("pub async fn create_lineup(") && !playerCatalog.includes("pub async fn create_lineup_pair("), "R7-07 后旧目录仍持有阵容创建 owner");
-requireTrue(playerCatalog.includes("pub async fn read_lineup(") && playerCatalog.includes("pub async fn remove_lineup_history("), "R7-07 越界删除 R7-08 读取/历史 owner");
+requireTrue(!playerCatalog.includes("pub async fn read_lineup(") && !playerCatalog.includes("pub async fn remove_lineup_history(") && lineupHistory.includes("pub async fn read_lineup(") && lineupHistory.includes("pub async fn remove_lineup_history("), "R7-08 读取/历史未切换到唯一 owner");
 requireTrue(!applicationAdapter.includes("read_match_exchange") && applicationAdapter.includes("PersistenceStore::read_match(self, match_id)"), "Application MatchCatalogPort 未显式调用 Persistence 固有读取方法");
 requireTrue(packageJson.scripts?.["verify:architecture"]?.includes("verify-r7-match-catalog.mjs") && frontend.includes('"verify-r7-match-catalog.mjs"'), "R7-01 未接入现有架构/前端门禁");
 requireTrue(databaseRunner.includes('"match_catalog_repository_contract"') && windowsAcceptance.includes('"match_catalog_repository_contract"'), "现有数据库基线与 Windows Full 遗漏 R7-01 契约");

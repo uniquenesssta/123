@@ -2187,6 +2187,84 @@ async fn match_scope_inference_and_lineup_pair_transaction_are_atomic() {
     assert!(visible.iter().all(|item| item.id != first_home_id));
     assert!(visible.iter().any(|item| item.id == latest.id));
 
+    let archived_record = database.store.read_lineup(first_home_id).await.unwrap();
+    assert_eq!(archived_record.id, first_home_id, "隐藏历史仍可按 ID 追溯");
+    assert_eq!(archived_record.players.len(), 11);
+    assert!(matches!(
+        database.store.remove_lineup_history(first_home_id, None).await,
+        Err(PersistenceError::InvalidState(message)) if message.contains("已经从历史列表隐藏")
+    ));
+    assert!(
+        database.store.read_lineup(replacement.id).await.is_err(),
+        "物理删除版本不能读回"
+    );
+
+    // R7-08：删除/恢复与创建必须按父比赛 -> 阵容的同一顺序串行。
+    let mut history_blocker = database.pool.begin().await.unwrap();
+    let history_blocker_pid: i32 = sqlx::query_scalar("SELECT pg_backend_pid()")
+        .fetch_one(&mut *history_blocker)
+        .await
+        .unwrap();
+    sqlx::query("SELECT id FROM football.matches WHERE id=$1 FOR UPDATE")
+        .bind(target.id)
+        .fetch_one(&mut *history_blocker)
+        .await
+        .unwrap();
+    let removal_store = database.store.clone();
+    let latest_id = latest.id;
+    let mut removal_task = tokio::spawn(async move {
+        removal_store
+            .remove_lineup_history(latest_id, Some("父锁并发删除"))
+            .await
+    });
+    replacement_home.captured_at = captured_at + Duration::minutes(25);
+    let creation_store = database.store.clone();
+    let mut creation_task =
+        tokio::spawn(async move { creation_store.create_lineup(&replacement_home).await });
+    let history_waiting = wait_for_lineup_lock(
+        &database.pool,
+        history_blocker_pid,
+        "SELECT home_team_id, away_team_id FROM football.matches WHERE id=$1 FOR UPDATE",
+        2,
+    )
+    .await;
+    if !history_waiting {
+        removal_task.abort();
+        creation_task.abort();
+    }
+    history_blocker.rollback().await.unwrap();
+    assert!(
+        history_waiting,
+        "历史删除与创建都必须在版本写入前等待同一父锁"
+    );
+    let history_results = tokio::time::timeout(std::time::Duration::from_secs(20), async {
+        tokio::join!(&mut removal_task, &mut creation_task)
+    })
+    .await;
+    if history_results.is_err() {
+        removal_task.abort();
+        creation_task.abort();
+    }
+    let (removed, replacement_result) = history_results.expect("历史删除与创建不能锁顺序死锁");
+    let removed = removed.unwrap().unwrap();
+    let after_history_race = replacement_result.unwrap().unwrap();
+    assert_eq!(removed.lineup_id, latest.id);
+    assert_eq!(removed.restored_lineup_id, None, "隐藏前驱不得恢复");
+    assert_eq!(after_history_race.status, "active");
+    let active_after_history_race: i64 = sqlx::query_scalar(
+        "SELECT count(*)::bigint FROM football.lineups WHERE match_id=$1 AND team_id=$2 AND snapshot_type='T-6h' AND lineup_type='expected' AND status='active'",
+    ).bind(target.id).bind(home.id).fetch_one(&database.pool).await.unwrap();
+    assert_eq!(
+        active_after_history_race, 1,
+        "删除/恢复与创建交错后只有一个活动版本"
+    );
+    let removal_audits: i64 = sqlx::query_scalar(
+        "SELECT count(*)::bigint FROM audit.events WHERE event_type='lineup_history_removed' AND entity_id=$1",
+    ).bind(latest.id.to_string()).fetch_one(&database.pool).await.unwrap();
+    assert_eq!(removal_audits, 1, "历史变更只提交一次成功审计");
+
+    let latest = after_history_race;
+
     // 复用真实预检/提交入口，覆盖 ended_previous 的业务、账本与审计事务。
     let lineup_key = format!("ledger-{token}");
     let mut rows = vec![SpreadsheetRawRow {
@@ -2653,6 +2731,101 @@ async fn match_lineup_chain_versions_model_selection_and_freeze_gate_are_consist
         .iter()
         .any(|item| item.id == confirmed.0.id));
 
+    let before_confirmed = database
+        .store
+        .read_match_lineup_chain_at(
+            target.id,
+            "T-6h",
+            confirmed.0.captured_at - Duration::microseconds(1),
+        )
+        .await
+        .unwrap();
+    assert!(before_confirmed.home.selected_lineup_id.is_none());
+    assert!(before_confirmed.away.selected_lineup_id.is_none());
+    let at_confirmed = database
+        .store
+        .read_match_lineup_chain_at(target.id, "T-6h", confirmed.0.captured_at)
+        .await
+        .unwrap();
+    assert_eq!(
+        at_confirmed.home.selected_lineup_id,
+        Some(confirmed.0.id),
+        "截止时点包含等时记录"
+    );
+    assert_eq!(at_confirmed.away.selected_lineup_id, Some(confirmed.1.id));
+
+    // 同时点以 confirmed 优先；仅差一微秒则先按记录时间排序。
+    let tied_expected = seed_valid_match_lineups(
+        &database,
+        MatchLineupSeed {
+            match_id: target.id,
+            home_team_id: home.id,
+            away_team_id: away.id,
+            kickoff,
+            snapshot_type: "T-6h",
+            lineup_type: LineupType::Expected,
+        },
+    )
+    .await;
+    let tied_chain = database
+        .store
+        .read_match_lineup_chain_at(target.id, "T-6h", confirmed.0.captured_at)
+        .await
+        .unwrap();
+    assert_eq!(
+        tied_chain.home.selected_lineup_id,
+        Some(confirmed.0.id),
+        "同时间 confirmed 优先于 expected"
+    );
+    assert_eq!(tied_chain.away.selected_lineup_id, Some(confirmed.1.id));
+    let tied_list = database
+        .store
+        .list_lineups(Some(target.id), 200)
+        .await
+        .unwrap();
+    let mut tied_ids = vec![
+        confirmed.0.id,
+        confirmed.1.id,
+        tied_expected.0.id,
+        tied_expected.1.id,
+    ];
+    tied_ids.sort_unstable_by(|a, b| b.cmp(a));
+    assert_eq!(
+        tied_list
+            .iter()
+            .filter(|item| item.captured_at == confirmed.0.captured_at)
+            .map(|item| item.id)
+            .collect::<Vec<_>>(),
+        tied_ids,
+        "等时间历史以 UUID 降序稳定排列"
+    );
+    for id in [tied_expected.0.id, tied_expected.1.id] {
+        sqlx::query("UPDATE football.lineups SET captured_at=$2 WHERE id=$1")
+            .bind(id)
+            .bind(confirmed.0.captured_at + Duration::microseconds(1))
+            .execute(&database.pool)
+            .await
+            .unwrap();
+    }
+    let newer_chain = database
+        .store
+        .read_match_lineup_chain_at(
+            target.id,
+            "T-6h",
+            confirmed.0.captured_at + Duration::microseconds(1),
+        )
+        .await
+        .unwrap();
+    assert_eq!(
+        newer_chain.home.selected_lineup_id,
+        Some(tied_expected.0.id),
+        "时间较新的 expected 优先于较旧 confirmed"
+    );
+    assert_eq!(
+        newer_chain.away.selected_lineup_id,
+        Some(tied_expected.1.id)
+    );
+
     let latest = seed_valid_match_lineups(
         &database,
         MatchLineupSeed {
@@ -2796,6 +2969,149 @@ async fn match_lineup_chain_versions_model_selection_and_freeze_gate_are_consist
             Err(PersistenceError::InvalidState(_))
         ),
         "无有效首发或只有 actual 时必须阻断输入冻结"
+    );
+
+    let earliest_home = seed_team_lineup(
+        &database,
+        TeamLineupSeed {
+            match_id: target.id,
+            team_id: home.id,
+            kickoff,
+            snapshot_type: "T-1h",
+            lineup_type: LineupType::Expected,
+            starter_count: 11,
+            label: "window-start",
+        },
+    )
+    .await;
+    let window_start = kickoff - Duration::hours(1);
+    sqlx::query("UPDATE football.lineups SET captured_at=$2 WHERE id=$1")
+        .bind(earliest_home.id)
+        .bind(window_start)
+        .execute(&database.pool)
+        .await
+        .unwrap();
+    let at_start = database
+        .store
+        .read_match_lineup_chain_at(target.id, "T-1h", window_start)
+        .await
+        .unwrap();
+    assert_eq!(
+        at_start.home.selected_lineup_id,
+        Some(earliest_home.id),
+        "窗口起点包含等时记录"
+    );
+    sqlx::query("UPDATE football.lineups SET captured_at=$2 WHERE id=$1")
+        .bind(earliest_home.id)
+        .bind(window_start - Duration::microseconds(1))
+        .execute(&database.pool)
+        .await
+        .unwrap();
+    let before_start = database
+        .store
+        .read_match_lineup_chain_at(target.id, "T-1h", window_start)
+        .await
+        .unwrap();
+    assert!(
+        before_start.home.selected_lineup_id.is_none(),
+        "窗口前一微秒不能选择"
+    );
+    sqlx::query("UPDATE football.lineups SET captured_at=$2, history_hidden_at=now() WHERE id=$1")
+        .bind(earliest_home.id)
+        .bind(window_start)
+        .execute(&database.pool)
+        .await
+        .unwrap();
+    let hidden_chain = database
+        .store
+        .read_match_lineup_chain_at(target.id, "T-1h", window_start)
+        .await
+        .unwrap();
+    assert!(hidden_chain.home.selected_lineup_id.is_none());
+    assert!(
+        hidden_chain
+            .home
+            .versions
+            .iter()
+            .all(|item| item.id != earliest_home.id),
+        "隐藏历史不出现在链列表"
+    );
+    assert_eq!(
+        database
+            .store
+            .read_lineup(earliest_home.id)
+            .await
+            .unwrap()
+            .players
+            .len(),
+        11,
+        "隐藏历史按 ID 保留明细"
+    );
+    assert!(database
+        .store
+        .list_team_match_lineups(home.id, 200)
+        .await
+        .unwrap()
+        .iter()
+        .all(|item| item.lineup.id != earliest_home.id));
+
+    // 原 API 的 1..=200 clamp 与等时间 UUID 排序保持，不把内部 500 请求误写为 500 返回。
+    let limit_ids = (0..201).map(|_| Uuid::new_v4()).collect::<Vec<_>>();
+    sqlx::query(
+        "INSERT INTO football.lineups (id,match_id,team_id,lineup_type,snapshot_type,captured_at,status) SELECT id,$2,$3,'expected','T-N',$4 + ordinal * interval '1 microsecond','superseded' FROM unnest($1::uuid[]) WITH ORDINALITY AS item(id,ordinal)",
+    ).bind(&limit_ids).bind(target.id).bind(home.id).bind(kickoff - Duration::minutes(10))
+        .execute(&database.pool).await.unwrap();
+    let mut sorted_ids = limit_ids.clone();
+    sorted_ids.reverse();
+    let list_zero = database
+        .store
+        .list_lineups(Some(target.id), 0)
+        .await
+        .unwrap();
+    let list_max = database
+        .store
+        .list_lineups(Some(target.id), u32::MAX)
+        .await
+        .unwrap();
+    assert_eq!(list_zero.len(), 1);
+    assert_eq!(list_zero[0].id, sorted_ids[0]);
+    assert_eq!(list_max.len(), 200);
+    assert_eq!(
+        list_max.iter().map(|item| item.id).collect::<Vec<_>>(),
+        sorted_ids[..200]
+    );
+    assert!(
+        list_max.iter().all(|item| item.players.is_empty()),
+        "列表保持摘要不载明细"
+    );
+    let team_zero = database
+        .store
+        .list_team_match_lineups(home.id, 0)
+        .await
+        .unwrap();
+    let team_max = database
+        .store
+        .list_team_match_lineups(home.id, u32::MAX)
+        .await
+        .unwrap();
+    assert_eq!(team_zero.len(), 1);
+    assert_eq!(team_zero[0].lineup.id, sorted_ids[0]);
+    assert_eq!(team_max.len(), 200);
+    assert_eq!(
+        team_max
+            .iter()
+            .map(|item| item.lineup.id)
+            .collect::<Vec<_>>(),
+        sorted_ids[..200]
+    );
+    let capped_chain = database
+        .store
+        .read_match_lineup_chain(target.id, "T-N")
+        .await
+        .unwrap();
+    assert_eq!(
+        capped_chain.home.versions.len() + capped_chain.away.versions.len(),
+        200
     );
 
     database.close().await;

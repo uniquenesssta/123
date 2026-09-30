@@ -417,7 +417,8 @@ impl PostgresStore {
         affected_lineups.sort_unstable();
         affected_lineups.dedup();
         for lineup_id in affected_lineups {
-            crate::lineup_chain::refresh_lineup_validation_in_tx(&mut tx, lineup_id).await?;
+            crate::adapters::lineups::chain::refresh_lineup_validation_in_tx(&mut tx, lineup_id)
+                .await?;
         }
         let finished_at = Utc::now();
         sqlx::query("UPDATE catalog.import_batches SET status='succeeded',finished_at=$2,inserted_count=$3,updated_count=$4,ended_previous_count=$5,skipped_count=$6,error_count=0 WHERE id=$1")
@@ -592,7 +593,7 @@ impl PostgresStore {
                 required(&payload, "match_key")?;
                 validate_lineup_type(&payload)?;
                 let snapshot_type = default_text(&payload, "snapshot_type", "T-1h");
-                crate::lineup_chain::normalize_lineup_snapshot_type(&snapshot_type)?;
+                crate::adapters::lineups::chain::normalize_lineup_snapshot_type(&snapshot_type)?;
                 payload.insert("snapshot_type".to_string(), json!(snapshot_type));
                 required_datetime(&payload, "captured_at")?;
                 let team = resolve_team_value(&self.pool, &payload, "team_id", "team_name").await?;

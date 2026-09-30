@@ -54,7 +54,7 @@ requireTokens("crates/persistence-postgres/src/role_resolution.rs", [
   "role_resolution_version",
 ], "统一角色解析器");
 
-const playerCatalog = read("crates/persistence-postgres/src/player_catalog.rs");
+const playerCatalog = read("crates/persistence-postgres/src/adapters/lineups/history/read.rs");
 const playerDirectoryList = read("crates/persistence-postgres/src/adapters/catalog/players/directory/list_players.rs");
 check(
   /FROM football\.lineup_players player[\s\S]{0,5000}JOIN football\.lineups lineup ON lineup\.id = player\.lineup_id[\s\S]{0,5000}position\.valid_from <= lineup\.captured_at::date/.test(playerCatalog),
@@ -75,7 +75,7 @@ requireTokens("crates/persistence-postgres/src/adapters/catalog/players/director
   "position.default_role_code AS primary_role_code",
   "jsonb_object_agg(position.position_code, position.default_role_code)",
 ], "当前球员目录角色持久化");
-requireTokens("crates/persistence-postgres/src/player_catalog.rs", [
+requireTokens("crates/persistence-postgres/src/adapters/lineups/history/read.rs", [
   "lineup.captured_at::date",
   "role_source_position_code",
 ], "历史比赛阵容角色持久化");

@@ -181,7 +181,7 @@ pub(super) async fn insert_lineup_in_tx(
         .execute(&mut **tx)
         .await?;
     }
-    crate::lineup_chain::refresh_lineup_validation_in_tx(tx, lineup_id).await?;
+    crate::adapters::lineups::chain::refresh_lineup_validation_in_tx(tx, lineup_id).await?;
     crate::write_audit_event(
         tx,
         "lineup_created",

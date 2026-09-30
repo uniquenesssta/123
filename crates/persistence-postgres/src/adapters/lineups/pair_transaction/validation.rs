@@ -45,7 +45,8 @@ pub(super) fn validate_lineup_draft(
         ));
     }
     let snapshot_type =
-        crate::lineup_chain::normalize_lineup_snapshot_type(&draft.snapshot_type)?.to_string();
+        crate::adapters::lineups::chain::normalize_lineup_snapshot_type(&draft.snapshot_type)?
+            .to_string();
     for player in &draft.players {
         if player
             .shirt_number

@@ -281,8 +281,8 @@
       "adapter_modules": [
         "crates/persistence-postgres/src/adapters/catalog/mod.rs",
         "crates/persistence-postgres/src/adapters/competition/mod.rs",
-        "crates/persistence-postgres/src/adapters/matches/mod.rs",
         "crates/persistence-postgres/src/adapters/lineups/mod.rs",
+        "crates/persistence-postgres/src/adapters/matches/mod.rs",
         "crates/persistence-postgres/src/adapters/mod.rs",
         "crates/persistence-postgres/src/adapters/register_adapters.rs",
         "crates/persistence-postgres/src/adapters/rules/mod.rs",
@@ -294,7 +294,6 @@
         "crates/persistence-postgres/src/fact_pipeline_records.rs",
         "crates/persistence-postgres/src/health/mod.rs",
         "crates/persistence-postgres/src/jobs.rs",
-        "crates/persistence-postgres/src/lineup_chain.rs",
         "crates/persistence-postgres/src/mapping/mod.rs",
         "crates/persistence-postgres/src/match_exchange.rs",
         "crates/persistence-postgres/src/match_prediction.rs",
@@ -400,7 +399,7 @@
     "frontend_features": 18,
     "workspace_members": 11,
     "ports": 4,
-    "postgres_adapters": 39,
+    "postgres_adapters": 38,
     "command_groups": 15,
     "commands": 171
   },
