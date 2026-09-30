@@ -1,0 +1,123 @@
+{
+  "schemaVersion": 1,
+  "runId": "footfigma-ai-chat-2026-09-30",
+  "repo": "uniquenesssta/123",
+  "branch": "ui-design-system",
+  "fileKey": "PN0Whgu6HLWIHx4Mv6aHfu",
+  "page": "3:4",
+  "phase": "accepted",
+  "completedAt": "2026-09-30",
+  "completedGroup": "AI Chat",
+  "allPlannedPatternsComplete": true,
+  "nextStage": "Product Screens: 17 routes / 7 navigation modules",
+  "nextStageStarted": false,
+  "screensStarted": false,
+  "applicationSourceModified": false,
+  "existingControlsMastersModified": false,
+  "globalVariablesModified": false,
+  "authority": "Figma for visual geometry, typography and colors; source only for functional, interaction and data semantics.",
+  "recordPath": "docs/FIGMA_AI_CHAT.md",
+  "statePath": "docs/FIGMA_AI_CHAT_STATE.json",
+  "previousStatePath": "docs/FIGMA_WORKFLOW_STEPPER_TIMELINE_STATE.json",
+  "pending": [],
+  "source": {"branch":"main","path":"src/pages/apiWorkspace.ts","sha":"79f4ee4e505ac9da12e6579c1a7729cdeb981bc1"},
+  "root": "434:17896",
+  "rootGeometry": {"x":200,"y":29915,"width":1600,"height":8886},
+  "sections": {"history":"434:17899","attachments":"434:17902","messages":"434:17905","composition":"434:17908","review":"434:17911"},
+  "sets": {"History Item":"434:18130","Attachment":"434:18157","Message":"434:18225","Composer":"436:18436"},
+  "productionComponents": {"History Sidebar":"438:18009","Workspace":"439:18050"},
+  "variantOrders": {
+    "History Item":"Selected False/True; within each Selected: State Default/Hover/Pressed/Focus/Disabled",
+    "Attachment":"Context, Legacy File",
+    "Message":"User, Assistant, Pending",
+    "Composer":"Empty, Ready, Sending, Error, Cancelled, Unavailable"
+  },
+  "variants": {
+    "History Item":["434:17914","434:17943","434:17962","434:17981","434:18000","434:18032","434:18051","434:18070","434:18089","434:18108"],
+    "Attachment":["434:18131","434:18144"],
+    "Message":["434:18158","434:18174","434:18204"],
+    "Composer":["436:17937","436:18060","436:18134","436:18211","436:18285","436:18359"]
+  },
+  "workspaceSlots": {"History":"439:18051","Messages":"439:18130","Composer":"439:18149"},
+  "historySessionsSlot": "438:18093",
+  "viewports": {"History":"438:18092","Messages":"439:18129"},
+  "qaRoot": "440:18135",
+  "reviewFrames": {
+    "Light1120":"440:18136","Dark1120":"440:18238","Narrow760":"440:18340",
+    "HistoryStateMatrix":"440:18442","AttachmentKinds":"440:18555","MessageKinds":"440:18580","ComposerStates":"440:18619",
+    "LongPlainText":"440:18760","ContextOptIn":"440:18831","EmptyHistory":"440:18877","LongConversationScroll":"447:19475"
+  },
+  "prototypeEntry": "444:18719",
+  "prototypeFrames": {
+    "ReadyA":"444:18719","SendingA":"444:19399","ErrorA":"444:19915","CancelledA":"444:20364",
+    "BrowseBPendingA":"444:20813","BrowseBAfterAComplete":"444:21265","CompletedA":"444:21629"
+  },
+  "prototypeLinks": [
+    ["I444:18746;439:18149;444:19346;436:18119","444:19399"],
+    ["444:19402","444:18719"],
+    ["444:19416","444:19915"],
+    ["444:19430","444:21629"],
+    ["I444:19444;439:18051;446:19516;438:18093;446:19513;434:17915","444:20813"],
+    ["I444:19444;439:18149;444:19830;436:18179","444:20364"],
+    ["444:19918","444:18719"],
+    ["I444:19932;439:18149;444:20311;436:18270","444:19399"],
+    ["444:20367","444:18719"],
+    ["I444:20381;439:18149;444:20760;436:18344","444:19399"],
+    ["444:20816","444:18719"],
+    ["444:20830","444:21265"],
+    ["I444:20844;439:18051;444:21194;438:18093;444:21190;434:17915","444:19399"],
+    ["444:21268","444:18719"],
+    ["I444:21282;439:18051;444:21558;438:18093;444:21554;434:17915","444:21629"],
+    ["444:21632","444:18719"],
+    ["I444:21646;439:18051;446:19526;438:18093;446:19523;434:17915","444:21265"]
+  ],
+  "prototypeInvariant": {
+    "requestId":"request-A-01","pendingOnlyIn":"SendingA",
+    "draftA":"请再列出两项需要人工确认的内容。","draftB":"这是 B 的独立草稿。",
+    "errorAndCancellationPreserveDraftA":true,"completingAWhileViewingBStaysInB":true,
+    "disabledSendScenes":["SendingA","BrowseBPendingA"],"cancelVisibleOnlyIn":"SendingA"
+  },
+  "baseline": {"patternSets":13,"patternVariants":104,"productionSingles":11,"variables":193,"textStyles":13,"effects":6},
+  "added": {"sets":4,"variants":21,"productionSingles":2,"variables":0,"textStyles":0,"effects":0},
+  "totals": {"patternSets":17,"patternVariants":125,"productionSingles":13,"variables":193,"textStyles":13,"effects":6,"controlsSets":61,"controlsVariants":506},
+  "qa": {
+    "status":"PASS","visibleNodesChecked":1417,"visibleNestedInstancesChecked":351,"ordinaryVisibleTextLayersMeasured":579,
+    "unintendedOverflow":0,"intentionalVerticalScrollFixtures":1,"brokenMainComponents":0,"unboundVisibleSolidPaints":0,"ownMissingTextStyles":0,"topLevelOverlap":0,
+    "prototypeScenes":7,"reachablePrototypeScenes":7,"prototypeLinks":17,"brokenPrototypeTargets":0,"disabledControlsChecked":15,"disabledControlsWithReactions":0,
+    "minimumOrdinaryTextContrastLight":4.532655704725225,"minimumOrdinaryTextContrastDark":6.862518790811412
+  },
+  "scrollStress": {"frame":"447:19475","workspace":"447:19477","viewportHeight":354,"contentHeight":1120,"clipsContent":true,"overflowDirection":"VERTICAL","composerOutsideViewport":true},
+  "localCorrections": {
+    "messageHeaders":["434:18159","434:18175","434:18205"],
+    "copyAnswer":{"id":"434:18179","width":80,"height":32},
+    "fixedAttachmentKindLabels":["442:18714","442:18715"],
+    "enteredDraftPrimaryTextOverrides":["I436:18077;143:336","I436:18151;143:336","I436:18228;143:336","I436:18302;143:336","I436:18376;143:336"],
+    "composerFeedback":"Fixed by State. Shared Status note TEXT property removed to prevent cross-variant defaults overwriting status messages."
+  },
+  "limitations": [
+    "Preset prototype only. Send/cancel/retry and listed A/B navigation/reset paths are wired; new/search/archive/clear/copy/history-toggle runtime actions are not claimed as implemented.",
+    "No real API, clipboard or database operations. Request cancellation, stale responses, safe rendering, keyboard/focus and persistent drafts require application tests.",
+    "Attachments are read-only Context and Legacy File records; no new upload, file generation or execution feature is authorized.",
+    "Show context is opt-in; Show cancel requires Sending and a matching requestId. Host owns these invariants.",
+    "760px sidebar collapse is an explicit review configuration, not an automatic Figma breakpoint.",
+    "Normalized virtual SLOT node IDs can change when overrides are edited; rediscover by stable parent master, slot and semantic node names."
+  ],
+  "recordCommit": "bd492b94f4a8df610835a69b41529f31c9056209",
+  "indexBlobShas": {
+    "docs/README.md":"677c52c256bd21fdbc1812590c8f22e1deab239d",
+    "docs/FIGMA_PATTERN_SCREEN_PLAN.md":"960f7236fe4b13ead80c1a86a0bbfd085df12f0d",
+    "docs/FIGMA_COMPONENT_RECORD.md":"ece3b1c1d91c001fa5718d63ba67efb4229fcf77"
+  },
+  "ownedPrimaryNodeCount": 344,
+  "ownedPrimaryNodeRangesEncoding": "Inclusive ranges of actual read-back primary IDs. Prepend prefix + colon; no gaps inferred. Normalized virtual SLOT content is located by parent/slot/name.",
+  "ownedPrimaryNodeRanges": {
+    "434":"17896-17919,17943-17948,17962-17967,17981-17986,18000-18005,18032-18037,18051-18056,18070-18075,18089-18094,18108-18113,18130-18132,18140-18145,18153-18165,18174-18179,18193-18195,18204-18211,18220-18221,18224-18225",
+    "436":"17937-17939,17947,17956,17973-17974,17998,18022,18059-18062,18068,18077,18090-18091,18105,18119,18133-18136,18142,18151,18164-18165,18179,18193,18210-18213,18219,18228,18241-18242,18256,18270,18284-18287,18293,18302,18315-18316,18330,18344,18358-18361,18367,18376,18389-18390,18404,18418,18435-18436",
+    "438":"18009-18011,18035,18092-18094,18133,18162,18181",
+    "439":"18050-18052,18100-18105,18129-18131,18138,18149-18150",
+    "440":"18135-18138,18238-18240,18340-18342,18442-18447,18456-18458,18467-18469,18478-18480,18489-18491,18500-18502,18511-18513,18522-18524,18533-18535,18544-18546,18555-18560,18569-18571,18580-18585,18592-18594,18605-18607,18619-18624,18644-18646,18666-18668,18694-18696,18716-18718,18738-18740,18760-18762,18831-18833,18877-18879",
+    "442":"18714-18715",
+    "444":"18719-18722,18746,19399-19402,19416,19430,19444,19915-19918,19932,20364-20367,20381,20813-20816,20830,20844,21265-21268,21282,21629-21632,21646",
+    "447":"19475-19477"
+  }
+}
