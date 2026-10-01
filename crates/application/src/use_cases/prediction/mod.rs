@@ -10,7 +10,6 @@ pub(crate) mod execute_p4_freeze;
 pub(crate) mod execute_prediction;
 pub(crate) mod execute_prediction_from_match;
 pub(crate) mod hide_run_from_history;
-pub(crate) mod inspect_match_prediction_readiness;
 pub(crate) mod list_p4_freeze_task_events;
 pub(crate) mod list_p4_freeze_tasks;
 pub(crate) mod list_recent_runs;
@@ -22,6 +21,7 @@ pub(crate) mod read_p4_freeze_task;
 pub(crate) mod read_p4_match_workspace;
 pub(crate) mod read_p4_task_workspace;
 pub(crate) mod read_run;
+pub(crate) mod readiness;
 pub(crate) mod shared;
 
 pub(crate) trait PredictionAccess:

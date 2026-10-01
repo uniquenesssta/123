@@ -2,10 +2,10 @@ use crate::model_registry::ModelRegistry;
 use crate::ports::prediction::{ModelRunHistoryItem, P4FreezeExecutionPort};
 use crate::use_cases::prediction::{
     dry_run_default_fixture, execute_p4_freeze, execute_prediction, execute_prediction_from_match,
-    hide_run_from_history, inspect_match_prediction_readiness, list_p4_freeze_task_events,
-    list_p4_freeze_tasks, list_recent_runs, p4_freeze_readiness, p4_snapshot, plan_p4_horizons,
-    preview_route, read_p4_freeze_task, read_p4_match_workspace, read_p4_task_workspace, read_run,
-    P4FreezeExecutionAccess, P4PlanningAccess, PredictionAccess,
+    hide_run_from_history, list_p4_freeze_task_events, list_p4_freeze_tasks, list_recent_runs,
+    p4_freeze_readiness, p4_snapshot, plan_p4_horizons, preview_route, read_p4_freeze_task,
+    read_p4_match_workspace, read_p4_task_workspace, read_run, readiness, P4FreezeExecutionAccess,
+    P4PlanningAccess, PredictionAccess,
 };
 use crate::{
     ApplicationResult, PredictionCommand, PredictionExecution, RoutePreviewCommand,
@@ -42,7 +42,7 @@ impl PredictionService {
         registry: &ModelRegistry,
         command: StoredMatchPredictionCommand,
     ) -> ApplicationResult<MatchPredictionReadiness> {
-        inspect_match_prediction_readiness::execute(port, registry, command).await
+        readiness::execute(port, registry, command).await
     }
 
     pub(crate) async fn execute_prediction_from_match<P: PredictionAccess + ?Sized>(

@@ -1,22 +1,21 @@
-use super::shared::audit::{build_prediction_input_manifest, sha256_value};
-use super::shared::readiness_checks::{
-    append_lineup_readiness_checks, append_prepared_input_checks,
-    append_unavailable_lineup_readiness_checks, append_unavailable_prepared_input_checks,
-    readiness_check,
-};
-use super::shared::routing::{
+use super::super::shared::audit::{build_prediction_input_manifest, sha256_value};
+use super::super::shared::routing::{
     ensure_model_selection_registered, normalize_model_selection, route_identity_manifest,
     validate_snapshot_type,
 };
-use super::PredictionAccess;
+use super::super::PredictionAccess;
+use super::input_quality::{
+    append_prepared_input_checks, append_unavailable_prepared_input_checks,
+};
+use super::lineups::{append_lineup_readiness_checks, append_unavailable_lineup_readiness_checks};
+use super::report::{readiness_check, summarize, Assessment};
 use crate::model_registry::ModelRegistry;
 use crate::ports::PortErrorKind;
 use crate::{ApplicationError, ApplicationResult, StoredMatchPredictionCommand};
 use chrono::Utc;
 use football_domain::{
     CompetitionKind, MatchContext, MatchPredictionReadiness, PredictionReadinessCheck,
-    PredictionReadinessCheckStatus, PredictionReadinessLevel, RouteRequest,
-    PREDICTION_INPUT_AUDIT_VERSION,
+    PredictionReadinessCheckStatus, RouteRequest, PREDICTION_INPUT_AUDIT_VERSION,
 };
 use serde_json::{json, Value};
 
@@ -231,55 +230,12 @@ pub(crate) async fn execute<P: PredictionAccess + ?Sized>(
         );
     }
 
-    let blockers = checks
-        .iter()
-        .filter(|check| check.status == PredictionReadinessCheckStatus::Blocked)
-        .flat_map(|check| {
-            if check.details.is_empty() {
-                vec![format!("{}：{}", check.label, check.summary)]
-            } else {
-                check
-                    .details
-                    .iter()
-                    .map(|detail| format!("{}：{detail}", check.label))
-                    .collect()
-            }
-        })
-        .collect::<Vec<_>>();
-    let mut warnings = checks
-        .iter()
-        .filter(|check| check.status == PredictionReadinessCheckStatus::Warning)
-        .flat_map(|check| {
-            if check.details.is_empty() {
-                vec![format!("{}：{}", check.label, check.summary)]
-            } else {
-                check
-                    .details
-                    .iter()
-                    .map(|detail| format!("{}：{detail}", check.label))
-                    .collect()
-            }
-        })
-        .collect::<Vec<_>>();
-    for reason in &shadow_reasons {
-        if !warnings.contains(reason) {
-            warnings.push(reason.clone());
-        }
-    }
-    let score = checks
-        .iter()
-        .map(|check| u16::from(check.score))
-        .sum::<u16>()
-        .min(100) as u8;
-    let level = if !blockers.is_empty() {
-        PredictionReadinessLevel::Blocked
-    } else if !shadow_reasons.is_empty() {
-        PredictionReadinessLevel::ShadowOnly
-    } else if !warnings.is_empty() {
-        PredictionReadinessLevel::ReadyWithWarnings
-    } else {
-        PredictionReadinessLevel::FormalReady
-    };
+    let Assessment {
+        blockers,
+        warnings,
+        score,
+        level,
+    } = summarize(&checks, &shadow_reasons);
     let input_manifest = prepared_input.as_ref().map(|prepared| {
         build_prediction_input_manifest(
             &prepared.match_input,

@@ -5,13 +5,13 @@
 > 后续阶段：`R9`  
 > 本文档是唯一执行依据之一；必须与 `00-总体架构与前23节.md` 同时适用。
 
-## 当前执行订正（2026-10-01）
+## 当前执行订正（2026-10-02）
 
 用户已启动唯一 R8 分支 `rewrite/r8-prediction-p4-orchestration`，起点 `90680bf945fbb0d1c191937c2d9e90c2c916fb00`。R7-01～15 及 Windows Automated 已完成；最终代码 `a928c8b` / run `36871154039` 通过。动态 PG、历史四项/账本、有效 XLSX、Windows Full 及模型历史删除风险仍最终封包新库待验，不继承为 PASS。
 
 适用总纲顶部的执行订正：仅 Windows 动态验证，沿用原单测/contract、既有 Windows runner/workflow/数据库入口；不新增专项或持续回归体系。公开仓库没有私有 P4/P7 引擎、参数和 Golden Master；模型保护资产可验证，公共 unavailable stub 的通过不能冒充私有固定概率实跑。目录模板按实际职责及 Rust 模块命名调整；顺序执行的后端 use case 无新增 UI 生命周期，不强制新增 State、请求 ID 或空出口。
 
-R8-01 已 `DONE`（精确 `cba72fd` / Windows run `36881256338` 全通过），R8-02 当前 `VERIFYING`，03～12 `BLOCKED`；精确门禁状态见 [阶段索引](../modular-rewrite/R08-prediction-p4-orchestration/README.md)。R8-02 须取得自身精确 Windows CI 才可 DONE，03 保持 BLOCKED。
+R8-01～02 已取得各自精确 Windows CI（`cba72fd` / `36881256338`、`cc2b0fe` / `36891488571`）及正式完成记录。用户已启动 R8-03；各项精确当前状态只由 [阶段索引](../modular-rewrite/R08-prediction-p4-orchestration/README.md) 维护。03 必须取得自身 Windows CI，不继承前项 PASS。
 
 ## 1. 阶段目标
 
@@ -317,7 +317,7 @@ crates/application/src/use_cases/prediction/build_input/
 
 ## R8-02 Historical Feature Reader
 
-状态：`VERIFYING`（实现与源码验证完成，等待自身精确 Windows CI；03 仍 BLOCKED）
+状态：见阶段索引；精确 `cc2b0fe` / Windows run `36891488571` 全通过，正式完成记录已创建。
 
 ### 1. 目标
 
@@ -454,7 +454,7 @@ crates/persistence-postgres/src/team_features.rs  # 原纯特征投影，无 I/O
 
 ## R8-03 Readiness Audit
 
-状态：`BLOCKED`（仅当上一任务与本任务前置门禁通过后改为 `READY`）
+状态：见阶段索引；已按用户指令开始，须自身精确 Windows CI 及完成记录才能关闭。
 
 ### 1. 目标
 
@@ -462,14 +462,19 @@ crates/persistence-postgres/src/team_features.rs  # 原纯特征投影，无 I/O
 
 ### 2. 现状与来源
 
-- `crates/application/src/prediction.rs`。
-- `p4_orchestration.rs`、`fact_pipeline.rs`、`p4_persistence.rs`、`p4_workbench.rs`。
-- 相关 persistence modules。
+- 旧 `prediction.rs` 已在 R3 删除，实际来源为 `use_cases/prediction/inspect_match_prediction_readiness/mod.rs` 和 `shared/readiness_checks.rs`。
+- Service 和 R8-01 build_input 调用该审计；数据窗口、输入准备和路由由原 Ports 提供。manifest/hash 留 R8-04，routing helper 留 R8-05；不提前迁移 P4 编排或 Persistence SQL。
 
 ### 3. 目标文件与目录
 
 ```text
 crates/application/src/use_cases/prediction/readiness/
+  mod.rs           # 模块登记和显式导出
+  workflow.rs      # 唯一评估时钟、原只读 Port 顺序与报告组装
+  lineups.rs       # 纯阵容/门将/首发上下文检查
+  input_quality.rs # 纯历史覆盖/质量检查
+  report.rs        # 检查载荷、评分/等级/原因归类
+  tests.rs         # 原单测 target 内复用 Probe 的行为测试
 ```
 
 ### 4. 文件职责边界
@@ -480,41 +485,43 @@ crates/application/src/use_cases/prediction/readiness/
 
 ### 5. 输入
 
-- 无。
+- 原 StoredMatchPredictionCommand、原 Ports 和 ModelRegistry；比赛、所选 snapshot、路由、准备输入及原质量证据。
 
 ### 6. 输出
 
-- 稳定的模块公开接口、可独立测试的实现和对应契约测试。
+- 原 MatchPredictionReadiness、checks/score/level/两种许可、blockers/warnings、cutoff/assessed_at、manifest/hash 和 route_identity，公共字段/错误保持。
 
 ### 7. 允许依赖
 
-- 无。
+- 既有 PredictionAccess/Ports、Domain、Application DTO/errors、registry/model-api、shared audit/routing；纯检查仅消费载荷。
 
 ### 8. 禁止依赖
 
-- 无。
+- 核心审计不得依赖具体 Persistence/SQL、私有引擎或 UI；不得 predict/save/enqueue、新增后台任务/缓存/重试或校准默认参数。
 
 ### 9. 状态所有权
 
-- 该任务不新增跨模块共享状态；需要状态时由目标模块内具名 State/Coordinator 唯一持有。
+- 所有审计变量为单次 workflow 局部状态，无跨请求共享 State；局部结果在请求结束释放。
 
 ### 10. 副作用边界
 
-- 所有 I/O、副作用和外部调用必须集中在明确命名的 adapter/transport/repository/workflow 文件。
+- 原只读 I/O 集中 workflow.rs，通过已有 Ports；同一 assessed_at 用于 read_match_chain_at 和 prepare_match_input_at，仅 ready_for_model 时准备。不增加读写副作用或改变错误优先级。
 
 ### 11. 异常路径
 
-- 保持现有错误码、错误类型和用户可见提示语义；新增内部错误必须在边界映射为既有公共错误。
+- 窗口/准备 InvalidState、路由 NotFound 继续生成阻断报告，其他 Port 错误原样返回；路由 scope/snapshot/支持性失败进入原模型路由检查。等级优先为 Blocked→ShadowOnly→ReadyWithWarnings→FormalReady，评分不能替代许可。原字符串/权重/metadata/原因顺序保持。
 
 ### 12. 并发/异步/生命周期
 
-- 所有异步请求必须具备请求 ID、取消或过期结果丢弃策略；销毁时解除监听器、定时器和挂起回调。
+- 后端为原顺序 await 请求，无新增监听器、定时器或后台生命周期；取消/过期由既有调用方管理，不创建模板请求 ID/空 State。
 
 ### 13. 兼容要求
 
 - P4.4 保持 SHADOW_ONLY。
 - P7 固定 lambda、概率、矩阵和 top scoreline 回归一致。
-- 历史 cutoff、输入指纹、路由和 schema 不变。
+- 历史 cutoff、输入指纹、路由和 schema 不变；现有公开 unavailable stub 不冒充私有固定概率 Golden Master。
+- 复用原 Probe/单测 target，补齐时钟、门槛、阵容/身份阻断、异常/错误优先级、无模型执行/历史写入及原因去重测试；不创建专项 runner/workflow/target/数据库。
+- 八项原 helper、原 async workflow 和报告汇总迁移逐段比对；Windows 为唯一动态验收，真实 PG/Full/私有固定回归及继承删除 trigger 风险仍最终新库待验。
 
 ### 14. 实施步骤
 
@@ -558,7 +565,7 @@ crates/application/src/use_cases/prediction/readiness/
 
 ### 20. 回退点
 
-- 回退到 R8-03 开始前的已验证提交；不得手工复制旧文件恢复。
+- 回退到精确已验证 `cc2b0fe7601efdbad44fa5badcb6507f226698a7`；受控 revert 同步唯一入口/检查/门禁/清单，不手工复制旧文件，不修改历史数据。
 
 ### 21. 根 README 摘要记录
 

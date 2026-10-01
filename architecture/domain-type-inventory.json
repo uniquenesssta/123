@@ -24,13 +24,13 @@
     "targetPublicExportPolicy": "explicit re-export only"
   },
   "sourceDigest": "217241ac243726a5ab6805a7f169e222b97e78c7c971749a5904714af673ebdd",
-  "rustUsageDigest": "ff639cbfc14fb7f113de1a7caa47b85a488e107246e683ff47a5eb02ba50096f",
+  "rustUsageDigest": "55eb16cf4715683ebc2e611cb43987f61199ab1c3644195d63b303e1b8f876e8",
   "summary": {
     "typeCount": 365,
     "publicCompatibilityTypeCount": 365,
     "internalTypeCount": 0,
     "domainSourceFileCount": 129,
-    "scannedRustFileCount": 1033,
+    "scannedRustFileCount": 1037,
     "databaseMappedTypeCount": 300,
     "byTargetModule": {
       "ai_workspace": 16,
@@ -3139,7 +3139,8 @@
       ],
       "externalCallers": [
         "crates/application/src/use_cases/ai_workspace/apply_operation/payload.rs",
-        "crates/application/src/use_cases/prediction/shared/readiness_checks.rs",
+        "crates/application/src/use_cases/prediction/readiness/lineups.rs",
+        "crates/application/src/use_cases/prediction/readiness/tests.rs",
         "crates/persistence-postgres/src/adapters/catalog/players/value_mapping.rs",
         "crates/persistence-postgres/src/adapters/catalog/teams/detail/squad_mapper.rs",
         "crates/persistence-postgres/src/adapters/lineups/pair_transaction/write.rs",
@@ -4837,7 +4838,8 @@
         "crates/application/src/use_cases/competition/create_stage/mod.rs",
         "crates/application/src/use_cases/prediction/build_input/mod.rs",
         "crates/application/src/use_cases/prediction/dry_run_default_fixture/mod.rs",
-        "crates/application/src/use_cases/prediction/inspect_match_prediction_readiness/mod.rs",
+        "crates/application/src/use_cases/prediction/readiness/tests.rs",
+        "crates/application/src/use_cases/prediction/readiness/workflow.rs",
         "crates/application/src/use_cases/prediction/tests.rs",
         "crates/application/src/use_cases/rules/package_factory/mod.rs",
         "crates/model-api/src/lib.rs",
@@ -10166,7 +10168,8 @@
         "crates/application/src/use_cases/lineups/create_lineup/mod.rs",
         "crates/application/src/use_cases/lineups/list_lineups/mod.rs",
         "crates/application/src/use_cases/lineups/read_lineup/mod.rs",
-        "crates/application/src/use_cases/prediction/shared/readiness_checks.rs",
+        "crates/application/src/use_cases/prediction/readiness/lineups.rs",
+        "crates/application/src/use_cases/prediction/readiness/tests.rs",
         "crates/application/src/use_cases/prediction/tests.rs",
         "crates/application/src/use_cases/review/package/shared.rs",
         "crates/persistence-postgres/src/adapters/lineups/chain/mod.rs",
@@ -10347,7 +10350,7 @@
       "externalCallers": [
         "crates/application/src/use_cases/analytics/parameter_lifecycle/run_parameter_shadow_validation/mod.rs",
         "crates/application/src/use_cases/prediction/dry_run_default_fixture/mod.rs",
-        "crates/application/src/use_cases/prediction/inspect_match_prediction_readiness/mod.rs",
+        "crates/application/src/use_cases/prediction/readiness/workflow.rs",
         "crates/application/src/use_cases/prediction/shared/routing.rs",
         "crates/application/src/use_cases/prediction/tests.rs",
         "crates/model-api/src/lib.rs",
@@ -10884,7 +10887,8 @@
         "crates/application/src/services/lineups/facade.rs",
         "crates/application/src/services/lineups/service.rs",
         "crates/application/src/use_cases/lineups/read_match_lineup_chain/mod.rs",
-        "crates/application/src/use_cases/prediction/shared/readiness_checks.rs",
+        "crates/application/src/use_cases/prediction/readiness/lineups.rs",
+        "crates/application/src/use_cases/prediction/readiness/tests.rs",
         "crates/application/src/use_cases/prediction/tests.rs",
         "crates/persistence-postgres/src/adapters/lineups/chain/mod.rs",
         "src-tauri/src/commands/catalog.rs"
@@ -11205,7 +11209,8 @@
         "crates/domain/tests/serde_contracts/module_paths.rs"
       ],
       "externalCallers": [
-        "crates/application/src/use_cases/prediction/shared/readiness_checks.rs",
+        "crates/application/src/use_cases/prediction/readiness/lineups.rs",
+        "crates/application/src/use_cases/prediction/readiness/tests.rs",
         "crates/persistence-postgres/src/adapters/lineups/chain/mod.rs"
       ],
       "databaseMappings": [
@@ -11334,7 +11339,7 @@
         "crates/application/src/services/prediction/facade.rs",
         "crates/application/src/services/prediction/service.rs",
         "crates/application/src/use_cases/prediction/build_input/mod.rs",
-        "crates/application/src/use_cases/prediction/inspect_match_prediction_readiness/mod.rs",
+        "crates/application/src/use_cases/prediction/readiness/workflow.rs",
         "crates/application/src/use_cases/prediction/shared/audit.rs",
         "src-tauri/src/commands/prediction.rs"
       ],
@@ -11449,6 +11454,7 @@
         "crates/application/src/services/lineups/service.rs",
         "crates/application/src/use_cases/lineups/create_match/mod.rs",
         "crates/application/src/use_cases/prediction/build_input/mod.rs",
+        "crates/application/src/use_cases/prediction/readiness/tests.rs",
         "crates/application/src/use_cases/prediction/shared/audit.rs",
         "crates/application/src/use_cases/prediction/tests.rs",
         "crates/persistence-postgres/src/adapters/matches/catalog/create.rs",
@@ -13786,6 +13792,7 @@
       ],
       "externalCallers": [
         "crates/application/src/use_cases/prediction/build_input/mod.rs",
+        "crates/application/src/use_cases/prediction/readiness/tests.rs",
         "crates/application/src/use_cases/prediction/tests.rs",
         "crates/persistence-postgres/src/adapters/catalog/teams/detail/recent_match_mapper.rs",
         "crates/persistence-postgres/src/adapters/matches/catalog/mapping.rs",
@@ -21447,8 +21454,10 @@
         "crates/domain/tests/serde_contracts/module_paths.rs"
       ],
       "externalCallers": [
-        "crates/application/src/use_cases/prediction/inspect_match_prediction_readiness/mod.rs",
-        "crates/application/src/use_cases/prediction/shared/readiness_checks.rs"
+        "crates/application/src/use_cases/prediction/readiness/input_quality.rs",
+        "crates/application/src/use_cases/prediction/readiness/lineups.rs",
+        "crates/application/src/use_cases/prediction/readiness/report.rs",
+        "crates/application/src/use_cases/prediction/readiness/workflow.rs"
       ],
       "databaseMappings": []
     },
@@ -21509,8 +21518,11 @@
         "crates/domain/tests/serde_contracts/module_paths.rs"
       ],
       "externalCallers": [
-        "crates/application/src/use_cases/prediction/inspect_match_prediction_readiness/mod.rs",
-        "crates/application/src/use_cases/prediction/shared/readiness_checks.rs"
+        "crates/application/src/use_cases/prediction/readiness/input_quality.rs",
+        "crates/application/src/use_cases/prediction/readiness/lineups.rs",
+        "crates/application/src/use_cases/prediction/readiness/report.rs",
+        "crates/application/src/use_cases/prediction/readiness/tests.rs",
+        "crates/application/src/use_cases/prediction/readiness/workflow.rs"
       ],
       "databaseMappings": []
     },
@@ -21577,7 +21589,8 @@
       ],
       "externalCallers": [
         "crates/application/src/use_cases/prediction/build_input/mod.rs",
-        "crates/application/src/use_cases/prediction/inspect_match_prediction_readiness/mod.rs"
+        "crates/application/src/use_cases/prediction/readiness/report.rs",
+        "crates/application/src/use_cases/prediction/readiness/tests.rs"
       ],
       "databaseMappings": []
     },
@@ -22152,8 +22165,9 @@
         "crates/application/src/composition/adapters/prediction.rs",
         "crates/application/src/ports/prediction/mod.rs",
         "crates/application/src/use_cases/prediction/build_input/mod.rs",
+        "crates/application/src/use_cases/prediction/readiness/input_quality.rs",
+        "crates/application/src/use_cases/prediction/readiness/tests.rs",
         "crates/application/src/use_cases/prediction/shared/audit.rs",
-        "crates/application/src/use_cases/prediction/shared/readiness_checks.rs",
         "crates/application/src/use_cases/prediction/tests.rs",
         "crates/persistence-postgres/src/match_prediction.rs"
       ],
@@ -24710,9 +24724,9 @@
         "crates/application/src/composition/adapters/rules.rs",
         "crates/application/src/ports/rules/mod.rs",
         "crates/application/src/use_cases/prediction/execute_prediction/mod.rs",
-        "crates/application/src/use_cases/prediction/inspect_match_prediction_readiness/mod.rs",
         "crates/application/src/use_cases/prediction/plan_p4_horizons/mod.rs",
         "crates/application/src/use_cases/prediction/preview_route/mod.rs",
+        "crates/application/src/use_cases/prediction/readiness/workflow.rs",
         "crates/application/src/use_cases/prediction/tests.rs",
         "crates/persistence-postgres/src/adapters/competition/route_resolution/route/binding_candidate.rs",
         "crates/persistence-postgres/src/adapters/competition/route_resolution/route/record_mapper.rs",

@@ -133,6 +133,11 @@ use std::sync::{Arc, Mutex};
 pub(crate) struct ProbeState {
     pub(crate) calls: Vec<&'static str>,
     pub(crate) failure: Option<&'static str>,
+    pub(crate) failure_kind: Option<PortErrorKind>,
+    pub(crate) scope_kind: Option<CompetitionKind>,
+    pub(crate) match_record: Option<MatchRecord>,
+    pub(crate) match_chain: Option<MatchLineupChain>,
+    pub(crate) chain_requests: Vec<(Uuid, String, DateTime<Utc>)>,
     pub(crate) task: Option<P4FreezeTaskRecord>,
     pub(crate) readiness: Option<P4FreezeReadiness>,
     pub(crate) snapshot_id: Option<Uuid>,
@@ -162,7 +167,7 @@ impl Probe {
         state.calls.push(name);
         if state.failure == Some(name) {
             return Err(PortError::new(
-                PortErrorKind::Unavailable,
+                state.failure_kind.unwrap_or(PortErrorKind::Unavailable),
                 format!("injected {name}"),
             ));
         }
@@ -275,7 +280,7 @@ impl PredictionModel for ProbeModel {
         })
     }
 }
-fn probe_registry(port: &Arc<Probe>) -> ModelRegistry {
+pub(crate) fn probe_registry(port: &Arc<Probe>) -> ModelRegistry {
     let mut registry = ModelRegistry::new();
     registry.register(Arc::new(ProbeModel(Arc::clone(port))));
     registry
@@ -473,7 +478,12 @@ impl RuleRoutingPort for Probe {
             competition_id,
             season_id,
             stage_id,
-            competition_kind,
+            competition_kind: self
+                .state
+                .lock()
+                .unwrap()
+                .scope_kind
+                .unwrap_or(competition_kind),
         })
     }
     async fn resolve_route(&self, request: &RouteRequest) -> PortResult<RouteDecision> {
@@ -559,7 +569,14 @@ impl MatchCatalogPort for Probe {
         panic!("forbidden Port call: delete_match")
     }
     async fn read_match(&self, _match_id: Uuid) -> PortResult<MatchRecord> {
-        panic!("forbidden Port call: read_match")
+        self.call("read_match")?;
+        Ok(self
+            .state
+            .lock()
+            .unwrap()
+            .match_record
+            .clone()
+            .expect("unselected Port call: read_match"))
     }
 }
 
@@ -597,11 +614,19 @@ impl LineupPort for Probe {
     }
     async fn read_match_chain_at(
         &self,
-        _match_id: Uuid,
-        _snapshot_type: &str,
-        _reference_time: DateTime<Utc>,
+        match_id: Uuid,
+        snapshot_type: &str,
+        reference_time: DateTime<Utc>,
     ) -> PortResult<MatchLineupChain> {
-        panic!("forbidden Port call: read_match_chain_at")
+        self.call("read_chain_at")?;
+        let mut state = self.state.lock().unwrap();
+        state
+            .chain_requests
+            .push((match_id, snapshot_type.to_string(), reference_time));
+        Ok(state
+            .match_chain
+            .clone()
+            .expect("unselected Port call: read_match_chain_at"))
     }
     async fn list_team_match_lineups(
         &self,

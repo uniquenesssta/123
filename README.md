@@ -6,7 +6,9 @@ R1–R6 累计补审覆盖 43 个任务节点。根据用户决定，R7-01 后�
 
 当前 R8 唯一分支 `rewrite/r8-prediction-p4-orchestration`，阶段起点 `90680bf`。R8-01 受审计输入构建已独立且 DONE，精确 `cba72fd` / Windows run `36881256338` 实际通过 Application 61/Persistence 135、17 视口、Rust/前端、release/MSI/NSIS/启动。详见 [01 完成记录](docs/modular-rewrite/R08-prediction-p4-orchestration/R08-01-match-prediction-input-builder.md)。
 
-R8-02 历史读取已实现，当前 VERIFYING：新增 `adapters/prediction/{mod.rs,historical_features/{mod.rs,read.rs}}`，收敛球队历史/进球基准 SQL、typed rows/映射和范围选取；原 `team_features.rs` 保留真正的纯投影及三项曲线测试，删除已迁出的 SQL，不保留空转发。原 36 候选、4 场范围阈值、12 场选中、cutoff/排序/绑定及评分/证据保持。新增六项 inline 测试，原 PG cutoff 用例增加相等、前后一微秒、finalized/created 各自未来隔离；Application 61/Persistence 141 为待 CI 实跑的数量。83 项现有源码检查、完整架构、Rustfmt、保护资产/171 命令/46 迁移静态基线通过，六项破坏探针拒绝并恢复；5 项浏览器检查和编译/单测/交付等本节点 Windows CI。不增加 Application wrapper/Port、runner/workflow/数据库/依赖/迁移；PG/私有固定回归/Full 及继承历史风险仍待验。详见 [R8 索引](docs/modular-rewrite/R08-prediction-p4-orchestration/README.md)。
+R8-02 历史读取已收尾，精确 `cc2b0fe` / Windows run `36891488571` 通过 Application 61/Persistence 141、六项新增历史特征测试、17 视口及 Windows 构建/打包/启动，详见 [02 完成记录](docs/modular-rewrite/R08-prediction-p4-orchestration/R08-02-historical-feature-reader.md)。
+
+R8-03 已实施：新增 `readiness/{mod,workflow,lineups,input_quality,report,tests}.rs`，将只读就绪审计、纯阵容/输入质量检查和报告归类收敛到单一 owner，删除旧 `inspect_match_prediction_readiness/mod.rs` 与 `shared/readiness_checks.rs`。Service 和 build_input 直接接入；原八项 helper、async 顺序和报告逻辑等价，manifest/路由继续复用原 owner。现有 Probe 增加八项行为测试，原两个验证器及 Domain/Port 使用清单同步；预期 Application 69/Persistence 141 须本项 Windows CI 确认。沿用既有源码/架构/Rustfmt/资产/命令/迁移门禁，不新增验证体系或数据库。当前状态和验证详见 [R8 索引](docs/modular-rewrite/R08-prediction-p4-orchestration/README.md)；PG/私有固定回归/Full 及继承历史风险仍最终新库待验。
 
 ## 公开边界
 

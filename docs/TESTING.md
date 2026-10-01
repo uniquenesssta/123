@@ -157,3 +157,12 @@ The public model stub must always return an explicit unavailable error. A succes
 现有 Persistence 生产模块 inline 增加六项测试（范围阈值/过滤后上限/typed 主客场及 scope/基准策略/原平台投影评分和证据/中性），原三项曲线测试保留；预期 Persistence 141、Application 61，尚待本项 Windows CI 确认。原 `postgres_integration::historical_snapshot_excludes_results_ingested_after_the_cutoff` 扩 cutoff 相等与前后一微秒、finalized/created 各自未来隔离和基准守卫；仍同一个 ignored target，18 broad 数量不变，沿用最终封包新库待验，不创建新 target/runner/workflow/数据库。
 
 83 项源码检查、完整架构、Rustfmt、保护资产/171 命令/46 迁移静态基线 PASS；两段 SQL、原辅助函数/测试/范围及加权投影比对不变，六项破坏探针拒绝并恢复。5 项浏览器检查与 Rust/Windows 交付待精确 CI；公共固定平台评分只验证既有公开特征投影，不等于私有 P4/P7 概率 Golden Master。现有两次查询没有跨查询事务快照保证，保持原语义；实际 PG 结果必须新库实跑，ignored 不计 PASS。
+
+
+## R8-02 Windows 收尾 / R8-03 验证
+
+`cc2b0fe7601efdbad44fa5badcb6507f226698a7` / run `36891488571` / job `110467936302` 全 SUCCESS。Application 61/Persistence 141、六项新增历史测试、17 视口、前端类型/生产构建、Rust fmt/Clippy/workspace tests、release/MSI/NSIS 和启动 7 条/3 操作通过。02 收尾记录保存精确 artifact，前节“待 CI”为实施时历史记录。
+
+03 在原 Application 单测 target 增加八项测试，复用原 Probe 和 fake registry；覆盖只读时钟/流程/manifest/路由、历史及质量临界值、阵容/身份阻断优先、异常转报告或原样返回、许可/评分/原因去重。预期 Application 69、Persistence 141，尚待本项 Windows CI，不将本地源码审查计为 Rust 实跑。原八 helper、async workflow 和报告汇总逐段等价；六项破坏探针均拒绝并恢复。83 项既有源码检查、完整 `npm run verify:architecture`、18 保护资产/171 命令/46 迁移及 18 PG 静态基线、Rustfmt 和 `git diff --check` 均已 PASS；5 项浏览器检查与编译/Clippy/单测/交付留自身 Windows CI。没有 Linux/macOS 动态验证、新 runner/workflow/target/数据库。
+
+真实 PG、历史四项/账本/XLSX/Full、私有 P4/P7 Golden Master、模型历史删除 trigger 风险仍沿用最终封包新库待验；ignored 不能计通过。

@@ -40,7 +40,7 @@ const storedExecution = read("crates/application/src/use_cases/prediction/execut
 check(useCases.includes("pub(crate) mod build_input;"), "R8-01 输入构建模块未登记");
 check(storedExecution.includes("super::build_input::execute(port, registry, command, persist_run).await?") && storedExecution.includes("execute_internal(port, registry, input, persist_run).await"), "正式/影子执行必须顺序复用输入构建及原执行器，保留模式");
 for (const token of ["prepare_match_input", "inspect_match_prediction_readiness", "attach_prediction_input_audit", "verify_prepared_input_matches_readiness", "PredictionCommand {"]) check(!storedExecution.includes(token), `原执行 owner 残留输入构建：${token}`);
-check(builderProduction.includes("inspect_match_prediction_readiness::execute(port, registry, command.clone()).await?"), "输入构建必须执行既有完整度评估");
+check(builderProduction.includes("readiness::execute(port, registry, command.clone()).await?"), "输入构建必须执行既有完整度评估");
 check(builderProduction.includes("readiness.can_run_formal") && builderProduction.includes("readiness.can_run_shadow") && builderProduction.includes("if !allowed {") && builderProduction.includes("return Err(ApplicationError::Validation(format!("), "输入 I/O 前必须按模式拒绝不允许的推演");
 const constructionSteps = ["if !allowed {", "let model_family = normalize_model_selection", ".prepare_match_input_at(", "verify_prepared_input_matches_readiness(&prepared, &readiness)?;", "attach_prediction_input_audit(&mut prepared.match_input, &readiness)?;", "Ok(PredictionCommand {"];
 const positions = constructionSteps.map(token=>builderProduction.indexOf(token));
@@ -73,5 +73,32 @@ for(const test of ["typed_history_mapping_keeps_team_perspective_venue_and_scope
 for(const test of ["historical_feature_projection_keeps_fixed_platform_scores_and_evidence", "empty_history_keeps_neutral_features_without_evidence", "ratio_curve_is_continuous_and_centered", "history_curve_rewards_better_results", "venue_curve_stays_bounded"]) check(featureProjection.includes(`fn ${test}`), `历史投影缺少既有/追加测试：${test}`);
 const pgHistory = read("crates/persistence-postgres/tests/postgres_integration.rs");
 check(pgHistory.includes("historical_snapshot_excludes_results_ingested_after_the_cutoff") && pgHistory.includes("for column in [\"finalized_at\", \"created_at\"]") && pgHistory.includes("for finalized_is_future in [true, false]") && pgHistory.includes("cutoff + Duration::microseconds(1)") && pgHistory.includes("cutoff - Duration::microseconds(1)"), "原 PG cutoff target 必须保留并增加精确数据库时间边界");
+// R8-03：唯一只读审计工作流；原检查/分级语义与原目标内测试。
+const readinessRoot = "crates/application/src/use_cases/prediction/readiness";
+const readinessExport = read(`${readinessRoot}/mod.rs`);
+const readinessFlow = read(`${readinessRoot}/workflow.rs`);
+const readinessLineups = read(`${readinessRoot}/lineups.rs`);
+const readinessQuality = read(`${readinessRoot}/input_quality.rs`);
+const readinessReport = read(`${readinessRoot}/report.rs`);
+const readinessTests = read(`${readinessRoot}/tests.rs`);
+check(useCases.includes("pub(crate) mod readiness;") && readinessExport.includes("pub(crate) use workflow::execute;"), "R8-03 审计模块必须登记且出口只导出");
+check(!readinessExport.includes("fn ") && !existsSync(join(root,"crates/application/src/use_cases/prediction/inspect_match_prediction_readiness")) && !existsSync(join(root,"crates/application/src/use_cases/prediction/shared/readiness_checks.rs")), "旧审计入口/检查不得保留空转发或重复 owner");
+check(service.includes("readiness::execute(port, registry, command).await"), "公开审计须直接使用唯一 owner");
+check((readinessFlow.match(/Utc::now\(\)/g) ?? []).length === 1 && readinessFlow.includes("let assessed_at = Utc::now();"), "审计只能取得一次评估时钟");
+check(readinessFlow.includes(".read_match_chain_at(command.match_id, &command.snapshot_type, assessed_at)") && /model_selection\.family,\s*assessed_at,/.test(readinessFlow), "阵容窗口和准备输入必须复用同一审计时间");
+const auditSteps = ["let assessed_at =", "normalize_model_selection", "ensure_model_selection_registered(registry", ".read_match(command.match_id)", ".read_match_chain_at(", ".resolve_competition_context(", ".resolve_route(", ".prepare_match_input_at(", "summarize(&checks, &shadow_reasons)", "let input_manifest =", "map(sha256_value).transpose()?", "Ok(MatchPredictionReadiness {"];
+const auditPositions = auditSteps.map(token => readinessFlow.indexOf(token, readinessFlow.indexOf("pub(crate) async fn execute")));
+check(auditPositions.every((position, index) => position >= 0 && (index === 0 || position > auditPositions[index-1])), "审计验证/读取/路由/输入/报告顺序漂移");
+check(readinessFlow.includes(".is_some_and(|chain| chain.ready_for_model)") && (readinessFlow.match(/error.kind == PortErrorKind::InvalidState/g) ?? []).length === 2 && readinessFlow.includes("error.kind == PortErrorKind::NotFound") && (readinessFlow.match(/Err\(error\) => return Err\(error.into\(\)\)/g) ?? []).length === 3, "窗口/准备状态与缺失路由生成报告，其他 Port 错误必须原样停止");
+for (const token of ["command.explicit_rule_package_id.is_none()", "validate_snapshot_type(&command.snapshot_type", "if !model.supports(&context)", "can_run_formal: level.can_run_formal()", "can_run_shadow: level.can_run_shadow()", "route_identity.as_ref()", "&match_record,", "&command.snapshot_type,"]) check(readinessFlow.includes(token), `审计丢失兼容规则：${token}`);
+for (const [name, source] of [["workflow",readinessFlow], ["lineups",readinessLineups], ["quality",readinessQuality], ["report",readinessReport]]) {
+  for (const token of ["save_run(", ".predict(", "enqueue", "Uuid::new", "prepare_match_input("]) check(!source.includes(token), `只读审计 ${name} 越界：${token}`);
+  if (name !== "workflow") for (const token of ["async fn", "Utc::now", "port.", "store.", "sqlx::"]) check(!source.includes(token), `审计纯检查 ${name} 引入 I/O：${token}`);
+}
+check(readinessLineups.includes("let selected_id = chain.selected_lineup_id?;") && readinessLineups.includes(".find(|lineup| lineup.id == selected_id)") && !readinessLineups.includes(".first()") && readinessLineups.includes("goalkeeper_count != 1") && readinessLineups.includes('code.eq_ignore_ascii_case("GK")'), "阵容选择必须精确匹配且首发只能有一个门将");
+check(readinessQuality.includes("home_history >= 5 && away_history >= 5") && readinessQuality.includes("home_history == 0 || away_history == 0") && readinessQuality.includes(".clamp(0.0, 1.0)") && readinessQuality.includes("quality_score >= 0.65") && readinessQuality.includes("quality_score >= 0.40") && readinessQuality.includes("quality_score < 0.40"), "历史/质量门槛与影子规则漂移");
+check(readinessReport.includes("score: score.min(weight)") && /sum::<u16>\(\)\s*\.min\(100\) as u8/.test(readinessReport) && readinessReport.includes("if !warnings.contains(reason)"), "报告评分上限或影子原因去重漂移");
+check(/if !blockers.is_empty\(\) \{\s*PredictionReadinessLevel::Blocked\s*\} else if !shadow_reasons.is_empty\(\) \{\s*PredictionReadinessLevel::ShadowOnly\s*\} else if !warnings.is_empty\(\) \{\s*PredictionReadinessLevel::ReadyWithWarnings\s*\} else \{\s*PredictionReadinessLevel::FormalReady/.test(readinessReport), "报告分级必须依次阻断、影子、警告、正式，无评分替代门禁");
+for (const test of ["formal_report_preserves_one_clock_order_route_manifest_and_read_only_calls", "history_and_quality_thresholds_preserve_scores_and_mode_permissions", "lineup_selection_goalkeepers_starter_context_and_identity_keep_blocking_priority", "unavailable_window_input_and_missing_route_become_reports_without_retry", "port_unavailable_errors_stop_at_the_original_read_boundary", "route_snapshot_scope_and_model_support_failures_remain_blocked_reports", "invalid_family_and_unregistered_selection_reject_before_read_io", "report_classification_preserves_labels_reason_order_dedup_and_score_caps"]) check(readinessTests.includes(`fn ${test}`), `R8-03 缺少原目标内行为测试：${test}`);
 if(failures.length) throw new Error(`Prediction Service 验证失败\n${failures.map((item)=>`- ${item}`).join("\n")}`);
 console.log(`Prediction Service 验证通过：${predictionFiles.length} 个 Service/Use Case Rust 文件，18 个公开 Application 职责已进入 Prediction Service/Ports 边界，P4 freeze execution 与 snapshot persistence 均不再由旧混合 owner 直接实现。`);

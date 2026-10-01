@@ -14,8 +14,7 @@ pub(crate) async fn execute<P: PredictionAccess + ?Sized>(
     command: StoredMatchPredictionCommand,
     persist_run: bool,
 ) -> ApplicationResult<PredictionCommand> {
-    let readiness =
-        super::inspect_match_prediction_readiness::execute(port, registry, command.clone()).await?;
+    let readiness = super::readiness::execute(port, registry, command.clone()).await?;
     from_assessment(port, command, readiness, persist_run).await
 }
 
