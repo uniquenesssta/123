@@ -1,17 +1,11 @@
 {
-  "schemaVersion": 1,
-  "runId": "footfigma-screens-lineup-presets-2026-10-01",
-  "repo": "uniquenesssta/123", "branch": "ui-design-system",
-  "fileKey": "PN0Whgu6HLWIHx4Mv6aHfu", "page": "3:5",
-  "currentScreen": "S08 lineup_presets / 阵容预设", "currentRoute": "lineup_presets",
-  "phase": "in_progress_semantics_verified", "currentExecutionFinished": false,
-  "previousAcceptedGlobalCheckpoint": "66d575f0d9985012a43448e2fed2af9f913c3117",
-  "acceptedRouteCount": 7, "routeCount": 17,
-  "source": {"page":{"path":"src/pages/lineupPresets.ts","ref":"main","blob":"e4bd6b88d03b06db039278e447afc71816064b32"},"main":{"path":"src/main.ts","ref":"main","scope":"targeted editor validation, manager, copy, deletion and apply preflight excerpts"}},
-  "authority": "Figma controls visual design; source provides functional and data semantics only.",
-  "frames": {},
-  "pending": ["compose directory, team presets and editor states", "safe copy/archive/delete and apply-contract overlays", "existing page entry wiring", "deep structural and screenshot QA", "accepted records and global checkpoint"],
-  "guards": ["exactly eleven starters with complete unique formation slots", "nullable usage probability or zero-to-one", "same-team default uniqueness", "archive differs from permanent preset deletion", "apply preflight and team identity rechecked; match copy independent"],
-  "applicationSourceModified": false, "existingMastersModified": false,
-  "warning": "WIP is not acceptance. Previous seven accepted routes remain authoritative until S08 final QA."
+  "schemaVersion":1,"runId":"footfigma-screens-lineup-presets-2026-10-01","repo":"uniquenesssta/123","branch":"ui-design-system","fileKey":"PN0Whgu6HLWIHx4Mv6aHfu","page":"3:5",
+  "currentScreen":"S08 lineup_presets / 阵容预设","currentRoute":"lineup_presets","phase":"composed_pending_prototype_and_qa","currentExecutionFinished":false,
+  "previousAcceptedGlobalCheckpoint":"66d575f0d9985012a43448e2fed2af9f913c3117","acceptedRouteCount":7,"routeCount":17,
+  "frames":{"No Selection":"570:86212","Team A":"570:87458","Team B":"570:88754","Filtered":"570:89909","No Results":"570:90930","Page 2":"570:91940","Loading":"570:92977","Load Error":"570:93993","Refreshing":"570:95015","Refresh Error":"570:96303","Team Loading":"570:97588","Team Error":"570:98657","Empty Presets":"570:99741","Archived Only":"570:100822","Manager":"570:101947","Empty Roster":"570:103247","Team Dark":"570:104334","Directory Compact":"570:105617","Editor Ready":"571:91867","Editor Blank":"571:94699","Editor Ten":"571:97425","Editor Duplicate":"571:100153","Editor Mismatch":"571:102881","Editor Probability":"571:105609","Saving":"571:108357","Save Error":"571:111573","Saved":"571:114316","Editor Dark":"571:117041","Editor Compact":"571:119766","Database Required":"571:122391"},
+  "dialogFrames":{"Save A-P1":"573:101868","Copy Blank":"573:101964","Copy Ready":"573:102094","Archive A-P1":"573:102176","Archive A-P2":"573:102232","Delete A-P1":"573:102288","Delete A-P2":"573:102387","Delete A-P3":"573:102456","Delete D-P1":"573:102525","Version":"573:102594","Role Source":"573:102650","Apply Contract":"573:102706","Apply Blocked":"573:102762","Apply Ready":"573:102821","A-P2 Summary":"573:102877","B-P1 Summary":"573:102933","Team E":"573:102989","Team F":"573:103045","No Roster":"573:103101"},
+  "reviewHub":"573:103157","productStateFrameCount":30,"dialogFrameCount":19,
+  "pending":["identity-safe bounded prototype and incoming links","deep layout/contrast/disabled-ancestor checks","final screenshots and accepted documentation"],
+  "applicationSourceModified":false,"existingMastersModified":false,"newScreenMasters":0,
+  "warning":"Composed roots are not accepted. Resolve actual normalized SLOT paths by semantic names; do not rebuild or overwrite previous accepted progress."
 }
