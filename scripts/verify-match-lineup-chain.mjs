@@ -54,7 +54,7 @@ requireTrue(persistence.includes("reference_time.min(kickoff_time - Duration::se
 requireTrue(persistence.includes('"T-N" => None') && persistence.includes("lineup.captured_at <= $3"), "T-N 任意赛前时间或最新阵容选择规则缺失");
 requireTrue(!persistence.includes("模型链只支持 T-24h / T-6h / T-90m / T-1h"), "阵容链仍拒绝 T-N");
 requireTrue(!catalog.includes("T-N 仅用于旧数据兼容") && !exchange.includes("T-N 仅用于旧数据兼容"), "阵容创建或导入仍拒绝 T-N");
-requireTrue(/let\s+snapshot_type\s*=\s*crate::adapters::lineups::chain::normalize_lineup_snapshot_type\(&draft\.snapshot_type\)\?\.to_string\(\);/.test(catalog), "阵容创建未把规范化 snapshot_type 转换为持久化 String");
+requireTrue(/let\s+snapshot_type\s*=\s*crate::adapters::lineups::chain::normalize_lineup_snapshot_type\(&draft\.snapshot_type\)\?\s*\.to_string\(\);/.test(catalog), "阵容创建未把规范化 snapshot_type 转换为持久化 String");
 requireTrue(workbook.includes('["T-N", "T-24h", "T-6h", "T-1h"]'), "比赛阵容工作簿窗口选项不正确");
 requireTrue(!workbook.includes('["T-N", "T-24h", "T-6h", "T-90m", "T-1h"]'), "比赛阵容工作簿仍开放T-90m新输入");
 requireTrue(catalog.includes("替补顺序必须位于 1–99") && catalog.includes("refresh_lineup_validation_in_tx"), "客户端创建阵容校验链缺失");

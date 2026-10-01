@@ -174,6 +174,17 @@ SQLx 0.8.6 的 Chrono DateTime 编码按自 2000 年起的整数微秒写入，�
 
 本轮受影响原静态检查、架构聚合、源码卫生/格式/解析、Windows 验收入口静态检查、数据库/保护资产/命令冻结与差异复核均通过。五项临时破坏探针分别去父锁、放入 actual、排除等时截止、扩大 limit、暴露隐藏历史，均被原门禁拒绝并恢复；14 个原规则/读取/mapper 函数体规范化对比不变，历史删除仅增加隔离/父锁前置。Domain 365 声明及 300 项数据库映射分类保持，直接模块 38；Windows 编译/fmt/Clippy/workspace tests/前端/打包/启动等待本轮 CI，真实数据库边界/历史删除并发及有效 XLSX/Full 均“最终封包新库待验”。历史四项失败仍未实跑关闭。成功 CI 后才创建 `R07-08-lineup-chain-and-history.md` 并开放 R7-09；回退本项需一起恢复职责路径、共同锁、直接调用方、清单/指纹和原门禁。
 
+### R7-08 首轮 CI 失败与修订（2026-10-01）
+
+首轮精确提交 `3362f456e3e08d36dcd09cf5cb36b9589e9531e1` 的 [Windows run 36764662888](https://github.com/uniquenesssta/123/actions/runs/36764662888) / job `110055685978` 失败于前端静态契约：`verify-formation-usage.mjs` 仍读旧 player_catalog，报“阵容目录映射缺失”。架构检查通过；Rust 编译/Clippy/单测、截图/生产构建/打包/启动尚未执行，不能记为通过。
+
+- 修订 `verify-formation-usage.mjs`，改读 `history/read.rs` 与 `history/mapping.rs`，明确检查 formation_id 关联和 code/name 投影、映射，不删除原契约。
+- 复现同类 `verify-history-scoreline-ui.mjs` 旧路径失败，改读唯一 `history/removal.rs`，保留删除/归档/活动前驱恢复断言。
+- 完整检查前端静态脚本发现 `verify-match-lineup-chain.mjs` 对 Rustfmt 的换行误拒绝；仅允许 `?` 与 `.to_string()` 之间正常空白，仍要求当前 chain owner 的规范化返回转换为 String。
+- 四项临时探针去阵型投影/ID映射、历史恢复及 String 转换均被修订门禁拒绝，随后原字节恢复。没有修改 Rust/前端业务、依赖/锁文件、工作流、测试集合/断言或迁移。
+
+现有前端入口的 83 个源码/契约检查全部通过，架构聚合及数据库/保护资产/171 命令冻结通过。其余 5 个检查需要浏览器交互/截图，当前环境没有 Windows 浏览器，明确待 Windows CI；不执行 Linux/macOS 客户端验收。本项仍 VERIFYING、R7-09 及以后 BLOCKED；新精确提交的 Windows Automated 待验，真实 PG/XLSX/Full 仍最终封包新库待验。尚未创建 R7-08 完成记录。
+
 ## R7-01 READY 边界
 
 - 处理 Match Catalog 创建、删除、列表、读取及其直接 validation/mapping/query owner，并修复 A1～A7 所需的 Application 调用方、现有验证器、清单和测试。

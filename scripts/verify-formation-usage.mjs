@@ -19,7 +19,8 @@ const persistence = [
 const monthlyWorkbooks = read("crates/persistence-postgres/src/monthly_workbooks.rs");
 const integrationTests = read("crates/persistence-postgres/tests/postgres_integration.rs");
 const spreadsheetApplication = read("crates/application/src/use_cases/exchange/preview_team_package_import/coverage.rs");
-const lineupPersistence = read("crates/persistence-postgres/src/player_catalog.rs");
+const lineupRead = read("crates/persistence-postgres/src/adapters/lineups/history/read.rs");
+const lineupMapping = read("crates/persistence-postgres/src/adapters/lineups/history/mapping.rs");
 const commands = read("src-tauri/src/commands/catalog.rs");
 const registry = read("src-tauri/src/bootstrap/command_registry.rs");
 const client = read("src/api/client.ts");
@@ -38,7 +39,8 @@ required(domain.includes("FormationUsageDistributionDraft") && domain.includes("
 required(persistence.includes("alpha * prior") && persistence.includes("UNKNOWN_FORMATION_ID"), "阵型平滑或未知回退缺失");
 required(!persistence.includes("DELETE FROM feature.formation_usage_observations"), "阵型观察必须追加历史，禁止删除覆盖");
 for (const level of contract.resolution_priority) required(persistence.includes(level), `解析优先级缺失: ${level}`);
-required(lineupPersistence.includes("formation_id") && lineupPersistence.includes("football.formations"), "阵容目录映射缺失");
+required(lineupRead.includes("LEFT JOIN football.formations formation ON formation.id = lineup.formation_id") && lineupRead.includes("formation.code AS formation_code, formation.name AS formation_name"), "阵容目录读取缺少阵型 ID/代码/名称关联");
+required(lineupMapping.includes('formation_id: row.try_get("formation_id")?') && lineupMapping.includes('formation_code: row.try_get("formation_code")?') && lineupMapping.includes('formation_name: row.try_get("formation_name")?'), "阵容目录映射缺少阵型 ID/代码/名称");
 required(monthlyWorkbooks.includes("已按阵型代码") && monthlyWorkbooks.includes("_resolved_formation_id"), "跨数据库阵型ID按代码重新绑定缺失");
 required(monthlyWorkbooks.includes("引用的阵型ID") && monthlyWorkbooks.includes("缺少 formation_code，无法重新绑定"), "过期阵型ID提交保护缺失");
 required(integrationTests.includes("monthly_workbook_rebinds_stale_formation_id_by_code"), "过期阵型ID重新绑定集成测试缺失");

@@ -27,7 +27,7 @@ const registry = read("src-tauri/src/bootstrap/command_registry.rs");
 const applicationPrediction = readRustTree("crates/application/src/services/prediction") + readRustTree("crates/application/src/use_cases/prediction");
 const applicationCatalog = read("crates/application/src/services/lineups/facade.rs");
 const modelPersistence = read("crates/persistence-postgres/src/model_runs.rs");
-const catalogPersistence = read("crates/persistence-postgres/src/player_catalog.rs");
+const lineupHistoryPersistence = read("crates/persistence-postgres/src/adapters/lineups/history/removal.rs");
 const matchScope = read("crates/persistence-postgres/src/adapters/matches/catalog/scope.rs");
 const matchDeletion = read("crates/persistence-postgres/src/adapters/matches/catalog/delete.rs");
 const runHistoryMigration = read("crates/persistence-postgres/migrations/0032_model_run_history_visibility.sql");
@@ -56,7 +56,7 @@ for (const source of [applicationPrediction, predictionCommand, registry, client
 requireTrue(runs.includes('data-context-kind="run"') && main.includes('document.addEventListener("contextmenu"'), "推演历史右键删除入口缺失");
 
 requireTrue(lineupHistoryMigration.includes("history_hidden_at") && lineupHistoryMigration.includes("history_hidden_reason"), "阵容历史隐藏/归档迁移缺失");
-requireTrue(catalogPersistence.includes("remove_lineup_history") && catalogPersistence.includes("restored_lineup_id"), "阵容历史删除、归档和活动版本恢复持久化缺失");
+requireTrue(lineupHistoryPersistence.includes("remove_lineup_history") && lineupHistoryPersistence.includes("restored_lineup_id"), "阵容历史删除、归档和活动版本恢复持久化缺失");
 for (const source of [applicationCatalog, catalogCommand, registry, client]) {
   requireTrue(source.includes("remove_lineup_history"), "阵容历史删除命令链未贯通");
 }

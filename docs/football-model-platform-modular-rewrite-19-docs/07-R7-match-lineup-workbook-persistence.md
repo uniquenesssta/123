@@ -158,7 +158,7 @@
 
 ## R7-08 Lineup Chain 与 History
 
-状态：`VERIFYING`，R7-07 已 DONE，用户已启动；chain/history 唯一职责迁移、删除共同父锁及现有断言已实现，Windows 待本轮 CI；真实数据库边界/历史并发最终封包新库待验。原任务 R7-03。
+状态：`VERIFYING`，R7-07 已 DONE，用户已启动；chain/history 唯一职责迁移、删除共同父锁及现有断言已实现，首轮 Windows run `36764662888` 失败于旧验证路径，三个现有 verifier 已修订，Windows 等新精确提交 CI；真实数据库边界/历史并发最终封包新库待验。原任务 R7-03。
 
 - **目标/契约**：收敛按时点的阵容选择、版本链与历史读取；actual 不进入赛前模型输入，保留截止时间、优先级、历史可追溯及稳定列表语义。
 - **来源与目标**：lineup_chain.rs 与现存 chain/history 调用方；迁入 `crates/persistence-postgres/src/adapters/lineups/history/、adapters/lineups/chain/`。按实际职责调整私有文件布局，不强制一函数一文件。
