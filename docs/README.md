@@ -6,12 +6,13 @@
 
 ## 当前恢复入口
 
-**2026-10-01最新检查点：S11 release / 发布验收的可编辑视觉、代表性本页状态及有限原型已验收。** Screens当前 **11 / 17条产品路由**，S12–S17六条尚未开始。完整运行时和跨页面端到端集成未完成。
+**2026-10-01最新检查点：S12 analytics / 分析的可编辑视觉、代表性本页状态及有限原型已验收。** Screens当前 **12 / 17条产品路由**，S13–S17五条尚未开始。真实运行时和完整跨页面端到端集成未完成。
 
 - [Screens总计划](FIGMA_SCREENS_PLAN.md)
 - [最新Screens总检查点](FIGMA_SCREENS_STATE.json)
-- [S11发布验收：请求、报告、证据与真实发布边界](FIGMA_SCREEN_RELEASE.md)
-- [S11全部节点与恢复状态](FIGMA_SCREEN_RELEASE_STATE.json)
+- [S12分析：任务、质量、审核、H/I与参数边界](FIGMA_SCREEN_ANALYTICS.md)
+- [S12全部节点与恢复状态](FIGMA_SCREEN_ANALYTICS_STATE.json)
+- [S11发布验收](FIGMA_SCREEN_RELEASE.md) / [独立状态](FIGMA_SCREEN_RELEASE_STATE.json)
 - [S10规则与模型](FIGMA_SCREEN_RULES.md) / [独立状态](FIGMA_SCREEN_RULES_STATE.json)
 - [S09 Excel工作包](FIGMA_SCREEN_WORKBOOKS.md) / [独立状态](FIGMA_SCREEN_WORKBOOKS_STATE.json)
 - [S08阵容预设](FIGMA_SCREEN_LINEUP_PRESETS.md) / [独立状态](FIGMA_SCREEN_LINEUP_PRESETS_STATE.json)
@@ -23,19 +24,19 @@
 - [S02比赛与阵容](FIGMA_SCREEN_LINEUPS.md) / [独立状态](FIGMA_SCREEN_LINEUPS_STATE.json)
 - [S01数据总览](FIGMA_SCREEN_DASHBOARD.md)
 
-**下一项：S12 `analytics` / 分析，尚未开始。** S11有33个产品状态、53个弹窗和1个Review Hub，仍只计一条路由。53个弹窗中40个为报告专属证据，只有2个运行确认；S01–S11累计348个状态，不是348条路由。
+**下一项：S13 `api_workspace` / AI问答，尚未开始。** S12有50个产品状态、48个弹窗和1个Review Hub；仍只计一条路由。S01–S12累计398个状态，不是398条路由。
 
-## S11本轮验收
+## S12本轮验收
 
-总览、全链路、性能、安全、成本、历史及右侧报告摘要完成。A/B/C报告与39项证据、3个完整JSON示例保持身份与13项合计一致；另有独立D零预算成本证据。没有把新请求等待期间的旧A当作本次结果，也不在B读取失败时显示A。
+历史样本与H监控、完整分析与后台任务、质量检查/人工审核、受控参数生命周期完成；含外部分析回包和高级统计。当前公开参数生成接口直接拒绝未捆绑提供器，生成按钮禁用；候选/影子/晋升/回滚只是条件化历史示例，不冒充当前生成。
 
-**当前后端固定包含外部模型运行时Warning。** 页面旧fixture文案不代表真实模型执行；本设计没有伪造整体Pass，没有新增实际部署按钮。报告生成、持久化、发布许可和部署分别说明。无P95显示“—”，未运行不记0阻断；空预算、零预算和超预算独立，最新用量日期不等于今日实时账单。
+正式结算与评估样本口径分开，最近全局快照不代表H/I精确分区许可。无scan_id不按0问题通过；取消请求不等于取消终态；结果未知不自动重发。回包导入、建议接受、pending能力候选、能力历史写入分别处理，绑定改变禁止旧候选晋升。
 
-Review Hub `599:136849` 可达33状态与53弹窗。最终 **676条NAVIGATE/OVERLAY、159项CLOSE、0其他动作**；S10默认Light/Dark的2条真实入站另计，只保留代表性主题，不转移候选规则包、比赛或许可。
+Review Hub `614:153064` 可达50状态与48弹窗。最终 **937条NAVIGATE/OVERLAY、144项CLOSE、0其他动作**，外部4条入站另计：S01/S11默认Light/Dark的分析导航进入真实S12，只保留代表性主题，不转移比赛、任务、文件、分区或许可。
 
-深层9,941个未隐藏节点、3,796个真实嵌套实例；非预期越界、失效引用/目标、未绑定可见solid颜色、顶层重叠、异常按钮高度和证据身份错误均0。196个禁用/忙控件无反应，父级点击旁路0；22处正常纵向滚动。普通文字最低对比度Light4.5048、Dark6.8625。
+最终13,938个未隐藏节点、5,424个真实嵌套实例；非预期越界、失效引用/目标、未绑定solid颜色、顶层重叠、异常按钮高度与门禁断言错误均0。266个禁用/忙控件无反应，父级旁路0；15处正常纵向滚动。普通文字最低对比度Light4.5327、Dark6.8625。
 
-158处本地文字对比度和62个继承CHANGE_TO演示反应已修正。2个最终运行确认没有执行连接；没有运行真实验收、数据库写入、模型、成本API或发布。所有报告ID、数据和占位哈希为设计演示，不能用于完整性证明。
+修复Steps SLOT纵向挤占正文，改为真实SLOT内的原生横向布局并保留四个Step实例；修正220处指标说明对比度、9处结果/扫描文案和未连接服务状态。四种证据判定分别保留必填说明字段。**25个最终操作确认均无执行连接，没有运行分析、写库、导入文件或改变参数。**
 
 ## 组件与模式记录
 
@@ -62,18 +63,18 @@ Review Hub `599:136849` 可达33状态与53弹窗。最终 **676条NAVIGATE/OVER
 - [底层Token与组件待办](FIGMA_FOUNDATION_COMPONENT_BACKLOG.md)
 - [Patterns与Screens总阶段计划](FIGMA_PATTERN_SCREEN_PLAN.md)
 
-底层组件与六组Patterns全部完成。Controls **61 sets /506 variants**，Patterns **17 sets /125 variants /13 production singles**，Foundations **193 variables /13 text styles /6 effects**。S11复用真实实例，没有创建Screen主组件、detach或修改共享资产和应用源码。
+底层组件与六组Patterns全部完成。Controls **61 sets /506 variants**，Patterns **17 sets /125 variants /13 production singles**，Foundations **193 variables /13 text styles /6 effects**。S12没有新增Screen主组件、detach、修改共享资产或应用源码。
 
 ## 历史与运行时边界
 
-各页原计数、节点、限定验收及未实现事项以独立状态为准，不能因S11通过而改写为全产品完成。S10四项客户端差异仍需落实：绑定赛事可选/必选不一致、P4路径过滤差异、同key版本保留顺序、浅JSON与候选失效。S09提交状态保护实现待办保留。
+以前各页计数、节点、验收和未实现事项继续以其独立状态为准。S12没有重新验收全部旧页，也没有消除S01–S11运行时缺口。
 
-继续保留S02双方11首发与准入独立；S03输入/提供器/输出独立；S04查看/执行与复盘/结算分开；S05隐藏不删血缘；S06归档/删除/强清与导入/P4资格分开；S07身份、可用性、能力与短期标签独立；S08预设与比赛副本独立；S09类别/文件/模式/批次隔离；AI Chat只读上下文与session/request隔离。
+S02双方11首发与准入独立；S03输入/提供器/输出独立；S04查看/执行、复盘/结算分开；S05隐藏不删血缘；S06归档/普通删除/强清和导入/P4门槛分开；S07来源身份、长期能力/短期标签独立；S08预设与比赛副本分离；S09类别/文件/模式/批次独立；S10读取/校验/注册/绑定/执行分开；S11报告完成不等于发布通过，保留公开运行时警告。AI Chat维持只读上下文主动勾选及session/request隔离。
 
-S11任意参数和报告组合、真实Windows/PostgreSQL测量、模型与凭据验证、成本聚合、不可变账本事务/指纹核验、幂等与结果未知恢复、全部主题/折叠/焦点/滚动/草稿持续性尚未实现。部分刷新和类别操作显示规范，不是完整控制器；有限导航不证明跨页竞态正确。
+S12任意参数与分区、真实任务及结果未知恢复、H评分、质量事实修复、回包文件身份/幂等、审核说明、能力历史事务、私有提供器、影子样本及绑定重检、人工晋升/回滚、所有权限/主题/滚动/草稿/焦点持续性尚未实现。表格只是代表性子集，诊断/刷新/字段入口部分为说明，不是完整控制器。设计验收不代表源码差异已修复或后端全面审计。
 
 ## 换会话恢复
 
-README → `FIGMA_SCREENS_PLAN.md` → `FIGMA_SCREENS_STATE.json` → `FIGMA_SCREEN_RELEASE_STATE.json`及S11记录 → 实际稳定根。虚拟SLOT节点按根、语义名称和真实组件引用解析，不猜ID。
+README → `FIGMA_SCREENS_PLAN.md` → `FIGMA_SCREENS_STATE.json` → `FIGMA_SCREEN_ANALYTICS_STATE.json`及S12记录 → 实际Figma稳定根。虚拟SLOT后代按根、语义名称和真实组件引用解析，不猜ID。
 
-S10总状态保留于 `aeeee7700b5665566729da826e6ab2b0a81b39ae`；S09于 `4627fecbe7d83ce377c36db82d63aec2bed34712`；更早恢复链见Screens计划和独立记录。初始/组合WIP已被accepted覆盖。旧截图、空handoff、旧“Screens未开始”不能代替最新明确状态；未改组件API不为更新进度重写。
+S11总检查点保留于 `a1ede69ac02f7ab7ac73e73485a44cc4e97f7eab`；S10于 `aeeee7700b5665566729da826e6ab2b0a81b39ae`；S09于 `4627fecbe7d83ce377c36db82d63aec2bed34712`；更早恢复链见Screens计划。初始/组合WIP不能覆盖最新accepted。旧截图、空handoff和旧“Screens未开始”记录不能替代明确检查点。
