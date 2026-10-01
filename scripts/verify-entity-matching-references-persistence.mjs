@@ -44,7 +44,7 @@ req(externalValidation.includes("外部 ID 实体类型无效") && externalValid
 const port = read("crates/application/src/ports/player/mod.rs");
 for (const method of ["list_references", "resolve_reference", "check_deletion", "bulk_archive", "create_data_provider", "add_external_id"]) req(port.includes(`async fn ${method}`), `EntityReferencePort changed: ${method}`);
 const externalWrite = read(`${referencesRoot}external_ids/write.rs`);
-const spreadsheet = read("crates/persistence-postgres/src/spreadsheet_exchange.rs");
+const spreadsheet = [read("crates/persistence-postgres/src/adapters/workbooks/player_catalog/commit.rs")].join("\n");
 req(externalWrite.includes("pub(crate) async fn write_external_entity_id(") && externalWrite.includes("connection: &mut PgConnection"), "external ID transaction-aware owner missing");
 req(externalWrite.includes("WHERE football.external_entity_ids.entity_id = EXCLUDED.entity_id") && externalWrite.includes(".fetch_optional(connection)") && externalWrite.includes("禁止自动改绑"), "external ID atomic conflict rejection missing");
 req(!/SET[\s\S]*?entity_id\s*=\s*EXCLUDED\.entity_id\s*,/.test(externalWrite), "external ID target overwrite remains");

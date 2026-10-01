@@ -9,7 +9,7 @@
 
 - 唯一阶段分支：`rewrite/r7-match-lineup-workbook-persistence`。
 - 规划依据：源码 `985f01816060cfd05672bdc03b6771dec7b4e842`，文档基线 `51f746729b2f94925e6382f2ae2108cf80855af6`，以及阶段 README 中 A1–A8、B1–B7 审计记录。
-- R7-01～R7-09 已完成精确提交的 Windows Automated 并为 `DONE`；09 run `36808609584` 的 Persistence 115 项/Application 53 项通过。用户已启动 R7-10，批次/行账本唯一职责、冲突计数与原回归已实现，当前 `VERIFYING`；R7-11 及以后 `BLOCKED`。真实 PG/XLSX/Full 保留最终封包新库待验。
+- R7-01～R7-10 已完成精确提交的 Windows Automated 并为 `DONE`；10 run `36815568401` 的 Persistence 121 项/Application 53 项通过。用户已启动 R7-11，球员工作簿唯一职责、调用/门禁及回归已实现，当前 `VERIFYING`；R7-12 及以后 `BLOCKED`。真实 PG/XLSX/Full 保留最终封包新库待验。
 - 当前状态以 `docs/modular-rewrite/R07-match-lineup-workbook-persistence/README.md` 的唯一状态表为准；历史审计中的旧编号按下表映射。
 - 允许整改触及直接相关的 Application composition/Ports、catalog identity/deletion、现有 P4 时间比较和测试；不提前实施 R8/R10 的整阶段重写。
 - 不包含前端导入 UI 重写、工作簿解析器整体验证框架建设、模型内部算法/参数修改或历史 migration 改写。
@@ -182,7 +182,7 @@
 
 ## R7-10 Spreadsheet Batch Ledger
 
-状态：`VERIFYING`，09 已 DONE，用户已启动；本项两类批次/行账本、暂存计数修订与现有门禁/测试已实现，新精确提交 Windows CI 待验；真实 PG 最终封包新库待验。原任务 R7-05。
+状态：`DONE`，精确提交 `cc0d34d` 的 Windows run `36815568401` / job `110219751121` 全通过，见阶段完成记录；真实 PG/XLSX/Full 仍最终封包新库待验。原任务 R7-05。
 
 - **目标/契约**：批次状态、行结果、计数、审计与业务写入保持一致事务；非法状态与未解决冲突不得提交，失败整批回滚。继承 R7-06 ended_previous_count 修复。
 - **来源与目标**：spreadsheet_exchange.rs、match_exchange.rs 的 batch/row ledger；迁入 `crates/persistence-postgres/src/adapters/workbooks/batch_ledger/`。按实际职责调整私有文件布局，不强制一函数一文件。
@@ -194,7 +194,7 @@
 
 ## R7-11 Player Workbook
 
-状态：`BLOCKED`，依赖 R7-10；原任务 R7-06。
+状态：`VERIFYING`，10 DONE，用户已启动；球员工作簿唯一职责、原 Port/Monthly/Team 调用、门禁与内联/原 PG 回归已实现，本项精确 Windows CI 待验；真实 PG/XLSX/Full 最终封包新库待验。原任务 R7-06。
 
 - **目标/契约**：收敛球员及名称、位置、效力期、可用性、能力、标签等子记录 preview/commit；同源 ID 不改绑，保留真实工作簿字段与行身份。
 - **来源与目标**：spreadsheet_exchange.rs 的 Player workbook persistence；迁入 `crates/persistence-postgres/src/adapters/workbooks/player_catalog/`。按实际职责调整私有文件布局，不强制一函数一文件。

@@ -120,7 +120,7 @@ for (const [file, tokens, label] of [
   ["crates/spreadsheet-io/src/lib.rs", ["default_role_code", "自动继承到比赛阵容", "apply_default_role_alias"], "球员 Excel"],
   ["crates/spreadsheet-io/src/monthly_workbook.rs", ["default_role_code", "组织核心", "apply_default_role_alias"], "月度工作簿"],
   ["crates/spreadsheet-io/src/match_workbook.rs", ["primary_role_code", "仅覆盖本场"], "比赛工作簿"],
-  ["crates/persistence-postgres/src/spreadsheet_exchange.rs", ["default_role_code", "spreadsheet_clear_fields"], "Excel 提交"],
+  ["crates/persistence-postgres/src/adapters/workbooks/player_catalog/commit.rs", ["default_role_code", "spreadsheet_clear_fields"], "Excel 提交"],
   ["src/pages/players.ts", ["默认战术角色", "player-position-default-role"], "球员档案 UI"],
   ["src/pages/teams.ts", ["默认角色", "role_code"], "球队名单 UI"],
   ["src/main.ts", ["defaultRoleForPlayer", "position_role_map?.[code]", "player_position_default", "lineup_override", "role_source_position_code"], "阵容编辑 UI"],

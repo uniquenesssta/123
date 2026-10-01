@@ -47,7 +47,8 @@ const teamDetailCoordinator = text("crates/persistence-postgres/src/adapters/cat
 const teamDetailProfile = text("crates/persistence-postgres/src/adapters/catalog/teams/detail/read_profile.rs");
 const teamDetailSquad = text("crates/persistence-postgres/src/adapters/catalog/teams/detail/read_squad.rs");
 const playerPersistence = deletionPersistence;
-const spreadsheetPersistence = text("crates/persistence-postgres/src/spreadsheet_exchange.rs");
+const spreadsheetPersistence = ["preview", "conflict", "commit", "export", "identity", "validation", "values"]
+  .map((name) => text(`crates/persistence-postgres/src/adapters/workbooks/player_catalog/${name}.rs`)).join("\n");
 const spreadsheetIo = text("crates/spreadsheet-io/src/lib.rs");
 const commands = text("src-tauri/src/commands/catalog.rs");
 const registry = text("src-tauri/src/bootstrap/command_registry.rs");
@@ -95,6 +96,13 @@ for (const artifact of contract.artifacts) {
       "crates/persistence-postgres/src/adapters/catalog/deletion/safe_delete.rs",
       "crates/persistence-postgres/src/adapters/catalog/deletion/delete_write.rs",
     ]) {
+      assert(existsSync(join(root, currentOwner)), `球队与球员管理当前制品不存在：${currentOwner}`);
+    }
+    continue;
+  }
+  if (artifact === ["crates/persistence-postgres/src/spreadsheet", "exchange.rs"].join("_")) {
+    for (const responsibility of ["mod", "preview", "conflict", "commit", "export", "identity", "validation", "values"]) {
+      const currentOwner = `crates/persistence-postgres/src/adapters/workbooks/player_catalog/${responsibility}.rs`;
       assert(existsSync(join(root, currentOwner)), `球队与球员管理当前制品不存在：${currentOwner}`);
     }
     continue;

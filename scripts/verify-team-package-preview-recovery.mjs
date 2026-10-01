@@ -5,7 +5,8 @@ const check = (condition, message) => {
   if (!condition) throw new Error(message);
 };
 
-const exchange = read("crates/persistence-postgres/src/spreadsheet_exchange.rs");
+const exchange = ["preview", "conflict", "commit", "export", "identity", "validation", "values"]
+  .map((name) => read(`crates/persistence-postgres/src/adapters/workbooks/player_catalog/${name}.rs`)).join("\n");
 const domain = read("crates/domain/src/player/status.rs");
 const migration = read("crates/persistence-postgres/migrations/0044_team_package_preview_recovery.sql");
 const types = read("src/types.ts");

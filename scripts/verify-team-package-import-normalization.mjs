@@ -14,7 +14,8 @@ const application =
   read("crates/application/src/use_cases/exchange/preview_team_package_import/package_rows.rs") +
   read("crates/application/src/use_cases/exchange/preview_team_package_import/use_case.rs") +
   read("crates/application/src/use_cases/exchange/commit_team_package_import/use_case.rs");
-const persistence = read("crates/persistence-postgres/src/spreadsheet_exchange.rs");
+const persistence = ["preview", "conflict", "commit", "export", "identity", "validation", "values"]
+  .map((name) => read(`crates/persistence-postgres/src/adapters/workbooks/player_catalog/${name}.rs`)).join("\n");
 const batchLedger = read("crates/persistence-postgres/src/adapters/workbooks/batch_ledger/batch.rs");
 const teamPersistence = read("crates/persistence-postgres/src/monthly_workbooks.rs");
 const template = read("crates/spreadsheet-io/src/team_package.rs");
@@ -27,7 +28,7 @@ assert(
 );
 assert(
   persistence.includes("external_team_references") &&
-    persistence.includes("DeferredExternal { key: String, name: String }") &&
+    read("crates/persistence-postgres/src/adapters/workbooks/player_catalog/mod.rs").includes("DeferredExternal { key: String, name: String }") &&
     persistence.includes("resolve_committed_team_id"),
   "球员链未支持跨批次延迟解析完整资料包球队",
 );

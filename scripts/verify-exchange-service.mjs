@@ -225,7 +225,8 @@ const ledgerBatch = read(`${ledgerRoot}/batch.rs`);
 const ledgerRows = read(`${ledgerRoot}/rows.rs`);
 const ledgerMapping = read(`${ledgerRoot}/mapping.rs`);
 const ledgerRead = read(`${ledgerRoot}/read.rs`);
-const playerWorkbook = read("crates/persistence-postgres/src/spreadsheet_exchange.rs");
+const playerWorkbook = ["preview", "conflict", "commit", "export", "identity", "validation", "values"]
+  .map((name) => read(`crates/persistence-postgres/src/adapters/workbooks/player_catalog/${name}.rs`)).join("\n");
 const matchWorkbook = read("crates/persistence-postgres/src/match_exchange.rs");
 const integration = read("crates/persistence-postgres/tests/postgres_integration.rs");
 const persistencePaths = [];
@@ -270,6 +271,36 @@ check((matchWorkbook.match(/ledger::lock_batch_in_tx\(/g)??[]).length===3 && mat
 check(ledgerRead.includes("ORDER BY row_number, sheet_name, id") && ledgerRead.includes("ORDER BY row_number,sheet_name,id") && !ledgerRead.includes(".begin()") && !ledgerRead.includes(".commit()"),"两类只读预览排序与不写入语义缺失");
 for (const token of ["未知导入实体", "未知比赛导入实体", "未知导入动作", "未知导入状态", "未知导入模式", "ready_end_previous"]) check(ledgerMapping.includes(token),`严格 codec 契约缺少：${token}`);
 for (const token of ["非 pending 球员批次不得提交", "未解决球员冲突不能启动业务写入", "球员冲突跳过与批次暂存计数共同提交", "球员成功返回与账本全部计数一致", "球员成功批次重试不得重复审计", "非 pending 比赛批次不得提交", "未解决比赛冲突不能启动业务写入", "比赛冲突跳过与批次暂存计数共同提交", "候选解决后的行状态与批次计数一致", "末行失败必须回滚替代阵容、前十个球员、账本与审计"]) check(integration.includes(token),`原数据库回归缺少：${token}`);
+// R7-11：球员工作簿唯一职责与公开入口、事务及行身份契约。
+const playerRoot = "crates/persistence-postgres/src/adapters/workbooks/player_catalog";
+const playerPreview = read(`${playerRoot}/preview.rs`);
+const playerConflict = read(`${playerRoot}/conflict.rs`);
+const playerCommit = read(`${playerRoot}/commit.rs`);
+const playerIdentity = read(`${playerRoot}/identity.rs`);
+const playerValidation = read(`${playerRoot}/validation.rs`);
+const playerValues = read(`${playerRoot}/values.rs`);
+const playerExport = read(`${playerRoot}/export.rs`);
+check(!fs.existsSync(path.join(root,"crates/persistence-postgres/src",["spreadsheet","exchange.rs"].join("_"))) && !read("crates/persistence-postgres/src/lib.rs").includes("mod spreadsheet_exchange;"),"旧球员工作簿 owner/注册必须删除");
+check(read("crates/persistence-postgres/src/adapters/workbooks/mod.rs").includes("mod player_catalog;"),"球员工作簿新职责未注册");
+for (const [file,names] of [["preview",["preview_spreadsheet_import","preview_spreadsheet_import_with_team_references","preview_spreadsheet_import_inner"]],["conflict",["resolve_spreadsheet_import_conflict"]],["commit",["commit_spreadsheet_import","apply_import_row"]],["export",["spreadsheet_export_data"]],["identity",["validate_external_id_resolution","decision_from_matches","resolve_player_reference","resolve_team_reference"]],["validation",["validate_spreadsheet_row","validate_child_fields"]],["values",["normalize_spreadsheet_payload","parse_spreadsheet_datetime","spreadsheet_clear_fields"]]]) {
+  for (const name of names) {
+    const owners=persistencePaths.filter((path)=>new RegExp(`fn\\s+${name}\\s*\\(`).test(read(path)));
+    check(owners.length===1 && owners[0]===`${playerRoot}/${file}.rs`,`${name} 球员职责必须只有一个 owner`);
+  }
+}
+for (const name of ["spreadsheet_export_data","preview_spreadsheet_import","preview_spreadsheet_import_with_team_references","read_spreadsheet_import_preview","resolve_spreadsheet_import_conflict","commit_spreadsheet_import"]) check(new RegExp(`PersistenceStore::${name}\\(\\s*self`).test(spreadsheetAdapter),`球员 Port 必须显式分派唯一持久化入口：${name}`);
+for (const source of [playerIdentity,playerValidation,playerValues,playerExport]) check(!source.includes(".begin()") && !source.includes(".commit()") && !source.includes(".execute("),"球员校验/身份/载荷/导出不得持有事务或写业务事实");
+check(!playerPreview.includes("football.players") && !playerPreview.includes("football.player_team_periods") && playerPreview.includes("ledger_rows::insert_import_row(") && (playerPreview.match(/row_number:\s*raw.row_number/g)??[]).length===2 && (playerPreview.match(/sheet_name:\s*raw.sheet_name.clone\(\)/g)??[]).length===2,"球员预检仅暂存真实工作表/物理行和原载荷，不写球员事实");
+const conflictTokens=["ledger::lock_batch_in_tx(","ledger::require_pending(","ledger_rows::lock_import_row_in_tx(",'row_status != "conflict"',"candidate.entity_id == selected","existing != selected","ledger_rows::resolve_import_row_in_tx(","spreadsheet_import_conflict_resolved","tx.commit().await?"];
+let conflictOffset=-1;
+for (const token of conflictTokens) {const next=playerConflict.indexOf(token);check(next>conflictOffset,`球员冲突事务顺序缺失：${token}`);conflictOffset=next;}
+check((playerConflict.match(/self.pool.begin\(\)/g)??[]).length===1 && (playerConflict.match(/tx.commit\(\)/g)??[]).length===1,"球员冲突行、计数和审计必须共同提交唯一事务");
+check(/write_external_entity_id\(\s*tx,[\s\S]*?\.await\?;/.test(playerCommit) && playerCommit.includes("struct ImportCommitContext") && !playerCommit.includes("ON CONFLICT (provider_id, entity_type, external_id) DO UPDATE"),"球员提交必须使用共享身份保护并保留同事务工作簿键解析");
+check(playerIdentity.includes("existing_id != target_id") && (playerIdentity.match(/if existing_entity_id.is_some\(\)/g)??[]).length===2 && playerIdentity.includes("该外部 ID 已绑定到另一条数据库记录，禁止自动改绑"),"球员预检不得改绑既有 ID 或转绑工作簿/包内待新增实体");
+for (const [source,banned] of [[playerValues,["super::identity","super::validation","super::commit","super::preview"]],[playerIdentity,["super::validation","super::commit","super::preview"]],[playerValidation,["super::commit","super::preview"]]]) for (const dependency of banned) check(!source.includes(dependency),`球员职责反向依赖：${dependency}`);
+for (const token of ["同名","external_id_never_rebinds_existing_or_deferred_identity","external_id_same_target_and_new_target_keep_update_and_skip_semantics","child_deferred_reference_keeps_team_key_name_and_other_fields","canonical_action_preserves_child_add_and_explicit_operations"]) check(playerIdentity.includes(token),`球员身份/子记录内联边界回归缺少：${token}`);
+for (const token of ["球员预览读回保持行 UUID、工作表、物理行与载荷","球员预览及重复读回不得写入球员、效力期或自动创建球队","球员只读预览不得产生提交审计"]) check(integration.includes(token),`现有球员数据库用例缺少：${token}`);
+check(integration.includes("team_package_player_team_period_subrecords_are_distinct") && read("crates/persistence-postgres/tests/entity_matching_references_repository_contract.rs").includes("external_id_identity_and_import_atomicity_are_preserved"),"球员多子记录与外部 ID 整批回滚既有回归必须保留");
 if (failures.length) {
   console.error("Exchange Service 验证失败：\n- " + failures.join("\n- "));
   process.exit(1);

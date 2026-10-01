@@ -2,7 +2,7 @@
 
 当前版本 **0.23.0**。本仓库是平台、数据库、数据准备、路由、工作台与外部模型调用入口的公开版本；真实 P4/P7 预测引擎、参数、Profile、固定比赛、私有研究提示词及模型专用固定回归资产不随仓库分发。
 
-R1–R6 累计补审覆盖 43 个任务节点。根据用户决定，R7-01 后新增 R7-02～06 审计整改，原 R7-02～10 顺延为 R7-07～15；优化拆分、验证与记录约束，沿用现有 Windows 验证和最终封包新库流程，不新增持续回归体系。R7-01 的 A1～A7 修订已通过 Windows CI run `36678914535`，节点 DONE；R7-02 外部 ID 身份保护、R7-03 普通删除与历史引用保护均已通过 Windows CI 并为 DONE。R7-04 清单、验证入口和历史记录已通过 Windows CI run `36706905645` 并为 DONE；R7-05 新增 20 个关键 Application 行为测试，精确 Windows CI run `36712015030` 已通过并 DONE；R7-06 的夹具/时间精度与账本修订已通过 Windows CI run `36734194083` 并 DONE；R7-07 阵容创建与共同并发锁已通过 Windows CI run `36757339619` 并 DONE；R7-08 阵容链/历史已通过 Windows CI run `36801488090` 并 DONE；R7-09 阵容预设已通过 Windows CI run `36808609584` 并 DONE；R7-10 两类导入的批次/行账本职责迁移和冲突计数同步已实现、当前 VERIFYING，R7-11 及以后 BLOCKED。PG/XLSX/Full 单独留到最终封包新库验收。详见 [R7 任务书](docs/football-model-platform-modular-rewrite-19-docs/07-R7-match-lineup-workbook-persistence.md) 与 [阶段索引/累计审计](docs/modular-rewrite/R07-match-lineup-workbook-persistence/README.md)。
+R1–R6 累计补审覆盖 43 个任务节点。根据用户决定，R7-01 后新增 R7-02～06 审计整改，原 R7-02～10 顺延为 R7-07～15；优化拆分、验证与记录约束，沿用现有 Windows 验证和最终封包新库流程，不新增持续回归体系。R7-01 的 A1～A7 修订已通过 Windows CI run `36678914535`，节点 DONE；R7-02 外部 ID 身份保护、R7-03 普通删除与历史引用保护均已通过 Windows CI 并为 DONE。R7-04 清单、验证入口和历史记录已通过 Windows CI run `36706905645` 并为 DONE；R7-05 新增 20 个关键 Application 行为测试，精确 Windows CI run `36712015030` 已通过并 DONE；R7-06 的夹具/时间精度与账本修订已通过 Windows CI run `36734194083` 并 DONE；R7-07 阵容创建与共同并发锁已通过 Windows CI run `36757339619` 并 DONE；R7-08 阵容链/历史已通过 Windows CI run `36801488090` 并 DONE；R7-09 阵容预设已通过 Windows CI run `36808609584` 并 DONE；R7-10 两类导入的批次/行账本职责与冲突计数同步已通过 Windows CI run `36815568401` 并 DONE；R7-11 球员工作簿唯一职责已实现、当前 VERIFYING，R7-12 及以后 BLOCKED。PG/XLSX/Full 单独留到最终封包新库验收。详见 [R7 任务书](docs/football-model-platform-modular-rewrite-19-docs/07-R7-match-lineup-workbook-persistence.md) 与 [阶段索引/累计审计](docs/modular-rewrite/R07-match-lineup-workbook-persistence/README.md)。
 
 ## 公开边界
 
@@ -44,6 +44,16 @@ Windows 可使用：
 Node 开发依赖固定安装和读取自源码根目录上一级的 `../node_modules`，npm 缓存固定使用 `../.npm-cache`；仓库根目录不再保存 Node 依赖目录。Cargo target 继续使用 `../.cargo-target`。
 
 ## 模块化重写执行记录
+
+### R7-11 Player Workbook（2026-10-01，VERIFYING）
+
+- 删除旧根 `spreadsheet_exchange.rs`，59 个生产函数按预览、冲突裁决、提交、导出、身份匹配、字段校验、载荷规范化迁入唯一 `adapters/workbooks/player_catalog/`；原函数体和 8 个内联测试保持，SpreadsheetExchangePort 六入口显式分派。复用 R7-10 账本和共享外部 ID 写入，保留候选边界、同源 ID 不改绑、月度/资料包调用、物理行及子记录身份、依赖顺序、幂等/clear/整批回滚与共同事务审计。
+- 增加 6 个现有生产文件内联测试，覆盖重名候选/模式/动作、外部 ID 已绑和新目标、包内延迟关联及载荷解析边界；原 PG 月度用例补重复只读预览的 UUID/工作表/物理行/载荷、无业务写入和无提交审计。原多效力期、外部 ID 竞争/末行回滚/重复导入回归保留；真实 PG/XLSX/Full 最终封包新库待验。
+- 现有导入/资料包/角色/身份验证器切换实际职责；Exchange 加唯一 owner、显式分派、预检只暂存、冲突父锁/候选/改绑拒绝/计数审计共同事务检查。模块清单直接模块 37，Domain 365 声明/300 映射分类保持，使用摘要和既有 PG 指纹刷新；无新测试目标、runner、workflow、依赖或迁移。83 项现有源码/契约检查、架构聚合与 Rustfmt 源码检查通过，六项破坏探针拒绝并恢复；本项 Windows CI 待验，R7-12～15 BLOCKED。
+
+### R7-10 Spreadsheet Batch Ledger（2026-10-01，DONE）
+
+- 两类导入账本唯一职责、人工冲突解决后的 pending 计数同步与调用方共同事务已通过精确提交 `cc0d34d` 的 [Windows CI run 36815568401](https://github.com/uniquenesssta/123/actions/runs/36815568401)。Persistence 121 项/Application 53 项、前端类型/17 视口/构建、fmt/Clippy/workspace tests、安装包/启动全部通过；见 [完成记录](docs/modular-rewrite/R07-match-lineup-workbook-persistence/R07-10-spreadsheet-batch-ledger.md)。18 broad PG 仍 ignored，历史四项/账本/有效 XLSX/Full 最终封包新库待验。
 
 ### R7-08 Lineup Chain / History（2026-10-01，VERIFYING）
 

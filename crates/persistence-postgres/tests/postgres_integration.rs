@@ -1114,6 +1114,40 @@ async fn monthly_workbooks_preview_commit_clear_and_idempotency_are_consistent()
         .expect("预检球员月度工作簿");
     assert_eq!(player_preview.counts.error, 0);
     assert_eq!(player_preview.counts.conflict, 0);
+    // R7-11：重复只读预览保留原行 UUID/工作表/物理行/载荷，不生成业务事实。
+    let initial_player_rows = serde_json::to_value(&player_preview.rows).unwrap();
+    for _ in 0..2 {
+        let readback = database
+            .store
+            .read_spreadsheet_import_preview(player_preview.batch_id)
+            .await
+            .unwrap();
+        assert_eq!(
+            serde_json::to_value(&readback.rows).unwrap(),
+            initial_player_rows,
+            "球员预览读回保持行 UUID、工作表、物理行与载荷"
+        );
+        for raw in &player_workbook.rows {
+            assert!(readback
+                .rows
+                .iter()
+                .any(|row| row.sheet_name == raw.sheet_name
+                    && row.row_number == raw.row_number
+                    && row.entity_type == raw.entity_type));
+        }
+    }
+    let preview_business_count:i64 = sqlx::query_scalar("SELECT (SELECT count(*) FROM football.players WHERE id=$1) + (SELECT count(*) FROM football.player_team_periods WHERE player_id=$1) + (SELECT count(*) FROM football.teams WHERE canonical_name=$2)")
+        .bind(player_id).bind(format!("placeholder-team-{token}")).fetch_one(&database.pool).await.unwrap();
+    assert_eq!(
+        preview_business_count, 0,
+        "球员预览及重复读回不得写入球员、效力期或自动创建球队"
+    );
+    let preview_success_audit_count:i64 = sqlx::query_scalar("SELECT count(*) FROM audit.events WHERE event_type='spreadsheet_import_committed' AND entity_id=$1")
+        .bind(player_preview.batch_id.to_string()).fetch_one(&database.pool).await.unwrap();
+    assert_eq!(
+        preview_success_audit_count, 0,
+        "球员只读预览不得产生提交审计"
+    );
     // R7-10：复用球员月度批次验证 pending 门禁、冲突阻断及暂存计数。
     for status in ["running", "failed", "cancelled"] {
         sqlx::query("UPDATE catalog.import_batches SET status=$2 WHERE id=$1")

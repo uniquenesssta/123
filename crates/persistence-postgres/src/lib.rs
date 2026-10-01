@@ -25,7 +25,6 @@ mod release_acceptance;
 mod research_gateway_records;
 mod review;
 mod role_resolution;
-mod spreadsheet_exchange;
 mod statistics;
 mod store;
 mod team_features;

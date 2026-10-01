@@ -13,7 +13,8 @@ const application =
   read("crates/application/src/use_cases/exchange/commit_team_package_import/policy.rs") +
   read("crates/application/src/use_cases/exchange/export_team_package_preview_json/use_case.rs");
 const persistence = read("crates/persistence-postgres/src/monthly_workbooks.rs");
-const playerPersistence = read("crates/persistence-postgres/src/spreadsheet_exchange.rs");
+const playerPersistence = ["preview", "conflict", "commit", "export", "identity", "validation", "values"]
+  .map((name) => read(`crates/persistence-postgres/src/adapters/workbooks/player_catalog/${name}.rs`)).join("\n");
 const commands = read("src-tauri/src/commands/exchange.rs");
 const registry = read("src-tauri/src/bootstrap/command_registry.rs");
 const client = read("src/api/client.ts");
