@@ -95,13 +95,13 @@ impl MonthlyWorkbookPort for PersistenceStore {
         workbook: &SpreadsheetParsedWorkbook,
         mode: SpreadsheetImportMode,
     ) -> PortResult<SpreadsheetImportPreview> {
-        self.preview_team_monthly_import(workbook, mode)
+        PersistenceStore::preview_team_monthly_import(self, workbook, mode)
             .await
             .map_err(map_persistence_error)
     }
 
     async fn read_import_preview(&self, preview_id: Uuid) -> PortResult<SpreadsheetImportPreview> {
-        self.read_team_monthly_import_preview(preview_id)
+        PersistenceStore::read_team_monthly_import_preview(self, preview_id)
             .await
             .map_err(map_persistence_error)
     }
@@ -111,13 +111,13 @@ impl MonthlyWorkbookPort for PersistenceStore {
         preview_id: Uuid,
         resolution: &SpreadsheetImportResolution,
     ) -> PortResult<SpreadsheetImportPreview> {
-        self.resolve_team_monthly_import_conflict(preview_id, resolution.clone())
+        PersistenceStore::resolve_team_monthly_import_conflict(self, preview_id, resolution.clone())
             .await
             .map_err(map_persistence_error)
     }
 
     async fn commit_import(&self, preview_id: Uuid) -> PortResult<SpreadsheetImportCommitResult> {
-        self.commit_team_monthly_import(preview_id)
+        PersistenceStore::commit_team_monthly_import(self, preview_id)
             .await
             .map_err(map_persistence_error)
     }

@@ -11,12 +11,14 @@ use uuid::Uuid;
 pub(crate) enum ImportFamily {
     Player,
     Match,
+    Team,
 }
 impl ImportFamily {
     fn import_types(self) -> Vec<&'static str> {
         match self {
             Self::Player => vec!["player_catalog_xlsx", "player_monthly_xlsx"],
             Self::Match => vec!["match_lineup_xlsx"],
+            Self::Team => vec!["team_monthly_xlsx"],
         }
     }
 }
@@ -144,6 +146,10 @@ pub(crate) async fn finish_batch_in_tx(
     sqlx::query("UPDATE catalog.import_batches SET status='succeeded',finished_at=$2,inserted_count=$3,updated_count=$4,ended_previous_count=$5,skipped_count=$6,error_count=$7 WHERE id=$1")
         .bind(result.batch_id).bind(result.finished_at).bind(result.inserted_count as i64).bind(result.updated_count as i64).bind(result.ended_previous_count as i64).bind(result.skipped_count as i64).bind(result.error_count as i64).execute(&mut **tx).await?;
     let (event, payload) = match family {
+        ImportFamily::Team => (
+            "team_monthly_workbook_imported",
+            json!({"inserted":result.inserted_count,"updated":result.updated_count,"ended_previous":result.ended_previous_count,"skipped":result.skipped_count}),
+        ),
         ImportFamily::Player => (
             "spreadsheet_import_committed",
             json!({"inserted":result.inserted_count,"updated":result.updated_count,"skipped":result.skipped_count}),
@@ -161,6 +167,42 @@ pub(crate) async fn finish_batch_in_tx(
         payload,
     )
     .await
+}
+
+pub(crate) async fn find_team_batch(
+    pool: &PgPool,
+    source_sha256: &str,
+) -> PersistenceResult<Option<Uuid>> {
+    Ok(sqlx::query_scalar("SELECT id FROM catalog.import_batches WHERE source_sha256=$1 AND import_type=$2 AND status IN ('pending','running','succeeded') ORDER BY started_at DESC NULLS LAST LIMIT 1").bind(source_sha256).bind("team_monthly_xlsx").fetch_optional(pool).await?)
+}
+pub(crate) async fn create_team_batch_in_tx(
+    tx: &mut Transaction<'_, Postgres>,
+    batch_id: Uuid,
+    parsed: &SpreadsheetParsedWorkbook,
+    counts: &SpreadsheetImportCounts,
+    mode_text: &str,
+) -> PersistenceResult<()> {
+    sqlx::query(
+        r#"
+            INSERT INTO catalog.import_batches (
+                id, import_type, workbook_kind, format_version, status,
+                source_file_name, source_sha256, import_mode, started_at,
+                skipped_count, error_count, metadata
+            ) VALUES ($1,$2,'team_monthly',$3,'pending',$4,$5,$6,now(),$7,$8,$9)
+            "#,
+    )
+    .bind(batch_id)
+    .bind("team_monthly_xlsx")
+    .bind(&parsed.format_version)
+    .bind(&parsed.source_file_name)
+    .bind(&parsed.source_sha256)
+    .bind(mode_text)
+    .bind(counts.skipped as i64)
+    .bind((counts.error + counts.conflict) as i64)
+    .bind(json!({"preview_counts": counts}))
+    .execute(&mut **tx)
+    .await?;
+    Ok(())
 }
 
 #[cfg(test)]
@@ -184,6 +226,13 @@ mod tests {
             ["player_catalog_xlsx", "player_monthly_xlsx"]
         );
         assert_eq!(ImportFamily::Match.import_types(), ["match_lineup_xlsx"]);
+        assert_eq!(ImportFamily::Team.import_types(), ["team_monthly_xlsx"]);
+        for family in [ImportFamily::Player, ImportFamily::Match] {
+            assert!(family
+                .import_types()
+                .iter()
+                .all(|kind| !ImportFamily::Team.import_types().contains(kind)));
+        }
         assert!(ImportFamily::Player
             .import_types()
             .iter()

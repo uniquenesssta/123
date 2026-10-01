@@ -232,7 +232,7 @@ const integration = read("crates/persistence-postgres/tests/postgres_integration
 const persistencePaths = [];
 const collectPersistence = (directory) => { for (const entry of fs.readdirSync(directory,{withFileTypes:true})) { const full=path.join(directory,entry.name); if(entry.isDirectory()) collectPersistence(full); else if(entry.name.endsWith(".rs")) persistencePaths.push(path.relative(root,full).replaceAll("\\","/")); } };
 collectPersistence(path.join(root,"crates/persistence-postgres/src"));
-for (const [owner,names] of [["read.rs",["read_spreadsheet_import_preview","read_match_lineup_import_preview"]],["batch.rs",["lock_batch_in_tx","start_batch_in_tx","finish_batch_in_tx","create_player_batch_in_tx","create_match_batch_in_tx","require_pending"]],["rows.rs",["insert_import_row","count_preview_rows","lock_import_row_in_tx","commit_rows_in_tx","mark_imported_in_tx","refresh_pending_counts_in_tx","skip_import_row_in_tx","resolve_import_row_in_tx"]]]) {
+for (const [owner,names] of [["read.rs",["read_spreadsheet_import_preview","read_match_lineup_import_preview","read_team_monthly_import_preview"]],["batch.rs",["lock_batch_in_tx","start_batch_in_tx","finish_batch_in_tx","create_player_batch_in_tx","create_match_batch_in_tx","require_pending"]],["rows.rs",["insert_import_row","count_preview_rows","lock_import_row_in_tx","commit_rows_in_tx","mark_imported_in_tx","refresh_pending_counts_in_tx","skip_import_row_in_tx","resolve_import_row_in_tx"]]]) {
   for (const name of names) {
     const owners=persistencePaths.filter((file)=>new RegExp(`(?:pub(?:\\(crate\\))?\\s+)?(?:async\\s+)?fn\\s+${name}\\s*\\(`).test(read(file)));
     check(owners.length===1 && owners[0]===`${ledgerRoot}/${owner}`,`${name} 必须只有一个批次账本 owner`);
@@ -256,7 +256,7 @@ for (const [source,family,method,apply] of [[playerWorkbook,"Player","commit_spr
   check(body.includes("Ok(result)") && body.includes("error_count: 0"),`${method} 返回必须使用同一成功结果对象`);
 }
 for (const source of [ledgerBatch,ledgerRows]) check(!source.includes(".begin()") && !source.includes(".commit()") && !source.includes("self.pool") && !source.includes("crate::spreadsheet_exchange") && !source.includes("crate::match_exchange"),"账本步骤不得另开/提交事务或反向依赖工作簿业务");
-check(ledgerBatch.includes("import_type=ANY($2) FOR UPDATE") && ledgerBatch.includes('vec!["player_catalog_xlsx", "player_monthly_xlsx"]') && ledgerBatch.includes('vec!["match_lineup_xlsx"]'),"批次父锁必须隔离球员与比赛导入类型");
+check(ledgerBatch.includes("import_type=ANY($2) FOR UPDATE") && ledgerBatch.includes('vec!["player_catalog_xlsx", "player_monthly_xlsx"]') && ledgerBatch.includes('vec!["match_lineup_xlsx"]') && ledgerBatch.includes('vec!["team_monthly_xlsx"]'),"批次父锁必须隔离球员与比赛导入类型");
 check(/if\s+status\s*==\s*"pending"\s*\{/.test(ledgerBatch) && ledgerRows.includes("status IN ('conflict','error')") && ledgerRows.includes("FOR UPDATE"),"批次状态/未解决冲突与行锁门禁缺失");
 check(playerWorkbook.includes('status == "succeeded"') && playerWorkbook.includes('batch.try_get::<i64, _>("ended_previous_count")? as u64') && !matchWorkbook.includes('status == "succeeded"'),"球员成功重试读回与比赛重复提交拒绝语义必须保持");
 const finisher=ledgerBatch.slice(ledgerBatch.indexOf("pub(crate) async fn finish_batch_in_tx"),ledgerBatch.indexOf("#[cfg(test)]"));

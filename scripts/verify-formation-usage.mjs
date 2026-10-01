@@ -16,7 +16,7 @@ const persistence = [
   "crates/persistence-postgres/src/adapters/catalog/formations/usage/read.rs",
   "crates/persistence-postgres/src/adapters/catalog/formations/resolution/resolve.rs",
 ].map(read).join("\n");
-const monthlyWorkbooks = read("crates/persistence-postgres/src/monthly_workbooks.rs");
+const monthlyWorkbooks = ["mod", "preview", "conflict", "commit", "write", "names", "identity", "formation", "validation", "values"].map((name) => read(`crates/persistence-postgres/src/adapters/workbooks/team_package/${name}.rs`)).join("\n");
 const integrationTests = read("crates/persistence-postgres/tests/postgres_integration.rs");
 const spreadsheetApplication = read("crates/application/src/use_cases/exchange/preview_team_package_import/coverage.rs");
 const lineupRead = read("crates/persistence-postgres/src/adapters/lineups/history/read.rs");

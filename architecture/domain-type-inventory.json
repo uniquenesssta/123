@@ -24,13 +24,13 @@
     "targetPublicExportPolicy": "explicit re-export only"
   },
   "sourceDigest": "217241ac243726a5ab6805a7f169e222b97e78c7c971749a5904714af673ebdd",
-  "rustUsageDigest": "f022d2e9b97ef0ac422fbbe17a07b4f9473b3fe85484ce28246860141c8220e2",
+  "rustUsageDigest": "737762d494fc0aa6852960deea8d53097a692e38f2b5f2227320163984b5d235",
   "summary": {
     "typeCount": 365,
     "publicCompatibilityTypeCount": 365,
     "internalTypeCount": 0,
     "domainSourceFileCount": 129,
-    "scannedRustFileCount": 1002,
+    "scannedRustFileCount": 1012,
     "databaseMappedTypeCount": 300,
     "byTargetModule": {
       "ai_workspace": 16,
@@ -26207,8 +26207,12 @@
         "crates/persistence-postgres/src/adapters/workbooks/player_catalog/conflict.rs",
         "crates/persistence-postgres/src/adapters/workbooks/player_catalog/identity.rs",
         "crates/persistence-postgres/src/adapters/workbooks/player_catalog/validation.rs",
+        "crates/persistence-postgres/src/adapters/workbooks/team_package/formation.rs",
+        "crates/persistence-postgres/src/adapters/workbooks/team_package/identity.rs",
+        "crates/persistence-postgres/src/adapters/workbooks/team_package/preview.rs",
+        "crates/persistence-postgres/src/adapters/workbooks/team_package/validation.rs",
+        "crates/persistence-postgres/src/adapters/workbooks/team_package/write.rs",
         "crates/persistence-postgres/src/match_exchange.rs",
-        "crates/persistence-postgres/src/monthly_workbooks.rs",
         "crates/persistence-postgres/tests/entity_matching_references_repository_contract.rs",
         "crates/persistence-postgres/tests/postgres_integration.rs",
         "crates/spreadsheet-io/src/lib.rs",
@@ -26223,8 +26227,12 @@
         "crates/persistence-postgres/src/adapters/workbooks/player_catalog/conflict.rs",
         "crates/persistence-postgres/src/adapters/workbooks/player_catalog/identity.rs",
         "crates/persistence-postgres/src/adapters/workbooks/player_catalog/validation.rs",
-        "crates/persistence-postgres/src/match_exchange.rs",
-        "crates/persistence-postgres/src/monthly_workbooks.rs"
+        "crates/persistence-postgres/src/adapters/workbooks/team_package/formation.rs",
+        "crates/persistence-postgres/src/adapters/workbooks/team_package/identity.rs",
+        "crates/persistence-postgres/src/adapters/workbooks/team_package/preview.rs",
+        "crates/persistence-postgres/src/adapters/workbooks/team_package/validation.rs",
+        "crates/persistence-postgres/src/adapters/workbooks/team_package/write.rs",
+        "crates/persistence-postgres/src/match_exchange.rs"
       ]
     },
     {
@@ -26285,16 +26293,20 @@
         "crates/persistence-postgres/src/adapters/workbooks/player_catalog/conflict.rs",
         "crates/persistence-postgres/src/adapters/workbooks/player_catalog/identity.rs",
         "crates/persistence-postgres/src/adapters/workbooks/player_catalog/mod.rs",
-        "crates/persistence-postgres/src/match_exchange.rs",
-        "crates/persistence-postgres/src/monthly_workbooks.rs"
+        "crates/persistence-postgres/src/adapters/workbooks/team_package/conflict.rs",
+        "crates/persistence-postgres/src/adapters/workbooks/team_package/identity.rs",
+        "crates/persistence-postgres/src/adapters/workbooks/team_package/mod.rs",
+        "crates/persistence-postgres/src/match_exchange.rs"
       ],
       "databaseMappings": [
         "crates/persistence-postgres/src/adapters/workbooks/batch_ledger/rows.rs",
         "crates/persistence-postgres/src/adapters/workbooks/player_catalog/conflict.rs",
         "crates/persistence-postgres/src/adapters/workbooks/player_catalog/identity.rs",
         "crates/persistence-postgres/src/adapters/workbooks/player_catalog/mod.rs",
-        "crates/persistence-postgres/src/match_exchange.rs",
-        "crates/persistence-postgres/src/monthly_workbooks.rs"
+        "crates/persistence-postgres/src/adapters/workbooks/team_package/conflict.rs",
+        "crates/persistence-postgres/src/adapters/workbooks/team_package/identity.rs",
+        "crates/persistence-postgres/src/adapters/workbooks/team_package/mod.rs",
+        "crates/persistence-postgres/src/match_exchange.rs"
       ]
     },
     {
@@ -26429,8 +26441,13 @@
         "crates/persistence-postgres/src/adapters/workbooks/player_catalog/preview.rs",
         "crates/persistence-postgres/src/adapters/workbooks/player_catalog/validation.rs",
         "crates/persistence-postgres/src/adapters/workbooks/player_catalog/values.rs",
+        "crates/persistence-postgres/src/adapters/workbooks/team_package/commit.rs",
+        "crates/persistence-postgres/src/adapters/workbooks/team_package/formation.rs",
+        "crates/persistence-postgres/src/adapters/workbooks/team_package/identity.rs",
+        "crates/persistence-postgres/src/adapters/workbooks/team_package/preview.rs",
+        "crates/persistence-postgres/src/adapters/workbooks/team_package/validation.rs",
+        "crates/persistence-postgres/src/adapters/workbooks/team_package/write.rs",
         "crates/persistence-postgres/src/match_exchange.rs",
-        "crates/persistence-postgres/src/monthly_workbooks.rs",
         "crates/persistence-postgres/tests/entity_matching_references_repository_contract.rs",
         "crates/persistence-postgres/tests/postgres_integration.rs",
         "crates/spreadsheet-io/src/lib.rs",
@@ -26447,8 +26464,13 @@
         "crates/persistence-postgres/src/adapters/workbooks/player_catalog/preview.rs",
         "crates/persistence-postgres/src/adapters/workbooks/player_catalog/validation.rs",
         "crates/persistence-postgres/src/adapters/workbooks/player_catalog/values.rs",
-        "crates/persistence-postgres/src/match_exchange.rs",
-        "crates/persistence-postgres/src/monthly_workbooks.rs"
+        "crates/persistence-postgres/src/adapters/workbooks/team_package/commit.rs",
+        "crates/persistence-postgres/src/adapters/workbooks/team_package/formation.rs",
+        "crates/persistence-postgres/src/adapters/workbooks/team_package/identity.rs",
+        "crates/persistence-postgres/src/adapters/workbooks/team_package/preview.rs",
+        "crates/persistence-postgres/src/adapters/workbooks/team_package/validation.rs",
+        "crates/persistence-postgres/src/adapters/workbooks/team_package/write.rs",
+        "crates/persistence-postgres/src/match_exchange.rs"
       ]
     },
     {
@@ -26747,15 +26769,15 @@
         "crates/application/src/use_cases/exchange/export_match_lineup_data/mod.rs",
         "crates/persistence-postgres/src/adapters/workbooks/batch_ledger/batch.rs",
         "crates/persistence-postgres/src/adapters/workbooks/player_catalog/commit.rs",
+        "crates/persistence-postgres/src/adapters/workbooks/team_package/commit.rs",
         "crates/persistence-postgres/src/match_exchange.rs",
-        "crates/persistence-postgres/src/monthly_workbooks.rs",
         "src-tauri/src/commands/exchange.rs"
       ],
       "databaseMappings": [
         "crates/persistence-postgres/src/adapters/workbooks/batch_ledger/batch.rs",
         "crates/persistence-postgres/src/adapters/workbooks/player_catalog/commit.rs",
-        "crates/persistence-postgres/src/match_exchange.rs",
-        "crates/persistence-postgres/src/monthly_workbooks.rs"
+        "crates/persistence-postgres/src/adapters/workbooks/team_package/commit.rs",
+        "crates/persistence-postgres/src/match_exchange.rs"
       ]
     },
     {
@@ -26833,13 +26855,11 @@
       "externalCallers": [
         "crates/application/src/use_cases/exchange/commit_team_package_import/policy.rs",
         "crates/persistence-postgres/src/adapters/workbooks/batch_ledger/batch.rs",
-        "crates/persistence-postgres/src/adapters/workbooks/batch_ledger/rows.rs",
-        "crates/persistence-postgres/src/monthly_workbooks.rs"
+        "crates/persistence-postgres/src/adapters/workbooks/batch_ledger/rows.rs"
       ],
       "databaseMappings": [
         "crates/persistence-postgres/src/adapters/workbooks/batch_ledger/batch.rs",
-        "crates/persistence-postgres/src/adapters/workbooks/batch_ledger/rows.rs",
-        "crates/persistence-postgres/src/monthly_workbooks.rs"
+        "crates/persistence-postgres/src/adapters/workbooks/batch_ledger/rows.rs"
       ]
     },
     {
@@ -26917,8 +26937,10 @@
         "crates/persistence-postgres/src/adapters/workbooks/player_catalog/mod.rs",
         "crates/persistence-postgres/src/adapters/workbooks/player_catalog/preview.rs",
         "crates/persistence-postgres/src/adapters/workbooks/player_catalog/validation.rs",
+        "crates/persistence-postgres/src/adapters/workbooks/team_package/identity.rs",
+        "crates/persistence-postgres/src/adapters/workbooks/team_package/preview.rs",
+        "crates/persistence-postgres/src/adapters/workbooks/team_package/validation.rs",
         "crates/persistence-postgres/src/match_exchange.rs",
-        "crates/persistence-postgres/src/monthly_workbooks.rs",
         "crates/persistence-postgres/tests/entity_matching_references_repository_contract.rs",
         "crates/persistence-postgres/tests/postgres_integration.rs",
         "src-tauri/src/commands/exchange.rs"
@@ -26931,8 +26953,10 @@
         "crates/persistence-postgres/src/adapters/workbooks/player_catalog/mod.rs",
         "crates/persistence-postgres/src/adapters/workbooks/player_catalog/preview.rs",
         "crates/persistence-postgres/src/adapters/workbooks/player_catalog/validation.rs",
-        "crates/persistence-postgres/src/match_exchange.rs",
-        "crates/persistence-postgres/src/monthly_workbooks.rs"
+        "crates/persistence-postgres/src/adapters/workbooks/team_package/identity.rs",
+        "crates/persistence-postgres/src/adapters/workbooks/team_package/preview.rs",
+        "crates/persistence-postgres/src/adapters/workbooks/team_package/validation.rs",
+        "crates/persistence-postgres/src/match_exchange.rs"
       ]
     },
     {
@@ -27026,16 +27050,18 @@
         "crates/persistence-postgres/src/adapters/workbooks/batch_ledger/read.rs",
         "crates/persistence-postgres/src/adapters/workbooks/player_catalog/conflict.rs",
         "crates/persistence-postgres/src/adapters/workbooks/player_catalog/preview.rs",
+        "crates/persistence-postgres/src/adapters/workbooks/team_package/conflict.rs",
+        "crates/persistence-postgres/src/adapters/workbooks/team_package/preview.rs",
         "crates/persistence-postgres/src/match_exchange.rs",
-        "crates/persistence-postgres/src/monthly_workbooks.rs",
         "src-tauri/src/commands/exchange.rs"
       ],
       "databaseMappings": [
         "crates/persistence-postgres/src/adapters/workbooks/batch_ledger/read.rs",
         "crates/persistence-postgres/src/adapters/workbooks/player_catalog/conflict.rs",
         "crates/persistence-postgres/src/adapters/workbooks/player_catalog/preview.rs",
-        "crates/persistence-postgres/src/match_exchange.rs",
-        "crates/persistence-postgres/src/monthly_workbooks.rs"
+        "crates/persistence-postgres/src/adapters/workbooks/team_package/conflict.rs",
+        "crates/persistence-postgres/src/adapters/workbooks/team_package/preview.rs",
+        "crates/persistence-postgres/src/match_exchange.rs"
       ]
     },
     {
@@ -27105,15 +27131,15 @@
         "crates/application/src/use_cases/exchange/resolve_player_catalog_import_conflict/use_case.rs",
         "crates/application/src/use_cases/exchange/resolve_team_monthly_import_conflict/use_case.rs",
         "crates/persistence-postgres/src/adapters/workbooks/player_catalog/conflict.rs",
+        "crates/persistence-postgres/src/adapters/workbooks/team_package/conflict.rs",
         "crates/persistence-postgres/src/match_exchange.rs",
-        "crates/persistence-postgres/src/monthly_workbooks.rs",
         "crates/persistence-postgres/tests/postgres_integration.rs",
         "src-tauri/src/commands/exchange.rs"
       ],
       "databaseMappings": [
         "crates/persistence-postgres/src/adapters/workbooks/player_catalog/conflict.rs",
-        "crates/persistence-postgres/src/match_exchange.rs",
-        "crates/persistence-postgres/src/monthly_workbooks.rs"
+        "crates/persistence-postgres/src/adapters/workbooks/team_package/conflict.rs",
+        "crates/persistence-postgres/src/match_exchange.rs"
       ]
     },
     {
@@ -27205,15 +27231,21 @@
         "crates/persistence-postgres/src/adapters/workbooks/batch_ledger/mapping.rs",
         "crates/persistence-postgres/src/adapters/workbooks/batch_ledger/rows.rs",
         "crates/persistence-postgres/src/adapters/workbooks/player_catalog/preview.rs",
-        "crates/persistence-postgres/src/match_exchange.rs",
-        "crates/persistence-postgres/src/monthly_workbooks.rs"
+        "crates/persistence-postgres/src/adapters/workbooks/team_package/formation.rs",
+        "crates/persistence-postgres/src/adapters/workbooks/team_package/identity.rs",
+        "crates/persistence-postgres/src/adapters/workbooks/team_package/preview.rs",
+        "crates/persistence-postgres/src/adapters/workbooks/team_package/write.rs",
+        "crates/persistence-postgres/src/match_exchange.rs"
       ],
       "databaseMappings": [
         "crates/persistence-postgres/src/adapters/workbooks/batch_ledger/mapping.rs",
         "crates/persistence-postgres/src/adapters/workbooks/batch_ledger/rows.rs",
         "crates/persistence-postgres/src/adapters/workbooks/player_catalog/preview.rs",
-        "crates/persistence-postgres/src/match_exchange.rs",
-        "crates/persistence-postgres/src/monthly_workbooks.rs"
+        "crates/persistence-postgres/src/adapters/workbooks/team_package/formation.rs",
+        "crates/persistence-postgres/src/adapters/workbooks/team_package/identity.rs",
+        "crates/persistence-postgres/src/adapters/workbooks/team_package/preview.rs",
+        "crates/persistence-postgres/src/adapters/workbooks/team_package/write.rs",
+        "crates/persistence-postgres/src/match_exchange.rs"
       ]
     },
     {
@@ -27280,8 +27312,8 @@
         "crates/application/src/use_cases/exchange/preview_team_package_import/use_case.rs",
         "crates/persistence-postgres/src/adapters/workbooks/batch_ledger/batch.rs",
         "crates/persistence-postgres/src/adapters/workbooks/player_catalog/preview.rs",
+        "crates/persistence-postgres/src/adapters/workbooks/team_package/preview.rs",
         "crates/persistence-postgres/src/match_exchange.rs",
-        "crates/persistence-postgres/src/monthly_workbooks.rs",
         "crates/persistence-postgres/tests/entity_matching_references_repository_contract.rs",
         "crates/persistence-postgres/tests/postgres_integration.rs",
         "crates/spreadsheet-io/src/lib.rs",
@@ -27292,8 +27324,8 @@
       "databaseMappings": [
         "crates/persistence-postgres/src/adapters/workbooks/batch_ledger/batch.rs",
         "crates/persistence-postgres/src/adapters/workbooks/player_catalog/preview.rs",
-        "crates/persistence-postgres/src/match_exchange.rs",
-        "crates/persistence-postgres/src/monthly_workbooks.rs"
+        "crates/persistence-postgres/src/adapters/workbooks/team_package/preview.rs",
+        "crates/persistence-postgres/src/match_exchange.rs"
       ]
     },
     {
@@ -27978,7 +28010,7 @@
       "externalCallers": [
         "crates/application/src/use_cases/exchange/preview_team_package_import/package_rows.rs",
         "crates/persistence-postgres/src/adapters/workbooks/player_catalog/identity.rs",
-        "crates/persistence-postgres/src/monthly_workbooks.rs",
+        "crates/persistence-postgres/src/adapters/workbooks/team_package/validation.rs",
         "crates/persistence-postgres/tests/entity_matching_references_repository_contract.rs",
         "crates/persistence-postgres/tests/postgres_integration.rs",
         "crates/spreadsheet-io/src/lib.rs",
@@ -27988,7 +28020,7 @@
       ],
       "databaseMappings": [
         "crates/persistence-postgres/src/adapters/workbooks/player_catalog/identity.rs",
-        "crates/persistence-postgres/src/monthly_workbooks.rs"
+        "crates/persistence-postgres/src/adapters/workbooks/team_package/validation.rs"
       ]
     },
     {
@@ -28073,8 +28105,14 @@
         "crates/persistence-postgres/src/adapters/workbooks/player_catalog/mod.rs",
         "crates/persistence-postgres/src/adapters/workbooks/player_catalog/preview.rs",
         "crates/persistence-postgres/src/adapters/workbooks/player_catalog/validation.rs",
+        "crates/persistence-postgres/src/adapters/workbooks/team_package/commit.rs",
+        "crates/persistence-postgres/src/adapters/workbooks/team_package/formation.rs",
+        "crates/persistence-postgres/src/adapters/workbooks/team_package/identity.rs",
+        "crates/persistence-postgres/src/adapters/workbooks/team_package/mod.rs",
+        "crates/persistence-postgres/src/adapters/workbooks/team_package/preview.rs",
+        "crates/persistence-postgres/src/adapters/workbooks/team_package/validation.rs",
+        "crates/persistence-postgres/src/adapters/workbooks/team_package/write.rs",
         "crates/persistence-postgres/src/match_exchange.rs",
-        "crates/persistence-postgres/src/monthly_workbooks.rs",
         "crates/persistence-postgres/tests/entity_matching_references_repository_contract.rs"
       ],
       "databaseMappings": [
@@ -28086,8 +28124,14 @@
         "crates/persistence-postgres/src/adapters/workbooks/player_catalog/mod.rs",
         "crates/persistence-postgres/src/adapters/workbooks/player_catalog/preview.rs",
         "crates/persistence-postgres/src/adapters/workbooks/player_catalog/validation.rs",
-        "crates/persistence-postgres/src/match_exchange.rs",
-        "crates/persistence-postgres/src/monthly_workbooks.rs"
+        "crates/persistence-postgres/src/adapters/workbooks/team_package/commit.rs",
+        "crates/persistence-postgres/src/adapters/workbooks/team_package/formation.rs",
+        "crates/persistence-postgres/src/adapters/workbooks/team_package/identity.rs",
+        "crates/persistence-postgres/src/adapters/workbooks/team_package/mod.rs",
+        "crates/persistence-postgres/src/adapters/workbooks/team_package/preview.rs",
+        "crates/persistence-postgres/src/adapters/workbooks/team_package/validation.rs",
+        "crates/persistence-postgres/src/adapters/workbooks/team_package/write.rs",
+        "crates/persistence-postgres/src/match_exchange.rs"
       ]
     },
     {

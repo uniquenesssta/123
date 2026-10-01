@@ -11,7 +11,7 @@ const lineups = read("src/pages/lineups.ts");
 const main = read("src/main.ts");
 const component = read("src/components/searchableSelect.ts");
 const css = read("src/styles/components.css");
-const persistence = read("crates/persistence-postgres/src/monthly_workbooks.rs");
+const persistence = ["mod", "preview", "conflict", "commit", "write", "names", "identity", "formation", "validation", "values"].map((name) => read(`crates/persistence-postgres/src/adapters/workbooks/team_package/${name}.rs`)).join("\n");
 
 for (const id of [
   "new-match-competition-scope",

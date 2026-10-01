@@ -12,7 +12,7 @@ const entityMigration = read("crates/persistence-postgres/migrations/0029_import
 const subrecordMigration = read("crates/persistence-postgres/migrations/0030_import_row_subrecord_identity.sql");
 const teamPeriodMigration = read("crates/persistence-postgres/migrations/0043_import_row_team_period_identity.sql");
 const parser = read("crates/spreadsheet-io/src/team_package.rs");
-const persistence = read("crates/persistence-postgres/src/monthly_workbooks.rs");
+const persistence = ["mod", "preview", "conflict", "commit", "write", "names", "identity", "formation", "validation", "values"].map((name) => read(`crates/persistence-postgres/src/adapters/workbooks/team_package/${name}.rs`)).join("\n");
 const packageJson = JSON.parse(read("package.json"));
 const readme = read("README.md");
 const databaseDoc = read("docs/DATABASE.md");

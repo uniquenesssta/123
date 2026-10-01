@@ -147,6 +147,81 @@ pub(crate) fn match_mode_text(mode: SpreadsheetImportMode) -> &'static str {
     }
 }
 
+pub(crate) fn team_import_row_from_db(
+    row: &sqlx::postgres::PgRow,
+) -> PersistenceResult<SpreadsheetImportRow> {
+    Ok(SpreadsheetImportRow {
+        id: row.try_get("id")?,
+        sheet_name: row.try_get("sheet_name")?,
+        row_number: row.try_get::<i32, _>("row_number")? as u32,
+        entity_type: team_parse_entity_type(&row.try_get::<String, _>("entity_type")?)?,
+        action: team_parse_action(&row.try_get::<String, _>("requested_action")?)?,
+        status: team_parse_status(&row.try_get::<String, _>("status")?)?,
+        message: row.try_get("message")?,
+        payload: row.try_get("payload")?,
+        matched_entity_id: row.try_get("matched_entity_id")?,
+        conflict_candidates: serde_json::from_value(row.try_get("conflict_candidates")?)?,
+    })
+}
+
+pub(crate) fn team_import_mode_text(mode: SpreadsheetImportMode) -> &'static str {
+    match mode {
+        SpreadsheetImportMode::AddOnly => "add_only",
+        SpreadsheetImportMode::AddAndUpdate => "add_and_update",
+    }
+}
+
+pub(crate) fn team_parse_import_mode(
+    value: Option<&str>,
+) -> PersistenceResult<SpreadsheetImportMode> {
+    match value.unwrap_or("add_and_update") {
+        "add_only" => Ok(SpreadsheetImportMode::AddOnly),
+        "add_and_update" => Ok(SpreadsheetImportMode::AddAndUpdate),
+        other => Err(PersistenceError::InvalidState(format!(
+            "未知导入模式 {other}"
+        ))),
+    }
+}
+
+pub(crate) fn team_parse_action(value: &str) -> PersistenceResult<SpreadsheetAction> {
+    match value {
+        "add" => Ok(SpreadsheetAction::Add),
+        "update" => Ok(SpreadsheetAction::Update),
+        "clear" => Ok(SpreadsheetAction::Clear),
+        "skip" => Ok(SpreadsheetAction::Skip),
+        other => Err(PersistenceError::InvalidState(format!("未知动作 {other}"))),
+    }
+}
+
+pub(crate) fn team_parse_status(value: &str) -> PersistenceResult<SpreadsheetRowStatus> {
+    match value {
+        "ready_add" => Ok(SpreadsheetRowStatus::ReadyAdd),
+        "ready_update" => Ok(SpreadsheetRowStatus::ReadyUpdate),
+        "ready_end_previous" => Ok(SpreadsheetRowStatus::ReadyEndPrevious),
+        "conflict" => Ok(SpreadsheetRowStatus::Conflict),
+        "error" => Ok(SpreadsheetRowStatus::Error),
+        "skip" => Ok(SpreadsheetRowStatus::Skip),
+        "imported" => Ok(SpreadsheetRowStatus::Imported),
+        other => Err(PersistenceError::InvalidState(format!("未知状态 {other}"))),
+    }
+}
+
+pub(crate) fn team_parse_entity_type(value: &str) -> PersistenceResult<SpreadsheetEntityType> {
+    match value {
+        "team" => Ok(SpreadsheetEntityType::Team),
+        "team_name" => Ok(SpreadsheetEntityType::TeamName),
+        "coach" => Ok(SpreadsheetEntityType::Coach),
+        "coach_name" => Ok(SpreadsheetEntityType::CoachName),
+        "team_coach_period" => Ok(SpreadsheetEntityType::TeamCoachPeriod),
+        "formation_usage" => Ok(SpreadsheetEntityType::FormationUsage),
+        "team_tactical_observation" => Ok(SpreadsheetEntityType::TeamTacticalObservation),
+        "team_ability_observation" => Ok(SpreadsheetEntityType::TeamAbilityObservation),
+        other => Err(PersistenceError::InvalidState(format!(
+            "球队月度批次包含未知实体 {other}"
+        ))),
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -208,6 +283,39 @@ mod tests {
         );
         assert!(
             matches!(match_parse_mode(Some("bad")), Err(PersistenceError::InvalidState(message)) if message == "未知导入模式")
+        );
+    }
+
+    #[test]
+    fn team_codec_keeps_clear_end_previous_and_rejects_other_families() {
+        for status in [
+            "ready_add",
+            "ready_update",
+            "ready_end_previous",
+            "conflict",
+            "error",
+            "skip",
+            "imported",
+        ] {
+            assert_eq!(team_parse_status(status).unwrap().as_str(), status);
+        }
+        assert!(matches!(
+            team_parse_action("clear").unwrap(),
+            SpreadsheetAction::Clear
+        ));
+        assert!(team_parse_action("upsert").is_err());
+        assert!(team_parse_entity_type("player").is_err());
+        assert!(team_parse_entity_type("match").is_err());
+        assert!(team_parse_entity_type("formation_usage").is_ok());
+        assert_eq!(
+            team_import_mode_text(team_parse_import_mode(None).unwrap()),
+            "add_and_update"
+        );
+        assert!(
+            matches!(team_parse_status("bad"),Err(PersistenceError::InvalidState(message)) if message == "未知状态 bad")
+        );
+        assert!(
+            matches!(team_parse_import_mode(Some("bad")),Err(PersistenceError::InvalidState(message)) if message == "未知导入模式 bad")
         );
     }
 }

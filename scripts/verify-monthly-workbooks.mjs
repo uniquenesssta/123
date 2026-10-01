@@ -15,7 +15,7 @@ const domain =
   read("crates/domain/src/exchange/monthly/contract.rs") +
   read("crates/domain/src/exchange/spreadsheet/contract.rs");
 const spreadsheetIo = read("crates/spreadsheet-io/src/monthly_workbook.rs");
-const persistence = read("crates/persistence-postgres/src/monthly_workbooks.rs");
+const persistence = read("crates/persistence-postgres/src/monthly_workbooks.rs") + ["mod", "preview", "conflict", "commit", "write", "names", "identity", "formation", "validation", "values"].map((name) => read(`crates/persistence-postgres/src/adapters/workbooks/team_package/${name}.rs`)).join("\n") + ["batch", "mapping", "read", "rows"].map((name) => read(`crates/persistence-postgres/src/adapters/workbooks/batch_ledger/${name}.rs`)).join("\n");
 const legacyPersistence = ["preview", "conflict", "commit", "export", "identity", "validation", "values"]
   .map((name) => read(`crates/persistence-postgres/src/adapters/workbooks/player_catalog/${name}.rs`)).join("\n");
 const application = read("crates/application/src/use_cases/exchange/preview_player_catalog_import/use_case.rs");
@@ -47,18 +47,12 @@ requireTrue(spreadsheetIo.includes("action=clear") && spreadsheetIo.includes("cl
 requireTrue(persistence.includes("source_sha256") && persistence.includes("team_monthly_xlsx"), "球队工作簿幂等链缺失");
 requireTrue(persistence.includes("begin().await") && persistence.includes("tx.commit().await"), "球队月度导入未使用事务");
 requireTrue(persistence.includes("_resolved_{prefix}_id") && persistence.includes("resolve_entity_id_tx"), "实体匹配结果未进入提交链");
-const previewImportSource = persistence.slice(
-  persistence.indexOf("pub async fn read_team_monthly_import_preview"),
-  persistence.indexOf("pub async fn resolve_team_monthly_import_conflict"),
-);
-const commitImportSource = persistence.slice(
-  persistence.indexOf("pub async fn commit_team_monthly_import"),
-  persistence.indexOf("pub async fn abort_team_monthly_import"),
-);
+const previewImportSource = read("crates/persistence-postgres/src/adapters/workbooks/batch_ledger/read.rs");
+const commitImportSource = read("crates/persistence-postgres/src/adapters/workbooks/team_package/commit.rs");
 requireTrue(
   previewImportSource.includes("let rows = sqlx::query(")
     && !previewImportSource.includes("let mut rows = sqlx::query(")
-    && commitImportSource.includes("let mut rows = sqlx::query(")
+    && commitImportSource.includes("let mut rows = ledger_rows::commit_rows_in_tx(")
     && commitImportSource.includes(".iter_mut()"),
   "球队月度导入查询游标可变性错误：预览 rows 不应为 mut，提交 rows 必须支持 iter_mut",
 );
@@ -68,7 +62,7 @@ requireTrue(
     && persistence.includes('"nationalteam"')
     && persistence.includes('"国家队"')
     && persistence.includes("normalize_team_type_payload(&mut payload)?")
-    && persistence.includes("UPDATE catalog.import_rows SET payload=$2 WHERE id=$1")
+    && persistence.includes("ledger_rows::set_import_payload_in_tx(") && persistence.includes("UPDATE catalog.import_rows SET payload=$2,message=COALESCE($3,message) WHERE id=$1")
     && persistence.includes('values.insert("team_type".into(), Value::String(canonical))')
     && persistence.includes(".bind(team_type)"),
   "球队月度导入缺少预检、既有批次重写或最终写库标准化",

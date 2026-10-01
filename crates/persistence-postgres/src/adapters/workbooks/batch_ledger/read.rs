@@ -94,3 +94,41 @@ impl PostgresStore {
         })
     }
 }
+
+impl PostgresStore {
+    pub async fn read_team_monthly_import_preview(
+        &self,
+        batch_id: Uuid,
+    ) -> PersistenceResult<SpreadsheetImportPreview> {
+        let batch = sqlx::query(
+            "SELECT source_file_name,source_sha256,import_mode,started_at FROM catalog.import_batches WHERE id=$1 AND import_type=$2",
+        ).bind(batch_id).bind("team_monthly_xlsx").fetch_one(&self.pool).await?;
+        let rows = sqlx::query(
+            r#"SELECT id,sheet_name,row_number,entity_type,requested_action,status,message,payload,matched_entity_id,conflict_candidates
+               FROM catalog.import_rows WHERE batch_id=$1 ORDER BY
+               CASE entity_type WHEN 'team' THEN 0 WHEN 'coach' THEN 1 WHEN 'team_name' THEN 2
+                    WHEN 'team_coach_period' THEN 3 WHEN 'formation_usage' THEN 4 ELSE 5 END,
+               row_number, id"#,
+        ).bind(batch_id).fetch_all(&self.pool).await?
+        .iter().map(super::mapping::team_import_row_from_db).collect::<PersistenceResult<Vec<_>>>()?;
+        Ok(SpreadsheetImportPreview {
+            batch_id,
+            source_file_name: batch
+                .try_get::<Option<String>, _>("source_file_name")?
+                .unwrap_or_default(),
+            source_sha256: batch
+                .try_get::<Option<String>, _>("source_sha256")?
+                .unwrap_or_default(),
+            import_mode: super::mapping::team_parse_import_mode(
+                batch
+                    .try_get::<Option<String>, _>("import_mode")?
+                    .as_deref(),
+            )?,
+            counts: count_preview_rows(&rows),
+            rows,
+            created_at: batch
+                .try_get::<Option<DateTime<Utc>>, _>("started_at")?
+                .unwrap_or_else(Utc::now),
+        })
+    }
+}

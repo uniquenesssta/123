@@ -58,4 +58,48 @@ mod tests {
             .expect_err("没有待写入或已导入记录时必须拒绝提交");
         assert!(error.to_string().contains("没有可写入或已完成记录"));
     }
+
+    #[test]
+    fn imported_or_ready_rows_do_not_override_conflict_and_error_blockers() {
+        for counts in [
+            SpreadsheetImportCounts {
+                total: 3,
+                imported: 2,
+                conflict: 1,
+                ..Default::default()
+            },
+            SpreadsheetImportCounts {
+                total: 3,
+                ready_add: 2,
+                error: 1,
+                ..Default::default()
+            },
+        ] {
+            let error =
+                ensure_preview_committable(&preview_with_counts(counts), "球队链").unwrap_err();
+            assert!(error.to_string().contains("仍有 1 条冲突或错误"));
+        }
+    }
+
+    #[test]
+    fn ready_end_previous_is_committable_but_skip_only_is_not() {
+        ensure_preview_committable(
+            &preview_with_counts(SpreadsheetImportCounts {
+                total: 1,
+                ready_end_previous: 1,
+                ..Default::default()
+            }),
+            "球队链",
+        )
+        .unwrap();
+        assert!(ensure_preview_committable(
+            &preview_with_counts(SpreadsheetImportCounts {
+                total: 1,
+                skipped: 1,
+                ..Default::default()
+            }),
+            "球队链"
+        )
+        .is_err());
+    }
 }

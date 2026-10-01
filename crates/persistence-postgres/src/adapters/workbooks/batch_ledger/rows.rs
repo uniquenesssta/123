@@ -128,6 +128,14 @@ pub(crate) async fn commit_rows_in_tx(
     family: super::batch::ImportFamily,
 ) -> PersistenceResult<Vec<PgRow>> {
     Ok(match family {
+        super::batch::ImportFamily::Team => sqlx::query(
+            r#"SELECT id,sheet_name,row_number,entity_type,requested_action,status,message,payload,matched_entity_id,conflict_candidates
+               FROM catalog.import_rows WHERE batch_id=$1 ORDER BY
+               CASE entity_type WHEN 'team' THEN 0 WHEN 'coach' THEN 1 WHEN 'team_name' THEN 2
+                    WHEN 'team_coach_period' THEN 3 WHEN 'team_tactical_observation' THEN 5
+                    WHEN 'team_ability_observation' THEN 6 ELSE 7 END,
+               row_number,id FOR UPDATE"#,
+        ).bind(batch_id).fetch_all(&mut **tx).await?,
         super::batch::ImportFamily::Player => sqlx::query(
             r#"
             SELECT id, entity_type, requested_action, status, payload, matched_entity_id
@@ -147,6 +155,32 @@ pub(crate) async fn commit_rows_in_tx(
         super::batch::ImportFamily::Match => sqlx::query("SELECT id,entity_type,status,payload,matched_entity_id FROM catalog.import_rows WHERE batch_id=$1 AND status IN ('ready_add','ready_update','skip') ORDER BY CASE entity_type WHEN 'match' THEN 1 WHEN 'lineup' THEN 2 WHEN 'lineup_player' THEN 3 WHEN 'player_dynamic_tag' THEN 4 ELSE 9 END,row_number,id")
             .bind(batch_id).fetch_all(&mut **tx).await?,
     })
+}
+
+// 调用方已持有批次及所选行锁；保留原规范化/身份合并消息和物理行身份。
+pub(crate) async fn set_import_payload_in_tx(
+    tx: &mut Transaction<'_, Postgres>,
+    row_id: Uuid,
+    payload: &serde_json::Value,
+    message: Option<&str>,
+) -> PersistenceResult<()> {
+    sqlx::query(
+        "UPDATE catalog.import_rows SET payload=$2,message=COALESCE($3,message) WHERE id=$1",
+    )
+    .bind(row_id)
+    .bind(payload)
+    .bind(message)
+    .execute(&mut **tx)
+    .await?;
+    Ok(())
+}
+pub(crate) async fn skip_duplicate_import_row_in_tx(
+    tx: &mut Transaction<'_, Postgres>,
+    row_id: Uuid,
+    message: &str,
+) -> PersistenceResult<()> {
+    sqlx::query("UPDATE catalog.import_rows SET status='skip',message=$2,matched_entity_id=NULL,conflict_candidates='[]'::jsonb WHERE id=$1").bind(row_id).bind(message).execute(&mut **tx).await?;
+    Ok(())
 }
 
 #[cfg(test)]

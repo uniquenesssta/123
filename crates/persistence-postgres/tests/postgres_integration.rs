@@ -952,6 +952,76 @@ async fn monthly_workbooks_preview_commit_clear_and_idempotency_are_consistent()
         .message
         .as_deref()
         .is_some_and(|message| message.contains("登记为自定义阵型")));
+
+    let team_preview_again = database
+        .store
+        .preview_team_monthly_import(&team_workbook, SpreadsheetImportMode::AddAndUpdate)
+        .await
+        .unwrap();
+    assert_eq!(team_preview_again.batch_id, preview.batch_id);
+    for row in &preview.rows {
+        let repeated = team_preview_again
+            .rows
+            .iter()
+            .find(|other| other.id == row.id)
+            .unwrap();
+        assert_eq!(repeated.sheet_name, row.sheet_name);
+        assert_eq!(repeated.row_number, row.row_number);
+        assert_eq!(repeated.payload, row.payload);
+    }
+    let team_facts_before: i64 =
+        sqlx::query_scalar("SELECT count(*)::bigint FROM football.teams WHERE id=$1")
+            .bind(team_id)
+            .fetch_one(&database.pool)
+            .await
+            .unwrap();
+    assert_eq!(team_facts_before, 0, "球队重复预检仅暂存行，不写事实");
+    let failing_team_row = preview
+        .rows
+        .iter()
+        .find(|row| row.entity_type == SpreadsheetEntityType::TeamAbilityObservation)
+        .unwrap();
+    let mut invalid_team_payload = failing_team_row.payload.clone();
+    invalid_team_payload["attack_rating"] = json!("invalid-rating");
+    sqlx::query("UPDATE catalog.import_rows SET payload=$2 WHERE id=$1")
+        .bind(failing_team_row.id)
+        .bind(&invalid_team_payload)
+        .execute(&database.pool)
+        .await
+        .unwrap();
+    assert!(
+        database
+            .store
+            .commit_team_monthly_import(preview.batch_id)
+            .await
+            .is_err(),
+        "最后业务行失败必须整条球队链回滚"
+    );
+    let team_facts_after_failure: i64 =
+        sqlx::query_scalar("SELECT count(*)::bigint FROM football.teams WHERE id=$1")
+            .bind(team_id)
+            .fetch_one(&database.pool)
+            .await
+            .unwrap();
+    assert_eq!(team_facts_after_failure, 0);
+    let team_batch_after_failure: (String,i64,i64,bool) = sqlx::query_as("SELECT status,inserted_count,ended_previous_count,finished_at IS NULL FROM catalog.import_batches WHERE id=$1").bind(preview.batch_id).fetch_one(&database.pool).await.unwrap();
+    assert_eq!(team_batch_after_failure, ("pending".into(), 0, 0, true));
+    let imported_after_failure: i64 = sqlx::query_scalar(
+        "SELECT count(*)::bigint FROM catalog.import_rows WHERE batch_id=$1 AND status='imported'",
+    )
+    .bind(preview.batch_id)
+    .fetch_one(&database.pool)
+    .await
+    .unwrap();
+    assert_eq!(imported_after_failure, 0);
+    let team_audits_after_failure: i64 = sqlx::query_scalar("SELECT count(*)::bigint FROM audit.events WHERE event_type='team_monthly_workbook_imported' AND entity_id=$1").bind(preview.batch_id.to_string()).fetch_one(&database.pool).await.unwrap();
+    assert_eq!(team_audits_after_failure, 0);
+    sqlx::query("UPDATE catalog.import_rows SET payload=$2 WHERE id=$1")
+        .bind(failing_team_row.id)
+        .bind(&failing_team_row.payload)
+        .execute(&database.pool)
+        .await
+        .unwrap();
     let committed = database
         .store
         .commit_team_monthly_import(preview.batch_id)
@@ -979,6 +1049,12 @@ async fn monthly_workbooks_preview_commit_clear_and_idempotency_are_consistent()
         .expect("重复提交应返回原结果");
     assert_eq!(repeated_commit.inserted_count, committed.inserted_count);
 
+    let team_audits: Vec<serde_json::Value> = sqlx::query_scalar("SELECT payload FROM audit.events WHERE event_type='team_monthly_workbook_imported' AND entity_id=$1").bind(preview.batch_id.to_string()).fetch_all(&database.pool).await.unwrap();
+    assert_eq!(team_audits.len(), 1, "成功重复提交不得重复审计");
+    assert_eq!(
+        team_audits[0],
+        json!({"inserted":committed.inserted_count,"updated":committed.updated_count,"ended_previous":committed.ended_previous_count,"skipped":committed.skipped_count})
+    );
     let profile = sqlx::query(
         "SELECT team_type, city, stadium, data_confidence FROM football.team_profiles WHERE team_id=$1",
     )
@@ -1074,6 +1150,163 @@ async fn monthly_workbooks_preview_commit_clear_and_idempotency_are_consistent()
             < 1e-9
     );
 
+    // 沿用本夹具验证人工裁决计数；无新测试目标或数据库入口。
+    let localized_name = format!("月度球队-{token}");
+    let localized_workbook = SpreadsheetParsedWorkbook {
+        format_version: TEAM_MONTHLY_FORMAT.into(),
+        source_file_name: format!("team-localized-{token}.xlsx"),
+        source_sha256: format!("team-localized-{token}"),
+        rows: vec![SpreadsheetRawRow {
+            sheet_name: "球队名称".into(),
+            row_number: 4,
+            entity_type: SpreadsheetEntityType::TeamName,
+            action: SpreadsheetAction::Add,
+            values: json!({"team_id":team_id.to_string(),"name_value":localized_name,"language_code":"zh-CN","is_primary":"true"}),
+        }],
+    };
+    let localized_preview = database
+        .store
+        .preview_team_monthly_import(&localized_workbook, SpreadsheetImportMode::AddAndUpdate)
+        .await
+        .unwrap();
+    database
+        .store
+        .commit_team_monthly_import(localized_preview.batch_id)
+        .await
+        .unwrap();
+    let display_name: String =
+        sqlx::query_scalar("SELECT canonical_name FROM football.teams WHERE id=$1")
+            .bind(team_id)
+            .fetch_one(&database.pool)
+            .await
+            .unwrap();
+    assert_eq!(display_name, localized_name);
+    for alias in [team_name.as_str(), localized_name.as_str(), "MTH"] {
+        let aliases: i64 = sqlx::query_scalar(
+            "SELECT count(*)::bigint FROM football.team_names WHERE team_id=$1 AND name=$2",
+        )
+        .bind(team_id)
+        .bind(alias)
+        .fetch_one(&database.pool)
+        .await
+        .unwrap();
+        assert_eq!(aliases, 1, "原文名、中文主名和简称必须共存且无重复");
+    }
+    let conflict_workbook = SpreadsheetParsedWorkbook {
+        format_version: TEAM_MONTHLY_FORMAT.into(),
+        source_file_name: format!("team-conflict-{token}.xlsx"),
+        source_sha256: format!("team-conflict-{token}"),
+        rows: (4..6)
+            .map(|row_number| SpreadsheetRawRow {
+                sheet_name: "球队总览".into(),
+                row_number,
+                entity_type: SpreadsheetEntityType::Team,
+                action: SpreadsheetAction::Update,
+                values: json!({"team_id":team_id.to_string(),"city":"After Conflict"}),
+            })
+            .collect(),
+    };
+    let conflict_preview = database
+        .store
+        .preview_team_monthly_import(&conflict_workbook, SpreadsheetImportMode::AddAndUpdate)
+        .await
+        .unwrap();
+    assert_eq!(conflict_preview.counts.ready_update, 2);
+    let candidate = json!([{"entity_id":team_id,"display_name":localized_name,"detail":null}]);
+    sqlx::query(
+        "UPDATE catalog.import_rows SET status='conflict',conflict_candidates=$2 WHERE batch_id=$1",
+    )
+    .bind(conflict_preview.batch_id)
+    .bind(&candidate)
+    .execute(&database.pool)
+    .await
+    .unwrap();
+    sqlx::query("UPDATE catalog.import_batches SET error_count=2 WHERE id=$1")
+        .bind(conflict_preview.batch_id)
+        .execute(&database.pool)
+        .await
+        .unwrap();
+    let skipped_row = conflict_preview.rows[0].id;
+    let selected_row = conflict_preview.rows[1].id;
+    let invalid_selection = football_domain::SpreadsheetImportResolution {
+        row_id: selected_row,
+        selected_entity_id: Some(Uuid::new_v4()),
+        skip: false,
+    };
+    assert!(database
+        .store
+        .resolve_team_monthly_import_conflict(conflict_preview.batch_id, invalid_selection)
+        .await
+        .is_err());
+    let unchanged_counts: (i64, i64) =
+        sqlx::query_as("SELECT skipped_count,error_count FROM catalog.import_batches WHERE id=$1")
+            .bind(conflict_preview.batch_id)
+            .fetch_one(&database.pool)
+            .await
+            .unwrap();
+    assert_eq!(unchanged_counts, (0, 2), "非法候选不得改变行或计数");
+    let skipped_preview = database
+        .store
+        .resolve_team_monthly_import_conflict(
+            conflict_preview.batch_id,
+            football_domain::SpreadsheetImportResolution {
+                row_id: skipped_row,
+                selected_entity_id: None,
+                skip: true,
+            },
+        )
+        .await
+        .unwrap();
+    assert_eq!(
+        (
+            skipped_preview.counts.skipped,
+            skipped_preview.counts.conflict
+        ),
+        (1, 1)
+    );
+    let skipped_counts: (i64, i64) =
+        sqlx::query_as("SELECT skipped_count,error_count FROM catalog.import_batches WHERE id=$1")
+            .bind(conflict_preview.batch_id)
+            .fetch_one(&database.pool)
+            .await
+            .unwrap();
+    assert_eq!(skipped_counts, (1, 1), "跳过与 pending 计数在共同事务提交");
+    let selected_preview = database
+        .store
+        .resolve_team_monthly_import_conflict(
+            conflict_preview.batch_id,
+            football_domain::SpreadsheetImportResolution {
+                row_id: selected_row,
+                selected_entity_id: Some(team_id),
+                skip: false,
+            },
+        )
+        .await
+        .unwrap();
+    assert_eq!(
+        (
+            selected_preview.counts.skipped,
+            selected_preview.counts.conflict,
+            selected_preview.counts.ready_update
+        ),
+        (1, 0, 1)
+    );
+    let selected_counts: (i64, i64) =
+        sqlx::query_as("SELECT skipped_count,error_count FROM catalog.import_batches WHERE id=$1")
+            .bind(conflict_preview.batch_id)
+            .fetch_one(&database.pool)
+            .await
+            .unwrap();
+    assert_eq!(selected_counts, (1, 0), "选择候选同步清除批次阻断计数");
+    let conflict_commit = database
+        .store
+        .commit_team_monthly_import(conflict_preview.batch_id)
+        .await
+        .unwrap();
+    assert_eq!(
+        (conflict_commit.updated_count, conflict_commit.skipped_count),
+        (1, 1)
+    );
     let player_id = Uuid::new_v4();
     let player_name = format!("monthly-player-{token}");
     let player_workbook = SpreadsheetParsedWorkbook {

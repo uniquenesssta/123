@@ -2,7 +2,7 @@
 
 当前版本 **0.23.0**。本仓库是平台、数据库、数据准备、路由、工作台与外部模型调用入口的公开版本；真实 P4/P7 预测引擎、参数、Profile、固定比赛、私有研究提示词及模型专用固定回归资产不随仓库分发。
 
-R1–R6 累计补审覆盖 43 个任务节点。根据用户决定，R7-01 后新增 R7-02～06 审计整改，原 R7-02～10 顺延为 R7-07～15；优化拆分、验证与记录约束，沿用现有 Windows 验证和最终封包新库流程，不新增持续回归体系。R7-01 的 A1～A7 修订已通过 Windows CI run `36678914535`，节点 DONE；R7-02 外部 ID 身份保护、R7-03 普通删除与历史引用保护均已通过 Windows CI 并为 DONE。R7-04 清单、验证入口和历史记录已通过 Windows CI run `36706905645` 并为 DONE；R7-05 新增 20 个关键 Application 行为测试，精确 Windows CI run `36712015030` 已通过并 DONE；R7-06 的夹具/时间精度与账本修订已通过 Windows CI run `36734194083` 并 DONE；R7-07 阵容创建与共同并发锁已通过 Windows CI run `36757339619` 并 DONE；R7-08 阵容链/历史已通过 Windows CI run `36801488090` 并 DONE；R7-09 阵容预设已通过 Windows CI run `36808609584` 并 DONE；R7-10 两类导入的批次/行账本职责与冲突计数同步已通过 Windows CI run `36815568401` 并 DONE；R7-11 球员工作簿唯一职责已实现、当前 VERIFYING，R7-12 及以后 BLOCKED。PG/XLSX/Full 单独留到最终封包新库验收。详见 [R7 任务书](docs/football-model-platform-modular-rewrite-19-docs/07-R7-match-lineup-workbook-persistence.md) 与 [阶段索引/累计审计](docs/modular-rewrite/R07-match-lineup-workbook-persistence/README.md)。
+R1–R6 累计补审覆盖 43 个任务节点。根据用户决定，R7-01 后新增 R7-02～06 审计整改，原 R7-02～10 顺延为 R7-07～15；优化拆分、验证与记录约束，沿用现有 Windows 验证和最终封包新库流程，不新增持续回归体系。R7-01 的 A1～A7 修订已通过 Windows CI run `36678914535`，节点 DONE；R7-02 外部 ID 身份保护、R7-03 普通删除与历史引用保护均已通过 Windows CI 并为 DONE。R7-04 清单、验证入口和历史记录已通过 Windows CI run `36706905645` 并为 DONE；R7-05 新增 20 个关键 Application 行为测试，精确 Windows CI run `36712015030` 已通过并 DONE；R7-06 的夹具/时间精度与账本修订已通过 Windows CI run `36734194083` 并 DONE；R7-07 阵容创建与共同并发锁已通过 Windows CI run `36757339619` 并 DONE；R7-08 阵容链/历史已通过 Windows CI run `36801488090` 并 DONE；R7-09 阵容预设已通过 Windows CI run `36808609584` 并 DONE；R7-10 两类导入的批次/行账本职责与冲突计数同步已通过 Windows CI run `36815568401` 并 DONE；R7-11 球员工作簿唯一职责已通过 Windows CI run `36824027121` 并 DONE；R7-12 球队资料包共享持久化职责与冲突计数修订已实现、当前 VERIFYING，R7-13 及以后 BLOCKED。PG/XLSX/Full 单独留到最终封包新库验收。详见 [R7 任务书](docs/football-model-platform-modular-rewrite-19-docs/07-R7-match-lineup-workbook-persistence.md) 与 [阶段索引/累计审计](docs/modular-rewrite/R07-match-lineup-workbook-persistence/README.md)。
 
 ## 公开边界
 
@@ -45,11 +45,17 @@ Node 开发依赖固定安装和读取自源码根目录上一级的 `../node_mo
 
 ## 模块化重写执行记录
 
-### R7-11 Player Workbook（2026-10-01，VERIFYING）
+### R7-12 Team Package（2026-10-01，VERIFYING）
+
+- 将资料包和旧球队月度共用的真实球队链迁入唯一 `adapters/workbooks/team_package/`，按预检、裁决、提交、事实写入、名称、身份合并/关联、阵型、校验、载荷划分职责。批次/行 SQL 和严格 Team codec 归既有 batch_ledger，MonthlyWorkbookPort 四入口显式分派；95 个原函数体和 7 个公开签名保持。`monthly_workbooks.rs` 剩余三项月度数据/缺口读取留给 13，无重复导入框架。
+- 修复球队人工 skip/候选裁决后 pending skipped/error 计数未同步的问题，行与计数在同一父锁事务提交。预检只写暂存，提交唯一事务内规范化、合并重复球队、绑定关联、写事实/行/计数/原审计。保留原文名/中文主名/简称和覆盖率；完整包保持原“球队成功后提交球员，球员失败保留球队并可重试”双链边界。
+- 原 22 个 inline 测试迁至实际职责，新增 Persistence 5 项/Application 2 项，预期 Windows 132/55 项，尚未执行。原 PG 月度夹具补重复预检身份、末行失败整条球队链回滚/原批次恢复、一次审计、三类名称、非法候选拒绝及裁决计数；沿用最终封包新库待验。83 项现有源码/契约门禁、架构聚合及 Rustfmt 通过，六项破坏探针拒绝并恢复；Windows CI 待验，13～15 BLOCKED。无新测试目标、runner、workflow、依赖、迁移或数据库设施。
+
+### R7-11 Player Workbook（2026-10-01，DONE）
 
 - 删除旧根 `spreadsheet_exchange.rs`，59 个生产函数按预览、冲突裁决、提交、导出、身份匹配、字段校验、载荷规范化迁入唯一 `adapters/workbooks/player_catalog/`；原函数体和 8 个内联测试保持，SpreadsheetExchangePort 六入口显式分派。复用 R7-10 账本和共享外部 ID 写入，保留候选边界、同源 ID 不改绑、月度/资料包调用、物理行及子记录身份、依赖顺序、幂等/clear/整批回滚与共同事务审计。
 - 增加 6 个现有生产文件内联测试，覆盖重名候选/模式/动作、外部 ID 已绑和新目标、包内延迟关联及载荷解析边界；原 PG 月度用例补重复只读预览的 UUID/工作表/物理行/载荷、无业务写入和无提交审计。原多效力期、外部 ID 竞争/末行回滚/重复导入回归保留；真实 PG/XLSX/Full 最终封包新库待验。
-- 现有导入/资料包/角色/身份验证器切换实际职责；Exchange 加唯一 owner、显式分派、预检只暂存、冲突父锁/候选/改绑拒绝/计数审计共同事务检查。模块清单直接模块 37，Domain 365 声明/300 映射分类保持，使用摘要和既有 PG 指纹刷新；无新测试目标、runner、workflow、依赖或迁移。83 项现有源码/契约检查、架构聚合与 Rustfmt 源码检查通过，六项破坏探针拒绝并恢复；本项 Windows CI 待验，R7-12～15 BLOCKED。
+- 现有导入/资料包/角色/身份验证器切换实际职责；Exchange 加唯一 owner、显式分派、预检只暂存、冲突父锁/候选/改绑拒绝/计数审计共同事务检查。模块清单直接模块 37，Domain 365 声明/300 映射分类保持，使用摘要和既有 PG 指纹刷新；无新测试目标、runner、workflow、依赖或迁移。83 项现有源码/契约检查、架构聚合与 Rustfmt 源码检查通过，六项破坏探针拒绝并恢复；精确提交 `310c46b` 的 [Windows CI run 36824027121](https://github.com/uniquenesssta/123/actions/runs/36824027121) 全通过，Persistence 127 项/Application 53 项通过，见 [完成记录](docs/modular-rewrite/R07-match-lineup-workbook-persistence/R07-11-player-workbook.md)；12 已启动，13～15 BLOCKED。
 
 ### R7-10 Spreadsheet Batch Ledger（2026-10-01，DONE）
 
