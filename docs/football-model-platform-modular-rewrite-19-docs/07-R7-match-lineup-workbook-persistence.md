@@ -9,7 +9,7 @@
 
 - 唯一阶段分支：`rewrite/r7-match-lineup-workbook-persistence`。
 - 规划依据：源码 `985f01816060cfd05672bdc03b6771dec7b4e842`，文档基线 `51f746729b2f94925e6382f2ae2108cf80855af6`，以及阶段 README 中 A1–A8、B1–B7 审计记录。
-- R7-01～R7-14 已完成精确提交的 Windows Automated 并为 `DONE`；14 run `36860224760` 的 Persistence 132/Application 55 通过。用户已启动 R7-15，共享行/子记录身份职责、行号前检及原回归已实现，当前 `VERIFYING`；本项精确 CI 尚待确认结果。真实 PG/XLSX/Full 保留最终封包新库待验，阶段完成记录不提前创建。
+- R7-01～R7-15 均 `DONE`；最终精确 `a928c8b5ddcf37b569fbdab8c413be06d6270aac` / Windows run `36871154039` 的 Persistence 135/Application 55、Windows Automated 全通过。节点与阶段完成记录已创建，R7 代码/节点及 Automated 出口收口；真实 PG/XLSX/Full 保留最终封包新库待验，尚未宣称最终验收通过；R8 未启动。
 - 当前状态以 `docs/modular-rewrite/R07-match-lineup-workbook-persistence/README.md` 的唯一状态表为准；历史审计中的旧编号按下表映射。
 - 允许整改触及直接相关的 Application composition/Ports、catalog identity/deletion、现有 P4 时间比较和测试；不提前实施 R8/R10 的整阶段重写。
 - 不包含前端导入 UI 重写、工作簿解析器整体验证框架建设、模型内部算法/参数修改或历史 migration 改写。
@@ -242,7 +242,7 @@
 
 ## R7-15 Row 与 Subrecord Identity
 
-状态：`VERIFYING`（首轮 Windows run `36866936459` 因旧 owner 遗留 unused import 在 Clippy 失败，已清理并同步使用摘要；修订提交 Windows CI 待验，PG/XLSX/Full 最终新库待验），依赖 R7-14；原任务 R7-10。
+状态：`DONE`（修订精确 Windows run `36871154039` / job `110398949507` 全通过，Persistence 135/Application 55；首轮 unused import 失败实际关闭，PG/XLSX/Full 最终新库待验），依赖 R7-14；原任务 R7-10。
 
 - **目标/契约**：明确物理行号与实体/子记录 identity 的不同语义；同一物理行的多个合法子记录不误去重，多球队效力子记录不被覆盖；子键仍由原数据库唯一计算，修复异常行号转换/同源批次提前取消；不修改冻结迁移来省略处理。
 - **来源与目标**：现有重复球队行合并、暂存行定位与物理行号边界；效力/能力/标签子记录的生成列继续保留原冻结迁移，解析器保留 spreadsheet-io owner；持久化共享职责迁入 `crates/persistence-postgres/src/adapters/workbooks/identity/`。按实际职责调整私有文件布局，不强制一函数一文件。

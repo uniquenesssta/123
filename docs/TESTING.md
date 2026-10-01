@@ -134,3 +134,10 @@ The public model stub must always return an explicit unavailable error. A succes
 精确 `bb0012085d92cb63742ff5b5571a8003984db709` / Windows run `36860224760` / job `110362332343` 全 SUCCESS；Persistence 132/Application 55、前端类型/17 视口/build、fmt/Clippy/workspace tests、release/MSI/NSIS 与启动日志 7 条/3 操作实际通过。artifact `11161982535` / 14,017,440 字节 / SHA-256 `31f7042c8981c0f5d34fd77630e78ff206b188be36579f6b9656d2f25652caf1`；14 DONE。
 
 15 原 8 个重复球队合并函数/5 inline 保持并迁入共享身份职责；新增原生产 row.rs inline 3 项，预期 Windows135/55，需本项CI实跑。原子记录 PG 用例扩生成键、同物理行多实体/维度/标签/双球队与跨行/表暂存、UUID/载荷读回、重复维度整批回滚、非法行号三类前检/同源 pending 保留、账本/事实/审计不留下失败副作用。原解析器空白行/多球队回归不变；18 broad数量不变且最终封包新库待验。83项现有源码/契约、架构/Rustfmt通过，六项破坏探针拒绝并恢复。完整R7当前职责/不变量已累计复核，15VERIFYING；不提前创建阶段完成记录或开始R8，PG/历史四项/账本/有效XLSX/Full的真实结果仍必须在最终新库验收取得。无新target/runner/workflow/数据库设施。
+
+
+### R7-15 与 R7 阶段收口（2026-10-01）
+
+精确 `a928c8b5ddcf37b569fbdab8c413be06d6270aac` / [Windows run 36871154039](https://github.com/uniquenesssta/123/actions/runs/36871154039) / job `110398949507` 全 SUCCESS；Persistence **135 项**、Application **55 项**、17 个截图视口、前端类型/生产构建、Rust fmt/Clippy/workspace tests、Windows release/MSI/NSIS 与启动日志 **7 条记录 / 3 个完成操作**实际通过。 artifact `11167454668` / 14,018,298 字节 / SHA-256 `8843e8c822b590dc4fd4a8f56e5ab4df477fe36ae8c11592795de852fa1fbc20`；首轮 unused import 的 Clippy 失败已由修订提交实跑关闭。
+
+15 DONE，R7 节点及 Windows Automated 出口完成；[阶段完成记录](modular-rewrite/R07-match-lineup-workbook-persistence/R07-stage-completion.md) 列明历史四项/账本/各 contracts/有效 XLSX/Windows Full 最终新库待验。18 broad PG 及其他数据库 contracts 仍 ignored，不能写成实跑通过。本轮只补文档，引用上述已验收的最终源码，不重复 Windows 编译打包；R8 未启动。
