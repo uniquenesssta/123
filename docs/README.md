@@ -6,13 +6,15 @@
 
 ## 当前恢复入口
 
-**2026-10-01最新检查点：S08 lineup_presets / 阵容预设的可编辑视觉、代表性本页状态及有限原型已验收。** Screens当前 **8 / 17条产品路由**：S01 dashboard、S02 lineups、S03 prediction、S04 review、S05 runs、S06 teams、S07 players、S08 lineup_presets。S09–S17共9条尚未开始。
+**2026-10-01最新检查点：S09 workbooks / Excel工作包的可编辑视觉、代表性本页状态及有限原型已验收。** Screens当前 **9 / 17条产品路由**：S01 dashboard、S02 lineups、S03 prediction、S04 review、S05 runs、S06 teams、S07 players、S08 lineup_presets、S09 workbooks。S10–S17共8条尚未开始。
 
 - [Screens总计划：17条路由与下一项](FIGMA_SCREENS_PLAN.md)
 - [最新Screens总检查点](FIGMA_SCREENS_STATE.json)
-- [S08阵容预设：编辑校验、身份、操作与套用边界](FIGMA_SCREEN_LINEUP_PRESETS.md)
-- [S08全部节点与明确恢复状态](FIGMA_SCREEN_LINEUP_PRESETS_STATE.json)
-- [S07球员：原验收记录](FIGMA_SCREEN_PLAYERS.md)
+- [S09工作包：类别、批次、预检和提交边界](FIGMA_SCREEN_WORKBOOKS.md)
+- [S09全部节点与明确恢复状态](FIGMA_SCREEN_WORKBOOKS_STATE.json)
+- [S08阵容预设：原验收记录](FIGMA_SCREEN_LINEUP_PRESETS.md)
+- [S08独立恢复状态](FIGMA_SCREEN_LINEUP_PRESETS_STATE.json)
+- [S07球员](FIGMA_SCREEN_PLAYERS.md)
 - [S07独立恢复状态](FIGMA_SCREEN_PLAYERS_STATE.json)
 - [S06球队](FIGMA_SCREEN_TEAMS.md)
 - [S06独立恢复状态](FIGMA_SCREEN_TEAMS_STATE.json)
@@ -26,7 +28,7 @@
 - [S02独立恢复状态](FIGMA_SCREEN_LINEUPS_STATE.json)
 - [S01数据总览](FIGMA_SCREEN_DASHBOARD.md)
 
-**下一项：S09 `workbooks` / Excel工作包，尚未开始。** S08有31个产品状态、20弹窗和1Review Hub，仍只计一条路由。S01–S08累计250个状态，不是250条路由；其他页面的局部工作包不代表S09完成。
+**下一项：S10 `rules` / 规则与模型，尚未开始。** S09有30个产品状态、26个弹窗和1Review Hub，仍只计一条路由。S01–S09累计280个状态，不是280条路由；此前页内工作包原型不代替这次独立S09验收。
 
 ## 组件与模式记录
 
@@ -55,34 +57,36 @@
 - [基础Token与底层组件待办](FIGMA_FOUNDATION_COMPONENT_BACKLOG.md)
 - [Patterns与Screens总阶段计划](FIGMA_PATTERN_SCREEN_PLAN.md)
 
-执行顺序：图标 → 基础依赖与组件 → Patterns → Screens。既有底层组件和Patterns六组全部完成。Controls **61 sets /506 variants**，Patterns **17 sets /125 variants /13 production singles**，Foundations **193 variables /13 text styles /6 effects**。本轮继续使用真实实例，没有创建Screen主组件、detach或修改共享资产。
+执行顺序：图标 → 基础依赖与组件 → Patterns → Screens。底层组件和Patterns六组全部完成。Controls **61 sets /506 variants**，Patterns **17 sets /125 variants /13 production singles**，Foundations **193 variables /13 text styles /6 effects**。S09没有创建Screen主组件、detach或修改共享资产。
 
-## S08验收摘要
+## S09验收摘要
 
-球队目录、活动/归档列表、默认方案、管理入口、代表性完整编辑、空/错误/刷新、保存校验、复制/归档/永久删除确认、比赛套用规则和数据库前置完成。
+球队月度、球员月度、比赛与阵容分别拥有文件、模式、批次和预检；模板导出、现有数据导出、预检、确认提交不是同一个操作。无变更、忙状态、已导入/重复、文件/模式变化和结果未确认分别禁提交；空白默认保留，clear显式清空但仍须校验。
 
-首发必须恰好11名，战术位置唯一且完整匹配阵型槽位；使用概率可空或0–1。保存中和结果不明禁止重复写入；v4成功读回不再提交旧v3确认。A-P1为完整编辑代表，其他球队/预设保持自己的只读说明，不跳入A字段。
+球队、球员和比赛使用T-DEMO-01、P-DEMO-01、M-DEMO-01；仅新增重新预检使用T-DEMO-02。Team Ready → Player Isolated → Team Ready保留球队预检的限定路径可用；其他多批次组合转只读说明，不假装全部持续性已实现。已有/不明批次不会借演示文件选择器返回旧Ready绕过保护。
 
-管理入口可永久删除活动或归档预设，但范围仅预设及其成员，不删除球队、球员或比赛副本。套用另做新预检，确认can_apply和同队身份，只替换目标侧草稿。11个最终操作确认均无执行连接。
+Review Hub `582:112939` 可达30状态、26弹窗。最后读回 **585条NAVIGATE/OVERLAY、78项CLOSE、0其他动作**；7条外部入站另计。6条S06/S07/S08目录Light/Dark工作包入口保留代表性主题；S07“全部工作包”只保留球员类别，不转移文件/批次。
 
-Review Hub `573:103157` 可达31状态与20弹窗。最终 **516条NAVIGATE/OVERLAY、60项CLOSE、0其他动作**；外部入站7条单独计数。S06/S07通用入口不伪造已选球队，S02主/客管理入口分别保持首尔FC和全北现代身份。
+深层8,190个未隐藏节点、3,186个真实嵌套实例、2,234个普通文字层；非预期越界、失效引用/目标、未绑定可见solid颜色、顶层重叠及异常按钮高度均0。167个禁用控件及父级点击旁路检查通过；17处正常滚动，提交栏在外。最低普通文字对比度Light **4.5327:1**、Dark **6.8625:1**。
 
-深层12,307个未隐藏节点、5,139个真实嵌套实例；非预期越界、失效引用/目标、未绑定可见颜色、顶层重叠和异常按钮高度均0。249个禁用/忙控件无反应、父容器旁路0；30处正常滚动。普通文字最低对比度Light **4.5048:1**、Dark **4.5490:1**。
+10个最终操作确认（6导出、4导入）反应全部0，没有执行文件或数据库写入。批次明细是结构说明，不是真实完整JSON；成功/错误由验收目录独立选择。
+
+**源码实现待办：** workbooks.ts的ready表达式只检查preview及冲突/错误；本页新增的无变更、忙状态、已提交、失效上下文和结果不明保护仍需核对并落实到运行时。本轮未修改源码，也不声称其他后端层没有任何保护。
 
 ## 历史与实现边界
 
-S01–S07分别为15、33、33、33、18、42、45个状态；原验收计数和未实现内容保留于各页独立状态。新增入口以最新总检查点为准，不将历史有限原型改写为全产品通过。
+S01–S08分别为15、33、33、33、18、42、45、31个状态。原验收计数和未实现内容保留于独立状态；后续入口以最新总检查点为准，不将有限原型回写为全产品集成通过。
 
-S02双方11首发、保存与准入独立；S03输入/ModelProvider/输出独立；S04查看/执行分离、SHA变化拒绝旧确认、复盘/结算分开；S05隐藏不删血缘；S06归档/普通删除/强制清除及导入/P4资格分开；S07有效履历、可用性、能力与短期标签分开。AI Chat维持只读上下文和session/request隔离。
+S02双方11首发、保存与准入独立；S03输入/ModelProvider/输出独立；S04查看/执行分离、SHA变化拒绝旧确认、复盘/结算分开；S05隐藏不删血缘；S06归档/普通删除/强制清除及导入/P4资格分开；S07有效履历、可用性、能力与短期标签分开；S08同队、11首发、唯一槽位及只替换目标侧草稿的规则保留。AI Chat维持只读上下文和session/request隔离。
 
-S08任意成员选择/字段输入/筛选、全部球队与预设编辑、自动分配与角色继承算法、实时伤停预检、真实保存/复制/归档/删除事务、草稿覆盖以及完整主题/滚动/焦点/上下文持续性尚未实现。复制、归档和删除全过程提交/错误控制器未计为完成。套用通过状态只是条件示例，不能当作已写入比赛。
+S08原31状态/20弹窗、516条导航/60关闭、7条入站、11个最终确认无执行，原完整编辑以A-P1为代表；S09没有修改其数据或验证规则，只接两条通用工作包入口。
 
-完整17路由集成、真实权限/竞态、文件/数据库、模型/Worker及先前页面保留的运行时缺口均需后续完成。所有球队、成员、版本与结果是预置演示。
+S09任意文件/模式输入、完整多批次控制器、冲突处理、导出范围与覆盖、真实解析/预检/提交/幂等/核验，以及全状态主题/滚动/焦点/上下文持续性尚未实现。完整17路由接线、真实权限/竞态、模型/Worker及此前遗留运行时缺口仍需后续完成。
 
 ## 换会话恢复
 
-先读本README、`FIGMA_SCREENS_PLAN.md`、`FIGMA_SCREENS_STATE.json`，再读 `FIGMA_SCREEN_LINEUP_PRESETS_STATE.json` 与S08记录，核对实际稳定根。S08初始和组合WIP已被accepted替代，不重复构建。
+先读本README、`FIGMA_SCREENS_PLAN.md`、`FIGMA_SCREENS_STATE.json`，再读 `FIGMA_SCREEN_WORKBOOKS_STATE.json`与S09记录，核对实际稳定根。S09初始和组合WIP由accepted替代，不重复创建。
 
-S07旧总状态保留于 `66d575f0d9985012a43448e2fed2af9f913c3117`，S06于 `ac85c1b42be55bd7378b0990a3406b6da4d9d087`；更早版本索引见Screens计划。一次工具连接错误后已先回读确认画布改动，再进行最终只读验收。
+S08旧总检查点保留于 `06eee1a492a92b620485d194cdd83844ecadef13`；S07于 `66d575f0d9985012a43448e2fed2af9f913c3117`；S06于 `ac85c1b42be55bd7378b0990a3406b6da4d9d087`。更早版本见Screens计划及Git历史。
 
-不要为更新进度重写未变化的组件API。旧截图、空handoff、组件阶段“Screens未开始”不能覆盖最新明确状态；规范化SLOT虚拟ID按稳定根、真实组件和语义路径恢复，不猜ID。
+不要为更新进度重写未变更组件API。旧截图、空handoff、组件阶段“Screens未开始”不能覆盖最新明确状态；规范化SLOT虚拟ID按稳定根、真实组件和语义路径恢复，不猜ID。Create State本次无新handoff，GitHub明确状态是恢复依据。
