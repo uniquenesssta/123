@@ -1,0 +1,12 @@
+{
+  "schemaVersion":1,
+  "runId":"footfigma-screens-analytics-2026-10-01",
+  "repo":"uniquenesssta/123","branch":"ui-design-system","fileKey":"PN0Whgu6HLWIHx4Mv6aHfu","page":"3:5",
+  "currentScreen":"S12 analytics / 分析","currentRoute":"analytics","phase":"in_progress_semantics_verified","currentExecutionFinished":false,
+  "acceptedRouteCount":11,"routeCount":17,"previousAcceptedGlobalCheckpoint":"a1ede69ac02f7ab7ac73e73485a44cc4e97f7eab",
+  "authority":"Figma determines visuals; source supplies functionality and data semantics only.",
+  "source":{"page":"src/pages/analytics.ts@6e87f0672a992f44c24425bd908724cb1e1874a3","application":"crates/application/src/analytics.rs@c5388ec4b2a69452cfc88cc99df974c2f3e8124b","persistence":"crates/persistence-postgres/src/analytics.rs@16c31e122d1c45ad76bd3823bc5f6c29ca99280b"},
+  "guards":["History, generated analytics, scanned quality and pending human reviews are independent gates","Missing analysis/quality is unknown, not zero issues or stable drift","Public generate_parameter_tuning_candidate returns a model-boundary error; no fake generation success","Global/latest analytics overview is not precise H/I partition authorization","Cancellation request is not terminal cancellation; retained results are labelled previous","AI package preview, suggestion import, acceptance, ability candidate and ability-history write are separate","Promotion and rollback require current identity and binding checks; final operations do not execute in this design"],
+  "frames":{},"pending":["compose four-step analytics workspace and representative local states","report/scan/package/candidate-scoped dialogs and genuine route entries","visual and structural QA","accepted independent record and global checkpoint"],
+  "applicationSourceModified":false,"existingMastersModified":false,"warning":"WIP is not acceptance; global accepted count stays eleven."
+}
