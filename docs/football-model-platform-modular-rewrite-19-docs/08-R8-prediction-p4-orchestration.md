@@ -11,7 +11,7 @@
 
 适用总纲顶部的执行订正：仅 Windows 动态验证，沿用原单测/contract、既有 Windows runner/workflow/数据库入口；不新增专项或持续回归体系。公开仓库没有私有 P4/P7 引擎、参数和 Golden Master；模型保护资产可验证，公共 unavailable stub 的通过不能冒充私有固定概率实跑。目录模板按实际职责及 Rust 模块命名调整；顺序执行的后端 use case 无新增 UI 生命周期，不强制新增 State、请求 ID 或空出口。
 
-R8-01 当前 `VERIFYING`，02～12 `BLOCKED`；精确门禁状态见 [阶段索引](../modular-rewrite/R08-prediction-p4-orchestration/README.md)。尚未取得本节点 Windows CI，通过前不得 DONE 或启动 02。
+R8-01 已 `DONE`（精确 `cba72fd` / Windows run `36881256338` 全通过），R8-02 当前 `VERIFYING`，03～12 `BLOCKED`；精确门禁状态见 [阶段索引](../modular-rewrite/R08-prediction-p4-orchestration/README.md)。R8-02 须取得自身精确 Windows CI 才可 DONE，03 保持 BLOCKED。
 
 ## 1. 阶段目标
 
@@ -181,7 +181,7 @@ Atomic Tasks：
 
 ## R8-01 Match Prediction Input Builder
 
-状态：`VERIFYING`（实现及源码验证完成，等待精确 Windows CI；02 仍 BLOCKED）
+状态：`DONE`（精确 Windows run `36881256338` 通过，见 01 完成记录）
 
 ### 1. 目标
 
@@ -317,7 +317,7 @@ crates/application/src/use_cases/prediction/build_input/
 
 ## R8-02 Historical Feature Reader
 
-状态：`BLOCKED`（仅当上一任务与本任务前置门禁通过后改为 `READY`）
+状态：`VERIFYING`（实现与源码验证完成，等待自身精确 Windows CI；03 仍 BLOCKED）
 
 ### 1. 目标
 
@@ -325,15 +325,15 @@ crates/application/src/use_cases/prediction/build_input/
 
 ### 2. 现状与来源
 
-- `crates/application/src/prediction.rs`。
-- `p4_orchestration.rs`、`fact_pipeline.rs`、`p4_persistence.rs`、`p4_workbench.rs`。
-- 相关 persistence modules。
+- 原模板 Application 根文件已在 R3 迁出。实际来源为 Persistence `team_features.rs` 中球队历史和进球基准读取。
+- 上游 `match_prediction.rs::build_prediction_team` 通过原 store 方法调用，Application 沿用 R8-01 builder 与原 PredictionInputPort/组合适配器。
+- R6 已收敛的球员贡献/观测/标签查询保留原 catalog owner 和 cutoff；本节点不复制其 SQL 或数学计算。
 
 ### 3. 目标文件与目录
 
 ```text
-crates/application/src/use_cases/prediction/read-historical-features/
 crates/persistence-postgres/src/adapters/prediction/historical_features/
+crates/persistence-postgres/src/team_features.rs  # 原纯特征投影，无 I/O
 ```
 
 ### 4. 文件职责边界
@@ -344,19 +344,19 @@ crates/persistence-postgres/src/adapters/prediction/historical_features/
 
 ### 5. 输入
 
-- 无。
+- 原 MatchRecord、team_id、主客场方向、data_cutoff_time、PostgresStore pool；固定原 36 候选/4 场范围/12 场上限。
 
 ### 6. 输出
 
-- 稳定的模块公开接口、可独立测试的实现和对应契约测试。
+- 原 TeamPreMatchFeatures；历史/质量/证据字段、评分、置信度、默认基准保持，SQL/解码错误仍映射原 PersistenceResult。
 
 ### 7. 允许依赖
 
-- 无。
+- 原 SQLx/Chrono/Uuid/Domain、现有 store/pool、team_features 纯投影及私有样本类型。
 
 ### 8. 禁止依赖
 
-- 无。
+- 模型内部/参数/输出、Application 具体数据库导入、历史写入、额外时钟或重试、新 Port/runner/数据库。
 
 ### 9. 状态所有权
 
@@ -372,7 +372,7 @@ crates/persistence-postgres/src/adapters/prediction/historical_features/
 
 ### 12. 并发/异步/生命周期
 
-- 所有异步请求必须具备请求 ID、取消或过期结果丢弃策略；销毁时解除监听器、定时器和挂起回调。
+- 复用原入参 cutoff，顺序只读两次查询，空历史不查基准，错误即时返回；不新增监听器/共享 State 或 UI 请求机制。原查询不提供事务快照保证，本节点不扩大或虚报一致性保证。
 
 ### 13. 兼容要求
 

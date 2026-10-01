@@ -2798,6 +2798,103 @@ async fn historical_snapshot_excludes_results_ingested_after_the_cutoff() {
         Some(0)
     );
 
+    // Both recorded-time guards are inclusive; one database microsecond later is excluded.
+    let cutoff = target_kickoff - Duration::hours(1);
+    sqlx::query(
+        "UPDATE football.match_results SET finalized_at = $2, created_at = $2 WHERE match_id = $1",
+    )
+    .bind(valid_history.id)
+    .bind(cutoff)
+    .execute(&database.pool)
+    .await
+    .expect("设置截止相等赛果");
+    let at_cutoff = database
+        .store
+        .prepare_match_prediction_input(target.id, "T-1h", "p4")
+        .await
+        .expect("截止相等历史输入");
+    assert_eq!(
+        at_cutoff.data_quality["home"]["team_features"]["history_match_count"],
+        json!(1)
+    );
+    assert_eq!(
+        at_cutoff.data_quality["home"]["team_features"]["baseline_match_count"],
+        json!(1)
+    );
+    for column in ["finalized_at", "created_at"] {
+        let update = format!("UPDATE football.match_results SET {column} = $2 WHERE match_id = $1");
+        sqlx::query(&update)
+            .bind(valid_history.id)
+            .bind(cutoff + Duration::microseconds(1))
+            .execute(&database.pool)
+            .await
+            .expect("设置截止后一微秒赛果");
+        let after_cutoff = database
+            .store
+            .prepare_match_prediction_input(target.id, "T-1h", "p4")
+            .await
+            .expect("拒绝截止后一微秒历史");
+        assert_eq!(
+            after_cutoff.data_quality["home"]["team_features"]["history_match_count"],
+            json!(0),
+            "{column} 晚一微秒不能进入球队历史"
+        );
+        assert_eq!(
+            after_cutoff.data_quality["home"]["team_features"]["neutral_team_ratings"],
+            json!(true)
+        );
+        sqlx::query(&update)
+            .bind(valid_history.id)
+            .bind(cutoff)
+            .execute(&database.pool)
+            .await
+            .expect("恢复截止相等赛果");
+    }
+    // Keep one visible sample so the baseline query also exercises each future-time exclusion.
+    for finalized_is_future in [true, false] {
+        let (finalized, recorded) = if finalized_is_future {
+            (cutoff + Duration::microseconds(1), cutoff)
+        } else {
+            (cutoff, cutoff + Duration::microseconds(1))
+        };
+        sqlx::query("UPDATE football.match_results SET finalized_at = $2, created_at = $3 WHERE match_id = $1")
+            .bind(late_history.id).bind(finalized).bind(recorded).execute(&database.pool).await.expect("设置单独未来赛果时间");
+        let baseline_guard = database
+            .store
+            .prepare_match_prediction_input(target.id, "T-1h", "p4")
+            .await
+            .expect("进球基准未来时间隔离");
+        assert_eq!(
+            baseline_guard.data_quality["home"]["team_features"]["history_match_count"],
+            json!(1)
+        );
+        assert_eq!(
+            baseline_guard.data_quality["home"]["team_features"]["baseline_match_count"],
+            json!(1),
+            "晚一微秒的 finalized/created 均不能进入进球基准"
+        );
+    }
+    // A visible historical baseline is queried only when the selected team has evidence.
+    sqlx::query("UPDATE football.match_results SET created_at = $2 WHERE match_id = $1")
+        .bind(valid_history.id)
+        .bind(cutoff - Duration::microseconds(1))
+        .execute(&database.pool)
+        .await
+        .expect("设置截止前一微秒赛果");
+    let before_cutoff = database
+        .store
+        .prepare_match_prediction_input(target.id, "T-1h", "p4")
+        .await
+        .expect("截止前一微秒历史输入");
+    assert_eq!(
+        before_cutoff.data_quality["home"]["team_features"]["history_match_count"],
+        json!(1)
+    );
+    assert_eq!(
+        before_cutoff.data_quality["home"]["team_features"]["baseline_match_count"],
+        json!(1)
+    );
+
     database.close().await;
 }
 
