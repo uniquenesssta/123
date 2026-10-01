@@ -29,7 +29,6 @@ mod spreadsheet_exchange;
 mod statistics;
 mod store;
 mod team_features;
-mod team_lineup_presets;
 
 pub use adapters::register_adapters;
 pub use adapters::ModelRegistration;

@@ -9,7 +9,7 @@ const check = (condition, message) => { if (!condition) failures.push(message); 
 const contract = JSON.parse(read("contracts/team-lineup-presets-contract.json"));
 const migration = read("crates/persistence-postgres/migrations/0045_team_lineup_presets.sql");
 const domain = (read("crates/domain/src/lib.rs") + read("crates/domain/src/lineup/kind.rs") + read("crates/domain/src/lineup/player.rs") + read("crates/domain/src/lineup/snapshot.rs") + read("crates/domain/src/lineup/preset.rs") + read("crates/domain/src/lineup/chain.rs") + read("crates/domain/src/match_record/status.rs") + read("crates/domain/src/match_record/catalog.rs"));
-const persistence = read("crates/persistence-postgres/src/team_lineup_presets.rs");
+const persistence = ["write.rs", "read.rs", "preview.rs", "validation.rs"].map((file) => read("crates/persistence-postgres/src/adapters/lineups/presets/" + file)).join("\n");
 const application = read("crates/application/src/services/lineups/facade.rs");
 const commands = read("src-tauri/src/commands/catalog.rs");
 const commandRegistry = read("src-tauri/src/bootstrap/command_registry.rs");

@@ -86,5 +86,41 @@ check((historyRemoval.match(/self.pool.begin\(\)/g) ?? []).length === 1 && (hist
 for (const token of ["feature.match_player_contributions", "feature.snapshots", "model.runs", "supersedes_lineup_id = $1", "history_hidden_at = now()", "status = 'superseded'", "history_hidden_at IS NULL", "ORDER BY captured_at DESC, created_at DESC, id DESC", "lineup_history_removed"]) check(historyRemoval.includes(token), `历史引用/恢复保护缺少：${token}`);
 for (const method of ["list_lineups", "read_lineup", "remove_lineup_history", "read_match_lineup_chain", "read_match_lineup_chain_at", "list_team_match_lineups"]) check(adapter.includes(`PersistenceStore::${method}(self,`), `LineupPort 未显式分派：${method}`);
 for (const token of ["历史删除与创建都必须在版本写入前等待同一父锁", "截止时点包含等时记录", "同时间 confirmed 优先于 expected", "时间较新的 expected 优先于较旧 confirmed", "窗口起点包含等时记录", "窗口前一微秒不能选择", "隐藏历史按 ID 保留明细", "等时间历史以 UUID 降序稳定排列", "list_max.len(), 200", "team_max.len(), 200"]) check(pairIntegration.includes(token), `已有 chain/history 测试缺少：${token}`);
+// R7-09：预设事务与只读预检分离，保留正式提交和主客侧草稿边界。
+const presetBase = "crates/persistence-postgres/src/adapters/lineups/presets";
+for (const file of ["mod.rs", "validation.rs", "write.rs", "read.rs", "preview.rs"]) check(existsSync(join(root, presetBase, file)), `缺少 R7-09 owner：${file}`);
+check(!existsSync(join(root, "crates/persistence-postgres/src/team_lineup_presets.rs")) && !read("crates/persistence-postgres/src/lib.rs").includes("mod team_lineup_presets;"), "旧预设实现或转发壳不能残留");
+check(read("crates/persistence-postgres/src/adapters/lineups/mod.rs").includes("pub(crate) mod presets;"), "lineups 命名空间未挂载唯一预设职责");
+const presetWrite = read(`${presetBase}/write.rs`);
+const presetRead = read(`${presetBase}/read.rs`);
+const presetPreview = read(`${presetBase}/preview.rs`);
+const presetValidation = read(`${presetBase}/validation.rs`);
+for (const [owner, names] of [["write.rs", ["save_team_lineup_preset", "archive_team_lineup_preset", "delete_team_lineup_preset", "duplicate_team_lineup_preset"]], ["read.rs", ["list_team_lineup_presets", "read_team_lineup_preset", "parse_availability"]], ["preview.rs", ["preview_team_lineup_preset_application", "assess_application"]], ["validation.rs", ["validate_preset", "verify_membership_in_tx"]]]) {
+  for (const name of names) {
+    const declarations = persistenceFiles.filter((file) => (name !== "parse_availability" || file.startsWith(presetBase + "/")) && new RegExp(`(?:pub(?:\\(super\\))?\\s+)?(?:async\\s+)?fn\\s+${name}\\s*\\(`).test(read(file)));
+    check(declarations.length === 1 && declarations[0] === `${presetBase}/${owner}`, `${name} 必须只有一个预设 owner`);
+  }
+}
+const previewProduction = presetPreview.split("#[cfg(test)]")[0];
+for (const source of [previewProduction, presetRead.split("#[cfg(test)]")[0]]) check(!/sqlx::query(?:_scalar|_as)?\s*\([\s\S]*?(?:INSERT INTO|UPDATE football|DELETE FROM)/.test(source) && !source.includes("write_audit_event") && !source.includes(".begin()") && !source.includes(".commit()") && !source.includes("create_lineup"), "预设读取/预检必须只读，不能提交阵容或审计");
+check(previewProduction.includes("self.read_team_lineup_preset(preset_id).await?") && previewProduction.includes("Ok(assess_application(preset))"), "预检必须读取唯一预设事实再纯评估");
+for (const token of ['preset.status != "active"', "preset.starter_count != 11", 'member.player_status != "active"', "member.current_team_id != Some(preset.team_id)", "AvailabilityStatus::Injured", "AvailabilityStatus::Suspended", "AvailabilityStatus::Unavailable", "AvailabilityStatus::Doubtful", "blockers.sort()", "blockers.dedup()", "warnings.sort()", "warnings.dedup()", "can_apply: blockers.is_empty()"]) check(previewProduction.includes(token), `预检门禁/提示缺少：${token}`);
+const savePreset = presetWrite.slice(presetWrite.indexOf("pub async fn save_team_lineup_preset("), presetWrite.indexOf("pub async fn archive_team_lineup_preset("));
+const archivePreset = presetWrite.slice(presetWrite.indexOf("pub async fn archive_team_lineup_preset("), presetWrite.indexOf("pub async fn delete_team_lineup_preset("));
+const deletePreset = presetWrite.slice(presetWrite.indexOf("pub async fn delete_team_lineup_preset("), presetWrite.indexOf("pub async fn duplicate_team_lineup_preset("));
+for (const [label, body, audit] of [["保存", savePreset, "team_lineup_preset_created"], ["归档", archivePreset, "team_lineup_preset_archived"], ["删除", deletePreset, "team_lineup_preset_deleted"]]) check((body.match(/self.pool.begin\(\)/g) ?? []).length === 1 && (body.match(/tx.commit\(\)/g) ?? []).length === 1 && body.indexOf(audit) >= 0 && body.indexOf(audit) < body.indexOf("tx.commit().await?"), `预设${label}必须在唯一事务共同提交审计`);
+check(savePreset.indexOf("validate_preset(draft)?") < savePreset.indexOf("self.pool.begin()") && savePreset.indexOf("verify_membership_in_tx(") < savePreset.indexOf("UPDATE football.team_lineup_presets") && savePreset.includes("FOR UPDATE") && savePreset.includes("existing_team_id != draft.team_id") && savePreset.includes('status != "active"'), "保存必须先校验，再检查成员/归属和活动状态，锁住原预设版本");
+check(savePreset.includes("let role_as_of = Utc::now().date_naive();") && savePreset.includes("metadata_with_role_resolution") && savePreset.includes("resolve_default_tactical_role_in_tx"), "保存角色继承/来源与共同审计日期缺失");
+for (const token of ["starter_count != 11", "unique_players.len() != draft.members.len()", "(0.0..=1.0).contains(&probability)", "period.team_id = $2", "period.valid_from <= current_date", "period.valid_to >= current_date"]) {
+  check(presetValidation.includes(token), `预设校验缺少：${token}`);
+}
+check(presetRead.includes("ORDER BY is_default DESC, status, updated_at DESC, lower(name), id") && presetRead.includes("LIMIT 200") && presetRead.includes("period.team_id=preset.team_id") && presetRead.includes("role_source_position_code") && presetRead.includes("position.valid_from <= current_date"), "预设列表上限/稳定顺序/成员和角色读取语义缺失");
+for (const method of ["save_team_lineup_preset", "list_team_lineup_presets", "preview_team_lineup_preset_application", "duplicate_team_lineup_preset", "archive_team_lineup_preset", "delete_team_lineup_preset"]) check(adapter.includes(`PersistenceStore::${method}(self,`), `LineupPresetPort 未显式分派：${method}`);
+check(presetValidation.includes("fetch_one(&mut **tx)") && !presetValidation.includes("self.pool") && !presetValidation.includes(".begin()") && !presetValidation.includes(".commit()"), "成员校验不得离开保存事务");
+const mainSource = read("src/main.ts");
+const applyPreset = mainSource.slice(mainSource.indexOf("async function applyLineupPreset("), mainSource.indexOf("function openPairedLineupPlayerSettings("));
+check(applyPreset.includes("api.previewTeamLineupPresetApplication(presetId)") && applyPreset.includes("if (!preview.can_apply)") && applyPreset.includes("preview.preset.team_id !== current.team_id") && applyPreset.includes("[side]: {") && applyPreset.includes("...current,"), "套用必须复检并校验所选主客侧，只替换这一侧草稿");
+check(!/api\.(?:createLineup|createLineupPair|saveTeamLineupPreset)/.test(applyPreset) && mainSource.includes("api.createLineupPair("), "预设套用不能隐式写正式阵容，必须保留显式双方提交");
+for (const token of ["合法预设可以预览", "重复预览保留原预设及角色来源", "预览不得写正式阵容、球员或审计", "预览不得修改预设版本或时间", "客队成员不得保存到主队预设", "过期成员阻止套用", "归档预设阻止套用", "删除活动与归档预设级联清理成员"]) check(pairIntegration.includes(token), `既有数据库用例缺少：${token}`);
 if(failures.length) throw new Error(`Lineups Service 验证失败\n${failures.map((item)=>`- ${item}`).join("\n")}`);
 console.log(`Lineups Service 验证通过：${serviceFiles.length} 个 Service/Use Case Rust 文件，19 个公开 Application 职责已切换 4 个既有 Ports，旧 player_catalog 所有者已退出。`);

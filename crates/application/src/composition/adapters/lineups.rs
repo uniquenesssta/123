@@ -139,7 +139,7 @@ impl LineupPresetPort for PersistenceStore {
         &self,
         draft: &TeamLineupPresetDraft,
     ) -> PortResult<TeamLineupPresetRecord> {
-        self.save_team_lineup_preset(draft)
+        PersistenceStore::save_team_lineup_preset(self, draft)
             .await
             .map_err(map_persistence_error)
     }
@@ -148,7 +148,7 @@ impl LineupPresetPort for PersistenceStore {
         team_id: Uuid,
         include_archived: bool,
     ) -> PortResult<Vec<TeamLineupPresetRecord>> {
-        self.list_team_lineup_presets(team_id, include_archived)
+        PersistenceStore::list_team_lineup_presets(self, team_id, include_archived)
             .await
             .map_err(map_persistence_error)
     }
@@ -156,7 +156,7 @@ impl LineupPresetPort for PersistenceStore {
         &self,
         preset_id: Uuid,
     ) -> PortResult<TeamLineupPresetApplicationPreview> {
-        self.preview_team_lineup_preset_application(preset_id)
+        PersistenceStore::preview_team_lineup_preset_application(self, preset_id)
             .await
             .map_err(map_persistence_error)
     }
@@ -165,17 +165,17 @@ impl LineupPresetPort for PersistenceStore {
         preset_id: Uuid,
         name: &str,
     ) -> PortResult<TeamLineupPresetRecord> {
-        self.duplicate_team_lineup_preset(preset_id, name)
+        PersistenceStore::duplicate_team_lineup_preset(self, preset_id, name)
             .await
             .map_err(map_persistence_error)
     }
     async fn archive_preset(&self, preset_id: Uuid) -> PortResult<TeamLineupPresetRecord> {
-        self.archive_team_lineup_preset(preset_id)
+        PersistenceStore::archive_team_lineup_preset(self, preset_id)
             .await
             .map_err(map_persistence_error)
     }
     async fn delete_preset(&self, preset_id: Uuid) -> PortResult<()> {
-        self.delete_team_lineup_preset(preset_id)
+        PersistenceStore::delete_team_lineup_preset(self, preset_id)
             .await
             .map_err(map_persistence_error)
     }

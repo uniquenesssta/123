@@ -2046,6 +2046,174 @@ async fn match_scope_inference_and_lineup_pair_transaction_are_atomic() {
     let mut away_players =
         create_lineup_player_drafts(&database, away.id, kickoff, &format!("pair-away-{token}"))
             .await;
+    // R7-09：沿用双方阵容夹具，预设预览不得产生正式阵容或审计写入。
+    let preset_draft = football_domain::TeamLineupPresetDraft {
+        id: None,
+        team_id: home.id,
+        name: format!("预设-{token}"),
+        formation_id: Some(formation.id),
+        coach_id: None,
+        usage_context: "general".into(),
+        usage_probability: Some(0.6),
+        is_default: true,
+        source_lineup_id: None,
+        notes: Some("只读预检".into()),
+        members: home_players
+            .iter()
+            .map(|player| football_domain::TeamLineupPresetMemberDraft {
+                player_id: player.player_id,
+                position_code: player.position_code.clone(),
+                role_code: player.role_code.clone(),
+                is_starter: player.is_starter,
+                shirt_number: player.shirt_number,
+                expected_minutes: player.expected_minutes,
+                sequence_no: player.sequence_no,
+                bench_order: player.bench_order,
+                is_captain: false,
+                metadata: player.metadata.clone(),
+            })
+            .collect(),
+    };
+    let saved_preset = database
+        .store
+        .save_team_lineup_preset(&preset_draft)
+        .await
+        .unwrap();
+    let counts_before: (i64, i64, i64) = sqlx::query_as(
+        "SELECT (SELECT count(*) FROM football.lineups), (SELECT count(*) FROM football.lineup_players), (SELECT count(*) FROM audit.events)",
+    ).fetch_one(&database.pool).await.unwrap();
+    for _ in 0..2 {
+        let preview = database
+            .store
+            .preview_team_lineup_preset_application(saved_preset.id)
+            .await
+            .unwrap();
+        assert!(
+            preview.can_apply && preview.blockers.is_empty(),
+            "合法预设可以预览"
+        );
+        assert_eq!(
+            serde_json::to_value(preview.preset).unwrap(),
+            serde_json::to_value(&saved_preset).unwrap(),
+            "重复预览保留原预设及角色来源"
+        );
+    }
+    let counts_after: (i64, i64, i64) = sqlx::query_as(
+        "SELECT (SELECT count(*) FROM football.lineups), (SELECT count(*) FROM football.lineup_players), (SELECT count(*) FROM audit.events)",
+    ).fetch_one(&database.pool).await.unwrap();
+    assert_eq!(
+        counts_before, counts_after,
+        "预览不得写正式阵容、球员或审计"
+    );
+    assert_eq!(
+        serde_json::to_value(
+            database
+                .store
+                .read_team_lineup_preset(saved_preset.id)
+                .await
+                .unwrap()
+        )
+        .unwrap(),
+        serde_json::to_value(&saved_preset).unwrap(),
+        "预览不得修改预设版本或时间"
+    );
+
+    let mut invalid_preset = preset_draft.clone();
+    invalid_preset.id = Some(saved_preset.id);
+    invalid_preset.members[0].player_id = away_players[0].player_id;
+    database
+        .store
+        .save_team_lineup_preset(&invalid_preset)
+        .await
+        .expect_err("客队成员不得保存到主队预设");
+    assert_eq!(
+        serde_json::to_value(
+            database
+                .store
+                .read_team_lineup_preset(saved_preset.id)
+                .await
+                .unwrap()
+        )
+        .unwrap(),
+        serde_json::to_value(&saved_preset).unwrap(),
+        "成员失败不得替换预设或改变默认标志"
+    );
+    sqlx::query("UPDATE football.player_team_periods SET valid_to=current_date-1 WHERE player_id=$1 AND team_id=$2")
+        .bind(home_players[0].player_id).bind(home.id).execute(&database.pool).await.unwrap();
+    let departed = database
+        .store
+        .preview_team_lineup_preset_application(saved_preset.id)
+        .await
+        .unwrap();
+    assert!(
+        !departed.can_apply
+            && departed
+                .blockers
+                .iter()
+                .any(|message| message.contains("当前不再属于")),
+        "过期成员阻止套用"
+    );
+    sqlx::query(
+        "UPDATE football.player_team_periods SET valid_to=NULL WHERE player_id=$1 AND team_id=$2",
+    )
+    .bind(home_players[0].player_id)
+    .bind(home.id)
+    .execute(&database.pool)
+    .await
+    .unwrap();
+    database
+        .store
+        .archive_team_lineup_preset(saved_preset.id)
+        .await
+        .unwrap();
+    assert!(
+        !database
+            .store
+            .preview_team_lineup_preset_application(saved_preset.id)
+            .await
+            .unwrap()
+            .can_apply,
+        "归档预设阻止套用"
+    );
+    assert!(database
+        .store
+        .list_team_lineup_presets(home.id, false)
+        .await
+        .unwrap()
+        .iter()
+        .all(|preset| preset.id != saved_preset.id));
+    let copy = database
+        .store
+        .duplicate_team_lineup_preset(saved_preset.id, &format!("预设副本-{token}"))
+        .await
+        .unwrap();
+    assert_ne!(copy.id, saved_preset.id);
+    assert!(!copy.is_default && copy.status == "active" && copy.version == 1);
+    assert_eq!(copy.members.len(), saved_preset.members.len());
+    database
+        .store
+        .delete_team_lineup_preset(copy.id)
+        .await
+        .unwrap();
+    database
+        .store
+        .delete_team_lineup_preset(saved_preset.id)
+        .await
+        .unwrap();
+    let remaining_members: i64 = sqlx::query_scalar(
+        "SELECT count(*) FROM football.team_lineup_preset_members WHERE preset_id=ANY($1::uuid[])",
+    )
+    .bind(vec![copy.id, saved_preset.id])
+    .fetch_one(&database.pool)
+    .await
+    .unwrap();
+    assert_eq!(remaining_members, 0, "删除活动与归档预设级联清理成员");
+    assert!(database
+        .store
+        .read_team_lineup_preset(saved_preset.id)
+        .await
+        .is_err());
+
     let valid_away_first = away_players[0].player_id;
     away_players[0].player_id = Uuid::new_v4();
     let captured_at = kickoff - Duration::hours(5);

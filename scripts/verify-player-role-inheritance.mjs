@@ -64,7 +64,7 @@ check(
   /primary_position\.default_role_code AS primary_role_code[\s\S]{0,7000}position\.valid_from <= current_date/.test(playerDirectoryList),
   "当前球员档案角色查询不应被历史阵容时点污染",
 );
-const presetSource = read("crates/persistence-postgres/src/team_lineup_presets.rs");
+const presetSource = read("crates/persistence-postgres/src/adapters/lineups/presets/write.rs");
 check(
   presetSource.includes("let role_as_of = Utc::now().date_naive();") &&
     presetSource.includes("resolve_default_tactical_role_in_tx(") &&
@@ -84,11 +84,11 @@ requireTokens("crates/persistence-postgres/src/adapters/lineups/pair_transaction
   "resolve_default_tactical_role_in_tx",
   "draft.captured_at.date_naive()",
 ], "阵容创建角色持久化");
-requireTokens("crates/persistence-postgres/src/team_lineup_presets.rs", [
+requireTokens("crates/persistence-postgres/src/adapters/lineups/presets/write.rs", [
   "resolve_default_tactical_role_in_tx",
   "metadata_with_role_resolution",
-  "player_position_default",
-], "阵容预设");
+], "阵容预设保存");
+requireTokens("crates/persistence-postgres/src/adapters/lineups/presets/read.rs", ["player_position_default", "role_source_position_code", "position.valid_from <= current_date"], "阵容预设读取");
 requireTokens("crates/persistence-postgres/src/match_exchange.rs", [
   "role_code: lineup_player.role_code.clone()",
   "role_origin: Some(lineup_player.role_origin.clone())",

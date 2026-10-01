@@ -4,6 +4,8 @@
 
 `IN_PROGRESS`
 
+当前进度以本段及任务索引为准：R7-01～08 `DONE`；R7-08 精确提交 `3c8f7f0230207f7352b7f806b8a1e92c4ebc81e5` 的 Windows run `36801488090` / job `110176585645` 全通过，Persistence 107 项/Application 53 项，详见 [08 完成记录](R07-08-lineup-chain-and-history.md)。R7-09 已按用户指令启动，源码和现有门禁已实现，当前 `VERIFYING`；R7-10～15 `BLOCKED`。后文旧节点的“当前/待验/下一项”叙述属于当时实施记录，不覆盖此处和任务表。
+
 R7 先完成 R1–R6 累计审计整改，再重写 Matches、Lineups、Presets 与 Workbook 持久化，重点保证双方阵容原子事务、截止时间、历史链路、批次账本、真实 XLSX 行/子记录 identity 与整批回滚；不实施工作簿解析算法本体或前端导入 UI。
 
 ## 前置基线
@@ -44,8 +46,8 @@ crates/persistence-postgres/src/adapters/workbooks/
 | R7-05 | 关键 Application 用例验证 | DONE |
 | R7-06 | 历史数据库失败与账本问题收口 | DONE |
 | R7-07 | Lineup Pair Transaction | DONE |
-| R7-08 | Lineup Chain / History | VERIFYING |
-| R7-09 | Team Lineup Presets | BLOCKED |
+| R7-08 | Lineup Chain / History | DONE |
+| R7-09 | Team Lineup Presets | VERIFYING |
 | R7-10 | Spreadsheet Batch Ledger | BLOCKED |
 | R7-11 | Player Workbook | BLOCKED |
 | R7-12 | Team Package | BLOCKED |
@@ -162,7 +164,7 @@ SQLx 0.8.6 的 Chrono DateTime 编码按自 2000 年起的整数微秒写入，�
 
 ## R7-08 当前验证状态
 
-进入/回退基线：`3ff21cba4ab01bc02108e8545f0ed133e25de687`。用户确认 R7-07 通过后启动，本项当前 `VERIFYING`；R7-09 及以后 BLOCKED。本项 Windows 结果待精确提交 CI，不继承 R7-07 PASS。
+进入/回退基线：`3ff21cba4ab01bc02108e8545f0ed133e25de687`。本项已 `DONE`，精确修订提交 `3c8f7f0` 的 Windows run `36801488090` 全通过，见 [完成记录](R07-08-lineup-chain-and-history.md)。用户已启动 R7-09；以下保留 08 实施时检查与首轮失败记录，动态待验已由成功 CI 更新，真实数据库待验保持。
 
 - `adapters/lineups/chain/mod.rs` 唯一持有 preferred lineup、按时点链读取与阻断说明；同目录 `window.rs` 持有规范化/窗口纯规则和原五项测试，`validation.rs` 持有原调用方事务内模型门禁刷新。旧 `lineup_chain.rs` 删除，不保留转发壳。
 - `adapters/lineups/history/read.rs` 唯一持有列表、按 ID 详情及球队历史；`mapping.rs` 持有严格枚举/明细/记录映射，`removal.rs` 持有引用保护、隐藏/物理删除、前驱恢复及审计单事务。旧 `player_catalog.rs` 仅保留原 reference data 聚合和既有 catalog 纯测试。
@@ -184,6 +186,22 @@ SQLx 0.8.6 的 Chrono DateTime 编码按自 2000 年起的整数微秒写入，�
 - 四项临时探针去阵型投影/ID映射、历史恢复及 String 转换均被修订门禁拒绝，随后原字节恢复。没有修改 Rust/前端业务、依赖/锁文件、工作流、测试集合/断言或迁移。
 
 现有前端入口的 83 个源码/契约检查全部通过，架构聚合及数据库/保护资产/171 命令冻结通过。其余 5 个检查需要浏览器交互/截图，当前环境没有 Windows 浏览器，明确待 Windows CI；不执行 Linux/macOS 客户端验收。本项仍 VERIFYING、R7-09 及以后 BLOCKED；新精确提交的 Windows Automated 待验，真实 PG/XLSX/Full 仍最终封包新库待验。尚未创建 R7-08 完成记录。
+
+
+## R7-09 当前验证状态
+
+进入/回退基线：`3c8f7f0230207f7352b7f806b8a1e92c4ebc81e5`。R7-08 DONE，用户已授权启动本项；本项 `VERIFYING`，R7-10 及以后 BLOCKED，不继承 08 的 Windows PASS。
+
+- 旧 `team_lineup_presets.rs` 实现删除；唯一职责迁入 `adapters/lineups/presets/`。`write.rs` 持有保存/复制/归档/删除及共同事务审计，`validation.rs` 持有结构与事务内成员校验，`read.rs` 持有 SQL 与紧密耦合的记录映射，`preview.rs` 持有只读入口与纯评估。不强制一函数一文件，不留旧转发壳。
+- 保存错误/11 首发/重复球员/队长/概率/归属/默认标志与版本语义、位置标准化及共用角色审计日期保持；预设读取的当前时点角色来源、球队关系、availability、稳定列表顺序与 200 上限保持。所有原方法及私有规则除 preview 纯评估抽取之外经规范化函数体比较保持；无算法、DTO、生产依赖或迁移变化。
+- `LineupPresetPort` 六个既有方法显式分派唯一持久化入口。既有前端 `applyLineupPreset` 复检预设门禁及所选主客侧 team_id，只替换 `[side]` 的比赛草稿；正式持久化沿用显式 `createLineupPair`。本次不改变前端行为。
+- 原两个结构 inline 测试保留，补 8 项现有文件内测试：空名/概率有限值及端点/最少成员、队长、availability 严格映射、合法预览完整内容及角色来源、归档/首发 blockers、停用/离队 blockers、伤停 warning、问题排序去重和重复确定性。Windows CI 待执行，不计本地 PASS。
+- 原 `match_scope_inference_and_lineup_pair_transaction_are_atomic` 沿用已有球队/成员夹具，补合法重复预览前后预设 JSON/正式阵容/球员/审计不变、客队成员保存失败保留版本与默认标志、过期成员/归档拒绝、活动列表过滤、复制与活动/归档删除及成员级联。无新 test target/runner/workflow/数据库设施；18 项 broad 数量保持，真实 PG 仍最终封包新库待验。
+- 原 Lineups Service verifier 补唯一职责、旧实现清零、预览只读、共同事务审计、角色和成员检查、主客侧草稿/显式提交门禁；E2 preset 与 role inheritance 原 verifier 指向实际职责。刷新 Domain 使用清单、数据库既有测试源码指纹和模块直接登记，直接模块 37，Domain 365 声明/300 映射分类及源码摘要保持。
+
+本轮 83 个既有源码/契约检查、架构聚合、源码卫生、171 命令、数据库/18 保护资产冻结、Domain inventory、Rustfmt 源码格式/解析及 diff 检查通过。9 个原函数体规范化比较保持；五项临时破坏探针分别引入预览写入、删除成员球队条件、删除主客侧校验、增加第二次事务提交、削弱首发 blocker，均被原门禁拒绝并恢复。
+
+本地仅运行既有 Node 源码/契约检查和 Rustfmt 源码格式/解析；Windows fmt/Clippy/workspace tests、前端交互/截图/生产构建、安装包和启动待新精确提交 CI。PG 四项历史失败与账本、有效 XLSX、Windows Full 均保留最终封包新库待验。成功后才创建 `R07-09-team-lineup-presets.md` 并开放 10；受控回退同步职责/Port 分派/门禁/清单和测试指纹，不恢复双实现或单独放宽门禁。
 
 ## R7-01 READY 边界
 

@@ -9,7 +9,7 @@
 
 - 唯一阶段分支：`rewrite/r7-match-lineup-workbook-persistence`。
 - 规划依据：源码 `985f01816060cfd05672bdc03b6771dec7b4e842`，文档基线 `51f746729b2f94925e6382f2ae2108cf80855af6`，以及阶段 README 中 A1–A8、B1–B7 审计记录。
-- R7-01～R7-07 已完成精确提交的 Windows Automated 并为 `DONE`；R7-07 run `36757339619` 的 102 个 Persistence/53 个 Application 单测全通过。用户已启动 R7-08，链/历史唯一职责及删除共同锁已实现、当前 `VERIFYING`，R7-09 及以后 `BLOCKED`。数据库/XLSX/Full 单独保留最终封包新库待验，证据见阶段 README。
+- R7-01～R7-08 已完成精确提交的 Windows Automated 并为 `DONE`；08 run `36801488090` 的 Persistence 107 项/Application 53 项通过。用户已启动 R7-09，预设唯一保存/读取/只读预检、显式提交与现有回归已实现，当前 `VERIFYING`；R7-10 及以后 `BLOCKED`。真实 PG/XLSX/Full 保留最终封包新库待验。
 - 当前状态以 `docs/modular-rewrite/R07-match-lineup-workbook-persistence/README.md` 的唯一状态表为准；历史审计中的旧编号按下表映射。
 - 允许整改触及直接相关的 Application composition/Ports、catalog identity/deletion、现有 P4 时间比较和测试；不提前实施 R8/R10 的整阶段重写。
 - 不包含前端导入 UI 重写、工作簿解析器整体验证框架建设、模型内部算法/参数修改或历史 migration 改写。
@@ -158,7 +158,7 @@
 
 ## R7-08 Lineup Chain 与 History
 
-状态：`VERIFYING`，R7-07 已 DONE，用户已启动；chain/history 唯一职责迁移、删除共同父锁及现有断言已实现，首轮 Windows run `36764662888` 失败于旧验证路径，三个现有 verifier 已修订，Windows 等新精确提交 CI；真实数据库边界/历史并发最终封包新库待验。原任务 R7-03。
+状态：`DONE`，精确提交 `3c8f7f0` 的 Windows run `36801488090` / job `110176585645` 全通过，详见阶段完成记录；真实数据库边界/并发仍最终封包新库待验。原任务 R7-03。
 
 - **目标/契约**：收敛按时点的阵容选择、版本链与历史读取；actual 不进入赛前模型输入，保留截止时间、优先级、历史可追溯及稳定列表语义。
 - **来源与目标**：lineup_chain.rs 与现存 chain/history 调用方；迁入 `crates/persistence-postgres/src/adapters/lineups/history/、adapters/lineups/chain/`。按实际职责调整私有文件布局，不强制一函数一文件。
@@ -170,7 +170,7 @@
 
 ## R7-09 Team Lineup Presets
 
-状态：`BLOCKED`，依赖 R7-08；原任务 R7-04。
+状态：`VERIFYING`，R7-08 已 DONE，用户已启动；预设唯一职责、只读评估/显式提交、原门禁和现有测试已实现，新精确提交 Windows CI 待验；真实 PG 最终封包新库待验。原任务 R7-04。
 
 - **目标/契约**：预设保存与应用预览分开，预览不得写正式阵容；位置/默认角色、球队成员与主客侧校验有明确 owner。正式应用仍经显式阵容提交。
 - **来源与目标**：team_lineup_presets.rs；迁入 `crates/persistence-postgres/src/adapters/lineups/presets/`。按实际职责调整私有文件布局，不强制一函数一文件。

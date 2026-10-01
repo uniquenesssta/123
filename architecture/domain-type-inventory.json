@@ -24,13 +24,13 @@
     "targetPublicExportPolicy": "explicit re-export only"
   },
   "sourceDigest": "217241ac243726a5ab6805a7f169e222b97e78c7c971749a5904714af673ebdd",
-  "rustUsageDigest": "847bff30cfe0aa38370cac9f4d9b8220817eada13fbda4fcead2371f4f302f14",
+  "rustUsageDigest": "5afd73c39be9b7df4c2a9c2604d75ed2edaba3badf4188884f606e39a983e8fb",
   "summary": {
     "typeCount": 365,
     "publicCompatibilityTypeCount": 365,
     "internalTypeCount": 0,
     "domainSourceFileCount": 129,
-    "scannedRustFileCount": 985,
+    "scannedRustFileCount": 989,
     "databaseMappedTypeCount": 300,
     "byTargetModule": {
       "ai_workspace": 16,
@@ -3143,9 +3143,10 @@
         "crates/persistence-postgres/src/adapters/catalog/players/value_mapping.rs",
         "crates/persistence-postgres/src/adapters/catalog/teams/detail/squad_mapper.rs",
         "crates/persistence-postgres/src/adapters/lineups/pair_transaction/write.rs",
+        "crates/persistence-postgres/src/adapters/lineups/presets/preview.rs",
+        "crates/persistence-postgres/src/adapters/lineups/presets/read.rs",
         "crates/persistence-postgres/src/match_exchange.rs",
         "crates/persistence-postgres/src/player_catalog.rs",
-        "crates/persistence-postgres/src/team_lineup_presets.rs",
         "crates/persistence-postgres/tests/player_directory_detail_repository_contract.rs",
         "crates/persistence-postgres/tests/player_team_periods_availability_repository_contract.rs",
         "crates/spreadsheet-io/src/match_review_workbook.rs"
@@ -3154,9 +3155,10 @@
         "crates/persistence-postgres/src/adapters/catalog/players/value_mapping.rs",
         "crates/persistence-postgres/src/adapters/catalog/teams/detail/squad_mapper.rs",
         "crates/persistence-postgres/src/adapters/lineups/pair_transaction/write.rs",
+        "crates/persistence-postgres/src/adapters/lineups/presets/preview.rs",
+        "crates/persistence-postgres/src/adapters/lineups/presets/read.rs",
         "crates/persistence-postgres/src/match_exchange.rs",
-        "crates/persistence-postgres/src/player_catalog.rs",
-        "crates/persistence-postgres/src/team_lineup_presets.rs"
+        "crates/persistence-postgres/src/player_catalog.rs"
       ]
     },
     {
@@ -29196,11 +29198,11 @@
         "crates/application/src/services/lineups/facade.rs",
         "crates/application/src/services/lineups/service.rs",
         "crates/application/src/use_cases/lineups/preview_team_lineup_preset_application/mod.rs",
-        "crates/persistence-postgres/src/team_lineup_presets.rs",
+        "crates/persistence-postgres/src/adapters/lineups/presets/preview.rs",
         "src-tauri/src/commands/catalog.rs"
       ],
       "databaseMappings": [
-        "crates/persistence-postgres/src/team_lineup_presets.rs"
+        "crates/persistence-postgres/src/adapters/lineups/presets/preview.rs"
       ]
     },
     {
@@ -29307,11 +29309,14 @@
         "crates/application/src/services/lineups/facade.rs",
         "crates/application/src/services/lineups/service.rs",
         "crates/application/src/use_cases/lineups/save_team_lineup_preset/mod.rs",
-        "crates/persistence-postgres/src/team_lineup_presets.rs",
+        "crates/persistence-postgres/src/adapters/lineups/presets/validation.rs",
+        "crates/persistence-postgres/src/adapters/lineups/presets/write.rs",
+        "crates/persistence-postgres/tests/postgres_integration.rs",
         "src-tauri/src/commands/catalog.rs"
       ],
       "databaseMappings": [
-        "crates/persistence-postgres/src/team_lineup_presets.rs"
+        "crates/persistence-postgres/src/adapters/lineups/presets/validation.rs",
+        "crates/persistence-postgres/src/adapters/lineups/presets/write.rs"
       ]
     },
     {
@@ -29410,10 +29415,13 @@
         "crates/domain/tests/serde_contracts/module_paths.rs"
       ],
       "externalCallers": [
-        "crates/persistence-postgres/src/team_lineup_presets.rs"
+        "crates/persistence-postgres/src/adapters/lineups/presets/validation.rs",
+        "crates/persistence-postgres/src/adapters/lineups/presets/write.rs",
+        "crates/persistence-postgres/tests/postgres_integration.rs"
       ],
       "databaseMappings": [
-        "crates/persistence-postgres/src/team_lineup_presets.rs"
+        "crates/persistence-postgres/src/adapters/lineups/presets/validation.rs",
+        "crates/persistence-postgres/src/adapters/lineups/presets/write.rs"
       ]
     },
     {
@@ -29532,10 +29540,12 @@
         "crates/domain/tests/serde_contracts/module_paths.rs"
       ],
       "externalCallers": [
-        "crates/persistence-postgres/src/team_lineup_presets.rs"
+        "crates/persistence-postgres/src/adapters/lineups/presets/preview.rs",
+        "crates/persistence-postgres/src/adapters/lineups/presets/read.rs"
       ],
       "databaseMappings": [
-        "crates/persistence-postgres/src/team_lineup_presets.rs"
+        "crates/persistence-postgres/src/adapters/lineups/presets/preview.rs",
+        "crates/persistence-postgres/src/adapters/lineups/presets/read.rs"
       ]
     },
     {
@@ -29670,11 +29680,15 @@
         "crates/application/src/use_cases/lineups/duplicate_team_lineup_preset/mod.rs",
         "crates/application/src/use_cases/lineups/list_team_lineup_presets/mod.rs",
         "crates/application/src/use_cases/lineups/save_team_lineup_preset/mod.rs",
-        "crates/persistence-postgres/src/team_lineup_presets.rs",
+        "crates/persistence-postgres/src/adapters/lineups/presets/preview.rs",
+        "crates/persistence-postgres/src/adapters/lineups/presets/read.rs",
+        "crates/persistence-postgres/src/adapters/lineups/presets/write.rs",
         "src-tauri/src/commands/catalog.rs"
       ],
       "databaseMappings": [
-        "crates/persistence-postgres/src/team_lineup_presets.rs"
+        "crates/persistence-postgres/src/adapters/lineups/presets/preview.rs",
+        "crates/persistence-postgres/src/adapters/lineups/presets/read.rs",
+        "crates/persistence-postgres/src/adapters/lineups/presets/write.rs"
       ]
     },
     {
