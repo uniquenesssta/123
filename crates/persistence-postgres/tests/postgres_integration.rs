@@ -1585,6 +1585,219 @@ async fn monthly_workbooks_preview_commit_clear_and_idempotency_are_consistent()
     let metadata: serde_json::Value = player.try_get("metadata").unwrap();
     assert_eq!(metadata["monthly_workbook"], true);
 
+    // R7-13：沿用同一月度夹具验证真实聚合、缺口、边界与只读性。
+    let monthly_snapshot_sql = r#"SELECT jsonb_build_object(
+        'team',(SELECT to_jsonb(t) FROM football.teams t WHERE id=$1),
+        'profile',(SELECT to_jsonb(p) FROM football.team_profiles p WHERE team_id=$1),
+        'names',(SELECT jsonb_agg(to_jsonb(n) ORDER BY n.id) FROM football.team_names n WHERE team_id=$1),
+        'coaches',(SELECT jsonb_agg(to_jsonb(p) ORDER BY p.id) FROM football.team_coach_periods p WHERE team_id=$1),
+        'player',(SELECT to_jsonb(p) FROM football.players p WHERE id=$2),
+        'periods',(SELECT jsonb_agg(to_jsonb(p) ORDER BY p.id) FROM football.player_team_periods p WHERE player_id=$2),
+        'audits',(SELECT count(*) FROM audit.events),
+        'batches',(SELECT count(*) FROM catalog.import_batches),
+        'rows',(SELECT count(*) FROM catalog.import_rows))"#;
+    let monthly_snapshot_before: serde_json::Value = sqlx::query_scalar(monthly_snapshot_sql)
+        .bind(team_id)
+        .bind(player_id)
+        .fetch_one(&database.pool)
+        .await
+        .unwrap();
+    let monthly_team_data = database.store.team_monthly_workbook_data().await.unwrap();
+    let exported_team = monthly_team_data
+        .teams
+        .iter()
+        .find(|row| row.team_id == team_id)
+        .unwrap();
+    assert_eq!(exported_team.official_name, localized_name);
+    assert_eq!(exported_team.short_name.as_deref(), Some("MTH"));
+    assert_eq!(exported_team.city.as_deref(), Some("After Conflict"));
+    assert_eq!(exported_team.stadium, None, "显式 clear 在导出中保持空值");
+    assert_eq!(exported_team.team_type, "club");
+    assert!((exported_team.data_confidence - 0.88).abs() < 1e-9);
+    assert!(monthly_team_data
+        .names
+        .iter()
+        .any(|row| row.team_id == team_id && row.name_value == team_name));
+    let exported_coaches: Vec<_> = monthly_team_data
+        .coach_periods
+        .iter()
+        .filter(|row| row.team_id == team_id)
+        .collect();
+    assert_eq!(exported_coaches.len(), 2, "历史与当前教练任期均保留");
+    assert_eq!(exported_coaches[0].coach_id, new_coach_id);
+    assert_eq!(exported_coaches[1].coach_id, old_coach_id);
+    assert_eq!(
+        monthly_team_data
+            .formation_usage
+            .iter()
+            .filter(|row| row.team_id == Some(team_id))
+            .count(),
+        2
+    );
+    let tactical = monthly_team_data
+        .tactical_observations
+        .iter()
+        .find(|row| row.team_id == team_id)
+        .unwrap();
+    assert_eq!(tactical.coach_id, Some(new_coach_id));
+    assert_eq!(
+        tactical.metadata["source_urls"],
+        json!(["https://example.test/tactics"])
+    );
+    let ability = monthly_team_data
+        .ability_observations
+        .iter()
+        .find(|row| row.team_id == team_id)
+        .unwrap();
+    assert_eq!(ability.attack_rating, Some(72.5));
+    assert_eq!(ability.defence_rating, Some(69.0));
+    assert_eq!(
+        ability.metadata["source_urls"],
+        json!(["https://example.test/ability"])
+    );
+    let monthly_player_data = database.store.spreadsheet_export_data().await.unwrap();
+    let exported_player = monthly_player_data
+        .players
+        .iter()
+        .find(|row| row.player_id == player_id)
+        .unwrap();
+    assert_eq!(exported_player.nationality_code, None);
+    assert_eq!(exported_player.height_cm, None);
+    let placeholder = monthly_player_data
+        .team_periods
+        .iter()
+        .find(|row| row.player_id == player_id)
+        .unwrap();
+    let placeholder_id = placeholder.team_id;
+    let empty_profile = monthly_team_data
+        .teams
+        .iter()
+        .find(|row| row.team_id == placeholder_id)
+        .unwrap();
+    assert_eq!(empty_profile.team_type, "club");
+    assert_eq!(empty_profile.data_confidence, 0.5);
+    assert_eq!(empty_profile.profile_observed_at, None);
+    let empty_profile_gaps: Vec<_> = monthly_team_data
+        .data_gaps
+        .iter()
+        .filter(|row| row.entity_id == placeholder_id)
+        .collect();
+    for field in [
+        "profile",
+        "country_code",
+        "current_coach",
+        "formation_usage",
+    ] {
+        let gap = empty_profile_gaps
+            .iter()
+            .find(|row| row.missing_field == field)
+            .unwrap();
+        assert_eq!(gap.entity_type, "team");
+        assert_eq!(gap.last_observed_at, None);
+        assert_eq!(gap.stale_days, None, "空资料时间不能伪造为零天");
+    }
+    assert_eq!(empty_profile_gaps[0].priority, "high");
+    let monthly_player_gaps = database.store.player_monthly_data_gaps().await.unwrap();
+    assert!(monthly_player_gaps
+        .iter()
+        .any(|row| row.entity_id == player_id
+            && row.missing_field == "position"
+            && row.priority == "high"));
+    assert!(monthly_player_gaps
+        .iter()
+        .any(|row| row.entity_id == player_id
+            && row.missing_field == "nationality_code"
+            && row.priority == "medium"));
+    assert!(!monthly_player_gaps
+        .iter()
+        .any(|row| row.entity_id == player_id && row.missing_field == "birth_date"));
+    database.store.team_monthly_workbook_data().await.unwrap();
+    database.store.spreadsheet_export_data().await.unwrap();
+    let monthly_snapshot_after: serde_json::Value = sqlx::query_scalar(monthly_snapshot_sql)
+        .bind(team_id)
+        .bind(player_id)
+        .fetch_one(&database.pool)
+        .await
+        .unwrap();
+    assert_eq!(
+        monthly_snapshot_after, monthly_snapshot_before,
+        "月度读取/缺口及重复导出不得改变事实、账本或审计"
+    );
+
+    sqlx::query("UPDATE football.team_coach_periods SET valid_from=current_date,valid_to=current_date WHERE team_id=$1 AND coach_id=$2").bind(team_id).bind(new_coach_id).execute(&database.pool).await.unwrap();
+    sqlx::query("UPDATE feature.formation_usage_observations SET observed_at=now()-interval '89 days' WHERE team_id=$1").bind(team_id).execute(&database.pool).await.unwrap();
+    let current_team_gaps = database.store.team_monthly_data_gaps().await.unwrap();
+    assert!(
+        !current_team_gaps.iter().any(|row| row.entity_id == team_id
+            && matches!(
+                row.missing_field.as_str(),
+                "current_coach" | "formation_usage"
+            )),
+        "当前任期起止日均包含，近期观察不报缺口"
+    );
+    sqlx::query("UPDATE football.team_coach_periods SET valid_from=current_date+1,valid_to=NULL WHERE team_id=$1 AND coach_id=$2").bind(team_id).bind(new_coach_id).execute(&database.pool).await.unwrap();
+    sqlx::query("UPDATE feature.formation_usage_observations SET observed_at=now()-interval '91 days' WHERE team_id=$1").bind(team_id).execute(&database.pool).await.unwrap();
+    let expired_team_gaps = database.store.team_monthly_data_gaps().await.unwrap();
+    for field in ["current_coach", "formation_usage"] {
+        assert!(
+            expired_team_gaps
+                .iter()
+                .any(|row| row.entity_id == team_id && row.missing_field == field),
+            "未来任期与超期观察不能消除当前缺口"
+        );
+    }
+    sqlx::query(
+        "UPDATE football.team_profiles SET updated_at=now()+interval '2 days' WHERE team_id=$1",
+    )
+    .bind(team_id)
+    .execute(&database.pool)
+    .await
+    .unwrap();
+    let future_profile_gaps = database.store.team_monthly_data_gaps().await.unwrap();
+    assert!(
+        future_profile_gaps
+            .iter()
+            .filter(|row| row.entity_id == team_id)
+            .all(|row| row.stale_days == Some(0)),
+        "未来资料时间的 stale_days 保持非负"
+    );
+
+    // 从数据库日期取月界，避免客户端时区决定缺口；原导出保留历史与未来记录。
+    sqlx::query("UPDATE football.player_team_periods SET valid_from=(date_trunc('month',current_date)-interval '1 month')::date,valid_to=date_trunc('month',current_date)::date-1 WHERE player_id=$1").bind(player_id).execute(&database.pool).await.unwrap();
+    let future_period_id = Uuid::new_v4();
+    sqlx::query("INSERT INTO football.player_team_periods(id,player_id,team_id,valid_from,registration_status) VALUES($1,$2,$3,(date_trunc('month',current_date)+interval '1 month')::date,'registered')").bind(future_period_id).bind(player_id).bind(team_id).execute(&database.pool).await.unwrap();
+    let month_boundary_gaps = database.store.player_monthly_data_gaps().await.unwrap();
+    assert!(
+        month_boundary_gaps
+            .iter()
+            .any(|row| row.entity_id == player_id && row.missing_field == "team_period"),
+        "上月已结束与下月待开始履历不充当当前关系"
+    );
+    let boundary_period_id = Uuid::new_v4();
+    sqlx::query("INSERT INTO football.player_team_periods(id,player_id,team_id,valid_from,valid_to,registration_status) VALUES($1,$2,$3,current_date,current_date,'registered')").bind(boundary_period_id).bind(player_id).bind(team_id).execute(&database.pool).await.unwrap();
+    let inclusive_period_gaps = database.store.player_monthly_data_gaps().await.unwrap();
+    assert!(
+        !inclusive_period_gaps
+            .iter()
+            .any(|row| row.entity_id == player_id && row.missing_field == "team_period"),
+        "球员效力期起止日均包含当前日"
+    );
+    let history_export = database.store.spreadsheet_export_data().await.unwrap();
+    let exported_periods: Vec<_> = history_export
+        .team_periods
+        .iter()
+        .filter(|row| row.player_id == player_id)
+        .collect();
+    assert_eq!(
+        exported_periods.len(),
+        3,
+        "同一球员多球队及历史/当前/未来履历不得过滤或合并"
+    );
+    assert_eq!(exported_periods[0].team_id, team_id);
+    assert_eq!(exported_periods[2].team_id, placeholder_id);
+    assert!(exported_periods
+        .windows(2)
+        .all(|pair| pair[0].valid_from >= pair[1].valid_from));
     database.close().await;
 }
 

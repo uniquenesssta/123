@@ -1,4 +1,6 @@
 import fs from "node:fs";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
 import crypto from "node:crypto";
 import { isVersionAtLeast } from "./version.mjs";
 
@@ -15,9 +17,9 @@ const domain =
   read("crates/domain/src/exchange/monthly/contract.rs") +
   read("crates/domain/src/exchange/spreadsheet/contract.rs");
 const spreadsheetIo = read("crates/spreadsheet-io/src/monthly_workbook.rs");
-const persistence = read("crates/persistence-postgres/src/monthly_workbooks.rs") + ["mod", "preview", "conflict", "commit", "write", "names", "identity", "formation", "validation", "values"].map((name) => read(`crates/persistence-postgres/src/adapters/workbooks/team_package/${name}.rs`)).join("\n") + ["batch", "mapping", "read", "rows"].map((name) => read(`crates/persistence-postgres/src/adapters/workbooks/batch_ledger/${name}.rs`)).join("\n");
+const persistence = ["monthly_team/read", "monthly_team/gaps", "monthly_player/read", "monthly_player/gaps", "monthly_gaps"].map((name) => read(`crates/persistence-postgres/src/adapters/workbooks/${name}.rs`)).join("\n") + ["mod", "preview", "conflict", "commit", "write", "names", "identity", "formation", "validation", "values"].map((name) => read(`crates/persistence-postgres/src/adapters/workbooks/team_package/${name}.rs`)).join("\n") + ["batch", "mapping", "read", "rows"].map((name) => read(`crates/persistence-postgres/src/adapters/workbooks/batch_ledger/${name}.rs`)).join("\n");
 const legacyPersistence = ["preview", "conflict", "commit", "export", "identity", "validation", "values"]
-  .map((name) => read(`crates/persistence-postgres/src/adapters/workbooks/player_catalog/${name}.rs`)).join("\n");
+  .map((name) => read(name === "export" ? "crates/persistence-postgres/src/adapters/workbooks/monthly_player/read.rs" : `crates/persistence-postgres/src/adapters/workbooks/player_catalog/${name}.rs`)).join("\n");
 const application = read("crates/application/src/use_cases/exchange/preview_player_catalog_import/use_case.rs");
 const commands = read("src-tauri/src/commands/exchange.rs");
 const registry = read("src-tauri/src/bootstrap/command_registry.rs");
@@ -101,4 +103,58 @@ requireTrue(teams.includes("球队完整资料包") && main.includes("previewTea
 requireTrue(main.includes("previewTeamImport") && client.includes("preview_team_monthly_import"), "旧球队月度工作簿兼容链缺失");
 requireTrue(players.includes("球员月度工作包") && main.includes("球员月度更新.xlsx"), "球员月度工作包界面缺失");
 requireTrue(main.includes("ended_previous_count"), "导入完成结果未显示结束旧记录数量");
+
+// R7-13：月度只读聚合/缺口实际职责，导入继续复用原唯一共享链。
+const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)),"..");
+const monthlyRoot = "crates/persistence-postgres/src/adapters/workbooks";
+const monthlySources = Object.fromEntries(["monthly_team/mod","monthly_team/read","monthly_team/gaps","monthly_player/mod","monthly_player/read","monthly_player/gaps","monthly_gaps"].map((name) => [name,read(`${monthlyRoot}/${name}.rs`)]));
+const files = [];
+const collect = (directory) => { for (const item of fs.readdirSync(path.join(root,directory),{withFileTypes:true})) { const name=`${directory}/${item.name}`; if(item.isDirectory()) collect(name); else if(item.name.endsWith(".rs")) files.push(name); } };
+collect("crates/persistence-postgres/src");
+for (const [name,owner] of [["team_monthly_workbook_data","monthly_team/read"],["team_monthly_data_gaps","monthly_team/gaps"],["player_monthly_data_gaps","monthly_player/gaps"],["spreadsheet_export_data","monthly_player/read"],["monthly_gap_from_row","monthly_gaps"]]) {
+  const owners = files.filter((file) => new RegExp(`\\bfn\\s+${name}\\s*\\(`).test(read(file)));
+  requireTrue(owners.length === 1 && owners[0] === `${monthlyRoot}/${owner}.rs`,`${name} 必须有唯一实际月度 owner`);
+}
+requireTrue(!fs.existsSync(path.join(root,"crates/persistence-postgres/src/monthly_workbooks.rs")) && !read("crates/persistence-postgres/src/lib.rs").includes("mod monthly_workbooks;"),"旧根月度实现/注册未删除");
+requireTrue(!fs.existsSync(path.join(root,`${monthlyRoot}/player_catalog/export.rs`)) && !read(`${monthlyRoot}/player_catalog/mod.rs`).includes("mod export;"),"原球员导出 owner 不得残留第二份实现或转发壳");
+for (const name of ["monthly_team","monthly_player","monthly_gaps"]) requireTrue(read(`${monthlyRoot}/mod.rs`).includes(`mod ${name};`),`${name} 未登记唯一模块`);
+for (const name of ["monthly_team","monthly_player"]) {
+  requireTrue(monthlySources[`${name}/mod`].includes("mod read;") && monthlySources[`${name}/mod`].includes("mod gaps;"),`${name} 聚合与缺口职责未登记`);
+  requireTrue(monthlySources[`${name}/gaps`].includes("super::super::monthly_gaps::monthly_gap_from_row") && monthlySources[`${name}/gaps`].includes("rows.iter().map(monthly_gap_from_row).collect()"),"两类缺口必须复用唯一共享行映射");
+}
+const forbidden = /\b(?:INSERT INTO|UPDATE|DELETE FROM|CREATE TABLE|ALTER TABLE)\s|\.execute\(|\.begin\(|\.commit\(|FOR UPDATE|catalog\.import_(?:batches|rows)|write_audit_event|refresh_player_ability_projections/;
+for (const [name,source] of Object.entries(monthlySources)) requireTrue(!forbidden.test(source),`${name} 月度读取不得写事实/账本/审计、取得写锁或触发投影`);
+const adapter = read("crates/application/src/composition/adapters/exchange/spreadsheet.rs");
+for (const name of ["team_monthly_workbook_data","player_monthly_data_gaps","spreadsheet_export_data"]) requireTrue(new RegExp(`PersistenceStore::${name}\\(\\s*self`).test(adapter),`${name} 原 Port 必须显式分派`);
+for (const name of ["preview_team_monthly_import","commit_team_monthly_import","preview_spreadsheet_import","commit_spreadsheet_import"]) requireTrue(new RegExp(`PersistenceStore::${name}\\(\\s*self`).test(adapter),`${name} 月度导入不得重新实现或改变分派`);
+const sqlContracts = {
+  "monthly_team/read": {
+    "queries": 7,
+    "sha256": "5bfa3267e704fb3bfc68af32f344f63a3bd841d5ad86a2dfa3e39c25cedb183b"
+  },
+  "monthly_team/gaps": {
+    "queries": 1,
+    "sha256": "b5134e47e5c267f97c7560152489c625cb686c5ec355665448d32a00fdbc751f"
+  },
+  "monthly_player/read": {
+    "queries": 9,
+    "sha256": "af9aacc48dc19897df38d202986a511528a20f411a9b1ad5bb7937654865d474"
+  },
+  "monthly_player/gaps": {
+    "queries": 1,
+    "sha256": "be93a21d7acf612a28110f69d566fda06341834621afbbd284ce8b00d56dbbcd"
+  }
+};
+// 原 SQL 集合按空白归一化：保留默认值、排序、连接、观察期限和日期边界。
+for (const [name,contract] of Object.entries(sqlContracts)) {
+  const queries = [...monthlySources[name].matchAll(/sqlx::query\(\s*(?:r#"([\s\S]*?)"#|"((?:\\.|[^"\\])*)")\s*,?\s*\)/g)].map((match) => (match[1]??match[2]).replace(/\s+/g," ").trim());
+  requireTrue(queries.length === contract.queries && crypto.createHash("sha256").update(queries.join("\n")).digest("hex") === contract.sha256,`${name} 原只读 SQL、默认、历史/排序或缺口日期边界已漂移`);
+}
+for (const field of ["entity_type","entity_id","entity_name","missing_field","last_observed_at","stale_days","priority","recommended_action"]) requireTrue(monthlySources.monthly_gaps.includes(`${field}: row.try_get("${field}")?`),`共享缺口字段映射不完整：${field}`);
+requireTrue(monthlySources["monthly_team/read"].includes("let data_gaps = self.team_monthly_data_gaps().await?;"),"球队导出必须带原缺口结果");
+const exportPlayer = read("crates/application/src/use_cases/exchange/export_player_catalog_data/use_case.rs");
+requireTrue(exportPlayer.indexOf("port.export_data().await?") < exportPlayer.indexOf("port.data_gaps().await?") && exportPlayer.includes("write_player_monthly_export(&output, &references, &data, &gaps)"),"球员月度导出必须保留原聚合/缺口/写出编排");
+const integration = read("crates/persistence-postgres/tests/postgres_integration.rs");
+for (const token of ["monthly_snapshot_before","monthly_snapshot_after","monthly_team_data","monthly_player_data","empty_profile_gaps","current_team_gaps","expired_team_gaps","month_boundary_gaps","inclusive_period_gaps","exported_periods"]) requireTrue(integration.includes(token),`原月度 PG 回归缺少真实读取边界：${token}`);
+
 console.log("阶段4球队与球员月度工作簿契约验证通过。");

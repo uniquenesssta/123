@@ -9,7 +9,7 @@
 
 - 唯一阶段分支：`rewrite/r7-match-lineup-workbook-persistence`。
 - 规划依据：源码 `985f01816060cfd05672bdc03b6771dec7b4e842`，文档基线 `51f746729b2f94925e6382f2ae2108cf80855af6`，以及阶段 README 中 A1–A8、B1–B7 审计记录。
-- R7-01～R7-11 已完成精确提交的 Windows Automated 并为 `DONE`；11 run `36824027121` 的 Persistence 127 项/Application 53 项通过。用户已启动 R7-12，共享球队资料包持久化、调用/门禁及回归已实现，当前 `VERIFYING`；R7-13 及以后 `BLOCKED`。真实 PG/XLSX/Full 保留最终封包新库待验。
+- R7-01～R7-12 已完成精确提交的 Windows Automated 并为 `DONE`；12 run `36831302483` 的 Persistence 132 项/Application 55 项通过。用户已启动 R7-13，月度只读聚合/缺口唯一职责、调用/门禁及原 PG 回归已实现，当前 `VERIFYING`；R7-14 及以后 `BLOCKED`。真实 PG/XLSX/Full 保留最终封包新库待验。
 - 当前状态以 `docs/modular-rewrite/R07-match-lineup-workbook-persistence/README.md` 的唯一状态表为准；历史审计中的旧编号按下表映射。
 - 允许整改触及直接相关的 Application composition/Ports、catalog identity/deletion、现有 P4 时间比较和测试；不提前实施 R8/R10 的整阶段重写。
 - 不包含前端导入 UI 重写、工作簿解析器整体验证框架建设、模型内部算法/参数修改或历史 migration 改写。
@@ -206,7 +206,7 @@
 
 ## R7-12 Team Package
 
-状态：`VERIFYING`，11 DONE，用户已启动；共享球队链唯一职责、计数修订和现有回归已实现，等待本项精确 Windows CI；真实 PG/XLSX/Full 最终封包新库待验。原任务 R7-07。
+状态：`DONE`，精确 `fe2f7eb` 的 Windows run `36831302483` / job `110268300510` 全通过，见阶段完成记录；真实 PG/XLSX/Full 最终封包新库待验。原任务 R7-07。
 
 - **目标/契约**：保留球队资料包名称、本地化、成员关系、覆盖范围、冲突裁决与恢复语义；preview 不写业务事实，每条持久化链的 commit 只有一个事务 owner；完整资料包保留现有先球队后球员、球员失败保留已完成球队并可重试的双链边界。
 - **来源与目标**：现有资料包复用 monthly_workbooks.rs 的共享球队 preview/commit persistence，原 MonthlyWorkbookPort/API 保持；迁入 `crates/persistence-postgres/src/adapters/workbooks/team_package/`。按实际职责调整私有文件布局，不强制一函数一文件。
@@ -218,10 +218,10 @@
 
 ## R7-13 Monthly Workbook
 
-状态：`BLOCKED`，依赖 R7-12；原任务 R7-08。
+状态：`VERIFYING`，12 DONE，用户已启动；月度只读聚合/缺口及现有回归已实现，等待本项精确 Windows CI；真实 PG/XLSX/Full 最终封包新库待验。原任务 R7-08。
 
 - **目标/契约**：收敛剩余球队/月度球员数据读取与缺口；导入继续复用 11/12 的唯一共享职责。时间窗口、历史效力和数据缺口语义保持，不复制整套导入框架。
-- **来源与目标**：monthly_workbooks.rs 剩余 team_monthly_workbook_data/team_monthly_data_gaps/player_monthly_data_gaps 及 player_catalog.rs 月度导出聚合；迁入 `crates/persistence-postgres/src/adapters/workbooks/monthly_team/、adapters/workbooks/monthly_player/`。按实际职责调整私有文件布局，不强制一函数一文件。
+- **来源与目标**：monthly_workbooks.rs 剩余 team_monthly_workbook_data/team_monthly_data_gaps/player_monthly_data_gaps 及 R7-11 已迁入 player_catalog/export.rs 的球员共享月度导出聚合（根 player_catalog.rs 仅引用目录）；迁入 `crates/persistence-postgres/src/adapters/workbooks/monthly_team/、adapters/workbooks/monthly_player/`。按实际职责调整私有文件布局，不强制一函数一文件。
 - **输入/输出**：沿用对应 Application Port、Domain Draft/Query/Record 与现有持久化结果；允许 Domain、SQLx、现有基础 mapping/audit。禁止依赖前端状态或私有模型实现，不保存第二份事实状态。
 - **实施与切换**：识别全部直接调用方和现有测试，完成唯一 owner 切换，同步现有验证器和清单，删除被替代实现；保留上游正常 API/错误契约。数据库事务是写入与审计的共同提交边界。
 - **验证**：沿用 monthly-workbooks 既有测试/验证器和真实 XLSX，核对月界、缺失数据、多球队履历及行映射。 Windows 最小检查、现有阶段回归和动态延期规则按第 3 节执行。

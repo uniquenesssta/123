@@ -28,7 +28,7 @@ impl SpreadsheetExchangePort for PersistenceStore {
     }
 
     async fn data_gaps(&self) -> PortResult<Vec<MonthlyDataGapRow>> {
-        self.player_monthly_data_gaps()
+        PersistenceStore::player_monthly_data_gaps(self)
             .await
             .map_err(map_persistence_error)
     }
@@ -85,7 +85,7 @@ impl SpreadsheetExchangePort for PersistenceStore {
 #[async_trait]
 impl MonthlyWorkbookPort for PersistenceStore {
     async fn export_data(&self) -> PortResult<TeamMonthlyWorkbookData> {
-        self.team_monthly_workbook_data()
+        PersistenceStore::team_monthly_workbook_data(self)
             .await
             .map_err(map_persistence_error)
     }

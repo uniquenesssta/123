@@ -4,7 +4,7 @@
 
 `IN_PROGRESS`
 
-当前进度以本段及任务索引为准：R7-01～11 `DONE`；11 精确提交 `310c46bbedb731e20ffaca2c67df0eefc3ce6e3a` 的 Windows run `36824027121` / job `110245578512` 全通过，Persistence 127 项/Application 53 项，详见 [11 完成记录](R07-11-player-workbook.md)。R7-12 已按用户指令启动，球队资料包共享持久化职责、原调用/门禁及回归已实现，当前 `VERIFYING`；R7-13～15 `BLOCKED`。后文旧节点的“当前/待验/下一项”叙述属于当时实施记录，不覆盖此处和任务表。
+当前进度以本段及任务索引为准：R7-01～12 `DONE`；12 精确提交 `fe2f7ebcbf50e4bb40016d649a95b2c295aeab55` 的 Windows run `36831302483` / job `110268300510` 全通过，Persistence 132 项/Application 55 项，详见 [12 完成记录](R07-12-team-package.md)。R7-13 已按用户指令启动，月度只读聚合/缺口、原调用/门禁及 PG 回归已实现，当前 `VERIFYING`；R7-14～15 `BLOCKED`。后文旧节点的“当前/待验/下一项”叙述属于当时实施记录，不覆盖此处和任务表。
 
 R7 先完成 R1–R6 累计审计整改，再重写 Matches、Lineups、Presets 与 Workbook 持久化，重点保证双方阵容原子事务、截止时间、历史链路、批次账本、真实 XLSX 行/子记录 identity 与整批回滚；不实施工作簿解析算法本体或前端导入 UI。
 
@@ -50,8 +50,8 @@ crates/persistence-postgres/src/adapters/workbooks/
 | R7-09 | Team Lineup Presets | DONE |
 | R7-10 | Spreadsheet Batch Ledger | DONE |
 | R7-11 | Player Workbook | DONE |
-| R7-12 | Team Package | VERIFYING |
-| R7-13 | Monthly Workbook | BLOCKED |
+| R7-12 | Team Package | DONE |
+| R7-13 | Monthly Workbook | VERIFYING |
 | R7-14 | Match Lineup Workbook | BLOCKED |
 | R7-15 | Row / Subrecord Identity | BLOCKED |
 
@@ -237,7 +237,7 @@ SQLx 0.8.6 的 Chrono DateTime 编码按自 2000 年起的整数微秒写入，�
 
 ## R7-12 当前验证状态
 
-进入/回退基线：`310c46bbedb731e20ffaca2c67df0eefc3ce6e3a`。11 DONE；12 唯一职责及现有回归已实现，当前 `VERIFYING`，13～15 BLOCKED；必须取得自己的精确 Windows CI。
+进入/回退基线：`310c46bbedb731e20ffaca2c67df0eefc3ce6e3a`。本项已 `DONE`：精确 `fe2f7eb` 的 Windows run `36831302483` 全通过，见 [完成记录](R07-12-team-package.md)。用户已启动 13；以下保留 12 实施记录，Windows 待验由本次成功 CI 更新，真实数据库待验保持。
 
 - 实际代码没有独立 team-package Port/持久化链；Application 把资料包分发到既有 Team Monthly 与 Player Monthly。12 收敛其共享球队身份/名称/教练/任期/阵型/战术/能力导入职责，70 个生产函数及 22 个原测试迁入 `adapters/workbooks/team_package/`。mod 仅登记与内部结果类型；preview/conflict/commit/write/names/identity/formation/validation/values 职责明确，跨职责细节仅 pub(super)。95 个未改变的原函数体规范化一致，七个原公开签名保持；调整只在编排/账本和已有计数缺口。
 - Team 批次头/同源复用/只读 preview/strict codec/行载荷/重复行跳过 SQL 归现有 batch_ledger。family 父锁只接受 team_monthly_xlsx；保持独立 Team codec 的 clear/end_previous/实体拒绝/error 中文文本、原行序及成功重试计数/完成时间。原 MonthlyWorkbookPort 四方法显式 PersistenceStore 分派；资料包、旧球队月度共用同一 owner。
@@ -248,7 +248,20 @@ SQLx 0.8.6 的 Chrono DateTime 编码按自 2000 年起的整数微秒写入，�
 - 原 broad 月度夹具补重复预检行 UUID/工作表/行/载荷和无事实，末行失败后球队/行/账本/审计回滚与原批次修复重试，一次成功审计及计数；本地化中文覆盖后原文/中文/简称各一个；非法候选不改计数，skip/选择分别同步 pending 计数并能提交。18 broad 数量不变；真实 PG、历史四项/账本、有效 XLSX/Full 仍最终封包新库待验。
 - 原八个工作簿/资料包门禁路径切换实际职责，TeamPackage/Exchange 门禁增强唯一 owner、类型隔离、显式调用、预览只暂存、父锁/候选/计数、事务/依赖/名称/双链恢复边界。83 项现有源码/契约门禁和架构聚合通过，Rustfmt 源码解析/格式通过；物理行、候选、唯一提交、原名保留、类型隔离、pending 计数六项破坏探针拒绝并恢复。架构直接模块 37，Domain 365 声明/300 映射分类和源码摘要不变，使用摘要/原 PG 指纹更新。保护资产/46 迁移/生产依赖/锁文件/工作流冻结。
 
-Windows 编译/Clippy/tests、浏览器/截图/前端生产构建、安装包/启动待本项精确 CI。本地未执行 Linux/macOS 动态验收或 PostgreSQL。成功后创建 `R07-12-team-package.md`，回退同步职责、调用、门禁/清单与 PG 指纹，不能恢复双实现或单独放宽门禁。
+Windows 编译/Clippy/tests、浏览器/截图/前端生产构建、安装包/启动待本项精确 CI。本地未执行 Linux/macOS 动态验收或 PostgreSQL。完成记录已创建；回退同步职责、调用、门禁/清单与 PG 指纹，不能恢复双实现或单独放宽门禁。
+
+## R7-13 当前验证状态
+
+进入/回退基线：`fe2f7ebcbf50e4bb40016d649a95b2c295aeab55`。12 DONE；13 月度只读唯一职责及现有回归已实现，当前 `VERIFYING`，14～15 BLOCKED；必须取得自己的精确 Windows CI。
+
+- 实际来源是 monthly_workbooks.rs 的球队聚合/两类缺口/共享 mapper，以及 11 已迁入 player_catalog/export.rs 的球员共享导出；根 player_catalog.rs 仅提供引用目录，并非月度导出 owner，本项不迁移该目录或它的三个原测试。唯一职责迁入 workbooks/monthly_team/{mod,read,gaps}、monthly_player/{mod,read,gaps} 与 monthly_gaps.rs；原根月度文件/注册、旧球员 export 文件/注册全部删除。五个原函数体、四个公开签名及 18 条 SQL/全部原字段映射规范化保持，无重复实现/转发壳。
+- 球队聚合完整保留 teams/names/coaches/coach_periods/formation_usage/tactical_observations/ability_observations/data_gaps；空 profile 的 club/0.5/空 observed_at、不筛除历史/未来任期与观察、原名称/ID/时点排序和元数据 source_urls/verified_at 保持。球员聚合保留 teams/players/names/positions/team_periods/abilities/availability/dynamic_tags/external_ids、默认战术角色、provider/实体过滤、历史排序与多球队记录。
+- 缺口 SQL 保持原数据库 current_date 的包含起止边界、球队 90 天阵型/球员 120 天能力近期判断、缺字段优先级/推荐动作、空资料时间以及 GREATEST 非负 stale_days。两类缺口只查询并复用唯一 monthly_gap_from_row；球队聚合调用同一 team gaps，球员月度应用用例仍按引用/聚合/缺口写出。不新增日期选择、客户端时区判定或读取事务/副作用。三项原 export/data_gaps Port 调用显式 PersistenceStore 分派；导入继续复用 11/12，无新框架或跨链事务。
+- 原 PG 月度夹具补真实聚合 field/null/default/metadata、原文/中文/简称与新旧教练/阵型/观察、同一原库读取前后事实/账本/审计快照一致、重复导出无写入；当前任期起止日期包含/未来任期拒绝、近期/超期阵型缺口、未来资料 stale_days 为零；球员上月结束/下月未开始不能作为当前关系，当前日单日关系可消除缺口，导出仍包含三段/两队履历并按开始日倒序。18 broad 数量不变、无新 target/runner/workflow/数据库；真实 PG/历史四项/账本/有效 XLSX/Full 仍最终封包新库待验。
+- 原七个导入/资料包/管理/Exchange 门禁保留覆盖并更新 已迁移导出 路径（实际读取新 owner）；原月度 verifier 增唯一 owner、旧实现/注册删除、显式 Port、只读/无写锁/无投影或账本/审计、共享 gap mapping 和 SQL 集合/默认/历史排序/日期边界检查，所有旧断言保留。六项破坏探针（空资料默认、观察期限、效力期包含边界、历史顺序、缺口列映射、SQL 写入）拒绝并恢复。
+- 83 项原 Node 源码/契约门禁、架构聚合、Rustfmt 源码解析/格式通过。直接注册模块从 37 精确变为 36，仅删除旧根 monthly_workbooks；Domain 365 声明/300 映射分类、声明摘要不变，usage 摘要/原 PG 指纹更新。正常 API/DTO、模型算法/参数/保护资产、生产依赖/锁文件、46 迁移及原工作流冻结。
+
+本项纯读取迁移，没有新增镜像 inline 单测；Windows 原 Persistence 132/Application 55 项仍须本项精确 CI 执行，不继承 12 PASS。Windows 编译/Clippy/tests、前端类型/浏览器/截图/build、安装包与启动待验；本地不执行 Linux/macOS 动态验收或 PG。成功后创建 R07-13-monthly-workbook.md，受控回退同步所有新 owner、原调用/门禁/清单与 PG 指纹，不恢复双实现或单独放宽门禁。
 
 ## R7-01 READY 边界
 

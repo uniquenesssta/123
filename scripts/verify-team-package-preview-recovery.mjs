@@ -6,7 +6,7 @@ const check = (condition, message) => {
 };
 
 const exchange = ["preview", "conflict", "commit", "export", "identity", "validation", "values"]
-  .map((name) => read(`crates/persistence-postgres/src/adapters/workbooks/player_catalog/${name}.rs`)).join("\n");
+  .map((name) => read(name === "export" ? "crates/persistence-postgres/src/adapters/workbooks/monthly_player/read.rs" : `crates/persistence-postgres/src/adapters/workbooks/player_catalog/${name}.rs`)).join("\n");
 const domain = read("crates/domain/src/player/status.rs");
 const migration = read("crates/persistence-postgres/migrations/0044_team_package_preview_recovery.sql");
 const types = read("src/types.ts");

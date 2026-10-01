@@ -115,3 +115,9 @@ The public model stub must always return an explicit unavailable error. A succes
 精确 `310c46bbedb731e20ffaca2c67df0eefc3ce6e3a` / Windows run `36824027121` / job `110245578512` 全 SUCCESS；Persistence 127 项/Application 53 项、前端类型/17 视口/构建、fmt/Clippy/workspace tests、release/MSI/NSIS 与启动日志 7 条/3 操作实际通过。artifact `11145641022` SHA-256 `2c58fc6f91f671b07b243b64908c5c5e52ee8c74d8d70c6f79eece58aa1ac51e`；11 DONE。
 
 12 原 22 个 inline 测试迁至真实共享球队职责，新增 Persistence 5 项/Application 2 项，预期 Windows 132/55 项，尚未执行。原 PG 月度夹具补重复预检行身份/载荷/无事实、末行失败后球队/行/账本/审计回滚及原批次恢复、一次成功审计、原文/中文主名/简称保存、非法候选拒绝及 skip/选择后 pending 计数共同事务。完整包保留两条独立原子链及原球员失败恢复边界。83 项原源码门禁/架构和 Rustfmt 通过，六项破坏探针拒绝并恢复；不继承 11 的 Windows PASS。18 broad 仍 ignored，真实 PG/历史四项/账本/有效 XLSX/Full 最终封包新库待验。沿用原验收流程，无新 target/runner/workflow/数据库设施；12 VERIFYING，13～15 BLOCKED。
+
+### R7-12 完成与 R7-13 待验（2026-10-01）
+
+精确 `fe2f7ebcbf50e4bb40016d649a95b2c295aeab55` / Windows run `36831302483` / job `110268300510` 全 SUCCESS；Persistence 132 项/Application 55 项、前端类型/17 视口/build、fmt/Clippy/workspace tests、release/MSI/NSIS 与启动日志 7 条/3 操作实际通过。artifact `11148207904` / 14,019,073 字节 / SHA-256 `19a5d423e18bb2e53a529416207194e8e829e26b4673e21425fd51011d34df2b`；12 DONE。
+
+13 纯月度读取迁移，五个原函数体/四签名/18 查询与映射保持，不增加镜像 inline 测试；原 132/55 项需本项 Windows CI 实际执行。原 PG 月度夹具扩空资料默认/null 时间、clear 值/元数据与历史聚合、重复读取不改事实/账本/审计、当前关系包含起止日/未来关系不能消除缺口、90 天前后观察、未来资料非负 stale_days、上月/下月/当前日关系与两队三段历史导出/排序。83 项现有源码/契约、架构与 Rustfmt 通过，六项破坏探针拒绝并恢复。18 broad 仍 ignored，PG/历史四项/账本/XLSX/Full 最终封包新库待验；无新 target/runner/workflow/数据库，模块清单 36，迁移/算法/资产/deps/locks 冻结。13 VERIFYING，14～15 BLOCKED。

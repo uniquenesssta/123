@@ -226,7 +226,7 @@ const ledgerRows = read(`${ledgerRoot}/rows.rs`);
 const ledgerMapping = read(`${ledgerRoot}/mapping.rs`);
 const ledgerRead = read(`${ledgerRoot}/read.rs`);
 const playerWorkbook = ["preview", "conflict", "commit", "export", "identity", "validation", "values"]
-  .map((name) => read(`crates/persistence-postgres/src/adapters/workbooks/player_catalog/${name}.rs`)).join("\n");
+  .map((name) => read(name === "export" ? "crates/persistence-postgres/src/adapters/workbooks/monthly_player/read.rs" : `crates/persistence-postgres/src/adapters/workbooks/player_catalog/${name}.rs`)).join("\n");
 const matchWorkbook = read("crates/persistence-postgres/src/match_exchange.rs");
 const integration = read("crates/persistence-postgres/tests/postgres_integration.rs");
 const persistencePaths = [];
@@ -279,13 +279,13 @@ const playerCommit = read(`${playerRoot}/commit.rs`);
 const playerIdentity = read(`${playerRoot}/identity.rs`);
 const playerValidation = read(`${playerRoot}/validation.rs`);
 const playerValues = read(`${playerRoot}/values.rs`);
-const playerExport = read(`${playerRoot}/export.rs`);
+const playerExport = read("crates/persistence-postgres/src/adapters/workbooks/monthly_player/read.rs");
 check(!fs.existsSync(path.join(root,"crates/persistence-postgres/src",["spreadsheet","exchange.rs"].join("_"))) && !read("crates/persistence-postgres/src/lib.rs").includes("mod spreadsheet_exchange;"),"旧球员工作簿 owner/注册必须删除");
 check(read("crates/persistence-postgres/src/adapters/workbooks/mod.rs").includes("mod player_catalog;"),"球员工作簿新职责未注册");
 for (const [file,names] of [["preview",["preview_spreadsheet_import","preview_spreadsheet_import_with_team_references","preview_spreadsheet_import_inner"]],["conflict",["resolve_spreadsheet_import_conflict"]],["commit",["commit_spreadsheet_import","apply_import_row"]],["export",["spreadsheet_export_data"]],["identity",["validate_external_id_resolution","decision_from_matches","resolve_player_reference","resolve_team_reference"]],["validation",["validate_spreadsheet_row","validate_child_fields"]],["values",["normalize_spreadsheet_payload","parse_spreadsheet_datetime","spreadsheet_clear_fields"]]]) {
   for (const name of names) {
     const owners=persistencePaths.filter((path)=>new RegExp(`fn\\s+${name}\\s*\\(`).test(read(path)));
-    check(owners.length===1 && owners[0]===`${playerRoot}/${file}.rs`,`${name} 球员职责必须只有一个 owner`);
+    check(owners.length===1 && owners[0]===(file === "export" ? "crates/persistence-postgres/src/adapters/workbooks/monthly_player/read.rs" : `${playerRoot}/${file}.rs`),`${name} 球员职责必须只有一个 owner`);
   }
 }
 for (const name of ["spreadsheet_export_data","preview_spreadsheet_import","preview_spreadsheet_import_with_team_references","read_spreadsheet_import_preview","resolve_spreadsheet_import_conflict","commit_spreadsheet_import"]) check(new RegExp(`PersistenceStore::${name}\\(\\s*self`).test(spreadsheetAdapter),`球员 Port 必须显式分派唯一持久化入口：${name}`);

@@ -24,13 +24,13 @@
     "targetPublicExportPolicy": "explicit re-export only"
   },
   "sourceDigest": "217241ac243726a5ab6805a7f169e222b97e78c7c971749a5904714af673ebdd",
-  "rustUsageDigest": "737762d494fc0aa6852960deea8d53097a692e38f2b5f2227320163984b5d235",
+  "rustUsageDigest": "ad2e5424a4c14379e9cb28a596cbbede889c3e1559b4b9885f3a6981638b0fcb",
   "summary": {
     "typeCount": 365,
     "publicCompatibilityTypeCount": 365,
     "internalTypeCount": 0,
     "domainSourceFileCount": 129,
-    "scannedRustFileCount": 1012,
+    "scannedRustFileCount": 1017,
     "databaseMappedTypeCount": 300,
     "byTargetModule": {
       "ai_workspace": 16,
@@ -14014,11 +14014,15 @@
       "externalCallers": [
         "crates/application/src/composition/adapters/exchange/spreadsheet.rs",
         "crates/application/src/ports/exchange/mod.rs",
-        "crates/persistence-postgres/src/monthly_workbooks.rs",
+        "crates/persistence-postgres/src/adapters/workbooks/monthly_gaps.rs",
+        "crates/persistence-postgres/src/adapters/workbooks/monthly_player/gaps.rs",
+        "crates/persistence-postgres/src/adapters/workbooks/monthly_team/gaps.rs",
         "crates/spreadsheet-io/src/monthly_workbook.rs"
       ],
       "databaseMappings": [
-        "crates/persistence-postgres/src/monthly_workbooks.rs"
+        "crates/persistence-postgres/src/adapters/workbooks/monthly_gaps.rs",
+        "crates/persistence-postgres/src/adapters/workbooks/monthly_player/gaps.rs",
+        "crates/persistence-postgres/src/adapters/workbooks/monthly_team/gaps.rs"
       ]
     },
     {
@@ -26551,12 +26555,12 @@
       "externalCallers": [
         "crates/application/src/composition/adapters/exchange/spreadsheet.rs",
         "crates/application/src/ports/exchange/mod.rs",
-        "crates/persistence-postgres/src/adapters/workbooks/player_catalog/export.rs",
+        "crates/persistence-postgres/src/adapters/workbooks/monthly_player/read.rs",
         "crates/spreadsheet-io/src/lib.rs",
         "crates/spreadsheet-io/src/monthly_workbook.rs"
       ],
       "databaseMappings": [
-        "crates/persistence-postgres/src/adapters/workbooks/player_catalog/export.rs"
+        "crates/persistence-postgres/src/adapters/workbooks/monthly_player/read.rs"
       ]
     },
     {
@@ -26682,10 +26686,10 @@
         "crates/domain/tests/serde_contracts/r2_07_module_paths.rs"
       ],
       "externalCallers": [
-        "crates/persistence-postgres/src/adapters/workbooks/player_catalog/export.rs"
+        "crates/persistence-postgres/src/adapters/workbooks/monthly_player/read.rs"
       ],
       "databaseMappings": [
-        "crates/persistence-postgres/src/adapters/workbooks/player_catalog/export.rs"
+        "crates/persistence-postgres/src/adapters/workbooks/monthly_player/read.rs"
       ]
     },
     {
@@ -27420,10 +27424,10 @@
         "crates/domain/tests/serde_contracts/r2_07_module_paths.rs"
       ],
       "externalCallers": [
-        "crates/persistence-postgres/src/adapters/workbooks/player_catalog/export.rs"
+        "crates/persistence-postgres/src/adapters/workbooks/monthly_player/read.rs"
       ],
       "databaseMappings": [
-        "crates/persistence-postgres/src/adapters/workbooks/player_catalog/export.rs"
+        "crates/persistence-postgres/src/adapters/workbooks/monthly_player/read.rs"
       ]
     },
     {
@@ -27510,10 +27514,10 @@
         "crates/domain/tests/serde_contracts/r2_07_module_paths.rs"
       ],
       "externalCallers": [
-        "crates/persistence-postgres/src/adapters/workbooks/player_catalog/export.rs"
+        "crates/persistence-postgres/src/adapters/workbooks/monthly_player/read.rs"
       ],
       "databaseMappings": [
-        "crates/persistence-postgres/src/adapters/workbooks/player_catalog/export.rs"
+        "crates/persistence-postgres/src/adapters/workbooks/monthly_player/read.rs"
       ]
     },
     {
@@ -27620,10 +27624,10 @@
         "crates/domain/tests/serde_contracts/r2_07_module_paths.rs"
       ],
       "externalCallers": [
-        "crates/persistence-postgres/src/adapters/workbooks/player_catalog/export.rs"
+        "crates/persistence-postgres/src/adapters/workbooks/monthly_player/read.rs"
       ],
       "databaseMappings": [
-        "crates/persistence-postgres/src/adapters/workbooks/player_catalog/export.rs"
+        "crates/persistence-postgres/src/adapters/workbooks/monthly_player/read.rs"
       ]
     },
     {
@@ -27698,10 +27702,10 @@
         "crates/domain/tests/serde_contracts/r2_07_module_paths.rs"
       ],
       "externalCallers": [
-        "crates/persistence-postgres/src/adapters/workbooks/player_catalog/export.rs"
+        "crates/persistence-postgres/src/adapters/workbooks/monthly_player/read.rs"
       ],
       "databaseMappings": [
-        "crates/persistence-postgres/src/adapters/workbooks/player_catalog/export.rs"
+        "crates/persistence-postgres/src/adapters/workbooks/monthly_player/read.rs"
       ]
     },
     {
@@ -27782,10 +27786,10 @@
         "crates/domain/tests/serde_contracts/r2_07_module_paths.rs"
       ],
       "externalCallers": [
-        "crates/persistence-postgres/src/adapters/workbooks/player_catalog/export.rs"
+        "crates/persistence-postgres/src/adapters/workbooks/monthly_player/read.rs"
       ],
       "databaseMappings": [
-        "crates/persistence-postgres/src/adapters/workbooks/player_catalog/export.rs"
+        "crates/persistence-postgres/src/adapters/workbooks/monthly_player/read.rs"
       ]
     },
     {
@@ -27856,10 +27860,10 @@
         "crates/domain/tests/serde_contracts/r2_07_module_paths.rs"
       ],
       "externalCallers": [
-        "crates/persistence-postgres/src/adapters/workbooks/player_catalog/export.rs"
+        "crates/persistence-postgres/src/adapters/workbooks/monthly_player/read.rs"
       ],
       "databaseMappings": [
-        "crates/persistence-postgres/src/adapters/workbooks/player_catalog/export.rs"
+        "crates/persistence-postgres/src/adapters/workbooks/monthly_player/read.rs"
       ]
     },
     {
@@ -27942,10 +27946,10 @@
         "crates/domain/tests/serde_contracts/r2_07_module_paths.rs"
       ],
       "externalCallers": [
-        "crates/persistence-postgres/src/adapters/workbooks/player_catalog/export.rs"
+        "crates/persistence-postgres/src/adapters/workbooks/monthly_player/read.rs"
       ],
       "databaseMappings": [
-        "crates/persistence-postgres/src/adapters/workbooks/player_catalog/export.rs"
+        "crates/persistence-postgres/src/adapters/workbooks/monthly_player/read.rs"
       ]
     },
     {
@@ -28190,10 +28194,10 @@
         "crates/domain/tests/serde_contracts/r2_07_module_paths.rs"
       ],
       "externalCallers": [
-        "crates/persistence-postgres/src/adapters/workbooks/player_catalog/export.rs"
+        "crates/persistence-postgres/src/adapters/workbooks/monthly_player/read.rs"
       ],
       "databaseMappings": [
-        "crates/persistence-postgres/src/adapters/workbooks/player_catalog/export.rs"
+        "crates/persistence-postgres/src/adapters/workbooks/monthly_player/read.rs"
       ]
     },
     {
@@ -28656,10 +28660,10 @@
         "crates/domain/tests/serde_contracts/r2_07_module_paths.rs"
       ],
       "externalCallers": [
-        "crates/persistence-postgres/src/monthly_workbooks.rs"
+        "crates/persistence-postgres/src/adapters/workbooks/monthly_team/read.rs"
       ],
       "databaseMappings": [
-        "crates/persistence-postgres/src/monthly_workbooks.rs"
+        "crates/persistence-postgres/src/adapters/workbooks/monthly_team/read.rs"
       ]
     },
     {
@@ -30320,10 +30324,10 @@
         "crates/domain/tests/serde_contracts/r2_07_module_paths.rs"
       ],
       "externalCallers": [
-        "crates/persistence-postgres/src/monthly_workbooks.rs"
+        "crates/persistence-postgres/src/adapters/workbooks/monthly_team/read.rs"
       ],
       "databaseMappings": [
-        "crates/persistence-postgres/src/monthly_workbooks.rs"
+        "crates/persistence-postgres/src/adapters/workbooks/monthly_team/read.rs"
       ]
     },
     {
@@ -30386,10 +30390,10 @@
         "crates/domain/tests/serde_contracts/r2_07_module_paths.rs"
       ],
       "externalCallers": [
-        "crates/persistence-postgres/src/monthly_workbooks.rs"
+        "crates/persistence-postgres/src/adapters/workbooks/monthly_team/read.rs"
       ],
       "databaseMappings": [
-        "crates/persistence-postgres/src/monthly_workbooks.rs"
+        "crates/persistence-postgres/src/adapters/workbooks/monthly_team/read.rs"
       ]
     },
     {
@@ -30508,10 +30512,10 @@
         "crates/domain/tests/serde_contracts/r2_07_module_paths.rs"
       ],
       "externalCallers": [
-        "crates/persistence-postgres/src/monthly_workbooks.rs"
+        "crates/persistence-postgres/src/adapters/workbooks/monthly_team/read.rs"
       ],
       "databaseMappings": [
-        "crates/persistence-postgres/src/monthly_workbooks.rs"
+        "crates/persistence-postgres/src/adapters/workbooks/monthly_team/read.rs"
       ]
     },
     {
@@ -30582,10 +30586,10 @@
         "crates/domain/tests/serde_contracts/r2_07_module_paths.rs"
       ],
       "externalCallers": [
-        "crates/persistence-postgres/src/monthly_workbooks.rs"
+        "crates/persistence-postgres/src/adapters/workbooks/monthly_team/read.rs"
       ],
       "databaseMappings": [
-        "crates/persistence-postgres/src/monthly_workbooks.rs"
+        "crates/persistence-postgres/src/adapters/workbooks/monthly_team/read.rs"
       ]
     },
     {
@@ -30680,10 +30684,10 @@
         "crates/domain/tests/serde_contracts/r2_07_module_paths.rs"
       ],
       "externalCallers": [
-        "crates/persistence-postgres/src/monthly_workbooks.rs"
+        "crates/persistence-postgres/src/adapters/workbooks/monthly_team/read.rs"
       ],
       "databaseMappings": [
-        "crates/persistence-postgres/src/monthly_workbooks.rs"
+        "crates/persistence-postgres/src/adapters/workbooks/monthly_team/read.rs"
       ]
     },
     {
@@ -30760,11 +30764,11 @@
       "externalCallers": [
         "crates/application/src/composition/adapters/exchange/spreadsheet.rs",
         "crates/application/src/ports/exchange/mod.rs",
-        "crates/persistence-postgres/src/monthly_workbooks.rs",
+        "crates/persistence-postgres/src/adapters/workbooks/monthly_team/read.rs",
         "crates/spreadsheet-io/src/monthly_workbook.rs"
       ],
       "databaseMappings": [
-        "crates/persistence-postgres/src/monthly_workbooks.rs"
+        "crates/persistence-postgres/src/adapters/workbooks/monthly_team/read.rs"
       ]
     },
     {
@@ -32156,10 +32160,10 @@
         "crates/domain/tests/serde_contracts/r2_07_module_paths.rs"
       ],
       "externalCallers": [
-        "crates/persistence-postgres/src/monthly_workbooks.rs"
+        "crates/persistence-postgres/src/adapters/workbooks/monthly_team/read.rs"
       ],
       "databaseMappings": [
-        "crates/persistence-postgres/src/monthly_workbooks.rs"
+        "crates/persistence-postgres/src/adapters/workbooks/monthly_team/read.rs"
       ]
     },
     {
