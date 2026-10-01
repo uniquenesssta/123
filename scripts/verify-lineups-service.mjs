@@ -26,7 +26,7 @@ const pair = read(`${pairBase}/mod.rs`);
 const lineupWrite = read(`${pairBase}/write.rs`);
 const lineupValidation = read(`${pairBase}/validation.rs`);
 const oldCatalog = read("crates/persistence-postgres/src/player_catalog.rs");
-const workbook = read("crates/persistence-postgres/src/match_exchange.rs");
+const workbook = ["preview","conflict","commit","context","read","write","identity","validation","values","mod"].map((name) => read(`crates/persistence-postgres/src/adapters/workbooks/match_lineup/${name}.rs`)).join("\n");
 const persistenceFiles = rustFiles("crates/persistence-postgres/src");
 for (const method of ["create_lineup", "create_lineup_pair"]) {
   const declarations = persistenceFiles.filter((file) => new RegExp(`pub\\s+async\\s+fn\\s+${method}\\s*\\(`).test(read(file)));

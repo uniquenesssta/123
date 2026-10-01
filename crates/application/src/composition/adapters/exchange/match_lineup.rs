@@ -15,7 +15,7 @@ impl MatchLineupExchangePort for PersistenceStore {
         &self,
         match_id: Option<Uuid>,
     ) -> PortResult<MatchLineupExportData> {
-        self.match_lineup_export_data(match_id)
+        PersistenceStore::match_lineup_export_data(self, match_id)
             .await
             .map_err(map_persistence_error)
     }
@@ -25,13 +25,13 @@ impl MatchLineupExchangePort for PersistenceStore {
         workbook: &SpreadsheetParsedWorkbook,
         mode: SpreadsheetImportMode,
     ) -> PortResult<SpreadsheetImportPreview> {
-        self.preview_match_lineup_import(workbook, mode)
+        PersistenceStore::preview_match_lineup_import(self, workbook, mode)
             .await
             .map_err(map_persistence_error)
     }
 
     async fn read_import_preview(&self, preview_id: Uuid) -> PortResult<SpreadsheetImportPreview> {
-        self.read_match_lineup_import_preview(preview_id)
+        PersistenceStore::read_match_lineup_import_preview(self, preview_id)
             .await
             .map_err(map_persistence_error)
     }
@@ -41,19 +41,19 @@ impl MatchLineupExchangePort for PersistenceStore {
         preview_id: Uuid,
         resolution: SpreadsheetImportResolution,
     ) -> PortResult<SpreadsheetImportPreview> {
-        self.resolve_match_lineup_import_conflict(preview_id, resolution)
+        PersistenceStore::resolve_match_lineup_import_conflict(self, preview_id, resolution)
             .await
             .map_err(map_persistence_error)
     }
 
     async fn commit_import(&self, preview_id: Uuid) -> PortResult<SpreadsheetImportCommitResult> {
-        self.commit_match_lineup_import(preview_id)
+        PersistenceStore::commit_match_lineup_import(self, preview_id)
             .await
             .map_err(map_persistence_error)
     }
 
     async fn ai_match_package_context(&self, match_id: Uuid) -> PortResult<AiMatchPackageContext> {
-        self.ai_match_package_context(match_id)
+        PersistenceStore::ai_match_package_context(self, match_id)
             .await
             .map_err(map_persistence_error)
     }

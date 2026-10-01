@@ -89,7 +89,7 @@ requireTokens("crates/persistence-postgres/src/adapters/lineups/presets/write.rs
   "metadata_with_role_resolution",
 ], "阵容预设保存");
 requireTokens("crates/persistence-postgres/src/adapters/lineups/presets/read.rs", ["player_position_default", "role_source_position_code", "position.valid_from <= current_date"], "阵容预设读取");
-requireTokens("crates/persistence-postgres/src/match_exchange.rs", [
+requireTokens("crates/persistence-postgres/src/adapters/workbooks/match_lineup/context.rs", [
   "role_code: lineup_player.role_code.clone()",
   "role_origin: Some(lineup_player.role_origin.clone())",
   "role_source_position_code: lineup_player",

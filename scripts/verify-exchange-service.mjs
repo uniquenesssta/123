@@ -1,3 +1,4 @@
+import crypto from "node:crypto";
 import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
@@ -227,7 +228,7 @@ const ledgerMapping = read(`${ledgerRoot}/mapping.rs`);
 const ledgerRead = read(`${ledgerRoot}/read.rs`);
 const playerWorkbook = ["preview", "conflict", "commit", "export", "identity", "validation", "values"]
   .map((name) => read(name === "export" ? "crates/persistence-postgres/src/adapters/workbooks/monthly_player/read.rs" : `crates/persistence-postgres/src/adapters/workbooks/player_catalog/${name}.rs`)).join("\n");
-const matchWorkbook = read("crates/persistence-postgres/src/match_exchange.rs");
+const matchWorkbook = ["preview","conflict","commit","context","read","write","identity","validation","values","mod"].map((name) => read(`crates/persistence-postgres/src/adapters/workbooks/match_lineup/${name}.rs`)).join("\n");
 const integration = read("crates/persistence-postgres/tests/postgres_integration.rs");
 const persistencePaths = [];
 const collectPersistence = (directory) => { for (const entry of fs.readdirSync(directory,{withFileTypes:true})) { const full=path.join(directory,entry.name); if(entry.isDirectory()) collectPersistence(full); else if(entry.name.endsWith(".rs")) persistencePaths.push(path.relative(root,full).replaceAll("\\","/")); } };
@@ -301,6 +302,132 @@ for (const [source,banned] of [[playerValues,["super::identity","super::validati
 for (const token of ["同名","external_id_never_rebinds_existing_or_deferred_identity","external_id_same_target_and_new_target_keep_update_and_skip_semantics","child_deferred_reference_keeps_team_key_name_and_other_fields","canonical_action_preserves_child_add_and_explicit_operations"]) check(playerIdentity.includes(token),`球员身份/子记录内联边界回归缺少：${token}`);
 for (const token of ["球员预览读回保持行 UUID、工作表、物理行与载荷","球员预览及重复读回不得写入球员、效力期或自动创建球队","球员只读预览不得产生提交审计"]) check(integration.includes(token),`现有球员数据库用例缺少：${token}`);
 check(integration.includes("team_package_player_team_period_subrecords_are_distinct") && read("crates/persistence-postgres/tests/entity_matching_references_repository_contract.rs").includes("external_id_identity_and_import_atomicity_are_preserved"),"球员多子记录与外部 ID 整批回滚既有回归必须保留");
+// R7-14：唯一比赛/阵容工作簿职责，原事务与只读边界。
+const matchRoot = "crates/persistence-postgres/src/adapters/workbooks/match_lineup";
+const matchSources = Object.fromEntries(["preview","conflict","commit","context","read","write","identity","validation","values","mod"].map((name) => [name,read(`${matchRoot}/${name}.rs`)]));
+check(!fs.existsSync(path.join(root,"crates/persistence-postgres/src/match_exchange.rs")) && !read("crates/persistence-postgres/src/lib.rs").includes("mod match_exchange;"),"旧比赛工作簿 owner 与注册必须删除");
+check(read("crates/persistence-postgres/src/adapters/workbooks/mod.rs").includes("mod match_lineup;"),"比赛工作簿职责未注册");
+const matchOwners = {
+  "preview": [
+    "preview_match_lineup_import"
+  ],
+  "conflict": [
+    "resolve_match_lineup_import_conflict"
+  ],
+  "commit": [
+    "commit_match_lineup_import"
+  ],
+  "context": [
+    "ai_match_package_context"
+  ],
+  "read": [
+    "match_lineup_export_data",
+    "hydrated_active_lineups",
+    "match_player_references"
+  ],
+  "write": [
+    "apply_match_exchange_row"
+  ],
+  "identity": [
+    "resolve_competition",
+    "resolve_team_value",
+    "resolve_player_value",
+    "resolution_validation",
+    "resolve_match_reference",
+    "find_match",
+    "decision",
+    "ready",
+    "skip",
+    "error",
+    "validate_lineup_match_team",
+    "resolve_lineup_formation",
+    "candidate_by_id",
+    "candidate_by_match_id",
+    "candidate_teams",
+    "candidate_players",
+    "candidate_row"
+  ],
+  "validation": [
+    "validate_match_exchange_row",
+    "validate_lineup_type",
+    "validate_lineup_player",
+    "validate_dynamic_tag"
+  ],
+  "values": [
+    "resolve_import_match",
+    "required",
+    "text",
+    "optional_text",
+    "default_text",
+    "optional_uuid",
+    "payload_optional_uuid",
+    "payload_uuid",
+    "optional_date",
+    "required_datetime",
+    "optional_f64",
+    "required_f64",
+    "optional_i16",
+    "optional_i32",
+    "optional_bool",
+    "required_bool",
+    "parse_source_urls",
+    "normalize",
+    "availability_from_str"
+  ]
+};
+for (const [owner,names] of Object.entries(matchOwners)) {
+  check(matchSources.mod.includes(`mod ${owner};`),`比赛工作簿模块未注册：${owner}`);
+  for (const name of names) {
+    const globalNames = ["match_lineup_export_data","ai_match_package_context","preview_match_lineup_import","resolve_match_lineup_import_conflict","commit_match_lineup_import","validate_match_exchange_row","hydrated_active_lineups","match_player_references","apply_match_exchange_row"];
+    const owners = persistencePaths.filter((file) => (globalNames.includes(name) || file.startsWith(`${matchRoot}/`)) && new RegExp(`fn\\s+${name}\\s*\\(`).test(read(file)));
+    check(owners.length === 1 && owners[0] === `${matchRoot}/${owner}.rs`,`${name} 必须只有一个比赛工作簿 owner`);
+  }
+}
+for (const [name,args] of [["match_lineup_export_data","match_id"],["preview_match_lineup_import","workbook, mode"],["read_match_lineup_import_preview","preview_id"],["resolve_match_lineup_import_conflict","preview_id, resolution"],["commit_match_lineup_import","preview_id"],["ai_match_package_context","match_id"]]) {
+  check(read(`${adapterRoot}/match_lineup.rs`).includes(`PersistenceStore::${name}(self, ${args})`),`比赛 Port 缺少显式分派：${name}`);
+}
+for (const name of ["read","context","identity","validation"]) {
+  check(!/\b(?:INSERT|UPDATE|DELETE|CREATE|ALTER)\b/.test(matchSources[name]) && !/\.execute\(|\.begin\(|\.commit\(|FOR UPDATE/.test(matchSources[name]),`${name} 读取/预检职责不得写事实或取得写锁`);
+}
+for (const name of ["read","context"]) {
+  check(!/ledger|write_audit|refresh_lineup_validation|enqueue/.test(matchSources[name]),`${name} 导出/上下文不得修改账本、审计或模型门禁`);
+}
+check(!matchSources.preview.includes("apply_match_exchange_row") && matchSources.preview.includes("ledger::create_match_batch_in_tx") && matchSources.preview.includes("ledger_rows::insert_import_row") && matchSources.preview.indexOf("validate_match_exchange_row")<matchSources.preview.indexOf("self.pool.begin()"),"比赛预检必须先校验、只写原批次/行暂存");
+for (const token of ['status != "conflict"','row_status != "conflict"',"item.entity_id == selected","object.remove(\"_conflict_prefix\")","ledger_rows::skip_import_row_in_tx","ledger_rows::resolve_import_row_in_tx"]) check(matchSources.conflict.includes(token),`比赛冲突两阶段父锁与候选保护缺少：${token}`);
+check((matchSources.conflict.match(/ledger::lock_batch_in_tx/g)??[]).length===2 && (matchSources.conflict.match(/ledger_rows::lock_import_row_in_tx/g)??[]).length===2,"比赛冲突校验前后必须重新取得父/行锁并检查 pending/conflict");
+check(matchSources.commit.indexOf("ledger_rows::mark_imported_in_tx") < matchSources.commit.indexOf("refresh_lineup_validation_in_tx") && matchSources.commit.indexOf("refresh_lineup_validation_in_tx") < matchSources.commit.indexOf("ledger::finish_batch_in_tx") && matchSources.commit.includes("affected_lineups.dedup()") && matchSources.commit.includes("ended_previous += outcome.ended_previous"),"比赛提交必须同事务去重刷新模型门禁并传递结束旧版本计数");
+check(!/\.begin\(|\.commit\(|self\.pool|catalog\.import_batches|catalog\.import_rows|write_audit_event/.test(matchSources.write) && matchSources.write.includes("execute(&mut **tx)"),"比赛事实写入必须仅复用调用方事务");
+const matchVersionWrite = matchSources.write.slice(matchSources.write.indexOf("SpreadsheetEntityType::Lineup => {"),matchSources.write.indexOf("SpreadsheetEntityType::LineupPlayer => {"));
+check(matchVersionWrite.includes("pair_transaction::lock_match_in_tx(tx, match_id)") && matchVersionWrite.indexOf("lock_match_in_tx")<matchVersionWrite.indexOf("let supersedes_lineup_id"),"工作簿结束旧阵容与写新版本前必须取得原共同比赛父锁");
+for (const token of ["lineup_match_id != requested_match_id || lineup_team_id != requested_team_id","lineup_captured_at.date_naive()","resolve_default_tactical_role_in_tx","metadata_with_role_resolution","ended_previous: superseded","lineup_keys.insert"]) check(matchSources.write.includes(token),`比赛工作簿写入关联/角色/历史规则缺少：${token}`);
+check(matchSources.read.includes('filter(|item| item.status == "active")') && matchSources.read.includes("self.list_lineups(Some(match_id), 200)") && matchSources.read.includes("item.kickoff_time") && matchSources.read.includes("self.player_catalog_reference_data()"),"导出保留活动历史读取上限、开球参考时间与共享目录");
+for (const token of ["data_cutoff_time: Some(Utc::now())","as_of: match_record.kickoff_time","tactical_role_origin","lineup_role: lineup_player.role_code.clone()","self.hydrated_active_lineups(match_id)","item.player.id == lineup_player.player_id"]) check(matchSources.context.includes(token),`AI 比赛上下文 cutoff/角色/去重语义缺少：${token}`);
+for (const token of ['"expected" | "confirmed" | "actual"',"0..=99","0..=150","0.0..=1.0","1..=99","to <= from","value < min || value > max"]) check(matchSources.validation.includes(token),`比赛字段边界缺少：${token}`);
+for (const [name,banned] of [["values",["super::identity","super::validation","super::write","super::commit"]],["identity",["super::validation","super::write","super::commit"]],["validation",["super::write","super::commit"]]]) for (const token of banned) check(!matchSources[name].includes(token),`比赛职责反向依赖：${token}`);
+const matchSql = {
+  "read": {
+    "queries": 1,
+    "sha256": "122c01ff4fd70fdadef318e26d08cdd73e1775fb0e7ae2c6f8c5008ba73b899a"
+  },
+  "write": {
+    "queries": 8,
+    "sha256": "59f7acae87278410f6b8ab34277817eff0c3e3a85e8eb4b47af941c2c93ff745"
+  },
+  "identity": {
+    "queries": 11,
+    "sha256": "b28ca9c7704206ea4177e93f9fec8445ad3c994f69c49e77b82cdaef7b8eed24"
+  },
+  "validation": {
+    "queries": 2,
+    "sha256": "1f4f81fe9c1498f2a8f92c095670024f9f6eee391b8c519ff24f957f3f00af5b"
+  }
+};
+for (const [name,contract] of Object.entries(matchSql)) {
+  const queries = [...matchSources[name].matchAll(/sqlx::query(?:_scalar|_as)?(?:\s*::<[^\n]*?>)?\(\s*(?:r#"([\s\S]*?)"#|"((?:\\.|[^"\\])*)")\s*,?\s*\)/g)].map((match) => (match[1]??match[2]).replace(/\s+/g," ").trim());
+  check(queries.length===contract.queries && crypto.createHash("sha256").update(queries.join("\n")).digest("hex")===contract.sha256,`${name} 原比赛工作簿 SQL、关联、历史/时间或字段已漂移`);
+}
+for (const token of ["比赛工作簿重复导出保持引用、活动版本和字段投影", "比赛导出和 AI 上下文不得修改事实、账本或审计", "比赛预检读回保持行身份、载荷和计数", "工作簿主客身份不符必须预检阻断", "非法单侧工作簿不得启动事实写入"]) check(integration.includes(token),`原比赛工作簿数据库夹具缺少：${token}`);
+
 if (failures.length) {
   console.error("Exchange Service 验证失败：\n- " + failures.join("\n- "));
   process.exit(1);

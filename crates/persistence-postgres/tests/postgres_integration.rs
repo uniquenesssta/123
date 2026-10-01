@@ -3079,6 +3079,114 @@ async fn match_scope_inference_and_lineup_pair_transaction_are_atomic() {
         source_sha256: format!("ledger-{token}"),
         rows,
     };
+    // R7-14：沿用同一双方/工作簿夹具验证读取与预检的事实边界。
+    let workbook_read_snapshot_sql = r#"
+        SELECT jsonb_build_object(
+            'match', (SELECT to_jsonb(fixture) FROM football.matches fixture WHERE id=$1),
+            'lineups', (SELECT COALESCE(jsonb_agg(to_jsonb(lineup) ORDER BY lineup.id),'[]'::jsonb)
+                        FROM football.lineups lineup WHERE match_id=$1),
+            'players', (SELECT COALESCE(jsonb_agg(to_jsonb(member) ORDER BY member.lineup_id,member.player_id),'[]'::jsonb)
+                        FROM football.lineup_players member JOIN football.lineups lineup ON lineup.id=member.lineup_id WHERE lineup.match_id=$1),
+            'tags', (SELECT count(*) FROM feature.player_dynamic_tags),
+            'batches', (SELECT count(*) FROM catalog.import_batches),
+            'rows', (SELECT count(*) FROM catalog.import_rows),
+            'audits', (SELECT count(*) FROM audit.events)
+        )
+    "#;
+    let workbook_read_before: serde_json::Value = sqlx::query_scalar(workbook_read_snapshot_sql)
+        .bind(target.id)
+        .fetch_one(&database.pool)
+        .await
+        .unwrap();
+    let export = database
+        .store
+        .match_lineup_export_data(Some(target.id))
+        .await
+        .unwrap();
+    let exported_again = database
+        .store
+        .match_lineup_export_data(Some(target.id))
+        .await
+        .unwrap();
+    assert_eq!(
+        serde_json::to_value(&export).unwrap(),
+        serde_json::to_value(&exported_again).unwrap(),
+        "比赛工作簿重复导出保持引用、活动版本和字段投影"
+    );
+    assert_eq!(export.selected_match.as_ref().unwrap().id, target.id);
+    assert!(export
+        .lineups
+        .iter()
+        .all(|lineup| lineup.match_id == target.id && lineup.status == "active"));
+    assert!(export
+        .lineups
+        .iter()
+        .any(|lineup| lineup.team_id == home.id));
+    assert!(export
+        .lineups
+        .iter()
+        .any(|lineup| lineup.team_id == away.id));
+    assert!(export
+        .players
+        .iter()
+        .any(|player| player.player_id == valid_pair.home.players[0].player_id));
+    let context = database
+        .store
+        .ai_match_package_context(target.id)
+        .await
+        .unwrap();
+    assert_eq!(context.match_record.id, target.id);
+    assert_eq!(
+        context
+            .lineups
+            .iter()
+            .map(|lineup| lineup.id)
+            .collect::<Vec<_>>(),
+        export
+            .lineups
+            .iter()
+            .map(|lineup| lineup.id)
+            .collect::<Vec<_>>()
+    );
+    let unique_context_players: std::collections::HashSet<_> = context
+        .players
+        .iter()
+        .map(|player| player.player.id)
+        .collect();
+    assert_eq!(
+        unique_context_players.len(),
+        context.players.len(),
+        "AI 比赛包跨活动版本只保留一份球员上下文"
+    );
+    for player in &context.players {
+        assert!(matches!(player.lineup_status.as_str(), "starter" | "bench"));
+        assert_eq!(
+            player.lineup_role, player.tactical_role_code,
+            "AI 旧角色字段保留纠正后的战术角色语义"
+        );
+    }
+    let empty_export = database.store.match_lineup_export_data(None).await.unwrap();
+    assert!(
+        empty_export.selected_match.is_none()
+            && empty_export.lineups.is_empty()
+            && empty_export.players.is_empty()
+            && empty_export.dynamic_tags.is_empty()
+    );
+    assert!(!empty_export.teams.is_empty() && !empty_export.formations.is_empty());
+    database
+        .store
+        .match_lineup_export_data(Some(Uuid::new_v4()))
+        .await
+        .expect_err("未知比赛导出保留 Match Catalog 错误");
+    let workbook_read_after: serde_json::Value = sqlx::query_scalar(workbook_read_snapshot_sql)
+        .bind(target.id)
+        .fetch_one(&database.pool)
+        .await
+        .unwrap();
+    assert_eq!(
+        workbook_read_before, workbook_read_after,
+        "比赛导出和 AI 上下文不得修改事实、账本或审计"
+    );
     let preview = database
         .store
         .preview_match_lineup_import(&workbook, SpreadsheetImportMode::AddAndUpdate)
@@ -3087,6 +3195,79 @@ async fn match_scope_inference_and_lineup_pair_transaction_are_atomic() {
     assert_eq!(preview.counts.error, 0);
     assert_eq!(preview.counts.conflict, 0);
     assert_eq!(preview.rows.len(), 12);
+    let preview_read = database
+        .store
+        .read_match_lineup_import_preview(preview.batch_id)
+        .await
+        .unwrap();
+    let preview_read_again = database
+        .store
+        .read_match_lineup_import_preview(preview.batch_id)
+        .await
+        .unwrap();
+    assert_eq!(
+        serde_json::to_value(&preview_read).unwrap(),
+        serde_json::to_value(&preview_read_again).unwrap(),
+        "比赛预检读回保持行身份、载荷和计数"
+    );
+    for original_row in &preview.rows {
+        let stored_row = preview_read
+            .rows
+            .iter()
+            .find(|row| row.id == original_row.id)
+            .unwrap();
+        assert_eq!(
+            serde_json::to_value(original_row).unwrap(),
+            serde_json::to_value(stored_row).unwrap()
+        );
+    }
+    let preview_snapshot: serde_json::Value = sqlx::query_scalar(workbook_read_snapshot_sql)
+        .bind(target.id)
+        .fetch_one(&database.pool)
+        .await
+        .unwrap();
+    for field in ["match", "lineups", "players", "tags", "audits"] {
+        assert_eq!(
+            workbook_read_before[field], preview_snapshot[field],
+            "比赛预检只暂存批次和行，不写事实或成功审计：{field}"
+        );
+    }
+    assert_eq!(
+        preview_snapshot["batches"].as_i64().unwrap(),
+        workbook_read_before["batches"].as_i64().unwrap() + 1
+    );
+    assert_eq!(
+        preview_snapshot["rows"].as_i64().unwrap(),
+        workbook_read_before["rows"].as_i64().unwrap() + 12
+    );
+    let mut wrong_side_workbook = workbook.clone();
+    wrong_side_workbook.source_sha256 = format!("wrong-side-{token}");
+    wrong_side_workbook.rows[0].values["team_side"] = json!("away");
+    let wrong_side_preview = database
+        .store
+        .preview_match_lineup_import(&wrong_side_workbook, SpreadsheetImportMode::AddAndUpdate)
+        .await
+        .unwrap();
+    assert_eq!(
+        wrong_side_preview.counts.error, 1,
+        "工作簿主客身份不符必须预检阻断"
+    );
+    database
+        .store
+        .commit_match_lineup_import(wrong_side_preview.batch_id)
+        .await
+        .expect_err("非法单侧工作簿不得启动事实写入");
+    let rejected_snapshot: serde_json::Value = sqlx::query_scalar(workbook_read_snapshot_sql)
+        .bind(target.id)
+        .fetch_one(&database.pool)
+        .await
+        .unwrap();
+    for field in ["match", "lineups", "players", "tags", "audits"] {
+        assert_eq!(
+            preview_snapshot[field], rejected_snapshot[field],
+            "工作簿阻断后事实与审计不变：{field}"
+        );
+    }
     let last_player_row = preview
         .rows
         .iter()

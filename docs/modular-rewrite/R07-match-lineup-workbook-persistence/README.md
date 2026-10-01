@@ -4,7 +4,7 @@
 
 `IN_PROGRESS`
 
-当前进度以本段及任务索引为准：R7-01～12 `DONE`；12 精确提交 `fe2f7ebcbf50e4bb40016d649a95b2c295aeab55` 的 Windows run `36831302483` / job `110268300510` 全通过，Persistence 132 项/Application 55 项，详见 [12 完成记录](R07-12-team-package.md)。R7-13 已按用户指令启动，月度只读聚合/缺口、原调用/门禁及 PG 回归已实现，当前 `VERIFYING`；R7-14～15 `BLOCKED`。后文旧节点的“当前/待验/下一项”叙述属于当时实施记录，不覆盖此处和任务表。
+当前进度以本段及任务索引为准：R7-01～13 `DONE`；13 精确 `78138dba30ead1dbc4f4e5d2c6595e5775edfa0c` / Windows run `36854202029` / job `110342691574` 全通过，Persistence 132 项/Application 55 项，见 [13 完成记录](R07-13-monthly-workbook.md)。用户已启动 R7-14，比赛阵容工作簿唯一职责、原调用/门禁及 PG 回归已实现，当前 `VERIFYING`；R7-15 `BLOCKED`。后文旧节点的“当前/待验/下一项”属于当时实施记录，不覆盖本段及任务表。
 
 R7 先完成 R1–R6 累计审计整改，再重写 Matches、Lineups、Presets 与 Workbook 持久化，重点保证双方阵容原子事务、截止时间、历史链路、批次账本、真实 XLSX 行/子记录 identity 与整批回滚；不实施工作簿解析算法本体或前端导入 UI。
 
@@ -51,8 +51,8 @@ crates/persistence-postgres/src/adapters/workbooks/
 | R7-10 | Spreadsheet Batch Ledger | DONE |
 | R7-11 | Player Workbook | DONE |
 | R7-12 | Team Package | DONE |
-| R7-13 | Monthly Workbook | VERIFYING |
-| R7-14 | Match Lineup Workbook | BLOCKED |
+| R7-13 | Monthly Workbook | DONE |
+| R7-14 | Match Lineup Workbook | VERIFYING |
 | R7-15 | Row / Subrecord Identity | BLOCKED |
 
 ## R7-02 当前验证状态
@@ -252,7 +252,7 @@ Windows 编译/Clippy/tests、浏览器/截图/前端生产构建、安装包/�
 
 ## R7-13 当前验证状态
 
-进入/回退基线：`fe2f7ebcbf50e4bb40016d649a95b2c295aeab55`。12 DONE；13 月度只读唯一职责及现有回归已实现，当前 `VERIFYING`，14～15 BLOCKED；必须取得自己的精确 Windows CI。
+进入/回退基线：`fe2f7ebcbf50e4bb40016d649a95b2c295aeab55`。13 月度只读唯一职责及现有回归已通过精确 Windows run `36854202029` / job `110342691574`，当前 `DONE`；132/55 实际 PASS，17 视口、构建/打包/启动通过，详见 [完成记录](R07-13-monthly-workbook.md)。14 已启动、15 BLOCKED。
 
 - 实际来源是 monthly_workbooks.rs 的球队聚合/两类缺口/共享 mapper，以及 11 已迁入 player_catalog/export.rs 的球员共享导出；根 player_catalog.rs 仅提供引用目录，并非月度导出 owner，本项不迁移该目录或它的三个原测试。唯一职责迁入 workbooks/monthly_team/{mod,read,gaps}、monthly_player/{mod,read,gaps} 与 monthly_gaps.rs；原根月度文件/注册、旧球员 export 文件/注册全部删除。五个原函数体、四个公开签名及 18 条 SQL/全部原字段映射规范化保持，无重复实现/转发壳。
 - 球队聚合完整保留 teams/names/coaches/coach_periods/formation_usage/tactical_observations/ability_observations/data_gaps；空 profile 的 club/0.5/空 observed_at、不筛除历史/未来任期与观察、原名称/ID/时点排序和元数据 source_urls/verified_at 保持。球员聚合保留 teams/players/names/positions/team_periods/abilities/availability/dynamic_tags/external_ids、默认战术角色、provider/实体过滤、历史排序与多球队记录。
@@ -261,7 +261,19 @@ Windows 编译/Clippy/tests、浏览器/截图/前端生产构建、安装包/�
 - 原七个导入/资料包/管理/Exchange 门禁保留覆盖并更新 已迁移导出 路径（实际读取新 owner）；原月度 verifier 增唯一 owner、旧实现/注册删除、显式 Port、只读/无写锁/无投影或账本/审计、共享 gap mapping 和 SQL 集合/默认/历史排序/日期边界检查，所有旧断言保留。六项破坏探针（空资料默认、观察期限、效力期包含边界、历史顺序、缺口列映射、SQL 写入）拒绝并恢复。
 - 83 项原 Node 源码/契约门禁、架构聚合、Rustfmt 源码解析/格式通过。直接注册模块从 37 精确变为 36，仅删除旧根 monthly_workbooks；Domain 365 声明/300 映射分类、声明摘要不变，usage 摘要/原 PG 指纹更新。正常 API/DTO、模型算法/参数/保护资产、生产依赖/锁文件、46 迁移及原工作流冻结。
 
-本项纯读取迁移，没有新增镜像 inline 单测；Windows 原 Persistence 132/Application 55 项仍须本项精确 CI 执行，不继承 12 PASS。Windows 编译/Clippy/tests、前端类型/浏览器/截图/build、安装包与启动待验；本地不执行 Linux/macOS 动态验收或 PG。成功后创建 R07-13-monthly-workbook.md，受控回退同步所有新 owner、原调用/门禁/清单与 PG 指纹，不恢复双实现或单独放宽门禁。
+本项纯读取迁移，没有新增镜像 inline 单测；Windows Persistence 132/Application 55、编译/Clippy/tests、前端类型/浏览器/17 视口/build、安装包与启动已由本项精确 CI 通过。18 broad/其他 PG contracts 仍 ignored，真实数据库/XLSX/Full 最终封包新库待验。13 完成记录已创建；受控回退同步所有 owner、调用/门禁/清单与 PG 指纹。
+
+## R7-14 当前验证状态
+
+进入/回退基线：`78138dba30ead1dbc4f4e5d2c6595e5775edfa0c`。13 DONE；14 当前 `VERIFYING`，15 BLOCKED；须取得本项自己的精确 Windows CI。
+
+- 48 个原函数从 match_exchange.rs 迁入唯一 workbooks/match_lineup/{read,context,preview,conflict,commit,write,identity,validation,values}；mod 仅注册职责和保存两种原内部结果。旧根文件/注册删除，无转发壳；全部原函数体、五个公开签名、22 条直接 SQL 及动态候选查询保持。MatchLineupExchangePort 六入口显式分派，原批次读取和所有账本/codec 继续复用 R7-10。
+- 预检先按原规则校验，仅暂存批次/行；冲突裁决保留校验前后两次父/行锁、pending/conflict 重查、候选边界及原跳过/解决计数共同事务。提交保留唯一事务：批次父锁、pending/阻断、按原依赖顺序写事实和行、去重刷新阵容门禁、同一个 result 写计数/成功审计后提交；保留 ended_previous、末行失败整批回滚、成功批次重复提交拒绝。
+- 阵容版本写入继续复用 pair_transaction 原比赛锁，先锁再读/结束旧版本并写新版本；LineupPlayer 与比赛/球队关联、捕获日角色继承、metadata/source_urls/分钟/概率/动态标签边界不变。原成对创建事务仍要求合法双方；工作簿保持允许替换已有客队比赛的主队版本。不得把合法单侧替换改为错误；错误主客身份仍阻断。导出与 AI 包保留活动版本历史、原 200/5000 上限、开球参考时间、球员去重、角色字段及原 cutoff。模型链的赛前截止/actual 隔离继续由 R7-08 唯一 owner 执行，导出/AI 上下文不被改为模型选用入口。
+- 原 PG pair/workbook 夹具扩重复导出字段一致、AI 球员去重/角色兼容、空/未知比赛、读取无事实/账本/审计写入、预检只暂存及 UUID/载荷/计数读回、错误主客身份预检阻断与无副作用；保留冲突/裁决计数、末行回滚/恢复/一次审计、pair/single/workbook 共同锁竞争和模型历史隔离。18 broad 数量不变，不新增测试目标、runner、workflow 或数据库；PG/历史四项/账本/有效 XLSX/Full 最终封包新库待验。
+- 五个原 verifier 更新实际 owner、全部旧断言保留；Exchange 增唯一职责、显式分派、只读/预检/冲突/提交事务、原 SQL、共同锁/计数/AI cutoff/角色边界检查。六项破坏探针（未解冲突、结束计数、共同父锁、AI cutoff、活动版本、效力期包含边界）拒绝并恢复。83 项原 Node 源码/契约、架构聚合与 Rustfmt 源码检查通过；直接模块 36→35 仅移除旧根注册，Domain 365/300 和声明摘要保持，使用清单与原 PG 指纹刷新。无业务算法/API/DTO、资产、deps/locks、46 迁移或工作流修改。
+
+本项纯职责迁移，不新增镜像 inline 测试；现有 Persistence 132/Application 55 项需本项 Windows CI 执行。编译/Clippy/tests、前端类型/浏览器/截图/build、release/MSI/NSIS 和启动待验；本地不执行 Linux/macOS 动态验收或 PG。成功后创建 R07-14-match-lineup-workbook.md；回退同步职责、调用、门禁/清单和 PG 指纹，不恢复双实现或放宽门禁。
 
 ## R7-01 READY 边界
 

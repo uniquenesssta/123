@@ -296,7 +296,6 @@
         "crates/persistence-postgres/src/health/mod.rs",
         "crates/persistence-postgres/src/jobs.rs",
         "crates/persistence-postgres/src/mapping/mod.rs",
-        "crates/persistence-postgres/src/match_exchange.rs",
         "crates/persistence-postgres/src/match_prediction.rs",
         "crates/persistence-postgres/src/match_review_package.rs",
         "crates/persistence-postgres/src/migrations/mod.rs",
@@ -397,7 +396,7 @@
     "frontend_features": 18,
     "workspace_members": 11,
     "ports": 4,
-    "postgres_adapters": 36,
+    "postgres_adapters": 35,
     "command_groups": 15,
     "commands": 171
   },

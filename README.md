@@ -2,7 +2,7 @@
 
 当前版本 **0.23.0**。本仓库是平台、数据库、数据准备、路由、工作台与外部模型调用入口的公开版本；真实 P4/P7 预测引擎、参数、Profile、固定比赛、私有研究提示词及模型专用固定回归资产不随仓库分发。
 
-R1–R6 累计补审覆盖 43 个任务节点。根据用户决定，R7-01 后新增 R7-02～06 审计整改，原 R7-02～10 顺延为 R7-07～15；优化拆分、验证与记录约束，沿用现有 Windows 验证和最终封包新库流程，不新增持续回归体系。R7-01 的 A1～A7 修订已通过 Windows CI run `36678914535`，节点 DONE；R7-02 外部 ID 身份保护、R7-03 普通删除与历史引用保护均已通过 Windows CI 并为 DONE。R7-04 清单、验证入口和历史记录已通过 Windows CI run `36706905645` 并为 DONE；R7-05 新增 20 个关键 Application 行为测试，精确 Windows CI run `36712015030` 已通过并 DONE；R7-06 的夹具/时间精度与账本修订已通过 Windows CI run `36734194083` 并 DONE；R7-07 阵容创建与共同并发锁已通过 Windows CI run `36757339619` 并 DONE；R7-08 阵容链/历史已通过 Windows CI run `36801488090` 并 DONE；R7-09 阵容预设已通过 Windows CI run `36808609584` 并 DONE；R7-10 两类导入的批次/行账本职责与冲突计数同步已通过 Windows CI run `36815568401` 并 DONE；R7-11 球员工作簿唯一职责已通过 Windows CI run `36824027121` 并 DONE；R7-12 球队资料包共享职责与冲突计数修订已通过 Windows CI run `36831302483` 并 DONE；R7-13 月度只读聚合与缺口唯一职责已实现、当前 VERIFYING，R7-14 及以后 BLOCKED。PG/XLSX/Full 单独留到最终封包新库验收。详见 [R7 任务书](docs/football-model-platform-modular-rewrite-19-docs/07-R7-match-lineup-workbook-persistence.md) 与 [阶段索引/累计审计](docs/modular-rewrite/R07-match-lineup-workbook-persistence/README.md)。
+R1–R6 累计补审覆盖 43 个任务节点。根据用户决定，R7-01 后新增 R7-02～06 审计整改，原 R7-02～10 顺延为 R7-07～15；优化拆分、验证与记录约束，沿用现有 Windows 验证和最终封包新库流程，不新增持续回归体系。R7-01 的 A1～A7 修订已通过 Windows CI run `36678914535`，节点 DONE；R7-02 外部 ID 身份保护、R7-03 普通删除与历史引用保护均已通过 Windows CI 并为 DONE。R7-04 清单、验证入口和历史记录已通过 Windows CI run `36706905645` 并为 DONE；R7-05 新增 20 个关键 Application 行为测试，精确 Windows CI run `36712015030` 已通过并 DONE；R7-06 的夹具/时间精度与账本修订已通过 Windows CI run `36734194083` 并 DONE；R7-07 阵容创建与共同并发锁已通过 Windows CI run `36757339619` 并 DONE；R7-08 阵容链/历史已通过 Windows CI run `36801488090` 并 DONE；R7-09 阵容预设已通过 Windows CI run `36808609584` 并 DONE；R7-10 两类导入的批次/行账本职责与冲突计数同步已通过 Windows CI run `36815568401` 并 DONE；R7-11 球员工作簿唯一职责已通过 Windows CI run `36824027121` 并 DONE；R7-12 球队资料包共享职责与冲突计数修订已通过 Windows CI run `36831302483` 并 DONE；R7-13 月度只读聚合与缺口唯一职责已通过 Windows CI run `36854202029` 并 DONE；R7-14 比赛阵容工作簿职责已实现、当前 VERIFYING，R7-15 BLOCKED。PG/XLSX/Full 单独留到最终封包新库验收。详见 [R7 任务书](docs/football-model-platform-modular-rewrite-19-docs/07-R7-match-lineup-workbook-persistence.md) 与 [阶段索引/累计审计](docs/modular-rewrite/R07-match-lineup-workbook-persistence/README.md)。
 
 ## 公开边界
 
@@ -45,11 +45,17 @@ Node 开发依赖固定安装和读取自源码根目录上一级的 `../node_mo
 
 ## 模块化重写执行记录
 
-### R7-13 Monthly Workbook（2026-10-01，VERIFYING）
+### R7-14 Match Lineup Workbook（2026-10-01，VERIFYING）
+
+- 将 48 个原函数按导出、AI 上下文、预检、冲突、提交、事实写入、身份、校验与载荷迁入唯一 `adapters/workbooks/match_lineup/`；旧根 owner/注册删除，五个公开签名与全部原函数体、SQL/字段映射保持，原 Port 六入口显式分派。
+- 原账本/两阶段冲突裁决、唯一整批事务、共同比赛锁、历史替代与角色继承、阵容门禁/计数/审计、回滚与重复提交拒绝保持。原 pair 要求成对，工作簿合法主队替换继续支持；模型截止与 actual 隔离继续复用原模型链。导出/AI 包保留原活动历史、引用时间、去重、角色和 cutoff。
+- 现有 PG pair/workbook 夹具补只读快照、导出/AI 投影、空/未知比赛、预检只暂存及行身份、错误主客身份阻断；原回滚/裁决/并发回归保留。五个现有 verifier、职责/SQL/事务门禁与清单更新，83 项源码/架构/Rustfmt 通过，六项破坏探针拒绝并恢复；Windows 132/55 项及构建/打包/启动须本项精确 CI，14 VERIFYING，15 BLOCKED。PG/XLSX/Full 最终封包新库待验，无新 target/runner/workflow/数据库或依赖/迁移。
+
+### R7-13 Monthly Workbook（2026-10-01，DONE）
 
 - 剩余球队聚合与两类缺口从 monthly_workbooks.rs 迁入唯一 monthly_team/read、monthly_team/gaps、monthly_player/gaps，球员共享月度导出从 player_catalog/export 迁至 monthly_player/read；共享缺口映射在 monthly_gaps。旧根文件/注册和旧导出位置删除，无转发壳。五个原函数体、四个公开签名和 18 条查询/映射保持；默认值、连接、排序、历史/未来记录、当前关系包含边界及 90/120 天缺口判定不变，导入继续复用 11/12。
-- 两类原 Port 导出/缺口调用显式分派；原 PG 月度夹具增加空资料默认/空时间、clear 值、元数据、名称/任期/阵型/能力聚合、只读快照、当前关系日期/90 天观察/未来资料非负天数、上月/下月及同一球员多球队履历断言。不新增镜像单测或测试目标；现有 inline 数量仍 132/55，本项 Windows CI 待验，真实 PG/XLSX/Full 最终封包新库待验。
-- 原月度/Exchange/资料包/管理门禁路径切到实际 owner；月度门禁增加唯一职责/旧 owner 删除/显式分派/无写入或写锁/共享缺口映射/原 SQL 集合与编排检查。83 项现有源码/契约、架构及 Rustfmt 通过，六项破坏探针拒绝并恢复。直接模块 36，Domain 365/300 及声明摘要保持，使用清单/原 PG 指纹刷新；工作流/依赖/锁文件/迁移/模型保护区冻结。14～15 BLOCKED。
+- 两类原 Port 导出/缺口调用显式分派；原 PG 月度夹具增加空资料默认/空时间、clear 值、元数据、名称/任期/阵型/能力聚合、只读快照、当前关系日期/90 天观察/未来资料非负天数、上月/下月及同一球员多球队履历断言。不新增镜像单测或测试目标；现有 inline 数量仍 132/55，本项精确 `78138db` / [Windows run 36854202029](https://github.com/uniquenesssta/123/actions/runs/36854202029) 已全通过，Persistence 132 项/Application 55 项；见 [完成记录](docs/modular-rewrite/R07-match-lineup-workbook-persistence/R07-13-monthly-workbook.md)。真实 PG/XLSX/Full 最终封包新库待验。
+- 原月度/Exchange/资料包/管理门禁路径切到实际 owner；月度门禁增加唯一职责/旧 owner 删除/显式分派/无写入或写锁/共享缺口映射/原 SQL 集合与编排检查。83 项现有源码/契约、架构及 Rustfmt 通过，六项破坏探针拒绝并恢复。直接模块 36，Domain 365/300 及声明摘要保持，使用清单/原 PG 指纹刷新；工作流/依赖/锁文件/迁移/模型保护区冻结。13 DONE，14 已启动，15 BLOCKED。
 
 ### R7-12 Team Package（2026-10-01，DONE）
 

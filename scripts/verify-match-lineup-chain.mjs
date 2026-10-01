@@ -14,7 +14,7 @@ const migration = read("crates/persistence-postgres/migrations/0024_match_lineup
 const domain = read("crates/domain/src/lineup/chain.rs") + read("crates/domain/src/exchange/lineup.rs") + (read("crates/domain/src/lib.rs") + read("crates/domain/src/lineup/kind.rs") + read("crates/domain/src/lineup/player.rs") + read("crates/domain/src/lineup/snapshot.rs") + read("crates/domain/src/lineup/preset.rs") + read("crates/domain/src/lineup/chain.rs") + read("crates/domain/src/match_record/status.rs") + read("crates/domain/src/match_record/catalog.rs"));
 const persistence = read("crates/persistence-postgres/src/adapters/lineups/chain/mod.rs") + read("crates/persistence-postgres/src/adapters/lineups/chain/window.rs") + read("crates/persistence-postgres/src/adapters/lineups/chain/validation.rs");
 const catalog = read("crates/persistence-postgres/src/adapters/lineups/pair_transaction/validation.rs") + read("crates/persistence-postgres/src/adapters/lineups/pair_transaction/write.rs");
-const exchange = read("crates/persistence-postgres/src/match_exchange.rs");
+const exchange = ["preview","conflict","commit","context","read","write","identity","validation","values","mod"].map((name) => read(`crates/persistence-postgres/src/adapters/workbooks/match_lineup/${name}.rs`)).join("\n");
 const prediction = read("crates/persistence-postgres/src/match_prediction.rs");
 const workbook = read("crates/spreadsheet-io/src/match_workbook.rs");
 const application = read("crates/application/src/services/lineups/facade.rs");

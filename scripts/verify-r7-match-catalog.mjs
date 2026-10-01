@@ -10,7 +10,7 @@ const requireTrue = (value, message) => { if (!value) throw new Error(message); 
 const base = "crates/persistence-postgres/src/adapters/matches/catalog";
 const adapters = read("crates/persistence-postgres/src/adapters/mod.rs");
 const playerCatalog = read("crates/persistence-postgres/src/player_catalog.rs");
-const exchange = read("crates/persistence-postgres/src/match_exchange.rs");
+const exchange = ["preview","conflict","commit","context","read","write","identity","validation","values","mod"].map((name) => read(`crates/persistence-postgres/src/adapters/workbooks/match_lineup/${name}.rs`)).join("\n");
 const matchPrediction = read("crates/persistence-postgres/src/match_prediction.rs");
 const lineupChain = read("crates/persistence-postgres/src/adapters/lineups/chain/mod.rs");
 const lineupHistory = read("crates/persistence-postgres/src/adapters/lineups/history/read.rs") + read("crates/persistence-postgres/src/adapters/lineups/history/removal.rs");
@@ -46,9 +46,9 @@ requireTrue(mapping.includes("match_record_from_row") && mapping.includes("Match
 for (const forbidden of ["pub async fn create_match", "pub async fn delete_match", "pub async fn list_upcoming_matches", "pub async fn list_managed_matches", "resolve_match_scope_draft", "validate_match_scope", "fn match_record_from_row"]) {
   requireTrue(!playerCatalog.includes(forbidden), `player_catalog.rs 仍持有 Match Catalog 职责: ${forbidden}`);
 }
-requireTrue(!exchange.includes("read_match_exchange"), "match_exchange.rs 仍持有重复 read_match_exchange owner");
-requireTrue(!exchange.includes("fn match_record_from_row"), "match_exchange.rs 仍持有重复 MatchRecord mapper");
-requireTrue(exchange.includes("self.read_match("), "match_exchange.rs 未切换到 Match Catalog read owner");
+requireTrue(!exchange.includes("read_match_exchange"), "比赛工作簿仍持有重复 read_match_exchange owner");
+requireTrue(!exchange.includes("fn match_record_from_row"), "比赛工作簿仍持有重复 MatchRecord mapper");
+requireTrue(exchange.includes("self.read_match("), "比赛工作簿未复用 Match Catalog read owner");
 requireTrue(!matchPrediction.includes("match_exchange::match_record_from_row"), "match_prediction.rs 仍依赖旧 Match Exchange mapper");
 requireTrue(matchPrediction.includes("adapters::matches::catalog::match_record_from_row"), "match_prediction.rs 未切换到 Match Catalog mapper");
 requireTrue(!lineupChain.includes("read_match_exchange("), "lineup_chain.rs 仍依赖旧 read_match_exchange");
