@@ -9,7 +9,7 @@
 
 - 唯一阶段分支：`rewrite/r7-match-lineup-workbook-persistence`。
 - 规划依据：源码 `985f01816060cfd05672bdc03b6771dec7b4e842`，文档基线 `51f746729b2f94925e6382f2ae2108cf80855af6`，以及阶段 README 中 A1–A8、B1–B7 审计记录。
-- R7-01～R7-13 已完成精确提交的 Windows Automated 并为 `DONE`；13 run `36854202029` 的 Persistence 132 项/Application 55 项通过。用户已启动 R7-14，比赛阵容工作簿唯一职责、调用/门禁及原 PG 回归已实现，当前 `VERIFYING`；R7-15 `BLOCKED`。真实 PG/XLSX/Full 保留最终封包新库待验。
+- R7-01～R7-14 已完成精确提交的 Windows Automated 并为 `DONE`；14 run `36860224760` 的 Persistence 132/Application 55 通过。用户已启动 R7-15，共享行/子记录身份职责、行号前检及原回归已实现，当前 `VERIFYING`；本项精确 CI 尚待确认结果。真实 PG/XLSX/Full 保留最终封包新库待验，阶段完成记录不提前创建。
 - 当前状态以 `docs/modular-rewrite/R07-match-lineup-workbook-persistence/README.md` 的唯一状态表为准；历史审计中的旧编号按下表映射。
 - 允许整改触及直接相关的 Application composition/Ports、catalog identity/deletion、现有 P4 时间比较和测试；不提前实施 R8/R10 的整阶段重写。
 - 不包含前端导入 UI 重写、工作簿解析器整体验证框架建设、模型内部算法/参数修改或历史 migration 改写。
@@ -230,7 +230,7 @@
 
 ## R7-14 Match Lineup Workbook
 
-状态：`VERIFYING`（唯一职责迁移及原回归已实现；Windows CI 待验，PG/XLSX/Full 最终新库待验），依赖 R7-13；原任务 R7-09。
+状态：`DONE`（精确 Windows run `36860224760` / job `110362332343` 全通过，Persistence 132/Application 55；PG/XLSX/Full 最终新库待验），依赖 R7-13；原任务 R7-09。
 
 - **目标/契约**：收敛单场比赛阵容导入导出，保持原双方创建事务、工作簿整批事务、时间截止、actual 模型隔离、冲突阻断及整批回滚；合法单侧替换保持，错误主客身份拒绝；返回/账本/审计结束履历计数一致。
 - **来源与目标**：match_exchange.rs；迁入 `crates/persistence-postgres/src/adapters/workbooks/match_lineup/`。按实际职责调整私有文件布局，不强制一函数一文件。
@@ -242,10 +242,10 @@
 
 ## R7-15 Row 与 Subrecord Identity
 
-状态：`BLOCKED`，依赖 R7-14；原任务 R7-10。
+状态：`VERIFYING`（共享职责、行号前检及原回归已实现；Windows CI 待验，PG/XLSX/Full 最终新库待验），依赖 R7-14；原任务 R7-10。
 
-- **目标/契约**：明确物理行号与实体/子记录 identity 的不同语义；同一物理行的多个合法子记录不误去重，多球队效力子记录不被覆盖；不修改冻结迁移来省略处理。
-- **来源与目标**：现有导入行和效力期/能力/标签等子记录 identity 规则；迁入 `crates/persistence-postgres/src/adapters/workbooks/identity/`。按实际职责调整私有文件布局，不强制一函数一文件。
+- **目标/契约**：明确物理行号与实体/子记录 identity 的不同语义；同一物理行的多个合法子记录不误去重，多球队效力子记录不被覆盖；子键仍由原数据库唯一计算，修复异常行号转换/同源批次提前取消；不修改冻结迁移来省略处理。
+- **来源与目标**：现有重复球队行合并、暂存行定位与物理行号边界；效力/能力/标签子记录的生成列继续保留原冻结迁移，解析器保留 spreadsheet-io owner；持久化共享职责迁入 `crates/persistence-postgres/src/adapters/workbooks/identity/`。按实际职责调整私有文件布局，不强制一函数一文件。
 - **输入/输出**：沿用对应 Application Port、Domain Draft/Query/Record 与现有持久化结果；允许 Domain、SQLx、现有基础 mapping/audit。禁止依赖前端状态或私有模型实现，不保存第二份事实状态。
 - **实施与切换**：识别全部直接调用方和现有测试，完成唯一 owner 切换，同步现有验证器和清单，删除被替代实现；保留上游正常 API/错误契约。数据库事务是写入与审计的共同提交边界。
 - **验证**：沿用 verify-import-row-identity.mjs 与现有导入测试，验证同物理行多子记录、稳定定位、冲突/重试与回滚；完成 R7 全阶段复核。 Windows 最小检查、现有阶段回归和动态延期规则按第 3 节执行。

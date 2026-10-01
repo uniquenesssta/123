@@ -585,6 +585,216 @@ async fn team_package_player_team_period_subrecords_are_distinct() {
     .await;
     assert!(duplicate.is_err(), "相同球队效力记录仍必须受唯一约束");
 
+    // R7-15：现有生成列继续作为子记录身份的唯一计算来源。
+    let team_id = Uuid::new_v4();
+    for (entity, payload, expected) in [
+        (
+            "player_ability",
+            json!({"dimension_code":" attack "}),
+            "attack".to_string(),
+        ),
+        (
+            "player_ability",
+            json!({"dimension_code":"defence"}),
+            "defence".to_string(),
+        ),
+        (
+            "player_dynamic_tag",
+            json!({"tag_code":" pace "}),
+            "pace".to_string(),
+        ),
+        (
+            "player_dynamic_tag",
+            json!({"tag_code":"form"}),
+            "form".to_string(),
+        ),
+        ("player", json!({}), String::new()),
+        (
+            "player_team_period",
+            json!({"team_id":team_id,"team_key":"ignored-key","team_name":"ignored name"}),
+            team_id.to_string(),
+        ),
+    ] {
+        let id = Uuid::new_v4();
+        sqlx::query("INSERT INTO catalog.import_rows(id,batch_id,sheet_name,row_number,entity_type,requested_action,status,payload) VALUES($1,$2,'球员与评分',2,$3,'skip','skip',$4)")
+            .bind(id).bind(batch_id).bind(entity).bind(&payload).execute(&database.pool).await.unwrap();
+        let key: String =
+            sqlx::query_scalar("SELECT subrecord_key FROM catalog.import_rows WHERE id=$1")
+                .bind(id)
+                .fetch_one(&database.pool)
+                .await
+                .unwrap();
+        assert_eq!(
+            key, expected,
+            "生成列保持能力/标签维度、实体及球队 ID 优先语义"
+        );
+    }
+
+    let token = Uuid::new_v4();
+    let mut parsed = SpreadsheetParsedWorkbook {
+        format_version: PLAYER_MONTHLY_FORMAT.into(),
+        source_file_name: "子记录身份.xlsx".into(),
+        source_sha256: format!("subrecord-{token}"),
+        rows: vec![],
+    };
+    // skip 行测试暂存身份，无需创建球员/球队事实；能力、标签和效力记录仍由真实账本插入。
+    for (entity_type, values) in [
+        (SpreadsheetEntityType::Player, json!({"player_key":"P1"})),
+        (
+            SpreadsheetEntityType::PlayerAbility,
+            json!({"dimension_code":"attack"}),
+        ),
+        (
+            SpreadsheetEntityType::PlayerAbility,
+            json!({"dimension_code":"defence"}),
+        ),
+        (
+            SpreadsheetEntityType::PlayerDynamicTag,
+            json!({"tag_code":"pace"}),
+        ),
+        (
+            SpreadsheetEntityType::PlayerDynamicTag,
+            json!({"tag_code":"form"}),
+        ),
+        (
+            SpreadsheetEntityType::PlayerTeamPeriod,
+            json!({"team_key":"national","team_name":"Algeria"}),
+        ),
+        (
+            SpreadsheetEntityType::PlayerTeamPeriod,
+            json!({"team_name":" Manchester CITY "}),
+        ),
+        (
+            SpreadsheetEntityType::PlayerPosition,
+            json!({"position_code":"ST"}),
+        ),
+    ] {
+        parsed.rows.push(SpreadsheetRawRow {
+            sheet_name: "球员与评分".into(),
+            row_number: 7,
+            entity_type,
+            action: SpreadsheetAction::Skip,
+            values,
+        });
+    }
+    let mut other_row = parsed.rows[1].clone();
+    other_row.row_number = 8;
+    parsed.rows.push(other_row);
+    let mut other_sheet = parsed.rows[1].clone();
+    other_sheet.sheet_name = "其他工作表".into();
+    parsed.rows.push(other_sheet);
+    let fact_counts_before: (i64,i64,i64) = sqlx::query_as("SELECT (SELECT count(*) FROM football.players),(SELECT count(*) FROM football.player_team_periods),(SELECT count(*) FROM audit.events)")
+        .fetch_one(&database.pool).await.unwrap();
+    let preview = database
+        .store
+        .preview_spreadsheet_import(&parsed, SpreadsheetImportMode::AddAndUpdate)
+        .await
+        .unwrap();
+    assert_eq!(
+        preview.rows.len(),
+        10,
+        "同物理行的多实体、多能力、多标签和双球队效力子记录全部暂存"
+    );
+    assert_eq!(preview.counts.skipped, 10);
+    let ids: std::collections::HashSet<_> = preview.rows.iter().map(|row| row.id).collect();
+    assert_eq!(ids.len(), 10, "暂存行 UUID 不由物理行号复用");
+    let reread = database
+        .store
+        .read_spreadsheet_import_preview(preview.batch_id)
+        .await
+        .unwrap();
+    for row in &preview.rows {
+        let stored = reread
+            .rows
+            .iter()
+            .find(|stored| stored.id == row.id)
+            .unwrap();
+        assert_eq!(
+            serde_json::to_value(row).unwrap(),
+            serde_json::to_value(stored).unwrap(),
+            "子记录读回保持原 UUID、工作表、物理行和载荷"
+        );
+    }
+    let subrecords: Vec<(String,String)> = sqlx::query_as("SELECT entity_type,subrecord_key FROM catalog.import_rows WHERE batch_id=$1 AND sheet_name='球员与评分' AND row_number=7 ORDER BY entity_type,subrecord_key")
+        .bind(preview.batch_id).fetch_all(&database.pool).await.unwrap();
+    assert_eq!(subrecords.len(), 8);
+    assert!(
+        subrecords.contains(&("player_ability".into(), "attack".into()))
+            && subrecords.contains(&("player_ability".into(), "defence".into()))
+    );
+    assert!(
+        subrecords.contains(&("player_dynamic_tag".into(), "pace".into()))
+            && subrecords.contains(&("player_dynamic_tag".into(), "form".into()))
+    );
+    assert!(
+        subrecords.contains(&("player_team_period".into(), "national".into()))
+            && subrecords.contains(&("player_team_period".into(), "manchester city".into()))
+    );
+    let ledger_counts_before: (i64,i64) = sqlx::query_as("SELECT (SELECT count(*) FROM catalog.import_batches),(SELECT count(*) FROM catalog.import_rows)")
+        .fetch_one(&database.pool).await.unwrap();
+    let mut duplicate_parsed = parsed.clone();
+    duplicate_parsed.source_sha256 = format!("duplicate-subrecord-{token}");
+    let mut repeated_dimension = parsed.rows[1].clone();
+    repeated_dimension.values["dimension_code"] = json!(" attack ");
+    duplicate_parsed.rows.push(repeated_dimension);
+    database
+        .store
+        .preview_spreadsheet_import(&duplicate_parsed, SpreadsheetImportMode::AddAndUpdate)
+        .await
+        .expect_err("重复子记录必须回滚新批次及此前合法行");
+    let mut invalid_parsed = parsed.clone();
+    invalid_parsed.rows[9].row_number = u32::MAX;
+    database
+        .store
+        .preview_spreadsheet_import(&invalid_parsed, SpreadsheetImportMode::AddAndUpdate)
+        .await
+        .expect_err("非法物理行号不得取消同源 pending 批次");
+    invalid_parsed.format_version = TEAM_MONTHLY_FORMAT.into();
+    database
+        .store
+        .preview_team_monthly_import(&invalid_parsed, SpreadsheetImportMode::AddAndUpdate)
+        .await
+        .expect_err("球队预检也须在数据库操作前拒绝非法行号");
+    invalid_parsed.format_version = "football.match-lineup.v2".into();
+    database
+        .store
+        .preview_match_lineup_import(&invalid_parsed, SpreadsheetImportMode::AddAndUpdate)
+        .await
+        .expect_err("比赛预检也须在数据库操作前拒绝非法行号");
+    let ledger_counts_after: (i64,i64) = sqlx::query_as("SELECT (SELECT count(*) FROM catalog.import_batches),(SELECT count(*) FROM catalog.import_rows)")
+        .fetch_one(&database.pool).await.unwrap();
+    assert_eq!(
+        ledger_counts_before, ledger_counts_after,
+        "重复子记录整批回滚及非法行号前检不得留下新账本行"
+    );
+    let pending_status: String =
+        sqlx::query_scalar("SELECT status FROM catalog.import_batches WHERE id=$1")
+            .bind(preview.batch_id)
+            .fetch_one(&database.pool)
+            .await
+            .unwrap();
+    assert_eq!(pending_status, "pending");
+    let retained = database
+        .store
+        .read_spreadsheet_import_preview(preview.batch_id)
+        .await
+        .unwrap();
+    assert_eq!(
+        serde_json::to_value(&reread).unwrap(),
+        serde_json::to_value(&retained).unwrap()
+    );
+    let fact_counts_after: (i64,i64,i64) = sqlx::query_as("SELECT (SELECT count(*) FROM football.players),(SELECT count(*) FROM football.player_team_periods),(SELECT count(*) FROM audit.events)")
+        .fetch_one(&database.pool).await.unwrap();
+    assert_eq!(
+        fact_counts_before, fact_counts_after,
+        "身份暂存、失败回滚和前检拒绝不写事实或成功审计"
+    );
+    sqlx::query("DELETE FROM catalog.import_batches WHERE id=$1")
+        .bind(preview.batch_id)
+        .execute(&database.pool)
+        .await
+        .unwrap();
+
     sqlx::query("DELETE FROM catalog.import_batches WHERE id=$1")
         .bind(batch_id)
         .execute(&database.pool)

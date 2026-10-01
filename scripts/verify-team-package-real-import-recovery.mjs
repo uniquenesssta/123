@@ -8,7 +8,7 @@ const check = (condition, message) => {
 const application =
   read("crates/application/src/use_cases/exchange/commit_team_package_import/policy.rs") +
   read("crates/application/src/use_cases/exchange/commit_team_package_import/use_case.rs");
-const teams = ["mod", "preview", "conflict", "commit", "write", "names", "identity", "formation", "validation", "values"].map((name) => read(`crates/persistence-postgres/src/adapters/workbooks/team_package/${name}.rs`)).join("\n");
+const teams = ["mod", "preview", "conflict", "commit", "write", "names", "identity", "formation", "validation", "values"].map((name) => read(`crates/persistence-postgres/src/adapters/workbooks/team_package/${name}.rs`)).join("\n") + read("crates/persistence-postgres/src/adapters/workbooks/identity/teams.rs");
 const players = ["preview", "conflict", "commit", "export", "identity", "validation", "values"]
   .map((name) => read(name === "export" ? "crates/persistence-postgres/src/adapters/workbooks/monthly_player/read.rs" : `crates/persistence-postgres/src/adapters/workbooks/player_catalog/${name}.rs`)).join("\n");
 

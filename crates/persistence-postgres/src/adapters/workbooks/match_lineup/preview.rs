@@ -1,4 +1,5 @@
 use super::super::batch_ledger::{batch as ledger, rows as ledger_rows};
+use super::super::identity::row::validate_workbook_row_locations;
 use crate::{PersistenceResult, PostgresStore};
 use chrono::Utc;
 use football_domain::{
@@ -13,6 +14,7 @@ impl PostgresStore {
         parsed: &SpreadsheetParsedWorkbook,
         mode: SpreadsheetImportMode,
     ) -> PersistenceResult<SpreadsheetImportPreview> {
+        validate_workbook_row_locations(parsed)?;
         let batch_id = Uuid::new_v4();
         let mut preview_rows = Vec::with_capacity(parsed.rows.len());
         for raw in &parsed.rows {

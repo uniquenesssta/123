@@ -4,7 +4,7 @@
 
 `IN_PROGRESS`
 
-当前进度以本段及任务索引为准：R7-01～13 `DONE`；13 精确 `78138dba30ead1dbc4f4e5d2c6595e5775edfa0c` / Windows run `36854202029` / job `110342691574` 全通过，Persistence 132 项/Application 55 项，见 [13 完成记录](R07-13-monthly-workbook.md)。用户已启动 R7-14，比赛阵容工作簿唯一职责、原调用/门禁及 PG 回归已实现，当前 `VERIFYING`；R7-15 `BLOCKED`。后文旧节点的“当前/待验/下一项”属于当时实施记录，不覆盖本段及任务表。
+当前进度以本段及任务索引为准：R7-01～14 `DONE`；14 精确 `bb0012085d92cb63742ff5b5571a8003984db709` / Windows run `36860224760` / job `110362332343` 全通过，Persistence 132/Application 55，见 [14 完成记录](R07-14-match-lineup-workbook.md)。用户已启动 R7-15，行/子记录身份收敛、行号前检及原回归已实现，当前 `VERIFYING`。15 必须取得自己的 Windows CI；阶段完成记录及 R8 未提前开放。后文旧节点的“当前/待验/下一项”属于当时实施记录，不覆盖本段及任务表。
 
 R7 先完成 R1–R6 累计审计整改，再重写 Matches、Lineups、Presets 与 Workbook 持久化，重点保证双方阵容原子事务、截止时间、历史链路、批次账本、真实 XLSX 行/子记录 identity 与整批回滚；不实施工作簿解析算法本体或前端导入 UI。
 
@@ -52,8 +52,8 @@ crates/persistence-postgres/src/adapters/workbooks/
 | R7-11 | Player Workbook | DONE |
 | R7-12 | Team Package | DONE |
 | R7-13 | Monthly Workbook | DONE |
-| R7-14 | Match Lineup Workbook | VERIFYING |
-| R7-15 | Row / Subrecord Identity | BLOCKED |
+| R7-14 | Match Lineup Workbook | DONE |
+| R7-15 | Row / Subrecord Identity | VERIFYING |
 
 ## R7-02 当前验证状态
 
@@ -265,7 +265,7 @@ Windows 编译/Clippy/tests、浏览器/截图/前端生产构建、安装包/�
 
 ## R7-14 当前验证状态
 
-进入/回退基线：`78138dba30ead1dbc4f4e5d2c6595e5775edfa0c`。13 DONE；14 当前 `VERIFYING`，15 BLOCKED；须取得本项自己的精确 Windows CI。
+进入/回退基线：`78138dba30ead1dbc4f4e5d2c6595e5775edfa0c`。14 已由精确 Windows run `36860224760` / job `110362332343` 通过并 `DONE`，132/55 实际 PASS、17 视口、构建/打包/启动通过，见 [完成记录](R07-14-match-lineup-workbook.md)；15 已启动。
 
 - 48 个原函数从 match_exchange.rs 迁入唯一 workbooks/match_lineup/{read,context,preview,conflict,commit,write,identity,validation,values}；mod 仅注册职责和保存两种原内部结果。旧根文件/注册删除，无转发壳；全部原函数体、五个公开签名、22 条直接 SQL 及动态候选查询保持。MatchLineupExchangePort 六入口显式分派，原批次读取和所有账本/codec 继续复用 R7-10。
 - 预检先按原规则校验，仅暂存批次/行；冲突裁决保留校验前后两次父/行锁、pending/conflict 重查、候选边界及原跳过/解决计数共同事务。提交保留唯一事务：批次父锁、pending/阻断、按原依赖顺序写事实和行、去重刷新阵容门禁、同一个 result 写计数/成功审计后提交；保留 ended_previous、末行失败整批回滚、成功批次重复提交拒绝。
@@ -273,7 +273,31 @@ Windows 编译/Clippy/tests、浏览器/截图/前端生产构建、安装包/�
 - 原 PG pair/workbook 夹具扩重复导出字段一致、AI 球员去重/角色兼容、空/未知比赛、读取无事实/账本/审计写入、预检只暂存及 UUID/载荷/计数读回、错误主客身份预检阻断与无副作用；保留冲突/裁决计数、末行回滚/恢复/一次审计、pair/single/workbook 共同锁竞争和模型历史隔离。18 broad 数量不变，不新增测试目标、runner、workflow 或数据库；PG/历史四项/账本/有效 XLSX/Full 最终封包新库待验。
 - 五个原 verifier 更新实际 owner、全部旧断言保留；Exchange 增唯一职责、显式分派、只读/预检/冲突/提交事务、原 SQL、共同锁/计数/AI cutoff/角色边界检查。六项破坏探针（未解冲突、结束计数、共同父锁、AI cutoff、活动版本、效力期包含边界）拒绝并恢复。83 项原 Node 源码/契约、架构聚合与 Rustfmt 源码检查通过；直接模块 36→35 仅移除旧根注册，Domain 365/300 和声明摘要保持，使用清单与原 PG 指纹刷新。无业务算法/API/DTO、资产、deps/locks、46 迁移或工作流修改。
 
-本项纯职责迁移，不新增镜像 inline 测试；现有 Persistence 132/Application 55 项需本项 Windows CI 执行。编译/Clippy/tests、前端类型/浏览器/截图/build、release/MSI/NSIS 和启动待验；本地不执行 Linux/macOS 动态验收或 PG。成功后创建 R07-14-match-lineup-workbook.md；回退同步职责、调用、门禁/清单和 PG 指纹，不恢复双实现或放宽门禁。
+本项纯职责迁移，无新增镜像 inline；Windows 原132/55、编译/Clippy/tests、前端类型/浏览器/17视口/build、release/MSI/NSIS 与启动已通过本项精确 CI。PG/XLSX/Full 仍最终新库待验；14 完成记录已创建，回退同步职责、调用、门禁/清单和 PG 指纹。
+
+## R7-15 当前验证状态
+
+进入/回退基线：`bb0012085d92cb63742ff5b5571a8003984db709`。14 DONE；15 当前 `VERIFYING`，须取得本项精确 Windows CI 后完成节点收口。
+
+- 共享 workbooks/identity/{mod,row,teams} 负责已暂存行 UUID/批次定位、物理行号落库检查及资料包重复球队行合并；8 个原函数与 5 个原 inline 测试从 team_package/identity.rs 迁入 teams.rs，原函数体/测试、球队国家/类型隔离、名称/来源规范化、显式总览优先、缺失字段合并与零/false/原显示名保持。Team commit 和来源关联切换唯一 owner，原 Team values 的五项策略仅放宽 workbooks 内部可见性，无复制实现、公开 API 或反向依赖业务编排。
+- 原 unchecked u32→i32 行号转换替换为 ImportRowLocation 的受检投影；UUID、batch、sheet、原物理行和 entity_type 保持，载荷/候选/匹配信息按原 SQL 暂存。三类预检在任何同源查找/取消或批次创建前检查行号，防止非法行号溢出及取消旧 pending 批次后才插入失败。保留既有 >=2 CHECK 和 PostgreSQL integer 上限，不额外限制合法整数行号或合并物理行。
+- 子记录唯一身份继续由冻结 0043 的生成列计算：能力 dimension_code、标签 tag_code 仅 BTRIM；效力 team_id→team_key→lower(BTRIM(team_name))，其余空子键。五字段 UNIQUE 和原 INSERT 决定共存/重复拒绝；Rust 不重算 subrecord_key，不去重同物理行、不通过 ON CONFLICT 吞掉重复。冲突裁决继续 batch+row UUID 定位，行锁/计数、提交依赖序、事实/审计/回滚边界保持。原 spreadsheet-io 解析与空白行/多球队/能力/标签规则保持原 owner，不引入对 Persistence 的反向依赖。
+- 新增现有生产 row.rs 中 3 项 inline，覆盖 header/整数溢出、同物理行两子记录的独立 UUID、前检不改变或去重实体/子记录；原 5 项迁移不增加数量，预期 Windows Persistence 135/Application 55，尚未实际执行。原 team_package_player_team_period_subrecords_are_distinct 扩能力/标签/实体及 team_id 优先生成键、真实 skip 行生产预检的十条共存记录（包含跨行/跨表）、UUID/载荷读回、重复维度整批回滚、三类行号前检、同源 pending 保留、账本与事实/审计无失败遗留。18 broad 数量不变，沿用最终新库待验。
+- 八个原资料包/月度/阵型/层级/名称 verifier 跟随共享 teams owner，所有旧断言保留；原 import-row-identity 门禁增唯一职责、旧实现清零、预检前置、受检字段/原载荷、数据库唯一来源、无独立 SQL/事务/审计检查。六项破坏探针（整数溢出、表头行、UUID 重建、前检缺失、载荷丢失、重复 owner）拒绝并恢复。83 项原源码/契约、架构聚合、Rustfmt 源码检查与 diff 检查通过；直接模块 35、Domain 365/300/声明摘要保持，使用清单和 PG 指纹更新。无新测试目标、runner、workflow、数据库、依赖/锁文件、46 迁移或算法/参数/保护资产修改。
+
+Windows 编译/Clippy/tests、前端类型/浏览器/截图/build、release/MSI/NSIS/启动待本项 CI；135/55 仅预期，不能继承 14 的 PASS。本地未执行 Linux/macOS 动态验收或 PG。成功后创建 R07-15-row-and-subrecord-identity.md 与要求的 R07-stage-completion.md，届时仍显著登记所有动态待验项；不提前开始 R8。受控回退同步共享身份职责、调用、前检、门禁/清单与 PG 指纹，不恢复双实现或放宽门禁。
+
+## R7 当前源码累计复核
+
+| 范围 | 当前职责/契约复核 | 验证界限 |
+|---|---|---|
+| R7-01～06 与 R1–R6 保留成果 | 比赛 catalog、外部 ID 不改绑、删除共享引用/父锁复检、清单/命令/Ports、原 Application 用例及历史夹具/账本修订由既有门禁保持；R1–R6 架构入口/owner 验证继续通过。 | 01～14 精确 Windows CI 已通过；历史四项 PG 修订仍未实跑关闭。 |
+| R7-07～09 | pair_transaction 唯一创建/共同比赛锁，chain/window/validation 与 history 保持赛前 cutoff/actual 隔离和恢复/归档，presets 唯一读写与删除职责。 | 原并发、取消、历史和恢复 PG 断言留在既有测试，最终新库待验。 |
+| R7-10～15 | batch_ledger、player_catalog、team_package、monthly_team/monthly_player、match_lineup 与共享 identity 各有唯一 owner；旧根已删除，正常 API/DTO/错误优先级、行 UUID/子记录、账本/审计事务和包双链恢复边界保持。 | 15 受影响源码/原契约通过；新 3 inline、编译/前端/打包需 15 精确 Windows CI。 |
+| 冻结边界与阶段出口 | 171 命令、43 Ports、365 Domain 类型/300 映射、保护资产及 0001–0046 迁移由原门禁复核；未新增 workflow/runner/数据库设施。 | 15 暂 VERIFYING，不创建 R07-stage-completion.md、不开始 R8；真实 PG/XLSX/Windows Full 最终封包新库验收不能省略。 |
+
+动态清单继续引用本索引 R7-06 的四项历史失败/账本表和各节点完成记录：外部 ID/删除并发、双方事务与取消、历史 cutoff/actual/恢复、预设、各类工作簿预检/裁决/提交/回滚/计数/身份、真实有效 XLSX 与客户端 Full 均最终新库待验。ignored 编译、源码探针及节点 DONE 均不替代实际数据库结果。
+
 
 ## R7-01 READY 边界
 

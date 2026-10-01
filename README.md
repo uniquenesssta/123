@@ -2,7 +2,7 @@
 
 当前版本 **0.23.0**。本仓库是平台、数据库、数据准备、路由、工作台与外部模型调用入口的公开版本；真实 P4/P7 预测引擎、参数、Profile、固定比赛、私有研究提示词及模型专用固定回归资产不随仓库分发。
 
-R1–R6 累计补审覆盖 43 个任务节点。根据用户决定，R7-01 后新增 R7-02～06 审计整改，原 R7-02～10 顺延为 R7-07～15；优化拆分、验证与记录约束，沿用现有 Windows 验证和最终封包新库流程，不新增持续回归体系。R7-01 的 A1～A7 修订已通过 Windows CI run `36678914535`，节点 DONE；R7-02 外部 ID 身份保护、R7-03 普通删除与历史引用保护均已通过 Windows CI 并为 DONE。R7-04 清单、验证入口和历史记录已通过 Windows CI run `36706905645` 并为 DONE；R7-05 新增 20 个关键 Application 行为测试，精确 Windows CI run `36712015030` 已通过并 DONE；R7-06 的夹具/时间精度与账本修订已通过 Windows CI run `36734194083` 并 DONE；R7-07 阵容创建与共同并发锁已通过 Windows CI run `36757339619` 并 DONE；R7-08 阵容链/历史已通过 Windows CI run `36801488090` 并 DONE；R7-09 阵容预设已通过 Windows CI run `36808609584` 并 DONE；R7-10 两类导入的批次/行账本职责与冲突计数同步已通过 Windows CI run `36815568401` 并 DONE；R7-11 球员工作簿唯一职责已通过 Windows CI run `36824027121` 并 DONE；R7-12 球队资料包共享职责与冲突计数修订已通过 Windows CI run `36831302483` 并 DONE；R7-13 月度只读聚合与缺口唯一职责已通过 Windows CI run `36854202029` 并 DONE；R7-14 比赛阵容工作簿职责已实现、当前 VERIFYING，R7-15 BLOCKED。PG/XLSX/Full 单独留到最终封包新库验收。详见 [R7 任务书](docs/football-model-platform-modular-rewrite-19-docs/07-R7-match-lineup-workbook-persistence.md) 与 [阶段索引/累计审计](docs/modular-rewrite/R07-match-lineup-workbook-persistence/README.md)。
+R1–R6 累计补审覆盖 43 个任务节点。根据用户决定，R7-01 后新增 R7-02～06 审计整改，原 R7-02～10 顺延为 R7-07～15；优化拆分、验证与记录约束，沿用现有 Windows 验证和最终封包新库流程，不新增持续回归体系。R7-01 的 A1～A7 修订已通过 Windows CI run `36678914535`，节点 DONE；R7-02 外部 ID 身份保护、R7-03 普通删除与历史引用保护均已通过 Windows CI 并为 DONE。R7-04 清单、验证入口和历史记录已通过 Windows CI run `36706905645` 并为 DONE；R7-05 新增 20 个关键 Application 行为测试，精确 Windows CI run `36712015030` 已通过并 DONE；R7-06 的夹具/时间精度与账本修订已通过 Windows CI run `36734194083` 并 DONE；R7-07 阵容创建与共同并发锁已通过 Windows CI run `36757339619` 并 DONE；R7-08 阵容链/历史已通过 Windows CI run `36801488090` 并 DONE；R7-09 阵容预设已通过 Windows CI run `36808609584` 并 DONE；R7-10 两类导入的批次/行账本职责与冲突计数同步已通过 Windows CI run `36815568401` 并 DONE；R7-11 球员工作簿唯一职责已通过 Windows CI run `36824027121` 并 DONE；R7-12 球队资料包共享职责与冲突计数修订已通过 Windows CI run `36831302483` 并 DONE；R7-13 月度只读聚合与缺口唯一职责已通过 Windows CI run `36854202029` 并 DONE；R7-14 比赛阵容工作簿唯一职责已通过 Windows CI run `36860224760` 并 DONE；R7-15 行/子记录身份收敛及行号前检修订已实现、当前 VERIFYING。PG/XLSX/Full 单独留到最终封包新库验收。详见 [R7 任务书](docs/football-model-platform-modular-rewrite-19-docs/07-R7-match-lineup-workbook-persistence.md) 与 [阶段索引/累计审计](docs/modular-rewrite/R07-match-lineup-workbook-persistence/README.md)。
 
 ## 公开边界
 
@@ -45,11 +45,17 @@ Node 开发依赖固定安装和读取自源码根目录上一级的 `../node_mo
 
 ## 模块化重写执行记录
 
-### R7-14 Match Lineup Workbook（2026-10-01，VERIFYING）
+### R7-15 Row 与 Subrecord Identity（2026-10-01，VERIFYING）
+
+- 将 8 个原重复球队行合并函数与 5 个原 inline 测试迁入共享 `workbooks/identity/teams`，提交及来源关联切换唯一职责；正常合并、名称/来源、显式总览优先、国家/类型隔离及原事务保持。`identity/row` 保留行 UUID/批次/工作表/物理行/实体定位，子记录键继续由原数据库生成列和 UNIQUE 判定，Rust 不重复计算或误去重。
+- 修复未经检查的行号整数转换：三类预检在同源查找/取消和暂存之前拒绝不能按原 >=2/integer 约束落库的行号，避免异常输入取消旧 pending 批次后才失败；原载荷/行定位、账本及事实/审计/回滚边界保持。
+- 新增原生产模块 inline 3 项，预期 Windows Persistence 135/Application 55；原 PG 子记录用例扩同物理行多实体/维度/标签/双球队、跨行/表、UUID 读回、重复键回滚、三类前检与旧批次保留。83 项现有源码、架构及 Rustfmt 通过，六项破坏探针拒绝并恢复；当前 VERIFYING，须本项精确 Windows CI。R7 累计职责/接口/保护资产复核见阶段索引；PG/XLSX/Full 最终新库待验，未宣称阶段整体验收完成。无新 target/runner/workflow/数据库/依赖或迁移。
+
+### R7-14 Match Lineup Workbook（2026-10-01，DONE）
 
 - 将 48 个原函数按导出、AI 上下文、预检、冲突、提交、事实写入、身份、校验与载荷迁入唯一 `adapters/workbooks/match_lineup/`；旧根 owner/注册删除，五个公开签名与全部原函数体、SQL/字段映射保持，原 Port 六入口显式分派。
 - 原账本/两阶段冲突裁决、唯一整批事务、共同比赛锁、历史替代与角色继承、阵容门禁/计数/审计、回滚与重复提交拒绝保持。原 pair 要求成对，工作簿合法主队替换继续支持；模型截止与 actual 隔离继续复用原模型链。导出/AI 包保留原活动历史、引用时间、去重、角色和 cutoff。
-- 现有 PG pair/workbook 夹具补只读快照、导出/AI 投影、空/未知比赛、预检只暂存及行身份、错误主客身份阻断；原回滚/裁决/并发回归保留。五个现有 verifier、职责/SQL/事务门禁与清单更新，83 项源码/架构/Rustfmt 通过，六项破坏探针拒绝并恢复；Windows 132/55 项及构建/打包/启动须本项精确 CI，14 VERIFYING，15 BLOCKED。PG/XLSX/Full 最终封包新库待验，无新 target/runner/workflow/数据库或依赖/迁移。
+- 现有 PG pair/workbook 夹具补只读快照、导出/AI 投影、空/未知比赛、预检只暂存及行身份、错误主客身份阻断；原回滚/裁决/并发回归保留。五个现有 verifier、职责/SQL/事务门禁与清单更新，83 项源码/架构/Rustfmt 通过，六项破坏探针拒绝并恢复；精确 `bb00120` / [Windows run 36860224760](https://github.com/uniquenesssta/123/actions/runs/36860224760) 已全通过，Persistence 132/Application 55、17 视口、构建/打包/启动通过，见 [完成记录](docs/modular-rewrite/R07-match-lineup-workbook-persistence/R07-14-match-lineup-workbook.md)；14 DONE，15 已启动。PG/XLSX/Full 最终封包新库待验，无新 target/runner/workflow/数据库或依赖/迁移。
 
 ### R7-13 Monthly Workbook（2026-10-01，DONE）
 

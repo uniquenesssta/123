@@ -6,7 +6,7 @@ const requireTrue = (condition, message) => { if (!condition) failures.push(mess
 
 const io = read("crates/spreadsheet-io/src/team_package.rs");
 const app = read("crates/application/src/use_cases/exchange/export_team_package_template/use_case.rs");
-const persistence = ["mod", "preview", "conflict", "commit", "write", "names", "identity", "formation", "validation", "values"].map((name) => read(`crates/persistence-postgres/src/adapters/workbooks/team_package/${name}.rs`)).join("\n");
+const persistence = ["mod", "preview", "conflict", "commit", "write", "names", "identity", "formation", "validation", "values"].map((name) => read(`crates/persistence-postgres/src/adapters/workbooks/team_package/${name}.rs`)).join("\n") + read("crates/persistence-postgres/src/adapters/workbooks/identity/teams.rs");
 
 for (const sheet of ["球队名称", "球员名称"]) {
   requireTrue(io.includes(`set_name("${sheet}")`), `完整资料包未生成工作表：${sheet}`);

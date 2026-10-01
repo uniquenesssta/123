@@ -1,4 +1,4 @@
-import { readFileSync } from "node:fs";
+import { readFileSync, readdirSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -12,7 +12,7 @@ const entityMigration = read("crates/persistence-postgres/migrations/0029_import
 const subrecordMigration = read("crates/persistence-postgres/migrations/0030_import_row_subrecord_identity.sql");
 const teamPeriodMigration = read("crates/persistence-postgres/migrations/0043_import_row_team_period_identity.sql");
 const parser = read("crates/spreadsheet-io/src/team_package.rs");
-const persistence = ["mod", "preview", "conflict", "commit", "write", "names", "identity", "formation", "validation", "values"].map((name) => read(`crates/persistence-postgres/src/adapters/workbooks/team_package/${name}.rs`)).join("\n");
+const persistence = ["mod", "preview", "conflict", "commit", "write", "names", "identity", "formation", "validation", "values"].map((name) => read(`crates/persistence-postgres/src/adapters/workbooks/team_package/${name}.rs`)).join("\n") + read("crates/persistence-postgres/src/adapters/workbooks/identity/teams.rs");
 const packageJson = JSON.parse(read("package.json"));
 const readme = read("README.md");
 const databaseDoc = read("docs/DATABASE.md");
@@ -146,5 +146,44 @@ requireTrue(
     databaseDoc.includes("team_key") && databaseDoc.includes("team_name"),
   "数据库文档未同步导入子记录唯一身份",
 );
+
+
+// R7-15：定位、子记录约束和重复球队合并职责分别唯一持有。
+const identityRoot="crates/persistence-postgres/src/adapters/workbooks/identity";
+const rowIdentity=read(`${identityRoot}/row.rs`);
+const teamsIdentity=read(`${identityRoot}/teams.rs`);
+const ledgerRows=read("crates/persistence-postgres/src/adapters/workbooks/batch_ledger/rows.rs");
+const oldTeamIdentity=read("crates/persistence-postgres/src/adapters/workbooks/team_package/identity.rs");
+const teamCommit=read("crates/persistence-postgres/src/adapters/workbooks/team_package/commit.rs");
+const paths=[];
+const scan=(directory)=>{for(const entry of readdirSync(join(root,directory),{withFileTypes:true})){const child=`${directory}/${entry.name}`;if(entry.isDirectory())scan(child);else if(entry.name.endsWith(".rs"))paths.push(child);}};
+scan("crates/persistence-postgres/src");
+for(const [file,names] of [["teams",["team_ready_add_identity","payload_value_is_present","team_row_preference","merge_missing_team_payload_fields","consolidate_duplicate_ready_add_team_rows","normalized_source_urls","team_ready_add_source_identity","consolidate_duplicate_ready_add_team_rows_by_source"]],["row",["persisted_worksheet_row_number","validate_workbook_row_locations"]]]) {
+  requireTrue(read(`${identityRoot}/mod.rs`).includes(`mod ${file};`),`${file} 身份职责未注册`);
+  for(const name of names){
+    const owners=paths.filter((file)=>new RegExp(`fn\\s+${name}\\s*\\(`).test(read(file)));
+    requireTrue(owners.length===1 && owners[0]===`${identityRoot}/${file}.rs`,`${name} 必须只有一个实际身份 owner`);
+  }
+}
+requireTrue(read("crates/persistence-postgres/src/adapters/workbooks/mod.rs").includes("mod identity;"),"共享行身份职责未登记");
+requireTrue(!oldTeamIdentity.includes("fn team_ready_add_identity") && !oldTeamIdentity.includes("fn normalized_source_urls") && !oldTeamIdentity.includes("fn consolidate_duplicate_ready_add_team_rows"),"旧球队身份模块不得保留重复行合并实现");
+requireTrue(teamCommit.includes("super::super::identity::teams") && oldTeamIdentity.includes("super::super::identity::teams::normalized_source_urls"),"原提交合并和批内来源关联必须切换共享唯一职责");
+const rowProduction=rowIdentity.slice(0,rowIdentity.indexOf("#[cfg(test)]"));
+requireTrue(rowProduction.includes("i32::try_from(row_number)") && rowProduction.includes("*value >= 2") && !rowProduction.includes("row_number as i32"),"物理行号必须遵守既有 >=2 CHECK 且拒绝整数溢出");
+for(const token of ["row_id: row.id","batch_id,","sheet_name: &row.sheet_name","persisted_worksheet_row_number(row.row_number)?","entity_type: row.entity_type.as_str()"]){requireTrue(rowProduction.includes(token),`已暂存行定位不得重建或丢字段：${token}`);}
+requireTrue(!/sqlx::|HashSet|HashMap|new_v4|dimension_code|tag_code|team_key|team_name/.test(rowProduction),"行定位不得生成第二份子记录规则、随机 ID 或物理行去重集合");
+const insert=ledgerRows.slice(ledgerRows.indexOf("async fn insert_import_row("),ledgerRows.indexOf("fn count_preview_rows("));
+requireTrue(insert.indexOf("ImportRowLocation::from_row(batch_id, row)?")<insert.indexOf("sqlx::query("),"账本插入必须先检查稳定定位");
+for(const token of ["location.row_id","location.batch_id","location.sheet_name","location.row_number","location.entity_type","&row.payload","row.matched_entity_id","&row.conflict_candidates"]){requireTrue(insert.includes(`.bind(${token})`) || (token==="&row.conflict_candidates" && insert.includes("serde_json::to_value(&row.conflict_candidates)?")),`原账本插入丢失字段：${token}`);}
+requireTrue(!insert.includes("subrecord_key") && !insert.includes("ON CONFLICT") && !insert.includes(".begin()") && !insert.includes(".commit()") && insert.includes("execute(&mut **tx)"),"原生成列/重复子记录拒绝与同事务 INSERT 必须保持");
+for(const [family,next] of [["player_catalog","ledger::find_player_batch("],["team_package","ledger::find_team_batch("],["match_lineup","Uuid::new_v4()"]]) {
+  const source=read(`crates/persistence-postgres/src/adapters/workbooks/${family}/preview.rs`);
+  requireTrue(source.indexOf("validate_workbook_row_locations(parsed)?")>=0 && source.indexOf("validate_workbook_row_locations(parsed)?")<source.indexOf(next),`${family} 非法行号必须在数据库操作或随机 ID 创建前拒绝`);
+}
+requireTrue(!/sqlx::query|self\.pool|\.begin\(|\.commit\(|write_audit_event/.test(teamsIdentity) && teamsIdentity.includes("ledger_rows::set_import_payload_in_tx(") && teamsIdentity.includes("ledger_rows::skip_duplicate_import_row_in_tx("),"球队合并仅复用原账本调用方事务，不另建 SQL/事务/审计");
+requireTrue(!teamsIdentity.includes("super::identity") && !teamsIdentity.includes("team_package::commit") && !teamsIdentity.includes("team_package::write"),"行合并职责不得反向依赖业务编排/写入");
+for(const token of ["worksheet_row_number_rejects_headers_and_integer_wraparound","row_uuid_keeps_two_subrecords_on_one_physical_row_distinct","preflight_preserves_same_row_entities_and_subrecords_for_database_rules"]){requireTrue(rowIdentity.includes(token),`行定位边界 inline 回归缺少：${token}`);}
+const integration=read("crates/persistence-postgres/tests/postgres_integration.rs");
+for(const token of ["同物理行的多实体、多能力、多标签和双球队效力子记录全部暂存","暂存行 UUID 不由物理行号复用","重复子记录必须回滚新批次及此前合法行","非法物理行号不得取消同源 pending 批次","子记录读回保持原 UUID、工作表、物理行和载荷"]){requireTrue(integration.includes(token),`原子记录 PG 回归缺少：${token}`);}
 
 console.log("导入行子记录身份专项验证通过：显式球队优先于球员表推导球队，同球队主/俱乐部关系会去重，不同球队双履历、多个能力维度和动态标签可共存，旧预检批次提交时也会合并重复球队实体。");

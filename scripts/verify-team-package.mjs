@@ -12,7 +12,7 @@ const application =
   read("crates/application/src/use_cases/exchange/preview_team_package_import/coverage.rs") +
   read("crates/application/src/use_cases/exchange/commit_team_package_import/policy.rs") +
   read("crates/application/src/use_cases/exchange/export_team_package_preview_json/use_case.rs");
-const persistence = ["mod", "preview", "conflict", "commit", "write", "names", "identity", "formation", "validation", "values"].map((name) => read(`crates/persistence-postgres/src/adapters/workbooks/team_package/${name}.rs`)).join("\n");
+const persistence = ["mod", "preview", "conflict", "commit", "write", "names", "identity", "formation", "validation", "values"].map((name) => read(`crates/persistence-postgres/src/adapters/workbooks/team_package/${name}.rs`)).join("\n") + read("crates/persistence-postgres/src/adapters/workbooks/identity/teams.rs");
 const playerPersistence = ["preview", "conflict", "commit", "export", "identity", "validation", "values"]
   .map((name) => read(name === "export" ? "crates/persistence-postgres/src/adapters/workbooks/monthly_player/read.rs" : `crates/persistence-postgres/src/adapters/workbooks/player_catalog/${name}.rs`)).join("\n");
 const commands = read("src-tauri/src/commands/exchange.rs");
@@ -91,7 +91,8 @@ for (const [owner,names] of [
   [`${teamRoot}/commit.rs`,["commit_team_monthly_import"]],
   [`${teamRoot}/write.rs`,["execute_team_monthly_row","apply_team_update","upsert_team_profile_from_values"]],
   [`${teamRoot}/names.rs`,["ensure_team_name_alias","preserve_current_team_canonical_alias"]],
-  [`${teamRoot}/identity.rs`,["consolidate_duplicate_ready_add_team_rows","consolidate_duplicate_ready_add_team_rows_by_source","bind_batch_team_references"]],
+  ["crates/persistence-postgres/src/adapters/workbooks/identity/teams.rs",["consolidate_duplicate_ready_add_team_rows","consolidate_duplicate_ready_add_team_rows_by_source"]],
+  [`${teamRoot}/identity.rs`,["bind_batch_team_references"]],
   [`${ledgerRoot}/read.rs`,["read_team_monthly_import_preview"]],
   [`${ledgerRoot}/mapping.rs`,["team_import_row_from_db","team_parse_import_mode","team_parse_status","team_parse_action","team_parse_entity_type"]],
   [`${ledgerRoot}/batch.rs`,["find_team_batch","create_team_batch_in_tx"]],
@@ -106,7 +107,7 @@ const adapter = read("crates/application/src/composition/adapters/exchange/sprea
 for (const method of ["preview_team_monthly_import","read_team_monthly_import_preview","resolve_team_monthly_import_conflict","commit_team_monthly_import"]) requireTrue(adapter.includes(`PersistenceStore::${method}(`), `${method} 的原 MonthlyWorkbookPort 必须显式分派`);
 requireTrue(read("crates/persistence-postgres/src/adapters/workbooks/mod.rs").includes("mod team_package;"),"球队资料包唯一模块未登记");
 requireTrue(!persistence.includes("catalog.import_batches") && !persistence.includes("catalog.import_rows"),"球队资料包业务职责不得保存第二份批次/行 SQL");
-for (const source of [sources.validation,sources.preview,sources.names,sources.write,sources.identity,sources.formation,ledger.batch,ledger.rows]) {
+for (const source of [sources.validation,sources.preview,sources.names,sources.write,sources.identity,read("crates/persistence-postgres/src/adapters/workbooks/identity/teams.rs"),sources.formation,ledger.batch,ledger.rows]) {
   if (source !== sources.preview) requireTrue(!source.includes(".begin()") && !source.includes(".commit()"),"球队步骤必须复用调用方事务，不得另开或提交");
 }
 requireTrue(!/\b(?:INSERT INTO|UPDATE|DELETE FROM)\s+(?:football|feature)\./.test(sources.preview+sources.validation),"球队预检不得写业务事实");

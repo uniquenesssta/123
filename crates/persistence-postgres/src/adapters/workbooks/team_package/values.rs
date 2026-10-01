@@ -4,7 +4,9 @@ use serde_json::{json, Map, Value};
 use std::collections::HashSet;
 use uuid::Uuid;
 
-pub(super) fn object(value: &Value) -> PersistenceResult<&Map<String, Value>> {
+pub(in crate::adapters::workbooks) fn object(
+    value: &Value,
+) -> PersistenceResult<&Map<String, Value>> {
     value
         .as_object()
         .ok_or_else(|| PersistenceError::InvalidState("Excel 行内容不是对象".into()))
@@ -16,7 +18,10 @@ pub(super) fn object_mut(value: &mut Value) -> PersistenceResult<&mut Map<String
         .ok_or_else(|| PersistenceError::InvalidState("Excel 行内容不是对象".into()))
 }
 
-pub(super) fn text(values: &Map<String, Value>, key: &str) -> Option<String> {
+pub(in crate::adapters::workbooks) fn text(
+    values: &Map<String, Value>,
+    key: &str,
+) -> Option<String> {
     values
         .get(key)
         .and_then(Value::as_str)
@@ -25,7 +30,9 @@ pub(super) fn text(values: &Map<String, Value>, key: &str) -> Option<String> {
         .map(str::to_string)
 }
 
-pub(super) fn normalize_team_type(value: Option<String>) -> PersistenceResult<Option<String>> {
+pub(in crate::adapters::workbooks) fn normalize_team_type(
+    value: Option<String>,
+) -> PersistenceResult<Option<String>> {
     let Some(raw) = value else {
         return Ok(None);
     };
@@ -74,7 +81,7 @@ pub(super) fn require_text(values: &Map<String, Value>, key: &str) -> Persistenc
     text(values, key).ok_or_else(|| PersistenceError::InvalidState(format!("缺少必填字段 {key}")))
 }
 
-pub(super) fn optional_uuid(
+pub(in crate::adapters::workbooks) fn optional_uuid(
     values: &Map<String, Value>,
     key: &str,
 ) -> PersistenceResult<Option<Uuid>> {
@@ -352,7 +359,7 @@ pub(super) fn common_metadata(values: &Map<String, Value>) -> Value {
     })
 }
 
-pub(super) fn normalize_name(value: &str) -> String {
+pub(in crate::adapters::workbooks) fn normalize_name(value: &str) -> String {
     value
         .split_whitespace()
         .collect::<Vec<_>>()

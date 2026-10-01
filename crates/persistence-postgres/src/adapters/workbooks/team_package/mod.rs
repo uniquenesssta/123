@@ -5,7 +5,7 @@ mod identity;
 mod names;
 mod preview;
 mod validation;
-mod values;
+pub(super) mod values;
 mod write;
 
 use football_domain::{SpreadsheetConflictCandidate, SpreadsheetRowStatus};

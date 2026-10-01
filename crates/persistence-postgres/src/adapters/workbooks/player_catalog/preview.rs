@@ -1,3 +1,4 @@
+use super::super::identity::row::validate_workbook_row_locations;
 use super::identity::{canonical_spreadsheet_import_action, collect_keys, duplicate_keys};
 use super::SpreadsheetValidationContext;
 use crate::adapters::workbooks::batch_ledger::{batch as ledger, rows as ledger_rows};
@@ -40,6 +41,7 @@ impl PostgresStore {
         external_team_references: &HashMap<String, String>,
     ) -> PersistenceResult<SpreadsheetImportPreview> {
         let import_type = player_import_type(&parsed.format_version)?;
+        validate_workbook_row_locations(parsed)?;
         if let Some(existing) =
             ledger::find_player_batch(&self.pool, &parsed.source_sha256, import_type).await?
         {

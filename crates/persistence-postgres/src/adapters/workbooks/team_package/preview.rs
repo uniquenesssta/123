@@ -1,3 +1,4 @@
+use super::super::identity::row::validate_workbook_row_locations;
 use super::formation::validate_formation_group_rows;
 use super::identity::canonical_team_import_action;
 use super::values::{normalize_name, object, text};
@@ -25,6 +26,7 @@ impl PostgresStore {
                 parsed.format_version
             )));
         }
+        validate_workbook_row_locations(parsed)?;
         if let Some(existing_id) =
             ledger::find_team_batch(&self.pool, &parsed.source_sha256).await?
         {

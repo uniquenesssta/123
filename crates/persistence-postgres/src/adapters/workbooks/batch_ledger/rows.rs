@@ -1,3 +1,4 @@
+use super::super::identity::row::ImportRowLocation;
 use crate::PersistenceResult;
 use football_domain::{SpreadsheetImportCounts, SpreadsheetImportRow, SpreadsheetRowStatus};
 use sqlx::{postgres::PgRow, Postgres, Transaction};
@@ -7,6 +8,7 @@ pub(crate) async fn insert_import_row(
     batch_id: Uuid,
     row: &SpreadsheetImportRow,
 ) -> PersistenceResult<()> {
+    let location = ImportRowLocation::from_row(batch_id, row)?;
     sqlx::query(
         r#"
         INSERT INTO catalog.import_rows (
@@ -16,11 +18,11 @@ pub(crate) async fn insert_import_row(
         ) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11)
         "#,
     )
-    .bind(row.id)
-    .bind(batch_id)
-    .bind(&row.sheet_name)
-    .bind(row.row_number as i32)
-    .bind(row.entity_type.as_str())
+    .bind(location.row_id)
+    .bind(location.batch_id)
+    .bind(location.sheet_name)
+    .bind(location.row_number)
+    .bind(location.entity_type)
     .bind(row.action.as_str())
     .bind(row.status.as_str())
     .bind(&row.message)

@@ -1,8 +1,8 @@
-use super::formation::{execute_formation_groups, normalize_formation_usage_payload};
-use super::identity::{
-    bind_batch_team_references, consolidate_duplicate_ready_add_team_rows,
-    consolidate_duplicate_ready_add_team_rows_by_source,
+use super::super::identity::teams::{
+    consolidate_duplicate_ready_add_team_rows, consolidate_duplicate_ready_add_team_rows_by_source,
 };
+use super::formation::{execute_formation_groups, normalize_formation_usage_payload};
+use super::identity::bind_batch_team_references;
 use super::values::{
     normalize_monthly_datetime_payload, normalize_point_observation_window_payload,
     normalize_team_type_payload,

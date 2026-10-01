@@ -17,7 +17,7 @@ const application =
 const persistence = ["preview", "conflict", "commit", "export", "identity", "validation", "values"]
   .map((name) => read(name === "export" ? "crates/persistence-postgres/src/adapters/workbooks/monthly_player/read.rs" : `crates/persistence-postgres/src/adapters/workbooks/player_catalog/${name}.rs`)).join("\n");
 const batchLedger = read("crates/persistence-postgres/src/adapters/workbooks/batch_ledger/batch.rs");
-const teamPersistence = ["mod", "preview", "conflict", "commit", "write", "names", "identity", "formation", "validation", "values"].map((name) => read(`crates/persistence-postgres/src/adapters/workbooks/team_package/${name}.rs`)).join("\n");
+const teamPersistence = ["mod", "preview", "conflict", "commit", "write", "names", "identity", "formation", "validation", "values"].map((name) => read(`crates/persistence-postgres/src/adapters/workbooks/team_package/${name}.rs`)).join("\n") + read("crates/persistence-postgres/src/adapters/workbooks/identity/teams.rs");
 const template = read("crates/spreadsheet-io/src/team_package.rs");
 
 assert(

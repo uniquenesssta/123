@@ -127,4 +127,10 @@ The public model stub must always return an explicit unavailable error. A succes
 
 精确 `78138dba30ead1dbc4f4e5d2c6595e5775edfa0c` / Windows run `36854202029` / job `110342691574` 全 SUCCESS；Persistence 132/Application 55、前端类型/17 视口/build、fmt/Clippy/workspace tests、release/MSI/NSIS 与启动日志 7 条/3 操作实际通过。artifact `11158674438` / 14,017,971 字节 / SHA-256 `3b6b481c07e7626c81938480d81db1298d03797bce3785d593b3c27c745aa295`；13 DONE。
 
-14 迁移 48 个原函数，全部函数体、五个公开签名、原 SQL/投影不变，不新增镜像 inline；原 132/55 项需本项 Windows CI。沿用 pair/workbook 原 PG 夹具补重复导出/AI 字段/去重、空/未知比赛、读取不写事实/账本/审计、预检只暂存及行身份/载荷/计数、错误主客身份阻断后无副作用；既有成对事务、单侧合法替换、末行回滚/恢复、裁决计数/审计、共同锁并发和 cutoff/actual 模型隔离保留。83 项现有源码/契约、架构与 Rustfmt 通过，六项破坏探针拒绝并恢复。18 broad PG 数量不变且最终封包新库待验，ignored 编译不算实跑；XLSX/Full 同样待验。无新 target/runner/workflow/数据库设施；14 VERIFYING，15 BLOCKED。
+14 迁移 48 个原函数，全部函数体、五个公开签名、原 SQL/投影不变，不新增镜像 inline；原 132/55 项需本项 Windows CI。沿用 pair/workbook 原 PG 夹具补重复导出/AI 字段/去重、空/未知比赛、读取不写事实/账本/审计、预检只暂存及行身份/载荷/计数、错误主客身份阻断后无副作用；既有成对事务、单侧合法替换、末行回滚/恢复、裁决计数/审计、共同锁并发和 cutoff/actual 模型隔离保留。83 项现有源码/契约、架构与 Rustfmt 通过，六项破坏探针拒绝并恢复。18 broad PG 数量不变且最终封包新库待验，ignored 编译不算实跑；XLSX/Full 同样待验。无新 target/runner/workflow/数据库设施；14 已通过下述精确 Windows CI 并 DONE，15 已启动、VERIFYING。
+
+### R7-14 完成与 R7-15 待验（2026-10-01）
+
+精确 `bb0012085d92cb63742ff5b5571a8003984db709` / Windows run `36860224760` / job `110362332343` 全 SUCCESS；Persistence 132/Application 55、前端类型/17 视口/build、fmt/Clippy/workspace tests、release/MSI/NSIS 与启动日志 7 条/3 操作实际通过。artifact `11161982535` / 14,017,440 字节 / SHA-256 `31f7042c8981c0f5d34fd77630e78ff206b188be36579f6b9656d2f25652caf1`；14 DONE。
+
+15 原 8 个重复球队合并函数/5 inline 保持并迁入共享身份职责；新增原生产 row.rs inline 3 项，预期 Windows135/55，需本项CI实跑。原子记录 PG 用例扩生成键、同物理行多实体/维度/标签/双球队与跨行/表暂存、UUID/载荷读回、重复维度整批回滚、非法行号三类前检/同源 pending 保留、账本/事实/审计不留下失败副作用。原解析器空白行/多球队回归不变；18 broad数量不变且最终封包新库待验。83项现有源码/契约、架构/Rustfmt通过，六项破坏探针拒绝并恢复。完整R7当前职责/不变量已累计复核，15VERIFYING；不提前创建阶段完成记录或开始R8，PG/历史四项/账本/有效XLSX/Full的真实结果仍必须在最终新库验收取得。无新target/runner/workflow/数据库设施。
