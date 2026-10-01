@@ -4,11 +4,11 @@
 
 ## 当前状态
 
-截至 **2026-10-01**，图标、底层组件及Patterns六组全部完成。Controls **61 sets /506 variants**；Patterns **17 sets /125 variants /13 production singles**；Foundations **193 variables /13 text styles /6 effects**。
+截至 **2026-10-01**，图标、底层组件与Patterns六组全部完成。Controls **61 sets /506 variants**；Patterns **17 sets /125 variants /13 production singles**；Foundations **193 variables /13 text styles /6 effects**。
 
-**Screens已有10 / 17条路由通过可编辑视觉、代表性本页状态及有限原型验收：S01 dashboard、S02 lineups、S03 prediction、S04 review、S05 runs、S06 teams、S07 players、S08 lineup_presets、S09 workbooks、S10 rules。S11–S17七条尚未开始。** 累计315个产品状态仍只计10条路由，弹窗、Review Hub、上下文菜单和Pattern QA不增加路由数量。完整跨路由和真实应用运行时未完成。
+**Screens已有11 / 17条路由通过可编辑视觉、代表性本页状态及有限原型验收：S01 dashboard、S02 lineups、S03 prediction、S04 review、S05 runs、S06 teams、S07 players、S08 lineup_presets、S09 workbooks、S10 rules、S11 release。S12–S17六条尚未开始。** 累计348个产品状态仍只计11条路由；弹窗、Review Hub、上下文菜单和Pattern QA不增加路由数量。真实运行时与完整跨路由端到端集成未完成。
 
-恢复：[Screens总状态](FIGMA_SCREENS_STATE.json) → [S10详细状态](FIGMA_SCREEN_RULES_STATE.json) → [S10独立记录](FIGMA_SCREEN_RULES.md)。执行顺序见[17路由计划](FIGMA_SCREENS_PLAN.md)。**下一项：S11 `release` / 发布验收，尚未开始。**
+恢复：[总状态](FIGMA_SCREENS_STATE.json) → [S11详细状态](FIGMA_SCREEN_RELEASE_STATE.json) → [S11独立记录](FIGMA_SCREEN_RELEASE.md)。执行顺序见[17路由计划](FIGMA_SCREENS_PLAN.md)。**下一项：S12 `analytics` / 分析，尚未开始。**
 
 ## Patterns执行记录
 
@@ -21,7 +21,7 @@
 
 各组独立归档：[Shell](FIGMA_PC_APP_SHELL.md)、[Page Bars](FIGMA_PAGE_HEADING_TOOLBAR_FILTER_SELECTION.md)、[Card/Panel](FIGMA_METRIC_ACTION_PANEL.md)、[MDI](FIGMA_MASTER_DETAIL_INSPECTOR.md)、[Workflow/Timeline](FIGMA_WORKFLOW_STEPPER_TIMELINE.md)、[AI Chat](FIGMA_AI_CHAT.md)。
 
-[AI Chat历史状态](FIGMA_AI_CHAT_STATE.json)和[Workflow历史状态](FIGMA_WORKFLOW_STEPPER_TIMELINE_STATE.json)不能覆盖后续Screens进度。未改变组件API不为更新进度重写其历史记录。
+[AI Chat历史状态](FIGMA_AI_CHAT_STATE.json)和[Workflow历史状态](FIGMA_WORKFLOW_STEPPER_TIMELINE_STATE.json)不能覆盖后续Screens进度。组件API未改变时，不为更新进度重写其历史记录。
 
 ## 当前阶段：Screens
 
@@ -35,37 +35,40 @@
 - [x] S08 `lineup_presets`：按球队管理预设、编辑校验、复制/归档/删除、套用边界。
 - [x] S09 `workbooks`：三类工作包、导出/预检/提交、类别与批次隔离。
 - [x] S10 `rules`：赛事目录、层级、模型路由、规则包。
-- [x] 各独立状态记录中明确列出的部分真实入站与返回。
-- [ ] **S11 `release`：下一项，尚未开始。**
-- [ ] S12–S17：见独立Screens计划，尚未开始。
-- [ ] 其余真实目标、全状态持续性、完整跨路由和运行时联调。
+- [x] S11 `release`：验收请求、分类检查、报告证据、性能/安全/成本、历史。
+- [x] 独立状态中明确列出的部分真实入站与返回。
+- [ ] **S12 `analytics`：下一项，尚未开始。**
+- [ ] S13–S17：见独立Screens计划，尚未开始。
+- [ ] 其余真实目标、全状态持续性、完整跨路由与运行时联调。
 
-S01–S09历史计数和验收含义保持于各自记录。S10新增35状态、27弹窗、Review Hub `591:124271`，只增加一条产品路由。
+历史S01–S10计数和验收含义保持于各自记录。S11新增33状态、53弹窗和Review Hub `599:136849`，只增加一条产品路由。
 
-## S10验收与边界
+## S11验收与边界
 
-最终 **697条NAVIGATE/OVERLAY、81项CLOSE、0其他动作**。Hub可达35状态和27弹窗，6条外部入站另计：S01/S03/S09默认Light/Dark模型导航进入真实S10，仅保留代表性主题，不转移比赛、文件、绑定或授权。
+当前后端13项检查包含固定的external_model_runtime Warning。旧页面fixture文案不表示真实执行模型；当前设计不伪造全报告Pass或部署按钮。报告生成、持久化、发布许可与部署分开。
 
-3,559个未隐藏嵌套实例可解析，8,939个节点完成深层检查。非预期越界、失效引用/目标、未绑定solid颜色、顶层重叠和异常按钮高度均0；205个禁用/忙控件及可点击父容器旁路通过；23处正常滚动。最低普通文字对比度Light4.5327/Dark6.8625。11个最终创建/停用/绑定/注册确认没有执行连接。
+A/B/C分别为11/2/0、9/1/3、9/4/0的通过/警告/阻断合计，各13项。40个专属证据弹窗含A/B/C各13项及独立D成本项；3个完整JSON示例保持report_id和合计一致。DEMO编号、数值和占位哈希不是真实后端身份或完整性证明。
 
-删除赛事实际为停用目录与赛事级绑定，保留历史比赛/推演/复盘；C1–C4身份与路径说明分开。目录级规则不等于本场路径或执行许可。上级C1改为C2后不沿用原S1/G1；空上级、无P4包、忙或结果未知禁保存。
+请求窗口1–365天整数；预算可空或有限非负。null、0和超限独立，最新用量日期不一定是今天。无P95不补0ms；未运行不记0阻断。新请求等待期间保留的A标为上次报告，B加载/失败不展示A。历史只读，无覆盖或删除；结果未知先核验，不自动重发。
 
-规则包读取、后端校验、注册、绑定和执行资格独立。P7只读；读取中/无效/变化文件禁旧候选注册。注册中、结果未确认、已注册读回禁当前重复提交；成功读回从Hub独立选择，不由确认按钮伪造。
+最终 **676条NAVIGATE/OVERLAY、159项CLOSE、0其他动作**。Hub可达33状态和53弹窗；S10默认Light/Dark的2条入站另计，只保留主题，不转移规则候选、比赛或许可。2个最终运行确认反应为0，不执行真实验收、账本写入、模型、成本接口或部署。
 
-本轮明确记录四项源码差异：绑定表单可选与处理器必选赛事不一致，目录与路径查询P4过滤不一致，倒序列表按key建Map可能保留旧包，以及浅JSON校验/候选失效保护。没有修改源码，也不据此断言后端全无保护。
+9,941个未隐藏节点、3,796嵌套实例、2,742普通文字层完成深层检查。非预期越界、失效主组件/目标、未绑定solid颜色、顶层重叠、异常按钮高度及证据身份错误0。196禁用/忙控件自身反应和父级旁路0；22处正常滚动；最低普通文字对比度Light4.5048、Dark6.8625。
+
+158处本地文字对比度修正；62处继承的CHANGE_TO演示动作移除。长JSON使用原生滚动Frame包住完整Dialog Body实例，Header/关闭栏在滚动区外。未改共享主组件。
 
 ## 页面与实现边界
 
-始终使用现有组件真实实例，不detach、不创建重复整页主组件、不用截图或旧QA代替产品目标。S10仅修改自有节点和6条旧页面原型入站，无旧页面视觉/共享主组件/变量/样式/应用源码变更。
+始终使用现有组件真实实例，不detach、不创建重复Screen主组件、不用截图或旧QA代替产品目标。S11只修改自有节点及2条S10原型入站，无旧页面视觉/共享资产/应用源码变更。
 
-任意筛选、表单和对象版本、全部父级切换、日期与重复校验、真实文件读取/schema兼容性、创建/停用/绑定/注册事务与幂等、完整操作控制器、所有主题/折叠/滚动/草稿/候选/焦点持续性尚未实现。部分刷新、格式、版本与核验入口展示规范而非执行逻辑；局部禁用状态不证明全部跨页竞态正确。
+任意参数输入和报告组合、真实Windows/PostgreSQL测量、外部模型验证、凭据/成本读取、不可变账本事务与哈希核验、幂等和结果未知恢复、全部主题/折叠/焦点/滚动/草稿持续性尚未实现。部分刷新、类别和组合导航提供范围说明，不等于完整控制器；B/C未单独制作的类别显示自己的完整报告，不借用A。
 
-保留先前边界：S09类别/文件/模式/批次独立，无变更/已导入/失效/结果未知禁提交；S08预设与比赛副本独立、实时can_apply和同队校验；S07未知年龄/能力不补0、来源身份和长期能力/短期标签分离；S06归档/删除/强清和导入/P4资格独立；S05隐藏不删血缘；S04查看/执行、复盘/结算分开且SHA变化拒绝旧确认；Timeline核验/修订/取消独立；S03输入/提供器/输出独立；S02双方各11首发且失败保留草稿；AI Chat只读上下文主动选择和session/request隔离。
+保留先前边界：S10四项源码差异仍未修复，规则包读取/注册/绑定/执行独立；S09类别/文件/模式/批次及结果未知保护；S08预设与比赛副本及实时can_apply；S07来源身份、长期能力与短期标签；S06归档/删除/强清与导入/P4资格；S05隐藏不删血缘；S04查看/执行与复盘/结算、SHA保护；Timeline核验/修订/取消；S03输入/提供器/输出；S02双方11首发和失败草稿；AI Chat只读上下文主动勾选、session/request隔离。
 
-所有赛事、球员、文件、版本、任务和结果均为预置示例。真实API/数据库、权限、模型/Worker、键盘焦点及异步恢复需实现阶段验证；不把有限原型当作17路由端到端通过。
+所有数据和结果是预置示例；不能把有限原型记成17路由端到端或真实产品发布通过。
 
 ## 恢复
 
-读取最新Screens计划、总状态、当前页详细状态及实际Figma稳定根。S09历史总检查点为 `4627fecbe7d83ce377c36db82d63aec2bed34712`；S08为 `06eee1a492a92b620485d194cdd83844ecadef13`；其余历史见Screens计划。
+读取最新Screens计划、总状态、当前页详细状态及实际Figma稳定根。S10历史总检查点为 `aeeee7700b5665566729da826e6ab2b0a81b39ae`；S09为 `4627fecbe7d83ce377c36db82d63aec2bed34712`；其余历史见Screens计划。
 
-S10初始/组合WIP已被accepted覆盖，不重复创建已有根。旧截图、空handoff和旧“Screens未开始”不能覆盖最新记录；SLOT虚拟ID按稳定根、语义名称和真实主组件恢复，不猜ID。
+S11初始/组合WIP由accepted覆盖，不重复创建已有根。旧截图、空handoff和旧“Screens未开始”不能覆盖新记录；SLOT虚拟ID按稳定根、语义名称与真实组件恢复，不猜ID。Create State handoff未创建，GitHub明确状态为恢复依据。
