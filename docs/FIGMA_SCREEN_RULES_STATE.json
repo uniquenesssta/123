@@ -1,0 +1,11 @@
+{
+  "schemaVersion":1,"runId":"footfigma-screens-rules-2026-10-01","repo":"uniquenesssta/123","branch":"ui-design-system","fileKey":"PN0Whgu6HLWIHx4Mv6aHfu","page":"3:5",
+  "currentScreen":"S10 rules / 规则与模型","currentRoute":"rules","phase":"in_progress_semantics_verified","currentExecutionFinished":false,
+  "previousAcceptedGlobalCheckpoint":"4627fecbe7d83ce377c36db82d63aec2bed34712","acceptedRouteCount":9,"routeCount":17,
+  "source":{"page":{"path":"src/pages/rules.ts","ref":"main","blob":"22b042a920f9841fe759d8d8e834d47b683c8c9b"},"main":{"path":"src/main.ts","blob":"65bb1744a63015c56f8be8258406304535accb45","scope":"rules handlers at1518-1720; file loader and parent filters around8270-8425; not a full main.ts audit"}},
+  "authority":"Figma visual geometry, typography and color only; source supplies functional and data semantics.",
+  "frames":{},"pending":["compose catalog/structure/routing/packages representative states","identity-safe confirmations and route explanations","genuine incoming links","deep instance/layout/disabled/prototype/contrast QA and screenshots","accepted records and global checkpoint"],
+  "guards":["deleting competition disables directory and competition-level bindings, retains history","binding creation requires competition and eligible package; season/stage must belong to selected parents","readable JSON is not backend validation or registration","P7 remains historical read-only; no model execution on rules page","file replacement/invalid JSON cannot leave previous candidate registerable","registration does not confer match readiness or provider availability"],
+  "sourceGaps":["binding form says optional competition but createBinding requires it","catalog helper filters P4 while showCompetitionPath does not filter the same way","descending active package list then Map by package_key overwrites earlier newer entries; do not label current option latest","file loader performs shallow checks; full validation and stale selection protection need runtime alignment"],
+  "applicationSourceModified":false,"existingMastersModified":false,"warning":"WIP is not acceptance. Nine accepted routes remain authoritative until final S10 QA."
+}
