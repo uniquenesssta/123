@@ -242,7 +242,7 @@
 
 ## R7-15 Row 与 Subrecord Identity
 
-状态：`VERIFYING`（共享职责、行号前检及原回归已实现；Windows CI 待验，PG/XLSX/Full 最终新库待验），依赖 R7-14；原任务 R7-10。
+状态：`VERIFYING`（首轮 Windows run `36866936459` 因旧 owner 遗留 unused import 在 Clippy 失败，已清理并同步使用摘要；修订提交 Windows CI 待验，PG/XLSX/Full 最终新库待验），依赖 R7-14；原任务 R7-10。
 
 - **目标/契约**：明确物理行号与实体/子记录 identity 的不同语义；同一物理行的多个合法子记录不误去重，多球队效力子记录不被覆盖；子键仍由原数据库唯一计算，修复异常行号转换/同源批次提前取消；不修改冻结迁移来省略处理。
 - **来源与目标**：现有重复球队行合并、暂存行定位与物理行号边界；效力/能力/标签子记录的生成列继续保留原冻结迁移，解析器保留 spreadsheet-io owner；持久化共享职责迁入 `crates/persistence-postgres/src/adapters/workbooks/identity/`。按实际职责调整私有文件布局，不强制一函数一文件。

@@ -2,7 +2,7 @@ use super::super::identity::teams::normalized_source_urls;
 use super::values::{normalize_name, object_mut, optional_uuid, text};
 use super::RowValidation;
 use crate::adapters::workbooks::batch_ledger::rows as ledger_rows;
-use crate::{PersistenceError, PersistenceResult};
+use crate::PersistenceResult;
 use football_domain::{
     SpreadsheetAction, SpreadsheetConflictCandidate, SpreadsheetEntityType, SpreadsheetImportMode,
     SpreadsheetImportRow, SpreadsheetRowStatus,

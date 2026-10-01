@@ -279,6 +279,8 @@ Windows 编译/Clippy/tests、浏览器/截图/前端生产构建、安装包/�
 
 进入/回退基线：`bb0012085d92cb63742ff5b5571a8003984db709`。14 DONE；15 当前 `VERIFYING`，须取得本项精确 Windows CI 后完成节点收口。
 
+首轮精确 `680b5890dfcd5dff1eb6006ae400ab23153defa9` / [Windows run 36866936459](https://github.com/uniquenesssta/123/actions/runs/36866936459) / job `110384651720` 为 failure：架构、前端契约/类型/17 视口/build 已通过，Clippy 因原 Team identity 遗留 unused `PersistenceError` 导入失败，workspace tests/release/启动未完成。本轮仅清理该无调用导入、同步使用摘要与事实记录，原业务函数/接口/SQL/测试/门禁不变且不添加 allow；原受影响门禁与 Rustfmt 通过，完整 Windows Rust/打包仍待修订提交 CI，不继承前一次的全量 PASS。
+
 - 共享 workbooks/identity/{mod,row,teams} 负责已暂存行 UUID/批次定位、物理行号落库检查及资料包重复球队行合并；8 个原函数与 5 个原 inline 测试从 team_package/identity.rs 迁入 teams.rs，原函数体/测试、球队国家/类型隔离、名称/来源规范化、显式总览优先、缺失字段合并与零/false/原显示名保持。Team commit 和来源关联切换唯一 owner，原 Team values 的五项策略仅放宽 workbooks 内部可见性，无复制实现、公开 API 或反向依赖业务编排。
 - 原 unchecked u32→i32 行号转换替换为 ImportRowLocation 的受检投影；UUID、batch、sheet、原物理行和 entity_type 保持，载荷/候选/匹配信息按原 SQL 暂存。三类预检在任何同源查找/取消或批次创建前检查行号，防止非法行号溢出及取消旧 pending 批次后才插入失败。保留既有 >=2 CHECK 和 PostgreSQL integer 上限，不额外限制合法整数行号或合并物理行。
 - 子记录唯一身份继续由冻结 0043 的生成列计算：能力 dimension_code、标签 tag_code 仅 BTRIM；效力 team_id→team_key→lower(BTRIM(team_name))，其余空子键。五字段 UNIQUE 和原 INSERT 决定共存/重复拒绝；Rust 不重算 subrecord_key，不去重同物理行、不通过 ON CONFLICT 吞掉重复。冲突裁决继续 batch+row UUID 定位，行锁/计数、提交依赖序、事实/审计/回滚边界保持。原 spreadsheet-io 解析与空白行/多球队/能力/标签规则保持原 owner，不引入对 Persistence 的反向依赖。

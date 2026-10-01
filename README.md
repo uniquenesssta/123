@@ -47,6 +47,8 @@ Node 开发依赖固定安装和读取自源码根目录上一级的 `../node_mo
 
 ### R7-15 Row 与 Subrecord Identity（2026-10-01，VERIFYING）
 
+- 首次 Windows run `36866936459` 在 Clippy `-D warnings` 因迁移后原 `team_package/identity.rs` 遗留未使用的 `PersistenceError` 导入失败；架构、前端类型/构建与 17 视口已通过，Rust tests/打包/启动未执行完成。已删除无调用导入并同步 Domain 使用指纹，直接受影响的原门禁、源码格式通过；无业务改动或警告抑制，仍待修订提交自己的 Windows CI。
+
 - 将 8 个原重复球队行合并函数与 5 个原 inline 测试迁入共享 `workbooks/identity/teams`，提交及来源关联切换唯一职责；正常合并、名称/来源、显式总览优先、国家/类型隔离及原事务保持。`identity/row` 保留行 UUID/批次/工作表/物理行/实体定位，子记录键继续由原数据库生成列和 UNIQUE 判定，Rust 不重复计算或误去重。
 - 修复未经检查的行号整数转换：三类预检在同源查找/取消和暂存之前拒绝不能按原 >=2/integer 约束落库的行号，避免异常输入取消旧 pending 批次后才失败；原载荷/行定位、账本及事实/审计/回滚边界保持。
 - 新增原生产模块 inline 3 项，预期 Windows Persistence 135/Application 55；原 PG 子记录用例扩同物理行多实体/维度/标签/双球队、跨行/表、UUID 读回、重复键回滚、三类前检与旧批次保留。83 项现有源码、架构及 Rustfmt 通过，六项破坏探针拒绝并恢复；当前 VERIFYING，须本项精确 Windows CI。R7 累计职责/接口/保护资产复核见阶段索引；PG/XLSX/Full 最终新库待验，未宣称阶段整体验收完成。无新 target/runner/workflow/数据库/依赖或迁移。
