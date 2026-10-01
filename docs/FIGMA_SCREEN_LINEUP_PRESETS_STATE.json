@@ -1,0 +1,17 @@
+{
+  "schemaVersion": 1,
+  "runId": "footfigma-screens-lineup-presets-2026-10-01",
+  "repo": "uniquenesssta/123", "branch": "ui-design-system",
+  "fileKey": "PN0Whgu6HLWIHx4Mv6aHfu", "page": "3:5",
+  "currentScreen": "S08 lineup_presets / 阵容预设", "currentRoute": "lineup_presets",
+  "phase": "in_progress_semantics_verified", "currentExecutionFinished": false,
+  "previousAcceptedGlobalCheckpoint": "66d575f0d9985012a43448e2fed2af9f913c3117",
+  "acceptedRouteCount": 7, "routeCount": 17,
+  "source": {"page":{"path":"src/pages/lineupPresets.ts","ref":"main","blob":"e4bd6b88d03b06db039278e447afc71816064b32"},"main":{"path":"src/main.ts","ref":"main","scope":"targeted editor validation, manager, copy, deletion and apply preflight excerpts"}},
+  "authority": "Figma controls visual design; source provides functional and data semantics only.",
+  "frames": {},
+  "pending": ["compose directory, team presets and editor states", "safe copy/archive/delete and apply-contract overlays", "existing page entry wiring", "deep structural and screenshot QA", "accepted records and global checkpoint"],
+  "guards": ["exactly eleven starters with complete unique formation slots", "nullable usage probability or zero-to-one", "same-team default uniqueness", "archive differs from permanent preset deletion", "apply preflight and team identity rechecked; match copy independent"],
+  "applicationSourceModified": false, "existingMastersModified": false,
+  "warning": "WIP is not acceptance. Previous seven accepted routes remain authoritative until S08 final QA."
+}
