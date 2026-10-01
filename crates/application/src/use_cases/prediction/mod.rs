@@ -4,6 +4,7 @@ use crate::ports::{
     rules::RuleRoutingPort,
 };
 
+pub(crate) mod build_input;
 pub(crate) mod dry_run_default_fixture;
 pub(crate) mod execute_p4_freeze;
 pub(crate) mod execute_prediction;

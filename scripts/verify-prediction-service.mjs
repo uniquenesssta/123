@@ -31,5 +31,23 @@ check(records.includes("data_cutoff_at = $2::timestamptz AS cutoff_matches") && 
 check(records.includes("published_at > $2::timestamptz") && records.includes("effective_at > $2::timestamptz"), "P4 证据截止必须使用相同数据库时间边界");
 check(records.includes("RETURNING created_at, data_cutoff_time, frozen_at") && records.includes('data_cutoff_at: row.try_get("data_cutoff_time")?') && records.includes('frozen_at: row.try_get("frozen_at")?'), "首建快照必须返回实际落库时间");
 check(records.includes("snapshot_fingerprint_preserves_submicrosecond_input_identity"), "纳秒输入身份不能通过时间容差放宽");
+// R8-01：输入构建唯一 owner；沿用原 Port、时钟、权限和审计契约。
+const builderPath = "crates/application/src/use_cases/prediction/build_input/mod.rs";
+check(existsSync(join(root,builderPath)), "R8-01 缺少输入构建 owner");
+const builder = read(builderPath);
+const builderProduction = builder.split("#[cfg(test)]")[0];
+const storedExecution = read("crates/application/src/use_cases/prediction/execute_prediction_from_match/mod.rs");
+check(useCases.includes("pub(crate) mod build_input;"), "R8-01 输入构建模块未登记");
+check(storedExecution.includes("super::build_input::execute(port, registry, command, persist_run).await?") && storedExecution.includes("execute_internal(port, registry, input, persist_run).await"), "正式/影子执行必须顺序复用输入构建及原执行器，保留模式");
+for (const token of ["prepare_match_input", "inspect_match_prediction_readiness", "attach_prediction_input_audit", "verify_prepared_input_matches_readiness", "PredictionCommand {"]) check(!storedExecution.includes(token), `原执行 owner 残留输入构建：${token}`);
+check(builderProduction.includes("inspect_match_prediction_readiness::execute(port, registry, command.clone()).await?"), "输入构建必须执行既有完整度评估");
+check(builderProduction.includes("readiness.can_run_formal") && builderProduction.includes("readiness.can_run_shadow") && builderProduction.includes("if !allowed {") && builderProduction.includes("return Err(ApplicationError::Validation(format!("), "输入 I/O 前必须按模式拒绝不允许的推演");
+const constructionSteps = ["if !allowed {", "let model_family = normalize_model_selection", ".prepare_match_input_at(", "verify_prepared_input_matches_readiness(&prepared, &readiness)?;", "attach_prediction_input_audit(&mut prepared.match_input, &readiness)?;", "Ok(PredictionCommand {"];
+const positions = constructionSteps.map(token=>builderProduction.indexOf(token));
+check(positions.every((position,index)=>position>=0 && (index===0 || position>positions[index-1])), "输入构建顺序必须为权限、家族、准备、指纹、审计、命令");
+check(/&model_family,\s*readiness\.assessed_at,/.test(builderProduction), "输入准备必须复用评估时间及规范化家族");
+for(const field of ["match_input: prepared.match_input", "snapshot_type: prepared.snapshot_type", "competition_id: prepared.match_record.competition_id", "season_id: prepared.match_record.season_id", "stage_id: prepared.match_record.stage_id", "competition_kind: prepared.competition_kind", "model_family: command.model_family", "explicit_rule_package_id: command.explicit_rule_package_id"]) check(builderProduction.includes(field), `输入构建丢失原命令字段：${field}`);
+for(const token of ["Utc::now", "Uuid::new", "execute_internal(", "save_run(", ".predict(", "sqlx::", "prepare_match_input("]) check(!builderProduction.includes(token), `输入构建越界副作用或重取时钟：${token}`);
+for(const test of ["audited_input_preserves_clock_family_route_and_manifest", "formal_and_shadow_permissions_block_input_io", "changed_input_manifest_blocks_construction", "runtime_identity_changes_preserve_assessed_manifest", "input_port_failure_and_missing_audit_do_not_return_command", "invalid_family_and_non_object_input_keep_existing_errors"]) check(builder.includes(`async fn ${test}`), `R8-01 缺少既有 target 内的行为测试：${test}`);
 if(failures.length) throw new Error(`Prediction Service 验证失败\n${failures.map((item)=>`- ${item}`).join("\n")}`);
 console.log(`Prediction Service 验证通过：${predictionFiles.length} 个 Service/Use Case Rust 文件，18 个公开 Application 职责已进入 Prediction Service/Ports 边界，P4 freeze execution 与 snapshot persistence 均不再由旧混合 owner 直接实现。`);

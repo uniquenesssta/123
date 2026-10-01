@@ -139,6 +139,8 @@ pub(crate) struct ProbeState {
     pub(crate) transitions: Vec<P4FreezeTaskTransition>,
     pub(crate) enqueues: Vec<EnqueueJobDraft>,
     pub(crate) queued_job_id: Option<Uuid>,
+    pub(crate) prepared_input: Option<PreparedMatchPredictionInput>,
+    pub(crate) input_requests: Vec<(Uuid, String, String, DateTime<Utc>)>,
     saved: Vec<(RouteDecision, ModelRequest, ModelOutput, i64)>,
     route_requests: Vec<RouteRequest>,
 }
@@ -528,12 +530,23 @@ impl PredictionInputPort for Probe {
     }
     async fn prepare_match_input_at(
         &self,
-        _match_id: Uuid,
-        _snapshot_type: &str,
-        _model_family: &str,
-        _reference_time: DateTime<Utc>,
+        match_id: Uuid,
+        snapshot_type: &str,
+        model_family: &str,
+        reference_time: DateTime<Utc>,
     ) -> PortResult<PreparedMatchPredictionInput> {
-        panic!("forbidden Port call: prepare_match_input_at")
+        self.call("prepare_input_at")?;
+        let mut state = self.state.lock().unwrap();
+        state.input_requests.push((
+            match_id,
+            snapshot_type.to_string(),
+            model_family.to_string(),
+            reference_time,
+        ));
+        Ok(state
+            .prepared_input
+            .clone()
+            .expect("unexpected prediction input preparation at assessed time"))
     }
 }
 

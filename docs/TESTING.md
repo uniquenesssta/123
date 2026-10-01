@@ -141,3 +141,9 @@ The public model stub must always return an explicit unavailable error. A succes
 精确 `a928c8b5ddcf37b569fbdab8c413be06d6270aac` / [Windows run 36871154039](https://github.com/uniquenesssta/123/actions/runs/36871154039) / job `110398949507` 全 SUCCESS；Persistence **135 项**、Application **55 项**、17 个截图视口、前端类型/生产构建、Rust fmt/Clippy/workspace tests、Windows release/MSI/NSIS 与启动日志 **7 条记录 / 3 个完成操作**实际通过。 artifact `11167454668` / 14,018,298 字节 / SHA-256 `8843e8c822b590dc4fd4a8f56e5ab4df477fe36ae8c11592795de852fa1fbc20`；首轮 unused import 的 Clippy 失败已由修订提交实跑关闭。
 
 15 DONE，R7 节点及 Windows Automated 出口完成；[阶段完成记录](modular-rewrite/R07-match-lineup-workbook-persistence/R07-stage-completion.md) 列明历史四项/账本/各 contracts/有效 XLSX/Windows Full 最终新库待验。18 broad PG 及其他数据库 contracts 仍 ignored，不能写成实跑通过。本轮只补文档，引用上述已验收的最终源码，不重复 Windows 编译打包；R8 未启动。
+
+## R8-01 当前验证（2026-10-01）
+
+沿用原 Application workspace tests 与 `prediction/tests.rs` Probe，在输入构建生产模块增加 6 项 tokio inline 测试：正式/影子与 P4/P7 家族/原 route/scope/manifest 保留，权限拒绝零输入 I/O，输入/质量变化拒绝，运行身份变化不改指纹，Port 失败/缺失审计停止，以及非法家族/非对象错误语义。原 55 项保持，预期 Application 61；Persistence 原 135 保持。此数量仅为源码预期，需精确 Windows CI 实跑确认，当前 VERIFYING。
+
+既有 `verify-prediction-service.mjs` 扩充唯一 owner、顺序、原时钟/字段和副作用边界检查；六项临时破坏探针必须拒绝并恢复。Node 源码检查及 Rustfmt 不计 Windows 编译/动态通过。原 P4/P7 contract/engine/time-window、persistence/fact/orchestration/workbench 测试沿用原目标；涉及 PG 的 ignored 项仍最终新库待验，公开 stub 不替代私有固定回归，不新增 runner/workflow/数据库。

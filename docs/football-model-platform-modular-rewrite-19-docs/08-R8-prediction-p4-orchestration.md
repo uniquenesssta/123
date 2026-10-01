@@ -5,6 +5,14 @@
 > 后续阶段：`R9`  
 > 本文档是唯一执行依据之一；必须与 `00-总体架构与前23节.md` 同时适用。
 
+## 当前执行订正（2026-10-01）
+
+用户已启动唯一 R8 分支 `rewrite/r8-prediction-p4-orchestration`，起点 `90680bf945fbb0d1c191937c2d9e90c2c916fb00`。R7-01～15 及 Windows Automated 已完成；最终代码 `a928c8b` / run `36871154039` 通过。动态 PG、历史四项/账本、有效 XLSX、Windows Full 及模型历史删除风险仍最终封包新库待验，不继承为 PASS。
+
+适用总纲顶部的执行订正：仅 Windows 动态验证，沿用原单测/contract、既有 Windows runner/workflow/数据库入口；不新增专项或持续回归体系。公开仓库没有私有 P4/P7 引擎、参数和 Golden Master；模型保护资产可验证，公共 unavailable stub 的通过不能冒充私有固定概率实跑。目录模板按实际职责及 Rust 模块命名调整；顺序执行的后端 use case 无新增 UI 生命周期，不强制新增 State、请求 ID 或空出口。
+
+R8-01 当前 `VERIFYING`，02～12 `BLOCKED`；精确门禁状态见 [阶段索引](../modular-rewrite/R08-prediction-p4-orchestration/README.md)。尚未取得本节点 Windows CI，通过前不得 DONE 或启动 02。
+
 ## 1. 阶段目标
 
 - 重写模型输入构建、历史特征读取、readiness、manifest、模型执行适配、运行持久化和 P4 外围编排。
@@ -173,7 +181,7 @@ Atomic Tasks：
 
 ## R8-01 Match Prediction Input Builder
 
-状态：`BLOCKED`（仅当上一任务与本任务前置门禁通过后改为 `READY`）
+状态：`VERIFYING`（实现及源码验证完成，等待精确 Windows CI；02 仍 BLOCKED）
 
 ### 1. 目标
 
@@ -181,14 +189,14 @@ Atomic Tasks：
 
 ### 2. 现状与来源
 
-- `crates/application/src/prediction.rs`。
-- `p4_orchestration.rs`、`fact_pipeline.rs`、`p4_persistence.rs`、`p4_workbench.rs`。
-- 相关 persistence modules。
+- 原模板列出的 Application 根文件已在 R3 迁出；不得重建旧 owner。
+- 实际来源：`crates/application/src/use_cases/prediction/execute_prediction_from_match/mod.rs` 的受审计输入构建。
+- 原 `PredictionInputPort`、组合适配器与 Persistence `match_prediction.rs` 保持，历史 SQL/贡献读取留 R8-02；评分、manifest、路由、执行和保存留 03～07。
 
 ### 3. 目标文件与目录
 
 ```text
-crates/application/src/use_cases/prediction/build-input/
+crates/application/src/use_cases/prediction/build_input/
 ```
 
 ### 4. 文件职责边界
@@ -199,19 +207,19 @@ crates/application/src/use_cases/prediction/build-input/
 
 ### 5. 输入
 
-- 无。
+- `StoredMatchPredictionCommand`、正式/影子模式、现有 PredictionAccess/ModelRegistry；评估结果提供唯一 assessed_at、权限、manifest 与 route identity。
 
 ### 6. 输出
 
-- 稳定的模块公开接口、可独立测试的实现和对应契约测试。
+- 内部 `PredictionCommand`，携带原输入及审计、原 scope/snapshot/kind、模型选择和显式路由；公共接口保持。
 
 ### 7. 允许依赖
 
-- 无。
+- 原 Domain/DTO/Ports、readiness 用例、shared audit/routing；通过原 Port 准备输入，不复制实现。
 
 ### 8. 禁止依赖
 
-- 无。
+- 具体数据库/SQL、模型内部/参数、运行保存、额外 Utc::now 或随机请求身份。
 
 ### 9. 状态所有权
 
@@ -227,7 +235,7 @@ crates/application/src/use_cases/prediction/build-input/
 
 ### 12. 并发/异步/生命周期
 
-- 所有异步请求必须具备请求 ID、取消或过期结果丢弃策略；销毁时解除监听器、定时器和挂起回调。
+- 不持有监听器、定时器或共享状态；原调用方控制请求生命周期。单请求顺序执行，权限拒绝、Port/指纹/审计失败直接返回，无新增重试；复用原 assessed_at。
 
 ### 13. 兼容要求
 

@@ -25,7 +25,7 @@
     ],
     "portSourceSha256": "a155a2f7e071bf7204d347db0599348b2da274fc4533171dfd9487cf6fcd44ff",
     "publicPortTraitCount": 43,
-    "applicationRustFileCount": 376,
+    "applicationRustFileCount": 377,
     "directConcretePersistenceImports": [
       "crates/application/src/composition/port_registry.rs"
     ]

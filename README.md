@@ -4,6 +4,8 @@
 
 R1–R6 累计补审覆盖 43 个任务节点。根据用户决定，R7-01 后新增 R7-02～06 审计整改，原 R7-02～10 顺延为 R7-07～15；优化拆分、验证与记录约束，沿用现有 Windows 验证和最终封包新库流程，不新增持续回归体系。R7-01 的 A1～A7 修订已通过 Windows CI run `36678914535`，节点 DONE；R7-02 外部 ID 身份保护、R7-03 普通删除与历史引用保护均已通过 Windows CI 并为 DONE。R7-04 清单、验证入口和历史记录已通过 Windows CI run `36706905645` 并为 DONE；R7-05 新增 20 个关键 Application 行为测试，精确 Windows CI run `36712015030` 已通过并 DONE；R7-06 的夹具/时间精度与账本修订已通过 Windows CI run `36734194083` 并 DONE；R7-07 阵容创建与共同并发锁已通过 Windows CI run `36757339619` 并 DONE；R7-08 阵容链/历史已通过 Windows CI run `36801488090` 并 DONE；R7-09 阵容预设已通过 Windows CI run `36808609584` 并 DONE；R7-10 两类导入的批次/行账本职责与冲突计数同步已通过 Windows CI run `36815568401` 并 DONE；R7-11 球员工作簿唯一职责已通过 Windows CI run `36824027121` 并 DONE；R7-12 球队资料包共享职责与冲突计数修订已通过 Windows CI run `36831302483` 并 DONE；R7-13 月度只读聚合与缺口唯一职责已通过 Windows CI run `36854202029` 并 DONE；R7-14 比赛阵容工作簿唯一职责已通过 Windows CI run `36860224760` 并 DONE；R7-15 行/子记录身份收敛及行号前检修订已通过 Windows CI run `36871154039` 并 DONE，R7 节点及 Windows Automated 阶段收口完成。PG/XLSX/Full 单独留到最终封包新库验收。详见 [R7 任务书](docs/football-model-platform-modular-rewrite-19-docs/07-R7-match-lineup-workbook-persistence.md) 与 [阶段索引/累计审计](docs/modular-rewrite/R07-match-lineup-workbook-persistence/README.md)。
 
+当前已进入 R8，唯一分支 `rewrite/r8-prediction-p4-orchestration`，以 R7 收尾 `90680bf` 为基线。R8-01 输入构建已实现并完成源码验证，当前 VERIFYING：新增 `use_cases/prediction/build_input/mod.rs`，原正式/影子入口顺序调用输入构建与执行器；权限、评估时间、家族规范化、指纹复核、审计和命令字段保持。沿用原 Probe/测试目标新增 6 项异常与身份测试，既有 Prediction verifier 扩充门禁。83 项现有前端源码检查、完整架构门禁、Rustfmt、保护资产/171 命令/46 迁移静态基线通过；5 项浏览器检查待 Windows。未改 Persistence SQL、模型、Ports、命令、依赖、迁移或 CI；不继承 R7 CI 为本项 PASS，PG/私有固定回归/Full 待验。详见 [R8 阶段索引](docs/modular-rewrite/R08-prediction-p4-orchestration/README.md)。
+
 ## 公开边界
 
 - 保留 `crates/model-api`、模型 ID、路由、规则包入口、预测页面和历史数据结构。
@@ -51,7 +53,7 @@ Node 开发依赖固定安装和读取自源码根目录上一级的 `../node_mo
 
 - 将 8 个原重复球队行合并函数与 5 个原 inline 测试迁入共享 `workbooks/identity/teams`，提交及来源关联切换唯一职责；正常合并、名称/来源、显式总览优先、国家/类型隔离及原事务保持。`identity/row` 保留行 UUID/批次/工作表/物理行/实体定位，子记录键继续由原数据库生成列和 UNIQUE 判定，Rust 不重复计算或误去重。
 - 修复未经检查的行号整数转换：三类预检在同源查找/取消和暂存之前拒绝不能按原 >=2/integer 约束落库的行号，避免异常输入取消旧 pending 批次后才失败；原载荷/行定位、账本及事实/审计/回滚边界保持。
-- 新增原生产模块 inline 3 项，Windows Persistence 135/Application 55 已实际通过；原 PG 子记录用例扩同物理行多实体/维度/标签/双球队、跨行/表、UUID 读回、重复键回滚、三类前检与旧批次保留。83 项现有源码、架构及 Rustfmt 通过，六项破坏探针拒绝并恢复；本项精确 Windows run `36871154039` 的 17 视口、Rust/前端、release/MSI/NSIS/启动全通过。R7-01～15 均 DONE，见 [15 完成记录](docs/modular-rewrite/R07-match-lineup-workbook-persistence/R07-15-row-and-subrecord-identity.md) 与 [R7 阶段完成记录](docs/modular-rewrite/R07-match-lineup-workbook-persistence/R07-stage-completion.md)；PG/历史四项/账本/有效 XLSX/Full 最终新库待验，未宣称最终封包验收通过；R8 未启动。无新 target/runner/workflow/数据库/依赖或迁移。
+- 新增原生产模块 inline 3 项，Windows Persistence 135/Application 55 已实际通过；原 PG 子记录用例扩同物理行多实体/维度/标签/双球队、跨行/表、UUID 读回、重复键回滚、三类前检与旧批次保留。83 项现有源码、架构及 Rustfmt 通过，六项破坏探针拒绝并恢复；本项精确 Windows run `36871154039` 的 17 视口、Rust/前端、release/MSI/NSIS/启动全通过。R7-01～15 均 DONE，见 [15 完成记录](docs/modular-rewrite/R07-match-lineup-workbook-persistence/R07-15-row-and-subrecord-identity.md) 与 [R7 阶段完成记录](docs/modular-rewrite/R07-match-lineup-workbook-persistence/R07-stage-completion.md)；PG/历史四项/账本/有效 XLSX/Full 最终新库待验，未宣称最终封包验收通过；该 R7 收尾时 R8 尚未启动；当前状态见上方 R8 索引。无新 target/runner/workflow/数据库/依赖或迁移。
 
 ### R7-14 Match Lineup Workbook（2026-10-01，DONE）
 
