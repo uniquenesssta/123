@@ -1,0 +1,11 @@
+{
+  "schemaVersion":1,"runId":"footfigma-screens-workbooks-2026-10-01","repo":"uniquenesssta/123","branch":"ui-design-system","fileKey":"PN0Whgu6HLWIHx4Mv6aHfu","page":"3:5",
+  "currentScreen":"S09 workbooks / Excel工作包","currentRoute":"workbooks","phase":"in_progress_semantics_verified","currentExecutionFinished":false,
+  "previousAcceptedGlobalCheckpoint":"06eee1a492a92b620485d194cdd83844ecadef13","acceptedRouteCount":8,"routeCount":17,
+  "source":{"page":{"path":"src/pages/workbooks.ts","ref":"main","blob":"06bf27cec0c3149aebb5dfeeca333a6e609c1149"},"main":{"path":"src/main.ts","ref":"main","scope":"targeted chooser/export/preview/commit and batch readback excerpts"}},
+  "authority":"Figma determines visual design. Source supplies functional and data semantics only.",
+  "frames":{},"pending":["compose category-specific workbooks and safe state transitions","compose confirmations and evidence dialogs","wire genuine incoming product controls","deep geometry/instance/interaction QA and screenshots","save accepted state and global checkpoint"],
+  "guards":["three category previews and batch IDs remain independent","preview does not write; blank preserves and clear is explicit","conflicts and format errors separate; no-change/busy/ambiguous outcomes must not resend","changing file or import mode invalidates the old submission context","final writes are not linked to fake success"],
+  "sourceGap":"workbookCard readiness currently checks only preview presence and conflict+error=0; busy/no-change/committed/stale-context guards shown in design require runtime enforcement and are not source fixes.",
+  "applicationSourceModified":false,"existingMastersModified":false,"warning":"WIP is not acceptance; eight accepted routes remain authoritative until final S09 QA."
+}
