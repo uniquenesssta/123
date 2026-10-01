@@ -94,10 +94,13 @@ requireTrue(integrationTests.includes("assert!(!invalid_home.model_eligible)"), 
 requireTrue(integrationTests.includes('snapshot_type: "T-N"') && integrationTests.includes("T-6h 数据窗口应读取窗口内最新 T-N 阵容"), "数据窗口最新记录 PostgreSQL 回归测试缺失");
 // R7-06：同一提交事务必须持久化结束旧版本计数，再写成功审计。
 const commitBody = exchange.slice(exchange.indexOf("pub async fn commit_match_lineup_import"), exchange.indexOf("pub async fn ai_match_package_context"));
-requireTrue(/ended_previous_count=\$5,skipped_count=\$6/.test(commitBody) && /\.bind\(ended_previous as i64\)/.test(commitBody), "比赛阵容导入账本漏写 ended_previous_count");
-const ledgerOffset = commitBody.indexOf("UPDATE catalog.import_batches SET status='succeeded'");
-const auditOffset = commitBody.indexOf('"match_lineup_import_committed"');
+const ledger = read("crates/persistence-postgres/src/adapters/workbooks/batch_ledger/batch.rs");
+const finishBody = ledger.slice(ledger.indexOf("pub(crate) async fn finish_batch_in_tx"), ledger.indexOf("#[cfg(test)]"));
+requireTrue(/ended_previous_count=\$5,skipped_count=\$6/.test(finishBody) && /\.bind\(result\.ended_previous_count as i64\)/.test(finishBody) && commitBody.includes("ended_previous_count: ended_previous"), "比赛阵容导入账本漏写 ended_previous_count");
+const ledgerOffset = finishBody.indexOf("UPDATE catalog.import_batches SET status='succeeded'");
+const auditOffset = finishBody.indexOf('"match_lineup_import_committed"');
 const commitOffset = commitBody.indexOf("tx.commit().await?");
-requireTrue(ledgerOffset >= 0 && auditOffset > ledgerOffset && commitOffset > auditOffset && commitBody.slice(ledgerOffset, auditOffset).includes("execute(&mut *tx)"), "比赛阵容业务/计数/成功审计必须在单一提交事务内");
+const finishOffset = commitBody.indexOf("ledger::finish_batch_in_tx(&mut tx, &result, ImportFamily::Match)");
+requireTrue(ledgerOffset >= 0 && auditOffset > ledgerOffset && finishOffset >= 0 && commitOffset > finishOffset && finishBody.slice(ledgerOffset, auditOffset).includes("execute(&mut **tx)") && finishBody.includes("crate::write_audit_event(") && !finishBody.includes(".begin()") && !finishBody.includes(".commit()"), "比赛阵容业务/计数/成功审计必须在单一提交事务内");
 requireTrue(integrationTests.includes("末行失败必须回滚替代阵容、前十个球员、账本与审计") && integrationTests.includes("committed.ended_previous_count, 1") && integrationTests.includes("audit_count_after, 1"), "比赛阵容账本失败重试/重复提交断言缺失");
 console.log("阶段5比赛、阵容与模型输入闭环契约验证通过。");

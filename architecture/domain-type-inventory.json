@@ -24,13 +24,13 @@
     "targetPublicExportPolicy": "explicit re-export only"
   },
   "sourceDigest": "217241ac243726a5ab6805a7f169e222b97e78c7c971749a5904714af673ebdd",
-  "rustUsageDigest": "5afd73c39be9b7df4c2a9c2604d75ed2edaba3badf4188884f606e39a983e8fb",
+  "rustUsageDigest": "54838e4a18e16e3ab656b4ff5528aeebe0a131da63773e3be0544aa727188cdd",
   "summary": {
     "typeCount": 365,
     "publicCompatibilityTypeCount": 365,
     "internalTypeCount": 0,
     "domainSourceFileCount": 129,
-    "scannedRustFileCount": 989,
+    "scannedRustFileCount": 995,
     "databaseMappedTypeCount": 300,
     "byTargetModule": {
       "ai_workspace": 16,
@@ -26201,6 +26201,8 @@
       "externalCallers": [
         "crates/application/src/use_cases/exchange/preview_team_package_import/coverage.rs",
         "crates/application/src/use_cases/exchange/preview_team_package_import/package_rows.rs",
+        "crates/persistence-postgres/src/adapters/workbooks/batch_ledger/mapping.rs",
+        "crates/persistence-postgres/src/adapters/workbooks/batch_ledger/rows.rs",
         "crates/persistence-postgres/src/match_exchange.rs",
         "crates/persistence-postgres/src/monthly_workbooks.rs",
         "crates/persistence-postgres/src/spreadsheet_exchange.rs",
@@ -26212,6 +26214,8 @@
         "crates/spreadsheet-io/src/team_package.rs"
       ],
       "databaseMappings": [
+        "crates/persistence-postgres/src/adapters/workbooks/batch_ledger/mapping.rs",
+        "crates/persistence-postgres/src/adapters/workbooks/batch_ledger/rows.rs",
         "crates/persistence-postgres/src/match_exchange.rs",
         "crates/persistence-postgres/src/monthly_workbooks.rs",
         "crates/persistence-postgres/src/spreadsheet_exchange.rs"
@@ -26271,11 +26275,13 @@
         "crates/domain/tests/serde_contracts/r2_07_module_paths.rs"
       ],
       "externalCallers": [
+        "crates/persistence-postgres/src/adapters/workbooks/batch_ledger/rows.rs",
         "crates/persistence-postgres/src/match_exchange.rs",
         "crates/persistence-postgres/src/monthly_workbooks.rs",
         "crates/persistence-postgres/src/spreadsheet_exchange.rs"
       ],
       "databaseMappings": [
+        "crates/persistence-postgres/src/adapters/workbooks/batch_ledger/rows.rs",
         "crates/persistence-postgres/src/match_exchange.rs",
         "crates/persistence-postgres/src/monthly_workbooks.rs",
         "crates/persistence-postgres/src/spreadsheet_exchange.rs"
@@ -26405,6 +26411,8 @@
       "externalCallers": [
         "crates/application/src/use_cases/exchange/preview_team_package_import/coverage.rs",
         "crates/application/src/use_cases/exchange/preview_team_package_import/package_rows.rs",
+        "crates/persistence-postgres/src/adapters/workbooks/batch_ledger/mapping.rs",
+        "crates/persistence-postgres/src/adapters/workbooks/batch_ledger/rows.rs",
         "crates/persistence-postgres/src/match_exchange.rs",
         "crates/persistence-postgres/src/monthly_workbooks.rs",
         "crates/persistence-postgres/src/spreadsheet_exchange.rs",
@@ -26416,6 +26424,8 @@
         "crates/spreadsheet-io/src/team_package.rs"
       ],
       "databaseMappings": [
+        "crates/persistence-postgres/src/adapters/workbooks/batch_ledger/mapping.rs",
+        "crates/persistence-postgres/src/adapters/workbooks/batch_ledger/rows.rs",
         "crates/persistence-postgres/src/match_exchange.rs",
         "crates/persistence-postgres/src/monthly_workbooks.rs",
         "crates/persistence-postgres/src/spreadsheet_exchange.rs"
@@ -26715,12 +26725,14 @@
         "crates/application/src/use_cases/exchange/commit_player_catalog_import/use_case.rs",
         "crates/application/src/use_cases/exchange/commit_team_monthly_import/use_case.rs",
         "crates/application/src/use_cases/exchange/export_match_lineup_data/mod.rs",
+        "crates/persistence-postgres/src/adapters/workbooks/batch_ledger/batch.rs",
         "crates/persistence-postgres/src/match_exchange.rs",
         "crates/persistence-postgres/src/monthly_workbooks.rs",
         "crates/persistence-postgres/src/spreadsheet_exchange.rs",
         "src-tauri/src/commands/exchange.rs"
       ],
       "databaseMappings": [
+        "crates/persistence-postgres/src/adapters/workbooks/batch_ledger/batch.rs",
         "crates/persistence-postgres/src/match_exchange.rs",
         "crates/persistence-postgres/src/monthly_workbooks.rs",
         "crates/persistence-postgres/src/spreadsheet_exchange.rs"
@@ -26800,14 +26812,14 @@
       ],
       "externalCallers": [
         "crates/application/src/use_cases/exchange/commit_team_package_import/policy.rs",
-        "crates/persistence-postgres/src/match_exchange.rs",
-        "crates/persistence-postgres/src/monthly_workbooks.rs",
-        "crates/persistence-postgres/src/spreadsheet_exchange.rs"
+        "crates/persistence-postgres/src/adapters/workbooks/batch_ledger/batch.rs",
+        "crates/persistence-postgres/src/adapters/workbooks/batch_ledger/rows.rs",
+        "crates/persistence-postgres/src/monthly_workbooks.rs"
       ],
       "databaseMappings": [
-        "crates/persistence-postgres/src/match_exchange.rs",
-        "crates/persistence-postgres/src/monthly_workbooks.rs",
-        "crates/persistence-postgres/src/spreadsheet_exchange.rs"
+        "crates/persistence-postgres/src/adapters/workbooks/batch_ledger/batch.rs",
+        "crates/persistence-postgres/src/adapters/workbooks/batch_ledger/rows.rs",
+        "crates/persistence-postgres/src/monthly_workbooks.rs"
       ]
     },
     {
@@ -26878,6 +26890,8 @@
         "crates/application/src/use_cases/exchange/preview_player_catalog_import/use_case.rs",
         "crates/application/src/use_cases/exchange/preview_team_monthly_import/use_case.rs",
         "crates/application/src/use_cases/exchange/preview_team_package_import/use_case.rs",
+        "crates/persistence-postgres/src/adapters/workbooks/batch_ledger/batch.rs",
+        "crates/persistence-postgres/src/adapters/workbooks/batch_ledger/mapping.rs",
         "crates/persistence-postgres/src/match_exchange.rs",
         "crates/persistence-postgres/src/monthly_workbooks.rs",
         "crates/persistence-postgres/src/spreadsheet_exchange.rs",
@@ -26886,6 +26900,8 @@
         "src-tauri/src/commands/exchange.rs"
       ],
       "databaseMappings": [
+        "crates/persistence-postgres/src/adapters/workbooks/batch_ledger/batch.rs",
+        "crates/persistence-postgres/src/adapters/workbooks/batch_ledger/mapping.rs",
         "crates/persistence-postgres/src/match_exchange.rs",
         "crates/persistence-postgres/src/monthly_workbooks.rs",
         "crates/persistence-postgres/src/spreadsheet_exchange.rs"
@@ -26979,12 +26995,14 @@
         "crates/application/src/use_cases/exchange/resolve_match_lineup_import_conflict/mod.rs",
         "crates/application/src/use_cases/exchange/resolve_player_catalog_import_conflict/use_case.rs",
         "crates/application/src/use_cases/exchange/resolve_team_monthly_import_conflict/use_case.rs",
+        "crates/persistence-postgres/src/adapters/workbooks/batch_ledger/read.rs",
         "crates/persistence-postgres/src/match_exchange.rs",
         "crates/persistence-postgres/src/monthly_workbooks.rs",
         "crates/persistence-postgres/src/spreadsheet_exchange.rs",
         "src-tauri/src/commands/exchange.rs"
       ],
       "databaseMappings": [
+        "crates/persistence-postgres/src/adapters/workbooks/batch_ledger/read.rs",
         "crates/persistence-postgres/src/match_exchange.rs",
         "crates/persistence-postgres/src/monthly_workbooks.rs",
         "crates/persistence-postgres/src/spreadsheet_exchange.rs"
@@ -27059,6 +27077,7 @@
         "crates/persistence-postgres/src/match_exchange.rs",
         "crates/persistence-postgres/src/monthly_workbooks.rs",
         "crates/persistence-postgres/src/spreadsheet_exchange.rs",
+        "crates/persistence-postgres/tests/postgres_integration.rs",
         "src-tauri/src/commands/exchange.rs"
       ],
       "databaseMappings": [
@@ -27153,11 +27172,15 @@
         "crates/domain/tests/serde_contracts/r2_07_module_paths.rs"
       ],
       "externalCallers": [
+        "crates/persistence-postgres/src/adapters/workbooks/batch_ledger/mapping.rs",
+        "crates/persistence-postgres/src/adapters/workbooks/batch_ledger/rows.rs",
         "crates/persistence-postgres/src/match_exchange.rs",
         "crates/persistence-postgres/src/monthly_workbooks.rs",
         "crates/persistence-postgres/src/spreadsheet_exchange.rs"
       ],
       "databaseMappings": [
+        "crates/persistence-postgres/src/adapters/workbooks/batch_ledger/mapping.rs",
+        "crates/persistence-postgres/src/adapters/workbooks/batch_ledger/rows.rs",
         "crates/persistence-postgres/src/match_exchange.rs",
         "crates/persistence-postgres/src/monthly_workbooks.rs",
         "crates/persistence-postgres/src/spreadsheet_exchange.rs"
@@ -27225,6 +27248,7 @@
         "crates/application/src/use_cases/exchange/preview_team_package_import/coverage.rs",
         "crates/application/src/use_cases/exchange/preview_team_package_import/package_rows.rs",
         "crates/application/src/use_cases/exchange/preview_team_package_import/use_case.rs",
+        "crates/persistence-postgres/src/adapters/workbooks/batch_ledger/batch.rs",
         "crates/persistence-postgres/src/match_exchange.rs",
         "crates/persistence-postgres/src/monthly_workbooks.rs",
         "crates/persistence-postgres/src/spreadsheet_exchange.rs",
@@ -27236,6 +27260,7 @@
         "crates/spreadsheet-io/src/team_package.rs"
       ],
       "databaseMappings": [
+        "crates/persistence-postgres/src/adapters/workbooks/batch_ledger/batch.rs",
         "crates/persistence-postgres/src/match_exchange.rs",
         "crates/persistence-postgres/src/monthly_workbooks.rs",
         "crates/persistence-postgres/src/spreadsheet_exchange.rs"
@@ -28010,12 +28035,16 @@
         "crates/domain/tests/serde_contracts/r2_07_module_paths.rs"
       ],
       "externalCallers": [
+        "crates/persistence-postgres/src/adapters/workbooks/batch_ledger/mapping.rs",
+        "crates/persistence-postgres/src/adapters/workbooks/batch_ledger/rows.rs",
         "crates/persistence-postgres/src/match_exchange.rs",
         "crates/persistence-postgres/src/monthly_workbooks.rs",
         "crates/persistence-postgres/src/spreadsheet_exchange.rs",
         "crates/persistence-postgres/tests/entity_matching_references_repository_contract.rs"
       ],
       "databaseMappings": [
+        "crates/persistence-postgres/src/adapters/workbooks/batch_ledger/mapping.rs",
+        "crates/persistence-postgres/src/adapters/workbooks/batch_ledger/rows.rs",
         "crates/persistence-postgres/src/match_exchange.rs",
         "crates/persistence-postgres/src/monthly_workbooks.rs",
         "crates/persistence-postgres/src/spreadsheet_exchange.rs"

@@ -1,3 +1,11 @@
+use crate::adapters::workbooks::batch_ledger::{
+    batch::{self as ledger, ImportFamily},
+    mapping::{
+        player_parse_action as parse_action, player_parse_entity_type as parse_entity_type,
+        player_parse_import_mode as parse_import_mode, player_parse_row_status as parse_row_status,
+    },
+    rows as ledger_rows,
+};
 use crate::{
     adapters::catalog::references::write_external_entity_id, PersistenceError, PersistenceResult,
     PostgresStore,
@@ -6,12 +14,11 @@ use chrono::{DateTime, Duration, NaiveDate, NaiveDateTime, SecondsFormat, Utc};
 use football_domain::{
     ExternalEntityIdDraft, SpreadsheetAction, SpreadsheetConflictCandidate, SpreadsheetEntityType,
     SpreadsheetExportData, SpreadsheetExternalIdRow, SpreadsheetImportCommitResult,
-    SpreadsheetImportCounts, SpreadsheetImportMode, SpreadsheetImportPreview,
-    SpreadsheetImportResolution, SpreadsheetImportRow, SpreadsheetParsedWorkbook,
-    SpreadsheetPlayerAbilityRow, SpreadsheetPlayerAvailabilityRow, SpreadsheetPlayerDynamicTagRow,
-    SpreadsheetPlayerNameRow, SpreadsheetPlayerPositionRow, SpreadsheetPlayerRow,
-    SpreadsheetPlayerTeamPeriodRow, SpreadsheetRowStatus, SpreadsheetTeamRow, PLAYER_IMPORT_FORMAT,
-    PLAYER_MONTHLY_FORMAT,
+    SpreadsheetImportMode, SpreadsheetImportPreview, SpreadsheetImportResolution,
+    SpreadsheetImportRow, SpreadsheetParsedWorkbook, SpreadsheetPlayerAbilityRow,
+    SpreadsheetPlayerAvailabilityRow, SpreadsheetPlayerDynamicTagRow, SpreadsheetPlayerNameRow,
+    SpreadsheetPlayerPositionRow, SpreadsheetPlayerRow, SpreadsheetPlayerTeamPeriodRow,
+    SpreadsheetRowStatus, SpreadsheetTeamRow, PLAYER_IMPORT_FORMAT, PLAYER_MONTHLY_FORMAT,
 };
 use serde_json::{json, Map, Value};
 use sqlx::{Postgres, Row, Transaction};
@@ -46,29 +53,15 @@ impl PostgresStore {
         external_team_references: &HashMap<String, String>,
     ) -> PersistenceResult<SpreadsheetImportPreview> {
         let import_type = player_import_type(&parsed.format_version)?;
-        if let Some(existing) = sqlx::query(
-            "SELECT id,status FROM catalog.import_batches WHERE source_sha256=$1 AND import_type=$2 AND status IN ('pending','running','succeeded') ORDER BY started_at DESC NULLS LAST LIMIT 1",
-        )
-        .bind(&parsed.source_sha256)
-        .bind(import_type)
-        .fetch_optional(&self.pool)
-        .await?
+        if let Some(existing) =
+            ledger::find_player_batch(&self.pool, &parsed.source_sha256, import_type).await?
         {
             let existing_id: Uuid = existing.try_get("id")?;
             let existing_status: String = existing.try_get("status")?;
             if existing_status != "pending" {
                 return self.read_spreadsheet_import_preview(existing_id).await;
             }
-            sqlx::query(
-                "UPDATE catalog.import_batches SET status='cancelled',finished_at=now(),metadata=metadata||$2 WHERE id=$1 AND status='pending'",
-            )
-            .bind(existing_id)
-            .bind(json!({
-                "cancel_reason": "repreview_same_source",
-                "replacement_requested_at": Utc::now(),
-            }))
-            .execute(&self.pool)
-            .await?;
+            ledger::cancel_pending_player_batch(&self.pool,existing_id,json!({"cancel_reason":"repreview_same_source","replacement_requested_at":Utc::now()})).await?;
         }
         let batch_id = Uuid::new_v4();
         let mode_text = match mode {
@@ -136,33 +129,19 @@ impl PostgresStore {
             };
             preview_rows.push(row);
         }
-        let counts = count_preview_rows(&preview_rows);
+        let counts = ledger_rows::count_preview_rows(&preview_rows);
         let mut tx = self.pool.begin().await?;
-        sqlx::query(
-            r#"
-            INSERT INTO catalog.import_batches (
-                id, import_type, workbook_kind, format_version, status, source_file_name, source_sha256,
-                import_mode, started_at, skipped_count, error_count, metadata
-            ) VALUES ($1, $2, $3, $4, 'pending', $5, $6, $7, now(), $8, $9, $10)
-            "#,
+        ledger::create_player_batch_in_tx(
+            &mut tx,
+            batch_id,
+            parsed,
+            &counts,
+            import_type,
+            mode_text,
         )
-        .bind(batch_id)
-        .bind(import_type)
-        .bind(if parsed.format_version == PLAYER_MONTHLY_FORMAT { "player_monthly" } else { "legacy_player" })
-        .bind(&parsed.format_version)
-        .bind(&parsed.source_file_name)
-        .bind(&parsed.source_sha256)
-        .bind(mode_text)
-        .bind(counts.skipped as i64)
-        .bind((counts.error + counts.conflict) as i64)
-        .bind(json!({
-            "format_version": parsed.format_version,
-            "preview_counts": &counts,
-        }))
-        .execute(&mut *tx)
         .await?;
         for row in &preview_rows {
-            insert_import_row(&mut tx, batch_id, row).await?;
+            ledger_rows::insert_import_row(&mut tx, batch_id, row).await?;
         }
         tx.commit().await?;
         Ok(SpreadsheetImportPreview {
@@ -176,98 +155,24 @@ impl PostgresStore {
         })
     }
 
-    pub async fn read_spreadsheet_import_preview(
-        &self,
-        batch_id: Uuid,
-    ) -> PersistenceResult<SpreadsheetImportPreview> {
-        let batch = sqlx::query(
-            r#"
-            SELECT source_file_name, source_sha256, import_mode, started_at
-            FROM catalog.import_batches
-            WHERE id = $1 AND import_type IN ('player_catalog_xlsx','player_monthly_xlsx')
-            "#,
-        )
-        .bind(batch_id)
-        .fetch_one(&self.pool)
-        .await?;
-        let rows = sqlx::query(
-            r#"
-            SELECT id, sheet_name, row_number, entity_type, requested_action,
-                   status, message, payload, matched_entity_id, conflict_candidates
-            FROM catalog.import_rows
-            WHERE batch_id = $1
-            ORDER BY row_number, sheet_name, id
-            "#,
-        )
-        .bind(batch_id)
-        .fetch_all(&self.pool)
-        .await?
-        .iter()
-        .map(import_row_from_row)
-        .collect::<PersistenceResult<Vec<_>>>()?;
-        let counts = count_preview_rows(&rows);
-        Ok(SpreadsheetImportPreview {
-            batch_id,
-            source_file_name: batch
-                .try_get::<Option<String>, _>("source_file_name")?
-                .unwrap_or_default(),
-            source_sha256: batch
-                .try_get::<Option<String>, _>("source_sha256")?
-                .unwrap_or_default(),
-            import_mode: parse_import_mode(
-                batch
-                    .try_get::<Option<String>, _>("import_mode")?
-                    .as_deref(),
-            )?,
-            counts,
-            rows,
-            created_at: batch
-                .try_get::<Option<DateTime<Utc>>, _>("started_at")?
-                .unwrap_or_else(Utc::now),
-        })
-    }
-
     pub async fn resolve_spreadsheet_import_conflict(
         &self,
         batch_id: Uuid,
         resolution: SpreadsheetImportResolution,
     ) -> PersistenceResult<SpreadsheetImportPreview> {
         let mut tx = self.pool.begin().await?;
-        let batch = sqlx::query(
-            r#"
-            SELECT status, import_mode, inserted_count, updated_count,
-                   ended_previous_count, skipped_count, error_count, finished_at
-            FROM catalog.import_batches
-            WHERE id = $1 AND import_type IN ('player_catalog_xlsx','player_monthly_xlsx')
-            FOR UPDATE
-            "#,
-        )
-        .bind(batch_id)
-        .fetch_one(&mut *tx)
-        .await?;
+        let batch = ledger::lock_batch_in_tx(&mut tx, batch_id, ImportFamily::Player).await?;
         let batch_status: String = batch.try_get("status")?;
-        if batch_status != "pending" {
-            return Err(PersistenceError::InvalidState(format!(
-                "导入批次状态为 {batch_status}，不能处理冲突"
-            )));
-        }
+        ledger::require_pending(
+            &batch_status,
+            format!("导入批次状态为 {batch_status}，不能处理冲突"),
+        )?;
         let import_mode = parse_import_mode(
             batch
                 .try_get::<Option<String>, _>("import_mode")?
                 .as_deref(),
         )?;
-        let row = sqlx::query(
-            r#"
-            SELECT entity_type, requested_action, status, payload, conflict_candidates
-            FROM catalog.import_rows
-            WHERE id = $1 AND batch_id = $2
-            FOR UPDATE
-            "#,
-        )
-        .bind(resolution.row_id)
-        .bind(batch_id)
-        .fetch_one(&mut *tx)
-        .await?;
+        let row = ledger_rows::lock_import_row_in_tx(&mut tx, batch_id, resolution.row_id).await?;
         let row_status: String = row.try_get("status")?;
         if row_status != "conflict" {
             return Err(PersistenceError::InvalidState(
@@ -275,16 +180,12 @@ impl PostgresStore {
             ));
         }
         if resolution.skip {
-            sqlx::query(
-                r#"
-                UPDATE catalog.import_rows SET
-                    status = 'skip', message = '用户在预检中选择跳过',
-                    matched_entity_id = NULL, conflict_candidates = '[]'::jsonb
-                WHERE id = $1
-                "#,
+            ledger_rows::skip_import_row_in_tx(
+                &mut tx,
+                batch_id,
+                resolution.row_id,
+                "用户在预检中选择跳过",
             )
-            .bind(resolution.row_id)
-            .execute(&mut *tx)
             .await?;
         } else {
             let selected = resolution.selected_entity_id.ok_or_else(|| {
@@ -379,20 +280,18 @@ impl PostgresStore {
             } else {
                 (SpreadsheetRowStatus::ReadyAdd, "已选择关联记录")
             };
-            sqlx::query(
-                r#"
-                UPDATE catalog.import_rows SET
-                    status = $2, message = $3, payload = $4,
-                    matched_entity_id = $5, conflict_candidates = '[]'::jsonb
-                WHERE id = $1
-                "#,
+            ledger_rows::resolve_import_row_in_tx(
+                &mut tx,
+                batch_id,
+                ledger_rows::ResolvedImportRow {
+                    id: resolution.row_id,
+                    status: status.as_str(),
+                    message: Some(message),
+                    payload: &payload,
+                    matched_entity_id: Some(selected),
+                    candidates: &[],
+                },
             )
-            .bind(resolution.row_id)
-            .bind(status.as_str())
-            .bind(message)
-            .bind(payload)
-            .bind(selected)
-            .execute(&mut *tx)
             .await?;
         }
         crate::write_audit_event(
@@ -416,18 +315,7 @@ impl PostgresStore {
         batch_id: Uuid,
     ) -> PersistenceResult<SpreadsheetImportCommitResult> {
         let mut tx = self.pool.begin().await?;
-        let batch = sqlx::query(
-            r#"
-            SELECT status, import_mode, inserted_count, updated_count,
-                   ended_previous_count, skipped_count, error_count, finished_at
-            FROM catalog.import_batches
-            WHERE id = $1 AND import_type IN ('player_catalog_xlsx','player_monthly_xlsx')
-            FOR UPDATE
-            "#,
-        )
-        .bind(batch_id)
-        .fetch_one(&mut *tx)
-        .await?;
+        let batch = ledger::lock_batch_in_tx(&mut tx, batch_id, ImportFamily::Player).await?;
         let status: String = batch.try_get("status")?;
         if status == "succeeded" {
             return Ok(SpreadsheetImportCommitResult {
@@ -442,42 +330,15 @@ impl PostgresStore {
                     .unwrap_or_else(Utc::now),
             });
         }
-        if status != "pending" {
-            return Err(PersistenceError::InvalidState(format!(
-                "导入批次状态为 {status}，不能提交"
-            )));
-        }
-        let blocking_count: i64 = sqlx::query_scalar(
-            "SELECT COUNT(*)::bigint FROM catalog.import_rows WHERE batch_id = $1 AND status IN ('conflict', 'error')",
-        )
-        .bind(batch_id)
-        .fetch_one(&mut *tx)
-        .await?;
+        ledger::require_pending(&status, format!("导入批次状态为 {status}，不能提交"))?;
+        let blocking_count: i64 = ledger_rows::blocking_rows_in_tx(&mut tx, batch_id).await?;
         if blocking_count > 0 {
             return Err(PersistenceError::InvalidState(format!(
                 "仍有 {blocking_count} 条冲突或错误记录，不能提交"
             )));
         }
-        sqlx::query("UPDATE catalog.import_batches SET status = 'running' WHERE id = $1")
-            .bind(batch_id)
-            .execute(&mut *tx)
-            .await?;
-        let rows = sqlx::query(
-            r#"
-            SELECT id, entity_type, requested_action, status, payload, matched_entity_id
-            FROM catalog.import_rows
-            WHERE batch_id = $1 AND status IN ('ready_add', 'ready_update')
-            ORDER BY CASE entity_type
-                WHEN 'team' THEN 1 WHEN 'player' THEN 2 WHEN 'player_name' THEN 3
-                WHEN 'player_position' THEN 4 WHEN 'player_team_period' THEN 5
-                WHEN 'player_ability' THEN 6 WHEN 'player_availability' THEN 7
-                WHEN 'external_entity_id' THEN 8 ELSE 99 END,
-                row_number, id
-            "#,
-        )
-        .bind(batch_id)
-        .fetch_all(&mut *tx)
-        .await?;
+        ledger::start_batch_in_tx(&mut tx, batch_id).await?;
+        let rows = ledger_rows::commit_rows_in_tx(&mut tx, batch_id, ImportFamily::Player).await?;
         let mut player_keys = HashMap::<String, Uuid>::new();
         let mut team_keys = HashMap::<String, Uuid>::new();
         let mut inserted = 0_u64;
@@ -507,43 +368,11 @@ impl PostgresStore {
                 ApplyOutcome::Inserted => inserted += 1,
                 ApplyOutcome::Updated => updated += 1,
             }
-            sqlx::query("UPDATE catalog.import_rows SET status = 'imported', imported_at = now() WHERE id = $1")
-                .bind(row_id)
-                .execute(&mut *tx)
-                .await?;
+            ledger_rows::mark_imported_in_tx(&mut tx, row_id).await?;
         }
-        let skipped: i64 = sqlx::query_scalar(
-            "SELECT COUNT(*)::bigint FROM catalog.import_rows WHERE batch_id = $1 AND status = 'skip'",
-        )
-        .bind(batch_id)
-        .fetch_one(&mut *tx)
-        .await?;
+        let skipped: i64 = ledger_rows::skipped_rows_in_tx(&mut tx, batch_id).await?;
         let finished_at = Utc::now();
-        sqlx::query(
-            r#"
-            UPDATE catalog.import_batches SET
-                status = 'succeeded', inserted_count = $2, updated_count = $3,
-                skipped_count = $4, error_count = 0, finished_at = $5
-            WHERE id = $1
-            "#,
-        )
-        .bind(batch_id)
-        .bind(inserted as i64)
-        .bind(updated as i64)
-        .bind(skipped)
-        .bind(finished_at)
-        .execute(&mut *tx)
-        .await?;
-        crate::write_audit_event(
-            &mut tx,
-            "spreadsheet_import_committed",
-            "import_batch",
-            batch_id.to_string(),
-            json!({"inserted": inserted, "updated": updated, "skipped": skipped}),
-        )
-        .await?;
-        tx.commit().await?;
-        Ok(SpreadsheetImportCommitResult {
+        let result = SpreadsheetImportCommitResult {
             batch_id,
             inserted_count: inserted,
             updated_count: updated,
@@ -551,7 +380,10 @@ impl PostgresStore {
             skipped_count: skipped as u64,
             error_count: 0,
             finished_at,
-        })
+        };
+        ledger::finish_batch_in_tx(&mut tx, &result, ImportFamily::Player).await?;
+        tx.commit().await?;
+        Ok(result)
     }
 
     pub async fn spreadsheet_export_data(&self) -> PersistenceResult<SpreadsheetExportData> {
@@ -1985,36 +1817,6 @@ fn validate_datetime_range(
     Ok(())
 }
 
-async fn insert_import_row(
-    tx: &mut Transaction<'_, Postgres>,
-    batch_id: Uuid,
-    row: &SpreadsheetImportRow,
-) -> PersistenceResult<()> {
-    sqlx::query(
-        r#"
-        INSERT INTO catalog.import_rows (
-            id, batch_id, sheet_name, row_number, entity_type,
-            requested_action, status, message, payload, matched_entity_id,
-            conflict_candidates
-        ) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11)
-        "#,
-    )
-    .bind(row.id)
-    .bind(batch_id)
-    .bind(&row.sheet_name)
-    .bind(row.row_number as i32)
-    .bind(row.entity_type.as_str())
-    .bind(row.action.as_str())
-    .bind(row.status.as_str())
-    .bind(&row.message)
-    .bind(&row.payload)
-    .bind(row.matched_entity_id)
-    .bind(serde_json::to_value(&row.conflict_candidates)?)
-    .execute(&mut **tx)
-    .await?;
-    Ok(())
-}
-
 struct ImportCommitContext<'a> {
     player_keys: &'a mut HashMap<String, Uuid>,
     team_keys: &'a mut HashMap<String, Uuid>,
@@ -2600,91 +2402,6 @@ fn candidates_to_domain(values: Vec<MatchCandidate>) -> Vec<SpreadsheetConflictC
             detail: v.detail,
         })
         .collect()
-}
-
-fn count_preview_rows(rows: &[SpreadsheetImportRow]) -> SpreadsheetImportCounts {
-    let mut c = SpreadsheetImportCounts {
-        total: rows.len() as u64,
-        ..Default::default()
-    };
-    for row in rows {
-        match row.status {
-            SpreadsheetRowStatus::ReadyAdd => c.ready_add += 1,
-            SpreadsheetRowStatus::ReadyUpdate => c.ready_update += 1,
-            SpreadsheetRowStatus::ReadyEndPrevious => c.ready_end_previous += 1,
-            SpreadsheetRowStatus::Conflict => c.conflict += 1,
-            SpreadsheetRowStatus::Error => c.error += 1,
-            SpreadsheetRowStatus::Skip => c.skipped += 1,
-            SpreadsheetRowStatus::Imported => c.imported += 1,
-        }
-    }
-    c
-}
-fn import_row_from_row(row: &sqlx::postgres::PgRow) -> PersistenceResult<SpreadsheetImportRow> {
-    let candidates: Value = row.try_get("conflict_candidates")?;
-    Ok(SpreadsheetImportRow {
-        id: row.try_get("id")?,
-        sheet_name: row.try_get("sheet_name")?,
-        row_number: row.try_get::<i32, _>("row_number")? as u32,
-        entity_type: parse_entity_type(&row.try_get::<String, _>("entity_type")?)?,
-        action: parse_action(&row.try_get::<String, _>("requested_action")?)?,
-        status: parse_row_status(&row.try_get::<String, _>("status")?)?,
-        message: row.try_get("message")?,
-        payload: row.try_get("payload")?,
-        matched_entity_id: row.try_get("matched_entity_id")?,
-        conflict_candidates: serde_json::from_value(candidates)?,
-    })
-}
-fn parse_entity_type(v: &str) -> PersistenceResult<SpreadsheetEntityType> {
-    match v {
-        "team" => Ok(SpreadsheetEntityType::Team),
-        "team_name" => Ok(SpreadsheetEntityType::TeamName),
-        "coach" => Ok(SpreadsheetEntityType::Coach),
-        "coach_name" => Ok(SpreadsheetEntityType::CoachName),
-        "team_coach_period" => Ok(SpreadsheetEntityType::TeamCoachPeriod),
-        "formation_usage" => Ok(SpreadsheetEntityType::FormationUsage),
-        "team_tactical_observation" => Ok(SpreadsheetEntityType::TeamTacticalObservation),
-        "team_ability_observation" => Ok(SpreadsheetEntityType::TeamAbilityObservation),
-        "player" => Ok(SpreadsheetEntityType::Player),
-        "player_name" => Ok(SpreadsheetEntityType::PlayerName),
-        "player_position" => Ok(SpreadsheetEntityType::PlayerPosition),
-        "player_team_period" => Ok(SpreadsheetEntityType::PlayerTeamPeriod),
-        "player_ability" => Ok(SpreadsheetEntityType::PlayerAbility),
-        "player_availability" => Ok(SpreadsheetEntityType::PlayerAvailability),
-        "player_dynamic_tag" => Ok(SpreadsheetEntityType::PlayerDynamicTag),
-        "external_entity_id" => Ok(SpreadsheetEntityType::ExternalEntityId),
-        _ => Err(PersistenceError::InvalidState(format!("未知导入实体：{v}"))),
-    }
-}
-fn parse_action(v: &str) -> PersistenceResult<SpreadsheetAction> {
-    match v {
-        "add" => Ok(SpreadsheetAction::Add),
-        "update" => Ok(SpreadsheetAction::Update),
-        "clear" => Ok(SpreadsheetAction::Clear),
-        "skip" => Ok(SpreadsheetAction::Skip),
-        _ => Err(PersistenceError::InvalidState(format!("未知导入动作：{v}"))),
-    }
-}
-fn parse_row_status(v: &str) -> PersistenceResult<SpreadsheetRowStatus> {
-    match v {
-        "ready_add" => Ok(SpreadsheetRowStatus::ReadyAdd),
-        "ready_update" => Ok(SpreadsheetRowStatus::ReadyUpdate),
-        "ready_end_previous" => Ok(SpreadsheetRowStatus::ReadyEndPrevious),
-        "conflict" => Ok(SpreadsheetRowStatus::Conflict),
-        "error" => Ok(SpreadsheetRowStatus::Error),
-        "skip" => Ok(SpreadsheetRowStatus::Skip),
-        "imported" => Ok(SpreadsheetRowStatus::Imported),
-        _ => Err(PersistenceError::InvalidState(format!("未知导入状态：{v}"))),
-    }
-}
-fn parse_import_mode(v: Option<&str>) -> PersistenceResult<SpreadsheetImportMode> {
-    match v.unwrap_or("add_and_update") {
-        "add_only" => Ok(SpreadsheetImportMode::AddOnly),
-        "add_and_update" => Ok(SpreadsheetImportMode::AddAndUpdate),
-        other => Err(PersistenceError::InvalidState(format!(
-            "未知导入模式：{other}"
-        ))),
-    }
 }
 
 fn text(values: &Map<String, Value>, key: &str) -> String {

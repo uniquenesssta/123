@@ -4,7 +4,7 @@
 
 `IN_PROGRESS`
 
-当前进度以本段及任务索引为准：R7-01～08 `DONE`；R7-08 精确提交 `3c8f7f0230207f7352b7f806b8a1e92c4ebc81e5` 的 Windows run `36801488090` / job `110176585645` 全通过，Persistence 107 项/Application 53 项，详见 [08 完成记录](R07-08-lineup-chain-and-history.md)。R7-09 已按用户指令启动，源码和现有门禁已实现，当前 `VERIFYING`；R7-10～15 `BLOCKED`。后文旧节点的“当前/待验/下一项”叙述属于当时实施记录，不覆盖此处和任务表。
+当前进度以本段及任务索引为准：R7-01～09 `DONE`；09 精确提交 `3525c04cbb0f75d79cdbc39a4ef64f3698f5eb92` 的 Windows run `36808609584` / job `110198409740` 全通过，Persistence 115 项/Application 53 项，详见 [09 完成记录](R07-09-team-lineup-presets.md)。R7-10 已按用户指令启动，源码和现有门禁已实现，当前 `VERIFYING`；R7-11～15 `BLOCKED`。后文旧节点的“当前/待验/下一项”叙述属于当时实施记录，不覆盖此处和任务表。
 
 R7 先完成 R1–R6 累计审计整改，再重写 Matches、Lineups、Presets 与 Workbook 持久化，重点保证双方阵容原子事务、截止时间、历史链路、批次账本、真实 XLSX 行/子记录 identity 与整批回滚；不实施工作簿解析算法本体或前端导入 UI。
 
@@ -47,8 +47,8 @@ crates/persistence-postgres/src/adapters/workbooks/
 | R7-06 | 历史数据库失败与账本问题收口 | DONE |
 | R7-07 | Lineup Pair Transaction | DONE |
 | R7-08 | Lineup Chain / History | DONE |
-| R7-09 | Team Lineup Presets | VERIFYING |
-| R7-10 | Spreadsheet Batch Ledger | BLOCKED |
+| R7-09 | Team Lineup Presets | DONE |
+| R7-10 | Spreadsheet Batch Ledger | VERIFYING |
 | R7-11 | Player Workbook | BLOCKED |
 | R7-12 | Team Package | BLOCKED |
 | R7-13 | Monthly Workbook | BLOCKED |
@@ -190,7 +190,7 @@ SQLx 0.8.6 的 Chrono DateTime 编码按自 2000 年起的整数微秒写入，�
 
 ## R7-09 当前验证状态
 
-进入/回退基线：`3c8f7f0230207f7352b7f806b8a1e92c4ebc81e5`。R7-08 DONE，用户已授权启动本项；本项 `VERIFYING`，R7-10 及以后 BLOCKED，不继承 08 的 Windows PASS。
+进入/回退基线：`3c8f7f0230207f7352b7f806b8a1e92c4ebc81e5`。本项已 `DONE`：精确提交 `3525c04` 的 Windows run `36808609584` 全通过，见 [完成记录](R07-09-team-lineup-presets.md)。用户已启动 R7-10；以下保留 09 实施检查记录，Windows 待验已由本次成功 CI 更新，真实数据库待验保持。
 
 - 旧 `team_lineup_presets.rs` 实现删除；唯一职责迁入 `adapters/lineups/presets/`。`write.rs` 持有保存/复制/归档/删除及共同事务审计，`validation.rs` 持有结构与事务内成员校验，`read.rs` 持有 SQL 与紧密耦合的记录映射，`preview.rs` 持有只读入口与纯评估。不强制一函数一文件，不留旧转发壳。
 - 保存错误/11 首发/重复球员/队长/概率/归属/默认标志与版本语义、位置标准化及共用角色审计日期保持；预设读取的当前时点角色来源、球队关系、availability、稳定列表顺序与 200 上限保持。所有原方法及私有规则除 preview 纯评估抽取之外经规范化函数体比较保持；无算法、DTO、生产依赖或迁移变化。
@@ -202,6 +202,23 @@ SQLx 0.8.6 的 Chrono DateTime 编码按自 2000 年起的整数微秒写入，�
 本轮 83 个既有源码/契约检查、架构聚合、源码卫生、171 命令、数据库/18 保护资产冻结、Domain inventory、Rustfmt 源码格式/解析及 diff 检查通过。9 个原函数体规范化比较保持；五项临时破坏探针分别引入预览写入、删除成员球队条件、删除主客侧校验、增加第二次事务提交、削弱首发 blocker，均被原门禁拒绝并恢复。
 
 本地仅运行既有 Node 源码/契约检查和 Rustfmt 源码格式/解析；Windows fmt/Clippy/workspace tests、前端交互/截图/生产构建、安装包和启动待新精确提交 CI。PG 四项历史失败与账本、有效 XLSX、Windows Full 均保留最终封包新库待验。成功后才创建 `R07-09-team-lineup-presets.md` 并开放 10；受控回退同步职责/Port 分派/门禁/清单和测试指纹，不恢复双实现或单独放宽门禁。
+
+
+## R7-10 当前验证状态
+
+进入/回退基线：`3525c04cbb0f75d79cdbc39a4ef64f3698f5eb92`。09 DONE，用户已授权启动本项；本项 `VERIFYING`，R7-11 及以后 BLOCKED，不继承 09 的 Windows PASS。
+
+- `adapters/workbooks/batch_ledger/` 唯一持有本项两类导入账本。batch 负责同源球员预检查找/取消、两类头记录、按导入类型隔离的父锁、pending 门禁、running/成功计数与审计；rows 负责原物理行身份写入、冲突行锁/变更、依赖顺序、导入状态、预览汇总及 pending 计数刷新；mapping 保持两类严格实体/动作/状态/模式 codec 与错误文字；read 持有两个既有公开预览读取方法及原稳定顺序。模块按职责布局，无一函数一文件或无意义转发层。
+- 原 spreadsheet/match 工作簿保留业务预检、候选解析、业务应用及调用方唯一事务编排，完全删除本项账本 SQL/旧行 mapper/count/insert 实现，只单向调用账本。账本步骤复用 `&mut **tx`，不另开/提交事务，不反向依赖工作簿业务。111 个保留业务/测试函数体规范化比较不变，改动集中在两类预检/冲突/提交共 6 个流程入口。Monthly/Team 的剩余账本适配随 R7-12/13 实际职责迁移，未提前搬迁其业务或记为完成。
+- 确认并修订暂存计数问题：原人工解决冲突只更新行，批次的 skipped_count/error_count 仍保留初始预检值；现在 skip/选择候选两条路径都在行更新后、同一父锁事务内刷新。metadata.preview_counts 保留首次预检快照，预览继续从当前行计算，成功计数由同一返回结果对象写账本/原审计。ended_previous_count 修复保持；没有新表、迁移、DTO 或额外事实状态。
+- 球员 succeeded 重试继续读回原计数，不重复业务/审计；比赛非 pending 与重复提交继续拒绝。比赛冲突两阶段业务校验仍重新取得父锁并检查行还为 conflict；不改变现有错误优先级和候选约束。球员 pending 同源重新预检继续取消旧批次，新建替代；两类只读预览继续按 row_number/sheet_name/id 稳定排序与隔离导入类型。
+- 在现有生产职责文件内补 6 个 inline 测试：pending/拒绝文字、family 隔离、实体/动作严格 codec、状态与结束旧记录 family 边界、模式默认/拒绝、全部七种行状态计数守恒。随 Windows 既有 workspace tests 待执行，不计本地 PASS。
+- 原球员月度用例补 running/failed/cancelled 拒绝、未解决冲突阻断、跳过后 pending 计数、已解决行重复处理拒绝、同源重新预检取消替代、成功返回/账本/一次审计、跨类型读取拒绝；原双方阵容/比赛导入用例补同样状态/冲突门禁、非法候选计数不变、skip/候选解决计数、跨类型读取，再继续原末行外键失败/整批回滚/恢复重试/计数与一次审计断言。18 broad 数量保持，无新 test target/runner/workflow/数据库设施；真实 PG 最终封包新库待验。
+- 既有 Exchange verifier 加唯一职责、调用方事务顺序、状态/类型隔离、两阶段重锁、无反向依赖、结果计数与暂存刷新门禁；原阵容链 ended_previous/同事务审计检查指向新账本，原资料包重复预检 verifier 检查业务调用和实际 SQL owner。清单/既有测试源码指纹刷新；直接模块 38，Domain 365 声明/300 映射分类及 Domain 源码摘要保持，Rust 使用摘要随实际代码刷新。
+
+本轮原前端入口 83 个源码/契约检查均已通过（清单刷新后补齐原 inventory 检查），架构聚合、994 文件源码卫生、171 命令、46 迁移/18 保护资产冻结、Rustfmt 源码格式/解析及 diff 复核通过。六项临时破坏探针分别去批次父锁、漏 ended_previous 绑定、漏暂存计数刷新、账本自行 commit、跳过冲突检查、允许 running 状态，均被原 Exchange 门禁拒绝并恢复。SQLx 锁定 0.8.6 的事务重借用通过 Context7 查询，并核对官方 v0.8.6 Transaction DerefMut 源码；未把 latest 文档当作版本专属证据。
+
+本地只运行现有 Node 源码/契约检查和 Rustfmt 源码格式/解析。Windows 编译/fmt/Clippy/workspace tests、前端浏览器/截图/生产构建、安装包与启动待新精确提交 CI；真实 PG 四项历史失败、账本、有效 XLSX 和 Windows Full 仍最终封包新库待验。成功后才创建 `R07-10-spreadsheet-batch-ledger.md` 并开放 11。受控回退本项需同步账本职责、业务调用、暂存计数修订、门禁/清单和测试指纹，不独立放宽检查。
 
 ## R7-01 READY 边界
 

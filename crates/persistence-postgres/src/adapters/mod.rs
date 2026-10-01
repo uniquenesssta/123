@@ -4,6 +4,7 @@ pub(crate) mod lineups;
 pub(crate) mod matches;
 mod register_adapters;
 mod rules;
+pub(crate) mod workbooks;
 
 pub(crate) use competition::register_model_in_tx;
 pub use competition::ModelRegistration;

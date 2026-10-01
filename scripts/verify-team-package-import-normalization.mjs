@@ -15,6 +15,7 @@ const application =
   read("crates/application/src/use_cases/exchange/preview_team_package_import/use_case.rs") +
   read("crates/application/src/use_cases/exchange/commit_team_package_import/use_case.rs");
 const persistence = read("crates/persistence-postgres/src/spreadsheet_exchange.rs");
+const batchLedger = read("crates/persistence-postgres/src/adapters/workbooks/batch_ledger/batch.rs");
 const teamPersistence = read("crates/persistence-postgres/src/monthly_workbooks.rs");
 const template = read("crates/spreadsheet-io/src/team_package.rs");
 
@@ -58,8 +59,12 @@ assert(
   "联网角色模型来源类型未规范化为数据库允许的 calculation",
 );
 assert(
-  persistence.includes('"cancel_reason": "repreview_same_source"') &&
-    persistence.includes("existing_status != \"pending\""),
+  /"cancel_reason"\s*:\s*"repreview_same_source"/.test(persistence) &&
+    persistence.includes("existing_status != \"pending\"") &&
+    persistence.includes("ledger::find_player_batch(") &&
+    persistence.includes("ledger::cancel_pending_player_batch(") &&
+    batchLedger.includes("status IN ('pending','running','succeeded')") &&
+    batchLedger.includes("WHERE id=$1 AND status='pending'"),
   "同一文件的旧失败预检批次仍会阻止重新验证",
 );
 assert(

@@ -218,6 +218,58 @@ check(packageDefinition.scripts?.["verify:exchange-service"] === "node scripts/v
 check(packageDefinition.scripts?.["verify:architecture"]?.includes("verify-exchange-service.mjs"), "verify:architecture 未接入 Exchange 门禁");
 check(frontendVerifier.includes('"verify-exchange-service.mjs"'), "完整 frontend 未接入 Exchange 门禁");
 
+// R7-10：账本持有唯一 SQL 职责，工作簿业务流程持有唯一提交事务。
+const ledgerRoot = "crates/persistence-postgres/src/adapters/workbooks/batch_ledger";
+for (const file of ["mod.rs", "batch.rs", "rows.rs", "mapping.rs", "read.rs"]) check(fs.existsSync(path.join(root, ledgerRoot, file)), `缺少批次账本职责：${file}`);
+const ledgerBatch = read(`${ledgerRoot}/batch.rs`);
+const ledgerRows = read(`${ledgerRoot}/rows.rs`);
+const ledgerMapping = read(`${ledgerRoot}/mapping.rs`);
+const ledgerRead = read(`${ledgerRoot}/read.rs`);
+const playerWorkbook = read("crates/persistence-postgres/src/spreadsheet_exchange.rs");
+const matchWorkbook = read("crates/persistence-postgres/src/match_exchange.rs");
+const integration = read("crates/persistence-postgres/tests/postgres_integration.rs");
+const persistencePaths = [];
+const collectPersistence = (directory) => { for (const entry of fs.readdirSync(directory,{withFileTypes:true})) { const full=path.join(directory,entry.name); if(entry.isDirectory()) collectPersistence(full); else if(entry.name.endsWith(".rs")) persistencePaths.push(path.relative(root,full).replaceAll("\\","/")); } };
+collectPersistence(path.join(root,"crates/persistence-postgres/src"));
+for (const [owner,names] of [["read.rs",["read_spreadsheet_import_preview","read_match_lineup_import_preview"]],["batch.rs",["lock_batch_in_tx","start_batch_in_tx","finish_batch_in_tx","create_player_batch_in_tx","create_match_batch_in_tx","require_pending"]],["rows.rs",["insert_import_row","count_preview_rows","lock_import_row_in_tx","commit_rows_in_tx","mark_imported_in_tx","refresh_pending_counts_in_tx","skip_import_row_in_tx","resolve_import_row_in_tx"]]]) {
+  for (const name of names) {
+    const owners=persistencePaths.filter((file)=>new RegExp(`(?:pub(?:\\(crate\\))?\\s+)?(?:async\\s+)?fn\\s+${name}\\s*\\(`).test(read(file)));
+    check(owners.length===1 && owners[0]===`${ledgerRoot}/${owner}`,`${name} 必须只有一个批次账本 owner`);
+  }
+}
+for (const [label,source] of [["球员",playerWorkbook],["比赛",matchWorkbook]]) {
+  check(!source.includes("catalog.import_batches") && !source.includes("catalog.import_rows"), `${label}工作簿仍残留第二份账本 SQL`);
+  check(!/fn (?:insert_row|insert_import_row|row_from_db|import_row_from_row|count_rows|count_preview_rows)\s*\(/.test(source),`${label}工作簿仍残留旧行账本实现`);
+}
+for (const [source,family,method,apply] of [[playerWorkbook,"Player","commit_spreadsheet_import","apply_import_row"],[matchWorkbook,"Match","commit_match_lineup_import","apply_match_exchange_row"]]) {
+  const start=source.indexOf(`pub async fn ${method}(`); const next=source.indexOf("pub async fn ",start+20); const body=source.slice(start,next < 0?undefined:next);
+  const lock=body.indexOf(`ledger::lock_batch_in_tx(&mut tx, batch_id, ImportFamily::${family})`);
+  const pending=body.indexOf("ledger::require_pending(");
+  const blockers=body.indexOf("ledger_rows::blocking_rows_in_tx(");
+  const running=body.indexOf("ledger::start_batch_in_tx(");
+  const applyOffset=body.indexOf(`${apply}(`);
+  const imported=body.indexOf("ledger_rows::mark_imported_in_tx(");
+  const finish=body.indexOf(`ledger::finish_batch_in_tx(&mut tx, &result, ImportFamily::${family})`);
+  const commit=body.indexOf("tx.commit().await?");
+  check((body.match(/self.pool.begin\(\)/g)??[]).length===1 && (body.match(/tx.commit\(\)/g)??[]).length===1 && lock>=0 && pending>lock && blockers>pending && running>blockers && applyOffset>running && imported>applyOffset && finish>imported && commit>finish, `${method} 必须锁批次、检查状态与冲突、应用业务、写行与计数审计后唯一提交`);
+  check(body.includes("Ok(result)") && body.includes("error_count: 0"),`${method} 返回必须使用同一成功结果对象`);
+}
+for (const source of [ledgerBatch,ledgerRows]) check(!source.includes(".begin()") && !source.includes(".commit()") && !source.includes("self.pool") && !source.includes("crate::spreadsheet_exchange") && !source.includes("crate::match_exchange"),"账本步骤不得另开/提交事务或反向依赖工作簿业务");
+check(ledgerBatch.includes("import_type=ANY($2) FOR UPDATE") && ledgerBatch.includes('vec!["player_catalog_xlsx", "player_monthly_xlsx"]') && ledgerBatch.includes('vec!["match_lineup_xlsx"]'),"批次父锁必须隔离球员与比赛导入类型");
+check(/if\s+status\s*==\s*"pending"\s*\{/.test(ledgerBatch) && ledgerRows.includes("status IN ('conflict','error')") && ledgerRows.includes("FOR UPDATE"),"批次状态/未解决冲突与行锁门禁缺失");
+check(playerWorkbook.includes('status == "succeeded"') && playerWorkbook.includes('batch.try_get::<i64, _>("ended_previous_count")? as u64') && !matchWorkbook.includes('status == "succeeded"'),"球员成功重试读回与比赛重复提交拒绝语义必须保持");
+const finisher=ledgerBatch.slice(ledgerBatch.indexOf("pub(crate) async fn finish_batch_in_tx"),ledgerBatch.indexOf("#[cfg(test)]"));
+for (const field of ["inserted_count","updated_count","ended_previous_count","skipped_count","error_count"]) check(finisher.includes(`.bind(result.${field} as i64)`),`成功账本漏用结果计数：${field}`);
+check(finisher.includes(".bind(result.finished_at)") && finisher.indexOf("execute(&mut **tx)")<finisher.indexOf("crate::write_audit_event(") && finisher.includes('"spreadsheet_import_committed"') && finisher.includes('"match_lineup_import_committed"') && finisher.includes('"ended_previous":result.ended_previous_count'),"完成计数、结束时间与原两类审计必须共用结果和调用方事务");
+for (const name of ["skip_import_row_in_tx","resolve_import_row_in_tx"]) {
+  const start=ledgerRows.indexOf(`pub(crate) async fn ${name}(`); const next=ledgerRows.indexOf("pub(crate)",start+20); const body=ledgerRows.slice(start,next<0?undefined:next);
+  check(body.includes("execute(&mut **tx)") && body.includes("refresh_pending_counts_in_tx(tx, batch_id).await") && body.includes("AND batch_id="),`${name} 必须在行更新后同事务刷新批次计数并限定所属批次`);
+}
+check(ledgerRows.includes("skipped_count=(SELECT count(*)") && ledgerRows.includes("error_count=(SELECT count(*)") && ledgerRows.includes("WHERE id=$1 AND status='pending'"),"冲突处理后必须刷新 pending 的跳过与阻断计数");
+check((matchWorkbook.match(/ledger::lock_batch_in_tx\(/g)??[]).length===3 && matchWorkbook.includes('row_status != "conflict"') && matchWorkbook.includes("该冲突行已被其他操作修改"),"比赛冲突两阶段校验必须重新取得父锁并检查行仍为 conflict");
+check(ledgerRead.includes("ORDER BY row_number, sheet_name, id") && ledgerRead.includes("ORDER BY row_number,sheet_name,id") && !ledgerRead.includes(".begin()") && !ledgerRead.includes(".commit()"),"两类只读预览排序与不写入语义缺失");
+for (const token of ["未知导入实体", "未知比赛导入实体", "未知导入动作", "未知导入状态", "未知导入模式", "ready_end_previous"]) check(ledgerMapping.includes(token),`严格 codec 契约缺少：${token}`);
+for (const token of ["非 pending 球员批次不得提交", "未解决球员冲突不能启动业务写入", "球员冲突跳过与批次暂存计数共同提交", "球员成功返回与账本全部计数一致", "球员成功批次重试不得重复审计", "非 pending 比赛批次不得提交", "未解决比赛冲突不能启动业务写入", "比赛冲突跳过与批次暂存计数共同提交", "候选解决后的行状态与批次计数一致", "末行失败必须回滚替代阵容、前十个球员、账本与审计"]) check(integration.includes(token),`原数据库回归缺少：${token}`);
 if (failures.length) {
   console.error("Exchange Service 验证失败：\n- " + failures.join("\n- "));
   process.exit(1);

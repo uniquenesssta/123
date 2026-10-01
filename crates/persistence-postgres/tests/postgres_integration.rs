@@ -1114,6 +1114,100 @@ async fn monthly_workbooks_preview_commit_clear_and_idempotency_are_consistent()
         .expect("预检球员月度工作簿");
     assert_eq!(player_preview.counts.error, 0);
     assert_eq!(player_preview.counts.conflict, 0);
+    // R7-10：复用球员月度批次验证 pending 门禁、冲突阻断及暂存计数。
+    for status in ["running", "failed", "cancelled"] {
+        sqlx::query("UPDATE catalog.import_batches SET status=$2 WHERE id=$1")
+            .bind(player_preview.batch_id)
+            .bind(status)
+            .execute(&database.pool)
+            .await
+            .unwrap();
+        database
+            .store
+            .commit_spreadsheet_import(player_preview.batch_id)
+            .await
+            .expect_err("非 pending 球员批次不得提交");
+        let unchanged: (String, i64, i64) = sqlx::query_as(
+            "SELECT status,inserted_count,updated_count FROM catalog.import_batches WHERE id=$1",
+        )
+        .bind(player_preview.batch_id)
+        .fetch_one(&database.pool)
+        .await
+        .unwrap();
+        assert_eq!(
+            unchanged,
+            (status.into(), 0, 0),
+            "非法状态不能改写账本或业务计数"
+        );
+    }
+    sqlx::query("UPDATE catalog.import_batches SET status='pending',error_count=1 WHERE id=$1")
+        .bind(player_preview.batch_id)
+        .execute(&database.pool)
+        .await
+        .unwrap();
+    let player_conflict_row_id = player_preview.rows[0].id;
+    sqlx::query("UPDATE catalog.import_rows SET status='conflict',conflict_candidates='[]'::jsonb WHERE id=$1").bind(player_conflict_row_id).execute(&database.pool).await.unwrap();
+    database
+        .store
+        .commit_spreadsheet_import(player_preview.batch_id)
+        .await
+        .expect_err("未解决球员冲突不能启动业务写入");
+    let skipped_preview = database
+        .store
+        .resolve_spreadsheet_import_conflict(
+            player_preview.batch_id,
+            football_domain::SpreadsheetImportResolution {
+                row_id: player_conflict_row_id,
+                selected_entity_id: None,
+                skip: true,
+            },
+        )
+        .await
+        .unwrap();
+    assert_eq!(skipped_preview.counts.skipped, 1);
+    assert_eq!(skipped_preview.counts.conflict, 0);
+    let pending_counts: (i64, i64) =
+        sqlx::query_as("SELECT skipped_count,error_count FROM catalog.import_batches WHERE id=$1")
+            .bind(player_preview.batch_id)
+            .fetch_one(&database.pool)
+            .await
+            .unwrap();
+    assert_eq!(pending_counts, (1, 0), "球员冲突跳过与批次暂存计数共同提交");
+    database
+        .store
+        .resolve_spreadsheet_import_conflict(
+            player_preview.batch_id,
+            football_domain::SpreadsheetImportResolution {
+                row_id: player_conflict_row_id,
+                selected_entity_id: None,
+                skip: true,
+            },
+        )
+        .await
+        .expect_err("已解决行不能重复处理冲突");
+    let superseded_preview_id = player_preview.batch_id;
+    let player_preview = database
+        .store
+        .preview_spreadsheet_import(&player_workbook, SpreadsheetImportMode::AddAndUpdate)
+        .await
+        .unwrap();
+    assert_ne!(
+        player_preview.batch_id, superseded_preview_id,
+        "pending 同源重新预检创建替代批次"
+    );
+    let previous_status: String =
+        sqlx::query_scalar("SELECT status FROM catalog.import_batches WHERE id=$1")
+            .bind(superseded_preview_id)
+            .fetch_one(&database.pool)
+            .await
+            .unwrap();
+    assert_eq!(previous_status, "cancelled");
+    assert_eq!(
+        player_preview.counts.error
+            + player_preview.counts.conflict
+            + player_preview.counts.skipped,
+        0
+    );
     let player_commit = database
         .store
         .commit_spreadsheet_import(player_preview.batch_id)
@@ -1132,6 +1226,40 @@ async fn monthly_workbooks_preview_commit_clear_and_idempotency_are_consistent()
         .await
         .expect("重复提交球员工作簿应幂等");
     assert_eq!(repeated_player_commit.inserted_count, 2);
+    assert_eq!(
+        repeated_player_commit.updated_count,
+        player_commit.updated_count
+    );
+    assert_eq!(
+        repeated_player_commit.skipped_count,
+        player_commit.skipped_count
+    );
+    assert_eq!(
+        repeated_player_commit.ended_previous_count,
+        player_commit.ended_previous_count
+    );
+    let player_ledger: (String,i64,i64,i64,i64,i64) = sqlx::query_as("SELECT status,inserted_count,updated_count,ended_previous_count,skipped_count,error_count FROM catalog.import_batches WHERE id=$1")
+        .bind(player_preview.batch_id).fetch_one(&database.pool).await.unwrap();
+    assert_eq!(
+        player_ledger,
+        ("succeeded".into(), 2, 0, 0, 0, 0),
+        "球员成功返回与账本全部计数一致"
+    );
+    let player_audits: Vec<serde_json::Value> = sqlx::query_scalar("SELECT payload FROM audit.events WHERE event_type='spreadsheet_import_committed' AND entity_id=$1")
+        .bind(player_preview.batch_id.to_string()).fetch_all(&database.pool).await.unwrap();
+    assert_eq!(player_audits.len(), 1, "球员成功批次重试不得重复审计");
+    assert_eq!(
+        player_audits[0],
+        json!({"inserted":player_commit.inserted_count,"updated":player_commit.updated_count,"skipped":player_commit.skipped_count})
+    );
+    assert!(
+        database
+            .store
+            .read_match_lineup_import_preview(player_preview.batch_id)
+            .await
+            .is_err(),
+        "匹配预览不得跨导入类型读取球员批次"
+    );
 
     let player_clear = SpreadsheetParsedWorkbook {
         format_version: PLAYER_MONTHLY_FORMAT.into(),
@@ -2484,6 +2612,123 @@ async fn match_scope_inference_and_lineup_pair_transaction_are_atomic() {
         .iter()
         .find(|row| row.entity_type == SpreadsheetEntityType::LineupPlayer && row.row_number == 12)
         .expect("定位最后一个球员预检行");
+    // R7-10：沿用已有比赛导入行，检查批次状态与两阶段冲突处理计数。
+    assert!(
+        database
+            .store
+            .read_spreadsheet_import_preview(preview.batch_id)
+            .await
+            .is_err(),
+        "球员预览不得跨导入类型读取比赛批次"
+    );
+    for status in ["running", "failed", "cancelled"] {
+        sqlx::query("UPDATE catalog.import_batches SET status=$2 WHERE id=$1")
+            .bind(preview.batch_id)
+            .bind(status)
+            .execute(&database.pool)
+            .await
+            .unwrap();
+        database
+            .store
+            .commit_match_lineup_import(preview.batch_id)
+            .await
+            .expect_err("非 pending 比赛批次不得提交");
+    }
+    sqlx::query("UPDATE catalog.import_batches SET status='pending',error_count=1 WHERE id=$1")
+        .bind(preview.batch_id)
+        .execute(&database.pool)
+        .await
+        .unwrap();
+    let selected_player = valid_pair.home.players[10].player_id;
+    let conflict_candidates =
+        json!([{"entity_id":selected_player,"display_name":"原主队球员","detail":null}]);
+    sqlx::query(
+        "UPDATE catalog.import_rows SET status='conflict',conflict_candidates=$2 WHERE id=$1",
+    )
+    .bind(last_player_row.id)
+    .bind(&conflict_candidates)
+    .execute(&database.pool)
+    .await
+    .unwrap();
+    database
+        .store
+        .commit_match_lineup_import(preview.batch_id)
+        .await
+        .expect_err("未解决比赛冲突不能启动业务写入");
+    database
+        .store
+        .resolve_match_lineup_import_conflict(
+            preview.batch_id,
+            football_domain::SpreadsheetImportResolution {
+                row_id: last_player_row.id,
+                selected_entity_id: Some(Uuid::new_v4()),
+                skip: false,
+            },
+        )
+        .await
+        .expect_err("候选范围之外不能修改冲突或计数");
+    let rejected_counts: (i64, i64) =
+        sqlx::query_as("SELECT skipped_count,error_count FROM catalog.import_batches WHERE id=$1")
+            .bind(preview.batch_id)
+            .fetch_one(&database.pool)
+            .await
+            .unwrap();
+    assert_eq!(rejected_counts, (0, 1), "候选拒绝不改变暂存计数");
+
+    let skipped = database
+        .store
+        .resolve_match_lineup_import_conflict(
+            preview.batch_id,
+            football_domain::SpreadsheetImportResolution {
+                row_id: last_player_row.id,
+                selected_entity_id: None,
+                skip: true,
+            },
+        )
+        .await
+        .unwrap();
+    assert_eq!(skipped.counts.skipped, 1);
+    let skip_counts: (i64, i64) =
+        sqlx::query_as("SELECT skipped_count,error_count FROM catalog.import_batches WHERE id=$1")
+            .bind(preview.batch_id)
+            .fetch_one(&database.pool)
+            .await
+            .unwrap();
+    assert_eq!(skip_counts, (1, 0), "比赛冲突跳过与批次暂存计数共同提交");
+    sqlx::query("UPDATE catalog.import_rows SET status='conflict',payload=$2,conflict_candidates=$3 WHERE id=$1")
+        .bind(last_player_row.id).bind(&last_player_row.payload).bind(&conflict_candidates).execute(&database.pool).await.unwrap();
+    sqlx::query("UPDATE catalog.import_batches SET skipped_count=0,error_count=1 WHERE id=$1")
+        .bind(preview.batch_id)
+        .execute(&database.pool)
+        .await
+        .unwrap();
+    let resolved = database
+        .store
+        .resolve_match_lineup_import_conflict(
+            preview.batch_id,
+            football_domain::SpreadsheetImportResolution {
+                row_id: last_player_row.id,
+                selected_entity_id: Some(selected_player),
+                skip: false,
+            },
+        )
+        .await
+        .unwrap();
+    assert_eq!(
+        resolved.counts.error + resolved.counts.conflict + resolved.counts.skipped,
+        0,
+        "合法候选解决后预览计数清零"
+    );
+    let resolved_counts: (i64, i64) =
+        sqlx::query_as("SELECT skipped_count,error_count FROM catalog.import_batches WHERE id=$1")
+            .bind(preview.batch_id)
+            .fetch_one(&database.pool)
+            .await
+            .unwrap();
+    assert_eq!(resolved_counts, (0, 0), "候选解决后的行状态与批次计数一致");
+    // 恢复原预检行，继续既有末行失败/整批回滚/重试/审计测试。
+    sqlx::query("UPDATE catalog.import_rows SET status=$2,payload=$3,matched_entity_id=$4,conflict_candidates='[]'::jsonb WHERE id=$1")
+        .bind(last_player_row.id).bind(last_player_row.status.as_str()).bind(&last_player_row.payload).bind(last_player_row.matched_entity_id).execute(&database.pool).await.unwrap();
     let mut invalid_payload = last_player_row.payload.clone();
     invalid_payload["_resolved_player_id"] = json!(Uuid::new_v4());
     sqlx::query("UPDATE catalog.import_rows SET payload=$2 WHERE id=$1")
