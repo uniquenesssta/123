@@ -119,3 +119,14 @@ R8-01～04 已取得各自精确 Windows CI；R8-05 须独立取得精确门禁�
 
 
 05 实际本地门禁：83/83 原源码检查 PASS（88 清单中的五浏览器项留 Windows）；完整 `npm run verify:architecture`、Rustfmt --check、`git diff --check`、18 保护资产、171 命令、46 迁移/18 PG 静态基线全部 PASS。六破坏探针拒绝并恢复。报告 `r805-source-checks.json` / `r805-architecture.log` 保存在本轮工作目录（可由上述原命令重现）；未执行本地 Cargo 或客户端动态验收。Application 扫描 384→388，Domain 1040→1044；43 traits/Port SHA、365 类型/300 映射及声明摘要保持。Mermaid Chart 已更新实际职责链路，结束时 Create State 保存进度；Windows 动态结果仍待本提交 CI。
+
+
+## R8-05 首轮 Windows CI 修正（2026-10-02）
+
+精确 `1f1613d4578b8b8f23f2a458cedc213d072e65b9` / [run 36970160631](https://github.com/uniquenesssta/123/actions/runs/36970160631) / job `110722266615` 失败：Windows Clippy 普通 lib 编译报告 route_model_request/mod.rs 的 `ensure_match_input_id` re-export 未使用，`-D warnings` 将其提升为错误。源码检查和 Windows 前端契约/类型/截图/生产构建已通过；Rust tests、release/安装包/启动尚未到达，不能计通过。
+
+根因是提取后实际请求组装已在 request.rs 内部调用该 helper，目录级导出只有 lib/tests 与模块单测消费。修复将该单一 re-export 限定 `#[cfg(test)]`，生产 helper 及请求组装保持；其余生产导出均有真实非测试调用方。既有 Prediction verifier 增加 cfg 及生产出口限制，去掉 cfg 的破坏探针须被拒绝。无 `allow(unused_imports)`、公共 API/行为/测试数量、模型/资产/依赖/迁移/数据库变化。修复后沿用原静态门禁及 Windows CI，05 仍 VERIFYING；不得关闭或启动 06。Context7 按 Rust 1.88.0 对照 cfg(test)/use 语义，实际动态结果以新精确 SHA 为准。
+
+本轮修复实际 PASS：83/83 原源码检查、完整 `npm run verify:architecture`、Rustfmt --check、18 保护资产、171 命令、46 迁移/18 PG 静态基线、`git diff --check`；移除 cfg 的单项破坏探针已拒绝并恢复，十项生产导出逐项确认非测试消费。报告 `r805-fix-source-checks.json` / `r805-fix-architecture.log` 位于本轮工作目录；未执行本地 Cargo 或客户端动态验收，Windows 结果待新精确 CI。此修复全部六个文件仅修改，无新增/移动/删除；Domain 使用清单的扫描指纹随出口源码刷新，365/300、声明摘要与其余冻结内容保持，生产函数和测试未变。
+
+首次本地检查提示 Domain 使用清单扫描指纹过期，已运行原 `generate-domain-type-inventory.mjs` 并核对只有 usage scan 指纹变化，随后重跑原检查；无类型/接口变更。

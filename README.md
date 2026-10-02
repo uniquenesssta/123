@@ -14,6 +14,8 @@ R8-04 输入清单已收尾，精确 `59c5679` / Windows run `36966815323` 通�
 
 R8-05 路由与请求已迁入 `route_model_request/{mod,selection,route,request,tests}.rs`，旧 `shared/routing.rs` 删除；预览/输入/审计/执行/default 使用同一 owner。原十二 helper、显式覆盖和两个请求组装保持等价，错误顺序/输入身份/路由参数不变；两原测试迁移、八新测试复用原 Probe，预期 Application 85/Persistence 141 待自身 Windows CI。现有 verifier 和使用清单同步，不新增验证体系或数据库。状态与结果见 [R8 索引](docs/modular-rewrite/R08-prediction-p4-orchestration/README.md)；PG/私有固定回归/Full 和继承删除风险仍最终新库待验。
 
+R8-05 首轮 Windows CI `36970160631` 在 Clippy 普通库构建失败：身份 helper 仅单测使用，却被无条件导出。已改为 `cfg(test)` 导出并增强原 verifier 防止复发，生产请求/公共接口/模型行为和测试数量保持。修复仍等待新的 Windows CI，未进入后续节点。
+
 ## 公开边界
 
 - 保留 `crates/model-api`、模型 ID、路由、规则包入口、预测页面和历史数据结构。

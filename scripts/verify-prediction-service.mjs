@@ -143,6 +143,8 @@ const requestTests = read(`${requestRoot}/tests.rs`);
 const routePreview = read("crates/application/src/use_cases/prediction/preview_route/mod.rs");
 const defaultDryRun = read("crates/application/src/use_cases/prediction/dry_run_default_fixture/mod.rs");
 check(useCases.includes("pub(crate) mod route_model_request;") && !requestExport.includes("fn "), "R8-05 必须登记并只导出");
+check(/#\[cfg\(test\)\]\s*pub\(crate\) use request::ensure_match_input_id;/.test(requestExport) && !requestExport.split("#[cfg(test)]")[0].includes("ensure_match_input_id"), "仅供单测的身份 helper 导出必须限定 cfg(test)，普通库构建不得留下 unused re-export");
+
 check(!existsSync(join(root,"crates/application/src/use_cases/prediction/shared/routing.rs")) && !read("crates/application/src/use_cases/prediction/shared/mod.rs").includes("mod routing;"), "旧 routing 必须完整删除");
 for (const [name, source] of [["builder",builder], ["readiness",readinessFlow], ["preview",routePreview], ["executor",predictionExecution]]) check(source.includes("route_model_request::") && !source.includes("shared::routing"), `路由调用方 ${name} 未使用唯一 owner`);
 for (const path of predictionFiles) {
