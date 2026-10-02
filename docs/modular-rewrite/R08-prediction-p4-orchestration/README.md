@@ -2,7 +2,7 @@
 
 ## 当前阶段状态
 
-`IN_PROGRESS`。唯一阶段分支 `rewrite/r8-prediction-p4-orchestration`，起点/回退基线 `90680bf945fbb0d1c191937c2d9e90c2c916fb00`。R8-01～03 已 DONE，用户已启动 R8-04，当前 `VERIFYING`；05～12 `BLOCKED`。精确当前状态只由本索引维护。
+`IN_PROGRESS`。唯一阶段分支 `rewrite/r8-prediction-p4-orchestration`，起点/回退基线 `90680bf945fbb0d1c191937c2d9e90c2c916fb00`。R8-01～04 已 DONE，用户已启动 R8-05，当前 `VERIFYING`；06～12 `BLOCKED`。精确当前状态只由本索引维护。
 
 ## 前置基线与范围
 
@@ -17,8 +17,8 @@ R8 依据 [任务书](../../football-model-platform-modular-rewrite-19-docs/08-R
 | R8-01 | Match Prediction Input Builder | DONE · [完成记录](R08-01-match-prediction-input-builder.md) |
 | R8-02 | Historical Feature Reader | DONE · [完成记录](R08-02-historical-feature-reader.md) |
 | R8-03 | Readiness Audit | DONE · [完成记录](R08-03-readiness-audit.md) |
-| R8-04 | Deterministic Input Manifest | VERIFYING |
-| R8-05 | Route / Model Request | BLOCKED |
+| R8-04 | Deterministic Input Manifest | DONE · [完成记录](R08-04-deterministic-input-manifest.md) |
+| R8-05 | Route / Model Request | VERIFYING |
 | R8-06 | Model Execution Adapter | BLOCKED |
 | R8-07 | Run Persistence | BLOCKED |
 | R8-08 | P4 Evidence Ledger | BLOCKED |
@@ -35,7 +35,7 @@ Readiness 评分/检查、manifest 算法、路由与模型执行仍由现有 ow
 
 ## 动态待验与阶段出口
 
-R8-01～03 已取得各自精确 Windows CI；R8-04 须独立取得精确门禁，不继承前项 PASS。数据库相关 contracts、历史四项/账本、模型历史删除风险、有效 XLSX、Windows Full 的真实结果仍最终新库待验，详见 R7 阶段清单。模型保护或真实固定回归不可取得时明确说明，公共 unavailable stub 不冒充私有引擎 Golden Master。后续节点成功后逐项更新；未完成全部节点不创建阶段完成记录。
+R8-01～04 已取得各自精确 Windows CI；R8-05 须独立取得精确门禁，不继承前项 PASS。数据库相关 contracts、历史四项/账本、模型历史删除风险、有效 XLSX、Windows Full 的真实结果仍最终新库待验，详见 R7 阶段清单。模型保护或真实固定回归不可取得时明确说明，公共 unavailable stub 不冒充私有引擎 Golden Master。后续节点成功后逐项更新；未完成全部节点不创建阶段完成记录。
 
 ## R8-01 实施与门禁记录（已通过）
 
@@ -88,7 +88,7 @@ R8-01～03 已取得各自精确 Windows CI；R8-04 须独立取得精确门禁�
 2026-10-02 核实 `47ba3de` / Windows run `36902069546` / job `110503393919` 全 SUCCESS；Application 69/Persistence 141、八项新审计测试、17 视口、Rust/前端、Windows release/MSI/NSIS/启动通过。artifact `11184750052`，14,023,532 字节，SHA-256 `1fe676d3e63a36507a0914e3f2339fc12f1aa25d68311dece17b1b0fc88a00f2`。详见 [03 完成记录](R08-03-readiness-audit.md)。03 DONE，04 起点/受控回退基线为精确 `47ba3dea6ca873248728b9846421c009d00f51bc`，沿用同一 R8 分支。
 
 
-## R8-04 实施与门禁记录（等待自身 Windows CI）
+## R8-04 实施与门禁记录（实施时记录；现已通过，见下方收尾）
 
 原 shared/audit.rs 六项函数迁入 `input_manifest/`：mod 仅登记/导出；canonical 唯一持有清单副本、原五运行字段排除与 JSON 字节/SHA256；audit 持有原受检重建、附加载荷和摘要复核。旧完整 audit 文件及登记删除。build_input、readiness/workflow、execute_prediction 及其原测试直接使用新 owner；P4 snapshot_projection 的输出矩阵哈希保持独立，routing 留 05。六项原函数及两项原测试去空白/格式逗号比较等价，无字段、序列化或错误语义变化。
 
@@ -99,3 +99,23 @@ R8-01～03 已取得各自精确 Windows CI；R8-04 须独立取得精确门禁�
 六项破坏探针（排除层级、输入副本、JSON 字节、stale 哈希、摘要复核、执行审计前置）均拒绝并恢复。83 项既有源码检查、完整 `npm run verify:architecture`、Rustfmt、18 保护指纹/私有缺席、171 命令、46 连续迁移/18 原 PG 静态基线及 `git diff --check` 均已 PASS；准确结果见 TESTING。Rustfmt 的旧本地运行库截断已从现有同版本归档恢复，格式化与 --check 已通过，不改变项目依赖。5 项浏览器与 Rust/Windows 动态验收留自身 CI；无 Linux/macOS 动态验证或新基础设施。
 
 纯函数无 I/O、随机/时钟/共享状态；附加函数在原错误检查成功后仅替换 input_audit，取消/异步生命周期由原调用方管理。原 provider/P4.4 策略保持。PG/历史四项/账本/XLSX/Full/私有固定回归和继承 model.runs/0041 删除 trigger 风险仍最终新库待验。回退用受控 revert 恢复已验证 `47ba3de`，同步 owner/调用/测试/门禁/清单，不复制旧实现或改历史数据。Mermaid Chart 已更新实际清单/复核/执行链路，结束时 Create State 保存状态；04 CI 启动即停止轮询，成功才创建正式完成记录。
+
+
+## R8-04 收尾 / R8-05 开始
+
+2026-10-02 核实 `59c5679` / Windows run `36966815323` / job `110712250872` 全 SUCCESS，Application 77/Persistence 141、两项保留及八项新清单测试、17 视口、Rust/前端、release/MSI/NSIS/启动 7 条/3 操作通过。artifact `11210976146`，14,025,634 字节，SHA-256 `dc0c8ec9ea9d5c9b5c9e9d62b0cdb27e5a9420747de5b81f839e68b0b7625677`。详见 [04 完成记录](R08-04-deterministic-input-manifest.md)。05 起点/回退基线为精确 `59c567912194e232b29f36ecf94c3a26c969ed06`，沿用唯一 R8 分支。
+
+## R8-05 实施与门禁记录（等待自身 Windows CI）
+
+实际来源为 shared/routing.rs 的十二项 helper、execute_prediction 的显式上下文覆盖/ModelRequest 组装以及 dry_run_default_fixture 的默认请求组装。新增唯一 `route_model_request/{mod,selection,route,request,tests}.rs`：mod 仅导出，selection 规范化和精确注册验证，route 快照类型与受审计身份，request 输入/上下文/实际和默认请求组装；全部纯计算。旧 routing 完整删除，shared 保留真实 p4_planning；没有兼容转发或第二 owner。预览、输入构建、审计、执行器、默认 dry run 和 lib 原测试接入唯一 owner。原 Port 路由 I/O、supports/predict、计时和正式/影子保存仍在原用例，留 06/07。
+
+新增文件为上述五项 Rust 文件和本轮 04 完成记录；修改 lib.rs、build_input/mod.rs、dry_run_default_fixture/mod.rs、execute_prediction/mod.rs、prediction/mod.rs、preview_route/mod.rs、readiness/workflow.rs、shared/mod.rs、prediction/tests.rs（两原测试迁出，原 Probe 只扩大测试内 route_fixture/route_requests 可见性）、现有 Prediction verifier、Domain/Port 清单、README/TESTING/任务书/本索引。删除 shared/routing.rs；无完整文件移动/重命名。
+
+十二项原 helper、原显式覆盖、两个组装块去空白/格式逗号比较等价；将提取调用重新内联后，原执行器和 dry run 完整函数等价；另三个调用方除 import 外等价。家族空白默认 P4、精确注册、RFC3339→UTC、手工 match key、原字符串保留、快照精确成员和 route identity 全十一字段保持。已有 match_id 在上下文 trim、输入载荷不 trim 的原行为明确保留。显式规则包覆盖执行上下文；readiness 原 catalog context 不改。默认请求仍 Custom/Null/无规则包身份和原公开外壳载荷，不回退提供器或私有算法。
+
+原两项模型选择测试迁移且断言不变，新增八项 inline 行为测试复用原 Probe，覆盖选择/错误、UTC/身份/名称/解析优先级、显式覆盖/参数/identity、快照和全身份变化、默认载荷、预览只读/Port 错误优先级、自动/显式类型及先于后续校验。预期 Application 85（77+8）、Persistence 141 须 05 精确 Windows CI 实跑；不新增 runner/workflow/target/DB。
+
+公共 API/DTO/schema、171 命令、43 Ports、365 Domain/300 映射、依赖/锁文件、模型算法/参数/18 资产、数据/配置/错误/日志/UI 及 0001～0046 保持。局部状态随原单次请求释放，没有新增 State、缓存、监听器、后台任务、重试或时钟。原取消由调用方管理。PG/历史四项/账本/XLSX/Full/私有固定回归与继承删除 trigger 风险保持最终新库待验。受控 revert 到 `59c5679` 并同步入口/清单/门禁，不复制重复实现。精确 CI 触发后停止轮询，05 成功后才创建正式完成记录及开放 06。
+
+
+05 实际本地门禁：83/83 原源码检查 PASS（88 清单中的五浏览器项留 Windows）；完整 `npm run verify:architecture`、Rustfmt --check、`git diff --check`、18 保护资产、171 命令、46 迁移/18 PG 静态基线全部 PASS。六破坏探针拒绝并恢复。报告 `r805-source-checks.json` / `r805-architecture.log` 保存在本轮工作目录（可由上述原命令重现）；未执行本地 Cargo 或客户端动态验收。Application 扫描 384→388，Domain 1040→1044；43 traits/Port SHA、365 类型/300 映射及声明摘要保持。Mermaid Chart 已更新实际职责链路，结束时 Create State 保存进度；Windows 动态结果仍待本提交 CI。

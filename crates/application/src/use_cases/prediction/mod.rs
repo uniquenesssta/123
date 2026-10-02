@@ -23,6 +23,7 @@ pub(crate) mod read_p4_match_workspace;
 pub(crate) mod read_p4_task_workspace;
 pub(crate) mod read_run;
 pub(crate) mod readiness;
+pub(crate) mod route_model_request;
 pub(crate) mod shared;
 
 pub(crate) trait PredictionAccess:

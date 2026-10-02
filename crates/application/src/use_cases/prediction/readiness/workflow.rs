@@ -1,5 +1,5 @@
 use super::super::input_manifest::{build_prediction_input_manifest, sha256_value};
-use super::super::shared::routing::{
+use super::super::route_model_request::{
     ensure_model_selection_registered, normalize_model_selection, route_identity_manifest,
     validate_snapshot_type,
 };

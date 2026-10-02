@@ -1,7 +1,7 @@
 use super::input_manifest::{
     attach_prediction_input_audit, verify_prepared_input_matches_readiness,
 };
-use super::shared::routing::normalize_model_selection;
+use super::route_model_request::normalize_model_selection;
 use super::PredictionAccess;
 use crate::model_registry::ModelRegistry;
 use crate::ports::prediction::PredictionInputPort;

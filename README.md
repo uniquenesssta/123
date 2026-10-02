@@ -10,7 +10,9 @@ R8-02 历史读取已收尾，精确 `cc2b0fe` / Windows run `36891488571` 通�
 
 R8-03 就绪审计已收尾，精确 `47ba3de` / Windows run `36902069546` 通过 Application 69/Persistence 141、八项新增审计测试、17 视口和 Windows 构建/打包/启动，详见 [03 完成记录](docs/modular-rewrite/R08-prediction-p4-orchestration/R08-03-readiness-audit.md)。
 
-R8-04 输入清单已迁入 `input_manifest/{mod,canonical,audit,tests}.rs`，删除旧 `shared/audit.rs`；就绪审计、输入构建和执行摘要使用同一 owner。原清单字段、五个运行身份排除位置、JSON 字节/SHA256、错误顺序、审计载荷与完整输入指纹保持。原两项测试迁移，新增八项固定指纹/事实敏感/排除层级/失败路径及篡改阻止执行测试；现有验证器和 Domain/Port 使用清单同步。预期 Application 77/Persistence 141 须本项 Windows CI 确认；源码/架构/格式/资产/命令/迁移沿用原门禁，不新增数据库或验证体系。精确状态和结果见 [R8 索引](docs/modular-rewrite/R08-prediction-p4-orchestration/README.md)，PG/私有固定回归/Full 及继承历史风险仍最终新库待验。
+R8-04 输入清单已收尾，精确 `59c5679` / Windows run `36966815323` 通过 Application 77/Persistence 141、八项新增清单测试、17 视口和 Windows release/MSI/NSIS/启动。详见 [04 完成记录](docs/modular-rewrite/R08-prediction-p4-orchestration/R08-04-deterministic-input-manifest.md)。
+
+R8-05 路由与请求已迁入 `route_model_request/{mod,selection,route,request,tests}.rs`，旧 `shared/routing.rs` 删除；预览/输入/审计/执行/default 使用同一 owner。原十二 helper、显式覆盖和两个请求组装保持等价，错误顺序/输入身份/路由参数不变；两原测试迁移、八新测试复用原 Probe，预期 Application 85/Persistence 141 待自身 Windows CI。现有 verifier 和使用清单同步，不新增验证体系或数据库。状态与结果见 [R8 索引](docs/modular-rewrite/R08-prediction-p4-orchestration/README.md)；PG/私有固定回归/Full 和继承删除风险仍最终新库待验。
 
 ## 公开边界
 

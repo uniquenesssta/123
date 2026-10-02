@@ -1,14 +1,13 @@
 use super::input_manifest::{prediction_input_audit_summary, sha256_value};
-use super::shared::routing::{
-    ensure_match_input_id, ensure_model_selection_registered, match_context_from_command,
-    normalize_model_selection, validate_snapshot_type, verify_route_identity_matches_input_audit,
+use super::route_model_request::{
+    apply_route_context, build_model_request, ensure_model_selection_registered,
+    match_context_from_command, normalize_model_selection, validate_snapshot_type,
+    verify_route_identity_matches_input_audit,
 };
 use super::PredictionAccess;
 use crate::model_registry::ModelRegistry;
 use crate::{ApplicationError, ApplicationResult, PredictionCommand, PredictionExecution};
-use football_domain::{ModelIdentity, RouteRequest};
-use football_model_api::ModelRequest;
-use serde_json::json;
+use football_domain::RouteRequest;
 use std::time::Instant;
 use uuid::Uuid;
 
@@ -50,24 +49,7 @@ pub(crate) async fn execute_internal<P: PredictionAccess + ?Sized>(
             explicit_rule_package_id: command.explicit_rule_package_id,
         })
         .await?;
-    if command.explicit_rule_package_id.is_some() {
-        context.competition_kind = decision.competition_profile.competition_kind;
-        if let Some(metadata) = context.metadata.as_object_mut() {
-            metadata.insert(
-                "explicit_competition_kind_override".to_string(),
-                json!({
-                    "catalog_kind": scope.competition_kind.as_str(),
-                    "rule_package_kind": decision.competition_profile.competition_kind.as_str(),
-                }),
-            );
-        }
-    } else if decision.competition_profile.competition_kind != scope.competition_kind {
-        return Err(ApplicationError::Validation(format!(
-            "自动规则包赛事类型 {} 与当前赛事类型 {} 不一致",
-            decision.competition_profile.competition_kind.as_str(),
-            scope.competition_kind.as_str()
-        )));
-    }
+    apply_route_context(&command, &mut context, &scope, &decision)?;
     validate_snapshot_type(&command.snapshot_type, &decision.routing)?;
     verify_route_identity_matches_input_audit(&decision, &command.match_input)?;
     let model = registry
@@ -81,19 +63,7 @@ pub(crate) async fn execute_internal<P: PredictionAccess + ?Sized>(
         )));
     }
 
-    let match_input = ensure_match_input_id(command.match_input, &context.match_key)?;
-    let request = ModelRequest {
-        context,
-        identity: ModelIdentity {
-            model_id: decision.model_id.clone(),
-            model_version: decision.model_version.clone(),
-            parameter_version: decision.parameter_version.clone(),
-            rule_package_version: Some(decision.package_version.clone()),
-        },
-        snapshot_type: command.snapshot_type,
-        input: match_input,
-        parameters: decision.parameters.clone(),
-    };
+    let request = build_model_request(command, context, &decision)?;
     let input_sha256 = sha256_value(&request.input)?;
     let input_audit = prediction_input_audit_summary(&request.input, &input_sha256)?;
     let started = Instant::now();

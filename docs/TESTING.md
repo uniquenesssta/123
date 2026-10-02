@@ -168,7 +168,7 @@ The public model stub must always return an explicit unavailable error. A succes
 真实 PG、历史四项/账本/XLSX/Full、私有 P4/P7 Golden Master、模型历史删除 trigger 风险仍沿用最终封包新库待验；ignored 不能计通过。
 
 
-## R8-03 Windows 收尾 / R8-04 当前验证（2026-10-02）
+## R8-03 Windows 收尾 / R8-04 实施时验证记录（2026-10-02；已通过，见下方）
 
 精确 `47ba3dea6ca873248728b9846421c009d00f51bc` / run `36902069546` / job `110503393919` 全 SUCCESS；Application 69/Persistence 141、八项新审计测试、17 视口、前端类型/构建、Rust fmt/Clippy/workspace tests、Windows release/MSI/NSIS 及启动 7 条/3 操作通过。前节“待 CI”为实施时记录，03 正式完成记录保存 SHA/树/artifact。
 
@@ -177,3 +177,17 @@ The public model stub must always return an explicit unavailable error. A succes
 六项原函数及两项原测试逐段等价。六探针（放宽排除、修改原输入、改变序列化字节、跳过 stale 哈希、跳过摘要复核、执行绕过审计）均拒绝并恢复。83 项现有源码检查、完整 `npm run verify:architecture`、Rustfmt、18 保护资产/171 命令/46 迁移与 18 PG 静态基线及 `git diff --check` 全 PASS。原本地 Rustfmt 运行库截断导致 loader/SIGBUS，已从现有相同版本归档完整恢复并通过格式化及 --check，无依赖/锁文件变更；这不是 Rust 编译验收。
 
 5 项浏览器检查、Rust 编译/Clippy/tests、Windows 交付仍待 04 自身精确 CI。没有 Linux/macOS 动态验证、新 runner/workflow/target/数据库；真实 PG/历史四项/账本/XLSX/Full/私有固定回归和继承模型历史删除 trigger 风险继续最终封包新库待验，ignored 不计 PASS。
+
+
+## R8-04 Windows 收尾 / R8-05 当前验证（2026-10-02）
+
+精确 `59c567912194e232b29f36ecf94c3a26c969ed06` / run `36966815323` / job `110712250872` 全 SUCCESS；日志确认 Application 77/Persistence 141、input_manifest 十项测试、17 视口、前端类型/构建、Rust fmt/Clippy/workspace tests、Windows release/MSI/NSIS 和启动 7 条记录/3 操作通过。上节待 CI 是实施时记录，04 正式完成记录保存树和 artifact。
+
+05 在原 Application target 迁移两项原选择测试，新增八项行为测试：选择空白/大小写/家族及精确注册、UTC/纳秒/模拟身份/名称及原输入身份、字段错误先于模型选择、显式类型覆盖/identity/参数、快照精确成员及十一字段路由变化、公开默认载荷、预览只读与 Port 错误顺序、自动/显式类型在后续检查前的行为。复用原 Probe，预期 Application 85（77+8）/Persistence 141。fake 只验证编排，不冒充私有模型固定概率。
+
+逐段比较十二原 helper、显式覆盖、两个请求组装及两原测试等价；提取调用重新内联后原执行器/default 完整函数等价；preview/build/readiness 除 import 外等价。六项破坏探针（家族漏 trim、显式不覆盖、参数身份回退、快照放宽 trim、绕过受审计路由、执行跳过上下文校验）全部被原增强 verifier 拒绝并恢复。
+
+本轮只执行原源码/架构/格式/资产/命令/迁移静态门禁；5 项浏览器检查、Rust 编译/Clippy/tests 和 Windows 交付等待 05 精确 CI。没有 Linux/macOS 动态验收、新 runner/workflow/target/数据库、依赖或迁移。PG/历史四项/账本/XLSX/Full/私有固定回归及模型历史删除 trigger 风险仍最终封包新库待验，ignored 不计通过。
+
+
+05 本地实际 PASS：83/83 原源码检查（报告 `r805-source-checks.json`）、完整 `npm run verify:architecture`（`r805-architecture.log`）、Rustfmt --check、`git diff --check`、18 保护资产、171 命令及 46 迁移/18 PG 静态基线。Application 文件扫描 384→388、Domain 1040→1044，43 traits/Port SHA、365/300 和声明摘要保持；Rust 编译/测试与 Windows 浏览器/交付结果尚未实跑，不计通过。

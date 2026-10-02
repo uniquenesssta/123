@@ -11,7 +11,7 @@
 
 适用总纲顶部的执行订正：仅 Windows 动态验证，沿用原单测/contract、既有 Windows runner/workflow/数据库入口；不新增专项或持续回归体系。公开仓库没有私有 P4/P7 引擎、参数和 Golden Master；模型保护资产可验证，公共 unavailable stub 的通过不能冒充私有固定概率实跑。目录模板按实际职责及 Rust 模块命名调整；顺序执行的后端 use case 无新增 UI 生命周期，不强制新增 State、请求 ID 或空出口。
 
-R8-01～03 已取得各自精确 Windows CI（`cba72fd` / `36881256338`、`cc2b0fe` / `36891488571`、`47ba3de` / `36902069546`）及正式完成记录。用户已启动 R8-04；各项精确当前状态只由 [阶段索引](../modular-rewrite/R08-prediction-p4-orchestration/README.md) 维护。04 必须取得自身 Windows CI，不继承前项 PASS。
+R8-01～04 已取得各自精确 Windows CI（`cba72fd` / `36881256338`、`cc2b0fe` / `36891488571`、`47ba3de` / `36902069546`、`59c5679` / `36966815323`）及正式完成记录。用户已启动 R8-05；各项精确当前状态只由 [阶段索引](../modular-rewrite/R08-prediction-p4-orchestration/README.md) 维护。05 必须取得自身 Windows CI，不继承前项 PASS。
 
 ## 1. 阶段目标
 
@@ -741,7 +741,9 @@ crates/application/src/use_cases/prediction/input_manifest/
 
 ## R8-05 Route 与 Model Request
 
-状态：`BLOCKED`（仅当上一任务与本任务前置门禁通过后改为 `READY`）
+当前状态与精确门禁结果见 [阶段索引](../modular-rewrite/R08-prediction-p4-orchestration/README.md)。
+
+实际实施：唯一 `route_model_request/{mod,selection,route,request,tests}.rs`，删除 shared/routing.rs；十二原 helper、显式执行上下文及两个请求组装块逐段等价，预览/审计/输入/执行/default 调用唯一 owner。原两测试迁移，八项新测试沿用原 Application target；模型执行/保存留 06/07。Windows CI 单独验收，PG/Full/私有固定回归最终新库待验。
 
 ### 1. 目标
 
@@ -749,14 +751,15 @@ crates/application/src/use_cases/prediction/input_manifest/
 
 ### 2. 现状与来源
 
-- `crates/application/src/prediction.rs`。
-- `p4_orchestration.rs`、`fact_pipeline.rs`、`p4_persistence.rs`、`p4_workbench.rs`。
-- 相关 persistence modules。
+- `use_cases/prediction/shared/routing.rs`。
+- `execute_prediction/mod.rs` 的显式上下文和实际请求组装。
+- `dry_run_default_fixture/mod.rs` 的公开默认请求组装。
+- 调用方 preview_route、build_input、readiness/workflow 和 lib 原测试；上述旧根文件早已删除，不能作为本项来源。
 
 ### 3. 目标文件与目录
 
 ```text
-crates/application/src/use_cases/prediction/route-model-request/
+crates/application/src/use_cases/prediction/route_model_request/
 ```
 
 ### 4. 文件职责边界
@@ -767,19 +770,19 @@ crates/application/src/use_cases/prediction/route-model-request/
 
 ### 5. 输入
 
-- 无。
+- 原 PredictionCommand、RoutePreviewCommand 解析值、resolved scope、RouteDecision、RuleRouting、受审计输入和既有 registry。
 
 ### 6. 输出
 
-- 稳定的模块公开接口、可独立测试的实现和对应契约测试。
+- 规范化选择、UTC/MatchContext、路由身份/校验结果、原 ModelRequest 及既有 ApplicationError；不新增 public DTO。
 
 ### 7. 允许依赖
 
-- 无。
+- 原 Domain/model-api、Application DTO/error、registry、chrono/serde_json、既有公开默认外壳函数。
 
 ### 8. 禁止依赖
 
-- 无。
+- 具体 Persistence、SQL、UI、私有模型、额外默认参数/算法、新 Port/依赖。
 
 ### 9. 状态所有权
 
@@ -787,7 +790,7 @@ crates/application/src/use_cases/prediction/route-model-request/
 
 ### 10. 副作用边界
 
-- 所有 I/O、副作用和外部调用必须集中在明确命名的 adapter/transport/repository/workflow 文件。
+- 本目录纯同步函数，无 Port I/O、predict、保存或时钟；原异步读取/执行/保存留在现有用例，不提前迁入 06/07。
 
 ### 11. 异常路径
 
@@ -795,7 +798,7 @@ crates/application/src/use_cases/prediction/route-model-request/
 
 ### 12. 并发/异步/生命周期
 
-- 所有异步请求必须具备请求 ID、取消或过期结果丢弃策略；销毁时解除监听器、定时器和挂起回调。
+- 单次调用局部值随请求释放；取消保持原调用方管理，不强制新 State、请求 ID、监听器或重试。
 
 ### 13. 兼容要求
 

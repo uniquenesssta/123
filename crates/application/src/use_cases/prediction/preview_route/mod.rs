@@ -1,4 +1,4 @@
-use super::shared::routing::{
+use super::route_model_request::{
     ensure_model_selection_registered, normalize_model_selection, parse_kickoff,
 };
 use super::PredictionAccess;

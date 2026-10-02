@@ -1,44 +1,15 @@
-use super::shared::routing::{ensure_model_selection_registered, normalize_model_selection};
-use crate::{ApplicationError, ApplicationService};
-use chrono::Utc;
-use serde_json::json;
-use uuid::Uuid;
-
-#[test]
-fn model_selection_supports_family_and_exact_ids() {
-    let p4 = normalize_model_selection("p4").expect("P4 系列必须有效");
-    assert_eq!(p4.family, "p4");
-    assert!(p4.exact_model_id.is_none());
-
-    let p7 = normalize_model_selection("P7_KNOCKOUT_90").expect("P7 精确模型必须有效");
-    assert_eq!(p7.family, "p7");
-    assert_eq!(p7.exact_model_id.as_deref(), Some("p7_knockout_90"));
-}
-
-#[test]
-fn exact_model_must_exist_in_registry() {
-    let service = ApplicationService::new();
-    let registered = normalize_model_selection("p7_league").expect("内置模型必须有效");
-    ensure_model_selection_registered(&service.registry, &registered).expect("已注册模型必须通过");
-
-    let missing = normalize_model_selection("p7_not_registered").expect("格式合法");
-    assert!(matches!(
-        ensure_model_selection_registered(&service.registry, &missing),
-        Err(ApplicationError::ModelNotFound(_))
-    ));
-}
-
 // Shared call recorder for the existing Prediction and P4 orchestration unit modules.
 // Only test builds expose this probe; every unselected Port method fails immediately.
-use crate::model_registry::ModelRegistry;
 use crate::ports::lineup::{LineupPort, MatchCatalogPort};
 use crate::ports::prediction::{
     ModelRunHistoryItem, ModelRunPort, PredictionInputPort, SerializedModelRun,
 };
 use crate::ports::rules::RuleRoutingPort;
 use crate::ports::{PortError, PortErrorKind, PortResult};
+use crate::{model_registry::ModelRegistry, ApplicationError, ApplicationService};
 use async_trait::async_trait;
 use chrono::DateTime;
+use chrono::Utc;
 use football_domain::{
     CompetitionBindingDraft, CompetitionBindingSummary, CompetitionKind, CompetitionProfile,
     EnqueueJobDraft, LineupDraft, LineupHistoryRemovalResult, LineupPairDraft, LineupPairRecord,
@@ -50,8 +21,10 @@ use football_domain::{
 use football_model_api::{
     ModelDescriptor, ModelError, ModelOutput, ModelRequest, ModelResult, PredictionModel,
 };
+use serde_json::json;
 use serde_json::Value;
 use std::sync::{Arc, Mutex};
+use uuid::Uuid;
 
 #[derive(Default)]
 pub(crate) struct ProbeState {
@@ -71,7 +44,7 @@ pub(crate) struct ProbeState {
     pub(crate) prepared_input: Option<PreparedMatchPredictionInput>,
     pub(crate) input_requests: Vec<(Uuid, String, String, DateTime<Utc>)>,
     saved: Vec<(RouteDecision, ModelRequest, ModelOutput, i64)>,
-    route_requests: Vec<RouteRequest>,
+    pub(crate) route_requests: Vec<RouteRequest>,
 }
 
 pub(crate) struct Probe {
@@ -105,7 +78,7 @@ impl Probe {
     }
 }
 
-fn route_fixture() -> RouteDecision {
+pub(crate) fn route_fixture() -> RouteDecision {
     RouteDecision {
         source: RouteSource::CompetitionKindDefault,
         binding_id: None,

@@ -163,7 +163,7 @@ mod tests {
     #[test]
     fn generated_match_key_is_written_back_to_manual_input() {
         let input = json!({"kickoff_time": "2026-07-20T12:00:00Z"});
-        let normalized = use_cases::prediction::shared::routing::ensure_match_input_id(
+        let normalized = use_cases::prediction::route_model_request::ensure_match_input_id(
             input,
             "SIM-20260720-TEAM-A-TEAM-B",
         )
