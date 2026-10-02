@@ -1,0 +1,13 @@
+{
+  "schemaVersion":1,
+  "runId":"footfigma-screens-api-workspace-2026-10-02",
+  "repo":"uniquenesssta/123","branch":"ui-design-system","fileKey":"PN0Whgu6HLWIHx4Mv6aHfu","page":"3:5",
+  "currentScreen":"S13 api_workspace / AI问答","phase":"in_progress_semantics_verified","currentExecutionFinished":false,
+  "acceptedRouteCount":12,"routeCount":17,"previousAcceptedGlobalCheckpoint":"0cdcbf5fd4c878f7cb4a8995786677f8ea251263",
+  "source":{"page":"src/pages/apiWorkspace.ts@79f4ee4e505ac9da12e6579c1a7729cdeb981bc1","application":"crates/application/src/api_workspace.rs@78f33c2aedd063811395fa843bed8a99e22fd84c","patternState":"docs/FIGMA_AI_CHAT_STATE.json@1a04d04384d82be079afc8b4e78c051a04b72301"},
+  "guards":["Only ordinary text and explicitly opted-in read-only context; no upload, generated files or business database execution","Message/session ledger persistence is distinct from prohibited AI business mutations","Existing session locks API profile, preset and context identity","Pending and completion results scoped to originating session and request","Cancel requested is not a confirmed cancellation; unknown result must not automatically resend","Archive removes from active history, not deletion of business records","S14 API settings remains a separate unstarted route"],
+  "componentIds":{"workspace":"439:18050","sidebar":"438:18009","messageSet":"434:18225","composerSet":"436:18436","historySet":"434:18130","attachmentSet":"434:18157"},
+  "frames":{},"pending":["compose S13 chat/history/context/inspector and asynchronous states","finite prototype and scoped incoming routes","deep QA and screenshots","synchronize independent and global accepted records"],
+  "authority":"Figma determines all visual geometry and styling. Source supplies semantics only.",
+  "applicationSourceModified":false,"existingMastersModified":false,"nextScreen":"S14 openai / 兼容API配置","nextScreenStarted":false
+}
