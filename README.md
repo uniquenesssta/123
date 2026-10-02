@@ -8,7 +8,9 @@ R1–R6 累计补审覆盖 43 个任务节点。根据用户决定，R7-01 后�
 
 R8-02 历史读取已收尾，精确 `cc2b0fe` / Windows run `36891488571` 通过 Application 61/Persistence 141、六项新增历史特征测试、17 视口及 Windows 构建/打包/启动，详见 [02 完成记录](docs/modular-rewrite/R08-prediction-p4-orchestration/R08-02-historical-feature-reader.md)。
 
-R8-03 已实施：新增 `readiness/{mod,workflow,lineups,input_quality,report,tests}.rs`，将只读就绪审计、纯阵容/输入质量检查和报告归类收敛到单一 owner，删除旧 `inspect_match_prediction_readiness/mod.rs` 与 `shared/readiness_checks.rs`。Service 和 build_input 直接接入；原八项 helper、async 顺序和报告逻辑等价，manifest/路由继续复用原 owner。现有 Probe 增加八项行为测试，原两个验证器及 Domain/Port 使用清单同步；预期 Application 69/Persistence 141 须本项 Windows CI 确认。沿用既有源码/架构/Rustfmt/资产/命令/迁移门禁，不新增验证体系或数据库。当前状态和验证详见 [R8 索引](docs/modular-rewrite/R08-prediction-p4-orchestration/README.md)；PG/私有固定回归/Full 及继承历史风险仍最终新库待验。
+R8-03 就绪审计已收尾，精确 `47ba3de` / Windows run `36902069546` 通过 Application 69/Persistence 141、八项新增审计测试、17 视口和 Windows 构建/打包/启动，详见 [03 完成记录](docs/modular-rewrite/R08-prediction-p4-orchestration/R08-03-readiness-audit.md)。
+
+R8-04 输入清单已迁入 `input_manifest/{mod,canonical,audit,tests}.rs`，删除旧 `shared/audit.rs`；就绪审计、输入构建和执行摘要使用同一 owner。原清单字段、五个运行身份排除位置、JSON 字节/SHA256、错误顺序、审计载荷与完整输入指纹保持。原两项测试迁移，新增八项固定指纹/事实敏感/排除层级/失败路径及篡改阻止执行测试；现有验证器和 Domain/Port 使用清单同步。预期 Application 77/Persistence 141 须本项 Windows CI 确认；源码/架构/格式/资产/命令/迁移沿用原门禁，不新增数据库或验证体系。精确状态和结果见 [R8 索引](docs/modular-rewrite/R08-prediction-p4-orchestration/README.md)，PG/私有固定回归/Full 及继承历史风险仍最终新库待验。
 
 ## 公开边界
 

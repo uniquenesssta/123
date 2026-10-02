@@ -10,6 +10,7 @@ pub(crate) mod execute_p4_freeze;
 pub(crate) mod execute_prediction;
 pub(crate) mod execute_prediction_from_match;
 pub(crate) mod hide_run_from_history;
+pub(crate) mod input_manifest;
 pub(crate) mod list_p4_freeze_task_events;
 pub(crate) mod list_p4_freeze_tasks;
 pub(crate) mod list_recent_runs;

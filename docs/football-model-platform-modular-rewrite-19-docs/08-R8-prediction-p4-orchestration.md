@@ -11,7 +11,7 @@
 
 适用总纲顶部的执行订正：仅 Windows 动态验证，沿用原单测/contract、既有 Windows runner/workflow/数据库入口；不新增专项或持续回归体系。公开仓库没有私有 P4/P7 引擎、参数和 Golden Master；模型保护资产可验证，公共 unavailable stub 的通过不能冒充私有固定概率实跑。目录模板按实际职责及 Rust 模块命名调整；顺序执行的后端 use case 无新增 UI 生命周期，不强制新增 State、请求 ID 或空出口。
 
-R8-01～02 已取得各自精确 Windows CI（`cba72fd` / `36881256338`、`cc2b0fe` / `36891488571`）及正式完成记录。用户已启动 R8-03；各项精确当前状态只由 [阶段索引](../modular-rewrite/R08-prediction-p4-orchestration/README.md) 维护。03 必须取得自身 Windows CI，不继承前项 PASS。
+R8-01～03 已取得各自精确 Windows CI（`cba72fd` / `36881256338`、`cc2b0fe` / `36891488571`、`47ba3de` / `36902069546`）及正式完成记录。用户已启动 R8-04；各项精确当前状态只由 [阶段索引](../modular-rewrite/R08-prediction-p4-orchestration/README.md) 维护。04 必须取得自身 Windows CI，不继承前项 PASS。
 
 ## 1. 阶段目标
 
@@ -454,7 +454,7 @@ crates/persistence-postgres/src/team_features.rs  # 原纯特征投影，无 I/O
 
 ## R8-03 Readiness Audit
 
-状态：见阶段索引；已按用户指令开始，须自身精确 Windows CI 及完成记录才能关闭。
+状态：见阶段索引；精确 `47ba3de` / Windows run `36902069546` 全通过，正式完成记录已创建。
 
 ### 1. 目标
 
@@ -597,7 +597,7 @@ crates/application/src/use_cases/prediction/readiness/
 
 ## R8-04 Deterministic Input Manifest
 
-状态：`BLOCKED`（仅当上一任务与本任务前置门禁通过后改为 `READY`）
+状态：见阶段索引；按用户指令开始，须自身精确 Windows CI 和完成记录才能关闭。
 
 ### 1. 目标
 
@@ -605,14 +605,18 @@ crates/application/src/use_cases/prediction/readiness/
 
 ### 2. 现状与来源
 
-- `crates/application/src/prediction.rs`。
-- `p4_orchestration.rs`、`fact_pipeline.rs`、`p4_persistence.rs`、`p4_workbench.rs`。
-- 相关 persistence modules。
+- 旧 `prediction.rs` 已在 R3 删除，实际来源为 `use_cases/prediction/shared/audit.rs` 的清单构建、运行身份排除、SHA256、受检重建、审计附加与摘要复核。
+- 直接调用方为 build_input、readiness/workflow、execute_prediction 及现有单测；原 tests.rs 的两项清单/审计测试一并迁移且保留断言。
+- P4 snapshot_projection 的矩阵哈希是独立输出契约，不属于本输入清单责任；routing 仍留 R8-05，Persistence/SQL 不改。
 
 ### 3. 目标文件与目录
 
 ```text
-crates/application/src/use_cases/prediction/input-manifest/
+crates/application/src/use_cases/prediction/input_manifest/
+  mod.rs       # 模块登记及显式导出
+  canonical.rs # 原清单副本/五字段排除/原 JSON 字节 SHA256
+  audit.rs     # 受检重建、审计载荷和摘要复核契约
+  tests.rs     # 原单测 target 内两项保留与八项新增测试
 ```
 
 ### 4. 文件职责边界
@@ -623,41 +627,45 @@ crates/application/src/use_cases/prediction/input-manifest/
 
 ### 5. 输入
 
-- 无。
+- 原输入 JSON、data_quality、MatchRecord、snapshot_type、可选 route_identity；原 PreparedMatchPredictionInput/MatchPredictionReadiness 和调用方提供的完整输入指纹。
 
 ### 6. 输出
 
-- 稳定的模块公开接口、可独立测试的实现和对应契约测试。
+- 原 manifest JSON、SHA256、小写 hex、input_audit 载荷、可选 PredictionInputAuditSummary 或原 Application 错误；不改变公共字段/格式。
 
 ### 7. 允许依赖
 
-- 无。
+- 原 Domain/DTO/Application errors、serde_json、sha2 和 hex；使用已有版本与序列化，不升级依赖或引入新的 canonicalization 算法。
 
 ### 8. 禁止依赖
 
-- 无。
+- 纯清单/审计不得依赖具体 Persistence、Ports I/O、模型执行、UI、时钟、随机身份、缓存或后台任务。
 
 ### 9. 状态所有权
 
-- 该任务不新增跨模块共享状态；需要状态时由目标模块内具名 State/Coordinator 唯一持有。
+- canonical 只修改输入副本；attach 仅在校验成功后替换调用者 input_audit 字段。其余无可变共享状态，不创建 State/Coordinator 空壳。
 
 ### 10. 副作用边界
 
-- 所有 I/O、副作用和外部调用必须集中在明确命名的 adapter/transport/repository/workflow 文件。
+- 本能力是纯数据变换/校验，无 I/O；prepare/predict/save 由现有调用方持有。完整输入指纹仍对原 request.input 计算，清单指纹才排除原运行身份。
 
 ### 11. 异常路径
 
-- 保持现有错误码、错误类型和用户可见提示语义；新增内部错误必须在边界映射为既有公共错误。
+- 保持全部原错误类型和字符串，以及缺失清单→缺失指纹→非对象附加、摘要 version→manifest→hash→不匹配的顺序；无审计仍返回 None。复核失败必须先于 predict/save，不静默补造清单或指纹。
 
 ### 12. 并发/异步/生命周期
 
-- 所有异步请求必须具备请求 ID、取消或过期结果丢弃策略；销毁时解除监听器、定时器和挂起回调。
+- 函数同步、无生命周期资源；异步调用及取消仍由既有工作流管理，不增加请求 ID/监听器/定时器。
 
 ### 13. 兼容要求
 
 - P4.4 保持 SHADOW_ONLY。
 - P7 固定 lambda、概率、矩阵和 top scoreline 回归一致。
 - 历史 cutoff、输入指纹、路由和 schema 不变。
+- 只排除根 feature_snapshot_id/input_audit、snapshot.snapshot_id/frozen_at、sources 对象 accessed_at；事实/纳秒 cutoff/阵容贡献/质量/路由保留，数组顺序和 null/缺失继续有意义。
+- 保持原 serde_json::to_vec → Sha256 → hex 算法，不修剪身份字段、排序数组、改变浮点或增加时差容差；既有 provider/P4.4 策略不改。
+- 六项原函数逐段等价，两项原测试迁移；新增固定公开平台指纹、排除层级、事实敏感、错误/元数据和篡改执行阻断测试进入已有 Application target。没有新 runner/workflow/target/数据库。
+- 仅 Windows 动态验收；真实 PG/账本/XLSX/Full/私有固定回归及继承删除 trigger 风险仍最终封包新库待验。
 
 ### 14. 实施步骤
 
@@ -701,7 +709,7 @@ crates/application/src/use_cases/prediction/input-manifest/
 
 ### 20. 回退点
 
-- 回退到 R8-04 开始前的已验证提交；不得手工复制旧文件恢复。
+- 受控 revert 回精确已验证 `47ba3dea6ca873248728b9846421c009d00f51bc`，同步唯一 owner/调用/测试/门禁/清单；不复制旧实现或修改历史数据。
 
 ### 21. 根 README 摘要记录
 

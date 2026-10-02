@@ -1,4 +1,4 @@
-use super::shared::audit::{
+use super::input_manifest::{
     attach_prediction_input_audit, verify_prepared_input_matches_readiness,
 };
 use super::shared::routing::normalize_model_selection;
@@ -73,7 +73,7 @@ async fn from_assessment<P: PredictionInputPort + ?Sized>(
 mod tests {
     use super::*;
     use crate::ports::PortErrorKind;
-    use crate::use_cases::prediction::shared::audit::{
+    use crate::use_cases::prediction::input_manifest::{
         build_prediction_input_manifest, sha256_value,
     };
     use crate::use_cases::prediction::tests::Probe;

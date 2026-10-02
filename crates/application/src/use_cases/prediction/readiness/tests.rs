@@ -4,7 +4,7 @@ use super::{
     report::{readiness_check, summarize},
 };
 use crate::ports::PortErrorKind;
-use crate::use_cases::prediction::shared::audit::{build_prediction_input_manifest, sha256_value};
+use crate::use_cases::prediction::input_manifest::{build_prediction_input_manifest, sha256_value};
 use crate::use_cases::prediction::tests::{probe_registry, Probe};
 use crate::{ApplicationError, StoredMatchPredictionCommand};
 use chrono::{DateTime, Utc};

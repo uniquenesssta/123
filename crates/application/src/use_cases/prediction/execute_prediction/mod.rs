@@ -1,4 +1,4 @@
-use super::shared::audit::{prediction_input_audit_summary, sha256_value};
+use super::input_manifest::{prediction_input_audit_summary, sha256_value};
 use super::shared::routing::{
     ensure_match_input_id, ensure_model_selection_registered, match_context_from_command,
     normalize_model_selection, validate_snapshot_type, verify_route_identity_matches_input_audit,

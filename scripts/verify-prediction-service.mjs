@@ -100,5 +100,38 @@ check(readinessQuality.includes("home_history >= 5 && away_history >= 5") && rea
 check(readinessReport.includes("score: score.min(weight)") && /sum::<u16>\(\)\s*\.min\(100\) as u8/.test(readinessReport) && readinessReport.includes("if !warnings.contains(reason)"), "报告评分上限或影子原因去重漂移");
 check(/if !blockers.is_empty\(\) \{\s*PredictionReadinessLevel::Blocked\s*\} else if !shadow_reasons.is_empty\(\) \{\s*PredictionReadinessLevel::ShadowOnly\s*\} else if !warnings.is_empty\(\) \{\s*PredictionReadinessLevel::ReadyWithWarnings\s*\} else \{\s*PredictionReadinessLevel::FormalReady/.test(readinessReport), "报告分级必须依次阻断、影子、警告、正式，无评分替代门禁");
 for (const test of ["formal_report_preserves_one_clock_order_route_manifest_and_read_only_calls", "history_and_quality_thresholds_preserve_scores_and_mode_permissions", "lineup_selection_goalkeepers_starter_context_and_identity_keep_blocking_priority", "unavailable_window_input_and_missing_route_become_reports_without_retry", "port_unavailable_errors_stop_at_the_original_read_boundary", "route_snapshot_scope_and_model_support_failures_remain_blocked_reports", "invalid_family_and_unregistered_selection_reject_before_read_io", "report_classification_preserves_labels_reason_order_dedup_and_score_caps"]) check(readinessTests.includes(`fn ${test}`), `R8-03 缺少原目标内行为测试：${test}`);
+// R8-04：确定性清单与审计协议唯一 owner，沿用原 JSON 字节/指纹。
+const manifestRoot = "crates/application/src/use_cases/prediction/input_manifest";
+const manifestExport = read(`${manifestRoot}/mod.rs`);
+const canonicalManifest = read(`${manifestRoot}/canonical.rs`);
+const inputAudit = read(`${manifestRoot}/audit.rs`);
+const manifestTests = read(`${manifestRoot}/tests.rs`);
+const predictionExecution = read("crates/application/src/use_cases/prediction/execute_prediction/mod.rs");
+check(useCases.includes("pub(crate) mod input_manifest;") && manifestExport.includes("pub(crate) use audit::") && manifestExport.includes("pub(crate) use canonical::"), "R8-04 输入清单必须登记且显式导出");
+check(!manifestExport.includes("fn ") && !existsSync(join(root,"crates/application/src/use_cases/prediction/shared/audit.rs")) && !read("crates/application/src/use_cases/prediction/shared/mod.rs").includes("mod audit;"), "旧 shared audit 必须删除，不保留双实现或空转发");
+for (const [name, source] of [["builder",builder], ["readiness",readinessFlow], ["executor",predictionExecution]]) check(source.includes("input_manifest::{") && !source.includes("shared::audit"), `清单调用方 ${name} 必须使用唯一新 owner`);
+check(canonicalManifest.includes("let mut canonical_input = input.clone();") && canonicalManifest.includes("strip_runtime_prediction_input_identity(&mut canonical_input);"), "清单必须在副本上排除运行身份，不能修改调用者输入");
+for (const field of ["audit_version", "database_match_id", "match_key", "competition_id", "season_id", "stage_id", "home_team_id", "away_team_id", "kickoff_time", "snapshot_type", "route_identity", "model_input", "data_quality"]) check(canonicalManifest.includes(`"${field}":`), `清单丢失原字段：${field}`);
+const excluded = [...canonicalManifest.matchAll(/(?:object|snapshot|source)\.remove\("([^"]+)"\)/g)].map(match=>match[1]);
+check(JSON.stringify(excluded) === JSON.stringify(["feature_snapshot_id", "input_audit", "snapshot_id", "frozen_at", "accessed_at"]), "只排除原五个运行身份字段，禁止放宽事实指纹");
+check(canonicalManifest.includes('object.get_mut("snapshot").and_then(Value::as_object_mut)') && canonicalManifest.includes('object.get_mut("sources").and_then(Value::as_array_mut)') && canonicalManifest.includes("source.as_object_mut()"), "运行身份排除必须限定原层级和 JSON 形态");
+check(canonicalManifest.includes("let bytes = serde_json::to_vec(value)?;") && canonicalManifest.includes("Ok(hex::encode(Sha256::digest(bytes)))"), "必须保持原 JSON 字节、SHA256 和小写 hex，不引入另一个 canonicalization");
+const verifyBody = inputAudit.slice(inputAudit.indexOf("pub(crate) fn verify_prepared_input_matches_readiness"), inputAudit.indexOf("pub(crate) fn attach_prediction_input_audit"));
+check(verifyBody.includes("readiness.input_manifest_sha256.as_deref().ok_or_else") && verifyBody.includes("let actual_sha256 = sha256_value(&manifest)?;") && verifyBody.includes("if actual_sha256 != expected_sha256") && verifyBody.includes("route_identity.as_ref()"), "受检重建必须比较受审计哈希及原路由/质量事实");
+check(verifyBody.indexOf("readiness.input_manifest_sha256") < verifyBody.indexOf("let manifest ="), "缺失受审计指纹的错误必须前置");
+const attachment = inputAudit.slice(inputAudit.indexOf("pub(crate) fn attach_prediction_input_audit"), inputAudit.indexOf("pub(crate) fn prediction_input_audit_summary"));
+check(attachment.indexOf("readiness.input_manifest.clone()") < attachment.indexOf("readiness.input_manifest_sha256.clone()") && attachment.indexOf("readiness.input_manifest_sha256.clone()") < attachment.indexOf(".as_object_mut()"), "审计附加必须保留缺失清单、缺失哈希、非对象输入错误优先级");
+for (const field of ["audit_version", "assessed_at", "level", "score", "can_run_formal", "can_run_shadow", "blockers", "warnings", "checks", "manifest", "manifest_sha256"]) check(attachment.includes(`"${field}":`), `审计附加丢失原字段：${field}`);
+check(inputAudit.includes("if calculated_manifest_sha256 != manifest_sha256") && inputAudit.includes('.unwrap_or("not_assessed")') && inputAudit.includes("u8::try_from(value).ok()") && inputAudit.includes("input_sha256: input_sha256.to_string()"), "审计摘要须复核清单并保持可选元数据和原输入哈希");
+const executionOrder = ["let input_sha256 = sha256_value(&request.input)?;", "let input_audit = prediction_input_audit_summary(&request.input, &input_sha256)?;", ".predict(&request)", ".save_successful_run("];
+const executionPositions = executionOrder.map(token=>predictionExecution.indexOf(token));
+check(executionPositions.every((position,index)=>position>=0 && (index===0 || position>executionPositions[index-1])), "执行必须先复核审计再 predict/save，原输入哈希不得先排除运行身份");
+for (const path of predictionFiles) {
+  const source = read(path).split("#[cfg(test)]")[0];
+  for (const fn of ["build_prediction_input_manifest", "verify_prepared_input_matches_readiness", "attach_prediction_input_audit", "prediction_input_audit_summary"]) if(source.includes(`fn ${fn}(`)) check(path.startsWith(manifestRoot+"/"), `清单/审计重复 owner：${path} ${fn}`);
+}
+for (const source of [canonicalManifest,inputAudit]) for (const token of ["async fn", "Utc::now", "Uuid::new", "port.", "store.", "sqlx::", ".predict(", "save_successful_run("]) check(!source.includes(token), `纯清单/审计不得增加 I/O 或重取身份：${token}`);
+for (const test of ["input_manifest_ignores_runtime_snapshot_identity", "audit_summary_rejects_modified_manifest", "fixed_manifest_preserves_original_shape_serialization_and_fingerprint", "runtime_exclusion_is_limited_to_original_documented_locations", "semantic_input_quality_route_match_and_window_changes_alter_fingerprint", "non_object_input_and_null_absence_preserve_original_manifest_semantics", "prepared_verification_preserves_hash_requirement_runtime_exclusion_and_drift_errors", "audit_attachment_preserves_payload_and_failure_priority", "audit_summary_preserves_field_errors_fallbacks_and_untrimmed_identity", "invalid_audit_stops_execution_before_prediction_and_history_write"]) check(manifestTests.includes(`fn ${test}`), `R8-04 缺少原目标内保留/新增测试：${test}`);
+check(manifestTests.includes("178afe68af4d0cb8ba9341a7f5f47ec3b89c4c2b9ceaafd0e6615db3a9a0fb87"), "固定公开平台清单指纹必须保持");
 if(failures.length) throw new Error(`Prediction Service 验证失败\n${failures.map((item)=>`- ${item}`).join("\n")}`);
 console.log(`Prediction Service 验证通过：${predictionFiles.length} 个 Service/Use Case Rust 文件，18 个公开 Application 职责已进入 Prediction Service/Ports 边界，P4 freeze execution 与 snapshot persistence 均不再由旧混合 owner 直接实现。`);

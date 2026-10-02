@@ -24,13 +24,13 @@
     "targetPublicExportPolicy": "explicit re-export only"
   },
   "sourceDigest": "217241ac243726a5ab6805a7f169e222b97e78c7c971749a5904714af673ebdd",
-  "rustUsageDigest": "55eb16cf4715683ebc2e611cb43987f61199ab1c3644195d63b303e1b8f876e8",
+  "rustUsageDigest": "2ee447db454de8e565e09abacb1b1724cf4b0d73e0021b6ce88b3547795df4f8",
   "summary": {
     "typeCount": 365,
     "publicCompatibilityTypeCount": 365,
     "internalTypeCount": 0,
     "domainSourceFileCount": 129,
-    "scannedRustFileCount": 1037,
+    "scannedRustFileCount": 1040,
     "databaseMappedTypeCount": 300,
     "byTargetModule": {
       "ai_workspace": 16,
@@ -4838,6 +4838,7 @@
         "crates/application/src/use_cases/competition/create_stage/mod.rs",
         "crates/application/src/use_cases/prediction/build_input/mod.rs",
         "crates/application/src/use_cases/prediction/dry_run_default_fixture/mod.rs",
+        "crates/application/src/use_cases/prediction/input_manifest/tests.rs",
         "crates/application/src/use_cases/prediction/readiness/tests.rs",
         "crates/application/src/use_cases/prediction/readiness/workflow.rs",
         "crates/application/src/use_cases/prediction/tests.rs",
@@ -11339,8 +11340,9 @@
         "crates/application/src/services/prediction/facade.rs",
         "crates/application/src/services/prediction/service.rs",
         "crates/application/src/use_cases/prediction/build_input/mod.rs",
+        "crates/application/src/use_cases/prediction/input_manifest/audit.rs",
+        "crates/application/src/use_cases/prediction/input_manifest/tests.rs",
         "crates/application/src/use_cases/prediction/readiness/workflow.rs",
-        "crates/application/src/use_cases/prediction/shared/audit.rs",
         "src-tauri/src/commands/prediction.rs"
       ],
       "databaseMappings": []
@@ -11454,8 +11456,9 @@
         "crates/application/src/services/lineups/service.rs",
         "crates/application/src/use_cases/lineups/create_match/mod.rs",
         "crates/application/src/use_cases/prediction/build_input/mod.rs",
+        "crates/application/src/use_cases/prediction/input_manifest/canonical.rs",
+        "crates/application/src/use_cases/prediction/input_manifest/tests.rs",
         "crates/application/src/use_cases/prediction/readiness/tests.rs",
-        "crates/application/src/use_cases/prediction/shared/audit.rs",
         "crates/application/src/use_cases/prediction/tests.rs",
         "crates/persistence-postgres/src/adapters/matches/catalog/create.rs",
         "crates/persistence-postgres/src/adapters/matches/catalog/list.rs",
@@ -13792,8 +13795,8 @@
       ],
       "externalCallers": [
         "crates/application/src/use_cases/prediction/build_input/mod.rs",
+        "crates/application/src/use_cases/prediction/input_manifest/tests.rs",
         "crates/application/src/use_cases/prediction/readiness/tests.rs",
-        "crates/application/src/use_cases/prediction/tests.rs",
         "crates/persistence-postgres/src/adapters/catalog/teams/detail/recent_match_mapper.rs",
         "crates/persistence-postgres/src/adapters/matches/catalog/mapping.rs",
         "crates/persistence-postgres/src/adapters/prediction/historical_features/read.rs",
@@ -21374,7 +21377,7 @@
       ],
       "externalCallers": [
         "crates/application/src/lib.rs",
-        "crates/application/src/use_cases/prediction/shared/audit.rs"
+        "crates/application/src/use_cases/prediction/input_manifest/audit.rs"
       ],
       "databaseMappings": []
     },
@@ -21589,6 +21592,7 @@
       ],
       "externalCallers": [
         "crates/application/src/use_cases/prediction/build_input/mod.rs",
+        "crates/application/src/use_cases/prediction/input_manifest/tests.rs",
         "crates/application/src/use_cases/prediction/readiness/report.rs",
         "crates/application/src/use_cases/prediction/readiness/tests.rs"
       ],
@@ -22165,9 +22169,10 @@
         "crates/application/src/composition/adapters/prediction.rs",
         "crates/application/src/ports/prediction/mod.rs",
         "crates/application/src/use_cases/prediction/build_input/mod.rs",
+        "crates/application/src/use_cases/prediction/input_manifest/audit.rs",
+        "crates/application/src/use_cases/prediction/input_manifest/tests.rs",
         "crates/application/src/use_cases/prediction/readiness/input_quality.rs",
         "crates/application/src/use_cases/prediction/readiness/tests.rs",
-        "crates/application/src/use_cases/prediction/shared/audit.rs",
         "crates/application/src/use_cases/prediction/tests.rs",
         "crates/persistence-postgres/src/match_prediction.rs"
       ],

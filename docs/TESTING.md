@@ -166,3 +166,14 @@ The public model stub must always return an explicit unavailable error. A succes
 03 在原 Application 单测 target 增加八项测试，复用原 Probe 和 fake registry；覆盖只读时钟/流程/manifest/路由、历史及质量临界值、阵容/身份阻断优先、异常转报告或原样返回、许可/评分/原因去重。预期 Application 69、Persistence 141，尚待本项 Windows CI，不将本地源码审查计为 Rust 实跑。原八 helper、async workflow 和报告汇总逐段等价；六项破坏探针均拒绝并恢复。83 项既有源码检查、完整 `npm run verify:architecture`、18 保护资产/171 命令/46 迁移及 18 PG 静态基线、Rustfmt 和 `git diff --check` 均已 PASS；5 项浏览器检查与编译/Clippy/单测/交付留自身 Windows CI。没有 Linux/macOS 动态验证、新 runner/workflow/target/数据库。
 
 真实 PG、历史四项/账本/XLSX/Full、私有 P4/P7 Golden Master、模型历史删除 trigger 风险仍沿用最终封包新库待验；ignored 不能计通过。
+
+
+## R8-03 Windows 收尾 / R8-04 当前验证（2026-10-02）
+
+精确 `47ba3dea6ca873248728b9846421c009d00f51bc` / run `36902069546` / job `110503393919` 全 SUCCESS；Application 69/Persistence 141、八项新审计测试、17 视口、前端类型/构建、Rust fmt/Clippy/workspace tests、Windows release/MSI/NSIS 及启动 7 条/3 操作通过。前节“待 CI”为实施时记录，03 正式完成记录保存 SHA/树/artifact。
+
+04 沿用原 Application target：两项原清单/审计测试迁入唯一目录且断言保持，新增八项测试，预期 Application 77（69+8）/Persistence 141。覆盖公开固定清单 SHA-256 `178afe68af4d0cb8ba9341a7f5f47ec3b89c4c2b9ceaafd0e6615db3a9a0fb87`、原字段与 UTF-8/对象序列化、五个运行字段的精确排除层级、原输入不修改、完整输入指纹与清单指纹的区别、纳秒 cutoff/阵容贡献/质量/路由/比赛/窗口的指纹敏感性、数组顺序/null 与缺失、受检重建/附加/摘要的错误顺序和可选元数据、两种模式下篡改先于 predict/save 拒绝。固定平台载荷不是私有模型概率 Golden Master。
+
+六项原函数及两项原测试逐段等价。六探针（放宽排除、修改原输入、改变序列化字节、跳过 stale 哈希、跳过摘要复核、执行绕过审计）均拒绝并恢复。83 项现有源码检查、完整 `npm run verify:architecture`、Rustfmt、18 保护资产/171 命令/46 迁移与 18 PG 静态基线及 `git diff --check` 全 PASS。原本地 Rustfmt 运行库截断导致 loader/SIGBUS，已从现有相同版本归档完整恢复并通过格式化及 --check，无依赖/锁文件变更；这不是 Rust 编译验收。
+
+5 项浏览器检查、Rust 编译/Clippy/tests、Windows 交付仍待 04 自身精确 CI。没有 Linux/macOS 动态验证、新 runner/workflow/target/数据库；真实 PG/历史四项/账本/XLSX/Full/私有固定回归和继承模型历史删除 trigger 风险继续最终封包新库待验，ignored 不计 PASS。
