@@ -16,9 +16,13 @@ R8-05 路由与模型请求已收尾：精确修复 `2aa99a7` / [Windows run `36
 
 R8-06 已收尾为 `DONE`：注册查找、supports、predict、完整错误转换和原毫秒计时收拢到唯一模型适配器，原执行器与默认 dry run 直接复用；默认 dry run 保留无额外 supports/validate 的行为。精确 `0969331` / [Windows run `37752995641`](https://github.com/uniquenesssta/123/actions/runs/37752995641) 通过 Application **92** / Persistence **141**、七项新增边界测试、17 视口、Rust/前端、Windows release/MSI/NSIS 及启动验收。详见 [06 完成记录](docs/modular-rewrite/R08-prediction-p4-orchestration/R08-06-model-execution-adapter.md)。后续当前状态见下段与 R8 索引；本段五份文档收尾提交使用 `[skip ci]`，不代表 07 已验证。
 
-R8-07 Run Persistence 已通过自身 Windows 门禁并收尾为 `DONE`；08 已获用户启动授权，09～12 `BLOCKED`。从已验源码的文档基线 `eadb49d` 开始，旧 `crates/persistence-postgres/src/model_runs.rs` 已删除，原保存、输入审计/快照前检、模型明细、历史读取和隐藏事务分别迁入 `adapters/prediction/runs/{write,input,details,read,visibility}.rs`，`mod.rs` 只登记/导出。公开 PostgresStore 方法及 ModelRunListItem 路径保持；正式保存/影子 nil 继续由原执行用例编排。九项生产函数体、原 SQL、四个公开签名及原测试比较保持一致，无整文件移动/重命名。完整 7 新增、15 修改、1 删除文件及取舍见 [07 实施记录](docs/modular-rewrite/R08-prediction-p4-orchestration/R08-07-run-persistence.md)。
+R8-07 Run Persistence 已通过自身 Windows 门禁并收尾为 `DONE`；08 已实施、`VERIFYING`，09～12 `BLOCKED`。从已验源码的文档基线 `eadb49d` 开始，旧 `crates/persistence-postgres/src/model_runs.rs` 已删除，原保存、输入审计/快照前检、模型明细、历史读取和隐藏事务分别迁入 `adapters/prediction/runs/{write,input,details,read,visibility}.rs`，`mod.rs` 只登记/导出。公开 PostgresStore 方法及 ModelRunListItem 路径保持；正式保存/影子 nil 继续由原执行用例编排。九项生产函数体、原 SQL、四个公开签名及原测试比较保持一致，无整文件移动/重命名。完整 7 新增、15 修改、1 删除文件及取舍见 [07 实施记录](docs/modular-rewrite/R08-prediction-p4-orchestration/R08-07-run-persistence.md)。
 
 07 实施时本地实际通过 83/83 现有源码门禁、完整 `npm run verify:architecture`、Rustfmt、18 保护资产/171 命令/46 迁移与 18 PG 静态契约、`git diff --check`；六项破坏探针均拒绝后恢复。新增七项 Persistence 边界单测，原 Application 保存失败测试扩为六类错误；预期 Persistence **148** / Application **92**，须本项精确 Windows CI 实跑，不继承 06 PASS。原 PG target 补共同回滚、快照复用、读回与隐藏不可变断言，仍 ignored，真实 PG/历史四项/账本/有效 XLSX/Windows Full/私有 Golden Master 与继承历史删除风险继续最终封包新库待验。沿用原 Windows workflow，启动后停止轮询；无 Linux/macOS Cargo/客户端动态验收或新基础设施。
+
+R8-08 P4 Evidence Ledger 已实施、`VERIFYING`：证据追加与冲突建组从旧 p4_records 迁入 `adapters/p4/evidence_ledger/{claims,conflicts,input,references,row}.rs`，mod 仅登记/导出，原证据状态投影和 P4 共用幂等实现各保持唯一 owner。旧文件保留版本登记/研究任务/快照职责，账本实现与原测试迁出，无空转发；10 原生产函数、原测试、31 SQL 和2公开签名核对等价，原文件其余34函数保持。新增9个Rust文件和 [08 实施记录](docs/modular-rewrite/R08-prediction-p4-orchestration/R08-08-p4-evidence-ledger.md)，累计10新增/11修改，无整文件移动或删除。
+
+08 实际本地通过83/83原源码检查、完整architecture、Rustfmt、18保护资产/171命令/46迁移及18PG静态契约、git diff --check，六项破坏探针均拒绝恢复。原Persistence target新增8项边界测试，预期 **156** / Application **92**；原PG Stage C扩原文读回/纳秒指纹、引用/SQL失败无残留、并发同键重试与单条审计、去重冲突/单opened事件及append-only，仍ignored。本项须自身Windows CI，启动后停止轮询；真实PG/历史四项/账本/XLSX/Windows Full/私有Golden Master及继承删除风险仍最终封包新库待验。09～12 BLOCKED，无新runner/workflow/target/数据库/依赖。
 
 ## 公开边界
 

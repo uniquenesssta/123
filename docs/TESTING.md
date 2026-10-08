@@ -251,3 +251,16 @@ Application **92** / Persistence **141**、七项新增 adapter 测试、前端�
 精确实施 `58b390a6400646ac6131dfef0503a49ce1128eca` / [Windows run `37796909083`](https://github.com/uniquenesssta/123/actions/runs/37796909083) / job `113378629485` 全 SUCCESS，完成于 2026-10-08 23:27:02（北京时间）。完整日志确认 Application **92** / Persistence **148**、七项新增边界及原审计测试、前端契约/类型/生产构建、**17** 视口、fmt/Clippy/workspace tests、Windows release/MSI/NSIS 和启动 **7 条记录 / 3 个完成操作**通过。报告 `logs/windows-acceptance-20261008-145959.json`；artifact `11559974847`，14,025,581 字节，SHA-256 `b31ac49010ca525cd6c836fa9746be451ed5dc72bc8e918522e6ecad7e22f2ac`。
 
 已核对精确 SHA、全部 job/steps、日志与 artifact；实施时预期/待验文字保留为历史记录。07 正式 **DONE**，08 前置通过；用户已授权“收尾07开始08”，沿用唯一 R8 分支。收尾仅同步五份文档，源码/测试/清单保持上述已验树，链接/状态/diff 核对，不重复全量构建，文档提交使用 `[skip ci]`。真实 PG/历史四项/账本/有效 XLSX/Windows Full/私有 Golden Master 与继承 model.runs/0041 删除风险继续最终封包新库待验，ignored 不计实跑 PASS。
+
+
+## R8-08 实施验证（2026-10-08，VERIFYING）
+
+08从07已验源码文档基线 `1db0e195cdbc26514d7ad015b4110a53a446ba26` 开始。原账本追加/冲突、声明前检/指纹、版本引用、Row及共享验证状态、P4共用幂等3函数共10生产函数迁出，原证据测试迁入。冲突纯前检提取后重新内联比较等价，原其余34函数、31SQL和2公开签名保持，Application/Ports/composition无生产改动。
+
+原Persistence target新增8项：六状态来源字段/空字符串原策略，必填/错误优先级与原文，retrieval纳秒边界，全部身份/出处/版本/时间/metadata指纹和retry-key策略，冲突BTreeSet去重/排序/指纹，240字节幂等键及不同成员下限，六种状态映射和未知错误，精确指纹重试错误。保留原一测试，预期Persistence **156**（148+8）/Application **92**；尚未Rust实跑，必须08精确Windows确认，不继承07。
+
+原PG `p4_stage_c_writes_are_idempotent_and_frozen_history_is_immutable` 夹具扩完整声明字段和微秒落库读回、metadata/纳秒身份变化拒绝、原conflict排序/重复/metadata排除策略、run/match/schema/prompt/conflict引用和source FK失败后无声明/审计、首次并发同键返回同UUID/一次审计、成员缺失/身份不符/重复最小集合失败无头/成员/事件/审计、并发冲突2成员1opened1审计、四类账本mutation拒绝。原快照cutoff/31字段/4链/immutable断言保持。18 broad仍ignored，编译不计PG实跑PASS；真实PG/历史四项/账本/有效XLSX/WindowsFull/私有GoldenMaster与继承删除trigger风险最终封包新库待验。
+
+实际本地PASS：原83/83frontend源码项（5浏览器项留Windows）、`npm run verify:architecture`、12 changed Rust targets的Rustfmt1.88.0 --check、`node scripts/verify_protected_assets.mjs`、`node scripts/verify_command_contract.mjs`、`node scripts/verify_database_baseline.mjs`、git diff --check。六项临时破坏探针均由原增强Prediction gate拒绝并恢复；健康门禁复跑PASS。初次architecture仅新增模块数量清单未同步，修正35→36后完整通过。无Linux/macOS Cargo/客户端动态、新runner/workflow/target/数据库/依赖/迁移。
+
+报告 `/workspace/scratch/0c69084e7a7f/r808-source-checks.json`、`r808-architecture.log`、`r808-negative-probes.json`、`r808-equivalence.json`。Domain扫描1051→1060，365/300/声明摘要保持，usageDigest `307b38c0ae795e65133ae11522339b21a47bd8ab5cc1129f02f679ca0ba97608`；Application390/43Port保持。PG runtime_sources只更新原postgres_integration blob `eb0f4dd987b3f4374a57c1f5295c8be0ffaf9966`，迁移摘要不变。08VERIFYING，09～12BLOCKED；原Windows全链路CI启动后停止轮询，详见 [08实施记录](modular-rewrite/R08-prediction-p4-orchestration/R08-08-p4-evidence-ledger.md)。

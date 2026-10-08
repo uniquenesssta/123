@@ -2,7 +2,7 @@
 
 ## 当前阶段状态
 
-`IN_PROGRESS`。唯一阶段分支 `rewrite/r8-prediction-p4-orchestration`，起点/回退基线 `90680bf945fbb0d1c191937c2d9e90c2c916fb00`。R8-01～07 已 DONE；07 精确 `58b390a` / Windows run `37796909083` 全 SUCCESS。08 前置通过、READY，用户已授权开始；09～12 `BLOCKED`。精确当前状态只由本索引维护。
+`IN_PROGRESS`。唯一阶段分支 `rewrite/r8-prediction-p4-orchestration`，起点/回退基线 `90680bf945fbb0d1c191937c2d9e90c2c916fb00`。R8-01～07 已 DONE；07 精确 `58b390a` / Windows run `37796909083` 全 SUCCESS。08 已按用户指令实施、`VERIFYING`，自身Windows CI待验；09～12 `BLOCKED`。精确当前状态只由本索引维护。
 
 ## 前置基线与范围
 
@@ -21,7 +21,7 @@ R8 依据 [任务书](../../football-model-platform-modular-rewrite-19-docs/08-R
 | R8-05 | Route / Model Request | DONE · [完成记录](R08-05-route-and-model-request.md) |
 | R8-06 | Model Execution Adapter | DONE · [完成记录](R08-06-model-execution-adapter.md) |
 | R8-07 | Run Persistence | DONE · [完成记录](R08-07-run-persistence.md) |
-| R8-08 | P4 Evidence Ledger | READY · 用户已授权开始 |
+| R8-08 | P4 Evidence Ledger | VERIFYING · [实施记录](R08-08-p4-evidence-ledger.md) · 自身Windows CI待验 |
 | R8-09 | Fact Pipeline | BLOCKED |
 | R8-10 | Horizon Orchestration | BLOCKED |
 | R8-11 | Workbench Reads | BLOCKED |
@@ -171,3 +171,14 @@ R8-01～07 已取得各自精确 Windows CI；08 及后续仍须独立取得自�
 精确实施 `58b390a6400646ac6131dfef0503a49ce1128eca` / [Windows run `37796909083`](https://github.com/uniquenesssta/123/actions/runs/37796909083) / job `113378629485` 全 SUCCESS，完成于 2026-10-08 23:27:02（北京时间）。完整日志确认 Application **92** / Persistence **148**、七项新增边界及原审计测试、前端契约/类型/生产构建、**17** 视口、fmt/Clippy/workspace tests、Windows release/MSI/NSIS 和启动 **7 条记录 / 3 个完成操作**通过。报告 `logs/windows-acceptance-20261008-145959.json`；artifact `11559974847`，14,025,581 字节，SHA-256 `b31ac49010ca525cd6c836fa9746be451ed5dc72bc8e918522e6ecad7e22f2ac`。
 
 已核对精确 SHA、全部 job/steps、日志与 artifact；实施时预期/待验文字保留为历史记录。07 正式 **DONE**，08 前置通过；用户已授权“收尾07开始08”，沿用唯一 R8 分支。收尾仅同步五份文档，源码/测试/清单保持上述已验树，链接/状态/diff 核对，不重复全量构建，文档提交使用 `[skip ci]`。真实 PG/历史四项/账本/有效 XLSX/Windows Full/私有 Golden Master 与继承 model.runs/0041 删除风险继续最终封包新库待验，ignored 不计实跑 PASS。
+
+
+## R8-08 实施与门禁记录（2026-10-08，VERIFYING）
+
+07 通过并文档收尾为 `1db0e195cdbc26514d7ad015b4110a53a446ba26`，08从该基线开始，沿用唯一R8分支。证据追加/冲突事务、纯输入前检、引用校验/Row投影从p4_records迁入evidence_ledger；原共用lock/key/fingerprint判定迁入p4/idempotency，旧非账本owner直接复用。原六种证据状态投影由ledger/row唯一持有且snapshot共享。没有新增Application空转发层；Artifact/ResearchRun/Snapshot/Fact/Workbench和冻结留对应后续owner。
+
+10原生产函数与原一测试迁移等价，冲突纯前检重新内联后原事务函数等价；2公开签名、31SQL及旧剩余34函数保持。文件清单10A11M，无整文件移动/删除，详见 [08实施记录](R08-08-p4-evidence-ledger.md)。原Persistence target新增8测试，预期156/Application92，需自身精确Windows实跑；原PG Stage C扩读回/引用失败/并发唯一/审计和不可变，18 broad仍ignored，真实结果最终新库待验。
+
+实际PASS：83/83原源码检查、完整architecture、12文件Rustfmt、18保护资产、171命令、46连续迁移/18PG静态基线和git diff --check；六探针（漏锁/漏metadata指纹/放宽字节键/漏实体校验/跳过Schema版本/提前commit）均拒绝并恢复。初次architecture发现新增p4直接module登记后计数未更新，已精确35→36并复跑通过，不放宽owner集合。Domain扫描1051→1060、365/300/sourceDigest保持，usageDigest `307b38c0ae795e65133ae11522339b21a47bd8ab5cc1129f02f679ca0ba97608`；Application390/43Ports保持，PG清单仅刷新原test blob。
+
+08须本项Windows Automated，CI启动后停止轮询；未做Linux/macOS动态验收。Mermaid Chart更新实际声明/冲突事务链，结束时Create State保存。08VERIFYING，09～12BLOCKED；真实PG/历史四项/账本/XLSX/Full/私有固定回归及继承model.runs/0041删除风险保持最终新库待验。回退受控revert恢复已验源码文档基线1db0e19，同步唯一owner/出口/测试/清单，不手工恢复双实现或修改历史库。

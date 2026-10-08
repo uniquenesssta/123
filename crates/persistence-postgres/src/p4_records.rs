@@ -1,8 +1,11 @@
 use super::{sha256_json, write_audit_event, PersistenceError, PersistenceResult, PostgresStore};
+use crate::adapters::p4::{
+    evidence_ledger::parse_verification_state,
+    idempotency::{advisory_lock, ensure_idempotent_fingerprint, validate_idempotency_key},
+};
 use chrono::{DateTime, Utc};
 use football_domain::{
-    CompetitionProfileVersionDraft, CompetitionProfileVersionRecord, EvidenceClaimDraft,
-    EvidenceClaimRecord, EvidenceConflictDraft, EvidenceConflictRecord, EvidenceVerificationState,
+    CompetitionProfileVersionDraft, CompetitionProfileVersionRecord, EvidenceVerificationState,
     P4Horizon, PrematchSnapshotBundle, PrematchSnapshotDraft, PrematchSnapshotRecord,
     PromptVersionDraft, PromptVersionRecord, ResearchRunDraft, ResearchRunEventDraft,
     ResearchRunRecord, ResearchRunStatus, SchemaVersionDraft, SchemaVersionRecord,
@@ -402,280 +405,6 @@ impl PostgresStore {
         .fetch_one(&mut *tx)
         .await?;
         let record = research_run_record_from_row(&row)?;
-        tx.commit().await?;
-        Ok(record)
-    }
-
-    pub async fn append_evidence_claim(
-        &self,
-        draft: &EvidenceClaimDraft,
-    ) -> PersistenceResult<EvidenceClaimRecord> {
-        validate_evidence_claim(draft)?;
-        let content_sha256 = sha256_json(&draft.value)?;
-        let claim_fingerprint = evidence_claim_fingerprint(draft, &content_sha256)?;
-        let mut tx = self.pool.begin().await?;
-        advisory_lock(&mut tx, &format!("evidence:{}", draft.idempotency_key)).await?;
-        if let Some(row) = sqlx::query(
-            r#"
-            SELECT id, match_id, field_key, verification_state, content_sha256,
-                   claim_fingerprint, idempotency_key, created_at
-            FROM research.evidence_claims
-            WHERE idempotency_key = $1
-            "#,
-        )
-        .bind(&draft.idempotency_key)
-        .fetch_optional(&mut *tx)
-        .await?
-        {
-            let existing: String = row.try_get("claim_fingerprint")?;
-            ensure_idempotent_fingerprint(
-                "证据声明",
-                &draft.idempotency_key,
-                &existing,
-                &claim_fingerprint,
-            )?;
-            let record = evidence_claim_record_from_row(&row)?;
-            tx.commit().await?;
-            return Ok(record);
-        }
-
-        let run =
-            sqlx::query("SELECT match_id, schema_version_id FROM research.runs WHERE id = $1")
-                .bind(draft.research_run_id)
-                .fetch_one(&mut *tx)
-                .await?;
-        if run.try_get::<Uuid, _>("match_id")? != draft.match_id {
-            return Err(PersistenceError::InvalidState(
-                "证据比赛与研究任务比赛不一致".to_string(),
-            ));
-        }
-        if run.try_get::<Uuid, _>("schema_version_id")? != draft.schema_version_id {
-            return Err(PersistenceError::InvalidState(
-                "证据Schema版本与研究任务不一致".to_string(),
-            ));
-        }
-        validate_evidence_version_references(&mut tx, draft).await?;
-
-        let id = Uuid::new_v4();
-        let row = sqlx::query(
-            r#"
-            INSERT INTO research.evidence_claims (
-                id, match_id, entity_type, entity_id, field_key, value,
-                verification_state, source_tier, source_document_id,
-                source_url, source_title, source_domain,
-                published_at, observed_at, effective_at, retrieved_at, timezone,
-                independent_source_count, conflict_group_id,
-                content_sha256, claim_fingerprint, research_run_id,
-                prompt_version_id, prompt_version, schema_version_id, schema_version,
-                idempotency_key, metadata
-            ) VALUES (
-                $1, $2, $3, $4, $5, $6,
-                $7, $8, $9,
-                $10, $11, $12,
-                $13, $14, $15, $16, $17,
-                $18, $19,
-                $20, $21, $22,
-                $23, $24, $25, $26,
-                $27, $28
-            )
-            RETURNING id, match_id, field_key, verification_state, content_sha256,
-                      claim_fingerprint, idempotency_key, created_at
-            "#,
-        )
-        .bind(id)
-        .bind(draft.match_id)
-        .bind(&draft.entity_type)
-        .bind(draft.entity_id)
-        .bind(&draft.field_key)
-        .bind(&draft.value)
-        .bind(draft.verification_state.as_str())
-        .bind(&draft.source_tier)
-        .bind(draft.source_document_id)
-        .bind(&draft.source_url)
-        .bind(&draft.source_title)
-        .bind(&draft.source_domain)
-        .bind(draft.published_at)
-        .bind(draft.observed_at)
-        .bind(draft.effective_at)
-        .bind(draft.retrieved_at)
-        .bind(&draft.timezone)
-        .bind(i32::from(draft.independent_source_count))
-        .bind(draft.conflict_group_id)
-        .bind(&content_sha256)
-        .bind(&claim_fingerprint)
-        .bind(draft.research_run_id)
-        .bind(draft.prompt_version_id)
-        .bind(&draft.prompt_version)
-        .bind(draft.schema_version_id)
-        .bind(&draft.schema_version)
-        .bind(&draft.idempotency_key)
-        .bind(&draft.metadata)
-        .fetch_one(&mut *tx)
-        .await?;
-        write_audit_event(
-            &mut tx,
-            "evidence_claim_appended",
-            "evidence_claim",
-            Some(id.to_string()),
-            json!({
-                "match_id": draft.match_id,
-                "field_key": draft.field_key,
-                "verification_state": draft.verification_state.as_str(),
-                "content_sha256": content_sha256,
-                "claim_fingerprint": claim_fingerprint,
-                "research_run_id": draft.research_run_id,
-            }),
-        )
-        .await?;
-        let record = evidence_claim_record_from_row(&row)?;
-        tx.commit().await?;
-        Ok(record)
-    }
-
-    pub async fn create_evidence_conflict(
-        &self,
-        draft: &EvidenceConflictDraft,
-    ) -> PersistenceResult<EvidenceConflictRecord> {
-        validate_idempotency_key(&draft.conflict_key)?;
-        let evidence_ids = draft.evidence_ids.iter().copied().collect::<BTreeSet<_>>();
-        if evidence_ids.len() < 2 {
-            return Err(PersistenceError::InvalidState(
-                "冲突组至少需要两条不同证据".to_string(),
-            ));
-        }
-        let conflict_fingerprint = sha256_json(&json!({
-            "match_id": draft.match_id,
-            "entity_type": draft.entity_type,
-            "entity_id": draft.entity_id,
-            "field_key": draft.field_key,
-            "evidence_ids": evidence_ids,
-            "trace_id": draft.trace_id,
-        }))?;
-        let mut tx = self.pool.begin().await?;
-        advisory_lock(&mut tx, &format!("conflict:{}", draft.conflict_key)).await?;
-        if let Some(row) = sqlx::query(
-            "SELECT id, conflict_key, conflict_fingerprint, created_at FROM research.evidence_conflicts WHERE conflict_key = $1",
-        )
-        .bind(&draft.conflict_key)
-        .fetch_optional(&mut *tx)
-        .await?
-        {
-            let existing: String = row.try_get("conflict_fingerprint")?;
-            ensure_idempotent_fingerprint(
-                "证据冲突",
-                &draft.conflict_key,
-                &existing,
-                &conflict_fingerprint,
-            )?;
-            let record = EvidenceConflictRecord {
-                id: row.try_get("id")?,
-                conflict_key: row.try_get("conflict_key")?,
-                created_at: row.try_get("created_at")?,
-            };
-            tx.commit().await?;
-            return Ok(record);
-        }
-
-        let rows = sqlx::query(
-            r#"
-            SELECT id, match_id, entity_type, entity_id, field_key
-            FROM research.evidence_claims
-            WHERE id = ANY($1)
-            "#,
-        )
-        .bind(evidence_ids.iter().copied().collect::<Vec<_>>())
-        .fetch_all(&mut *tx)
-        .await?;
-        if rows.len() != evidence_ids.len() {
-            return Err(PersistenceError::InvalidState(
-                "冲突组包含不存在的证据".to_string(),
-            ));
-        }
-        for row in &rows {
-            let match_id: Uuid = row.try_get("match_id")?;
-            let entity_type: String = row.try_get("entity_type")?;
-            let entity_id: Option<Uuid> = row.try_get("entity_id")?;
-            let field_key: String = row.try_get("field_key")?;
-            if match_id != draft.match_id
-                || entity_type != draft.entity_type
-                || entity_id != draft.entity_id
-                || field_key != draft.field_key
-            {
-                return Err(PersistenceError::InvalidState(
-                    "冲突组证据必须属于同一比赛、实体和字段".to_string(),
-                ));
-            }
-        }
-
-        let id = Uuid::new_v4();
-        let row = sqlx::query(
-            r#"
-            INSERT INTO research.evidence_conflicts (
-                id, match_id, entity_type, entity_id, field_key,
-                conflict_key, conflict_fingerprint, trace_id, metadata
-            ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
-            RETURNING id, conflict_key, created_at
-            "#,
-        )
-        .bind(id)
-        .bind(draft.match_id)
-        .bind(&draft.entity_type)
-        .bind(draft.entity_id)
-        .bind(&draft.field_key)
-        .bind(&draft.conflict_key)
-        .bind(&conflict_fingerprint)
-        .bind(draft.trace_id)
-        .bind(&draft.metadata)
-        .fetch_one(&mut *tx)
-        .await?;
-        for evidence_id in evidence_ids {
-            sqlx::query(
-                r#"
-                INSERT INTO research.evidence_conflict_members (conflict_id, evidence_id)
-                VALUES ($1, $2)
-                "#,
-            )
-            .bind(id)
-            .bind(evidence_id)
-            .execute(&mut *tx)
-            .await?;
-        }
-        let opened_payload = json!({"evidence_count": rows.len()});
-        let opened_fingerprint = sha256_json(&json!({
-            "event_type": "opened",
-            "payload": opened_payload,
-        }))?;
-        sqlx::query(
-            r#"
-            INSERT INTO research.evidence_conflict_events (
-                id, conflict_id, event_type, payload, idempotency_key, event_fingerprint
-            ) VALUES ($1, $2, 'opened', $3, 'opened', $4)
-            "#,
-        )
-        .bind(Uuid::new_v4())
-        .bind(id)
-        .bind(&opened_payload)
-        .bind(&opened_fingerprint)
-        .execute(&mut *tx)
-        .await?;
-        write_audit_event(
-            &mut tx,
-            "evidence_conflict_opened",
-            "evidence_conflict",
-            Some(id.to_string()),
-            json!({
-                "match_id": draft.match_id,
-                "field_key": draft.field_key,
-                "conflict_key": draft.conflict_key,
-                "evidence_count": rows.len(),
-            }),
-        )
-        .await?;
-        let record = EvidenceConflictRecord {
-            id: row.try_get("id")?,
-            conflict_key: row.try_get("conflict_key")?,
-            created_at: row.try_get("created_at")?,
-        };
         tx.commit().await?;
         Ok(record)
     }
@@ -1180,67 +909,6 @@ async fn snapshot_record_by_id(
     })
 }
 
-async fn validate_evidence_version_references(
-    tx: &mut Transaction<'_, Postgres>,
-    draft: &EvidenceClaimDraft,
-) -> PersistenceResult<()> {
-    let registered_schema_version: Option<String> =
-        sqlx::query_scalar("SELECT version FROM research.schema_versions WHERE id = $1")
-            .bind(draft.schema_version_id)
-            .fetch_optional(&mut **tx)
-            .await?;
-    if registered_schema_version.as_deref() != Some(draft.schema_version.as_str()) {
-        return Err(PersistenceError::InvalidState(
-            "证据Schema版本ID与版本号不一致".to_string(),
-        ));
-    }
-
-    match (draft.prompt_version_id, draft.prompt_version.as_deref()) {
-        (None, None) => {}
-        (Some(prompt_version_id), Some(prompt_version)) => {
-            let registered_prompt_version: Option<String> =
-                sqlx::query_scalar("SELECT version FROM research.prompt_versions WHERE id = $1")
-                    .bind(prompt_version_id)
-                    .fetch_optional(&mut **tx)
-                    .await?;
-            if registered_prompt_version.as_deref() != Some(prompt_version) {
-                return Err(PersistenceError::InvalidState(
-                    "证据Prompt版本ID与版本号不一致".to_string(),
-                ));
-            }
-        }
-        _ => {
-            return Err(PersistenceError::InvalidState(
-                "证据Prompt版本ID与版本号必须同时提供或同时为空".to_string(),
-            ));
-        }
-    }
-
-    if let Some(conflict_group_id) = draft.conflict_group_id {
-        let conflict = sqlx::query(
-            r#"
-            SELECT match_id, entity_type, entity_id, field_key
-            FROM research.evidence_conflicts
-            WHERE id = $1
-            "#,
-        )
-        .bind(conflict_group_id)
-        .fetch_optional(&mut **tx)
-        .await?
-        .ok_or_else(|| PersistenceError::InvalidState("证据引用的冲突组不存在".to_string()))?;
-        if conflict.try_get::<Uuid, _>("match_id")? != draft.match_id
-            || conflict.try_get::<String, _>("entity_type")? != draft.entity_type
-            || conflict.try_get::<Option<Uuid>, _>("entity_id")? != draft.entity_id
-            || conflict.try_get::<String, _>("field_key")? != draft.field_key
-        {
-            return Err(PersistenceError::InvalidState(
-                "证据引用的冲突组必须属于同一比赛、实体和字段".to_string(),
-            ));
-        }
-    }
-    Ok(())
-}
-
 async fn validate_snapshot_references(
     tx: &mut Transaction<'_, Postgres>,
     draft: &PrematchSnapshotDraft,
@@ -1488,35 +1156,6 @@ fn validate_snapshot_draft(draft: &PrematchSnapshotDraft) -> PersistenceResult<(
     Ok(())
 }
 
-fn validate_evidence_claim(draft: &EvidenceClaimDraft) -> PersistenceResult<()> {
-    validate_idempotency_key(&draft.idempotency_key)?;
-    if draft.entity_type.trim().is_empty()
-        || draft.field_key.trim().is_empty()
-        || draft.source_tier.trim().is_empty()
-        || draft.timezone.trim().is_empty()
-        || draft.schema_version.trim().is_empty()
-    {
-        return Err(PersistenceError::InvalidState(
-            "证据实体、字段、来源等级、时区和Schema版本不能为空".to_string(),
-        ));
-    }
-    if draft.verification_state.requires_source()
-        && (draft.source_url.as_deref().is_none_or(str::is_empty)
-            || draft.source_title.as_deref().is_none_or(str::is_empty)
-            || draft.source_domain.as_deref().is_none_or(str::is_empty))
-    {
-        return Err(PersistenceError::InvalidState(
-            "有事实来源的证据必须保存URL、标题和域名".to_string(),
-        ));
-    }
-    if draft.retrieved_at < draft.observed_at {
-        return Err(PersistenceError::InvalidState(
-            "retrieved_at不能早于observed_at".to_string(),
-        ));
-    }
-    Ok(())
-}
-
 fn research_run_fingerprint(draft: &ResearchRunDraft) -> PersistenceResult<String> {
     sha256_json(&json!({
         "match_id": draft.match_id,
@@ -1530,60 +1169,11 @@ fn research_run_fingerprint(draft: &ResearchRunDraft) -> PersistenceResult<Strin
     }))
 }
 
-fn evidence_claim_fingerprint(
-    draft: &EvidenceClaimDraft,
-    content_sha256: &str,
-) -> PersistenceResult<String> {
-    sha256_json(&json!({
-        "match_id": draft.match_id,
-        "entity_type": draft.entity_type,
-        "entity_id": draft.entity_id,
-        "field_key": draft.field_key,
-        "verification_state": draft.verification_state.as_str(),
-        "source_tier": draft.source_tier,
-        "source_document_id": draft.source_document_id,
-        "source_url": draft.source_url,
-        "source_title": draft.source_title,
-        "source_domain": draft.source_domain,
-        "published_at": draft.published_at,
-        "observed_at": draft.observed_at,
-        "effective_at": draft.effective_at,
-        "retrieved_at": draft.retrieved_at,
-        "timezone": draft.timezone,
-        "independent_source_count": draft.independent_source_count,
-        "conflict_group_id": draft.conflict_group_id,
-        "content_sha256": content_sha256,
-        "research_run_id": draft.research_run_id,
-        "prompt_version_id": draft.prompt_version_id,
-        "prompt_version": draft.prompt_version,
-        "schema_version_id": draft.schema_version_id,
-        "schema_version": draft.schema_version,
-        "metadata": draft.metadata,
-    }))
-}
-
-async fn advisory_lock(tx: &mut Transaction<'_, Postgres>, key: &str) -> PersistenceResult<()> {
-    sqlx::query("SELECT pg_advisory_xact_lock(hashtext($1)::bigint)")
-        .bind(key)
-        .execute(&mut **tx)
-        .await?;
-    Ok(())
-}
-
 fn validate_version_identity(key: &str, version: &str, label: &str) -> PersistenceResult<()> {
     if key.trim().is_empty() || version.trim().is_empty() {
         return Err(PersistenceError::InvalidState(format!(
             "{label}键和版本不能为空"
         )));
-    }
-    Ok(())
-}
-
-fn validate_idempotency_key(value: &str) -> PersistenceResult<()> {
-    if value.trim().is_empty() || value.len() > 240 {
-        return Err(PersistenceError::InvalidState(
-            "幂等键不能为空且长度不得超过240".to_string(),
-        ));
     }
     Ok(())
 }
@@ -1613,20 +1203,6 @@ fn ensure_same_hash(
     if existing != expected {
         return Err(PersistenceError::InvalidState(format!(
             "{key}@{version}已存在但内容指纹不同；必须发布新版本"
-        )));
-    }
-    Ok(())
-}
-
-fn ensure_idempotent_fingerprint(
-    entity: &str,
-    idempotency_key: &str,
-    existing: &str,
-    expected: &str,
-) -> PersistenceResult<()> {
-    if existing != expected {
-        return Err(PersistenceError::InvalidState(format!(
-            "{entity}幂等键{idempotency_key}已绑定不同载荷"
         )));
     }
     Ok(())
@@ -1672,23 +1248,6 @@ fn research_run_record_from_row(
         idempotency_key: row.try_get("idempotency_key")?,
         request_fingerprint: row.try_get("request_fingerprint")?,
         status: parse_research_status(row.try_get::<String, _>("status")?.as_str())?,
-        created_at: row.try_get("created_at")?,
-    })
-}
-
-fn evidence_claim_record_from_row(
-    row: &sqlx::postgres::PgRow,
-) -> PersistenceResult<EvidenceClaimRecord> {
-    Ok(EvidenceClaimRecord {
-        id: row.try_get("id")?,
-        match_id: row.try_get("match_id")?,
-        field_key: row.try_get("field_key")?,
-        verification_state: parse_verification_state(
-            row.try_get::<String, _>("verification_state")?.as_str(),
-        )?,
-        content_sha256: row.try_get("content_sha256")?,
-        claim_fingerprint: row.try_get("claim_fingerprint")?,
-        idempotency_key: row.try_get("idempotency_key")?,
         created_at: row.try_get("created_at")?,
     })
 }
@@ -1764,20 +1323,6 @@ fn parse_research_status(value: &str) -> PersistenceResult<ResearchRunStatus> {
         "cancelled" => Ok(ResearchRunStatus::Cancelled),
         other => Err(PersistenceError::InvalidState(format!(
             "未知研究任务状态：{other}"
-        ))),
-    }
-}
-
-fn parse_verification_state(value: &str) -> PersistenceResult<EvidenceVerificationState> {
-    match value {
-        "CONFIRMED" => Ok(EvidenceVerificationState::Confirmed),
-        "PROBABLE" => Ok(EvidenceVerificationState::Probable),
-        "CONFLICT" => Ok(EvidenceVerificationState::Conflict),
-        "NOT_FOUND" => Ok(EvidenceVerificationState::NotFound),
-        "STALE" => Ok(EvidenceVerificationState::Stale),
-        "NOT_APPLICABLE" => Ok(EvidenceVerificationState::NotApplicable),
-        other => Err(PersistenceError::InvalidState(format!(
-            "未知证据验证状态：{other}"
         ))),
     }
 }
@@ -1889,38 +1434,6 @@ mod tests {
         assert!(validate_snapshot_draft(&draft).is_err());
     }
 
-    #[test]
-    fn evidence_source_is_required_for_supported_facts() {
-        let now = Utc::now();
-        let claim = EvidenceClaimDraft {
-            match_id: Uuid::new_v4(),
-            entity_type: "team".to_string(),
-            entity_id: None,
-            field_key: "injury".to_string(),
-            value: json!({"status": "out"}),
-            verification_state: EvidenceVerificationState::Confirmed,
-            source_tier: "official".to_string(),
-            source_document_id: None,
-            source_url: None,
-            source_title: None,
-            source_domain: None,
-            published_at: Some(now),
-            observed_at: now,
-            effective_at: Some(now),
-            retrieved_at: now,
-            timezone: "UTC".to_string(),
-            independent_source_count: 1,
-            conflict_group_id: None,
-            research_run_id: Uuid::new_v4(),
-            prompt_version_id: None,
-            prompt_version: None,
-            schema_version_id: Uuid::new_v4(),
-            schema_version: "evidence-v1".to_string(),
-            idempotency_key: "evidence:test".to_string(),
-            metadata: json!({}),
-        };
-        assert!(validate_evidence_claim(&claim).is_err());
-    }
     #[test]
     fn immutable_version_identity_rejects_semantic_field_drift() {
         assert!(ensure_same_identity_field(

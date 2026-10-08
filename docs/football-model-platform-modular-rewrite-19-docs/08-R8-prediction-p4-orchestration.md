@@ -11,7 +11,7 @@
 
 适用总纲顶部的执行订正：仅 Windows 动态验证，沿用原单测/contract、既有 Windows runner/workflow/数据库入口；不新增专项或持续回归体系。公开仓库没有私有 P4/P7 引擎、参数和 Golden Master；模型保护资产可验证，公共 unavailable stub 的通过不能冒充私有固定概率实跑。目录模板按实际职责及 Rust 模块命名调整；顺序执行的后端 use case 无新增 UI 生命周期，不强制新增 State、请求 ID 或空出口。
 
-R8-01～06 已取得各自精确 Windows CI（`cba72fd` / `36881256338`、`cc2b0fe` / `36891488571`、`47ba3de` / `36902069546`、`59c5679` / `36966815323`、修复 `2aa99a7` / `36971419476`、`0969331` / `37752995641`）及正式完成记录。07 精确 `58b390a` / `37796909083` 已通过并 DONE，08 已获启动授权；各项精确当前状态只由 [阶段索引](../modular-rewrite/R08-prediction-p4-orchestration/README.md) 维护。07 及后续必须取得自身 Windows CI，不继承前项 PASS。
+R8-01～06 已取得各自精确 Windows CI（`cba72fd` / `36881256338`、`cc2b0fe` / `36891488571`、`47ba3de` / `36902069546`、`59c5679` / `36966815323`、修复 `2aa99a7` / `36971419476`、`0969331` / `37752995641`）及正式完成记录。07 精确 `58b390a` / `37796909083` 已通过并 DONE，08 已按用户指令实施、VERIFYING；各项精确当前状态只由 [阶段索引](../modular-rewrite/R08-prediction-p4-orchestration/README.md) 维护。07 及后续必须取得自身 Windows CI，不继承前项 PASS。
 
 ## 1. 阶段目标
 
@@ -1165,7 +1165,7 @@ crates/persistence-postgres/src/adapters/prediction/runs/
 
 ## R8-08 P4 Evidence Ledger
 
-状态：`READY`（07 精确 Windows 门禁与完成记录已通过；用户已授权开始）
+状态：`VERIFYING`（已实施，须自身Windows CI；09～12 BLOCKED）。详见 [实施记录](../modular-rewrite/R08-prediction-p4-orchestration/R08-08-p4-evidence-ledger.md)。
 
 ### 1. 目标
 
@@ -1173,59 +1173,69 @@ crates/persistence-postgres/src/adapters/prediction/runs/
 
 ### 2. 现状与来源
 
-- `crates/application/src/prediction.rs`。
-- `p4_orchestration.rs`、`fact_pipeline.rs`、`p4_persistence.rs`、`p4_workbench.rs`。
-- 相关 persistence modules。
+- 实际来源是 `crates/persistence-postgres/src/p4_records.rs` 的 append_evidence_claim/create_evidence_conflict、声明前检/指纹、版本引用、Row及证据状态投影；旧Application文件在R3已删除。
+- 上游为ResearchService/ledger及FactPipeline经原ResearchEvidenceLedgerPort/composition调用；Application不增加空转发层。
+- 同文件供Schema/Research/Snapshot使用的幂等锁/键/指纹比较迁入P4 idempotency唯一共享owner，非账本职责原位保持。
 
 ### 3. 目标文件与目录
 
 ```text
-crates/persistence-postgres/src/adapters/p4/evidence_ledger/
+crates/persistence-postgres/src/adapters/p4/
+├─ mod.rs
+├─ idempotency.rs
+└─ evidence_ledger/
+   ├─ mod.rs
+   ├─ claims.rs
+   ├─ conflicts.rs
+   ├─ input.rs
+   ├─ references.rs
+   ├─ row.rs
+   └─ tests.rs
 ```
 
 ### 4. 文件职责边界
 
-- 每个文件只承担一个可用一句话描述的职责。
-- 目录出口文件只负责显式导出。
-- 协调器只编排，不实现数据访问、UI 渲染或领域计算。
+- claims和conflicts分别拥有一个业务原子事务；input仅纯前检/指纹，references只借用原事务核对版本和冲突引用，row负责声明投影与共享六状态映射，tests复用原单测target。
+- idempotency只持有共用事务锁/键/精确指纹判定；mod仅登记/导出，无重复owner。
 
 ### 5. 输入
 
-- 无。
+- 原EvidenceClaimDraft/EvidenceConflictDraft，含比赛实体字段、来源/时间/研究和版本引用、幂等键与成员。
 
 ### 6. 输出
 
-- 稳定的模块公开接口、可独立测试的实现和对应契约测试。
+- 原EvidenceClaimRecord/EvidenceConflictRecord与PersistenceResult错误；签名/字段/Serde/公开路径保持。
 
 ### 7. 允许依赖
 
-- 无。
+- 原PostgresStore/PgPool/SQLx Transaction、Domain、audit/sha256_json、Serde/UUID/BTreeSet及现有依赖。
 
 ### 8. 禁止依赖
 
-- 无。
+- UI/Tauri、Application内部State、私有模型算法、网络研究执行、FactPipeline/Snapshot/Workbench/Freeze写入；不新增通用框架。
 
 ### 9. 状态所有权
 
-- 该任务不新增跨模块共享状态；需要状态时由目标模块内具名 State/Coordinator 唯一持有。
+- 原PostgresStore连接池保持唯一；每次声明/冲突拥有局部单事务，原同键pg_advisory_xact_lock序列化，不新增缓存/后台任务/重试State。
 
 ### 10. 副作用边界
 
-- 所有 I/O、副作用和外部调用必须集中在明确命名的 adapter/transport/repository/workflow 文件。
+- claims前检→hash→单事务锁→已有精确指纹重试或引用检查→声明→审计；conflicts去重前检→单事务锁→重试或全成员身份核对→头/成员/opened事件/审计。每次新建和重试各沿原出口commit，不在helper自行开池或提交。
 
 ### 11. 异常路径
 
-- 保持现有错误码、错误类型和用户可见提示语义；新增内部错误必须在边界映射为既有公共错误。
+- 保持原错误/中文提示和优先级；不存在或身份/版本不匹配、SQL和审计失败沿原边界返回并释放/回滚事务，不吞错或自动重试。
 
 ### 12. 并发/异步/生命周期
 
-- 所有异步请求必须具备请求 ID、取消或过期结果丢弃策略；销毁时解除监听器、定时器和挂起回调。
+- 沿原键命名和局部transaction生命周期，同键锁随提交或失败/drop释放。没有UI监听器/定时器，不套用UI请求模板；取消仍遵循原调用方及SQLx事务行为。
 
 ### 13. 兼容要求
 
 - P4.4 保持 SHADOW_ONLY。
 - P7 固定 lambda、概率、矩阵和 top scoreline 回归一致。
 - 历史 cutoff、输入指纹、路由和 schema 不变。
+- 原来源空字符串检查不额外trim；240字节键限制、精确nanosecond载荷指纹、BTreeSet成员顺序/去重、冲突metadata不入原指纹、声明metadata入指纹及append-only保持。版本/研究/冻结等剩余职责不提前迁移。
 
 ### 14. 实施步骤
 

@@ -2,6 +2,7 @@ pub(crate) mod catalog;
 pub(crate) mod competition;
 pub(crate) mod lineups;
 pub(crate) mod matches;
+pub(crate) mod p4;
 mod prediction;
 mod register_adapters;
 mod rules;

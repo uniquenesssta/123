@@ -225,5 +225,41 @@ check(/assert_eq!\(\s*counts,\s*\(0, 0, 0, 0, 0\)/.test(runContract), "PG 明细
 const applicationRunTests = read("crates/application/src/use_cases/prediction/tests.rs");
 for (const name of ["formal_prediction_saves_normalized_input_and_routed_identity_once", "repeated_shadow_prediction_never_writes_model_history", "prediction_errors_stop_every_later_side_effect", "failed_run_save_is_propagated_without_success_or_automatic_retry"]) check(applicationRunTests.includes(`fn ${name}`), `正式/影子/失败保存原回归丢失：${name}`);
 for (const kind of ["Unavailable", "NotFound", "Conflict", "InvalidState", "Serialization", "Infrastructure"]) check(applicationRunTests.includes(`PortErrorKind::${kind}`), `保存错误不得静默降级或重试：${kind}`);
+// R8-08: evidence append/conflict ledgers own their original atomic writes.
+const ledgerRoot = "crates/persistence-postgres/src/adapters/p4/evidence_ledger";
+const ledgerExport = read(`${ledgerRoot}/mod.rs`);
+const claimWriter = read(`${ledgerRoot}/claims.rs`);
+const conflictWriter = read(`${ledgerRoot}/conflicts.rs`);
+const ledgerInput = read(`${ledgerRoot}/input.rs`);
+const ledgerReferences = read(`${ledgerRoot}/references.rs`);
+const ledgerRow = read(`${ledgerRoot}/row.rs`);
+const ledgerTests = read(`${ledgerRoot}/tests.rs`);
+const p4Idempotency = read("crates/persistence-postgres/src/adapters/p4/idempotency.rs");
+check(read("crates/persistence-postgres/src/adapters/mod.rs").includes("pub(crate) mod p4;") && read("crates/persistence-postgres/src/adapters/p4/mod.rs").includes("pub(crate) mod evidence_ledger;"), "R8-08 账本必须接入既有 adapter owner");
+check(!ledgerExport.includes("fn ") && ledgerExport.includes("pub(crate) use row::parse_verification_state;") && records.includes("evidence_ledger::parse_verification_state"), "账本出口只登记/导出，共享验证状态投影唯一复用");
+for (const name of ["append_evidence_claim", "create_evidence_conflict", "validate_evidence_claim", "evidence_claim_fingerprint", "validate_evidence_version_references", "evidence_claim_record_from_row", "parse_verification_state", "advisory_lock", "validate_idempotency_key", "ensure_idempotent_fingerprint"]) {
+  check(!records.includes(`fn ${name}(`), `旧 p4_records 仍持有账本/共用幂等实现：${name}`);
+  const sources=[records,claimWriter,conflictWriter,ledgerInput,ledgerReferences,ledgerRow,p4Idempotency].join("\n");
+  check((sources.match(new RegExp(`\\bfn ${name}\\(`,"g"))??[]).length===1, `P4 账本/幂等职责必须唯一：${name}`);
+}
+for (const [label,source,key,preflight] of [["claim",claimWriter,"evidence","validate_evidence_claim(draft)?;"],["conflict",conflictWriter,"conflict","prepared_conflict(draft)?;"]]) {
+  check(source.indexOf(preflight)<source.indexOf("let mut tx = self.pool.begin().await?;") && source.indexOf(preflight)>=0, `${label} 纯前检必须先于事务`);
+  check(source.includes(`advisory_lock(&mut tx, &format!("${key}:{}", draft.`) && source.indexOf("advisory_lock(&mut tx")<source.indexOf(".fetch_optional(&mut *tx)"), `${label} 同键事务锁必须先于重试查找`);
+  check((source.match(/self\.pool\.begin\(\)/g)??[]).length===1 && (source.match(/tx\.commit\(\)/g)??[]).length===2, `${label} 必须保留一个事务与原新建/重试两个出口`);
+  check(source.indexOf("ensure_idempotent_fingerprint(")<source.indexOf("return Ok(record);") && source.lastIndexOf("write_audit_event(")<source.lastIndexOf("tx.commit().await?;"), `${label} 重试先核对载荷，新建审计先于提交`);
+  check(!source.includes(".execute(&self.pool)") && !source.includes(".fetch_one(&self.pool)") && !source.includes("DELETE FROM") && !source.includes("UPDATE "), `${label} 不得逃逸事务或修改历史`);
+}
+check(p4Idempotency.includes("SELECT pg_advisory_xact_lock(hashtext($1)::bigint)") && p4Idempotency.includes(".execute(&mut **tx)") && p4Idempotency.includes("value.trim().is_empty() || value.len() > 240") && p4Idempotency.includes("if existing != expected"), "原P4幂等锁、字节键上限与精确指纹比较必须保持");
+check(records.includes("idempotency::{advisory_lock, ensure_idempotent_fingerprint, validate_idempotency_key}"), "非账本 P4 owner 必须复用唯一幂等实现");
+for (const token of ["if run.try_get::<Uuid, _>(\"match_id\")? != draft.match_id", "if run.try_get::<Uuid, _>(\"schema_version_id\")? != draft.schema_version_id", "validate_evidence_version_references(&mut tx, draft).await?", "evidence_claim_appended", '"claim_fingerprint": claim_fingerprint', "FROM research.evidence_claims", "WHERE idempotency_key = $1"]) check(claimWriter.includes(token), `证据声明必须保留身份/引用/审计：${token}`);
+check(claimWriter.indexOf("validate_evidence_version_references(&mut tx")<claimWriter.indexOf("INSERT INTO research.evidence_claims"), "证据版本引用必须在首次写入前验证");
+for(const token of ["registered_schema_version.as_deref() != Some(draft.schema_version.as_str())", "(None, None) => {}", "(Some(prompt_version_id), Some(prompt_version))", "registered_prompt_version.as_deref() != Some(prompt_version)", "证据Prompt版本ID与版本号必须同时提供或同时为空", 'conflict.try_get::<Uuid, _>("match_id")? != draft.match_id', 'conflict.try_get::<Option<Uuid>, _>("entity_id")? != draft.entity_id']) check(ledgerReferences.includes(token), `证据引用保持ID/版本与冲突身份：${token}`);
+for(const token of ["draft.verification_state.requires_source()", "draft.source_url.as_deref().is_none_or(str::is_empty)", "draft.source_title.as_deref().is_none_or(str::is_empty)", "draft.source_domain.as_deref().is_none_or(str::is_empty)", "draft.retrieved_at < draft.observed_at", '"metadata": draft.metadata', '"published_at": draft.published_at', '"observed_at": draft.observed_at', '"retrieved_at": draft.retrieved_at', '"schema_version_id": draft.schema_version_id', '"content_sha256": content_sha256', "collect::<BTreeSet<_>>()", "if evidence_ids.len() < 2", '"trace_id": draft.trace_id']) check(ledgerInput.includes(token), `账本前检/指纹原语义丢失：${token}`);
+for(const token of ["async fn", "sqlx::", "Utc::now", "Uuid::new", "PostgresStore"]) check(!ledgerInput.includes(token), `账本纯前检越界：${token}`);
+for(const token of ["rows.len() != evidence_ids.len()", "|| entity_type != draft.entity_type", "|| entity_id != draft.entity_id", "|| field_key != draft.field_key", "INSERT INTO research.evidence_conflict_members", "INSERT INTO research.evidence_conflict_events", "'opened'", "evidence_conflict_opened"]) check(conflictWriter.includes(token), `冲突建组身份/明细/事件/审计原子链缺失：${token}`);
+check(conflictWriter.indexOf("if rows.len() != evidence_ids.len()")<conflictWriter.indexOf("INSERT INTO research.evidence_conflicts") && conflictWriter.indexOf("INSERT INTO research.evidence_conflict_members")<conflictWriter.indexOf("INSERT INTO research.evidence_conflict_events") && conflictWriter.indexOf("INSERT INTO research.evidence_conflict_events")<conflictWriter.indexOf("write_audit_event("), "冲突必须先核对全组身份再写头/成员/opened/审计");
+for(const state of ["CONFIRMED","PROBABLE","CONFLICT","NOT_FOUND","STALE","NOT_APPLICABLE"]) check(ledgerRow.includes(`"${state}" => Ok(EvidenceVerificationState::`), `证据Row状态映射缺少：${state}`);
+for(const test of ["evidence_source_is_required_for_supported_facts", "source_states_and_complete_provenance_keep_original_policy", "claim_mandatory_fields_keep_error_priority_and_raw_values", "claim_retrieval_window_keeps_nanosecond_boundary", "claim_fingerprint_preserves_semantic_identity_and_retry_key_policy", "conflict_preparation_deduplicates_sorts_and_keeps_identity_policy", "conflict_preflight_keeps_byte_key_limit_and_distinct_member_minimum", "verification_row_parser_keeps_six_states_and_unknown_errors", "idempotent_retry_keeps_exact_fingerprint_and_original_error"]) check(ledgerTests.includes(`fn ${test}`), `账本缺少原target行为测试：${test}`);
+for(const token of ["claim field {field} must survive unchanged", "claim fingerprint must reject metadata/raw nanosecond drift", "same-key first writers share the original transaction lock", "failed conflict leaves no header/member/event/audit", "evidence ledger must remain append-only", "concurrent_conflict", "tokio::join!", "source_fk", "prompt_pair", "conflict_identity"]) check(pgHistory.includes(token), `既有PG账本契约缺少：${token}`);
 if(failures.length) throw new Error(`Prediction Service 验证失败\n${failures.map((item)=>`- ${item}`).join("\n")}`);
 console.log(`Prediction Service 验证通过：${predictionFiles.length} 个 Service/Use Case Rust 文件，18 个公开 Application 职责已进入 Prediction Service/Ports 边界，P4 freeze execution 与 snapshot persistence 均不再由旧混合 owner 直接实现。`);

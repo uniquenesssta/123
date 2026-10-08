@@ -2399,6 +2399,251 @@ async fn p4_stage_c_writes_are_idempotent_and_frozen_history_is_immutable() {
         .expect("重复建立同一冲突组应幂等");
     assert_eq!(conflict.id, conflict_retry.id);
 
+    // R8-08: use the existing Stage C fixture for the evidence ledger contract.
+    let stored_claim: serde_json::Value =
+        sqlx::query_scalar("SELECT to_jsonb(c) FROM research.evidence_claims c WHERE id=$1")
+            .bind(claim_a.id)
+            .fetch_one(&database.pool)
+            .await
+            .unwrap();
+    let draft_json = serde_json::to_value(&claim_a_draft).unwrap();
+    for field in [
+        "match_id",
+        "entity_type",
+        "entity_id",
+        "field_key",
+        "value",
+        "verification_state",
+        "source_tier",
+        "source_document_id",
+        "source_url",
+        "source_title",
+        "source_domain",
+        "timezone",
+        "independent_source_count",
+        "conflict_group_id",
+        "research_run_id",
+        "prompt_version_id",
+        "prompt_version",
+        "schema_version_id",
+        "schema_version",
+        "idempotency_key",
+        "metadata",
+    ] {
+        assert_eq!(
+            stored_claim[field], draft_json[field],
+            "claim field {field} must survive unchanged"
+        );
+    }
+    assert_eq!(
+        stored_claim["content_sha256"],
+        json!(claim_a.content_sha256)
+    );
+    assert_eq!(
+        stored_claim["claim_fingerprint"],
+        json!(claim_a.claim_fingerprint)
+    );
+    for (field, expected) in [
+        ("published_at", claim_a_draft.published_at.unwrap()),
+        ("observed_at", claim_a_draft.observed_at),
+        ("effective_at", claim_a_draft.effective_at.unwrap()),
+        ("retrieved_at", claim_a_draft.retrieved_at),
+    ] {
+        let stored =
+            chrono::DateTime::parse_from_rfc3339(stored_claim[field].as_str().unwrap()).unwrap();
+        assert_eq!(
+            stored,
+            expected - Duration::nanoseconds(789),
+            "database retains its original microsecond precision"
+        );
+    }
+    for change_metadata in [true, false] {
+        let mut changed = claim_a_draft.clone();
+        if change_metadata {
+            changed.metadata = json!({"changed":true});
+        } else {
+            changed.observed_at += Duration::nanoseconds(1);
+        }
+        assert!(
+            matches!(
+                database.store.append_evidence_claim(&changed).await,
+                Err(PersistenceError::InvalidState(_))
+            ),
+            "original claim fingerprint must reject metadata/raw nanosecond drift"
+        );
+    }
+    let mut reordered = conflict_draft.clone();
+    reordered.evidence_ids = vec![claim_b.id, claim_a.id, claim_b.id];
+    reordered.metadata = json!({"retry_metadata":"ignored by existing fingerprint"});
+    assert_eq!(
+        database
+            .store
+            .create_evidence_conflict(&reordered)
+            .await
+            .unwrap()
+            .id,
+        conflict.id
+    );
+    reordered.trace_id = Uuid::new_v4();
+    assert!(matches!(
+        database.store.create_evidence_conflict(&reordered).await,
+        Err(PersistenceError::InvalidState(_))
+    ));
+
+    let audit_before_bad_claims: i64 = sqlx::query_scalar(
+        "SELECT count(*) FROM audit.events WHERE event_type='evidence_claim_appended' AND payload->>'research_run_id'=$1",
+    ).bind(research.id.to_string()).fetch_one(&database.pool).await.unwrap();
+    for bad_kind in [
+        "run",
+        "match",
+        "schema_version",
+        "prompt_pair",
+        "prompt_id",
+        "conflict_missing",
+        "conflict_identity",
+        "source_fk",
+    ] {
+        let mut bad = claim_a_draft.clone();
+        bad.idempotency_key = format!("evidence:{token}:bad-{bad_kind}");
+        match bad_kind {
+            "run" => bad.research_run_id = Uuid::new_v4(),
+            "match" => bad.match_id = Uuid::new_v4(),
+            "schema_version" => bad.schema_version = "wrong-version".into(),
+            "prompt_pair" => bad.prompt_version = Some("unpaired-version".into()),
+            "prompt_id" => {
+                bad.prompt_version_id = Some(Uuid::new_v4());
+                bad.prompt_version = Some("missing-version".into());
+            }
+            "conflict_missing" => bad.conflict_group_id = Some(Uuid::new_v4()),
+            "conflict_identity" => {
+                bad.conflict_group_id = Some(conflict.id);
+                bad.field_key = "another-field".into();
+            }
+            "source_fk" => bad.source_document_id = Some(Uuid::new_v4()),
+            _ => unreachable!(),
+        }
+        assert!(
+            database.store.append_evidence_claim(&bad).await.is_err(),
+            "{bad_kind}"
+        );
+        let count: i64 = sqlx::query_scalar(
+            "SELECT count(*) FROM research.evidence_claims WHERE idempotency_key=$1",
+        )
+        .bind(&bad.idempotency_key)
+        .fetch_one(&database.pool)
+        .await
+        .unwrap();
+        assert_eq!(count, 0, "rejected reference/SQL write must leave no claim");
+    }
+    let audit_after_bad_claims: i64 = sqlx::query_scalar(
+        "SELECT count(*) FROM audit.events WHERE event_type='evidence_claim_appended' AND payload->>'research_run_id'=$1",
+    ).bind(research.id.to_string()).fetch_one(&database.pool).await.unwrap();
+    assert_eq!(
+        audit_after_bad_claims, audit_before_bad_claims,
+        "rejected reference/SQL write must leave no audit"
+    );
+    let mut concurrent_claim = claim_a_draft.clone();
+    concurrent_claim.idempotency_key = format!("evidence:{token}:concurrent");
+    let (left, right) = tokio::join!(
+        database.store.append_evidence_claim(&concurrent_claim),
+        database.store.append_evidence_claim(&concurrent_claim)
+    );
+    let concurrent = left.unwrap();
+    assert_eq!(
+        concurrent.id,
+        right.unwrap().id,
+        "same-key first writers share the original transaction lock"
+    );
+    for id in [claim_a.id, claim_b.id, concurrent.id] {
+        let count:i64=sqlx::query_scalar("SELECT count(*) FROM audit.events WHERE event_type='evidence_claim_appended' AND entity_id=$1")
+            .bind(id.to_string()).fetch_one(&database.pool).await.unwrap();
+        assert_eq!(
+            count, 1,
+            "retry/rejection/concurrent claim must not duplicate successful audit"
+        );
+    }
+    let mut other_field = claim_a_draft.clone();
+    other_field.idempotency_key = format!("evidence:{token}:other-field");
+    other_field.field_key = "injury".into();
+    let other_claim = database
+        .store
+        .append_evidence_claim(&other_field)
+        .await
+        .unwrap();
+    for bad_kind in ["missing", "identity", "duplicates"] {
+        let mut bad = conflict_draft.clone();
+        bad.conflict_key = format!("conflict:{token}:bad-{bad_kind}");
+        bad.evidence_ids = match bad_kind {
+            "missing" => vec![claim_a.id, Uuid::new_v4()],
+            "identity" => vec![claim_a.id, other_claim.id],
+            "duplicates" => vec![claim_a.id, claim_a.id],
+            _ => unreachable!(),
+        };
+        assert!(database.store.create_evidence_conflict(&bad).await.is_err());
+        let counts:(i64,i64,i64,i64)=sqlx::query_as(r#"
+            SELECT (SELECT count(*) FROM research.evidence_conflicts WHERE conflict_key=$1),
+                   (SELECT count(*) FROM research.evidence_conflict_members m JOIN research.evidence_conflicts c ON c.id=m.conflict_id WHERE c.conflict_key=$1),
+                   (SELECT count(*) FROM research.evidence_conflict_events e JOIN research.evidence_conflicts c ON c.id=e.conflict_id WHERE c.conflict_key=$1),
+                   (SELECT count(*) FROM audit.events WHERE event_type='evidence_conflict_opened' AND payload->>'conflict_key'=$1)
+        "#).bind(&bad.conflict_key).fetch_one(&database.pool).await.unwrap();
+        assert_eq!(
+            counts,
+            (0, 0, 0, 0),
+            "failed conflict leaves no header/member/event/audit"
+        );
+    }
+    let mut concurrent_conflict = conflict_draft.clone();
+    concurrent_conflict.conflict_key = format!("conflict:{token}:concurrent");
+    let (left, right) = tokio::join!(
+        database
+            .store
+            .create_evidence_conflict(&concurrent_conflict),
+        database
+            .store
+            .create_evidence_conflict(&concurrent_conflict)
+    );
+    let concurrent = left.unwrap();
+    assert_eq!(concurrent.id, right.unwrap().id);
+    for id in [conflict.id, concurrent.id] {
+        let counts:(i64,i64,i64)=sqlx::query_as(r#"
+            SELECT (SELECT count(*) FROM research.evidence_conflict_members WHERE conflict_id=$1),
+                   (SELECT count(*) FROM research.evidence_conflict_events WHERE conflict_id=$1 AND event_type='opened'),
+                   (SELECT count(*) FROM audit.events WHERE event_type='evidence_conflict_opened' AND entity_id=$2)
+        "#).bind(id).bind(id.to_string()).fetch_one(&database.pool).await.unwrap();
+        assert_eq!(
+            counts,
+            (2, 1, 1),
+            "successful/retried/concurrent conflict has one atomic opened event and audit"
+        );
+    }
+    for (sql, id) in [
+        (
+            "UPDATE research.evidence_claims SET value='{}'::jsonb WHERE id=$1",
+            claim_a.id,
+        ),
+        (
+            "DELETE FROM research.evidence_conflicts WHERE id=$1",
+            conflict.id,
+        ),
+        (
+            "DELETE FROM research.evidence_conflict_members WHERE conflict_id=$1",
+            conflict.id,
+        ),
+        (
+            "UPDATE research.evidence_conflict_events SET payload='{}'::jsonb WHERE conflict_id=$1",
+            conflict.id,
+        ),
+    ] {
+        assert!(
+            sqlx::query(sql)
+                .bind(id)
+                .execute(&database.pool)
+                .await
+                .is_err(),
+            "evidence ledger must remain append-only"
+        );
+    }
+
     let descriptor = ModelDescriptor {
         model_id: format!("p4-stage-c-model-{token}"),
         display_name: "P4接入C测试模型".to_string(),

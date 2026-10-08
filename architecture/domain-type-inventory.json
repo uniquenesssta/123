@@ -24,13 +24,13 @@
     "targetPublicExportPolicy": "explicit re-export only"
   },
   "sourceDigest": "217241ac243726a5ab6805a7f169e222b97e78c7c971749a5904714af673ebdd",
-  "rustUsageDigest": "57653c49ff4d861f79dbb439e83e066899455c6aeb98f94cc5f4474253c484d2",
+  "rustUsageDigest": "307b38c0ae795e65133ae11522339b21a47bd8ab5cc1129f02f679ca0ba97608",
   "summary": {
     "typeCount": 365,
     "publicCompatibilityTypeCount": 365,
     "internalTypeCount": 0,
     "domainSourceFileCount": 129,
-    "scannedRustFileCount": 1051,
+    "scannedRustFileCount": 1060,
     "databaseMappedTypeCount": 300,
     "byTargetModule": {
       "ai_workspace": 16,
@@ -7332,11 +7332,17 @@
         "crates/application/src/use_cases/research/fact_pipeline/mod.rs",
         "crates/application/src/use_cases/research/fact_pipeline/routing.rs",
         "crates/application/src/use_cases/research/ledger.rs",
-        "crates/persistence-postgres/src/p4_records.rs",
+        "crates/persistence-postgres/src/adapters/p4/evidence_ledger/claims.rs",
+        "crates/persistence-postgres/src/adapters/p4/evidence_ledger/input.rs",
+        "crates/persistence-postgres/src/adapters/p4/evidence_ledger/references.rs",
+        "crates/persistence-postgres/src/adapters/p4/evidence_ledger/tests.rs",
         "crates/persistence-postgres/tests/postgres_integration.rs"
       ],
       "databaseMappings": [
-        "crates/persistence-postgres/src/p4_records.rs"
+        "crates/persistence-postgres/src/adapters/p4/evidence_ledger/claims.rs",
+        "crates/persistence-postgres/src/adapters/p4/evidence_ledger/input.rs",
+        "crates/persistence-postgres/src/adapters/p4/evidence_ledger/references.rs",
+        "crates/persistence-postgres/src/adapters/p4/evidence_ledger/tests.rs"
       ]
     },
     {
@@ -7417,10 +7423,12 @@
         "crates/application/src/use_cases/research/fact_pipeline/evidence.rs",
         "crates/application/src/use_cases/research/fact_pipeline/mod.rs",
         "crates/application/src/use_cases/research/ledger.rs",
-        "crates/persistence-postgres/src/p4_records.rs"
+        "crates/persistence-postgres/src/adapters/p4/evidence_ledger/claims.rs",
+        "crates/persistence-postgres/src/adapters/p4/evidence_ledger/row.rs"
       ],
       "databaseMappings": [
-        "crates/persistence-postgres/src/p4_records.rs"
+        "crates/persistence-postgres/src/adapters/p4/evidence_ledger/claims.rs",
+        "crates/persistence-postgres/src/adapters/p4/evidence_ledger/row.rs"
       ]
     },
     {
@@ -7505,11 +7513,15 @@
         "crates/application/src/use_cases/research/fact_pipeline/conflict.rs",
         "crates/application/src/use_cases/research/fact_pipeline/mod.rs",
         "crates/application/src/use_cases/research/ledger.rs",
-        "crates/persistence-postgres/src/p4_records.rs",
+        "crates/persistence-postgres/src/adapters/p4/evidence_ledger/conflicts.rs",
+        "crates/persistence-postgres/src/adapters/p4/evidence_ledger/input.rs",
+        "crates/persistence-postgres/src/adapters/p4/evidence_ledger/tests.rs",
         "crates/persistence-postgres/tests/postgres_integration.rs"
       ],
       "databaseMappings": [
-        "crates/persistence-postgres/src/p4_records.rs"
+        "crates/persistence-postgres/src/adapters/p4/evidence_ledger/conflicts.rs",
+        "crates/persistence-postgres/src/adapters/p4/evidence_ledger/input.rs",
+        "crates/persistence-postgres/src/adapters/p4/evidence_ledger/tests.rs"
       ]
     },
     {
@@ -7568,10 +7580,10 @@
         "crates/application/src/services/research/facade.rs",
         "crates/application/src/services/research/service.rs",
         "crates/application/src/use_cases/research/ledger.rs",
-        "crates/persistence-postgres/src/p4_records.rs"
+        "crates/persistence-postgres/src/adapters/p4/evidence_ledger/conflicts.rs"
       ],
       "databaseMappings": [
-        "crates/persistence-postgres/src/p4_records.rs"
+        "crates/persistence-postgres/src/adapters/p4/evidence_ledger/conflicts.rs"
       ]
     },
     {
@@ -8351,10 +8363,14 @@
         "crates/application/src/use_cases/research/fact_pipeline/routing.rs",
         "crates/application/src/use_cases/research/fact_pipeline/types.rs",
         "crates/application/src/use_cases/research/fact_pipeline/validation.rs",
+        "crates/persistence-postgres/src/adapters/p4/evidence_ledger/row.rs",
+        "crates/persistence-postgres/src/adapters/p4/evidence_ledger/tests.rs",
         "crates/persistence-postgres/src/p4_records.rs",
         "crates/persistence-postgres/tests/postgres_integration.rs"
       ],
       "databaseMappings": [
+        "crates/persistence-postgres/src/adapters/p4/evidence_ledger/row.rs",
+        "crates/persistence-postgres/src/adapters/p4/evidence_ledger/tests.rs",
         "crates/persistence-postgres/src/p4_records.rs"
       ]
     },
