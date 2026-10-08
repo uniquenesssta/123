@@ -211,3 +211,14 @@ The public model stub must always return an explicit unavailable error. A succes
 artifact `11212471101`，14,023,932 字节，SHA-256 `1cb00b0a91d1bbf25270dc8fb535b0405e0280b60595a313f0bc74f4503a3538`。首轮 unused re-export 已由 cfg(test) 修复；前节待 CI 和失败记录仅属实施历史，不代表当前结果。详细差异/兼容/验证见 [05 完成记录](modular-rewrite/R08-prediction-p4-orchestration/R08-05-route-and-model-request.md)。
 
 本轮仅文档收尾，源码/测试/清单不变，复用上述已验证源码证据；只核对相对链接、状态、Git 差异和源码不变，不重复非 Windows Cargo/客户端动态或全量构建。PG/历史四项/账本/XLSX/Windows Full/私有 Golden Master 与继承 model.runs/0041 删除 trigger 风险仍最终新库待验，ignored 不计 PASS。05 完成，06 READY 尚未实施。
+
+
+## R8-06 实施验证（2026-10-08；等待 Windows CI）
+
+R8-05 的精确代码 run `36971419476` 和收尾文档 run `37737677787` 均 SUCCESS。06 不继承其动态 PASS。新模型适配器在原 Application 单测 target 内增加 7 项测试：精确注册/Arc 身份与缺失错误、实际 context/原 scope 提示、完整请求/输出保真、五类模型错误与单次调用、毫秒截断/饱和、默认 dry run 省略 supports/validate、路由失败先后顺序与不写历史。预期 Application 92（85+7）/Persistence 141；以本次精确 Windows 日志为准，不把静态解析计为 Rust 测试通过。
+
+实际本地 PASS：现有 verify-frontend 清单的 83/83 源码项（5 浏览器项留 Windows）、`npm run verify:architecture`、Rustfmt 1.88.0 对 adapter/测试/登记/两调用方的 `--check`、`node scripts/verify_protected_assets.mjs`、`node scripts/verify_command_contract.mjs`、`node scripts/verify_database_baseline.mjs`、`git diff --check`。六项临时破坏探针均由增强的原 Prediction 门禁拒绝并恢复；调用方重新内联比较确认原顺序/审计/保存/输出不变。报告 `r806-source-checks.json`、`r806-architecture.log` 位于本轮工作目录；原命令可重现。
+
+执行中首次静态门禁发现格式化后的 usage scan 过期，以及原组合根文件集合未登记 adapter；已用原生成器刷新清单并精确登记文件，复跑通过。现有 Rustfmt 运行库在本地不可读，恢复同版本工具后目标格式检查通过；未运行 Linux/macOS Cargo 或客户端动态检查。Windows CI 复用原 workflow 完成完整 frontend、17 视口、fmt/Clippy/workspace tests、release/MSI/NSIS/启动，启动后停止轮询。06 VERIFYING，07 未开始；详见 [实施记录](modular-rewrite/R08-prediction-p4-orchestration/R08-06-model-execution-adapter.md)。
+
+没有新 workflow/runner/test target/数据库/依赖，公共接口、模型算法/参数/18 资产、43 Ports、171 命令、365 Domain/300 映射及迁移0001～0046保持。伪提供器只验证编排边界；私有固定比赛/Golden Master、真实 PG/历史四项/账本/XLSX/Windows Full 和继承历史删除风险仍最终新库待验，ignored 不计 PASS。

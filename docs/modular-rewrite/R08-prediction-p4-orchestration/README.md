@@ -2,7 +2,7 @@
 
 ## 当前阶段状态
 
-`IN_PROGRESS`。唯一阶段分支 `rewrite/r8-prediction-p4-orchestration`，起点/回退基线 `90680bf945fbb0d1c191937c2d9e90c2c916fb00`。R8-01～05 已 DONE；R8-06 `READY`，尚未实施；07～12 `BLOCKED`。精确当前状态只由本索引维护。
+`IN_PROGRESS`。唯一阶段分支 `rewrite/r8-prediction-p4-orchestration`，起点/回退基线 `90680bf945fbb0d1c191937c2d9e90c2c916fb00`。R8-01～05 已 DONE；R8-06 `VERIFYING`，实现与本地静态门禁完成，等待自身 Windows CI；07～12 `BLOCKED`。精确当前状态只由本索引维护。
 
 ## 前置基线与范围
 
@@ -19,7 +19,7 @@ R8 依据 [任务书](../../football-model-platform-modular-rewrite-19-docs/08-R
 | R8-03 | Readiness Audit | DONE · [完成记录](R08-03-readiness-audit.md) |
 | R8-04 | Deterministic Input Manifest | DONE · [完成记录](R08-04-deterministic-input-manifest.md) |
 | R8-05 | Route / Model Request | DONE · [完成记录](R08-05-route-and-model-request.md) |
-| R8-06 | Model Execution Adapter | READY |
+| R8-06 | Model Execution Adapter | VERIFYING · [实施记录](R08-06-model-execution-adapter.md) |
 | R8-07 | Run Persistence | BLOCKED |
 | R8-08 | P4 Evidence Ledger | BLOCKED |
 | R8-09 | Fact Pipeline | BLOCKED |
@@ -137,3 +137,14 @@ R8-01～05 已取得各自精确 Windows CI；R8-06 实施后须独立取得精�
 核实精确修复 `2aa99a76cb97bb289fd486bb8e3ed5059620fb88` / Windows run `36971419476` / job `110726001870` 全 SUCCESS；CI 完成时间 2026-10-02 14:22:38（北京时间）。日志确认 Application 85/Persistence 141、两项保留及八项新路由请求测试、17 视口、Rust/前端、release/MSI/NSIS/启动 7 条/3 操作通过。artifact `11212471101`，14,023,932 字节，SHA-256 `1cb00b0a91d1bbf25270dc8fb535b0405e0280b60595a313f0bc74f4503a3538`。详见 [05 完成记录](R08-05-route-and-model-request.md)，含完整累计 23 文件、首轮失败/修复、兼容和延期风险。
 
 本轮只新增完成记录并同步根 README、TESTING、任务书、本索引，源码/测试/清单不变，复用已验证 `2aa99a7` 源码。05 DONE；06 前置通过、READY 尚未实施；07～12 BLOCKED。PG/历史四项/账本/XLSX/Full/私有 Golden Master 和继承删除 trigger 风险继续最终封包新库待验。纯文档提交不重复全量验证，不将自动触发的尚未结束 CI 计为通过。
+
+
+## R8-05 收尾确认 / R8-06 实施（2026-10-08）
+
+05 代码验收 run `36971419476` 与收尾文档 run `37737677787` 均已 SUCCESS。06 从当前 `4420fd48ab5e88d55ce15e5b0cdc4b6b05f1c43d` 开始；该提交仅补充 UI 设计接入文档，模型代码仍为已验证 `2aa99a7`，沿用唯一 R8 分支。
+
+06 将原执行器的注册查找/实际 context 支持检查/模型调用/错误转换/毫秒计时迁入唯一 `model_registry/prediction_model_adapter.rs`；默认 dry run 复用注册查找及不计时调用，按原政策不新增 supports/validate。查找返回同一 Arc provider，请求借用和输出原样传递，模型错误完整保留；错误提示继续使用原 scope 类型。路由/组装/输入审计及正式保存/影子 nil 仍由原 owner 负责，保存拆分留 07，不创建空 execute-model 转发目录。readiness 的只读 supports 和 R10 的 Analytics 调用不提前迁移。
+
+原 Application target 新增 7 项模型边界测试；预期 Application 92（85+7）、Persistence 141，须本次精确 Windows CI 实跑。实际本地 PASS：83/83 原源码检查、完整 verify:architecture、Rustfmt 1.88.0 目标检查、18 保护资产、171 命令、46 迁移/18 PG 契约静态基线、git diff --check。六探针（跳过支持、提示类型漂移、丢错误详情、耗时溢出、额外 validate、绕过 adapter）均拒绝并恢复；原执行器重新内联后去空白比较完全一致。原组合根精确文件集合同步登记 adapter，未放宽公共注册/状态所有者断言。清单仅刷新使用方/源码扫描：Application 388→390，Domain 1044→1046；43/365/300 与声明摘要不变。
+
+详细文件和验证见 [06 实施记录](R08-06-model-execution-adapter.md)。无 Linux/macOS Cargo/客户端动态验收、无新 runner/workflow/target/DB；本次 Windows CI 开始后停止轮询。06 VERIFYING，07～12 BLOCKED；CI 成功才收尾06并开放07。PG/历史四项/账本/XLSX/Full/私有 Golden Master 与继承删除 trigger 风险仍最终新库待验。Mermaid Chart 已更新真实链路，结束时 Create State 保存继续位置。

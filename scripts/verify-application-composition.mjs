@@ -43,7 +43,7 @@ check(
 );
 check(
   JSON.stringify(filesIn("crates/application/src/model_registry")) ===
-    JSON.stringify(["mod.rs", "registry.rs"]),
+    JSON.stringify(["mod.rs", "prediction_model_adapter.rs", "registry.rs"]),
   "Model registry 文件集合不正确",
 );
 

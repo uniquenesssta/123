@@ -5,10 +5,9 @@ use super::route_model_request::{
     verify_route_identity_matches_input_audit,
 };
 use super::PredictionAccess;
-use crate::model_registry::ModelRegistry;
-use crate::{ApplicationError, ApplicationResult, PredictionCommand, PredictionExecution};
+use crate::model_registry::{prediction_model_adapter, ModelRegistry};
+use crate::{ApplicationResult, PredictionCommand, PredictionExecution};
 use football_domain::RouteRequest;
-use std::time::Instant;
 use uuid::Uuid;
 
 pub(crate) async fn execute<P: PredictionAccess + ?Sized>(
@@ -52,25 +51,17 @@ pub(crate) async fn execute_internal<P: PredictionAccess + ?Sized>(
     apply_route_context(&command, &mut context, &scope, &decision)?;
     validate_snapshot_type(&command.snapshot_type, &decision.routing)?;
     verify_route_identity_matches_input_audit(&decision, &command.match_input)?;
-    let model = registry
-        .get(&decision.model_id)
-        .ok_or_else(|| ApplicationError::ModelNotFound(decision.model_id.clone()))?;
-    if !model.supports(&context) {
-        return Err(ApplicationError::Model(format!(
-            "模型 {} 不支持赛事类型 {}",
-            model.descriptor().display_name,
-            scope.competition_kind.as_str()
-        )));
-    }
+    let model = prediction_model_adapter::supported_model(
+        registry,
+        &decision.model_id,
+        &context,
+        scope.competition_kind,
+    )?;
 
     let request = build_model_request(command, context, &decision)?;
     let input_sha256 = sha256_value(&request.input)?;
     let input_audit = prediction_input_audit_summary(&request.input, &input_sha256)?;
-    let started = Instant::now();
-    let output = model
-        .predict(&request)
-        .map_err(|error| ApplicationError::Model(error.to_string()))?;
-    let duration_ms = started.elapsed().as_millis().min(i64::MAX as u128) as i64;
+    let (output, duration_ms) = prediction_model_adapter::execute(model.as_ref(), &request)?;
     let run_id = if persist_run {
         store
             .save_successful_run(&decision, &request, &output, duration_ms)

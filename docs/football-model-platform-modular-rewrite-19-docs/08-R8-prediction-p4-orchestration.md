@@ -882,62 +882,63 @@ crates/application/src/use_cases/prediction/route_model_request/
 
 ## R8-06 Model Execution Adapter
 
-05 前置门禁已通过；本项当前状态见 [阶段索引](../modular-rewrite/R08-prediction-p4-orchestration/README.md)，本轮未开始实施。
+05 代码与收尾门禁均已通过；06 实现完成、`VERIFYING`，等待自身 Windows CI。精确状态见 [阶段索引](../modular-rewrite/R08-prediction-p4-orchestration/README.md) 和 [实施记录](../modular-rewrite/R08-prediction-p4-orchestration/R08-06-model-execution-adapter.md)。
 
 ### 1. 目标
 
-- 完成 Model Execution Adapter 的完全重写，并将该能力收敛到唯一、可递归拆分的模块目录。
+- 将注册模型查找、支持检查、调用、错误转换及原耗时统计收拢到唯一适配器，保持既有行为。
 
 ### 2. 现状与来源
 
-- `crates/application/src/prediction.rs`。
-- `p4_orchestration.rs`、`fact_pipeline.rs`、`p4_persistence.rs`、`p4_workbench.rs`。
-- 相关 persistence modules。
+- 旧 prediction.rs 已在 R3 删除；实际来源为 `use_cases/prediction/execute_prediction/mod.rs` 的查找/支持/predict/计时以及 `dry_run_default_fixture/mod.rs` 的查找/predict。
+- ModelRegistry 保留原状态与公开 API；P4 冻结经原 Prediction 路径复用，不提前改写 Fact/Workbench/保存。
 
 ### 3. 目标文件与目录
 
 ```text
-crates/application/src/use_cases/prediction/execute-model/
 crates/application/src/model_registry/prediction_model_adapter.rs
+crates/application/src/model_registry/prediction_model_adapter/tests.rs
+crates/application/src/use_cases/prediction/execute_prediction/mod.rs
+crates/application/src/use_cases/prediction/dry_run_default_fixture/mod.rs
 ```
 
 ### 4. 文件职责边界
 
 - 每个文件只承担一个可用一句话描述的职责。
-- 目录出口文件只负责显式导出。
+- model_registry/mod.rs 只声明内部 adapter 并保留原显式公共出口。适配器文件承担同一模型边界责任，测试独立为子模块；按总纲订正不再创建空 execute-model 转发目录。
 - 协调器只编排，不实现数据访问、UI 渲染或领域计算。
 
 ### 5. 输入
 
-- 无。
+- 原 ModelRegistry、精确 model_id、实际 MatchContext、原 scope CompetitionKind、借用的 ModelRequest。
 
 ### 6. 输出
 
-- 稳定的模块公开接口、可独立测试的实现和对应契约测试。
+- 原注册 provider Arc、原 ModelOutput，以及成功执行的 i64 毫秒耗时；公共服务接口保持。
 
 ### 7. 允许依赖
 
-- 无。
+- 既有 ModelRegistry、ApplicationError/Result、football-model-api、football-domain 与 std Arc/Instant/Duration。
 
 ### 8. 禁止依赖
 
-- 无。
+- Persistence/SQL、私有引擎或 stub 直接实现、输入/路由构建、审计、运行保存、概率重写、额外 validate、重试与回退。
 
 ### 9. 状态所有权
 
-- 该任务不新增跨模块共享状态；需要状态时由目标模块内具名 State/Coordinator 唯一持有。
+- 原 ModelRegistry 仍唯一持有模型 Arc；适配器只克隆原句柄并持有局部耗时，不增加缓存或共享状态。
 
 ### 10. 副作用边界
 
-- 所有 I/O、副作用和外部调用必须集中在明确命名的 adapter/transport/repository/workflow 文件。
+- 模型调用集中到 adapter；路由 Port I/O 和正式保存/影子 nil 仍留原执行用例，保存拆分留 R8-07。默认 dry run 不增加 supports/validate/计时。
 
 ### 11. 异常路径
 
-- 保持现有错误码、错误类型和用户可见提示语义；新增内部错误必须在边界映射为既有公共错误。
+- 原查找→supports→请求组装→审计→predict→保存顺序保持；缺失模型原 ID、unsupported 的显示名/原 scope 类型及五类 ModelError 完整提示保持。失败不重试、不写历史。
 
 ### 12. 并发/异步/生命周期
 
-- 所有异步请求必须具备请求 ID、取消或过期结果丢弃策略；销毁时解除监听器、定时器和挂起回调。
+- 适配器是原同步模型调用，不新增任务/监听器/定时器/回调；请求及取消生命周期继续由原调用方管理，不机械增加 UI State 或取消协议。
 
 ### 13. 兼容要求
 
@@ -948,7 +949,7 @@ crates/application/src/model_registry/prediction_model_adapter.rs
 ### 14. 实施步骤
 
 1. 读取 R0 生成的文件、命令、类型和调用方清单，确认本任务准确影响范围。
-2. 为目标目录创建清晰的 `mod.rs`/`index.ts` 出口，出口只 re-export，不承载业务逻辑。
+2. 登记唯一内部 adapter，保留 ModelRegistry 原出口；不创建没有真实职责的目录或转发层。
 3. 先迁移或补齐契约测试，再实现新文件。
 4. 按职责逐文件实现；发现单文件再次出现第二职责时立即递归升级为子目录。
 5. 接入上游和下游，确保跨层只经过公开接口。
@@ -966,12 +967,14 @@ crates/application/src/model_registry/prediction_model_adapter.rs
 
 ### 17. 最小验证
 
-- 相关 crate/feature 单元测试通过。
+- 原 Application target 追加 7 项适配器边界测试，预期 92/Persistence 141；须自身 Windows CI 实跑。
 - TypeScript/Rust 编译或类型检查通过。
 - 架构边界脚本通过。
 - 模型保护资产指纹通过。
 
 ### 18. 阶段回归
+
+以下动态回归仅在现有 Windows CI 执行；本地可执行 Node 静态检查和同版本 Rustfmt，不运行 Linux/macOS Cargo/客户端验证，不新增专项 runner/workflow/DB。
 
 - `npm run verify:frontend`。
 - `cargo fmt --all -- --check`。
