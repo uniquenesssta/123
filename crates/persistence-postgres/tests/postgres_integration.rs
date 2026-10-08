@@ -1,19 +1,21 @@
 use chrono::{Duration, Timelike, Utc};
 use football_domain::{
-    CompetitionDraft, CompetitionKind, CompetitionProfile, EnqueueJobDraft, EvidenceClaimDraft,
-    EvidenceConflictDraft, EvidenceVerificationState, FormationDistributionQuery,
-    FormationUsageDistributionDraft, FormationUsageEntryDraft, FormationUsageListQuery, JobStatus,
-    LineupDraft, LineupPairDraft, LineupPlayerDraft, LineupType, MatchDraft,
-    MatchEventRevisionStatus, MatchEventType, MatchEventVerificationStatus, MatchResultDraft,
-    MatchReviewDraft, MatchReviewPackageComparison, MatchReviewPackageDiffSummary,
-    MatchReviewPackagePreview, MatchReviewPackageSnapshotSummary, MatchReviewPackageSummary,
-    MatchReviewPackageWorkflowAction, MatchReviewPackageWorkflowStatus,
+    CompetitionDraft, CompetitionKind, CompetitionProfile, ConflictEvaluationDraft,
+    ConflictEvaluationStatus, EnqueueJobDraft, EntityResolutionDraft, EntityResolutionStatus,
+    EvidenceClaimDraft, EvidenceConflictDraft, EvidenceRouteDraft, EvidenceRouteStatus,
+    EvidenceVerificationState, FormationDistributionQuery, FormationUsageDistributionDraft,
+    FormationUsageEntryDraft, FormationUsageListQuery, JobStatus, LineupDraft, LineupPairDraft,
+    LineupPlayerDraft, LineupType, MatchDraft, MatchEventRevisionStatus, MatchEventType,
+    MatchEventVerificationStatus, MatchResultDraft, MatchReviewDraft, MatchReviewPackageComparison,
+    MatchReviewPackageDiffSummary, MatchReviewPackagePreview, MatchReviewPackageSnapshotSummary,
+    MatchReviewPackageSummary, MatchReviewPackageWorkflowAction, MatchReviewPackageWorkflowStatus,
     MatchReviewPackageWorkflowStep, MatchStatus, P4Horizon, PrematchSnapshotDraft,
     ResearchRunDraft, RulePackageDraft, RuleRouting, RuleSourceReference, SchemaVersionDraft,
     SeasonDraft, SnapshotFeatureDraft, SnapshotProbabilityDraft, SnapshotSourceKind,
     SourcePolicyDefinition, SourcePolicyVersionDraft, SourceTierDefinition, SourceTierRule,
     SpreadsheetAction, SpreadsheetEntityType, SpreadsheetImportMode, SpreadsheetParsedWorkbook,
-    SpreadsheetRawRow, TeamDraft, PLAYER_MONTHLY_FORMAT, TEAM_MONTHLY_FORMAT,
+    SpreadsheetRawRow, TeamDraft, TimeAuditDraft, TimeAuditStatus, PLAYER_MONTHLY_FORMAT,
+    TEAM_MONTHLY_FORMAT,
 };
 use football_model_api::ModelDescriptor;
 use football_persistence_postgres::{DatabaseOptions, PersistenceError, PostgresStore};
@@ -2073,7 +2075,49 @@ async fn p4_stage_e_source_policy_is_idempotent_versioned_and_immutable() {
         .register_source_policy_version(&draft)
         .await
         .expect("相同来源策略应幂等复用");
-    assert_eq!(first.id, retry.id);
+    assert_eq!(
+        (first.id, first.created_at, &first.content_sha256),
+        (retry.id, retry.created_at, &retry.content_sha256)
+    );
+    let mut metadata_retry = draft.clone();
+    metadata_retry.metadata = json!({"changed": true});
+    assert_eq!(
+        database
+            .store
+            .register_source_policy_version(&metadata_retry)
+            .await
+            .unwrap()
+            .id,
+        first.id
+    );
+    let stored_metadata: serde_json::Value =
+        sqlx::query_scalar("SELECT metadata FROM research.source_policy_versions WHERE id=$1")
+            .bind(first.id)
+            .fetch_one(&database.pool)
+            .await
+            .unwrap();
+    assert_eq!(stored_metadata, draft.metadata);
+    let audits: i64 = sqlx::query_scalar("SELECT count(*) FROM audit.events WHERE event_type='source_policy_registered' AND entity_id=$1")
+        .bind(first.id.to_string()).fetch_one(&database.pool).await.unwrap();
+    assert_eq!(audits, 1);
+    let mut invalid = draft.clone();
+    invalid.policy_key = format!("invalid-{token}");
+    invalid.definition.default_tier = "absent".into();
+    assert!(matches!(
+        database
+            .store
+            .register_source_policy_version(&invalid)
+            .await,
+        Err(PersistenceError::InvalidState(_))
+    ));
+    let residue: i64 = sqlx::query_scalar(
+        "SELECT count(*) FROM research.source_policy_versions WHERE policy_key=$1",
+    )
+    .bind(&invalid.policy_key)
+    .fetch_one(&database.pool)
+    .await
+    .unwrap();
+    assert_eq!(residue, 0);
 
     let mut changed = draft.clone();
     changed.definition.tiers[1].rank = 450;
@@ -2320,6 +2364,119 @@ async fn p4_stage_c_writes_are_idempotent_and_frozen_history_is_immutable() {
         Err(PersistenceError::InvalidState(_))
     ));
 
+    // R8-09: reuse the Stage C database and run for the Fact Pipeline owners.
+    let pipeline_context = database
+        .store
+        .fact_pipeline_context(research.id)
+        .await
+        .unwrap();
+    assert_eq!(pipeline_context.research_run_id, research.id);
+    assert_eq!(pipeline_context.match_id, target.id);
+    assert_eq!(pipeline_context.home_team_id, Some(home.id));
+    assert_eq!(pipeline_context.away_team_id, Some(away.id));
+    assert_eq!(pipeline_context.schema_version_id, schema.id);
+    assert_eq!(pipeline_context.trace_id, trace_id);
+    assert_eq!(pipeline_context.data_cutoff_at, research.data_cutoff_at);
+    let normalized_home = home.canonical_name.to_lowercase();
+    let compact_home: String = normalized_home
+        .chars()
+        .filter(|c| c.is_alphanumeric())
+        .collect();
+    let home_candidates = database
+        .store
+        .find_entity_candidates(
+            &pipeline_context,
+            "team",
+            &normalized_home,
+            &compact_home,
+            None,
+        )
+        .await
+        .unwrap();
+    assert!(home_candidates
+        .iter()
+        .any(|c| c.entity_id == home.id && c.relation.as_deref() == Some("home")));
+    assert!(home_candidates
+        .windows(2)
+        .all(|pair| pair[0].score >= pair[1].score));
+    let resolution_draft = EntityResolutionDraft {
+        research_run_id: research.id,
+        match_id: target.id,
+        trace_id,
+        fact_key: "fixture.home-team".into(),
+        entity_type: "team".into(),
+        raw_name: home.canonical_name.clone(),
+        normalized_name: normalized_home,
+        external_id: None,
+        status: EntityResolutionStatus::Resolved,
+        resolved_entity_id: Some(home.id),
+        resolved_name: Some(home.canonical_name.clone()),
+        strategy: "fixture".into(),
+        confidence_score: 100,
+        candidates: home_candidates,
+        reason: "R8-09 fixture".into(),
+        idempotency_key: format!("entity:{token}:home"),
+    };
+    let resolution = database
+        .store
+        .append_entity_resolution(&resolution_draft)
+        .await
+        .unwrap();
+    let retry = database
+        .store
+        .append_entity_resolution(&resolution_draft)
+        .await
+        .unwrap();
+    assert_eq!(
+        (
+            resolution.id,
+            resolution.created_at,
+            &resolution.resolution_fingerprint
+        ),
+        (retry.id, retry.created_at, &retry.resolution_fingerprint)
+    );
+    let mut changed = resolution_draft.clone();
+    changed.reason = "changed".into();
+    assert!(matches!(
+        database.store.append_entity_resolution(&changed).await,
+        Err(PersistenceError::InvalidState(_))
+    ));
+    let time_draft = TimeAuditDraft {
+        research_run_id: research.id,
+        match_id: target.id,
+        trace_id,
+        fact_key: resolution_draft.fact_key.clone(),
+        field_key: "home_lineup_status".into(),
+        data_cutoff_at,
+        published_at: Some(data_cutoff_at - Duration::hours(1)),
+        observed_at: None,
+        effective_at: None,
+        retrieved_at: data_cutoff_at,
+        timezone: Some("UTC".into()),
+        status: TimeAuditStatus::Accepted,
+        reason: "R8-09 fixture".into(),
+        idempotency_key: format!("time:{token}:home"),
+    };
+    let time = database.store.append_time_audit(&time_draft).await.unwrap();
+    let retry = database.store.append_time_audit(&time_draft).await.unwrap();
+    assert_eq!(
+        (time.id, time.created_at, &time.time_fingerprint),
+        (retry.id, retry.created_at, &retry.time_fingerprint)
+    );
+    let mut changed = time_draft.clone();
+    changed.reason = "changed".into();
+    assert!(matches!(
+        database.store.append_time_audit(&changed).await,
+        Err(PersistenceError::InvalidState(_))
+    ));
+    let stored_cutoff: chrono::DateTime<Utc> =
+        sqlx::query_scalar("SELECT data_cutoff_at FROM research.time_audits WHERE id=$1")
+            .bind(time.id)
+            .fetch_one(&database.pool)
+            .await
+            .unwrap();
+    assert_eq!(stored_cutoff, research.data_cutoff_at);
+
     let claim_time = data_cutoff_at;
     let claim_a_draft = EvidenceClaimDraft {
         match_id: target.id,
@@ -2398,6 +2555,136 @@ async fn p4_stage_c_writes_are_idempotent_and_frozen_history_is_immutable() {
         .await
         .expect("重复建立同一冲突组应幂等");
     assert_eq!(conflict.id, conflict_retry.id);
+
+    let evaluation_draft = ConflictEvaluationDraft {
+        conflict_id: conflict.id,
+        research_run_id: research.id,
+        match_id: target.id,
+        trace_id,
+        source_policy_key: "fixture".into(),
+        source_policy_version: "1.0.0".into(),
+        status: ConflictEvaluationStatus::AutoResolved,
+        winning_evidence_ids: vec![claim_a.id],
+        winning_value: claim_a_draft.value.clone(),
+        ranking: json!([{ "rank": 500 }]),
+        reason: "R8-09 fixture".into(),
+        idempotency_key: format!("evaluation:{token}"),
+    };
+    let evaluation = database
+        .store
+        .append_conflict_evaluation(&evaluation_draft)
+        .await
+        .unwrap();
+    let retry = database
+        .store
+        .append_conflict_evaluation(&evaluation_draft)
+        .await
+        .unwrap();
+    assert_eq!(
+        (
+            evaluation.id,
+            evaluation.created_at,
+            &evaluation.evaluation_fingerprint
+        ),
+        (retry.id, retry.created_at, &retry.evaluation_fingerprint)
+    );
+    let mut changed = evaluation_draft.clone();
+    changed.winning_value = json!({"changed": true});
+    assert!(matches!(
+        database.store.append_conflict_evaluation(&changed).await,
+        Err(PersistenceError::InvalidState(_))
+    ));
+    let event_key = format!("resolution:{token}");
+    let event_payload = json!({"winning_evidence_ids": [claim_a.id]});
+    for _ in 0..2 {
+        database
+            .store
+            .append_conflict_event(
+                conflict.id,
+                "resolved",
+                "fixture",
+                &event_payload,
+                &event_key,
+            )
+            .await
+            .unwrap();
+    }
+    assert!(matches!(
+        database
+            .store
+            .append_conflict_event(conflict.id, "resolved", "fixture", &json!({}), &event_key)
+            .await,
+        Err(PersistenceError::InvalidState(_))
+    ));
+    let event_count: i64 = sqlx::query_scalar("SELECT count(*) FROM research.evidence_conflict_events WHERE conflict_id=$1 AND idempotency_key=$2")
+        .bind(conflict.id).bind(&event_key).fetch_one(&database.pool).await.unwrap();
+    assert_eq!(event_count, 1);
+    let route_draft = EvidenceRouteDraft {
+        research_run_id: research.id,
+        match_id: target.id,
+        trace_id,
+        route_key: format!("fixture:home:{token}"),
+        field_key: "home_lineup_status".into(),
+        target_module: "fixture".into(),
+        target_slot: "home".into(),
+        route_registry_version: football_domain::P4_EVIDENCE_ROUTE_VERSION.into(),
+        entity_type: Some("team".into()),
+        entity_id: Some(home.id),
+        status: EvidenceRouteStatus::Routed,
+        verification_state: "CONFIRMED".into(),
+        selected_evidence_ids: vec![claim_b.id, claim_a.id, claim_a.id],
+        selected_value: claim_a_draft.value.clone(),
+        reason: "R8-09 fixture".into(),
+        idempotency_key: format!("route:{token}"),
+    };
+    let route = database
+        .store
+        .append_evidence_route(&route_draft)
+        .await
+        .unwrap();
+    let mut reordered_route = route_draft.clone();
+    reordered_route.selected_evidence_ids = vec![claim_a.id, claim_b.id];
+    let retry = database
+        .store
+        .append_evidence_route(&reordered_route)
+        .await
+        .unwrap();
+    assert_eq!(
+        (route.id, route.created_at, &route.route_fingerprint),
+        (retry.id, retry.created_at, &retry.route_fingerprint)
+    );
+    let mut changed = route_draft.clone();
+    changed.reason = "changed".into();
+    assert!(matches!(
+        database.store.append_evidence_route(&changed).await,
+        Err(PersistenceError::InvalidState(_))
+    ));
+    let stored_ids: Vec<Uuid> = sqlx::query_scalar(
+        "SELECT selected_evidence_ids FROM research.evidence_routes WHERE id=$1",
+    )
+    .bind(route.id)
+    .fetch_one(&database.pool)
+    .await
+    .unwrap();
+    let mut expected_ids = vec![claim_a.id, claim_b.id];
+    expected_ids.sort_unstable();
+    assert_eq!(stored_ids, expected_ids);
+    for (table, id) in [
+        ("entity_resolutions", resolution.id),
+        ("time_audits", time.id),
+        ("conflict_evaluations", evaluation.id),
+        ("evidence_routes", route.id),
+    ] {
+        let mut tx = database.pool.begin().await.unwrap();
+        let mutation = sqlx::query(&format!(
+            "UPDATE research.{table} SET reason='tampered' WHERE id=$1"
+        ))
+        .bind(id)
+        .execute(&mut *tx)
+        .await;
+        assert!(mutation.is_err(), "{table} must remain immutable");
+        tx.rollback().await.unwrap();
+    }
 
     // R8-08: use the existing Stage C fixture for the evidence ledger contract.
     let stored_claim: serde_json::Value =

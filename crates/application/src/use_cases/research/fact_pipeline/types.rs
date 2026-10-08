@@ -1,4 +1,10 @@
-use super::*;
+use chrono::{DateTime, Utc};
+use football_domain::{
+    EntityResolutionRecord, EntityResolutionStatus, EvidenceVerificationState, TimeAuditRecord,
+};
+use football_research_gateway::ResearchFact;
+use serde_json::Value;
+use uuid::Uuid;
 
 #[derive(Debug, Clone)]
 pub(super) struct SourceReference {

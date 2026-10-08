@@ -87,7 +87,7 @@
     {"path":"crates/persistence-postgres/src/statistics/database_stats.rs","git_blob_sha1":"e6dc9979bb0bc8eef57b64088cc85d5a9e056d7e"},
     {"path":"crates/persistence-postgres/src/statistics/read_statistics.rs","git_blob_sha1":"cf5849f972dc923d33a2cc39c1a0f3ead88a53db"},
     {"path":"crates/persistence-postgres/src/store/postgres_store.rs","git_blob_sha1":"8b3cd1939080bcaf3ac776fd22adb012c279ce32"},
-    {"path":"crates/persistence-postgres/tests/postgres_integration.rs","git_blob_sha1":"eb0f4dd987b3f4374a57c1f5295c8be0ffaf9966"}
+    {"path":"crates/persistence-postgres/tests/postgres_integration.rs","git_blob_sha1":"95045418dcbdc7a4593aa7868e430622ba2daa66"}
   ],
   "runtime_requirements": [
     {"path":"crates/persistence-postgres/src/migrations/run_migrations.rs","required_tokens":["static MIGRATOR: sqlx::migrate::Migrator = sqlx::migrate!(\"./migrations\");","reconcile_known_legacy_migrations(&self.pool).await?;","MIGRATOR.run(&self.pool).await?;","ensure_runtime_schema_compatibility(&self.pool).await?;","SELECT feature.refresh_player_ability_projections()"]},

@@ -1,4 +1,24 @@
-use super::*;
+use super::command::ProcessResearchEvidenceCommand;
+use super::routing::{built_in_route_registry, validate_route_registry};
+use super::types::SourceReference;
+use crate::ports::research::ResearchArtifactPort;
+use crate::{ApplicationError, ApplicationResult};
+use football_domain::{SourcePolicyDefinition, SourcePolicyVersionDraft, P4_SOURCE_POLICY_VERSION};
+use serde_json::json;
+use std::collections::BTreeMap;
+use url::Url;
+
+pub(super) const SOURCE_POLICY_KEY: &str = "p4-default-source-policy";
+pub(super) const SOURCE_POLICY_SEMVER: &str = "1.0.0";
+
+pub(crate) async fn register_fact_pipeline_artifacts(
+    port: &dyn ResearchArtifactPort,
+) -> ApplicationResult<()> {
+    port.register_source_policy(&built_in_source_policy())
+        .await?;
+    validate_route_registry(&built_in_route_registry())?;
+    Ok(())
+}
 
 pub(super) fn build_source_index(
     command: &ProcessResearchEvidenceCommand,

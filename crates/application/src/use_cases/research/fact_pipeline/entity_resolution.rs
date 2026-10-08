@@ -1,4 +1,5 @@
-use super::*;
+use super::types::ResolutionDecision;
+use football_domain::{EntityCandidate, EntityResolutionStatus};
 
 pub(super) fn decide_entity_resolution(
     entity_type: &str,

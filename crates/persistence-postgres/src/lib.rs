@@ -4,7 +4,6 @@ mod api_workspace;
 mod audit;
 mod competition_kind;
 mod error;
-mod fact_pipeline_records;
 mod health;
 mod jobs;
 mod mapping;

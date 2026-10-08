@@ -1,4 +1,8 @@
-use super::*;
+use super::command::ProcessResearchEvidenceCommand;
+use crate::{ApplicationError, ApplicationResult};
+use football_domain::{EvidenceVerificationState, FactPipelineContext};
+use serde_json::Value;
+use sha2::{Digest, Sha256};
 
 pub(super) fn verification_priority(state: EvidenceVerificationState) -> u8 {
     match state {

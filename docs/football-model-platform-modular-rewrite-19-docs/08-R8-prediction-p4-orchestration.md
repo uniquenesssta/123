@@ -1311,137 +1311,108 @@ crates/persistence-postgres/src/adapters/p4/
 
 ## R8-09 Fact Pipeline
 
-状态：`READY`（08精确Windows修复CI通过，用户已授权“收尾08开始09”）
+状态：`VERIFYING`（08精确Windows修复CI已通过并收尾；用户已授权实施09，等待09自身Windows CI）
 
 ### 1. 目标
 
-- 完成 Fact Pipeline 的完全重写，并将该能力收敛到唯一、可递归拆分的模块目录。
+收敛事实处理编排、输入准备和P4事实记录的唯一职责；保留既有Ports、处理顺序、来源/实体/时间/冲突/路由政策。
 
 ### 2. 现状与来源
 
-- `crates/application/src/prediction.rs`。
-- `p4_orchestration.rs`、`fact_pipeline.rs`、`p4_persistence.rs`、`p4_workbench.rs`。
-- 相关 persistence modules。
+实际来源是 `crates/application/src/use_cases/research/fact_pipeline/`：原 `mod.rs` 混合公共命令、组合访问trait、artifact注册、主编排和事实准备；其余已有实体/时间/来源/证据/冲突/路由模块，继续复用。旧根 `prediction.rs`、`fact_pipeline.rs`、`p4_persistence.rs`、`p4_workbench.rs` 已在前阶段退出，不再作为来源。
+
+Postgres实际来源为 `crates/persistence-postgres/src/fact_pipeline_records.rs`，混合8个公开方法和9个内部helper，包括来源策略、上下文/候选查询和实体/时间/评估/事件/路由记录。
 
 ### 3. 目标文件与目录
 
-```text
-crates/application/src/use_cases/research/p4/fact-pipeline/
-```
+- Application既有 `use_cases/research/fact_pipeline/` 新增 `command.rs`、`process.rs`、`prepare.rs`，不创建无调用的 `p4/fact-pipeline` 模板目录。
+- Postgres既有P4 adapter新增 `adapters/p4/fact_pipeline/{mod,source_policy,context,candidates,entity_resolution,time_audit,conflicts,routes,fingerprint}.rs`。
+- 详细唯一owner及完整文件清单见 [09实施记录](../modular-rewrite/R08-prediction-p4-orchestration/R08-09-fact-pipeline.md)。
 
 ### 4. 文件职责边界
 
-- 每个文件只承担一个可用一句话描述的职责。
-- 目录出口文件只负责显式导出。
-- 协调器只编排，不实现数据访问、UI 渲染或领域计算。
+Application mod只登记和显式导出；command持有原DTO；process只顺序编排；prepare组合实体/主客队/时间/引用校验并产出分组输入。原计算helper保留既有owner，取消 `use super::*`，不复制公式。来源artifact注册归入既有source_policy。Postgresmod只登记，查询、来源策略和各记录生命周期分开；共享指纹冲突helper只由该目录持有。冲突评估和事件同属conflicts，避免单函数空转发层。
 
 ### 5. 输入
 
-- 无。
+既有 `ProcessResearchEvidenceCommand`、研究上下文、联网事实/缺失字段及已验证引用索引；校验response_id、比赛键、精确cutoff和schema版本。
 
 ### 6. 输出
 
-- 稳定的模块公开接口、可独立测试的实现和对应契约测试。
+既有 `FactPipelineSummary` 与原证据/解析/时间/冲突/路由账本，不改变序列化字段、公开类型路径或PostgresStore签名。
 
 ### 7. 允许依赖
 
-- 无。
+Domain、Research Gateway已有DTO、既有ResearchService与FactPipelinePort/ResearchEvidenceLedgerPort/ResearchArtifactPort；Application组合根继续负责具体Postgres接入。Postgres内部复用原pool、hash和审计writer。
 
 ### 8. 禁止依赖
 
-- 无。
+Application use case禁止SQLx/PgPool/具体Store、Tauri或UI；不引入私有模型算法、参数、概率默认值或新依赖、工作流、target、DB设施。
 
 ### 9. 状态所有权
 
-- 该任务不新增跨模块共享状态；需要状态时由目标模块内具名 State/Coordinator 唯一持有。
+summary、引用索引、BTreeMap分组是单次调用局部值；无新增共享State、缓存或后台生命周期。持久化记录由原数据库约束唯一持有。
 
 ### 10. 副作用边界
 
-- 所有 I/O、副作用和外部调用必须集中在明确命名的 adapter/transport/repository/workflow 文件。
+Application所有I/O走原Ports；SQL只在P4 adapters。来源策略验证→事务/同key版本锁→幂等读回或插入→同事务审计→提交。其他事实记录沿用原独立写入、冲突读回和精确指纹检查，不虚构整条pipeline原子事务。
 
 ### 11. 异常路径
 
-- 保持现有错误码、错误类型和用户可见提示语义；新增内部错误必须在边界映射为既有公共错误。
+命令无效在context前停止；context身份不一致在记录写入前停止。原事实来源缺失发生在实体/时间写入后，这些既成记录保留；后续证据/路由不执行。Port错误保留kind/message并立即返回，无新增重试或错误兜底。
 
 ### 12. 并发/异步/生命周期
 
-- 所有异步请求必须具备请求 ID、取消或过期结果丢弃策略；销毁时解除监听器、定时器和挂起回调。
+保留顺序准备全部事实→BTreeMap有序分组处理→缺失字段处理。等分候选不猜测；主客队filter、历史日期查询、截止纳秒校验保持。独立记录仍依数据库唯一键/ON CONFLICT及原指纹约束收敛，来源策略仍用原事务锁；不增加UI请求ID/取消/销毁模板。
 
 ### 13. 兼容要求
 
-- P4.4 保持 SHADOW_ONLY。
-- P7 固定 lambda、概率、矩阵和 top scoreline 回归一致。
-- 历史 cutoff、输入指纹、路由和 schema 不变。
+命令/DTO/43 Ports/171 Tauri命令/365 Domain类型/300映射/46迁移保持。来源等级、冲突安全唯一赢家、路由版本、幂等键、SQL与提示保持。P4.4 SHADOW_ONLY、P7模型资产和固定概率逻辑不修改；公开保护资产通过不能替代私有Golden Master实跑。
 
 ### 14. 实施步骤
 
-1. 读取 R0 生成的文件、命令、类型和调用方清单，确认本任务准确影响范围。
-2. 为目标目录创建清晰的 `mod.rs`/`index.ts` 出口，出口只 re-export，不承载业务逻辑。
-3. 先迁移或补齐契约测试，再实现新文件。
-4. 按职责逐文件实现；发现单文件再次出现第二职责时立即递归升级为子目录。
-5. 接入上游和下游，确保跨层只经过公开接口。
-6. 切换唯一入口，删除旧职责实现、重复类型、重复状态和重复样式。
-7. 运行最小验证、阶段回归和保护资产验证。
-8. 更新 README 并创建可回退原子提交。
+1. 从08收尾基线 `6718c996613edc6e4770457ed02fff16f8a95e26` 核对实际入口。
+2. 保留原纯职责，提取command/process/prepare并精确显式导出。
+3. 将混合Postgres owner按查询/策略/记录生命周期提取，删除旧文件/根登记。
+4. 原Application/Persistence单测target新增7+7边界测试；原Stage C/E数据库入口扩读回/幂等/不可变断言，仍ignored。
+5. 强化既有Research门禁的owner/依赖/调用顺序/旧实现清理，精确刷新原清单；不新增runner。
+6. 完成等价比较、静态门禁、破坏探针与记录，推送自身Windows CI；启动后停止轮询。
 
 ### 15. 切换入口
 
-- 在新实现通过最小验证后切换唯一调用入口；切换完成后立即运行契约验证。
+ResearchService、OpenAI Gateway、P4 worker、组合adapter和公开Application入口继续原路径；mod显式指向新process/command。PostgresStore同名方法由P4内的新owner直接实现，不留旧转发。
 
 ### 16. 删除清单
 
-- 删除被本任务替代的旧职责实现、重复出口、重复测试和临时转发。
+删除 `crates/persistence-postgres/src/fact_pipeline_records.rs` 及根登记；移除Application父模块混合实现/通配导入。无整文件移动/重命名，无删除既有测试。
 
 ### 17. 最小验证
 
-- 相关 crate/feature 单元测试通过。
-- TypeScript/Rust 编译或类型检查通过。
-- 架构边界脚本通过。
-- 模型保护资产指纹通过。
+Research专项、完整architecture、原83源码检查、Rustfmt目标文件、18模型保护资产、171命令、46迁移/18PG静态基线与diff检查；生产函数/SQL/签名/DTO对照。真实Rust编译/单测由09精确Windows CI验证。
 
 ### 18. 阶段回归
 
-- `npm run verify:frontend`。
-- `cargo fmt --all -- --check`。
-- `cargo clippy --locked --workspace --all-targets -- -D warnings`。
-- `cargo test --locked --workspace`。
+既有Windows Automated执行 `npm run verify:frontend`、fmt、Clippy、`cargo test --locked --workspace`、17视口、release/MSI/NSIS/启动。不运行Linux/macOS Cargo或客户端；18项PG ignored、真实XLSX、Windows Full及私有Golden Master最终封包新库待验。
 
 ### 19. 失败停止条件
 
-- 任何保护资产指纹变化。
-- 公共契约出现未批准变化。
-- 最小验证失败。
-- 发现用户未提交修改与目标文件重叠且无法安全合并。
+保护资产、公开契约或兼容语义变化；本地必需门禁失败；精确Windows失败；与用户未提交修改冲突。失败修复仍限09，不进入10。
 
 ### 20. 回退点
 
-- 回退到 R8-09 开始前的已验证提交；不得手工复制旧文件恢复。
+用受控revert恢复本项基线 `6718c99`，同时恢复唯一owner、入口、清单、测试和文档；禁止手工复制双实现或修改历史数据。
 
 ### 21. 根 README 摘要记录
 
-- 记录 R8-09 实际创建、移动、删除的文件。
-- 记录执行过的命令、结果、未执行项与剩余风险。
+记录实际拆分、旧文件删除、兼容检查、14新增边界测试及已执行/待执行门禁。
 
 ### 22. docs 阶段节点详细记录
 
-- 创建 `docs/modular-rewrite/R08-prediction-p4-orchestration/R08-09-fact-pipeline.md`。
-- 记录本节点实际做了什么、为何修改、修改前后职责、行为和依赖变化。
-- 分别列出全部新增、修改、移动/重命名和删除文件；没有对应类型时明确写“无”。
-- 文件清单必须与本节点真实 `git diff --name-status` 和最终工作区一致。
-- 记录公共接口、DTO、Schema、数据格式、配置、错误语义、日志、UI 行为和模型保护资产是否变化。
-- 记录实际执行的验证命令、环境、结果和报告路径；未执行项必须写明原因、替代验证和剩余风险。
-- 记录入口切换、旧实现清理、关键设计决策、计划偏差和回退方法。
-- 更新 `docs/modular-rewrite/R08-prediction-p4-orchestration/README.md` 中本任务的状态、记录链接和门禁结果。
-- 节点记录及阶段索引未完成时，本任务只能停留在 `VERIFYING`，不得改为 `DONE`。
+创建 [R08-09-fact-pipeline.md](../modular-rewrite/R08-prediction-p4-orchestration/R08-09-fact-pipeline.md)，完整列出A/M/D及无移动、决定/偏差/异常/事务边界、验证与真实风险；更新索引。CI启动保持VERIFYING，10～12BLOCKED；不将预期数或ignored标为PASS。
 
 ### 23. 完成标准
 
-- 目标职责已由唯一新模块承担。
-- 旧入口和旧实现已删除。
-- 最小验证与阶段回归均通过。
-- README 与实际状态一致。
-- `R08-09-fact-pipeline.md` 已创建并与实际变更、验证结果一致。
-- 阶段 `README.md` 已更新本任务状态和记录链接。
+唯一新owner和旧实现退出、全部静态与09精确Windows门禁通过、README/任务书/节点/索引一致，才收尾DONE；下一项仍须用户授权。
 
 ---
 

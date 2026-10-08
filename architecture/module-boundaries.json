@@ -294,7 +294,6 @@
         "crates/persistence-postgres/src/audit/mod.rs",
         "crates/persistence-postgres/src/competition_kind.rs",
         "crates/persistence-postgres/src/error/mod.rs",
-        "crates/persistence-postgres/src/fact_pipeline_records.rs",
         "crates/persistence-postgres/src/health/mod.rs",
         "crates/persistence-postgres/src/jobs.rs",
         "crates/persistence-postgres/src/mapping/mod.rs",
@@ -397,7 +396,7 @@
     "frontend_features": 18,
     "workspace_members": 11,
     "ports": 4,
-    "postgres_adapters": 36,
+    "postgres_adapters": 35,
     "command_groups": 15,
     "commands": 171
   },

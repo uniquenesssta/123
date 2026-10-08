@@ -1,4 +1,18 @@
-use super::*;
+use super::process::FactPipelineAccess;
+use super::routing::{append_route, resolved_route_status};
+use super::source_policy::{SOURCE_POLICY_KEY, SOURCE_POLICY_SEMVER};
+use super::types::{PersistedFact, RankedValue};
+use super::validation::{canonical_json, sha256_text};
+use crate::ports::research::SerializedConflictEventPayload;
+use crate::{ApplicationError, ApplicationResult};
+use football_domain::{
+    ConflictEvaluationDraft, ConflictEvaluationStatus, EvidenceConflictDraft, EvidenceRouteRule,
+    EvidenceRouteStatus, FactPipelineContext, FactPipelineSummary,
+};
+use serde_json::{json, Value};
+use std::cmp::Ordering;
+use std::collections::{BTreeMap, BTreeSet};
+use uuid::Uuid;
 
 pub(super) async fn process_conflict_group(
     port: &dyn FactPipelineAccess,

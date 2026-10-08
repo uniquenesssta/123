@@ -2,7 +2,7 @@
 
 ## 当前阶段状态
 
-`IN_PROGRESS`。唯一阶段分支 `rewrite/r8-prediction-p4-orchestration`，起点/回退基线 `90680bf945fbb0d1c191937c2d9e90c2c916fb00`。R8-01～08 已 DONE；08精确修复 `52f23ab` / Windows run `37817443918` 全SUCCESS，首轮Clippy失败已关闭。用户已授权“收尾08开始09”，09前置通过、READY；10～12 `BLOCKED`。精确当前状态只由本索引维护。
+`IN_PROGRESS`。唯一阶段分支 `rewrite/r8-prediction-p4-orchestration`，起点/回退基线 `90680bf945fbb0d1c191937c2d9e90c2c916fb00`。R8-01～08 已 DONE；08精确修复 `52f23ab` / Windows run `37817443918` 全SUCCESS，首轮Clippy失败已关闭。用户已授权“收尾08开始09”，09已实施、`VERIFYING`，等待自身Windows CI；10～12 `BLOCKED`。精确当前状态只由本索引维护。
 
 ## 前置基线与范围
 
@@ -22,7 +22,7 @@ R8 依据 [任务书](../../football-model-platform-modular-rewrite-19-docs/08-R
 | R8-06 | Model Execution Adapter | DONE · [完成记录](R08-06-model-execution-adapter.md) |
 | R8-07 | Run Persistence | DONE · [完成记录](R08-07-run-persistence.md) |
 | R8-08 | P4 Evidence Ledger | DONE · [完成记录](R08-08-p4-evidence-ledger.md) · 精确Windows修复CI全SUCCESS |
-| R8-09 | Fact Pipeline | READY · 前置门禁通过，已授权开始 |
+| R8-09 | Fact Pipeline | VERIFYING · [实施记录](R08-09-fact-pipeline.md) · 等待自身Windows CI |
 | R8-10 | Horizon Orchestration | BLOCKED |
 | R8-11 | Workbench Reads | BLOCKED |
 | R8-12 | Freeze Transaction | BLOCKED |
@@ -182,3 +182,16 @@ R8-01～08 已取得各自精确 Windows CI；09及后续仍须独立取得自�
 实际PASS：83/83原源码检查、完整architecture、12文件Rustfmt、18保护资产、171命令、46连续迁移/18PG静态基线和git diff --check；六探针（漏锁/漏metadata指纹/放宽字节键/漏实体校验/跳过Schema版本/提前commit）均拒绝并恢复。初次architecture发现新增p4直接module登记后计数未更新，已精确35→36并复跑通过，不放宽owner集合。Domain扫描1051→1060、365/300/sourceDigest保持，usageDigest `307b38c0ae795e65133ae11522339b21a47bd8ab5cc1129f02f679ca0ba97608`；Application390/43Ports保持，PG清单仅刷新原test blob。
 
 08须本项Windows Automated，CI启动后停止轮询；未做Linux/macOS动态验收。Mermaid Chart更新实际声明/冲突事务链，结束时Create State保存。08VERIFYING，09～12BLOCKED；真实PG/历史四项/账本/XLSX/Full/私有固定回归及继承model.runs/0041删除风险保持最终新库待验。回退受控revert恢复已验源码文档基线1db0e19，同步唯一owner/出口/测试/清单，不手工恢复双实现或修改历史库。
+
+
+## R8-09 实施与门禁记录（2026-10-08，VERIFYING）
+
+08精确修复 `52f23ab` / Windows run `37817443918` 全SUCCESS，收尾文档已推送 `6718c996613edc6e4770457ed02fff16f8a95e26`。用户授权“收尾08开始09”，09从该基线开始，沿用唯一R8分支。
+
+Application原Fact Pipeline已有纯职责复用；mod中的公共命令、编排和事实准备提取到command/process/prepare，artifact注册归source_policy，mod只显式出口，所有原通配导入改为具体依赖。原Postgres混合fact_pipeline_records完整删除，8公开方法/9内部helper按来源策略、上下文、候选、实体/时间/冲突/路由及指纹迁入既有P4 adapter。原ResearchService/Ports/上游调用路径保持，不新建空模板State或转发。完整13新增/22修改/1删除、无整文件移动，见 [09实施记录](R08-09-fact-pipeline.md)。
+
+原Application/Persistence target各新增7边界测试，预期99/163，须09自身Windows实跑。原PG Stage C/E补实际context/candidates、各记录首次值/指纹/排序去重/重试/不可变及来源策略元数据/审计/前检零残留；18 broad仍ignored，真实结果最终新库待验。保留来源缺失发生在实体/时间写入后的原部分副作用，不虚构pipeline整体事务或自动重试。
+
+实际本地PASS：83/83现有源码检查、完整architecture、25目标Rustfmt、18保护资产、171命令、46迁移/18PG静态基线与diff。17旧Postgres生产函数/8签名、18原SQL raw literals及208字符串、32原Application helper、注册/序列化命令和重新内联编排比较一致。六探针（目录实现/无序分组/cutoff身份/主客队过滤/路由ID去重/指纹前缀）均拒绝并恢复。清单精确刷新：Application390→393/43 Ports保持，Postgres根36→35，Domain扫描1060→1071/365/300/声明摘要保持；PG仅刷新原test blob。
+
+09保持VERIFYING、10～12BLOCKED。Windows Automated启动后停止轮询，无Linux/macOS Cargo/客户端动态验收；真实PG/历史四项/账本/XLSX/Full/私有Golden Master及继承历史删除风险继续最终新库待验。Mermaid Chart已更新真实事实流水线，结束时Create State保存继续位置。回退受控revert至 `6718c99`，同步owner/出口/测试/清单/文档，不恢复双实现或修改历史库。

@@ -271,3 +271,14 @@ Application **92** / Persistence **141**、七项新增 adapter 测试、前端�
 修复 `52f23ab4e582f313f412058623f0d83a6ddf6f98` / [Windows run `37817443918`](https://github.com/uniquenesssta/123/actions/runs/37817443918) / job `113449572979` 全SUCCESS，前端/类型/生产构建、17视口、Rust fmt/Clippy/workspace tests、Windows release/MSI/NSIS、启动状态载入和日志覆盖通过。首轮 `91e9585` 的未使用导入失败已关闭。报告 `logs/windows-acceptance-20261008-173456.json`，artifact `11568918565` / 14,023,349字节 / SHA-256 `d52b465dd73216453496a5a7b079ad6d331ebad3293c58af606e1187bc57acb8`。
 
 08DONE；用户已授权09开始，09不能继承08动态PASS。08收尾仅同步既有五文档并使用 `[skip ci]`，无源码/清单变化。真实PG、历史四项/账本、有效XLSX、Windows Full、私有Golden Master和继承历史删除风险继续最终封包新库待验；ignored不计实跑PASS。
+
+
+## R8-09 Fact Pipeline 实施待验（2026-10-08）
+
+08精确修复 `52f23ab` / run `37817443918` 全SUCCESS并文档收尾为 `6718c99`；09已实施、VERIFYING，10～12BLOCKED。沿用原Windows Automated和原单测/PG入口，不新增target、runner、workflow、依赖或库。
+
+原Application target保留9项事实纯helper测试，新增7项异步主链/错误/来源/主客队/截止/冲突边界；原Persistence target保留2项事实helper测试，新增7项持久化状态边界、精确指纹、候选等分和来源策略前检。预期Application99/Persistence163只作实施预期，09精确Windows实跑前不计PASS。Port错误测试包括六类错误与冲突创建/评估/事件/路由失败，检查即时停止与原kind/message。无pipeline整体原子回滚承诺。
+
+原postgres_integration的Stage C扩context字段及微秒落库、主队候选、四类记录首次id/time/fingerprint/内容变化拒绝、路由证据ID排序去重、事件唯一及不可变；Stage E扩首次metadata保留/唯一audit/无效策略零残留。18 broad仍ignored；真实PG/历史四项/账本/XLSX/Windows Full/私有固定回归及继承删除风险最终封包新库待验，编译不冒充实跑。
+
+本地静态PASS：83源码检查、完整architecture、25目标Rustfmt、18保护资产、171命令、46迁移/18PG静态基线、diff；六破坏探针拒绝并恢复。生产17函数/8签名/18原SQL及208字符串、32Application helper/注册/命令/重新内联主链等价核对通过。5浏览器项及Rust fmt/Clippy/workspace tests和Windows release/MSI/NSIS/启动由09自身CI执行，启动后停止轮询；无Linux/macOS动态验收。完整文件/行为/验证及回退见 [09实施记录](modular-rewrite/R08-prediction-p4-orchestration/R08-09-fact-pipeline.md)。
