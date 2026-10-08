@@ -1,0 +1,11 @@
+{
+  "schemaVersion":1,
+  "runId":"footfigma-screens-architecture-2026-10-09",
+  "repo":"uniquenesssta/123","branch":"ui-design-system","fileKey":"PN0Whgu6HLWIHx4Mv6aHfu","page":"3:5",
+  "currentScreen":"S17 architecture / 架构信息","currentRoute":"architecture","phase":"in_progress_semantics_verified","currentExecutionFinished":false,
+  "acceptedRouteCount":16,"routeCount":17,"previousAcceptedGlobalCheckpoint":"7d3b72310a745a007075d3b8ed35ef38cc33a49d",
+  "source":{"page":"src/pages/architecture.ts@d92836f27d24170eb2f2eb7e79405e0155ae8f4b","routing":"crates/persistence-postgres/src/routing.rs@c2abaeb1a30e985a3f560f3f9793c1a6766e8097","providerBoundary":"contracts/model-provider-boundary-contract.json@680f3029994f82053dc9898b6df05227b7ba2418"},
+  "guards":["Static read-only explanations are not current health, installed runtime capability or release acceptance","No artificial loading, save, delete, deployment or model-execution controls on a static page","Normal historical revision principles do not promise immunity from explicit destructive database reset","Routing priority is conditional on active bindings, validity and request context; no match must not fabricate a default","Declared model interface is distinct from separately supplied runtime","No database required for reading local architecture explanations","After17 visual routes complete, all prior runtime gaps and full integration remain open"],
+  "frames":{},"pending":["editable composition","representative read-only states and local navigation","deep structural, contrast and screenshot checks","synchronize independent record, README, both plans and global checkpoint"],
+  "applicationSourceModified":false,"existingMastersModified":false,"runtimeOperationsPerformed":false
+}
