@@ -16,9 +16,9 @@ R8-05 路由与模型请求已收尾：精确修复 `2aa99a7` / [Windows run `36
 
 R8-06 已收尾为 `DONE`：注册查找、supports、predict、完整错误转换和原毫秒计时收拢到唯一模型适配器，原执行器与默认 dry run 直接复用；默认 dry run 保留无额外 supports/validate 的行为。精确 `0969331` / [Windows run `37752995641`](https://github.com/uniquenesssta/123/actions/runs/37752995641) 通过 Application **92** / Persistence **141**、七项新增边界测试、17 视口、Rust/前端、Windows release/MSI/NSIS 及启动验收。详见 [06 完成记录](docs/modular-rewrite/R08-prediction-p4-orchestration/R08-06-model-execution-adapter.md)。后续当前状态见下段与 R8 索引；本段五份文档收尾提交使用 `[skip ci]`，不代表 07 已验证。
 
-R8-07 Run Persistence 已实施，状态 `VERIFYING`，08～12 `BLOCKED`。从已验源码的文档基线 `eadb49d` 开始，旧 `crates/persistence-postgres/src/model_runs.rs` 已删除，原保存、输入审计/快照前检、模型明细、历史读取和隐藏事务分别迁入 `adapters/prediction/runs/{write,input,details,read,visibility}.rs`，`mod.rs` 只登记/导出。公开 PostgresStore 方法及 ModelRunListItem 路径保持；正式保存/影子 nil 继续由原执行用例编排。九项生产函数体、原 SQL、四个公开签名及原测试比较保持一致，无整文件移动/重命名。完整 7 新增、15 修改、1 删除文件及取舍见 [07 实施记录](docs/modular-rewrite/R08-prediction-p4-orchestration/R08-07-run-persistence.md)。
+R8-07 Run Persistence 已通过自身 Windows 门禁并收尾为 `DONE`；08 已获用户启动授权，09～12 `BLOCKED`。从已验源码的文档基线 `eadb49d` 开始，旧 `crates/persistence-postgres/src/model_runs.rs` 已删除，原保存、输入审计/快照前检、模型明细、历史读取和隐藏事务分别迁入 `adapters/prediction/runs/{write,input,details,read,visibility}.rs`，`mod.rs` 只登记/导出。公开 PostgresStore 方法及 ModelRunListItem 路径保持；正式保存/影子 nil 继续由原执行用例编排。九项生产函数体、原 SQL、四个公开签名及原测试比较保持一致，无整文件移动/重命名。完整 7 新增、15 修改、1 删除文件及取舍见 [07 实施记录](docs/modular-rewrite/R08-prediction-p4-orchestration/R08-07-run-persistence.md)。
 
-07 本地实际通过 83/83 现有源码门禁、完整 `npm run verify:architecture`、Rustfmt、18 保护资产/171 命令/46 迁移与 18 PG 静态契约、`git diff --check`；六项破坏探针均拒绝后恢复。新增七项 Persistence 边界单测，原 Application 保存失败测试扩为六类错误；预期 Persistence **148** / Application **92**，须本项精确 Windows CI 实跑，不继承 06 PASS。原 PG target 补共同回滚、快照复用、读回与隐藏不可变断言，仍 ignored，真实 PG/历史四项/账本/有效 XLSX/Windows Full/私有 Golden Master 与继承历史删除风险继续最终封包新库待验。沿用原 Windows workflow，启动后停止轮询；无 Linux/macOS Cargo/客户端动态验收或新基础设施。
+07 实施时本地实际通过 83/83 现有源码门禁、完整 `npm run verify:architecture`、Rustfmt、18 保护资产/171 命令/46 迁移与 18 PG 静态契约、`git diff --check`；六项破坏探针均拒绝后恢复。新增七项 Persistence 边界单测，原 Application 保存失败测试扩为六类错误；预期 Persistence **148** / Application **92**，须本项精确 Windows CI 实跑，不继承 06 PASS。原 PG target 补共同回滚、快照复用、读回与隐藏不可变断言，仍 ignored，真实 PG/历史四项/账本/有效 XLSX/Windows Full/私有 Golden Master 与继承历史删除风险继续最终封包新库待验。沿用原 Windows workflow，启动后停止轮询；无 Linux/macOS Cargo/客户端动态验收或新基础设施。
 
 ## 公开边界
 
@@ -521,3 +521,5 @@ PostgreSQL 实跑、Windows Full 和用户本机 Windows 10/11 实机验收仍�
 - 文档后的完整 `verify:frontend` 首轮发现 `verify-database-reset.mjs` 仍从 Database facade 检查自动重连/P4 worker，已将原断言迁到 `database_lifecycle/reset.rs` 与 P4 facade；恢复 run 随后通过该契约与 17 个截图回归，但因临时 runner 未先执行仓库 Node setup，在 `typescript` 包解析处停止。该环境失败未记为通过，后续使用仓库既有 `npm run setup` 后重跑完整 frontend。
 - 相对 R3-10 基线，当前源码/验证变更共 42 个文件、`+740/-389`；旧 P4 单文件 owner 清零，新增职责文件均保持小型化。未修改 PostgreSQL SQL/migration/Schema、Tauri 产品命令、前端产品源码、模型实现/私有资产、配置或生产依赖。
 - 18 个需要专用可写 `FOOTBALL_TEST_DATABASE_URL` 的 PostgreSQL 集成测试未在 AT1/AT2 hard gate 执行，未记为通过；未执行破坏性数据库验证。PR #21 当前保持 Draft / Open / 未合并；R3-10 在 clean Public Platform CI 与正式合并/收口前保持 `VERIFYING`，不得提前标记 `DONE`。
+
+R8-07 精确 `58b390a` / [Windows run `37796909083`](https://github.com/uniquenesssta/123/actions/runs/37796909083) 全 SUCCESS：Application 92/Persistence 148、七项新增边界测试、17 视口、fmt/Clippy/workspace、Windows release/MSI/NSIS/启动7条3操作通过。详见 [07 完成记录](docs/modular-rewrite/R08-prediction-p4-orchestration/R08-07-run-persistence.md)。真实 PG/Full/私有固定回归与继承删除风险仍最终新库待验；07 DONE，08 按用户指令开始，当前状态见 [R8 索引](docs/modular-rewrite/R08-prediction-p4-orchestration/README.md)。

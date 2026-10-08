@@ -2,7 +2,7 @@
 
 ## 当前阶段状态
 
-`IN_PROGRESS`。唯一阶段分支 `rewrite/r8-prediction-p4-orchestration`，起点/回退基线 `90680bf945fbb0d1c191937c2d9e90c2c916fb00`。R8-01～06 已 DONE；R8-06 精确 `0969331` / Windows run `37752995641` 全 SUCCESS。用户“开始07”后，07 已实施、`VERIFYING`，自身 Windows CI 待验；08～12 `BLOCKED`。精确当前状态只由本索引维护。
+`IN_PROGRESS`。唯一阶段分支 `rewrite/r8-prediction-p4-orchestration`，起点/回退基线 `90680bf945fbb0d1c191937c2d9e90c2c916fb00`。R8-01～07 已 DONE；07 精确 `58b390a` / Windows run `37796909083` 全 SUCCESS。08 前置通过、READY，用户已授权开始；09～12 `BLOCKED`。精确当前状态只由本索引维护。
 
 ## 前置基线与范围
 
@@ -20,8 +20,8 @@ R8 依据 [任务书](../../football-model-platform-modular-rewrite-19-docs/08-R
 | R8-04 | Deterministic Input Manifest | DONE · [完成记录](R08-04-deterministic-input-manifest.md) |
 | R8-05 | Route / Model Request | DONE · [完成记录](R08-05-route-and-model-request.md) |
 | R8-06 | Model Execution Adapter | DONE · [完成记录](R08-06-model-execution-adapter.md) |
-| R8-07 | Run Persistence | VERIFYING · [实施记录](R08-07-run-persistence.md) · 自身 Windows CI 待验 |
-| R8-08 | P4 Evidence Ledger | BLOCKED |
+| R8-07 | Run Persistence | DONE · [完成记录](R08-07-run-persistence.md) |
+| R8-08 | P4 Evidence Ledger | READY · 用户已授权开始 |
 | R8-09 | Fact Pipeline | BLOCKED |
 | R8-10 | Horizon Orchestration | BLOCKED |
 | R8-11 | Workbench Reads | BLOCKED |
@@ -35,7 +35,7 @@ Readiness 评分/检查、manifest 算法、路由与模型执行仍由现有 ow
 
 ## 动态待验与阶段出口
 
-R8-01～06 已取得各自精确 Windows CI；07 已实施，仍须独立取得精确门禁，不继承前项 PASS。数据库相关 contracts、历史四项/账本、模型历史删除风险、有效 XLSX、Windows Full 的真实结果仍最终新库待验，详见 R7 阶段清单。模型保护或真实固定回归不可取得时明确说明，公共 unavailable stub 不冒充私有引擎 Golden Master。后续节点成功后逐项更新；未完成全部节点不创建阶段完成记录。
+R8-01～07 已取得各自精确 Windows CI；08 及后续仍须独立取得自身门禁，不继承前项 PASS。数据库相关 contracts、历史四项/账本、模型历史删除风险、有效 XLSX、Windows Full 的真实结果仍最终新库待验，详见 R7 阶段清单。模型保护或真实固定回归不可取得时明确说明，公共 unavailable stub 不冒充私有引擎 Golden Master。后续节点成功后逐项更新；未完成全部节点不创建阶段完成记录。
 
 ## R8-01 实施与门禁记录（已通过）
 
@@ -164,3 +164,10 @@ R8-01～06 已取得各自精确 Windows CI；07 已实施，仍须独立取得�
 实际 PASS：83/83 现有源码检查、完整 architecture、目标 Rustfmt、18 保护资产、171 命令、46 迁移/18 PG 静态基线、git diff --check；六破坏探针均拒绝并恢复。Postgres 根模块 36→35，Domain 扫描 1046→1051、usageDigest 刷新；Application 390/43 Ports、365/300 与声明摘要不变。5 浏览器项和 Rust/Windows 编译/测试/交付留本项 CI，不继承06。无 Linux/macOS 动态验收。
 
 回退用受控 revert 恢复本项已验源码基线 `eadb49d`，同步唯一 owner、出口、测试/门禁/清单和记录，不手工复制旧文件或改历史数据。Mermaid Chart 已更新数据库比赛与手工推演、正式事务/影子、历史读取与隐藏链路；结束时 Create State 保存状态。Windows CI 启动后停止轮询，07 保持 VERIFYING、08～12 BLOCKED；成功才收尾07。真实 PG/历史四项/账本/XLSX/Full/私有固定回归及继承删除 trigger 风险保持最终新库待验。
+
+
+## R8-07 精确 Windows 验收与收尾（2026-10-08）
+
+精确实施 `58b390a6400646ac6131dfef0503a49ce1128eca` / [Windows run `37796909083`](https://github.com/uniquenesssta/123/actions/runs/37796909083) / job `113378629485` 全 SUCCESS，完成于 2026-10-08 23:27:02（北京时间）。完整日志确认 Application **92** / Persistence **148**、七项新增边界及原审计测试、前端契约/类型/生产构建、**17** 视口、fmt/Clippy/workspace tests、Windows release/MSI/NSIS 和启动 **7 条记录 / 3 个完成操作**通过。报告 `logs/windows-acceptance-20261008-145959.json`；artifact `11559974847`，14,025,581 字节，SHA-256 `b31ac49010ca525cd6c836fa9746be451ed5dc72bc8e918522e6ecad7e22f2ac`。
+
+已核对精确 SHA、全部 job/steps、日志与 artifact；实施时预期/待验文字保留为历史记录。07 正式 **DONE**，08 前置通过；用户已授权“收尾07开始08”，沿用唯一 R8 分支。收尾仅同步五份文档，源码/测试/清单保持上述已验树，链接/状态/diff 核对，不重复全量构建，文档提交使用 `[skip ci]`。真实 PG/历史四项/账本/有效 XLSX/Windows Full/私有 Golden Master 与继承 model.runs/0041 删除风险继续最终封包新库待验，ignored 不计实跑 PASS。

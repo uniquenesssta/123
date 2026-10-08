@@ -11,7 +11,7 @@
 
 适用总纲顶部的执行订正：仅 Windows 动态验证，沿用原单测/contract、既有 Windows runner/workflow/数据库入口；不新增专项或持续回归体系。公开仓库没有私有 P4/P7 引擎、参数和 Golden Master；模型保护资产可验证，公共 unavailable stub 的通过不能冒充私有固定概率实跑。目录模板按实际职责及 Rust 模块命名调整；顺序执行的后端 use case 无新增 UI 生命周期，不强制新增 State、请求 ID 或空出口。
 
-R8-01～06 已取得各自精确 Windows CI（`cba72fd` / `36881256338`、`cc2b0fe` / `36891488571`、`47ba3de` / `36902069546`、`59c5679` / `36966815323`、修复 `2aa99a7` / `36971419476`、`0969331` / `37752995641`）及正式完成记录。07 已按用户指令实施、VERIFYING；各项精确当前状态只由 [阶段索引](../modular-rewrite/R08-prediction-p4-orchestration/README.md) 维护。07 及后续必须取得自身 Windows CI，不继承前项 PASS。
+R8-01～06 已取得各自精确 Windows CI（`cba72fd` / `36881256338`、`cc2b0fe` / `36891488571`、`47ba3de` / `36902069546`、`59c5679` / `36966815323`、修复 `2aa99a7` / `36971419476`、`0969331` / `37752995641`）及正式完成记录。07 精确 `58b390a` / `37796909083` 已通过并 DONE，08 已获启动授权；各项精确当前状态只由 [阶段索引](../modular-rewrite/R08-prediction-p4-orchestration/README.md) 维护。07 及后续必须取得自身 Windows CI，不继承前项 PASS。
 
 ## 1. 阶段目标
 
@@ -1022,7 +1022,7 @@ crates/application/src/use_cases/prediction/dry_run_default_fixture/mod.rs
 
 ## R8-07 Run Persistence
 
-状态：`VERIFYING`（已按用户“开始07”实施；本项精确 Windows CI 待验，08～12 BLOCKED）。详见 [实施记录](../modular-rewrite/R08-prediction-p4-orchestration/R08-07-run-persistence.md)。
+状态：`DONE`（精确 `58b390a` / Windows run `37796909083` 全 SUCCESS）。详见 [完成记录](../modular-rewrite/R08-prediction-p4-orchestration/R08-07-run-persistence.md)。
 
 ### 1. 目标
 
@@ -1165,7 +1165,7 @@ crates/persistence-postgres/src/adapters/prediction/runs/
 
 ## R8-08 P4 Evidence Ledger
 
-状态：`BLOCKED`（仅当上一任务与本任务前置门禁通过后改为 `READY`）
+状态：`READY`（07 精确 Windows 门禁与完成记录已通过；用户已授权开始）
 
 ### 1. 目标
 

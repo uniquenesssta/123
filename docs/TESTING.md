@@ -244,3 +244,10 @@ Application **92** / Persistence **141**、七项新增 adapter 测试、前端�
 报告 `/workspace/scratch/0c69084e7a7f/r807-source-checks.json` 和 `/workspace/scratch/0c69084e7a7f/r807-negative-probes.json`；命令由仓库原入口可重现。Rustfmt 本地运行库缺损从已有同版本归档完整恢复后检查通过，没有项目依赖变更。Application 扫描 390 不变；Postgres 直接模块 36→35（删除根 model_runs，runs 在既有 prediction 下）；Domain 扫描 1046→1051，365 类型/300 映射与声明摘要保持，usageDigest `57653c49ff4d861f79dbb439e83e066899455c6aeb98f94cc5f4474253c484d2`。
 
 本项复用原 Windows Automated：完整前端/类型/生产构建、17 视口、fmt/Clippy/workspace tests、Windows release/MSI/NSIS/启动。CI 启动后停止轮询；未运行 Linux/macOS Cargo/客户端动态验收，无新 workflow/runner/target/数据库/依赖或迁移。07 VERIFYING、08～12 BLOCKED。PG/历史四项/账本/有效 XLSX/Windows Full/私有 Golden Master 和继承 model.runs/0041 删除风险继续最终封包新库待验；ignored 编译不计 PASS。详见 [07 实施记录](modular-rewrite/R08-prediction-p4-orchestration/R08-07-run-persistence.md)。
+
+
+## R8-07 精确 Windows 验收与收尾（2026-10-08）
+
+精确实施 `58b390a6400646ac6131dfef0503a49ce1128eca` / [Windows run `37796909083`](https://github.com/uniquenesssta/123/actions/runs/37796909083) / job `113378629485` 全 SUCCESS，完成于 2026-10-08 23:27:02（北京时间）。完整日志确认 Application **92** / Persistence **148**、七项新增边界及原审计测试、前端契约/类型/生产构建、**17** 视口、fmt/Clippy/workspace tests、Windows release/MSI/NSIS 和启动 **7 条记录 / 3 个完成操作**通过。报告 `logs/windows-acceptance-20261008-145959.json`；artifact `11559974847`，14,025,581 字节，SHA-256 `b31ac49010ca525cd6c836fa9746be451ed5dc72bc8e918522e6ecad7e22f2ac`。
+
+已核对精确 SHA、全部 job/steps、日志与 artifact；实施时预期/待验文字保留为历史记录。07 正式 **DONE**，08 前置通过；用户已授权“收尾07开始08”，沿用唯一 R8 分支。收尾仅同步五份文档，源码/测试/清单保持上述已验树，链接/状态/diff 核对，不重复全量构建，文档提交使用 `[skip ci]`。真实 PG/历史四项/账本/有效 XLSX/Windows Full/私有 Golden Master 与继承 model.runs/0041 删除风险继续最终封包新库待验，ignored 不计实跑 PASS。

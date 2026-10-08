@@ -1,8 +1,8 @@
-# R08-07 Run Persistence 实施记录
+# R08-07 Run Persistence 完成记录
 
 ## 状态与基线
 
-2026-10-08，用户“开始07”后实施。状态 **VERIFYING**：本地静态门禁通过，本项精确 Windows CI 待验；08～12 BLOCKED，不继承06的动态 PASS。唯一阶段分支 `rewrite/r8-prediction-p4-orchestration`。起点/受控回退点 `eadb49d51722f50349509a0402c5a925402a53dc`，这是06文档收尾，其生产源码为已通过 `0969331` / Windows run `37752995641` 的树。当前状态见 [索引](README.md)，范围依据 [任务书](../../football-model-platform-modular-rewrite-19-docs/08-R8-prediction-p4-orchestration.md)。
+2026-10-08，用户“开始07”后实施。当前状态 **DONE**：精确 `58b390a` / Windows run `37796909083` 全 SUCCESS；本文实施时的预期/待验描述保留为历史，当前验收见末节。08 已获用户启动授权，09～12 BLOCKED。唯一阶段分支 `rewrite/r8-prediction-p4-orchestration`。起点/受控回退点 `eadb49d51722f50349509a0402c5a925402a53dc`，这是06文档收尾，其生产源码为已通过 `0969331` / Windows run `37752995641` 的树。当前状态见 [索引](README.md)，范围依据 [任务书](../../football-model-platform-modular-rewrite-19-docs/08-R8-prediction-p4-orchestration.md)。
 
 ## 实际来源与职责变化
 
@@ -103,3 +103,10 @@ Postgres 直接模块清单移除已删除 model_runs，计数36→35；runs 位
 保存/隐藏局部事务随原调用生命周期释放；无缓存、后台任务、监听器、定时器或额外 State。Mermaid Chart 已更新实际数据库比赛/手工请求、正式/影子、事务失败、历史读取/隐藏链路；交接时 Create State 保存节点/约束。
 
 失败时受控 revert 本节点完整提交，恢复基线 `eadb49d51722f50349509a0402c5a925402a53dc` 的唯一 owner，同步上述23文件、测试/门禁/清单与文档状态；不手工复制旧文件、不保留双实现、不修改历史数据库。当前实施记录不冒充已完成验收记录或阶段完成记录。
+
+
+## R8-07 精确 Windows 验收与收尾（2026-10-08）
+
+精确实施 `58b390a6400646ac6131dfef0503a49ce1128eca` / [Windows run `37796909083`](https://github.com/uniquenesssta/123/actions/runs/37796909083) / job `113378629485` 全 SUCCESS，完成于 2026-10-08 23:27:02（北京时间）。完整日志确认 Application **92** / Persistence **148**、七项新增边界及原审计测试、前端契约/类型/生产构建、**17** 视口、fmt/Clippy/workspace tests、Windows release/MSI/NSIS 和启动 **7 条记录 / 3 个完成操作**通过。报告 `logs/windows-acceptance-20261008-145959.json`；artifact `11559974847`，14,025,581 字节，SHA-256 `b31ac49010ca525cd6c836fa9746be451ed5dc72bc8e918522e6ecad7e22f2ac`。
+
+已核对精确 SHA、全部 job/steps、日志与 artifact；实施时预期/待验文字保留为历史记录。07 正式 **DONE**，08 前置通过；用户已授权“收尾07开始08”，沿用唯一 R8 分支。收尾仅同步五份文档，源码/测试/清单保持上述已验树，链接/状态/diff 核对，不重复全量构建，文档提交使用 `[skip ci]`。真实 PG/历史四项/账本/有效 XLSX/Windows Full/私有 Golden Master 与继承 model.runs/0041 删除风险继续最终封包新库待验，ignored 不计实跑 PASS。
