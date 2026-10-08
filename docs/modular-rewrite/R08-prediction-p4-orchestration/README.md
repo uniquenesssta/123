@@ -2,7 +2,7 @@
 
 ## 当前阶段状态
 
-`IN_PROGRESS`。唯一阶段分支 `rewrite/r8-prediction-p4-orchestration`，起点/回退基线 `90680bf945fbb0d1c191937c2d9e90c2c916fb00`。R8-01～07 已 DONE；07 精确 `58b390a` / Windows run `37796909083` 全 SUCCESS。08 已按用户指令实施、`VERIFYING`，自身Windows CI待验；09～12 `BLOCKED`。精确当前状态只由本索引维护。
+`IN_PROGRESS`。唯一阶段分支 `rewrite/r8-prediction-p4-orchestration`，起点/回退基线 `90680bf945fbb0d1c191937c2d9e90c2c916fb00`。R8-01～07 已 DONE；07 精确 `58b390a` / Windows run `37796909083` 全 SUCCESS。08 首轮 `91e9585` / Windows run `37804265878` 因测试专用顶层导入被Clippy拦截；已移入测试模块并通过本地受影响静态门禁，仍 `VERIFYING`，修复自身Windows CI待验；09～12 `BLOCKED`。精确当前状态只由本索引维护。
 
 ## 前置基线与范围
 
@@ -21,7 +21,7 @@ R8 依据 [任务书](../../football-model-platform-modular-rewrite-19-docs/08-R
 | R8-05 | Route / Model Request | DONE · [完成记录](R08-05-route-and-model-request.md) |
 | R8-06 | Model Execution Adapter | DONE · [完成记录](R08-06-model-execution-adapter.md) |
 | R8-07 | Run Persistence | DONE · [完成记录](R08-07-run-persistence.md) |
-| R8-08 | P4 Evidence Ledger | VERIFYING · [实施记录](R08-08-p4-evidence-ledger.md) · 自身Windows CI待验 |
+| R8-08 | P4 Evidence Ledger | VERIFYING · [实施/修复记录](R08-08-p4-evidence-ledger.md) · 首轮Clippy失败已修复，修复自身Windows CI待验 |
 | R8-09 | Fact Pipeline | BLOCKED |
 | R8-10 | Horizon Orchestration | BLOCKED |
 | R8-11 | Workbench Reads | BLOCKED |

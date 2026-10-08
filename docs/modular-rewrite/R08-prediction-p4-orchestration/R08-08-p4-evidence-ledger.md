@@ -4,7 +4,7 @@
 
 2026-10-08，用户“收尾07开始08”。07精确 `58b390a6400646ac6131dfef0503a49ce1128eca` / Windows run `37796909083` / job `113378629485` 已全SUCCESS，Application92/Persistence148、17视口、Windows构建/打包/启动通过；收尾文档 `1db0e195cdbc26514d7ad015b4110a53a446ba26` 使用 `[skip ci]`，生产源码保持。08从此开始，沿用唯一分支 `rewrite/r8-prediction-p4-orchestration`。
 
-08 **VERIFYING**：已实施，本地静态门禁通过，自身精确Windows CI待验；09～12 BLOCKED。没有将07的动态PASS继承为08。状态见 [索引](README.md)，范围依据 [任务书](../../football-model-platform-modular-rewrite-19-docs/08-R8-prediction-p4-orchestration.md)。
+08 **VERIFYING**：已实施，首轮 `91e9585` / Windows run `37804265878` 因测试专用顶层导入被Clippy拦截；已修复并通过本地受影响静态门禁，修复自身精确Windows CI待验；09～12 BLOCKED。没有将07的动态PASS继承为08。状态见 [索引](README.md)，范围依据 [任务书](../../football-model-platform-modular-rewrite-19-docs/08-R8-prediction-p4-orchestration.md)。
 
 ## 来源与最终职责
 
@@ -95,6 +95,16 @@
 工作目录报告 `/workspace/scratch/0c69084e7a7f/r808-source-checks.json`、`r808-architecture.log`、`r808-negative-probes.json`、`r808-equivalence.json`，原仓库命令可重现。六项临时破坏探针（漏事务锁、漏metadata指纹、放宽字节键上限、漏冲突实体ID、跳过Schema版本、提前commit）全部被原Prediction gate拒绝，逐一恢复并健康复跑PASS，不提交临时探针。首次architecture仅P4新增直接模块计数未同步，精确35→36修正后完整通过，owner集合未放宽。
 
 清单仅登记新P4直接module与原使用方；Domain扫描1051→1060，365类型/300映射和sourceDigest `217241ac243726a5ab6805a7f169e222b97e78c7c971749a5904714af673ebdd`保持，usageDigest `307b38c0ae795e65133ae11522339b21a47bd8ab5cc1129f02f679ca0ba97608`。Application390/43Ports及契约不变；PG runtime_sources仅刷新原postgres_integration blob `eb0f4dd987b3f4374a57c1f5295c8be0ffaf9966`。保护区、dependencies/locks、0001～0046、数据库runtime生产设施均不改。
+
+## 首轮 Windows CI 失败与修复（2026-10-09）
+
+首轮源码 `91e958581f8b675b58e56524c33834511af4985e` / [run `37804265878`](https://github.com/uniquenesssta/123/actions/runs/37804265878) / job `113404293519` 为 FAILURE。完整架构、前端契约/类型/生产构建、17视口和Cargo锁同步已通过；Rust验收在Clippy `-D warnings` 因 `p4_records.rs:8` 的未使用 `EvidenceVerificationState` 导入退出101，Rust tests及Windows release/MSI/NSIS/启动未完成，不记通过。
+
+该类型拆分后仅由原快照测试夹具使用，生产状态投影已在 `evidence_ledger/row.rs`。将其从生产顶层use移入原 `#[cfg(test)] mod tests`，保留测试使用和严格警告门槛；同次拆分的账本/幂等模块导入已核对。唯一Domain清单仅更新 `rustUsageDigest` 为 `38d0ed328bcb3015ded4bcc7a85ab2b6206db82152d5eec2b3c8e1953218baaa`，365类型/300映射、声明摘要与使用方集合保持。
+
+修复仅修改 `p4_records.rs`、`architecture/domain-type-inventory.json`、根README、本实施记录及阶段索引；无新增/移动/删除文件。生产函数、SQL、测试体、公开契约、依赖、迁移和模型资产不变，无警告抑制或新增专项测试。
+
+修复本地 `npm run verify:architecture`、Rustfmt 1.88.0 单文件格式检查、`node scripts/verify-rust-source-hygiene.mjs`、`git diff --check` 已PASS；导入之外的生产/测试函数逐字比较保持。第一次本地架构检查因导入调整后使用摘要未同步而失败，按原生成器同步并审查唯一摘要差异后完整复跑通过。未执行非Windows Cargo/客户端动态验证；本轮修复的Clippy/workspace tests/Windows构建打包启动仍由原Windows CI验证，启动后停止轮询，08不提前DONE，09～12继续BLOCKED。修复可单独revert本次提交；完整节点回退仍按下方原08基线。
 
 ## 待验、交接与回退
 

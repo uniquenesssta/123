@@ -24,6 +24,8 @@ R8-08 P4 Evidence Ledger 已实施、`VERIFYING`：证据追加与冲突建组�
 
 08 实际本地通过83/83原源码检查、完整architecture、Rustfmt、18保护资产/171命令/46迁移及18PG静态契约、git diff --check，六项破坏探针均拒绝恢复。原Persistence target新增8项边界测试，预期 **156** / Application **92**；原PG Stage C扩原文读回/纳秒指纹、引用/SQL失败无残留、并发同键重试与单条审计、去重冲突/单opened事件及append-only，仍ignored。本项须自身Windows CI，启动后停止轮询；真实PG/历史四项/账本/XLSX/Windows Full/私有Golden Master及继承删除风险仍最终封包新库待验。09～12 BLOCKED，无新runner/workflow/target/数据库/依赖。
 
+08 首轮 `91e9585` / [Windows run `37804265878`](https://github.com/uniquenesssta/123/actions/runs/37804265878) 在 Clippy 因 `p4_records.rs` 的测试专用 `EvidenceVerificationState` 顶层导入失败；前端契约、类型、生产构建与17视口已通过，Rust测试/打包/启动未完成。现将导入移入原 `#[cfg(test)]` 模块并同步唯一 Domain 使用摘要，完整架构、Rustfmt 1.88、源码卫生及差异检查通过；业务函数和原测试体保持。本项仍 `VERIFYING`，修复须重新取得自身Windows全链路结果。
+
 ## 公开边界
 
 - 保留 `crates/model-api`、模型 ID、路由、规则包入口、预测页面和历史数据结构。

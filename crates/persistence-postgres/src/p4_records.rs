@@ -5,11 +5,11 @@ use crate::adapters::p4::{
 };
 use chrono::{DateTime, Utc};
 use football_domain::{
-    CompetitionProfileVersionDraft, CompetitionProfileVersionRecord, EvidenceVerificationState,
-    P4Horizon, PrematchSnapshotBundle, PrematchSnapshotDraft, PrematchSnapshotRecord,
-    PromptVersionDraft, PromptVersionRecord, ResearchRunDraft, ResearchRunEventDraft,
-    ResearchRunRecord, ResearchRunStatus, SchemaVersionDraft, SchemaVersionRecord,
-    SnapshotFeatureDraft, SnapshotProbabilityDraft, SnapshotSourceKind, P4_FEATURE_FIELD_COUNT,
+    CompetitionProfileVersionDraft, CompetitionProfileVersionRecord, P4Horizon,
+    PrematchSnapshotBundle, PrematchSnapshotDraft, PrematchSnapshotRecord, PromptVersionDraft,
+    PromptVersionRecord, ResearchRunDraft, ResearchRunEventDraft, ResearchRunRecord,
+    ResearchRunStatus, SchemaVersionDraft, SchemaVersionRecord, SnapshotFeatureDraft,
+    SnapshotProbabilityDraft, SnapshotSourceKind, P4_FEATURE_FIELD_COUNT,
 };
 use serde_json::{json, Value};
 use sha2::{Digest, Sha256};
@@ -1331,6 +1331,7 @@ fn parse_research_status(value: &str) -> PersistenceResult<ResearchRunStatus> {
 mod tests {
     use super::*;
     use chrono::Duration;
+    use football_domain::EvidenceVerificationState;
 
     fn feature(order: u8) -> SnapshotFeatureDraft {
         SnapshotFeatureDraft {
