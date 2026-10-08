@@ -1,8 +1,8 @@
-# R8-06 Model Execution Adapter：实施记录
+# R8-06 Model Execution Adapter：节点完成记录
 
 ## 状态与基线
 
-`VERIFYING`。2026-10-08 用户授权“05收尾开始06”，唯一分支 `rewrite/r8-prediction-p4-orchestration`。05 精确代码 `2aa99a7` / Windows run `36971419476` 已通过，收尾文档 run `37737677787` 亦 SUCCESS。06 起点/回退基线为 `4420fd48ab5e88d55ce15e5b0cdc4b6b05f1c43d`；它只补 UI 接入文档，模型源码仍为已验证 05 实现。06 需取得自身精确 Windows CI，不继承前项 PASS；07～12 仍 BLOCKED。
+`DONE`（唯一职责与 Windows Automated 已完成；真实 PG、私有固定回归和 Full 仍待验）。2026-10-08 用户反馈“已通过”，本轮独立核实精确提交与 Windows CI 后收尾。唯一分支 `rewrite/r8-prediction-p4-orchestration`；实施提交 `09693318f8a7c8a557a15b89ef3a81e7ea391b11`，自身 Windows run `37752995641` / job `113230527909` 全 SUCCESS。06 起点/回退基线为 `4420fd48ab5e88d55ce15e5b0cdc4b6b05f1c43d`，该提交只补 UI 接入文档，模型源码仍为已验证 05 实现。07 前置门禁通过、READY 尚未实施；08～12 BLOCKED。
 
 ## 修改原因与最终职责
 
@@ -43,7 +43,7 @@
 
 ## 验证与失败处理
 
-新增 7 项测试进入原 Application target，预期 Application 92（85+7）/Persistence 141；尚未将预期数量记为动态 PASS。覆盖精确注册/Arc、缺失错误、实际 context/原 scope 提示、完整请求和全部输出保真、五类错误/单次调用、毫秒截断和饱和、默认 dry run 无额外支持/校验、路由失败优先级/不写历史。原正式/影子和审计测试继续沿用。
+新增 7 项测试进入原 Application target，精确 Windows CI 已实际通过 Application 92（85+7）/Persistence 141。覆盖精确注册/Arc、缺失错误、实际 context/原 scope 提示、完整请求和全部输出保真、五类错误/单次调用、毫秒截断和饱和、默认 dry run 无额外支持/校验、路由失败优先级/不写历史。原正式/影子和审计测试继续沿用。
 
 实际本地验证（Node 24.19.0，Rustfmt 1.88.0）：
 
@@ -56,8 +56,16 @@
 
 首轮源码检查发现格式化后 usage scan 过期、原组合根精确文件集合未登记新 adapter，已刷新原清单并更新精确集合，83项及完整架构复跑通过；未删除公共注册/状态 owner 断言。现有本地 formatter 动态库不可读，恢复同版本工具后目标格式检查通过。没有本地 Linux/macOS Cargo或客户端动态验证，也没有新增workflow、runner、test target、数据库或依赖。
 
-本提交推送后沿用原 Windows CI 验证完整前端、17视口、fmt/Clippy/workspace tests、release/MSI/NSIS与启动；确认启动即结束，不持续轮询。CI成功才能将06改为DONE并开始07。真实PG/历史四项/账本、有效XLSX、Windows Full、私有Golden Master及继承delete_match→model.runs.match_id NULL与0041不可变trigger冲突，继续最终封包新库待验，ignored不计PASS。
+实施提交推送后沿用原 Windows CI，确认启动即结束，未持续轮询；本轮根据用户反馈核实该提交的独立结果。真实PG/历史四项/账本、有效XLSX、Windows Full、私有Golden Master及继承delete_match→model.runs.match_id NULL与0041不可变trigger冲突，继续最终封包新库待验，ignored不计PASS。
+
+## 精确 Windows 验收与收尾
+
+- [Windows run `37752995641`](https://github.com/uniquenesssta/123/actions/runs/37752995641)，HEAD `09693318f8a7c8a557a15b89ef3a81e7ea391b11`，job `113230527909` 全 SUCCESS；完成于 **2026-10-08 17:12:32（北京时间）**。核对分支、精确 SHA、全部步骤、完整日志及 artifact，未继承其他节点结果。
+- Application **92** / Persistence **141** 实际通过，adapter 的七项新增测试均 `ok`；前端契约/类型/生产构建、**17** 视口、Rust fmt/Clippy/workspace tests 全通过。ignored PG/contract 继续单列待验。
+- Windows release、MSI、NSIS 和客户端启动/状态载入通过；运行日志验收 **7 条记录 / 3 个完成操作**。报告 `logs/windows-acceptance-20261008-085549.json`。
+- artifact `11539138019`，**14,023,860 字节**，SHA-256 `c0e37e6bb7c706aa292215859844a93491266978dc88f4819abd93b3fb568dd3`；核实时未过期，保留至 2026-10-22。精确摘要和验收证据在本记录保存。
+- 本轮仅修改本记录、阶段索引、R8 任务书、根 README 和 TESTING 共五份文档；无新增、移动/重命名或删除文件，源码/测试/清单/依赖/工作流不变。复用上述已验证源码证据，验证相对链接、状态和 Git 差异；纯文档提交使用 `[skip ci]`，不重复全量构建。
 
 ## 入口、回退与继续
 
-两个执行入口已切换到唯一 adapter，旧模型边界块已移除；保存仍是原 owner，没有提前实现07。使用Git受控revert本节点提交回退至`4420fd4`，同步调用、门禁、清单和文档，不复制旧代码建立双实现或修改历史数据。Mermaid Chart已更新实际链路，结束时Create State保存当前VERIFYING状态与约束。下一步是用户反馈06 CI后核验精确SHA和日志，成功则收尾06并按指令开始07。
+两个执行入口已切换到唯一 adapter，旧模型边界块已移除；保存仍是原 owner，没有提前实现07。使用Git受控revert本节点提交回退至`4420fd4`，同步调用、门禁、清单和文档，不复制旧代码建立双实现或修改历史数据。实施时 Mermaid Chart 已更新实际链路，本轮仅收尾、不改变架构。06 已 DONE；07 为唯一 READY，等待用户启动指令，08～12 继续 BLOCKED，不创建未完成的 R8 阶段完成记录。结束时 Create State 保存精确验收和继续位置。

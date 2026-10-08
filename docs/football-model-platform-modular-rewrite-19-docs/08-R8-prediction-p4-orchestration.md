@@ -11,7 +11,7 @@
 
 适用总纲顶部的执行订正：仅 Windows 动态验证，沿用原单测/contract、既有 Windows runner/workflow/数据库入口；不新增专项或持续回归体系。公开仓库没有私有 P4/P7 引擎、参数和 Golden Master；模型保护资产可验证，公共 unavailable stub 的通过不能冒充私有固定概率实跑。目录模板按实际职责及 Rust 模块命名调整；顺序执行的后端 use case 无新增 UI 生命周期，不强制新增 State、请求 ID 或空出口。
 
-R8-01～05 已取得各自精确 Windows CI（`cba72fd` / `36881256338`、`cc2b0fe` / `36891488571`、`47ba3de` / `36902069546`、`59c5679` / `36966815323`、修复 `2aa99a7` / `36971419476`）及正式完成记录。06 前置通过、尚未实施；各项精确当前状态只由 [阶段索引](../modular-rewrite/R08-prediction-p4-orchestration/README.md) 维护。06 实施后必须取得自身 Windows CI，不继承前项 PASS。
+R8-01～06 已取得各自精确 Windows CI（`cba72fd` / `36881256338`、`cc2b0fe` / `36891488571`、`47ba3de` / `36902069546`、`59c5679` / `36966815323`、修复 `2aa99a7` / `36971419476`、`0969331` / `37752995641`）及正式完成记录。07 前置通过、READY 尚未实施；各项精确当前状态只由 [阶段索引](../modular-rewrite/R08-prediction-p4-orchestration/README.md) 维护。07 及后续实施后必须取得自身 Windows CI，不继承前项 PASS。
 
 ## 1. 阶段目标
 
@@ -882,7 +882,7 @@ crates/application/src/use_cases/prediction/route_model_request/
 
 ## R8-06 Model Execution Adapter
 
-05 代码与收尾门禁均已通过；06 实现完成、`VERIFYING`，等待自身 Windows CI。精确状态见 [阶段索引](../modular-rewrite/R08-prediction-p4-orchestration/README.md) 和 [实施记录](../modular-rewrite/R08-prediction-p4-orchestration/R08-06-model-execution-adapter.md)。
+06 精确提交 `0969331` / Windows run `37752995641` 全 SUCCESS，已收尾为 `DONE`；Application 92/Persistence 141、七项新增测试、17 视口和 Windows 构建/打包/启动均通过。精确状态见 [阶段索引](../modular-rewrite/R08-prediction-p4-orchestration/README.md) 和 [完成记录](../modular-rewrite/R08-prediction-p4-orchestration/R08-06-model-execution-adapter.md)。
 
 ### 1. 目标
 
@@ -1022,7 +1022,7 @@ crates/application/src/use_cases/prediction/dry_run_default_fixture/mod.rs
 
 ## R8-07 Run Persistence
 
-状态：`BLOCKED`（仅当上一任务与本任务前置门禁通过后改为 `READY`）
+状态：`READY`（06 精确 Windows 门禁及完成记录已通过；尚未实施，等待用户启动指令）
 
 ### 1. 目标
 

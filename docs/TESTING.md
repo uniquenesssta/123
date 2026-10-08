@@ -213,7 +213,7 @@ artifact `11212471101`，14,023,932 字节，SHA-256 `1cb00b0a91d1bbf25270dc8fb5
 本轮仅文档收尾，源码/测试/清单不变，复用上述已验证源码证据；只核对相对链接、状态、Git 差异和源码不变，不重复非 Windows Cargo/客户端动态或全量构建。PG/历史四项/账本/XLSX/Windows Full/私有 Golden Master 与继承 model.runs/0041 删除 trigger 风险仍最终新库待验，ignored 不计 PASS。05 完成，06 READY 尚未实施。
 
 
-## R8-06 实施验证（2026-10-08；等待 Windows CI）
+## R8-06 实施验证（2026-10-08；实施时记录，已通过见下方收尾）
 
 R8-05 的精确代码 run `36971419476` 和收尾文档 run `37737677787` 均 SUCCESS。06 不继承其动态 PASS。新模型适配器在原 Application 单测 target 内增加 7 项测试：精确注册/Arc 身份与缺失错误、实际 context/原 scope 提示、完整请求/输出保真、五类模型错误与单次调用、毫秒截断/饱和、默认 dry run 省略 supports/validate、路由失败先后顺序与不写历史。预期 Application 92（85+7）/Persistence 141；以本次精确 Windows 日志为准，不把静态解析计为 Rust 测试通过。
 
@@ -222,3 +222,11 @@ R8-05 的精确代码 run `36971419476` 和收尾文档 run `37737677787` 均 SU
 执行中首次静态门禁发现格式化后的 usage scan 过期，以及原组合根文件集合未登记 adapter；已用原生成器刷新清单并精确登记文件，复跑通过。现有 Rustfmt 运行库在本地不可读，恢复同版本工具后目标格式检查通过；未运行 Linux/macOS Cargo 或客户端动态检查。Windows CI 复用原 workflow 完成完整 frontend、17 视口、fmt/Clippy/workspace tests、release/MSI/NSIS/启动，启动后停止轮询。06 VERIFYING，07 未开始；详见 [实施记录](modular-rewrite/R08-prediction-p4-orchestration/R08-06-model-execution-adapter.md)。
 
 没有新 workflow/runner/test target/数据库/依赖，公共接口、模型算法/参数/18 资产、43 Ports、171 命令、365 Domain/300 映射及迁移0001～0046保持。伪提供器只验证编排边界；私有固定比赛/Golden Master、真实 PG/历史四项/账本/XLSX/Windows Full 和继承历史删除风险仍最终新库待验，ignored 不计 PASS。
+
+## R8-06 精确 Windows 验收与收尾（2026-10-08）
+
+实施提交 `09693318f8a7c8a557a15b89ef3a81e7ea391b11` 的 [Windows run `37752995641`](https://github.com/uniquenesssta/123/actions/runs/37752995641) / job `113230527909` 全 SUCCESS，完成于 2026-10-08 17:12:32（北京时间）。核对精确 SHA、全部步骤、完整日志和 artifact；前节预期数及待 CI 状态仅属实施历史。
+
+Application **92** / Persistence **141**、七项新增 adapter 测试、前端契约/类型/生产构建、**17** 视口、Rust fmt/Clippy/workspace tests、Windows release/MSI/NSIS 和客户端启动/状态载入全部通过。运行日志 **7 条记录 / 3 个完成操作**通过；报告 `logs/windows-acceptance-20261008-085549.json`。artifact `11539138019`，14,023,860 字节，SHA-256 `c0e37e6bb7c706aa292215859844a93491266978dc88f4819abd93b3fb568dd3`。详见 [06 完成记录](modular-rewrite/R08-prediction-p4-orchestration/R08-06-model-execution-adapter.md)。
+
+本轮仅五份现有文档收尾，源码/测试/清单不变，复用已验证证据并检查链接、状态及差异，使用 `[skip ci]` 不重复全量构建。06 DONE；07 READY 尚未实施，08～12 BLOCKED。ignored PG/contract、真实 PG/历史四项/账本/有效 XLSX/Windows Full/私有 Golden Master 和继承历史删除风险继续最终封包新库待验，不计实跑通过。

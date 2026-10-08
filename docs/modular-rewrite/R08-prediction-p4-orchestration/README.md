@@ -2,7 +2,7 @@
 
 ## 当前阶段状态
 
-`IN_PROGRESS`。唯一阶段分支 `rewrite/r8-prediction-p4-orchestration`，起点/回退基线 `90680bf945fbb0d1c191937c2d9e90c2c916fb00`。R8-01～05 已 DONE；R8-06 `VERIFYING`，实现与本地静态门禁完成，等待自身 Windows CI；07～12 `BLOCKED`。精确当前状态只由本索引维护。
+`IN_PROGRESS`。唯一阶段分支 `rewrite/r8-prediction-p4-orchestration`，起点/回退基线 `90680bf945fbb0d1c191937c2d9e90c2c916fb00`。R8-01～06 已 DONE；R8-06 精确 `0969331` / Windows run `37752995641` 全 SUCCESS。07 为唯一 `READY`，尚未实施；08～12 `BLOCKED`。精确当前状态只由本索引维护。
 
 ## 前置基线与范围
 
@@ -19,8 +19,8 @@ R8 依据 [任务书](../../football-model-platform-modular-rewrite-19-docs/08-R
 | R8-03 | Readiness Audit | DONE · [完成记录](R08-03-readiness-audit.md) |
 | R8-04 | Deterministic Input Manifest | DONE · [完成记录](R08-04-deterministic-input-manifest.md) |
 | R8-05 | Route / Model Request | DONE · [完成记录](R08-05-route-and-model-request.md) |
-| R8-06 | Model Execution Adapter | VERIFYING · [实施记录](R08-06-model-execution-adapter.md) |
-| R8-07 | Run Persistence | BLOCKED |
+| R8-06 | Model Execution Adapter | DONE · [完成记录](R08-06-model-execution-adapter.md) |
+| R8-07 | Run Persistence | READY · 尚未实施 |
 | R8-08 | P4 Evidence Ledger | BLOCKED |
 | R8-09 | Fact Pipeline | BLOCKED |
 | R8-10 | Horizon Orchestration | BLOCKED |
@@ -35,7 +35,7 @@ Readiness 评分/检查、manifest 算法、路由与模型执行仍由现有 ow
 
 ## 动态待验与阶段出口
 
-R8-01～05 已取得各自精确 Windows CI；R8-06 实施后须独立取得精确门禁，不继承前项 PASS。数据库相关 contracts、历史四项/账本、模型历史删除风险、有效 XLSX、Windows Full 的真实结果仍最终新库待验，详见 R7 阶段清单。模型保护或真实固定回归不可取得时明确说明，公共 unavailable stub 不冒充私有引擎 Golden Master。后续节点成功后逐项更新；未完成全部节点不创建阶段完成记录。
+R8-01～06 已取得各自精确 Windows CI；07 及后续实施后仍须独立取得精确门禁，不继承前项 PASS。数据库相关 contracts、历史四项/账本、模型历史删除风险、有效 XLSX、Windows Full 的真实结果仍最终新库待验，详见 R7 阶段清单。模型保护或真实固定回归不可取得时明确说明，公共 unavailable stub 不冒充私有引擎 Golden Master。后续节点成功后逐项更新；未完成全部节点不创建阶段完成记录。
 
 ## R8-01 实施与门禁记录（已通过）
 
@@ -139,7 +139,7 @@ R8-01～05 已取得各自精确 Windows CI；R8-06 实施后须独立取得精�
 本轮只新增完成记录并同步根 README、TESTING、任务书、本索引，源码/测试/清单不变，复用已验证 `2aa99a7` 源码。05 DONE；06 前置通过、READY 尚未实施；07～12 BLOCKED。PG/历史四项/账本/XLSX/Full/私有 Golden Master 和继承删除 trigger 风险继续最终封包新库待验。纯文档提交不重复全量验证，不将自动触发的尚未结束 CI 计为通过。
 
 
-## R8-05 收尾确认 / R8-06 实施（2026-10-08）
+## R8-05 收尾确认 / R8-06 实施（2026-10-08；实施时记录，已通过见下方收尾）
 
 05 代码验收 run `36971419476` 与收尾文档 run `37737677787` 均已 SUCCESS。06 从当前 `4420fd48ab5e88d55ce15e5b0cdc4b6b05f1c43d` 开始；该提交仅补充 UI 设计接入文档，模型代码仍为已验证 `2aa99a7`，沿用唯一 R8 分支。
 
@@ -148,3 +148,9 @@ R8-01～05 已取得各自精确 Windows CI；R8-06 实施后须独立取得精�
 原 Application target 新增 7 项模型边界测试；预期 Application 92（85+7）、Persistence 141，须本次精确 Windows CI 实跑。实际本地 PASS：83/83 原源码检查、完整 verify:architecture、Rustfmt 1.88.0 目标检查、18 保护资产、171 命令、46 迁移/18 PG 契约静态基线、git diff --check。六探针（跳过支持、提示类型漂移、丢错误详情、耗时溢出、额外 validate、绕过 adapter）均拒绝并恢复；原执行器重新内联后去空白比较完全一致。原组合根精确文件集合同步登记 adapter，未放宽公共注册/状态所有者断言。清单仅刷新使用方/源码扫描：Application 388→390，Domain 1044→1046；43/365/300 与声明摘要不变。
 
 详细文件和验证见 [06 实施记录](R08-06-model-execution-adapter.md)。无 Linux/macOS Cargo/客户端动态验收、无新 runner/workflow/target/DB；本次 Windows CI 开始后停止轮询。06 VERIFYING，07～12 BLOCKED；CI 成功才收尾06并开放07。PG/历史四项/账本/XLSX/Full/私有 Golden Master 与继承删除 trigger 风险仍最终新库待验。Mermaid Chart 已更新真实链路，结束时 Create State 保存继续位置。
+
+## R8-06 收尾（2026-10-08）
+
+用户反馈“已通过”后核实精确实施 `09693318f8a7c8a557a15b89ef3a81e7ea391b11` / [Windows run `37752995641`](https://github.com/uniquenesssta/123/actions/runs/37752995641) / job `113230527909` 全 SUCCESS；完成于 2026-10-08 17:12:32（北京时间）。日志确认 Application **92** / Persistence **141**、七项新增 adapter 测试、17 视口、Rust/前端、Windows release/MSI/NSIS 及启动 **7 条记录 / 3 个完成操作**通过。artifact `11539138019`，14,023,860 字节，SHA-256 `c0e37e6bb7c706aa292215859844a93491266978dc88f4819abd93b3fb568dd3`；报告 `logs/windows-acceptance-20261008-085549.json`。详见 [06 完成记录](R08-06-model-execution-adapter.md)。
+
+本轮仅同步五份现有文档，源码/测试/清单保持已验证状态，检查链接、任务状态和差异；纯文档提交使用 `[skip ci]`，不重复构建。06 DONE；07 前置通过、READY 尚未实施，等待用户启动指令；08～12 BLOCKED。真实 PG/历史四项/账本/XLSX/Windows Full/私有 Golden Master 及继承历史删除风险继续最终封包新库待验，ignored 不计 PASS。架构无变化，沿用实施时链路图；Create State 保存验收与继续位置。

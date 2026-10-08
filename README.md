@@ -14,7 +14,7 @@ R8-04 输入清单已收尾，精确 `59c5679` / Windows run `36966815323` 通�
 
 R8-05 路由与模型请求已收尾：精确修复 `2aa99a7` / [Windows run `36971419476`](https://github.com/uniquenesssta/123/actions/runs/36971419476) 通过 Application 85/Persistence 141、十项路由请求测试、17 视口、Rust/前端、Windows release/MSI/NSIS/启动。原 shared/routing 已删除，唯一 route_model_request 持有原选择/校验/上下文/请求职责；首轮测试专用导出引起的 Clippy 失败已修复并通过。详见 [05 完成记录](docs/modular-rewrite/R08-prediction-p4-orchestration/R08-05-route-and-model-request.md) 与 [R8 索引](docs/modular-rewrite/R08-prediction-p4-orchestration/README.md)。05 收尾文档 CI `37737677787` 亦已通过；真实 PG/私有固定回归/Full 及继承历史删除风险仍最终新库待验。
 
-R8-06 已实施，状态 `VERIFYING`：注册模型查找、supports、predict、完整错误转换及原毫秒计时收拢到唯一 `model_registry/prediction_model_adapter.rs`，原执行器和默认 dry run 接入；默认 dry run 不增加 supports/validate。新增 adapter、其 tests.rs 和 [06 实施记录](docs/modular-rewrite/R08-prediction-p4-orchestration/R08-06-model-execution-adapter.md)，修改两个执行入口、模块登记、两原验证器、Domain/Port 清单与相关文档；无完整文件移动/删除。7 项测试加入原 Application target，预期 92/Persistence 141，动态结果待本次 Windows CI。83 项源码检查、完整架构、Rustfmt、保护/命令/迁移静态契约及六项拒绝探针已通过；无 Linux/macOS 动态验证、新基础设施或模型变化。正式/影子保存留 R8-07，07～12 仍 BLOCKED。CI 启动即结束本轮，回退基线 `4420fd4`。
+R8-06 已收尾为 `DONE`：注册查找、supports、predict、完整错误转换和原毫秒计时收拢到唯一模型适配器，原执行器与默认 dry run 直接复用；默认 dry run 保留无额外 supports/validate 的行为。精确 `0969331` / [Windows run `37752995641`](https://github.com/uniquenesssta/123/actions/runs/37752995641) 通过 Application **92** / Persistence **141**、七项新增边界测试、17 视口、Rust/前端、Windows release/MSI/NSIS 及启动验收。详见 [06 完成记录](docs/modular-rewrite/R08-prediction-p4-orchestration/R08-06-model-execution-adapter.md)。07 Run Persistence 为唯一 READY、尚未实施；08～12 BLOCKED。真实 PG/私有固定回归/Full 和继承历史删除风险继续最终新库待验。本轮仅补齐五份文档，复用精确源码证据，提交使用 `[skip ci]`。
 
 ## 公开边界
 
