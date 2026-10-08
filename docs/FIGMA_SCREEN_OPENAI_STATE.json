@@ -1,12 +1,12 @@
 {
-  "schemaVersion":1,
-  "runId":"footfigma-screens-openai-2026-10-08",
+  "schemaVersion":1,"runId":"footfigma-screens-openai-2026-10-08",
   "repo":"uniquenesssta/123","branch":"ui-design-system","fileKey":"PN0Whgu6HLWIHx4Mv6aHfu","page":"3:5",
-  "currentScreen":"S14 openai / 兼容API配置","currentRoute":"openai","phase":"in_progress_semantics_verified","currentExecutionFinished":false,
-  "acceptedRouteCount":13,"routeCount":17,"previousAcceptedGlobalCheckpoint":"9ae16eaf438d3a8963fd2868e9b26611fd963dd4",
+  "currentScreen":"S14 openai / 兼容API配置","currentRoute":"openai","phase":"in_progress_composed_pending_qa","currentExecutionFinished":false,
+  "acceptedRouteCount":13,"routeCount":17,"previousAcceptedGlobalCheckpoint":"9ae16eaf438d3a8963fd2868e9b26611fd963dd4","initialWipCommit":"460eb0dcadd58e40842291d900ee0157eb4fdf40",
   "source":{"page":"src/pages/openai.ts@main","profileStore":"src-tauri/src/openai_profiles.rs@549d12bca870402f9916256fcd40c96439ce81d2","parser":"crates/research-gateway/src/api_example.rs@0075cb5ebc4f1130acdc0b5159c652e39c15a3e9"},
-  "guards":["Saved metadata, key existence, selected editor, active profile and last tested snapshot are distinct","Key display cannot retrieve a stored secret; all examples contain only placeholder text","API Example parsing is not command execution or network testing","Activation requires a key, not a successful connection test","Responses is a formal research candidate, not proof of full research capability","Connection-changing saves invalidate old test results; late responses must match tested settings","Removing keys and deleting profiles do not rebind existing chat sessions","No live network, credentials, billing or database changes"],
-  "frames":{},"pending":["compose editable screens","prototype and safe cross-route entries","screenshots and deep validation","synchronize independent state, README, plans and global checkpoint"],
-  "authority":"Figma supplies visual geometry, typography and colors; source supplies semantics only.",
-  "applicationSourceModified":false,"existingMastersModified":false,"nextScreen":"S15 database / 数据库","nextScreenStarted":false
+  "frames":{"Profiles":"647:166715","Profiles Dark":"651:167034","Profiles Compact":"651:167868","New":"651:168625","No Profiles":"651:169406","Loading":"651:170197","Load Error":"651:170991","Profile B":"651:171785","Profile C":"651:172553","Request Changed":"651:173334","Name Conflict":"651:174063","Invalid Settings":"651:174853","Example":"654:174172","Example Parsing":"654:175244","Example Responses":"654:176368","Example Chat":"654:177329","Example Multiple":"654:178290","Example Invalid":"654:179251","Example Stale":"654:180254","Models":"654:181253","Models Invalid":"654:182260","Tests":"652:170058","Saving":"652:170930","Saved":"652:171939","Save Failed":"652:172668","Save Unknown":"652:173399","Testing A":"652:174370","Test Success A":"652:175187","Test Failed A":"652:175952","Stale Test A":"652:176717","B While A Testing":"652:177484","Activated B":"652:178251","Key Removed A":"652:178995","Deleted A":"652:179750","No Database":"652:180494","Security":"654:183373","Models Compact":"654:184178","Replacement Key":"652:181227"},
+  "productStateFrameCount":38,"dialogFrames":{},"reviewHub":null,
+  "pending":["identity wording alignment and deep structural checks","scoped prototype/dialogs and genuine S13 incoming routes","contrast and screenshot verification","synchronize accepted independent record, README, two plans and global state"],
+  "authority":"Figma determines visual geometry, typography and colors; source provides semantics only.",
+  "applicationSourceModified":false,"existingMastersModified":false,"runtimeCallsPerformed":false,"nextScreen":"S15 database / 数据库","nextScreenStarted":false
 }
