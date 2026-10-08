@@ -1,0 +1,12 @@
+{
+  "schemaVersion":1,
+  "runId":"footfigma-screens-openai-2026-10-08",
+  "repo":"uniquenesssta/123","branch":"ui-design-system","fileKey":"PN0Whgu6HLWIHx4Mv6aHfu","page":"3:5",
+  "currentScreen":"S14 openai / 兼容API配置","currentRoute":"openai","phase":"in_progress_semantics_verified","currentExecutionFinished":false,
+  "acceptedRouteCount":13,"routeCount":17,"previousAcceptedGlobalCheckpoint":"9ae16eaf438d3a8963fd2868e9b26611fd963dd4",
+  "source":{"page":"src/pages/openai.ts@main","profileStore":"src-tauri/src/openai_profiles.rs@549d12bca870402f9916256fcd40c96439ce81d2","parser":"crates/research-gateway/src/api_example.rs@0075cb5ebc4f1130acdc0b5159c652e39c15a3e9"},
+  "guards":["Saved metadata, key existence, selected editor, active profile and last tested snapshot are distinct","Key display cannot retrieve a stored secret; all examples contain only placeholder text","API Example parsing is not command execution or network testing","Activation requires a key, not a successful connection test","Responses is a formal research candidate, not proof of full research capability","Connection-changing saves invalidate old test results; late responses must match tested settings","Removing keys and deleting profiles do not rebind existing chat sessions","No live network, credentials, billing or database changes"],
+  "frames":{},"pending":["compose editable screens","prototype and safe cross-route entries","screenshots and deep validation","synchronize independent state, README, plans and global checkpoint"],
+  "authority":"Figma supplies visual geometry, typography and colors; source supplies semantics only.",
+  "applicationSourceModified":false,"existingMastersModified":false,"nextScreen":"S15 database / 数据库","nextScreenStarted":false
+}
