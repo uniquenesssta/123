@@ -1,10 +1,10 @@
-# R08-08 P4 Evidence Ledger 实施记录
+# R08-08 P4 Evidence Ledger 完成记录
 
 ## 状态与基线
 
 2026-10-08，用户“收尾07开始08”。07精确 `58b390a6400646ac6131dfef0503a49ce1128eca` / Windows run `37796909083` / job `113378629485` 已全SUCCESS，Application92/Persistence148、17视口、Windows构建/打包/启动通过；收尾文档 `1db0e195cdbc26514d7ad015b4110a53a446ba26` 使用 `[skip ci]`，生产源码保持。08从此开始，沿用唯一分支 `rewrite/r8-prediction-p4-orchestration`。
 
-08 **VERIFYING**：已实施，首轮 `91e9585` / Windows run `37804265878` 因测试专用顶层导入被Clippy拦截；已修复并通过本地受影响静态门禁，修复自身精确Windows CI待验；09～12 BLOCKED。没有将07的动态PASS继承为08。状态见 [索引](README.md)，范围依据 [任务书](../../football-model-platform-modular-rewrite-19-docs/08-R8-prediction-p4-orchestration.md)。
+08 **DONE**：精确修复 `52f23ab4e582f313f412058623f0d83a6ddf6f98` / Windows run `37817443918` / job `113449572979` 全SUCCESS，首轮测试专用导入导致的Clippy失败已关闭。用户已授权“收尾08开始09”；09从该已验源码继续，10～12 BLOCKED。状态见 [索引](README.md)，范围依据 [任务书](../../football-model-platform-modular-rewrite-19-docs/08-R8-prediction-p4-orchestration.md)。
 
 ## 来源与最终职责
 
@@ -106,10 +106,16 @@
 
 修复本地 `npm run verify:architecture`、Rustfmt 1.88.0 单文件格式检查、`node scripts/verify-rust-source-hygiene.mjs`、`git diff --check` 已PASS；导入之外的生产/测试函数逐字比较保持。第一次本地架构检查因导入调整后使用摘要未同步而失败，按原生成器同步并审查唯一摘要差异后完整复跑通过。未执行非Windows Cargo/客户端动态验证；本轮修复的Clippy/workspace tests/Windows构建打包启动仍由原Windows CI验证，启动后停止轮询，08不提前DONE，09～12继续BLOCKED。修复可单独revert本次提交；完整节点回退仍按下方原08基线。
 
+## 精确 Windows 验收与收尾（2026-10-09）
+
+核对修复SHA、run/job全部步骤、日志与artifact。Windows Automated全SUCCESS，2026-10-09 02:02:35（北京时间）完成；前端契约/类型/生产构建、17视口、Rust fmt/Clippy/workspace tests、Windows release/MSI/NSIS、客户端启动/状态载入及日志覆盖验收通过。报告 `logs/windows-acceptance-20261008-173456.json`；artifact `11568918565` / 14,023,349字节 / SHA-256 `d52b465dd73216453496a5a7b079ad6d331ebad3293c58af606e1187bc57acb8`。本节以精确CI回执为证据，不将实施时静态结果或预计单测数量替代动态验收。
+
+08正式DONE；收尾仅同步既有五份文档，源码/测试/清单与已验修复树保持，文档提交使用 `[skip ci]` 复用上述证据。09已授权开始且沿用原分支；真实PG/历史四项/账本/有效XLSX/Windows Full/私有Golden Master和继承历史删除风险继续最终封包新库待验，不计实跑通过。
+
 ## 待验、交接与回退
 
 仅Windows动态验证；08自身原Windows Automated负责完整frontend/类型/production build、17视口、fmt/Clippy/workspace tests、Windows release/MSI/NSIS/启动。启动后停止轮询、等待用户结果，取得精确SHA验收后才DONE并开放09。未执行Linux/macOS Cargo或客户端动态，无新增runner/workflow/target/数据库/框架。
 
 真实PG/历史四项/账本/有效XLSX/Windows Full/私有P4/P7固定概率及Golden Master仍最终封包新库待验。公开unavailable stub不冒充私有模型回归；继承delete_match置model.runs.match_idNULL与0041inputimmutable trigger的风险未在本项关闭。原未收紧的来源字符串/冲突metadata指纹策略明确保留，不承诺新增数据规范化或隔离保证。
 
-Mermaid Chart已更新真实声明/冲突事务、共用锁、身份引用/审计和共享状态投影；结束时Create State保存稳定项目下的节点/证据/约束。失败时受控revert08完整提交恢复 `1db0e195cdbc26514d7ad015b4110a53a446ba26` 已验源码文档树，同步上述21文件的唯一owner/调用/门禁/清单/文档，不手工复制旧实现或改变历史数据库。本实施记录不冒充完成记录或R8阶段收尾。
+Mermaid Chart已更新真实声明/冲突事务、共用锁、身份引用/审计和共享状态投影；结束时Create State保存稳定项目下的节点/证据/约束。失败时受控revert08修复及完整实施提交恢复 `1db0e195cdbc26514d7ad015b4110a53a446ba26` 已验源码文档树，同步唯一owner/调用/门禁/清单/文档，不手工复制旧实现或改变历史数据库。此为08节点完成记录，R8阶段尚未收尾。

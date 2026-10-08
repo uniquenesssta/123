@@ -2,7 +2,7 @@
 
 ## 当前阶段状态
 
-`IN_PROGRESS`。唯一阶段分支 `rewrite/r8-prediction-p4-orchestration`，起点/回退基线 `90680bf945fbb0d1c191937c2d9e90c2c916fb00`。R8-01～07 已 DONE；07 精确 `58b390a` / Windows run `37796909083` 全 SUCCESS。08 首轮 `91e9585` / Windows run `37804265878` 因测试专用顶层导入被Clippy拦截；已移入测试模块并通过本地受影响静态门禁，仍 `VERIFYING`，修复自身Windows CI待验；09～12 `BLOCKED`。精确当前状态只由本索引维护。
+`IN_PROGRESS`。唯一阶段分支 `rewrite/r8-prediction-p4-orchestration`，起点/回退基线 `90680bf945fbb0d1c191937c2d9e90c2c916fb00`。R8-01～08 已 DONE；08精确修复 `52f23ab` / Windows run `37817443918` 全SUCCESS，首轮Clippy失败已关闭。用户已授权“收尾08开始09”，09前置通过、READY；10～12 `BLOCKED`。精确当前状态只由本索引维护。
 
 ## 前置基线与范围
 
@@ -21,8 +21,8 @@ R8 依据 [任务书](../../football-model-platform-modular-rewrite-19-docs/08-R
 | R8-05 | Route / Model Request | DONE · [完成记录](R08-05-route-and-model-request.md) |
 | R8-06 | Model Execution Adapter | DONE · [完成记录](R08-06-model-execution-adapter.md) |
 | R8-07 | Run Persistence | DONE · [完成记录](R08-07-run-persistence.md) |
-| R8-08 | P4 Evidence Ledger | VERIFYING · [实施/修复记录](R08-08-p4-evidence-ledger.md) · 首轮Clippy失败已修复，修复自身Windows CI待验 |
-| R8-09 | Fact Pipeline | BLOCKED |
+| R8-08 | P4 Evidence Ledger | DONE · [完成记录](R08-08-p4-evidence-ledger.md) · 精确Windows修复CI全SUCCESS |
+| R8-09 | Fact Pipeline | READY · 前置门禁通过，已授权开始 |
 | R8-10 | Horizon Orchestration | BLOCKED |
 | R8-11 | Workbench Reads | BLOCKED |
 | R8-12 | Freeze Transaction | BLOCKED |
@@ -35,7 +35,7 @@ Readiness 评分/检查、manifest 算法、路由与模型执行仍由现有 ow
 
 ## 动态待验与阶段出口
 
-R8-01～07 已取得各自精确 Windows CI；08 及后续仍须独立取得自身门禁，不继承前项 PASS。数据库相关 contracts、历史四项/账本、模型历史删除风险、有效 XLSX、Windows Full 的真实结果仍最终新库待验，详见 R7 阶段清单。模型保护或真实固定回归不可取得时明确说明，公共 unavailable stub 不冒充私有引擎 Golden Master。后续节点成功后逐项更新；未完成全部节点不创建阶段完成记录。
+R8-01～08 已取得各自精确 Windows CI；09及后续仍须独立取得自身门禁，不继承前项 PASS。数据库相关 contracts、历史四项/账本、模型历史删除风险、有效 XLSX、Windows Full 的真实结果仍最终新库待验，详见 R7 阶段清单。模型保护或真实固定回归不可取得时明确说明，公共 unavailable stub 不冒充私有引擎 Golden Master。后续节点成功后逐项更新；未完成全部节点不创建阶段完成记录。
 
 ## R8-01 实施与门禁记录（已通过）
 

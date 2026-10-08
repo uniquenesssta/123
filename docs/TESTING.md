@@ -264,3 +264,10 @@ Application **92** / Persistence **141**、七项新增 adapter 测试、前端�
 实际本地PASS：原83/83frontend源码项（5浏览器项留Windows）、`npm run verify:architecture`、12 changed Rust targets的Rustfmt1.88.0 --check、`node scripts/verify_protected_assets.mjs`、`node scripts/verify_command_contract.mjs`、`node scripts/verify_database_baseline.mjs`、git diff --check。六项临时破坏探针均由原增强Prediction gate拒绝并恢复；健康门禁复跑PASS。初次architecture仅新增模块数量清单未同步，修正35→36后完整通过。无Linux/macOS Cargo/客户端动态、新runner/workflow/target/数据库/依赖/迁移。
 
 报告 `/workspace/scratch/0c69084e7a7f/r808-source-checks.json`、`r808-architecture.log`、`r808-negative-probes.json`、`r808-equivalence.json`。Domain扫描1051→1060，365/300/声明摘要保持，usageDigest `307b38c0ae795e65133ae11522339b21a47bd8ab5cc1129f02f679ca0ba97608`；Application390/43Port保持。PG runtime_sources只更新原postgres_integration blob `eb0f4dd987b3f4374a57c1f5295c8be0ffaf9966`，迁移摘要不变。08VERIFYING，09～12BLOCKED；原Windows全链路CI启动后停止轮询，详见 [08实施记录](modular-rewrite/R08-prediction-p4-orchestration/R08-08-p4-evidence-ledger.md)。
+
+
+## R8-08 精确 Windows 验收与收尾（2026-10-09）
+
+修复 `52f23ab4e582f313f412058623f0d83a6ddf6f98` / [Windows run `37817443918`](https://github.com/uniquenesssta/123/actions/runs/37817443918) / job `113449572979` 全SUCCESS，前端/类型/生产构建、17视口、Rust fmt/Clippy/workspace tests、Windows release/MSI/NSIS、启动状态载入和日志覆盖通过。首轮 `91e9585` 的未使用导入失败已关闭。报告 `logs/windows-acceptance-20261008-173456.json`，artifact `11568918565` / 14,023,349字节 / SHA-256 `d52b465dd73216453496a5a7b079ad6d331ebad3293c58af606e1187bc57acb8`。
+
+08DONE；用户已授权09开始，09不能继承08动态PASS。08收尾仅同步既有五文档并使用 `[skip ci]`，无源码/清单变化。真实PG、历史四项/账本、有效XLSX、Windows Full、私有Golden Master和继承历史删除风险继续最终封包新库待验；ignored不计实跑PASS。

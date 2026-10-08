@@ -20,11 +20,13 @@ R8-07 Run Persistence 已通过自身 Windows 门禁并收尾为 `DONE`；08 已
 
 07 实施时本地实际通过 83/83 现有源码门禁、完整 `npm run verify:architecture`、Rustfmt、18 保护资产/171 命令/46 迁移与 18 PG 静态契约、`git diff --check`；六项破坏探针均拒绝后恢复。新增七项 Persistence 边界单测，原 Application 保存失败测试扩为六类错误；预期 Persistence **148** / Application **92**，须本项精确 Windows CI 实跑，不继承 06 PASS。原 PG target 补共同回滚、快照复用、读回与隐藏不可变断言，仍 ignored，真实 PG/历史四项/账本/有效 XLSX/Windows Full/私有 Golden Master 与继承历史删除风险继续最终封包新库待验。沿用原 Windows workflow，启动后停止轮询；无 Linux/macOS Cargo/客户端动态验收或新基础设施。
 
-R8-08 P4 Evidence Ledger 已实施、`VERIFYING`：证据追加与冲突建组从旧 p4_records 迁入 `adapters/p4/evidence_ledger/{claims,conflicts,input,references,row}.rs`，mod 仅登记/导出，原证据状态投影和 P4 共用幂等实现各保持唯一 owner。旧文件保留版本登记/研究任务/快照职责，账本实现与原测试迁出，无空转发；10 原生产函数、原测试、31 SQL 和2公开签名核对等价，原文件其余34函数保持。新增9个Rust文件和 [08 实施记录](docs/modular-rewrite/R08-prediction-p4-orchestration/R08-08-p4-evidence-ledger.md)，累计10新增/11修改，无整文件移动或删除。
+R8-08 P4 Evidence Ledger 已收尾为 `DONE`：证据追加与冲突建组从旧 p4_records 迁入 `adapters/p4/evidence_ledger/{claims,conflicts,input,references,row}.rs`，mod 仅登记/导出，原证据状态投影和 P4 共用幂等实现各保持唯一 owner。旧文件保留版本登记/研究任务/快照职责，账本实现与原测试迁出，无空转发；10 原生产函数、原测试、31 SQL 和2公开签名核对等价，原文件其余34函数保持。新增9个Rust文件和 [08 实施记录](docs/modular-rewrite/R08-prediction-p4-orchestration/R08-08-p4-evidence-ledger.md)，累计10新增/11修改，无整文件移动或删除。
 
 08 实际本地通过83/83原源码检查、完整architecture、Rustfmt、18保护资产/171命令/46迁移及18PG静态契约、git diff --check，六项破坏探针均拒绝恢复。原Persistence target新增8项边界测试，预期 **156** / Application **92**；原PG Stage C扩原文读回/纳秒指纹、引用/SQL失败无残留、并发同键重试与单条审计、去重冲突/单opened事件及append-only，仍ignored。本项须自身Windows CI，启动后停止轮询；真实PG/历史四项/账本/XLSX/Windows Full/私有Golden Master及继承删除风险仍最终封包新库待验。09～12 BLOCKED，无新runner/workflow/target/数据库/依赖。
 
 08 首轮 `91e9585` / [Windows run `37804265878`](https://github.com/uniquenesssta/123/actions/runs/37804265878) 在 Clippy 因 `p4_records.rs` 的测试专用 `EvidenceVerificationState` 顶层导入失败；前端契约、类型、生产构建与17视口已通过，Rust测试/打包/启动未完成。现将导入移入原 `#[cfg(test)]` 模块并同步唯一 Domain 使用摘要，完整架构、Rustfmt 1.88、源码卫生及差异检查通过；业务函数和原测试体保持。本项仍 `VERIFYING`，修复须重新取得自身Windows全链路结果。
+
+08精确修复 `52f23ab` / [Windows run `37817443918`](https://github.com/uniquenesssta/123/actions/runs/37817443918) 全SUCCESS，前端/17视口、Rust fmt/Clippy/workspace tests、Windows构建打包与启动全部通过，首轮Clippy失败已关闭。详见 [08完成记录](docs/modular-rewrite/R08-prediction-p4-orchestration/R08-08-p4-evidence-ledger.md)；用户已授权09开始，10～12仍BLOCKED。收尾只同步五份文档并复用精确CI证据；真实PG/XLSX/Full/私有固定回归继续最终新库待验。
 
 ## 公开边界
 
