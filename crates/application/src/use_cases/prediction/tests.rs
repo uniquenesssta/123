@@ -287,27 +287,34 @@ async fn prediction_errors_stop_every_later_side_effect() {
 
 #[tokio::test]
 async fn failed_run_save_is_propagated_without_success_or_automatic_retry() {
-    let port = Arc::new(Probe::new());
-    port.fail_at(Some("save_run"));
-    let error = super::execute_prediction::execute(
-        port.as_ref(),
-        &probe_registry(&port),
-        command_fixture(),
-    )
-    .await
-    .unwrap_err();
-    assert!(matches!(
-        error,
-        ApplicationError::Port(PortError {
-            kind: PortErrorKind::Unavailable,
-            ..
-        })
-    ));
-    assert_eq!(
-        port.calls(),
-        ["scope", "route", "model_supports", "predict", "save_run"]
-    );
-    assert!(port.state.lock().unwrap().saved.is_empty());
+    for kind in [
+        PortErrorKind::Unavailable,
+        PortErrorKind::NotFound,
+        PortErrorKind::Conflict,
+        PortErrorKind::InvalidState,
+        PortErrorKind::Serialization,
+        PortErrorKind::Infrastructure,
+    ] {
+        let port = Arc::new(Probe::new());
+        port.fail_at(Some("save_run"));
+        port.state.lock().unwrap().failure_kind = Some(kind);
+        let error = super::execute_prediction::execute(
+            port.as_ref(),
+            &probe_registry(&port),
+            command_fixture(),
+        )
+        .await
+        .unwrap_err();
+        assert!(
+            matches!(error, ApplicationError::Port(PortError { kind: actual, message })
+            if actual == kind && message == "injected save_run")
+        );
+        assert_eq!(
+            port.calls(),
+            ["scope", "route", "model_supports", "predict", "save_run"]
+        );
+        assert!(port.state.lock().unwrap().saved.is_empty());
+    }
 }
 
 #[tokio::test]

@@ -14,7 +14,11 @@ R8-04 输入清单已收尾，精确 `59c5679` / Windows run `36966815323` 通�
 
 R8-05 路由与模型请求已收尾：精确修复 `2aa99a7` / [Windows run `36971419476`](https://github.com/uniquenesssta/123/actions/runs/36971419476) 通过 Application 85/Persistence 141、十项路由请求测试、17 视口、Rust/前端、Windows release/MSI/NSIS/启动。原 shared/routing 已删除，唯一 route_model_request 持有原选择/校验/上下文/请求职责；首轮测试专用导出引起的 Clippy 失败已修复并通过。详见 [05 完成记录](docs/modular-rewrite/R08-prediction-p4-orchestration/R08-05-route-and-model-request.md) 与 [R8 索引](docs/modular-rewrite/R08-prediction-p4-orchestration/README.md)。05 收尾文档 CI `37737677787` 亦已通过；真实 PG/私有固定回归/Full 及继承历史删除风险仍最终新库待验。
 
-R8-06 已收尾为 `DONE`：注册查找、supports、predict、完整错误转换和原毫秒计时收拢到唯一模型适配器，原执行器与默认 dry run 直接复用；默认 dry run 保留无额外 supports/validate 的行为。精确 `0969331` / [Windows run `37752995641`](https://github.com/uniquenesssta/123/actions/runs/37752995641) 通过 Application **92** / Persistence **141**、七项新增边界测试、17 视口、Rust/前端、Windows release/MSI/NSIS 及启动验收。详见 [06 完成记录](docs/modular-rewrite/R08-prediction-p4-orchestration/R08-06-model-execution-adapter.md)。07 Run Persistence 为唯一 READY、尚未实施；08～12 BLOCKED。真实 PG/私有固定回归/Full 和继承历史删除风险继续最终新库待验。本轮仅补齐五份文档，复用精确源码证据，提交使用 `[skip ci]`。
+R8-06 已收尾为 `DONE`：注册查找、supports、predict、完整错误转换和原毫秒计时收拢到唯一模型适配器，原执行器与默认 dry run 直接复用；默认 dry run 保留无额外 supports/validate 的行为。精确 `0969331` / [Windows run `37752995641`](https://github.com/uniquenesssta/123/actions/runs/37752995641) 通过 Application **92** / Persistence **141**、七项新增边界测试、17 视口、Rust/前端、Windows release/MSI/NSIS 及启动验收。详见 [06 完成记录](docs/modular-rewrite/R08-prediction-p4-orchestration/R08-06-model-execution-adapter.md)。后续当前状态见下段与 R8 索引；本段五份文档收尾提交使用 `[skip ci]`，不代表 07 已验证。
+
+R8-07 Run Persistence 已实施，状态 `VERIFYING`，08～12 `BLOCKED`。从已验源码的文档基线 `eadb49d` 开始，旧 `crates/persistence-postgres/src/model_runs.rs` 已删除，原保存、输入审计/快照前检、模型明细、历史读取和隐藏事务分别迁入 `adapters/prediction/runs/{write,input,details,read,visibility}.rs`，`mod.rs` 只登记/导出。公开 PostgresStore 方法及 ModelRunListItem 路径保持；正式保存/影子 nil 继续由原执行用例编排。九项生产函数体、原 SQL、四个公开签名及原测试比较保持一致，无整文件移动/重命名。完整 7 新增、15 修改、1 删除文件及取舍见 [07 实施记录](docs/modular-rewrite/R08-prediction-p4-orchestration/R08-07-run-persistence.md)。
+
+07 本地实际通过 83/83 现有源码门禁、完整 `npm run verify:architecture`、Rustfmt、18 保护资产/171 命令/46 迁移与 18 PG 静态契约、`git diff --check`；六项破坏探针均拒绝后恢复。新增七项 Persistence 边界单测，原 Application 保存失败测试扩为六类错误；预期 Persistence **148** / Application **92**，须本项精确 Windows CI 实跑，不继承 06 PASS。原 PG target 补共同回滚、快照复用、读回与隐藏不可变断言，仍 ignored，真实 PG/历史四项/账本/有效 XLSX/Windows Full/私有 Golden Master 与继承历史删除风险继续最终封包新库待验。沿用原 Windows workflow，启动后停止轮询；无 Linux/macOS Cargo/客户端动态验收或新基础设施。
 
 ## 公开边界
 

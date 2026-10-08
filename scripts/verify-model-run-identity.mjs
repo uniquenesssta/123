@@ -69,9 +69,9 @@ const ruleInsert = read("crates/persistence-postgres/src/adapters/rules/packages
 check(ruleTransaction.includes("adapters::register_model_in_tx") && !ruleTransaction.includes("routing::register_model_in_tx"), "Rule Package transaction must consume the new R5-06 registration boundary");
 check(ruleInsert.includes("adapters::ModelRegistration") && !ruleInsert.includes("routing::ModelRegistration"), "Rule Package insert must consume the new ModelRegistration export");
 
-const modelRuns = read("crates/persistence-postgres/src/model_runs.rs");
+const modelRuns = read("crates/persistence-postgres/src/adapters/prediction/runs/read.rs");
 const readRunStart = modelRuns.indexOf("pub async fn read_run");
-const readRunEnd = modelRuns.indexOf("async fn save_model_details", readRunStart);
+const readRunEnd = modelRuns.length;
 const readRun = readRunStart >= 0 && readRunEnd > readRunStart ? modelRuns.slice(readRunStart, readRunEnd) : "";
 check(readRun.includes("read_model_run_identity(self, run_id).await?"), "read_run must delegate model identity lookup to R5-06 owner");
 check(!readRun.includes("JOIN model.versions") && !readRun.includes("JOIN model.definitions") && !readRun.includes("JOIN model.parameter_sets") && !readRun.includes("JOIN model.rule_packages"), "read_run must not retain duplicate model identity joins");

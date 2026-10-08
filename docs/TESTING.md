@@ -230,3 +230,17 @@ R8-05 的精确代码 run `36971419476` 和收尾文档 run `37737677787` 均 SU
 Application **92** / Persistence **141**、七项新增 adapter 测试、前端契约/类型/生产构建、**17** 视口、Rust fmt/Clippy/workspace tests、Windows release/MSI/NSIS 和客户端启动/状态载入全部通过。运行日志 **7 条记录 / 3 个完成操作**通过；报告 `logs/windows-acceptance-20261008-085549.json`。artifact `11539138019`，14,023,860 字节，SHA-256 `c0e37e6bb7c706aa292215859844a93491266978dc88f4819abd93b3fb568dd3`。详见 [06 完成记录](modular-rewrite/R08-prediction-p4-orchestration/R08-06-model-execution-adapter.md)。
 
 本轮仅五份现有文档收尾，源码/测试/清单不变，复用已验证证据并检查链接、状态及差异，使用 `[skip ci]` 不重复全量构建。06 DONE；07 READY 尚未实施，08～12 BLOCKED。ignored PG/contract、真实 PG/历史四项/账本/有效 XLSX/Windows Full/私有 Golden Master 和继承历史删除风险继续最终封包新库待验，不计实跑通过。
+
+## R8-07 实施验证（2026-10-08，VERIFYING）
+
+07 从 `eadb49d51722f50349509a0402c5a925402a53dc` 开始，沿用唯一 R8 分支。旧 model_runs.rs 的九项生产函数、原一项审计测试、全部 SQL literals 和四个公开签名分别比较保持；唯一 runs owner 分为 write/input/details/read/visibility，mod 只登记/导出。原 Application 正式保存/影子 nil、Port、错误映射及结果组装保持。没有为了路径增加空转发层。
+
+在原 Persistence target 保留原审计测试，新增七项边界测试：legacy 审计 shape/hash/null、受审计身份 trim/四等级/原可选分值语义、错误优先级/null manifest、快照身份/纳秒窗口/原 schema、缺元数据/身份变化拒绝、质量闭区间与类型、模型明细整数/浮点/缺字段错误。原 Application 保存失败测试扩为六类 Port 错误，验证原 kind/message、一次保存、不返回成功及无重试。预期 Persistence **148**（141+7）/Application **92**；尚未 Rust 实跑，须本项精确 Windows CI 确认。
+
+原 `model_run_identity_repository_contract` target 增加公开 API 链路：第二比分的 smallint/DB 概率约束失败后，run/snapshot/modules/scorelines/completion audit 五类计数共同归零；两次成功产生不同 run 并复用一个 runtime snapshot；完整输入/输出/summary/explanation/hash/audit/route/duration 读回、模块细节/比分默认值/每次一条完成审计、历史 topscore/name/limit、重复隐藏保留首次时间和两次审计、隐藏后 read_run、缺失运行与输入 immutable trigger。保留原完整及 nullable 身份用例。仍 ignored，没有真实 PG 通过结论，18 broad targets 数量不变。
+
+本地实际 PASS：现有 verify-frontend 清单 **83/83** 源码检查（5 浏览器项留 Windows）、完整 `npm run verify:architecture`、同版本 Rustfmt 1.88.0 目标 `--check`、`node scripts/verify_protected_assets.mjs`（18）、`node scripts/verify_command_contract.mjs`（171）、`node scripts/verify_database_baseline.mjs`（46 迁移/18 PG 静态契约）及 `git diff --check`。六项破坏探针（提前提交、快照复用来源放宽、绕过 audit hash、放宽 quality 上界、去掉 hidden 过滤、影子写正式历史）均被原增强 Prediction gate 拒绝且文件恢复；健康门禁复跑 PASS。格式化后的回滚断言换行曾使新增静态断言不匹配，已保留断言内容并用允许空白的正则检查，复跑通过。
+
+报告 `/workspace/scratch/0c69084e7a7f/r807-source-checks.json` 和 `/workspace/scratch/0c69084e7a7f/r807-negative-probes.json`；命令由仓库原入口可重现。Rustfmt 本地运行库缺损从已有同版本归档完整恢复后检查通过，没有项目依赖变更。Application 扫描 390 不变；Postgres 直接模块 36→35（删除根 model_runs，runs 在既有 prediction 下）；Domain 扫描 1046→1051，365 类型/300 映射与声明摘要保持，usageDigest `57653c49ff4d861f79dbb439e83e066899455c6aeb98f94cc5f4474253c484d2`。
+
+本项复用原 Windows Automated：完整前端/类型/生产构建、17 视口、fmt/Clippy/workspace tests、Windows release/MSI/NSIS/启动。CI 启动后停止轮询；未运行 Linux/macOS Cargo/客户端动态验收，无新 workflow/runner/target/数据库/依赖或迁移。07 VERIFYING、08～12 BLOCKED。PG/历史四项/账本/有效 XLSX/Windows Full/私有 Golden Master 和继承 model.runs/0041 删除风险继续最终封包新库待验；ignored 编译不计 PASS。详见 [07 实施记录](modular-rewrite/R08-prediction-p4-orchestration/R08-07-run-persistence.md)。

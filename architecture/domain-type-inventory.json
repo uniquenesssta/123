@@ -24,13 +24,13 @@
     "targetPublicExportPolicy": "explicit re-export only"
   },
   "sourceDigest": "217241ac243726a5ab6805a7f169e222b97e78c7c971749a5904714af673ebdd",
-  "rustUsageDigest": "628b7e3735c11179ca0535f50987b216285c16ceec6d21994717ba86e694fef8",
+  "rustUsageDigest": "57653c49ff4d861f79dbb439e83e066899455c6aeb98f94cc5f4474253c484d2",
   "summary": {
     "typeCount": 365,
     "publicCompatibilityTypeCount": 365,
     "internalTypeCount": 0,
     "domainSourceFileCount": 129,
-    "scannedRustFileCount": 1046,
+    "scannedRustFileCount": 1051,
     "databaseMappedTypeCount": 300,
     "byTargetModule": {
       "ai_workspace": 16,
@@ -4858,6 +4858,7 @@
         "crates/persistence-postgres/tests/competition_bindings_repository_contract.rs",
         "crates/persistence-postgres/tests/competition_hierarchy_repository_contract.rs",
         "crates/persistence-postgres/tests/competitions_repository_contract.rs",
+        "crates/persistence-postgres/tests/model_run_identity_repository_contract.rs",
         "crates/persistence-postgres/tests/postgres_integration.rs",
         "crates/persistence-postgres/tests/route_resolution_repository_contract.rs",
         "crates/persistence-postgres/tests/rule_package_repository_contract.rs"
@@ -4966,6 +4967,7 @@
         "crates/application/src/use_cases/rules/package_factory/mod.rs",
         "crates/persistence-postgres/src/adapters/competition/route_resolution/route/record_mapper.rs",
         "crates/persistence-postgres/tests/competition_bindings_repository_contract.rs",
+        "crates/persistence-postgres/tests/model_run_identity_repository_contract.rs",
         "crates/persistence-postgres/tests/postgres_integration.rs",
         "crates/persistence-postgres/tests/route_resolution_repository_contract.rs",
         "crates/persistence-postgres/tests/rule_package_repository_contract.rs"
@@ -10359,7 +10361,8 @@
         "crates/application/src/use_cases/prediction/route_model_request/request.rs",
         "crates/application/src/use_cases/prediction/tests.rs",
         "crates/model-api/src/lib.rs",
-        "crates/model-stub/src/lib.rs"
+        "crates/model-stub/src/lib.rs",
+        "crates/persistence-postgres/tests/model_run_identity_repository_contract.rs"
       ],
       "databaseMappings": []
     },
@@ -13959,7 +13962,8 @@
         "crates/application/src/use_cases/analytics/parameter_lifecycle/run_parameter_shadow_validation/mod.rs",
         "crates/application/src/use_cases/prediction/route_model_request/request.rs",
         "crates/model-api/src/lib.rs",
-        "crates/model-stub/src/lib.rs"
+        "crates/model-stub/src/lib.rs",
+        "crates/persistence-postgres/tests/model_run_identity_repository_contract.rs"
       ],
       "databaseMappings": []
     },
@@ -21723,7 +21727,8 @@
         "crates/application/src/model_registry/prediction_model_adapter/tests.rs",
         "crates/application/src/ports/prediction/mod.rs",
         "crates/application/src/use_cases/prediction/tests.rs",
-        "crates/model-api/src/lib.rs"
+        "crates/model-api/src/lib.rs",
+        "crates/persistence-postgres/tests/model_run_identity_repository_contract.rs"
       ],
       "databaseMappings": []
     },
@@ -24639,13 +24644,14 @@
         "crates/application/src/use_cases/prediction/tests.rs",
         "crates/persistence-postgres/src/adapters/competition/route_resolution/route/record_mapper.rs",
         "crates/persistence-postgres/src/adapters/competition/route_resolution/route/resolve_route.rs",
-        "crates/persistence-postgres/src/model_runs.rs",
+        "crates/persistence-postgres/src/adapters/prediction/runs/write.rs",
+        "crates/persistence-postgres/tests/model_run_identity_repository_contract.rs",
         "src-tauri/src/commands/prediction.rs"
       ],
       "databaseMappings": [
         "crates/persistence-postgres/src/adapters/competition/route_resolution/route/record_mapper.rs",
         "crates/persistence-postgres/src/adapters/competition/route_resolution/route/resolve_route.rs",
-        "crates/persistence-postgres/src/model_runs.rs"
+        "crates/persistence-postgres/src/adapters/prediction/runs/write.rs"
       ]
     },
     {
@@ -24819,6 +24825,7 @@
         "crates/persistence-postgres/src/adapters/competition/route_resolution/route/record_mapper.rs",
         "crates/persistence-postgres/src/adapters/competition/route_resolution/route/resolve_route.rs",
         "crates/persistence-postgres/tests/competition_bindings_repository_contract.rs",
+        "crates/persistence-postgres/tests/model_run_identity_repository_contract.rs",
         "crates/persistence-postgres/tests/route_resolution_repository_contract.rs"
       ],
       "databaseMappings": [
@@ -25130,6 +25137,7 @@
         "crates/application/src/use_cases/prediction/tests.rs",
         "crates/application/src/use_cases/rules/package_factory/mod.rs",
         "crates/persistence-postgres/tests/competition_bindings_repository_contract.rs",
+        "crates/persistence-postgres/tests/model_run_identity_repository_contract.rs",
         "crates/persistence-postgres/tests/postgres_integration.rs",
         "crates/persistence-postgres/tests/route_resolution_repository_contract.rs",
         "crates/persistence-postgres/tests/rule_package_repository_contract.rs"

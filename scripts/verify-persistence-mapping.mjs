@@ -33,7 +33,9 @@ const p4 = read("crates/persistence-postgres/src/p4_orchestration.rs");
 const bindingMapper = read("crates/persistence-postgres/src/adapters/competition/bindings/record_mapper.rs");
 const bindingPackageMetadata = read("crates/persistence-postgres/src/adapters/competition/bindings/package_route_metadata.rs");
 const rulePackageMapper = read("crates/persistence-postgres/src/adapters/rules/packages/record_mapper.rs");
-const modelRuns = read("crates/persistence-postgres/src/model_runs.rs");
+const runInput = read("crates/persistence-postgres/src/adapters/prediction/runs/input.rs");
+const runWrite = read("crates/persistence-postgres/src/adapters/prediction/runs/write.rs");
+const modelRuns = runInput + runWrite;
 check(!exists("crates/persistence-postgres/src/competitions.rs"), "R5-05 后 legacy competitions.rs 不得重新成为 mapping 调用 owner");
 check(library.includes("mod mapping;") && library.includes("mod competition_kind;"), "lib.rs 未注册 mapping/competition_kind 模块");
 check(library.includes("pub(crate) use competition_kind::parse_competition_kind;"), "lib.rs 未保留共享 CompetitionKind crate 内出口");
@@ -49,7 +51,7 @@ for (const [label, source] of [
   ["R5-03 rule package mapper", rulePackageMapper],
 ]) check(source.includes("parse_competition_kind"), `${label} 共享 CompetitionKind 调用路径缺失`);
 check(!routeContextMapper.includes("sqlx::query") && !routeContextMapper.includes("PgRow"), "R5-05 route context mapper 必须保持纯 typed Row -> Domain mapping");
-check(modelRuns.includes("use crate::mapping::{optional_uuid, required_datetime, required_uuid, to_json_value};"), "model_runs 未使用 mapping 基础出口");
+check(runInput.includes("use crate::mapping::{optional_uuid, required_datetime, required_uuid};") && runWrite.includes("use crate::mapping::{optional_uuid, to_json_value};"), "runs 输入和写入 owner 未使用 mapping 基础出口");
 check(!modelRuns.includes("fn required_datetime(") && !modelRuns.includes("fn optional_uuid("), "model_runs 仍保留重复标量 helper");
 check(modelRuns.includes('required_uuid(snapshot_id, "snapshot.snapshot_id")?'), "snapshot UUID 未切换统一 mapping");
 check(modelRuns.includes("to_json_value(&output.summary)?"), "Model summary JSON 未切换统一 mapping");

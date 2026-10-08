@@ -1,5 +1,12 @@
+use chrono::{Duration, Utc};
+use football_domain::{
+    CompetitionKind, CompetitionProfile, MatchContext, ModelIdentity, PredictionSummary,
+    RouteDecision, RouteSource, RuleRouting,
+};
+use football_model_api::{ModelOutput, ModelRequest};
 use football_persistence_postgres::{DatabaseOptions, ModelRegistration, PostgresStore};
 use serde_json::json;
+use sha2::{Digest, Sha256};
 use sqlx::{postgres::PgPoolOptions, PgPool};
 use uuid::Uuid;
 
@@ -241,6 +248,249 @@ async fn model_run_identity_repository_contract_is_preserved() {
     assert!(nullable["rule_package_version"].is_null());
     assert!(nullable["rule_package_name"].is_null());
     assert!(nullable["route_binding_id"].is_null());
+
+    // R8-07: exercise the public save/read/visibility chain in the existing PG target.
+    let match_id = Uuid::new_v4();
+    let snapshot_id = Uuid::new_v4();
+    let match_key = format!("R8-07-RUN-{token}");
+    let kickoff = Utc::now() + Duration::hours(2);
+    sqlx::query("INSERT INTO football.matches (id, external_key, kickoff_time) VALUES ($1,$2,$3)")
+        .bind(match_id)
+        .bind(&match_key)
+        .bind(kickoff)
+        .execute(&database.pool)
+        .await
+        .expect("创建 R8-07 运行比赛");
+    let decision = RouteDecision {
+        source: RouteSource::ExplicitRulePackage,
+        binding_id: Some(binding_id),
+        rule_package_id,
+        package_key: package_key.clone(),
+        package_version: "1.0.0".into(),
+        package_display_name: "R5-06 Identity Package".into(),
+        model_id: model_key.clone(),
+        model_version_id,
+        model_version: "r5-06-model-version-1".into(),
+        parameter_set_id,
+        parameter_version: "r5-06-parameters-1".into(),
+        competition_profile_id: profile_id,
+        parameters: json!({"alpha":0.51}),
+        routing: RuleRouting {
+            model_id: model_key.clone(),
+            model_version: "r5-06-model-version-1".into(),
+            parameter_version: "r5-06-parameters-1".into(),
+            priority: 51,
+            activate_as_type_default: false,
+            supported_snapshot_types: vec!["T-1h".into()],
+        },
+        competition_profile: CompetitionProfile {
+            profile_id: format!("r506-profile-{token}"),
+            name: "R5-06 League Profile".into(),
+            competition_kind: CompetitionKind::League,
+            normal_time_minutes: 90,
+            extra_time_possible: false,
+            penalties_possible: false,
+            two_legged: false,
+            neutral_venue: false,
+            metadata: json!({}),
+        },
+        feature_requirements: json!({}),
+        output_contract: json!({}),
+        priority: 51,
+        reason: json!({"source":"r8-07-contract"}),
+    };
+    let manifest = json!({"match_key":match_key,"snapshot_type":"T-1h"});
+    let manifest_hash = hex::encode(Sha256::digest(serde_json::to_vec(&manifest).unwrap()));
+    let request = ModelRequest {
+        context: MatchContext {
+            match_key: match_key.clone(),
+            kickoff_time: kickoff,
+            competition_id: None,
+            season_id: None,
+            stage_id: None,
+            competition_kind: CompetitionKind::League,
+            home_team_name: "R8-07 Home".into(),
+            away_team_name: "R8-07 Away".into(),
+            metadata: json!({}),
+        },
+        identity: ModelIdentity {
+            model_id: model_key.clone(),
+            model_version: decision.model_version.clone(),
+            parameter_version: decision.parameter_version.clone(),
+            rule_package_version: Some("1.0.0".into()),
+        },
+        snapshot_type: "T-1h".into(),
+        parameters: decision.parameters.clone(),
+        input: json!({"match_id":match_key,"database_match_id":match_id,"feature_snapshot_id":snapshot_id,
+            "preparation_version":"r8-07-input", "feature_quality_score":0.9,
+            "team_a":{"name":"R8-07 Home"},"team_b":{"name":"R8-07 Away"},
+            "snapshot":{"snapshot_id":snapshot_id,"type":"T-1h",
+                "data_cutoff_time":kickoff-Duration::hours(1),"frozen_at":kickoff-Duration::minutes(30)},
+            "input_audit":{"audit_version":"prematch-input-audit-v1",
+                "readiness":{"level":"formal_ready","score":96},
+                "manifest":manifest,"manifest_sha256":manifest_hash}}),
+    };
+    let output = ModelOutput {
+        identity: request.identity.clone(),
+        summary: PredictionSummary {
+            home_win: 0.55,
+            draw: 0.25,
+            away_win: 0.20,
+            btts: None,
+            over_2_5: None,
+        },
+        payload: json!({"modules":{"home_attack":{"raw_score":1.25,"confidence":0.8,
+            "effective_score":1.0,"multiplier":1.1,"evidence":"preserved"}},
+            "scorelines":[{"goals_a":2,"goals_b":0,"probability":0.55,"rank":1,
+                "cumulative_probability":0.55,"route":"home"},
+                {"goals_a":0,"goals_b":0,"probability":0.25,"rank":2,"cumulative_probability":0.8}]}),
+        explanation: json!({"contract":"r8-07","unaltered":true}),
+    };
+    for invalid_rank in [true, false] {
+        let mut invalid_output = output.clone();
+        let field = if invalid_rank { "rank" } else { "probability" };
+        invalid_output.payload["scorelines"][1][field] = if invalid_rank {
+            json!(32768)
+        } else {
+            json!(2.0)
+        };
+        assert!(database
+            .store
+            .save_successful_run(&decision, &request, &invalid_output, 17)
+            .await
+            .is_err());
+        let counts:(i64,i64,i64,i64,i64)=sqlx::query_as(r#"
+            SELECT (SELECT count(*) FROM model.runs WHERE match_key=$1),
+                   (SELECT count(*) FROM feature.snapshots WHERE match_key=$1),
+                   (SELECT count(*) FROM model.run_modules m JOIN model.runs r ON r.id=m.run_id WHERE r.match_key=$1),
+                   (SELECT count(*) FROM model.run_scorelines s JOIN model.runs r ON r.id=s.run_id WHERE r.match_key=$1),
+                   (SELECT count(*) FROM audit.events WHERE event_type='model_run_completed' AND payload->>'match_key'=$1)
+        "#).bind(&match_key).fetch_one(&database.pool).await.unwrap();
+        assert_eq!(
+            counts,
+            (0, 0, 0, 0, 0),
+            "run/details/snapshot/audit must roll back together"
+        );
+    }
+    let first = database
+        .store
+        .save_successful_run(&decision, &request, &output, 17)
+        .await
+        .unwrap();
+    let second = database
+        .store
+        .save_successful_run(&decision, &request, &output, 19)
+        .await
+        .unwrap();
+    assert_ne!(
+        first, second,
+        "successful reruns have distinct run identities"
+    );
+    let snapshot_count: i64 =
+        sqlx::query_scalar("SELECT count(*) FROM feature.snapshots WHERE match_key=$1")
+            .bind(&match_key)
+            .fetch_one(&database.pool)
+            .await
+            .unwrap();
+    assert_eq!(snapshot_count, 1, "identical runtime snapshot is reused");
+    let expected_input_hash =
+        hex::encode(Sha256::digest(serde_json::to_vec(&request.input).unwrap()));
+    for (id, duration) in [(first, 17_i64), (second, 19)] {
+        let document = database.store.read_run(id).await.unwrap();
+        assert_eq!(document["input"], request.input);
+        assert_eq!(document["output"], output.payload);
+        assert_eq!(document["explanation"], output.explanation);
+        assert_eq!(
+            document["summary"],
+            serde_json::to_value(&output.summary).unwrap()
+        );
+        assert_eq!(document["input_sha256"], expected_input_hash);
+        assert_eq!(document["input_audit"]["manifest_sha256"], manifest_hash);
+        assert_eq!(
+            document["input_audit"]["feature_snapshot_id"],
+            json!(snapshot_id)
+        );
+        assert_eq!(document["route_binding_id"], json!(binding_id));
+        assert_eq!(document["duration_ms"], json!(duration));
+        let module: serde_json::Value = sqlx::query_scalar(
+            "SELECT details FROM model.run_modules WHERE run_id=$1 AND module_key='home_attack'",
+        )
+        .bind(id)
+        .fetch_one(&database.pool)
+        .await
+        .unwrap();
+        assert_eq!(module, output.payload["modules"]["home_attack"]);
+        let route: String =
+            sqlx::query_scalar("SELECT route FROM model.run_scorelines WHERE run_id=$1 AND rank=2")
+                .bind(id)
+                .fetch_one(&database.pool)
+                .await
+                .unwrap();
+        assert_eq!(route, "未分类");
+        let audit_count:i64=sqlx::query_scalar("SELECT count(*) FROM audit.events WHERE event_type='model_run_completed' AND entity_id=$1")
+            .bind(id.to_string()).fetch_one(&database.pool).await.unwrap();
+        assert_eq!(audit_count, 1);
+    }
+    let history = database.store.list_recent_runs(500).await.unwrap();
+    let first_item = history.iter().find(|r| r.id == first).unwrap();
+    assert_eq!(first_item.top_scoreline.as_deref(), Some("2-0"));
+    assert_eq!(first_item.top_scoreline_probability, Some(0.55));
+    assert_eq!(first_item.home_team_name.as_deref(), Some("R8-07 Home"));
+    assert_eq!(database.store.list_recent_runs(0).await.unwrap().len(), 1);
+    database
+        .store
+        .hide_run_from_history(first, Some("  "))
+        .await
+        .unwrap();
+    let hidden_at: chrono::DateTime<Utc> =
+        sqlx::query_scalar("SELECT history_hidden_at FROM model.runs WHERE id=$1")
+            .bind(first)
+            .fetch_one(&database.pool)
+            .await
+            .unwrap();
+    database
+        .store
+        .hide_run_from_history(first, Some("  R8-07 hidden  "))
+        .await
+        .unwrap();
+    let hidden: (chrono::DateTime<Utc>, String) = sqlx::query_as(
+        "SELECT history_hidden_at,history_hidden_reason FROM model.runs WHERE id=$1",
+    )
+    .bind(first)
+    .fetch_one(&database.pool)
+    .await
+    .unwrap();
+    assert_eq!(hidden, (hidden_at, "R8-07 hidden".into()));
+    assert!(!database
+        .store
+        .list_recent_runs(500)
+        .await
+        .unwrap()
+        .iter()
+        .any(|r| r.id == first));
+    assert_eq!(
+        database.store.read_run(first).await.unwrap()["input"],
+        request.input
+    );
+    let hidden_audits:i64=sqlx::query_scalar("SELECT count(*) FROM audit.events WHERE event_type='model_run_history_hidden' AND entity_id=$1")
+        .bind(first.to_string()).fetch_one(&database.pool).await.unwrap();
+    assert_eq!(
+        hidden_audits, 2,
+        "each successful visibility request retains its audit"
+    );
+    assert!(database
+        .store
+        .hide_run_from_history(Uuid::new_v4(), None)
+        .await
+        .is_err());
+    let mutation = sqlx::query("UPDATE model.runs SET input_payload='{}'::jsonb WHERE id=$1")
+        .bind(first)
+        .execute(&database.pool)
+        .await;
+    assert!(
+        mutation.is_err(),
+        "API-saved input identity remains immutable"
+    );
 
     database.close().await;
 }

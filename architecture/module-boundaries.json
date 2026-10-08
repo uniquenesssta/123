@@ -300,7 +300,6 @@
         "crates/persistence-postgres/src/match_prediction.rs",
         "crates/persistence-postgres/src/match_review_package.rs",
         "crates/persistence-postgres/src/migrations/mod.rs",
-        "crates/persistence-postgres/src/model_runs.rs",
         "crates/persistence-postgres/src/p4_orchestration.rs",
         "crates/persistence-postgres/src/p4_records.rs",
         "crates/persistence-postgres/src/p4_workbench.rs",
@@ -397,7 +396,7 @@
     "frontend_features": 18,
     "workspace_members": 11,
     "ports": 4,
-    "postgres_adapters": 36,
+    "postgres_adapters": 35,
     "command_groups": 15,
     "commands": 171
   },

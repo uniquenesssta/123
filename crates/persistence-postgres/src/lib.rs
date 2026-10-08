@@ -11,7 +11,6 @@ mod mapping;
 mod match_prediction;
 mod match_review_package;
 mod migrations;
-mod model_runs;
 mod p4_orchestration;
 mod p4_records;
 mod p4_workbench;
@@ -29,9 +28,9 @@ mod team_features;
 
 pub use adapters::register_adapters;
 pub use adapters::ModelRegistration;
+pub use adapters::ModelRunListItem;
 pub use error::{PersistenceError, PersistenceResult};
 pub use health::DatabaseHealth;
-pub use model_runs::ModelRunListItem;
 pub use pool::DatabaseOptions;
 pub use statistics::DatabaseStats;
 pub use store::PostgresStore;

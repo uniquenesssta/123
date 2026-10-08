@@ -11,7 +11,7 @@
 
 适用总纲顶部的执行订正：仅 Windows 动态验证，沿用原单测/contract、既有 Windows runner/workflow/数据库入口；不新增专项或持续回归体系。公开仓库没有私有 P4/P7 引擎、参数和 Golden Master；模型保护资产可验证，公共 unavailable stub 的通过不能冒充私有固定概率实跑。目录模板按实际职责及 Rust 模块命名调整；顺序执行的后端 use case 无新增 UI 生命周期，不强制新增 State、请求 ID 或空出口。
 
-R8-01～06 已取得各自精确 Windows CI（`cba72fd` / `36881256338`、`cc2b0fe` / `36891488571`、`47ba3de` / `36902069546`、`59c5679` / `36966815323`、修复 `2aa99a7` / `36971419476`、`0969331` / `37752995641`）及正式完成记录。07 前置通过、READY 尚未实施；各项精确当前状态只由 [阶段索引](../modular-rewrite/R08-prediction-p4-orchestration/README.md) 维护。07 及后续实施后必须取得自身 Windows CI，不继承前项 PASS。
+R8-01～06 已取得各自精确 Windows CI（`cba72fd` / `36881256338`、`cc2b0fe` / `36891488571`、`47ba3de` / `36902069546`、`59c5679` / `36966815323`、修复 `2aa99a7` / `36971419476`、`0969331` / `37752995641`）及正式完成记录。07 已按用户指令实施、VERIFYING；各项精确当前状态只由 [阶段索引](../modular-rewrite/R08-prediction-p4-orchestration/README.md) 维护。07 及后续必须取得自身 Windows CI，不继承前项 PASS。
 
 ## 1. 阶段目标
 
@@ -1022,7 +1022,7 @@ crates/application/src/use_cases/prediction/dry_run_default_fixture/mod.rs
 
 ## R8-07 Run Persistence
 
-状态：`READY`（06 精确 Windows 门禁及完成记录已通过；尚未实施，等待用户启动指令）
+状态：`VERIFYING`（已按用户“开始07”实施；本项精确 Windows CI 待验，08～12 BLOCKED）。详见 [实施记录](../modular-rewrite/R08-prediction-p4-orchestration/R08-07-run-persistence.md)。
 
 ### 1. 目标
 
@@ -1030,59 +1030,66 @@ crates/application/src/use_cases/prediction/dry_run_default_fixture/mod.rs
 
 ### 2. 现状与来源
 
-- `crates/application/src/prediction.rs`。
-- `p4_orchestration.rs`、`fact_pipeline.rs`、`p4_persistence.rs`、`p4_workbench.rs`。
-- 相关 persistence modules。
+- 实际来源为 `crates/persistence-postgres/src/model_runs.rs`：保存事务、输入审计与快照前检、模型明细、历史读取、隐藏事务及原一项 inline 测试。旧 Application `prediction.rs` 在 R3 已删除，不以不存在的文件为来源。
+- 上游为 `use_cases/prediction/execute_prediction/mod.rs`、`PredictionExecutionPort` 与 `composition/adapters/prediction.rs`；正式保存/影子 nil 和结果组装保持同一执行用例，不增加仅转发的 Application 目录。
+- 历史身份读取复用 R5-06 `adapters/rules/model_run_identity/read`；原共享 mapping/audit owner 不复制。
 
 ### 3. 目标文件与目录
 
 ```text
 crates/persistence-postgres/src/adapters/prediction/runs/
+├─ mod.rs
+├─ write.rs
+├─ input.rs
+├─ details.rs
+├─ read.rs
+└─ visibility.rs
 ```
 
 ### 4. 文件职责边界
 
-- 每个文件只承担一个可用一句话描述的职责。
-- 目录出口文件只负责显式导出。
-- 协调器只编排，不实现数据访问、UI 渲染或领域计算。
+- mod 只登记私有模块并导出原 DTO；write 唯一拥有保存事务及完成审计；input 纯前检；details 借用同一事务写模块/比分明细；read 只读原历史投影；visibility 唯一拥有隐藏与审计事务。
+- 每个文件只承担上述单一职责；输入前检没有 SQL、时钟或共享状态。
+- 业务执行用例通过原 Port 调用 PostgresStore，结果组装不拆成空转发层。
 
 ### 5. 输入
 
-- 无。
+- RouteDecision、ModelRequest、ModelOutput、duration_ms；历史 limit；运行 UUID 和可选隐藏原因。
 
 ### 6. 输出
 
-- 稳定的模块公开接口、可独立测试的实现和对应契约测试。
+- 原保存 UUID、ModelRunListItem 列表、原 read_run JSON、隐藏成功结果和 PersistenceResult 错误；字段、签名及路径保持。
 
 ### 7. 允许依赖
 
-- 无。
+- 原 PostgresStore/PgPool、SQLx transaction、Domain/Model API、mapping、audit、R5-06 身份读取、Serde/chrono/UUID；仅使用现有依赖，不增加框架。
 
 ### 8. 禁止依赖
 
-- 无。
+- UI/Tauri、Application 内部状态、私有模型实现、Research/P4 账本写入；不重复实现共享审计或输入指纹算法。
 
 ### 9. 状态所有权
 
-- 该任务不新增跨模块共享状态；需要状态时由目标模块内具名 State/Coordinator 唯一持有。
+- 沿用 PostgresStore 的唯一连接池；每次正式保存或隐藏各拥有一个局部事务，不新增 State、缓存、后台任务或自动重试。
 
 ### 10. 副作用边界
 
-- 所有 I/O、副作用和外部调用必须集中在明确命名的 adapter/transport/repository/workflow 文件。
+- 保存前完成原审计/快照前检；runtime 快照复用或创建、run、明细和完成审计在 write 的同一事务提交。details 只借用该事务，不自行开池/提交。隐藏更新及审计在 visibility 同一事务。read 只读。
 
 ### 11. 异常路径
 
-- 保持现有错误码、错误类型和用户可见提示语义；新增内部错误必须在边界映射为既有公共错误。
+- 保持原错误类型、中文提示和检查优先级；任何 SQL/明细/审计错误结束同一事务并向原 Port 映射，执行用例不吞错、不返回成功或重试。
 
 ### 12. 并发/异步/生命周期
 
-- 所有异步请求必须具备请求 ID、取消或过期结果丢弃策略；销毁时解除监听器、定时器和挂起回调。
+- 保存前按原顺序生成运行 UUID；每次 async 调用借用原请求/输出，局部 transaction 随成功提交或失败/取消 drop 释放并遵守原 SQLx 回滚行为。快照冲突沿原 ON CONFLICT 和精确查找复用，不增加并发策略；没有 UI 监听器/计时器，不套用 UI 请求状态模板。
 
 ### 13. 兼容要求
 
 - P4.4 保持 SHADOW_ONLY。
 - P7 固定 lambda、概率、矩阵和 top scoreline 回归一致。
 - 历史 cutoff、输入指纹、路由和 schema 不变。
+- 原四个公开方法签名、DTO 字段、九项生产函数体和 SQL 保持；历史 limit 夹到 1～500，只显示成功且未隐藏记录，顺序/名称 fallback/比分/身份不变；重复隐藏保留首次时间，原记录仍可 read_run。
 
 ### 14. 实施步骤
 
