@@ -179,7 +179,7 @@ The public model stub must always return an explicit unavailable error. A succes
 5 项浏览器检查、Rust 编译/Clippy/tests、Windows 交付仍待 04 自身精确 CI。没有 Linux/macOS 动态验证、新 runner/workflow/target/数据库；真实 PG/历史四项/账本/XLSX/Full/私有固定回归和继承模型历史删除 trigger 风险继续最终封包新库待验，ignored 不计 PASS。
 
 
-## R8-04 Windows 收尾 / R8-05 当前验证（2026-10-02）
+## R8-04 Windows 收尾 / R8-05 实施时验证（2026-10-02；已通过，见下方）
 
 精确 `59c567912194e232b29f36ecf94c3a26c969ed06` / run `36966815323` / job `110712250872` 全 SUCCESS；日志确认 Application 77/Persistence 141、input_manifest 十项测试、17 视口、前端类型/构建、Rust fmt/Clippy/workspace tests、Windows release/MSI/NSIS 和启动 7 条记录/3 操作通过。上节待 CI 是实施时记录，04 正式完成记录保存树和 artifact。
 
@@ -193,7 +193,7 @@ The public model stub must always return an explicit unavailable error. A succes
 05 本地实际 PASS：83/83 原源码检查（报告 `r805-source-checks.json`）、完整 `npm run verify:architecture`（`r805-architecture.log`）、Rustfmt --check、`git diff --check`、18 保护资产、171 命令及 46 迁移/18 PG 静态基线。Application 文件扫描 384→388、Domain 1040→1044，43 traits/Port SHA、365/300 和声明摘要保持；Rust 编译/测试与 Windows 浏览器/交付结果尚未实跑，不计通过。
 
 
-## R8-05 首轮 Windows CI 修正（2026-10-02）
+## R8-05 首轮 Windows CI 修正（2026-10-02；修复已通过）
 
 精确 `1f1613d4578b8b8f23f2a458cedc213d072e65b9` / [run 36970160631](https://github.com/uniquenesssta/123/actions/runs/36970160631) / job `110722266615` 失败：Windows Clippy 普通 lib 编译报告 route_model_request/mod.rs 的 `ensure_match_input_id` re-export 未使用，`-D warnings` 将其提升为错误。源码检查和 Windows 前端契约/类型/截图/生产构建已通过；Rust tests、release/安装包/启动尚未到达，不能计通过。
 
@@ -202,3 +202,12 @@ The public model stub must always return an explicit unavailable error. A succes
 本轮修复实际 PASS：83/83 原源码检查、完整 `npm run verify:architecture`、Rustfmt --check、18 保护资产、171 命令、46 迁移/18 PG 静态基线、`git diff --check`；移除 cfg 的单项破坏探针已拒绝并恢复，十项生产导出逐项确认非测试消费。报告 `r805-fix-source-checks.json` / `r805-fix-architecture.log` 位于本轮工作目录；未执行本地 Cargo 或客户端动态验收，Windows 结果待新精确 CI。此修复全部六个文件仅修改，无新增/移动/删除；Domain 使用清单的扫描指纹随出口源码刷新，365/300、声明摘要与其余冻结内容保持，生产函数和测试未变。
 
 首次本地检查提示 Domain 使用清单扫描指纹过期，已运行原 `generate-domain-type-inventory.mjs` 并核对只有 usage scan 指纹变化，随后重跑原检查；无类型/接口变更。
+
+
+## R8-05 Windows 验收与收尾（2026-10-08 核实）
+
+精确 `2aa99a76cb97bb289fd486bb8e3ed5059620fb88` / [run 36971419476](https://github.com/uniquenesssta/123/actions/runs/36971419476) / job `110726001870` 全 SUCCESS，CI 完成时间 2026-10-02 14:22:38（北京时间）。实际通过 Application 85/Persistence 141、route_model_request 十项单测（保留2+新增8）、17 视口、前端契约/类型/生产构建、Rust fmt/Clippy/workspace tests、Windows release/MSI/NSIS 和启动 7 条记录/3 个完成操作。
+
+artifact `11212471101`，14,023,932 字节，SHA-256 `1cb00b0a91d1bbf25270dc8fb535b0405e0280b60595a313f0bc74f4503a3538`。首轮 unused re-export 已由 cfg(test) 修复；前节待 CI 和失败记录仅属实施历史，不代表当前结果。详细差异/兼容/验证见 [05 完成记录](modular-rewrite/R08-prediction-p4-orchestration/R08-05-route-and-model-request.md)。
+
+本轮仅文档收尾，源码/测试/清单不变，复用上述已验证源码证据；只核对相对链接、状态、Git 差异和源码不变，不重复非 Windows Cargo/客户端动态或全量构建。PG/历史四项/账本/XLSX/Windows Full/私有 Golden Master 与继承 model.runs/0041 删除 trigger 风险仍最终新库待验，ignored 不计 PASS。05 完成，06 READY 尚未实施。

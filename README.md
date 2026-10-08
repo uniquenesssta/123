@@ -12,9 +12,7 @@ R8-03 就绪审计已收尾，精确 `47ba3de` / Windows run `36902069546` 通�
 
 R8-04 输入清单已收尾，精确 `59c5679` / Windows run `36966815323` 通过 Application 77/Persistence 141、八项新增清单测试、17 视口和 Windows release/MSI/NSIS/启动。详见 [04 完成记录](docs/modular-rewrite/R08-prediction-p4-orchestration/R08-04-deterministic-input-manifest.md)。
 
-R8-05 路由与请求已迁入 `route_model_request/{mod,selection,route,request,tests}.rs`，旧 `shared/routing.rs` 删除；预览/输入/审计/执行/default 使用同一 owner。原十二 helper、显式覆盖和两个请求组装保持等价，错误顺序/输入身份/路由参数不变；两原测试迁移、八新测试复用原 Probe，预期 Application 85/Persistence 141 待自身 Windows CI。现有 verifier 和使用清单同步，不新增验证体系或数据库。状态与结果见 [R8 索引](docs/modular-rewrite/R08-prediction-p4-orchestration/README.md)；PG/私有固定回归/Full 和继承删除风险仍最终新库待验。
-
-R8-05 首轮 Windows CI `36970160631` 在 Clippy 普通库构建失败：身份 helper 仅单测使用，却被无条件导出。已改为 `cfg(test)` 导出并增强原 verifier 防止复发，生产请求/公共接口/模型行为和测试数量保持。修复仍等待新的 Windows CI，未进入后续节点。
+R8-05 路由与模型请求已收尾：精确修复 `2aa99a7` / [Windows run `36971419476`](https://github.com/uniquenesssta/123/actions/runs/36971419476) 通过 Application 85/Persistence 141、十项路由请求测试、17 视口、Rust/前端、Windows release/MSI/NSIS/启动。原 shared/routing 已删除，唯一 route_model_request 持有原选择/校验/上下文/请求职责；首轮测试专用导出引起的 Clippy 失败已修复并通过。详见 [05 完成记录](docs/modular-rewrite/R08-prediction-p4-orchestration/R08-05-route-and-model-request.md) 与 [R8 索引](docs/modular-rewrite/R08-prediction-p4-orchestration/README.md)。06 已 READY、尚未实施；真实 PG/私有固定回归/Full 及继承历史删除风险仍最终新库待验。
 
 ## 公开边界
 

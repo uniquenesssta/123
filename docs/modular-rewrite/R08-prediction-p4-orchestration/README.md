@@ -2,7 +2,7 @@
 
 ## 当前阶段状态
 
-`IN_PROGRESS`。唯一阶段分支 `rewrite/r8-prediction-p4-orchestration`，起点/回退基线 `90680bf945fbb0d1c191937c2d9e90c2c916fb00`。R8-01～04 已 DONE，用户已启动 R8-05，当前 `VERIFYING`；06～12 `BLOCKED`。精确当前状态只由本索引维护。
+`IN_PROGRESS`。唯一阶段分支 `rewrite/r8-prediction-p4-orchestration`，起点/回退基线 `90680bf945fbb0d1c191937c2d9e90c2c916fb00`。R8-01～05 已 DONE；R8-06 `READY`，尚未实施；07～12 `BLOCKED`。精确当前状态只由本索引维护。
 
 ## 前置基线与范围
 
@@ -18,8 +18,8 @@ R8 依据 [任务书](../../football-model-platform-modular-rewrite-19-docs/08-R
 | R8-02 | Historical Feature Reader | DONE · [完成记录](R08-02-historical-feature-reader.md) |
 | R8-03 | Readiness Audit | DONE · [完成记录](R08-03-readiness-audit.md) |
 | R8-04 | Deterministic Input Manifest | DONE · [完成记录](R08-04-deterministic-input-manifest.md) |
-| R8-05 | Route / Model Request | VERIFYING |
-| R8-06 | Model Execution Adapter | BLOCKED |
+| R8-05 | Route / Model Request | DONE · [完成记录](R08-05-route-and-model-request.md) |
+| R8-06 | Model Execution Adapter | READY |
 | R8-07 | Run Persistence | BLOCKED |
 | R8-08 | P4 Evidence Ledger | BLOCKED |
 | R8-09 | Fact Pipeline | BLOCKED |
@@ -35,7 +35,7 @@ Readiness 评分/检查、manifest 算法、路由与模型执行仍由现有 ow
 
 ## 动态待验与阶段出口
 
-R8-01～04 已取得各自精确 Windows CI；R8-05 须独立取得精确门禁，不继承前项 PASS。数据库相关 contracts、历史四项/账本、模型历史删除风险、有效 XLSX、Windows Full 的真实结果仍最终新库待验，详见 R7 阶段清单。模型保护或真实固定回归不可取得时明确说明，公共 unavailable stub 不冒充私有引擎 Golden Master。后续节点成功后逐项更新；未完成全部节点不创建阶段完成记录。
+R8-01～05 已取得各自精确 Windows CI；R8-06 实施后须独立取得精确门禁，不继承前项 PASS。数据库相关 contracts、历史四项/账本、模型历史删除风险、有效 XLSX、Windows Full 的真实结果仍最终新库待验，详见 R7 阶段清单。模型保护或真实固定回归不可取得时明确说明，公共 unavailable stub 不冒充私有引擎 Golden Master。后续节点成功后逐项更新；未完成全部节点不创建阶段完成记录。
 
 ## R8-01 实施与门禁记录（已通过）
 
@@ -105,7 +105,7 @@ R8-01～04 已取得各自精确 Windows CI；R8-05 须独立取得精确门禁�
 
 2026-10-02 核实 `59c5679` / Windows run `36966815323` / job `110712250872` 全 SUCCESS，Application 77/Persistence 141、两项保留及八项新清单测试、17 视口、Rust/前端、release/MSI/NSIS/启动 7 条/3 操作通过。artifact `11210976146`，14,025,634 字节，SHA-256 `dc0c8ec9ea9d5c9b5c9e9d62b0cdb27e5a9420747de5b81f839e68b0b7625677`。详见 [04 完成记录](R08-04-deterministic-input-manifest.md)。05 起点/回退基线为精确 `59c567912194e232b29f36ecf94c3a26c969ed06`，沿用唯一 R8 分支。
 
-## R8-05 实施与门禁记录（等待自身 Windows CI）
+## R8-05 实施与门禁记录（实施时记录；已通过，见下方收尾）
 
 实际来源为 shared/routing.rs 的十二项 helper、execute_prediction 的显式上下文覆盖/ModelRequest 组装以及 dry_run_default_fixture 的默认请求组装。新增唯一 `route_model_request/{mod,selection,route,request,tests}.rs`：mod 仅导出，selection 规范化和精确注册验证，route 快照类型与受审计身份，request 输入/上下文/实际和默认请求组装；全部纯计算。旧 routing 完整删除，shared 保留真实 p4_planning；没有兼容转发或第二 owner。预览、输入构建、审计、执行器、默认 dry run 和 lib 原测试接入唯一 owner。原 Port 路由 I/O、supports/predict、计时和正式/影子保存仍在原用例，留 06/07。
 
@@ -121,7 +121,7 @@ R8-01～04 已取得各自精确 Windows CI；R8-05 须独立取得精确门禁�
 05 实际本地门禁：83/83 原源码检查 PASS（88 清单中的五浏览器项留 Windows）；完整 `npm run verify:architecture`、Rustfmt --check、`git diff --check`、18 保护资产、171 命令、46 迁移/18 PG 静态基线全部 PASS。六破坏探针拒绝并恢复。报告 `r805-source-checks.json` / `r805-architecture.log` 保存在本轮工作目录（可由上述原命令重现）；未执行本地 Cargo 或客户端动态验收。Application 扫描 384→388，Domain 1040→1044；43 traits/Port SHA、365 类型/300 映射及声明摘要保持。Mermaid Chart 已更新实际职责链路，结束时 Create State 保存进度；Windows 动态结果仍待本提交 CI。
 
 
-## R8-05 首轮 Windows CI 修正（2026-10-02）
+## R8-05 首轮 Windows CI 修正（2026-10-02；实施时记录，修复已通过）
 
 精确 `1f1613d4578b8b8f23f2a458cedc213d072e65b9` / [run 36970160631](https://github.com/uniquenesssta/123/actions/runs/36970160631) / job `110722266615` 失败：Windows Clippy 普通 lib 编译报告 route_model_request/mod.rs 的 `ensure_match_input_id` re-export 未使用，`-D warnings` 将其提升为错误。源码检查和 Windows 前端契约/类型/截图/生产构建已通过；Rust tests、release/安装包/启动尚未到达，不能计通过。
 
@@ -130,3 +130,10 @@ R8-01～04 已取得各自精确 Windows CI；R8-05 须独立取得精确门禁�
 本轮修复实际 PASS：83/83 原源码检查、完整 `npm run verify:architecture`、Rustfmt --check、18 保护资产、171 命令、46 迁移/18 PG 静态基线、`git diff --check`；移除 cfg 的单项破坏探针已拒绝并恢复，十项生产导出逐项确认非测试消费。报告 `r805-fix-source-checks.json` / `r805-fix-architecture.log` 位于本轮工作目录；未执行本地 Cargo 或客户端动态验收，Windows 结果待新精确 CI。此修复全部六个文件仅修改，无新增/移动/删除；Domain 使用清单的扫描指纹随出口源码刷新，365/300、声明摘要与其余冻结内容保持，生产函数和测试未变。
 
 首次本地检查提示 Domain 使用清单扫描指纹过期，已运行原 `generate-domain-type-inventory.mjs` 并核对只有 usage scan 指纹变化，随后重跑原检查；无类型/接口变更。
+
+
+## R8-05 收尾（2026-10-08）
+
+核实精确修复 `2aa99a76cb97bb289fd486bb8e3ed5059620fb88` / Windows run `36971419476` / job `110726001870` 全 SUCCESS；CI 完成时间 2026-10-02 14:22:38（北京时间）。日志确认 Application 85/Persistence 141、两项保留及八项新路由请求测试、17 视口、Rust/前端、release/MSI/NSIS/启动 7 条/3 操作通过。artifact `11212471101`，14,023,932 字节，SHA-256 `1cb00b0a91d1bbf25270dc8fb535b0405e0280b60595a313f0bc74f4503a3538`。详见 [05 完成记录](R08-05-route-and-model-request.md)，含完整累计 23 文件、首轮失败/修复、兼容和延期风险。
+
+本轮只新增完成记录并同步根 README、TESTING、任务书、本索引，源码/测试/清单不变，复用已验证 `2aa99a7` 源码。05 DONE；06 前置通过、READY 尚未实施；07～12 BLOCKED。PG/历史四项/账本/XLSX/Full/私有 Golden Master 和继承删除 trigger 风险继续最终封包新库待验。纯文档提交不重复全量验证，不将自动触发的尚未结束 CI 计为通过。

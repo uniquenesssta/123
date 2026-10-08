@@ -5,13 +5,13 @@
 > 后续阶段：`R9`  
 > 本文档是唯一执行依据之一；必须与 `00-总体架构与前23节.md` 同时适用。
 
-## 当前执行订正（2026-10-02）
+## 当前执行订正（2026-10-08）
 
 用户已启动唯一 R8 分支 `rewrite/r8-prediction-p4-orchestration`，起点 `90680bf945fbb0d1c191937c2d9e90c2c916fb00`。R7-01～15 及 Windows Automated 已完成；最终代码 `a928c8b` / run `36871154039` 通过。动态 PG、历史四项/账本、有效 XLSX、Windows Full 及模型历史删除风险仍最终封包新库待验，不继承为 PASS。
 
 适用总纲顶部的执行订正：仅 Windows 动态验证，沿用原单测/contract、既有 Windows runner/workflow/数据库入口；不新增专项或持续回归体系。公开仓库没有私有 P4/P7 引擎、参数和 Golden Master；模型保护资产可验证，公共 unavailable stub 的通过不能冒充私有固定概率实跑。目录模板按实际职责及 Rust 模块命名调整；顺序执行的后端 use case 无新增 UI 生命周期，不强制新增 State、请求 ID 或空出口。
 
-R8-01～04 已取得各自精确 Windows CI（`cba72fd` / `36881256338`、`cc2b0fe` / `36891488571`、`47ba3de` / `36902069546`、`59c5679` / `36966815323`）及正式完成记录。用户已启动 R8-05；各项精确当前状态只由 [阶段索引](../modular-rewrite/R08-prediction-p4-orchestration/README.md) 维护。05 必须取得自身 Windows CI，不继承前项 PASS。
+R8-01～05 已取得各自精确 Windows CI（`cba72fd` / `36881256338`、`cc2b0fe` / `36891488571`、`47ba3de` / `36902069546`、`59c5679` / `36966815323`、修复 `2aa99a7` / `36971419476`）及正式完成记录。06 前置通过、尚未实施；各项精确当前状态只由 [阶段索引](../modular-rewrite/R08-prediction-p4-orchestration/README.md) 维护。06 实施后必须取得自身 Windows CI，不继承前项 PASS。
 
 ## 1. 阶段目标
 
@@ -743,6 +743,8 @@ crates/application/src/use_cases/prediction/input_manifest/
 
 当前状态与精确门禁结果见 [阶段索引](../modular-rewrite/R08-prediction-p4-orchestration/README.md)。
 
+收尾证据：修复 `2aa99a7` / Windows run `36971419476` 已通过 Application 85/Persistence 141、十项路由请求测试、17 视口及 Windows 交付；见 [05 完成记录](../modular-rewrite/R08-prediction-p4-orchestration/R08-05-route-and-model-request.md)。首轮测试专用 re-export 已限定 cfg(test)，原编排和行为保持。
+
 实际实施：唯一 `route_model_request/{mod,selection,route,request,tests}.rs`，删除 shared/routing.rs；十二原 helper、显式执行上下文及两个请求组装块逐段等价，预览/审计/输入/执行/default 调用唯一 owner。原两测试迁移，八项新测试沿用原 Application target；模型执行/保存留 06/07。Windows CI 单独验收，PG/Full/私有固定回归最终新库待验。
 
 ### 1. 目标
@@ -880,7 +882,7 @@ crates/application/src/use_cases/prediction/route_model_request/
 
 ## R8-06 Model Execution Adapter
 
-状态：`BLOCKED`（仅当上一任务与本任务前置门禁通过后改为 `READY`）
+05 前置门禁已通过；本项当前状态见 [阶段索引](../modular-rewrite/R08-prediction-p4-orchestration/README.md)，本轮未开始实施。
 
 ### 1. 目标
 
