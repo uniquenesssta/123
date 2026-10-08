@@ -55,6 +55,12 @@ Node 开发依赖固定安装和读取自源码根目录上一级的 `../node_mo
 
 ## 模块化重写执行记录
 
+### Figma 设计接入任务书补充（2026-10-08）
+
+- [总纲第 8.0 节](docs/football-model-platform-modular-rewrite-19-docs/00-总体架构与前23节.md#80-figma-设计接入依据2026-10-08-补充)纳入 `ui-design-system` 分支 `docs/` 的设计依据与可追溯基线 `460eb0d`：已确认 Figma 决定新视觉，源码/契约提供功能和数据语义。R12 承接现有组件与 Patterns，R13～R15 补齐页面到节点的映射；设计路由不机械等同代码模块。
+- S01～S13 的 13 / 17 路由仅为视觉、代表性状态及有限原型验收。未开始的 S14 配置、S15 数据库、S16 日志、S17 架构分别登记在对应 UI 节点，不阻塞 R8～R11 和 R12 基础工作；R17 沿用现有 Windows fixtures/截图/交互验收，保留真实运行时和最终新库待验边界。
+- 本次仅补充总纲、R12～R15/R17 任务书与本记录；未实施 UI，R8-06 仍 READY。文档差异、41 个设计文件引用、6 个本地链接/锚点及节点编号/状态检查通过；复用原源码验证证据，纯文档提交标记 `[skip ci]` 避免重复构建，不修改 CI workflow、数据库入口或依赖。
+
 ### R7-15 Row 与 Subrecord Identity（2026-10-01，DONE）
 
 - 首次 Windows run `36866936459` 在 Clippy `-D warnings` 因迁移后原 `team_package/identity.rs` 遗留未使用的 `PersistenceError` 导入失败；架构、前端类型/构建与 17 视口已通过，Rust tests/打包/启动未执行完成。已删除无调用导入并同步 Domain 使用指纹，直接受影响的原门禁、源码格式通过；无业务改动或警告抑制，修订 `a928c8b` / Windows run `36871154039` 已全通过，该 CI 失败已关闭。

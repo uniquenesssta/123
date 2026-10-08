@@ -19,6 +19,23 @@
 - R13 完成。
 - R8/R10/R11 后端契约全部通过。
 
+### 3.1 Figma 核心页面接入（2026-10-08 补充）
+
+适用[总纲第 8.0 节](00-总体架构与前23节.md#80-figma-设计接入依据2026-10-08-补充)。以下设计记录来自 `ui-design-system` 分支 `docs/`，按最新明确 accepted 版本及实际节点读取，并作为对应 Atomic Task 的共同输入和验收依据。
+
+| R14 节点 | Figma 页面与独立记录 | 实现边界 |
+|---|---|---|
+| R14-01～06 | S03 `prediction` / `FIGMA_SCREEN_PREDICTION.md`、`FIGMA_SCREEN_PREDICTION_STATE.json` | 上下文、readiness、正式/影子、结果及 P4 研究；输入、Provider、准入与输出分别维护，UI 不计算模型结果 |
+| R14-07 | S05 `runs` / `FIGMA_SCREEN_RUNS.md`、`FIGMA_SCREEN_RUNS_STATE.json` | 列表、详情、技术追踪与历史隐藏；未知值不补零，隐藏不删除底层血缘 |
+| R14-08～11 | S04 `review` / `FIGMA_SCREEN_REVIEW.md`、`FIGMA_SCREEN_REVIEW_STATE.json` | 九步工作流、事实、回包与结果；查看不授予执行许可，确认后的身份/SHA 仍须验证 |
+| R14-12 | S04 `review` 与 S12 `analytics` 的赛后/结算相关状态 | 按 Postmatch 的实际职责核对覆盖，复盘与结算分别处理；缺少独立场景时在本节点补齐设计输入，不推测已有整页完成 |
+| R14-13～16 | S12 `analytics` / `FIGMA_SCREEN_ANALYTICS.md`、`FIGMA_SCREEN_ANALYTICS_STATE.json` | 总览、任务、包/建议与候选；全局快照不授予精确分区许可，接受建议不等于正式能力/参数已修改 |
+| R14-17 | S11 `release` / `FIGMA_SCREEN_RELEASE.md`、`FIGMA_SCREEN_RELEASE_STATE.json` | 验收请求、分类检查、不可变报告和历史；报告完成不等于真实发布，保留公开运行时警告 |
+
+上述页面在 `460eb0d` 检查点已通过有限设计验收，不表示 R14 代码或真实后端联调完成。进入节点时读取其独立记录的未实现项和源码差异，只解决本节点真实影响范围；设计包含的手动演示结果必须替换为真实任务状态，未分发模型继续显示原有不可用语义，不伪造成功结果。
+
+按实际操作验证上下文切换、输入失效、请求身份、取消/迟到结果、重试/结果未知、最终确认和只读边界；跨页导航保留正确来源与主题，不转移执行权限。Windows 视觉/交互证据沿用原体系，未实跑的私有引擎、PG 与 Full 验收继续登记待验；设计 PASS 不能冲销这些条件。
+
 ## 4. 明确范围
 
 ### 4.1 纳入范围

@@ -19,6 +19,26 @@
 - R12 Foundation 全部通过。
 - 对应后端命令和契约稳定。
 
+### 3.1 Figma 页面映射与设计前置（2026-10-08 补充）
+
+适用[总纲第 8.0 节](00-总体架构与前23节.md#80-figma-设计接入依据2026-10-08-补充)。以下 S 编号及文件来自 `ui-design-system` 分支 `docs/`。以最新明确 accepted 记录与实际 Figma 节点为输入，复用 R12 的唯一组件实现。本节补充所有对应 Atomic Task 的设计输入和完成条件。
+
+| R13 节点 | Figma 页面与记录 | 本次核对状态 / 对接要求 |
+|---|---|---|
+| R13-01 Dashboard | S01 `dashboard` / `FIGMA_SCREEN_DASHBOARD.md` | 视觉与代表性本页状态已验收；接入真实总览、连接状态和快捷入口 |
+| R13-02 Database | S15 `database` / `FIGMA_SCREENS_PLAN.md` | 设计尚未开始；本节点 UI 验收前取得数据库页面的 accepted 设计与状态记录 |
+| R13-03 Competitions、04 Rules | S10 `rules` / `FIGMA_SCREEN_RULES.md`及 `_STATE.json` | 赛事目录、层级、路由、规则包属于同一设计路由，按代码职责拆分并保持页面入口一致 |
+| R13-05 Teams | S06 `teams` / `FIGMA_SCREEN_TEAMS.md`及 `_STATE.json` | 目录、档案、名单、资料包与危险操作边界接入 |
+| R13-06 Players | S07 `players` / `FIGMA_SCREEN_PLAYERS.md`及 `_STATE.json` | 目录、来源身份、履历、长期能力和短期标签分别接入 |
+| R13-07 Lineup Presets | S08 `lineup_presets` / `FIGMA_SCREEN_LINEUP_PRESETS.md`及 `_STATE.json` | 预设编辑、归档与套用；预设和比赛副本分离 |
+| R13-08 Lineups | S02 `lineups` / `FIGMA_SCREEN_LINEUPS.md`及 `_STATE.json` | 比赛、双方阵容、历史与局部工作包；保存和准入分开 |
+| R13-09 Workbooks | S09 `workbooks` / `FIGMA_SCREEN_WORKBOOKS.md`及 `_STATE.json` | 三类工作包、预检、确认与批次隔离 |
+| R13-10 Architecture Page | S17 `architecture` / `FIGMA_SCREENS_PLAN.md` | 设计尚未开始；本节点 UI 验收前取得架构页面的 accepted 设计与状态记录 |
+
+“及 `_STATE.json`”指同名 Markdown 去掉 `.md` 后添加 `_STATE.json` 的独立状态文件。S15/S17 尚无完整页面验收记录，不推测文件或节点 ID；从 Screens 总计划确认后续真实交付。表内“尚未开始”是 `460eb0d` 检查点的设计状态，执行前须重新核对，不永久阻塞已补齐的设计。
+
+每页先将原有操作、当前接口和设计状态对齐，登记该页记录中的源码差异/运行时缺口，再在对应节点实现；不得因画板只覆盖代表性对象而删去其他合法数据路径。保留搜索/分页/选择、来源返回、错误不串用旧对象、失败草稿和工作区恢复等真实行为。数据变更及最终确认调用现有 API；Windows 验收复用已有 fixtures/脚本，真实数据库与工作簿待验仍按总纲登记。S15/S17 的设计缺口只影响对应节点，不阻塞前置后端和 R12 基础工作。
+
 ## 4. 明确范围
 
 ### 4.1 纳入范围

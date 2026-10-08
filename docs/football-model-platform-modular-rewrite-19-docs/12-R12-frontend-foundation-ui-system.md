@@ -18,7 +18,28 @@
 ## 3. 前置输入与进入条件
 
 - R11 命令层稳定。
-- 前端旧行为、截图和交互基线已冻结。
+- 前端旧行为、截图和交互基线已留存用于功能对照；新视觉以已确认 Figma 为准。
+
+### 3.1 已有 Figma 成果接入（2026-10-08 补充）
+
+先执行[总纲第 8.0 节](00-总体架构与前23节.md#80-figma-设计接入依据2026-10-08-补充)的版本、设计权威与 Windows 验收规则。本节作为所有 R12 Atomic Task 的共同输入；旧节点模板中的“输入：无”不排除此输入。设计来源为 `ui-design-system` 分支 `docs/`，本次基线 `460eb0dcadd58e40842291d900ee0157eb4fdf40`，后续执行时按总纲核对最新 accepted 记录。
+
+| R12 节点 | 已有设计记录（均位于设计分支 `docs/`） | 接入责任 |
+|---|---|---|
+| R12-03、05、07 | `FIGMA_PC_APP_SHELL.md` | 7 模块 / 17 路由的导航、Topbar、折叠、主题、页面区域与工作区恢复；视觉路由不改变 Feature 状态所有权 |
+| R12-06、14 | `FIGMA_TOAST_INLINE_ALERT_BLOCKING_MESSAGE.md`、`FIGMA_DIALOG.md` | 全局警告入口、通知、任务活动、错误、弹窗和危险确认；明确关闭提示与取消任务的区别 |
+| R12-10 | `FIGMA_COMPONENT_RECORD.md`、`FIGMA_FOUNDATION_COMPONENT_BACKLOG.md`及后续组件记录 | 按当前实际变量/样式绑定实现 Tokens，覆盖 Light/Dark；历史记录内旧 CSS 尺寸和“Screens 未开始”不覆盖最新已确认值及总检查点 |
+| R12-11～12 | `FIGMA_BUTTON_COMPONENTS.md`、`FIGMA_EXTENDED_FIELDS.md`、`FIGMA_SEARCHABLE_COMBOBOX.md`、`FIGMA_SWITCH_TOGGLE.md`及组件总记录 | 基础控件、字段、校验和适用交互状态；组件属性映射到职责明确的 TypeScript/DOM/CSS 接口 |
+| R12-13 | `FIGMA_DATA_TABLE_PAGINATION.md`、`FIGMA_METRIC_ACTION_PANEL.md`、`FIGMA_PROGRESS_SKELETON_EMPTY_STATE.md`、`FIGMA_WORKFLOW_STEPPER_TIMELINE.md`、`FIGMA_AVATAR.md` | 表格、分页、指标、面板、进度、空状态、Timeline 和头像；仅通用展示/交互进入 UI 层 |
+| R12-14～15 | `FIGMA_DROPDOWN_CONTEXT_OVERFLOW_MENU.md`、`FIGMA_TABS_SEGMENTED_CONTROL.md`、`FIGMA_ACCORDION_DISCLOSURE.md`及 Shell/Dialog 记录 | 菜单、标签页、折叠、布局、滚动与焦点；控件禁用不能通过父容器点击绕过 |
+| R12-16 | `FIGMA_PATTERN_SCREEN_PLAN.md`及六组 Patterns 独立记录 | 复用页面标题/工具栏/筛选/选择、卡片/面板、主从详情、工作流及 AI Chat 的通用结构；足球规则、九步复盘和 AI 请求状态仍归对应 Feature |
+| R12-17～19 | `FIGMA_ICON_BACKLOG.md`、相关组件/Patterns 的验收记录 | 图标、资源、可访问性、样式边界和现有 Foundation 验证；实现真实键盘、焦点、缩放与生命周期 |
+
+R12-01～02、04、08～09 的启动、生命周期、会话和平台能力继续按原职责实现，为设计交互提供真实运行时支持，不因没有独立画板重复创建 UI。
+
+R12-05 开始前应已明确 Shell 使用的变量、组件与状态接口。确需先落地的最小 Tokens/控件依赖放入 R12-10～15 规划的唯一目标目录并在原记录注明，后续节点继续完善同一实现；不复制临时 Shell 专用设计系统，不凭前置依赖完成就将后续节点标为 DONE。
+
+R12 可使用已完成的基础组件与 Patterns，不以 S14～S17 全部完成为前置。各节点退出时记录采用的设计版本/根节点、组件映射和 Windows 证据；预置原型尚未实现的焦点锁定/恢复、真实异步、取消、滚动和工作区持续性按职责补齐，不能仅凭 Figma PASS 关闭节点。
 
 ## 4. 明确范围
 
