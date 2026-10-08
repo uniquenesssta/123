@@ -1,0 +1,37 @@
+{
+  "schemaVersion": 1,
+  "runId": "footfigma-screens-logs-2026-10-08",
+  "repo": "uniquenesssta/123",
+  "branch": "ui-design-system",
+  "fileKey": "PN0Whgu6HLWIHx4Mv6aHfu",
+  "page": "3:5",
+  "currentScreen": "S16 logs / 问题日志",
+  "currentRoute": "logs",
+  "phase": "in_progress_semantics_verified",
+  "currentExecutionFinished": false,
+  "acceptedRouteCount": 15,
+  "routeCount": 17,
+  "previousAcceptedGlobalCheckpoint": "920432210478b26e17f2a3c9ffaf74c0f9f01e6f",
+  "nextScreen": "S17 architecture / 架构信息",
+  "nextScreenStarted": false,
+  "source": {
+    "page": "src/pages/logs.ts@cabb4829f6f19101e3118446852d00cb7f4c4613",
+    "store": "src-tauri/src/issue_log.rs@55c904362403a141ccf85f80f40511c13929fb60",
+    "commands": "src-tauri/src/commands/issues.rs@630934c336728095013f7dcb48e008b18407d0da"
+  },
+  "guards": [
+    "Historical records are not live health or resolution status",
+    "Unique issue count, occurrence count and merged repeats are distinct",
+    "Same retained occurrence key does not increment; different attempt may increment",
+    "Local logs remain available without database; connected refresh may ingest failed background jobs",
+    "Export is a local text snapshot, not an upload or full runtime trace",
+    "Clearing removes issue history, not runtime logs or business data; subsequent scans may recreate issues",
+    "Clear mutates memory before persistence; failure does not prove previous disk/memory state preserved",
+    "Unknown/load failure is not confirmed empty; masking is not a comprehensive secret audit"
+  ],
+  "frames": {},
+  "pending": ["editable composition", "representative states and bounded prototype", "deep structural and screenshot QA", "synchronize independent and global checkpoints"],
+  "applicationSourceModified": false,
+  "existingMastersModified": false,
+  "runtimeOperationsPerformed": false
+}
