@@ -2,7 +2,9 @@
 
 ## 当前阶段状态
 
-`IN_PROGRESS`。唯一阶段分支 `rewrite/r8-prediction-p4-orchestration`，阶段起点 `90680bf945fbb0d1c191937c2d9e90c2c916fb00`。R8-01～11已DONE；11精确 `47bda23` / Windows `37891346613` 全SUCCESS，文档收尾 `1b7017f`。用户授权“收尾11开始12”，12实际冻结职责已实施、VERIFYING，等待自身精确Windows CI。精确当前状态由本索引维护；R8未完成，不启动R9。
+`DONE`（R8-01～12 代码/节点及 Windows Automated 阶段出口）。唯一阶段分支 `rewrite/r8-prediction-p4-orchestration`，起点 `90680bf945fbb0d1c191937c2d9e90c2c916fb00`。最终代码 `af3c98c31e28a332fe19ec47f4ed11c3a5a261ab` / [Windows run `37899786755`](https://github.com/uniquenesssta/123/actions/runs/37899786755) 全 SUCCESS，Application 126/Persistence 175、17 视口和 Windows 构建/打包/启动通过。已创建 [阶段完成记录](R08-stage-completion.md)。真实 PostgreSQL、历史四项数据库验收、账本/并发/回滚、有效 XLSX、Windows Full、私有 P4/P7 Golden Master，以及继承的 model.runs/0041 历史删除风险继续最终封包新库待验；ignored、公开 unavailable stub 和静态保护指纹均不计真实执行 PASS。
+
+R8 任务书只有 12 项；后续唯一节点 [R9-01 Shared Transport](../R09-research-ai-backend/README.md) 为 READY。用户“开始13”的编号待厘清，未创建 R9 分支或开始其代码。
 
 ## 前置基线与范围
 
@@ -25,7 +27,7 @@ R8 依据 [任务书](../../football-model-platform-modular-rewrite-19-docs/08-R
 | R8-09 | Fact Pipeline | DONE · [完成记录](R08-09-fact-pipeline.md) · 精确Windows全SUCCESS |
 | R8-10 | Horizon Orchestration | DONE · [完成记录](R08-10-horizon-orchestration.md) · 精确Windows全SUCCESS |
 | R8-11 | Workbench Reads | DONE · [完成记录](R08-11-workbench-reads.md) · 精确Windows全SUCCESS |
-| R8-12 | Freeze Transaction | VERIFYING · [实施记录](R08-12-freeze-transaction.md) · 等待自身精确Windows |
+| R8-12 | Freeze Transaction | DONE · [完成记录](R08-12-freeze-transaction.md) · 精确Windows全SUCCESS |
 
 ## R8-01 实际来源与实施边界
 
@@ -35,7 +37,7 @@ Readiness 评分/检查、manifest 算法、路由与模型执行仍由现有 ow
 
 ## 动态待验与阶段出口
 
-R8-01～11 已取得各自精确 Windows CI；12仍须独立取得自身门禁，不继承前项 PASS。数据库相关 contracts、历史四项/账本、模型历史删除风险、有效 XLSX、Windows Full 的真实结果仍最终新库待验，详见 R7 阶段清单。模型保护或真实固定回归不可取得时明确说明，公共 unavailable stub 不冒充私有引擎 Golden Master。后续节点成功后逐项更新；未完成全部节点不创建阶段完成记录。
+R8-01～12 已取得各自精确 Windows CI；本索引与阶段完成记录完整覆盖 12 项。阶段 DONE 限于代码/节点及 Windows Automated；真实 PostgreSQL、历史四项数据库验收、账本/并发/回滚、有效 XLSX、Windows Full、私有 P4/P7 Golden Master，以及继承的 model.runs/0041 历史删除风险继续最终封包新库待验；ignored、公开 unavailable stub 和静态保护指纹均不计真实执行 PASS。 下方逐次实施时的旧状态保留为历史，当前状态以本节、任务表和最后收尾为准。
 
 ## R8-01 实施与门禁记录（已通过）
 
@@ -257,3 +259,14 @@ R8-12 Freeze Transaction 已实施、`VERIFYING`：原冻结用例分为编排�
 83原源码/完整architecture、Prediction/Domain/源码卫生、18保护资产/171命令/46迁移/18PG静态契约、Rustfmt1.88 --check和diff均PASS。七探针：脱离明细、pool写、证据截止变包含边界、删除完成时钟、Schema/路由身份绕过、正式标记改变，全部拒绝并恢复。等价核对：两编排函数/七投影函数、26原Postgres函数逐token保持；拆出明细重内联后原快照事务保持；260条SQL/消息/哈希/审计literal与原八测试/fixture函数保持。
 
 报告 `/workspace/scratch/eb298ad5cdcb/r812-static-checks.json`、`r812-architecture.log`、`r812-negative-probes.json`、`r812-equivalence.json`。Domain扫描1090→1099、usageDigest `cf79a5f2a44e5cae6a3ad16545150b6c32db7faae8c3693217956a993d7ea53c`，365/300/sourceDigest不变；Application399→402、43Ports和Postgres根35保持。PG runtime_sources仅原测试blob更新为 `33e58c3275014c1adf99f94a2f938c2dbff1fa75`。无依赖/API升级、迁移或数据库基础设施变化；不执行Linux/macOS动态。原Windows Automated确认启动后停止轮询；12 VERIFYING，R8 IN_PROGRESS、R9不开始。原真实PG/历史四项/账本/有效XLSX/Windows Full/私有固定回归及继承model.runs/0041删除风险继续最终新库待验。
+
+
+## R8-12 精确验收及 R8 阶段收尾（2026-10-09）
+
+精确实施提交 `af3c98c31e28a332fe19ec47f4ed11c3a5a261ab`，源码树 `a911da88c084e9f6abfaf25a1a1909567a6eb166`；[Windows run `37899786755`](https://github.com/uniquenesssta/123/actions/runs/37899786755) / job `113719388521` 全 SUCCESS，完成于 2026-10-09 15:58:10（北京时间）。完整日志确认 Application **126/126**、Persistence **175/175**，本项新增八项 Application、六项 Persistence 及四项原快照测试均通过；前端契约/类型/Vite、**17** 视口、Rust fmt/Clippy/workspace tests、Windows release/MSI/NSIS 和启动 **7 条记录 / 3 个完成操作**通过。
+
+报告 `logs/windows-acceptance-20261009-073548.json`；artifact `11603095137`，名称 `windows-automated-delivery-evidence-af3c98c31e28a332fe19ec47f4ed11c3a5a261ab`，14,034,892 字节，SHA-256 `d82a43858b5389bc66f998d05aea577e3709b1ec263142f28b5a4892b8d979ef`。已核对 run 的分支/head、全部 job/steps、完整日志及未过期的交付 artifact。
+
+12 正式 DONE；[阶段完成记录](R08-stage-completion.md) 已逐项引用 12 份节点记录，列出以阶段起点为基线的完整新增/修改/删除清单、实际职责/状态/事务、兼容接口、验证与回退。继承延期见该记录第 13、16 节，不改写为 PASS。
+
+本次纯文档收尾同步根 README、TESTING、R8 任务书/索引/12 记录，新增阶段完成记录及 R9 索引，并将 R9 任务书首节点登记 READY。源码与最终 Windows 成功树保持；文档差异、链接、节点状态、累计文件清单和保护边界复核，提交 `[skip ci]`，不新建工作流或重复构建。R9-01 只完成前置交接；“13”不是现有 R8 原子任务，待用户厘清对应节点后才开始后续代码，R9-02～11 BLOCKED。真实 PostgreSQL、历史四项数据库验收、账本/并发/回滚、有效 XLSX、Windows Full、私有 P4/P7 Golden Master，以及继承的 model.runs/0041 历史删除风险继续最终封包新库待验；ignored、公开 unavailable stub 和静态保护指纹均不计真实执行 PASS。

@@ -1,6 +1,6 @@
 # R8-12 Freeze Transaction 实施记录
 
-状态：`VERIFYING`。2026-10-09，用户授权“收尾11开始12”；唯一分支 `rewrite/r8-prediction-p4-orchestration`。11精确47bda231575a9179cd629367d5a3273cd2ab654a / Windows37891346613全SUCCESS，118/169、17视口和Windows交付通过；五文档收尾基线 `1b7017fabcc131ef80515b5e5c70507de45da9e0`。本项须自身精确Windows，R8仍IN_PROGRESS，不启动R9。
+状态：`DONE`（精确 `af3c98c` / Windows `37899786755` 全 SUCCESS）。唯一分支 `rewrite/r8-prediction-p4-orchestration`；原实施基线 `1b7017fabcc131ef80515b5e5c70507de45da9e0`。以下实施时的预期、VERIFYING 和不启动 R9 文字保留为历史；当前完成事实见文末精确验收与阶段收尾。
 
 ## 实际来源、职责与唯一入口
 
@@ -86,3 +86,14 @@ API/DTO/serde/Schema/数据格式/配置/错误类型和提示/日志/UI、路�
 ## 回退与真实风险
 
 回退基线1b7017fabcc131ef80515b5e5c70507de45da9e0；受控revert并同步唯一owner/原测试/门禁/清单/记录，不复制旧实现或变更历史数据库。原不同键同正式队列并发可能返回唯一约束SQL错误、模型运行已保存后快照失败仍可能保留原run，均为保留的原边界，不新增跨事务修复。真实PG/历史四项/账本/有效XLSX/Windows Full/私有P4/P7 Golden Master及继承model.runs/0041删除风险继续最终封包新库待验，公开stub/ignored编译/静态保护指纹不能替代实跑。
+
+
+## 精确 Windows 验收与阶段收尾（2026-10-09，DONE）
+
+精确实施提交 `af3c98c31e28a332fe19ec47f4ed11c3a5a261ab`，源码树 `a911da88c084e9f6abfaf25a1a1909567a6eb166`；[Windows run `37899786755`](https://github.com/uniquenesssta/123/actions/runs/37899786755) / job `113719388521` 全 SUCCESS，完成于 2026-10-09 15:58:10（北京时间）。完整日志确认 Application **126/126**、Persistence **175/175**，本项新增八项 Application、六项 Persistence 及四项原快照测试均通过；前端契约/类型/Vite、**17** 视口、Rust fmt/Clippy/workspace tests、Windows release/MSI/NSIS 和启动 **7 条记录 / 3 个完成操作**通过。
+
+报告 `logs/windows-acceptance-20261009-073548.json`；artifact `11603095137`，名称 `windows-automated-delivery-evidence-af3c98c31e28a332fe19ec47f4ed11c3a5a261ab`，14,034,892 字节，SHA-256 `d82a43858b5389bc66f998d05aea577e3709b1ec263142f28b5a4892b8d979ef`。已核对 run 的分支/head、全部 job/steps、完整日志及未过期的交付 artifact。
+
+12 的预期 126/175 已由自身 Windows 实际确认，正式 DONE。01～12 均有独立验收与正式记录，现已创建 [R8 阶段完成记录](R08-stage-completion.md) 并收尾阶段代码/节点及 Windows Automated 出口。真实 PostgreSQL、历史四项数据库验收、账本/并发/回滚、有效 XLSX、Windows Full、私有 P4/P7 Golden Master，以及继承的 model.runs/0041 历史删除风险继续最终封包新库待验；ignored、公开 unavailable stub 和静态保护指纹均不计真实执行 PASS。
+
+本次仅修改六份文档、新增两份文档，源码、测试、架构清单、数据库、保护资产、依赖和工作流均保持上述已验树；收尾提交使用 `[skip ci]` 复用该精确源码证据。R8 任务书止于 12，下一唯一节点为 R9-01 Shared Transport，已登记 READY；用户“开始13”的对应编号待厘清，未创建 R9 工作分支或实施代码。回退仍使用前述基线及受控 revert，不保留双实现。Create State 保存本项目实际完成与待续位置。

@@ -5,6 +5,14 @@
 > 后续阶段：`R10`  
 > 本文档是唯一执行依据之一；必须与 `00-总体架构与前23节.md` 同时适用。
 
+## 当前前置交接（2026-10-09）
+
+R8 的12个节点及 Windows Automated 阶段出口已DONE，最终代码 `af3c98c31e28a332fe19ec47f4ed11c3a5a261ab` / [Windows run `37899786755`](https://github.com/uniquenesssta/123/actions/runs/37899786755) 全 SUCCESS。实际来源/文件/门禁/回退见 [R8阶段完成记录](../modular-rewrite/R08-prediction-p4-orchestration/R08-stage-completion.md)；继承真实PG/XLSX/Full/私有固定回归及删除风险仍最终新库待验，不继承为PASS。
+
+执行总纲顶部订正：只在Windows动态验证，复用原targets/contract/workflow/数据库入口，不新增持续回归体系；R9不升级外部协议、不修改AI Workspace前端。R8期间 `crates/research-gateway/`、公开契约、依赖与配置保持，最终CI原Gateway测试/contract通过，原协议行为作为下一节点基线。
+
+唯一首节点 R9-01 已登记 `READY`，先创建 [R9阶段索引](../modular-rewrite/R09-research-ai-backend/README.md)，R9-02～11继续BLOCKED。R8不存在13；用户“开始13”对应节点待厘清，目前只完成前置交接，尚未创建R9分支或开始代码。
+
 ## 1. 阶段目标
 
 - 把正式研究与普通问答拆成独立协议和工作流。
@@ -161,7 +169,7 @@ Atomic Tasks：
 
 ## R9-01 Shared Transport
 
-状态：`BLOCKED`（仅当上一任务与本任务前置门禁通过后改为 `READY`）
+状态：`READY`（R8节点与Windows阶段出口已通过，原Gateway协议/配置保持；仅前置交接，“开始13”对应节点待厘清，尚未实施。）
 
 ### 1. 目标
 

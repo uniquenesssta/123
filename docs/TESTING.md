@@ -330,7 +330,7 @@ Persistence原target新增6项纯职责测试：正式写入/兼容读取区别�
 
 11正式DONE；四项新增测试及118/169已经实际通过。五文档收尾复用已验源码证据；用户授权12开始，须12自身Windows CI。18 broad PG仍ignored；原真实PG/历史四项/账本/XLSX/Full/私有固定回归和继承删除风险继续最终新库待验。R8尚未完成，不提前创建阶段完成记录或启动R9。
 
-## R8-12 Freeze Transaction 实施待验（2026-10-09）
+## R8-12 Freeze Transaction 实施验证（2026-10-09；以下为实施时记录，现已通过）
 
 新增原Application target八项：完整冻结顺序与全部锁定身份/溯源/31字段/质量分数/外部单链，七个末段Port边界×六种kind/message停止，四路由身份/Schema/空矩阵/非法概率/空比分漂移阻断，快照已提交而FROZEN登记失败后的只读恢复；纯投影另覆盖原路由顺序/原值/证据排序去重与CONFLICT/STALE、外部拓扑/正式覆盖/clean-sheet/矩阵原字节哈希、矩阵缺失/非法/0和65536比分边界。四项原快照Persistence测试原样迁入input，新增六项前检/指纹测试：交付元数据原排除、14类不可变身份/原载荷变化、只排序副本而保留原键/证据列表、完整31序号/trim唯一、有限概率/1e-9和/小写64哈希/optional/u16、正式时点/截止相等及240字节键。源码预期Application **126**（118+8）、Persistence **175**（169+6），须本项Windows实跑。
 
@@ -339,3 +339,14 @@ Persistence原target新增6项纯职责测试：正式写入/兼容读取区别�
 83原源码/完整architecture、Prediction/Domain/源码卫生、18保护资产/171命令/46迁移/18PG静态契约、Rustfmt1.88 --check和diff均PASS。七探针：脱离明细、pool写、证据截止变包含边界、删除完成时钟、Schema/路由身份绕过、正式标记改变，全部拒绝并恢复。等价核对：两编排函数/七投影函数、26原Postgres函数逐token保持；拆出明细重内联后原快照事务保持；260条SQL/消息/哈希/审计literal与原八测试/fixture函数保持。
 
 报告 `/workspace/scratch/eb298ad5cdcb/r812-static-checks.json`、`r812-architecture.log`、`r812-negative-probes.json`、`r812-equivalence.json`。Domain扫描1090→1099、usageDigest `cf79a5f2a44e5cae6a3ad16545150b6c32db7faae8c3693217956a993d7ea53c`，365/300/sourceDigest不变；Application399→402、43Ports和Postgres根35保持。PG runtime_sources仅原测试blob更新为 `33e58c3275014c1adf99f94a2f938c2dbff1fa75`。无依赖/API升级、迁移或数据库基础设施变化；不执行Linux/macOS动态。原Windows Automated确认启动后停止轮询；12 VERIFYING，R8 IN_PROGRESS、R9不开始。原真实PG/历史四项/账本/有效XLSX/Windows Full/私有固定回归及继承model.runs/0041删除风险继续最终新库待验。
+
+
+## R8-12 精确 Windows 验收及 R8 阶段出口（2026-10-09，DONE）
+
+精确实施提交 `af3c98c31e28a332fe19ec47f4ed11c3a5a261ab`，源码树 `a911da88c084e9f6abfaf25a1a1909567a6eb166`；[Windows run `37899786755`](https://github.com/uniquenesssta/123/actions/runs/37899786755) / job `113719388521` 全 SUCCESS，完成于 2026-10-09 15:58:10（北京时间）。完整日志确认 Application **126/126**、Persistence **175/175**，本项新增八项 Application、六项 Persistence 及四项原快照测试均通过；前端契约/类型/Vite、**17** 视口、Rust fmt/Clippy/workspace tests、Windows release/MSI/NSIS 和启动 **7 条记录 / 3 个完成操作**通过。
+
+报告 `logs/windows-acceptance-20261009-073548.json`；artifact `11603095137`，名称 `windows-automated-delivery-evidence-af3c98c31e28a332fe19ec47f4ed11c3a5a261ab`，14,034,892 字节，SHA-256 `d82a43858b5389bc66f998d05aea577e3709b1ec263142f28b5a4892b8d979ef`。已核对 run 的分支/head、全部 job/steps、完整日志及未过期的交付 artifact。
+
+R8-01～12各节点均取得自身精确Windows，最终全workspace与原前端/交付入口在上述head通过。阶段出口额外复核现有保护资产（18项）、命令（171）、数据库静态基线（46迁移/18PG）、Prediction Service职责（48文件/18公开职责）；阶段与收尾范围核对确认 model-api/P4/P7/Domain/research-gateway、迁移/contracts/schemas、依赖/锁文件/workflow和前后端代码均无R8改动。完整文件清单、验收与回退见 [R8阶段完成记录](modular-rewrite/R08-prediction-p4-orchestration/R08-stage-completion.md)。
+
+本轮六修改/两新增均文档；仅验证链接、状态、完整阶段文件清单及diff，不执行非Windows动态、不重复上述成功构建，提交 `[skip ci]`。R9-01只登记READY，未实施。真实 PostgreSQL、历史四项数据库验收、账本/并发/回滚、有效 XLSX、Windows Full、私有 P4/P7 Golden Master，以及继承的 model.runs/0041 历史删除风险继续最终封包新库待验；ignored、公开 unavailable stub 和静态保护指纹均不计真实执行 PASS。

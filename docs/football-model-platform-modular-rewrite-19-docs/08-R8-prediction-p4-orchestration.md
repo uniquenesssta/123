@@ -11,7 +11,9 @@
 
 适用总纲顶部的执行订正：仅 Windows 动态验证，沿用原单测/contract、既有 Windows runner/workflow/数据库入口；不新增专项或持续回归体系。公开仓库没有私有 P4/P7 引擎、参数和 Golden Master；模型保护资产可验证，公共 unavailable stub 的通过不能冒充私有固定概率实跑。目录模板按实际职责及 Rust 模块命名调整；顺序执行的后端 use case 无新增 UI 生命周期，不强制新增 State、请求 ID 或空出口。
 
-R8-01～11已取得各自精确Windows CI及正式完成记录；11精确 `47bda23` / `37891346613` 全SUCCESS并文档收尾 `1b7017f`。用户授权“收尾11开始12”；12已实施、VERIFYING，必须取得自身精确Windows，不继承11 PASS。各项当前状态只由 [阶段索引](../modular-rewrite/R08-prediction-p4-orchestration/README.md) 维护；R8尚未完成，不提前创建阶段完成记录或启动R9。
+R8-01～12已取得各自精确Windows CI及正式完成记录，阶段代码/节点与 Windows Automated 为 DONE；最终 `af3c98c31e28a332fe19ec47f4ed11c3a5a261ab` / [Windows run `37899786755`](https://github.com/uniquenesssta/123/actions/runs/37899786755) 全 SUCCESS，126/175、17 视口和 Windows 交付通过。[阶段索引](../modular-rewrite/R08-prediction-p4-orchestration/README.md) 及 [阶段完成记录](../modular-rewrite/R08-prediction-p4-orchestration/R08-stage-completion.md) 已完整同步。真实 PostgreSQL、历史四项数据库验收、账本/并发/回滚、有效 XLSX、Windows Full、私有 P4/P7 Golden Master，以及继承的 model.runs/0041 历史删除风险继续最终封包新库待验；ignored、公开 unavailable stub 和静态保护指纹均不计真实执行 PASS。
+
+R8仅有12个节点，后续唯一 R9-01 为 READY；用户“开始13”的对应编号待厘清，未开始 R9 代码或创建其阶段分支。下方实施记录内的旧状态为历史，当前状态以上方订正和阶段索引为准。
 
 ## 1. 阶段目标
 
@@ -597,7 +599,7 @@ crates/application/src/use_cases/prediction/readiness/
 
 ## R8-04 Deterministic Input Manifest
 
-状态：见阶段索引；按用户指令开始，须自身精确 Windows CI 和完成记录才能关闭。
+状态：`DONE`（精确 `59c5679` / Windows `36966815323` 全 SUCCESS，见阶段索引及04完成记录）。
 
 ### 1. 目标
 
@@ -1616,7 +1618,7 @@ Application只用既有PredictionWorkflowPort；composition已有Postgres方法�
 
 ## R8-12 Freeze Transaction
 
-状态：`VERIFYING`（用户授权“收尾11开始12”；11精确47bda23 / Windows37891346613全SUCCESS，文档收尾基线1b7017f。12本地静态通过，须自身精确Windows CI。）
+状态：`DONE`（精确 `af3c98c` / Windows `37899786755` 全 SUCCESS，Application126/Persistence175，详见12完成记录与阶段完成记录）。
 
 ### 1. 目标
 
@@ -1729,11 +1731,11 @@ crates/persistence-postgres/src/adapters/p4/freeze_transaction/
 
 ### 22. docs 阶段节点详细记录
 
-- 已创建 `docs/modular-rewrite/R08-prediction-p4-orchestration/R08-12-freeze-transaction.md`，列出全部实际A/M/D、决策/等价核对/七探针/原测试/报告/风险；索引12 VERIFYING，R8 IN_PROGRESS。
+- 已创建 `docs/modular-rewrite/R08-prediction-p4-orchestration/R08-12-freeze-transaction.md`，列出全部实际A/M/D、决策/等价核对/七探针/原测试/报告/风险；精确 Windows 验收完成后索引12 DONE、R8阶段DONE，阶段完成记录已创建。
 
 ### 23. 完成标准
 
-- 唯一职责与旧实现清理、原接口/行为/SQL/指纹、静态验证及记录已满足；必须再取得12自身精确Windows CI，才可收尾12并评估R8出口。最终新库/私有固定回归的延期不得继承为PASS。
+- 唯一职责与旧实现清理、原接口/行为/SQL/指纹、静态验证及记录已满足；12自身精确 Windows run `37899786755` 已全 SUCCESS，12与R8代码/节点及 Windows Automated 出口已收尾。最终新库/私有固定回归的延期不得继承为PASS。
 
 ---
 
