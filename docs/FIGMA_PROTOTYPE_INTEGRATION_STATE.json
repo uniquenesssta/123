@@ -198,9 +198,9 @@
         "pairedNavigation": 34
       },
       "Collapse": {
-        "fixedNavigation": 4,
-        "inert": 28,
-        "scope": 2
+        "variableBindings": 34,
+        "status": "AUTHORED_RETEST_PENDING",
+        "scope": "34 canonical defaults are within695 receipted states; broader regression incomplete."
       },
       "Back": {
         "disabled": 34
@@ -379,13 +379,53 @@
       "id": "INT-04",
       "priority": "P2",
       "category": "prototype_global_state_not_implemented",
-      "status": "OPEN",
+      "status": "PARTIALLY_IMPLEMENTED_RETEST_PENDING",
       "title": "Global history, collapse and reset limited to presets",
       "defaultBackDisabled": 34,
       "defaultForwardDisabled": 34,
       "storedBackActions": 0,
       "initialHomeDisabledBackIsNotItselfBug": true,
-      "retest": "Verify representative multi-page back/forward, collapse, selection, draft and scroll policies; review shortcuts must not substitute for business navigation."
+      "retest": "Verify representative multi-page back/forward, collapse, selection, draft and scroll policies; review shortcuts must not substitute for business navigation.",
+      "collapseBatch03": {
+        "phase": "INT04_VISIBILITY_IMPLEMENTED_WITH_RECEIPT_GAP_RETEST_INCOMPLETE",
+        "overallAcceptance": "NOT_PASSED",
+        "date": "2026-10-09",
+        "baselineCommit": "62e894ff496bf2719e8485658badfccba0ea2e71",
+        "recordPath": "docs/FIGMA_PROTOTYPE_INTEGRATION_REPAIRS.md",
+        "batchDataPath": "docs/FIGMA_PROTOTYPE_REPAIR_BATCH03.json",
+        "productStatesBound": 705,
+        "completeAuthoringReceiptRoots": 695,
+        "timedOutRootsToRecheck": 10,
+        "topbarPreservationRoots": 705,
+        "topbarPropertyReactionComparisons": 7050,
+        "initialExpanded": 677,
+        "initialCollapsed": 28,
+        "prototypeVariablesCreated": 2,
+        "prototypeCollectionsCreated": 1,
+        "temporaryProbeRemoved": true,
+        "inventory": {
+          "roots": 1077,
+          "productStates": 705,
+          "dialogs": 354,
+          "contextMenus": 1,
+          "reviewHubs": 17,
+          "productRoutes": 17
+        },
+        "finalDefaultsRestored": true,
+        "regressionCompleted": false,
+        "browserPlaybackPerformed": false,
+        "runtimeImplementationStarted": false,
+        "historyImplemented": false,
+        "resetWorkflowImplemented": false,
+        "openFindings": [
+          "INT-04"
+        ]
+      },
+      "retestResult": {
+        "status": "INCOMPLETE",
+        "browserPlaybackPerformed": false,
+        "fullProductRetestCompleted": false
+      }
     }
   ],
   "confirmedBoundedCases": [
@@ -436,7 +476,7 @@
     "INT-04",
     "repeat whole-product acceptance"
   ],
-  "nextWork": "INT-04 global history/collapse/reset, then whole-product prototype retest",
+  "nextWork": "先完成 INT-04 导航显隐复验（优先核对10个超时状态的两态动作及来源／导航回归），再实施工作区详情历史与重置，最后重复全产品验收。",
   "nextWorkStarted": false,
   "limitations": [
     "Stored graph plus representative screenshots, not browser event playback or runtime acceptance.",
@@ -446,10 +486,14 @@
     "Rollback data are node-level changes, not an offline Figma backup. Ordinary deltas preserve old/new destinations; ten removed original actions are not full serialized reaction snapshots.",
     "No application source, shared masters, shared variables, real API/database writes or permissions changed.",
     "INT-01 remains bounded to34 default Light/Dark screens; all-state navigation completeness not newly claimed.",
-    "INT-04, arbitrary source combinations, drafts/scroll/focus and runtime operations remain unaccepted."
+    "INT-04, arbitrary source combinations, drafts/scroll/focus and runtime operations remain unaccepted.",
+    "Batch03 adds two hidden-from-publishing prototype navigation variables; existing design variables and component masters remain unchanged.",
+    "Batch03 visibility implemented;10 timed-out authoring roots and broad content/navigation regression require retest. History and reset workflow are still open.",
+    "Batch03 screenshot has missing Chinese glyphs although stored source strings read back complete. No visual or browser playback pass claimed."
   ],
   "recovery": {
     "order": [
+      "docs/FIGMA_PROTOTYPE_REPAIR_BATCH03.json",
       "docs/README.md",
       "docs/FIGMA_PROTOTYPE_INTEGRATION_REPAIRS.md",
       "docs/FIGMA_PROTOTYPE_REPAIR_BATCH02.json",
@@ -3124,5 +3168,40 @@
       "disabledOwnOrAncestorPointerViolations": 0,
       "scope": "288 changed/paired product roots plus S07 Review Hub; visible stored reactions and State=Disabled own/ancestor pointer checks, not all705-state enumeration or browser event replay."
     }
+  },
+  "repairBatch03": {
+    "phase": "INT04_VISIBILITY_IMPLEMENTED_WITH_RECEIPT_GAP_RETEST_INCOMPLETE",
+    "overallAcceptance": "NOT_PASSED",
+    "date": "2026-10-09",
+    "baselineCommit": "62e894ff496bf2719e8485658badfccba0ea2e71",
+    "recordPath": "docs/FIGMA_PROTOTYPE_INTEGRATION_REPAIRS.md",
+    "batchDataPath": "docs/FIGMA_PROTOTYPE_REPAIR_BATCH03.json",
+    "productStatesBound": 705,
+    "completeAuthoringReceiptRoots": 695,
+    "timedOutRootsToRecheck": 10,
+    "topbarPreservationRoots": 705,
+    "topbarPropertyReactionComparisons": 7050,
+    "initialExpanded": 677,
+    "initialCollapsed": 28,
+    "prototypeVariablesCreated": 2,
+    "prototypeCollectionsCreated": 1,
+    "temporaryProbeRemoved": true,
+    "inventory": {
+      "roots": 1077,
+      "productStates": 705,
+      "dialogs": 354,
+      "contextMenus": 1,
+      "reviewHubs": 17,
+      "productRoutes": 17
+    },
+    "finalDefaultsRestored": true,
+    "regressionCompleted": false,
+    "browserPlaybackPerformed": false,
+    "runtimeImplementationStarted": false,
+    "historyImplemented": false,
+    "resetWorkflowImplemented": false,
+    "openFindings": [
+      "INT-04"
+    ]
   }
 }
