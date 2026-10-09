@@ -2,7 +2,7 @@
 
 ## 当前阶段状态
 
-`IN_PROGRESS`。唯一阶段分支 `rewrite/r8-prediction-p4-orchestration`，阶段起点 `90680bf945fbb0d1c191937c2d9e90c2c916fb00`。R8-01～10已DONE；10精确修复 `481bfcb` / Windows `37886029199` 全SUCCESS，文档收尾 `2770adc`。用户授权“收尾10 开始11”；11实际读取职责已实施、VERIFYING，等待自身精确Windows CI；12 BLOCKED。精确当前状态由本索引维护。
+`IN_PROGRESS`。唯一阶段分支 `rewrite/r8-prediction-p4-orchestration`，阶段起点 `90680bf945fbb0d1c191937c2d9e90c2c916fb00`。R8-01～11已DONE；11精确 `47bda23` / Windows run `37891346613` 全SUCCESS。用户已授权“收尾11开始12”，12前置通过、READY。精确当前状态由本索引维护；R8未完成，不启动R9。
 
 ## 前置基线与范围
 
@@ -24,8 +24,8 @@ R8 依据 [任务书](../../football-model-platform-modular-rewrite-19-docs/08-R
 | R8-08 | P4 Evidence Ledger | DONE · [完成记录](R08-08-p4-evidence-ledger.md) · 精确Windows修复CI全SUCCESS |
 | R8-09 | Fact Pipeline | DONE · [完成记录](R08-09-fact-pipeline.md) · 精确Windows全SUCCESS |
 | R8-10 | Horizon Orchestration | DONE · [完成记录](R08-10-horizon-orchestration.md) · 精确Windows全SUCCESS |
-| R8-11 | Workbench Reads | VERIFYING · [实施记录](R08-11-workbench-reads.md) · 等待自身精确Windows |
-| R8-12 | Freeze Transaction | BLOCKED |
+| R8-11 | Workbench Reads | DONE · [完成记录](R08-11-workbench-reads.md) · 精确Windows全SUCCESS |
+| R8-12 | Freeze Transaction | READY · 前置通过，已授权开始 |
 
 ## R8-01 实际来源与实施边界
 
@@ -35,7 +35,7 @@ Readiness 评分/检查、manifest 算法、路由与模型执行仍由现有 ow
 
 ## 动态待验与阶段出口
 
-R8-01～10 已取得各自精确 Windows CI；11及后续仍须独立取得自身门禁，不继承前项 PASS。数据库相关 contracts、历史四项/账本、模型历史删除风险、有效 XLSX、Windows Full 的真实结果仍最终新库待验，详见 R7 阶段清单。模型保护或真实固定回归不可取得时明确说明，公共 unavailable stub 不冒充私有引擎 Golden Master。后续节点成功后逐项更新；未完成全部节点不创建阶段完成记录。
+R8-01～11 已取得各自精确 Windows CI；12仍须独立取得自身门禁，不继承前项 PASS。数据库相关 contracts、历史四项/账本、模型历史删除风险、有效 XLSX、Windows Full 的真实结果仍最终新库待验，详见 R7 阶段清单。模型保护或真实固定回归不可取得时明确说明，公共 unavailable stub 不冒充私有引擎 Golden Master。后续节点成功后逐项更新；未完成全部节点不创建阶段完成记录。
 
 ## R8-01 实施与门禁记录（已通过）
 
@@ -238,3 +238,9 @@ R8-11 Workbench Reads 已实施并进入 `VERIFYING`：原工作台数据库读�
 报告 `/workspace/scratch/eb298ad5cdcb/r811-static-checks.json`、`r811-architecture.log`、`r811-negative-probes.json`、`r811-equivalence.json`。Domain使用扫描1084→1090，365/300/sourceDigest保持，usageDigest `f0d81ca6c8f8d56746b800dea3e4b9d44680643f584db3ceb248add79d759751`；Application399/43Ports与Postgres根35保持，PG runtime_sources只刷新原测试blob `d422b3ac0fd7acbc17794e1edc2f2c00f717f523`。无依赖/API升级、target/runner/workflow/数据库新增，无Linux/macOS动态验收。原Windows Automated执行完整frontend/类型/构建/17视口、Rust/Clippy/workspace tests及Windows交付；确认启动后停止轮询。11 VERIFYING，12 BLOCKED；真实PG/历史四项/账本/XLSX/Full/私有固定回归及继承model.runs/0041删除风险继续最终新库待验。
 
 Application现有清晰委托保持，未套旧空目录模板。四查询及五人工writer原行为保持；读取仍无跨查询一致快照保证。Mermaid Chart已更新真实读取/人工投影链，Create State在结束保存正确足球模型继续位置；回退受控revert至2770adc，同步唯一owner/测试/清单，不改历史库。
+
+## R8-11 精确Windows验收与收尾（2026-10-09）
+
+精确实施提交 `47bda231575a9179cd629367d5a3273cd2ab654a` / [Windows run `37891346613`](https://github.com/uniquenesssta/123/actions/runs/37891346613) / job `113692742591` 全SUCCESS，完成于2026-10-09 14:27:11（北京时间）。完整日志确认Application **118/118**、Persistence **169/169**，四项新增Application工作台测试通过；前端契约/类型/生产构建、**17**视口、Rust fmt/Clippy/workspace tests、Windows release/MSI/NSIS、启动 **7条记录 / 3个完成操作**全部通过。报告 `logs/windows-acceptance-20261009-060211.json`；artifact `11599306895`，14,034,588字节，SHA-256 `86214d994c421fa9c50a1d9c4638aa7af116361ee3a7e8d14e696106029912ae`。
+
+详见 [11完成记录](R08-11-workbench-reads.md)。五文档收尾复用已验源码证据；11DONE，12获用户授权，R8仍IN_PROGRESS，不启动R9。原真实PG/Full/XLSX/私有固定回归及继承删除风险继续最终新库待验。

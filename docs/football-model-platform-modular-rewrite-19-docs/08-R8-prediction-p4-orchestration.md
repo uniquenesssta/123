@@ -1518,7 +1518,7 @@ Application经原Ports创建/入队/迁移；首建和迁移各保持任务+事�
 
 ## R8-11 Workbench Reads
 
-状态：`VERIFYING`（10精确修复Windows已全成功并收尾，用户授权“收尾10 开始11”；11等待自身精确Windows，12 BLOCKED）
+状态：`DONE`（精确 `47bda23` / Windows `37891346613` 全SUCCESS，详见11完成记录）
 
 ### 1. 目标
 
@@ -1616,7 +1616,7 @@ Application只用既有PredictionWorkflowPort；composition已有Postgres方法�
 
 ## R8-12 Freeze Transaction
 
-状态：`BLOCKED`（仅当上一任务与本任务前置门禁通过后改为 `READY`）
+状态：`READY`（11自身精确Windows已通过并收尾，用户已授权“收尾11开始12”）
 
 ### 1. 目标
 

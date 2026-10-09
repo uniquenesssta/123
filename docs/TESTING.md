@@ -322,3 +322,10 @@ Persistence原target新增6项纯职责测试：正式写入/兼容读取区别�
 83项原前端源码检查、完整 `npm run verify:architecture`、Prediction/Domain/源码卫生、保护18指纹（聚合d74e0936…）、171命令、46迁移/18PG静态契约（聚合d9f2eb50…）、Rustfmt1.88 `--check` 与 `git diff --check`均PASS。七探针：任务上限、就绪度顺序、证据run过滤、人工task范围、最新事件ID排序、NULL证据数组、writer导入，均被原Prediction门禁拒绝且恢复。提取核对确认四SQL逐字、五writer/比赛函数/两Application生产入口与原逻辑等价，三个查询投影和任务汇总重内联保持。
 
 报告 `/workspace/scratch/eb298ad5cdcb/r811-static-checks.json`、`r811-architecture.log`、`r811-negative-probes.json`、`r811-equivalence.json`。Domain使用扫描1084→1090，365/300/sourceDigest保持，usageDigest `f0d81ca6c8f8d56746b800dea3e4b9d44680643f584db3ceb248add79d759751`；Application399/43Ports与Postgres根35保持，PG runtime_sources只刷新原测试blob `d422b3ac0fd7acbc17794e1edc2f2c00f717f523`。无依赖/API升级、target/runner/workflow/数据库新增，无Linux/macOS动态验收。原Windows Automated执行完整frontend/类型/构建/17视口、Rust/Clippy/workspace tests及Windows交付；确认启动后停止轮询。11 VERIFYING，12 BLOCKED；真实PG/历史四项/账本/XLSX/Full/私有固定回归及继承model.runs/0041删除风险继续最终新库待验。
+
+
+## R8-11 精确Windows完成（2026-10-09）
+
+精确实施提交 `47bda231575a9179cd629367d5a3273cd2ab654a` / [Windows run `37891346613`](https://github.com/uniquenesssta/123/actions/runs/37891346613) / job `113692742591` 全SUCCESS，完成于2026-10-09 14:27:11（北京时间）。完整日志确认Application **118/118**、Persistence **169/169**，四项新增Application工作台测试通过；前端契约/类型/生产构建、**17**视口、Rust fmt/Clippy/workspace tests、Windows release/MSI/NSIS、启动 **7条记录 / 3个完成操作**全部通过。报告 `logs/windows-acceptance-20261009-060211.json`；artifact `11599306895`，14,034,588字节，SHA-256 `86214d994c421fa9c50a1d9c4638aa7af116361ee3a7e8d14e696106029912ae`。
+
+11正式DONE；四项新增测试及118/169已经实际通过。五文档收尾复用已验源码证据；用户授权12开始，须12自身Windows CI。18 broad PG仍ignored；原真实PG/历史四项/账本/XLSX/Full/私有固定回归和继承删除风险继续最终新库待验。R8尚未完成，不提前创建阶段完成记录或启动R9。

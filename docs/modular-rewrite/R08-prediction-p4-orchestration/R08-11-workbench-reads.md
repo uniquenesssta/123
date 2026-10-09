@@ -1,6 +1,6 @@
-# R8-11 Workbench Reads 实施记录
+# R8-11 Workbench Reads 完成记录
 
-状态：`VERIFYING`。2026-10-09，用户授权“收尾10 开始11”；唯一分支 `rewrite/r8-prediction-p4-orchestration`。10修复精确 `481bfcb967349afedbf7eac44959f2f8a020744b` / [Windows run `37886029199`](https://github.com/uniquenesssta/123/actions/runs/37886029199) 全SUCCESS，114/169、21新增测试、17视口及Windows交付通过；五文档收尾基线 `2770adca714fa471e3d801ecd3f541f0f6a05db4`。11须自身精确Windows CI，12 BLOCKED。
+状态：`DONE`。唯一分支 `rewrite/r8-prediction-p4-orchestration`；实施基线 `2770adca714fa471e3d801ecd3f541f0f6a05db4`，精确实现 `47bda231575a9179cd629367d5a3273cd2ab654a` 已取得自身Windows全链路SUCCESS。下文实施时的VERIFYING/预期/延期状态保留供追溯，当前完成事实以末尾收尾节为准。用户授权“收尾11开始12”，12前置通过；R8仍IN_PROGRESS，不启动R9。
 
 ## 实际职责与设计
 
@@ -76,3 +76,10 @@ API/DTO/serde/Schema、数据格式、配置、错误类型/用户提示、日�
 ## 回退与真实风险
 
 回退基线2770adca714fa471e3d801ecd3f541f0f6a05db4；受控revert本节点，同步出口/唯一owner/原测试/门禁/清单/记录，不手工复制旧实现或变更历史库。Postgres多读之间状态仍可能推进，这是保留的原语义。真实PG/历史四项/账本/有效XLSX/Windows Full/私有P4/P7 Golden Master及继承model.runs/0041历史删除风险仍最终封包新库待验；公开stub/编译/静态指纹不能替代这些结果。
+
+
+## 精确Windows验收与收尾（2026-10-09）
+
+精确实施提交 `47bda231575a9179cd629367d5a3273cd2ab654a` / [Windows run `37891346613`](https://github.com/uniquenesssta/123/actions/runs/37891346613) / job `113692742591` 全SUCCESS，完成于2026-10-09 14:27:11（北京时间）。完整日志确认Application **118/118**、Persistence **169/169**，四项新增Application工作台测试通过；前端契约/类型/生产构建、**17**视口、Rust fmt/Clippy/workspace tests、Windows release/MSI/NSIS、启动 **7条记录 / 3个完成操作**全部通过。报告 `logs/windows-acceptance-20261009-060211.json`；artifact `11599306895`，14,034,588字节，SHA-256 `86214d994c421fa9c50a1d9c4638aa7af116361ee3a7e8d14e696106029912ae`。
+
+已核对精确head、全部job/steps、完整日志及artifact。118/169现由本项Windows实际确认，不继承前项PASS。本次收尾仅同步五份既有文档，复用同源码树证据，文档提交使用 `[skip ci]`；原实现变更清单保持。11正式DONE，12用户授权开始；R8尚未完成，R9不启动。18 broad PG仍ignored，不计通过；真实PG/历史四项/账本/有效XLSX/Windows Full/私有P4/P7 Golden Master及继承model.runs/0041删除风险仍最终封包新库待验。
