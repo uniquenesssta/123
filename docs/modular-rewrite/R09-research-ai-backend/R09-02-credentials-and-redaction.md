@@ -1,6 +1,6 @@
 # R9-02 Credentials 与 Redaction 实施记录
 
-状态：`VERIFYING`。2026-10-09用户“收尾01开始02”授权。项目uniquenesssta/123、版本0.23.0；唯一R9分支 `rewrite/r9-research-ai-backend`，基线/回退 `b80f09e6488af18435c8e281395ddf7962c48eb5` 为01五文档收尾 `[skip ci]`，源码等于精确f3da62d/run37933341557全SUCCESS。02必须自身精确WindowsCI，不继承01或源码预期为02执行PASS；03～11BLOCKED，R9整体IN_PROGRESS。
+状态：`DONE`（修复自身Windows run37954536795全SUCCESS）。2026-10-09用户“收尾01开始02”授权。项目uniquenesssta/123、版本0.23.0；唯一R9分支 `rewrite/r9-research-ai-backend`，基线/回退 `b80f09e6488af18435c8e281395ddf7962c48eb5` 为01五文档收尾 `[skip ci]`，源码等于精确f3da62d/run37933341557全SUCCESS。02必须自身精确WindowsCI，不继承01或源码预期为02执行PASS；当前03已授权READY、04～11BLOCKED，R9整体IN_PROGRESS。
 
 ## 实际来源、为何修改与职责切换
 
@@ -111,3 +111,10 @@ provider生产段与原提交逐字一致，完整文件仅一个format表达式
 Context7按已确认Rust1.88.0查询Clippy，但仅返回master的lint开发/配置内容，没有提供准确版本证据；不用该结果冒充1.88验证。该具体修复以精确Windows 1.88日志中的Clippy建议为依据，无不确定第三方API或升级。本次单测试格式修复不改变架构数据链，沿用上一轮真实Mermaid图；Create State按已核实足球稳定model保存新失败/修复/待验信息。
 
 本次修复回退点98d542f；整个02回退点仍b80f09e。本项保持VERIFYING，03～11BLOCKED；修复提交自身Windows CI确认开始后停止轮询，成功后再收尾，失败继续只修相关链路。真实PG/历史四项/账本并发回滚/有效XLSX/Windows Full/私有固定回归及继承删除风险仍最终新库待验，ignored/公共unavailable stub不计PASS。
+
+
+## R9-02 精确 Windows 收尾（2026-10-10，DONE）
+
+精确修复 `05055d1fd90e9a19ee4bc791e769018ca700dd14` / [Windows run `37954536795`](https://github.com/uniquenesssta/123/actions/runs/37954536795) / job `113901577714` 全 SUCCESS，2026-10-10 00:15:32北京时间完成。Gateway **35/35**、contract **16/16**、Application **126/126**、Persistence **175/175**，新增12项及原凭据/示例/传输测试全部通过；前端/TypeScript/Vite/17视口、Rust fmt/Clippy/workspace、Windows release/MSI/NSIS/启动7条记录/3完成操作均通过。证据artifact `11628233815`，14,037,356字节，SHA-256 `9a738defde297f2ff10bc0218885efa72d9e7f2c9ad4ff999bcf237cafc0e45a`。
+
+首轮 Clippy 失败已由该修复自身精确 Windows 关闭。当前02 DONE；用户“收尾02开始03”授权同一R9分支03 READY，04～11 BLOCKED，R9整体IN_PROGRESS。本次只同步既有五份文档，源码/验证器/依赖保持，使用 `[skip ci]` 复用上述精确源码结果；此前VERIFYING叙述为实施历史。真实PG、历史四项/账本/并发/回滚、有效XLSX、Windows Full、私有P4/P7固定回归及继承model.runs/0041删除风险仍最终新库待验，ignored和公共stub不计PASS。
