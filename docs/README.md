@@ -6,10 +6,12 @@
 
 ## 当前恢复入口
 
-**2026-10-09最新检查点：S17 architecture / 架构信息的可编辑视觉、代表性阅读状态与有限原型已验收。Screens计划内17 / 17条产品页面均完成这一层验收，没有尚未制作的页面。**
+**2026-10-09：全产品原型连通与状态一致性验收已执行，整体未通过；修复尚未开始。** 17 / 17条产品页面的可编辑视觉及限定本页状态仍已完成，没有缺失页面，也没有新增S18。
 
-**这不等于软件已全部实现或可发布。全产品导航、全部状态持续性、真实功能和端到端集成仍待单独验收。** S17之后没有擅自新建S18或启动实现阶段。
+最新结果与恢复入口：
 
+- [全产品原型验收报告、问题节点与复验条件](FIGMA_PROTOTYPE_INTEGRATION_AUDIT.md)
+- [本次验收状态与逐页统计](FIGMA_PROTOTYPE_INTEGRATION_STATE.json)
 - [Screens总计划与后续边界](FIGMA_SCREENS_PLAN.md)
 - [最新Screens总检查点](FIGMA_SCREENS_STATE.json)
 - [S17架构信息：系统边界、原则与模块职责](FIGMA_SCREEN_ARCHITECTURE.md)
@@ -31,9 +33,17 @@
 - [S02比赛与阵容](FIGMA_SCREEN_LINEUPS.md) / [独立状态](FIGMA_SCREEN_LINEUPS_STATE.json)
 - [S01数据总览](FIGMA_SCREEN_DASHBOARD.md)
 
-S17有13个阅读/布局状态、5个只读说明弹窗和1个Review Hub，仍只计一条路由。S01–S17累计561个状态，不是561条路由。
+## 全产品原型验收结果
 
-## S17本轮验收
+本次只读检查933个根（561状态、354弹窗、1菜单、17验收目录）及12,215项存储反应。各页验收目录均可达自己的全部状态；从首页不用验收捷径也能到达17条路由。失效目标与NAVIGATE/OVERLAY/SWAP误入Screens外目标均0；3,738个可见Disabled实例自身和祖先指针旁路均0。
+
+**整体仍未通过：** 默认Light/Dark共34页中92个非选中导航没有点击动作、4个仅显示说明；普通导航存在156条主题变化静态候选；球队→球员来源档案→基础资料会丢失来源球队返回入口（仍是A01，不是串成其他球员）；全局返回/前进、折叠/重置与完整状态保持仍未形成统一可验收行为。
+
+问题编号INT-01至INT-04已记录准确节点、范围和复验条件。156是静态候选数量，不是156个逐一回放的独立缺陷；92/4只统计默认明暗页面。检查未执行浏览器全事件回放、真实请求或写入，也没有改动画布或应用源码。下一步修复原型问题后复验，不能把本轮“验收执行结束”记为“集成已通过”。
+
+S17原有局部结果保留：13个阅读/布局状态、5个只读说明弹窗和1个Review Hub，只计一条路由。S01–S17累计561个状态，不是561条路由。
+
+## S17历史验收
 
 完成四层职责、历史与路由原则、五类模块展开/收起、明暗主题、Compact及无数据库阅读。静态说明不伪装实时健康、运行版本、已安装模型或发布通过；没有增加无关的加载、保存、删除或执行流程。
 
@@ -70,20 +80,20 @@ Review Hub `694:197834`可达全部13状态和5弹窗。最终**165 NAVIGATE +66
 - [底层Token与组件待办](FIGMA_FOUNDATION_COMPONENT_BACKLOG.md)
 - [Patterns与Screens总阶段计划](FIGMA_PATTERN_SCREEN_PLAN.md)
 
-底层组件、六组Patterns和17条Screens可编辑视觉阶段完成。Controls **61 sets/506 variants**，Patterns **17 sets/125 variants/13 production singles**；Foundations本轮回读仍为**193 variables/13 text styles/6 effects**。S17没有新增Screen主组件、detach或修改共享资产和应用源码。
+底层组件、六组Patterns和17条Screens可编辑视觉阶段完成。Controls **61 sets/506 variants**，Patterns **17 sets/125 variants/13 production singles**；Foundations在S17回读仍为**193 variables/13 text styles/6 effects**。本次原型验收没有修改共享资产或应用源码。
 
 ## 历史与后续边界
 
-以前各页的详细节点、有限验收与未实现事项继续以独立记录为准。S17不重新验收S01–S16，不消除历史运行时缺口。
+以前各页的详细节点、有限验收与未实现事项继续以独立记录为准。S17不重新验收S01–S16，不消除历史运行时缺口；本轮整体验收也没有重做全部视觉/字体/对比度检查。
 
 S02双方11首发与准入独立；S03输入/提供器/输出独立；S04查看/执行与复盘/结算分开；S05隐藏不删血缘；S06归档/普通删除/强清与导入/P4分开；S07来源身份、长期能力和短期标签独立；S08预设与比赛副本分离；S09类别/文件/模式/批次隔离；S10读取/校验/注册/绑定/执行分开；S11报告完成不等于发布；S12全局快照不是精确分区许可；S13只读上下文主动勾选和会话/请求/草稿隔离；S14选中/当前/密钥/测试独立；S15schema删除先提交再重建，失败不承诺回滚；S16历史日志不是当前故障，清空不修复业务。
 
-后续须单独处理完整导航与目标一致性、主题/折叠/返回/滚动/焦点/草稿持续性、实际文件和API请求、凭据/数据库事务、异步失效保护、模型可用性、真实发布验收，以及各页已经记录的源码差异。**视觉完成与运行时/安全/发布完成分别计数。**
+后续处理INT-01至INT-04并复验完整导航、主题/折叠/返回/滚动/焦点/草稿持续性。实际文件和API请求、凭据/数据库事务、异步失效保护、模型可用性、真实发布验收及各页源码差异仍为独立实现工作。**视觉完成、原型集成通过与运行时/安全/发布完成分别记录。**
 
 ## 换会话恢复
 
-README → `FIGMA_SCREENS_PLAN.md` → `FIGMA_SCREENS_STATE.json` → `FIGMA_SCREEN_ARCHITECTURE_STATE.json`及本页记录 → 实际Figma稳定根。SLOT后代按稳定根、语义名称和真实主组件定位，不猜ID。
+README → `FIGMA_PROTOTYPE_INTEGRATION_AUDIT.md` → `FIGMA_PROTOTYPE_INTEGRATION_STATE.json` → `FIGMA_SCREENS_STATE.json`中的integrationAudit → 实际Figma稳定根。各页独立状态继续作为局部依据；SLOT后代按稳定根、语义名称和真实主组件定位，不猜ID。
 
-S16完整检查点为`7d3b72310a745a007075d3b8ed35ef38cc33a49d`，S15为`920432210478b26e17f2a3c9ffaf74c0f9f01e6f`，S14为`52236b78b5a0f478bb6fb3b4235d30fd92d4e97c`；更早历史链保留在Screens计划和Git历史。
+S17视觉阶段完整基线为`67e2c5000dce035b70860826c55ccde61fe84396`；S16为`7d3b72310a745a007075d3b8ed35ef38cc33a49d`，S15为`920432210478b26e17f2a3c9ffaf74c0f9f01e6f`，S14为`52236b78b5a0f478bb6fb3b4235d30fd92d4e97c`；更早历史链保留在Screens计划和Git历史。
 
-初始WIP、回滚批次、旧截图和旧“未开始”不覆盖accepted。Create State handoff未创建；恢复依据是GitHub独立记录及同步总检查点。后续全产品集成工作尚未开始。
+初始WIP、回滚批次、旧截图和旧“未开始”不覆盖accepted。Create State handoff未创建；恢复依据是GitHub独立记录及同步总检查点。原型验收已执行且未通过；原型修复和后续源码实现尚未开始。
