@@ -476,8 +476,8 @@
     "INT-04",
     "repeat whole-product acceptance"
   ],
-  "nextWork": "完成INT-04直接显隐分组复验，然后工作区历史、统一重置和全产品复验",
-  "nextWorkStarted": true,
+  "nextWork": "INT-04工作区详情历史、统一重置和全产品复验；直接显隐限定复验已通过",
+  "nextWorkStarted": false,
   "limitations": [
     "Stored graph plus representative screenshots, not browser event playback or runtime acceptance.",
     "Theme scan excludes explicit Theme/Review Hub/验收/演示/Demo/Outcome/Reviewer paths and overlays.",
@@ -3205,7 +3205,7 @@
     ]
   },
   "repairBatch03R1": {
-    "phase": "MIGRATION_COMPLETE_VALIDATION_IN_PROGRESS",
+    "phase": "VISIBILITY_REPAIRED_BOUNDED_RETEST_PASSED_HISTORY_RESET_OPEN",
     "overallAcceptance": "NOT_PASSED",
     "date": "2026-10-10",
     "baselineCommit": "fd8d3ea38c32c9dd44fc3208dcb9bf3fe4284895",
@@ -3219,6 +3219,18 @@
     "browserPlaybackPerformed": false,
     "openFindings": [
       "INT-04"
-    ]
+    ],
+    "structuralStatesChecked": 705,
+    "structuralIssues": 0,
+    "sourceStatesChecked": 28,
+    "genericReturnStatesChecked": 2,
+    "sourceIssues": 0,
+    "defaultNavigationEntriesChecked": 272,
+    "defaultNavigationIssues": 0,
+    "variableEvaluationStatesChecked": 24,
+    "variableEvaluationIssues": 0,
+    "defaultsRestored": true,
+    "screenshotReviewed": true,
+    "regressionCompleted": "bounded_visibility_scope"
   }
 }
