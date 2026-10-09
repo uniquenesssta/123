@@ -1,6 +1,6 @@
-# R8-09 Fact Pipeline：实施记录
+# R8-09 Fact Pipeline：完成记录
 
-状态：**VERIFYING**。分支 `rewrite/r8-prediction-p4-orchestration`；实施基线 `6718c996613edc6e4770457ed02fff16f8a95e26`（08收尾文档），其源码复用已验证 `52f23ab4e582f313f412058623f0d83a6ddf6f98`。用户已授权“收尾08开始09”。09静态验证已完成，提交启动既有Windows CI后停止轮询；尚未取得09精确Windows结果，10～12继续BLOCKED。
+状态：**DONE**。分支 `rewrite/r8-prediction-p4-orchestration`；实施基线 `6718c996613edc6e4770457ed02fff16f8a95e26`，精确实施提交 `4025781f2f0419f374edfa7669a4c5bcfe71ee66` 已取得自身Windows全链路SUCCESS。下文保留实施时的预期/待验文字供追溯，当前完成事实以末尾收尾节为准。用户已授权“收尾09 开始10”；10前置通过，11～12继续BLOCKED。
 
 ## 前置与实际问题
 
@@ -142,3 +142,10 @@ Mermaid Chart已展示上述真实链路；无尚未实现的模型或事务包�
 按实际Rust owner使用既有research/fact_pipeline和Postgres p4/fact_pipeline，替代任务书过期模板；原已拆纯职责继续复用，只拆真实混合职责。选择保留原部分写入/精度/政策以保持兼容，未扩展全pipeline原子化。CI成功前不能DONE；下一项须授权。
 
 回退用受控revert恢复 `6718c99` 基线，同步owner/注册/显式出口、原测试/门禁/清单和节点文档，不手工复制旧文件造成双实现，不变更历史库。结束时Create State保存精确实施提交、CI启动位置、VERIFYING与上述约束，不替代Git和本记录。
+
+
+## 精确Windows验收与收尾（2026-10-09）
+
+精确实施 `4025781f2f0419f374edfa7669a4c5bcfe71ee66` / [Windows run `37825126808`](https://github.com/uniquenesssta/123/actions/runs/37825126808) / job `113475889770` 全SUCCESS，完成于2026-10-09 02:56:31（北京时间）。日志确认Application **99** / Persistence **163**、14项新增事实边界测试、前端契约/类型/生产构建、**17**视口、fmt/Clippy/workspace tests、Windows release/MSI/NSIS与启动 **7条记录 / 3个完成操作**全部通过。报告 `logs/windows-acceptance-20261008-183420.json`；artifact `11571947799`，14,024,945字节，SHA-256 `5030ebbe6a3a7ffa551c404a7733297e555faf44c21776bdfee34c7c616cdd9e`。
+
+已核对精确SHA、全部job/steps、完整日志和artifact；实施预期99/163现由Windows实跑确认。本次09收尾仅同步五份既有文档，复用同源码树证据，文档提交用 `[skip ci]`，不重复全量构建。原实现文件13A/22M/1D不变，累计变更清单已完整；09正式DONE，10用户授权开始，11～12BLOCKED。真实PG/历史四项/账本/有效XLSX/Windows Full/私有Golden Master和继承历史删除风险仍最终封包新库待验，18 broad ignored不计通过。

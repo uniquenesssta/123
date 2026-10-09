@@ -282,3 +282,10 @@ Application **92** / Persistence **141**、七项新增 adapter 测试、前端�
 原postgres_integration的Stage C扩context字段及微秒落库、主队候选、四类记录首次id/time/fingerprint/内容变化拒绝、路由证据ID排序去重、事件唯一及不可变；Stage E扩首次metadata保留/唯一audit/无效策略零残留。18 broad仍ignored；真实PG/历史四项/账本/XLSX/Windows Full/私有固定回归及继承删除风险最终封包新库待验，编译不冒充实跑。
 
 本地静态PASS：83源码检查、完整architecture、25目标Rustfmt、18保护资产、171命令、46迁移/18PG静态基线、diff；六破坏探针拒绝并恢复。生产17函数/8签名/18原SQL及208字符串、32Application helper/注册/命令/重新内联主链等价核对通过。5浏览器项及Rust fmt/Clippy/workspace tests和Windows release/MSI/NSIS/启动由09自身CI执行，启动后停止轮询；无Linux/macOS动态验收。完整文件/行为/验证及回退见 [09实施记录](modular-rewrite/R08-prediction-p4-orchestration/R08-09-fact-pipeline.md)。
+
+
+## R8-09 精确Windows完成（2026-10-09）
+
+精确实施 `4025781f2f0419f374edfa7669a4c5bcfe71ee66` / [Windows run `37825126808`](https://github.com/uniquenesssta/123/actions/runs/37825126808) / job `113475889770` 全SUCCESS，完成于2026-10-09 02:56:31（北京时间）。日志确认Application **99** / Persistence **163**、14项新增事实边界测试、前端契约/类型/生产构建、**17**视口、fmt/Clippy/workspace tests、Windows release/MSI/NSIS与启动 **7条记录 / 3个完成操作**全部通过。报告 `logs/windows-acceptance-20261008-183420.json`；artifact `11571947799`，14,024,945字节，SHA-256 `5030ebbe6a3a7ffa551c404a7733297e555faf44c21776bdfee34c7c616cdd9e`。
+
+09正式DONE；14新边界测试实际通过，99/163不再只是预期。五文档收尾复用同源码证据，不重复全量构建；用户授权10开始，须10自身WindowsCI。18 PG broad仍ignored，真实PG/历史四项/账本/XLSX/Full/私有Golden Master与继承删除风险最终新库待验。

@@ -11,7 +11,7 @@
 
 适用总纲顶部的执行订正：仅 Windows 动态验证，沿用原单测/contract、既有 Windows runner/workflow/数据库入口；不新增专项或持续回归体系。公开仓库没有私有 P4/P7 引擎、参数和 Golden Master；模型保护资产可验证，公共 unavailable stub 的通过不能冒充私有固定概率实跑。目录模板按实际职责及 Rust 模块命名调整；顺序执行的后端 use case 无新增 UI 生命周期，不强制新增 State、请求 ID 或空出口。
 
-R8-01～06 已取得各自精确 Windows CI（`cba72fd` / `36881256338`、`cc2b0fe` / `36891488571`、`47ba3de` / `36902069546`、`59c5679` / `36966815323`、修复 `2aa99a7` / `36971419476`、`0969331` / `37752995641`）及正式完成记录。07 精确 `58b390a` / `37796909083` 已通过并DONE，08精确修复 `52f23ab` / `37817443918` 全SUCCESS并DONE，用户已授权09开始；各项精确当前状态只由 [阶段索引](../modular-rewrite/R08-prediction-p4-orchestration/README.md) 维护。07 及后续必须取得自身 Windows CI，不继承前项 PASS。
+R8-01～06 已取得各自精确 Windows CI（`cba72fd` / `36881256338`、`cc2b0fe` / `36891488571`、`47ba3de` / `36902069546`、`59c5679` / `36966815323`、修复 `2aa99a7` / `36971419476`、`0969331` / `37752995641`）及正式完成记录。07 精确 `58b390a` / `37796909083` 已通过并DONE，08精确修复 `52f23ab` / `37817443918` 全SUCCESS并DONE，09精确 `4025781` / `37825126808` 全SUCCESS并DONE，用户已授权“收尾09 开始10”；各项精确当前状态只由 [阶段索引](../modular-rewrite/R08-prediction-p4-orchestration/README.md) 维护。07 及后续必须取得自身 Windows CI，不继承前项 PASS。
 
 ## 1. 阶段目标
 
@@ -1311,7 +1311,7 @@ crates/persistence-postgres/src/adapters/p4/
 
 ## R8-09 Fact Pipeline
 
-状态：`VERIFYING`（08精确Windows修复CI已通过并收尾；用户已授权实施09，等待09自身Windows CI）
+状态：`DONE`（精确 `4025781` / Windows `37825126808` 全SUCCESS，详见09完成记录）
 
 ### 1. 目标
 
@@ -1418,7 +1418,7 @@ Research专项、完整architecture、原83源码检查、Rustfmt目标文件、
 
 ## R8-10 Horizon Orchestration
 
-状态：`BLOCKED`（仅当上一任务与本任务前置门禁通过后改为 `READY`）
+状态：`READY`（09精确Windows已通过并收尾，用户已授权“收尾09 开始10”）
 
 ### 1. 目标
 

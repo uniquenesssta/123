@@ -2,7 +2,7 @@
 
 ## 当前阶段状态
 
-`IN_PROGRESS`。唯一阶段分支 `rewrite/r8-prediction-p4-orchestration`，起点/回退基线 `90680bf945fbb0d1c191937c2d9e90c2c916fb00`。R8-01～08 已 DONE；08精确修复 `52f23ab` / Windows run `37817443918` 全SUCCESS，首轮Clippy失败已关闭。用户已授权“收尾08开始09”，09已实施、`VERIFYING`，等待自身Windows CI；10～12 `BLOCKED`。精确当前状态只由本索引维护。
+`IN_PROGRESS`。唯一阶段分支 `rewrite/r8-prediction-p4-orchestration`，阶段起点 `90680bf945fbb0d1c191937c2d9e90c2c916fb00`。R8-01～09已DONE；09精确 `4025781` / Windows run `37825126808` 全SUCCESS。用户已授权“收尾09 开始10”，10前置通过、READY；11～12BLOCKED。精确当前状态由本索引维护。
 
 ## 前置基线与范围
 
@@ -22,8 +22,8 @@ R8 依据 [任务书](../../football-model-platform-modular-rewrite-19-docs/08-R
 | R8-06 | Model Execution Adapter | DONE · [完成记录](R08-06-model-execution-adapter.md) |
 | R8-07 | Run Persistence | DONE · [完成记录](R08-07-run-persistence.md) |
 | R8-08 | P4 Evidence Ledger | DONE · [完成记录](R08-08-p4-evidence-ledger.md) · 精确Windows修复CI全SUCCESS |
-| R8-09 | Fact Pipeline | VERIFYING · [实施记录](R08-09-fact-pipeline.md) · 等待自身Windows CI |
-| R8-10 | Horizon Orchestration | BLOCKED |
+| R8-09 | Fact Pipeline | DONE · [完成记录](R08-09-fact-pipeline.md) · 精确Windows全SUCCESS |
+| R8-10 | Horizon Orchestration | READY · 前置通过，已授权开始 |
 | R8-11 | Workbench Reads | BLOCKED |
 | R8-12 | Freeze Transaction | BLOCKED |
 
@@ -195,3 +195,10 @@ Application原Fact Pipeline已有纯职责复用；mod中的公共命令、编�
 实际本地PASS：83/83现有源码检查、完整architecture、25目标Rustfmt、18保护资产、171命令、46迁移/18PG静态基线与diff。17旧Postgres生产函数/8签名、18原SQL raw literals及208字符串、32原Application helper、注册/序列化命令和重新内联编排比较一致。六探针（目录实现/无序分组/cutoff身份/主客队过滤/路由ID去重/指纹前缀）均拒绝并恢复。清单精确刷新：Application390→393/43 Ports保持，Postgres根36→35，Domain扫描1060→1071/365/300/声明摘要保持；PG仅刷新原test blob。
 
 09保持VERIFYING、10～12BLOCKED。Windows Automated启动后停止轮询，无Linux/macOS Cargo/客户端动态验收；真实PG/历史四项/账本/XLSX/Full/私有Golden Master及继承历史删除风险继续最终新库待验。Mermaid Chart已更新真实事实流水线，结束时Create State保存继续位置。回退受控revert至 `6718c99`，同步owner/出口/测试/清单/文档，不恢复双实现或修改历史库。
+
+
+## R8-09 精确Windows验收与收尾（2026-10-09）
+
+精确实施 `4025781f2f0419f374edfa7669a4c5bcfe71ee66` / [Windows run `37825126808`](https://github.com/uniquenesssta/123/actions/runs/37825126808) / job `113475889770` 全SUCCESS，完成于2026-10-09 02:56:31（北京时间）。日志确认Application **99** / Persistence **163**、14项新增事实边界测试、前端契约/类型/生产构建、**17**视口、fmt/Clippy/workspace tests、Windows release/MSI/NSIS与启动 **7条记录 / 3个完成操作**全部通过。报告 `logs/windows-acceptance-20261008-183420.json`；artifact `11571947799`，14,024,945字节，SHA-256 `5030ebbe6a3a7ffa551c404a7733297e555faf44c21776bdfee34c7c616cdd9e`。
+
+详见 [09完成记录](R08-09-fact-pipeline.md)。源码/测试/清单保持已验树，五文档收尾复用精确证据、不重复动态验证；09DONE，10已获用户授权，11～12BLOCKED。真实PG/历史四项/账本/XLSX/Full/私有固定回归及继承历史删除风险仍最终新库待验。

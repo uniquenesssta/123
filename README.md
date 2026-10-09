@@ -28,7 +28,7 @@ R8-08 P4 Evidence Ledger 已收尾为 `DONE`：证据追加与冲突建组从旧
 
 08精确修复 `52f23ab` / [Windows run `37817443918`](https://github.com/uniquenesssta/123/actions/runs/37817443918) 全SUCCESS，前端/17视口、Rust fmt/Clippy/workspace tests、Windows构建打包与启动全部通过，首轮Clippy失败已关闭。详见 [08完成记录](docs/modular-rewrite/R08-prediction-p4-orchestration/R08-08-p4-evidence-ledger.md)；用户已授权09开始，10～12仍BLOCKED。收尾只同步五份文档并复用精确CI证据；真实PG/XLSX/Full/私有固定回归继续最终新库待验。
 
-R8-09 Fact Pipeline 已实施，保持 `VERIFYING`，等待自身 Windows CI。原目录出口中的命令/编排/事实准备提取为具名职责，Postgres混合 `fact_pipeline_records.rs` 已删除并由既有P4 adapter的查询/来源策略/各账本owner唯一实现；公共命令、Ports、调用路径、来源/实体/时间/冲突/路由顺序与幂等政策保持。原target新增Application/Persistence各7边界测试，预期99/163须Windows实跑；PG Stage C/E已扩展但仍最终新库待验。83源码检查、完整architecture、25目标Rustfmt、保护资产/命令/迁移静态基线与六破坏探针通过，生产函数/SQL/DTO等价核对保持。13新增/22修改/1删除详见 [09实施记录](docs/modular-rewrite/R08-prediction-p4-orchestration/R08-09-fact-pipeline.md)。10～12仍BLOCKED；CI启动后停止轮询。
+R8-09 Fact Pipeline 已收尾为 `DONE`：目录出口中的命令/编排/事实准备已提取为具名职责，Postgres混合fact_pipeline_records已退出，原接口/Ports及来源/实体/时间/冲突/路由政策保持。精确 `4025781` / [Windows run `37825126808`](https://github.com/uniquenesssta/123/actions/runs/37825126808) 全SUCCESS，Application99/Persistence163、14新增边界测试、17视口、Rust/前端、Windows构建打包与启动全部通过。完整变更与证据见 [09完成记录](docs/modular-rewrite/R08-prediction-p4-orchestration/R08-09-fact-pipeline.md)。用户已授权10开始，11～12仍BLOCKED；真实PG/XLSX/Full/私有固定回归及继承历史删除风险继续最终新库待验。
 
 ## 公开边界
 
