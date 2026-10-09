@@ -289,3 +289,13 @@ Application **92** / Persistence **141**、七项新增 adapter 测试、前端�
 精确实施 `4025781f2f0419f374edfa7669a4c5bcfe71ee66` / [Windows run `37825126808`](https://github.com/uniquenesssta/123/actions/runs/37825126808) / job `113475889770` 全SUCCESS，完成于2026-10-09 02:56:31（北京时间）。日志确认Application **99** / Persistence **163**、14项新增事实边界测试、前端契约/类型/生产构建、**17**视口、fmt/Clippy/workspace tests、Windows release/MSI/NSIS与启动 **7条记录 / 3个完成操作**全部通过。报告 `logs/windows-acceptance-20261008-183420.json`；artifact `11571947799`，14,024,945字节，SHA-256 `5030ebbe6a3a7ffa551c404a7733297e555faf44c21776bdfee34c7c616cdd9e`。
 
 09正式DONE；14新边界测试实际通过，99/163不再只是预期。五文档收尾复用同源码证据，不重复全量构建；用户授权10开始，须10自身WindowsCI。18 PG broad仍ignored，真实PG/历史四项/账本/XLSX/Full/私有Golden Master与继承删除风险最终新库待验。
+
+## R8-10 Horizon Orchestration 实施待验（2026-10-09）
+
+09精确Windows已实际通过99/163，文档收尾7c1ccd3；10独立VERIFYING，11/12 BLOCKED。复用原Application target/Probe新增8项规划测试：三个正式时点/固定路由Schema29事实及原队列政策、非PLANNED重试无写、前检拒绝/规范化、全部六版本与事实身份漂移、过期任务、八Port边界×六错误kind/message、首建后入队失败恢复、绑定失败复用job。queue原生产模块另补纳秒前/相等/后的截止恢复与非PLANNED无写；后台原target新增6项结算/完成错误/未耗尽与耗尽失败/终态或读取失败/尽力迁移和队列错误优先级测试。Application源码预期99+15=114，尚未在本项Windows实际执行。
+
+Persistence原target新增6项纯职责测试：正式写入/兼容读取区别、空事实拒绝、排序去重指纹、固定身份变化、纳秒输入区别、12状态/5时点/6研究状态的精确解析。源码预期163+6=169，需本项实跑。原postgres_integration Stage C（18 broad数量不变）增加context/Schema/run读回、任务首次值/实际微秒/原始纳秒指纹、同键重试与并发、错指纹拒绝、兼容时点零残留、FK创建/状态更新失败回滚恢复、原队列绑定、同状态无写、expected/非法迁移冲突、三时点排序、事件唯一/不可变与共同成功审计。该target仍ignored，编译不计真实数据库PASS。
+
+本地PASS：83/83原源码门禁（5浏览器项交Windows）、完整npm run verify:architecture、23目标Rustfmt 1.88、18保护资产/171命令/46迁移与18PG静态契约、git diff --check。六破坏探针为非正式时点、漏身份、错PLANNED恢复条件、错队列key、去FOR UPDATE、漏成功审计，全部拒绝恢复。静态批次在刻意移除FOR UPDATE期间读取到一次单项失败，恢复后串行重跑该项通过；首次Mapping gate指向原根context已修正真实owner，完整架构复跑通过。23原Postgres函数（重新内联preflight）、规划prepare/identity/draft/未来队列、dispatcher/terminal failure/settlement比较保持；PLANNED恢复明确属于缺陷修复，不伪称全行为等价。
+
+报告：`/workspace/scratch/eb298ad5cdcb/r810-static-checks.json`、`r810-negative-probes.json`、`r810-equivalence.json`。Application393→399、Domain1071→1084，43 Ports/365/300/声明摘要不变；Postgres根35保持，数据库清单只刷新原PG test blob。复用原Windows Automated执行frontend/17视口/类型构建、fmt/Clippy/workspace tests、Windows release/MSI/NSIS/启动，启动后停止轮询。无Linux/macOS Cargo/客户端动态或新基础设施；真实PG/历史四项/账本/有效XLSX/Windows Full/私有Golden Master与继承删除风险继续最终封包新库待验。详见 [10记录](modular-rewrite/R08-prediction-p4-orchestration/R08-10-horizon-orchestration.md)。

@@ -9,13 +9,13 @@ use football_domain::{
     MatchEventVerificationStatus, MatchResultDraft, MatchReviewDraft, MatchReviewPackageComparison,
     MatchReviewPackageDiffSummary, MatchReviewPackagePreview, MatchReviewPackageSnapshotSummary,
     MatchReviewPackageSummary, MatchReviewPackageWorkflowAction, MatchReviewPackageWorkflowStatus,
-    MatchReviewPackageWorkflowStep, MatchStatus, P4Horizon, PrematchSnapshotDraft,
-    ResearchRunDraft, RulePackageDraft, RuleRouting, RuleSourceReference, SchemaVersionDraft,
-    SeasonDraft, SnapshotFeatureDraft, SnapshotProbabilityDraft, SnapshotSourceKind,
-    SourcePolicyDefinition, SourcePolicyVersionDraft, SourceTierDefinition, SourceTierRule,
-    SpreadsheetAction, SpreadsheetEntityType, SpreadsheetImportMode, SpreadsheetParsedWorkbook,
-    SpreadsheetRawRow, TeamDraft, TimeAuditDraft, TimeAuditStatus, PLAYER_MONTHLY_FORMAT,
-    TEAM_MONTHLY_FORMAT,
+    MatchReviewPackageWorkflowStep, MatchStatus, P4FreezeTaskDraft, P4FreezeTaskState,
+    P4FreezeTaskTransition, P4Horizon, PrematchSnapshotDraft, ResearchRunDraft, RulePackageDraft,
+    RuleRouting, RuleSourceReference, SchemaVersionDraft, SeasonDraft, SnapshotFeatureDraft,
+    SnapshotProbabilityDraft, SnapshotSourceKind, SourcePolicyDefinition, SourcePolicyVersionDraft,
+    SourceTierDefinition, SourceTierRule, SpreadsheetAction, SpreadsheetEntityType,
+    SpreadsheetImportMode, SpreadsheetParsedWorkbook, SpreadsheetRawRow, TeamDraft, TimeAuditDraft,
+    TimeAuditStatus, PLAYER_MONTHLY_FORMAT, TEAM_MONTHLY_FORMAT,
 };
 use football_model_api::ModelDescriptor;
 use football_persistence_postgres::{DatabaseOptions, PersistenceError, PostgresStore};
@@ -2968,6 +2968,305 @@ async fn p4_stage_c_writes_are_idempotent_and_frozen_history_is_immutable() {
     let competition_profile_id: Uuid = ids
         .try_get("competition_profile_id")
         .expect("赛事Profile版本ID");
+
+    // R8-10: reuse this real database/fixture to exercise task identity and the event/audit transaction.
+    let planning_context = database
+        .store
+        .p4_planning_match_context(target.id)
+        .await
+        .unwrap();
+    assert_eq!(
+        (
+            planning_context.match_id,
+            planning_context.match_key.as_str(),
+            planning_context.competition_kind
+        ),
+        (
+            target.id,
+            target.external_key.as_str(),
+            CompetitionKind::League
+        )
+    );
+    assert_eq!(
+        database
+            .store
+            .read_schema_version_by_key(&schema_draft.schema_key, &schema_draft.version)
+            .await
+            .unwrap()
+            .id,
+        schema.id
+    );
+    assert_eq!(
+        database
+            .store
+            .read_research_run(research.id)
+            .await
+            .unwrap()
+            .id,
+        research.id
+    );
+    let horizon_draft = P4FreezeTaskDraft {
+        match_id: target.id,
+        match_key: target.external_key.clone(),
+        horizon: P4Horizon::T24h,
+        kickoff_at: planning_context.kickoff_at,
+        data_cutoff_at,
+        research_due_at: data_cutoff_at - Duration::minutes(15),
+        freeze_deadline_at: data_cutoff_at + Duration::minutes(15),
+        rule_package_id: registered.id,
+        model_version_id,
+        parameter_set_id,
+        competition_profile_id,
+        research_schema_version_id: schema.id,
+        snapshot_schema_version_id: schema.id,
+        requested_fact_keys: vec!["injury".into(), "lineup".into(), "lineup".into()],
+        trace_id: Uuid::new_v4(),
+        state: P4FreezeTaskState::Planned,
+        idempotency_key: format!("horizon:{token}:t24h"),
+        metadata: json!({"integration_test":true}),
+    };
+    let horizon_task = database
+        .store
+        .create_p4_freeze_task(&horizon_draft)
+        .await
+        .unwrap();
+    let mut reordered = horizon_draft.clone();
+    reordered.requested_fact_keys = vec!["lineup".into(), "injury".into()];
+    let retry = database
+        .store
+        .create_p4_freeze_task(&reordered)
+        .await
+        .unwrap();
+    assert_eq!(
+        serde_json::to_value(&horizon_task).unwrap(),
+        serde_json::to_value(&retry).unwrap()
+    );
+    assert_eq!(horizon_task.requested_fact_keys, ["injury", "lineup"]);
+    assert_eq!(
+        horizon_task.data_cutoff_at,
+        data_cutoff_at - Duration::nanoseconds(789)
+    );
+    assert_eq!(
+        database
+            .store
+            .find_p4_freeze_task_by_idempotency(&horizon_draft.idempotency_key)
+            .await
+            .unwrap()
+            .unwrap()
+            .id,
+        horizon_task.id
+    );
+    assert_eq!(
+        database
+            .store
+            .read_p4_freeze_task(horizon_task.id)
+            .await
+            .unwrap()
+            .id,
+        horizon_task.id
+    );
+    for change in ["metadata", "trace", "nanosecond"] {
+        let mut changed = horizon_draft.clone();
+        match change {
+            "metadata" => changed.metadata = json!({"changed":true}),
+            "trace" => changed.trace_id = Uuid::new_v4(),
+            _ => changed.data_cutoff_at += Duration::nanoseconds(1),
+        }
+        assert!(matches!(
+            database.store.create_p4_freeze_task(&changed).await,
+            Err(PersistenceError::InvalidState(_))
+        ));
+    }
+    for horizon in [P4Horizon::T90m, P4Horizon::LegacyTN] {
+        let mut bad = horizon_draft.clone();
+        bad.horizon = horizon;
+        bad.idempotency_key = format!("horizon:{token}:{}", horizon.as_str());
+        bad.trace_id = Uuid::new_v4();
+        assert!(database.store.create_p4_freeze_task(&bad).await.is_err());
+        assert!(database
+            .store
+            .find_p4_freeze_task_by_idempotency(&bad.idempotency_key)
+            .await
+            .unwrap()
+            .is_none());
+    }
+    let mut concurrent_draft = horizon_draft.clone();
+    concurrent_draft.horizon = P4Horizon::T6h;
+    concurrent_draft.data_cutoff_at = planning_context.kickoff_at - Duration::hours(6);
+    concurrent_draft.research_due_at = concurrent_draft.data_cutoff_at - Duration::minutes(15);
+    concurrent_draft.freeze_deadline_at = concurrent_draft.data_cutoff_at + Duration::minutes(15);
+    concurrent_draft.idempotency_key = format!("horizon:{token}:concurrent");
+    concurrent_draft.trace_id = Uuid::new_v4();
+    let (left, right) = tokio::join!(
+        database.store.create_p4_freeze_task(&concurrent_draft),
+        database.store.create_p4_freeze_task(&concurrent_draft)
+    );
+    let concurrent_task = left.unwrap();
+    assert_eq!(concurrent_task.id, right.unwrap().id);
+    let mut rollback = concurrent_draft.clone();
+    rollback.horizon = P4Horizon::T1h;
+    rollback.data_cutoff_at = planning_context.kickoff_at - Duration::hours(1);
+    rollback.research_due_at = rollback.data_cutoff_at - Duration::minutes(15);
+    rollback.freeze_deadline_at = rollback.data_cutoff_at + Duration::minutes(15);
+    rollback.idempotency_key = format!("horizon:{token}:rollback");
+    rollback.trace_id = Uuid::new_v4();
+    let valid_rule = rollback.rule_package_id;
+    rollback.rule_package_id = Uuid::new_v4();
+    assert!(database
+        .store
+        .create_p4_freeze_task(&rollback)
+        .await
+        .is_err());
+    assert!(database
+        .store
+        .find_p4_freeze_task_by_idempotency(&rollback.idempotency_key)
+        .await
+        .unwrap()
+        .is_none());
+    let audit_before:i64=sqlx::query_scalar("SELECT count(*) FROM audit.events WHERE event_type='p4_freeze_task_created' AND payload->>'match_id'=$1")
+        .bind(target.id.to_string()).fetch_one(&database.pool).await.unwrap();
+    assert_eq!(audit_before, 2);
+    rollback.rule_package_id = valid_rule;
+    let restored = database
+        .store
+        .create_p4_freeze_task(&rollback)
+        .await
+        .unwrap();
+    let queue_job = database
+        .store
+        .enqueue_job(&EnqueueJobDraft {
+            job_type: "p4_horizon_research".into(),
+            payload: json!({"task_id":horizon_task.id}),
+            idempotency_key: Some(format!("p4-research-job:{}", horizon_task.id)),
+            available_at: Some(horizon_task.research_due_at),
+            priority: 10,
+            max_attempts: 3,
+        })
+        .await
+        .unwrap();
+    let transition = P4FreezeTaskTransition {
+        task_id: horizon_task.id,
+        expected_state: P4FreezeTaskState::Planned,
+        next_state: P4FreezeTaskState::ResearchQueued,
+        reason: "integration queued".into(),
+        blockers: json!(null),
+        payload: json!({"job_id":queue_job.id}),
+        research_run_id: Some(research.id),
+        research_job_id: Some(queue_job.id),
+        freeze_job_id: None,
+        snapshot_id: None,
+    };
+    let queued = database
+        .store
+        .transition_p4_freeze_task(&transition)
+        .await
+        .unwrap();
+    assert_eq!(
+        (queued.research_job_id, queued.research_run_id),
+        (Some(queue_job.id), Some(research.id))
+    );
+    let events = database
+        .store
+        .list_p4_freeze_task_events(horizon_task.id)
+        .await
+        .unwrap();
+    assert_eq!(events.len(), 2);
+    let same = database
+        .store
+        .transition_p4_freeze_task(&transition)
+        .await
+        .unwrap();
+    assert_eq!(
+        serde_json::to_value(&queued).unwrap(),
+        serde_json::to_value(&same).unwrap()
+    );
+    assert_eq!(
+        serde_json::to_value(&events).unwrap(),
+        serde_json::to_value(
+            database
+                .store
+                .list_p4_freeze_task_events(horizon_task.id)
+                .await
+                .unwrap()
+        )
+        .unwrap()
+    );
+    for invalid in ["expected", "illegal", "foreign_key"] {
+        let mut rejected = transition.clone();
+        rejected.next_state = P4FreezeTaskState::ResearchRunning;
+        match invalid {
+            "expected" => {}
+            "illegal" => {
+                rejected.expected_state = P4FreezeTaskState::ResearchQueued;
+                rejected.next_state = P4FreezeTaskState::Frozen;
+            }
+            _ => {
+                rejected.expected_state = P4FreezeTaskState::ResearchQueued;
+                rejected.research_run_id = Some(Uuid::new_v4());
+            }
+        }
+        assert!(database
+            .store
+            .transition_p4_freeze_task(&rejected)
+            .await
+            .is_err());
+        assert_eq!(
+            serde_json::to_value(&queued).unwrap(),
+            serde_json::to_value(
+                database
+                    .store
+                    .read_p4_freeze_task(horizon_task.id)
+                    .await
+                    .unwrap()
+            )
+            .unwrap()
+        );
+        assert_eq!(
+            database
+                .store
+                .list_p4_freeze_task_events(horizon_task.id)
+                .await
+                .unwrap()
+                .len(),
+            2
+        );
+    }
+    assert_eq!(events[0].from_state, None);
+    assert_eq!(events[0].to_state, P4FreezeTaskState::Planned);
+    assert_eq!(events[1].from_state, Some(P4FreezeTaskState::Planned));
+    assert_eq!(events[1].to_state, P4FreezeTaskState::ResearchQueued);
+    let ordered = database
+        .store
+        .list_p4_freeze_tasks(Some(target.id), 500)
+        .await
+        .unwrap();
+    assert_eq!(
+        ordered.iter().map(|task| task.horizon).collect::<Vec<_>>(),
+        P4Horizon::CANONICAL
+    );
+    for task in [&horizon_task, &concurrent_task, &restored] {
+        let count:i64=sqlx::query_scalar("SELECT count(*) FROM audit.events WHERE event_type='p4_freeze_task_created' AND entity_id=$1")
+            .bind(task.id.to_string()).fetch_one(&database.pool).await.unwrap();
+        assert_eq!(count, 1);
+    }
+    let count:i64=sqlx::query_scalar("SELECT count(*) FROM audit.events WHERE event_type='p4_freeze_task_transitioned' AND entity_id=$1")
+        .bind(horizon_task.id.to_string()).fetch_one(&database.pool).await.unwrap();
+    assert_eq!(count, 1);
+    assert!(sqlx::query(
+        "UPDATE platform.p4_freeze_task_events SET reason='changed' WHERE task_id=$1"
+    )
+    .bind(horizon_task.id)
+    .execute(&database.pool)
+    .await
+    .is_err());
+    assert!(
+        sqlx::query("UPDATE platform.p4_freeze_tasks SET trace_id=$2 WHERE id=$1")
+            .bind(horizon_task.id)
+            .bind(Uuid::new_v4())
+            .execute(&database.pool)
+            .await
+            .is_err()
+    );
 
     let features = (1_u8..=31)
         .map(|field_order| SnapshotFeatureDraft {

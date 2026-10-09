@@ -1,16 +1,9 @@
-use super::P4OrchestrationAccess;
+use super::dispatch::OrchestrationJobPayload;
 use crate::ports::prediction::PredictionWorkflowPort;
 use football_domain::{BackgroundJob, P4FreezeTaskState, P4FreezeTaskTransition};
-use serde::Deserialize;
 use serde_json::json;
-use uuid::Uuid;
 
-#[derive(Debug, Deserialize)]
-pub(super) struct OrchestrationJobPayload {
-    pub(super) task_id: Uuid,
-}
-
-pub(super) async fn mark_terminal_failure<P: P4OrchestrationAccess + ?Sized>(
+pub(super) async fn mark_terminal_failure<P: PredictionWorkflowPort + ?Sized>(
     port: &P,
     job: &BackgroundJob,
     error_message: &str,

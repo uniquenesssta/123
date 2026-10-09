@@ -2,7 +2,7 @@
 
 ## 当前阶段状态
 
-`IN_PROGRESS`。唯一阶段分支 `rewrite/r8-prediction-p4-orchestration`，阶段起点 `90680bf945fbb0d1c191937c2d9e90c2c916fb00`。R8-01～09已DONE；09精确 `4025781` / Windows run `37825126808` 全SUCCESS。用户已授权“收尾09 开始10”，10前置通过、READY；11～12BLOCKED。精确当前状态由本索引维护。
+`IN_PROGRESS`。唯一阶段分支 `rewrite/r8-prediction-p4-orchestration`，阶段起点 `90680bf945fbb0d1c191937c2d9e90c2c916fb00`。R8-01～09已DONE；09精确 `4025781` / Windows run `37825126808` 全SUCCESS。用户已授权“收尾09 开始10”，10已实施、VERIFYING，等待自身精确Windows CI；11～12BLOCKED。精确当前状态由本索引维护。
 
 ## 前置基线与范围
 
@@ -23,7 +23,7 @@ R8 依据 [任务书](../../football-model-platform-modular-rewrite-19-docs/08-R
 | R8-07 | Run Persistence | DONE · [完成记录](R08-07-run-persistence.md) |
 | R8-08 | P4 Evidence Ledger | DONE · [完成记录](R08-08-p4-evidence-ledger.md) · 精确Windows修复CI全SUCCESS |
 | R8-09 | Fact Pipeline | DONE · [完成记录](R08-09-fact-pipeline.md) · 精确Windows全SUCCESS |
-| R8-10 | Horizon Orchestration | READY · 前置通过，已授权开始 |
+| R8-10 | Horizon Orchestration | VERIFYING · [实施记录](R08-10-horizon-orchestration.md) · 静态通过，等待自身Windows |
 | R8-11 | Workbench Reads | BLOCKED |
 | R8-12 | Freeze Transaction | BLOCKED |
 
@@ -35,7 +35,7 @@ Readiness 评分/检查、manifest 算法、路由与模型执行仍由现有 ow
 
 ## 动态待验与阶段出口
 
-R8-01～08 已取得各自精确 Windows CI；09及后续仍须独立取得自身门禁，不继承前项 PASS。数据库相关 contracts、历史四项/账本、模型历史删除风险、有效 XLSX、Windows Full 的真实结果仍最终新库待验，详见 R7 阶段清单。模型保护或真实固定回归不可取得时明确说明，公共 unavailable stub 不冒充私有引擎 Golden Master。后续节点成功后逐项更新；未完成全部节点不创建阶段完成记录。
+R8-01～09 已取得各自精确 Windows CI；10及后续仍须独立取得自身门禁，不继承前项 PASS。数据库相关 contracts、历史四项/账本、模型历史删除风险、有效 XLSX、Windows Full 的真实结果仍最终新库待验，详见 R7 阶段清单。模型保护或真实固定回归不可取得时明确说明，公共 unavailable stub 不冒充私有引擎 Golden Master。后续节点成功后逐项更新；未完成全部节点不创建阶段完成记录。
 
 ## R8-01 实施与门禁记录（已通过）
 
@@ -202,3 +202,13 @@ Application原Fact Pipeline已有纯职责复用；mod中的公共命令、编�
 精确实施 `4025781f2f0419f374edfa7669a4c5bcfe71ee66` / [Windows run `37825126808`](https://github.com/uniquenesssta/123/actions/runs/37825126808) / job `113475889770` 全SUCCESS，完成于2026-10-09 02:56:31（北京时间）。日志确认Application **99** / Persistence **163**、14项新增事实边界测试、前端契约/类型/生产构建、**17**视口、fmt/Clippy/workspace tests、Windows release/MSI/NSIS与启动 **7条记录 / 3个完成操作**全部通过。报告 `logs/windows-acceptance-20261008-183420.json`；artifact `11571947799`，14,024,945字节，SHA-256 `5030ebbe6a3a7ffa551c404a7733297e555faf44c21776bdfee34c7c616cdd9e`。
 
 详见 [09完成记录](R08-09-fact-pipeline.md)。源码/测试/清单保持已验树，五文档收尾复用精确证据、不重复动态验证；09DONE，10已获用户授权，11～12BLOCKED。真实PG/历史四项/账本/XLSX/Full/私有固定回归及继承历史删除风险仍最终新库待验。
+
+## R8-10 实施与门禁（2026-10-09，VERIFYING）
+
+09精确 `4025781` / run `37825126808` 全SUCCESS，文档收尾 `7c1ccd3` 已推送。10从此基线在唯一R8分支实施：实际planner拆为prepare/schedule/queue/process，原后台领取结算与dispatch分离，Postgres任务context/前检/读取/事务/事件/投影迁入horizon。旧根保留后续readiness/冻结查询/路由事实五函数，无整文件移动/删除或空转发。完整14新增/20修改及取舍见 [10记录](R08-10-horizon-orchestration.md)。
+
+修复首建后入队/绑定失败重试停在PLANNED的问题：先核对固定身份，仅PLANNED恢复，未来用原幂等job键、截止已到转MISSED，其他状态原样返回。原三时点、29事实、Schema、cutoff/15分钟窗口、队列载荷/优先级/3次尝试与事务保持；不承诺planner整体原子，不增加自动重试/worker/State。
+
+本地实际通过83源码门禁、完整architecture、23 Rustfmt、18资产/171命令/46迁移与18 PG静态契约/diff，六破坏探针拒绝恢复。原23 Postgres函数重新内联前检比较一致，规划字段/未来队列及后台分派/失败/结算保持；新增15 Application/6 Persistence行为测试，原PG Stage C补同键并发/首建读回/状态冲突/回滚恢复/唯一事件审计及不可变。预期114/169须10自身Windows确认，18 broad仍ignored。首次架构发现旧Mapping门禁指向已迁出context，已修正到真实owner并完整复跑通过；源码批次与刻意破坏探针重叠的单项误报已在恢复后串行复核通过。
+
+Application扫描393→399、Domain1071→1084，43 Ports/365类型/300映射及Domain声明摘要保持，根Postgres清单35保持。原workflow与最终新库方式保持，不新增target/runner/workflow/数据库/依赖。Mermaid Chart已更新真实链路，Create State在本轮结束保存。10VERIFYING；11/12 BLOCKED。Windows CI启动后停止轮询；真实PG/历史四项/账本/XLSX/Full/私有Golden Master及继承model.runs/0041删除风险继续最终封包新库待验。回退受控revert至7c1ccd3。

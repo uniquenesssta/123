@@ -5,7 +5,7 @@
 > 后续阶段：`R9`  
 > 本文档是唯一执行依据之一；必须与 `00-总体架构与前23节.md` 同时适用。
 
-## 当前执行订正（2026-10-08）
+## 当前执行订正（2026-10-09）
 
 用户已启动唯一 R8 分支 `rewrite/r8-prediction-p4-orchestration`，起点 `90680bf945fbb0d1c191937c2d9e90c2c916fb00`。R7-01～15 及 Windows Automated 已完成；最终代码 `a928c8b` / run `36871154039` 通过。动态 PG、历史四项/账本、有效 XLSX、Windows Full 及模型历史删除风险仍最终封包新库待验，不继承为 PASS。
 
@@ -1418,137 +1418,99 @@ Research专项、完整architecture、原83源码检查、Rustfmt目标文件、
 
 ## R8-10 Horizon Orchestration
 
-状态：`READY`（09精确Windows已通过并收尾，用户已授权“收尾09 开始10”）
+状态：`VERIFYING`（09精确Windows已通过并收尾；10已实施，等待自身精确Windows CI；11～12仍BLOCKED）
 
 ### 1. 目标
 
-- 完成 Horizon Orchestration 的完全重写，并将该能力收敛到唯一、可递归拆分的模块目录。
+按实际职责拆分正式时点规划、后台分派和任务持久化，并修复任务首建后入队/绑定失败时重试无法恢复的已确认缺口。
 
 ### 2. 现状与来源
 
-- `crates/application/src/prediction.rs`。
-- `p4_orchestration.rs`、`fact_pipeline.rs`、`p4_persistence.rs`、`p4_workbench.rs`。
-- 相关 persistence modules。
+实际来源为 `use_cases/prediction/plan_p4_horizons/mod.rs`、`use_cases/p4_orchestration/{mod,process_next,failure}.rs` 和 Postgres 根 `p4_orchestration.rs`。R3已删除旧Application根文件；不创建已过时的Research horizon模板。原planner先创建PLANNED，再入队/绑定；中途失败后重试只返回existing，任务无法继续。
 
 ### 3. 目标文件与目录
 
-```text
-crates/application/src/use_cases/research/p4/horizon-orchestration/
-```
+Application规划保留原目录，拆为 `plan_p4_horizons/{prepare,schedule,queue,process}.rs`。后台分派在原 `use_cases/p4_orchestration/dispatch.rs`，领取/结算仍在process_next。Postgres迁入 `adapters/p4/horizon/{context,input,read,tasks,events,row}.rs`，两个mod只登记/显式导出。
 
 ### 4. 文件职责边界
 
-- 每个文件只承担一个可用一句话描述的职责。
-- 目录出口文件只负责显式导出。
-- 协调器只编排，不实现数据访问、UI 渲染或领域计算。
+prepare锁定比赛/显式路由/两Schema/29事实；schedule纯计算时点身份及原draft；queue拥有PLANNED恢复、截止判断和原队列绑定；process只编排。dispatch解析任务载荷并委托原Research/Prediction。Postgres context读取规划引用，input纯前检/指纹，read读取任务/事件，tasks拥有事务，events借用事务，row唯一投影。
 
 ### 5. 输入
 
-- 无。
+原PlanP4HorizonsCommand：match_id、显式rule_package_id、requested_fact_keys；原BackgroundJob的job_type/payload/id/attempts；原task draft/transition。空事实请求代表全部29项，非空仍须与注册表精确集合相等。
 
 ### 6. 输出
 
-- 稳定的模块公开接口、可独立测试的实现和对应契约测试。
+原顺序T-24h/T-6h/T-1h三条任务、原队列JSON结果及既有Postgres DTO。T-90m/T-N保留历史读取兼容，不进入正式计划创建。
 
 ### 7. 允许依赖
 
-- 无。
+原Domain、PredictionWorkflowPort/JobQueuePort/ResearchArtifactPort/RuleRoutingPort、现有ModelRegistry与Research/PredictionService；SQLx、审计和指纹只在Persistence职责。不增加依赖版本。
 
 ### 8. 禁止依赖
 
-- 无。
+Application不得访问具体Postgres/SQLx或私有模型；不得复制Fact Pipeline、Workbench聚合、冻结模型执行和快照事务。Root剩余readiness/冻结查询/路由事实五项仍原位，交后续11/12审查。
 
 ### 9. 状态所有权
 
-- 该任务不新增跨模块共享状态；需要状态时由目标模块内具名 State/Coordinator 唯一持有。
+准备信息、单次捕获时钟和三任务数组只属于本请求；任务/事件由原Postgres持有，后台AtomicBool仍由原Service/worker唯一持有。无新缓存、State、后台线程或前端状态。
 
 ### 10. 副作用边界
 
-- 所有 I/O、副作用和外部调用必须集中在明确命名的 adapter/transport/repository/workflow 文件。
+Application经原Ports创建/入队/迁移；首建和迁移各保持任务+事件+审计共同事务。队列预约与任务绑定仍为两个独立Port操作，不承诺整个三时点或planner原子回滚。
 
 ### 11. 异常路径
 
-- 保持现有错误码、错误类型和用户可见提示语义；新增内部错误必须在边界映射为既有公共错误。
+前检与Port错误即时传播原kind/message，保留前面已完成的时点及部分副作用。已有任务先复核版本/Schema/事实；仅PLANNED可以恢复，未来用原幂等队列键绑定，截止相等/已过转MISSED，其他状态只读返回。队列已存在但绑定失败的恢复仍复用该job；过期时不删除旧job，由原worker终态策略处理。后台达到次数上限才尽力标记合法非终态FAILED，随后原队列fail；fail本身错误仍按原优先级传播。
 
 ### 12. 并发/异步/生命周期
 
-- 所有异步请求必须具备请求 ID、取消或过期结果丢弃策略；销毁时解除监听器、定时器和挂起回调。
+保留单次Utc::now、逐时点顺序await、原队列预约/3次尝试与30秒轮询、AtomicBool与数据库断连退出。Postgres首建保留同键事务锁与首次指纹核对，状态迁移保留FOR UPDATE、同状态无写重试、expected冲突及合法迁移。无新增自动重试循环或UI监听器。
 
 ### 13. 兼容要求
 
-- P4.4 保持 SHADOW_ONLY。
-- P7 固定 lambda、概率、矩阵和 top scoreline 回归一致。
-- 历史 cutoff、输入指纹、路由和 schema 不变。
+公开API/DTO/Schema、43 Ports、171命令、配置/日志/UI/原错误保持；模型、P4.4权限、P7、29事实、两版Schema、原cutoff/15分钟lead与grace、键/priority/attempts和0001～0046保持。明确行为修复仅为上述PLANNED恢复；不把该修复称为全行为等价。
 
 ### 14. 实施步骤
 
-1. 读取 R0 生成的文件、命令、类型和调用方清单，确认本任务准确影响范围。
-2. 为目标目录创建清晰的 `mod.rs`/`index.ts` 出口，出口只 re-export，不承载业务逻辑。
-3. 先迁移或补齐契约测试，再实现新文件。
-4. 按职责逐文件实现；发现单文件再次出现第二职责时立即递归升级为子目录。
-5. 接入上游和下游，确保跨层只经过公开接口。
-6. 切换唯一入口，删除旧职责实现、重复类型、重复状态和重复样式。
-7. 运行最小验证、阶段回归和保护资产验证。
-8. 更新 README 并创建可回退原子提交。
+从09已验源码及文档基线 `7c1ccd34f9d72d13fc5d4b76104cbb248fc2c63a` 开始；核对实际来源与缺口，按职责提取、切换原入口并清理旧实现；复用原Probe和目标补15 Application/6 Persistence测试及原Stage C夹具；扩展原Prediction/Research/Mapping门禁，刷新原清单；核对原函数/SQL/载荷，恢复所有破坏探针；更新四文档与本项记录，推送同分支启动原Windows CI后结束轮询。
 
 ### 15. 切换入口
 
-- 在新实现通过最小验证后切换唯一调用入口；切换完成后立即运行契约验证。
+原PredictionService仍调用plan_p4_horizons::execute显式出口；原P4Service调用process_next，后者通过dispatch委托原服务。PostgresStore公开方法路径/签名保持，只有真实实现owner迁移。
 
 ### 16. 删除清单
 
-- 删除被本任务替代的旧职责实现、重复出口、重复测试和临时转发。
+旧planner和跨服务mod中的实现已迁出；Postgres根18项函数/9公开方法迁出，保留后续五函数；无完整文件删除、移动或空转发壳，无双实现。
 
 ### 17. 最小验证
 
-- 相关 crate/feature 单元测试通过。
-- TypeScript/Rust 编译或类型检查通过。
-- 架构边界脚本通过。
-- 模型保护资产指纹通过。
+本地83源码检查、完整architecture、Rustfmt 1.88的23目标文件、18保护资产/171命令/46迁移及18PG静态契约、差异检查通过。原23 Postgres函数（前检重新内联）及规划准备/身份/draft/未来队列、分派/失败/结算核对等价；六破坏探针拒绝并恢复。详细证据见实施记录。
 
 ### 18. 阶段回归
 
-- `npm run verify:frontend`。
-- `cargo fmt --all -- --check`。
-- `cargo clippy --locked --workspace --all-targets -- -D warnings`。
-- `cargo test --locked --workspace`。
+复用既有Windows Automated：完整frontend/5浏览器项与17视口、类型/构建、Rust fmt/Clippy/workspace tests、Windows release/MSI/NSIS/启动。预期Application114/Persistence169只是源码预期，须10精确head实跑；无Linux/macOS Cargo/客户端动态验收。真实PG/历史四项/账本/有效XLSX/Windows Full/私有Golden Master仍最终封包新库待验，ignored不计PASS。
 
 ### 19. 失败停止条件
 
-- 任何保护资产指纹变化。
-- 公共契约出现未批准变化。
-- 最小验证失败。
-- 发现用户未提交修改与目标文件重叠且无法安全合并。
+保护资产、公开契约、依赖/迁移变化或门禁失败必须修复，10保持VERIFYING；不得继承09 PASS、提前开始11/12或创建R8阶段完成记录。无法取得私有引擎/数据库实际结果时明确保留待验。
 
 ### 20. 回退点
 
-- 回退到 R8-10 开始前的已验证提交；不得手工复制旧文件恢复。
+受控revert本项至 `7c1ccd3`，同步owner/出口、原测试/门禁/清单及记录；不复制旧文件形成双实现，不改历史库。
 
 ### 21. 根 README 摘要记录
 
-- 记录 R8-10 实际创建、移动、删除的文件。
-- 记录执行过的命令、结果、未执行项与剩余风险。
+记录09精确通过及10实际职责、PLANNED修复、静态PASS/Windows待验、测试源码预期、文件清单链接与11～12BLOCKED。
 
 ### 22. docs 阶段节点详细记录
 
-- 创建 `docs/modular-rewrite/R08-prediction-p4-orchestration/R08-10-horizon-orchestration.md`。
-- 记录本节点实际做了什么、为何修改、修改前后职责、行为和依赖变化。
-- 分别列出全部新增、修改、移动/重命名和删除文件；没有对应类型时明确写“无”。
-- 文件清单必须与本节点真实 `git diff --name-status` 和最终工作区一致。
-- 记录公共接口、DTO、Schema、数据格式、配置、错误语义、日志、UI 行为和模型保护资产是否变化。
-- 记录实际执行的验证命令、环境、结果和报告路径；未执行项必须写明原因、替代验证和剩余风险。
-- 记录入口切换、旧实现清理、关键设计决策、计划偏差和回退方法。
-- 更新 `docs/modular-rewrite/R08-prediction-p4-orchestration/README.md` 中本任务的状态、记录链接和门禁结果。
-- 节点记录及阶段索引未完成时，本任务只能停留在 `VERIFYING`，不得改为 `DONE`。
+建立 [R08-10-horizon-orchestration.md](../modular-rewrite/R08-prediction-p4-orchestration/R08-10-horizon-orchestration.md)，完整A/M清单，无移动/删除，记录职责、修复偏差、事务/异步/部分副作用边界、验证、异常、回退及Mermaid/Create State；同步索引。Windows启动后停止轮询，精确结果取得前不关闭。
 
 ### 23. 完成标准
 
-- 目标职责已由唯一新模块承担。
-- 旧入口和旧实现已删除。
-- 最小验证与阶段回归均通过。
-- README 与实际状态一致。
-- `R08-10-horizon-orchestration.md` 已创建并与实际变更、验证结果一致。
-- 阶段 `README.md` 已更新本任务状态和记录链接。
+唯一owner及原入口兼容，明确修复的回归、所有静态及10自身精确Windows门禁通过、文档/实际差异一致才DONE；真实PG等独立待验继续按最终封包约定保留，下一项仍须用户授权。
 
 ---
 

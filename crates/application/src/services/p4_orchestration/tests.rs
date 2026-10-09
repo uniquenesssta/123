@@ -47,7 +47,7 @@ use football_domain::{
 use serde_json::json;
 use uuid::Uuid;
 
-fn task_fixture(state: P4FreezeTaskState) -> P4FreezeTaskRecord {
+pub(crate) fn task_fixture(state: P4FreezeTaskState) -> P4FreezeTaskRecord {
     let now = Utc::now();
     P4FreezeTaskRecord {
         id: Uuid::from_u128(30),
@@ -418,14 +418,31 @@ async fn research_readiness_port_error_cannot_enqueue_or_transition_task() {
 
 #[async_trait]
 impl PredictionWorkflowPort for Probe {
-    async fn planning_match_context(&self, _match_id: Uuid) -> PortResult<P4PlanningMatchContext> {
-        panic!("forbidden Port call: planning_match_context")
+    async fn planning_match_context(&self, match_id: Uuid) -> PortResult<P4PlanningMatchContext> {
+        self.call("context")?;
+        let context = self
+            .state
+            .lock()
+            .unwrap()
+            .planning_context
+            .clone()
+            .expect("unexpected planning context");
+        assert_eq!(context.match_id, match_id);
+        Ok(context)
     }
     async fn find_freeze_task_by_idempotency(
         &self,
-        _idempotency_key: &str,
+        idempotency_key: &str,
     ) -> PortResult<Option<P4FreezeTaskRecord>> {
-        panic!("forbidden Port call: find_freeze_task_by_idempotency")
+        self.call("find_task")?;
+        Ok(self
+            .state
+            .lock()
+            .unwrap()
+            .planned_tasks
+            .iter()
+            .find(|task| task.idempotency_key == idempotency_key)
+            .cloned())
     }
     async fn list_freeze_tasks(
         &self,
@@ -442,9 +459,25 @@ impl PredictionWorkflowPort for Probe {
     }
     async fn create_freeze_task(
         &self,
-        _draft: &P4FreezeTaskDraft,
+        draft: &P4FreezeTaskDraft,
     ) -> PortResult<P4FreezeTaskRecord> {
-        panic!("forbidden Port call: create_freeze_task")
+        self.call("create_task")?;
+        let mut state = self.state.lock().unwrap();
+        let now = Utc::now();
+        let mut value = serde_json::to_value(draft).unwrap();
+        let object = value.as_object_mut().unwrap();
+        object.insert(
+            "id".into(),
+            json!(Uuid::from_u128(200 + state.planned_tasks.len() as u128)),
+        );
+        object.insert("created_at".into(), json!(now));
+        object.insert("updated_at".into(), json!(now));
+        object.insert("task_fingerprint".into(), json!("test-fingerprint"));
+        object.insert("blockers".into(), json!([]));
+        let task: P4FreezeTaskRecord = serde_json::from_value(value).unwrap();
+        state.task_drafts.push(draft.clone());
+        state.planned_tasks.push(task.clone());
+        Ok(task)
     }
     async fn read_freeze_task(&self, task_id: Uuid) -> PortResult<P4FreezeTaskRecord> {
         self.call("read_task")?;
@@ -465,12 +498,26 @@ impl PredictionWorkflowPort for Probe {
     ) -> PortResult<P4FreezeTaskRecord> {
         self.call("transition")?;
         let mut value = self.state.lock().unwrap();
-        let task = value.task.as_mut().unwrap();
+        let task = if value.task.as_ref().is_some_and(|task| task.id == task_id) {
+            value.task.as_mut().unwrap()
+        } else {
+            value
+                .planned_tasks
+                .iter_mut()
+                .find(|task| task.id == task_id)
+                .unwrap()
+        };
         assert_eq!(task_id, task.id);
         assert_eq!(transition.task_id, task.id);
         assert_eq!(task.state, transition.expected_state);
         assert!(task.state.can_transition_to(transition.next_state));
         task.state = transition.next_state;
+        if let Some(id) = transition.research_run_id {
+            task.research_run_id = Some(id);
+        }
+        if let Some(id) = transition.research_job_id {
+            task.research_job_id = Some(id);
+        }
         if let Some(id) = transition.snapshot_id {
             task.snapshot_id = Some(id);
         }
@@ -495,11 +542,23 @@ impl JobQueuePort for Probe {
     async fn enqueue(&self, draft: &EnqueueJobDraft) -> PortResult<BackgroundJob> {
         self.call("enqueue")?;
         let mut value = self.state.lock().unwrap();
-        if let Some(first) = value.enqueues.first() {
+        if let Some(first) = value
+            .enqueues
+            .first()
+            .filter(|_| value.planning_context.is_none())
+        {
             assert_eq!(draft.idempotency_key, first.idempotency_key);
         }
         value.enqueues.push(draft.clone());
-        let id = *value.queued_job_id.get_or_insert(Uuid::from_u128(60));
+        let id = if value.planning_context.is_some() {
+            let next = Uuid::from_u128(100 + value.planned_job_ids.len() as u128);
+            *value
+                .planned_job_ids
+                .entry(draft.idempotency_key.clone().unwrap())
+                .or_insert(next)
+        } else {
+            *value.queued_job_id.get_or_insert(Uuid::from_u128(60))
+        };
         let now = Utc::now();
         Ok(BackgroundJob {
             id,
@@ -579,10 +638,18 @@ impl P4FreezeExecutionPort for Probe {
 impl ResearchArtifactPort for Probe {
     async fn read_schema(
         &self,
-        _schema_key: &str,
-        _version: &str,
+        schema_key: &str,
+        version: &str,
     ) -> PortResult<SchemaVersionRecord> {
-        panic!("forbidden Port call: read_schema")
+        self.call("schema")?;
+        let mut state = self.state.lock().unwrap();
+        state.schema_reads.push((schema_key.into(), version.into()));
+        Ok(state
+            .schemas
+            .iter()
+            .find(|schema| schema.schema_key == schema_key && schema.version == version)
+            .cloned()
+            .expect("unexpected schema version"))
     }
     async fn register_schema(
         &self,
@@ -620,4 +687,445 @@ impl ResearchArtifactPort for Probe {
     ) -> PortResult<ResearchRunRecord> {
         panic!("forbidden Port call: record_run_event")
     }
+}
+
+fn planning_probe(kickoff_at: chrono::DateTime<Utc>) -> Probe {
+    use crate::built_in_artifacts::{
+        P4_RESEARCH_SCHEMA_ARTIFACT_VERSION, P4_RESEARCH_SCHEMA_KEY,
+        P4_SNAPSHOT_SCHEMA_ARTIFACT_VERSION, P4_SNAPSHOT_SCHEMA_KEY,
+    };
+    let probe = Probe::new();
+    let mut state = probe.state.lock().unwrap();
+    state.planning_context = Some(P4PlanningMatchContext {
+        match_id: Uuid::from_u128(31),
+        match_key: "test-match".into(),
+        kickoff_at,
+        competition_id: Some(Uuid::from_u128(21)),
+        season_id: Some(Uuid::from_u128(22)),
+        stage_id: Some(Uuid::from_u128(23)),
+        competition_kind: football_domain::CompetitionKind::League,
+        home_team_name: "Home".into(),
+        away_team_name: "Away".into(),
+    });
+    let mut route = crate::use_cases::prediction::tests::route_fixture();
+    route.routing.supported_snapshot_types = P4Horizon::CANONICAL
+        .into_iter()
+        .map(|h| h.as_str().into())
+        .collect();
+    state.planning_route = Some(route);
+    state.schemas = [
+        (
+            14,
+            P4_RESEARCH_SCHEMA_KEY,
+            P4_RESEARCH_SCHEMA_ARTIFACT_VERSION,
+        ),
+        (
+            15,
+            P4_SNAPSHOT_SCHEMA_KEY,
+            P4_SNAPSHOT_SCHEMA_ARTIFACT_VERSION,
+        ),
+    ]
+    .into_iter()
+    .map(|(id, key, version)| SchemaVersionRecord {
+        id: Uuid::from_u128(id),
+        schema_key: key.into(),
+        version: version.into(),
+        schema_kind: "test".into(),
+        content_sha256: "test".into(),
+        created_at: Utc::now(),
+    })
+    .collect();
+    drop(state);
+    probe
+}
+
+fn planning_command() -> football_domain::PlanP4HorizonsCommand {
+    football_domain::PlanP4HorizonsCommand {
+        match_id: Uuid::from_u128(31),
+        explicit_rule_package_id: Uuid::from_u128(10),
+        requested_fact_keys: vec![],
+    }
+}
+
+#[tokio::test]
+async fn planner_pins_three_formal_horizons_route_schemas_facts_and_queue_policy() {
+    let kickoff = Utc::now() + Duration::hours(48);
+    let probe = planning_probe(kickoff);
+    let tasks = crate::use_cases::prediction::plan_p4_horizons::execute(&probe, planning_command())
+        .await
+        .unwrap();
+    let state = probe.state.lock().unwrap();
+    assert_eq!(
+        state.calls,
+        [
+            "context",
+            "scope",
+            "route",
+            "schema",
+            "schema",
+            "find_task",
+            "create_task",
+            "enqueue",
+            "transition",
+            "find_task",
+            "create_task",
+            "enqueue",
+            "transition",
+            "find_task",
+            "create_task",
+            "enqueue",
+            "transition"
+        ]
+    );
+    assert_eq!(tasks.len(), 3);
+    assert_eq!(state.schema_reads.len(), 2);
+    let request = &state.route_requests[0];
+    assert_eq!(request.preferred_model_family.as_deref(), Some("p4"));
+    assert_eq!(request.explicit_rule_package_id, Some(Uuid::from_u128(10)));
+    assert_eq!(request.kickoff_time, kickoff);
+    assert_eq!(
+        (request.competition_id, request.season_id, request.stage_id),
+        (
+            Some(Uuid::from_u128(21)),
+            Some(Uuid::from_u128(22)),
+            Some(Uuid::from_u128(23))
+        )
+    );
+    for (index, horizon) in P4Horizon::CANONICAL.into_iter().enumerate() {
+        let task = &tasks[index];
+        let job = &state.enqueues[index];
+        let draft = &state.task_drafts[index];
+        let cutoff = horizon.data_cutoff_at(kickoff).unwrap();
+        assert_eq!(task.horizon, horizon);
+        assert_eq!(task.state, P4FreezeTaskState::ResearchQueued);
+        assert_eq!(task.requested_fact_keys, canonical_fact_keys());
+        assert_eq!(
+            (
+                task.research_schema_version_id,
+                task.snapshot_schema_version_id
+            ),
+            (Uuid::from_u128(14), Uuid::from_u128(15))
+        );
+        assert_eq!(
+            (
+                task.rule_package_id,
+                task.model_version_id,
+                task.parameter_set_id,
+                task.competition_profile_id
+            ),
+            (
+                Uuid::from_u128(10),
+                Uuid::from_u128(11),
+                Uuid::from_u128(12),
+                Uuid::from_u128(13)
+            )
+        );
+        assert_eq!(
+            task.idempotency_key,
+            format!(
+                "p4-freeze:{}:{}:{}:{}:{}:{}",
+                task.match_id,
+                task.model_version_id,
+                task.parameter_set_id,
+                task.competition_profile_id,
+                horizon.as_str(),
+                cutoff.timestamp()
+            )
+        );
+        assert_eq!(task.data_cutoff_at, cutoff);
+        assert_eq!(task.research_due_at, cutoff - Duration::minutes(15));
+        assert_eq!(task.freeze_deadline_at, cutoff + Duration::minutes(15));
+        assert_eq!(draft.state, P4FreezeTaskState::Planned);
+        assert_eq!(job.job_type, "p4_horizon_research");
+        assert_eq!(job.payload, json!({"task_id":task.id}));
+        assert_eq!(
+            job.idempotency_key,
+            Some(format!("p4-research-job:{}", task.id))
+        );
+        assert_eq!(job.available_at, Some(task.research_due_at));
+        assert_eq!(job.priority, [10, 20, 40][index]);
+        assert_eq!(job.max_attempts, 3);
+        assert_eq!(
+            task.research_job_id,
+            Some(Uuid::from_u128(100 + index as u128))
+        );
+        assert_eq!(
+            draft.metadata["planner_version"],
+            json!(football_domain::P4_ORCHESTRATION_PLANNER_VERSION)
+        );
+    }
+}
+
+#[tokio::test]
+async fn planner_retry_preserves_progressed_and_terminal_tasks_without_writes() {
+    let probe = planning_probe(Utc::now() + Duration::hours(48));
+    let initial =
+        crate::use_cases::prediction::plan_p4_horizons::execute(&probe, planning_command())
+            .await
+            .unwrap();
+    for preserved in P4FreezeTaskState::ALL
+        .into_iter()
+        .filter(|s| *s != P4FreezeTaskState::Planned)
+    {
+        {
+            let mut state = probe.state.lock().unwrap();
+            state.calls.clear();
+            state.planned_tasks[0].state = preserved;
+        }
+        let retry =
+            crate::use_cases::prediction::plan_p4_horizons::execute(&probe, planning_command())
+                .await
+                .unwrap();
+        let state = probe.state.lock().unwrap();
+        assert_eq!(retry[0].state, preserved);
+        assert_eq!(retry[0].id, initial[0].id);
+        assert_eq!(retry[0].trace_id, initial[0].trace_id);
+        assert_eq!(
+            state.calls,
+            [
+                "context",
+                "scope",
+                "route",
+                "schema",
+                "schema",
+                "find_task",
+                "find_task",
+                "find_task"
+            ]
+        );
+        assert_eq!(
+            (
+                state.task_drafts.len(),
+                state.enqueues.len(),
+                state.transitions.len()
+            ),
+            (3, 3, 3)
+        );
+    }
+}
+
+#[tokio::test]
+async fn planner_rejects_route_capability_or_fact_subset_before_writes() {
+    for invalid in ["model", "horizon", "facts"] {
+        let probe = planning_probe(Utc::now() + Duration::hours(48));
+        let mut command = planning_command();
+        {
+            let mut state = probe.state.lock().unwrap();
+            let route = state.planning_route.as_mut().unwrap();
+            match invalid {
+                "model" => route.model_id = "p7".into(),
+                "horizon" => {
+                    route.routing.supported_snapshot_types.pop();
+                }
+                _ => command.requested_fact_keys = vec!["subset".into()],
+            }
+        }
+        assert!(matches!(
+            crate::use_cases::prediction::plan_p4_horizons::execute(&probe, command).await,
+            Err(ApplicationError::Validation(_))
+        ));
+        let state = probe.state.lock().unwrap();
+        assert_eq!(state.calls, ["context", "scope", "route"]);
+        assert!(state.task_drafts.is_empty());
+        assert!(state.enqueues.is_empty());
+    }
+    let probe = planning_probe(Utc::now() + Duration::hours(48));
+    let mut command = planning_command();
+    command.requested_fact_keys = canonical_fact_keys()
+        .into_iter()
+        .map(|s| format!(" {s} "))
+        .collect();
+    command
+        .requested_fact_keys
+        .push(command.requested_fact_keys[0].clone());
+    let result = crate::use_cases::prediction::plan_p4_horizons::execute(&probe, command)
+        .await
+        .unwrap();
+    assert_eq!(result[0].requested_fact_keys, canonical_fact_keys());
+}
+
+#[tokio::test]
+async fn planner_rejects_every_pinned_identity_drift_before_resume() {
+    for field in [
+        "rule_package_id",
+        "model_version_id",
+        "parameter_set_id",
+        "competition_profile_id",
+        "research_schema_version_id",
+        "snapshot_schema_version_id",
+        "requested_fact_keys",
+    ] {
+        let probe = planning_probe(Utc::now() + Duration::hours(48));
+        crate::use_cases::prediction::plan_p4_horizons::execute(&probe, planning_command())
+            .await
+            .unwrap();
+        {
+            let mut state = probe.state.lock().unwrap();
+            let mut task = serde_json::to_value(&state.planned_tasks[0]).unwrap();
+            task[field] = if field == "requested_fact_keys" {
+                json!(["wrong"])
+            } else {
+                json!(Uuid::from_u128(999))
+            };
+            state.planned_tasks[0] = serde_json::from_value(task).unwrap();
+            state.calls.clear();
+        }
+        assert!(matches!(
+            crate::use_cases::prediction::plan_p4_horizons::execute(&probe, planning_command())
+                .await,
+            Err(ApplicationError::Validation(_))
+        ));
+        let state = probe.state.lock().unwrap();
+        assert_eq!(
+            state.calls,
+            ["context", "scope", "route", "schema", "schema", "find_task"]
+        );
+        assert_eq!((state.task_drafts.len(), state.enqueues.len()), (3, 3));
+    }
+}
+
+#[tokio::test]
+async fn planner_marks_elapsed_horizons_missed_without_enqueuing_them() {
+    for (hours, queued) in [(-1, 0), (2, 1)] {
+        let probe = planning_probe(Utc::now() + Duration::hours(hours));
+        let result =
+            crate::use_cases::prediction::plan_p4_horizons::execute(&probe, planning_command())
+                .await
+                .unwrap();
+        assert_eq!(result.len(), 3);
+        assert_eq!(
+            result
+                .iter()
+                .filter(|t| t.state == P4FreezeTaskState::Missed)
+                .count(),
+            3 - queued
+        );
+        let state = probe.state.lock().unwrap();
+        assert_eq!(state.enqueues.len(), queued);
+        assert_eq!(state.transitions.len(), queued);
+    }
+}
+
+#[tokio::test]
+async fn planner_preserves_port_error_kind_and_stops_at_each_boundary() {
+    use crate::ports::PortErrorKind;
+    for boundary in [
+        "context",
+        "scope",
+        "route",
+        "schema",
+        "find_task",
+        "create_task",
+        "enqueue",
+        "transition",
+    ] {
+        for kind in [
+            PortErrorKind::Unavailable,
+            PortErrorKind::NotFound,
+            PortErrorKind::Conflict,
+            PortErrorKind::InvalidState,
+            PortErrorKind::Serialization,
+            PortErrorKind::Infrastructure,
+        ] {
+            let probe = planning_probe(Utc::now() + Duration::hours(48));
+            {
+                let mut state = probe.state.lock().unwrap();
+                state.failure = Some(boundary);
+                state.failure_kind = Some(kind);
+            }
+            let error =
+                crate::use_cases::prediction::plan_p4_horizons::execute(&probe, planning_command())
+                    .await
+                    .unwrap_err();
+            let ApplicationError::Port(error) = error else {
+                panic!("lost Port error")
+            };
+            assert_eq!(error.kind, kind);
+            assert_eq!(error.message, format!("injected {boundary}"));
+            assert_eq!(probe.calls().last(), Some(&boundary));
+            let state = probe.state.lock().unwrap();
+            assert_eq!(
+                state.planned_tasks.len(),
+                usize::from(matches!(boundary, "enqueue" | "transition"))
+            );
+            assert_eq!(state.enqueues.len(), usize::from(boundary == "transition"));
+            assert!(state.transitions.is_empty());
+        }
+    }
+}
+
+#[tokio::test]
+async fn planner_recovers_creation_followed_by_enqueue_failure_with_same_task_identity() {
+    let probe = planning_probe(Utc::now() + Duration::hours(48));
+    probe.fail_at(Some("enqueue"));
+    assert!(
+        crate::use_cases::prediction::plan_p4_horizons::execute(&probe, planning_command())
+            .await
+            .is_err()
+    );
+    let original = probe.state.lock().unwrap().planned_tasks[0].clone();
+    assert_eq!(original.state, P4FreezeTaskState::Planned);
+    probe.fail_at(None);
+    let retry = crate::use_cases::prediction::plan_p4_horizons::execute(&probe, planning_command())
+        .await
+        .unwrap();
+    assert_eq!(
+        (
+            retry[0].id,
+            retry[0].trace_id,
+            retry[0].idempotency_key.as_str()
+        ),
+        (
+            original.id,
+            original.trace_id,
+            original.idempotency_key.as_str()
+        )
+    );
+    assert_eq!(retry[0].state, P4FreezeTaskState::ResearchQueued);
+    let state = probe.state.lock().unwrap();
+    assert_eq!(
+        (
+            state.task_drafts.len(),
+            state.planned_job_ids.len(),
+            state.transitions.len()
+        ),
+        (3, 3, 3)
+    );
+}
+
+#[tokio::test]
+async fn planner_recovers_binding_failure_using_original_idempotent_queue_job() {
+    let probe = planning_probe(Utc::now() + Duration::hours(48));
+    probe.fail_at(Some("transition"));
+    assert!(
+        crate::use_cases::prediction::plan_p4_horizons::execute(&probe, planning_command())
+            .await
+            .is_err()
+    );
+    let (task, job) = {
+        let state = probe.state.lock().unwrap();
+        (
+            state.planned_tasks[0].clone(),
+            *state.planned_job_ids.values().next().unwrap(),
+        )
+    };
+    probe.fail_at(None);
+    let retry = crate::use_cases::prediction::plan_p4_horizons::execute(&probe, planning_command())
+        .await
+        .unwrap();
+    assert_eq!(retry[0].id, task.id);
+    assert_eq!(retry[0].research_job_id, Some(job));
+    let state = probe.state.lock().unwrap();
+    assert_eq!(
+        state.enqueues[0].idempotency_key,
+        state.enqueues[1].idempotency_key
+    );
+    assert_eq!(
+        (
+            state.task_drafts.len(),
+            state.enqueues.len(),
+            state.planned_job_ids.len()
+        ),
+        (3, 4, 3)
+    );
 }

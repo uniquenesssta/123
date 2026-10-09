@@ -5,4 +5,4 @@ mod worker;
 pub(crate) use service::P4OrchestrationService;
 
 #[cfg(test)]
-mod tests;
+pub(crate) mod tests;

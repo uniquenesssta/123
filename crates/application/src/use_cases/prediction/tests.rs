@@ -28,6 +28,15 @@ use uuid::Uuid;
 
 #[derive(Default)]
 pub(crate) struct ProbeState {
+    pub(crate) planning_context: Option<football_domain::P4PlanningMatchContext>,
+    pub(crate) planning_route: Option<RouteDecision>,
+    pub(crate) planned_tasks: Vec<P4FreezeTaskRecord>,
+    pub(crate) task_drafts: Vec<football_domain::P4FreezeTaskDraft>,
+    pub(crate) schemas: Vec<football_domain::SchemaVersionRecord>,
+    pub(crate) schema_reads: Vec<(String, String)>,
+    pub(crate) planned_job_ids: std::collections::BTreeMap<String, Uuid>,
+    pub(crate) job_results: Vec<(Uuid, String)>,
+    pub(crate) job_failures: Vec<(Uuid, String)>,
     pub(crate) calls: Vec<&'static str>,
     pub(crate) failure: Option<&'static str>,
     pub(crate) failure_kind: Option<PortErrorKind>,
@@ -397,7 +406,13 @@ impl RuleRoutingPort for Probe {
             .unwrap()
             .route_requests
             .push(request.clone());
-        Ok(self.route.clone())
+        Ok(self
+            .state
+            .lock()
+            .unwrap()
+            .planning_route
+            .clone()
+            .unwrap_or_else(|| self.route.clone()))
     }
 }
 

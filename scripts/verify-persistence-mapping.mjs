@@ -29,7 +29,7 @@ const library = read("crates/persistence-postgres/src/lib.rs");
 const competitionKind = read("crates/persistence-postgres/src/competition_kind.rs");
 const competitionMapper = read("crates/persistence-postgres/src/adapters/competition/detail/record_mapper.rs");
 const routeContextMapper = read("crates/persistence-postgres/src/adapters/competition/route_resolution/context/record_mapper.rs");
-const p4 = read("crates/persistence-postgres/src/p4_orchestration.rs");
+const p4 = read("crates/persistence-postgres/src/adapters/p4/horizon/context.rs");
 const bindingMapper = read("crates/persistence-postgres/src/adapters/competition/bindings/record_mapper.rs");
 const bindingPackageMetadata = read("crates/persistence-postgres/src/adapters/competition/bindings/package_route_metadata.rs");
 const rulePackageMapper = read("crates/persistence-postgres/src/adapters/rules/packages/record_mapper.rs");
@@ -45,7 +45,7 @@ check(competitionKind.includes("未知赛事类型：{other}"), "CompetitionKind
 for (const [label, source] of [
   ["R5-01 competition mapper", competitionMapper],
   ["R5-05 route context mapper", routeContextMapper],
-  ["p4_orchestration", p4],
+  ["p4/horizon/context", p4],
   ["R5-04 binding mapper", bindingMapper],
   ["R5-04 binding package metadata", bindingPackageMetadata],
   ["R5-03 rule package mapper", rulePackageMapper],

@@ -101,7 +101,7 @@ const p4Transitions = read("crates/application/src/use_cases/research/p4_worker/
 const p4Manual = read("crates/application/src/use_cases/research/p4_manual_conflict/mod.rs");
 const p4Decision = read("crates/application/src/use_cases/research/p4_manual_conflict/decision.rs");
 const p4Reconciliation = read("crates/application/src/use_cases/research/p4_manual_conflict/reconciliation.rs");
-const p4Orchestration = read("crates/application/src/use_cases/p4_orchestration/process_next.rs");
+const p4Orchestration = read("crates/application/src/use_cases/p4_orchestration/dispatch.rs");
 const lib = read("crates/application/src/lib.rs");
 const packageJson = JSON.parse(read("package.json"));
 const frontend = read("scripts/verify-frontend.mjs");
@@ -247,4 +247,4 @@ check(packageJson.scripts?.["verify:architecture"]?.includes("verify-research-se
 check(frontend.includes('"verify-research-service.mjs"'), "verify:frontend 未接入 R3-07 门禁");
 
 if (failures.length) throw new Error(`Research Service 验证失败\n${failures.map((item) => `- ${item}`).join("\n")}`);
-console.log(`Research Service / R8-09 Fact Pipeline 验证通过：${researchFiles.length} 个 Service/Use Case Rust 文件；10 个公开 Research API 保持兼容，Fact Pipeline、OpenAI Gateway、P4 Research worker 与人工冲突裁决均进入 ResearchService/Ports，根 p4_orchestration.rs 仅保留跨服务 dispatcher/worker loop，旧 p4_workbench.rs 已删除。`);
+console.log(`Research Service / R8-09 Fact Pipeline 验证通过：${researchFiles.length} 个 Service/Use Case Rust 文件；10 个公开 Research API 保持兼容，Fact Pipeline、OpenAI Gateway、P4 Research worker 与人工冲突裁决均进入 ResearchService/Ports，实际 dispatch owner 仅分派原 Research/Prediction 服务，process_next 领取并结算队列，旧 p4_workbench.rs 已删除。`);

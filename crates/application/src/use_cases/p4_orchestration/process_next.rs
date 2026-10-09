@@ -1,14 +1,18 @@
-use super::{failure, P4OrchestrationAccess};
-use crate::model_registry::ModelRegistry;
-use crate::ports::prediction::{P4OrchestrationQueuePort, SerializedP4OrchestrationResult};
-use crate::services::{prediction::PredictionService, research::ResearchService};
-use crate::use_cases::research::p4_worker::P4ResearchWorkerAccess;
-use crate::{ApplicationError, ApplicationResult};
-use serde_json::Value;
-use uuid::Uuid;
+use crate::ports::{
+    analytics::JobQueuePort,
+    prediction::P4OrchestrationQueuePort,
+    research::{ResearchArtifactPort, ResearchGatewayAuditPort},
+};
+use crate::use_cases::{
+    prediction::P4FreezeExecutionAccess, research::fact_pipeline::FactPipelineAccess,
+};
 
-const P4_RESEARCH_JOB: &str = "p4_horizon_research";
-const P4_FREEZE_JOB: &str = "p4_horizon_freeze";
+use super::{dispatch, failure};
+use crate::model_registry::ModelRegistry;
+use crate::ports::prediction::SerializedP4OrchestrationResult;
+use crate::services::{prediction::PredictionService, research::ResearchService};
+use crate::ApplicationResult;
+use serde_json::Value;
 
 pub(crate) async fn execute<P: P4OrchestrationAccess>(
     port: &P,
@@ -16,14 +20,16 @@ pub(crate) async fn execute<P: P4OrchestrationAccess>(
     research: &ResearchService,
     prediction: &PredictionService,
 ) -> ApplicationResult<Option<Value>> {
-    let Some(job) =
-        P4OrchestrationQueuePort::claim_next_p4_job(port, &[P4_RESEARCH_JOB, P4_FREEZE_JOB])
-            .await?
+    let Some(job) = P4OrchestrationQueuePort::claim_next_p4_job(
+        port,
+        &[dispatch::P4_RESEARCH_JOB, dispatch::P4_FREEZE_JOB],
+    )
+    .await?
     else {
         return Ok(None);
     };
 
-    let result = execute_job(
+    let result = dispatch::execute_job(
         port,
         registry,
         research,
@@ -33,6 +39,16 @@ pub(crate) async fn execute<P: P4OrchestrationAccess>(
         job.id,
     )
     .await;
+    settle_job(port, &job, result).await
+}
+
+pub(super) async fn settle_job<
+    P: crate::ports::prediction::PredictionWorkflowPort + P4OrchestrationQueuePort + ?Sized,
+>(
+    port: &P,
+    job: &football_domain::BackgroundJob,
+    result: ApplicationResult<Value>,
+) -> ApplicationResult<Option<Value>> {
     match result {
         Ok(value) => {
             let serialized = SerializedP4OrchestrationResult::new(serde_json::to_string(&value)?);
@@ -40,46 +56,30 @@ pub(crate) async fn execute<P: P4OrchestrationAccess>(
             Ok(Some(value))
         }
         Err(error) => {
-            failure::mark_terminal_failure(port, &job, &error.to_string()).await;
+            failure::mark_terminal_failure(port, job, &error.to_string()).await;
             P4OrchestrationQueuePort::fail_p4_job(port, job.id, &error.to_string()).await?;
             Err(error)
         }
     }
 }
 
-async fn execute_job<P: P4OrchestrationAccess>(
-    port: &P,
-    registry: &ModelRegistry,
-    research: &ResearchService,
-    prediction: &PredictionService,
-    job_type: &str,
-    payload: &Value,
-    job_id: Uuid,
-) -> ApplicationResult<Value> {
-    let payload: failure::OrchestrationJobPayload = serde_json::from_value(payload.clone())?;
-    match job_type {
-        P4_RESEARCH_JOB => {
-            research
-                .execute_p4_research_task(
-                    P4ResearchWorkerAccess {
-                        workflow: port,
-                        jobs: port,
-                        artifacts: port,
-                        audit: port,
-                        pipeline: port,
-                    },
-                    payload.task_id,
-                    job_id,
-                )
-                .await
-        }
-        P4_FREEZE_JOB => {
-            prediction
-                .execute_p4_freeze_task(port, registry, payload.task_id, job_id)
-                .await
-        }
-        other => Err(ApplicationError::Validation(format!(
-            "P4编排器不支持后台任务：{other}"
-        ))),
-    }
+pub(crate) trait P4OrchestrationAccess:
+    P4OrchestrationQueuePort
+    + P4FreezeExecutionAccess
+    + JobQueuePort
+    + ResearchArtifactPort
+    + ResearchGatewayAuditPort
+    + FactPipelineAccess
+{
+}
+
+impl<T> P4OrchestrationAccess for T where
+    T: P4OrchestrationQueuePort
+        + P4FreezeExecutionAccess
+        + JobQueuePort
+        + ResearchArtifactPort
+        + ResearchGatewayAuditPort
+        + FactPipelineAccess
+        + ?Sized
+{
 }
