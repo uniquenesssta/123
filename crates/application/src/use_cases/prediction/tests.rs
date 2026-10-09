@@ -40,6 +40,7 @@ pub(crate) struct ProbeState {
     pub(crate) calls: Vec<&'static str>,
     pub(crate) failure: Option<&'static str>,
     pub(crate) failure_kind: Option<PortErrorKind>,
+    pub(crate) failure_call_number: Option<usize>,
     pub(crate) scope_kind: Option<CompetitionKind>,
     pub(crate) match_record: Option<MatchRecord>,
     pub(crate) match_chain: Option<MatchLineupChain>,
@@ -51,6 +52,9 @@ pub(crate) struct ProbeState {
     pub(crate) task: Option<P4FreezeTaskRecord>,
     pub(crate) readiness: Option<P4FreezeReadiness>,
     pub(crate) snapshot_id: Option<Uuid>,
+    pub(crate) frozen_drafts: Vec<football_domain::PrematchSnapshotDraft>,
+    pub(crate) freeze_routes: Option<Vec<football_domain::P4RoutedFact>>,
+    pub(crate) provider_payload: Option<Value>,
     pub(crate) transitions: Vec<P4FreezeTaskTransition>,
     pub(crate) enqueues: Vec<EnqueueJobDraft>,
     pub(crate) queued_job_id: Option<Uuid>,
@@ -75,7 +79,11 @@ impl Probe {
     pub(crate) fn call(&self, name: &'static str) -> PortResult<()> {
         let mut state = self.state.lock().unwrap();
         state.calls.push(name);
-        if state.failure == Some(name) {
+        if state.failure == Some(name)
+            && state.failure_call_number.is_none_or(|number| {
+                state.calls.iter().filter(|call| **call == name).count() == number
+            })
+        {
             return Err(PortError::new(
                 state.failure_kind.unwrap_or(PortErrorKind::Unavailable),
                 format!("injected {name}"),
@@ -185,7 +193,14 @@ impl PredictionModel for ProbeModel {
                 btts: None,
                 over_2_5: None,
             },
-            payload: json!({"test_only": true}),
+            payload: self
+                .0
+                .state
+                .lock()
+                .unwrap()
+                .provider_payload
+                .clone()
+                .unwrap_or_else(|| json!({"test_only": true})),
             explanation: json!({}),
         })
     }
@@ -458,8 +473,15 @@ impl PredictionInputPort for Probe {
         model_family: &str,
     ) -> PortResult<PreparedMatchPredictionInput> {
         self.call("prepare_input")?;
-        let _ = (match_id, snapshot_type, model_family);
-        panic!("unexpected prediction input preparation")
+        let state = self.state.lock().unwrap();
+        let prepared = state
+            .prepared_input
+            .clone()
+            .expect("unexpected prediction input preparation");
+        assert_eq!(prepared.match_record.id, match_id);
+        assert_eq!(prepared.snapshot_type, snapshot_type);
+        assert_eq!(model_family, "p4");
+        Ok(prepared)
     }
     async fn prepare_match_input_at(
         &self,

@@ -11,7 +11,7 @@
 
 适用总纲顶部的执行订正：仅 Windows 动态验证，沿用原单测/contract、既有 Windows runner/workflow/数据库入口；不新增专项或持续回归体系。公开仓库没有私有 P4/P7 引擎、参数和 Golden Master；模型保护资产可验证，公共 unavailable stub 的通过不能冒充私有固定概率实跑。目录模板按实际职责及 Rust 模块命名调整；顺序执行的后端 use case 无新增 UI 生命周期，不强制新增 State、请求 ID 或空出口。
 
-R8-01～06 已取得各自精确 Windows CI（`cba72fd` / `36881256338`、`cc2b0fe` / `36891488571`、`47ba3de` / `36902069546`、`59c5679` / `36966815323`、修复 `2aa99a7` / `36971419476`、`0969331` / `37752995641`）及正式完成记录。07 精确 `58b390a` / `37796909083` 已通过并DONE，08精确修复 `52f23ab` / `37817443918` 全SUCCESS并DONE，09精确 `4025781` / `37825126808` 全SUCCESS并DONE，用户已授权“收尾09 开始10”；各项精确当前状态只由 [阶段索引](../modular-rewrite/R08-prediction-p4-orchestration/README.md) 维护。07 及后续必须取得自身 Windows CI，不继承前项 PASS。
+R8-01～11已取得各自精确Windows CI及正式完成记录；11精确 `47bda23` / `37891346613` 全SUCCESS并文档收尾 `1b7017f`。用户授权“收尾11开始12”；12已实施、VERIFYING，必须取得自身精确Windows，不继承11 PASS。各项当前状态只由 [阶段索引](../modular-rewrite/R08-prediction-p4-orchestration/README.md) 维护；R8尚未完成，不提前创建阶段完成记录或启动R9。
 
 ## 1. 阶段目标
 
@@ -1616,138 +1616,124 @@ Application只用既有PredictionWorkflowPort；composition已有Postgres方法�
 
 ## R8-12 Freeze Transaction
 
-状态：`READY`（11自身精确Windows已通过并收尾，用户已授权“收尾11开始12”）
+状态：`VERIFYING`（用户授权“收尾11开始12”；11精确47bda23 / Windows37891346613全SUCCESS，文档收尾基线1b7017f。12本地静态通过，须自身精确Windows CI。）
 
 ### 1. 目标
 
-- 完成 Freeze Transaction 的完全重写，并将该能力收敛到唯一、可递归拆分的模块目录。
+- 为正式冻结编排、快照投影和不可变持久化确定唯一职责与事务所有者，保持现有行为。
 
 ### 2. 现状与来源
 
-- `crates/application/src/prediction.rs`。
-- `p4_orchestration.rs`、`fact_pipeline.rs`、`p4_persistence.rs`、`p4_workbench.rs`。
-- 相关 persistence modules。
+- 实际Application来源为 `use_cases/prediction/execute_p4_freeze/mod.rs` 和混合 `snapshot_projection.rs`；原 `prediction.rs` 在R3已删除。
+- Postgres来源为 `p4_records.rs` 的冻结/读取、指纹前检、引用/证据校验与Row投影。Schema/Prompt/Profile/Research记录不属快照事务，保持原owner；历史horizon解析复用原helper。
 
 ### 3. 目标文件与目录
 
 ```text
-crates/application/src/use_cases/research/p4/freeze/
+crates/application/src/use_cases/prediction/execute_p4_freeze/
+├─ mod.rs
+├─ workflow.rs
+├─ input.rs
+├─ features.rs
+└─ probabilities.rs
 crates/persistence-postgres/src/adapters/p4/freeze_transaction/
+├─ mod.rs
+├─ write.rs
+├─ input.rs
+├─ details.rs
+├─ validation.rs
+└─ read.rs
 ```
 
 ### 4. 文件职责边界
 
-- 每个文件只承担一个可用一句话描述的职责。
-- 目录出口文件只负责显式导出。
-- 协调器只编排，不实现数据访问、UI 渲染或领域计算。
+- 两mod只登记/导出。Application workflow唯一编排；input附加原溯源输入并复核四项锁定路由；features投影31字段；probabilities读取外部拓扑、标记和原矩阵哈希，均不计算模型概率。
+- Persistence write拥有快照事务/审计；input纯前检和五指纹；details借用同一事务写字段/证据/概率；validation借用同一事务核对引用与证据截止；read只读原Bundle/Row、两级复用记录并复用原horizon/验证状态解析。
 
 ### 5. 输入
 
-- 无。
+- 原task_id/job_id、ModelRegistry与P4FreezeExecutionAccess；原PrematchSnapshotDraft或snapshot_id。
 
 ### 6. 输出
 
-- 稳定的模块公开接口、可独立测试的实现和对应契约测试。
+- 原冻结JSON/任务状态/快照ID/模型运行ID、PrematchSnapshotRecord/Bundle与既有错误；原公开方法/DTO/Port不变。
 
 ### 7. 允许依赖
 
-- 无。
+- 原Domain、Model API/registry、Application Ports与built-in Schema、SQLx/PostgresStore、原共享idempotency/audit/sha256_json/Row解析、Serde/chrono/UUID/SHA现有依赖。
 
 ### 8. 禁止依赖
 
-- 无。
+- 私有模型内部实现、UI/Tauri、具体Persistence进入Application、重复共享原语、外部运行器、依赖或迁移升级。
 
 ### 9. 状态所有权
 
-- 该任务不新增跨模块共享状态；需要状态时由目标模块内具名 State/Coordinator 唯一持有。
+- 每次用例持有局部task，状态通过原Port迁移；write持有原pool开启的局部事务，无新State/缓存/后台任务。冻结后记录由不可变数据库账本持有。
 
 ### 10. 副作用边界
 
-- 所有 I/O、副作用和外部调用必须集中在明确命名的 adapter/transport/repository/workflow 文件。
+- 纯前检先于begin；原同键事务锁→同键/正式精确队列复用→引用/证据检查→快照头/31字段/证据链接/概率→审计→同一事务提交。明细不自行begin/commit或使用pool写入。
+- 模型运行保存、快照提交与后续任务FROZEN登记仍为原独立事务；不宣称跨Port全链原子。既有快照恢复在模型/就绪度/截止复核前执行，合法FREEZING恢复不重写快照或模型。
 
 ### 11. 异常路径
 
-- 保持现有错误码、错误类型和用户可见提示语义；新增内部错误必须在边界映射为既有公共错误。
+- 所有PortError kind/message、SQL错误及Validation顺序保持；模型/Schema/四身份失败不写快照；末段SQL失败回滚同一快照事务；FROZEN登记失败保留已提交快照并由重试恢复，不吞错、不自动重试。
 
 ### 12. 并发/异步/生命周期
 
-- 所有异步请求必须具备请求 ID、取消或过期结果丢弃策略；销毁时解除监听器、定时器和挂起回调。
+- 保留原同幂等键advisory事务锁、正式精确队列唯一约束与两个复用提交出口；不新增跨不同键并发政策。局部SQLx事务失败/取消沿原drop回滚，读仍使用原事务/隔离语义，不承诺新增跨查询一致性。
+- 用例无UI监听器/定时器，不新增请求State或无意义research/p4/freeze转发目录。冻结前与模型完成后各捕获一次Utc，保留严格小于截止/大于宽限的判断。
 
 ### 13. 兼容要求
 
-- P4.4 保持 SHADOW_ONLY。
-- P7 固定 lambda、概率、矩阵和 top scoreline 回归一致。
-- 历史 cutoff、输入指纹、路由和 schema 不变。
+- P4.4 SHADOW_ONLY、P7固定回归、cutoff/路由/Schema/指纹、外部provider拓扑不变；不强迫四链，至少一链的原契约保持。
+- 43Ports/171命令/365Domain/300映射、API/DTO/serde/配置/错误/日志/UI、0001～0046、模型18保护资产及依赖/lock保持。
 
 ### 14. 实施步骤
 
-1. 读取 R0 生成的文件、命令、类型和调用方清单，确认本任务准确影响范围。
-2. 为目标目录创建清晰的 `mod.rs`/`index.ts` 出口，出口只 re-export，不承载业务逻辑。
-3. 先迁移或补齐契约测试，再实现新文件。
-4. 按职责逐文件实现；发现单文件再次出现第二职责时立即递归升级为子目录。
-5. 接入上游和下游，确保跨层只经过公开接口。
-6. 切换唯一入口，删除旧职责实现、重复类型、重复状态和重复样式。
-7. 运行最小验证、阶段回归和保护资产验证。
-8. 更新 README 并创建可回退原子提交。
+1. 核对真实调用、原事务/指纹/Row和既有测试；迁移唯一职责与原四快照单测。
+2. mod显式登记，原execute re-export与Store公开方法保持；删除混合投影和根快照实现。
+3. 沿原Application Probe/target补冻结完整执行、所有六种错误、漂移与已提交恢复；沿原Persistence单测补指纹与前检边界。
+4. 原PG Stage C补末段SQL回滚、同键并发、正式队列重用/冲突与完整原文读回；无新数据库或target。
+5. 更新既有Prediction门禁/清单/记录，静态复核，推送原分支并启动精确Windows。
 
 ### 15. 切换入口
 
-- 在新实现通过最小验证后切换唯一调用入口；切换完成后立即运行契约验证。
+- 原Tauri/Facade/Service/Ports/composition不变。execute由workflow唯一实现；freeze/read_prematch_snapshot唯一分别归write/read，adapters/p4登记，无空兼容转发。
 
 ### 16. 删除清单
 
-- 删除被本任务替代的旧职责实现、重复出口、重复测试和临时转发。
+- 整文件删除 `execute_p4_freeze/snapshot_projection.rs`；原混合mod执行体和p4_records快照实现/专用导入退出。保留非快照职责与原共享horizon解析；无复制双实现。
 
 ### 17. 最小验证
 
-- 相关 crate/feature 单元测试通过。
-- TypeScript/Rust 编译或类型检查通过。
-- 架构边界脚本通过。
-- 模型保护资产指纹通过。
+- 本地Prediction门禁、完整architecture、Domain/源码卫生、Rustfmt1.88 --check、git diff --check和静态资产/数据库/命令契约PASS；七破坏探针拒绝后恢复PASS。
+- 原完整Application与Persistence测试由本项Windows执行；126/175仅源码预期，尚未冒充实跑。
 
 ### 18. 阶段回归
 
-- `npm run verify:frontend`。
-- `cargo fmt --all -- --check`。
-- `cargo clippy --locked --workspace --all-targets -- -D warnings`。
-- `cargo test --locked --workspace`。
+- 83项原源码门禁PASS；完整frontend/type/Vite、17视口、fmt/Clippy/workspace tests、Windows release/MSI/NSIS/启动沿既有Windows Automated执行。确认新head启动后结束，不持续轮询。
+- 未执行Linux/macOS Cargo或客户端动态验收。18 broad PG保持ignored，真实PG/历史四项/账本/有效XLSX/Full/私有Golden Master及继承删除风险继续最终新库待验。
 
 ### 19. 失败停止条件
 
-- 任何保护资产指纹变化。
-- 公共契约出现未批准变化。
-- 最小验证失败。
-- 发现用户未提交修改与目标文件重叠且无法安全合并。
+- 模型保护指纹变化、公共契约变化、硬门禁失败或用户改动冲突即停止。12未取得自身Windows全SUCCESS前，不标记DONE、不创建R8阶段完成记录或启动R9。
 
 ### 20. 回退点
 
-- 回退到 R8-12 开始前的已验证提交；不得手工复制旧文件恢复。
+- 基线 `1b7017fabcc131ef80515b5e5c70507de45da9e0`。受控revert本项并同步唯一owner、测试/门禁/清单和文档，不手工复制实现或变更历史库。
 
 ### 21. 根 README 摘要记录
 
-- 记录 R8-12 实际创建、移动、删除的文件。
-- 记录执行过的命令、结果、未执行项与剩余风险。
+- 当前冻结职责、原事务/恢复边界、静态结果、Windows待验、记录链接及真实延期已同步。
 
 ### 22. docs 阶段节点详细记录
 
-- 创建 `docs/modular-rewrite/R08-prediction-p4-orchestration/R08-12-freeze-transaction.md`。
-- 记录本节点实际做了什么、为何修改、修改前后职责、行为和依赖变化。
-- 分别列出全部新增、修改、移动/重命名和删除文件；没有对应类型时明确写“无”。
-- 文件清单必须与本节点真实 `git diff --name-status` 和最终工作区一致。
-- 记录公共接口、DTO、Schema、数据格式、配置、错误语义、日志、UI 行为和模型保护资产是否变化。
-- 记录实际执行的验证命令、环境、结果和报告路径；未执行项必须写明原因、替代验证和剩余风险。
-- 记录入口切换、旧实现清理、关键设计决策、计划偏差和回退方法。
-- 更新 `docs/modular-rewrite/R08-prediction-p4-orchestration/README.md` 中本任务的状态、记录链接和门禁结果。
-- 节点记录及阶段索引未完成时，本任务只能停留在 `VERIFYING`，不得改为 `DONE`。
+- 已创建 `docs/modular-rewrite/R08-prediction-p4-orchestration/R08-12-freeze-transaction.md`，列出全部实际A/M/D、决策/等价核对/七探针/原测试/报告/风险；索引12 VERIFYING，R8 IN_PROGRESS。
 
 ### 23. 完成标准
 
-- 目标职责已由唯一新模块承担。
-- 旧入口和旧实现已删除。
-- 最小验证与阶段回归均通过。
-- README 与实际状态一致。
-- `R08-12-freeze-transaction.md` 已创建并与实际变更、验证结果一致。
-- 阶段 `README.md` 已更新本任务状态和记录链接。
+- 唯一职责与旧实现清理、原接口/行为/SQL/指纹、静态验证及记录已满足；必须再取得12自身精确Windows CI，才可收尾12并评估R8出口。最终新库/私有固定回归的延期不得继承为PASS。
 
 ---
 

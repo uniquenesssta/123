@@ -38,6 +38,8 @@ R8-10 首轮 `db5fd51` / [Windows run `37884818742`](https://github.com/uniquene
 
 R8-11 Workbench Reads 已收尾为 `DONE`：工作台读取归比赛、任务汇总、研究、证据与冲突职责，原四SQL、顺序/错误/NULL与人工覆盖政策保持。精确 `47bda23` / [Windows run `37891346613`](https://github.com/uniquenesssta/123/actions/runs/37891346613) 全SUCCESS，Application118/Persistence169、四项新增测试、17视口、Rust/前端、Windows构建打包与启动通过。完整变更及证据见 [11完成记录](docs/modular-rewrite/R08-prediction-p4-orchestration/R08-11-workbench-reads.md)。用户授权12开始，R8仍IN_PROGRESS，不启动R9；真实PG/Full/XLSX/私有固定回归及继承删除风险继续最终新库待验。
 
+R8-12 Freeze Transaction 已实施、`VERIFYING`：原冻结用例分为编排、输入/锁定路由、31字段投影和外部概率投影；Postgres快照归事务写入、纯指纹前检、同事务明细、数据库引用/证据校验与完整读取。原两次截止复核、幂等/正式队列复用、SQL/错误及指纹保持，快照事务提交后再登记FROZEN，失败沿既有恢复路径续接。新增原target测试8项Application/6项Persistence，源码预期126/175，须本项精确Windows确认。83源码/完整架构、Rustfmt、静态契约及七项破坏探针通过；详见 [12实施记录](docs/modular-rewrite/R08-prediction-p4-orchestration/R08-12-freeze-transaction.md)。新CI启动后停止轮询；R8仍IN_PROGRESS，不提前创建阶段完成记录或启动R9。真实PG/XLSX/Full/私有固定回归及继承删除风险继续最终新库待验。
+
 ## 公开边界
 
 - 保留 `crates/model-api`、模型 ID、路由、规则包入口、预测页面和历史数据结构。

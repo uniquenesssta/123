@@ -3828,12 +3828,122 @@ async fn p4_stage_c_writes_are_idempotent_and_frozen_history_is_immutable() {
             .await
             .unwrap();
     assert_eq!(count_before, 0, "拒绝的截止时间不留下快照");
-    let snapshot = database
-        .store
-        .freeze_prematch_snapshot(&snapshot_draft)
+    // R8-12: original Stage C database, no extra runner, trigger or schema.
+    let freeze_ledger_sql = r#"SELECT jsonb_build_object(
+        'snapshots',(SELECT count(*) FROM feature.snapshots),
+        'features',(SELECT count(*) FROM feature.snapshot_features),
+        'evidence',(SELECT count(*) FROM feature.snapshot_evidence),
+        'probabilities',(SELECT count(*) FROM model.snapshot_probabilities),
+        'audit',(SELECT count(*) FROM audit.events)
+    )"#;
+    let freeze_before: serde_json::Value = sqlx::query_scalar(freeze_ledger_sql)
+        .fetch_one(&database.pool)
         .await
-        .expect("冻结P4赛前快照");
-    assert!(snapshot.created);
+        .unwrap();
+    for failure in ["evidence_duplicate", "probability_json"] {
+        let mut rejected = snapshot_draft.clone();
+        if failure == "evidence_duplicate" {
+            rejected.features[0].evidence_ids.push(claim_a.id);
+        } else {
+            // PostgreSQL rejects the JSON zero character after header/features/evidence writes.
+            rejected
+                .probabilities
+                .iter_mut()
+                .find(|p| p.chain_key == "secondary")
+                .unwrap()
+                .metadata = json!({"invalid_json_text":"\u{0}"});
+        }
+        assert!(
+            matches!(
+                database.store.freeze_prematch_snapshot(&rejected).await,
+                Err(PersistenceError::Sqlx(_))
+            ),
+            "late snapshot SQL failure: {failure}"
+        );
+        let after: serde_json::Value = sqlx::query_scalar(freeze_ledger_sql)
+            .fetch_one(&database.pool)
+            .await
+            .unwrap();
+        assert_eq!(after, freeze_before, "failed snapshot details must roll back header/features/evidence/probabilities/audit together: {failure}");
+    }
+    let (first, concurrent) = tokio::join!(
+        database.store.freeze_prematch_snapshot(&snapshot_draft),
+        database.store.freeze_prematch_snapshot(&snapshot_draft)
+    );
+    let first = first.expect("first concurrent freeze");
+    let concurrent = concurrent.expect("same-key concurrent freeze");
+    assert_eq!(first.id, concurrent.id);
+    assert_ne!(
+        first.created, concurrent.created,
+        "one same-key concurrent freeze creates the immutable snapshot"
+    );
+    let snapshot = if first.created { first } else { concurrent };
+    let frozen_counts: serde_json::Value = sqlx::query_scalar(freeze_ledger_sql)
+        .fetch_one(&database.pool)
+        .await
+        .unwrap();
+    assert_eq!(
+        frozen_counts["snapshots"].as_i64().unwrap(),
+        freeze_before["snapshots"].as_i64().unwrap() + 1
+    );
+    assert_eq!(
+        frozen_counts["features"].as_i64().unwrap(),
+        freeze_before["features"].as_i64().unwrap() + 31
+    );
+    assert_eq!(
+        frozen_counts["evidence"].as_i64().unwrap(),
+        freeze_before["evidence"].as_i64().unwrap() + 1
+    );
+    assert_eq!(
+        frozen_counts["probabilities"].as_i64().unwrap(),
+        freeze_before["probabilities"].as_i64().unwrap() + 4
+    );
+    assert_eq!(
+        frozen_counts["audit"].as_i64().unwrap(),
+        freeze_before["audit"].as_i64().unwrap() + 1
+    );
+    let freeze_audit_count: i64 = sqlx::query_scalar("SELECT count(*) FROM audit.events WHERE event_type='prematch_snapshot_frozen' AND entity_id=$1")
+        .bind(snapshot.id.to_string()).fetch_one(&database.pool).await.unwrap();
+    assert_eq!(
+        freeze_audit_count, 1,
+        "same-key concurrent freeze writes one audit"
+    );
+    let mut reordered = snapshot_draft.clone();
+    reordered.features.reverse();
+    reordered.probabilities.reverse();
+    reordered.frozen_at += Duration::minutes(1);
+    let same_key = database
+        .store
+        .freeze_prematch_snapshot(&reordered)
+        .await
+        .unwrap();
+    assert_eq!(same_key.id, snapshot.id);
+    assert_eq!(same_key.frozen_at, snapshot.frozen_at);
+    let mut same_cohort = snapshot_draft.clone();
+    same_cohort.idempotency_key = format!("snapshot:{token}:same-cohort");
+    let reused = database
+        .store
+        .freeze_prematch_snapshot(&same_cohort)
+        .await
+        .unwrap();
+    assert_eq!(reused.id, snapshot.id);
+    assert!(!reused.created);
+    assert_eq!(
+        reused.idempotency_key, snapshot_draft.idempotency_key,
+        "formal cohort preserves the first delivery key"
+    );
+    same_cohort.input_payload = json!({"different":true});
+    assert!(
+        matches!(database.store.freeze_prematch_snapshot(&same_cohort).await, Err(PersistenceError::InvalidState(ref message)) if message.starts_with("精确队列已冻结不同载荷"))
+    );
+    let after_retries: serde_json::Value = sqlx::query_scalar(freeze_ledger_sql)
+        .fetch_one(&database.pool)
+        .await
+        .unwrap();
+    assert_eq!(
+        after_retries, frozen_counts,
+        "snapshot retries and rejected formal cohort never write ledgers"
+    );
     let snapshot_retry = database
         .store
         .freeze_prematch_snapshot(&snapshot_draft)
@@ -3979,6 +4089,23 @@ async fn p4_stage_c_writes_are_idempotent_and_frozen_history_is_immutable() {
     assert_eq!(bundle.snapshot.data_cutoff_at, snapshot.data_cutoff_at);
     assert_eq!(bundle.features.len(), 31);
     assert_eq!(bundle.probabilities.len(), 4);
+    assert_eq!(bundle.input_payload, snapshot_draft.input_payload);
+    assert_eq!(
+        serde_json::to_value(&bundle.features).unwrap(),
+        serde_json::to_value(&snapshot_draft.features).unwrap()
+    );
+    let mut sorted_probabilities = snapshot_draft.probabilities.clone();
+    sorted_probabilities.sort_by(|a, b| a.chain_key.cmp(&b.chain_key));
+    assert_eq!(
+        serde_json::to_value(&bundle.probabilities).unwrap(),
+        serde_json::to_value(sorted_probabilities).unwrap()
+    );
+    let flags: Vec<(String,bool,Option<String>)> = sqlx::query_as("SELECT chain_key,is_formal,shadow_status FROM model.snapshot_probabilities WHERE snapshot_id=$1 ORDER BY chain_key")
+        .bind(snapshot.id).fetch_all(&database.pool).await.unwrap();
+    for (chain, formal, shadow) in flags {
+        assert_eq!(formal, chain == "full");
+        assert!(shadow.is_none());
+    }
 
     let mut transaction = database.pool.begin().await.expect("开启不可变性校验事务");
     let mutation = sqlx::query(

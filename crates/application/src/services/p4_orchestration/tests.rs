@@ -104,6 +104,272 @@ fn workflow_probe(state: P4FreezeTaskState, ready: bool) -> Probe {
     probe
 }
 
+// Provider-owned JSON here is only a boundary fixture, never a probability regression oracle.
+fn freeze_execution_probe() -> std::sync::Arc<Probe> {
+    use crate::built_in_artifacts::{P4_SNAPSHOT_SCHEMA_ARTIFACT_VERSION, P4_SNAPSHOT_SCHEMA_KEY};
+    use crate::use_cases::prediction::tests::command_fixture;
+    use football_domain::{
+        CompetitionKind, MatchRecord, MatchStatus, PreparedMatchPredictionInput,
+    };
+    let probe = std::sync::Arc::new(workflow_probe(P4FreezeTaskState::ReadyToFreeze, true));
+    let mut state = probe.state.lock().unwrap();
+    let task = state.task.clone().unwrap();
+    let mut input = command_fixture().match_input;
+    input["match_id"] = json!(task.match_key);
+    input["kickoff_time"] = json!(task.kickoff_at.to_rfc3339());
+    input["feature_quality_score"] = json!(0.6);
+    state.prepared_input = Some(PreparedMatchPredictionInput {
+        match_record: MatchRecord {
+            id: task.match_id,
+            external_key: task.match_key.clone(),
+            competition_id: Some(Uuid::from_u128(21)),
+            competition_name: None,
+            season_id: Some(Uuid::from_u128(22)),
+            stage_id: Some(Uuid::from_u128(23)),
+            round_id: None,
+            home_team_id: Uuid::from_u128(1),
+            home_team_name: "Home".into(),
+            away_team_id: Uuid::from_u128(2),
+            away_team_name: "Away".into(),
+            kickoff_time: task.kickoff_at,
+            status: MatchStatus::Scheduled,
+            venue: None,
+        },
+        competition_kind: CompetitionKind::League,
+        snapshot_type: task.horizon.as_str().into(),
+        match_input: input,
+        data_quality: json!({"cutoff_aware":true}),
+    });
+    state.freeze_routes = Some(vec![]);
+    state.provider_payload = Some(json!({"matrices": {"provider_chain": {
+        "outcome":{"a_win":0.4,"draw":0.3,"b_win":0.3},
+        "scorelines":[{"score":"1-0","probability":0.4}],"formal":true
+    }}}));
+    state.schemas.push(SchemaVersionRecord {
+        id: task.snapshot_schema_version_id,
+        schema_key: P4_SNAPSHOT_SCHEMA_KEY.into(),
+        version: P4_SNAPSHOT_SCHEMA_ARTIFACT_VERSION.into(),
+        schema_kind: "snapshot".into(),
+        content_sha256: "fixture".into(),
+        created_at: Utc::now(),
+    });
+    drop(state);
+    probe
+}
+
+async fn execute_freeze_probe(
+    probe: &std::sync::Arc<Probe>,
+) -> crate::ApplicationResult<serde_json::Value> {
+    execute_p4_freeze::execute(
+        probe.as_ref(),
+        &crate::use_cases::prediction::tests::probe_registry(probe),
+        Uuid::from_u128(30),
+        Uuid::from_u128(40),
+    )
+    .await
+}
+
+#[tokio::test]
+async fn freeze_execution_pins_snapshot_provenance_and_commits_before_frozen_transition() {
+    let probe = freeze_execution_probe();
+    let value = execute_freeze_probe(&probe).await.unwrap();
+    assert_eq!(value["state"], "FROZEN");
+    assert_eq!(value["snapshot_id"], json!(Uuid::from_u128(50)));
+    assert_eq!(
+        probe.calls(),
+        [
+            "read_task",
+            "find_snapshot",
+            "readiness",
+            "transition",
+            "routed_facts",
+            "prepare_input",
+            "scope",
+            "route",
+            "model_supports",
+            "predict",
+            "save_run",
+            "schema",
+            "freeze_snapshot",
+            "transition"
+        ]
+    );
+    let state = probe.state.lock().unwrap();
+    assert_eq!(state.frozen_drafts.len(), 1);
+    let draft = &state.frozen_drafts[0];
+    let task = state.task.as_ref().unwrap();
+    assert_eq!(draft.data_cutoff_at, task.data_cutoff_at);
+    assert!(draft.frozen_at >= draft.data_cutoff_at && draft.frozen_at <= task.freeze_deadline_at);
+    assert_eq!(draft.trace_id, task.trace_id);
+    assert_eq!(draft.research_run_id, task.research_run_id);
+    assert_eq!(draft.model_version_id, task.model_version_id);
+    assert_eq!(draft.parameter_set_id, task.parameter_set_id);
+    assert_eq!(draft.competition_profile_id, task.competition_profile_id);
+    assert_eq!(draft.schema_version_id, task.snapshot_schema_version_id);
+    assert_eq!(
+        draft.idempotency_key,
+        format!("p4-prematch-snapshot:{}", task.id)
+    );
+    assert_eq!(draft.source_kind, football_domain::SnapshotSourceKind::Real);
+    assert!((draft.quality_score - 0.8).abs() < f64::EPSILON);
+    assert_eq!(draft.features.len(), 31);
+    assert_eq!(draft.features[29].value, json!({"cutoff_aware":true}));
+    assert_eq!(
+        draft.probabilities.len(),
+        1,
+        "provider topology is not forced to four chains"
+    );
+    assert_eq!(draft.probabilities[0].chain_key, "provider_chain");
+    assert_eq!(
+        draft.input_payload["p4_output"],
+        state.provider_payload.clone().unwrap()
+    );
+    assert_eq!(
+        draft.input_payload["match_input"]["p4_orchestration"]["task_id"],
+        json!(task.id)
+    );
+    assert_eq!(draft.metadata["model_run_id"], json!(Uuid::from_u128(99)));
+    assert_eq!(
+        state.transitions.last().unwrap().snapshot_id,
+        Some(Uuid::from_u128(50))
+    );
+    assert_eq!(
+        state.route_requests[0].explicit_rule_package_id,
+        Some(task.rule_package_id)
+    );
+}
+
+#[tokio::test]
+async fn freeze_execution_stops_at_each_late_port_failure_without_snapshot_or_frozen_state() {
+    use crate::ports::PortErrorKind;
+    for boundary in [
+        "routed_facts",
+        "prepare_input",
+        "scope",
+        "route",
+        "save_run",
+        "schema",
+        "freeze_snapshot",
+    ] {
+        for kind in [
+            PortErrorKind::InvalidState,
+            PortErrorKind::NotFound,
+            PortErrorKind::Conflict,
+            PortErrorKind::Unavailable,
+            PortErrorKind::Serialization,
+            PortErrorKind::Infrastructure,
+        ] {
+            let probe = freeze_execution_probe();
+            probe.fail_at(Some(boundary));
+            probe.state.lock().unwrap().failure_kind = Some(kind);
+            let error = execute_freeze_probe(&probe).await.unwrap_err();
+            assert!(
+                matches!(error, ApplicationError::Port(ref actual) if actual.kind == kind && actual.message == format!("injected {boundary}"))
+            );
+            assert_eq!(probe.calls().last(), Some(&boundary));
+            let state = probe.state.lock().unwrap();
+            assert!(state.frozen_drafts.is_empty());
+            assert_eq!(
+                state.task.as_ref().unwrap().state,
+                P4FreezeTaskState::Freezing
+            );
+            assert!(state.task.as_ref().unwrap().snapshot_id.is_none());
+            assert_eq!(state.transitions.len(), 1);
+        }
+    }
+}
+
+#[tokio::test]
+async fn freeze_execution_rejects_route_schema_and_provider_output_drift_before_snapshot() {
+    for drift in [
+        "rule",
+        "model",
+        "parameter",
+        "profile",
+        "schema",
+        "matrices",
+        "outcome",
+        "scorelines",
+    ] {
+        let probe = freeze_execution_probe();
+        {
+            let mut state = probe.state.lock().unwrap();
+            let mut route = crate::use_cases::prediction::tests::route_fixture();
+            match drift {
+                "rule" => route.rule_package_id = Uuid::from_u128(999),
+                "model" => route.model_version_id = Uuid::from_u128(999),
+                "parameter" => route.parameter_set_id = Uuid::from_u128(999),
+                "profile" => route.competition_profile_id = Uuid::from_u128(999),
+                "schema" => state.schemas[0].id = Uuid::from_u128(999),
+                "matrices" => state.provider_payload = Some(json!({"matrices":{}})),
+                "outcome" => {
+                    state.provider_payload.as_mut().unwrap()["matrices"]["provider_chain"]
+                        ["outcome"]["a_win"] = json!(1.1)
+                }
+                "scorelines" => {
+                    state.provider_payload.as_mut().unwrap()["matrices"]["provider_chain"]
+                        ["scorelines"] = json!([])
+                }
+                _ => unreachable!(),
+            }
+            state.planning_route = Some(route);
+        }
+        assert!(matches!(
+            execute_freeze_probe(&probe).await,
+            Err(ApplicationError::Validation(_))
+        ));
+        let state = probe.state.lock().unwrap();
+        assert!(state.frozen_drafts.is_empty());
+        assert_eq!(
+            state.task.as_ref().unwrap().state,
+            P4FreezeTaskState::Freezing
+        );
+        assert!(!state.calls.contains(&"freeze_snapshot"));
+    }
+}
+
+#[tokio::test]
+async fn freeze_execution_recovers_committed_snapshot_after_frozen_transition_failure() {
+    let probe = freeze_execution_probe();
+    probe.fail_at(Some("transition"));
+    probe.state.lock().unwrap().failure_call_number = Some(2);
+    assert!(matches!(
+        execute_freeze_probe(&probe).await,
+        Err(ApplicationError::Port(_))
+    ));
+    {
+        let state = probe.state.lock().unwrap();
+        assert_eq!(state.frozen_drafts.len(), 1);
+        assert_eq!(state.snapshot_id, Some(Uuid::from_u128(50)));
+        assert_eq!(
+            state.task.as_ref().unwrap().state,
+            P4FreezeTaskState::Freezing
+        );
+        assert!(state.task.as_ref().unwrap().snapshot_id.is_none());
+    }
+    probe.fail_at(None);
+    let before = probe.calls().len();
+    assert_eq!(
+        execute_freeze_probe(&probe).await.unwrap()["recovered"],
+        true
+    );
+    assert_eq!(
+        &probe.calls()[before..],
+        ["read_task", "find_snapshot", "transition"]
+    );
+    let state = probe.state.lock().unwrap();
+    assert_eq!(
+        state.frozen_drafts.len(),
+        1,
+        "recovery never repeats model or snapshot writes"
+    );
+    assert_eq!(
+        state.task.as_ref().unwrap().state,
+        P4FreezeTaskState::Frozen
+    );
+    assert_eq!(state.task.as_ref().unwrap().snapshot_id, state.snapshot_id);
+}
+
 async fn freeze(probe: &Probe) -> crate::ApplicationResult<serde_json::Value> {
     execute_p4_freeze::execute(
         probe,
@@ -632,14 +898,37 @@ impl P4FreezeExecutionPort for Probe {
     }
     async fn routed_facts(&self, task_id: Uuid) -> PortResult<Vec<P4RoutedFact>> {
         self.call("routed_facts")?;
-        let _ = task_id;
-        panic!("unexpected snapshot/model execution in guard and recovery tests")
+        let state = self.state.lock().unwrap();
+        assert_eq!(state.task.as_ref().unwrap().id, task_id);
+        Ok(state
+            .freeze_routes
+            .clone()
+            .expect("unexpected snapshot/model execution in guard and recovery tests"))
     }
     async fn freeze_snapshot(
         &self,
-        _draft: &PrematchSnapshotDraft,
+        draft: &PrematchSnapshotDraft,
     ) -> PortResult<PrematchSnapshotRecord> {
-        panic!("forbidden Port call: freeze_snapshot")
+        self.call("freeze_snapshot")?;
+        let mut state = self.state.lock().unwrap();
+        assert!(state.freeze_routes.is_some(), "unselected freeze_snapshot");
+        let id = Uuid::from_u128(50);
+        state.frozen_drafts.push(draft.clone());
+        state.snapshot_id = Some(id);
+        Ok(PrematchSnapshotRecord {
+            id,
+            match_id: draft.match_id,
+            match_key: draft.match_key.clone(),
+            horizon: draft.horizon,
+            data_cutoff_at: draft.data_cutoff_at,
+            frozen_at: draft.frozen_at,
+            snapshot_fingerprint: "test-snapshot-fingerprint".into(),
+            idempotency_key: draft.idempotency_key.clone(),
+            source_kind: draft.source_kind,
+            evidence_scope: draft.source_kind.evidence_scope().into(),
+            created: true,
+            created_at: Utc::now(),
+        })
     }
     async fn read_snapshot(&self, _snapshot_id: Uuid) -> PortResult<PrematchSnapshotBundle> {
         panic!("forbidden Port call: read_snapshot")

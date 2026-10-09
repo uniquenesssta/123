@@ -24,13 +24,13 @@
     "targetPublicExportPolicy": "explicit re-export only"
   },
   "sourceDigest": "217241ac243726a5ab6805a7f169e222b97e78c7c971749a5904714af673ebdd",
-  "rustUsageDigest": "f0d81ca6c8f8d56746b800dea3e4b9d44680643f584db3ceb248add79d759751",
+  "rustUsageDigest": "cf79a5f2a44e5cae6a3ad16545150b6c32db7faae8c3693217956a993d7ea53c",
   "summary": {
     "typeCount": 365,
     "publicCompatibilityTypeCount": 365,
     "internalTypeCount": 0,
     "domainSourceFileCount": 129,
-    "scannedRustFileCount": 1090,
+    "scannedRustFileCount": 1099,
     "databaseMappedTypeCount": 300,
     "byTargetModule": {
       "ai_workspace": 16,
@@ -8366,20 +8366,20 @@
         "crates/domain/tests/serde_contracts/module_paths.rs"
       ],
       "externalCallers": [
-        "crates/application/src/use_cases/prediction/execute_p4_freeze/snapshot_projection.rs",
+        "crates/application/src/use_cases/prediction/execute_p4_freeze/features.rs",
         "crates/application/src/use_cases/research/fact_pipeline/evidence.rs",
         "crates/application/src/use_cases/research/fact_pipeline/routing.rs",
         "crates/application/src/use_cases/research/fact_pipeline/types.rs",
         "crates/application/src/use_cases/research/fact_pipeline/validation.rs",
         "crates/persistence-postgres/src/adapters/p4/evidence_ledger/row.rs",
         "crates/persistence-postgres/src/adapters/p4/evidence_ledger/tests.rs",
-        "crates/persistence-postgres/src/p4_records.rs",
+        "crates/persistence-postgres/src/adapters/p4/freeze_transaction/input.rs",
         "crates/persistence-postgres/tests/postgres_integration.rs"
       ],
       "databaseMappings": [
         "crates/persistence-postgres/src/adapters/p4/evidence_ledger/row.rs",
         "crates/persistence-postgres/src/adapters/p4/evidence_ledger/tests.rs",
-        "crates/persistence-postgres/src/p4_records.rs"
+        "crates/persistence-postgres/src/adapters/p4/freeze_transaction/input.rs"
       ]
     },
     {
@@ -11490,6 +11490,7 @@
         "crates/application/src/ports/review/package.rs",
         "crates/application/src/services/lineups/facade.rs",
         "crates/application/src/services/lineups/service.rs",
+        "crates/application/src/services/p4_orchestration/tests.rs",
         "crates/application/src/use_cases/lineups/create_match/mod.rs",
         "crates/application/src/use_cases/prediction/build_input/mod.rs",
         "crates/application/src/use_cases/prediction/input_manifest/canonical.rs",
@@ -13830,6 +13831,7 @@
         "crates/domain/tests/serde_contracts/module_paths.rs"
       ],
       "externalCallers": [
+        "crates/application/src/services/p4_orchestration/tests.rs",
         "crates/application/src/use_cases/prediction/build_input/mod.rs",
         "crates/application/src/use_cases/prediction/input_manifest/tests.rs",
         "crates/application/src/use_cases/prediction/readiness/tests.rs",
@@ -14822,7 +14824,8 @@
         "crates/application/src/services/p4_orchestration/tests.rs",
         "crates/application/src/services/prediction/facade.rs",
         "crates/application/src/services/prediction/service.rs",
-        "crates/application/src/use_cases/prediction/execute_p4_freeze/snapshot_projection.rs",
+        "crates/application/src/use_cases/prediction/execute_p4_freeze/features.rs",
+        "crates/application/src/use_cases/prediction/execute_p4_freeze/input.rs",
         "crates/application/src/use_cases/prediction/p4_freeze_readiness/mod.rs",
         "crates/application/src/use_cases/prediction/tests.rs",
         "crates/persistence-postgres/src/p4_orchestration.rs",
@@ -15195,8 +15198,9 @@
         "crates/application/src/services/p4_orchestration/tests.rs",
         "crates/application/src/services/prediction/facade.rs",
         "crates/application/src/services/prediction/service.rs",
-        "crates/application/src/use_cases/prediction/execute_p4_freeze/mod.rs",
-        "crates/application/src/use_cases/prediction/execute_p4_freeze/snapshot_projection.rs",
+        "crates/application/src/use_cases/prediction/execute_p4_freeze/features.rs",
+        "crates/application/src/use_cases/prediction/execute_p4_freeze/input.rs",
+        "crates/application/src/use_cases/prediction/execute_p4_freeze/workflow.rs",
         "crates/application/src/use_cases/prediction/list_p4_freeze_tasks/mod.rs",
         "crates/application/src/use_cases/prediction/plan_p4_horizons/process.rs",
         "crates/application/src/use_cases/prediction/plan_p4_horizons/queue.rs",
@@ -15339,7 +15343,8 @@
         "crates/application/src/services/p4_orchestration/tests.rs",
         "crates/application/src/use_cases/p4_orchestration/failure.rs",
         "crates/application/src/use_cases/p4_orchestration/tests.rs",
-        "crates/application/src/use_cases/prediction/execute_p4_freeze/mod.rs",
+        "crates/application/src/use_cases/prediction/execute_p4_freeze/features.rs",
+        "crates/application/src/use_cases/prediction/execute_p4_freeze/workflow.rs",
         "crates/application/src/use_cases/prediction/plan_p4_horizons/process.rs",
         "crates/application/src/use_cases/prediction/plan_p4_horizons/queue.rs",
         "crates/application/src/use_cases/prediction/plan_p4_horizons/schedule.rs",
@@ -15455,7 +15460,7 @@
         "crates/application/src/ports/prediction/mod.rs",
         "crates/application/src/services/p4_orchestration/tests.rs",
         "crates/application/src/use_cases/p4_orchestration/failure.rs",
-        "crates/application/src/use_cases/prediction/execute_p4_freeze/mod.rs",
+        "crates/application/src/use_cases/prediction/execute_p4_freeze/workflow.rs",
         "crates/application/src/use_cases/prediction/plan_p4_horizons/queue.rs",
         "crates/application/src/use_cases/prediction/tests.rs",
         "crates/application/src/use_cases/research/p4_manual_conflict/reconciliation.rs",
@@ -15550,12 +15555,14 @@
         "crates/application/src/use_cases/prediction/plan_p4_horizons/process.rs",
         "crates/application/src/use_cases/prediction/plan_p4_horizons/schedule.rs",
         "crates/application/src/use_cases/prediction/shared/p4_planning.rs",
+        "crates/persistence-postgres/src/adapters/p4/freeze_transaction/input.rs",
         "crates/persistence-postgres/src/adapters/p4/horizon/input.rs",
         "crates/persistence-postgres/src/adapters/p4/horizon/row.rs",
         "crates/persistence-postgres/src/p4_records.rs",
         "crates/persistence-postgres/tests/postgres_integration.rs"
       ],
       "databaseMappings": [
+        "crates/persistence-postgres/src/adapters/p4/freeze_transaction/input.rs",
         "crates/persistence-postgres/src/adapters/p4/horizon/input.rs",
         "crates/persistence-postgres/src/adapters/p4/horizon/row.rs",
         "crates/persistence-postgres/src/p4_records.rs"
@@ -16182,7 +16189,9 @@
         "crates/application/src/composition/adapters/prediction.rs",
         "crates/application/src/ports/prediction/mod.rs",
         "crates/application/src/services/p4_orchestration/tests.rs",
-        "crates/application/src/use_cases/prediction/execute_p4_freeze/snapshot_projection.rs",
+        "crates/application/src/use_cases/prediction/execute_p4_freeze/features.rs",
+        "crates/application/src/use_cases/prediction/execute_p4_freeze/input.rs",
+        "crates/application/src/use_cases/prediction/tests.rs",
         "crates/persistence-postgres/src/p4_orchestration.rs"
       ],
       "databaseMappings": [
@@ -21942,10 +21951,10 @@
         "crates/application/src/services/prediction/facade.rs",
         "crates/application/src/services/prediction/service.rs",
         "crates/application/src/use_cases/prediction/p4_snapshot/mod.rs",
-        "crates/persistence-postgres/src/p4_records.rs"
+        "crates/persistence-postgres/src/adapters/p4/freeze_transaction/read.rs"
       ],
       "databaseMappings": [
-        "crates/persistence-postgres/src/p4_records.rs"
+        "crates/persistence-postgres/src/adapters/p4/freeze_transaction/read.rs"
       ]
     },
     {
@@ -22072,13 +22081,18 @@
         "crates/application/src/services/p4_orchestration/tests.rs",
         "crates/application/src/services/prediction/facade.rs",
         "crates/application/src/services/prediction/service.rs",
-        "crates/application/src/use_cases/prediction/execute_p4_freeze/mod.rs",
+        "crates/application/src/use_cases/prediction/execute_p4_freeze/workflow.rs",
         "crates/application/src/use_cases/prediction/p4_snapshot/mod.rs",
-        "crates/persistence-postgres/src/p4_records.rs",
+        "crates/application/src/use_cases/prediction/tests.rs",
+        "crates/persistence-postgres/src/adapters/p4/freeze_transaction/input.rs",
+        "crates/persistence-postgres/src/adapters/p4/freeze_transaction/validation.rs",
+        "crates/persistence-postgres/src/adapters/p4/freeze_transaction/write.rs",
         "crates/persistence-postgres/tests/postgres_integration.rs"
       ],
       "databaseMappings": [
-        "crates/persistence-postgres/src/p4_records.rs"
+        "crates/persistence-postgres/src/adapters/p4/freeze_transaction/input.rs",
+        "crates/persistence-postgres/src/adapters/p4/freeze_transaction/validation.rs",
+        "crates/persistence-postgres/src/adapters/p4/freeze_transaction/write.rs"
       ]
     },
     {
@@ -22175,10 +22189,12 @@
         "crates/application/src/services/prediction/facade.rs",
         "crates/application/src/services/prediction/service.rs",
         "crates/application/src/use_cases/prediction/p4_snapshot/mod.rs",
-        "crates/persistence-postgres/src/p4_records.rs"
+        "crates/persistence-postgres/src/adapters/p4/freeze_transaction/read.rs",
+        "crates/persistence-postgres/src/adapters/p4/freeze_transaction/write.rs"
       ],
       "databaseMappings": [
-        "crates/persistence-postgres/src/p4_records.rs"
+        "crates/persistence-postgres/src/adapters/p4/freeze_transaction/read.rs",
+        "crates/persistence-postgres/src/adapters/p4/freeze_transaction/write.rs"
       ]
     },
     {
@@ -22242,6 +22258,7 @@
       "externalCallers": [
         "crates/application/src/composition/adapters/prediction.rs",
         "crates/application/src/ports/prediction/mod.rs",
+        "crates/application/src/services/p4_orchestration/tests.rs",
         "crates/application/src/use_cases/prediction/build_input/mod.rs",
         "crates/application/src/use_cases/prediction/input_manifest/audit.rs",
         "crates/application/src/use_cases/prediction/input_manifest/tests.rs",
@@ -24705,7 +24722,7 @@
         "crates/application/src/ports/rules/mod.rs",
         "crates/application/src/services/prediction/facade.rs",
         "crates/application/src/services/prediction/service.rs",
-        "crates/application/src/use_cases/prediction/execute_p4_freeze/snapshot_projection.rs",
+        "crates/application/src/use_cases/prediction/execute_p4_freeze/input.rs",
         "crates/application/src/use_cases/prediction/plan_p4_horizons/prepare.rs",
         "crates/application/src/use_cases/prediction/preview_route/mod.rs",
         "crates/application/src/use_cases/prediction/route_model_request/request.rs",
@@ -25753,12 +25770,14 @@
         "crates/domain/tests/serde_contracts/module_paths.rs"
       ],
       "externalCallers": [
-        "crates/application/src/use_cases/prediction/execute_p4_freeze/snapshot_projection.rs",
-        "crates/persistence-postgres/src/p4_records.rs",
+        "crates/application/src/use_cases/prediction/execute_p4_freeze/features.rs",
+        "crates/persistence-postgres/src/adapters/p4/freeze_transaction/input.rs",
+        "crates/persistence-postgres/src/adapters/p4/freeze_transaction/read.rs",
         "crates/persistence-postgres/tests/postgres_integration.rs"
       ],
       "databaseMappings": [
-        "crates/persistence-postgres/src/p4_records.rs"
+        "crates/persistence-postgres/src/adapters/p4/freeze_transaction/input.rs",
+        "crates/persistence-postgres/src/adapters/p4/freeze_transaction/read.rs"
       ]
     },
     {
@@ -25857,12 +25876,14 @@
         "crates/domain/tests/serde_contracts/module_paths.rs"
       ],
       "externalCallers": [
-        "crates/application/src/use_cases/prediction/execute_p4_freeze/snapshot_projection.rs",
-        "crates/persistence-postgres/src/p4_records.rs",
+        "crates/application/src/use_cases/prediction/execute_p4_freeze/probabilities.rs",
+        "crates/persistence-postgres/src/adapters/p4/freeze_transaction/input.rs",
+        "crates/persistence-postgres/src/adapters/p4/freeze_transaction/read.rs",
         "crates/persistence-postgres/tests/postgres_integration.rs"
       ],
       "databaseMappings": [
-        "crates/persistence-postgres/src/p4_records.rs"
+        "crates/persistence-postgres/src/adapters/p4/freeze_transaction/input.rs",
+        "crates/persistence-postgres/src/adapters/p4/freeze_transaction/read.rs"
       ]
     },
     {
@@ -25922,12 +25943,19 @@
         "crates/domain/tests/serde_contracts/module_paths.rs"
       ],
       "externalCallers": [
-        "crates/application/src/use_cases/prediction/execute_p4_freeze/mod.rs",
-        "crates/persistence-postgres/src/p4_records.rs",
+        "crates/application/src/services/p4_orchestration/tests.rs",
+        "crates/application/src/use_cases/prediction/execute_p4_freeze/workflow.rs",
+        "crates/persistence-postgres/src/adapters/p4/freeze_transaction/input.rs",
+        "crates/persistence-postgres/src/adapters/p4/freeze_transaction/read.rs",
+        "crates/persistence-postgres/src/adapters/p4/freeze_transaction/validation.rs",
+        "crates/persistence-postgres/src/adapters/p4/freeze_transaction/write.rs",
         "crates/persistence-postgres/tests/postgres_integration.rs"
       ],
       "databaseMappings": [
-        "crates/persistence-postgres/src/p4_records.rs"
+        "crates/persistence-postgres/src/adapters/p4/freeze_transaction/input.rs",
+        "crates/persistence-postgres/src/adapters/p4/freeze_transaction/read.rs",
+        "crates/persistence-postgres/src/adapters/p4/freeze_transaction/validation.rs",
+        "crates/persistence-postgres/src/adapters/p4/freeze_transaction/write.rs"
       ]
     },
     {
