@@ -1,6 +1,6 @@
-# R8-10 Horizon Orchestration 实施记录
+# R8-10 Horizon Orchestration 完成记录
 
-状态：`VERIFYING`。2026-10-09，用户授权“收尾09 开始10”。唯一分支 `rewrite/r8-prediction-p4-orchestration`；09精确实施 `4025781f2f0419f374edfa7669a4c5bcfe71ee66` / [Windows run 37825126808](https://github.com/uniquenesssta/123/actions/runs/37825126808) 全SUCCESS，Application99/Persistence163，09文档收尾基线 `7c1ccd34f9d72d13fc5d4b76104cbb248fc2c63a` 已推送。10首轮db5fd51的Windows编译失败，导入修复等待新精确提交的门禁，不继承09结果；11/12 BLOCKED。
+状态：`DONE`。唯一分支 `rewrite/r8-prediction-p4-orchestration`；实施基线 `7c1ccd34f9d72d13fc5d4b76104cbb248fc2c63a`，首轮 `db5fd51` 的E0433已由精确修复 `481bfcb967349afedbf7eac44959f2f8a020744b` 消除，并取得自身Windows全链路SUCCESS。下文保留实施预期及首轮失败过程供追溯，当前完成事实以末尾收尾节为准。用户授权“收尾10 开始11”；11前置通过，12继续BLOCKED。
 
 ## 实际问题与行为决定
 
@@ -145,3 +145,10 @@ flowchart TD
 本次本地完整architecture、Prediction专项、Domain清单、Rustfmt1.88检查、source hygiene、18资产/171命令/46迁移与18PG静态契约、git diff --check通过；五个保留函数体与失败提交逐字一致，报告 `/workspace/scratch/eb298ad5cdcb/r810-import-fix-check.json`。Domain365/300/声明摘要与1084扫描不变，只刷新usage摘要，43Ports/Application399/PG根35及原PG test blob保持；测试源码预期114/169不变。Context7查询官方Rust Reference模块use声明作用域，结合仓库Rust1.88.0/edition2021验证，不涉及版本升级。没有非Windows Cargo/客户端动态、数据库实跑或新设施。
 
 修复提交在同一R8分支推送并触发原Windows Automated，确认新精确head启动后结束轮询；10保持VERIFYING，11/12未开始。真实PG/历史四项/账本/有效XLSX/Full/私有固定回归与继承历史删除风险继续最终新库待验。只回退此次导入修复将重新引入已确认E0433，完整节点回退仍用7c1ccd3；Create State保存正确足球模型稳定ID及新head/CI待验，不替代Git。
+
+
+## 精确Windows验收与收尾（2026-10-09）
+
+精确修复提交 `481bfcb967349afedbf7eac44959f2f8a020744b` / [Windows run `37886029199`](https://github.com/uniquenesssta/123/actions/runs/37886029199) / job `113676124080` 全SUCCESS，完成于2026-10-09 13:22:30（北京时间）。完整日志确认Application **114/114**、Persistence **169/169**，10新增15项Application和6项Persistence测试均通过；前端契约/类型/生产构建、**17**视口、Rust fmt/Clippy/workspace tests、Windows release/MSI/NSIS、启动 **7条记录 / 3个完成操作**全部通过。报告 `logs/windows-acceptance-20261009-045537.json`；artifact `11596878906`，14,033,721字节，SHA-256 `10c5c6e2cc39ffeb13ac964a5dd5200adff62d547cd63b06429dda7da02624c2`。
+
+已核对精确head、全部job/steps、完整日志及artifact。114/169现由本项Windows实际确认，首轮失败未被继承为PASS。本次收尾仅同步五份既有文档，复用同源码树证据，文档提交使用 `[skip ci]`；原实现及修复变更清单保留。10正式DONE，11用户授权开始，12BLOCKED。18 broad PG仍ignored，不计通过；真实PG/历史四项/账本/有效XLSX/Windows Full/私有Golden Master及继承model.runs/0041删除风险仍最终封包新库待验。

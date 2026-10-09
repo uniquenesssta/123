@@ -305,3 +305,10 @@ Persistence原target新增6项纯职责测试：正式写入/兼容读取区别�
 仅补回根生产导入、扩展原Prediction gate并刷新Domain usage摘要；8个相关Postgres生产文件的原Domain类型依赖复核无其他同类遗漏，五个保留函数体/SQL与失败head逐字保持。移除该导入的单项破坏探针被拒绝，恢复后通过；报告 `/workspace/scratch/eb298ad5cdcb/r810-import-fix-check.json`。本次复核完整architecture、Prediction专项、Domain清单、Rustfmt 1.88、源码卫生、18保护资产/171命令/46迁移与18PG静态契约和diff；不新增Rust测试、target或Clippy抑制，预期114/169不变。Context7按实际1.88.0/edition2021核对官方Rust Reference模块use作用域；依赖/API/可见性不变。新精确Windows CI启动后停止轮询，10仍VERIFYING，11/12 BLOCKED；PG等原动态待验保留。
 
 报告：`/workspace/scratch/eb298ad5cdcb/r810-static-checks.json`、`r810-negative-probes.json`、`r810-equivalence.json`。Application393→399、Domain1071→1084，43 Ports/365/300/声明摘要不变；Postgres根35保持，数据库清单只刷新原PG test blob。复用原Windows Automated执行frontend/17视口/类型构建、fmt/Clippy/workspace tests、Windows release/MSI/NSIS/启动，启动后停止轮询。无Linux/macOS Cargo/客户端动态或新基础设施；真实PG/历史四项/账本/有效XLSX/Windows Full/私有Golden Master与继承删除风险继续最终封包新库待验。详见 [10记录](modular-rewrite/R08-prediction-p4-orchestration/R08-10-horizon-orchestration.md)。
+
+
+## R8-10 精确Windows完成（2026-10-09）
+
+精确修复提交 `481bfcb967349afedbf7eac44959f2f8a020744b` / [Windows run `37886029199`](https://github.com/uniquenesssta/123/actions/runs/37886029199) / job `113676124080` 全SUCCESS，完成于2026-10-09 13:22:30（北京时间）。完整日志确认Application **114/114**、Persistence **169/169**，10新增15项Application和6项Persistence测试均通过；前端契约/类型/生产构建、**17**视口、Rust fmt/Clippy/workspace tests、Windows release/MSI/NSIS、启动 **7条记录 / 3个完成操作**全部通过。报告 `logs/windows-acceptance-20261009-045537.json`；artifact `11596878906`，14,033,721字节，SHA-256 `10c5c6e2cc39ffeb13ac964a5dd5200adff62d547cd63b06429dda7da02624c2`。
+
+10正式DONE；21项新增测试及114/169已经实际通过。五文档收尾复用已验源码证据；用户授权11开始，须11自身Windows CI。18 broad PG仍ignored；原真实PG/历史四项/账本/XLSX/Full/私有固定回归和继承删除风险继续最终新库待验。

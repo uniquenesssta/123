@@ -2,7 +2,7 @@
 
 ## 当前阶段状态
 
-`IN_PROGRESS`。唯一阶段分支 `rewrite/r8-prediction-p4-orchestration`，阶段起点 `90680bf945fbb0d1c191937c2d9e90c2c916fb00`。R8-01～09已DONE；09精确 `4025781` / Windows run `37825126808` 全SUCCESS。用户已授权“收尾09 开始10”，10首轮Windows编译失败，导入修复仍VERIFYING，等待新精确CI；11～12BLOCKED。精确当前状态由本索引维护。
+`IN_PROGRESS`。唯一阶段分支 `rewrite/r8-prediction-p4-orchestration`，阶段起点 `90680bf945fbb0d1c191937c2d9e90c2c916fb00`。R8-01～10已DONE；10精确修复 `481bfcb` / Windows run `37886029199` 全SUCCESS。用户已授权“收尾10 开始11”，11前置通过、READY；12BLOCKED。精确当前状态由本索引维护。
 
 ## 前置基线与范围
 
@@ -23,8 +23,8 @@ R8 依据 [任务书](../../football-model-platform-modular-rewrite-19-docs/08-R
 | R8-07 | Run Persistence | DONE · [完成记录](R08-07-run-persistence.md) |
 | R8-08 | P4 Evidence Ledger | DONE · [完成记录](R08-08-p4-evidence-ledger.md) · 精确Windows修复CI全SUCCESS |
 | R8-09 | Fact Pipeline | DONE · [完成记录](R08-09-fact-pipeline.md) · 精确Windows全SUCCESS |
-| R8-10 | Horizon Orchestration | VERIFYING · [实施记录](R08-10-horizon-orchestration.md) · 首轮E0433已修，等待新精确Windows |
-| R8-11 | Workbench Reads | BLOCKED |
+| R8-10 | Horizon Orchestration | DONE · [完成记录](R08-10-horizon-orchestration.md) · 精确Windows全SUCCESS |
+| R8-11 | Workbench Reads | READY · 前置通过，已授权开始 |
 | R8-12 | Freeze Transaction | BLOCKED |
 
 ## R8-01 实际来源与实施边界
@@ -35,7 +35,7 @@ Readiness 评分/检查、manifest 算法、路由与模型执行仍由现有 ow
 
 ## 动态待验与阶段出口
 
-R8-01～09 已取得各自精确 Windows CI；10及后续仍须独立取得自身门禁，不继承前项 PASS。数据库相关 contracts、历史四项/账本、模型历史删除风险、有效 XLSX、Windows Full 的真实结果仍最终新库待验，详见 R7 阶段清单。模型保护或真实固定回归不可取得时明确说明，公共 unavailable stub 不冒充私有引擎 Golden Master。后续节点成功后逐项更新；未完成全部节点不创建阶段完成记录。
+R8-01～10 已取得各自精确 Windows CI；11及后续仍须独立取得自身门禁，不继承前项 PASS。数据库相关 contracts、历史四项/账本、模型历史删除风险、有效 XLSX、Windows Full 的真实结果仍最终新库待验，详见 R7 阶段清单。模型保护或真实固定回归不可取得时明确说明，公共 unavailable stub 不冒充私有引擎 Golden Master。后续节点成功后逐项更新；未完成全部节点不创建阶段完成记录。
 
 ## R8-01 实施与门禁记录（已通过）
 
@@ -217,3 +217,10 @@ Application扫描393→399、Domain1071→1084，43 Ports/365类型/300映射及
 ## R8-10 首轮失败修复（2026-10-09）
 
 精确db5fd511518f50e8ab7a16ef8d693b0585bc552e / [Windows run37884818742](https://github.com/uniquenesssta/123/actions/runs/37884818742) / job113672333836 FAILURE：保留根readiness漏ResearchRunStatus导入，E0433阻止Rust编译；完整前端、类型、构建和17视口通过，Rust测试/打包/启动未完成。补回唯一生产导入，原五函数体/SQL不变；复核八生产文件原Domain依赖无同类遗漏，原Prediction gate增加依赖检查并通过去导入破坏探针/恢复，Domain usage摘要刷新。完整architecture/专项/清单/Rustfmt/源码卫生/资产/命令/数据库静态契约及diff复核通过；114/169仍为预期，未冒称动态成功。无模型/行为/API/Schema/SQL/依赖或测试数变化，无新基础设施。Context7核对Rust1.88实际模块作用域，已有Mermaid链路无变化；Create State保存新精确提交与继续位置。新WindowsCI启动后停止轮询，10VERIFYING，11/12 BLOCKED；真实PG等最终新库待验保留。
+
+
+## R8-10 精确Windows验收与收尾（2026-10-09）
+
+精确修复提交 `481bfcb967349afedbf7eac44959f2f8a020744b` / [Windows run `37886029199`](https://github.com/uniquenesssta/123/actions/runs/37886029199) / job `113676124080` 全SUCCESS，完成于2026-10-09 13:22:30（北京时间）。完整日志确认Application **114/114**、Persistence **169/169**，10新增15项Application和6项Persistence测试均通过；前端契约/类型/生产构建、**17**视口、Rust fmt/Clippy/workspace tests、Windows release/MSI/NSIS、启动 **7条记录 / 3个完成操作**全部通过。报告 `logs/windows-acceptance-20261009-045537.json`；artifact `11596878906`，14,033,721字节，SHA-256 `10c5c6e2cc39ffeb13ac964a5dd5200adff62d547cd63b06429dda7da02624c2`。
+
+详见 [10完成记录](R08-10-horizon-orchestration.md)。五文档收尾复用已验源码证据；10DONE，11获用户授权，12BLOCKED。原真实PG/Full/XLSX/私有固定回归及继承删除风险继续最终新库待验。

@@ -30,11 +30,11 @@ R8-08 P4 Evidence Ledger 已收尾为 `DONE`：证据追加与冲突建组从旧
 
 R8-09 Fact Pipeline 已收尾为 `DONE`：目录出口中的命令/编排/事实准备已提取为具名职责，Postgres混合fact_pipeline_records已退出，原接口/Ports及来源/实体/时间/冲突/路由政策保持。精确 `4025781` / [Windows run `37825126808`](https://github.com/uniquenesssta/123/actions/runs/37825126808) 全SUCCESS，Application99/Persistence163、14新增边界测试、17视口、Rust/前端、Windows构建打包与启动全部通过。完整变更与证据见 [09完成记录](docs/modular-rewrite/R08-prediction-p4-orchestration/R08-09-fact-pipeline.md)。用户已授权10开始，11～12仍BLOCKED；真实PG/XLSX/Full/私有固定回归及继承历史删除风险继续最终新库待验。
 
-R8-10 Horizon Orchestration 已实施并进入 `VERIFYING`：规划预检、时点身份、PLANNED恢复与主流程各有唯一职责，原后台领取/结算与分派分离，任务读写/事件/指纹/投影归 `adapters/p4/horizon/`。修复任务首建后入队或绑定失败导致重试无法继续的问题；未来任务复用原幂等队列键，过期转MISSED，其他状态原样返回。原三个正式时点、29事实、Schema、模型、队列政策与数据库结构保持。完整14新增/20修改、无整文件移动/删除，见 [10实施记录](docs/modular-rewrite/R08-prediction-p4-orchestration/R08-10-horizon-orchestration.md)。
+R8-10 Horizon Orchestration 已收尾为 `DONE`：规划预检、时点身份、PLANNED恢复与主流程各有唯一职责，原后台领取/结算与分派分离，任务读写/事件/指纹/投影归 `adapters/p4/horizon/`。精确修复 `481bfcb` / [Windows run `37886029199`](https://github.com/uniquenesssta/123/actions/runs/37886029199) 全SUCCESS，Application114/Persistence169、21项新增测试、17视口、Rust/前端、Windows构建打包与启动通过。完整变更与证据见 [10完成记录](docs/modular-rewrite/R08-prediction-p4-orchestration/R08-10-horizon-orchestration.md)。用户授权11开始，12BLOCKED；真实PG/Full/XLSX/私有固定回归及继承删除风险继续最终新库待验。
 
-10本地83源码/完整架构、Rustfmt、保护资产/命令/数据库静态契约与差异检查通过；六破坏探针拒绝恢复。新增15 Application/6 Persistence行为测试，预期 **114/169** 须自身精确Windows CI确认，原PG Stage C扩事务/并发/回滚覆盖仍待实际数据库执行。沿用原Windows workflow，启动后停止轮询；11～12仍BLOCKED，真实PG/XLSX/Full/私有固定回归与继承历史删除风险继续最终新库待验。
+10实施时本地83源码/完整架构、Rustfmt、保护资产/命令/数据库静态契约与差异检查通过；六破坏探针拒绝恢复。新增15 Application/6 Persistence行为测试，预期 **114/169** 须自身精确Windows CI确认，原PG Stage C扩事务/并发/回滚覆盖仍待实际数据库执行。沿用原Windows workflow，启动后停止轮询；当时11～12 BLOCKED，现10精确通过并授权11。真实PG/XLSX/Full/私有固定回归与继承历史删除风险继续最终新库待验。
 
-R8-10 首轮 `db5fd51` / [Windows run `37884818742`](https://github.com/uniquenesssta/123/actions/runs/37884818742) 因保留的 `p4_orchestration.rs` readiness 使用 `ResearchRunStatus` 却缺少模块导入而报 E0433；前端/类型/生产构建和17视口已通过，Rust测试/打包/启动未完成。修复补回该生产导入，原五函数体、SQL和规划行为保持；既有 Prediction 门禁增加该依赖检查，移除导入的探针已拒绝并恢复，Domain使用摘要同步。修复仍待自身精确Windows CI，10保持VERIFYING，11～12BLOCKED。
+R8-10 首轮 `db5fd51` / [Windows run `37884818742`](https://github.com/uniquenesssta/123/actions/runs/37884818742) 因保留的 `p4_orchestration.rs` readiness 使用 `ResearchRunStatus` 却缺少模块导入而报 E0433；前端/类型/生产构建和17视口已通过，Rust测试/打包/启动未完成。修复补回该生产导入，原五函数体、SQL和规划行为保持；既有 Prediction 门禁增加该依赖检查，移除导入的探针已拒绝并恢复，Domain使用摘要同步。修复提交时保持VERIFYING；现精确修复Windows全SUCCESS，10完成证据见上段及完成记录。
 
 ## 公开边界
 

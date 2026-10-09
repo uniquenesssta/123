@@ -1418,7 +1418,7 @@ Research专项、完整architecture、原83源码检查、Rustfmt目标文件、
 
 ## R8-10 Horizon Orchestration
 
-状态：`VERIFYING`（09已DONE；10首轮精确Windows编译失败，导入修复等待新精确CI；11～12仍BLOCKED）
+状态：`DONE`（精确修复 `481bfcb` / Windows `37886029199` 全SUCCESS，详见10完成记录）
 
 ### 1. 目标
 
@@ -1518,7 +1518,7 @@ Application经原Ports创建/入队/迁移；首建和迁移各保持任务+事�
 
 ## R8-11 Workbench Reads
 
-状态：`BLOCKED`（仅当上一任务与本任务前置门禁通过后改为 `READY`）
+状态：`READY`（10自身精确Windows已通过并收尾，用户已授权“收尾10 开始11”）
 
 ### 1. 目标
 
