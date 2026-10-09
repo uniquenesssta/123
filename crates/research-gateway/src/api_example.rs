@@ -1,9 +1,8 @@
+use crate::credentials::{is_placeholder_key, sanitized_api_example};
 use crate::{ApiProtocol, GatewayError, GatewayErrorCategory, TokenLimitField};
 use serde::{Deserialize, Serialize};
-use serde_json::{json, Map, Value};
+use serde_json::Value;
 use url::Url;
-
-const API_KEY_PLACEHOLDER: &str = "YOUR_API_KEY";
 
 #[derive(Clone, Serialize, Deserialize, PartialEq)]
 pub struct ApiExampleCandidate {
@@ -189,8 +188,7 @@ fn build_candidate(
         .filter(|value| !value.is_empty())
         .map(ToString::to_string);
     let (token_limit_field, max_output_tokens) = detect_token_limit(body, protocol);
-    let sanitized_body = sanitize_body(body);
-    let sanitized_example = canonical_curl(endpoint.as_str(), &sanitized_body);
+    let sanitized_example = sanitized_api_example(endpoint.as_str(), body, api_key.as_deref());
     let mut warnings = Vec::new();
     if model_id.is_none() {
         warnings.push("请求体没有model字段；解析后不会替换现有模型ID".to_string());
@@ -294,30 +292,6 @@ fn detect_token_limit(body: &Value, protocol: ApiProtocol) -> (TokenLimitField, 
     (protocol.default_token_limit_field(), None)
 }
 
-fn sanitize_body(body: &Value) -> Value {
-    match body {
-        Value::Object(object) => {
-            let sanitized = object
-                .iter()
-                .map(|(key, value)| (key.clone(), sanitize_body(value)))
-                .collect::<Map<String, Value>>();
-            Value::Object(sanitized)
-        }
-        Value::Array(values) => Value::Array(values.iter().map(sanitize_body).collect()),
-        Value::String(value) if looks_like_secret(value) => {
-            Value::String(API_KEY_PLACEHOLDER.to_string())
-        }
-        _ => body.clone(),
-    }
-}
-
-fn canonical_curl(endpoint_url: &str, body: &Value) -> String {
-    let pretty = serde_json::to_string_pretty(body).unwrap_or_else(|_| json!({}).to_string());
-    format!(
-        "curl {endpoint_url} \\\n  -H \"Content-Type: application/json\" \\\n  -H \"Authorization: Bearer {API_KEY_PLACEHOLDER}\" \\\n  -d '{pretty}'"
-    )
-}
-
 fn split_header(header: &str, name: &str) -> Option<String> {
     let (header_name, value) = header.split_once(':')?;
     header_name
@@ -334,28 +308,6 @@ fn extract_bearer_token(value: &str) -> Option<String> {
         return None;
     }
     Some(token.to_string())
-}
-
-fn is_placeholder_key(value: &str) -> bool {
-    let normalized = value.trim().to_ascii_uppercase();
-    normalized.is_empty()
-        || normalized.contains("YOUR_API_KEY")
-        || normalized.contains("API_KEY_HERE")
-        || normalized.contains("REPLACE_ME")
-        || normalized.starts_with('<')
-        || normalized.starts_with("${")
-        || normalized == "XXX"
-        || normalized == "TOKEN"
-}
-
-fn looks_like_secret(value: &str) -> bool {
-    let trimmed = value.trim();
-    !is_placeholder_key(trimmed)
-        && trimmed.len() >= 20
-        && !trimmed.chars().any(char::is_whitespace)
-        && (trimmed.starts_with("sk-")
-            || trimmed.starts_with("sk_")
-            || trimmed.starts_with("Bearer "))
 }
 
 fn extract_curl_commands(input: &str) -> Vec<String> {
@@ -514,6 +466,7 @@ fn example_error(message: impl Into<String>) -> GatewayError {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::credentials::API_KEY_PLACEHOLDER;
 
     const MULTI_EXAMPLE: &str = r#"
 ### Chat
@@ -573,5 +526,21 @@ curl https://api.gptsapi.net/v1/responses \
             .selected
             .sanitized_example
             .contains(API_KEY_PLACEHOLDER));
+    }
+
+    #[test]
+    fn extracted_compatible_key_is_redacted_inside_nested_persisted_template() {
+        let key = "fixture-compatible-key";
+        let example = format!(
+            r#"{{"url":"https://fixture.invalid/v1/responses","headers":{{"Authorization":"Bearer {key}"}},"body":{{"model":"fixture-model","input":[{{"content":"prefix {key} suffix"}}]}}}}"#
+        );
+        let parsed = parse_api_example(&example, None).expect("example");
+        assert_eq!(parsed.selected.api_key.as_deref(), Some(key));
+        assert_eq!(parsed.selected.model_id.as_deref(), Some("fixture-model"));
+        assert!(!parsed.selected.sanitized_example.contains(key));
+        assert!(parsed
+            .selected
+            .sanitized_example
+            .contains("prefix YOUR_API_KEY suffix"));
     }
 }

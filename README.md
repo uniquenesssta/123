@@ -42,6 +42,8 @@ R8-12 Freeze Transaction 已收尾为 `DONE`，R8-01～12 阶段代码/节点及
 
 R9-01 Shared Transport 已收尾为 `DONE`。精确实现 `f3da62d4b84235044c7483399f6f8aa145d9438d` / [Windows run `37933341557`](https://github.com/uniquenesssta/123/actions/runs/37933341557) / job `113829199317` 全 SUCCESS（2026-10-09 21:24北京时间完成）；Gateway **23/23**、contract **16/16**、Application **126/126**、Persistence **175/175**，本项8个新增测试全部通过；前端/TypeScript/Vite/17视口、Rust fmt/Clippy/workspace、Windows release/MSI/NSIS/启动全部通过。证据artifact `11617684270`，14,032,903字节，SHA-256 `a2178dd81182ec5839db1e0d53b57cc0a40c00802a3f553c159164124ae19c48`。 原传输契约/HTTP/响应解码唯一owner、公开接口与协议保持；详见 [01完成记录](docs/modular-rewrite/R09-research-ai-backend/R09-01-shared-transport.md)。本次仅五份文档收尾 `[skip ci]`，用户已授权同一R9分支开始02 Credentials与Redaction，03～11 BLOCKED。真实PG、历史四项/不可变账本/并发/回滚、有效XLSX、Windows Full、私有P4/P7 Golden Master及继承model.runs/0041历史删除风险继续最终封包新库待验；ignored与公共stub不计PASS。
 
+R9-02 Credentials与Redaction已实施、`VERIFYING`，同一R9分支从01收尾b80f09e起。旧credentials.rs删除，密钥生命周期/提供者/目标管理/WindowsIO/解码/错误/模板脱敏各有唯一owner，六原公开接口保持；补齐失败分支及UTF16临时清理，已提取compatible密钥在嵌套模板中脱敏。9A/9M/1D、原4凭据/3示例测试保留，新12项进入原unit target，预期Gateway35/contract16、Application126/Persistence175须自身Windows。83现有静态/完整architecture/Rustfmt/保护资产及8破坏探针通过；完整记录见 [02实施记录](docs/modular-rewrite/R09-research-ai-backend/R09-02-credentials-and-redaction.md)。原UI/配置/协议/依赖/DB保持，contract仅更新实际制品路径；03～11BLOCKED。CI开始后停止轮询；真实PostgreSQL、历史四项/不可变账本/并发/回滚、有效XLSX、Windows Full、私有P4/P7 Golden Master及继承model.runs/0041历史删除风险继续最终封包新库待验；ignored与公共unavailable stub不计PASS。
+
 ## 公开边界
 
 - 保留 `crates/model-api`、模型 ID、路由、规则包入口、预测页面和历史数据结构。

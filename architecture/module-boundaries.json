@@ -270,7 +270,7 @@
         ]
       },
       "ApiKeyProvider": {
-        "owner": "crates/research-gateway/src/credentials.rs",
+        "owner": "crates/research-gateway/src/credentials/provider.rs",
         "adapter": "DefaultApiKeyProvider"
       }
     },

@@ -11,7 +11,7 @@ R8 的12个节点及 Windows Automated 阶段出口已DONE，最终代码 `af3c9
 
 执行总纲顶部订正：只在Windows动态验证，复用原targets/contract/workflow/数据库入口，不新增持续回归体系；R9不升级外部协议、不修改AI Workspace前端。R8期间 `crates/research-gateway/`、公开契约、依赖与配置保持，最终CI原Gateway测试/contract通过，原协议行为作为下一节点基线。
 
-用户已明确“开始R9-01”，编号映射已厘清。从R8文档收尾 `c72e559af4f29c9510daf2f9bf66b926dacb3013` 建立唯一分支 `rewrite/r9-research-ai-backend`；01共享传输自身精确Windows全SUCCESS、DONE，用户“收尾01开始02”授权02 READY，03～11 BLOCKED，精确状态见 [阶段索引](../modular-rewrite/R09-research-ai-backend/README.md)。必须取得01自身Windows CI，R8成功不能替代。适用总纲顶部职责/生命周期/既有验证订正，真实验证延期边界继续保留。
+用户已明确“开始R9-01”，编号映射已厘清。从R8文档收尾 `c72e559af4f29c9510daf2f9bf66b926dacb3013` 建立唯一分支 `rewrite/r9-research-ai-backend`；01共享传输自身精确Windows全SUCCESS、DONE，用户“收尾01开始02”授权02，已实施VERIFYING，03～11 BLOCKED，精确状态见 [阶段索引](../modular-rewrite/R09-research-ai-backend/README.md)。必须取得01自身Windows CI，R8成功不能替代。适用总纲顶部职责/生命周期/既有验证订正，真实验证延期边界继续保留。
 
 ## 1. 阶段目标
 
@@ -273,137 +273,99 @@ Atomic Tasks：
 
 ## R9-02 Credentials 与 Redaction
 
-状态：`READY`（01自身精确Windows全SUCCESS，用户“收尾01开始02”已授权）
+状态：`VERIFYING`（用户授权01收尾/02开始；实际职责及静态完成，自身精确Windows待验）。
 
 ### 1. 目标
 
-- 完成 Credentials 与 Redaction 的完全重写，并将该能力收敛到唯一、可递归拆分的模块目录。
+- 将实际凭据生命周期、来源选择、档案目标、平台IO、编码与持久化脱敏拆为唯一owner，补齐四处安全边界；不推进后续节点。
 
 ### 2. 现状与来源
 
-- `crates/research-gateway/`。
-- application/openai_research、api_workspace。
-- src-tauri openai/workspace stores。
+- 原Gateway credentials.rs与api_example.rs；只扫描Application/Tauri profile/workspace真实调用，本轮其源码无改动。
 
 ### 3. 目标文件与目录
 
-```text
-crates/research-gateway/src/credentials/
-```
+- credentials/{mod,key,provider,store,windows,blob,error,redaction}.rs；实际清单见02记录。
 
 ### 4. 文件职责边界
 
-- 每个文件只承担一个可用一句话描述的职责。
-- 目录出口文件只负责显式导出。
-- 协调器只编排，不实现数据访问、UI 渲染或领域计算。
+- mod只显式导出；key生命周期，provider来源，store目标/三公开操作，windows平台IO，blob纯编码，error原共享错误，redaction纯持久化模板。
 
 ### 5. 输入
 
-- 无。
+- CredentialConfig/原String key及target；示例endpoint/JSON与借用的瞬时提取key。
 
 ### 6. 输出
 
-- 稳定的模块公开接口、可独立测试的实现和对应契约测试。
+- 原ApiKey/ApiKeyProvider/Default与三个公开函数、原GatewayError、canonical sanitized模板；公共DTO与名称保持。
 
 ### 7. 允许依赖
 
-- 无。
+- 原async_trait/zeroize1.9.0/windows-sys0.61/serde_json；只复用锁定依赖。
 
 ### 8. 禁止依赖
 
-- 无。
+- 无新增runner/workflow/target/DB/依赖；纯key/blob/redaction不得环境/文件/网络或后台IO，不跨到协议或UI。
 
 ### 9. 状态所有权
 
-- 该任务不新增跨模块共享状态；需要状态时由目标模块内具名 State/Coordinator 唯一持有。
+- ApiKey唯一String所有权、Drop与Debug掩码；临时Zeroizing。无新跨模块State或第二provider；原profiles状态/rollback不动。
 
 ### 10. 副作用边界
 
-- 所有 I/O、副作用和外部调用必须集中在明确命名的 adapter/transport/repository/workflow 文件。
+- Windows适配器唯一原native调用；Default provider唯一原环境读取；目标及key错误在nativeIO前停止，blob/redaction纯函数。
 
 ### 11. 异常路径
 
-- 保持现有错误码、错误类型和用户可见提示语义；新增内部错误必须在边界映射为既有公共错误。
+- 原category/完整中文提示/recovery/provider metadata保持；107生产literal保持；normalized/save早返/UTF16临时清理修复。
 
 ### 12. 并发/异步/生命周期
 
-- 所有异步请求必须具备请求 ID、取消或过期结果丢弃策略；销毁时解除监听器、定时器和挂起回调。
+- 原async load/Send+Sync与外层取消原样；ApiKey与临时缓冲销毁清零，无新线程/registry/监听。测试不修改全局环境。
 
 ### 13. 兼容要求
 
-- 正式研究只走 Responses。
-- 普通问答不带 web search/tools/schema/token fields。
-- 现有配置键与 profile 行为不变。
+- 正式Responses与普通问答最小字段、双协议/profile/配置/DTO/UI保持；有意只修改含已提取凭据的模板文本/对象键。
 
 ### 14. 实施步骤
 
-1. 读取 R0 生成的文件、命令、类型和调用方清单，确认本任务准确影响范围。
-2. 为目标目录创建清晰的 `mod.rs`/`index.ts` 出口，出口只 re-export，不承载业务逻辑。
-3. 先迁移或补齐契约测试，再实现新文件。
-4. 按职责逐文件实现；发现单文件再次出现第二职责时立即递归升级为子目录。
-5. 接入上游和下游，确保跨层只经过公开接口。
-6. 切换唯一入口，删除旧职责实现、重复类型、重复状态和重复样式。
-7. 运行最小验证、阶段回归和保护资产验证。
-8. 更新 README 并创建可回退原子提交。
+- 按真实调用/原四凭据测试与三示例测试核对，切唯一目录出口；删除旧owner，更新原artifact/owner门禁，补12项原unit测试并验证。
 
 ### 15. 切换入口
 
-- 在新实现通过最小验证后切换唯一调用入口；切换完成后立即运行契约验证。
+- 原mod credentials继续解析为目录；lib/client逐字保持；api_example仅从credentials出口一次调用统一sanitized_api_example。
 
 ### 16. 删除清单
 
-- 删除被本任务替代的旧职责实现、重复出口、重复测试和临时转发。
+- 旧credentials.rs及api_example四重复脱敏helper/placeholder常量；无forwarding shell、整文件移动或重复状态。
 
 ### 17. 最小验证
 
-- 相关 crate/feature 单元测试通过。
-- TypeScript/Rust 编译或类型检查通过。
-- 架构边界脚本通过。
-- 模型保护资产指纹通过。
+- 83/83原静态、完整architecture、原API/Domain/源码卫生/保护资产/命令/数据库静态、Rustfmt1.88和diffPASS。
 
 ### 18. 阶段回归
 
-- `npm run verify:frontend`。
-- `cargo fmt --all -- --check`。
-- `cargo clippy --locked --workspace --all-targets -- -D warnings`。
-- `cargo test --locked --workspace`。
+- 自身Windows原前端/contracts/TS/Vite/17视口、fmt/Clippy/workspace与35/16/126/175预期、release/MSI/NSIS/启动待验；本地非Windows无动态。
 
 ### 19. 失败停止条件
 
-- 任何保护资产指纹变化。
-- 公共契约出现未批准变化。
-- 最小验证失败。
-- 发现用户未提交修改与目标文件重叠且无法安全合并。
+- 保护指纹/公共契约未批准变化、任一门禁失败或用户修改冲突硬停；首轮清单漂移用官方生成器修正后全量83/架构复验，未放宽。
 
 ### 20. 回退点
 
-- 回退到 R9-02 开始前的已验证提交；不得手工复制旧文件恢复。
+- 基线b80f09e6488af18435c8e281395ddf7962c48eb5；受控revert源码/实际清单/门禁/文档，不复制双实现或更改历史数据。
 
 ### 21. 根 README 摘要记录
 
-- 记录 R9-02 实际创建、移动、删除的文件。
-- 记录执行过的命令、结果、未执行项与剩余风险。
+- 已同步01 DONE/02VERIFYING、9A/9M/1D、12原target新测试与待验/安全取舍/继续位置。
 
 ### 22. docs 阶段节点详细记录
 
-- 创建 `docs/modular-rewrite/R09-research-ai-backend/R09-02-credentials-and-redaction.md`。
-- 记录本节点实际做了什么、为何修改、修改前后职责、行为和依赖变化。
-- 分别列出全部新增、修改、移动/重命名和删除文件；没有对应类型时明确写“无”。
-- 文件清单必须与本节点真实 `git diff --name-status` 和最终工作区一致。
-- 记录公共接口、DTO、Schema、数据格式、配置、错误语义、日志、UI 行为和模型保护资产是否变化。
-- 记录实际执行的验证命令、环境、结果和报告路径；未执行项必须写明原因、替代验证和剩余风险。
-- 记录入口切换、旧实现清理、关键设计决策、计划偏差和回退方法。
-- 更新 `docs/modular-rewrite/R09-research-ai-backend/README.md` 中本任务的状态、记录链接和门禁结果。
-- 节点记录及阶段索引未完成时，本任务只能停留在 `VERIFYING`，不得改为 `DONE`。
+- 已创建[02实施记录](../modular-rewrite/R09-research-ai-backend/R09-02-credentials-and-redaction.md)，含完整清单、边界/四项差异/12测试/8探针/等价/报告/工具/回退；阶段索引02VERIFYING/03～11BLOCKED。
 
 ### 23. 完成标准
 
-- 目标职责已由唯一新模块承担。
-- 旧入口和旧实现已删除。
-- 最小验证与阶段回归均通过。
-- README 与实际状态一致。
-- `R09-02-credentials-and-redaction.md` 已创建并与实际变更、验证结果一致。
-- 阶段 `README.md` 已更新本任务状态和记录链接。
+- 实际唯一职责与旧实现清理、兼容、静态及文档已完成；必须自身精确Windows成功才DONE，不能继承01或源码预期。真实PostgreSQL、历史四项/不可变账本/并发/回滚、有效XLSX、Windows Full、私有P4/P7 Golden Master及继承model.runs/0041历史删除风险继续最终封包新库待验；ignored与公共unavailable stub不计PASS。
 
 ---
 

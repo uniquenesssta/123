@@ -60,7 +60,14 @@
     "src-tauri/src/commands/openai.rs",
     "crates/research-gateway/src/api_example.rs",
     "crates/research-gateway/src/config.rs",
-    "crates/research-gateway/src/credentials.rs",
+    "crates/research-gateway/src/credentials/mod.rs",
+    "crates/research-gateway/src/credentials/key.rs",
+    "crates/research-gateway/src/credentials/provider.rs",
+    "crates/research-gateway/src/credentials/store.rs",
+    "crates/research-gateway/src/credentials/blob.rs",
+    "crates/research-gateway/src/credentials/error.rs",
+    "crates/research-gateway/src/credentials/windows.rs",
+    "crates/research-gateway/src/credentials/redaction.rs",
     "crates/research-gateway/src/client.rs"
   ]
 }

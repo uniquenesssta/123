@@ -361,3 +361,12 @@ R8-01～12各节点均取得自身精确Windows，最终全workspace与原前端
 报告 `/workspace/scratch/eb298ad5cdcb/r901-static-checks.json`、`r901-architecture.log`、`r901-negative-probes.json`、`r901-equivalence.json`；实际源/边界/全部文件及回退见 [01记录](modular-rewrite/R09-research-ai-backend/R09-01-shared-transport.md)。reqwest0.13.4官方精确文档核对原请求timeout从连接至body读完，不用Context7 latest替代锁定版本。原格式化缓存截断，已恢复官方SHA校验的同版formatter，仅做源码format/check，不执行Linux/macOS Cargo/单测或客户端动态。
 
 精确实现 `f3da62d4b84235044c7483399f6f8aa145d9438d` / [Windows run `37933341557`](https://github.com/uniquenesssta/123/actions/runs/37933341557) / job `113829199317` 全 SUCCESS（2026-10-09 21:24北京时间完成）；Gateway **23/23**、contract **16/16**、Application **126/126**、Persistence **175/175**，本项8个新增测试全部通过；前端/TypeScript/Vite/17视口、Rust fmt/Clippy/workspace、Windows release/MSI/NSIS/启动全部通过。证据artifact `11617684270`，14,032,903字节，SHA-256 `a2178dd81182ec5839db1e0d53b57cc0a40c00802a3f553c159164124ae19c48`。 本次仅五文档 `[skip ci]` 收尾，不重复动态；用户授权02开始，03～11BLOCKED。真实PG、历史四项/不可变账本/并发/回滚、有效XLSX、Windows Full、私有P4/P7 Golden Master及继承model.runs/0041历史删除风险继续最终封包新库待验；ignored与公共stub不计PASS。
+
+
+## R9-02 Credentials与Redaction 实施验证（2026-10-09，VERIFYING）
+
+原Gateway unit target新增12项密钥错误/字节与Unicode、来源/桌面隔离、目标优先级与IO前拒绝、编码/终止/失败、递归模板与公开解析器接入边界。原4凭据/3示例测试保持，源码预期35/contract16，Application126/Persistence175；实际Rust运行仅本项WindowsCI，不读写真实凭据、不修改全局测试环境、不调用真实API。
+
+83/83静态、完整architecture、Rustfmt1.88源check、保护18/命令171/46迁移与18PG静态、diff实际PASS。8探针全部拒绝恢复；8原native函数及provider政策/错误literal保持，四项安全修复与全部A/M/D、等价/报告/回退见 [02记录](modular-rewrite/R09-research-ai-backend/R09-02-credentials-and-redaction.md)。首轮清单漂移已用官方生成器及完整复验解决；无非Windows编译/单测/浏览器动态。报告r902-static-checks.json/r902-architecture.log/r902-equivalence.json/r902-negative-probes.json。
+
+待精确Windows前端/17视口/Rust fmt-Clippy-workspace/12新unit/release-MSI-NSIS/启动；CI开始后停止轮询，02VERIFYING/03～11BLOCKED，不继承01成功。真实PostgreSQL、历史四项/不可变账本/并发/回滚、有效XLSX、Windows Full、私有P4/P7 Golden Master及继承model.runs/0041历史删除风险继续最终封包新库待验；ignored与公共unavailable stub不计PASS。
