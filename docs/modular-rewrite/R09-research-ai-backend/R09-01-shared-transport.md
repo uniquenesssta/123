@@ -1,6 +1,6 @@
 # R9-01 Shared Transport 实施记录
 
-状态：`VERIFYING`。2026-10-09用户明确“开始R9-01”，此前编号歧义已厘清。项目uniquenesssta/123、0.23.0，唯一阶段分支 `rewrite/r9-research-ai-backend`，起点/回退 `c72e559af4f29c9510daf2f9bf66b926dacb3013`；R8最终af3c98c/run37899786755源码已验，c72e559仅R8文档收尾。本项必须自身精确Windows，不继承R8成功。
+状态：`DONE`。2026-10-09用户明确“开始R9-01”，此前编号歧义已厘清。项目uniquenesssta/123、0.23.0，唯一阶段分支 `rewrite/r9-research-ai-backend`，起点/回退 `c72e559af4f29c9510daf2f9bf66b926dacb3013`；R8最终af3c98c/run37899786755源码已验，c72e559仅R8文档收尾。本项必须自身精确Windows，不继承R8成功。
 
 ## 实际来源与职责取舍
 
@@ -71,7 +71,7 @@ loopback仅测试夹具，原std线程、accept/read/write各5秒上限，测试
 
 清单只将OpenAiTransport owner设实际transport/contract，Domain扫描1099→1103、rustUsageDigest `21761727c797739ac862976e35399f8c0291bc27c02a2a509b7616f11cd97981`；365Domain/300映射/sourceDigest `217241ac243726a5ab6805a7f169e222b97e78c7c971749a5904714af673ebdd`保持。Application402/43Ports、171命令、PG根35及46迁移保持。整个crates/application、persistence-postgres、domain、model-api/P4/P7、contracts/schemas、src/src-tauri、依赖锁文件/workflow均无本项源码修改。
 
-Windows待验：原前端contract/TypeScript/Vite/17视口、Rust fmt/Clippy/workspace（含8新测试）、release/MSI/NSIS/启动。沿用Public Platform CI，确认本项精确head/Windows job开始后停止轮询；01VERIFYING、02～11BLOCKED，不提前创建R9阶段完成记录。真实PG、历史四项/不可变账本/并发/回滚、有效XLSX、Windows Full、私有P4/P7 Golden Master及继承model.runs/0041历史删除风险继续最终封包新库待验；ignored与公共stub不计PASS。
+精确实现 `f3da62d4b84235044c7483399f6f8aa145d9438d` / [Windows run `37933341557`](https://github.com/uniquenesssta/123/actions/runs/37933341557) / job `113829199317` 全 SUCCESS（2026-10-09 21:24北京时间完成）；Gateway **23/23**、contract **16/16**、Application **126/126**、Persistence **175/175**，本项8个新增测试全部通过；前端/TypeScript/Vite/17视口、Rust fmt/Clippy/workspace、Windows release/MSI/NSIS/启动全部通过。证据artifact `11617684270`，14,032,903字节，SHA-256 `a2178dd81182ec5839db1e0d53b57cc0a40c00802a3f553c159164124ae19c48`。 本次收尾复用该源码精确CI，仅修改五份文档、提交 `[skip ci]`，无重复动态验证；用户“收尾01开始02”授权02，03～11BLOCKED，不创建R9阶段完成记录。真实PG、历史四项/不可变账本/并发/回滚、有效XLSX、Windows Full、私有P4/P7 Golden Master及继承model.runs/0041历史删除风险继续最终封包新库待验；ignored与公共stub不计PASS。
 
 ## 文档、工具核对与订正
 
@@ -83,4 +83,12 @@ Context7以实际锁定reqwest0.13.4查询，但仅返回latest示例；已另�
 
 ## 回退与继续位置
 
-回退基线 `c72e559af4f29c9510daf2f9bf66b926dacb3013`；受控revert本项源码、原门禁/清单和文档，恢复唯一owner/公开export，不复制旧实现、不覆盖用户改动或变更历史数据。下一步核实01自身精确Windows全SUCCESS后收尾01，02前置开放；失败则只修完整相关链路，不越级进入02。真实PG、历史四项/不可变账本/并发/回滚、有效XLSX、Windows Full、私有P4/P7 Golden Master及继承model.runs/0041历史删除风险继续最终封包新库待验；ignored与公共stub不计PASS。
+回退基线 `c72e559af4f29c9510daf2f9bf66b926dacb3013`；受控revert本项源码、原门禁/清单和文档，恢复唯一owner/公开export，不复制旧实现、不覆盖用户改动或变更历史数据。01自身Windows全SUCCESS，01已收尾，用户授权02；下一步实施Credentials与Redaction，03～11不启动。真实PG、历史四项/不可变账本/并发/回滚、有效XLSX、Windows Full、私有P4/P7 Golden Master及继承model.runs/0041历史删除风险继续最终封包新库待验；ignored与公共stub不计PASS。
+
+## 本次收尾（2026-10-09）
+
+精确实现 `f3da62d4b84235044c7483399f6f8aa145d9438d` / [Windows run `37933341557`](https://github.com/uniquenesssta/123/actions/runs/37933341557) / job `113829199317` 全 SUCCESS（2026-10-09 21:24北京时间完成）；Gateway **23/23**、contract **16/16**、Application **126/126**、Persistence **175/175**，本项8个新增测试全部通过；前端/TypeScript/Vite/17视口、Rust fmt/Clippy/workspace、Windows release/MSI/NSIS/启动全部通过。证据artifact `11617684270`，14,032,903字节，SHA-256 `a2178dd81182ec5839db1e0d53b57cc0a40c00802a3f553c159164124ae19c48`。
+
+核实run/head/branch、job所有步骤与原日志，8项新增测试逐项ok，真实数据库测试仍ignored。五份文档为README、docs/TESTING、R9任务书、阶段索引和本记录，无A/D/移动；源码、原门禁与清单未变，复用精确源码CI。Create State摘要只作交接，Git/本记录为实际依据。
+
+Windows原验收报告 `D:\a\123\123\logs\windows-acceptance-20261009-125654.json` / 同名txt；运行日志 `football-runtime-20261009T132149.091Z-pid7424-adbda1e1.jsonl`，7条记录/3个完成操作PASS。报告封存于上述artifact，未虚构新的本地Windows报告。

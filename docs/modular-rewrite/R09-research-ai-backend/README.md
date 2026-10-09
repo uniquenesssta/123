@@ -2,7 +2,7 @@
 
 ## 当前阶段状态
 
-`IN_PROGRESS`。用户已明确“开始R9-01”，节点映射已厘清。唯一阶段分支 `rewrite/r9-research-ai-backend`，起点 `c72e559af4f29c9510daf2f9bf66b926dacb3013`。01 Shared Transport已实施、VERIFYING，须自身精确Windows CI；02～11 BLOCKED，不创建阶段完成记录。
+`IN_PROGRESS`。用户已明确“开始R9-01”，节点映射已厘清。唯一阶段分支 `rewrite/r9-research-ai-backend`，起点 `c72e559af4f29c9510daf2f9bf66b926dacb3013`。01 Shared Transport自身Windows全SUCCESS、DONE；用户“收尾01开始02”授权02 READY，03～11 BLOCKED，不创建阶段完成记录。
 
 ## 前置基线与依据
 
@@ -14,8 +14,8 @@ R8期间research-gateway、公开契约、配置/依赖及锁文件保持；原G
 
 | 任务 | 责任 | 状态 |
 |---|---|---|
-| R9-01 | Shared Transport | VERIFYING · [实施记录](R09-01-shared-transport.md) · 待自身精确Windows |
-| R9-02 | Credentials 与 Redaction | BLOCKED |
+| R9-01 | Shared Transport | DONE · [完成记录](R09-01-shared-transport.md) · run37933341557 SUCCESS |
+| R9-02 | Credentials 与 Redaction | READY · 用户已授权 |
 | R9-03 | Retry、Circuit Breaker 与 Cancel | BLOCKED |
 | R9-04 | Formal Research Request | BLOCKED |
 | R9-05 | Formal Response、Schema 与 Citation | BLOCKED |
@@ -28,12 +28,12 @@ R8期间research-gateway、公开契约、配置/依赖及锁文件保持；原G
 
 ## 实施范围与继续位置
 
-原client的三个公共传输类型与HTTP职责已切换transport唯一owner；Formal/Plain/Structured/连接测试/恢复GET/取消空POST继续同一原接口，不升级协议、不修改AI Workspace前端或凭据/重试政策。详见01记录；下一步核实01精确Windows，成功才收尾并开放02。
+原client的三个公共传输类型与HTTP职责已切换transport唯一owner；Formal/Plain/Structured/连接测试/恢复GET/取消空POST继续同一原接口，不升级协议、不修改AI Workspace前端或凭据/重试政策。详见01记录；01自身Windows全SUCCESS，下一步实施02 Credentials与Redaction。
 
-沿用现有单测/contract、Windows runner/workflow与最终新库入口；不新增持续回归基础设施，不执行Linux/macOS动态。每项必须自身精确Windows验收及实施记录才能DONE。已创建01实施记录；其状态仍VERIFYING，不创建R9阶段完成记录。Create State仅记录足球模型项目0.23.0的交接状态。
+沿用现有单测/contract、Windows runner/workflow与最终新库入口；不新增持续回归基础设施，不执行Linux/macOS动态。每项必须自身精确Windows验收及实施记录才能DONE。已创建01实施记录；其状态已DONE，不创建R9阶段完成记录。Create State仅记录足球模型项目0.23.0的交接状态。
 
 
-## R9-01 实施与门禁（2026-10-09，VERIFYING）
+## R9-01 实施与门禁（2026-10-09，DONE）
 
 从c72e559已验源码文档基线建立唯一R9分支，原client将TransportResponse/OpenAiTransport迁入transport/contract；原ReqwestTransport/headers/send/三种请求/rustls Once/error转换由http唯一持有；纯JSON/空响应/解析错误由response持有，mod只登记/re-export。crate根仍导出原三个名字，Application/Tauri/原mock调用方不需变化。原GatewayAttemptSink、协议/重试/并发/取消/研究与会话职责保持原owner，无额外全局状态或转发层。
 
@@ -41,4 +41,10 @@ R8期间research-gateway、公开契约、配置/依赖及锁文件保持；原G
 
 83/83现有静态、完整architecture、18保护资产/171命令/46迁移/18PG静态、Rustfmt1.88源码check及diff通过；6破坏探针全部拒绝恢复。8原HTTP函数逐token保持，decode重内联后原execute保持、剩余client全体token与265生产literal保持。清单只登记OpenAiTransport实际owner和Domain扫描1099→1103/使用摘要，43Ports/365Domain/300映射/声明摘要保持。Context7只给latest示例，另核对官方reqwest0.13.4准确版本timeout范围；不升级API/依赖。Mermaid已更新原入口与策略/共享IO边界，取消不是transport新增state，连接测试不强加执行重试。
 
-本项须自身Windows fmt/Clippy/workspace/前端/17视口/release/MSI/NSIS/启动；不继承R8 PASS或源码预期，CI开始后停止轮询。详细A/M/D、等价/测试/报告/订正与回退见01记录。真实PG、历史四项/不可变账本/并发/回滚、有效XLSX、Windows Full、私有P4/P7 Golden Master及继承model.runs/0041历史删除风险继续最终封包新库待验；ignored与公共stub不计PASS。
+本项自身Windows fmt/Clippy/workspace/前端/17视口/release/MSI/NSIS/启动已全部通过，精确证据见下段；此前CI启动后停止轮询。详细A/M/D、等价/测试/报告/订正与回退见01记录。真实PG、历史四项/不可变账本/并发/回滚、有效XLSX、Windows Full、私有P4/P7 Golden Master及继承model.runs/0041历史删除风险继续最终封包新库待验；ignored与公共stub不计PASS。
+
+## 01 收尾与02授权
+
+精确实现 `f3da62d4b84235044c7483399f6f8aa145d9438d` / [Windows run `37933341557`](https://github.com/uniquenesssta/123/actions/runs/37933341557) / job `113829199317` 全 SUCCESS（2026-10-09 21:24北京时间完成）；Gateway **23/23**、contract **16/16**、Application **126/126**、Persistence **175/175**，本项8个新增测试全部通过；前端/TypeScript/Vite/17视口、Rust fmt/Clippy/workspace、Windows release/MSI/NSIS/启动全部通过。证据artifact `11617684270`，14,032,903字节，SHA-256 `a2178dd81182ec5839db1e0d53b57cc0a40c00802a3f553c159164124ae19c48`。
+
+五份文档同步01 DONE/02 READY，源码与验证器保持，提交 `[skip ci]` 复用精确源码结果。下一步02实际职责重写；03～11仍BLOCKED，R9整体仍IN_PROGRESS。

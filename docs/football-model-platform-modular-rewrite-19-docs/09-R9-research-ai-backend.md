@@ -11,7 +11,7 @@ R8 的12个节点及 Windows Automated 阶段出口已DONE，最终代码 `af3c9
 
 执行总纲顶部订正：只在Windows动态验证，复用原targets/contract/workflow/数据库入口，不新增持续回归体系；R9不升级外部协议、不修改AI Workspace前端。R8期间 `crates/research-gateway/`、公开契约、依赖与配置保持，最终CI原Gateway测试/contract通过，原协议行为作为下一节点基线。
 
-用户已明确“开始R9-01”，编号映射已厘清。从R8文档收尾 `c72e559af4f29c9510daf2f9bf66b926dacb3013` 建立唯一分支 `rewrite/r9-research-ai-backend`；01共享传输已实施、VERIFYING，02～11 BLOCKED，精确状态见 [阶段索引](../modular-rewrite/R09-research-ai-backend/README.md)。必须取得01自身Windows CI，R8成功不能替代。适用总纲顶部职责/生命周期/既有验证订正，真实验证延期边界继续保留。
+用户已明确“开始R9-01”，编号映射已厘清。从R8文档收尾 `c72e559af4f29c9510daf2f9bf66b926dacb3013` 建立唯一分支 `rewrite/r9-research-ai-backend`；01共享传输自身精确Windows全SUCCESS、DONE，用户“收尾01开始02”授权02 READY，03～11 BLOCKED，精确状态见 [阶段索引](../modular-rewrite/R09-research-ai-backend/README.md)。必须取得01自身Windows CI，R8成功不能替代。适用总纲顶部职责/生命周期/既有验证订正，真实验证延期边界继续保留。
 
 ## 1. 阶段目标
 
@@ -169,7 +169,7 @@ Atomic Tasks：
 
 ## R9-01 Shared Transport
 
-状态：`VERIFYING`（用户明确开始R9-01；实际共享传输已实施，静态通过，须自身精确Windows）。
+状态：`DONE`（用户明确开始R9-01；实际共享传输已实施，静态通过，须自身精确Windows）。
 
 ### 1. 目标
 
@@ -257,7 +257,7 @@ Atomic Tasks：
 
 ### 22. docs 阶段节点详细记录
 
-- 已创建 [01实施记录](../modular-rewrite/R09-research-ai-backend/R09-01-shared-transport.md)，完整A/M/D、测试/等价/探针/报告/取舍/回退；阶段索引01VERIFYING、02～11BLOCKED。
+- 已创建 [01实施记录](../modular-rewrite/R09-research-ai-backend/R09-01-shared-transport.md)，完整A/M/D、测试/等价/探针/报告/取舍/回退；阶段索引01DONE、02已授权、03～11BLOCKED。
 
 ### 23. 完成标准
 
@@ -265,9 +265,15 @@ Atomic Tasks：
 
 ---
 
+### 本次完成证据
+
+精确实现 `f3da62d4b84235044c7483399f6f8aa145d9438d` / [Windows run `37933341557`](https://github.com/uniquenesssta/123/actions/runs/37933341557) / job `113829199317` 全 SUCCESS（2026-10-09 21:24北京时间完成）；Gateway **23/23**、contract **16/16**、Application **126/126**、Persistence **175/175**，本项8个新增测试全部通过；前端/TypeScript/Vite/17视口、Rust fmt/Clippy/workspace、Windows release/MSI/NSIS/启动全部通过。证据artifact `11617684270`，14,032,903字节，SHA-256 `a2178dd81182ec5839db1e0d53b57cc0a40c00802a3f553c159164124ae19c48`。
+
+仅五文档 `[skip ci]` 收尾，无源码/门禁/清单变化；用户授权02，真实延期仍保留。
+
 ## R9-02 Credentials 与 Redaction
 
-状态：`BLOCKED`（仅当上一任务与本任务前置门禁通过后改为 `READY`）
+状态：`READY`（01自身精确Windows全SUCCESS，用户“收尾01开始02”已授权）
 
 ### 1. 目标
 

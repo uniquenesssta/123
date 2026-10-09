@@ -352,7 +352,7 @@ R8-01～12各节点均取得自身精确Windows，最终全workspace与原前端
 本轮六修改/两新增均文档；仅验证链接、状态、完整阶段文件清单及diff，不执行非Windows动态、不重复上述成功构建，提交 `[skip ci]`。R9-01只登记READY，未实施。真实 PostgreSQL、历史四项数据库验收、账本/并发/回滚、有效 XLSX、Windows Full、私有 P4/P7 Golden Master，以及继承的 model.runs/0041 历史删除风险继续最终封包新库待验；ignored、公开 unavailable stub 和静态保护指纹均不计真实执行 PASS。
 
 
-## R9-01 Shared Transport 实施验证（2026-10-09，VERIFYING）
+## R9-01 Shared Transport 完成验证（2026-10-09，DONE）
 
 唯一R9分支从c72e559起，原Gateway unit target新增8项transport边界测试，源码预期23（15+8）；原gateway_contract16、Application126/Persistence175保持。HTTP夹具仅有界127.0.0.1：检查三动作方法/URL/UA/Bearer/Content-Type/JSON或无body、HTTP429/请求ID透传、307禁止重定向及请求timeout覆盖响应体。其余覆盖非法URL网络错误、认证非法字符、任意JSON/HTTP状态、空body Null及非法JSON完整原错误。实际单测/loopback只在本项Windows执行，无真实API调用、新test target、依赖或fixture服务。
 
@@ -360,4 +360,4 @@ R8-01～12各节点均取得自身精确Windows，最终全workspace与原前端
 
 报告 `/workspace/scratch/eb298ad5cdcb/r901-static-checks.json`、`r901-architecture.log`、`r901-negative-probes.json`、`r901-equivalence.json`；实际源/边界/全部文件及回退见 [01记录](modular-rewrite/R09-research-ai-backend/R09-01-shared-transport.md)。reqwest0.13.4官方精确文档核对原请求timeout从连接至body读完，不用Context7 latest替代锁定版本。原格式化缓存截断，已恢复官方SHA校验的同版formatter，仅做源码format/check，不执行Linux/macOS Cargo/单测或客户端动态。
 
-待自身Windows：原前端/contracts/TypeScript/Vite/17视口、Rust fmt/Clippy/workspace、新8测试、release/MSI/NSIS/启动。确认CI开始后停止轮询，01VERIFYING、02～11BLOCKED，不继承R8成功为本项成功。真实PG、历史四项/不可变账本/并发/回滚、有效XLSX、Windows Full、私有P4/P7 Golden Master及继承model.runs/0041历史删除风险继续最终封包新库待验；ignored与公共stub不计PASS。
+精确实现 `f3da62d4b84235044c7483399f6f8aa145d9438d` / [Windows run `37933341557`](https://github.com/uniquenesssta/123/actions/runs/37933341557) / job `113829199317` 全 SUCCESS（2026-10-09 21:24北京时间完成）；Gateway **23/23**、contract **16/16**、Application **126/126**、Persistence **175/175**，本项8个新增测试全部通过；前端/TypeScript/Vite/17视口、Rust fmt/Clippy/workspace、Windows release/MSI/NSIS/启动全部通过。证据artifact `11617684270`，14,032,903字节，SHA-256 `a2178dd81182ec5839db1e0d53b57cc0a40c00802a3f553c159164124ae19c48`。 本次仅五文档 `[skip ci]` 收尾，不重复动态；用户授权02开始，03～11BLOCKED。真实PG、历史四项/不可变账本/并发/回滚、有效XLSX、Windows Full、私有P4/P7 Golden Master及继承model.runs/0041历史删除风险继续最终封包新库待验；ignored与公共stub不计PASS。
