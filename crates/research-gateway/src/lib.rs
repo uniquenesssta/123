@@ -5,15 +5,13 @@ mod config;
 mod credentials;
 mod error;
 mod response;
+mod transport;
 mod types;
 mod validation;
 
 pub use api_example::{parse_api_example, ApiExampleCandidate, ApiExampleParseResult};
 pub use cancellation::CancellationToken;
-pub use client::{
-    test_openai_connection, GatewayAttemptSink, OpenAiResearchGateway, OpenAiTransport,
-    ReqwestTransport, TransportResponse,
-};
+pub use client::{test_openai_connection, GatewayAttemptSink, OpenAiResearchGateway};
 pub use config::{
     ApiProtocol, ApiWorkspaceWebSearchMode, BudgetConfig, CircuitBreakerConfig, CredentialConfig,
     CredentialMode, GatewayConfig, ModelPricing, ReasoningEffort, SearchContextSize, SourcePolicy,
@@ -24,6 +22,7 @@ pub use credentials::{
     DefaultApiKeyProvider,
 };
 pub use error::{GatewayError, GatewayErrorCategory, RecoveryAdvice};
+pub use transport::{OpenAiTransport, ReqwestTransport, TransportResponse};
 pub use types::{
     CitationLocation, GatewayAttempt, GatewayExecution, GatewayOperation, GatewayRequest,
     GatewayResponse, GatewayUsage, MissingField, OpenAiConnectionTest, PlainTextGatewayExecution,

@@ -259,7 +259,7 @@
         "consumer": "crates/application/src/model_registry/registry.rs::ModelRegistry"
       },
       "OpenAiTransport": {
-        "owner": "crates/research-gateway/src/client.rs",
+        "owner": "crates/research-gateway/src/transport/contract.rs",
         "adapter": "ReqwestTransport"
       },
       "GatewayAttemptSink": {

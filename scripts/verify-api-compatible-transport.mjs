@@ -14,6 +14,15 @@ const gateway = text("crates/research-gateway/src/client.rs");
 const response = text("crates/research-gateway/src/response.rs");
 const types = text("crates/research-gateway/src/types.rs");
 const tests = text("crates/research-gateway/tests/gateway_contract.rs");
+const transportRoot = "crates/research-gateway/src/transport";
+const transportExports = text(`${transportRoot}/mod.rs`);
+const transportContract = text(`${transportRoot}/contract.rs`);
+const transportHttp = text(`${transportRoot}/http.rs`);
+const transportResponse = text(`${transportRoot}/response.rs`);
+const httpProduction = transportHttp.split("#[cfg(test)]")[0];
+const responseProduction = transportResponse.split("#[cfg(test)]")[0];
+const gatewayExports = text("crates/research-gateway/src/lib.rs");
+const moduleContract = json("architecture/module-boundaries.json");
 const body = slice(gateway, "fn build_plain_text_request_body", "fn build_structured_request_body");
 assert(contract.release_version === "0.14.0" && isVersionAtLeast(packageJson.version, contract.release_version), "兼容传输历史契约或当前项目版本未同步");
 assert(contract.request_policy.tools_sent === false, "AI问答不得发送工具");
@@ -26,5 +35,19 @@ for (const field of ["tools", "tool_choice", "json_schema", "max_output_tokens",
 assert(response.includes("extract_responses_text") && response.includes("extract_chat_completions_text"), "纯文本响应未覆盖双协议");
 assert(tests.includes("plain_text"), "缺少纯文本网关测试");
 assert(gateway.includes("P4正式联网研究仅支持Responses协议"), "P4正式研究协议边界被破坏");
+// R9-01: one shared transport owner; protocol/workflow policy remains in the gateway.
+assert(transportExports.includes("pub use contract::{OpenAiTransport, TransportResponse};") && transportExports.includes("pub use http::ReqwestTransport;"), "Shared Transport出口不完整");
+assert(!/\b(?:fn|struct|trait|impl)\b/.test(transportExports), "Shared Transport出口不得承载业务实现");
+assert(gatewayExports.includes("pub use transport::{OpenAiTransport, ReqwestTransport, TransportResponse};"), "原网关三个公共传输类型未由唯一transport导出");
+for (const token of ["pub struct TransportResponse", "pub trait OpenAiTransport", "async fn post_json(", "async fn get_json(", "async fn post_empty(", "pub status: u16", "pub provider_request_id: Option<String>", "pub body: Value"]) assert(transportContract.includes(token), `共享传输契约缺少${token}`);
+for (const token of ["pub struct ReqwestTransport", "pub trait OpenAiTransport", "pub struct TransportResponse", "reqwest::", "RUSTLS_PROVIDER_INSTALL", "fn map_reqwest_error"]) assert(!gateway.includes(token), `client仍持有重复传输职责：${token}`);
+for (const token of [".redirect(reqwest::redirect::Policy::none())", "RUSTLS_PROVIDER_INSTALL.call_once", "rustls::crypto::ring::default_provider().install_default()", "headers.insert(AUTHORIZATION, authorization)", 'HeaderValue::from_static("application/json")', ".timeout(timeout)", ".send()", 'get("x-request-id")', "value.to_str().ok()", "response.bytes().await.map_err(map_reqwest_error)?", "decode_response(status, provider_request_id, &bytes)", ".json(body)", "self.client.get(url).headers(Self::headers(api_key)?)", "self.client.post(url).headers(Self::headers(api_key)?)", "error.is_timeout()", "GatewayErrorCategory::Timeout", "GatewayErrorCategory::Network"]) assert(httpProduction.includes(token), `HTTP传输兼容边界缺少${token}`);
+assert((httpProduction.match(/Self::execute\(/g) ?? []).length === 3, "POST JSON/GET/空POST必须共享同一发送与读取出口");
+assert((httpProduction.match(/\.post\(url\)/g) ?? []).length === 2 && (httpProduction.match(/\.get\(url\)/g) ?? []).length === 1, "两类POST与只读GET方法不得漂移");
+for (const token of ["bytes.is_empty()", "Value::Null", "serde_json::from_slice(bytes)", "GatewayErrorCategory::SchemaValidation", ".with_provider(Some(status), None)", "status,", "provider_request_id,", "body,"]) assert(responseProduction.includes(token), `传输响应解码边界缺少${token}`);
+for (const token of ["error_for_status", "retry_delay", "tokio::select!", "apply_token_limit", "parse_provider_error", "build_plain_text_request_body", "build_structured_request_body", "key_provider.load"]) assert(![httpProduction, responseProduction, transportContract].some(source => source.includes(token)), `transport越界承担网关策略：${token}`);
+assert(moduleContract.rust.ports.OpenAiTransport.owner === `${transportRoot}/contract.rs`, "OpenAiTransport架构owner未同步实际契约");
+for (const token of ["transport_preserves_any_json_and_http_status_without_protocol_policy", "empty_response_is_null_and_preserves_original_metadata", "malformed_json_retains_original_error_category_message_and_status"]) assert(transportResponse.includes(`fn ${token}`), `原unit target缺少响应边界测试：${token}`);
+for (const token of ["authentication_headers_preserve_value_and_reject_invalid_characters", "three_http_operations_preserve_method_url_headers_body_and_response", "redirects_are_returned_without_following_location", "timeout_covers_response_body_and_keeps_original_recovery", "invalid_url_keeps_network_error_without_provider_metadata"]) assert(transportHttp.includes(`fn ${token}`), `原unit target缺少HTTP边界测试：${token}`);
 if (failures.length) { console.error("AI问答兼容传输验证失败："); failures.forEach((item) => console.error(`- ${item}`)); process.exit(1); }
-console.log("AI问答兼容传输验证通过：Responses与Chat Completions均使用无工具、无Schema、无Token字段的最小文本请求。");
+console.log("AI问答兼容传输验证通过：Responses与Chat Completions保持最小文本请求；R9-01共享HTTP/解码唯一owner、原公共契约和策略边界保持。");

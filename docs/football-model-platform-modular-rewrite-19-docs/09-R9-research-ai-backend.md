@@ -5,13 +5,13 @@
 > 后续阶段：`R10`  
 > 本文档是唯一执行依据之一；必须与 `00-总体架构与前23节.md` 同时适用。
 
-## 当前前置交接（2026-10-09）
+## 当前执行订正（2026-10-09）
 
 R8 的12个节点及 Windows Automated 阶段出口已DONE，最终代码 `af3c98c31e28a332fe19ec47f4ed11c3a5a261ab` / [Windows run `37899786755`](https://github.com/uniquenesssta/123/actions/runs/37899786755) 全 SUCCESS。实际来源/文件/门禁/回退见 [R8阶段完成记录](../modular-rewrite/R08-prediction-p4-orchestration/R08-stage-completion.md)；继承真实PG/XLSX/Full/私有固定回归及删除风险仍最终新库待验，不继承为PASS。
 
 执行总纲顶部订正：只在Windows动态验证，复用原targets/contract/workflow/数据库入口，不新增持续回归体系；R9不升级外部协议、不修改AI Workspace前端。R8期间 `crates/research-gateway/`、公开契约、依赖与配置保持，最终CI原Gateway测试/contract通过，原协议行为作为下一节点基线。
 
-唯一首节点 R9-01 已登记 `READY`，先创建 [R9阶段索引](../modular-rewrite/R09-research-ai-backend/README.md)，R9-02～11继续BLOCKED。R8不存在13；用户“开始13”对应节点待厘清，目前只完成前置交接，尚未创建R9分支或开始代码。
+用户已明确“开始R9-01”，编号映射已厘清。从R8文档收尾 `c72e559af4f29c9510daf2f9bf66b926dacb3013` 建立唯一分支 `rewrite/r9-research-ai-backend`；01共享传输已实施、VERIFYING，02～11 BLOCKED，精确状态见 [阶段索引](../modular-rewrite/R09-research-ai-backend/README.md)。必须取得01自身Windows CI，R8成功不能替代。适用总纲顶部职责/生命周期/既有验证订正，真实验证延期边界继续保留。
 
 ## 1. 阶段目标
 
@@ -169,137 +169,99 @@ Atomic Tasks：
 
 ## R9-01 Shared Transport
 
-状态：`READY`（R8节点与Windows阶段出口已通过，原Gateway协议/配置保持；仅前置交接，“开始13”对应节点待厘清，尚未实施。）
+状态：`VERIFYING`（用户明确开始R9-01；实际共享传输已实施，静态通过，须自身精确Windows）。
 
 ### 1. 目标
 
-- 完成 Shared Transport 的完全重写，并将该能力收敛到唯一、可递归拆分的模块目录。
+- 收敛原共享HTTP契约、请求发送、响应解码职责，保持正式/普通/分析/连接/恢复/取消各原入口。
 
 ### 2. 现状与来源
 
-- `crates/research-gateway/`。
-- application/openai_research、api_workspace。
-- src-tauri openai/workspace stores。
+- 原client.rs混合TransportResponse、OpenAiTransport、ReqwestTransport/rustls/错误与业务网关。提取该实际责任，不提前迁移协议、凭据、重试/熔断/取消、会话或诊断。
 
 ### 3. 目标文件与目录
 
-```text
-crates/research-gateway/src/transport/
-```
+- `crates/research-gateway/src/transport/{mod,contract,http,response}.rs`；原crate根显式导出原三个公共名字。
 
 ### 4. 文件职责边界
 
-- 每个文件只承担一个可用一句话描述的职责。
-- 目录出口文件只负责显式导出。
-- 协调器只编排，不实现数据访问、UI 渲染或领域计算。
+- contract：原trait/DTO；http：唯一HTTP客户端/认证头/三操作/超时/字节读取/网络错误/原TLS Once；response：纯JSON/空body/解析错误；mod仅登记导出。原Gateway策略、GatewayAttemptSink及provider错误解释仍client，不创建空转发。
 
 ### 5. 输入
 
-- 无。
+- 原借用ApiKey/URL/JSON与Duration；无新增字段或提供器协议。
 
 ### 6. 输出
 
-- 稳定的模块公开接口、可独立测试的实现和对应契约测试。
+- 原status/provider_request_id/Value或完整原GatewayError；transport不解释provider业务状态。
 
 ### 7. 允许依赖
 
-- 无。
+- 原reqwest0.13.4/rustls0.23.42/async-trait/serde_json/std及crate内原类型；不升级/新增。
 
 ### 8. 禁止依赖
 
-- 无。
+- 领域/持久化/Tauri/UI；不向transport放协议组装、Token/tools/schema、凭据读取或Gateway重试状态。
 
 ### 9. 状态所有权
 
-- 该任务不新增跨模块共享状态；需要状态时由目标模块内具名 State/Coordinator 唯一持有。
+- 原ReqwestTransport持同一cloneable Client；原TLS Once唯一；Gateway持原Semaphore/circuit，原凭据/取消owner保持，无新全局state。
 
 ### 10. 副作用边界
 
-- 所有 I/O、副作用和外部调用必须集中在明确命名的 adapter/transport/repository/workflow 文件。
+- 三原HTTP操作共用http/execute，原headers/timeout/send/body读及错误保持；response纯解码不IO。
 
 ### 11. 异常路径
 
-- 保持现有错误码、错误类型和用户可见提示语义；新增内部错误必须在边界映射为既有公共错误。
+- 原MissingCredential/Network/Timeout/SchemaValidation完整消息/恢复/provider_status保持。JSON错误仍先于Gateway对HTTP状态的provider解释；空body保留Null，原invalid x-request-id处理保持。
 
 ### 12. 并发/异步/生命周期
 
-- 所有异步请求必须具备请求 ID、取消或过期结果丢弃策略；销毁时解除监听器、定时器和挂起回调。
+- 原请求trace/id、外层tokio::select/超时/future drop/重试等待/远端取消保持；transport不新增请求registry/UI监听器。连接测试不擅自新增重试、并发或token取消策略。
 
 ### 13. 兼容要求
 
-- 正式研究只走 Responses。
-- 普通问答不带 web search/tools/schema/token fields。
-- 现有配置键与 profile 行为不变。
+- 正式研究只Responses，普通双协议最小文本且不带tools/web search/schema/token fields；结构化/连接测试原字段/端点/配置/profile保持。禁止重定向、原UA/Bearer/Content-Type、GET/两POST与原body字节保持。
 
 ### 14. 实施步骤
 
-1. 读取 R0 生成的文件、命令、类型和调用方清单，确认本任务准确影响范围。
-2. 为目标目录创建清晰的 `mod.rs`/`index.ts` 出口，出口只 re-export，不承载业务逻辑。
-3. 先迁移或补齐契约测试，再实现新文件。
-4. 按职责逐文件实现；发现单文件再次出现第二职责时立即递归升级为子目录。
-5. 接入上游和下游，确保跨层只经过公开接口。
-6. 切换唯一入口，删除旧职责实现、重复类型、重复状态和重复样式。
-7. 运行最小验证、阶段回归和保护资产验证。
-8. 更新 README 并创建可回退原子提交。
+- 核对起点/原真实调用及R0清单，提取唯一owner并切换root exports、架构owner；原Gateway target新增8边界测试，原contract16保持。同步原验证器和使用清单；源码等价与静态门禁/探针通过后推送本项Windows。
 
 ### 15. 切换入口
 
-- 在新实现通过最小验证后切换唯一调用入口；切换完成后立即运行契约验证。
+- 同一公开root类型由transport导出；原所有生产/mock调用方直接消费原接口，无旧wrapper或新增side path。
 
 ### 16. 删除清单
 
-- 删除被本任务替代的旧职责实现、重复出口、重复测试和临时转发。
+- client中旧trait/DTO/Reqwest/TLS/网络错误职责移除。无整文件删除或重命名、无双实现。
 
 ### 17. 最小验证
 
-- 相关 crate/feature 单元测试通过。
-- TypeScript/Rust 编译或类型检查通过。
-- 架构边界脚本通过。
-- 模型保护资产指纹通过。
+- 已通过：原API兼容传输/源码卫生/Domain/保护/命令/DB静态与Rustfmt、等价8函数/265literal及完整client、六破坏探针。Rust编译/单测/loopback实际执行待本项Windows。
 
 ### 18. 阶段回归
 
-- `npm run verify:frontend`。
-- `cargo fmt --all -- --check`。
-- `cargo clippy --locked --workspace --all-targets -- -D warnings`。
-- `cargo test --locked --workspace`。
+- 已通过83现有源码/完整architecture；五浏览器项、Rust fmt/Clippy/workspace、前端构建/17视口/Windows交付待原Public Platform CI。没有非Windows动态、新入口/runner/target/数据库/依赖。
 
 ### 19. 失败停止条件
 
-- 任何保护资产指纹变化。
-- 公共契约出现未批准变化。
-- 最小验证失败。
-- 发现用户未提交修改与目标文件重叠且无法安全合并。
+- 保护/API/硬门禁失败须修复，01不得DONE或启动02；本项精确Windows未取得前保持VERIFYING。
 
 ### 20. 回退点
 
-- 回退到 R9-01 开始前的已验证提交；不得手工复制旧文件恢复。
+- `c72e559af4f29c9510daf2f9bf66b926dacb3013`；受控revert同步唯一owner/原测试/门禁/清单/记录，不复制旧实现或变更历史库。
 
 ### 21. 根 README 摘要记录
 
-- 记录 R9-01 实际创建、移动、删除的文件。
-- 记录执行过的命令、结果、未执行项与剩余风险。
+- 已记录实际职责/接口保持、静态/Windows待验、继续位置及继承真实延期。
 
 ### 22. docs 阶段节点详细记录
 
-- 创建 `docs/modular-rewrite/R09-research-ai-backend/R09-01-shared-transport.md`。
-- 记录本节点实际做了什么、为何修改、修改前后职责、行为和依赖变化。
-- 分别列出全部新增、修改、移动/重命名和删除文件；没有对应类型时明确写“无”。
-- 文件清单必须与本节点真实 `git diff --name-status` 和最终工作区一致。
-- 记录公共接口、DTO、Schema、数据格式、配置、错误语义、日志、UI 行为和模型保护资产是否变化。
-- 记录实际执行的验证命令、环境、结果和报告路径；未执行项必须写明原因、替代验证和剩余风险。
-- 记录入口切换、旧实现清理、关键设计决策、计划偏差和回退方法。
-- 更新 `docs/modular-rewrite/R09-research-ai-backend/README.md` 中本任务的状态、记录链接和门禁结果。
-- 节点记录及阶段索引未完成时，本任务只能停留在 `VERIFYING`，不得改为 `DONE`。
+- 已创建 [01实施记录](../modular-rewrite/R09-research-ai-backend/R09-01-shared-transport.md)，完整A/M/D、测试/等价/探针/报告/取舍/回退；阶段索引01VERIFYING、02～11BLOCKED。
 
 ### 23. 完成标准
 
-- 目标职责已由唯一新模块承担。
-- 旧入口和旧实现已删除。
-- 最小验证与阶段回归均通过。
-- README 与实际状态一致。
-- `R09-01-shared-transport.md` 已创建并与实际变更、验证结果一致。
-- 阶段 `README.md` 已更新本任务状态和记录链接。
+- 实际职责与旧实现清理、兼容、静态及记录已完成；必须自身精确Windows成功后才收尾01，不继承R8 PASS。真实PG、历史四项/不可变账本/并发/回滚、有效XLSX、Windows Full、私有P4/P7 Golden Master及继承model.runs/0041历史删除风险继续最终封包新库待验；ignored与公共stub不计PASS。
 
 ---
 

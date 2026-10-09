@@ -6,50 +6,17 @@ use crate::{
     validate_research_output, ApiKey, ApiKeyProvider, ApiProtocol, CancellationToken,
     GatewayAttempt, GatewayConfig, GatewayError, GatewayErrorCategory, GatewayExecution,
     GatewayOperation, GatewayRequest, GatewayResponse, GatewayUsage, ModelPricing,
-    OpenAiConnectionTest, PlainTextGatewayExecution, PlainTextGatewayRequest,
+    OpenAiConnectionTest, OpenAiTransport, PlainTextGatewayExecution, PlainTextGatewayRequest,
     PlainTextGatewayResponse, StructuredGatewayExecution, StructuredGatewayRequest,
-    StructuredGatewayResponse, TokenLimitField, ValidationContext,
+    StructuredGatewayResponse, TokenLimitField, TransportResponse, ValidationContext,
 };
 use async_trait::async_trait;
 use chrono::Utc;
-use reqwest::header::{HeaderMap, HeaderValue, AUTHORIZATION, CONTENT_TYPE};
 use serde_json::{json, Value};
 use sha2::{Digest, Sha256};
-use std::sync::{Arc, Once};
+use std::sync::Arc;
 use std::time::{Duration, Instant};
 use tokio::sync::{Mutex, Semaphore};
-
-#[derive(Debug, Clone)]
-pub struct TransportResponse {
-    pub status: u16,
-    pub provider_request_id: Option<String>,
-    pub body: Value,
-}
-
-#[async_trait]
-pub trait OpenAiTransport: Send + Sync {
-    async fn post_json(
-        &self,
-        url: &str,
-        api_key: &ApiKey,
-        body: &Value,
-        timeout: Duration,
-    ) -> Result<TransportResponse, GatewayError>;
-
-    async fn get_json(
-        &self,
-        url: &str,
-        api_key: &ApiKey,
-        timeout: Duration,
-    ) -> Result<TransportResponse, GatewayError>;
-
-    async fn post_empty(
-        &self,
-        url: &str,
-        api_key: &ApiKey,
-        timeout: Duration,
-    ) -> Result<TransportResponse, GatewayError>;
-}
 
 #[async_trait]
 pub trait GatewayAttemptSink: Send + Sync {
@@ -63,124 +30,6 @@ struct NoopAttemptSink;
 impl GatewayAttemptSink for NoopAttemptSink {
     async fn record(&self, _attempt: &GatewayAttempt) -> Result<(), GatewayError> {
         Ok(())
-    }
-}
-
-#[derive(Clone)]
-pub struct ReqwestTransport {
-    client: reqwest::Client,
-}
-
-impl ReqwestTransport {
-    pub fn new() -> Result<Self, GatewayError> {
-        install_rustls_crypto_provider();
-        let client = reqwest::Client::builder()
-            .user_agent(concat!(
-                "football-match-model-platform/",
-                env!("CARGO_PKG_VERSION")
-            ))
-            .redirect(reqwest::redirect::Policy::none())
-            .build()
-            .map_err(|error| network_error(format!("无法初始化兼容 API HTTP客户端：{error}")))?;
-        Ok(Self { client })
-    }
-
-    fn headers(api_key: &ApiKey) -> Result<HeaderMap, GatewayError> {
-        let mut headers = HeaderMap::new();
-        let authorization = HeaderValue::from_str(&format!("Bearer {}", api_key.expose()))
-            .map_err(|_| {
-                GatewayError::new(
-                    GatewayErrorCategory::MissingCredential,
-                    "兼容 API密钥包含无效字符",
-                    false,
-                    "重新保存Windows凭据管理器中的API密钥",
-                )
-            })?;
-        headers.insert(AUTHORIZATION, authorization);
-        headers.insert(CONTENT_TYPE, HeaderValue::from_static("application/json"));
-        Ok(headers)
-    }
-
-    async fn execute(
-        request: reqwest::RequestBuilder,
-        timeout: Duration,
-    ) -> Result<TransportResponse, GatewayError> {
-        let response = request
-            .timeout(timeout)
-            .send()
-            .await
-            .map_err(map_reqwest_error)?;
-        let status = response.status().as_u16();
-        let provider_request_id = response
-            .headers()
-            .get("x-request-id")
-            .and_then(|value| value.to_str().ok())
-            .map(ToString::to_string);
-        let bytes = response.bytes().await.map_err(map_reqwest_error)?;
-        let body = if bytes.is_empty() {
-            Value::Null
-        } else {
-            serde_json::from_slice(&bytes).map_err(|error| {
-                GatewayError::new(
-                    GatewayErrorCategory::SchemaValidation,
-                    format!("兼容 API返回了无法解析的JSON：{error}"),
-                    true,
-                    "保留HTTP状态和请求ID后重试；持续发生时检查API端点配置",
-                )
-                .with_provider(Some(status), None)
-            })?
-        };
-        Ok(TransportResponse {
-            status,
-            provider_request_id,
-            body,
-        })
-    }
-}
-
-#[async_trait]
-impl OpenAiTransport for ReqwestTransport {
-    async fn post_json(
-        &self,
-        url: &str,
-        api_key: &ApiKey,
-        body: &Value,
-        timeout: Duration,
-    ) -> Result<TransportResponse, GatewayError> {
-        Self::execute(
-            self.client
-                .post(url)
-                .headers(Self::headers(api_key)?)
-                .json(body),
-            timeout,
-        )
-        .await
-    }
-
-    async fn get_json(
-        &self,
-        url: &str,
-        api_key: &ApiKey,
-        timeout: Duration,
-    ) -> Result<TransportResponse, GatewayError> {
-        Self::execute(
-            self.client.get(url).headers(Self::headers(api_key)?),
-            timeout,
-        )
-        .await
-    }
-
-    async fn post_empty(
-        &self,
-        url: &str,
-        api_key: &ApiKey,
-        timeout: Duration,
-    ) -> Result<TransportResponse, GatewayError> {
-        Self::execute(
-            self.client.post(url).headers(Self::headers(api_key)?),
-            timeout,
-        )
-        .await
     }
 }
 
@@ -442,14 +291,6 @@ fn validate_response_id(response_id: &str) -> Result<(), GatewayError> {
         ));
     }
     Ok(())
-}
-
-static RUSTLS_PROVIDER_INSTALL: Once = Once::new();
-
-fn install_rustls_crypto_provider() {
-    RUSTLS_PROVIDER_INSTALL.call_once(|| {
-        let _ = rustls::crypto::ring::default_provider().install_default();
-    });
 }
 
 struct CircuitState {
@@ -1869,28 +1710,6 @@ fn fingerprint(value: &Value) -> Result<String, GatewayError> {
         )
     })?;
     Ok(hex::encode(Sha256::digest(bytes)))
-}
-
-fn map_reqwest_error(error: reqwest::Error) -> GatewayError {
-    if error.is_timeout() {
-        GatewayError::new(
-            GatewayErrorCategory::Timeout,
-            "OpenAI请求超时",
-            true,
-            "按退避策略重试；持续超时则缩小搜索范围或提高超时配置",
-        )
-    } else {
-        network_error(format!("OpenAI网络请求失败：{error}"))
-    }
-}
-
-fn network_error(message: impl Into<String>) -> GatewayError {
-    GatewayError::new(
-        GatewayErrorCategory::Network,
-        message,
-        true,
-        "检查网络连接后按幂等键重试；应用历史记录和手工事实不受影响",
-    )
 }
 
 fn cancelled_error() -> GatewayError {
