@@ -5,7 +5,7 @@
   "branch": "ui-design-system",
   "fileKey": "PN0Whgu6HLWIHx4Mv6aHfu",
   "page": "3:5",
-  "checkpointDate": "2026-10-09",
+  "checkpointDate": "2026-10-10",
   "phase": "repairs_in_progress",
   "executionFinished": true,
   "overallAcceptance": "NOT_PASSED",
@@ -476,8 +476,8 @@
     "INT-04",
     "repeat whole-product acceptance"
   ],
-  "nextWork": "先完成 INT-04 导航显隐复验（优先核对10个超时状态的两态动作及来源／导航回归），再实施工作区详情历史与重置，最后重复全产品验收。",
-  "nextWorkStarted": false,
+  "nextWork": "完成INT-04直接显隐分组复验，然后工作区历史、统一重置和全产品复验",
+  "nextWorkStarted": true,
   "limitations": [
     "Stored graph plus representative screenshots, not browser event playback or runtime acceptance.",
     "Theme scan excludes explicit Theme/Review Hub/验收/演示/Demo/Outcome/Reviewer paths and overlays.",
@@ -3200,6 +3200,23 @@
     "runtimeImplementationStarted": false,
     "historyImplemented": false,
     "resetWorkflowImplemented": false,
+    "openFindings": [
+      "INT-04"
+    ]
+  },
+  "repairBatch03R1": {
+    "phase": "MIGRATION_COMPLETE_VALIDATION_IN_PROGRESS",
+    "overallAcceptance": "NOT_PASSED",
+    "date": "2026-10-10",
+    "baselineCommit": "fd8d3ea38c32c9dd44fc3208dcb9bf3fe4284895",
+    "batchDataPath": "docs/FIGMA_PROTOTYPE_REPAIR_BATCH03R1.json",
+    "productStatesMigrated": 705,
+    "initialExpanded": 677,
+    "initialCollapsed": 28,
+    "prototypeVariablesCount": 6,
+    "historyImplemented": false,
+    "resetWorkflowImplemented": false,
+    "browserPlaybackPerformed": false,
     "openFindings": [
       "INT-04"
     ]

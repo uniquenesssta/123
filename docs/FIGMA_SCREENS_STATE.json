@@ -9,7 +9,7 @@
   "screensStarted": true,
   "phase": "visual_and_local_states_complete",
   "phaseDefinition": "All planned page visuals and bounded representative local states accepted. Whole-product prototype integration audit completed but NOT_PASSED; runtime and product release remain unaccepted.",
-  "checkpointDate": "2026-10-09",
+  "checkpointDate": "2026-10-10",
   "currentScreen": "S17 architecture / 架构信息",
   "currentRoute": "architecture",
   "currentScreenPhase": "accepted_visual_and_local_states",
@@ -22,11 +22,11 @@
   "acceptedRouteCountDefinition": "Editable visual composition, representative local presets and bounded prototype. Not arbitrary inputs or records, live operations, complete navigation/state continuity, automatic responsive behavior or end-to-end acceptance.",
   "nextScreen": null,
   "nextScreenStarted": false,
-  "nextWork": "先完成 INT-04 导航显隐复验（优先核对10个超时状态的两态动作及来源／导航回归），再实施工作区详情历史与重置，最后重复全产品验收。",
-  "nextWorkStarted": false,
+  "nextWork": "完成INT-04直接显隐分组复验，然后工作区历史、统一重置和全产品复验",
+  "nextWorkStarted": true,
   "allPlannedPatternsComplete": true,
-  "latestActivity": "prototype_integration_repair_batch03_visibility_retest_incomplete",
-  "latestActivityExecutionFinished": true,
+  "latestActivity": "INT04_visibility_continuation_validation_in_progress",
+  "latestActivityExecutionFinished": false,
   "integrationAudit": {
     "runId": "footfigma-prototype-integration-audit-2026-10-09",
     "phase": "audit_complete_not_passed",
@@ -734,36 +734,18 @@
   "newScreenMasters": 0,
   "runtimeOperationsPerformed": false,
   "integrationRepair": {
-    "phase": "INT04_VISIBILITY_IMPLEMENTED_WITH_RECEIPT_GAP_RETEST_INCOMPLETE",
+    "phase": "MIGRATION_COMPLETE_VALIDATION_IN_PROGRESS",
     "overallAcceptance": "NOT_PASSED",
-    "date": "2026-10-09",
-    "baselineCommit": "62e894ff496bf2719e8485658badfccba0ea2e71",
-    "recordPath": "docs/FIGMA_PROTOTYPE_INTEGRATION_REPAIRS.md",
-    "batchDataPath": "docs/FIGMA_PROTOTYPE_REPAIR_BATCH03.json",
-    "productStatesBound": 705,
-    "completeAuthoringReceiptRoots": 695,
-    "timedOutRootsToRecheck": 10,
-    "topbarPreservationRoots": 705,
-    "topbarPropertyReactionComparisons": 7050,
+    "date": "2026-10-10",
+    "baselineCommit": "fd8d3ea38c32c9dd44fc3208dcb9bf3fe4284895",
+    "batchDataPath": "docs/FIGMA_PROTOTYPE_REPAIR_BATCH03R1.json",
+    "productStatesMigrated": 705,
     "initialExpanded": 677,
     "initialCollapsed": 28,
-    "prototypeVariablesCreated": 2,
-    "prototypeCollectionsCreated": 1,
-    "temporaryProbeRemoved": true,
-    "inventory": {
-      "roots": 1077,
-      "productStates": 705,
-      "dialogs": 354,
-      "contextMenus": 1,
-      "reviewHubs": 17,
-      "productRoutes": 17
-    },
-    "finalDefaultsRestored": true,
-    "regressionCompleted": false,
-    "browserPlaybackPerformed": false,
-    "runtimeImplementationStarted": false,
+    "prototypeVariablesCount": 6,
     "historyImplemented": false,
     "resetWorkflowImplemented": false,
+    "browserPlaybackPerformed": false,
     "openFindings": [
       "INT-04"
     ]
@@ -808,8 +790,43 @@
     }
   },
   "prototypeOnlyVariables": {
-    "count": 2,
+    "count": 6,
     "collection": "VariableCollectionId:734:251835",
     "hiddenFromPublishing": true
+  },
+  "integrationRepairBatch03": {
+    "phase": "INT04_VISIBILITY_IMPLEMENTED_WITH_RECEIPT_GAP_RETEST_INCOMPLETE",
+    "overallAcceptance": "NOT_PASSED",
+    "date": "2026-10-09",
+    "baselineCommit": "62e894ff496bf2719e8485658badfccba0ea2e71",
+    "recordPath": "docs/FIGMA_PROTOTYPE_INTEGRATION_REPAIRS.md",
+    "batchDataPath": "docs/FIGMA_PROTOTYPE_REPAIR_BATCH03.json",
+    "productStatesBound": 705,
+    "completeAuthoringReceiptRoots": 695,
+    "timedOutRootsToRecheck": 10,
+    "topbarPreservationRoots": 705,
+    "topbarPropertyReactionComparisons": 7050,
+    "initialExpanded": 677,
+    "initialCollapsed": 28,
+    "prototypeVariablesCreated": 2,
+    "prototypeCollectionsCreated": 1,
+    "temporaryProbeRemoved": true,
+    "inventory": {
+      "roots": 1077,
+      "productStates": 705,
+      "dialogs": 354,
+      "contextMenus": 1,
+      "reviewHubs": 17,
+      "productRoutes": 17
+    },
+    "finalDefaultsRestored": true,
+    "regressionCompleted": false,
+    "browserPlaybackPerformed": false,
+    "runtimeImplementationStarted": false,
+    "historyImplemented": false,
+    "resetWorkflowImplemented": false,
+    "openFindings": [
+      "INT-04"
+    ]
   }
 }
