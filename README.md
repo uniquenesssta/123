@@ -44,6 +44,8 @@ R9-01 Shared Transport 已收尾为 `DONE`。精确实现 `f3da62d4b84235044c748
 
 R9-02 Credentials与Redaction已实施、`VERIFYING`，同一R9分支从01收尾b80f09e起。旧credentials.rs删除，密钥生命周期/提供者/目标管理/WindowsIO/解码/错误/模板脱敏各有唯一owner，六原公开接口保持；补齐失败分支及UTF16临时清理，已提取compatible密钥在嵌套模板中脱敏。9A/9M/1D、原4凭据/3示例测试保留，新12项进入原unit target，预期Gateway35/contract16、Application126/Persistence175须自身Windows。83现有静态/完整architecture/Rustfmt/保护资产及8破坏探针通过；完整记录见 [02实施记录](docs/modular-rewrite/R09-research-ai-backend/R09-02-credentials-and-redaction.md)。原UI/配置/协议/依赖/DB保持，contract仅更新实际制品路径；03～11BLOCKED。CI开始后停止轮询；真实PostgreSQL、历史四项/不可变账本/并发/回滚、有效XLSX、Windows Full、私有P4/P7 Golden Master及继承model.runs/0041历史删除风险继续最终封包新库待验；ignored与公共unavailable stub不计PASS。
 
+R9-02 首轮 `98d542f` / [Windows run `37944445186`](https://github.com/uniquenesssta/123/actions/runs/37944445186) 在新增 provider Debug 测试被 Clippy `uninlined_format_args` 拦截；前端/类型/构建和17视口已通过，Rust单测/打包/启动未执行。已改为内联参数，提供者生产实现、原测试断言与35项测试数量保持；既有源码卫生检查增加该回归检查，原写法/换行/尾逗号三探针均拒绝并恢复。83/83静态、完整架构、Rustfmt与保护资产通过；仍VERIFYING，须修复提交自身Windows确认，03～11BLOCKED。
+
 ## 公开边界
 
 - 保留 `crates/model-api`、模型 ID、路由、规则包入口、预测页面和历史数据结构。

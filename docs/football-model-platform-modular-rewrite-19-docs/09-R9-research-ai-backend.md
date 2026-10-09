@@ -273,7 +273,7 @@ Atomic Tasks：
 
 ## R9-02 Credentials 与 Redaction
 
-状态：`VERIFYING`（用户授权01收尾/02开始；实际职责及静态完成，自身精确Windows待验）。
+状态：`VERIFYING`（用户授权01收尾/02开始；实际职责及静态完成，首轮精确Windows在Clippy失败，已修正测试，待修复精确Windows）。
 
 ### 1. 目标
 
@@ -366,6 +366,12 @@ Atomic Tasks：
 ### 23. 完成标准
 
 - 实际唯一职责与旧实现清理、兼容、静态及文档已完成；必须自身精确Windows成功才DONE，不能继承01或源码预期。真实PostgreSQL、历史四项/不可变账本/并发/回滚、有效XLSX、Windows Full、私有P4/P7 Golden Master及继承model.runs/0041历史删除风险继续最终封包新库待验；ignored与公共unavailable stub不计PASS。
+
+### 首轮失败与修复证据
+
+R9-02 首轮 `98d542f` / [Windows run `37944445186`](https://github.com/uniquenesssta/123/actions/runs/37944445186) 在新增 provider Debug 测试被 Clippy `uninlined_format_args` 拦截；前端/类型/构建和17视口已通过，Rust单测/打包/启动未执行。已改为内联参数，提供者生产实现、原测试断言与35项测试数量保持；既有源码卫生检查增加该回归检查，原写法/换行/尾逗号三探针均拒绝并恢复。83/83静态、完整架构、Rustfmt与保护资产通过；仍VERIFYING，须修复提交自身Windows确认，03～11BLOCKED。
+
+修复仅8M：单个测试format参数、原源码卫生门禁、Domain使用摘要及五份现有文档；生产职责/原错误/协议保持，无A/D/移动。原生Windows单测/打包/启动未完成，修复CI開始后停止轮询，不提前DONE/03。
 
 ---
 

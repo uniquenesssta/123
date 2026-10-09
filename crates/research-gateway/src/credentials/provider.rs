@@ -86,7 +86,7 @@ mod tests {
             ))
         );
         assert_eq!(
-            format!("{:?}", DefaultApiKeyProvider),
+            format!("{DefaultApiKeyProvider:?}"),
             "DefaultApiKeyProvider"
         );
     }

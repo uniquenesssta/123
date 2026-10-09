@@ -15,7 +15,7 @@ R8期间research-gateway、公开契约、配置/依赖及锁文件保持；原G
 | 任务 | 责任 | 状态 |
 |---|---|---|
 | R9-01 | Shared Transport | DONE · [完成记录](R09-01-shared-transport.md) · run37933341557 SUCCESS |
-| R9-02 | Credentials 与 Redaction | VERIFYING · [实施记录](R09-02-credentials-and-redaction.md) · 待自身精确Windows |
+| R9-02 | Credentials 与 Redaction | VERIFYING · [实施记录](R09-02-credentials-and-redaction.md) · 首轮Clippy失败已修正，待修复精确Windows |
 | R9-03 | Retry、Circuit Breaker 与 Cancel | BLOCKED |
 | R9-04 | Formal Research Request | BLOCKED |
 | R9-05 | Formal Response、Schema 与 Citation | BLOCKED |
@@ -52,3 +52,9 @@ R8期间research-gateway、公开契约、配置/依赖及锁文件保持；原G
 ## R9-02 实施与门禁（VERIFYING）
 
 基线b80f09e；9A/9M/1D，credentials目录唯一持密钥生命周期/提供者/目标操作/WindowsIO/解码/错误/纯脱敏，旧单文件及解析器重复脱敏删除。原六公共接口、cfg native8函数、provider/错误/配置政策保持；失败副本/UTF16清理及已提取compatible key在嵌套模板替换为四项明确安全变化。原测试保留、新12unit预期35/contract16；83静态/完整架构/format/18保护资产/171命令/46迁移18PG静态及8探针PASS，自身Windows待验。详见02记录；03～11BLOCKED，CI开始后停止轮询。真实PostgreSQL、历史四项/不可变账本/并发/回滚、有效XLSX、Windows Full、私有P4/P7 Golden Master及继承model.runs/0041历史删除风险继续最终封包新库待验；ignored与公共unavailable stub不计PASS。
+
+## R9-02 首轮失败修复
+
+R9-02 首轮 `98d542f` / [Windows run `37944445186`](https://github.com/uniquenesssta/123/actions/runs/37944445186) 在新增 provider Debug 测试被 Clippy `uninlined_format_args` 拦截；前端/类型/构建和17视口已通过，Rust单测/打包/启动未执行。已改为内联参数，提供者生产实现、原测试断言与35项测试数量保持；既有源码卫生检查增加该回归检查，原写法/换行/尾逗号三探针均拒绝并恢复。83/83静态、完整架构、Rustfmt与保护资产通过；仍VERIFYING，须修复提交自身Windows确认，03～11BLOCKED。
+
+修复相对98d542f仅8M、0A/0D/0移动，生产职责/依赖与配置无变化，报告及完整文件见02记录。已有精确01成功不替代02验收，R9仍IN_PROGRESS。

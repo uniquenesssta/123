@@ -85,3 +85,29 @@ Windows native read/write/delete/exists的8个cfg函数逐token保持；CredRead
 Context7按实际Cargo.lock zeroize1.9.0准确版本核对Zeroizing::new/Drop、Deref/DerefMut与alloc String/Vec；初次resolve说明问题写1.8.2但随源码立即确认为1.9.0，实际查询与应用均1.9.0。Windows-sys0.61原系统调用只迁移、没有新增API；不升级外部依赖或照搬latest接口。Mermaid Chart已展示示例→唯一脱敏→原metadata，以及Windows/server provider→ApiKey→共享HTTP真实链路。Create State只保存足球稳定model `96f03270-c236-46de-99fa-db85d2fbf4ce`；合成摘要不替代Git/精确CI，也不能把Clippy误记为本地已执行。
 
 回退到 `b80f09e6488af18435c8e281395ddf7962c48eb5`，受控revert本项源码/路径清单/原门禁和文档，恢复旧唯一owner与公开export；不手工复制双实现、不覆盖用户修改、不变更历史数据。下一步核实02自身精确Windows：成功才能收尾，失败只修完整相关链路；03仅用户授权后启动。真实PostgreSQL、历史四项/不可变账本/并发/回滚、有效XLSX、Windows Full、私有P4/P7 Golden Master及继承model.runs/0041历史删除风险继续最终封包新库待验；ignored与公共unavailable stub不计PASS。
+
+
+## 首轮 Windows 失败与本次修复（2026-10-09）
+
+首轮精确HEAD `98d542fe183cefa94aadb05a66235e1c51ef3867` / [run37944445186](https://github.com/uniquenesssta/123/actions/runs/37944445186) / job113866973203已FAILURE，2026-10-09T14:35:28Z结束。日志唯一Rust错误位于credentials/provider.rs:88～91，新增测试使用 `format!("{:?}", DefaultApiKeyProvider)`，Rust1.88 Clippy建议 `format!("{DefaultApiKeyProvider:?}")`；`-D warnings`使uninlined_format_args阻断lib test检查。前端/contracts/TS/Vite/17视口已成功，Rustfmt阶段已进入Clippy，但workspace单测、Windows release/MSI/NSIS/启动没有执行；不能计Gateway35或后续交付为PASS。失败过程报告 `D:\a\123\123\logs\windows-acceptance-20261009-143026.txt`；失败artifact11623485055，671字节，SHA256 `c190abf69b58d3daa6f4f2c1d3512270e9100ff6c183f3399996a21b15106fdb`，不是完整成功验收包。
+
+本次只将该Debug断言的format变量内联；预期字符串仍DefaultApiKeyProvider，测试名/数量/条件与生产实现保持。检查全部02凭据/示例格式化调用，没有其他新增的同类可内联标识符参数遗漏；原配置字段访问及repeat/OS错误表达式不是该处标识符形式。沿用原源码卫生门禁的已知Clippy回归检查机制，给provider owner增加可匹配原写法/任意换行与可选尾逗号的拒绝断言；没有移除测试、允许告警、改变production Debug或泛化新的验证体系。
+
+本次修复相对首轮98d542f的完整清单：**8M / 0A / 0D / 0移动重命名**（此前19文件的初始实施清单仍有效，以下为额外修复提交）：
+
+- `README.md`
+- `architecture/domain-type-inventory.json`
+- `crates/research-gateway/src/credentials/provider.rs`
+- `docs/TESTING.md`
+- `docs/football-model-platform-modular-rewrite-19-docs/09-R9-research-ai-backend.md`
+- `docs/modular-rewrite/R09-research-ai-backend/R09-02-credentials-and-redaction.md`
+- `docs/modular-rewrite/R09-research-ai-backend/README.md`
+- `scripts/verify-rust-source-hygiene.mjs`
+
+provider生产段与原提交逐字一致，完整文件仅一个format表达式不同；原Gateway35测试（12新增）/contract16、Application126/Persistence175数量保持，production error/config/template 107literal等价及原职责核对仍通过。其他源码、UI/Tauri/Application/PG/Domain、契约/Schema、依赖/锁、workflow保持；清单仅同步rustUsageDigest `f343a8846085754e5bce01af9eee24dc327a4a475df054273826375ecc57294c`，Domain365/300/声明摘要/扫描1110保持。
+
+实际本地静态：83/83既有检查、完整verify:architecture、Rustfmt1.88源check、18保护资产/171命令/46迁移18PG静态、diff、原等价通过。三破坏探针还原原失败表达式、跨行表达式、尾逗号表达式，均被原增强卫生门禁拒绝，并逐字恢复后通过；未启动Rust代码或非Windows动态。报告 `/workspace/scratch/eb298ad5cdcb/r902-fix-review.json`、`r902-fix-static-checks.json`、`r902-fix-architecture.log`、`r902-fix-equivalence.json`。
+
+Context7按已确认Rust1.88.0查询Clippy，但仅返回master的lint开发/配置内容，没有提供准确版本证据；不用该结果冒充1.88验证。该具体修复以精确Windows 1.88日志中的Clippy建议为依据，无不确定第三方API或升级。本次单测试格式修复不改变架构数据链，沿用上一轮真实Mermaid图；Create State按已核实足球稳定model保存新失败/修复/待验信息。
+
+本次修复回退点98d542f；整个02回退点仍b80f09e。本项保持VERIFYING，03～11BLOCKED；修复提交自身Windows CI确认开始后停止轮询，成功后再收尾，失败继续只修相关链路。真实PG/历史四项/账本并发回滚/有效XLSX/Windows Full/私有固定回归及继承删除风险仍最终新库待验，ignored/公共unavailable stub不计PASS。

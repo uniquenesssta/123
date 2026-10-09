@@ -370,3 +370,10 @@ R8-01～12各节点均取得自身精确Windows，最终全workspace与原前端
 83/83静态、完整architecture、Rustfmt1.88源check、保护18/命令171/46迁移与18PG静态、diff实际PASS。8探针全部拒绝恢复；8原native函数及provider政策/错误literal保持，四项安全修复与全部A/M/D、等价/报告/回退见 [02记录](modular-rewrite/R09-research-ai-backend/R09-02-credentials-and-redaction.md)。首轮清单漂移已用官方生成器及完整复验解决；无非Windows编译/单测/浏览器动态。报告r902-static-checks.json/r902-architecture.log/r902-equivalence.json/r902-negative-probes.json。
 
 待精确Windows前端/17视口/Rust fmt-Clippy-workspace/12新unit/release-MSI-NSIS/启动；CI开始后停止轮询，02VERIFYING/03～11BLOCKED，不继承01成功。真实PostgreSQL、历史四项/不可变账本/并发/回滚、有效XLSX、Windows Full、私有P4/P7 Golden Master及继承model.runs/0041历史删除风险继续最终封包新库待验；ignored与公共unavailable stub不计PASS。
+
+
+### R9-02 首轮 Windows 失败与修复（2026-10-09）
+
+R9-02 首轮 `98d542f` / [Windows run `37944445186`](https://github.com/uniquenesssta/123/actions/runs/37944445186) 在新增 provider Debug 测试被 Clippy `uninlined_format_args` 拦截；前端/类型/构建和17视口已通过，Rust单测/打包/启动未执行。已改为内联参数，提供者生产实现、原测试断言与35项测试数量保持；既有源码卫生检查增加该回归检查，原写法/换行/尾逗号三探针均拒绝并恢复。83/83静态、完整架构、Rustfmt与保护资产通过；仍VERIFYING，须修复提交自身Windows确认，03～11BLOCKED。
+
+修复本地只做源码/静态：完整83检查、verify:architecture、Rustfmt1.88源码check、18保护资产/171命令/46迁移18PG静态、等价及diff通过。未执行非Windows Cargo/编译/单测，Clippy与实际35/16/126/175、release/MSI/NSIS/启动待修复精确Windows。报告 `/workspace/scratch/eb298ad5cdcb/r902-fix-static-checks.json`、`r902-fix-architecture.log`、`r902-fix-review.json`、`r902-fix-equivalence.json`；完整失败证据及8M清单见02记录。
