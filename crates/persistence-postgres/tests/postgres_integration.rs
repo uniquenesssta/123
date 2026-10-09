@@ -3268,6 +3268,461 @@ async fn p4_stage_c_writes_are_idempotent_and_frozen_history_is_immutable() {
             .is_err()
     );
 
+    // R8-11: reuse Stage C for read projections, run/task isolation and append-only views.
+    let match_workspace = database
+        .store
+        .read_p4_match_workspace(target.id)
+        .await
+        .unwrap();
+    assert_eq!(match_workspace.match_id, target.id);
+    assert_eq!(match_workspace.match_key, target.external_key);
+    assert_eq!(match_workspace.home_team_name, home.canonical_name);
+    assert_eq!(match_workspace.away_team_name, away.canonical_name);
+    assert_eq!(
+        match_workspace.competition_name.as_deref(),
+        Some(competition.name.as_str())
+    );
+    assert_eq!(match_workspace.kickoff_at, planning_context.kickoff_at);
+    assert_eq!(
+        serde_json::to_value(&match_workspace.tasks).unwrap(),
+        serde_json::to_value(&ordered).unwrap()
+    );
+    let no_competition = database
+        .store
+        .create_match(&MatchDraft {
+            external_key: format!("workbench-null-competition:{token}"),
+            competition_id: None,
+            season_id: None,
+            stage_id: None,
+            round_id: None,
+            home_team_id: home.id,
+            away_team_id: away.id,
+            kickoff_time: kickoff,
+            status: MatchStatus::Scheduled,
+            venue: None,
+            metadata: json!({}),
+        })
+        .await
+        .unwrap();
+    let empty_match = database
+        .store
+        .read_p4_match_workspace(no_competition.id)
+        .await
+        .unwrap();
+    assert!(empty_match.competition_name.is_none() && empty_match.tasks.is_empty());
+    let empty_task = database
+        .store
+        .read_p4_task_workspace(restored.id)
+        .await
+        .unwrap();
+    assert_eq!(empty_task.task.state, P4FreezeTaskState::Planned);
+    assert!(empty_task.research_run.is_none() && empty_task.snapshot.is_none());
+    assert!(
+        empty_task.evidence.is_empty()
+            && empty_task.conflicts.is_empty()
+            && empty_task.routes.is_empty()
+    );
+    assert_eq!(empty_task.events.len(), 1);
+    assert!(!empty_task.readiness.ready);
+    assert_eq!(empty_task.readiness.blockers, ["研究任务尚未创建"]);
+
+    let mut nullable = claim_a_draft.clone();
+    nullable.field_key = "z_not_found".into();
+    nullable.entity_id = None;
+    nullable.value = json!(null);
+    nullable.verification_state = EvidenceVerificationState::NotFound;
+    nullable.source_url = None;
+    nullable.source_title = None;
+    nullable.source_domain = None;
+    nullable.published_at = None;
+    nullable.effective_at = None;
+    nullable.idempotency_key = format!("workbench-null-evidence:{token}");
+    let nullable_claim = database
+        .store
+        .append_evidence_claim(&nullable)
+        .await
+        .unwrap();
+    let mut foreign_run_draft = research_draft.clone();
+    foreign_run_draft.horizon = P4Horizon::T6h;
+    foreign_run_draft.data_cutoff_at = kickoff - Duration::hours(6);
+    foreign_run_draft.trace_id = Uuid::new_v4();
+    foreign_run_draft.idempotency_key = format!("workbench-foreign-run:{token}");
+    let foreign_run = database
+        .store
+        .create_research_run(&foreign_run_draft)
+        .await
+        .unwrap();
+    let mut foreign_ids = Vec::new();
+    for suffix in ["a", "b"] {
+        let mut draft = claim_a_draft.clone();
+        draft.research_run_id = foreign_run.id;
+        draft.idempotency_key = format!("workbench-foreign-evidence:{token}:{suffix}");
+        foreign_ids.push(
+            database
+                .store
+                .append_evidence_claim(&draft)
+                .await
+                .unwrap()
+                .id,
+        );
+    }
+    let mut foreign_conflict_draft = conflict_draft.clone();
+    foreign_conflict_draft.conflict_key = format!("workbench-foreign-conflict:{token}");
+    foreign_conflict_draft.evidence_ids = foreign_ids.clone();
+    let foreign_conflict = database
+        .store
+        .create_evidence_conflict(&foreign_conflict_draft)
+        .await
+        .unwrap();
+    let selected_view = database
+        .store
+        .read_p4_task_workspace(horizon_task.id)
+        .await
+        .unwrap();
+    let original_conflict = selected_view
+        .conflicts
+        .iter()
+        .find(|item| item.id == conflict.id)
+        .unwrap();
+    assert_eq!(original_conflict.status, "resolved");
+    assert_eq!(
+        original_conflict.evaluation_status.as_deref(),
+        Some("auto_resolved")
+    );
+    assert_eq!(original_conflict.evidence_ids, expected_ids);
+    assert!(
+        original_conflict.manual_decision_kind.is_none()
+            && original_conflict.manual_decision_at.is_none()
+    );
+    assert!(
+        original_conflict.selected_evidence_ids.is_empty(),
+        "NULL manual evidence becomes the original empty array"
+    );
+    assert!(!selected_view
+        .conflicts
+        .iter()
+        .any(|item| item.id == foreign_conflict.id));
+    assert!(!selected_view
+        .evidence
+        .iter()
+        .any(|item| foreign_ids.contains(&item.id)));
+    let projected_claim = selected_view
+        .evidence
+        .iter()
+        .find(|item| item.id == claim_a.id)
+        .unwrap();
+    let projected_json = serde_json::to_value(projected_claim).unwrap();
+    for (field, value) in projected_json.as_object().unwrap() {
+        if matches!(
+            field.as_str(),
+            "published_at" | "observed_at" | "effective_at" | "retrieved_at" | "created_at"
+        ) {
+            let stored =
+                chrono::DateTime::parse_from_rfc3339(stored_claim[field].as_str().unwrap())
+                    .unwrap();
+            let projected = chrono::DateTime::parse_from_rfc3339(value.as_str().unwrap()).unwrap();
+            assert_eq!(
+                projected, stored,
+                "workspace preserves database timestamp precision"
+            );
+        } else {
+            assert_eq!(
+                value, &stored_claim[field],
+                "workspace evidence field {field} must survive unchanged"
+            );
+        }
+    }
+    let projected_null = selected_view
+        .evidence
+        .iter()
+        .find(|item| item.id == nullable_claim.id)
+        .unwrap();
+    assert!(projected_null.value.is_null() && projected_null.entity_id.is_none());
+    assert!(
+        projected_null.source_url.is_none()
+            && projected_null.source_title.is_none()
+            && projected_null.source_domain.is_none()
+    );
+    assert!(projected_null.published_at.is_none() && projected_null.effective_at.is_none());
+    assert_eq!(projected_null.verification_state, "NOT_FOUND");
+    assert!(selected_view.evidence.windows(2).all(|pair| (
+        &pair[0].field_key,
+        pair[0].created_at,
+        pair[0].id
+    ) <= (
+        &pair[1].field_key,
+        pair[1].created_at,
+        pair[1].id
+    )));
+    assert!(selected_view.conflicts.windows(2).all(|pair| (
+        &pair[0].field_key,
+        pair[0].created_at,
+        pair[0].id
+    ) <= (
+        &pair[1].field_key,
+        pair[1].created_at,
+        pair[1].id
+    )));
+    assert_eq!(
+        serde_json::to_value(&selected_view.events).unwrap(),
+        serde_json::to_value(&events).unwrap()
+    );
+    assert!(!selected_view.readiness.ready && selected_view.snapshot.is_none());
+
+    // Respect 0018: future cutoff, partial task, shared trace, manual_required evaluation,
+    // one immutable decision per (task, conflict). Never disable a database trigger.
+    let future_match = create_match(
+        &database.store,
+        &competition.id,
+        &format!("workbench-manual-match:{token}"),
+        home.id,
+        away.id,
+        Utc::now() + Duration::days(3),
+        MatchStatus::Scheduled,
+    )
+    .await;
+    let future_trace = Uuid::new_v4();
+    let mut future_run_draft = research_draft.clone();
+    future_run_draft.match_id = future_match.id;
+    future_run_draft.trace_id = future_trace;
+    future_run_draft.data_cutoff_at = future_match.kickoff_time - Duration::hours(24);
+    future_run_draft.idempotency_key = format!("workbench-manual-run:{token}");
+    let future_run = database
+        .store
+        .create_research_run(&future_run_draft)
+        .await
+        .unwrap();
+    let mut manual_ids = Vec::new();
+    for (suffix, value) in [
+        ("a", json!({"status":"probable"})),
+        ("b", json!({"status":"unknown"})),
+    ] {
+        let mut draft = claim_a_draft.clone();
+        draft.match_id = future_match.id;
+        draft.research_run_id = future_run.id;
+        draft.value = value;
+        draft.idempotency_key = format!("workbench-manual-evidence:{token}:{suffix}");
+        manual_ids.push(
+            database
+                .store
+                .append_evidence_claim(&draft)
+                .await
+                .unwrap()
+                .id,
+        );
+    }
+    let mut manual_conflict_draft = conflict_draft.clone();
+    manual_conflict_draft.match_id = future_match.id;
+    manual_conflict_draft.trace_id = future_trace;
+    manual_conflict_draft.conflict_key = format!("workbench-manual-conflict:{token}");
+    manual_conflict_draft.evidence_ids = manual_ids.clone();
+    let manual_conflict = database
+        .store
+        .create_evidence_conflict(&manual_conflict_draft)
+        .await
+        .unwrap();
+    let mut manual_evaluation = evaluation_draft.clone();
+    manual_evaluation.conflict_id = manual_conflict.id;
+    manual_evaluation.research_run_id = future_run.id;
+    manual_evaluation.match_id = future_match.id;
+    manual_evaluation.trace_id = future_trace;
+    manual_evaluation.status = ConflictEvaluationStatus::ManualRequired;
+    manual_evaluation.winning_evidence_ids.clear();
+    manual_evaluation.winning_value = json!(null);
+    manual_evaluation.idempotency_key = format!("workbench-manual-evaluation:{token}");
+    database
+        .store
+        .append_conflict_evaluation(&manual_evaluation)
+        .await
+        .unwrap();
+    let mut blocked_route = route_draft.clone();
+    blocked_route.match_id = future_match.id;
+    blocked_route.research_run_id = future_run.id;
+    blocked_route.trace_id = future_trace;
+    blocked_route.route_key = format!("workbench-blocked:{token}");
+    blocked_route.idempotency_key = format!("workbench-blocked-route:{token}");
+    blocked_route.status = EvidenceRouteStatus::BlockedConflict;
+    blocked_route.verification_state = "CONFLICT".into();
+    blocked_route.selected_evidence_ids = manual_ids.clone();
+    blocked_route.selected_value = json!(null);
+    database
+        .store
+        .append_evidence_route(&blocked_route)
+        .await
+        .unwrap();
+    let mut manual_tasks = Vec::new();
+    for horizon in [P4Horizon::T24h, P4Horizon::T6h] {
+        let mut draft = horizon_draft.clone();
+        draft.match_id = future_match.id;
+        draft.match_key = future_match.external_key.clone();
+        draft.horizon = horizon;
+        draft.kickoff_at = future_match.kickoff_time;
+        draft.data_cutoff_at = horizon.data_cutoff_at(future_match.kickoff_time).unwrap();
+        draft.research_due_at = draft.data_cutoff_at - Duration::minutes(15);
+        draft.freeze_deadline_at = draft.data_cutoff_at + Duration::minutes(15);
+        draft.trace_id = future_trace;
+        draft.idempotency_key = format!("workbench-manual-task:{token}:{}", horizon.as_str());
+        let created = database.store.create_p4_freeze_task(&draft).await.unwrap();
+        let mut previous = P4FreezeTaskState::Planned;
+        for next in [
+            P4FreezeTaskState::ResearchQueued,
+            P4FreezeTaskState::ResearchRunning,
+            P4FreezeTaskState::ResearchPartial,
+        ] {
+            let mut update = transition.clone();
+            update.task_id = created.id;
+            update.expected_state = previous;
+            update.next_state = next;
+            update.research_run_id = Some(future_run.id);
+            update.research_job_id = None;
+            update.payload = json!({});
+            update.reason = "workbench manual fixture".into();
+            database
+                .store
+                .transition_p4_freeze_task(&update)
+                .await
+                .unwrap();
+            previous = next;
+        }
+        manual_tasks.push(created);
+    }
+    let manual = football_domain::P4ManualRouteOverrideDraft {
+        task_id: manual_tasks[0].id,
+        research_run_id: future_run.id,
+        conflict_id: manual_conflict.id,
+        route_key: blocked_route.route_key.clone(),
+        field_key: blocked_route.field_key.clone(),
+        target_module: blocked_route.target_module.clone(),
+        target_slot: blocked_route.target_slot.clone(),
+        entity_type: blocked_route.entity_type.clone(),
+        entity_id: blocked_route.entity_id,
+        decision_kind: football_domain::P4ManualConflictDecisionKind::SelectEvidence,
+        selected_evidence_ids: vec![manual_ids[0]],
+        selected_value: json!({"status":"probable"}),
+        verification_state: "PROBABLE".into(),
+        route_status: "routed".into(),
+        reason: "workbench manual route".into(),
+        actor: "fixture".into(),
+        note: Some("原人工备注".into()),
+        idempotency_key: format!("workbench-manual:{token}"),
+    };
+    let override_record = database
+        .store
+        .append_p4_manual_route_override(&manual)
+        .await
+        .unwrap();
+    let manual_view = database
+        .store
+        .read_p4_task_workspace(manual_tasks[0].id)
+        .await
+        .unwrap();
+    let projected_manual = manual_view
+        .conflicts
+        .iter()
+        .find(|item| item.id == manual_conflict.id)
+        .unwrap();
+    assert_eq!(projected_manual.selected_evidence_ids, [manual_ids[0]]);
+    assert_eq!(
+        projected_manual.manual_decision_kind.as_deref(),
+        Some("select_evidence")
+    );
+    assert_eq!(
+        projected_manual.manual_decision_note.as_deref(),
+        Some("原人工备注")
+    );
+    assert_eq!(
+        projected_manual.manual_decision_at,
+        Some(override_record.created_at)
+    );
+    assert_eq!(projected_manual.status, "resolved");
+    assert_eq!(
+        projected_manual.evaluation_status.as_deref(),
+        Some("manual_required")
+    );
+    let projected_route = manual_view
+        .routes
+        .iter()
+        .find(|item| item.route_key == blocked_route.route_key)
+        .unwrap();
+    assert_eq!(projected_route.route_status, "routed");
+    assert_eq!(projected_route.verification_state, "PROBABLE");
+    assert_eq!(projected_route.selected_evidence_ids, [manual_ids[0]]);
+    assert_eq!(projected_route.selected_value, manual.selected_value);
+    assert_eq!(projected_route.reason, manual.reason);
+    let peer_view = database
+        .store
+        .read_p4_task_workspace(manual_tasks[1].id)
+        .await
+        .unwrap();
+    let peer_conflict = peer_view
+        .conflicts
+        .iter()
+        .find(|item| item.id == manual_conflict.id)
+        .unwrap();
+    assert!(
+        peer_conflict.manual_decision_kind.is_none() && peer_conflict.manual_decision_at.is_none()
+    );
+    assert!(peer_conflict.selected_evidence_ids.is_empty());
+    assert_eq!(
+        peer_view
+            .routes
+            .iter()
+            .find(|item| item.route_key == blocked_route.route_key)
+            .unwrap()
+            .route_status,
+        "blocked_conflict"
+    );
+    let mut peer_manual = manual.clone();
+    peer_manual.task_id = manual_tasks[1].id;
+    peer_manual.decision_kind = football_domain::P4ManualConflictDecisionKind::AcceptUnknown;
+    peer_manual.selected_evidence_ids.clear();
+    peer_manual.selected_value = json!(null);
+    peer_manual.verification_state = "NOT_FOUND".into();
+    peer_manual.route_status = "missing".into();
+    peer_manual.note = Some("另一任务接受未知".into());
+    peer_manual.idempotency_key = format!("workbench-peer-manual:{token}");
+    database
+        .store
+        .append_p4_manual_route_override(&peer_manual)
+        .await
+        .unwrap();
+    let latest_view = database
+        .store
+        .read_p4_task_workspace(manual_tasks[0].id)
+        .await
+        .unwrap();
+    let latest_conflict = latest_view
+        .conflicts
+        .iter()
+        .find(|item| item.id == manual_conflict.id)
+        .unwrap();
+    // Event status belongs to the conflict, while the decision overlay belongs to the selected task.
+    assert_eq!(latest_conflict.status, "accepted_unknown");
+    assert_eq!(
+        latest_conflict.manual_decision_kind.as_deref(),
+        Some("select_evidence")
+    );
+    assert_eq!(latest_conflict.selected_evidence_ids, [manual_ids[0]]);
+    let accepted_view = database
+        .store
+        .read_p4_task_workspace(manual_tasks[1].id)
+        .await
+        .unwrap();
+    let accepted_conflict = accepted_view
+        .conflicts
+        .iter()
+        .find(|item| item.id == manual_conflict.id)
+        .unwrap();
+    assert_eq!(
+        accepted_conflict.manual_decision_kind.as_deref(),
+        Some("accept_unknown")
+    );
+    assert_eq!(
+        accepted_conflict.manual_decision_note.as_deref(),
+        Some("另一任务接受未知")
+    );
+    assert!(accepted_conflict.selected_evidence_ids.is_empty());
+
     let features = (1_u8..=31)
         .map(|field_order| SnapshotFeatureDraft {
             field_order,
@@ -3389,6 +3844,121 @@ async fn p4_stage_c_writes_are_idempotent_and_frozen_history_is_immutable() {
     assert_eq!(snapshot.data_cutoff_at, research.data_cutoff_at);
     assert_eq!(snapshot.data_cutoff_at, snapshot_retry.data_cutoff_at);
     assert_eq!(snapshot.frozen_at, snapshot_retry.frozen_at);
+
+    for status in [
+        football_domain::ResearchRunStatus::Running,
+        football_domain::ResearchRunStatus::Succeeded,
+    ] {
+        database
+            .store
+            .record_research_run_event(&football_domain::ResearchRunEventDraft {
+                research_run_id: research.id,
+                idempotency_key: format!("workbench-research:{token}:{}", status.as_str()),
+                status,
+                response_id: Some("workspace-response".into()),
+                model_id: Some("workspace-fixture".into()),
+                token_usage: json!({}),
+                error_category: None,
+                error_message: None,
+                payload: json!({}),
+            })
+            .await
+            .unwrap();
+    }
+    let mut previous = P4FreezeTaskState::ResearchQueued;
+    for next in [
+        P4FreezeTaskState::ResearchRunning,
+        P4FreezeTaskState::ResearchSucceeded,
+        P4FreezeTaskState::ReadyToFreeze,
+        P4FreezeTaskState::Freezing,
+        P4FreezeTaskState::Frozen,
+    ] {
+        let mut update = transition.clone();
+        update.expected_state = previous;
+        update.next_state = next;
+        update.reason = "workbench snapshot fixture".into();
+        update.snapshot_id = (next == P4FreezeTaskState::Frozen).then_some(snapshot.id);
+        database
+            .store
+            .transition_p4_freeze_task(&update)
+            .await
+            .unwrap();
+        previous = next;
+    }
+    let ledger_tables = [
+        "platform.p4_freeze_tasks",
+        "platform.p4_freeze_task_events",
+        "platform.jobs",
+        "research.runs",
+        "research.run_events",
+        "research.evidence_claims",
+        "research.evidence_routes",
+        "research.evidence_conflicts",
+        "research.evidence_conflict_events",
+        "research.manual_route_overrides",
+        "feature.snapshots",
+        "audit.events",
+    ];
+    let mut ledger_counts = Vec::new();
+    for table in ledger_tables {
+        ledger_counts.push(
+            sqlx::query_scalar::<_, i64>(&format!("SELECT count(*) FROM {table}"))
+                .fetch_one(&database.pool)
+                .await
+                .unwrap(),
+        );
+    }
+    for _ in 0..2 {
+        let frozen_view = database
+            .store
+            .read_p4_task_workspace(horizon_task.id)
+            .await
+            .unwrap();
+        assert_eq!(frozen_view.task.state, P4FreezeTaskState::Frozen);
+        let run_view = frozen_view.research_run.as_ref().unwrap();
+        assert_eq!(run_view.id, research.id);
+        assert_eq!(run_view.status, "succeeded");
+        assert_eq!(run_view.attempt_count, 1);
+        assert_eq!(run_view.response_id.as_deref(), Some("workspace-response"));
+        assert_eq!(run_view.model_id.as_deref(), Some("workspace-fixture"));
+        assert!(run_view.error_category.is_none() && run_view.error_message.is_none());
+        assert!(run_view.started_at.is_some() && run_view.finished_at.is_some());
+        assert_eq!(
+            serde_json::to_value(frozen_view.snapshot.as_ref().unwrap()).unwrap(),
+            serde_json::to_value(
+                database
+                    .store
+                    .read_prematch_snapshot(snapshot.id)
+                    .await
+                    .unwrap()
+            )
+            .unwrap()
+        );
+        database
+            .store
+            .read_p4_match_workspace(target.id)
+            .await
+            .unwrap();
+        assert!(
+            matches!(database.store.read_p4_match_workspace(Uuid::new_v4()).await,
+            Err(PersistenceError::InvalidState(message)) if message == "比赛不存在")
+        );
+        assert!(
+            matches!(database.store.read_p4_task_workspace(Uuid::new_v4()).await,
+            Err(PersistenceError::InvalidState(message)) if message == "P4冻结任务不存在")
+        );
+    }
+    for (table, before) in ledger_tables.into_iter().zip(ledger_counts) {
+        let after = sqlx::query_scalar::<_, i64>(&format!("SELECT count(*) FROM {table}"))
+            .fetch_one(&database.pool)
+            .await
+            .unwrap();
+        assert_eq!(
+            after, before,
+            "workbench reads must not write task/job/research/evidence/snapshot/audit ledgers"
+        );
+    }
+
     let mut changed_snapshot = snapshot_draft.clone();
     changed_snapshot.input_payload = json!({"tampered": true});
     assert!(

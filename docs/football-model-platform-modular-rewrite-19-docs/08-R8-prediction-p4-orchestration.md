@@ -1518,138 +1518,99 @@ Application经原Ports创建/入队/迁移；首建和迁移各保持任务+事�
 
 ## R8-11 Workbench Reads
 
-状态：`READY`（10自身精确Windows已通过并收尾，用户已授权“收尾10 开始11”）
+状态：`VERIFYING`（10精确修复Windows已全成功并收尾，用户授权“收尾10 开始11”；11等待自身精确Windows，12 BLOCKED）
 
 ### 1. 目标
 
-- 完成 Workbench Reads 的完全重写，并将该能力收敛到唯一、可递归拆分的模块目录。
+将现有工作台读取的数据库职责从混合人工裁决writer提取到唯一 `adapters/p4/workbench/`，保留两项Application/Port/Store公开契约、原读取顺序与投影。
 
 ### 2. 现状与来源
 
-- `crates/application/src/prediction.rs`。
-- `p4_orchestration.rs`、`fact_pipeline.rs`、`p4_persistence.rs`、`p4_workbench.rs`。
-- 相关 persistence modules。
+实际来源为 `crates/persistence-postgres/src/p4_workbench.rs` 的 `read_p4_match_workspace` 与 `read_p4_task_workspace`。Application实际已经使用 `use_cases/prediction/read_p4_{match,task}_workspace/mod.rs`，各自仅委托原PredictionWorkflowPort；旧 `application/prediction.rs` 已不存在。人工裁决writer与其四个私有助手、根readiness/routed_facts及快照读取保留原owner。
 
 ### 3. 目标文件与目录
 
-```text
-crates/application/src/use_cases/research/p4/workbench/
-crates/persistence-postgres/src/adapters/p4/workbench/
-```
+PostgreSQL新增 `adapters/p4/workbench/{mod,matches,tasks,research,evidence,conflicts}.rs`。Application在两项原用例补inline测试并复用原Probe，不创建只有转发的research/p4/workbench目录。
 
 ### 4. 文件职责边界
 
-- 每个文件只承担一个可用一句话描述的职责。
-- 目录出口文件只负责显式导出。
-- 协调器只编排，不实现数据访问、UI 渲染或领域计算。
+mod只显式登记；matches持有比赛/可空赛事与原100任务列表的投影；tasks只汇总现有读取；research读取研究状态/响应/次数/错误/时间；evidence读取当前run的来源与时间证据；conflicts读取run内成员、最新全局事件、run内评估和任务人工裁决。每项SQL与其Row投影共置，不另建通用Mapper。
 
 ### 5. 输入
 
-- 无。
+既有 `match_id: Uuid` 或 `task_id: Uuid`；任务记录中的research_run_id/snapshot_id决定可选读取。沿用原实例连接池和上下文，不新增输入、时钟或身份。
 
 ### 6. 输出
 
-- 稳定的模块公开接口、可独立测试的实现和对应契约测试。
+原P4MatchWorkspace/P4TaskWorkspace及嵌套DTO原样返回；赛事/研究/人工裁决/快照保留Option，缺少研究时证据和冲突为空，NULL人工selected_evidence_ids仍为空数组。
 
 ### 7. 允许依赖
 
-- 无。
+Application只用既有PredictionWorkflowPort；composition已有Postgres方法→PortError映射不动。新PG查询用原PostgresStore/PersistenceResult、football_domain、sqlx Row与Uuid，汇总复用原任务/readiness/events/routes/snapshot方法。
 
 ### 8. 禁止依赖
 
-- 无。
+不在Application加入SQL/具体持久化；读取owner不创建事务、队列、模型调用、状态迁移、裁决、证据、快照或审计写入，不新增缓存/后台任务/依赖。
 
 ### 9. 状态所有权
 
-- 该任务不新增跨模块共享状态；需要状态时由目标模块内具名 State/Coordinator 唯一持有。
+连接池归原PostgresStore；工作台数据仅由单次请求局部变量拥有，返回DTO。原任务/研究/快照/人工账本状态保持原owner，测试Probe新增字段只在cfg(test)内。
 
 ### 10. 副作用边界
 
-- 所有 I/O、副作用和外部调用必须集中在明确命名的 adapter/transport/repository/workflow 文件。
+生产改动仅把四段原SELECT迁入查询owner；所有原SQL literal逐字保持，绑定值/顺序、fetch_optional/fetch_one/fetch_all、Row字段、错误传播保持。五项人工写入函数逐token保持。
 
 ### 11. 异常路径
 
-- 保持现有错误码、错误类型和用户可见提示语义；新增内部错误必须在边界映射为既有公共错误。
+比赛缺失仍InvalidState“比赛不存在”；任务缺失仍“P4冻结任务不存在”；数据库/Row映射错误仍早停。任务→就绪度→事件→路由→研究→证据→冲突→快照顺序不动，不产生部分成功视图，不增加吞错、重试或回退。
 
 ### 12. 并发/异步/生命周期
 
-- 所有异步请求必须具备请求 ID、取消或过期结果丢弃策略；销毁时解除监听器、定时器和挂起回调。
+保留原异步顺序和独立连接池读取；未增加跨查询一致快照事务，因此不承诺各字段来自同一数据库时刻。请求取消、过期UI结果及监听器归原调用方；未创建需释放的后台资源。
 
 ### 13. 兼容要求
 
-- P4.4 保持 SHADOW_ONLY。
-- P7 固定 lambda、概率、矩阵和 top scoreline 回归一致。
-- 历史 cutoff、输入指纹、路由和 schema 不变。
+两Store方法、原Facade/Service/Port/composition/Tauri命令和DTO/serde/Schema、数据格式、配置、错误/日志/UI语义保持；43 Ports/171命令/365类型/300映射、依赖/锁文件、模型与参数、P4.4 SHADOW_ONLY/P7、cutoff与路由及46迁移均保持。
 
 ### 14. 实施步骤
 
-1. 读取 R0 生成的文件、命令、类型和调用方清单，确认本任务准确影响范围。
-2. 为目标目录创建清晰的 `mod.rs`/`index.ts` 出口，出口只 re-export，不承载业务逻辑。
-3. 先迁移或补齐契约测试，再实现新文件。
-4. 按职责逐文件实现；发现单文件再次出现第二职责时立即递归升级为子目录。
-5. 接入上游和下游，确保跨层只经过公开接口。
-6. 切换唯一入口，删除旧职责实现、重复类型、重复状态和重复样式。
-7. 运行最小验证、阶段回归和保护资产验证。
-8. 更新 README 并创建可回退原子提交。
+先核实10精确Windows成功并五文档收尾；以该同源码文档head为基线，按实际职责提取SQL与汇总，移除旧读实现，补原Application/PG测试及原Prediction门禁，刷新使用清单并复核原逻辑/SQL/写入。
 
 ### 15. 切换入口
 
-- 在新实现通过最小验证后切换唯一调用入口；切换完成后立即运行契约验证。
+原public inherent Store方法签名保持，定义分别由matches/tasks唯一持有；既有composition/Service/命令无需改名或新增转发。p4/mod显式登记新workbench，旧根文件只持人工裁决写入。
 
 ### 16. 删除清单
 
-- 删除被本任务替代的旧职责实现、重复出口、重复测试和临时转发。
+移除旧p4_workbench中的两项读取实现及其五个专用Domain导入；没有整文件删除、移动/重命名或旧读空壳。五项writer完整保留，后续Freeze责任未提前改写。
 
 ### 17. 最小验证
 
-- 相关 crate/feature 单元测试通过。
-- TypeScript/Rust 编译或类型检查通过。
-- 架构边界脚本通过。
-- 模型保护资产指纹通过。
+原Application target增加4测试，覆盖比赛身份/可空赛事/顺序、任务空及丰富视图与进展/终态、两个边界全部六种Port错误且无写入/重试。原ignored Stage C扩真实投影、run/task隔离、NULL来源/时间、排序、人工裁决/全局最新事件、冻结快照、研究元数据与重复/未知ID读取无账本写入。预期Application118（114+4）/Persistence169，须自身Windows实跑，18 broad PG仍ignored。
 
 ### 18. 阶段回归
 
-- `npm run verify:frontend`。
-- `cargo fmt --all -- --check`。
-- `cargo clippy --locked --workspace --all-targets -- -D warnings`。
-- `cargo test --locked --workspace`。
+本地83项原前端源码门禁、完整 `npm run verify:architecture`、Prediction/Domain/源码卫生、18保护资产/171命令/46迁移与18 PG静态契约、Rustfmt1.88和diff通过。七项破坏探针均拒绝恢复；四SQL、比赛函数、两Application入口、三个查询投影及重内联任务汇总等价，五writer不变。完整frontend/类型/Vite/17视口、Clippy/workspace tests、Windows release/MSI/NSIS/启动留原Windows CI。
 
 ### 19. 失败停止条件
 
-- 任何保护资产指纹变化。
-- 公共契约出现未批准变化。
-- 最小验证失败。
-- 发现用户未提交修改与目标文件重叠且无法安全合并。
+保护资产/公开契约/门禁失败必须修复；11保持VERIFYING，不继承10 PASS，不自动开始12或创建R8阶段完成记录。私有Golden Master或真实PG未执行继续明确待验。
 
 ### 20. 回退点
 
-- 回退到 R8-11 开始前的已验证提交；不得手工复制旧文件恢复。
+本项基线 `2770adca714fa471e3d801ecd3f541f0f6a05db4`（10已验源码481bfcb的纯文档收尾）。受控revert本节点提交，同步唯一owner、module登记、原测试/清单/门禁与文档；不手工复制双实现或变更历史库。
 
 ### 21. 根 README 摘要记录
 
-- 记录 R8-11 实际创建、移动、删除的文件。
-- 记录执行过的命令、结果、未执行项与剩余风险。
+根README记录实际读取职责和契约保持、7A/14M且无整文件移动/删除、原测试与静态结果及Windows待验；完整清单和风险由节点记录提供。
 
 ### 22. docs 阶段节点详细记录
 
-- 创建 `docs/modular-rewrite/R08-prediction-p4-orchestration/R08-11-workbench-reads.md`。
-- 记录本节点实际做了什么、为何修改、修改前后职责、行为和依赖变化。
-- 分别列出全部新增、修改、移动/重命名和删除文件；没有对应类型时明确写“无”。
-- 文件清单必须与本节点真实 `git diff --name-status` 和最终工作区一致。
-- 记录公共接口、DTO、Schema、数据格式、配置、错误语义、日志、UI 行为和模型保护资产是否变化。
-- 记录实际执行的验证命令、环境、结果和报告路径；未执行项必须写明原因、替代验证和剩余风险。
-- 记录入口切换、旧实现清理、关键设计决策、计划偏差和回退方法。
-- 更新 `docs/modular-rewrite/R08-prediction-p4-orchestration/README.md` 中本任务的状态、记录链接和门禁结果。
-- 节点记录及阶段索引未完成时，本任务只能停留在 `VERIFYING`，不得改为 `DONE`。
+创建 [R08-11-workbench-reads.md](../modular-rewrite/R08-prediction-p4-orchestration/R08-11-workbench-reads.md)，列全A/M/D、原读取与写入边界、测试/探针、真实PG延期、夹具订正、清单/插件与回退；更新索引。11 VERIFYING，12 BLOCKED。
 
 ### 23. 完成标准
 
-- 目标职责已由唯一新模块承担。
-- 旧入口和旧实现已删除。
-- 最小验证与阶段回归均通过。
-- README 与实际状态一致。
-- `R08-11-workbench-reads.md` 已创建并与实际变更、验证结果一致。
-- 阶段 `README.md` 已更新本任务状态和记录链接。
+职责唯一、旧读实现退出且文档一致；自身精确Windows全链路成功后才能补验收证据并关闭11。真实PG/历史四项/账本/XLSX/Windows Full/私有固定回归与继承删除风险继续最终封包新库待验。
 
 ---
 

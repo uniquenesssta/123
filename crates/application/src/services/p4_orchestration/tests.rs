@@ -451,11 +451,23 @@ impl PredictionWorkflowPort for Probe {
     ) -> PortResult<Vec<P4FreezeTaskRecord>> {
         panic!("forbidden Port call: list_freeze_tasks")
     }
-    async fn read_match_workspace(&self, _match_id: Uuid) -> PortResult<P4MatchWorkspace> {
-        panic!("forbidden Port call: read_match_workspace")
+    async fn read_match_workspace(&self, match_id: Uuid) -> PortResult<P4MatchWorkspace> {
+        self.call("match_workspace")?;
+        let mut state = self.state.lock().unwrap();
+        state.match_workspace_requests.push(match_id);
+        Ok(state
+            .match_workspace
+            .clone()
+            .expect("selected match workspace"))
     }
-    async fn read_task_workspace(&self, _task_id: Uuid) -> PortResult<P4TaskWorkspace> {
-        panic!("forbidden Port call: read_task_workspace")
+    async fn read_task_workspace(&self, task_id: Uuid) -> PortResult<P4TaskWorkspace> {
+        self.call("task_workspace")?;
+        let mut state = self.state.lock().unwrap();
+        state.task_workspace_requests.push(task_id);
+        Ok(state
+            .task_workspace
+            .clone()
+            .expect("selected task workspace"))
     }
     async fn create_freeze_task(
         &self,

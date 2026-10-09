@@ -305,5 +305,39 @@ check(read(`${horizonRoot}/queue.rs`).includes("fn planned_resume_uses_inclusive
 const horizonPg=read("crates/persistence-postgres/tests/postgres_integration.rs");
 for(const token of ["let horizon_draft = P4FreezeTaskDraft", "create_p4_freeze_task(&concurrent_draft)", "transition_p4_freeze_task(&rejected)", "p4_freeze_task_created", "p4_freeze_task_transitioned", "UPDATE platform.p4_freeze_task_events SET reason='changed'", "horizon_task.data_cutoff_at"]) check(horizonPg.includes(token),`R8-10 既有PG夹具缺少任务事务/重试/不可变断言：${token}`);
 
+
+// R8-11: existing read entry points, independent query owners and task/run scoped projections.
+const workbenchRoot="crates/persistence-postgres/src/adapters/p4/workbench";
+const workbenchExport=read(`${workbenchRoot}/mod.rs`),matchRead=read(`${workbenchRoot}/matches.rs`),workspaceRead=read(`${workbenchRoot}/tasks.rs`),researchRead=read(`${workbenchRoot}/research.rs`),evidenceRead=read(`${workbenchRoot}/evidence.rs`),conflictRead=read(`${workbenchRoot}/conflicts.rs`);
+const workbenchLegacy=read("crates/persistence-postgres/src/p4_workbench.rs");
+check(read("crates/persistence-postgres/src/adapters/p4/mod.rs").includes("pub(crate) mod workbench;") && !workbenchExport.includes("fn "),"R8-11 adapter必须接入，目录只显式登记职责");
+for(const name of ["matches","tasks","research","evidence","conflicts"]) check(workbenchExport.includes(`mod ${name};`),`R8-11 缺少独立读取职责：${name}`);
+for(const [name,file] of [["read_p4_match_workspace","matches"],["read_p4_task_workspace","tasks"]]) {
+ const owners=rustFiles("crates/persistence-postgres/src").filter(path=>read(path).includes(`pub async fn ${name}(`));
+ check(owners.length===1 && owners[0]===`${workbenchRoot}/${file}.rs` && !workbenchLegacy.includes(`fn ${name}(`),`R8-11 公共读取必须有唯一owner：${name}`);
+}
+check((workbenchLegacy.match(/\bfn /g)??[]).length===5 && ["append_p4_manual_route_override","validate_selected_conflict_evidence","append_conflict_event_in_tx","lock_override","manual_override_from_row"].every(name=>workbenchLegacy.includes(`fn ${name}(`)),"R8-11 必须保留五项原人工决策写入职责");
+for(const type of ["P4ManualConflictDecisionKind","P4ManualRouteOverrideDraft","P4ManualRouteOverrideRecord"]) check(new RegExp(`use football_domain::\\{[^}]*\\b${type}\\b[^}]*\\};`).test(workbenchLegacy),`R8-11 保留writer缺少真实Domain导入：${type}`);
+const readSources=[matchRead,workspaceRead,researchRead,evidenceRead,conflictRead];
+for(const source of readSources) for(const token of [".begin(",".commit(",".execute(","INSERT INTO","UPDATE ","DELETE FROM","Uuid::new","Utc::now",".enqueue(",".transition_p4_freeze_task(","record_research_run_event(","append_p4_manual_route_override("]) check(!source.includes(token),`R8-11 读取职责不得写入、生成身份或重新执行工作流：${token}`);
+check(!workspaceRead.includes("sqlx::") && !workspaceRead.includes("SELECT "),"R8-11 任务汇总只编排既有读取职责");
+const workspaceOrder=[".read_p4_freeze_task(task_id)",".p4_freeze_readiness(task_id)",".list_p4_freeze_task_events(task_id)",".p4_routed_facts(task_id)","research::read(self, research_run_id)","evidence::read(self, research_run_id)","conflicts::read(self, research_run_id, task_id)",".read_prematch_snapshot(snapshot_id)","Ok(P4TaskWorkspace {"];
+const workspacePositions=workspaceOrder.map(token=>workspaceRead.indexOf(token));
+check(workspacePositions.every((pos,index)=>pos>=0 && (index===0 || pos>workspacePositions[index-1])),"R8-11 读取顺序/错误优先级必须保持");
+check((workspaceRead.match(/if let Some\(research_run_id\) = task.research_run_id/g)??[]).length===3 && workspaceRead.includes("if let Some(snapshot_id) = task.snapshot_id") && (workspaceRead.match(/Vec::new\(\)/g)??[]).length===2 && (workspaceRead.match(/\n\s*None\n/g)??[]).length===2,"R8-11 无研究或快照时保持None/空集合，不做查询");
+check(matchRead.includes("LEFT JOIN football.competitions") && matchRead.includes("WHERE fixture.id = $1") && matchRead.includes(".bind(match_id)") && matchRead.includes(".fetch_optional(&self.pool)") && matchRead.includes('PersistenceError::InvalidState("比赛不存在".to_string())') && matchRead.includes("self.list_p4_freeze_tasks(Some(match_id), 100).await?"),"R8-11 比赛精确身份/可空赛事/不存在错误/100任务上限必须保持");
+check(researchRead.includes("WHERE id = $1") && researchRead.includes(".bind(research_run_id)") && researchRead.includes(".fetch_one(&store.pool)"),"R8-11 研究元数据按精确run读取，不添加回退");
+for(const field of ["id","status","attempt_count","response_id","model_id","error_category","error_message","created_at","started_at","finished_at"]) check(researchRead.includes(`row.try_get("${field}")?`),`R8-11 研究元数据丢失：${field}`);
+check(evidenceRead.includes("WHERE research_run_id = $1") && evidenceRead.includes(".bind(research_run_id)") && evidenceRead.includes("ORDER BY field_key, created_at, id"),"R8-11 证据必须按当前run过滤并保持三字段排序");
+for(const field of ["id","field_key","entity_type","entity_id","value","verification_state","source_tier","source_url","source_title","source_domain","published_at","observed_at","effective_at","retrieved_at","timezone","conflict_group_id","created_at"]) check(evidenceRead.includes(`row.try_get("${field}")?`),`R8-11 原证据来源/时间/值投影丢失：${field}`);
+for(const token of ["claim.research_run_id = $1","members ON cardinality(members.evidence_ids) > 0","COALESCE(latest_event.event_type, 'opened') AS conflict_status","evaluation.research_run_id = $1","manual_override.task_id = $2","manual_override.conflict_id = conflict.id","array_agg(member.evidence_id ORDER BY member.evidence_id)","ORDER BY event.occurred_at DESC, event.id DESC","ORDER BY evaluation.created_at DESC, evaluation.id DESC","ORDER BY manual_override.created_at DESC, manual_override.id DESC","ORDER BY conflict.field_key, conflict.created_at, conflict.id"]) check(conflictRead.includes(token),`R8-11 冲突run/task范围或最新事件/评估/人工裁决排序漂移：${token}`);
+check(/\.bind\(research_run_id\)\s*\.bind\(task_id\)/.test(conflictRead) && /try_get::<Option<Vec<Uuid>>, _>\("selected_evidence_ids"\)\?\s*\.unwrap_or_default\(\)/.test(conflictRead),"R8-11 冲突run/task绑定顺序或NULL人工证据空数组语义丢失");
+for(const [owner,dto,method,tests] of [["read_p4_match_workspace","P4MatchWorkspace","read_match_workspace",["match_workspace_preserves_identity_nullable_competition_and_task_order_without_writes","match_workspace_preserves_all_port_errors_without_retry_or_fallback"]],["read_p4_task_workspace","P4TaskWorkspace","read_task_workspace",["task_workspace_preserves_empty_and_populated_views_in_progressed_and_terminal_states","task_workspace_preserves_all_port_errors_without_partial_view_or_retry"]]]) {
+ const source=read(`crates/application/src/use_cases/prediction/${owner}/mod.rs`),production=source.split("#[cfg(test)]")[0];
+ check(production.includes(`Ok(port.${method}(`) && production.includes(`ApplicationResult<${dto}>`) && (production.match(/await/g)??[]).length===1 && !production.includes("sqlx::"),`R8-11 既有Application委托边界漂移：${owner}`);
+ for(const name of tests) check(source.includes(`fn ${name}`),`R8-11 原Application目标缺少工作台回归：${name}`);
+}
+for(const token of ["workbench-null-competition", "workbench-foreign-conflict", "NULL manual evidence becomes the original empty array", "workspace evidence field {field} must survive unchanged", "workbench snapshot fixture", "workbench reads must not write task/job/research/evidence/snapshot/audit ledgers", "workbench-peer-manual", "peer_conflict.manual_decision_kind.is_none()", "frozen_view.snapshot.as_ref().unwrap()", "workspace-response", "ConflictEvaluationStatus::ManualRequired", "workbench manual fixture", "one immutable decision per (task, conflict)"]) check(horizonPg.includes(token),`R8-11 原PG Stage C缺少真实读取投影契约：${token}`);
+
 if(failures.length) throw new Error(`Prediction Service 验证失败\n${failures.map((item)=>`- ${item}`).join("\n")}`);
 console.log(`Prediction Service 验证通过：${predictionFiles.length} 个 Service/Use Case Rust 文件，18 个公开 Application 职责已进入 Prediction Service/Ports 边界，P4 freeze execution 与 snapshot persistence 均不再由旧混合 owner 直接实现。`);

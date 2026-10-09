@@ -36,6 +36,8 @@ R8-10 Horizon Orchestration 已收尾为 `DONE`：规划预检、时点身份、
 
 R8-10 首轮 `db5fd51` / [Windows run `37884818742`](https://github.com/uniquenesssta/123/actions/runs/37884818742) 因保留的 `p4_orchestration.rs` readiness 使用 `ResearchRunStatus` 却缺少模块导入而报 E0433；前端/类型/生产构建和17视口已通过，Rust测试/打包/启动未完成。修复补回该生产导入，原五函数体、SQL和规划行为保持；既有 Prediction 门禁增加该依赖检查，移除导入的探针已拒绝并恢复，Domain使用摘要同步。修复提交时保持VERIFYING；现精确修复Windows全SUCCESS，10完成证据见上段及完成记录。
 
+R8-11 Workbench Reads 已实施并进入 `VERIFYING`：原工作台数据库读取归 `adapters/p4/workbench/` 的比赛、任务汇总、研究、证据与冲突职责；原Application用例与Port委托保持，四段SQL、读取顺序/错误、NULL来源/赛事/裁决与任务人工覆盖政策保持，人工裁决五项writer不变。新增6个Rust职责文件及1份节点记录，修改14文件，无整文件移动/删除；详见 [11实施记录](docs/modular-rewrite/R08-prediction-p4-orchestration/R08-11-workbench-reads.md)。4项原target新增Application测试预期118/Persistence169须自身Windows确认；83源码/架构/静态资产与七项探针已通过。原Windows CI启动后停止轮询，12 BLOCKED；真实PG/XLSX/Full/私有固定回归和继承删除风险继续最终新库待验。
+
 ## 公开边界
 
 - 保留 `crates/model-api`、模型 ID、路由、规则包入口、预测页面和历史数据结构。
