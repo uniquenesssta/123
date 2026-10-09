@@ -1,8 +1,8 @@
 # Figma Patterns & Screen Plan
 
-**2026-10-09 修复检查点：INT-01 的96处默认导航缺口已实际补齐并回读；34个默认明暗画面272/272个非选中入口具有正确产品路由，缺口与错误目标均0。整体仍未通过；INT-02、INT-03、INT-04待修复。默认导航中另有8条既存主题不连续，保留归入INT-02。仅验证存储动作，未作完整浏览器事件回放。详见[修复记录](FIGMA_PROTOTYPE_INTEGRATION_REPAIRS.md)。**
+**2026-10-09 第二批修复检查点：INT-01 已修复；INT-03 的球队来源档案返回与 INT-02 的普通导航主题连续性已通过存储动作复验。705 个产品状态的普通主题变化候选为 0；28 个明暗来源档案保持首尔 FC 返回。整体仍为 NOT_PASSED，INT-04 待修复及全产品复验。未进行浏览器全事件回放或真实运行时验收。详见[修复记录](FIGMA_PROTOTYPE_INTEGRATION_REPAIRS.md)和[本批节点与复验数据](FIGMA_PROTOTYPE_REPAIR_BATCH02.json)。**
 
-> 以下原验收数量和“只读／修复未启动”叙述属于修复前历史快照；当前修复状态以本页顶部与修复记录为准。
+> 下文原验收的 933 根、561 状态、156 候选及“只读／尚未修复”均为历史快照；当前为 1,077 根、705 状态，INT-01/02/03 限定范围已修复，INT-04 未修复。当前状态以顶部、修复记录及第二批数据为准。
 
 **设计依据：Figma决定尺寸、比例、间距、字号和颜色；源码只提供功能、交互与数据语义。旧CSS不是新视觉依据。** 唯一设计记录分支`ui-design-system`。
 
@@ -10,11 +10,11 @@
 
 图标、底层组件、六组Patterns以及计划内17条Screens的可编辑视觉与代表性本页状态阶段完成。Controls **61 sets/506 variants**；Patterns **17 sets/125 variants/13 production singles**。S17回读Foundations仍为**193 variables/13 text styles/6 effects**，没有修改共享资产。
 
-**2026-10-09，Screens视觉与限定本页状态为17 / 17，没有尚未制作的产品页面。随后执行的全产品原型连通与状态一致性验收整体未通过，问题INT-01至INT-04尚未修复。** S01–S17累计561个产品状态仍只计17条路由。弹窗、Review Hub、上下文菜单与Pattern QA不增加路由数。
+**2026-10-09，Screens视觉与限定本页状态为17 / 17，没有尚未制作的产品页面。随后执行的全产品原型连通与状态一致性验收整体未通过，INT-01/02/03 的限定存储动作修复已完成，INT-04 待修复。** S01–S17 原视觉基线 561 状态，本批后为 705 状态，仍只计 17 条路由。弹窗、Review Hub、上下文菜单与Pattern QA不增加路由数。
 
-**17页视觉完成不等于全产品集成、软件完成或发布通过。** 本轮仅进行只读验收与记录，没有改动画布、应用源码或共享资产，没有新增S18。
+**17页视觉完成不等于全产品集成、软件完成或发布通过。** 首次验收为只读；其后原型已修复接线并新增来源/主题状态，应用源码和共享资产未改，没有新增 S18。
 
-最新恢复：[验收报告](FIGMA_PROTOTYPE_INTEGRATION_AUDIT.md) → [验收状态](FIGMA_PROTOTYPE_INTEGRATION_STATE.json) → [总状态](FIGMA_SCREENS_STATE.json)中的integrationAudit。S17[详细状态](FIGMA_SCREEN_ARCHITECTURE_STATE.json)和[独立记录](FIGMA_SCREEN_ARCHITECTURE.md)继续保留，完整页面清单见[17路由计划](FIGMA_SCREENS_PLAN.md)。
+最新恢复：[验收报告](FIGMA_PROTOTYPE_INTEGRATION_AUDIT.md) → [验收状态](FIGMA_PROTOTYPE_INTEGRATION_STATE.json) → [总状态](FIGMA_SCREENS_STATE.json)中的integrationRepair。S17[详细状态](FIGMA_SCREEN_ARCHITECTURE_STATE.json)和[独立记录](FIGMA_SCREEN_ARCHITECTURE.md)继续保留，完整页面清单见[17路由计划](FIGMA_SCREENS_PLAN.md)。
 
 ## Patterns执行记录
 
@@ -48,12 +48,13 @@
 - [x] S17 `architecture`：系统边界、运行原则、五类模块及静态阅读布局。
 - [x] 各页独立状态明确记录的有限真实入站与返回。
 - [x] 全产品存储原型图、默认导航矩阵与指定状态路径验收已执行，结论未通过。
-- [ ] 修复INT-01至INT-04并复验导航、来源返回与主题/全局状态持续性。
+- [x] INT-01/02/03 限定存储动作修复与复验。
+- [ ] 修复 INT-04 并复验全产品导航、来源返回、主题与全局状态持续性。
 - [ ] 全部真实功能、源码差异、文件/凭据/数据库/模型运行时与端到端集成。
 
 各页历史计数、节点、源码差异及未实现事项以独立记录为准。S17只新增13个产品状态和5个只读弹窗，增加一条路由。
 
-## 全产品原型验收
+## 首次全产品原型验收（修复前历史）
 
 933根及12,215项存储反应已检查；从首页不依赖Hub可到达17路由，各页Hub可达本页全部状态。失效目标和跨出Screens的导航0；3,738个可见Disabled实例的自身及祖先指针旁路0。
 

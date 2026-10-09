@@ -22,10 +22,10 @@
   "acceptedRouteCountDefinition": "Editable visual composition, representative local presets and bounded prototype. Not arbitrary inputs or records, live operations, complete navigation/state continuity, automatic responsive behavior or end-to-end acceptance.",
   "nextScreen": null,
   "nextScreenStarted": false,
-  "nextWork": "INT-03 and INT-02 preserving origin, identity and business state, then INT-04 and whole-product retest",
-  "nextWorkStarted": true,
+  "nextWork": "INT-04 global history/collapse/reset, then whole-product prototype retest",
+  "nextWorkStarted": false,
   "allPlannedPatternsComplete": true,
-  "latestActivity": "prototype_integration_repair_INT01",
+  "latestActivity": "prototype_integration_repair_batch02",
   "latestActivityExecutionFinished": true,
   "integrationAudit": {
     "runId": "footfigma-prototype-integration-audit-2026-10-09",
@@ -80,7 +80,8 @@
     "runtimeImplementationStarted": false,
     "canvasNodesModified": 0,
     "applicationSourceModified": false,
-    "scope": "Stored graph and default effective-navigation matrix, pointer disabled hierarchy, specified semantic paths and screenshots; not complete runtime, all event combinations, full visual or security re-audit."
+    "scope": "Stored graph and default effective-navigation matrix, pointer disabled hierarchy, specified semantic paths and screenshots; not complete runtime, all event combinations, full visual or security re-audit.",
+    "historicalSnapshotBeforeRepairs": true
   },
   "authority": "Figma determines visual geometry, typography, spacing and color. Source provides functional, interaction and data semantics only.",
   "statePath": "docs/FIGMA_SCREENS_STATE.json",
@@ -588,7 +589,7 @@
       "logs"
     ],
     "all17RoutesIntegrated": false,
-    "remainingTargets": "All planned visuals exist and all routes are reachable from home; repair integration navigation, theme, source-return and global-history findings, then retest. Runtime remains separate.",
+    "remainingTargets": "INT-04 global history/collapse/reset and whole-product retest remain; INT01/02/03 bounded stored-graph repairs recorded in integrationRepair.",
     "all17DefaultRootsExist": true,
     "priorPagesReaudited": false,
     "priorPagesReauditedDefinition": "No repeated full visual/runtime audit; latest whole-product stored-graph review is recorded separately in integrationAudit."
@@ -689,9 +690,9 @@
   },
   "pendingForCurrentVisualScope": [],
   "pending": [
-    "Repair INT-01 through INT-04 and repeat whole-product prototype navigation/state-continuity acceptance",
+    "Repair INT-04 and repeat whole-product prototype navigation/state-continuity acceptance; INT01/02/03 bounded stored-graph repairs complete",
     "Remaining genuine source-entry backfills and all identity/return-path combinations",
-    "Complete theme/collapse/back-forward/scroll/focus/draft persistence across routes",
+    "Complete history/collapse/reset, arbitrary source/theme combinations, scroll/focus/draft persistence and browser playback",
     "All previous page source-alignment issues and runtime gaps remain open",
     "Live file/API/credential/database transactions, concurrency, idempotency and unknown-result recovery",
     "External model availability, actual measurements and full release acceptance",
@@ -702,17 +703,18 @@
     "S17 is13 reading/layout states with5 read-only dialogs, not13 new routes.",
     "No live network, model, file, credential, database or deployment operation occurred.",
     "Unsupported Compact theme and global Shell collapse/reset actions show scope rather than complete controllers.",
-    "Latest stored-graph audit covered all933 roots; full prior visual/runtime acceptance was not repeated.",
-    "No new page or S18 is invented. Integration audit completed NOT_PASSED; prototype repairs and runtime work are not started.",
+    "Original full audit covered933 roots; Batch02 ordinary-theme retest covers705 current product states. Full visual/runtime audit not repeated.",
+    "No S18. INT01/02/03 bounded prototype repairs complete; overall integration NOT_PASSED and runtime work not started.",
     "All prior runtime, safety and persistence limitations remain in independent records."
   ],
   "recovery": {
     "order": [
       "docs/README.md",
-      "docs/FIGMA_PROTOTYPE_INTEGRATION_AUDIT.md",
+      "docs/FIGMA_PROTOTYPE_INTEGRATION_REPAIRS.md",
+      "docs/FIGMA_PROTOTYPE_REPAIR_BATCH02.json",
       "docs/FIGMA_PROTOTYPE_INTEGRATION_STATE.json",
-      "docs/FIGMA_SCREENS_STATE.json integrationAudit",
-      "relevant page-local state and actual Figma stable nodes"
+      "docs/FIGMA_SCREENS_STATE.json integrationRepair",
+      "actual Figma stable nodes"
     ],
     "staleWipDoesNotOverrideAccepted": true,
     "pageLocalAcceptedDoesNotOverrideFailedIntegrationAudit": true,
@@ -727,73 +729,47 @@
   "existingMastersModified": false,
   "sharedVariablesModified": false,
   "priorScreenVisualsModified": false,
-  "priorScreenPrototypeNodesModified": 6,
-  "priorScreenPrototypeNodesModifiedScope": "Historical S17 entry wiring; latest integration audit modified zero canvas nodes.",
+  "priorScreenPrototypeNodesModified": true,
+  "priorScreenPrototypeNodesModifiedScope": "INT01 default navigation96 plus Batch02 source and ordinary-theme repairs; full node data in repair records.",
   "newScreenMasters": 0,
   "runtimeOperationsPerformed": false,
   "integrationRepair": {
-    "phase": "INT01_repaired_remaining_findings_open",
+    "phase": "INT01_INT02_INT03_repaired_INT04_open",
     "overallAcceptance": "NOT_PASSED",
     "date": "2026-10-09",
-    "baselineCommit": "86d1ec5e54e98fb657518d476e5f0af8c0696436",
+    "baselineCommit": "5c71a8c099e14da541ff9c8198624a86a86c7232",
     "recordPath": "docs/FIGMA_PROTOTYPE_INTEGRATION_REPAIRS.md",
-    "mutatedNodeCount": 96,
-    "defaultNavigation": {
-      "roots": 34,
-      "nonselected": 272,
-      "gaps": [],
-      "badTargets": [],
-      "themeMismatch": [
-        [
-          "470:18992",
-          "Page/review",
-          "505:34022"
-        ],
-        [
-          "490:24140",
-          "Page/review",
-          "505:34022"
-        ],
-        [
-          "516:50441",
-          "Page/review",
-          "505:34022"
-        ],
-        [
-          "579:125239",
-          "Module/home",
-          "453:2"
-        ],
-        [
-          "579:125239",
-          "Module/matches",
-          "466:4436"
-        ],
-        [
-          "579:125239",
-          "Page/teams",
-          "527:54630"
-        ],
-        [
-          "579:125239",
-          "Page/players",
-          "550:69407"
-        ],
-        [
-          "579:125239",
-          "Page/lineup_presets",
-          "570:86212"
-        ]
-      ],
-      "disabledChecked": 184,
-      "disabledViolations": [],
-      "canvasRootCount": 933
+    "batchDataPath": "docs/FIGMA_PROTOTYPE_REPAIR_BATCH02.json",
+    "createdStateCount": 144,
+    "createdSourceLightStates": 13,
+    "createdThemeStates": 131,
+    "createdHubEntries": 13,
+    "mutatedNodeCount": 1932,
+    "inventory": {
+      "roots": 1077,
+      "productStates": 705,
+      "dialogs": 354,
+      "contextMenus": 1,
+      "reviewHubs": 17,
+      "productRoutes": 17
     },
+    "ordinaryThemeCandidates": 0,
+    "productStatesThemeChecked": 705,
+    "sourceStatesChecked": 28,
+    "sourceContextIssues": 0,
     "openFindings": [
-      "INT-02",
-      "INT-03",
       "INT-04"
     ],
-    "runtimeImplementationStarted": false
-  }
+    "browserPlaybackPerformed": false,
+    "runtimeImplementationStarted": false,
+    "guardRetest": {
+      "rootsChecked": 289,
+      "disabledChecked": 1926,
+      "missingTargets": 0,
+      "disabledOwnOrAncestorPointerViolations": 0,
+      "scope": "288 changed/paired product roots plus S07 Review Hub; visible stored reactions and State=Disabled own/ancestor pointer checks, not all705-state enumeration or browser event replay."
+    }
+  },
+  "currentProductStateFrameCount": 705,
+  "currentRootCount": 1077
 }
