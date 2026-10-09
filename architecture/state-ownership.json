@@ -249,8 +249,36 @@
         "localStorage"
       ],
       "transition": null
+    },
+    {
+      "id": "gateway.circuit-breaker",
+      "owner": "crates/research-gateway/src/resilience/circuit_breaker.rs::CircuitBreaker",
+      "scope": "OpenAiResearchGateway instance across formal/plain/structured requests",
+      "writers": [
+        "CircuitBreaker.check",
+        "CircuitBreaker.record_success",
+        "CircuitBreaker.record_failure"
+      ],
+      "forbidden": [
+        "crates/research-gateway/src/client.rs",
+        "crates/research-gateway/src/transport/**"
+      ],
+      "transition": null
+    },
+    {
+      "id": "gateway.local-cancellation",
+      "owner": "crates/research-gateway/src/resilience/cancellation.rs::CancellationState",
+      "scope": "CancellationToken and its clones; independent tokens are independent",
+      "writers": [
+        "CancellationToken.cancel"
+      ],
+      "forbidden": [
+        "crates/research-gateway/src/client.rs",
+        "crates/research-gateway/src/transport/**"
+      ],
+      "transition": null
     }
   ],
-  "count": 17,
+  "count": 19,
   "last_updated_task": "R3-02"
 }

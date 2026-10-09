@@ -11,7 +11,7 @@ R8 的12个节点及 Windows Automated 阶段出口已DONE，最终代码 `af3c9
 
 执行总纲顶部订正：只在Windows动态验证，复用原targets/contract/workflow/数据库入口，不新增持续回归体系；R9不升级外部协议、不修改AI Workspace前端。R8期间 `crates/research-gateway/`、公开契约、依赖与配置保持，最终CI原Gateway测试/contract通过，原协议行为作为下一节点基线。
 
-用户已明确“开始R9-01”，编号映射已厘清。从R8文档收尾 `c72e559af4f29c9510daf2f9bf66b926dacb3013` 建立唯一分支 `rewrite/r9-research-ai-backend`；01共享传输自身精确Windows全SUCCESS、DONE，用户“收尾01开始02”授权02，已自身精确Windows全SUCCESS、DONE；用户“收尾02开始03”授权03 READY，04～11 BLOCKED，精确状态见 [阶段索引](../modular-rewrite/R09-research-ai-backend/README.md)。必须取得01自身Windows CI，R8成功不能替代。适用总纲顶部职责/生命周期/既有验证订正，真实验证延期边界继续保留。
+用户已明确“开始R9-01”，编号映射已厘清。从R8文档收尾 `c72e559af4f29c9510daf2f9bf66b926dacb3013` 建立唯一分支 `rewrite/r9-research-ai-backend`；01共享传输自身精确Windows全SUCCESS、DONE，用户“收尾01开始02”授权02，已自身精确Windows全SUCCESS、DONE；用户“收尾02开始03”授权03，已实施VERIFYING，04～11 BLOCKED，精确状态见 [阶段索引](../modular-rewrite/R09-research-ai-backend/README.md)。必须取得01自身Windows CI，R8成功不能替代。适用总纲顶部职责/生命周期/既有验证订正，真实验证延期边界继续保留。
 
 ## 1. 阶段目标
 
@@ -384,139 +384,123 @@ R9-02 首轮 `98d542f` / [Windows run `37944445186`](https://github.com/uniquene
 
 ## R9-03 Retry、Circuit Breaker 与 Cancel
 
-状态：`READY`（02精确Windows全SUCCESS并DONE，用户“收尾02开始03”已授权）。
+状态：`VERIFYING`（02自身Windows全SUCCESS并DONE，用户已授权03；本项静态/记录完成，待自身Windows）。
 
 ### 1. 目标
 
-- 完成 Retry、Circuit Breaker 与 Cancel 的完全重写，并将该能力收敛到唯一、可递归拆分的模块目录。
+- 已把原重试预算/等待、熔断状态与本地取消令牌归到唯一resilience职责；协议编排留原client，不改业务策略。
 
 ### 2. 现状与来源
 
-- `crates/research-gateway/`。
-- application/openai_research、api_workspace。
-- src-tauri openai/workspace stores。
+- 原client.rs混合三协议、三个重复退避select、CircuitState/三状态方法、取消错误；原cancellation.rs只持本地令牌。
+- 原GatewayAttemptSink、Application/Tauri Registry、Responses远端取消/轮询继续原owner；R9-10另处理Registry。
 
 ### 3. 目标文件与目录
 
-```text
-crates/research-gateway/src/resilience/retry/
-crates/research-gateway/src/resilience/circuit_breaker/
-crates/research-gateway/src/resilience/cancellation/
-```
+- `resilience/{retry,circuit_breaker,cancellation}.rs` 与仅登记/显式export的mod.rs；旧cancellation.rs删除。
+- 按总纲顶部订正使用三个实际职责文件，不为单一可独立职责机械创建空子目录。
 
 ### 4. 文件职责边界
 
-- 每个文件只承担一个可用一句话描述的职责。
-- 目录出口文件只负责显式导出。
-- 协调器只编排，不实现数据访问、UI 渲染或领域计算。
+- retry持原次数上限、指数退避与可取消等待，不持模型/错误重试资格/协议/账本。
+- CircuitBreaker持单一Mutex<CircuitState>及check/success/failure；配置仍唯一GatewayConfig，不克隆第二政策对象。
+- CancellationToken持原Arc<AtomicBool+Notify>共享克隆及原Cancelled错误；不持网络响应ID/Registry。
 
 ### 5. 输入
 
-- 无。
+- 原max_retries、retry_base_delay_ms/retry_index；GatewayError及借用CircuitBreakerConfig；原CancellationToken。
 
 ### 6. 输出
 
-- 稳定的模块公开接口、可独立测试的实现和对应契约测试。
+- 原每模型max_retries+1预算、原Duration/Ok或Cancelled、原CircuitOpen/Ok及同一令牌公共接口。
 
 ### 7. 允许依赖
 
-- 无。
+- 已锁定std、tokio1.52.3 sync/time/macros与现有GatewayError/Config；依赖/feature/锁文件保持。
 
 ### 8. 禁止依赖
 
-- 无。
+- resilience不调用transport、key_provider、HTTP、账本/数据库、Domain预测、Tauri、UI或Responses远端取消。
 
 ### 9. 状态所有权
 
-- 该任务不新增跨模块共享状态；需要状态时由目标模块内具名 State/Coordinator 唯一持有。
+- CircuitBreaker实例唯一持consecutive_failures/open_until，三协议共用；令牌原Arc生命周期唯一持cancelled/notify。
+- 原architecture/state-ownership登记这两个实际owner，配置仍GatewayConfig，Semaphore仍client原请求scope。
 
 ### 10. 副作用边界
 
-- 所有 I/O、副作用和外部调用必须集中在明确命名的 adapter/transport/repository/workflow 文件。
+- retry仅原tokio sleep及取消等待；circuit仅原锁内内存状态；token仅原SeqCst原子位/notify_waiters。
+- 所有网络调用、远端cancel/poll与attempt sink仍原client/transport，不新增IO、日志或持久化事件。
 
 ### 11. 异常路径
 
-- 保持现有错误码、错误类型和用户可见提示语义；新增内部错误必须在边界映射为既有公共错误。
+- 原四类Network/Timeout/RateLimit/ProviderUnavailable计数，与retryable位独立；其余15类不计数且不清零。
+- 到阈值设置原open_seconds窗口，下一入口拒绝；到期或在途成功清零；不新增半开单探针政策。
+- 原sink.record错误先于熔断状态更新；原Cancelled/CircuitOpen完整错误、metadata与优先级保持。
 
 ### 12. 并发/异步/生命周期
 
-- 所有异步请求必须具备请求 ID、取消或过期结果丢弃策略；销毁时解除监听器、定时器和挂起回调。
+- 原三个入口只在请求开始check；在途失败可能打开熔断但当次原重试继续，不增加每次retry检查。
+- 原select分支顺序、公平选择、网络future丢弃及OwnedSemaphorePermit请求scope保持。
+- 令牌先创建Notified再查取消位；SeqCst/notify_waiters/幂等cancel、克隆共享及独立token保持，丢弃等待不取消token。
 
 ### 13. 兼容要求
 
-- 正式研究只走 Responses。
-- 普通问答不带 web search/tools/schema/token fields。
-- 现有配置键与 profile 行为不变。
+- 正式研究只Responses；Plain双协议仍不发送tools/web/schema/token字段。
+- Structured自动web-search兼容回退、模型fallback资格/去重、每模型预算、attempt_offset/饱和及事件顺序全部保持。
+- 原公共Gateway/CancellationToken API、DTO、Schema、配置键/profile、错误文案/日志/UI/版本0.23.0保持。
 
 ### 14. 实施步骤
 
-1. 读取 R0 生成的文件、命令、类型和调用方清单，确认本任务准确影响范围。
-2. 为目标目录创建清晰的 `mod.rs`/`index.ts` 出口，出口只 re-export，不承载业务逻辑。
-3. 先迁移或补齐契约测试，再实现新文件。
-4. 按职责逐文件实现；发现单文件再次出现第二职责时立即递归升级为子目录。
-5. 接入上游和下游，确保跨层只经过公开接口。
-6. 切换唯一入口，删除旧职责实现、重复类型、重复状态和重复样式。
-7. 运行最小验证、阶段回归和保护资产验证。
-8. 更新 README 并创建可回退原子提交。
+1. 已核实02修复自身Windows全SUCCESS，五文档收尾59af3f2，用户授权03；原35 unit/16 contract为基线。
+2. 已迁移三职责及唯一export，原生产体和整个client剩余逻辑完成重路由等价核对。
+3. 原unit新增12、原contract新增5；原测试保持，无新target/runner/workflow/数据库。
+4. 原兼容传输验证器补唯一owner/三入口/政策/唤醒顺序，6破坏探针拒绝恢复。
+5. 静态/保护验证及记录完成；提交自身WindowsCI开始后停止轮询，待下次核实精确结果。
 
 ### 15. 切换入口
 
-- 在新实现通过最小验证后切换唯一调用入口；切换完成后立即运行契约验证。
+- crate根继续公开CancellationToken原名；client直接持CircuitBreaker并调用方法，三个等待共用wait_retry。
+- 不留下Gateway转发方法、旧取消入口、第二状态或第二退避公式；远端取消不是本地token副作用。
 
 ### 16. 删除清单
 
-- 删除被本任务替代的旧职责实现、重复出口、重复测试和临时转发。
+- 删除旧cancellation.rs；client移除CircuitState、check_circuit/record_success/record_failure、retry_delay/cancelled_error和三重复退避select。
+- 原其他client方法和原contract16测试/9具名helper与实现逐token保留；不删除行为/断言。
 
 ### 17. 最小验证
 
-- 相关 crate/feature 单元测试通过。
-- TypeScript/Rust 编译或类型检查通过。
-- 架构边界脚本通过。
-- 模型保护资产指纹通过。
+- 实际83/83原静态检查、完整verify:architecture、Rustfmt1.88源check、171命令、18保护资产、46迁移/18PG静态及diff PASS。
+- 生产3熔断体/原token全部/退避与错误/重路由剩余client/251literal等价，6探针拒绝恢复。
+- 源码预期Gateway47/contract21、Application126/Persistence175，新增12+5须本项Windows实际运行，不能记为已PASS。
 
 ### 18. 阶段回归
 
-- `npm run verify:frontend`。
-- `cargo fmt --all -- --check`。
-- `cargo clippy --locked --workspace --all-targets -- -D warnings`。
-- `cargo test --locked --workspace`。
+- 原Public Platform CI：完整frontend/contracts/TypeScript/Vite/17视口、fmt/Clippy -D warnings/workspace tests、Windows release/MSI/NSIS/启动。
+- 本地仅源码静态，未执行Linux/macOS Cargo/编译/单测/loopback/浏览器动态；真实PG/历史四项/账本并发回滚/有效XLSX/Full/私有固定回归仍最终新库待验。
 
 ### 19. 失败停止条件
 
-- 任何保护资产指纹变化。
-- 公共契约出现未批准变化。
-- 最小验证失败。
-- 发现用户未提交修改与目标文件重叠且无法安全合并。
+- 自身Windows失败只修相关链路，03不得DONE/启动04；公共契约/保护资产/静态门禁失败先修复，不放宽或略过。
 
 ### 20. 回退点
 
-- 回退到 R9-03 开始前的已验证提交；不得手工复制旧文件恢复。
+- 03基线59af3f2ec65030a28150a3042d3b0673d65a48a8，源码等于02精确05055d1/run37954536795成功；受控revert03整体并恢复原唯一owner，不复制双实现、不覆盖用户修改。
 
 ### 21. 根 README 摘要记录
 
-- 记录 R9-03 实际创建、移动、删除的文件。
-- 记录执行过的命令、结果、未执行项与剩余风险。
+- 已同步02DONE/03VERIFYING、5A/10M/1D、职责/等价/12+5测试及实际静态/Windows待验边界。
 
 ### 22. docs 阶段节点详细记录
 
-- 创建 `docs/modular-rewrite/R09-research-ai-backend/R09-03-retry-circuit-breaker-and-cancel.md`。
-- 记录本节点实际做了什么、为何修改、修改前后职责、行为和依赖变化。
-- 分别列出全部新增、修改、移动/重命名和删除文件；没有对应类型时明确写“无”。
-- 文件清单必须与本节点真实 `git diff --name-status` 和最终工作区一致。
-- 记录公共接口、DTO、Schema、数据格式、配置、错误语义、日志、UI 行为和模型保护资产是否变化。
-- 记录实际执行的验证命令、环境、结果和报告路径；未执行项必须写明原因、替代验证和剩余风险。
-- 记录入口切换、旧实现清理、关键设计决策、计划偏差和回退方法。
-- 更新 `docs/modular-rewrite/R09-research-ai-backend/README.md` 中本任务的状态、记录链接和门禁结果。
-- 节点记录及阶段索引未完成时，本任务只能停留在 `VERIFYING`，不得改为 `DONE`。
+- 已创建03实施记录和准确全文件清单、报告/工具/回退；阶段索引03VERIFYING、04～11BLOCKED，R9整体IN_PROGRESS。
 
 ### 23. 完成标准
 
-- 目标职责已由唯一新模块承担。
-- 旧入口和旧实现已删除。
-- 最小验证与阶段回归均通过。
-- README 与实际状态一致。
-- `R09-03-retry-circuit-breaker-and-cancel.md` 已创建并与实际变更、验证结果一致。
-- 阶段 `README.md` 已更新本任务状态和记录链接。
+- 代码/静态/文档已完成；仍须本项精确Windows完整SUCCESS才能03DONE。
+- 未执行真实PG等延期项目不冒充PASS，阶段不创建完成记录或提前启动04。
+
+详见 [03实施记录](../modular-rewrite/R09-research-ai-backend/R09-03-retry-circuit-breaker-and-cancel.md)，含全部文件清单/测试/报告/工具与回退。
 
 ---
 

@@ -1,4 +1,4 @@
-import { readFileSync } from "node:fs";
+import { existsSync, readFileSync } from "node:fs";
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { isVersionAtLeast } from "./version.mjs";
@@ -49,5 +49,30 @@ for (const token of ["error_for_status", "retry_delay", "tokio::select!", "apply
 assert(moduleContract.rust.ports.OpenAiTransport.owner === `${transportRoot}/contract.rs`, "OpenAiTransport架构owner未同步实际契约");
 for (const token of ["transport_preserves_any_json_and_http_status_without_protocol_policy", "empty_response_is_null_and_preserves_original_metadata", "malformed_json_retains_original_error_category_message_and_status"]) assert(transportResponse.includes(`fn ${token}`), `原unit target缺少响应边界测试：${token}`);
 for (const token of ["authentication_headers_preserve_value_and_reject_invalid_characters", "three_http_operations_preserve_method_url_headers_body_and_response", "redirects_are_returned_without_following_location", "timeout_covers_response_body_and_keeps_original_recovery", "invalid_url_keeps_network_error_without_provider_metadata"]) assert(transportHttp.includes(`fn ${token}`), `原unit target缺少HTTP边界测试：${token}`);
+// R9-03: retry policy, circuit state and cloneable local cancellation each have one owner.
+const resilienceRoot = "crates/research-gateway/src/resilience";
+const resilienceExports = text(`${resilienceRoot}/mod.rs`);
+const retry = text(`${resilienceRoot}/retry.rs`).split("#[cfg(test)]")[0];
+const circuit = text(`${resilienceRoot}/circuit_breaker.rs`).split("#[cfg(test)]")[0];
+const cancellation = text(`${resilienceRoot}/cancellation.rs`).split("#[cfg(test)]")[0];
+assert(!existsSync(join(root, "crates/research-gateway/src/cancellation.rs")), "旧取消owner必须删除");
+assert(!/\b(?:fn|struct|trait|impl)\b/.test(resilienceExports), "resilience出口不得承载实现");
+assert(gatewayExports.includes("pub use resilience::CancellationToken;"), "原CancellationToken公开出口未接入唯一owner");
+for (const token of ["struct CircuitState", "fn check_circuit", "fn record_success", "fn record_failure", "fn retry_delay", "fn cancelled_error", "Mutex<CircuitState>"]) assert(!gateway.includes(token), `client仍持有重复resilience职责：${token}`);
+assert((gateway.match(/attempt_limit\(self\.config\.max_retries\)/g) ?? []).length === 3, "三个协议必须共用原重试预算");
+assert((gateway.match(/wait_retry\(delay, cancellation\)\.await\?/g) ?? []).length === 3, "三个协议必须共用可取消退避等待");
+assert((gateway.match(/self\.circuit\.check\(\)\.await\?/g) ?? []).length === 3, "三个协议必须共用同一熔断入口");
+assert((gateway.match(/\.record_failure\(&error, &self\.config\.circuit_breaker\)/g) ?? []).length === 5, "原五个失败分支必须共享熔断政策");
+assert((gateway.match(/self\.circuit\.record_success\(\)\.await/g) ?? []).length === 3, "原三个成功分支必须复位熔断");
+assert(gateway.includes("concurrency: Arc<Semaphore>") && gateway.includes("let _permit = permit;") && gateway.includes("async fn cancel_remote("), "原并发许可及远端取消编排必须留在调用方");
+for (const token of ["max_retries.saturating_add(1)", "attempt_number.saturating_sub(1).min(10)", "base_ms.saturating_mul(1u64 << exponent)", "tokio::time::sleep(delay)", "cancellation.cancelled() => Err(cancelled_error())"]) assert(retry.includes(token), `原重试政策缺少${token}`);
+for (const token of ["state: Mutex<CircuitState>", "Instant::now() < open_until", "state.open_until = None;", "state.consecutive_failures = 0;", "GatewayErrorCategory::Network", "GatewayErrorCategory::Timeout", "GatewayErrorCategory::RateLimit", "GatewayErrorCategory::ProviderUnavailable", "state.consecutive_failures.saturating_add(1)", "config.consecutive_failure_threshold", "Duration::from_secs(config.open_seconds)"]) assert(circuit.includes(token), `原熔断政策缺少${token}`);
+assert((circuit.match(/state.consecutive_failures = 0;/g) ?? []).length === 2 && (circuit.match(/state.open_until = None;/g) ?? []).length === 2, "熔断到期与成功必须各自清零");
+for (const token of ["#[derive(Clone, Default)]", "inner: Arc<CancellationState>", "cancelled: AtomicBool", "notify: Notify", "cancelled.swap(true, Ordering::SeqCst)", "self.inner.notify.notify_waiters()", "cancelled.load(Ordering::SeqCst)"]) assert(cancellation.includes(token), `原取消生命周期缺少${token}`);
+assert(/let notified = self\.inner\.notify\.notified\(\);\s*if self\.is_cancelled\(\) \{\s*return;\s*\}\s*notified\.await;/.test(cancellation), "取消必须先建立通知future再检查取消位，保留原唤醒保证");
+for (const source of [retry, circuit, cancellation]) for (const token of ["reqwest::", "key_provider", "post_json(", "get_json(", "post_empty(", "response_id", "GatewayAttemptSink"]) assert(!source.includes(token), `resilience越界承担协议/IO/账本职责：${token}`);
+const states = json("architecture/state-ownership.json").states;
+assert(states.find(state => state.id === "gateway.circuit-breaker")?.owner === `${resilienceRoot}/circuit_breaker.rs::CircuitBreaker`, "熔断唯一状态owner未同步");
+assert(states.find(state => state.id === "gateway.local-cancellation")?.owner === `${resilienceRoot}/cancellation.rs::CancellationState`, "取消唯一状态owner未同步");
 if (failures.length) { console.error("AI问答兼容传输验证失败："); failures.forEach((item) => console.error(`- ${item}`)); process.exit(1); }
-console.log("AI问答兼容传输验证通过：Responses与Chat Completions保持最小文本请求；R9-01共享HTTP/解码唯一owner、原公共契约和策略边界保持。");
+console.log("AI问答兼容传输验证通过：Responses与Chat Completions保持最小文本请求；R9-01共享HTTP/解码与R9-03重试/熔断/取消唯一owner、原公共契约和策略边界保持。");

@@ -48,6 +48,8 @@ R9-02 Credentials与Redaction实施时`VERIFYING`，同一R9分支从01收尾b80
 
 R9-02 首轮 `98d542f` / [Windows run `37944445186`](https://github.com/uniquenesssta/123/actions/runs/37944445186) 在新增 provider Debug 测试被 Clippy `uninlined_format_args` 拦截；前端/类型/构建和17视口已通过，Rust单测/打包/启动未执行。已改为内联参数，提供者生产实现、原测试断言与35项测试数量保持；既有源码卫生检查增加该回归检查，原写法/换行/尾逗号三探针均拒绝并恢复。83/83静态、完整架构、Rustfmt与保护资产通过；当时VERIFYING；现精确修复Windows已通过，该失败已关闭。
 
+R9-03 Retry/Circuit/Cancel已实施、`VERIFYING`，基线59af3f2，同一R9分支。原重试预算/退避/可取消等待、单一熔断state与本地token各归resilience具名职责，旧cancellation.rs及client重复实现删除；协议fallback/工具兼容/远端取消与Semaphore原scope保持。5A/10M/1D，无API/DTO/Schema/依赖/DB/UI/生产策略变化。原unit新增12、contract新增5，源码预期Gateway47/contract21、Application126/Persistence175，须自身Windows实跑；83/83静态/完整architecture/Rustfmt/18保护资产/171命令/46迁移18PG静态与6破坏探针均PASS，原生产体/重路由client/251literal与原16contract等价。详见 [03实施记录](docs/modular-rewrite/R09-research-ai-backend/R09-03-retry-circuit-breaker-and-cancel.md)。CI开始后停止轮询，04～11BLOCKED；真实PG/历史四项/账本并发回滚/有效XLSX/Windows Full/私有固定回归及继承删除风险仍最终新库待验。
+
 ## 公开边界
 
 - 保留 `crates/model-api`、模型 ID、路由、规则包入口、预测页面和历史数据结构。

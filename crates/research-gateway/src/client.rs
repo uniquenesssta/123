@@ -1,3 +1,4 @@
+use crate::resilience::{attempt_limit, cancelled_error, retry_delay, wait_retry, CircuitBreaker};
 use crate::response::{
     parse_plain_text_success_response, parse_provider_error, parse_structured_success_response,
     parse_success_response,
@@ -16,7 +17,7 @@ use serde_json::{json, Value};
 use sha2::{Digest, Sha256};
 use std::sync::Arc;
 use std::time::{Duration, Instant};
-use tokio::sync::{Mutex, Semaphore};
+use tokio::sync::Semaphore;
 
 #[async_trait]
 pub trait GatewayAttemptSink: Send + Sync {
@@ -293,17 +294,12 @@ fn validate_response_id(response_id: &str) -> Result<(), GatewayError> {
     Ok(())
 }
 
-struct CircuitState {
-    consecutive_failures: u32,
-    open_until: Option<Instant>,
-}
-
 pub struct OpenAiResearchGateway {
     config: GatewayConfig,
     transport: Arc<dyn OpenAiTransport>,
     key_provider: Arc<dyn ApiKeyProvider>,
     concurrency: Arc<Semaphore>,
-    circuit: Mutex<CircuitState>,
+    circuit: CircuitBreaker,
 }
 
 impl OpenAiResearchGateway {
@@ -318,10 +314,7 @@ impl OpenAiResearchGateway {
             config,
             transport,
             key_provider,
-            circuit: Mutex::new(CircuitState {
-                consecutive_failures: 0,
-                open_until: None,
-            }),
+            circuit: CircuitBreaker::new(),
         })
     }
 
@@ -362,7 +355,7 @@ impl OpenAiResearchGateway {
                 "关闭background后重试；AI问答使用同步Responses或Chat Completions请求",
             ));
         }
-        self.check_circuit().await?;
+        self.circuit.check().await?;
         self.check_plain_text_budget(request)?;
         let permit = tokio::select! {
             result = self.concurrency.clone().acquire_owned() => result.map_err(|_| {
@@ -386,7 +379,7 @@ impl OpenAiResearchGateway {
         let mut attempts = Vec::new();
         let mut last_error = None;
         let mut attempt_sequence = request.attempt_number_offset;
-        let total_attempt_limit = self.config.max_retries.saturating_add(1);
+        let total_attempt_limit = attempt_limit(self.config.max_retries);
 
         'model_loop: for (model_index, model) in models.iter().enumerate() {
             for retry_index in 1..=total_attempt_limit {
@@ -443,7 +436,7 @@ impl OpenAiResearchGateway {
                                 };
                                 attempt_sink.record(&attempt).await?;
                                 attempts.push(attempt);
-                                self.record_success().await;
+                                self.circuit.record_success().await;
                                 return Ok(PlainTextGatewayExecution { response, attempts });
                             }
                             Err(error) => {
@@ -471,7 +464,9 @@ impl OpenAiResearchGateway {
                                 };
                                 attempt_sink.record(&attempt).await?;
                                 attempts.push(attempt);
-                                self.record_failure(&error).await;
+                                self.circuit
+                                    .record_failure(&error, &self.config.circuit_breaker)
+                                    .await;
                                 let has_fallback = model_index + 1 < models.len();
                                 let is_last_retry = retry_index >= total_attempt_limit;
                                 last_error = Some(error.clone());
@@ -513,7 +508,9 @@ impl OpenAiResearchGateway {
                         };
                         attempt_sink.record(&attempt).await?;
                         attempts.push(attempt);
-                        self.record_failure(&error).await;
+                        self.circuit
+                            .record_failure(&error, &self.config.circuit_breaker)
+                            .await;
                         let has_fallback = model_index + 1 < models.len();
                         let is_last_retry = retry_index >= total_attempt_limit;
                         last_error = Some(error.clone());
@@ -529,10 +526,7 @@ impl OpenAiResearchGateway {
                     }
                 }
                 let delay = retry_delay(self.config.retry_base_delay_ms, retry_index);
-                tokio::select! {
-                    _ = tokio::time::sleep(delay) => {},
-                    _ = cancellation.cancelled() => return Err(cancelled_error()),
-                }
+                wait_retry(delay, cancellation).await?;
             }
         }
         Err(last_error.unwrap_or_else(|| {
@@ -569,7 +563,7 @@ impl OpenAiResearchGateway {
                 "关闭background后重试；API协作使用同步Responses或Chat Completions请求",
             ));
         }
-        self.check_circuit().await?;
+        self.circuit.check().await?;
         self.check_structured_budget(request)?;
         let permit = tokio::select! {
             result = self.concurrency.clone().acquire_owned() => result.map_err(|_| {
@@ -670,7 +664,7 @@ impl OpenAiResearchGateway {
                                 };
                                 attempt_sink.record(&attempt).await?;
                                 attempts.push(attempt);
-                                self.record_success().await;
+                                self.circuit.record_success().await;
                                 return Ok(StructuredGatewayExecution { response, attempts });
                             }
                             Err(error) => {
@@ -711,7 +705,9 @@ impl OpenAiResearchGateway {
                                     last_error = Some(error);
                                     continue 'retry_loop;
                                 }
-                                self.record_failure(&error).await;
+                                self.circuit
+                                    .record_failure(&error, &self.config.circuit_breaker)
+                                    .await;
                                 let retryable = error.recovery.retryable;
                                 let is_last_retry = retry_index >= total_attempt_limit;
                                 let has_fallback = model_index + 1 < models.len();
@@ -754,7 +750,9 @@ impl OpenAiResearchGateway {
                         };
                         attempt_sink.record(&attempt).await?;
                         attempts.push(attempt);
-                        self.record_failure(&error).await;
+                        self.circuit
+                            .record_failure(&error, &self.config.circuit_breaker)
+                            .await;
                         let is_last_retry = retry_index >= total_attempt_limit;
                         let has_fallback = model_index + 1 < models.len();
                         last_error = Some(error.clone());
@@ -770,10 +768,7 @@ impl OpenAiResearchGateway {
                     }
                 }
                 let delay = retry_delay(self.config.retry_base_delay_ms, retry_index);
-                tokio::select! {
-                    _ = tokio::time::sleep(delay) => {},
-                    _ = cancellation.cancelled() => return Err(cancelled_error()),
-                }
+                wait_retry(delay, cancellation).await?;
             }
         }
         Err(last_error.unwrap_or_else(|| {
@@ -801,7 +796,7 @@ impl OpenAiResearchGateway {
                 "在兼容 API设置中粘贴并选择/v1/responses示例；Chat Completions仅用于连通性测试",
             ));
         }
-        self.check_circuit().await?;
+        self.circuit.check().await?;
         self.check_budget(request)?;
         let permit = tokio::select! {
             result = self.concurrency.clone().acquire_owned() => result.map_err(|_| {
@@ -827,7 +822,7 @@ impl OpenAiResearchGateway {
         let mut attempt_sequence = request.attempt_number_offset;
 
         'model_loop: for (model_index, model) in models.iter().enumerate() {
-            for retry_index in 1..=self.config.max_retries.saturating_add(1) {
+            for retry_index in 1..=attempt_limit(self.config.max_retries) {
                 attempt_sequence = attempt_sequence.saturating_add(1);
                 let attempt_number = attempt_sequence;
                 if cancellation.is_cancelled() {
@@ -887,7 +882,7 @@ impl OpenAiResearchGateway {
                         };
                         attempt_sink.record(&attempt).await?;
                         attempts.push(attempt);
-                        self.record_success().await;
+                        self.circuit.record_success().await;
                         return Ok(GatewayExecution { response, attempts });
                     }
                     Err(error) => {
@@ -936,7 +931,9 @@ impl OpenAiResearchGateway {
                         };
                         attempt_sink.record(&attempt).await?;
                         attempts.push(attempt);
-                        self.record_failure(&error).await;
+                        self.circuit
+                            .record_failure(&error, &self.config.circuit_breaker)
+                            .await;
                         last_error = Some(error.clone());
 
                         if error.category == GatewayErrorCategory::ModelUnavailable && has_fallback
@@ -962,10 +959,7 @@ impl OpenAiResearchGateway {
                         }
 
                         let delay = retry_delay(self.config.retry_base_delay_ms, retry_index);
-                        tokio::select! {
-                            _ = tokio::time::sleep(delay) => {},
-                            _ = cancellation.cancelled() => return Err(cancelled_error()),
-                        }
+                        wait_retry(delay, cancellation).await?;
                     }
                 }
             }
@@ -1573,7 +1567,7 @@ Return only one JSON object. Do not use Markdown fences or explanatory text outs
     }
 
     fn max_attempts_per_model(&self) -> u32 {
-        self.config.max_retries.saturating_add(1)
+        attempt_limit(self.config.max_retries)
     }
 
     fn estimate_actual_cost(&self, response: &GatewayResponse) -> Option<f64> {
@@ -1605,48 +1599,6 @@ Return only one JSON object. Do not use Markdown fences or explanatory text outs
                 .max_by_key(|(configured, _)| configured.len())
                 .map(|(_, pricing)| pricing)
         })
-    }
-
-    async fn check_circuit(&self) -> Result<(), GatewayError> {
-        let mut state = self.circuit.lock().await;
-        if let Some(open_until) = state.open_until {
-            if Instant::now() < open_until {
-                return Err(GatewayError::new(
-                    GatewayErrorCategory::CircuitOpen,
-                    "OpenAI研究网关因连续失败已暂时熔断",
-                    true,
-                    "等待熔断窗口结束；历史记录和手工事实仍可继续使用",
-                ));
-            }
-            state.open_until = None;
-            state.consecutive_failures = 0;
-        }
-        Ok(())
-    }
-
-    async fn record_success(&self) {
-        let mut state = self.circuit.lock().await;
-        state.consecutive_failures = 0;
-        state.open_until = None;
-    }
-
-    async fn record_failure(&self, error: &GatewayError) {
-        if !matches!(
-            error.category,
-            GatewayErrorCategory::Network
-                | GatewayErrorCategory::Timeout
-                | GatewayErrorCategory::RateLimit
-                | GatewayErrorCategory::ProviderUnavailable
-        ) {
-            return;
-        }
-        let mut state = self.circuit.lock().await;
-        state.consecutive_failures = state.consecutive_failures.saturating_add(1);
-        if state.consecutive_failures >= self.config.circuit_breaker.consecutive_failure_threshold {
-            state.open_until = Some(
-                Instant::now() + Duration::from_secs(self.config.circuit_breaker.open_seconds),
-            );
-        }
     }
 }
 
@@ -1695,11 +1647,6 @@ fn response_id_from_body(body: &Value) -> Option<String> {
         .map(ToString::to_string)
 }
 
-fn retry_delay(base_ms: u64, attempt_number: u32) -> Duration {
-    let exponent = attempt_number.saturating_sub(1).min(10);
-    Duration::from_millis(base_ms.saturating_mul(1u64 << exponent))
-}
-
 fn fingerprint(value: &Value) -> Result<String, GatewayError> {
     let bytes = serde_json::to_vec(value).map_err(|error| {
         GatewayError::new(
@@ -1710,15 +1657,6 @@ fn fingerprint(value: &Value) -> Result<String, GatewayError> {
         )
     })?;
     Ok(hex::encode(Sha256::digest(bytes)))
-}
-
-fn cancelled_error() -> GatewayError {
-    GatewayError::new(
-        GatewayErrorCategory::Cancelled,
-        "OpenAI研究任务已取消",
-        false,
-        "可从已保存的研究任务重新发起；已存在证据和快照不会被删除",
-    )
 }
 
 fn budget_error(message: impl Into<String>) -> GatewayError {

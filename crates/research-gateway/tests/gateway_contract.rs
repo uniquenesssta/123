@@ -3,10 +3,10 @@ use chrono::{TimeZone, Utc};
 use football_research_gateway::{
     test_openai_connection, ApiKey, ApiKeyProvider, ApiProtocol, ApiWorkspaceWebSearchMode,
     BudgetConfig, CancellationToken, CircuitBreakerConfig, CredentialConfig, CredentialMode,
-    GatewayConfig, GatewayError, GatewayErrorCategory, GatewayOperation, GatewayRequest,
-    ModelPricing, OpenAiResearchGateway, OpenAiTransport, PlainTextGatewayRequest,
-    PlainTextMessage, ReasoningEffort, SearchContextSize, SourcePolicy, StructuredGatewayRequest,
-    TokenLimitField, TransportResponse,
+    GatewayAttempt, GatewayAttemptSink, GatewayConfig, GatewayError, GatewayErrorCategory,
+    GatewayOperation, GatewayRequest, ModelPricing, OpenAiResearchGateway, OpenAiTransport,
+    PlainTextGatewayRequest, PlainTextMessage, ReasoningEffort, SearchContextSize, SourcePolicy,
+    StructuredGatewayRequest, TokenLimitField, TransportResponse,
 };
 use serde_json::{json, Value};
 use std::collections::{BTreeMap, VecDeque};
@@ -926,4 +926,337 @@ fn rejects_non_https_remote_endpoint_and_blank_fallback() {
             .category,
         GatewayErrorCategory::InvalidConfiguration
     );
+}
+
+fn rate_limited_response() -> TransportResponse {
+    TransportResponse {
+        status: 429,
+        provider_request_id: Some("resilience-rate-limit".to_string()),
+        body: json!({"error":{"message":"rate limited","code":"rate_limit"}}),
+    }
+}
+
+fn resilience_plain_request() -> PlainTextGatewayRequest {
+    PlainTextGatewayRequest {
+        operation: GatewayOperation::Extraction,
+        trace_id: "resilience-plain".to_string(),
+        static_instructions: "Answer in ordinary text.".to_string(),
+        messages: vec![PlainTextMessage {
+            role: "user".to_string(),
+            content: "hello".to_string(),
+        }],
+        daily_spend_usd: 0.0,
+        monthly_spend_usd: 0.0,
+        attempt_number_offset: 0,
+    }
+}
+
+fn resilience_structured_request() -> StructuredGatewayRequest {
+    StructuredGatewayRequest {
+        operation: GatewayOperation::Extraction,
+        trace_id: "resilience-structured".to_string(),
+        schema_name: "workspace_test".to_string(),
+        schema_version: "workspace.test.v1".to_string(),
+        schema: json!({"type":"object","properties":{"schema_version":{"const":"workspace.test.v1"}}}),
+        static_instructions: "Return structured JSON.".to_string(),
+        input: json!({"message":"hello"}),
+        enable_web_search: false,
+        daily_spend_usd: 0.0,
+        monthly_spend_usd: 0.0,
+        attempt_number_offset: 0,
+    }
+}
+
+#[tokio::test]
+async fn circuit_is_shared_by_formal_plain_and_structured_entries() {
+    let transport = Arc::new(FakeTransport::with_responses(vec![rate_limited_response()]));
+    let mut policy = config();
+    policy.max_retries = 0;
+    policy.fallback_model = None;
+    policy.circuit_breaker.consecutive_failure_threshold = 1;
+    let gateway =
+        OpenAiResearchGateway::new(policy, transport.clone(), Arc::new(TestKeyProvider)).unwrap();
+    assert_eq!(
+        gateway
+            .execute(&request(), &CancellationToken::new())
+            .await
+            .expect_err("rate limit")
+            .category,
+        GatewayErrorCategory::RateLimit
+    );
+    assert_eq!(
+        gateway
+            .execute_plain_text(&resilience_plain_request(), &CancellationToken::new())
+            .await
+            .expect_err("shared circuit")
+            .category,
+        GatewayErrorCategory::CircuitOpen
+    );
+    assert_eq!(
+        gateway
+            .execute_structured(&resilience_structured_request(), &CancellationToken::new())
+            .await
+            .expect_err("shared circuit")
+            .category,
+        GatewayErrorCategory::CircuitOpen
+    );
+    assert_eq!(
+        gateway
+            .execute(&request(), &CancellationToken::new())
+            .await
+            .expect_err("shared circuit")
+            .category,
+        GatewayErrorCategory::CircuitOpen
+    );
+    assert_eq!(transport.requests.lock().unwrap().len(), 1);
+}
+
+#[tokio::test]
+async fn successful_execution_resets_failure_count_between_requests() {
+    let transport = Arc::new(FakeTransport::with_responses(vec![
+        rate_limited_response(),
+        successful_response(),
+        rate_limited_response(),
+        successful_response(),
+    ]));
+    let mut policy = config();
+    policy.max_retries = 0;
+    policy.fallback_model = None;
+    policy.circuit_breaker.consecutive_failure_threshold = 2;
+    let gateway =
+        OpenAiResearchGateway::new(policy, transport.clone(), Arc::new(TestKeyProvider)).unwrap();
+    for _ in 0..2 {
+        assert_eq!(
+            gateway
+                .execute(&request(), &CancellationToken::new())
+                .await
+                .expect_err("rate limit")
+                .category,
+            GatewayErrorCategory::RateLimit
+        );
+        gateway
+            .execute(&request(), &CancellationToken::new())
+            .await
+            .expect("success resets circuit");
+    }
+    assert_eq!(transport.requests.lock().unwrap().len(), 4);
+}
+
+struct CancelAfterAttemptSink {
+    token: CancellationToken,
+    attempt_numbers: Mutex<Vec<u32>>,
+}
+
+#[async_trait]
+impl GatewayAttemptSink for CancelAfterAttemptSink {
+    async fn record(&self, attempt: &GatewayAttempt) -> Result<(), GatewayError> {
+        self.attempt_numbers
+            .lock()
+            .unwrap()
+            .push(attempt.attempt_number);
+        self.token.cancel();
+        Ok(())
+    }
+}
+
+#[tokio::test]
+async fn cancellation_during_retry_stops_retry_and_fallback_and_releases_permit() {
+    let transport = Arc::new(FakeTransport::with_responses(vec![
+        rate_limited_response(),
+        successful_response(),
+    ]));
+    let mut policy = config();
+    policy.retry_base_delay_ms = 60_000;
+    let gateway =
+        OpenAiResearchGateway::new(policy, transport.clone(), Arc::new(TestKeyProvider)).unwrap();
+    let token = CancellationToken::new();
+    let sink = CancelAfterAttemptSink {
+        token: token.clone(),
+        attempt_numbers: Mutex::new(Vec::new()),
+    };
+    let mut input = request();
+    input.attempt_number_offset = 7;
+    let error = tokio::time::timeout(
+        Duration::from_secs(2),
+        gateway.execute_with_sink(&input, &token, &sink),
+    )
+    .await
+    .expect("bounded retry cancellation")
+    .expect_err("cancelled");
+    assert_eq!(error.category, GatewayErrorCategory::Cancelled);
+    assert_eq!(*sink.attempt_numbers.lock().unwrap(), vec![8]);
+    assert_eq!(transport.requests.lock().unwrap().len(), 1);
+    tokio::time::timeout(
+        Duration::from_secs(2),
+        gateway.execute(&request(), &CancellationToken::new()),
+    )
+    .await
+    .expect("permit released")
+    .expect("next request succeeds");
+    let requests = transport.requests.lock().unwrap();
+    assert_eq!(requests.len(), 2);
+    assert!(requests
+        .iter()
+        .all(|body| body["model"] == "configured-research-model"));
+}
+
+struct RejectAttemptSink;
+
+#[async_trait]
+impl GatewayAttemptSink for RejectAttemptSink {
+    async fn record(&self, _attempt: &GatewayAttempt) -> Result<(), GatewayError> {
+        Err(GatewayError::new(
+            GatewayErrorCategory::Persistence,
+            "fixture ledger rejection",
+            false,
+            "fixture recovery",
+        ))
+    }
+}
+
+#[tokio::test]
+async fn attempt_sink_failure_precedes_circuit_mutation_and_releases_permit() {
+    let transport = Arc::new(FakeTransport::with_responses(vec![
+        rate_limited_response(),
+        rate_limited_response(),
+    ]));
+    let mut policy = config();
+    policy.max_retries = 0;
+    policy.fallback_model = None;
+    policy.circuit_breaker.consecutive_failure_threshold = 1;
+    let gateway =
+        OpenAiResearchGateway::new(policy, transport.clone(), Arc::new(TestKeyProvider)).unwrap();
+    assert_eq!(
+        gateway
+            .execute_with_sink(&request(), &CancellationToken::new(), &RejectAttemptSink)
+            .await
+            .expect_err("ledger failure")
+            .category,
+        GatewayErrorCategory::Persistence
+    );
+    assert_eq!(
+        tokio::time::timeout(
+            Duration::from_secs(2),
+            gateway.execute(&request(), &CancellationToken::new())
+        )
+        .await
+        .expect("permit released")
+        .expect_err("rate limit counted only now")
+        .category,
+        GatewayErrorCategory::RateLimit
+    );
+    assert_eq!(
+        gateway
+            .execute(&request(), &CancellationToken::new())
+            .await
+            .expect_err("now open")
+            .category,
+        GatewayErrorCategory::CircuitOpen
+    );
+    assert_eq!(transport.requests.lock().unwrap().len(), 2);
+}
+
+struct PendingFirstTransport {
+    calls: std::sync::atomic::AtomicUsize,
+    first_dropped: Arc<std::sync::atomic::AtomicBool>,
+}
+
+struct PendingRequestGuard(Arc<std::sync::atomic::AtomicBool>);
+
+impl Drop for PendingRequestGuard {
+    fn drop(&mut self) {
+        self.0.store(true, std::sync::atomic::Ordering::SeqCst);
+    }
+}
+
+#[async_trait]
+impl OpenAiTransport for PendingFirstTransport {
+    async fn post_json(
+        &self,
+        _url: &str,
+        _api_key: &ApiKey,
+        _body: &Value,
+        _timeout: Duration,
+    ) -> Result<TransportResponse, GatewayError> {
+        if self.calls.fetch_add(1, std::sync::atomic::Ordering::SeqCst) == 0 {
+            let _guard = PendingRequestGuard(self.first_dropped.clone());
+            std::future::pending::<()>().await;
+        }
+        Ok(successful_response())
+    }
+    async fn get_json(
+        &self,
+        _url: &str,
+        _api_key: &ApiKey,
+        _timeout: Duration,
+    ) -> Result<TransportResponse, GatewayError> {
+        panic!("unexpected get")
+    }
+    async fn post_empty(
+        &self,
+        _url: &str,
+        _api_key: &ApiKey,
+        _timeout: Duration,
+    ) -> Result<TransportResponse, GatewayError> {
+        panic!("unexpected remote cancel")
+    }
+}
+
+#[tokio::test]
+async fn cancellation_of_transport_and_semaphore_queue_drops_pending_io_and_restores_capacity() {
+    use std::future::{poll_fn, Future};
+    use std::sync::atomic::{AtomicBool, AtomicUsize, Ordering};
+    use std::task::Poll;
+    let transport = Arc::new(PendingFirstTransport {
+        calls: AtomicUsize::new(0),
+        first_dropped: Arc::new(AtomicBool::new(false)),
+    });
+    let gateway =
+        OpenAiResearchGateway::new(config(), transport.clone(), Arc::new(TestKeyProvider)).unwrap();
+    let input = request();
+    let active_token = CancellationToken::new();
+    let active = gateway.execute(&input, &active_token);
+    tokio::pin!(active);
+    poll_fn(|cx| {
+        assert!(active.as_mut().poll(cx).is_pending());
+        Poll::Ready(())
+    })
+    .await;
+    let queued_token = CancellationToken::new();
+    let queued = gateway.execute(&input, &queued_token);
+    tokio::pin!(queued);
+    poll_fn(|cx| {
+        assert!(queued.as_mut().poll(cx).is_pending());
+        Poll::Ready(())
+    })
+    .await;
+    assert_eq!(transport.calls.load(Ordering::SeqCst), 1);
+    queued_token.cancel();
+    assert_eq!(
+        tokio::time::timeout(Duration::from_secs(2), queued)
+            .await
+            .expect("queue cancellation")
+            .expect_err("cancelled")
+            .category,
+        GatewayErrorCategory::Cancelled
+    );
+    assert_eq!(transport.calls.load(Ordering::SeqCst), 1);
+    active_token.cancel();
+    assert_eq!(
+        tokio::time::timeout(Duration::from_secs(2), active)
+            .await
+            .expect("IO cancellation")
+            .expect_err("cancelled")
+            .category,
+        GatewayErrorCategory::Cancelled
+    );
+    assert!(transport.first_dropped.load(Ordering::SeqCst));
+    tokio::time::timeout(
+        Duration::from_secs(2),
+        gateway.execute(&input, &CancellationToken::new()),
+    )
+    .await
+    .expect("capacity restored")
+    .expect("next request");
+    assert_eq!(transport.calls.load(Ordering::SeqCst), 2);
 }
