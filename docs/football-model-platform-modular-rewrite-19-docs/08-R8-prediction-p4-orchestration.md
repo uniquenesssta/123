@@ -1418,7 +1418,7 @@ Research专项、完整architecture、原83源码检查、Rustfmt目标文件、
 
 ## R8-10 Horizon Orchestration
 
-状态：`VERIFYING`（09精确Windows已通过并收尾；10已实施，等待自身精确Windows CI；11～12仍BLOCKED）
+状态：`VERIFYING`（09已DONE；10首轮精确Windows编译失败，导入修复等待新精确CI；11～12仍BLOCKED）
 
 ### 1. 目标
 
@@ -1487,6 +1487,8 @@ Application经原Ports创建/入队/迁移；首建和迁移各保持任务+事�
 ### 17. 最小验证
 
 本地83源码检查、完整architecture、Rustfmt 1.88的23目标文件、18保护资产/171命令/46迁移及18PG静态契约、差异检查通过。原23 Postgres函数（前检重新内联）及规划准备/身份/draft/未来队列、分派/失败/结算核对等价；六破坏探针拒绝并恢复。详细证据见实施记录。
+
+首轮 `db5fd51` / run `37884818742` 在保留readiness的 `ResearchRunStatus` 缺导入处报E0433，前端/17视口已通过，Rust测试及打包启动未完成。修复只补生产导入、强化原专项依赖检查与刷新Domain使用摘要；8相关生产文件依赖核对、去导入探针/恢复、保留五函数体等价与既有静态门禁通过。不得将修复源码或静态通过记作Windows成功；新head仍须独立实跑。
 
 ### 18. 阶段回归
 

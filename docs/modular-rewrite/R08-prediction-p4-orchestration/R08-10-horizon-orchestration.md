@@ -1,6 +1,6 @@
 # R8-10 Horizon Orchestration 实施记录
 
-状态：`VERIFYING`。2026-10-09，用户授权“收尾09 开始10”。唯一分支 `rewrite/r8-prediction-p4-orchestration`；09精确实施 `4025781f2f0419f374edfa7669a4c5bcfe71ee66` / [Windows run 37825126808](https://github.com/uniquenesssta/123/actions/runs/37825126808) 全SUCCESS，Application99/Persistence163，09文档收尾基线 `7c1ccd34f9d72d13fc5d4b76104cbb248fc2c63a` 已推送。10等待本记录所在实施提交的精确Windows门禁，不继承09结果；11/12 BLOCKED。
+状态：`VERIFYING`。2026-10-09，用户授权“收尾09 开始10”。唯一分支 `rewrite/r8-prediction-p4-orchestration`；09精确实施 `4025781f2f0419f374edfa7669a4c5bcfe71ee66` / [Windows run 37825126808](https://github.com/uniquenesssta/123/actions/runs/37825126808) 全SUCCESS，Application99/Persistence163，09文档收尾基线 `7c1ccd34f9d72d13fc5d4b76104cbb248fc2c63a` 已推送。10首轮db5fd51的Windows编译失败，导入修复等待新精确提交的门禁，不继承09结果；11/12 BLOCKED。
 
 ## 实际问题与行为决定
 
@@ -132,3 +132,16 @@ flowchart TD
 沿用原Windows Automated，推送本实施提交触发完整frontend/17视口/类型构建、Rust fmt/Clippy/workspace tests、Windows release/MSI/NSIS/启动，启动后停止轮询。当前10 VERIFYING，不将预期测试数/历史09/ignored标为本项PASS。精确head成功后才能补完成证据、收尾10；11/12尚未开始。
 
 真实PG/历史四项/账本/有效XLSX/Windows Full/私有Golden Master与继承model.runs/0041删除风险仍最终封包新库待验，公共unavailable stub不冒充真实模型回归。回退用受控revert至7c1ccd3，同步owner/出口/测试/门禁/清单与文档，不手工复制双实现或修改历史数据。Create State在本轮结束记录正确足球模型ID、精确提交/CI待验、重要决定与后续约束；不替代Git或任务书。
+
+
+## 首轮Windows失败与生产导入修复（2026-10-09）
+
+初次实施精确 `db5fd511518f50e8ab7a16ef8d693b0585bc552e` / [Windows run `37884818742`](https://github.com/uniquenesssta/123/actions/runs/37884818742) / job `113672333836` 结束为FAILURE。完整前端/TypeScript/Vite/17视口已成功，Rustfmt成功后Clippy编译在根p4_orchestration.rs:83报E0433：ResearchRunStatus未绑定；workspace tests、release/MSI/NSIS与启动未完成，原114/169预期不计实跑。
+
+拆分时将run解析迁至context，删减旧根导入遗漏了保留readiness的生产使用；新子模块导入不作用于旧根。本次只补回原Domain enum导入，不改五函数体、SQL、状态/错误、PLANNED恢复政策或图中链路。8相关Postgres生产文件原Domain类型依赖复核只发现该遗漏，修复后无同类遗漏；原Prediction gate补真实依赖检查（不以子模块use冒充根绑定），移除导入探针被拒绝并恢复；不增加镜像Rust测试、Clippy allow或依赖。
+
+本次相对失败head全部8个M文件：`crates/persistence-postgres/src/p4_orchestration.rs`、`scripts/verify-prediction-service.mjs`、`architecture/domain-type-inventory.json`、`README.md`、`docs/TESTING.md`、`docs/football-model-platform-modular-rewrite-19-docs/08-R8-prediction-p4-orchestration.md`、`docs/modular-rewrite/R08-prediction-p4-orchestration/README.md`、本记录。A/D/移动均无；相对节点基线的完整14A/20M表仍保持。
+
+本次本地完整architecture、Prediction专项、Domain清单、Rustfmt1.88检查、source hygiene、18资产/171命令/46迁移与18PG静态契约、git diff --check通过；五个保留函数体与失败提交逐字一致，报告 `/workspace/scratch/eb298ad5cdcb/r810-import-fix-check.json`。Domain365/300/声明摘要与1084扫描不变，只刷新usage摘要，43Ports/Application399/PG根35及原PG test blob保持；测试源码预期114/169不变。Context7查询官方Rust Reference模块use声明作用域，结合仓库Rust1.88.0/edition2021验证，不涉及版本升级。没有非Windows Cargo/客户端动态、数据库实跑或新设施。
+
+修复提交在同一R8分支推送并触发原Windows Automated，确认新精确head启动后结束轮询；10保持VERIFYING，11/12未开始。真实PG/历史四项/账本/有效XLSX/Full/私有固定回归与继承历史删除风险继续最终新库待验。只回退此次导入修复将重新引入已确认E0433，完整节点回退仍用7c1ccd3；Create State保存正确足球模型稳定ID及新head/CI待验，不替代Git。

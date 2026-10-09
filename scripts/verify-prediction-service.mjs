@@ -289,6 +289,7 @@ for(const name of ["p4_planning_match_context","read_schema_version_by_key","rea
  check(!taskLegacy.includes(`fn ${name}(`),`R8-10 旧根仍残留任务实现：${name}`);
 }
 check((taskLegacy.match(/\bfn /g)??[]).length===5 && ["p4_freeze_readiness","p4_route_readiness","p4_readiness","find_frozen_p4_snapshot_id","p4_routed_facts"].every(name=>taskLegacy.includes(`fn ${name}(`)),"R8-10 后续readiness/Freeze五项职责必须原位保留");
+check(/use football_domain::\{[^}]*\bResearchRunStatus\b[^}]*\};/.test(taskLegacy) && taskLegacy.includes("ResearchRunStatus::Succeeded.as_str()"),"R8-10 保留的 readiness 必须导入其真实使用的 ResearchRunStatus，子模块导入不能替代根模块绑定");
 const createWrite=taskWrite.slice(taskWrite.indexOf("pub async fn create_p4_freeze_task"),taskWrite.indexOf("pub async fn transition_p4_freeze_task"));
 const transitionWrite=taskWrite.slice(taskWrite.indexOf("pub async fn transition_p4_freeze_task"),taskWrite.indexOf("async fn lock_key"));
 check(createWrite.indexOf("prepare(draft)?")<createWrite.indexOf("self.pool.begin()") && createWrite.indexOf("lock_key(")<createWrite.indexOf("select_task_by_idempotency(") && createWrite.includes("if existing != task_fingerprint"),"R8-10 纯前检/同键事务锁/首次载荷复核顺序漂移");

@@ -2,7 +2,7 @@
 
 ## 当前阶段状态
 
-`IN_PROGRESS`。唯一阶段分支 `rewrite/r8-prediction-p4-orchestration`，阶段起点 `90680bf945fbb0d1c191937c2d9e90c2c916fb00`。R8-01～09已DONE；09精确 `4025781` / Windows run `37825126808` 全SUCCESS。用户已授权“收尾09 开始10”，10已实施、VERIFYING，等待自身精确Windows CI；11～12BLOCKED。精确当前状态由本索引维护。
+`IN_PROGRESS`。唯一阶段分支 `rewrite/r8-prediction-p4-orchestration`，阶段起点 `90680bf945fbb0d1c191937c2d9e90c2c916fb00`。R8-01～09已DONE；09精确 `4025781` / Windows run `37825126808` 全SUCCESS。用户已授权“收尾09 开始10”，10首轮Windows编译失败，导入修复仍VERIFYING，等待新精确CI；11～12BLOCKED。精确当前状态由本索引维护。
 
 ## 前置基线与范围
 
@@ -23,7 +23,7 @@ R8 依据 [任务书](../../football-model-platform-modular-rewrite-19-docs/08-R
 | R8-07 | Run Persistence | DONE · [完成记录](R08-07-run-persistence.md) |
 | R8-08 | P4 Evidence Ledger | DONE · [完成记录](R08-08-p4-evidence-ledger.md) · 精确Windows修复CI全SUCCESS |
 | R8-09 | Fact Pipeline | DONE · [完成记录](R08-09-fact-pipeline.md) · 精确Windows全SUCCESS |
-| R8-10 | Horizon Orchestration | VERIFYING · [实施记录](R08-10-horizon-orchestration.md) · 静态通过，等待自身Windows |
+| R8-10 | Horizon Orchestration | VERIFYING · [实施记录](R08-10-horizon-orchestration.md) · 首轮E0433已修，等待新精确Windows |
 | R8-11 | Workbench Reads | BLOCKED |
 | R8-12 | Freeze Transaction | BLOCKED |
 
@@ -212,3 +212,8 @@ Application原Fact Pipeline已有纯职责复用；mod中的公共命令、编�
 本地实际通过83源码门禁、完整architecture、23 Rustfmt、18资产/171命令/46迁移与18 PG静态契约/diff，六破坏探针拒绝恢复。原23 Postgres函数重新内联前检比较一致，规划字段/未来队列及后台分派/失败/结算保持；新增15 Application/6 Persistence行为测试，原PG Stage C补同键并发/首建读回/状态冲突/回滚恢复/唯一事件审计及不可变。预期114/169须10自身Windows确认，18 broad仍ignored。首次架构发现旧Mapping门禁指向已迁出context，已修正到真实owner并完整复跑通过；源码批次与刻意破坏探针重叠的单项误报已在恢复后串行复核通过。
 
 Application扫描393→399、Domain1071→1084，43 Ports/365类型/300映射及Domain声明摘要保持，根Postgres清单35保持。原workflow与最终新库方式保持，不新增target/runner/workflow/数据库/依赖。Mermaid Chart已更新真实链路，Create State在本轮结束保存。10VERIFYING；11/12 BLOCKED。Windows CI启动后停止轮询；真实PG/历史四项/账本/XLSX/Full/私有Golden Master及继承model.runs/0041删除风险继续最终封包新库待验。回退受控revert至7c1ccd3。
+
+
+## R8-10 首轮失败修复（2026-10-09）
+
+精确db5fd511518f50e8ab7a16ef8d693b0585bc552e / [Windows run37884818742](https://github.com/uniquenesssta/123/actions/runs/37884818742) / job113672333836 FAILURE：保留根readiness漏ResearchRunStatus导入，E0433阻止Rust编译；完整前端、类型、构建和17视口通过，Rust测试/打包/启动未完成。补回唯一生产导入，原五函数体/SQL不变；复核八生产文件原Domain依赖无同类遗漏，原Prediction gate增加依赖检查并通过去导入破坏探针/恢复，Domain usage摘要刷新。完整architecture/专项/清单/Rustfmt/源码卫生/资产/命令/数据库静态契约及diff复核通过；114/169仍为预期，未冒称动态成功。无模型/行为/API/Schema/SQL/依赖或测试数变化，无新基础设施。Context7核对Rust1.88实际模块作用域，已有Mermaid链路无变化；Create State保存新精确提交与继续位置。新WindowsCI启动后停止轮询，10VERIFYING，11/12 BLOCKED；真实PG等最终新库待验保留。

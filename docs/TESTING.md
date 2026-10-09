@@ -298,4 +298,10 @@ Persistence原target新增6项纯职责测试：正式写入/兼容读取区别�
 
 本地PASS：83/83原源码门禁（5浏览器项交Windows）、完整npm run verify:architecture、23目标Rustfmt 1.88、18保护资产/171命令/46迁移与18PG静态契约、git diff --check。六破坏探针为非正式时点、漏身份、错PLANNED恢复条件、错队列key、去FOR UPDATE、漏成功审计，全部拒绝恢复。静态批次在刻意移除FOR UPDATE期间读取到一次单项失败，恢复后串行重跑该项通过；首次Mapping gate指向原根context已修正真实owner，完整架构复跑通过。23原Postgres函数（重新内联preflight）、规划prepare/identity/draft/未来队列、dispatcher/terminal failure/settlement比较保持；PLANNED恢复明确属于缺陷修复，不伪称全行为等价。
 
+### R8-10 首轮编译失败与导入修复
+
+精确 `db5fd511518f50e8ab7a16ef8d693b0585bc552e` / [run `37884818742`](https://github.com/uniquenesssta/123/actions/runs/37884818742) / job `113672333836` 为FAILURE。日志唯一Rust编译错误为 `crates/persistence-postgres/src/p4_orchestration.rs:83` 的 E0433：`ResearchRunStatus` 未导入。其解析函数已移入horizon/context，但根中保留的readiness仍需该enum；子模块use不提供父模块名称绑定。该轮完整前端、TypeScript、Vite和17视口已通过，fmt通过后Clippy编译失败，workspace tests、Windows release/MSI/NSIS及启动未完成，114/169仍未在本项实际验证。
+
+仅补回根生产导入、扩展原Prediction gate并刷新Domain usage摘要；8个相关Postgres生产文件的原Domain类型依赖复核无其他同类遗漏，五个保留函数体/SQL与失败head逐字保持。移除该导入的单项破坏探针被拒绝，恢复后通过；报告 `/workspace/scratch/eb298ad5cdcb/r810-import-fix-check.json`。本次复核完整architecture、Prediction专项、Domain清单、Rustfmt 1.88、源码卫生、18保护资产/171命令/46迁移与18PG静态契约和diff；不新增Rust测试、target或Clippy抑制，预期114/169不变。Context7按实际1.88.0/edition2021核对官方Rust Reference模块use作用域；依赖/API/可见性不变。新精确Windows CI启动后停止轮询，10仍VERIFYING，11/12 BLOCKED；PG等原动态待验保留。
+
 报告：`/workspace/scratch/eb298ad5cdcb/r810-static-checks.json`、`r810-negative-probes.json`、`r810-equivalence.json`。Application393→399、Domain1071→1084，43 Ports/365/300/声明摘要不变；Postgres根35保持，数据库清单只刷新原PG test blob。复用原Windows Automated执行frontend/17视口/类型构建、fmt/Clippy/workspace tests、Windows release/MSI/NSIS/启动，启动后停止轮询。无Linux/macOS Cargo/客户端动态或新基础设施；真实PG/历史四项/账本/有效XLSX/Windows Full/私有Golden Master与继承删除风险继续最终封包新库待验。详见 [10记录](modular-rewrite/R08-prediction-p4-orchestration/R08-10-horizon-orchestration.md)。

@@ -1,6 +1,6 @@
 use crate::{PersistenceError, PersistenceResult, PostgresStore};
 use chrono::{DateTime, Utc};
-use football_domain::{P4FreezeReadiness, P4FreezeTaskRecord, P4RoutedFact};
+use football_domain::{P4FreezeReadiness, P4FreezeTaskRecord, P4RoutedFact, ResearchRunStatus};
 use sqlx::Row;
 use std::collections::HashMap;
 use uuid::Uuid;
