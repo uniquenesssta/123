@@ -88,6 +88,12 @@ for (const token of ["fn validate_gateway_request", "fn build_request_body", "fn
 assert((gateway.match(/validate_gateway_request\(request\)\?/g) ?? []).length === 2, "正式执行/恢复必须复用唯一输入校验");
 assert(gateway.includes("build_request_body(&self.config, request, model)?"), "正式执行未接入唯一载荷owner");
 const formalExecution = slice(gateway, "pub async fn execute_with_sink(", "pub async fn resume(");
+// The protocol rejection contract must reach execute with a valid Chat configuration.
+const formalProtocolContract = slice(tests, "async fn formal_request_validation_and_protocol_errors_stop_before_credentials_and_io()", "#[tokio::test]");
+const fixtureAdmission = ["let mut policy = config();", "policy.api_protocol = ApiProtocol::ChatCompletions;", 'policy.request_endpoint = Some("https://api.openai.com/v1/chat/completions".to_string());', "OpenAiResearchGateway::new(policy,"];
+const fixturePositions = fixtureAdmission.map(token => formalProtocolContract.indexOf(token));
+assert(fixturePositions.every((position, index) => position >= 0 && (index === 0 || position > fixturePositions[index - 1])) && (formalProtocolContract.match(/policy\.request_endpoint\s*=/g) ?? []).length === 1, "正式协议拒绝契约必须先配置匹配Chat Completions的有效请求端点，再初始化Gateway");
+for (const token of ['.expect_err("identity first")', '.expect_err("schema second")', '.expect_err("protocol guard")', '"P4正式联网研究仅支持Responses协议"', "provider.loads.load(std::sync::atomic::Ordering::SeqCst), 0", "transport.requests.lock().unwrap().is_empty()"]) assert(formalProtocolContract.includes(token), `正式协议拒绝契约缺少原错误优先级/零凭据IO断言：${token}`);
 assert(/check_formal_budget\(\s*&self\.config,\s*request,\s*self\.model_for_operation\(request\.operation\),?\s*\)\?/.test(formalExecution), "正式执行未接入原路由及唯一预算前检");
 const admission = ["validate_gateway_request(request)?", "self.config.api_protocol != ApiProtocol::Responses", "self.circuit.check().await?", "check_formal_budget(", "acquire_owned()", "key_provider.load", "build_request_body(&self.config, request, model)?"];
 const positions = admission.map(token => formalExecution.indexOf(token));

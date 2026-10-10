@@ -177,3 +177,36 @@ Context7按Cargo.lock serde_json1.0.150核对Value clone/Map remove，但仅返�
 实际偏差仅参考目录按职责具体化：定价/预算错误与Token别名是真实跨调用方共用政策，不能放在正式目录让Plain/连接依赖正式私有实现，也不复制。原model_for_operation仍唯一Gateway路由；预算参数primary_model只是借用既有确定性选择，不增加IO/状态或改变拒绝优先级。响应解析/后台状态/实际成本和Plain预算继续原owner，后续05/07按任务处理，不把本项变成整个Gateway重写。
 
 沿用Public Platform CI，确认自身精确head/Windows job开始后立即停止轮询，预计20～30分钟。下一轮先核实04自身结果，成功才收尾，失败只修相关完整链路；05～11仍BLOCKED，R9整体IN_PROGRESS。真实PG/历史四项/不可变账本/并发/回滚、有效XLSX、Windows Full、私有P4/P7 Golden Master与继承model.runs/0041历史删除风险仍最终封包新库待验；ignored与公共unavailable stub不计PASS。
+
+
+## 首轮 Windows 失败与修复（2026-10-10）
+
+用户“未通过”指向本项首次代码，不收尾04或开始05。精确提交 `16b5d4e06442466e45553e0beebe668fba4bbe70`、tree `26569fb830bb7c0a2e768fac3955d8de074857e8`、同一R9分支，[run `38021521371`](https://github.com/uniquenesssta/123/actions/runs/38021521371) / [Windows job `114123347337`](https://github.com/uniquenesssta/123/actions/runs/38021521371/job/114123347337) **FAILURE**，完成2026-10-10 11:54:24北京。日志实际：
+
+- 原架构、frontend/contracts/TypeScript/Vite与17视口通过，fmt/Clippy通过；Application126、Persistence175、Gateway60通过。
+- gateway_contract实际24 PASS / 1 FAIL；新增 `formal_request_validation_and_protocol_errors_stop_before_credentials_and_io` 在原第1283行Gateway构造器unwrap收到InvalidConfiguration：“兼容 API请求端点与所选协议不一致”。该契约尚未到达身份/Schema/正式协议拒绝断言，不能算断言成功。
+- release/MSI/NSIS/启动未执行，workspace整体失败；原18 broad PG仍ignored，真实数据库不记PASS。
+- 验收记录 `D:\a\123\123\logs\windows-acceptance-20261010-034410.txt`；失败证据artifact `11657834137` / `windows-automated-delivery-evidence-16b5d4e06442466e45553e0beebe668fba4bbe70`，671 bytes，SHA-256 `a1c5979bb89af09306cb22042957b2fbedf0a53bb62b473c2f91ee131d21961f`。仅失败过程证据，不含成功交付。
+
+根因：新测试从原Responses config()克隆后仅改api_protocol，显式request_endpoint仍为 `/v1/responses`；原GatewayConfig::validate先检查URL协议后缀，在进入execute前按正确政策拒绝。原3处Chat契约的端点配置均正确，审计本项4个新增契约没有第二处协议切换遗漏。修复在构造器前补该测试的显式 `/v1/chat/completions` 地址；保留原配置校验及正式协议守卫，不修改生产策略，不删除/放宽断言或用Clippy抑制。
+
+原 `verify-api-compatible-transport.mjs` 增加该错误优先级契约的配置顺序、唯一端点赋值及身份/Schema/正式协议错误、零provider/IO断言守卫。缺失端点、错用Responses端点、构造器后才设置端点3破坏探针均被该守卫拒绝，并逐字恢复后通过。没有新runner/target/workflow/持续回归框架或数据库设施。
+
+相对失败head实际 **8M / 0A / 0D**，无重命名，完整文件：
+
+- `crates/research-gateway/tests/gateway_contract.rs`：仅新增一行有效Chat端点，原21契约及新增4项所有断言/测试数量不变。
+- `scripts/verify-api-compatible-transport.mjs`：扩展原R9-04守卫。
+- `architecture/domain-type-inventory.json`：用原生成器只刷新usageDigest为 `0b91bb6cd84c76569b6b6e4a67c70f3e690994372350566b67619fadbde9b90c`；365/300、1121扫描和sourceDigest保持。
+- `README.md`：同步首轮实际失败及修复状态。
+- `docs/TESTING.md`：同步精确Windows和本次验证边界。
+- `docs/football-model-platform-modular-rewrite-19-docs/09-R9-research-ai-backend.md`：04仍VERIFYING，05～11BLOCKED。
+- `docs/modular-rewrite/R09-research-ai-backend/README.md`：准确阶段状态和继续位置。
+- `docs/modular-rewrite/R09-research-ai-backend/R09-04-formal-research-request.md`：完整根因/修复/清单/验证/回退记录。
+
+所有生产Rust文件相对16b5d4e逐字保持。相对整个04基线bbc9031再次复核7迁出函数、其余client重路由tokens、247原literal、47原unit/21原contract及公开exports保持，生产policy_changes=[]。测试文件对失败head的精确差异仅上述一行，保留全部原断言及预计60/25/126/175数量。
+
+本次实际本地PASS：83/83原静态门禁、完整npm verify:architecture、Rustfmt1.88源码check、18保护资产/171命令/46迁移18PG静态、diff、3破坏探针及等价。报告 `/workspace/scratch/eb298ad5cdcb/r904fix-static-checks.json`、`r904fix-architecture.log`、`r904fix-equivalence.json`、`r904fix-source-preservation.json`、`r904fix-negative-probes.json`。未运行Linux/macOS Cargo/编译/测试/loopback/客户端动态；修复自身Windows尚未完整通过，首轮局部PASS不能替代修复精确结果。
+
+本次是既有测试配置遗漏，无第三方API/版本/架构变化；依据精确CI错误和原config校验修复，未重复查询Context7或绘制无变化架构。收尾保存前重新核实Create State稳定足球model；记录以Git/CI为准，模型合成摘要不替代精确证据。
+
+修复回退点16b5d4e；整个04回退点仍bbc9031。使用同一R9分支/原Public Platform CI，核实修复精确head及Windows job开始后停止轮询，预计20～30分钟。04仍VERIFYING，05～11BLOCKED；下一轮核实修复自身结果，成功才收尾，失败继续修相关链路。真实PG/历史四项/不可变账本/并发/回滚/有效XLSX/Windows Full/私有P4/P7固定回归及继承model.runs/0041历史删除风险仍最终封包新库待验，ignored与公共stub不计PASS。

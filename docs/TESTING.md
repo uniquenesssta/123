@@ -445,3 +445,10 @@ Context7按Cargo.lock serde_json1.0.150核对Value clone/Map remove，但仅返�
 实际偏差仅参考目录按职责具体化：定价/预算错误与Token别名是真实跨调用方共用政策，不能放在正式目录让Plain/连接依赖正式私有实现，也不复制。原model_for_operation仍唯一Gateway路由；预算参数primary_model只是借用既有确定性选择，不增加IO/状态或改变拒绝优先级。响应解析/后台状态/实际成本和Plain预算继续原owner，后续05/07按任务处理，不把本项变成整个Gateway重写。
 
 沿用Public Platform CI，确认自身精确head/Windows job开始后立即停止轮询，预计20～30分钟。下一轮先核实04自身结果，成功才收尾，失败只修相关完整链路；05～11仍BLOCKED，R9整体IN_PROGRESS。真实PG/历史四项/不可变账本/并发/回滚、有效XLSX、Windows Full、私有P4/P7 Golden Master与继承model.runs/0041历史删除风险仍最终封包新库待验；ignored与公共unavailable stub不计PASS。
+
+
+## R9-04 首轮失败与修复（2026-10-10，VERIFYING）
+
+R9-04 首轮 `16b5d4e` / [Windows run `38021521371`](https://github.com/uniquenesssta/123/actions/runs/38021521371) 的新增协议拒绝契约仅切换Chat Completions，却保留Responses显式端点，Gateway初始化报InvalidConfiguration，未到达该测试断言。前端/类型/构建/17视口及fmt/Clippy通过，Gateway60、Application126、Persistence175通过；contract24/25，release/MSI/NSIS/启动未执行。修复只补该夹具的匹配Chat端点，生产实现及全部断言/测试数量保持；既有兼容传输门禁增加夹具顺序与原断言守卫，缺失/错协议/构造后配置三探针均拒绝恢复。83/83静态、完整架构、Rustfmt/保护资产/命令/数据库静态和等价复核通过；仍VERIFYING，05～11BLOCKED，必须取得修复自身Windows完整SUCCESS。
+
+Windows job `114123347337` 完成于2026-10-10 11:54:24北京，失败于gateway_contract.rs:1283构造器unwrap，错误原文“兼容 API请求端点与所选协议不一致”；不是正式执行入口拒绝结果。修复补显式 `/v1/chat/completions` 端点，原03/04全部生产Rust文件逐字保持，原21契约及新增4项断言保持，源码预期60/25/126/175不变。本次8M/0A/0D，无新target/runner/workflow/DB/依赖/协议；Domain使用摘要更新为 `0b91bb6cd84c76569b6b6e4a67c70f3e690994372350566b67619fadbde9b90c`，365/300/1121扫描与声明摘要保持。报告r904fix-static-checks.json、r904fix-architecture.log、r904fix-equivalence.json、r904fix-source-preservation.json、r904fix-negative-probes.json。原Windows CI精确启动后停止轮询；真实PG/历史四项/账本并发回滚/XLSX/Full/私有固定回归及继承删除风险仍最终新库待验，ignored不计PASS。

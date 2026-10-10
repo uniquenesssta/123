@@ -513,7 +513,11 @@ R9-02 首轮 `98d542f` / [Windows run `37944445186`](https://github.com/uniquene
 
 ## R9-04 Formal Research Request
 
-状态：`VERIFYING`（03自身Windows全SUCCESS并DONE，用户已授权04；职责/静态/记录完成，待本项Windows）。
+状态：`VERIFYING`（03自身Windows全SUCCESS并DONE，用户已授权04；首轮契约夹具失败已修，待修复自身Windows）。
+
+R9-04 首轮 `16b5d4e` / [Windows run `38021521371`](https://github.com/uniquenesssta/123/actions/runs/38021521371) 的新增协议拒绝契约仅切换Chat Completions，却保留Responses显式端点，Gateway初始化报InvalidConfiguration，未到达该测试断言。前端/类型/构建/17视口及fmt/Clippy通过，Gateway60、Application126、Persistence175通过；contract24/25，release/MSI/NSIS/启动未执行。修复只补该夹具的匹配Chat端点，生产实现及全部断言/测试数量保持；既有兼容传输门禁增加夹具顺序与原断言守卫，缺失/错协议/构造后配置三探针均拒绝恢复。83/83静态、完整架构、Rustfmt/保护资产/命令/数据库静态和等价复核通过；仍VERIFYING，05～11BLOCKED，必须取得修复自身Windows完整SUCCESS。
+
+本次8M/0A/0D，仅原契约夹具补匹配端点、增强原兼容传输门禁及刷新Domain摘要/五份既有文档。生产Rust/接口/配置校验/协议/依赖/DB保持，未调用Linux/macOS动态验收，未推进05或创建阶段完成记录。详细失败证据、文件清单、探针/静态/等价/回退见 [04实施记录](../modular-rewrite/R09-research-ai-backend/R09-04-formal-research-request.md#首轮-windows-失败与修复2026-10-10)。
 
 ### 1. 目标
 

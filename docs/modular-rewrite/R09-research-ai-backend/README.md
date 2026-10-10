@@ -17,7 +17,7 @@ R8期间research-gateway、公开契约、配置/依赖及锁文件保持；原G
 | R9-01 | Shared Transport | DONE · [完成记录](R09-01-shared-transport.md) · run37933341557 SUCCESS |
 | R9-02 | Credentials 与 Redaction | DONE · [完成记录](R09-02-credentials-and-redaction.md) · run37954536795 SUCCESS |
 | R9-03 | Retry、Circuit Breaker 与 Cancel | DONE · [完成记录](R09-03-retry-circuit-breaker-and-cancel.md) · run37960534145 SUCCESS |
-| R9-04 | Formal Research Request | VERIFYING · [实施记录](R09-04-formal-research-request.md) · 静态通过、待自身Windows |
+| R9-04 | Formal Research Request | VERIFYING · [实施记录](R09-04-formal-research-request.md) · 首轮契约失败已修、待修复自身Windows |
 | R9-05 | Formal Response、Schema 与 Citation | BLOCKED |
 | R9-06 | Source 与 Time Policy | BLOCKED |
 | R9-07 | Plain Chat Responses | BLOCKED |
@@ -82,3 +82,10 @@ R9-03 Retry/Circuit/Cancel已实施、`VERIFYING`，基线59af3f2，同一R9分�
 ## R9-04 实施与门禁（VERIFYING）
 
 R9-04 Formal Request已实施、`VERIFYING`。正式输入/Schema校验、Responses载荷及请求前预算分别归唯一职责；原连接测试/Plain等复用唯一Token投影与定价政策。9A/9M/0D，无API/DTO/Schema/配置/依赖/DB/UI或生产策略变化；7原函数及其余Gateway编排、247literal/原47unit/21contract保持。新增13单测/4契约，源码预期Gateway60/contract25、Application126/Persistence175，须本项Windows实跑。83现有静态/完整architecture/Rustfmt/保护资产/171命令/46迁移18PG静态及7破坏探针通过。详见 [04记录](R09-04-formal-research-request.md)，基线bbc9031，报告r904-static-checks.json/r904-architecture.log/r904-equivalence.json/r904-negative-probes.json/r904-review.json。正式执行/恢复入口共享校验、原请求门禁顺序与上下文/Schema投影保持；Context7及官方serde_json1.0.150源码核对、Mermaid及足球Create State同步。Windows精确开始后停止轮询；05～11BLOCKED，不创建阶段完成记录。真实PG/Full/XLSX/私有固定回归及继承历史删除风险仍最终新库待验。
+
+
+## R9-04 首轮失败与修复
+
+R9-04 首轮 `16b5d4e` / [Windows run `38021521371`](https://github.com/uniquenesssta/123/actions/runs/38021521371) 的新增协议拒绝契约仅切换Chat Completions，却保留Responses显式端点，Gateway初始化报InvalidConfiguration，未到达该测试断言。前端/类型/构建/17视口及fmt/Clippy通过，Gateway60、Application126、Persistence175通过；contract24/25，release/MSI/NSIS/启动未执行。修复只补该夹具的匹配Chat端点，生产实现及全部断言/测试数量保持；既有兼容传输门禁增加夹具顺序与原断言守卫，缺失/错协议/构造后配置三探针均拒绝恢复。83/83静态、完整架构、Rustfmt/保护资产/命令/数据库静态和等价复核通过；仍VERIFYING，05～11BLOCKED，必须取得修复自身Windows完整SUCCESS。
+
+同一R9分支，修复回退16b5d4e，整个04回退仍bbc9031；8M/0A/0D，正式请求链路与响应/凭据/重试策略均保持。继续位置：核实修复自身精确Windows；成功后才能收尾04，05尚未开始。

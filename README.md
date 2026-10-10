@@ -54,6 +54,8 @@ R9-03 已收尾为 `DONE`。精确实现 `d58aa38f88c2b59e3ee3b6f568b54d5430843b
 
 R9-04 Formal Request已实施、`VERIFYING`。正式输入/Schema校验、Responses载荷及请求前预算分别归唯一职责；原连接测试/Plain等复用唯一Token投影与定价政策。9A/9M/0D，无API/DTO/Schema/配置/依赖/DB/UI或生产策略变化；7原函数及其余Gateway编排、247literal/原47unit/21contract保持。新增13单测/4契约，源码预期Gateway60/contract25、Application126/Persistence175，须本项Windows实跑。83现有静态/完整architecture/Rustfmt/保护资产/171命令/46迁移18PG静态及7破坏探针通过。详见 [04实施记录](docs/modular-rewrite/R09-research-ai-backend/R09-04-formal-research-request.md)。CI开始后停止轮询，05～11BLOCKED；真实PG/Full/XLSX/私有固定回归及继承删除风险仍最终新库待验。
 
+R9-04 首轮 `16b5d4e` / [Windows run `38021521371`](https://github.com/uniquenesssta/123/actions/runs/38021521371) 的新增协议拒绝契约仅切换Chat Completions，却保留Responses显式端点，Gateway初始化报InvalidConfiguration，未到达该测试断言。前端/类型/构建/17视口及fmt/Clippy通过，Gateway60、Application126、Persistence175通过；contract24/25，release/MSI/NSIS/启动未执行。修复只补该夹具的匹配Chat端点，生产实现及全部断言/测试数量保持；既有兼容传输门禁增加夹具顺序与原断言守卫，缺失/错协议/构造后配置三探针均拒绝恢复。83/83静态、完整架构、Rustfmt/保护资产/命令/数据库静态和等价复核通过；仍VERIFYING，05～11BLOCKED，必须取得修复自身Windows完整SUCCESS。
+
 ## 公开边界
 
 - 保留 `crates/model-api`、模型 ID、路由、规则包入口、预测页面和历史数据结构。

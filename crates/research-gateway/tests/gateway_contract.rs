@@ -1280,6 +1280,7 @@ async fn formal_request_validation_and_protocol_errors_stop_before_credentials_a
     let provider = Arc::new(CountingKeyProvider::default());
     let mut policy = config();
     policy.api_protocol = ApiProtocol::ChatCompletions;
+    policy.request_endpoint = Some("https://api.openai.com/v1/chat/completions".to_string());
     let gateway = OpenAiResearchGateway::new(policy, transport.clone(), provider.clone()).unwrap();
     let mut input = request();
     input.trace_id = " ".to_string();
