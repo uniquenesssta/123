@@ -5,9 +5,9 @@
   "branch": "ui-design-system",
   "fileKey": "PN0Whgu6HLWIHx4Mv6aHfu",
   "page": "3:5",
-  "checkpointDate": "2026-10-09",
+  "checkpointDate": "2026-10-10",
   "phase": "repairs_in_progress",
-  "executionFinished": true,
+  "executionFinished": false,
   "overallAcceptance": "NOT_PASSED",
   "repairsStarted": true,
   "runtimeImplementationStarted": false,
@@ -379,7 +379,7 @@
       "id": "INT-04",
       "priority": "P2",
       "category": "prototype_global_state_not_implemented",
-      "status": "PARTIALLY_IMPLEMENTED_BOUNDED_RETEST_PASSED",
+      "status": "PARTIALLY_IMPLEMENTED_AUTHORING_IN_PROGRESS",
       "title": "Global history, collapse and reset limited to presets",
       "defaultBackDisabled": 34,
       "defaultForwardDisabled": 34,
@@ -8922,6 +8922,25 @@
             "effectStyles": 6
           }
         }
+      },
+      "historyResetBatch05": {
+        "phase": "AUTHORING_IN_PROGRESS",
+        "batchDataPath": "docs/FIGMA_PROTOTYPE_REPAIR_BATCH05.json",
+        "overallAcceptance": "NOT_PASSED",
+        "executionFinished": false,
+        "plannedScope": {
+          "productStates": 705,
+          "stableSnapshotStates": 618,
+          "transientProtectedStates": 87,
+          "confirmationResetStates": 609,
+          "originalResetDisabledStates": 9,
+          "nativeBidirectionalThemePairs": 157,
+          "prototypeVariables": 25
+        },
+        "verifiedStates": 8,
+        "pilotAssertions": 129,
+        "prototypeVariables": 25,
+        "browserPlaybackPerformed": false
       }
     }
   ],
@@ -8973,8 +8992,8 @@
     "INT-04",
     "repeat whole-product acceptance"
   ],
-  "nextWork": "继续覆盖剩余592状态及缺少主题配对的详情，完成浏览器事件回放与全产品复验",
-  "nextWorkStarted": false,
+  "nextWork": "完成第五批705预置状态历史／重置规则扩展与限定复验，再完成主题缺配及浏览器事件回放",
+  "nextWorkStarted": true,
   "limitations": [
     "Stored graph plus representative screenshots, not browser event playback or runtime acceptance.",
     "Theme scan excludes explicit Theme/Review Hub/验收/演示/Demo/Outcome/Reviewer paths and overlays.",
@@ -23040,5 +23059,24 @@
         "effectStyles": 6
       }
     }
+  },
+  "repairBatch05": {
+    "phase": "AUTHORING_IN_PROGRESS",
+    "batchDataPath": "docs/FIGMA_PROTOTYPE_REPAIR_BATCH05.json",
+    "overallAcceptance": "NOT_PASSED",
+    "executionFinished": false,
+    "plannedScope": {
+      "productStates": 705,
+      "stableSnapshotStates": 618,
+      "transientProtectedStates": 87,
+      "confirmationResetStates": 609,
+      "originalResetDisabledStates": 9,
+      "nativeBidirectionalThemePairs": 157,
+      "prototypeVariables": 25
+    },
+    "verifiedStates": 8,
+    "pilotAssertions": 129,
+    "prototypeVariables": 25,
+    "browserPlaybackPerformed": false
   }
 }
