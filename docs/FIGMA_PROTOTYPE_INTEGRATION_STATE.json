@@ -7,7 +7,7 @@
   "page": "3:5",
   "checkpointDate": "2026-10-10",
   "phase": "repairs_in_progress",
-  "executionFinished": true,
+  "executionFinished": false,
   "overallAcceptance": "NOT_PASSED",
   "repairsStarted": true,
   "runtimeImplementationStarted": false,
@@ -24,8 +24,8 @@
   "newScreenStageCreated": false,
   "scope": "705 authored preset policies with stored-action interpretation, native variable evaluation and limited visual check; not browser event playback or full runtime acceptance.",
   "inventory": {
-    "roots": 1079,
-    "productStates": 705,
+    "roots": 1094,
+    "productStates": 720,
     "dialogs": 356,
     "contextMenus": 1,
     "reviewHubs": 17,
@@ -48,12 +48,12 @@
   "perStage": [
     [
       1,
-      15,
+      26,
       0
     ],
     [
       2,
-      50,
+      54,
       0
     ],
     [
@@ -817,8 +817,8 @@
     "INT-04",
     "repeat whole-product acceptance"
   ],
-  "nextWork": "补齐391个缺少双向主题配对的状态，完成浏览器事件回放及真实输入、草稿、滚动和焦点策略验收",
-  "nextWorkStarted": false,
+  "nextWork": "继续batch06:创建剩余376个精确对应状态，然后接入双向主题、同主题普通页面跳转和历史重置；弹窗、浏览器与真实输入/滚动/焦点另验。",
+  "nextWorkStarted": true,
   "limitations": [
     "Stored graph plus representative screenshots, not browser event playback or runtime acceptance.",
     "Theme scan excludes explicit Theme/Review Hub/验收/演示/Demo/Outcome/Reviewer paths and overlays.",
@@ -11105,5 +11105,24 @@
     "openFindings": [
       "INT-04"
     ]
+  },
+  "repairBatch06": {
+    "phase": "EXACT_THEME_COUNTERPARTS_STAGED_NOT_CONNECTED",
+    "overallAcceptance": "NOT_PASSED",
+    "plannedCounterpartCount": 391,
+    "createdCounterpartCount": 15,
+    "remainingCreationCount": 376,
+    "connectedNewThemePairCount": 0,
+    "presetPolicyStateCount": 705,
+    "stagedUninstrumentedStateCount": 15,
+    "currentProductStateFrameCount": 720,
+    "currentRootCount": 1094,
+    "existingNativeBidirectionalThemePairCount": 157,
+    "statesWithoutVerifiedBidirectionalPairCount": 406,
+    "browserPlaybackPerformed": false,
+    "existingMastersModified": false,
+    "sharedDesignVariablesModified": false,
+    "applicationSourceModified": false,
+    "batchDataPath": "docs/FIGMA_PROTOTYPE_REPAIR_BATCH06.json"
   }
 }
