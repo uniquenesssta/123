@@ -7,7 +7,7 @@
   "page": "3:5",
   "baselineCommit": "4bdd7fa1bbf9b9d3d4b956cdb61d55ce9f0ed09f",
   "checkpointDate": "2026-10-10",
-  "status": "EXACT_COUNTERPART_CREATION_COMPLETE_THEME_WIRING_UNVERIFIED",
+  "status": "COUNTERPART_CREATION_COMPLETE_CONTINUED_AND_RETESTED_IN_BATCH07",
   "overallAcceptance": "NOT_PASSED",
   "summary": {
     "phase": "EXACT_COUNTERPART_CREATION_COMPLETE_THEME_WIRING_UNVERIFIED",
@@ -40,8 +40,8 @@
   "taskBook": {
     "goal": "补齐391个精确主题对应状态；保留548个业务状态身份，包括10个旧Dark独立身份；接入双向主题与历史重置并复验。",
     "creationPlanPath": "embedded baselineGaps",
-    "currentTask": "Creation complete. Recover and certify theme wiring outcome before applying full prepared policy source.",
-    "nextTask": "Fresh-read thirteen possibly-mutated roots; idempotently complete all1096 theme/nav handlers, apply prepared preset policy, then verify actual stored actions, native variables, visual screenshots and browser playback.",
+    "currentTask": "Creation evidence complete; theme/history/reset continuation passed in batch07. Historical prepared code and creation receipts retained.",
+    "nextTask": "Inspect and repair ordinary business-dialog theme continuity, then separately perform browser/live-input/draft/scroll/focus acceptance.",
     "scopeExcludes": [
       "shared component masters",
       "shared design variable values",
@@ -53469,5 +53469,42 @@
     "historyAndResetReauthorCertified": false,
     "newVisualScreenshotsReviewed": false,
     "browserPlaybackPerformed": false
+  },
+  "historicalCheckpointStatus": "EXACT_COUNTERPART_CREATION_COMPLETE_THEME_WIRING_UNVERIFIED",
+  "historicalCheckpointSummary": {
+    "phase": "EXACT_COUNTERPART_CREATION_COMPLETE_THEME_WIRING_UNVERIFIED",
+    "overallAcceptance": "NOT_PASSED",
+    "plannedCounterpartCount": 391,
+    "createdCounterpartCount": 391,
+    "remainingCreationCount": 0,
+    "logicalPresetIdentityCount": 548,
+    "physicalPresetStateCount": 1096,
+    "currentProductStateFrameCount": 1096,
+    "currentRootCount": 1470,
+    "lightStateCount": 548,
+    "darkStateCount": 548,
+    "potentialExactThemePairCount": 548,
+    "verifiedNativeThemePairCountAtBatch05": 157,
+    "currentNativeThemePairCount": null,
+    "presetPolicyStateCountVerifiedAtBatch05": 705,
+    "currentWholePresetPolicyCertified": false,
+    "newHistoryPolicyAuthoringStarted": false,
+    "themeWiringStarted": true,
+    "themeWiringCertified": false,
+    "browserPlaybackPerformed": false,
+    "runtimeImplementationStarted": false,
+    "newRootCreatedNodeCount": 243889,
+    "existingMastersModified": false,
+    "sharedDesignVariablesModified": false,
+    "applicationSourceModified": false,
+    "batchDataPath": "docs/FIGMA_PROTOTYPE_REPAIR_BATCH06.json"
+  },
+  "continuation": {
+    "recordPath": "docs/FIGMA_PROTOTYPE_REPAIR_BATCH07.json",
+    "checkpointAt": "2026-10-11T01:50:14.969875+08:00",
+    "status": "PRODUCT_PRESET_THEME_HISTORY_RESET_RETEST_PASSED",
+    "boundedAcceptance": "PASSED",
+    "overallAcceptance": "NOT_PASSED",
+    "creationRepeated": false
   }
 }
