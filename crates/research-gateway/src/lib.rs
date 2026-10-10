@@ -1,5 +1,6 @@
 mod api_example;
 mod budget;
+mod citations;
 mod client;
 mod config;
 mod credentials;
@@ -8,9 +9,11 @@ mod formal_research;
 mod request_fields;
 mod resilience;
 mod response;
+mod response_fields;
 mod transport;
 mod types;
 mod validation;
+mod validation_error;
 
 pub use api_example::{parse_api_example, ApiExampleCandidate, ApiExampleParseResult};
 pub use client::{test_openai_connection, GatewayAttemptSink, OpenAiResearchGateway};
@@ -24,6 +27,7 @@ pub use credentials::{
     DefaultApiKeyProvider,
 };
 pub use error::{GatewayError, GatewayErrorCategory, RecoveryAdvice};
+pub use formal_research::schema::{validate_research_output, ValidationContext};
 pub use resilience::CancellationToken;
 pub use transport::{OpenAiTransport, ReqwestTransport, TransportResponse};
 pub use types::{
@@ -33,4 +37,3 @@ pub use types::{
     ResearchOutput, ResearchSubject, ResearchValue, ResearchValueKind, StructuredGatewayExecution,
     StructuredGatewayRequest, StructuredGatewayResponse, WebCitation, WebSource,
 };
-pub use validation::{validate_research_output, ValidationContext};

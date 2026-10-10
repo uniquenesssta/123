@@ -1465,3 +1465,282 @@ async fn formal_extraction_fallback_preserves_request_context_and_schema_between
     assert_eq!(dynamic["dynamic_context"], input.dynamic_context);
     assert_eq!(input, original);
 }
+
+#[derive(Default)]
+struct FormalResponseAttemptSink {
+    attempts: Mutex<Vec<GatewayAttempt>>,
+}
+
+#[async_trait]
+impl GatewayAttemptSink for FormalResponseAttemptSink {
+    async fn record(&self, attempt: &GatewayAttempt) -> Result<(), GatewayError> {
+        self.attempts.lock().unwrap().push(attempt.clone());
+        Ok(())
+    }
+}
+
+#[tokio::test]
+async fn formal_response_failures_preserve_attempt_evidence_without_retry_or_fallback() {
+    for case in 0..7 {
+        let mut response = successful_response();
+        let mut output: Value = serde_json::from_str(
+            response.body["output"][1]["content"][0]["text"]
+                .as_str()
+                .unwrap(),
+        )
+        .unwrap();
+        let expected = match case {
+            0 => {
+                output["facts"][0]["subject"]["unexpected"] = json!(true);
+                GatewayErrorCategory::SchemaValidation
+            }
+            1 => {
+                output["match_key"] = json!("wrong-match");
+                GatewayErrorCategory::SchemaValidation
+            }
+            2 => {
+                response.body["output"][0]["action"]["sources"] = json!([]);
+                response.body["output"][1]["content"][0]["annotations"] = json!([]);
+                GatewayErrorCategory::SourcePolicy
+            }
+            3 => {
+                output["facts"][0]["observed_at"] = json!("2026-07-14T10:00:00.000000001Z");
+                GatewayErrorCategory::SchemaValidation
+            }
+            4 => {
+                output["facts"] = json!([]);
+                GatewayErrorCategory::SchemaValidation
+            }
+            5 => {
+                response.body["output"][1]["content"][0]["annotations"][0]["url"] = Value::Null;
+                GatewayErrorCategory::SchemaValidation
+            }
+            _ => {
+                let duplicate = output["facts"][0].clone();
+                output["facts"].as_array_mut().unwrap().push(duplicate);
+                GatewayErrorCategory::SchemaValidation
+            }
+        };
+        response.body["output"][1]["content"][0]["text"] = json!(output.to_string());
+        let raw = response.body.clone();
+        let transport = Arc::new(FakeTransport::with_responses(vec![response]));
+        let provider = Arc::new(CountingKeyProvider::default());
+        let sink = FormalResponseAttemptSink::default();
+        let gateway =
+            OpenAiResearchGateway::new(config(), transport.clone(), provider.clone()).unwrap();
+        let error = gateway
+            .execute_with_sink(&request(), &CancellationToken::new(), &sink)
+            .await
+            .expect_err("formal validation failure");
+        assert_eq!(error.category, expected);
+        assert!(!error.recovery.retryable);
+        assert_eq!(provider.loads.load(std::sync::atomic::Ordering::SeqCst), 1);
+        assert_eq!(transport.requests.lock().unwrap().len(), 1);
+        let attempts = sink.attempts.lock().unwrap();
+        assert_eq!(attempts.len(), 1);
+        assert_eq!(attempts[0].attempt_number, 1);
+        assert_eq!(attempts[0].response_id.as_deref(), Some("resp_1"));
+        assert_eq!(attempts[0].provider_request_id.as_deref(), Some("req_1"));
+        assert_eq!(attempts[0].provider_status, Some(200));
+        assert_eq!(attempts[0].status, "failed");
+        assert_eq!(attempts[0].raw_response.as_ref(), Some(&raw));
+        assert_eq!(
+            attempts[0].error.as_ref().unwrap().user_message,
+            error.user_message
+        );
+        assert_eq!(attempts[0].usage.total_tokens, 0);
+        assert!(attempts[0].estimated_cost_usd.is_none());
+    }
+}
+
+#[tokio::test]
+async fn formal_strict_citations_do_not_change_structured_compatibility_policy() {
+    let mut response = successful_response();
+    response.body["output"][0]["action"]["sources"][0]["url"] = json!("invalid-url");
+    response.body["output"][1]["content"][0]["annotations"][0]["url"] = json!("invalid-url");
+    let transport = Arc::new(FakeTransport::with_responses(vec![
+        response.clone(),
+        response,
+    ]));
+    let gateway =
+        OpenAiResearchGateway::new(config(), transport.clone(), Arc::new(TestKeyProvider)).unwrap();
+    let error = gateway
+        .execute(&request(), &CancellationToken::new())
+        .await
+        .expect_err("strict citation");
+    assert_eq!(error.category, GatewayErrorCategory::SchemaValidation);
+    assert_eq!(error.user_message, "引用包含无效URL：invalid-url");
+    let input = StructuredGatewayRequest {
+        operation: GatewayOperation::Extraction,
+        trace_id: "trace-compatible".to_string(),
+        schema_name: "workspace".to_string(),
+        schema_version: "football.api-workspace-response.v2".to_string(),
+        schema: json!({"type":"object","additionalProperties":false}),
+        static_instructions: "workspace answer".to_string(),
+        input: json!({"message":"hello"}),
+        enable_web_search: false,
+        daily_spend_usd: 0.0,
+        monthly_spend_usd: 0.0,
+        attempt_number_offset: 0,
+    };
+    let execution = gateway
+        .execute_structured(&input, &CancellationToken::new())
+        .await
+        .expect("original tolerant compatible path");
+    assert!(execution.response.citations.is_empty());
+    assert!(execution.response.sources.is_empty());
+    assert_eq!(execution.response.search_call_count, 1);
+    assert_eq!(
+        execution.response.output["schema_version"],
+        input.schema_version
+    );
+    assert_eq!(transport.requests.lock().unwrap().len(), 2);
+}
+
+#[tokio::test]
+async fn formal_provider_status_guards_stay_before_schema_consumption() {
+    for (status, category) in [
+        ("queued", GatewayErrorCategory::SchemaValidation),
+        ("in_progress", GatewayErrorCategory::SchemaValidation),
+        ("failed", GatewayErrorCategory::ProviderUnavailable),
+        ("incomplete", GatewayErrorCategory::ProviderUnavailable),
+        ("cancelled", GatewayErrorCategory::Cancelled),
+        ("unknown", GatewayErrorCategory::SchemaValidation),
+    ] {
+        let mut response = successful_response();
+        response.body["status"] = json!(status);
+        response.body["output"][1]["content"][0]["text"] = json!("not json");
+        let transport = Arc::new(FakeTransport::with_responses(vec![response]));
+        let mut policy = config();
+        policy.max_retries = 0;
+        policy.fallback_model = None;
+        let gateway =
+            OpenAiResearchGateway::new(policy, transport.clone(), Arc::new(TestKeyProvider))
+                .unwrap();
+        let error = gateway
+            .execute(&request(), &CancellationToken::new())
+            .await
+            .expect_err("provider state before schema");
+        assert_eq!(error.category, category);
+        assert!(!error.user_message.contains("无法反序列化"));
+        assert_eq!(transport.requests.lock().unwrap().len(), 1);
+    }
+}
+
+struct FormalPollingTransport {
+    posted: Mutex<Option<TransportResponse>>,
+    completed: Mutex<Option<TransportResponse>>,
+    post_calls: std::sync::atomic::AtomicUsize,
+    get_urls: Mutex<Vec<String>>,
+}
+
+#[async_trait]
+impl OpenAiTransport for FormalPollingTransport {
+    async fn post_json(
+        &self,
+        _url: &str,
+        _api_key: &ApiKey,
+        _body: &Value,
+        _timeout: Duration,
+    ) -> Result<TransportResponse, GatewayError> {
+        self.post_calls
+            .fetch_add(1, std::sync::atomic::Ordering::SeqCst);
+        Ok(self
+            .posted
+            .lock()
+            .unwrap()
+            .take()
+            .expect("single background post"))
+    }
+    async fn get_json(
+        &self,
+        url: &str,
+        _api_key: &ApiKey,
+        _timeout: Duration,
+    ) -> Result<TransportResponse, GatewayError> {
+        self.get_urls.lock().unwrap().push(url.to_string());
+        Ok(self
+            .completed
+            .lock()
+            .unwrap()
+            .take()
+            .expect("single completion get"))
+    }
+    async fn post_empty(
+        &self,
+        _url: &str,
+        _api_key: &ApiKey,
+        _timeout: Duration,
+    ) -> Result<TransportResponse, GatewayError> {
+        panic!("unexpected cancellation post")
+    }
+}
+
+#[tokio::test]
+async fn queued_and_resumed_formal_responses_share_the_same_schema_and_citation_validation() {
+    use std::sync::atomic::Ordering;
+    for resume in [false, true] {
+        for invalid in [false, true] {
+            let mut completed = successful_response();
+            if invalid {
+                let mut output: Value = serde_json::from_str(
+                    completed.body["output"][1]["content"][0]["text"]
+                        .as_str()
+                        .unwrap(),
+                )
+                .unwrap();
+                output["match_key"] = json!("wrong-match");
+                completed.body["output"][1]["content"][0]["text"] = json!(output.to_string());
+            }
+            let raw = completed.body.clone();
+            let transport = Arc::new(FormalPollingTransport {
+                posted: Mutex::new(Some(TransportResponse {
+                    status: 200,
+                    provider_request_id: Some("req_queued".to_string()),
+                    body: json!({"id":"resp_1","status":"queued"}),
+                })),
+                completed: Mutex::new(Some(completed)),
+                post_calls: std::sync::atomic::AtomicUsize::new(0),
+                get_urls: Mutex::new(vec![]),
+            });
+            let provider = Arc::new(CountingKeyProvider::default());
+            let mut policy = config();
+            policy.background_mode = true;
+            policy.store = true;
+            let gateway =
+                OpenAiResearchGateway::new(policy, transport.clone(), provider.clone()).unwrap();
+            let parsed = if resume {
+                gateway
+                    .resume(&request(), "resp_1", &CancellationToken::new())
+                    .await
+            } else {
+                gateway
+                    .execute(&request(), &CancellationToken::new())
+                    .await
+                    .map(|execution| execution.response)
+            };
+            if invalid {
+                assert_eq!(
+                    parsed.expect_err("shared match validation").user_message,
+                    "联网输出的比赛键与研究任务不一致"
+                );
+            } else {
+                let response = parsed.expect("shared successful validation");
+                assert_eq!(response.raw_response, raw);
+                assert_eq!(response.citations.len(), 1);
+                assert_eq!(response.sources.len(), 1);
+                assert_eq!(response.provider_request_id.as_deref(), Some("req_1"));
+                assert_eq!(response.usage.cached_input_tokens, 20);
+            }
+            assert_eq!(provider.loads.load(Ordering::SeqCst), 1);
+            assert_eq!(
+                transport.post_calls.load(Ordering::SeqCst),
+                usize::from(!resume)
+            );
+            assert_eq!(
+                *transport.get_urls.lock().unwrap(),
+                vec!["https://api.openai.com/v1/responses/resp_1".to_string()]
+            );
+        }
+    }
+}

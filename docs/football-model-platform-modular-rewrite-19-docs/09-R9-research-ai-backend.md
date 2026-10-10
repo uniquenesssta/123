@@ -11,7 +11,7 @@ R8 的12个节点及 Windows Automated 阶段出口已DONE，最终代码 `af3c9
 
 执行总纲顶部订正：只在Windows动态验证，复用原targets/contract/workflow/数据库入口，不新增持续回归体系；R9不升级外部协议、不修改AI Workspace前端。R8期间 `crates/research-gateway/`、公开契约、依赖与配置保持，最终CI原Gateway测试/contract通过，原协议行为作为下一节点基线。
 
-用户已明确“开始R9-01”，编号映射已厘清。从R8文档收尾 `c72e559af4f29c9510daf2f9bf66b926dacb3013` 建立唯一分支 `rewrite/r9-research-ai-backend`；01共享传输自身精确Windows全SUCCESS、DONE，用户“收尾01开始02”授权02，已自身精确Windows全SUCCESS、DONE；用户“收尾02开始03”授权03，已自身Windows全SUCCESS并DONE；用户“收尾03开始04”授权04，已自身Windows全SUCCESS并DONE；用户“收尾04开始05”授权05 READY，06～11 BLOCKED，精确状态见 [阶段索引](../modular-rewrite/R09-research-ai-backend/README.md)。必须取得01自身Windows CI，R8成功不能替代。适用总纲顶部职责/生命周期/既有验证订正，真实验证延期边界继续保留。
+用户已明确“开始R9-01”，编号映射已厘清。从R8文档收尾 `c72e559af4f29c9510daf2f9bf66b926dacb3013` 建立唯一分支 `rewrite/r9-research-ai-backend`；01共享传输自身精确Windows全SUCCESS、DONE，用户“收尾01开始02”授权02，已自身精确Windows全SUCCESS、DONE；用户“收尾02开始03”授权03，已自身Windows全SUCCESS并DONE；用户“收尾03开始04”授权04，已自身Windows全SUCCESS并DONE；用户“收尾04开始05”授权05，已实施VERIFYING，06～11 BLOCKED，精确状态见 [阶段索引](../modular-rewrite/R09-research-ai-backend/README.md)。必须取得01自身Windows CI，R8成功不能替代。适用总纲顶部职责/生命周期/既有验证订正，真实验证延期边界继续保留。
 
 ## 1. 阶段目标
 
@@ -642,139 +642,13 @@ R9-04 首轮 `16b5d4e` / [Windows run `38021521371`](https://github.com/uniquene
 
 ## R9-05 Formal Response、Schema 与 Citation
 
-状态：`READY`（04自身精确Windows全SUCCESS/DONE，用户已授权05）。
+状态：`VERIFYING`（04自身精确Windows全SUCCESS/DONE，用户已授权05；实施/静态/记录完成，待本项Windows）。
 
-### 1. 目标
+R9-05 Formal Response/Schema/Citation已实施、`VERIFYING`，基线53e49f8，同一R9分支。正式严格解析/解码/公开输出校验/引用关联各归唯一职责，共用引用wire/用量/错误映射仍唯一且兼容调用方不依赖Formal；URL/domain/time原政策留06。12A/12M/0D，无公开API/DTO/Schema/配置/依赖/DB/UI/生产政策变化，17原函数/657生产literal/原60unit和25contract保持。新增22unit/4contract，源码预期Gateway82/contract29、Application126/Persistence175须自身Windows；83/83静态/完整architecture/Rustfmt/保护资产/171命令/46迁移18PG静态及6破坏探针通过。
 
-- 完成 Formal Response、Schema 与 Citation 的完全重写，并将该能力收敛到唯一、可递归拆分的模块目录。
+实际公开ValidationContext/validate_research_output直接迁Schema，client同步/后台完成/resume各传真实响应到唯一parse_and_validate；原严格JSON语句抽出decode，五层deny_unknown_fields保留，root response只持真实兼容解析，root validation只持真实URL/domain/time政策。共用wire拥有两个真实调用家族，避免依赖Formal/重复实现；引用索引使用显式借用输入以解除Schema上下文耦合。原17迁移函数/其余client与兼容函数tokens、657literal、原60/25测试和所有公开接口保持。
 
-### 2. 现状与来源
-
-- `crates/research-gateway/`。
-- application/openai_research、api_workspace。
-- src-tauri openai/workspace stores。
-
-### 3. 目标文件与目录
-
-```text
-crates/research-gateway/src/formal_research/response/
-crates/research-gateway/src/formal_research/schema/
-crates/research-gateway/src/formal_research/citations/
-```
-
-### 4. 文件职责边界
-
-- 每个文件只承担一个可用一句话描述的职责。
-- 目录出口文件只负责显式导出。
-- 协调器只编排，不实现数据访问、UI 渲染或领域计算。
-
-### 5. 输入
-
-- 无。
-
-### 6. 输出
-
-- 稳定的模块公开接口、可独立测试的实现和对应契约测试。
-
-### 7. 允许依赖
-
-- 无。
-
-### 8. 禁止依赖
-
-- 无。
-
-### 9. 状态所有权
-
-- 该任务不新增跨模块共享状态；需要状态时由目标模块内具名 State/Coordinator 唯一持有。
-
-### 10. 副作用边界
-
-- 所有 I/O、副作用和外部调用必须集中在明确命名的 adapter/transport/repository/workflow 文件。
-
-### 11. 异常路径
-
-- 保持现有错误码、错误类型和用户可见提示语义；新增内部错误必须在边界映射为既有公共错误。
-
-### 12. 并发/异步/生命周期
-
-- 所有异步请求必须具备请求 ID、取消或过期结果丢弃策略；销毁时解除监听器、定时器和挂起回调。
-
-### 13. 兼容要求
-
-- 正式研究只走 Responses。
-- 普通问答不带 web search/tools/schema/token fields。
-- 现有配置键与 profile 行为不变。
-
-### 14. 实施步骤
-
-1. 读取 R0 生成的文件、命令、类型和调用方清单，确认本任务准确影响范围。
-2. 为目标目录创建清晰的 `mod.rs`/`index.ts` 出口，出口只 re-export，不承载业务逻辑。
-3. 先迁移或补齐契约测试，再实现新文件。
-4. 按职责逐文件实现；发现单文件再次出现第二职责时立即递归升级为子目录。
-5. 接入上游和下游，确保跨层只经过公开接口。
-6. 切换唯一入口，删除旧职责实现、重复类型、重复状态和重复样式。
-7. 运行最小验证、阶段回归和保护资产验证。
-8. 更新 README 并创建可回退原子提交。
-
-### 15. 切换入口
-
-- 在新实现通过最小验证后切换唯一调用入口；切换完成后立即运行契约验证。
-
-### 16. 删除清单
-
-- 删除被本任务替代的旧职责实现、重复出口、重复测试和临时转发。
-
-### 17. 最小验证
-
-- 相关 crate/feature 单元测试通过。
-- TypeScript/Rust 编译或类型检查通过。
-- 架构边界脚本通过。
-- 模型保护资产指纹通过。
-
-### 18. 阶段回归
-
-- `npm run verify:frontend`。
-- `cargo fmt --all -- --check`。
-- `cargo clippy --locked --workspace --all-targets -- -D warnings`。
-- `cargo test --locked --workspace`。
-
-### 19. 失败停止条件
-
-- 任何保护资产指纹变化。
-- 公共契约出现未批准变化。
-- 最小验证失败。
-- 发现用户未提交修改与目标文件重叠且无法安全合并。
-
-### 20. 回退点
-
-- 回退到 R9-05 开始前的已验证提交；不得手工复制旧文件恢复。
-
-### 21. 根 README 摘要记录
-
-- 记录 R9-05 实际创建、移动、删除的文件。
-- 记录执行过的命令、结果、未执行项与剩余风险。
-
-### 22. docs 阶段节点详细记录
-
-- 创建 `docs/modular-rewrite/R09-research-ai-backend/R09-05-formal-response-schema-and-citation.md`。
-- 记录本节点实际做了什么、为何修改、修改前后职责、行为和依赖变化。
-- 分别列出全部新增、修改、移动/重命名和删除文件；没有对应类型时明确写“无”。
-- 文件清单必须与本节点真实 `git diff --name-status` 和最终工作区一致。
-- 记录公共接口、DTO、Schema、数据格式、配置、错误语义、日志、UI 行为和模型保护资产是否变化。
-- 记录实际执行的验证命令、环境、结果和报告路径；未执行项必须写明原因、替代验证和剩余风险。
-- 记录入口切换、旧实现清理、关键设计决策、计划偏差和回退方法。
-- 更新 `docs/modular-rewrite/R09-research-ai-backend/README.md` 中本任务的状态、记录链接和门禁结果。
-- 节点记录及阶段索引未完成时，本任务只能停留在 `VERIFYING`，不得改为 `DONE`。
-
-### 23. 完成标准
-
-- 目标职责已由唯一新模块承担。
-- 旧入口和旧实现已删除。
-- 最小验证与阶段回归均通过。
-- README 与实际状态一致。
-- `R09-05-formal-response-schema-and-citation.md` 已创建并与实际变更、验证结果一致。
-- 阶段 `README.md` 已更新本任务状态和记录链接。
+准确23项职责/兼容/异常/生命周期/入口/删除/回退说明与所有24文件清单、22+4新增测试、实际静态/等价/探针/Context7版本取舍及延期见 [05实施记录](../modular-rewrite/R09-research-ai-backend/R09-05-formal-response-schema-and-citation.md)。沿用原Windows Automated，无新runner/workflow/target/回归框架/DB；精确开始后停止轮询，06～11BLOCKED。05自身Windows成功前不DONE；真实PG/历史四项/账本并发回滚/有效XLSX/Full/私有固定回归及继承model.runs/0041删除风险仍最终新库待验。
 
 ---
 

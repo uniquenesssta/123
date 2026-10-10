@@ -2,19 +2,19 @@ use crate::budget::{budget_error, pricing_for_model};
 use crate::formal_research::request::{
     build_request_body, check_budget as check_formal_budget, validate_gateway_request,
 };
+use crate::formal_research::response::parse_and_validate;
 use crate::request_fields::apply_token_limit;
 use crate::resilience::{attempt_limit, cancelled_error, retry_delay, wait_retry, CircuitBreaker};
 use crate::response::{
     parse_plain_text_success_response, parse_provider_error, parse_structured_success_response,
-    parse_success_response,
 };
 use crate::{
-    validate_research_output, ApiKey, ApiKeyProvider, ApiProtocol, CancellationToken,
-    GatewayAttempt, GatewayConfig, GatewayError, GatewayErrorCategory, GatewayExecution,
-    GatewayOperation, GatewayRequest, GatewayResponse, GatewayUsage, OpenAiConnectionTest,
-    OpenAiTransport, PlainTextGatewayExecution, PlainTextGatewayRequest, PlainTextGatewayResponse,
+    ApiKey, ApiKeyProvider, ApiProtocol, CancellationToken, GatewayAttempt, GatewayConfig,
+    GatewayError, GatewayErrorCategory, GatewayExecution, GatewayOperation, GatewayRequest,
+    GatewayResponse, GatewayUsage, OpenAiConnectionTest, OpenAiTransport,
+    PlainTextGatewayExecution, PlainTextGatewayRequest, PlainTextGatewayResponse,
     StructuredGatewayExecution, StructuredGatewayRequest, StructuredGatewayResponse,
-    TransportResponse, ValidationContext,
+    TransportResponse,
 };
 use async_trait::async_trait;
 use chrono::Utc;
@@ -948,7 +948,7 @@ impl OpenAiResearchGateway {
         let response = self
             .poll_background(response_id, &key, cancellation)
             .await?;
-        self.parse_and_validate(request, response)
+        parse_and_validate(&self.config.source_policy, request, response)
     }
 
     pub async fn cancel_remote(&self, response_id: &str) -> Result<(), GatewayError> {
@@ -1000,7 +1000,7 @@ impl OpenAiResearchGateway {
                             )
                         })?;
                 let completed = self.poll_background(response_id, key, cancellation).await?;
-                self.parse_and_validate(request, completed)
+                parse_and_validate(&self.config.source_policy, request, completed)
             }
             "queued" | "in_progress" => Err(GatewayError::new(
                 GatewayErrorCategory::SchemaValidation,
@@ -1015,7 +1015,7 @@ impl OpenAiResearchGateway {
                 "保留response_id和原始响应，检查incomplete_details后重试",
             )),
             "cancelled" => Err(cancelled_error()),
-            "completed" => self.parse_and_validate(request, response),
+            "completed" => parse_and_validate(&self.config.source_policy, request, response),
             other => Err(GatewayError::new(
                 GatewayErrorCategory::SchemaValidation,
                 format!("未知OpenAI响应状态：{other}"),
@@ -1092,28 +1092,6 @@ impl OpenAiResearchGateway {
                 }
             }
         }
-    }
-
-    fn parse_and_validate(
-        &self,
-        request: &GatewayRequest,
-        response: TransportResponse,
-    ) -> Result<GatewayResponse, GatewayError> {
-        let parsed =
-            parse_success_response(response.status, response.provider_request_id, response.body)?;
-        validate_research_output(
-            &parsed.output,
-            &ValidationContext {
-                match_key: &request.match_key,
-                schema_version: &request.schema_version,
-                data_cutoff_at: request.data_cutoff_at,
-                requested_fact_keys: &request.requested_fact_keys,
-                source_policy: &self.config.source_policy,
-                citations: &parsed.citations,
-                sources: &parsed.sources,
-            },
-        )?;
-        Ok(parsed)
     }
 
     fn build_plain_text_request_body(

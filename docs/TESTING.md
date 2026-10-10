@@ -461,3 +461,10 @@ Windows job `114123347337` 完成于2026-10-10 11:54:24北京，失败于gateway
 交付artifact `11671897216` / `windows-automated-delivery-evidence-cb3d2cadfb8caa0c7dc3f4eb7c34faedd49f79bc`，14,040,701 bytes，SHA-256 `b8928c736b0d462199c251a39ff1a9bb821cc23242e36874dcb86d6558275dd3`。验收报告 `D:\a\123\123\logs\windows-acceptance-20261010-132633.json`，过程记录同名.txt；Windows制品为原0.23.0 x64 zh-CN MSI和NSIS setup。原18 broad PG仍ignored；真实数据库、历史四项/不可变账本/并发/回滚、有效XLSX、Windows Full、私有P4/P7 Golden Master及继承model.runs/0041历史删除风险仍最终封包新库待验，ignored与公共stub不计PASS。
 
 首轮失败由该修复自身精确Windows关闭。04 **DONE**；用户“收尾04开始05”授权同一R9分支05 **READY**，06～11BLOCKED，R9整体IN_PROGRESS。本次仅既有五文档 `[skip ci]` 收尾，源码/门禁/依赖保持，同源码树复用上述Windows成功。此前VERIFYING叙述为实施历史，不创建R9阶段完成记录。
+
+
+## R9-05 Formal Response、Schema 与 Citation（2026-10-11，VERIFYING）
+
+R9-05 Formal Response/Schema/Citation已实施、`VERIFYING`，基线53e49f8，同一R9分支。正式严格解析/解码/公开输出校验/引用关联各归唯一职责，共用引用wire/用量/错误映射仍唯一且兼容调用方不依赖Formal；URL/domain/time原政策留06。12A/12M/0D，无公开API/DTO/Schema/配置/依赖/DB/UI/生产政策变化，17原函数/657生产literal/原60unit和25contract保持。新增22unit/4contract，源码预期Gateway82/contract29、Application126/Persistence175须自身Windows；83/83静态/完整architecture/Rustfmt/保护资产/171命令/46迁移18PG静态及6破坏探针通过。
+
+新增unit/契约细节、所有24文件、等价/探针/工具证据与报告见 [05记录](modular-rewrite/R09-research-ai-backend/R09-05-formal-response-schema-and-citation.md#行为覆盖与真实结果)。Domain扫描1132、usageDigest7dca548fa0c39319eb8f393a24a1823e8ffa705046dc89d86b1596dc6e4d13a9，365/300/声明摘要保持；生产URL/时间/协议/取消/预算/凭据/模型/迁移/锁/工作流保持。不执行Linux/macOS动态，不将82/29预期或04成功冒充05PASS。精确Windows开始后停止轮询；真实PG/历史四项/账本并发回滚/XLSX/Full/私有固定回归及继承删除风险仍最终新库待验，ignored/公共stub不计PASS。
