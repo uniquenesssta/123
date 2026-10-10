@@ -11,7 +11,7 @@ R8 的12个节点及 Windows Automated 阶段出口已DONE，最终代码 `af3c9
 
 执行总纲顶部订正：只在Windows动态验证，复用原targets/contract/workflow/数据库入口，不新增持续回归体系；R9不升级外部协议、不修改AI Workspace前端。R8期间 `crates/research-gateway/`、公开契约、依赖与配置保持，最终CI原Gateway测试/contract通过，原协议行为作为下一节点基线。
 
-用户已明确“开始R9-01”，编号映射已厘清。从R8文档收尾 `c72e559af4f29c9510daf2f9bf66b926dacb3013` 建立唯一分支 `rewrite/r9-research-ai-backend`；01共享传输自身精确Windows全SUCCESS、DONE，用户“收尾01开始02”授权02，已自身精确Windows全SUCCESS、DONE；用户“收尾02开始03”授权03，已自身Windows全SUCCESS并DONE；用户“收尾03开始04”授权04，已实施VERIFYING，05～11 BLOCKED，精确状态见 [阶段索引](../modular-rewrite/R09-research-ai-backend/README.md)。必须取得01自身Windows CI，R8成功不能替代。适用总纲顶部职责/生命周期/既有验证订正，真实验证延期边界继续保留。
+用户已明确“开始R9-01”，编号映射已厘清。从R8文档收尾 `c72e559af4f29c9510daf2f9bf66b926dacb3013` 建立唯一分支 `rewrite/r9-research-ai-backend`；01共享传输自身精确Windows全SUCCESS、DONE，用户“收尾01开始02”授权02，已自身精确Windows全SUCCESS、DONE；用户“收尾02开始03”授权03，已自身Windows全SUCCESS并DONE；用户“收尾03开始04”授权04，已自身Windows全SUCCESS并DONE；用户“收尾04开始05”授权05 READY，06～11 BLOCKED，精确状态见 [阶段索引](../modular-rewrite/R09-research-ai-backend/README.md)。必须取得01自身Windows CI，R8成功不能替代。适用总纲顶部职责/生命周期/既有验证订正，真实验证延期边界继续保留。
 
 ## 1. 阶段目标
 
@@ -513,7 +513,7 @@ R9-02 首轮 `98d542f` / [Windows run `37944445186`](https://github.com/uniquene
 
 ## R9-04 Formal Research Request
 
-状态：`VERIFYING`（03自身Windows全SUCCESS并DONE，用户已授权04；首轮契约夹具失败已修，待修复自身Windows）。
+状态：`DONE`（修复cb3d2ca/run38055651688自身Windows全SUCCESS，见04完成记录）。
 
 R9-04 首轮 `16b5d4e` / [Windows run `38021521371`](https://github.com/uniquenesssta/123/actions/runs/38021521371) 的新增协议拒绝契约仅切换Chat Completions，却保留Responses显式端点，Gateway初始化报InvalidConfiguration，未到达该测试断言。前端/类型/构建/17视口及fmt/Clippy通过，Gateway60、Application126、Persistence175通过；contract24/25，release/MSI/NSIS/启动未执行。修复只补该夹具的匹配Chat端点，生产实现及全部断言/测试数量保持；既有兼容传输门禁增加夹具顺序与原断言守卫，缺失/错协议/构造后配置三探针均拒绝恢复。83/83静态、完整架构、Rustfmt/保护资产/命令/数据库静态和等价复核通过；仍VERIFYING，05～11BLOCKED，必须取得修复自身Windows完整SUCCESS。
 
@@ -642,7 +642,7 @@ R9-04 首轮 `16b5d4e` / [Windows run `38021521371`](https://github.com/uniquene
 
 ## R9-05 Formal Response、Schema 与 Citation
 
-状态：`BLOCKED`（仅当上一任务与本任务前置门禁通过后改为 `READY`）
+状态：`READY`（04自身精确Windows全SUCCESS/DONE，用户已授权05）。
 
 ### 1. 目标
 
@@ -1655,3 +1655,12 @@ docs/modular-rewrite/R09-research-ai-backend/R09-stage-completion.md
 ```
 
 阶段完成记录必须引用本阶段每个节点记录，不得只重复任务书中的计划。缺少任何节点记录、真实文件总表、验证结果或回退信息时，本阶段不得标记为 `DONE`。
+
+
+## R9-04 精确 Windows 收尾（2026-10-11，DONE）
+
+精确修复提交 `cb3d2cadfb8caa0c7dc3f4eb7c34faedd49f79bc` / tree `8da6d35f383939d61ef4278b6d575f8c8eca1e34`，同一分支rewrite/r9-research-ai-backend，[Public Platform CI run `38055651688`](https://github.com/uniquenesssta/123/actions/runs/38055651688) 与 [Windows job `114223464446`](https://github.com/uniquenesssta/123/actions/runs/38055651688/job/114223464446) 均 **SUCCESS**；完成于2026-10-10 21:53:28北京。前端/contracts/TypeScript/Vite/17视口、Rust fmt/Clippy -D warnings/workspace、Windows release/MSI/NSIS/启动及运行日志覆盖/错误扫描通过；实际Gateway60/contract25、Application126/Persistence175均通过，首轮失败契约已执行成功。
+
+交付artifact `11671897216` / `windows-automated-delivery-evidence-cb3d2cadfb8caa0c7dc3f4eb7c34faedd49f79bc`，14,040,701 bytes，SHA-256 `b8928c736b0d462199c251a39ff1a9bb821cc23242e36874dcb86d6558275dd3`。验收报告 `D:\a\123\123\logs\windows-acceptance-20261010-132633.json`，过程记录同名.txt；Windows制品为原0.23.0 x64 zh-CN MSI和NSIS setup。原18 broad PG仍ignored；真实数据库、历史四项/不可变账本/并发/回滚、有效XLSX、Windows Full、私有P4/P7 Golden Master及继承model.runs/0041历史删除风险仍最终封包新库待验，ignored与公共stub不计PASS。
+
+首轮失败由该修复自身精确Windows关闭。04 **DONE**；用户“收尾04开始05”授权同一R9分支05 **READY**，06～11BLOCKED，R9整体IN_PROGRESS。本次仅既有五文档 `[skip ci]` 收尾，源码/门禁/依赖保持，同源码树复用上述Windows成功。此前VERIFYING叙述为实施历史，不创建R9阶段完成记录。

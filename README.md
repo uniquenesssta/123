@@ -559,3 +559,12 @@ PostgreSQL 实跑、Windows Full 和用户本机 Windows 10/11 实机验收仍�
 - 18 个需要专用可写 `FOOTBALL_TEST_DATABASE_URL` 的 PostgreSQL 集成测试未在 AT1/AT2 hard gate 执行，未记为通过；未执行破坏性数据库验证。PR #21 当前保持 Draft / Open / 未合并；R3-10 在 clean Public Platform CI 与正式合并/收口前保持 `VERIFYING`，不得提前标记 `DONE`。
 
 R8-07 精确 `58b390a` / [Windows run `37796909083`](https://github.com/uniquenesssta/123/actions/runs/37796909083) 全 SUCCESS：Application 92/Persistence 148、七项新增边界测试、17 视口、fmt/Clippy/workspace、Windows release/MSI/NSIS/启动7条3操作通过。详见 [07 完成记录](docs/modular-rewrite/R08-prediction-p4-orchestration/R08-07-run-persistence.md)。真实 PG/Full/私有固定回归与继承删除风险仍最终新库待验；07 DONE，08 按用户指令开始，当前状态见 [R8 索引](docs/modular-rewrite/R08-prediction-p4-orchestration/README.md)。
+
+
+## R9-04 精确 Windows 收尾（2026-10-11，DONE）
+
+精确修复提交 `cb3d2cadfb8caa0c7dc3f4eb7c34faedd49f79bc` / tree `8da6d35f383939d61ef4278b6d575f8c8eca1e34`，同一分支rewrite/r9-research-ai-backend，[Public Platform CI run `38055651688`](https://github.com/uniquenesssta/123/actions/runs/38055651688) 与 [Windows job `114223464446`](https://github.com/uniquenesssta/123/actions/runs/38055651688/job/114223464446) 均 **SUCCESS**；完成于2026-10-10 21:53:28北京。前端/contracts/TypeScript/Vite/17视口、Rust fmt/Clippy -D warnings/workspace、Windows release/MSI/NSIS/启动及运行日志覆盖/错误扫描通过；实际Gateway60/contract25、Application126/Persistence175均通过，首轮失败契约已执行成功。
+
+交付artifact `11671897216` / `windows-automated-delivery-evidence-cb3d2cadfb8caa0c7dc3f4eb7c34faedd49f79bc`，14,040,701 bytes，SHA-256 `b8928c736b0d462199c251a39ff1a9bb821cc23242e36874dcb86d6558275dd3`。验收报告 `D:\a\123\123\logs\windows-acceptance-20261010-132633.json`，过程记录同名.txt；Windows制品为原0.23.0 x64 zh-CN MSI和NSIS setup。原18 broad PG仍ignored；真实数据库、历史四项/不可变账本/并发/回滚、有效XLSX、Windows Full、私有P4/P7 Golden Master及继承model.runs/0041历史删除风险仍最终封包新库待验，ignored与公共stub不计PASS。
+
+首轮失败由该修复自身精确Windows关闭。04 **DONE**；用户“收尾04开始05”授权同一R9分支05 **READY**，06～11BLOCKED，R9整体IN_PROGRESS。本次仅既有五文档 `[skip ci]` 收尾，源码/门禁/依赖保持，同源码树复用上述Windows成功。此前VERIFYING叙述为实施历史，不创建R9阶段完成记录。

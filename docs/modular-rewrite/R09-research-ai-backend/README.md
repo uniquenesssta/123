@@ -2,7 +2,7 @@
 
 ## 当前阶段状态
 
-`IN_PROGRESS`。用户已明确“开始R9-01”，节点映射已厘清。唯一阶段分支 `rewrite/r9-research-ai-backend`，起点 `c72e559af4f29c9510daf2f9bf66b926dacb3013`。01 Shared Transport自身Windows全SUCCESS、DONE；用户“收尾01开始02”授权02，已自身Windows全SUCCESS、DONE；用户“收尾02开始03”授权03，已自身Windows全SUCCESS并DONE；用户“收尾03开始04”授权04，已实施VERIFYING，05～11 BLOCKED，不创建阶段完成记录。
+`IN_PROGRESS`。用户已明确“开始R9-01”，节点映射已厘清。唯一阶段分支 `rewrite/r9-research-ai-backend`，起点 `c72e559af4f29c9510daf2f9bf66b926dacb3013`。01 Shared Transport自身Windows全SUCCESS、DONE；用户“收尾01开始02”授权02，已自身Windows全SUCCESS、DONE；用户“收尾02开始03”授权03，已自身Windows全SUCCESS并DONE；用户“收尾03开始04”授权04，已自身Windows全SUCCESS并DONE；用户“收尾04开始05”授权05 READY，06～11 BLOCKED，不创建阶段完成记录。
 
 ## 前置基线与依据
 
@@ -17,8 +17,8 @@ R8期间research-gateway、公开契约、配置/依赖及锁文件保持；原G
 | R9-01 | Shared Transport | DONE · [完成记录](R09-01-shared-transport.md) · run37933341557 SUCCESS |
 | R9-02 | Credentials 与 Redaction | DONE · [完成记录](R09-02-credentials-and-redaction.md) · run37954536795 SUCCESS |
 | R9-03 | Retry、Circuit Breaker 与 Cancel | DONE · [完成记录](R09-03-retry-circuit-breaker-and-cancel.md) · run37960534145 SUCCESS |
-| R9-04 | Formal Research Request | VERIFYING · [实施记录](R09-04-formal-research-request.md) · 首轮契约失败已修、待修复自身Windows |
-| R9-05 | Formal Response、Schema 与 Citation | BLOCKED |
+| R9-04 | Formal Research Request | DONE · [完成记录](R09-04-formal-research-request.md) · run38055651688 SUCCESS |
+| R9-05 | Formal Response、Schema 与 Citation | READY |
 | R9-06 | Source 与 Time Policy | BLOCKED |
 | R9-07 | Plain Chat Responses | BLOCKED |
 | R9-08 | Plain Chat Chat Completions | BLOCKED |
@@ -28,7 +28,7 @@ R8期间research-gateway、公开契约、配置/依赖及锁文件保持；原G
 
 ## 实施范围与继续位置
 
-原client的三个公共传输类型与HTTP职责已切换transport唯一owner；Formal/Plain/Structured/连接测试/恢复GET/取消空POST继续同一原接口，不升级协议、不修改AI Workspace前端或凭据/重试政策。详见01记录；01自身Windows全SUCCESS，02已自身精确Windows通过并DONE，03已自身Windows全SUCCESS并DONE，04正式请求职责已拆分，下一步核实其自身Windows。
+原client的三个公共传输类型与HTTP职责已切换transport唯一owner；Formal/Plain/Structured/连接测试/恢复GET/取消空POST继续同一原接口，不升级协议、不修改AI Workspace前端或凭据/重试政策。详见01记录；01自身Windows全SUCCESS，02已自身精确Windows通过并DONE，03已自身Windows全SUCCESS并DONE，04正式请求职责已拆分并自身Windows全SUCCESS/DONE，下一步执行05。
 
 沿用现有单测/contract、Windows runner/workflow与最终新库入口；不新增持续回归基础设施，不执行Linux/macOS动态。每项必须自身精确Windows验收及实施记录才能DONE。已创建01实施记录；其状态已DONE，不创建R9阶段完成记录。Create State仅记录足球模型项目0.23.0的交接状态。
 
@@ -89,3 +89,12 @@ R9-04 Formal Request已实施、`VERIFYING`。正式输入/Schema校验、Respon
 R9-04 首轮 `16b5d4e` / [Windows run `38021521371`](https://github.com/uniquenesssta/123/actions/runs/38021521371) 的新增协议拒绝契约仅切换Chat Completions，却保留Responses显式端点，Gateway初始化报InvalidConfiguration，未到达该测试断言。前端/类型/构建/17视口及fmt/Clippy通过，Gateway60、Application126、Persistence175通过；contract24/25，release/MSI/NSIS/启动未执行。修复只补该夹具的匹配Chat端点，生产实现及全部断言/测试数量保持；既有兼容传输门禁增加夹具顺序与原断言守卫，缺失/错协议/构造后配置三探针均拒绝恢复。83/83静态、完整架构、Rustfmt/保护资产/命令/数据库静态和等价复核通过；仍VERIFYING，05～11BLOCKED，必须取得修复自身Windows完整SUCCESS。
 
 同一R9分支，修复回退16b5d4e，整个04回退仍bbc9031；8M/0A/0D，正式请求链路与响应/凭据/重试策略均保持。继续位置：核实修复自身精确Windows；成功后才能收尾04，05尚未开始。
+
+
+## R9-04 精确 Windows 收尾（2026-10-11，DONE）
+
+精确修复提交 `cb3d2cadfb8caa0c7dc3f4eb7c34faedd49f79bc` / tree `8da6d35f383939d61ef4278b6d575f8c8eca1e34`，同一分支rewrite/r9-research-ai-backend，[Public Platform CI run `38055651688`](https://github.com/uniquenesssta/123/actions/runs/38055651688) 与 [Windows job `114223464446`](https://github.com/uniquenesssta/123/actions/runs/38055651688/job/114223464446) 均 **SUCCESS**；完成于2026-10-10 21:53:28北京。前端/contracts/TypeScript/Vite/17视口、Rust fmt/Clippy -D warnings/workspace、Windows release/MSI/NSIS/启动及运行日志覆盖/错误扫描通过；实际Gateway60/contract25、Application126/Persistence175均通过，首轮失败契约已执行成功。
+
+交付artifact `11671897216` / `windows-automated-delivery-evidence-cb3d2cadfb8caa0c7dc3f4eb7c34faedd49f79bc`，14,040,701 bytes，SHA-256 `b8928c736b0d462199c251a39ff1a9bb821cc23242e36874dcb86d6558275dd3`。验收报告 `D:\a\123\123\logs\windows-acceptance-20261010-132633.json`，过程记录同名.txt；Windows制品为原0.23.0 x64 zh-CN MSI和NSIS setup。原18 broad PG仍ignored；真实数据库、历史四项/不可变账本/并发/回滚、有效XLSX、Windows Full、私有P4/P7 Golden Master及继承model.runs/0041历史删除风险仍最终封包新库待验，ignored与公共stub不计PASS。
+
+首轮失败由该修复自身精确Windows关闭。04 **DONE**；用户“收尾04开始05”授权同一R9分支05 **READY**，06～11BLOCKED，R9整体IN_PROGRESS。本次仅既有五文档 `[skip ci]` 收尾，源码/门禁/依赖保持，同源码树复用上述Windows成功。此前VERIFYING叙述为实施历史，不创建R9阶段完成记录。
