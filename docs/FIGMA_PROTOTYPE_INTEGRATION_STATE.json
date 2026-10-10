@@ -22,10 +22,10 @@
   "unstartedRouteCount": 0,
   "fullyIntegratedRouteCount": 0,
   "newScreenStageCreated": false,
-  "scope": "705 authored preset policies with stored-action interpretation, native variable evaluation and limited visual check; not browser event playback or full runtime acceptance.",
+  "scope": "batch06 creation complete; current theme wiring and full preset policy remain uncertified after transport timeouts",
   "inventory": {
-    "roots": 1345,
-    "productStates": 971,
+    "roots": 1470,
+    "productStates": 1096,
     "dialogs": 356,
     "contextMenus": 1,
     "reviewHubs": 17,
@@ -108,27 +108,27 @@
     ],
     [
       13,
-      61,
+      98,
       0
     ],
     [
       14,
-      45,
+      74,
       0
     ],
     [
       15,
-      36,
+      62,
       0
     ],
     [
       16,
-      30,
+      58,
       0
     ],
     [
       17,
-      13,
+      18,
       0
     ]
   ],
@@ -817,7 +817,7 @@
     "INT-04",
     "repeat whole-product acceptance"
   ],
-  "nextWork": "继续batch06：创建剩余125个精确主题对应状态；完成后接入双向主题、同主题页面跳转和历史重置并复验；弹窗、浏览器与真实输入/滚动/焦点另验。",
+  "nextWork": "恢复batch06：只读核对13个主题接入结果不明的根，幂等完成1096状态的主题/普通导航，应用已准备预置历史与重置策略并复验；弹窗主题、浏览器、真实输入/草稿/滚动/焦点另验。",
   "nextWorkStarted": true,
   "limitations": [
     "Stored graph plus representative screenshots, not browser event playback or runtime acceptance.",
@@ -11107,19 +11107,28 @@
     ]
   },
   "repairBatch06": {
-    "phase": "EXACT_THEME_COUNTERPARTS_STAGED_NOT_CONNECTED",
+    "phase": "EXACT_COUNTERPART_CREATION_COMPLETE_THEME_WIRING_UNVERIFIED",
     "overallAcceptance": "NOT_PASSED",
     "plannedCounterpartCount": 391,
-    "createdCounterpartCount": 266,
-    "remainingCreationCount": 125,
-    "connectedNewThemePairCount": 0,
-    "presetPolicyStateCount": 705,
-    "stagedUninstrumentedStateCount": 266,
-    "currentProductStateFrameCount": 971,
-    "currentRootCount": 1345,
-    "existingNativeBidirectionalThemePairCount": 157,
-    "statesWithoutVerifiedBidirectionalPairCount": 657,
+    "createdCounterpartCount": 391,
+    "remainingCreationCount": 0,
+    "logicalPresetIdentityCount": 548,
+    "physicalPresetStateCount": 1096,
+    "currentProductStateFrameCount": 1096,
+    "currentRootCount": 1470,
+    "lightStateCount": 548,
+    "darkStateCount": 548,
+    "potentialExactThemePairCount": 548,
+    "verifiedNativeThemePairCountAtBatch05": 157,
+    "currentNativeThemePairCount": null,
+    "presetPolicyStateCountVerifiedAtBatch05": 705,
+    "currentWholePresetPolicyCertified": false,
+    "newHistoryPolicyAuthoringStarted": false,
+    "themeWiringStarted": true,
+    "themeWiringCertified": false,
     "browserPlaybackPerformed": false,
+    "runtimeImplementationStarted": false,
+    "newRootCreatedNodeCount": 243889,
     "existingMastersModified": false,
     "sharedDesignVariablesModified": false,
     "applicationSourceModified": false,
