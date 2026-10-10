@@ -2,7 +2,7 @@
 
 ## 当前阶段状态
 
-`IN_PROGRESS`。用户已明确“开始R9-01”，节点映射已厘清。唯一阶段分支 `rewrite/r9-research-ai-backend`，起点 `c72e559af4f29c9510daf2f9bf66b926dacb3013`。01 Shared Transport自身Windows全SUCCESS、DONE；用户“收尾01开始02”授权02，已自身Windows全SUCCESS、DONE；用户“收尾02开始03”授权03，已实施VERIFYING，04～11 BLOCKED，不创建阶段完成记录。
+`IN_PROGRESS`。用户已明确“开始R9-01”，节点映射已厘清。唯一阶段分支 `rewrite/r9-research-ai-backend`，起点 `c72e559af4f29c9510daf2f9bf66b926dacb3013`。01 Shared Transport自身Windows全SUCCESS、DONE；用户“收尾01开始02”授权02，已自身Windows全SUCCESS、DONE；用户“收尾02开始03”授权03，已自身Windows全SUCCESS并DONE；用户“收尾03开始04”授权04 READY，05～11 BLOCKED，不创建阶段完成记录。
 
 ## 前置基线与依据
 
@@ -16,8 +16,8 @@ R8期间research-gateway、公开契约、配置/依赖及锁文件保持；原G
 |---|---|---|
 | R9-01 | Shared Transport | DONE · [完成记录](R09-01-shared-transport.md) · run37933341557 SUCCESS |
 | R9-02 | Credentials 与 Redaction | DONE · [完成记录](R09-02-credentials-and-redaction.md) · run37954536795 SUCCESS |
-| R9-03 | Retry、Circuit Breaker 与 Cancel | VERIFYING · [实施记录](R09-03-retry-circuit-breaker-and-cancel.md) · 静态通过、待自身Windows |
-| R9-04 | Formal Research Request | BLOCKED |
+| R9-03 | Retry、Circuit Breaker 与 Cancel | DONE · [完成记录](R09-03-retry-circuit-breaker-and-cancel.md) · run37960534145 SUCCESS |
+| R9-04 | Formal Research Request | READY · 用户已授权 |
 | R9-05 | Formal Response、Schema 与 Citation | BLOCKED |
 | R9-06 | Source 与 Time Policy | BLOCKED |
 | R9-07 | Plain Chat Responses | BLOCKED |
@@ -28,7 +28,7 @@ R8期间research-gateway、公开契约、配置/依赖及锁文件保持；原G
 
 ## 实施范围与继续位置
 
-原client的三个公共传输类型与HTTP职责已切换transport唯一owner；Formal/Plain/Structured/连接测试/恢复GET/取消空POST继续同一原接口，不升级协议、不修改AI Workspace前端或凭据/重试政策。详见01记录；01自身Windows全SUCCESS，02已自身精确Windows通过并DONE，03重试/熔断/取消职责已拆分，下一步核实其自身Windows。
+原client的三个公共传输类型与HTTP职责已切换transport唯一owner；Formal/Plain/Structured/连接测试/恢复GET/取消空POST继续同一原接口，不升级协议、不修改AI Workspace前端或凭据/重试政策。详见01记录；01自身Windows全SUCCESS，02已自身精确Windows通过并DONE，03已自身Windows全SUCCESS并DONE，下一步04正式研究请求职责拆分。
 
 沿用现有单测/contract、Windows runner/workflow与最终新库入口；不新增持续回归基础设施，不执行Linux/macOS动态。每项必须自身精确Windows验收及实施记录才能DONE。已创建01实施记录；其状态已DONE，不创建R9阶段完成记录。Create State仅记录足球模型项目0.23.0的交接状态。
 
@@ -70,3 +70,10 @@ R9-02 首轮 `98d542f` / [Windows run `37944445186`](https://github.com/uniquene
 ## R9-03 实施与门禁（VERIFYING）
 
 R9-03 Retry/Circuit/Cancel已实施、`VERIFYING`，基线59af3f2，同一R9分支。原重试预算/退避/可取消等待、单一熔断state与本地token各归resilience具名职责，旧cancellation.rs及client重复实现删除；协议fallback/工具兼容/远端取消与Semaphore原scope保持。5A/10M/1D，无API/DTO/Schema/依赖/DB/UI/生产策略变化。原unit新增12、contract新增5，源码预期Gateway47/contract21、Application126/Persistence175，须自身Windows实跑；83/83静态/完整architecture/Rustfmt/18保护资产/171命令/46迁移18PG静态与6破坏探针均PASS，原生产体/重路由client/251literal与原16contract等价。详见 [03记录](R09-03-retry-circuit-breaker-and-cancel.md)，报告r903-static-checks.json/r903-architecture.log/r903-equivalence.json/r903-negative-probes.json；通知原顺序经官方tokio1.52.3源码确认。沿用原Windows workflow，精确开始后停止轮询；04～11BLOCKED，不创建阶段完成记录。真实PG/Full/XLSX/私有固定回归及继承历史删除风险仍最终新库待验。
+
+
+## R9-03 精确 Windows 收尾（2026-10-10，DONE）
+
+精确实现 `d58aa38f88c2b59e3ee3b6f568b54d5430843b29` / [Windows run `37960534145`](https://github.com/uniquenesssta/123/actions/runs/37960534145) / job `113921936420` 全 SUCCESS，2026-10-10 01:05:49北京时间完成。Gateway **47/47**、contract **21/21**、Application **126/126**、Persistence **175/175**，新增12单测/5契约及原测试全部通过；完整前端/TypeScript/Vite/17视口、Rust fmt/Clippy/workspace、Windows release/MSI/NSIS/启动验收均通过。artifact `11632067812`，14,041,285字节，SHA-256 `71b4a13385cb2f77cb773e0181f2d1987d533148220b657317ad802507450d5b`。
+
+03 DONE；用户“收尾03开始04”授权同一R9分支04 READY，05～11 BLOCKED，R9整体IN_PROGRESS。本次仅既有五文档 `[skip ci]` 收尾，同源码树复用上述精确Windows；此前VERIFYING是实施历史。真实PG/历史四项/账本并发回滚/有效XLSX/Windows Full/私有P4P7固定回归及继承model.runs/0041删除风险继续最终新库待验，ignored及公共stub不计PASS。

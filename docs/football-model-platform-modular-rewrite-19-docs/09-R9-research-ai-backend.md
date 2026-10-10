@@ -11,7 +11,7 @@ R8 的12个节点及 Windows Automated 阶段出口已DONE，最终代码 `af3c9
 
 执行总纲顶部订正：只在Windows动态验证，复用原targets/contract/workflow/数据库入口，不新增持续回归体系；R9不升级外部协议、不修改AI Workspace前端。R8期间 `crates/research-gateway/`、公开契约、依赖与配置保持，最终CI原Gateway测试/contract通过，原协议行为作为下一节点基线。
 
-用户已明确“开始R9-01”，编号映射已厘清。从R8文档收尾 `c72e559af4f29c9510daf2f9bf66b926dacb3013` 建立唯一分支 `rewrite/r9-research-ai-backend`；01共享传输自身精确Windows全SUCCESS、DONE，用户“收尾01开始02”授权02，已自身精确Windows全SUCCESS、DONE；用户“收尾02开始03”授权03，已实施VERIFYING，04～11 BLOCKED，精确状态见 [阶段索引](../modular-rewrite/R09-research-ai-backend/README.md)。必须取得01自身Windows CI，R8成功不能替代。适用总纲顶部职责/生命周期/既有验证订正，真实验证延期边界继续保留。
+用户已明确“开始R9-01”，编号映射已厘清。从R8文档收尾 `c72e559af4f29c9510daf2f9bf66b926dacb3013` 建立唯一分支 `rewrite/r9-research-ai-backend`；01共享传输自身精确Windows全SUCCESS、DONE，用户“收尾01开始02”授权02，已自身精确Windows全SUCCESS、DONE；用户“收尾02开始03”授权03，已自身Windows全SUCCESS并DONE；用户“收尾03开始04”授权04 READY，05～11 BLOCKED，精确状态见 [阶段索引](../modular-rewrite/R09-research-ai-backend/README.md)。必须取得01自身Windows CI，R8成功不能替代。适用总纲顶部职责/生命周期/既有验证订正，真实验证延期边界继续保留。
 
 ## 1. 阶段目标
 
@@ -384,7 +384,7 @@ R9-02 首轮 `98d542f` / [Windows run `37944445186`](https://github.com/uniquene
 
 ## R9-03 Retry、Circuit Breaker 与 Cancel
 
-状态：`VERIFYING`（02自身Windows全SUCCESS并DONE，用户已授权03；本项静态/记录完成，待自身Windows）。
+状态：`DONE`（d58aa38 / Windows run37960534145完整SUCCESS）。
 
 ### 1. 目标
 
@@ -504,9 +504,16 @@ R9-02 首轮 `98d542f` / [Windows run `37944445186`](https://github.com/uniquene
 
 ---
 
+
+## R9-03 精确 Windows 收尾（2026-10-10，DONE）
+
+精确实现 `d58aa38f88c2b59e3ee3b6f568b54d5430843b29` / [Windows run `37960534145`](https://github.com/uniquenesssta/123/actions/runs/37960534145) / job `113921936420` 全 SUCCESS，2026-10-10 01:05:49北京时间完成。Gateway **47/47**、contract **21/21**、Application **126/126**、Persistence **175/175**，新增12单测/5契约及原测试全部通过；完整前端/TypeScript/Vite/17视口、Rust fmt/Clippy/workspace、Windows release/MSI/NSIS/启动验收均通过。artifact `11632067812`，14,041,285字节，SHA-256 `71b4a13385cb2f77cb773e0181f2d1987d533148220b657317ad802507450d5b`。
+
+03 DONE；用户“收尾03开始04”授权同一R9分支04 READY，05～11 BLOCKED，R9整体IN_PROGRESS。本次仅既有五文档 `[skip ci]` 收尾，同源码树复用上述精确Windows；此前VERIFYING是实施历史。真实PG/历史四项/账本并发回滚/有效XLSX/Windows Full/私有P4P7固定回归及继承model.runs/0041删除风险继续最终新库待验，ignored及公共stub不计PASS。
+
 ## R9-04 Formal Research Request
 
-状态：`BLOCKED`（仅当上一任务与本任务前置门禁通过后改为 `READY`）
+状态：`READY`（03精确Windows全SUCCESS并DONE；用户“收尾03开始04”已授权）。
 
 ### 1. 目标
 

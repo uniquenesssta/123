@@ -1,6 +1,6 @@
 # R9-03 Retry、Circuit Breaker 与 Cancel 实施记录
 
-状态：`VERIFYING`。用户2026-10-10“收尾02开始03”授权；uniquenesssta/123、0.23.0、唯一阶段分支rewrite/r9-research-ai-backend。02精确05055d1/run37954536795全SUCCESS并DONE，五文档收尾/03基线59af3f2ec65030a28150a3042d3b0673d65a48a8 `[skip ci]`。04～11BLOCKED。
+状态：`DONE`（自身Windows run37960534145全SUCCESS）。用户2026-10-10“收尾02开始03”授权；uniquenesssta/123、0.23.0、唯一阶段分支rewrite/r9-research-ai-backend。02精确05055d1/run37954536795全SUCCESS并DONE，五文档收尾/03基线59af3f2ec65030a28150a3042d3b0673d65a48a8 `[skip ci]`。当前04授权READY、05～11BLOCKED。
 
 ### 1. 目标
 
@@ -162,3 +162,10 @@ Domain使用扫描1110→1113、usageDigest `3f2e1c1e006acf971cc176490eeaa23d451
 Context7按Cargo.lock tokio1.52.3核对Notify，但目录仅给latest；准确docs.rs1.52.3页面访问失败，已通过GitHub读取官方tokio-rs/tokio的tokio-1.52.3标签notify.rs，确认Notified在创建后即能收到notify_waiters且不必先poll。原顺序原样迁移，不增加enable/notify_one、新库或依赖升级。Mermaid Chart已展示真实闭合/熔断/到期/在途成功与取消生命周期，不引入半开探针；Create State仅保存核实的足球稳定model96f03270-c236-46de-99fa-db85d2fbf4ce，合成摘要不替代源码及CI。
 
 沿用原Windows workflow，精确head与Windows job确认开始后停止轮询，预计20～30分钟。下一轮先核实03自身结果：成功收尾、失败修相关完整链路；04必须另有授权且门禁通过才能开始。真实PostgreSQL、历史四项/不可变账本/并发/回滚、有效XLSX、Windows Full、私有P4/P7 Golden Master及继承model.runs/0041删除风险仍最终封包新库待验；ignored与公开unavailable stub不计PASS。R9整体IN_PROGRESS，无阶段完成记录。
+
+
+## R9-03 精确 Windows 收尾（2026-10-10，DONE）
+
+精确实现 `d58aa38f88c2b59e3ee3b6f568b54d5430843b29` / [Windows run `37960534145`](https://github.com/uniquenesssta/123/actions/runs/37960534145) / job `113921936420` 全 SUCCESS，2026-10-10 01:05:49北京时间完成。Gateway **47/47**、contract **21/21**、Application **126/126**、Persistence **175/175**，新增12单测/5契约及原测试全部通过；完整前端/TypeScript/Vite/17视口、Rust fmt/Clippy/workspace、Windows release/MSI/NSIS/启动验收均通过。artifact `11632067812`，14,041,285字节，SHA-256 `71b4a13385cb2f77cb773e0181f2d1987d533148220b657317ad802507450d5b`。
+
+03 DONE；用户“收尾03开始04”授权同一R9分支04 READY，05～11 BLOCKED，R9整体IN_PROGRESS。本次仅既有五文档 `[skip ci]` 收尾，同源码树复用上述精确Windows；此前VERIFYING是实施历史。真实PG/历史四项/账本并发回滚/有效XLSX/Windows Full/私有P4P7固定回归及继承model.runs/0041删除风险继续最终新库待验，ignored及公共stub不计PASS。
