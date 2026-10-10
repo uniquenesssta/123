@@ -11,7 +11,7 @@ R8 的12个节点及 Windows Automated 阶段出口已DONE，最终代码 `af3c9
 
 执行总纲顶部订正：只在Windows动态验证，复用原targets/contract/workflow/数据库入口，不新增持续回归体系；R9不升级外部协议、不修改AI Workspace前端。R8期间 `crates/research-gateway/`、公开契约、依赖与配置保持，最终CI原Gateway测试/contract通过，原协议行为作为下一节点基线。
 
-用户已明确“开始R9-01”，编号映射已厘清。从R8文档收尾 `c72e559af4f29c9510daf2f9bf66b926dacb3013` 建立唯一分支 `rewrite/r9-research-ai-backend`；01共享传输自身精确Windows全SUCCESS、DONE，用户“收尾01开始02”授权02，已自身精确Windows全SUCCESS、DONE；用户“收尾02开始03”授权03，已自身Windows全SUCCESS并DONE；用户“收尾03开始04”授权04 READY，05～11 BLOCKED，精确状态见 [阶段索引](../modular-rewrite/R09-research-ai-backend/README.md)。必须取得01自身Windows CI，R8成功不能替代。适用总纲顶部职责/生命周期/既有验证订正，真实验证延期边界继续保留。
+用户已明确“开始R9-01”，编号映射已厘清。从R8文档收尾 `c72e559af4f29c9510daf2f9bf66b926dacb3013` 建立唯一分支 `rewrite/r9-research-ai-backend`；01共享传输自身精确Windows全SUCCESS、DONE，用户“收尾01开始02”授权02，已自身精确Windows全SUCCESS、DONE；用户“收尾02开始03”授权03，已自身Windows全SUCCESS并DONE；用户“收尾03开始04”授权04，已实施VERIFYING，05～11 BLOCKED，精确状态见 [阶段索引](../modular-rewrite/R09-research-ai-backend/README.md)。必须取得01自身Windows CI，R8成功不能替代。适用总纲顶部职责/生命周期/既有验证订正，真实验证延期边界继续保留。
 
 ## 1. 阶段目标
 
@@ -513,137 +513,126 @@ R9-02 首轮 `98d542f` / [Windows run `37944445186`](https://github.com/uniquene
 
 ## R9-04 Formal Research Request
 
-状态：`READY`（03精确Windows全SUCCESS并DONE；用户“收尾03开始04”已授权）。
+状态：`VERIFYING`（03自身Windows全SUCCESS并DONE，用户已授权04；职责/静态/记录完成，待本项Windows）。
 
 ### 1. 目标
 
-- 完成 Formal Research Request 的完全重写，并将该能力收敛到唯一、可递归拆分的模块目录。
+- 已将正式研究请求的输入校验、Responses载荷和请求前预算检查归到唯一职责；协议和执行生命周期留原Gateway。
 
 ### 2. 现状与来源
 
-- `crates/research-gateway/`。
-- application/openai_research、api_workspace。
-- src-tauri openai/workspace stores。
+- 原client.rs混合三协议编排、正式请求身份/Schema校验、载荷/上下文、预算前检/估算及共用定价/Token字段投影。
+- 以03精确成功代码及五文档收尾bbc9031为基线；原Gateway47 unit/21 contract保持。
 
 ### 3. 目标文件与目录
 
-```text
-crates/research-gateway/src/formal_research/request/
-```
+- `formal_research/request/{validation,payload,budget}.rs` 分别持校验、载荷和预算；tests.rs仅原unit target行为测试/夹具。
+- formal_research/mod与request/mod仅登记/显式export；共用预算政策归src/budget.rs，Token字段投影归request_fields.rs。
+- 依总纲顶部订正按真实职责共置函数，不机械逐函数建目录；shared helper必须支持正式与原非正式调用方。
 
 ### 4. 文件职责边界
 
-- 每个文件只承担一个可用一句话描述的职责。
-- 目录出口文件只负责显式导出。
-- 协调器只编排，不实现数据访问、UI 渲染或领域计算。
+- validation持原trace/match/schema/fact字段及严格Schema根校验，无IO/状态；execute与resume各直接复用一次。
+- payload持正式JSON载荷、可信静态instructions/不可信动态输入、Schema副本根字段投影及研究web-search字段。
+- 正式budget持原用量前检、主模型/去重fallback与每模型重试预算的完整上界检查；不持真实账本或定价缓存。
+- 共用budget只持原精确/最长dash前缀价格查找及BudgetExceeded映射；request_fields只持共享Token别名投影，两者不认识正式协议编排。
 
 ### 5. 输入
 
-- 无。
+- 原借用GatewayConfig/GatewayRequest及本次模型；预算使用原Gateway model_for_operation选择的primary_model。
+- 路由、配置、请求 DTO、Schema和预算用量来源不变，无新的公开输入类型。
 
 ### 6. 输出
 
-- 稳定的模块公开接口、可独立测试的实现和对应契约测试。
+- 原Value载荷、原GatewayError或Ok；配置/请求不会被修改，价格仍借用原配置中的ModelPricing。
 
 ### 7. 允许依赖
 
-- 无。
+- 已锁定serde_json1.0.150、现有std及Gateway类型；预算复用03 attempt_limit和唯一共享定价，载荷复用唯一Token字段投影。
 
 ### 8. 禁止依赖
 
-- 无。
+- 请求职责不依赖HTTP/transport、ApiKey/provider、tokio/取消/锁、GatewayAttemptSink、数据库/Domain预测、Tauri或UI。
+- 不将正式构造器用于普通聊天，不把正式请求特有策略放入shared HTTP transport。
 
 ### 9. 状态所有权
 
-- 该任务不新增跨模块共享状态；需要状态时由目标模块内具名 State/Coordinator 唯一持有。
+- 新职责全是借用输入的纯处理，无新跨请求状态/配置副本；Gateway仍唯一持config/transport/provider/Semaphore及03 CircuitBreaker。
+- 原19状态、Application402/43Ports/PG根35保持，不登记不存在的新State。
 
 ### 10. 副作用边界
 
-- 所有 I/O、副作用和外部调用必须集中在明确命名的 adapter/transport/repository/workflow 文件。
+- 只构造/校验本次JSON和金额；原凭据读取、许可获取、网络、sink/响应解析/轮询/取消继续原Gateway/transport。
+- 不新增API调用、日志字段、持久化事件、Schema文件或真实凭据测试。
 
 ### 11. 异常路径
 
-- 保持现有错误码、错误类型和用户可见提示语义；新增内部错误必须在边界映射为既有公共错误。
+- 原身份错误优先于Schema；根不是object与type/additionalProperties错误分别保留原完整错误。
+- 原正式执行顺序：请求校验→Responses协议→熔断→预算→许可→凭据→构造→IO；resume仍请求校验→response_id→background/store→凭据/轮询。
+- 无效预算NaN/无限/负值先拒绝；原daily/monthly/per-request优先、完整BudgetExceeded/recovery与无provider metadata保持。
 
 ### 12. 并发/异步/生命周期
 
-- 所有异步请求必须具备请求 ID、取消或过期结果丢弃策略；销毁时解除监听器、定时器和挂起回调。
+- 新模块无async/锁/全局变量；借用config/request，仅clone本次provider_schema副本，不修改来源或共享缓存。
+- 原attempt offset/饱和、retry/fallback、sink先于熔断、select/OwnedSemaphorePermit及远端取消/后台响应生命周期保持。
 
 ### 13. 兼容要求
 
-- 正式研究只走 Responses。
-- 普通问答不带 web search/tools/schema/token fields。
-- 现有配置键与 profile 行为不变。
+- 正式Research/Extraction仍Responses，原研究/提取路由不变，普通聊天双协议最小载荷保持；不升级外部API。
+- Schema仅移除副本根$schema/$id，嵌套原样；原动态context_is_untrusted、strict/name/metadata/reasoning/store/background/domain filters/tool/include/token字段不变。
+- trace64/match200/fact100为字符、Schema名称64为字节且ASCII；31事实及raw精确去重、原trim只检查非空不规范化政策保持。
+- 原formal静态指令不擅加Plain的30000字符限制；原缺少价格filter_map政策不擅改，预算公式/路由/profile/DTO/配置/错误/UI/日志/版本0.23.0保持。
 
 ### 14. 实施步骤
 
-1. 读取 R0 生成的文件、命令、类型和调用方清单，确认本任务准确影响范围。
-2. 为目标目录创建清晰的 `mod.rs`/`index.ts` 出口，出口只 re-export，不承载业务逻辑。
-3. 先迁移或补齐契约测试，再实现新文件。
-4. 按职责逐文件实现；发现单文件再次出现第二职责时立即递归升级为子目录。
-5. 接入上游和下游，确保跨层只经过公开接口。
-6. 切换唯一入口，删除旧职责实现、重复类型、重复状态和重复样式。
-7. 运行最小验证、阶段回归和保护资产验证。
-8. 更新 README 并创建可回退原子提交。
+1. 已核实03自身精确Windows成功，5文档收尾bbc9031，用户“收尾03开始04”已授权。
+2. 已按三个正式请求职责及两个实际共用政策拆分，入口直调；迁出7函数及其余client重路由等价核对。
+3. 原unit新增13、原contract新增4；原47/21测试保留，无新target/runner/workflow/数据库/依赖。
+4. 原兼容传输验证器增加请求owner/入口顺序/政策守卫，7破坏探针全拒绝恢复；完整静态/格式/保护验证通过。
+5. 同步实施记录与准确文件清单；提交后确认自身WindowsCI开始即停止轮询，仍VERIFYING。
 
 ### 15. 切换入口
 
-- 在新实现通过最小验证后切换唯一调用入口；切换完成后立即运行契约验证。
+- client从formal_research::request直接导入校验/构造/预算，无旧Gateway转发壳；execute/resume共用一个原校验器。
+- 原所有成本调用直接共用budget::pricing_for_model，连接测试与正式构造共用request_fields::apply_token_limit；旧helper全部移除。
 
 ### 16. 删除清单
 
-- 删除被本任务替代的旧职责实现、重复出口、重复测试和临时转发。
+- client删除validate_gateway_request/build_request_body/check_budget/estimate_request_ceiling/pricing_for_model/budget_error/apply_token_limit定义；原公开入口未删除。
+- 无旧Rust文件整文件删除或改名，无第二构造器/校验器/价格公式；响应/Schema消费验证留05、source/time留06，不提前推进。
 
 ### 17. 最小验证
 
-- 相关 crate/feature 单元测试通过。
-- TypeScript/Rust 编译或类型检查通过。
-- 架构边界脚本通过。
-- 模型保护资产指纹通过。
+- 本地实际83/83现有源码门禁、完整npm verify:architecture、Rustfmt1.88源码format/check、18保护资产/171命令/46迁移18PG静态、diff及等价通过。
+- 7生产函数/整个剩余client重路由tokens、247生产literal、47原unit源及21原contract保持；7探针拒绝恢复。
+- 源码预期Gateway60/contract25、Application126/Persistence175，新增13+4须本项Windows实际运行，不能计源码预期为PASS。
 
 ### 18. 阶段回归
 
-- `npm run verify:frontend`。
-- `cargo fmt --all -- --check`。
-- `cargo clippy --locked --workspace --all-targets -- -D warnings`。
-- `cargo test --locked --workspace`。
+- 原Public Platform CI/Windows Automated复用完整frontend/contracts/TypeScript/Vite/17视口、Rust fmt/Clippy -D warnings/workspace tests、release/MSI/NSIS/启动。
+- 本地不执行Linux/macOS Cargo/编译/单测/loopback/浏览器动态；真实PG/历史四项/账本并发回滚/有效XLSX/Windows Full/私有固定回归继续最终新库待验。
 
 ### 19. 失败停止条件
 
-- 任何保护资产指纹变化。
-- 公共契约出现未批准变化。
-- 最小验证失败。
-- 发现用户未提交修改与目标文件重叠且无法安全合并。
+- 自身Windows未完整SUCCESS前04保持VERIFYING、05～11BLOCKED；失败只修相关链路，保护资产/公开契约/静态门禁失败先修，不放宽门禁或抑制Clippy。
 
 ### 20. 回退点
 
-- 回退到 R9-04 开始前的已验证提交；不得手工复制旧文件恢复。
+- 04基线bbc9031a41e21c3b4c90831a1d2ec1ce2fdcb1a4，源码等于03精确d58aa38/run37960534145全SUCCESS；受控revert本项，恢复原唯一owner及清单，不复制双实现或覆盖用户修改。
 
 ### 21. 根 README 摘要记录
 
-- 记录 R9-04 实际创建、移动、删除的文件。
-- 记录执行过的命令、结果、未执行项与剩余风险。
+- 已记录03DONE/04VERIFYING、9A/9M/0D、请求职责/兼容、13+4测试、实际静态和Windows待验。
 
 ### 22. docs 阶段节点详细记录
 
-- 创建 `docs/modular-rewrite/R09-research-ai-backend/R09-04-formal-research-request.md`。
-- 记录本节点实际做了什么、为何修改、修改前后职责、行为和依赖变化。
-- 分别列出全部新增、修改、移动/重命名和删除文件；没有对应类型时明确写“无”。
-- 文件清单必须与本节点真实 `git diff --name-status` 和最终工作区一致。
-- 记录公共接口、DTO、Schema、数据格式、配置、错误语义、日志、UI 行为和模型保护资产是否变化。
-- 记录实际执行的验证命令、环境、结果和报告路径；未执行项必须写明原因、替代验证和剩余风险。
-- 记录入口切换、旧实现清理、关键设计决策、计划偏差和回退方法。
-- 更新 `docs/modular-rewrite/R09-research-ai-backend/README.md` 中本任务的状态、记录链接和门禁结果。
-- 节点记录及阶段索引未完成时，本任务只能停留在 `VERIFYING`，不得改为 `DONE`。
+- 已创建04实施记录，包含全18文件/测试/等价/报告/工具/偏差/回退；阶段索引04VERIFYING、05～11BLOCKED，R9整体IN_PROGRESS，无阶段完成记录。
 
 ### 23. 完成标准
 
-- 目标职责已由唯一新模块承担。
-- 旧入口和旧实现已删除。
-- 最小验证与阶段回归均通过。
-- README 与实际状态一致。
-- `R09-04-formal-research-request.md` 已创建并与实际变更、验证结果一致。
-- 阶段 `README.md` 已更新本任务状态和记录链接。
+- 实现/静态/文档已完成，须04自身精确Windows完整SUCCESS后才能DONE；延期真实数据库/Full等不能冒充PASS或从03继承。
+
+详见 [04实施记录](../modular-rewrite/R09-research-ai-backend/R09-04-formal-research-request.md)，含全部18文件清单、测试/报告/工具/取舍/回退。
 
 ---
 

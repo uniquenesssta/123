@@ -52,6 +52,8 @@ R9-03 Retry/Circuit/Cancel实施时`VERIFYING`，基线59af3f2，同一R9分支�
 
 R9-03 已收尾为 `DONE`。精确实现 `d58aa38f88c2b59e3ee3b6f568b54d5430843b29` / [Windows run `37960534145`](https://github.com/uniquenesssta/123/actions/runs/37960534145) / job `113921936420` 全 SUCCESS，2026-10-10 01:05:49北京时间完成。Gateway **47/47**、contract **21/21**、Application **126/126**、Persistence **175/175**，新增12单测/5契约及原测试全部通过；完整前端/TypeScript/Vite/17视口、Rust fmt/Clippy/workspace、Windows release/MSI/NSIS/启动验收均通过。artifact `11632067812`，14,041,285字节，SHA-256 `71b4a13385cb2f77cb773e0181f2d1987d533148220b657317ad802507450d5b`。 用户授权04正式研究请求开始，05～11BLOCKED。详见 [03完成记录](docs/modular-rewrite/R09-research-ai-backend/R09-03-retry-circuit-breaker-and-cancel.md)。
 
+R9-04 Formal Request已实施、`VERIFYING`。正式输入/Schema校验、Responses载荷及请求前预算分别归唯一职责；原连接测试/Plain等复用唯一Token投影与定价政策。9A/9M/0D，无API/DTO/Schema/配置/依赖/DB/UI或生产策略变化；7原函数及其余Gateway编排、247literal/原47unit/21contract保持。新增13单测/4契约，源码预期Gateway60/contract25、Application126/Persistence175，须本项Windows实跑。83现有静态/完整architecture/Rustfmt/保护资产/171命令/46迁移18PG静态及7破坏探针通过。详见 [04实施记录](docs/modular-rewrite/R09-research-ai-backend/R09-04-formal-research-request.md)。CI开始后停止轮询，05～11BLOCKED；真实PG/Full/XLSX/私有固定回归及继承删除风险仍最终新库待验。
+
 ## 公开边界
 
 - 保留 `crates/model-api`、模型 ID、路由、规则包入口、预测页面和历史数据结构。

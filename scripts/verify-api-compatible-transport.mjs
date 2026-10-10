@@ -74,5 +74,30 @@ for (const source of [retry, circuit, cancellation]) for (const token of ["reqwe
 const states = json("architecture/state-ownership.json").states;
 assert(states.find(state => state.id === "gateway.circuit-breaker")?.owner === `${resilienceRoot}/circuit_breaker.rs::CircuitBreaker`, "熔断唯一状态owner未同步");
 assert(states.find(state => state.id === "gateway.local-cancellation")?.owner === `${resilienceRoot}/cancellation.rs::CancellationState`, "取消唯一状态owner未同步");
+// R9-04: formal request validation, payload and admission each have a single owner.
+const formalRoot = "crates/research-gateway/src/formal_research";
+const formalExports = text(`${formalRoot}/mod.rs`);
+const formalRequestExports = text(`${formalRoot}/request/mod.rs`);
+const formalValidation = text(`${formalRoot}/request/validation.rs`);
+const formalPayload = text(`${formalRoot}/request/payload.rs`);
+const formalBudget = text(`${formalRoot}/request/budget.rs`);
+const budgetPolicy = text("crates/research-gateway/src/budget.rs");
+const requestFields = text("crates/research-gateway/src/request_fields.rs");
+for (const source of [formalExports, formalRequestExports]) assert(!/\b(?:fn|struct|trait|impl)\b/.test(source), "正式研究出口只登记/显式导出");
+for (const token of ["fn validate_gateway_request", "fn build_request_body", "fn check_budget", "fn estimate_request_ceiling", "fn pricing_for_model", "fn budget_error", "fn apply_token_limit"]) assert(!gateway.includes(token), `client仍持有重复请求职责：${token}`);
+assert((gateway.match(/validate_gateway_request\(request\)\?/g) ?? []).length === 2, "正式执行/恢复必须复用唯一输入校验");
+assert(gateway.includes("build_request_body(&self.config, request, model)?"), "正式执行未接入唯一载荷owner");
+const formalExecution = slice(gateway, "pub async fn execute_with_sink(", "pub async fn resume(");
+assert(/check_formal_budget\(\s*&self\.config,\s*request,\s*self\.model_for_operation\(request\.operation\),?\s*\)\?/.test(formalExecution), "正式执行未接入原路由及唯一预算前检");
+const admission = ["validate_gateway_request(request)?", "self.config.api_protocol != ApiProtocol::Responses", "self.circuit.check().await?", "check_formal_budget(", "acquire_owned()", "key_provider.load", "build_request_body(&self.config, request, model)?"];
+const positions = admission.map(token => formalExecution.indexOf(token));
+assert(positions.every((position, index) => position >= 0 && (index === 0 || position > positions[index - 1])), "正式校验/协议/熔断/预算/许可/凭据/载荷原顺序漂移");
+for (const token of ["request.trace_id.chars().count() > 64", "request.match_key.chars().count() > 200", "request.schema_name.len() <= 64", "byte.is_ascii_alphanumeric()", "request.requested_fact_keys.len() > 31", "unique_fact_keys.len() != request.requested_fact_keys.len()", "key.chars().count() > 100", 'schema.get("additionalProperties").and_then(Value::as_bool) != Some(false)']) assert(formalValidation.includes(token), `正式校验原边界缺少${token}`);
+for (const token of ['"task": "p4_public_web_fact_research"', '"dynamic_context_is_untrusted": true', '"instructions": request.static_instructions', "request.schema.clone()", 'schema.remove("$schema")', 'schema.remove("$id")', '"type": "json_schema"', '"strict": true', '"schema": provider_schema', '"trace_id": request.trace_id', '"schema_version": request.schema_version', "if config.background_mode", '"type": "web_search"', "if !config.source_policy.allowed_domains.is_empty()", '"allowed_domains": &config.source_policy.allowed_domains', "config.token_limit_field", "config.max_output_tokens", 'body["tool_choice"] = json!("auto")', 'body["include"] = json!(["web_search_call.action.sources"])', 'body["max_tool_calls"] = json!(config.max_tool_calls)']) assert(formalPayload.includes(token), `正式载荷原政策缺少${token}`);
+for (const token of ["!request.daily_spend_usd.is_finite()", "!request.monthly_spend_usd.is_finite()", "if !models.contains(&fallback)", "attempt_limit(config.max_retries) as f64", "ceiling * attempts_per_model", "serialized.chars().count() as f64 / 4.0", "config.max_tool_calls as f64 * config.budget.web_search_usd_per_call"]) assert(formalBudget.includes(token), `正式预算原政策缺少${token}`);
+for (const token of ['model.starts_with(&format!("{}-", configured.as_str()))', ".max_by_key(|(configured, _)| configured.len())", "GatewayErrorCategory::BudgetExceeded"]) assert(budgetPolicy.includes(token), `共享预算政策缺少${token}`);
+for (const token of ['object.remove("max_output_tokens")', 'object.remove("max_tokens")', "object.insert(field.as_str().to_string(), json!(value))"]) assert(requestFields.includes(token), `共享Token字段政策缺少${token}`);
+assert(gateway.includes("use crate::request_fields::apply_token_limit;") && formalPayload.includes("use crate::request_fields::apply_token_limit;"), "连通性与正式请求必须复用一个Token字段owner");
+for (const source of [formalValidation, formalPayload, formalBudget, budgetPolicy, requestFields]) for (const token of ["reqwest::", "key_provider", "OpenAiTransport", "tokio::", "GatewayAttemptSink", "Mutex<", "ApiKey"]) assert(!source.includes(token), `请求纯职责越界承担IO/状态：${token}`);
 if (failures.length) { console.error("AI问答兼容传输验证失败："); failures.forEach((item) => console.error(`- ${item}`)); process.exit(1); }
-console.log("AI问答兼容传输验证通过：Responses与Chat Completions保持最小文本请求；R9-01共享HTTP/解码与R9-03重试/熔断/取消唯一owner、原公共契约和策略边界保持。");
+console.log("AI问答兼容传输验证通过：Responses与Chat Completions保持最小文本请求；R9-01共享HTTP/解码与R9-03重试/熔断/取消与R9-04正式请求唯一owner、原公共契约和策略边界保持。");

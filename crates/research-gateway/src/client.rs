@@ -1,3 +1,8 @@
+use crate::budget::{budget_error, pricing_for_model};
+use crate::formal_research::request::{
+    build_request_body, check_budget as check_formal_budget, validate_gateway_request,
+};
+use crate::request_fields::apply_token_limit;
 use crate::resilience::{attempt_limit, cancelled_error, retry_delay, wait_retry, CircuitBreaker};
 use crate::response::{
     parse_plain_text_success_response, parse_provider_error, parse_structured_success_response,
@@ -6,10 +11,10 @@ use crate::response::{
 use crate::{
     validate_research_output, ApiKey, ApiKeyProvider, ApiProtocol, CancellationToken,
     GatewayAttempt, GatewayConfig, GatewayError, GatewayErrorCategory, GatewayExecution,
-    GatewayOperation, GatewayRequest, GatewayResponse, GatewayUsage, ModelPricing,
-    OpenAiConnectionTest, OpenAiTransport, PlainTextGatewayExecution, PlainTextGatewayRequest,
-    PlainTextGatewayResponse, StructuredGatewayExecution, StructuredGatewayRequest,
-    StructuredGatewayResponse, TokenLimitField, TransportResponse, ValidationContext,
+    GatewayOperation, GatewayRequest, GatewayResponse, GatewayUsage, OpenAiConnectionTest,
+    OpenAiTransport, PlainTextGatewayExecution, PlainTextGatewayRequest, PlainTextGatewayResponse,
+    StructuredGatewayExecution, StructuredGatewayRequest, StructuredGatewayResponse,
+    TransportResponse, ValidationContext,
 };
 use async_trait::async_trait;
 use chrono::Utc;
@@ -217,61 +222,6 @@ fn validate_structured_gateway_request(
             "API协作输入超过8 MiB上限",
             false,
             "减少附件或拆分对话后重试",
-        ));
-    }
-    Ok(())
-}
-
-fn validate_gateway_request(request: &GatewayRequest) -> Result<(), GatewayError> {
-    let valid_schema_name = !request.schema_name.is_empty()
-        && request.schema_name.len() <= 64
-        && request
-            .schema_name
-            .bytes()
-            .all(|byte| byte.is_ascii_alphanumeric() || byte == b'_' || byte == b'-');
-    let unique_fact_keys: std::collections::BTreeSet<_> = request
-        .requested_fact_keys
-        .iter()
-        .map(String::as_str)
-        .collect();
-    if request.trace_id.trim().is_empty()
-        || request.trace_id.chars().count() > 64
-        || request.match_key.trim().is_empty()
-        || request.match_key.chars().count() > 200
-        || !valid_schema_name
-        || request.schema_version.trim().is_empty()
-        || request.static_instructions.trim().is_empty()
-        || request.requested_fact_keys.is_empty()
-        || request.requested_fact_keys.len() > 31
-        || unique_fact_keys.len() != request.requested_fact_keys.len()
-        || request
-            .requested_fact_keys
-            .iter()
-            .any(|key| key.trim().is_empty() || key.chars().count() > 100)
-    {
-        return Err(GatewayError::new(
-            GatewayErrorCategory::InvalidConfiguration,
-            "OpenAI研究请求的追踪、比赛、Schema或事实字段契约无效",
-            false,
-            "修正研究任务输入后重试",
-        ));
-    }
-    let schema = request.schema.as_object().ok_or_else(|| {
-        GatewayError::new(
-            GatewayErrorCategory::InvalidConfiguration,
-            "OpenAI严格输出Schema根节点必须是对象",
-            false,
-            "修正版本化Schema后重试",
-        )
-    })?;
-    if schema.get("type").and_then(Value::as_str) != Some("object")
-        || schema.get("additionalProperties").and_then(Value::as_bool) != Some(false)
-    {
-        return Err(GatewayError::new(
-            GatewayErrorCategory::InvalidConfiguration,
-            "OpenAI严格输出Schema必须是type=object且additionalProperties=false",
-            false,
-            "修正版本化Schema后重试",
         ));
     }
     Ok(())
@@ -797,7 +747,11 @@ impl OpenAiResearchGateway {
             ));
         }
         self.circuit.check().await?;
-        self.check_budget(request)?;
+        check_formal_budget(
+            &self.config,
+            request,
+            self.model_for_operation(request.operation),
+        )?;
         let permit = tokio::select! {
             result = self.concurrency.clone().acquire_owned() => result.map_err(|_| {
                 GatewayError::new(
@@ -828,7 +782,7 @@ impl OpenAiResearchGateway {
                 if cancellation.is_cancelled() {
                     return Err(cancelled_error());
                 }
-                let body = self.build_request_body(request, model)?;
+                let body = build_request_body(&self.config, request, model)?;
                 let request_fingerprint = fingerprint(&body)?;
                 let started_at = Utc::now();
                 let started = Instant::now();
@@ -1162,74 +1116,6 @@ impl OpenAiResearchGateway {
         Ok(parsed)
     }
 
-    fn build_request_body(
-        &self,
-        request: &GatewayRequest,
-        model: &str,
-    ) -> Result<Value, GatewayError> {
-        let input = serde_json::to_string(&json!({
-            "task": "p4_public_web_fact_research",
-            "match_key": request.match_key,
-            "data_cutoff_at": request.data_cutoff_at,
-            "requested_fact_keys": request.requested_fact_keys,
-            "dynamic_context": request.dynamic_context,
-            "dynamic_context_is_untrusted": true
-        }))
-        .map_err(|error| {
-            GatewayError::new(
-                GatewayErrorCategory::InvalidConfiguration,
-                format!("研究任务动态上下文无法序列化：{error}"),
-                false,
-                "修正研究任务输入后重试",
-            )
-        })?;
-        let mut provider_schema = request.schema.clone();
-        if let Value::Object(schema) = &mut provider_schema {
-            schema.remove("$schema");
-            schema.remove("$id");
-        }
-        let mut body = json!({
-            "model": model,
-            "instructions": request.static_instructions,
-            "input": input,
-            "reasoning": {"effort": self.config.reasoning_effort.as_str()},
-            "text": {"format": {
-                "type": "json_schema",
-                "name": request.schema_name,
-                "strict": true,
-                "schema": provider_schema
-            }},
-            "store": self.config.store,
-            "metadata": {
-                "trace_id": request.trace_id,
-                "match_key": request.match_key,
-                "schema_version": request.schema_version
-            }
-        });
-        if self.config.background_mode {
-            body["background"] = json!(true);
-        }
-        let mut web_search = json!({
-            "type": "web_search",
-            "search_context_size": self.config.search_context_size.as_str()
-        });
-        if !self.config.source_policy.allowed_domains.is_empty() {
-            web_search["filters"] = json!({
-                "allowed_domains": &self.config.source_policy.allowed_domains
-            });
-        }
-        apply_token_limit(
-            &mut body,
-            self.config.token_limit_field,
-            self.config.max_output_tokens,
-        );
-        body["tools"] = json!([web_search]);
-        body["tool_choice"] = json!("auto");
-        body["include"] = json!(["web_search_call.action.sources"]);
-        body["max_tool_calls"] = json!(self.config.max_tool_calls);
-        Ok(body)
-    }
-
     fn build_plain_text_request_body(
         &self,
         request: &PlainTextGatewayRequest,
@@ -1362,7 +1248,7 @@ Return only one JSON object. Do not use Markdown fences or explanatory text outs
             .unwrap_or(0.0);
         let estimate = models
             .into_iter()
-            .filter_map(|model| self.pricing_for_model(model))
+            .filter_map(|model| pricing_for_model(&self.config, model))
             .map(|pricing| {
                 input_tokens / 1_000_000.0 * pricing.input_usd_per_million
                     + self.config.max_output_tokens as f64 / 1_000_000.0
@@ -1395,7 +1281,7 @@ Return only one JSON object. Do not use Markdown fences or explanatory text outs
     }
 
     fn estimate_plain_text_actual_cost(&self, response: &PlainTextGatewayResponse) -> Option<f64> {
-        let pricing = self.pricing_for_model(&response.model_id)?;
+        let pricing = pricing_for_model(&self.config, &response.model_id)?;
         let uncached = response
             .usage
             .input_tokens
@@ -1451,7 +1337,7 @@ Return only one JSON object. Do not use Markdown fences or explanatory text outs
             .saturating_add(u32::from(automatic_fallback_attempt));
         let estimate = models
             .into_iter()
-            .filter_map(|model| self.pricing_for_model(model))
+            .filter_map(|model| pricing_for_model(&self.config, model))
             .map(|pricing| {
                 input_tokens / 1_000_000.0 * pricing.input_usd_per_million
                     + self.config.max_output_tokens as f64 / 1_000_000.0
@@ -1485,7 +1371,7 @@ Return only one JSON object. Do not use Markdown fences or explanatory text outs
     }
 
     fn estimate_structured_actual_cost(&self, response: &StructuredGatewayResponse) -> Option<f64> {
-        let pricing = self.pricing_for_model(&response.model_id)?;
+        let pricing = pricing_for_model(&self.config, &response.model_id)?;
         let uncached = response
             .usage
             .input_tokens
@@ -1507,71 +1393,12 @@ Return only one JSON object. Do not use Markdown fences or explanatory text outs
         }
     }
 
-    fn check_budget(&self, request: &GatewayRequest) -> Result<(), GatewayError> {
-        if !request.daily_spend_usd.is_finite()
-            || request.daily_spend_usd < 0.0
-            || !request.monthly_spend_usd.is_finite()
-            || request.monthly_spend_usd < 0.0
-        {
-            return Err(budget_error("数据库返回了无效的OpenAI预算用量"));
-        }
-        let mut models = vec![self.model_for_operation(request.operation)];
-        if let Some(fallback) = self.config.fallback_model.as_deref() {
-            if !models.contains(&fallback) {
-                models.push(fallback);
-            }
-        }
-        let attempts_per_model = self.max_attempts_per_model() as f64;
-        let estimate = models
-            .into_iter()
-            .filter_map(|model| self.estimate_request_ceiling(request, model))
-            .map(|ceiling| ceiling * attempts_per_model)
-            .sum::<f64>();
-
-        if let Some(limit) = self.config.budget.daily_budget_usd {
-            if request.daily_spend_usd + estimate > limit {
-                return Err(budget_error(format!(
-                    "本次请求可能使今日成本超过{limit:.6}美元预算"
-                )));
-            }
-        }
-        if let Some(limit) = self.config.budget.monthly_budget_usd {
-            if request.monthly_spend_usd + estimate > limit {
-                return Err(budget_error(format!(
-                    "本次请求可能使本月成本超过{limit:.6}美元预算"
-                )));
-            }
-        }
-        if let Some(limit) = self.config.budget.per_request_max_usd {
-            if estimate > limit {
-                return Err(budget_error(format!(
-                    "本次请求成本上界{estimate:.6}美元超过单次预算{limit:.6}美元"
-                )));
-            }
-        }
-        Ok(())
-    }
-
-    fn estimate_request_ceiling(&self, request: &GatewayRequest, model: &str) -> Option<f64> {
-        let pricing = self.pricing_for_model(model)?;
-        let serialized = serde_json::to_string(request).ok()?;
-        let estimated_input_tokens = (serialized.chars().count() as f64 / 4.0).ceil();
-        let search_cost =
-            self.config.max_tool_calls as f64 * self.config.budget.web_search_usd_per_call;
-        Some(
-            estimated_input_tokens / 1_000_000.0 * pricing.input_usd_per_million
-                + self.config.max_output_tokens as f64 / 1_000_000.0
-                    * pricing.output_usd_per_million
-                + search_cost,
-        )
-    }
-
     fn max_attempts_per_model(&self) -> u32 {
         attempt_limit(self.config.max_retries)
     }
 
     fn estimate_actual_cost(&self, response: &GatewayResponse) -> Option<f64> {
-        let pricing = self.pricing_for_model(&response.model_id)?;
+        let pricing = pricing_for_model(&self.config, &response.model_id)?;
         let uncached = response
             .usage
             .input_tokens
@@ -1584,21 +1411,6 @@ Return only one JSON object. Do not use Markdown fences or explanatory text outs
                     * pricing.output_usd_per_million
                 + response.search_call_count as f64 * self.config.budget.web_search_usd_per_call,
         )
-    }
-
-    fn pricing_for_model(&self, model: &str) -> Option<&ModelPricing> {
-        self.config.budget.model_pricing.get(model).or_else(|| {
-            self.config
-                .budget
-                .model_pricing
-                .iter()
-                .filter(|(configured, _)| {
-                    model == configured.as_str()
-                        || model.starts_with(&format!("{}-", configured.as_str()))
-                })
-                .max_by_key(|(configured, _)| configured.len())
-                .map(|(_, pricing)| pricing)
-        })
     }
 }
 
@@ -1629,14 +1441,6 @@ fn unsupported_structured_web_search(status: u16, body: &Value) -> bool {
     mentions_unsupported && mentions_web_field
 }
 
-fn apply_token_limit(body: &mut Value, field: TokenLimitField, value: u32) {
-    if let Value::Object(object) = body {
-        object.remove("max_output_tokens");
-        object.remove("max_tokens");
-        object.insert(field.as_str().to_string(), json!(value));
-    }
-}
-
 fn elapsed_millis(started: Instant) -> u64 {
     u64::try_from(started.elapsed().as_millis()).unwrap_or(u64::MAX)
 }
@@ -1657,13 +1461,4 @@ fn fingerprint(value: &Value) -> Result<String, GatewayError> {
         )
     })?;
     Ok(hex::encode(Sha256::digest(bytes)))
-}
-
-fn budget_error(message: impl Into<String>) -> GatewayError {
-    GatewayError::new(
-        GatewayErrorCategory::BudgetExceeded,
-        message,
-        false,
-        "调整预算配置或等待下一预算周期；不得绕过预算生成伪完成状态",
-    )
 }

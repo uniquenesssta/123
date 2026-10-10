@@ -414,3 +414,34 @@ Context7按Cargo.lock tokio1.52.3核对Notify，但目录仅给latest；准确do
 精确实现 `d58aa38f88c2b59e3ee3b6f568b54d5430843b29` / [Windows run `37960534145`](https://github.com/uniquenesssta/123/actions/runs/37960534145) / job `113921936420` 全 SUCCESS，2026-10-10 01:05:49北京时间完成。Gateway **47/47**、contract **21/21**、Application **126/126**、Persistence **175/175**，新增12单测/5契约及原测试全部通过；完整前端/TypeScript/Vite/17视口、Rust fmt/Clippy/workspace、Windows release/MSI/NSIS/启动验收均通过。artifact `11632067812`，14,041,285字节，SHA-256 `71b4a13385cb2f77cb773e0181f2d1987d533148220b657317ad802507450d5b`。
 
 03 DONE；用户“收尾03开始04”授权同一R9分支04 READY，05～11 BLOCKED，R9整体IN_PROGRESS。本次仅既有五文档 `[skip ci]` 收尾，同源码树复用上述精确Windows；此前VERIFYING是实施历史。真实PG/历史四项/账本并发回滚/有效XLSX/Windows Full/私有P4P7固定回归及继承model.runs/0041删除风险继续最终新库待验，ignored及公共stub不计PASS。
+
+## R9-04 Formal Request（2026-10-10，VERIFYING）
+
+R9-04 Formal Request已实施、`VERIFYING`。正式输入/Schema校验、Responses载荷及请求前预算分别归唯一职责；原连接测试/Plain等复用唯一Token投影与定价政策。9A/9M/0D，无API/DTO/Schema/配置/依赖/DB/UI或生产策略变化；7原函数及其余Gateway编排、247literal/原47unit/21contract保持。新增13单测/4契约，源码预期Gateway60/contract25、Application126/Persistence175，须本项Windows实跑。83现有静态/完整architecture/Rustfmt/保护资产/171命令/46迁移18PG静态及7破坏探针通过。
+
+## 新增行为测试与实际验证
+
+原47 Gateway unit/21 contract保持，新13 unit进入原target：
+
+- 输入4：精确字符/字节边界及来源不修改；空白/超长/非ASCII Schema名称与完整错误；31/32事实、空/重复/100/101字符及raw身份保持；三类Schema根错误与输入错误优先/Schema版本和指令非空。
+- 载荷3：可信静态instructions与不可信嵌套context隔离、trace/match/cutoff/事实元数据；根Schema投影/嵌套$id保留与两次构造不修改来源；同步/后台、store、白名单/无filters、两Token别名、reasoning/search/tool/include原政策。
+- 正式预算3：每模型初次+retry、相同fallback去重与不同fallback成本；NaN/正负无限/负值、daily→monthly→per-request优先及原缺席价格政策；ASCII/Unicode相同字符量/更多字节的金额阈值及严格超限。
+- 共用政策3：精确价格优先、最长dash前缀/非dash拒绝、返回原配置借用；原完整预算错误/recovery/metadata；两Token别名替换、其他字段保留与非object不改。
+
+新4 contract通过公开入口核对：正式错误优先/Chat隔离在key/IO前停止；预算在key/IO前拒绝且CircuitOpen仍优先于预算；resume共享请求校验先于response_id与后台守卫；Extraction→fallback两次attempt8/9保持上下文/Schema副本、嵌套$id、研究字段与原来源不修改。使用原mock及本项计数provider，无真实API/凭据调用、不修改全局环境，无新增test target。
+
+源码预期Gateway **60** / contract **25**、Application **126** / Persistence **175**，自身Windows尚待验。实际本地PASS为83/83现有静态、完整verify:architecture、Rustfmt1.88源码format/check、原兼容传输/Domain/命令/数据库静态/18保护资产与git diff --check；无非Windows编译/单测/客户端动态。保护聚合 `d74e0936b60c69f444a498405fed3e704b8db63b81f26b40036f772b4b6eac57`、PG静态聚合 `d9f2eb50bacd747b7cbf08492189c2635b7c0ec2cf4c764def1d32a837f8ba93`保持。
+
+7破坏探针分别移除正式校验接入、31事实改32、不可信标志反转、根$id投影丢失、fallback去重反转、Token别名清理丢失、最长价格前缀改最短，原增强兼容传输验证器全部拒绝；所有源码逐字恢复、原门禁及Domain清单通过。无新回归框架/runner/workflow/数据库入口。
+
+等价核对迁出7函数：校验完整tokens，构造/预算/估算/定价体在仅还原接收参数后tokens保持，两共享helper完整tokens保持；剩余client反向恢复入口路由后全部tokens保持，247条原生产literal、原47unit所有source/21contract及35原具名函数集合保持。公共lib导出保持，仅新增私有模块登记，生产政策变化=[]。
+
+报告：`/workspace/scratch/eb298ad5cdcb/r904-static-checks.json`、`r904-architecture.log`、`r904-equivalence.json`、`r904-negative-probes.json`、`r904-review.json`。本地没有运行Clippy，Clippy及Rust运行以本项Windows为准。
+
+## 工具、取舍与继续位置
+
+Context7按Cargo.lock serde_json1.0.150核对Value clone/Map remove，但仅返回latest；已额外读取官方serde-rs/json v1.0.150的src/value/mod.rs和src/map.rs确认Clone/持有Map/Vec及remove实现，原clone/根remove原样迁移，无API升级或preserve_order feature变化。Mermaid Chart已展示正式执行/恢复、纯校验/构造/预算、共享政策及原IO链路。Create State仅保存本轮已核实足球稳定model96f03270-c236-46de-99fa-db85d2fbf4ce，摘要不替代Git及CI。
+
+实际偏差仅参考目录按职责具体化：定价/预算错误与Token别名是真实跨调用方共用政策，不能放在正式目录让Plain/连接依赖正式私有实现，也不复制。原model_for_operation仍唯一Gateway路由；预算参数primary_model只是借用既有确定性选择，不增加IO/状态或改变拒绝优先级。响应解析/后台状态/实际成本和Plain预算继续原owner，后续05/07按任务处理，不把本项变成整个Gateway重写。
+
+沿用Public Platform CI，确认自身精确head/Windows job开始后立即停止轮询，预计20～30分钟。下一轮先核实04自身结果，成功才收尾，失败只修相关完整链路；05～11仍BLOCKED，R9整体IN_PROGRESS。真实PG/历史四项/不可变账本/并发/回滚、有效XLSX、Windows Full、私有P4/P7 Golden Master与继承model.runs/0041历史删除风险仍最终封包新库待验；ignored与公共unavailable stub不计PASS。

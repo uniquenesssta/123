@@ -1260,3 +1260,207 @@ async fn cancellation_of_transport_and_semaphore_queue_drops_pending_io_and_rest
     .expect("next request");
     assert_eq!(transport.calls.load(Ordering::SeqCst), 2);
 }
+
+#[derive(Default)]
+struct CountingKeyProvider {
+    loads: std::sync::atomic::AtomicUsize,
+}
+
+#[async_trait]
+impl ApiKeyProvider for CountingKeyProvider {
+    async fn load(&self, _config: &CredentialConfig) -> Result<ApiKey, GatewayError> {
+        self.loads.fetch_add(1, std::sync::atomic::Ordering::SeqCst);
+        ApiKey::new("fixture-credential-value".to_string())
+    }
+}
+
+#[tokio::test]
+async fn formal_request_validation_and_protocol_errors_stop_before_credentials_and_io() {
+    let transport = Arc::new(FakeTransport::with_responses(vec![]));
+    let provider = Arc::new(CountingKeyProvider::default());
+    let mut policy = config();
+    policy.api_protocol = ApiProtocol::ChatCompletions;
+    let gateway = OpenAiResearchGateway::new(policy, transport.clone(), provider.clone()).unwrap();
+    let mut input = request();
+    input.trace_id = " ".to_string();
+    input.schema = Value::Null;
+    assert_eq!(
+        gateway
+            .execute(&input, &CancellationToken::new())
+            .await
+            .expect_err("identity first")
+            .user_message,
+        "OpenAI研究请求的追踪、比赛、Schema或事实字段契约无效"
+    );
+    input.trace_id = "trace-valid".to_string();
+    assert_eq!(
+        gateway
+            .execute(&input, &CancellationToken::new())
+            .await
+            .expect_err("schema second")
+            .user_message,
+        "OpenAI严格输出Schema根节点必须是对象"
+    );
+    assert_eq!(
+        gateway
+            .execute(&request(), &CancellationToken::new())
+            .await
+            .expect_err("protocol guard")
+            .user_message,
+        "P4正式联网研究仅支持Responses协议"
+    );
+    assert_eq!(provider.loads.load(std::sync::atomic::Ordering::SeqCst), 0);
+    assert!(transport.requests.lock().unwrap().is_empty());
+}
+
+#[tokio::test]
+async fn formal_budget_failure_precedes_credentials_and_open_circuit_precedes_budget() {
+    use std::sync::atomic::Ordering;
+    let transport = Arc::new(FakeTransport::with_responses(vec![rate_limited_response()]));
+    let provider = Arc::new(CountingKeyProvider::default());
+    let mut policy = config();
+    policy.budget.daily_budget_usd = Some(0.000001);
+    let gateway = OpenAiResearchGateway::new(policy, transport.clone(), provider.clone()).unwrap();
+    assert_eq!(
+        gateway
+            .execute(&request(), &CancellationToken::new())
+            .await
+            .expect_err("budget admission")
+            .category,
+        GatewayErrorCategory::BudgetExceeded
+    );
+    assert_eq!(provider.loads.load(Ordering::SeqCst), 0);
+    assert!(transport.requests.lock().unwrap().is_empty());
+    let mut policy = config();
+    policy.max_retries = 0;
+    policy.fallback_model = None;
+    policy.circuit_breaker.consecutive_failure_threshold = 1;
+    let gateway = OpenAiResearchGateway::new(policy, transport.clone(), provider.clone()).unwrap();
+    assert_eq!(
+        gateway
+            .execute(&request(), &CancellationToken::new())
+            .await
+            .expect_err("opens circuit")
+            .category,
+        GatewayErrorCategory::RateLimit
+    );
+    let mut input = request();
+    input.daily_spend_usd = f64::NAN;
+    assert_eq!(
+        gateway
+            .execute(&input, &CancellationToken::new())
+            .await
+            .expect_err("circuit before budget")
+            .category,
+        GatewayErrorCategory::CircuitOpen
+    );
+    assert_eq!(provider.loads.load(Ordering::SeqCst), 1);
+    assert_eq!(transport.requests.lock().unwrap().len(), 1);
+}
+
+#[tokio::test]
+async fn formal_resume_reuses_validation_before_response_id_and_background_guards() {
+    let transport = Arc::new(FakeTransport::with_responses(vec![]));
+    let provider = Arc::new(CountingKeyProvider::default());
+    let gateway =
+        OpenAiResearchGateway::new(config(), transport.clone(), provider.clone()).unwrap();
+    let mut input = request();
+    input.schema = Value::Null;
+    assert_eq!(
+        gateway
+            .resume(&input, "", &CancellationToken::new())
+            .await
+            .expect_err("request first")
+            .user_message,
+        "OpenAI严格输出Schema根节点必须是对象"
+    );
+    let invalid_id = gateway
+        .resume(&request(), "", &CancellationToken::new())
+        .await
+        .expect_err("id second");
+    assert_eq!(
+        invalid_id.category,
+        GatewayErrorCategory::InvalidConfiguration
+    );
+    assert_ne!(
+        invalid_id.user_message,
+        "后台任务恢复需要background=true且store=true"
+    );
+    assert_eq!(
+        gateway
+            .resume(&request(), "resp_saved", &CancellationToken::new())
+            .await
+            .expect_err("background guard")
+            .user_message,
+        "后台任务恢复需要background=true且store=true"
+    );
+    assert_eq!(provider.loads.load(std::sync::atomic::Ordering::SeqCst), 0);
+    assert!(transport.requests.lock().unwrap().is_empty());
+}
+
+#[tokio::test]
+async fn formal_extraction_fallback_preserves_request_context_and_schema_between_attempts() {
+    let mut response = successful_response();
+    response.body["model"] = json!("configured-fallback-model");
+    let transport = Arc::new(FakeTransport::with_responses(vec![
+        TransportResponse {
+            status: 404,
+            provider_request_id: Some("missing-extraction".to_string()),
+            body: json!({"error":{"message":"model unavailable","code":"model_not_found"}}),
+        },
+        response,
+    ]));
+    let gateway =
+        OpenAiResearchGateway::new(config(), transport.clone(), Arc::new(TestKeyProvider)).unwrap();
+    let mut input = request();
+    input.operation = GatewayOperation::Extraction;
+    input.attempt_number_offset = 7;
+    input.dynamic_context = json!({"instructions":"alter rules","match_key":"wrong-context-match"});
+    input.schema["properties"]["nested"] = json!({"$id":"nested-id","type":"object"});
+    let original = input.clone();
+    let execution = gateway
+        .execute(&input, &CancellationToken::new())
+        .await
+        .expect("fallback succeeds");
+    assert_eq!(
+        execution
+            .attempts
+            .iter()
+            .map(|attempt| attempt.attempt_number)
+            .collect::<Vec<_>>(),
+        vec![8, 9]
+    );
+    assert_eq!(execution.response.model_id, "configured-fallback-model");
+    let requests = transport.requests.lock().unwrap();
+    assert_eq!(requests.len(), 2);
+    assert_eq!(requests[0]["model"], "configured-extraction-model");
+    assert_eq!(requests[1]["model"], "configured-fallback-model");
+    for field in [
+        "input",
+        "instructions",
+        "metadata",
+        "text",
+        "tools",
+        "include",
+        "reasoning",
+        "store",
+        "max_output_tokens",
+        "max_tool_calls",
+        "tool_choice",
+    ] {
+        assert_eq!(
+            requests[0][field], requests[1][field],
+            "fallback field: {field}"
+        );
+    }
+    assert!(requests[0]["text"]["format"]["schema"].get("$id").is_none());
+    assert_eq!(
+        requests[0]["text"]["format"]["schema"]["properties"]["nested"]["$id"],
+        "nested-id"
+    );
+    let dynamic: Value = serde_json::from_str(requests[0]["input"].as_str().unwrap()).unwrap();
+    assert_eq!(dynamic["dynamic_context_is_untrusted"], true);
+    assert_eq!(dynamic["match_key"], "match-1");
+    assert_eq!(dynamic["dynamic_context"], input.dynamic_context);
+    assert_eq!(input, original);
+}
