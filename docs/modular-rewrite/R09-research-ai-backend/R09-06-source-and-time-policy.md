@@ -96,7 +96,7 @@ b6636fef9589e86ee59c173732a847fd92cb21ed源码等于05精确aa70d2b成功。受�
 
 ## 完整实际文件清单
 
-相对b6636fe，含untracked，初版f714acb为4A/11M/1D、16文件；含两轮修复当前实际 **4A / 12M / 1D**，17文件；移动/重命名：无。
+相对b6636fe，含untracked，初版f714acb为4A/11M/1D、16文件；含三轮修复当前实际 **4A / 12M / 1D**，17文件；移动/重命名：无。
 
 新增（4）：
 
@@ -197,3 +197,32 @@ Context7 resolve/query /rust-lang/rust-clippy未提供1.88.0版本目录，另�
 本次为项目内原字符串规则与新增夹具不一致，不涉及陌生库、新API或版本/编译问题；不另查Context7，之前锁版本证据保持。未改架构，原Mermaid图保持；Create State本轮核实稳定足球model96f03270-c236-46de-99fa-db85d2fbf4ce后保存实际失败/修复/待验。
 
 同一rewrite/r9-research-ai-backend分支推送原Windows CI，精确修复自身Windows job开始即停止轮询，预计20～30分钟；05 DONE、06 VERIFYING、07～11BLOCKED。本轮回退仅受控revert该测试/门禁/摘要/文档修复；整体06回退仍b6636fe。最终新库真实PG/历史四项/账本并发回滚/XLSX/Full/私有固定回归及继承删除风险继续显式待验。
+
+## 第三轮 Windows 契约失败修复（2026-10-11）
+
+用户再次“未通过”后核实精确43dba5f7aa9bf2fc1180ccbaa27369c89e10ec10 / tree e105256715eb62f10425446806ba74523098fc0b，[run38135480448](https://github.com/uniquenesssta/123/actions/runs/38135480448) / [job114458351000](https://github.com/uniquenesssta/123/actions/runs/38135480448/job/114458351000) 均FAILURE。2026-10-11 19:35:14北京在gateway_contract.rs:1917的queued_and_resumed_policies_keep_original_urls_cutoff_and_content_validation失败，实际来源首项https://example.com/team-news?q=one#citation，误期望#search。该轮前端/contracts/TypeScript/Vite/17视口、Rust fmt/Clippy -D warnings、Gateway90/90和Application126/126、Persistence175/175单测通过；Gateway contract30/31，后续workspace/release/MSI/NSIS/启动未完成。前两项修复已通过，不代表06完整SUCCESS；ignored数据库测试不计真实数据库PASS。日志windows-acceptance-20261011-112634.txt。
+
+正式解析原先即使用完整原URL为BTreeMap键，合并搜索来源与引用，into_values输出按URL排序；#citation、#search原片段不同，形成两条原始WebSource，#citation排在#search之前。Citation政策只以移除fragment后的URL做成员关联，不修改响应来源列表。既有05单测formal_citations_preserve_order_first_source_metadata_usage_and_raw_response已覆盖原排序，本轮实际Windows已通过；新增06契约却错误假定来源首项就是搜索项，之前复核漏掉该排序。
+
+只把该一处索引断言替换为来源URL完整Vec相等断言，精确保留查询/片段和#citation→#search顺序及两条来源；不只改索引或用contains弱化集合验证。该契约的两种入口×三种情形逐项复核，原raw_response、事实/引用URL、UTC cutoff、两类错误、cached用量/provider request ID、凭据加载/POST/GET次数与实际GET地址保持；其他契约/夹具、全部Gateway src与90unit均字节不变，仍90unit/31contract。正式URL键与规范成员关联各留原owner，不改变生产行为。
+
+原scripts/verify-api-compatible-transport.mjs补完整URL键/搜索与引用合并/原排序出口，以及该具名契约完整来源列表和原分支断言守卫。四反向探针（旧失败首项断言、预期列表倒序、列表漏引用、生产wire键误去fragment）均被针对性拒绝并恢复，最终正向通过。没有allow、跳测试、门禁放宽或新runner/target/workflow/framework/DB入口。
+
+本轮相对43dba5f实际 **0A / 8M / 0D**，移动/重命名无：
+
+- README.md
+- architecture/domain-type-inventory.json
+- crates/research-gateway/tests/gateway_contract.rs
+- scripts/verify-api-compatible-transport.mjs
+- docs/TESTING.md
+- docs/football-model-platform-modular-rewrite-19-docs/09-R9-research-ai-backend.md
+- docs/modular-rewrite/R09-research-ai-backend/R09-06-source-and-time-policy.md
+- docs/modular-rewrite/R09-research-ai-backend/README.md
+
+06全量仍 **4A/12M/1D、17文件**。Domain清单仅rustUsageDigest随契约测试行偏移变为c3aece9b4b2beec64c5434d549d9596532b310b9e88541fda2220ba2c1845bc0；1134扫描、365/300和声明sourceDigest不变。原生产API/DTO/Schema/SourcePolicy配置、错误/来源时间政策/同步后台恢复/用量raw、依赖/模型/迁移/DB/UI/Windows流程保持。
+
+实际本轮83/83既有JS静态、完整npm run verify:architecture、Rustfmt1.88 check、diff/生产与其余契约字节等价、四探针及18保护/171命令/46迁移18PG静态通过；报告/workspace/scratch/eb298ad5cdcb/r906f3-static-checks.json、r906f3-architecture.log、r906f3-equivalence.json、r906f3-review.json。静态不能关闭Windows契约失败，修复自身90unit/31contract全过及完整Windows仍待验；非Windows不执行Cargo/编译/Clippy/单测/浏览器运行时。
+
+本次是既有项目来源列表语义与新增断言不一致，原实现及已通过单测提供证据，无新版本/API/编译问题，不另查Context7；原架构/Mermaid图保持。Create State本轮先核实足球稳定model96f03270-c236-46de-99fa-db85d2fbf4ce再保存实际失败/修复/待验。五既有文档同步，当前阶段索引仍05 DONE、06 VERIFYING、07～11BLOCKED、R9 IN_PROGRESS，无阶段完成记录。
+
+原rewrite/r9-research-ai-backend分支推送修复自身Windows CI，精确job开始即停止轮询，预计20～30分钟。回退仅受控revert本轮测试/门禁/摘要/文档修复，整体06仍b6636fe。最终新库真实PG/历史四项/账本并发回滚/有效XLSX/Windows Full/私有P4P7固定回归及继承model.runs/0041删除风险继续显式待验。

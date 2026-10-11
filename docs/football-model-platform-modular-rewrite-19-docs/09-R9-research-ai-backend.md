@@ -664,7 +664,7 @@ R9-05 Formal Response/Schema/Citation已实施、`VERIFYING`，基线53e49f8，�
 
 ## R9-06 Source 与 Time Policy
 
-状态：`VERIFYING`（05 DONE，06首轮Clippy已通过；第二轮域名测试夹具失败已修复，待本轮自身Windows完整验证）。
+状态：`VERIFYING`（05 DONE；06 Clippy和90unit已通过，第三轮来源列表契约断言已修复，待本轮自身Windows完整验证）。
 
 R9-06 Source/Time Policy已实施、`VERIFYING`，基线b6636fe，同一R9分支。URL/domain与禁用字段/内容归source_policy，三可选事实时间归time_policy；Schema保留身份/主体/值形状/覆盖，Citation保留关联，删除旧root validation。4A/11M/1D、16文件；原公开API/DTO/Schema/SourcePolicy配置/协议/依赖/DB/UI/错误/生产策略不变。原82unit/29contract保留，新增8unit/2contract；源码预期Gateway90/contract31、Application126/Persistence175须06自身Windows。83/83静态、完整architecture、Rustfmt、657生产literal/原规则与组合等价、保护资产/171命令/46迁移18PG静态、7破坏探针均通过。
 
@@ -676,6 +676,8 @@ R9-06 初版f714acb的Windows run38108158888/job114377958564因SourcePolicy字�
 
 R9-06 第二轮 `3981b9d` / [Windows run38109741446](https://github.com/uniquenesssta/123/actions/runs/38109741446) / job114382644048 已通过fmt/Clippy，Gateway单测89/90，新增域名测试错误地把大写WWW配置当作去前缀后的apex。已按原“trim→去*.→去小写www.→小写”顺序修正夹具，补大写/混合前缀拒绝与保留前缀的子域成功断言；生产代码保持。原兼容传输门禁锁定该顺序及夹具，三反向探针均拒绝恢复。 第二轮Application126/Persistence175单测通过，contract31/后续workspace/release/启动未完成；本轮8M、生产字节保持、90unit/31contract数量保持，83/83静态/完整architecture/Rustfmt通过。06仍VERIFYING、07～11BLOCKED，完整清单及待验边界见06单测修复记录。
 
+
+R9-06 第三轮43dba5f / [Windows run38135480448](https://github.com/uniquenesssta/123/actions/runs/38135480448) 的Gateway单测90/90通过，contract30/31；新增后台/恢复契约误把完整URL排序后首条引用来源当作搜索来源。已改为比较包含#citation、#search的完整有序列表，保留其他断言与全部生产源码；原兼容门禁补排序/完整列表守卫，四反向探针拒绝恢复。 该轮Application126/Persistence175单测通过，contract30/31及后续workspace/release/启动未完成；本轮0A/8M/0D，90unit/31contract数量保持，生产及其余契约字节不变。83/83静态、完整architecture/Rustfmt/四探针通过；06仍VERIFYING、07～11BLOCKED，准确清单和待验见06记录。
 ---
 
 ## R9-07 Plain Chat Responses

@@ -496,3 +496,11 @@ R9-06 第二轮 `3981b9d` / [Windows run38109741446](https://github.com/uniquene
 第二轮于2026-10-11 12:03:19北京在source_policy.rs:135失败。该轮前端/TypeScript/Vite/17视口及fmt/Clippy -D warnings通过，Application126/126、Persistence175/175单测通过；Gateway89/90未全过，Gateway contract31、后续workspace/release/MSI/NSIS/启动未完成，不能计全链路PASS。ignored数据库测试不计真实数据库通过。
 
 本轮保留90unit/31contract数量与其他Gateway测试字节，usageDigest仅刷新为 `c6b0e2980fbdb43f4f4a7feecb0df38fa8ccf98c503eda723c93f314bc593510`。83/83既有静态、完整architecture、Rustfmt、生产等价及保护资产复核通过，报告r906f2-static-checks.json/r906f2-architecture.log/r906f2-equivalence.json/r906f2-review.json。06自身Windows待验、07～11BLOCKED，真实新库/Full/XLSX/私有固定回归边界保持；不执行非Windows动态。
+
+## R9-06 Windows 来源列表契约修复（2026-10-11，VERIFYING）
+
+R9-06 第三轮43dba5f / [Windows run38135480448](https://github.com/uniquenesssta/123/actions/runs/38135480448) 的Gateway单测90/90通过，contract30/31；新增后台/恢复契约误把完整URL排序后首条引用来源当作搜索来源。已改为比较包含#citation、#search的完整有序列表，保留其他断言与全部生产源码；原兼容门禁补排序/完整列表守卫，四反向探针拒绝恢复。
+
+该轮2026-10-11 19:35:14北京在gateway_contract.rs:1917失败：实际首项#citation，误期望#search。前端/contracts/TypeScript/Vite/17视口、Rust fmt/Clippy -D warnings、Gateway90/90及Application126/126、Persistence175/175单测通过；Gateway contract30/31、后续workspace/release/MSI/NSIS/启动未完成，不能计全链路PASS。之前两项Clippy和域名前缀单测修复已通过，ignored数据库测试不计真实数据库通过。
+
+本轮仅替换该契约一处sources断言；两种入口×三种情形、原raw/事实/引用URL、UTC cutoff、错误、缓存用量、提供方请求ID、凭据/POST/GET次数和真实GET URL保持。90unit/31contract数量保持；所有Gateway src字节不变，其他contract字节不变。Domain清单仅usageDigest变为c3aece9b4b2beec64c5434d549d9596532b310b9e88541fda2220ba2c1845bc0。83/83既有JS静态、完整architecture、Rustfmt、等价/四探针与保护复核通过，证据r906f3-static-checks.json/r906f3-architecture.log/r906f3-equivalence.json/r906f3-review.json。06自身Windows待验、07～11BLOCKED，最终新库边界保持；不执行非Windows动态。

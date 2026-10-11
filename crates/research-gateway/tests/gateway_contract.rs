@@ -1915,8 +1915,15 @@ async fn queued_and_resumed_policies_keep_original_urls_cutoff_and_content_valid
                         "https://example.com/team-news?q=one#citation"
                     );
                     assert_eq!(
-                        response.sources[0].url,
-                        "https://example.com/team-news?q=one#search"
+                        response
+                            .sources
+                            .iter()
+                            .map(|source| source.url.as_str())
+                            .collect::<Vec<_>>(),
+                        vec![
+                            "https://example.com/team-news?q=one#citation",
+                            "https://example.com/team-news?q=one#search",
+                        ]
                     );
                     assert_eq!(
                         response.output.facts[0].observed_at,
