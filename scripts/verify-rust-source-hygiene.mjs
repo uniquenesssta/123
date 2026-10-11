@@ -171,6 +171,12 @@ for (const file of files) {
       `${display} 的提供者 Debug 测试必须内联格式化参数，避免 uninlined_format_args 阻断 Windows Clippy`,
     );
   }
+  if (display === "crates/research-gateway/src/formal_research/policies/source_policy.rs") {
+    assert(
+      !/format!\s*\(\s*"字段\{\}属于禁止进入模型的预测、盘口或推荐内容"\s*,\s*field_key\s*,?\s*\)/.test(source),
+      `${display} 的字段错误应内联 field_key，避免职责迁移后 uninlined_format_args 阻断 Windows Clippy`,
+    );
+  }
   for (const match of source.matchAll(testModulePattern)) {
     const openingBrace = match.index + match[0].lastIndexOf("{");
     const closingBrace = matchingBrace(source, openingBrace);

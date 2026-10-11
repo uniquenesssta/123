@@ -88,7 +88,7 @@ b6636fef9589e86ee59c173732a847fd92cb21ed源码等于05精确aa70d2b成功。受�
 
 ### 22. docs 阶段节点详细记录
 
-本记录保留23职责/契约字段、16真实文件、原行为等价与新增测试/工具/取舍/延期/回退。阶段索引06 VERIFYING、07～11BLOCKED，不创建R9阶段完成记录。
+本记录保留23职责/契约字段、17真实文件、原行为等价与新增测试/工具/取舍/延期/回退。阶段索引06 VERIFYING、07～11BLOCKED，不创建R9阶段完成记录。
 
 ### 23. 完成标准
 
@@ -96,7 +96,7 @@ b6636fef9589e86ee59c173732a847fd92cb21ed源码等于05精确aa70d2b成功。受�
 
 ## 完整实际文件清单
 
-相对b6636fe，含untracked，实际 **4A / 11M / 1D**，16文件；移动/重命名：无。
+相对b6636fe，含untracked，初版f714acb为4A/11M/1D、16文件；含本轮修复当前实际 **4A / 12M / 1D**，17文件；移动/重命名：无。
 
 新增（4）：
 
@@ -105,7 +105,7 @@ b6636fef9589e86ee59c173732a847fd92cb21ed源码等于05精确aa70d2b成功。受�
 - crates/research-gateway/src/formal_research/policies/time_policy.rs
 - docs/modular-rewrite/R09-research-ai-backend/R09-06-source-and-time-policy.md
 
-修改（11）：
+修改（12）：
 
 - README.md
 - architecture/domain-type-inventory.json
@@ -115,6 +115,7 @@ b6636fef9589e86ee59c173732a847fd92cb21ed源码等于05精确aa70d2b成功。受�
 - crates/research-gateway/src/lib.rs
 - crates/research-gateway/tests/gateway_contract.rs
 - scripts/verify-api-compatible-transport.mjs
+- scripts/verify-rust-source-hygiene.mjs
 - docs/TESTING.md
 - docs/football-model-platform-modular-rewrite-19-docs/09-R9-research-ai-backend.md
 - docs/modular-rewrite/R09-research-ai-backend/README.md
@@ -142,3 +143,30 @@ Context7先resolve /servo/rust-url再查询fragment规则，文档未提供2.5.8
 比参考目录多迁Schema禁字段/内容块是完整SourcePolicy消费边界必需；FactContentPolicy只命名原两Vec准备职责，不新增策略/状态/泛化配置。配置合法性、工具filters、Application审核治理不迁出其原owner。原HTTPS关闭及空禁词等行为按已验证基线保留，没有借重构改变规则。
 
 同一分支推送原Windows CI，确认本项精确head/Windows job开始即停止轮询，预计20～30分钟；06 VERIFYING、07～11BLOCKED。下轮先查自身结果，失败先修相关链路。真实PG/历史四项/账本并发回滚/有效XLSX/Windows Full/私有P4P7 Golden Master及继承model.runs/0041删除风险保持最终封包新库待验，ignored与公共unavailable stub不计PASS。
+
+## 首轮 Windows 失败修复（2026-10-11）
+
+用户“未通过”后核实：精确初版 `f714acbcf382a42840c55abb9c26d5f0c593dc2e` / tree `a3f8c1d34b84cbac9481b05b260fe241c7af5005`，[run38108158888](https://github.com/uniquenesssta/123/actions/runs/38108158888) 与 [job114377958564](https://github.com/uniquenesssta/123/actions/runs/38108158888/job/114377958564) 均FAILURE。2026-10-11 11:28:24北京在Rust门禁停止，source_policy.rs:77 `uninlined_format_args` 被 `-D warnings` 提升为错误。前端/contracts/TypeScript/Vite/17视口已通过，Rust工作区测试、release/MSI/NSIS/启动尚未执行；90/31不能记为PASS。
+
+原表达式格式参数为fact.field_key成员访问；抽取字段策略后成为field_key普通变量，保留原占位写法因此触发Clippy。改为 `"字段{field_key}属于禁止进入模型的预测、盘口或推荐内容"` 内嵌捕获，原Display输出、错误类别/恢复建议/非retry和策略不变。没有allow、门禁放宽或依赖变更。检查迁移相关format调用，其余已捕获变量或保持原成员表达式，无其他同根点。
+
+原scripts/verify-rust-source-hygiene.mjs增加具名路径回归守卫，旧源码被该守卫拒绝，改后通过；复用已有入口，不新增runner/framework/target。原Gateway90unit/31contract源码全保持，既有同步12类政策错误契约含home_ODDS完整提示断言。修复仅一个生产format表达式，全部其他Gateway src/tests字节保持，原API/DTO/配置/来源时间/错误顺序/用量/raw/模型/迁移/UI不变。初版657生产literal等价记录属于初版；本轮只有该format模板字面量改变，输出完全相同，literal总数保持。
+
+本轮相对f714acb实际 **0A / 8M / 0D**，移动/重命名无：
+
+- README.md
+- architecture/domain-type-inventory.json
+- crates/research-gateway/src/formal_research/policies/source_policy.rs
+- scripts/verify-rust-source-hygiene.mjs
+- docs/TESTING.md
+- docs/football-model-platform-modular-rewrite-19-docs/09-R9-research-ai-backend.md
+- docs/modular-rewrite/R09-research-ai-backend/R09-06-source-and-time-policy.md
+- docs/modular-rewrite/R09-research-ai-backend/README.md
+
+原节点4A/11M/1D、16文件，含新增卫生门禁修改后为 **4A/12M/1D、17文件**，上方完整清单已同步。Domain扫描1134、365/300与sourceDigest保持，当前usageDigest `d52e1a00455c4b29c48382a6c591f0d65aafde4a4da093bb7c6bb769fcaf3cbd`；只该摘要更新，其他inventory字段不变。
+
+实际验证：83/83既有JS静态、完整npm run verify:architecture、Rustfmt1.88 source_policy源码check、差异/语义等价、原缺陷拒绝/修复接受及18保护/171命令/DB静态PASS。报告 `/workspace/scratch/eb298ad5cdcb/r906f-static-checks.json`、`r906f-architecture.log`、`r906f-equivalence.json`、`r906f-review.json`。非Windows不执行Cargo/编译/Clippy/单测；修复自身Windows必须复验，静态不能关闭Windows失败。
+
+Context7 resolve/query /rust-lang/rust-clippy未提供1.88.0版本目录，另读官方rust-lang/rust-clippy **rust-1.88.0** clippy_lints/src/format_args.rs（blob `8a3f8e1c5874d45ca2c67cbe4e0c49fcec9233c3`）核对原lint与内嵌示例。简单格式修复未改架构，原Mermaid图仍适用；Create State本轮核实稳定足球model后保存真实失败/修复/待验。
+
+原分支推送修复自身Windows，精确开始后停止轮询，预计20～30分钟；06仍VERIFYING、07～11BLOCKED，05 DONE。回退仅受控revert该格式/门禁/摘要/文档修复；完整06回退点仍b6636fe。真实PG/历史四项/账本并发回滚/XLSX/Windows Full/私有固定回归及继承删除风险保持最终封包新库待验。

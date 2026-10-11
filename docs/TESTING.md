@@ -482,3 +482,9 @@ R9-05 Formal Response/Schema/Citation已实施、`VERIFYING`，基线53e49f8，�
 R9-06 Source/Time Policy已实施、`VERIFYING`，基线b6636fe，同一R9分支。URL/domain与禁用字段/内容归source_policy，三可选事实时间归time_policy；Schema保留身份/主体/值形状/覆盖，Citation保留关联，删除旧root validation。4A/11M/1D、16文件；原公开API/DTO/Schema/SourcePolicy配置/协议/依赖/DB/UI/错误/生产策略不变。原82unit/29contract保留，新增8unit/2contract；源码预期Gateway90/contract31、Application126/Persistence175须06自身Windows。83/83静态、完整architecture、Rustfmt、657生产literal/原规则与组合等价、保护资产/171命令/46迁移18PG静态、7破坏探针均通过。
 
 新增8unit/2contract与等价/7探针、16文件、报告/工具/回退详见 [06记录](modular-rewrite/R09-research-ai-backend/R09-06-source-and-time-policy.md#行为覆盖与证据)。复用原Windows Automated，不执行非Windows动态，不将05 SUCCESS或90/31源码预期冒充06通过；真实PG/历史四项/账本并发回滚/XLSX/Full/私有固定回归及继承删除风险保持最终封包新库待验。
+
+## R9-06 Windows Clippy 修复（2026-10-11，VERIFYING）
+
+R9-06 初版f714acb的Windows run38108158888/job114377958564因SourcePolicy字段提示触发Clippy uninlined_format_args失败。现将普通变量格式参数改为内嵌field_key，错误文字/类别/恢复建议/政策保持；原源码卫生门禁新增该回归守卫（旧源码拒绝、修复后通过），Domain使用摘要同步。83/83现有静态、完整architecture、Rustfmt和差异/提示等价通过；Gateway90/contract31仍是待本轮Windows验证的预期，06 VERIFYING、07～11BLOCKED。
+
+初轮前端/contracts/TypeScript/17视口/生产构建通过，Rust Clippy在source_policy.rs:77阻断；工作区测试、release/MSI/NSIS/客户端启动未执行，不计PASS。原90unit/31contract测试源码保持，原同步契约已有home_ODDS完整提示断言；本轮生产只改一个Display格式表达式。当前usageDigest `d52e1a00455c4b29c48382a6c591f0d65aafde4a4da093bb7c6bb769fcaf3cbd`，1134/365/300/声明摘要保持。报告r906f-static-checks.json/r906f-architecture.log/r906f-equivalence.json/r906f-review.json；不执行非Windows动态，最终新库延期边界保持。

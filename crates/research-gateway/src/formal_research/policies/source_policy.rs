@@ -75,8 +75,7 @@ impl FactContentPolicy {
             .any(|term| normalized_key.contains(term))
         {
             return Err(source_error(format!(
-                "字段{}属于禁止进入模型的预测、盘口或推荐内容",
-                field_key
+                "字段{field_key}属于禁止进入模型的预测、盘口或推荐内容"
             )));
         }
         Ok(())

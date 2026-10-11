@@ -2,7 +2,7 @@
 
 ## 当前阶段状态
 
-`IN_PROGRESS`。用户已明确“开始R9-01”，节点映射已厘清。唯一阶段分支 `rewrite/r9-research-ai-backend`，起点 `c72e559af4f29c9510daf2f9bf66b926dacb3013`。01 Shared Transport自身Windows全SUCCESS、DONE；用户“收尾01开始02”授权02，已自身Windows全SUCCESS、DONE；用户“收尾02开始03”授权03，已自身Windows全SUCCESS并DONE；用户“收尾03开始04”授权04，已自身Windows全SUCCESS并DONE；用户“收尾04开始05”授权05，已自身Windows全SUCCESS并DONE；用户“收尾05开始06”授权06，已实施VERIFYING，07～11 BLOCKED，不创建阶段完成记录。
+`IN_PROGRESS`。用户已明确“开始R9-01”，节点映射已厘清。唯一阶段分支 `rewrite/r9-research-ai-backend`，起点 `c72e559af4f29c9510daf2f9bf66b926dacb3013`。01 Shared Transport自身Windows全SUCCESS、DONE；用户“收尾01开始02”授权02，已自身Windows全SUCCESS、DONE；用户“收尾02开始03”授权03，已自身Windows全SUCCESS并DONE；用户“收尾03开始04”授权04，已自身Windows全SUCCESS并DONE；用户“收尾04开始05”授权05，已自身Windows全SUCCESS并DONE；用户“收尾05开始06”授权06，已实施VERIFYING（首轮Clippy失败修复待复验），07～11 BLOCKED，不创建阶段完成记录。
 
 ## 前置基线与依据
 
@@ -19,7 +19,7 @@ R8期间research-gateway、公开契约、配置/依赖及锁文件保持；原G
 | R9-03 | Retry、Circuit Breaker 与 Cancel | DONE · [完成记录](R09-03-retry-circuit-breaker-and-cancel.md) · run37960534145 SUCCESS |
 | R9-04 | Formal Research Request | DONE · [完成记录](R09-04-formal-research-request.md) · run38055651688 SUCCESS |
 | R9-05 | Formal Response、Schema 与 Citation | DONE · [完成记录](R09-05-formal-response-schema-and-citation.md) · run38072987214 SUCCESS |
-| R9-06 | Source 与 Time Policy | VERIFYING · [实施记录](R09-06-source-and-time-policy.md) · 静态通过、待自身Windows |
+| R9-06 | Source 与 Time Policy | VERIFYING · [实施/修复记录](R09-06-source-and-time-policy.md) · 首轮Clippy失败已修复、待自身Windows复验 |
 | R9-07 | Plain Chat Responses | BLOCKED |
 | R9-08 | Plain Chat Chat Completions | BLOCKED |
 | R9-09 | Session Persistence | BLOCKED |
@@ -115,3 +115,7 @@ R9-05 Formal Response/Schema/Citation已实施、`VERIFYING`，基线53e49f8，�
 ## R9-06 实施与门禁（VERIFYING）
 
 R9-06 Source/Time Policy已实施、`VERIFYING`，基线b6636fe，同一R9分支。URL/domain与禁用字段/内容归source_policy，三可选事实时间归time_policy；Schema保留身份/主体/值形状/覆盖，Citation保留关联，删除旧root validation。4A/11M/1D、16文件；原公开API/DTO/Schema/SourcePolicy配置/协议/依赖/DB/UI/错误/生产策略不变。原82unit/29contract保留，新增8unit/2contract；源码预期Gateway90/contract31、Application126/Persistence175须06自身Windows。83/83静态、完整architecture、Rustfmt、657生产literal/原规则与组合等价、保护资产/171命令/46迁移18PG静态、7破坏探针均通过。 详见 [06记录](R09-06-source-and-time-policy.md)，报告r906-static-checks.json/r906-architecture.log/r906-equivalence.json/r906-negative-probes.json/r906-review.json。Context7与官方url2.5.8源码/Mermaid/足球状态同步，Windows精确开始后停止轮询；07～11BLOCKED，不创建阶段完成记录，真实延期边界保持。
+
+## R9-06 首轮 Windows 修复（VERIFYING）
+
+R9-06 初版f714acb的Windows run38108158888/job114377958564因SourcePolicy字段提示触发Clippy uninlined_format_args失败。现将普通变量格式参数改为内嵌field_key，错误文字/类别/恢复建议/政策保持；原源码卫生门禁新增该回归守卫（旧源码拒绝、修复后通过），Domain使用摘要同步。83/83现有静态、完整architecture、Rustfmt和差异/提示等价通过；Gateway90/contract31仍是待本轮Windows验证的预期，06 VERIFYING、07～11BLOCKED。 当前节点4A/12M/1D共17文件；本轮仅8M，生产只一个格式表达式。复用原Windows CI，精确开始后停止轮询；05 DONE，07～11BLOCKED，真实延期边界保持。
