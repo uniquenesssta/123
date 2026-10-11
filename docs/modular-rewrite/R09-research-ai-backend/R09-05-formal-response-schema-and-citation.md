@@ -1,6 +1,6 @@
 # R9-05 Formal Response、Schema 与 Citation 实施记录
 
-状态：`VERIFYING`。用户2026-10-11“收尾04开始05”授权。uniquenesssta/123、0.23.0，唯一阶段分支rewrite/r9-research-ai-backend；04修复cb3d2ca/run38055651688/Windows job114223464446全SUCCESS并DONE，五文档收尾基线/回退 `53e49f86f56f5766d85a0c8f938b47abf2a4ce34`、tree `3e6739375846c3eb8765e2a2c60d74aebe056827`，源码与04成功相同。06～11BLOCKED，R9整体IN_PROGRESS。
+状态：`DONE`。用户2026-10-11“收尾04开始05”授权。uniquenesssta/123、0.23.0，唯一阶段分支rewrite/r9-research-ai-backend；04修复cb3d2ca/run38055651688/Windows job114223464446全SUCCESS并DONE，五文档收尾基线/回退 `53e49f86f56f5766d85a0c8f938b47abf2a4ce34`、tree `3e6739375846c3eb8765e2a2c60d74aebe056827`，源码与04成功相同。06～11BLOCKED，R9整体IN_PROGRESS。
 
 ### 1. 目标
 
@@ -155,3 +155,11 @@ Context7核对serde严格解码，但所选官方文档集未提供1.0.228版本
 引用索引改为显式借用citations/sources/policy，使引用关联不依赖Schema上下文所有者；唯一严格decode只是抽出原语句，错误与Typed DTO原样。真实共用wire/错误映射放在根具名职责，避免Plain/协作绕入Formal或复制实现。root validation继续真实URL/domain/time实现，06后续按任务处理。
 
 同一R9分支原Windows CI确认05精确head/Windows job开始即停止轮询，预计20～30分钟；05仍VERIFYING、06～11BLOCKED。下一轮先核实05自身结果，成功才收尾，失败只修完整相关链路。真实PG/历史四项/不可变账本/并发/回滚/有效XLSX/Windows Full/私有P4P7 Golden Master及继承model.runs/0041历史删除风险仍最终封包新库待验，ignored与公共unavailable stub不计PASS。
+
+## R9-05 精确 Windows 收尾（2026-10-11，DONE）
+
+精确提交 `aa70d2b4464e86254eecfcace11621d1b03aad51` / tree `e3581a2ee6264999ab5c3afb37be695e70f6e9bb`，同一分支rewrite/r9-research-ai-backend，[Public Platform CI run `38072987214`](https://github.com/uniquenesssta/123/actions/runs/38072987214) 与 [Windows job `114274071102`](https://github.com/uniquenesssta/123/actions/runs/38072987214/job/114274071102) 均 **SUCCESS**，2026-10-11 02:04:42北京完成。前端/contracts/TypeScript/Vite/17视口、Rust fmt/Clippy -D warnings/workspace tests、Windows release/MSI/NSIS/客户端启动及运行日志覆盖/错误扫描通过；实际 **Gateway82 / contract29 / Application126 / Persistence175** 均通过。
+
+交付artifact `11677353373` / `windows-automated-delivery-evidence-aa70d2b4464e86254eecfcace11621d1b03aad51`，14,042,360 bytes，SHA-256 `ae05f14fdbdbe18f49bc34de912ab2b0e63ef928f74ff5409db585f6d0cbbb47`。报告 `D:\a\123\123\logs\windows-acceptance-20261010-174601.json`，过程记录同名.txt。原18 broad PG仍ignored；真实PG/历史四项/不可变账本/并发/回滚/有效XLSX/Windows Full/私有P4P7固定回归及继承model.runs/0041删除风险保持最终封包新库待验，ignored与公开stub不计PASS。
+
+05 **DONE**；用户2026-10-11“收尾05开始06”授权06 **READY**，07～11BLOCKED，R9整体IN_PROGRESS。本次仅既有五文档 `[skip ci]` 收尾，源码/门禁/依赖保持，复用上述同源码Windows成功；此前VERIFYING叙述属于实施历史，不创建R9阶段完成记录。

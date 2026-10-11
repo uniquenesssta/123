@@ -642,7 +642,7 @@ R9-04 首轮 `16b5d4e` / [Windows run `38021521371`](https://github.com/uniquene
 
 ## R9-05 Formal Response、Schema 与 Citation
 
-状态：`VERIFYING`（04自身精确Windows全SUCCESS/DONE，用户已授权05；实施/静态/记录完成，待本项Windows）。
+状态：`DONE`（05自身精确Windows完整SUCCESS；下述VERIFYING内容为实施历史）。
 
 R9-05 Formal Response/Schema/Citation已实施、`VERIFYING`，基线53e49f8，同一R9分支。正式严格解析/解码/公开输出校验/引用关联各归唯一职责，共用引用wire/用量/错误映射仍唯一且兼容调用方不依赖Formal；URL/domain/time原政策留06。12A/12M/0D，无公开API/DTO/Schema/配置/依赖/DB/UI/生产政策变化，17原函数/657生产literal/原60unit和25contract保持。新增22unit/4contract，源码预期Gateway82/contract29、Application126/Persistence175须自身Windows；83/83静态/完整architecture/Rustfmt/保护资产/171命令/46迁移18PG静态及6破坏探针通过。
 
@@ -652,9 +652,19 @@ R9-05 Formal Response/Schema/Citation已实施、`VERIFYING`，基线53e49f8，�
 
 ---
 
+## R9-05 精确 Windows 收尾（2026-10-11，DONE）
+
+精确提交 `aa70d2b4464e86254eecfcace11621d1b03aad51` / tree `e3581a2ee6264999ab5c3afb37be695e70f6e9bb`，同一分支rewrite/r9-research-ai-backend，[Public Platform CI run `38072987214`](https://github.com/uniquenesssta/123/actions/runs/38072987214) 与 [Windows job `114274071102`](https://github.com/uniquenesssta/123/actions/runs/38072987214/job/114274071102) 均 **SUCCESS**，2026-10-11 02:04:42北京完成。前端/contracts/TypeScript/Vite/17视口、Rust fmt/Clippy -D warnings/workspace tests、Windows release/MSI/NSIS/客户端启动及运行日志覆盖/错误扫描通过；实际 **Gateway82 / contract29 / Application126 / Persistence175** 均通过。
+
+交付artifact `11677353373` / `windows-automated-delivery-evidence-aa70d2b4464e86254eecfcace11621d1b03aad51`，14,042,360 bytes，SHA-256 `ae05f14fdbdbe18f49bc34de912ab2b0e63ef928f74ff5409db585f6d0cbbb47`。报告 `D:\a\123\123\logs\windows-acceptance-20261010-174601.json`，过程记录同名.txt。原18 broad PG仍ignored；真实PG/历史四项/不可变账本/并发/回滚/有效XLSX/Windows Full/私有P4P7固定回归及继承model.runs/0041删除风险保持最终封包新库待验，ignored与公开stub不计PASS。
+
+05 **DONE**；用户2026-10-11“收尾05开始06”授权06 **READY**，07～11BLOCKED，R9整体IN_PROGRESS。本次仅既有五文档 `[skip ci]` 收尾，源码/门禁/依赖保持，复用上述同源码Windows成功；此前VERIFYING叙述属于实施历史，不创建R9阶段完成记录。
+
+---
+
 ## R9-06 Source 与 Time Policy
 
-状态：`BLOCKED`（仅当上一任务与本任务前置门禁通过后改为 `READY`）
+状态：`READY`（05自身精确Windows完整SUCCESS/DONE，用户“收尾05开始06”授权）
 
 ### 1. 目标
 
