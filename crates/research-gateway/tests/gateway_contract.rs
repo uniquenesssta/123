@@ -1744,3 +1744,210 @@ async fn queued_and_resumed_formal_responses_share_the_same_schema_and_citation_
         }
     }
 }
+
+#[tokio::test]
+async fn formal_source_and_time_policies_preserve_attempt_evidence_and_error_order() {
+    for case in 0..12 {
+        let mut policy = config();
+        let mut input = request();
+        let mut response = successful_response();
+        let mut output: Value = serde_json::from_str(
+            response.body["output"][1]["content"][0]["text"]
+                .as_str()
+                .unwrap(),
+        )
+        .unwrap();
+        let expected_message = match case {
+            0 => {
+                policy.source_policy.blocked_domains = vec!["www.example.com".to_string()];
+                "来源域名已被禁止：example.com"
+            }
+            1 => {
+                policy.source_policy.allowed_domains = vec!["other.example".to_string()];
+                "来源域名不在当前赛事允许列表：example.com"
+            }
+            2 => {
+                response.body["output"][0]["action"]["sources"][0]["url"] =
+                    json!("http://example.com/team-news");
+                "来源URL必须使用HTTPS：http://example.com/team-news"
+            }
+            3 => {
+                input.requested_fact_keys = vec!["home_ODDS".to_string()];
+                output["facts"][0]["field_key"] = json!("home_ODDS");
+                "字段home_ODDS属于禁止进入模型的预测、盘口或推荐内容"
+            }
+            4 => {
+                output["facts"][0]["value"]["strings"] = json!(["BETTING", "TIP"]);
+                "联网结果包含预测、推荐、盘口或博彩分析内容，已阻止进入事实库"
+            }
+            5..=7 => {
+                let field = ["published_at", "observed_at", "effective_at"][case - 5];
+                output["facts"][0][field] = json!("2026-07-14T10:00:00.000000001Z");
+                match field {
+                    "published_at" => "published_at晚于赛前数据截止时间，不能进入当前研究结果",
+                    "observed_at" => "observed_at晚于赛前数据截止时间，不能进入当前研究结果",
+                    _ => "effective_at晚于赛前数据截止时间，不能进入当前研究结果",
+                }
+            }
+            8 => {
+                output["facts"][0]["value"]["strings"] = json!(["BETTING", "TIP"]);
+                output["facts"][0]["value"]["integer"] = json!(1);
+                "事实值kind与实际载荷不一致"
+            }
+            9 => {
+                output["facts"][0]["subject"]["entity_type"] = json!("unknown");
+                output["facts"][0]["value"]["strings"] = json!(["BETTING", "TIP"]);
+                "未知事实实体类型：unknown"
+            }
+            10 => {
+                policy.source_policy.blocked_domains = vec!["www.example.com".to_string()];
+                output["match_key"] = json!("other");
+                "联网输出的比赛键与研究任务不一致"
+            }
+            _ => {
+                response.body["output"][0]["action"]["sources"][0]["url"] =
+                    json!("http://example.com/team-news");
+                let fact = output["facts"][0].clone();
+                output["facts"] = json!(vec![fact; 257]);
+                "来源URL必须使用HTTPS：http://example.com/team-news"
+            }
+        };
+        let expected_category = if matches!(case, 5..=10) {
+            GatewayErrorCategory::SchemaValidation
+        } else {
+            GatewayErrorCategory::SourcePolicy
+        };
+        response.body["output"][1]["content"][0]["text"] = json!(output.to_string());
+        let raw = response.body.clone();
+        let transport = Arc::new(FakeTransport::with_responses(vec![response]));
+        let provider = Arc::new(CountingKeyProvider::default());
+        let sink = FormalResponseAttemptSink::default();
+        let gateway =
+            OpenAiResearchGateway::new(policy, transport.clone(), provider.clone()).unwrap();
+        let error = gateway
+            .execute_with_sink(&input, &CancellationToken::new(), &sink)
+            .await
+            .expect_err("policy rejection");
+        assert_eq!(error.category, expected_category, "case {case}");
+        assert_eq!(error.user_message, expected_message, "case {case}");
+        assert!(!error.recovery.retryable);
+        assert_eq!(provider.loads.load(std::sync::atomic::Ordering::SeqCst), 1);
+        assert_eq!(transport.requests.lock().unwrap().len(), 1);
+        let attempts = sink.attempts.lock().unwrap();
+        assert_eq!(attempts.len(), 1);
+        assert_eq!(attempts[0].status, "failed");
+        assert_eq!(attempts[0].provider_status, Some(200));
+        assert_eq!(attempts[0].provider_request_id.as_deref(), Some("req_1"));
+        assert_eq!(attempts[0].response_id.as_deref(), Some("resp_1"));
+        assert_eq!(attempts[0].raw_response.as_ref(), Some(&raw));
+        assert_eq!(
+            attempts[0].error.as_ref().unwrap().user_message,
+            expected_message
+        );
+        assert_eq!(attempts[0].usage.total_tokens, 0);
+        assert!(attempts[0].estimated_cost_usd.is_none());
+    }
+}
+
+#[tokio::test]
+async fn queued_and_resumed_policies_keep_original_urls_cutoff_and_content_validation() {
+    use std::sync::atomic::Ordering;
+    for resume in [false, true] {
+        for case in 0..3 {
+            let mut completed = successful_response();
+            let mut output: Value = serde_json::from_str(
+                completed.body["output"][1]["content"][0]["text"]
+                    .as_str()
+                    .unwrap(),
+            )
+            .unwrap();
+            completed.body["output"][0]["action"]["sources"][0]["url"] =
+                json!("https://example.com/team-news?q=one#search");
+            completed.body["output"][1]["content"][0]["annotations"][0]["url"] =
+                json!("https://example.com/team-news?q=one#citation");
+            output["facts"][0]["source_urls"] = json!(["https://example.com/team-news?q=one#fact"]);
+            for field in ["published_at", "observed_at", "effective_at"] {
+                output["facts"][0][field] = json!("2026-07-14T18:00:00+08:00");
+            }
+            if case == 1 {
+                output["facts"][0]["observed_at"] = json!("2026-07-14T18:00:00.000000001+08:00");
+            } else if case == 2 {
+                output["facts"][0]["value"]["strings"] = json!(["BETTING", "TIP"]);
+            }
+            completed.body["output"][1]["content"][0]["text"] = json!(output.to_string());
+            let raw = completed.body.clone();
+            let transport = Arc::new(FormalPollingTransport {
+                posted: Mutex::new(Some(TransportResponse {
+                    status: 200,
+                    provider_request_id: Some("req_queued".to_string()),
+                    body: json!({"id":"resp_1","status":"queued"}),
+                })),
+                completed: Mutex::new(Some(completed)),
+                post_calls: std::sync::atomic::AtomicUsize::new(0),
+                get_urls: Mutex::new(vec![]),
+            });
+            let provider = Arc::new(CountingKeyProvider::default());
+            let mut policy = config();
+            policy.background_mode = true;
+            policy.store = true;
+            let gateway =
+                OpenAiResearchGateway::new(policy, transport.clone(), provider.clone()).unwrap();
+            let parsed = if resume {
+                gateway
+                    .resume(&request(), "resp_1", &CancellationToken::new())
+                    .await
+            } else {
+                gateway
+                    .execute(&request(), &CancellationToken::new())
+                    .await
+                    .map(|execution| execution.response)
+            };
+            match case {
+                0 => {
+                    let response = parsed.expect("same UTC cutoff and normalized membership");
+                    assert_eq!(response.raw_response, raw);
+                    assert_eq!(
+                        response.output.facts[0].source_urls,
+                        vec!["https://example.com/team-news?q=one#fact"]
+                    );
+                    assert_eq!(
+                        response.citations[0].url,
+                        "https://example.com/team-news?q=one#citation"
+                    );
+                    assert_eq!(
+                        response.sources[0].url,
+                        "https://example.com/team-news?q=one#search"
+                    );
+                    assert_eq!(
+                        response.output.facts[0].observed_at,
+                        Some(request().data_cutoff_at)
+                    );
+                    assert_eq!(response.usage.cached_input_tokens, 20);
+                    assert_eq!(response.provider_request_id.as_deref(), Some("req_1"));
+                }
+                1 => {
+                    let error = parsed.expect_err("nanosecond after cutoff");
+                    assert_eq!(error.category, GatewayErrorCategory::SchemaValidation);
+                    assert_eq!(
+                        error.user_message,
+                        "observed_at晚于赛前数据截止时间，不能进入当前研究结果"
+                    );
+                }
+                _ => {
+                    let error = parsed.expect_err("prohibited content");
+                    assert_eq!(error.category, GatewayErrorCategory::SourcePolicy);
+                    assert!(!error.recovery.retryable);
+                }
+            }
+            assert_eq!(provider.loads.load(Ordering::SeqCst), 1);
+            assert_eq!(
+                transport.post_calls.load(Ordering::SeqCst),
+                usize::from(!resume)
+            );
+            assert_eq!(
+                *transport.get_urls.lock().unwrap(),
+                vec!["https://api.openai.com/v1/responses/resp_1".to_string()]
+            );
+        }
+    }
+}

@@ -114,7 +114,7 @@ const formalCitations = text(`${formalRoot}/citations/validation.rs`).split("#[c
 const citationWire = text("crates/research-gateway/src/citations.rs").split("#[cfg(test)]")[0];
 const responseFields = text("crates/research-gateway/src/response_fields.rs").split("#[cfg(test)]")[0];
 const validationErrors = text("crates/research-gateway/src/validation_error.rs");
-for (const directory of ["response", "schema", "citations"]) assert(!/\b(?:fn|struct|trait|impl)\b/.test(text(`${formalRoot}/${directory}/mod.rs`)), `${directory}出口不得承载实现`);
+for (const directory of ["response", "schema", "citations", "policies"]) assert(!/\b(?:fn|struct|trait|impl)\b/.test(text(`${formalRoot}/${directory}/mod.rs`)), `${directory}出口不得承载实现`);
 assert(!gateway.includes("fn parse_and_validate") && !response.includes("fn parse_success_response"), "旧正式响应解析/校验定义必须移除");
 assert(gateway.includes("use crate::formal_research::response::parse_and_validate;") && (gateway.match(/parse_and_validate\(\s*&self\.config\.source_policy,\s*request,\s*(?:response|completed),?\s*\)/g) ?? []).length === 3, "正式同步/后台完成/恢复必须接入同一解析校验owner");
 const formalResume = slice(gateway, "pub async fn resume(", "pub async fn cancel_remote(");
@@ -138,5 +138,28 @@ for (const token of ["usize::try_from(value)", 'host.trim_start_matches("www.").
 for (const token of ['.or_else(|| value.get("prompt_tokens"))', '.or_else(|| value.get("completion_tokens"))', "input_tokens.saturating_add(output_tokens)"]) assert(responseFields.includes(token), `共享用量原别名/溢出政策缺少${token}`);
 assert(validationErrors.includes("保留原始响应并将任务标记为结构校验失败；修正Prompt或Schema版本后重试") && validationErrors.includes("检查来源策略、引用完整性和禁用内容后重新执行研究任务"), "原Schema/SourcePolicy恢复建议不得合并为wire错误");
 for (const source of [formalResponse, formalResponseValidation, formalSchema, formalDecode, formalCitations, citationWire, responseFields, validationErrors]) for (const token of ["reqwest::", "key_provider", "OpenAiTransport", "tokio::", "GatewayAttemptSink", "Mutex<", "ApiKey"]) assert(!source.includes(token), `响应纯职责越界承担IO/状态：${token}`);
+// R9-06: pure source/content and cutoff policy, with original ordering and semantics.
+const policyExports = text(`${formalRoot}/policies/mod.rs`);
+const sourcePolicyFile = text(`${formalRoot}/policies/source_policy.rs`);
+const timePolicyFile = text(`${formalRoot}/policies/time_policy.rs`);
+const sourcePolicy = sourcePolicyFile.split("#[cfg(test)]")[0];
+const timePolicy = timePolicyFile.split("#[cfg(test)]")[0];
+assert(formalExports.includes("pub(crate) mod policies;") && policyExports.includes("pub(crate) use source_policy::{validate_url, FactContentPolicy};") && policyExports.includes("pub(crate) use time_policy::validate_time;"), "Source/Time政策出口必须直连唯一owner");
+assert(!existsSync(join(root, "crates/research-gateway/src/validation.rs")) && !gatewayExports.includes("mod validation;"), "旧根validation文件和登记必须删除，不能保留转发或重复实现");
+assert(formalCitations.includes("use crate::formal_research::policies::validate_url;") && formalSchema.includes("use crate::formal_research::policies::{validate_time, FactContentPolicy};"), "引用和Schema必须直连Source/Time政策");
+for (const token of ["Url::parse(value)", 'policy.https_only && parsed.scheme() != "https"', ".host_str()", '.trim_start_matches("www.")', ".blocked_domains", "!policy.allowed_domains.is_empty()", ".allowed_domains", "normalized.set_fragment(None)", "Ok(normalized.to_string())", '.trim_start_matches("*.")', 'host == configured || host.ends_with(&format!(".{configured}"))']) assert(sourcePolicy.includes(token), `Source政策原URL/domain边界缺少${token}`);
+const urlOrder = ["Url::parse(value)", "policy.https_only", ".host_str()", ".blocked_domains", "!policy.allowed_domains.is_empty()", "normalized.set_fragment(None)", "Ok(normalized.to_string())"].map(token => sourcePolicy.indexOf(token));
+assert(urlOrder.every((position, index) => position >= 0 && (index === 0 || position > urlOrder[index - 1])), "原解析/HTTPS/host/黑名单/白名单/fragment顺序漂移");
+for (const token of ["pub(crate) struct FactContentPolicy", "prohibited_keys: Vec<String>", "prohibited_terms: Vec<String>", ".prohibited_fact_keys", ".prohibited_content_terms", "let normalized_key = field_key.to_lowercase()", "normalized_key.contains(term)", 'ResearchValueKind::StringList => value.strings.join(" ").to_lowercase()', "_ => String::new()", "text.contains(term)"]) assert(sourcePolicy.includes(token), `Source政策原字段/内容规则缺少${token}`);
+assert((sourcePolicy.match(/\.map\(\|value\| value\.to_lowercase\(\)\)/g) ?? []).length === 2, "字段/内容禁词必须各按原规则小写，不能自行trim或过滤空term");
+assert(timePolicy.includes("value: Option<DateTime<Utc>>") && timePolicy.includes("value.is_some_and(|timestamp| timestamp > cutoff)") && timePolicy.includes("{field}晚于赛前数据截止时间，不能进入当前研究结果") && timePolicy.includes("use crate::validation_error::schema_error;"), "Time政策必须保持可选/相等允许/纳秒后拒绝及原Schema错误");
+const schemaPolicyOrder = ["FactContentPolicy::new(context.source_policy)", "build_source_index(", "output.facts.len() > 256", "content_policy.validate_field_key(&fact.field_key)?", "validate_subject(", "validate_verification_state(", "validate_value(&fact.value)?", "content_policy.validate_content(&fact.value)?", 'validate_time("published_at"', 'validate_time("observed_at"', 'validate_time("effective_at"', "validate_fact_sources("].map(token => formalSchema.indexOf(token));
+assert(schemaPolicyOrder.every((position, index) => position >= 0 && (index === 0 || position > schemaPolicyOrder[index - 1])), "Schema身份后来源索引/上限/字段/主体/状态/值形状/内容/三时间/引用原优先级漂移");
+for (const token of [".prohibited_fact_keys", ".prohibited_content_terms", "fn validate_url", "fn domain_matches", "fn validate_time"]) assert(!formalSchema.includes(token) && !formalCitations.includes(token), `Schema/Citation残留Source/Time实现：${token}`);
+for (const source of [sourcePolicy, timePolicy]) for (const token of ["reqwest::", "key_provider", "OpenAiTransport", "tokio::", "GatewayAttemptSink", "Mutex<", "ApiKey", "Utc::now", "SystemTime", "std::fs", "static "]) assert(!source.includes(token), `政策越界承担IO/状态/墙钟：${token}`);
+assert(!response.includes("formal_research::policies") && !gateway.includes("formal_research::policies"), "兼容路径和Gateway不得实现或绕入正式政策");
+for (const name of ["domain_rules_keep_case_prefix_subdomains_and_dot_boundaries", "source_errors_keep_parse_https_host_block_and_allow_priority", "normalized_source_removes_only_fragment_after_original_url_parsing", "empty_allow_list_and_disabled_https_keep_original_scheme_policy", "content_restrictions_keep_substrings_case_and_joined_string_lists", "restrictions_keep_raw_whitespace_and_empty_term_behavior"]) assert(sourcePolicyFile.includes(`fn ${name}`), `原unit target缺Source政策行为覆盖：${name}`);
+for (const name of ["optional_fact_times_accept_none_before_and_equal_but_reject_one_nanosecond_after", "cutoff_compares_utc_instants_without_wall_clock_or_string_timezone_rules"]) assert(timePolicyFile.includes(`fn ${name}`), `原unit target缺Time政策行为覆盖：${name}`);
+for (const name of ["formal_source_and_time_policies_preserve_attempt_evidence_and_error_order", "queued_and_resumed_policies_keep_original_urls_cutoff_and_content_validation"]) assert(tests.includes(`fn ${name}`), `原contract target缺正式政策链路：${name}`);
 if (failures.length) { console.error("AI问答兼容传输验证失败："); failures.forEach((item) => console.error(`- ${item}`)); process.exit(1); }
-console.log("AI问答兼容传输验证通过：Responses与Chat Completions保持最小文本请求；R9-01/03/04/05传输、弹性、正式请求/响应与Schema/引用唯一owner，原公共契约和策略边界保持。");
+console.log("AI问答兼容传输验证通过：Responses与Chat Completions保持最小文本请求；R9-01/03/04/05/06传输、弹性、正式请求/响应/Schema/引用与来源/时间政策唯一owner，原公共契约和策略边界保持。");

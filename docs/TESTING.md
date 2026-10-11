@@ -476,3 +476,9 @@ R9-05 Formal Response/Schema/Citation已实施、`VERIFYING`，基线53e49f8，�
 交付artifact `11677353373` / `windows-automated-delivery-evidence-aa70d2b4464e86254eecfcace11621d1b03aad51`，14,042,360 bytes，SHA-256 `ae05f14fdbdbe18f49bc34de912ab2b0e63ef928f74ff5409db585f6d0cbbb47`。报告 `D:\a\123\123\logs\windows-acceptance-20261010-174601.json`，过程记录同名.txt。原18 broad PG仍ignored；真实PG/历史四项/不可变账本/并发/回滚/有效XLSX/Windows Full/私有P4P7固定回归及继承model.runs/0041删除风险保持最终封包新库待验，ignored与公开stub不计PASS。
 
 05 **DONE**；用户2026-10-11“收尾05开始06”授权06 **READY**，07～11BLOCKED，R9整体IN_PROGRESS。本次仅既有五文档 `[skip ci]` 收尾，源码/门禁/依赖保持，复用上述同源码Windows成功；此前VERIFYING叙述属于实施历史，不创建R9阶段完成记录。
+
+## R9-06 Source 与 Time Policy（2026-10-11，VERIFYING）
+
+R9-06 Source/Time Policy已实施、`VERIFYING`，基线b6636fe，同一R9分支。URL/domain与禁用字段/内容归source_policy，三可选事实时间归time_policy；Schema保留身份/主体/值形状/覆盖，Citation保留关联，删除旧root validation。4A/11M/1D、16文件；原公开API/DTO/Schema/SourcePolicy配置/协议/依赖/DB/UI/错误/生产策略不变。原82unit/29contract保留，新增8unit/2contract；源码预期Gateway90/contract31、Application126/Persistence175须06自身Windows。83/83静态、完整architecture、Rustfmt、657生产literal/原规则与组合等价、保护资产/171命令/46迁移18PG静态、7破坏探针均通过。
+
+新增8unit/2contract与等价/7探针、16文件、报告/工具/回退详见 [06记录](modular-rewrite/R09-research-ai-backend/R09-06-source-and-time-policy.md#行为覆盖与证据)。复用原Windows Automated，不执行非Windows动态，不将05 SUCCESS或90/31源码预期冒充06通过；真实PG/历史四项/账本并发回滚/XLSX/Full/私有固定回归及继承删除风险保持最终封包新库待验。

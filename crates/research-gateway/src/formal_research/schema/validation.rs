@@ -1,6 +1,6 @@
 use crate::formal_research::citations::{build_source_index, validate_fact_sources};
-use crate::validation::validate_time;
-use crate::validation_error::{schema_error, source_error};
+use crate::formal_research::policies::{validate_time, FactContentPolicy};
+use crate::validation_error::schema_error;
 use crate::{
     GatewayError, ResearchOutput, ResearchValue, ResearchValueKind, SourcePolicy, WebCitation,
     WebSource,
@@ -37,18 +37,7 @@ pub fn validate_research_output(
         .iter()
         .map(String::as_str)
         .collect();
-    let prohibited_keys: Vec<String> = context
-        .source_policy
-        .prohibited_fact_keys
-        .iter()
-        .map(|value| value.to_lowercase())
-        .collect();
-    let prohibited_terms: Vec<String> = context
-        .source_policy
-        .prohibited_content_terms
-        .iter()
-        .map(|value| value.to_lowercase())
-        .collect();
+    let content_policy = FactContentPolicy::new(context.source_policy);
     let source_index =
         build_source_index(context.citations, context.sources, context.source_policy)?;
     let mut seen_fact_keys = BTreeSet::new();
@@ -83,19 +72,11 @@ pub fn validate_research_output(
             )));
         }
         seen_fields.insert(fact.field_key.as_str());
-        let normalized_key = fact.field_key.to_lowercase();
-        if prohibited_keys
-            .iter()
-            .any(|term| normalized_key.contains(term))
-        {
-            return Err(source_error(format!(
-                "字段{}属于禁止进入模型的预测、盘口或推荐内容",
-                fact.field_key
-            )));
-        }
+        content_policy.validate_field_key(&fact.field_key)?;
         validate_subject(&fact.subject.entity_type, &fact.subject.name)?;
         validate_verification_state(&fact.verification_state)?;
-        validate_value(&fact.value, &prohibited_terms)?;
+        validate_value(&fact.value)?;
+        content_policy.validate_content(&fact.value)?;
         validate_time("published_at", fact.published_at, context.data_cutoff_at)?;
         validate_time("observed_at", fact.observed_at, context.data_cutoff_at)?;
         validate_time("effective_at", fact.effective_at, context.data_cutoff_at)?;
@@ -168,7 +149,7 @@ fn validate_verification_state(state: &str) -> Result<(), GatewayError> {
     }
 }
 
-fn validate_value(value: &ResearchValue, prohibited_terms: &[String]) -> Result<(), GatewayError> {
+fn validate_value(value: &ResearchValue) -> Result<(), GatewayError> {
     let valid = match value.kind {
         ResearchValueKind::String => {
             value
@@ -219,16 +200,6 @@ fn validate_value(value: &ResearchValue, prohibited_terms: &[String]) -> Result<
     };
     if !valid {
         return Err(schema_error("事实值kind与实际载荷不一致"));
-    }
-    let text = match value.kind {
-        ResearchValueKind::String => value.text.as_deref().unwrap_or_default().to_lowercase(),
-        ResearchValueKind::StringList => value.strings.join(" ").to_lowercase(),
-        _ => String::new(),
-    };
-    if prohibited_terms.iter().any(|term| text.contains(term)) {
-        return Err(source_error(
-            "联网结果包含预测、推荐、盘口或博彩分析内容，已阻止进入事实库",
-        ));
     }
     Ok(())
 }
@@ -594,13 +565,13 @@ mod tests {
         value.strings = vec!["news".to_string()];
         values.push(value);
         for value in &values {
-            validate_value(value, &[]).expect("matching payload");
+            validate_value(value).expect("matching payload");
         }
         for mut value in values {
             value.integer = Some(1);
             value.boolean = Some(true);
             assert_eq!(
-                validate_value(&value, &[])
+                validate_value(&value)
                     .expect_err("mixed payload")
                     .user_message,
                 "事实值kind与实际载荷不一致"
@@ -615,7 +586,7 @@ mod tests {
                 boolean: None,
                 strings: vec![],
             };
-            assert!(validate_value(&value, &[]).is_err());
+            assert!(validate_value(&value).is_err());
         }
     }
 
@@ -639,7 +610,10 @@ mod tests {
         );
         let mut value = valid_output().facts.remove(0).value;
         value.strings = vec!["BETTING".to_string(), "TIP".to_string()];
-        let error = validate_value(&value, &["betting tip".to_string()])
+        let policy = FactContentPolicy::new(context(&[], &[]).source_policy);
+        validate_value(&value).expect("valid payload");
+        let error = policy
+            .validate_content(&value)
             .expect_err("joined forbidden content");
         assert_eq!(error.category, GatewayErrorCategory::SourcePolicy);
         assert!(!error.recovery.retryable);

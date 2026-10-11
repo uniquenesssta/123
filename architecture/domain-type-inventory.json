@@ -24,13 +24,13 @@
     "targetPublicExportPolicy": "explicit re-export only"
   },
   "sourceDigest": "217241ac243726a5ab6805a7f169e222b97e78c7c971749a5904714af673ebdd",
-  "rustUsageDigest": "7dca548fa0c39319eb8f393a24a1823e8ffa705046dc89d86b1596dc6e4d13a9",
+  "rustUsageDigest": "33b0d1b4baf260934d849a561f30f3c48f8061cc3e40214552486c22fc177d3f",
   "summary": {
     "typeCount": 365,
     "publicCompatibilityTypeCount": 365,
     "internalTypeCount": 0,
     "domainSourceFileCount": 129,
-    "scannedRustFileCount": 1132,
+    "scannedRustFileCount": 1134,
     "databaseMappedTypeCount": 300,
     "byTargetModule": {
       "ai_workspace": 16,

@@ -12,7 +12,6 @@ mod response;
 mod response_fields;
 mod transport;
 mod types;
-mod validation;
 mod validation_error;
 
 pub use api_example::{parse_api_example, ApiExampleCandidate, ApiExampleParseResult};

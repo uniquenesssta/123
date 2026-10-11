@@ -1,4 +1,4 @@
-use crate::validation::validate_url;
+use crate::formal_research::policies::validate_url;
 use crate::validation_error::source_error;
 use crate::{GatewayError, SourcePolicy, WebCitation, WebSource};
 use std::collections::{BTreeMap, BTreeSet};
