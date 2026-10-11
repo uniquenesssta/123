@@ -1,6 +1,6 @@
 # R9-06 Source 与 Time Policy 实施记录
 
-状态：`VERIFYING`。用户2026-10-11“收尾05开始06”授权。uniquenesssta/123、0.23.0，唯一阶段分支rewrite/r9-research-ai-backend。05精确aa70d2b/run38072987214/job114274071102全SUCCESS/DONE，五文档收尾基线/回退 `b6636fef9589e86ee59c173732a847fd92cb21ed`、tree `2cb6d893136938d065a317a48758aa2e5c63e7fb`；源码与05成功一致。07～11BLOCKED，R9整体IN_PROGRESS。
+状态：`DONE`（精确d996a4d自身Windows全SUCCESS；下述VERIFYING为实施历史）。用户2026-10-11“收尾05开始06”授权。uniquenesssta/123、0.23.0，唯一阶段分支rewrite/r9-research-ai-backend。05精确aa70d2b/run38072987214/job114274071102全SUCCESS/DONE，五文档收尾基线/回退 `b6636fef9589e86ee59c173732a847fd92cb21ed`、tree `2cb6d893136938d065a317a48758aa2e5c63e7fb`；源码与05成功一致。用户已授权07 READY，08～11BLOCKED，R9整体IN_PROGRESS。
 
 ### 1. 目标
 
@@ -226,3 +226,11 @@ Context7 resolve/query /rust-lang/rust-clippy未提供1.88.0版本目录，另�
 本次是既有项目来源列表语义与新增断言不一致，原实现及已通过单测提供证据，无新版本/API/编译问题，不另查Context7；原架构/Mermaid图保持。Create State本轮先核实足球稳定model96f03270-c236-46de-99fa-db85d2fbf4ce再保存实际失败/修复/待验。五既有文档同步，当前阶段索引仍05 DONE、06 VERIFYING、07～11BLOCKED、R9 IN_PROGRESS，无阶段完成记录。
 
 原rewrite/r9-research-ai-backend分支推送修复自身Windows CI，精确job开始即停止轮询，预计20～30分钟。回退仅受控revert本轮测试/门禁/摘要/文档修复，整体06仍b6636fe。最终新库真实PG/历史四项/账本并发回滚/有效XLSX/Windows Full/私有P4P7固定回归及继承model.runs/0041删除风险继续显式待验。
+
+## R9-06 完成记录（2026-10-12）
+
+精确修复提交d996a4d4bea34d53486b14a642fa1f655478bde7 / tree2584ce620b3d9f53595f8d4d49da0b3f5ae42df0，[Windows run38145691538](https://github.com/uniquenesssta/123/actions/runs/38145691538) / job114488432087均SUCCESS，2026-10-11 22:30:11北京完成。Gateway90/90、contract31/31、Application126/126、Persistence175/175；前端/contracts/TypeScript/Vite/17视口、Rust fmt/Clippy/workspace、Windows release/MSI/NSIS/启动及日志扫描通过（7条记录、3个完成操作）。
+
+证据artifact11705243220，14,039,496字节，SHA-256 4d11fab6a5732281e1cbe5b3112ebdf2314d20f9d2d99d13141cb25e9ca499d8；报告windows-acceptance-20261011-140603.json、同名.txt。初轮format捕获、第二轮域名前缀夹具、第三轮来源排序断言三个失败均由该精确修复自身Windows关闭；新增8unit/2contract全通过。
+
+06 DONE；用户2026-10-12“收尾06开始07”授权07 READY，同一rewrite/r9-research-ai-backend分支，08～11 BLOCKED、R9 IN_PROGRESS。本次只同步五既有文档，使用[skip ci]复用上述同源码Windows成功；此前VERIFYING为实施历史，无R9阶段完成记录。真实PG/历史四项/账本并发回滚/有效XLSX/Windows Full/私有P4P7固定回归及继承model.runs/0041删除风险仍最终封包新库待验，ignored和公共stub不计PASS。

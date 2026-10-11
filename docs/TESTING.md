@@ -504,3 +504,11 @@ R9-06 第三轮43dba5f / [Windows run38135480448](https://github.com/uniquenesss
 该轮2026-10-11 19:35:14北京在gateway_contract.rs:1917失败：实际首项#citation，误期望#search。前端/contracts/TypeScript/Vite/17视口、Rust fmt/Clippy -D warnings、Gateway90/90及Application126/126、Persistence175/175单测通过；Gateway contract30/31、后续workspace/release/MSI/NSIS/启动未完成，不能计全链路PASS。之前两项Clippy和域名前缀单测修复已通过，ignored数据库测试不计真实数据库通过。
 
 本轮仅替换该契约一处sources断言；两种入口×三种情形、原raw/事实/引用URL、UTC cutoff、错误、缓存用量、提供方请求ID、凭据/POST/GET次数和真实GET URL保持。90unit/31contract数量保持；所有Gateway src字节不变，其他contract字节不变。Domain清单仅usageDigest变为c3aece9b4b2beec64c5434d549d9596532b310b9e88541fda2220ba2c1845bc0。83/83既有JS静态、完整architecture、Rustfmt、等价/四探针与保护复核通过，证据r906f3-static-checks.json/r906f3-architecture.log/r906f3-equivalence.json/r906f3-review.json。06自身Windows待验、07～11BLOCKED，最终新库边界保持；不执行非Windows动态。
+
+## R9-06 Windows 完成与07前置（2026-10-12）
+
+精确修复提交d996a4d4bea34d53486b14a642fa1f655478bde7 / tree2584ce620b3d9f53595f8d4d49da0b3f5ae42df0，[Windows run38145691538](https://github.com/uniquenesssta/123/actions/runs/38145691538) / job114488432087均SUCCESS，2026-10-11 22:30:11北京完成。Gateway90/90、contract31/31、Application126/126、Persistence175/175；前端/contracts/TypeScript/Vite/17视口、Rust fmt/Clippy/workspace、Windows release/MSI/NSIS/启动及日志扫描通过（7条记录、3个完成操作）。
+
+证据artifact11705243220，14,039,496字节，SHA-256 4d11fab6a5732281e1cbe5b3112ebdf2314d20f9d2d99d13141cb25e9ca499d8；报告windows-acceptance-20261011-140603.json及同名.txt。三次已知Windows失败均由精确修复自身成功关闭，新增8unit/2contract全部执行通过。
+
+06 DONE；用户2026-10-12“收尾06开始07”授权07 READY，同一rewrite/r9-research-ai-backend分支，08～11 BLOCKED、R9 IN_PROGRESS。本次只同步五既有文档，使用[skip ci]复用上述同源码Windows成功；此前VERIFYING为实施历史，无R9阶段完成记录。真实PG/历史四项/账本并发回滚/有效XLSX/Windows Full/私有P4P7固定回归及继承model.runs/0041删除风险仍最终封包新库待验，ignored和公共stub不计PASS。
