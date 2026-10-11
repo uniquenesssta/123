@@ -512,3 +512,9 @@ R9-06 第三轮43dba5f / [Windows run38135480448](https://github.com/uniquenesss
 证据artifact11705243220，14,039,496字节，SHA-256 4d11fab6a5732281e1cbe5b3112ebdf2314d20f9d2d99d13141cb25e9ca499d8；报告windows-acceptance-20261011-140603.json及同名.txt。三次已知Windows失败均由精确修复自身成功关闭，新增8unit/2contract全部执行通过。
 
 06 DONE；用户2026-10-12“收尾06开始07”授权07 READY，同一rewrite/r9-research-ai-backend分支，08～11 BLOCKED、R9 IN_PROGRESS。本次只同步五既有文档，使用[skip ci]复用上述同源码Windows成功；此前VERIFYING为实施历史，无R9阶段完成记录。真实PG/历史四项/账本并发回滚/有效XLSX/Windows Full/私有P4P7固定回归及继承model.runs/0041删除风险仍最终封包新库待验，ignored和公共stub不计PASS。
+
+## R9-07 Plain Chat Responses（2026-10-12，VERIFYING）
+
+R9-07 Plain Chat Responses已实施、`VERIFYING`，基线9ddb27a，同一R9分支。普通Responses最小载荷/原始文本解码归plain_chat/responses/{request,response}.rs，两个mod只登记/显式导出；共用校验/预算/许可/取消/重试/provider/refusal/回退/用量/attempt仍原owner，原Chat分支留08。5A/11M/0D、16文件：新增上述四Rust模块及07节点记录；修改根README、TESTING、R9任务书/索引、Domain清单、lib/client/response、原contract及两个既有兼容门禁，整文件删除/移动无。原API/DTO/Schema/配置/profile/DB/UI/协议/依赖/错误/生产政策保持。原90unit/31contract全文保持，新增8unit/4contract，预期Gateway98/35、Application126/Persistence175待07自身Windows。83/83静态、完整architecture、Rustfmt、完整共用client/response逆迁移等价、字符串多重集/保护/171命令/46迁移18PG静态与7破坏探针通过。报告r907-static-checks.json/r907-architecture.log/r907-equivalence.json/r907-negative-probes.json/r907-review.json；真实文件、23职责与兼容细节见07记录。Context7/官方serde_json1.0.150源码/Mermaid/足球状态同步；Windows精确开始后停止轮询，预计20～30分钟。06 DONE、07 VERIFYING、08～11BLOCKED，R9 IN_PROGRESS；真实PG/历史四项/账本并发回滚/有效XLSX/Windows Full/私有固定回归及继承model.runs/0041风险仍最终封包新库待验，不把ignored/公共stub记PASS。
+
+原Public Platform CI的Windows Automated执行frontend/TypeScript/Vite/17视口、fmt/Clippy -D warnings/workspace tests、Windows release/MSI/NSIS/启动/日志。当前实跑仅源码静态与格式，98/35不可记动态PASS；没有执行非WindowsCargo或浏览器运行时。07契约沿用原targets/mocks，最小载荷与完整attempt、7类容错元数据/回退、5类provider/refusal优先、5类入口拒绝共18情形；预算耗尽夹具先满足正数配置，后台夹具先store=true。

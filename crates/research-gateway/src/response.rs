@@ -1,4 +1,5 @@
 use crate::citations::{parse_citation, parse_source};
+use crate::plain_chat::responses::extract_text as extract_responses_text;
 use crate::response_fields::parse_usage;
 use crate::{
     ApiProtocol, GatewayError, GatewayErrorCategory, PlainTextGatewayResponse,
@@ -129,43 +130,6 @@ fn extract_compatible_text(protocol: ApiProtocol, value: &Value) -> Option<Strin
         .or_else(|| extract_chat_completions_text(value))
         .map(|text| text.trim().to_string())
         .filter(|text| !text.is_empty())
-}
-
-fn extract_responses_text(value: &Value) -> Option<String> {
-    if let Some(text) = value.get("output_text").and_then(Value::as_str) {
-        if !text.trim().is_empty() {
-            return Some(text.to_string());
-        }
-    }
-    let mut parts = Vec::new();
-    for item in value
-        .get("output")
-        .and_then(Value::as_array)
-        .into_iter()
-        .flatten()
-    {
-        if let Some(text) = item.as_str() {
-            parts.push(text.to_string());
-            continue;
-        }
-        for content in item
-            .get("content")
-            .and_then(Value::as_array)
-            .into_iter()
-            .flatten()
-        {
-            if let Some(text) = content.as_str() {
-                parts.push(text.to_string());
-            } else if let Some(text) = content
-                .get("text")
-                .and_then(Value::as_str)
-                .or_else(|| content.get("content").and_then(Value::as_str))
-            {
-                parts.push(text.to_string());
-            }
-        }
-    }
-    (!parts.is_empty()).then(|| parts.join("\n"))
 }
 
 fn extract_chat_completions_text(value: &Value) -> Option<String> {

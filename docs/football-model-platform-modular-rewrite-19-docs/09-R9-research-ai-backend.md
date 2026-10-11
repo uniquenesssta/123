@@ -688,7 +688,7 @@ R9-06 第三轮43dba5f / [Windows run38135480448](https://github.com/uniquenesss
 
 ## R9-07 Plain Chat Responses
 
-状态：`READY`（06自身Windows全SUCCESS/DONE；用户已授权开始07，同一R9分支）
+状态：`VERIFYING`（实现/静态/记录完成；07自身Windows待验，08～11BLOCKED）
 
 ### 1. 目标
 
@@ -819,6 +819,14 @@ crates/research-gateway/src/plain_chat/responses/
 - README 与实际状态一致。
 - `R09-07-plain-chat-responses.md` 已创建并与实际变更、验证结果一致。
 - 阶段 `README.md` 已更新本任务状态和记录链接。
+
+---
+
+### R9-07 实施与门禁（2026-10-12）
+
+R9-07 Plain Chat Responses已实施、`VERIFYING`，基线9ddb27a，同一R9分支。普通Responses最小载荷/原始文本解码归plain_chat/responses/{request,response}.rs，两个mod只登记/显式导出；共用校验/预算/许可/取消/重试/provider/refusal/回退/用量/attempt仍原owner，原Chat分支留08。5A/11M/0D、16文件：新增上述四Rust模块及07节点记录；修改根README、TESTING、R9任务书/索引、Domain清单、lib/client/response、原contract及两个既有兼容门禁，整文件删除/移动无。原API/DTO/Schema/配置/profile/DB/UI/协议/依赖/错误/生产政策保持。原90unit/31contract全文保持，新增8unit/4contract，预期Gateway98/35、Application126/Persistence175待07自身Windows。83/83静态、完整architecture、Rustfmt、完整共用client/response逆迁移等价、字符串多重集/保护/171命令/46迁移18PG静态与7破坏探针通过。报告r907-static-checks.json/r907-architecture.log/r907-equivalence.json/r907-negative-probes.json/r907-review.json；真实文件、23职责与兼容细节见07记录。Context7/官方serde_json1.0.150源码/Mermaid/足球状态同步；Windows精确开始后停止轮询，预计20～30分钟。06 DONE、07 VERIFYING、08～11BLOCKED，R9 IN_PROGRESS；真实PG/历史四项/账本并发回滚/有效XLSX/Windows Full/私有固定回归及继承model.runs/0041风险仍最终封包新库待验，不把ignored/公共stub记PASS。
+
+记录：[R09-07-plain-chat-responses.md](../modular-rewrite/R09-research-ai-backend/R09-07-plain-chat-responses.md)。
 
 ---
 

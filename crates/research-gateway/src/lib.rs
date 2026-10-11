@@ -6,6 +6,7 @@ mod config;
 mod credentials;
 mod error;
 mod formal_research;
+mod plain_chat;
 mod request_fields;
 mod resilience;
 mod response;

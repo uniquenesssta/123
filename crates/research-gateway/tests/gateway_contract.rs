@@ -1958,3 +1958,379 @@ async fn queued_and_resumed_policies_keep_original_urls_cutoff_and_content_valid
         }
     }
 }
+
+fn plain_responses_request() -> PlainTextGatewayRequest {
+    PlainTextGatewayRequest {
+        operation: GatewayOperation::Extraction,
+        trace_id: "trace-r907-plain".to_string(),
+        static_instructions: " 普通文本回答\n".to_string(),
+        messages: vec![
+            PlainTextMessage {
+                role: "user".to_string(),
+                content: "你好⚽\"\\".to_string(),
+            },
+            PlainTextMessage {
+                role: "assistant".to_string(),
+                content: "先前回答".to_string(),
+            },
+        ],
+        daily_spend_usd: 0.0,
+        monthly_spend_usd: 0.0,
+        attempt_number_offset: 7,
+    }
+}
+
+#[tokio::test]
+async fn plain_responses_preserves_minimal_payload_and_complete_attempt_evidence() {
+    use sha2::{Digest, Sha256};
+    use std::sync::atomic::Ordering;
+    let raw = json!({
+        "id":"resp_r907", "model":"configured-extraction-model", "status":"completed",
+        "output_text":" 普通回答⚽\n ",
+        "usage":{"input_tokens":100,"input_tokens_details":{"cached_tokens":20},"output_tokens":50,"total_tokens":150},
+        "output":[{"type":"web_search_call"}]
+    });
+    let transport = Arc::new(FakeTransport::with_responses(vec![TransportResponse {
+        status: 200,
+        provider_request_id: Some("req_r907".to_string()),
+        body: raw.clone(),
+    }]));
+    let provider = Arc::new(CountingKeyProvider::default());
+    let sink = FormalResponseAttemptSink::default();
+    let mut configuration = config();
+    configuration.store = true;
+    configuration.api_workspace_web_search_mode = ApiWorkspaceWebSearchMode::ResponsesWebSearch;
+    let gateway =
+        OpenAiResearchGateway::new(configuration, transport.clone(), provider.clone()).unwrap();
+    let execution = gateway
+        .execute_plain_text_with_sink(&plain_responses_request(), &CancellationToken::new(), &sink)
+        .await
+        .unwrap();
+    let expected = json!({"model":"configured-extraction-model","input":[
+        {"role":"system","content":[{"type":"input_text","text":" 普通文本回答\n"}]},
+        {"role":"user","content":[{"type":"input_text","text":"你好⚽\"\\"}]},
+        {"role":"assistant","content":[{"type":"input_text","text":"先前回答"}]}
+    ]});
+    assert_eq!(*transport.requests.lock().unwrap(), vec![expected.clone()]);
+    assert_eq!(provider.loads.load(Ordering::SeqCst), 1);
+    assert_eq!(execution.response.text, "普通回答⚽");
+    assert_eq!(execution.response.raw_response, raw);
+    assert_eq!(execution.response.response_id, "resp_r907");
+    assert_eq!(
+        execution.response.provider_request_id.as_deref(),
+        Some("req_r907")
+    );
+    assert_eq!(execution.attempts.len(), 1);
+    let attempt = &execution.attempts[0];
+    assert_eq!(attempt.attempt_number, 8);
+    assert_eq!(attempt.model_id, "configured-extraction-model");
+    assert_eq!(attempt.request_payload, expected);
+    assert_eq!(
+        attempt.request_fingerprint,
+        hex::encode(Sha256::digest(serde_json::to_vec(&expected).unwrap()))
+    );
+    assert_eq!(attempt.response_id.as_deref(), Some("resp_r907"));
+    assert_eq!(attempt.provider_request_id.as_deref(), Some("req_r907"));
+    assert_eq!(attempt.provider_status, Some(200));
+    assert_eq!(attempt.status, "completed");
+    assert_eq!(attempt.usage, execution.response.usage);
+    assert_eq!(attempt.usage.input_tokens, 100);
+    assert_eq!(attempt.usage.cached_input_tokens, 20);
+    assert_eq!(attempt.usage.output_tokens, 50);
+    assert_eq!(attempt.usage.total_tokens, 150);
+    assert_eq!(attempt.search_call_count, 0);
+    assert!((attempt.estimated_cost_usd.unwrap() - 0.000182).abs() < 1e-12);
+    assert_eq!(attempt.raw_response.as_ref(), Some(&raw));
+    assert!(attempt.error.is_none());
+    assert!(attempt.finished_at >= attempt.started_at);
+    assert_eq!(*sink.attempts.lock().unwrap(), execution.attempts);
+}
+
+#[tokio::test]
+async fn plain_responses_keeps_tolerant_text_metadata_and_cross_protocol_fallback() {
+    for (raw, expected_text, expected_id, expected_model, expected_status, provider_id) in [
+        (
+            json!({"id":"resp_top","model":"wire-model","status":"queued","output_text":" 顶层 ","output":["嵌套"],"choices":[{"message":{"content":"chat"}}]}),
+            Some("顶层"),
+            "resp_top",
+            "wire-model",
+            "queued",
+            Some("req_plain"),
+        ),
+        (
+            json!({"id":null,"model":4,"status":4,"output":["一",{"content":[{"text":"二","content":"忽略"},{"content":"三"}]}],"usage":{"prompt_tokens":7,"completion_tokens":3}}),
+            Some("一\n二\n三"),
+            "req_plain",
+            "compatible-model",
+            "completed",
+            Some("req_plain"),
+        ),
+        (
+            json!({"choices":[{"message":{"content":" chat回退 "}}]}),
+            Some("chat回退"),
+            "req_plain",
+            "compatible-model",
+            "completed",
+            Some("req_plain"),
+        ),
+        (
+            json!({"output_text":" \n","output":[" 嵌套 "]}),
+            Some("嵌套"),
+            "req_plain",
+            "compatible-model",
+            "completed",
+            Some("req_plain"),
+        ),
+        (
+            json!({"output":[{"content":[{"text":" \n"}]}],"choices":[{"message":{"content":"不能覆盖已识别空白"}}]}),
+            None,
+            "req_plain",
+            "compatible-model",
+            "completed",
+            Some("req_plain"),
+        ),
+        (
+            json!({"output":[{"content":[{"refusal":"原不识别"}]}]}),
+            None,
+            "req_plain",
+            "compatible-model",
+            "completed",
+            Some("req_plain"),
+        ),
+        (
+            json!({"output_text":"无响应ID"}),
+            Some("无响应ID"),
+            "provider-response-id-unavailable",
+            "compatible-model",
+            "completed",
+            None,
+        ),
+    ] {
+        let mut configuration = config();
+        configuration.max_retries = 0;
+        configuration.fallback_model = None;
+        let transport = Arc::new(FakeTransport::with_responses(vec![TransportResponse {
+            status: 200,
+            provider_request_id: provider_id.map(str::to_string),
+            body: raw.clone(),
+        }]));
+        let sink = FormalResponseAttemptSink::default();
+        let gateway =
+            OpenAiResearchGateway::new(configuration, transport.clone(), Arc::new(TestKeyProvider))
+                .unwrap();
+        let result = gateway
+            .execute_plain_text_with_sink(
+                &plain_responses_request(),
+                &CancellationToken::new(),
+                &sink,
+            )
+            .await;
+        match expected_text {
+            Some(text) => {
+                let execution = result.expect("compatible plain response");
+                assert_eq!(execution.response.text, text);
+                assert_eq!(execution.response.response_id, expected_id);
+                assert_eq!(execution.response.model_id, expected_model);
+                assert_eq!(execution.response.status, expected_status);
+                assert_eq!(
+                    execution.response.provider_request_id.as_deref(),
+                    provider_id
+                );
+                assert_eq!(execution.response.raw_response, raw);
+                assert_eq!(*sink.attempts.lock().unwrap(), execution.attempts);
+                if raw.get("usage").is_some() {
+                    assert_eq!(execution.response.usage.input_tokens, 7);
+                    assert_eq!(execution.response.usage.output_tokens, 3);
+                    assert_eq!(execution.response.usage.total_tokens, 10);
+                }
+            }
+            None => {
+                let error = result.expect_err("nested blank or unrecognized parts keep NoResult");
+                assert_eq!(error.category, GatewayErrorCategory::NoResult);
+                assert_eq!(error.user_message, "兼容 API响应中没有识别到文本内容");
+                assert!(error.recovery.retryable);
+                assert_eq!(
+                    error.recovery.action,
+                    "检查所选协议、端点和模型；详细原始响应已写入运行日志"
+                );
+            }
+        }
+        let attempts = sink.attempts.lock().unwrap();
+        assert_eq!(attempts.len(), 1);
+        assert_eq!(attempts[0].raw_response.as_ref(), Some(&raw));
+        assert_eq!(attempts[0].provider_request_id.as_deref(), provider_id);
+        assert_eq!(attempts[0].provider_status, Some(200));
+        assert_eq!(attempts[0].search_call_count, 0);
+        assert_eq!(transport.requests.lock().unwrap().len(), 1);
+    }
+}
+
+#[tokio::test]
+async fn plain_responses_preserves_provider_refusal_and_no_result_error_priority() {
+    for (status, raw, category, message, retryable, action) in [
+        (
+            429,
+            json!({"id":"resp_error","refusal":"拒绝","output_text":"文本","error":{"message":"slow down","code":"rate_limit"}}),
+            GatewayErrorCategory::RateLimit,
+            "兼容 API请求失败（HTTP 429）：slow down",
+            true,
+            "等待限流窗口后重试，并检查并发和账户配额",
+        ),
+        (
+            200,
+            json!({"id":"resp_error","refusal":"拒绝","output_text":"文本"}),
+            GatewayErrorCategory::Refused,
+            "兼容 API拒绝了本次AI问答请求：拒绝",
+            false,
+            "检查问题内容后重试",
+        ),
+        (
+            200,
+            json!({"id":"resp_error","refusal":"","output_text":"文本"}),
+            GatewayErrorCategory::Refused,
+            "兼容 API拒绝了本次AI问答请求：",
+            false,
+            "检查问题内容后重试",
+        ),
+        (
+            200,
+            json!({"id":"resp_error","output_text":"文本","choices":[{"message":{"refusal":"chat拒绝"}}]}),
+            GatewayErrorCategory::Refused,
+            "兼容 API拒绝了本次AI问答请求：chat拒绝",
+            false,
+            "检查问题内容后重试",
+        ),
+        (
+            200,
+            json!({"id":"resp_error","output":[{"content":[{"type":"refusal","refusal":"原不识别"}]}]}),
+            GatewayErrorCategory::NoResult,
+            "兼容 API响应中没有识别到文本内容",
+            true,
+            "检查所选协议、端点和模型；详细原始响应已写入运行日志",
+        ),
+    ] {
+        let mut configuration = config();
+        configuration.max_retries = 0;
+        configuration.fallback_model = None;
+        let transport = Arc::new(FakeTransport::with_responses(vec![TransportResponse {
+            status,
+            provider_request_id: Some("req_error".to_string()),
+            body: raw.clone(),
+        }]));
+        let sink = FormalResponseAttemptSink::default();
+        let gateway =
+            OpenAiResearchGateway::new(configuration, transport.clone(), Arc::new(TestKeyProvider))
+                .unwrap();
+        let error = gateway
+            .execute_plain_text_with_sink(
+                &plain_responses_request(),
+                &CancellationToken::new(),
+                &sink,
+            )
+            .await
+            .expect_err("original error priority");
+        assert_eq!(error.category, category);
+        assert_eq!(error.user_message, message);
+        assert_eq!(error.recovery.retryable, retryable);
+        assert_eq!(error.recovery.action, action);
+        assert_eq!(
+            error.provider_status,
+            if status == 429 { Some(429) } else { None }
+        );
+        assert_eq!(
+            error.provider_code.as_deref(),
+            if status == 429 {
+                Some("rate_limit")
+            } else {
+                None
+            }
+        );
+        let attempts = sink.attempts.lock().unwrap();
+        assert_eq!(attempts.len(), 1);
+        assert_eq!(attempts[0].attempt_number, 8);
+        assert_eq!(attempts[0].response_id.as_deref(), Some("resp_error"));
+        assert_eq!(
+            attempts[0].provider_request_id.as_deref(),
+            Some("req_error")
+        );
+        assert_eq!(attempts[0].provider_status, Some(status));
+        assert_eq!(attempts[0].raw_response.as_ref(), Some(&raw));
+        assert_eq!(attempts[0].error.as_ref(), Some(&error));
+        assert_eq!(attempts[0].usage.total_tokens, 0);
+        assert_eq!(attempts[0].estimated_cost_usd, None);
+        assert_eq!(attempts[0].search_call_count, 0);
+        assert_eq!(transport.requests.lock().unwrap().len(), 1);
+    }
+}
+
+#[tokio::test]
+async fn plain_responses_validation_background_and_budget_stop_before_credentials_and_io() {
+    use std::sync::atomic::Ordering;
+    for case in 0..5 {
+        let mut configuration = config();
+        let mut request = plain_responses_request();
+        let (category, message, action) = match case {
+            0 => {
+                request.messages[0].role = "tool".to_string();
+                (
+                    GatewayErrorCategory::InvalidConfiguration,
+                    "AI问答消息角色或内容无效",
+                    "只发送非空的user或assistant消息",
+                )
+            }
+            1 => {
+                configuration.background_mode = true;
+                configuration.store = true;
+                request.trace_id.clear();
+                (
+                    GatewayErrorCategory::InvalidConfiguration,
+                    "AI问答请求缺少追踪ID、系统指令或消息",
+                    "修正请求构造后重试",
+                )
+            }
+            2 => {
+                configuration.background_mode = true;
+                configuration.store = true;
+                (
+                    GatewayErrorCategory::InvalidConfiguration,
+                    "AI问答不支持后台请求模式",
+                    "关闭background后重试；AI问答使用同步Responses或Chat Completions请求",
+                )
+            }
+            3 => {
+                request.daily_spend_usd = f64::NAN;
+                (
+                    GatewayErrorCategory::BudgetExceeded,
+                    "数据库返回了无效的AI问答预算用量",
+                    "调整预算配置或等待下一预算周期；不得绕过预算生成伪完成状态",
+                )
+            }
+            _ => {
+                request.daily_spend_usd = 10.0;
+                (
+                    GatewayErrorCategory::BudgetExceeded,
+                    "本次请求可能使今日成本超过10.000000美元预算",
+                    "调整预算配置或等待下一预算周期；不得绕过预算生成伪完成状态",
+                )
+            }
+        };
+        let provider = Arc::new(CountingKeyProvider::default());
+        let transport = Arc::new(FakeTransport::default());
+        let sink = FormalResponseAttemptSink::default();
+        let gateway =
+            OpenAiResearchGateway::new(configuration, transport.clone(), provider.clone())
+                .expect("valid configuration before plain workflow rejection");
+        let error = gateway
+            .execute_plain_text_with_sink(&request, &CancellationToken::new(), &sink)
+            .await
+            .expect_err("stop before credentials and I/O");
+        assert_eq!(error.category, category);
+        assert_eq!(error.user_message, message);
+        assert_eq!(error.recovery.action, action);
+        assert!(!error.recovery.retryable);
+        assert_eq!(error.provider_status, None);
+        assert_eq!(provider.loads.load(Ordering::SeqCst), 0);
+        assert!(transport.requests.lock().unwrap().is_empty());
+        assert!(sink.attempts.lock().unwrap().is_empty());
+    }
+}
