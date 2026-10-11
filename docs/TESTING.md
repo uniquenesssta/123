@@ -488,3 +488,11 @@ R9-06 Source/Time Policy已实施、`VERIFYING`，基线b6636fe，同一R9分支
 R9-06 初版f714acb的Windows run38108158888/job114377958564因SourcePolicy字段提示触发Clippy uninlined_format_args失败。现将普通变量格式参数改为内嵌field_key，错误文字/类别/恢复建议/政策保持；原源码卫生门禁新增该回归守卫（旧源码拒绝、修复后通过），Domain使用摘要同步。83/83现有静态、完整architecture、Rustfmt和差异/提示等价通过；Gateway90/contract31仍是待本轮Windows验证的预期，06 VERIFYING、07～11BLOCKED。
 
 初轮前端/contracts/TypeScript/17视口/生产构建通过，Rust Clippy在source_policy.rs:77阻断；工作区测试、release/MSI/NSIS/客户端启动未执行，不计PASS。原90unit/31contract测试源码保持，原同步契约已有home_ODDS完整提示断言；本轮生产只改一个Display格式表达式。当前usageDigest `d52e1a00455c4b29c48382a6c591f0d65aafde4a4da093bb7c6bb769fcaf3cbd`，1134/365/300/声明摘要保持。报告r906f-static-checks.json/r906f-architecture.log/r906f-equivalence.json/r906f-review.json；不执行非Windows动态，最终新库延期边界保持。
+
+## R9-06 Windows 域名测试修复（2026-10-11，VERIFYING）
+
+R9-06 第二轮 `3981b9d` / [Windows run38109741446](https://github.com/uniquenesssta/123/actions/runs/38109741446) / job114382644048 已通过fmt/Clippy，Gateway单测89/90，新增域名测试错误地把大写WWW配置当作去前缀后的apex。已按原“trim→去*.→去小写www.→小写”顺序修正夹具，补大写/混合前缀拒绝与保留前缀的子域成功断言；生产代码保持。原兼容传输门禁锁定该顺序及夹具，三反向探针均拒绝恢复。
+
+第二轮于2026-10-11 12:03:19北京在source_policy.rs:135失败。该轮前端/TypeScript/Vite/17视口及fmt/Clippy -D warnings通过，Application126/126、Persistence175/175单测通过；Gateway89/90未全过，Gateway contract31、后续workspace/release/MSI/NSIS/启动未完成，不能计全链路PASS。ignored数据库测试不计真实数据库通过。
+
+本轮保留90unit/31contract数量与其他Gateway测试字节，usageDigest仅刷新为 `c6b0e2980fbdb43f4f4a7feecb0df38fa8ccf98c503eda723c93f314bc593510`。83/83既有静态、完整architecture、Rustfmt、生产等价及保护资产复核通过，报告r906f2-static-checks.json/r906f2-architecture.log/r906f2-equivalence.json/r906f2-review.json。06自身Windows待验、07～11BLOCKED，真实新库/Full/XLSX/私有固定回归边界保持；不执行非Windows动态。

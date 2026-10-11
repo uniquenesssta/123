@@ -96,7 +96,7 @@ b6636fef9589e86ee59c173732a847fd92cb21ed源码等于05精确aa70d2b成功。受�
 
 ## 完整实际文件清单
 
-相对b6636fe，含untracked，初版f714acb为4A/11M/1D、16文件；含本轮修复当前实际 **4A / 12M / 1D**，17文件；移动/重命名：无。
+相对b6636fe，含untracked，初版f714acb为4A/11M/1D、16文件；含两轮修复当前实际 **4A / 12M / 1D**，17文件；移动/重命名：无。
 
 新增（4）：
 
@@ -170,3 +170,30 @@ Context7先resolve /servo/rust-url再查询fragment规则，文档未提供2.5.8
 Context7 resolve/query /rust-lang/rust-clippy未提供1.88.0版本目录，另读官方rust-lang/rust-clippy **rust-1.88.0** clippy_lints/src/format_args.rs（blob `8a3f8e1c5874d45ca2c67cbe4e0c49fcec9233c3`）核对原lint与内嵌示例。简单格式修复未改架构，原Mermaid图仍适用；Create State本轮核实稳定足球model后保存真实失败/修复/待验。
 
 原分支推送修复自身Windows，精确开始后停止轮询，预计20～30分钟；06仍VERIFYING、07～11BLOCKED，05 DONE。回退仅受控revert该格式/门禁/摘要/文档修复；完整06回退点仍b6636fe。真实PG/历史四项/账本并发回滚/XLSX/Windows Full/私有固定回归及继承删除风险保持最终封包新库待验。
+
+## 第二轮 Windows 单测失败修复（2026-10-11）
+
+用户再次“未通过”后核实精确修复提交 `3981b9d836343df1fa71fbe60e722b26c6e85436` / tree `6d7b692e483d067b09aa50b5ecddb42bc865f478`，[run38109741446](https://github.com/uniquenesssta/123/actions/runs/38109741446) / [job114382644048](https://github.com/uniquenesssta/123/actions/runs/38109741446/job/114382644048) 均FAILURE，2026-10-11 12:03:19北京停止。前端/contracts/TypeScript/Vite/17视口及Rust fmt/Clippy -D warnings已通过；Application126/126、Persistence175/175单测通过，Gateway89/90。失败为新增domain_rules_keep_case_prefix_subdomains_and_dot_boundaries在source_policy.rs:135对apex执行expect，实际SourcePolicy错误“来源域名不在当前赛事允许列表：example.com”。Gateway contract31、后续workspace/release/MSI/NSIS/客户端启动未完成，不能标记全链路SUCCESS；ignored数据库测试不计真实数据库通过。日志记录D:\a\123\123\logs\windows-acceptance-20261011-035310.txt。
+
+原domain_matches先trim配置、去*.和仅小写www.前缀，最后to_lowercase，和05基线完全一致。新增成功夹具误将“ WWW.EXAMPLE.COM ”当成example.com；实际保留前缀后得到www.example.com，URL host规范后为example.com，因此拒绝正确。本轮只修原具名unit中的夹具和覆盖：成功矩阵包括EXAMPLE.COM主体大小写、仅小写www.与*.www.；新增WWW/WwW及*.WWW配置对apex/普通子域的完整错误、类别/非retry断言，同时验证sub.www.example.com仍按点分子域成功。原成功、子域边界和错误断言保留，不改生产政策迁就测试。
+
+原scripts/verify-api-compatible-transport.mjs补前缀去除/小写先后及具名测试矩阵守卫。三个反向探针：本次失败原夹具、提前小写生产规则、移除大写前缀拒绝断言，均被针对性拒绝并恢复，最终正向门禁通过。不新增测试target/runner/workflow/framework，不跳过测试、抑制Clippy或放宽门禁。测试数量仍90unit/31contract，原82unit/29contract以及其他Gateway源码/测试字节保持；本轮所有Gateway生产字节与3981b9d完全相同。
+
+本轮相对3981b9d实际 **0A / 8M / 0D**，移动/重命名无：
+
+- README.md
+- architecture/domain-type-inventory.json
+- crates/research-gateway/src/formal_research/policies/source_policy.rs
+- scripts/verify-api-compatible-transport.mjs
+- docs/TESTING.md
+- docs/football-model-platform-modular-rewrite-19-docs/09-R9-research-ai-backend.md
+- docs/modular-rewrite/R09-research-ai-backend/R09-06-source-and-time-policy.md
+- docs/modular-rewrite/R09-research-ai-backend/README.md
+
+06全量仍 **4A/12M/1D、17文件**。Domain清单仅rustUsageDigest因测试行偏移变为 `c6b0e2980fbdb43f4f4a7feecb0df38fa8ccf98c503eda723c93f314bc593510`；1134扫描、365/300和声明sourceDigest不变。生产接口/DTO/配置/错误/来源与时间策略、原同步/后台/恢复链路、用量/raw、依赖/模型/迁移/DB/UI/Windows流程保持。
+
+本轮实际83/83既有JS静态、完整npm run verify:architecture、Rustfmt1.88 check、diff/生产字节等价与18保护/171命令/46迁移18PG静态通过。报告 `/workspace/scratch/eb298ad5cdcb/r906f2-static-checks.json`、`r906f2-architecture.log`、`r906f2-equivalence.json`、`r906f2-review.json`。静态不能关闭Windows运行失败，90/31全过仍是修复自身Windows待验；非Windows不执行Cargo/编译/Clippy/单测/浏览器运行时。
+
+本次为项目内原字符串规则与新增夹具不一致，不涉及陌生库、新API或版本/编译问题；不另查Context7，之前锁版本证据保持。未改架构，原Mermaid图保持；Create State本轮核实稳定足球model96f03270-c236-46de-99fa-db85d2fbf4ce后保存实际失败/修复/待验。
+
+同一rewrite/r9-research-ai-backend分支推送原Windows CI，精确修复自身Windows job开始即停止轮询，预计20～30分钟；05 DONE、06 VERIFYING、07～11BLOCKED。本轮回退仅受控revert该测试/门禁/摘要/文档修复；整体06回退仍b6636fe。最终新库真实PG/历史四项/账本并发回滚/XLSX/Full/私有固定回归及继承删除风险继续显式待验。

@@ -19,7 +19,7 @@ R8期间research-gateway、公开契约、配置/依赖及锁文件保持；原G
 | R9-03 | Retry、Circuit Breaker 与 Cancel | DONE · [完成记录](R09-03-retry-circuit-breaker-and-cancel.md) · run37960534145 SUCCESS |
 | R9-04 | Formal Research Request | DONE · [完成记录](R09-04-formal-research-request.md) · run38055651688 SUCCESS |
 | R9-05 | Formal Response、Schema 与 Citation | DONE · [完成记录](R09-05-formal-response-schema-and-citation.md) · run38072987214 SUCCESS |
-| R9-06 | Source 与 Time Policy | VERIFYING · [实施/修复记录](R09-06-source-and-time-policy.md) · 首轮Clippy失败已修复、待自身Windows复验 |
+| R9-06 | Source 与 Time Policy | VERIFYING · [实施/修复记录](R09-06-source-and-time-policy.md) · Clippy已通过、第二轮域名夹具失败已修复，待自身Windows复验 |
 | R9-07 | Plain Chat Responses | BLOCKED |
 | R9-08 | Plain Chat Chat Completions | BLOCKED |
 | R9-09 | Session Persistence | BLOCKED |
@@ -119,3 +119,7 @@ R9-06 Source/Time Policy已实施、`VERIFYING`，基线b6636fe，同一R9分支
 ## R9-06 首轮 Windows 修复（VERIFYING）
 
 R9-06 初版f714acb的Windows run38108158888/job114377958564因SourcePolicy字段提示触发Clippy uninlined_format_args失败。现将普通变量格式参数改为内嵌field_key，错误文字/类别/恢复建议/政策保持；原源码卫生门禁新增该回归守卫（旧源码拒绝、修复后通过），Domain使用摘要同步。83/83现有静态、完整architecture、Rustfmt和差异/提示等价通过；Gateway90/contract31仍是待本轮Windows验证的预期，06 VERIFYING、07～11BLOCKED。 当前节点4A/12M/1D共17文件；本轮仅8M，生产只一个格式表达式。复用原Windows CI，精确开始后停止轮询；05 DONE，07～11BLOCKED，真实延期边界保持。
+
+## R9-06 第二轮 Windows 单测修复（VERIFYING）
+
+R9-06 第二轮 `3981b9d` / [Windows run38109741446](https://github.com/uniquenesssta/123/actions/runs/38109741446) / job114382644048 已通过fmt/Clippy，Gateway单测89/90，新增域名测试错误地把大写WWW配置当作去前缀后的apex。已按原“trim→去*.→去小写www.→小写”顺序修正夹具，补大写/混合前缀拒绝与保留前缀的子域成功断言；生产代码保持。原兼容传输门禁锁定该顺序及夹具，三反向探针均拒绝恢复。 该轮Application126/Persistence175单测通过，contract31/后续workspace/release/启动未完成；本轮0A/8M/0D，生产字节与90unit/31contract数量保持。83/83既有静态/完整architecture/Rustfmt/等价和保护复核通过；详见06记录及r906f2报告。05 DONE、06 VERIFYING、07～11BLOCKED，待修复自身Windows；精确开始后停止轮询，真实延期边界保持。

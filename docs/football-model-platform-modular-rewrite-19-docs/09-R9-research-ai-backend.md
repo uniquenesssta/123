@@ -664,15 +664,17 @@ R9-05 Formal Response/Schema/Citation已实施、`VERIFYING`，基线53e49f8，�
 
 ## R9-06 Source 与 Time Policy
 
-状态：`VERIFYING`（05自身精确Windows完整SUCCESS/DONE，用户已授权06；首轮Clippy失败已修复，待修复提交自身Windows）。
+状态：`VERIFYING`（05 DONE，06首轮Clippy已通过；第二轮域名测试夹具失败已修复，待本轮自身Windows完整验证）。
 
 R9-06 Source/Time Policy已实施、`VERIFYING`，基线b6636fe，同一R9分支。URL/domain与禁用字段/内容归source_policy，三可选事实时间归time_policy；Schema保留身份/主体/值形状/覆盖，Citation保留关联，删除旧root validation。4A/11M/1D、16文件；原公开API/DTO/Schema/SourcePolicy配置/协议/依赖/DB/UI/错误/生产策略不变。原82unit/29contract保留，新增8unit/2contract；源码预期Gateway90/contract31、Application126/Persistence175须06自身Windows。83/83静态、完整architecture、Rustfmt、657生产literal/原规则与组合等价、保护资产/171命令/46迁移18PG静态、7破坏探针均通过。
 
 原三URL/domain/time函数逐字迁移；Schema全部禁词规范化/字段/内容块迁入source_policy，FactContentPolicy只持本次原两Vec。Schema保留公开Context/校验与值形状，Citation保留关联；身份/来源索引/上限/字段/主体/状态/形状/内容/三时间/引用原次序和错误完全保持。旧root validation.rs及登记删除，无转发、第二策略或配置副本。配置/filters/Application审核治理各留原owner。
 
-23项职责/契约/生命周期/入口/删除/回退与全部16文件、8+2新增测试、等价/探针/工具/延期详见 [06实施记录](../modular-rewrite/R09-research-ai-backend/R09-06-source-and-time-policy.md)。复用原Windows Automated，精确本项Windows开始后停止轮询。自身完整SUCCESS前不DONE；07～11BLOCKED，真实PG/历史四项/账本并发回滚/有效XLSX/Full/私有固定回归与继承删除风险保持最终新库待验。
+23项职责/契约/生命周期/入口/删除/回退与当前全部17文件、8+2新增测试、等价/探针/工具/延期详见 [06实施记录](../modular-rewrite/R09-research-ai-backend/R09-06-source-and-time-policy.md)。复用原Windows Automated，精确本项Windows开始后停止轮询。自身完整SUCCESS前不DONE；07～11BLOCKED，真实PG/历史四项/账本并发回滚/有效XLSX/Full/私有固定回归与继承删除风险保持最终新库待验。
 
 R9-06 初版f714acb的Windows run38108158888/job114377958564因SourcePolicy字段提示触发Clippy uninlined_format_args失败。现将普通变量格式参数改为内嵌field_key，错误文字/类别/恢复建议/政策保持；原源码卫生门禁新增该回归守卫（旧源码拒绝、修复后通过），Domain使用摘要同步。83/83现有静态、完整architecture、Rustfmt和差异/提示等价通过；Gateway90/contract31仍是待本轮Windows验证的预期，06 VERIFYING、07～11BLOCKED。 修复细节与8M清单见06记录；当前节点全量4A/12M/1D，17文件，原职责与契约保持。
+
+R9-06 第二轮 `3981b9d` / [Windows run38109741446](https://github.com/uniquenesssta/123/actions/runs/38109741446) / job114382644048 已通过fmt/Clippy，Gateway单测89/90，新增域名测试错误地把大写WWW配置当作去前缀后的apex。已按原“trim→去*.→去小写www.→小写”顺序修正夹具，补大写/混合前缀拒绝与保留前缀的子域成功断言；生产代码保持。原兼容传输门禁锁定该顺序及夹具，三反向探针均拒绝恢复。 第二轮Application126/Persistence175单测通过，contract31/后续workspace/release/启动未完成；本轮8M、生产字节保持、90unit/31contract数量保持，83/83静态/完整architecture/Rustfmt通过。06仍VERIFYING、07～11BLOCKED，完整清单及待验边界见06单测修复记录。
 
 ---
 

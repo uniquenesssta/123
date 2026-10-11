@@ -124,7 +124,12 @@ mod tests {
 
     #[test]
     fn domain_rules_keep_case_prefix_subdomains_and_dot_boundaries() {
-        for configured in ["example.com", " WWW.EXAMPLE.COM ", " *.www.Example.Com "] {
+        for configured in [
+            "example.com",
+            " EXAMPLE.COM ",
+            " www.Example.Com ",
+            " *.www.Example.Com ",
+        ] {
             let mut policy = policy();
             policy.allowed_domains = vec![configured.to_string()];
             for url in [
@@ -143,6 +148,30 @@ mod tests {
                     .user_message
                     .contains("允许列表"));
             }
+        }
+        // Prefix removal precedes lowercasing in the original policy.
+        for configured in [
+            " WWW.EXAMPLE.COM ",
+            " *.WWW.Example.Com ",
+            " WwW.Example.Com ",
+        ] {
+            let mut policy = policy();
+            policy.allowed_domains = vec![configured.to_string()];
+            for (url, host) in [
+                ("https://EXAMPLE.COM/news", "example.com"),
+                ("https://www.example.com/news", "example.com"),
+                ("https://a.b.example.com/news", "a.b.example.com"),
+            ] {
+                let error = validate_url(url, &policy).expect_err("uppercase prefix is retained");
+                assert_eq!(error.category, GatewayErrorCategory::SourcePolicy);
+                assert_eq!(
+                    error.user_message,
+                    format!("来源域名不在当前赛事允许列表：{host}")
+                );
+                assert!(!error.recovery.retryable);
+            }
+            validate_url("https://sub.www.example.com/news", &policy)
+                .expect("subdomain of retained www prefix");
         }
     }
 
