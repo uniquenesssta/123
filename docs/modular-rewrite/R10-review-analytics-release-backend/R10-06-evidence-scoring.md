@@ -1,6 +1,6 @@
 # R10-06 Evidence Scoring
 
-状态：`VERIFYING`。用户2026-10-13“收尾05开始06”授权；uniquenesssta/123 v0.23.0，唯一rewrite/r10-review-analytics-release-backend，基线18f726400d70024e90c8335a4b9f1b6d1cfeced6。01～05自身精确Windows DONE；07～13 BLOCKED，R10 IN_PROGRESS。
+状态：`DONE`（自身精确Windows全SUCCESS；下述VERIFYING为实施历史）。用户2026-10-13“收尾05开始06”授权；uniquenesssta/123 v0.23.0，唯一rewrite/r10-review-analytics-release-backend，基线18f726400d70024e90c8335a4b9f1b6d1cfeced6。01～05自身精确Windows DONE；07～13 BLOCKED，R10 IN_PROGRESS。
 
 ### 1. 目标
 
@@ -180,3 +180,14 @@ flowchart TD
 | M | docs/modular-rewrite/R10-review-analytics-release-backend/README.md |
 | M | scripts/verify-postmatch-service.mjs |
 | M | scripts/verify-postmatch-settlement.mjs |
+
+
+## R10-06 精确 Windows 完成与07授权（2026-10-13）
+
+精确提交 `1ed6dbe0a0805a1255917971fc053e509d7e8452` / tree `06e53984ede9ca117973950dabecb4d855ca79d1`，[Public Platform CI run38290328302](https://github.com/uniquenesssta/123/actions/runs/38290328302) / Windows job114948593892 全SUCCESS，run于2026-10-13 02:41:58北京时间完成。实际Application165/165、Persistence207/207、Gateway112/112 unit及41/41 contract；新增6App/8PG unit与原verdict/timeliness unit通过，前端/contracts/TypeScript/Vite/17视口、Rust fmt/locked Clippy all-targets -D warnings/workspace、Windows release/MSI/NSIS、启动及日志扫描通过（7条记录、3个完成操作）。报告windows-acceptance-20261012-182256.json及同名.txt。
+
+证据artifact11767052093，14,046,257字节，SHA-256 `e80a1c864624bde656ed13c83e379aa2e14946fac57ac4cca5be446f546dcf52`。06自身完整成功后DONE；用户2026-10-13“收尾06开始07”授权07 Provider Score READY，继续唯一rewrite/r10-review-analytics-release-backend，08～13 BLOCKED，R10 IN_PROGRESS。本次只五份既有文档收尾[skip ci]，源码同精确成功提交，07须自身完整Windows证据。此前06 VERIFYING与预期计数保留为实施历史。
+
+真实PG/历史保护四项/不可变账本/并发回滚/有效XLSX/Windows Full/私有P4/P7固定回归及继承model.runs/0041删除风险仍最终封包新库待验；ignored、公开unavailable stub和静态指纹不计真实PASS。无R10阶段完成记录。
+
+本收尾5M/0A/0D：根README、TESTING、R10任务书、阶段索引与本节点。06实施12A/13M/3D及职责/回退记录保持，源码不变。

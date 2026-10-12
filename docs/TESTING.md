@@ -688,3 +688,12 @@ R10-05 Postmatch Settlement已实施 `VERIFYING`，基线96ef21d，继续唯一r
 R10-06 Evidence Scoring已实施 `VERIFYING`，基线18f7264，继续唯一rewrite/r10-review-analytics-release-backend。App两证据用例迁入evidence_scoring并切Service/删旧路径；PG查询/映射/人工决定/评分与原队列收拢唯一owner，结算仍借用原tx调用同一队列方法。原SQL/错误/JSON、说明trim后UTF-8字节门槛、评分权重/别名、不可验证NULL、不可变决定/审计/提交后回读保持；不自动判定/晋升参数。新增6App/8PG unit待Windows，预期Application165 / Persistence207 / Gateway112 unit、41 contract；84/84静态、完整架构、16 Rustfmt、16等价及8负向通过。01～05自身Windows DONE，06 VERIFYING、07～13 BLOCKED、R10 IN_PROGRESS；真实PG/历史四项/账本并发回滚/有效XLSX/Windows Full/私有P4P7回归及继承model.runs/0041删除风险仍最终新库待验。
 
 新增14只原App/PG unit targets，覆盖完整Port字段/可选参数/错误无重试与status/UTF8字节/手工三数值/核验/来源别名/不可验证；原verdict/timeliness各迁移登记一次且正文保持。原PGintegration不改，真正重复/并发/不可变触发器/回滚仍最终新库待验。本地16实际Rust仅独立Rustfmt，不跑非WindowsCargo/运行时；自身06完整Windows前不能DONE。完整记录见[06](modular-rewrite/R10-review-analytics-release-backend/R10-06-evidence-scoring.md)。
+
+
+## R10-06 精确 Windows 完成与07授权（2026-10-13）
+
+精确提交 `1ed6dbe0a0805a1255917971fc053e509d7e8452` / tree `06e53984ede9ca117973950dabecb4d855ca79d1`，[Public Platform CI run38290328302](https://github.com/uniquenesssta/123/actions/runs/38290328302) / Windows job114948593892 全SUCCESS，run于2026-10-13 02:41:58北京时间完成。实际Application165/165、Persistence207/207、Gateway112/112 unit及41/41 contract；新增6App/8PG unit与原verdict/timeliness unit通过，前端/contracts/TypeScript/Vite/17视口、Rust fmt/locked Clippy all-targets -D warnings/workspace、Windows release/MSI/NSIS、启动及日志扫描通过（7条记录、3个完成操作）。报告windows-acceptance-20261012-182256.json及同名.txt。
+
+证据artifact11767052093，14,046,257字节，SHA-256 `e80a1c864624bde656ed13c83e379aa2e14946fac57ac4cca5be446f546dcf52`。06自身完整成功后DONE；用户2026-10-13“收尾06开始07”授权07 Provider Score READY，继续唯一rewrite/r10-review-analytics-release-backend，08～13 BLOCKED，R10 IN_PROGRESS。本次只五份既有文档收尾[skip ci]，源码同精确成功提交，07须自身完整Windows证据。此前06 VERIFYING与预期计数保留为实施历史。
+
+真实PG/历史保护四项/不可变账本/并发回滚/有效XLSX/Windows Full/私有P4/P7固定回归及继承model.runs/0041删除风险仍最终封包新库待验；ignored、公开unavailable stub和静态指纹不计真实PASS。无R10阶段完成记录。
