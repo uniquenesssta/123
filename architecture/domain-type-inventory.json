@@ -24,14 +24,14 @@
     "targetPublicExportPolicy": "explicit re-export only"
   },
   "sourceDigest": "217241ac243726a5ab6805a7f169e222b97e78c7c971749a5904714af673ebdd",
-  "rustUsageDigest": "8da9e65bd81b6d17649f59c27658b3be2f73981b548af12e4083b41989b3295b",
+  "rustUsageDigest": "02197c04a23585c69e915efd0c7bf447a1ce1f2174c6015368c76d5d2a6c583c",
   "summary": {
     "typeCount": 365,
     "publicCompatibilityTypeCount": 365,
     "internalTypeCount": 0,
     "domainSourceFileCount": 129,
-    "scannedRustFileCount": 1167,
-    "databaseMappedTypeCount": 300,
+    "scannedRustFileCount": 1177,
+    "databaseMappedTypeCount": 301,
     "byTargetModule": {
       "ai_workspace": 16,
       "analytics": 39,
@@ -10602,12 +10602,18 @@
         "crates/domain/tests/serde_contracts/r2_06_module_paths.rs"
       ],
       "externalCallers": [
-        "crates/persistence-postgres/src/review.rs",
+        "crates/persistence-postgres/src/adapters/review/facts/mapping.rs",
+        "crates/persistence-postgres/src/adapters/review/facts/read.rs",
+        "crates/persistence-postgres/src/adapters/review/facts/tests.rs",
+        "crates/persistence-postgres/src/adapters/review/facts/validation.rs",
         "crates/persistence-postgres/tests/postgres_integration.rs",
         "crates/spreadsheet-io/src/match_review_workbook.rs"
       ],
       "databaseMappings": [
-        "crates/persistence-postgres/src/review.rs"
+        "crates/persistence-postgres/src/adapters/review/facts/mapping.rs",
+        "crates/persistence-postgres/src/adapters/review/facts/read.rs",
+        "crates/persistence-postgres/src/adapters/review/facts/tests.rs",
+        "crates/persistence-postgres/src/adapters/review/facts/validation.rs"
       ]
     },
     {
@@ -10688,10 +10694,10 @@
       ],
       "externalCallers": [
         "crates/application/src/use_cases/review/package/workflow/tests.rs",
-        "crates/persistence-postgres/src/review.rs"
+        "crates/persistence-postgres/src/adapters/review/facts/read.rs"
       ],
       "databaseMappings": [
-        "crates/persistence-postgres/src/review.rs"
+        "crates/persistence-postgres/src/adapters/review/facts/read.rs"
       ]
     },
     {
@@ -10799,12 +10805,16 @@
       ],
       "externalCallers": [
         "crates/application/src/use_cases/review/package/shared.rs",
-        "crates/persistence-postgres/src/review.rs",
+        "crates/persistence-postgres/src/adapters/review/facts/mapping.rs",
+        "crates/persistence-postgres/src/adapters/review/facts/validation.rs",
+        "crates/persistence-postgres/src/adapters/review/facts/write.rs",
         "crates/persistence-postgres/tests/postgres_integration.rs",
         "crates/spreadsheet-io/src/match_review_workbook.rs"
       ],
       "databaseMappings": [
-        "crates/persistence-postgres/src/review.rs"
+        "crates/persistence-postgres/src/adapters/review/facts/mapping.rs",
+        "crates/persistence-postgres/src/adapters/review/facts/validation.rs",
+        "crates/persistence-postgres/src/adapters/review/facts/write.rs"
       ]
     },
     {
@@ -10867,12 +10877,18 @@
         "crates/domain/tests/serde_contracts/r2_06_module_paths.rs"
       ],
       "externalCallers": [
-        "crates/persistence-postgres/src/review.rs",
+        "crates/persistence-postgres/src/adapters/review/facts/mapping.rs",
+        "crates/persistence-postgres/src/adapters/review/facts/read.rs",
+        "crates/persistence-postgres/src/adapters/review/facts/tests.rs",
+        "crates/persistence-postgres/src/adapters/review/facts/validation.rs",
         "crates/persistence-postgres/tests/postgres_integration.rs",
         "crates/spreadsheet-io/src/match_review_workbook.rs"
       ],
       "databaseMappings": [
-        "crates/persistence-postgres/src/review.rs"
+        "crates/persistence-postgres/src/adapters/review/facts/mapping.rs",
+        "crates/persistence-postgres/src/adapters/review/facts/read.rs",
+        "crates/persistence-postgres/src/adapters/review/facts/tests.rs",
+        "crates/persistence-postgres/src/adapters/review/facts/validation.rs"
       ]
     },
     {
@@ -11530,6 +11546,7 @@
         "crates/persistence-postgres/src/adapters/matches/catalog/read.rs",
         "crates/persistence-postgres/src/adapters/prediction/historical_features/mod.rs",
         "crates/persistence-postgres/src/adapters/prediction/historical_features/read.rs",
+        "crates/persistence-postgres/src/adapters/review/facts/write.rs",
         "crates/persistence-postgres/src/match_prediction.rs",
         "crates/persistence-postgres/src/review.rs",
         "crates/persistence-postgres/src/team_features.rs",
@@ -11543,6 +11560,7 @@
         "crates/persistence-postgres/src/adapters/matches/catalog/read.rs",
         "crates/persistence-postgres/src/adapters/prediction/historical_features/mod.rs",
         "crates/persistence-postgres/src/adapters/prediction/historical_features/read.rs",
+        "crates/persistence-postgres/src/adapters/review/facts/write.rs",
         "crates/persistence-postgres/src/match_prediction.rs",
         "crates/persistence-postgres/src/review.rs",
         "crates/persistence-postgres/src/team_features.rs"
@@ -11726,10 +11744,16 @@
       "externalCallers": [
         "crates/application/src/ports/review/package.rs",
         "crates/application/src/use_cases/review/package/shared.rs",
+        "crates/persistence-postgres/src/adapters/review/facts/mapping.rs",
+        "crates/persistence-postgres/src/adapters/review/facts/read.rs",
+        "crates/persistence-postgres/src/adapters/review/facts/write.rs",
         "crates/persistence-postgres/src/review.rs",
         "crates/persistence-postgres/tests/postgres_integration.rs"
       ],
       "databaseMappings": [
+        "crates/persistence-postgres/src/adapters/review/facts/mapping.rs",
+        "crates/persistence-postgres/src/adapters/review/facts/read.rs",
+        "crates/persistence-postgres/src/adapters/review/facts/write.rs",
         "crates/persistence-postgres/src/review.rs"
       ]
     },
@@ -11914,12 +11938,20 @@
         "crates/application/src/services/review/service.rs",
         "crates/application/src/use_cases/review/generate_match_review/mod.rs",
         "crates/application/src/use_cases/review/package/workflow/tests.rs",
+        "crates/persistence-postgres/src/adapters/review/facts/repository.rs",
+        "crates/persistence-postgres/src/adapters/review/facts/tests.rs",
+        "crates/persistence-postgres/src/adapters/review/facts/validation.rs",
+        "crates/persistence-postgres/src/adapters/review/facts/write.rs",
         "crates/persistence-postgres/src/review.rs",
         "crates/persistence-postgres/tests/postgres_integration.rs",
         "crates/spreadsheet-io/src/match_review_workbook.rs",
         "src-tauri/src/commands/review.rs"
       ],
       "databaseMappings": [
+        "crates/persistence-postgres/src/adapters/review/facts/repository.rs",
+        "crates/persistence-postgres/src/adapters/review/facts/tests.rs",
+        "crates/persistence-postgres/src/adapters/review/facts/validation.rs",
+        "crates/persistence-postgres/src/adapters/review/facts/write.rs",
         "crates/persistence-postgres/src/review.rs"
       ]
     },
@@ -12088,11 +12120,13 @@
       ],
       "externalCallers": [
         "crates/application/src/use_cases/review/package/shared.rs",
-        "crates/persistence-postgres/src/review.rs",
+        "crates/persistence-postgres/src/adapters/review/facts/identity.rs",
+        "crates/persistence-postgres/src/adapters/review/facts/tests.rs",
         "crates/spreadsheet-io/src/match_review_workbook.rs"
       ],
       "databaseMappings": [
-        "crates/persistence-postgres/src/review.rs"
+        "crates/persistence-postgres/src/adapters/review/facts/identity.rs",
+        "crates/persistence-postgres/src/adapters/review/facts/tests.rs"
       ]
     },
     {
@@ -12247,10 +12281,14 @@
         "crates/domain/tests/serde_contracts/r2_06_module_paths.rs"
       ],
       "externalCallers": [
-        "crates/persistence-postgres/src/review.rs"
+        "crates/persistence-postgres/src/adapters/review/facts/mapping.rs",
+        "crates/persistence-postgres/src/adapters/review/facts/read.rs",
+        "crates/persistence-postgres/src/adapters/review/facts/tests.rs"
       ],
       "databaseMappings": [
-        "crates/persistence-postgres/src/review.rs"
+        "crates/persistence-postgres/src/adapters/review/facts/mapping.rs",
+        "crates/persistence-postgres/src/adapters/review/facts/read.rs",
+        "crates/persistence-postgres/src/adapters/review/facts/tests.rs"
       ]
     },
     {
@@ -12794,7 +12832,7 @@
       "externalCallers": [
         "crates/application/src/services/review/facade.rs",
         "crates/application/src/services/review/service.rs",
-        "crates/application/src/use_cases/review/package/workflow/coordinator.rs",
+        "crates/application/src/use_cases/review/facts/coordinator.rs",
         "src-tauri/src/commands/postmatch.rs"
       ],
       "databaseMappings": []
@@ -13334,6 +13372,7 @@
       ],
       "externalCallers": [
         "crates/application/src/use_cases/postmatch/settle_postmatch_review/mod.rs",
+        "crates/application/src/use_cases/review/facts/coordinator.rs",
         "crates/application/src/use_cases/review/package/preview.rs",
         "crates/application/src/use_cases/review/package/workflow/coordinator.rs",
         "crates/application/src/use_cases/review/package/workflow/guards.rs",
@@ -20093,12 +20132,12 @@
         "crates/domain/tests/serde_contracts/r2_06_module_paths.rs"
       ],
       "externalCallers": [
-        "crates/persistence-postgres/src/review.rs",
+        "crates/persistence-postgres/src/adapters/review/facts/validation.rs",
         "crates/review-engine/src/lib.rs",
         "crates/spreadsheet-io/src/match_review_workbook.rs"
       ],
       "databaseMappings": [
-        "crates/persistence-postgres/src/review.rs"
+        "crates/persistence-postgres/src/adapters/review/facts/validation.rs"
       ]
     },
     {
@@ -28685,16 +28724,19 @@
       "compatibilityLevel": "root_public_compatibility",
       "currentRootExport": "explicit_reexport",
       "targetRootExport": "explicit_reexport",
-      "databaseMapping": "none_detected",
+      "databaseMapping": "referenced_by_postgres_adapter",
       "domainCallers": [
         "crates/domain/src/lib.rs",
         "crates/domain/src/review/aggregate.rs",
         "crates/domain/tests/serde_contracts/r2_06_module_paths.rs"
       ],
       "externalCallers": [
+        "crates/persistence-postgres/src/adapters/review/facts/tests.rs",
         "crates/spreadsheet-io/src/match_review_workbook.rs"
       ],
-      "databaseMappings": []
+      "databaseMappings": [
+        "crates/persistence-postgres/src/adapters/review/facts/tests.rs"
+      ]
     },
     {
       "typeName": "SubstitutionRecord",
@@ -28781,9 +28823,15 @@
         "crates/domain/tests/serde_contracts/r2_06_module_paths.rs"
       ],
       "externalCallers": [
+        "crates/persistence-postgres/src/adapters/review/facts/mapping.rs",
+        "crates/persistence-postgres/src/adapters/review/facts/read.rs",
+        "crates/persistence-postgres/src/adapters/review/facts/write.rs",
         "crates/persistence-postgres/src/review.rs"
       ],
       "databaseMappings": [
+        "crates/persistence-postgres/src/adapters/review/facts/mapping.rs",
+        "crates/persistence-postgres/src/adapters/review/facts/read.rs",
+        "crates/persistence-postgres/src/adapters/review/facts/write.rs",
         "crates/persistence-postgres/src/review.rs"
       ]
     },

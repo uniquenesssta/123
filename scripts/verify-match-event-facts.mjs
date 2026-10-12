@@ -14,7 +14,11 @@ const reviewAggregate = read("crates/domain/src/review/aggregate.rs");
 const domain = `${eventSemantics}\n${eventPayload}`;
 const reviewDomain = `${eventPayload}\n${reviewAggregate}`;
 const packageDomain = eventPayload;
-const persistence = read("crates/persistence-postgres/src/review.rs");
+const legacyReview = read("crates/persistence-postgres/src/review.rs");
+const factsRoot = "crates/persistence-postgres/src/adapters/review/facts/";
+const factsFiles = ["mod.rs", "identity.rs", "mapping.rs", "read.rs", "repository.rs", "validation.rs", "write.rs", "tests.rs"];
+const facts = Object.fromEntries(factsFiles.map((file) => [file, read(`${factsRoot}${file}`)]));
+const persistence = [legacyReview, ...factsFiles.filter((file) => file !== "tests.rs").map((file) => facts[file])].join("\n");
 const workbook = read("crates/spreadsheet-io/src/match_review_workbook.rs");
 const application = read("crates/application/src/use_cases/review/package/shared.rs");
 const migration = read("crates/persistence-postgres/migrations/0042_structured_match_event_facts.sql");
@@ -119,6 +123,29 @@ check(
   "build 或 verify:frontend 未通过统一验证编排接入 D2 事件事实门禁",
 );
 check(packageJson.scripts["verify:match-event-facts"] === "node scripts/verify-match-event-facts.mjs", "缺少 verify:match-event-facts 脚本");
+
+const ordered = (source, tokens) => {
+  let offset = 0;
+  return tokens.every((token) => {
+    const index = source.indexOf(token, offset);
+    if (index < 0) return false;
+    offset = index + token.length;
+    return true;
+  });
+};
+for (const name of ["commit_match_review_facts", "read_match_result", "list_match_events", "list_substitutions", "list_substitutions_in_tx", "match_event_key", "match_review_package_id", "summarize_match_events", "validate_review_draft", "validate_performance_metrics", "performance_metrics_have_signal", "match_result_from_row", "match_event_from_row", "substitution_from_row"]) check(!new RegExp(`(?:async )?fn ${name}\\(`).test(legacyReview), `旧review.rs仍定义事实职责 ${name}`);
+check(ordered(legacyReview.slice(legacyReview.indexOf("async fn prepare_review_in_tx")), ["write_facts_in_tx(tx, draft).await?", "load_review_players_in_tx", "calculate_recent_starter_overlap", "load_prediction_context_in_tx"]), "事实拆分不得丢弃原准备上下文或改变同事务顺序");
+check(ordered(facts["repository.rs"], ["validate_review_draft(draft)?", "self.pool.begin().await?", "prepare_review_in_tx(&mut tx, draft).await?", "write_audit_event(", "tx.commit().await?"]), "事实提交验证、事务、完整准备与审计提交顺序漂移");
+check((facts["repository.rs"].match(/tx\.commit\(\)\.await\?/g) ?? []).length === 1 && facts["repository.rs"].indexOf("write_audit_event(") < facts["repository.rs"].indexOf("tx.commit().await?"), "事实事务必须仅在审计成功后提交一次");
+check(facts["repository.rs"].indexOf("validate_review_draft(draft)?") < facts["repository.rs"].indexOf("self.pool.begin().await?") && (facts["repository.rs"].match(/self\.pool\.begin\(\)\.await\?/g) ?? []).length === 1, "事实事务只能在纯校验成功后开启一次");
+check(!facts["write.rs"].includes(".begin(") && !facts["write.rs"].includes(".commit(") && !facts["write.rs"].includes(".rollback("), "事实写入必须借用原事务，不能另开或提前完成事务");
+check(ordered(facts["write.rs"], ["FOR UPDATE OF fixture", "let valid_teams", "revision_event_ids", "rows.len() != revision_event_ids.len()", "referenced_match_id != draft.match_id", "INSERT INTO football.match_results", "UPDATE football.matches SET status='finished'", "DELETE FROM football.substitutions", "INSERT INTO football.substitutions", "INSERT INTO review.match_events", "SET revision_status = 'superseded'", "DELETE FROM review.player_match_observations", "INSERT INTO review.player_match_observations", "list_substitutions_in_tx(tx, draft.match_id).await?"]), "事实锁/身份检查/写入/同事务回读顺序漂移");
+for (const token of ["player_teams", "MatchEventType::OwnGoal", "*value != team_id", ".bind(event.source_package_id.or(package_id))", "metadata = football.match_results.metadata || EXCLUDED.metadata", "metadata = review.match_events.metadata || EXCLUDED.metadata", ".execute(&mut **tx)"]) check(facts["write.rs"].includes(token), `事实写入身份/来源/元数据/事务漂移：${token}`);
+check(/if event\.event_type == MatchEventType::OwnGoal\s*\{\s*\*value != team_id\s*\}\s*else\s*\{\s*\*value == team_id\s*\}/.test(facts["write.rs"]), "乌龙球必须使用对手身份分支，不能误用后面的关联球员检查");
+for (const token of ["event.confidence.is_finite()", "MatchEventRevisionStatus::Superseded", "MatchEventVerificationStatus::Verified", "event.verified_at.is_none()", "event.revision_status.is_effective()", "ordered_scores.sort_by_key", "latest_regulation_score", "has_extra_time_score", "value.is_finite()", "performance_metrics_have_signal"]) check(facts["validation.rs"].includes(token), `事实校验缺少原保护 ${token}`);
+check(facts["identity.rs"].includes('format!("generated:{}", hex::encode(digest))') && facts["identity.rs"].includes("event.sequence_no.unwrap_or(index as i32 + 1)"), "自动事件身份格式或原顺序基准漂移");
+for (const token of ["event.revision_status <> 'superseded'", "ORDER BY event.sequence_no, event.minute", "event.revision_status.is_effective()", "summary.event_type_counts = counts"]) check(facts["read.rs"].includes(token), `事实查询/统计缺少 ${token}`);
+for (const name of ["event_identity_keeps_explicit_keys_and_excludes_descriptive_updates", "source_package_identity_preserves_optional_top_level_uuid_contract", "draft_result_coverage_and_duplicate_observations_are_rejected", "player_metrics_ranges_and_required_playing_signal_preserve_boundaries", "substitution_and_event_player_links_are_validated", "event_sequence_verification_and_import_status_guards_are_preserved", "event_scores_check_regulation_extra_time_and_ignore_cancelled_revisions", "event_summary_counts_effective_and_audit_statuses_separately"]) check(facts["tests.rs"].includes(`fn ${name}(`), `缺少原PG unit target事实边界测试 ${name}`);
 
 if (failures.length) {
   console.error("阶段 D2 结构化比赛事件验证失败：");

@@ -3,7 +3,7 @@ use football_domain::{
     MatchReviewPackagePreview, MatchReviewPackageWorkflowAction, MatchReviewPackageWorkflowRecord,
 };
 
-pub(super) fn matches_revalidated_preview(
+pub(in crate::use_cases::review) fn matches_revalidated_preview(
     workflow: &MatchReviewPackageWorkflowRecord,
     preview: &MatchReviewPackagePreview,
 ) -> bool {

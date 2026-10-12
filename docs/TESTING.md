@@ -611,3 +611,12 @@ R10-01 Review Package Workflow 已实施、`VERIFYING`；唯一阶段分支 `rew
 artifact11739056741，14,041,808字节，SHA-256 `2831911b9159911fb03ebc9bf894e03f00a4a01c73001b9ffddc8f9a289a1fa7`。01自身完整成功后标记DONE；用户2026-10-12“收尾01开始02”授权，02 Structured Match Facts READY，同一rewrite/r10-review-analytics-release-backend分支，03～13 BLOCKED，R10 IN_PROGRESS。本次仅五既有文档收尾[skip ci]，源码同上述成功提交；后续02必须取得自身完整Windows证据。
 
 真实PG/历史保护四项/不可变账本/并发/回滚/有效XLSX/Windows Full/私有P4/P7固定回归与继承model.runs/0041删除风险仍最终封包新库待验；ignored/公开unavailable stub/静态指纹不计这些真实项目PASS。此前01 VERIFYING及预期计数保留为实施历史，不替代当前DONE状态。
+
+
+## R10-02 Structured Match Facts（2026-10-12，VERIFYING）
+
+R10-02 Structured Match Facts 已实施 `VERIFYING`，基线ab43aee，继续唯一分支rewrite/r10-review-analytics-release-backend。Application真实事实阶段迁入facts coordinator，ReviewService与组合工作流直接复用；PG facts目录独占校验、事件身份、事务写入、查询/摘要、行映射和事实提交，旧review.rs的14职责及事实写入正文移除。原比赛锁、修订归属、SQL/审计/同事务上下文与十个公开方法签名保持，不改变报告/候选/参数人工门禁。新增8 PG unit待自身Windows，预期Persistence187 / Application146 / Gateway112 unit、41 contract；84/84静态、完整架构、19 Rust文件Rustfmt、等价与8破坏探针通过。01自身Windows已DONE，02 VERIFYING、03～13 BLOCKED、R10 IN_PROGRESS；真实PG/历史四项/账本并发回滚/有效XLSX/Windows Full/私有P4/P7回归与继承model.runs/0041删除风险仍最终新库待验。
+
+复用原Public Platform CI Windows Automated与原Rust unit/contract targets；没有新增runner/workflow/target、数据库专项入口或迁移。PG新增8 unit覆盖稳定身份/来源、赛果/覆盖率/重复表现、指标范围/信号、换人/门将关系、事件顺序/核验/修订/比分、加时与取消、摘要；待Windows实际执行，静态或预期187不记动态PASS。19 Rust变更文件只做独立Rustfmt1.88 check，本地未运行Linux/macOS Cargo/check/Clippy/build/test、loopback或浏览器。
+
+PG14原职责和全部剩余函数规范化等价；事实writer/原prepare内联等价，锁/SQL/同事务回读/预测上下文与审计保持。8/8负向源码探针拒绝并恢复。18保护资产、171命令、46迁移及18 PG原静态契约保持；301扫描映射中的新增SubstitutionDraft只来自新typed unit fixture，真实生产映射及Schema保持。详见 [02记录](modular-rewrite/R10-review-analytics-release-backend/R10-02-structured-match-facts.md)。

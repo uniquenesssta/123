@@ -7,7 +7,7 @@ use crate::{
         },
     },
     use_cases::review::{
-        decide_ability_candidate, generate_match_review, list_ability_candidates,
+        decide_ability_candidate, facts, generate_match_review, list_ability_candidates,
         list_match_reviews, list_reviewable_matches, package, read_match_review,
     },
     ApplicationResult,
@@ -137,7 +137,7 @@ impl ReviewService {
             + LineupPort
             + ?Sized,
     {
-        package::workflow::commit_facts(port, package_id).await
+        facts::commit_facts(port, package_id).await
     }
 
     pub(crate) async fn generate_match_review_from_package<P>(

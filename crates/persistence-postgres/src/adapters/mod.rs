@@ -6,7 +6,7 @@ pub(crate) mod matches;
 pub(crate) mod p4;
 mod prediction;
 mod register_adapters;
-mod review;
+pub(crate) mod review;
 mod rules;
 pub(crate) mod workbooks;
 

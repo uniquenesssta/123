@@ -20,10 +20,11 @@ const packageExport = read("crates/application/src/use_cases/review/package/expo
 const packagePreview = read("crates/application/src/use_cases/review/package/preview.rs");
 const workflowRoot = "crates/application/src/use_cases/review/package/workflow/";
 const workflowCoordinator = read(`${workflowRoot}coordinator.rs`);
+const factsCoordinator = read("crates/application/src/use_cases/review/facts/coordinator.rs");
 const workflowGuards = read(`${workflowRoot}guards.rs`);
 const workflowConfirmation = read(`${workflowRoot}confirmation.rs`);
 const workflowTests = read(`${workflowRoot}tests.rs`);
-const packageLifecycle = [workflowCoordinator, workflowGuards, workflowConfirmation].join("\n");
+const packageLifecycle = [workflowCoordinator, factsCoordinator, workflowGuards, workflowConfirmation].join("\n");
 const packageShared = read("crates/application/src/use_cases/review/package/shared.rs");
 const packageAdapter = read("crates/application/src/composition/adapters/review.rs");
 const packagePorts = read("crates/application/src/ports/review/package.rs");
@@ -38,7 +39,7 @@ const application = [
   packagePorts,
 ].join("\n");
 const persistence = read("crates/persistence-postgres/src/adapters/review/package_workflow/repository.rs");
-const reviewPersistence = read("crates/persistence-postgres/src/review.rs");
+const reviewPersistence = [read("crates/persistence-postgres/src/review.rs"), ...["read.rs", "write.rs"].map((file) => read(`crates/persistence-postgres/src/adapters/review/facts/${file}`))].join("\n");
 const entityPersistence = read("crates/persistence-postgres/src/adapters/catalog/deletion/preflight/references.rs");
 const forceDeletePersistence = [
   read("crates/persistence-postgres/src/adapters/catalog/deletion/force_delete/targets.rs"),
@@ -95,11 +96,11 @@ const ordered = (source, tokens) => {
     return true;
   });
 };
-const operation = (name) => workflowCoordinator.split(`pub(crate) async fn ${name}<P>`)[1]?.split("pub(crate) async fn ")[0] ?? "";
+const operation = (name) => (name === "commit_facts" ? factsCoordinator : workflowCoordinator).split(`pub(crate) async fn ${name}<P>`)[1]?.split("pub(crate) async fn ")[0] ?? "";
 for (const legacy of ["crates/application/src/use_cases/review/package/lifecycle.rs", "crates/persistence-postgres/src/match_review_package.rs"]) check(!fs.existsSync(new URL(`../${legacy}`, import.meta.url)), `旧工作流 owner 仍存在：${legacy}`);
 for (const [name, action] of [["confirm", "ConfirmImport"], ["commit_facts", "CommitFacts"], ["generate_review", "GenerateReview"]]) check(ordered(operation(name), ["port.read_workflow(", `.require_action(MatchReviewPackageWorkflowAction::${action})`]), `${name} 未先读取并执行领域动作门禁`);
 check(ordered(operation("confirm"), [".require_action(", "if !workflow.preview_ready", "workflow.import_path", "preview::validate(", "guards::matches_revalidated_preview(", ".confirm_workflow("]), "人工确认前检、重新预检和确认写入顺序漂移");
-check(ordered(operation("commit_facts"), [".require_action(", "preview::validate(", "guards::matches_revalidated_preview(", "apply_confirmation_metadata(", "port.create_lineup_pair(", "port.commit_review_facts(", "port.mark_facts_committed("]), "事实提交原三次 Port 调用顺序漂移");
+check(ordered(operation("commit_facts"), [".require_action(", "preview::validate(", "matches_revalidated_preview(", "apply_confirmation_metadata(", "port.create_lineup_pair(", "port.commit_review_facts(", "port.mark_facts_committed("]), "事实提交原三次 Port 调用顺序漂移");
 check(ordered(operation("generate_review"), [".require_action(", "port.read_package_preview(", "apply_confirmation_metadata(", "port.generate_match_review(", ".mark_review_created("]), "正式复盘必须生成成功后才推进工作流");
 check(ordered(operation("commit"), ["guards::ensure_commit_preview_ready(", "port.read_workflow(", "guards::ensure_commit_identity(", "confirm(", "commit_facts(", "generate_review("]), "组合提交前检或阶段顺序漂移");
 for (const token of ["preview.package_id == workflow.package_id", "preview.source_sha256 == workflow.import_sha256.as_deref().unwrap_or_default()", "&& preview.ready", "&& preview.errors.is_empty()", "if !preview.ready || !preview.errors.is_empty()", ".require_action(MatchReviewPackageWorkflowAction::ConfirmImport)", "workflow.import_sha256.as_deref() != Some(preview.source_sha256.as_str())", "workflow.match_id != preview.match_id"]) check(workflowGuards.includes(token), `资料包身份/阻断门禁漂移：${token}`);

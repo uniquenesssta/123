@@ -10,6 +10,8 @@ const coreRequired = [
   "crates/application/src/services/review/service.rs",
   "crates/application/src/services/review/facade.rs",
   "crates/application/src/use_cases/review/mod.rs",
+  "crates/application/src/use_cases/review/facts/mod.rs",
+  "crates/application/src/use_cases/review/facts/coordinator.rs",
   "crates/application/src/use_cases/review/generate_match_review/mod.rs",
   "crates/application/src/use_cases/review/list_reviewable_matches/mod.rs",
   "crates/application/src/use_cases/review/list_match_reviews/mod.rs",
@@ -118,9 +120,15 @@ if (!fs.existsSync(path.join(root, "crates/application/src/services/analytics/fa
 
 const workflowMod = fs.readFileSync(path.join(root, "crates/application/src/use_cases/review/package/workflow/mod.rs"), "utf8");
 if (!workflowMod.includes("pub(crate) use coordinator::") || /(?:async fn|sqlx::|impl )/.test(workflowMod)) failures.push("工作流入口必须只登记模块并导出唯一 coordinator");
-for (const method of ["read_active_workflow", "confirm", "commit_facts", "generate_review", "commit"]) {
+for (const method of ["read_active_workflow", "confirm", "generate_review", "commit"]) {
   if (!service.includes(`package::workflow::${method}(`)) failures.push(`ReviewService 未切换唯一工作流入口 ${method}`);
 }
+if (!service.includes("facts::commit_facts(")) failures.push("ReviewService 未调用唯一 facts 用例");
+if (!reviewUseCases.includes("pub(crate) mod facts;")) failures.push("Review use_cases 未登记 facts");
+const factsMod = fs.readFileSync(path.join(root, "crates/application/src/use_cases/review/facts/mod.rs"), "utf8");
+if (!factsMod.includes("pub(crate) use coordinator::commit_facts;") || /(?:async fn|sqlx::|impl )/.test(factsMod)) failures.push("facts 出口必须只登记并导出唯一 coordinator");
+const workflowCoordinator = fs.readFileSync(path.join(root, "crates/application/src/use_cases/review/package/workflow/coordinator.rs"), "utf8");
+if (/async fn commit_facts</.test(workflowCoordinator) || !workflowCoordinator.includes("use crate::use_cases::review::facts::commit_facts;")) failures.push("组合工作流未复用唯一事实用例或保留重复实现");
 if (service.includes("package::lifecycle::")) failures.push("ReviewService 仍调用旧 lifecycle");
 for (const relative of ["crates/persistence-postgres/src/adapters/review/mod.rs", "crates/persistence-postgres/src/adapters/review/package_workflow/mod.rs", "crates/persistence-postgres/src/adapters/review/package_workflow/repository.rs"]) {
   if (!fs.existsSync(path.join(root, relative))) failures.push(`缺少工作流适配器：${relative}`);

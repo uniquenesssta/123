@@ -1,7 +1,7 @@
 use football_domain::{MatchReviewPackagePreview, MatchReviewPackageWorkflowRecord};
 use serde_json::{json, Value};
 
-pub(super) fn apply_confirmation_metadata(
+pub(in crate::use_cases::review) fn apply_confirmation_metadata(
     preview: &mut MatchReviewPackagePreview,
     workflow: &MatchReviewPackageWorkflowRecord,
 ) {
