@@ -22,7 +22,7 @@ impl AiWorkspaceService {
         P: ApiWorkspaceSessionPort + ResearchGatewayAuditPort,
         F: Future<Output = ApplicationResult<P>>,
     {
-        ai_workspace::usage_totals::execute(session).await
+        ai_workspace::sessions::usage_totals(session).await
     }
 
     pub(crate) async fn list_sessions<P, F>(
@@ -34,7 +34,7 @@ impl AiWorkspaceService {
         P: ApiWorkspaceSessionPort,
         F: Future<Output = ApplicationResult<P>>,
     {
-        ai_workspace::list_sessions::execute(session, limit).await
+        ai_workspace::sessions::list_sessions(session, limit).await
     }
 
     pub(crate) async fn create_session<P, F>(
@@ -46,7 +46,7 @@ impl AiWorkspaceService {
         P: ApiWorkspaceSessionPort,
         F: Future<Output = ApplicationResult<P>>,
     {
-        ai_workspace::create_session::execute(session, draft).await
+        ai_workspace::sessions::create_session(session, draft).await
     }
 
     pub(crate) async fn archive_session<P, F>(
@@ -58,7 +58,7 @@ impl AiWorkspaceService {
         P: ApiWorkspaceSessionPort,
         F: Future<Output = ApplicationResult<P>>,
     {
-        ai_workspace::archive_session::execute(session, session_id).await
+        ai_workspace::sessions::archive_session(session, session_id).await
     }
 
     pub(crate) async fn read_session<P, F>(
@@ -70,7 +70,7 @@ impl AiWorkspaceService {
         P: ApiWorkspaceSessionPort,
         F: Future<Output = ApplicationResult<P>>,
     {
-        ai_workspace::read_session::execute(session, session_id).await
+        ai_workspace::sessions::read_session(session, session_id).await
     }
 
     pub(crate) async fn append_user_message<P, F>(
@@ -84,7 +84,7 @@ impl AiWorkspaceService {
         P: ApiWorkspaceSessionPort,
         F: Future<Output = ApplicationResult<P>>,
     {
-        ai_workspace::append_user_message::execute(session, session_id, content, attachments).await
+        ai_workspace::sessions::append_user_message(session, session_id, content, attachments).await
     }
 
     pub(crate) async fn append_assistant_bundle<P, F>(
@@ -98,7 +98,7 @@ impl AiWorkspaceService {
         P: ApiWorkspaceSessionPort,
         F: Future<Output = ApplicationResult<P>>,
     {
-        ai_workspace::append_assistant_bundle::execute(session, message, operations, files).await
+        ai_workspace::sessions::append_assistant_bundle(session, message, operations, files).await
     }
 
     pub(crate) async fn read_generated_file<P, F>(
@@ -110,6 +110,6 @@ impl AiWorkspaceService {
         P: ApiWorkspaceSessionPort,
         F: Future<Output = ApplicationResult<P>>,
     {
-        ai_workspace::read_generated_file::execute(session, file_id).await
+        ai_workspace::sessions::read_generated_file(session, file_id).await
     }
 }

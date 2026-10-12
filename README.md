@@ -609,3 +609,5 @@ R9-08 Plain Chat Chat Completions已实施、`VERIFYING`，同一R9分支，基�
 证据artifact11722500937，14,041,703字节，SHA-256 791a0a3414641bdbc70b524c69be0ef16e4b3e57a93078b2b4809bcd2844ff29；报告windows-acceptance-20261012-011909.json及同名.txt。08新增8unit/4contract全部执行通过。
 
 08 DONE；用户2026-10-12“收尾08开始09”授权09 READY，同一rewrite/r9-research-ai-backend分支，10～11 BLOCKED、R9 IN_PROGRESS。本次五既有文档[skip ci]收尾，源码与上述成功一致，先前VERIFYING为实施历史；未创建R9阶段完成记录。真实PG/历史四项/账本并发回滚/有效XLSX/Windows Full/私有固定回归及继承model.runs/0041删除风险仍最终封包新库待验，ignored与公共stub不计PASS。
+
+R9-09 Session Persistence已实施、`VERIFYING`，同一R9分支，基线06ecdd2。8会话用例移动到Application sessions且Service直连出口；9个PG会话方法迁入adapters/ai_workspace/sessions，查询、消息、回答事务、文件、用量、Row映射与载荷校验职责明确，原提案状态流转/校验/映射唯一owner保持。公开接口/DTO/SQL绑定/事务审计顺序/配置/DB迁移/模型/Gateway/UI/依赖不变。新增4Application/4Persistence unit；83/83静态、完整architecture/Rustfmt、14原PG方法字节等价与8探针通过，Application130/Persistence179、Gateway106/39待自身Windows。08 DONE、09 VERIFYING、10～11 BLOCKED，R9 IN_PROGRESS。 完整A/M/D/8移动、验证与最终新库待验见 [09实施记录](docs/modular-rewrite/R09-research-ai-backend/R09-09-session-persistence.md)。

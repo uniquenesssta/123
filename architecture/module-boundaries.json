@@ -279,6 +279,7 @@
       "pool_owner": "PostgresStore.pool",
       "migration_root": "migrations",
       "adapter_modules": [
+        "crates/persistence-postgres/src/adapters/ai_workspace/mod.rs",
         "crates/persistence-postgres/src/adapters/catalog/mod.rs",
         "crates/persistence-postgres/src/adapters/competition/mod.rs",
         "crates/persistence-postgres/src/adapters/lineups/mod.rs",
@@ -396,7 +397,7 @@
     "frontend_features": 18,
     "workspace_members": 11,
     "ports": 4,
-    "postgres_adapters": 35,
+    "postgres_adapters": 36,
     "command_groups": 15,
     "commands": 171
   },

@@ -29,7 +29,7 @@ const migrationV2 = text("crates/persistence-postgres/migrations/0020_team_playe
 const gateway = text("crates/research-gateway/src/client.rs");
 const response = text("crates/research-gateway/src/response.rs");
 const application = text("crates/application/src/use_cases/ai_workspace/presets/mod.rs");
-const persistence = text("crates/persistence-postgres/src/api_workspace.rs");
+const persistence = [text("crates/persistence-postgres/src/api_workspace.rs"), ...["catalog", "messages", "assistant_bundle", "generated_files", "usage"].map(name => text(`crates/persistence-postgres/src/adapters/ai_workspace/sessions/${name}.rs`))].join("\n");
 const commands = text("src-tauri/src/commands/api_workspace.rs");
 const registry = text("src-tauri/src/bootstrap/command_registry.rs");
 const client = text("src/api/client.ts");

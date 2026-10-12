@@ -24,13 +24,13 @@
     "targetPublicExportPolicy": "explicit re-export only"
   },
   "sourceDigest": "217241ac243726a5ab6805a7f169e222b97e78c7c971749a5904714af673ebdd",
-  "rustUsageDigest": "3cd4c687ac512bf476c270e38a2908b9b67eae248332e9ee96fb1d93965784b5",
+  "rustUsageDigest": "de438d1742d587852c69db2d0f2da9e9cd84cafa97f7820e967e5de8fe5af9b5",
   "summary": {
     "typeCount": 365,
     "publicCompatibilityTypeCount": 365,
     "internalTypeCount": 0,
     "domainSourceFileCount": 129,
-    "scannedRustFileCount": 1141,
+    "scannedRustFileCount": 1152,
     "databaseMappedTypeCount": 300,
     "byTargetModule": {
       "ai_workspace": 16,
@@ -2127,8 +2127,9 @@
       "externalCallers": [
         "crates/application/src/services/ai_workspace/facade/sessions.rs",
         "crates/application/src/services/ai_workspace/service/sessions.rs",
-        "crates/application/src/use_cases/ai_workspace/append_user_message/mod.rs",
         "crates/application/src/use_cases/ai_workspace/read_attachments/mod.rs",
+        "crates/application/src/use_cases/ai_workspace/sessions/append_user_message.rs",
+        "crates/application/src/use_cases/ai_workspace/sessions/tests.rs",
         "src-tauri/src/commands/api_workspace.rs"
       ],
       "databaseMappings": []
@@ -2184,11 +2185,12 @@
         "crates/application/src/ports/ai_workspace/mod.rs",
         "crates/application/src/services/ai_workspace/facade/sessions.rs",
         "crates/application/src/services/ai_workspace/service/sessions.rs",
-        "crates/application/src/use_cases/ai_workspace/read_generated_file/mod.rs",
-        "crates/persistence-postgres/src/api_workspace.rs"
+        "crates/application/src/use_cases/ai_workspace/sessions/read_generated_file.rs",
+        "crates/application/src/use_cases/ai_workspace/sessions/tests.rs",
+        "crates/persistence-postgres/src/adapters/ai_workspace/sessions/generated_files.rs"
       ],
       "databaseMappings": [
-        "crates/persistence-postgres/src/api_workspace.rs"
+        "crates/persistence-postgres/src/adapters/ai_workspace/sessions/generated_files.rs"
       ]
     },
     {
@@ -2258,11 +2260,14 @@
         "crates/application/src/ports/ai_workspace/mod.rs",
         "crates/application/src/services/ai_workspace/facade/sessions.rs",
         "crates/application/src/services/ai_workspace/service/sessions.rs",
-        "crates/application/src/use_cases/ai_workspace/append_assistant_bundle/mod.rs",
-        "crates/persistence-postgres/src/api_workspace.rs"
+        "crates/application/src/use_cases/ai_workspace/sessions/append_assistant_bundle.rs",
+        "crates/application/src/use_cases/ai_workspace/sessions/tests.rs",
+        "crates/persistence-postgres/src/adapters/ai_workspace/sessions/assistant_bundle.rs",
+        "crates/persistence-postgres/src/adapters/ai_workspace/sessions/validation.rs"
       ],
       "databaseMappings": [
-        "crates/persistence-postgres/src/api_workspace.rs"
+        "crates/persistence-postgres/src/adapters/ai_workspace/sessions/assistant_bundle.rs",
+        "crates/persistence-postgres/src/adapters/ai_workspace/sessions/validation.rs"
       ]
     },
     {
@@ -2338,10 +2343,10 @@
         "crates/domain/tests/serde_contracts/r2_07_module_paths.rs"
       ],
       "externalCallers": [
-        "crates/persistence-postgres/src/api_workspace.rs"
+        "crates/persistence-postgres/src/adapters/ai_workspace/sessions/mapping.rs"
       ],
       "databaseMappings": [
-        "crates/persistence-postgres/src/api_workspace.rs"
+        "crates/persistence-postgres/src/adapters/ai_workspace/sessions/mapping.rs"
       ]
     },
     {
@@ -2435,13 +2440,18 @@
         "crates/application/src/ports/ai_workspace/mod.rs",
         "crates/application/src/services/ai_workspace/facade/sessions.rs",
         "crates/application/src/services/ai_workspace/service/sessions.rs",
-        "crates/application/src/use_cases/ai_workspace/append_assistant_bundle/mod.rs",
-        "crates/application/src/use_cases/ai_workspace/append_user_message/mod.rs",
-        "crates/persistence-postgres/src/api_workspace.rs",
+        "crates/application/src/use_cases/ai_workspace/sessions/append_assistant_bundle.rs",
+        "crates/application/src/use_cases/ai_workspace/sessions/append_user_message.rs",
+        "crates/application/src/use_cases/ai_workspace/sessions/tests.rs",
+        "crates/persistence-postgres/src/adapters/ai_workspace/sessions/assistant_bundle.rs",
+        "crates/persistence-postgres/src/adapters/ai_workspace/sessions/messages.rs",
+        "crates/persistence-postgres/src/adapters/ai_workspace/sessions/validation.rs",
         "src-tauri/src/commands/api_workspace.rs"
       ],
       "databaseMappings": [
-        "crates/persistence-postgres/src/api_workspace.rs"
+        "crates/persistence-postgres/src/adapters/ai_workspace/sessions/assistant_bundle.rs",
+        "crates/persistence-postgres/src/adapters/ai_workspace/sessions/messages.rs",
+        "crates/persistence-postgres/src/adapters/ai_workspace/sessions/validation.rs"
       ]
     },
     {
@@ -2532,11 +2542,14 @@
         "crates/application/src/ports/ai_workspace/mod.rs",
         "crates/application/src/services/ai_workspace/facade/sessions.rs",
         "crates/application/src/services/ai_workspace/service/sessions.rs",
-        "crates/application/src/use_cases/ai_workspace/append_user_message/mod.rs",
-        "crates/persistence-postgres/src/api_workspace.rs"
+        "crates/application/src/use_cases/ai_workspace/sessions/append_user_message.rs",
+        "crates/application/src/use_cases/ai_workspace/sessions/tests.rs",
+        "crates/persistence-postgres/src/adapters/ai_workspace/sessions/mapping.rs",
+        "crates/persistence-postgres/src/adapters/ai_workspace/sessions/messages.rs"
       ],
       "databaseMappings": [
-        "crates/persistence-postgres/src/api_workspace.rs"
+        "crates/persistence-postgres/src/adapters/ai_workspace/sessions/mapping.rs",
+        "crates/persistence-postgres/src/adapters/ai_workspace/sessions/messages.rs"
       ]
     },
     {
@@ -2614,10 +2627,13 @@
         "crates/application/src/ports/ai_workspace/mod.rs",
         "crates/application/src/services/ai_workspace/facade/sessions.rs",
         "crates/application/src/services/ai_workspace/service/sessions.rs",
-        "crates/application/src/use_cases/ai_workspace/append_assistant_bundle/mod.rs",
+        "crates/application/src/use_cases/ai_workspace/sessions/append_assistant_bundle.rs",
+        "crates/application/src/use_cases/ai_workspace/sessions/tests.rs",
+        "crates/persistence-postgres/src/adapters/ai_workspace/sessions/assistant_bundle.rs",
         "crates/persistence-postgres/src/api_workspace.rs"
       ],
       "databaseMappings": [
+        "crates/persistence-postgres/src/adapters/ai_workspace/sessions/assistant_bundle.rs",
         "crates/persistence-postgres/src/api_workspace.rs"
       ]
     },
@@ -2868,13 +2884,16 @@
         "crates/application/src/ports/ai_workspace/mod.rs",
         "crates/application/src/services/ai_workspace/facade/sessions.rs",
         "crates/application/src/services/ai_workspace/service/sessions.rs",
-        "crates/application/src/use_cases/ai_workspace/append_assistant_bundle/mod.rs",
-        "crates/application/src/use_cases/ai_workspace/read_session/mod.rs",
-        "crates/persistence-postgres/src/api_workspace.rs",
+        "crates/application/src/use_cases/ai_workspace/sessions/append_assistant_bundle.rs",
+        "crates/application/src/use_cases/ai_workspace/sessions/read_session.rs",
+        "crates/application/src/use_cases/ai_workspace/sessions/tests.rs",
+        "crates/persistence-postgres/src/adapters/ai_workspace/sessions/assistant_bundle.rs",
+        "crates/persistence-postgres/src/adapters/ai_workspace/sessions/catalog.rs",
         "src-tauri/src/commands/api_workspace.rs"
       ],
       "databaseMappings": [
-        "crates/persistence-postgres/src/api_workspace.rs"
+        "crates/persistence-postgres/src/adapters/ai_workspace/sessions/assistant_bundle.rs",
+        "crates/persistence-postgres/src/adapters/ai_workspace/sessions/catalog.rs"
       ]
     },
     {
@@ -2944,12 +2963,13 @@
         "crates/application/src/ports/ai_workspace/mod.rs",
         "crates/application/src/services/ai_workspace/facade/sessions.rs",
         "crates/application/src/services/ai_workspace/service/sessions.rs",
-        "crates/application/src/use_cases/ai_workspace/create_session/mod.rs",
-        "crates/persistence-postgres/src/api_workspace.rs",
+        "crates/application/src/use_cases/ai_workspace/sessions/create_session.rs",
+        "crates/application/src/use_cases/ai_workspace/sessions/tests.rs",
+        "crates/persistence-postgres/src/adapters/ai_workspace/sessions/catalog.rs",
         "src-tauri/src/commands/api_workspace.rs"
       ],
       "databaseMappings": [
-        "crates/persistence-postgres/src/api_workspace.rs"
+        "crates/persistence-postgres/src/adapters/ai_workspace/sessions/catalog.rs"
       ]
     },
     {
@@ -3044,13 +3064,16 @@
         "crates/application/src/ports/ai_workspace/mod.rs",
         "crates/application/src/services/ai_workspace/facade/sessions.rs",
         "crates/application/src/services/ai_workspace/service/sessions.rs",
-        "crates/application/src/use_cases/ai_workspace/create_session/mod.rs",
-        "crates/application/src/use_cases/ai_workspace/list_sessions/mod.rs",
-        "crates/persistence-postgres/src/api_workspace.rs",
+        "crates/application/src/use_cases/ai_workspace/sessions/create_session.rs",
+        "crates/application/src/use_cases/ai_workspace/sessions/list_sessions.rs",
+        "crates/application/src/use_cases/ai_workspace/sessions/tests.rs",
+        "crates/persistence-postgres/src/adapters/ai_workspace/sessions/catalog.rs",
+        "crates/persistence-postgres/src/adapters/ai_workspace/sessions/mapping.rs",
         "src-tauri/src/commands/api_workspace.rs"
       ],
       "databaseMappings": [
-        "crates/persistence-postgres/src/api_workspace.rs"
+        "crates/persistence-postgres/src/adapters/ai_workspace/sessions/catalog.rs",
+        "crates/persistence-postgres/src/adapters/ai_workspace/sessions/mapping.rs"
       ]
     },
     {
@@ -14349,6 +14372,7 @@
       "externalCallers": [
         "crates/application/src/composition/adapters/research.rs",
         "crates/application/src/ports/research/mod.rs",
+        "crates/application/src/use_cases/ai_workspace/sessions/tests.rs",
         "crates/application/src/use_cases/research/openai_gateway/attempt_audit.rs",
         "crates/application/src/use_cases/research/openai_gateway/mod.rs",
         "crates/persistence-postgres/src/research_gateway_records.rs"
@@ -14426,6 +14450,7 @@
       "externalCallers": [
         "crates/application/src/composition/adapters/research.rs",
         "crates/application/src/ports/research/mod.rs",
+        "crates/application/src/use_cases/ai_workspace/sessions/tests.rs",
         "crates/persistence-postgres/src/research_gateway_records.rs"
       ],
       "databaseMappings": [
@@ -14494,12 +14519,13 @@
         "crates/application/src/ports/research/mod.rs",
         "crates/application/src/services/ai_workspace/facade/sessions.rs",
         "crates/application/src/services/ai_workspace/service/sessions.rs",
-        "crates/application/src/use_cases/ai_workspace/usage_totals/mod.rs",
-        "crates/persistence-postgres/src/api_workspace.rs",
+        "crates/application/src/use_cases/ai_workspace/sessions/tests.rs",
+        "crates/application/src/use_cases/ai_workspace/sessions/usage_totals.rs",
+        "crates/persistence-postgres/src/adapters/ai_workspace/sessions/usage.rs",
         "crates/persistence-postgres/src/research_gateway_records.rs"
       ],
       "databaseMappings": [
-        "crates/persistence-postgres/src/api_workspace.rs",
+        "crates/persistence-postgres/src/adapters/ai_workspace/sessions/usage.rs",
         "crates/persistence-postgres/src/research_gateway_records.rs"
       ]
     },
@@ -32694,6 +32720,7 @@
       "externalCallers": [
         "crates/application/src/composition/adapters/research.rs",
         "crates/application/src/ports/research/mod.rs",
+        "crates/application/src/use_cases/ai_workspace/sessions/tests.rs",
         "crates/application/src/use_cases/research/openai_gateway/mod.rs",
         "crates/application/src/use_cases/research/openai_gateway/references.rs",
         "crates/persistence-postgres/src/research_gateway_records.rs"
@@ -32769,6 +32796,7 @@
       "externalCallers": [
         "crates/application/src/composition/adapters/research.rs",
         "crates/application/src/ports/research/mod.rs",
+        "crates/application/src/use_cases/ai_workspace/sessions/tests.rs",
         "crates/application/src/use_cases/research/openai_gateway/mod.rs",
         "crates/application/src/use_cases/research/openai_gateway/references.rs",
         "crates/persistence-postgres/src/research_gateway_records.rs"

@@ -996,7 +996,7 @@ R9-08 Plain Chat Chat Completions已实施、`VERIFYING`，同一R9分支，基�
 
 ## R9-09 Session Persistence
 
-状态：`READY`（08自身Windows全SUCCESS/DONE；用户已授权开始09，同一R9分支）
+状态：`VERIFYING`（实现/静态/记录完成；09自身Windows待验，10～11BLOCKED）
 
 ### 1. 目标
 
@@ -1128,6 +1128,14 @@ crates/persistence-postgres/src/adapters/ai_workspace/sessions/
 - README 与实际状态一致。
 - `R09-09-session-persistence.md` 已创建并与实际变更、验证结果一致。
 - 阶段 `README.md` 已更新本任务状态和记录链接。
+
+---
+
+### R9-09 实施与门禁（2026-10-12）
+
+R9-09 Session Persistence已实施、`VERIFYING`，同一R9分支，基线06ecdd2。8会话用例移动到Application sessions且Service直连出口；9个PG会话方法迁入adapters/ai_workspace/sessions，查询、消息、回答事务、文件、用量、Row映射与载荷校验职责明确，原提案状态流转/校验/映射唯一owner保持。公开接口/DTO/SQL绑定/事务审计顺序/配置/DB迁移/模型/Gateway/UI/依赖不变。新增4Application/4Persistence unit；83/83静态、完整architecture/Rustfmt、14原PG方法字节等价与8探针通过，Application130/Persistence179、Gateway106/39待自身Windows。08 DONE、09 VERIFYING、10～11 BLOCKED，R9 IN_PROGRESS。
+
+记录：[R09-09-session-persistence.md](../modular-rewrite/R09-research-ai-backend/R09-09-session-persistence.md)。实际移动/清单、预审失败修正和所有真实数据库延期见记录；130/179/106/39不可计本地动态PASS。
 
 ---
 

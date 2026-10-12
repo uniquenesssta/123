@@ -540,3 +540,9 @@ R9-08 Plain Chat Chat Completions已实施、`VERIFYING`，同一R9分支，基�
 证据artifact11722500937，14,041,703字节，SHA-256 791a0a3414641bdbc70b524c69be0ef16e4b3e57a93078b2b4809bcd2844ff29；报告windows-acceptance-20261012-011909.json及同名.txt。08新增8unit/4contract全部执行通过。
 
 08 DONE；用户2026-10-12“收尾08开始09”授权09 READY，同一rewrite/r9-research-ai-backend分支，10～11 BLOCKED、R9 IN_PROGRESS。本次五既有文档[skip ci]收尾，源码与上述成功一致，先前VERIFYING为实施历史；未创建R9阶段完成记录。真实PG/历史四项/账本并发回滚/有效XLSX/Windows Full/私有固定回归及继承model.runs/0041删除风险仍最终封包新库待验，ignored与公共stub不计PASS。
+
+## R9-09 Session Persistence（2026-10-12，VERIFYING）
+
+R9-09 Session Persistence已实施、`VERIFYING`，同一R9分支，基线06ecdd2。8会话用例移动到Application sessions且Service直连出口；9个PG会话方法迁入adapters/ai_workspace/sessions，查询、消息、回答事务、文件、用量、Row映射与载荷校验职责明确，原提案状态流转/校验/映射唯一owner保持。公开接口/DTO/SQL绑定/事务审计顺序/配置/DB迁移/模型/Gateway/UI/依赖不变。新增4Application/4Persistence unit；83/83静态、完整architecture/Rustfmt、14原PG方法字节等价与8探针通过，Application130/Persistence179、Gateway106/39待自身Windows。08 DONE、09 VERIFYING、10～11 BLOCKED，R9 IN_PROGRESS。
+
+原targets新增8unit，覆盖输入先于factory、元数据/完整载荷/Port错误、用量顺序与饱和计数、角色/Unicode字符/文件字节边界；14方法SQL/绑定/审计/事务与7helper正文等价，8反向探针拒绝。原Windows执行frontend/17视口、fmt/Clippy/workspace、release/MSI/NSIS/启动/日志，精确开始后停止查询，预计20～30分钟。未执行非Windows动态，真实PG会话事务/历史四项/账本并发回滚/有效XLSX/Full/私有固定回归及继承model.runs/0041风险仍最终封包新库待验，不把ignored/stub记PASS。报告r909-static-checks.json/r909-architecture.log/r909-equivalence.json/r909-negative-probes.json/r909-review.json。
