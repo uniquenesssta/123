@@ -1,6 +1,6 @@
 # R10-02 Structured Match Facts
 
-状态：`VERIFYING`。用户2026-10-12“收尾01开始02”授权；uniquenesssta/123 v0.23.0，唯一rewrite/r10-review-analytics-release-backend，基线ab43aee85ad2911b87fe1fa1a57f5aa0138fcb32。01精确838e39e / run38229119264 / job114743919870全SUCCESS并DONE；03～13 BLOCKED，R10 IN_PROGRESS。
+状态：`DONE`（自身精确Windows全SUCCESS；下述VERIFYING为实施历史）。用户2026-10-12“收尾01开始02”授权；uniquenesssta/123 v0.23.0，唯一rewrite/r10-review-analytics-release-backend，基线ab43aee85ad2911b87fe1fa1a57f5aa0138fcb32。01精确838e39e / run38229119264 / job114743919870全SUCCESS并DONE；03～13 BLOCKED，R10 IN_PROGRESS。
 
 ### 1. 目标
 
@@ -171,3 +171,14 @@ flowchart TD
 | M | scripts/verify-match-review-package.mjs |
 | M | scripts/verify-review-service.mjs |
 | M | scripts/verify-stage-a-architecture.mjs |
+
+
+## R10-02 精确 Windows 完成与03授权（2026-10-12）
+
+精确提交 `1ad6e68042e7749caf6671b2eb4756077dbfa17b` / tree `822588ffe13bd392fbe2851af389eb111b2391ad`，[Public Platform CI run38245932270](https://github.com/uniquenesssta/123/actions/runs/38245932270) / Windows job114799659672全SUCCESS，run于2026-10-12 20:18:27北京完成。实际Application146/146、Persistence187/187（新增8事实unit均成功）、Gateway112/112 unit和41/41 contract；frontend/contracts/TypeScript/Vite/17视口、Rust fmt/locked Clippy all-targets -D warnings/workspace、Windows release/MSI/NSIS/客户端启动及运行日志扫描通过。报告windows-acceptance-20261012-115847.json。
+
+artifact11746489380，14,041,992字节，SHA-256 `378486f022954e5ee7044258e31b09bcd83c8c484c55af6fff11ef71ef1af3d1`。02自身完整成功后DONE；用户2026-10-12“收尾02开始03”授权03 Review Engine Adapter READY，同一rewrite/r10-review-analytics-release-backend，04～13 BLOCKED，R10 IN_PROGRESS。本次只五既有文档收尾[skip ci]，源码同上述已验提交；03必须取得自身精确Windows完整证据。
+
+真实PG/历史保护四项/不可变账本/并发/回滚/有效XLSX/Windows Full/私有P4/P7固定回归与继承model.runs/0041删除风险仍最终封包新库待验，ignored/公开stub/静态指纹不计真实PASS。此前02 VERIFYING与预期计数保留为实施历史。
+
+本收尾5M/0A/0D，无移动/重命名：根README、TESTING、R10任务书、阶段README与本节点。02实施完整11A/19M/0D及职责迁移记录保持。

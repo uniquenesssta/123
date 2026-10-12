@@ -620,3 +620,12 @@ R10-02 Structured Match Facts 已实施 `VERIFYING`，基线ab43aee，继续唯�
 复用原Public Platform CI Windows Automated与原Rust unit/contract targets；没有新增runner/workflow/target、数据库专项入口或迁移。PG新增8 unit覆盖稳定身份/来源、赛果/覆盖率/重复表现、指标范围/信号、换人/门将关系、事件顺序/核验/修订/比分、加时与取消、摘要；待Windows实际执行，静态或预期187不记动态PASS。19 Rust变更文件只做独立Rustfmt1.88 check，本地未运行Linux/macOS Cargo/check/Clippy/build/test、loopback或浏览器。
 
 PG14原职责和全部剩余函数规范化等价；事实writer/原prepare内联等价，锁/SQL/同事务回读/预测上下文与审计保持。8/8负向源码探针拒绝并恢复。18保护资产、171命令、46迁移及18 PG原静态契约保持；301扫描映射中的新增SubstitutionDraft只来自新typed unit fixture，真实生产映射及Schema保持。详见 [02记录](modular-rewrite/R10-review-analytics-release-backend/R10-02-structured-match-facts.md)。
+
+
+## R10-02 精确 Windows 完成与03授权（2026-10-12）
+
+精确提交 `1ad6e68042e7749caf6671b2eb4756077dbfa17b` / tree `822588ffe13bd392fbe2851af389eb111b2391ad`，[Public Platform CI run38245932270](https://github.com/uniquenesssta/123/actions/runs/38245932270) / Windows job114799659672全SUCCESS，run于2026-10-12 20:18:27北京完成。实际Application146/146、Persistence187/187（新增8事实unit均成功）、Gateway112/112 unit和41/41 contract；frontend/contracts/TypeScript/Vite/17视口、Rust fmt/locked Clippy all-targets -D warnings/workspace、Windows release/MSI/NSIS/客户端启动及运行日志扫描通过。报告windows-acceptance-20261012-115847.json。
+
+artifact11746489380，14,041,992字节，SHA-256 `378486f022954e5ee7044258e31b09bcd83c8c484c55af6fff11ef71ef1af3d1`。02自身完整成功后DONE；用户2026-10-12“收尾02开始03”授权03 Review Engine Adapter READY，同一rewrite/r10-review-analytics-release-backend，04～13 BLOCKED，R10 IN_PROGRESS。本次只五既有文档收尾[skip ci]，源码同上述已验提交；03必须取得自身精确Windows完整证据。
+
+真实PG/历史保护四项/不可变账本/并发/回滚/有效XLSX/Windows Full/私有P4/P7固定回归与继承model.runs/0041删除风险仍最终封包新库待验，ignored/公开stub/静态指纹不计真实PASS。此前02 VERIFYING与预期计数保留为实施历史。

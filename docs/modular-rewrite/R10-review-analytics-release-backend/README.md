@@ -2,7 +2,7 @@
 
 ## 当前阶段状态
 
-`IN_PROGRESS`。用户2026-10-12“开始R10-01”授权；从R9文档收尾HEAD `48618fed2d7ff7c2a4db831a037f227dc789f278` 建立唯一阶段分支 `rewrite/r10-review-analytics-release-backend`。01自身精确Windows run38229119264/job114743919870全SUCCESS并DONE；用户“收尾01开始02”授权02已实施VERIFYING，03～13 BLOCKED。
+`IN_PROGRESS`。用户2026-10-12“开始R10-01”授权；从R9文档收尾HEAD `48618fed2d7ff7c2a4db831a037f227dc789f278` 建立唯一阶段分支 `rewrite/r10-review-analytics-release-backend`。01自身精确Windows run38229119264/job114743919870全SUCCESS并DONE；02自身1ad6e68 / Windows run38245932270/job114799659672全SUCCESS并DONE；用户“收尾02开始03”授权03 READY，04～13 BLOCKED。
 
 ## 前置基线与依据
 
@@ -13,8 +13,8 @@
 | 任务 | 责任 | 状态 |
 |---|---|---|
 | R10-01 | [Review Package Workflow](R10-01-review-package-workflow.md) | DONE · 自身精确Windows全SUCCESS |
-| R10-02 | [Structured Match Facts](R10-02-structured-match-facts.md) | VERIFYING · 已实施，静态通过，自身Windows待验 |
-| R10-03 | Review Engine Adapter | BLOCKED |
+| R10-02 | [Structured Match Facts](R10-02-structured-match-facts.md) | DONE · 自身精确Windows全SUCCESS |
+| R10-03 | Review Engine Adapter | READY · 用户已授权 |
 | R10-04 | Ability Candidate Transaction | BLOCKED |
 | R10-05 | Postmatch Settlement | BLOCKED |
 | R10-06 | Evidence Scoring | BLOCKED |
@@ -49,3 +49,12 @@ artifact11739056741，14,041,808字节，SHA-256 `2831911b9159911fb03ebc9bf894e0
 R10-02 Structured Match Facts 已实施 `VERIFYING`，基线ab43aee，继续唯一分支rewrite/r10-review-analytics-release-backend。Application真实事实阶段迁入facts coordinator，ReviewService与组合工作流直接复用；PG facts目录独占校验、事件身份、事务写入、查询/摘要、行映射和事实提交，旧review.rs的14职责及事实写入正文移除。原比赛锁、修订归属、SQL/审计/同事务上下文与十个公开方法签名保持，不改变报告/候选/参数人工门禁。新增8 PG unit待自身Windows，预期Persistence187 / Application146 / Gateway112 unit、41 contract；84/84静态、完整架构、19 Rust文件Rustfmt、等价与8破坏探针通过。01自身Windows已DONE，02 VERIFYING、03～13 BLOCKED、R10 IN_PROGRESS；真实PG/历史四项/账本并发回滚/有效XLSX/Windows Full/私有P4/P7回归与继承model.runs/0041删除风险仍最终新库待验。
 
 事实事务借用边界与原完整准备上下文保持，原prepare_review_in_tx仍有真实球员/连续性/预测准备职责，留给03 Review Engine Adapter；无提前移除或新增计算。先核对02精确Windows完整结果，失败只修本唯一R10分支；成功且用户授权收尾后才推进03，无阶段完成记录。完整11A/19M/0D、职责迁移、原错误/SQL/风险与回退见 [02记录](R10-02-structured-match-facts.md)。
+
+
+## R10-02 精确 Windows 完成与03授权（2026-10-12）
+
+精确提交 `1ad6e68042e7749caf6671b2eb4756077dbfa17b` / tree `822588ffe13bd392fbe2851af389eb111b2391ad`，[Public Platform CI run38245932270](https://github.com/uniquenesssta/123/actions/runs/38245932270) / Windows job114799659672全SUCCESS，run于2026-10-12 20:18:27北京完成。实际Application146/146、Persistence187/187（新增8事实unit均成功）、Gateway112/112 unit和41/41 contract；frontend/contracts/TypeScript/Vite/17视口、Rust fmt/locked Clippy all-targets -D warnings/workspace、Windows release/MSI/NSIS/客户端启动及运行日志扫描通过。报告windows-acceptance-20261012-115847.json。
+
+artifact11746489380，14,041,992字节，SHA-256 `378486f022954e5ee7044258e31b09bcd83c8c484c55af6fff11ef71ef1af3d1`。02自身完整成功后DONE；用户2026-10-12“收尾02开始03”授权03 Review Engine Adapter READY，同一rewrite/r10-review-analytics-release-backend，04～13 BLOCKED，R10 IN_PROGRESS。本次只五既有文档收尾[skip ci]，源码同上述已验提交；03必须取得自身精确Windows完整证据。
+
+真实PG/历史保护四项/不可变账本/并发/回滚/有效XLSX/Windows Full/私有P4/P7固定回归与继承model.runs/0041删除风险仍最终封包新库待验，ignored/公开stub/静态指纹不计真实PASS。此前02 VERIFYING与预期计数保留为实施历史。
