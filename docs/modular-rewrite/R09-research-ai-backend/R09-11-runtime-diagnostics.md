@@ -158,3 +158,33 @@ flowchart TD
 - docs/football-model-platform-modular-rewrite-19-docs/09-R9-research-ai-backend.md
 - docs/modular-rewrite/R09-research-ai-backend/README.md
 - scripts/verify-api-runtime-diagnostics.mjs
+
+
+## 首轮 Windows 契约失败修复（2026-10-12）
+
+用户15:52:17北京“未通过”。精确提交5ff91641dbc992c3b9f66b1fde3257f9b488c738 / Windows run38218231140 / job114707912576整体FAILURE，2026-10-12 15:43:16北京结束。architecture/前端静态及构建、fmt/Clippy通过，Application138/138、Persistence179/179、Gateway112/112 unit（新增6项均通过）；gateway_contract 39通过/2失败。后续workspace及Windows release/MSI/NSIS/启动未完成，不将这轮或旧10成功替代自身验收。
+
+失败位于gateway_contract.rs原2808/2861构造网关处。两个新增双协议循环只改api_protocol，config()仍显式request_endpoint=/v1/responses；ChatCompletions因此触发原GatewayConfig.validate的“兼容 API请求端点与所选协议不一致”，尚未进入该协议的sink断言。这是本轮新增测试夹具遗漏，保留原严格配置校验。
+
+两处新增逐协议match：Responses→https://api.openai.com/v1/responses，ChatCompletions→https://api.openai.com/v1/chat/completions。保留原两协议循环、完整Persistence错误、RateLimit后CircuitOpen、请求数1/2和2秒permit释放断言。不存在删除测试、跳过协议或生产配置/代码调整。
+
+原verify-api-runtime-diagnostics新增逐个fixture检查：两协议不能删；api_protocol之后/网关构造之前必须设置端点；match两分支必须使用各自精确端点。4源破坏探针分别恢复plain遗漏、structured遗漏、错误Chat→Responses映射、删除Chat覆盖，均被门禁拒绝并完整恢复。
+
+本轮以5ff9164为基线，两个端点块逆移除后整个contract文件逐字一致；git差异确认全部生产Rust/前端/SQL/日志/模型/协议/配置校验/公开接口未变。Application138/Persistence179/Gateway112unit及41contract数量保持；Domain仅rustUsageDigest更新为ca1c4ca5b864d11ae14b5d766950dc10f1bbae568694469f435b2983cfc5ad9e，1161文件/365类型/300映射/声明摘要保持。19状态/171命令/46迁移/18PG源码/保护聚合保持，policy_changes=[]。
+
+验证：python /workspace/scratch/eb298ad5cdcb/r911_fix_static.py 83/83，npm run verify:architecture，原runtime诊断及Domain门禁通过；Rustfmt1.88 --check --edition2021 --config skip_children=true对唯一变更Rust contract通过；Python内联夹具逆切/生产无变化/库存与数量证明通过；python /workspace/scratch/eb298ad5cdcb/r911_fix_probes.py 4/4，git diff --check通过。报告r911-fix-static-checks.json/r911-fix-architecture.log/r911-fix-equivalence.json/r911-fix-negative-probes.json/r911-fix-review.json位于/workspace/scratch/eb298ad5cdcb。未运行非Windows Cargo/check/Clippy/build/test/loopback/浏览器动态，新提交自身Windows仍待完整执行。
+
+本轮Context7按Rust1.88查询enum match仅返回通用master资料，未冒称锁版本；实际两协议/端点规则以原ApiProtocol.endpoint_suffix、GatewayConfig.validate及既有Chat fixtures核对。单一测试夹具修正不改变原Mermaid诊断图。Create State已先确认足球稳定ID96f03270-c236-46de-99fa-db85d2fbf4ce，保存本次失败原因/修复/待验；不写入HFM项目。
+
+本轮实际 **0A/8M/0D**，移动/重命名无；整个11相对6f471d0仍7A/11M/0D，18路径，上述完整节点清单保持。修改8路径：
+
+- README.md
+- architecture/domain-type-inventory.json
+- crates/research-gateway/tests/gateway_contract.rs
+- docs/TESTING.md
+- docs/football-model-platform-modular-rewrite-19-docs/09-R9-research-ai-backend.md
+- docs/modular-rewrite/R09-research-ai-backend/README.md
+- docs/modular-rewrite/R09-research-ai-backend/R09-11-runtime-diagnostics.md
+- scripts/verify-api-runtime-diagnostics.mjs
+
+仅修复原R9分支并推送原Windows CI；精确新head的Windows job开始即停止查询，预计20～30分钟。11 VERIFYING、R9 IN_PROGRESS，未进入R10或创建R9阶段完成记录。原最终新库待验项（真实PG/历史保护四项/账本并发回滚/有效XLSX/Windows Full/私有P4/P7固定回归及继承model.runs/0041删除风险）保持；ignored/公共stub不能记为真实PASS。回退可受控revert本夹具修复到5ff9164（该提交是失败记录，不能视为通过的回退验收基线）；最近完整已验源码仍10的07da8d9，若撤回整个11应按原受控revert至6f471d0。

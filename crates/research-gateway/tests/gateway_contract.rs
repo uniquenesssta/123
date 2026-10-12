@@ -2800,6 +2800,13 @@ async fn plain_attempt_sink_failure_preserves_circuit_and_releases_permit_for_bo
         ]));
         let mut policy = config();
         policy.api_protocol = protocol;
+        policy.request_endpoint = Some(
+            match protocol {
+                ApiProtocol::Responses => "https://api.openai.com/v1/responses",
+                ApiProtocol::ChatCompletions => "https://api.openai.com/v1/chat/completions",
+            }
+            .to_string(),
+        );
         policy.max_retries = 0;
         policy.fallback_model = None;
         policy.circuit_breaker.consecutive_failure_threshold = 1;
@@ -2853,6 +2860,13 @@ async fn structured_attempt_sink_failure_preserves_circuit_and_releases_permit_f
         ]));
         let mut policy = config();
         policy.api_protocol = protocol;
+        policy.request_endpoint = Some(
+            match protocol {
+                ApiProtocol::Responses => "https://api.openai.com/v1/responses",
+                ApiProtocol::ChatCompletions => "https://api.openai.com/v1/chat/completions",
+            }
+            .to_string(),
+        );
         policy.max_retries = 0;
         policy.fallback_model = None;
         policy.circuit_breaker.consecutive_failure_threshold = 1;

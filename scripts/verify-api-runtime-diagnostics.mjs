@@ -50,6 +50,13 @@ assert((gateway.match(/&NoopAttemptSink/g) ?? []).length === 3, "formal/plain/st
 for (const source of [diagnostics.attempt, diagnostics.sink, diagnostics.evidence, diagnostics.timing]) for (const forbidden of ["reqwest::", "std::fs", "OpenAiTransport", "ApiKey", "Mutex<", "static ", "runtime_log.record", "println!", "post_json(", "get_json("]) assert(!source.includes(forbidden), `纯诊断协议/证据不得新增IO/密钥/共享状态：${forbidden}`);
 for (const test of ["request_fingerprint_keeps_utf8_json_bytes_and_lowercase_sha256", "request_fingerprint_preserves_array_order_and_json_value_types", "response_evidence_id_keeps_original_strings_and_rejects_other_types", "attempt_serialization_preserves_all_public_evidence_and_optional_nulls", "default_attempt_sink_accepts_evidence_through_the_original_dyn_interface", "latency_reports_elapsed_milliseconds_without_waiting_or_rounding_to_seconds"]) assert(diagnostics.tests.includes(`fn ${test}(`), `原Gateway unit target缺少诊断覆盖：${test}`);
 for (const test of ["attempt_sink_failure_precedes_circuit_mutation_and_releases_permit", "plain_attempt_sink_failure_preserves_circuit_and_releases_permit_for_both_protocols", "structured_attempt_sink_failure_preserves_circuit_and_releases_permit_for_both_protocols"]) assert(gatewayContracts.includes(`fn ${test}(`), `原contract target缺少审计失败顺序/permit覆盖：${test}`);
+for (const test of ["plain_attempt_sink_failure_preserves_circuit_and_releases_permit_for_both_protocols", "structured_attempt_sink_failure_preserves_circuit_and_releases_permit_for_both_protocols"]) {
+  const fixture = slice(gatewayContracts, `async fn ${test}`, "\n#[tokio::test]");
+  assert(fixture.includes("for protocol in [ApiProtocol::Responses, ApiProtocol::ChatCompletions]"), `${test}不得删去任一协议覆盖`);
+  const endpointIndex = fixture.indexOf("policy.request_endpoint = Some(");
+  assert(endpointIndex > fixture.indexOf("policy.api_protocol = protocol;") && endpointIndex < fixture.indexOf("OpenAiResearchGateway::new("), `${test}必须在构造网关前同步协议与端点`);
+  assert(/match protocol\s*\{\s*ApiProtocol::Responses => "https:\/\/api\.openai\.com\/v1\/responses",\s*ApiProtocol::ChatCompletions => "https:\/\/api\.openai\.com\/v1\/chat\/completions",\s*\}\s*\.to_string\(\)/.test(fixture), `${test}端点必须逐协议匹配，不能继承默认Responses覆盖值`);
+}
 assert(contract.release_version === "0.14.0" && isVersionAtLeast(packageJson.version, contract.release_version), "运行诊断历史契约或当前项目版本未同步");
 assert(contract.contract_version === "2.2.0", "运行诊断契约版本未升级");
 for (const token of ["LOG_DIRECTORY_NAME", '"logs"', "session_log_filename", ".create_new(true)", '"session_id"', '"sequence"']) assert(runtime.includes(token), `独立会话日志缺少${token}`);

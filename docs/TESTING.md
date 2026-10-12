@@ -577,3 +577,10 @@ R9-10 Cancellation Registry已实施、`VERIFYING`，基线8d80ee6，同一R9分
 R9-11 Runtime Diagnostics已实施、`VERIFYING`，基线6f471d0，同一R9分支。Gateway diagnostics唯一持有尝试DTO、异步sink/default、JSON指纹/响应ID/毫秒耗时，根出口与实际client已切换，旧owner正文移除；原八条审计→尝试收集→熔断/重试顺序保持。56公开导出名字、DTO/错误/profile/协议/SQL事务/日志/UI/模型/版本/依赖保持，无新共享状态或IO。新增6 Gateway unit/2双协议contract待自身Windows，预期112/41、Application138/Persistence179；83/83静态、完整architecture/Rustfmt、逐字等价与8破坏探针通过。10 DONE、11 VERIFYING、R9 IN_PROGRESS，R10不启动。
 
 新增测试只进入既有Gateway unit/contract targets，未新增runner/workflow/target/数据库专项。未运行非Windows Cargo/浏览器动态，自身Windows全SUCCESS前不得DONE；真实PG/历史保护四项/账本并发回滚/有效XLSX/Windows Full/私有固定回归及继承model.runs/0041删除风险仍最终封包新库待验，ignored/公开stub不计PASS。完整命令/证据见 [11记录](modular-rewrite/R09-research-ai-backend/R09-11-runtime-diagnostics.md)。
+
+
+## R9-11 首轮Windows契约失败修复（2026-10-12，VERIFYING）
+
+R9-11 首轮Windows run38218231140 / job114707912576在精确5ff9164失败：Gateway112/112 unit通过，contract39/41，新增plain/structured两测试把协议切为Chat Completions但保留默认Responses显式端点，构造网关即报“兼容 API请求端点与所选协议不一致”。已补两夹具逐协议端点match；原运行诊断门禁锁定两协议覆盖、构造前同步与正确映射，4负向探针均拒绝且恢复。生产源码/公开接口/配置验证/协议/SQL/日志/模型不变，测试数量112/41不变；83/83静态、完整architecture/Rustfmt与夹具逆切等价通过。11仍VERIFYING，R9 IN_PROGRESS，须修复提交自身完整Windows，不启动R10。
+
+首轮Application138/138、Persistence179/179，Gateway112单测含新增6项通过；fmt/Clippy已通过，但workspace在两个contract失败处停止，后续workspace/Windows release/安装包/启动未完成，不能记为整轮SUCCESS。未运行非Windows Rust/浏览器动态，真实PG/历史保护/账本并发回滚/有效XLSX/Windows Full/私有固定回归及继承删除风险继续最终新库待验，ignored/公开stub不计PASS。
