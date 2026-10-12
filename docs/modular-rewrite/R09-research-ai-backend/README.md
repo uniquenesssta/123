@@ -2,7 +2,7 @@
 
 ## 当前阶段状态
 
-`IN_PROGRESS`。用户已明确“开始R9-01”，节点映射已厘清。唯一阶段分支 `rewrite/r9-research-ai-backend`，起点 `c72e559af4f29c9510daf2f9bf66b926dacb3013`。01 Shared Transport自身Windows全SUCCESS、DONE；用户“收尾01开始02”授权02，已自身Windows全SUCCESS、DONE；用户“收尾02开始03”授权03，已自身Windows全SUCCESS并DONE；用户“收尾03开始04”授权04，已自身Windows全SUCCESS并DONE；用户“收尾04开始05”授权05，已自身Windows全SUCCESS并DONE；用户“收尾05开始06”授权06，已自身精确Windows全SUCCESS并DONE；用户“收尾06开始07”授权07，已自身精确Windows全SUCCESS并DONE；用户“收尾07开始08”授权08，已自身精确Windows全SUCCESS并DONE；用户“收尾08开始09”授权09，已实施并VERIFYING，10～11 BLOCKED，不创建阶段完成记录。
+`IN_PROGRESS`。用户已明确“开始R9-01”，节点映射已厘清。唯一阶段分支 `rewrite/r9-research-ai-backend`，起点 `c72e559af4f29c9510daf2f9bf66b926dacb3013`。01 Shared Transport自身Windows全SUCCESS、DONE；用户“收尾01开始02”授权02，已自身Windows全SUCCESS、DONE；用户“收尾02开始03”授权03，已自身Windows全SUCCESS并DONE；用户“收尾03开始04”授权04，已自身Windows全SUCCESS并DONE；用户“收尾04开始05”授权05，已自身Windows全SUCCESS并DONE；用户“收尾05开始06”授权06，已自身精确Windows全SUCCESS并DONE；用户“收尾06开始07”授权07，已自身精确Windows全SUCCESS并DONE；用户“收尾07开始08”授权08，已自身精确Windows全SUCCESS并DONE；用户“收尾08开始09”授权09，已自身精确Windows全SUCCESS并DONE；用户“收尾09开始10”授权10 READY，11 BLOCKED，不创建阶段完成记录。
 
 ## 前置基线与依据
 
@@ -22,13 +22,13 @@ R8期间research-gateway、公开契约、配置/依赖及锁文件保持；原G
 | R9-06 | Source 与 Time Policy | DONE · [完成记录](R09-06-source-and-time-policy.md) · run38145691538 SUCCESS |
 | R9-07 | Plain Chat Responses | DONE · [完成记录](R09-07-plain-chat-responses.md) · run38155453893 SUCCESS |
 | R9-08 | Plain Chat Chat Completions | DONE · [完成记录](R09-08-plain-chat-chat-completions.md) · run38191340582 SUCCESS |
-| R9-09 | Session Persistence | VERIFYING · [实施记录](R09-09-session-persistence.md) · 自身Windows待验 |
-| R9-10 | Cancellation Registry | BLOCKED |
+| R9-09 | Session Persistence | DONE · [完成记录](R09-09-session-persistence.md) · run38196834750 SUCCESS |
+| R9-10 | Cancellation Registry | READY · 用户已授权 |
 | R9-11 | Runtime Diagnostics | BLOCKED |
 
 ## 实施范围与继续位置
 
-原client的三个公共传输类型与HTTP职责已切换transport唯一owner；Formal/Plain/Structured/连接测试/恢复GET/取消空POST继续同一原接口，不升级协议、不修改AI Workspace前端或凭据/重试政策。详见01记录；01自身Windows全SUCCESS，02已自身精确Windows通过并DONE，03已自身Windows全SUCCESS并DONE，04正式请求职责已拆分并自身Windows全SUCCESS/DONE，05响应/Schema/引用职责已自身Windows全SUCCESS并DONE，06 Source/Time政策已自身精确Windows全SUCCESS并DONE，07普通Responses已自身精确Windows全SUCCESS并DONE；08 Chat Completions已自身精确Windows全SUCCESS并DONE；09 Session Persistence已实施并VERIFYING，等待自身Windows；10～11仍BLOCKED。
+原client的三个公共传输类型与HTTP职责已切换transport唯一owner；Formal/Plain/Structured/连接测试/恢复GET/取消空POST继续同一原接口，不升级协议、不修改AI Workspace前端或凭据/重试政策。详见01记录；01自身Windows全SUCCESS，02已自身精确Windows通过并DONE，03已自身Windows全SUCCESS并DONE，04正式请求职责已拆分并自身Windows全SUCCESS/DONE，05响应/Schema/引用职责已自身Windows全SUCCESS并DONE，06 Source/Time政策已自身精确Windows全SUCCESS并DONE，07普通Responses已自身精确Windows全SUCCESS并DONE；08 Chat Completions已自身精确Windows全SUCCESS并DONE；09 Session Persistence已自身精确Windows全SUCCESS并DONE；10已授权，下一步实施取消注册表，11仍BLOCKED。
 
 沿用现有单测/contract、Windows runner/workflow与最终新库入口；不新增持续回归基础设施，不执行Linux/macOS动态。每项必须自身精确Windows验收及实施记录才能DONE。已创建01实施记录；其状态已DONE，不创建R9阶段完成记录。Create State仅记录足球模型项目0.23.0的交接状态。
 
@@ -163,3 +163,11 @@ R9-08 Plain Chat Chat Completions已实施、`VERIFYING`，同一R9分支，基�
 ## R9-09 实施与门禁（VERIFYING）
 
 R9-09 Session Persistence已实施、`VERIFYING`，同一R9分支，基线06ecdd2。8会话用例移动到Application sessions且Service直连出口；9个PG会话方法迁入adapters/ai_workspace/sessions，查询、消息、回答事务、文件、用量、Row映射与载荷校验职责明确，原提案状态流转/校验/映射唯一owner保持。公开接口/DTO/SQL绑定/事务审计顺序/配置/DB迁移/模型/Gateway/UI/依赖不变。新增4Application/4Persistence unit；83/83静态、完整architecture/Rustfmt、14原PG方法字节等价与8探针通过，Application130/Persistence179、Gateway106/39待自身Windows。08 DONE、09 VERIFYING、10～11 BLOCKED，R9 IN_PROGRESS。 详见 [09记录](R09-09-session-persistence.md)。
+
+## R9-09 完成与10授权（2026-10-12）
+
+精确09提交4ed656d51fac604cf74665009cd340f4d7ddbc59 / treee1ea669d51e98fe11797fc90213df5bb3ccbf48b，[Windows run38196834750](https://github.com/uniquenesssta/123/actions/runs/38196834750) / job114641262453全SUCCESS，2026-10-12 11:10:30北京完成。Application130/130、Persistence179/179、Gateway106/106 unit和39/39 contract；前端/contracts/TypeScript/Vite/17视口、Rust fmt/Clippy -D warnings/workspace、Windows release/MSI/NSIS/启动及日志扫描通过（7记录、3完成操作）。
+
+证据artifact11724985136，14,040,086字节，SHA-256 00fdea25a74bfc9fc99bf0031a03161e2f2eb5419f158065c4a5f43c335550b7；报告windows-acceptance-20261012-024340.json及同名.txt。09新增4Application/4Persistence unit均执行通过，未增加/运行真实PG专项。
+
+09 DONE；用户2026-10-12“收尾09开始10”授权10 READY，同一rewrite/r9-research-ai-backend分支，11 BLOCKED、R9 IN_PROGRESS。本次五既有文档[skip ci]收尾，源码与上述成功一致，先前VERIFYING为实施历史；未创建R9阶段完成记录。真实PG会话事务/历史四项/账本并发回滚/有效XLSX/Windows Full/私有固定回归及继承model.runs/0041删除风险仍最终封包新库待验，ignored与公共stub不计PASS。

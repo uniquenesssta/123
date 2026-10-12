@@ -546,3 +546,11 @@ R9-08 Plain Chat Chat Completions已实施、`VERIFYING`，同一R9分支，基�
 R9-09 Session Persistence已实施、`VERIFYING`，同一R9分支，基线06ecdd2。8会话用例移动到Application sessions且Service直连出口；9个PG会话方法迁入adapters/ai_workspace/sessions，查询、消息、回答事务、文件、用量、Row映射与载荷校验职责明确，原提案状态流转/校验/映射唯一owner保持。公开接口/DTO/SQL绑定/事务审计顺序/配置/DB迁移/模型/Gateway/UI/依赖不变。新增4Application/4Persistence unit；83/83静态、完整architecture/Rustfmt、14原PG方法字节等价与8探针通过，Application130/Persistence179、Gateway106/39待自身Windows。08 DONE、09 VERIFYING、10～11 BLOCKED，R9 IN_PROGRESS。
 
 原targets新增8unit，覆盖输入先于factory、元数据/完整载荷/Port错误、用量顺序与饱和计数、角色/Unicode字符/文件字节边界；14方法SQL/绑定/审计/事务与7helper正文等价，8反向探针拒绝。原Windows执行frontend/17视口、fmt/Clippy/workspace、release/MSI/NSIS/启动/日志，精确开始后停止查询，预计20～30分钟。未执行非Windows动态，真实PG会话事务/历史四项/账本并发回滚/有效XLSX/Full/私有固定回归及继承model.runs/0041风险仍最终封包新库待验，不把ignored/stub记PASS。报告r909-static-checks.json/r909-architecture.log/r909-equivalence.json/r909-negative-probes.json/r909-review.json。
+
+## R9-09 完成与10授权（2026-10-12）
+
+精确09提交4ed656d51fac604cf74665009cd340f4d7ddbc59 / treee1ea669d51e98fe11797fc90213df5bb3ccbf48b，[Windows run38196834750](https://github.com/uniquenesssta/123/actions/runs/38196834750) / job114641262453全SUCCESS，2026-10-12 11:10:30北京完成。Application130/130、Persistence179/179、Gateway106/106 unit和39/39 contract；前端/contracts/TypeScript/Vite/17视口、Rust fmt/Clippy -D warnings/workspace、Windows release/MSI/NSIS/启动及日志扫描通过（7记录、3完成操作）。
+
+证据artifact11724985136，14,040,086字节，SHA-256 00fdea25a74bfc9fc99bf0031a03161e2f2eb5419f158065c4a5f43c335550b7；报告windows-acceptance-20261012-024340.json及同名.txt。09新增4Application/4Persistence unit均执行通过，未增加/运行真实PG专项。
+
+09 DONE；用户2026-10-12“收尾09开始10”授权10 READY，同一rewrite/r9-research-ai-backend分支，11 BLOCKED、R9 IN_PROGRESS。本次五既有文档[skip ci]收尾，源码与上述成功一致，先前VERIFYING为实施历史；未创建R9阶段完成记录。真实PG会话事务/历史四项/账本并发回滚/有效XLSX/Windows Full/私有固定回归及继承model.runs/0041删除风险仍最终封包新库待验，ignored与公共stub不计PASS。

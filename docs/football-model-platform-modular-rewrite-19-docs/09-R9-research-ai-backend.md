@@ -996,7 +996,7 @@ R9-08 Plain Chat Chat Completions已实施、`VERIFYING`，同一R9分支，基�
 
 ## R9-09 Session Persistence
 
-状态：`VERIFYING`（实现/静态/记录完成；09自身Windows待验，10～11BLOCKED）
+状态：`DONE`（精确4ed656d / run38196834750自身Windows全SUCCESS；下述VERIFYING为实施历史）
 
 ### 1. 目标
 
@@ -1139,9 +1139,19 @@ R9-09 Session Persistence已实施、`VERIFYING`，同一R9分支，基线06ecdd
 
 ---
 
+## R9-09 完成与10授权（2026-10-12）
+
+精确09提交4ed656d51fac604cf74665009cd340f4d7ddbc59 / treee1ea669d51e98fe11797fc90213df5bb3ccbf48b，[Windows run38196834750](https://github.com/uniquenesssta/123/actions/runs/38196834750) / job114641262453全SUCCESS，2026-10-12 11:10:30北京完成。Application130/130、Persistence179/179、Gateway106/106 unit和39/39 contract；前端/contracts/TypeScript/Vite/17视口、Rust fmt/Clippy -D warnings/workspace、Windows release/MSI/NSIS/启动及日志扫描通过（7记录、3完成操作）。
+
+证据artifact11724985136，14,040,086字节，SHA-256 00fdea25a74bfc9fc99bf0031a03161e2f2eb5419f158065c4a5f43c335550b7；报告windows-acceptance-20261012-024340.json及同名.txt。09新增4Application/4Persistence unit均执行通过，未增加/运行真实PG专项。
+
+09 DONE；用户2026-10-12“收尾09开始10”授权10 READY，同一rewrite/r9-research-ai-backend分支，11 BLOCKED、R9 IN_PROGRESS。本次五既有文档[skip ci]收尾，源码与上述成功一致，先前VERIFYING为实施历史；未创建R9阶段完成记录。真实PG会话事务/历史四项/账本并发回滚/有效XLSX/Windows Full/私有固定回归及继承model.runs/0041删除风险仍最终封包新库待验，ignored与公共stub不计PASS。
+
+---
+
 ## R9-10 Cancellation Registry
 
-状态：`BLOCKED`（仅当上一任务与本任务前置门禁通过后改为 `READY`）
+状态：`READY`（09自身Windows全SUCCESS/DONE；用户已授权开始10，同一R9分支）
 
 ### 1. 目标
 
