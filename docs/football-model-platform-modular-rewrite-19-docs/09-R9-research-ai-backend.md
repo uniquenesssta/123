@@ -11,7 +11,7 @@ R8 的12个节点及 Windows Automated 阶段出口已DONE，最终代码 `af3c9
 
 执行总纲顶部订正：只在Windows动态验证，复用原targets/contract/workflow/数据库入口，不新增持续回归体系；R9不升级外部协议、不修改AI Workspace前端。R8期间 `crates/research-gateway/`、公开契约、依赖与配置保持，最终CI原Gateway测试/contract通过，原协议行为作为下一节点基线。
 
-用户已明确“开始R9-01”，编号映射已厘清。从R8文档收尾 `c72e559af4f29c9510daf2f9bf66b926dacb3013` 建立唯一分支 `rewrite/r9-research-ai-backend`；01共享传输自身精确Windows全SUCCESS、DONE，用户“收尾01开始02”授权02，已自身精确Windows全SUCCESS、DONE；用户“收尾02开始03”授权03，已自身Windows全SUCCESS并DONE；用户“收尾03开始04”授权04，已自身Windows全SUCCESS并DONE；用户“收尾04开始05”授权05，已实施VERIFYING，06～11 BLOCKED，精确状态见 [阶段索引](../modular-rewrite/R09-research-ai-backend/README.md)。必须取得01自身Windows CI，R8成功不能替代。适用总纲顶部职责/生命周期/既有验证订正，真实验证延期边界继续保留。
+当前阶段状态：`DONE`（01～11代码/节点及Windows Automated出口完成）。唯一分支rewrite/r9-research-ai-backend，起点c72e559af4f29c9510daf2f9bf66b926dacb3013；最终修复b50d8047a6dbf32775d70704afde61d99b897069 / run38221009454全SUCCESS。用户“收尾11”，完整阶段总表/证据/回退见 [阶段完成记录](../modular-rewrite/R09-research-ai-backend/R09-stage-completion.md)。仅R10-01 READY，未启动实现或新分支；真实验证延期仍按总纲顶部订正适用，不记为PASS。
 
 ## 1. 阶段目标
 
@@ -66,7 +66,7 @@ crates/persistence-postgres/src/adapters/ai_workspace/
 
 - 正式研究和普通问答有独立 request/response 类型。
 - 凭据只通过 Secret Provider 进入 transport。
-- 诊断只能记录脱敏元数据。
+- 桌面根运行日志只记录脱敏元数据；GatewayAttempt原request/raw数据库审计证据按既有Port保持，不新增正文或Schema到根日志。
 
 ## 8. 数据流、调用流与依赖方向
 
@@ -1304,7 +1304,7 @@ R9-10 Cancellation Registry已实施、`VERIFYING`，基线8d80ee6，同一R9分
 
 ## R9-11 Runtime Diagnostics
 
-状态：`VERIFYING`（首轮双协议契约夹具失败已修，须修复提交自身精确Windows全SUCCESS；10 DONE、R9 IN_PROGRESS）
+状态：`DONE`（修复b50d804自身Windows全SUCCESS，首轮失败已关闭）
 
 ### 1. 目标
 
@@ -1520,3 +1520,12 @@ docs/modular-rewrite/R09-research-ai-backend/R09-stage-completion.md
 交付artifact `11671897216` / `windows-automated-delivery-evidence-cb3d2cadfb8caa0c7dc3f4eb7c34faedd49f79bc`，14,040,701 bytes，SHA-256 `b8928c736b0d462199c251a39ff1a9bb821cc23242e36874dcb86d6558275dd3`。验收报告 `D:\a\123\123\logs\windows-acceptance-20261010-132633.json`，过程记录同名.txt；Windows制品为原0.23.0 x64 zh-CN MSI和NSIS setup。原18 broad PG仍ignored；真实数据库、历史四项/不可变账本/并发/回滚、有效XLSX、Windows Full、私有P4/P7 Golden Master及继承model.runs/0041历史删除风险仍最终封包新库待验，ignored与公共stub不计PASS。
 
 首轮失败由该修复自身精确Windows关闭。04 **DONE**；用户“收尾04开始05”授权同一R9分支05 **READY**，06～11BLOCKED，R9整体IN_PROGRESS。本次仅既有五文档 `[skip ci]` 收尾，源码/门禁/依赖保持，同源码树复用上述Windows成功。此前VERIFYING叙述为实施历史，不创建R9阶段完成记录。
+
+
+## R9-11 精确 Windows 完成与阶段收尾（2026-10-12）
+
+精确修复提交b50d8047a6dbf32775d70704afde61d99b897069 / tree7dd421459bbff3156d4c034fc01e9b74dd2985d5，[Windows run38221009454](https://github.com/uniquenesssta/123/actions/runs/38221009454) / job114716987812整体SUCCESS，2026-10-12 16:29:01北京完成。Gateway112/112 unit、41/41 contract，Application138/138、Persistence179/179；两项plain/structured双协议审计失败契约已实际通过，首轮39/41失败由本修复自身关闭。前端/contracts/TypeScript/Vite/17视口、Rust fmt/Clippy -D warnings/workspace、Windows release/MSI/NSIS/启动与日志扫描通过（7记录、3完成操作）。
+
+证据artifact11735687461，14,038,470字节，SHA-256 3e28db7fddd900f59e4655c058df08e7d69c04feaab92e02e641f99900c05a68；报告windows-acceptance-20261012-080203.json及同名.txt。
+
+用户2026-10-12“收尾11”：11 DONE；R9全部01～11及Windows Automated阶段出口DONE，阶段完成记录与实际总表已建立。仅R10-01 Review Package Workflow READY，02～13 BLOCKED；未开始R10实现、未建立第二分支。本次纯文档[skip ci]，源码、门禁与清单同精确成功提交。真实PG/历史保护四项/账本并发回滚/有效XLSX/Windows Full/私有P4/P7固定回归及继承model.runs/0041删除风险仍最终封包新库待验，ignored/公开stub不计真实PASS；此前VERIFYING/失败叙述保留为实施历史。

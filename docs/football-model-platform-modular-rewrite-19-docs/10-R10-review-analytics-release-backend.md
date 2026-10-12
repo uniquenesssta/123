@@ -5,6 +5,10 @@
 > 后续阶段：`R11`  
 > 本文档是唯一执行依据之一；必须与 `00-总体架构与前23节.md` 同时适用。
 
+## 当前前置状态（2026-10-12）
+
+R9完成，最终b50d804 / Windows run38221009454全SUCCESS；[R9完成记录](../modular-rewrite/R09-research-ai-backend/R09-stage-completion.md)与 [本阶段索引](../modular-rewrite/R10-review-analytics-release-backend/README.md)已建立。阶段状态READY，仅R10-01 READY，02～13 BLOCKED。用户当前只授权“收尾11”，未开始本阶段、未创建新分支；真实数据库/历史保护/账本并发回滚/XLSX/Full/私有回归及继承删除风险沿用最终新库待验，不继承为R10 PASS。
+
 ## 1. 阶段目标
 
 - 完成从复盘事实到赛后结算、分析、候选晋升和发布验收的后端闭环。
@@ -165,7 +169,7 @@ Atomic Tasks：
 
 ## R10-01 Review Package Workflow
 
-状态：`BLOCKED`（仅当上一任务与本任务前置门禁通过后改为 `READY`）
+状态：`READY`（R9全部节点及Windows Automated阶段出口DONE；仅文档前置，未开始实现）
 
 ### 1. 目标
 

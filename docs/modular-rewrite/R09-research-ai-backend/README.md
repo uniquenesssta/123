@@ -2,7 +2,7 @@
 
 ## 当前阶段状态
 
-`IN_PROGRESS`。用户已明确“开始R9-01”，节点映射已厘清。唯一阶段分支 `rewrite/r9-research-ai-backend`，起点 `c72e559af4f29c9510daf2f9bf66b926dacb3013`。01 Shared Transport自身Windows全SUCCESS、DONE；用户“收尾01开始02”授权02，已自身Windows全SUCCESS、DONE；用户“收尾02开始03”授权03，已自身Windows全SUCCESS并DONE；用户“收尾03开始04”授权04，已自身Windows全SUCCESS并DONE；用户“收尾04开始05”授权05，已自身Windows全SUCCESS并DONE；用户“收尾05开始06”授权06，已自身精确Windows全SUCCESS并DONE；用户“收尾06开始07”授权07，已自身精确Windows全SUCCESS并DONE；用户“收尾07开始08”授权08，已自身精确Windows全SUCCESS并DONE；用户“收尾08开始09”授权09，已自身精确Windows全SUCCESS并DONE；用户“收尾09开始10”授权10，已自身精确Windows全SUCCESS并DONE；用户“收尾10开始11”授权11，已实施VERIFYING，不创建阶段完成记录。
+`DONE`（01～11代码/节点及Windows Automated阶段出口完成）。唯一阶段分支rewrite/r9-research-ai-backend，起点c72e559af4f29c9510daf2f9bf66b926dacb3013；最终b50d8047a6dbf32775d70704afde61d99b897069 / run38221009454、job114716987812全SUCCESS。用户“收尾11”。[R9阶段完成记录](R09-stage-completion.md)保存全部真实文件、证据、限制与回退；最终新库待验不计PASS。下一阶段仅 [R10-01 Review Package Workflow](../R10-review-analytics-release-backend/README.md) READY，未启动实现或创建分支。
 
 ## 前置基线与依据
 
@@ -24,13 +24,13 @@ R8期间research-gateway、公开契约、配置/依赖及锁文件保持；原G
 | R9-08 | Plain Chat Chat Completions | DONE · [完成记录](R09-08-plain-chat-chat-completions.md) · run38191340582 SUCCESS |
 | R9-09 | Session Persistence | DONE · [完成记录](R09-09-session-persistence.md) · run38196834750 SUCCESS |
 | R9-10 | Cancellation Registry | DONE · [完成记录](R09-10-cancellation-registry.md) · run38213432437 SUCCESS |
-| R9-11 | Runtime Diagnostics | VERIFYING · [实施与修复记录](R09-11-runtime-diagnostics.md) · 首轮契约失败已修，待新Windows |
+| R9-11 | Runtime Diagnostics | DONE · [完成与修复记录](R09-11-runtime-diagnostics.md) · run38221009454 SUCCESS |
 
 ## 实施范围与继续位置
 
-原client的三个公共传输类型与HTTP职责已切换transport唯一owner；Formal/Plain/Structured/连接测试/恢复GET/取消空POST继续同一原接口，不升级协议、不修改AI Workspace前端或凭据/重试政策。详见01记录；01自身Windows全SUCCESS，02已自身精确Windows通过并DONE，03已自身Windows全SUCCESS并DONE，04正式请求职责已拆分并自身Windows全SUCCESS/DONE，05响应/Schema/引用职责已自身Windows全SUCCESS并DONE，06 Source/Time政策已自身精确Windows全SUCCESS并DONE，07普通Responses已自身精确Windows全SUCCESS并DONE；08 Chat Completions已自身精确Windows全SUCCESS并DONE；09 Session Persistence已自身精确Windows全SUCCESS并DONE；10取消注册表已自身Windows全SUCCESS/DONE；11运行诊断已实施VERIFYING，等待自身精确Windows完整验收，R10不启动。
+R9原子节点01～11全部DONE，实际唯一目录/消费链/旧职责清理及明确安全/取消修正见阶段完成记录第7～11节。完整Windows已核实，初轮诊断测试失败由自身修复关闭，历史VERIFYING保留用于追溯。当前不再实施R9代码；R10-01只开放READY，开始时再核对其任务书/实际Review package及Ports/PG、建立唯一新阶段分支。
 
-沿用现有单测/contract、Windows runner/workflow与最终新库入口；不新增持续回归基础设施，不执行Linux/macOS动态。每项必须自身精确Windows验收及实施记录才能DONE。已创建01实施记录；其状态已DONE，不创建R9阶段完成记录。Create State仅记录足球模型项目0.23.0的交接状态。
+沿用现有单测/contract、Windows runner/workflow与最终新库入口，真实PG/XLSX/Full/私有回归及继承删除风险保持待验；不新增持续回归基础设施。
 
 
 ## R9-01 实施与门禁（2026-10-09，DONE）
@@ -195,3 +195,12 @@ R9-11 Runtime Diagnostics已实施、`VERIFYING`，基线6f471d0，同一R9分�
 ## R9-11 首轮Windows契约失败修复（VERIFYING）
 
 R9-11 首轮Windows run38218231140 / job114707912576在精确5ff9164失败：Gateway112/112 unit通过，contract39/41，新增plain/structured两测试把协议切为Chat Completions但保留默认Responses显式端点，构造网关即报“兼容 API请求端点与所选协议不一致”。已补两夹具逐协议端点match；原运行诊断门禁锁定两协议覆盖、构造前同步与正确映射，4负向探针均拒绝且恢复。生产源码/公开接口/配置验证/协议/SQL/日志/模型不变，测试数量112/41不变；83/83静态、完整architecture/Rustfmt与夹具逆切等价通过。11仍VERIFYING，R9 IN_PROGRESS，须修复提交自身完整Windows，不启动R10。 详见 [11记录](R09-11-runtime-diagnostics.md)。
+
+
+## R9-11 精确 Windows 完成与阶段收尾（2026-10-12）
+
+精确修复提交b50d8047a6dbf32775d70704afde61d99b897069 / tree7dd421459bbff3156d4c034fc01e9b74dd2985d5，[Windows run38221009454](https://github.com/uniquenesssta/123/actions/runs/38221009454) / job114716987812整体SUCCESS，2026-10-12 16:29:01北京完成。Gateway112/112 unit、41/41 contract，Application138/138、Persistence179/179；两项plain/structured双协议审计失败契约已实际通过，首轮39/41失败由本修复自身关闭。前端/contracts/TypeScript/Vite/17视口、Rust fmt/Clippy -D warnings/workspace、Windows release/MSI/NSIS/启动与日志扫描通过（7记录、3完成操作）。
+
+证据artifact11735687461，14,038,470字节，SHA-256 3e28db7fddd900f59e4655c058df08e7d69c04feaab92e02e641f99900c05a68；报告windows-acceptance-20261012-080203.json及同名.txt。
+
+用户2026-10-12“收尾11”：11 DONE；R9全部01～11及Windows Automated阶段出口DONE，阶段完成记录与实际总表已建立。仅R10-01 Review Package Workflow READY，02～13 BLOCKED；未开始R10实现、未建立第二分支。本次纯文档[skip ci]，源码、门禁与清单同精确成功提交。真实PG/历史保护四项/账本并发回滚/有效XLSX/Windows Full/私有P4/P7固定回归及继承model.runs/0041删除风险仍最终封包新库待验，ignored/公开stub不计真实PASS；此前VERIFYING/失败叙述保留为实施历史。

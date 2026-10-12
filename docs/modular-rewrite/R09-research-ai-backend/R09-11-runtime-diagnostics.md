@@ -1,6 +1,6 @@
 # R9-11 Runtime Diagnostics
 
-状态：`VERIFYING`。用户2026-10-12“收尾10开始11”授权；唯一原分支rewrite/r9-research-ai-backend，基线6f471d02f0358ee5991fe426d5471515cd662dc6（10文档收尾，源码同已通过Windows的07da8d9）。10 DONE；11已实施与静态复核，须自身精确Windows完整SUCCESS方可DONE；R9 IN_PROGRESS，不进入R10、不创建阶段完成记录。
+状态：`DONE`（修复自身精确Windows全SUCCESS；下述VERIFYING/首轮失败为实施历史）。用户2026-10-12“收尾10开始11”授权；唯一原分支rewrite/r9-research-ai-backend，基线6f471d02f0358ee5991fe426d5471515cd662dc6（10文档收尾，源码同已通过Windows的07da8d9）。10 DONE；11已实施与静态复核，须自身精确Windows完整SUCCESS方可DONE；R9 IN_PROGRESS，不进入R10、不创建阶段完成记录。
 
 ### 1. 目标
 
@@ -188,3 +188,12 @@ flowchart TD
 - scripts/verify-api-runtime-diagnostics.mjs
 
 仅修复原R9分支并推送原Windows CI；精确新head的Windows job开始即停止查询，预计20～30分钟。11 VERIFYING、R9 IN_PROGRESS，未进入R10或创建R9阶段完成记录。原最终新库待验项（真实PG/历史保护四项/账本并发回滚/有效XLSX/Windows Full/私有P4/P7固定回归及继承model.runs/0041删除风险）保持；ignored/公共stub不能记为真实PASS。回退可受控revert本夹具修复到5ff9164（该提交是失败记录，不能视为通过的回退验收基线）；最近完整已验源码仍10的07da8d9，若撤回整个11应按原受控revert至6f471d0。
+
+
+## R9-11 精确 Windows 完成与阶段收尾（2026-10-12）
+
+精确修复提交b50d8047a6dbf32775d70704afde61d99b897069 / tree7dd421459bbff3156d4c034fc01e9b74dd2985d5，[Windows run38221009454](https://github.com/uniquenesssta/123/actions/runs/38221009454) / job114716987812整体SUCCESS，2026-10-12 16:29:01北京完成。Gateway112/112 unit、41/41 contract，Application138/138、Persistence179/179；两项plain/structured双协议审计失败契约已实际通过，首轮39/41失败由本修复自身关闭。前端/contracts/TypeScript/Vite/17视口、Rust fmt/Clippy -D warnings/workspace、Windows release/MSI/NSIS/启动与日志扫描通过（7记录、3完成操作）。
+
+证据artifact11735687461，14,038,470字节，SHA-256 3e28db7fddd900f59e4655c058df08e7d69c04feaab92e02e641f99900c05a68；报告windows-acceptance-20261012-080203.json及同名.txt。
+
+用户2026-10-12“收尾11”：11 DONE；R9全部01～11及Windows Automated阶段出口DONE，阶段完成记录与实际总表已建立。仅R10-01 Review Package Workflow READY，02～13 BLOCKED；未开始R10实现、未建立第二分支。本次纯文档[skip ci]，源码、门禁与清单同精确成功提交。真实PG/历史保护四项/账本并发回滚/有效XLSX/Windows Full/私有P4/P7固定回归及继承model.runs/0041删除风险仍最终封包新库待验，ignored/公开stub不计真实PASS；此前VERIFYING/失败叙述保留为实施历史。
