@@ -2,7 +2,7 @@
 
 ## 当前阶段状态
 
-`IN_PROGRESS`。用户已明确“开始R9-01”，节点映射已厘清。唯一阶段分支 `rewrite/r9-research-ai-backend`，起点 `c72e559af4f29c9510daf2f9bf66b926dacb3013`。01 Shared Transport自身Windows全SUCCESS、DONE；用户“收尾01开始02”授权02，已自身Windows全SUCCESS、DONE；用户“收尾02开始03”授权03，已自身Windows全SUCCESS并DONE；用户“收尾03开始04”授权04，已自身Windows全SUCCESS并DONE；用户“收尾04开始05”授权05，已自身Windows全SUCCESS并DONE；用户“收尾05开始06”授权06，已自身精确Windows全SUCCESS并DONE；用户“收尾06开始07”授权07，已自身精确Windows全SUCCESS并DONE；用户“收尾07开始08”授权08，已自身精确Windows全SUCCESS并DONE；用户“收尾08开始09”授权09，已自身精确Windows全SUCCESS并DONE；用户“收尾09开始10”授权10 READY，11 BLOCKED，不创建阶段完成记录。
+`IN_PROGRESS`。用户已明确“开始R9-01”，节点映射已厘清。唯一阶段分支 `rewrite/r9-research-ai-backend`，起点 `c72e559af4f29c9510daf2f9bf66b926dacb3013`。01 Shared Transport自身Windows全SUCCESS、DONE；用户“收尾01开始02”授权02，已自身Windows全SUCCESS、DONE；用户“收尾02开始03”授权03，已自身Windows全SUCCESS并DONE；用户“收尾03开始04”授权04，已自身Windows全SUCCESS并DONE；用户“收尾04开始05”授权05，已自身Windows全SUCCESS并DONE；用户“收尾05开始06”授权06，已自身精确Windows全SUCCESS并DONE；用户“收尾06开始07”授权07，已自身精确Windows全SUCCESS并DONE；用户“收尾07开始08”授权08，已自身精确Windows全SUCCESS并DONE；用户“收尾08开始09”授权09，已自身精确Windows全SUCCESS并DONE；用户“收尾09开始10”授权10，已实施VERIFYING，11 BLOCKED，不创建阶段完成记录。
 
 ## 前置基线与依据
 
@@ -23,7 +23,7 @@ R8期间research-gateway、公开契约、配置/依赖及锁文件保持；原G
 | R9-07 | Plain Chat Responses | DONE · [完成记录](R09-07-plain-chat-responses.md) · run38155453893 SUCCESS |
 | R9-08 | Plain Chat Chat Completions | DONE · [完成记录](R09-08-plain-chat-chat-completions.md) · run38191340582 SUCCESS |
 | R9-09 | Session Persistence | DONE · [完成记录](R09-09-session-persistence.md) · run38196834750 SUCCESS |
-| R9-10 | Cancellation Registry | READY · 用户已授权 |
+| R9-10 | Cancellation Registry | VERIFYING · [实施记录](R09-10-cancellation-registry.md) · 自身Windows待验 |
 | R9-11 | Runtime Diagnostics | BLOCKED |
 
 ## 实施范围与继续位置
@@ -171,3 +171,8 @@ R9-09 Session Persistence已实施、`VERIFYING`，同一R9分支，基线06ecdd
 证据artifact11724985136，14,040,086字节，SHA-256 00fdea25a74bfc9fc99bf0031a03161e2f2eb5419f158065c4a5f43c335550b7；报告windows-acceptance-20261012-024340.json及同名.txt。09新增4Application/4Persistence unit均执行通过，未增加/运行真实PG专项。
 
 09 DONE；用户2026-10-12“收尾09开始10”授权10 READY，同一rewrite/r9-research-ai-backend分支，11 BLOCKED、R9 IN_PROGRESS。本次五既有文档[skip ci]收尾，源码与上述成功一致，先前VERIFYING为实施历史；未创建R9阶段完成记录。真实PG会话事务/历史四项/账本并发回滚/有效XLSX/Windows Full/私有固定回归及继承model.runs/0041删除风险仍最终封包新库待验，ignored与公共stub不计PASS。
+
+
+## R9-10 实施与门禁（VERIFYING）
+
+R9-10 Cancellation Registry已实施、`VERIFYING`，基线8d80ee6，同一R9分支。Application唯一Registry及不可克隆Lease管理活动ID/token，Tauri已切换且旧map/锁操作移除；重复ID不覆盖原token并在profile/会话副作用前拒绝，准备失败/网关结束/任务abort/unwind自动清理。原命令/DTO/错误文案/协议/profile/SQL事务/日志载荷/UI/模型/版本/依赖保持；仅新增两个Rust类型导出与明确取消生命周期修正。8新增Application unit待自身Windows，预期138/179与Gateway106/39；83/83静态、完整architecture/Rustfmt、逆切等价和8破坏探针通过。09 DONE、10 VERIFYING、11 BLOCKED、R9 IN_PROGRESS。 完整16路径与最终新库待验见 [10记录](R09-10-cancellation-registry.md)。

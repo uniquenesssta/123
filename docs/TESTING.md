@@ -554,3 +554,10 @@ R9-09 Session Persistence已实施、`VERIFYING`，同一R9分支，基线06ecdd
 证据artifact11724985136，14,040,086字节，SHA-256 00fdea25a74bfc9fc99bf0031a03161e2f2eb5419f158065c4a5f43c335550b7；报告windows-acceptance-20261012-024340.json及同名.txt。09新增4Application/4Persistence unit均执行通过，未增加/运行真实PG专项。
 
 09 DONE；用户2026-10-12“收尾09开始10”授权10 READY，同一rewrite/r9-research-ai-backend分支，11 BLOCKED、R9 IN_PROGRESS。本次五既有文档[skip ci]收尾，源码与上述成功一致，先前VERIFYING为实施历史；未创建R9阶段完成记录。真实PG会话事务/历史四项/账本并发回滚/有效XLSX/Windows Full/私有固定回归及继承model.runs/0041删除风险仍最终封包新库待验，ignored与公共stub不计PASS。
+
+
+## R9-10 Cancellation Registry（2026-10-12，VERIFYING）
+
+R9-10 Cancellation Registry已实施、`VERIFYING`，基线8d80ee6，同一R9分支。Application唯一Registry及不可克隆Lease管理活动ID/token，Tauri已切换且旧map/锁操作移除；重复ID不覆盖原token并在profile/会话副作用前拒绝，准备失败/网关结束/任务abort/unwind自动清理。原命令/DTO/错误文案/协议/profile/SQL事务/日志载荷/UI/模型/版本/依赖保持；仅新增两个Rust类型导出与明确取消生命周期修正。8新增Application unit待自身Windows，预期138/179与Gateway106/39；83/83静态、完整architecture/Rustfmt、逆切等价和8破坏探针通过。09 DONE、10 VERIFYING、11 BLOCKED、R9 IN_PROGRESS。
+
+新增测试均纳入原Application unit target，未增加runner/workflow/target/数据库专项；未执行非Windows Rust/浏览器动态。自身Windows全SUCCESS前不得DONE，真实PG/历史保护/账本并发回滚/有效XLSX/Windows Full/私有固定回归及继承model.runs/0041删除风险仍最终封包新库待验；ignored和公开stub不计PASS。完整命令与证据见 [10记录](modular-rewrite/R09-research-ai-backend/R09-10-cancellation-registry.md)。

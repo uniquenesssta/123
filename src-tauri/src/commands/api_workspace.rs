@@ -4,9 +4,7 @@ use football_domain::{
     ApiWorkspaceAttachment, ApiWorkspaceMessageDraft, ApiWorkspacePreset,
     ApiWorkspaceSessionDetail, ApiWorkspaceSessionDraft, ApiWorkspaceSessionRecord,
 };
-use football_research_gateway::{
-    CancellationToken, GatewayOperation, PlainTextGatewayRequest, PlainTextMessage,
-};
+use football_research_gateway::{GatewayOperation, PlainTextGatewayRequest, PlainTextMessage};
 use serde::Deserialize;
 use serde_json::{json, Value};
 use tauri::State;
@@ -119,6 +117,10 @@ pub async fn send_api_workspace_message(
         return Err("AI问答实体上下文只支持 team 或 player".to_string());
     }
 
+    let registration = state
+        .api_workspace_requests
+        .register(request_id)
+        .map_err(|error| error.to_string())?;
     let (profile, gateway) = state.openai_profiles.gateway_for(Some(profile_id))?;
     let session = match command.session_id.as_deref() {
         Some(value) => {
@@ -250,18 +252,10 @@ pub async fn send_api_workspace_message(
         monthly_spend_usd: usage.month_cost_usd,
         attempt_number_offset: 0,
     };
-    let cancellation = CancellationToken::new();
-    {
-        let mut requests = state.api_workspace_requests.lock().await;
-        if requests
-            .insert(request_id.to_string(), cancellation.clone())
-            .is_some()
-        {
-            return Err("AI问答请求 ID 已在使用".to_string());
-        }
-    }
-    let execution_result = gateway.execute_plain_text(&request, &cancellation).await;
-    state.api_workspace_requests.lock().await.remove(request_id);
+    let execution_result = gateway
+        .execute_plain_text(&request, registration.cancellation())
+        .await;
+    drop(registration);
     let execution = match execution_result {
         Ok(execution) => execution,
         Err(error) => {
@@ -349,18 +343,7 @@ pub async fn cancel_api_workspace_request(
     if request_id.is_empty() {
         return Err("AI问答请求 ID 不能为空".to_string());
     }
-    let token = state
-        .api_workspace_requests
-        .lock()
-        .await
-        .get(request_id)
-        .cloned();
-    if let Some(token) = token {
-        token.cancel();
-        Ok(true)
-    } else {
-        Ok(false)
-    }
+    Ok(state.api_workspace_requests.cancel(request_id))
 }
 
 #[tauri::command]

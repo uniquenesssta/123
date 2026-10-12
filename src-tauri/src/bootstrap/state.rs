@@ -3,11 +3,9 @@ use crate::{
     issue_log::IssueLogStore, openai_profiles::OpenAiProfileStore, runtime_log::RuntimeLogStore,
     workspace_state::WorkspaceStateStore,
 };
-use football_application::ApplicationService;
-use football_research_gateway::CancellationToken;
-use std::{collections::HashMap, path::PathBuf, sync::Arc};
+use football_application::{AiWorkspaceRequestRegistry, ApplicationService};
+use std::{path::PathBuf, sync::Arc};
 use tauri::Manager;
-use tokio::sync::Mutex;
 
 pub struct AppState {
     pub service: Arc<ApplicationService>,
@@ -16,7 +14,7 @@ pub struct AppState {
     pub runtime_log: Arc<RuntimeLogStore>,
     pub openai_profiles: Arc<OpenAiProfileStore>,
     pub workspace_state: Arc<WorkspaceStateStore>,
-    pub api_workspace_requests: Arc<Mutex<HashMap<String, CancellationToken>>>,
+    pub api_workspace_requests: AiWorkspaceRequestRegistry,
 }
 
 pub(crate) fn install<R: tauri::Runtime>(app: &mut tauri::App<R>) -> Result<(), std::io::Error> {
@@ -46,7 +44,7 @@ pub(crate) fn install<R: tauri::Runtime>(app: &mut tauri::App<R>) -> Result<(), 
         workspace_state: Arc::new(WorkspaceStateStore::new(
             config_dir.join("workspace-state.json"),
         )),
-        api_workspace_requests: Arc::new(Mutex::new(HashMap::new())),
+        api_workspace_requests: AiWorkspaceRequestRegistry::default(),
     });
     Ok(())
 }

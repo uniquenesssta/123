@@ -224,10 +224,10 @@
     },
     {
       "id": "tauri.api-requests",
-      "owner": "AppState.api_workspace_requests",
+      "owner": "crates/application/src/use_cases/ai_workspace/cancellation/registry.rs::AiWorkspaceRequestRegistry",
       "scope": "Tauri application",
       "writers": [
-        "src-tauri/src/commands/api_workspace.rs"
+        "crates/application/src/use_cases/ai_workspace/cancellation/registry.rs"
       ],
       "forbidden": [
         "src/**",

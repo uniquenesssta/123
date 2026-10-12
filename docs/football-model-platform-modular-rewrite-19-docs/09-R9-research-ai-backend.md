@@ -1151,7 +1151,7 @@ R9-09 Session Persistence已实施、`VERIFYING`，同一R9分支，基线06ecdd
 
 ## R9-10 Cancellation Registry
 
-状态：`READY`（09自身Windows全SUCCESS/DONE；用户已授权开始10，同一R9分支）
+状态：`VERIFYING`（10已实施，须自身精确Windows全SUCCESS；09 DONE、11 BLOCKED，同一R9分支）
 
 ### 1. 目标
 
@@ -1282,6 +1282,14 @@ crates/application/src/use_cases/ai_workspace/cancellation/
 - README 与实际状态一致。
 - `R09-10-cancellation-registry.md` 已创建并与实际变更、验证结果一致。
 - 阶段 `README.md` 已更新本任务状态和记录链接。
+
+---
+
+### R9-10 实施与门禁（2026-10-12）
+
+R9-10 Cancellation Registry已实施、`VERIFYING`，基线8d80ee6，同一R9分支。Application唯一Registry及不可克隆Lease管理活动ID/token，Tauri已切换且旧map/锁操作移除；重复ID不覆盖原token并在profile/会话副作用前拒绝，准备失败/网关结束/任务abort/unwind自动清理。原命令/DTO/错误文案/协议/profile/SQL事务/日志载荷/UI/模型/版本/依赖保持；仅新增两个Rust类型导出与明确取消生命周期修正。8新增Application unit待自身Windows，预期138/179与Gateway106/39；83/83静态、完整architecture/Rustfmt、逆切等价和8破坏探针通过。09 DONE、10 VERIFYING、11 BLOCKED、R9 IN_PROGRESS。
+
+完整4A/12M/0D、8生命周期unit与8破坏探针、唯一owner/入口切换、行为修正/工具/回退/未执行与最终新库待验见 [10节点记录](../modular-rewrite/R09-research-ai-backend/R09-10-cancellation-registry.md)。
 
 ---
 

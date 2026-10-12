@@ -31,6 +31,13 @@ const response = text("crates/research-gateway/src/response.rs");
 const application = text("crates/application/src/use_cases/ai_workspace/presets/mod.rs");
 const persistence = [text("crates/persistence-postgres/src/api_workspace.rs"), ...["catalog", "messages", "assistant_bundle", "generated_files", "usage"].map(name => text(`crates/persistence-postgres/src/adapters/ai_workspace/sessions/${name}.rs`))].join("\n");
 const commands = text("src-tauri/src/commands/api_workspace.rs");
+const requestRegistryPath = "crates/application/src/use_cases/ai_workspace/cancellation/registry.rs";
+const requestRegistry = text(requestRegistryPath);
+const requestRegistryExport = text("crates/application/src/use_cases/ai_workspace/cancellation/mod.rs");
+const requestRegistryTests = text("crates/application/src/use_cases/ai_workspace/cancellation/tests.rs");
+const appState = text("src-tauri/src/bootstrap/state.rs");
+const applicationExport = text("crates/application/src/lib.rs");
+const requestState = json("architecture/state-ownership.json").states.find(state => state.id === "tauri.api-requests");
 const registry = text("src-tauri/src/bootstrap/command_registry.rs");
 const client = text("src/api/client.ts");
 const page = text("src/pages/apiWorkspace.ts");
@@ -100,7 +107,36 @@ assert(send.includes("include_context"), "缺少可选只读上下文");
 assert(send.includes('"ai_chat"'), "AI问答运行日志未使用独立子系统");
 assert(send.includes('"message_chars"') && send.includes('"response_chars"'), "运行日志缺少文本长度");
 assert(!send.includes('"prompt"') && !send.includes('"schema"'), "运行日志不得记录问题正文或Schema");
-assert(commands.includes("CancellationToken::new"), "缺少请求取消令牌");
+assert(requestRegistry.includes("CancellationToken::new"), "Application注册表缺少请求取消令牌");
+assert(requestRegistryExport.includes("pub use registry::{AiWorkspaceRequestLease, AiWorkspaceRequestRegistry};"), "取消目录必须显式导出注册表与清理守卫");
+assert(!/\b(?:fn|struct|impl)\b/.test(requestRegistryExport), "取消目录出口不得承载运行时实现");
+assert(applicationExport.includes("use_cases::ai_workspace::cancellation::{") && applicationExport.includes("AiWorkspaceRequestLease, AiWorkspaceRequestRegistry"), "Application缺少取消生命周期出口");
+assert(appState.includes("pub api_workspace_requests: AiWorkspaceRequestRegistry") && appState.includes("api_workspace_requests: AiWorkspaceRequestRegistry::default()"), "AppState必须持有每个应用独立的Application注册表");
+assert(!appState.includes("HashMap") && !commands.includes("CancellationToken::new") && !/api_workspace_requests\s*\.lock\(/.test(commands), "Tauri不得保留取消map或直接锁操作");
+assert(requestState?.owner === `${requestRegistryPath}::AiWorkspaceRequestRegistry` && JSON.stringify(requestState.writers) === JSON.stringify([requestRegistryPath]), "取消状态唯一owner/writer登记不一致");
+const registrationIndex = send.indexOf(".register(request_id)");
+assert(registrationIndex >= 0 && registrationIndex < send.indexOf("gateway_for(Some(profile_id))") && registrationIndex < send.indexOf(".create_api_workspace_session("), "请求ID必须在profile/会话副作用之前注册");
+assert(/execute_plain_text\(&request, registration\.cancellation\(\)\)\s*\.await;\s*drop\(registration\);\s*let execution = match execution_result/.test(send), "网关必须使用守卫令牌，并在成功/失败响应处理前释放登记");
+const cancel = slice(commands, "pub async fn cancel_api_workspace_request", "pub async fn archive_api_workspace_session");
+assert(cancel.includes("let request_id = request_id.trim();") && cancel.includes('Err("AI问答请求 ID 不能为空".to_string())') && cancel.includes("Ok(state.api_workspace_requests.cancel(request_id))"), "取消命令必须保留trim/空ID错误并委托注册表");
+const registration = slice(requestRegistry, "pub fn register", "pub fn cancel");
+assert(registration.includes("requests.entry(request_id.to_owned())") && registration.includes('Entry::Occupied(_) => Err("AI问答请求 ID 已在使用")') && registration.includes("Entry::Vacant(entry) =>"), "重复请求ID不得替换活动令牌");
+assert(!registration.includes("requests.insert("), "禁止先覆盖map后拒绝重复ID");
+const cancellation = slice(requestRegistry, "pub fn cancel", "fn lock");
+assert(/let token = self\.lock\(\)\.get\(request_id\)\.cloned\(\);\s*if let Some\(token\) = token/.test(cancellation) && cancellation.includes("token.cancel();"), "取消必须在释放map锁后通知已有令牌");
+assert(requestRegistry.includes("sync::{Arc, Mutex, MutexGuard}") && !requestRegistry.includes(".await") && requestRegistry.includes("unwrap_or_else(|poisoned| poisoned.into_inner())"), "同步清理只能持有短时map锁并安全处理poison");
+assert(!/#\[derive\([^\]]*Clone[^\]]*\)\]\s*pub struct AiWorkspaceRequestLease/.test(requestRegistry) && !requestRegistry.includes("impl Clone for AiWorkspaceRequestLease"), "请求清理守卫必须保持唯一不可克隆的owner");
+assert(/impl Drop for AiWorkspaceRequestLease\s*\{\s*fn drop\(&mut self\)\s*\{\s*self\.registry\.lock\(\)\.remove\(&self\.request_id\);\s*self\.cancellation\.cancel\(\);/.test(requestRegistry), "所有退出路径必须先移除登记、释放锁，再取消令牌");
+for (const test of [
+  "registry_clones_share_requests_but_application_instances_are_isolated",
+  "duplicate_registration_preserves_the_running_requests_cancellation",
+  "cancellation_and_cleanup_leave_other_requests_active",
+  "completed_request_releases_its_id_for_a_fresh_uncancelled_request",
+  "preparation_error_releases_the_request_without_reaching_execution",
+  "aborting_a_request_task_cancels_its_token_and_releases_its_id",
+  "panic_unwinding_cleans_up_the_request_lease",
+  "concurrent_duplicate_ids_have_one_owner_and_one_cancellable_token",
+]) assert(requestRegistryTests.includes(`fn ${test}(`), `原Application unit target缺少生命周期覆盖：${test}`);
 assert(commands.includes("archive_api_workspace_session"), "缺少会话归档命令");
 
 assert(persistence.includes("WHERE session.status = 'active'"), "常用会话列表未过滤归档项");
