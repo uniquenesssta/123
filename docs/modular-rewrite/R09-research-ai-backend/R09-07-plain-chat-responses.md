@@ -1,6 +1,6 @@
 # R9-07 Plain Chat Responses
 
-状态：`VERIFYING`。用户2026-10-12“收尾06开始07”授权；原分支`rewrite/r9-research-ai-backend`。06精确代码d996a4d / Windows run38145691538、job114488432087全SUCCESS并DONE；07基线为仅文档收尾提交`9ddb27ac72af3fac2545ef4c1a1fb0968411e3b0`，源码与上述成功一致。07必须自身Windows通过，08～11仍BLOCKED，R9整体IN_PROGRESS。
+状态：`DONE`（07自身精确Windows全SUCCESS；下述VERIFYING为实施历史）。用户2026-10-12“收尾06开始07”授权；原分支`rewrite/r9-research-ai-backend`。06精确代码d996a4d / Windows run38145691538、job114488432087全SUCCESS并DONE；07基线为仅文档收尾提交`9ddb27ac72af3fac2545ef4c1a1fb0968411e3b0`，源码与上述成功一致。07必须自身Windows通过，08～11仍BLOCKED，R9整体IN_PROGRESS。
 
 ### 1. 目标
 
@@ -143,3 +143,11 @@ Context7先resolve /serde-rs/json，再查询json!借用字符串/数组的Value
 最小完整拆分仅迁Responses专属载荷和文本，不为共用拒绝/用量/重试复制实现，不提前实施08。新增第二个现有门禁读取迁后载荷，避免只检查旧client而漏检新字段。没有新增runner、target、测试框架、DB入口或依赖。
 
 同一分支推送原Windows CI，确认本项精确head/Windows job开始即停止轮询，预计20～30分钟；07 VERIFYING、08～11BLOCKED。真实PG、历史四项、账本并发回滚、有效XLSX、Windows Full、私有P4/P7固定回归，以及继承model.runs/0041删除风险继续最终封包新库待验；ignored、公共stub及静态指纹不计这些真实项目PASS。
+
+## R9-07 完成与08授权（2026-10-12）
+
+精确07提交3dbfde3c7246a08e91ad8bde6dd324a774f5a4a9 / tree38d8ce7f358eb45e8ce73e1414013b46f7462ced，[Windows run38155453893](https://github.com/uniquenesssta/123/actions/runs/38155453893) / job114517387791全SUCCESS，2026-10-12 00:54:23北京完成。Gateway98/98 unit、35/35 contract、Application126/126、Persistence175/175；前端/contracts/TypeScript/Vite/17视口、Rust fmt/Clippy -D warnings/workspace、Windows release/MSI/NSIS/启动及日志扫描通过。
+
+证据artifact11709500697，14,040,090字节，SHA-256 10c5237fa3aa7713212cfdcd7647b927bd61d60ed5f82878ce03b190c16f8c01；报告windows-acceptance-20261011-162740.json及同名.txt。07新增8unit/4contract全部执行通过。
+
+07 DONE；用户2026-10-12“收尾07开始08”授权08 READY，同一rewrite/r9-research-ai-backend分支，09～11 BLOCKED、R9 IN_PROGRESS。本次五既有文档[skip ci]收尾，源码树与上述成功一致，先前VERIFYING叙述为实施历史；未创建R9阶段完成记录。真实PG/历史四项/账本并发回滚/有效XLSX/Windows Full/私有固定回归及继承model.runs/0041删除风险仍最终封包新库待验，ignored和公共stub不计PASS。

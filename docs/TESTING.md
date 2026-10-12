@@ -518,3 +518,11 @@ R9-06 第三轮43dba5f / [Windows run38135480448](https://github.com/uniquenesss
 R9-07 Plain Chat Responses已实施、`VERIFYING`，基线9ddb27a，同一R9分支。普通Responses最小载荷/原始文本解码归plain_chat/responses/{request,response}.rs，两个mod只登记/显式导出；共用校验/预算/许可/取消/重试/provider/refusal/回退/用量/attempt仍原owner，原Chat分支留08。5A/11M/0D、16文件：新增上述四Rust模块及07节点记录；修改根README、TESTING、R9任务书/索引、Domain清单、lib/client/response、原contract及两个既有兼容门禁，整文件删除/移动无。原API/DTO/Schema/配置/profile/DB/UI/协议/依赖/错误/生产政策保持。原90unit/31contract全文保持，新增8unit/4contract，预期Gateway98/35、Application126/Persistence175待07自身Windows。83/83静态、完整architecture、Rustfmt、完整共用client/response逆迁移等价、字符串多重集/保护/171命令/46迁移18PG静态与7破坏探针通过。报告r907-static-checks.json/r907-architecture.log/r907-equivalence.json/r907-negative-probes.json/r907-review.json；真实文件、23职责与兼容细节见07记录。Context7/官方serde_json1.0.150源码/Mermaid/足球状态同步；Windows精确开始后停止轮询，预计20～30分钟。06 DONE、07 VERIFYING、08～11BLOCKED，R9 IN_PROGRESS；真实PG/历史四项/账本并发回滚/有效XLSX/Windows Full/私有固定回归及继承model.runs/0041风险仍最终封包新库待验，不把ignored/公共stub记PASS。
 
 原Public Platform CI的Windows Automated执行frontend/TypeScript/Vite/17视口、fmt/Clippy -D warnings/workspace tests、Windows release/MSI/NSIS/启动/日志。当前实跑仅源码静态与格式，98/35不可记动态PASS；没有执行非WindowsCargo或浏览器运行时。07契约沿用原targets/mocks，最小载荷与完整attempt、7类容错元数据/回退、5类provider/refusal优先、5类入口拒绝共18情形；预算耗尽夹具先满足正数配置，后台夹具先store=true。
+
+## R9-07 完成与08授权（2026-10-12）
+
+精确07提交3dbfde3c7246a08e91ad8bde6dd324a774f5a4a9 / tree38d8ce7f358eb45e8ce73e1414013b46f7462ced，[Windows run38155453893](https://github.com/uniquenesssta/123/actions/runs/38155453893) / job114517387791全SUCCESS，2026-10-12 00:54:23北京完成。Gateway98/98 unit、35/35 contract、Application126/126、Persistence175/175；前端/contracts/TypeScript/Vite/17视口、Rust fmt/Clippy -D warnings/workspace、Windows release/MSI/NSIS/启动及日志扫描通过。
+
+证据artifact11709500697，14,040,090字节，SHA-256 10c5237fa3aa7713212cfdcd7647b927bd61d60ed5f82878ce03b190c16f8c01；报告windows-acceptance-20261011-162740.json及同名.txt。07新增8unit/4contract全部执行通过。
+
+07 DONE；用户2026-10-12“收尾07开始08”授权08 READY，同一rewrite/r9-research-ai-backend分支，09～11 BLOCKED、R9 IN_PROGRESS。本次五既有文档[skip ci]收尾，源码树与上述成功一致，先前VERIFYING叙述为实施历史；未创建R9阶段完成记录。真实PG/历史四项/账本并发回滚/有效XLSX/Windows Full/私有固定回归及继承model.runs/0041删除风险仍最终封包新库待验，ignored和公共stub不计PASS。
