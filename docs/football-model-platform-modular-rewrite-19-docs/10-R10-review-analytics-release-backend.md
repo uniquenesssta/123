@@ -7,7 +7,7 @@
 
 ## 当前前置状态（2026-10-12）
 
-R9 全部节点及 Windows Automated 阶段出口 DONE；已验源码 b50d804 / Windows run38221009454 SUCCESS，R9 文档收尾 HEAD48618fed2d7ff7c2a4db831a037f227dc789f278。用户2026-10-12“开始R10-01”授权，唯一新分支 rewrite/r10-review-analytics-release-backend 已建立；R10 IN_PROGRESS，01自身精确838e39e / run38229119264 / job114743919870全SUCCESS并DONE；02精确1ad6e68 / Windows run38245932270/job114799659672全SUCCESS并DONE；用户“收尾02开始03”授权03已实施VERIFYING，04～13 BLOCKED；[03实际记录](../modular-rewrite/R10-review-analytics-release-backend/R10-03-review-engine-adapter.md)。[02实际记录](../modular-rewrite/R10-review-analytics-release-backend/R10-02-structured-match-facts.md)。实际 owner、测试与完整清单见 [01实施记录](../modular-rewrite/R10-review-analytics-release-backend/R10-01-review-package-workflow.md) 及 [本阶段索引](../modular-rewrite/R10-review-analytics-release-backend/README.md)。真实数据库/历史保护/账本并发回滚/XLSX/Full/私有回归及继承删除风险仍最终新库待验，R9成功不替代R10自身验收。
+R9 全部节点及 Windows Automated 阶段出口 DONE；已验源码 b50d804 / Windows run38221009454 SUCCESS，R9 文档收尾 HEAD48618fed2d7ff7c2a4db831a037f227dc789f278。用户2026-10-12“开始R10-01”授权，唯一新分支 rewrite/r10-review-analytics-release-backend 已建立；R10 IN_PROGRESS，01自身精确838e39e / run38229119264 / job114743919870全SUCCESS并DONE；02精确1ad6e68 / Windows run38245932270/job114799659672全SUCCESS并DONE；用户“收尾02开始03”授权03已实施，精确99b15ad / Windows run38259438025/job114845878326全SUCCESS并DONE，04～13 BLOCKED；[03实际记录](../modular-rewrite/R10-review-analytics-release-backend/R10-03-review-engine-adapter.md)。[02实际记录](../modular-rewrite/R10-review-analytics-release-backend/R10-02-structured-match-facts.md)。实际 owner、测试与完整清单见 [01实施记录](../modular-rewrite/R10-review-analytics-release-backend/R10-01-review-package-workflow.md) 及 [本阶段索引](../modular-rewrite/R10-review-analytics-release-backend/README.md)。真实数据库/历史保护/账本并发回滚/XLSX/Full/私有回归及继承删除风险仍最终新库待验，R9成功不替代R10自身验收。
 
 ## 1. 阶段目标
 
@@ -437,7 +437,7 @@ crates/application/src/use_cases/review/facts/
 
 ## R10-03 Review Engine Adapter
 
-状态：`VERIFYING`（已实施；84/84静态、完整架构、18Rustfmt与等价/8负向探针通过；5新增Application unit待自身精确Windows，01～02 DONE、04～13 BLOCKED）
+状态：`DONE`（99b15ad / Windows run38259438025 / job114845878326全SUCCESS；Application151/Persistence187/Gateway112 unit、41 contract及17视口/构建/打包/启动通过，01～03 DONE、04～13 BLOCKED）
 
 ### 1. 目标
 
@@ -1968,3 +1968,14 @@ docs/modular-rewrite/R10-review-analytics-release-backend/R10-stage-completion.m
 ```
 
 阶段完成记录必须引用本阶段每个节点记录，不得只重复任务书中的计划。缺少任何节点记录、真实文件总表、验证结果或回退信息时，本阶段不得标记为 `DONE`。
+
+
+## R10-03 精确 Windows 验收完成（2026-10-12）
+
+精确提交 `99b15ad261a178322231320ad9dc2f8af00ded8e` / tree `a52fd71ad9551a615720c49d9a69d3380d90361f`，[Public Platform CI run38259438025](https://github.com/uniquenesssta/123/actions/runs/38259438025) / Windows job114845878326 全 SUCCESS，run 于 2026-10-12 22:22:12 北京时间完成。实际 Application151/151、Persistence187/187、Gateway112/112 unit 和41/41 contract；新增5个普通入口测试及迁移的2个资料包生成测试均实际通过。前端契约、TypeScript、Vite、17视口、Rust fmt、locked Clippy all-targets -D warnings、完整workspace tests、Windows release/MSI/NSIS、客户端启动和运行日志扫描全部通过（7条记录、3个完成操作）。
+
+证据 artifact11753201967，14,041,892字节，SHA-256 `984de7735649121de192de496d5d92921feb46583e145ad7b8985d37a483ff04`；报告 `windows-acceptance-20261012-135927.json` 及同名.txt。验收对应上述03自身代码，不借用02结果。本次仅五份既有文档补齐验收状态并提交 [skip ci]，生产源码、测试、门禁、清单及依赖均与精确成功提交一致，不重复运行同源码Windows。
+
+03自身完整Windows通过，当前 DONE；01～03 DONE，04～13 BLOCKED，R10 IN_PROGRESS，继续唯一 `rewrite/r10-review-analytics-release-backend` 分支。用户重复“收尾02开始03”的范围已完成；本次没有新增04授权或进入04实施，没有创建R10阶段完成记录。此前03 VERIFYING、预期151和待Windows描述保留为实施历史，以本节和首部当前状态为准。
+
+真实PG、历史保护四项、不可变账本、并发/回滚、有效XLSX、Windows Full、私有P4/P7固定回归及继承的model.runs/0041删除风险仍最终封包新库待验；ignored、公开unavailable stub、静态指纹不计这些真实验收PASS。本轮未运行非Windows Cargo/check/Clippy/build/test、loopback或浏览器动态。

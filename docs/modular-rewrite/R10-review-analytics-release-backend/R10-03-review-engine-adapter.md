@@ -1,6 +1,6 @@
 # R10-03 Review Engine Adapter
 
-状态：`VERIFYING`。用户2026-10-12“收尾02开始03”授权；uniquenesssta/123 v0.23.0，唯一rewrite/r10-review-analytics-release-backend，基线93a008e007490b60eeb1ecbcd27c61d5fc12bb18。01～02自身精确Windows DONE；04～13 BLOCKED，R10 IN_PROGRESS。
+状态：`DONE`（自身精确Windows全SUCCESS；下述VERIFYING为实施历史）。用户2026-10-12“收尾02开始03”授权；uniquenesssta/123 v0.23.0，唯一rewrite/r10-review-analytics-release-backend，基线93a008e007490b60eeb1ecbcd27c61d5fc12bb18。01～03自身精确Windows DONE；04～13 BLOCKED，R10 IN_PROGRESS。
 
 ### 1. 目标
 
@@ -172,3 +172,16 @@ flowchart TD
 | M | scripts/verify-match-review-package.mjs |
 | M | scripts/verify-review-service.mjs |
 | M | scripts/verify-stage-a-architecture.mjs |
+
+
+## R10-03 精确 Windows 验收完成（2026-10-12）
+
+精确提交 `99b15ad261a178322231320ad9dc2f8af00ded8e` / tree `a52fd71ad9551a615720c49d9a69d3380d90361f`，[Public Platform CI run38259438025](https://github.com/uniquenesssta/123/actions/runs/38259438025) / Windows job114845878326 全 SUCCESS，run 于 2026-10-12 22:22:12 北京时间完成。实际 Application151/151、Persistence187/187、Gateway112/112 unit 和41/41 contract；新增5个普通入口测试及迁移的2个资料包生成测试均实际通过。前端契约、TypeScript、Vite、17视口、Rust fmt、locked Clippy all-targets -D warnings、完整workspace tests、Windows release/MSI/NSIS、客户端启动和运行日志扫描全部通过（7条记录、3个完成操作）。
+
+证据 artifact11753201967，14,041,892字节，SHA-256 `984de7735649121de192de496d5d92921feb46583e145ad7b8985d37a483ff04`；报告 `windows-acceptance-20261012-135927.json` 及同名.txt。验收对应上述03自身代码，不借用02结果。本次仅五份既有文档补齐验收状态并提交 [skip ci]，生产源码、测试、门禁、清单及依赖均与精确成功提交一致，不重复运行同源码Windows。
+
+03自身完整Windows通过，当前 DONE；01～03 DONE，04～13 BLOCKED，R10 IN_PROGRESS，继续唯一 `rewrite/r10-review-analytics-release-backend` 分支。用户重复“收尾02开始03”的范围已完成；本次没有新增04授权或进入04实施，没有创建R10阶段完成记录。此前03 VERIFYING、预期151和待Windows描述保留为实施历史，以本节和首部当前状态为准。
+
+真实PG、历史保护四项、不可变账本、并发/回滚、有效XLSX、Windows Full、私有P4/P7固定回归及继承的model.runs/0041删除风险仍最终封包新库待验；ignored、公开unavailable stub、静态指纹不计这些真实验收PASS。本轮未运行非Windows Cargo/check/Clippy/build/test、loopback或浏览器动态。
+
+本次验收补记5M/0A/0D，无移动/重命名：根README、TESTING、R10任务书、阶段README及本节点。03实施相对93a008e的11A/18M/1D、旧职责清理及基线回退记录保持。GitHub核对精确run/job/log/artifact与当前分支；沿用已核实的Mermaid Chart真实生成事务图，不变更图中链路；Create State保存当前验收状态，未产生新的API兼容问题。
