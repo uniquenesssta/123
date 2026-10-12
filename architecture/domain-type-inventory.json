@@ -24,13 +24,13 @@
     "targetPublicExportPolicy": "explicit re-export only"
   },
   "sourceDigest": "217241ac243726a5ab6805a7f169e222b97e78c7c971749a5904714af673ebdd",
-  "rustUsageDigest": "8d50c3635998f66d1a26a5d4da8312d58f45339ebf4ae15e438301273098fcca",
+  "rustUsageDigest": "d5856f6a851ac8fb95e9dcb3ed87ba63e9b53b1da405f6c2d6f65d84f753f56c",
   "summary": {
     "typeCount": 365,
     "publicCompatibilityTypeCount": 365,
     "internalTypeCount": 0,
     "domainSourceFileCount": 129,
-    "scannedRustFileCount": 1211,
+    "scannedRustFileCount": 1217,
     "databaseMappedTypeCount": 301,
     "byTargetModule": {
       "ai_workspace": 16,
@@ -22669,10 +22669,12 @@
         "crates/domain/tests/serde_contracts/r2_06_module_paths.rs"
       ],
       "externalCallers": [
-        "crates/persistence-postgres/src/postmatch.rs"
+        "crates/persistence-postgres/src/adapters/postmatch/provider_score/mapping.rs",
+        "crates/persistence-postgres/src/adapters/postmatch/provider_score/read.rs"
       ],
       "databaseMappings": [
-        "crates/persistence-postgres/src/postmatch.rs"
+        "crates/persistence-postgres/src/adapters/postmatch/provider_score/mapping.rs",
+        "crates/persistence-postgres/src/adapters/postmatch/provider_score/read.rs"
       ]
     },
     {

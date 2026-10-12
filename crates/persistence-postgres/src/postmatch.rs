@@ -2,12 +2,10 @@ use super::{sha256_json, write_audit_event, PersistenceError, PersistenceResult,
 use football_analytics_engine::calculate_analytics;
 use football_domain::{
     EvaluationSample, PostmatchDriftFindingRecord, PostmatchDriftRunRecord,
-    PostmatchMonitoringRequest, PostmatchOverview, ProviderScoreSnapshotRecord,
-    POSTMATCH_MONITORING_VERSION,
+    PostmatchMonitoringRequest, PostmatchOverview, POSTMATCH_MONITORING_VERSION,
 };
 use serde_json::{json, Value};
 use sqlx::Row;
-use std::collections::BTreeMap;
 use uuid::Uuid;
 
 pub(crate) const FORMAL_HORIZONS: [&str; 4] = ["T-N", "T-24h", "T-6h", "T-1h"];
@@ -108,111 +106,6 @@ impl PostgresStore {
                 "{model_version_id}:{competition_profile_id}:{parameter_set_id}:{horizon}"
             ),
         })
-    }
-
-    async fn refresh_provider_scores_for_partition(
-        &self,
-        partition: &PostmatchPartition,
-    ) -> PersistenceResult<()> {
-        let rows = sqlx::query(
-            r#"
-            SELECT item.provider_id, decision.id AS decision_id, decision.verdict,
-                   decision.accuracy_score, decision.reliability_score,
-                   item.timeliness_score, decision.decision_fingerprint
-            FROM review.evidence_scoring_items item
-            JOIN review.postmatch_settlements settlement ON settlement.id=item.settlement_id
-            JOIN review.evidence_scoring_decisions decision ON decision.item_id=item.id
-            WHERE settlement.competition_id=$1
-              AND settlement.competition_profile_id=$2
-              AND settlement.model_version_id=$3
-              AND settlement.parameter_set_id=$4
-              AND settlement.horizon=$5
-              AND item.provider_id IS NOT NULL
-            ORDER BY item.provider_id, decision.id
-            "#,
-        )
-        .bind(partition.competition_id)
-        .bind(partition.competition_profile_id)
-        .bind(partition.model_version_id)
-        .bind(partition.parameter_set_id)
-        .bind(&partition.horizon)
-        .fetch_all(&self.pool)
-        .await?;
-        let mut groups: BTreeMap<Uuid, ProviderAggregate> = BTreeMap::new();
-        for row in rows {
-            let provider_id: Uuid = row.try_get("provider_id")?;
-            let entry = groups.entry(provider_id).or_default();
-            let verdict: String = row.try_get("verdict")?;
-            match verdict.as_str() {
-                "correct" => entry.correct += 1,
-                "partial" => entry.partial += 1,
-                "incorrect" => entry.incorrect += 1,
-                _ => entry.not_verifiable += 1,
-            }
-            if let Some(value) = row.try_get::<Option<f64>, _>("accuracy_score")? {
-                entry.accuracy.push(value);
-            }
-            if let Some(value) = row.try_get::<Option<f64>, _>("reliability_score")? {
-                entry.reliability.push(value);
-            }
-            entry.timeliness.push(row.try_get("timeliness_score")?);
-            entry
-                .decision_fingerprints
-                .push(row.try_get("decision_fingerprint")?);
-        }
-        for (provider_id, aggregate) in groups {
-            let accuracy_mean = mean(&aggregate.accuracy).unwrap_or(0.0);
-            let timeliness_mean = mean(&aggregate.timeliness).unwrap_or(0.0);
-            let reliability_mean = mean(&aggregate.reliability).unwrap_or(0.0);
-            let weighted_score = if aggregate.accuracy.is_empty() {
-                0.0
-            } else {
-                round6(accuracy_mean * 0.60 + timeliness_mean * 0.15 + reliability_mean * 0.25)
-            };
-            let decision_set_sha256 = sha256_json(&aggregate.decision_fingerprints)?;
-            let snapshot_key = format!(
-                "{}:{}:{}:{}",
-                provider_id,
-                partition.partition_key,
-                decision_set_sha256,
-                POSTMATCH_MONITORING_VERSION
-            );
-            sqlx::query(
-                r#"
-                INSERT INTO analytics.provider_score_snapshots (
-                    id, provider_id, scope_key, competition_id, competition_profile_id,
-                    model_version_id, parameter_set_id, horizon, sample_size,
-                    correct_count, partial_count, incorrect_count, not_verifiable_count,
-                    accuracy_mean, timeliness_mean, reliability_mean, weighted_score,
-                    decision_set_sha256, snapshot_key, calculation_version
-                ) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18,$19,$20)
-                ON CONFLICT (snapshot_key) DO NOTHING
-                "#,
-            )
-            .bind(Uuid::new_v4())
-            .bind(provider_id)
-            .bind(&partition.partition_key)
-            .bind(partition.competition_id)
-            .bind(partition.competition_profile_id)
-            .bind(partition.model_version_id)
-            .bind(partition.parameter_set_id)
-            .bind(&partition.horizon)
-            .bind(aggregate.total() as i64)
-            .bind(aggregate.correct as i64)
-            .bind(aggregate.partial as i64)
-            .bind(aggregate.incorrect as i64)
-            .bind(aggregate.not_verifiable as i64)
-            .bind(round6(accuracy_mean))
-            .bind(round6(timeliness_mean))
-            .bind(round6(reliability_mean))
-            .bind(weighted_score)
-            .bind(&decision_set_sha256)
-            .bind(snapshot_key)
-            .bind(POSTMATCH_MONITORING_VERSION)
-            .execute(&self.pool)
-            .await?;
-        }
-        Ok(())
     }
 
     async fn refresh_drift_for_partition(
@@ -384,33 +277,6 @@ impl PostgresStore {
         Ok(())
     }
 
-    async fn list_provider_scores(
-        &self,
-        limit: u32,
-    ) -> PersistenceResult<Vec<ProviderScoreSnapshotRecord>> {
-        let rows = sqlx::query(
-            r#"
-            SELECT DISTINCT ON (score.provider_id, score.scope_key)
-                   score.id, score.provider_id, provider.name AS provider_name,
-                   score.scope_key, score.competition_id, score.competition_profile_id,
-                   score.model_version_id, score.parameter_set_id, score.horizon,
-                   score.sample_size, score.correct_count,
-                   score.partial_count, score.incorrect_count, score.not_verifiable_count,
-                   score.accuracy_mean, score.timeliness_mean, score.reliability_mean,
-                   score.weighted_score, score.decision_set_sha256,
-                   score.calculation_version, score.generated_at
-            FROM analytics.provider_score_snapshots score
-            JOIN catalog.data_providers provider ON provider.id=score.provider_id
-            ORDER BY score.provider_id, score.scope_key, score.generated_at DESC, score.id DESC
-            LIMIT $1
-            "#,
-        )
-        .bind(i64::from(limit.clamp(1, 500)))
-        .fetch_all(&self.pool)
-        .await?;
-        rows.iter().map(provider_score_from_row).collect()
-    }
-
     async fn list_postmatch_drift_runs(
         &self,
         limit: u32,
@@ -475,62 +341,13 @@ impl PostgresStore {
 }
 
 #[derive(Debug)]
-struct PostmatchPartition {
-    competition_id: Uuid,
-    competition_profile_id: Uuid,
-    model_version_id: Uuid,
-    parameter_set_id: Uuid,
-    horizon: String,
-    partition_key: String,
-}
-
-#[derive(Debug, Default)]
-struct ProviderAggregate {
-    correct: usize,
-    partial: usize,
-    incorrect: usize,
-    not_verifiable: usize,
-    accuracy: Vec<f64>,
-    timeliness: Vec<f64>,
-    reliability: Vec<f64>,
-    decision_fingerprints: Vec<String>,
-}
-
-impl ProviderAggregate {
-    fn total(&self) -> usize {
-        self.correct + self.partial + self.incorrect + self.not_verifiable
-    }
-}
-
-fn provider_score_from_row(
-    row: &sqlx::postgres::PgRow,
-) -> PersistenceResult<ProviderScoreSnapshotRecord> {
-    Ok(ProviderScoreSnapshotRecord {
-        id: row.try_get("id")?,
-        provider_id: row.try_get("provider_id")?,
-        provider_name: row.try_get("provider_name")?,
-        scope_key: row.try_get("scope_key")?,
-        competition_id: row.try_get("competition_id")?,
-        competition_profile_id: row.try_get("competition_profile_id")?,
-        model_version_id: row.try_get("model_version_id")?,
-        parameter_set_id: row.try_get("parameter_set_id")?,
-        horizon: row.try_get("horizon")?,
-        sample_size: non_negative_u64(row.try_get("sample_size")?, "供应商样本")?,
-        correct_count: non_negative_u64(row.try_get("correct_count")?, "正确证据数量")?,
-        partial_count: non_negative_u64(row.try_get("partial_count")?, "部分正确证据数量")?,
-        incorrect_count: non_negative_u64(row.try_get("incorrect_count")?, "错误证据数量")?,
-        not_verifiable_count: non_negative_u64(
-            row.try_get("not_verifiable_count")?,
-            "不可验证证据数量",
-        )?,
-        accuracy_mean: row.try_get("accuracy_mean")?,
-        timeliness_mean: row.try_get("timeliness_mean")?,
-        reliability_mean: row.try_get("reliability_mean")?,
-        weighted_score: row.try_get("weighted_score")?,
-        decision_set_sha256: row.try_get("decision_set_sha256")?,
-        calculation_version: row.try_get("calculation_version")?,
-        generated_at: row.try_get("generated_at")?,
-    })
+pub(crate) struct PostmatchPartition {
+    pub(crate) competition_id: Uuid,
+    pub(crate) competition_profile_id: Uuid,
+    pub(crate) model_version_id: Uuid,
+    pub(crate) parameter_set_id: Uuid,
+    pub(crate) horizon: String,
+    pub(crate) partition_key: String,
 }
 
 fn drift_finding_from_row(
@@ -568,10 +385,6 @@ fn validate_horizon(value: &str) -> PersistenceResult<()> {
 
 pub(crate) fn non_negative_u64(value: i64, label: &str) -> PersistenceResult<u64> {
     u64::try_from(value).map_err(|_| PersistenceError::InvalidState(format!("{label}不能为负数")))
-}
-
-fn mean(values: &[f64]) -> Option<f64> {
-    (!values.is_empty()).then(|| values.iter().sum::<f64>() / values.len() as f64)
 }
 
 pub(crate) fn round6(value: f64) -> f64 {

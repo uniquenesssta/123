@@ -7,7 +7,7 @@
 
 ## 当前前置状态（2026-10-13）
 
-R9 全部节点及 Windows Automated 阶段出口 DONE；已验源码 b50d804 / Windows run38221009454 SUCCESS，R9 文档收尾 HEAD48618fed2d7ff7c2a4db831a037f227dc789f278。用户2026-10-12“开始R10-01”授权，唯一新分支 rewrite/r10-review-analytics-release-backend 已建立；R10 IN_PROGRESS，01自身精确838e39e / run38229119264 / job114743919870全SUCCESS并DONE；02精确1ad6e68 / Windows run38245932270/job114799659672全SUCCESS并DONE；用户“收尾02开始03”授权03已实施，精确99b15ad / Windows run38259438025/job114845878326全SUCCESS并DONE，04精确221d211 / Windows run38271387412/job114886215505全SUCCESS并DONE；05精确fe3529f / Windows run38277864089/job114907643831全SUCCESS并DONE；06精确1ed6dbe / Windows run38290328302/job114948593892全SUCCESS并DONE；用户“收尾06开始07”授权07 READY，08～13 BLOCKED；[06实际记录](../modular-rewrite/R10-review-analytics-release-backend/R10-06-evidence-scoring.md)；[05实际记录](../modular-rewrite/R10-review-analytics-release-backend/R10-05-postmatch-settlement.md)；[04实际记录](../modular-rewrite/R10-review-analytics-release-backend/R10-04-ability-candidate-transaction.md)；[03实际记录](../modular-rewrite/R10-review-analytics-release-backend/R10-03-review-engine-adapter.md)。[02实际记录](../modular-rewrite/R10-review-analytics-release-backend/R10-02-structured-match-facts.md)。实际 owner、测试与完整清单见 [01实施记录](../modular-rewrite/R10-review-analytics-release-backend/R10-01-review-package-workflow.md) 及 [本阶段索引](../modular-rewrite/R10-review-analytics-release-backend/README.md)。真实数据库/历史保护/账本并发回滚/XLSX/Full/私有回归及继承删除风险仍最终新库待验，R9成功不替代R10自身验收。
+R9 全部节点及 Windows Automated 阶段出口 DONE；已验源码 b50d804 / Windows run38221009454 SUCCESS，R9 文档收尾 HEAD48618fed2d7ff7c2a4db831a037f227dc789f278。用户2026-10-12“开始R10-01”授权，唯一新分支 rewrite/r10-review-analytics-release-backend 已建立；R10 IN_PROGRESS，01自身精确838e39e / run38229119264 / job114743919870全SUCCESS并DONE；02精确1ad6e68 / Windows run38245932270/job114799659672全SUCCESS并DONE；用户“收尾02开始03”授权03已实施，精确99b15ad / Windows run38259438025/job114845878326全SUCCESS并DONE，04精确221d211 / Windows run38271387412/job114886215505全SUCCESS并DONE；05精确fe3529f / Windows run38277864089/job114907643831全SUCCESS并DONE；06精确1ed6dbe / Windows run38290328302/job114948593892全SUCCESS并DONE；用户“收尾06开始07”授权07已实施VERIFYING，08～13 BLOCKED；[07实际记录](../modular-rewrite/R10-review-analytics-release-backend/R10-07-provider-score.md)；[06实际记录](../modular-rewrite/R10-review-analytics-release-backend/R10-06-evidence-scoring.md)；[05实际记录](../modular-rewrite/R10-review-analytics-release-backend/R10-05-postmatch-settlement.md)；[04实际记录](../modular-rewrite/R10-review-analytics-release-backend/R10-04-ability-candidate-transaction.md)；[03实际记录](../modular-rewrite/R10-review-analytics-release-backend/R10-03-review-engine-adapter.md)。[02实际记录](../modular-rewrite/R10-review-analytics-release-backend/R10-02-structured-match-facts.md)。实际 owner、测试与完整清单见 [01实施记录](../modular-rewrite/R10-review-analytics-release-backend/R10-01-review-package-workflow.md) 及 [本阶段索引](../modular-rewrite/R10-review-analytics-release-backend/README.md)。真实数据库/历史保护/账本并发回滚/XLSX/Full/私有回归及继承删除风险仍最终新库待验，R9成功不替代R10自身验收。
 
 ## 1. 阶段目标
 
@@ -973,7 +973,7 @@ crates/application/src/use_cases/postmatch/evidence-scoring/
 
 ## R10-07 Provider Score
 
-状态：`READY`（06自身精确完整Windows DONE；用户2026-10-13“收尾06开始07”授权，同一R10分支，08～13 BLOCKED）
+状态：`VERIFYING`（84/84静态、完整架构、8Rustfmt、14等价与10负向通过；9PG unit待自身Windows，预期App165/PG216，01～06 DONE、08～13 BLOCKED）
 
 ### 1. 目标
 
@@ -2000,3 +2000,10 @@ R10-05 Postmatch Settlement已实施 `VERIFYING`，基线96ef21d，继续唯一r
 R10-06 Evidence Scoring已实施 `VERIFYING`，基线18f7264，继续唯一rewrite/r10-review-analytics-release-backend。App两证据用例迁入evidence_scoring并切Service/删旧路径；PG查询/映射/人工决定/评分与原队列收拢唯一owner，结算仍借用原tx调用同一队列方法。原SQL/错误/JSON、说明trim后UTF-8字节门槛、评分权重/别名、不可验证NULL、不可变决定/审计/提交后回读保持；不自动判定/晋升参数。新增6App/8PG unit待Windows，预期Application165 / Persistence207 / Gateway112 unit、41 contract；84/84静态、完整架构、16 Rustfmt、16等价及8负向通过。01～05自身Windows DONE，06 VERIFYING、07～13 BLOCKED、R10 IN_PROGRESS；真实PG/历史四项/账本并发回滚/有效XLSX/Windows Full/私有P4P7回归及继承model.runs/0041删除风险仍最终新库待验。
 
 参考evidence-scoring采用Rust语义evidence_scoring；实际PG整评分链与05原队列同责任迁入、原事务调用不变。12A/13M/3D、23字段/字节语义/全部兼容/风险/回退见[06记录](../modular-rewrite/R10-review-analytics-release-backend/R10-06-evidence-scoring.md)。未启动07～13。
+
+
+## R10-07 实施订正与当前边界（2026-10-13）
+
+R10-07 Provider Score已实施 `VERIFYING`，基线85ecf15，继续唯一rewrite/r10-review-analytics-release-backend。实际PG供应商聚合、原评分/指纹与快照写入、最新读取和字段映射归provider_score唯一owner；App综合监控/两原Ports不变，不为参考App目录虚构供应商入口。原SQL五分区过滤/BTreeMap与决定顺序、60/15/25原公式、空准确率零分、未先舍入的均值、原指纹/版本/快照键及逐组pool幂等写入保持；监控仍供应商→漂移→总览，没有新事务/审计或自动参数晋升。新增9原PG unit待自身Windows，预期Persistence216 / Application165 / Gateway112 unit、41 contract；84/84静态、完整架构、8 Rustfmt、14等价及10负向通过。01～06自身Windows DONE，07 VERIFYING、08～13 BLOCKED、R10 IN_PROGRESS；真实PG/历史四项/账本并发回滚/有效XLSX/Windows Full/私有P4P7回归及继承model.runs/0041删除风险仍最终新库待验。
+
+参考App provider-score目录与真实来源不同：仅有综合Monitoring Port，实际PG评分职责收拢provider_score，App保持原综合入口/契约。7A/9M/0D、23字段/全部兼容/共享分区内部可见性/风险/回退见[07记录](../modular-rewrite/R10-review-analytics-release-backend/R10-07-provider-score.md)。未启动08～13。
