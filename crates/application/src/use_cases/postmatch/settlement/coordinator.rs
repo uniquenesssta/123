@@ -7,7 +7,7 @@ use football_domain::{
     PostmatchSettlementRecord,
 };
 
-pub(crate) async fn execute<P>(
+pub(crate) async fn settle_postmatch_review<P>(
     port: &P,
     draft: PostmatchSettlementDraft,
 ) -> ApplicationResult<PostmatchSettlementRecord>

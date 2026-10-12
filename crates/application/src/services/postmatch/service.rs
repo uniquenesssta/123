@@ -28,7 +28,7 @@ impl PostmatchService {
     where
         P: PostmatchSettlementPort + ?Sized,
     {
-        postmatch::postmatch_settlement_readiness::execute(port, match_review_id).await
+        postmatch::settlement::postmatch_settlement_readiness(port, match_review_id).await
     }
 
     pub(crate) async fn settle_postmatch_review<P>(
@@ -39,7 +39,7 @@ impl PostmatchService {
     where
         P: PostmatchSettlementPort + MatchReviewPackageStatePort + ?Sized,
     {
-        postmatch::settle_postmatch_review::execute(port, draft).await
+        postmatch::settlement::settle_postmatch_review(port, draft).await
     }
 
     pub(crate) async fn list_postmatch_settlements<P>(
@@ -50,7 +50,7 @@ impl PostmatchService {
     where
         P: PostmatchSettlementPort + ?Sized,
     {
-        postmatch::list_postmatch_settlements::execute(port, limit).await
+        postmatch::settlement::list_postmatch_settlements(port, limit).await
     }
 
     pub(crate) async fn list_evidence_scoring_items<P>(

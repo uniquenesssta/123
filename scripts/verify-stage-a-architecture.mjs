@@ -23,7 +23,7 @@ const application = [
 ].join("\n");
 const postmatchApplication = [
   read("crates/application/src/services/postmatch/facade.rs"),
-  read("crates/application/src/use_cases/postmatch/settle_postmatch_review/mod.rs"),
+  read("crates/application/src/use_cases/postmatch/settlement/coordinator.rs"),
 ].join("\n");
 const persistence = read("crates/persistence-postgres/src/adapters/review/package_workflow/repository.rs");
 const commands = read("src-tauri/src/commands/postmatch.rs");

@@ -5,9 +5,9 @@
 > 后续阶段：`R11`  
 > 本文档是唯一执行依据之一；必须与 `00-总体架构与前23节.md` 同时适用。
 
-## 当前前置状态（2026-10-12）
+## 当前前置状态（2026-10-13）
 
-R9 全部节点及 Windows Automated 阶段出口 DONE；已验源码 b50d804 / Windows run38221009454 SUCCESS，R9 文档收尾 HEAD48618fed2d7ff7c2a4db831a037f227dc789f278。用户2026-10-12“开始R10-01”授权，唯一新分支 rewrite/r10-review-analytics-release-backend 已建立；R10 IN_PROGRESS，01自身精确838e39e / run38229119264 / job114743919870全SUCCESS并DONE；02精确1ad6e68 / Windows run38245932270/job114799659672全SUCCESS并DONE；用户“收尾02开始03”授权03已实施，精确99b15ad / Windows run38259438025/job114845878326全SUCCESS并DONE，04精确221d211 / Windows run38271387412/job114886215505全SUCCESS并DONE；用户2026-10-13“收尾04开始05”授权05 READY，06～13 BLOCKED；[04实际记录](../modular-rewrite/R10-review-analytics-release-backend/R10-04-ability-candidate-transaction.md)；[03实际记录](../modular-rewrite/R10-review-analytics-release-backend/R10-03-review-engine-adapter.md)。[02实际记录](../modular-rewrite/R10-review-analytics-release-backend/R10-02-structured-match-facts.md)。实际 owner、测试与完整清单见 [01实施记录](../modular-rewrite/R10-review-analytics-release-backend/R10-01-review-package-workflow.md) 及 [本阶段索引](../modular-rewrite/R10-review-analytics-release-backend/README.md)。真实数据库/历史保护/账本并发回滚/XLSX/Full/私有回归及继承删除风险仍最终新库待验，R9成功不替代R10自身验收。
+R9 全部节点及 Windows Automated 阶段出口 DONE；已验源码 b50d804 / Windows run38221009454 SUCCESS，R9 文档收尾 HEAD48618fed2d7ff7c2a4db831a037f227dc789f278。用户2026-10-12“开始R10-01”授权，唯一新分支 rewrite/r10-review-analytics-release-backend 已建立；R10 IN_PROGRESS，01自身精确838e39e / run38229119264 / job114743919870全SUCCESS并DONE；02精确1ad6e68 / Windows run38245932270/job114799659672全SUCCESS并DONE；用户“收尾02开始03”授权03已实施，精确99b15ad / Windows run38259438025/job114845878326全SUCCESS并DONE，04精确221d211 / Windows run38271387412/job114886215505全SUCCESS并DONE；用户2026-10-13“收尾04开始05”授权05已实施VERIFYING，06～13 BLOCKED；[05实际记录](../modular-rewrite/R10-review-analytics-release-backend/R10-05-postmatch-settlement.md)；[04实际记录](../modular-rewrite/R10-review-analytics-release-backend/R10-04-ability-candidate-transaction.md)；[03实际记录](../modular-rewrite/R10-review-analytics-release-backend/R10-03-review-engine-adapter.md)。[02实际记录](../modular-rewrite/R10-review-analytics-release-backend/R10-02-structured-match-facts.md)。实际 owner、测试与完整清单见 [01实施记录](../modular-rewrite/R10-review-analytics-release-backend/R10-01-review-package-workflow.md) 及 [本阶段索引](../modular-rewrite/R10-review-analytics-release-backend/README.md)。真实数据库/历史保护/账本并发回滚/XLSX/Full/私有回归及继承删除风险仍最终新库待验，R9成功不替代R10自身验收。
 
 ## 1. 阶段目标
 
@@ -705,7 +705,7 @@ crates/persistence-postgres/src/adapters/review/ability_candidate_transaction/
 
 ## R10-05 Postmatch Settlement
 
-状态：`READY`（04自身完整Windows已DONE；用户2026-10-13“收尾04开始05”授权，同一R10分支，06～13 BLOCKED）
+状态：`VERIFYING`（已实施；84/84静态、完整架构、18Rustfmt与12等价/8负向通过；8App/4PG unit待自身Windows，预期159/199，01～04 DONE，06～13 BLOCKED）
 
 ### 1. 目标
 
@@ -1986,3 +1986,10 @@ docs/modular-rewrite/R10-review-analytics-release-backend/R10-stage-completion.m
 R10-04 Ability Candidate Transaction已实施 `VERIFYING`，基线aa24f5a，继续唯一rewrite/r10-review-analytics-release-backend。PG候选列表/详情/行映射/人工决策事务迁入ability_candidate_transaction唯一模块；原状态、处理人归一化、0.01过期判断和四状态解码提取并复用，旧root四职责删除。Application/Ports/公开PostgresStore签名、全部SQL/错误/JSON载荷、候选锁与单事务审计/提交后回读保持；拒绝不写能力观察，不自动接受或晋升参数。新增8原PG unit待Windows，预期Persistence195 / Application151 / Gateway112 unit、41 contract；84/84静态、完整架构、8 Rustfmt、13等价核对与8破坏探针通过。01～03自身Windows DONE，04 VERIFYING、05～13 BLOCKED、R10 IN_PROGRESS；真实PG/历史四项/账本并发回滚/有效XLSX/Windows Full/私有P4P7回归及继承model.runs/0041删除风险仍最终新库待验。
 
 参考目录仅要求实际候选责任收拢，原Application透传不做机械迁移。唯一实际事务、读/行映射/纯门禁，7A/8M/0D及全部23字段/原并发边界见[04记录](../modular-rewrite/R10-review-analytics-release-backend/R10-04-ability-candidate-transaction.md)；无新runner/target/workflow/数据库专项入口或迁移。
+
+
+## R10-05 实施订正与当前边界（2026-10-13）
+
+R10-05 Postmatch Settlement已实施 `VERIFYING`，基线96ef21d，继续唯一rewrite/r10-review-analytics-release-backend。Application结算/readiness/列表迁入settlement唯一模块，三个旧用例删除；PG15原生产职责、3上下文类型及1原时效unit迁入具名结算适配器，证据队列/正式样本继续借用同一原事务。全部SQL/错误/JSON、指纹/幂等键、原readiness、既有返回/插入冲突路径及提交后回读保持，原资料包mark_settled仍独立Port；不自动接受候选或晋升参数。新增8 Application/4 PG unit待Windows，预期Application159 / Persistence199 / Gateway112 unit、41 contract；84/84静态、完整架构、18 Rustfmt、12等价与8负向通过。01～04自身Windows DONE，05 VERIFYING、06～13 BLOCKED、R10 IN_PROGRESS；真实PG/历史四项/账本并发回滚/有效XLSX/Windows Full/私有P4P7回归及继承model.runs/0041删除风险仍最终新库待验。
+
+参考App目录扩展为实际完整结算链：原事务的证据队列/正式样本支持同步迁移，原评分判定/供应商/漂移正文不变。实际15A/14M/3D、23字段/完整兼容/异常/已有与冲突路径差异见[05记录](../modular-rewrite/R10-review-analytics-release-backend/R10-05-postmatch-settlement.md)。无新框架、入口或迁移，06～13未启动。

@@ -2,7 +2,7 @@
 
 ## 当前阶段状态
 
-`IN_PROGRESS`。用户2026-10-12“开始R10-01”授权；从R9文档收尾HEAD `48618fed2d7ff7c2a4db831a037f227dc789f278` 建立唯一阶段分支 `rewrite/r10-review-analytics-release-backend`。01自身精确Windows run38229119264/job114743919870全SUCCESS并DONE；02自身1ad6e68 / Windows run38245932270/job114799659672全SUCCESS并DONE；用户“收尾02开始03”授权03已实施；03自身99b15ad / Windows run38259438025/job114845878326全SUCCESS并DONE，04自身221d211 / Windows run38271387412/job114886215505全SUCCESS并DONE；用户“收尾04开始05”授权05 READY，06～13 BLOCKED。
+`IN_PROGRESS`。用户2026-10-12“开始R10-01”授权；从R9文档收尾HEAD `48618fed2d7ff7c2a4db831a037f227dc789f278` 建立唯一阶段分支 `rewrite/r10-review-analytics-release-backend`。01自身精确Windows run38229119264/job114743919870全SUCCESS并DONE；02自身1ad6e68 / Windows run38245932270/job114799659672全SUCCESS并DONE；用户“收尾02开始03”授权03已实施；03自身99b15ad / Windows run38259438025/job114845878326全SUCCESS并DONE，04自身221d211 / Windows run38271387412/job114886215505全SUCCESS并DONE；用户“收尾04开始05”授权05已实施VERIFYING，06～13 BLOCKED。
 
 ## 前置基线与依据
 
@@ -16,7 +16,7 @@
 | R10-02 | [Structured Match Facts](R10-02-structured-match-facts.md) | DONE · 自身精确Windows全SUCCESS |
 | R10-03 | [Review Engine Adapter](R10-03-review-engine-adapter.md) | DONE · 自身精确Windows全SUCCESS |
 | R10-04 | [Ability Candidate Transaction](R10-04-ability-candidate-transaction.md) | DONE · 自身精确Windows全SUCCESS |
-| R10-05 | Postmatch Settlement | READY · 用户已授权 |
+| R10-05 | [Postmatch Settlement](R10-05-postmatch-settlement.md) | VERIFYING · 已实施，静态通过，自身Windows待验 |
 | R10-06 | Evidence Scoring | BLOCKED |
 | R10-07 | Provider Score | BLOCKED |
 | R10-08 | Drift Monitoring | BLOCKED |
@@ -94,3 +94,10 @@ R10-04 Ability Candidate Transaction已实施 `VERIFYING`，基线aa24f5a，继�
 证据artifact11758811423，14,041,670字节，SHA-256 `296e86e05c1a649bfab6cda6cb9a938f8b83d75c4f2b19c71d80a3ad404fec59`。04自身完整成功后DONE；用户2026-10-13“收尾04开始05”授权05 Postmatch Settlement READY，继续唯一rewrite/r10-review-analytics-release-backend，06～13 BLOCKED，R10 IN_PROGRESS。本次只五份既有文档收尾[skip ci]，源码同精确成功提交，后续05须自身完整Windows证据。此前04 VERIFYING与预期计数保留为实施历史。
 
 真实PG/历史保护四项/不可变账本/并发回滚/有效XLSX/Windows Full/私有P4/P7固定回归及继承model.runs/0041删除风险仍最终封包新库待验；ignored、公开unavailable stub和静态指纹不计这些真实PASS。无R10阶段完成记录。
+
+
+## R10-05 实际边界与继续位置
+
+R10-05 Postmatch Settlement已实施 `VERIFYING`，基线96ef21d，继续唯一rewrite/r10-review-analytics-release-backend。Application结算/readiness/列表迁入settlement唯一模块，三个旧用例删除；PG15原生产职责、3上下文类型及1原时效unit迁入具名结算适配器，证据队列/正式样本继续借用同一原事务。全部SQL/错误/JSON、指纹/幂等键、原readiness、既有返回/插入冲突路径及提交后回读保持，原资料包mark_settled仍独立Port；不自动接受候选或晋升参数。新增8 Application/4 PG unit待Windows，预期Application159 / Persistence199 / Gateway112 unit、41 contract；84/84静态、完整架构、18 Rustfmt、12等价与8负向通过。01～04自身Windows DONE，05 VERIFYING、06～13 BLOCKED、R10 IN_PROGRESS；真实PG/历史四项/账本并发回滚/有效XLSX/Windows Full/私有P4P7回归及继承model.runs/0041删除风险仍最终新库待验。
+
+原已有结算快速回读/插入冲突指纹检查各自保持；结算数据库事务与资料包StatePort不合并。15A/14M/3D、真实队列/样本和测试迁移/回退详见[05记录](R10-05-postmatch-settlement.md)。先核对05自身完整Windows，失败修同分支，成功且用户授权再推进06；不提前创建阶段完成记录。
