@@ -16,13 +16,14 @@ const domainWorkflow = read("crates/domain/src/review/package/workflow.rs");
 const domainRecord = domainWorkflow;
 const application = [
   read("crates/application/src/use_cases/review/package/preview.rs"),
-  read("crates/application/src/use_cases/review/package/lifecycle.rs"),
+  read("crates/application/src/use_cases/review/package/workflow/coordinator.rs"),
+  read("crates/application/src/use_cases/review/package/workflow/guards.rs"),
 ].join("\n");
 const postmatchApplication = [
   read("crates/application/src/services/postmatch/facade.rs"),
   read("crates/application/src/use_cases/postmatch/settle_postmatch_review/mod.rs"),
 ].join("\n");
-const persistence = read("crates/persistence-postgres/src/match_review_package.rs");
+const persistence = read("crates/persistence-postgres/src/adapters/review/package_workflow/repository.rs");
 const commands = read("src-tauri/src/commands/postmatch.rs");
 const apiClient = read("src/api/client.ts");
 const types = read("src/types.ts");

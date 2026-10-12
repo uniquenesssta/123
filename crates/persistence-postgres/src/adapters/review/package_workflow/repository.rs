@@ -1,4 +1,4 @@
-use super::{write_audit_event, PersistenceError, PersistenceResult, PostgresStore};
+use crate::{write_audit_event, PersistenceError, PersistenceResult, PostgresStore};
 use football_domain::{
     MatchReviewPackagePreview, MatchReviewPackageSummary, MatchReviewPackageWorkflowRecord,
     MatchReviewPackageWorkflowStatus,

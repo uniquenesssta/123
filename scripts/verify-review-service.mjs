@@ -23,7 +23,11 @@ const packageRequired = [
   "crates/application/src/use_cases/review/package/mod.rs",
   "crates/application/src/use_cases/review/package/export.rs",
   "crates/application/src/use_cases/review/package/preview.rs",
-  "crates/application/src/use_cases/review/package/lifecycle.rs",
+  "crates/application/src/use_cases/review/package/workflow/mod.rs",
+  "crates/application/src/use_cases/review/package/workflow/coordinator.rs",
+  "crates/application/src/use_cases/review/package/workflow/guards.rs",
+  "crates/application/src/use_cases/review/package/workflow/confirmation.rs",
+  "crates/application/src/use_cases/review/package/workflow/tests.rs",
   "crates/application/src/use_cases/review/package/shared.rs",
   "crates/application/src/use_cases/review/package/workbook.rs",
 ];
@@ -111,6 +115,19 @@ if (fs.existsSync(path.join(root, "crates/application/src/postmatch.rs"))) failu
 if (!fs.existsSync(path.join(root, "crates/application/src/services/postmatch/facade.rs"))) failures.push("AT3 Postmatch facade 未建立");
 if (fs.existsSync(path.join(root, legacyAnalyticsOwner))) failures.push("AT4 后旧 analytics.rs 不得恢复");
 if (!fs.existsSync(path.join(root, "crates/application/src/services/analytics/facade.rs"))) failures.push("AT4 Analytics facade 未建立");
+
+const workflowMod = fs.readFileSync(path.join(root, "crates/application/src/use_cases/review/package/workflow/mod.rs"), "utf8");
+if (!workflowMod.includes("pub(crate) use coordinator::") || /(?:async fn|sqlx::|impl )/.test(workflowMod)) failures.push("工作流入口必须只登记模块并导出唯一 coordinator");
+for (const method of ["read_active_workflow", "confirm", "commit_facts", "generate_review", "commit"]) {
+  if (!service.includes(`package::workflow::${method}(`)) failures.push(`ReviewService 未切换唯一工作流入口 ${method}`);
+}
+if (service.includes("package::lifecycle::")) failures.push("ReviewService 仍调用旧 lifecycle");
+for (const relative of ["crates/persistence-postgres/src/adapters/review/mod.rs", "crates/persistence-postgres/src/adapters/review/package_workflow/mod.rs", "crates/persistence-postgres/src/adapters/review/package_workflow/repository.rs"]) {
+  if (!fs.existsSync(path.join(root, relative))) failures.push(`缺少工作流适配器：${relative}`);
+}
+const pgAdapters = fs.readFileSync(path.join(root, "crates/persistence-postgres/src/adapters/mod.rs"), "utf8");
+const pgLib = fs.readFileSync(path.join(root, "crates/persistence-postgres/src/lib.rs"), "utf8");
+if (!pgAdapters.includes("mod review;") || /^mod match_review_package;$/m.test(pgLib)) failures.push("PG 工作流适配器登记未完成");
 
 if (failures.length) {
   console.error("Review Service 验证失败：\n- " + failures.join("\n- "));

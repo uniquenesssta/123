@@ -2,17 +2,17 @@
 
 ## 当前阶段状态
 
-`READY`（仅前置文档）。R9全部01～11与Windows Automated阶段出口已DONE，用户当前“收尾11”，未授权开始R10实现。当前工作分支仍rewrite/r9-research-ai-backend；未创建第二分支。收到开始R10-01指令后，从R9纯文档收尾HEAD建立本阶段唯一分支。
+`IN_PROGRESS`。用户2026-10-12“开始R10-01”授权；从R9文档收尾HEAD `48618fed2d7ff7c2a4db831a037f227dc789f278` 建立唯一阶段分支 `rewrite/r10-review-analytics-release-backend`。01已实施 `VERIFYING`，必须自身精确Windows完整SUCCESS后才能DONE；02～13 BLOCKED。
 
 ## 前置基线与依据
 
-[R10任务书](../../football-model-platform-modular-rewrite-19-docs/10-R10-review-analytics-release-backend.md)、[总纲执行订正](../../football-model-platform-modular-rewrite-19-docs/00-总体架构与前23节.md)、[R9完成记录](../R09-research-ai-backend/R09-stage-completion.md)。已验源码b50d8047a6dbf32775d70704afde61d99b897069 / tree7dd421459bbff3156d4c034fc01e9b74dd2985d5 / [Windows run38221009454](https://github.com/uniquenesssta/123/actions/runs/38221009454) / job114716987812全SUCCESS；本轮收尾文档复用其源码，不替代R10自身验收。
+[R10任务书](../../football-model-platform-modular-rewrite-19-docs/10-R10-review-analytics-release-backend.md)、[总纲执行订正](../../football-model-platform-modular-rewrite-19-docs/00-总体架构与前23节.md)、[R9完成记录](../R09-research-ai-backend/R09-stage-completion.md)。已验源码b50d8047a6dbf32775d70704afde61d99b897069 / tree7dd421459bbff3156d4c034fc01e9b74dd2985d5 / [Windows run38221009454](https://github.com/uniquenesssta/123/actions/runs/38221009454) / job114716987812 SUCCESS；R9收尾只改文档，不能替代R10自身验收。
 
 ## 任务状态
 
 | 任务 | 责任 | 状态 |
 |---|---|---|
-| R10-01 | Review Package Workflow | READY · 未实施 |
+| R10-01 | [Review Package Workflow](R10-01-review-package-workflow.md) | VERIFYING · 已实施，静态通过，自身Windows待验 |
 | R10-02 | Structured Match Facts | BLOCKED |
 | R10-03 | Review Engine Adapter | BLOCKED |
 | R10-04 | Ability Candidate Transaction | BLOCKED |
@@ -26,10 +26,10 @@
 | R10-12 | Parameter Lifecycle | BLOCKED |
 | R10-13 | Release Acceptance | BLOCKED |
 
-## R10-01 继续位置
+## R10-01 实际边界与验证
 
-目标为Review Package Workflow，任务书参考目录use_cases/review/package-workflow；现有实际owner在Application services/review/service.rs及use_cases/review/package/{export,preview,lifecycle,shared,workbook}，原Review Ports/composition与PG调用继续当前实现。开始时须完整核对实际九步状态机/包身份/事实写入/候选人工接受/原事务/全部调用方，再按职责决定目录与切换，不能仅为模板路径机械改名。
+R10-01 Review Package Workflow 已实施、`VERIFYING`；唯一阶段分支 `rewrite/r10-review-analytics-release-backend`，从 R9 收尾 `48618fed2d7ff7c2a4db831a037f227dc789f278` 建立。Application workflow 独立持有编排、身份门禁与人工确认元数据，ReviewService 五入口已切换；PG 十个工作流方法迁入对应适配器，SQL、审计及事务正文逐字保持，旧两 owner 删除。原 Domain 八状态/九步界面、171 命令、Ports/DTO/错误/模型保护区保持；不自动接受候选或晋升参数。新增 8 项原 Application unit 待自身 Windows，预期 Application146 / Persistence179 / Gateway112 unit、41 contract。84/84 既有源码门禁、完整架构、Rustfmt、等价复核与 8 破坏探针通过；CI 开始后停止查询。R10 IN_PROGRESS，02～13 BLOCKED，真实 PG/历史四项/账本并发回滚/有效 XLSX/Windows Full/私有 P4/P7 固定回归及继承 model.runs/0041 删除风险仍最终封包新库待验。
 
-未创建R10-01实施记录、测试或阶段完成记录，不写入尚未发生的A/M/D/验证。保持纯计算公式/模型资产、171命令/DTO/config/error/log/UI以及历史与幂等语义；不得自动接受候选或晋升参数，不使合成fixture混入真实统计。
+采用现有 package/workflow 子目录按职责递归拆分，而非为参考路径机械迁移整个资料包。export/preview/workbook仍承担其原职责；workflow独占五个生命周期编排、三项纯身份门禁和确认元数据，PG适配器独占工作流持久化。Domain状态权限继续唯一权威，事实提交原阵容→事实→状态三个Port操作保持各自原事务，未声称改成全包单事务。SQL条件保留幂等结算和单活动包约束。
 
-仅Windows动态；沿用原Rust unit/contract/Windows runner/workflow/数据库入口，不新增持续回归体系。真实PG/历史保护四项/账本并发回滚/有效XLSX/Windows Full/私有P4/P7固定回归及继承model.runs/0041删除风险仍最终封包新库待验；ignored/公开stub/静态指纹不是这些真实项目PASS。
+无新runner/workflow/target/数据库专项入口、依赖或迁移；无R10阶段完成记录。ignored/公共unavailable stub/静态指纹不能记为真实新库项目PASS。

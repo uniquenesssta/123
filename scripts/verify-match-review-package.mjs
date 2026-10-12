@@ -18,7 +18,12 @@ const applicationFacade = read("crates/application/src/services/review/facade.rs
 const applicationService = read("crates/application/src/services/review/service.rs");
 const packageExport = read("crates/application/src/use_cases/review/package/export.rs");
 const packagePreview = read("crates/application/src/use_cases/review/package/preview.rs");
-const packageLifecycle = read("crates/application/src/use_cases/review/package/lifecycle.rs");
+const workflowRoot = "crates/application/src/use_cases/review/package/workflow/";
+const workflowCoordinator = read(`${workflowRoot}coordinator.rs`);
+const workflowGuards = read(`${workflowRoot}guards.rs`);
+const workflowConfirmation = read(`${workflowRoot}confirmation.rs`);
+const workflowTests = read(`${workflowRoot}tests.rs`);
+const packageLifecycle = [workflowCoordinator, workflowGuards, workflowConfirmation].join("\n");
 const packageShared = read("crates/application/src/use_cases/review/package/shared.rs");
 const packageAdapter = read("crates/application/src/composition/adapters/review.rs");
 const packagePorts = read("crates/application/src/ports/review/package.rs");
@@ -32,7 +37,7 @@ const application = [
   packageAdapter,
   packagePorts,
 ].join("\n");
-const persistence = read("crates/persistence-postgres/src/match_review_package.rs");
+const persistence = read("crates/persistence-postgres/src/adapters/review/package_workflow/repository.rs");
 const reviewPersistence = read("crates/persistence-postgres/src/review.rs");
 const entityPersistence = read("crates/persistence-postgres/src/adapters/catalog/deletion/preflight/references.rs");
 const forceDeletePersistence = [
@@ -79,6 +84,31 @@ check(packageLifecycle.includes("commit_review_facts") && packageLifecycle.inclu
 check(packageShared.includes("snapshot_from_lineups") && packageShared.includes("snapshot_from_pair") && packagePreview.includes("validate_event_identities"), "三方值对照或事件身份预检未接入后端");
 check(packagePorts.includes("MatchReviewPackageSourcePort") && packagePorts.includes("MatchReviewPackageStatePort") && packagePorts.includes("MatchReviewPackageFactsPort"), "资料包职责未进入明确 Port 边界");
 check(!fs.existsSync(new URL("../crates/application/src/match_review_package.rs", import.meta.url)), "旧 match_review_package.rs owner 仍存在");
+
+// Preserve workflow ownership, gate semantics and the original sequencing.
+const ordered = (source, tokens) => {
+  let offset = 0;
+  return tokens.every((token) => {
+    const index = source.indexOf(token, offset);
+    if (index < 0) return false;
+    offset = index + token.length;
+    return true;
+  });
+};
+const operation = (name) => workflowCoordinator.split(`pub(crate) async fn ${name}<P>`)[1]?.split("pub(crate) async fn ")[0] ?? "";
+for (const legacy of ["crates/application/src/use_cases/review/package/lifecycle.rs", "crates/persistence-postgres/src/match_review_package.rs"]) check(!fs.existsSync(new URL(`../${legacy}`, import.meta.url)), `旧工作流 owner 仍存在：${legacy}`);
+for (const [name, action] of [["confirm", "ConfirmImport"], ["commit_facts", "CommitFacts"], ["generate_review", "GenerateReview"]]) check(ordered(operation(name), ["port.read_workflow(", `.require_action(MatchReviewPackageWorkflowAction::${action})`]), `${name} 未先读取并执行领域动作门禁`);
+check(ordered(operation("confirm"), [".require_action(", "if !workflow.preview_ready", "workflow.import_path", "preview::validate(", "guards::matches_revalidated_preview(", ".confirm_workflow("]), "人工确认前检、重新预检和确认写入顺序漂移");
+check(ordered(operation("commit_facts"), [".require_action(", "preview::validate(", "guards::matches_revalidated_preview(", "apply_confirmation_metadata(", "port.create_lineup_pair(", "port.commit_review_facts(", "port.mark_facts_committed("]), "事实提交原三次 Port 调用顺序漂移");
+check(ordered(operation("generate_review"), [".require_action(", "port.read_package_preview(", "apply_confirmation_metadata(", "port.generate_match_review(", ".mark_review_created("]), "正式复盘必须生成成功后才推进工作流");
+check(ordered(operation("commit"), ["guards::ensure_commit_preview_ready(", "port.read_workflow(", "guards::ensure_commit_identity(", "confirm(", "commit_facts(", "generate_review("]), "组合提交前检或阶段顺序漂移");
+for (const token of ["preview.package_id == workflow.package_id", "preview.source_sha256 == workflow.import_sha256.as_deref().unwrap_or_default()", "&& preview.ready", "&& preview.errors.is_empty()", "if !preview.ready || !preview.errors.is_empty()", ".require_action(MatchReviewPackageWorkflowAction::ConfirmImport)", "workflow.import_sha256.as_deref() != Some(preview.source_sha256.as_str())", "workflow.match_id != preview.match_id"]) check(workflowGuards.includes(token), `资料包身份/阻断门禁漂移：${token}`);
+check(!packageShared.includes("apply_confirmation_metadata") && !packageShared.includes("merge_metadata"), "确认元数据仍有重复 owner");
+for (const token of ["&mut preview.review.result.metadata", "&mut preview.lineup_pair.home.metadata", "&mut preview.lineup_pair.away.metadata", '"review_package_confirmation"', "workflow.confirmation_note", "人工确认："]) check(workflowConfirmation.includes(token) || (token === "workflow.confirmation_note" && /workflow\s*\.confirmation_note/.test(workflowConfirmation)), `确认元数据缺少 ${token}`);
+check(ordered(persistence, ["let mut tx = self.pool.begin().await?", "UPDATE review.match_review_package_workflows", "INSERT INTO review.match_review_package_workflows", "write_audit_event(", "tx.commit().await?"]), "导出登记替代旧包/插入/审计/提交事务顺序漂移");
+check(persistence.indexOf("write_audit_event(") < persistence.indexOf("tx.commit().await?") && (persistence.match(/tx\.commit\(\)\.await\?/g) ?? []).length === 1, "导出事务不得提前或重复提交");
+for (const token of ["AND status='preview_valid'", "WHERE package_id=$1 AND status='confirmed'", "WHERE package_id=$1 AND status='facts_committed'", "COALESCE(settled_at, now())"]) check(persistence.includes(token), `持久化状态/幂等门禁漂移：${token}`);
+for (const test of ["revalidated_preview_checks_each_identity_and_blocker", "combined_commit_preserves_readiness_and_strict_identity_guards", "confirmation_metadata_preserves_existing_values_and_normalizes_non_objects", "confirmation_blank_note_preserves_notes_and_empty_existing_note_is_replaced", "confirmation_rejects_invalid_state_readiness_and_missing_path_before_io", "generate_review_preserves_order_confirmation_and_returned_ids", "generate_review_stops_at_failed_dependency_or_domain_guard", "active_workflow_preserves_some_none_and_port_failure_without_writes"]) check(workflowTests.includes(`fn ${test}(`), `缺少原 Application target 工作流边界测试：${test}`);
 
 for (const method of ["exportMatchReviewPackage", "previewMatchReviewPackage", "readMatchReviewPackageWorkflow", "confirmMatchReviewPackage", "commitMatchReviewPackageFacts", "generateMatchReviewFromPackage"]) check(api.includes(`${method}:`), `前端 API 缺少 ${method}`);
 for (const action of ["export-match-review-package", "preview-match-review-package", "confirm-match-review-package", "commit-match-review-package-facts", "generate-match-review-from-package", "inspect-postmatch-readiness", "settle-postmatch-review"]) check(main.includes(`case "${action}"`) && page.includes(`data-action="${action}"`), `赛后复盘链路缺少动作 ${action}`);

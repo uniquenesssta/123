@@ -595,3 +595,10 @@ R9-11 首轮Windows run38218231140 / job114707912576在精确5ff9164失败：Gat
 用户2026-10-12“收尾11”：11 DONE；R9全部01～11及Windows Automated阶段出口DONE，阶段完成记录与实际总表已建立。仅R10-01 Review Package Workflow READY，02～13 BLOCKED；未开始R10实现、未建立第二分支。本次纯文档[skip ci]，源码、门禁与清单同精确成功提交。真实PG/历史保护四项/账本并发回滚/有效XLSX/Windows Full/私有P4/P7固定回归及继承model.runs/0041删除风险仍最终封包新库待验，ignored/公开stub不计真实PASS；此前VERIFYING/失败叙述保留为实施历史。
 
 阶段出口静态复核：18保护资产/46迁移及18PG静态/171命令/runtime诊断/AI Workspace owner原门禁通过；不重跑同源码Windows，不运行非Windows动态。完整阶段证据与延期见 [R9完成记录](modular-rewrite/R09-research-ai-backend/R09-stage-completion.md)。
+
+
+## R10-01 Review Package Workflow（2026-10-12，VERIFYING）
+
+R10-01 Review Package Workflow 已实施、`VERIFYING`；唯一阶段分支 `rewrite/r10-review-analytics-release-backend`，从 R9 收尾 `48618fed2d7ff7c2a4db831a037f227dc789f278` 建立。Application workflow 独立持有编排、身份门禁与人工确认元数据，ReviewService 五入口已切换；PG 十个工作流方法迁入对应适配器，SQL、审计及事务正文逐字保持，旧两 owner 删除。原 Domain 八状态/九步界面、171 命令、Ports/DTO/错误/模型保护区保持；不自动接受候选或晋升参数。新增 8 项原 Application unit 待自身 Windows，预期 Application146 / Persistence179 / Gateway112 unit、41 contract。84/84 既有源码门禁、完整架构、Rustfmt、等价复核与 8 破坏探针通过；CI 开始后停止查询。R10 IN_PROGRESS，02～13 BLOCKED，真实 PG/历史四项/账本并发回滚/有效 XLSX/Windows Full/私有 P4/P7 固定回归及继承 model.runs/0041 删除风险仍最终封包新库待验。
+
+现有 83 项源码检查加原 verify-review-service 共 84 项通过；原 verify:architecture、verify_protected_assets、verify_command_contract、verify_database_baseline 通过。独立 Rustfmt1.88 检查 13 个实际变更 Rust 文件；没有运行非 Windows Cargo/check/Clippy/build/test、loopback 或浏览器运行时。8 新增单测、全部工作区和 17 视口/打包/启动由原 Public Platform CI Windows Automated 执行；等待本节点精确提交自身完整 SUCCESS，静态与预期计数不记为动态 PASS。详见 [01记录](modular-rewrite/R10-review-analytics-release-backend/R10-01-review-package-workflow.md)。

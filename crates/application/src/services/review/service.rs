@@ -99,7 +99,7 @@ impl ReviewService {
     where
         P: MatchReviewPackageStatePort + ?Sized,
     {
-        package::lifecycle::read_active_workflow(port, match_id).await
+        package::workflow::read_active_workflow(port, match_id).await
     }
 
     pub(crate) async fn preview_match_review_package<P>(
@@ -122,7 +122,7 @@ impl ReviewService {
     where
         P: MatchReviewPackageSourcePort + MatchReviewPackageStatePort + ?Sized,
     {
-        package::lifecycle::confirm(port, request).await
+        package::workflow::confirm(port, request).await
     }
 
     pub(crate) async fn commit_match_review_package_facts<P>(
@@ -137,7 +137,7 @@ impl ReviewService {
             + LineupPort
             + ?Sized,
     {
-        package::lifecycle::commit_facts(port, package_id).await
+        package::workflow::commit_facts(port, package_id).await
     }
 
     pub(crate) async fn generate_match_review_from_package<P>(
@@ -148,7 +148,7 @@ impl ReviewService {
     where
         P: MatchReviewPackageStatePort + MatchReviewPort + ?Sized,
     {
-        package::lifecycle::generate_review(port, package_id).await
+        package::workflow::generate_review(port, package_id).await
     }
 
     pub(crate) async fn commit_match_review_package<P>(
@@ -164,6 +164,6 @@ impl ReviewService {
             + LineupPort
             + ?Sized,
     {
-        package::lifecycle::commit(port, request).await
+        package::workflow::commit(port, request).await
     }
 }

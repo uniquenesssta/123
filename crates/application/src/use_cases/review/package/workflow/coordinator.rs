@@ -1,4 +1,5 @@
-use super::{preview, shared::apply_confirmation_metadata};
+use super::super::preview;
+use super::{confirmation::apply_confirmation_metadata, guards};
 use crate::{
     ports::{
         lineup::LineupPort,
@@ -47,11 +48,7 @@ where
         ApplicationError::Validation("预检记录缺少导入文件路径，请重新预检".to_string())
     })?;
     let preview = preview::validate(port, import_path, Some(workflow.match_id), false).await?;
-    if preview.package_id != workflow.package_id
-        || preview.source_sha256 != workflow.import_sha256.as_deref().unwrap_or_default()
-        || !preview.ready
-        || !preview.errors.is_empty()
-    {
+    if !guards::matches_revalidated_preview(&workflow, &preview) {
         return Err(ApplicationError::Validation(
             "资料包在预检后已变化或重新校验失败，请重新预检".to_string(),
         ));
@@ -84,11 +81,7 @@ where
         ApplicationError::Validation("确认记录缺少导入文件路径，请重新预检".to_string())
     })?;
     let mut preview = preview::validate(port, import_path, Some(workflow.match_id), false).await?;
-    if preview.package_id != workflow.package_id
-        || preview.source_sha256 != workflow.import_sha256.as_deref().unwrap_or_default()
-        || !preview.ready
-        || !preview.errors.is_empty()
-    {
+    if !guards::matches_revalidated_preview(&workflow, &preview) {
         return Err(ApplicationError::Validation(
             "已确认资料包发生变化，拒绝写入赛后事实".to_string(),
         ));
@@ -136,22 +129,9 @@ where
         + LineupPort
         + ?Sized,
 {
-    if !request.preview.ready || !request.preview.errors.is_empty() {
-        return Err(ApplicationError::Validation(
-            "赛后复盘资料包仍有阻断错误，不能确认导入".to_string(),
-        ));
-    }
+    guards::ensure_commit_preview_ready(&request.preview)?;
     let workflow = port.read_workflow(request.preview.package_id).await?;
-    if workflow
-        .require_action(MatchReviewPackageWorkflowAction::ConfirmImport)
-        .is_err()
-        || workflow.import_sha256.as_deref() != Some(request.preview.source_sha256.as_str())
-        || workflow.match_id != request.preview.match_id
-    {
-        return Err(ApplicationError::Validation(
-            "当前预检不属于本轮导出的资料包，请重新导出并预检".to_string(),
-        ));
-    }
+    guards::ensure_commit_identity(&workflow, &request.preview)?;
     let package_id = request.preview.package_id;
     confirm(
         port,
