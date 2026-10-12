@@ -7,7 +7,7 @@
 
 ## 当前前置状态（2026-10-12）
 
-R9 全部节点及 Windows Automated 阶段出口 DONE；已验源码 b50d804 / Windows run38221009454 SUCCESS，R9 文档收尾 HEAD48618fed2d7ff7c2a4db831a037f227dc789f278。用户2026-10-12“开始R10-01”授权，唯一新分支 rewrite/r10-review-analytics-release-backend 已建立；R10 IN_PROGRESS，01已实施 VERIFYING，02～13 BLOCKED。实际 owner、测试与完整清单见 [01实施记录](../modular-rewrite/R10-review-analytics-release-backend/R10-01-review-package-workflow.md) 及 [本阶段索引](../modular-rewrite/R10-review-analytics-release-backend/README.md)。真实数据库/历史保护/账本并发回滚/XLSX/Full/私有回归及继承删除风险仍最终新库待验，R9成功不替代R10自身验收。
+R9 全部节点及 Windows Automated 阶段出口 DONE；已验源码 b50d804 / Windows run38221009454 SUCCESS，R9 文档收尾 HEAD48618fed2d7ff7c2a4db831a037f227dc789f278。用户2026-10-12“开始R10-01”授权，唯一新分支 rewrite/r10-review-analytics-release-backend 已建立；R10 IN_PROGRESS，01自身精确838e39e / run38229119264 / job114743919870全SUCCESS并DONE；用户“收尾01开始02”授权02 READY，03～13 BLOCKED。实际 owner、测试与完整清单见 [01实施记录](../modular-rewrite/R10-review-analytics-release-backend/R10-01-review-package-workflow.md) 及 [本阶段索引](../modular-rewrite/R10-review-analytics-release-backend/README.md)。真实数据库/历史保护/账本并发回滚/XLSX/Full/私有回归及继承删除风险仍最终新库待验，R9成功不替代R10自身验收。
 
 ## 1. 阶段目标
 
@@ -169,7 +169,7 @@ Atomic Tasks：
 
 ## R10-01 Review Package Workflow
 
-状态：`VERIFYING`（2026-10-12 已实施；84/84源码、完整架构、Rustfmt与等价/8负向探针通过，等待自身精确Windows完整SUCCESS；02～13 BLOCKED）
+状态：`DONE`（838e39e / Windows run38229119264 / job114743919870全SUCCESS；Application146/Persistence179/Gateway112 unit、41 contract及17视口/构建/打包/启动通过）
 
 ### 1. 目标
 
@@ -303,7 +303,7 @@ crates/application/src/use_cases/review/package-workflow/
 
 ## R10-02 Structured Match Facts
 
-状态：`BLOCKED`（仅当上一任务与本任务前置门禁通过后改为 `READY`）
+状态：`READY`（01自身精确Windows全SUCCESS并DONE，用户2026-10-12“收尾01开始02”已授权；同一R10分支，03～13 BLOCKED）
 
 ### 1. 目标
 
