@@ -842,7 +842,7 @@ R9-07 Plain Chat Responses已实施、`VERIFYING`，基线9ddb27a，同一R9分�
 
 ## R9-08 Plain Chat Chat Completions
 
-状态：`READY`（07自身Windows全SUCCESS/DONE；用户已授权开始08，同一R9分支）
+状态：`VERIFYING`（实现/静态/记录完成；08自身Windows待验，09～11BLOCKED）
 
 ### 1. 目标
 
@@ -973,6 +973,14 @@ crates/research-gateway/src/plain_chat/chat_completions/
 - README 与实际状态一致。
 - `R09-08-plain-chat-chat-completions.md` 已创建并与实际变更、验证结果一致。
 - 阶段 `README.md` 已更新本任务状态和记录链接。
+
+---
+
+### R9-08 实施与门禁（2026-10-12）
+
+R9-08 Plain Chat Chat Completions已实施、`VERIFYING`，同一R9分支，基线d065cff。原model/messages载荷与首choice文本提取迁入plain_chat/chat_completions/{request,response}.rs；mod仅登记/显式导出，旧内联与旧函数移除，共用执行/错误/回退/预算/取消/用量/attempt保持。4A/11M/0D、15文件：新增三Chat模块及08节点，修改client/plain_chat根mod/response、原contract、两个既有兼容门禁、Domain清单和README/TESTING/任务书/索引，删除/移动无。原98unit/35contract保留，新增8unit/4contract；83/83静态、完整architecture、Rustfmt、逆迁移等价与8探针通过，106unit/39contract待08自身Windows。API/DTO/Schema/profile/配置/依赖/DB/UI/模型/生产政策保持；07 DONE、08 VERIFYING、09～11 BLOCKED、R9 IN_PROGRESS。
+
+记录：[R09-08-plain-chat-chat-completions.md](../modular-rewrite/R09-research-ai-backend/R09-08-plain-chat-chat-completions.md)。仅静态实跑，106/39不能计动态PASS；原Windows精确开始即停止查询，所有最终新库延期边界保持。
 
 ---
 

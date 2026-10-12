@@ -84,10 +84,11 @@ for (const command of v3.disabled_legacy_commands) {
 
 const plainBody = slice(gateway, "fn build_plain_text_request_body", "fn build_structured_request_body");
 const plainResponsesBody = text("crates/research-gateway/src/plain_chat/responses/request.rs").split("#[cfg(test)]")[0];
+const plainChatBody = text("crates/research-gateway/src/plain_chat/chat_completions/request.rs").split("#[cfg(test)]")[0];
 assert(plainBody.includes("ApiProtocol::Responses"), "纯文本链缺少Responses请求");
 assert(plainBody.includes("ApiProtocol::ChatCompletions"), "纯文本链缺少Chat Completions请求");
 for (const forbidden of ["tools", "tool_choice", "json_schema", "max_output_tokens", "max_completion_tokens", "background", "store", "reasoning", "metadata"]) {
-  assert(![plainBody, plainResponsesBody].some(source => source.includes(`\"${forbidden}\"`)), `纯文本请求不得发送${forbidden}`);
+  assert(![plainBody, plainResponsesBody, plainChatBody].some(source => source.includes(`\"${forbidden}\"`)), `纯文本请求不得发送${forbidden}`);
 }
 assert(response.includes("parse_plain_text_success_response"), "缺少纯文本响应解析");
 assert(gateway.includes("execute_plain_text_with_sink"), "缺少纯文本执行入口");

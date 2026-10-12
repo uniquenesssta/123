@@ -1,4 +1,5 @@
 use crate::citations::{parse_citation, parse_source};
+use crate::plain_chat::chat_completions::extract_text as extract_chat_completions_text;
 use crate::plain_chat::responses::extract_text as extract_responses_text;
 use crate::response_fields::parse_usage;
 use crate::{
@@ -130,32 +131,6 @@ fn extract_compatible_text(protocol: ApiProtocol, value: &Value) -> Option<Strin
         .or_else(|| extract_chat_completions_text(value))
         .map(|text| text.trim().to_string())
         .filter(|text| !text.is_empty())
-}
-
-fn extract_chat_completions_text(value: &Value) -> Option<String> {
-    let choice = value.get("choices").and_then(Value::as_array)?.first()?;
-    if let Some(text) = choice.get("text").and_then(Value::as_str) {
-        if !text.trim().is_empty() {
-            return Some(text.to_string());
-        }
-    }
-    let content = choice.get("message")?.get("content")?;
-    if let Some(text) = content.as_str() {
-        return Some(text.to_string());
-    }
-    let mut parts = Vec::new();
-    for item in content.as_array().into_iter().flatten() {
-        if let Some(text) = item.as_str() {
-            parts.push(text.to_string());
-        } else if let Some(text) = item
-            .get("text")
-            .and_then(Value::as_str)
-            .or_else(|| item.get("content").and_then(Value::as_str))
-        {
-            parts.push(text.to_string());
-        }
-    }
-    (!parts.is_empty()).then(|| parts.join("\n"))
 }
 
 fn extract_compatible_refusal(value: &Value) -> Option<String> {

@@ -2334,3 +2334,459 @@ async fn plain_responses_validation_background_and_budget_stop_before_credential
         assert!(sink.attempts.lock().unwrap().is_empty());
     }
 }
+
+fn plain_chat_config() -> GatewayConfig {
+    let mut configuration = config();
+    configuration.api_protocol = ApiProtocol::ChatCompletions;
+    configuration.request_endpoint =
+        Some("https://api.example.com/v1/chat/completions".to_string());
+    configuration
+}
+
+#[tokio::test]
+async fn plain_chat_preserves_minimal_payload_and_complete_attempt_evidence() {
+    use sha2::{Digest, Sha256};
+    use std::sync::atomic::Ordering;
+    let raw = json!({
+        "id":"chatcmpl_r908","model":"configured-extraction-model",
+        "choices":[{"message":{"content":" 普通回答⚽\n "},"finish_reason":"length"}],
+        "usage":{"prompt_tokens":100,"prompt_tokens_details":{"cached_tokens":20},"completion_tokens":50,"total_tokens":150}
+    });
+    let transport = Arc::new(FakeTransport::with_responses(vec![TransportResponse {
+        status: 200,
+        provider_request_id: Some("req_chat_r908".to_string()),
+        body: raw.clone(),
+    }]));
+    let provider = Arc::new(CountingKeyProvider::default());
+    let sink = FormalResponseAttemptSink::default();
+    let mut configuration = plain_chat_config();
+    configuration.store = true;
+    let gateway =
+        OpenAiResearchGateway::new(configuration, transport.clone(), provider.clone()).unwrap();
+    let execution = gateway
+        .execute_plain_text_with_sink(&plain_responses_request(), &CancellationToken::new(), &sink)
+        .await
+        .unwrap();
+    let expected = json!({"model":"configured-extraction-model","messages":[
+        {"role":"system","content":" 普通文本回答\n"},
+        {"role":"user","content":"你好⚽\"\\"},
+        {"role":"assistant","content":"先前回答"}
+    ]});
+    assert_eq!(*transport.requests.lock().unwrap(), vec![expected.clone()]);
+    assert_eq!(provider.loads.load(Ordering::SeqCst), 1);
+    assert_eq!(execution.response.text, "普通回答⚽");
+    assert_eq!(execution.response.status, "completed");
+    assert_eq!(execution.response.response_id, "chatcmpl_r908");
+    assert_eq!(
+        execution.response.provider_request_id.as_deref(),
+        Some("req_chat_r908")
+    );
+    assert_eq!(execution.response.raw_response, raw);
+    assert_eq!(execution.attempts.len(), 1);
+    let attempt = &execution.attempts[0];
+    assert_eq!(attempt.attempt_number, 8);
+    assert_eq!(attempt.model_id, "configured-extraction-model");
+    assert_eq!(attempt.request_payload, expected);
+    assert_eq!(
+        attempt.request_fingerprint,
+        hex::encode(Sha256::digest(serde_json::to_vec(&expected).unwrap()))
+    );
+    assert_eq!(attempt.response_id.as_deref(), Some("chatcmpl_r908"));
+    assert_eq!(
+        attempt.provider_request_id.as_deref(),
+        Some("req_chat_r908")
+    );
+    assert_eq!(attempt.provider_status, Some(200));
+    assert_eq!(attempt.status, "completed");
+    assert_eq!(attempt.usage, execution.response.usage);
+    assert_eq!(attempt.usage.input_tokens, 100);
+    assert_eq!(attempt.usage.cached_input_tokens, 20);
+    assert_eq!(attempt.usage.output_tokens, 50);
+    assert_eq!(attempt.usage.total_tokens, 150);
+    assert_eq!(attempt.search_call_count, 0);
+    assert!((attempt.estimated_cost_usd.unwrap() - 0.000182).abs() < 1e-12);
+    assert_eq!(attempt.raw_response.as_ref(), Some(&raw));
+    assert!(attempt.error.is_none());
+    assert!(attempt.finished_at >= attempt.started_at);
+    assert_eq!(*sink.attempts.lock().unwrap(), execution.attempts);
+}
+
+#[tokio::test]
+async fn plain_chat_keeps_first_choice_text_metadata_and_responses_fallback() {
+    for (raw, expected_text, expected_id, expected_model, expected_status, provider_id) in [
+        (
+            json!({"id":"chat_top","model":"wire-model","status":"queued","choices":[{"text":" 旧式文本 ","message":{"content":"消息"}},{"text":"第二条"}],"output_text":"Responses"}),
+            Some("旧式文本"),
+            "chat_top",
+            "wire-model",
+            "queued",
+            Some("req_chat"),
+        ),
+        (
+            json!({"id":"","model":"","status":"","choices":[{"message":{"content":" 消息优先 "},"finish_reason":"length"}],"output_text":"Responses"}),
+            Some("消息优先"),
+            "",
+            "",
+            "",
+            Some("req_chat"),
+        ),
+        (
+            json!({"choices":[{"message":{"content":["一",{"text":"二","content":"忽略"},{"content":"三"},null]}}],"usage":{"prompt_tokens":7,"completion_tokens":3,"prompt_tokens_details":{"cached_tokens":1}}}),
+            Some("一\n二\n三"),
+            "req_chat",
+            "compatible-model",
+            "completed",
+            Some("req_chat"),
+        ),
+        (
+            json!({"choices":[{"text":" \n","message":{"content":"消息"}}]}),
+            Some("消息"),
+            "req_chat",
+            "compatible-model",
+            "completed",
+            Some("req_chat"),
+        ),
+        (
+            json!({"choices":[{}, {"message":{"content":"第二条不能救回"}}],"output_text":" Responses回退 "}),
+            Some("Responses回退"),
+            "req_chat",
+            "compatible-model",
+            "completed",
+            Some("req_chat"),
+        ),
+        (
+            json!({"choices":[{"message":{"content":""}}],"output_text":"不能覆盖已识别空白"}),
+            None,
+            "req_chat",
+            "compatible-model",
+            "completed",
+            Some("req_chat"),
+        ),
+        (
+            json!({"choices":[{"message":{"content":[" \n"]}}],"output":["不能覆盖已识别空白"]}),
+            None,
+            "req_chat",
+            "compatible-model",
+            "completed",
+            Some("req_chat"),
+        ),
+        (
+            json!({"choices":[{}, {"message":{"content":"第二条不能救回"}}]}),
+            None,
+            "req_chat",
+            "compatible-model",
+            "completed",
+            Some("req_chat"),
+        ),
+        (
+            json!({"output":[{"content":[{"text":" 无请求ID的回退 "}]}]}),
+            Some("无请求ID的回退"),
+            "provider-response-id-unavailable",
+            "compatible-model",
+            "completed",
+            None,
+        ),
+    ] {
+        let mut configuration = plain_chat_config();
+        configuration.max_retries = 0;
+        configuration.fallback_model = None;
+        let transport = Arc::new(FakeTransport::with_responses(vec![TransportResponse {
+            status: 200,
+            provider_request_id: provider_id.map(str::to_string),
+            body: raw.clone(),
+        }]));
+        let sink = FormalResponseAttemptSink::default();
+        let gateway =
+            OpenAiResearchGateway::new(configuration, transport.clone(), Arc::new(TestKeyProvider))
+                .unwrap();
+        let result = gateway
+            .execute_plain_text_with_sink(
+                &plain_responses_request(),
+                &CancellationToken::new(),
+                &sink,
+            )
+            .await;
+        match expected_text {
+            Some(text) => {
+                let execution = result.expect("original compatible chat response");
+                assert_eq!(execution.response.text, text);
+                assert_eq!(execution.response.response_id, expected_id);
+                assert_eq!(execution.response.model_id, expected_model);
+                assert_eq!(execution.response.status, expected_status);
+                assert_eq!(
+                    execution.response.provider_request_id.as_deref(),
+                    provider_id
+                );
+                assert_eq!(execution.response.raw_response, raw);
+                assert_eq!(*sink.attempts.lock().unwrap(), execution.attempts);
+                if raw.get("usage").is_some() {
+                    assert_eq!(execution.response.usage.input_tokens, 7);
+                    assert_eq!(execution.response.usage.cached_input_tokens, 1);
+                    assert_eq!(execution.response.usage.output_tokens, 3);
+                    assert_eq!(execution.response.usage.total_tokens, 10);
+                }
+            }
+            None => {
+                let error =
+                    result.expect_err("blank primary and absent first choice keep NoResult");
+                assert_eq!(error.category, GatewayErrorCategory::NoResult);
+                assert_eq!(error.user_message, "兼容 API响应中没有识别到文本内容");
+                assert!(error.recovery.retryable);
+                assert_eq!(
+                    error.recovery.action,
+                    "检查所选协议、端点和模型；详细原始响应已写入运行日志"
+                );
+            }
+        }
+        let attempts = sink.attempts.lock().unwrap();
+        assert_eq!(attempts.len(), 1);
+        assert_eq!(attempts[0].raw_response.as_ref(), Some(&raw));
+        assert_eq!(attempts[0].provider_request_id.as_deref(), provider_id);
+        assert_eq!(attempts[0].provider_status, Some(200));
+        assert_eq!(attempts[0].search_call_count, 0);
+        assert_eq!(transport.requests.lock().unwrap().len(), 1);
+    }
+}
+
+#[tokio::test]
+async fn plain_chat_preserves_provider_and_refusal_error_priority_with_attempt_evidence() {
+    for (status, raw, category, message, retryable, action) in [
+        (
+            401,
+            json!({"id":"chat_error","refusal":"拒绝","choices":[{"message":{"content":"文本"}}],"error":{"message":"invalid key","code":"invalid_key"}}),
+            GatewayErrorCategory::Authentication,
+            "兼容 API请求失败（HTTP 401）：invalid key",
+            false,
+            "检查Windows凭据管理器中的API密钥是否有效",
+        ),
+        (
+            200,
+            json!({"id":"chat_error","refusal":"顶层拒绝","choices":[{"message":{"refusal":"消息拒绝","content":"文本"}}]}),
+            GatewayErrorCategory::Refused,
+            "兼容 API拒绝了本次AI问答请求：顶层拒绝",
+            false,
+            "检查问题内容后重试",
+        ),
+        (
+            200,
+            json!({"id":"chat_error","choices":[{"text":"旧式文本","message":{"refusal":"消息拒绝","content":"文本"}}],"output_text":"Responses文本"}),
+            GatewayErrorCategory::Refused,
+            "兼容 API拒绝了本次AI问答请求：消息拒绝",
+            false,
+            "检查问题内容后重试",
+        ),
+        (
+            200,
+            json!({"id":"chat_error","refusal":"","choices":[{"message":{"content":"文本"}}]}),
+            GatewayErrorCategory::Refused,
+            "兼容 API拒绝了本次AI问答请求：",
+            false,
+            "检查问题内容后重试",
+        ),
+        (
+            200,
+            json!({"id":"chat_error","output":[{"content":[{"refusal":"原不识别"}]}]}),
+            GatewayErrorCategory::NoResult,
+            "兼容 API响应中没有识别到文本内容",
+            true,
+            "检查所选协议、端点和模型；详细原始响应已写入运行日志",
+        ),
+    ] {
+        let mut configuration = plain_chat_config();
+        configuration.max_retries = 0;
+        configuration.fallback_model = None;
+        let transport = Arc::new(FakeTransport::with_responses(vec![TransportResponse {
+            status,
+            provider_request_id: Some("req_chat_error".to_string()),
+            body: raw.clone(),
+        }]));
+        let sink = FormalResponseAttemptSink::default();
+        let gateway =
+            OpenAiResearchGateway::new(configuration, transport.clone(), Arc::new(TestKeyProvider))
+                .unwrap();
+        let error = gateway
+            .execute_plain_text_with_sink(
+                &plain_responses_request(),
+                &CancellationToken::new(),
+                &sink,
+            )
+            .await
+            .expect_err("original error priority");
+        assert_eq!(error.category, category);
+        assert_eq!(error.user_message, message);
+        assert_eq!(error.recovery.retryable, retryable);
+        assert_eq!(error.recovery.action, action);
+        assert_eq!(
+            error.provider_status,
+            if status == 401 { Some(401) } else { None }
+        );
+        assert_eq!(
+            error.provider_code.as_deref(),
+            if status == 401 {
+                Some("invalid_key")
+            } else {
+                None
+            }
+        );
+        let attempts = sink.attempts.lock().unwrap();
+        assert_eq!(attempts.len(), 1);
+        assert_eq!(attempts[0].attempt_number, 8);
+        assert_eq!(attempts[0].model_id, "configured-extraction-model");
+        assert_eq!(attempts[0].response_id.as_deref(), Some("chat_error"));
+        assert_eq!(
+            attempts[0].provider_request_id.as_deref(),
+            Some("req_chat_error")
+        );
+        assert_eq!(attempts[0].provider_status, Some(status));
+        assert_eq!(attempts[0].raw_response.as_ref(), Some(&raw));
+        assert_eq!(attempts[0].error.as_ref(), Some(&error));
+        assert_eq!(attempts[0].usage.total_tokens, 0);
+        assert_eq!(attempts[0].estimated_cost_usd, None);
+        assert_eq!(attempts[0].search_call_count, 0);
+        assert_eq!(transport.requests.lock().unwrap().len(), 1);
+    }
+}
+
+#[tokio::test]
+async fn plain_chat_retry_model_fallback_and_cancellation_keep_payload_and_release_permit() {
+    use std::sync::atomic::Ordering;
+    for cancel_after_first in [false, true] {
+        let raw_bodies = [
+            json!({"error":{"message":"slow down","code":"rate_limit"}}),
+            json!({"error":{"message":"model unavailable","code":"model_not_found"}}),
+            json!({"id":"chat_fallback","model":"configured-fallback-model","choices":[{"message":{"content":"完成"}}]}),
+        ];
+        let transport = Arc::new(FakeTransport::with_responses(vec![
+            TransportResponse {
+                status: 429,
+                provider_request_id: Some("req_chat_limit".to_string()),
+                body: raw_bodies[0].clone(),
+            },
+            TransportResponse {
+                status: 400,
+                provider_request_id: Some("req_chat_model".to_string()),
+                body: raw_bodies[1].clone(),
+            },
+            TransportResponse {
+                status: 200,
+                provider_request_id: Some("req_chat_done".to_string()),
+                body: raw_bodies[2].clone(),
+            },
+        ]));
+        let provider = Arc::new(CountingKeyProvider::default());
+        let mut configuration = plain_chat_config();
+        if cancel_after_first {
+            configuration.retry_base_delay_ms = 60_000;
+        }
+        let gateway =
+            OpenAiResearchGateway::new(configuration, transport.clone(), provider.clone()).unwrap();
+        let token = CancellationToken::new();
+        let recording_sink = FormalResponseAttemptSink::default();
+        let cancelling_sink = CancelAfterAttemptSink {
+            token: token.clone(),
+            attempt_numbers: Mutex::new(Vec::new()),
+        };
+        let sink: &dyn GatewayAttemptSink = if cancel_after_first {
+            &cancelling_sink
+        } else {
+            &recording_sink
+        };
+        let result = tokio::time::timeout(
+            Duration::from_secs(2),
+            gateway.execute_plain_text_with_sink(&plain_responses_request(), &token, sink),
+        )
+        .await
+        .expect("bounded chat execution");
+        let execution = if cancel_after_first {
+            let error = result.expect_err("cancel before retry and fallback");
+            assert_eq!(error.category, GatewayErrorCategory::Cancelled);
+            assert_eq!(*cancelling_sink.attempt_numbers.lock().unwrap(), vec![8]);
+            assert_eq!(transport.requests.lock().unwrap().len(), 1);
+            assert_eq!(transport.responses.lock().unwrap().len(), 2);
+            assert_eq!(provider.loads.load(Ordering::SeqCst), 1);
+            tokio::time::timeout(
+                Duration::from_secs(2),
+                gateway.execute_plain_text(&plain_responses_request(), &CancellationToken::new()),
+            )
+            .await
+            .expect("permit released after cancellation")
+            .expect("fresh token request succeeds")
+        } else {
+            let execution = result.expect("retry then fallback succeeds");
+            assert_eq!(*recording_sink.attempts.lock().unwrap(), execution.attempts);
+            assert_eq!(
+                execution.attempts[0].error.as_ref().unwrap().category,
+                GatewayErrorCategory::RateLimit
+            );
+            execution
+        };
+        assert_eq!(execution.response.text, "完成");
+        assert_eq!(execution.response.model_id, "configured-fallback-model");
+        assert_eq!(execution.response.raw_response, raw_bodies[2]);
+        assert_eq!(
+            execution
+                .attempts
+                .iter()
+                .map(|a| a.attempt_number)
+                .collect::<Vec<_>>(),
+            if cancel_after_first {
+                vec![8, 9]
+            } else {
+                vec![8, 9, 10]
+            }
+        );
+        let failed = &execution.attempts[execution.attempts.len() - 2];
+        assert_eq!(failed.model_id, "configured-extraction-model");
+        assert_eq!(failed.provider_status, Some(400));
+        assert_eq!(
+            failed.provider_request_id.as_deref(),
+            Some("req_chat_model")
+        );
+        assert_eq!(failed.raw_response.as_ref(), Some(&raw_bodies[1]));
+        assert_eq!(
+            failed.error.as_ref().unwrap().category,
+            GatewayErrorCategory::ModelUnavailable
+        );
+        let success = execution.attempts.last().unwrap();
+        assert_eq!(success.model_id, "configured-fallback-model");
+        assert_eq!(success.provider_status, Some(200));
+        assert_eq!(
+            success.provider_request_id.as_deref(),
+            Some("req_chat_done")
+        );
+        assert_eq!(success.response_id.as_deref(), Some("chat_fallback"));
+        assert_eq!(success.raw_response.as_ref(), Some(&raw_bodies[2]));
+        assert!(success.error.is_none());
+        assert!(execution.attempts.iter().all(|a| a.search_call_count == 0));
+        assert_eq!(
+            provider.loads.load(Ordering::SeqCst),
+            1 + usize::from(cancel_after_first)
+        );
+        let requests = transport.requests.lock().unwrap();
+        assert_eq!(requests.len(), 3);
+        assert_eq!(
+            requests
+                .iter()
+                .map(|body| body["model"].as_str().unwrap())
+                .collect::<Vec<_>>(),
+            vec![
+                "configured-extraction-model",
+                "configured-extraction-model",
+                "configured-fallback-model"
+            ]
+        );
+        let messages = json!([
+            {"role":"system","content":" 普通文本回答\n"},
+            {"role":"user","content":"你好⚽\"\\"},
+            {"role":"assistant","content":"先前回答"}
+        ]);
+        for body in requests.iter() {
+            assert_eq!(body.as_object().unwrap().len(), 2);
+            assert_eq!(body["messages"], messages);
+        }
+        for attempt in &execution.attempts {
+            assert_eq!(attempt.request_payload["model"], attempt.model_id);
+            assert_eq!(attempt.request_payload["messages"], messages);
+        }
+    }
+}

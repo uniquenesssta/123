@@ -526,3 +526,9 @@ R9-07 Plain Chat Responses已实施、`VERIFYING`，基线9ddb27a，同一R9分�
 证据artifact11709500697，14,040,090字节，SHA-256 10c5237fa3aa7713212cfdcd7647b927bd61d60ed5f82878ce03b190c16f8c01；报告windows-acceptance-20261011-162740.json及同名.txt。07新增8unit/4contract全部执行通过。
 
 07 DONE；用户2026-10-12“收尾07开始08”授权08 READY，同一rewrite/r9-research-ai-backend分支，09～11 BLOCKED、R9 IN_PROGRESS。本次五既有文档[skip ci]收尾，源码树与上述成功一致，先前VERIFYING叙述为实施历史；未创建R9阶段完成记录。真实PG/历史四项/账本并发回滚/有效XLSX/Windows Full/私有固定回归及继承model.runs/0041删除风险仍最终封包新库待验，ignored和公共stub不计PASS。
+
+## R9-08 Chat Completions（2026-10-12，VERIFYING）
+
+R9-08 Plain Chat Chat Completions已实施、`VERIFYING`，同一R9分支，基线d065cff。原model/messages载荷与首choice文本提取迁入plain_chat/chat_completions/{request,response}.rs；mod仅登记/显式导出，旧内联与旧函数移除，共用执行/错误/回退/预算/取消/用量/attempt保持。4A/11M/0D、15文件：新增三Chat模块及08节点，修改client/plain_chat根mod/response、原contract、两个既有兼容门禁、Domain清单和README/TESTING/任务书/索引，删除/移动无。原98unit/35contract保留，新增8unit/4contract；83/83静态、完整architecture、Rustfmt、逆迁移等价与8探针通过，106unit/39contract待08自身Windows。API/DTO/Schema/profile/配置/依赖/DB/UI/模型/生产政策保持；07 DONE、08 VERIFYING、09～11 BLOCKED、R9 IN_PROGRESS。
+
+新增覆盖最小载荷/完整attempt、9类首choice/legacy/message/Responses回退与元数据、5类provider/refusal优先、限流重试/模型fallback/取消及许可释放两分支。报告r908-static-checks.json/r908-architecture.log/r908-equivalence.json/r908-negative-probes.json/r908-review.json；原Windows执行frontend/TypeScript/Vite/17视口、fmt/Clippy/workspace、release/MSI/NSIS/启动/日志，预计20～30分钟，精确开始后停止轮询。未执行非Windows动态，真实PG/历史四项/账本并发回滚/有效XLSX/Windows Full/私有固定回归及继承model.runs/0041风险仍最终封包新库待验，ignored/公共stub不计PASS。

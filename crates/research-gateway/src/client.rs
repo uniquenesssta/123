@@ -3,6 +3,7 @@ use crate::formal_research::request::{
     build_request_body, check_budget as check_formal_budget, validate_gateway_request,
 };
 use crate::formal_research::response::parse_and_validate;
+use crate::plain_chat::chat_completions::build_request as build_plain_text_chat_completions_body;
 use crate::plain_chat::responses::build_request as build_plain_text_responses_body;
 use crate::request_fields::apply_token_limit;
 use crate::resilience::{attempt_limit, cancelled_error, retry_delay, wait_retry, CircuitBreaker};
@@ -1107,13 +1108,7 @@ impl OpenAiResearchGateway {
         }
         let body = match self.config.api_protocol {
             ApiProtocol::Responses => build_plain_text_responses_body(model, messages),
-            ApiProtocol::ChatCompletions => json!({
-                "model": model,
-                "messages": messages.into_iter().map(|(role, content)| json!({
-                    "role": role,
-                    "content": content
-                })).collect::<Vec<_>>()
-            }),
+            ApiProtocol::ChatCompletions => build_plain_text_chat_completions_body(model, messages),
         };
         Ok(body)
     }
