@@ -24,13 +24,13 @@
     "targetPublicExportPolicy": "explicit re-export only"
   },
   "sourceDigest": "217241ac243726a5ab6805a7f169e222b97e78c7c971749a5904714af673ebdd",
-  "rustUsageDigest": "e99f65817e3af3b300d9afa5a182174c454ea41195205af291e564c5da91d060",
+  "rustUsageDigest": "c71c0df0e496a9dc51dbb098a5d503fd5f5201bf373be877b5eb40cd1aa28e34",
   "summary": {
     "typeCount": 365,
     "publicCompatibilityTypeCount": 365,
     "internalTypeCount": 0,
     "domainSourceFileCount": 129,
-    "scannedRustFileCount": 1186,
+    "scannedRustFileCount": 1192,
     "databaseMappedTypeCount": 301,
     "byTargetModule": {
       "ai_workspace": 16,
@@ -114,10 +114,10 @@
         "crates/domain/tests/serde_contracts/r2_06_module_paths.rs"
       ],
       "externalCallers": [
-        "crates/persistence-postgres/src/review.rs"
+        "crates/persistence-postgres/src/adapters/review/ability_candidate_transaction/repository.rs"
       ],
       "databaseMappings": [
-        "crates/persistence-postgres/src/review.rs"
+        "crates/persistence-postgres/src/adapters/review/ability_candidate_transaction/repository.rs"
       ]
     },
     {
@@ -185,11 +185,11 @@
         "crates/application/src/services/review/service.rs",
         "crates/application/src/use_cases/review/decide_ability_candidate/mod.rs",
         "crates/application/src/use_cases/review/test_support.rs",
-        "crates/persistence-postgres/src/review.rs",
+        "crates/persistence-postgres/src/adapters/review/ability_candidate_transaction/repository.rs",
         "src-tauri/src/commands/review.rs"
       ],
       "databaseMappings": [
-        "crates/persistence-postgres/src/review.rs"
+        "crates/persistence-postgres/src/adapters/review/ability_candidate_transaction/repository.rs"
       ]
     },
     {
@@ -331,11 +331,15 @@
         "crates/application/src/services/review/service.rs",
         "crates/application/src/use_cases/review/list_ability_candidates/mod.rs",
         "crates/application/src/use_cases/review/test_support.rs",
-        "crates/persistence-postgres/src/review.rs",
+        "crates/persistence-postgres/src/adapters/review/ability_candidate_transaction/mapping.rs",
+        "crates/persistence-postgres/src/adapters/review/ability_candidate_transaction/read.rs",
+        "crates/persistence-postgres/src/adapters/review/ability_candidate_transaction/tests.rs",
         "src-tauri/src/commands/review.rs"
       ],
       "databaseMappings": [
-        "crates/persistence-postgres/src/review.rs"
+        "crates/persistence-postgres/src/adapters/review/ability_candidate_transaction/mapping.rs",
+        "crates/persistence-postgres/src/adapters/review/ability_candidate_transaction/read.rs",
+        "crates/persistence-postgres/src/adapters/review/ability_candidate_transaction/tests.rs"
       ]
     },
     {
@@ -533,11 +537,15 @@
         "crates/application/src/use_cases/review/decide_ability_candidate/mod.rs",
         "crates/application/src/use_cases/review/list_ability_candidates/mod.rs",
         "crates/application/src/use_cases/review/test_support.rs",
-        "crates/persistence-postgres/src/review.rs",
+        "crates/persistence-postgres/src/adapters/review/ability_candidate_transaction/mapping.rs",
+        "crates/persistence-postgres/src/adapters/review/ability_candidate_transaction/read.rs",
+        "crates/persistence-postgres/src/adapters/review/ability_candidate_transaction/repository.rs",
         "src-tauri/src/commands/review.rs"
       ],
       "databaseMappings": [
-        "crates/persistence-postgres/src/review.rs"
+        "crates/persistence-postgres/src/adapters/review/ability_candidate_transaction/mapping.rs",
+        "crates/persistence-postgres/src/adapters/review/ability_candidate_transaction/read.rs",
+        "crates/persistence-postgres/src/adapters/review/ability_candidate_transaction/repository.rs"
       ]
     },
     {

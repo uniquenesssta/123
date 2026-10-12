@@ -7,7 +7,7 @@
 
 ## 当前前置状态（2026-10-12）
 
-R9 全部节点及 Windows Automated 阶段出口 DONE；已验源码 b50d804 / Windows run38221009454 SUCCESS，R9 文档收尾 HEAD48618fed2d7ff7c2a4db831a037f227dc789f278。用户2026-10-12“开始R10-01”授权，唯一新分支 rewrite/r10-review-analytics-release-backend 已建立；R10 IN_PROGRESS，01自身精确838e39e / run38229119264 / job114743919870全SUCCESS并DONE；02精确1ad6e68 / Windows run38245932270/job114799659672全SUCCESS并DONE；用户“收尾02开始03”授权03已实施，精确99b15ad / Windows run38259438025/job114845878326全SUCCESS并DONE，04～13 BLOCKED；[03实际记录](../modular-rewrite/R10-review-analytics-release-backend/R10-03-review-engine-adapter.md)。[02实际记录](../modular-rewrite/R10-review-analytics-release-backend/R10-02-structured-match-facts.md)。实际 owner、测试与完整清单见 [01实施记录](../modular-rewrite/R10-review-analytics-release-backend/R10-01-review-package-workflow.md) 及 [本阶段索引](../modular-rewrite/R10-review-analytics-release-backend/README.md)。真实数据库/历史保护/账本并发回滚/XLSX/Full/私有回归及继承删除风险仍最终新库待验，R9成功不替代R10自身验收。
+R9 全部节点及 Windows Automated 阶段出口 DONE；已验源码 b50d804 / Windows run38221009454 SUCCESS，R9 文档收尾 HEAD48618fed2d7ff7c2a4db831a037f227dc789f278。用户2026-10-12“开始R10-01”授权，唯一新分支 rewrite/r10-review-analytics-release-backend 已建立；R10 IN_PROGRESS，01自身精确838e39e / run38229119264 / job114743919870全SUCCESS并DONE；02精确1ad6e68 / Windows run38245932270/job114799659672全SUCCESS并DONE；用户“收尾02开始03”授权03已实施，精确99b15ad / Windows run38259438025/job114845878326全SUCCESS并DONE，用户2026-10-12“收尾03开始04”授权04已实施VERIFYING，05～13 BLOCKED；[04实际记录](../modular-rewrite/R10-review-analytics-release-backend/R10-04-ability-candidate-transaction.md)；[03实际记录](../modular-rewrite/R10-review-analytics-release-backend/R10-03-review-engine-adapter.md)。[02实际记录](../modular-rewrite/R10-review-analytics-release-backend/R10-02-structured-match-facts.md)。实际 owner、测试与完整清单见 [01实施记录](../modular-rewrite/R10-review-analytics-release-backend/R10-01-review-package-workflow.md) 及 [本阶段索引](../modular-rewrite/R10-review-analytics-release-backend/README.md)。真实数据库/历史保护/账本并发回滚/XLSX/Full/私有回归及继承删除风险仍最终新库待验，R9成功不替代R10自身验收。
 
 ## 1. 阶段目标
 
@@ -571,7 +571,7 @@ crates/application/src/use_cases/review/engine-adapter/
 
 ## R10-04 Ability Candidate Transaction
 
-状态：`BLOCKED`（仅当上一任务与本任务前置门禁通过后改为 `READY`）
+状态：`VERIFYING`（03精确Windows已DONE，用户“收尾03开始04”授权；84/84静态、完整架构、8Rustfmt、13等价与8负向通过；8新增PG unit待自身Windows，预期195，05～13 BLOCKED）
 
 ### 1. 目标
 
@@ -1979,3 +1979,10 @@ docs/modular-rewrite/R10-review-analytics-release-backend/R10-stage-completion.m
 03自身完整Windows通过，当前 DONE；01～03 DONE，04～13 BLOCKED，R10 IN_PROGRESS，继续唯一 `rewrite/r10-review-analytics-release-backend` 分支。用户重复“收尾02开始03”的范围已完成；本次没有新增04授权或进入04实施，没有创建R10阶段完成记录。此前03 VERIFYING、预期151和待Windows描述保留为实施历史，以本节和首部当前状态为准。
 
 真实PG、历史保护四项、不可变账本、并发/回滚、有效XLSX、Windows Full、私有P4/P7固定回归及继承的model.runs/0041删除风险仍最终封包新库待验；ignored、公开unavailable stub、静态指纹不计这些真实验收PASS。本轮未运行非Windows Cargo/check/Clippy/build/test、loopback或浏览器动态。
+
+
+## R10-04 实施订正与当前边界（2026-10-12）
+
+R10-04 Ability Candidate Transaction已实施 `VERIFYING`，基线aa24f5a，继续唯一rewrite/r10-review-analytics-release-backend。PG候选列表/详情/行映射/人工决策事务迁入ability_candidate_transaction唯一模块；原状态、处理人归一化、0.01过期判断和四状态解码提取并复用，旧root四职责删除。Application/Ports/公开PostgresStore签名、全部SQL/错误/JSON载荷、候选锁与单事务审计/提交后回读保持；拒绝不写能力观察，不自动接受或晋升参数。新增8原PG unit待Windows，预期Persistence195 / Application151 / Gateway112 unit、41 contract；84/84静态、完整架构、8 Rustfmt、13等价核对与8破坏探针通过。01～03自身Windows DONE，04 VERIFYING、05～13 BLOCKED、R10 IN_PROGRESS；真实PG/历史四项/账本并发回滚/有效XLSX/Windows Full/私有P4P7回归及继承model.runs/0041删除风险仍最终新库待验。
+
+参考目录仅要求实际候选责任收拢，原Application透传不做机械迁移。唯一实际事务、读/行映射/纯门禁，7A/8M/0D及全部23字段/原并发边界见[04记录](../modular-rewrite/R10-review-analytics-release-backend/R10-04-ability-candidate-transaction.md)；无新runner/target/workflow/数据库专项入口或迁移。

@@ -649,3 +649,10 @@ R10-03 Review Engine Adapter已实施 `VERIFYING`，基线93a008e，继续唯一
 03自身完整Windows通过，当前 DONE；01～03 DONE，04～13 BLOCKED，R10 IN_PROGRESS，继续唯一 `rewrite/r10-review-analytics-release-backend` 分支。用户重复“收尾02开始03”的范围已完成；本次没有新增04授权或进入04实施，没有创建R10阶段完成记录。此前03 VERIFYING、预期151和待Windows描述保留为实施历史，以本节和首部当前状态为准。
 
 真实PG、历史保护四项、不可变账本、并发/回滚、有效XLSX、Windows Full、私有P4/P7固定回归及继承的model.runs/0041删除风险仍最终封包新库待验；ignored、公开unavailable stub、静态指纹不计这些真实验收PASS。本轮未运行非Windows Cargo/check/Clippy/build/test、loopback或浏览器动态。
+
+
+## R10-04 Ability Candidate Transaction（2026-10-12，VERIFYING）
+
+R10-04 Ability Candidate Transaction已实施 `VERIFYING`，基线aa24f5a，继续唯一rewrite/r10-review-analytics-release-backend。PG候选列表/详情/行映射/人工决策事务迁入ability_candidate_transaction唯一模块；原状态、处理人归一化、0.01过期判断和四状态解码提取并复用，旧root四职责删除。Application/Ports/公开PostgresStore签名、全部SQL/错误/JSON载荷、候选锁与单事务审计/提交后回读保持；拒绝不写能力观察，不自动接受或晋升参数。新增8原PG unit待Windows，预期Persistence195 / Application151 / Gateway112 unit、41 contract；84/84静态、完整架构、8 Rustfmt、13等价核对与8破坏探针通过。01～03自身Windows DONE，04 VERIFYING、05～13 BLOCKED、R10 IN_PROGRESS；真实PG/历史四项/账本并发回滚/有效XLSX/Windows Full/私有P4P7回归及继承model.runs/0041删除风险仍最终新库待验。
+
+新增8unit仅原PG target，覆盖已处理/未知pending、身份默认与Unicode trim、投影包含边界/缺失/非有限、四状态和未知codec。13等价核对确认SQL/载荷/签名/原门禁逆内联与剩余root不变；8负向均拒绝且文件字节恢复。8实际Rust独立Rustfmt，未运行非Windows Cargo/check/Clippy/build/test、loopback/浏览器；自身Windows全部动态结果待验，原真实PG/历史四项等仍最终新库待验。详见[04记录](modular-rewrite/R10-review-analytics-release-backend/R10-04-ability-candidate-transaction.md)。
