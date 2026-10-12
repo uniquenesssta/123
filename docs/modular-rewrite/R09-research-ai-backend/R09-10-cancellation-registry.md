@@ -1,6 +1,6 @@
 # R9-10 Cancellation Registry
 
-状态：`VERIFYING`。用户2026-10-12“收尾09开始10”授权；原分支rewrite/r9-research-ai-backend，基线8d80ee6a29144377ddb1f69041344d0a8411dd67（09仅文档收尾，源码同已通过Windows的4ed656d）。09 DONE，10实施与本地静态完成，须自身精确Windows全SUCCESS方可DONE；11 BLOCKED、R9 IN_PROGRESS。
+状态：`DONE`（10自身精确Windows全SUCCESS；下述VERIFYING为实施历史）。用户2026-10-12“收尾09开始10”授权；原分支rewrite/r9-research-ai-backend，基线8d80ee6a29144377ddb1f69041344d0a8411dd67（09仅文档收尾，源码同已通过Windows的4ed656d）。09 DONE，10实施与本地静态完成，须自身精确Windows全SUCCESS方可DONE；11 BLOCKED、R9 IN_PROGRESS。
 
 ### 1. 目标
 
@@ -156,3 +156,12 @@ flowchart TD
 - scripts/verify-api-workspace.mjs
 - src-tauri/src/bootstrap/state.rs
 - src-tauri/src/commands/api_workspace.rs
+
+
+## R9-10 完成与11授权（2026-10-12）
+
+精确10提交07da8d9a70726fe707fe18fb50e6cbf49d402d49 / tree0ae872b0e41609a989ca4a8fbdc2aaca85cef34e，[Windows run38213432437](https://github.com/uniquenesssta/123/actions/runs/38213432437) / job114692567611整体SUCCESS，2026-10-12 15:05:56北京完成。Application138/138、Persistence179/179、Gateway106/106 unit和39/39 contract；前端/contracts/TypeScript/Vite/17视口、Rust fmt/Clippy -D warnings/workspace、Windows release/MSI/NSIS/启动及日志扫描通过（7记录、3完成操作）。10新增8个生命周期unit均实际通过，包括并发同ID、任务abort和panic清理。
+
+证据artifact11731842587，14,039,211字节，SHA-256 b610fb2b906fd93db285eab9c0908dff0cd3e37df73e25f88f16fda9fc798366；报告windows-acceptance-20261012-063850.json及同名.txt。
+
+10 DONE；用户2026-10-12“收尾10开始11”授权11 READY，同一rewrite/r9-research-ai-backend分支、R9 IN_PROGRESS，未进入R10。本次五既有文档[skip ci]收尾，源码同精确成功提交；先前VERIFYING为实施历史。自身11完整Windows未完成前不创建R9阶段完成记录。真实PG/历史保护四项/账本并发回滚/有效XLSX/Windows Full/私有P4/P7固定回归及继承model.runs/0041删除风险仍最终封包新库待验，ignored/公开stub不计PASS。

@@ -624,3 +624,12 @@ R9-09 Session Persistence已实施、`VERIFYING`，同一R9分支，基线06ecdd
 ## R9-10 取消注册表（2026-10-12）
 
 R9-10 Cancellation Registry已实施、`VERIFYING`，基线8d80ee6，同一R9分支。Application唯一Registry及不可克隆Lease管理活动ID/token，Tauri已切换且旧map/锁操作移除；重复ID不覆盖原token并在profile/会话副作用前拒绝，准备失败/网关结束/任务abort/unwind自动清理。原命令/DTO/错误文案/协议/profile/SQL事务/日志载荷/UI/模型/版本/依赖保持；仅新增两个Rust类型导出与明确取消生命周期修正。8新增Application unit待自身Windows，预期138/179与Gateway106/39；83/83静态、完整architecture/Rustfmt、逆切等价和8破坏探针通过。09 DONE、10 VERIFYING、11 BLOCKED、R9 IN_PROGRESS。 完整4A/12M/0D清单、工具/回退和最终新库待验见 [10实施记录](docs/modular-rewrite/R09-research-ai-backend/R09-10-cancellation-registry.md)。
+
+
+## R9-10 完成与11授权（2026-10-12）
+
+精确10提交07da8d9a70726fe707fe18fb50e6cbf49d402d49 / tree0ae872b0e41609a989ca4a8fbdc2aaca85cef34e，[Windows run38213432437](https://github.com/uniquenesssta/123/actions/runs/38213432437) / job114692567611整体SUCCESS，2026-10-12 15:05:56北京完成。Application138/138、Persistence179/179、Gateway106/106 unit和39/39 contract；前端/contracts/TypeScript/Vite/17视口、Rust fmt/Clippy -D warnings/workspace、Windows release/MSI/NSIS/启动及日志扫描通过（7记录、3完成操作）。10新增8个生命周期unit均实际通过，包括并发同ID、任务abort和panic清理。
+
+证据artifact11731842587，14,039,211字节，SHA-256 b610fb2b906fd93db285eab9c0908dff0cd3e37df73e25f88f16fda9fc798366；报告windows-acceptance-20261012-063850.json及同名.txt。
+
+10 DONE；用户2026-10-12“收尾10开始11”授权11 READY，同一rewrite/r9-research-ai-backend分支、R9 IN_PROGRESS，未进入R10。本次五既有文档[skip ci]收尾，源码同精确成功提交；先前VERIFYING为实施历史。自身11完整Windows未完成前不创建R9阶段完成记录。真实PG/历史保护四项/账本并发回滚/有效XLSX/Windows Full/私有P4/P7固定回归及继承model.runs/0041删除风险仍最终封包新库待验，ignored/公开stub不计PASS。
