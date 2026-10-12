@@ -60,7 +60,7 @@ R10-01 Review Package Workflow 已实施、`VERIFYING`；唯一阶段分支 `rew
 
 R10-02 Structured Match Facts 已实施 `VERIFYING`，基线ab43aee，继续唯一分支rewrite/r10-review-analytics-release-backend。Application真实事实阶段迁入facts coordinator，ReviewService与组合工作流直接复用；PG facts目录独占校验、事件身份、事务写入、查询/摘要、行映射和事实提交，旧review.rs的14职责及事实写入正文移除。原比赛锁、修订归属、SQL/审计/同事务上下文与十个公开方法签名保持，不改变报告/候选/参数人工门禁。新增8 PG unit待自身Windows，预期Persistence187 / Application146 / Gateway112 unit、41 contract；84/84静态、完整架构、19 Rust文件Rustfmt、等价与8破坏探针通过。01自身Windows已DONE，02 VERIFYING、03～13 BLOCKED、R10 IN_PROGRESS；真实PG/历史四项/账本并发回滚/有效XLSX/Windows Full/私有P4/P7回归与继承model.runs/0041删除风险仍最终新库待验。 详见 [02实施记录](docs/modular-rewrite/R10-review-analytics-release-backend/R10-02-structured-match-facts.md)。
 
-R10-03 Review Engine Adapter 当前 `DONE`：普通/资料包生成及PG准备、上下文、纯引擎调用和报告事务已迁入唯一owner，原公式/公开契约及候选人工门禁保持。精确 `99b15ad` / [Windows run38259438025](https://github.com/uniquenesssta/123/actions/runs/38259438025) 全SUCCESS，Application151/Persistence187、Gateway112 unit/41 contract、新增5项及17视口/打包/启动通过。01～04 DONE，05 VERIFYING、06～13 BLOCKED，R10 IN_PROGRESS；真实PG/Full/私有固定回归及继承删除风险仍最终新库待验。完整文件、证据与回退见 [03记录](docs/modular-rewrite/R10-review-analytics-release-backend/R10-03-review-engine-adapter.md) 和 [阶段索引](docs/modular-rewrite/R10-review-analytics-release-backend/README.md)。
+R10-03 Review Engine Adapter 当前 `DONE`：普通/资料包生成及PG准备、上下文、纯引擎调用和报告事务已迁入唯一owner，原公式/公开契约及候选人工门禁保持。精确 `99b15ad` / [Windows run38259438025](https://github.com/uniquenesssta/123/actions/runs/38259438025) 全SUCCESS，Application151/Persistence187、Gateway112 unit/41 contract、新增5项及17视口/打包/启动通过。01～05 DONE，06 READY、07～13 BLOCKED，R10 IN_PROGRESS；真实PG/Full/私有固定回归及继承删除风险仍最终新库待验。完整文件、证据与回退见 [03记录](docs/modular-rewrite/R10-review-analytics-release-backend/R10-03-review-engine-adapter.md) 和 [阶段索引](docs/modular-rewrite/R10-review-analytics-release-backend/README.md)。
 
 ## 公开边界
 
@@ -717,3 +717,12 @@ R10-03 Review Engine Adapter已实施 `VERIFYING`，基线93a008e，继续唯一
 ### R10-05 赛后结算（2026-10-13，VERIFYING）
 
 结算编排、readiness/列表和PG幂等事务及直接证据/样本支持迁入唯一settlement模块，三个旧App用例删除；原指纹/键、SQL/错误/版本、单事务审计/提交后回读、资料包独立Port推进及参数人工门禁保持。15A/14M/3D，新增8App/4PG原unit待Windows（预期159/199）；84/84静态、完整架构、18Rustfmt、等价/负向通过。04已收尾DONE，05 VERIFYING、06～13 BLOCKED、R10 IN_PROGRESS；完整文件/验证与最终新库延期见[05记录](docs/modular-rewrite/R10-review-analytics-release-backend/R10-05-postmatch-settlement.md)和[阶段索引](docs/modular-rewrite/R10-review-analytics-release-backend/README.md)。
+
+
+## R10-05 精确 Windows 完成与06授权（2026-10-13）
+
+精确提交 `fe3529f93ac1ec6777ccff53da73c0836d310a7f` / tree `950654f5357fb05a162fe4cd1449cb071aa9fd79`，[Public Platform CI run38277864089](https://github.com/uniquenesssta/123/actions/runs/38277864089) / Windows job114907643831 全SUCCESS，run于2026-10-13 00:58:51北京时间完成。实际Application159/159、Persistence199/199、Gateway112/112 unit和41/41 contract；新增8App/4PG unit与迁移的原timeliness unit通过，前端/contracts/TypeScript/Vite/17视口、Rust fmt/locked Clippy all-targets -D warnings/workspace、Windows release/MSI/NSIS、启动及日志扫描通过（7条记录、3个完成操作）。报告windows-acceptance-20261012-163146.json及同名.txt。
+
+证据artifact11761067078，14,042,191字节，SHA-256 `65186f8312bf643c3b6547cc36cc7a61669e23f735a82be172128584ecb382f2`。05自身完整成功后DONE；用户2026-10-13“收尾05开始06”授权06 Evidence Scoring READY，继续唯一rewrite/r10-review-analytics-release-backend，07～13 BLOCKED，R10 IN_PROGRESS。本次只五份既有文档收尾[skip ci]，源码同精确成功提交，06须自身完整Windows证据。此前05 VERIFYING与预期计数保留为实施历史。
+
+真实PG/历史保护四项/不可变账本/并发回滚/有效XLSX/Windows Full/私有P4/P7固定回归及继承model.runs/0041删除风险仍最终封包新库待验；ignored、公开unavailable stub和静态指纹不计真实PASS。无R10阶段完成记录。
