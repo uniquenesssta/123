@@ -7,7 +7,7 @@ use crate::{
         },
     },
     use_cases::review::{
-        decide_ability_candidate, facts, generate_match_review, list_ability_candidates,
+        decide_ability_candidate, engine_adapter, facts, list_ability_candidates,
         list_match_reviews, list_reviewable_matches, package, read_match_review,
     },
     ApplicationResult,
@@ -34,7 +34,7 @@ impl ReviewService {
         port: &P,
         draft: MatchReviewDraft,
     ) -> ApplicationResult<MatchReviewDetail> {
-        generate_match_review::execute(port, draft).await
+        engine_adapter::generate_match_review(port, draft).await
     }
 
     pub(crate) async fn list_reviewable_matches<P: MatchReviewPort + ?Sized>(
@@ -148,7 +148,7 @@ impl ReviewService {
     where
         P: MatchReviewPackageStatePort + MatchReviewPort + ?Sized,
     {
-        package::workflow::generate_review(port, package_id).await
+        engine_adapter::generate_review(port, package_id).await
     }
 
     pub(crate) async fn commit_match_review_package<P>(

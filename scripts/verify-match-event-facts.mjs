@@ -15,6 +15,7 @@ const domain = `${eventSemantics}\n${eventPayload}`;
 const reviewDomain = `${eventPayload}\n${reviewAggregate}`;
 const packageDomain = eventPayload;
 const legacyReview = read("crates/persistence-postgres/src/review.rs");
+const enginePreparation = read("crates/persistence-postgres/src/adapters/review/engine_adapter/preparation.rs");
 const factsRoot = "crates/persistence-postgres/src/adapters/review/facts/";
 const factsFiles = ["mod.rs", "identity.rs", "mapping.rs", "read.rs", "repository.rs", "validation.rs", "write.rs", "tests.rs"];
 const facts = Object.fromEntries(factsFiles.map((file) => [file, read(`${factsRoot}${file}`)]));
@@ -134,7 +135,7 @@ const ordered = (source, tokens) => {
   });
 };
 for (const name of ["commit_match_review_facts", "read_match_result", "list_match_events", "list_substitutions", "list_substitutions_in_tx", "match_event_key", "match_review_package_id", "summarize_match_events", "validate_review_draft", "validate_performance_metrics", "performance_metrics_have_signal", "match_result_from_row", "match_event_from_row", "substitution_from_row"]) check(!new RegExp(`(?:async )?fn ${name}\\(`).test(legacyReview), `旧review.rs仍定义事实职责 ${name}`);
-check(ordered(legacyReview.slice(legacyReview.indexOf("async fn prepare_review_in_tx")), ["write_facts_in_tx(tx, draft).await?", "load_review_players_in_tx", "calculate_recent_starter_overlap", "load_prediction_context_in_tx"]), "事实拆分不得丢弃原准备上下文或改变同事务顺序");
+check(ordered(enginePreparation, ["write_facts_in_tx(tx, draft).await?", "load_review_players_in_tx", "calculate_recent_starter_overlap", "load_prediction_context_in_tx"]), "事实拆分不得丢弃原准备上下文或改变同事务顺序");
 check(ordered(facts["repository.rs"], ["validate_review_draft(draft)?", "self.pool.begin().await?", "prepare_review_in_tx(&mut tx, draft).await?", "write_audit_event(", "tx.commit().await?"]), "事实提交验证、事务、完整准备与审计提交顺序漂移");
 check((facts["repository.rs"].match(/tx\.commit\(\)\.await\?/g) ?? []).length === 1 && facts["repository.rs"].indexOf("write_audit_event(") < facts["repository.rs"].indexOf("tx.commit().await?"), "事实事务必须仅在审计成功后提交一次");
 check(facts["repository.rs"].indexOf("validate_review_draft(draft)?") < facts["repository.rs"].indexOf("self.pool.begin().await?") && (facts["repository.rs"].match(/self\.pool\.begin\(\)\.await\?/g) ?? []).length === 1, "事实事务只能在纯校验成功后开启一次");

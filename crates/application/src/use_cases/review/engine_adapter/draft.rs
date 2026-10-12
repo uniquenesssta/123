@@ -1,7 +1,7 @@
 use crate::{ports::review::MatchReviewPort, ApplicationError, ApplicationResult};
 use football_domain::{MatchReviewDetail, MatchReviewDraft};
 
-pub(crate) async fn execute<P>(
+pub(crate) async fn generate_match_review<P>(
     port: &P,
     mut draft: MatchReviewDraft,
 ) -> ApplicationResult<MatchReviewDetail>

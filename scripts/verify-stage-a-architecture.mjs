@@ -17,6 +17,7 @@ const domainRecord = domainWorkflow;
 const application = [
   read("crates/application/src/use_cases/review/package/preview.rs"),
   read("crates/application/src/use_cases/review/package/workflow/coordinator.rs"),
+  read("crates/application/src/use_cases/review/engine_adapter/package.rs"),
   read("crates/application/src/use_cases/review/facts/coordinator.rs"),
   read("crates/application/src/use_cases/review/package/workflow/guards.rs"),
 ].join("\n");

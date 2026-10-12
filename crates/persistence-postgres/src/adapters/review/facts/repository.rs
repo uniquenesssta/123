@@ -1,5 +1,8 @@
 use super::validate_review_draft;
-use crate::{review::prepare_review_in_tx, write_audit_event, PersistenceResult, PostgresStore};
+use crate::{
+    adapters::review::engine_adapter::prepare_review_in_tx, write_audit_event, PersistenceResult,
+    PostgresStore,
+};
 use football_domain::MatchReviewDraft;
 use serde_json::json;
 

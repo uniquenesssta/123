@@ -629,3 +629,12 @@ PG14原职责和全部剩余函数规范化等价；事实writer/原prepare内�
 artifact11746489380，14,041,992字节，SHA-256 `378486f022954e5ee7044258e31b09bcd83c8c484c55af6fff11ef71ef1af3d1`。02自身完整成功后DONE；用户2026-10-12“收尾02开始03”授权03 Review Engine Adapter READY，同一rewrite/r10-review-analytics-release-backend，04～13 BLOCKED，R10 IN_PROGRESS。本次只五既有文档收尾[skip ci]，源码同上述已验提交；03必须取得自身精确Windows完整证据。
 
 真实PG/历史保护四项/不可变账本/并发/回滚/有效XLSX/Windows Full/私有P4/P7固定回归与继承model.runs/0041删除风险仍最终封包新库待验，ignored/公开stub/静态指纹不计真实PASS。此前02 VERIFYING与预期计数保留为实施历史。
+
+
+## R10-03 Review Engine Adapter（2026-10-12，VERIFYING）
+
+R10-03 Review Engine Adapter已实施 `VERIFYING`，基线93a008e，继续唯一rewrite/r10-review-analytics-release-backend。Application普通/资料包两条实际生成入口迁入engine_adapter，Service与组合工作流已切换；PG六个引擎职责迁入准备、上下文、原计算事务和报告持久化，事实提交复用同一完整准备。纯review-engine源码/公式、原SQL/错误/JSON载荷、公开签名、事务/审计/提交后回读及pending候选人工门禁保持。原8 Application测试正文保持，其中2生成测试迁入新owner、共用原fixture；新增5入口unit待Windows，预期Application151 / Persistence187 / Gateway112 unit、41 contract。84/84静态、完整架构、18 Rustfmt、等价及8负向探针通过；01～02 DONE，03 VERIFYING，04～13 BLOCKED、R10 IN_PROGRESS。真实PG/历史四项/账本并发回滚/有效XLSX/Full/私有P4P7回归及继承model.runs/0041删除风险仍最终新库待验。
+
+新增5原Application unit覆盖结果ID不一致不调用Port、空版本转None/空备注保留Some(空字符串)/None保持、Unicode trim且原事实/数据覆盖率/来源不变、完整Port详情透明返回、Port失败无工作流写入；迁移的2资料包生成测试继续覆盖顺序/确认/ID与每步失败停止。所有原测试正文保持，纯计算原tests和PG原integration不变；预期151/187不记动态PASS。
+
+本地仅原84 JS、完整verify:architecture、18实际Rust独立Rustfmt1.88 check、规范化等价/生产SQL错误JSON字面量精确集合/8负向/diff及文档核对；未运行非Windows Cargo/check/Clippy/build/test、loopback或浏览器。原Public Platform CI Windows Automated承担全部动态/17视口/打包/启动；04～13等待03自身完整SUCCESS。最终新库延期沿用02。详见[03记录](modular-rewrite/R10-review-analytics-release-backend/R10-03-review-engine-adapter.md)。

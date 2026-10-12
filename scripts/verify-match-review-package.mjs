@@ -20,11 +20,12 @@ const packageExport = read("crates/application/src/use_cases/review/package/expo
 const packagePreview = read("crates/application/src/use_cases/review/package/preview.rs");
 const workflowRoot = "crates/application/src/use_cases/review/package/workflow/";
 const workflowCoordinator = read(`${workflowRoot}coordinator.rs`);
+const enginePackage = read("crates/application/src/use_cases/review/engine_adapter/package.rs");
 const factsCoordinator = read("crates/application/src/use_cases/review/facts/coordinator.rs");
 const workflowGuards = read(`${workflowRoot}guards.rs`);
 const workflowConfirmation = read(`${workflowRoot}confirmation.rs`);
-const workflowTests = read(`${workflowRoot}tests.rs`);
-const packageLifecycle = [workflowCoordinator, factsCoordinator, workflowGuards, workflowConfirmation].join("\n");
+const workflowTests = [read(`${workflowRoot}tests.rs`), read("crates/application/src/use_cases/review/engine_adapter/tests.rs")].join("\n");
+const packageLifecycle = [workflowCoordinator, factsCoordinator, enginePackage, workflowGuards, workflowConfirmation].join("\n");
 const packageShared = read("crates/application/src/use_cases/review/package/shared.rs");
 const packageAdapter = read("crates/application/src/composition/adapters/review.rs");
 const packagePorts = read("crates/application/src/ports/review/package.rs");
@@ -96,7 +97,7 @@ const ordered = (source, tokens) => {
     return true;
   });
 };
-const operation = (name) => (name === "commit_facts" ? factsCoordinator : workflowCoordinator).split(`pub(crate) async fn ${name}<P>`)[1]?.split("pub(crate) async fn ")[0] ?? "";
+const operation = (name) => (name === "commit_facts" ? factsCoordinator : name === "generate_review" ? enginePackage : workflowCoordinator).split(`pub(crate) async fn ${name}<P>`)[1]?.split("pub(crate) async fn ")[0] ?? "";
 for (const legacy of ["crates/application/src/use_cases/review/package/lifecycle.rs", "crates/persistence-postgres/src/match_review_package.rs"]) check(!fs.existsSync(new URL(`../${legacy}`, import.meta.url)), `旧工作流 owner 仍存在：${legacy}`);
 for (const [name, action] of [["confirm", "ConfirmImport"], ["commit_facts", "CommitFacts"], ["generate_review", "GenerateReview"]]) check(ordered(operation(name), ["port.read_workflow(", `.require_action(MatchReviewPackageWorkflowAction::${action})`]), `${name} 未先读取并执行领域动作门禁`);
 check(ordered(operation("confirm"), [".require_action(", "if !workflow.preview_ready", "workflow.import_path", "preview::validate(", "guards::matches_revalidated_preview(", ".confirm_workflow("]), "人工确认前检、重新预检和确认写入顺序漂移");

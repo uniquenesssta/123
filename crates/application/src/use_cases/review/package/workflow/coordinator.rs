@@ -1,6 +1,6 @@
 use super::super::preview;
-use super::{confirmation::apply_confirmation_metadata, guards};
-use crate::use_cases::review::facts::commit_facts;
+use super::guards;
+use crate::use_cases::review::{engine_adapter::generate_review, facts::commit_facts};
 use crate::{
     ports::{
         lineup::LineupPort,
@@ -13,8 +13,8 @@ use crate::{
 };
 use football_domain::{
     MatchReviewPackageCommitRequest, MatchReviewPackageCommitResult,
-    MatchReviewPackageConfirmationRequest, MatchReviewPackageReviewResult,
-    MatchReviewPackageWorkflowAction, MatchReviewPackageWorkflowRecord,
+    MatchReviewPackageConfirmationRequest, MatchReviewPackageWorkflowAction,
+    MatchReviewPackageWorkflowRecord,
 };
 use uuid::Uuid;
 
@@ -60,26 +60,6 @@ where
             request.confirmation_note.as_deref(),
         )
         .await?)
-}
-
-pub(crate) async fn generate_review<P>(
-    port: &P,
-    package_id: Uuid,
-) -> ApplicationResult<MatchReviewPackageReviewResult>
-where
-    P: MatchReviewPackageStatePort + MatchReviewPort + ?Sized,
-{
-    let workflow = port.read_workflow(package_id).await?;
-    workflow
-        .require_action(MatchReviewPackageWorkflowAction::GenerateReview)
-        .map_err(ApplicationError::Validation)?;
-    let mut preview = port.read_package_preview(package_id).await?;
-    apply_confirmation_metadata(&mut preview, &workflow);
-    let review = port.generate_match_review(&preview.review).await?;
-    let workflow = port
-        .mark_review_created(package_id, review.summary.id)
-        .await?;
-    Ok(MatchReviewPackageReviewResult { review, workflow })
 }
 
 pub(crate) async fn commit<P>(

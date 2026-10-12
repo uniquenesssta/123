@@ -12,7 +12,11 @@ const coreRequired = [
   "crates/application/src/use_cases/review/mod.rs",
   "crates/application/src/use_cases/review/facts/mod.rs",
   "crates/application/src/use_cases/review/facts/coordinator.rs",
-  "crates/application/src/use_cases/review/generate_match_review/mod.rs",
+  "crates/application/src/use_cases/review/engine_adapter/mod.rs",
+  "crates/application/src/use_cases/review/engine_adapter/draft.rs",
+  "crates/application/src/use_cases/review/engine_adapter/package.rs",
+  "crates/application/src/use_cases/review/engine_adapter/tests.rs",
+  "crates/application/src/use_cases/review/test_support.rs",
   "crates/application/src/use_cases/review/list_reviewable_matches/mod.rs",
   "crates/application/src/use_cases/review/list_match_reviews/mod.rs",
   "crates/application/src/use_cases/review/read_match_review/mod.rs",
@@ -39,6 +43,7 @@ for (const relative of required) {
 }
 for (const legacy of [
   "crates/application/src/review.rs",
+  "crates/application/src/use_cases/review/generate_match_review/mod.rs",
   "crates/application/src/match_review_package.rs",
 ]) {
   if (fs.existsSync(path.join(root, legacy))) failures.push(`旧 Review owner 仍存在：${legacy}`);
@@ -120,7 +125,7 @@ if (!fs.existsSync(path.join(root, "crates/application/src/services/analytics/fa
 
 const workflowMod = fs.readFileSync(path.join(root, "crates/application/src/use_cases/review/package/workflow/mod.rs"), "utf8");
 if (!workflowMod.includes("pub(crate) use coordinator::") || /(?:async fn|sqlx::|impl )/.test(workflowMod)) failures.push("工作流入口必须只登记模块并导出唯一 coordinator");
-for (const method of ["read_active_workflow", "confirm", "generate_review", "commit"]) {
+for (const method of ["read_active_workflow", "confirm", "commit"]) {
   if (!service.includes(`package::workflow::${method}(`)) failures.push(`ReviewService 未切换唯一工作流入口 ${method}`);
 }
 if (!service.includes("facts::commit_facts(")) failures.push("ReviewService 未调用唯一 facts 用例");
@@ -128,7 +133,7 @@ if (!reviewUseCases.includes("pub(crate) mod facts;")) failures.push("Review use
 const factsMod = fs.readFileSync(path.join(root, "crates/application/src/use_cases/review/facts/mod.rs"), "utf8");
 if (!factsMod.includes("pub(crate) use coordinator::commit_facts;") || /(?:async fn|sqlx::|impl )/.test(factsMod)) failures.push("facts 出口必须只登记并导出唯一 coordinator");
 const workflowCoordinator = fs.readFileSync(path.join(root, "crates/application/src/use_cases/review/package/workflow/coordinator.rs"), "utf8");
-if (/async fn commit_facts</.test(workflowCoordinator) || !workflowCoordinator.includes("use crate::use_cases::review::facts::commit_facts;")) failures.push("组合工作流未复用唯一事实用例或保留重复实现");
+if (/async fn commit_facts</.test(workflowCoordinator) || !workflowCoordinator.includes("facts::commit_facts")) failures.push("组合工作流未复用唯一事实用例或保留重复实现");
 if (service.includes("package::lifecycle::")) failures.push("ReviewService 仍调用旧 lifecycle");
 for (const relative of ["crates/persistence-postgres/src/adapters/review/mod.rs", "crates/persistence-postgres/src/adapters/review/package_workflow/mod.rs", "crates/persistence-postgres/src/adapters/review/package_workflow/repository.rs"]) {
   if (!fs.existsSync(path.join(root, relative))) failures.push(`缺少工作流适配器：${relative}`);
@@ -136,6 +141,42 @@ for (const relative of ["crates/persistence-postgres/src/adapters/review/mod.rs"
 const pgAdapters = fs.readFileSync(path.join(root, "crates/persistence-postgres/src/adapters/mod.rs"), "utf8");
 const pgLib = fs.readFileSync(path.join(root, "crates/persistence-postgres/src/lib.rs"), "utf8");
 if (!pgAdapters.includes("mod review;") || /^mod match_review_package;$/m.test(pgLib)) failures.push("PG 工作流适配器登记未完成");
+
+const engineRoot = "crates/application/src/use_cases/review/engine_adapter/";
+const engineDraft = fs.readFileSync(path.join(root, `${engineRoot}draft.rs`), "utf8");
+const enginePackage = fs.readFileSync(path.join(root, `${engineRoot}package.rs`), "utf8");
+const engineTests = fs.readFileSync(path.join(root, `${engineRoot}tests.rs`), "utf8");
+const pgEngineRoot = "crates/persistence-postgres/src/adapters/review/engine_adapter/";
+const pgEngine = Object.fromEntries(["mod.rs", "repository.rs", "preparation.rs", "context.rs", "report.rs"].map((file) => [file, fs.readFileSync(path.join(root, `${pgEngineRoot}${file}`), "utf8")]));
+const pgReview = fs.readFileSync(path.join(root, "crates/persistence-postgres/src/review.rs"), "utf8");
+const pgFacts = fs.readFileSync(path.join(root, "crates/persistence-postgres/src/adapters/review/facts/repository.rs"), "utf8");
+const ordered = (source, tokens) => {
+  let offset = 0;
+  return tokens.every((token) => {
+    const index = source.indexOf(token, offset);
+    if (index < 0) return false;
+    offset = index + token.length;
+    return true;
+  });
+};
+if (!reviewUseCases.includes("pub(crate) mod engine_adapter;") || reviewUseCases.includes("mod generate_match_review;")) failures.push("Review未切换唯一engine_adapter");
+for (const method of ["generate_match_review", "generate_review"]) if (!service.includes(`engine_adapter::${method}(`)) failures.push(`ReviewService未调用引擎适配 ${method}`);
+if (workflowCoordinator.includes("async fn generate_review<") || !workflowCoordinator.includes("engine_adapter::generate_review")) failures.push("组合工作流未复用唯一资料包复盘生成或保留重复owner");
+if (!ordered(engineDraft, ["draft.match_id != draft.result.match_id", "draft.review_version.as_mut()", "version.trim().to_string()", "draft.review_version = None", "draft.notes.as_mut()", "notes.trim().to_string()", "port.generate_match_review(&draft).await?"])) failures.push("普通复盘ID前检/版本备注归一化/引擎调用契约漂移");
+if (!ordered(enginePackage, ["port.read_workflow(", ".require_action(MatchReviewPackageWorkflowAction::GenerateReview)", "port.read_package_preview(", "apply_confirmation_metadata(", "port.generate_match_review(&preview.review).await?", ".mark_review_created("])) failures.push("资料包复盘动作/确认/生成成功后推进状态的顺序漂移");
+if ((enginePackage.match(/\.mark_review_created\(/g) ?? []).length !== 1 || enginePackage.indexOf("port.generate_match_review(&preview.review).await?") > enginePackage.indexOf(".mark_review_created(")) failures.push("资料包生成成功后才可推进状态一次，不得提前或重复写入");
+if (enginePackage.includes("draft.result.match_id") || enginePackage.includes("draft.notes.as_mut()")) failures.push("不得把普通复盘前检/归一化新增到原资料包路径");
+for (const name of ["generate_match_review", "prepare_review_in_tx", "persist_calculation_in_tx", "load_review_players_in_tx", "calculate_recent_starter_overlap", "load_prediction_context_in_tx"]) if (new RegExp(`(?:async )?fn ${name}\\(`).test(pgReview)) failures.push(`旧PG review仍持有引擎职责 ${name}`);
+if (!pgFacts.includes("engine_adapter::prepare_review_in_tx")) failures.push("事实提交没有复用迁移后的唯一完整准备");
+if (!ordered(pgEngine["repository.rs"], ["validate_review_draft(draft)?", "self.pool.begin().await?", "prepare_review_in_tx(&mut tx, draft).await?", "calculate_review(&preparation)", "persist_calculation_in_tx(&mut tx, draft, &preparation, &calculation).await?", "write_audit_event(", "tx.commit().await?", "self.read_match_review(review_id).await"])) failures.push("原引擎事务校验/准备/计算/报告/审计/提交/回读顺序漂移");
+if ((pgEngine["repository.rs"].match(/self\.pool\.begin\(\)\.await\?/g) ?? []).length !== 1 || (pgEngine["repository.rs"].match(/tx\.commit\(\)\.await\?/g) ?? []).length !== 1 || pgEngine["repository.rs"].indexOf("write_audit_event(") > pgEngine["repository.rs"].indexOf("tx.commit().await?")) failures.push("引擎必须只开一个原事务并在审计后提交一次");
+for (const file of ["preparation.rs", "context.rs", "report.rs"]) if (/\.(?:begin|commit|rollback)\(/.test(pgEngine[file])) failures.push(`${file}必须借用原事务，不能提前完成或新增事务`);
+if (!pgEngine["repository.rs"].includes("use football_review_engine::calculate_review;")) failures.push("唯一适配器没有直接调用原纯计算引擎");
+if (!ordered(pgEngine["preparation.rs"], ["write_facts_in_tx(tx, draft).await?", "load_review_players_in_tx", "calculate_recent_starter_overlap", "load_prediction_context_in_tx", "Ok(ReviewPreparationData"])) failures.push("事实及原球员/球队/预测计算输入准备顺序漂移");
+for (const token of ["snapshot.effective_contribution", "profile.average_value, 50", "match_review.match_id <> observation.match_id", "fixture.kickoff_time < $3", "LIMIT 10", "status='succeeded'", "completed_at DESC NULLS LAST", "指定的模型运行不存在、未成功或不属于该场比赛", "actual_scoreline_probability"]) if (!pgEngine["context.rs"].includes(token)) failures.push(`原计算上下文缺少 ${token}`);
+if (!ordered(pgEngine["report.rs"], ["WITH superseded AS", "INSERT INTO review.ability_update_decisions", "UPDATE review.match_reviews SET status='superseded'", "let review_id = Uuid::new_v4()", "INSERT INTO review.match_reviews", "INSERT INTO review.player_match_reviews", "INSERT INTO review.ability_update_candidates", "INSERT INTO review.team_match_reviews", "INSERT INTO feature.player_dynamic_tags", "Ok(review_id)"])) failures.push("报告/候选/动态标签不可变快照与原版本替代顺序漂移");
+for (const token of ["serde_json::to_value(&preparation.result)?", "serde_json::to_value(&preparation.substitutions)?", "calculation.conclusions.clone()", "'pending',$10,$11", "Duration::days(14)", "&calculation.calculation_version"]) if (!pgEngine["report.rs"].includes(token)) failures.push(`报告载荷/候选人工门禁缺少 ${token}`);
+for (const name of ["generate_review_preserves_order_confirmation_and_returned_ids", "generate_review_stops_at_failed_dependency_or_domain_guard", "draft_mismatched_result_stops_before_engine_port", "draft_blank_version_and_notes_preserve_optional_contract", "draft_normalization_preserves_fact_payload_and_source_context", "draft_generation_returns_the_complete_port_detail", "draft_generation_propagates_port_failure_without_workflow_writes"]) if (!engineTests.includes(`fn ${name}(`)) failures.push(`缺少原Application target引擎适配边界测试 ${name}`);
 
 if (failures.length) {
   console.error("Review Service 验证失败：\n- " + failures.join("\n- "));

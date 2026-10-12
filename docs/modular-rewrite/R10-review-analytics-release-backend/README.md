@@ -2,7 +2,7 @@
 
 ## 当前阶段状态
 
-`IN_PROGRESS`。用户2026-10-12“开始R10-01”授权；从R9文档收尾HEAD `48618fed2d7ff7c2a4db831a037f227dc789f278` 建立唯一阶段分支 `rewrite/r10-review-analytics-release-backend`。01自身精确Windows run38229119264/job114743919870全SUCCESS并DONE；02自身1ad6e68 / Windows run38245932270/job114799659672全SUCCESS并DONE；用户“收尾02开始03”授权03 READY，04～13 BLOCKED。
+`IN_PROGRESS`。用户2026-10-12“开始R10-01”授权；从R9文档收尾HEAD `48618fed2d7ff7c2a4db831a037f227dc789f278` 建立唯一阶段分支 `rewrite/r10-review-analytics-release-backend`。01自身精确Windows run38229119264/job114743919870全SUCCESS并DONE；02自身1ad6e68 / Windows run38245932270/job114799659672全SUCCESS并DONE；用户“收尾02开始03”授权03已实施VERIFYING，04～13 BLOCKED。
 
 ## 前置基线与依据
 
@@ -14,7 +14,7 @@
 |---|---|---|
 | R10-01 | [Review Package Workflow](R10-01-review-package-workflow.md) | DONE · 自身精确Windows全SUCCESS |
 | R10-02 | [Structured Match Facts](R10-02-structured-match-facts.md) | DONE · 自身精确Windows全SUCCESS |
-| R10-03 | Review Engine Adapter | READY · 用户已授权 |
+| R10-03 | [Review Engine Adapter](R10-03-review-engine-adapter.md) | VERIFYING · 已实施，静态通过，自身Windows待验 |
 | R10-04 | Ability Candidate Transaction | BLOCKED |
 | R10-05 | Postmatch Settlement | BLOCKED |
 | R10-06 | Evidence Scoring | BLOCKED |
@@ -58,3 +58,12 @@ R10-02 Structured Match Facts 已实施 `VERIFYING`，基线ab43aee，继续唯�
 artifact11746489380，14,041,992字节，SHA-256 `378486f022954e5ee7044258e31b09bcd83c8c484c55af6fff11ef71ef1af3d1`。02自身完整成功后DONE；用户2026-10-12“收尾02开始03”授权03 Review Engine Adapter READY，同一rewrite/r10-review-analytics-release-backend，04～13 BLOCKED，R10 IN_PROGRESS。本次只五既有文档收尾[skip ci]，源码同上述已验提交；03必须取得自身精确Windows完整证据。
 
 真实PG/历史保护四项/不可变账本/并发/回滚/有效XLSX/Windows Full/私有P4/P7固定回归与继承model.runs/0041删除风险仍最终封包新库待验，ignored/公开stub/静态指纹不计真实PASS。此前02 VERIFYING与预期计数保留为实施历史。
+
+
+## R10-03 实际边界与继续位置
+
+R10-03 Review Engine Adapter已实施 `VERIFYING`，基线93a008e，继续唯一rewrite/r10-review-analytics-release-backend。Application普通/资料包两条实际生成入口迁入engine_adapter，Service与组合工作流已切换；PG六个引擎职责迁入准备、上下文、原计算事务和报告持久化，事实提交复用同一完整准备。纯review-engine源码/公式、原SQL/错误/JSON载荷、公开签名、事务/审计/提交后回读及pending候选人工门禁保持。原8 Application测试正文保持，其中2生成测试迁入新owner、共用原fixture；新增5入口unit待Windows，预期Application151 / Persistence187 / Gateway112 unit、41 contract。84/84静态、完整架构、18 Rustfmt、等价及8负向探针通过；01～02 DONE，03 VERIFYING，04～13 BLOCKED、R10 IN_PROGRESS。真实PG/历史四项/账本并发回滚/有效XLSX/Full/私有P4P7回归及继承model.runs/0041删除风险仍最终新库待验。
+
+普通入口原ID/版本/备注归一化与资料包原状态/确认流程保持各自契约，未把一条路径的前检新加到另一条。PG适配器直接调用原纯calculate_review；共享prepare仍先事实、再球员/历史/预测上下文，报告/候选pending/动态标签/审计同一原事务，提交后详情回读不改顺序。root review仍持有读取和候选人工决定，留给04等后续节点，无重复旧生成/上下文/报告owner。
+
+完整11A/18M/1D及职责迁移/回退见[03记录](R10-03-review-engine-adapter.md)。先核对03自身精确Windows，失败修本唯一分支，成功并获用户收尾04授权后再推进；无R10阶段完成记录。
