@@ -1,6 +1,6 @@
 # R10-04 Ability Candidate Transaction
 
-状态：`VERIFYING`。用户2026-10-12“收尾03开始04”授权；uniquenesssta/123 v0.23.0，唯一rewrite/r10-review-analytics-release-backend，基线aa24f5a3c05ec6008206a53af47f136e92bd7f4a。01～03自身精确Windows DONE；05～13 BLOCKED，R10 IN_PROGRESS。
+状态：`DONE`（自身精确Windows全SUCCESS；下述VERIFYING为实施历史）。用户2026-10-12“收尾03开始04”授权；uniquenesssta/123 v0.23.0，唯一rewrite/r10-review-analytics-release-backend，基线aa24f5a3c05ec6008206a53af47f136e92bd7f4a。01～03自身精确Windows DONE；05～13 BLOCKED，R10 IN_PROGRESS。
 
 ### 1. 目标
 
@@ -162,3 +162,14 @@ flowchart TD
 | A | docs/modular-rewrite/R10-review-analytics-release-backend/R10-04-ability-candidate-transaction.md |
 | M | docs/modular-rewrite/R10-review-analytics-release-backend/README.md |
 | M | scripts/verify-review-service.mjs |
+
+
+## R10-04 精确 Windows 完成与05授权（2026-10-13）
+
+精确提交 `221d21134c46fa45e280230238153694be415aa1` / tree `5f8234f89eb86a6aeb7c19dd8bfc1376385d31b4`，[Public Platform CI run38271387412](https://github.com/uniquenesssta/123/actions/runs/38271387412) / Windows job114886215505 全SUCCESS，run于2026-10-13 00:03:32北京时间完成。实际Application151/151、Persistence195/195（新增8候选unit均成功）、Gateway112/112 unit和41/41 contract；前端/contracts/TypeScript/Vite/17视口、Rust fmt/locked Clippy all-targets -D warnings/workspace、Windows release/MSI/NSIS、客户端启动及日志扫描通过（7条记录、3个完成操作）。报告windows-acceptance-20261012-153709.json及同名.txt。
+
+证据artifact11758811423，14,041,670字节，SHA-256 `296e86e05c1a649bfab6cda6cb9a938f8b83d75c4f2b19c71d80a3ad404fec59`。04自身完整成功后DONE；用户2026-10-13“收尾04开始05”授权05 Postmatch Settlement READY，继续唯一rewrite/r10-review-analytics-release-backend，06～13 BLOCKED，R10 IN_PROGRESS。本次只五份既有文档收尾[skip ci]，源码同精确成功提交，后续05须自身完整Windows证据。此前04 VERIFYING与预期计数保留为实施历史。
+
+真实PG/历史保护四项/不可变账本/并发回滚/有效XLSX/Windows Full/私有P4/P7固定回归及继承model.runs/0041删除风险仍最终封包新库待验；ignored、公开unavailable stub和静态指纹不计这些真实PASS。无R10阶段完成记录。
+
+收尾5M/0A/0D：根README、TESTING、R10任务书、阶段索引与本节点。04实施7A/8M/0D及原职责/回退记录保持，源码不变。
