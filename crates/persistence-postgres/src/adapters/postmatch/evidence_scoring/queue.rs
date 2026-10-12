@@ -5,7 +5,7 @@ use sqlx::{Postgres, Row, Transaction};
 use uuid::Uuid;
 
 impl PostgresStore {
-    pub(super) async fn insert_evidence_scoring_items_in_tx(
+    pub(in crate::adapters::postmatch) async fn insert_evidence_scoring_items_in_tx(
         &self,
         tx: &mut Transaction<'_, Postgres>,
         settlement_id: Uuid,

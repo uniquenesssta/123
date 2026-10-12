@@ -21,15 +21,15 @@ const composition = read("crates/application/src/composition/application_composi
 const applicationService = read("crates/application/src/service/application_service.rs");
 const contract = JSON.parse(read("contracts/postmatch-settlement-contract.json"));
 const useCaseFiles = [
-  "list_evidence_scoring_items",
-  "decide_evidence_scoring_item",
   "refresh_postmatch_monitoring",
   "postmatch_overview",
 ].map((name) => read(`crates/application/src/use_cases/postmatch/${name}/mod.rs`));
 const settlementMod = read(`${settlementRoot}mod.rs`);
 const settlementRead = read(`${settlementRoot}read.rs`);
 const settlementTests = read(`${settlementRoot}tests.rs`);
-const applicationLayer = [facade, service, settle, settlementRead, settlementTests, ...useCaseFiles].join("\n");
+const evidenceRoot = "crates/application/src/use_cases/postmatch/evidence_scoring/";
+const evidence = Object.fromEntries(["mod", "read", "decision", "tests"].map((name) => [name, read(`${evidenceRoot}${name}.rs`)]));
+const applicationLayer = [facade, service, settle, settlementRead, settlementTests, ...Object.values(evidence), ...useCaseFiles].join("\n");
 
 assert(!exists("crates/application/src/postmatch.rs"), "旧 Postmatch Application owner 仍存在");
 assert(
@@ -92,7 +92,7 @@ for (const forbidden of [
 }
 
 const pgRoot = "crates/persistence-postgres/src/adapters/postmatch/settlement/";
-const pg = Object.fromEntries(["mod", "context", "readiness", "read", "repository", "evidence_queue", "evaluation_sample", "validation", "tests"].map((name) => [name, read(`${pgRoot}${name}.rs`)]));
+const pg = Object.fromEntries(["mod", "context", "readiness", "read", "repository", "evidence_queue", "evaluation_sample", "validation", "tests"].map((name) => [name, read(name === "evidence_queue" ? "crates/persistence-postgres/src/adapters/postmatch/evidence_scoring/queue.rs" : `${pgRoot}${name}.rs`)]));
 const oldPg = read("crates/persistence-postgres/src/postmatch.rs");
 const ordered = (source, tokens) => {
   let offset = 0;
@@ -118,6 +118,30 @@ assert(ordered(pg.evaluation_sample, ["最终复盘没有可用预测评价", "a
 assert(/#\[test\]\s+fn timeliness_is_bounded_and_rewards_fresh_sources/.test(pg.evidence_queue) && !/#\[test\]\s+#\[test\]/.test(oldPg), "原timeliness unit必须迁移注册一次，不能丢失或重复属性");
 for (const name of ["plain_settlement_preserves_draft_detail_and_returned_review_identity", "review_created_package_settles_then_marks_once", "settled_package_retries_original_idempotent_port_without_new_readiness", "blocked_package_states_stop_before_settlement_with_original_domain_reason", "workflow_lookup_failure_stops_all_settlement_effects", "settlement_and_mark_errors_preserve_original_side_effect_boundary", "readiness_and_list_preserve_input_parameters_and_complete_results", "readiness_and_list_propagate_port_errors_without_workflow_writes"]) assert(settlementTests.includes(`fn ${name}(`), `缺少原App target结算测试 ${name}`);
 for (const name of ["readiness_preserves_formal_horizons_and_real_manual_snapshot_sources", "readiness_accumulates_original_eight_blockers_in_order", "readiness_rejects_each_snapshot_identity_axis_and_nonformal_scope", "existing_settlement_identity_does_not_override_current_readiness_guards"]) assert(pg.tests.includes(`fn ${name}(`), `缺少原PG target readiness测试 ${name}`);
+
+const scoringRoot = "crates/persistence-postgres/src/adapters/postmatch/evidence_scoring/";
+const scoring = Object.fromEntries(["mod", "read", "mapping", "repository", "policy", "queue", "tests"].map((name) => [name, read(`${scoringRoot}${name}.rs`)]));
+for (const name of ["list_evidence_scoring_items", "decide_evidence_scoring_item"]) {
+  assert(!exists(`crates/application/src/use_cases/postmatch/${name}/mod.rs`), `旧证据用例仍存在 ${name}`);
+  assert(service.includes(`postmatch::evidence_scoring::${name}(`), `Service未切证据入口 ${name}`);
+}
+assert(read("crates/application/src/use_cases/postmatch/mod.rs").includes("pub(crate) mod evidence_scoring;") && read("crates/persistence-postgres/src/adapters/postmatch/mod.rs").includes("mod evidence_scoring;"), "App/PG未登记唯一evidence_scoring");
+assert(evidence.mod.includes("pub(crate) use decision::decide_evidence_scoring_item;") && evidence.mod.includes("pub(crate) use read::list_evidence_scoring_items;") && !/(?:async fn|impl |sqlx::)/.test(evidence.mod), "证据App出口必须仅登记/导出实际入口");
+assert(evidence.read.includes(".list_evidence_scoring_items(status.as_deref(), limit)") && evidence.decision.includes("port.decide_evidence_scoring_item(&draft).await?"), "证据用例必须保持原字段/参数透传");
+assert(!/trim\(|clamp\(|verdict_scores\(/.test(evidence.read + evidence.decision), "App不能新加原PG验证/归一化或评分公式");
+for (const name of ["list_evidence_scoring_items", "decide_evidence_scoring_item", "read_evidence_scoring_item", "evidence_item_from_row", "verdict_scores"]) assert(!new RegExp(`(?:async )?fn ${name}\\(`).test(oldPg), `旧PG保留证据职责 ${name}`);
+assert(!exists(`${pgRoot}evidence_queue.rs`) && !read(`${pgRoot}mod.rs`).includes("mod evidence_queue;"), "旧结算目录不能保留重复证据队列owner");
+assert(scoring.queue.includes("pub(in crate::adapters::postmatch) async fn insert_evidence_scoring_items_in_tx("), "队列必须仅在原postmatch事务模块间共享");
+assert(ordered(scoring.repository, ["validate_evidence_decision_note(&draft.decision_note)?", "EXISTS (SELECT 1 FROM review.evidence_scoring_decisions", "证据评分项不存在", "item.try_get::<bool, _>(\"decided\")?", "历史决定不可覆盖", "verdict_scores(draft.verdict, &verification_state, &source_tier)", "sha256_json(", "\"decision_note\": draft.decision_note.trim()", "self.pool.begin().await?", "INSERT INTO review.evidence_scoring_decisions", "write_audit_event(", "tx.commit().await?", "self.read_evidence_scoring_item(draft.item_id).await"]), "原说明/已判定前检/评分指纹/共同决定审计/提交后回读顺序漂移");
+assert((scoring.repository.match(/self\.pool\.begin\(\)\.await\?/g) ?? []).length === 1 && (scoring.repository.match(/tx\.commit\(\)\.await\?/g) ?? []).length === 1 && scoring.repository.indexOf("write_audit_event(") < scoring.repository.indexOf("tx.commit().await?"), "证据决定必须仅一个原事务且审计后提交一次");
+assert(!/ON CONFLICT|UPDATE review\.evidence_scoring_decisions|DELETE FROM review\.evidence_scoring_decisions/.test(scoring.repository), "证据决定不可覆盖或自动重试改写旧记录");
+for (const token of ["!matches!(value, \"pending\" | \"scored\" | \"not_verifiable\")", "if note.trim().len() < 8", "证据判定说明至少需要 8 个字符", "if verdict == EvidenceVerdict::NotVerifiable", "return (None, None)", "EvidenceVerdict::Partial => 0.5", "source_tier.to_ascii_lowercase().as_str()", "accuracy * 0.70 + verification_quality * 0.15 + source_quality * 0.15", "(Some(round6(accuracy)), Some(round6(reliability)))"]) assert(scoring.policy.includes(token), `原评分/说明字节门槛/状态规则缺少 ${token}`);
+for (const token of [".bind(draft.decided_by.as_deref())", ".bind(draft.decision_note.trim())", "\"decided_by\": draft.decided_by.as_deref()", "\"evidence_scoring_decided\""]) assert(scoring.repository.includes(token), `原人工决定载荷缺少 ${token}`);
+for (const token of ["validate_evidence_status(status)?", "limit.clamp(1, 1000)", "decision.id IS NULL", "decision.verdict = 'not_verifiable'", "item.created_at DESC, item.id DESC", "evidence_item_from_row"]) assert(scoring.read.includes(token), `原评分查询/状态派生缺少 ${token}`);
+for (const name of ["read", "mapping", "policy", "queue"]) assert(!/\.(?:begin|commit|rollback)\(/.test(scoring[name]), `${name}不得另开或完成证据决定事务`);
+assert(/#\[test\]\s+fn not_verifiable_does_not_fake_accuracy/.test(scoring.policy) && /#\[test\]\s+fn timeliness_is_bounded_and_rewards_fresh_sources/.test(scoring.queue), "原verdict与timeliness两unit都必须注册保留");
+for (const name of ["list_none_filter_preserves_zero_limit_and_full_port_records", "list_preserves_exact_optional_status_and_unclamped_limit", "decision_preserves_all_four_verdicts_and_complete_returned_record", "decision_keeps_missing_or_blank_actor_and_note_validation_at_port_boundary", "list_propagates_all_port_error_kinds_without_other_calls", "decision_propagates_port_failure_without_retry_or_monitoring"]) assert(evidence.tests.includes(`fn ${name}(`), `缺少App原target证据测试 ${name}`);
+for (const name of ["status_filter_accepts_none_and_original_three_states", "status_filter_rejects_unknown_case_and_whitespace", "decision_note_accepts_original_utf8_byte_boundary_after_trim", "decision_note_rejects_short_or_blank_with_original_error", "verdict_accuracy_preserves_three_manual_values", "reliability_preserves_verification_quality_and_case_policy", "reliability_preserves_source_aliases_case_and_untrimmed_fallback", "not_verifiable_has_no_scores_for_any_quality_context"]) assert(scoring.tests.includes(`fn ${name}(`), `缺少PG原target证据测试 ${name}`);
 console.log(
   "Postmatch Service 验证通过：7 个公共入口、2 个既有 Ports、资料包状态机与 PostgreSQL adapter 边界完整。",
 );

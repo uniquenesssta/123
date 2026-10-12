@@ -62,7 +62,7 @@ impl PostmatchService {
     where
         P: PostmatchSettlementPort + ?Sized,
     {
-        postmatch::list_evidence_scoring_items::execute(port, status, limit).await
+        postmatch::evidence_scoring::list_evidence_scoring_items(port, status, limit).await
     }
 
     pub(crate) async fn decide_evidence_scoring_item<P>(
@@ -73,7 +73,7 @@ impl PostmatchService {
     where
         P: PostmatchSettlementPort + ?Sized,
     {
-        postmatch::decide_evidence_scoring_item::execute(port, draft).await
+        postmatch::evidence_scoring::decide_evidence_scoring_item(port, draft).await
     }
 
     pub(crate) async fn refresh_postmatch_monitoring<P>(

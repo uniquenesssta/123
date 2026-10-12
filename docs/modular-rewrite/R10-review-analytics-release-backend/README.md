@@ -2,7 +2,7 @@
 
 ## 当前阶段状态
 
-`IN_PROGRESS`。用户2026-10-12“开始R10-01”授权；从R9文档收尾HEAD `48618fed2d7ff7c2a4db831a037f227dc789f278` 建立唯一阶段分支 `rewrite/r10-review-analytics-release-backend`。01自身精确Windows run38229119264/job114743919870全SUCCESS并DONE；02自身1ad6e68 / Windows run38245932270/job114799659672全SUCCESS并DONE；用户“收尾02开始03”授权03已实施；03自身99b15ad / Windows run38259438025/job114845878326全SUCCESS并DONE，04自身221d211 / Windows run38271387412/job114886215505全SUCCESS并DONE；05自身fe3529f / Windows run38277864089/job114907643831全SUCCESS并DONE；用户“收尾05开始06”授权06 READY，07～13 BLOCKED。
+`IN_PROGRESS`。用户2026-10-12“开始R10-01”授权；从R9文档收尾HEAD `48618fed2d7ff7c2a4db831a037f227dc789f278` 建立唯一阶段分支 `rewrite/r10-review-analytics-release-backend`。01自身精确Windows run38229119264/job114743919870全SUCCESS并DONE；02自身1ad6e68 / Windows run38245932270/job114799659672全SUCCESS并DONE；用户“收尾02开始03”授权03已实施；03自身99b15ad / Windows run38259438025/job114845878326全SUCCESS并DONE，04自身221d211 / Windows run38271387412/job114886215505全SUCCESS并DONE；05自身fe3529f / Windows run38277864089/job114907643831全SUCCESS并DONE；用户“收尾05开始06”授权06已实施VERIFYING，07～13 BLOCKED。
 
 ## 前置基线与依据
 
@@ -17,7 +17,7 @@
 | R10-03 | [Review Engine Adapter](R10-03-review-engine-adapter.md) | DONE · 自身精确Windows全SUCCESS |
 | R10-04 | [Ability Candidate Transaction](R10-04-ability-candidate-transaction.md) | DONE · 自身精确Windows全SUCCESS |
 | R10-05 | [Postmatch Settlement](R10-05-postmatch-settlement.md) | DONE · 自身精确Windows全SUCCESS |
-| R10-06 | Evidence Scoring | READY · 用户已授权 |
+| R10-06 | [Evidence Scoring](R10-06-evidence-scoring.md) | VERIFYING · 已实施，静态通过，自身Windows待验 |
 | R10-07 | Provider Score | BLOCKED |
 | R10-08 | Drift Monitoring | BLOCKED |
 | R10-09 | Analytics Calculation | BLOCKED |
@@ -110,3 +110,10 @@ R10-05 Postmatch Settlement已实施 `VERIFYING`，基线96ef21d，继续唯一r
 证据artifact11761067078，14,042,191字节，SHA-256 `65186f8312bf643c3b6547cc36cc7a61669e23f735a82be172128584ecb382f2`。05自身完整成功后DONE；用户2026-10-13“收尾05开始06”授权06 Evidence Scoring READY，继续唯一rewrite/r10-review-analytics-release-backend，07～13 BLOCKED，R10 IN_PROGRESS。本次只五份既有文档收尾[skip ci]，源码同精确成功提交，06须自身完整Windows证据。此前05 VERIFYING与预期计数保留为实施历史。
 
 真实PG/历史保护四项/不可变账本/并发回滚/有效XLSX/Windows Full/私有P4/P7固定回归及继承model.runs/0041删除风险仍最终封包新库待验；ignored、公开unavailable stub和静态指纹不计真实PASS。无R10阶段完成记录。
+
+
+## R10-06 实际边界与继续位置
+
+R10-06 Evidence Scoring已实施 `VERIFYING`，基线18f7264，继续唯一rewrite/r10-review-analytics-release-backend。App两证据用例迁入evidence_scoring并切Service/删旧路径；PG查询/映射/人工决定/评分与原队列收拢唯一owner，结算仍借用原tx调用同一队列方法。原SQL/错误/JSON、说明trim后UTF-8字节门槛、评分权重/别名、不可验证NULL、不可变决定/审计/提交后回读保持；不自动判定/晋升参数。新增6App/8PG unit待Windows，预期Application165 / Persistence207 / Gateway112 unit、41 contract；84/84静态、完整架构、16 Rustfmt、16等价及8负向通过。01～05自身Windows DONE，06 VERIFYING、07～13 BLOCKED、R10 IN_PROGRESS；真实PG/历史四项/账本并发回滚/有效XLSX/Windows Full/私有P4P7回归及继承model.runs/0041删除风险仍最终新库待验。
+
+证据队列归唯一评分owner，原结算同事务调用/支持权限保持；原note8字节/评分权重/NotVerifiable空分/不可变决定保护不改。12A/13M/3D及真实异常/旧test/回退见[06记录](R10-06-evidence-scoring.md)。先核对06自身完整Windows，失败修同分支，成功且用户授权后进入07；无阶段完成记录。

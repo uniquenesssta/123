@@ -24,13 +24,13 @@
     "targetPublicExportPolicy": "explicit re-export only"
   },
   "sourceDigest": "217241ac243726a5ab6805a7f169e222b97e78c7c971749a5904714af673ebdd",
-  "rustUsageDigest": "819b53c9f9b9b8845b324b6f33881a6a461d890fa2e759f2ea04fc738ce76966",
+  "rustUsageDigest": "8d50c3635998f66d1a26a5d4da8312d58f45339ebf4ae15e438301273098fcca",
   "summary": {
     "typeCount": 365,
     "publicCompatibilityTypeCount": 365,
     "internalTypeCount": 0,
     "domainSourceFileCount": 129,
-    "scannedRustFileCount": 1203,
+    "scannedRustFileCount": 1211,
     "databaseMappedTypeCount": 301,
     "byTargetModule": {
       "ai_workspace": 16,
@@ -8095,13 +8095,14 @@
         "crates/application/src/ports/postmatch/mod.rs",
         "crates/application/src/services/postmatch/facade.rs",
         "crates/application/src/services/postmatch/service.rs",
-        "crates/application/src/use_cases/postmatch/decide_evidence_scoring_item/mod.rs",
+        "crates/application/src/use_cases/postmatch/evidence_scoring/decision.rs",
+        "crates/application/src/use_cases/postmatch/evidence_scoring/tests.rs",
         "crates/application/src/use_cases/postmatch/settlement/tests.rs",
-        "crates/persistence-postgres/src/postmatch.rs",
+        "crates/persistence-postgres/src/adapters/postmatch/evidence_scoring/repository.rs",
         "src-tauri/src/commands/postmatch.rs"
       ],
       "databaseMappings": [
-        "crates/persistence-postgres/src/postmatch.rs"
+        "crates/persistence-postgres/src/adapters/postmatch/evidence_scoring/repository.rs"
       ]
     },
     {
@@ -8244,14 +8245,19 @@
         "crates/application/src/ports/postmatch/mod.rs",
         "crates/application/src/services/postmatch/facade.rs",
         "crates/application/src/services/postmatch/service.rs",
-        "crates/application/src/use_cases/postmatch/decide_evidence_scoring_item/mod.rs",
-        "crates/application/src/use_cases/postmatch/list_evidence_scoring_items/mod.rs",
+        "crates/application/src/use_cases/postmatch/evidence_scoring/decision.rs",
+        "crates/application/src/use_cases/postmatch/evidence_scoring/read.rs",
+        "crates/application/src/use_cases/postmatch/evidence_scoring/tests.rs",
         "crates/application/src/use_cases/postmatch/settlement/tests.rs",
-        "crates/persistence-postgres/src/postmatch.rs",
+        "crates/persistence-postgres/src/adapters/postmatch/evidence_scoring/mapping.rs",
+        "crates/persistence-postgres/src/adapters/postmatch/evidence_scoring/read.rs",
+        "crates/persistence-postgres/src/adapters/postmatch/evidence_scoring/repository.rs",
         "src-tauri/src/commands/postmatch.rs"
       ],
       "databaseMappings": [
-        "crates/persistence-postgres/src/postmatch.rs"
+        "crates/persistence-postgres/src/adapters/postmatch/evidence_scoring/mapping.rs",
+        "crates/persistence-postgres/src/adapters/postmatch/evidence_scoring/read.rs",
+        "crates/persistence-postgres/src/adapters/postmatch/evidence_scoring/repository.rs"
       ]
     },
     {
@@ -8315,10 +8321,13 @@
         "crates/domain/tests/serde_contracts/r2_06_module_paths.rs"
       ],
       "externalCallers": [
-        "crates/persistence-postgres/src/postmatch.rs"
+        "crates/application/src/use_cases/postmatch/evidence_scoring/tests.rs",
+        "crates/persistence-postgres/src/adapters/postmatch/evidence_scoring/policy.rs",
+        "crates/persistence-postgres/src/adapters/postmatch/evidence_scoring/tests.rs"
       ],
       "databaseMappings": [
-        "crates/persistence-postgres/src/postmatch.rs"
+        "crates/persistence-postgres/src/adapters/postmatch/evidence_scoring/policy.rs",
+        "crates/persistence-postgres/src/adapters/postmatch/evidence_scoring/tests.rs"
       ]
     },
     {
@@ -21205,6 +21214,7 @@
         "crates/application/src/ports/postmatch/mod.rs",
         "crates/application/src/services/postmatch/facade.rs",
         "crates/application/src/services/postmatch/service.rs",
+        "crates/application/src/use_cases/postmatch/evidence_scoring/tests.rs",
         "crates/application/src/use_cases/postmatch/settlement/coordinator.rs",
         "crates/application/src/use_cases/postmatch/settlement/tests.rs",
         "crates/persistence-postgres/src/adapters/postmatch/settlement/repository.rs",
@@ -21321,6 +21331,7 @@
         "crates/application/src/ports/postmatch/mod.rs",
         "crates/application/src/services/postmatch/facade.rs",
         "crates/application/src/services/postmatch/service.rs",
+        "crates/application/src/use_cases/postmatch/evidence_scoring/tests.rs",
         "crates/application/src/use_cases/postmatch/settlement/read.rs",
         "crates/application/src/use_cases/postmatch/settlement/tests.rs",
         "crates/persistence-postgres/src/adapters/postmatch/settlement/readiness.rs",
@@ -21498,6 +21509,7 @@
         "crates/application/src/ports/postmatch/mod.rs",
         "crates/application/src/services/postmatch/facade.rs",
         "crates/application/src/services/postmatch/service.rs",
+        "crates/application/src/use_cases/postmatch/evidence_scoring/tests.rs",
         "crates/application/src/use_cases/postmatch/settlement/coordinator.rs",
         "crates/application/src/use_cases/postmatch/settlement/read.rs",
         "crates/application/src/use_cases/postmatch/settlement/tests.rs",

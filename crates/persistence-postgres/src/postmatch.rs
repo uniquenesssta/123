@@ -1,9 +1,9 @@
 use super::{sha256_json, write_audit_event, PersistenceError, PersistenceResult, PostgresStore};
 use football_analytics_engine::calculate_analytics;
 use football_domain::{
-    EvaluationSample, EvidenceScoringDecisionDraft, EvidenceScoringItemRecord, EvidenceVerdict,
-    PostmatchDriftFindingRecord, PostmatchDriftRunRecord, PostmatchMonitoringRequest,
-    PostmatchOverview, ProviderScoreSnapshotRecord, POSTMATCH_MONITORING_VERSION,
+    EvaluationSample, PostmatchDriftFindingRecord, PostmatchDriftRunRecord,
+    PostmatchMonitoringRequest, PostmatchOverview, ProviderScoreSnapshotRecord,
+    POSTMATCH_MONITORING_VERSION,
 };
 use serde_json::{json, Value};
 use sqlx::Row;
@@ -13,128 +13,6 @@ use uuid::Uuid;
 pub(crate) const FORMAL_HORIZONS: [&str; 4] = ["T-N", "T-24h", "T-6h", "T-1h"];
 
 impl PostgresStore {
-    pub async fn list_evidence_scoring_items(
-        &self,
-        status: Option<&str>,
-        limit: u32,
-    ) -> PersistenceResult<Vec<EvidenceScoringItemRecord>> {
-        if let Some(value) = status {
-            if !matches!(value, "pending" | "scored" | "not_verifiable") {
-                return Err(PersistenceError::InvalidState(
-                    "证据评分状态必须为 pending、scored 或 not_verifiable".to_string(),
-                ));
-            }
-        }
-        let rows = sqlx::query(
-            r#"
-            SELECT item.id, item.settlement_id, item.evidence_id, item.provider_id,
-                   provider.name AS provider_name, item.source_document_id, item.field_key,
-                   item.verification_state, item.source_tier, claim.source_title,
-                   claim.source_domain, item.published_at, item.retrieved_at,
-                   item.data_cutoff_at, item.timeliness_score, item.created_at,
-                   decision.id AS decision_id, decision.verdict, decision.accuracy_score,
-                   decision.reliability_score, decision.decided_by, decision.decision_note,
-                   decision.decided_at,
-                   CASE
-                       WHEN decision.id IS NULL THEN 'pending'
-                       WHEN decision.verdict = 'not_verifiable' THEN 'not_verifiable'
-                       ELSE 'scored'
-                   END AS status
-            FROM review.evidence_scoring_items item
-            JOIN research.evidence_claims claim ON claim.id = item.evidence_id
-            LEFT JOIN catalog.data_providers provider ON provider.id = item.provider_id
-            LEFT JOIN review.evidence_scoring_decisions decision ON decision.item_id = item.id
-            WHERE $1::text IS NULL OR
-                  ($1 = 'pending' AND decision.id IS NULL) OR
-                  ($1 = 'scored' AND decision.id IS NOT NULL AND decision.verdict <> 'not_verifiable') OR
-                  ($1 = 'not_verifiable' AND decision.verdict = 'not_verifiable')
-            ORDER BY CASE WHEN decision.id IS NULL THEN 0 ELSE 1 END,
-                     item.created_at DESC, item.id DESC
-            LIMIT $2
-            "#,
-        )
-        .bind(status)
-        .bind(i64::from(limit.clamp(1, 1000)))
-        .fetch_all(&self.pool)
-        .await?;
-        rows.iter().map(evidence_item_from_row).collect()
-    }
-
-    pub async fn decide_evidence_scoring_item(
-        &self,
-        draft: &EvidenceScoringDecisionDraft,
-    ) -> PersistenceResult<EvidenceScoringItemRecord> {
-        if draft.decision_note.trim().len() < 8 {
-            return Err(PersistenceError::InvalidState(
-                "证据判定说明至少需要 8 个字符".to_string(),
-            ));
-        }
-        let item = sqlx::query(
-            r#"
-            SELECT item.id, item.verification_state, item.source_tier,
-                   EXISTS (SELECT 1 FROM review.evidence_scoring_decisions decision WHERE decision.item_id=item.id) AS decided
-            FROM review.evidence_scoring_items item
-            WHERE item.id=$1
-            "#,
-        )
-        .bind(draft.item_id)
-        .fetch_optional(&self.pool)
-        .await?
-        .ok_or_else(|| PersistenceError::InvalidState("证据评分项不存在".to_string()))?;
-        if item.try_get::<bool, _>("decided")? {
-            return Err(PersistenceError::InvalidState(
-                "该证据评分项已经完成判定，历史决定不可覆盖".to_string(),
-            ));
-        }
-        let verification_state: String = item.try_get("verification_state")?;
-        let source_tier: String = item.try_get("source_tier")?;
-        let (accuracy_score, reliability_score) =
-            verdict_scores(draft.verdict, &verification_state, &source_tier);
-        let decision_fingerprint = sha256_json(&json!({
-            "item_id": draft.item_id,
-            "verdict": draft.verdict.as_str(),
-            "accuracy_score": accuracy_score,
-            "reliability_score": reliability_score,
-            "decided_by": draft.decided_by.as_deref(),
-            "decision_note": draft.decision_note.trim(),
-        }))?;
-        let decision_id = Uuid::new_v4();
-        let mut tx = self.pool.begin().await?;
-        sqlx::query(
-            r#"
-            INSERT INTO review.evidence_scoring_decisions (
-                id, item_id, verdict, accuracy_score, reliability_score,
-                decided_by, decision_note, decision_fingerprint
-            ) VALUES ($1,$2,$3,$4,$5,$6,$7,$8)
-            "#,
-        )
-        .bind(decision_id)
-        .bind(draft.item_id)
-        .bind(draft.verdict.as_str())
-        .bind(accuracy_score)
-        .bind(reliability_score)
-        .bind(draft.decided_by.as_deref())
-        .bind(draft.decision_note.trim())
-        .bind(&decision_fingerprint)
-        .execute(&mut *tx)
-        .await?;
-        write_audit_event(
-            &mut tx,
-            "evidence_scoring_decided",
-            "evidence_scoring_item",
-            Some(draft.item_id.to_string()),
-            json!({
-                "decision_id": decision_id,
-                "verdict": draft.verdict.as_str(),
-                "accuracy_score": accuracy_score,
-                "reliability_score": reliability_score,
-            }),
-        )
-        .await?;
-        tx.commit().await?;
-        self.read_evidence_scoring_item(draft.item_id).await
-    }
-
     pub async fn refresh_postmatch_monitoring(
         &self,
         request: &PostmatchMonitoringRequest,
@@ -193,39 +71,6 @@ impl PostgresStore {
             provider_scores,
             drift_runs,
         })
-    }
-
-    async fn read_evidence_scoring_item(
-        &self,
-        item_id: Uuid,
-    ) -> PersistenceResult<EvidenceScoringItemRecord> {
-        let row = sqlx::query(
-            r#"
-            SELECT item.id, item.settlement_id, item.evidence_id, item.provider_id,
-                   provider.name AS provider_name, item.source_document_id, item.field_key,
-                   item.verification_state, item.source_tier, claim.source_title,
-                   claim.source_domain, item.published_at, item.retrieved_at,
-                   item.data_cutoff_at, item.timeliness_score, item.created_at,
-                   decision.id AS decision_id, decision.verdict, decision.accuracy_score,
-                   decision.reliability_score, decision.decided_by, decision.decision_note,
-                   decision.decided_at,
-                   CASE
-                       WHEN decision.id IS NULL THEN 'pending'
-                       WHEN decision.verdict = 'not_verifiable' THEN 'not_verifiable'
-                       ELSE 'scored'
-                   END AS status
-            FROM review.evidence_scoring_items item
-            JOIN research.evidence_claims claim ON claim.id = item.evidence_id
-            LEFT JOIN catalog.data_providers provider ON provider.id = item.provider_id
-            LEFT JOIN review.evidence_scoring_decisions decision ON decision.item_id = item.id
-            WHERE item.id=$1
-            "#,
-        )
-        .bind(item_id)
-        .fetch_optional(&self.pool)
-        .await?
-        .ok_or_else(|| PersistenceError::InvalidState("证据评分项不存在".to_string()))?;
-        evidence_item_from_row(&row)
     }
 
     async fn active_postmatch_partition(
@@ -657,37 +502,6 @@ impl ProviderAggregate {
     }
 }
 
-fn evidence_item_from_row(
-    row: &sqlx::postgres::PgRow,
-) -> PersistenceResult<EvidenceScoringItemRecord> {
-    Ok(EvidenceScoringItemRecord {
-        id: row.try_get("id")?,
-        settlement_id: row.try_get("settlement_id")?,
-        evidence_id: row.try_get("evidence_id")?,
-        provider_id: row.try_get("provider_id")?,
-        provider_name: row.try_get("provider_name")?,
-        source_document_id: row.try_get("source_document_id")?,
-        field_key: row.try_get("field_key")?,
-        verification_state: row.try_get("verification_state")?,
-        source_tier: row.try_get("source_tier")?,
-        source_title: row.try_get("source_title")?,
-        source_domain: row.try_get("source_domain")?,
-        published_at: row.try_get("published_at")?,
-        retrieved_at: row.try_get("retrieved_at")?,
-        data_cutoff_at: row.try_get("data_cutoff_at")?,
-        timeliness_score: row.try_get("timeliness_score")?,
-        decision_id: row.try_get("decision_id")?,
-        verdict: row.try_get("verdict")?,
-        accuracy_score: row.try_get("accuracy_score")?,
-        reliability_score: row.try_get("reliability_score")?,
-        decided_by: row.try_get("decided_by")?,
-        decision_note: row.try_get("decision_note")?,
-        decided_at: row.try_get("decided_at")?,
-        status: row.try_get("status")?,
-        created_at: row.try_get("created_at")?,
-    })
-}
-
 fn provider_score_from_row(
     row: &sqlx::postgres::PgRow,
 ) -> PersistenceResult<ProviderScoreSnapshotRecord> {
@@ -733,39 +547,6 @@ fn drift_finding_from_row(
     })
 }
 
-fn verdict_scores(
-    verdict: EvidenceVerdict,
-    verification_state: &str,
-    source_tier: &str,
-) -> (Option<f64>, Option<f64>) {
-    if verdict == EvidenceVerdict::NotVerifiable {
-        return (None, None);
-    }
-    let accuracy: f64 = match verdict {
-        EvidenceVerdict::Correct => 1.0,
-        EvidenceVerdict::Partial => 0.5,
-        EvidenceVerdict::Incorrect => 0.0,
-        EvidenceVerdict::NotVerifiable => unreachable!(),
-    };
-    let verification_quality: f64 = match verification_state {
-        "CONFIRMED" => 1.0,
-        "PROBABLE" => 0.8,
-        "CONFLICT" => 0.35,
-        "STALE" => 0.25,
-        "NOT_FOUND" | "NOT_APPLICABLE" => 0.5,
-        _ => 0.5,
-    };
-    let source_quality: f64 = match source_tier.to_ascii_lowercase().as_str() {
-        "official" | "tier_1" | "tier1" => 1.0,
-        "reliable" | "tier_2" | "tier2" => 0.8,
-        "secondary" | "tier_3" | "tier3" => 0.6,
-        _ => 0.5,
-    };
-    let reliability =
-        (accuracy * 0.70 + verification_quality * 0.15 + source_quality * 0.15).clamp(0.0, 1.0);
-    (Some(round6(accuracy)), Some(round6(reliability)))
-}
-
 fn window_json(samples: &[EvaluationSample]) -> Value {
     json!({
         "sample_size": samples.len(),
@@ -795,21 +576,4 @@ fn mean(values: &[f64]) -> Option<f64> {
 
 pub(crate) fn round6(value: f64) -> f64 {
     (value * 1_000_000.0).round() / 1_000_000.0
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn not_verifiable_does_not_fake_accuracy() {
-        assert_eq!(
-            verdict_scores(EvidenceVerdict::NotVerifiable, "CONFIRMED", "official"),
-            (None, None)
-        );
-        let (accuracy, reliability) =
-            verdict_scores(EvidenceVerdict::Correct, "CONFIRMED", "official");
-        assert_eq!(accuracy, Some(1.0));
-        assert_eq!(reliability, Some(1.0));
-    }
 }

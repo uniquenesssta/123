@@ -1,7 +1,7 @@
 use crate::{ports::postmatch::PostmatchSettlementPort, ApplicationResult};
 use football_domain::{EvidenceScoringDecisionDraft, EvidenceScoringItemRecord};
 
-pub(crate) async fn execute<P>(
+pub(crate) async fn decide_evidence_scoring_item<P>(
     port: &P,
     draft: EvidenceScoringDecisionDraft,
 ) -> ApplicationResult<EvidenceScoringItemRecord>

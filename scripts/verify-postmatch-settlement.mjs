@@ -10,7 +10,7 @@ const contract = JSON.parse(contractText);
 const schema = JSON.parse(read("schemas/postmatch-settlement-contract.schema.json"));
 const migration = read(contract.migration);
 const application = read("crates/application/src/services/postmatch/facade.rs");
-const persistence = [read("crates/persistence-postgres/src/postmatch.rs"), ...["context", "readiness", "read", "repository", "evidence_queue", "evaluation_sample", "validation"].map((name) => read(`crates/persistence-postgres/src/adapters/postmatch/settlement/${name}.rs`))].join("\n");
+const persistence = [read("crates/persistence-postgres/src/postmatch.rs"), ...["context", "readiness", "read", "repository", "evaluation_sample", "validation"].map((name) => read(`crates/persistence-postgres/src/adapters/postmatch/settlement/${name}.rs`)), ...["read", "mapping", "repository", "policy", "queue"].map((name) => read(`crates/persistence-postgres/src/adapters/postmatch/evidence_scoring/${name}.rs`))].join("\n");
 const commands = read("src-tauri/src/commands/postmatch.rs");
 const registry = read("src-tauri/src/bootstrap/command_registry.rs");
 const client = read("src/api/client.ts");

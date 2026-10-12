@@ -681,3 +681,10 @@ R10-05 Postmatch Settlement已实施 `VERIFYING`，基线96ef21d，继续唯一r
 证据artifact11761067078，14,042,191字节，SHA-256 `65186f8312bf643c3b6547cc36cc7a61669e23f735a82be172128584ecb382f2`。05自身完整成功后DONE；用户2026-10-13“收尾05开始06”授权06 Evidence Scoring READY，继续唯一rewrite/r10-review-analytics-release-backend，07～13 BLOCKED，R10 IN_PROGRESS。本次只五份既有文档收尾[skip ci]，源码同精确成功提交，06须自身完整Windows证据。此前05 VERIFYING与预期计数保留为实施历史。
 
 真实PG/历史保护四项/不可变账本/并发回滚/有效XLSX/Windows Full/私有P4/P7固定回归及继承model.runs/0041删除风险仍最终封包新库待验；ignored、公开unavailable stub和静态指纹不计真实PASS。无R10阶段完成记录。
+
+
+## R10-06 Evidence Scoring（2026-10-13，VERIFYING）
+
+R10-06 Evidence Scoring已实施 `VERIFYING`，基线18f7264，继续唯一rewrite/r10-review-analytics-release-backend。App两证据用例迁入evidence_scoring并切Service/删旧路径；PG查询/映射/人工决定/评分与原队列收拢唯一owner，结算仍借用原tx调用同一队列方法。原SQL/错误/JSON、说明trim后UTF-8字节门槛、评分权重/别名、不可验证NULL、不可变决定/审计/提交后回读保持；不自动判定/晋升参数。新增6App/8PG unit待Windows，预期Application165 / Persistence207 / Gateway112 unit、41 contract；84/84静态、完整架构、16 Rustfmt、16等价及8负向通过。01～05自身Windows DONE，06 VERIFYING、07～13 BLOCKED、R10 IN_PROGRESS；真实PG/历史四项/账本并发回滚/有效XLSX/Windows Full/私有P4P7回归及继承model.runs/0041删除风险仍最终新库待验。
+
+新增14只原App/PG unit targets，覆盖完整Port字段/可选参数/错误无重试与status/UTF8字节/手工三数值/核验/来源别名/不可验证；原verdict/timeliness各迁移登记一次且正文保持。原PGintegration不改，真正重复/并发/不可变触发器/回滚仍最终新库待验。本地16实际Rust仅独立Rustfmt，不跑非WindowsCargo/运行时；自身06完整Windows前不能DONE。完整记录见[06](modular-rewrite/R10-review-analytics-release-backend/R10-06-evidence-scoring.md)。
