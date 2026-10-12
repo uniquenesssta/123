@@ -1,4 +1,5 @@
 use crate::budget::{budget_error, pricing_for_model};
+use crate::diagnostics::{elapsed_millis, fingerprint, response_id_from_body, NoopAttemptSink};
 use crate::formal_research::request::{
     build_request_body, check_budget as check_formal_budget, validate_gateway_request,
 };
@@ -11,35 +12,18 @@ use crate::response::{
     parse_plain_text_success_response, parse_provider_error, parse_structured_success_response,
 };
 use crate::{
-    ApiKey, ApiKeyProvider, ApiProtocol, CancellationToken, GatewayAttempt, GatewayConfig,
-    GatewayError, GatewayErrorCategory, GatewayExecution, GatewayOperation, GatewayRequest,
-    GatewayResponse, GatewayUsage, OpenAiConnectionTest, OpenAiTransport,
+    ApiKey, ApiKeyProvider, ApiProtocol, CancellationToken, GatewayAttempt, GatewayAttemptSink,
+    GatewayConfig, GatewayError, GatewayErrorCategory, GatewayExecution, GatewayOperation,
+    GatewayRequest, GatewayResponse, GatewayUsage, OpenAiConnectionTest, OpenAiTransport,
     PlainTextGatewayExecution, PlainTextGatewayRequest, PlainTextGatewayResponse,
     StructuredGatewayExecution, StructuredGatewayRequest, StructuredGatewayResponse,
     TransportResponse,
 };
-use async_trait::async_trait;
 use chrono::Utc;
 use serde_json::{json, Value};
-use sha2::{Digest, Sha256};
 use std::sync::Arc;
 use std::time::{Duration, Instant};
 use tokio::sync::Semaphore;
-
-#[async_trait]
-pub trait GatewayAttemptSink: Send + Sync {
-    async fn record(&self, attempt: &GatewayAttempt) -> Result<(), GatewayError>;
-}
-
-#[derive(Debug, Default)]
-struct NoopAttemptSink;
-
-#[async_trait]
-impl GatewayAttemptSink for NoopAttemptSink {
-    async fn record(&self, _attempt: &GatewayAttempt) -> Result<(), GatewayError> {
-        Ok(())
-    }
-}
 
 pub async fn test_openai_connection(
     config: &GatewayConfig,
@@ -1407,26 +1391,4 @@ fn unsupported_structured_web_search(status: u16, body: &Value) -> bool {
     .iter()
     .any(|needle| text.contains(needle));
     mentions_unsupported && mentions_web_field
-}
-
-fn elapsed_millis(started: Instant) -> u64 {
-    u64::try_from(started.elapsed().as_millis()).unwrap_or(u64::MAX)
-}
-
-fn response_id_from_body(body: &Value) -> Option<String> {
-    body.get("id")
-        .and_then(Value::as_str)
-        .map(ToString::to_string)
-}
-
-fn fingerprint(value: &Value) -> Result<String, GatewayError> {
-    let bytes = serde_json::to_vec(value).map_err(|error| {
-        GatewayError::new(
-            GatewayErrorCategory::InvalidConfiguration,
-            format!("OpenAI请求无法计算指纹：{error}"),
-            false,
-            "修正请求载荷后重试",
-        )
-    })?;
-    Ok(hex::encode(Sha256::digest(bytes)))
 }

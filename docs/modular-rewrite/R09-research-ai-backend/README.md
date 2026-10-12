@@ -2,7 +2,7 @@
 
 ## 当前阶段状态
 
-`IN_PROGRESS`。用户已明确“开始R9-01”，节点映射已厘清。唯一阶段分支 `rewrite/r9-research-ai-backend`，起点 `c72e559af4f29c9510daf2f9bf66b926dacb3013`。01 Shared Transport自身Windows全SUCCESS、DONE；用户“收尾01开始02”授权02，已自身Windows全SUCCESS、DONE；用户“收尾02开始03”授权03，已自身Windows全SUCCESS并DONE；用户“收尾03开始04”授权04，已自身Windows全SUCCESS并DONE；用户“收尾04开始05”授权05，已自身Windows全SUCCESS并DONE；用户“收尾05开始06”授权06，已自身精确Windows全SUCCESS并DONE；用户“收尾06开始07”授权07，已自身精确Windows全SUCCESS并DONE；用户“收尾07开始08”授权08，已自身精确Windows全SUCCESS并DONE；用户“收尾08开始09”授权09，已自身精确Windows全SUCCESS并DONE；用户“收尾09开始10”授权10，已自身精确Windows全SUCCESS并DONE；用户“收尾10开始11”授权11 READY，不创建阶段完成记录。
+`IN_PROGRESS`。用户已明确“开始R9-01”，节点映射已厘清。唯一阶段分支 `rewrite/r9-research-ai-backend`，起点 `c72e559af4f29c9510daf2f9bf66b926dacb3013`。01 Shared Transport自身Windows全SUCCESS、DONE；用户“收尾01开始02”授权02，已自身Windows全SUCCESS、DONE；用户“收尾02开始03”授权03，已自身Windows全SUCCESS并DONE；用户“收尾03开始04”授权04，已自身Windows全SUCCESS并DONE；用户“收尾04开始05”授权05，已自身Windows全SUCCESS并DONE；用户“收尾05开始06”授权06，已自身精确Windows全SUCCESS并DONE；用户“收尾06开始07”授权07，已自身精确Windows全SUCCESS并DONE；用户“收尾07开始08”授权08，已自身精确Windows全SUCCESS并DONE；用户“收尾08开始09”授权09，已自身精确Windows全SUCCESS并DONE；用户“收尾09开始10”授权10，已自身精确Windows全SUCCESS并DONE；用户“收尾10开始11”授权11，已实施VERIFYING，不创建阶段完成记录。
 
 ## 前置基线与依据
 
@@ -24,11 +24,11 @@ R8期间research-gateway、公开契约、配置/依赖及锁文件保持；原G
 | R9-08 | Plain Chat Chat Completions | DONE · [完成记录](R09-08-plain-chat-chat-completions.md) · run38191340582 SUCCESS |
 | R9-09 | Session Persistence | DONE · [完成记录](R09-09-session-persistence.md) · run38196834750 SUCCESS |
 | R9-10 | Cancellation Registry | DONE · [完成记录](R09-10-cancellation-registry.md) · run38213432437 SUCCESS |
-| R9-11 | Runtime Diagnostics | READY · 用户已授权 |
+| R9-11 | Runtime Diagnostics | VERIFYING · [实施记录](R09-11-runtime-diagnostics.md) · 自身Windows待验 |
 
 ## 实施范围与继续位置
 
-原client的三个公共传输类型与HTTP职责已切换transport唯一owner；Formal/Plain/Structured/连接测试/恢复GET/取消空POST继续同一原接口，不升级协议、不修改AI Workspace前端或凭据/重试政策。详见01记录；01自身Windows全SUCCESS，02已自身精确Windows通过并DONE，03已自身Windows全SUCCESS并DONE，04正式请求职责已拆分并自身Windows全SUCCESS/DONE，05响应/Schema/引用职责已自身Windows全SUCCESS并DONE，06 Source/Time政策已自身精确Windows全SUCCESS并DONE，07普通Responses已自身精确Windows全SUCCESS并DONE；08 Chat Completions已自身精确Windows全SUCCESS并DONE；09 Session Persistence已自身精确Windows全SUCCESS并DONE；10取消注册表已自身Windows全SUCCESS/DONE；11已授权，下一步实施Runtime Diagnostics。
+原client的三个公共传输类型与HTTP职责已切换transport唯一owner；Formal/Plain/Structured/连接测试/恢复GET/取消空POST继续同一原接口，不升级协议、不修改AI Workspace前端或凭据/重试政策。详见01记录；01自身Windows全SUCCESS，02已自身精确Windows通过并DONE，03已自身Windows全SUCCESS并DONE，04正式请求职责已拆分并自身Windows全SUCCESS/DONE，05响应/Schema/引用职责已自身Windows全SUCCESS并DONE，06 Source/Time政策已自身精确Windows全SUCCESS并DONE，07普通Responses已自身精确Windows全SUCCESS并DONE；08 Chat Completions已自身精确Windows全SUCCESS并DONE；09 Session Persistence已自身精确Windows全SUCCESS并DONE；10取消注册表已自身Windows全SUCCESS/DONE；11运行诊断已实施VERIFYING，等待自身精确Windows完整验收，R10不启动。
 
 沿用现有单测/contract、Windows runner/workflow与最终新库入口；不新增持续回归基础设施，不执行Linux/macOS动态。每项必须自身精确Windows验收及实施记录才能DONE。已创建01实施记录；其状态已DONE，不创建R9阶段完成记录。Create State仅记录足球模型项目0.23.0的交接状态。
 
@@ -185,3 +185,8 @@ R9-10 Cancellation Registry已实施、`VERIFYING`，基线8d80ee6，同一R9分
 证据artifact11731842587，14,039,211字节，SHA-256 b610fb2b906fd93db285eab9c0908dff0cd3e37df73e25f88f16fda9fc798366；报告windows-acceptance-20261012-063850.json及同名.txt。
 
 10 DONE；用户2026-10-12“收尾10开始11”授权11 READY，同一rewrite/r9-research-ai-backend分支、R9 IN_PROGRESS，未进入R10。本次五既有文档[skip ci]收尾，源码同精确成功提交；先前VERIFYING为实施历史。自身11完整Windows未完成前不创建R9阶段完成记录。真实PG/历史保护四项/账本并发回滚/有效XLSX/Windows Full/私有P4/P7固定回归及继承model.runs/0041删除风险仍最终封包新库待验，ignored/公开stub不计PASS。
+
+
+## R9-11 实施与门禁（VERIFYING）
+
+R9-11 Runtime Diagnostics已实施、`VERIFYING`，基线6f471d0，同一R9分支。Gateway diagnostics唯一持有尝试DTO、异步sink/default、JSON指纹/响应ID/毫秒耗时，根出口与实际client已切换，旧owner正文移除；原八条审计→尝试收集→熔断/重试顺序保持。56公开导出名字、DTO/错误/profile/协议/SQL事务/日志/UI/模型/版本/依赖保持，无新共享状态或IO。新增6 Gateway unit/2双协议contract待自身Windows，预期112/41、Application138/Persistence179；83/83静态、完整architecture/Rustfmt、逐字等价与8破坏探针通过。10 DONE、11 VERIFYING、R9 IN_PROGRESS，R10不启动。 完整18路径及最终新库待验见 [11记录](R09-11-runtime-diagnostics.md)。

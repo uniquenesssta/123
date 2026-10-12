@@ -2790,3 +2790,108 @@ async fn plain_chat_retry_model_fallback_and_cancellation_keep_payload_and_relea
         }
     }
 }
+
+#[tokio::test]
+async fn plain_attempt_sink_failure_preserves_circuit_and_releases_permit_for_both_protocols() {
+    for protocol in [ApiProtocol::Responses, ApiProtocol::ChatCompletions] {
+        let transport = Arc::new(FakeTransport::with_responses(vec![
+            rate_limited_response(),
+            rate_limited_response(),
+        ]));
+        let mut policy = config();
+        policy.api_protocol = protocol;
+        policy.max_retries = 0;
+        policy.fallback_model = None;
+        policy.circuit_breaker.consecutive_failure_threshold = 1;
+        let gateway =
+            OpenAiResearchGateway::new(policy, transport.clone(), Arc::new(TestKeyProvider))
+                .unwrap();
+        let input = resilience_plain_request();
+        assert_eq!(
+            gateway
+                .execute_plain_text_with_sink(&input, &CancellationToken::new(), &RejectAttemptSink)
+                .await
+                .unwrap_err(),
+            GatewayError::new(
+                GatewayErrorCategory::Persistence,
+                "fixture ledger rejection",
+                false,
+                "fixture recovery"
+            )
+        );
+        assert_eq!(transport.requests.lock().unwrap().len(), 1);
+        assert_eq!(
+            tokio::time::timeout(
+                Duration::from_secs(2),
+                gateway.execute_plain_text(&input, &CancellationToken::new())
+            )
+            .await
+            .expect("permit released")
+            .unwrap_err()
+            .category,
+            GatewayErrorCategory::RateLimit
+        );
+        assert_eq!(
+            gateway
+                .execute_plain_text(&input, &CancellationToken::new())
+                .await
+                .unwrap_err()
+                .category,
+            GatewayErrorCategory::CircuitOpen
+        );
+        assert_eq!(transport.requests.lock().unwrap().len(), 2);
+    }
+}
+
+#[tokio::test]
+async fn structured_attempt_sink_failure_preserves_circuit_and_releases_permit_for_both_protocols()
+{
+    for protocol in [ApiProtocol::Responses, ApiProtocol::ChatCompletions] {
+        let transport = Arc::new(FakeTransport::with_responses(vec![
+            rate_limited_response(),
+            rate_limited_response(),
+        ]));
+        let mut policy = config();
+        policy.api_protocol = protocol;
+        policy.max_retries = 0;
+        policy.fallback_model = None;
+        policy.circuit_breaker.consecutive_failure_threshold = 1;
+        let gateway =
+            OpenAiResearchGateway::new(policy, transport.clone(), Arc::new(TestKeyProvider))
+                .unwrap();
+        let input = resilience_structured_request();
+        assert_eq!(
+            gateway
+                .execute_structured_with_sink(&input, &CancellationToken::new(), &RejectAttemptSink)
+                .await
+                .unwrap_err(),
+            GatewayError::new(
+                GatewayErrorCategory::Persistence,
+                "fixture ledger rejection",
+                false,
+                "fixture recovery"
+            )
+        );
+        assert_eq!(transport.requests.lock().unwrap().len(), 1);
+        assert_eq!(
+            tokio::time::timeout(
+                Duration::from_secs(2),
+                gateway.execute_structured(&input, &CancellationToken::new())
+            )
+            .await
+            .expect("permit released")
+            .unwrap_err()
+            .category,
+            GatewayErrorCategory::RateLimit
+        );
+        assert_eq!(
+            gateway
+                .execute_structured(&input, &CancellationToken::new())
+                .await
+                .unwrap_err()
+                .category,
+            GatewayErrorCategory::CircuitOpen
+        );
+        assert_eq!(transport.requests.lock().unwrap().len(), 2);
+    }
+}

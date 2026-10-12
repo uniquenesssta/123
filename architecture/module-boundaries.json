@@ -263,7 +263,7 @@
         "adapter": "ReqwestTransport"
       },
       "GatewayAttemptSink": {
-        "owner": "crates/research-gateway/src/client.rs",
+        "owner": "crates/research-gateway/src/diagnostics/sink.rs",
         "adapters": [
           "NoopAttemptSink",
           "application persistence sink"

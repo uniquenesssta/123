@@ -1304,7 +1304,7 @@ R9-10 Cancellation Registry已实施、`VERIFYING`，基线8d80ee6，同一R9分
 
 ## R9-11 Runtime Diagnostics
 
-状态：`READY`（10自身精确Windows全SUCCESS/DONE；用户已授权开始11，同一R9分支）
+状态：`VERIFYING`（11已实施，须自身精确Windows全SUCCESS；10 DONE、R9 IN_PROGRESS，同一R9分支）
 
 ### 1. 目标
 
@@ -1435,6 +1435,14 @@ crates/research-gateway/src/diagnostics/
 - README 与实际状态一致。
 - `R09-11-runtime-diagnostics.md` 已创建并与实际变更、验证结果一致。
 - 阶段 `README.md` 已更新本任务状态和记录链接。
+
+---
+
+### R9-11 实施与门禁（2026-10-12）
+
+R9-11 Runtime Diagnostics已实施、`VERIFYING`，基线6f471d0，同一R9分支。Gateway diagnostics唯一持有尝试DTO、异步sink/default、JSON指纹/响应ID/毫秒耗时，根出口与实际client已切换，旧owner正文移除；原八条审计→尝试收集→熔断/重试顺序保持。56公开导出名字、DTO/错误/profile/协议/SQL事务/日志/UI/模型/版本/依赖保持，无新共享状态或IO。新增6 Gateway unit/2双协议contract待自身Windows，预期112/41、Application138/Persistence179；83/83静态、完整architecture/Rustfmt、逐字等价与8破坏探针通过。10 DONE、11 VERIFYING、R9 IN_PROGRESS，R10不启动。
+
+完整7A/11M/0D、兼容/8破坏探针/工具/回退/未执行与最终新库待验见 [11节点记录](../modular-rewrite/R09-research-ai-backend/R09-11-runtime-diagnostics.md)。
 
 ---
 
