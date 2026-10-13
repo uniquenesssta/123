@@ -1,204 +1,19 @@
 use super::{write_audit_event, PersistenceError, PersistenceResult, PostgresStore};
 use chrono::{DateTime, Utc};
-use football_analytics_engine::calculate_analytics;
 use football_domain::{
     AiAnalysisPackageData, AiAnalysisPackageSummary, AiAnalysisResponsePreview,
-    AiAnalysisSuggestionRecord, AiSuggestionDecision, AiSuggestionDecisionDraft, AnalyticsOverview,
-    AnalyticsRefreshRequest, CalibrationBucket, DataQualityDecisionDraft, DataQualityFinding,
-    DataQualitySummary, DriftFinding, EvaluationSample, ParameterTuningCandidateRecord,
-    ParameterTuningDecision, ParameterTuningDecisionDraft, QueryPerformanceFinding,
-    QueryPerformanceSummary, ANALYTICS_CALCULATION_VERSION,
+    AiAnalysisSuggestionRecord, AiSuggestionDecision, AiSuggestionDecisionDraft,
+    DataQualityDecisionDraft, DataQualityFinding, DataQualitySummary,
+    ParameterTuningCandidateRecord, ParameterTuningDecision, ParameterTuningDecisionDraft,
+    QueryPerformanceFinding, QueryPerformanceSummary, ANALYTICS_CALCULATION_VERSION,
 };
 use serde_json::{json, Value};
 use sqlx::postgres::PgPoolCopyExt;
-use sqlx::{Postgres, QueryBuilder, Row};
-use std::{collections::HashMap, time::Instant};
+use sqlx::Row;
+use std::time::Instant;
 use uuid::Uuid;
 
 impl PostgresStore {
-    pub async fn refresh_analytics(
-        &self,
-        request: &AnalyticsRefreshRequest,
-    ) -> PersistenceResult<AnalyticsOverview> {
-        let samples = self.load_evaluation_samples(request).await?;
-        let calculation = calculate_analytics(
-            &samples,
-            request.bucket_count,
-            request.baseline_size,
-            request.current_size,
-        );
-        let snapshot_id = Uuid::new_v4();
-        let mut tx = self.pool.begin().await?;
-
-        for chunk in samples.chunks(500) {
-            let mut builder = QueryBuilder::<Postgres>::new(
-                "INSERT INTO analytics.evaluation_samples (id, review_id, run_id, model_version_id, parameter_set_id, competition_id, season_id, stage_id, snapshot_type, kickoff_time, actual_outcome, home_win, draw, away_win, log_loss, brier, scoreline_nll, data_coverage, calculation_version, calculated_at) ",
-            );
-            builder.push_values(chunk, |mut row, sample| {
-                row.push_bind(Uuid::new_v4())
-                    .push_bind(sample.review_id)
-                    .push_bind(sample.run_id)
-                    .push_bind(sample.model_version_id)
-                    .push_bind(sample.parameter_set_id)
-                    .push_bind(sample.competition_id)
-                    .push_bind(sample.season_id)
-                    .push_bind(sample.stage_id)
-                    .push_bind(&sample.snapshot_type)
-                    .push_bind(sample.kickoff_time)
-                    .push_bind(&sample.actual_outcome)
-                    .push_bind(sample.home_win)
-                    .push_bind(sample.draw)
-                    .push_bind(sample.away_win)
-                    .push_bind(sample.log_loss)
-                    .push_bind(sample.brier)
-                    .push_bind(sample.scoreline_nll)
-                    .push_bind(sample.data_coverage)
-                    .push_bind(ANALYTICS_CALCULATION_VERSION)
-                    .push_bind(calculation.generated_at);
-            });
-            builder.push(
-                " ON CONFLICT (run_id, kickoff_time, calculation_version) DO UPDATE SET \
-                  review_id=EXCLUDED.review_id, model_version_id=EXCLUDED.model_version_id, \
-                  parameter_set_id=EXCLUDED.parameter_set_id, competition_id=EXCLUDED.competition_id, \
-                  season_id=EXCLUDED.season_id, stage_id=EXCLUDED.stage_id, snapshot_type=EXCLUDED.snapshot_type, \
-                  actual_outcome=EXCLUDED.actual_outcome, home_win=EXCLUDED.home_win, draw=EXCLUDED.draw, \
-                  away_win=EXCLUDED.away_win, log_loss=EXCLUDED.log_loss, brier=EXCLUDED.brier, \
-                  scoreline_nll=EXCLUDED.scoreline_nll, data_coverage=EXCLUDED.data_coverage, \
-                  calculated_at=EXCLUDED.calculated_at",
-            );
-            builder.build().execute(&mut *tx).await?;
-        }
-
-        let window_start = request
-            .window_start
-            .or_else(|| samples.iter().map(|item| item.kickoff_time).min());
-        let window_end = request
-            .window_end
-            .or_else(|| samples.iter().map(|item| item.kickoff_time).max());
-        let metric_window_start = window_start.unwrap_or(calculation.generated_at);
-        let metric_window_end = window_end.unwrap_or(calculation.generated_at);
-        let summary = serde_json::to_value(&calculation)?;
-        sqlx::query(
-            "INSERT INTO analytics.analysis_snapshots (id, competition_id, window_start, window_end, sample_size, summary, calculation_version, created_at) VALUES ($1,$2,$3,$4,$5,$6,$7,$8)",
-        )
-        .bind(snapshot_id)
-        .bind(request.competition_id)
-        .bind(window_start)
-        .bind(window_end)
-        .bind(calculation.sample_size as i64)
-        .bind(&summary)
-        .bind(&calculation.calculation_version)
-        .bind(calculation.generated_at)
-        .execute(&mut *tx)
-        .await?;
-
-        for bucket in &calculation.calibration {
-            insert_calibration_bucket(
-                &mut tx,
-                snapshot_id,
-                request,
-                window_start,
-                window_end,
-                bucket,
-            )
-            .await?;
-        }
-        for finding in &calculation.drift {
-            insert_drift_finding(&mut tx, snapshot_id, request, finding).await?;
-        }
-
-        let ids_by_group = sample_group_ids(&samples);
-        for comparison in &calculation.comparisons {
-            let key = (
-                comparison.model_key.clone(),
-                comparison.model_version.clone(),
-                comparison.parameter_version.clone(),
-                comparison.snapshot_type.clone(),
-            );
-            if let Some((model_version_id, parameter_set_id)) = ids_by_group.get(&key) {
-                let metrics = serde_json::to_value(comparison)?;
-                sqlx::query(
-                    r#"
-                    INSERT INTO analytics.model_metrics (
-                        id, model_version_id, parameter_set_id, competition_id,
-                        window_start, window_end, sample_size, metrics,
-                        calculation_version, calculated_at
-                    ) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10)
-                    ON CONFLICT (model_version_id, parameter_set_id, competition_id, window_start, window_end, calculation_version)
-                    DO UPDATE SET sample_size=EXCLUDED.sample_size, metrics=EXCLUDED.metrics, calculated_at=EXCLUDED.calculated_at
-                    "#,
-                )
-                .bind(Uuid::new_v4())
-                .bind(*model_version_id)
-                .bind(*parameter_set_id)
-                .bind(request.competition_id)
-                .bind(metric_window_start)
-                .bind(metric_window_end)
-                .bind(comparison.sample_size as i64)
-                .bind(metrics)
-                .bind(&calculation.calculation_version)
-                .bind(calculation.generated_at)
-                .execute(&mut *tx)
-                .await?;
-            }
-        }
-
-        write_audit_event(
-            &mut tx,
-            "analytics_refreshed",
-            "analysis_snapshot",
-            Some(snapshot_id.to_string()),
-            json!({"sample_size": calculation.sample_size, "competition_id": request.competition_id}),
-        )
-        .await?;
-        tx.commit().await?;
-        self.analytics_overview().await
-    }
-
-    pub async fn analytics_overview(&self) -> PersistenceResult<AnalyticsOverview> {
-        let calculation: Option<football_domain::AnalyticsCalculation> =
-            sqlx::query_scalar::<_, Value>(
-                "SELECT summary FROM analytics.analysis_snapshots ORDER BY created_at DESC, id DESC LIMIT 1",
-            )
-            .fetch_optional(&self.pool)
-            .await?
-            .map(serde_json::from_value)
-            .transpose()?;
-        let quality = self.latest_data_quality_summary(100).await?;
-        let query_performance = self.latest_query_performance().await?;
-        if let Some(calculation) = calculation {
-            Ok(AnalyticsOverview {
-                generated_at: Some(calculation.generated_at),
-                calculation_version: calculation.calculation_version,
-                sample_size: calculation.sample_size,
-                average_log_loss: calculation.average_log_loss,
-                average_brier: calculation.average_brier,
-                average_scoreline_nll: calculation.average_scoreline_nll,
-                expected_calibration_error: calculation.expected_calibration_error,
-                comparisons: calculation.comparisons,
-                calibration: calculation.calibration,
-                drift: calculation.drift,
-                data_quality: quality,
-                query_performance,
-            })
-        } else {
-            Ok(AnalyticsOverview {
-                generated_at: None,
-                calculation_version: ANALYTICS_CALCULATION_VERSION.to_string(),
-                sample_size: 0,
-                average_log_loss: None,
-                average_brier: None,
-                average_scoreline_nll: None,
-                expected_calibration_error: None,
-                comparisons: Vec::new(),
-                calibration: Vec::new(),
-                drift: Vec::new(),
-                data_quality: quality,
-                query_performance,
-            })
-        }
-    }
-
     pub async fn run_data_quality_scan(&self) -> PersistenceResult<DataQualitySummary> {
         let scan_id = Uuid::new_v4();
         sqlx::query("INSERT INTO analytics.data_quality_scans (id,status,scope) VALUES ($1,'running','{}'::jsonb)")
@@ -685,50 +500,6 @@ impl PostgresStore {
         }
     }
 
-    async fn load_evaluation_samples(
-        &self,
-        request: &AnalyticsRefreshRequest,
-    ) -> PersistenceResult<Vec<EvaluationSample>> {
-        let rows = sqlx::query(
-            r#"
-            SELECT DISTINCT ON (run.id)
-                review.id AS review_id, run.id AS run_id,
-                run.model_version_id, run.parameter_set_id,
-                definition.model_key, version.version AS model_version,
-                parameter.parameter_version,
-                fixture.competition_id, competition.name AS competition_name,
-                fixture.season_id, fixture.stage_id, run.snapshot_type, fixture.kickoff_time,
-                review.prediction_evaluation->>'actual_outcome' AS actual_outcome,
-                (review.prediction_evaluation->'predicted_probabilities'->>'home_win')::double precision AS home_win,
-                (review.prediction_evaluation->'predicted_probabilities'->>'draw')::double precision AS draw,
-                (review.prediction_evaluation->'predicted_probabilities'->>'away_win')::double precision AS away_win,
-                (review.prediction_evaluation->>'log_loss')::double precision AS log_loss,
-                (review.prediction_evaluation->>'brier')::double precision AS brier,
-                NULLIF(review.prediction_evaluation->>'scoreline_nll','')::double precision AS scoreline_nll,
-                review.data_coverage::double precision AS data_coverage
-            FROM review.match_reviews review
-            JOIN model.runs run ON run.id=review.source_run_id AND run.status='succeeded'
-            JOIN model.versions version ON version.id=run.model_version_id
-            JOIN model.definitions definition ON definition.id=version.model_id
-            JOIN model.parameter_sets parameter ON parameter.id=run.parameter_set_id
-            JOIN football.matches fixture ON fixture.id=review.match_id
-            LEFT JOIN football.competitions competition ON competition.id=fixture.competition_id
-            WHERE review.status='finalized'
-              AND COALESCE((review.prediction_evaluation->>'available')::boolean,false)=true
-              AND ($1::uuid IS NULL OR fixture.competition_id=$1)
-              AND ($2::timestamptz IS NULL OR fixture.kickoff_time >= $2)
-              AND ($3::timestamptz IS NULL OR fixture.kickoff_time <= $3)
-            ORDER BY run.id, review.created_at DESC, review.id DESC
-            "#,
-        )
-        .bind(request.competition_id)
-        .bind(request.window_start)
-        .bind(request.window_end)
-        .fetch_all(&self.pool)
-        .await?;
-        rows.iter().map(evaluation_sample_from_row).collect()
-    }
-
     async fn collect_data_quality_findings(
         &self,
         scan_id: Uuid,
@@ -812,7 +583,7 @@ impl PostgresStore {
         Ok(findings)
     }
 
-    async fn latest_data_quality_summary(
+    pub(crate) async fn latest_data_quality_summary(
         &self,
         limit: u32,
     ) -> PersistenceResult<DataQualitySummary> {
@@ -866,7 +637,9 @@ impl PostgresStore {
         })
     }
 
-    async fn latest_query_performance(&self) -> PersistenceResult<QueryPerformanceSummary> {
+    pub(crate) async fn latest_query_performance(
+        &self,
+    ) -> PersistenceResult<QueryPerformanceSummary> {
         let row = sqlx::query("SELECT database_size_bytes,tables,captured_at FROM analytics.query_performance_snapshots ORDER BY captured_at DESC,id DESC LIMIT 1")
             .fetch_optional(&self.pool).await?;
         let Some(row) = row else {
@@ -1112,81 +885,6 @@ impl PostgresStore {
             .bind(id).fetch_optional(&self.pool).await?.ok_or_else(|| PersistenceError::InvalidState("AI 建议不存在".to_string()))?;
         ai_suggestion_from_row(&row)
     }
-}
-
-fn sample_group_ids(
-    samples: &[EvaluationSample],
-) -> HashMap<(String, String, String, String), (Uuid, Uuid)> {
-    samples
-        .iter()
-        .map(|sample| {
-            (
-                (
-                    sample.model_key.clone(),
-                    sample.model_version.clone(),
-                    sample.parameter_version.clone(),
-                    sample.snapshot_type.clone(),
-                ),
-                (sample.model_version_id, sample.parameter_set_id),
-            )
-        })
-        .collect()
-}
-
-async fn insert_calibration_bucket(
-    tx: &mut sqlx::Transaction<'_, Postgres>,
-    snapshot_id: Uuid,
-    request: &AnalyticsRefreshRequest,
-    window_start: Option<DateTime<Utc>>,
-    window_end: Option<DateTime<Utc>>,
-    bucket: &CalibrationBucket,
-) -> PersistenceResult<()> {
-    sqlx::query("INSERT INTO analytics.calibration_buckets (id,snapshot_id,competition_id,outcome,bucket_index,lower_bound,upper_bound,sample_size,predicted_mean,actual_rate,absolute_gap,ece_component,window_start,window_end,calculation_version) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15)")
-        .bind(Uuid::new_v4()).bind(snapshot_id).bind(request.competition_id).bind(&bucket.outcome).bind(i16::from(bucket.bucket_index))
-        .bind(bucket.lower_bound).bind(bucket.upper_bound).bind(bucket.sample_size as i64).bind(bucket.predicted_mean).bind(bucket.actual_rate)
-        .bind(bucket.absolute_gap).bind(bucket.ece_component).bind(window_start).bind(window_end).bind(ANALYTICS_CALCULATION_VERSION)
-        .execute(&mut **tx).await?;
-    Ok(())
-}
-
-async fn insert_drift_finding(
-    tx: &mut sqlx::Transaction<'_, Postgres>,
-    snapshot_id: Uuid,
-    request: &AnalyticsRefreshRequest,
-    finding: &DriftFinding,
-) -> PersistenceResult<()> {
-    sqlx::query("INSERT INTO analytics.drift_snapshots (id,snapshot_id,competition_id,metric_name,baseline_mean,current_mean,absolute_delta,relative_delta,baseline_size,current_size,severity,direction,details,calculation_version) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,'{}'::jsonb,$13)")
-        .bind(Uuid::new_v4()).bind(snapshot_id).bind(request.competition_id).bind(&finding.metric_name).bind(finding.baseline_mean)
-        .bind(finding.current_mean).bind(finding.absolute_delta).bind(finding.relative_delta).bind(finding.baseline_size as i64)
-        .bind(finding.current_size as i64).bind(&finding.severity).bind(&finding.direction).bind(ANALYTICS_CALCULATION_VERSION)
-        .execute(&mut **tx).await?;
-    Ok(())
-}
-
-fn evaluation_sample_from_row(row: &sqlx::postgres::PgRow) -> PersistenceResult<EvaluationSample> {
-    Ok(EvaluationSample {
-        review_id: row.try_get("review_id")?,
-        run_id: row.try_get("run_id")?,
-        model_version_id: row.try_get("model_version_id")?,
-        parameter_set_id: row.try_get("parameter_set_id")?,
-        model_key: row.try_get("model_key")?,
-        model_version: row.try_get("model_version")?,
-        parameter_version: row.try_get("parameter_version")?,
-        competition_id: row.try_get("competition_id")?,
-        competition_name: row.try_get("competition_name")?,
-        season_id: row.try_get("season_id")?,
-        stage_id: row.try_get("stage_id")?,
-        snapshot_type: row.try_get("snapshot_type")?,
-        kickoff_time: row.try_get("kickoff_time")?,
-        actual_outcome: row.try_get("actual_outcome")?,
-        home_win: row.try_get("home_win")?,
-        draw: row.try_get("draw")?,
-        away_win: row.try_get("away_win")?,
-        log_loss: row.try_get("log_loss")?,
-        brier: row.try_get("brier")?,
-        scoreline_nll: row.try_get("scoreline_nll")?,
-        data_coverage: row.try_get("data_coverage")?,
-    })
 }
 
 fn parameter_tuning_candidate_from_row(

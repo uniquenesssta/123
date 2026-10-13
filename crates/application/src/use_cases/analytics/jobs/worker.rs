@@ -1,3 +1,4 @@
+use super::super::calculation::refresh_analytics;
 use crate::{
     ports::analytics::{
         AnalyticsJobProgressPayload, AnalyticsJobResult, AnalyticsPort, JobQueuePort,
@@ -64,7 +65,7 @@ where
                 return Err(ApplicationError::Validation("任务已取消".to_string()));
             }
             Ok(AnalyticsJobResult::AnalyticsOverview(Box::new(
-                port.refresh(&request).await?,
+                refresh_analytics(port, &request).await?,
             )))
         }
         "data_quality_scan" => {
@@ -112,7 +113,7 @@ where
             {
                 return Err(ApplicationError::Validation("任务已取消".to_string()));
             }
-            let overview = port.refresh(&request).await?;
+            let overview = refresh_analytics(port, &request).await?;
             if port
                 .update_progress(
                     job_id,

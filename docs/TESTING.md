@@ -766,3 +766,10 @@ R10-08 Drift Monitoring已实施 `VERIFYING`，基线33f7188，继续唯一rewri
 证据artifact11794826120，14,048,433字节，SHA-256 `d188c4d0fae8316bde55f14089eac7a7240490a9bf8af36e64df0674db0f4756`。08自身完整SUCCESS后DONE；用户2026-10-13“收尾08开始09”授权09 Analytics Calculation READY，继续唯一rewrite/r10-review-analytics-release-backend，10～13BLOCKED、R10IN_PROGRESS。本次五既有文档收尾[skip ci]，源码同已验f834e31，09须自身完整Windows，无阶段完成记录。此前08 VERIFYING和预期计数保留为历史。
 
 真实PG/历史保护四项/不可变账本/并发回滚/有效XLSX/WindowsFull/私有P4P7固定回归及继承model.runs/0041删除风险仍最终新库待验，ignored/公开unavailable stub/静态指纹不计这些真实PASS。
+
+
+### R10-09 分析计算（2026-10-13，VERIFYING）
+
+R10-09 Analytics Calculation已实施 `VERIFYING`，基线3fdb443，同一唯一R10分支。App总览及两实际worker刷新归calculation；PG样本/解码/原事务/子指标/持久化与总览投影/读取各有唯一owner，旧root七职责移除，剩余29函数保持。原纯引擎/SQL/绑定/公开接口/错误/窗口/分组覆盖政策、500批次/单事务审计及提交后回读保持；后台进度/取消/全量质量→查询顺序保持，10未提前开始。新增5App/8PG unit待自身Windows，预期176/235、Gateway112unit+41contract；84/84静态、完整架构、18Rustfmt、15等价与11负向通过。01～08DONE、09VERIFYING、10～13BLOCKED、R10IN_PROGRESS；真实PG/历史四项/账本并发回滚/有效XLSX/WindowsFull/私有P4P7回归及继承model.runs/0041删除风险仍最终新库待验。
+
+沿用原Windows workflow/targets，job实际启动后停止一切CI查询并提示20～30分钟；未执行非Windows动态验收。15等价含原273字面量/公开签名/29保留函数与13新unit登记，11负向全拒绝恢复；具体命令/静态报告和待验风险见[09记录](modular-rewrite/R10-review-analytics-release-backend/R10-09-analytics-calculation.md)。无阶段完成记录。

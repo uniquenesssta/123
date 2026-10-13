@@ -24,13 +24,13 @@
     "targetPublicExportPolicy": "explicit re-export only"
   },
   "sourceDigest": "217241ac243726a5ab6805a7f169e222b97e78c7c971749a5904714af673ebdd",
-  "rustUsageDigest": "f50e50dddd84c46d3d83ffb5a812d57a9fc922deba6fbb5341dcdbed51821a25",
+  "rustUsageDigest": "b73aa7346035c274f5583c189878c2216d278d30d5d84c8e3992e5b1f7c3ab06",
   "summary": {
     "typeCount": 365,
     "publicCompatibilityTypeCount": 365,
     "internalTypeCount": 0,
     "domainSourceFileCount": 129,
-    "scannedRustFileCount": 1232,
+    "scannedRustFileCount": 1244,
     "databaseMappedTypeCount": 301,
     "byTargetModule": {
       "ai_workspace": 16,
@@ -614,6 +614,7 @@
         "crates/analysis-package/src/lib.rs",
         "crates/application/src/composition/adapters/analytics.rs",
         "crates/application/src/ports/analytics/mod.rs",
+        "crates/application/src/use_cases/analytics/calculation/tests.rs",
         "crates/persistence-postgres/src/analytics.rs"
       ],
       "databaseMappings": [
@@ -756,6 +757,7 @@
         "crates/application/src/services/analytics/facade.rs",
         "crates/application/src/services/analytics/service.rs",
         "crates/application/src/use_cases/analytics/ai_package/export_ai_analysis_package/mod.rs",
+        "crates/application/src/use_cases/analytics/calculation/tests.rs",
         "crates/persistence-postgres/src/analytics.rs",
         "src-tauri/src/commands/analytics.rs"
       ],
@@ -892,6 +894,7 @@
         "crates/application/src/services/analytics/facade.rs",
         "crates/application/src/services/analytics/service.rs",
         "crates/application/src/use_cases/analytics/ai_package/preview_ai_analysis_response/mod.rs",
+        "crates/application/src/use_cases/analytics/calculation/tests.rs",
         "crates/persistence-postgres/src/analytics.rs",
         "src-tauri/src/commands/analytics.rs"
       ],
@@ -1083,6 +1086,7 @@
         "crates/application/src/use_cases/analytics/ai_package/decide_ai_analysis_suggestion/mod.rs",
         "crates/application/src/use_cases/analytics/ai_package/import_ai_analysis_response/mod.rs",
         "crates/application/src/use_cases/analytics/ai_package/list_ai_analysis_suggestions/mod.rs",
+        "crates/application/src/use_cases/analytics/calculation/tests.rs",
         "crates/persistence-postgres/src/analytics.rs",
         "src-tauri/src/commands/analytics.rs"
       ],
@@ -1537,6 +1541,7 @@
         "crates/application/src/services/analytics/facade.rs",
         "crates/application/src/services/analytics/service.rs",
         "crates/application/src/use_cases/analytics/ai_package/decide_ai_analysis_suggestion/mod.rs",
+        "crates/application/src/use_cases/analytics/calculation/tests.rs",
         "crates/persistence-postgres/src/analytics.rs",
         "src-tauri/src/commands/analytics.rs"
       ],
@@ -1624,12 +1629,16 @@
       ],
       "externalCallers": [
         "crates/analytics-engine/src/lib.rs",
-        "crates/persistence-postgres/src/adapters/postmatch/drift_monitoring/calculation.rs",
-        "crates/persistence-postgres/src/analytics.rs"
+        "crates/persistence-postgres/src/adapters/analytics/calculation/projection.rs",
+        "crates/persistence-postgres/src/adapters/analytics/calculation/read.rs",
+        "crates/persistence-postgres/src/adapters/analytics/calculation/tests.rs",
+        "crates/persistence-postgres/src/adapters/postmatch/drift_monitoring/calculation.rs"
       ],
       "databaseMappings": [
-        "crates/persistence-postgres/src/adapters/postmatch/drift_monitoring/calculation.rs",
-        "crates/persistence-postgres/src/analytics.rs"
+        "crates/persistence-postgres/src/adapters/analytics/calculation/projection.rs",
+        "crates/persistence-postgres/src/adapters/analytics/calculation/read.rs",
+        "crates/persistence-postgres/src/adapters/analytics/calculation/tests.rs",
+        "crates/persistence-postgres/src/adapters/postmatch/drift_monitoring/calculation.rs"
       ]
     },
     {
@@ -1725,13 +1734,19 @@
         "crates/application/src/ports/analytics/mod.rs",
         "crates/application/src/services/analytics/facade.rs",
         "crates/application/src/services/analytics/service.rs",
-        "crates/application/src/use_cases/analytics/analytics_overview/mod.rs",
+        "crates/application/src/use_cases/analytics/calculation/overview.rs",
+        "crates/application/src/use_cases/analytics/calculation/refresh.rs",
+        "crates/application/src/use_cases/analytics/calculation/tests.rs",
         "crates/application/src/use_cases/analytics/jobs/worker.rs",
-        "crates/persistence-postgres/src/analytics.rs",
+        "crates/persistence-postgres/src/adapters/analytics/calculation/projection.rs",
+        "crates/persistence-postgres/src/adapters/analytics/calculation/read.rs",
+        "crates/persistence-postgres/src/adapters/analytics/calculation/repository.rs",
         "src-tauri/src/commands/analytics.rs"
       ],
       "databaseMappings": [
-        "crates/persistence-postgres/src/analytics.rs"
+        "crates/persistence-postgres/src/adapters/analytics/calculation/projection.rs",
+        "crates/persistence-postgres/src/adapters/analytics/calculation/read.rs",
+        "crates/persistence-postgres/src/adapters/analytics/calculation/repository.rs"
       ]
     },
     {
@@ -1812,11 +1827,21 @@
       "externalCallers": [
         "crates/application/src/composition/adapters/analytics.rs",
         "crates/application/src/ports/analytics/mod.rs",
+        "crates/application/src/use_cases/analytics/calculation/refresh.rs",
+        "crates/application/src/use_cases/analytics/calculation/tests.rs",
         "crates/application/src/use_cases/analytics/jobs/worker.rs",
-        "crates/persistence-postgres/src/analytics.rs"
+        "crates/persistence-postgres/src/adapters/analytics/calculation/metrics.rs",
+        "crates/persistence-postgres/src/adapters/analytics/calculation/projection.rs",
+        "crates/persistence-postgres/src/adapters/analytics/calculation/repository.rs",
+        "crates/persistence-postgres/src/adapters/analytics/calculation/samples.rs",
+        "crates/persistence-postgres/src/adapters/analytics/calculation/tests.rs"
       ],
       "databaseMappings": [
-        "crates/persistence-postgres/src/analytics.rs"
+        "crates/persistence-postgres/src/adapters/analytics/calculation/metrics.rs",
+        "crates/persistence-postgres/src/adapters/analytics/calculation/projection.rs",
+        "crates/persistence-postgres/src/adapters/analytics/calculation/repository.rs",
+        "crates/persistence-postgres/src/adapters/analytics/calculation/samples.rs",
+        "crates/persistence-postgres/src/adapters/analytics/calculation/tests.rs"
       ]
     },
     {
@@ -3909,10 +3934,10 @@
       ],
       "externalCallers": [
         "crates/analytics-engine/src/lib.rs",
-        "crates/persistence-postgres/src/analytics.rs"
+        "crates/persistence-postgres/src/adapters/analytics/calculation/metrics.rs"
       ],
       "databaseMappings": [
-        "crates/persistence-postgres/src/analytics.rs"
+        "crates/persistence-postgres/src/adapters/analytics/calculation/metrics.rs"
       ]
     },
     {
@@ -5835,6 +5860,7 @@
         "crates/application/src/ports/analytics/mod.rs",
         "crates/application/src/services/analytics/facade.rs",
         "crates/application/src/services/analytics/service.rs",
+        "crates/application/src/use_cases/analytics/calculation/tests.rs",
         "crates/application/src/use_cases/analytics/decide_data_quality_finding/mod.rs",
         "crates/persistence-postgres/src/analytics.rs",
         "src-tauri/src/commands/analytics.rs"
@@ -5931,6 +5957,7 @@
         "crates/application/src/ports/analytics/mod.rs",
         "crates/application/src/services/analytics/facade.rs",
         "crates/application/src/services/analytics/service.rs",
+        "crates/application/src/use_cases/analytics/calculation/tests.rs",
         "crates/application/src/use_cases/analytics/decide_data_quality_finding/mod.rs",
         "crates/persistence-postgres/src/analytics.rs",
         "src-tauri/src/commands/analytics.rs"
@@ -6010,9 +6037,14 @@
         "crates/application/src/composition/adapters/analytics.rs",
         "crates/application/src/ports/analytics/contracts.rs",
         "crates/application/src/ports/analytics/mod.rs",
+        "crates/application/src/use_cases/analytics/calculation/tests.rs",
+        "crates/persistence-postgres/src/adapters/analytics/calculation/projection.rs",
+        "crates/persistence-postgres/src/adapters/analytics/calculation/tests.rs",
         "crates/persistence-postgres/src/analytics.rs"
       ],
       "databaseMappings": [
+        "crates/persistence-postgres/src/adapters/analytics/calculation/projection.rs",
+        "crates/persistence-postgres/src/adapters/analytics/calculation/tests.rs",
         "crates/persistence-postgres/src/analytics.rs"
       ]
     },
@@ -6093,14 +6125,14 @@
       ],
       "externalCallers": [
         "crates/analytics-engine/src/lib.rs",
+        "crates/persistence-postgres/src/adapters/analytics/calculation/metrics.rs",
         "crates/persistence-postgres/src/adapters/postmatch/drift_monitoring/calculation.rs",
-        "crates/persistence-postgres/src/adapters/postmatch/drift_monitoring/tests.rs",
-        "crates/persistence-postgres/src/analytics.rs"
+        "crates/persistence-postgres/src/adapters/postmatch/drift_monitoring/tests.rs"
       ],
       "databaseMappings": [
+        "crates/persistence-postgres/src/adapters/analytics/calculation/metrics.rs",
         "crates/persistence-postgres/src/adapters/postmatch/drift_monitoring/calculation.rs",
-        "crates/persistence-postgres/src/adapters/postmatch/drift_monitoring/tests.rs",
-        "crates/persistence-postgres/src/analytics.rs"
+        "crates/persistence-postgres/src/adapters/postmatch/drift_monitoring/tests.rs"
       ]
     },
     {
@@ -7200,16 +7232,22 @@
       ],
       "externalCallers": [
         "crates/analytics-engine/src/lib.rs",
+        "crates/persistence-postgres/src/adapters/analytics/calculation/mapping.rs",
+        "crates/persistence-postgres/src/adapters/analytics/calculation/projection.rs",
+        "crates/persistence-postgres/src/adapters/analytics/calculation/samples.rs",
+        "crates/persistence-postgres/src/adapters/analytics/calculation/tests.rs",
         "crates/persistence-postgres/src/adapters/postmatch/drift_monitoring/calculation.rs",
         "crates/persistence-postgres/src/adapters/postmatch/drift_monitoring/samples.rs",
-        "crates/persistence-postgres/src/adapters/postmatch/drift_monitoring/tests.rs",
-        "crates/persistence-postgres/src/analytics.rs"
+        "crates/persistence-postgres/src/adapters/postmatch/drift_monitoring/tests.rs"
       ],
       "databaseMappings": [
+        "crates/persistence-postgres/src/adapters/analytics/calculation/mapping.rs",
+        "crates/persistence-postgres/src/adapters/analytics/calculation/projection.rs",
+        "crates/persistence-postgres/src/adapters/analytics/calculation/samples.rs",
+        "crates/persistence-postgres/src/adapters/analytics/calculation/tests.rs",
         "crates/persistence-postgres/src/adapters/postmatch/drift_monitoring/calculation.rs",
         "crates/persistence-postgres/src/adapters/postmatch/drift_monitoring/samples.rs",
-        "crates/persistence-postgres/src/adapters/postmatch/drift_monitoring/tests.rs",
-        "crates/persistence-postgres/src/analytics.rs"
+        "crates/persistence-postgres/src/adapters/postmatch/drift_monitoring/tests.rs"
       ]
     },
     {
@@ -22836,9 +22874,14 @@
         "crates/application/src/composition/adapters/analytics.rs",
         "crates/application/src/ports/analytics/contracts.rs",
         "crates/application/src/ports/analytics/mod.rs",
+        "crates/application/src/use_cases/analytics/calculation/tests.rs",
+        "crates/persistence-postgres/src/adapters/analytics/calculation/projection.rs",
+        "crates/persistence-postgres/src/adapters/analytics/calculation/tests.rs",
         "crates/persistence-postgres/src/analytics.rs"
       ],
       "databaseMappings": [
+        "crates/persistence-postgres/src/adapters/analytics/calculation/projection.rs",
+        "crates/persistence-postgres/src/adapters/analytics/calculation/tests.rs",
         "crates/persistence-postgres/src/analytics.rs"
       ]
     },

@@ -1241,7 +1241,7 @@ crates/application/src/use_cases/postmatch/drift-monitoring/
 
 ## R10-09 Analytics Calculation
 
-状态：`READY`（08自身精确完整Windows DONE；用户2026-10-13“收尾08开始09”授权，同一R10分支，10～13BLOCKED）
+状态：`VERIFYING`（用户2026-10-13“收尾08开始09”授权；原计算入口与PG事务职责已重写，84源码/完整架构/等价/负向通过，自身完整Windows待验，10～13BLOCKED）。详见[09实施记录](../modular-rewrite/R10-review-analytics-release-backend/R10-09-analytics-calculation.md)。
 
 ### 1. 目标
 

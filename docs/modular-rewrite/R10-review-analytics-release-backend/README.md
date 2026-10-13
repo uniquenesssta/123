@@ -2,7 +2,7 @@
 
 ## 当前阶段状态
 
-`IN_PROGRESS`。用户2026-10-12“开始R10-01”授权；从R9文档收尾HEAD `48618fed2d7ff7c2a4db831a037f227dc789f278` 建立唯一阶段分支 `rewrite/r10-review-analytics-release-backend`。01自身精确Windows run38229119264/job114743919870全SUCCESS并DONE；02自身1ad6e68 / Windows run38245932270/job114799659672全SUCCESS并DONE；用户“收尾02开始03”授权03已实施；03自身99b15ad / Windows run38259438025/job114845878326全SUCCESS并DONE，04自身221d211 / Windows run38271387412/job114886215505全SUCCESS并DONE；05自身fe3529f / Windows run38277864089/job114907643831全SUCCESS并DONE；06自身1ed6dbe / Windows run38290328302/job114948593892全SUCCESS并DONE；07自身cdd2797 / Windows run38350692611/job115142166008全SUCCESS并DONE；08自身f834e31 / Windows run38357781835/job115164583225全SUCCESS并DONE；用户“收尾08开始09”授权09 READY，10～13 BLOCKED。
+`IN_PROGRESS`。用户2026-10-12“开始R10-01”授权；从R9文档收尾HEAD `48618fed2d7ff7c2a4db831a037f227dc789f278` 建立唯一阶段分支 `rewrite/r10-review-analytics-release-backend`。01自身精确Windows run38229119264/job114743919870全SUCCESS并DONE；02自身1ad6e68 / Windows run38245932270/job114799659672全SUCCESS并DONE；用户“收尾02开始03”授权03已实施；03自身99b15ad / Windows run38259438025/job114845878326全SUCCESS并DONE，04自身221d211 / Windows run38271387412/job114886215505全SUCCESS并DONE；05自身fe3529f / Windows run38277864089/job114907643831全SUCCESS并DONE；06自身1ed6dbe / Windows run38290328302/job114948593892全SUCCESS并DONE；07自身cdd2797 / Windows run38350692611/job115142166008全SUCCESS并DONE；08自身f834e31 / Windows run38357781835/job115164583225全SUCCESS并DONE；用户“收尾08开始09”授权09已实施VERIFYING，10～13 BLOCKED。
 
 ## 前置基线与依据
 
@@ -20,7 +20,7 @@
 | R10-06 | [Evidence Scoring](R10-06-evidence-scoring.md) | DONE · 自身精确Windows全SUCCESS |
 | R10-07 | [Provider Score](R10-07-provider-score.md) | DONE · 自身精确Windows全SUCCESS |
 | R10-08 | [Drift Monitoring](R10-08-drift-monitoring.md) | DONE · 自身精确Windows全SUCCESS |
-| R10-09 | Analytics Calculation | READY · 用户已授权 |
+| R10-09 | [Analytics Calculation](R10-09-analytics-calculation.md) | VERIFYING · 自身完整Windows待验 |
 | R10-10 | Background Jobs | BLOCKED |
 | R10-11 | Analysis Package | BLOCKED |
 | R10-12 | Parameter Lifecycle | BLOCKED |
@@ -195,3 +195,10 @@ App采用原综合monitoring入口而非虚构Drift Port，PG实际漂移目录�
 证据artifact11794826120，14,048,433字节，SHA-256 `d188c4d0fae8316bde55f14089eac7a7240490a9bf8af36e64df0674db0f4756`。08自身完整SUCCESS后DONE；用户2026-10-13“收尾08开始09”授权09 Analytics Calculation READY，继续唯一rewrite/r10-review-analytics-release-backend，10～13BLOCKED、R10IN_PROGRESS。本次五既有文档收尾[skip ci]，源码同已验f834e31，09须自身完整Windows，无阶段完成记录。此前08 VERIFYING和预期计数保留为历史。
 
 真实PG/历史保护四项/不可变账本/并发回滚/有效XLSX/WindowsFull/私有P4P7固定回归及继承model.runs/0041删除风险仍最终新库待验，ignored/公开unavailable stub/静态指纹不计这些真实PASS。
+
+
+## R10-09 实际边界与继续位置
+
+R10-09 Analytics Calculation已实施 `VERIFYING`，基线3fdb443，同一唯一R10分支。App总览及两实际worker刷新归calculation；PG样本/解码/原事务/子指标/持久化与总览投影/读取各有唯一owner，旧root七职责移除，剩余29函数保持。原纯引擎/SQL/绑定/公开接口/错误/窗口/分组覆盖政策、500批次/单事务审计及提交后回读保持；后台进度/取消/全量质量→查询顺序保持，10未提前开始。新增5App/8PG unit待自身Windows，预期176/235、Gateway112unit+41contract；84/84静态、完整架构、18Rustfmt、15等价与11负向通过。01～08DONE、09VERIFYING、10～13BLOCKED、R10IN_PROGRESS；真实PG/历史四项/账本并发回滚/有效XLSX/WindowsFull/私有P4P7回归及继承model.runs/0041删除风险仍最终新库待验。
+
+App采用原AnalyticsPort，两实际刷新调用切换；PG计算目录与纯引擎保持独立，不把质量/AI/参数及队列生命周期提入本项。14A/13M/1D、逻辑迁移1项和23字段完整记录见[09记录](R10-09-analytics-calculation.md)。后续仅核对09自身精确Windows；失败修同分支、成功并获用户授权再进入10，job启动即停止查询，无阶段完成记录。

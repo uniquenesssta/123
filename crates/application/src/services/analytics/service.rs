@@ -33,7 +33,7 @@ impl AnalyticsService {
     where
         P: AnalyticsPort + ?Sized,
     {
-        analytics::analytics_overview::execute(port).await
+        analytics::calculation::analytics_overview(port).await
     }
 
     pub(crate) async fn enqueue_job<P>(
