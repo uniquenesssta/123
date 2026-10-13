@@ -789,3 +789,10 @@ R10-09首轮精确656a97c / [Windows run38371099454](https://github.com/uniquene
 证据artifact11815192224，14,048,590字节，SHA-256 `eccc82a62ef2b48036040ad1ddec43f6c4c0001af7a9db0c83526ce5b28d3f3a`。首轮656a97c的Clippy type_complexity失败由本修复自身完整成功关闭；具名窗口与原8期望值实际通过，之前失败/VERIFYING为实施历史。09自身完整SUCCESS后DONE；用户2026-10-13“收尾09开始10”授权10 Background Jobs READY，同一唯一rewrite/r10-review-analytics-release-backend分支，11～13BLOCKED、R10IN_PROGRESS。本次仅五既有文档[skip ci]收尾，源码同已验fbfe83a，10须自身精确Windows，无阶段完成记录。
 
 真实PG/历史保护四项/不可变账本/并发回滚/有效XLSX/WindowsFull/私有P4P7固定回归及继承model.runs/0041删除风险仍最终封包新库待验，ignored/公开unavailable stub/static指纹不计真实PASS。
+
+
+### R10-10 后台任务（2026-10-13，VERIFYING）
+
+R10-10 Background Jobs已实施 `VERIFYING`，基线4a6fa9b，继续唯一R10分支。App四队列控制入口编组，启动/领取结算/任务执行/请求解码各唯一；PG共享jobs按控制/读取/领取/生命周期/映射/政策重写，旧root及四旧App目录删除。原四类型/六取消checkpoint、状态/错误/重试/到期/优先级/幂等、SKIP LOCKED/状态事件同事务及提交后读解码保持，P4与启动恢复原调用不变。新增13App/6PG unit待自身Windows，预期189/241、Gateway112unit+41contract；84/84源码、完整架构、18Rustfmt、17等价及12负向通过。01～09DONE、10VERIFYING、11～13BLOCKED、R10IN_PROGRESS；真实PG/历史四项/账本并发回滚/有效XLSX/WindowsFull/私有P4P7固定回归及继承model.runs/0041删除风险仍最终新库待验。
+
+沿用原Windows workflow/targets，job实际启动后停止查询并提示20～30分钟；无非Windows动态验收。原PG并发领取/重启预算与18静态契约保持ignored/既有入口安排，不计真实PGPASS。17等价含70原生产字面量/11签名与19unit登记，12破坏探针全拒绝恢复；具体命令/静态报告和32路径见[10记录](modular-rewrite/R10-review-analytics-release-backend/R10-10-background-jobs.md)。无阶段完成记录。

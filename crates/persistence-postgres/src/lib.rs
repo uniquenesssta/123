@@ -5,7 +5,6 @@ mod audit;
 mod competition_kind;
 mod error;
 mod health;
-mod jobs;
 mod mapping;
 mod match_prediction;
 mod migrations;

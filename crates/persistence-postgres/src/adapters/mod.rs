@@ -2,6 +2,7 @@ mod ai_workspace;
 mod analytics;
 pub(crate) mod catalog;
 pub(crate) mod competition;
+mod jobs;
 pub(crate) mod lineups;
 pub(crate) mod matches;
 pub(crate) mod p4;

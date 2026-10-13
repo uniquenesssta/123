@@ -1375,7 +1375,7 @@ crates/application/src/use_cases/analytics/calculation/
 
 ## R10-10 Background Jobs
 
-状态：`READY`（09自身精确完整Windows DONE；用户2026-10-13“收尾09开始10”授权，同一R10分支，11～13BLOCKED）
+状态：`VERIFYING`（用户2026-10-13“收尾09开始10”授权；后台控制/启动/领取结算/执行与共享PG队列已重写，84源码/完整架构/等价/负向通过，自身完整Windows待验，11～13BLOCKED）。详见[10实施记录](../modular-rewrite/R10-review-analytics-release-backend/R10-10-background-jobs.md)。
 
 ### 1. 目标
 

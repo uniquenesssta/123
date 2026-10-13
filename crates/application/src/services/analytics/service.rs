@@ -44,7 +44,7 @@ impl AnalyticsService {
     where
         P: AnalyticsPort + JobQueuePort + Clone + Send + Sync + 'static,
     {
-        analytics::jobs::enqueue_analysis_job::execute(port, draft).await
+        analytics::jobs::enqueue_analysis_job(port, draft).await
     }
 
     pub(crate) async fn list_jobs<P>(
@@ -55,7 +55,7 @@ impl AnalyticsService {
     where
         P: JobQueuePort + ?Sized,
     {
-        analytics::jobs::list_background_jobs::execute(port, limit).await
+        analytics::jobs::list_background_jobs(port, limit).await
     }
 
     pub(crate) async fn cancel_job<P>(
@@ -66,7 +66,7 @@ impl AnalyticsService {
     where
         P: JobQueuePort + ?Sized,
     {
-        analytics::jobs::cancel_background_job::execute(port, job_id).await
+        analytics::jobs::cancel_background_job(port, job_id).await
     }
 
     pub(crate) async fn retry_job<P>(
@@ -77,7 +77,7 @@ impl AnalyticsService {
     where
         P: AnalyticsPort + JobQueuePort + Clone + Send + Sync + 'static,
     {
-        analytics::jobs::retry_background_job::execute(port, job_id).await
+        analytics::jobs::retry_background_job(port, job_id).await
     }
 
     pub(crate) async fn decide_data_quality<P>(

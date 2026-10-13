@@ -24,13 +24,13 @@
     "targetPublicExportPolicy": "explicit re-export only"
   },
   "sourceDigest": "217241ac243726a5ab6805a7f169e222b97e78c7c971749a5904714af673ebdd",
-  "rustUsageDigest": "f80276941dc555a7864c61f2f714de4e5819a4c3ebe048f0a58db90796d4075a",
+  "rustUsageDigest": "b80bce0a8341a13a7a4022538da1df240223a6ca36e287eab92d6c0011e1d89e",
   "summary": {
     "typeCount": 365,
     "publicCompatibilityTypeCount": 365,
     "internalTypeCount": 0,
     "domainSourceFileCount": 129,
-    "scannedRustFileCount": 1244,
+    "scannedRustFileCount": 1252,
     "databaseMappedTypeCount": 301,
     "byTargetModule": {
       "ai_workspace": 16,
@@ -615,6 +615,7 @@
         "crates/application/src/composition/adapters/analytics.rs",
         "crates/application/src/ports/analytics/mod.rs",
         "crates/application/src/use_cases/analytics/calculation/tests.rs",
+        "crates/application/src/use_cases/analytics/jobs/tests.rs",
         "crates/persistence-postgres/src/analytics.rs"
       ],
       "databaseMappings": [
@@ -758,6 +759,7 @@
         "crates/application/src/services/analytics/service.rs",
         "crates/application/src/use_cases/analytics/ai_package/export_ai_analysis_package/mod.rs",
         "crates/application/src/use_cases/analytics/calculation/tests.rs",
+        "crates/application/src/use_cases/analytics/jobs/tests.rs",
         "crates/persistence-postgres/src/analytics.rs",
         "src-tauri/src/commands/analytics.rs"
       ],
@@ -895,6 +897,7 @@
         "crates/application/src/services/analytics/service.rs",
         "crates/application/src/use_cases/analytics/ai_package/preview_ai_analysis_response/mod.rs",
         "crates/application/src/use_cases/analytics/calculation/tests.rs",
+        "crates/application/src/use_cases/analytics/jobs/tests.rs",
         "crates/persistence-postgres/src/analytics.rs",
         "src-tauri/src/commands/analytics.rs"
       ],
@@ -1087,6 +1090,7 @@
         "crates/application/src/use_cases/analytics/ai_package/import_ai_analysis_response/mod.rs",
         "crates/application/src/use_cases/analytics/ai_package/list_ai_analysis_suggestions/mod.rs",
         "crates/application/src/use_cases/analytics/calculation/tests.rs",
+        "crates/application/src/use_cases/analytics/jobs/tests.rs",
         "crates/persistence-postgres/src/analytics.rs",
         "src-tauri/src/commands/analytics.rs"
       ],
@@ -1542,6 +1546,7 @@
         "crates/application/src/services/analytics/service.rs",
         "crates/application/src/use_cases/analytics/ai_package/decide_ai_analysis_suggestion/mod.rs",
         "crates/application/src/use_cases/analytics/calculation/tests.rs",
+        "crates/application/src/use_cases/analytics/jobs/tests.rs",
         "crates/persistence-postgres/src/analytics.rs",
         "src-tauri/src/commands/analytics.rs"
       ],
@@ -1737,7 +1742,8 @@
         "crates/application/src/use_cases/analytics/calculation/overview.rs",
         "crates/application/src/use_cases/analytics/calculation/refresh.rs",
         "crates/application/src/use_cases/analytics/calculation/tests.rs",
-        "crates/application/src/use_cases/analytics/jobs/worker.rs",
+        "crates/application/src/use_cases/analytics/jobs/execution.rs",
+        "crates/application/src/use_cases/analytics/jobs/tests.rs",
         "crates/persistence-postgres/src/adapters/analytics/calculation/projection.rs",
         "crates/persistence-postgres/src/adapters/analytics/calculation/read.rs",
         "crates/persistence-postgres/src/adapters/analytics/calculation/repository.rs",
@@ -1829,7 +1835,8 @@
         "crates/application/src/ports/analytics/mod.rs",
         "crates/application/src/use_cases/analytics/calculation/refresh.rs",
         "crates/application/src/use_cases/analytics/calculation/tests.rs",
-        "crates/application/src/use_cases/analytics/jobs/worker.rs",
+        "crates/application/src/use_cases/analytics/jobs/request.rs",
+        "crates/application/src/use_cases/analytics/jobs/tests.rs",
         "crates/persistence-postgres/src/adapters/analytics/calculation/metrics.rs",
         "crates/persistence-postgres/src/adapters/analytics/calculation/projection.rs",
         "crates/persistence-postgres/src/adapters/analytics/calculation/repository.rs",
@@ -3333,19 +3340,23 @@
         "crates/application/src/services/analytics/facade.rs",
         "crates/application/src/services/analytics/service.rs",
         "crates/application/src/services/p4_orchestration/tests.rs",
-        "crates/application/src/use_cases/analytics/jobs/cancel_background_job/mod.rs",
-        "crates/application/src/use_cases/analytics/jobs/enqueue_analysis_job/mod.rs",
-        "crates/application/src/use_cases/analytics/jobs/list_background_jobs/mod.rs",
-        "crates/application/src/use_cases/analytics/jobs/retry_background_job/mod.rs",
+        "crates/application/src/use_cases/analytics/jobs/commands.rs",
+        "crates/application/src/use_cases/analytics/jobs/tests.rs",
         "crates/application/src/use_cases/p4_orchestration/failure.rs",
         "crates/application/src/use_cases/p4_orchestration/process_next.rs",
         "crates/application/src/use_cases/p4_orchestration/tests.rs",
-        "crates/persistence-postgres/src/jobs.rs",
+        "crates/persistence-postgres/src/adapters/jobs/claim.rs",
+        "crates/persistence-postgres/src/adapters/jobs/commands.rs",
+        "crates/persistence-postgres/src/adapters/jobs/mapping.rs",
+        "crates/persistence-postgres/src/adapters/jobs/read.rs",
         "src-tauri/src/commands/analytics.rs",
         "src-tauri/src/commands/issues.rs"
       ],
       "databaseMappings": [
-        "crates/persistence-postgres/src/jobs.rs"
+        "crates/persistence-postgres/src/adapters/jobs/claim.rs",
+        "crates/persistence-postgres/src/adapters/jobs/commands.rs",
+        "crates/persistence-postgres/src/adapters/jobs/mapping.rs",
+        "crates/persistence-postgres/src/adapters/jobs/read.rs"
       ]
     },
     {
@@ -5862,6 +5873,7 @@
         "crates/application/src/services/analytics/service.rs",
         "crates/application/src/use_cases/analytics/calculation/tests.rs",
         "crates/application/src/use_cases/analytics/decide_data_quality_finding/mod.rs",
+        "crates/application/src/use_cases/analytics/jobs/tests.rs",
         "crates/persistence-postgres/src/analytics.rs",
         "src-tauri/src/commands/analytics.rs"
       ],
@@ -5959,6 +5971,7 @@
         "crates/application/src/services/analytics/service.rs",
         "crates/application/src/use_cases/analytics/calculation/tests.rs",
         "crates/application/src/use_cases/analytics/decide_data_quality_finding/mod.rs",
+        "crates/application/src/use_cases/analytics/jobs/tests.rs",
         "crates/persistence-postgres/src/analytics.rs",
         "src-tauri/src/commands/analytics.rs"
       ],
@@ -6038,6 +6051,7 @@
         "crates/application/src/ports/analytics/contracts.rs",
         "crates/application/src/ports/analytics/mod.rs",
         "crates/application/src/use_cases/analytics/calculation/tests.rs",
+        "crates/application/src/use_cases/analytics/jobs/tests.rs",
         "crates/persistence-postgres/src/adapters/analytics/calculation/projection.rs",
         "crates/persistence-postgres/src/adapters/analytics/calculation/tests.rs",
         "crates/persistence-postgres/src/analytics.rs"
@@ -6213,16 +6227,17 @@
         "crates/application/src/services/analytics/facade.rs",
         "crates/application/src/services/analytics/service.rs",
         "crates/application/src/services/p4_orchestration/tests.rs",
-        "crates/application/src/use_cases/analytics/jobs/enqueue_analysis_job/mod.rs",
+        "crates/application/src/use_cases/analytics/jobs/commands.rs",
+        "crates/application/src/use_cases/analytics/jobs/tests.rs",
         "crates/application/src/use_cases/prediction/plan_p4_horizons/queue.rs",
         "crates/application/src/use_cases/prediction/tests.rs",
         "crates/application/src/use_cases/research/p4_worker/transitions.rs",
-        "crates/persistence-postgres/src/jobs.rs",
+        "crates/persistence-postgres/src/adapters/jobs/commands.rs",
         "crates/persistence-postgres/tests/postgres_integration.rs",
         "src-tauri/src/commands/analytics.rs"
       ],
       "databaseMappings": [
-        "crates/persistence-postgres/src/jobs.rs"
+        "crates/persistence-postgres/src/adapters/jobs/commands.rs"
       ]
     },
     {
@@ -9572,13 +9587,16 @@
       ],
       "externalCallers": [
         "crates/application/src/services/p4_orchestration/tests.rs",
+        "crates/application/src/use_cases/analytics/jobs/tests.rs",
         "crates/application/src/use_cases/p4_orchestration/tests.rs",
-        "crates/persistence-postgres/src/jobs.rs",
+        "crates/persistence-postgres/src/adapters/jobs/policy.rs",
+        "crates/persistence-postgres/src/adapters/jobs/tests.rs",
         "crates/persistence-postgres/tests/postgres_integration.rs",
         "src-tauri/src/commands/issues.rs"
       ],
       "databaseMappings": [
-        "crates/persistence-postgres/src/jobs.rs"
+        "crates/persistence-postgres/src/adapters/jobs/policy.rs",
+        "crates/persistence-postgres/src/adapters/jobs/tests.rs"
       ]
     },
     {
@@ -22875,6 +22893,7 @@
         "crates/application/src/ports/analytics/contracts.rs",
         "crates/application/src/ports/analytics/mod.rs",
         "crates/application/src/use_cases/analytics/calculation/tests.rs",
+        "crates/application/src/use_cases/analytics/jobs/tests.rs",
         "crates/persistence-postgres/src/adapters/analytics/calculation/projection.rs",
         "crates/persistence-postgres/src/adapters/analytics/calculation/tests.rs",
         "crates/persistence-postgres/src/analytics.rs"
