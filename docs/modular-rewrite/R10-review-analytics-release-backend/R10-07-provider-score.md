@@ -1,6 +1,6 @@
 # R10-07 Provider Score
 
-状态：`VERIFYING`（次轮精度测试夹具已纠正，待本修复提交自身完整Windows）。用户2026-10-13“收尾06开始07”授权；uniquenesssta/123 v0.23.0，唯一rewrite/r10-review-analytics-release-backend，基线85ecf15e0b9f75e5f02ccf73576f6430f5c2f7c9。01～06自身精确Windows DONE；08～13 BLOCKED，R10 IN_PROGRESS。
+状态：`DONE`（自身精确cdd2797完整Windows全SUCCESS，以下VERIFYING为实施历史）。
 
 ### 1. 目标
 
@@ -233,3 +233,14 @@ Domain365/129/301映射、scan1217/sourceDigest217241ac243726a5ab6805a7f169e222b
 | M | `scripts/verify-postmatch-service.mjs` |
 
 生产文件未在此修复清单中；回退仍以已验06收尾85ecf15受控revert整个07，前两轮失败不能作为可用验收基线。
+
+
+## R10-07 精确 Windows 完成与08授权（2026-10-13）
+
+精确修复提交 `cdd2797dbd1fa3fe01ff6ca2bdcc7f9d718745fc` / tree `bef40499f1e2b332adccd2008405d6889aefe699`，[Public Platform CI run38350692611](https://github.com/uniquenesssta/123/actions/runs/38350692611) / Windows job115142166008全SUCCESS，run于2026-10-13 13:44:22北京时间完成。实际Application165/165、Persistence216/216、Gateway112/112 unit和41/41 contract；9个新增供应商unit含纠正后的双精度夹具全部通过。前端/contracts/TypeScript/Vite/17视口、Rust fmt/locked Clippy all-targets -D warnings/workspace、Windows release/MSI/NSIS/启动/日志扫描均通过（7条记录、3个完成操作）。报告windows-acceptance-20261013-051954.json及同名.txt。
+
+证据artifact11791662118，14,046,120字节，SHA-256 `e31726acc367194dd9e0f593775bfa45fbac649e71be7a9bffc310e99cd7f166`。首轮688892d的Clippy失败及次轮8c9ab5d的精度夹具失败已由本精确完整成功关闭；失败和纠正过程保留为历史，不以此前部分PASS替代最终证据。07自身完整成功后DONE，用户2026-10-13“收尾07开始08”授权08 Drift Monitoring READY，继续唯一rewrite/r10-review-analytics-release-backend，09～13BLOCKED、R10IN_PROGRESS。本次仅五既有文档收尾[skip ci]，源码同已验cdd2797，08须自身完整Windows成功，无阶段完成记录。
+
+真实PG/历史保护四项/不可变账本/并发回滚/有效XLSX/WindowsFull/私有P4P7固定回归及继承model.runs/0041删除风险仍最终新库待验，ignored/公开unavailable stub/static指纹不计真实PASS。
+
+本收尾0A/5M/0D：根README、TESTING、R10任务书、阶段索引与本节点，源码保持。原累计7A/10M/0D及失败修复清单保留。
