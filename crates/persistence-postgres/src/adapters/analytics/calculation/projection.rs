@@ -6,16 +6,19 @@ use football_domain::{
 use std::collections::HashMap;
 use uuid::Uuid;
 
+#[derive(Debug, PartialEq, Eq)]
+pub(super) struct AnalysisWindows {
+    pub(super) window_start: Option<DateTime<Utc>>,
+    pub(super) window_end: Option<DateTime<Utc>>,
+    pub(super) metric_window_start: DateTime<Utc>,
+    pub(super) metric_window_end: DateTime<Utc>,
+}
+
 pub(super) fn analysis_windows(
     request: &AnalyticsRefreshRequest,
     samples: &[EvaluationSample],
     generated_at: DateTime<Utc>,
-) -> (
-    Option<DateTime<Utc>>,
-    Option<DateTime<Utc>>,
-    DateTime<Utc>,
-    DateTime<Utc>,
-) {
+) -> AnalysisWindows {
     let window_start = request
         .window_start
         .or_else(|| samples.iter().map(|item| item.kickoff_time).min());
@@ -24,12 +27,12 @@ pub(super) fn analysis_windows(
         .or_else(|| samples.iter().map(|item| item.kickoff_time).max());
     let metric_window_start = window_start.unwrap_or(generated_at);
     let metric_window_end = window_end.unwrap_or(generated_at);
-    (
+    AnalysisWindows {
         window_start,
         window_end,
         metric_window_start,
         metric_window_end,
-    )
+    }
 }
 
 pub(super) fn sample_group_ids(

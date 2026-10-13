@@ -1,4 +1,6 @@
-use super::projection::{analysis_windows, overview_from_calculation, sample_group_ids};
+use super::projection::{
+    analysis_windows, overview_from_calculation, sample_group_ids, AnalysisWindows,
+};
 use chrono::{DateTime, Utc};
 use football_domain::{
     AnalyticsCalculation, AnalyticsRefreshRequest, DataQualitySummary, EvaluationSample,
@@ -54,7 +56,12 @@ fn query() -> QueryPerformanceSummary {
 fn empty_samples_keep_null_snapshot_window_and_generated_metric_window() {
     assert_eq!(
         analysis_windows(&AnalyticsRefreshRequest::default(), &[], time(9)),
-        (None, None, time(9), time(9))
+        AnalysisWindows {
+            window_start: None,
+            window_end: None,
+            metric_window_start: time(9),
+            metric_window_end: time(9)
+        }
     );
 }
 
@@ -63,7 +70,12 @@ fn inferred_windows_use_min_max_without_reordering_and_keep_nanoseconds() {
     let samples = [sample(2), sample(0), sample(1)];
     assert_eq!(
         analysis_windows(&AnalyticsRefreshRequest::default(), &samples, time(9)),
-        (Some(time(0)), Some(time(2)), time(0), time(2))
+        AnalysisWindows {
+            window_start: Some(time(0)),
+            window_end: Some(time(2)),
+            metric_window_start: time(0),
+            metric_window_end: time(2)
+        }
     );
     assert_eq!(
         samples.map(|s| s.run_id),
@@ -80,11 +92,21 @@ fn explicit_windows_override_samples_without_repairing_inverted_bounds() {
     };
     assert_eq!(
         analysis_windows(&request, &[sample(0), sample(2)], time(9)),
-        (Some(time(8)), Some(time(4)), time(8), time(4))
+        AnalysisWindows {
+            window_start: Some(time(8)),
+            window_end: Some(time(4)),
+            metric_window_start: time(8),
+            metric_window_end: time(4)
+        }
     );
     assert_eq!(
         analysis_windows(&request, &[], time(9)),
-        (Some(time(8)), Some(time(4)), time(8), time(4))
+        AnalysisWindows {
+            window_start: Some(time(8)),
+            window_end: Some(time(4)),
+            metric_window_start: time(8),
+            metric_window_end: time(4)
+        }
     );
 }
 
@@ -100,19 +122,39 @@ fn one_sided_windows_infer_only_missing_bound_and_fallback_only_empty_bound() {
     };
     assert_eq!(
         analysis_windows(&start, &[sample(2), sample(0)], time(9)),
-        (Some(time(8)), Some(time(2)), time(8), time(2))
+        AnalysisWindows {
+            window_start: Some(time(8)),
+            window_end: Some(time(2)),
+            metric_window_start: time(8),
+            metric_window_end: time(2)
+        }
     );
     assert_eq!(
         analysis_windows(&end, &[sample(2), sample(0)], time(9)),
-        (Some(time(0)), Some(time(4)), time(0), time(4))
+        AnalysisWindows {
+            window_start: Some(time(0)),
+            window_end: Some(time(4)),
+            metric_window_start: time(0),
+            metric_window_end: time(4)
+        }
     );
     assert_eq!(
         analysis_windows(&start, &[], time(9)),
-        (Some(time(8)), None, time(8), time(9))
+        AnalysisWindows {
+            window_start: Some(time(8)),
+            window_end: None,
+            metric_window_start: time(8),
+            metric_window_end: time(9)
+        }
     );
     assert_eq!(
         analysis_windows(&end, &[], time(9)),
-        (None, Some(time(4)), time(9), time(4))
+        AnalysisWindows {
+            window_start: None,
+            window_end: Some(time(4)),
+            metric_window_start: time(9),
+            metric_window_end: time(4)
+        }
     );
 }
 

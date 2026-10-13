@@ -20,7 +20,7 @@
 | R10-06 | [Evidence Scoring](R10-06-evidence-scoring.md) | DONE · 自身精确Windows全SUCCESS |
 | R10-07 | [Provider Score](R10-07-provider-score.md) | DONE · 自身精确Windows全SUCCESS |
 | R10-08 | [Drift Monitoring](R10-08-drift-monitoring.md) | DONE · 自身精确Windows全SUCCESS |
-| R10-09 | [Analytics Calculation](R10-09-analytics-calculation.md) | VERIFYING · 自身完整Windows待验 |
+| R10-09 | [Analytics Calculation](R10-09-analytics-calculation.md) | VERIFYING · 首轮Clippy修复后自身Windows待验 |
 | R10-10 | Background Jobs | BLOCKED |
 | R10-11 | Analysis Package | BLOCKED |
 | R10-12 | Parameter Lifecycle | BLOCKED |
@@ -202,3 +202,10 @@ App采用原综合monitoring入口而非虚构Drift Port，PG实际漂移目录�
 R10-09 Analytics Calculation已实施 `VERIFYING`，基线3fdb443，同一唯一R10分支。App总览及两实际worker刷新归calculation；PG样本/解码/原事务/子指标/持久化与总览投影/读取各有唯一owner，旧root七职责移除，剩余29函数保持。原纯引擎/SQL/绑定/公开接口/错误/窗口/分组覆盖政策、500批次/单事务审计及提交后回读保持；后台进度/取消/全量质量→查询顺序保持，10未提前开始。新增5App/8PG unit待自身Windows，预期176/235、Gateway112unit+41contract；84/84静态、完整架构、18Rustfmt、15等价与11负向通过。01～08DONE、09VERIFYING、10～13BLOCKED、R10IN_PROGRESS；真实PG/历史四项/账本并发回滚/有效XLSX/WindowsFull/私有P4P7回归及继承model.runs/0041删除风险仍最终新库待验。
 
 App采用原AnalyticsPort，两实际刷新调用切换；PG计算目录与纯引擎保持独立，不把质量/AI/参数及队列生命周期提入本项。14A/13M/1D、逻辑迁移1项和23字段完整记录见[09记录](R10-09-analytics-calculation.md)。后续仅核对09自身精确Windows；失败修同分支、成功并获用户授权再进入10，job启动即停止查询，无阶段完成记录。
+
+
+## R10-09 首轮 Windows 类型修复（2026-10-13）
+
+R10-09首轮精确656a97c / [Windows run38371099454](https://github.com/uniquenesssta/123/actions/runs/38371099454)因窗口返回类型触发Clippy type_complexity失败。现改为具名内部AnalysisWindows，同步唯一事务调用方和8处原窗口断言，原值、窗口政策、SQL/事务/审计及纯引擎保持；原5App/8PG测试数量不变。84/84源码、完整架构、3Rustfmt、22等价及5新负向通过；09仍VERIFYING，须修复提交自身完整Windows，10～13BLOCKED。
+
+原纯计算、事务/生命周期链不变；本轮10M/0A/0D、具名值投影与原断言逆切核对及未执行项见[09记录](R10-09-analytics-calculation.md)。01～08DONE，R10IN_PROGRESS，无阶段完成记录；Windows job启动即停止CI查询，真实PG/Full/私有回归仍最终新库待验。

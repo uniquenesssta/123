@@ -773,3 +773,10 @@ R10-08 Drift Monitoring已实施 `VERIFYING`，基线33f7188，继续唯一rewri
 R10-09 Analytics Calculation已实施 `VERIFYING`，基线3fdb443，同一唯一R10分支。App总览及两实际worker刷新归calculation；PG样本/解码/原事务/子指标/持久化与总览投影/读取各有唯一owner，旧root七职责移除，剩余29函数保持。原纯引擎/SQL/绑定/公开接口/错误/窗口/分组覆盖政策、500批次/单事务审计及提交后回读保持；后台进度/取消/全量质量→查询顺序保持，10未提前开始。新增5App/8PG unit待自身Windows，预期176/235、Gateway112unit+41contract；84/84静态、完整架构、18Rustfmt、15等价与11负向通过。01～08DONE、09VERIFYING、10～13BLOCKED、R10IN_PROGRESS；真实PG/历史四项/账本并发回滚/有效XLSX/WindowsFull/私有P4P7回归及继承model.runs/0041删除风险仍最终新库待验。
 
 沿用原Windows workflow/targets，job实际启动后停止一切CI查询并提示20～30分钟；未执行非Windows动态验收。15等价含原273字面量/公开签名/29保留函数与13新unit登记，11负向全拒绝恢复；具体命令/静态报告和待验风险见[09记录](modular-rewrite/R10-review-analytics-release-backend/R10-09-analytics-calculation.md)。无阶段完成记录。
+
+
+## R10-09 Windows 窗口类型修复（2026-10-13）
+
+R10-09首轮精确656a97c / [Windows run38371099454](https://github.com/uniquenesssta/123/actions/runs/38371099454)因窗口返回类型触发Clippy type_complexity失败。现改为具名内部AnalysisWindows，同步唯一事务调用方和8处原窗口断言，原值、窗口政策、SQL/事务/审计及纯引擎保持；原5App/8PG测试数量不变。84/84源码、完整架构、3Rustfmt、22等价及5新负向通过；09仍VERIFYING，须修复提交自身完整Windows，10～13BLOCKED。
+
+首轮前端/contracts/TypeScript/Vite/17视口及Rustfmt实际通过，Clippy阻断后workspace单测、release/MSI/NSIS/启动未完成，不能记完整PASS。artifact11799147265/672bytes，sha256 f4f8cd93df7fe95ab7c79c325591cf394b3d0bdef21381c5e0580247977ce227；报告windows-acceptance-20261013-084347.txt。原窗口边界期望只改具名形状，值不变；预期App176/PG235/Gateway112unit+41contract保持，须自身Windows确认。原Windows job启动后停止查询并提示20～30分钟；无非Windows动态验收，真实PG/历史四项/不可变账本/并发回滚/有效XLSX/WindowsFull/私有P4P7固定回归及继承model.runs/0041删除风险仍最终新库待验。详细10M清单、回退及Context7版本核对见[09记录](modular-rewrite/R10-review-analytics-release-backend/R10-09-analytics-calculation.md)。

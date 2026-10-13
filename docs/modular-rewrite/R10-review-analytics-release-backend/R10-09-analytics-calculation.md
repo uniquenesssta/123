@@ -36,7 +36,7 @@ App不引具体数据库、SQL、文件IO或公式。projection不承担IO，两
 
 ### 9. 状态所有权
 
-原数据库快照/指标/审计持有状态，调用内HashMap和窗口元组只是临时投影。原19 state owner、43Ports/19Port文件保持，App425文件；PG直接模块owner由37增至38，仅登记实际新增analytics适配器。没有长期共享可变状态。
+原数据库快照/指标/审计持有状态，调用内HashMap和具名窗口值只是临时投影。原19 state owner、43Ports/19Port文件保持，App425文件；PG直接模块owner由37增至38，仅登记实际新增analytics适配器。没有长期共享可变状态。
 
 ### 10. 副作用边界
 
@@ -150,3 +150,37 @@ Mermaid Chart已显示中文实际刷新/总览、样本→纯计算→同一事
 - `crates/application/src/use_cases/analytics/analytics_overview/mod.rs`
 
 Git整文件原样重命名：无。旧9行总览职责改名/归属为逻辑迁移，其他为函数或纯投影片段提取；不按文件数量机械切分。实际合计28路径，18存在的变更Rust文件独立格式检查通过；删除文件不纳入Rustfmt。
+
+
+## 首轮 Windows type_complexity 修复（2026-10-13）
+
+首轮精确提交656a97cb466c480ed50125a60b3af1d288597f29 / tree4c6333eef2ebad1e3cf5ceda760845f232188ff4，[Public Platform CI run38371099454](https://github.com/uniquenesssta/123/actions/runs/38371099454) / job115208003236完整结束FAILURE。唯一错误在PG calculation/projection.rs:13，analysis_windows返回两个Option<DateTime<Utc>>及两个DateTime<Utc>的四项元组触发clippy::type_complexity，-D warnings使编译停止。2026-10-13 16:47:00北京记录Rust链失败；不是窗口数值单测失败，workspace单测/打包/启动尚未完成。前端/contracts/TypeScript/Vite/17视口和Rustfmt实际通过，不能据此标记09DONE。
+
+失败报告windows-acceptance-20261013-084347.txt；artifact11799147265，672bytes，sha256 f4f8cd93df7fe95ab7c79c325591cf394b3d0bdef21381c5e0580247977ce227。修复基线本首轮656a97c，不重做08收尾或进入10。
+
+现在同一projection定义pub(super) AnalysisWindows，四原字段window_start/end为Option<DateTime<Utc>>，metric_window_start/end为DateTime<Utc>；Debug/PartialEq/Eq仅支持现有值断言。analysis_windows原局部推导代码和显式优先/minmax/空边fallback不变，返回四字段具名值。repository在原分批写后同一时点解构该值，原变量继续原快照/子记录/metrics绑定。结构只在计算模块内可见，没有Domain/公共API/DTO/Schema/长期State或新的wrapper/file。没有allow/expect、阈值配置、工具链或依赖变化。
+
+原tests中8处窗口期望元组改为同四值的具名结构，保持空/乱序/纳秒/显式倒置/单边边界与原assert_eq，不改其余函数、数据、容差、断言或测试数量。原5App/8PG新unit数量保持；预期App176/PG235/Gateway112unit+41contract仍须此修复提交自身Windows执行。
+
+实际84/84原JS源码、完整npm run verify:architecture、3实际修改Rust独立Rustfmt1.88 --check、22等价（原15核对+本次7项类型形状逆切）、5新负向及git diff --check通过。7项修复核对为：window逆返回形状后完整原函数一致；其他projection函数保持；结构精确四原字段/内部可见性；repository逆具名解构/类型导入后全文一致；tests逆8处具名期望/导入后全文一致；无lint抑制/工具链依赖配置变化；只改这3个Rust文件。原29保留函数、273生产字面量多重集、SQL/绑定/公开签名/纯引擎/原worker和Service逆切及原保护区保持。
+
+原Analytics Service门禁新增窗口具名返回、四原字段类型和值映射、真实事务解构及无type_complexity抑制检查。5探针：恢复多行复杂元组、恢复单行复杂元组、把window_start映为window_end、加入allow(type_complexity)、调用方漏metric_window_end；全部被拒绝且按bytes恢复。此前11生产破坏探针为初始实施历史，本修复不重复无变化探针；现22等价重新确认整条原链。scratch r1009fix1-static-checks.json/r1009fix1-architecture.log/r1009fix1-equivalence.json/r1009fix1-negative-probes.json可复建，未增加验收框架/runner/workflow/target/数据库入口。
+
+官方Domain365/129声明文件/301映射、scan1244/sourceDigest217241ac243726a5ab6805a7f169e222b97e78c7c971749a5904714af673ebdd保持。由于原3个Rust文件变化，rustUsageDigest刷新为f80276941dc555a7864c61f2f714de4e5819a4c3ebe048f0a58db90796d4075a；没有新增Domain类型。App425/43Ports/19Port文件、PG直接owner38/state19保持，18保护/171命令/46迁移和18PG静态契约不变。
+
+已从原.github/workflows/ci.yml确认Rust/Clippy1.88.0。Context7返回当前Rust Clippy源码说明复杂度按嵌套类型计分，未提供1.88专属索引；再核对[官方rust-1.88.0标签的类型复杂度实现](https://github.com/rust-lang/rust-clippy/blob/rust-1.88.0/clippy_lints/src/types/type_complexity.rs)，该版本按语法中的Path/Tup/嵌套类型访问并与阈值比较。采用简单具名Path返回和分别声明字段，结合1.88实际CI诊断修正，不将master文档冒充版本证据。原Mermaid复杂链继续准确，本次类型形状改动不改变图中拓扑或事务边界，无子代理。Create State按稳定足球UUID96f03270-c236-46de-99fa-db85d2fbf4ce保存本失败/修复/新CI交接。
+
+本轮相对656a97c为10M/0A/0D，移动/重命名无。受控revert本修复到656a97c仅回退类型/原期望形状/守卫/使用摘要/记录，会恢复已知Clippy失败；回退整个09则按第20节基线3fdb443。09仍VERIFYING，10～13BLOCKED、R10IN_PROGRESS；修复后的原Windows job实际启动即停止一切CI查询并提示20～30分钟。未执行非Windows Cargo/check/Clippy/build/test/frontendbuild/browser/loopback；真实PG/历史保护四项/不可变账本/并发回滚/有效XLSX/WindowsFull/私有P4P7固定回归与继承model.runs/0041删除风险仍最终封包新库待验，ignored/公共stub/static指纹不计真实PASS。
+
+### 本修复全部修改文件（10）
+
+- `README.md`
+- `architecture/domain-type-inventory.json`
+- `crates/persistence-postgres/src/adapters/analytics/calculation/projection.rs`
+- `crates/persistence-postgres/src/adapters/analytics/calculation/repository.rs`
+- `crates/persistence-postgres/src/adapters/analytics/calculation/tests.rs`
+- `docs/TESTING.md`
+- `docs/football-model-platform-modular-rewrite-19-docs/10-R10-review-analytics-release-backend.md`
+- `docs/modular-rewrite/R10-review-analytics-release-backend/R10-09-analytics-calculation.md`
+- `docs/modular-rewrite/R10-review-analytics-release-backend/README.md`
+- `scripts/verify-analytics-service.mjs`

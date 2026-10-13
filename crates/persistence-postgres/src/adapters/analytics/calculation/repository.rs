@@ -1,6 +1,6 @@
 use super::{
     metrics::{insert_calibration_bucket, insert_drift_finding},
-    projection::{analysis_windows, sample_group_ids},
+    projection::{analysis_windows, sample_group_ids, AnalysisWindows},
 };
 use crate::{write_audit_event, PersistenceResult, PostgresStore};
 use football_analytics_engine::calculate_analytics;
@@ -63,8 +63,12 @@ impl PostgresStore {
             builder.build().execute(&mut *tx).await?;
         }
 
-        let (window_start, window_end, metric_window_start, metric_window_end) =
-            analysis_windows(request, &samples, calculation.generated_at);
+        let AnalysisWindows {
+            window_start,
+            window_end,
+            metric_window_start,
+            metric_window_end,
+        } = analysis_windows(request, &samples, calculation.generated_at);
         let summary = serde_json::to_value(&calculation)?;
         sqlx::query(
             "INSERT INTO analytics.analysis_snapshots (id, competition_id, window_start, window_end, sample_size, summary, calculation_version, created_at) VALUES ($1,$2,$3,$4,$5,$6,$7,$8)",

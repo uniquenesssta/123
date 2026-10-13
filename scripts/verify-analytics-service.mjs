@@ -180,6 +180,15 @@ for (const token of ["SELECT DISTINCT ON (run.id)", "run.status='succeeded'", "r
   "rows.iter().map(evaluation_sample_from_row).collect()"])
   check(samples.includes(token), `计算样本原筛选/顺序/错误映射缺失：${token}`);
 const normalizedProjection = compact(projection);
+check(/pub\(super\)\s+struct\s+AnalysisWindows\s*\{/.test(projection) &&
+  /fn\s+analysis_windows\([\s\S]*?\)\s*->\s*AnalysisWindows\s*\{/.test(projection), "计算窗口必须返回具名内部投影，避免复杂时间元组");
+check(compact(repository).includes("letAnalysisWindows{window_start,window_end,metric_window_start,metric_window_end,}=analysis_windows(request,&samples,calculation.generated_at);"), "计算事务必须解构同一窗口投影的四个原字段");
+for (const token of ["pub(super)window_start:Option<DateTime<Utc>>", "pub(super)window_end:Option<DateTime<Utc>>",
+  "pub(super)metric_window_start:DateTime<Utc>", "pub(super)metric_window_end:DateTime<Utc>"])
+  check(normalizedProjection.includes(token), `计算窗口具名字段类型改变：${token}`);
+check(normalizedProjection.includes("AnalysisWindows{window_start,window_end,metric_window_start,metric_window_end,}"), "具名窗口字段必须保持原值映射");
+check(!/#\s*\[\s*(?:allow|expect)\s*\([^\]]*type_complexity/.test(projection + repository), "计算窗口不得抑制 type_complexity");
+
 for (const token of ["request.window_start.or_else(||samples.iter().map(|item|item.kickoff_time).min())",
   "request.window_end.or_else(||samples.iter().map(|item|item.kickoff_time).max())",
   "window_start.unwrap_or(generated_at)", "window_end.unwrap_or(generated_at)",
