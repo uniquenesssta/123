@@ -1241,7 +1241,7 @@ crates/application/src/use_cases/postmatch/drift-monitoring/
 
 ## R10-09 Analytics Calculation
 
-状态：`VERIFYING`（用户2026-10-13“收尾08开始09”授权；原计算入口与PG事务职责已重写；首轮Clippy type_complexity失败已按具名窗口类型修正，84源码/完整架构/等价/负向通过，修复提交自身完整Windows待验，10～13BLOCKED）。详见[09实施记录](../modular-rewrite/R10-review-analytics-release-backend/R10-09-analytics-calculation.md)。
+状态：`DONE`（自身精确fbfe83a / Windows run38398255939全SUCCESS；用户2026-10-13“收尾09开始10”授权10 READY）。详见[09完成记录](../modular-rewrite/R10-review-analytics-release-backend/R10-09-analytics-calculation.md)。
 
 ### 1. 目标
 
@@ -1375,7 +1375,7 @@ crates/application/src/use_cases/analytics/calculation/
 
 ## R10-10 Background Jobs
 
-状态：`BLOCKED`（仅当上一任务与本任务前置门禁通过后改为 `READY`）
+状态：`READY`（09自身精确完整Windows DONE；用户2026-10-13“收尾09开始10”授权，同一R10分支，11～13BLOCKED）
 
 ### 1. 目标
 

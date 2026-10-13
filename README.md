@@ -766,3 +766,6 @@ R10-09 Analytics Calculation已实施 `VERIFYING`，基线3fdb443，同一唯一
 
 
 R10-09首轮精确656a97c / [Windows run38371099454](https://github.com/uniquenesssta/123/actions/runs/38371099454)因窗口返回类型触发Clippy type_complexity失败。现改为具名内部AnalysisWindows，同步唯一事务调用方和8处原窗口断言，原值、窗口政策、SQL/事务/审计及纯引擎保持；原5App/8PG测试数量不变。84/84源码、完整架构、3Rustfmt、22等价及5新负向通过；09仍VERIFYING，须修复提交自身完整Windows，10～13BLOCKED。完整修复与待验项见[09记录](docs/modular-rewrite/R10-review-analytics-release-backend/R10-09-analytics-calculation.md)。
+
+
+R10-09 已收尾DONE：精确fbfe83a / [Windows run38398255939](https://github.com/uniquenesssta/123/actions/runs/38398255939)全SUCCESS，Application176/Persistence235/Gateway112unit+41contract及13新测试、17视口/打包/启动通过，首轮窗口类型Clippy失败已关闭。用户授权10后台任务，11～13BLOCKED；完整证据与最终新库待验见[09完成记录](docs/modular-rewrite/R10-review-analytics-release-backend/R10-09-analytics-calculation.md)。

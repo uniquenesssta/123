@@ -780,3 +780,12 @@ R10-09 Analytics Calculation已实施 `VERIFYING`，基线3fdb443，同一唯一
 R10-09首轮精确656a97c / [Windows run38371099454](https://github.com/uniquenesssta/123/actions/runs/38371099454)因窗口返回类型触发Clippy type_complexity失败。现改为具名内部AnalysisWindows，同步唯一事务调用方和8处原窗口断言，原值、窗口政策、SQL/事务/审计及纯引擎保持；原5App/8PG测试数量不变。84/84源码、完整架构、3Rustfmt、22等价及5新负向通过；09仍VERIFYING，须修复提交自身完整Windows，10～13BLOCKED。
 
 首轮前端/contracts/TypeScript/Vite/17视口及Rustfmt实际通过，Clippy阻断后workspace单测、release/MSI/NSIS/启动未完成，不能记完整PASS。artifact11799147265/672bytes，sha256 f4f8cd93df7fe95ab7c79c325591cf394b3d0bdef21381c5e0580247977ce227；报告windows-acceptance-20261013-084347.txt。原窗口边界期望只改具名形状，值不变；预期App176/PG235/Gateway112unit+41contract保持，须自身Windows确认。原Windows job启动后停止查询并提示20～30分钟；无非Windows动态验收，真实PG/历史四项/不可变账本/并发回滚/有效XLSX/WindowsFull/私有P4P7固定回归及继承model.runs/0041删除风险仍最终新库待验。详细10M清单、回退及Context7版本核对见[09记录](modular-rewrite/R10-review-analytics-release-backend/R10-09-analytics-calculation.md)。
+
+
+## R10-09 精确 Windows 完成与10授权（2026-10-13）
+
+精确修复提交 `fbfe83a9e3b979b2c10e154a718c19639900a41d` / tree `91c39ea42d331e1cc294752479f430bf2655c2a9`，[Public Platform CI run38398255939](https://github.com/uniquenesssta/123/actions/runs/38398255939) / Windows job115298907093全SUCCESS，run于2026-10-13 21:02:32北京时间完成。实际Application176/176、Persistence235/235、Gateway112/112 unit及41/41 contract；原5App/8PG新增unit全部通过。前端/contracts/TypeScript/Vite/17视口、Rust fmt/locked Clippy all-targets -D warnings/workspace、Windows release/MSI/NSIS/启动与日志扫描均通过（7条记录、3个完成操作）。报告windows-acceptance-20261013-123542.json及同名.txt。
+
+证据artifact11815192224，14,048,590字节，SHA-256 `eccc82a62ef2b48036040ad1ddec43f6c4c0001af7a9db0c83526ce5b28d3f3a`。首轮656a97c的Clippy type_complexity失败由本修复自身完整成功关闭；具名窗口与原8期望值实际通过，之前失败/VERIFYING为实施历史。09自身完整SUCCESS后DONE；用户2026-10-13“收尾09开始10”授权10 Background Jobs READY，同一唯一rewrite/r10-review-analytics-release-backend分支，11～13BLOCKED、R10IN_PROGRESS。本次仅五既有文档[skip ci]收尾，源码同已验fbfe83a，10须自身精确Windows，无阶段完成记录。
+
+真实PG/历史保护四项/不可变账本/并发回滚/有效XLSX/WindowsFull/私有P4P7固定回归及继承model.runs/0041删除风险仍最终封包新库待验，ignored/公开unavailable stub/static指纹不计真实PASS。

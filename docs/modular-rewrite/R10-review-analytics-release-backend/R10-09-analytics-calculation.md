@@ -1,6 +1,6 @@
 # R10-09 Analytics Calculation
 
-状态：`VERIFYING`。用户2026-10-13“收尾08开始09”授权；uniquenesssta/123 v0.23.0，唯一分支rewrite/r10-review-analytics-release-backend。基线3fdb4435524af6a776256c3fa252ac3f685d06ab为08五文档[skip ci]收尾，源码同f834e31/Windows run38357781835全SUCCESS。01～08 DONE，09 VERIFYING，10～13 BLOCKED，R10 IN_PROGRESS。
+状态：`DONE`（自身精确修复Windows全SUCCESS，以下VERIFYING/失败为实施历史）。用户2026-10-13“收尾08开始09”授权；uniquenesssta/123 v0.23.0，唯一分支rewrite/r10-review-analytics-release-backend。基线3fdb4435524af6a776256c3fa252ac3f685d06ab为08五文档[skip ci]收尾，源码同f834e31/Windows run38357781835全SUCCESS。01～08 DONE，09 VERIFYING，10～13 BLOCKED，R10 IN_PROGRESS。
 
 ### 1. 目标
 
@@ -184,3 +184,12 @@ Git整文件原样重命名：无。旧9行总览职责改名/归属为逻辑迁
 - `docs/modular-rewrite/R10-review-analytics-release-backend/R10-09-analytics-calculation.md`
 - `docs/modular-rewrite/R10-review-analytics-release-backend/README.md`
 - `scripts/verify-analytics-service.mjs`
+
+
+## R10-09 精确 Windows 完成与10授权（2026-10-13）
+
+精确修复提交 `fbfe83a9e3b979b2c10e154a718c19639900a41d` / tree `91c39ea42d331e1cc294752479f430bf2655c2a9`，[Public Platform CI run38398255939](https://github.com/uniquenesssta/123/actions/runs/38398255939) / Windows job115298907093全SUCCESS，run于2026-10-13 21:02:32北京时间完成。实际Application176/176、Persistence235/235、Gateway112/112 unit及41/41 contract；原5App/8PG新增unit全部通过。前端/contracts/TypeScript/Vite/17视口、Rust fmt/locked Clippy all-targets -D warnings/workspace、Windows release/MSI/NSIS/启动与日志扫描均通过（7条记录、3个完成操作）。报告windows-acceptance-20261013-123542.json及同名.txt。
+
+证据artifact11815192224，14,048,590字节，SHA-256 `eccc82a62ef2b48036040ad1ddec43f6c4c0001af7a9db0c83526ce5b28d3f3a`。首轮656a97c的Clippy type_complexity失败由本修复自身完整成功关闭；具名窗口与原8期望值实际通过，之前失败/VERIFYING为实施历史。09自身完整SUCCESS后DONE；用户2026-10-13“收尾09开始10”授权10 Background Jobs READY，同一唯一rewrite/r10-review-analytics-release-backend分支，11～13BLOCKED、R10IN_PROGRESS。本次仅五既有文档[skip ci]收尾，源码同已验fbfe83a，10须自身精确Windows，无阶段完成记录。
+
+真实PG/历史保护四项/不可变账本/并发回滚/有效XLSX/WindowsFull/私有P4P7固定回归及继承model.runs/0041删除风险仍最终封包新库待验，ignored/公开unavailable stub/static指纹不计真实PASS。

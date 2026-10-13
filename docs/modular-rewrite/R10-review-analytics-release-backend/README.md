@@ -2,7 +2,7 @@
 
 ## 当前阶段状态
 
-`IN_PROGRESS`。用户2026-10-12“开始R10-01”授权；从R9文档收尾HEAD `48618fed2d7ff7c2a4db831a037f227dc789f278` 建立唯一阶段分支 `rewrite/r10-review-analytics-release-backend`。01自身精确Windows run38229119264/job114743919870全SUCCESS并DONE；02自身1ad6e68 / Windows run38245932270/job114799659672全SUCCESS并DONE；用户“收尾02开始03”授权03已实施；03自身99b15ad / Windows run38259438025/job114845878326全SUCCESS并DONE，04自身221d211 / Windows run38271387412/job114886215505全SUCCESS并DONE；05自身fe3529f / Windows run38277864089/job114907643831全SUCCESS并DONE；06自身1ed6dbe / Windows run38290328302/job114948593892全SUCCESS并DONE；07自身cdd2797 / Windows run38350692611/job115142166008全SUCCESS并DONE；08自身f834e31 / Windows run38357781835/job115164583225全SUCCESS并DONE；用户“收尾08开始09”授权09已实施VERIFYING，10～13 BLOCKED。
+`IN_PROGRESS`。用户2026-10-12“开始R10-01”授权；从R9文档收尾HEAD `48618fed2d7ff7c2a4db831a037f227dc789f278` 建立唯一阶段分支 `rewrite/r10-review-analytics-release-backend`。01自身精确Windows run38229119264/job114743919870全SUCCESS并DONE；02自身1ad6e68 / Windows run38245932270/job114799659672全SUCCESS并DONE；用户“收尾02开始03”授权03已实施；03自身99b15ad / Windows run38259438025/job114845878326全SUCCESS并DONE，04自身221d211 / Windows run38271387412/job114886215505全SUCCESS并DONE；05自身fe3529f / Windows run38277864089/job114907643831全SUCCESS并DONE；06自身1ed6dbe / Windows run38290328302/job114948593892全SUCCESS并DONE；07自身cdd2797 / Windows run38350692611/job115142166008全SUCCESS并DONE；08自身f834e31 / Windows run38357781835/job115164583225全SUCCESS并DONE；09自身fbfe83a / Windows run38398255939/job115298907093全SUCCESS并DONE；用户“收尾09开始10”授权10 READY，11～13 BLOCKED。
 
 ## 前置基线与依据
 
@@ -20,8 +20,8 @@
 | R10-06 | [Evidence Scoring](R10-06-evidence-scoring.md) | DONE · 自身精确Windows全SUCCESS |
 | R10-07 | [Provider Score](R10-07-provider-score.md) | DONE · 自身精确Windows全SUCCESS |
 | R10-08 | [Drift Monitoring](R10-08-drift-monitoring.md) | DONE · 自身精确Windows全SUCCESS |
-| R10-09 | [Analytics Calculation](R10-09-analytics-calculation.md) | VERIFYING · 首轮Clippy修复后自身Windows待验 |
-| R10-10 | Background Jobs | BLOCKED |
+| R10-09 | [Analytics Calculation](R10-09-analytics-calculation.md) | DONE · 自身精确修复Windows全SUCCESS |
+| R10-10 | Background Jobs | READY · 用户已授权 |
 | R10-11 | Analysis Package | BLOCKED |
 | R10-12 | Parameter Lifecycle | BLOCKED |
 | R10-13 | Release Acceptance | BLOCKED |
@@ -209,3 +209,12 @@ App采用原AnalyticsPort，两实际刷新调用切换；PG计算目录与纯�
 R10-09首轮精确656a97c / [Windows run38371099454](https://github.com/uniquenesssta/123/actions/runs/38371099454)因窗口返回类型触发Clippy type_complexity失败。现改为具名内部AnalysisWindows，同步唯一事务调用方和8处原窗口断言，原值、窗口政策、SQL/事务/审计及纯引擎保持；原5App/8PG测试数量不变。84/84源码、完整架构、3Rustfmt、22等价及5新负向通过；09仍VERIFYING，须修复提交自身完整Windows，10～13BLOCKED。
 
 原纯计算、事务/生命周期链不变；本轮10M/0A/0D、具名值投影与原断言逆切核对及未执行项见[09记录](R10-09-analytics-calculation.md)。01～08DONE，R10IN_PROGRESS，无阶段完成记录；Windows job启动即停止CI查询，真实PG/Full/私有回归仍最终新库待验。
+
+
+## R10-09 精确 Windows 完成与10授权（2026-10-13）
+
+精确修复提交 `fbfe83a9e3b979b2c10e154a718c19639900a41d` / tree `91c39ea42d331e1cc294752479f430bf2655c2a9`，[Public Platform CI run38398255939](https://github.com/uniquenesssta/123/actions/runs/38398255939) / Windows job115298907093全SUCCESS，run于2026-10-13 21:02:32北京时间完成。实际Application176/176、Persistence235/235、Gateway112/112 unit及41/41 contract；原5App/8PG新增unit全部通过。前端/contracts/TypeScript/Vite/17视口、Rust fmt/locked Clippy all-targets -D warnings/workspace、Windows release/MSI/NSIS/启动与日志扫描均通过（7条记录、3个完成操作）。报告windows-acceptance-20261013-123542.json及同名.txt。
+
+证据artifact11815192224，14,048,590字节，SHA-256 `eccc82a62ef2b48036040ad1ddec43f6c4c0001af7a9db0c83526ce5b28d3f3a`。首轮656a97c的Clippy type_complexity失败由本修复自身完整成功关闭；具名窗口与原8期望值实际通过，之前失败/VERIFYING为实施历史。09自身完整SUCCESS后DONE；用户2026-10-13“收尾09开始10”授权10 Background Jobs READY，同一唯一rewrite/r10-review-analytics-release-backend分支，11～13BLOCKED、R10IN_PROGRESS。本次仅五既有文档[skip ci]收尾，源码同已验fbfe83a，10须自身精确Windows，无阶段完成记录。
+
+真实PG/历史保护四项/不可变账本/并发回滚/有效XLSX/WindowsFull/私有P4P7固定回归及继承model.runs/0041删除风险仍最终封包新库待验，ignored/公开unavailable stub/static指纹不计真实PASS。
