@@ -60,7 +60,7 @@ R10-01 Review Package Workflow 已实施、`VERIFYING`；唯一阶段分支 `rew
 
 R10-02 Structured Match Facts 已实施 `VERIFYING`，基线ab43aee，继续唯一分支rewrite/r10-review-analytics-release-backend。Application真实事实阶段迁入facts coordinator，ReviewService与组合工作流直接复用；PG facts目录独占校验、事件身份、事务写入、查询/摘要、行映射和事实提交，旧review.rs的14职责及事实写入正文移除。原比赛锁、修订归属、SQL/审计/同事务上下文与十个公开方法签名保持，不改变报告/候选/参数人工门禁。新增8 PG unit待自身Windows，预期Persistence187 / Application146 / Gateway112 unit、41 contract；84/84静态、完整架构、19 Rust文件Rustfmt、等价与8破坏探针通过。01自身Windows已DONE，02 VERIFYING、03～13 BLOCKED、R10 IN_PROGRESS；真实PG/历史四项/账本并发回滚/有效XLSX/Windows Full/私有P4/P7回归与继承model.runs/0041删除风险仍最终新库待验。 详见 [02实施记录](docs/modular-rewrite/R10-review-analytics-release-backend/R10-02-structured-match-facts.md)。
 
-R10-03 Review Engine Adapter 当前 `DONE`：普通/资料包生成及PG准备、上下文、纯引擎调用和报告事务已迁入唯一owner，原公式/公开契约及候选人工门禁保持。精确 `99b15ad` / [Windows run38259438025](https://github.com/uniquenesssta/123/actions/runs/38259438025) 全SUCCESS，Application151/Persistence187、Gateway112 unit/41 contract、新增5项及17视口/打包/启动通过。01～07 DONE，08 VERIFYING、09～13 BLOCKED，R10 IN_PROGRESS；真实PG/Full/私有固定回归及继承删除风险仍最终新库待验。完整文件、证据与回退见 [03记录](docs/modular-rewrite/R10-review-analytics-release-backend/R10-03-review-engine-adapter.md) 和 [阶段索引](docs/modular-rewrite/R10-review-analytics-release-backend/README.md)。
+R10-03 Review Engine Adapter 当前 `DONE`：普通/资料包生成及PG准备、上下文、纯引擎调用和报告事务已迁入唯一owner，原公式/公开契约及候选人工门禁保持。精确 `99b15ad` / [Windows run38259438025](https://github.com/uniquenesssta/123/actions/runs/38259438025) 全SUCCESS，Application151/Persistence187、Gateway112 unit/41 contract、新增5项及17视口/打包/启动通过。01～08 DONE，09 READY、10～13 BLOCKED，R10 IN_PROGRESS；真实PG/Full/私有固定回归及继承删除风险仍最终新库待验。完整文件、证据与回退见 [03记录](docs/modular-rewrite/R10-review-analytics-release-backend/R10-03-review-engine-adapter.md) 和 [阶段索引](docs/modular-rewrite/R10-review-analytics-release-backend/README.md)。
 
 ## 公开边界
 
@@ -753,3 +753,6 @@ R10-07 已收尾DONE：精确cdd2797 / [Windows run38350692611](https://github.c
 ### R10-08 漂移监控（2026-10-13，VERIFYING）
 
 原监控入口、共享活动分区与漂移样本/准备/幂等事务/读回已形成唯一owner；旧App两入口删除，原SQL/公式/窗口/状态/单事务审计和供应商→漂移→总览顺序保持。18A/13M/2D，新增6App/11PG unit待Windows（预期171/227）；84/84静态、完整架构、22Rustfmt、19等价及10负向通过。07已DONE、08VERIFYING、09～13BLOCKED，完整变化与最终新库延期见[08记录](docs/modular-rewrite/R10-review-analytics-release-backend/R10-08-drift-monitoring.md)和[阶段索引](docs/modular-rewrite/R10-review-analytics-release-backend/README.md)。
+
+
+R10-08 已收尾DONE：精确f834e31 / [Windows run38357781835](https://github.com/uniquenesssta/123/actions/runs/38357781835) 全SUCCESS，Application171/Persistence227/Gateway112unit+41contract及17新测试、17视口/打包/启动通过。用户授权09分析计算，10～13BLOCKED；完整证据见[08记录](docs/modular-rewrite/R10-review-analytics-release-backend/R10-08-drift-monitoring.md)。

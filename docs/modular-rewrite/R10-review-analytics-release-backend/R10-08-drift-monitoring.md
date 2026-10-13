@@ -1,6 +1,6 @@
 # R10-08 Drift Monitoring
 
-状态：`VERIFYING`。用户2026-10-13“收尾07开始08”授权；uniquenesssta/123 v0.23.0，唯一rewrite/r10-review-analytics-release-backend，基线33f718858e550aa4a39192255b3c6fc2c28b6cff。01～07自身精确Windows DONE，09～13BLOCKED、R10IN_PROGRESS。
+状态：`DONE`（自身精确完整Windows全SUCCESS，下述VERIFYING为实施历史）。用户2026-10-13“收尾07开始08”授权；uniquenesssta/123 v0.23.0，唯一rewrite/r10-review-analytics-release-backend，基线33f718858e550aa4a39192255b3c6fc2c28b6cff。01～07自身精确Windows DONE，09～13BLOCKED、R10IN_PROGRESS。
 
 ### 1. 目标
 
@@ -188,3 +188,14 @@ flowchart TD
 | M | `scripts/verify-postmatch-settlement.mjs` | 原契约验证读实际新owner |
 
 两旧App文件删除与两个具名实际入口A对应；PG root按函数退出、共享规则仍原路径，原supplier方法正文保持，仅分区引用改变。
+
+
+## R10-08 精确 Windows 完成与09授权（2026-10-13）
+
+精确提交 `f834e3152e65e791b91897ce4803cedd284f7311` / tree `bc48b5f701f2f2262bd1118390b7691c23ad17a0`，[Public Platform CI run38357781835](https://github.com/uniquenesssta/123/actions/runs/38357781835) / Windows job115164583225全SUCCESS，2026-10-13 15:06:50北京时间完成。实际Application171/171、Persistence227/227、Gateway112/112 unit及41/41 contract；本项新增6App/11PG unit全部通过。前端/contracts/TypeScript/Vite/17视口、Rust fmt/locked Clippy all-targets -D warnings/workspace、Windows release/MSI/NSIS/启动与日志扫描均通过（7条记录、3个完成操作）。报告windows-acceptance-20261013-063917.json及同名.txt。
+
+证据artifact11794826120，14,048,433字节，SHA-256 `d188c4d0fae8316bde55f14089eac7a7240490a9bf8af36e64df0674db0f4756`。08自身完整SUCCESS后DONE；用户2026-10-13“收尾08开始09”授权09 Analytics Calculation READY，继续唯一rewrite/r10-review-analytics-release-backend，10～13BLOCKED、R10IN_PROGRESS。本次五既有文档收尾[skip ci]，源码同已验f834e31，09须自身完整Windows，无阶段完成记录。此前08 VERIFYING和预期计数保留为历史。
+
+真实PG/历史保护四项/不可变账本/并发回滚/有效XLSX/WindowsFull/私有P4P7固定回归及继承model.runs/0041删除风险仍最终新库待验，ignored/公开unavailable stub/静态指纹不计这些真实PASS。
+
+本收尾0A/5M/0D，根README/TESTING/R10任务书/阶段索引/本节点，源码不变。原18A/13M/2D完整清单和职责/回退保留。
