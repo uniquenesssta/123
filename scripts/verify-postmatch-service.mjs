@@ -160,6 +160,17 @@ assert(ordered(provider.aggregation, ["sha256_json(&self.decision_fingerprints)?
 for (const token of ["SELECT DISTINCT ON (score.provider_id, score.scope_key)", "JOIN catalog.data_providers provider ON provider.id=score.provider_id", "ORDER BY score.provider_id, score.scope_key, score.generated_at DESC, score.id DESC", "limit.clamp(1, 500)", "rows.iter().map(provider_score_from_row).collect()"]) assert(provider.read.includes(token), `供应商原最新快照读取缺少 ${token}`);
 for (const field of ["sample_size", "correct_count", "partial_count", "incorrect_count", "not_verifiable_count"]) assert(new RegExp(`${field}: non_negative_u64\\(\\s*row.try_get\\("${field}"\\)\\?`).test(provider.mapping), `供应商计数解码缺少原负数门禁 ${field}`);
 for (const name of ["empty_decisions_create_no_provider_groups", "empty_aggregate_keeps_zero_counts_means_and_score", "unverifiable_only_keeps_timeliness_but_cannot_gain_weighted_accuracy", "mixed_decisions_use_separate_available_score_denominators", "weighted_score_uses_unrounded_means_before_original_six_digit_rounding", "missing_reliability_and_timeliness_keep_original_zero_defaults", "sample_count_uses_all_verdict_counts_without_score_vector_lengths", "snapshot_digest_preserves_decision_order_and_duplicate_fingerprints", "snapshot_key_is_repeatable_and_separates_provider_and_partition"]) assert(provider.tests.includes(`fn ${name}(`), `缺少原PG target供应商评分测试 ${name}`);
+const precisionFixture = provider.tests.slice(provider.tests.indexOf("fn weighted_score_uses_unrounded_means_before_original_six_digit_rounding("), provider.tests.indexOf("fn missing_reliability_and_timeliness_keep_original_zero_defaults("));
+const precisionRows = [...precisionFixture.matchAll(/\(\s*(0\.\d{8})\s*,\s*(0\.\d{8})\s*,\s*(0\.\d{8})\s*,\s*(0\.\d{6})\s*,\s*(0\.\d{6})\s*,?\s*\)/g)];
+assert(precisionRows.length === 2 && precisionFixture.includes("assert_ne!(weighted, rounded_means_score)"), "供应商精度测试必须包含两个可区分提前舍入的夹具");
+for (const row of precisionRows) {
+  const [accuracy, timeliness, reliability, expected, roundedMeans] = row.slice(1).map((value) => BigInt(value.replace(".", "")));
+  const weightedNumerator = accuracy * 60n + timeliness * 15n + reliability * 25n;
+  const exactRoundedScore = (weightedNumerator + 5000n) / 10000n;
+  const roundedMeansNumerator = ((accuracy + 50n) / 100n) * 60n + ((timeliness + 50n) / 100n) * 15n + ((reliability + 50n) / 100n) * 25n;
+  const earlyRoundedScore = (roundedMeansNumerator + 50n) / 100n;
+  assert(exactRoundedScore === expected && earlyRoundedScore === roundedMeans && expected !== roundedMeans, "供应商精度测试的数值预期错误或夹具无法区分提前舍入");
+}
 console.log(
   "Postmatch Service 验证通过：7 个公共入口、2 个既有 Ports、资料包状态机与 PostgreSQL adapter 边界完整。",
 );

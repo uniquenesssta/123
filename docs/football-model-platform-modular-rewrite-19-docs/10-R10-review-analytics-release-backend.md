@@ -973,7 +973,7 @@ crates/application/src/use_cases/postmatch/evidence-scoring/
 
 ## R10-07 Provider Score
 
-状态：`VERIFYING`（首轮688892d / Windows run38296053769在Clippy失败；格式捕获修复及84源码/完整架构/等价/13负向通过，仍待修复提交完整Windows，预期App165/PG216，08～13BLOCKED）
+状态：`VERIFYING`（8c9ab5d / Windows run38346437982编译和Clippy通过，PG215/216因精度夹具预期错误失败；双夹具已纠正，84源码/完整架构/静态数值核对通过，仍待本提交完整Windows，08～13BLOCKED）
 
 ### 1. 目标
 
@@ -2012,3 +2012,8 @@ R10-07 Provider Score已实施 `VERIFYING`，基线85ecf15，继续唯一rewrite
 ## R10-07 Windows 修复记录（2026-10-13）
 
 首轮688892d/run38296053769在Clippy uninlined_format_args失败，前端/17视口通过，Rust单测/打包/启动未完成。原快照键改捕获四具名值，内容与原接口/SQL/公式保持；旧格式回归守卫、使用摘要和全部记录同步，84静态/完整architecture/1Rustfmt/等价及13探针通过。9unit仍待本修复Windows，07VERIFYING、08～13BLOCKED；完整修复9M与当前累计7A/10M/0D见[07记录](../modular-rewrite/R10-review-analytics-release-backend/R10-07-provider-score.md)。
+
+
+## R10-07 第二轮夹具修复记录（2026-10-13）
+
+8c9ab5d/run38346437982实际frontend/17视口/fmt/Clippy/App165通过，PG215通过1精度测试失败：旧夹具算式为.2641972900而预期误写.264198，且无法区分提前舍入。现原unit改两个经Decimal/整数独立核对的区分夹具，补静态数据守卫，生产公式/链/其他8unit/容差保持；修复8M，累计7A/10M/0D，84源码/完整architecture/1Rustfmt与3夹具负向通过。07VERIFYING、08～13BLOCKED，完整[07记录](../modular-rewrite/R10-review-analytics-release-backend/R10-07-provider-score.md)。

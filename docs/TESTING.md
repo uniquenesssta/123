@@ -719,3 +719,25 @@ Domain365/129/301映射、scan1217/sourceDigest217241ac243726a5ab6805a7f169e222b
 按root AGENTS查询Context7：确认rust-toolchain/原workflow固定1.88.0；仓库索引无该精确问法结果，[Clippy官方stable文档](https://rust-lang.github.io/rust-clippy/stable/index.html#uninlined_format_args)给出uninlined_format_args规则及format!("{var}")写法（lint自1.66加入），结合本项目1.88实际诊断采用；没有声称取得1.88专属页面或新增版本/依赖。Create State使用稳定足球UUID96f03270-c236-46de-99fa-db85d2fbf4ce保存本轮精确失败/修复/新CI交接。链路逻辑未变，原Mermaid Chart图继续适用，无新增流程图或子代理。
 
 修复提交仍VERIFYING，01～06DONE、08～13BLOCKED、R10IN_PROGRESS。沿用唯一rewrite/r10-review-analytics-release-backend和原Windows CI；实际Windows job启动后停止查询并提示约20～30分钟，不以首轮前端成功或源码检查替代整轮Windows通过。真实PG/历史四项/不可变账本/并发回滚/有效XLSX/WindowsFull/私有P4P7固定回归及继承model.runs/0041删除风险仍最终新库待验，ignored/公开stub/static指纹不计真实PASS。
+
+
+## R10-07 第二轮 Windows 精度夹具修复（2026-10-13）
+
+精确修复提交 `8c9ab5d4fae894ed0735c9adc74432e6b8a984c4` / tree `d31cfe075eaedc76c3f99ba59c251b179a9d4661`，[Windows run38346437982](https://github.com/uniquenesssta/123/actions/runs/38346437982) / job115128855419完整结束且FAILURE。前端/contracts/TypeScript/Vite/17视口与Rust fmt/Clippy all-targets -D warnings已实际通过，首轮uninlined_format_args问题关闭；Application165/165通过，Persistence215通过/1失败。失败唯一为weighted_score_uses_unrounded_means_before_original_six_digit_rounding；其余8个新供应商unit实际通过。PG失败后后续workspace目标、release/MSI/NSIS/启动未完成，不算完整WindowsPASS。失败记录windows-acceptance-20261013-042741.txt；artifact11789116976，669字节，sha256 `154ecca44731c101df3e238a31017de1e73f3f367f373aeb49fb834b12690717`。
+
+实际原因是新增测试夹具/预期的算术错误，不是生产公式偏差：旧输入(.12345649,.87654349,.23456749)按原60/15/25加权的准确十进制值为.2641972900，原最后round6结果.264197，测试误写.264198；且该旧输入提前round均值也得.264197，原本不能区分被测错误。此前记录“该夹具正确.264198/能区分提前舍入”属于错误实施断言，由本节明确订正，不用于当前验收。
+
+现只在该原unit中改为两个已独立核算的区分夹具，unit数量仍9、close容差仍1e-12，额外assert_ne明确拒绝提前舍入结果；没有删测试、调宽容差或改生产评分。两夹具见下表。原Postmatch Service源码门禁读取实际Rust测试数据，用整数BigInt按8位输入/6位输出独立核对60/15/25和正数四舍五入，检查正确分数、提前舍入分数及二者不同；这是静态测试数据检查，不能替代Rust单测实跑。无新框架/target/CI入口。
+
+| 准确率输入 | 时效输入 | 可靠度输入 | 原公式未舍入结果 | 最后舍入正确值 | 提前舍入均值错误值 |
+| --- | --- | --- | --- | --- | --- |
+| .12345649 | .87654349 | .23456949 | .2641977900 | .264198 | .264197 |
+| .12345651 | .87654351 | .23456751 | .2641973100 | .264197 | .264198 |
+
+独立Decimal静态核对同时复查其余数值/样本计数与三个SHA断言：混合样本.5375、缺时效/可靠度.45、不可验证时效均值.9与零weighted、四verdict样本总数17及有序/重复/重排指纹SHA一致。只有一个测试函数变化，其他8个测试/close与全部生产Rust链、公式、快照键、原SQL/绑定/事务/Ports/API/Domain/状态/模型保护保持8c9ab5d逐字不变。
+
+实际84/84原JS、完整npm run verify:architecture、1修改Rust独立Rustfmt1.88check、源夹具Decimal/整数双重核算、生产链冻结/单测试函数变更核对、3新夹具负向（错误预期、恢复旧坏夹具、让正确值与提前舍入值相同）均通过，探针全部文件bytes恢复；未运行非Windows Cargo/check/Clippy/build/test/前端构建/browser/loopback。之前13探针结果和快照格式化守卫保留，原07十四等价对应的生产代码此次完全不变，不重复生产破坏探针。本轮scratch r1007fix2-fixture-audit.json/r1007fix2-static-checks.json/r1007fix2-architecture.log可重建。修复后的原Rust9unit预期仍PG216/App165/Gateway112unit+41contract，必须自身完整Windows确认。
+
+Domain365/129/301映射、scan1217/sourceDigest217241ac243726a5ab6805a7f169e222b97e78c7c971749a5904714af673ebdd保持，使用摘要因测试源更新为 `3b104aec0014ca938b9e67dff0d7b210a39dcfe152d21b268d72fecbb4c05a7c`。18保护/171命令/46迁移与18PG静态契约不变；旧使用摘要与前轮“9测试未改”保留为各轮历史，不代表本次精度函数未改。
+
+07仍VERIFYING、01～06DONE、08～13BLOCKED、R10IN_PROGRESS。继续唯一rewrite/r10-review-analytics-release-backend，原Windows job启动后停止查询并提示约20～30分钟；首轮/次轮部分PASS不替代完整Windows。原Mermaid链适用，本次纯测试数据错误无需重查版本文档/Context7；Create State按稳定足球UUID96f03270-c236-46de-99fa-db85d2fbf4ce记录精确失败/修复/新CI，无子代理。真实PG/历史四项/账本并发回滚/有效XLSX/WindowsFull/私有P4P7固定回归与继承model.runs/0041删除风险仍最终新库待验，ignored/公开stub/静态指纹不计真实PASS。

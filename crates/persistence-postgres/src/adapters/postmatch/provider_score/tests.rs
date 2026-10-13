@@ -55,17 +55,23 @@ fn mixed_decisions_use_separate_available_score_denominators() {
 
 #[test]
 fn weighted_score_uses_unrounded_means_before_original_six_digit_rounding() {
-    let aggregate = ProviderAggregate {
-        accuracy: vec![0.12345649],
-        timeliness: vec![0.87654349],
-        reliability: vec![0.23456749],
-        ..ProviderAggregate::default()
-    };
-    let (accuracy, timeliness, reliability, weighted) = aggregate.scores();
-    close(accuracy, 0.12345649);
-    close(timeliness, 0.87654349);
-    close(reliability, 0.23456749);
-    close(weighted, 0.264198);
+    for (accuracy_input, timeliness_input, reliability_input, expected, rounded_means_score) in [
+        (0.12345649, 0.87654349, 0.23456949, 0.264198, 0.264197),
+        (0.12345651, 0.87654351, 0.23456751, 0.264197, 0.264198),
+    ] {
+        let aggregate = ProviderAggregate {
+            accuracy: vec![accuracy_input],
+            timeliness: vec![timeliness_input],
+            reliability: vec![reliability_input],
+            ..ProviderAggregate::default()
+        };
+        let (accuracy, timeliness, reliability, weighted) = aggregate.scores();
+        close(accuracy, accuracy_input);
+        close(timeliness, timeliness_input);
+        close(reliability, reliability_input);
+        close(weighted, expected);
+        assert_ne!(weighted, rounded_means_score);
+    }
 }
 
 #[test]
