@@ -1,7 +1,7 @@
 use crate::{ports::postmatch::PostmatchMonitoringPort, ApplicationResult};
 use football_domain::{PostmatchMonitoringRequest, PostmatchOverview};
 
-pub(crate) async fn execute<P>(
+pub(crate) async fn refresh_postmatch_monitoring<P>(
     port: &P,
     request: PostmatchMonitoringRequest,
 ) -> ApplicationResult<PostmatchOverview>

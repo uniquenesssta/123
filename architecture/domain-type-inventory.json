@@ -24,13 +24,13 @@
     "targetPublicExportPolicy": "explicit re-export only"
   },
   "sourceDigest": "217241ac243726a5ab6805a7f169e222b97e78c7c971749a5904714af673ebdd",
-  "rustUsageDigest": "3b104aec0014ca938b9e67dff0d7b210a39dcfe152d21b268d72fecbb4c05a7c",
+  "rustUsageDigest": "f50e50dddd84c46d3d83ffb5a812d57a9fc922deba6fbb5341dcdbed51821a25",
   "summary": {
     "typeCount": 365,
     "publicCompatibilityTypeCount": 365,
     "internalTypeCount": 0,
     "domainSourceFileCount": 129,
-    "scannedRustFileCount": 1217,
+    "scannedRustFileCount": 1232,
     "databaseMappedTypeCount": 301,
     "byTargetModule": {
       "ai_workspace": 16,
@@ -1624,9 +1624,11 @@
       ],
       "externalCallers": [
         "crates/analytics-engine/src/lib.rs",
+        "crates/persistence-postgres/src/adapters/postmatch/drift_monitoring/calculation.rs",
         "crates/persistence-postgres/src/analytics.rs"
       ],
       "databaseMappings": [
+        "crates/persistence-postgres/src/adapters/postmatch/drift_monitoring/calculation.rs",
         "crates/persistence-postgres/src/analytics.rs"
       ]
     },
@@ -6091,9 +6093,13 @@
       ],
       "externalCallers": [
         "crates/analytics-engine/src/lib.rs",
+        "crates/persistence-postgres/src/adapters/postmatch/drift_monitoring/calculation.rs",
+        "crates/persistence-postgres/src/adapters/postmatch/drift_monitoring/tests.rs",
         "crates/persistence-postgres/src/analytics.rs"
       ],
       "databaseMappings": [
+        "crates/persistence-postgres/src/adapters/postmatch/drift_monitoring/calculation.rs",
+        "crates/persistence-postgres/src/adapters/postmatch/drift_monitoring/tests.rs",
         "crates/persistence-postgres/src/analytics.rs"
       ]
     },
@@ -7194,12 +7200,16 @@
       ],
       "externalCallers": [
         "crates/analytics-engine/src/lib.rs",
-        "crates/persistence-postgres/src/analytics.rs",
-        "crates/persistence-postgres/src/postmatch.rs"
+        "crates/persistence-postgres/src/adapters/postmatch/drift_monitoring/calculation.rs",
+        "crates/persistence-postgres/src/adapters/postmatch/drift_monitoring/samples.rs",
+        "crates/persistence-postgres/src/adapters/postmatch/drift_monitoring/tests.rs",
+        "crates/persistence-postgres/src/analytics.rs"
       ],
       "databaseMappings": [
-        "crates/persistence-postgres/src/analytics.rs",
-        "crates/persistence-postgres/src/postmatch.rs"
+        "crates/persistence-postgres/src/adapters/postmatch/drift_monitoring/calculation.rs",
+        "crates/persistence-postgres/src/adapters/postmatch/drift_monitoring/samples.rs",
+        "crates/persistence-postgres/src/adapters/postmatch/drift_monitoring/tests.rs",
+        "crates/persistence-postgres/src/analytics.rs"
       ]
     },
     {
@@ -20876,10 +20886,10 @@
         "crates/domain/tests/serde_contracts/r2_06_module_paths.rs"
       ],
       "externalCallers": [
-        "crates/persistence-postgres/src/postmatch.rs"
+        "crates/persistence-postgres/src/adapters/postmatch/drift_monitoring/mapping.rs"
       ],
       "databaseMappings": [
-        "crates/persistence-postgres/src/postmatch.rs"
+        "crates/persistence-postgres/src/adapters/postmatch/drift_monitoring/mapping.rs"
       ]
     },
     {
@@ -20998,10 +21008,10 @@
         "crates/domain/tests/serde_contracts/r2_06_module_paths.rs"
       ],
       "externalCallers": [
-        "crates/persistence-postgres/src/postmatch.rs"
+        "crates/persistence-postgres/src/adapters/postmatch/drift_monitoring/read.rs"
       ],
       "databaseMappings": [
-        "crates/persistence-postgres/src/postmatch.rs"
+        "crates/persistence-postgres/src/adapters/postmatch/drift_monitoring/read.rs"
       ]
     },
     {
@@ -21067,12 +21077,17 @@
         "crates/application/src/ports/postmatch/mod.rs",
         "crates/application/src/services/postmatch/facade.rs",
         "crates/application/src/services/postmatch/service.rs",
-        "crates/application/src/use_cases/postmatch/refresh_postmatch_monitoring/mod.rs",
-        "crates/persistence-postgres/src/postmatch.rs",
+        "crates/application/src/use_cases/postmatch/monitoring/refresh.rs",
+        "crates/application/src/use_cases/postmatch/monitoring/tests.rs",
+        "crates/persistence-postgres/src/adapters/postmatch/monitoring/refresh.rs",
+        "crates/persistence-postgres/src/adapters/postmatch/monitoring/tests.rs",
+        "crates/persistence-postgres/src/adapters/postmatch/monitoring/validation.rs",
         "src-tauri/src/commands/postmatch.rs"
       ],
       "databaseMappings": [
-        "crates/persistence-postgres/src/postmatch.rs"
+        "crates/persistence-postgres/src/adapters/postmatch/monitoring/refresh.rs",
+        "crates/persistence-postgres/src/adapters/postmatch/monitoring/tests.rs",
+        "crates/persistence-postgres/src/adapters/postmatch/monitoring/validation.rs"
       ]
     },
     {
@@ -21146,13 +21161,16 @@
         "crates/application/src/ports/postmatch/mod.rs",
         "crates/application/src/services/postmatch/facade.rs",
         "crates/application/src/services/postmatch/service.rs",
-        "crates/application/src/use_cases/postmatch/postmatch_overview/mod.rs",
-        "crates/application/src/use_cases/postmatch/refresh_postmatch_monitoring/mod.rs",
-        "crates/persistence-postgres/src/postmatch.rs",
+        "crates/application/src/use_cases/postmatch/monitoring/overview.rs",
+        "crates/application/src/use_cases/postmatch/monitoring/refresh.rs",
+        "crates/application/src/use_cases/postmatch/monitoring/tests.rs",
+        "crates/persistence-postgres/src/adapters/postmatch/monitoring/overview.rs",
+        "crates/persistence-postgres/src/adapters/postmatch/monitoring/refresh.rs",
         "src-tauri/src/commands/postmatch.rs"
       ],
       "databaseMappings": [
-        "crates/persistence-postgres/src/postmatch.rs"
+        "crates/persistence-postgres/src/adapters/postmatch/monitoring/overview.rs",
+        "crates/persistence-postgres/src/adapters/postmatch/monitoring/refresh.rs"
       ]
     },
     {

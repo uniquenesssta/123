@@ -7,7 +7,7 @@
 
 ## 当前前置状态（2026-10-13）
 
-R9 全部节点及 Windows Automated 阶段出口 DONE；已验源码 b50d804 / Windows run38221009454 SUCCESS，R9 文档收尾 HEAD48618fed2d7ff7c2a4db831a037f227dc789f278。用户2026-10-12“开始R10-01”授权，唯一新分支 rewrite/r10-review-analytics-release-backend 已建立；R10 IN_PROGRESS，01自身精确838e39e / run38229119264 / job114743919870全SUCCESS并DONE；02精确1ad6e68 / Windows run38245932270/job114799659672全SUCCESS并DONE；用户“收尾02开始03”授权03已实施，精确99b15ad / Windows run38259438025/job114845878326全SUCCESS并DONE，04精确221d211 / Windows run38271387412/job114886215505全SUCCESS并DONE；05精确fe3529f / Windows run38277864089/job114907643831全SUCCESS并DONE；06精确1ed6dbe / Windows run38290328302/job114948593892全SUCCESS并DONE；07精确cdd2797 / Windows run38350692611/job115142166008全SUCCESS并DONE；用户“收尾07开始08”授权08 READY，09～13 BLOCKED；[07实际记录](../modular-rewrite/R10-review-analytics-release-backend/R10-07-provider-score.md)；[06实际记录](../modular-rewrite/R10-review-analytics-release-backend/R10-06-evidence-scoring.md)；[05实际记录](../modular-rewrite/R10-review-analytics-release-backend/R10-05-postmatch-settlement.md)；[04实际记录](../modular-rewrite/R10-review-analytics-release-backend/R10-04-ability-candidate-transaction.md)；[03实际记录](../modular-rewrite/R10-review-analytics-release-backend/R10-03-review-engine-adapter.md)。[02实际记录](../modular-rewrite/R10-review-analytics-release-backend/R10-02-structured-match-facts.md)。实际 owner、测试与完整清单见 [01实施记录](../modular-rewrite/R10-review-analytics-release-backend/R10-01-review-package-workflow.md) 及 [本阶段索引](../modular-rewrite/R10-review-analytics-release-backend/README.md)。真实数据库/历史保护/账本并发回滚/XLSX/Full/私有回归及继承删除风险仍最终新库待验，R9成功不替代R10自身验收。
+R9 全部节点及 Windows Automated 阶段出口 DONE；已验源码 b50d804 / Windows run38221009454 SUCCESS，R9 文档收尾 HEAD48618fed2d7ff7c2a4db831a037f227dc789f278。用户2026-10-12“开始R10-01”授权，唯一新分支 rewrite/r10-review-analytics-release-backend 已建立；R10 IN_PROGRESS，01自身精确838e39e / run38229119264 / job114743919870全SUCCESS并DONE；02精确1ad6e68 / Windows run38245932270/job114799659672全SUCCESS并DONE；用户“收尾02开始03”授权03已实施，精确99b15ad / Windows run38259438025/job114845878326全SUCCESS并DONE，04精确221d211 / Windows run38271387412/job114886215505全SUCCESS并DONE；05精确fe3529f / Windows run38277864089/job114907643831全SUCCESS并DONE；06精确1ed6dbe / Windows run38290328302/job114948593892全SUCCESS并DONE；07精确cdd2797 / Windows run38350692611/job115142166008全SUCCESS并DONE；用户“收尾07开始08”授权08已实施VERIFYING，09～13 BLOCKED；[08实际记录](../modular-rewrite/R10-review-analytics-release-backend/R10-08-drift-monitoring.md)；[07实际记录](../modular-rewrite/R10-review-analytics-release-backend/R10-07-provider-score.md)；[06实际记录](../modular-rewrite/R10-review-analytics-release-backend/R10-06-evidence-scoring.md)；[05实际记录](../modular-rewrite/R10-review-analytics-release-backend/R10-05-postmatch-settlement.md)；[04实际记录](../modular-rewrite/R10-review-analytics-release-backend/R10-04-ability-candidate-transaction.md)；[03实际记录](../modular-rewrite/R10-review-analytics-release-backend/R10-03-review-engine-adapter.md)。[02实际记录](../modular-rewrite/R10-review-analytics-release-backend/R10-02-structured-match-facts.md)。实际 owner、测试与完整清单见 [01实施记录](../modular-rewrite/R10-review-analytics-release-backend/R10-01-review-package-workflow.md) 及 [本阶段索引](../modular-rewrite/R10-review-analytics-release-backend/README.md)。真实数据库/历史保护/账本并发回滚/XLSX/Full/私有回归及继承删除风险仍最终新库待验，R9成功不替代R10自身验收。
 
 ## 1. 阶段目标
 
@@ -1107,7 +1107,7 @@ crates/application/src/use_cases/postmatch/provider-score/
 
 ## R10-08 Drift Monitoring
 
-状态：`READY`（07自身精确完整Windows DONE；用户2026-10-13“收尾07开始08”授权，同一R10分支，09～13BLOCKED）
+状态：`VERIFYING`（84/84静态、完整架构、22Rustfmt、19等价与10负向通过；6App/11PG unit待自身Windows，预期171/227，01～07DONE、09～13BLOCKED）
 
 ### 1. 目标
 
@@ -2017,3 +2017,10 @@ R10-07 Provider Score已实施 `VERIFYING`，基线85ecf15，继续唯一rewrite
 ## R10-07 第二轮夹具修复记录（2026-10-13）
 
 8c9ab5d/run38346437982实际frontend/17视口/fmt/Clippy/App165通过，PG215通过1精度测试失败：旧夹具算式为.2641972900而预期误写.264198，且无法区分提前舍入。现原unit改两个经Decimal/整数独立核对的区分夹具，补静态数据守卫，生产公式/链/其他8unit/容差保持；修复8M，累计7A/10M/0D，84源码/完整architecture/1Rustfmt与3夹具负向通过。07VERIFYING、08～13BLOCKED，完整[07记录](../modular-rewrite/R10-review-analytics-release-backend/R10-07-provider-score.md)。
+
+
+## R10-08 实施订正与当前边界（2026-10-13）
+
+R10-08 Drift Monitoring已实施 `VERIFYING`，基线33f7188，继续唯一rewrite/r10-review-analytics-release-backend。App原综合监控两入口归monitoring；PG监控前检/活动分区/总览与漂移样本/纯准备/幂等事务/读取映射各有唯一owner。原Monitoring Port与公开签名保持；供应商→漂移→总览顺序、全部SQL/原纯引擎、窗口/状态/指纹、单漂移事务、新run才写finding/审计与冲突不重写保持。新增6App/11PG unit待自身Windows，预期Application171 / Persistence227 / Gateway112unit+41contract；84/84静态、完整架构、22Rustfmt、19等价及10负向通过。01～07自身Windows DONE、08VERIFYING、09～13BLOCKED、R10IN_PROGRESS；真实PG/历史四项/账本并发回滚/有效XLSX/WindowsFull/私有P4P7回归及继承model.runs/0041删除风险仍最终新库待验。
+
+参考drift-monitoring采用PG drift_monitoring实际职责，App/PG综合监控采用monitoring唯一编排与共享partition；不创建新Port或改变供应商/漂移/总览顺序。18A/13M/2D及全部契约/异常/回退见[08记录](../modular-rewrite/R10-review-analytics-release-backend/R10-08-drift-monitoring.md)。没有进入09。

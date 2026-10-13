@@ -20,10 +20,9 @@ const settle = read(`${settlementRoot}coordinator.rs`);
 const composition = read("crates/application/src/composition/application_composition.rs");
 const applicationService = read("crates/application/src/service/application_service.rs");
 const contract = JSON.parse(read("contracts/postmatch-settlement-contract.json"));
-const useCaseFiles = [
-  "refresh_postmatch_monitoring",
-  "postmatch_overview",
-].map((name) => read(`crates/application/src/use_cases/postmatch/${name}/mod.rs`));
+const monitoringRoot = "crates/application/src/use_cases/postmatch/monitoring/";
+const monitoring = Object.fromEntries(["mod", "refresh", "overview", "tests"].map((name) => [name, read(`${monitoringRoot}${name}.rs`)]));
+const useCaseFiles = Object.values(monitoring);
 const settlementMod = read(`${settlementRoot}mod.rs`);
 const settlementRead = read(`${settlementRoot}read.rs`);
 const settlementTests = read(`${settlementRoot}tests.rs`);
@@ -94,6 +93,8 @@ for (const forbidden of [
 const pgRoot = "crates/persistence-postgres/src/adapters/postmatch/settlement/";
 const pg = Object.fromEntries(["mod", "context", "readiness", "read", "repository", "evidence_queue", "evaluation_sample", "validation", "tests"].map((name) => [name, read(name === "evidence_queue" ? "crates/persistence-postgres/src/adapters/postmatch/evidence_scoring/queue.rs" : `${pgRoot}${name}.rs`)]));
 const oldPg = read("crates/persistence-postgres/src/postmatch.rs");
+const pgMonitoringRoot = "crates/persistence-postgres/src/adapters/postmatch/monitoring/";
+const pgMonitoring = Object.fromEntries(["mod", "refresh", "overview", "partition", "validation", "tests"].map((name) => [name, read(`${pgMonitoringRoot}${name}.rs`)]));
 const ordered = (source, tokens) => {
   let offset = 0;
   return tokens.every((token) => { const index = source.indexOf(token, offset); if (index < 0) return false; offset = index + token.length; return true; });
@@ -148,7 +149,7 @@ assert(read("crates/persistence-postgres/src/adapters/postmatch/mod.rs").include
 assert(!/(?:async fn|impl |sqlx::)/.test(provider.mod), "供应商评分出口必须只登记模块");
 for (const name of ["refresh_provider_scores_for_partition", "list_provider_scores", "provider_score_from_row", "mean"]) assert(!new RegExp(`(?:async )?fn ${name}\\(`).test(oldPg), `旧PG供应商职责未移除 ${name}`);
 assert(!oldPg.includes("struct ProviderAggregate"), "旧PG仍持有供应商聚合状态");
-assert(ordered(oldPg, [".active_postmatch_partition(", "self.refresh_provider_scores_for_partition(&partition)", "self.refresh_drift_for_partition(", "self.postmatch_overview(100).await"]), "原监控刷新必须保持供应商/漂移/总览顺序");
+assert(ordered(pgMonitoring.refresh, [".active_postmatch_partition(", "self.refresh_provider_scores_for_partition(&partition)", "self.refresh_drift_for_partition(", "self.postmatch_overview(100).await"]), "原监控刷新必须保持供应商/漂移/总览顺序");
 assert(ordered(provider.repository, ["settlement.competition_id=$1", "settlement.competition_profile_id=$2", "settlement.model_version_id=$3", "settlement.parameter_set_id=$4", "settlement.horizon=$5", "item.provider_id IS NOT NULL", "ORDER BY item.provider_id, decision.id", ".bind(partition.competition_id)", ".bind(partition.competition_profile_id)", ".bind(partition.model_version_id)", ".bind(partition.parameter_set_id)", ".bind(&partition.horizon)", ".fetch_all(&self.pool)", "aggregate_provider_rows(rows)?", "for (provider_id, aggregate) in groups", "aggregate.scores()", "aggregate.snapshot_identity(provider_id, &partition.partition_key)?", "INSERT INTO analytics.provider_score_snapshots", "ON CONFLICT (snapshot_key) DO NOTHING", ".bind(aggregate.total() as i64)", ".bind(aggregate.correct as i64)", ".bind(aggregate.partial as i64)", ".bind(aggregate.incorrect as i64)", ".bind(aggregate.not_verifiable as i64)", ".bind(round6(accuracy_mean))", ".bind(round6(timeliness_mean))", ".bind(round6(reliability_mean))", ".bind(weighted_score)", ".bind(&decision_set_sha256)", ".bind(snapshot_key)", ".bind(POSTMATCH_MONITORING_VERSION)", ".execute(&self.pool)"]), "供应商原分区查询/逐组评分/不可变快照绑定顺序漂移");
 assert(/ORDER BY item\.provider_id, decision\.id\s*\n\s*"#/.test(provider.repository), "供应商决定顺序必须保持原升序，不能增加DESC或排序字段");
 for (const name of ["repository", "read", "mapping", "aggregation"]) assert(!/\.(?:begin|commit|rollback)\(|write_audit_event\(|(?:UPDATE|DELETE FROM) analytics\.provider_score_snapshots/.test(provider[name]), `供应商${name}不得新增事务、审计或覆盖快照`);
@@ -171,6 +172,37 @@ for (const row of precisionRows) {
   const earlyRoundedScore = (roundedMeansNumerator + 50n) / 100n;
   assert(exactRoundedScore === expected && earlyRoundedScore === roundedMeans && expected !== roundedMeans, "供应商精度测试的数值预期错误或夹具无法区分提前舍入");
 }
+const driftRoot = "crates/persistence-postgres/src/adapters/postmatch/drift_monitoring/";
+const drift = Object.fromEntries(["mod", "samples", "calculation", "repository", "read", "mapping", "tests"].map((name) => [name, read(`${driftRoot}${name}.rs`)]));
+for (const name of ["refresh_postmatch_monitoring", "postmatch_overview"]) {
+  assert(!exists(`crates/application/src/use_cases/postmatch/${name}/mod.rs`) && service.includes(`postmatch::monitoring::${name}(`), `原监控用例未切换唯一owner ${name}`);
+}
+assert(read("crates/application/src/use_cases/postmatch/mod.rs").includes("pub(crate) mod monitoring;"), "Application未登记monitoring");
+assert(monitoring.mod.includes("pub(crate) use refresh::refresh_postmatch_monitoring;") && monitoring.mod.includes("pub(crate) use overview::postmatch_overview;") && !/(?:async fn|impl |sqlx::)/.test(monitoring.mod), "App监控出口必须只登记与导出");
+assert(monitoring.refresh.includes("port.refresh_monitoring(&request).await?") && monitoring.overview.includes("port.overview(limit).await?") && !/trim\(|clamp\(|validate_|prepare_drift/.test(monitoring.refresh + monitoring.overview), "App监控必须保持原请求/limit/错误透传，验证仍在PG边界");
+assert(read("crates/persistence-postgres/src/adapters/postmatch/mod.rs").includes("mod monitoring;") && read("crates/persistence-postgres/src/adapters/postmatch/mod.rs").includes("mod drift_monitoring;"), "PG未登记监控/漂移owner");
+for (const name of ["refresh_postmatch_monitoring", "postmatch_overview", "active_postmatch_partition", "refresh_drift_for_partition", "list_postmatch_drift_runs", "drift_finding_from_row", "window_json", "validate_horizon"]) assert(!new RegExp(`(?:async )?fn ${name}\\(`).test(oldPg), `旧PG监控/漂移职责未移除 ${name}`);
+assert(!oldPg.includes("struct PostmatchPartition") && pgMonitoring.mod.includes("pub(super) use partition::PostmatchPartition;"), "活动分区必须有一个内部共享owner");
+for (const source of [pgMonitoring.mod, drift.mod]) assert(!/(?:async fn|impl |sqlx::)/.test(source), "PG监控/漂移出口必须只登记与导出");
+assert(ordered(pgMonitoring.refresh, ["validate_monitoring_request(request)?", ".active_postmatch_partition(", "self.refresh_provider_scores_for_partition(&partition)", "self.refresh_drift_for_partition(", "self.postmatch_overview(100).await"]), "原监控前检/分区/供应商/漂移/回读顺序漂移");
+assert(ordered(pgMonitoring.validation, ["validate_horizon(&request.horizon)?", "request.baseline_size < 5 || request.current_size < 5", "漂移基线窗口和当前窗口都不能少于 5 场"]), "原时点/五场窗口前检顺序漂移");
+assert(pgMonitoring.validation.includes("FORMAL_HORIZONS.contains(&value)") && pgMonitoring.validation.includes("正式赛后监控只支持 T-N、T-24h、T-6h、T-1h"), "原正式时点规则缺失");
+for (const token of ["binding.competition_id=$1 AND binding.is_active=true", "package.status='active'", "ORDER BY binding.priority DESC, binding.id DESC", "未找到该赛事的活动模型绑定", '"{model_version_id}:{competition_profile_id}:{parameter_set_id}:{horizon}"']) assert(pgMonitoring.partition.includes(token), `原活动分区规则缺少 ${token}`);
+assert(provider.repository.includes("super::super::monitoring::PostmatchPartition") && drift.repository.includes("super::super::monitoring::PostmatchPartition") && drift.samples.includes("super::super::monitoring::PostmatchPartition"), "供应商和漂移必须复用同一活动分区类型");
+assert(ordered(pgMonitoring.overview, ["self.list_postmatch_settlements(limit).await?", "self.list_evidence_scoring_items(None, limit).await?", "self.list_provider_scores(limit).await?", "self.list_postmatch_drift_runs(limit).await?", "SELECT count(*)::bigint FROM review.postmatch_settlements", "WHERE NOT EXISTS", "WHERE verdict <> 'not_verifiable'", "Ok(PostmatchOverview"]), "原总览四读取/三计数/状态派生顺序漂移");
+assert(ordered(drift.samples, ["sample.competition_id=$1", "sample.competition_profile_id=$2", "sample.model_version_id=$3", "sample.parameter_set_id=$4", "sample.snapshot_type=$5", "sample.calculation_version=$6", "ORDER BY sample.kickoff_time, sample.run_id", ".bind(POSTMATCH_MONITORING_VERSION)", ".fetch_all(&self.pool)", "settlement_ids.push(row.try_get::<Uuid, _>(\"settlement_id\")?)", "samples.push(EvaluationSample", "Ok((samples, settlement_ids))"]), "原漂移分区/版本/样本与结算身份顺序漂移");
+assert(ordered(drift.calculation, ["calculate_analytics(samples, 10, baseline_size, current_size)", "let status = drift_status(", "&calculation.drift", "drift_windows(samples, baseline_size, current_size)", "window_json(baseline_slice)", "window_json(current_slice)", "let run_payload = json!", '"partition_key": partition_key', '"baseline_size": baseline_size', '"current_size": current_size', '"settlement_ids": settlement_ids', '"calculation_version": POSTMATCH_MONITORING_VERSION', "sha256_json(&run_payload)?"]), "原引擎调用/窗口与指纹身份准备顺序漂移");
+assert(ordered(drift.calculation, ["sample_count >= baseline_size + current_size", "if !enough", '"insufficient"', 'item.severity == "critical"', '"critical"', 'item.severity == "warning"', '"warning"', '"stable"']), "样本不足优先/critical-warning-stable原策略漂移");
+for (const token of ["samples.len().saturating_sub(current_size)", "current_start.saturating_sub(baseline_size)", "&samples[baseline_start..current_start]", "&samples[current_start..]", "samples.first().map(|item| item.kickoff_time)", "samples.last().map(|item| item.kickoff_time)", "samples.iter().map(|item| item.run_id).collect::<Vec<_>>()"]) assert(drift.calculation.includes(token), `原窗口边界/有序身份缺少 ${token}`);
+assert(ordered(drift.repository, ["self.load_drift_samples(partition).await?", "let prepared = prepare_drift(", "Uuid::new_v4()", "self.pool.begin().await?", "INSERT INTO analytics.postmatch_drift_runs", "ON CONFLICT (run_key) DO NOTHING", "if let Some(id) = inserted", "for finding in &prepared.calculation.drift", "INSERT INTO analytics.postmatch_drift_findings", "write_audit_event(", "tx.commit().await?", "Ok(())"]), "原漂移准备/单事务/幂等/新插入才写finding审计/提交顺序漂移");
+assert((drift.repository.match(/self\.pool\.begin\(\)\.await\?/g) ?? []).length === 1 && (drift.repository.match(/tx\.commit\(\)\.await\?/g) ?? []).length === 1 && drift.repository.indexOf("write_audit_event(") > drift.repository.indexOf("if let Some(id) = inserted") && drift.repository.indexOf("write_audit_event(") < drift.repository.indexOf("tx.commit().await?"), "漂移必须仅一个原事务，冲突重试不重复审计");
+for (const token of [".bind(prepared.baseline_count as i64)", ".bind(prepared.current_count as i64)", ".bind(&prepared.baseline_window)", ".bind(&prepared.current_window)", ".bind(prepared.status)", ".bind(&prepared.run_key)", '"postmatch_drift_refreshed"', '"baseline_size": prepared.baseline_count', '"current_size": prepared.current_count']) assert(drift.repository.includes(token), `原漂移实际窗口/审计字段缺少 ${token}`);
+for (const source of [pgMonitoring.refresh, pgMonitoring.overview, pgMonitoring.partition, pgMonitoring.validation, drift.samples, drift.calculation, drift.read, drift.mapping]) assert(!/\.(?:begin|commit|rollback)\(/.test(source), "监控与漂移支持职责不得新增事务");
+assert(!/(?:UPDATE|DELETE FROM) analytics\.postmatch_drift/.test(drift.repository), "漂移不可变报告不得覆盖历史");
+for (const token of ["ORDER BY run.generated_at DESC, run.id DESC", "limit.clamp(1, 500)", "WHERE run_id=$1 ORDER BY metric_name", "drift_finding_from_row", "non_negative_u64(row.try_get(\"baseline_size\")?", "non_negative_u64(row.try_get(\"current_size\")?"]) assert(drift.read.includes(token), `原漂移读取/负数门禁缺少 ${token}`);
+for (const name of ["refresh_preserves_request_and_complete_provider_drift_response", "refresh_leaves_horizon_and_window_validation_at_original_port_boundary", "overview_preserves_zero_and_max_limit_and_complete_response", "refresh_propagates_all_port_errors_without_retry_or_overview", "overview_propagates_all_port_errors_without_refresh", "empty_overview_keeps_returned_counts_without_inventing_records"]) assert(monitoring.tests.includes(`fn ${name}(`), `缺少App原target监控测试 ${name}`);
+for (const name of ["monitoring_accepts_original_four_horizons_and_five_sample_boundary", "monitoring_rejects_horizon_before_window_validation", "monitoring_rejects_either_short_window_with_original_error"]) assert(pgMonitoring.tests.includes(`fn ${name}(`), `缺少PG原target监控前检测试 ${name}`);
+for (const name of ["insufficient_samples_override_all_findings", "complete_windows_prioritize_critical_independent_of_finding_order", "warning_and_stable_keep_original_case_sensitive_policy", "window_slices_saturate_for_empty_and_short_histories", "window_slices_use_latest_disjoint_windows_and_drop_old_surplus", "window_json_preserves_input_order_endpoints_and_nanoseconds", "prepared_empty_run_keeps_requested_identity_and_actual_empty_windows", "run_identity_is_repeatable_and_sensitive_to_partition_requested_sizes_and_order"]) assert(drift.tests.includes(`fn ${name}(`), `缺少PG原target漂移测试 ${name}`);
 console.log(
   "Postmatch Service 验证通过：7 个公共入口、2 个既有 Ports、资料包状态机与 PostgreSQL adapter 边界完整。",
 );

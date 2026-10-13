@@ -750,3 +750,10 @@ Domain365/129/301映射、scan1217/sourceDigest217241ac243726a5ab6805a7f169e222b
 证据artifact11791662118，14,046,120字节，SHA-256 `e31726acc367194dd9e0f593775bfa45fbac649e71be7a9bffc310e99cd7f166`。首轮688892d的Clippy失败及次轮8c9ab5d的精度夹具失败已由本精确完整成功关闭；失败和纠正过程保留为历史，不以此前部分PASS替代最终证据。07自身完整成功后DONE，用户2026-10-13“收尾07开始08”授权08 Drift Monitoring READY，继续唯一rewrite/r10-review-analytics-release-backend，09～13BLOCKED、R10IN_PROGRESS。本次仅五既有文档收尾[skip ci]，源码同已验cdd2797，08须自身完整Windows成功，无阶段完成记录。
 
 真实PG/历史保护四项/不可变账本/并发回滚/有效XLSX/WindowsFull/私有P4P7固定回归及继承model.runs/0041删除风险仍最终新库待验，ignored/公开unavailable stub/static指纹不计真实PASS。
+
+
+## R10-08 漂移监控验证（2026-10-13）
+
+R10-08 Drift Monitoring已实施 `VERIFYING`，基线33f7188，继续唯一rewrite/r10-review-analytics-release-backend。App原综合监控两入口归monitoring；PG监控前检/活动分区/总览与漂移样本/纯准备/幂等事务/读取映射各有唯一owner。原Monitoring Port与公开签名保持；供应商→漂移→总览顺序、全部SQL/原纯引擎、窗口/状态/指纹、单漂移事务、新run才写finding/审计与冲突不重写保持。新增6App/11PG unit待自身Windows，预期Application171 / Persistence227 / Gateway112unit+41contract；84/84静态、完整架构、22Rustfmt、19等价及10负向通过。01～07自身Windows DONE、08VERIFYING、09～13BLOCKED、R10IN_PROGRESS；真实PG/历史四项/账本并发回滚/有效XLSX/WindowsFull/私有P4P7回归及继承model.runs/0041删除风险仍最终新库待验。
+
+6App/11PG进入原unit targets，19等价/10负向/22Rustfmt与84原JS/完整architecture通过；171/227仍须本项Windows实跑，原pure engine/07九unit/18PG静态契约与UI/gateway/依赖保持。完整[08记录](modular-rewrite/R10-review-analytics-release-backend/R10-08-drift-monitoring.md)。原Windowsjob启动后停止查询，约20～30分钟；真实PG/历史保护/Full/XLSX/私有固定回归仍最终新库待验。

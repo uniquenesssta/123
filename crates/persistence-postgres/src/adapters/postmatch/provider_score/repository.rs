@@ -1,8 +1,6 @@
+use super::super::monitoring::PostmatchPartition;
 use super::aggregation::aggregate_provider_rows;
-use crate::{
-    postmatch::{round6, PostmatchPartition},
-    PersistenceResult, PostgresStore,
-};
+use crate::{postmatch::round6, PersistenceResult, PostgresStore};
 use football_domain::POSTMATCH_MONITORING_VERSION;
 use uuid::Uuid;
 

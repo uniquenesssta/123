@@ -2,7 +2,7 @@
 
 ## 当前阶段状态
 
-`IN_PROGRESS`。用户2026-10-12“开始R10-01”授权；从R9文档收尾HEAD `48618fed2d7ff7c2a4db831a037f227dc789f278` 建立唯一阶段分支 `rewrite/r10-review-analytics-release-backend`。01自身精确Windows run38229119264/job114743919870全SUCCESS并DONE；02自身1ad6e68 / Windows run38245932270/job114799659672全SUCCESS并DONE；用户“收尾02开始03”授权03已实施；03自身99b15ad / Windows run38259438025/job114845878326全SUCCESS并DONE，04自身221d211 / Windows run38271387412/job114886215505全SUCCESS并DONE；05自身fe3529f / Windows run38277864089/job114907643831全SUCCESS并DONE；06自身1ed6dbe / Windows run38290328302/job114948593892全SUCCESS并DONE；07自身cdd2797 / Windows run38350692611/job115142166008全SUCCESS并DONE；用户“收尾07开始08”授权08 READY，09～13 BLOCKED。
+`IN_PROGRESS`。用户2026-10-12“开始R10-01”授权；从R9文档收尾HEAD `48618fed2d7ff7c2a4db831a037f227dc789f278` 建立唯一阶段分支 `rewrite/r10-review-analytics-release-backend`。01自身精确Windows run38229119264/job114743919870全SUCCESS并DONE；02自身1ad6e68 / Windows run38245932270/job114799659672全SUCCESS并DONE；用户“收尾02开始03”授权03已实施；03自身99b15ad / Windows run38259438025/job114845878326全SUCCESS并DONE，04自身221d211 / Windows run38271387412/job114886215505全SUCCESS并DONE；05自身fe3529f / Windows run38277864089/job114907643831全SUCCESS并DONE；06自身1ed6dbe / Windows run38290328302/job114948593892全SUCCESS并DONE；07自身cdd2797 / Windows run38350692611/job115142166008全SUCCESS并DONE；用户“收尾07开始08”授权08已实施VERIFYING，09～13 BLOCKED。
 
 ## 前置基线与依据
 
@@ -19,7 +19,7 @@
 | R10-05 | [Postmatch Settlement](R10-05-postmatch-settlement.md) | DONE · 自身精确Windows全SUCCESS |
 | R10-06 | [Evidence Scoring](R10-06-evidence-scoring.md) | DONE · 自身精确Windows全SUCCESS |
 | R10-07 | [Provider Score](R10-07-provider-score.md) | DONE · 自身精确Windows全SUCCESS |
-| R10-08 | Drift Monitoring | READY · 用户已授权 |
+| R10-08 | [Drift Monitoring](R10-08-drift-monitoring.md) | VERIFYING · 已实施，待自身完整Windows |
 | R10-09 | Analytics Calculation | BLOCKED |
 | R10-10 | Background Jobs | BLOCKED |
 | R10-11 | Analysis Package | BLOCKED |
@@ -179,3 +179,10 @@ Domain365/129/301映射、scan1217/sourceDigest217241ac243726a5ab6805a7f169e222b
 证据artifact11791662118，14,046,120字节，SHA-256 `e31726acc367194dd9e0f593775bfa45fbac649e71be7a9bffc310e99cd7f166`。首轮688892d的Clippy失败及次轮8c9ab5d的精度夹具失败已由本精确完整成功关闭；失败和纠正过程保留为历史，不以此前部分PASS替代最终证据。07自身完整成功后DONE，用户2026-10-13“收尾07开始08”授权08 Drift Monitoring READY，继续唯一rewrite/r10-review-analytics-release-backend，09～13BLOCKED、R10IN_PROGRESS。本次仅五既有文档收尾[skip ci]，源码同已验cdd2797，08须自身完整Windows成功，无阶段完成记录。
 
 真实PG/历史保护四项/不可变账本/并发回滚/有效XLSX/WindowsFull/私有P4P7固定回归及继承model.runs/0041删除风险仍最终新库待验，ignored/公开unavailable stub/static指纹不计真实PASS。
+
+
+## R10-08 实际边界与继续位置
+
+R10-08 Drift Monitoring已实施 `VERIFYING`，基线33f7188，继续唯一rewrite/r10-review-analytics-release-backend。App原综合监控两入口归monitoring；PG监控前检/活动分区/总览与漂移样本/纯准备/幂等事务/读取映射各有唯一owner。原Monitoring Port与公开签名保持；供应商→漂移→总览顺序、全部SQL/原纯引擎、窗口/状态/指纹、单漂移事务、新run才写finding/审计与冲突不重写保持。新增6App/11PG unit待自身Windows，预期Application171 / Persistence227 / Gateway112unit+41contract；84/84静态、完整架构、22Rustfmt、19等价及10负向通过。01～07自身Windows DONE、08VERIFYING、09～13BLOCKED、R10IN_PROGRESS；真实PG/历史四项/账本并发回滚/有效XLSX/WindowsFull/私有P4P7回归及继承model.runs/0041删除风险仍最终新库待验。
+
+App采用原综合monitoring入口而非虚构Drift Port，PG实际漂移目录单独承担样本/准备/事务/read；原供应商共用分区。18A/13M/2D、23字段/职责/实际异常/回退见[08记录](R10-08-drift-monitoring.md)。先核对08自身精确Windows，失败修同分支，成功且获用户授权后进入09，无阶段完成记录。

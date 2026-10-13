@@ -84,7 +84,7 @@ impl PostmatchService {
     where
         P: PostmatchMonitoringPort + ?Sized,
     {
-        postmatch::refresh_postmatch_monitoring::execute(port, request).await
+        postmatch::monitoring::refresh_postmatch_monitoring(port, request).await
     }
 
     pub(crate) async fn postmatch_overview<P>(
@@ -95,6 +95,6 @@ impl PostmatchService {
     where
         P: PostmatchMonitoringPort + ?Sized,
     {
-        postmatch::postmatch_overview::execute(port, limit).await
+        postmatch::monitoring::postmatch_overview(port, limit).await
     }
 }
