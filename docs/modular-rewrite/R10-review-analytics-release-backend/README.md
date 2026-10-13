@@ -18,7 +18,7 @@
 | R10-04 | [Ability Candidate Transaction](R10-04-ability-candidate-transaction.md) | DONE · 自身精确Windows全SUCCESS |
 | R10-05 | [Postmatch Settlement](R10-05-postmatch-settlement.md) | DONE · 自身精确Windows全SUCCESS |
 | R10-06 | [Evidence Scoring](R10-06-evidence-scoring.md) | DONE · 自身精确Windows全SUCCESS |
-| R10-07 | [Provider Score](R10-07-provider-score.md) | VERIFYING · 已实施，静态通过，自身Windows待验 |
+| R10-07 | [Provider Score](R10-07-provider-score.md) | VERIFYING · 首轮Clippy失败已修复，待本修复Windows |
 | R10-08 | Drift Monitoring | BLOCKED |
 | R10-09 | Analytics Calculation | BLOCKED |
 | R10-10 | Background Jobs | BLOCKED |
@@ -133,3 +133,18 @@ R10-06 Evidence Scoring已实施 `VERIFYING`，基线18f7264，继续唯一rewri
 R10-07 Provider Score已实施 `VERIFYING`，基线85ecf15，继续唯一rewrite/r10-review-analytics-release-backend。实际PG供应商聚合、原评分/指纹与快照写入、最新读取和字段映射归provider_score唯一owner；App综合监控/两原Ports不变，不为参考App目录虚构供应商入口。原SQL五分区过滤/BTreeMap与决定顺序、60/15/25原公式、空准确率零分、未先舍入的均值、原指纹/版本/快照键及逐组pool幂等写入保持；监控仍供应商→漂移→总览，没有新事务/审计或自动参数晋升。新增9原PG unit待自身Windows，预期Persistence216 / Application165 / Gateway112 unit、41 contract；84/84静态、完整架构、8 Rustfmt、14等价及10负向通过。01～06自身Windows DONE，07 VERIFYING、08～13 BLOCKED、R10 IN_PROGRESS；真实PG/历史四项/账本并发回滚/有效XLSX/Windows Full/私有P4P7回归及继承model.runs/0041删除风险仍最终新库待验。
 
 7A/9M/0D与23字段/原公式/调用/可见性/风险/回退见[07记录](R10-07-provider-score.md)。原共享partition及08漂移继续root，不新增不存在的App供应商API。先核对07自身精确Windows；失败修同分支，成功且用户授权后推进08，无阶段完成记录。
+
+
+## R10-07 首轮 Windows 失败修复（2026-10-13）
+
+首轮精确提交 `688892dd1a67401df028cfdde9cbec08ccedf39b` / tree `aa331e6126bd926b7378ba44ba715d544ac02aff`，[Public Platform CI run38296053769](https://github.com/uniquenesssta/123/actions/runs/38296053769) / job114967284703已完整结束且FAILURE。架构、前端/contracts/TypeScript/Vite与17视口已实际通过，Rust在Clippy阶段因provider_score/aggregation.rs:47的 `uninlined_format_args` 失败；workspace单测和Windows release/MSI/NSIS/启动未执行完成，不记PASS。失败记录windows-acceptance-20261012-191326.txt，artifact11768138324，671字节，sha256 `23bbd18f0a2e47b2791aebbcd96de0138c8015b96ad23c464604b842065d8f8e`。
+
+原因：原key的混合字段表达式partition.partition_key提取为纯函数参数partition_key后，四个format参数均为普通具名标识符，旧位置参数写法触发Rust1.88严格Clippy。现改为 `format!("{provider_id}:{partition_key}:{decision_set_sha256}:{POSTMATCH_MONITORING_VERSION}")`，相同四个Display值/冒号/顺序/版本，哈希和快照键字节语义不变。未改评分、SQL/绑定、幂等、事务、公开API、原9unit或前后调用顺序，未用allow或关闭-D warnings。原Postmatch身份守卫切到实际捕获写法；原Rust源码卫生门禁新增此已确认回归的含空白/换行/可选尾逗号拒绝检查，无新框架。
+
+修复实际通过84/84原JS、完整npm run verify:architecture、1个实际修改Rust文件独立Rustfmt1.88check、单表达式逆替换精确恢复688892d全文、其余链/9unit冻结核对、原07的14项等价（仅先将捕获格式展开为原位置参数再比较）、原10破坏探针与新3格式回归探针，全部字节恢复。三新探针为旧多行、单行、可选尾逗号，分别由既有Rust卫生门禁独立拒绝。原9unit数量/断言保持，预期PG216/App165/Gateway112unit+41contract仍待修复提交自身Windows实跑。
+
+Domain365/129/301映射、scan1217/sourceDigest217241ac243726a5ab6805a7f169e222b97e78c7c971749a5904714af673ebdd保持；使用摘要更新为 `18ce78fc3bd7b90bb6ba841e96ed6bd60a28f3660d9b278370c2ea4461f0891b`。18保护资产、171命令、46迁移与18原PG静态契约/State/Ports保持；旧使用摘要与首次无Windows失败描述保留为实施历史，以本节为准。scratch r1007fix-static-checks.json/r1007fix-architecture.log/r1007fix-equivalence-probes.json/r1007fix-original-equivalence.json均可重建。
+
+按root AGENTS查询Context7：确认rust-toolchain/原workflow固定1.88.0；仓库索引无该精确问法结果，[Clippy官方stable文档](https://rust-lang.github.io/rust-clippy/stable/index.html#uninlined_format_args)给出uninlined_format_args规则及format!("{var}")写法（lint自1.66加入），结合本项目1.88实际诊断采用；没有声称取得1.88专属页面或新增版本/依赖。Create State使用稳定足球UUID96f03270-c236-46de-99fa-db85d2fbf4ce保存本轮精确失败/修复/新CI交接。链路逻辑未变，原Mermaid Chart图继续适用，无新增流程图或子代理。
+
+修复提交仍VERIFYING，01～06DONE、08～13BLOCKED、R10IN_PROGRESS。沿用唯一rewrite/r10-review-analytics-release-backend和原Windows CI；实际Windows job启动后停止查询并提示约20～30分钟，不以首轮前端成功或源码检查替代整轮Windows通过。真实PG/历史四项/不可变账本/并发回滚/有效XLSX/WindowsFull/私有P4P7固定回归及继承model.runs/0041删除风险仍最终新库待验，ignored/公开stub/static指纹不计真实PASS。

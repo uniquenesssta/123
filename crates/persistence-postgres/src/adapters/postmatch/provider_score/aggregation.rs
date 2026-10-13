@@ -45,8 +45,7 @@ impl ProviderAggregate {
     ) -> PersistenceResult<(String, String)> {
         let decision_set_sha256 = sha256_json(&self.decision_fingerprints)?;
         let snapshot_key = format!(
-            "{}:{}:{}:{}",
-            provider_id, partition_key, decision_set_sha256, POSTMATCH_MONITORING_VERSION
+            "{provider_id}:{partition_key}:{decision_set_sha256}:{POSTMATCH_MONITORING_VERSION}"
         );
         Ok((decision_set_sha256, snapshot_key))
     }

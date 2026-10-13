@@ -177,6 +177,12 @@ for (const file of files) {
       `${display} 的字段错误应内联 field_key，避免职责迁移后 uninlined_format_args 阻断 Windows Clippy`,
     );
   }
+  if (display === "crates/persistence-postgres/src/adapters/postmatch/provider_score/aggregation.rs") {
+    assert(
+      !/format!\s*\(\s*"\{\}:\{\}:\{\}:\{\}"\s*,\s*provider_id\s*,\s*partition_key\s*,\s*decision_set_sha256\s*,\s*POSTMATCH_MONITORING_VERSION\s*,?\s*\)/.test(source),
+      `${display} 的供应商快照键应内联具名参数，避免职责提取后 uninlined_format_args 阻断 Windows Clippy`,
+    );
+  }
   for (const match of source.matchAll(testModulePattern)) {
     const openingBrace = match.index + match[0].lastIndexOf("{");
     const closingBrace = matchingBrace(source, openingBrace);

@@ -973,7 +973,7 @@ crates/application/src/use_cases/postmatch/evidence-scoring/
 
 ## R10-07 Provider Score
 
-状态：`VERIFYING`（84/84静态、完整架构、8Rustfmt、14等价与10负向通过；9PG unit待自身Windows，预期App165/PG216，01～06 DONE、08～13 BLOCKED）
+状态：`VERIFYING`（首轮688892d / Windows run38296053769在Clippy失败；格式捕获修复及84源码/完整架构/等价/13负向通过，仍待修复提交完整Windows，预期App165/PG216，08～13BLOCKED）
 
 ### 1. 目标
 
@@ -2007,3 +2007,8 @@ R10-06 Evidence Scoring已实施 `VERIFYING`，基线18f7264，继续唯一rewri
 R10-07 Provider Score已实施 `VERIFYING`，基线85ecf15，继续唯一rewrite/r10-review-analytics-release-backend。实际PG供应商聚合、原评分/指纹与快照写入、最新读取和字段映射归provider_score唯一owner；App综合监控/两原Ports不变，不为参考App目录虚构供应商入口。原SQL五分区过滤/BTreeMap与决定顺序、60/15/25原公式、空准确率零分、未先舍入的均值、原指纹/版本/快照键及逐组pool幂等写入保持；监控仍供应商→漂移→总览，没有新事务/审计或自动参数晋升。新增9原PG unit待自身Windows，预期Persistence216 / Application165 / Gateway112 unit、41 contract；84/84静态、完整架构、8 Rustfmt、14等价及10负向通过。01～06自身Windows DONE，07 VERIFYING、08～13 BLOCKED、R10 IN_PROGRESS；真实PG/历史四项/账本并发回滚/有效XLSX/Windows Full/私有P4P7回归及继承model.runs/0041删除风险仍最终新库待验。
 
 参考App provider-score目录与真实来源不同：仅有综合Monitoring Port，实际PG评分职责收拢provider_score，App保持原综合入口/契约。7A/9M/0D、23字段/全部兼容/共享分区内部可见性/风险/回退见[07记录](../modular-rewrite/R10-review-analytics-release-backend/R10-07-provider-score.md)。未启动08～13。
+
+
+## R10-07 Windows 修复记录（2026-10-13）
+
+首轮688892d/run38296053769在Clippy uninlined_format_args失败，前端/17视口通过，Rust单测/打包/启动未完成。原快照键改捕获四具名值，内容与原接口/SQL/公式保持；旧格式回归守卫、使用摘要和全部记录同步，84静态/完整architecture/1Rustfmt/等价及13探针通过。9unit仍待本修复Windows，07VERIFYING、08～13BLOCKED；完整修复9M与当前累计7A/10M/0D见[07记录](../modular-rewrite/R10-review-analytics-release-backend/R10-07-provider-score.md)。

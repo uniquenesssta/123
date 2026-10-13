@@ -1,6 +1,6 @@
 # R10-07 Provider Score
 
-状态：`VERIFYING`。用户2026-10-13“收尾06开始07”授权；uniquenesssta/123 v0.23.0，唯一rewrite/r10-review-analytics-release-backend，基线85ecf15e0b9f75e5f02ccf73576f6430f5c2f7c9。01～06自身精确Windows DONE；08～13 BLOCKED，R10 IN_PROGRESS。
+状态：`VERIFYING`（首轮Windows Clippy失败已修复，待本修复提交自身完整Windows）。用户2026-10-13“收尾06开始07”授权；uniquenesssta/123 v0.23.0，唯一rewrite/r10-review-analytics-release-backend，基线85ecf15e0b9f75e5f02ccf73576f6430f5c2f7c9。01～06自身精确Windows DONE；08～13 BLOCKED，R10 IN_PROGRESS。
 
 ### 1. 目标
 
@@ -138,7 +138,7 @@ flowchart TD
 
 ## 实际完整 A/M/D 清单
 
-相对已验06收尾基线 85ecf15e0b9f75e5f02ccf73576f6430f5c2f7c9：**7A / 9M / 0D，共16路径**；无整文件移动或重命名，旧root职责按函数迁出。
+相对已验06收尾基线 85ecf15e0b9f75e5f02ccf73576f6430f5c2f7c9：**7A / 10M / 0D，共17路径**；无整文件移动或重命名，旧root职责按函数迁出。
 
 | 类型 | 文件 | 实际职责/原因 |
 | --- | --- | --- |
@@ -158,5 +158,39 @@ flowchart TD
 | M | `docs/modular-rewrite/R10-review-analytics-release-backend/README.md` | 阶段状态/07入口与继续边界 |
 | M | `scripts/verify-postmatch-service.mjs` | 既有门禁切实际owner/补原政策及唯一入口 |
 | M | `scripts/verify-postmatch-settlement.mjs` | 既有验证读取实际新评分owner |
+| M | `scripts/verify-rust-source-hygiene.mjs` | 已确认供应商格式回归守卫，不抑制Clippy |
 
 职责出口、旧owner清理、源路径与所有记录随同提交，清单未用预设文件数量替代实际diff。
+
+
+## R10-07 首轮 Windows 失败修复（2026-10-13）
+
+首轮精确提交 `688892dd1a67401df028cfdde9cbec08ccedf39b` / tree `aa331e6126bd926b7378ba44ba715d544ac02aff`，[Public Platform CI run38296053769](https://github.com/uniquenesssta/123/actions/runs/38296053769) / job114967284703已完整结束且FAILURE。架构、前端/contracts/TypeScript/Vite与17视口已实际通过，Rust在Clippy阶段因provider_score/aggregation.rs:47的 `uninlined_format_args` 失败；workspace单测和Windows release/MSI/NSIS/启动未执行完成，不记PASS。失败记录windows-acceptance-20261012-191326.txt，artifact11768138324，671字节，sha256 `23bbd18f0a2e47b2791aebbcd96de0138c8015b96ad23c464604b842065d8f8e`。
+
+原因：原key的混合字段表达式partition.partition_key提取为纯函数参数partition_key后，四个format参数均为普通具名标识符，旧位置参数写法触发Rust1.88严格Clippy。现改为 `format!("{provider_id}:{partition_key}:{decision_set_sha256}:{POSTMATCH_MONITORING_VERSION}")`，相同四个Display值/冒号/顺序/版本，哈希和快照键字节语义不变。未改评分、SQL/绑定、幂等、事务、公开API、原9unit或前后调用顺序，未用allow或关闭-D warnings。原Postmatch身份守卫切到实际捕获写法；原Rust源码卫生门禁新增此已确认回归的含空白/换行/可选尾逗号拒绝检查，无新框架。
+
+修复实际通过84/84原JS、完整npm run verify:architecture、1个实际修改Rust文件独立Rustfmt1.88check、单表达式逆替换精确恢复688892d全文、其余链/9unit冻结核对、原07的14项等价（仅先将捕获格式展开为原位置参数再比较）、原10破坏探针与新3格式回归探针，全部字节恢复。三新探针为旧多行、单行、可选尾逗号，分别由既有Rust卫生门禁独立拒绝。原9unit数量/断言保持，预期PG216/App165/Gateway112unit+41contract仍待修复提交自身Windows实跑。
+
+Domain365/129/301映射、scan1217/sourceDigest217241ac243726a5ab6805a7f169e222b97e78c7c971749a5904714af673ebdd保持；使用摘要更新为 `18ce78fc3bd7b90bb6ba841e96ed6bd60a28f3660d9b278370c2ea4461f0891b`。18保护资产、171命令、46迁移与18原PG静态契约/State/Ports保持；旧使用摘要与首次无Windows失败描述保留为实施历史，以本节为准。scratch r1007fix-static-checks.json/r1007fix-architecture.log/r1007fix-equivalence-probes.json/r1007fix-original-equivalence.json均可重建。
+
+按root AGENTS查询Context7：确认rust-toolchain/原workflow固定1.88.0；仓库索引无该精确问法结果，[Clippy官方stable文档](https://rust-lang.github.io/rust-clippy/stable/index.html#uninlined_format_args)给出uninlined_format_args规则及format!("{var}")写法（lint自1.66加入），结合本项目1.88实际诊断采用；没有声称取得1.88专属页面或新增版本/依赖。Create State使用稳定足球UUID96f03270-c236-46de-99fa-db85d2fbf4ce保存本轮精确失败/修复/新CI交接。链路逻辑未变，原Mermaid Chart图继续适用，无新增流程图或子代理。
+
+修复提交仍VERIFYING，01～06DONE、08～13BLOCKED、R10IN_PROGRESS。沿用唯一rewrite/r10-review-analytics-release-backend和原Windows CI；实际Windows job启动后停止查询并提示约20～30分钟，不以首轮前端成功或源码检查替代整轮Windows通过。真实PG/历史四项/不可变账本/并发回滚/有效XLSX/WindowsFull/私有P4P7固定回归及继承model.runs/0041删除风险仍最终新库待验，ignored/公开stub/static指纹不计真实PASS。
+
+### 本次修复实际 A/M/D
+
+相对失败688892d：**0A / 9M / 0D**，无整文件移动或改名；原07清单已累计更新为7A/10M/0D，旧7A/9M为首版历史。
+
+| 类型 | 文件 |
+| --- | --- |
+| M | `README.md` |
+| M | `architecture/domain-type-inventory.json` |
+| M | `crates/persistence-postgres/src/adapters/postmatch/provider_score/aggregation.rs` |
+| M | `docs/TESTING.md` |
+| M | `docs/football-model-platform-modular-rewrite-19-docs/10-R10-review-analytics-release-backend.md` |
+| M | `docs/modular-rewrite/R10-review-analytics-release-backend/R10-07-provider-score.md` |
+| M | `docs/modular-rewrite/R10-review-analytics-release-backend/README.md` |
+| M | `scripts/verify-postmatch-service.mjs` |
+| M | `scripts/verify-rust-source-hygiene.mjs` |
+
+相对已验06收尾85ecf15的当前累计17路径包含新增Rust卫生门禁守卫；回退仍使用该已验源码基线受控revert。
