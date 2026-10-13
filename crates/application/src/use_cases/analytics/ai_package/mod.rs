@@ -1,6 +1,10 @@
-pub(crate) mod decide_ai_analysis_suggestion;
-pub(crate) mod export_ai_analysis_package;
-pub(crate) mod export_ai_analysis_response_template;
-pub(crate) mod import_ai_analysis_response;
-pub(crate) mod list_ai_analysis_suggestions;
-pub(crate) mod preview_ai_analysis_response;
+mod exports;
+mod response;
+mod suggestions;
+
+#[cfg(test)]
+mod tests;
+
+pub(crate) use exports::{export_ai_analysis_package, export_ai_analysis_response_template};
+pub(crate) use response::{import_ai_analysis_response, preview_ai_analysis_response};
+pub(crate) use suggestions::{decide_ai_analysis_suggestion, list_ai_analysis_suggestions};

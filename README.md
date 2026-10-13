@@ -779,3 +779,10 @@ R10-10 Background Jobs已实施 `VERIFYING`，基线4a6fa9b，继续唯一R10分
 
 
 R10-10 已收尾DONE：精确3365b2b / [Windows run38411713492](https://github.com/uniquenesssta/123/actions/runs/38411713492)全SUCCESS，Application189/Persistence241/Gateway112unit+41contract及19新测试、17视口/打包/启动通过。用户授权11分析资料包，12～13BLOCKED；完整证据与最终新库待验见[10完成记录](docs/modular-rewrite/R10-review-analytics-release-backend/R10-10-background-jobs.md)。
+
+
+### R10-11 分析资料包（2026-10-13，VERIFYING）
+
+R10-11 Analysis Package已实施 `VERIFYING`，基线5a19c71，继续唯一R10分支。App导出/回包/人工建议六入口按三职责编组；PG资料包数据/元数据/导入/决定/读取/映射/政策各唯一，旧六目录与root15职责移除，剩余14函数保持。原ZIP库/格式/Schema/摘要验证、SQL/错误/身份核验/待审导入/人工候选事务与提交后回读保持，不自动晋升参数。新增11App/8PG unit待自身Windows，预期200/249、Gateway112unit+41contract；84/84源码、完整架构、17Rustfmt、18等价及13负向通过。01～10DONE、11VERIFYING、12～13BLOCKED、R10IN_PROGRESS；真实PG/历史四项/账本并发回滚/有效XLSX/WindowsFull/私有P4P7固定回归及继承model.runs/0041删除风险继续最终新库待验。
+
+14A/11M/6D、实际职责/人工门禁/验证与回退见[11记录](docs/modular-rewrite/R10-review-analytics-release-backend/R10-11-analysis-package.md)和[R10索引](docs/modular-rewrite/R10-review-analytics-release-backend/README.md)。

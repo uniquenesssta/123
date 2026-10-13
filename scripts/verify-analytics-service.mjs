@@ -17,12 +17,9 @@ const publicUseCaseFiles = [
   `${useCaseRoot}/calculation/overview.rs`,
   `${useCaseRoot}/decide_data_quality_finding/mod.rs`,
   `${useCaseRoot}/jobs/commands.rs`,
-  `${useCaseRoot}/ai_package/export_ai_analysis_response_template/mod.rs`,
-  `${useCaseRoot}/ai_package/export_ai_analysis_package/mod.rs`,
-  `${useCaseRoot}/ai_package/preview_ai_analysis_response/mod.rs`,
-  `${useCaseRoot}/ai_package/import_ai_analysis_response/mod.rs`,
-  `${useCaseRoot}/ai_package/list_ai_analysis_suggestions/mod.rs`,
-  `${useCaseRoot}/ai_package/decide_ai_analysis_suggestion/mod.rs`,
+  `${useCaseRoot}/ai_package/exports.rs`,
+  `${useCaseRoot}/ai_package/response.rs`,
+  `${useCaseRoot}/ai_package/suggestions.rs`,
   `${useCaseRoot}/parameter_lifecycle/generate_parameter_tuning_candidate/mod.rs`,
   `${useCaseRoot}/parameter_lifecycle/list_parameter_tuning_candidates/mod.rs`,
   `${useCaseRoot}/parameter_lifecycle/decide_parameter_tuning_candidate/mod.rs`,
@@ -46,6 +43,8 @@ const requiredFiles = [
   ...["commands.rs", "coordinator.rs", "execution.rs", "request.rs", "tests.rs"].map((file) => `${useCaseRoot}/jobs/${file}`),
   ...["mod.rs", "claim.rs", "commands.rs", "lifecycle.rs", "mapping.rs", "policy.rs", "read.rs", "tests.rs"].map((file) => `crates/persistence-postgres/src/adapters/jobs/${file}`),
   `${useCaseRoot}/ai_package/mod.rs`,
+  `${useCaseRoot}/ai_package/tests.rs`,
+  ...["mod.rs", "data.rs", "decisions.rs", "exports.rs", "imports.rs", "mapping.rs", "policy.rs", "suggestions.rs", "tests.rs"].map((file) => `crates/persistence-postgres/src/adapters/analytics/analysis_package/${file}`),
   `${useCaseRoot}/parameter_lifecycle/mod.rs`,
   `${useCaseRoot}/parameter_lifecycle/metrics.rs`,
   ...publicUseCaseFiles,
@@ -64,6 +63,7 @@ for (const file of [
   `${useCaseRoot}/jobs.rs`,
   ...["enqueue_analysis_job", "list_background_jobs", "cancel_background_job", "retry_background_job"].map((entry) => `${useCaseRoot}/jobs/${entry}/mod.rs`),
   `${useCaseRoot}/ai_package.rs`,
+  ...["export_ai_analysis_response_template", "export_ai_analysis_package", "preview_ai_analysis_response", "import_ai_analysis_response", "list_ai_analysis_suggestions", "decide_ai_analysis_suggestion"].map((entry) => `${useCaseRoot}/ai_package/${entry}/mod.rs`),
   `${useCaseRoot}/parameter_lifecycle/candidates.rs`,
   `${useCaseRoot}/parameter_lifecycle/readiness.rs`,
   `${useCaseRoot}/parameter_lifecycle/promotion.rs`,
@@ -125,13 +125,13 @@ for (const token of ["sqlx::", "PostgresStore", "PersistenceStore", "football_pe
   check(!serviceAndUseCases.includes(token), `Service/Use Case 泄漏基础设施符号：${token}`);
 }
 check(!service.includes("std::fs") && !service.includes("Path::new"), "AnalyticsService 直接承担文件 I/O");
-check(read(`${useCaseRoot}/ai_package/export_ai_analysis_package/mod.rs`).includes("write_analysis_package"), "AI Analysis Package 导出未归属独立 Use Case");
-check(read(`${useCaseRoot}/ai_package/preview_ai_analysis_response/mod.rs`).includes("read_analysis_response"), "AI Analysis Package 预检未归属独立 Use Case");
+check(read(`${useCaseRoot}/ai_package/exports.rs`).includes("write_analysis_package"), "AI Analysis Package 导出未归属独立 Use Case");
+check(read(`${useCaseRoot}/ai_package/response.rs`).includes("read_analysis_response"), "AI Analysis Package 预检未归属独立 Use Case");
 check(coordinator.includes("claim_next_by_types") && execution.includes("AnalyticsJobResult") && worker.includes("run_queue(&port).await"), "后台任务启动/领取结算/执行职责未切换唯一模块");
 check(service.includes("start_job_worker") && service.includes("analytics::jobs::worker::spawn"), "AnalyticsService 未暴露后台 worker 启动边界");
 check(parameterMetrics.includes("expected_calibration_error") && parameterMetrics.includes("lifecycle_metrics"), "Parameter Lifecycle 指标计算未独立拆分");
 check(parameterShadow.includes("binding_unchanged") && parameterShadow.includes("finite_probabilities"), "Parameter shadow 安全门禁缺失");
-check(publicUseCaseFiles.length === 18, `Analytics 公共入口应归属18个实际职责源（Jobs四入口共用commands），实际 ${publicUseCaseFiles.length}`);
+check(publicUseCaseFiles.length === 15, `Analytics 公共入口应归属15个实际职责源（Jobs四入口及资料包六入口按职责编组），实际 ${publicUseCaseFiles.length}`);
 
 
 const calculationRoot = `${useCaseRoot}/calculation`;
@@ -144,7 +144,7 @@ const metrics = read(`${pgCalculation}/metrics.rs`);
 const projection = read(`${pgCalculation}/projection.rs`);
 const pgRead = read(`${pgCalculation}/read.rs`);
 const pgLegacy = read("crates/persistence-postgres/src/analytics.rs");
-check(pgLegacy.includes("use chrono::{DateTime, Utc};") && pgLegacy.includes("ANALYTICS_CALCULATION_VERSION,"), "保留 AI 职责所需的时间/版本生产导入缺失");
+check(read("crates/persistence-postgres/src/adapters/analytics/analysis_package/data.rs").includes("use chrono::{DateTime, Utc};") &&  /use football_domain::\{[^}]*\bANALYTICS_CALCULATION_VERSION\b[^}]*\};/s.test(read("crates/persistence-postgres/src/adapters/analytics/analysis_package/exports.rs")), "资料包真实 owner 所需的时间/版本生产导入缺失");
 const compact = (text) => text.replace(/\s+/g, "");
 const occurrences = (text, token) => text.split(token).length - 1;
 check(read(`${useCaseRoot}/mod.rs`).includes("pub(crate) mod calculation;") &&
@@ -276,6 +276,66 @@ for (const [dir, names] of [
 ]) {
   check(read(`${dir}/mod.rs`).includes("#[cfg(test)]\nmod tests;"), `后台任务测试未登记原target：${dir}`);
   for (const name of names) check(read(`${dir}/tests.rs`).includes(`fn ${name}(`), `后台任务边界测试缺失：${name}`);
+}
+
+
+const aiRoot = `${useCaseRoot}/ai_package`;
+const pgPackage = "crates/persistence-postgres/src/adapters/analytics/analysis_package";
+const appExports = read(`${aiRoot}/exports.rs`);
+const appResponse = read(`${aiRoot}/response.rs`);
+const appSuggestions = read(`${aiRoot}/suggestions.rs`);
+const packageData = read(`${pgPackage}/data.rs`);
+const packageImport = read(`${pgPackage}/imports.rs`);
+const packageDecision = read(`${pgPackage}/decisions.rs`);
+const packagePolicy = read(`${pgPackage}/policy.rs`);
+const packageSuggestions = read(`${pgPackage}/suggestions.rs`);
+for (const file of [`${aiRoot}/mod.rs`, `${pgPackage}/mod.rs`])
+  check(!/\bfn\b|\bimpl\b|\blet\b/.test(read(file)), `资料包出口承载业务：${file}`);
+check(read("crates/persistence-postgres/src/adapters/analytics/mod.rs").includes("mod analysis_package;"), "PG资料包owner未登记原analytics适配器树");
+for (const [entry, file] of [["export_ai_analysis_response_template", appExports], ["export_ai_analysis_package", appExports],
+  ["preview_ai_analysis_response", appResponse], ["import_ai_analysis_response", appResponse],
+  ["list_ai_analysis_suggestions", appSuggestions], ["decide_ai_analysis_suggestion", appSuggestions]]) {
+  check(occurrences(file, `fn ${entry}`) === 1 && service.includes(`analytics::ai_package::${entry}(`), `资料包实际入口未切换：${entry}`);
+}
+let exportStep = -1;
+for (const token of ["let data = port.build_ai_analysis_data().await?;", "write_analysis_package(Path::new(&output_path), &data)?", "port.record_ai_export(&summary).await?;", "Ok(summary)"]) {
+  const current = appExports.indexOf(token); check(current > exportStep, `原数据→写包→元数据记录顺序改变：${token}`); exportStep = current;
+}
+check(appExports.includes("response_template_bytes(source_package_id)?") && appExports.includes("fs::write(&output_path, bytes)?"), "模板原版本/来源参数/文件错误边界改变");
+check(occurrences(appResponse, "read_analysis_response(Path::new(&input_path))?") === 2 && appResponse.includes("port.import_ai_response(&input_path, &preview).await?"), "同一文件预览/导入原解析边界改变");
+check(appSuggestions.includes("status.as_deref(), limit") && appSuggestions.includes("port.decide_ai_suggestion(&draft).await?"), "建议列表/人工决定原Port边界改变");
+for (const owner of ["build_ai_analysis_data", "record_ai_export", "import_ai_response", "list_ai_suggestions", "decide_ai_suggestion", "database_summary_json", "player_review_summary_json", "team_review_summary_json", "ability_candidates_json", "schema_summary_json", "read_ai_suggestion", "ai_suggestion_from_row", "json_string", "json_number", "json_uuid"])
+  check(!new RegExp(`\\bfn\\s+${owner}\\b`).test(pgLegacy), `根analytics重复资料包职责：${owner}`);
+let dataStep = -1;
+for (const token of ["self.analytics_overview().await?", "self.database_summary_json().await?", "self.player_review_summary_json().await?", "self.team_review_summary_json().await?", "self.ability_candidates_json().await?", "self.schema_summary_json().await?"]) {
+  const current = packageData.indexOf(token); check(current > dataStep, `资料包六数据读取原顺序改变：${token}`); dataStep = current;
+}
+check(occurrences(packageImport, "self.pool.begin().await?") === 1 && occurrences(packageImport, "tx.commit().await?") === 1, "回包导入原单事务改变");
+let importStep = -1;
+for (const token of ["validate_import_preview(preview)?", "self.pool.begin().await?", "SELECT EXISTS(SELECT 1 FROM analytics.ai_package_imports WHERE response_id=$1)", "if already_imported", "if let Some(source_package_id)", "SELECT EXISTS(SELECT 1 FROM analytics.ai_package_exports WHERE package_id=$1)", "if !source_exists", "INSERT INTO analytics.ai_package_imports", "for suggestion in &preview.suggestions", "INSERT INTO analytics.ai_suggestions", "write_audit_event(", "tx.commit().await?", 'self.list_ai_suggestions(Some("pending"), 500).await']) {
+  const current = packageImport.indexOf(token); check(current > importStep, `原回包阻断/身份/导入/提交后全pending回读顺序改变：${token}`); importStep = current;
+}
+for (const token of ["该 AI 回包已经导入，不能重复写入建议", "AI 回包引用的来源分析包不属于当前数据库", "suggestion_severity(&suggestion.severity)", "serde_json::to_value(&preview.warnings)?", "$9,'pending'", "ai_analysis_response_imported"])
+  check(packageImport.includes(token), `原回包幂等/来源/待审/审计政策缺失：${token}`);
+check(occurrences(packageDecision, "self.pool.begin().await?") === 1 && occurrences(packageDecision, "tx.commit().await?") === 1, "人工建议决定原单事务改变");
+let decisionStep = -1;
+for (const token of ["self.pool.begin().await?", "SELECT suggestion_type,payload,status FROM analytics.ai_suggestions WHERE id=$1 FOR UPDATE", "let status: String", "ensure_pending(&status)?", "let suggestion_type: String", "let payload: Value", "AiSuggestionDecision::Accept if suggestion_type == \"ability_update\"", "json_uuid(&payload", "json_string(&payload", "let identity_valid:", "if !identity_valid", "ability_values(&payload)?", "SELECT value FROM feature.player_current_abilities", "INSERT INTO review.ability_update_candidates", "UPDATE analytics.ai_suggestions SET status", "write_audit_event(", "tx.commit().await?", "self.read_ai_suggestion(draft.suggestion_id).await"]) {
+  const current = packageDecision.indexOf(token); check(current > decisionStep, `人工建议原锁/状态/身份/候选/提交顺序改变：${token}`); decisionStep = current;
+}
+for (const token of ['AiSuggestionDecision::Reject => "rejected"', 'AiSuggestionDecision::Accept => "accepted"', 'unwrap_or("desktop-user")', "'ai-analysis-response-v1','pending'", "AI 能力建议引用了不存在的球员或能力维度", "ai_suggestion_decided"])
+  check(packageDecision.includes(token), `原人工建议/待审候选政策缺失：${token}`);
+check(!/INSERT INTO feature\.player_ability_observations|INSERT INTO model\.|promote_parameter|promote_candidate/.test(packageDecision), "AI建议不得直接写正式能力观察或自动晋升参数");
+for (const token of ['!preview.blocking_errors.is_empty()', 'preview.blocking_errors.join("；")', 'if status != "pending"', 'json_number(payload, "proposed_value")?.clamp(0.0, 100.0)', '.unwrap_or(0.5)', '.clamp(0.0, 1.0)', '.clamp(0, i32::MAX as i64) as i32'])
+  check(packagePolicy.includes(token), `原导入/待审/能力payload政策缺失：${token}`);
+check(compact(packagePolicy).includes('ifseverity.trim().is_empty(){"info"}else{severity}') &&
+  compact(packagePolicy).includes('Ok(AbilitySuggestionValues{proposed_value,confidence,sample_size,})'), "严重级别原样回传/具名能力值投影改变");
+check(packageSuggestions.includes("ORDER BY created_at DESC,id DESC LIMIT $2") && packageSuggestions.includes("limit.clamp(1, 1000)") && packageSuggestions.includes(".bind(status)"), "建议读取原筛选/上限/顺序改变");
+for (const [dir, names] of [
+  [aiRoot, ["template_writes_real_response_zip_with_optional_source_and_valid_hash", "import_forwards_same_file_preview_warnings_and_unfiltered_port_result", "missing_or_invalid_zip_fails_before_import_port", "export_writes_package_then_records_exact_summary_with_repeatable_content_hash", "data_read_errors_preserve_kind_and_stop_before_creating_file", "file_write_failures_keep_original_error_boundary_and_skip_export_record", "metadata_errors_leave_original_written_package_and_propagate_all_port_kinds", "import_port_errors_keep_kind_without_extra_writes_or_retry", "suggestion_list_preserves_optional_filter_limits_and_complete_records", "explicit_accept_and_reject_preserve_manual_identity_note_and_port_record", "suggestion_control_errors_preserve_all_port_kinds_without_other_actions"]],
+  [pgPackage, ["blocking_preview_errors_keep_original_order_and_separator", "warnings_and_empty_suggestions_do_not_become_blocking_errors", "severity_defaults_only_for_blank_and_otherwise_keeps_original_bytes", "manual_decision_requires_exact_pending_status", "payload_string_values_remain_untrimmed_and_wrong_types_keep_error", "payload_uuid_preserves_valid_nil_and_original_missing_or_invalid_errors", "ability_values_keep_original_clamps_defaults_and_integer_type_policy", "ability_proposed_value_must_be_numeric_before_optional_defaults"]],
+]) {
+  check(read(`${dir}/mod.rs`).includes("#[cfg(test)]\nmod tests;"), `资料包测试未登记原target：${dir}`);
+  for (const name of names) check(read(`${dir}/tests.rs`).includes(`fn ${name}(`), `资料包边界测试缺失：${name}`);
 }
 
 const publicMethods = [

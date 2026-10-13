@@ -96,10 +96,7 @@ impl AnalyticsService {
         output_path: String,
         source_package_id: Option<Uuid>,
     ) -> ApplicationResult<String> {
-        analytics::ai_package::export_ai_analysis_response_template::execute(
-            output_path,
-            source_package_id,
-        )
+        analytics::ai_package::export_ai_analysis_response_template(output_path, source_package_id)
     }
 
     pub(crate) async fn export_ai_package<P>(
@@ -110,14 +107,14 @@ impl AnalyticsService {
     where
         P: AnalyticsPort + ?Sized,
     {
-        analytics::ai_package::export_ai_analysis_package::execute(port, output_path).await
+        analytics::ai_package::export_ai_analysis_package(port, output_path).await
     }
 
     pub(crate) fn preview_ai_response(
         &self,
         input_path: String,
     ) -> ApplicationResult<AiAnalysisResponsePreview> {
-        analytics::ai_package::preview_ai_analysis_response::execute(input_path)
+        analytics::ai_package::preview_ai_analysis_response(input_path)
     }
 
     pub(crate) async fn import_ai_response<P>(
@@ -128,7 +125,7 @@ impl AnalyticsService {
     where
         P: AnalyticsPort + ?Sized,
     {
-        analytics::ai_package::import_ai_analysis_response::execute(port, input_path).await
+        analytics::ai_package::import_ai_analysis_response(port, input_path).await
     }
 
     pub(crate) async fn list_ai_suggestions<P>(
@@ -140,7 +137,7 @@ impl AnalyticsService {
     where
         P: AnalyticsPort + ?Sized,
     {
-        analytics::ai_package::list_ai_analysis_suggestions::execute(port, status, limit).await
+        analytics::ai_package::list_ai_analysis_suggestions(port, status, limit).await
     }
 
     pub(crate) async fn decide_ai_suggestion<P>(
@@ -151,7 +148,7 @@ impl AnalyticsService {
     where
         P: AnalyticsPort + ?Sized,
     {
-        analytics::ai_package::decide_ai_analysis_suggestion::execute(port, draft).await
+        analytics::ai_package::decide_ai_analysis_suggestion(port, draft).await
     }
 
     pub(crate) async fn generate_parameter_candidate(

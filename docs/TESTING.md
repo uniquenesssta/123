@@ -805,3 +805,10 @@ R10-10 Background Jobs已实施 `VERIFYING`，基线4a6fa9b，继续唯一R10分
 证据artifact11824026576，14,051,930字节，SHA-256 `ec237a2d6899402531ad616aab6c7fba11cbb6d1098c3d3e868eafe75e8a030f`。10自身完整SUCCESS后DONE；用户2026-10-13“收尾10开始11”授权11 Analysis Package READY，同一唯一rewrite/r10-review-analytics-release-backend分支，12～13BLOCKED、R10IN_PROGRESS。本次仅五既有文档[skip ci]收尾，源码同已验3365b2b，11须自身精确完整Windows，无阶段完成记录。此前10 VERIFYING与预期计数保留为实施历史。
 
 真实PG/历史保护四项/不可变账本/并发回滚/有效XLSX/WindowsFull/私有P4P7固定回归及继承model.runs/0041删除风险仍最终封包新库待验，ignored/公开unavailable stub/static指纹不计真实PASS。
+
+
+### R10-11 分析资料包（2026-10-13，VERIFYING）
+
+R10-11 Analysis Package已实施 `VERIFYING`，基线5a19c71，继续唯一R10分支。App导出/回包/人工建议六入口按三职责编组；PG资料包数据/元数据/导入/决定/读取/映射/政策各唯一，旧六目录与root15职责移除，剩余14函数保持。原ZIP库/格式/Schema/摘要验证、SQL/错误/身份核验/待审导入/人工候选事务与提交后回读保持，不自动晋升参数。新增11App/8PG unit待自身Windows，预期200/249、Gateway112unit+41contract；84/84源码、完整架构、17Rustfmt、18等价及13负向通过。01～10DONE、11VERIFYING、12～13BLOCKED、R10IN_PROGRESS；真实PG/历史四项/账本并发回滚/有效XLSX/WindowsFull/私有P4P7固定回归及继承model.runs/0041删除风险继续最终新库待验。
+
+新实际文件IO测试只随原Windows unit执行，PG规则测试不算真实事务验收；18等价含原库冻结/240字面量/14保留函数与19unit原target登记，13负向拒绝恢复。Windows job启动即停止CI查询并提示20～30分钟；具体命令/未执行项和31路径见[11记录](modular-rewrite/R10-review-analytics-release-backend/R10-11-analysis-package.md)。无阶段完成记录。

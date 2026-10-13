@@ -1509,7 +1509,7 @@ crates/application/src/use_cases/analytics/jobs/
 
 ## R10-11 Analysis Package
 
-状态：`READY`（10自身精确完整Windows DONE；用户2026-10-13“收尾10开始11”授权，同一R10分支，12～13BLOCKED）
+状态：`VERIFYING`（用户2026-10-13“收尾10开始11”授权；分析资料包/回包/人工建议边界已重写，84源码/完整架构/等价/负向通过，自身完整Windows待验，12～13BLOCKED）。详见[11实施记录](../modular-rewrite/R10-review-analytics-release-backend/R10-11-analysis-package.md)。
 
 ### 1. 目标
 
@@ -1524,8 +1524,10 @@ crates/application/src/use_cases/analytics/jobs/
 ### 3. 目标文件与目录
 
 ```text
-crates/application/src/use_cases/analytics/analysis-package/
+crates/application/src/use_cases/analytics/ai_package/
 ```
+
+实际沿用已有合法Rust模块标识 `ai_package`，六入口按导出/回包/人工建议三职责编组，不新建并行目录；PG配套实现位于 `adapters/analytics/analysis_package/`。
 
 ### 4. 文件职责边界
 
