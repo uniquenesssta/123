@@ -1375,7 +1375,7 @@ crates/application/src/use_cases/analytics/calculation/
 
 ## R10-10 Background Jobs
 
-状态：`VERIFYING`（用户2026-10-13“收尾09开始10”授权；后台控制/启动/领取结算/执行与共享PG队列已重写，84源码/完整架构/等价/负向通过，自身完整Windows待验，11～13BLOCKED）。详见[10实施记录](../modular-rewrite/R10-review-analytics-release-backend/R10-10-background-jobs.md)。
+状态：`DONE`（自身精确3365b2b / Windows run38411713492全SUCCESS；用户2026-10-13“收尾10开始11”授权11 READY）。详见[10完成记录](../modular-rewrite/R10-review-analytics-release-backend/R10-10-background-jobs.md)。
 
 ### 1. 目标
 
@@ -1509,7 +1509,7 @@ crates/application/src/use_cases/analytics/jobs/
 
 ## R10-11 Analysis Package
 
-状态：`BLOCKED`（仅当上一任务与本任务前置门禁通过后改为 `READY`）
+状态：`READY`（10自身精确完整Windows DONE；用户2026-10-13“收尾10开始11”授权，同一R10分支，12～13BLOCKED）
 
 ### 1. 目标
 
