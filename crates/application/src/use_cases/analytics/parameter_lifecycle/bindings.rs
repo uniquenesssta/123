@@ -1,10 +1,12 @@
 use super::metrics::{minimum_sample_size, required_candidate_uuid};
 use crate::{ports::analytics::ParameterLifecyclePort, ApplicationError, ApplicationResult};
 use football_domain::{
-    ParameterLifecycleReadinessRequest, ParameterPromotionDecisionRecord, ParameterPromotionRequest,
+    ParameterLifecycleReadinessRequest, ParameterPromotionDecisionRecord,
+    ParameterPromotionRequest, ParameterRollbackRequest,
 };
+use uuid::Uuid;
 
-pub(crate) async fn execute<P>(
+pub(crate) async fn promote_parameter_candidate<P>(
     port: &P,
     request: ParameterPromotionRequest,
 ) -> ApplicationResult<ParameterPromotionDecisionRecord>
@@ -39,4 +41,29 @@ where
         ));
     }
     Ok(port.promote(&request).await?)
+}
+
+pub(crate) async fn rollback_parameter_candidate<P>(
+    port: &P,
+    request: ParameterRollbackRequest,
+) -> ApplicationResult<ParameterPromotionDecisionRecord>
+where
+    P: ParameterLifecyclePort + ?Sized,
+{
+    if request.decision_note.trim().len() < 8 {
+        return Err(ApplicationError::Validation(
+            "回滚说明至少需要 8 个字符".to_string(),
+        ));
+    }
+    Ok(port.rollback(&request).await?)
+}
+
+pub(crate) async fn list_parameter_promotion_decisions<P>(
+    port: &P,
+    candidate_id: Uuid,
+) -> ApplicationResult<Vec<ParameterPromotionDecisionRecord>>
+where
+    P: ParameterLifecyclePort + ?Sized,
+{
+    Ok(port.list_promotion_decisions(candidate_id).await?)
 }

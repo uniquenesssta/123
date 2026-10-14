@@ -306,7 +306,7 @@
         "crates/persistence-postgres/src/p4_orchestration.rs",
         "crates/persistence-postgres/src/p4_records.rs",
         "crates/persistence-postgres/src/p4_workbench.rs",
-        "crates/persistence-postgres/src/parameter_lifecycle.rs",
+        "crates/persistence-postgres/src/parameter_lifecycle/mod.rs",
         "crates/persistence-postgres/src/player_catalog.rs",
         "crates/persistence-postgres/src/pool/mod.rs",
         "crates/persistence-postgres/src/postmatch.rs",

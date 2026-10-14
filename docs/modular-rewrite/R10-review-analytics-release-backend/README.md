@@ -2,7 +2,7 @@
 
 ## 当前阶段状态
 
-`IN_PROGRESS`。用户2026-10-12“开始R10-01”授权；从R9文档收尾HEAD `48618fed2d7ff7c2a4db831a037f227dc789f278` 建立唯一阶段分支 `rewrite/r10-review-analytics-release-backend`。01自身精确Windows run38229119264/job114743919870全SUCCESS并DONE；02自身1ad6e68 / Windows run38245932270/job114799659672全SUCCESS并DONE；用户“收尾02开始03”授权03已实施；03自身99b15ad / Windows run38259438025/job114845878326全SUCCESS并DONE，04自身221d211 / Windows run38271387412/job114886215505全SUCCESS并DONE；05自身fe3529f / Windows run38277864089/job114907643831全SUCCESS并DONE；06自身1ed6dbe / Windows run38290328302/job114948593892全SUCCESS并DONE；07自身cdd2797 / Windows run38350692611/job115142166008全SUCCESS并DONE；08自身f834e31 / Windows run38357781835/job115164583225全SUCCESS并DONE；09自身fbfe83a / Windows run38398255939/job115298907093全SUCCESS并DONE；10自身3365b2b / Windows run38411713492/job115345476640全SUCCESS并DONE；11自身9d3727c / Windows run38423742534/job115387546853全SUCCESS并DONE；用户2026-10-14“收尾11开始12”授权12 READY，13 BLOCKED。
+`IN_PROGRESS`。用户2026-10-12“开始R10-01”授权；从R9文档收尾HEAD `48618fed2d7ff7c2a4db831a037f227dc789f278` 建立唯一阶段分支 `rewrite/r10-review-analytics-release-backend`。01自身精确Windows run38229119264/job114743919870全SUCCESS并DONE；02自身1ad6e68 / Windows run38245932270/job114799659672全SUCCESS并DONE；用户“收尾02开始03”授权03已实施；03自身99b15ad / Windows run38259438025/job114845878326全SUCCESS并DONE，04自身221d211 / Windows run38271387412/job114886215505全SUCCESS并DONE；05自身fe3529f / Windows run38277864089/job114907643831全SUCCESS并DONE；06自身1ed6dbe / Windows run38290328302/job114948593892全SUCCESS并DONE；07自身cdd2797 / Windows run38350692611/job115142166008全SUCCESS并DONE；08自身f834e31 / Windows run38357781835/job115164583225全SUCCESS并DONE；09自身fbfe83a / Windows run38398255939/job115298907093全SUCCESS并DONE；10自身3365b2b / Windows run38411713492/job115345476640全SUCCESS并DONE；11自身9d3727c / Windows run38423742534/job115387546853全SUCCESS并DONE；用户2026-10-14“收尾11开始12”授权12已实施VERIFYING，13 BLOCKED。
 
 ## 前置基线与依据
 
@@ -23,7 +23,7 @@
 | R10-09 | [Analytics Calculation](R10-09-analytics-calculation.md) | DONE · 自身精确修复Windows全SUCCESS |
 | R10-10 | [Background Jobs](R10-10-background-jobs.md) | DONE · 自身精确Windows全SUCCESS |
 | R10-11 | [Analysis Package](R10-11-analysis-package.md) | DONE · 自身精确Windows全SUCCESS |
-| R10-12 | Parameter Lifecycle | READY · 用户授权，前置门禁通过 |
+| R10-12 | [Parameter Lifecycle](R10-12-parameter-lifecycle.md) | VERIFYING · 自身完整Windows待验 |
 | R10-13 | Release Acceptance | BLOCKED |
 
 ## R10-01 实际边界与验证
@@ -250,3 +250,9 @@ R10-11 Analysis Package已实施 `VERIFYING`，基线5a19c71，继续唯一R10�
 证据artifact11828902351，14,051,522字节，SHA-256 `bf5b6c6f869263510a06e462570b02fef9265c3a4b6aeb664f1f164ac96d7eea`。11自身完整SUCCESS后DONE；用户2026-10-14“收尾11开始12”授权12 Parameter Lifecycle READY，继续唯一rewrite/r10-review-analytics-release-backend，13BLOCKED、R10IN_PROGRESS。本次仅五既有文档[skip ci]收尾，源码同已验9d3727c；12须自身精确完整Windows，无阶段完成记录。此前11VERIFYING/预期计数为实施历史。
 
 真实PG/历史保护四项/不可变账本/并发回滚/有效XLSX/WindowsFull/私有P4P7固定回归及继承model.runs/0041删除风险继续最终封包新库待验；ignored/公开stub/static指纹不计这些真实PASS。
+
+## R10-12 实际边界与继续位置
+
+R10-12 Parameter Lifecycle已实施 `VERIFYING`，基线6da5057，同一R10分支。App九入口按候选/就绪/影子验证/人工绑定四职责编组；PG同名模块升级为职责目录，22原函数迁入，root analytics保留九原函数。指标公式/排序/阈值/哈希、公开提供器拒绝、H精确分区、不可覆盖报告、人工状态门禁/锁/CAS/两绑定事务及提交后回读保持。新增15App/6PG unit待自身Windows，预期215/255、Gateway112unit+41contract；82源码、完整架构、19Rustfmt、19等价及20负向通过。01～11DONE、12VERIFYING、13BLOCKED、R10IN_PROGRESS。真实PG/历史四项/账本并发回滚/有效XLSX/WindowsFull/私有P4P7固定回归及继承model.runs/0041删除风险继续最终新库待验。
+
+沿用既有parameter_lifecycle标识与原PG根模块登记，无新Port/State或自动晋升。23字段/全部39路径及回退见[12记录](R10-12-parameter-lifecycle.md)。先核对12自身精确完整Windows，失败同分支修复，成功且用户授权后进入13；无阶段完成记录。

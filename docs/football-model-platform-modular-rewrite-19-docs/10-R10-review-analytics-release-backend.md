@@ -1645,7 +1645,7 @@ crates/application/src/use_cases/analytics/ai_package/
 
 ## R10-12 Parameter Lifecycle
 
-状态：`READY`（11自身精确9d3727c完整Windows SUCCESS；用户2026-10-14“收尾11开始12”授权，同一R10分支，13BLOCKED）。
+状态：`VERIFYING`（11自身精确9d3727c完整Windows SUCCESS；用户2026-10-14“收尾11开始12”授权。参数生命周期职责已重写，静态/等价/负向通过，自身完整Windows待验，13BLOCKED）。详见[12实施记录](../modular-rewrite/R10-review-analytics-release-backend/R10-12-parameter-lifecycle.md)。
 
 ### 1. 目标
 
@@ -1660,8 +1660,10 @@ crates/application/src/use_cases/analytics/ai_package/
 ### 3. 目标文件与目录
 
 ```text
-crates/application/src/use_cases/analytics/parameter-lifecycle/
+crates/application/src/use_cases/analytics/parameter_lifecycle/
 ```
+
+实际沿用已有合法Rust标识 `parameter_lifecycle`，九入口按候选/就绪/影子验证/人工绑定编组。PG同名根模块由单文件升级为职责目录，保持原lib.rs登记及API，不新增并行层。
 
 ### 4. 文件职责边界
 

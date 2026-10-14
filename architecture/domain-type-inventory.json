@@ -24,13 +24,13 @@
     "targetPublicExportPolicy": "explicit re-export only"
   },
   "sourceDigest": "217241ac243726a5ab6805a7f169e222b97e78c7c971749a5904714af673ebdd",
-  "rustUsageDigest": "ae838daa05f042312d2d0d8de616d9e398fbabeda00ef3683a38b045251cfc7f",
+  "rustUsageDigest": "57b22b534e916a40c70c9a2b88eca9cb1eb04f110e011bd6f05644b51398df80",
   "summary": {
     "typeCount": 365,
     "publicCompatibilityTypeCount": 365,
     "internalTypeCount": 0,
     "domainSourceFileCount": 129,
-    "scannedRustFileCount": 1259,
+    "scannedRustFileCount": 1265,
     "databaseMappedTypeCount": 301,
     "byTargetModule": {
       "ai_workspace": 16,
@@ -10516,7 +10516,7 @@
       "externalCallers": [
         "crates/application/src/model_registry/prediction_model_adapter.rs",
         "crates/application/src/model_registry/prediction_model_adapter/tests.rs",
-        "crates/application/src/use_cases/analytics/parameter_lifecycle/run_parameter_shadow_validation/mod.rs",
+        "crates/application/src/use_cases/analytics/parameter_lifecycle/validation.rs",
         "crates/application/src/use_cases/prediction/readiness/workflow.rs",
         "crates/application/src/use_cases/prediction/route_model_request/request.rs",
         "crates/application/src/use_cases/prediction/tests.rs",
@@ -14189,7 +14189,7 @@
         "crates/domain/tests/serde_contracts/module_paths.rs"
       ],
       "externalCallers": [
-        "crates/application/src/use_cases/analytics/parameter_lifecycle/run_parameter_shadow_validation/mod.rs",
+        "crates/application/src/use_cases/analytics/parameter_lifecycle/validation.rs",
         "crates/application/src/use_cases/prediction/route_model_request/request.rs",
         "crates/model-api/src/lib.rs",
         "crates/model-stub/src/lib.rs",
@@ -16564,10 +16564,10 @@
         "crates/domain/tests/serde_contracts/r2_07_module_paths.rs"
       ],
       "externalCallers": [
-        "crates/persistence-postgres/src/parameter_lifecycle.rs"
+        "crates/persistence-postgres/src/parameter_lifecycle/artifacts.rs"
       ],
       "databaseMappings": [
-        "crates/persistence-postgres/src/parameter_lifecycle.rs"
+        "crates/persistence-postgres/src/parameter_lifecycle/artifacts.rs"
       ]
     },
     {
@@ -16670,10 +16670,10 @@
         "crates/domain/tests/serde_contracts/r2_07_module_paths.rs"
       ],
       "externalCallers": [
-        "crates/persistence-postgres/src/parameter_lifecycle.rs"
+        "crates/persistence-postgres/src/parameter_lifecycle/readiness.rs"
       ],
       "databaseMappings": [
-        "crates/persistence-postgres/src/parameter_lifecycle.rs"
+        "crates/persistence-postgres/src/parameter_lifecycle/readiness.rs"
       ]
     },
     {
@@ -16787,12 +16787,13 @@
         "crates/application/src/ports/analytics/mod.rs",
         "crates/application/src/services/analytics/facade.rs",
         "crates/application/src/services/analytics/service.rs",
-        "crates/application/src/use_cases/analytics/parameter_lifecycle/parameter_lifecycle_readiness/mod.rs",
-        "crates/persistence-postgres/src/parameter_lifecycle.rs",
+        "crates/application/src/use_cases/analytics/parameter_lifecycle/readiness.rs",
+        "crates/application/src/use_cases/analytics/parameter_lifecycle/tests.rs",
+        "crates/persistence-postgres/src/parameter_lifecycle/readiness.rs",
         "src-tauri/src/commands/analytics.rs"
       ],
       "databaseMappings": [
-        "crates/persistence-postgres/src/parameter_lifecycle.rs"
+        "crates/persistence-postgres/src/parameter_lifecycle/readiness.rs"
       ]
     },
     {
@@ -16854,14 +16855,15 @@
         "crates/application/src/ports/analytics/mod.rs",
         "crates/application/src/services/analytics/facade.rs",
         "crates/application/src/services/analytics/service.rs",
-        "crates/application/src/use_cases/analytics/parameter_lifecycle/parameter_lifecycle_readiness/mod.rs",
-        "crates/application/src/use_cases/analytics/parameter_lifecycle/promote_parameter_candidate/mod.rs",
-        "crates/application/src/use_cases/analytics/parameter_lifecycle/run_parameter_shadow_validation/mod.rs",
-        "crates/persistence-postgres/src/parameter_lifecycle.rs",
+        "crates/application/src/use_cases/analytics/parameter_lifecycle/bindings.rs",
+        "crates/application/src/use_cases/analytics/parameter_lifecycle/readiness.rs",
+        "crates/application/src/use_cases/analytics/parameter_lifecycle/tests.rs",
+        "crates/application/src/use_cases/analytics/parameter_lifecycle/validation.rs",
+        "crates/persistence-postgres/src/parameter_lifecycle/readiness.rs",
         "src-tauri/src/commands/analytics.rs"
       ],
       "databaseMappings": [
-        "crates/persistence-postgres/src/parameter_lifecycle.rs"
+        "crates/persistence-postgres/src/parameter_lifecycle/readiness.rs"
       ]
     },
     {
@@ -16939,14 +16941,17 @@
         "crates/application/src/ports/analytics/mod.rs",
         "crates/application/src/services/analytics/facade.rs",
         "crates/application/src/services/analytics/service.rs",
-        "crates/application/src/use_cases/analytics/parameter_lifecycle/list_parameter_promotion_decisions/mod.rs",
-        "crates/application/src/use_cases/analytics/parameter_lifecycle/promote_parameter_candidate/mod.rs",
-        "crates/application/src/use_cases/analytics/parameter_lifecycle/rollback_parameter_candidate/mod.rs",
-        "crates/persistence-postgres/src/parameter_lifecycle.rs",
+        "crates/application/src/use_cases/analytics/parameter_lifecycle/bindings.rs",
+        "crates/application/src/use_cases/analytics/parameter_lifecycle/tests.rs",
+        "crates/persistence-postgres/src/parameter_lifecycle/bindings.rs",
+        "crates/persistence-postgres/src/parameter_lifecycle/decisions.rs",
+        "crates/persistence-postgres/src/parameter_lifecycle/mapping.rs",
         "src-tauri/src/commands/analytics.rs"
       ],
       "databaseMappings": [
-        "crates/persistence-postgres/src/parameter_lifecycle.rs"
+        "crates/persistence-postgres/src/parameter_lifecycle/bindings.rs",
+        "crates/persistence-postgres/src/parameter_lifecycle/decisions.rs",
+        "crates/persistence-postgres/src/parameter_lifecycle/mapping.rs"
       ]
     },
     {
@@ -17006,12 +17011,13 @@
         "crates/application/src/ports/analytics/mod.rs",
         "crates/application/src/services/analytics/facade.rs",
         "crates/application/src/services/analytics/service.rs",
-        "crates/application/src/use_cases/analytics/parameter_lifecycle/promote_parameter_candidate/mod.rs",
-        "crates/persistence-postgres/src/parameter_lifecycle.rs",
+        "crates/application/src/use_cases/analytics/parameter_lifecycle/bindings.rs",
+        "crates/application/src/use_cases/analytics/parameter_lifecycle/tests.rs",
+        "crates/persistence-postgres/src/parameter_lifecycle/bindings.rs",
         "src-tauri/src/commands/analytics.rs"
       ],
       "databaseMappings": [
-        "crates/persistence-postgres/src/parameter_lifecycle.rs"
+        "crates/persistence-postgres/src/parameter_lifecycle/bindings.rs"
       ]
     },
     {
@@ -17144,10 +17150,13 @@
         "crates/application/src/composition/adapters/analytics.rs",
         "crates/application/src/ports/analytics/mod.rs",
         "crates/application/src/use_cases/analytics/parameter_lifecycle/metrics.rs",
-        "crates/persistence-postgres/src/parameter_lifecycle.rs"
+        "crates/application/src/use_cases/analytics/parameter_lifecycle/tests.rs",
+        "crates/persistence-postgres/src/parameter_lifecycle/mapping.rs",
+        "crates/persistence-postgres/src/parameter_lifecycle/replay.rs"
       ],
       "databaseMappings": [
-        "crates/persistence-postgres/src/parameter_lifecycle.rs"
+        "crates/persistence-postgres/src/parameter_lifecycle/mapping.rs",
+        "crates/persistence-postgres/src/parameter_lifecycle/replay.rs"
       ]
     },
     {
@@ -17207,12 +17216,13 @@
         "crates/application/src/ports/analytics/mod.rs",
         "crates/application/src/services/analytics/facade.rs",
         "crates/application/src/services/analytics/service.rs",
-        "crates/application/src/use_cases/analytics/parameter_lifecycle/rollback_parameter_candidate/mod.rs",
-        "crates/persistence-postgres/src/parameter_lifecycle.rs",
+        "crates/application/src/use_cases/analytics/parameter_lifecycle/bindings.rs",
+        "crates/application/src/use_cases/analytics/parameter_lifecycle/tests.rs",
+        "crates/persistence-postgres/src/parameter_lifecycle/bindings.rs",
         "src-tauri/src/commands/analytics.rs"
       ],
       "databaseMappings": [
-        "crates/persistence-postgres/src/parameter_lifecycle.rs"
+        "crates/persistence-postgres/src/parameter_lifecycle/bindings.rs"
       ]
     },
     {
@@ -17302,13 +17312,15 @@
         "crates/application/src/ports/analytics/mod.rs",
         "crates/application/src/services/analytics/facade.rs",
         "crates/application/src/services/analytics/service.rs",
-        "crates/application/src/use_cases/analytics/parameter_lifecycle/list_parameter_shadow_validations/mod.rs",
-        "crates/application/src/use_cases/analytics/parameter_lifecycle/run_parameter_shadow_validation/mod.rs",
-        "crates/persistence-postgres/src/parameter_lifecycle.rs",
+        "crates/application/src/use_cases/analytics/parameter_lifecycle/tests.rs",
+        "crates/application/src/use_cases/analytics/parameter_lifecycle/validation.rs",
+        "crates/persistence-postgres/src/parameter_lifecycle/mapping.rs",
+        "crates/persistence-postgres/src/parameter_lifecycle/shadow.rs",
         "src-tauri/src/commands/analytics.rs"
       ],
       "databaseMappings": [
-        "crates/persistence-postgres/src/parameter_lifecycle.rs"
+        "crates/persistence-postgres/src/parameter_lifecycle/mapping.rs",
+        "crates/persistence-postgres/src/parameter_lifecycle/shadow.rs"
       ]
     },
     {
@@ -17356,7 +17368,8 @@
       "externalCallers": [
         "crates/application/src/services/analytics/facade.rs",
         "crates/application/src/services/analytics/service.rs",
-        "crates/application/src/use_cases/analytics/parameter_lifecycle/run_parameter_shadow_validation/mod.rs",
+        "crates/application/src/use_cases/analytics/parameter_lifecycle/tests.rs",
+        "crates/application/src/use_cases/analytics/parameter_lifecycle/validation.rs",
         "src-tauri/src/commands/analytics.rs"
       ],
       "databaseMappings": []
@@ -17524,17 +17537,18 @@
         "crates/application/src/ports/analytics/mod.rs",
         "crates/application/src/services/analytics/facade.rs",
         "crates/application/src/services/analytics/service.rs",
-        "crates/application/src/use_cases/analytics/parameter_lifecycle/decide_parameter_tuning_candidate/mod.rs",
-        "crates/application/src/use_cases/analytics/parameter_lifecycle/generate_parameter_tuning_candidate/mod.rs",
-        "crates/application/src/use_cases/analytics/parameter_lifecycle/list_parameter_tuning_candidates/mod.rs",
+        "crates/application/src/use_cases/analytics/parameter_lifecycle/candidates.rs",
         "crates/application/src/use_cases/analytics/parameter_lifecycle/metrics.rs",
-        "crates/persistence-postgres/src/analytics.rs",
-        "crates/persistence-postgres/src/parameter_lifecycle.rs",
+        "crates/application/src/use_cases/analytics/parameter_lifecycle/tests.rs",
+        "crates/persistence-postgres/src/parameter_lifecycle/artifacts.rs",
+        "crates/persistence-postgres/src/parameter_lifecycle/candidates.rs",
+        "crates/persistence-postgres/src/parameter_lifecycle/mapping.rs",
         "src-tauri/src/commands/analytics.rs"
       ],
       "databaseMappings": [
-        "crates/persistence-postgres/src/analytics.rs",
-        "crates/persistence-postgres/src/parameter_lifecycle.rs"
+        "crates/persistence-postgres/src/parameter_lifecycle/artifacts.rs",
+        "crates/persistence-postgres/src/parameter_lifecycle/candidates.rs",
+        "crates/persistence-postgres/src/parameter_lifecycle/mapping.rs"
       ]
     },
     {
@@ -17590,10 +17604,13 @@
         "crates/domain/tests/serde_contracts/r2_07_module_paths.rs"
       ],
       "externalCallers": [
-        "crates/persistence-postgres/src/analytics.rs"
+        "crates/application/src/use_cases/analytics/parameter_lifecycle/tests.rs",
+        "crates/persistence-postgres/src/parameter_lifecycle/policy.rs",
+        "crates/persistence-postgres/src/parameter_lifecycle/tests.rs"
       ],
       "databaseMappings": [
-        "crates/persistence-postgres/src/analytics.rs"
+        "crates/persistence-postgres/src/parameter_lifecycle/policy.rs",
+        "crates/persistence-postgres/src/parameter_lifecycle/tests.rs"
       ]
     },
     {
@@ -17653,12 +17670,13 @@
         "crates/application/src/ports/analytics/mod.rs",
         "crates/application/src/services/analytics/facade.rs",
         "crates/application/src/services/analytics/service.rs",
-        "crates/application/src/use_cases/analytics/parameter_lifecycle/decide_parameter_tuning_candidate/mod.rs",
-        "crates/persistence-postgres/src/analytics.rs",
+        "crates/application/src/use_cases/analytics/parameter_lifecycle/candidates.rs",
+        "crates/application/src/use_cases/analytics/parameter_lifecycle/tests.rs",
+        "crates/persistence-postgres/src/parameter_lifecycle/candidates.rs",
         "src-tauri/src/commands/analytics.rs"
       ],
       "databaseMappings": [
-        "crates/persistence-postgres/src/analytics.rs"
+        "crates/persistence-postgres/src/parameter_lifecycle/candidates.rs"
       ]
     },
     {
@@ -17730,7 +17748,8 @@
       "externalCallers": [
         "crates/application/src/services/analytics/facade.rs",
         "crates/application/src/services/analytics/service.rs",
-        "crates/application/src/use_cases/analytics/parameter_lifecycle/generate_parameter_tuning_candidate/mod.rs",
+        "crates/application/src/use_cases/analytics/parameter_lifecycle/candidates.rs",
+        "crates/application/src/use_cases/analytics/parameter_lifecycle/tests.rs",
         "src-tauri/src/commands/analytics.rs"
       ],
       "databaseMappings": []

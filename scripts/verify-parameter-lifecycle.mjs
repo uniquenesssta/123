@@ -11,9 +11,9 @@ const schema = JSON.parse(read("schemas/parameter-lifecycle-contract.schema.json
 const migration = read(contract.migration);
 const application = [
   read("crates/application/src/services/analytics/facade.rs"),
-  read("crates/application/src/use_cases/analytics/parameter_lifecycle/run_parameter_shadow_validation/mod.rs"),
+  read("crates/application/src/use_cases/analytics/parameter_lifecycle/validation.rs"),
 ].join("\n");
-const persistence = read("crates/persistence-postgres/src/parameter_lifecycle.rs");
+const persistence = ["readiness", "candidates", "artifacts", "replay", "shadow", "bindings", "decisions", "mapping", "policy"].map((owner) => read(`crates/persistence-postgres/src/parameter_lifecycle/${owner}.rs`)).join("\n");
 const commands = read("src-tauri/src/commands/analytics.rs");
 const registry = read("src-tauri/src/bootstrap/command_registry.rs");
 const client = read("src/api/client.ts");

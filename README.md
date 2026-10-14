@@ -795,3 +795,9 @@ R10-11 Analysis Package已实施 `VERIFYING`，基线5a19c71，继续唯一R10�
 证据artifact11828902351，14,051,522字节，SHA-256 `bf5b6c6f869263510a06e462570b02fef9265c3a4b6aeb664f1f164ac96d7eea`。11自身完整SUCCESS后DONE；用户2026-10-14“收尾11开始12”授权12 Parameter Lifecycle READY，继续唯一rewrite/r10-review-analytics-release-backend，13BLOCKED、R10IN_PROGRESS。本次仅五既有文档[skip ci]收尾，源码同已验9d3727c；12须自身精确完整Windows，无阶段完成记录。此前11VERIFYING/预期计数为实施历史。
 
 真实PG/历史保护四项/不可变账本/并发回滚/有效XLSX/WindowsFull/私有P4P7固定回归及继承model.runs/0041删除风险继续最终封包新库待验；ignored/公开stub/static指纹不计这些真实PASS。
+
+### R10-12 参数生命周期（2026-10-14，VERIFYING）
+
+R10-12 Parameter Lifecycle已实施 `VERIFYING`，基线6da5057，同一R10分支。App九入口按候选/就绪/影子验证/人工绑定四职责编组；PG同名模块升级为职责目录，22原函数迁入，root analytics保留九原函数。指标公式/排序/阈值/哈希、公开提供器拒绝、H精确分区、不可覆盖报告、人工状态门禁/锁/CAS/两绑定事务及提交后回读保持。新增15App/6PG unit待自身Windows，预期215/255、Gateway112unit+41contract；82源码、完整架构、19Rustfmt、19等价及20负向通过。01～11DONE、12VERIFYING、13BLOCKED、R10IN_PROGRESS。真实PG/历史四项/账本并发回滚/有效XLSX/WindowsFull/私有P4P7固定回归及继承model.runs/0041删除风险继续最终新库待验。
+
+17A/12M/10D、实际职责/保护与验证见[12记录](docs/modular-rewrite/R10-review-analytics-release-backend/R10-12-parameter-lifecycle.md)和[R10索引](docs/modular-rewrite/R10-review-analytics-release-backend/README.md)。

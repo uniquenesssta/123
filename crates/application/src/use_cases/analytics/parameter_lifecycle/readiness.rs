@@ -1,7 +1,7 @@
 use crate::{ports::analytics::ParameterLifecyclePort, ApplicationError, ApplicationResult};
 use football_domain::{ParameterLifecycleReadiness, ParameterLifecycleReadinessRequest};
 
-pub(crate) async fn execute<P>(
+pub(crate) async fn parameter_lifecycle_readiness<P>(
     port: &P,
     request: ParameterLifecycleReadinessRequest,
 ) -> ApplicationResult<ParameterLifecycleReadiness>

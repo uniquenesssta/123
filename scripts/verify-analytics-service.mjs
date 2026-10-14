@@ -20,15 +20,10 @@ const publicUseCaseFiles = [
   `${useCaseRoot}/ai_package/exports.rs`,
   `${useCaseRoot}/ai_package/response.rs`,
   `${useCaseRoot}/ai_package/suggestions.rs`,
-  `${useCaseRoot}/parameter_lifecycle/generate_parameter_tuning_candidate/mod.rs`,
-  `${useCaseRoot}/parameter_lifecycle/list_parameter_tuning_candidates/mod.rs`,
-  `${useCaseRoot}/parameter_lifecycle/decide_parameter_tuning_candidate/mod.rs`,
-  `${useCaseRoot}/parameter_lifecycle/parameter_lifecycle_readiness/mod.rs`,
-  `${useCaseRoot}/parameter_lifecycle/run_parameter_shadow_validation/mod.rs`,
-  `${useCaseRoot}/parameter_lifecycle/list_parameter_shadow_validations/mod.rs`,
-  `${useCaseRoot}/parameter_lifecycle/promote_parameter_candidate/mod.rs`,
-  `${useCaseRoot}/parameter_lifecycle/rollback_parameter_candidate/mod.rs`,
-  `${useCaseRoot}/parameter_lifecycle/list_parameter_promotion_decisions/mod.rs`,
+  `${useCaseRoot}/parameter_lifecycle/candidates.rs`,
+  `${useCaseRoot}/parameter_lifecycle/readiness.rs`,
+  `${useCaseRoot}/parameter_lifecycle/validation.rs`,
+  `${useCaseRoot}/parameter_lifecycle/bindings.rs`,
 ];
 const requiredFiles = [
   `${serviceRoot}/mod.rs`,
@@ -47,6 +42,8 @@ const requiredFiles = [
   ...["mod.rs", "data.rs", "decisions.rs", "exports.rs", "imports.rs", "mapping.rs", "policy.rs", "suggestions.rs", "tests.rs"].map((file) => `crates/persistence-postgres/src/adapters/analytics/analysis_package/${file}`),
   `${useCaseRoot}/parameter_lifecycle/mod.rs`,
   `${useCaseRoot}/parameter_lifecycle/metrics.rs`,
+  `${useCaseRoot}/parameter_lifecycle/tests.rs`,
+  ...["mod.rs", "readiness.rs", "candidates.rs", "artifacts.rs", "replay.rs", "shadow.rs", "bindings.rs", "decisions.rs", "mapping.rs", "policy.rs", "tests.rs"].map((file) => `crates/persistence-postgres/src/parameter_lifecycle/${file}`),
   ...publicUseCaseFiles,
   "crates/application/src/ports/analytics/mod.rs",
   "crates/application/src/ports/analytics/contracts.rs",
@@ -64,10 +61,8 @@ for (const file of [
   ...["enqueue_analysis_job", "list_background_jobs", "cancel_background_job", "retry_background_job"].map((entry) => `${useCaseRoot}/jobs/${entry}/mod.rs`),
   `${useCaseRoot}/ai_package.rs`,
   ...["export_ai_analysis_response_template", "export_ai_analysis_package", "preview_ai_analysis_response", "import_ai_analysis_response", "list_ai_analysis_suggestions", "decide_ai_analysis_suggestion"].map((entry) => `${useCaseRoot}/ai_package/${entry}/mod.rs`),
-  `${useCaseRoot}/parameter_lifecycle/candidates.rs`,
-  `${useCaseRoot}/parameter_lifecycle/readiness.rs`,
-  `${useCaseRoot}/parameter_lifecycle/promotion.rs`,
-  `${useCaseRoot}/parameter_lifecycle/shadow.rs`,
+  ...["generate_parameter_tuning_candidate", "list_parameter_tuning_candidates", "decide_parameter_tuning_candidate", "parameter_lifecycle_readiness", "run_parameter_shadow_validation", "list_parameter_shadow_validations", "promote_parameter_candidate", "rollback_parameter_candidate", "list_parameter_promotion_decisions"].map((entry) => `${useCaseRoot}/parameter_lifecycle/${entry}/mod.rs`),
+  "crates/persistence-postgres/src/parameter_lifecycle.rs",
 ]) {
   check(!exists(file), `Analytics 聚合 Use Case owner 未退出：${file}`);
 }
@@ -88,7 +83,7 @@ const execution = read(`${useCaseRoot}/jobs/execution.rs`);
 const jobCommands = read(`${useCaseRoot}/jobs/commands.rs`);
 const jobRequest = read(`${useCaseRoot}/jobs/request.rs`);
 const parameterMetrics = read(`${useCaseRoot}/parameter_lifecycle/metrics.rs`);
-const parameterShadow = read(`${useCaseRoot}/parameter_lifecycle/run_parameter_shadow_validation/mod.rs`);
+const parameterShadow = read(`${useCaseRoot}/parameter_lifecycle/validation.rs`);
 const packageDefinition = JSON.parse(read("package.json"));
 const frontendVerifier = read("scripts/verify-frontend.mjs");
 
@@ -131,7 +126,7 @@ check(coordinator.includes("claim_next_by_types") && execution.includes("Analyti
 check(service.includes("start_job_worker") && service.includes("analytics::jobs::worker::spawn"), "AnalyticsService 未暴露后台 worker 启动边界");
 check(parameterMetrics.includes("expected_calibration_error") && parameterMetrics.includes("lifecycle_metrics"), "Parameter Lifecycle 指标计算未独立拆分");
 check(parameterShadow.includes("binding_unchanged") && parameterShadow.includes("finite_probabilities"), "Parameter shadow 安全门禁缺失");
-check(publicUseCaseFiles.length === 15, `Analytics 公共入口应归属15个实际职责源（Jobs四入口及资料包六入口按职责编组），实际 ${publicUseCaseFiles.length}`);
+check(publicUseCaseFiles.length === 10, `Analytics 公共入口应归属10个实际职责源（队列、资料包及参数生命周期按职责编组），实际 ${publicUseCaseFiles.length}`);
 
 
 const calculationRoot = `${useCaseRoot}/calculation`;
@@ -385,6 +380,55 @@ const walk = (relativeDir) => {
 };
 for (const dir of executableRoots) walk(dir);
 check(staleReferences.length === 0, `仍有可执行链引用旧 Analytics owner：${staleReferences.join(", ")}`);
+
+
+const parameterRoot = `${useCaseRoot}/parameter_lifecycle`;
+const pgParameterRoot = "crates/persistence-postgres/src/parameter_lifecycle";
+const parameterCandidates = read(`${parameterRoot}/candidates.rs`);
+const parameterReadiness = read(`${parameterRoot}/readiness.rs`);
+const parameterBindings = read(`${parameterRoot}/bindings.rs`);
+const pgParameterCandidates = read(`${pgParameterRoot}/candidates.rs`);
+const pgParameterReadiness = read(`${pgParameterRoot}/readiness.rs`);
+const pgParameterArtifacts = read(`${pgParameterRoot}/artifacts.rs`);
+const pgParameterReplay = read(`${pgParameterRoot}/replay.rs`);
+const pgParameterShadow = read(`${pgParameterRoot}/shadow.rs`);
+const pgParameterBindings = read(`${pgParameterRoot}/bindings.rs`);
+const pgParameterDecisions = read(`${pgParameterRoot}/decisions.rs`);
+const pgParameterPolicy = read(`${pgParameterRoot}/policy.rs`);
+const pgParameterMapping = read(`${pgParameterRoot}/mapping.rs`);
+for (const file of [`${parameterRoot}/mod.rs`, `${pgParameterRoot}/mod.rs`]) {
+  check(!/\bfn\b|\bimpl\b|\blet\b/.test(read(file)), `参数生命周期出口承载业务：${file}`);
+  check(read(file).includes("#[cfg(test)]\nmod tests;"), `参数生命周期未登记原单测：${file}`);
+}
+const parameterEntries = ["generate_parameter_tuning_candidate", "list_parameter_tuning_candidates", "decide_parameter_tuning_candidate", "parameter_lifecycle_readiness", "run_parameter_shadow_validation", "list_parameter_shadow_validations", "promote_parameter_candidate", "rollback_parameter_candidate", "list_parameter_promotion_decisions"];
+const parameterApp = [parameterCandidates, parameterReadiness, parameterShadow, parameterBindings].join("\n");
+for (const entry of parameterEntries) {
+  check(occurrences(parameterApp, `fn ${entry}`) === 1 && service.includes(`parameter_lifecycle::${entry}(`) && !service.includes(`parameter_lifecycle::${entry}::execute`), `参数实际入口或唯一 owner 未切换：${entry}`);
+}
+for (const entry of ["save_parameter_tuning_candidate", "list_parameter_tuning_candidates", "decide_parameter_tuning_candidate", "read_parameter_tuning_candidate", "parameter_tuning_candidate_from_row"]) {
+  check(!new RegExp(String.raw`\bfn\s+${entry}\b`).test(pgLegacy), `PG analytics 仍承载参数职责：${entry}`);
+}
+check(read("crates/persistence-postgres/src/lib.rs").includes("mod parameter_lifecycle;") && read("architecture/module-boundaries.json").includes(`${pgParameterRoot}/mod.rs`), "参数目录未保持原根模块登记与直接 owner");
+check(parameterCandidates.includes("公开仓库未捆绑模型提供器，不能生成提供器私有参数候选") && !parameterCandidates.includes("save_tuning_candidate"), "公开生成不得替换为自动参数生成");
+check(compact(parameterReadiness).includes('matches!(snapshot_type,"T-N"|"T-24h"|"T-6h"|"T-1h")') && parameterReadiness.includes("request.minimum_sample_size < 20"), "原就绪 horizon 或最小样本规则改变");
+const shadowOrder = ["port.read_tuning_candidate(request.candidate_id).await?", "candidate.status.as_str()", "required_candidate_uuid(candidate.competition_id", "port.readiness(&readiness_request).await?", "if !readiness.ready_for_shadow_validation", "return Ok(port.save_shadow_validation(&record).await?)", ".load_replay_fixtures(", "fixtures.sort_by_key(|item| (item.kickoff_time, item.run_id))", "validate_baseline_probabilities(&fixtures)?", "fixtures.len() < minimum_sample_size(&candidate)", "lifecycle_split(&fixtures)?", ".read_parameter_set_definition(candidate_parameter_set_id)", ".validate_parameters(candidate_parameters.as_value())", "for fixture in holdout", "let binding_unchanged", "validation_key(&candidate, holdout, \"holdout\")", "Ok(port.save_shadow_validation(&record).await?)"];
+let shadowPosition = -1;
+for (const token of shadowOrder) { const next = parameterShadow.indexOf(token, shadowPosition + 1); check(next > shadowPosition, `原影子验证调用/错误顺序改变：${token}`); shadowPosition = next; }
+check(parameterShadow.includes('"automatic_promotion": false') && parameterShadow.includes('"provider_state": "NOT_BUNDLED"') && !parameterShadow.includes("port.promote("), "影子验证不得自动修改正式绑定");
+check(parameterBindings.indexOf("request.decision_note.trim().len() < 8") < parameterBindings.indexOf("port.read_tuning_candidate") && parameterBindings.includes("readiness.active_model_version_id != candidate.baseline_model_version_id") && parameterBindings.includes("readiness.active_parameter_set_id != candidate.baseline_parameter_set_id"), "人工晋升原说明/基线门禁改变");
+check(occurrences(parameterBindings, "request.decision_note.trim().len() < 8") === 2 && occurrences(parameterBindings, "port.promote(&request).await?") === 1 && occurrences(parameterBindings, "port.rollback(&request).await?") === 1, "人工晋升/回滚请求不能新增透传重试或自动操作");
+check(pgParameterReadiness.includes("contract_key = 'p4-postmatch-settlement'") && pgParameterReadiness.includes("stage = 'H'") && pgParameterReadiness.includes("status = 'locked'") && pgParameterReadiness.includes("settlement.horizon = $3") && pgParameterReadiness.includes("sample.parameter_set_id = settlement.parameter_set_id"), "原H与精确样本分区核验缺失");
+check(pgParameterReplay.includes("SELECT DISTINCT ON (run.id)") && pgParameterReplay.includes("run.parameter_set_id = settlement.parameter_set_id") && pgParameterReplay.includes("review.prediction_evaluation->>'available'"), "原回放事实与参数身份过滤缺失");
+check(pgParameterCandidates.includes("limit.clamp(1, 500)") && pgParameterCandidates.includes("WHERE id=$1 AND status='pending'") && pgParameterCandidates.includes("let status = tuning_decision_status(draft.decision);"), "参数候选原读取或显式人工审核改变");
+check(compact(pgParameterPolicy).includes('ParameterTuningDecision::AcceptForBacktest=>"accepted_for_backtest"') && compact(pgParameterPolicy).includes('ParameterTuningDecision::Reject=>"rejected"') && compact(pgParameterPolicy).includes('"passed"=>"shadow_passed"') && compact(pgParameterPolicy).includes('"failed"=>"shadow_failed"') && compact(pgParameterPolicy).includes('_=>"blocked_by_h"'), "参数原状态转换规则改变");
+check(pgParameterPolicy.includes('if status != "shadow_passed"') && pgParameterPolicy.includes('if status != "promoted"') && pgParameterPolicy.includes("u64::try_from(value)"), "参数人工门禁或负数拒绝规则改变");
+check(pgParameterMapping.includes('u64::try_from(sample_size)') && pgParameterMapping.includes('row.try_get("sample_count")?'), "参数样本映射不得默默夹紧或丢弃错误");
+check(occurrences(pgParameterArtifacts, "self.pool.begin().await?") === 1 && occurrences(pgParameterArtifacts, "tx.commit().await?") === 1 && pgParameterArtifacts.indexOf("INSERT INTO model.versions") >= 0 && pgParameterArtifacts.indexOf("INSERT INTO model.versions") < pgParameterArtifacts.indexOf("INSERT INTO model.parameter_sets") && pgParameterArtifacts.indexOf("INSERT INTO model.parameter_sets") < pgParameterArtifacts.indexOf("INSERT INTO analytics.parameter_tuning_candidates"), "候选制品原单事务或三表顺序改变");
+check(pgParameterShadow.includes("ON CONFLICT (candidate_id, validation_key) DO NOTHING") && occurrences(pgParameterShadow, "self.pool.begin().await?") === 1 && occurrences(pgParameterShadow, "tx.commit().await?") === 1 && pgParameterShadow.includes("let candidate_status = shadow_candidate_status(&record.status);"), "影子报告原幂等键/不可覆盖或事务改变");
+for (const token of ["ensure_promotable(&candidate.status)?", "ensure_rollback_allowed(&candidate.status)?", "FOR UPDATE OF binding", "AND model_version_id = $4", "AND parameter_set_id = $5", "WHERE id=$1 AND status='shadow_passed'", "WHERE id=$1 AND status='promoted'", "updated.rows_affected() != 1", "promoted.rows_affected() != 1", "rolled_back.rows_affected() != 1", "拒绝覆盖式晋升", "拒绝覆盖式回滚"]) check(pgParameterBindings.includes(token), `原人工绑定并发/状态/CAS保护缺失：${token}`);
+check(occurrences(pgParameterBindings, "self.pool.begin().await?") === 2 && occurrences(pgParameterBindings, "tx.commit().await?") === 2 && occurrences(pgParameterBindings, "write_audit_event(") === 2 && !/UPDATE\s+analytics\.parameter_(?:promotion_decisions|binding_changes)/i.test(pgParameterBindings), "晋升/回滚必须各保留原独立事务和不可变账本");
+check(pgParameterDecisions.includes("ORDER BY created_at DESC, id DESC") && pgParameterDecisions.includes("pub(super) async fn read_parameter_promotion_decision"), "原决策账本读取或跨兄弟可见性缺失");
+check(occurrences(read(`${parameterRoot}/tests.rs`), "#[tokio::test]") === 15 && occurrences(read(`${pgParameterRoot}/tests.rs`), "#[test]") === 6, "参数新增原单测边界缺失");
 
 check(
   packageDefinition.scripts?.["verify:analytics-service"] === "node scripts/verify-analytics-service.mjs",

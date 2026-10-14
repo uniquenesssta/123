@@ -15,7 +15,7 @@ use football_model_api::ModelRequest;
 use serde_json::json;
 use uuid::Uuid;
 
-pub(crate) async fn execute<P>(
+pub(crate) async fn run_parameter_shadow_validation<P>(
     port: &P,
     registry: &ModelRegistry,
     request: ParameterShadowValidationRequest,
@@ -229,4 +229,14 @@ where
         generated_at: chrono::Utc::now(),
     };
     Ok(port.save_shadow_validation(&record).await?)
+}
+
+pub(crate) async fn list_parameter_shadow_validations<P>(
+    port: &P,
+    candidate_id: Uuid,
+) -> ApplicationResult<Vec<ParameterShadowValidationRecord>>
+where
+    P: ParameterLifecyclePort + ?Sized,
+{
+    Ok(port.list_shadow_validations(candidate_id).await?)
 }

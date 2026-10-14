@@ -155,7 +155,7 @@ impl AnalyticsService {
         &self,
         draft: ParameterTuningDraft,
     ) -> ApplicationResult<ParameterTuningCandidateRecord> {
-        analytics::parameter_lifecycle::generate_parameter_tuning_candidate::execute(draft).await
+        analytics::parameter_lifecycle::generate_parameter_tuning_candidate(draft).await
     }
 
     pub(crate) async fn list_parameter_candidates<P>(
@@ -166,7 +166,7 @@ impl AnalyticsService {
     where
         P: ParameterLifecyclePort + ?Sized,
     {
-        analytics::parameter_lifecycle::list_parameter_tuning_candidates::execute(port, limit).await
+        analytics::parameter_lifecycle::list_parameter_tuning_candidates(port, limit).await
     }
 
     pub(crate) async fn decide_parameter_candidate<P>(
@@ -177,8 +177,7 @@ impl AnalyticsService {
     where
         P: ParameterLifecyclePort + ?Sized,
     {
-        analytics::parameter_lifecycle::decide_parameter_tuning_candidate::execute(port, draft)
-            .await
+        analytics::parameter_lifecycle::decide_parameter_tuning_candidate(port, draft).await
     }
 
     pub(crate) async fn parameter_readiness<P>(
@@ -189,7 +188,7 @@ impl AnalyticsService {
     where
         P: ParameterLifecyclePort + ?Sized,
     {
-        analytics::parameter_lifecycle::parameter_lifecycle_readiness::execute(port, request).await
+        analytics::parameter_lifecycle::parameter_lifecycle_readiness(port, request).await
     }
 
     pub(crate) async fn run_shadow_validation<P>(
@@ -201,10 +200,8 @@ impl AnalyticsService {
     where
         P: ParameterLifecyclePort + ?Sized,
     {
-        analytics::parameter_lifecycle::run_parameter_shadow_validation::execute(
-            port, registry, request,
-        )
-        .await
+        analytics::parameter_lifecycle::run_parameter_shadow_validation(port, registry, request)
+            .await
     }
 
     pub(crate) async fn list_shadow_validations<P>(
@@ -215,11 +212,7 @@ impl AnalyticsService {
     where
         P: ParameterLifecyclePort + ?Sized,
     {
-        analytics::parameter_lifecycle::list_parameter_shadow_validations::execute(
-            port,
-            candidate_id,
-        )
-        .await
+        analytics::parameter_lifecycle::list_parameter_shadow_validations(port, candidate_id).await
     }
 
     pub(crate) async fn promote_parameter<P>(
@@ -230,7 +223,7 @@ impl AnalyticsService {
     where
         P: ParameterLifecyclePort + ?Sized,
     {
-        analytics::parameter_lifecycle::promote_parameter_candidate::execute(port, request).await
+        analytics::parameter_lifecycle::promote_parameter_candidate(port, request).await
     }
 
     pub(crate) async fn rollback_parameter<P>(
@@ -241,7 +234,7 @@ impl AnalyticsService {
     where
         P: ParameterLifecyclePort + ?Sized,
     {
-        analytics::parameter_lifecycle::rollback_parameter_candidate::execute(port, request).await
+        analytics::parameter_lifecycle::rollback_parameter_candidate(port, request).await
     }
 
     pub(crate) async fn list_promotion_decisions<P>(
@@ -252,10 +245,6 @@ impl AnalyticsService {
     where
         P: ParameterLifecyclePort + ?Sized,
     {
-        analytics::parameter_lifecycle::list_parameter_promotion_decisions::execute(
-            port,
-            candidate_id,
-        )
-        .await
+        analytics::parameter_lifecycle::list_parameter_promotion_decisions(port, candidate_id).await
     }
 }
