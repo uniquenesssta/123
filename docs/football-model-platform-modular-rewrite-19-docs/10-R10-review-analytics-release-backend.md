@@ -1509,7 +1509,7 @@ crates/application/src/use_cases/analytics/jobs/
 
 ## R10-11 Analysis Package
 
-状态：`VERIFYING`（用户2026-10-13“收尾10开始11”授权；分析资料包/回包/人工建议边界已重写，84源码/完整架构/等价/负向通过，自身完整Windows待验，12～13BLOCKED）。详见[11实施记录](../modular-rewrite/R10-review-analytics-release-backend/R10-11-analysis-package.md)。
+状态：`DONE`（自身精确9d3727c / Windows run38423742534全SUCCESS；用户2026-10-14“收尾11开始12”授权12 READY）。详见[11完成记录](../modular-rewrite/R10-review-analytics-release-backend/R10-11-analysis-package.md)。
 
 ### 1. 目标
 
@@ -1645,7 +1645,7 @@ crates/application/src/use_cases/analytics/ai_package/
 
 ## R10-12 Parameter Lifecycle
 
-状态：`BLOCKED`（仅当上一任务与本任务前置门禁通过后改为 `READY`）
+状态：`READY`（11自身精确9d3727c完整Windows SUCCESS；用户2026-10-14“收尾11开始12”授权，同一R10分支，13BLOCKED）。
 
 ### 1. 目标
 
