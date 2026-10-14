@@ -827,3 +827,12 @@ R10-11 Analysis Package已实施 `VERIFYING`，基线5a19c71，继续唯一R10�
 R10-12 Parameter Lifecycle已实施 `VERIFYING`，基线6da5057，同一R10分支。App九入口按候选/就绪/影子验证/人工绑定四职责编组；PG同名模块升级为职责目录，22原函数迁入，root analytics保留九原函数。指标公式/排序/阈值/哈希、公开提供器拒绝、H精确分区、不可覆盖报告、人工状态门禁/锁/CAS/两绑定事务及提交后回读保持。新增15App/6PG unit待自身Windows，预期215/255、Gateway112unit+41contract；82源码、完整架构、19Rustfmt、19等价及20负向通过。01～11DONE、12VERIFYING、13BLOCKED、R10IN_PROGRESS。真实PG/历史四项/账本并发回滚/有效XLSX/WindowsFull/私有P4P7固定回归及继承model.runs/0041删除风险继续最终新库待验。
 
 21新增测试只随原Windows unit运行，82源码检查不含五浏览器入口及Windows进程测试。具体命令/19等价/20负向/真实待验与39路径见[12记录](modular-rewrite/R10-review-analytics-release-backend/R10-12-parameter-lifecycle.md)。job实际启动即停止CI查询，预计20～30分钟。
+
+
+## R10-12 精确 Windows 完成与13授权（2026-10-14）
+
+精确提交 `6c4243c1150ba0bbf2c0139429e52c3477df6d8a` / tree `8b3928901a0e495f211eb0b937322eb4b48541d2`，[Public Platform CI run38508581096](https://github.com/uniquenesssta/123/actions/runs/38508581096) / Windows job115671629414完整SUCCESS，2026-10-14 12:18:42北京时间完成。实际Application215/215、Persistence255/255、Gateway112/112 unit及41/41 contract；本项新增15App/6PG unit逐项通过。前端/contracts/TypeScript/Vite/17视口、Rust fmt/locked Clippy all-targets -D warnings/workspace、Windows release/MSI/NSIS/启动及日志均通过（7条记录、3个完成操作）。报告windows-acceptance-20261014-035521.json及同名.txt。
+
+证据artifact11869757552，14,050,358字节，SHA-256 `ae7631e1aafcfdfe6e230961c04709d0b8c205dc3e1b28213c7df67c5b4e5c1a`。12自身完整SUCCESS后DONE；用户2026-10-14“收尾12开始13”授权13 Release Acceptance READY，继续唯一rewrite/r10-review-analytics-release-backend，R10IN_PROGRESS。本次仅五既有文档[skip ci]收尾，源码同已验6c4243c；13须自身精确完整Windows，无阶段完成记录。此前12VERIFYING为实施历史。
+
+真实PG/历史保护四项/不可变账本/并发回滚/有效XLSX/WindowsFull/私有P4P7固定回归及继承model.runs/0041删除风险继续最终封包新库待验；ignored/公开stub/static指纹不是这些真实PASS。

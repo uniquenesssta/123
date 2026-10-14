@@ -1645,7 +1645,7 @@ crates/application/src/use_cases/analytics/ai_package/
 
 ## R10-12 Parameter Lifecycle
 
-状态：`VERIFYING`（11自身精确9d3727c完整Windows SUCCESS；用户2026-10-14“收尾11开始12”授权。参数生命周期职责已重写，静态/等价/负向通过，自身完整Windows待验，13BLOCKED）。详见[12实施记录](../modular-rewrite/R10-review-analytics-release-backend/R10-12-parameter-lifecycle.md)。
+状态：`DONE`（自身精确6c4243c / Windows run38508581096完整SUCCESS；用户2026-10-14“收尾12开始13”授权13 READY）。详见[12完成记录](../modular-rewrite/R10-review-analytics-release-backend/R10-12-parameter-lifecycle.md)。
 
 ### 1. 目标
 
@@ -1781,7 +1781,7 @@ crates/application/src/use_cases/analytics/parameter_lifecycle/
 
 ## R10-13 Release Acceptance
 
-状态：`BLOCKED`（仅当上一任务与本任务前置门禁通过后改为 `READY`）
+状态：`READY`（12自身精确6c4243c完整Windows SUCCESS；用户2026-10-14“收尾12开始13”授权，同一R10分支）。
 
 ### 1. 目标
 
