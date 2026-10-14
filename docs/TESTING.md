@@ -836,3 +836,9 @@ R10-12 Parameter Lifecycle已实施 `VERIFYING`，基线6da5057，同一R10分�
 证据artifact11869757552，14,050,358字节，SHA-256 `ae7631e1aafcfdfe6e230961c04709d0b8c205dc3e1b28213c7df67c5b4e5c1a`。12自身完整SUCCESS后DONE；用户2026-10-14“收尾12开始13”授权13 Release Acceptance READY，继续唯一rewrite/r10-review-analytics-release-backend，R10IN_PROGRESS。本次仅五既有文档[skip ci]收尾，源码同已验6c4243c；13须自身精确完整Windows，无阶段完成记录。此前12VERIFYING为实施历史。
 
 真实PG/历史保护四项/不可变账本/并发回滚/有效XLSX/WindowsFull/私有P4P7固定回归及继承model.runs/0041删除风险继续最终封包新库待验；ignored/公开stub/static指纹不是这些真实PASS。
+
+### R10-13 发布验收（2026-10-14，VERIFYING）
+
+R10-13 Release Acceptance已实施 `VERIFYING`，基线04b2b4c，继续同一R10分支。App编排和检查构造退出mod，两个原报告查询归并；PG同名模块升级为事实/不可变事务/读取映射职责目录。原检查、汇总、哈希、lazy会话、阻断报告写入、SQL/错误及全部保护资产保持。新增15App/4PG unit待自身Windows，预期230/259、Gateway112unit+41contract；82源码、完整架构、14Rustfmt、18等价、22负向通过。01～12DONE、13VERIFYING、R10IN_PROGRESS；真实PG/历史四项/账本并发回滚/有效XLSX/WindowsFull/私有P4P7固定回归与继承model.runs/0041删除风险继续最终新库待验。
+
+19新增测试只随原Windows unit执行，82源码不含Windows进程及五浏览器入口。详细命令/等价/负向/未实跑与27路径见[13记录](modular-rewrite/R10-review-analytics-release-backend/R10-13-release-acceptance.md)。Windows job实际启动即停止CI查询，预计20～30分钟；本项自身完成前无阶段完成记录。

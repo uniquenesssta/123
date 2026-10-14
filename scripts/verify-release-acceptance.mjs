@@ -13,7 +13,7 @@ const application = [
   read("crates/application/src/services/release/facade.rs"),
   read("crates/application/src/use_cases/release/run_acceptance/checks/chain.rs"),
 ].join("\n");
-const persistence = read("crates/persistence-postgres/src/release_acceptance.rs");
+const persistence = read("crates/persistence-postgres/src/release_acceptance/ledger.rs");
 const commands = read("src-tauri/src/commands/release_acceptance.rs");
 const registry = read("src-tauri/src/bootstrap/command_registry.rs");
 const client = read("src/api/client.ts");

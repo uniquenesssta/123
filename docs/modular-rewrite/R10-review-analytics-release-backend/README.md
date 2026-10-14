@@ -2,7 +2,7 @@
 
 ## 当前阶段状态
 
-`IN_PROGRESS`。用户2026-10-12“开始R10-01”授权；从R9文档收尾HEAD `48618fed2d7ff7c2a4db831a037f227dc789f278` 建立唯一阶段分支 `rewrite/r10-review-analytics-release-backend`。01自身精确Windows run38229119264/job114743919870全SUCCESS并DONE；02自身1ad6e68 / Windows run38245932270/job114799659672全SUCCESS并DONE；用户“收尾02开始03”授权03已实施；03自身99b15ad / Windows run38259438025/job114845878326全SUCCESS并DONE，04自身221d211 / Windows run38271387412/job114886215505全SUCCESS并DONE；05自身fe3529f / Windows run38277864089/job114907643831全SUCCESS并DONE；06自身1ed6dbe / Windows run38290328302/job114948593892全SUCCESS并DONE；07自身cdd2797 / Windows run38350692611/job115142166008全SUCCESS并DONE；08自身f834e31 / Windows run38357781835/job115164583225全SUCCESS并DONE；09自身fbfe83a / Windows run38398255939/job115298907093全SUCCESS并DONE；10自身3365b2b / Windows run38411713492/job115345476640全SUCCESS并DONE；11自身9d3727c / Windows run38423742534/job115387546853全SUCCESS并DONE；12自身6c4243c / Windows run38508581096/job115671629414全SUCCESS并DONE；用户2026-10-14“收尾12开始13”授权13 READY。
+`IN_PROGRESS`。用户2026-10-12“开始R10-01”授权；从R9文档收尾HEAD `48618fed2d7ff7c2a4db831a037f227dc789f278` 建立唯一阶段分支 `rewrite/r10-review-analytics-release-backend`。01自身精确Windows run38229119264/job114743919870全SUCCESS并DONE；02自身1ad6e68 / Windows run38245932270/job114799659672全SUCCESS并DONE；用户“收尾02开始03”授权03已实施；03自身99b15ad / Windows run38259438025/job114845878326全SUCCESS并DONE，04自身221d211 / Windows run38271387412/job114886215505全SUCCESS并DONE；05自身fe3529f / Windows run38277864089/job114907643831全SUCCESS并DONE；06自身1ed6dbe / Windows run38290328302/job114948593892全SUCCESS并DONE；07自身cdd2797 / Windows run38350692611/job115142166008全SUCCESS并DONE；08自身f834e31 / Windows run38357781835/job115164583225全SUCCESS并DONE；09自身fbfe83a / Windows run38398255939/job115298907093全SUCCESS并DONE；10自身3365b2b / Windows run38411713492/job115345476640全SUCCESS并DONE；11自身9d3727c / Windows run38423742534/job115387546853全SUCCESS并DONE；12自身6c4243c / Windows run38508581096/job115671629414全SUCCESS并DONE；用户2026-10-14“收尾12开始13”授权13已实施VERIFYING。
 
 ## 前置基线与依据
 
@@ -24,7 +24,7 @@
 | R10-10 | [Background Jobs](R10-10-background-jobs.md) | DONE · 自身精确Windows全SUCCESS |
 | R10-11 | [Analysis Package](R10-11-analysis-package.md) | DONE · 自身精确Windows全SUCCESS |
 | R10-12 | [Parameter Lifecycle](R10-12-parameter-lifecycle.md) | DONE · 自身精确Windows全SUCCESS |
-| R10-13 | Release Acceptance | READY · 用户授权，前置门禁通过 |
+| R10-13 | [Release Acceptance](R10-13-release-acceptance.md) | VERIFYING · 自身完整Windows待验 |
 
 ## R10-01 实际边界与验证
 
@@ -265,3 +265,9 @@ R10-12 Parameter Lifecycle已实施 `VERIFYING`，基线6da5057，同一R10分�
 证据artifact11869757552，14,050,358字节，SHA-256 `ae7631e1aafcfdfe6e230961c04709d0b8c205dc3e1b28213c7df67c5b4e5c1a`。12自身完整SUCCESS后DONE；用户2026-10-14“收尾12开始13”授权13 Release Acceptance READY，继续唯一rewrite/r10-review-analytics-release-backend，R10IN_PROGRESS。本次仅五既有文档[skip ci]收尾，源码同已验6c4243c；13须自身精确完整Windows，无阶段完成记录。此前12VERIFYING为实施历史。
 
 真实PG/历史保护四项/不可变账本/并发回滚/有效XLSX/WindowsFull/私有P4P7固定回归及继承model.runs/0041删除风险继续最终封包新库待验；ignored/公开stub/static指纹不是这些真实PASS。
+
+## R10-13 实际边界与继续位置
+
+R10-13 Release Acceptance已实施 `VERIFYING`，基线04b2b4c，继续同一R10分支。App编排和检查构造退出mod，两个原报告查询归并；PG同名模块升级为事实/不可变事务/读取映射职责目录。原检查、汇总、哈希、lazy会话、阻断报告写入、SQL/错误及全部保护资产保持。新增15App/4PG unit待自身Windows，预期230/259、Gateway112unit+41contract；82源码、完整架构、14Rustfmt、18等价、22负向通过。01～12DONE、13VERIFYING、R10IN_PROGRESS；真实PG/历史四项/账本并发回滚/有效XLSX/WindowsFull/私有P4P7固定回归与继承model.runs/0041删除风险继续最终新库待验。
+
+保留既有run_acceptance和PG根模块标识，检查/hash正文保持；冻结公开模型守卫不变，原敏感名单由既有Release门禁覆盖新owner。23字段/27路径/回退见[13记录](R10-13-release-acceptance.md)。先核对13自身精确完整Windows，失败同分支修复；阶段收尾/R11须后续用户授权及出口门禁，不提前创建阶段完成记录。

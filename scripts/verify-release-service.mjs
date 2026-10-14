@@ -37,14 +37,19 @@ for (const file of [
   `${useCaseRoot}/run_acceptance/checks/security.rs`,
   `${useCaseRoot}/run_acceptance/checks/cost.rs`,
   `${useCaseRoot}/run_acceptance/checks/release.rs`,
-  `${useCaseRoot}/list_runs/mod.rs`,
-  `${useCaseRoot}/read_run/mod.rs`,
+  `${useCaseRoot}/queries.rs`,
+  `${useCaseRoot}/run_acceptance/workflow.rs`,
+  `${useCaseRoot}/run_acceptance/checks/catalog.rs`,
+  `${useCaseRoot}/tests.rs`,
   adapter,
 ]) {
   check(fs.existsSync(path.join(root, file)), `缺少 Release 模块文件：${file}`);
 }
-for (const useCase of useCases) {
-  check(fs.existsSync(path.join(root, useCaseRoot, useCase, "mod.rs")), `Release Use Case 未独立成目录：${useCase}`);
+for (const file of ["mod.rs", "runtime.rs", "ledger.rs", "read.rs", "mapping.rs", "tests.rs"]) {
+  check(fs.existsSync(path.join(root, "crates/persistence-postgres/src/release_acceptance", file)), `缺少发布验收PG职责：${file}`);
+}
+for (const file of [`${useCaseRoot}/list_runs/mod.rs`, `${useCaseRoot}/read_run/mod.rs`, "crates/persistence-postgres/src/release_acceptance.rs"]) {
+  check(!fs.existsSync(path.join(root, file)), `旧发布验收职责未退出：${file}`);
 }
 
 const service = read(`${serviceRoot}/service.rs`);
@@ -96,8 +101,10 @@ for (const relativePath of [
   `${useCaseRoot}/run_acceptance/checks/security.rs`,
   `${useCaseRoot}/run_acceptance/checks/cost.rs`,
   `${useCaseRoot}/run_acceptance/checks/release.rs`,
-  `${useCaseRoot}/list_runs/mod.rs`,
-  `${useCaseRoot}/read_run/mod.rs`,
+  `${useCaseRoot}/queries.rs`,
+  `${useCaseRoot}/run_acceptance/workflow.rs`,
+  `${useCaseRoot}/run_acceptance/checks/catalog.rs`,
+  `${useCaseRoot}/tests.rs`,
 ]) {
   const text = read(relativePath);
   for (const token of banned) check(!text.includes(token), `${relativePath} 泄漏基础设施符号：${token}`);
@@ -176,6 +183,61 @@ for (const token of [
   '"cost"',
   '"checks"',
 ]) check(report.includes(token), `Release 报告哈希字段丢失：${token}`);
+
+
+const workflow = read(`${useCaseRoot}/run_acceptance/workflow.rs`);
+const queries = read(`${useCaseRoot}/queries.rs`);
+const catalog = read(`${useCaseRoot}/run_acceptance/checks/catalog.rs`);
+const pgRoot = "crates/persistence-postgres/src/release_acceptance";
+const runtime = read(`${pgRoot}/runtime.rs`);
+const ledger = read(`${pgRoot}/ledger.rs`);
+const pgRead = read(`${pgRoot}/read.rs`);
+const mapping = read(`${pgRoot}/mapping.rs`);
+const compact = (text) => text.replace(/\s+/g, "");
+const occurrences = (text, token) => text.split(token).length - 1;
+const sensitivePolicy = read("scripts/verify-public-model-boundary.mjs").match(/const sensitiveTokens = \[([\s\S]*?)\];/);
+check(Boolean(sensitivePolicy), "原冻结模型保护策略缺失");
+const sensitiveTokens = JSON.parse(`[${(sensitivePolicy?.[1] ?? "").replace(/,\s*$/, "")}]`);
+check(sensitiveTokens.every((token) => typeof token === "string"), "原模型敏感策略应为字符串名单");
+for (const owner of [workflow, queries, catalog]) {
+  for (const token of sensitiveTokens) check(!owner.toLowerCase().includes(token.toLowerCase()), `新发布实际owner出现原保护模型内容：${token}`);
+}
+for (const file of [`${useCaseRoot}/mod.rs`, `${useCaseRoot}/run_acceptance/mod.rs`, `${useCaseRoot}/run_acceptance/checks/mod.rs`, `${pgRoot}/mod.rs`]) {
+  check(!/\bfn\b|\bimpl\b|\blet\b/.test(read(file)), `发布验收目录出口承载业务：${file}`);
+}
+check(read(`${useCaseRoot}/mod.rs`).includes("#[cfg(test)]\nmod tests;") && read(`${pgRoot}/mod.rs`).includes("#[cfg(test)]\nmod tests;"), "发布验收未登记原单测目标");
+check(read(`${useCaseRoot}/run_acceptance/mod.rs`).includes("pub(crate) use workflow::run_release_acceptance;") && read(`${useCaseRoot}/run_acceptance/checks/mod.rs`).includes("pub(super) use catalog::{build, check};"), "发布验收目录未显式导出实际 owner");
+check(catalog.includes("pub(in crate::use_cases::release::run_acceptance) fn"), "目录内检查构造可见性不能扩大到公开服务");
+for (const [method,call,owner] of [
+  ["run_release_acceptance", "release::run_acceptance::run_release_acceptance(session, request)", workflow],
+  ["list_release_acceptance_runs", "release::list_release_acceptance_runs(session, limit)", queries],
+  ["read_release_acceptance_run", "release::read_release_acceptance_run(session, run_id)", queries],
+]) {
+  check(occurrences(owner, `fn ${method}`) === 1 && service.includes(call), `发布验收实际调用或唯一owner未切换：${method}`);
+}
+check(!service.includes("::execute("), "ReleaseService 仍经过旧execute入口");
+check(occurrences(workflow, "session.await?")===1 && occurrences(workflow, "port.persist_run(&run).await?")===1, "原发布会话获取和报告保存必须各一次");
+const order = ["validation::normalize_request(request)?", "Utc::now()", "Uuid::new_v4()", "session.await?", ".runtime_facts(request.performance_window_days, request.cost_window_days)", "checks::build(run_id, &runtime, &request)", "summary::build(&checks, &runtime, &request)", "let completed_at = Utc::now()", "report::hash(", "let run = ReleaseAcceptanceRun", "port.persist_run(&run).await?", "Ok(run)"];
+let previous = -1;
+for (const token of order) { const index = workflow.indexOf(token, previous+1); check(index > previous, `发布原校验/会话/生成/保存顺序改变：${token}`); previous=index; }
+check(!workflow.includes("port.read_run(") && !workflow.includes("if summary.overall_status"), "原发布执行不得新增回读或丢弃阻断报告");
+const checkOrder = ["chain::runtime_checks", "chain::fixture_checks", "performance::checks", "security::checks", "cost::checks", "release::checks", "checks.iter_mut().enumerate()", "i32::try_from(index + 1)"];
+previous=-1;for(const token of checkOrder){const index=catalog.indexOf(token);check(index>previous,`发布检查顺序/序号改变：${token}`);previous=index;}
+check(catalog.includes("id: Uuid::new_v4()") && catalog.includes("duration_ms: duration_ms.max(0)"), "检查身份或原非负耗时投影改变");
+check(queries.includes("Ok(session.await?.list_runs(limit).await?)") && queries.includes("Ok(session.await?.read_run(run_id).await?)") && !queries.includes("clamp(") && !queries.includes("report::hash"), "报告查询不得新增筛选/窗口校验/重算哈希");
+check(read("crates/persistence-postgres/src/lib.rs").includes("mod release_acceptance;") && read("architecture/module-boundaries.json").includes(`${pgRoot}/mod.rs`), "PG发布验收必须保持原根模块身份");
+const runtimeOrder = ["self.health().await?", "SELECT DISTINCT stage", "FROM pg_trigger", "let chain =", "let performance =", "let cost =", "Ok(ReleaseAcceptanceRuntimeFacts"];
+previous=-1;for(const token of runtimeOrder){const index=runtime.indexOf(token);check(index>previous,`原运行事实读取顺序改变：${token}`);previous=index;}
+check(runtime.includes("performance_window_days.clamp(1, 365)") && runtime.includes("cost_window_days.clamp(1, 365)") && runtime.includes("percentile_cont(0.95)") && runtime.includes("usage_day_utc = (SELECT MAX(usage_day_utc) FROM usage)"), "原窗口/耗时P95/最新用量日期规则改变");
+check(occurrences(ledger, "self.pool.begin().await?")===1 && occurrences(ledger,"tx.commit().await?")===1, "不可变报告与全部检查必须保持原单事务");
+const ledgerOrder = ["self.pool.begin().await?", "INSERT INTO platform.release_acceptance_runs", "for check in &run.checks", "insert_release_acceptance_check(&mut tx, check).await?", "write_audit_event(", "tx.commit().await?", "Ok(())"];
+previous=-1;for(const token of ledgerOrder){const index=ledger.indexOf(token,previous+1);check(index>previous,`原报告/check/审计/提交顺序改变：${token}`);previous=index;}
+check(ledger.includes("INSERT INTO platform.release_acceptance_checks") && ledger.includes('.bind(&run.report_sha256)') && ledger.includes('"acceptance_mode":"public_shell_and_runtime"') && ledger.includes('"provider_state":"NOT_BUNDLED"') && !/UPDATE\s+platform\.release_acceptance_|ON\s+CONFLICT/i.test(ledger), "报告写入不得变为覆盖/冲突成功，哈希与公开元数据必须保持");
+check(pgRead.includes("limit.clamp(1, 200)") && pgRead.includes("ORDER BY completed_at DESC, id DESC") && pgRead.includes("WHERE run_id=$1 ORDER BY sequence_no") && pgRead.includes("发布验收记录不存在"), "原报告列表/缺失/检查排序规则改变");
+check(pgRead.includes("run_from_row(&row, checks)") && occurrences(mapping,"report_count(row.try_get::<i32, _>")===6 && mapping.includes("u32::try_from(value).unwrap_or_default()"), "报告映射及六计数默认不能改变");
+for(const token of ['"pass" => Ok(ReleaseAcceptanceStatus::Pass)', '"warning" => Ok(ReleaseAcceptanceStatus::Warning)', '"blocked" => Ok(ReleaseAcceptanceStatus::Blocked)', '未知发布验收状态：{other}']) check(mapping.includes(token),`原状态解析/错误改变：${token}`);
+check(!mapping.includes("value.trim()"), "状态解析不得新增修剪");
+check(occurrences(read(`${useCaseRoot}/tests.rs`),"#[tokio::test]")===15 && occurrences(read(`${pgRoot}/tests.rs`),"#[test]")===4, "发布验收新增原单测边界缺失");
 
 for (const command of publicMethods) {
   check(commands.includes(`fn ${command}`), `Tauri Release 命令缺少：${command}`);

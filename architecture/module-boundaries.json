@@ -310,7 +310,7 @@
         "crates/persistence-postgres/src/player_catalog.rs",
         "crates/persistence-postgres/src/pool/mod.rs",
         "crates/persistence-postgres/src/postmatch.rs",
-        "crates/persistence-postgres/src/release_acceptance.rs",
+        "crates/persistence-postgres/src/release_acceptance/mod.rs",
         "crates/persistence-postgres/src/research_gateway_records.rs",
         "crates/persistence-postgres/src/review.rs",
         "crates/persistence-postgres/src/role_resolution.rs",

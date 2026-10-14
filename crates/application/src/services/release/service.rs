@@ -22,7 +22,7 @@ impl ReleaseService {
         P: ReleaseAcceptancePort,
         F: Future<Output = ApplicationResult<P>>,
     {
-        release::run_acceptance::execute(session, request).await
+        release::run_acceptance::run_release_acceptance(session, request).await
     }
 
     pub(crate) async fn list_runs<P, F>(
@@ -34,7 +34,7 @@ impl ReleaseService {
         P: ReleaseAcceptancePort,
         F: Future<Output = ApplicationResult<P>>,
     {
-        release::list_runs::execute(session, limit).await
+        release::list_release_acceptance_runs(session, limit).await
     }
 
     pub(crate) async fn read_run<P, F>(
@@ -46,6 +46,6 @@ impl ReleaseService {
         P: ReleaseAcceptancePort,
         F: Future<Output = ApplicationResult<P>>,
     {
-        release::read_run::execute(session, run_id).await
+        release::read_release_acceptance_run(session, run_id).await
     }
 }

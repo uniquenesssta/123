@@ -1781,7 +1781,7 @@ crates/application/src/use_cases/analytics/parameter_lifecycle/
 
 ## R10-13 Release Acceptance
 
-状态：`READY`（12自身精确6c4243c完整Windows SUCCESS；用户2026-10-14“收尾12开始13”授权，同一R10分支）。
+状态：`VERIFYING`（12自身精确6c4243c完整Windows SUCCESS；用户2026-10-14“收尾12开始13”授权。发布验收职责已重写，静态/等价/负向通过，自身完整Windows待验、R10IN_PROGRESS）。详见[13实施记录](../modular-rewrite/R10-review-analytics-release-backend/R10-13-release-acceptance.md)。
 
 ### 1. 目标
 
@@ -1796,8 +1796,10 @@ crates/application/src/use_cases/analytics/parameter_lifecycle/
 ### 3. 目标文件与目录
 
 ```text
-crates/application/src/use_cases/release/acceptance/
+crates/application/src/use_cases/release/run_acceptance/
 ```
+
+实际沿用既有 `run_acceptance` 目录与纯规则/hash文件，编排和检查构造移出mod；两个报告查询归release/queries.rs。PG同名根模块单文件升级为职责目录，保留原登记/API，不新建并行模块。
 
 ### 4. 文件职责边界
 
