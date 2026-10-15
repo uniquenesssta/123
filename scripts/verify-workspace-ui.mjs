@@ -26,7 +26,7 @@ const ai = text("src/pages/apiWorkspace.ts");
 const prediction = text("src/pages/prediction.ts");
 const release = text("src/pages/release.ts");
 const backend = text("src-tauri/src/workspace_state.rs");
-const commands = text("src-tauri/src/commands/workspace.rs");
+const commands = ["read_workspace_state", "save_workspace_state", "clear_workspace_state"].map(name => text(`src-tauri/src/commands/platform/${name}.rs`)).join("\n");
 const registry = text("src-tauri/src/bootstrap/command_registry.rs");
 const client = text("src/api/client.ts");
 const readme = readFileSync(join(root, "README.md"), "utf8");

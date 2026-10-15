@@ -4,15 +4,13 @@ mod catalog;
 mod competition;
 mod database;
 mod exchange;
-mod issues;
-mod logging;
 mod openai;
 mod orchestration;
+mod platform;
 mod postmatch;
 mod prediction;
 mod release_acceptance;
 mod review;
-mod workspace;
 
 pub use analytics::*;
 pub use api_workspace::*;
@@ -20,15 +18,15 @@ pub use catalog::*;
 pub use competition::*;
 pub use database::*;
 pub use exchange::*;
-pub use issues::*;
-pub use logging::*;
 pub use openai::*;
 pub use orchestration::*;
+pub use platform::*;
 pub use postmatch::*;
 pub use prediction::*;
 pub use release_acceptance::*;
 pub use review::*;
-pub use workspace::*;
+
+use platform::record_failed_background_jobs;
 
 pub(crate) use crate::bootstrap::AppState;
 use uuid::Uuid;

@@ -1,85 +1,8 @@
 use super::AppState;
 use crate::config::DesktopConfig;
-use crate::issue_log::IssueLogDraft;
-use football_application::BootstrapData;
 use football_persistence_postgres::{DatabaseHealth, DatabaseOptions};
-use serde::Serialize;
 use tauri::State;
 
-#[derive(Debug, Serialize)]
-pub struct BootstrapResponse {
-    pub data: BootstrapData,
-    pub connection_error: Option<String>,
-    pub config_path: String,
-    pub runtime_log_path: String,
-}
-
-async fn ensure_saved_connection(state: &AppState) -> Option<String> {
-    if state.service.is_database_connected().await {
-        return None;
-    }
-    let config = match DesktopConfig::load(&state.config_path) {
-        Ok(config) => config,
-        Err(error) => return Some(error),
-    };
-    let options = config.database?;
-    state
-        .service
-        .connect_database(options)
-        .await
-        .err()
-        .map(|error| error.to_string())
-}
-
-#[tauri::command]
-pub async fn bootstrap(state: State<'_, AppState>) -> Result<BootstrapResponse, String> {
-    let connection_error = ensure_saved_connection(&state).await;
-    if let Some(message) = connection_error.as_ref() {
-        let _ = state.issue_log.record(IssueLogDraft {
-            severity: "error".to_string(),
-            source: "startup".to_string(),
-            operation: "恢复数据库连接".to_string(),
-            user_message: "启动时未能恢复数据库连接".to_string(),
-            technical_message: message.clone(),
-            occurrence_key: None,
-        });
-        let _ = state.runtime_log.record(
-            "error",
-            "database",
-            "saved_connection_restore_failed",
-            None,
-            serde_json::json!({"error": message}),
-        );
-    }
-    let data = match state.service.bootstrap().await {
-        Ok(data) => data,
-        Err(error) => {
-            let message = error.to_string();
-            let _ = state.issue_log.record(IssueLogDraft {
-                severity: "critical".to_string(),
-                source: "startup".to_string(),
-                operation: "平台初始化".to_string(),
-                user_message: "平台初始化失败".to_string(),
-                technical_message: message.clone(),
-                occurrence_key: None,
-            });
-            let _ = state.runtime_log.record(
-                "critical",
-                "application",
-                "bootstrap_failed",
-                None,
-                serde_json::json!({"error": message}),
-            );
-            return Err(message);
-        }
-    };
-    Ok(BootstrapResponse {
-        data,
-        connection_error,
-        config_path: state.config_path.to_string_lossy().to_string(),
-        runtime_log_path: state.runtime_log.relative_display_path(),
-    })
-}
 #[tauri::command]
 pub async fn configure_database(
     state: State<'_, AppState>,

@@ -217,7 +217,7 @@ function verify(options) {
     }
     groupedCommands.push(...group.commands);
 
-    const definition = readText(
+    const definitionRoot = readText(
       options.root,
       group.definition_file,
       `命令组 ${group.module} definition_file`,
@@ -238,16 +238,27 @@ function verify(options) {
       `命令组 ${group.module} frontend_shared_dto_file`,
     );
 
-    const definitions = extractRustCommandDefinitions(definition.text);
+    const definitionFiles = group.command_definition_files;
+    if (definitionFiles) {
+      compareSets(`命令组 ${group.module} 定义归属`, group.commands, Object.keys(definitionFiles), failures);
+    }
+    const sources = definitionFiles
+      ? Object.entries(definitionFiles).map(([command, file]) => {
+        const source = readText(options.root, file, `${group.module}.${command} definition_file`);
+        compareSets(`命令文件 ${file}`, [command], extractRustCommandDefinitions(source.text), failures);
+        return source;
+      })
+      : [definitionRoot];
+    const definitions = sources.flatMap((source) => extractRustCommandDefinitions(source.text));
     const duplicateDefinitions = duplicateValues(definitions);
     if (duplicateDefinitions.length > 0) {
       failures.push(
-        `Rust 命令文件 ${definition.relative} 存在重复定义：${duplicateDefinitions.join(", ")}`,
+        `Rust 命令组 ${group.module} 存在重复定义：${duplicateDefinitions.join(", ")}`,
       );
     }
 
     compareSets(
-      `命令组 ${group.module}（${definition.relative}）`,
+      `命令组 ${group.module}（${definitionRoot.relative}）`,
       group.commands,
       definitions,
       failures,
@@ -257,16 +268,16 @@ function verify(options) {
       rustDefinitions.push(command);
       const owner = definitionOwners.get(command);
       if (owner) {
-        failures.push(`Rust 命令 ${command} 同时定义于 ${owner} 和 ${definition.relative}`);
+        failures.push(`Rust 命令 ${command} 同时定义于 ${owner} 和 ${definitionRoot.relative}`);
       } else {
-        definitionOwners.set(command, definition.relative);
+        definitionOwners.set(command, definitionFiles?.[command] ?? definitionRoot.relative);
       }
     }
   }
 
   const definitionMapInput = contract.command_groups
     .flatMap((group) =>
-      group.commands.map((command) => `${command}\0${normalizeRelativePath(group.definition_file)}\n`),
+      group.commands.map((command) => `${command}\0${normalizeRelativePath(group.command_definition_files?.[command] ?? group.definition_file)}\n`),
     )
     .sort()
     .join("");

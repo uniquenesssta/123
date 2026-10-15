@@ -11,7 +11,7 @@ const slice = (source, start, end) => { const a = source.indexOf(start); const b
 const contract = json("contracts/api-runtime-diagnostics-contract.json");
 const packageJson = json("package.json");
 const runtime = text("src-tauri/src/runtime_log.rs");
-const operationCommand = text("src-tauri/src/commands/logging.rs");
+const operationCommand = [text("src-tauri/src/commands/platform/runtime_operation/command.rs"), text("src-tauri/src/commands/platform/runtime_operation/validation.rs")].join("\n");
 const client = text("src/api/client.ts");
 const main = text("src/main.ts");
 const commands = text("src-tauri/src/commands/api_workspace.rs");

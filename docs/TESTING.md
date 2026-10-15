@@ -853,3 +853,12 @@ R10-13 Release Acceptance已实施 `VERIFYING`，基线04b2b4c，继续同一R10
 R10期初Application138/Persistence179，期末230/259，原unit累计净增92App/80PG；Gateway112unit/41contract保持，最后Windows包含全部已有与新增targets。各节点精确证据、失败修复、完整累计A/M/D、兼容和回退见[R10阶段完成记录](modular-rewrite/R10-review-analytics-release-backend/R10-stage-completion.md)。本次仅2A/6M文档，复核保护/171命令/DB静态、Release owner和运行诊断门禁、清单/链接/diff及源码冻结，不重复全量构建或非Windows动态。R10 DONE；R11仅01 READY、02～10 BLOCKED、未启动。
 
 真实PostgreSQL、历史保护四项、不可变账本/并发回滚、有效XLSX、Windows Full、私有P4/P7固定回归及继承的model.runs/0041删除风险继续最终封包新库待验；ignored、公开unavailable stub和静态指纹不计这些真实项目PASS。
+
+
+## R11-01 平台命令（2026-10-15，VERIFYING）
+
+9条平台命令迁移，原171命令与注册顺序保持，internal定义组15→13和逐命令真实路径同步。新增11个原Tauri unit：5保存配置恢复/回包、4运行日志phase/Unicode/serde边界、2失败任务筛选/attempt去重；2原日志unit迁移正文保持。预期Desktop38=27+11，App230/PG259/Gateway112unit+41contract保持，须本项精确完整Windows确认。
+
+82/82原只读源码、完整architecture、24Rustfmt1.88、33完整等价和16破坏拒绝/bytes恢复通过；保护18/171命令/46迁移18PG静态保持。命令、公开wire DTO、3后续DB命令与冻结源码等价边界、内部清单变化、真实A/M/D与回退见[01记录](modular-rewrite/R11-tauri-commands/R11-01-bootstrap-workspace-and-logs-commands.md)。未执行非Windows Cargo/Clippy/build/test/前端构建/浏览器/loopback；五原浏览器入口和Windows进程入口仍随原Windows全CI执行。job实际启动即停止查询，约20～30分钟；本项VERIFYING、02～10BLOCKED、R11IN_PROGRESS。
+
+真实PostgreSQL、历史保护四项、不可变账本/并发回滚、有效XLSX、Windows Full、私有P4/P7固定回归及继承model.runs/0041删除风险仍最终封包新库待验；ignored、公开unavailable stub和静态指纹不计这些真实PASS。

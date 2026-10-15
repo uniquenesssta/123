@@ -2,17 +2,17 @@
 
 ## 当前阶段状态
 
-`READY`（未启动）。用户2026-10-15只要求“收尾13”；R10全部13节点及Windows Automated阶段出口DONE，精确4ca43ad1c4757ace4c95e126bda34f470d3854ea / treea37d2b14c7748d92600d6d61bc846f87ac057fb9 / [Windows run38591308033](https://github.com/uniquenesssta/123/actions/runs/38591308033) / job115946614576完整SUCCESS。依据R10阶段出口设唯一R11-01 READY；未开始R11代码、节点实施记录或新分支。
+`IN_PROGRESS`。R11-01 Bootstrap、Workspace 与 Logs Commands已实施 `VERIFYING`。用户2026-10-15“开始R11-01”，uniquenesssta/123 v0.23.0，从R10文档收尾3d43e8ec216f55daa04d5b8afeec68e372ce467c建立唯一 `rewrite/r11-tauri-commands`。9条平台命令已切换唯一owner，公共171命令与注册顺序保持；自身完整Windows待验，02～10 BLOCKED，R11 IN_PROGRESS。
 
 ## 依据与前置基线
 
-[R11任务书](../../football-model-platform-modular-rewrite-19-docs/11-R11-tauri-commands.md)、[总纲执行订正](../../football-model-platform-modular-rewrite-19-docs/00-总体架构与前23节.md)、[R10完成记录](../R10-review-analytics-release-backend/R10-stage-completion.md)。当前仍在rewrite/r10-review-analytics-release-backend文档收尾，源码同上述Windows成功树。开始R11时先核实用户授权与收尾后HEAD，读取01任务及真实bootstrap/workspace/log命令、DTO/映射/状态和原测试，再建立唯一阶段分支。
+[R11任务书](../../football-model-platform-modular-rewrite-19-docs/11-R11-tauri-commands.md)、[总纲执行订正](../../football-model-platform-modular-rewrite-19-docs/00-总体架构与前23节.md)、[R10完成记录](../R10-review-analytics-release-backend/R10-stage-completion.md)。本阶段已从R10收尾3d43e8e建立唯一rewrite/r11-tauri-commands，01实施与验证详节点记录；后续02～10尚未授权/实施。
 
 ## 任务状态
 
 | 任务 | 职责 | 状态 |
 |---|---|---|
-| R11-01 | Bootstrap、Workspace 与 Logs Commands | READY · 未实施 |
+| R11-01 | [Bootstrap、Workspace 与 Logs Commands](R11-01-bootstrap-workspace-and-logs-commands.md) | VERIFYING · 自身完整Windows待验 |
 | R11-02 | Database Commands | BLOCKED |
 | R11-03 | Competitions 与 Rules Commands | BLOCKED |
 | R11-04 | Teams 与 Players Commands | BLOCKED |
@@ -28,3 +28,10 @@
 171命令名称/参数/返回DTO、错误码和trace、UI、43Ports/19Port源、模型/参数/Schema/迁移/依赖保护保持。命令层沿用Application唯一业务职责，不复制SQL/模型计算；目录以实际职责为准，已有正确DTO/mapper不机械复制。仅Windows动态验收，复用既有targets/workflow；纯文档不重复全构建，不新增持续回归或数据库专项设施。
 
 真实PostgreSQL、历史保护四项、不可变账本/并发回滚、有效XLSX、Windows Full、私有P4/P7固定回归及继承的model.runs/0041删除风险继续最终封包新库待验；ignored、公开unavailable stub和静态指纹不计这些真实项目PASS。
+
+
+## R11-01 实际边界与验证
+
+R11-01 Bootstrap、Workspace 与 Logs Commands已实施 `VERIFYING`。用户2026-10-15“开始R11-01”，uniquenesssta/123 v0.23.0，从R10文档收尾3d43e8ec216f55daa04d5b8afeec68e372ce467c建立唯一 `rewrite/r11-tauri-commands`。9条平台命令已切换唯一owner，公共171命令与注册顺序保持；自身完整Windows待验，02～10 BLOCKED，R11 IN_PROGRESS。 9条命令迁入platform，3旧owner删除；原bootstrap恢复/日志、wire DTO、文本校验、工作区Store、Failed任务/attempt去重保持，Analytics真实调用同步。新增11原Tauri unit待Windows，预期Desktop38/App230/PG259/Gateway112+41；82源码、完整architecture、24Rustfmt、33等价、16负向通过。真实清单/接口与内部清单变化/回退见[01记录](R11-01-bootstrap-workspace-and-logs-commands.md)。
+
+真实PostgreSQL、历史保护四项、不可变账本/并发回滚、有效XLSX、Windows Full、私有P4/P7固定回归及继承model.runs/0041删除风险仍最终封包新库待验；ignored、公开unavailable stub和静态指纹不计这些真实PASS。

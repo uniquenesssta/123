@@ -225,23 +225,39 @@
       "frontend_parameter_and_return_signature_file": "src/api/client.ts",
       "frontend_shared_dto_file": "src/types.ts",
       "commands": [
-        "bootstrap",
         "configure_database",
         "disconnect_database",
         "reset_database"
       ]
     },
     {
-      "module": "workspace",
-      "definition_file": "src-tauri/src/commands/workspace.rs",
-      "parameter_and_return_signature_file": "src-tauri/src/commands/workspace.rs",
+      "module": "platform",
+      "definition_file": "src-tauri/src/commands/platform/mod.rs",
+      "parameter_and_return_signature_file": "src-tauri/src/commands/platform/mod.rs",
       "frontend_parameter_and_return_signature_file": "src/api/client.ts",
       "frontend_shared_dto_file": "src/types.ts",
       "commands": [
+        "bootstrap",
         "read_workspace_state",
         "save_workspace_state",
-        "clear_workspace_state"
-      ]
+        "clear_workspace_state",
+        "record_issue",
+        "record_runtime_operation",
+        "list_issue_logs",
+        "clear_issue_logs",
+        "export_issue_logs"
+      ],
+      "command_definition_files": {
+        "bootstrap": "src-tauri/src/commands/platform/bootstrap/command.rs",
+        "read_workspace_state": "src-tauri/src/commands/platform/read_workspace_state.rs",
+        "save_workspace_state": "src-tauri/src/commands/platform/save_workspace_state.rs",
+        "clear_workspace_state": "src-tauri/src/commands/platform/clear_workspace_state.rs",
+        "record_issue": "src-tauri/src/commands/platform/record_issue.rs",
+        "record_runtime_operation": "src-tauri/src/commands/platform/runtime_operation/command.rs",
+        "list_issue_logs": "src-tauri/src/commands/platform/list_issue_logs.rs",
+        "clear_issue_logs": "src-tauri/src/commands/platform/clear_issue_logs.rs",
+        "export_issue_logs": "src-tauri/src/commands/platform/export_issue_logs.rs"
+      }
     },
     {
       "module": "api_workspace",
@@ -256,29 +272,6 @@
         "send_api_workspace_message",
         "cancel_api_workspace_request",
         "archive_api_workspace_session"
-      ]
-    },
-    {
-      "module": "issues",
-      "definition_file": "src-tauri/src/commands/issues.rs",
-      "parameter_and_return_signature_file": "src-tauri/src/commands/issues.rs",
-      "frontend_parameter_and_return_signature_file": "src/api/client.ts",
-      "frontend_shared_dto_file": "src/types.ts",
-      "commands": [
-        "record_issue",
-        "list_issue_logs",
-        "clear_issue_logs",
-        "export_issue_logs"
-      ]
-    },
-    {
-      "module": "logging",
-      "definition_file": "src-tauri/src/commands/logging.rs",
-      "parameter_and_return_signature_file": "src-tauri/src/commands/logging.rs",
-      "frontend_parameter_and_return_signature_file": "src/api/client.ts",
-      "frontend_shared_dto_file": "src/types.ts",
-      "commands": [
-        "record_runtime_operation"
       ]
     },
     {
@@ -526,5 +519,5 @@
     }
   ],
   "command_set_sha256": "dfc477a8b0bec95735fdad006349fcea0f367b4ebc85aede1b63a128a55de669",
-  "command_definition_map_sha256": "eb908c4ae31ec8d49e65a1b336c1105cb550e755fcdbae40f4943f99433cc9f5"
+  "command_definition_map_sha256": "60bb424a490da2908aacbaee125f19cb7c81f76793f631c56f2d6b765ed78a83"
 }

@@ -1,4 +1,4 @@
-import { readFileSync, readdirSync } from "node:fs";
+import { readFileSync, readdirSync, existsSync } from "node:fs";
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -131,6 +131,79 @@ check(
   "状态所有权契约未切换 tauri.app-state owner",
 );
 check(tauriAppState?.transition === null, "tauri.app-state 仍处于过渡状态");
+
+const platformRoot = "src-tauri/src/commands/platform";
+const platform = read(`${platformRoot}/mod.rs`);
+const platformCommands = {
+  bootstrap: "bootstrap/command.rs",
+  read_workspace_state: "read_workspace_state.rs",
+  save_workspace_state: "save_workspace_state.rs",
+  clear_workspace_state: "clear_workspace_state.rs",
+  record_issue: "record_issue.rs",
+  record_runtime_operation: "runtime_operation/command.rs",
+  list_issue_logs: "list_issue_logs.rs",
+  clear_issue_logs: "clear_issue_logs.rs",
+  export_issue_logs: "export_issue_logs.rs",
+};
+const platformSignatures = {
+  bootstrap: "pub async fn bootstrap(state: State<'_, AppState>) -> Result<BootstrapResponse, String>",
+  read_workspace_state: "pub fn read_workspace_state(state: State<'_, AppState>) -> Result<Value, String>",
+  save_workspace_state: "pub fn save_workspace_state(state: State<'_, AppState>, document: Value) -> Result<(), String>",
+  clear_workspace_state: "pub fn clear_workspace_state(state: State<'_, AppState>) -> Result<Value, String>",
+  record_issue: "pub fn record_issue(state: State<'_, AppState>, draft: IssueLogDraft) -> Result<IssueLogEntry, String>",
+  record_runtime_operation: "pub fn record_runtime_operation(state: State<'_, AppState>, draft: RuntimeOperationDraft) -> Result<(), String>",
+  list_issue_logs: "pub async fn list_issue_logs(state: State<'_, AppState>, limit: Option<u32>) -> Result<Vec<IssueLogEntry>, String>",
+  clear_issue_logs: "pub fn clear_issue_logs(state: State<'_, AppState>) -> Result<(), String>",
+  export_issue_logs: "pub fn export_issue_logs(state: State<'_, AppState>, output_path: String) -> Result<(), String>",
+};
+const signatureTokens = source => source.replace(/,\s*\)/g, ")").replace(/\s+/g, "");
+const platformGroup = commandContract.command_groups.find(group => group.module === "platform");
+check(commands.includes("mod platform;") && commands.includes("pub use platform::*;"), "平台命令未接入唯一根出口");
+check(platformGroup?.definition_file === `${platformRoot}/mod.rs`, "平台命令清单根出口未同步");
+for (const [name, file] of Object.entries(platformCommands)) {
+  const source = read(`${platformRoot}/${file}`);
+  check(source.includes(`fn ${name}(`), `平台命令缺失：${name}`);
+  const signature = source.match(new RegExp(`pub (?:async )?fn ${name}\\([\\s\\S]*?\\{`))?.[0].slice(0, -1) ?? "";
+  check(signatureTokens(signature) === signatureTokens(platformSignatures[name]), `平台命令公共签名漂移：${name}`);
+  check(platform.includes(`__cmd__${name}`) && platform.includes(`__tauri_command_name_${name}`), `平台命令缺少Tauri 2.6.3宏出口：${name}`);
+  check(platformGroup?.command_definition_files?.[name] === `${platformRoot}/${file}`, `平台命令归属不准确：${name}`);
+  for (const forbidden of ["sqlx::", "PostgresStore::", "static ", "Arc<Mutex", "CREATE TABLE", "SELECT ", "UPDATE "]) {
+    check(!source.includes(forbidden), `平台命令越过原基础设施边界：${name}/${forbidden}`);
+  }
+}
+for (const file of ["mod.rs", "bootstrap/mod.rs", "runtime_operation/mod.rs"]) {
+  check(!/\b(?:fn|struct|impl|enum)\s/.test(read(`${platformRoot}/${file}`)), `平台出口仍承载业务：${file}`);
+}
+for (const old of ["workspace", "issues", "logging"]) {
+  check(!existsSync(join(root, `src-tauri/src/commands/${old}.rs`)), `旧平台owner未删除：${old}`);
+  check(!commands.includes(`mod ${old};`), `旧平台模块仍登记：${old}`);
+}
+check(!read("src-tauri/src/commands/database.rs").includes("fn bootstrap("), "数据库命令仍持有旧bootstrap");
+const connection = read(`${platformRoot}/bootstrap/connection.rs`);
+check(connection.includes("if service.is_database_connected().await") && connection.indexOf("is_database_connected().await") < connection.indexOf("DesktopConfig::load(config_path)"), "恢复连接前必须保留已连接短路");
+check(connection.includes("let options = config.database?;") && connection.includes(".connect_database(options)"), "恢复连接必须保持原可选配置/连接入口");
+const coordinator = read(`${platformRoot}/bootstrap/coordinator.rs`);
+check(coordinator.includes("ensure_saved_connection(") && coordinator.indexOf("ensure_saved_connection(") < coordinator.indexOf("state.service.bootstrap().await"), "bootstrap必须先恢复保存连接再读初始化数据");
+for (const token of ["saved_connection_restore_failed", "bootstrap_failed", "return Err(message);", "state.runtime_log.relative_display_path()", "config_path: state.config_path.to_string_lossy().to_string()"])
+  check(coordinator.includes(token), `bootstrap丢失原错误/路径行为：${token}`);
+const operation = read(`${platformRoot}/runtime_operation/command.rs`);
+check(operation.includes("normalize_phase(&draft.phase)?") && operation.includes('validate_text("操作名称"') && operation.indexOf("normalize_phase(&draft.phase)?") < operation.indexOf('validate_text("操作名称"'), "运行日志必须保留phase先于operation的校验顺序");
+check(operation.includes('validate_text("链路 ID"') && operation.indexOf('validate_text("链路 ID"') < operation.indexOf("state.runtime_log.record("), "运行日志必须在完整校验后写入");
+check(operation.includes('"failed" => "error"') && operation.includes('"frontend.operation"') && operation.includes('format!("operation_{phase}")') && operation.includes("draft.context.unwrap_or(Value::Null)"), "运行日志级别/事件/显式null投影漂移");
+const issueList = read(`${platformRoot}/list_issue_logs.rs`);
+check(issueList.includes("list_background_jobs(500).await") && issueList.includes("state.issue_log.list(limit.unwrap_or(500) as usize)"), "问题列表后台扫描或原limit投影漂移");
+check(issueList.includes("if state.service.is_database_connected().await") && issueList.indexOf("is_database_connected().await") < issueList.indexOf("list_background_jobs(500).await"), "断开数据库时不得扫描后台任务");
+check(read("src-tauri/src/commands/analytics.rs").includes("use super::record_failed_background_jobs;"), "Analytics未切换共享问题投影owner");
+const background = read(`${platformRoot}/background_jobs.rs`);
+for (const token of ["job.status == JobStatus::Failed", "if let Some(message)", 'format!("{}:{}", job.id, job.attempts)', "let _ = issue_log.record("])
+  check(background.includes(token), `后台问题投影原语义丢失：${token}`);
+const newTests = [
+  ["bootstrap/tests.rs", ["missing_saved_connection_does_not_create_config_or_connect", "saved_config_errors_are_returned_unchanged_without_repair_or_connection", "empty_current_config_is_read_without_rewriting_or_connecting", "legacy_empty_config_keeps_original_load_migration", "bootstrap_response_keeps_original_wire_fields_nulls_and_paths"]],
+  ["runtime_operation/tests.rs", ["phase_validation_rejects_unknown_values", "operation_name_validation_is_bounded", "phases_keep_case_normalization_and_unknown_phase_error", "text_limits_count_unicode_scalars_and_preserve_exact_errors", "runtime_draft_keeps_optional_nulls_unknown_fields_and_raw_input", "runtime_draft_keeps_required_fields_and_original_wire_types"]],
+  ["tests.rs", ["background_scan_keeps_failed_only_filter_and_original_issue_projection", "repeated_scan_deduplicates_same_attempt_but_records_a_new_attempt"]],
+];
+for (const [file, names] of newTests) for (const name of names) check(read(`${platformRoot}/${file}`).includes(`fn ${name}(`), `原Tauri unit target缺少平台覆盖：${name}`);
+for (const file of ["mod.rs", "bootstrap/mod.rs", "runtime_operation/mod.rs"]) check(read(`${platformRoot}/${file}`).includes("#[cfg(test)]\nmod tests;"), `平台测试未登记：${file}`);
 
 if (failures.length) {
   throw new Error(`Tauri 组合根验证失败\n${failures.map((item) => `- ${item}`).join("\n")}`);

@@ -175,7 +175,12 @@
       "owner": "src-tauri/src/issue_log.rs::IssueLogStore",
       "scope": "Tauri application",
       "writers": [
-        "src-tauri/src/commands/issues.rs"
+        "src-tauri/src/commands/platform/bootstrap/coordinator.rs",
+        "src-tauri/src/commands/platform/record_issue.rs",
+        "src-tauri/src/commands/platform/list_issue_logs.rs",
+        "src-tauri/src/commands/platform/clear_issue_logs.rs",
+        "src-tauri/src/commands/platform/export_issue_logs.rs",
+        "src-tauri/src/commands/platform/background_jobs.rs"
       ],
       "forbidden": [
         "src/**",
@@ -214,7 +219,9 @@
       "owner": "src-tauri/src/workspace_state.rs::WorkspaceStateStore",
       "scope": "Tauri application",
       "writers": [
-        "src-tauri/src/commands/workspace.rs"
+        "src-tauri/src/commands/platform/read_workspace_state.rs",
+        "src-tauri/src/commands/platform/save_workspace_state.rs",
+        "src-tauri/src/commands/platform/clear_workspace_state.rs"
       ],
       "forbidden": [
         "src/pages/**",

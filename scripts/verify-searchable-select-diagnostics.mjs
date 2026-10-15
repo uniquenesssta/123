@@ -14,7 +14,7 @@ const contract = JSON.parse(read("contracts/searchable-select-diagnostics-contra
 const component = read("src/components/searchableSelect.ts");
 const binding = read("src/diagnostics/searchableSelectDiagnostics.ts");
 const client = read("src/api/client.ts");
-const rust = read("src-tauri/src/commands/logging.rs");
+const rust = read("src-tauri/src/commands/platform/runtime_operation/validation.rs");
 
 for (const event of contract.required_events) {
   if (!component.includes(`"${event}"`)) {

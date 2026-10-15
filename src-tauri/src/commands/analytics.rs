@@ -1,4 +1,4 @@
-use super::issues::record_failed_background_jobs;
+use super::record_failed_background_jobs;
 use super::{parse_uuid, AppState};
 use tauri::State;
 
