@@ -5,9 +5,11 @@
 > 后续阶段：`R11`  
 > 本文档是唯一执行依据之一；必须与 `00-总体架构与前23节.md` 同时适用。
 
-## 当前前置状态（2026-10-13）
+## 当前阶段状态（2026-10-15）
 
-R9 全部节点及 Windows Automated 阶段出口 DONE；已验源码 b50d804 / Windows run38221009454 SUCCESS，R9 文档收尾 HEAD48618fed2d7ff7c2a4db831a037f227dc789f278。用户2026-10-12“开始R10-01”授权，唯一新分支 rewrite/r10-review-analytics-release-backend 已建立；R10 IN_PROGRESS，01自身精确838e39e / run38229119264 / job114743919870全SUCCESS并DONE；02精确1ad6e68 / Windows run38245932270/job114799659672全SUCCESS并DONE；用户“收尾02开始03”授权03已实施，精确99b15ad / Windows run38259438025/job114845878326全SUCCESS并DONE，04精确221d211 / Windows run38271387412/job114886215505全SUCCESS并DONE；05精确fe3529f / Windows run38277864089/job114907643831全SUCCESS并DONE；06精确1ed6dbe / Windows run38290328302/job114948593892全SUCCESS并DONE；07精确cdd2797 / Windows run38350692611/job115142166008全SUCCESS并DONE；08精确f834e31 / Windows run38357781835/job115164583225全SUCCESS并DONE；用户“收尾08开始09”授权09 READY，10～13 BLOCKED；[08实际记录](../modular-rewrite/R10-review-analytics-release-backend/R10-08-drift-monitoring.md)；[07实际记录](../modular-rewrite/R10-review-analytics-release-backend/R10-07-provider-score.md)；[06实际记录](../modular-rewrite/R10-review-analytics-release-backend/R10-06-evidence-scoring.md)；[05实际记录](../modular-rewrite/R10-review-analytics-release-backend/R10-05-postmatch-settlement.md)；[04实际记录](../modular-rewrite/R10-review-analytics-release-backend/R10-04-ability-candidate-transaction.md)；[03实际记录](../modular-rewrite/R10-review-analytics-release-backend/R10-03-review-engine-adapter.md)。[02实际记录](../modular-rewrite/R10-review-analytics-release-backend/R10-02-structured-match-facts.md)。实际 owner、测试与完整清单见 [01实施记录](../modular-rewrite/R10-review-analytics-release-backend/R10-01-review-package-workflow.md) 及 [本阶段索引](../modular-rewrite/R10-review-analytics-release-backend/README.md)。真实数据库/历史保护/账本并发回滚/XLSX/Full/私有回归及继承删除风险仍最终新库待验，R9成功不替代R10自身验收。
+R10 `DONE`：01～13均已取得自身精确Windows完整SUCCESS；最终4ca43ad / run38591308033 / job115946614576完整SUCCESS，Application230/Persistence259、Gateway112unit+41contract及完整Windows Automated通过。唯一分支rewrite/r10-review-analytics-release-backend，阶段起点48618fed2d7ff7c2a4db831a037f227dc789f278。用户本次“收尾13”，只补文档[skip ci]；[阶段索引](../modular-rewrite/R10-review-analytics-release-backend/README.md)和[18节阶段完成记录](../modular-rewrite/R10-review-analytics-release-backend/R10-stage-completion.md)是当前结论。R11仅01 READY、02～10 BLOCKED，未启动实现或新分支。
+
+真实PostgreSQL、历史保护四项、不可变账本/并发回滚、有效XLSX、Windows Full、私有P4/P7固定回归及继承的model.runs/0041删除风险继续最终封包新库待验；ignored、公开unavailable stub和静态指纹不计这些真实项目PASS。
 
 ## 1. 阶段目标
 
@@ -1781,7 +1783,7 @@ crates/application/src/use_cases/analytics/parameter_lifecycle/
 
 ## R10-13 Release Acceptance
 
-状态：`VERIFYING`（12自身精确6c4243c完整Windows SUCCESS；用户2026-10-14“收尾12开始13”授权。发布验收职责已重写，静态/等价/负向通过，自身完整Windows待验、R10IN_PROGRESS）。详见[13实施记录](../modular-rewrite/R10-review-analytics-release-backend/R10-13-release-acceptance.md)。
+状态：`DONE`（自身精确4ca43ad / Windows run38591308033完整SUCCESS；用户2026-10-15“收尾13”）。详见[13完成记录](../modular-rewrite/R10-review-analytics-release-backend/R10-13-release-acceptance.md)与[阶段完成记录](../modular-rewrite/R10-review-analytics-release-backend/R10-stage-completion.md)。
 
 ### 1. 目标
 
@@ -2030,3 +2032,14 @@ R10-07 Provider Score已实施 `VERIFYING`，基线85ecf15，继续唯一rewrite
 R10-08 Drift Monitoring已实施 `VERIFYING`，基线33f7188，继续唯一rewrite/r10-review-analytics-release-backend。App原综合监控两入口归monitoring；PG监控前检/活动分区/总览与漂移样本/纯准备/幂等事务/读取映射各有唯一owner。原Monitoring Port与公开签名保持；供应商→漂移→总览顺序、全部SQL/原纯引擎、窗口/状态/指纹、单漂移事务、新run才写finding/审计与冲突不重写保持。新增6App/11PG unit待自身Windows，预期Application171 / Persistence227 / Gateway112unit+41contract；84/84静态、完整架构、22Rustfmt、19等价及10负向通过。01～07自身Windows DONE、08VERIFYING、09～13BLOCKED、R10IN_PROGRESS；真实PG/历史四项/账本并发回滚/有效XLSX/WindowsFull/私有P4P7回归及继承model.runs/0041删除风险仍最终新库待验。
 
 参考drift-monitoring采用PG drift_monitoring实际职责，App/PG综合监控采用monitoring唯一编排与共享partition；不创建新Port或改变供应商/漂移/总览顺序。18A/13M/2D及全部契约/异常/回退见[08记录](../modular-rewrite/R10-review-analytics-release-backend/R10-08-drift-monitoring.md)。没有进入09。
+
+
+## R10-13 与阶段出口确认（2026-10-15）
+
+精确提交 `4ca43ad1c4757ace4c95e126bda34f470d3854ea` / tree `a37d2b14c7748d92600d6d61bc846f87ac057fb9`，[Public Platform CI run38591308033](https://github.com/uniquenesssta/123/actions/runs/38591308033) / Windows job115946614576完整SUCCESS，2026-10-15 00:09:19北京时间完成。实际Application230/230、Persistence259/259、Gateway112/112 unit及41/41 contract；本项新增15App/4PG unit逐项成功。前端/contracts/TypeScript/Vite/17视口、Rust fmt/locked Clippy all-targets -D warnings/workspace、Windows release/MSI/NSIS、客户端启动和运行日志扫描均通过（7条记录、3个完成操作）。
+
+报告 `logs/windows-acceptance-20261014-154132.json` 及同名.txt；未过期artifact11908923021，14,051,269字节，SHA-256 `046186113ac42de27713e3b8633f83253c4844cb2690378da9ab9cd838984afa`。已核对run精确head/分支、全部job步骤、完整日志和artifact；本次纯文档[skip ci]收尾复用该源码树，不重复运行同源码Windows。
+
+01～13全部DONE，阶段索引/18节完成记录/真实总表/兼容/回退已完整；后端核心职责闭环的代码、unit与Windows Automated门禁通过。阶段矩阵中真实PG/私有固定集成按总纲顶部执行订正继续最终新库待验，不能把它们写成全部实跑成功。R11-01仅READY，未开始实现。
+
+真实PostgreSQL、历史保护四项、不可变账本/并发回滚、有效XLSX、Windows Full、私有P4/P7固定回归及继承的model.runs/0041删除风险继续最终封包新库待验；ignored、公开unavailable stub和静态指纹不计这些真实项目PASS。

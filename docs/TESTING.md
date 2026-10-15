@@ -842,3 +842,14 @@ R10-12 Parameter Lifecycle已实施 `VERIFYING`，基线6da5057，同一R10分�
 R10-13 Release Acceptance已实施 `VERIFYING`，基线04b2b4c，继续同一R10分支。App编排和检查构造退出mod，两个原报告查询归并；PG同名模块升级为事实/不可变事务/读取映射职责目录。原检查、汇总、哈希、lazy会话、阻断报告写入、SQL/错误及全部保护资产保持。新增15App/4PG unit待自身Windows，预期230/259、Gateway112unit+41contract；82源码、完整架构、14Rustfmt、18等价、22负向通过。01～12DONE、13VERIFYING、R10IN_PROGRESS；真实PG/历史四项/账本并发回滚/有效XLSX/WindowsFull/私有P4P7固定回归与继承model.runs/0041删除风险继续最终新库待验。
 
 19新增测试只随原Windows unit执行，82源码不含Windows进程及五浏览器入口。详细命令/等价/负向/未实跑与27路径见[13记录](modular-rewrite/R10-review-analytics-release-backend/R10-13-release-acceptance.md)。Windows job实际启动即停止CI查询，预计20～30分钟；本项自身完成前无阶段完成记录。
+
+
+## R10-13 精确 Windows 与 R10 阶段完成（2026-10-15）
+
+精确提交 `4ca43ad1c4757ace4c95e126bda34f470d3854ea` / tree `a37d2b14c7748d92600d6d61bc846f87ac057fb9`，[Public Platform CI run38591308033](https://github.com/uniquenesssta/123/actions/runs/38591308033) / Windows job115946614576完整SUCCESS，2026-10-15 00:09:19北京时间完成。实际Application230/230、Persistence259/259、Gateway112/112 unit及41/41 contract；本项新增15App/4PG unit逐项成功。前端/contracts/TypeScript/Vite/17视口、Rust fmt/locked Clippy all-targets -D warnings/workspace、Windows release/MSI/NSIS、客户端启动和运行日志扫描均通过（7条记录、3个完成操作）。
+
+报告 `logs/windows-acceptance-20261014-154132.json` 及同名.txt；未过期artifact11908923021，14,051,269字节，SHA-256 `046186113ac42de27713e3b8633f83253c4844cb2690378da9ab9cd838984afa`。已核对run精确head/分支、全部job步骤、完整日志和artifact；本次纯文档[skip ci]收尾复用该源码树，不重复运行同源码Windows。
+
+R10期初Application138/Persistence179，期末230/259，原unit累计净增92App/80PG；Gateway112unit/41contract保持，最后Windows包含全部已有与新增targets。各节点精确证据、失败修复、完整累计A/M/D、兼容和回退见[R10阶段完成记录](modular-rewrite/R10-review-analytics-release-backend/R10-stage-completion.md)。本次仅2A/6M文档，复核保护/171命令/DB静态、Release owner和运行诊断门禁、清单/链接/diff及源码冻结，不重复全量构建或非Windows动态。R10 DONE；R11仅01 READY、02～10 BLOCKED、未启动。
+
+真实PostgreSQL、历史保护四项、不可变账本/并发回滚、有效XLSX、Windows Full、私有P4/P7固定回归及继承的model.runs/0041删除风险继续最终封包新库待验；ignored、公开unavailable stub和静态指纹不计这些真实项目PASS。

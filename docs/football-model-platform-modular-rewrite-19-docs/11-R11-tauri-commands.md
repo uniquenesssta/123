@@ -5,6 +5,12 @@
 > 后续阶段：`R12`  
 > 本文档是唯一执行依据之一；必须与 `00-总体架构与前23节.md` 同时适用。
 
+## 当前前置状态（2026-10-15）
+
+R10全部13节点及Windows Automated阶段出口DONE，最终精确4ca43ad / run38591308033完整SUCCESS；[R10完成记录](../modular-rewrite/R10-review-analytics-release-backend/R10-stage-completion.md)已创建。已建立[R11索引](../modular-rewrite/R11-tauri-commands/README.md)，仅R11-01 READY、02～10 BLOCKED。用户当前只要求“收尾13”，未开始R11源码或创建R11分支。实际实施时必须按总纲执行订正先核实既有命令职责，不为参考目录制造DTO/mapper空壳；171命令契约与公共行为保持。
+
+真实PostgreSQL、历史保护四项、不可变账本/并发回滚、有效XLSX、Windows Full、私有P4/P7固定回归及继承的model.runs/0041删除风险继续最终封包新库待验；ignored、公开unavailable stub和静态指纹不计这些真实项目PASS。
+
 ## 1. 阶段目标
 
 - 把每条 Tauri 命令拆成独立文件/目录，并让命令层只做 DTO、Mapping、调用和错误转换。
@@ -157,7 +163,7 @@ docs/modular-rewrite/R11-tauri-commands/
 
 ## R11-01 Bootstrap、Workspace 与 Logs Commands
 
-状态：`BLOCKED`（仅当上一任务与本任务前置门禁通过后改为 `READY`）
+状态：`READY`（R10全部节点及Windows Automated阶段出口DONE，索引已创建；仅就绪、未启动）
 
 ### 1. 目标
 

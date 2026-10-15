@@ -2,7 +2,9 @@
 
 ## 当前阶段状态
 
-`IN_PROGRESS`。用户2026-10-12“开始R10-01”授权；从R9文档收尾HEAD `48618fed2d7ff7c2a4db831a037f227dc789f278` 建立唯一阶段分支 `rewrite/r10-review-analytics-release-backend`。01自身精确Windows run38229119264/job114743919870全SUCCESS并DONE；02自身1ad6e68 / Windows run38245932270/job114799659672全SUCCESS并DONE；用户“收尾02开始03”授权03已实施；03自身99b15ad / Windows run38259438025/job114845878326全SUCCESS并DONE，04自身221d211 / Windows run38271387412/job114886215505全SUCCESS并DONE；05自身fe3529f / Windows run38277864089/job114907643831全SUCCESS并DONE；06自身1ed6dbe / Windows run38290328302/job114948593892全SUCCESS并DONE；07自身cdd2797 / Windows run38350692611/job115142166008全SUCCESS并DONE；08自身f834e31 / Windows run38357781835/job115164583225全SUCCESS并DONE；09自身fbfe83a / Windows run38398255939/job115298907093全SUCCESS并DONE；10自身3365b2b / Windows run38411713492/job115345476640全SUCCESS并DONE；11自身9d3727c / Windows run38423742534/job115387546853全SUCCESS并DONE；12自身6c4243c / Windows run38508581096/job115671629414全SUCCESS并DONE；用户2026-10-14“收尾12开始13”授权13已实施VERIFYING。
+`DONE`（01～13代码/节点与Windows Automated阶段出口）。uniquenesssta/123 v0.23.0；唯一阶段分支 `rewrite/r10-review-analytics-release-backend`，起点 `48618fed2d7ff7c2a4db831a037f227dc789f278`。最终自身精确4ca43ad / [Windows run38591308033](https://github.com/uniquenesssta/123/actions/runs/38591308033) / job115946614576完整SUCCESS，2026-10-15 00:09:19北京时间完成。用户“收尾13”，本次只文档收尾；[阶段完成记录](R10-stage-completion.md)含完整总表/证据/延期/回退。[R11索引](../R11-tauri-commands/README.md)仅01 READY、其余BLOCKED，未启动代码或新分支。下方逐节点VERIFYING/待验与旧状态为实施历史，当前状态以本节和任务表为准。
+
+真实PostgreSQL、历史保护四项、不可变账本/并发回滚、有效XLSX、Windows Full、私有P4/P7固定回归及继承的model.runs/0041删除风险继续最终封包新库待验；ignored、公开unavailable stub和静态指纹不计这些真实项目PASS。
 
 ## 前置基线与依据
 
@@ -24,7 +26,7 @@
 | R10-10 | [Background Jobs](R10-10-background-jobs.md) | DONE · 自身精确Windows全SUCCESS |
 | R10-11 | [Analysis Package](R10-11-analysis-package.md) | DONE · 自身精确Windows全SUCCESS |
 | R10-12 | [Parameter Lifecycle](R10-12-parameter-lifecycle.md) | DONE · 自身精确Windows全SUCCESS |
-| R10-13 | [Release Acceptance](R10-13-release-acceptance.md) | VERIFYING · 自身完整Windows待验 |
+| R10-13 | [Release Acceptance](R10-13-release-acceptance.md) | DONE · 自身精确Windows全SUCCESS |
 
 ## R10-01 实际边界与验证
 
@@ -271,3 +273,14 @@ R10-12 Parameter Lifecycle已实施 `VERIFYING`，基线6da5057，同一R10分�
 R10-13 Release Acceptance已实施 `VERIFYING`，基线04b2b4c，继续同一R10分支。App编排和检查构造退出mod，两个原报告查询归并；PG同名模块升级为事实/不可变事务/读取映射职责目录。原检查、汇总、哈希、lazy会话、阻断报告写入、SQL/错误及全部保护资产保持。新增15App/4PG unit待自身Windows，预期230/259、Gateway112unit+41contract；82源码、完整架构、14Rustfmt、18等价、22负向通过。01～12DONE、13VERIFYING、R10IN_PROGRESS；真实PG/历史四项/账本并发回滚/有效XLSX/WindowsFull/私有P4P7固定回归与继承model.runs/0041删除风险继续最终新库待验。
 
 保留既有run_acceptance和PG根模块标识，检查/hash正文保持；冻结公开模型守卫不变，原敏感名单由既有Release门禁覆盖新owner。23字段/27路径/回退见[13记录](R10-13-release-acceptance.md)。先核对13自身精确完整Windows，失败同分支修复；阶段收尾/R11须后续用户授权及出口门禁，不提前创建阶段完成记录。
+
+
+## R10-13 精确 Windows 与阶段完成（2026-10-15）
+
+精确提交 `4ca43ad1c4757ace4c95e126bda34f470d3854ea` / tree `a37d2b14c7748d92600d6d61bc846f87ac057fb9`，[Public Platform CI run38591308033](https://github.com/uniquenesssta/123/actions/runs/38591308033) / Windows job115946614576完整SUCCESS，2026-10-15 00:09:19北京时间完成。实际Application230/230、Persistence259/259、Gateway112/112 unit及41/41 contract；本项新增15App/4PG unit逐项成功。前端/contracts/TypeScript/Vite/17视口、Rust fmt/locked Clippy all-targets -D warnings/workspace、Windows release/MSI/NSIS、客户端启动和运行日志扫描均通过（7条记录、3个完成操作）。
+
+报告 `logs/windows-acceptance-20261014-154132.json` 及同名.txt；未过期artifact11908923021，14,051,269字节，SHA-256 `046186113ac42de27713e3b8633f83253c4844cb2690378da9ab9cd838984afa`。已核对run精确head/分支、全部job步骤、完整日志和artifact；本次纯文档[skip ci]收尾复用该源码树，不重复运行同源码Windows。
+
+全部13节点自身成功并已索引；阶段完成记录已创建，后端职责闭环代码与Automated门禁DONE。R11-01为唯一READY，未实施。
+
+真实PostgreSQL、历史保护四项、不可变账本/并发回滚、有效XLSX、Windows Full、私有P4/P7固定回归及继承的model.runs/0041删除风险继续最终封包新库待验；ignored、公开unavailable stub和静态指纹不计这些真实项目PASS。

@@ -811,8 +811,8 @@ R10-12 Parameter Lifecycle已实施 `VERIFYING`，基线6da5057，同一R10分�
 
 真实PG/历史保护四项/不可变账本/并发回滚/有效XLSX/WindowsFull/私有P4P7固定回归及继承model.runs/0041删除风险继续最终封包新库待验；ignored/公开stub/static指纹不是这些真实PASS。
 
-### R10-13 发布验收（2026-10-14，VERIFYING）
+### R10-13 与 R10 阶段收尾（2026-10-15，DONE）
 
-R10-13 Release Acceptance已实施 `VERIFYING`，基线04b2b4c，继续同一R10分支。App编排和检查构造退出mod，两个原报告查询归并；PG同名模块升级为事实/不可变事务/读取映射职责目录。原检查、汇总、哈希、lazy会话、阻断报告写入、SQL/错误及全部保护资产保持。新增15App/4PG unit待自身Windows，预期230/259、Gateway112unit+41contract；82源码、完整架构、14Rustfmt、18等价、22负向通过。01～12DONE、13VERIFYING、R10IN_PROGRESS；真实PG/历史四项/账本并发回滚/有效XLSX/WindowsFull/私有P4P7固定回归与继承model.runs/0041删除风险继续最终新库待验。
+R10-13精确 `4ca43ad` / [Windows run38591308033](https://github.com/uniquenesssta/123/actions/runs/38591308033) 完整SUCCESS，实际Application230、Persistence259、Gateway112unit+41contract；新增15App/4PG unit、前端/17视口、Rust、Windows release/MSI/NSIS/启动与日志全部通过。原检查、报告哈希、不可变事务及模型保护保持。01～13与R10代码/Windows Automated阶段出口DONE，详见[13完成记录](docs/modular-rewrite/R10-review-analytics-release-backend/R10-13-release-acceptance.md)、[阶段完成总表与限制](docs/modular-rewrite/R10-review-analytics-release-backend/R10-stage-completion.md)。
 
-11A/13M/3D、实际职责/报告语义/保护与验证见[13记录](docs/modular-rewrite/R10-review-analytics-release-backend/R10-13-release-acceptance.md)和[R10索引](docs/modular-rewrite/R10-review-analytics-release-backend/README.md)。
+本次“收尾13”只文档[skip ci]；[R11-01仅READY](docs/modular-rewrite/R11-tauri-commands/README.md)，未启动代码或新分支。真实PostgreSQL、历史保护四项、不可变账本/并发回滚、有效XLSX、Windows Full、私有P4/P7固定回归及继承的model.runs/0041删除风险继续最终封包新库待验；ignored、公开unavailable stub和静态指纹不计这些真实项目PASS。

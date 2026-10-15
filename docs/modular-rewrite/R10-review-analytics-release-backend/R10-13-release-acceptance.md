@@ -1,6 +1,6 @@
 # R10-13 Release Acceptance
 
-状态：`VERIFYING`。用户2026-10-14“收尾12开始13”授权；uniquenesssta/123 v0.23.0，继续唯一rewrite/r10-review-analytics-release-backend。基线04b2b4cb95cafc861505a4fa9d13bd35a37fce73为12五文档[skip ci]收尾，源码同自身完整Windows SUCCESS的6c4243c。01～12DONE、13VERIFYING、R10IN_PROGRESS，未进入R11或创建阶段完成记录。
+状态：`DONE`（自身精确4ca43ad / Windows run38591308033完整SUCCESS）。用户2026-10-15“收尾13”；uniquenesssta/123 v0.23.0，继续唯一rewrite/r10-review-analytics-release-backend。基线04b2b4cb95cafc861505a4fa9d13bd35a37fce73为12纯文档收尾。01～13与R10代码/Windows Automated阶段出口均DONE；R11-01仅READY、未启动。下述VERIFYING/预期计数/未建阶段记录为实施历史，以阶段索引和本次完成节为准。
 
 ### 1. 目标
 
@@ -149,3 +149,14 @@ Mermaid Chart中文实际链区分预算失败不获取会话、所有状态报�
 - `crates/persistence-postgres/src/release_acceptance.rs`
 
 实际27路径，14现存变更Rust格式通过；已删除文件不参与Rustfmt。移动/重命名：无。
+
+
+## 精确 Windows 完成与阶段收尾（2026-10-15）
+
+精确提交 `4ca43ad1c4757ace4c95e126bda34f470d3854ea` / tree `a37d2b14c7748d92600d6d61bc846f87ac057fb9`，[Public Platform CI run38591308033](https://github.com/uniquenesssta/123/actions/runs/38591308033) / Windows job115946614576完整SUCCESS，2026-10-15 00:09:19北京时间完成。实际Application230/230、Persistence259/259、Gateway112/112 unit及41/41 contract；本项新增15App/4PG unit逐项成功。前端/contracts/TypeScript/Vite/17视口、Rust fmt/locked Clippy all-targets -D warnings/workspace、Windows release/MSI/NSIS、客户端启动和运行日志扫描均通过（7条记录、3个完成操作）。
+
+报告 `logs/windows-acceptance-20261014-154132.json` 及同名.txt；未过期artifact11908923021，14,051,269字节，SHA-256 `046186113ac42de27713e3b8633f83253c4844cb2690378da9ab9cd838984afa`。已核对run精确head/分支、全部job步骤、完整日志和artifact；本次纯文档[skip ci]收尾复用该源码树，不重复运行同源码Windows。
+
+用户本次只要求“收尾13”。13已DONE；阶段完成记录汇总全部13节点、真实文件总表、兼容/限制/回退，R10阶段出口DONE。R11仅01 READY、02～10 BLOCKED，未开始源码实施或新分支。
+
+真实PostgreSQL、历史保护四项、不可变账本/并发回滚、有效XLSX、Windows Full、私有P4/P7固定回归及继承的model.runs/0041删除风险继续最终封包新库待验；ignored、公开unavailable stub和静态指纹不计这些真实项目PASS。
