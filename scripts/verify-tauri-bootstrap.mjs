@@ -180,9 +180,13 @@ for (const old of ["workspace", "issues", "logging"]) {
 }
 check(!read("src-tauri/src/commands/database.rs").includes("fn bootstrap("), "数据库命令仍持有旧bootstrap");
 const connection = read(`${platformRoot}/bootstrap/connection.rs`);
+const databaseFacade = read("crates/application/src/services/database/facade.rs");
+check(/pub async fn connect_database\(\s*self: &Arc<Self>,/.test(databaseFacade), "连接恢复必须核对原ApplicationService的Arc接收者");
+check(connection.includes("service: &Arc<ApplicationService>") && connection.includes("sync::Arc"), "恢复连接必须借用原Arc服务句柄，不得退化为普通ApplicationService引用");
 check(connection.includes("if service.is_database_connected().await") && connection.indexOf("is_database_connected().await") < connection.indexOf("DesktopConfig::load(config_path)"), "恢复连接前必须保留已连接短路");
 check(connection.includes("let options = config.database?;") && connection.includes(".connect_database(options)"), "恢复连接必须保持原可选配置/连接入口");
 const coordinator = read(`${platformRoot}/bootstrap/coordinator.rs`);
+check(coordinator.includes("ensure_saved_connection(&state.service, &state.config_path).await"), "恢复连接必须直接借用AppState的原Arc，不得另造服务或连接");
 check(coordinator.includes("ensure_saved_connection(") && coordinator.indexOf("ensure_saved_connection(") < coordinator.indexOf("state.service.bootstrap().await"), "bootstrap必须先恢复保存连接再读初始化数据");
 for (const token of ["saved_connection_restore_failed", "bootstrap_failed", "return Err(message);", "state.runtime_log.relative_display_path()", "config_path: state.config_path.to_string_lossy().to_string()"])
   check(coordinator.includes(token), `bootstrap丢失原错误/路径行为：${token}`);

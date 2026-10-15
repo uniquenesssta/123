@@ -1,6 +1,6 @@
 # R11-01 Bootstrap、Workspace 与 Logs Commands
 
-状态：`VERIFYING`。
+状态：`VERIFYING`（首轮9e0a907的Windows E0599失败；Arc接收者已修复，等待本次精确Windows复验）。
 
 R11-01 Bootstrap、Workspace 与 Logs Commands已实施 `VERIFYING`。用户2026-10-15“开始R11-01”，uniquenesssta/123 v0.23.0，从R10文档收尾3d43e8ec216f55daa04d5b8afeec68e372ce467c建立唯一 `rewrite/r11-tauri-commands`。9条平台命令已切换唯一owner，公共171命令与注册顺序保持；自身完整Windows待验，02～10 BLOCKED，R11 IN_PROGRESS。
 
@@ -163,3 +163,28 @@ Context7仅核实当前宏出口问题，最终以锁定2.6.3官方源码为依�
 - `src-tauri/src/commands/issues.rs`
 - `src-tauri/src/commands/logging.rs`
 - `src-tauri/src/commands/workspace.rs`
+
+
+## R11-01 首轮 Windows 失败与 Arc 接收者修复（2026-10-15）
+
+首轮精确9e0a9079565e0ce2bd76aeedb1174e9da22bbfe1 / [Windows run38689146967](https://github.com/uniquenesssta/123/actions/runs/38689146967) / job116270781582为FAILURE。前端契约/TypeScript/Vite/17视口和架构检查通过；Rust在Clippy编译阶段报E0599，connection.rs调用connect_database时接收者为普通&ApplicationService，原API要求self:&Arc<Self>。Rust单测、Windows打包及启动未完成；失败报告过程文件logs/windows-acceptance-20261015-055311.txt，不能把预期计数写成实际成功。
+
+恢复helper参数为&Arc<ApplicationService>，仍直接借用AppState同一service，不新建/clone服务或改变原恢复顺序；四处调用helper的原测试夹具同步Arc，Response独立测试保持原样。原连接API、Application/Store、全部生产函数正文、错误/日志/公共命令/DTO和依赖保持；原33项正文等价未检查提取参数丢失Arc的问题，本次补原AppState字段类型及原API接收者核对。既有平台守卫加入Arc类型与原句柄调用检查；将参数退回普通引用的负向探针已拒绝并恢复。
+
+修复实际9M/0A/0D，累计仍22A/16M/3D共41路径；不新增单测target或测试数量。82/82原源码、完整architecture、2Rustfmt1.88、35等价、17负向拒绝/bytes恢复、保护/171命令/DB静态及gitdiffcheck通过。Domain只usageDigest更新为3394cc8b635bb7a2fb2f7abb548a435f01b16c8fc1f41b68a6a3164a67e85995，365/129/301/scan1290保持。
+
+本次修改相对失败9e0a907如下；其他路径不变：
+
+| 修改文件 | 本次内容 |
+|---|---|
+| src-tauri/src/commands/platform/bootstrap/connection.rs | 恢复原Arc服务借用类型 |
+| src-tauri/src/commands/platform/bootstrap/tests.rs | 四个恢复夹具使用Arc |
+| scripts/verify-tauri-bootstrap.mjs | 原接收者/借用检查及回归保护 |
+| architecture/domain-type-inventory.json | 原使用摘要刷新 |
+| README.md | 修复与复验摘要 |
+| docs/TESTING.md | 真实失败/验证与复验状态 |
+| docs/football-model-platform-modular-rewrite-19-docs/11-R11-tauri-commands.md | 当前修复状态 |
+| docs/modular-rewrite/R11-tauri-commands/README.md | 当前失败与修复位置 |
+| docs/modular-rewrite/R11-tauri-commands/R11-01-bootstrap-workspace-and-logs-commands.md | 根因/全部修复路径/证据 |
+
+01继续VERIFYING、02～10BLOCKED、R11IN_PROGRESS，沿唯一rewrite/r11-tauri-commands重新推送原Windows。预期Desktop38/App230/PG259/Gateway112unit+41contract，须修复提交自身完整Windows确认。原9e0a907不是已验回退点；节点回退基线仍3d43e8e。真实PG/历史四项/账本并发回滚/XLSX/WindowsFull/私有P4P7固定回归及继承model.runs/0041删除风险仍最终新库待验。

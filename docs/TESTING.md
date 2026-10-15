@@ -862,3 +862,8 @@ R10期初Application138/Persistence179，期末230/259，原unit累计净增92Ap
 82/82原只读源码、完整architecture、24Rustfmt1.88、33完整等价和16破坏拒绝/bytes恢复通过；保护18/171命令/46迁移18PG静态保持。命令、公开wire DTO、3后续DB命令与冻结源码等价边界、内部清单变化、真实A/M/D与回退见[01记录](modular-rewrite/R11-tauri-commands/R11-01-bootstrap-workspace-and-logs-commands.md)。未执行非Windows Cargo/Clippy/build/test/前端构建/浏览器/loopback；五原浏览器入口和Windows进程入口仍随原Windows全CI执行。job实际启动即停止查询，约20～30分钟；本项VERIFYING、02～10BLOCKED、R11IN_PROGRESS。
 
 真实PostgreSQL、历史保护四项、不可变账本/并发回滚、有效XLSX、Windows Full、私有P4/P7固定回归及继承model.runs/0041删除风险仍最终封包新库待验；ignored、公开unavailable stub和静态指纹不计这些真实PASS。
+
+
+### R11-01 Arc 接收者修复（2026-10-15，VERIFYING）
+
+首轮9e0a907 / Windows run38689146967在Rust E0599失败：恢复helper丢失原Arc接收者。现恢复&Arc<ApplicationService>并同步四处测试夹具、既有守卫及使用摘要；原API/正文/契约保持，35等价/17负向与82源码/完整架构/2Rustfmt通过。本修复自身Windows待验，01VERIFYING、02～10BLOCKED。 首轮前端/17视口通过，Rust单测/打包/启动未完成；原新增11unit及预期38/230/259/112+41不计实际PASS。修复9M、无新增target或unit数量变化；源码/35等价/17破坏恢复/完整architecture和2Rustfmt1.88已通过。详情及真实待验/回退见[01记录](modular-rewrite/R11-tauri-commands/R11-01-bootstrap-workspace-and-logs-commands.md)。未运行非Windows动态验证。

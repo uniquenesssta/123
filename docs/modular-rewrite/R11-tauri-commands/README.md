@@ -2,7 +2,7 @@
 
 ## 当前阶段状态
 
-`IN_PROGRESS`。R11-01 Bootstrap、Workspace 与 Logs Commands已实施 `VERIFYING`。用户2026-10-15“开始R11-01”，uniquenesssta/123 v0.23.0，从R10文档收尾3d43e8ec216f55daa04d5b8afeec68e372ce467c建立唯一 `rewrite/r11-tauri-commands`。9条平台命令已切换唯一owner，公共171命令与注册顺序保持；自身完整Windows待验，02～10 BLOCKED，R11 IN_PROGRESS。
+`IN_PROGRESS`。R11-01 Bootstrap、Workspace 与 Logs Commands已实施 `VERIFYING`。用户2026-10-15“开始R11-01”，uniquenesssta/123 v0.23.0，从R10文档收尾3d43e8ec216f55daa04d5b8afeec68e372ce467c建立唯一 `rewrite/r11-tauri-commands`。9条平台命令已切换唯一owner，公共171命令与注册顺序保持；自身完整Windows待验，02～10 BLOCKED，R11 IN_PROGRESS。 首轮失败与本次Arc修复见文末。
 
 ## 依据与前置基线
 
@@ -35,3 +35,8 @@
 R11-01 Bootstrap、Workspace 与 Logs Commands已实施 `VERIFYING`。用户2026-10-15“开始R11-01”，uniquenesssta/123 v0.23.0，从R10文档收尾3d43e8ec216f55daa04d5b8afeec68e372ce467c建立唯一 `rewrite/r11-tauri-commands`。9条平台命令已切换唯一owner，公共171命令与注册顺序保持；自身完整Windows待验，02～10 BLOCKED，R11 IN_PROGRESS。 9条命令迁入platform，3旧owner删除；原bootstrap恢复/日志、wire DTO、文本校验、工作区Store、Failed任务/attempt去重保持，Analytics真实调用同步。新增11原Tauri unit待Windows，预期Desktop38/App230/PG259/Gateway112+41；82源码、完整architecture、24Rustfmt、33等价、16负向通过。真实清单/接口与内部清单变化/回退见[01记录](R11-01-bootstrap-workspace-and-logs-commands.md)。
 
 真实PostgreSQL、历史保护四项、不可变账本/并发回滚、有效XLSX、Windows Full、私有P4/P7固定回归及继承model.runs/0041删除风险仍最终封包新库待验；ignored、公开unavailable stub和静态指纹不计这些真实PASS。
+
+
+## R11-01 Arc 修复与复验位置
+
+首轮9e0a907 / Windows run38689146967在Rust E0599失败：恢复helper丢失原Arc接收者。现恢复&Arc<ApplicationService>并同步四处测试夹具、既有守卫及使用摘要；原API/正文/契约保持，35等价/17负向与82源码/完整架构/2Rustfmt通过。本修复自身Windows待验，01VERIFYING、02～10BLOCKED。 详细根因、9M清单和回退见[01记录](R11-01-bootstrap-workspace-and-logs-commands.md)。

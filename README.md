@@ -821,3 +821,6 @@ R10-13精确 `4ca43ad` / [Windows run38591308033](https://github.com/uniquenesss
 ### R11-01 平台命令（2026-10-15，VERIFYING）
 
 Bootstrap、工作区与日志9条命令已收拢至commands/platform，唯一rewrite/r11-tauri-commands，基线3d43e8e。原保存连接恢复、错误/日志、State与wire DTO保持，171公共命令/注册顺序不变，内部定义清单同步真实位置。新增11原Tauri单测待Windows；82源码、完整架构、24Rustfmt、33等价和16负向通过。01VERIFYING、02～10BLOCKED，完整[01记录](docs/modular-rewrite/R11-tauri-commands/R11-01-bootstrap-workspace-and-logs-commands.md)与[阶段索引](docs/modular-rewrite/R11-tauri-commands/README.md)。真实PostgreSQL、历史保护四项、不可变账本/并发回滚、有效XLSX、Windows Full、私有P4/P7固定回归及继承model.runs/0041删除风险仍最终封包新库待验；ignored、公开unavailable stub和静态指纹不计这些真实PASS。
+
+
+R11-01 首轮 `9e0a907` / [Windows run38689146967](https://github.com/uniquenesssta/123/actions/runs/38689146967) 在恢复连接helper因Arc接收者类型丢失报E0599；前端和17视口通过。现已恢复原Arc借用、同步四个测试夹具并补原守卫，82源码/完整架构/2Rustfmt/35等价/17负向通过；同一R11分支复跑Windows，01仍VERIFYING。详见[01修复记录](docs/modular-rewrite/R11-tauri-commands/R11-01-bootstrap-workspace-and-logs-commands.md)。

@@ -163,7 +163,7 @@ docs/modular-rewrite/R11-tauri-commands/
 
 ## R11-01 Bootstrap、Workspace 与 Logs Commands
 
-状态：`VERIFYING`（用户2026-10-15“开始R11-01”；唯一rewrite/r11-tauri-commands已实施，静态/等价/负向通过，自身完整Windows待验）
+状态：`VERIFYING`（首轮9e0a907 / run38689146967的E0599已定位，原Arc接收者已修复；同一R11分支等待修复自身完整Windows）
 
 ### 1. 目标
 
@@ -1570,3 +1570,8 @@ docs/modular-rewrite/R11-tauri-commands/R11-stage-completion.md
 ```
 
 阶段完成记录必须引用本阶段每个节点记录，不得只重复任务书中的计划。缺少任何节点记录、真实文件总表、验证结果或回退信息时，本阶段不得标记为 `DONE`。
+
+
+## R11-01 Windows 首轮修复（2026-10-15）
+
+首轮9e0a907 / Windows run38689146967在Rust E0599失败：恢复helper丢失原Arc接收者。现恢复&Arc<ApplicationService>并同步四处测试夹具、既有守卫及使用摘要；原API/正文/契约保持，35等价/17负向与82源码/完整架构/2Rustfmt通过。本修复自身Windows待验，01VERIFYING、02～10BLOCKED。 [完整修复记录](../modular-rewrite/R11-tauri-commands/R11-01-bootstrap-workspace-and-logs-commands.md)。

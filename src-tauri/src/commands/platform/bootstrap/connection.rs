@@ -1,9 +1,9 @@
 use crate::config::DesktopConfig;
 use football_application::ApplicationService;
-use std::path::Path;
+use std::{path::Path, sync::Arc};
 
 pub(super) async fn ensure_saved_connection(
-    service: &ApplicationService,
+    service: &Arc<ApplicationService>,
     config_path: &Path,
 ) -> Option<String> {
     if service.is_database_connected().await {
