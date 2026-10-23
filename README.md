@@ -883,3 +883,6 @@ R11-08已收尾DONE：精确858288e / [Windows run39974291282](https://github.co
 
 
 R11-09发布验收命令已按执行/列表/读取拆分，旧入口删除，真实报告生成与查询继续原服务；171命令与公共DTO不变。源码/架构/格式/等价及隔离回归检查通过，自身完整Windows待验，10未开始。详[09记录](docs/modular-rewrite/R11-tauri-commands/R11-09-release-commands.md)。
+
+
+R11-09首轮Windows被无用AppState重导出阻断，现删除遗留中转，并修正组合根守卫为实际命令直接使用唯一状态类型；发布命令与真实服务/报告行为不变。源码/架构/格式/等价与隔离检查通过，修复自身Windows待验。详[09修复记录](docs/modular-rewrite/R11-tauri-commands/R11-09-release-commands.md)。

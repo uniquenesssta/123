@@ -26,7 +26,6 @@ pub use review::*;
 
 use platform::record_failed_background_jobs;
 
-pub(crate) use crate::bootstrap::AppState;
 use uuid::Uuid;
 
 pub(super) fn parse_uuid(value: &str, label: &str) -> Result<Uuid, String> {

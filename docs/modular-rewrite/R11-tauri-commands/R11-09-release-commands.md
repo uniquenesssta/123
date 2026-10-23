@@ -1,6 +1,6 @@
 # R11-09 Release Commands
 
-状态：`VERIFYING`（已实现与静态通过；09自身完整Windows待验）。
+状态：`VERIFYING`（首轮unused_imports失败已修复；修复自身完整Windows待验，以下初始记录保留历史）。
 
 R11-01～08 DONE（08自身精确858288e / Windows run39974291282完整SUCCESS）；09 Release Commands已实施VERIFYING，10 BLOCKED，R11 IN_PROGRESS。用户2026-10-23“通过收尾08开始09”，继续唯一rewrite/r11-tauri-commands；09基线dd01f9d为08五文档[skip ci]收尾，源码同08已验树。
 
@@ -70,7 +70,7 @@ flowchart TD
 
 ## 实际文件清单
 
-基于dd01f9d5cb4983637f25c639835fcfe66a1ad17f，no-renames口径5A/10M/1D，共16路径。4新Rust（3命令与1纯出口）；既有Rust仅根登记修改，整文件逐字移动/重命名无，三原函数按职责迁移。
+以下为初始dce36ac的历史清单：基于dd01f9d5cb4983637f25c639835fcfe66a1ad17f，no-renames口径5A/10M/1D，共16路径。4新Rust（3命令与1纯出口）；既有Rust仅根登记修改，整文件逐字移动/重命名无，三原函数按职责迁移。
 
 | 状态 | 路径 |
 |---|---|
@@ -90,3 +90,51 @@ flowchart TD
 | A | `src-tauri/src/commands/release/read_release_acceptance_run.rs` |
 | A | `src-tauri/src/commands/release/run_release_acceptance.rs` |
 | D | `src-tauri/src/commands/release_acceptance.rs` |
+
+
+## R11-09 unused_imports 修复（2026-10-24）
+
+### 本次失败与根因
+
+精确提交`dce36ac4c6e9d4729f6bf3832961c2e7ba290f92` / tree`3e02fc03f23534f935bdbe18b18cf6d7d1d50dbf`，[Public Platform CI run39981102375](https://github.com/uniquenesssta/123/actions/runs/39981102375) / Windows job120508282038在2026-10-23 23:53:14北京时间以FAILURE完成。已fresh核对head/branch、全部job步骤与完整日志；源码架构、完整frontend/contracts/TypeScript/Vite/17视口通过，Rust1.88.0 Clippy阶段在`src-tauri/src/commands.rs:29:16`报唯一`unused import: crate::bootstrap::AppState`，`-D unused-imports`由`-D warnings`提升为错误，lib与lib test编译被阻断。工作区单测及Windows release/MSI/NSIS/启动/运行日志验收未完成，不能计PASS。
+
+artifact12514082002仅668字节，SHA-256 `416fef090ef69dbe40863d39f8252625ffc189dcbca75b18c861f105d611a818`，未过期；仅为失败过程证据，不是完整验收包。失败过程记录`logs/windows-acceptance-20261023-154810.txt`。
+
+旧release_acceptance.rs是根AppState中转的最后消费者；迁移后所有实际命令直接导入`bootstrap::AppState`，根的`pub(crate) use crate::bootstrap::AppState;`遂失去消费者。上轮遗漏清理这一行，旧bootstrap守卫又只要求该文字存在，无法识别它已经无效。问题在导入清理与过时守卫，不是服务/状态实例或发布业务行为。
+
+### 实际修复与不变量
+
+生产Rust只删除commands.rs这一行；实际AppState定义/7字段/安装、bootstrap公开出口、所有命令的原State签名与导入、全部服务/Port/PG/真实报告流程/DTO/公共171注册和模型资产全部字节保持。未改变任何业务行为，不新增allow/降低Clippy或关闭检查。
+
+只修正原`verify-tauri-bootstrap.mjs`中已经过时的根重导出断言：根不得再出现AppState中转/替代定义；从正式清单逐个读取实际命令定义，使用AppState的命令必须直接借用bootstrap唯一类型。其余bootstrap所有断言经逆变换精确保持，原Release Service与Release Acceptance两守卫均冻结。不是为了让冗余入口通过而恢复消费者。
+
+Domain清单仅rustUsageDigest刷新为`aa4b72f8b9d56d7dfee35efc2293e32e12998bcd72750e2a68d7c15846cffa10`；全部365类型/129源/301映射/1494扫描及全部类型caller/sourceDigest精确保持，未新增文件或状态。
+
+### 实际验证与边界
+
+82/82原只读Node、完整`npm run verify:architecture`、1个commands.rs独立Rustfmt1.88 --check、42项原09等价核对（明确仅归一化这次删除的无用重导出）、原正式command verifier、18保护资产/46迁移18PG静态契约与git diff --check通过。修复额外严格复核生产仅删除此行、其余全部Rust/业务/UI/测试/依赖/工作流冻结、Domain仅usageDigest变化、bootstrap除这一个失效断言更新外精确不变。
+
+6项隔离破坏探针全部拒绝：原重导出、分组写法、换行写法、allow掩盖、命令改用已退役中转、bootstrap唯一状态出口被改写；3原守卫恢复正向通过，主252源码/清单/守卫/根与bootstrap状态指纹不变。只在repo外临时副本变异，主源码无破坏。报告r1109f-static.json、r1109f-architecture.log、r1109f-equivalence.json、r1109f-review.json、r1109f-primary-fingerprints.json在临时工作区。
+
+本次新增/迁移单测0，全部原测试字节冻结；未在非Windows执行Cargo/check/Clippy/tests/前端构建/浏览器/loopback。预期Desktop58/App230/PG259/Gateway112unit+41contract须修复自身完整Windows确认，前序成功或本次静态不替代。继续复用既有Windows workflow；实际job首次in_progress后停止所有CI查询，等待用户返回。
+
+Context7已查询Rust官方lint文档核对-D提升错误语义，但未返回1.88精确重导出条目；官网1.88归档页在工具中不可访问。对应版本直接依据是本次真实Rust1.88.0 Windows诊断；未改依赖/API/版本。单一导入清理不改变架构或真实流程，沿09现有中文Mermaid；Create State记录失败/修复与待验。
+
+09保持VERIFYING、10 BLOCKED，不标记本节点或R11完成。真实PG报告事务/并发回滚、历史保护四项/不可变账本、有效XLSX、Windows Full、私有P4P7固定回归及继承model.runs/0041删除风险仍最终封包新库待验；08真实API/用户凭据/会话取消端到端仍待环境。ignored、公开stub及静态指纹不计真实PASS。回退本次修复会回到已知失败dce36ac，不是可验收回退；最近完整成功源码仍08的858288e/文档dd01f9d。
+
+### 本次修复真实清单
+
+相对dce36ac4c6e9d4729f6bf3832961c2e7ba290f92，8M/0A/0D；没有移动或重命名。
+
+| 状态 | 修复路径 |
+|---|---|
+| M | `README.md` |
+| M | `architecture/domain-type-inventory.json` |
+| M | `docs/TESTING.md` |
+| M | `docs/football-model-platform-modular-rewrite-19-docs/11-R11-tauri-commands.md` |
+| M | `docs/modular-rewrite/R11-tauri-commands/R11-09-release-commands.md` |
+| M | `docs/modular-rewrite/R11-tauri-commands/README.md` |
+| M | `scripts/verify-tauri-bootstrap.mjs` |
+| M | `src-tauri/src/commands.rs` |
+
+相对09开始前dd01f9d的累计清单为5A/11M/1D，共17路径；比初始16路径仅增加既有scripts/verify-tauri-bootstrap.mjs的必要守卫修正。上方初始清单保留历史，当前额外8M如本表。

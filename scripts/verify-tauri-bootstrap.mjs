@@ -103,7 +103,18 @@ check(
   error.includes("io::Error::other") || error.includes("std::io::Error::other"),
   "启动 I/O 错误映射发生变化",
 );
-check(commands.includes("pub(crate) use crate::bootstrap::AppState;"), "commands.rs 未使用组合根 AppState");
+// R11-09 retired state re-export BEGIN
+check(!/\bAppState\b/.test(commands), "commands.rs 不得残留无消费者的 AppState 重导出或替代状态定义");
+const commandDefinitionFiles = new Set(commandContract.command_groups.flatMap(group =>
+  Object.values(group.command_definition_files ?? { root: group.definition_file }),
+));
+for (const file of commandDefinitionFiles) {
+  const source = read(file);
+  if (/\bAppState\b/.test(source)) {
+    check(/\bbootstrap\s*::\s*AppState\b/.test(source), `命令必须直接借用组合根唯一 AppState，不得恢复 commands 中转：${file}`);
+  }
+}
+// R11-09 retired state re-export END
 check(!commands.includes("pub struct AppState"), "commands.rs 仍重复定义 AppState");
 check(commands.includes("use uuid::Uuid;"), "commands.rs 丢失 UUID 解析依赖");
 

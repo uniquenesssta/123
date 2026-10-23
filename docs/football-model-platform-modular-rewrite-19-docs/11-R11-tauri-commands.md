@@ -7,7 +7,7 @@
 
 ## 当前前置状态（2026-10-23）
 
-R11-01～08 DONE（08自身精确858288e / Windows run39974291282完整SUCCESS）；09 Release Commands已实施VERIFYING，10 BLOCKED，R11 IN_PROGRESS。用户2026-10-23“通过收尾08开始09”，继续唯一rewrite/r11-tauri-commands；09基线dd01f9d为08五文档[skip ci]收尾，源码同08已验树。 [当前索引](../modular-rewrite/R11-tauri-commands/README.md)与[09记录](../modular-rewrite/R11-tauri-commands/R11-09-release-commands.md)。
+R11-01～08 DONE；09 VERIFYING、10 BLOCKED，R11 IN_PROGRESS，继续唯一rewrite/r11-tauri-commands。09首轮dce36ac / Windows run39981102375因commands.rs遗留无消费者AppState重导出触发unused_imports失败；现删除这一行，并把原bootstrap守卫改为检查根无中转与实际命令直接借用唯一bootstrap状态。三发布命令/原State/真实服务/DTO/注册保持；82源码/完整架构/1Rustfmt/42等价及6隔离负向通过，修复自身完整Windows待验。 [当前索引](../modular-rewrite/R11-tauri-commands/README.md)与[09修复记录](../modular-rewrite/R11-tauri-commands/R11-09-release-commands.md)。
 
 真实PostgreSQL、历史保护四项、不可变账本/并发回滚、有效XLSX、Windows Full、私有P4/P7固定回归及继承的model.runs/0041删除风险继续最终封包新库待验；ignored、公开unavailable stub和静态指纹不计这些真实项目PASS。
 
@@ -1243,7 +1243,7 @@ src-tauri/src/commands/ai_workspace/
 
 ## R11-09 Release Commands
 
-状态：`VERIFYING`（3条发布命令职责已独立，静态通过，自身完整Windows待验）
+状态：`VERIFYING`（首轮无用AppState重导出失败已修复，自身完整Windows待验）
 
 ### 1. 目标
 

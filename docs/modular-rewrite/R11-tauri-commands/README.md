@@ -2,7 +2,7 @@
 
 ## 当前阶段状态
 
-`IN_PROGRESS`。R11-01～08 DONE（08自身精确858288e / Windows run39974291282完整SUCCESS）；09 Release Commands已实施VERIFYING，10 BLOCKED，R11 IN_PROGRESS。用户2026-10-23“通过收尾08开始09”，继续唯一rewrite/r11-tauri-commands；09基线dd01f9d为08五文档[skip ci]收尾，源码同08已验树。 当前以本节与任务表为准。
+`IN_PROGRESS`。R11-01～08 DONE；09 VERIFYING、10 BLOCKED，R11 IN_PROGRESS，继续唯一rewrite/r11-tauri-commands。09首轮dce36ac / Windows run39981102375因commands.rs遗留无消费者AppState重导出触发unused_imports失败；现删除这一行，并把原bootstrap守卫改为检查根无中转与实际命令直接借用唯一bootstrap状态。三发布命令/原State/真实服务/DTO/注册保持；82源码/完整架构/1Rustfmt/42等价及6隔离负向通过，修复自身完整Windows待验。 当前以本节与任务表为准。
 
 ## 依据与前置基线
 
@@ -20,7 +20,7 @@
 | R11-06 | [Prediction、Research 与 Runs Commands](R11-06-prediction-research-and-runs-commands.md) | DONE · 自身精确Windows完整SUCCESS |
 | R11-07 | [Review、Postmatch 与 Analytics Commands](R11-07-review-postmatch-and-analytics-commands.md) | DONE · 自身精确Windows完整SUCCESS |
 | R11-08 | [AI Workspace 与 OpenAI Profiles Commands](R11-08-ai-workspace-and-openai-profiles-commands.md) | DONE · 自身精确Windows完整SUCCESS |
-| R11-09 | [Release Commands](R11-09-release-commands.md) | VERIFYING · 自身完整Windows待验 |
+| R11-09 | [Release Commands](R11-09-release-commands.md) | VERIFYING · unused_imports修复自身Windows待验 |
 | R11-10 | Command Registry 收敛 | BLOCKED |
 
 ## 继续约束
@@ -161,3 +161,8 @@ R11-01～07 DONE；08 VERIFYING、09～10 BLOCKED，R11 IN_PROGRESS，继续唯�
 ## R11-09 实施与验证
 
 3条发布验收命令按执行/列表/读取归入唯一commands/release目录，纯出口显式导出命令与双宏，旧release_acceptance.rs删除；原真实Application/ReleaseService/Port/PG报告链与三完整正文/签名保持。171公共命令/注册顺序不变，内部组release_acceptance→release、12组不变。82源码/完整架构/5Rustfmt/42等价/21隔离负向及保护门禁通过；09自身完整Windows待验，10 BLOCKED，R11 IN_PROGRESS。 详[09记录](R11-09-release-commands.md)。
+
+
+## R11-09 unused_imports修复
+
+R11-01～08 DONE；09 VERIFYING、10 BLOCKED，R11 IN_PROGRESS，继续唯一rewrite/r11-tauri-commands。09首轮dce36ac / Windows run39981102375因commands.rs遗留无消费者AppState重导出触发unused_imports失败；现删除这一行，并把原bootstrap守卫改为检查根无中转与实际命令直接借用唯一bootstrap状态。三发布命令/原State/真实服务/DTO/注册保持；82源码/完整架构/1Rustfmt/42等价及6隔离负向通过，修复自身完整Windows待验。 详[09修复记录](R11-09-release-commands.md)。
