@@ -7,7 +7,7 @@
 
 ## 当前前置状态（2026-10-15）
 
-R11-01 Bootstrap、Workspace 与 Logs Commands已实施 `VERIFYING`。用户2026-10-15“开始R11-01”，uniquenesssta/123 v0.23.0，从R10文档收尾3d43e8ec216f55daa04d5b8afeec68e372ce467c建立唯一 `rewrite/r11-tauri-commands`。9条平台命令已切换唯一owner，公共171命令与注册顺序保持；自身完整Windows待验，02～10 BLOCKED，R11 IN_PROGRESS。 前置R10已完整收尾，R11自身结果不能继承R10成功；[当前索引](../modular-rewrite/R11-tauri-commands/README.md)和[01实施记录](../modular-rewrite/R11-tauri-commands/R11-01-bootstrap-workspace-and-logs-commands.md)为实际边界与验证依据。
+R11-01 DONE，自身精确e56d21f / Windows run38724727036完整SUCCESS；首轮E0599已关闭。用户2026-10-23“已通过收尾01开始02”，02 READY、03～10 BLOCKED，R11 IN_PROGRESS，继续唯一rewrite/r11-tauri-commands。详[01记录](../modular-rewrite/R11-tauri-commands/R11-01-bootstrap-workspace-and-logs-commands.md)和[当前索引](../modular-rewrite/R11-tauri-commands/README.md)。
 
 真实PostgreSQL、历史保护四项、不可变账本/并发回滚、有效XLSX、Windows Full、私有P4/P7固定回归及继承的model.runs/0041删除风险继续最终封包新库待验；ignored、公开unavailable stub和静态指纹不计这些真实项目PASS。
 
@@ -163,7 +163,7 @@ docs/modular-rewrite/R11-tauri-commands/
 
 ## R11-01 Bootstrap、Workspace 与 Logs Commands
 
-状态：`VERIFYING`（首轮9e0a907 / run38689146967的E0599已定位，原Arc接收者已修复；同一R11分支等待修复自身完整Windows）
+状态：`DONE`（自身精确e56d21f / Windows run38724727036完整SUCCESS）。
 
 ### 1. 目标
 
@@ -298,7 +298,7 @@ src-tauri/src/commands/platform/
 
 ## R11-02 Database Commands
 
-状态：`BLOCKED`（仅当上一任务与本任务前置门禁通过后改为 `READY`）
+状态：`READY`（01自身完整Windows通过；用户2026-10-23“已通过收尾01开始02”授权）
 
 ### 1. 目标
 

@@ -824,3 +824,6 @@ Bootstrap、工作区与日志9条命令已收拢至commands/platform，唯一re
 
 
 R11-01 首轮 `9e0a907` / [Windows run38689146967](https://github.com/uniquenesssta/123/actions/runs/38689146967) 在恢复连接helper因Arc接收者类型丢失报E0599；前端和17视口通过。现已恢复原Arc借用、同步四个测试夹具并补原守卫，82源码/完整架构/2Rustfmt/35等价/17负向通过；同一R11分支复跑Windows，01仍VERIFYING。详见[01修复记录](docs/modular-rewrite/R11-tauri-commands/R11-01-bootstrap-workspace-and-logs-commands.md)。
+
+
+R11-01已收尾DONE：精确e56d21f / [Windows run38724727036](https://github.com/uniquenesssta/123/actions/runs/38724727036)完整SUCCESS，Desktop38/App230/PG259及完整前端/17视口、Rust、Windows打包/启动/日志通过，原E0599关闭。用户2026-10-23授权02 READY，沿同一R11分支；[01完成记录](docs/modular-rewrite/R11-tauri-commands/R11-01-bootstrap-workspace-and-logs-commands.md)。真实PG/私有回归/XLSX/Full与继承删除风险仍最终新库待验。
