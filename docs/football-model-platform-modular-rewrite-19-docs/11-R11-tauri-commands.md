@@ -7,7 +7,7 @@
 
 ## 当前前置状态（2026-10-23）
 
-R11-01、02 DONE；03 Competitions与Rules Commands已实施，状态VERIFYING；04～10 BLOCKED，R11 IN_PROGRESS。基线df3d3cc8461a54da12211b068441282a204331c4为02五文档[skip ci]收尾，生产源码同自身完整Windows成功a2341de。用户2026-10-23“收尾02开始03”，继续唯一rewrite/r11-tauri-commands。 [03实施记录](../modular-rewrite/R11-tauri-commands/R11-03-competitions-and-rules-commands.md)与[当前索引](../modular-rewrite/R11-tauri-commands/README.md)为当前依据。
+R11-01～03 DONE；03精确849f1a4 / Windows run39930230184完整SUCCESS。用户2026-10-23“收尾03开始04”，04 READY、05～10 BLOCKED，R11 IN_PROGRESS，继续唯一rewrite/r11-tauri-commands。详[03完成记录](../modular-rewrite/R11-tauri-commands/R11-03-competitions-and-rules-commands.md)与[当前索引](../modular-rewrite/R11-tauri-commands/README.md)。
 
 真实PostgreSQL、历史保护四项、不可变账本/并发回滚、有效XLSX、Windows Full、私有P4/P7固定回归及继承的model.runs/0041删除风险继续最终封包新库待验；ignored、公开unavailable stub和静态指纹不计这些真实项目PASS。
 
@@ -433,7 +433,7 @@ src-tauri/src/commands/database/
 
 ## R11-03 Competitions 与 Rules Commands
 
-状态：`VERIFYING`（七条薄命令职责及真实调用保持；静态通过，自身完整Windows待验）
+状态：`DONE`（自身精确849f1a4 / Windows run39930230184完整SUCCESS）
 
 ### 1. 目标
 
@@ -568,7 +568,7 @@ src-tauri/src/commands/competitions/
 
 ## R11-04 Teams 与 Players Commands
 
-状态：`BLOCKED`（仅当上一任务与本任务前置门禁通过后改为 `READY`）
+状态：`READY`（03自身完整Windows通过；用户2026-10-23“收尾03开始04”授权）
 
 ### 1. 目标
 
