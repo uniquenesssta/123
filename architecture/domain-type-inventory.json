@@ -24,13 +24,13 @@
     "targetPublicExportPolicy": "explicit re-export only"
   },
   "sourceDigest": "217241ac243726a5ab6805a7f169e222b97e78c7c971749a5904714af673ebdd",
-  "rustUsageDigest": "86bab5f5cc9f4e4806ea09f94504b54bf3ace9c1dfa73eb2a28d28c94afb959f",
+  "rustUsageDigest": "65c552d254848eddd51c255c5c16e4be7910b5089b137eee88dabc86769a5dd7",
   "summary": {
     "typeCount": 365,
     "publicCompatibilityTypeCount": 365,
     "internalTypeCount": 0,
     "domainSourceFileCount": 129,
-    "scannedRustFileCount": 1298,
+    "scannedRustFileCount": 1306,
     "databaseMappedTypeCount": 301,
     "byTargetModule": {
       "ai_workspace": 16,
@@ -4630,7 +4630,7 @@
         "crates/persistence-postgres/src/adapters/competition/bindings/create_binding/validation.rs",
         "crates/persistence-postgres/tests/competition_bindings_repository_contract.rs",
         "crates/persistence-postgres/tests/route_resolution_repository_contract.rs",
-        "src-tauri/src/commands/competition.rs"
+        "src-tauri/src/commands/competition/rules/create_competition_binding.rs"
       ],
       "databaseMappings": [
         "crates/persistence-postgres/src/adapters/competition/bindings/create_binding/transaction.rs",
@@ -4741,7 +4741,7 @@
         "crates/persistence-postgres/src/adapters/competition/bindings/list_bindings.rs",
         "crates/persistence-postgres/src/adapters/competition/bindings/read_binding.rs",
         "crates/persistence-postgres/src/adapters/competition/bindings/record_mapper.rs",
-        "src-tauri/src/commands/competition.rs"
+        "src-tauri/src/commands/competition/rules/create_competition_binding.rs"
       ],
       "databaseMappings": [
         "crates/persistence-postgres/src/adapters/competition/bindings/create_binding/transaction.rs",
@@ -4832,7 +4832,7 @@
         "crates/persistence-postgres/tests/competitions_repository_contract.rs",
         "crates/persistence-postgres/tests/postgres_integration.rs",
         "crates/persistence-postgres/tests/route_resolution_repository_contract.rs",
-        "src-tauri/src/commands/competition.rs"
+        "src-tauri/src/commands/competition/create_competition.rs"
       ],
       "databaseMappings": [
         "crates/persistence-postgres/src/adapters/competition/directory/create_competition.rs"
@@ -5310,7 +5310,7 @@
         "crates/persistence-postgres/src/adapters/competition/detail/record_mapper.rs",
         "crates/persistence-postgres/src/adapters/competition/directory/create_competition.rs",
         "crates/persistence-postgres/src/adapters/competition/directory/list_competitions.rs",
-        "src-tauri/src/commands/competition.rs"
+        "src-tauri/src/commands/competition/create_competition.rs"
       ],
       "databaseMappings": [
         "crates/persistence-postgres/src/adapters/competition/detail/read_competition.rs",
@@ -24766,7 +24766,7 @@
         "crates/application/src/use_cases/competition/create_round/mod.rs",
         "crates/persistence-postgres/src/adapters/competition/hierarchy/rounds/create_round.rs",
         "crates/persistence-postgres/tests/competition_hierarchy_repository_contract.rs",
-        "src-tauri/src/commands/competition.rs"
+        "src-tauri/src/commands/competition/create_round.rs"
       ],
       "databaseMappings": [
         "crates/persistence-postgres/src/adapters/competition/hierarchy/rounds/create_round.rs"
@@ -24856,7 +24856,7 @@
         "crates/persistence-postgres/src/adapters/competition/hierarchy/rounds/list_rounds.rs",
         "crates/persistence-postgres/src/adapters/competition/hierarchy/rounds/read_round.rs",
         "crates/persistence-postgres/src/adapters/competition/hierarchy/rounds/record_mapper.rs",
-        "src-tauri/src/commands/competition.rs"
+        "src-tauri/src/commands/competition/create_round.rs"
       ],
       "databaseMappings": [
         "crates/persistence-postgres/src/adapters/competition/hierarchy/rounds/create_round.rs",
@@ -25296,7 +25296,7 @@
         "crates/persistence-postgres/tests/postgres_integration.rs",
         "crates/persistence-postgres/tests/route_resolution_repository_contract.rs",
         "crates/persistence-postgres/tests/rule_package_repository_contract.rs",
-        "src-tauri/src/commands/competition.rs"
+        "src-tauri/src/commands/competition/rules/register_rule_package.rs"
       ],
       "databaseMappings": [
         "crates/persistence-postgres/src/adapters/rules/packages/register_rule_package/insert_rule_package.rs",
@@ -25406,7 +25406,7 @@
         "crates/persistence-postgres/src/adapters/rules/packages/list_rule_packages.rs",
         "crates/persistence-postgres/src/adapters/rules/packages/record_mapper.rs",
         "crates/persistence-postgres/src/adapters/rules/packages/register_rule_package/transaction.rs",
-        "src-tauri/src/commands/competition.rs"
+        "src-tauri/src/commands/competition/rules/register_rule_package.rs"
       ],
       "databaseMappings": [
         "crates/persistence-postgres/src/adapters/rules/packages/list_rule_packages.rs",
@@ -25812,7 +25812,7 @@
         "crates/persistence-postgres/tests/competition_hierarchy_repository_contract.rs",
         "crates/persistence-postgres/tests/postgres_integration.rs",
         "crates/persistence-postgres/tests/route_resolution_repository_contract.rs",
-        "src-tauri/src/commands/competition.rs"
+        "src-tauri/src/commands/competition/create_season.rs"
       ],
       "databaseMappings": [
         "crates/persistence-postgres/src/adapters/competition/hierarchy/seasons/create_season.rs"
@@ -25898,7 +25898,7 @@
         "crates/persistence-postgres/src/adapters/competition/hierarchy/seasons/list_seasons.rs",
         "crates/persistence-postgres/src/adapters/competition/hierarchy/seasons/read_season.rs",
         "crates/persistence-postgres/src/adapters/competition/hierarchy/seasons/record_mapper.rs",
-        "src-tauri/src/commands/competition.rs"
+        "src-tauri/src/commands/competition/create_season.rs"
       ],
       "databaseMappings": [
         "crates/persistence-postgres/src/adapters/competition/hierarchy/seasons/create_season.rs",
@@ -28727,7 +28727,7 @@
         "crates/persistence-postgres/tests/competition_bindings_repository_contract.rs",
         "crates/persistence-postgres/tests/competition_hierarchy_repository_contract.rs",
         "crates/persistence-postgres/tests/route_resolution_repository_contract.rs",
-        "src-tauri/src/commands/competition.rs"
+        "src-tauri/src/commands/competition/create_stage.rs"
       ],
       "databaseMappings": [
         "crates/persistence-postgres/src/adapters/competition/hierarchy/stages/create_stage.rs"
@@ -28821,7 +28821,7 @@
         "crates/persistence-postgres/src/adapters/competition/hierarchy/stages/list_stages.rs",
         "crates/persistence-postgres/src/adapters/competition/hierarchy/stages/read_stage.rs",
         "crates/persistence-postgres/src/adapters/competition/hierarchy/stages/record_mapper.rs",
-        "src-tauri/src/commands/competition.rs"
+        "src-tauri/src/commands/competition/create_stage.rs"
       ],
       "databaseMappings": [
         "crates/persistence-postgres/src/adapters/competition/hierarchy/stages/create_stage.rs",

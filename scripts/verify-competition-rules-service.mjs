@@ -60,7 +60,17 @@ const bootstrap = read("crates/application/src/services/database/bootstrap.rs");
 const applicationBootstrap = read("crates/application/src/use_cases/application_facade/bootstrap.rs");
 const lifecycleInitialize = read("crates/application/src/use_cases/application_facade/database_lifecycle/initialize.rs");
 const databaseFacade = read("crates/application/src/services/database/facade.rs");
-const tauriCompetition = read("src-tauri/src/commands/competition.rs");
+const commandRoot = "src-tauri/src/commands/competition";
+const commandFiles = {
+  create_competition: "create_competition.rs",
+  delete_competition: "delete_competition.rs",
+  create_season: "create_season.rs",
+  create_stage: "create_stage.rs",
+  create_round: "create_round.rs",
+  register_rule_package: "rules/register_rule_package.rs",
+  create_competition_binding: "rules/create_competition_binding.rs",
+};
+const tauriCompetition = Object.values(commandFiles).map(file => read(`${commandRoot}/${file}`)).join("\n");
 const packageDefinition = JSON.parse(read("package.json"));
 const frontendVerifier = read("scripts/verify-frontend.mjs");
 
@@ -131,6 +141,60 @@ for (const command of [
 ]) {
   check(tauriCompetition.includes(command), `Tauri Competition 公共调用链发生变化：${command}`);
 }
+
+// R11-03: verify the actual thin transport definitions and their unique owners.
+const commandContract = JSON.parse(read("architecture/command-contract.json"));
+const boundaries = JSON.parse(read("architecture/module-boundaries.json"));
+const commandGroup = commandContract.command_groups.find(group => group.module === "competition");
+const commandModules = read("src-tauri/src/commands.rs");
+check(!existsSync(join(root, `${commandRoot}.rs`)), "旧赛事命令owner仍存在");
+check(commandModules.includes("mod competition;") && commandModules.includes("pub use competition::*;"), "赛事命令未接入原唯一根出口");
+check(commandGroup?.definition_file === `${commandRoot}/mod.rs` && commandGroup?.parameter_and_return_signature_file === `${commandRoot}/mod.rs`, "赛事命令契约根出口未同步");
+check(boundaries.tauri_commands?.groups?.competition === `${commandRoot}/mod.rs`, "赛事命令边界owner未同步");
+const commandTypes = {
+  create_competition: ["CompetitionDraft", "CompetitionRecord"],
+  create_season: ["SeasonDraft", "SeasonRecord"],
+  create_stage: ["StageDraft", "StageRecord"],
+  create_round: ["RoundDraft", "RoundRecord"],
+  register_rule_package: ["RulePackageDraft", "RulePackageSummary"],
+  create_competition_binding: ["CompetitionBindingDraft", "CompetitionBindingSummary"],
+};
+const rustTokens = source => (source.match(/"(?:\\.|[^"\\])*"|[A-Za-z_][A-Za-z_0-9]*|[^\s]/g) ?? []).join("\0");
+const exportLine = (module, name) => `pub use ${module}::{__cmd__${name}, __tauri_command_name_${name}, ${name}};`;
+const hierarchyCommands = Object.keys(commandFiles).filter(name => !commandFiles[name].startsWith("rules/")).sort();
+const rulesCommands = Object.keys(commandFiles).filter(name => commandFiles[name].startsWith("rules/")).sort();
+const expectedRoot = [
+  ...hierarchyCommands.map(name => `mod ${name};`), "mod rules;",
+  ...hierarchyCommands.map(name => exportLine(name, name)),
+  `pub use rules::{${rulesCommands.flatMap(name => [`__cmd__${name}`, `__tauri_command_name_${name}`, name]).sort().join(",")}};`,
+].join("\n");
+const expectedRules = [
+  ...rulesCommands.map(name => `mod ${name};`),
+  ...rulesCommands.map(name => exportLine(name, name)),
+].join("\n");
+// Rustfmt may retain or add a trailing comma to grouped imports.
+const moduleTokens = source => rustTokens(source.replace(/,\s*}/g, "}"));
+check(moduleTokens(read(`${commandRoot}/mod.rs`)) === moduleTokens(expectedRoot), "赛事出口必须只显式登记原命令及双宏出口");
+check(moduleTokens(read(`${commandRoot}/rules/mod.rs`)) === moduleTokens(expectedRules), "规则出口必须只显式登记原命令及双宏出口");
+for (const [name, file] of Object.entries(commandFiles)) {
+  const source = read(`${commandRoot}/${file}`);
+  const types = commandTypes[name];
+  const argument = types ? `draft: ${types[0]}` : "competition_id: String";
+  const response = types ? types[1] : "()";
+  const parsing = types ? "" : 'let competition_id = parse_uuid(&competition_id, "赛事 ID")?;';
+  const input = types ? "draft" : "competition_id";
+  const expected = `#[tauri::command] pub async fn ${name}(state: State<'_, AppState>, ${argument}) -> Result<${response}, String> {
+    ${parsing} state.service.${name}(${input}).await.map_err(|error| error.to_string())
+  }`;
+  const actual = source.match(/#\[tauri::command\][\s\S]*$/)?.[0] ?? "";
+  check(rustTokens(actual.replace(/,\s*\)/g, ")")) === rustTokens(expected), `赛事命令公开签名/UUID门槛/真实调用/原错误投影漂移：${name}`);
+  check(commandGroup?.command_definition_files?.[name] === `${commandRoot}/${file}`, `赛事命令定义归属漂移：${name}`);
+  check(source.includes("crate::bootstrap::AppState") || source.includes("bootstrap::AppState, commands::parse_uuid"), `赛事命令未借用原AppState：${name}`);
+  for (const forbidden of ["football_persistence_postgres", "sqlx::", "PgPool", "PostgresStore", "ApplicationService::new", "tokio::spawn", "Mutex<", "static ", "macro_rules!", "unwrap(", "expect("]) {
+    check(!source.includes(forbidden), `赛事命令越过原服务边界：${name}/${forbidden}`);
+  }
+}
+check(read(`${commandRoot}/delete_competition.rs`).includes("commands::parse_uuid"), "删除赛事不得复制或替换原UUID校验");
 
 check(
   packageDefinition.scripts?.["verify:competition-rules-service"] ===

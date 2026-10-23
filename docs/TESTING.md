@@ -893,3 +893,11 @@ R11-02 Database Commands已实施 `VERIFYING`，基线f56a1c004cee8018f657b6cdd9
 报告logs/windows-acceptance-20261023-082447.json及同名.txt；artifact12490175090，14,053,267字节，SHA-256 `cbbf826844a2ee62603696928ab7702ff4b09d43847746913f8522369826d373`，查询时未过期。已核对精确head/branch、全部job步骤、完整日志与artifact。用户2026-10-23“收尾02开始03”，02 DONE，03 Competitions与Rules Commands READY，04～10 BLOCKED，R11 IN_PROGRESS，继续唯一rewrite/r11-tauri-commands。本次仅5份既有文档[skip ci]收尾，源码沿用上述自身完整Windows成功，不重复同源码构建。下文原VERIFYING及预期计数保留为实施历史，当前状态以阶段索引为准；03须自身精确Windows，无R11阶段完成记录。
 
 真实PG/历史保护四项/不可变账本并发回滚/有效XLSX/Windows Full/私有P4P7固定回归及继承model.runs/0041删除风险仍最终封包新库待验；ignored、公开unavailable stub和静态指纹不计这些真实PASS。
+
+## R11-03 赛事与规则命令（2026-10-23，VERIFYING）
+
+R11-01、02 DONE；03 Competitions与Rules Commands已实施，状态VERIFYING；04～10 BLOCKED，R11 IN_PROGRESS。基线df3d3cc8461a54da12211b068441282a204331c4为02五文档[skip ci]收尾，生产源码同自身完整Windows成功a2341de。用户2026-10-23“收尾02开始03”，继续唯一rewrite/r11-tauri-commands。
+
+82/82原只读源码、完整architecture、9独立Rustfmt1.88、38完整等价、17负向拒绝/bytes恢复、保护/171命令/DB静态与差异检查通过。七条原薄命令只迁移职责与显式出口，本次新单测0、迁移单测0，原Desktop46/App230/PG259/Gateway112+41预期保持；仍须03自身Windows编译、自动测试、打包、启动和日志结果。未执行非Windows动态，真实PG效果未实跑。详[03记录](modular-rewrite/R11-tauri-commands/R11-03-competitions-and-rules-commands.md)。
+
+真实PG/历史保护四项/不可变账本并发回滚/有效XLSX/Windows Full/私有P4P7固定回归及继承model.runs/0041删除风险仍最终封包新库待验；ignored、公开unavailable stub和静态指纹不计这些真实PASS。

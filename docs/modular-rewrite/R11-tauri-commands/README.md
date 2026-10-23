@@ -2,7 +2,7 @@
 
 ## 当前阶段状态
 
-`IN_PROGRESS`。01与02均自身完整Windows成功并DONE；02精确a2341de / run39924367412 / job120317021511。用户2026-10-23“收尾02开始03”，03 READY、04～10 BLOCKED，继续唯一rewrite/r11-tauri-commands。当前状态以本节与任务表为准，原VERIFYING段落保留历史。
+`IN_PROGRESS`。R11-01、02 DONE；03 Competitions与Rules Commands已实施，状态VERIFYING；04～10 BLOCKED，R11 IN_PROGRESS。基线df3d3cc8461a54da12211b068441282a204331c4为02五文档[skip ci]收尾，生产源码同自身完整Windows成功a2341de。用户2026-10-23“收尾02开始03”，继续唯一rewrite/r11-tauri-commands。 当前以本节及任务表为准。
 
 ## 依据与前置基线
 
@@ -14,7 +14,7 @@
 |---|---|---|
 | R11-01 | [Bootstrap、Workspace 与 Logs Commands](R11-01-bootstrap-workspace-and-logs-commands.md) | DONE · 自身精确Windows完整SUCCESS |
 | R11-02 | [Database Commands](R11-02-database-commands.md) | DONE · 自身精确Windows完整SUCCESS |
-| R11-03 | Competitions 与 Rules Commands | READY |
+| R11-03 | [Competitions 与 Rules Commands](R11-03-competitions-and-rules-commands.md) | VERIFYING · 自身完整Windows待验 |
 | R11-04 | Teams 与 Players Commands | BLOCKED |
 | R11-05 | Lineups、Presets 与 Workbooks Commands | BLOCKED |
 | R11-06 | Prediction、Research 与 Runs Commands | BLOCKED |
@@ -64,5 +64,11 @@ R11-02 Database Commands已实施 `VERIFYING`，基线f56a1c004cee8018f657b6cdd9
 精确提交 `a2341de108f61198b7fe10c23c40db6e3785a1bc` / tree `c99c1ad3bde30652634a3564d60e9c4dfebadb40`，[Public Platform CI run39924367412](https://github.com/uniquenesssta/123/actions/runs/39924367412) / Windows job120317021511完整SUCCESS，run于2026-10-23 16:46:55北京时间完成。实际Desktop46/46（新增8项数据库命令unit逐项OK）、Application230/230、Persistence259/259、Gateway112/112 unit和41/41 contract；完整frontend/contracts/TypeScript/Vite/17视口、Rust fmt/locked Clippy all-targets -D warnings/workspace tests、Windows release/MSI/NSIS/启动与日志均通过（7条记录、3个完成操作）。
 
 报告logs/windows-acceptance-20261023-082447.json及同名.txt；artifact12490175090，14,053,267字节，SHA-256 `cbbf826844a2ee62603696928ab7702ff4b09d43847746913f8522369826d373`，查询时未过期。已核对精确head/branch、全部job步骤、完整日志与artifact。用户2026-10-23“收尾02开始03”，02 DONE，03 Competitions与Rules Commands READY，04～10 BLOCKED，R11 IN_PROGRESS，继续唯一rewrite/r11-tauri-commands。本次仅5份既有文档[skip ci]收尾，源码沿用上述自身完整Windows成功，不重复同源码构建。下文原VERIFYING及预期计数保留为实施历史，当前状态以阶段索引为准；03须自身精确Windows，无R11阶段完成记录。
+
+真实PG/历史保护四项/不可变账本并发回滚/有效XLSX/Windows Full/私有P4P7固定回归及继承model.runs/0041删除风险仍最终封包新库待验；ignored、公开unavailable stub和静态指纹不计这些真实PASS。
+
+## R11-03 实施与验证
+
+七条命令已独立、规则子目录与双层宏出口接入、旧owner删除，原完整调用正文/签名保持。82源码/完整架构/9Rustfmt/38等价/17破坏拒绝和保护门禁通过；本次新增单测0，原目标交自身Windows。详[03记录](R11-03-competitions-and-rules-commands.md)。
 
 真实PG/历史保护四项/不可变账本并发回滚/有效XLSX/Windows Full/私有P4P7固定回归及继承model.runs/0041删除风险仍最终封包新库待验；ignored、公开unavailable stub和静态指纹不计这些真实PASS。
