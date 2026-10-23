@@ -21,7 +21,7 @@ const persistence = ["monthly_team/read", "monthly_team/gaps", "monthly_player/r
 const legacyPersistence = ["preview", "conflict", "commit", "export", "identity", "validation", "values"]
   .map((name) => read(name === "export" ? "crates/persistence-postgres/src/adapters/workbooks/monthly_player/read.rs" : `crates/persistence-postgres/src/adapters/workbooks/player_catalog/${name}.rs`)).join("\n");
 const application = read("crates/application/src/use_cases/exchange/preview_player_catalog_import/use_case.rs");
-const commands = read("src-tauri/src/commands/exchange.rs");
+const commands = [...new Set(Object.values(JSON.parse(read("architecture/command-contract.json")).command_groups.find(group => group.module === "exchange").command_definition_files))].map(read).join("\n");
 const registry = read("src-tauri/src/bootstrap/command_registry.rs");
 const client = read("src/api/client.ts");
 const teams = read("src/pages/teams.ts");

@@ -349,14 +349,15 @@
       "catalog": "src-tauri/src/commands/catalog/mod.rs",
       "competition": "src-tauri/src/commands/competition/mod.rs",
       "database": "src-tauri/src/commands/database/mod.rs",
-      "exchange": "src-tauri/src/commands/exchange.rs",
+      "exchange": "src-tauri/src/commands/exchange/mod.rs",
       "openai": "src-tauri/src/commands/openai.rs",
       "orchestration": "src-tauri/src/commands/orchestration.rs",
       "platform": "src-tauri/src/commands/platform/mod.rs",
       "postmatch": "src-tauri/src/commands/postmatch.rs",
       "prediction": "src-tauri/src/commands/prediction.rs",
       "release_acceptance": "src-tauri/src/commands/release_acceptance.rs",
-      "review": "src-tauri/src/commands/review.rs"
+      "review": "src-tauri/src/commands/review.rs",
+      "lineups": "src-tauri/src/commands/lineups/mod.rs"
     },
     "rules": [
       "names/parameters/returns/order frozen",

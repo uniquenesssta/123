@@ -11,7 +11,7 @@ const migration = read("crates/persistence-postgres/migrations/0045_team_lineup_
 const domain = (read("crates/domain/src/lib.rs") + read("crates/domain/src/lineup/kind.rs") + read("crates/domain/src/lineup/player.rs") + read("crates/domain/src/lineup/snapshot.rs") + read("crates/domain/src/lineup/preset.rs") + read("crates/domain/src/lineup/chain.rs") + read("crates/domain/src/match_record/status.rs") + read("crates/domain/src/match_record/catalog.rs"));
 const persistence = ["write.rs", "read.rs", "preview.rs", "validation.rs"].map((file) => read("crates/persistence-postgres/src/adapters/lineups/presets/" + file)).join("\n");
 const application = read("crates/application/src/services/lineups/facade.rs");
-const commands = ["formations", "matches", "lineup_presets", "lineups"].map(name => read(`src-tauri/src/commands/catalog/${name}.rs`)).join("\n");
+const commands = [...new Set(Object.values(JSON.parse(read("architecture/command-contract.json")).command_groups.find(group => group.module === "lineups").command_definition_files))].map(read).join("\n");
 const commandRegistry = read("src-tauri/src/bootstrap/command_registry.rs");
 const api = read("src/api/client.ts");
 const types = read("src/types.ts");

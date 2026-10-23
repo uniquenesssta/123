@@ -21,7 +21,7 @@ const integrationTests = read("crates/persistence-postgres/tests/postgres_integr
 const spreadsheetApplication = read("crates/application/src/use_cases/exchange/preview_team_package_import/coverage.rs");
 const lineupRead = read("crates/persistence-postgres/src/adapters/lineups/history/read.rs");
 const lineupMapping = read("crates/persistence-postgres/src/adapters/lineups/history/mapping.rs");
-const commands = ["formations", "matches", "lineup_presets", "lineups"].map(name => read(`src-tauri/src/commands/catalog/${name}.rs`)).join("\n");
+const commands = [...new Set(Object.values(JSON.parse(read("architecture/command-contract.json")).command_groups.find(group => group.module === "lineups").command_definition_files))].map(read).join("\n");
 const registry = read("src-tauri/src/bootstrap/command_registry.rs");
 const client = read("src/api/client.ts");
 const teams = read("src/pages/teams.ts");

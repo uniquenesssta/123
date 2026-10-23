@@ -86,7 +86,71 @@ const port = read("crates/application/src/ports/exchange/mod.rs");
 const matchLineupAdapter = read(`${adapterRoot}/match_lineup.rs`);
 const spreadsheetAdapter = read(`${adapterRoot}/spreadsheet.rs`);
 const library = read("crates/application/src/lib.rs");
-const commands = read("src-tauri/src/commands/exchange.rs");
+// R11-05 transport locations.
+const exchangeTransportRoot = "src-tauri/src/commands/exchange";
+const exchangeTransportGroups = {
+  "team_package": [
+    "export_team_package_template",
+    "export_team_package_preview_json",
+    "preview_team_package_import",
+    "commit_team_package_import"
+  ],
+  "player_catalog": [
+    "export_player_catalog_template",
+    "export_player_catalog_data",
+    "preview_player_catalog_import",
+    "read_player_catalog_import_preview",
+    "resolve_player_catalog_import_conflict",
+    "commit_player_catalog_import"
+  ],
+  "team_monthly": [
+    "export_team_monthly_template",
+    "export_team_monthly_data",
+    "preview_team_monthly_import",
+    "read_team_monthly_import_preview",
+    "resolve_team_monthly_import_conflict",
+    "commit_team_monthly_import"
+  ],
+  "match_lineup": [
+    "export_match_lineup_template",
+    "export_match_lineup_data",
+    "preview_match_lineup_import",
+    "read_match_lineup_import_preview",
+    "resolve_match_lineup_import_conflict",
+    "commit_match_lineup_import"
+  ],
+  "ai_match_package": [
+    "export_ai_match_package",
+    "preview_ai_match_package"
+  ]
+};
+const exchangeTransportFiles = {
+  "export_team_package_template": "src-tauri/src/commands/exchange/team_package/export_team_package_template.rs",
+  "export_team_package_preview_json": "src-tauri/src/commands/exchange/team_package/export_team_package_preview_json.rs",
+  "preview_team_package_import": "src-tauri/src/commands/exchange/team_package/preview_team_package_import.rs",
+  "commit_team_package_import": "src-tauri/src/commands/exchange/team_package/commit_team_package_import.rs",
+  "export_player_catalog_template": "src-tauri/src/commands/exchange/player_catalog/export_player_catalog_template.rs",
+  "export_player_catalog_data": "src-tauri/src/commands/exchange/player_catalog/export_player_catalog_data.rs",
+  "preview_player_catalog_import": "src-tauri/src/commands/exchange/player_catalog/preview_player_catalog_import.rs",
+  "read_player_catalog_import_preview": "src-tauri/src/commands/exchange/player_catalog/read_player_catalog_import_preview.rs",
+  "resolve_player_catalog_import_conflict": "src-tauri/src/commands/exchange/player_catalog/resolve_player_catalog_import_conflict.rs",
+  "commit_player_catalog_import": "src-tauri/src/commands/exchange/player_catalog/commit_player_catalog_import.rs",
+  "export_team_monthly_template": "src-tauri/src/commands/exchange/team_monthly/export_team_monthly_template.rs",
+  "export_team_monthly_data": "src-tauri/src/commands/exchange/team_monthly/export_team_monthly_data.rs",
+  "preview_team_monthly_import": "src-tauri/src/commands/exchange/team_monthly/preview_team_monthly_import.rs",
+  "read_team_monthly_import_preview": "src-tauri/src/commands/exchange/team_monthly/read_team_monthly_import_preview.rs",
+  "resolve_team_monthly_import_conflict": "src-tauri/src/commands/exchange/team_monthly/resolve_team_monthly_import_conflict.rs",
+  "commit_team_monthly_import": "src-tauri/src/commands/exchange/team_monthly/commit_team_monthly_import.rs",
+  "export_match_lineup_template": "src-tauri/src/commands/exchange/match_lineup/export_match_lineup_template.rs",
+  "export_match_lineup_data": "src-tauri/src/commands/exchange/match_lineup/export_match_lineup_data.rs",
+  "preview_match_lineup_import": "src-tauri/src/commands/exchange/match_lineup/preview_match_lineup_import.rs",
+  "read_match_lineup_import_preview": "src-tauri/src/commands/exchange/match_lineup/read_match_lineup_import_preview.rs",
+  "resolve_match_lineup_import_conflict": "src-tauri/src/commands/exchange/match_lineup/resolve_match_lineup_import_conflict.rs",
+  "commit_match_lineup_import": "src-tauri/src/commands/exchange/match_lineup/commit_match_lineup_import.rs",
+  "export_ai_match_package": "src-tauri/src/commands/exchange/ai_match_package/export_ai_match_package.rs",
+  "preview_ai_match_package": "src-tauri/src/commands/exchange/ai_match_package/preview_ai_match_package.rs"
+};
+const commands = Object.values(exchangeTransportFiles).map(read).join("\n");
 const composition = read("crates/application/src/composition/application_composition.rs");
 const applicationService = read("crates/application/src/service/application_service.rs");
 
@@ -427,6 +491,124 @@ for (const [name,contract] of Object.entries(matchSql)) {
   check(queries.length===contract.queries && crypto.createHash("sha256").update(queries.join("\n")).digest("hex")===contract.sha256,`${name} 原比赛工作簿 SQL、关联、历史/时间或字段已漂移`);
 }
 for (const token of ["比赛工作簿重复导出保持引用、活动版本和字段投影", "比赛导出和 AI 上下文不得修改事实、账本或审计", "比赛预检读回保持行身份、载荷和计数", "工作簿主客身份不符必须预检阻断", "非法单侧工作簿不得启动事实写入"]) check(integration.includes(token),`原比赛工作簿数据库夹具缺少：${token}`);
+
+// R11-05 transport contract BEGIN
+{
+  const transportRoot = exchangeTransportRoot;
+  const transportGroups = exchangeTransportGroups;
+  const transportFiles = exchangeTransportFiles;
+  const transportSignatures = {
+  "export_team_package_template": "pub async fn export_team_package_template(\n    state: State<'_, AppState>,\n    output_path: String,\n) -> Result<football_domain::TeamPackageExportSummary, String>",
+  "export_team_package_preview_json": "pub async fn export_team_package_preview_json(\n    state: State<'_, AppState>,\n    output_path: String,\n    preview: football_domain::TeamPackageImportPreview,\n) -> Result<football_domain::TeamPackagePreviewExportSummary, String>",
+  "preview_team_package_import": "pub async fn preview_team_package_import(\n    state: State<'_, AppState>,\n    input_path: String,\n    mode: football_domain::SpreadsheetImportMode,\n) -> Result<football_domain::TeamPackageImportPreview, String>",
+  "commit_team_package_import": "pub async fn commit_team_package_import(\n    state: State<'_, AppState>,\n    request: football_domain::TeamPackageCommitRequest,\n) -> Result<football_domain::TeamPackageCommitResult, String>",
+  "export_player_catalog_template": "pub async fn export_player_catalog_template(\n    state: State<'_, AppState>,\n    output_path: String,\n) -> Result<football_domain::SpreadsheetExportSummary, String>",
+  "export_player_catalog_data": "pub async fn export_player_catalog_data(\n    state: State<'_, AppState>,\n    output_path: String,\n) -> Result<football_domain::SpreadsheetExportSummary, String>",
+  "preview_player_catalog_import": "pub async fn preview_player_catalog_import(\n    state: State<'_, AppState>,\n    input_path: String,\n    mode: football_domain::SpreadsheetImportMode,\n) -> Result<football_domain::SpreadsheetImportPreview, String>",
+  "read_player_catalog_import_preview": "pub async fn read_player_catalog_import_preview(\n    state: State<'_, AppState>,\n    batch_id: String,\n) -> Result<football_domain::SpreadsheetImportPreview, String>",
+  "resolve_player_catalog_import_conflict": "pub async fn resolve_player_catalog_import_conflict(\n    state: State<'_, AppState>,\n    batch_id: String,\n    resolution: football_domain::SpreadsheetImportResolution,\n) -> Result<football_domain::SpreadsheetImportPreview, String>",
+  "commit_player_catalog_import": "pub async fn commit_player_catalog_import(\n    state: State<'_, AppState>,\n    batch_id: String,\n) -> Result<football_domain::SpreadsheetImportCommitResult, String>",
+  "export_team_monthly_template": "pub async fn export_team_monthly_template(\n    state: State<'_, AppState>,\n    output_path: String,\n) -> Result<football_domain::MonthlyWorkbookExportSummary, String>",
+  "export_team_monthly_data": "pub async fn export_team_monthly_data(\n    state: State<'_, AppState>,\n    output_path: String,\n) -> Result<football_domain::MonthlyWorkbookExportSummary, String>",
+  "preview_team_monthly_import": "pub async fn preview_team_monthly_import(\n    state: State<'_, AppState>,\n    input_path: String,\n    mode: football_domain::SpreadsheetImportMode,\n) -> Result<football_domain::SpreadsheetImportPreview, String>",
+  "read_team_monthly_import_preview": "pub async fn read_team_monthly_import_preview(\n    state: State<'_, AppState>,\n    batch_id: String,\n) -> Result<football_domain::SpreadsheetImportPreview, String>",
+  "resolve_team_monthly_import_conflict": "pub async fn resolve_team_monthly_import_conflict(\n    state: State<'_, AppState>,\n    batch_id: String,\n    resolution: football_domain::SpreadsheetImportResolution,\n) -> Result<football_domain::SpreadsheetImportPreview, String>",
+  "commit_team_monthly_import": "pub async fn commit_team_monthly_import(\n    state: State<'_, AppState>,\n    batch_id: String,\n) -> Result<football_domain::SpreadsheetImportCommitResult, String>",
+  "export_match_lineup_template": "pub async fn export_match_lineup_template(\n    state: State<'_, AppState>,\n    output_path: String,\n) -> Result<football_domain::MatchLineupExportSummary, String>",
+  "export_match_lineup_data": "pub async fn export_match_lineup_data(\n    state: State<'_, AppState>,\n    output_path: String,\n    match_id: String,\n) -> Result<football_domain::MatchLineupExportSummary, String>",
+  "preview_match_lineup_import": "pub async fn preview_match_lineup_import(\n    state: State<'_, AppState>,\n    input_path: String,\n    mode: football_domain::SpreadsheetImportMode,\n) -> Result<football_domain::SpreadsheetImportPreview, String>",
+  "read_match_lineup_import_preview": "pub async fn read_match_lineup_import_preview(\n    state: State<'_, AppState>,\n    batch_id: String,\n) -> Result<football_domain::SpreadsheetImportPreview, String>",
+  "resolve_match_lineup_import_conflict": "pub async fn resolve_match_lineup_import_conflict(\n    state: State<'_, AppState>,\n    batch_id: String,\n    resolution: football_domain::SpreadsheetImportResolution,\n) -> Result<football_domain::SpreadsheetImportPreview, String>",
+  "commit_match_lineup_import": "pub async fn commit_match_lineup_import(\n    state: State<'_, AppState>,\n    batch_id: String,\n) -> Result<football_domain::SpreadsheetImportCommitResult, String>",
+  "export_ai_match_package": "pub async fn export_ai_match_package(\n    state: State<'_, AppState>,\n    output_path: String,\n    match_id: String,\n) -> Result<football_domain::AiMatchPackageSummary, String>",
+  "preview_ai_match_package": "pub async fn preview_ai_match_package(\n    state: State<'_, AppState>,\n    input_path: String,\n    mode: football_domain::SpreadsheetImportMode,\n) -> Result<football_domain::SpreadsheetImportPreview, String>"
+};
+  const transportValidation = {
+  "read_player_catalog_import_preview": "let parsed = parse_uuid(&batch_id, \"批次 ID\")?;",
+  "resolve_player_catalog_import_conflict": "let parsed = parse_uuid(&batch_id, \"批次 ID\")?;",
+  "commit_player_catalog_import": "let parsed = parse_uuid(&batch_id, \"批次 ID\")?;",
+  "read_team_monthly_import_preview": "let batch_id = parse_uuid(&batch_id, \"批次 ID\")?;",
+  "resolve_team_monthly_import_conflict": "let batch_id = parse_uuid(&batch_id, \"批次 ID\")?;",
+  "commit_team_monthly_import": "let batch_id = parse_uuid(&batch_id, \"批次 ID\")?;",
+  "export_match_lineup_data": "let match_id = parse_uuid(&match_id, \"比赛 ID\")?;",
+  "read_match_lineup_import_preview": "let batch_id = parse_uuid(&batch_id, \"批次 ID\")?;",
+  "resolve_match_lineup_import_conflict": "let batch_id = parse_uuid(&batch_id, \"批次 ID\")?;",
+  "commit_match_lineup_import": "let batch_id = parse_uuid(&batch_id, \"批次 ID\")?;",
+  "export_ai_match_package": "let match_id = parse_uuid(&match_id, \"比赛 ID\")?;"
+};
+  const transportCalls = {
+  "export_team_package_template": "export_team_package_template(output_path)",
+  "export_team_package_preview_json": "export_team_package_preview_json(output_path, preview)",
+  "preview_team_package_import": "preview_team_package_import(input_path, mode)",
+  "commit_team_package_import": "commit_team_package_import(request)",
+  "export_player_catalog_template": "export_player_catalog_template(output_path)",
+  "export_player_catalog_data": "export_player_catalog_data(output_path)",
+  "preview_player_catalog_import": "preview_player_catalog_import(input_path, mode)",
+  "read_player_catalog_import_preview": "read_player_catalog_import_preview(parsed)",
+  "resolve_player_catalog_import_conflict": "resolve_player_catalog_import_conflict(parsed, resolution)",
+  "commit_player_catalog_import": "commit_player_catalog_import(parsed)",
+  "export_team_monthly_template": "export_team_monthly_template(output_path)",
+  "export_team_monthly_data": "export_team_monthly_data(output_path)",
+  "preview_team_monthly_import": "preview_team_monthly_import(input_path, mode)",
+  "read_team_monthly_import_preview": "read_team_monthly_import_preview(batch_id)",
+  "resolve_team_monthly_import_conflict": "resolve_team_monthly_import_conflict(batch_id, resolution)",
+  "commit_team_monthly_import": "commit_team_monthly_import(batch_id)",
+  "export_match_lineup_template": "export_match_lineup_template(output_path)",
+  "export_match_lineup_data": "export_match_lineup_data(output_path, match_id)",
+  "preview_match_lineup_import": "preview_match_lineup_import(input_path, mode)",
+  "read_match_lineup_import_preview": "read_match_lineup_import_preview(batch_id)",
+  "resolve_match_lineup_import_conflict": "resolve_match_lineup_import_conflict(batch_id, resolution)",
+  "commit_match_lineup_import": "commit_match_lineup_import(batch_id)",
+  "export_ai_match_package": "export_ai_match_package(output_path, match_id)",
+  "preview_ai_match_package": "preview_ai_match_package(input_path, mode)"
+};
+  const transportContract = JSON.parse(read("architecture/command-contract.json"));
+  const transportBoundaries = JSON.parse(read("architecture/module-boundaries.json"));
+  const transportGroup = transportContract.command_groups.find(group => group.module === "exchange");
+  const transportModules = read("src-tauri/src/commands.rs");
+  const rustTokens = source => (source.match(/"(?:\\.|[^"\\])*"|[A-Za-z_][A-Za-z_0-9]*|[^\s]/g) ?? []).join("\0");
+  const signatureTokens = source => rustTokens(source.replace(/,\s*\)/g, ")"));
+  const moduleTokens = source => rustTokens(source.replace(/,\s*}/g, "}"));
+  const exports = (module, names) => `pub use ${module}::{${names.flatMap(name => [`__cmd__${name}`, `__tauri_command_name_${name}`, name]).sort().join(",")}};`;
+  check(transportModules.includes(`mod ${"exchange"};`) && transportModules.includes(`pub use ${"exchange"}::*;`), "传输根模块未登记唯一入口");
+  check(transportGroup?.definition_file === `${transportRoot}/mod.rs` && transportGroup?.parameter_and_return_signature_file === `${transportRoot}/mod.rs`, "传输清单根出口漂移");
+  check(transportBoundaries.tauri_commands?.groups?.["exchange"] === `${transportRoot}/mod.rs`, "传输边界owner漂移");
+  const modules = Object.fromEntries([
+    ...(transportGroups[""] ?? []).map(name => [name, [name]]),
+    ...Object.entries(transportGroups).filter(([group]) => group !== ""),
+  ]);
+  const orderedModules = Object.keys(modules).sort();
+  const expectedRoot = [...orderedModules.map(name => `mod ${name};`), ...orderedModules.map(name => exports(name, modules[name]))].join("\n");
+  check(moduleTokens(read(`${transportRoot}/mod.rs`)) === moduleTokens(expectedRoot), "传输出口必须仅显式登记原命令与双宏");
+  for (const [group, names] of Object.entries(transportGroups)) {
+    if (!group) continue;
+    const ordered = [...names].sort();
+    const expected = [...ordered.map(name => `mod ${name};`), ...ordered.map(name => exports(name, [name]))].join("\n");
+    check(moduleTokens(read(`${transportRoot}/${group}/mod.rs`)) === moduleTokens(expected), `传输子出口承载逻辑或漏宏/命令：${group}`);
+  }
+  for (const [name, file] of Object.entries(transportFiles)) {
+    const source = read(file);
+    const signature = source.match(new RegExp(`pub async fn ${name}\\([\\s\\S]*?\\{`))?.[0].slice(0, -1) ?? "";
+    check(signatureTokens(signature) === signatureTokens(transportSignatures[name]), `传输公开签名漂移：${name}`);
+    check(transportGroup?.command_definition_files?.[name] === file, `传输定义owner漂移：${name}`);
+    check((source.match(/#\[tauri::command\]/g) ?? []).length === 1 && source.includes("bootstrap::AppState"), `传输未直接使用原State/唯一命令：${name}`);
+    check(rustTokens(source).includes(rustTokens("." + transportCalls[name])), `传输未调用原Application能力与原参数/内联UUID：${name}`);
+    check(source.includes(".map_err(|error| error.to_string())"), `传输错误投影漂移：${name}`);
+    const fullBody = source.slice(source.indexOf("{", source.indexOf(`pub async fn ${name}`)) + 1, source.lastIndexOf("}"));
+    const expectedBody = `${transportValidation[name] ?? ""} state.service.${transportCalls[name]}.await.map_err(|error| error.to_string())`;
+    check(rustTokens(fullBody) === rustTokens(expectedBody), `薄传输不得新增业务门槛、文件处理或替代结果：${name}`);
+    if (transportValidation[name]) {
+      const body = source.slice(source.indexOf("{", source.indexOf(`pub async fn ${name}`)) + 1);
+      check(rustTokens(body).startsWith(rustTokens(transportValidation[name])), `UUID/可选ID转换必须在原服务调用前失败返回：${name}`);
+    }
+    if (transportCalls[name].includes("parse_uuid") || transportValidation[name]?.includes("parse_uuid")) check(source.includes("commands::parse_uuid"), `传输不得复制UUID校验：${name}`);
+    for (const forbidden of ["sqlx::", "football_persistence_postgres", "PostgresStore", "PgPool", "ApplicationService::new", "std::fs", "std::io", "tokio::spawn", "Mutex<", "static ", "macro_rules!", ".unwrap()", ".expect("]) {
+      check(!source.includes(forbidden), `传输越过原业务/文件/生命周期边界：${name}/${forbidden}`);
+    }
+  }
+  for (const retired of ["src-tauri/src/commands/exchange.rs"]) check(!fs.existsSync(path.join(root, retired)), `旧传输owner仍存在：${retired}`);
+}
+// R11-05 transport contract END
 
 if (failures.length) {
   console.error("Exchange Service 验证失败：\n- " + failures.join("\n- "));

@@ -52,38 +52,8 @@ const splitCommandGroups = {
     "add_external_entity_id"
   ]
 };
-const deferredCommandGroups = {
-  "formations": [
-    "list_formations",
-    "save_formation_usage_distribution",
-    "list_formation_usage_distributions",
-    "resolve_formation_distribution"
-  ],
-  "matches": [
-    "create_match",
-    "delete_match"
-  ],
-  "lineup_presets": [
-    "save_team_lineup_preset",
-    "list_team_lineup_presets",
-    "preview_team_lineup_preset_application",
-    "duplicate_team_lineup_preset",
-    "archive_team_lineup_preset",
-    "delete_team_lineup_preset"
-  ],
-  "lineups": [
-    "create_lineup",
-    "create_lineup_pair",
-    "list_lineups",
-    "read_lineup",
-    "remove_lineup_history",
-    "read_match_lineup_chain",
-    "list_team_match_lineups"
-  ]
-};
 const commandFiles = Object.fromEntries([
   ...Object.entries(splitCommandGroups).flatMap(([group, names]) => names.map(name => [name, `${catalogRoot}/${group}/${name}.rs`])),
-  ...Object.entries(deferredCommandGroups).flatMap(([group, names]) => names.map(name => [name, `${catalogRoot}/${group}.rs`])),
 ]);
 const teamMethods = ["create_team", "list_team_options", "list_teams", "read_team", "update_team", "add_team_name", "upsert_team_profile", "bulk_delete_teams", "preview_force_delete_team", "force_delete_team"];
 const playerMethods = ["reference_data", "create_player", "update_player", "delete_player", "bulk_delete_players", "list_players", "read_player", "add_player_name", "assign_player_position", "add_player_team_period", "add_player_availability", "add_player_ability_observation", "add_player_dynamic_tag", "calculate_player_match_contribution", "create_coach", "list_coaches", "read_coach", "add_coach_name", "add_team_coach_period", "list_entity_references", "resolve_entity_reference", "check_entity_deletion", "bulk_archive_entities", "create_data_provider", "add_external_entity_id"];
@@ -201,10 +171,10 @@ const rustTokens = source => (source.match(/"(?:\\.|[^"\\])*"|[A-Za-z_][A-Za-z_0
 const signatureTokens = source => rustTokens(source.replace(/,\s*\)/g, ")"));
 const moduleTokens = source => rustTokens(source.replace(/,\s*}/g, "}"));
 const exports = (module, names) => `pub use ${module}::{${names.flatMap(name => [`__cmd__${name}`, `__tauri_command_name_${name}`, name]).sort().join(",")}};`;
-const rootModules = [...Object.keys(splitCommandGroups), ...Object.keys(deferredCommandGroups)].sort();
+const rootModules = Object.keys(splitCommandGroups).sort();
 const expectedRoot = [
   ...rootModules.map(name => `mod ${name};`),
-  ...rootModules.map(name => exports(name, splitCommandGroups[name] ?? deferredCommandGroups[name])),
+  ...rootModules.map(name => exports(name, splitCommandGroups[name])),
 ].join("\n");
 check(moduleTokens(read(`${catalogRoot}/mod.rs`)) === moduleTokens(expectedRoot), "目录出口必须仅显式登记实际职责和全部双宏");
 for (const [group, names] of Object.entries(splitCommandGroups)) {

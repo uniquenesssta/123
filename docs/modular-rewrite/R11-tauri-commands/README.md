@@ -2,7 +2,7 @@
 
 ## 当前阶段状态
 
-`IN_PROGRESS`。01～04均自身完整Windows成功并DONE；04精确7ccb11e / run39937856913 / job120361707651。用户2026-10-23“收尾04开始05”，05 READY、06～10 BLOCKED，继续唯一rewrite/r11-tauri-commands。当前以本节与任务表为准，历史VERIFYING段落保留。
+`IN_PROGRESS`。R11-01～04 DONE；05 Lineups/Presets/Workbooks Commands已实施VERIFYING，06～10 BLOCKED，R11 IN_PROGRESS。用户2026-10-23“收尾04开始05”，继续唯一rewrite/r11-tauri-commands；基线9e39ba0c22e5e1c224252b891965718e2c6ebad5为04五文档[skip ci]收尾，生产源码同自身完整Windows成功7ccb11e。 当前以本节与任务表为准。
 
 ## 依据与前置基线
 
@@ -16,7 +16,7 @@
 | R11-02 | [Database Commands](R11-02-database-commands.md) | DONE · 自身精确Windows完整SUCCESS |
 | R11-03 | [Competitions 与 Rules Commands](R11-03-competitions-and-rules-commands.md) | DONE · 自身精确Windows完整SUCCESS |
 | R11-04 | [Teams 与 Players Commands](R11-04-teams-and-players-commands.md) | DONE · 自身精确Windows完整SUCCESS |
-| R11-05 | Lineups、Presets 与 Workbooks Commands | READY |
+| R11-05 | [Lineups、Presets 与 Workbooks Commands](R11-05-lineups-presets-and-workbooks-commands.md) | VERIFYING · 自身完整Windows待验 |
 | R11-06 | Prediction、Research 与 Runs Commands | BLOCKED |
 | R11-07 | Review、Postmatch 与 Analytics Commands | BLOCKED |
 | R11-08 | AI Workspace 与 OpenAI Profiles Commands | BLOCKED |
@@ -92,5 +92,11 @@ R11-02 Database Commands已实施 `VERIFYING`，基线f56a1c004cee8018f657b6cdd9
 精确提交 `7ccb11edad7f5ed770792014603011ccc234aa2d` / tree `edaf6e2559f8af9e83ad9356c6f2899203a60a29`，[Public Platform CI run39937856913](https://github.com/uniquenesssta/123/actions/runs/39937856913) / Windows job120361707651完整SUCCESS，run于2026-10-23 18:49:19北京时间完成。实际Desktop46/46、Application230/230、Persistence259/259、Gateway112/112 unit和41/41 contract；完整frontend/contracts/TypeScript/Vite/17视口、Rust fmt/locked Clippy all-targets -D warnings/workspace tests、Windows release/MSI/NSIS/启动与日志均通过（7条记录、3个完成操作）。本节点新增/迁移单测0，不将189等价或20静态探针计作动态测试。
 
 报告logs/windows-acceptance-20261023-101739.json及同名.txt；artifact12495743898，14,053,472字节，SHA-256 `e14a4aced7038af2eb3a4759361cd3d4fa6b4bdbb16a8649d11957dcadcdb6b0`，查询时未过期。已核对精确head/branch、全部job步骤、完整日志与artifact。用户2026-10-23“收尾04开始05”，04 DONE，05 Lineups/Presets/Workbooks Commands READY，06～10 BLOCKED，R11 IN_PROGRESS，继续唯一rewrite/r11-tauri-commands。本次仅5份既有文档[skip ci]收尾，源码沿上述自身完整Windows证据，不重复同源码构建；历史VERIFYING/预期计数保留，当前状态以阶段索引为准，05须自身完整Windows。
+
+真实PG/历史保护四项/不可变账本并发回滚/有效XLSX/Windows Full/私有P4P7固定回归及继承model.runs/0041删除风险仍最终封包新库待验；ignored、公开unavailable stub和静态指纹不计这些真实PASS。
+
+## R11-05 实施与验证
+
+19+24命令独立，catalog保留35，lineups独立根与exchange子目录接通，旧5owner删除；171公共契约与43完整正文保持，内部物理组14。最终82源码/完整架构/55Rustfmt/161等价/20隔离负向及保护门禁通过；自身Windows待验。详[05记录](R11-05-lineups-presets-and-workbooks-commands.md)。
 
 真实PG/历史保护四项/不可变账本并发回滚/有效XLSX/Windows Full/私有P4P7固定回归及继承model.runs/0041删除风险仍最终封包新库待验；ignored、公开unavailable stub和静态指纹不计这些真实PASS。

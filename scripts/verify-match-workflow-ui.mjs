@@ -25,7 +25,7 @@ const domain = (read("crates/domain/src/lib.rs") + read("crates/domain/src/lineu
 const persistence = read("crates/persistence-postgres/src/adapters/lineups/pair_transaction/mod.rs");
 const matchScope = read("crates/persistence-postgres/src/adapters/matches/catalog/scope.rs");
 const application = read("crates/application/src/services/lineups/facade.rs");
-const command = ["formations", "matches", "lineup_presets", "lineups"].map(name => read(`src-tauri/src/commands/catalog/${name}.rs`)).join("\n");
+const command = [...new Set(Object.values(JSON.parse(read("architecture/command-contract.json")).command_groups.find(group => group.module === "lineups").command_definition_files))].map(read).join("\n");
 const registry = read("src-tauri/src/bootstrap/command_registry.rs");
 const prediction = read("src/pages/prediction.ts");
 const predictionApplication = readRustTree("crates/application/src/services/prediction") + readRustTree("crates/application/src/use_cases/prediction");

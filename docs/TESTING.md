@@ -925,3 +925,11 @@ R11-01～03 DONE；04 Teams与Players Commands已实施VERIFYING，05～10 BLOCK
 报告logs/windows-acceptance-20261023-101739.json及同名.txt；artifact12495743898，14,053,472字节，SHA-256 `e14a4aced7038af2eb3a4759361cd3d4fa6b4bdbb16a8649d11957dcadcdb6b0`，查询时未过期。已核对精确head/branch、全部job步骤、完整日志与artifact。用户2026-10-23“收尾04开始05”，04 DONE，05 Lineups/Presets/Workbooks Commands READY，06～10 BLOCKED，R11 IN_PROGRESS，继续唯一rewrite/r11-tauri-commands。本次仅5份既有文档[skip ci]收尾，源码沿上述自身完整Windows证据，不重复同源码构建；历史VERIFYING/预期计数保留，当前状态以阶段索引为准，05须自身完整Windows。
 
 真实PG/历史保护四项/不可变账本并发回滚/有效XLSX/Windows Full/私有P4P7固定回归及继承model.runs/0041删除风险仍最终封包新库待验；ignored、公开unavailable stub和静态指纹不计这些真实PASS。
+
+## R11-05 阵容、预设与工作簿命令（2026-10-23，VERIFYING）
+
+R11-01～04 DONE；05 Lineups/Presets/Workbooks Commands已实施VERIFYING，06～10 BLOCKED，R11 IN_PROGRESS。用户2026-10-23“收尾04开始05”，继续唯一rewrite/r11-tauri-commands；基线9e39ba0c22e5e1c224252b891965718e2c6ebad5为04五文档[skip ci]收尾，生产源码同自身完整Windows成功7ccb11e。
+
+最终82/82源码、完整architecture、55独立Rustfmt1.88、161等价、20隔离破坏拒绝与4恢复正向、主工作区162源码/清单指纹、18保护/171命令14组/DB静态及差异检查通过。43原公开签名/正文保持，本次新增/迁移单测0，预期Desktop46/App230/PG259/Gateway112+41保持；05自身Windows编译/自动测试/打包/启动/日志待确认，无非Windows动态。首次主目录探针恢复残留已被正向复核拦截，改为独立副本并完整复核后才交付；详[05记录](modular-rewrite/R11-tauri-commands/R11-05-lineups-presets-and-workbooks-commands.md)。
+
+真实PG/历史保护四项/不可变账本并发回滚/有效XLSX/Windows Full/私有P4P7固定回归及继承model.runs/0041删除风险仍最终封包新库待验；ignored、公开unavailable stub和静态指纹不计这些真实PASS。

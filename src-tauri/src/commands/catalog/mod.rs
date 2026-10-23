@@ -1,9 +1,5 @@
 mod coaches;
 mod entities;
-mod formations;
-mod lineup_presets;
-mod lineups;
-mod matches;
 mod players;
 mod teams;
 
@@ -22,41 +18,6 @@ pub use entities::{
     __tauri_command_name_list_entity_references, __tauri_command_name_resolve_entity_reference,
     add_external_entity_id, bulk_archive_entities, check_entity_deletion, create_data_provider,
     list_entity_references, resolve_entity_reference,
-};
-pub use formations::{
-    __cmd__list_formation_usage_distributions, __cmd__list_formations,
-    __cmd__resolve_formation_distribution, __cmd__save_formation_usage_distribution,
-    __tauri_command_name_list_formation_usage_distributions, __tauri_command_name_list_formations,
-    __tauri_command_name_resolve_formation_distribution,
-    __tauri_command_name_save_formation_usage_distribution, list_formation_usage_distributions,
-    list_formations, resolve_formation_distribution, save_formation_usage_distribution,
-};
-pub use lineup_presets::{
-    __cmd__archive_team_lineup_preset, __cmd__delete_team_lineup_preset,
-    __cmd__duplicate_team_lineup_preset, __cmd__list_team_lineup_presets,
-    __cmd__preview_team_lineup_preset_application, __cmd__save_team_lineup_preset,
-    __tauri_command_name_archive_team_lineup_preset,
-    __tauri_command_name_delete_team_lineup_preset,
-    __tauri_command_name_duplicate_team_lineup_preset,
-    __tauri_command_name_list_team_lineup_presets,
-    __tauri_command_name_preview_team_lineup_preset_application,
-    __tauri_command_name_save_team_lineup_preset, archive_team_lineup_preset,
-    delete_team_lineup_preset, duplicate_team_lineup_preset, list_team_lineup_presets,
-    preview_team_lineup_preset_application, save_team_lineup_preset,
-};
-pub use lineups::{
-    __cmd__create_lineup, __cmd__create_lineup_pair, __cmd__list_lineups,
-    __cmd__list_team_match_lineups, __cmd__read_lineup, __cmd__read_match_lineup_chain,
-    __cmd__remove_lineup_history, __tauri_command_name_create_lineup,
-    __tauri_command_name_create_lineup_pair, __tauri_command_name_list_lineups,
-    __tauri_command_name_list_team_match_lineups, __tauri_command_name_read_lineup,
-    __tauri_command_name_read_match_lineup_chain, __tauri_command_name_remove_lineup_history,
-    create_lineup, create_lineup_pair, list_lineups, list_team_match_lineups, read_lineup,
-    read_match_lineup_chain, remove_lineup_history,
-};
-pub use matches::{
-    __cmd__create_match, __cmd__delete_match, __tauri_command_name_create_match,
-    __tauri_command_name_delete_match, create_match, delete_match,
 };
 pub use players::{
     __cmd__add_player_ability_observation, __cmd__add_player_availability,
