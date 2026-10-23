@@ -5,9 +5,9 @@
 > 后续阶段：`R12`  
 > 本文档是唯一执行依据之一；必须与 `00-总体架构与前23节.md` 同时适用。
 
-## 当前前置状态（2026-10-15）
+## 当前前置状态（2026-10-23）
 
-01已完整Windows收尾DONE；R11-02 Database Commands已实施 `VERIFYING`，基线f56a1c004cee8018f657b6cdd9fa5389a81dec20（01五文档[skip ci]收尾，源码同自身完整Windows成功e56d21f）。用户2026-10-23“已通过收尾01开始02”，继续唯一rewrite/r11-tauri-commands；01 DONE、02 VERIFYING、03～10 BLOCKED，R11 IN_PROGRESS。 [02实施记录](../modular-rewrite/R11-tauri-commands/R11-02-database-commands.md)与[当前索引](../modular-rewrite/R11-tauri-commands/README.md)为当前依据。
+R11-01、02 DONE；02精确a2341de / Windows run39924367412完整SUCCESS。用户2026-10-23“收尾02开始03”，03 READY、04～10 BLOCKED，R11 IN_PROGRESS，继续唯一rewrite/r11-tauri-commands。详[02完成记录](../modular-rewrite/R11-tauri-commands/R11-02-database-commands.md)与[当前索引](../modular-rewrite/R11-tauri-commands/README.md)。
 
 真实PostgreSQL、历史保护四项、不可变账本/并发回滚、有效XLSX、Windows Full、私有P4/P7固定回归及继承的model.runs/0041删除风险继续最终封包新库待验；ignored、公开unavailable stub和静态指纹不计这些真实项目PASS。
 
@@ -298,7 +298,7 @@ src-tauri/src/commands/platform/
 
 ## R11-02 Database Commands
 
-状态：`VERIFYING`（三命令职责已实施，32等价/17负向与源码/格式通过；自身完整Windows待验）
+状态：`DONE`（自身精确a2341de / Windows run39924367412完整SUCCESS）
 
 ### 1. 目标
 
@@ -433,7 +433,7 @@ src-tauri/src/commands/database/
 
 ## R11-03 Competitions 与 Rules Commands
 
-状态：`BLOCKED`（仅当上一任务与本任务前置门禁通过后改为 `READY`）
+状态：`READY`（02自身完整Windows通过；用户2026-10-23“收尾02开始03”授权）
 
 ### 1. 目标
 
