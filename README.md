@@ -877,3 +877,6 @@ R11-07已收尾DONE：精确5b779b9 / [Windows run39962382506](https://github.co
 
 
 R11-08首轮ffbaedc / [Windows run39971471528](https://github.com/uniquenesssta/123/actions/runs/39971471528)在追踪ID格式化处被Clippy uninlined_format_args拦截；前端/17视口通过。现内联session_id/request_id，追踪内容及原发送/取消/凭据行为保持，补原源码卫生守卫；82源码/完整架构/1Rustfmt/61显式等价与3隔离负向通过。修复自身Windows待验，08 VERIFYING、09～10 BLOCKED；详[08修复记录](docs/modular-rewrite/R11-tauri-commands/R11-08-ai-workspace-and-openai-profiles-commands.md)。
+
+
+R11-08已收尾DONE：精确858288e / [Windows run39974291282](https://github.com/uniquenesssta/123/actions/runs/39974291282)完整SUCCESS，Desktop58（新增12项AI发送unit）/App230/PG259、完整前端/17视口、Rust、Windows打包/启动/日志通过，首轮Clippy失败关闭。同一R11分支09 READY、10 BLOCKED；详[08完成记录](docs/modular-rewrite/R11-tauri-commands/R11-08-ai-workspace-and-openai-profiles-commands.md)。真实API/凭据/会话取消端到端、PG/XLSX/Full/私有固定回归与继承删除风险仍待实际验收。

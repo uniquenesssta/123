@@ -2,11 +2,11 @@
 
 ## 当前阶段状态
 
-`IN_PROGRESS`。R11-01～07 DONE；08 VERIFYING、09～10 BLOCKED，R11 IN_PROGRESS，继续唯一rewrite/r11-tauri-commands。首轮ffbaedc / Windows run39971471528因send/gateway.rs追踪ID触发Clippy uninlined_format_args失败；现将普通变量参数改为内联捕获，原追踪ID内容/发送/取消/凭据/DTO保持，已补既有源码卫生守卫。82源码/完整架构/1Rustfmt/61显式格式等价及3隔离负向通过；修复自身完整Windows待验。 当前以本节与任务表为准。
+`IN_PROGRESS`。R11-01～08 DONE；08自身精确858288e / Windows run39974291282完整SUCCESS。用户2026-10-23“通过收尾08开始09”，09 Release Commands READY，10 BLOCKED，R11 IN_PROGRESS，继续唯一rewrite/r11-tauri-commands。此前VERIFYING与首轮Clippy失败保留实施历史，当前状态以索引与任务表为准。 当前以本节与任务表为准。
 
 ## 依据与前置基线
 
-[R11任务书](../../football-model-platform-modular-rewrite-19-docs/11-R11-tauri-commands.md)、[总纲执行订正](../../football-model-platform-modular-rewrite-19-docs/00-总体架构与前23节.md)、[R10完成记录](../R10-review-analytics-release-backend/R10-stage-completion.md)。本阶段从R10收尾3d43e8e建立唯一rewrite/r11-tauri-commands；01～07已获自身精确Windows成功，08当前实施/验证详节点，09～10 BLOCKED。
+[R11任务书](../../football-model-platform-modular-rewrite-19-docs/11-R11-tauri-commands.md)、[总纲执行订正](../../football-model-platform-modular-rewrite-19-docs/00-总体架构与前23节.md)、[R10完成记录](../R10-review-analytics-release-backend/R10-stage-completion.md)。本阶段从R10收尾3d43e8e建立唯一rewrite/r11-tauri-commands；01～08已获自身精确Windows成功，09 READY，10 BLOCKED。
 
 ## 任务状态
 
@@ -19,8 +19,8 @@
 | R11-05 | [Lineups、Presets 与 Workbooks Commands](R11-05-lineups-presets-and-workbooks-commands.md) | DONE · 自身精确Windows完整SUCCESS |
 | R11-06 | [Prediction、Research 与 Runs Commands](R11-06-prediction-research-and-runs-commands.md) | DONE · 自身精确Windows完整SUCCESS |
 | R11-07 | [Review、Postmatch 与 Analytics Commands](R11-07-review-postmatch-and-analytics-commands.md) | DONE · 自身精确Windows完整SUCCESS |
-| R11-08 | [AI Workspace 与 OpenAI Profiles Commands](R11-08-ai-workspace-and-openai-profiles-commands.md) | VERIFYING · Clippy修复自身Windows待验 |
-| R11-09 | Release Commands | BLOCKED |
+| R11-08 | [AI Workspace 与 OpenAI Profiles Commands](R11-08-ai-workspace-and-openai-profiles-commands.md) | DONE · 自身精确Windows完整SUCCESS |
+| R11-09 | Release Commands | READY |
 | R11-10 | Command Registry 收敛 | BLOCKED |
 
 ## 继续约束
@@ -147,3 +147,12 @@ R11-02 Database Commands已实施 `VERIFYING`，基线f56a1c004cee8018f657b6cdd9
 ## R11-08 Clippy修复
 
 R11-01～07 DONE；08 VERIFYING、09～10 BLOCKED，R11 IN_PROGRESS，继续唯一rewrite/r11-tauri-commands。首轮ffbaedc / Windows run39971471528因send/gateway.rs追踪ID触发Clippy uninlined_format_args失败；现将普通变量参数改为内联捕获，原追踪ID内容/发送/取消/凭据/DTO保持，已补既有源码卫生守卫。82源码/完整架构/1Rustfmt/61显式格式等价及3隔离负向通过；修复自身完整Windows待验。 详[08修复记录](R11-08-ai-workspace-and-openai-profiles-commands.md)。
+
+
+## R11-08 精确 Windows 完成与09授权（2026-10-23）
+
+精确修复提交 `858288e70fc5052ba381f5af40aef7560de9640d` / tree `19bb3909968f1620640f77a5b8a54a1b794f79e7`，[Public Platform CI run39974291282](https://github.com/uniquenesssta/123/actions/runs/39974291282) / Windows job120484760225完整SUCCESS，run于2026-10-23 23:23:37北京时间完成。实际Desktop58/58（新增12项AI发送原Tauri unit逐项OK）、Application230/230、Persistence259/259、Gateway112/112 unit和41/41 contract；完整frontend/contracts/TypeScript/Vite/17视口、Rust fmt/locked Clippy all-targets -D warnings/workspace tests、Windows release/MSI/NSIS/启动与日志均通过（7条记录、3个完成操作）。首轮ffbaedc格式化lint失败已由修复自身完整成功关闭；61源码等价与隔离探针不计动态测试。
+
+报告logs/windows-acceptance-20261023-150111.json及同名.txt；artifact12511254062，14,061,073字节，SHA-256 `1780ac5540092049c25b998604e7678743de7297e1dd89ac365ddb01871d2964`，查询时未过期。已核对精确head/branch、全部job步骤、完整日志与artifact。用户2026-10-23“通过收尾08开始09”，08 DONE，09 Release Commands READY，10 BLOCKED，R11 IN_PROGRESS，继续唯一rewrite/r11-tauri-commands。此次仅5份既有文档[skip ci]收尾，源码沿上述自身完整Windows成功证据，不重复同源码构建；09须自身完整Windows。
+
+真实PG/历史保护四项/不可变账本并发回滚/有效XLSX/Windows Full/私有P4P7固定回归及继承model.runs/0041删除风险仍最终封包新库待验；ignored、公开unavailable stub和静态指纹不计这些真实PASS。真实API/用户Windows凭据/实际会话PG与取消UI端到端仍待可用环境验收。

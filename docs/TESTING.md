@@ -1012,3 +1012,12 @@ Context7查询官方Clippy文档核对uninlined_format_args与默认allow-mixed-
 原08最初61等价/全生产literal保持叙述属于首轮实施历史；本修复当前允许变化的是格式表达式字面写法，输出内容保持，其余等价检查仍严格执行。首轮46路径清单保留其提交事实；当前修复相对ffbaedc为8M/0A/0D，累计相对08基线b7c2eb1为30A/15M/2D，共47路径（仅额外加入原verify-rust-source-hygiene.mjs）。不把首轮清单误称为当前累计46。
 
 08仍VERIFYING、09～10 BLOCKED，修复沿原完整Windows CI；实际Windows job首次in_progress后停止全部CI查询，提示约20～30分钟并等用户返回。真实API/用户凭据/会话PG/取消端到端、历史四项/账本并发回滚/有效XLSX/Windows Full/私有P4P7固定回归和继承model.runs/0041删除风险仍最终封包待验；ignored/公开stub/静态hash不是这些真实PASS。回退可受控revert本修复提交；ffbaedc是已知失败点，最近同阶段已验前置源码仍07成功5b779b9（docs基线b7c2eb1），不得把回退到ffbaedc称为可验收完成。
+
+
+## R11-08 精确 Windows 完成与09授权（2026-10-23）
+
+精确修复提交 `858288e70fc5052ba381f5af40aef7560de9640d` / tree `19bb3909968f1620640f77a5b8a54a1b794f79e7`，[Public Platform CI run39974291282](https://github.com/uniquenesssta/123/actions/runs/39974291282) / Windows job120484760225完整SUCCESS，run于2026-10-23 23:23:37北京时间完成。实际Desktop58/58（新增12项AI发送原Tauri unit逐项OK）、Application230/230、Persistence259/259、Gateway112/112 unit和41/41 contract；完整frontend/contracts/TypeScript/Vite/17视口、Rust fmt/locked Clippy all-targets -D warnings/workspace tests、Windows release/MSI/NSIS/启动与日志均通过（7条记录、3个完成操作）。首轮ffbaedc格式化lint失败已由修复自身完整成功关闭；61源码等价与隔离探针不计动态测试。
+
+报告logs/windows-acceptance-20261023-150111.json及同名.txt；artifact12511254062，14,061,073字节，SHA-256 `1780ac5540092049c25b998604e7678743de7297e1dd89ac365ddb01871d2964`，查询时未过期。已核对精确head/branch、全部job步骤、完整日志与artifact。用户2026-10-23“通过收尾08开始09”，08 DONE，09 Release Commands READY，10 BLOCKED，R11 IN_PROGRESS，继续唯一rewrite/r11-tauri-commands。此次仅5份既有文档[skip ci]收尾，源码沿上述自身完整Windows成功证据，不重复同源码构建；09须自身完整Windows。
+
+真实PG/历史保护四项/不可变账本并发回滚/有效XLSX/Windows Full/私有P4P7固定回归及继承model.runs/0041删除风险仍最终封包新库待验；ignored、公开unavailable stub和静态指纹不计这些真实PASS。真实API/用户Windows凭据/实际会话PG与取消UI端到端仍待可用环境验收。
