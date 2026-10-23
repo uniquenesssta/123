@@ -2,7 +2,7 @@
 
 ## 当前阶段状态
 
-`IN_PROGRESS`。R11-01～03 DONE；04 Teams与Players Commands已实施VERIFYING，05～10 BLOCKED，R11 IN_PROGRESS。用户2026-10-23“收尾03开始04”，继续唯一rewrite/r11-tauri-commands；基线d1e9b7d01df6c4225876c90a15ce246dcabae80a为03五文档[skip ci]收尾，生产源码同自身完整Windows成功849f1a4。 当前以本节与任务表为准。
+`IN_PROGRESS`。01～04均自身完整Windows成功并DONE；04精确7ccb11e / run39937856913 / job120361707651。用户2026-10-23“收尾04开始05”，05 READY、06～10 BLOCKED，继续唯一rewrite/r11-tauri-commands。当前以本节与任务表为准，历史VERIFYING段落保留。
 
 ## 依据与前置基线
 
@@ -15,8 +15,8 @@
 | R11-01 | [Bootstrap、Workspace 与 Logs Commands](R11-01-bootstrap-workspace-and-logs-commands.md) | DONE · 自身精确Windows完整SUCCESS |
 | R11-02 | [Database Commands](R11-02-database-commands.md) | DONE · 自身精确Windows完整SUCCESS |
 | R11-03 | [Competitions 与 Rules Commands](R11-03-competitions-and-rules-commands.md) | DONE · 自身精确Windows完整SUCCESS |
-| R11-04 | [Teams 与 Players Commands](R11-04-teams-and-players-commands.md) | VERIFYING · 自身完整Windows待验 |
-| R11-05 | Lineups、Presets 与 Workbooks Commands | BLOCKED |
+| R11-04 | [Teams 与 Players Commands](R11-04-teams-and-players-commands.md) | DONE · 自身精确Windows完整SUCCESS |
+| R11-05 | Lineups、Presets 与 Workbooks Commands | READY |
 | R11-06 | Prediction、Research 与 Runs Commands | BLOCKED |
 | R11-07 | Review、Postmatch 与 Analytics Commands | BLOCKED |
 | R11-08 | AI Workspace 与 OpenAI Profiles Commands | BLOCKED |
@@ -84,5 +84,13 @@ R11-02 Database Commands已实施 `VERIFYING`，基线f56a1c004cee8018f657b6cdd9
 ## R11-04 实施与验证
 
 35条命令职责已独立，19条后续能力函数原样归位以清理旧catalog owner；根及子目录显式双宏出口，54签名/正文及强删线程隔离保持，05尚未完成。82源码/完整架构/44Rustfmt/189等价/20负向与保护门禁通过，原测试目标交04自身Windows。详[04记录](R11-04-teams-and-players-commands.md)。
+
+真实PG/历史保护四项/不可变账本并发回滚/有效XLSX/Windows Full/私有P4P7固定回归及继承model.runs/0041删除风险仍最终封包新库待验；ignored、公开unavailable stub和静态指纹不计这些真实PASS。
+
+## R11-04 Windows 完成与05授权（2026-10-23）
+
+精确提交 `7ccb11edad7f5ed770792014603011ccc234aa2d` / tree `edaf6e2559f8af9e83ad9356c6f2899203a60a29`，[Public Platform CI run39937856913](https://github.com/uniquenesssta/123/actions/runs/39937856913) / Windows job120361707651完整SUCCESS，run于2026-10-23 18:49:19北京时间完成。实际Desktop46/46、Application230/230、Persistence259/259、Gateway112/112 unit和41/41 contract；完整frontend/contracts/TypeScript/Vite/17视口、Rust fmt/locked Clippy all-targets -D warnings/workspace tests、Windows release/MSI/NSIS/启动与日志均通过（7条记录、3个完成操作）。本节点新增/迁移单测0，不将189等价或20静态探针计作动态测试。
+
+报告logs/windows-acceptance-20261023-101739.json及同名.txt；artifact12495743898，14,053,472字节，SHA-256 `e14a4aced7038af2eb3a4759361cd3d4fa6b4bdbb16a8649d11957dcadcdb6b0`，查询时未过期。已核对精确head/branch、全部job步骤、完整日志与artifact。用户2026-10-23“收尾04开始05”，04 DONE，05 Lineups/Presets/Workbooks Commands READY，06～10 BLOCKED，R11 IN_PROGRESS，继续唯一rewrite/r11-tauri-commands。本次仅5份既有文档[skip ci]收尾，源码沿上述自身完整Windows证据，不重复同源码构建；历史VERIFYING/预期计数保留，当前状态以阶段索引为准，05须自身完整Windows。
 
 真实PG/历史保护四项/不可变账本并发回滚/有效XLSX/Windows Full/私有P4P7固定回归及继承model.runs/0041删除风险仍最终封包新库待验；ignored、公开unavailable stub和静态指纹不计这些真实PASS。

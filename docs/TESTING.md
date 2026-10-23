@@ -917,3 +917,11 @@ R11-01～03 DONE；04 Teams与Players Commands已实施VERIFYING，05～10 BLOCK
 82/82源码、完整architecture、44独立Rustfmt1.88、189完整等价、20负向拒绝/bytes恢复、保护/171命令/DB静态及差异检查通过。35命令按职责独立，另外19完整函数仅必要原样归位；54公开签名/正文及11个原守卫其余断言保持。本次新增/迁移单测0，预期Desktop46/App230/PG259/Gateway112+41保持；04自身Windows编译/自动测试/打包/启动/日志尚待确认，未做非Windows动态或真实PG操作。详[04记录](modular-rewrite/R11-tauri-commands/R11-04-teams-and-players-commands.md)。
 
 真实PG/历史保护四项/不可变账本并发回滚/有效XLSX/Windows Full/私有P4P7固定回归及继承model.runs/0041删除风险仍最终封包新库待验；ignored、公开unavailable stub和静态指纹不计这些真实PASS。
+
+## R11-04 Windows 完成与05授权（2026-10-23）
+
+精确提交 `7ccb11edad7f5ed770792014603011ccc234aa2d` / tree `edaf6e2559f8af9e83ad9356c6f2899203a60a29`，[Public Platform CI run39937856913](https://github.com/uniquenesssta/123/actions/runs/39937856913) / Windows job120361707651完整SUCCESS，run于2026-10-23 18:49:19北京时间完成。实际Desktop46/46、Application230/230、Persistence259/259、Gateway112/112 unit和41/41 contract；完整frontend/contracts/TypeScript/Vite/17视口、Rust fmt/locked Clippy all-targets -D warnings/workspace tests、Windows release/MSI/NSIS/启动与日志均通过（7条记录、3个完成操作）。本节点新增/迁移单测0，不将189等价或20静态探针计作动态测试。
+
+报告logs/windows-acceptance-20261023-101739.json及同名.txt；artifact12495743898，14,053,472字节，SHA-256 `e14a4aced7038af2eb3a4759361cd3d4fa6b4bdbb16a8649d11957dcadcdb6b0`，查询时未过期。已核对精确head/branch、全部job步骤、完整日志与artifact。用户2026-10-23“收尾04开始05”，04 DONE，05 Lineups/Presets/Workbooks Commands READY，06～10 BLOCKED，R11 IN_PROGRESS，继续唯一rewrite/r11-tauri-commands。本次仅5份既有文档[skip ci]收尾，源码沿上述自身完整Windows证据，不重复同源码构建；历史VERIFYING/预期计数保留，当前状态以阶段索引为准，05须自身完整Windows。
+
+真实PG/历史保护四项/不可变账本并发回滚/有效XLSX/Windows Full/私有P4P7固定回归及继承model.runs/0041删除风险仍最终封包新库待验；ignored、公开unavailable stub和静态指纹不计这些真实PASS。
