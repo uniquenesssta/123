@@ -7,7 +7,7 @@
 
 ## 当前前置状态（2026-10-23）
 
-R11-01～04 DONE；05 Lineups/Presets/Workbooks Commands已实施VERIFYING，06～10 BLOCKED，R11 IN_PROGRESS。用户2026-10-23“收尾04开始05”，继续唯一rewrite/r11-tauri-commands；基线9e39ba0c22e5e1c224252b891965718e2c6ebad5为04五文档[skip ci]收尾，生产源码同自身完整Windows成功7ccb11e。 [05实施记录](../modular-rewrite/R11-tauri-commands/R11-05-lineups-presets-and-workbooks-commands.md)与[当前索引](../modular-rewrite/R11-tauri-commands/README.md)为当前依据。
+R11-01～05 DONE；05自身精确b9040df / Windows run39946211886完整SUCCESS。用户2026-10-23“收尾05开始06”，06 Prediction/Research/Runs Commands READY，07～10 BLOCKED，R11 IN_PROGRESS，继续唯一rewrite/r11-tauri-commands。此前VERIFYING叙述为实施历史，当前状态以索引与任务表为准。 [当前索引](../modular-rewrite/R11-tauri-commands/README.md)。
 
 真实PostgreSQL、历史保护四项、不可变账本/并发回滚、有效XLSX、Windows Full、私有P4/P7固定回归及继承的model.runs/0041删除风险继续最终封包新库待验；ignored、公开unavailable stub和静态指纹不计这些真实项目PASS。
 
@@ -703,7 +703,7 @@ src-tauri/src/commands/catalog/
 
 ## R11-05 Lineups、Presets 与 Workbooks Commands
 
-状态：`VERIFYING`（19阵容与24工作簿命令独立；最终静态通过，自身完整Windows待验）
+状态：`DONE`（自身精确b9040df / Windows run39946211886完整SUCCESS）
 
 ### 1. 目标
 
@@ -838,7 +838,7 @@ src-tauri/src/commands/lineups/
 
 ## R11-06 Prediction、Research 与 Runs Commands
 
-状态：`BLOCKED`（仅当上一任务与本任务前置门禁通过后改为 `READY`）
+状态：`READY`（05自身完整Windows通过；用户2026-10-23“收尾05开始06”授权）
 
 ### 1. 目标
 

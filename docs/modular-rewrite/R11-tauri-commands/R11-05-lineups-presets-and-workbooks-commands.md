@@ -1,6 +1,6 @@
 # R11-05 Lineups、Presets 与 Workbooks Commands
 
-状态：`VERIFYING`（自身完整Windows尚待验收）。
+状态：`DONE`（自身精确b9040df / Windows run39946211886完整SUCCESS；下文VERIFYING为实施历史）。
 
 R11-01～04 DONE；05 Lineups/Presets/Workbooks Commands已实施VERIFYING，06～10 BLOCKED，R11 IN_PROGRESS。用户2026-10-23“收尾04开始05”，继续唯一rewrite/r11-tauri-commands；基线9e39ba0c22e5e1c224252b891965718e2c6ebad5为04五文档[skip ci]收尾，生产源码同自身完整Windows成功7ccb11e。
 
@@ -216,3 +216,12 @@ Domain365/129声明源/301映射，scan1349→1397；sourceDigest217241ac243726a
 - `src-tauri/src/commands/catalog/lineups.rs`
 - `src-tauri/src/commands/catalog/matches.rs`
 - `src-tauri/src/commands/exchange.rs`
+
+
+## R11-05 精确 Windows 完成与06授权（2026-10-23）
+
+精确提交 `b9040dffe35c49502751fc8ff48a7a4f11d50f6c` / tree `4f53426972e02a34b6719e309197dc0f3a172826`，[Public Platform CI run39946211886](https://github.com/uniquenesssta/123/actions/runs/39946211886) / Windows job120389397887完整SUCCESS，run于2026-10-23 19:51:49北京时间完成。实际Desktop46/46、Application230/230、Persistence259/259、Gateway112/112 unit和41/41 contract；完整frontend/contracts/TypeScript/Vite/17视口、Rust fmt/locked Clippy all-targets -D warnings/workspace tests、Windows release/MSI/NSIS/启动与日志均通过（7条记录、3个完成操作）。新增/迁移单测0，161等价和20隔离探针不计动态测试。
+
+报告logs/windows-acceptance-20261023-112929.json及同名.txt；artifact12500090504，14,053,835字节，SHA-256 `2c79371808d79341c298920fcfd3ff7b82d2b8d57f4da2da5d9b20ee4af99946`，查询时未过期。已核对精确head/branch、全部job步骤、完整日志与artifact。用户2026-10-23“收尾05开始06”，05 DONE，06 Prediction/Research/Runs Commands READY，07～10 BLOCKED，R11 IN_PROGRESS。此次仅5份既有文档[skip ci]收尾，源码沿上述自身完整Windows证据，不重复同源码构建；历史VERIFYING/预期计数保留，06须自身完整Windows。
+
+真实PG/历史保护四项/不可变账本并发回滚/有效XLSX/Windows Full/私有P4P7固定回归及继承model.runs/0041删除风险仍最终封包新库待验；ignored、公开unavailable stub和静态指纹不计这些真实PASS。

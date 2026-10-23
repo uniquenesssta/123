@@ -850,3 +850,6 @@ R11-04已收尾DONE：精确7ccb11e / [Windows run39937856913](https://github.co
 ### R11-05 阵容、预设与工作簿命令（2026-10-23，VERIFYING）
 
 19条阵容/阵型/比赛/预设命令与24条工作簿/资料包命令已独立，catalog收敛35，删除5个旧owner；内部物理组增至14，171公共命令/注册顺序/原参数与错误保持。最终82源码/完整架构/55Rustfmt/161等价/20隔离负向通过，05自身Windows待验。详[05记录](docs/modular-rewrite/R11-tauri-commands/R11-05-lineups-presets-and-workbooks-commands.md)；真实PG/XLSX与原最终新库项目仍待验。
+
+
+R11-05已收尾DONE：精确b9040df / [Windows run39946211886](https://github.com/uniquenesssta/123/actions/runs/39946211886)完整SUCCESS，Desktop46/App230/PG259、完整前端/17视口、Rust、Windows打包/启动/日志通过。用户授权同一R11分支06 READY，07～10 BLOCKED；详[05完成记录](docs/modular-rewrite/R11-tauri-commands/R11-05-lineups-presets-and-workbooks-commands.md)。真实PG/XLSX/Full/私有固定回归和继承删除风险仍最终新库待验。
