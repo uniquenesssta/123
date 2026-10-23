@@ -50,7 +50,8 @@ const playerPersistence = deletionPersistence;
 const spreadsheetPersistence = ["preview", "conflict", "commit", "export", "identity", "validation", "values"]
   .map((name) => text(name === "export" ? "crates/persistence-postgres/src/adapters/workbooks/monthly_player/read.rs" : `crates/persistence-postgres/src/adapters/workbooks/player_catalog/${name}.rs`)).join("\n");
 const spreadsheetIo = text("crates/spreadsheet-io/src/lib.rs");
-const commands = text("src-tauri/src/commands/catalog.rs");
+const catalogDefinitionFiles = JSON.parse(text("architecture/command-contract.json")).command_groups.find(group => group.module === "catalog").command_definition_files;
+const commands = [...new Set(Object.values(catalogDefinitionFiles))].map(text).join("\n");
 const registry = text("src-tauri/src/bootstrap/command_registry.rs");
 const client = text("src/api/client.ts");
 const shell = text("src/app/shell.ts");
@@ -81,6 +82,13 @@ assert(readme.includes("## 0.14.0 变更记录"), "根README缺少0.14.0变更�
 assert(readme.includes("## 0.15.0 变更记录"), "根README缺少0.15.0变更记录");
 
 for (const artifact of contract.artifacts) {
+  if (artifact === "src-tauri/src/commands/catalog.rs") {
+    assert(!existsSync(join(root, artifact)), "R11-04旧catalog命令owner仍存在");
+    for (const currentOwner of ["src-tauri/src/commands/catalog/mod.rs", ...new Set(Object.values(catalogDefinitionFiles))]) {
+      assert(existsSync(join(root, currentOwner)), `球队与球员当前命令owner不存在：${currentOwner}`);
+    }
+    continue;
+  }
   if (artifact === "crates/application/src/player_catalog.rs") {
     for (const currentOwner of [
       "crates/application/src/services/teams/facade.rs",

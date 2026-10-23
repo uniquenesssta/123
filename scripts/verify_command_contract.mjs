@@ -242,10 +242,18 @@ function verify(options) {
     if (definitionFiles) {
       compareSets(`命令组 ${group.module} 定义归属`, group.commands, Object.keys(definitionFiles), failures);
     }
+    const commandsByFile = new Map();
+    if (definitionFiles) {
+      for (const [command, file] of Object.entries(definitionFiles)) {
+        const commands = commandsByFile.get(file) ?? [];
+        commands.push(command);
+        commandsByFile.set(file, commands);
+      }
+    }
     const sources = definitionFiles
-      ? Object.entries(definitionFiles).map(([command, file]) => {
-        const source = readText(options.root, file, `${group.module}.${command} definition_file`);
-        compareSets(`命令文件 ${file}`, [command], extractRustCommandDefinitions(source.text), failures);
+      ? [...commandsByFile].map(([file, commands]) => {
+        const source = readText(options.root, file, `${group.module} definition_file`);
+        compareSets(`命令文件 ${file}`, commands, extractRustCommandDefinitions(source.text), failures);
         return source;
       })
       : [definitionRoot];

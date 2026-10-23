@@ -840,3 +840,7 @@ R11-02已收尾DONE：精确a2341de / [Windows run39924367412](https://github.co
 七条赛事/赛季/阶段/轮次/删除/规则包/绑定命令已按职责独立，规则两入口归rules子目录；保留原UUID门槛、Application调用和错误投影，旧competition.rs删除，171公共契约不变。82源码/完整架构/9Rustfmt/38等价/17负向通过；原单测目标保持，03自身Windows待验、04～10 BLOCKED。详[03记录](docs/modular-rewrite/R11-tauri-commands/R11-03-competitions-and-rules-commands.md)；真实PG及原最终新库项目继续待验。
 
 R11-03已收尾DONE：精确849f1a4 / [Windows run39930230184](https://github.com/uniquenesssta/123/actions/runs/39930230184)完整SUCCESS，Desktop46/App230/PG259及完整前端/17视口、Rust、Windows打包/启动/日志通过。04已获授权READY，沿同一R11分支；[03完成记录](docs/modular-rewrite/R11-tauri-commands/R11-03-competitions-and-rules-commands.md)。真实PG及原最终新库待验项目保持。
+
+### R11-04 球队与球员命令（2026-10-23，VERIFYING）
+
+球队/球员/教练/实体35条命令已按职责独立，原19条阵型/比赛/阵容/预设命令为删除混合catalog入口按能力原样归位，05继续验收。54条原签名/正文、批量UUID首错和强删非Send线程/错误保持，171公共契约不变。82源码/完整架构/44Rustfmt/189等价/20负向通过，原动态目标保持，04自身Windows待验。详[04记录](docs/modular-rewrite/R11-tauri-commands/R11-04-teams-and-players-commands.md)；真实PG及原最终新库项目仍待验。

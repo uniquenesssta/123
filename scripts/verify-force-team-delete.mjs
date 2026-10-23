@@ -18,7 +18,9 @@ const application = [
   read("crates/application/src/services/teams/facade.rs"),
   read("crates/application/src/services/teams/service.rs"),
 ].join("\n");
-const commands = read("src-tauri/src/commands/catalog.rs");
+const previewCommand = read("src-tauri/src/commands/catalog/teams/preview_force_delete_team.rs");
+const executeCommand = read("src-tauri/src/commands/catalog/teams/force_delete_team.rs");
+const commands = `${previewCommand}\n${executeCommand}`;
 const registry = read("src-tauri/src/bootstrap/command_registry.rs");
 const client = read("src/api/client.ts");
 const types = read("src/types.ts");
@@ -83,14 +85,6 @@ for (const command of ["preview_force_delete_team", "force_delete_team"]) {
   requireTrue(registry.includes(`commands::${command}`), `Tauri命令未注册：${command}`);
   requireTrue(client.includes(`"${command}"`), `前端API未调用：${command}`);
 }
-const previewCommand = commands.slice(
-  commands.indexOf("pub async fn preview_force_delete_team"),
-  commands.indexOf("pub async fn force_delete_team"),
-);
-const executeCommand = commands.slice(
-  commands.indexOf("pub async fn force_delete_team"),
-  commands.indexOf("pub async fn create_data_provider"),
-);
 for (const [label, source] of [["预检", previewCommand], ["执行", executeCommand]]) {
   requireTrue(source.includes("state.service.clone()"), `强制清除${label}命令未取得拥有所有权的服务句柄`);
   requireTrue(source.includes("tauri::async_runtime::handle()"), `强制清除${label}命令未绑定Tauri运行时句柄`);

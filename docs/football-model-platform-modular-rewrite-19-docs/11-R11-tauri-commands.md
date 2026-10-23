@@ -7,7 +7,7 @@
 
 ## 当前前置状态（2026-10-23）
 
-R11-01～03 DONE；03精确849f1a4 / Windows run39930230184完整SUCCESS。用户2026-10-23“收尾03开始04”，04 READY、05～10 BLOCKED，R11 IN_PROGRESS，继续唯一rewrite/r11-tauri-commands。详[03完成记录](../modular-rewrite/R11-tauri-commands/R11-03-competitions-and-rules-commands.md)与[当前索引](../modular-rewrite/R11-tauri-commands/README.md)。
+R11-01～03 DONE；04 Teams与Players Commands已实施VERIFYING，05～10 BLOCKED，R11 IN_PROGRESS。用户2026-10-23“收尾03开始04”，继续唯一rewrite/r11-tauri-commands；基线d1e9b7d01df6c4225876c90a15ce246dcabae80a为03五文档[skip ci]收尾，生产源码同自身完整Windows成功849f1a4。 [04实施记录](../modular-rewrite/R11-tauri-commands/R11-04-teams-and-players-commands.md)与[当前索引](../modular-rewrite/R11-tauri-commands/README.md)为当前依据。
 
 真实PostgreSQL、历史保护四项、不可变账本/并发回滚、有效XLSX、Windows Full、私有P4/P7固定回归及继承的model.runs/0041删除风险继续最终封包新库待验；ignored、公开unavailable stub和静态指纹不计这些真实项目PASS。
 
@@ -568,7 +568,7 @@ src-tauri/src/commands/competitions/
 
 ## R11-04 Teams 与 Players Commands
 
-状态：`READY`（03自身完整Windows通过；用户2026-10-23“收尾03开始04”授权）
+状态：`VERIFYING`（35命令独立，另19函数必要原样归位；静态通过，自身完整Windows待验）
 
 ### 1. 目标
 

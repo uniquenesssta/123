@@ -55,7 +55,8 @@ const application = [
   text("crates/application/src/services/players/facade.rs"),
   text("crates/application/src/services/players/service.rs"),
 ].join("\n");
-const commands = text("src-tauri/src/commands/catalog.rs");
+const catalogDefinitionFiles = JSON.parse(text("architecture/command-contract.json")).command_groups.find(group => group.module === "catalog").command_definition_files;
+const commands = [...new Set(Object.values(catalogDefinitionFiles))].map(text).join("\n");
 const registry = text("src-tauri/src/bootstrap/command_registry.rs");
 const client = text("src/api/client.ts");
 const main = text("src/main.ts");

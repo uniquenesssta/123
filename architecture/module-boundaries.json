@@ -346,7 +346,7 @@
     "groups": {
       "analytics": "src-tauri/src/commands/analytics.rs",
       "api_workspace": "src-tauri/src/commands/api_workspace.rs",
-      "catalog": "src-tauri/src/commands/catalog.rs",
+      "catalog": "src-tauri/src/commands/catalog/mod.rs",
       "competition": "src-tauri/src/commands/competition/mod.rs",
       "database": "src-tauri/src/commands/database/mod.rs",
       "exchange": "src-tauri/src/commands/exchange.rs",

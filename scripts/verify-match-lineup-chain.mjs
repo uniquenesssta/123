@@ -18,7 +18,7 @@ const exchange = ["preview","conflict","commit","context","read","write","identi
 const prediction = read("crates/persistence-postgres/src/match_prediction.rs");
 const workbook = read("crates/spreadsheet-io/src/match_workbook.rs");
 const application = read("crates/application/src/services/lineups/facade.rs");
-const commands = read("src-tauri/src/commands/catalog.rs");
+const commands = ["formations", "matches", "lineup_presets", "lineups"].map(name => read(`src-tauri/src/commands/catalog/${name}.rs`)).join("\n");
 const registry = read("src-tauri/src/bootstrap/command_registry.rs");
 const client = read("src/api/client.ts");
 const lineupsPage = read("src/pages/lineups.ts");

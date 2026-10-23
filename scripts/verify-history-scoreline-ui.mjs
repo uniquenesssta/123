@@ -22,7 +22,7 @@ const styles = read("src/styles/app.css");
 const workspacePanels = read("src/styles/workspacePanels.css");
 const client = read("src/api/client.ts");
 const predictionCommand = read("src-tauri/src/commands/prediction.rs");
-const catalogCommand = read("src-tauri/src/commands/catalog.rs");
+const catalogCommand = ["formations", "matches", "lineup_presets", "lineups"].map(name => read(`src-tauri/src/commands/catalog/${name}.rs`)).join("\n");
 const registry = read("src-tauri/src/bootstrap/command_registry.rs");
 const applicationPrediction = readRustTree("crates/application/src/services/prediction") + readRustTree("crates/application/src/use_cases/prediction");
 const applicationCatalog = read("crates/application/src/services/lineups/facade.rs");
