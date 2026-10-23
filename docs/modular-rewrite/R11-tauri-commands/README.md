@@ -2,7 +2,7 @@
 
 ## 当前阶段状态
 
-`IN_PROGRESS`。R11-01～05 DONE；06 Prediction/Research/Runs Commands已实施VERIFYING，07～10 BLOCKED，R11 IN_PROGRESS。用户2026-10-23“收尾05开始06”，继续唯一rewrite/r11-tauri-commands；基线29de82c820448e34ba65722addb47073b0824d7c为05五文档[skip ci]收尾，生产源码同自身完整Windows成功b9040df。 当前以本节和任务表为准，历史VERIFYING保留。
+`IN_PROGRESS`。R11-01～06 DONE；06自身精确faa6f72 / Windows run39954995571完整SUCCESS。用户2026-10-23“收尾06开始07”，07 Review/Postmatch/Analytics Commands READY，08～10 BLOCKED，R11 IN_PROGRESS，继续唯一rewrite/r11-tauri-commands。此前VERIFYING为实施历史，当前状态以索引与任务表为准。
 
 ## 依据与前置基线
 
@@ -17,8 +17,8 @@
 | R11-03 | [Competitions 与 Rules Commands](R11-03-competitions-and-rules-commands.md) | DONE · 自身精确Windows完整SUCCESS |
 | R11-04 | [Teams 与 Players Commands](R11-04-teams-and-players-commands.md) | DONE · 自身精确Windows完整SUCCESS |
 | R11-05 | [Lineups、Presets 与 Workbooks Commands](R11-05-lineups-presets-and-workbooks-commands.md) | DONE · 自身精确Windows完整SUCCESS |
-| R11-06 | [Prediction、Research 与 Runs Commands](R11-06-prediction-research-and-runs-commands.md) | VERIFYING · 自身完整Windows待验 |
-| R11-07 | Review、Postmatch 与 Analytics Commands | BLOCKED |
+| R11-06 | [Prediction、Research 与 Runs Commands](R11-06-prediction-research-and-runs-commands.md) | DONE · 自身精确Windows完整SUCCESS |
+| R11-07 | Review、Postmatch 与 Analytics Commands | READY |
 | R11-08 | AI Workspace 与 OpenAI Profiles Commands | BLOCKED |
 | R11-09 | Release Commands | BLOCKED |
 | R11-10 | Command Registry 收敛 | BLOCKED |
@@ -114,3 +114,12 @@ R11-02 Database Commands已实施 `VERIFYING`，基线f56a1c004cee8018f657b6cdd9
 ## R11-06 实施与验证
 
 17条原命令已按推演6、运行记录3、P4任务/工作台7、研究冲突1归入唯一commands/prediction目录，4纯出口接通原Application能力，旧prediction.rs/orchestration.rs删除。171公共命令/注册顺序/原签名与正文保持，内部物理组14→13；82源码/完整架构/22Rustfmt/69等价/19隔离负向与保护门禁通过。06自身完整Windows待验，07～10 BLOCKED，R11 IN_PROGRESS。 详[06记录](R11-06-prediction-research-and-runs-commands.md)。
+
+
+## R11-06 精确 Windows 完成与07授权（2026-10-23）
+
+精确提交 `faa6f720cc199c29c628d64fdfac870e973ae770` / tree `b37132ef0b14bc547d1a50a184a73db261d90bb9`，[Public Platform CI run39954995571](https://github.com/uniquenesssta/123/actions/runs/39954995571) / Windows job120418506013完整SUCCESS，run于2026-10-23 21:07:29北京时间完成。实际Desktop46/46、Application230/230、Persistence259/259、Gateway112/112 unit和41/41 contract；完整frontend/contracts/TypeScript/Vite/17视口、Rust fmt/locked Clippy all-targets -D warnings/workspace tests、Windows release/MSI/NSIS/启动与日志均通过（7条记录、3个完成操作）。新增/迁移单测0，69等价与19隔离探针不计动态测试。
+
+报告logs/windows-acceptance-20261023-124109.json及同名.txt；artifact12503252874，14,053,432字节，SHA-256 `0fc8d67798fb6bf1f4331a9b411ea0c27859aa9e7f66972e5ddbd62a6a114004`，查询时未过期。已核对精确head/branch、全部job步骤、完整日志与artifact。用户2026-10-23“收尾06开始07”，06 DONE，07 Review/Postmatch/Analytics Commands READY，08～10 BLOCKED，R11 IN_PROGRESS。此次仅5份既有文档[skip ci]收尾，源码沿上述自身完整Windows证据，不重复同源码构建；历史VERIFYING/预期计数保留，07须自身完整Windows。
+
+真实PG/历史保护四项/不可变账本并发回滚/有效XLSX/Windows Full/私有P4P7固定回归及继承model.runs/0041删除风险仍最终封包新库待验；ignored、公开unavailable stub和静态指纹不计这些真实PASS。

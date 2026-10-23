@@ -953,3 +953,12 @@ R11-01～04 DONE；05 Lineups/Presets/Workbooks Commands已实施VERIFYING，06�
 原Prediction门禁新增17薄传输/纯出口/双宏/唯一owner/签名/原参数、UUID与完整传输形状，既有所有业务断言反向核对保持；历史比分UI门禁仅同步定义映射读者，正式命令验证器字节冻结。公共171集合哈希保持；Domain365/129/301、scan1397→1416、sourceDigest保持，usageDigest1164aba99321eb90f30185c02633d60a012506b917680f5077759f5ac75ed12f；App422/43Ports/19Port文件/PG直接38/状态19不变。18保护资产及46迁移18PG静态契约通过。
 
 沿原Windows Public Platform CI执行完整frontend/17视口、Rust fmt/locked Clippy workspace all-targets -D warnings/workspace tests、Windows release/MSI/NSIS/启动与日志。实际Windows job首次in_progress即停止全部CI查询，提示约20～30分钟并等用户返回；06保持VERIFYING，不继承05成功。真实PG/历史保护四项/不可变账本并发回滚/有效XLSX/Windows Full/私有P4P7固定回归及继承model.runs/0041删除风险仍最终封包新库待验；ignored、公共unavailable stub和静态指纹不计真实PASS。详[06记录](modular-rewrite/R11-tauri-commands/R11-06-prediction-research-and-runs-commands.md)。
+
+
+## R11-06 精确 Windows 完成与07授权（2026-10-23）
+
+精确提交 `faa6f720cc199c29c628d64fdfac870e973ae770` / tree `b37132ef0b14bc547d1a50a184a73db261d90bb9`，[Public Platform CI run39954995571](https://github.com/uniquenesssta/123/actions/runs/39954995571) / Windows job120418506013完整SUCCESS，run于2026-10-23 21:07:29北京时间完成。实际Desktop46/46、Application230/230、Persistence259/259、Gateway112/112 unit和41/41 contract；完整frontend/contracts/TypeScript/Vite/17视口、Rust fmt/locked Clippy all-targets -D warnings/workspace tests、Windows release/MSI/NSIS/启动与日志均通过（7条记录、3个完成操作）。新增/迁移单测0，69等价与19隔离探针不计动态测试。
+
+报告logs/windows-acceptance-20261023-124109.json及同名.txt；artifact12503252874，14,053,432字节，SHA-256 `0fc8d67798fb6bf1f4331a9b411ea0c27859aa9e7f66972e5ddbd62a6a114004`，查询时未过期。已核对精确head/branch、全部job步骤、完整日志与artifact。用户2026-10-23“收尾06开始07”，06 DONE，07 Review/Postmatch/Analytics Commands READY，08～10 BLOCKED，R11 IN_PROGRESS。此次仅5份既有文档[skip ci]收尾，源码沿上述自身完整Windows证据，不重复同源码构建；历史VERIFYING/预期计数保留，07须自身完整Windows。
+
+真实PG/历史保护四项/不可变账本并发回滚/有效XLSX/Windows Full/私有P4P7固定回归及继承model.runs/0041删除风险仍最终封包新库待验；ignored、公开unavailable stub和静态指纹不计这些真实PASS。
