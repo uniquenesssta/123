@@ -869,3 +869,8 @@ R11-06已收尾DONE：精确faa6f72 / [Windows run39954995571](https://github.co
 
 
 R11-07已收尾DONE：精确5b779b9 / [Windows run39962382506](https://github.com/uniquenesssta/123/actions/runs/39962382506)完整SUCCESS，Desktop46/App230/PG259、完整前端/17视口、Rust、Windows打包/启动/日志通过。用户授权同一R11分支08 READY，09～10 BLOCKED；详[07完成记录](docs/modular-rewrite/R11-tauri-commands/R11-07-review-postmatch-and-analytics-commands.md)。真实PG/XLSX/Full/私有固定回归与继承删除风险仍最终新库待验。
+
+
+### R11-08 AI问答与兼容API配置命令（2026-10-23，VERIFYING）
+
+13条原AI问答/配置命令归入唯一commands/ai_workspace，发送流程分离纯校验、会话绑定、内容、网关/日志及回答投影；取消仍原唯一租约，配置仍原凭据存储。旧api_workspace.rs/openai.rs删除，171公共命令/注册/DTO保持，物理组13→12，配置owner不变且刷新实际五个writer。新增12原Tauri单测待Windows；82源码/完整架构/30Rustfmt/61等价/30隔离负向与保护门禁通过。08自身Windows待验，09～10 BLOCKED，R11 IN_PROGRESS。 详[08记录](docs/modular-rewrite/R11-tauri-commands/R11-08-ai-workspace-and-openai-profiles-commands.md)与[R11索引](docs/modular-rewrite/R11-tauri-commands/README.md)。真实API/凭据/会话端到端、PG/XLSX/Full/私有固定回归与原最终新库项目仍待验。

@@ -2,11 +2,11 @@
 
 ## 当前阶段状态
 
-`IN_PROGRESS`。R11-01～07 DONE；07自身精确5b779b9 / Windows run39962382506完整SUCCESS。用户2026-10-23“收尾07开始08”，08 AI Workspace/OpenAI Profiles Commands READY，09～10 BLOCKED，R11 IN_PROGRESS，继续唯一rewrite/r11-tauri-commands。此前VERIFYING为实施历史，当前状态以索引与任务表为准。
+`IN_PROGRESS`。R11-01～07 DONE；08 AI Workspace/OpenAI Profiles Commands已实施VERIFYING，09～10 BLOCKED，R11 IN_PROGRESS。用户2026-10-23“收尾07开始08”，继续唯一rewrite/r11-tauri-commands；基线b7c2eb132a3803b8aa514b685ed097966b4e843f为07五文档[skip ci]收尾，生产源码同自身完整Windows成功5b779b9。 当前以本节和任务表为准，历史VERIFYING保留。
 
 ## 依据与前置基线
 
-[R11任务书](../../football-model-platform-modular-rewrite-19-docs/11-R11-tauri-commands.md)、[总纲执行订正](../../football-model-platform-modular-rewrite-19-docs/00-总体架构与前23节.md)、[R10完成记录](../R10-review-analytics-release-backend/R10-stage-completion.md)。本阶段从R10收尾3d43e8e建立唯一rewrite/r11-tauri-commands；01～06已获自身精确Windows成功，07当前实施/验证详节点，08～10 BLOCKED。
+[R11任务书](../../football-model-platform-modular-rewrite-19-docs/11-R11-tauri-commands.md)、[总纲执行订正](../../football-model-platform-modular-rewrite-19-docs/00-总体架构与前23节.md)、[R10完成记录](../R10-review-analytics-release-backend/R10-stage-completion.md)。本阶段从R10收尾3d43e8e建立唯一rewrite/r11-tauri-commands；01～07已获自身精确Windows成功，08当前实施/验证详节点，09～10 BLOCKED。
 
 ## 任务状态
 
@@ -19,7 +19,7 @@
 | R11-05 | [Lineups、Presets 与 Workbooks Commands](R11-05-lineups-presets-and-workbooks-commands.md) | DONE · 自身精确Windows完整SUCCESS |
 | R11-06 | [Prediction、Research 与 Runs Commands](R11-06-prediction-research-and-runs-commands.md) | DONE · 自身精确Windows完整SUCCESS |
 | R11-07 | [Review、Postmatch 与 Analytics Commands](R11-07-review-postmatch-and-analytics-commands.md) | DONE · 自身精确Windows完整SUCCESS |
-| R11-08 | AI Workspace 与 OpenAI Profiles Commands | READY |
+| R11-08 | [AI Workspace 与 OpenAI Profiles Commands](R11-08-ai-workspace-and-openai-profiles-commands.md) | VERIFYING · 自身完整Windows待验 |
 | R11-09 | Release Commands | BLOCKED |
 | R11-10 | Command Registry 收敛 | BLOCKED |
 
@@ -137,3 +137,8 @@ R11-02 Database Commands已实施 `VERIFYING`，基线f56a1c004cee8018f657b6cdd9
 报告logs/windows-acceptance-20261023-133701.json及同名.txt；artifact12507405698，14,053,924字节，SHA-256 `76a48e55a30cf7f237f864c1abd55e4986837d67a727a9b770a3b379148daffc`，查询时未过期。已核对精确head/branch、全部job步骤、完整日志与artifact。用户2026-10-23“收尾07开始08”，07 DONE，08 AI Workspace/OpenAI Profiles Commands READY，09～10 BLOCKED，R11 IN_PROGRESS。此次仅5份既有文档[skip ci]收尾，源码沿上述自身完整Windows证据，不重复同源码构建；历史VERIFYING/预期计数保留，08须自身完整Windows。
 
 真实PG/历史保护四项/不可变账本并发回滚/有效XLSX/Windows Full/私有P4P7固定回归及继承model.runs/0041删除风险仍最终封包新库待验；ignored、公开unavailable stub和静态指纹不计这些真实PASS。
+
+
+## R11-08 实施与验证
+
+13条原AI问答/配置命令归入唯一commands/ai_workspace，发送流程分离纯校验、会话绑定、内容、网关/日志及回答投影；取消仍原唯一租约，配置仍原凭据存储。旧api_workspace.rs/openai.rs删除，171公共命令/注册/DTO保持，物理组13→12，配置owner不变且刷新实际五个writer。新增12原Tauri单测待Windows；82源码/完整架构/30Rustfmt/61等价/30隔离负向与保护门禁通过。08自身Windows待验，09～10 BLOCKED，R11 IN_PROGRESS。 详[08记录](R11-08-ai-workspace-and-openai-profiles-commands.md)。

@@ -29,7 +29,7 @@ const shell = read("src/app/shell.ts");
 const navigation = read("src/app/navigation.ts");
 const commandRegistry = read("src-tauri/src/bootstrap/command_registry.rs");
 const desktopState = read("src-tauri/src/bootstrap/state.rs");
-const commands = read("src-tauri/src/commands/openai.rs");
+const commands = [...new Set(Object.values(JSON.parse(read("architecture/command-contract.json")).command_groups.find(group => group.module === "ai_workspace").command_definition_files))].map(read).join("\n");
 const store = read("src-tauri/src/openai_profiles.rs");
 const credentialRoot = "crates/research-gateway/src/credentials";
 const credentialExports = read(`${credentialRoot}/mod.rs`);
@@ -74,7 +74,13 @@ assert(tauri.version === packageJson.version, "Tauri版本与package.json不一�
 assert(cargo.includes(`version = "${packageJson.version}"`), "Cargo workspace版本不一致");
 assert(readme.includes(`版本 **${packageJson.version}**`), "README版本不一致");
 
-for (const artifact of contract.artifacts) assert(existsSync(join(root, artifact)), `缺少兼容API配置制品：${artifact}`);
+// R11-08 migrated profile artifacts BEGIN
+for (const artifact of contract.artifacts) {
+  if (artifact === "src-tauri/src/commands/openai.rs") {
+    for (const owner of ["src-tauri/src/commands/ai_workspace/profiles/mod.rs", ...Object.values(json("architecture/command-contract.json").command_groups.find(group => group.module === "ai_workspace").command_definition_files).filter(file => file.startsWith("src-tauri/src/commands/ai_workspace/profiles/"))]) assert(existsSync(join(root, owner)), `缺少迁移后的兼容API命令：${owner}`);
+  } else assert(existsSync(join(root, artifact)), `缺少兼容API配置制品：${artifact}`);
+}
+// R11-08 migrated profile artifacts END
 for (const command of contract.commands) {
   assert(client.includes(`"${command}"`), `前端API未调用${command}`);
   assert(commandRegistry.includes(`commands::${command}`), `Tauri未注册${command}`);
@@ -167,6 +173,10 @@ for (const field of ["api_protocol", "api_endpoint", "token_limit_field", "api_w
   assert(fieldCount(metadataTestInitializer, field) === 1, `OpenAiProfileDraft测试字段${field}必须且只能初始化一次`);
 }
 
+// R11-08 profile state writers BEGIN
+const profileState = json("architecture/state-ownership.json").states.find(state => state.id === "tauri.openai-profiles");
+assert(profileState?.owner === "src-tauri/src/openai_profiles.rs::OpenAiProfileStore" && JSON.stringify(profileState.writers) === JSON.stringify(["src-tauri/src/commands/ai_workspace/profiles/save_openai_profile.rs", "src-tauri/src/commands/ai_workspace/profiles/set_active_openai_profile.rs", "src-tauri/src/commands/ai_workspace/profiles/delete_openai_profile.rs", "src-tauri/src/commands/ai_workspace/profiles/clear_openai_profile_key.rs", "src-tauri/src/commands/ai_workspace/profiles/test_openai_profile.rs"]), "原配置状态owner必须保持且writer只登记实际五个传输入口");
+// R11-08 profile state writers END
 if (failures.length) {
   console.error("兼容API Example配置入口验证失败：");
   for (const failure of failures) console.error(`- ${failure}`);

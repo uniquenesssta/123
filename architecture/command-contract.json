@@ -265,9 +265,9 @@
       }
     },
     {
-      "module": "api_workspace",
-      "definition_file": "src-tauri/src/commands/api_workspace.rs",
-      "parameter_and_return_signature_file": "src-tauri/src/commands/api_workspace.rs",
+      "module": "ai_workspace",
+      "definition_file": "src-tauri/src/commands/ai_workspace/mod.rs",
+      "parameter_and_return_signature_file": "src-tauri/src/commands/ai_workspace/mod.rs",
       "frontend_parameter_and_return_signature_file": "src/api/client.ts",
       "frontend_shared_dto_file": "src/types.ts",
       "commands": [
@@ -276,8 +276,30 @@
         "read_api_workspace_session",
         "send_api_workspace_message",
         "cancel_api_workspace_request",
-        "archive_api_workspace_session"
-      ]
+        "archive_api_workspace_session",
+        "parse_openai_api_example",
+        "list_openai_profiles",
+        "save_openai_profile",
+        "set_active_openai_profile",
+        "delete_openai_profile",
+        "clear_openai_profile_key",
+        "test_openai_profile"
+      ],
+      "command_definition_files": {
+        "list_api_workspace_presets": "src-tauri/src/commands/ai_workspace/list_api_workspace_presets.rs",
+        "list_api_workspace_sessions": "src-tauri/src/commands/ai_workspace/sessions/list_api_workspace_sessions.rs",
+        "read_api_workspace_session": "src-tauri/src/commands/ai_workspace/sessions/read_api_workspace_session.rs",
+        "send_api_workspace_message": "src-tauri/src/commands/ai_workspace/send/command.rs",
+        "cancel_api_workspace_request": "src-tauri/src/commands/ai_workspace/cancel_api_workspace_request.rs",
+        "archive_api_workspace_session": "src-tauri/src/commands/ai_workspace/sessions/archive_api_workspace_session.rs",
+        "parse_openai_api_example": "src-tauri/src/commands/ai_workspace/profiles/parse_openai_api_example.rs",
+        "list_openai_profiles": "src-tauri/src/commands/ai_workspace/profiles/list_openai_profiles.rs",
+        "save_openai_profile": "src-tauri/src/commands/ai_workspace/profiles/save_openai_profile.rs",
+        "set_active_openai_profile": "src-tauri/src/commands/ai_workspace/profiles/set_active_openai_profile.rs",
+        "delete_openai_profile": "src-tauri/src/commands/ai_workspace/profiles/delete_openai_profile.rs",
+        "clear_openai_profile_key": "src-tauri/src/commands/ai_workspace/profiles/clear_openai_profile_key.rs",
+        "test_openai_profile": "src-tauri/src/commands/ai_workspace/profiles/test_openai_profile.rs"
+      }
     },
     {
       "module": "prediction",
@@ -664,24 +686,8 @@
         "list_release_acceptance_runs",
         "read_release_acceptance_run"
       ]
-    },
-    {
-      "module": "openai",
-      "definition_file": "src-tauri/src/commands/openai.rs",
-      "parameter_and_return_signature_file": "src-tauri/src/commands/openai.rs",
-      "frontend_parameter_and_return_signature_file": "src/api/client.ts",
-      "frontend_shared_dto_file": "src/types.ts",
-      "commands": [
-        "parse_openai_api_example",
-        "list_openai_profiles",
-        "save_openai_profile",
-        "set_active_openai_profile",
-        "delete_openai_profile",
-        "clear_openai_profile_key",
-        "test_openai_profile"
-      ]
     }
   ],
   "command_set_sha256": "dfc477a8b0bec95735fdad006349fcea0f367b4ebc85aede1b63a128a55de669",
-  "command_definition_map_sha256": "e4271c64e385f45e10f765d20af92a8a0d572dd698741a40cb9b7473fe403e05"
+  "command_definition_map_sha256": "7e86fb076698f679f57d690ea174a43e061b8bc65048823cdeed654c0315c64c"
 }

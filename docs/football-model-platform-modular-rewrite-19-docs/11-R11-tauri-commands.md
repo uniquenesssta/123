@@ -7,7 +7,7 @@
 
 ## 当前前置状态（2026-10-23）
 
-R11-01～07 DONE；07自身精确5b779b9 / Windows run39962382506完整SUCCESS。用户2026-10-23“收尾07开始08”，08 AI Workspace/OpenAI Profiles Commands READY，09～10 BLOCKED，R11 IN_PROGRESS，继续唯一rewrite/r11-tauri-commands。此前VERIFYING为实施历史，当前状态以索引与任务表为准。 [当前索引](../modular-rewrite/R11-tauri-commands/README.md)。
+R11-01～07 DONE；08 AI Workspace/OpenAI Profiles Commands已实施VERIFYING，09～10 BLOCKED，R11 IN_PROGRESS。用户2026-10-23“收尾07开始08”，继续唯一rewrite/r11-tauri-commands；基线b7c2eb132a3803b8aa514b685ed097966b4e843f为07五文档[skip ci]收尾，生产源码同自身完整Windows成功5b779b9。 [08实施记录](../modular-rewrite/R11-tauri-commands/R11-08-ai-workspace-and-openai-profiles-commands.md)与[当前索引](../modular-rewrite/R11-tauri-commands/README.md)为当前依据。
 
 真实PostgreSQL、历史保护四项、不可变账本/并发回滚、有效XLSX、Windows Full、私有P4/P7固定回归及继承的model.runs/0041删除风险继续最终封包新库待验；ignored、公开unavailable stub和静态指纹不计这些真实项目PASS。
 
@@ -1108,7 +1108,7 @@ src-tauri/src/commands/review/
 
 ## R11-08 AI Workspace 与 OpenAI Profiles Commands
 
-状态：`READY`（07自身完整Windows通过；用户2026-10-23“收尾07开始08”授权）
+状态：`VERIFYING`（13条命令与发送职责已实施；自身完整Windows尚待验收）
 
 ### 1. 目标
 

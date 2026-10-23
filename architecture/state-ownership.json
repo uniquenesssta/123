@@ -206,7 +206,11 @@
       "owner": "src-tauri/src/openai_profiles.rs::OpenAiProfileStore",
       "scope": "Tauri application",
       "writers": [
-        "src-tauri/src/commands/openai.rs"
+        "src-tauri/src/commands/ai_workspace/profiles/save_openai_profile.rs",
+        "src-tauri/src/commands/ai_workspace/profiles/set_active_openai_profile.rs",
+        "src-tauri/src/commands/ai_workspace/profiles/delete_openai_profile.rs",
+        "src-tauri/src/commands/ai_workspace/profiles/clear_openai_profile_key.rs",
+        "src-tauri/src/commands/ai_workspace/profiles/test_openai_profile.rs"
       ],
       "forbidden": [
         "src/**",

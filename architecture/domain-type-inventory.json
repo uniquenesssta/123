@@ -24,13 +24,13 @@
     "targetPublicExportPolicy": "explicit re-export only"
   },
   "sourceDigest": "217241ac243726a5ab6805a7f169e222b97e78c7c971749a5904714af673ebdd",
-  "rustUsageDigest": "2f57057c21c018f83ae397f8311147d54326487442e8600636c3fe693fa77fe6",
+  "rustUsageDigest": "cc2ff0a54510e70b3a690cf891594405f95634c23410c918f2cb50f3a99a67d8",
   "summary": {
     "typeCount": 365,
     "publicCompatibilityTypeCount": 365,
     "internalTypeCount": 0,
     "domainSourceFileCount": 129,
-    "scannedRustFileCount": 1464,
+    "scannedRustFileCount": 1491,
     "databaseMappedTypeCount": 301,
     "byTargetModule": {
       "ai_workspace": 16,
@@ -2195,7 +2195,7 @@
         "crates/application/src/use_cases/ai_workspace/read_attachments/mod.rs",
         "crates/application/src/use_cases/ai_workspace/sessions/append_user_message.rs",
         "crates/application/src/use_cases/ai_workspace/sessions/tests.rs",
-        "src-tauri/src/commands/api_workspace.rs"
+        "src-tauri/src/commands/ai_workspace/send/request.rs"
       ],
       "databaseMappings": []
     },
@@ -2511,7 +2511,7 @@
         "crates/persistence-postgres/src/adapters/ai_workspace/sessions/assistant_bundle.rs",
         "crates/persistence-postgres/src/adapters/ai_workspace/sessions/messages.rs",
         "crates/persistence-postgres/src/adapters/ai_workspace/sessions/validation.rs",
-        "src-tauri/src/commands/api_workspace.rs"
+        "src-tauri/src/commands/ai_workspace/send/response.rs"
       ],
       "databaseMappings": [
         "crates/persistence-postgres/src/adapters/ai_workspace/sessions/assistant_bundle.rs",
@@ -2886,7 +2886,8 @@
       ],
       "externalCallers": [
         "crates/application/src/use_cases/ai_workspace/presets/mod.rs",
-        "src-tauri/src/commands/api_workspace.rs"
+        "src-tauri/src/commands/ai_workspace/list_api_workspace_presets.rs",
+        "src-tauri/src/commands/ai_workspace/send/metadata.rs"
       ],
       "databaseMappings": []
     },
@@ -2954,7 +2955,11 @@
         "crates/application/src/use_cases/ai_workspace/sessions/tests.rs",
         "crates/persistence-postgres/src/adapters/ai_workspace/sessions/assistant_bundle.rs",
         "crates/persistence-postgres/src/adapters/ai_workspace/sessions/catalog.rs",
-        "src-tauri/src/commands/api_workspace.rs"
+        "src-tauri/src/commands/ai_workspace/send/command.rs",
+        "src-tauri/src/commands/ai_workspace/send/content.rs",
+        "src-tauri/src/commands/ai_workspace/send/content_tests.rs",
+        "src-tauri/src/commands/ai_workspace/send/workflow.rs",
+        "src-tauri/src/commands/ai_workspace/sessions/read_api_workspace_session.rs"
       ],
       "databaseMappings": [
         "crates/persistence-postgres/src/adapters/ai_workspace/sessions/assistant_bundle.rs",
@@ -3031,7 +3036,7 @@
         "crates/application/src/use_cases/ai_workspace/sessions/create_session.rs",
         "crates/application/src/use_cases/ai_workspace/sessions/tests.rs",
         "crates/persistence-postgres/src/adapters/ai_workspace/sessions/catalog.rs",
-        "src-tauri/src/commands/api_workspace.rs"
+        "src-tauri/src/commands/ai_workspace/send/session.rs"
       ],
       "databaseMappings": [
         "crates/persistence-postgres/src/adapters/ai_workspace/sessions/catalog.rs"
@@ -3134,7 +3139,8 @@
         "crates/application/src/use_cases/ai_workspace/sessions/tests.rs",
         "crates/persistence-postgres/src/adapters/ai_workspace/sessions/catalog.rs",
         "crates/persistence-postgres/src/adapters/ai_workspace/sessions/mapping.rs",
-        "src-tauri/src/commands/api_workspace.rs"
+        "src-tauri/src/commands/ai_workspace/send/session.rs",
+        "src-tauri/src/commands/ai_workspace/sessions/list_api_workspace_sessions.rs"
       ],
       "databaseMappings": [
         "crates/persistence-postgres/src/adapters/ai_workspace/sessions/catalog.rs",

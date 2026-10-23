@@ -30,7 +30,7 @@ const gateway = text("crates/research-gateway/src/client.rs");
 const response = text("crates/research-gateway/src/response.rs");
 const application = text("crates/application/src/use_cases/ai_workspace/presets/mod.rs");
 const persistence = [text("crates/persistence-postgres/src/api_workspace.rs"), ...["catalog", "messages", "assistant_bundle", "generated_files", "usage"].map(name => text(`crates/persistence-postgres/src/adapters/ai_workspace/sessions/${name}.rs`))].join("\n");
-const commands = text("src-tauri/src/commands/api_workspace.rs");
+const commands = [...new Set(Object.values(JSON.parse(text("architecture/command-contract.json")).command_groups.find(group => group.module === "ai_workspace").command_definition_files))].map(text).join("\n") + "\n" + ["src-tauri/src/commands/ai_workspace/send/validation.rs", "src-tauri/src/commands/ai_workspace/send/workflow.rs", "src-tauri/src/commands/ai_workspace/send/session.rs", "src-tauri/src/commands/ai_workspace/send/gateway.rs", "src-tauri/src/commands/ai_workspace/send/response.rs", "src-tauri/src/commands/ai_workspace/send/content.rs", "src-tauri/src/commands/ai_workspace/send/metadata.rs", "src-tauri/src/commands/ai_workspace/send/request.rs"].map(text).join("\n");
 const requestRegistryPath = "crates/application/src/use_cases/ai_workspace/cancellation/registry.rs";
 const requestRegistry = text(requestRegistryPath);
 const requestRegistryExport = text("crates/application/src/use_cases/ai_workspace/cancellation/mod.rs");
@@ -73,6 +73,8 @@ for (const artifact of v3.artifacts) {
     for (const owner of migratedApplicationOwners) {
       assert(existsSync(join(root, owner)), `AI问答v3迁移后制品不存在：${owner}`);
     }
+  } else if (artifact === "src-tauri/src/commands/api_workspace.rs") {
+    for (const owner of ["src-tauri/src/commands/ai_workspace/mod.rs", ...Object.values(json("architecture/command-contract.json").command_groups.find(group => group.module === "ai_workspace").command_definition_files)]) assert(existsSync(join(root, owner)), `AI问答命令迁移后制品不存在：${owner}`);
   } else {
     assert(existsSync(join(root, artifact)), `AI问答v3制品不存在：${artifact}`);
   }
@@ -100,7 +102,7 @@ for (const forbidden of ["tools", "tool_choice", "json_schema", "max_output_toke
 assert(response.includes("parse_plain_text_success_response"), "缺少纯文本响应解析");
 assert(gateway.includes("execute_plain_text_with_sink"), "缺少纯文本执行入口");
 
-const send = slice(commands, "pub async fn send_api_workspace_message", "pub async fn cancel_api_workspace_request");
+const send = ["src-tauri/src/commands/ai_workspace/send/command.rs", "src-tauri/src/commands/ai_workspace/send/validation.rs", "src-tauri/src/commands/ai_workspace/send/workflow.rs", "src-tauri/src/commands/ai_workspace/send/session.rs", "src-tauri/src/commands/ai_workspace/send/gateway.rs", "src-tauri/src/commands/ai_workspace/send/response.rs", "src-tauri/src/commands/ai_workspace/send/content.rs", "src-tauri/src/commands/ai_workspace/send/metadata.rs", "src-tauri/src/commands/ai_workspace/send/request.rs"].map(text).join("\n");
 assert(send.includes("AI问答不支持附件"), "新请求未阻断附件");
 assert(send.includes("execute_plain_text"), "Tauri发送链未使用纯文本网关");
 assert(send.includes("include_context"), "缺少可选只读上下文");
@@ -117,7 +119,7 @@ assert(requestState?.owner === `${requestRegistryPath}::AiWorkspaceRequestRegist
 const registrationIndex = send.indexOf(".register(request_id)");
 assert(registrationIndex >= 0 && registrationIndex < send.indexOf("gateway_for(Some(profile_id))") && registrationIndex < send.indexOf(".create_api_workspace_session("), "请求ID必须在profile/会话副作用之前注册");
 assert(/execute_plain_text\(&request, registration\.cancellation\(\)\)\s*\.await;\s*drop\(registration\);\s*let execution = match execution_result/.test(send), "网关必须使用守卫令牌，并在成功/失败响应处理前释放登记");
-const cancel = slice(commands, "pub async fn cancel_api_workspace_request", "pub async fn archive_api_workspace_session");
+const cancel = text("src-tauri/src/commands/ai_workspace/cancel_api_workspace_request.rs");
 assert(cancel.includes("let request_id = request_id.trim();") && cancel.includes('Err("AI问答请求 ID 不能为空".to_string())') && cancel.includes("Ok(state.api_workspace_requests.cancel(request_id))"), "取消命令必须保留trim/空ID错误并委托注册表");
 const registration = slice(requestRegistry, "pub fn register", "pub fn cancel");
 assert(registration.includes("requests.entry(request_id.to_owned())") && registration.includes('Entry::Occupied(_) => Err("AI问答请求 ID 已在使用")') && registration.includes("Entry::Vacant(entry) =>"), "重复请求ID不得替换活动令牌");

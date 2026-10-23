@@ -12,7 +12,7 @@ const packageJson = json("package.json");
 const page = text("src/pages/apiWorkspace.ts");
 const settings = text("src/pages/openai.ts");
 const main = text("src/main.ts");
-const commands = text("src-tauri/src/commands/api_workspace.rs");
+const commands = [...new Set(Object.values(JSON.parse(text("architecture/command-contract.json")).command_groups.find(group => group.module === "ai_workspace").command_definition_files))].map(text).join("\n") + "\n" + ["src-tauri/src/commands/ai_workspace/send/validation.rs", "src-tauri/src/commands/ai_workspace/send/workflow.rs", "src-tauri/src/commands/ai_workspace/send/session.rs", "src-tauri/src/commands/ai_workspace/send/gateway.rs", "src-tauri/src/commands/ai_workspace/send/response.rs", "src-tauri/src/commands/ai_workspace/send/content.rs", "src-tauri/src/commands/ai_workspace/send/metadata.rs", "src-tauri/src/commands/ai_workspace/send/request.rs"].map(text).join("\n");
 const gateway = text("crates/research-gateway/src/client.rs");
 assert(contract.release_version === "0.14.0" && isVersionAtLeast(packageJson.version, contract.release_version), "研究控制历史契约或当前项目版本未同步");
 assert(contract.surface.global_busy_overlay_during_send === false, "发送期间不得使用全局遮罩");

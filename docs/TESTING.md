@@ -982,3 +982,14 @@ Domain365/129声明源/301映射、scan1416→1464、sourceDigest保持，usageD
 报告logs/windows-acceptance-20261023-133701.json及同名.txt；artifact12507405698，14,053,924字节，SHA-256 `76a48e55a30cf7f237f864c1abd55e4986837d67a727a9b770a3b379148daffc`，查询时未过期。已核对精确head/branch、全部job步骤、完整日志与artifact。用户2026-10-23“收尾07开始08”，07 DONE，08 AI Workspace/OpenAI Profiles Commands READY，09～10 BLOCKED，R11 IN_PROGRESS。此次仅5份既有文档[skip ci]收尾，源码沿上述自身完整Windows证据，不重复同源码构建；历史VERIFYING/预期计数保留，08须自身完整Windows。
 
 真实PG/历史保护四项/不可变账本并发回滚/有效XLSX/Windows Full/私有P4P7固定回归及继承model.runs/0041删除风险仍最终封包新库待验；ignored、公开unavailable stub和静态指纹不计这些真实PASS。
+
+
+## R11-08 AI Workspace 与 OpenAI Profiles Commands（2026-10-23，VERIFYING）
+
+13条原AI问答/配置命令归入唯一commands/ai_workspace，发送流程分离纯校验、会话绑定、内容、网关/日志及回答投影；取消仍原唯一租约，配置仍原凭据存储。旧api_workspace.rs/openai.rs删除，171公共命令/注册/DTO保持，物理组13→12，配置owner不变且刷新实际五个writer。新增12原Tauri单测待Windows；82源码/完整架构/30Rustfmt/61等价/30隔离负向与保护门禁通过。08自身Windows待验，09～10 BLOCKED，R11 IN_PROGRESS。 原Application/PG/Gateway全部测试正文保持，原Tauri target新增12项请求wire/校验优先级/元数据/Unicode历史和上下文/回答投影单测，预期Desktop58（46+12）/Application230/Persistence259/Gateway112unit+41contract须08自身精确Windows确认。
+
+最终82read-only node、完整npm run verify:architecture、30文件独立Rustfmt1.88 --edition 2021 --config skip_children=true --check、61等价（13签名、12薄正文、原DTO/6私有helper/校验/会话/网关/回答/整发送展开、生产literal、冻结范围/11组/5守卫逆变换）、隔离30拒绝/6守卫恢复正向、主247源码/清单/守卫SHA256保持及git diff --check通过。临时脚本循环变量复用曾将response_tests.rs误写成JS，Rustfmt拦截、未推送；固定显式写入目标并恢复测试后重新通过82源码/完整架构/30格式/等价，未关闭检查。scratch等价核对器另纠正网关片段终点选择和Rustfmt根排序口径，生产路径未改。
+
+报告r1108-static.json、r1108-architecture.log、r1108-equivalence.json、r1108-negative.json、r1108-primary-fingerprints.json在repo外scratch。Domain365/129声明源/301映射、scan1464→1491、sourceDigest保持，usageDigestcc2ff0a54510e70b3a690cf891594405f95634c23410c918f2cb50f3a99a67d8；App422/43Ports19files/PG直接38/状态19保持。18保护资产及46迁移18PG静态契约通过，正式command verifier字节冻结。5既有门禁原断言逆变换保持，仅补实际传输/流程/纯出口、12原target测试声明和实际reader/历史artifact映射；无新依赖/迁移/runner/workflow/target/数据库专项入口。
+
+完整frontend/TS/Vite/17视口、Rust fmt/locked Clippy workspace all-targets -D warnings/workspace tests、Windows release/MSI/NSIS/启动与日志交给原Public Platform CI。实际Windows job首次in_progress后停止全部CI查询，告知约20～30分钟并等用户返回；不执行非Windows Cargo/check/Clippy/build/test/前端构建/浏览器/loopback。08保持VERIFYING，不继承07成功。真实提供方API请求/用户凭据存取/会话PG与取消端到端、历史四项/不可变账本并发回滚/有效XLSX/Windows Full/私有P4P7固定回归及继承model.runs/0041删除风险仍最终封包验收待测；ignored/公开unavailable stub/静态指纹不是这些真实PASS。详[08记录](modular-rewrite/R11-tauri-commands/R11-08-ai-workspace-and-openai-profiles-commands.md)。
