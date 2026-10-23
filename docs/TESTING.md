@@ -1021,3 +1021,10 @@ Context7查询官方Clippy文档核对uninlined_format_args与默认allow-mixed-
 报告logs/windows-acceptance-20261023-150111.json及同名.txt；artifact12511254062，14,061,073字节，SHA-256 `1780ac5540092049c25b998604e7678743de7297e1dd89ac365ddb01871d2964`，查询时未过期。已核对精确head/branch、全部job步骤、完整日志与artifact。用户2026-10-23“通过收尾08开始09”，08 DONE，09 Release Commands READY，10 BLOCKED，R11 IN_PROGRESS，继续唯一rewrite/r11-tauri-commands。此次仅5份既有文档[skip ci]收尾，源码沿上述自身完整Windows成功证据，不重复同源码构建；09须自身完整Windows。
 
 真实PG/历史保护四项/不可变账本并发回滚/有效XLSX/Windows Full/私有P4P7固定回归及继承model.runs/0041删除风险仍最终封包新库待验；ignored、公开unavailable stub和静态指纹不计这些真实PASS。真实API/用户Windows凭据/实际会话PG与取消UI端到端仍待可用环境验收。
+
+
+## R11-09 Release Commands（2026-10-23，VERIFYING）
+
+3条发布验收命令按执行/列表/读取归入唯一commands/release目录，纯出口显式导出命令与双宏，旧release_acceptance.rs删除；原真实Application/ReleaseService/Port/PG报告链与三完整正文/签名保持。171公共命令/注册顺序不变，内部组release_acceptance→release、12组不变。82源码/完整架构/5Rustfmt/42等价/21隔离负向及保护门禁通过；09自身完整Windows待验，10 BLOCKED，R11 IN_PROGRESS。 新增/迁移单测0，全部现有测试正文与入口冻结；沿原Tauri/Desktop58、Application230（原Release15项）、Persistence259（原Release映射4项）、Gateway112unit+41contract目标，计数为09自身Windows待确认，不能继承08动态成功。
+
+82既有只读Node、npm run verify:architecture、5现存Rust独立Rustfmt1.88 --check、42源码等价、21隔离破坏拒绝/3恢复正向、主250指纹不变及git diff --check通过。原2发布门禁全部断言逆变换保持；只补实际命令传输/出口/清单，未新增runner/workflow/target/依赖/迁移/数据库专项入口。临时报告r1109-static.json、r1109-architecture.log、r1109-equivalence.json、r1109-negative.json、r1109-primary-fingerprints.json在repo外。真实PG报告事务/并发回滚/历史保护、有效XLSX、Windows Full、私有P4P7固定回归与继承model.runs/0041删除风险仍最终新库待验，ignored/公开stub/静态不计这些真实PASS。

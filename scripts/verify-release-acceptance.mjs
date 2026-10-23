@@ -14,7 +14,7 @@ const application = [
   read("crates/application/src/use_cases/release/run_acceptance/checks/chain.rs"),
 ].join("\n");
 const persistence = read("crates/persistence-postgres/src/release_acceptance/ledger.rs");
-const commands = read("src-tauri/src/commands/release_acceptance.rs");
+const commands = ["run_release_acceptance", "list_release_acceptance_runs", "read_release_acceptance_run"].map(name => read(`src-tauri/src/commands/release/${name}.rs`)).join("\n");
 const registry = read("src-tauri/src/bootstrap/command_registry.rs");
 const client = read("src/api/client.ts");
 const pkg = JSON.parse(read("package.json"));

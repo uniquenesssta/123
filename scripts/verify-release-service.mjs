@@ -59,7 +59,7 @@ const composition = read("crates/application/src/composition/application_composi
 const applicationService = read("crates/application/src/service/application_service.rs");
 const ports = read("crates/application/src/ports/release/mod.rs");
 const adapterText = read(adapter);
-const commands = read("src-tauri/src/commands/release_acceptance.rs");
+const commands = ["run_release_acceptance", "list_release_acceptance_runs", "read_release_acceptance_run"].map(name => read(`src-tauri/src/commands/release/${name}.rs`)).join("\n");
 
 check(!library.includes("mod release_acceptance;"), "lib.rs 仍登记旧 Release owner");
 check(composition.includes("release: ReleaseService"), "ApplicationComposition 未聚合 ReleaseService");
@@ -264,6 +264,53 @@ const frontendVerifier = read("scripts/verify-frontend.mjs");
 check(packageDefinition.scripts?.["verify:release-service"] === "node scripts/verify-release-service.mjs", "package.json 未登记 Release 专项门禁");
 check(packageDefinition.scripts?.["verify:architecture"]?.includes("verify-release-service.mjs"), "verify:architecture 未接入 Release 门禁");
 check(frontendVerifier.includes('"verify-release-service.mjs"'), "完整 frontend 未接入 Release 门禁");
+
+// R11-09 transport contract BEGIN
+{
+  const commandRoot = "src-tauri/src/commands/release";
+  const files = {
+  "run_release_acceptance": "src-tauri/src/commands/release/run_release_acceptance.rs",
+  "list_release_acceptance_runs": "src-tauri/src/commands/release/list_release_acceptance_runs.rs",
+  "read_release_acceptance_run": "src-tauri/src/commands/release/read_release_acceptance_run.rs"
+};
+  const signatures = {
+  "run_release_acceptance": "pub async fn run_release_acceptance(\n    state: State<'_, AppState>,\n    request: football_domain::ReleaseAcceptanceRequest,\n) -> Result<football_domain::ReleaseAcceptanceRun, String>",
+  "list_release_acceptance_runs": "pub async fn list_release_acceptance_runs(\n    state: State<'_, AppState>,\n    limit: u32,\n) -> Result<Vec<football_domain::ReleaseAcceptanceRunSummary>, String>",
+  "read_release_acceptance_run": "pub async fn read_release_acceptance_run(\n    state: State<'_, AppState>,\n    run_id: String,\n) -> Result<football_domain::ReleaseAcceptanceRun, String>"
+};
+  const bodies = {
+  "run_release_acceptance": "state\n        .service\n        .run_release_acceptance(request)\n        .await\n        .map_err(|error| error.to_string())",
+  "list_release_acceptance_runs": "state\n        .service\n        .list_release_acceptance_runs(limit)\n        .await\n        .map_err(|error| error.to_string())",
+  "read_release_acceptance_run": "state\n        .service\n        .read_release_acceptance_run(parse_uuid(&run_id, \"验收运行 ID\")?)\n        .await\n        .map_err(|error| error.to_string())"
+};
+  const tokens = source => (source.match(/"(?:\\.|[^"\\])*"|[A-Za-z_][A-Za-z_0-9]*|[^\s]/g) ?? []).join("\0");
+  const signatureTokens = source => tokens(source.replace(/,\s*\)/g, ")"));
+  const moduleTokens = source => tokens(source.replace(/,\s*}/g, "}"));
+  const names = Object.keys(files).sort();
+  const contract = JSON.parse(read("architecture/command-contract.json"));
+  const boundaries = JSON.parse(read("architecture/module-boundaries.json")).tauri_commands;
+  const group = contract.command_groups.find(item => item.module === "release");
+  const modules = read("src-tauri/src/commands.rs");
+  check(!fs.existsSync(path.join(root, "src-tauri/src/commands/release_acceptance.rs")), "R11-09 旧发布命令owner仍存在");
+  check(modules.includes("mod release;") && modules.includes("pub use release::*;") && !modules.includes("release_acceptance"), "R11-09 根入口未切换唯一release目录");
+  check(group?.definition_file === `${commandRoot}/mod.rs` && group?.parameter_and_return_signature_file === `${commandRoot}/mod.rs` && boundaries.groups.release === `${commandRoot}/mod.rs` && !Object.hasOwn(boundaries.groups, "release_acceptance"), "R11-09 正式清单必须指向唯一release目录");
+  check(JSON.stringify(group?.commands) === JSON.stringify(["run_release_acceptance", "list_release_acceptance_runs", "read_release_acceptance_run"]), "R11-09 原三命令组内顺序漂移");
+  const exports = name => `pub use ${name}::{__cmd__${name},__tauri_command_name_${name},${name}};`;
+  check(moduleTokens(read(`${commandRoot}/mod.rs`)) === moduleTokens([...names.map(name => `mod ${name};`), ...names.map(exports)].join("\n")), "R11-09 出口只显式登记三条命令与双宏，不承载业务或替代路由");
+  for (const name of names) {
+    const file = files[name];
+    const source = read(file);
+    const signature = source.match(new RegExp(`pub (?:async )?fn ${name}\\([\\s\\S]*?\\{`))?.[0].slice(0, -1) ?? "";
+    const body = source.slice(source.indexOf("{", source.indexOf(`fn ${name}`)) + 1, source.lastIndexOf("}"));
+    check(signatureTokens(signature) === signatureTokens(signatures[name]), `R11-09 原State/async/参数/返回签名漂移：${name}`);
+    check(tokens(body) === tokens(bodies[name]), `R11-09 必须保留真实Service/原参数/UUID/await/错误转换：${name}`);
+    check(group?.command_definition_files?.[name] === file, `R11-09 原命令实际定义owner漂移：${name}`);
+    const imports = `use crate::bootstrap::AppState; ${name === "read_release_acceptance_run" ? "use crate::commands::parse_uuid;" : ""} use tauri::State;`;
+    check(tokens(source.slice(0, source.indexOf("#[tauri::command]"))) === tokens(imports) && (source.match(/#\[tauri::command\]/g) ?? []).length === 1 && (source.match(/\bfn\b/g) ?? []).length === 1, `R11-09 命令必须只借原State与唯一UUID helper：${name}`);
+    for (const token of ["sqlx::", "football_persistence_postgres", "PostgresStore", "PgPool", "std::fs", "tokio::spawn", "ApplicationService::new", "Mutex<", "static ", "macro_rules!", ".unwrap()", ".expect("]) check(!source.includes(token), `R11-09 命令越过原业务/状态/存储边界：${name}/${token}`);
+  }
+}
+// R11-09 transport contract END
 
 if (failures.length) {
   console.error("Release Service 验证失败：\n- " + failures.join("\n- "));

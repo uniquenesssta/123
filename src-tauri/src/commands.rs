@@ -8,7 +8,7 @@ mod lineups;
 mod platform;
 mod postmatch;
 mod prediction;
-mod release_acceptance;
+mod release;
 mod review;
 
 pub use ai_workspace::*;
@@ -21,7 +21,7 @@ pub use lineups::*;
 pub use platform::*;
 pub use postmatch::*;
 pub use prediction::*;
-pub use release_acceptance::*;
+pub use release::*;
 pub use review::*;
 
 use platform::record_failed_background_jobs;

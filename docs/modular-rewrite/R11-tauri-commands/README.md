@@ -2,11 +2,11 @@
 
 ## 当前阶段状态
 
-`IN_PROGRESS`。R11-01～08 DONE；08自身精确858288e / Windows run39974291282完整SUCCESS。用户2026-10-23“通过收尾08开始09”，09 Release Commands READY，10 BLOCKED，R11 IN_PROGRESS，继续唯一rewrite/r11-tauri-commands。此前VERIFYING与首轮Clippy失败保留实施历史，当前状态以索引与任务表为准。 当前以本节与任务表为准。
+`IN_PROGRESS`。R11-01～08 DONE（08自身精确858288e / Windows run39974291282完整SUCCESS）；09 Release Commands已实施VERIFYING，10 BLOCKED，R11 IN_PROGRESS。用户2026-10-23“通过收尾08开始09”，继续唯一rewrite/r11-tauri-commands；09基线dd01f9d为08五文档[skip ci]收尾，源码同08已验树。 当前以本节与任务表为准。
 
 ## 依据与前置基线
 
-[R11任务书](../../football-model-platform-modular-rewrite-19-docs/11-R11-tauri-commands.md)、[总纲执行订正](../../football-model-platform-modular-rewrite-19-docs/00-总体架构与前23节.md)、[R10完成记录](../R10-review-analytics-release-backend/R10-stage-completion.md)。本阶段从R10收尾3d43e8e建立唯一rewrite/r11-tauri-commands；01～08已获自身精确Windows成功，09 READY，10 BLOCKED。
+[R11任务书](../../football-model-platform-modular-rewrite-19-docs/11-R11-tauri-commands.md)、[总纲执行订正](../../football-model-platform-modular-rewrite-19-docs/00-总体架构与前23节.md)、[R10完成记录](../R10-review-analytics-release-backend/R10-stage-completion.md)。本阶段从R10收尾3d43e8e建立唯一rewrite/r11-tauri-commands；01～08已获自身精确Windows成功，09当前实施/验证详节点，10 BLOCKED。
 
 ## 任务状态
 
@@ -20,7 +20,7 @@
 | R11-06 | [Prediction、Research 与 Runs Commands](R11-06-prediction-research-and-runs-commands.md) | DONE · 自身精确Windows完整SUCCESS |
 | R11-07 | [Review、Postmatch 与 Analytics Commands](R11-07-review-postmatch-and-analytics-commands.md) | DONE · 自身精确Windows完整SUCCESS |
 | R11-08 | [AI Workspace 与 OpenAI Profiles Commands](R11-08-ai-workspace-and-openai-profiles-commands.md) | DONE · 自身精确Windows完整SUCCESS |
-| R11-09 | Release Commands | READY |
+| R11-09 | [Release Commands](R11-09-release-commands.md) | VERIFYING · 自身完整Windows待验 |
 | R11-10 | Command Registry 收敛 | BLOCKED |
 
 ## 继续约束
@@ -156,3 +156,8 @@ R11-01～07 DONE；08 VERIFYING、09～10 BLOCKED，R11 IN_PROGRESS，继续唯�
 报告logs/windows-acceptance-20261023-150111.json及同名.txt；artifact12511254062，14,061,073字节，SHA-256 `1780ac5540092049c25b998604e7678743de7297e1dd89ac365ddb01871d2964`，查询时未过期。已核对精确head/branch、全部job步骤、完整日志与artifact。用户2026-10-23“通过收尾08开始09”，08 DONE，09 Release Commands READY，10 BLOCKED，R11 IN_PROGRESS，继续唯一rewrite/r11-tauri-commands。此次仅5份既有文档[skip ci]收尾，源码沿上述自身完整Windows成功证据，不重复同源码构建；09须自身完整Windows。
 
 真实PG/历史保护四项/不可变账本并发回滚/有效XLSX/Windows Full/私有P4P7固定回归及继承model.runs/0041删除风险仍最终封包新库待验；ignored、公开unavailable stub和静态指纹不计这些真实PASS。真实API/用户Windows凭据/实际会话PG与取消UI端到端仍待可用环境验收。
+
+
+## R11-09 实施与验证
+
+3条发布验收命令按执行/列表/读取归入唯一commands/release目录，纯出口显式导出命令与双宏，旧release_acceptance.rs删除；原真实Application/ReleaseService/Port/PG报告链与三完整正文/签名保持。171公共命令/注册顺序不变，内部组release_acceptance→release、12组不变。82源码/完整架构/5Rustfmt/42等价/21隔离负向及保护门禁通过；09自身完整Windows待验，10 BLOCKED，R11 IN_PROGRESS。 详[09记录](R11-09-release-commands.md)。

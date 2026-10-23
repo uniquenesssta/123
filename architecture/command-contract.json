@@ -676,18 +676,23 @@
       }
     },
     {
-      "module": "release_acceptance",
-      "definition_file": "src-tauri/src/commands/release_acceptance.rs",
-      "parameter_and_return_signature_file": "src-tauri/src/commands/release_acceptance.rs",
+      "module": "release",
+      "definition_file": "src-tauri/src/commands/release/mod.rs",
+      "parameter_and_return_signature_file": "src-tauri/src/commands/release/mod.rs",
       "frontend_parameter_and_return_signature_file": "src/api/client.ts",
       "frontend_shared_dto_file": "src/types.ts",
       "commands": [
         "run_release_acceptance",
         "list_release_acceptance_runs",
         "read_release_acceptance_run"
-      ]
+      ],
+      "command_definition_files": {
+        "run_release_acceptance": "src-tauri/src/commands/release/run_release_acceptance.rs",
+        "list_release_acceptance_runs": "src-tauri/src/commands/release/list_release_acceptance_runs.rs",
+        "read_release_acceptance_run": "src-tauri/src/commands/release/read_release_acceptance_run.rs"
+      }
     }
   ],
   "command_set_sha256": "dfc477a8b0bec95735fdad006349fcea0f367b4ebc85aede1b63a128a55de669",
-  "command_definition_map_sha256": "7e86fb076698f679f57d690ea174a43e061b8bc65048823cdeed654c0315c64c"
+  "command_definition_map_sha256": "c45a2d4b54fc5ad7eeaae3f3b57eda65f58ce03dc6b1d6be3576fb807b1d0696"
 }

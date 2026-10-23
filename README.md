@@ -880,3 +880,6 @@ R11-08首轮ffbaedc / [Windows run39971471528](https://github.com/uniquenesssta/
 
 
 R11-08已收尾DONE：精确858288e / [Windows run39974291282](https://github.com/uniquenesssta/123/actions/runs/39974291282)完整SUCCESS，Desktop58（新增12项AI发送unit）/App230/PG259、完整前端/17视口、Rust、Windows打包/启动/日志通过，首轮Clippy失败关闭。同一R11分支09 READY、10 BLOCKED；详[08完成记录](docs/modular-rewrite/R11-tauri-commands/R11-08-ai-workspace-and-openai-profiles-commands.md)。真实API/凭据/会话取消端到端、PG/XLSX/Full/私有固定回归与继承删除风险仍待实际验收。
+
+
+R11-09发布验收命令已按执行/列表/读取拆分，旧入口删除，真实报告生成与查询继续原服务；171命令与公共DTO不变。源码/架构/格式/等价及隔离回归检查通过，自身完整Windows待验，10未开始。详[09记录](docs/modular-rewrite/R11-tauri-commands/R11-09-release-commands.md)。
