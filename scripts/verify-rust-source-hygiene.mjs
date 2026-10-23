@@ -165,6 +165,12 @@ for (const file of files) {
   if (display === "src-tauri/src/openai_profiles.rs") {
     assert(!source.includes('"{}；同时无法回滚兼容 API配置元数据：{rollback_error}"'), `${display} 不得恢复未内联的回滚错误格式化参数`);
   }
+  if (display === "src-tauri/src/commands/ai_workspace/send/gateway.rs") {
+    assert(
+      !/format!\s*\(\s*"ai-chat:\{\}:\{\}"\s*,\s*session_id\s*,\s*request_id\s*,?\s*\)/.test(source),
+      `${display} 的追踪ID应内联session_id/request_id，避免职责提取后uninlined_format_args阻断Windows Clippy`,
+    );
+  }
   if (display === "crates/research-gateway/src/credentials/provider.rs") {
     assert(
       !/format!\s*\(\s*"\{:\?\}"\s*,\s*DefaultApiKeyProvider\s*,?\s*\)/.test(source),

@@ -29,7 +29,7 @@ pub(super) async fn execute(
         .api_workspace_openai_usage_totals()
         .await
         .map_err(|error| error.to_string())?;
-    let trace_id = format!("ai-chat:{}:{}", session_id, request_id);
+    let trace_id = format!("ai-chat:{session_id}:{request_id}");
     let endpoint = gateway.config().request_endpoint();
     let protocol = serde_json::to_value(profile.api_protocol)
         .ok()

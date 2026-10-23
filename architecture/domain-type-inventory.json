@@ -24,7 +24,7 @@
     "targetPublicExportPolicy": "explicit re-export only"
   },
   "sourceDigest": "217241ac243726a5ab6805a7f169e222b97e78c7c971749a5904714af673ebdd",
-  "rustUsageDigest": "cc2ff0a54510e70b3a690cf891594405f95634c23410c918f2cb50f3a99a67d8",
+  "rustUsageDigest": "ded94c69cc93a5fc02d563e94103be51fe41aacb973cfc53e109cd7c84b5e98a",
   "summary": {
     "typeCount": 365,
     "publicCompatibilityTypeCount": 365,

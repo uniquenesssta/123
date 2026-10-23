@@ -2,7 +2,7 @@
 
 ## 当前阶段状态
 
-`IN_PROGRESS`。R11-01～07 DONE；08 AI Workspace/OpenAI Profiles Commands已实施VERIFYING，09～10 BLOCKED，R11 IN_PROGRESS。用户2026-10-23“收尾07开始08”，继续唯一rewrite/r11-tauri-commands；基线b7c2eb132a3803b8aa514b685ed097966b4e843f为07五文档[skip ci]收尾，生产源码同自身完整Windows成功5b779b9。 当前以本节和任务表为准，历史VERIFYING保留。
+`IN_PROGRESS`。R11-01～07 DONE；08 VERIFYING、09～10 BLOCKED，R11 IN_PROGRESS，继续唯一rewrite/r11-tauri-commands。首轮ffbaedc / Windows run39971471528因send/gateway.rs追踪ID触发Clippy uninlined_format_args失败；现将普通变量参数改为内联捕获，原追踪ID内容/发送/取消/凭据/DTO保持，已补既有源码卫生守卫。82源码/完整架构/1Rustfmt/61显式格式等价及3隔离负向通过；修复自身完整Windows待验。 当前以本节与任务表为准。
 
 ## 依据与前置基线
 
@@ -19,7 +19,7 @@
 | R11-05 | [Lineups、Presets 与 Workbooks Commands](R11-05-lineups-presets-and-workbooks-commands.md) | DONE · 自身精确Windows完整SUCCESS |
 | R11-06 | [Prediction、Research 与 Runs Commands](R11-06-prediction-research-and-runs-commands.md) | DONE · 自身精确Windows完整SUCCESS |
 | R11-07 | [Review、Postmatch 与 Analytics Commands](R11-07-review-postmatch-and-analytics-commands.md) | DONE · 自身精确Windows完整SUCCESS |
-| R11-08 | [AI Workspace 与 OpenAI Profiles Commands](R11-08-ai-workspace-and-openai-profiles-commands.md) | VERIFYING · 自身完整Windows待验 |
+| R11-08 | [AI Workspace 与 OpenAI Profiles Commands](R11-08-ai-workspace-and-openai-profiles-commands.md) | VERIFYING · Clippy修复自身Windows待验 |
 | R11-09 | Release Commands | BLOCKED |
 | R11-10 | Command Registry 收敛 | BLOCKED |
 
@@ -142,3 +142,8 @@ R11-02 Database Commands已实施 `VERIFYING`，基线f56a1c004cee8018f657b6cdd9
 ## R11-08 实施与验证
 
 13条原AI问答/配置命令归入唯一commands/ai_workspace，发送流程分离纯校验、会话绑定、内容、网关/日志及回答投影；取消仍原唯一租约，配置仍原凭据存储。旧api_workspace.rs/openai.rs删除，171公共命令/注册/DTO保持，物理组13→12，配置owner不变且刷新实际五个writer。新增12原Tauri单测待Windows；82源码/完整架构/30Rustfmt/61等价/30隔离负向与保护门禁通过。08自身Windows待验，09～10 BLOCKED，R11 IN_PROGRESS。 详[08记录](R11-08-ai-workspace-and-openai-profiles-commands.md)。
+
+
+## R11-08 Clippy修复
+
+R11-01～07 DONE；08 VERIFYING、09～10 BLOCKED，R11 IN_PROGRESS，继续唯一rewrite/r11-tauri-commands。首轮ffbaedc / Windows run39971471528因send/gateway.rs追踪ID触发Clippy uninlined_format_args失败；现将普通变量参数改为内联捕获，原追踪ID内容/发送/取消/凭据/DTO保持，已补既有源码卫生守卫。82源码/完整架构/1Rustfmt/61显式格式等价及3隔离负向通过；修复自身完整Windows待验。 详[08修复记录](R11-08-ai-workspace-and-openai-profiles-commands.md)。

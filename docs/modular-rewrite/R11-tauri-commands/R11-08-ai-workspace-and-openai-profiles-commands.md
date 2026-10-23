@@ -1,6 +1,6 @@
 # R11-08 AI Workspace 与 OpenAI Profiles Commands
 
-状态：`VERIFYING`（自身完整Windows尚待验收）。
+状态：`VERIFYING`（首轮Clippy失败已修复；修复自身完整Windows待验，下文首轮记录保留历史）。
 
 R11-01～07 DONE；08 AI Workspace/OpenAI Profiles Commands已实施VERIFYING，09～10 BLOCKED，R11 IN_PROGRESS。用户2026-10-23“收尾07开始08”，继续唯一rewrite/r11-tauri-commands；基线b7c2eb132a3803b8aa514b685ed097966b4e843f为07五文档[skip ci]收尾，生产源码同自身完整Windows成功5b779b9。
 
@@ -123,7 +123,7 @@ Domain365/129声明源/301映射、scan1464→1491；sourceDigest217241ac243726a
 
 未发送真实用户API请求/操作用户Windows密钥，也未实跑会话PG/取消UI端到端；原真实服务/网关/凭据/Lease链路保留接通，实际效果仍待验。Mermaid Chart已更新校验→原lease→profile/session→用户消息/只读上下文→Gateway/脱敏日志→释放lease→回答事务及失败Drop的中文实际链路；Create State沿足球稳定UUID96f03270-c236-46de-99fa-db85d2fbf4ce续接，无子代理。
 
-## 全部实际文件清单
+## 首轮全部实际文件清单（ffbaedc）
 
 基于b7c2eb132a3803b8aa514b685ed097966b4e843f，no-renames口径30A/14M/2D，共46路径。29新Rust（13命令、4纯出口、8发送职责、4测试文件），既有Rust修改仅commands.rs；整文件逐字移动/重命名无，按真实职责迁移/组合原完整语句。
 
@@ -181,3 +181,35 @@ Domain365/129声明源/301映射、scan1464→1491；sourceDigest217241ac243726a
 
 - `src-tauri/src/commands/api_workspace.rs`
 - `src-tauri/src/commands/openai.rs`
+
+
+## R11-08 首轮Clippy失败修复（2026-10-23，VERIFYING）
+
+精确首轮ffbaedc11049e040e42282aa476b79d680be49c1 / [Windows run39971471528](https://github.com/uniquenesssta/123/actions/runs/39971471528) / job120474983650为FAILURE，run于2026-10-23 22:46:44北京时间完成。完整日志唯一Rust错误为send/gateway.rs:32的clippy::uninlined_format_args；lib与lib test均因此停止。架构及前端契约/类型/生产构建/17视口已通过；工作区单测（含新增12项）、Windows release/MSI/NSIS/启动没有完成，不能以首轮前端成功或静态检查替代。
+
+根因：职责提取前format!参数含session.id字段访问；提取后变成session_id普通变量，原混合表达式变为可全部内联的变量，触发项目-D warnings下的Clippy门禁。生产只将format!("ai-chat:{}:{}", session_id, request_id)改为format!("ai-chat:{session_id}:{request_id}")；Display顺序/分隔符/UUID与request_id值不变，不修改trace政策、日志字段、发送/租约/配置/数据/DTO/错误或行为。
+
+既有verify-rust-source-hygiene.mjs新增该路径的普通参数形式拒绝断言；先对首轮源码执行并确认失败，修复后通过。没有allow属性、降级告警或放宽门禁。原unit及12项新增unit所有字节保持，无新增/删除/迁移测试；预期Desktop58/Application230/Persistence259/Gateway112unit+41contract仍须本修复自身精确Windows确认。
+
+实际82/82原只读源码、完整npm run verify:architecture、gateway.rs独立Rustfmt1.88 --edition 2021 --config skip_children=true --check、git diff --check通过。沿原61等价核对，仅对这一处已声明等价格式表达式做规范化；原13签名/12薄正文/DTO/6helper/完整发送展开及其他生产字符串保持。fix相对ffbaedc仅一处Rust替换，业务/模型/UI/依赖/所有原测试/命令契约/边界/19状态清单字节冻结；Domain仅rustUsageDigest刷新为ded94c69cc93a5fc02d563e94103be51fe41aacb973cfc53e109cd7c84b5e98a，365/129/301及scan1491/sourceDigest保持。
+
+3破坏探针（首轮写法、多行/尾逗号写法、allow掩盖）仅在repo外隔离副本执行，全部拒绝；2既有守卫恢复正向，主248源码/清单/守卫SHA256保持。验证器的继承等价执行使用隔离命名空间，避免临时变量覆盖后续路径；首次scratch路径变量被覆盖只导致副本路径校验失败，未改生产目录，修正后全部通过。报告r1108f-static.json、r1108f-architecture.log、r1108f-equivalence.json、r1108f-review.json、r1108f-primary-fingerprints.json在repo外scratch。
+
+Context7查询官方Clippy文档核对uninlined_format_args与默认allow-mixed-uninlined-format-args；实际项目Rust1.88.0和该版本Windows诊断/建议为对应版本证据。没有升级依赖或新增API。此为单表达式修复，架构/真实数据流不变，沿08既有Mermaid图；Create State保存本次失败、修复与待验状态。
+
+原08最初61等价/全生产literal保持叙述属于首轮实施历史；本修复当前允许变化的是格式表达式字面写法，输出内容保持，其余等价检查仍严格执行。首轮46路径清单保留其提交事实；当前修复相对ffbaedc为8M/0A/0D，累计相对08基线b7c2eb1为30A/15M/2D，共47路径（仅额外加入原verify-rust-source-hygiene.mjs）。不把首轮清单误称为当前累计46。
+
+08仍VERIFYING、09～10 BLOCKED，修复沿原完整Windows CI；实际Windows job首次in_progress后停止全部CI查询，提示约20～30分钟并等用户返回。真实API/用户凭据/会话PG/取消端到端、历史四项/账本并发回滚/有效XLSX/Windows Full/私有P4P7固定回归和继承model.runs/0041删除风险仍最终封包待验；ignored/公开stub/静态hash不是这些真实PASS。回退可受控revert本修复提交；ffbaedc是已知失败点，最近同阶段已验前置源码仍07成功5b779b9（docs基线b7c2eb1），不得把回退到ffbaedc称为可验收完成。
+
+### 本次修复全部修改（8）
+
+- `README.md`
+- `architecture/domain-type-inventory.json`
+- `docs/TESTING.md`
+- `docs/football-model-platform-modular-rewrite-19-docs/11-R11-tauri-commands.md`
+- `docs/modular-rewrite/R11-tauri-commands/R11-08-ai-workspace-and-openai-profiles-commands.md`
+- `docs/modular-rewrite/R11-tauri-commands/README.md`
+- `scripts/verify-rust-source-hygiene.mjs`
+- `src-tauri/src/commands/ai_workspace/send/gateway.rs`
+
+新增、删除、移动/重命名：无。

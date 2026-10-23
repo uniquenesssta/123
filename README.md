@@ -874,3 +874,6 @@ R11-07已收尾DONE：精确5b779b9 / [Windows run39962382506](https://github.co
 ### R11-08 AI问答与兼容API配置命令（2026-10-23，VERIFYING）
 
 13条原AI问答/配置命令归入唯一commands/ai_workspace，发送流程分离纯校验、会话绑定、内容、网关/日志及回答投影；取消仍原唯一租约，配置仍原凭据存储。旧api_workspace.rs/openai.rs删除，171公共命令/注册/DTO保持，物理组13→12，配置owner不变且刷新实际五个writer。新增12原Tauri单测待Windows；82源码/完整架构/30Rustfmt/61等价/30隔离负向与保护门禁通过。08自身Windows待验，09～10 BLOCKED，R11 IN_PROGRESS。 详[08记录](docs/modular-rewrite/R11-tauri-commands/R11-08-ai-workspace-and-openai-profiles-commands.md)与[R11索引](docs/modular-rewrite/R11-tauri-commands/README.md)。真实API/凭据/会话端到端、PG/XLSX/Full/私有固定回归与原最终新库项目仍待验。
+
+
+R11-08首轮ffbaedc / [Windows run39971471528](https://github.com/uniquenesssta/123/actions/runs/39971471528)在追踪ID格式化处被Clippy uninlined_format_args拦截；前端/17视口通过。现内联session_id/request_id，追踪内容及原发送/取消/凭据行为保持，补原源码卫生守卫；82源码/完整架构/1Rustfmt/61显式等价与3隔离负向通过。修复自身Windows待验，08 VERIFYING、09～10 BLOCKED；详[08修复记录](docs/modular-rewrite/R11-tauri-commands/R11-08-ai-workspace-and-openai-profiles-commands.md)。
