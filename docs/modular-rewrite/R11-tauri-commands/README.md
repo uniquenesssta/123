@@ -2,11 +2,11 @@
 
 ## 当前阶段状态
 
-`IN_PROGRESS`。R11-01～08 DONE；09 VERIFYING、10 BLOCKED，R11 IN_PROGRESS，继续唯一rewrite/r11-tauri-commands。09首轮dce36ac / Windows run39981102375因commands.rs遗留无消费者AppState重导出触发unused_imports失败；现删除这一行，并把原bootstrap守卫改为检查根无中转与实际命令直接借用唯一bootstrap状态。三发布命令/原State/真实服务/DTO/注册保持；82源码/完整架构/1Rustfmt/42等价及6隔离负向通过，修复自身完整Windows待验。 当前以本节与任务表为准。
+`IN_PROGRESS`。R11-01～09 DONE；09自身精确44f2047 / Windows run39986012998完整SUCCESS。用户2026-10-24“收尾09开始10”，10 Command Registry收敛 READY，R11 IN_PROGRESS，继续唯一rewrite/r11-tauri-commands。此前失败/VERIFYING保留实施历史，当前以索引与任务表为准。
 
 ## 依据与前置基线
 
-[R11任务书](../../football-model-platform-modular-rewrite-19-docs/11-R11-tauri-commands.md)、[总纲执行订正](../../football-model-platform-modular-rewrite-19-docs/00-总体架构与前23节.md)、[R10完成记录](../R10-review-analytics-release-backend/R10-stage-completion.md)。本阶段从R10收尾3d43e8e建立唯一rewrite/r11-tauri-commands；01～08已获自身精确Windows成功，09当前实施/验证详节点，10 BLOCKED。
+[R11任务书](../../football-model-platform-modular-rewrite-19-docs/11-R11-tauri-commands.md)、[总纲执行订正](../../football-model-platform-modular-rewrite-19-docs/00-总体架构与前23节.md)、[R10完成记录](../R10-review-analytics-release-backend/R10-stage-completion.md)。本阶段从R10收尾3d43e8e建立唯一rewrite/r11-tauri-commands；01～09已获自身精确Windows成功，10 READY。
 
 ## 任务状态
 
@@ -20,8 +20,8 @@
 | R11-06 | [Prediction、Research 与 Runs Commands](R11-06-prediction-research-and-runs-commands.md) | DONE · 自身精确Windows完整SUCCESS |
 | R11-07 | [Review、Postmatch 与 Analytics Commands](R11-07-review-postmatch-and-analytics-commands.md) | DONE · 自身精确Windows完整SUCCESS |
 | R11-08 | [AI Workspace 与 OpenAI Profiles Commands](R11-08-ai-workspace-and-openai-profiles-commands.md) | DONE · 自身精确Windows完整SUCCESS |
-| R11-09 | [Release Commands](R11-09-release-commands.md) | VERIFYING · unused_imports修复自身Windows待验 |
-| R11-10 | Command Registry 收敛 | BLOCKED |
+| R11-09 | [Release Commands](R11-09-release-commands.md) | DONE · 自身精确Windows完整SUCCESS |
+| R11-10 | Command Registry 收敛 | READY |
 
 ## 继续约束
 
@@ -166,3 +166,12 @@ R11-01～07 DONE；08 VERIFYING、09～10 BLOCKED，R11 IN_PROGRESS，继续唯�
 ## R11-09 unused_imports修复
 
 R11-01～08 DONE；09 VERIFYING、10 BLOCKED，R11 IN_PROGRESS，继续唯一rewrite/r11-tauri-commands。09首轮dce36ac / Windows run39981102375因commands.rs遗留无消费者AppState重导出触发unused_imports失败；现删除这一行，并把原bootstrap守卫改为检查根无中转与实际命令直接借用唯一bootstrap状态。三发布命令/原State/真实服务/DTO/注册保持；82源码/完整架构/1Rustfmt/42等价及6隔离负向通过，修复自身完整Windows待验。 详[09修复记录](R11-09-release-commands.md)。
+
+
+## R11-09 精确 Windows 完成与10授权（2026-10-24）
+
+精确修复提交`44f2047c8391981618f4442ca1c06164626a2554` / tree`e84d02e1011920ed5dd2591a516a8aabf2c39e6b`，[Public Platform CI run39986012998](https://github.com/uniquenesssta/123/actions/runs/39986012998) / Windows job120525276486完整SUCCESS，run于2026-10-24 00:46:56北京时间完成。实际Desktop58/58、Application230/230、Persistence259/259、Gateway112/112 unit和41/41 contract；完整frontend/contracts/TypeScript/Vite/17视口、Rust fmt/locked Clippy all-targets -D warnings/workspace tests、Windows release/MSI/NSIS/启动与运行日志均通过（7条记录、3个完成操作）。本节点新增/迁移单测0；首轮dce36ac unused_imports失败已由本次修复自身完整成功关闭，源码等价和静态探针不计动态测试。
+
+报告logs/windows-acceptance-20261023-162241.json及同名.txt；artifact12517606093，14,060,201字节，SHA-256 `ccf89e18048dca8ba08855d84dbc26b15aa1a5cb429eae65010938710a36ffd1`，查询时未过期。已fresh核对精确head/branch、全部job步骤、完整日志与artifact。用户2026-10-24“收尾09开始10”，09 DONE、10 READY、R11 IN_PROGRESS；此次仅5份既有文档[skip ci]收尾，源码同09已验树，不重复同源码构建。R11阶段完成记录尚未创建，10与阶段出口须按自身实际影响验收。
+
+真实PG报告事务/并发回滚、历史保护四项/不可变账本、有效XLSX、Windows Full、私有P4P7固定回归及继承model.runs/0041删除风险仍最终封包新库待验；08真实API/用户凭据/会话PG取消UI端到端同样待实际环境。ignored、公开unavailable stub和静态指纹不计这些真实PASS。

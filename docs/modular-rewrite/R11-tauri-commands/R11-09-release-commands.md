@@ -1,6 +1,6 @@
 # R11-09 Release Commands
 
-状态：`VERIFYING`（首轮unused_imports失败已修复；修复自身完整Windows待验，以下初始记录保留历史）。
+状态：`DONE`（自身精确44f2047 / Windows run39986012998完整SUCCESS；下文失败/VERIFYING保留实施历史）。
 
 R11-01～08 DONE（08自身精确858288e / Windows run39974291282完整SUCCESS）；09 Release Commands已实施VERIFYING，10 BLOCKED，R11 IN_PROGRESS。用户2026-10-23“通过收尾08开始09”，继续唯一rewrite/r11-tauri-commands；09基线dd01f9d为08五文档[skip ci]收尾，源码同08已验树。
 
@@ -138,3 +138,12 @@ Context7已查询Rust官方lint文档核对-D提升错误语义，但未返回1.
 | M | `src-tauri/src/commands.rs` |
 
 相对09开始前dd01f9d的累计清单为5A/11M/1D，共17路径；比初始16路径仅增加既有scripts/verify-tauri-bootstrap.mjs的必要守卫修正。上方初始清单保留历史，当前额外8M如本表。
+
+
+## R11-09 精确 Windows 完成与10授权（2026-10-24）
+
+精确修复提交`44f2047c8391981618f4442ca1c06164626a2554` / tree`e84d02e1011920ed5dd2591a516a8aabf2c39e6b`，[Public Platform CI run39986012998](https://github.com/uniquenesssta/123/actions/runs/39986012998) / Windows job120525276486完整SUCCESS，run于2026-10-24 00:46:56北京时间完成。实际Desktop58/58、Application230/230、Persistence259/259、Gateway112/112 unit和41/41 contract；完整frontend/contracts/TypeScript/Vite/17视口、Rust fmt/locked Clippy all-targets -D warnings/workspace tests、Windows release/MSI/NSIS/启动与运行日志均通过（7条记录、3个完成操作）。本节点新增/迁移单测0；首轮dce36ac unused_imports失败已由本次修复自身完整成功关闭，源码等价和静态探针不计动态测试。
+
+报告logs/windows-acceptance-20261023-162241.json及同名.txt；artifact12517606093，14,060,201字节，SHA-256 `ccf89e18048dca8ba08855d84dbc26b15aa1a5cb429eae65010938710a36ffd1`，查询时未过期。已fresh核对精确head/branch、全部job步骤、完整日志与artifact。用户2026-10-24“收尾09开始10”，09 DONE、10 READY、R11 IN_PROGRESS；此次仅5份既有文档[skip ci]收尾，源码同09已验树，不重复同源码构建。R11阶段完成记录尚未创建，10与阶段出口须按自身实际影响验收。
+
+真实PG报告事务/并发回滚、历史保护四项/不可变账本、有效XLSX、Windows Full、私有P4P7固定回归及继承model.runs/0041删除风险仍最终封包新库待验；08真实API/用户凭据/会话PG取消UI端到端同样待实际环境。ignored、公开unavailable stub和静态指纹不计这些真实PASS。

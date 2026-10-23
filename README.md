@@ -886,3 +886,6 @@ R11-09发布验收命令已按执行/列表/读取拆分，旧入口删除，真
 
 
 R11-09首轮Windows被无用AppState重导出阻断，现删除遗留中转，并修正组合根守卫为实际命令直接使用唯一状态类型；发布命令与真实服务/报告行为不变。源码/架构/格式/等价与隔离检查通过，修复自身Windows待验。详[09修复记录](docs/modular-rewrite/R11-tauri-commands/R11-09-release-commands.md)。
+
+
+R11-09已收尾DONE：精确44f2047 / [Windows run39986012998](https://github.com/uniquenesssta/123/actions/runs/39986012998)完整SUCCESS，Desktop58/App230/PG259/Gateway112+41、完整前端/17视口、Rust、Windows打包/启动/日志通过，首轮unused_imports失败关闭。同一R11分支10 READY，阶段尚未完成；详[09完成记录](docs/modular-rewrite/R11-tauri-commands/R11-09-release-commands.md)。真实PG/Full/XLSX/私有固定回归及继承风险继续待实际验收。
