@@ -220,6 +220,57 @@ const newTests = [
 for (const [file, names] of newTests) for (const name of names) check(read(`${platformRoot}/${file}`).includes(`fn ${name}(`), `原Tauri unit target缺少平台覆盖：${name}`);
 for (const file of ["mod.rs", "bootstrap/mod.rs", "runtime_operation/mod.rs"]) check(read(`${platformRoot}/${file}`).includes("#[cfg(test)]\nmod tests;"), `平台测试未登记：${file}`);
 
+// R11-10 registry boundary BEGIN
+{
+  const tokens = source => (source.match(/\/\/[^\n]*|\/\*[\s\S]*?\*\/|"(?:\\.|[^"\\])*"|[A-Za-z_][A-Za-z_0-9]*|[^\s]/g) ?? [])
+    .filter(token => !token.startsWith("//") && !token.startsWith("/*"));
+  const sameCode = (actual, expected) => JSON.stringify(tokens(actual)) === JSON.stringify(tokens(expected));
+  const expectedRegistry = `use crate::commands;
+    pub(crate) fn register<R: tauri::Runtime>(builder: tauri::Builder<R>) -> tauri::Builder<R> {
+      builder.invoke_handler(tauri::generate_handler![${expectedCommands.map(name => `commands::${name},`).join("\n")}])
+    }`;
+  check(sameCode(registry, expectedRegistry), "R11-10 command_registry.rs 只能包含原同步泛型 Builder 注册函数与按原顺序明确列出的171命令，不得混入业务/状态/替代宏路由");
+  check(sameCode(library, `mod bootstrap; mod commands; mod config; mod file_store; mod issue_log; mod openai_profiles; mod runtime_log; mod workspace_state;
+    #[cfg_attr(mobile, tauri::mobile_entry_point)] pub fn run() { bootstrap::run(); }`), "R11-10 lib.rs 只保留原模块与公开启动委托，不得恢复注册/状态或新增另一入口");
+  check(sameCode(application, `use super::{command_registry, error, state};
+    pub(crate) fn run() {
+      let builder = tauri::Builder::default()
+        .plugin(tauri_plugin_dialog::init())
+        .setup(|app| -> Result<(), Box<dyn std::error::Error>> { state::install(app)?; Ok(()) });
+      error::expect_startup(command_registry::register(builder).run(tauri::generate_context!()));
+    }`), "R11-10 组合根必须保持插件、状态安装、唯一注册、context与原启动错误处理链");
+  const collect = directory => readdirSync(join(root, directory), { withFileTypes: true }).flatMap(entry => {
+    const file = `${directory}/${entry.name}`;
+    return entry.isDirectory() ? collect(file) : entry.isFile() && entry.name.endsWith(".rs") ? [file] : [];
+  });
+  const desktopSources = collect("src-tauri/src").map(file => ({ file, code: tokens(read(file)).join(" ") }));
+  const sites = pattern => desktopSources.flatMap(({ file, code }) => [...code.matchAll(pattern)].map(() => file));
+  check(JSON.stringify(sites(/\btauri : : generate_handler !/g)) === JSON.stringify(["src-tauri/src/bootstrap/command_registry.rs"]), "R11-10 整个桌面源码只能存在一个 generate_handler! 所有者");
+  check(JSON.stringify(sites(/\. invoke_handler \(/g)) === JSON.stringify(["src-tauri/src/bootstrap/command_registry.rs"]), "R11-10 整个桌面源码只能在原注册表安装一次 handler");
+  check(JSON.stringify(sites(/\bcommand_registry : : register \(/g)) === JSON.stringify(["src-tauri/src/bootstrap/application.rs"]), "R11-10 registry只能由原组合根调用一次");
+  check(JSON.stringify(sites(/\bbootstrap : : run \(/g)) === JSON.stringify(["src-tauri/src/lib.rs"]), "R11-10 bootstrap只能由原公开run入口委托一次");
+  const ownedFiles = new Set();
+  let ownedCommands = 0;
+  for (const group of commandContract.command_groups) {
+    const definitionRoot = `src-tauri/src/commands/${group.module}/mod.rs`;
+    check(group.definition_file === definitionRoot && group.parameter_and_return_signature_file === definitionRoot && moduleContract.tauri_commands.groups[group.module] === definitionRoot, `R11-10 正式清单未统一到实际职责目录：${group.module}`);
+    check(!tokens(read(definitionRoot)).some(token => ["fn", "struct", "enum", "impl", "let", "static", "const"].includes(token)), `R11-10 目录出口不得承载实现或状态：${group.module}`);
+    check(Object.keys(group.command_definition_files ?? {}).length === group.commands.length, `R11-10 每条命令必须有实际定义映射：${group.module}`);
+    for (const name of group.commands) {
+      const file = group.command_definition_files?.[name];
+      check(typeof file === "string" && file.startsWith(`src-tauri/src/commands/${group.module}/`), `R11-10 命令不能越出所属职责目录：${name}`);
+      if (typeof file !== "string") continue;
+      check(!ownedFiles.has(file), `R11-10 每条命令须有唯一具名实现文件，不能重新聚合：${name}`);
+      ownedFiles.add(file);
+      const names = [...read(file).matchAll(/#\s*\[\s*tauri::command\s*\]\s*pub\s+(?:async\s+)?fn\s+([a-z_][a-z_0-9]*)/g)].map(match => match[1]);
+      check(names.length === 1 && names[0] === name, `R11-10 正式映射必须接通原单一实际命令：${name}`);
+      ownedCommands += names.length;
+    }
+  }
+  check(ownedFiles.size === 171 && ownedCommands === 171, "R11-10 必须保持171条命令及171个独立实际定义文件");
+}
+// R11-10 registry boundary END
+
 if (failures.length) {
   throw new Error(`Tauri 组合根验证失败\n${failures.map((item) => `- ${item}`).join("\n")}`);
 }

@@ -2,11 +2,11 @@
 
 ## 当前阶段状态
 
-`IN_PROGRESS`。R11-01～09 DONE；09自身精确44f2047 / Windows run39986012998完整SUCCESS。用户2026-10-24“收尾09开始10”，10 Command Registry收敛 READY，R11 IN_PROGRESS，继续唯一rewrite/r11-tauri-commands。此前失败/VERIFYING保留实施历史，当前以索引与任务表为准。
+`IN_PROGRESS`。R11-01～09 DONE；10 Command Registry收敛已实施VERIFYING，R11 IN_PROGRESS，继续唯一rewrite/r11-tauri-commands。注册表已为唯一纯登记入口，生产Rust与171命令/DTO/顺序保持；本次在原bootstrap守卫补完整注册结构、组合根链、全桌面唯一入口与171文件实际归属约束。82源码/完整架构/16隔离负向与保护门禁通过，10自身完整Windows待验，阶段完成记录未创建，R12未启动。
 
 ## 依据与前置基线
 
-[R11任务书](../../football-model-platform-modular-rewrite-19-docs/11-R11-tauri-commands.md)、[总纲执行订正](../../football-model-platform-modular-rewrite-19-docs/00-总体架构与前23节.md)、[R10完成记录](../R10-review-analytics-release-backend/R10-stage-completion.md)。本阶段从R10收尾3d43e8e建立唯一rewrite/r11-tauri-commands；01～09已获自身精确Windows成功，10 READY。
+[R11任务书](../../football-model-platform-modular-rewrite-19-docs/11-R11-tauri-commands.md)、[总纲执行订正](../../football-model-platform-modular-rewrite-19-docs/00-总体架构与前23节.md)、[R10完成记录](../R10-review-analytics-release-backend/R10-stage-completion.md)。本阶段从R10收尾3d43e8e建立唯一rewrite/r11-tauri-commands；01～09已获自身精确Windows成功，10当前实施/验证详节点。
 
 ## 任务状态
 
@@ -21,7 +21,7 @@
 | R11-07 | [Review、Postmatch 与 Analytics Commands](R11-07-review-postmatch-and-analytics-commands.md) | DONE · 自身精确Windows完整SUCCESS |
 | R11-08 | [AI Workspace 与 OpenAI Profiles Commands](R11-08-ai-workspace-and-openai-profiles-commands.md) | DONE · 自身精确Windows完整SUCCESS |
 | R11-09 | [Release Commands](R11-09-release-commands.md) | DONE · 自身精确Windows完整SUCCESS |
-| R11-10 | Command Registry 收敛 | READY |
+| R11-10 | [Command Registry 收敛](R11-10-command-registry-收敛.md) | VERIFYING · 自身完整Windows待验 |
 
 ## 继续约束
 
@@ -175,3 +175,8 @@ R11-01～08 DONE；09 VERIFYING、10 BLOCKED，R11 IN_PROGRESS，继续唯一rew
 报告logs/windows-acceptance-20261023-162241.json及同名.txt；artifact12517606093，14,060,201字节，SHA-256 `ccf89e18048dca8ba08855d84dbc26b15aa1a5cb429eae65010938710a36ffd1`，查询时未过期。已fresh核对精确head/branch、全部job步骤、完整日志与artifact。用户2026-10-24“收尾09开始10”，09 DONE、10 READY、R11 IN_PROGRESS；此次仅5份既有文档[skip ci]收尾，源码同09已验树，不重复同源码构建。R11阶段完成记录尚未创建，10与阶段出口须按自身实际影响验收。
 
 真实PG报告事务/并发回滚、历史保护四项/不可变账本、有效XLSX、Windows Full、私有P4P7固定回归及继承model.runs/0041删除风险仍最终封包新库待验；08真实API/用户凭据/会话PG取消UI端到端同样待实际环境。ignored、公开unavailable stub和静态指纹不计这些真实PASS。
+
+
+## R11-10 注册表边界与实际归属
+
+R11-01～09 DONE；10 Command Registry收敛已实施VERIFYING，R11 IN_PROGRESS，继续唯一rewrite/r11-tauri-commands。注册表已为唯一纯登记入口，生产Rust与171命令/DTO/顺序保持；本次在原bootstrap守卫补完整注册结构、组合根链、全桌面唯一入口与171文件实际归属约束。82源码/完整架构/16隔离负向与保护门禁通过，10自身完整Windows待验，阶段完成记录未创建，R12未启动。 详[10记录](R11-10-command-registry-收敛.md)。
