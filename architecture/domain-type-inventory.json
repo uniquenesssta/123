@@ -24,13 +24,13 @@
     "targetPublicExportPolicy": "explicit re-export only"
   },
   "sourceDigest": "217241ac243726a5ab6805a7f169e222b97e78c7c971749a5904714af673ebdd",
-  "rustUsageDigest": "22bfb45754826ae27197d6f54ff41ea4f68eed6b4db3bda3f86d5967f2007c73",
+  "rustUsageDigest": "1164aba99321eb90f30185c02633d60a012506b917680f5077759f5ac75ed12f",
   "summary": {
     "typeCount": 365,
     "publicCompatibilityTypeCount": 365,
     "internalTypeCount": 0,
     "domainSourceFileCount": 129,
-    "scannedRustFileCount": 1397,
+    "scannedRustFileCount": 1416,
     "databaseMappedTypeCount": 301,
     "byTargetModule": {
       "ai_workspace": 16,
@@ -11534,7 +11534,7 @@
         "crates/application/src/use_cases/prediction/input_manifest/audit.rs",
         "crates/application/src/use_cases/prediction/input_manifest/tests.rs",
         "crates/application/src/use_cases/prediction/readiness/workflow.rs",
-        "src-tauri/src/commands/prediction.rs"
+        "src-tauri/src/commands/prediction/inspect_match_prediction_readiness.rs"
       ],
       "databaseMappings": []
     },
@@ -15039,7 +15039,7 @@
         "crates/application/src/use_cases/prediction/p4_freeze_readiness/mod.rs",
         "crates/application/src/use_cases/prediction/tests.rs",
         "crates/persistence-postgres/src/p4_orchestration.rs",
-        "src-tauri/src/commands/orchestration.rs"
+        "src-tauri/src/commands/prediction/p4/p4_freeze_readiness.rs"
       ],
       "databaseMappings": [
         "crates/persistence-postgres/src/p4_orchestration.rs"
@@ -15248,7 +15248,7 @@
         "crates/application/src/use_cases/prediction/list_p4_freeze_task_events/mod.rs",
         "crates/persistence-postgres/src/adapters/p4/horizon/read.rs",
         "crates/persistence-postgres/src/adapters/p4/horizon/row.rs",
-        "src-tauri/src/commands/orchestration.rs"
+        "src-tauri/src/commands/prediction/p4/list_p4_freeze_task_events.rs"
       ],
       "databaseMappings": [
         "crates/persistence-postgres/src/adapters/p4/horizon/read.rs",
@@ -15424,7 +15424,9 @@
         "crates/persistence-postgres/src/adapters/p4/horizon/row.rs",
         "crates/persistence-postgres/src/adapters/p4/horizon/tasks.rs",
         "crates/persistence-postgres/src/p4_orchestration.rs",
-        "src-tauri/src/commands/orchestration.rs"
+        "src-tauri/src/commands/prediction/p4/list_p4_freeze_tasks.rs",
+        "src-tauri/src/commands/prediction/p4/plan_p4_horizons.rs",
+        "src-tauri/src/commands/prediction/p4/read_p4_freeze_task.rs"
       ],
       "databaseMappings": [
         "crates/persistence-postgres/src/adapters/p4/horizon/read.rs",
@@ -16130,7 +16132,7 @@
         "crates/application/src/use_cases/prediction/read_p4_match_workspace/mod.rs",
         "crates/application/src/use_cases/prediction/tests.rs",
         "crates/persistence-postgres/src/adapters/p4/workbench/matches.rs",
-        "src-tauri/src/commands/orchestration.rs"
+        "src-tauri/src/commands/prediction/p4/read_p4_match_workspace.rs"
       ],
       "databaseMappings": [
         "crates/persistence-postgres/src/adapters/p4/workbench/matches.rs"
@@ -16495,7 +16497,8 @@
         "crates/application/src/use_cases/research/p4_manual_conflict/decision.rs",
         "crates/application/src/use_cases/research/p4_manual_conflict/mod.rs",
         "crates/persistence-postgres/src/adapters/p4/workbench/tasks.rs",
-        "src-tauri/src/commands/orchestration.rs"
+        "src-tauri/src/commands/prediction/p4/read_p4_task_workspace.rs",
+        "src-tauri/src/commands/prediction/research/resolve_p4_conflict.rs"
       ],
       "databaseMappings": [
         "crates/persistence-postgres/src/adapters/p4/workbench/tasks.rs"
@@ -17889,7 +17892,7 @@
         "crates/application/src/services/prediction/service.rs",
         "crates/application/src/use_cases/prediction/plan_p4_horizons/prepare.rs",
         "crates/application/src/use_cases/prediction/plan_p4_horizons/process.rs",
-        "src-tauri/src/commands/orchestration.rs"
+        "src-tauri/src/commands/prediction/p4/plan_p4_horizons.rs"
       ],
       "databaseMappings": []
     },
@@ -24371,7 +24374,7 @@
         "crates/application/src/services/research/service.rs",
         "crates/application/src/use_cases/research/p4_manual_conflict/decision.rs",
         "crates/application/src/use_cases/research/p4_manual_conflict/mod.rs",
-        "src-tauri/src/commands/orchestration.rs"
+        "src-tauri/src/commands/prediction/research/resolve_p4_conflict.rs"
       ],
       "databaseMappings": []
     },
@@ -25007,7 +25010,7 @@
         "crates/persistence-postgres/src/adapters/competition/route_resolution/route/resolve_route.rs",
         "crates/persistence-postgres/src/adapters/prediction/runs/write.rs",
         "crates/persistence-postgres/tests/model_run_identity_repository_contract.rs",
-        "src-tauri/src/commands/prediction.rs"
+        "src-tauri/src/commands/prediction/preview_route.rs"
       ],
       "databaseMappings": [
         "crates/persistence-postgres/src/adapters/competition/route_resolution/route/record_mapper.rs",

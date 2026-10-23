@@ -281,8 +281,8 @@
     },
     {
       "module": "prediction",
-      "definition_file": "src-tauri/src/commands/prediction.rs",
-      "parameter_and_return_signature_file": "src-tauri/src/commands/prediction.rs",
+      "definition_file": "src-tauri/src/commands/prediction/mod.rs",
+      "parameter_and_return_signature_file": "src-tauri/src/commands/prediction/mod.rs",
       "frontend_parameter_and_return_signature_file": "src/api/client.ts",
       "frontend_shared_dto_file": "src/types.ts",
       "commands": [
@@ -294,16 +294,7 @@
         "preview_route",
         "list_recent_runs",
         "read_run",
-        "hide_model_run_history"
-      ]
-    },
-    {
-      "module": "orchestration",
-      "definition_file": "src-tauri/src/commands/orchestration.rs",
-      "parameter_and_return_signature_file": "src-tauri/src/commands/orchestration.rs",
-      "frontend_parameter_and_return_signature_file": "src/api/client.ts",
-      "frontend_shared_dto_file": "src/types.ts",
-      "commands": [
+        "hide_model_run_history",
         "plan_p4_horizons",
         "list_p4_freeze_tasks",
         "read_p4_freeze_task",
@@ -312,7 +303,26 @@
         "read_p4_match_workspace",
         "read_p4_task_workspace",
         "resolve_p4_conflict"
-      ]
+      ],
+      "command_definition_files": {
+        "dry_run_default_fixture": "src-tauri/src/commands/prediction/dry_run_default_fixture.rs",
+        "execute_prediction": "src-tauri/src/commands/prediction/execute_prediction.rs",
+        "execute_prediction_from_match": "src-tauri/src/commands/prediction/execute_prediction_from_match.rs",
+        "execute_shadow_prediction_from_match": "src-tauri/src/commands/prediction/execute_shadow_prediction_from_match.rs",
+        "inspect_match_prediction_readiness": "src-tauri/src/commands/prediction/inspect_match_prediction_readiness.rs",
+        "preview_route": "src-tauri/src/commands/prediction/preview_route.rs",
+        "list_recent_runs": "src-tauri/src/commands/prediction/runs/list_recent_runs.rs",
+        "read_run": "src-tauri/src/commands/prediction/runs/read_run.rs",
+        "hide_model_run_history": "src-tauri/src/commands/prediction/runs/hide_model_run_history.rs",
+        "plan_p4_horizons": "src-tauri/src/commands/prediction/p4/plan_p4_horizons.rs",
+        "list_p4_freeze_tasks": "src-tauri/src/commands/prediction/p4/list_p4_freeze_tasks.rs",
+        "read_p4_freeze_task": "src-tauri/src/commands/prediction/p4/read_p4_freeze_task.rs",
+        "list_p4_freeze_task_events": "src-tauri/src/commands/prediction/p4/list_p4_freeze_task_events.rs",
+        "p4_freeze_readiness": "src-tauri/src/commands/prediction/p4/p4_freeze_readiness.rs",
+        "read_p4_match_workspace": "src-tauri/src/commands/prediction/p4/read_p4_match_workspace.rs",
+        "read_p4_task_workspace": "src-tauri/src/commands/prediction/p4/read_p4_task_workspace.rs",
+        "resolve_p4_conflict": "src-tauri/src/commands/prediction/research/resolve_p4_conflict.rs"
+      }
     },
     {
       "module": "competition",
@@ -626,5 +636,5 @@
     }
   ],
   "command_set_sha256": "dfc477a8b0bec95735fdad006349fcea0f367b4ebc85aede1b63a128a55de669",
-  "command_definition_map_sha256": "129344d380145a89a5ea8015876ffcd165e3b4847d98edc338d0d309ced0ea10"
+  "command_definition_map_sha256": "fe7b8d78d2daf40329c3d007c278dde5a8086e63a5b68387d0dcf919e3f53ca2"
 }

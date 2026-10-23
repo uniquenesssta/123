@@ -853,3 +853,8 @@ R11-04已收尾DONE：精确7ccb11e / [Windows run39937856913](https://github.co
 
 
 R11-05已收尾DONE：精确b9040df / [Windows run39946211886](https://github.com/uniquenesssta/123/actions/runs/39946211886)完整SUCCESS，Desktop46/App230/PG259、完整前端/17视口、Rust、Windows打包/启动/日志通过。用户授权同一R11分支06 READY，07～10 BLOCKED；详[05完成记录](docs/modular-rewrite/R11-tauri-commands/R11-05-lineups-presets-and-workbooks-commands.md)。真实PG/XLSX/Full/私有固定回归和继承删除风险仍最终新库待验。
+
+
+### R11-06 推演、研究与运行记录命令（2026-10-23，VERIFYING）
+
+17条原命令已按推演6、运行记录3、P4任务/工作台7、研究冲突1归入唯一commands/prediction目录，4纯出口接通原Application能力，旧prediction.rs/orchestration.rs删除。171公共命令/注册顺序/原签名与正文保持，内部物理组14→13；82源码/完整架构/22Rustfmt/69等价/19隔离负向与保护门禁通过。06自身完整Windows待验，07～10 BLOCKED，R11 IN_PROGRESS。 详[06记录](docs/modular-rewrite/R11-tauri-commands/R11-06-prediction-research-and-runs-commands.md)与[R11索引](docs/modular-rewrite/R11-tauri-commands/README.md)。真实PG/Full/私有固定回归及原最终新库项目仍待验。

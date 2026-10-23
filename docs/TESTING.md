@@ -942,3 +942,14 @@ R11-01～04 DONE；05 Lineups/Presets/Workbooks Commands已实施VERIFYING，06�
 报告logs/windows-acceptance-20261023-112929.json及同名.txt；artifact12500090504，14,053,835字节，SHA-256 `2c79371808d79341c298920fcfd3ff7b82d2b8d57f4da2da5d9b20ee4af99946`，查询时未过期。已核对精确head/branch、全部job步骤、完整日志与artifact。用户2026-10-23“收尾05开始06”，05 DONE，06 Prediction/Research/Runs Commands READY，07～10 BLOCKED，R11 IN_PROGRESS。此次仅5份既有文档[skip ci]收尾，源码沿上述自身完整Windows证据，不重复同源码构建；历史VERIFYING/预期计数保留，06须自身完整Windows。
 
 真实PG/历史保护四项/不可变账本并发回滚/有效XLSX/Windows Full/私有P4P7固定回归及继承model.runs/0041删除风险仍最终封包新库待验；ignored、公开unavailable stub和静态指纹不计这些真实PASS。
+
+
+## R11-06 Prediction、Research 与 Runs Commands（2026-10-23，VERIFYING）
+
+17条原命令已按推演6、运行记录3、P4任务/工作台7、研究冲突1归入唯一commands/prediction目录，4纯出口接通原Application能力，旧prediction.rs/orchestration.rs删除。171公共命令/注册顺序/原签名与正文保持，内部物理组14→13；82源码/完整架构/22Rustfmt/69等价/19隔离负向与保护门禁通过。06自身完整Windows待验，07～10 BLOCKED，R11 IN_PROGRESS。 新增/迁移Rust单测0，原targets不变，预期Desktop46/Application230/Persistence259/Gateway112unit+41contract须06自身精确Windows确认。
+
+实际read-only node入口82、npm run verify:architecture、22文件独立Rustfmt1.88 --edition 2021 --config skip_children=true --check、17正文/17签名等69完整等价、隔离副本19拒绝/3守卫恢复正向、主目录167源码/清单SHA256不变及git diff --check通过。汇总器首次误把三个scripts/architecture脚本定位到根architecture而MODULE_NOT_FOUND，其余79通过；纠正scratch路径后仅重跑这三项，最终82/82。无生产代码失败、非Windows动态或新runner/workflow/target/依赖/迁移。报告r1106-static.json、r1106-architecture.log、r1106-equivalence.json、r1106-negative.json和r1106-primary-fingerprints.json位于repo外scratch。
+
+原Prediction门禁新增17薄传输/纯出口/双宏/唯一owner/签名/原参数、UUID与完整传输形状，既有所有业务断言反向核对保持；历史比分UI门禁仅同步定义映射读者，正式命令验证器字节冻结。公共171集合哈希保持；Domain365/129/301、scan1397→1416、sourceDigest保持，usageDigest1164aba99321eb90f30185c02633d60a012506b917680f5077759f5ac75ed12f；App422/43Ports/19Port文件/PG直接38/状态19不变。18保护资产及46迁移18PG静态契约通过。
+
+沿原Windows Public Platform CI执行完整frontend/17视口、Rust fmt/locked Clippy workspace all-targets -D warnings/workspace tests、Windows release/MSI/NSIS/启动与日志。实际Windows job首次in_progress即停止全部CI查询，提示约20～30分钟并等用户返回；06保持VERIFYING，不继承05成功。真实PG/历史保护四项/不可变账本并发回滚/有效XLSX/Windows Full/私有P4P7固定回归及继承model.runs/0041删除风险仍最终封包新库待验；ignored、公共unavailable stub和静态指纹不计真实PASS。详[06记录](modular-rewrite/R11-tauri-commands/R11-06-prediction-research-and-runs-commands.md)。

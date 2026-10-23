@@ -21,7 +21,7 @@ const lineups = read("src/pages/lineups.ts");
 const styles = read("src/styles/app.css");
 const workspacePanels = read("src/styles/workspacePanels.css");
 const client = read("src/api/client.ts");
-const predictionCommand = read("src-tauri/src/commands/prediction.rs");
+const predictionCommand = [...new Set(Object.values(JSON.parse(read("architecture/command-contract.json")).command_groups.find(group => group.module === "prediction").command_definition_files))].map(read).join("\n");
 const catalogCommand = [...new Set(Object.values(JSON.parse(read("architecture/command-contract.json")).command_groups.find(group => group.module === "lineups").command_definition_files))].map(read).join("\n");
 const registry = read("src-tauri/src/bootstrap/command_registry.rs");
 const applicationPrediction = readRustTree("crates/application/src/services/prediction") + readRustTree("crates/application/src/use_cases/prediction");

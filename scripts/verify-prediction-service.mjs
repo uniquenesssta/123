@@ -375,5 +375,153 @@ for(const token of ["INSERT INTO","UPDATE ","DELETE FROM","write_audit_event(","
 for(const name of ["freeze_execution_pins_snapshot_provenance_and_commits_before_frozen_transition","freeze_execution_stops_at_each_late_port_failure_without_snapshot_or_frozen_state","freeze_execution_rejects_route_schema_and_provider_output_drift_before_snapshot","freeze_execution_recovers_committed_snapshot_after_frozen_transition_failure"]) check(planTests.includes(`fn ${name}`),`R8-12 原Application目标缺少冻结契约：${name}`);
 for(const token of ["failed snapshot details must roll back header/features/evidence/probabilities/audit together", "same-key concurrent freeze writes one audit", "formal cohort preserves the first delivery key", "snapshot retries and rejected formal cohort never write ledgers", "invalid_json_text"]) check(horizonPg.includes(token),`R8-12 原PG Stage C缺少事务/并发/复用契约：${token}`);
 
+// R11-06 command transport BEGIN
+{
+  const commandRoot = "src-tauri/src/commands/prediction";
+  const commandGroups = {
+  "": [
+    "dry_run_default_fixture",
+    "execute_prediction",
+    "inspect_match_prediction_readiness",
+    "execute_prediction_from_match",
+    "execute_shadow_prediction_from_match",
+    "preview_route"
+  ],
+  "runs": [
+    "list_recent_runs",
+    "read_run",
+    "hide_model_run_history"
+  ],
+  "p4": [
+    "plan_p4_horizons",
+    "list_p4_freeze_tasks",
+    "read_p4_freeze_task",
+    "list_p4_freeze_task_events",
+    "p4_freeze_readiness",
+    "read_p4_match_workspace",
+    "read_p4_task_workspace"
+  ],
+  "research": [
+    "resolve_p4_conflict"
+  ]
+};
+  const commandFiles = {
+  "dry_run_default_fixture": "src-tauri/src/commands/prediction/dry_run_default_fixture.rs",
+  "execute_prediction": "src-tauri/src/commands/prediction/execute_prediction.rs",
+  "inspect_match_prediction_readiness": "src-tauri/src/commands/prediction/inspect_match_prediction_readiness.rs",
+  "execute_prediction_from_match": "src-tauri/src/commands/prediction/execute_prediction_from_match.rs",
+  "execute_shadow_prediction_from_match": "src-tauri/src/commands/prediction/execute_shadow_prediction_from_match.rs",
+  "preview_route": "src-tauri/src/commands/prediction/preview_route.rs",
+  "list_recent_runs": "src-tauri/src/commands/prediction/runs/list_recent_runs.rs",
+  "read_run": "src-tauri/src/commands/prediction/runs/read_run.rs",
+  "hide_model_run_history": "src-tauri/src/commands/prediction/runs/hide_model_run_history.rs",
+  "plan_p4_horizons": "src-tauri/src/commands/prediction/p4/plan_p4_horizons.rs",
+  "list_p4_freeze_tasks": "src-tauri/src/commands/prediction/p4/list_p4_freeze_tasks.rs",
+  "read_p4_freeze_task": "src-tauri/src/commands/prediction/p4/read_p4_freeze_task.rs",
+  "list_p4_freeze_task_events": "src-tauri/src/commands/prediction/p4/list_p4_freeze_task_events.rs",
+  "p4_freeze_readiness": "src-tauri/src/commands/prediction/p4/p4_freeze_readiness.rs",
+  "read_p4_match_workspace": "src-tauri/src/commands/prediction/p4/read_p4_match_workspace.rs",
+  "read_p4_task_workspace": "src-tauri/src/commands/prediction/p4/read_p4_task_workspace.rs",
+  "resolve_p4_conflict": "src-tauri/src/commands/prediction/research/resolve_p4_conflict.rs"
+};
+  const signatures = {
+  "dry_run_default_fixture": "pub fn dry_run_default_fixture(state: State<'_, AppState>) -> Result<Value, String>",
+  "execute_prediction": "pub async fn execute_prediction(\n    state: State<'_, AppState>,\n    command: PredictionCommand,\n) -> Result<PredictionExecution, String>",
+  "inspect_match_prediction_readiness": "pub async fn inspect_match_prediction_readiness(\n    state: State<'_, AppState>,\n    command: StoredMatchPredictionCommand,\n) -> Result<MatchPredictionReadiness, String>",
+  "execute_prediction_from_match": "pub async fn execute_prediction_from_match(\n    state: State<'_, AppState>,\n    command: StoredMatchPredictionCommand,\n) -> Result<PredictionExecution, String>",
+  "execute_shadow_prediction_from_match": "pub async fn execute_shadow_prediction_from_match(\n    state: State<'_, AppState>,\n    command: StoredMatchPredictionCommand,\n) -> Result<PredictionExecution, String>",
+  "preview_route": "pub async fn preview_route(\n    state: State<'_, AppState>,\n    command: RoutePreviewCommand,\n) -> Result<RouteDecision, String>",
+  "list_recent_runs": "pub async fn list_recent_runs(\n    state: State<'_, AppState>,\n    limit: i64,\n) -> Result<Vec<ModelRunListItem>, String>",
+  "read_run": "pub async fn read_run(state: State<'_, AppState>, run_id: String) -> Result<Value, String>",
+  "hide_model_run_history": "pub async fn hide_model_run_history(\n    state: State<'_, AppState>,\n    run_id: String,\n    reason: Option<String>,\n) -> Result<(), String>",
+  "plan_p4_horizons": "pub async fn plan_p4_horizons(\n    state: State<'_, AppState>,\n    command: PlanP4HorizonsCommand,\n) -> Result<Vec<P4FreezeTaskRecord>, String>",
+  "list_p4_freeze_tasks": "pub async fn list_p4_freeze_tasks(\n    state: State<'_, AppState>,\n    match_id: Option<String>,\n    limit: u32,\n) -> Result<Vec<P4FreezeTaskRecord>, String>",
+  "read_p4_freeze_task": "pub async fn read_p4_freeze_task(\n    state: State<'_, AppState>,\n    task_id: String,\n) -> Result<P4FreezeTaskRecord, String>",
+  "list_p4_freeze_task_events": "pub async fn list_p4_freeze_task_events(\n    state: State<'_, AppState>,\n    task_id: String,\n) -> Result<Vec<P4FreezeTaskEventRecord>, String>",
+  "p4_freeze_readiness": "pub async fn p4_freeze_readiness(\n    state: State<'_, AppState>,\n    task_id: String,\n) -> Result<P4FreezeReadiness, String>",
+  "read_p4_match_workspace": "pub async fn read_p4_match_workspace(\n    state: State<'_, AppState>,\n    match_id: String,\n) -> Result<P4MatchWorkspace, String>",
+  "read_p4_task_workspace": "pub async fn read_p4_task_workspace(\n    state: State<'_, AppState>,\n    task_id: String,\n) -> Result<P4TaskWorkspace, String>",
+  "resolve_p4_conflict": "pub async fn resolve_p4_conflict(\n    state: State<'_, AppState>,\n    command: ResolveP4ConflictCommand,\n) -> Result<P4TaskWorkspace, String>"
+};
+  const validations = {
+  "execute_prediction": "",
+  "inspect_match_prediction_readiness": "",
+  "execute_prediction_from_match": "",
+  "execute_shadow_prediction_from_match": "",
+  "preview_route": "",
+  "list_recent_runs": "",
+  "read_run": "let parsed = parse_uuid(&run_id, \"运行 ID\")?;",
+  "hide_model_run_history": "let parsed = parse_uuid(&run_id, \"运行 ID\")?;",
+  "plan_p4_horizons": "",
+  "list_p4_freeze_tasks": "let match_id = match_id\n        .as_deref()\n        .map(|value| parse_uuid(value, \"比赛 ID\"))\n        .transpose()?;",
+  "read_p4_freeze_task": "",
+  "list_p4_freeze_task_events": "",
+  "p4_freeze_readiness": "",
+  "read_p4_match_workspace": "",
+  "read_p4_task_workspace": "",
+  "resolve_p4_conflict": ""
+};
+  const calls = {
+  "execute_prediction": "execute_prediction(command)",
+  "inspect_match_prediction_readiness": "inspect_match_prediction_readiness(command)",
+  "execute_prediction_from_match": "execute_prediction_from_match(command)",
+  "execute_shadow_prediction_from_match": "execute_shadow_prediction_from_match(command)",
+  "preview_route": "preview_route(command)",
+  "list_recent_runs": "list_recent_runs(limit)",
+  "read_run": "read_run(parsed)",
+  "hide_model_run_history": "hide_run_from_history(parsed, reason)",
+  "plan_p4_horizons": "plan_p4_horizons(command)",
+  "list_p4_freeze_tasks": "list_p4_freeze_tasks(match_id, limit)",
+  "read_p4_freeze_task": "read_p4_freeze_task(parse_uuid(&task_id, \"冻结任务 ID\")?)",
+  "list_p4_freeze_task_events": "list_p4_freeze_task_events(parse_uuid(&task_id, \"冻结任务 ID\")?)",
+  "p4_freeze_readiness": "p4_freeze_readiness(parse_uuid(&task_id, \"冻结任务 ID\")?)",
+  "read_p4_match_workspace": "read_p4_match_workspace(parse_uuid(&match_id, \"比赛 ID\")?)",
+  "read_p4_task_workspace": "read_p4_task_workspace(parse_uuid(&task_id, \"冻结任务 ID\")?)",
+  "resolve_p4_conflict": "resolve_p4_conflict(command)"
+};
+  const contract = JSON.parse(read("architecture/command-contract.json"));
+  const group = contract.command_groups.find(item => item.module === "prediction");
+  const boundary = JSON.parse(read("architecture/module-boundaries.json")).tauri_commands;
+  const tokens = source => (source.match(/"(?:\\.|[^"\\])*"|[A-Za-z_][A-Za-z_0-9]*|[^\s]/g) ?? []).join("\0");
+  const signatureTokens = source => tokens(source.replace(/,\s*\)/g, ")"));
+  const moduleTokens = source => tokens(source.replace(/,\s*}/g, "}"));
+  const exports = (module, names) => `pub use ${module}::{${names.flatMap(name => [`__cmd__${name}`, `__tauri_command_name_${name}`, name]).sort().join(",")}};`;
+  const rootModules = Object.fromEntries([
+    ...commandGroups[""].map(name => [name, [name]]),
+    ...Object.entries(commandGroups).filter(([name]) => name !== ""),
+  ]);
+  const rootNames = Object.keys(rootModules).sort();
+  check(moduleTokens(read(`${commandRoot}/mod.rs`)) === moduleTokens([...rootNames.map(name => `mod ${name};`), ...rootNames.map(name => exports(name, rootModules[name]))].join("\n")), "R11-06 根出口只能显式登记命令与原双宏");
+  for (const [name, commands] of Object.entries(commandGroups)) {
+    if (!name) continue;
+    const ordered = [...commands].sort();
+    const expected = [...ordered.map(command => `mod ${command};`), ...ordered.map(command => exports(command, [command]))].join("\n");
+    check(moduleTokens(read(`${commandRoot}/${name}/mod.rs`)) === moduleTokens(expected), `R11-06 子出口夹带逻辑或漏命令/宏：${name}`);
+  }
+  check(group?.definition_file === `${commandRoot}/mod.rs` && group?.parameter_and_return_signature_file === `${commandRoot}/mod.rs` && boundary.groups.prediction === `${commandRoot}/mod.rs`, "R11-06 唯一命令owner必须接通正式清单");
+  check(!contract.command_groups.some(item => item.module === "orchestration") && !boundary.groups.orchestration, "R11-06 旧混合命令组必须退休");
+  const commandModules = read("src-tauri/src/commands.rs");
+  check(commandModules.includes("mod prediction;") && commandModules.includes("pub use prediction::*;") && !/\borchestration\b/.test(commandModules), "R11-06 根登记未切换唯一目录");
+  check(Object.keys(commandFiles).length === 17 && group?.commands.length === 17, "R11-06 必须覆盖原17条公开命令");
+  for (const [name, file] of Object.entries(commandFiles)) {
+    const source = read(file);
+    const signature = source.match(new RegExp(`pub (?:async )?fn ${name}\\([\\s\\S]*?\\{`))?.[0].slice(0, -1) ?? "";
+    check(signatureTokens(signature) === signatureTokens(signatures[name]), `R11-06 参数/返回/async签名漂移：${name}`);
+    check(group?.command_definition_files?.[name] === file, `R11-06 定义owner漂移：${name}`);
+    check((source.match(/#\[tauri::command\]/g) ?? []).length === 1 && source.includes("bootstrap::AppState"), `R11-06 必须借用原State且每文件唯一命令：${name}`);
+    const body = source.slice(source.indexOf("{", source.indexOf(`fn ${name}`)) + 1, source.lastIndexOf("}"));
+    const expected = name === "dry_run_default_fixture"
+      ? "let output = state.service.dry_run_default_fixture().map_err(|error| error.to_string())?; serde_json::to_value(output).map_err(|error| error.to_string())"
+      : `${validations[name]} state.service.${calls[name]}.await.map_err(|error| error.to_string())`;
+    check(tokens(body) === tokens(expected), `R11-06 薄传输必须保持原UUID/参数/调用顺序与错误：${name}`);
+    if (expected.includes("parse_uuid")) check(source.includes("commands::parse_uuid"), `R11-06 UUID校验必须复用原helper：${name}`);
+    for (const forbidden of ["sqlx::", "PgPool", "PostgresStore", "std::fs", "std::io", "tokio::spawn", "ApplicationService::new", "Mutex<", "static ", "macro_rules!", ".unwrap()", ".expect("]) check(!source.includes(forbidden), `R11-06 传输越过业务/状态/worker边界：${name}/${forbidden}`);
+    if (source.includes("football_persistence_postgres")) check(name === "list_recent_runs" && source.includes("use football_persistence_postgres::ModelRunListItem;"), "R11-06 只允许原有运行列表DTO导入，不得新增持久化访问");
+  }
+  for (const retired of ["src-tauri/src/commands/prediction.rs", "src-tauri/src/commands/orchestration.rs"]) check(!existsSync(join(root, retired)), `R11-06 旧混合owner仍存在：${retired}`);
+  check(researchFacade.includes("pub async fn resolve_p4_conflict") && read(commandFiles.resolve_p4_conflict).includes(".resolve_p4_conflict(command)"), "R11-06 研究冲突仍须原Research facade所有者，不能转入Prediction业务");
+}
+// R11-06 command transport END
+
 if(failures.length) throw new Error(`Prediction Service 验证失败\n${failures.map((item)=>`- ${item}`).join("\n")}`);
 console.log(`Prediction Service 验证通过：${predictionFiles.length} 个 Service/Use Case Rust 文件，18 个公开 Application 职责已进入 Prediction Service/Ports 边界，P4 freeze execution 与 snapshot persistence 均不再由旧混合 owner 直接实现。`);

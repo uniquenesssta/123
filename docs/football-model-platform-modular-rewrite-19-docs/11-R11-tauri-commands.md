@@ -7,7 +7,7 @@
 
 ## 当前前置状态（2026-10-23）
 
-R11-01～05 DONE；05自身精确b9040df / Windows run39946211886完整SUCCESS。用户2026-10-23“收尾05开始06”，06 Prediction/Research/Runs Commands READY，07～10 BLOCKED，R11 IN_PROGRESS，继续唯一rewrite/r11-tauri-commands。此前VERIFYING叙述为实施历史，当前状态以索引与任务表为准。 [当前索引](../modular-rewrite/R11-tauri-commands/README.md)。
+R11-01～05 DONE；06 Prediction/Research/Runs Commands已实施VERIFYING，07～10 BLOCKED，R11 IN_PROGRESS。用户2026-10-23“收尾05开始06”，继续唯一rewrite/r11-tauri-commands；基线29de82c820448e34ba65722addb47073b0824d7c为05五文档[skip ci]收尾，生产源码同自身完整Windows成功b9040df。 [06实施记录](../modular-rewrite/R11-tauri-commands/R11-06-prediction-research-and-runs-commands.md)与[当前索引](../modular-rewrite/R11-tauri-commands/README.md)为当前依据。
 
 真实PostgreSQL、历史保护四项、不可变账本/并发回滚、有效XLSX、Windows Full、私有P4/P7固定回归及继承的model.runs/0041删除风险继续最终封包新库待验；ignored、公开unavailable stub和静态指纹不计这些真实项目PASS。
 
@@ -838,7 +838,7 @@ src-tauri/src/commands/lineups/
 
 ## R11-06 Prediction、Research 与 Runs Commands
 
-状态：`READY`（05自身完整Windows通过；用户2026-10-23“收尾05开始06”授权）
+状态：`VERIFYING`（17条命令已实施；自身完整Windows尚待验收）
 
 ### 1. 目标
 

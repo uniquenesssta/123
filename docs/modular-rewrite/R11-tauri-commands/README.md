@@ -2,11 +2,11 @@
 
 ## 当前阶段状态
 
-`IN_PROGRESS`。R11-01～05 DONE；05自身精确b9040df / Windows run39946211886完整SUCCESS。用户2026-10-23“收尾05开始06”，06 Prediction/Research/Runs Commands READY，07～10 BLOCKED，R11 IN_PROGRESS，继续唯一rewrite/r11-tauri-commands。此前VERIFYING叙述为实施历史，当前状态以索引与任务表为准。
+`IN_PROGRESS`。R11-01～05 DONE；06 Prediction/Research/Runs Commands已实施VERIFYING，07～10 BLOCKED，R11 IN_PROGRESS。用户2026-10-23“收尾05开始06”，继续唯一rewrite/r11-tauri-commands；基线29de82c820448e34ba65722addb47073b0824d7c为05五文档[skip ci]收尾，生产源码同自身完整Windows成功b9040df。 当前以本节和任务表为准，历史VERIFYING保留。
 
 ## 依据与前置基线
 
-[R11任务书](../../football-model-platform-modular-rewrite-19-docs/11-R11-tauri-commands.md)、[总纲执行订正](../../football-model-platform-modular-rewrite-19-docs/00-总体架构与前23节.md)、[R10完成记录](../R10-review-analytics-release-backend/R10-stage-completion.md)。本阶段已从R10收尾3d43e8e建立唯一rewrite/r11-tauri-commands，01实施与验证详节点记录；后续02～10尚未授权/实施。
+[R11任务书](../../football-model-platform-modular-rewrite-19-docs/11-R11-tauri-commands.md)、[总纲执行订正](../../football-model-platform-modular-rewrite-19-docs/00-总体架构与前23节.md)、[R10完成记录](../R10-review-analytics-release-backend/R10-stage-completion.md)。本阶段从R10收尾3d43e8e建立唯一rewrite/r11-tauri-commands；01～05已获自身精确Windows成功，06当前实施/验证详节点，07～10 BLOCKED。
 
 ## 任务状态
 
@@ -17,7 +17,7 @@
 | R11-03 | [Competitions 与 Rules Commands](R11-03-competitions-and-rules-commands.md) | DONE · 自身精确Windows完整SUCCESS |
 | R11-04 | [Teams 与 Players Commands](R11-04-teams-and-players-commands.md) | DONE · 自身精确Windows完整SUCCESS |
 | R11-05 | [Lineups、Presets 与 Workbooks Commands](R11-05-lineups-presets-and-workbooks-commands.md) | DONE · 自身精确Windows完整SUCCESS |
-| R11-06 | Prediction、Research 与 Runs Commands | READY |
+| R11-06 | [Prediction、Research 与 Runs Commands](R11-06-prediction-research-and-runs-commands.md) | VERIFYING · 自身完整Windows待验 |
 | R11-07 | Review、Postmatch 与 Analytics Commands | BLOCKED |
 | R11-08 | AI Workspace 与 OpenAI Profiles Commands | BLOCKED |
 | R11-09 | Release Commands | BLOCKED |
@@ -109,3 +109,8 @@ R11-02 Database Commands已实施 `VERIFYING`，基线f56a1c004cee8018f657b6cdd9
 报告logs/windows-acceptance-20261023-112929.json及同名.txt；artifact12500090504，14,053,835字节，SHA-256 `2c79371808d79341c298920fcfd3ff7b82d2b8d57f4da2da5d9b20ee4af99946`，查询时未过期。已核对精确head/branch、全部job步骤、完整日志与artifact。用户2026-10-23“收尾05开始06”，05 DONE，06 Prediction/Research/Runs Commands READY，07～10 BLOCKED，R11 IN_PROGRESS。此次仅5份既有文档[skip ci]收尾，源码沿上述自身完整Windows证据，不重复同源码构建；历史VERIFYING/预期计数保留，06须自身完整Windows。
 
 真实PG/历史保护四项/不可变账本并发回滚/有效XLSX/Windows Full/私有P4P7固定回归及继承model.runs/0041删除风险仍最终封包新库待验；ignored、公开unavailable stub和静态指纹不计这些真实PASS。
+
+
+## R11-06 实施与验证
+
+17条原命令已按推演6、运行记录3、P4任务/工作台7、研究冲突1归入唯一commands/prediction目录，4纯出口接通原Application能力，旧prediction.rs/orchestration.rs删除。171公共命令/注册顺序/原签名与正文保持，内部物理组14→13；82源码/完整架构/22Rustfmt/69等价/19隔离负向与保护门禁通过。06自身完整Windows待验，07～10 BLOCKED，R11 IN_PROGRESS。 详[06记录](R11-06-prediction-research-and-runs-commands.md)。
