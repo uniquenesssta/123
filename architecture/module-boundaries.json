@@ -348,7 +348,7 @@
       "api_workspace": "src-tauri/src/commands/api_workspace.rs",
       "catalog": "src-tauri/src/commands/catalog.rs",
       "competition": "src-tauri/src/commands/competition.rs",
-      "database": "src-tauri/src/commands/database.rs",
+      "database": "src-tauri/src/commands/database/mod.rs",
       "exchange": "src-tauri/src/commands/exchange.rs",
       "openai": "src-tauri/src/commands/openai.rs",
       "orchestration": "src-tauri/src/commands/orchestration.rs",

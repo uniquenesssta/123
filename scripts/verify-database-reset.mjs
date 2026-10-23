@@ -1,4 +1,4 @@
-import { readFileSync } from "node:fs";
+import { readFileSync, existsSync } from "node:fs";
 import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -10,7 +10,7 @@ const teamRecordMapper = read("crates/persistence-postgres/src/adapters/catalog/
 const playerRecordMapper = read("crates/persistence-postgres/src/adapters/catalog/players/record/mapper.rs");
 const connection = read("crates/persistence-postgres/src/migrations/reset_to_pristine.rs");
 const integration = read("crates/persistence-postgres/tests/postgres_integration.rs");
-const command = read("src-tauri/src/commands/database.rs");
+const command = [read("src-tauri/src/commands/database/reset/command.rs"), read("src-tauri/src/commands/database/reset/coordinator.rs")].join("\n");
 const compactCommand = command.replace(/\s+/g, "");
 const databaseFacade = read("crates/application/src/services/database/facade.rs");
 const databaseService = read("crates/application/src/services/database/service.rs");
@@ -92,5 +92,72 @@ requireText(main, "requestDatabaseReset", "输入数据库名称确认弹窗");
 requireText(main, 'data-action="execute-database-reset"', "最终清空按钮");
 requireText(main, "api.clearWorkspaceState()", "清空后移除失效工作区引用");
 requireText(main, "window.location.reload()", "清空后重启界面状态");
+
+const databaseRoot = "src-tauri/src/commands/database";
+const definitions = {
+  configure_database: "configure/command.rs",
+  disconnect_database: "disconnect_database.rs",
+  reset_database: "reset/command.rs",
+};
+const commandContract = JSON.parse(read("architecture/command-contract.json"));
+const databaseGroup = commandContract.command_groups.find(group => group.module === "database");
+const boundaries = JSON.parse(read("architecture/module-boundaries.json"));
+if (existsSync(resolve(root, "src-tauri/src/commands/database.rs"))) throw new Error("旧数据库命令owner仍存在");
+requireText(read("src-tauri/src/commands.rs"), "mod database;", "数据库命令原根登记");
+if (databaseGroup?.definition_file !== `${databaseRoot}/mod.rs` || boundaries.tauri_commands?.groups?.database !== `${databaseRoot}/mod.rs`) throw new Error("数据库职责清单未指向唯一出口");
+for (const file of ["mod.rs", "configure/mod.rs", "reset/mod.rs"]) {
+  if (/\b(?:fn|struct|impl|enum)\s/.test(read(`${databaseRoot}/${file}`))) throw new Error(`数据库出口包含业务：${file}`);
+}
+const signatures = {
+  configure_database: "pub async fn configure_database(state: State<'_, AppState>, options: DatabaseOptions) -> Result<DatabaseHealth, String>",
+  disconnect_database: "pub async fn disconnect_database(state: State<'_, AppState>) -> Result<(), String>",
+  reset_database: "pub async fn reset_database(state: State<'_, AppState>, confirmation: String) -> Result<DatabaseHealth, String>",
+};
+const compact = text => text.replace(/,\s*\)/g, ")").replace(/\s+/g, "");
+for (const [name, file] of Object.entries(definitions)) {
+  const source = read(`${databaseRoot}/${file}`);
+  const signature = source.match(new RegExp(`pub async fn ${name}\\([\\s\\S]*?\\{`))?.[0].slice(0, -1) ?? "";
+  if (compact(signature) !== compact(signatures[name])) throw new Error(`数据库公共签名漂移：${name}`);
+  const delegate = name === "disconnect_database" ? "execute(&state).await" : `coordinator::execute(&state, ${name === "configure_database" ? "options" : "confirmation"}).await`;
+  requireText(compact(source), compact(delegate), `数据库实际命令委托：${name}`);
+  if (databaseGroup?.command_definition_files?.[name] !== `${databaseRoot}/${file}`) throw new Error(`数据库命令定义归属漂移：${name}`);
+  const exit = read(`${databaseRoot}/mod.rs`);
+  for (const token of [`__cmd__${name}`, `__tauri_command_name_${name}`]) requireText(exit, token, `数据库Tauri宏出口：${token}`);
+  if (file.includes("/")) {
+    const groupExit = read(`${databaseRoot}/${file.split("/")[0]}/mod.rs`);
+    for (const token of [`__cmd__${name}`, `__tauri_command_name_${name}`]) requireText(groupExit, token, `数据库子模块宏出口：${token}`);
+  }
+}
+function ordered(source, tokens, label) {
+  const text = compact(source);
+  let previous = -1;
+  for (const token of tokens) {
+    const position = text.indexOf(compact(token));
+    if (position < 0 || position <= previous) throw new Error(`数据库原顺序漂移：${label}/${token}`);
+    previous = position;
+  }
+}
+const configure = read(`${databaseRoot}/configure/coordinator.rs`);
+ordered(configure, ['"connection_attempt_started"', '.connect_database(options.clone())', '"connection_attempt_succeeded"', '.save(&state.config_path)', 'state.service.disconnect_database().await', 'return Err(error);'], "连接/保存失败断开");
+requireText(configure, '"connection_attempt_failed"', "连接失败原日志");
+const disconnect = functionBody(read(`${databaseRoot}/disconnect_database.rs`), "execute");
+ordered(disconnect, ['DesktopConfig::default().save(&state.config_path)?', 'state.service.disconnect_database().await', 'Ok(())'], "先清配置再断开");
+const reset = read(`${databaseRoot}/reset/coordinator.rs`);
+ordered(reset, ['DesktopConfig::load(&state.config_path)?', '.ok_or_else(', '.preflight_database_reset(&options, &confirmation)', '"destructive_reset_started"', '.reset_database(options, confirmation)', 'tokio::task::yield_now().await', 'state.service.ensure_p4_orchestration_worker()', '"destructive_reset_succeeded"'], "强确认/重置/工作器恢复");
+requireText(reset, 'message.starts_with("彻底清空数据库失败：")', "仅原重置阶段错误写critical");
+requireText(reset, '"destructive_reset_failed"', "重置失败日志");
+for (const source of [configure, disconnect, reset]) {
+  requireText(source, "state: &AppState", "保留原AppState服务Arc句柄");
+  if (/sqlx::|PostgresStore::connect|reset_to_pristine\(|static\s/.test(source)) throw new Error("数据库命令协调器越过原服务/状态边界");
+}
+for (const source of [configure, reset]) if ((source.match(/let _\s*=\s*state\.runtime_log\.record\(/g) ?? []).length !== 3) throw new Error("数据库诊断必须保持原三次尽力写入，不得变为业务失败");
+if (!/pub async fn reset_database\(\s*self: &Arc<Self>,/.test(databaseFacade)) throw new Error("重置必须保留原ApplicationService的Arc接收者");
+requireText(read("src-tauri/src/bootstrap/state.rs"), "pub service: Arc<ApplicationService>", "唯一AppState原服务句柄");
+const tests = read(`${databaseRoot}/tests.rs`);
+for (const name of ["configure_parse_failure_keeps_config_and_original_error_events", "configure_logging_failure_does_not_replace_connection_error", "disconnect_clears_saved_metadata_and_credentials_through_original_store", "disconnect_save_failure_preserves_credentials_and_returns_file_error", "reset_missing_or_empty_saved_connection_stops_before_backend_and_logs", "reset_config_errors_preserve_original_strings_without_reset_side_effects", "reset_missing_credential_stops_before_reset_events_and_keeps_metadata", "reset_preflight_parse_failure_keeps_config_without_destructive_events"]) requireText(tests, `fn ${name}(`, `原Tauri unit注册：${name}`);
+requireText(read(`${databaseRoot}/mod.rs`), "#[cfg(test)]\nmod tests;", "数据库原unit target登记");
+requireText(tests, "runtime_log::tests::test_store", "隔离复用原日志fixture，禁止discover污染真实运行目录");
+if (/RuntimeLogStore::discover|set_var\(|set_current_dir\(/.test(tests)) throw new Error("数据库unit不得发现真实日志目录或修改进程环境");
+requireText(read("src-tauri/src/runtime_log.rs"), "#[cfg(test)]\npub(crate) mod tests", "日志fixture只在测试编译中可见");
 
 console.log("数据库编译修复与彻底清空契约通过：记录映射、后端重建、强确认、自动重连和前端状态重置均已锁定。");

@@ -878,3 +878,10 @@ R10期初Application138/Persistence179，期末230/259，原unit累计净增92Ap
 用户2026-10-23“已通过收尾01开始02”，01 DONE，02 Database Commands READY，03～10 BLOCKED，R11 IN_PROGRESS，继续唯一rewrite/r11-tauri-commands。本次仅5份既有文档[skip ci]收尾，源码同上述成功树，不重复同源码全Windows。此前VERIFYING/失败/预期计数保留实施历史；02须自身精确Windows，无R11阶段完成记录。
 
 真实PG/历史保护四项/不可变账本并发回滚/有效XLSX/Windows Full/私有P4P7固定回归及继承model.runs/0041删除风险仍最终封包新库待验；ignored、公开unavailable stub和静态指纹不计这些真实PASS。
+
+
+## R11-02 数据库命令（2026-10-23，VERIFYING）
+
+R11-02 Database Commands已实施 `VERIFYING`，基线f56a1c004cee8018f657b6cdd9fa5389a81dec20（01五文档[skip ci]收尾，源码同自身完整Windows成功e56d21f）。用户2026-10-23“已通过收尾01开始02”，继续唯一rewrite/r11-tauri-commands；01 DONE、02 VERIFYING、03～10 BLOCKED，R11 IN_PROGRESS。 新增8原Tauri unit覆盖真实协调/Config/日志的错误或文件路径，预期Desktop46=38+8，App230/PG259/Gateway112unit+41contract保持，须02自身Windows确认。82/82原只读源码、完整architecture、10Rustfmt1.88、32等价、17破坏拒绝/bytes恢复、保护/171命令/DB静态通过。测试不连接或重置真实数据库，使用原cfg(test)日志fixture隔离临时文件；配置成功后保存失败的补偿、完整强确认/重置/重连/并发等专用库效果不能算本轮已实跑。完整命令、实际清单/兼容和待验见[02记录](modular-rewrite/R11-tauri-commands/R11-02-database-commands.md)。未执行非Windows动态；沿原Windows CI，job启动即停止查询。
+
+真实PG/历史保护四项/不可变账本并发回滚/有效XLSX/Windows Full/私有P4P7固定回归及继承model.runs/0041删除风险仍最终封包新库待验；ignored、公开unavailable stub和静态指纹不能计为这些真实PASS。

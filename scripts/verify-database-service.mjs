@@ -42,7 +42,7 @@ const databaseAdapter = read("crates/application/src/composition/adapters/databa
 const applicationService = read("crates/application/src/service/application_service.rs");
 const researchService = read("crates/application/src/services/research/service.rs");
 const researchArtifactCatalog = read("crates/application/src/use_cases/research/artifact_catalog.rs");
-const tauri = read("src-tauri/src/commands/database.rs");
+const tauri = [read("src-tauri/src/commands/database/reset/command.rs"), read("src-tauri/src/commands/database/reset/coordinator.rs")].join("\n");
 const stateOwnership = JSON.parse(read("architecture/state-ownership.json"));
 const pkg = JSON.parse(read("package.json"));
 

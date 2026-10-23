@@ -591,11 +591,11 @@ fn redact_bearer_tokens(output: &mut String) {
 }
 
 #[cfg(test)]
-mod tests {
+pub(crate) mod tests {
     use super::*;
     use tempfile::tempdir;
 
-    fn test_store(path: PathBuf) -> RuntimeLogStore {
+    pub(crate) fn test_store(path: PathBuf) -> RuntimeLogStore {
         RuntimeLogStore {
             path,
             session_id: "00000000-0000-0000-0000-000000000000".to_string(),

@@ -159,7 +159,7 @@ for (const file of files) {
     assert(!source.includes("gateway_attempt_sink"), `${display} 不得恢复阶段 1 已停用的结构化网关尝试日志适配器`);
     assert(!source.includes("RuntimeGatewayAttemptSink"), `${display} 不得保留无调用方的网关日志 Sink`);
   }
-  if (display === "src-tauri/src/commands/database.rs") {
+  if (display === "src-tauri/src/commands/database/reset/coordinator.rs") {
     assert(!/let\s+Some\(options\)\s*=\s*config\.database\s+else/.test(source), `${display} 的可选数据库配置应使用 ? 提前返回`);
   }
   if (display === "src-tauri/src/openai_profiles.rs") {

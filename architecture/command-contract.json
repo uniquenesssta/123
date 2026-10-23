@@ -220,15 +220,20 @@
   "command_groups": [
     {
       "module": "database",
-      "definition_file": "src-tauri/src/commands/database.rs",
-      "parameter_and_return_signature_file": "src-tauri/src/commands/database.rs",
+      "definition_file": "src-tauri/src/commands/database/mod.rs",
+      "parameter_and_return_signature_file": "src-tauri/src/commands/database/mod.rs",
       "frontend_parameter_and_return_signature_file": "src/api/client.ts",
       "frontend_shared_dto_file": "src/types.ts",
       "commands": [
         "configure_database",
         "disconnect_database",
         "reset_database"
-      ]
+      ],
+      "command_definition_files": {
+        "configure_database": "src-tauri/src/commands/database/configure/command.rs",
+        "disconnect_database": "src-tauri/src/commands/database/disconnect_database.rs",
+        "reset_database": "src-tauri/src/commands/database/reset/command.rs"
+      }
     },
     {
       "module": "platform",
@@ -519,5 +524,5 @@
     }
   ],
   "command_set_sha256": "dfc477a8b0bec95735fdad006349fcea0f367b4ebc85aede1b63a128a55de669",
-  "command_definition_map_sha256": "60bb424a490da2908aacbaee125f19cb7c81f76793f631c56f2d6b765ed78a83"
+  "command_definition_map_sha256": "9202f5f9efc00f12491c4f1a644457935581e87214eac70e766fd568785710a9"
 }

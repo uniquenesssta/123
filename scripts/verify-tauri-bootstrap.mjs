@@ -178,7 +178,7 @@ for (const old of ["workspace", "issues", "logging"]) {
   check(!existsSync(join(root, `src-tauri/src/commands/${old}.rs`)), `旧平台owner未删除：${old}`);
   check(!commands.includes(`mod ${old};`), `旧平台模块仍登记：${old}`);
 }
-check(!read("src-tauri/src/commands/database.rs").includes("fn bootstrap("), "数据库命令仍持有旧bootstrap");
+check(!["mod.rs", "configure/command.rs", "configure/coordinator.rs", "disconnect_database.rs", "reset/command.rs", "reset/coordinator.rs"].some(file => read(`src-tauri/src/commands/database/${file}`).includes("fn bootstrap(")), "数据库命令仍持有旧bootstrap");
 const connection = read(`${platformRoot}/bootstrap/connection.rs`);
 const databaseFacade = read("crates/application/src/services/database/facade.rs");
 check(/pub async fn connect_database\(\s*self: &Arc<Self>,/.test(databaseFacade), "连接恢复必须核对原ApplicationService的Arc接收者");
