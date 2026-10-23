@@ -540,8 +540,8 @@
     },
     {
       "module": "review",
-      "definition_file": "src-tauri/src/commands/review.rs",
-      "parameter_and_return_signature_file": "src-tauri/src/commands/review.rs",
+      "definition_file": "src-tauri/src/commands/review/mod.rs",
+      "parameter_and_return_signature_file": "src-tauri/src/commands/review/mod.rs",
       "frontend_parameter_and_return_signature_file": "src/api/client.ts",
       "frontend_shared_dto_file": "src/types.ts",
       "commands": [
@@ -551,12 +551,20 @@
         "read_match_review",
         "list_ability_candidates",
         "decide_ability_candidate"
-      ]
+      ],
+      "command_definition_files": {
+        "generate_match_review": "src-tauri/src/commands/review/generate_match_review.rs",
+        "list_reviewable_matches": "src-tauri/src/commands/review/list_reviewable_matches.rs",
+        "list_match_reviews": "src-tauri/src/commands/review/list_match_reviews.rs",
+        "read_match_review": "src-tauri/src/commands/review/read_match_review.rs",
+        "list_ability_candidates": "src-tauri/src/commands/review/abilities/list_ability_candidates.rs",
+        "decide_ability_candidate": "src-tauri/src/commands/review/abilities/decide_ability_candidate.rs"
+      }
     },
     {
       "module": "postmatch",
-      "definition_file": "src-tauri/src/commands/postmatch.rs",
-      "parameter_and_return_signature_file": "src-tauri/src/commands/postmatch.rs",
+      "definition_file": "src-tauri/src/commands/postmatch/mod.rs",
+      "parameter_and_return_signature_file": "src-tauri/src/commands/postmatch/mod.rs",
       "frontend_parameter_and_return_signature_file": "src/api/client.ts",
       "frontend_shared_dto_file": "src/types.ts",
       "commands": [
@@ -574,12 +582,28 @@
         "commit_match_review_package_facts",
         "generate_match_review_from_package",
         "commit_match_review_package"
-      ]
+      ],
+      "command_definition_files": {
+        "postmatch_settlement_readiness": "src-tauri/src/commands/postmatch/postmatch_settlement_readiness.rs",
+        "settle_postmatch_review": "src-tauri/src/commands/postmatch/settle_postmatch_review.rs",
+        "list_postmatch_settlements": "src-tauri/src/commands/postmatch/list_postmatch_settlements.rs",
+        "list_evidence_scoring_items": "src-tauri/src/commands/postmatch/evidence/list_evidence_scoring_items.rs",
+        "decide_evidence_scoring_item": "src-tauri/src/commands/postmatch/evidence/decide_evidence_scoring_item.rs",
+        "refresh_postmatch_monitoring": "src-tauri/src/commands/postmatch/monitoring/refresh_postmatch_monitoring.rs",
+        "postmatch_overview": "src-tauri/src/commands/postmatch/monitoring/postmatch_overview.rs",
+        "export_match_review_package": "src-tauri/src/commands/postmatch/package/export_match_review_package.rs",
+        "preview_match_review_package": "src-tauri/src/commands/postmatch/package/preview_match_review_package.rs",
+        "read_match_review_package_workflow": "src-tauri/src/commands/postmatch/package/read_match_review_package_workflow.rs",
+        "confirm_match_review_package": "src-tauri/src/commands/postmatch/package/confirm_match_review_package.rs",
+        "commit_match_review_package_facts": "src-tauri/src/commands/postmatch/package/commit_match_review_package_facts.rs",
+        "generate_match_review_from_package": "src-tauri/src/commands/postmatch/package/generate_match_review_from_package.rs",
+        "commit_match_review_package": "src-tauri/src/commands/postmatch/package/commit_match_review_package.rs"
+      }
     },
     {
       "module": "analytics",
-      "definition_file": "src-tauri/src/commands/analytics.rs",
-      "parameter_and_return_signature_file": "src-tauri/src/commands/analytics.rs",
+      "definition_file": "src-tauri/src/commands/analytics/mod.rs",
+      "parameter_and_return_signature_file": "src-tauri/src/commands/analytics/mod.rs",
       "frontend_parameter_and_return_signature_file": "src/api/client.ts",
       "frontend_shared_dto_file": "src/types.ts",
       "commands": [
@@ -604,7 +628,30 @@
         "promote_parameter_candidate",
         "rollback_parameter_candidate",
         "list_parameter_promotion_decisions"
-      ]
+      ],
+      "command_definition_files": {
+        "analytics_overview": "src-tauri/src/commands/analytics/analytics_overview.rs",
+        "enqueue_analysis_job": "src-tauri/src/commands/analytics/jobs/enqueue_analysis_job.rs",
+        "list_background_jobs": "src-tauri/src/commands/analytics/jobs/list_background_jobs.rs",
+        "cancel_background_job": "src-tauri/src/commands/analytics/jobs/cancel_background_job.rs",
+        "retry_background_job": "src-tauri/src/commands/analytics/jobs/retry_background_job.rs",
+        "export_ai_analysis_package": "src-tauri/src/commands/analytics/ai_package/export_ai_analysis_package.rs",
+        "preview_ai_analysis_response": "src-tauri/src/commands/analytics/ai_package/preview_ai_analysis_response.rs",
+        "import_ai_analysis_response": "src-tauri/src/commands/analytics/ai_package/import_ai_analysis_response.rs",
+        "list_ai_analysis_suggestions": "src-tauri/src/commands/analytics/ai_package/list_ai_analysis_suggestions.rs",
+        "decide_ai_analysis_suggestion": "src-tauri/src/commands/analytics/ai_package/decide_ai_analysis_suggestion.rs",
+        "decide_data_quality_finding": "src-tauri/src/commands/analytics/decide_data_quality_finding.rs",
+        "export_ai_analysis_response_template": "src-tauri/src/commands/analytics/ai_package/export_ai_analysis_response_template.rs",
+        "generate_parameter_tuning_candidate": "src-tauri/src/commands/analytics/parameter_lifecycle/generate_parameter_tuning_candidate.rs",
+        "list_parameter_tuning_candidates": "src-tauri/src/commands/analytics/parameter_lifecycle/list_parameter_tuning_candidates.rs",
+        "decide_parameter_tuning_candidate": "src-tauri/src/commands/analytics/parameter_lifecycle/decide_parameter_tuning_candidate.rs",
+        "parameter_lifecycle_readiness": "src-tauri/src/commands/analytics/parameter_lifecycle/parameter_lifecycle_readiness.rs",
+        "run_parameter_shadow_validation": "src-tauri/src/commands/analytics/parameter_lifecycle/run_parameter_shadow_validation.rs",
+        "list_parameter_shadow_validations": "src-tauri/src/commands/analytics/parameter_lifecycle/list_parameter_shadow_validations.rs",
+        "promote_parameter_candidate": "src-tauri/src/commands/analytics/parameter_lifecycle/promote_parameter_candidate.rs",
+        "rollback_parameter_candidate": "src-tauri/src/commands/analytics/parameter_lifecycle/rollback_parameter_candidate.rs",
+        "list_parameter_promotion_decisions": "src-tauri/src/commands/analytics/parameter_lifecycle/list_parameter_promotion_decisions.rs"
+      }
     },
     {
       "module": "release_acceptance",
@@ -636,5 +683,5 @@
     }
   ],
   "command_set_sha256": "dfc477a8b0bec95735fdad006349fcea0f367b4ebc85aede1b63a128a55de669",
-  "command_definition_map_sha256": "fe7b8d78d2daf40329c3d007c278dde5a8086e63a5b68387d0dcf919e3f53ca2"
+  "command_definition_map_sha256": "e4271c64e385f45e10f765d20af92a8a0d572dd698741a40cb9b7473fe403e05"
 }

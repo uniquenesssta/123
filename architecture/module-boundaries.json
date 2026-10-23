@@ -344,7 +344,7 @@
     "registration_owner": "src-tauri/src/bootstrap/command_registry.rs",
     "frontend_owner": "src/api/client.ts",
     "groups": {
-      "analytics": "src-tauri/src/commands/analytics.rs",
+      "analytics": "src-tauri/src/commands/analytics/mod.rs",
       "api_workspace": "src-tauri/src/commands/api_workspace.rs",
       "catalog": "src-tauri/src/commands/catalog/mod.rs",
       "competition": "src-tauri/src/commands/competition/mod.rs",
@@ -352,10 +352,10 @@
       "exchange": "src-tauri/src/commands/exchange/mod.rs",
       "openai": "src-tauri/src/commands/openai.rs",
       "platform": "src-tauri/src/commands/platform/mod.rs",
-      "postmatch": "src-tauri/src/commands/postmatch.rs",
+      "postmatch": "src-tauri/src/commands/postmatch/mod.rs",
       "prediction": "src-tauri/src/commands/prediction/mod.rs",
       "release_acceptance": "src-tauri/src/commands/release_acceptance.rs",
-      "review": "src-tauri/src/commands/review.rs",
+      "review": "src-tauri/src/commands/review/mod.rs",
       "lineups": "src-tauri/src/commands/lineups/mod.rs"
     },
     "rules": [

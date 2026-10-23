@@ -65,8 +65,11 @@ const service = fs.readFileSync(path.join(root, "crates/application/src/services
 const port = fs.readFileSync(path.join(root, "crates/application/src/ports/review/mod.rs"), "utf8");
 const packagePort = fs.readFileSync(path.join(root, "crates/application/src/ports/review/package.rs"), "utf8");
 const adapter = fs.readFileSync(path.join(root, "crates/application/src/composition/adapters/review.rs"), "utf8");
-const tauriReview = fs.readFileSync(path.join(root, "src-tauri/src/commands/review.rs"), "utf8");
-const tauriPostmatch = fs.readFileSync(path.join(root, "src-tauri/src/commands/postmatch.rs"), "utf8");
+// R11-07 definition readers BEGIN
+const tauriCommandGroup = module => [...new Set(Object.values(JSON.parse(fs.readFileSync(path.join(root, "architecture/command-contract.json"), "utf8")).command_groups.find(group => group.module === module).command_definition_files))].map(file => fs.readFileSync(path.join(root, file), "utf8")).join("\n");
+// R11-07 definition readers END
+const tauriReview = tauriCommandGroup("review");
+const tauriPostmatch = tauriCommandGroup("postmatch");
 const coreMethods = [
   "generate_match_review",
   "list_reviewable_matches",
@@ -197,6 +200,200 @@ for (const token of ["pub async fn list_ability_candidates(", "pub(super) async 
 for (const token of ["status: candidate_status_from_db(&status)?", "\"pending\" => Ok(AbilityCandidateStatus::Pending)", "\"accepted\" => Ok(AbilityCandidateStatus::Accepted)", "\"rejected\" => Ok(AbilityCandidateStatus::Rejected)", "\"superseded\" => Ok(AbilityCandidateStatus::Superseded)", "未知候选状态：{other}"]) if (!candidate["mapping.rs"].includes(token)) failures.push(`原候选行映射缺少 ${token}`);
 if (!pgReview.includes(".list_ability_candidates(None, 1000, Some(review_id))")) failures.push("复盘详情未复用唯一候选读取入口");
 for (const name of ["pending_guard_rejects_every_decided_status", "pending_guard_preserves_exact_status_and_error_text", "decision_actor_defaults_only_for_missing_or_blank_identity", "decision_actor_trims_unicode_without_changing_identity", "current_projection_accepts_missing_pair_and_inclusive_tolerance", "current_projection_rejects_stale_missing_and_nonfinite_values", "candidate_status_mapping_preserves_four_domain_states", "candidate_status_mapping_rejects_unknown_without_normalization"]) if (!candidate["tests.rs"].includes(`fn ${name}(`)) failures.push(`缺少原PG unit target候选边界测试 ${name}`);
+
+// R11-07 transport contract BEGIN
+{
+  const read = relative => fs.readFileSync(path.join(root, relative), "utf8").replaceAll("\r\n", "\n");
+  const check = (ok, message) => { if (!ok) failures.push(message); };
+  const domains = {
+  "review": {
+    "": [
+      "generate_match_review",
+      "list_reviewable_matches",
+      "list_match_reviews",
+      "read_match_review"
+    ],
+    "abilities": [
+      "list_ability_candidates",
+      "decide_ability_candidate"
+    ]
+  },
+  "postmatch": {
+    "": [
+      "postmatch_settlement_readiness",
+      "settle_postmatch_review",
+      "list_postmatch_settlements"
+    ],
+    "evidence": [
+      "list_evidence_scoring_items",
+      "decide_evidence_scoring_item"
+    ],
+    "monitoring": [
+      "refresh_postmatch_monitoring",
+      "postmatch_overview"
+    ],
+    "package": [
+      "export_match_review_package",
+      "preview_match_review_package",
+      "read_match_review_package_workflow",
+      "confirm_match_review_package",
+      "commit_match_review_package_facts",
+      "generate_match_review_from_package",
+      "commit_match_review_package"
+    ]
+  }
+};
+  const files = {
+  "generate_match_review": "src-tauri/src/commands/review/generate_match_review.rs",
+  "list_reviewable_matches": "src-tauri/src/commands/review/list_reviewable_matches.rs",
+  "list_match_reviews": "src-tauri/src/commands/review/list_match_reviews.rs",
+  "read_match_review": "src-tauri/src/commands/review/read_match_review.rs",
+  "list_ability_candidates": "src-tauri/src/commands/review/abilities/list_ability_candidates.rs",
+  "decide_ability_candidate": "src-tauri/src/commands/review/abilities/decide_ability_candidate.rs",
+  "postmatch_settlement_readiness": "src-tauri/src/commands/postmatch/postmatch_settlement_readiness.rs",
+  "settle_postmatch_review": "src-tauri/src/commands/postmatch/settle_postmatch_review.rs",
+  "list_postmatch_settlements": "src-tauri/src/commands/postmatch/list_postmatch_settlements.rs",
+  "list_evidence_scoring_items": "src-tauri/src/commands/postmatch/evidence/list_evidence_scoring_items.rs",
+  "decide_evidence_scoring_item": "src-tauri/src/commands/postmatch/evidence/decide_evidence_scoring_item.rs",
+  "refresh_postmatch_monitoring": "src-tauri/src/commands/postmatch/monitoring/refresh_postmatch_monitoring.rs",
+  "postmatch_overview": "src-tauri/src/commands/postmatch/monitoring/postmatch_overview.rs",
+  "export_match_review_package": "src-tauri/src/commands/postmatch/package/export_match_review_package.rs",
+  "preview_match_review_package": "src-tauri/src/commands/postmatch/package/preview_match_review_package.rs",
+  "read_match_review_package_workflow": "src-tauri/src/commands/postmatch/package/read_match_review_package_workflow.rs",
+  "confirm_match_review_package": "src-tauri/src/commands/postmatch/package/confirm_match_review_package.rs",
+  "commit_match_review_package_facts": "src-tauri/src/commands/postmatch/package/commit_match_review_package_facts.rs",
+  "generate_match_review_from_package": "src-tauri/src/commands/postmatch/package/generate_match_review_from_package.rs",
+  "commit_match_review_package": "src-tauri/src/commands/postmatch/package/commit_match_review_package.rs"
+};
+  const signatures = {
+  "generate_match_review": "pub async fn generate_match_review(\n    state: State<'_, AppState>,\n    draft: football_domain::MatchReviewDraft,\n) -> Result<football_domain::MatchReviewDetail, String>",
+  "list_reviewable_matches": "pub async fn list_reviewable_matches(\n    state: State<'_, AppState>,\n    limit: u32,\n) -> Result<Vec<football_domain::ReviewableMatch>, String>",
+  "list_match_reviews": "pub async fn list_match_reviews(\n    state: State<'_, AppState>,\n    limit: u32,\n) -> Result<Vec<football_domain::MatchReviewSummary>, String>",
+  "read_match_review": "pub async fn read_match_review(\n    state: State<'_, AppState>,\n    review_id: String,\n) -> Result<football_domain::MatchReviewDetail, String>",
+  "list_ability_candidates": "pub async fn list_ability_candidates(\n    state: State<'_, AppState>,\n    status: Option<football_domain::AbilityCandidateStatus>,\n    limit: u32,\n    match_review_id: Option<String>,\n) -> Result<Vec<football_domain::AbilityUpdateCandidateRecord>, String>",
+  "decide_ability_candidate": "pub async fn decide_ability_candidate(\n    state: State<'_, AppState>,\n    draft: football_domain::AbilityCandidateDecisionDraft,\n) -> Result<football_domain::AbilityUpdateCandidateRecord, String>",
+  "postmatch_settlement_readiness": "pub async fn postmatch_settlement_readiness(\n    state: State<'_, AppState>,\n    match_review_id: String,\n) -> Result<football_domain::PostmatchSettlementReadiness, String>",
+  "settle_postmatch_review": "pub async fn settle_postmatch_review(\n    state: State<'_, AppState>,\n    draft: football_domain::PostmatchSettlementDraft,\n) -> Result<football_domain::PostmatchSettlementRecord, String>",
+  "list_postmatch_settlements": "pub async fn list_postmatch_settlements(\n    state: State<'_, AppState>,\n    limit: u32,\n) -> Result<Vec<football_domain::PostmatchSettlementRecord>, String>",
+  "list_evidence_scoring_items": "pub async fn list_evidence_scoring_items(\n    state: State<'_, AppState>,\n    status: Option<String>,\n    limit: u32,\n) -> Result<Vec<football_domain::EvidenceScoringItemRecord>, String>",
+  "decide_evidence_scoring_item": "pub async fn decide_evidence_scoring_item(\n    state: State<'_, AppState>,\n    draft: football_domain::EvidenceScoringDecisionDraft,\n) -> Result<football_domain::EvidenceScoringItemRecord, String>",
+  "refresh_postmatch_monitoring": "pub async fn refresh_postmatch_monitoring(\n    state: State<'_, AppState>,\n    request: football_domain::PostmatchMonitoringRequest,\n) -> Result<football_domain::PostmatchOverview, String>",
+  "postmatch_overview": "pub async fn postmatch_overview(\n    state: State<'_, AppState>,\n    limit: u32,\n) -> Result<football_domain::PostmatchOverview, String>",
+  "export_match_review_package": "pub async fn export_match_review_package(\n    state: State<'_, AppState>,\n    output_path: String,\n    match_id: String,\n) -> Result<football_domain::MatchReviewPackageSummary, String>",
+  "preview_match_review_package": "pub async fn preview_match_review_package(\n    state: State<'_, AppState>,\n    input_path: String,\n    expected_match_id: Option<String>,\n) -> Result<football_domain::MatchReviewPackagePreview, String>",
+  "read_match_review_package_workflow": "pub async fn read_match_review_package_workflow(\n    state: State<'_, AppState>,\n    match_id: String,\n) -> Result<Option<football_domain::MatchReviewPackageWorkflowRecord>, String>",
+  "confirm_match_review_package": "pub async fn confirm_match_review_package(\n    state: State<'_, AppState>,\n    request: football_domain::MatchReviewPackageConfirmationRequest,\n) -> Result<football_domain::MatchReviewPackageWorkflowRecord, String>",
+  "commit_match_review_package_facts": "pub async fn commit_match_review_package_facts(\n    state: State<'_, AppState>,\n    package_id: String,\n) -> Result<football_domain::MatchReviewPackageFactsCommitResult, String>",
+  "generate_match_review_from_package": "pub async fn generate_match_review_from_package(\n    state: State<'_, AppState>,\n    package_id: String,\n) -> Result<football_domain::MatchReviewPackageReviewResult, String>",
+  "commit_match_review_package": "pub async fn commit_match_review_package(\n    state: State<'_, AppState>,\n    request: football_domain::MatchReviewPackageCommitRequest,\n) -> Result<football_domain::MatchReviewPackageCommitResult, String>"
+};
+  const validations = {
+  "generate_match_review": "",
+  "list_reviewable_matches": "",
+  "list_match_reviews": "",
+  "read_match_review": "let review_id = parse_uuid(&review_id, \"复盘 ID\")?;",
+  "list_ability_candidates": "let match_review_id = match_review_id\n        .map(|value| parse_uuid(&value, \"复盘 ID\"))\n        .transpose()?;",
+  "decide_ability_candidate": "",
+  "postmatch_settlement_readiness": "",
+  "settle_postmatch_review": "",
+  "list_postmatch_settlements": "",
+  "list_evidence_scoring_items": "",
+  "decide_evidence_scoring_item": "",
+  "refresh_postmatch_monitoring": "",
+  "postmatch_overview": "",
+  "export_match_review_package": "",
+  "preview_match_review_package": "let expected_match_id = expected_match_id\n        .as_deref()\n        .map(|value| parse_uuid(value, \"当前比赛 ID\"))\n        .transpose()?;",
+  "read_match_review_package_workflow": "",
+  "confirm_match_review_package": "",
+  "commit_match_review_package_facts": "",
+  "generate_match_review_from_package": "",
+  "commit_match_review_package": ""
+};
+  const calls = {
+  "generate_match_review": "generate_match_review(draft)",
+  "list_reviewable_matches": "list_reviewable_matches(limit)",
+  "list_match_reviews": "list_match_reviews(limit)",
+  "read_match_review": "read_match_review(review_id)",
+  "list_ability_candidates": "list_ability_candidates(status, limit, match_review_id)",
+  "decide_ability_candidate": "decide_ability_candidate(draft)",
+  "postmatch_settlement_readiness": "postmatch_settlement_readiness(parse_uuid(&match_review_id, \"复盘 ID\")?)",
+  "settle_postmatch_review": "settle_postmatch_review(draft)",
+  "list_postmatch_settlements": "list_postmatch_settlements(limit)",
+  "list_evidence_scoring_items": "list_evidence_scoring_items(status, limit)",
+  "decide_evidence_scoring_item": "decide_evidence_scoring_item(draft)",
+  "refresh_postmatch_monitoring": "refresh_postmatch_monitoring(request)",
+  "postmatch_overview": "postmatch_overview(limit)",
+  "export_match_review_package": "export_match_review_package(output_path, parse_uuid(&match_id, \"比赛 ID\")?)",
+  "preview_match_review_package": "preview_match_review_package(input_path, expected_match_id)",
+  "read_match_review_package_workflow": "read_match_review_package_workflow(parse_uuid(&match_id, \"比赛 ID\")?)",
+  "confirm_match_review_package": "confirm_match_review_package(request)",
+  "commit_match_review_package_facts": "commit_match_review_package_facts(parse_uuid(&package_id, \"资料包 ID\")?)",
+  "generate_match_review_from_package": "generate_match_review_from_package(parse_uuid(&package_id, \"资料包 ID\")?)",
+  "commit_match_review_package": "commit_match_review_package(request)"
+};
+  const isAsync = {
+  "generate_match_review": true,
+  "list_reviewable_matches": true,
+  "list_match_reviews": true,
+  "read_match_review": true,
+  "list_ability_candidates": true,
+  "decide_ability_candidate": true,
+  "postmatch_settlement_readiness": true,
+  "settle_postmatch_review": true,
+  "list_postmatch_settlements": true,
+  "list_evidence_scoring_items": true,
+  "decide_evidence_scoring_item": true,
+  "refresh_postmatch_monitoring": true,
+  "postmatch_overview": true,
+  "export_match_review_package": true,
+  "preview_match_review_package": true,
+  "read_match_review_package_workflow": true,
+  "confirm_match_review_package": true,
+  "commit_match_review_package_facts": true,
+  "generate_match_review_from_package": true,
+  "commit_match_review_package": true
+};
+  const contract = JSON.parse(read("architecture/command-contract.json"));
+  const boundaries = JSON.parse(read("architecture/module-boundaries.json")).tauri_commands;
+  const tokens = source => (source.match(/"(?:\\.|[^"\\])*"|[A-Za-z_][A-Za-z_0-9]*|[^\s]/g) ?? []).join("\0");
+  const signatureTokens = source => tokens(source.replace(/,\s*\)/g, ")"));
+  const moduleTokens = source => tokens(source.replace(/,\s*}/g, "}"));
+  const exports = (module, names) => `pub use ${module}::{${names.flatMap(name => [`__cmd__${name}`, `__tauri_command_name_${name}`, name]).sort().join(",")}};`;
+  const commandModules = read("src-tauri/src/commands.rs");
+  for (const [domain, groups] of Object.entries(domains)) {
+    const commandRoot = `src-tauri/src/commands/${domain}`;
+    const group = contract.command_groups.find(item => item.module === domain);
+    const rootModules = Object.fromEntries([...groups[""].map(name => [name, [name]]), ...Object.entries(groups).filter(([name]) => name !== "")]);
+    const rootNames = Object.keys(rootModules).sort();
+    check(moduleTokens(read(`${commandRoot}/mod.rs`)) === moduleTokens([...rootNames.map(name => `mod ${name};`), ...rootNames.map(name => exports(name, rootModules[name]))].join("\n")), `R11-07 根出口必须只显式登记原命令与双宏：${domain}`);
+    for (const [name, commands] of Object.entries(groups)) {
+      if (!name) continue;
+      const ordered = [...commands].sort();
+      check(moduleTokens(read(`${commandRoot}/${name}/mod.rs`)) === moduleTokens([...ordered.map(command => `mod ${command};`), ...ordered.map(command => exports(command, [command]))].join("\n")), `R11-07 子出口夹带逻辑或缺失命令/宏：${domain}/${name}`);
+    }
+    check(group?.definition_file === `${commandRoot}/mod.rs` && group?.parameter_and_return_signature_file === `${commandRoot}/mod.rs` && boundaries.groups[domain] === `${commandRoot}/mod.rs`, `R11-07 正式清单必须接通唯一目录：${domain}`);
+    check(group?.commands.length === Object.values(groups).flat().length, `R11-07 原命令数量漂移：${domain}`);
+    check(commandModules.includes(`mod ${domain};`) && commandModules.includes(`pub use ${domain}::*;`), `R11-07 原根登记丢失：${domain}`);
+    check(!fs.existsSync(path.join(root, `${commandRoot}.rs`)), `R11-07 旧混合owner仍存在：${domain}`);
+    for (const name of Object.values(groups).flat()) {
+      const file = files[name];
+      const source = read(file);
+      const signature = source.match(new RegExp(`pub (?:async )?fn ${name}\\([\\s\\S]*?\\{`))?.[0].slice(0, -1) ?? "";
+      check(signatureTokens(signature) === signatureTokens(signatures[name]), `R11-07 原参数/返回/async签名漂移：${name}`);
+      check(group?.command_definition_files?.[name] === file, `R11-07 定义owner漂移：${name}`);
+      check((source.match(/#\[tauri::command\]/g) ?? []).length === 1 && source.includes("bootstrap::AppState"), `R11-07 必须借用原State且每文件唯一命令：${name}`);
+      const body = source.slice(source.indexOf("{", source.indexOf(`fn ${name}`)) + 1, source.lastIndexOf("}"));
+      const expected = name === "list_background_jobs"
+        ? "let jobs = state.service.list_background_jobs(limit).await.map_err(|error| error.to_string())?; record_failed_background_jobs(&state.issue_log, &jobs); Ok(jobs)"
+        : `${validations[name]} state.service.${calls[name]}${isAsync[name] ? ".await" : ""}.map_err(|error| error.to_string())`;
+      check(tokens(body) === tokens(expected), `R11-07 薄传输必须保留原UUID/参数/顺序/错误/日志投影：${name}`);
+      if (expected.includes("parse_uuid")) check(source.includes("commands::parse_uuid"), `R11-07 UUID校验必须沿原唯一helper：${name}`);
+      if (name === "list_background_jobs") check(source.includes("use crate::commands::record_failed_background_jobs;"), "R11-07 后台任务必须沿原共享失败投影owner，不能新增日志实现或丢失问题投影");
+      for (const forbidden of ["sqlx::", "football_persistence_postgres", "PostgresStore", "PgPool", "std::fs", "std::io", "tokio::spawn", "ApplicationService::new", "Mutex<", "static ", "macro_rules!", ".unwrap()", ".expect("]) check(!source.includes(forbidden), `R11-07 命令越过原业务/状态/文件/worker边界：${name}/${forbidden}`);
+    }
+  }
+}
+// R11-07 transport contract END
 
 if (failures.length) {
   console.error("Review Service 验证失败：\n- " + failures.join("\n- "));

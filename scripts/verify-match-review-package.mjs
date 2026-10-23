@@ -48,7 +48,7 @@ const forceDeletePersistence = [
   read("crates/persistence-postgres/src/adapters/catalog/deletion/force_delete/execute.rs"),
 ].join("\n");
 const migration = read("crates/persistence-postgres/migrations/0040_match_review_package_workflow.sql");
-const commands = read("src-tauri/src/commands/postmatch.rs");
+const commands = [...new Set(Object.values(JSON.parse(read("architecture/command-contract.json")).command_groups.find(group => group.module === "postmatch").command_definition_files))].map(read).join("\n");
 const commandRegistry = read("src-tauri/src/bootstrap/command_registry.rs");
 const main = read("src/main.ts");
 const page = read("src/pages/review.ts");

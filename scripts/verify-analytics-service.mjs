@@ -440,6 +440,200 @@ check(
 );
 check(frontendVerifier.includes('"verify-analytics-service.mjs"'), "前端聚合验证未接入 Analytics Service");
 
+// R11-07 transport contract BEGIN
+{
+  const read = relative => fs.readFileSync(path.join(root, relative), "utf8").replaceAll("\r\n", "\n");
+  const check = (ok, message) => { if (!ok) failures.push(message); };
+  const domains = {
+  "analytics": {
+    "": [
+      "analytics_overview",
+      "decide_data_quality_finding"
+    ],
+    "jobs": [
+      "enqueue_analysis_job",
+      "list_background_jobs",
+      "cancel_background_job",
+      "retry_background_job"
+    ],
+    "ai_package": [
+      "export_ai_analysis_package",
+      "preview_ai_analysis_response",
+      "import_ai_analysis_response",
+      "list_ai_analysis_suggestions",
+      "decide_ai_analysis_suggestion",
+      "export_ai_analysis_response_template"
+    ],
+    "parameter_lifecycle": [
+      "generate_parameter_tuning_candidate",
+      "list_parameter_tuning_candidates",
+      "decide_parameter_tuning_candidate",
+      "parameter_lifecycle_readiness",
+      "run_parameter_shadow_validation",
+      "list_parameter_shadow_validations",
+      "promote_parameter_candidate",
+      "rollback_parameter_candidate",
+      "list_parameter_promotion_decisions"
+    ]
+  }
+};
+  const files = {
+  "analytics_overview": "src-tauri/src/commands/analytics/analytics_overview.rs",
+  "decide_data_quality_finding": "src-tauri/src/commands/analytics/decide_data_quality_finding.rs",
+  "enqueue_analysis_job": "src-tauri/src/commands/analytics/jobs/enqueue_analysis_job.rs",
+  "list_background_jobs": "src-tauri/src/commands/analytics/jobs/list_background_jobs.rs",
+  "cancel_background_job": "src-tauri/src/commands/analytics/jobs/cancel_background_job.rs",
+  "retry_background_job": "src-tauri/src/commands/analytics/jobs/retry_background_job.rs",
+  "export_ai_analysis_package": "src-tauri/src/commands/analytics/ai_package/export_ai_analysis_package.rs",
+  "preview_ai_analysis_response": "src-tauri/src/commands/analytics/ai_package/preview_ai_analysis_response.rs",
+  "import_ai_analysis_response": "src-tauri/src/commands/analytics/ai_package/import_ai_analysis_response.rs",
+  "list_ai_analysis_suggestions": "src-tauri/src/commands/analytics/ai_package/list_ai_analysis_suggestions.rs",
+  "decide_ai_analysis_suggestion": "src-tauri/src/commands/analytics/ai_package/decide_ai_analysis_suggestion.rs",
+  "export_ai_analysis_response_template": "src-tauri/src/commands/analytics/ai_package/export_ai_analysis_response_template.rs",
+  "generate_parameter_tuning_candidate": "src-tauri/src/commands/analytics/parameter_lifecycle/generate_parameter_tuning_candidate.rs",
+  "list_parameter_tuning_candidates": "src-tauri/src/commands/analytics/parameter_lifecycle/list_parameter_tuning_candidates.rs",
+  "decide_parameter_tuning_candidate": "src-tauri/src/commands/analytics/parameter_lifecycle/decide_parameter_tuning_candidate.rs",
+  "parameter_lifecycle_readiness": "src-tauri/src/commands/analytics/parameter_lifecycle/parameter_lifecycle_readiness.rs",
+  "run_parameter_shadow_validation": "src-tauri/src/commands/analytics/parameter_lifecycle/run_parameter_shadow_validation.rs",
+  "list_parameter_shadow_validations": "src-tauri/src/commands/analytics/parameter_lifecycle/list_parameter_shadow_validations.rs",
+  "promote_parameter_candidate": "src-tauri/src/commands/analytics/parameter_lifecycle/promote_parameter_candidate.rs",
+  "rollback_parameter_candidate": "src-tauri/src/commands/analytics/parameter_lifecycle/rollback_parameter_candidate.rs",
+  "list_parameter_promotion_decisions": "src-tauri/src/commands/analytics/parameter_lifecycle/list_parameter_promotion_decisions.rs"
+};
+  const signatures = {
+  "analytics_overview": "pub async fn analytics_overview(\n    state: State<'_, AppState>,\n) -> Result<football_domain::AnalyticsOverview, String>",
+  "decide_data_quality_finding": "pub async fn decide_data_quality_finding(\n    state: State<'_, AppState>,\n    draft: football_domain::DataQualityDecisionDraft,\n) -> Result<football_domain::DataQualityFinding, String>",
+  "enqueue_analysis_job": "pub async fn enqueue_analysis_job(\n    state: State<'_, AppState>,\n    draft: football_domain::EnqueueJobDraft,\n) -> Result<football_domain::BackgroundJob, String>",
+  "list_background_jobs": "pub async fn list_background_jobs(\n    state: State<'_, AppState>,\n    limit: u32,\n) -> Result<Vec<football_domain::BackgroundJob>, String>",
+  "cancel_background_job": "pub async fn cancel_background_job(\n    state: State<'_, AppState>,\n    job_id: String,\n) -> Result<football_domain::BackgroundJob, String>",
+  "retry_background_job": "pub async fn retry_background_job(\n    state: State<'_, AppState>,\n    job_id: String,\n) -> Result<football_domain::BackgroundJob, String>",
+  "export_ai_analysis_package": "pub async fn export_ai_analysis_package(\n    state: State<'_, AppState>,\n    output_path: String,\n) -> Result<football_domain::AiAnalysisPackageSummary, String>",
+  "preview_ai_analysis_response": "pub fn preview_ai_analysis_response(\n    state: State<'_, AppState>,\n    input_path: String,\n) -> Result<football_domain::AiAnalysisResponsePreview, String>",
+  "import_ai_analysis_response": "pub async fn import_ai_analysis_response(\n    state: State<'_, AppState>,\n    input_path: String,\n) -> Result<Vec<football_domain::AiAnalysisSuggestionRecord>, String>",
+  "list_ai_analysis_suggestions": "pub async fn list_ai_analysis_suggestions(\n    state: State<'_, AppState>,\n    status: Option<String>,\n    limit: u32,\n) -> Result<Vec<football_domain::AiAnalysisSuggestionRecord>, String>",
+  "decide_ai_analysis_suggestion": "pub async fn decide_ai_analysis_suggestion(\n    state: State<'_, AppState>,\n    draft: football_domain::AiSuggestionDecisionDraft,\n) -> Result<football_domain::AiAnalysisSuggestionRecord, String>",
+  "export_ai_analysis_response_template": "pub fn export_ai_analysis_response_template(\n    state: State<'_, AppState>,\n    output_path: String,\n    source_package_id: Option<String>,\n) -> Result<String, String>",
+  "generate_parameter_tuning_candidate": "pub async fn generate_parameter_tuning_candidate(\n    state: State<'_, AppState>,\n    draft: football_domain::ParameterTuningDraft,\n) -> Result<football_domain::ParameterTuningCandidateRecord, String>",
+  "list_parameter_tuning_candidates": "pub async fn list_parameter_tuning_candidates(\n    state: State<'_, AppState>,\n    limit: u32,\n) -> Result<Vec<football_domain::ParameterTuningCandidateRecord>, String>",
+  "decide_parameter_tuning_candidate": "pub async fn decide_parameter_tuning_candidate(\n    state: State<'_, AppState>,\n    draft: football_domain::ParameterTuningDecisionDraft,\n) -> Result<football_domain::ParameterTuningCandidateRecord, String>",
+  "parameter_lifecycle_readiness": "pub async fn parameter_lifecycle_readiness(\n    state: State<'_, AppState>,\n    request: football_domain::ParameterLifecycleReadinessRequest,\n) -> Result<football_domain::ParameterLifecycleReadiness, String>",
+  "run_parameter_shadow_validation": "pub async fn run_parameter_shadow_validation(\n    state: State<'_, AppState>,\n    request: football_domain::ParameterShadowValidationRequest,\n) -> Result<football_domain::ParameterShadowValidationRecord, String>",
+  "list_parameter_shadow_validations": "pub async fn list_parameter_shadow_validations(\n    state: State<'_, AppState>,\n    candidate_id: String,\n) -> Result<Vec<football_domain::ParameterShadowValidationRecord>, String>",
+  "promote_parameter_candidate": "pub async fn promote_parameter_candidate(\n    state: State<'_, AppState>,\n    request: football_domain::ParameterPromotionRequest,\n) -> Result<football_domain::ParameterPromotionDecisionRecord, String>",
+  "rollback_parameter_candidate": "pub async fn rollback_parameter_candidate(\n    state: State<'_, AppState>,\n    request: football_domain::ParameterRollbackRequest,\n) -> Result<football_domain::ParameterPromotionDecisionRecord, String>",
+  "list_parameter_promotion_decisions": "pub async fn list_parameter_promotion_decisions(\n    state: State<'_, AppState>,\n    candidate_id: String,\n) -> Result<Vec<football_domain::ParameterPromotionDecisionRecord>, String>"
+};
+  const validations = {
+  "analytics_overview": "",
+  "decide_data_quality_finding": "",
+  "enqueue_analysis_job": "",
+  "list_background_jobs": "let jobs =",
+  "cancel_background_job": "let job_id = parse_uuid(&job_id, \"任务 ID\")?;",
+  "retry_background_job": "let job_id = parse_uuid(&job_id, \"任务 ID\")?;",
+  "export_ai_analysis_package": "",
+  "preview_ai_analysis_response": "",
+  "import_ai_analysis_response": "",
+  "list_ai_analysis_suggestions": "",
+  "decide_ai_analysis_suggestion": "",
+  "export_ai_analysis_response_template": "let source_package_id = source_package_id\n        .map(|value| parse_uuid(&value, \"来源分析包 ID\"))\n        .transpose()?;",
+  "generate_parameter_tuning_candidate": "",
+  "list_parameter_tuning_candidates": "",
+  "decide_parameter_tuning_candidate": "",
+  "parameter_lifecycle_readiness": "",
+  "run_parameter_shadow_validation": "",
+  "list_parameter_shadow_validations": "",
+  "promote_parameter_candidate": "",
+  "rollback_parameter_candidate": "",
+  "list_parameter_promotion_decisions": ""
+};
+  const calls = {
+  "analytics_overview": "analytics_overview()",
+  "decide_data_quality_finding": "decide_data_quality_finding(draft)",
+  "enqueue_analysis_job": "enqueue_analysis_job(draft)",
+  "list_background_jobs": "list_background_jobs(limit)",
+  "cancel_background_job": "cancel_background_job(job_id)",
+  "retry_background_job": "retry_background_job(job_id)",
+  "export_ai_analysis_package": "export_ai_analysis_package(output_path)",
+  "preview_ai_analysis_response": "preview_ai_analysis_response(input_path)",
+  "import_ai_analysis_response": "import_ai_analysis_response(input_path)",
+  "list_ai_analysis_suggestions": "list_ai_analysis_suggestions(status, limit)",
+  "decide_ai_analysis_suggestion": "decide_ai_analysis_suggestion(draft)",
+  "export_ai_analysis_response_template": "export_ai_analysis_response_template(output_path, source_package_id)",
+  "generate_parameter_tuning_candidate": "generate_parameter_tuning_candidate(draft)",
+  "list_parameter_tuning_candidates": "list_parameter_tuning_candidates(limit)",
+  "decide_parameter_tuning_candidate": "decide_parameter_tuning_candidate(draft)",
+  "parameter_lifecycle_readiness": "parameter_lifecycle_readiness(request)",
+  "run_parameter_shadow_validation": "run_parameter_shadow_validation(request)",
+  "list_parameter_shadow_validations": "list_parameter_shadow_validations(parse_uuid(&candidate_id, \"候选 ID\")?)",
+  "promote_parameter_candidate": "promote_parameter_candidate(request)",
+  "rollback_parameter_candidate": "rollback_parameter_candidate(request)",
+  "list_parameter_promotion_decisions": "list_parameter_promotion_decisions(parse_uuid(&candidate_id, \"候选 ID\")?)"
+};
+  const isAsync = {
+  "analytics_overview": true,
+  "decide_data_quality_finding": true,
+  "enqueue_analysis_job": true,
+  "list_background_jobs": true,
+  "cancel_background_job": true,
+  "retry_background_job": true,
+  "export_ai_analysis_package": true,
+  "preview_ai_analysis_response": false,
+  "import_ai_analysis_response": true,
+  "list_ai_analysis_suggestions": true,
+  "decide_ai_analysis_suggestion": true,
+  "export_ai_analysis_response_template": false,
+  "generate_parameter_tuning_candidate": true,
+  "list_parameter_tuning_candidates": true,
+  "decide_parameter_tuning_candidate": true,
+  "parameter_lifecycle_readiness": true,
+  "run_parameter_shadow_validation": true,
+  "list_parameter_shadow_validations": true,
+  "promote_parameter_candidate": true,
+  "rollback_parameter_candidate": true,
+  "list_parameter_promotion_decisions": true
+};
+  const contract = JSON.parse(read("architecture/command-contract.json"));
+  const boundaries = JSON.parse(read("architecture/module-boundaries.json")).tauri_commands;
+  const tokens = source => (source.match(/"(?:\\.|[^"\\])*"|[A-Za-z_][A-Za-z_0-9]*|[^\s]/g) ?? []).join("\0");
+  const signatureTokens = source => tokens(source.replace(/,\s*\)/g, ")"));
+  const moduleTokens = source => tokens(source.replace(/,\s*}/g, "}"));
+  const exports = (module, names) => `pub use ${module}::{${names.flatMap(name => [`__cmd__${name}`, `__tauri_command_name_${name}`, name]).sort().join(",")}};`;
+  const commandModules = read("src-tauri/src/commands.rs");
+  for (const [domain, groups] of Object.entries(domains)) {
+    const commandRoot = `src-tauri/src/commands/${domain}`;
+    const group = contract.command_groups.find(item => item.module === domain);
+    const rootModules = Object.fromEntries([...groups[""].map(name => [name, [name]]), ...Object.entries(groups).filter(([name]) => name !== "")]);
+    const rootNames = Object.keys(rootModules).sort();
+    check(moduleTokens(read(`${commandRoot}/mod.rs`)) === moduleTokens([...rootNames.map(name => `mod ${name};`), ...rootNames.map(name => exports(name, rootModules[name]))].join("\n")), `R11-07 根出口必须只显式登记原命令与双宏：${domain}`);
+    for (const [name, commands] of Object.entries(groups)) {
+      if (!name) continue;
+      const ordered = [...commands].sort();
+      check(moduleTokens(read(`${commandRoot}/${name}/mod.rs`)) === moduleTokens([...ordered.map(command => `mod ${command};`), ...ordered.map(command => exports(command, [command]))].join("\n")), `R11-07 子出口夹带逻辑或缺失命令/宏：${domain}/${name}`);
+    }
+    check(group?.definition_file === `${commandRoot}/mod.rs` && group?.parameter_and_return_signature_file === `${commandRoot}/mod.rs` && boundaries.groups[domain] === `${commandRoot}/mod.rs`, `R11-07 正式清单必须接通唯一目录：${domain}`);
+    check(group?.commands.length === Object.values(groups).flat().length, `R11-07 原命令数量漂移：${domain}`);
+    check(commandModules.includes(`mod ${domain};`) && commandModules.includes(`pub use ${domain}::*;`), `R11-07 原根登记丢失：${domain}`);
+    check(!fs.existsSync(path.join(root, `${commandRoot}.rs`)), `R11-07 旧混合owner仍存在：${domain}`);
+    for (const name of Object.values(groups).flat()) {
+      const file = files[name];
+      const source = read(file);
+      const signature = source.match(new RegExp(`pub (?:async )?fn ${name}\\([\\s\\S]*?\\{`))?.[0].slice(0, -1) ?? "";
+      check(signatureTokens(signature) === signatureTokens(signatures[name]), `R11-07 原参数/返回/async签名漂移：${name}`);
+      check(group?.command_definition_files?.[name] === file, `R11-07 定义owner漂移：${name}`);
+      check((source.match(/#\[tauri::command\]/g) ?? []).length === 1 && source.includes("bootstrap::AppState"), `R11-07 必须借用原State且每文件唯一命令：${name}`);
+      const body = source.slice(source.indexOf("{", source.indexOf(`fn ${name}`)) + 1, source.lastIndexOf("}"));
+      const expected = name === "list_background_jobs"
+        ? "let jobs = state.service.list_background_jobs(limit).await.map_err(|error| error.to_string())?; record_failed_background_jobs(&state.issue_log, &jobs); Ok(jobs)"
+        : `${validations[name]} state.service.${calls[name]}${isAsync[name] ? ".await" : ""}.map_err(|error| error.to_string())`;
+      check(tokens(body) === tokens(expected), `R11-07 薄传输必须保留原UUID/参数/顺序/错误/日志投影：${name}`);
+      if (expected.includes("parse_uuid")) check(source.includes("commands::parse_uuid"), `R11-07 UUID校验必须沿原唯一helper：${name}`);
+      if (name === "list_background_jobs") check(source.includes("use crate::commands::record_failed_background_jobs;"), "R11-07 后台任务必须沿原共享失败投影owner，不能新增日志实现或丢失问题投影");
+      for (const forbidden of ["sqlx::", "football_persistence_postgres", "PostgresStore", "PgPool", "std::fs", "std::io", "tokio::spawn", "ApplicationService::new", "Mutex<", "static ", "macro_rules!", ".unwrap()", ".expect("]) check(!source.includes(forbidden), `R11-07 命令越过原业务/状态/文件/worker边界：${name}/${forbidden}`);
+    }
+  }
+}
+// R11-07 transport contract END
+
 if (failures.length) {
   throw new Error(`Analytics Service 验证失败\n${failures.map((item) => `- ${item}`).join("\n")}`);
 }

@@ -26,7 +26,7 @@ const postmatchApplication = [
   read("crates/application/src/use_cases/postmatch/settlement/coordinator.rs"),
 ].join("\n");
 const persistence = read("crates/persistence-postgres/src/adapters/review/package_workflow/repository.rs");
-const commands = read("src-tauri/src/commands/postmatch.rs");
+const commands = [...new Set(Object.values(JSON.parse(read("architecture/command-contract.json")).command_groups.find(group => group.module === "postmatch").command_definition_files))].map(read).join("\n");
 const apiClient = read("src/api/client.ts");
 const types = read("src/types.ts");
 const page = read("src/pages/review.ts");

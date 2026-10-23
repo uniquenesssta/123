@@ -197,7 +197,7 @@ check(operation.includes('"failed" => "error"') && operation.includes('"frontend
 const issueList = read(`${platformRoot}/list_issue_logs.rs`);
 check(issueList.includes("list_background_jobs(500).await") && issueList.includes("state.issue_log.list(limit.unwrap_or(500) as usize)"), "问题列表后台扫描或原limit投影漂移");
 check(issueList.includes("if state.service.is_database_connected().await") && issueList.indexOf("is_database_connected().await") < issueList.indexOf("list_background_jobs(500).await"), "断开数据库时不得扫描后台任务");
-check(read("src-tauri/src/commands/analytics.rs").includes("use super::record_failed_background_jobs;"), "Analytics未切换共享问题投影owner");
+check(read("src-tauri/src/commands/analytics/jobs/list_background_jobs.rs").includes("use crate::commands::record_failed_background_jobs;"), "Analytics未切换共享问题投影owner");
 const background = read(`${platformRoot}/background_jobs.rs`);
 for (const token of ["job.status == JobStatus::Failed", "if let Some(message)", 'format!("{}:{}", job.id, job.attempts)', "let _ = issue_log.record("])
   check(background.includes(token), `后台问题投影原语义丢失：${token}`);

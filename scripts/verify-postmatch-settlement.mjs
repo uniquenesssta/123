@@ -11,7 +11,7 @@ const schema = JSON.parse(read("schemas/postmatch-settlement-contract.schema.jso
 const migration = read(contract.migration);
 const application = read("crates/application/src/services/postmatch/facade.rs");
 const persistence = [read("crates/persistence-postgres/src/postmatch.rs"), ...["context", "readiness", "read", "repository", "evaluation_sample", "validation"].map((name) => read(`crates/persistence-postgres/src/adapters/postmatch/settlement/${name}.rs`)), ...["read", "mapping", "repository", "policy", "queue"].map((name) => read(`crates/persistence-postgres/src/adapters/postmatch/evidence_scoring/${name}.rs`)), ...["aggregation", "read", "mapping", "repository"].map((name) => read(`crates/persistence-postgres/src/adapters/postmatch/provider_score/${name}.rs`)), ...["refresh", "overview", "partition", "validation"].map((name) => read(`crates/persistence-postgres/src/adapters/postmatch/monitoring/${name}.rs`)), ...["samples", "calculation", "repository", "read", "mapping"].map((name) => read(`crates/persistence-postgres/src/adapters/postmatch/drift_monitoring/${name}.rs`))].join("\n");
-const commands = read("src-tauri/src/commands/postmatch.rs");
+const commands = [...new Set(Object.values(JSON.parse(read("architecture/command-contract.json")).command_groups.find(group => group.module === "postmatch").command_definition_files))].map(read).join("\n");
 const registry = read("src-tauri/src/bootstrap/command_registry.rs");
 const client = read("src/api/client.ts");
 const pkg = JSON.parse(read("package.json"));

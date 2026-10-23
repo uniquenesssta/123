@@ -24,13 +24,13 @@
     "targetPublicExportPolicy": "explicit re-export only"
   },
   "sourceDigest": "217241ac243726a5ab6805a7f169e222b97e78c7c971749a5904714af673ebdd",
-  "rustUsageDigest": "1164aba99321eb90f30185c02633d60a012506b917680f5077759f5ac75ed12f",
+  "rustUsageDigest": "2f57057c21c018f83ae397f8311147d54326487442e8600636c3fe693fa77fe6",
   "summary": {
     "typeCount": 365,
     "publicCompatibilityTypeCount": 365,
     "internalTypeCount": 0,
     "domainSourceFileCount": 129,
-    "scannedRustFileCount": 1416,
+    "scannedRustFileCount": 1464,
     "databaseMappedTypeCount": 301,
     "byTargetModule": {
       "ai_workspace": 16,
@@ -186,7 +186,7 @@
         "crates/application/src/use_cases/review/decide_ability_candidate/mod.rs",
         "crates/application/src/use_cases/review/test_support.rs",
         "crates/persistence-postgres/src/adapters/review/ability_candidate_transaction/repository.rs",
-        "src-tauri/src/commands/review.rs"
+        "src-tauri/src/commands/review/abilities/decide_ability_candidate.rs"
       ],
       "databaseMappings": [
         "crates/persistence-postgres/src/adapters/review/ability_candidate_transaction/repository.rs"
@@ -334,7 +334,7 @@
         "crates/persistence-postgres/src/adapters/review/ability_candidate_transaction/mapping.rs",
         "crates/persistence-postgres/src/adapters/review/ability_candidate_transaction/read.rs",
         "crates/persistence-postgres/src/adapters/review/ability_candidate_transaction/tests.rs",
-        "src-tauri/src/commands/review.rs"
+        "src-tauri/src/commands/review/abilities/list_ability_candidates.rs"
       ],
       "databaseMappings": [
         "crates/persistence-postgres/src/adapters/review/ability_candidate_transaction/mapping.rs",
@@ -540,7 +540,8 @@
         "crates/persistence-postgres/src/adapters/review/ability_candidate_transaction/mapping.rs",
         "crates/persistence-postgres/src/adapters/review/ability_candidate_transaction/read.rs",
         "crates/persistence-postgres/src/adapters/review/ability_candidate_transaction/repository.rs",
-        "src-tauri/src/commands/review.rs"
+        "src-tauri/src/commands/review/abilities/decide_ability_candidate.rs",
+        "src-tauri/src/commands/review/abilities/list_ability_candidates.rs"
       ],
       "databaseMappings": [
         "crates/persistence-postgres/src/adapters/review/ability_candidate_transaction/mapping.rs",
@@ -763,7 +764,7 @@
         "crates/application/src/use_cases/analytics/calculation/tests.rs",
         "crates/application/src/use_cases/analytics/jobs/tests.rs",
         "crates/persistence-postgres/src/adapters/analytics/analysis_package/exports.rs",
-        "src-tauri/src/commands/analytics.rs"
+        "src-tauri/src/commands/analytics/ai_package/export_ai_analysis_package.rs"
       ],
       "databaseMappings": [
         "crates/persistence-postgres/src/adapters/analytics/analysis_package/exports.rs"
@@ -904,7 +905,7 @@
         "crates/persistence-postgres/src/adapters/analytics/analysis_package/imports.rs",
         "crates/persistence-postgres/src/adapters/analytics/analysis_package/policy.rs",
         "crates/persistence-postgres/src/adapters/analytics/analysis_package/tests.rs",
-        "src-tauri/src/commands/analytics.rs"
+        "src-tauri/src/commands/analytics/ai_package/preview_ai_analysis_response.rs"
       ],
       "databaseMappings": [
         "crates/persistence-postgres/src/adapters/analytics/analysis_package/imports.rs",
@@ -1102,7 +1103,9 @@
         "crates/persistence-postgres/src/adapters/analytics/analysis_package/imports.rs",
         "crates/persistence-postgres/src/adapters/analytics/analysis_package/mapping.rs",
         "crates/persistence-postgres/src/adapters/analytics/analysis_package/suggestions.rs",
-        "src-tauri/src/commands/analytics.rs"
+        "src-tauri/src/commands/analytics/ai_package/decide_ai_analysis_suggestion.rs",
+        "src-tauri/src/commands/analytics/ai_package/import_ai_analysis_response.rs",
+        "src-tauri/src/commands/analytics/ai_package/list_ai_analysis_suggestions.rs"
       ],
       "databaseMappings": [
         "crates/persistence-postgres/src/adapters/analytics/analysis_package/decisions.rs",
@@ -1563,7 +1566,7 @@
         "crates/application/src/use_cases/analytics/calculation/tests.rs",
         "crates/application/src/use_cases/analytics/jobs/tests.rs",
         "crates/persistence-postgres/src/adapters/analytics/analysis_package/decisions.rs",
-        "src-tauri/src/commands/analytics.rs"
+        "src-tauri/src/commands/analytics/ai_package/decide_ai_analysis_suggestion.rs"
       ],
       "databaseMappings": [
         "crates/persistence-postgres/src/adapters/analytics/analysis_package/decisions.rs"
@@ -1763,7 +1766,7 @@
         "crates/persistence-postgres/src/adapters/analytics/calculation/projection.rs",
         "crates/persistence-postgres/src/adapters/analytics/calculation/read.rs",
         "crates/persistence-postgres/src/adapters/analytics/calculation/repository.rs",
-        "src-tauri/src/commands/analytics.rs"
+        "src-tauri/src/commands/analytics/analytics_overview.rs"
       ],
       "databaseMappings": [
         "crates/persistence-postgres/src/adapters/analytics/calculation/projection.rs",
@@ -3366,7 +3369,10 @@
         "crates/persistence-postgres/src/adapters/jobs/commands.rs",
         "crates/persistence-postgres/src/adapters/jobs/mapping.rs",
         "crates/persistence-postgres/src/adapters/jobs/read.rs",
-        "src-tauri/src/commands/analytics.rs",
+        "src-tauri/src/commands/analytics/jobs/cancel_background_job.rs",
+        "src-tauri/src/commands/analytics/jobs/enqueue_analysis_job.rs",
+        "src-tauri/src/commands/analytics/jobs/list_background_jobs.rs",
+        "src-tauri/src/commands/analytics/jobs/retry_background_job.rs",
         "src-tauri/src/commands/platform/background_jobs.rs",
         "src-tauri/src/commands/platform/tests.rs"
       ],
@@ -5895,7 +5901,7 @@
         "crates/application/src/use_cases/analytics/decide_data_quality_finding/mod.rs",
         "crates/application/src/use_cases/analytics/jobs/tests.rs",
         "crates/persistence-postgres/src/analytics.rs",
-        "src-tauri/src/commands/analytics.rs"
+        "src-tauri/src/commands/analytics/decide_data_quality_finding.rs"
       ],
       "databaseMappings": [
         "crates/persistence-postgres/src/analytics.rs"
@@ -5994,7 +6000,7 @@
         "crates/application/src/use_cases/analytics/decide_data_quality_finding/mod.rs",
         "crates/application/src/use_cases/analytics/jobs/tests.rs",
         "crates/persistence-postgres/src/analytics.rs",
-        "src-tauri/src/commands/analytics.rs"
+        "src-tauri/src/commands/analytics/decide_data_quality_finding.rs"
       ],
       "databaseMappings": [
         "crates/persistence-postgres/src/analytics.rs"
@@ -6256,7 +6262,7 @@
         "crates/application/src/use_cases/research/p4_worker/transitions.rs",
         "crates/persistence-postgres/src/adapters/jobs/commands.rs",
         "crates/persistence-postgres/tests/postgres_integration.rs",
-        "src-tauri/src/commands/analytics.rs"
+        "src-tauri/src/commands/analytics/jobs/enqueue_analysis_job.rs"
       ],
       "databaseMappings": [
         "crates/persistence-postgres/src/adapters/jobs/commands.rs"
@@ -8184,7 +8190,7 @@
         "crates/application/src/use_cases/postmatch/evidence_scoring/tests.rs",
         "crates/application/src/use_cases/postmatch/settlement/tests.rs",
         "crates/persistence-postgres/src/adapters/postmatch/evidence_scoring/repository.rs",
-        "src-tauri/src/commands/postmatch.rs"
+        "src-tauri/src/commands/postmatch/evidence/decide_evidence_scoring_item.rs"
       ],
       "databaseMappings": [
         "crates/persistence-postgres/src/adapters/postmatch/evidence_scoring/repository.rs"
@@ -8337,7 +8343,8 @@
         "crates/persistence-postgres/src/adapters/postmatch/evidence_scoring/mapping.rs",
         "crates/persistence-postgres/src/adapters/postmatch/evidence_scoring/read.rs",
         "crates/persistence-postgres/src/adapters/postmatch/evidence_scoring/repository.rs",
-        "src-tauri/src/commands/postmatch.rs"
+        "src-tauri/src/commands/postmatch/evidence/decide_evidence_scoring_item.rs",
+        "src-tauri/src/commands/postmatch/evidence/list_evidence_scoring_items.rs"
       ],
       "databaseMappings": [
         "crates/persistence-postgres/src/adapters/postmatch/evidence_scoring/mapping.rs",
@@ -11950,7 +11957,8 @@
         "crates/application/src/use_cases/review/test_support.rs",
         "crates/persistence-postgres/src/adapters/review/engine_adapter/repository.rs",
         "crates/persistence-postgres/src/review.rs",
-        "src-tauri/src/commands/review.rs"
+        "src-tauri/src/commands/review/generate_match_review.rs",
+        "src-tauri/src/commands/review/read_match_review.rs"
       ],
       "databaseMappings": [
         "crates/persistence-postgres/src/adapters/review/engine_adapter/repository.rs",
@@ -12062,7 +12070,7 @@
         "crates/persistence-postgres/src/adapters/review/facts/write.rs",
         "crates/persistence-postgres/tests/postgres_integration.rs",
         "crates/spreadsheet-io/src/match_review_workbook.rs",
-        "src-tauri/src/commands/review.rs"
+        "src-tauri/src/commands/review/generate_match_review.rs"
       ],
       "databaseMappings": [
         "crates/persistence-postgres/src/adapters/review/engine_adapter/preparation.rs",
@@ -12521,7 +12529,7 @@
         "crates/application/src/services/review/facade.rs",
         "crates/application/src/services/review/service.rs",
         "crates/application/src/use_cases/review/package/workflow/coordinator.rs",
-        "src-tauri/src/commands/postmatch.rs"
+        "src-tauri/src/commands/postmatch/package/commit_match_review_package.rs"
       ],
       "databaseMappings": []
     },
@@ -12580,7 +12588,7 @@
         "crates/application/src/services/review/facade.rs",
         "crates/application/src/services/review/service.rs",
         "crates/application/src/use_cases/review/package/workflow/coordinator.rs",
-        "src-tauri/src/commands/postmatch.rs"
+        "src-tauri/src/commands/postmatch/package/commit_match_review_package.rs"
       ],
       "databaseMappings": []
     },
@@ -12715,7 +12723,7 @@
         "crates/application/src/services/review/service.rs",
         "crates/application/src/use_cases/review/package/workflow/coordinator.rs",
         "crates/application/src/use_cases/review/package/workflow/tests.rs",
-        "src-tauri/src/commands/postmatch.rs"
+        "src-tauri/src/commands/postmatch/package/confirm_match_review_package.rs"
       ],
       "databaseMappings": []
     },
@@ -12952,7 +12960,7 @@
         "crates/application/src/services/review/facade.rs",
         "crates/application/src/services/review/service.rs",
         "crates/application/src/use_cases/review/facts/coordinator.rs",
-        "src-tauri/src/commands/postmatch.rs"
+        "src-tauri/src/commands/postmatch/package/commit_match_review_package_facts.rs"
       ],
       "databaseMappings": []
     },
@@ -13180,7 +13188,7 @@
         "crates/persistence-postgres/src/adapters/review/package_workflow/repository.rs",
         "crates/persistence-postgres/tests/postgres_integration.rs",
         "crates/spreadsheet-io/src/match_review_workbook.rs",
-        "src-tauri/src/commands/postmatch.rs"
+        "src-tauri/src/commands/postmatch/package/preview_match_review_package.rs"
       ],
       "databaseMappings": [
         "crates/persistence-postgres/src/adapters/review/package_workflow/repository.rs"
@@ -13236,7 +13244,7 @@
         "crates/application/src/services/review/facade.rs",
         "crates/application/src/services/review/service.rs",
         "crates/application/src/use_cases/review/engine_adapter/package.rs",
-        "src-tauri/src/commands/postmatch.rs"
+        "src-tauri/src/commands/postmatch/package/generate_match_review_from_package.rs"
       ],
       "databaseMappings": []
     },
@@ -13408,7 +13416,7 @@
         "crates/application/src/use_cases/review/test_support.rs",
         "crates/persistence-postgres/src/adapters/review/package_workflow/repository.rs",
         "crates/persistence-postgres/tests/postgres_integration.rs",
-        "src-tauri/src/commands/postmatch.rs"
+        "src-tauri/src/commands/postmatch/package/export_match_review_package.rs"
       ],
       "databaseMappings": [
         "crates/persistence-postgres/src/adapters/review/package_workflow/repository.rs"
@@ -13670,7 +13678,8 @@
         "crates/application/src/use_cases/review/package/workflow/guards.rs",
         "crates/application/src/use_cases/review/test_support.rs",
         "crates/persistence-postgres/src/adapters/review/package_workflow/repository.rs",
-        "src-tauri/src/commands/postmatch.rs"
+        "src-tauri/src/commands/postmatch/package/confirm_match_review_package.rs",
+        "src-tauri/src/commands/postmatch/package/read_match_review_package_workflow.rs"
       ],
       "databaseMappings": [
         "crates/persistence-postgres/src/adapters/review/package_workflow/repository.rs"
@@ -13961,7 +13970,7 @@
         "crates/application/src/use_cases/review/list_match_reviews/mod.rs",
         "crates/application/src/use_cases/review/test_support.rs",
         "crates/persistence-postgres/src/review.rs",
-        "src-tauri/src/commands/review.rs"
+        "src-tauri/src/commands/review/list_match_reviews.rs"
       ],
       "databaseMappings": [
         "crates/persistence-postgres/src/review.rs"
@@ -16801,7 +16810,7 @@
         "crates/application/src/use_cases/analytics/parameter_lifecycle/readiness.rs",
         "crates/application/src/use_cases/analytics/parameter_lifecycle/tests.rs",
         "crates/persistence-postgres/src/parameter_lifecycle/readiness.rs",
-        "src-tauri/src/commands/analytics.rs"
+        "src-tauri/src/commands/analytics/parameter_lifecycle/parameter_lifecycle_readiness.rs"
       ],
       "databaseMappings": [
         "crates/persistence-postgres/src/parameter_lifecycle/readiness.rs"
@@ -16871,7 +16880,7 @@
         "crates/application/src/use_cases/analytics/parameter_lifecycle/tests.rs",
         "crates/application/src/use_cases/analytics/parameter_lifecycle/validation.rs",
         "crates/persistence-postgres/src/parameter_lifecycle/readiness.rs",
-        "src-tauri/src/commands/analytics.rs"
+        "src-tauri/src/commands/analytics/parameter_lifecycle/parameter_lifecycle_readiness.rs"
       ],
       "databaseMappings": [
         "crates/persistence-postgres/src/parameter_lifecycle/readiness.rs"
@@ -16957,7 +16966,9 @@
         "crates/persistence-postgres/src/parameter_lifecycle/bindings.rs",
         "crates/persistence-postgres/src/parameter_lifecycle/decisions.rs",
         "crates/persistence-postgres/src/parameter_lifecycle/mapping.rs",
-        "src-tauri/src/commands/analytics.rs"
+        "src-tauri/src/commands/analytics/parameter_lifecycle/list_parameter_promotion_decisions.rs",
+        "src-tauri/src/commands/analytics/parameter_lifecycle/promote_parameter_candidate.rs",
+        "src-tauri/src/commands/analytics/parameter_lifecycle/rollback_parameter_candidate.rs"
       ],
       "databaseMappings": [
         "crates/persistence-postgres/src/parameter_lifecycle/bindings.rs",
@@ -17025,7 +17036,7 @@
         "crates/application/src/use_cases/analytics/parameter_lifecycle/bindings.rs",
         "crates/application/src/use_cases/analytics/parameter_lifecycle/tests.rs",
         "crates/persistence-postgres/src/parameter_lifecycle/bindings.rs",
-        "src-tauri/src/commands/analytics.rs"
+        "src-tauri/src/commands/analytics/parameter_lifecycle/promote_parameter_candidate.rs"
       ],
       "databaseMappings": [
         "crates/persistence-postgres/src/parameter_lifecycle/bindings.rs"
@@ -17230,7 +17241,7 @@
         "crates/application/src/use_cases/analytics/parameter_lifecycle/bindings.rs",
         "crates/application/src/use_cases/analytics/parameter_lifecycle/tests.rs",
         "crates/persistence-postgres/src/parameter_lifecycle/bindings.rs",
-        "src-tauri/src/commands/analytics.rs"
+        "src-tauri/src/commands/analytics/parameter_lifecycle/rollback_parameter_candidate.rs"
       ],
       "databaseMappings": [
         "crates/persistence-postgres/src/parameter_lifecycle/bindings.rs"
@@ -17327,7 +17338,8 @@
         "crates/application/src/use_cases/analytics/parameter_lifecycle/validation.rs",
         "crates/persistence-postgres/src/parameter_lifecycle/mapping.rs",
         "crates/persistence-postgres/src/parameter_lifecycle/shadow.rs",
-        "src-tauri/src/commands/analytics.rs"
+        "src-tauri/src/commands/analytics/parameter_lifecycle/list_parameter_shadow_validations.rs",
+        "src-tauri/src/commands/analytics/parameter_lifecycle/run_parameter_shadow_validation.rs"
       ],
       "databaseMappings": [
         "crates/persistence-postgres/src/parameter_lifecycle/mapping.rs",
@@ -17381,7 +17393,7 @@
         "crates/application/src/services/analytics/service.rs",
         "crates/application/src/use_cases/analytics/parameter_lifecycle/tests.rs",
         "crates/application/src/use_cases/analytics/parameter_lifecycle/validation.rs",
-        "src-tauri/src/commands/analytics.rs"
+        "src-tauri/src/commands/analytics/parameter_lifecycle/run_parameter_shadow_validation.rs"
       ],
       "databaseMappings": []
     },
@@ -17554,7 +17566,9 @@
         "crates/persistence-postgres/src/parameter_lifecycle/artifacts.rs",
         "crates/persistence-postgres/src/parameter_lifecycle/candidates.rs",
         "crates/persistence-postgres/src/parameter_lifecycle/mapping.rs",
-        "src-tauri/src/commands/analytics.rs"
+        "src-tauri/src/commands/analytics/parameter_lifecycle/decide_parameter_tuning_candidate.rs",
+        "src-tauri/src/commands/analytics/parameter_lifecycle/generate_parameter_tuning_candidate.rs",
+        "src-tauri/src/commands/analytics/parameter_lifecycle/list_parameter_tuning_candidates.rs"
       ],
       "databaseMappings": [
         "crates/persistence-postgres/src/parameter_lifecycle/artifacts.rs",
@@ -17684,7 +17698,7 @@
         "crates/application/src/use_cases/analytics/parameter_lifecycle/candidates.rs",
         "crates/application/src/use_cases/analytics/parameter_lifecycle/tests.rs",
         "crates/persistence-postgres/src/parameter_lifecycle/candidates.rs",
-        "src-tauri/src/commands/analytics.rs"
+        "src-tauri/src/commands/analytics/parameter_lifecycle/decide_parameter_tuning_candidate.rs"
       ],
       "databaseMappings": [
         "crates/persistence-postgres/src/parameter_lifecycle/candidates.rs"
@@ -17761,7 +17775,7 @@
         "crates/application/src/services/analytics/service.rs",
         "crates/application/src/use_cases/analytics/parameter_lifecycle/candidates.rs",
         "crates/application/src/use_cases/analytics/parameter_lifecycle/tests.rs",
-        "src-tauri/src/commands/analytics.rs"
+        "src-tauri/src/commands/analytics/parameter_lifecycle/generate_parameter_tuning_candidate.rs"
       ],
       "databaseMappings": []
     },
@@ -21190,7 +21204,7 @@
         "crates/persistence-postgres/src/adapters/postmatch/monitoring/refresh.rs",
         "crates/persistence-postgres/src/adapters/postmatch/monitoring/tests.rs",
         "crates/persistence-postgres/src/adapters/postmatch/monitoring/validation.rs",
-        "src-tauri/src/commands/postmatch.rs"
+        "src-tauri/src/commands/postmatch/monitoring/refresh_postmatch_monitoring.rs"
       ],
       "databaseMappings": [
         "crates/persistence-postgres/src/adapters/postmatch/monitoring/refresh.rs",
@@ -21274,7 +21288,8 @@
         "crates/application/src/use_cases/postmatch/monitoring/tests.rs",
         "crates/persistence-postgres/src/adapters/postmatch/monitoring/overview.rs",
         "crates/persistence-postgres/src/adapters/postmatch/monitoring/refresh.rs",
-        "src-tauri/src/commands/postmatch.rs"
+        "src-tauri/src/commands/postmatch/monitoring/postmatch_overview.rs",
+        "src-tauri/src/commands/postmatch/monitoring/refresh_postmatch_monitoring.rs"
       ],
       "databaseMappings": [
         "crates/persistence-postgres/src/adapters/postmatch/monitoring/overview.rs",
@@ -21344,7 +21359,7 @@
         "crates/application/src/use_cases/postmatch/settlement/coordinator.rs",
         "crates/application/src/use_cases/postmatch/settlement/tests.rs",
         "crates/persistence-postgres/src/adapters/postmatch/settlement/repository.rs",
-        "src-tauri/src/commands/postmatch.rs"
+        "src-tauri/src/commands/postmatch/settle_postmatch_review.rs"
       ],
       "databaseMappings": [
         "crates/persistence-postgres/src/adapters/postmatch/settlement/repository.rs"
@@ -21461,7 +21476,7 @@
         "crates/application/src/use_cases/postmatch/settlement/read.rs",
         "crates/application/src/use_cases/postmatch/settlement/tests.rs",
         "crates/persistence-postgres/src/adapters/postmatch/settlement/readiness.rs",
-        "src-tauri/src/commands/postmatch.rs"
+        "src-tauri/src/commands/postmatch/postmatch_settlement_readiness.rs"
       ],
       "databaseMappings": [
         "crates/persistence-postgres/src/adapters/postmatch/settlement/readiness.rs"
@@ -21641,7 +21656,8 @@
         "crates/application/src/use_cases/postmatch/settlement/tests.rs",
         "crates/persistence-postgres/src/adapters/postmatch/settlement/read.rs",
         "crates/persistence-postgres/src/adapters/postmatch/settlement/repository.rs",
-        "src-tauri/src/commands/postmatch.rs"
+        "src-tauri/src/commands/postmatch/list_postmatch_settlements.rs",
+        "src-tauri/src/commands/postmatch/settle_postmatch_review.rs"
       ],
       "databaseMappings": [
         "crates/persistence-postgres/src/adapters/postmatch/settlement/read.rs",
@@ -24444,7 +24460,7 @@
         "crates/application/src/use_cases/review/list_reviewable_matches/mod.rs",
         "crates/application/src/use_cases/review/test_support.rs",
         "crates/persistence-postgres/src/review.rs",
-        "src-tauri/src/commands/review.rs"
+        "src-tauri/src/commands/review/list_reviewable_matches.rs"
       ],
       "databaseMappings": [
         "crates/persistence-postgres/src/review.rs"

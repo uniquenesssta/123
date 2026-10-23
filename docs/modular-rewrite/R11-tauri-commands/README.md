@@ -2,11 +2,11 @@
 
 ## 当前阶段状态
 
-`IN_PROGRESS`。R11-01～06 DONE；06自身精确faa6f72 / Windows run39954995571完整SUCCESS。用户2026-10-23“收尾06开始07”，07 Review/Postmatch/Analytics Commands READY，08～10 BLOCKED，R11 IN_PROGRESS，继续唯一rewrite/r11-tauri-commands。此前VERIFYING为实施历史，当前状态以索引与任务表为准。
+`IN_PROGRESS`。R11-01～06 DONE；07 Review/Postmatch/Analytics Commands已实施VERIFYING，08～10 BLOCKED，R11 IN_PROGRESS。用户2026-10-23“收尾06开始07”，继续唯一rewrite/r11-tauri-commands；基线859f12da03c04b4136be153d8b35f80015fce0a7为06五文档[skip ci]收尾，生产源码同自身完整Windows成功faa6f72。 当前以本节和任务表为准，历史VERIFYING保留。
 
 ## 依据与前置基线
 
-[R11任务书](../../football-model-platform-modular-rewrite-19-docs/11-R11-tauri-commands.md)、[总纲执行订正](../../football-model-platform-modular-rewrite-19-docs/00-总体架构与前23节.md)、[R10完成记录](../R10-review-analytics-release-backend/R10-stage-completion.md)。本阶段从R10收尾3d43e8e建立唯一rewrite/r11-tauri-commands；01～05已获自身精确Windows成功，06当前实施/验证详节点，07～10 BLOCKED。
+[R11任务书](../../football-model-platform-modular-rewrite-19-docs/11-R11-tauri-commands.md)、[总纲执行订正](../../football-model-platform-modular-rewrite-19-docs/00-总体架构与前23节.md)、[R10完成记录](../R10-review-analytics-release-backend/R10-stage-completion.md)。本阶段从R10收尾3d43e8e建立唯一rewrite/r11-tauri-commands；01～06已获自身精确Windows成功，07当前实施/验证详节点，08～10 BLOCKED。
 
 ## 任务状态
 
@@ -18,7 +18,7 @@
 | R11-04 | [Teams 与 Players Commands](R11-04-teams-and-players-commands.md) | DONE · 自身精确Windows完整SUCCESS |
 | R11-05 | [Lineups、Presets 与 Workbooks Commands](R11-05-lineups-presets-and-workbooks-commands.md) | DONE · 自身精确Windows完整SUCCESS |
 | R11-06 | [Prediction、Research 与 Runs Commands](R11-06-prediction-research-and-runs-commands.md) | DONE · 自身精确Windows完整SUCCESS |
-| R11-07 | Review、Postmatch 与 Analytics Commands | READY |
+| R11-07 | [Review、Postmatch 与 Analytics Commands](R11-07-review-postmatch-and-analytics-commands.md) | VERIFYING · 自身完整Windows待验 |
 | R11-08 | AI Workspace 与 OpenAI Profiles Commands | BLOCKED |
 | R11-09 | Release Commands | BLOCKED |
 | R11-10 | Command Registry 收敛 | BLOCKED |
@@ -123,3 +123,8 @@ R11-02 Database Commands已实施 `VERIFYING`，基线f56a1c004cee8018f657b6cdd9
 报告logs/windows-acceptance-20261023-124109.json及同名.txt；artifact12503252874，14,053,432字节，SHA-256 `0fc8d67798fb6bf1f4331a9b411ea0c27859aa9e7f66972e5ddbd62a6a114004`，查询时未过期。已核对精确head/branch、全部job步骤、完整日志与artifact。用户2026-10-23“收尾06开始07”，06 DONE，07 Review/Postmatch/Analytics Commands READY，08～10 BLOCKED，R11 IN_PROGRESS。此次仅5份既有文档[skip ci]收尾，源码沿上述自身完整Windows证据，不重复同源码构建；历史VERIFYING/预期计数保留，07须自身完整Windows。
 
 真实PG/历史保护四项/不可变账本并发回滚/有效XLSX/Windows Full/私有P4P7固定回归及继承model.runs/0041删除风险仍最终封包新库待验；ignored、公开unavailable stub和静态指纹不计这些真实PASS。
+
+
+## R11-07 实施与验证
+
+41条原命令按复盘6、赛后14、分析21拆入各自唯一职责目录及能力子目录；10个纯出口接通原Application，旧review.rs/postmatch.rs/analytics.rs删除。后台任务失败问题投影沿原共享owner与原调用顺序；171公共命令/注册顺序/签名/正文保持，13物理组不变。82源码/完整架构/51Rustfmt/154等价/26隔离负向与保护门禁通过；07自身完整Windows待验，08～10 BLOCKED，R11 IN_PROGRESS。 详[07记录](R11-07-review-postmatch-and-analytics-commands.md)。
