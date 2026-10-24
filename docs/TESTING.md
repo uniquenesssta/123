@@ -1,5 +1,11 @@
 # Testing
 
+## R12-04 Session验证（2026-10-24，VERIFYING）
+
+03已按精确Windows结果收尾；04基线`1cfd7cea36265b7170b48acdd1b9226b9e5680e0`。原浏览器组合根验证入口新增18项真实AppSession/SessionPersistence行为测试，原24生命周期与21路由行为保持；覆盖保存键兼容/无效主题/存储异常、启动销毁去重与竞态、摘要深复制冻结、当前/过期错误、最近列表与完整摘要刷新交错、停止后的失效与主题投影失败。原浏览器详情夹具加入真实会话主题初始化/切换/原键保存，继续检查输入/多选/滚动/焦点重绘保持。无新脚本、依赖或runner。
+
+首次全量在既有规则页恢复检查因旧变量名失败，已改为真实`session.bootstrap`，保留当前任务分区断言；失败日志保留，修复后完整结果见[04记录](modular-rewrite/R12-frontend-foundation-ui-system/R12-04-session.md)。23个owner、171命令及18保护资产保持验证。04自身Rust Clippy/workspace tests、MSI/NSIS、应用启动与日志交由原Windows流水线，提交后不轮询；未将03通过当成04结果。
+
 ## R12-03 Windows收尾（2026-10-24）
 
 精确7f67940/run40103980479/job120901723538完整SUCCESS，全部步骤与日志、artifact12565230054已核对；14,063,089字节ZIP的SHA-256为`d144993efb654c5c3b49a157efb68973cc74383870bc615d4b33ee723554bef2`。startup报告7有效runtime记录、无错误，bootstrap与工作区读写三操作配对；前端/17视口、24生命周期/21路由行为、Rust测试/Clippy、release/MSI/NSIS/应用启动通过。03 DONE，04READY。仅一次性收尾读取，不轮询、不重复同源码Windows。详情与环境待验见[03完成记录](modular-rewrite/R12-frontend-foundation-ui-system/R12-03-router-and-navigation.md)。

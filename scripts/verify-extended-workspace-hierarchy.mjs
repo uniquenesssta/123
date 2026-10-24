@@ -39,7 +39,7 @@ for (const page of ["rules", "release", "analytics", "api_workspace", "openai", 
   check(shell.includes(`"${page}"`), `应用壳未将 ${page} 纳入工作区页面`);
 }
 
-check(main.includes('rulesPage(state, pendingRulePackage, workspace.active_section ?? "catalog")'), "规则页未从工作区状态恢复当前任务");
+check(main.includes('rulesPage(session.bootstrap, pendingRulePackage, workspace.active_section ?? "catalog")'), "规则页未从会话摘要及工作区状态恢复当前任务");
 for (const [id, label] of [["catalog", "赛事目录"], ["structure", "赛事结构"], ["routing", "模型路由"], ["packages", "规则包"]]) {
   check(rules.includes(`id: "${id}"`) && rules.includes(`label: "${label}"`), `规则页缺少任务：${label}`);
   check(rules.includes(`data-workspace-section="${id}"`), `规则页任务 ${id} 未接入页面内容区`);

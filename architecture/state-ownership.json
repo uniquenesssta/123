@@ -100,6 +100,30 @@
       "transition": "later feature state adapters"
     },
     {
+      "id": "browser.session",
+      "owner": "src/app/session/appSessionState.ts::AppSessionState",
+      "scope": "browser-window",
+      "writers": ["AppSession via AppSessionState methods"],
+      "forbidden": ["src/pages/**", "src/components/**", "src/api/**"],
+      "transition": null
+    },
+    {
+      "id": "browser.bootstrap-summary",
+      "owner": "src/app/session/bootstrapState.ts::BootstrapState",
+      "scope": "browser-window",
+      "writers": ["AppSession via BootstrapState methods"],
+      "forbidden": ["src/pages/**", "src/main.ts", "src/api/**"],
+      "transition": null
+    },
+    {
+      "id": "browser.theme",
+      "owner": "src/app/session/themeState.ts::ThemeState",
+      "scope": "browser-window+theme-preference",
+      "writers": ["AppSession via ThemeState methods"],
+      "forbidden": ["src/pages/**", "src/main.ts", "src/api/**"],
+      "transition": null
+    },
+    {
       "id": "application.model-registry",
       "owner": "crates/application/src/model_registry/registry.rs::ModelRegistry",
       "scope": "ApplicationService",
@@ -298,6 +322,6 @@
       "transition": null
     }
   ],
-  "count": 20,
+  "count": 23,
   "last_updated_task": "R3-02"
 }

@@ -33,6 +33,17 @@ for (const name of lifecycleFiles) {
 check(applicationHandle.includes("new MountHandle(") && applicationHandle.includes("new DisposableScope("), "R12-02 应用启动/销毁必须使用唯一生命周期实现");
 check(!applicationHandle.includes("private startTask") && !applicationHandle.includes("destroyModuleSequence"), "R12-02 组合根不得保留第二套生命周期状态机");
 const browserApplication = read("src/main.ts");
+for (const name of ["appSession", "appSessionState", "bootstrapState", "themeState", "sessionPersistence", "index"]) {
+  const source = read(`src/app/session/${name}.ts`);
+  check(!/from ["'][^"']*(?:pages|api\/client|viewState|router|modal)["']/.test(source), `R12-04 会话不得反向吸收Feature/Router/Workspace：${name}`);
+  if (name !== "sessionPersistence") check(!/\b(?:window\.)?(?:localStorage|sessionStorage)\b/.test(source), `R12-04 会话持久副作用必须集中：${name}`);
+}
+check((browserApplication.match(/new AppSession\(/g) ?? []).length === 1, "R12-04 真实浏览器须唯一实例化会话");
+check(!/\blet (?:state|currentTheme)\s*:|const bootstrapRequests|readInitialTheme|function applyTheme/.test(browserApplication), "R12-04 启动摘要或主题仍留第二所有者");
+check((browserApplication.match(/api\.bootstrap\(\)/g) ?? []).length === 1 && (browserApplication.match(/api\.listRecentRuns\(100\)/g) ?? []).length === 1, "R12-04 摘要/最近运行读取不得绕过唯一会话adapter");
+check(!/session\.bootstrap(?:\.data(?:\.[A-Za-z_]+)?)?\s*=(?!=)/.test(browserApplication), "R12-04 入口仍直接改写只读摘要");
+check(browserApplication.includes("session.start()") && browserApplication.includes("session.stop()") && browserApplication.includes("session.destroy()"), "R12-04 会话未接通真实生命周期");
+check(browserApplication.includes("session.toggleTheme();\n  render({ preserveForm: true });"), "R12-04 主题切换未保持原表单重绘语义");
 check(browserApplication.includes("new EventScope()") && browserApplication.includes("new MountHandle("), "R12-02 真实浏览器模块未使用生命周期基础设施");
 check(!/window\.(?:setTimeout|setInterval)\(/.test(browserApplication), "R12-02 真实浏览器定时器必须归事件scope");
 check(browserApplication.includes("openAiExampleRequests.invalidate()") && browserApplication.includes("request.isCurrent()"), "R12-02 示例解析必须丢弃过期结果");
@@ -117,6 +128,7 @@ for (const path of requiredFiles) {
 
 // R12-02 executes production modules in this existing verification entry. No runner or dependency added.
 let lifecycleCases = 0;
+let sessionCases = 0;
 async function verifyLifecycleBehavior() {
   const ts = createRequire(import.meta.url)("typescript");
   const cache = new Map();
@@ -139,11 +151,124 @@ async function verifyLifecycleBehavior() {
   const { MountHandle, EventScope, AsyncScope, DisposableScope, LifecycleError } = load("src/app/lifecycle/index.ts");
   const { ApplicationHandle } = load("src/bootstrap/applicationHandle.ts");
   const { WorkspaceStateStore } = load("src/app/viewState.ts");
+  const { AppSession, SessionPersistence, SESSION_THEME_KEY } = load("src/app/session/index.ts");
   const deferred = () => { let resolve, reject; const promise = new Promise((a, b) => { resolve = a; reject = b; }); return { promise, resolve, reject }; };
   const test = async (name, run) => {
     try { await run(); lifecycleCases++; }
     catch (error) { failures.push(`R12-02 ${name}: ${error.stack ?? error}`); }
   };
+  const sessionTest = async (name, run) => {
+    try { await run(); sessionCases++; }
+    catch (error) { failures.push(`R12-04 ${name}: ${error.stack ?? error}`); }
+  };
+  const bootstrap = (version, runs = []) => ({ data: { app_version: version, recent_runs: runs, competitions: [], database_configured: false }, connection_error: null, config_path: "database.json", runtime_log_path: "runtime.jsonl" });
+  const sessionFixture = (options = {}) => {
+    const values = new Map(options.theme ? [[SESSION_THEME_KEY, options.theme]] : []), writes = [], themes = [];
+    const storage = { getItem: key => values.get(key) ?? null, setItem(key, value) { writes.push([key, value]); values.set(key, value); } };
+    const persistence = options.persistence ?? new SessionPersistence(() => storage);
+    const session = new AppSession({ loadBootstrap: options.loadBootstrap ?? (async () => bootstrap("initial")), loadRecentRuns: options.loadRecentRuns ?? (async () => [{ id: "recent" }]), applyTheme: theme => themes.push(theme) }, persistence);
+    return { session, values, writes, themes };
+  };
+  await sessionTest("legacy theme key and raw value survive restart", async () => {
+    const { session, values, themes } = sessionFixture({ theme: "dark" });
+    assert.equal(SESSION_THEME_KEY, "football-model-platform.theme"); assert.equal(session.theme, "dark"); assert.deepEqual(themes, ["dark"]);
+    await session.start(); session.toggleTheme(); assert.equal(values.get(SESSION_THEME_KEY), "light"); await session.destroy();
+    const restored = new SessionPersistence(() => ({ getItem: key => values.get(key) ?? null, setItem() {} }));
+    assert.equal(restored.readTheme(), "light");
+  });
+  await sessionTest("missing and invalid theme default to light without rewriting unrelated keys", async () => {
+    for (const theme of [undefined, "system", '{"theme":"dark"}']) {
+      const { session, writes } = sessionFixture({ theme }); assert.equal(session.theme, "light"); assert.deepEqual(writes, []); await session.destroy();
+    }
+  });
+  await sessionTest("blocked storage getter/read/write remain a usable in-memory session", async () => {
+    for (const provider of [() => { throw new Error("SecurityError"); }, () => ({ getItem() { throw new Error("read"); }, setItem() { throw new Error("quota"); } })]) {
+      const { session, themes } = sessionFixture({ persistence: new SessionPersistence(provider) }); await session.start();
+      session.toggleTheme(); assert.equal(session.theme, "dark"); assert.deepEqual(themes, ["light", "dark"]); await session.destroy();
+    }
+  });
+  await sessionTest("one start/destroy promise and one actual bootstrap", async () => {
+    let loads = 0; const { session } = sessionFixture({ loadBootstrap: async () => { loads++; return bootstrap("once"); } });
+    const start = session.start(); assert.equal(session.start(), start); await start; assert.equal(loads, 1); assert.equal(session.state.phase, "ready");
+    const destroy = session.destroy(); assert.equal(session.destroy(), destroy); await destroy; assert.equal(session.bootstrap, null); assert.equal(session.state.phase, "stopped");
+    await assert.rejects(session.start(), LifecycleError); assert.equal(await session.refresh(), false); assert.equal(await session.refreshRecentRuns(), false);
+    assert.throws(() => session.toggleTheme(), LifecycleError);
+  });
+  await sessionTest("stopping before start does not call loader", async () => {
+    const { session } = sessionFixture({ loadBootstrap: async () => assert.fail("stopped load") }); session.stop();
+    await assert.rejects(session.start(), LifecycleError); await session.destroy(); assert.equal(session.bootstrap, null);
+  });
+  await sessionTest("startup refresh coalesces while initial bootstrap is pending", async () => {
+    const pending = deferred(), entered = deferred(); let calls = 0;
+    const { session } = sessionFixture({ loadBootstrap: () => { calls++; entered.resolve(); return pending.promise; } });
+    const start = session.start(); await entered.promise; const refresh = session.refresh();
+    assert.equal(session.state.phase, "starting"); pending.resolve(bootstrap("ready")); await Promise.all([start, refresh]);
+    assert.equal(calls, 1); assert.equal(session.state.phase, "ready"); assert.equal(session.bootstrap.data.app_version, "ready"); await session.destroy();
+  });
+  await sessionTest("destroy while startup is pending discards response and ready phase", async () => {
+    const pending = deferred(), entered = deferred(); const { session } = sessionFixture({ loadBootstrap: () => { entered.resolve(); return pending.promise; } });
+    const start = session.start(); await entered.promise; const destroy = session.destroy(); pending.resolve(bootstrap("late")); await Promise.all([start, destroy]);
+    assert.equal(session.bootstrap, null); assert.equal(session.state.phase, "stopped");
+  });
+  await sessionTest("startup error identity is preserved and failed resources cannot restart", async () => {
+    const error = new Error("bootstrap"); const { session } = sessionFixture({ loadBootstrap: async () => { throw error; } });
+    await assert.rejects(session.start(), value => value === error); assert.equal(session.state.error, error); await session.destroy(); assert.equal(session.bootstrap, null);
+  });
+  await sessionTest("refreshes use latest result and stale errors do not replace data", async () => {
+    const { session } = sessionFixture(); await session.start();
+    const first = deferred(), second = deferred(); let calls = 0;
+    // The actual session adapter is injected, as in the browser composition root.
+    const other = sessionFixture({ loadBootstrap: () => ++calls === 1 ? Promise.resolve(bootstrap("base")) : calls === 2 ? first.promise : second.promise }).session;
+    await other.start(); const a = other.refresh(), b = other.refresh(); second.resolve(bootstrap("new")); assert.equal(await b, true);
+    first.reject(new Error("stale")); assert.equal(await a, false); assert.equal(other.bootstrap.data.app_version, "new"); await other.destroy(); await session.destroy();
+  });
+  await sessionTest("current refresh failure retains last summary and allows retry", async () => {
+    let fail = false; const error = new Error("refresh"); const { session } = sessionFixture({ loadBootstrap: async () => { if (fail) throw error; return bootstrap("kept"); } });
+    await session.start(); fail = true; await assert.rejects(session.refresh(), value => value === error); assert.equal(session.bootstrap.data.app_version, "kept");
+    fail = false; assert.equal(await session.refresh(), true); await session.destroy();
+  });
+  await sessionTest("bootstrap summary is detached and deeply frozen for existing view signatures", async () => {
+    const input = bootstrap("immutable", [{ id: "one", payload: { nested: [1] } }]); const { session } = sessionFixture({ loadBootstrap: async () => input });
+    await session.start(); input.data.app_version = "outside"; input.data.recent_runs[0].payload.nested.push(2);
+    assert.equal(session.bootstrap.data.app_version, "immutable"); assert.deepEqual(session.bootstrap.data.recent_runs[0].payload.nested, [1]);
+    assert.ok(Object.isFrozen(session.bootstrap.data.recent_runs[0].payload.nested)); assert.throws(() => { session.bootstrap.data.recent_runs = []; }, TypeError); await session.destroy();
+  });
+  await sessionTest("recent run refresh updates only its field with detached immutable data", async () => {
+    const rows = [{ id: "one" }]; const { session } = sessionFixture({ loadRecentRuns: async () => rows }); await session.start();
+    assert.equal(await session.refreshRecentRuns(), true); rows.push({ id: "outside" }); assert.equal(session.bootstrap.data.recent_runs.length, 1);
+    assert.equal(session.bootstrap.data.app_version, "initial"); await session.destroy();
+  });
+  await sessionTest("new full refresh invalidates older recent-run result", async () => {
+    const recent = deferred(); let calls = 0; const { session } = sessionFixture({ loadBootstrap: async () => bootstrap(++calls === 1 ? "base" : "full", [{ id: "full" }]), loadRecentRuns: () => recent.promise });
+    await session.start(); const pending = session.refreshRecentRuns(); await session.refresh(); recent.resolve([{ id: "old" }]);
+    assert.equal(await pending, false); assert.equal(session.bootstrap.data.recent_runs[0].id, "full"); await session.destroy();
+  });
+  await sessionTest("full refresh preserves recent rows committed by a later refresh", async () => {
+    const full = deferred(); let calls = 0; const { session } = sessionFixture({ loadBootstrap: () => ++calls === 1 ? Promise.resolve(bootstrap("base")) : full.promise });
+    await session.start(); const pending = session.refresh(); await session.refreshRecentRuns(); full.resolve(bootstrap("full", [{ id: "older-list" }])); await pending;
+    assert.equal(session.bootstrap.data.app_version, "full"); assert.equal(session.bootstrap.data.recent_runs[0].id, "recent"); await session.destroy();
+  });
+  await sessionTest("late recent-run response after stop cannot revive session", async () => {
+    const task = deferred(); const { session } = sessionFixture({ loadRecentRuns: () => task.promise }); await session.start(); const pending = session.refreshRecentRuns();
+    session.stop(); task.resolve([{ id: "late" }]); assert.equal(await pending, false); assert.equal(session.bootstrap.data.recent_runs.length, 0); await session.destroy();
+  });
+  await sessionTest("recent-run refreshes use latest result and preserve current errors", async () => {
+    const first = deferred(), second = deferred(), currentError = new Error("recent-current"); let calls = 0;
+    const { session } = sessionFixture({ loadRecentRuns: () => ++calls === 1 ? first.promise : calls === 2 ? second.promise : Promise.reject(currentError) });
+    await session.start(); const a = session.refreshRecentRuns(), b = session.refreshRecentRuns(); second.resolve([{ id: "latest" }]); assert.equal(await b, true);
+    first.reject(new Error("stale")); assert.equal(await a, false); await assert.rejects(session.refreshRecentRuns(), error => error === currentError);
+    assert.equal(session.bootstrap.data.recent_runs[0].id, "latest"); await session.destroy();
+  });
+  await sessionTest("late full refresh after stop cannot overwrite last summary", async () => {
+    const task = deferred(); let calls = 0; const { session } = sessionFixture({ loadBootstrap: () => ++calls === 1 ? Promise.resolve(bootstrap("kept")) : task.promise });
+    await session.start(); const pending = session.refresh(); session.stop(); task.resolve(bootstrap("late")); assert.equal(await pending, false);
+    assert.equal(session.bootstrap.data.app_version, "kept"); await session.destroy(); assert.equal(session.bootstrap, null);
+  });
+  await sessionTest("failed theme projection preserves theme value and saved preference", async () => {
+    const values = new Map([[SESSION_THEME_KEY, "light"]]); let calls = 0;
+    const session = new AppSession({ loadBootstrap: async () => bootstrap("base"), loadRecentRuns: async () => [], applyTheme() { if (++calls > 1) throw new Error("projection"); } }, new SessionPersistence(() => ({ getItem: key => values.get(key), setItem: (key, value) => values.set(key, value) })));
+    assert.throws(() => session.toggleTheme(), /projection/); assert.equal(session.theme, "light"); assert.equal(values.get(SESSION_THEME_KEY), "light"); await session.destroy();
+  });
   await test("start/destroy single promise and one cleanup", async () => {
     const calls = [];
     const handle = new MountHandle({ start() { calls.push("start"); }, stop() { calls.push("stop"); }, destroy() { calls.push("destroy"); } });
@@ -332,11 +457,11 @@ async function verifyLifecycleBehavior() {
     }
   }
 }
-try { await verifyLifecycleBehavior(); } catch (error) { failures.push(`R12-02 生命周期验证无法执行：${error.stack ?? error}`); }
+try { await verifyLifecycleBehavior(); } catch (error) { failures.push(`R12-02/04 生命周期与会话验证无法执行：${error.stack ?? error}`); }
 
 if (failures.length > 0) {
   console.error("浏览器组合根验证失败：");
   for (const failure of failures) console.error(`- ${failure}`);
   process.exit(1);
 }
-console.log(`浏览器组合根验证通过：唯一入口、模块注册和生命周期边界；${lifecycleCases}项真实生命周期行为测试通过。`);
+console.log(`浏览器组合根验证通过：唯一入口、模块注册和生命周期边界；${lifecycleCases}项真实生命周期行为、${sessionCases}项真实会话行为测试通过。`);

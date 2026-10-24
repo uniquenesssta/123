@@ -7,7 +7,7 @@
 
 ## 当前前置状态（2026-10-24）
 
-R12-01～03 DONE；03精确7f67940/run40103980479完整Windows、日志及下载产物验证通过。用户授权04 Session，现READY，05～19 BLOCKED，R12 IN_PROGRESS，唯一rewrite/r12-frontend-foundation-ui-system。收尾只读取一次，不轮询CI。[当前索引](../modular-rewrite/R12-frontend-foundation-ui-system/README.md)与[03完成记录](../modular-rewrite/R12-frontend-foundation-ui-system/R12-03-router-and-navigation.md)。
+R12-01～03 DONE；03精确7f67940/run40103980479完整Windows及产物通过，收尾1cfd7ce。用户授权04 Session，现已实施VERIFYING：唯一会话协调/启动摘要/主题/持久化接入真实链路，18项会话行为及浏览器检查通过；05～19 BLOCKED，R12 IN_PROGRESS，唯一rewrite/r12-frontend-foundation-ui-system。04自身完整Windows待验，不轮询CI。[当前索引](../modular-rewrite/R12-frontend-foundation-ui-system/README.md)与[04记录](../modular-rewrite/R12-frontend-foundation-ui-system/R12-04-session.md)。
 
 ## 1. 阶段目标
 
@@ -767,7 +767,7 @@ src/app/router/routeHistory.ts
 
 ## R12-04 Session
 
-状态：`READY`（03自身完整Windows与记录已通过，用户授权开始）
+状态：`VERIFYING`（用户2026-10-24授权，代码与本地验证见04记录；自身完整Windows待验）
 
 ### 1. 目标
 

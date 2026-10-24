@@ -1,5 +1,9 @@
 # 足球模型平台公开外壳
 
+## R12-04 Session（2026-10-24，VERIFYING）
+
+03已完成Windows验收并收尾。04已将会话协调、启动摘要、主题与原主题偏好持久化迁入唯一`app/session`，接通真实启动/刷新/停止/销毁；摘要以独立深冻结快照供既有页面读取，最近运行列表统一更新并丢弃过期响应。原验证入口新增18项会话行为检查，实际浏览器验证主题与详情输入/滚动/焦点保持；不新增依赖或验证入口。实际清单与验证见[04记录](docs/modular-rewrite/R12-frontend-foundation-ui-system/R12-04-session.md)。01～03 DONE，04 VERIFYING，05～19 BLOCKED；04自身完整Windows验收待结果，不轮询CI。
+
 ## R12-03 Router 与 Navigation（2026-10-24，DONE）
 
 03精确`7f67940`的[Windows run40103980479](https://github.com/uniquenesssta/123/actions/runs/40103980479)完整成功：前端/17视口、24生命周期/21路由行为、Rust、打包、启动与日志通过，下载产物哈希及报告已核对。01～03 DONE；用户要求收尾03开始04，Session现READY，05～19 BLOCKED。详[03记录](docs/modular-rewrite/R12-frontend-foundation-ui-system/R12-03-router-and-navigation.md)和[R12索引](docs/modular-rewrite/R12-frontend-foundation-ui-system/README.md)。遵守不轮询CI；真实PG/XLSX/Full/私有固定回归等最终环境待验继续保留。

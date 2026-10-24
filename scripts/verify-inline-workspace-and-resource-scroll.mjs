@@ -53,7 +53,11 @@ requireTrue(modal.includes("new RouteHistory<WorkspacePanelEntry>()") && !modal.
 // Execute actual detail/history/format modules in the existing Windows browser fixture.
 const browser = resolveChromiumExecutable();
 if (!browser) throw new Error("未找到Chromium、Chrome或Edge，无法验证详情历史输入与滚动");
-const source = [read("src/components/format.ts"), read("src/app/router/routeHistory.ts"), modal]
+const source = [
+  read("src/components/format.ts"), read("src/app/router/routeHistory.ts"), modal,
+  ...["lifecycleError", "asyncScope", "mountHandle"].map(name => read(`src/app/lifecycle/${name}.ts`)),
+  ...["sessionPersistence", "themeState", "bootstrapState", "appSessionState", "appSession"].map(name => read(`src/app/session/${name}.ts`)),
+]
   .join("\n").replace(/^import\s+.*?from\s+["'][^"']+["'];?\s*$/gm, "").replaceAll("export ", "");
 const javascript = ts.transpileModule(source, { compilerOptions: { target: ts.ScriptTarget.ES2022, module: ts.ModuleKind.None } }).outputText;
 const html = `<!doctype html><html><head><meta charset="utf-8"><style>
@@ -64,11 +68,14 @@ const host=document.querySelector('#host');
 const shell=()=>'<main class="main-content"><button data-action="workspace-history-back" disabled>返回</button><button data-action="workspace-history-forward" disabled>前进</button><div class="page-container">基础页面</div><div id="modal-root"></div></main>';
 const markup=()=>'<div class="content"><input id="draft"><input id="checked" type="checkbox"><select id="multi" multiple><option value="a">A</option><option value="b">B</option></select><input id="password" type="password"><input id="api-key"><input id="private-draft" data-workspace-persist="false"><input id="file" type="file"></div>';
 const controller=new ModalController();
+const preferences=new Map([[SESSION_THEME_KEY,'dark']]);
+const session=new AppSession({loadBootstrap:async()=>({data:{recent_runs:[]}}),loadRecentRuns:async()=>[],applyTheme(theme){document.documentElement.dataset.theme=theme;document.documentElement.style.colorScheme=theme;}},new SessionPersistence(()=>({getItem:key=>preferences.get(key)??null,setItem(key,value){preferences.set(key,value)}})));
 const expect=(ok,message)=>{if(!ok)throw new Error(message)};
 const field=id=>document.getElementById(id);
 const body=()=>document.querySelector('.workspace-detail-body');
 const historyButtons=()=>Array.from(document.querySelectorAll('[data-action="workspace-history-back"], [data-action="workspace-history-forward"]'));
 try{
+  expect(session.theme==='dark' && document.documentElement.dataset.theme==='dark' && document.documentElement.style.colorScheme==='dark','initial session theme');
   host.innerHTML=shell(); controller.restore();
   expect(historyButtons().every(button=>button.disabled),'empty boundaries');
   controller.showHtml('详情A','测试',markup());
@@ -82,12 +89,14 @@ try{
   expect(!field('password').value && !field('api-key').value && !field('private-draft').value,'sensitive snapshot');
   controller.forward(); expect(field('draft').value==='未保存输入B' && body().scrollTop===219,'forward draft/scroll');
   field('draft').value='主题重绘前的输入'; field('draft').focus(); body().scrollTop=311;
-  controller.capture(); document.documentElement.dataset.theme='dark'; host.innerHTML=shell(); controller.restore();
+  session.toggleTheme(); controller.capture(); host.innerHTML=shell(); controller.restore();
   expect(field('draft').value==='主题重绘前的输入' && body().scrollTop===311 && document.activeElement===field('draft'),'theme redraw');
+  expect(session.theme==='light' && document.documentElement.style.colorScheme==='light' && preferences.get(SESSION_THEME_KEY)==='light','session theme persistence');
   controller.back(); controller.back(); expect(!field('draft') && !document.querySelector('.page-container').hasAttribute('aria-hidden'),'base page');
   controller.forward(); expect(field('draft').value==='未保存输入A','base forward');
   controller.showHtml('详情C','测试',markup()); controller.forward(); expect(document.querySelector('h2').textContent==='详情C','branch truncate');
   controller.reset(); expect(historyButtons().every(button=>button.disabled) && !field('draft'),'navigation reset');
+  session.stop(); void session.destroy();
   document.querySelector('.test-marker').style.background='#00ff00'; document.body.dataset.testResult='pass';
 }catch(error){document.body.dataset.error=String(error); document.body.insertAdjacentHTML('beforeend','<pre>'+escapeHtml(error.stack)+'</pre>');}
 </script></body></html>`;
@@ -97,4 +106,4 @@ fs.writeFileSync(htmlPath, html);
 await captureHtmlScreenshot({ browser, htmlPath, outputPath, width: 700, height: 400 });
 const image = decodePng(outputPath), offset = (5 * image.width + 5) * image.channels;
 requireTrue(image.pixels[offset] < 40 && image.pixels[offset+1] > 220 && image.pixels[offset+2] < 40, `详情历史浏览器验证失败，检查保留的${htmlPath}与${outputPath}`);
-console.log(`右侧内联工作区、资源滚动与日志验证通过；实际浏览器详情A/B/基础页、输入/多选/滚动/焦点、主题重绘、敏感排除、分支清栈通过。产物保留：${directory}`);
+console.log(`右侧内联工作区、资源滚动与日志验证通过；实际浏览器详情A/B/基础页、输入/多选/滚动/焦点、真实会话主题初始化/切换/保存与重绘、敏感排除、分支清栈通过。产物保留：${directory}`);

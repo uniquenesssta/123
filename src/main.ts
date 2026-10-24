@@ -14,6 +14,7 @@ import {
   recordUiOperationFailure,
 } from "./api/client";
 import { ModalController } from "./app/modal";
+import { AppSession } from "./app/session";
 import { AsyncScope, EventScope, MountHandle } from "./app/lifecycle";
 import { Router, NavigationContext, isRoute, type NavigationRequest } from "./app/router";
 import { pageTitle, renderShell } from "./app/shell";
@@ -55,7 +56,6 @@ import { apiWorkspacePage } from "./pages/apiWorkspace";
 import { reviewPage } from "./pages/review";
 import { releasePage } from "./pages/release";
 import type {
-  BootstrapResponse,
   CompetitionBindingDraft,
   CompetitionDraft,
   CompetitionKind,
@@ -121,7 +121,6 @@ import type {
   TeamCoachPeriodDraft,
   FormationRecord,
   FormationUsageDistributionDraft,
-  Theme,
   SpreadsheetImportMode,
   SpreadsheetImportPreview,
   TeamPackageImportPreview,
@@ -163,10 +162,8 @@ import type {
 } from "./types";
 
 const browserLifecycleController = new EventScope();
-const bootstrapRequests = new AsyncScope();
 const openAiExampleRequests = new AsyncScope();
 
-const THEME_KEY = "football-model-platform.theme";
 const DATABASE_RESET_COMPLETE_KEY = "football-model-platform.database-reset-complete";
 const ANALYSIS_PACKAGE_ID_KEY = "football-model-platform.last-analysis-package-id";
 const TEAM_QUERY_KEY = "football-model-platform.team-query";
@@ -179,7 +176,7 @@ function readStoredObject<T>(key: string): Partial<T> | null {
     const value = JSON.parse(raw);
     return value && typeof value === "object" && !Array.isArray(value) ? value as Partial<T> : null;
   } catch {
-    window.localStorage.removeItem(key);
+    try { window.localStorage.removeItem(key); } catch { /* Preference storage may be unavailable. */ }
     return null;
   }
 }
@@ -269,12 +266,18 @@ function prepareDirectPlayerDirectoryEntry(): void {
 
 let app: HTMLDivElement;
 
-let state: BootstrapResponse | null = null;
+const session = new AppSession({
+  loadBootstrap: () => api.bootstrap(),
+  loadRecentRuns: () => api.listRecentRuns(100),
+  applyTheme(theme) {
+    document.documentElement.dataset.theme = theme;
+    document.documentElement.style.colorScheme = theme;
+  },
+});
 const navigation = new Router();
 const workflowNavigation = new NavigationContext();
 let busy = false;
 let lastPredictionResult: unknown = null;
-let currentTheme: Theme = readInitialTheme();
 let playerReferences: PlayerCatalogReferenceData | null = null;
 let playerListPage: PlayerListPage | null = null;
 let selectedPlayer: PlayerDetail | null = null;
@@ -408,24 +411,8 @@ let selectedApiWorkspaceContextEntityLabel: string | null = null;
 let apiWorkspaceSessionSearch = "";
 let apiWorkspaceIncludeContext = false;
 let apiWorkspaceActiveRequestId: string | null = null;
-applyTheme(currentTheme);
-
-function readInitialTheme(): Theme {
-  const stored = window.localStorage.getItem(THEME_KEY);
-  if (stored === "light" || stored === "dark") return stored;
-  return "light";
-}
-
-function applyTheme(theme: Theme): void {
-  currentTheme = theme;
-  document.documentElement.dataset.theme = theme;
-  document.documentElement.style.colorScheme = theme;
-}
-
 function toggleTheme(): void {
-  const next: Theme = currentTheme === "dark" ? "light" : "dark";
-  applyTheme(next);
-  window.localStorage.setItem(THEME_KEY, next);
+  session.toggleTheme();
   render({ preserveForm: true });
 }
 
@@ -500,7 +487,7 @@ function render(options: RenderOptions = {}): void {
   if (options.preserveForm === true && renderedPage === "review") {
     captureLineupFormFromDom();
   }
-  if (!state) {
+  if (!session.bootstrap) {
     app.innerHTML = `<div class="boot-screen"><div class="spinner"></div><strong>正在启动平台</strong></div>`;
     renderedPage = null;
     return;
@@ -513,20 +500,20 @@ function render(options: RenderOptions = {}): void {
   let content = "";
   switch (navigation.page) {
     case "dashboard":
-      content = dashboardPage(state);
+      content = dashboardPage(session.bootstrap);
       break;
     case "database":
-      content = databasePage(state);
+      content = databasePage(session.bootstrap);
       break;
     case "rules": {
       const workspace = workspaceState.module("rules");
-      content = rulesPage(state, pendingRulePackage, workspace.active_section ?? "catalog");
+      content = rulesPage(session.bootstrap, pendingRulePackage, workspace.active_section ?? "catalog");
       break;
     }
     case "players": {
       const workspace = workspaceState.module("players");
       content = playersPage(
-        state, playerReferences, playerListPage, selectedPlayer, playerQuery, spreadsheetPreview, selectedPlayerIds,
+        session.bootstrap, playerReferences, playerListPage, selectedPlayer, playerQuery, spreadsheetPreview, selectedPlayerIds,
         workspace.tabs, workspace.active_tab_id, workspace.layout_mode, workspace.module_sidebar_collapsed, workspace.inspector_collapsed,
         workspace.active_section ?? "directory", playerCursorHistory.length + 1, playerNavigationContext,
       );
@@ -535,7 +522,7 @@ function render(options: RenderOptions = {}): void {
     case "teams": {
       const workspace = workspaceState.module("teams");
       content = teamsPage(
-        state, teamListPage, selectedTeam, selectedPlayer, teamQuery, selectedTeamIds, coachList, formationCatalog,
+        session.bootstrap, teamListPage, selectedTeam, selectedPlayer, teamQuery, selectedTeamIds, coachList, formationCatalog,
         teamPackagePreview, selectedTeamLineupHistory, selectedTeamLineupPresets, workspace.tabs, workspace.active_tab_id,
         workspace.layout_mode, workspace.module_sidebar_collapsed, workspace.inspector_collapsed,
         workspace.active_section ?? "directory", teamCursorHistory.length + 1,
@@ -544,19 +531,19 @@ function render(options: RenderOptions = {}): void {
     }
     case "lineup_presets": {
       content = lineupPresetsPage(
-        state, teamListPage, selectedTeam, selectedTeamLineupPresets, teamQuery, teamCursorHistory.length + 1,
+        session.bootstrap, teamListPage, selectedTeam, selectedTeamLineupPresets, teamQuery, teamCursorHistory.length + 1,
       );
       break;
     }
     case "workbooks": {
       const workspace = workspaceState.module("workbooks");
-      content = workbooksPage(state, teamSpreadsheetPreview, spreadsheetPreview, matchSpreadsheetPreview, workspace.module_sidebar_collapsed, workspace.inspector_collapsed, workspace.active_section ?? "team");
+      content = workbooksPage(session.bootstrap, teamSpreadsheetPreview, spreadsheetPreview, matchSpreadsheetPreview, workspace.module_sidebar_collapsed, workspace.inspector_collapsed, workspace.active_section ?? "team");
       break;
     }
     case "lineups": {
       const workspace = workspaceState.module("lineups");
       content = lineupsPage(
-        state,
+        session.bootstrap,
         playerReferences,
         lineupRecords,
         matchSpreadsheetPreview,
@@ -574,7 +561,7 @@ function render(options: RenderOptions = {}): void {
     case "prediction": {
       const workspace = workspaceState.module("prediction");
       content = predictionPage(
-        state,
+        session.bootstrap,
         playerReferences,
         selectedP4MatchId,
         p4MatchWorkspace,
@@ -593,7 +580,7 @@ function render(options: RenderOptions = {}): void {
       const workspace = workspaceState.module("review");
       const storedStep = Number((workspace.active_section ?? "").replace("step-", ""));
       content = reviewPage(
-        state,
+        session.bootstrap,
         reviewableMatches,
         selectedReviewMatchId,
         reviewLineups,
@@ -612,20 +599,20 @@ function render(options: RenderOptions = {}): void {
     }
     case "analytics":
       content = analyticsPage(
-        state,
+        session.bootstrap,
         analyticsOverview,
         analysisJobs,
         aiAnalysisResponsePreview,
         aiAnalysisSuggestions,
         analysisAbilityCandidates,
-        state.data.competitions,
+        session.bootstrap.data.competitions,
         parameterTuningCandidates,
         postmatchOverview,
         lastAiAnalysisPackageId,
       );
       break;
     case "runs":
-      content = runsPage(state);
+      content = runsPage(session.bootstrap);
       break;
     case "logs":
       content = logsPage(issueLogs);
@@ -639,7 +626,7 @@ function render(options: RenderOptions = {}): void {
       break;
     case "api_workspace":
       content = apiWorkspacePage(
-        state,
+        session.bootstrap,
         apiWorkspacePresets,
         apiWorkspaceSessions,
         apiWorkspaceDetail,
@@ -664,7 +651,7 @@ function render(options: RenderOptions = {}): void {
     case "release": {
       const workspace = workspaceState.module("release");
       content = releasePage(
-        state,
+        session.bootstrap,
         releaseAcceptanceRuns,
         selectedReleaseAcceptanceRun,
         workspace.module_sidebar_collapsed,
@@ -679,9 +666,9 @@ function render(options: RenderOptions = {}): void {
   }
   content = renderWorkflowContinuationBanner() + content;
   app.innerHTML = renderShell({
-    state,
+    state: session.bootstrap,
     page: navigation.page,
-    theme: currentTheme,
+    theme: session.theme,
     content,
     busy,
     navigationPending: navigation.pendingPage === navigation.page,
@@ -709,10 +696,7 @@ function render(options: RenderOptions = {}): void {
 
 async function refresh(): Promise<void> {
   if (browserLifecycleController.signal.aborted) return;
-  await bootstrapRequests.run(() => api.bootstrap(), result => {
-    state = result;
-    render();
-  });
+  if (await session.refresh()) render();
 }
 
 function appendWorkspaceTab(targetPage: "teams" | "players", tab: WorkspaceTabState): void {
@@ -1400,7 +1384,7 @@ async function connectDatabase(): Promise<void> {
 }
 
 function requestDatabaseReset(): void {
-  const databaseName = state?.data.database_health?.database_name;
+  const databaseName = session.bootstrap?.data.database_health?.database_name;
   if (!databaseName) throw new Error("当前未连接数据库，无法执行彻底清空");
   const body = `
     <div class="confirm-visual">
@@ -1439,7 +1423,7 @@ async function executeDatabaseReset(): Promise<void> {
 }
 
 function syncSimpleMatchInput(): Record<string, unknown> {
-  const base = state?.data.default_match;
+  const base = session.bootstrap?.data.default_match;
   const input =
     base && typeof base === "object"
       ? (JSON.parse(JSON.stringify(base)) as Record<string, unknown>)
@@ -1510,7 +1494,7 @@ async function executePrediction(): Promise<void> {
     ...routeSelection(),
   };
   const result = await runBusy(() => api.executePrediction(command));
-  if (state) state.data.recent_runs = await api.listRecentRuns(100);
+  if (session.bootstrap) await session.refreshRecentRuns();
   render();
   showRouteDecision(result.route);
   showPredictionResult(result, "formal");
@@ -1539,15 +1523,15 @@ async function createCompetition(): Promise<void> {
 }
 
 function showCompetitionPath(competitionId: string): void {
-  if (!state) return;
-  const competition = state.data.competitions.find(
+  if (!session.bootstrap) return;
+  const competition = session.bootstrap.data.competitions.find(
     (item) => item.id === competitionId,
   );
   if (!competition) throw new Error("赛事不存在");
-  const exactBindings = state.data.competition_bindings
+  const exactBindings = session.bootstrap.data.competition_bindings
     .filter((item) => item.is_active && item.competition_id === competitionId)
     .sort((left, right) => right.priority - left.priority);
-  const defaultBindings = state.data.competition_bindings
+  const defaultBindings = session.bootstrap.data.competition_bindings
     .filter(
       (item) =>
         item.is_active &&
@@ -1557,10 +1541,10 @@ function showCompetitionPath(competitionId: string): void {
     .sort((left, right) => right.priority - left.priority);
   const selectedBinding = exactBindings[0] ?? defaultBindings[0] ?? null;
   const selectedPackage = selectedBinding
-    ? (state.data.rule_packages.find(
+    ? (session.bootstrap.data.rule_packages.find(
         (item) => item.id === selectedBinding.rule_package_id,
       ) ?? null)
-    : (state.data.rule_packages
+    : (session.bootstrap.data.rule_packages
         .filter(
           (item) =>
             item.competition_kind === competition.competition_kind &&
@@ -1776,7 +1760,7 @@ function applyPlayerCatalog(result: PlayerCatalogLoadResult): void {
 }
 
 async function loadPlayerCatalog(resetCursor: boolean): Promise<void> {
-  if (!state?.data.database_configured) return;
+  if (!session.bootstrap?.data.database_configured) return;
   applyPlayerCatalog(
     await fetchPlayerCatalog(
       playerQuery,
@@ -1810,7 +1794,7 @@ function setPlayerPageLoading(active: boolean): void {
 async function loadPlayerPage(
   nextQuery: PlayerListQuery,
 ): Promise<PlayerCatalogLoadResult | null> {
-  if (!state?.data.database_configured || playerPageLoading) return null;
+  if (!session.bootstrap?.data.database_configured || playerPageLoading) return null;
   setPlayerPageLoading(true);
   try {
     return await fetchPlayerCatalog(
@@ -1893,7 +1877,7 @@ function applyTeamCatalog(result: TeamCatalogLoadResult): void {
 }
 
 async function loadTeamCatalog(resetCursor: boolean): Promise<void> {
-  if (!state?.data.database_configured) return;
+  if (!session.bootstrap?.data.database_configured) return;
   const [catalog, coaches, formations] = await Promise.all([
     fetchTeamCatalog(teamQuery, selectedTeam, resetCursor),
     api.listCoaches({ search: null, active_only: false, limit: 500 }),
@@ -1933,7 +1917,7 @@ function applyLineups(result: LineupsLoadResult): void {
 }
 
 async function loadLineups(): Promise<void> {
-  if (!state?.data.database_configured) return;
+  if (!session.bootstrap?.data.database_configured) return;
   applyLineups(await fetchLineups());
 }
 
@@ -1952,7 +1936,7 @@ function applyReviewCenter(result: ReviewCenterLoadResult): void {
 }
 
 async function loadReviewCenter(): Promise<void> {
-  if (!state?.data.database_configured) return;
+  if (!session.bootstrap?.data.database_configured) return;
   applyReviewCenter(await fetchReviewCenter(selectedReviewMatchId));
 }
 
@@ -1966,7 +1950,7 @@ function applyAnalysisCenter(result: AnalysisCenterLoadResult): void {
 }
 
 async function loadAnalysisCenter(): Promise<void> {
-  if (!state?.data.database_configured) return;
+  if (!session.bootstrap?.data.database_configured) return;
   applyAnalysisCenter(await fetchAnalysisCenter());
 }
 
@@ -2030,7 +2014,7 @@ async function loadApiWorkspace(
       presets[0]?.key ??
       "plain_chat";
   }
-  if (!state?.data.database_configured) {
+  if (!session.bootstrap?.data.database_configured) {
     apiWorkspaceSessions = [];
     apiWorkspaceDetail = null;
     return;
@@ -2222,7 +2206,7 @@ async function loadNavigationPage(request: NavigationRequest): Promise<void> {
     await loadApiWorkspace(undefined, request.isCurrent);
     return;
   }
-  if (!state?.data.database_configured) return;
+  if (!session.bootstrap?.data.database_configured) return;
   if (nextPage === "release") {
     const runs = await api.listReleaseAcceptanceRuns(50);
     if (!navigation.isCurrent(request)) return;
@@ -2310,7 +2294,7 @@ async function loadNavigationPage(request: NavigationRequest): Promise<void> {
 }
 
 async function refreshBootstrapAndCatalog(): Promise<void> {
-  state = await api.bootstrap();
+  await session.refresh();
   await loadPlayerCatalog(true);
   if (teamListPage !== null || navigation.page === "teams" || navigation.page === "lineup_presets") await loadTeamCatalog(true);
 }
@@ -2862,7 +2846,7 @@ async function bulkArchiveEntities(
   );
   const removedIds = [...result.archived_ids, ...result.already_archived_ids];
   const activeId = removeWorkspaceObjects(entityType === "team" ? "teams" : "players", removedIds);
-  state = await api.bootstrap();
+  await session.refresh();
   if (entityType === "team") await loadTeamCatalog(true);
   else await loadPlayerCatalog(true);
   playerReferences = await api.playerCatalogReferenceData();
@@ -2962,7 +2946,7 @@ async function requestBulkDeleteTeams(): Promise<void> {
 
   let activeId = removeWorkspaceObjects("teams", missingIds);
   if (missingIds.length > 0) {
-    state = await api.bootstrap();
+    await session.refresh();
     await loadTeamCatalog(true);
     playerReferences = await api.playerCatalogReferenceData();
     persistWorkspaceSelection("teams");
@@ -2994,7 +2978,7 @@ async function requestBulkDeleteTeams(): Promise<void> {
     async () => {
       const result = await runBusy(() => api.bulkDeleteTeams(deletableIds));
       activeId = removeWorkspaceObjects("teams", result.deleted_ids);
-      state = await api.bootstrap();
+      await session.refresh();
       await loadTeamCatalog(true);
       playerReferences = await api.playerCatalogReferenceData();
       persistWorkspaceSelection("teams");
@@ -3108,7 +3092,7 @@ async function confirmForceDeleteTeam(): Promise<void> {
   teamSpreadsheetPreview = null;
   spreadsheetPreview = null;
   matchSpreadsheetPreview = null;
-  state = await api.bootstrap();
+  await session.refresh();
   await Promise.all([loadTeamCatalog(true), loadPlayerCatalog(true)]);
   playerReferences = await api.playerCatalogReferenceData();
   persistWorkspaceSelection("teams");
@@ -3840,7 +3824,7 @@ async function calculateStoredMatch(): Promise<void> {
     }),
   );
   lastPredictionResult = result;
-  if (state) state.data.recent_runs = await api.listRecentRuns(100);
+  if (session.bootstrap) await session.refreshRecentRuns();
   render();
   showPredictionDetail("比赛推演结果", result);
   toast("已使用数据库中的比赛、阵容和动态标签完成推演", "success");
@@ -3858,10 +3842,10 @@ function storedMatchRouteCommand(matchId: string): RoutePreviewCommand {
   ).find((item) => item.id === matchId);
   if (!match) throw new Error("所选比赛不存在，请刷新比赛列表");
   const stage = match.stage_id
-    ? state?.data.stages.find((item) => item.id === match.stage_id)
+    ? session.bootstrap?.data.stages.find((item) => item.id === match.stage_id)
     : null;
   const competition = match.competition_id
-    ? state?.data.competitions.find((item) => item.id === match.competition_id)
+    ? session.bootstrap?.data.competitions.find((item) => item.id === match.competition_id)
     : null;
   return {
     kickoff_time: match.kickoff_time,
@@ -4080,7 +4064,7 @@ async function calculatePredictionMatch(): Promise<void> {
     return;
   }
   lastPredictionResult = outcome.result;
-  if (state) state.data.recent_runs = await api.listRecentRuns(100);
+  if (session.bootstrap) await session.refreshRecentRuns();
   render();
   showRouteDecision(outcome.result.route);
   showPredictionResult(outcome.result, "formal");
@@ -5277,7 +5261,7 @@ async function inspectPairedLineupChain(): Promise<void> {
 }
 
 function inferCompetitionTeamScope(competitionId: string | null): "national" | "club" | "all" {
-  const competition = state?.data.competitions.find((item) => item.id === competitionId);
+  const competition = session.bootstrap?.data.competitions.find((item) => item.id === competitionId);
   if (!competition) return "all";
   const explicitScope = typeof competition.metadata?.scope === "string" ? competition.metadata.scope.toLowerCase() : "";
   if (explicitScope === "national" || explicitScope === "club") return explicitScope;
@@ -5477,7 +5461,7 @@ async function createMatch(): Promise<void> {
   };
   const created = await runBusy(async () => {
     const saved = await api.createMatch(draft);
-    state = await api.bootstrap();
+    await session.refresh();
     playerReferences = await api.playerCatalogReferenceData();
     lineupRecords = await api.listLineups(null, 100);
     return saved;
@@ -5531,7 +5515,7 @@ function requestHideRunHistory(runId: string, runLabel: string): void {
     "确认从列表删除",
     async () => {
       await runBusy(() => api.hideModelRunHistory(runId, "用户从历史列表删除"));
-      if (state) state.data.recent_runs = await api.listRecentRuns(100);
+      if (session.bootstrap) await session.refreshRecentRuns();
       render();
       toast("推演记录已从历史列表移除", "success");
     },
@@ -6196,7 +6180,7 @@ async function decideAbilityCandidate(
       selectedMatchReview.summary.id,
     );
   if (navigation.page === "analytics") await loadAnalysisCenter();
-  state = await api.bootstrap();
+  await session.refresh();
   render();
   toast(
     decision === "accept" ? "候选已接受并写入能力历史" : "候选已拒绝",
@@ -6573,7 +6557,7 @@ async function decideAiSuggestion(
     }),
   );
   await loadAnalysisCenter();
-  state = await api.bootstrap();
+  await session.refresh();
   render();
   toast(
     decision === "accept" ? "建议已接受并按受控流程处理" : "建议已拒绝",
@@ -7884,8 +7868,8 @@ async function handleAction(
       );
       break;
     case "refresh-runs":
-      if (!state) return;
-      state.data.recent_runs = await runBusy(() => api.listRecentRuns(100));
+      if (!session.bootstrap) return;
+      await runBusy(() => session.refreshRecentRuns());
       render();
       break;
     case "request-remove-lineup-history":
@@ -8535,7 +8519,9 @@ async function initializeApplication(): Promise<void> {
   if (browserLifecycleController.signal.aborted) return;
   selectedTeamIds = new Set(workspaceState.module("teams").selected_object_ids);
   selectedPlayerIds = new Set(workspaceState.module("players").selected_object_ids);
-  await refresh();
+  await session.start();
+  if (browserLifecycleController.signal.aborted) return;
+  render();
   if (window.sessionStorage.getItem(DATABASE_RESET_COMPLETE_KEY) === "1") {
     window.sessionStorage.removeItem(DATABASE_RESET_COMPLETE_KEY);
     toast("数据库已彻底清空并重建为空白状态", "success");
@@ -8585,13 +8571,13 @@ export function createBrowserApplicationModule(
         const currentPageRoot = app.querySelector<HTMLElement>(".page-container") ?? app;
         workspaceState.capture(renderedPage, currentPageRoot, true);
       }
-      await workspaceState.destroy();
+      try { await workspaceState.destroy(); } finally { await session.destroy(); }
     },
   });
 
   function stopResources(): void {
     browserLifecycleController.destroy();
-    bootstrapRequests.destroy();
+    session.stop();
     openAiExampleRequests.destroy();
     navigation.destroy();
     modal.reset();

@@ -163,7 +163,7 @@ const loaderJs = ts.transpileModule(functions, { compilerOptions: { target: ts.S
 function loaderContext() {
   const applied = [], router = new Router();
   const context = {
-    navigation: router, browserLifecycleController: { signal: { aborted: false } }, state: { data: { database_configured: true } },
+    navigation: router, browserLifecycleController: { signal: { aborted: false } }, session: { bootstrap: { data: { database_configured: true } } },
     issueLogs: "before", releaseAcceptanceRuns: "before", selectedReleaseAcceptanceRun: null, openAiProfiles: "before", creatingOpenAiProfile: false, selectedOpenAiProfileId: null,
     playerQuery: {}, selectedPlayer: null, playerListPage: null, teamQuery: {}, selectedTeam: null, teamListPage: null, playerReferences: null, selectedP4MatchId: null, p4TaskWorkspace: null,
     selectedReviewMatchId: null, apiWorkspaceDetail: null, apiWorkspacePresets: "before", selectedApiWorkspaceProfileId: "", selectedApiWorkspacePresetKey: "", selectedApiWorkspaceMatchId: null,
