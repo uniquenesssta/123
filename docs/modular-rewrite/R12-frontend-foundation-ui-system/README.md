@@ -2,7 +2,7 @@
 
 ## 当前阶段状态
 
-`IN_PROGRESS`。R11 DONE；R12-01 Bootstrap组合根已实施VERIFYING，02～19 BLOCKED，R12 IN_PROGRESS，唯一rewrite/r12-frontend-foundation-ui-system。既有真实启动链与生产TypeScript保持，本次在原浏览器组合根守卫补唯一实际启动、真实根/handle/延迟模块注册、await与失败投影约束。82源码/完整架构/23隔离负向及保护门禁通过，01自身完整Windows待验。 基线e5952df为R11纯文档闭合，生产同R11自身完整Windows成功ed11637。
+`IN_PROGRESS`。R12-01 Bootstrap组合根DONE：精确f460fbf / Windows run40061447839于2026-10-24 12:42:31北京时间完整SUCCESS，Desktop58/App230/PG259/Gateway112unit+41contract、前端/17视口、Rust、Windows打包/启动/日志通过。R12-02生命周期基础设施READY（尚未实施），03～19 BLOCKED，R12 IN_PROGRESS，唯一rewrite/r12-frontend-foundation-ui-system。
 
 ## 依据与设计边界
 
@@ -12,8 +12,8 @@
 
 | 任务 | 职责 | 状态 |
 |---|---|---|
-| R12-01 | [Bootstrap 组合根](R12-01-bootstrap-组合根.md) | VERIFYING · 自身完整Windows待验 |
-| R12-02 | 生命周期基础设施 | BLOCKED |
+| R12-01 | [Bootstrap 组合根](R12-01-bootstrap-组合根.md) | DONE · 自身Windows完整SUCCESS |
+| R12-02 | 生命周期基础设施 | READY · 尚未实施 |
 | R12-03 | Router 与 Navigation | BLOCKED |
 | R12-04 | Session | BLOCKED |
 | R12-05 | Application Shell | BLOCKED |
@@ -35,6 +35,11 @@
 真实PG/历史保护四项/不可变账本并发回滚/XLSX/Windows Full/私有固定回归与继承删除风险仍最终新库待验；08真实API/凭据/会话取消UI端到端同样待环境，ignored/公开stub/静态不算这些PASS。
 
 
-## R12-01 启动边界实施
+## R12-01 启动边界实施历史（验收前）
 
 R11 DONE；R12-01 Bootstrap组合根已实施VERIFYING，02～19 BLOCKED，R12 IN_PROGRESS，唯一rewrite/r12-frontend-foundation-ui-system。既有真实启动链与生产TypeScript保持，本次在原浏览器组合根守卫补唯一实际启动、真实根/handle/延迟模块注册、await与失败投影约束。82源码/完整架构/23隔离负向及保护门禁通过，01自身完整Windows待验。 详[01记录](R12-01-bootstrap-组合根.md)。
+
+
+## R12-01 Windows验收完成与下一任务
+
+[run40061447839](https://github.com/uniquenesssta/123/actions/runs/40061447839)与精确f460fbf匹配，全部步骤、完整日志和下载产物/报告校验通过。Desktop58/App230/PG259/Gateway112unit+41contract、前端/17视口、Rust、Windows打包/启动/日志通过；[01完成记录](R12-01-bootstrap-组合根.md)列明覆盖、GitHub Actions弃用提示和最终环境待验。01 DONE，02仅READY，03～19 BLOCKED；下一项生命周期基础设施尚未开始实现。收尾5M/0A/0移动/0D，节点累计仍1A/5M/0D六路径；生产/守卫同已验f460fbf，不重复全Windows、不创建阶段完成记录。

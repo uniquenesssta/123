@@ -7,7 +7,7 @@
 
 ## 当前前置状态（2026-10-24）
 
-R11 DONE；R12-01 Bootstrap组合根已实施VERIFYING，02～19 BLOCKED，R12 IN_PROGRESS，唯一rewrite/r12-frontend-foundation-ui-system。既有真实启动链与生产TypeScript保持，本次在原浏览器组合根守卫补唯一实际启动、真实根/handle/延迟模块注册、await与失败投影约束。82源码/完整架构/23隔离负向及保护门禁通过，01自身完整Windows待验。 [当前索引](../modular-rewrite/R12-frontend-foundation-ui-system/README.md)与[01记录](../modular-rewrite/R12-frontend-foundation-ui-system/R12-01-bootstrap-组合根.md)。
+R12-01 Bootstrap组合根DONE：精确f460fbf / Windows run40061447839于2026-10-24 12:42:31北京时间完整SUCCESS，Desktop58/App230/PG259/Gateway112unit+41contract、前端/17视口、Rust、Windows打包/启动/日志通过。R12-02生命周期基础设施READY（尚未实施），03～19 BLOCKED，R12 IN_PROGRESS，唯一rewrite/r12-frontend-foundation-ui-system。 [当前索引](../modular-rewrite/R12-frontend-foundation-ui-system/README.md)与[01完成记录](../modular-rewrite/R12-frontend-foundation-ui-system/R12-01-bootstrap-组合根.md)。
 
 ## 1. 阶段目标
 
@@ -352,7 +352,7 @@ R12 硬门禁：任何 feature 重写不得在 Foundation 未通过时开始。
 
 ## R12-01 Bootstrap 组合根
 
-状态：`VERIFYING`（既有真实组合根已核对并补启动边界守卫，自身完整Windows待验）
+状态：`DONE`（精确f460fbf / Windows run40061447839自身完整成功，详01记录）
 
 ### 1. 目标
 
@@ -489,7 +489,7 @@ src/bootstrap/registerApplicationModules.ts
 
 ## R12-02 生命周期基础设施
 
-状态：`BLOCKED`（仅当上一任务与本任务前置门禁通过后改为 `READY`）
+状态：`READY`（01已通过自身完整Windows并收尾；本节点尚未实施）
 
 ### 1. 目标
 

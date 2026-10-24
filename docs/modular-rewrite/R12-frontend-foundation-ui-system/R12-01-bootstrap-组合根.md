@@ -1,6 +1,8 @@
 # R12-01 Bootstrap 组合根
 
-状态：`VERIFYING`（启动边界与唯一真实链路已核对/补守卫，01自身完整Windows待验）。
+状态：`DONE`（2026-10-24，精确f460fbf / Windows run40061447839自身完整SUCCESS）。
+
+以下为实施时记录；待验/预期措辞保留历史，当前结论见末尾验收收尾与阶段索引。
 
 R11已通过自身Windows Automated阶段出口并收尾，基线`e5952dffa47daf689a12085cc2c003b03162767b`为纯文档闭合，生产同已验ed11637/run39996999630。用户“10收尾开始11”没有对应R11-11节点；按现有任务书下一项对应R12-01，已明确此解释，未新增任务。独立唯一分支rewrite/r12-frontend-foundation-ui-system，02～19 BLOCKED，R12 IN_PROGRESS。
 
@@ -77,3 +79,17 @@ flowchart TD
 | A | `docs/modular-rewrite/R12-frontend-foundation-ui-system/R12-01-bootstrap-组合根.md` |
 | M | `docs/modular-rewrite/R12-frontend-foundation-ui-system/README.md` |
 | M | `scripts/verify-browser-bootstrap.mjs` |
+
+
+
+## R12-01 精确 Windows 验收收尾（2026-10-24）
+
+精确提交 `f460fbf18eb5a101aeadca44210b1e5381e5834a` / tree `176abfa61782e1dc051cf8962b76886d816e909a`，[Public Platform CI run40061447839](https://github.com/uniquenesssta/123/actions/runs/40061447839) / Windows job120775637935全部步骤SUCCESS，run于2026-10-24 12:42:31北京时间完成。Windows Server 2025 / Rust1.88.0下，完整前端契约、TypeScript、Vite、17视口、`cargo fmt --all -- --check`、`cargo clippy --locked --workspace --all-targets -- -D warnings`、`cargo test --locked --workspace`通过；实际Desktop58/58、Application230/230、Persistence259/259、Gateway112/112 unit及41/41 contract。新增/迁移unit为0，原23隔离源码探针不计动态单测。
+
+Windows release、MSI、NSIS及真实客户端启动通过。已下载并核验artifact12548625176，14,059,798字节，SHA-256 `f4cdb0069489c929073da0f5e414139be2eb36c8f5f7ce77191e760390d300e7`，与GitHub digest一致；查询时未过期。包内报告 `logs/windows-acceptance-20261024-041332.json` 与同名 `.txt` 已检查，Automated过程各阶段通过；JSON为startup profile，status=pass，7条有效日志、0无效行/运行错误，完成bootstrap/read_workspace_state/save_workspace_state三操作。实际运行日志 `logs/football-runtime-20261024T044032.128Z-pid3876-70b33af4.jsonl`已核对，无缺失必需覆盖组。本次不覆盖启动故障注入、所有业务交互或Windows Full。
+
+GitHub Actions日志有Node.js20强制切至24、punycode和url.parse弃用提示，未导致job失败；项目Rust Clippy `-D warnings`通过。未为文档收尾改依赖或workflow。真实PG/历史保护四项/不可变账本并发回滚/有效XLSX/Windows Full/私有P4P7固定回归、继承model.runs/0041删除风险及真实用户API/凭据/会话PG取消UI端到端仍按既有最终环境待验，ignored/公开stub/静态指纹不计这些PASS。
+
+01 DONE；02仅READY，尚未实施，重复start/destroy、销毁顺序、过期异步、事件解绑和定时器清理须02自身验证。03～19 BLOCKED，R12 IN_PROGRESS，不创建阶段完成记录。此前VERIFYING/预期计数为实施历史，当前状态以阶段索引为准。
+
+本次只修改5份既有Markdown：根README、docs/TESTING、R12任务书、R12索引及01记录；新增、移动/重命名和删除文件均无。生产源码、原verify-browser-bootstrap守卫、测试、架构清单、契约、模型资产、迁移、依赖及CI同已验f460fbf原树，复用其Windows证据，不重复构建。相对R11闭合基线累计仍为原1A/5M/0D六路径。文档回退至f460fbf；代码节点仍按实施记录回退至e5952df，无需数据库处理。

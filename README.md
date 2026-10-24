@@ -898,3 +898,8 @@ R11已收尾DONE：171命令归入12职责目录，唯一注册边界收敛；�
 
 
 R12-01已补强启动组合根校验：唯一入口实际调用、真实根与handle、原应用延迟注册/启动/销毁、等待与失败投影均接通原实现，能拦截空启动和旁路。生产TypeScript/业务/视觉保持，源码与隔离检查通过，自身Windows待验；详[01记录](docs/modular-rewrite/R12-frontend-foundation-ui-system/R12-01-bootstrap-组合根.md)。
+
+
+### R12-01 Windows验收收尾（2026-10-24，DONE）
+
+R12-01 Bootstrap组合根DONE：精确f460fbf / Windows run40061447839于2026-10-24 12:42:31北京时间完整SUCCESS，Desktop58/App230/PG259/Gateway112unit+41contract、前端/17视口、Rust、Windows打包/启动/日志通过。R12-02生命周期基础设施READY（尚未实施），03～19 BLOCKED，R12 IN_PROGRESS，唯一rewrite/r12-frontend-foundation-ui-system。本次仅文档收尾，生产与守卫同已验树；[01完成记录](docs/modular-rewrite/R12-frontend-foundation-ui-system/R12-01-bootstrap-组合根.md)包含日志、报告和产物校验值。真实PG/Full/XLSX/私有固定回归及既有最终环境待验保持。
