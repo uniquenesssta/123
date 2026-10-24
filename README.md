@@ -1,8 +1,12 @@
 # 足球模型平台公开外壳
 
-## R12-07 Workspace（2026-10-25，VERIFYING）
+## R12-08 Tauri Transport（2026-10-25，VERIFYING）
 
-06自身Windows验收已核对并收尾。07将工作区收敛到唯一`app/workspace`，分离状态、版本、串行持久化与DOM恢复；读取失败保留原文件，修复重叠保存/清空竞态并接通输入事件自动保存。沿既有Figma外壳和工作区设计，重启、输入、滚动与焦点检查已通过；91步骤完整前端、16项状态/竞态测试、12组1,104项Shell/工作区检查、136告警和17截图通过；自身Windows待验，08～19 BLOCKED。详[07记录](docs/modular-rewrite/R12-frontend-foundation-ui-system/R12-07-workspace.md)。
+07自身Windows验收已核对并收尾。08将Tauri命令调用、错误、追踪、响应和本地取消收敛到唯一`platform/tauri`；171个命令及原API方法签名/参数/返回保持，退出先完成工作区保存再停止请求。24项生产模块测试与命令/类型门禁通过；91步骤完整前端、1,104项Shell/工作区、136项告警与17截图通过，自身Windows待验，09～19 BLOCKED。详[08记录](docs/modular-rewrite/R12-frontend-foundation-ui-system/R12-08-tauri-transport.md)。
+
+## R12-07 Workspace（2026-10-25，DONE）
+
+06自身Windows验收已核对并收尾。07将工作区收敛到唯一`app/workspace`，分离状态、版本、串行持久化与DOM恢复；读取失败保留原文件，修复重叠保存/清空竞态并接通输入事件自动保存。沿既有Figma外壳和工作区设计，重启、输入、滚动与焦点检查已通过；91步骤完整前端、16项状态/竞态测试、12组1,104项Shell/工作区检查、136告警和17截图通过；自身精确b0b26d6/run40134011943的Windows、产物摘要及启动日志核对通过。08另按用户授权执行。详[07记录](docs/modular-rewrite/R12-frontend-foundation-ui-system/R12-07-workspace.md)。
 
 ## R12-06 Warning Center（2026-10-25，DONE）
 

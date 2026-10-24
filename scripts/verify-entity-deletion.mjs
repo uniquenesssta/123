@@ -19,7 +19,7 @@ const entityPersistence = [
   text("crates/persistence-postgres/src/adapters/catalog/deletion/archive/write.rs"),
 ].join("\n");
 const main = text("src/main.ts");
-const client = text("src/api/client.ts");
+const client = text("src/api/client.ts") + "\n" + text("src/platform/tauri/invokeResponse.ts");
 const teams = text("src/pages/teams.ts");
 const readme = readFileSync(join(root, "README.md"), "utf8");
 

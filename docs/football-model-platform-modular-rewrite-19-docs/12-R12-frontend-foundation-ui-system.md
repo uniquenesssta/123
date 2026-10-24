@@ -7,7 +7,7 @@
 
 ## 当前前置状态（2026-10-25）
 
-`IN_PROGRESS`。01～06 DONE；06精确793eea9/run40127756204及下载产物/启动日志核验通过。用户2026-10-25明确要求“开始”，07 Workspace已实施VERIFYING，08～19 BLOCKED。沿唯一rewrite/r12-frontend-foundation-ui-system。07自身Windows待验；不轮询CI，交接时核对精确提交证据。详[07记录](../modular-rewrite/R12-frontend-foundation-ui-system/R12-07-workspace.md)。
+`IN_PROGRESS`。01～07 DONE；07精确b0b26d6/run40134011943及全部步骤、产物摘要/启动日志核验通过。用户2026-10-25授权“07通过，开始08”，08 Tauri Transport已实施VERIFYING，09～19 BLOCKED。沿唯一rewrite/r12-frontend-foundation-ui-system。08自身Windows待验；不轮询CI，交接时核对精确提交证据。详[08记录](../modular-rewrite/R12-frontend-foundation-ui-system/R12-08-tauri-transport.md)。
 
 ## 1. 阶段目标
 
@@ -1181,7 +1181,7 @@ src/app/warnings/warning-dto/
 
 ## R12-07 Workspace
 
-状态：`VERIFYING`。06自身完整Windows已核验，用户2026-10-25明确要求开始07；基线793eea9，沿当前R12分支。实现和验证详[R12-07记录](../modular-rewrite/R12-frontend-foundation-ui-system/R12-07-workspace.md)，07自身Windows待验，08～19 BLOCKED。
+状态：`DONE`。07精确b0b26d6/run40134011943、全部步骤、完整日志与下载产物摘要/startup报告已核验。详[R12-07记录](../modular-rewrite/R12-frontend-foundation-ui-system/R12-07-workspace.md)。
 
 ### 1. 目标
 
@@ -1319,7 +1319,7 @@ src/app/workspace/workspaceRecovery.ts
 
 ## R12-08 Tauri Transport
 
-状态：`BLOCKED`（仅当上一任务与本任务前置门禁通过后改为 `READY`）
+状态：`VERIFYING`。07自身Windows已核验，用户2026-10-25授权开始08；基线b0b26d6，沿当前R12分支。实现与验证详[R12-08记录](../modular-rewrite/R12-frontend-foundation-ui-system/R12-08-tauri-transport.md)；08自身Windows待验，09～19 BLOCKED。
 
 ### 1. 目标
 

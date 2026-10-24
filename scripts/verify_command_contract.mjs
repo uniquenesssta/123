@@ -2,6 +2,7 @@ import fs from "node:fs";
 import path from "node:path";
 import crypto from "node:crypto";
 import { fileURLToPath } from "node:url";
+import { readTransportSources } from "./tauri/transportSources.mjs";
 
 const scriptDirectory = path.dirname(fileURLToPath(import.meta.url));
 
@@ -118,7 +119,7 @@ function compareSets(label, expectedValues, actualValues, failures) {
 function extractFrontendCommands(text, allowedDynamicArgument, failures) {
   const commands = [];
   const literalPattern =
-    /\b(?:invoke|tauriInvoke)(?:\s*<[^;()]*?>)?\s*\(\s*["'`]([a-zA-Z0-9_]+)["'`]/g;
+    /\b(?:invoke|tauriInvoke|native)(?:\s*<[^;()]*?>)?\s*\(\s*["'`]([a-zA-Z0-9_]+)["'`]/g;
   for (const match of text.matchAll(literalPattern)) {
     commands.push(match[1]);
   }
@@ -322,7 +323,7 @@ function verify(options) {
     "frontend.shared_dto_file",
   );
   const frontendCommands = extractFrontendCommands(
-    frontendSource.text,
+    [frontendSource.text, ...readTransportSources(options.root).filter(entry => entry.file !== frontendSource.relative).map(entry => entry.text)].join("\n"),
     contract.sources.frontend.allowed_dynamic_transport_argument,
     failures,
   );

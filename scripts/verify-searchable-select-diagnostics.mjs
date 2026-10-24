@@ -13,7 +13,7 @@ const read = (relative) => fs.readFileSync(path.join(root, relative), "utf8");
 const contract = JSON.parse(read("contracts/searchable-select-diagnostics-contract.json"));
 const component = read("src/components/searchableSelect.ts");
 const binding = read("src/diagnostics/searchableSelectDiagnostics.ts");
-const client = read("src/api/client.ts");
+const client = read("src/api/client.ts") + "\n" + read("src/platform/tauri/invokeTrace.ts");
 const rust = read("src-tauri/src/commands/platform/runtime_operation/validation.rs");
 
 for (const event of contract.required_events) {

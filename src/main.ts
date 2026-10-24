@@ -35,6 +35,7 @@ import { AsyncScope, EventScope, MountHandle } from "./app/lifecycle";
 import { Router, NavigationContext, isRoute, type NavigationRequest } from "./app/router";
 import { ApplicationShellController, pageTitle, renderShell } from "./app/shell";
 import { WarningCenterController } from "./app/warnings";
+import { stopTauriTransport } from "./platform/tauri";
 import { WorkspaceCoordinator, type WorkspaceLayoutMode, type WorkspaceTabState } from "./app/workspace";
 import { matchReviewWorkflowAllows } from "./app/matchReviewWorkflow";
 import {
@@ -8608,7 +8609,8 @@ export function createBrowserApplicationModule(
       }
     },
     async destroy() {
-      try { await workspaceState.destroy(); } finally { await session.destroy(); }
+      try { await workspaceState.destroy(); }
+      finally { try { await session.destroy(); } finally { stopTauriTransport(); } }
     },
   });
 

@@ -32,9 +32,22 @@
       "target_task": null
     },
     "transport": {
-      "owner": "src/api/client.ts",
+      "owner": "src/platform/tauri/tauriAdapter.ts",
       "external": "@tauri-apps/api/core",
-      "command_count": 171
+      "command_count": 171,
+      "public_entry": "src/platform/tauri/index.ts",
+      "request_owner": "src/platform/tauri/invokeRequest.ts",
+      "source_entries": [
+        "src/platform/tauri/index.ts",
+        "src/platform/tauri/tauriAdapter.ts",
+        "src/platform/tauri/invokeRequest.ts",
+        "src/platform/tauri/invokeResponse.ts",
+        "src/platform/tauri/invokeError.ts",
+        "src/platform/tauri/invokeTrace.ts",
+        "src/platform/tauri/traceSummary.ts",
+        "src/platform/tauri/cancellationRegistry.ts",
+        "src/platform/tauri/commandName.ts"
+      ]
     },
     "shared": {
       "app": "src/app",
@@ -54,6 +67,7 @@
       "forbidden": [
         "@tauri-apps/api/core",
         "src/api/client.ts",
+        "src/platform/tauri",
         "src-tauri",
         "crates",
         "migrations"

@@ -1,10 +1,11 @@
 import { readFileSync, readdirSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { dirname, extname, resolve } from "node:path";
+import { readTransportSources } from "./tauri/transportSources.mjs";
 
 const scriptDir = dirname(fileURLToPath(import.meta.url));
 const projectRoot = resolve(scriptDir, "..");
-const clientSource = readFileSync(resolve(projectRoot, "src/api/client.ts"), "utf8");
+const clientSource = [readFileSync(resolve(projectRoot, "src/api/client.ts"), "utf8"), ...readTransportSources(projectRoot).map(entry => entry.text)].join("\n");
 const desktopSource = readFileSync(resolve(projectRoot, "src-tauri/src/bootstrap/command_registry.rs"), "utf8");
 const commandDirectory = resolve(projectRoot, "src-tauri/src/commands");
 
@@ -28,7 +29,7 @@ function difference(left, right) {
 }
 
 const frontendCommands = [];
-for (const match of clientSource.matchAll(/\b(?:invoke|tauriInvoke)(?:<[^>]+>)?\(\s*["']([a-z0-9_]+)["']/g)) {
+for (const match of clientSource.matchAll(/\b(?:invoke|tauriInvoke|native)(?:<[^>]+>)?\(\s*["']([a-z0-9_]+)["']/g)) {
   frontendCommands.push(match[1]);
 }
 

@@ -1,8 +1,12 @@
 # Testing
 
-## R12-07 Workspace（2026-10-25，VERIFYING）
+## R12-08 Tauri Transport（2026-10-25，VERIFYING）
 
-沿原verify-workspace-ui入口新增生产模块行为检查；沿原Shell浏览器夹具验证真正的DOM恢复、重启、输入事件自动保存、敏感控件排除和停止清理。原24生命周期/18会话/21路由及截图基线保持。91步骤完整前端及16项状态/并发测试、12组1,104项Shell/工作区、136告警和17截图通过；07自身Windows CI提交后独立核验，不轮询。详[07记录](modular-rewrite/R12-frontend-foundation-ui-system/R12-07-workspace.md)。
+沿原运行诊断入口增加24项生产Transport测试，检查请求/响应、错误、追踪、取消、迟到结果、监听清理及原API门面；两套原命令检查器追随实际owner，171命令和冻结契约不变，SDK导入收紧为唯一adapter。91步骤完整前端、1,104项Shell/工作区、136项告警与17截图通过；08自身Windows CI待提交后独立核验，不轮询。详[08记录](modular-rewrite/R12-frontend-foundation-ui-system/R12-08-tauri-transport.md)。
+
+## R12-07 Workspace（2026-10-25，DONE）
+
+沿原verify-workspace-ui入口新增生产模块行为检查；沿原Shell浏览器夹具验证真正的DOM恢复、重启、输入事件自动保存、敏感控件排除和停止清理。原24生命周期/18会话/21路由及截图基线保持。91步骤完整前端及16项状态/并发测试、12组1,104项Shell/工作区、136告警和17截图通过；07自身精确b0b26d6/run40134011943的Windows、产物摘要及startup报告已独立核验通过。详[07记录](modular-rewrite/R12-frontend-foundation-ui-system/R12-07-workspace.md)。
 
 ## R12-06 Warning Center（2026-10-25，DONE）
 

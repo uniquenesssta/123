@@ -47,7 +47,7 @@ for (const importer of frontendFiles) {
   const source = readFileSync(join(repositoryRoot, importer), "utf8").replaceAll("\r\n", "\n");
   for (const specifier of parseJavaScriptImports(source)) {
     if (isPackageImport(specifier, "@tauri-apps/api/core")) {
-      const allowed = importer === transportOwner || importer.startsWith("src/platform/tauri/");
+      const allowed = importer === transportOwner;
       report.check(allowed, `${importer} 不得直接导入 @tauri-apps/api/core`);
     }
 
