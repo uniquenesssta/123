@@ -2,7 +2,7 @@
 
 ## 当前阶段状态
 
-`READY`。R11代码/节点与Windows Automated出口已完成，见[R11阶段完成记录](../R11-tauri-commands/R11-stage-completion.md)。任务书顺序的下一项为R12-01 Bootstrap组合根 READY，02～19 BLOCKED。用户“10收尾开始11”按现有序列对应下一阶段首项，不新增不存在的R11-11。尚未更改前端实现或视觉。
+`IN_PROGRESS`。R11 DONE；R12-01 Bootstrap组合根已实施VERIFYING，02～19 BLOCKED，R12 IN_PROGRESS，唯一rewrite/r12-frontend-foundation-ui-system。既有真实启动链与生产TypeScript保持，本次在原浏览器组合根守卫补唯一实际启动、真实根/handle/延迟模块注册、await与失败投影约束。82源码/完整架构/23隔离负向及保护门禁通过，01自身完整Windows待验。 基线e5952df为R11纯文档闭合，生产同R11自身完整Windows成功ed11637。
 
 ## 依据与设计边界
 
@@ -12,7 +12,7 @@
 
 | 任务 | 职责 | 状态 |
 |---|---|---|
-| R12-01 | Bootstrap 组合根 | READY |
+| R12-01 | [Bootstrap 组合根](R12-01-bootstrap-组合根.md) | VERIFYING · 自身完整Windows待验 |
 | R12-02 | 生命周期基础设施 | BLOCKED |
 | R12-03 | Router 与 Navigation | BLOCKED |
 | R12-04 | Session | BLOCKED |
@@ -33,3 +33,8 @@
 | R12-19 | Foundation 测试 | BLOCKED |
 
 真实PG/历史保护四项/不可变账本并发回滚/XLSX/Windows Full/私有固定回归与继承删除风险仍最终新库待验；08真实API/凭据/会话取消UI端到端同样待环境，ignored/公开stub/静态不算这些PASS。
+
+
+## R12-01 启动边界实施
+
+R11 DONE；R12-01 Bootstrap组合根已实施VERIFYING，02～19 BLOCKED，R12 IN_PROGRESS，唯一rewrite/r12-frontend-foundation-ui-system。既有真实启动链与生产TypeScript保持，本次在原浏览器组合根守卫补唯一实际启动、真实根/handle/延迟模块注册、await与失败投影约束。82源码/完整架构/23隔离负向及保护门禁通过，01自身完整Windows待验。 详[01记录](R12-01-bootstrap-组合根.md)。

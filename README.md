@@ -895,3 +895,6 @@ R11-10已锁定唯一命令注册入口与171个实际命令文件，现有守�
 
 
 R11已收尾DONE：171命令归入12职责目录，唯一注册边界收敛；最终ed11637 / [Windows run39996999630](https://github.com/uniquenesssta/123/actions/runs/39996999630)完整SUCCESS，前端/17视口、Rust测试、Windows打包/启动/日志通过。[阶段完成记录](docs/modular-rewrite/R11-tauri-commands/R11-stage-completion.md)汇总真实清单和待验；下一项R12-01 READY（R11仅10项）。最终新库/Full/私有固定回归等真实待验未关闭。
+
+
+R12-01已补强启动组合根校验：唯一入口实际调用、真实根与handle、原应用延迟注册/启动/销毁、等待与失败投影均接通原实现，能拦截空启动和旁路。生产TypeScript/业务/视觉保持，源码与隔离检查通过，自身Windows待验；详[01记录](docs/modular-rewrite/R12-frontend-foundation-ui-system/R12-01-bootstrap-组合根.md)。

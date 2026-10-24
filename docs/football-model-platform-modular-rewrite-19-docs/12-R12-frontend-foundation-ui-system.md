@@ -7,7 +7,7 @@
 
 ## 当前前置状态（2026-10-24）
 
-R11代码/节点与Windows Automated出口DONE，精确ed11637 / run39996999630完整SUCCESS，[完成记录](../modular-rewrite/R11-tauri-commands/R11-stage-completion.md)。按现有序列R12-01 READY，02～19 BLOCKED；R12尚未实施，继续约束以[当前索引](../modular-rewrite/R12-frontend-foundation-ui-system/README.md)为准。
+R11 DONE；R12-01 Bootstrap组合根已实施VERIFYING，02～19 BLOCKED，R12 IN_PROGRESS，唯一rewrite/r12-frontend-foundation-ui-system。既有真实启动链与生产TypeScript保持，本次在原浏览器组合根守卫补唯一实际启动、真实根/handle/延迟模块注册、await与失败投影约束。82源码/完整架构/23隔离负向及保护门禁通过，01自身完整Windows待验。 [当前索引](../modular-rewrite/R12-frontend-foundation-ui-system/README.md)与[01记录](../modular-rewrite/R12-frontend-foundation-ui-system/R12-01-bootstrap-组合根.md)。
 
 ## 1. 阶段目标
 
@@ -352,7 +352,7 @@ R12 硬门禁：任何 feature 重写不得在 Foundation 未通过时开始。
 
 ## R12-01 Bootstrap 组合根
 
-状态：`READY`（R11阶段出口完成；按既有任务序列进入下一首项）
+状态：`VERIFYING`（既有真实组合根已核对并补启动边界守卫，自身完整Windows待验）
 
 ### 1. 目标
 

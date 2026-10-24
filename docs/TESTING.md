@@ -1060,3 +1060,12 @@ R11-01～09 DONE；10 Command Registry收敛已实施VERIFYING，R11 IN_PROGRESS
 报告logs/windows-acceptance-20261023-174142.json及同名.txt；artifact12521059525，14,060,932字节，SHA-256 `1d8b893a6003363a8ac64c842493a2a860a36feb542fb435e10c5c75d0ba864a`，查询未过期。10 DONE，01～10均有自身精确Windows成功；本次仅文档[skip ci]收尾，生产及验证源码同该已验提交，不重复全Windows。详[R11阶段完成记录](modular-rewrite/R11-tauri-commands/R11-stage-completion.md)。
 
 追溯订正：原注册表与lib公开入口在R11开始前的Git树中已经存在且全阶段字节未改；10初版将入口建立归于R11-01不准确，现明确为R11-01沿用原组合根，逐组收敛命令，10补强真实边界检查。R11任务书止于10，没有R11-11；按现有序列，下一项为R12-01。真实PG/历史保护/账本并发回滚/XLSX/Windows Full/私有固定回归及继承model.runs/0041风险、08真实API/凭据/会话取消端到端仍待最终实际环境，ignored/公开stub/静态不计这些PASS。
+
+
+## R12-01 Bootstrap组合根（2026-10-24，VERIFYING）
+
+R11 DONE；R12-01 Bootstrap组合根已实施VERIFYING，02～19 BLOCKED，R12 IN_PROGRESS，唯一rewrite/r12-frontend-foundation-ui-system。既有真实启动链与生产TypeScript保持，本次在原浏览器组合根守卫补唯一实际启动、真实根/handle/延迟模块注册、await与失败投影约束。82源码/完整架构/23隔离负向及保护门禁通过，01自身完整Windows待验。 新增/迁移unit0，新增脚本/runner/workflow/target0。只在既有verify-browser-bootstrap.mjs补入口、依赖和实际调用契约，原断言完整保持；全部生产src/Rust/现有tests/architecture/契约/依赖/CI冻结。
+
+旧守卫漏掉真实启动调用删除已在隔离副本复现；补充后23项破坏全拒绝、3原守卫恢复正向与1注释空白正向通过，主68前端/清单/守卫/组合根指纹不变。82原只读Node、完整architecture、原171命令/18保护/46迁移18PG静态与diffcheck通过。预期Desktop58/App230/PG259/Gateway112unit+41contract及原完整frontend/17视口/Rust/Windows打包/启动/日志须01自身Windows确认。静态探针不是浏览器/运行时单测，本地未执行非Windows动态。
+
+设计来源ui-design-system@eadd8026eb65263a95aed904b05537ac8e6417aa，最新17路由视觉与局部状态accepted，产品原型整体NOT_PASSED；本节点不改几何，不对Figma视觉或真实输入/焦点/滚动另作PASS声明。真实PG/Full/XLSX/私有固定回归及继承风险保持最终新库待验。
