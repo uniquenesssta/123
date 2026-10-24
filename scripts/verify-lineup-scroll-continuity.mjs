@@ -27,8 +27,9 @@ for (const key of [
   check(lineups.includes(`data-workspace-scroll-key=\"${key}\"`), `比赛中心缺少真实滚动容器键：${key}`);
 }
 check(!lineups.includes('data-workspace-scroll-key="lineups-main"'), "不得继续把不负责滚动的 balanced-workspace-main 当作滚动容器");
+const restoreFrame = viewState.indexOf("this.events.requestAnimationFrame");
 check(
-  viewState.indexOf("window.requestAnimationFrame") < viewState.indexOf("snapshot.internal_scrolls", viewState.indexOf("window.requestAnimationFrame")),
+  restoreFrame >= 0 && restoreFrame < viewState.indexOf("snapshot.internal_scrolls", restoreFrame),
   "内部滚动位置必须在布局完成后的 animation frame 恢复",
 );
 
@@ -41,7 +42,11 @@ if (failures.length) {
 const browser = resolveChromiumExecutable();
 if (!browser) throw new Error("未找到 Chromium、Chrome 或 Edge，无法验证阵容滚动连续性");
 
-const source = viewState.replaceAll("export ", "");
+// Execute the actual extracted dependencies in the existing browser fixture, not a second implementation.
+const source = [
+  ...["lifecycleError", "eventScope", "asyncScope"].map(name => read(`src/app/lifecycle/${name}.ts`)),
+  viewState,
+].join("\n").replace(/^import\s+.*?from\s+["'][^"']+["'];?\s*$/gm, "").replaceAll("export ", "");
 const javascript = ts.transpileModule(source, {
   compilerOptions: {
     target: ts.ScriptTarget.ES2022,

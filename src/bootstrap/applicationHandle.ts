@@ -1,24 +1,48 @@
+import { DisposableScope, MountHandle } from "../app/lifecycle";
+
 export interface ApplicationModule {
   readonly name: string;
   start(): Promise<void> | void;
   destroy(): Promise<void> | void;
+  stop?(): void;
 }
 
 export class ApplicationHandle {
   readonly root: HTMLDivElement;
   private readonly modules: ApplicationModule[] = [];
-  private readonly startedModules: ApplicationModule[] = [];
   private readonly moduleNames = new Set<string>();
-  private startTask: Promise<void> | null = null;
-  private destroyTask: Promise<void> | null = null;
-  private destroyed = false;
+  private readonly startedModules: ApplicationModule[] = [];
+  private readonly resources = new DisposableScope("应用模块销毁失败");
+  private readonly lifecycle: MountHandle;
+  private registrationClosed = false;
+  private startingModule = "";
 
   constructor(root: HTMLDivElement) {
     this.root = root;
+    this.lifecycle = new MountHandle({
+      start: () => this.startModules(),
+      stop: () => {
+        const errors: unknown[] = [];
+        for (const module of [...this.startedModules].reverse()) {
+          try { module.stop?.(); } catch (error: unknown) { errors.push(error); }
+        }
+        if (errors.length) throw new AggregateError(errors, "应用模块停止失败");
+      },
+      destroy: async () => {
+        try { await this.resources.dispose(); } finally {
+          this.startedModules.length = 0;
+          this.modules.length = 0;
+          this.moduleNames.clear();
+        }
+      },
+      closedMessage: "应用生命周期已结束",
+      destroyFailureMessage: "应用模块销毁失败",
+      startFailureMessage: () => `应用模块启动失败：${this.startingModule}`,
+    });
   }
 
   register(module: ApplicationModule): void {
-    if (this.startTask || this.destroyed) {
+    if (this.registrationClosed) {
       throw new Error("应用启动后不能继续注册模块");
     }
     if (this.moduleNames.has(module.name)) {
@@ -29,61 +53,22 @@ export class ApplicationHandle {
   }
 
   start(): Promise<void> {
-    if (this.destroyed) return Promise.reject(new Error("应用生命周期已结束"));
-    if (!this.startTask) this.startTask = this.startModules();
-    return this.startTask;
+    this.registrationClosed = true;
+    return this.lifecycle.start();
   }
 
   destroy(): Promise<void> {
-    if (!this.destroyTask) this.destroyTask = this.destroyModules();
-    return this.destroyTask;
+    this.registrationClosed = true;
+    return this.lifecycle.destroy();
   }
 
   private async startModules(): Promise<void> {
     for (const module of this.modules) {
-      try {
-        await module.start();
-        this.startedModules.push(module);
-      } catch (error: unknown) {
-        const cleanupErrors = await this.destroyModuleSequence([module, ...[...this.startedModules].reverse()]);
-        this.startedModules.length = 0;
-        this.destroyed = true;
-        if (cleanupErrors.length > 0) {
-          throw new AggregateError([error, ...cleanupErrors], `应用模块启动失败：${module.name}`);
-        }
-        throw error;
-      }
+      if (this.lifecycle.signal.aborted) return;
+      this.startingModule = module.name;
+      this.startedModules.push(module);
+      this.resources.defer(() => module.destroy());
+      await module.start();
     }
-  }
-
-  private async destroyModules(): Promise<void> {
-    if (this.destroyed) return;
-    this.destroyed = true;
-    if (this.startTask) {
-      try {
-        await this.startTask;
-      } catch {
-        return;
-      }
-    }
-    const cleanupErrors = await this.destroyModuleSequence([...this.startedModules].reverse());
-    this.startedModules.length = 0;
-    if (cleanupErrors.length > 0) {
-      throw new AggregateError(cleanupErrors, "应用模块销毁失败");
-    }
-  }
-
-  private async destroyModuleSequence(
-    modules: readonly ApplicationModule[],
-  ): Promise<unknown[]> {
-    const errors: unknown[] = [];
-    for (const module of modules) {
-      try {
-        await module.destroy();
-      } catch (error: unknown) {
-        errors.push(error);
-      }
-    }
-    return errors;
   }
 }

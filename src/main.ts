@@ -14,6 +14,7 @@ import {
   recordUiOperationFailure,
 } from "./api/client";
 import { ModalController } from "./app/modal";
+import { AsyncScope, EventScope, MountHandle } from "./app/lifecycle";
 import { NavigationCoordinator } from "./app/navigation";
 import { pageTitle, renderShell } from "./app/shell";
 import { WorkspaceStateStore, type WorkspaceLayoutMode, type WorkspaceTabState } from "./app/viewState";
@@ -161,7 +162,9 @@ import type {
   ReleaseAcceptanceRunSummary,
 } from "./types";
 
-const browserLifecycleController = new AbortController();
+const browserLifecycleController = new EventScope();
+const bootstrapRequests = new AsyncScope();
+const openAiExampleRequests = new AsyncScope();
 
 const THEME_KEY = "football-model-platform.theme";
 const DATABASE_RESET_COMPLETE_KEY = "football-model-platform.database-reset-complete";
@@ -380,7 +383,6 @@ let openAiProfiles: OpenAiProfilesState | null = null;
 let selectedOpenAiProfileId: string | null = null;
 let creatingOpenAiProfile = false;
 let openAiApiExampleTimer: number | null = null;
-let openAiApiExampleSequence = 0;
 let openAiApiExampleLastParsed = "";
 let selectedP4MatchId: string | null = null;
 let selectedPredictionSnapshot: LineupSnapshotType = "T-N";
@@ -493,6 +495,7 @@ async function returnToWorkflow(): Promise<void> {
 }
 
 function render(options: RenderOptions = {}): void {
+  if (browserLifecycleController.signal.aborted) return;
   if (options.preserveForm === true && renderedPage === "lineups") {
     capturePairedLineupFromDom();
   }
@@ -707,8 +710,11 @@ function render(options: RenderOptions = {}): void {
 }
 
 async function refresh(): Promise<void> {
-  state = await api.bootstrap();
-  render();
+  if (browserLifecycleController.signal.aborted) return;
+  await bootstrapRequests.run(() => api.bootstrap(), result => {
+    state = result;
+    render();
+  });
 }
 
 function appendWorkspaceTab(targetPage: "teams" | "players", tab: WorkspaceTabState): void {
@@ -851,10 +857,11 @@ function toast(
   kind: "normal" | "success" | "error" = "normal",
 ): void {
   const node = document.querySelector<HTMLDivElement>("#toast");
+  if (browserLifecycleController.signal.aborted) return;
   if (!node) return;
   node.textContent = message;
   node.className = `toast visible ${kind}`;
-  window.setTimeout(() => node.classList.remove("visible"), 3200);
+  browserLifecycleController.setTimeout(() => node.classList.remove("visible"), 3200);
 }
 
 function userFacingError(error: unknown): string {
@@ -2103,7 +2110,7 @@ async function sendApiWorkspaceMessage(): Promise<void> {
   };
   apiWorkspaceDraftMessage = "";
   render();
-  window.setTimeout(
+  browserLifecycleController.setTimeout(
     () =>
       document
         .querySelector("#api-workspace-conversation")
@@ -2171,9 +2178,9 @@ async function sendApiWorkspaceMessage(): Promise<void> {
     apiWorkspaceSending = false;
     apiWorkspaceActiveRequestId = null;
     apiWorkspacePendingMessage = null;
-    if (page === "api_workspace") {
+    if (page === "api_workspace" && !browserLifecycleController.signal.aborted) {
       render();
-      window.setTimeout(
+      browserLifecycleController.setTimeout(
         () =>
           document
             .querySelector("#api-workspace-conversation")
@@ -6668,6 +6675,8 @@ function applyOpenAiApiExample(result: OpenAiApiExampleParseResult): void {
 }
 
 async function parseOpenAiApiExampleNow(): Promise<boolean> {
+  if (browserLifecycleController.signal.aborted) return false;
+  const request = openAiExampleRequests.begin();
   const textarea = document.querySelector<HTMLTextAreaElement>(
     "#openai-api-example",
   );
@@ -6682,7 +6691,6 @@ async function parseOpenAiApiExampleNow(): Promise<boolean> {
     );
     return true;
   }
-  const sequence = ++openAiApiExampleSequence;
   const protocol = value("openai-api-protocol") as OpenAiApiProtocol;
   setOpenAiApiExampleStatus(
     "parsing",
@@ -6691,21 +6699,22 @@ async function parseOpenAiApiExampleNow(): Promise<boolean> {
   );
   try {
     const result = await api.parseOpenAiApiExample(example, protocol);
-    if (sequence !== openAiApiExampleSequence) return false;
+    if (!request.isCurrent() || textarea !== document.querySelector("#openai-api-example") || textarea.value.trim() !== example) return false;
     applyOpenAiApiExample(result);
     openAiApiExampleLastParsed = example;
     return true;
   } catch (error: unknown) {
-    if (sequence !== openAiApiExampleSequence) return false;
+    if (!request.isCurrent() || textarea !== document.querySelector("#openai-api-example") || textarea.value.trim() !== example) return false;
     setOpenAiApiExampleStatus("error", "无法解析", userFacingError(error));
     return false;
   }
 }
 
 function scheduleOpenAiApiExampleParse(): void {
+  openAiExampleRequests.invalidate();
   if (openAiApiExampleTimer !== null)
-    window.clearTimeout(openAiApiExampleTimer);
-  openAiApiExampleTimer = window.setTimeout(() => {
+    browserLifecycleController.clearTimeout(openAiApiExampleTimer);
+  openAiApiExampleTimer = browserLifecycleController.setTimeout(() => {
     openAiApiExampleTimer = null;
     void parseOpenAiApiExampleNow();
   }, 320);
@@ -6741,7 +6750,7 @@ async function saveOpenAiProfile(showSuccess = true): Promise<string> {
       ?.value.trim() ?? "";
   if (example && example !== openAiApiExampleLastParsed) {
     if (openAiApiExampleTimer !== null) {
-      window.clearTimeout(openAiApiExampleTimer);
+      browserLifecycleController.clearTimeout(openAiApiExampleTimer);
       openAiApiExampleTimer = null;
     }
     const parsed = await parseOpenAiApiExampleNow();
@@ -8528,6 +8537,7 @@ window.addEventListener("unhandledrejection", (event) => {
 
 async function initializeApplication(): Promise<void> {
   await workspaceState.initialize();
+  if (browserLifecycleController.signal.aborted) return;
   selectedTeamIds = new Set(workspaceState.module("teams").selected_object_ids);
   selectedPlayerIds = new Set(workspaceState.module("players").selected_object_ids);
   await refresh();
@@ -8549,6 +8559,7 @@ export interface BrowserApplicationModule {
   readonly name: "browser-application";
   start(): Promise<void>;
   destroy(): Promise<void>;
+  stop(): void;
 }
 
 let browserApplicationCreated = false;
@@ -8561,13 +8572,10 @@ export function createBrowserApplicationModule(
   }
   browserApplicationCreated = true;
   app = root;
-  let startTask: Promise<void> | null = null;
-  let destroyed = false;
-
-  async function start(): Promise<void> {
-    if (destroyed) throw new Error("浏览器应用生命周期已结束");
-    if (startTask) return startTask;
-    startTask = (async () => {
+  const lifecycle = new MountHandle({
+    closedMessage: "浏览器应用生命周期已结束",
+    stop: stopResources,
+    async start() {
       bindSearchableSelectDiagnostics(browserLifecycleController.signal);
       render();
       try {
@@ -8576,24 +8584,27 @@ export function createBrowserApplicationModule(
         recordClientIssue(error, "平台启动", "critical");
         throw new Error(userFacingError(error), { cause: error });
       }
-    })();
-    return startTask;
+    },
+    async destroy() {
+      if (renderedPage) {
+        const currentPageRoot = app.querySelector<HTMLElement>(".page-container") ?? app;
+        workspaceState.capture(renderedPage, currentPageRoot, true);
+      }
+      await workspaceState.destroy();
+    },
+  });
+
+  function stopResources(): void {
+    browserLifecycleController.destroy();
+    bootstrapRequests.destroy();
+    openAiExampleRequests.destroy();
+    navigation.cancel();
+    workspaceState.stop();
+    lineupPlayerLoadSequence += 1;
+    pairedLineupLoadSequence.home += 1;
+    pairedLineupLoadSequence.away += 1;
+    openAiApiExampleTimer = null;
   }
 
-  async function destroy(): Promise<void> {
-    if (destroyed) return;
-    destroyed = true;
-    browserLifecycleController.abort();
-    if (openAiApiExampleTimer !== null) {
-      window.clearTimeout(openAiApiExampleTimer);
-      openAiApiExampleTimer = null;
-    }
-    if (renderedPage) {
-      const currentPageRoot = app.querySelector<HTMLElement>(".page-container") ?? app;
-      workspaceState.capture(renderedPage, currentPageRoot, true);
-    }
-    await workspaceState.destroy();
-  }
-
-  return { name: "browser-application", start, destroy };
+  return { name: "browser-application", start: () => lifecycle.start(), destroy: () => lifecycle.destroy(), stop: () => lifecycle.stop() };
 }

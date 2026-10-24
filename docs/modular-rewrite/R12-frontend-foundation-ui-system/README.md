@@ -2,7 +2,7 @@
 
 ## 当前阶段状态
 
-`IN_PROGRESS`。R12-01 Bootstrap组合根DONE：精确f460fbf / Windows run40061447839于2026-10-24 12:42:31北京时间完整SUCCESS，Desktop58/App230/PG259/Gateway112unit+41contract、前端/17视口、Rust、Windows打包/启动/日志通过。R12-02生命周期基础设施READY（尚未实施），03～19 BLOCKED，R12 IN_PROGRESS，唯一rewrite/r12-frontend-foundation-ui-system。
+`IN_PROGRESS`。R12-01 DONE（f460fbf/run40061447839）。R12-02生命周期基础设施已实施VERIFYING：唯一挂载/释放/事件/异步scope接通真实启动和工作区，24项行为测试及本地完整前端/17视口、类型、架构、保护指纹通过；自身完整Windows打包/启动/日志待验。03～19 BLOCKED，唯一rewrite/r12-frontend-foundation-ui-system。
 
 ## 依据与设计边界
 
@@ -13,7 +13,7 @@
 | 任务 | 职责 | 状态 |
 |---|---|---|
 | R12-01 | [Bootstrap 组合根](R12-01-bootstrap-组合根.md) | DONE · 自身Windows完整SUCCESS |
-| R12-02 | 生命周期基础设施 | READY · 尚未实施 |
+| R12-02 | [生命周期基础设施](R12-02-生命周期基础设施.md) | VERIFYING · 自身完整Windows待验 |
 | R12-03 | Router 与 Navigation | BLOCKED |
 | R12-04 | Session | BLOCKED |
 | R12-05 | Application Shell | BLOCKED |

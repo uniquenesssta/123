@@ -7,7 +7,7 @@
 
 ## 当前前置状态（2026-10-24）
 
-R12-01 Bootstrap组合根DONE：精确f460fbf / Windows run40061447839于2026-10-24 12:42:31北京时间完整SUCCESS，Desktop58/App230/PG259/Gateway112unit+41contract、前端/17视口、Rust、Windows打包/启动/日志通过。R12-02生命周期基础设施READY（尚未实施），03～19 BLOCKED，R12 IN_PROGRESS，唯一rewrite/r12-frontend-foundation-ui-system。 [当前索引](../modular-rewrite/R12-frontend-foundation-ui-system/README.md)与[01完成记录](../modular-rewrite/R12-frontend-foundation-ui-system/R12-01-bootstrap-组合根.md)。
+R12-01 DONE（f460fbf/run40061447839）。R12-02生命周期基础设施已实施VERIFYING：唯一挂载/事件/异步/释放scope接通真实启动与工作区，24项行为测试及本地完整前端/17视口、类型、架构和保护指纹通过；自身完整Windows打包/启动/日志尚待验。03～19 BLOCKED，R12 IN_PROGRESS，唯一rewrite/r12-frontend-foundation-ui-system。[当前索引](../modular-rewrite/R12-frontend-foundation-ui-system/README.md)与[02记录](../modular-rewrite/R12-frontend-foundation-ui-system/R12-02-生命周期基础设施.md)。
 
 ## 1. 阶段目标
 
@@ -489,7 +489,7 @@ src/bootstrap/registerApplicationModules.ts
 
 ## R12-02 生命周期基础设施
 
-状态：`READY`（01已通过自身完整Windows并收尾；本节点尚未实施）
+状态：`VERIFYING`（生命周期已接通，24项行为测试及本地前端/17视口通过；自身完整Windows待验，见02记录）
 
 ### 1. 目标
 

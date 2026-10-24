@@ -1,5 +1,9 @@
 # 足球模型平台公开外壳
 
+## R12-02 生命周期基础设施（2026-10-24，VERIFYING）
+
+启动、销毁、逆序资源释放、事件/定时器/恢复帧取消与过期异步结果已接入唯一 `app/lifecycle` 实现；真实浏览器、启动组合根和工作区均使用该实现。原浏览器组合根验证入口新增24项行为测试，既有阵容滚动夹具装配实际拆出模块，未新增runner或依赖。TypeScript、架构与保护指纹及本地完整前端/17视口通过，自身完整Windows打包/启动/日志尚待验；03～19保持BLOCKED。7A/10M/0移动/0D及实际边界见[02记录](docs/modular-rewrite/R12-frontend-foundation-ui-system/R12-02-生命周期基础设施.md)和[R12索引](docs/modular-rewrite/R12-frontend-foundation-ui-system/README.md)。页面视觉、171条命令、配置/DTO/持久格式、Rust与模型资产保持；真实PG/Full/XLSX/私有固定回归及既有最终环境待验仍保留。
+
 当前版本 **0.23.0**。本仓库是平台、数据库、数据准备、路由、工作台与外部模型调用入口的公开版本；真实 P4/P7 预测引擎、参数、Profile、固定比赛、私有研究提示词及模型专用固定回归资产不随仓库分发。
 
 R1–R6 累计补审覆盖 43 个任务节点。根据用户决定，R7-01 后新增 R7-02～06 审计整改，原 R7-02～10 顺延为 R7-07～15；优化拆分、验证与记录约束，沿用现有 Windows 验证和最终封包新库流程，不新增持续回归体系。R7-01 的 A1～A7 修订已通过 Windows CI run `36678914535`，节点 DONE；R7-02 外部 ID 身份保护、R7-03 普通删除与历史引用保护均已通过 Windows CI 并为 DONE。R7-04 清单、验证入口和历史记录已通过 Windows CI run `36706905645` 并为 DONE；R7-05 新增 20 个关键 Application 行为测试，精确 Windows CI run `36712015030` 已通过并 DONE；R7-06 的夹具/时间精度与账本修订已通过 Windows CI run `36734194083` 并 DONE；R7-07 阵容创建与共同并发锁已通过 Windows CI run `36757339619` 并 DONE；R7-08 阵容链/历史已通过 Windows CI run `36801488090` 并 DONE；R7-09 阵容预设已通过 Windows CI run `36808609584` 并 DONE；R7-10 两类导入的批次/行账本职责与冲突计数同步已通过 Windows CI run `36815568401` 并 DONE；R7-11 球员工作簿唯一职责已通过 Windows CI run `36824027121` 并 DONE；R7-12 球队资料包共享职责与冲突计数修订已通过 Windows CI run `36831302483` 并 DONE；R7-13 月度只读聚合与缺口唯一职责已通过 Windows CI run `36854202029` 并 DONE；R7-14 比赛阵容工作簿唯一职责已通过 Windows CI run `36860224760` 并 DONE；R7-15 行/子记录身份收敛及行号前检修订已通过 Windows CI run `36871154039` 并 DONE，R7 节点及 Windows Automated 阶段收口完成。PG/XLSX/Full 单独留到最终封包新库验收。详见 [R7 任务书](docs/football-model-platform-modular-rewrite-19-docs/07-R7-match-lineup-workbook-persistence.md) 与 [阶段索引/累计审计](docs/modular-rewrite/R07-match-lineup-workbook-persistence/README.md)。以下逐节点叙述保留实施历史，当前状态见最新 R8-12 及 R8 阶段索引。

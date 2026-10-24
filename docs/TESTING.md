@@ -1,5 +1,11 @@
 # Testing
 
+## R12-02 生命周期验证（2026-10-24）
+
+复用 `node scripts/verify-browser-bootstrap.mjs`，执行实际TypeScript生命周期模块的24项行为测试：启动/销毁promise去重、销毁重入与启动竞态、部分启动失败的逆序释放及聚合错误、事件解绑、三种定时/动画回调取消、过期请求成功/失败丢弃、当前错误保留、工作区延迟初始化/恢复/最终保存。没有新增runner、workflow、依赖或数据库入口。`verify-lineup-scroll-continuity.mjs`从真实生命周期源码装配既有浏览器夹具，继续用437px位置和绿像素判定，不更新基线。
+
+本地Windows Node24.16/TypeScript5.8.3的24项测试、类型检查、完整架构、保护指纹、171命令及前端完整回归/17视口/Vite通过；Rustfmt通过。临时产物按用户禁止批量删除要求保留（本地preload仅禁止文件清理，不改变断言或页面代码，不提交）；初次受限浏览器未完成与拆分依赖漏接的红像素失败保留在02记录，不算PASS。原Windows CI对本节点精确提交的Rust Clippy/tests、打包、启动和日志尚待完整结果。当前VERIFYING，后续节点不启动；[02记录](modular-rewrite/R12-frontend-foundation-ui-system/R12-02-生命周期基础设施.md)。
+
 ## 2026-09-30 验证执行约定
 
 沿用本文件现有 Windows 验证命令、`windows-acceptance.ps1`、`run_database_baseline.mjs` 和已有 Rust 测试目标。不新增持续回归框架、runner、CI workflow 或数据库专项入口；已有验证器路径/调用遗漏可在现有入口内修正。

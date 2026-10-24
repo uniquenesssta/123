@@ -1,3 +1,5 @@
+import { AsyncScope, EventScope } from "./lifecycle";
+
 export type WorkspaceLayoutMode = "detail" | "compare" | "cards";
 
 export interface WorkspaceTabState {
@@ -97,12 +99,17 @@ export class WorkspaceStateStore<PageKey extends string> {
   private restoreSequence = 0;
   private saveTimer: number | null = null;
   private initialized = false;
+  private readonly events = new EventScope();
+  private readonly initialization = new AsyncScope();
+  private destroyTask: Promise<void> | null = null;
 
   constructor(private readonly adapter: WorkspaceStateAdapter<PageKey>) {}
 
   async initialize(): Promise<void> {
+    const request = this.initialization.begin();
     try {
       const loaded = await this.adapter.read();
+      if (!request.isCurrent()) return;
       if (loaded.schema_version !== 1) {
         this.document = emptyDocument<PageKey>();
         await this.adapter.save(this.document);
@@ -138,9 +145,12 @@ export class WorkspaceStateStore<PageKey extends string> {
         if (needsUiMigration) await this.adapter.save(this.document);
       }
     } catch {
-      this.document = await this.adapter.clear();
+      if (!request.isCurrent()) return;
+      const cleared = await this.adapter.clear();
+      if (!request.isCurrent()) return;
+      this.document = cleared;
     }
-    this.initialized = true;
+    if (request.isCurrent()) this.initialized = true;
   }
 
   capture(page: PageKey, root: ParentNode, includeControls: boolean): void {
@@ -183,6 +193,7 @@ export class WorkspaceStateStore<PageKey extends string> {
   }
 
   restore(page: PageKey, root: ParentNode): void {
+    if (this.events.signal.aborted) return;
     const sequence = ++this.restoreSequence;
     const snapshot = this.module(page);
     for (const [id, item] of Object.entries(snapshot.controls)) {
@@ -205,7 +216,7 @@ export class WorkspaceStateStore<PageKey extends string> {
       const clamped = Math.min(460, Math.max(240, width));
       grid.style.setProperty(key.includes("inspector") ? "--workspace-inspector-width" : "--module-sidebar-width", `${clamped}px`);
     }
-    window.requestAnimationFrame(() => {
+    this.events.requestAnimationFrame(() => {
       if (sequence !== this.restoreSequence) return;
       for (const [key, position] of Object.entries(snapshot.internal_scrolls)) {
         root.querySelector<HTMLElement>(`[data-workspace-scroll-key="${CSS.escape(key)}"]`)?.scrollTo(position.left, position.top);
@@ -231,13 +242,20 @@ export class WorkspaceStateStore<PageKey extends string> {
   async clearAll(): Promise<void> { this.restoreSequence += 1; this.document = await this.adapter.clear(); }
   async flush(): Promise<void> {
     if (!this.initialized) return;
-    if (this.saveTimer !== null) { window.clearTimeout(this.saveTimer); this.saveTimer = null; }
+    if (this.saveTimer !== null) { this.events.clearTimeout(this.saveTimer); this.saveTimer = null; }
     await this.adapter.save(this.document);
   }
-  async destroy(): Promise<void> {
+  stop(): void {
     this.restoreSequence += 1;
-    await this.flush();
-    this.initialized = false;
+    this.events.destroy();
+    this.initialization.destroy();
+  }
+  destroy(): Promise<void> {
+    if (!this.destroyTask) {
+      this.stop();
+      this.destroyTask = this.flush().finally(() => { this.initialized = false; });
+    }
+    return this.destroyTask;
   }
 
   private setModule(page: PageKey, state: WorkspaceModuleState): void {
@@ -245,8 +263,8 @@ export class WorkspaceStateStore<PageKey extends string> {
     this.scheduleSave();
   }
   private scheduleSave(): void {
-    if (!this.initialized) return;
-    if (this.saveTimer !== null) window.clearTimeout(this.saveTimer);
-    this.saveTimer = window.setTimeout(() => { this.saveTimer = null; void this.adapter.save(this.document); }, 250);
+    if (!this.initialized || this.events.signal.aborted) return;
+    if (this.saveTimer !== null) this.events.clearTimeout(this.saveTimer);
+    this.saveTimer = this.events.setTimeout(() => { this.saveTimer = null; void this.adapter.save(this.document); }, 250);
   }
 }
