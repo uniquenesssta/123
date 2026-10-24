@@ -1,0 +1,21 @@
+/* PC App Shell 380:1366. Desktop contract: 960x600 minimum; no compact/mobile variant. */
+html:has(.application-shell) { scrollbar-gutter: auto; }
+.application-shell {
+  --active-secondary-sidebar-width: var(--shell-secondary-sidebar-width);
+  --shell-navigation-offset: calc(var(--shell-primary-rail-width) + var(--active-secondary-sidebar-width));
+  --active-sidebar-width: var(--shell-navigation-offset);
+  --ui-topbar-height: var(--fip-topbar-height);
+  display: grid;
+  grid-template-columns: var(--shell-primary-rail-width) var(--active-secondary-sidebar-width) minmax(0, 1fr);
+  height: 100dvh;
+  min-height: 600px;
+  min-width: 960px;
+  overflow: hidden;
+  color: var(--fip-text);
+  background: var(--fip-canvas);
+  font-family: inherit;
+}
+.application-shell.secondary-collapsed { --active-secondary-sidebar-width: 0px; }
+.application-shell [hidden] { display: none; }
+.application-shell button { font-family: inherit; cursor: pointer; }
+.application-shell button:disabled { cursor: default; }

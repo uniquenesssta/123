@@ -1,6 +1,6 @@
 # R12-04 Session
 
-状态：`VERIFYING`。用户2026-10-24要求“收尾03开始04”；03精确`7f67940`/Windows run`40103980479`完整通过，日志及下载产物哈希已核对。04起点为纯文档收尾`1cfd7cea36265b7170b48acdd1b9226b9e5680e0`，同03已验源码树。沿唯一`rewrite/r12-frontend-foundation-ui-system`；01～03 DONE，05～19 BLOCKED，R12 IN_PROGRESS。04代码、本地验证及记录完成，自身完整Windows Rust/打包/启动/日志待原CI；不轮询CI，不自动实施05。
+状态：`DONE`。2026-10-25用户明确确认“04已通过，没问题开始05”。本轮依据该确认收尾，未重新查询CI，也未重新下载审计产物；不填写未经本轮核实的最终通过run/head。04实施提交为f66e87ae373eedb02445e8d0a5924c8207cb7218。已知e44505e/run40110489633仅作为此前复跑历史，不据此断言它就是用户本次确认的最终验收对象。沿原阶段分支继续05；R12整体IN_PROGRESS。
 
 ## 实际实现与边界
 
@@ -83,4 +83,4 @@ docs/modular-rewrite/R12-frontend-foundation-ui-system/README.md
 
 ## 回退与后续
 
-受控回退04原子提交到`1cfd7ce`，无数据库或持久格式迁移。04保持VERIFYING，发布后等待自身原Windows验收；不轮询、不新增自动监控。05 Application Shell未实施，仍须自己的设计/代码/Windows证据；未创建R12阶段完成记录。
+受控回退04原子提交到`1cfd7ce`，无数据库或持久格式迁移。以上为04实施时的VERIFYING状态；2026-10-25已由用户确认Windows通过并关闭。05另有自身记录与验收，不创建R12阶段完成记录。

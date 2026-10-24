@@ -8,7 +8,7 @@ const failures = [];
 const check = (condition, message) => { if (!condition) failures.push(message); };
 
 const main = read("src/main.ts");
-const shell = read("src/app/shell.ts");
+const shell = JSON.parse(read("contracts/global-visual-system-contract.json")).shell_source_entries.map(read).join("\n");
 const navigation = read("src/app/router/routeRegistry.ts");
 const teams = read("src/pages/teams.ts");
 const players = read("src/pages/players.ts");
@@ -23,12 +23,12 @@ const playerDirectoryMapper = read("crates/persistence-postgres/src/adapters/cat
 const teamSquadPersistence = read("crates/persistence-postgres/src/adapters/catalog/teams/detail/read_squad.rs");
 const teamSquadMapper = read("crates/persistence-postgres/src/adapters/catalog/teams/detail/squad_mapper.rs");
 const teamRecordMapper = read("crates/persistence-postgres/src/adapters/catalog/teams/detail/record_mapper.rs");
-const css = read("src/styles/entityCenter.css");
+const css = read("src/styles/entityCenter.css") + read("src/ui/tokens/dimensions.css") + read("src/app/shell/application-shell/applicationShell.css");
 
 check(main.indexOf('import "./styles/entityCenter.css";') > main.indexOf('import "./styles/layout.css";'), "资源中心样式必须最后加载，避免旧阶段样式反向覆盖");
 check(shell.includes("primary-rail") && shell.includes("secondary-sidebar") && navigation.includes('key: "management"'), "管理一级模块及上下文二级菜单必须常驻");
 check(css.includes("--shell-sidebar-expanded") && css.includes("--shell-sidebar-collapsed"), "双层全局导航缺少展开/折叠双常驻宽度");
-check(css.includes(".app-shell.dual-navigation.sidebar-collapsed"), "二级菜单折叠状态样式缺失");
+check(css.includes(".application-shell.secondary-collapsed"), "二级菜单折叠状态样式缺失");
 
 for (const source of [teams, players]) {
   check(source.includes("workspaceSectionNavigation") && source.includes("core-local-navigation"), "球队/球员资源中心缺少固定三级任务导航");

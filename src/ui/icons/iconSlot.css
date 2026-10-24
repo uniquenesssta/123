@@ -1,0 +1,39 @@
+.ui-icon-slot {
+  display: inline-block;
+  flex-shrink: 0;
+  background-color: currentColor;
+  mask: var(--ui-icon-source) center / contain no-repeat;
+}
+.ui-icon-size-16 { width: 16px; height: 16px; }
+.ui-icon-size-20 { width: 20px; height: 20px; }
+.ui-icon-size-24 { width: 24px; height: 24px; }
+.ui-icon-dashboard { --ui-icon-source: url("../../assets/icons/dashboard.svg"); }
+.ui-icon-match-center { --ui-icon-source: url("../../assets/icons/match-center.svg"); }
+.ui-icon-prediction { --ui-icon-source: url("../../assets/icons/prediction.svg"); }
+.ui-icon-release-acceptance { --ui-icon-source: url("../../assets/icons/release-acceptance.svg"); }
+.ui-icon-history { --ui-icon-source: url("../../assets/icons/history.svg"); }
+.ui-icon-shield { --ui-icon-source: url("../../assets/icons/shield.svg"); }
+.ui-icon-users { --ui-icon-source: url("../../assets/icons/users.svg"); }
+.ui-icon-lineup-preset { --ui-icon-source: url("../../assets/icons/lineup-preset.svg"); }
+.ui-icon-sheet { --ui-icon-source: url("../../assets/icons/sheet.svg"); }
+.ui-icon-settings { --ui-icon-source: url("../../assets/icons/settings.svg"); }
+.ui-icon-chart { --ui-icon-source: url("../../assets/icons/chart.svg"); }
+.ui-icon-chat { --ui-icon-source: url("../../assets/icons/chat.svg"); }
+.ui-icon-plug { --ui-icon-source: url("../../assets/icons/plug.svg"); }
+.ui-icon-database { --ui-icon-source: url("../../assets/icons/database.svg"); }
+.ui-icon-issue-log { --ui-icon-source: url("../../assets/icons/issue-log.svg"); }
+.ui-icon-info { --ui-icon-source: url("../../assets/icons/info.svg"); }
+.ui-icon-contrast { --ui-icon-source: url("../../assets/icons/contrast.svg"); }
+.ui-icon-panel-left { --ui-icon-source: url("../../assets/icons/panel-left.svg"); }
+.ui-icon-panel-right { --ui-icon-source: url("../../assets/icons/panel-right.svg"); }
+.ui-icon-arrow-left { --ui-icon-source: url("../../assets/icons/arrow-left.svg"); }
+.ui-icon-arrow-right { --ui-icon-source: url("../../assets/icons/arrow-right.svg"); }
+.ui-icon-reset { --ui-icon-source: url("../../assets/icons/reset.svg"); }
+.ui-icon-alert-circle { --ui-icon-source: url("../../assets/icons/alert-circle.svg"); }
+.ui-icon-close { --ui-icon-source: url("../../assets/icons/close.svg"); }
+.ui-icon-spinner { position: relative; background: transparent; mask: none; animation: fip-spinner .8s linear infinite; }
+.ui-icon-spinner > svg { position: absolute; inset: -3.90625%; width: 107.8125%; height: 107.8125%; }
+.ui-icon-spinner [id="Track"] { stroke: var(--fip-border); stroke-opacity: 1; }
+.ui-icon-spinner [id="Active arc"] { stroke: var(--fip-accent); }
+@keyframes fip-spinner { to { transform: rotate(360deg); } }
+@media (prefers-reduced-motion: reduce) { .ui-icon-spinner { animation: none; } }

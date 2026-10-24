@@ -13,10 +13,10 @@ const requireTrue = (condition, message) => {
 };
 
 const modal = read("src/app/modal.ts");
-const shell = read("src/app/shell.ts");
+const shell = JSON.parse(read("contracts/global-visual-system-contract.json")).shell_source_entries.map(read).join("\n");
 const main = read("src/main.ts");
 const teams = read("src/pages/teams.ts");
-const panelCss = read("src/styles/workspacePanels.css");
+const panelCss = read("src/styles/workspacePanels.css") + read("src/app/shell/content-region/contentRegion.css");
 const entityCss = read("src/styles/entityCenter.css");
 const runtimeLog = read("src-tauri/src/runtime_log.rs");
 
@@ -26,10 +26,11 @@ requireTrue(modal.includes('class="workspace-detail-page'), "详情控制器未�
 requireTrue(modal.includes("back(): void") && modal.includes("forward(): void"), "右侧工作区缺少返回/前进历史");
 requireTrue(modal.includes("captureCurrentState(): void") && modal.includes("restoreCurrentState") && modal.includes("bodyScrollTop"), "右侧工作区返回/前进未保留表单草稿与滚动位置");
 requireTrue(modal.includes("restore(): void") && main.includes("modal.restore();"), "页面重绘后未恢复右侧工作区");
-requireTrue(main.includes('case "workspace-history-back"') && main.includes('case "workspace-history-forward"'), "返回/前进按钮未接入事件链");
-requireTrue(/navigation\.navigate\(nextPage, loadNavigationPage,\s*\{\s*started\(\)\s*\{\s*modal\.reset\(\);/.test(main), "跨二级页面导航未在切换开始清理旧右侧工作区历史");
-requireTrue(shell.includes('data-action="workspace-history-back"') && shell.includes('data-action="workspace-history-forward"'), "顶部栏未提供返回/前进按钮");
-requireTrue(shell.indexOf('id="modal-root"') < shell.indexOf("</main>"), "右侧工作区根节点未放在主内容区域内");
+const shellController = read("src/app/shell/application-shell/applicationShellController.ts");
+requireTrue(main.includes("shellController?.handleAction(action)") && shellController.includes('case "workspace-history-back"') && shellController.includes('case "workspace-history-forward"'), "返回/前进按钮未接入唯一Shell事件链");
+requireTrue(/async function navigateTo[\s\S]*?navigation\.navigate\(nextPage,[\s\S]*?started\(\)\s*\{\s*modal\.reset\(\);/.test(main), "跨二级页面导航未在切换开始清理旧右侧工作区历史");
+requireTrue(shell.includes('iconButtonView("workspace-history-back"') && shell.includes('iconButtonView("workspace-history-forward"'), "顶部栏未提供返回/前进按钮");
+requireTrue(read("src/app/shell/page-frame/pageFrameView.ts").includes("${contentRegionView(options.content, options.navigationPending, options.navigationFailed)}</main>") && read("src/app/shell/content-region/contentRegionView.ts").includes('id="modal-root"'), "右侧工作区根节点未放在主内容区域内");
 requireTrue(panelCss.includes(".main-content.workspace-panel-open > .page-container") && panelCss.includes("display: none !important"), "打开右侧工作区时未替换原页面内容");
 requireTrue(panelCss.includes(".workspace-detail-body") && panelCss.includes("overflow: auto"), "右侧完整工作区内容不可滚动");
 
@@ -107,3 +108,126 @@ await captureHtmlScreenshot({ browser, htmlPath, outputPath, width: 700, height:
 const image = decodePng(outputPath), offset = (5 * image.width + 5) * image.channels;
 requireTrue(image.pixels[offset] < 40 && image.pixels[offset+1] > 220 && image.pixels[offset+2] < 40, `详情历史浏览器验证失败，检查保留的${htmlPath}与${outputPath}`);
 console.log(`右侧内联工作区、资源滚动与日志验证通过；实际浏览器详情A/B/基础页、输入/多选/滚动/焦点、真实会话主题初始化/切换/保存与重绘、敏感排除、分支清栈通过。产物保留：${directory}`);
+
+// R12-05: the same browser entry also mounts the production Shell module tree.
+const modules = {};
+function bundle(file) {
+  if (modules[file]) return;
+  const output = ts.transpileModule(read(file), { compilerOptions: { target: ts.ScriptTarget.ES2022, module: ts.ModuleKind.CommonJS } }).outputText;
+  modules[file] = { output, imports: {} };
+  for (const [, specifier] of output.matchAll(/require\("([^"]+)"\)/g)) {
+    requireTrue(specifier.startsWith("."), `Shell fixture dependency must be local: ${specifier}`);
+    const base = path.resolve(root, path.dirname(file), specifier);
+    if (specifier.endsWith(".svg?raw")) {
+      const target = path.relative(root, base).replaceAll("\\", "/");
+      modules[file].imports[specifier] = target;
+      modules[target] = { output: `exports.default=${JSON.stringify(fs.readFileSync(base.replace(/\?raw$/, ""), "utf8"))}`, imports: {} };
+      continue;
+    }
+    const target = path.relative(root, fs.existsSync(`${base}.ts`) ? `${base}.ts` : path.join(base, "index.ts")).replaceAll("\\", "/");
+    modules[file].imports[specifier] = target;
+    bundle(target);
+  }
+}
+const entry = "src/app/shell/__tests__/shellBrowserFixture.ts";
+bundle(entry);
+const shellBundle = `const shellModules=${JSON.stringify(modules)};const shellCache={};function shellRequire(id){if(shellCache[id])return shellCache[id];const record=shellModules[id],exports={};shellCache[id]=exports;new Function('exports','require',record.output)(exports,s=>shellRequire(record.imports[s]));return exports;}`;
+const mainStyles = [...main.matchAll(/^import "(\.\/[^"\n]+\.css)";/gm)].map(match => match[1].replace("./", "src/"));
+const shellStyles = mainStyles.map(file => read(file).replace(/url\("([^"\n]+\.svg)"\)/g, (_match, asset) => {
+  const bytes = fs.readFileSync(path.resolve(root, path.dirname(file), asset));
+  return `url("data:image/svg+xml;base64,${bytes.toString("base64")}")`;
+})).join("\n");
+const shellResults = [];
+for (const [width, height] of [[960, 600], [1440, 900], [2560, 1440]]) {
+  for (const theme of ["light", "dark"]) for (const collapsed of [false, true]) {
+    const name = `shell-${width}x${height}-${theme}-${collapsed ? "collapsed" : "expanded"}`;
+    const fixturePath = path.join(directory, `${name}.html`);
+    fs.writeFileSync(fixturePath, `<!doctype html><html lang="zh-CN" data-theme="${theme}"><head><meta charset="utf-8"><style>${shellStyles}\nbody{margin:0}</style></head><body><div id="shell-host"></div><script>${shellBundle.replaceAll("</script", "<\\/script")}
+window.shellFixtureReady=shellRequire(${JSON.stringify(entry)}).installShellFixture(${JSON.stringify(theme)},${collapsed}).then(result=>{window.shellFixture=result;return {passed:true,checks:result.checks}}).catch(error=>({passed:false,error:String(error.stack)}));</script></body></html>`);
+    const result = await captureHtmlScreenshot({ browser, htmlPath: fixturePath, outputPath: path.join(directory, `${name}.png`), width, height,
+      async exercise(cdp) {
+        const response = await cdp.send("Runtime.evaluate", { expression: "window.shellFixtureReady", awaitPromise: true, returnByValue: true });
+        const result = response.result?.value ?? { passed: false, error: response.exceptionDetails?.text ?? "no fixture result" };
+        if (!result.passed) return result;
+        await cdp.send("Page.bringToFront");
+        await cdp.send("Runtime.evaluate", { expression: "document.querySelector('#shell-draft').focus();document.querySelector('#shell-draft').select()" });
+        await cdp.send("Input.insertText", { text: "真实浏览器输入" });
+        const typed = await cdp.send("Runtime.evaluate", { expression: "document.querySelector('#shell-draft').value", returnByValue: true });
+        if (typed.result?.value !== "真实浏览器输入") return { passed: false, error: "native text input" };
+        result.checks.push("native text input");
+        // This point remains inside the workspace and the native headless window at every viewport.
+        await cdp.send("Runtime.evaluate", { expression: `window.shellWheelResult = new Promise(resolve => {
+          const page = document.querySelector('.page-container');
+          const snapshot = () => ({top:page.scrollTop,height:page.scrollHeight,client:page.clientHeight,windowY:window.scrollY});
+          const timer = setTimeout(() => resolve(snapshot()), 1000);
+          page.addEventListener('scroll', () => requestAnimationFrame(() => { clearTimeout(timer); resolve(snapshot()); }), {once:true});
+        });` });
+        await cdp.send("Input.dispatchMouseEvent", { type: "mouseMoved", x: 400, y: 300 });
+        await cdp.send("Input.dispatchMouseEvent", { type: "mouseWheel", x: 400, y: 300, deltaX: 0, deltaY: 180 });
+        const scrolled = await cdp.send("Runtime.evaluate", { expression: "window.shellWheelResult", awaitPromise: true, returnByValue: true });
+        if (!(scrolled.result?.value?.top > 0) || scrolled.result.value.windowY !== 0) return { passed: false, error: `native workspace wheel scroll: ${JSON.stringify(scrolled.result?.value)}` };
+        result.checks.push("native workspace wheel scroll");
+        // Trusted browser keyboard events exercise the native button activation path.
+        for (const [key, code, vk] of [["Enter", "Enter", 13], [" ", "Space", 32]]) {
+          await cdp.send("Runtime.evaluate", { expression: "Array.from(document.querySelectorAll('[data-action=\"toggle-global-sidebar\"]')).find(button=>!button.closest('[hidden]')).focus()" });
+          await cdp.send("Input.dispatchKeyEvent", { type: "keyDown", key, code, text: key === "Enter" ? "\r" : " ", unmodifiedText: key === "Enter" ? "\r" : " ", windowsVirtualKeyCode: vk, nativeVirtualKeyCode: vk });
+          await cdp.send("Input.dispatchKeyEvent", { type: "keyUp", key, code, windowsVirtualKeyCode: vk, nativeVirtualKeyCode: vk });
+          const state = await cdp.send("Runtime.evaluate", { expression: "({collapsed:document.querySelector('.secondary-sidebar').hidden,focus:document.activeElement?.dataset?.action,draft:document.querySelector('#shell-draft').value})", returnByValue: true });
+          const expectedCollapsed = key === "Enter" ? !collapsed : collapsed;
+          if (state.result?.value?.collapsed !== expectedCollapsed) return { passed: false, error: `native ${code} activation failed: ${JSON.stringify(state.result?.value)}` };
+          if (state.result?.value?.draft !== "真实浏览器输入") return { passed: false, error: `native ${code} lost typed draft` };
+          result.checks.push(`native ${code} activation`);
+        }
+        // Tab gives the browser a real keyboard modality for the visible focus ring.
+        await cdp.send("Runtime.evaluate", { expression: "document.querySelector('.primary-nav-item').focus()" });
+        await cdp.send("Input.dispatchKeyEvent", { type: "keyDown", key: "Tab", code: "Tab", windowsVirtualKeyCode: 9 });
+        await cdp.send("Input.dispatchKeyEvent", { type: "keyUp", key: "Tab", code: "Tab", windowsVirtualKeyCode: 9 });
+        const focus = await cdp.send("Runtime.evaluate", { expression: "({visible:document.activeElement.matches(':focus-visible'),width:getComputedStyle(document.activeElement).outlineWidth})", returnByValue: true });
+        if (!focus.result?.value?.visible || focus.result.value.width !== "1px") return { passed: false, error: "native keyboard focus ring" };
+        result.checks.push("native Tab focus ring 1px");
+        await cdp.send("Runtime.evaluate", { expression: "document.querySelector('[data-action=\"reset-current-workspace\"]').focus()" });
+        await cdp.send("Input.dispatchKeyEvent", { type: "keyDown", key: "Enter", code: "Enter", text: "\r", windowsVirtualKeyCode: 13 });
+        await cdp.send("Input.dispatchKeyEvent", { type: "keyUp", key: "Enter", code: "Enter", windowsVirtualKeyCode: 13 });
+        const dialog = await cdp.send("Runtime.evaluate", { expression: "({open:!!document.querySelector('dialog:modal'),width:document.querySelector('dialog')?.getBoundingClientRect().width,cancel:document.activeElement.matches('footer [data-confirmation-action=cancel]')})", returnByValue: true });
+        if (!dialog.result?.value?.open || dialog.result.value.width !== 480 || !dialog.result.value.cancel) return { passed: false, error: `native reset dialog: ${JSON.stringify(dialog.result?.value)}` };
+        result.checks.push("native reset dialog 480 and Cancel focus");
+        for (let index = 0; index < 3; index++) {
+          await cdp.send("Input.dispatchKeyEvent", { type: "keyDown", key: "Tab", code: "Tab", windowsVirtualKeyCode: 9 });
+          await cdp.send("Input.dispatchKeyEvent", { type: "keyUp", key: "Tab", code: "Tab", windowsVirtualKeyCode: 9 });
+          const inside = await cdp.send("Runtime.evaluate", { expression: "document.querySelector('dialog').contains(document.activeElement)", returnByValue: true });
+          if (!inside.result?.value) return { passed: false, error: "native dialog focus escaped" };
+        }
+        result.checks.push("native dialog Tab focus confinement");
+        const dialogScreenshot = await cdp.send("Page.captureScreenshot", { format: "png", fromSurface: true, captureBeyondViewport: false });
+        fs.writeFileSync(path.join(directory, `${name}-reset-confirmation.png`), Buffer.from(dialogScreenshot.data, "base64"));
+        await cdp.send("Input.dispatchKeyEvent", { type: "keyDown", key: "Escape", code: "Escape", windowsVirtualKeyCode: 27 });
+        await cdp.send("Input.dispatchKeyEvent", { type: "keyUp", key: "Escape", code: "Escape", windowsVirtualKeyCode: 27 });
+        const cancelled = await cdp.send("Runtime.evaluate", { expression: "({closed:!document.querySelector('dialog:modal'),draft:document.querySelector('#shell-draft').value,focus:document.activeElement.dataset.action})", returnByValue: true });
+        if (!cancelled.result?.value?.closed || cancelled.result.value.draft !== "真实浏览器输入" || cancelled.result.value.focus !== "reset-current-workspace") return { passed: false, error: `native dialog Escape: ${JSON.stringify(cancelled.result?.value)}` };
+        result.checks.push("native Escape cancels reset and restores focus/draft");
+        await cdp.send("Runtime.evaluate", { expression: "const probe=document.createElement('div');probe.id='motion-probe';probe.innerHTML=shellRequire('src/app/shell/topbar/serviceStatusView.ts').serviceStatusView(true,true);document.querySelector('.topbar').append(probe)" });
+        for (const [value, expected] of [["no-preference", "fip-spinner"], ["reduce", "none"]]) {
+          await cdp.send("Emulation.setEmulatedMedia", { features: [{ name: "prefers-reduced-motion", value }] });
+          const motion = await cdp.send("Runtime.evaluate", { expression: "getComputedStyle(document.querySelector('#motion-probe .ui-icon-spinner')).animationName", returnByValue: true });
+          if (motion.result?.value !== expected) return { passed: false, error: `reduced-motion ${value}` };
+          result.checks.push(`spinner motion ${value}`);
+        }
+        await cdp.send("Runtime.evaluate", { expression: "document.querySelector('#motion-probe').remove();document.querySelector('#shell-draft').value='初始输入';document.querySelector('.page-container').scrollTop=0" });
+        await cdp.send("Runtime.evaluate", { expression: "document.activeElement.blur(); window.shellFixture.finish()" });
+        return result;
+      },
+    });
+    shellResults.push({ name, ...result });
+    fs.writeFileSync(path.join(directory, "shell-results.json"), JSON.stringify(shellResults, null, 2));
+    requireTrue(result?.passed, `${name}: ${result?.error}. See ${fixturePath}`);
+    console.log(`${name}: ${result.checks.length} Shell layout/interaction/lifecycle checks passed`);
+  }
+}
+console.log(`R12-05真实Shell浏览器验证通过：${shellResults.length}个深浅主题/折叠/桌面视口组合，保留截图和结构化结果：${directory}`);
+// Reuse the existing Windows artifact location (../logs/**); no workflow or runner added.
+const evidenceDirectory = path.resolve(root, "..", "logs", `r12-05-shell-${Date.now()}`);
+fs.mkdirSync(evidenceDirectory, { recursive: true });
+for (const file of fs.readdirSync(directory).filter(name => name.endsWith(".png") || name === "shell-results.json")) {
+  fs.copyFileSync(path.join(directory, file), path.join(evidenceDirectory, file));
+}
+console.log(`Shell/确认弹窗证据已复制到原Windows日志产物目录：${evidenceDirectory}`);

@@ -1,0 +1,7 @@
+.application-shell .topbar { position: relative; top: auto; display: flex; flex: 0 0 var(--fip-topbar-height); align-items: center; gap: 8px; height: var(--fip-topbar-height); min-height: var(--fip-topbar-height); padding: 0 12px; border-bottom: 1px solid var(--fip-border); background: var(--fip-surface); backdrop-filter: none; z-index: 1; }
+.application-shell .topbar-history { display: inline-flex; flex-shrink: 0; align-items: center; gap: 4px; }
+.application-shell .topbar-separator { flex: 0 0 1px; width: 1px; height: 16px; background: var(--fip-border); }
+.application-shell .topbar-title { display: block; flex: 1 1 0; min-width: 0; margin: 0; overflow: hidden; font-size: 12px; font-weight: 500; line-height: 16px; color: var(--fip-text); white-space: nowrap; text-overflow: ellipsis; }
+.application-shell .shell-service-status { display: inline-flex; flex-shrink: 0; align-items: center; gap: 4px; height: 24px; color: var(--fip-text); font-size: 11px; font-weight: 500; line-height: 16px; white-space: nowrap; }
+.application-shell .shell-service-badge { display: inline-flex; align-items: center; height: 24px; padding: 0 8px; border: 1px solid var(--fip-accent); border-radius: 12px; font-size: 12px; font-weight: 500; line-height: 16px; }
+.application-shell .unconfigured .shell-service-badge { border-color: var(--fip-warning); }

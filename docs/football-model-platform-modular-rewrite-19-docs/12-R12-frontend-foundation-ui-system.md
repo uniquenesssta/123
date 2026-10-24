@@ -5,9 +5,9 @@
 > 后续阶段：`R13`  
 > 本文档是唯一执行依据之一；必须与 `00-总体架构与前23节.md` 同时适用。
 
-## 当前前置状态（2026-10-24）
+## 当前前置状态（2026-10-25）
 
-R12-01～03 DONE；03精确7f67940/run40103980479完整Windows及产物通过，收尾1cfd7ce。用户授权04 Session，现已实施VERIFYING：唯一会话协调/启动摘要/主题/持久化接入真实链路，18项会话行为及浏览器检查通过；05～19 BLOCKED，R12 IN_PROGRESS，唯一rewrite/r12-frontend-foundation-ui-system。04自身完整Windows待验，不轮询CI。[当前索引](../modular-rewrite/R12-frontend-foundation-ui-system/README.md)与[04记录](../modular-rewrite/R12-frontend-foundation-ui-system/R12-04-session.md)。
+R12-01～04 DONE；04由用户2026-10-25确认通过。05 Application Shell已实施VERIFYING，采用设计分支40109ce及Figma380:1366、304:4348、280:2814，接通真实导航/主题/详情历史/工作区、确认弹窗与加载失败恢复。90步骤前端、912项Shell检查与原17视口通过。06～19 BLOCKED，R12 IN_PROGRESS，唯一rewrite/r12-frontend-foundation-ui-system。05自身完整Windows待验，不轮询CI。详[当前索引](../modular-rewrite/R12-frontend-foundation-ui-system/README.md)与[05记录](../modular-rewrite/R12-frontend-foundation-ui-system/R12-05-application-shell.md)。
 
 ## 1. 阶段目标
 
@@ -269,6 +269,8 @@ app/shell/content-region/
 - clock、debounce、request sequence。
 
 ### R12-10 Design Tokens
+
+05已在唯一目标目录先落地Shell必需的颜色/尺寸子集，详05记录；本节点仍BLOCKED，后续在同一实现补齐，不另建token副本。
 
 分别建立颜色、字体、间距、尺寸、圆角、边框、阴影、动效、层级和断点 token。禁止在 feature CSS 中新增无法解释的魔法值。
 
@@ -767,7 +769,7 @@ src/app/router/routeHistory.ts
 
 ## R12-04 Session
 
-状态：`VERIFYING`（用户2026-10-24授权，代码与本地验证见04记录；自身完整Windows待验）
+状态：`DONE`（2026-10-25用户明确确认04通过；本轮不查询或臆定最终CI编号，详04记录）
 
 ### 1. 目标
 
@@ -905,7 +907,7 @@ src/app/session/sessionPersistence.ts
 
 ## R12-05 Application Shell
 
-状态：`BLOCKED`（仅当上一任务与本任务前置门禁通过后改为 `READY`）
+状态：`VERIFYING`（2026-10-25用户授权05；实现及本地证据见05记录，自身完整Windows待验，不轮询）
 
 ### 1. 目标
 

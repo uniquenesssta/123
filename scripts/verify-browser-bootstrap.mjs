@@ -43,7 +43,7 @@ check(!/\blet (?:state|currentTheme)\s*:|const bootstrapRequests|readInitialThem
 check((browserApplication.match(/api\.bootstrap\(\)/g) ?? []).length === 1 && (browserApplication.match(/api\.listRecentRuns\(100\)/g) ?? []).length === 1, "R12-04 摘要/最近运行读取不得绕过唯一会话adapter");
 check(!/session\.bootstrap(?:\.data(?:\.[A-Za-z_]+)?)?\s*=(?!=)/.test(browserApplication), "R12-04 入口仍直接改写只读摘要");
 check(browserApplication.includes("session.start()") && browserApplication.includes("session.stop()") && browserApplication.includes("session.destroy()"), "R12-04 会话未接通真实生命周期");
-check(browserApplication.includes("session.toggleTheme();\n  render({ preserveForm: true });"), "R12-04 主题切换未保持原表单重绘语义");
+check(browserApplication.includes("toggleTheme: () => session.toggleTheme()") && browserApplication.includes("renderPreservingWorkspace: () => render({ preserveForm: true })") && read("src/app/shell/application-shell/applicationShellController.ts").includes('case "toggle-theme":\n        this.operations.toggleTheme();\n        this.operations.renderPreservingWorkspace();'), "R12-04/05 主题切换未通过Shell保持原表单重绘语义");
 check(browserApplication.includes("new EventScope()") && browserApplication.includes("new MountHandle("), "R12-02 真实浏览器模块未使用生命周期基础设施");
 check(!/window\.(?:setTimeout|setInterval)\(/.test(browserApplication), "R12-02 真实浏览器定时器必须归事件scope");
 check(browserApplication.includes("openAiExampleRequests.invalidate()") && browserApplication.includes("request.isCurrent()"), "R12-02 示例解析必须丢弃过期结果");

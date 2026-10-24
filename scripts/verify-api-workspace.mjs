@@ -42,7 +42,7 @@ const registry = text("src-tauri/src/bootstrap/command_registry.rs");
 const client = text("src/api/client.ts");
 const page = text("src/pages/apiWorkspace.ts");
 const main = text("src/main.ts");
-const shell = text("src/app/shell.ts");
+const shell = JSON.parse(text("contracts/global-visual-system-contract.json")).shell_source_entries.map(text).join("\n");
 const navigation = text("src/app/router/routeRegistry.ts");
 const readme = text("README.md");
 

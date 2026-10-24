@@ -1,6 +1,10 @@
 # 足球模型平台公开外壳
 
-## R12-04 Session（2026-10-24，VERIFYING）
+## R12-05 Application Shell（2026-10-25，VERIFYING）
+
+04已按用户确认收尾。05按已确认Figma的60/154导航、44顶栏、32操作接入五个Shell目录；导航、主题、详情历史、工作区输入/滚动保持原唯一owner。接入重置确认弹窗，修正旧页面回写及加载/错误面板覆盖草稿的问题；读取失败可重试本页读取或查看日志。必要的共享Tokens/按钮/图标/错误展示/确认弹窗子集落在后续节点唯一目录，其余节点仍BLOCKED。90项前端门禁、12组桌面组合的912项Shell检查及原17视口通过；实际变更和自身Windows待验见[05记录](docs/modular-rewrite/R12-frontend-foundation-ui-system/R12-05-application-shell.md)与[R12索引](docs/modular-rewrite/R12-frontend-foundation-ui-system/README.md)。01～04 DONE、05 VERIFYING、06～19 BLOCKED；不轮询CI，不自动实施06。
+
+## R12-04 Session实施记录（2026-10-24，验收前）
 
 03已完成Windows验收并收尾。04已将会话协调、启动摘要、主题与原主题偏好持久化迁入唯一`app/session`，接通真实启动/刷新/停止/销毁；摘要以独立深冻结快照供既有页面读取，最近运行列表统一更新并丢弃过期响应。原验证入口新增18项会话行为检查，实际浏览器验证主题与详情输入/滚动/焦点保持；不新增依赖或验证入口。实际清单与验证见[04记录](docs/modular-rewrite/R12-frontend-foundation-ui-system/R12-04-session.md)。01～03 DONE，04 VERIFYING，05～19 BLOCKED；04自身完整Windows验收待结果，不轮询CI。
 

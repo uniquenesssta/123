@@ -154,6 +154,8 @@ export class WorkspaceStateStore<PageKey extends string> {
   }
 
   capture(page: PageKey, root: ParentNode, includeControls: boolean): void {
+    // A loading/error presentation must not replace the last usable workspace snapshot.
+    if (root instanceof HTMLElement && root.dataset.workspaceCapture === "suspended") return;
     const previous = this.module(page);
     const controls: Record<string, ControlSnapshot> = includeControls ? {} : previous.controls;
     if (includeControls) {
@@ -170,7 +172,9 @@ export class WorkspaceStateStore<PageKey extends string> {
       if (element.open) openDetails.push(detailsKey(element, index));
     });
     const internalScrolls: Record<string, { left: number; top: number }> = {};
-    root.querySelectorAll<HTMLElement>("[data-workspace-scroll-key]").forEach((element) => {
+    const scrollRegions = Array.from(root.querySelectorAll<HTMLElement>("[data-workspace-scroll-key]"));
+    if (root instanceof HTMLElement && root.hasAttribute("data-workspace-scroll-key")) scrollRegions.unshift(root);
+    scrollRegions.forEach((element) => {
       const key = element.dataset.workspaceScrollKey;
       if (key) internalScrolls[key] = { left: element.scrollLeft, top: element.scrollTop };
     });
@@ -219,7 +223,8 @@ export class WorkspaceStateStore<PageKey extends string> {
     this.events.requestAnimationFrame(() => {
       if (sequence !== this.restoreSequence) return;
       for (const [key, position] of Object.entries(snapshot.internal_scrolls)) {
-        root.querySelector<HTMLElement>(`[data-workspace-scroll-key="${CSS.escape(key)}"]`)?.scrollTo(position.left, position.top);
+        const region = root instanceof HTMLElement && root.dataset.workspaceScrollKey === key ? root : root.querySelector<HTMLElement>(`[data-workspace-scroll-key="${CSS.escape(key)}"]`);
+        region?.scrollTo(position.left, position.top);
       }
       window.scrollTo(snapshot.scroll_x, snapshot.scroll_y);
       if (snapshot.active_element_id) root.querySelector<HTMLElement>(`#${CSS.escape(snapshot.active_element_id)}`)?.focus({ preventScroll: true });

@@ -54,14 +54,14 @@ const catalogDefinitionFiles = JSON.parse(text("architecture/command-contract.js
 const commands = [...new Set(Object.values(catalogDefinitionFiles))].map(text).join("\n");
 const registry = text("src-tauri/src/bootstrap/command_registry.rs");
 const client = text("src/api/client.ts");
-const shell = text("src/app/shell.ts");
+const shell = JSON.parse(text("contracts/global-visual-system-contract.json")).shell_source_entries.map(text).join("\n");
 const navigation = text("src/app/router/routeRegistry.ts");
 const main = text("src/main.ts");
 const teamsPage = text("src/pages/teams.ts");
 const playersPage = text("src/pages/players.ts");
 const types = text("src/types.ts");
 const styles = text("src/styles/components.css");
-const entityStyles = text("src/styles/entityCenter.css");
+const entityStyles = text("src/styles/entityCenter.css") + text("src/ui/tokens/dimensions.css") + text("src/app/shell/application-shell/applicationShell.css");
 const readme = text("README.md");
 
 assert(contract.contract_id === "football.team-player-management-contract.v1", "球队与球员管理契约ID错误");
@@ -82,6 +82,13 @@ assert(readme.includes("## 0.14.0 变更记录"), "根README缺少0.14.0变更�
 assert(readme.includes("## 0.15.0 变更记录"), "根README缺少0.15.0变更记录");
 
 for (const artifact of contract.artifacts) {
+  if (artifact === "src/app/shell.ts") {
+    assert(!existsSync(join(root, artifact)), "R12-05旧单文件Shell仍存在");
+    for (const currentOwner of ["src/app/shell/index.ts", "src/app/shell/application-shell/applicationShellView.ts", "src/app/shell/sidebar/sidebarView.ts", "src/app/shell/topbar/topbarView.ts", "src/app/shell/page-frame/pageFrameView.ts", "src/app/shell/content-region/contentRegionView.ts"]) {
+      assert(existsSync(join(root, currentOwner)), `Shell当前制品不存在：${currentOwner}`);
+    }
+    continue;
+  }
   if (artifact === "src-tauri/src/commands/catalog.rs") {
     assert(!existsSync(join(root, artifact)), "R11-04旧catalog命令owner仍存在");
     for (const currentOwner of ["src-tauri/src/commands/catalog/mod.rs", ...new Set(Object.values(catalogDefinitionFiles))]) {
@@ -179,7 +186,7 @@ const apiWorkspaceApplication = text("crates/application/src/use_cases/ai_worksp
 assert(apiWorkspaceApplication.includes("let current = port.read_team(team_id).await?.profile"), "API球队档案提案未读取现有档案");
 assert(apiWorkspaceApplication.includes("or_else(|| current.as_ref()"), "API球队档案提案未采用增量合并");
 assert(entityStyles.includes(".entity-browser") && entityStyles.includes("@media (max-width: 1100px)") && entityStyles.includes("@media (max-width: 620px)"), "球队与球员资源中心缺少分级响应式布局");
-assert(entityStyles.includes("--shell-sidebar-expanded") && entityStyles.includes(".app-shell.dual-navigation.sidebar-collapsed"), "双层全局导航缺少展开与折叠常驻状态");
+assert(entityStyles.includes("--shell-sidebar-expanded") && entityStyles.includes(".application-shell.secondary-collapsed"), "双层全局导航缺少展开与折叠常驻状态");
 
 assert(contract.team_center.organization_model === "generic_fm_fifa_inspired_without_proprietary_data", "球队组织逻辑必须是通用借鉴而非专有复制");
 assert(contract.bulk_delete.explicit_confirmation_required === true, "批量删除必须显式确认");

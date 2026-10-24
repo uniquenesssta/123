@@ -11,11 +11,11 @@ const failures = [];
 const check = (condition, message) => { if (!condition) failures.push(message); };
 
 const navigation = read("src/app/router/routeRegistry.ts");
-const shell = read("src/app/shell.ts");
+const shell = JSON.parse(read("contracts/global-visual-system-contract.json")).shell_source_entries.map(read).join("\n");
 const viewState = read("src/app/viewState.ts");
 const types = read("src/types.ts");
-const layout = read("src/styles/layout.css");
-const entityStyles = read("src/styles/entityCenter.css");
+const layout = ["src/app/shell/application-shell/applicationShell.css","src/app/shell/sidebar/sidebar.css","src/app/shell/topbar/topbar.css","src/app/shell/page-frame/pageFrame.css","src/app/shell/content-region/contentRegion.css"].map(read).join("\n");
+const entityStyles = read("src/styles/entityCenter.css") + read("src/app/shell/application-shell/applicationShell.css");
 const contract = JSON.parse(read("contracts/workspace-ui-contract.json"));
 
 const pageUnion = types.match(/export type Page\s*=([\s\S]*?);/)?.[1] ?? "";
@@ -43,9 +43,9 @@ check(shell.includes("${activeModule.label} / ${activeTitle}"), "顶部面包屑
 check(!shell.includes("nav-management"), "旧管理折叠菜单仍残留在Shell");
 
 check(layout.includes(".primary-rail") && layout.includes(".secondary-sidebar") && layout.includes(".secondary-nav-item"), "双层导航视觉样式不完整");
-check(layout.includes("position: fixed") && layout.includes("--shell-navigation-offset"), "一级与二级菜单未固定或主内容偏移链缺失");
-check(layout.includes(".dual-navigation.secondary-collapsed") && layout.includes(".secondary-reveal-button"), "二级菜单折叠态样式不完整");
-check(entityStyles.includes(".app-shell.dual-navigation") && !entityStyles.includes(".sidebar .nav-item"), "资源中心仍覆盖旧全局侧栏结构");
+check(layout.includes("height: 100dvh") && layout.includes("--shell-navigation-offset"), "一级与二级菜单未固定或主内容偏移链缺失");
+check(layout.includes(".application-shell.secondary-collapsed") && read("src/ui/primitives/icon-button/iconButton.css").includes("var(--fip-action-size)") && shell.includes("secondary-reveal-button"), "二级菜单折叠态样式不完整");
+check(entityStyles.includes(".application-shell") && !entityStyles.includes(".sidebar .nav-item"), "资源中心仍覆盖旧全局侧栏结构");
 check(viewState.includes("ui_revision: 5") && viewState.includes("sidebar_collapsed") && viewState.includes("needsUiMigration ? false"), "工作区状态未迁移到双层导航修订版或首次升级未展开二级菜单");
 
 // R12-03 uses this existing entry to exercise actual production modules and page loaders.
@@ -239,7 +239,7 @@ for (const name of ["route", "routeRegistry", "router", "routeTransition", "navi
   check(!/from ["'][^"']*(?:pages|api\/client|viewState|modal)["']/.test(code), `Router不得反向依赖业务或UI：${name}`);
 }
 check(main.includes("navigation.destroy()") && main.includes("workflowNavigation.clear()"), "停止时未释放路由及返回位置");
-check(main.includes("targetPage === navigation.page") && main.includes("!isRoute(targetPage)"), "通用入口未保护无效/已选中页面");
+check(main.includes("targetPage === navigation.page") && main.includes("if (isRoute(targetPage)) activatePage(targetPage)"), "通用入口未保护无效/已选中页面");
 
 if (failures.length) {
   console.error("双层全局导航专项验证失败：");

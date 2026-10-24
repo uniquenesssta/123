@@ -10,7 +10,7 @@ const failures = [];
 const requireTrue = (condition, message) => { if (!condition) failures.push(message); };
 const contract = json("contracts/workspace-ui-contract.json");
 const pkg = json("package.json");
-const shell = text("src/app/shell.ts");
+const shell = JSON.parse(text("contracts/global-visual-system-contract.json")).shell_source_entries.map(text).join("\n");
 const navigation = text("src/app/router/routeRegistry.ts");
 const state = text("src/app/viewState.ts");
 const main = text("src/main.ts");

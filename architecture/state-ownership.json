@@ -26,6 +26,22 @@
   },
   "states": [
     {
+      "id": "browser.shell-reset-confirmation",
+      "owner": "src/ui/overlays/confirmation-dialog/confirmationDialogState.ts::ConfirmationDialogState",
+      "scope": "local UI reset confirmation; never a detail history entry or persisted workspace state",
+      "writers": ["ConfirmationDialogController.show", "ConfirmationDialogController.dismiss"],
+      "forbidden": ["src/pages/**", "src/app/session/**", "src/api/**"],
+      "transition": null
+    },
+    {
+      "id": "browser.shell-navigation-failure",
+      "owner": "src/app/shell/content-region/contentRegionState.ts::ContentRegionState",
+      "scope": "application shell lifecycle; transient read-failure presentation only",
+      "writers": ["ApplicationShellController.clearNavigationFailure", "ApplicationShellController.showNavigationFailure"],
+      "forbidden": ["src/pages/**", "src/app/session/**", "src/api/**"],
+      "transition": null
+    },
+    {
       "id": "browser.lifecycle",
       "owner": "src/bootstrap/applicationHandle.ts::ApplicationHandle",
       "scope": "browser-window",
@@ -322,6 +338,6 @@
       "transition": null
     }
   ],
-  "count": 23,
+  "count": 25,
   "last_updated_task": "R3-02"
 }

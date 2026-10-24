@@ -8,7 +8,7 @@ const failures = [];
 const check = (condition, message) => { if (!condition) failures.push(message); };
 
 const contract = JSON.parse(read("contracts/global-visual-system-contract.json"));
-const styles = read(contract.style_entry);
+const styles = [contract.style_entry, ...contract.shell_style_entries].map(read).join("\n");
 const main = read("src/main.ts");
 const pkg = JSON.parse(read("package.json"));
 const taskUi = JSON.parse(read("contracts/task-ui-contract.json"));

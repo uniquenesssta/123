@@ -2,7 +2,7 @@
 
 ## 当前阶段状态
 
-`IN_PROGRESS`。01～03 DONE；03精确7f67940/run40103980479全部Windows步骤、日志与下载产物校验通过，收尾提交`1cfd7cea36265b7170b48acdd1b9226b9e5680e0`。04 Session已实施VERIFYING：会话/启动摘要/主题/持久化唯一职责与真实运行时接通，18项会话行为及浏览器主题/草稿保持检查通过；05～19 BLOCKED，唯一`rewrite/r12-frontend-foundation-ui-system`。04自身完整Windows待验；不轮询CI。
+`IN_PROGRESS`。01～04 DONE；04按2026-10-25用户确认收尾。05 Application Shell已实施VERIFYING：按已确认Figma接入五个职责目录、真实导航/主题/详情历史/工作区恢复及读取失败恢复。06～19 BLOCKED，唯一`rewrite/r12-frontend-foundation-ui-system`。05自身完整Windows待验；不轮询CI。
 
 ## 依据与设计边界
 
@@ -15,8 +15,8 @@
 | R12-01 | [Bootstrap 组合根](R12-01-bootstrap-组合根.md) | DONE · 自身Windows完整SUCCESS |
 | R12-02 | [生命周期基础设施](R12-02-生命周期基础设施.md) | DONE · 用户确认Windows通过 |
 | R12-03 | [Router 与 Navigation](R12-03-router-and-navigation.md) | DONE · 自身Windows完整SUCCESS |
-| R12-04 | [Session](R12-04-session.md) | VERIFYING · 自身完整Windows待验 |
-| R12-05 | Application Shell | BLOCKED |
+| R12-04 | [Session](R12-04-session.md) | DONE · 用户确认Windows通过 |
+| R12-05 | [Application Shell](R12-05-application-shell.md) | VERIFYING · 自身完整Windows待验 |
 | R12-06 | Warning Center | BLOCKED |
 | R12-07 | Workspace | BLOCKED |
 | R12-08 | Tauri Transport | BLOCKED |

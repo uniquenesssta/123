@@ -1,0 +1,11 @@
+<svg preserveAspectRatio="none" overflow="visible" style="display: block;" width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+<g id="Icon/Utility/Contrast" clip-path="url(#clip0_0_624)">
+<path id="Stroke 1" d="M18.3333 10C18.3333 14.6024 14.6024 18.3333 10 18.3333C5.39763 18.3333 1.66667 14.6024 1.66667 10C1.66667 5.39763 5.39763 1.66667 10 1.66667C14.6024 1.66667 18.3333 5.39763 18.3333 10Z" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" stroke="#303846"/>
+<path id="Stroke 2" d="M10 15C11.3261 15 12.5979 14.4732 13.5355 13.5355C14.4732 12.5979 15 11.3261 15 10C15 8.67392 14.4732 7.40215 13.5355 6.46447C12.5979 5.52678 11.3261 5 10 5V15Z" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" stroke="#303846"/>
+</g>
+<defs>
+<clipPath id="clip0_0_624">
+<rect width="20" height="20" fill="white"/>
+</clipPath>
+</defs>
+</svg>

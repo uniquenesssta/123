@@ -1,0 +1,45 @@
+/* FIP Color 17:3, resolved from Figma on 2026-10-25. Shell consumes this subset. */
+:root {
+  --fip-canvas: #f6f7f9;
+  --fip-surface: #ffffff;
+  --fip-raised: #f5f6f8;
+  --fip-subtle: #f8f9fb;
+  --fip-text: #303846;
+  --fip-strong: #151b26;
+  --fip-muted: #687386;
+  --fip-border: rgb(30 45 66 / 10.588235%);
+  --fip-border-strong: rgb(30 45 66 / 16.862746%);
+  --fip-accent: #356df3;
+  --fip-accent-soft: rgb(53 109 243 / 9.019608%);
+  --fip-warning: #b7791f;
+  --fip-danger: #c84d59;
+  --fip-danger-hover: #b33f4b;
+  --fip-danger-pressed: #96343f;
+  --fip-modal-overlay: rgb(25 39 47 / 46%);
+  --fip-dialog-shadow: 0 10px 24px rgb(34 50 72 / 4.5%);
+  --fip-accent-hover: #285bd7;
+  --fip-accent-pressed: #163fb7;
+  --fip-on-accent: #ffffff;
+}
+:root[data-theme="dark"] {
+  --fip-canvas: #0b1118;
+  --fip-surface: #111923;
+  --fip-raised: #151f2a;
+  --fip-subtle: #0e1720;
+  --fip-text: #edf2f7;
+  --fip-strong: #ffffff;
+  --fip-muted: #96a3ae;
+  --fip-border: rgb(255 255 255 / 8.627451%);
+  --fip-border-strong: rgb(255 255 255 / 14.117648%);
+  --fip-accent: #6e9fff;
+  --fip-accent-soft: rgb(110 159 255 / 12.156863%);
+  --fip-warning: #e7b35c;
+  --fip-danger: #f17982;
+  --fip-danger-hover: #ff929a;
+  --fip-danger-pressed: #d8646e;
+  --fip-modal-overlay: rgb(2 7 10 / 82%);
+  --fip-dialog-shadow: 0 12px 28px rgb(0 0 0 / 26%);
+  --fip-accent-hover: #8ab2ff;
+  --fip-accent-pressed: #5c8ce6;
+  --fip-on-accent: #071426;
+}

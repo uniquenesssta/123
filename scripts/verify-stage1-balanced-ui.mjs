@@ -5,9 +5,9 @@ const failures = [];
 const requireTrue = (condition, message) => { if (!condition) failures.push(message); };
 
 const layout = read("src/styles/layout.css");
-const entityStyles = read("src/styles/entityCenter.css");
+const entityStyles = read("src/styles/entityCenter.css") + read("src/ui/tokens/dimensions.css") + read("src/app/shell/application-shell/applicationShell.css");
 const styles = read("src/styles/app.css");
-const shell = read("src/app/shell.ts");
+const shell = JSON.parse(read("contracts/global-visual-system-contract.json")).shell_source_entries.map(read).join("\n");
 const navigation = read("src/app/router/routeRegistry.ts");
 const lineups = read("src/pages/lineups.ts");
 const prediction = read("src/pages/prediction.ts");
@@ -15,7 +15,7 @@ const runs = read("src/pages/runs.ts");
 const teams = read("src/pages/teams.ts");
 const main = read("src/main.ts");
 
-requireTrue(entityStyles.includes("--shell-sidebar-expanded") && entityStyles.includes(".app-shell.dual-navigation.sidebar-collapsed"), "双层全局导航没有展开与折叠常驻结构");
+requireTrue(entityStyles.includes("--shell-sidebar-expanded") && entityStyles.includes(".application-shell.secondary-collapsed"), "双层全局导航没有展开与折叠常驻结构");
 requireTrue(shell.includes("primary-rail") && shell.includes("secondary-sidebar") && navigation.includes('key: "management"'), "一级、二级菜单或管理模块结构缺失");
 requireTrue(styles.includes(".balanced-page-heading") && styles.includes(".balanced-section-tabs") && styles.includes(".balanced-workspace-main"), "平衡信息密度公共页面结构样式缺失");
 

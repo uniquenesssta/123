@@ -1,0 +1,22 @@
+:is(.application-shell, .ui-confirmation-dialog) .ui-icon-button {
+  display: inline-flex;
+  flex: 0 0 var(--fip-action-size);
+  align-items: center;
+  justify-content: center;
+  width: var(--fip-action-size);
+  height: var(--fip-action-size);
+  min-height: var(--fip-action-size);
+  padding: 0;
+  border: 0;
+  border-radius: var(--fip-radius-md);
+  background: transparent;
+  color: var(--fip-text);
+  box-shadow: none;
+  transform: none;
+  cursor: pointer;
+}
+:is(.application-shell, .ui-confirmation-dialog) .ui-icon-button:hover:not(:disabled) { background: var(--fip-raised); }
+:is(.application-shell, .ui-confirmation-dialog) .ui-icon-button:active:not(:disabled) { background: var(--fip-accent-soft); }
+:is(.application-shell, .ui-confirmation-dialog) .ui-icon-button:disabled { opacity: 1; cursor: default; }
+:is(.application-shell, .ui-confirmation-dialog) .ui-icon-button:disabled .ui-icon-slot { opacity: var(--fip-disabled-opacity); }
+:is(.application-shell, .ui-confirmation-dialog) .ui-icon-button:focus-visible { outline: 1px solid var(--fip-accent); outline-offset: -1px; }

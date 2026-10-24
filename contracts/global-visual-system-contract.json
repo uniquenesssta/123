@@ -24,8 +24,8 @@
     "shell": [
       ".primary-rail",
       ".secondary-sidebar",
-      ".dual-navigation .topbar",
-      ".dual-navigation .page-container"
+      ".application-shell .topbar",
+      ".application-shell .page-container"
     ],
     "hierarchy": [
       ".task-page-header",
@@ -125,5 +125,21 @@
     "small_control_height": 29,
     "table_row_height": 38,
     "principle": "slightly-larger-on-2k-without-losing-density"
-  }
+  },
+  "shell_style_entries": [
+    "src/ui/tokens/dimensions.css",
+    "src/app/shell/application-shell/applicationShell.css",
+    "src/app/shell/sidebar/sidebar.css",
+    "src/app/shell/topbar/topbar.css",
+    "src/app/shell/page-frame/pageFrame.css",
+    "src/app/shell/content-region/contentRegion.css"
+  ],
+  "shell_source_entries": [
+    "src/app/shell/application-shell/applicationShellView.ts",
+    "src/app/shell/sidebar/sidebarView.ts",
+    "src/app/shell/topbar/topbarView.ts",
+    "src/app/shell/page-frame/pageFrameView.ts",
+    "src/app/shell/content-region/contentRegionView.ts",
+    "src/ui/primitives/icon-button/iconButtonView.ts"
+  ]
 }

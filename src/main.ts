@@ -7,6 +7,18 @@ import "./styles/coreWorkspaces.css";
 import "./styles/moduleWorkspaces.css";
 import "./styles/visualSystem.css";
 import "./styles/workspacePanels.css";
+import "./ui/tokens/colors.css";
+import "./ui/tokens/dimensions.css";
+import "./ui/icons/iconSlot.css";
+import "./ui/primitives/icon-button/iconButton.css";
+import "./ui/primitives/button/button.css";
+import "./ui/feedback/blocking-message/blockingMessage.css";
+import "./ui/overlays/confirmation-dialog/confirmationDialog.css";
+import "./app/shell/application-shell/applicationShell.css";
+import "./app/shell/sidebar/sidebar.css";
+import "./app/shell/topbar/topbar.css";
+import "./app/shell/page-frame/pageFrame.css";
+import "./app/shell/content-region/contentRegion.css";
 import {
   api,
   issueWasLogged,
@@ -17,7 +29,7 @@ import { ModalController } from "./app/modal";
 import { AppSession } from "./app/session";
 import { AsyncScope, EventScope, MountHandle } from "./app/lifecycle";
 import { Router, NavigationContext, isRoute, type NavigationRequest } from "./app/router";
-import { pageTitle, renderShell } from "./app/shell";
+import { ApplicationShellController, pageTitle, renderShell } from "./app/shell";
 import { WorkspaceStateStore, type WorkspaceLayoutMode, type WorkspaceTabState } from "./app/viewState";
 import { matchReviewWorkflowAllows } from "./app/matchReviewWorkflow";
 import {
@@ -411,17 +423,13 @@ let selectedApiWorkspaceContextEntityLabel: string | null = null;
 let apiWorkspaceSessionSearch = "";
 let apiWorkspaceIncludeContext = false;
 let apiWorkspaceActiveRequestId: string | null = null;
-function toggleTheme(): void {
-  session.toggleTheme();
-  render({ preserveForm: true });
-}
-
 const workspaceState = new WorkspaceStateStore<Page>({
   read: () => api.readWorkspaceState(),
   save: (document) => api.saveWorkspaceState(document),
   clear: () => api.clearWorkspaceState(),
 });
 const modal = new ModalController();
+let shellController: ApplicationShellController | null = null;
 let renderedPage: Page | null = null;
 
 interface RenderOptions {
@@ -480,6 +488,7 @@ async function returnToWorkflow(): Promise<void> {
 
 function render(options: RenderOptions = {}): void {
   if (browserLifecycleController.signal.aborted) return;
+  const shellFocus = shellController?.captureFocus() ?? null;
   modal.capture();
   if (options.preserveForm === true && renderedPage === "lineups") {
     capturePairedLineupFromDom();
@@ -672,12 +681,14 @@ function render(options: RenderOptions = {}): void {
     content,
     busy,
     navigationPending: navigation.pendingPage === navigation.page,
+    navigationFailed: shellController?.navigationFailed ?? false,
     sidebarCollapsed: workspaceState.sidebarCollapsed(),
   });
   modal.restore();
   renderedPage = navigation.page;
   const currentPageRoot = app.querySelector<HTMLElement>(".page-container") ?? app;
   workspaceState.restore(navigation.page, currentPageRoot);
+  shellController?.restoreFocus(shellFocus);
   if (navigation.page === "lineups") {
   queueMicrotask(() => {
     const matchCompetition = currentPageRoot.querySelector<HTMLSelectElement>("#new-match-competition");
@@ -826,10 +837,22 @@ function toggleWorkspacePane(pane: "module-sidebar" | "inspector"): void {
 }
 
 function resetCurrentWorkspace(): void {
+  if (navigation.pendingPage) return;
+  const page = navigation.page;
+  shellController?.confirmWorkspaceReset(pageTitle(page), () => {
+    if (navigation.page !== page || browserLifecycleController.signal.aborted) return;
+    resetWorkspaceContents();
+  });
+}
+
+function resetWorkspaceContents(): void {
+  modal.reset();
   workspaceState.clear(navigation.page);
   if (navigation.page === "teams") { selectedTeamIds.clear(); selectedTeam = null; selectedPlayer = null; selectedTeamLineupHistory = []; selectedTeamLineupPresets = []; teamCursorHistory = []; }
   if (navigation.page === "players") { selectedPlayerIds.clear(); selectedPlayer = null; playerCursorHistory = []; }
   if (navigation.page === "lineup_presets") { selectedTeam = null; selectedTeamLineupPresets = []; selectedTeamLineupHistory = []; teamCursorHistory = []; }
+  // Do not capture the discarded DOM back into the just-cleared workspace.
+  renderedPage = null;
   render();
   toast("当前工作区已重置", "success");
 }
@@ -2172,9 +2195,18 @@ async function sendApiWorkspaceMessage(): Promise<void> {
 }
 
 async function navigateTo(nextPage: Page): Promise<void> {
-  await navigation.navigate(nextPage, loadNavigationPage, {
+  await navigation.navigate(nextPage, async request => {
+    try {
+      await loadNavigationPage(request);
+      if (navigation.isCurrent(request)) shellController?.clearNavigationFailure();
+    } catch (error) {
+      if (navigation.isCurrent(request)) shellController?.showNavigationFailure();
+      throw error;
+    }
+  }, {
     started() {
       modal.reset();
+      shellController?.clearNavigationFailure();
       render({ preserveForm: true });
     },
     settled() { render({ preserveForm: true }); },
@@ -6857,11 +6889,9 @@ async function handleAction(
   action: string,
   button: HTMLElement,
 ): Promise<void> {
+  const shellAction = shellController?.handleAction(action);
+  if (shellAction === true || (shellAction && await shellAction)) return;
   switch (action) {
-    case "toggle-global-sidebar":
-      workspaceState.setSidebarCollapsed(!workspaceState.sidebarCollapsed());
-      render({ preserveForm: true });
-      break;
     case "toggle-workspace-pane":
       toggleWorkspacePane(button.dataset.pane === "inspector" ? "inspector" : "module-sidebar");
       break;
@@ -6918,9 +6948,6 @@ async function handleAction(
     case "show-release-acceptance-json":
       if (selectedReleaseAcceptanceRun) showModal("接入点 J 完整验收报告", selectedReleaseAcceptanceRun);
       break;
-    case "reset-current-workspace":
-      resetCurrentWorkspace();
-      break;
     case "open-selected-teams":
       await openSelectedWorkspaceObjects("teams");
       break;
@@ -6944,9 +6971,6 @@ async function handleAction(
       break;
     case "set-players-workspace-mode":
       setWorkspaceMode("players", (button.dataset.mode ?? "detail") as WorkspaceLayoutMode);
-      break;
-    case "toggle-theme":
-      toggleTheme();
       break;
     case "new-api-workspace-session":
       workspaceState.patchModule("api_workspace", { active_section: "chat" });
@@ -7909,12 +7933,6 @@ async function handleAction(
       if (lastPredictionResult !== null)
         showPredictionDetail("推演完整结果", lastPredictionResult);
       break;
-    case "workspace-history-back":
-      modal.back();
-      break;
-    case "workspace-history-forward":
-      modal.forward();
-      break;
     case "confirm-workspace-action":
       await modal.runPendingAction();
       break;
@@ -8063,30 +8081,34 @@ function selectRulesDirectoryLevel(target: HTMLElement): boolean {
 
 document.addEventListener("click", (event) => {
   const target = event.target as HTMLElement;
+  if (shellController?.hasConfirmation) return;
+  if (target.closest("[data-shell-controls]")) return;
+  if (target.closest("button:disabled, [inert], [aria-disabled='true']")) return;
   if (!target.closest("#app-context-menu")) closeAppContextMenu();
   if (selectRulesDirectoryLevel(target)) return;
   const pageButton = target.closest<HTMLElement>("[data-page]");
   if (pageButton?.dataset.page) {
     const targetPage = pageButton.dataset.page;
-    if (!isRoute(targetPage) || targetPage === navigation.page) return;
-    if (targetPage === "players") prepareDirectPlayerDirectoryEntry();
-    const navigationTraceId = recordUiOperation("navigation", `page:${targetPage}`, {
-      fromPage: navigation.page,
-      toPage: targetPage,
-    });
-    void navigateTo(targetPage).catch((error: unknown) => {
-      recordUiOperationFailure(`page:${targetPage}`, error, navigationTraceId, {
-        fromPage: navigation.page,
-        toPage: targetPage,
-      });
-      recordClientIssue(error, `打开页面：${pageTitle(targetPage)}`);
-      toast(userFacingError(error), "error");
-    });
+    if (isRoute(targetPage)) activatePage(targetPage);
     return;
   }
   const actionButton = target.closest<HTMLElement>("[data-action]");
   if (!actionButton?.dataset.action) return;
-  const action = actionButton.dataset.action;
+  dispatchAction(actionButton.dataset.action, actionButton);
+}, { signal: browserLifecycleController.signal });
+
+function activatePage(targetPage: Page): void {
+  if (targetPage === navigation.page) return;
+  if (targetPage === "players") prepareDirectPlayerDirectoryEntry();
+  const navigationTraceId = recordUiOperation("navigation", `page:${targetPage}`, { fromPage: navigation.page, toPage: targetPage });
+  void navigateTo(targetPage).catch((error: unknown) => {
+    recordUiOperationFailure(`page:${targetPage}`, error, navigationTraceId, { fromPage: navigation.page, toPage: targetPage });
+    recordClientIssue(error, `打开页面：${pageTitle(targetPage)}`);
+    toast(userFacingError(error), "error");
+  });
+}
+
+function dispatchAction(action: string, actionButton: HTMLElement): void {
   const actionTraceId = recordUiOperation("ui_action", `action:${action}`, {
     page: navigation.page,
     dataset: { ...actionButton.dataset },
@@ -8096,7 +8118,7 @@ document.addEventListener("click", (event) => {
     recordClientIssue(error, `${pageTitle(navigation.page)} / ${action}`);
     toast(userFacingError(error), "error");
   });
-}, { signal: browserLifecycleController.signal });
+}
 
 function filterSelectOptions(
   selectId: string,
@@ -8553,10 +8575,22 @@ export function createBrowserApplicationModule(
   }
   browserApplicationCreated = true;
   app = root;
+  shellController = new ApplicationShellController(root, { navigate: activatePage, action: dispatchAction }, {
+    sidebarCollapsed: () => workspaceState.sidebarCollapsed(),
+    setSidebarCollapsed: collapsed => workspaceState.setSidebarCollapsed(collapsed),
+    toggleTheme: () => session.toggleTheme(),
+    renderPreservingWorkspace: () => render({ preserveForm: true }),
+    historyBack: () => modal.back(),
+    historyForward: () => modal.forward(),
+    resetWorkspace: resetCurrentWorkspace,
+    retryPageRead: () => navigateTo(navigation.page),
+    openLogs: () => navigation.page === "logs" ? navigateTo("logs") : activatePage("logs"),
+  });
   const lifecycle = new MountHandle({
     closedMessage: "浏览器应用生命周期已结束",
     stop: stopResources,
     async start() {
+      shellController?.start();
       bindSearchableSelectDiagnostics(browserLifecycleController.signal);
       render();
       try {
@@ -8576,6 +8610,7 @@ export function createBrowserApplicationModule(
   });
 
   function stopResources(): void {
+    shellController?.destroy();
     browserLifecycleController.destroy();
     session.stop();
     openAiExampleRequests.destroy();

@@ -1,0 +1,15 @@
+/* Existing FIP Size / Control Scale subset required by R12-05. */
+:root {
+  --shell-primary-rail-width: 60px;
+  --shell-secondary-sidebar-width: 154px;
+  --shell-sidebar-expanded: calc(var(--shell-primary-rail-width) + var(--shell-secondary-sidebar-width));
+  --shell-sidebar-collapsed: var(--shell-primary-rail-width);
+  --fip-topbar-height: 44px;
+  --fip-action-size: 32px;
+  --fip-radius-md: 7px;
+  --fip-space-xs: 4px;
+  --fip-space-sm: 8px;
+  --fip-space-md: 12px;
+  --fip-space-lg: 16px;
+  --fip-disabled-opacity: .42;
+}

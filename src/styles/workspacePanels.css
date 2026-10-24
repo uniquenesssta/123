@@ -1,39 +1,9 @@
 /* Inline right-side workspaces replace modal overlays across the application. */
-.topbar-history {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-}
-.topbar-history .icon-button {
-  width: 27px;
-  height: 27px;
-  min-height: 27px;
-  padding: 0;
-  font-size: 15px;
-  font-weight: 760;
-}
-.topbar-history .icon-button:disabled {
-  opacity: .34;
-  cursor: default;
-}
 
 .workspace-panel-root {
   display: none;
   min-width: 0;
   min-height: 0;
-}
-.main-content.workspace-panel-open {
-  height: 100dvh;
-  overflow: hidden;
-}
-.main-content.workspace-panel-open > .page-container {
-  display: none !important;
-}
-.main-content.workspace-panel-open > .workspace-panel-root {
-  height: calc(100dvh - var(--ui-topbar-height, 44px));
-  display: block;
-  padding: var(--ui-page-padding-y, 10px) var(--ui-page-padding-x, 12px) 12px;
-  overflow: hidden;
 }
 .workspace-detail-page {
   width: 100%;
@@ -133,8 +103,6 @@
 }
 
 @media (max-width: 760px) {
-  .topbar-history { display: none; }
-  .main-content.workspace-panel-open > .workspace-panel-root { padding: 7px; }
   .workspace-detail-toolbar { align-items: stretch; flex-direction: column; }
   .workspace-detail-history { width: 100%; }
   .workspace-detail-history button { flex: 1; }

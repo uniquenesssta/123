@@ -9,7 +9,7 @@ const rules = read("src/pages/rules.ts");
 const lineups = read("src/pages/lineups.ts");
 const main = read("src/main.ts");
 const styles = read("src/styles/app.css");
-const layout = read("src/styles/layout.css");
+const layout = read("src/styles/layout.css") + read("src/app/shell/content-region/contentRegion.css");
 const modal = read("src/app/modal.ts");
 const loaders = read("src/controllers/pageLoaders.ts");
 
@@ -47,7 +47,7 @@ requireTrue(layout.includes(".app-shell.workspace-page .balanced-workspace-main 
 requireTrue(layout.includes('data-workspace-section="matches"') && layout.includes(".match-browser-detail {") && layout.includes("grid-template-rows: auto auto minmax(0, 1fr) auto;"), "比赛中心左右分栏没有独立滚动所有权");
 requireTrue(layout.includes("scrollbar-width: none;") && layout.includes("::-webkit-scrollbar") && layout.includes("display: none;"), "业务滚动能力未保留为隐藏滚动条模式");
 requireTrue(layout.includes(".app-shell.workspace-page .balanced-section-tabs {") && layout.includes("position: static;") && layout.includes("top: auto;"), "顶部模块导航仍使用粘性定位压住业务内容");
-requireTrue(layout.includes("max-width: none") && layout.includes("clamp(16px, 1.45vw, 28px)"), "页面容器没有按窗口宽度自适应");
+requireTrue(layout.includes("max-width: none") && layout.includes("width: 100%") && layout.includes("flex: 1 1 0"), "页面容器没有填满可用空间并随窗口宽度自适应");
 requireTrue(styles.includes("height: clamp(280px, calc(100dvh - 545px), 620px)") && styles.includes("overscroll-behavior-y: contain"), "阵容列表没有按窗口高度自适应滚动");
 requireTrue(layout.includes("font-size: clamp(16px, .92vw, 18px)") && layout.includes("font-size: 15px;") && layout.includes("font-size: 14px;"), "业务界面没有建立新的可读字号下限");
 requireTrue(styles.includes("height: clamp(450px, calc(100dvh - 300px), 720px)") && styles.includes(".rules-competition-table th"), "赛事设置目录没有自适应内部滚动与固定表头");

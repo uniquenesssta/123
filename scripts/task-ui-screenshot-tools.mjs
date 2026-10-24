@@ -201,7 +201,7 @@ async function connectCdp(webSocketUrl) {
   };
 }
 
-export async function captureHtmlScreenshot({ browser, htmlPath, outputPath, width, height }) {
+export async function captureHtmlScreenshot({ browser, htmlPath, outputPath, width, height, exercise }) {
   fs.mkdirSync(path.dirname(outputPath), { recursive: true });
   const profileDirectory = fs.mkdtempSync(path.join(os.tmpdir(), "football-task-ui-browser-"));
   const args = [
@@ -222,6 +222,7 @@ export async function captureHtmlScreenshot({ browser, htmlPath, outputPath, wid
   let stderr = "";
   child.stderr?.on("data", (chunk) => { stderr += chunk.toString(); });
   const portFile = path.join(profileDirectory, "DevToolsActivePort");
+  let exerciseResult;
   try {
     const port = await readDevToolsPort(portFile, () => stderr);
     const target = await requestJson({ port, path: "/json/new?about:blank", method: "PUT" });
@@ -234,6 +235,7 @@ export async function captureHtmlScreenshot({ browser, htmlPath, outputPath, wid
       await cdp.send("Page.setDocumentContent", { frameId: frameTree.frameTree.frame.id, html: inlineFixtureStyles(htmlPath) });
       await cdp.send("Runtime.evaluate", { expression: "document.fonts ? document.fonts.ready.then(() => true) : true", awaitPromise: true, returnByValue: true });
       await sleep(180);
+      if (exercise) exerciseResult = await exercise(cdp);
       const screenshot = await cdp.send("Page.captureScreenshot", { format: "png", fromSurface: true, captureBeyondViewport: false });
       fs.writeFileSync(outputPath, Buffer.from(screenshot.data, "base64"));
       await cdp.send("Browser.close").catch(() => {});
@@ -249,6 +251,7 @@ export async function captureHtmlScreenshot({ browser, htmlPath, outputPath, wid
       catch { await sleep(100); }
     }
   }
+  return exerciseResult;
 }
 
 function paeth(a, b, c) {

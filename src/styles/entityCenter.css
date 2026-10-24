@@ -1,9 +1,5 @@
 /* 0.24.0 · unified commercial shell and large catalogue resource center */
 :root {
-  --shell-primary-rail-width: 72px;
-  --shell-secondary-sidebar-width: 196px;
-  --shell-sidebar-expanded: calc(var(--shell-primary-rail-width) + var(--shell-secondary-sidebar-width));
-  --shell-sidebar-collapsed: var(--shell-primary-rail-width);
   --entity-directory-width: 286px;
   --entity-inspector-width: 342px;
   --entity-radius: 14px;
@@ -18,8 +14,6 @@ body { overflow-x: hidden; }
  * second-level menu. Resource-center styles start below and must not override
  * global navigation geometry.
  */
-.app-shell.dual-navigation { --active-sidebar-width: var(--shell-sidebar-expanded); }
-.app-shell.dual-navigation.sidebar-collapsed { --active-sidebar-width: var(--shell-sidebar-collapsed); }
 
 /* Entity resource center */
 .app-shell[data-current-page="teams"] .page-container,
@@ -375,7 +369,7 @@ body { overflow-x: hidden; }
 }
 
 @media (max-width: 1100px) {
-  :root { --shell-sidebar-expanded: 220px; --entity-directory-width: 100%; }
+  :root { --entity-directory-width: 100%; }
   .app-shell[data-current-page="teams"] .page-container,
   .app-shell[data-current-page="players"] .page-container { overflow-y: auto; }
   .entity-page { height: auto; min-height: calc(100dvh - 100px); grid-template-rows: auto auto; }
@@ -415,15 +409,12 @@ body { overflow-x: hidden; }
   .team-resource-actions { width: 100%; justify-content: flex-start; }
   .entity-data-table { min-width: 590px; }
   .player-directory-table { min-width: 690px; }
-  .player-directory-table th:nth-child(5), .player-directory-table td:nth-child(5),
-  .player-directory-table th:nth-child(6), .player-directory-table td:nth-child(6) { display: none; }
+  .player-directory-table th:nth-child(5), .player-directory-table td:nth-child(5), .player-directory-table th:nth-child(6), .player-directory-table td:nth-child(6) { display: none; }
   .entity-task-workspace > header { align-items: flex-start; flex-direction: column; }
   .task-form-grid { grid-template-columns: 1fr; }
 }
 
 @media (max-width: 620px) {
-  .topbar { padding-inline: 12px !important; }
-  .topbar-title span { display: none; }
   .app-shell[data-current-page="teams"] .page-container,
   .app-shell[data-current-page="players"] .page-container { padding: 12px 10px 16px !important; }
   .entity-page-header h1 { font-size: 23px; }
@@ -444,11 +435,9 @@ body { overflow-x: hidden; }
   .entity-search.wide { width: 100%; }
   .entity-list-actions { justify-content: space-between; }
   .entity-data-table { min-width: 520px; }
-  .roster-table th:nth-child(3), .roster-table td:nth-child(3),
-  .roster-table th:nth-child(5), .roster-table td:nth-child(5) { display: none; }
+  .roster-table th:nth-child(3), .roster-table td:nth-child(3), .roster-table th:nth-child(5), .roster-table td:nth-child(5) { display: none; }
   .player-directory-table { min-width: 560px; }
-  .player-directory-table th:nth-child(4), .player-directory-table td:nth-child(4),
-  .player-directory-table th:nth-child(7), .player-directory-table td:nth-child(7) { display: none; }
+  .player-directory-table th:nth-child(4), .player-directory-table td:nth-child(4), .player-directory-table th:nth-child(7), .player-directory-table td:nth-child(7) { display: none; }
   .entity-browser > .entity-inspector { width: calc(100vw - var(--active-sidebar-width)); }
   .entity-selection-bar { left: calc(var(--active-sidebar-width) + 8px); right: 8px; bottom: 8px; flex-wrap: wrap; transform: none; }
   .entity-selection-bar span { display: none; }
@@ -457,7 +446,7 @@ body { overflow-x: hidden; }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .primary-rail, .secondary-sidebar, .main-content, .entity-browser > .entity-inspector { transition: none !important; }
+  .entity-browser > .entity-inspector { transition: none !important; }
 }
 
 /* Explicit large-catalog filters */
