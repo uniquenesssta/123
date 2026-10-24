@@ -7,7 +7,7 @@
 
 ## 当前前置状态（2026-10-25）
 
-R12-01～04 DONE；04由用户2026-10-25确认通过。05 Application Shell已实施VERIFYING，采用设计分支40109ce及Figma380:1366、304:4348、280:2814，接通真实导航/主题/详情历史/工作区、确认弹窗与加载失败恢复。90步骤前端、912项Shell检查与原17视口通过。06～19 BLOCKED，R12 IN_PROGRESS，唯一rewrite/r12-frontend-foundation-ui-system。05自身完整Windows待验，不轮询CI。详[当前索引](../modular-rewrite/R12-frontend-foundation-ui-system/README.md)与[05记录](../modular-rewrite/R12-frontend-foundation-ui-system/R12-05-application-shell.md)。
+R12-01～05 DONE；05精确c880d04/run40121131372已核对Windows全部步骤/完整日志/产物SHA-256与startup报告。06 Warning Center已实施VERIFYING：统一告警入口、分组/未读/弹窗与通知/任务生命周期，91步骤前端、136项告警交互及原912 Shell/17视口通过。07～19 BLOCKED，R12 IN_PROGRESS，唯一rewrite/r12-frontend-foundation-ui-system。06自身Windows待验；不轮询CI，交接核对精确提交结果。详[06记录](../modular-rewrite/R12-frontend-foundation-ui-system/R12-06-warning-center.md)。
 
 ## 1. 阶段目标
 
@@ -907,7 +907,7 @@ src/app/session/sessionPersistence.ts
 
 ## R12-05 Application Shell
 
-状态：`VERIFYING`（2026-10-25用户授权05；实现及本地证据见05记录，自身完整Windows待验，不轮询）
+状态：`DONE`。精确c880d04/run40121131372的全部步骤、日志及下载产物已核对通过，详[05收尾](../modular-rewrite/R12-frontend-foundation-ui-system/R12-05-application-shell.md)。
 
 ### 1. 目标
 
@@ -1045,7 +1045,7 @@ src/app/shell/content-region/
 
 ## R12-06 Warning Center
 
-状态：`BLOCKED`（仅当上一任务与本任务前置门禁通过后改为 `READY`）
+状态：`VERIFYING`。用户2026-10-25授权；05自身CI已核验。实现及本地结果详[R12-06记录](../modular-rewrite/R12-frontend-foundation-ui-system/R12-06-warning-center.md)，06自身完整Windows待验。
 
 ### 1. 目标
 

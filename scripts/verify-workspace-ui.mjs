@@ -17,7 +17,8 @@ const main = text("src/main.ts");
 const styles = `${text("src/styles/layout.css")}
 ${text("src/styles/app.css")}
 ${text("src/styles/entityCenter.css")}
-${text("src/styles/moduleWorkspaces.css")}`;
+${text("src/styles/moduleWorkspaces.css")}
+${text("src/ui/feedback/task-activity/taskActivity.css")}`;
 const teams = text("src/pages/teams.ts");
 const players = text("src/pages/players.ts");
 const lineups = text("src/pages/lineups.ts");
@@ -62,7 +63,7 @@ requireTrue(ai.includes("module-workspace-page ai-module-workspace") && ai.inclu
 requireTrue(prediction.includes("balanced-workspace") && prediction.includes("workspaceSectionNavigation") && prediction.includes("workspace-module-view") && prediction.includes("外部提供器规则入口") && prediction.includes("参数版本"), "赛事推演未统一平衡信息密度排布逻辑");
 requireTrue(release.includes("workspaceSectionNavigation") && release.includes("不可变发布验收记录"), "发布验收工作区不完整");
 requireTrue(!teams.includes('workspacePaneToggle("module-sidebar"') && !players.includes('workspacePaneToggle("module-sidebar"') && !lineups.includes('workspacePaneToggle("module-sidebar"') && !workbooks.includes('workspacePaneToggle("module-sidebar"') && !ai.includes('workspacePaneToggle("module-sidebar"') && !prediction.includes('workspacePaneToggle("module-sidebar"') && !release.includes('workspacePaneToggle("module-sidebar"'), "桌面模块左栏不得继续提供收起入口");
-requireTrue(styles.includes(".workspace-grid") && styles.includes(".workspace-section-nav") && styles.includes(".workspace-module-view.active") && styles.includes(".balanced-workspace") && styles.includes(".balanced-section-tabs") && styles.includes(".task-activity"), "工作区固定导航、平衡模块切换或局部异步样式不完整");
+requireTrue(styles.includes(".workspace-grid") && styles.includes(".workspace-section-nav") && styles.includes(".workspace-module-view.active") && styles.includes(".balanced-workspace") && styles.includes(".balanced-section-tabs") && styles.includes(".ui-task-activity"), "工作区固定导航、平衡模块切换或局部异步样式不完整");
 requireTrue(state.includes("ui_revision: 5") && state.includes("active_section: null") && state.includes("inspector_collapsed: true"), "双层导航工作区状态迁移或默认抽屉状态缺失");
 requireTrue(styles.includes(".selection-commandbar") && styles.includes(".workspace-inspector") && styles.includes(".balanced-data-table") && styles.includes("overflow-y: auto"), "上下文批量操作、按需检查器或高密度列表滚动样式缺失");
 requireTrue(!styles.includes("resize: horizontal"), "模块边栏不得保留原生横向拖拽");

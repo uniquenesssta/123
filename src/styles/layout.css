@@ -423,24 +423,6 @@
 .sidebar-collapsed .nav-more > summary span:last-child { display: block; }
 .sidebar-collapsed .sidebar-footer { justify-content: center; }
 
-.task-activity {
-  position: fixed;
-  right: 20px;
-  bottom: 20px;
-  z-index: 100;
-  display: none;
-  align-items: center;
-  gap: 9px;
-  min-width: 140px;
-  padding: 10px 13px;
-  border: 1px solid var(--line);
-  border-radius: 10px;
-  background: var(--panel);
-  box-shadow: 0 16px 40px rgba(0, 0, 0, .22);
-}
-.task-activity.visible { display: flex; }
-.task-activity .spinner { width: 16px; height: 16px; border-width: 2px; }
-.task-activity span { font-size: 11px; color: var(--muted); }
 
 /* Entity and workflow workspaces use a master-detail layout. The inspector is a drawer, not a permanent third column. */
 .workspace-grid {
@@ -2357,11 +2339,6 @@ textarea:focus {
   border-radius: var(--ui-radius-lg) !important;
   background: var(--panel) !important;
   box-shadow: 0 30px 90px rgba(0,0,0,.42) !important;
-}
-.toast {
-  border-color: var(--border-strong) !important;
-  border-radius: var(--ui-radius-sm) !important;
-  background: var(--panel-2) !important;
 }
 
 @media (max-width: 1380px) {

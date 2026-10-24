@@ -37,3 +37,5 @@
 .ui-icon-spinner [id="Active arc"] { stroke: var(--fip-accent); }
 @keyframes fip-spinner { to { transform: rotate(360deg); } }
 @media (prefers-reduced-motion: reduce) { .ui-icon-spinner { animation: none; } }
+
+.ui-icon-check { --ui-icon-source: url("../../assets/icons/check.svg"); }

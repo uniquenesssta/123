@@ -6,7 +6,6 @@ export interface ShellOptions {
   readonly page: Page;
   readonly theme: Theme;
   readonly content: string;
-  readonly busy: boolean;
   readonly navigationPending: boolean;
   readonly navigationFailed?: boolean;
   /** Existing persisted key: only the secondary navigation is collapsed. */

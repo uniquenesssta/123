@@ -1,8 +1,12 @@
 # 足球模型平台公开外壳
 
-## R12-05 Application Shell（2026-10-25，VERIFYING）
+## R12-06 Warning Center（2026-10-25，VERIFYING）
 
-04已按用户确认收尾。05按已确认Figma的60/154导航、44顶栏、32操作接入五个Shell目录；导航、主题、详情历史、工作区输入/滚动保持原唯一owner。接入重置确认弹窗，修正旧页面回写及加载/错误面板覆盖草稿的问题；读取失败可重试本页读取或查看日志。必要的共享Tokens/按钮/图标/错误展示/确认弹窗子集落在后续节点唯一目录，其余节点仍BLOCKED。90项前端门禁、12组桌面组合的912项Shell检查及原17视口通过；实际变更和自身Windows待验见[05记录](docs/modular-rewrite/R12-frontend-foundation-ui-system/R12-05-application-shell.md)与[R12索引](docs/modular-rewrite/R12-frontend-foundation-ui-system/README.md)。01～04 DONE、05 VERIFYING、06～19 BLOCKED；不轮询CI，不自动实施06。
+05已按精确Windows结果收尾。06接通统一顶栏告警入口、日期分组、未读徽标与弹窗；连接错误和持续错误进入唯一会话告警记录。通知采用单槽、去重及悬停/焦点暂停，关闭提示保留任务、输入和业务门禁；任务提示与ARIA同步。已补齐Figma明暗组合稿，清理旧反馈DOM/样式，并复用原生弹窗焦点机制。91步骤前端、136项告警交互、原912项Shell和17视口通过；自身Windows待验，07～19 BLOCKED。详[06记录](docs/modular-rewrite/R12-frontend-foundation-ui-system/R12-06-warning-center.md)。不轮询CI；交接时核对精确提交的一次性验收证据。
+
+## R12-05 Application Shell（2026-10-25，DONE）
+
+05精确c880d04/run40121131372已核对全部步骤、job日志、产物哈希和startup报告，Windows自动验收通过。05 DONE，06按用户授权实施。设计与原实现详[05记录](docs/modular-rewrite/R12-frontend-foundation-ui-system/R12-05-application-shell.md)。
 
 ## R12-04 Session实施记录（2026-10-24，验收前）
 

@@ -26,6 +26,49 @@
   },
   "states": [
     {
+      "id": "browser.warning-store",
+      "owner": "src/app/warnings/warning-store/warningStore.ts::WarningStore",
+      "scope": "application session; warning history, read state, one visible notice and exclusive task gate",
+      "writers": [
+        "WarningCenterController methods"
+      ],
+      "forbidden": [
+        "src/pages/**",
+        "src/app/session/**",
+        "src/app/shell/**",
+        "src/api/**"
+      ],
+      "transition": null
+    },
+    {
+      "id": "browser.warning-dialog",
+      "owner": "src/app/warnings/warning-center/warningCenterState.ts::WarningCenterState",
+      "scope": "transient warning dialog visibility only",
+      "writers": [
+        "WarningCenterController.open",
+        "WarningCenterController.close"
+      ],
+      "forbidden": [
+        "src/pages/**",
+        "src/app/session/**",
+        "src/api/**"
+      ],
+      "transition": null
+    },
+    {
+      "id": "browser.toast-presentation",
+      "owner": "src/ui/feedback/toast/toastController.ts::ToastController",
+      "scope": "local notice presentation; remaining duration, hover/focus pause and disposable timer",
+      "writers": [
+        "ToastController methods"
+      ],
+      "forbidden": [
+        "src/pages/**",
+        "src/api/**"
+      ],
+      "transition": null
+    },
+    {
       "id": "browser.shell-reset-confirmation",
       "owner": "src/ui/overlays/confirmation-dialog/confirmationDialogState.ts::ConfirmationDialogState",
       "scope": "local UI reset confirmation; never a detail history entry or persisted workspace state",
@@ -338,6 +381,6 @@
       "transition": null
     }
   ],
-  "count": 25,
+  "count": 28,
   "last_updated_task": "R3-02"
 }

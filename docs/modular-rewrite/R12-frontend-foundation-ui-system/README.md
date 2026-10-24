@@ -2,7 +2,7 @@
 
 ## 当前阶段状态
 
-`IN_PROGRESS`。01～04 DONE；04按2026-10-25用户确认收尾。05 Application Shell已实施VERIFYING：按已确认Figma接入五个职责目录、真实导航/主题/详情历史/工作区恢复及读取失败恢复。06～19 BLOCKED，唯一`rewrite/r12-frontend-foundation-ui-system`。05自身完整Windows待验；不轮询CI。
+`IN_PROGRESS`。01～05 DONE；05精确c880d04/run40121131372与产物/日志核对通过。06 Warning Center已实施VERIFYING：统一入口、分组/未读、弹窗及通知/任务生命周期。07～19 BLOCKED，唯一rewrite/r12-frontend-foundation-ui-system。06自身完整Windows待验；不轮询CI，交接时核对精确提交证据。
 
 ## 依据与设计边界
 
@@ -16,8 +16,8 @@
 | R12-02 | [生命周期基础设施](R12-02-生命周期基础设施.md) | DONE · 用户确认Windows通过 |
 | R12-03 | [Router 与 Navigation](R12-03-router-and-navigation.md) | DONE · 自身Windows完整SUCCESS |
 | R12-04 | [Session](R12-04-session.md) | DONE · 用户确认Windows通过 |
-| R12-05 | [Application Shell](R12-05-application-shell.md) | VERIFYING · 自身完整Windows待验 |
-| R12-06 | Warning Center | BLOCKED |
+| R12-05 | [Application Shell](R12-05-application-shell.md) | DONE · 自身Windows完整SUCCESS |
+| R12-06 | [Warning Center](R12-06-warning-center.md) | VERIFYING · 本地91步骤/136告警/原912 Shell/17视口通过，自身Windows待验 |
 | R12-07 | Workspace | BLOCKED |
 | R12-08 | Tauri Transport | BLOCKED |
 | R12-09 | Files、Storage、Diagnostics、Clipboard 与 Timing | BLOCKED |

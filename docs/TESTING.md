@@ -1,8 +1,12 @@
 # Testing
 
-## R12-05 Shell验证（2026-10-25，VERIFYING）
+## R12-06 Warning Center（2026-10-25，VERIFYING）
 
-04已按用户确认收尾；05沿原浏览器/路由/架构/截图验证入口，真实Shell装配、原生输入/滚轮/Enter/Space/Tab/Escape、主题/折叠保持、详情与取消/确认重置、读取失败恢复及快照保护、销毁和减少动画通过。90步骤前端门禁、12组深浅主题/折叠/桌面视口共912项Shell检查及原17视口通过；数据adapter受控，像素阈值和PNG基线保持。完整结果、产物路径及失败修正见[05记录](modular-rewrite/R12-frontend-foundation-ui-system/R12-05-application-shell.md)。05自身Rust/Windows打包/启动/日志待原流水线，不轮询；未将04通过计为05结果。
+新增verify-warning-center.mjs并接入原前端门禁；沿既有Chromium/CDP工具验证生产模块，没有新增依赖、runner或workflow。91步骤前端通过，含136项实际告警交互、原912项Shell及17截图视口；状态合并/日期/脱敏/任务门禁与真实3200ms计时、原生键盘/指针/滚轮、焦点、长列表、生命周期均验证。完整证据和环境边界见[06记录](modular-rewrite/R12-frontend-foundation-ui-system/R12-06-warning-center.md)。06自身Rust Clippy/tests、打包/实际客户端启动/日志由原Windows流水线独立验收，当前VERIFYING。
+
+## R12-05 Shell验证（2026-10-25，DONE）
+
+04已按用户确认收尾；05沿原浏览器/路由/架构/截图验证入口，真实Shell装配、原生输入/滚轮/Enter/Space/Tab/Escape、主题/折叠保持、详情与取消/确认重置、读取失败恢复及快照保护、销毁和减少动画通过。90步骤前端门禁、12组深浅主题/折叠/桌面视口共912项Shell检查及原17视口通过；数据adapter受控，像素阈值和PNG基线保持。完整结果、产物路径及失败修正见[05记录](modular-rewrite/R12-frontend-foundation-ui-system/R12-05-application-shell.md)。05精确c880d04/run40121131372已核对全部步骤/完整job日志/ZIP哈希与startup报告，Windows通过；详05完成记录。未将04结果替代05验收。
 
 ## R12-04 Session验证（2026-10-24，VERIFYING）
 

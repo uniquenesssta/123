@@ -1,6 +1,6 @@
 {
   "contract_id": "football.global-visual-system.v1",
-  "contract_version": "1.2.0",
+  "contract_version": "1.3.0",
   "style_entry": "src/styles/visualSystem.css",
   "required_tokens": [
     "--ui-canvas",
@@ -44,8 +44,8 @@
     ],
     "feedback": [
       ".page-load-progress",
-      ".task-activity",
-      ".toast",
+      ".ui-task-activity",
+      ".ui-toast",
       ".modal"
     ]
   },
@@ -133,6 +133,12 @@
     "src/app/shell/topbar/topbar.css",
     "src/app/shell/page-frame/pageFrame.css",
     "src/app/shell/content-region/contentRegion.css"
+  ],
+  "feedback_style_entries": [
+    "src/ui/feedback/feedback-content/feedbackContent.css",
+    "src/ui/feedback/toast/toast.css",
+    "src/ui/feedback/task-activity/taskActivity.css",
+    "src/app/warnings/warning-center/warningCenter.css"
   ],
   "shell_source_entries": [
     "src/app/shell/application-shell/applicationShellView.ts",

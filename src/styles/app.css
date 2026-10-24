@@ -182,12 +182,6 @@ button:disabled { opacity: .35; cursor: not-allowed; }
 .architecture-flow article > span { color: var(--accent); font: 11px ui-monospace, monospace; }
 .architecture-flow h2 { margin: 24px 0 8px; font-size: 18px; color: var(--text-strong); }
 .architecture-flow p { color: var(--muted); line-height: 1.55; margin: 0; }
-.toast { position: fixed; right: 24px; bottom: 24px; z-index: 50; transform: translateY(20px); opacity: 0; pointer-events: none; padding: 12px 16px; border: 1px solid var(--line); border-radius: 10px; color: var(--text); background: var(--panel-2); box-shadow: var(--shadow); transition: .2s; }
-.toast.visible { transform: translateY(0); opacity: 1; }
-.toast.success { color: var(--accent); }
-.toast.error { color: var(--danger); }
-.busy { position: fixed; inset: 0; z-index: 60; display: none; place-content: center; gap: 12px; color: var(--text); background: var(--busy-overlay); backdrop-filter: blur(5px); }
-.busy.visible { display: grid; }
 .spinner { width: 28px; height: 28px; border: 3px solid var(--line); border-top-color: var(--accent); border-radius: 50%; animation: spin .8s linear infinite; }
 @keyframes spin { to { transform: rotate(360deg); } }
 .modal-backdrop { position: fixed; inset: 0; z-index: 70; display: grid; place-items: center; padding: 30px; background: var(--modal-overlay); }
@@ -1496,7 +1490,6 @@ select:focus {
 .tag { padding: 4px 7px; border-radius: 6px; font-size: 9px; }
 .alert { padding: 11px 13px; margin-bottom: 14px; border-radius: 9px; }
 .status-pill { padding: 6px 9px; font-size: 10px; }
-.toast { right: 20px; bottom: 20px; padding: 10px 13px; border-radius: 9px; font-size: 11px; }
 .modal { border-radius: 13px; }
 .modal header { padding: 14px 16px; }
 .modal pre { padding: 16px; font-size: 11px; }

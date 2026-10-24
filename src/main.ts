@@ -19,6 +19,10 @@ import "./app/shell/sidebar/sidebar.css";
 import "./app/shell/topbar/topbar.css";
 import "./app/shell/page-frame/pageFrame.css";
 import "./app/shell/content-region/contentRegion.css";
+import "./ui/feedback/feedback-content/feedbackContent.css";
+import "./ui/feedback/toast/toast.css";
+import "./ui/feedback/task-activity/taskActivity.css";
+import "./app/warnings/warning-center/warningCenter.css";
 import {
   api,
   issueWasLogged,
@@ -30,6 +34,7 @@ import { AppSession } from "./app/session";
 import { AsyncScope, EventScope, MountHandle } from "./app/lifecycle";
 import { Router, NavigationContext, isRoute, type NavigationRequest } from "./app/router";
 import { ApplicationShellController, pageTitle, renderShell } from "./app/shell";
+import { WarningCenterController } from "./app/warnings";
 import { WorkspaceStateStore, type WorkspaceLayoutMode, type WorkspaceTabState } from "./app/viewState";
 import { matchReviewWorkflowAllows } from "./app/matchReviewWorkflow";
 import {
@@ -288,7 +293,6 @@ const session = new AppSession({
 });
 const navigation = new Router();
 const workflowNavigation = new NavigationContext();
-let busy = false;
 let lastPredictionResult: unknown = null;
 let playerReferences: PlayerCatalogReferenceData | null = null;
 let playerListPage: PlayerListPage | null = null;
@@ -430,6 +434,7 @@ const workspaceState = new WorkspaceStateStore<Page>({
 });
 const modal = new ModalController();
 let shellController: ApplicationShellController | null = null;
+let warningCenter: WarningCenterController | null = null;
 let renderedPage: Page | null = null;
 
 interface RenderOptions {
@@ -679,12 +684,12 @@ function render(options: RenderOptions = {}): void {
     page: navigation.page,
     theme: session.theme,
     content,
-    busy,
     navigationPending: navigation.pendingPage === navigation.page,
     navigationFailed: shellController?.navigationFailed ?? false,
     sidebarCollapsed: workspaceState.sidebarCollapsed(),
   });
   modal.restore();
+  warningCenter?.observeConnection(session.bootstrap.connection_error);
   renderedPage = navigation.page;
   const currentPageRoot = app.querySelector<HTMLElement>(".page-container") ?? app;
   workspaceState.restore(navigation.page, currentPageRoot);
@@ -861,12 +866,7 @@ function toast(
   message: string,
   kind: "normal" | "success" | "error" = "normal",
 ): void {
-  const node = document.querySelector<HTMLDivElement>("#toast");
-  if (browserLifecycleController.signal.aborted) return;
-  if (!node) return;
-  node.textContent = message;
-  node.className = `toast visible ${kind}`;
-  browserLifecycleController.setTimeout(() => node.classList.remove("visible"), 3200);
+  warningCenter?.notify(message, kind === "error" ? "danger" : kind === "success" ? "success" : "info", "客户端");
 }
 
 function userFacingError(error: unknown): string {
@@ -899,6 +899,7 @@ function recordClientIssue(
   operation: string,
   severity: IssueSeverity = "error",
 ): void {
+  if (severity === "critical") warningCenter?.record({ key: `critical:${operation}`, source: "客户端", severity, title: operation, message: userFacingError(error), target: "logs" });
   if (issueWasLogged(error)) return;
   const technicalMessage = technicalErrorMessage(error);
   if (severity !== "critical" && isUserGuidanceMessage(technicalMessage))
@@ -917,15 +918,8 @@ function recordClientIssue(
 }
 
 async function runBusy<T>(operation: () => Promise<T>): Promise<T> {
-  if (busy) throw new Error("已有任务正在执行");
-  busy = true;
-  document.querySelector("#busy")?.classList.add("visible");
-  try {
-    return await operation();
-  } finally {
-    busy = false;
-    document.querySelector("#busy")?.classList.remove("visible");
-  }
+  if (!warningCenter) throw new Error("应用告警模块尚未启动");
+  return warningCenter.runTask(operation);
 }
 
 function value(id: string): string {
@@ -8575,6 +8569,7 @@ export function createBrowserApplicationModule(
   }
   browserApplicationCreated = true;
   app = root;
+  warningCenter = new WarningCenterController(root, { navigate: target => activatePage(target) });
   shellController = new ApplicationShellController(root, { navigate: activatePage, action: dispatchAction }, {
     sidebarCollapsed: () => workspaceState.sidebarCollapsed(),
     setSidebarCollapsed: collapsed => workspaceState.setSidebarCollapsed(collapsed),
@@ -8590,6 +8585,7 @@ export function createBrowserApplicationModule(
     closedMessage: "浏览器应用生命周期已结束",
     stop: stopResources,
     async start() {
+      warningCenter?.start();
       shellController?.start();
       bindSearchableSelectDiagnostics(browserLifecycleController.signal);
       render();
@@ -8610,6 +8606,7 @@ export function createBrowserApplicationModule(
   });
 
   function stopResources(): void {
+    warningCenter?.destroy();
     shellController?.destroy();
     browserLifecycleController.destroy();
     session.stop();

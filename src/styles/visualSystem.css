@@ -510,24 +510,6 @@ tbody tr:hover { background: var(--soft-hover); }
 .empty-state p,
 .empty-state span,
 .visual-empty p { color: var(--ui-text-muted); font-size: 10px; line-height: 1.5; }
-.task-activity {
-  border: 1px solid var(--ui-border-strong);
-  border-radius: var(--ui-radius-md);
-  color: var(--ui-text);
-  background: var(--ui-surface-raised);
-  box-shadow: var(--ui-shadow-float);
-}
-.toast {
-  max-width: min(420px, calc(100vw - 28px));
-  padding: 10px 13px;
-  border: 1px solid var(--ui-border-strong);
-  border-radius: var(--ui-radius-sm);
-  color: var(--ui-text);
-  background: var(--ui-surface-raised);
-  box-shadow: var(--ui-shadow-float);
-}
-.toast.success { color: var(--ui-success); }
-.toast.error { color: var(--ui-danger); }
 
 .modal-backdrop {
   padding: 18px;
@@ -1059,7 +1041,6 @@ tbody tr { min-height: var(--ui-table-row-height); }
 .alert,
 .blocking-note,
 .package-message { padding: 8px 10px; margin-bottom: 9px; border-radius: 5px; font-size: 10px; }
-.toast { max-width: min(380px, calc(100vw - 22px)); padding: 8px 10px; border-radius: 5px; font-size: 10px; }
 .modal-backdrop { padding: 12px; }
 .modal {
   width: min(960px, calc(100vw - 24px));
@@ -1345,6 +1326,5 @@ tbody tr { min-height: var(--ui-table-row-height); }
   .alert,
   .blocking-note,
   .package-message,
-  .toast { font-size: 11px; }
   .modal h2 { font-size: 15px; }
 }

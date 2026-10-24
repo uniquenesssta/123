@@ -12,6 +12,10 @@
   --fip-accent: #356df3;
   --fip-accent-soft: rgb(53 109 243 / 9.019608%);
   --fip-warning: #b7791f;
+  --fip-warning-soft: #b7791f17;
+  --fip-danger-soft: #c84d5917;
+  --fip-success: #168b69;
+  --fip-feedback-shadow: 0 1px 2px rgb(0 0 0 / 5%);
   --fip-danger: #c84d59;
   --fip-danger-hover: #b33f4b;
   --fip-danger-pressed: #96343f;
@@ -34,6 +38,10 @@
   --fip-accent: #6e9fff;
   --fip-accent-soft: rgb(110 159 255 / 12.156863%);
   --fip-warning: #e7b35c;
+  --fip-warning-soft: #e7b35c1f;
+  --fip-danger-soft: #f179821f;
+  --fip-success: #58cfa6;
+  --fip-feedback-shadow: 0 1px 2px rgb(0 0 0 / 35%);
   --fip-danger: #f17982;
   --fip-danger-hover: #ff929a;
   --fip-danger-pressed: #d8646e;

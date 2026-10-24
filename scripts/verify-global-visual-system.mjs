@@ -8,14 +8,15 @@ const failures = [];
 const check = (condition, message) => { if (!condition) failures.push(message); };
 
 const contract = JSON.parse(read("contracts/global-visual-system-contract.json"));
-const styles = [contract.style_entry, ...contract.shell_style_entries].map(read).join("\n");
+const styles = [contract.style_entry, ...contract.shell_style_entries, ...contract.feedback_style_entries].map(read).join("\n");
 const main = read("src/main.ts");
 const pkg = JSON.parse(read("package.json"));
 const taskUi = JSON.parse(read("contracts/task-ui-contract.json"));
 
 check(contract.contract_id === "football.global-visual-system.v1", "全局视觉契约 ID 错误");
-check(contract.contract_version === "1.2.0", "全局视觉契约版本错误");
+check(contract.contract_version === "1.3.0", "全局视觉契约版本错误");
 check(existsSync(join(root, contract.style_entry)), "缺少全局视觉样式入口");
+for (const entry of contract.feedback_style_entries) check(main.includes(`import "./${entry.replace(/^src\//, "")}";`), `反馈样式未接入真实入口：${entry}`);
 check(
   main.lastIndexOf('import "./styles/visualSystem.css";') > main.lastIndexOf('import "./styles/moduleWorkspaces.css";'),
   "全局视觉样式必须最后加载，避免被历史页面样式覆盖",

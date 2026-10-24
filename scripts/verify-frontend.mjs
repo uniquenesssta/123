@@ -11,6 +11,7 @@ const nodeChecks = [
   "architecture/verifyProtectedImports.mjs",
   "verify-domain-type-inventory.mjs",
   "verify-browser-bootstrap.mjs",
+  "verify-warning-center.mjs",
   "verify-tauri-bootstrap.mjs",
   "verify-application-composition.mjs",
   "verify-application-ports.mjs",

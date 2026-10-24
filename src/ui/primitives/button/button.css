@@ -1,13 +1,13 @@
 /* Minimal feedback action32 dependency; the complete primitive matrix remains R12-11. */
-:is(.application-shell, .ui-confirmation-dialog) .ui-button { display: inline-flex; align-items: center; justify-content: center; gap: 6px; min-height: 32px; height: 32px; padding: 0 12px; border: 1px solid transparent; border-radius: 7px; font-size: 13px; font-weight: 500; line-height: 16px; white-space: nowrap; box-shadow: none; transform: none; }
-:is(.application-shell, .ui-confirmation-dialog) .ui-button-primary { background: var(--fip-accent); color: var(--fip-on-accent); }
-:is(.application-shell, .ui-confirmation-dialog) .ui-button-primary:hover { background: var(--fip-accent-hover); }
-:is(.application-shell, .ui-confirmation-dialog) .ui-button-primary:active { background: var(--fip-accent-pressed); }
-:is(.application-shell, .ui-confirmation-dialog) .ui-button-danger { background: var(--fip-danger); color: var(--fip-on-accent); }
-:is(.application-shell, .ui-confirmation-dialog) .ui-button-danger:hover { background: var(--fip-danger-hover); }
-:is(.application-shell, .ui-confirmation-dialog) .ui-button-danger:active { background: var(--fip-danger-pressed); }
-:is(.application-shell, .ui-confirmation-dialog) .ui-button { cursor: pointer; }
-:is(.application-shell, .ui-confirmation-dialog) .ui-button-secondary { background: var(--fip-surface); color: var(--fip-text); border-color: var(--fip-border); }
-:is(.application-shell, .ui-confirmation-dialog) .ui-button-secondary:hover { background: var(--fip-raised); }
-:is(.application-shell, .ui-confirmation-dialog) .ui-button-secondary:active { background: var(--fip-accent-soft); }
-:is(.application-shell, .ui-confirmation-dialog) .ui-button:focus-visible { outline: 1px solid var(--fip-accent); outline-offset: -1px; }
+:is(.application-shell, .ui-confirmation-dialog, .warning-center-root) .ui-button { display: inline-flex; align-items: center; justify-content: center; gap: 6px; min-height: 32px; height: 32px; padding: 0 12px; border: 1px solid transparent; border-radius: 7px; font-size: 13px; font-weight: 500; line-height: 16px; white-space: nowrap; box-shadow: none; transform: none; }
+:is(.application-shell, .ui-confirmation-dialog, .warning-center-root) .ui-button-primary { background: var(--fip-accent); color: var(--fip-on-accent); }
+:is(.application-shell, .ui-confirmation-dialog, .warning-center-root) .ui-button-primary:hover { background: var(--fip-accent-hover); }
+:is(.application-shell, .ui-confirmation-dialog, .warning-center-root) .ui-button-primary:active { background: var(--fip-accent-pressed); }
+:is(.application-shell, .ui-confirmation-dialog, .warning-center-root) .ui-button-danger { background: var(--fip-danger); color: var(--fip-on-accent); }
+:is(.application-shell, .ui-confirmation-dialog, .warning-center-root) .ui-button-danger:hover { background: var(--fip-danger-hover); }
+:is(.application-shell, .ui-confirmation-dialog, .warning-center-root) .ui-button-danger:active { background: var(--fip-danger-pressed); }
+:is(.application-shell, .ui-confirmation-dialog, .warning-center-root) .ui-button { cursor: pointer; }
+:is(.application-shell, .ui-confirmation-dialog, .warning-center-root) .ui-button-secondary { background: var(--fip-surface); color: var(--fip-text); border-color: var(--fip-border); }
+:is(.application-shell, .ui-confirmation-dialog, .warning-center-root) .ui-button-secondary:hover { background: var(--fip-raised); }
+:is(.application-shell, .ui-confirmation-dialog, .warning-center-root) .ui-button-secondary:active { background: var(--fip-accent-soft); }
+:is(.application-shell, .ui-confirmation-dialog, .warning-center-root) .ui-button:focus-visible { outline: 1px solid var(--fip-accent); outline-offset: -1px; }

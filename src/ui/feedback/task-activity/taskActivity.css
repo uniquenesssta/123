@@ -1,0 +1,3 @@
+.ui-task-activity { display: flex; align-items: center; align-self: flex-end; gap: 9px; min-width: 140px; max-width: 380px; padding: 10px 13px; border: 1px solid var(--fip-border-strong); border-radius: 7px; background: var(--fip-raised); box-shadow: var(--fip-feedback-shadow); pointer-events: auto; }
+.ui-task-activity[hidden] { display: none; }
+.ui-task-activity > span:last-child { color: var(--fip-text); font-size: 11px; font-weight: 500; line-height: 16px; letter-spacing: .1px; overflow-wrap: anywhere; }

@@ -38,7 +38,7 @@ export async function installShellFixture(theme: Theme, collapsed: boolean): Pro
     const focus = actionController.captureFocus();
     modal.capture();
     if (painted) workspace.capture(painted, pageRoot(), true);
-    root.innerHTML = renderShell({ state: session.bootstrap!, page: router.page, theme: session.theme, content: `<section class="shell-test-content"><h1>${router.page}</h1><label>工作区草稿 <input id="shell-draft" value="初始输入"></label><div style="height:1600px"></div></section>`, busy: false, navigationPending: router.pendingPage === router.page, navigationFailed: controller.navigationFailed, sidebarCollapsed: workspace.sidebarCollapsed() });
+    root.innerHTML = renderShell({ state: session.bootstrap!, page: router.page, theme: session.theme, content: `<section class="shell-test-content"><h1>${router.page}</h1><label>工作区草稿 <input id="shell-draft" value="初始输入"></label><div style="height:1600px"></div></section>`, navigationPending: router.pendingPage === router.page, navigationFailed: controller.navigationFailed, sidebarCollapsed: workspace.sidebarCollapsed() });
     modal.restore();
     painted = router.page;
     workspace.restore(router.page, pageRoot());

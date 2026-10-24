@@ -16,6 +16,7 @@ export function topbarView(options: ShellOptions, activeModule: PrimaryNavigatio
     <span class="topbar-separator" aria-hidden="true"></span>
     <span class="topbar-title" title="${escapeHtml(location)}">${escapeHtml(location)}</span>
     ${serviceStatusView(options.state.data.database_configured, options.navigationPending)}
+    <span data-warning-entry></span>
     ${iconButtonView("reset-current-workspace", "重置当前页面工作区", "reset", "topbar-reset")}
   </header>`;
 }

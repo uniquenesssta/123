@@ -1,6 +1,12 @@
 # R12-05 Application Shell
 
-状态：`VERIFYING`。用户2026-10-25明确确认“04已通过，没问题开始05”。04按用户确认收尾，未重新查询或轮询CI。05基线为`75e3981d544498a0a76e17b85e472860c293e431`，沿唯一`rewrite/r12-frontend-foundation-ui-system`；01～04 DONE，06～19 BLOCKED，R12整体IN_PROGRESS。05代码与本地验证不替代自身完整Windows打包/启动/日志验收，提交后不轮询、不自动进入06。
+状态：`DONE`。05已于2026-10-25按精确CI、日志及下载产物收尾。用户此前明确确认“04已通过，没问题开始05”；05实现基线为`75e3981d544498a0a76e17b85e472860c293e431`，沿唯一`rewrite/r12-frontend-foundation-ui-system`。当前05已完成，06另按用户授权实施，R12整体IN_PROGRESS。
+
+## Windows验收收尾（2026-10-25）
+
+精确提交`c880d04952285e2ac05282a82b50d1a3f1642e9e`的[run40121131372](https://github.com/uniquenesssta/123/actions/runs/40121131372)、job120952691419均SUCCESS，attempt=1。2026-10-25收尾时一次性核对head/分支、全部步骤、完整job日志及下载产物，没有轮询。artifact12571986845未过期，15,433,702字节ZIP的SHA-256为`976e5adc0155d48910cab48f38e3b29e235746b8e74183c4652590276d581505`，与GitHub摘要一致。前端/17视口、Rust检查/测试、release/MSI/NSIS、应用启动及日志检查通过。startup报告PASS，7条有效运行记录、0错误/无效行；会话0fc2c04c-a2da-44b0-a0f2-8032bd3430e8内3组trace开始/完成配对，对应bootstrap、read_workspace_state、save_workspace_state。此报告仅为startup profile，真实PG/XLSX/Full/私有固定回归等最终环境待验继续保留。下载ZIP位于仓库上一级R12-05-windows-evidence.zip。
+
+用户授权“05ci通过，开始06”，06沿当前R12分支实施；07～19仍BLOCKED。
 
 ## 依据与真实设计映射
 
@@ -170,9 +176,9 @@ Shell检查覆盖几何/完整视口、选中与默认路由、禁用不激活�
 
 早期全量被旧Shell路径/旧布局片段断言拦截；现已跟随唯一生产模块及Figma布局，历史SQL契约保持原哈希。浏览器夹具还修正了隐藏按钮选择、绑定已销毁测试实例、原生按键参数及滚轮绘制等待；原生弹窗Tab边界已补齐。默认沙箱只读诊断中的浏览器启动出现unsettled top-level await，最终用允许的本机进程/端口权限复验，不算这些失败轮次通过。日志和临时产物保留，未通过降低门槛掩盖失败。
 
-## 尚待验收与回退
+## 剩余环境验收与回退
 
-05自身Rust Clippy、workspace tests、release/MSI/NSIS、实际应用启动及日志配对交由原Windows流水线，未用04通过替代。发布后停止查询CI。Vite仍提示既有主chunk超过500kB，不在本节点夹带拆Feature或放宽警告阈值。
+05自身Rust Clippy、workspace tests、release/MSI/NSIS、实际应用启动及日志配对现已由上述精确Windows运行核实通过；未用04结果替代。后续节点独立验收。Vite仍提示既有主chunk超过500kB，不在本节点夹带拆Feature或放宽警告阈值。
 
 真实PostgreSQL、历史保护四项、不可变账本并发/回滚、有效XLSX、Windows Full、私有P4/P7固定回归及继承model.runs/0041删除风险继续按原最终封包/新库流程待验；公开stub、静态指纹和模拟adapter不算这些真实PASS。完整表单控件、异步/危险业务弹窗、平台能力、全局Warning Center及完整无障碍仍属后续节点。
 

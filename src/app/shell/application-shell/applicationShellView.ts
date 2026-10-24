@@ -14,7 +14,5 @@ export function renderShell(options: ShellOptions): string {
     ${sidebarView(options, activeModule)}
     ${pageFrameView(options, topbarView(options, activeModule))}
   </div>
-  <div data-confirmation-host></div>
-  <div id="toast" class="toast" role="status" aria-live="polite"></div>
-  <div id="busy" class="task-activity ${options.busy ? "visible" : ""}" aria-hidden="${!options.busy}"><div class="spinner"></div><span>正在处理</span></div>`;
+  <div data-confirmation-host></div>`;
 }
