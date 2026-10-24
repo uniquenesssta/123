@@ -6,7 +6,7 @@ import {
   navigationModuleForPage,
   type PrimaryNavigationModule,
   type SecondaryNavigationItem,
-} from "./navigation";
+} from "./router";
 import type { BootstrapResponse, Page, Theme } from "../types";
 
 export function pageTitle(current: Page): string {

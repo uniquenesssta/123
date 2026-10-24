@@ -1,5 +1,11 @@
 # Testing
 
+## R12-03 路由与详情历史验证（2026-10-24，VERIFYING）
+
+用户确认02通过并要求开始03；本轮不重新查询02的CI或轮询03。原`verify-dual-level-navigation.mjs`新增21项真实模块/页面加载行为测试，覆盖路由集合、切换竞态、过期成功/错误、销毁、重入、详情边界/分支及返回位置。原`verify-inline-workspace-and-resource-scroll.mjs`装配真实ModalController/RouteHistory/format模块，在Windows浏览器验证详情A/B/基础页、普通输入/checkbox/多选、滚动/焦点、主题重绘、敏感控件排除和清栈；新增夹具产物保留，不新增清理动作。
+
+03自身完整Windows Rust Clippy/tests、打包、应用启动和日志待原CI结果；本地验证及环境、实际范围见[03记录](modular-rewrite/R12-frontend-foundation-ui-system/R12-03-router-and-navigation.md)。下文02待验为实施历史，已按用户确认收口。
+
 ## R12-02 生命周期验证（2026-10-24）
 
 复用 `node scripts/verify-browser-bootstrap.mjs`，执行实际TypeScript生命周期模块的24项行为测试：启动/销毁promise去重、销毁重入与启动竞态、部分启动失败的逆序释放及聚合错误、事件解绑、三种定时/动画回调取消、过期请求成功/失败丢弃、当前错误保留、工作区延迟初始化/恢复/最终保存。没有新增runner、workflow、依赖或数据库入口。`verify-lineup-scroll-continuity.mjs`从真实生命周期源码装配既有浏览器夹具，继续用437px位置和绿像素判定，不更新基线。

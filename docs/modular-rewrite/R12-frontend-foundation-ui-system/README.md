@@ -2,7 +2,7 @@
 
 ## 当前阶段状态
 
-`IN_PROGRESS`。R12-01 DONE（f460fbf/run40061447839）。R12-02生命周期基础设施已实施VERIFYING：唯一挂载/释放/事件/异步scope接通真实启动和工作区，24项行为测试及本地完整前端/17视口、类型、架构、保护指纹通过；自身完整Windows打包/启动/日志待验。03～19 BLOCKED，唯一rewrite/r12-frontend-foundation-ui-system。
+`IN_PROGRESS`。01～02 DONE；用户2026-10-24确认02通过并授权03。03 Router与Navigation已实施VERIFYING：唯一注册/路由切换/详情历史/返回位置，真实加载竞态与详情重绘恢复已接通。04～19 BLOCKED，唯一`rewrite/r12-frontend-foundation-ui-system`。03自身完整Windows验收待结果；遵守用户要求不轮询CI。
 
 ## 依据与设计边界
 
@@ -13,8 +13,8 @@
 | 任务 | 职责 | 状态 |
 |---|---|---|
 | R12-01 | [Bootstrap 组合根](R12-01-bootstrap-组合根.md) | DONE · 自身Windows完整SUCCESS |
-| R12-02 | [生命周期基础设施](R12-02-生命周期基础设施.md) | VERIFYING · 自身完整Windows待验 |
-| R12-03 | Router 与 Navigation | BLOCKED |
+| R12-02 | [生命周期基础设施](R12-02-生命周期基础设施.md) | DONE · 用户确认Windows通过 |
+| R12-03 | [Router 与 Navigation](R12-03-router-and-navigation.md) | VERIFYING · 自身完整Windows待验 |
 | R12-04 | Session | BLOCKED |
 | R12-05 | Application Shell | BLOCKED |
 | R12-06 | Warning Center | BLOCKED |

@@ -1,8 +1,8 @@
 # 足球模型平台公开外壳
 
-## R12-02 生命周期基础设施（2026-10-24，VERIFYING）
+## R12-03 Router 与 Navigation（2026-10-24，VERIFYING）
 
-启动、销毁、逆序资源释放、事件/定时器/恢复帧取消与过期异步结果已接入唯一 `app/lifecycle` 实现；真实浏览器、启动组合根和工作区均使用该实现。原浏览器组合根验证入口新增24项行为测试，既有阵容滚动夹具装配实际拆出模块，未新增runner或依赖。TypeScript、架构与保护指纹及本地完整前端/17视口通过，自身完整Windows打包/启动/日志尚待验；03～19保持BLOCKED。7A/10M/0移动/0D及实际边界见[02记录](docs/modular-rewrite/R12-frontend-foundation-ui-system/R12-02-生命周期基础设施.md)和[R12索引](docs/modular-rewrite/R12-frontend-foundation-ui-system/README.md)。页面视觉、171条命令、配置/DTO/持久格式、Rust与模型资产保持；真实PG/Full/XLSX/私有固定回归及既有最终环境待验仍保留。
+用户确认02通过，已推进03：7模块/17路由注册、当前页与切换租约、右侧详情历史、返回位置各有唯一职责；真实页面加载接入过期保护，主题重绘保留详情输入/滚动/焦点，敏感控件不进历史快照。没有新增依赖或验证入口。实际范围、验证与剩余待验见[03记录](docs/modular-rewrite/R12-frontend-foundation-ui-system/R12-03-router-and-navigation.md)和[R12索引](docs/modular-rewrite/R12-frontend-foundation-ui-system/README.md)。01～02 DONE，03 VERIFYING，04～19 BLOCKED；03完整Windows打包/启动/日志待自身结果，不轮询CI。
 
 当前版本 **0.23.0**。本仓库是平台、数据库、数据准备、路由、工作台与外部模型调用入口的公开版本；真实 P4/P7 预测引擎、参数、Profile、固定比赛、私有研究提示词及模型专用固定回归资产不随仓库分发。
 

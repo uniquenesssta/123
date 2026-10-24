@@ -41,10 +41,10 @@
     },
     {
       "id": "browser.navigation",
-      "owner": "src/app/navigation.ts::NavigationCoordinator",
+      "owner": "src/app/router/router.ts::Router",
       "scope": "browser-window",
       "writers": [
-        "NavigationCoordinator methods"
+        "Router methods"
       ],
       "forbidden": [
         "src/pages/**",
@@ -66,11 +66,19 @@
       "transition": null
     },
     {
+      "id": "browser.navigation-return",
+      "owner": "src/app/router/navigationContext.ts::NavigationContext",
+      "scope": "browser-window",
+      "writers": ["NavigationContext methods"],
+      "forbidden": ["src/pages/**", "src/api/**"],
+      "transition": null
+    },
+    {
       "id": "browser.modal-history",
-      "owner": "src/app/modal.ts::ModalController",
+      "owner": "src/app/router/routeHistory.ts::RouteHistory",
       "scope": "browser-window",
       "writers": [
-        "ModalController methods"
+        "RouteHistory methods via ModalController"
       ],
       "forbidden": [
         "src/pages/**",
@@ -290,6 +298,6 @@
       "transition": null
     }
   ],
-  "count": 19,
+  "count": 20,
   "last_updated_task": "R3-02"
 }

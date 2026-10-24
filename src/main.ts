@@ -15,7 +15,7 @@ import {
 } from "./api/client";
 import { ModalController } from "./app/modal";
 import { AsyncScope, EventScope, MountHandle } from "./app/lifecycle";
-import { NavigationCoordinator } from "./app/navigation";
+import { Router, NavigationContext, isRoute, type NavigationRequest } from "./app/router";
 import { pageTitle, renderShell } from "./app/shell";
 import { WorkspaceStateStore, type WorkspaceLayoutMode, type WorkspaceTabState } from "./app/viewState";
 import { matchReviewWorkflowAllows } from "./app/matchReviewWorkflow";
@@ -270,7 +270,8 @@ function prepareDirectPlayerDirectoryEntry(): void {
 let app: HTMLDivElement;
 
 let state: BootstrapResponse | null = null;
-let page: Page = "dashboard";
+const navigation = new Router();
+const workflowNavigation = new NavigationContext();
 let busy = false;
 let lastPredictionResult: unknown = null;
 let currentTheme: Theme = readInitialTheme();
@@ -366,8 +367,6 @@ let pairedLineupLoadSequence: Record<LineupSide, number> = { home: 0, away: 0 };
 let selectedManagedMatchId: string | null = null;
 
 interface WorkflowContinuation {
-  readonly returnPage: Page;
-  readonly returnSection: string | null;
   readonly reason: string;
   readonly matchId: string | null;
   readonly snapshotType: LineupSnapshotType | null;
@@ -430,14 +429,12 @@ function toggleTheme(): void {
   render({ preserveForm: true });
 }
 
-const navigation = new NavigationCoordinator<Page>();
 const workspaceState = new WorkspaceStateStore<Page>({
   read: () => api.readWorkspaceState(),
   save: (document) => api.saveWorkspaceState(document),
   clear: () => api.clearWorkspaceState(),
 });
 const modal = new ModalController();
-let navigationPendingPage: Page | null = null;
 let renderedPage: Page | null = null;
 
 interface RenderOptions {
@@ -445,7 +442,7 @@ interface RenderOptions {
 }
 
 function renderWorkflowContinuationBanner(): string {
-  if (!workflowContinuation || page === workflowContinuation.returnPage) return "";
+  if (!workflowContinuation || !workflowNavigation.target || navigation.page === workflowNavigation.target.page) return "";
   return `<section class="workflow-continuation-banner" role="status"><div><span>正在补齐前置资料</span><strong>${escapeHtml(workflowContinuation.reason)}</strong><small>完成当前资料后可返回原工作流，比赛和时间窗口不会丢失。</small></div><div class="button-row"><button class="secondary" data-action="workflow-return">返回原任务</button><button class="ghost" data-action="workflow-cancel">取消返回</button></div></section>`;
 }
 
@@ -456,9 +453,8 @@ function workflowSection(pageName: Page): string | null {
 async function startWorkflowCompletion(button: HTMLElement): Promise<void> {
   const targetPage = button.dataset.targetPage as Page | undefined;
   if (!targetPage) throw new Error("缺少补录目标页面");
+  workflowNavigation.set({ page: navigation.page, section: workflowSection(navigation.page) });
   workflowContinuation = {
-    returnPage: page,
-    returnSection: workflowSection(page),
     reason: button.dataset.returnReason ?? "补齐缺失资料后返回",
     matchId: pairedLineupBuilder.match_id || selectedManagedMatchId,
     snapshotType: pairedLineupBuilder.snapshot_type,
@@ -470,11 +466,12 @@ async function startWorkflowCompletion(button: HTMLElement): Promise<void> {
 
 async function returnToWorkflow(): Promise<void> {
   const continuation = workflowContinuation;
-  if (!continuation) return;
+  const returnTarget = workflowNavigation.take();
+  if (!continuation || !returnTarget) return;
   workflowContinuation = null;
-  if (continuation.returnSection) {
-    workspaceState.patchModule(continuation.returnPage, {
-      active_section: continuation.returnSection,
+  if (returnTarget.section) {
+    workspaceState.patchModule(returnTarget.page, {
+      active_section: returnTarget.section,
     });
   }
   if (continuation.matchId) {
@@ -486,8 +483,8 @@ async function returnToWorkflow(): Promise<void> {
       snapshot_type: continuation.snapshotType ?? pairedLineupBuilder.snapshot_type,
     };
   }
-  await navigateTo(continuation.returnPage);
-  if (continuation.returnPage === "lineups" && continuation.matchId) {
+  await navigateTo(returnTarget.page);
+  if (returnTarget.page === "lineups" && continuation.matchId) {
     resetPairedBuilderForMatch(continuation.matchId, false);
     await loadBothPairedLineupSides();
     render({ preserveForm: true });
@@ -496,6 +493,7 @@ async function returnToWorkflow(): Promise<void> {
 
 function render(options: RenderOptions = {}): void {
   if (browserLifecycleController.signal.aborted) return;
+  modal.capture();
   if (options.preserveForm === true && renderedPage === "lineups") {
     capturePairedLineupFromDom();
   }
@@ -513,7 +511,7 @@ function render(options: RenderOptions = {}): void {
   }
 
   let content = "";
-  switch (page) {
+  switch (navigation.page) {
     case "dashboard":
       content = dashboardPage(state);
       break;
@@ -682,18 +680,18 @@ function render(options: RenderOptions = {}): void {
   content = renderWorkflowContinuationBanner() + content;
   app.innerHTML = renderShell({
     state,
-    page,
+    page: navigation.page,
     theme: currentTheme,
     content,
     busy,
-    navigationPending: navigationPendingPage === page,
+    navigationPending: navigation.pendingPage === navigation.page,
     sidebarCollapsed: workspaceState.sidebarCollapsed(),
   });
   modal.restore();
-  renderedPage = page;
+  renderedPage = navigation.page;
   const currentPageRoot = app.querySelector<HTMLElement>(".page-container") ?? app;
-  workspaceState.restore(page, currentPageRoot);
-  if (page === "lineups") {
+  workspaceState.restore(navigation.page, currentPageRoot);
+  if (navigation.page === "lineups") {
   queueMicrotask(() => {
     const matchCompetition = currentPageRoot.querySelector<HTMLSelectElement>("#new-match-competition");
     if (matchCompetition) {
@@ -835,19 +833,19 @@ function setWorkspaceMode(targetPage: "teams" | "players", mode: WorkspaceLayout
 }
 
 function toggleWorkspacePane(pane: "module-sidebar" | "inspector"): void {
-  const current = workspaceState.module(page);
+  const current = workspaceState.module(navigation.page);
   const patch = pane === "module-sidebar"
     ? { module_sidebar_collapsed: !current.module_sidebar_collapsed }
     : { inspector_collapsed: !current.inspector_collapsed };
-  workspaceState.patchModule(page, patch);
+  workspaceState.patchModule(navigation.page, patch);
   render({ preserveForm: true });
 }
 
 function resetCurrentWorkspace(): void {
-  workspaceState.clear(page);
-  if (page === "teams") { selectedTeamIds.clear(); selectedTeam = null; selectedPlayer = null; selectedTeamLineupHistory = []; selectedTeamLineupPresets = []; teamCursorHistory = []; }
-  if (page === "players") { selectedPlayerIds.clear(); selectedPlayer = null; playerCursorHistory = []; }
-  if (page === "lineup_presets") { selectedTeam = null; selectedTeamLineupPresets = []; selectedTeamLineupHistory = []; teamCursorHistory = []; }
+  workspaceState.clear(navigation.page);
+  if (navigation.page === "teams") { selectedTeamIds.clear(); selectedTeam = null; selectedPlayer = null; selectedTeamLineupHistory = []; selectedTeamLineupPresets = []; teamCursorHistory = []; }
+  if (navigation.page === "players") { selectedPlayerIds.clear(); selectedPlayer = null; playerCursorHistory = []; }
+  if (navigation.page === "lineup_presets") { selectedTeam = null; selectedTeamLineupPresets = []; selectedTeamLineupHistory = []; teamCursorHistory = []; }
   render();
   toast("当前工作区已重置", "success");
 }
@@ -1536,8 +1534,7 @@ async function createCompetition(): Promise<void> {
   };
   await runBusy(() => api.createCompetition(draft));
   await refresh();
-  page = "rules";
-  render();
+  await navigateTo("rules");
   toast("赛事已创建", "success");
 }
 
@@ -1609,8 +1606,7 @@ function requestDeleteCompetition(
     async () => {
       await runBusy(() => api.deleteCompetition(competitionId));
       await refresh();
-      page = "rules";
-      render();
+      await navigateTo("rules");
       toast("赛事已删除，历史数据仍然保留", "success");
     },
   );
@@ -1629,8 +1625,7 @@ async function createSeason(): Promise<void> {
   };
   await runBusy(() => api.createSeason(draft));
   await refresh();
-  page = "rules";
-  render();
+  await navigateTo("rules");
   toast("赛季已创建", "success");
 }
 
@@ -1647,8 +1642,7 @@ async function createStage(): Promise<void> {
   };
   await runBusy(() => api.createStage(draft));
   await refresh();
-  page = "rules";
-  render();
+  await navigateTo("rules");
   toast("赛事阶段已创建", "success");
 }
 
@@ -1665,8 +1659,7 @@ async function createRound(): Promise<void> {
   };
   await runBusy(() => api.createRound(draft));
   await refresh();
-  page = "rules";
-  render();
+  await navigateTo("rules");
   toast("比赛轮次已创建", "success");
 }
 
@@ -1675,8 +1668,7 @@ async function registerRulePackage(): Promise<void> {
   await runBusy(() => api.registerRulePackage(pendingRulePackage!));
   pendingRulePackage = null;
   await refresh();
-  page = "rules";
-  render();
+  await navigateTo("rules");
   toast("规则包已校验并注册", "success");
 }
 
@@ -1697,8 +1689,7 @@ async function createBinding(): Promise<void> {
   };
   await runBusy(() => api.createCompetitionBinding(draft));
   await refresh();
-  page = "rules";
-  render();
+  await navigateTo("rules");
   toast("赛事专属路由已建立", "success");
 }
 
@@ -1834,7 +1825,7 @@ async function loadPlayerPage(
 }
 
 function refreshPlayerPageDom(): boolean {
-  if (page !== "players" || !playerListPage) return false;
+  if (navigation.page !== "players" || !playerListPage) return false;
   const tbody = document.querySelector<HTMLTableSectionElement>(
     ".entity-page-players .player-directory-table tbody",
   );
@@ -2014,11 +2005,13 @@ async function refreshP4Workspace(): Promise<void> {
 
 async function loadApiWorkspace(
   selectedSessionId: string | null = apiWorkspaceDetail?.session.id ?? null,
+  isCurrent: () => boolean = () => !browserLifecycleController.signal.aborted,
 ): Promise<void> {
   const [profiles, presets] = await Promise.all([
     api.listOpenAiProfiles(),
     api.listApiWorkspacePresets(),
   ]);
+  if (!isCurrent()) return;
   openAiProfiles = profiles;
   apiWorkspacePresets = presets;
   selectedApiWorkspaceProfileId =
@@ -2046,15 +2039,18 @@ async function loadApiWorkspace(
     api.listApiWorkspaceSessions(100),
     api.playerCatalogReferenceData(),
   ]);
-  apiWorkspaceSessions = sessions;
-  apiWorkspaceMatches = references.managed_matches;
+  if (!isCurrent()) return;
   const sessionId =
     selectedSessionId && sessions.some((item) => item.id === selectedSessionId)
       ? selectedSessionId
       : null;
-  apiWorkspaceDetail = sessionId
+  const detail = sessionId
     ? await api.readApiWorkspaceSession(sessionId)
     : null;
+  if (!isCurrent()) return;
+  apiWorkspaceSessions = sessions;
+  apiWorkspaceMatches = references.managed_matches;
+  apiWorkspaceDetail = detail;
   if (apiWorkspaceDetail) {
     selectedApiWorkspaceProfileId = apiWorkspaceDetail.session.profile_id;
     selectedApiWorkspacePresetKey = apiWorkspaceDetail.session.preset_key;
@@ -2099,7 +2095,7 @@ async function sendApiWorkspaceMessage(): Promise<void> {
 
   const requestStartedAt = new Date().toISOString();
   const previousDetailId = apiWorkspaceDetail?.session.id ?? null;
-  const requestOriginPage = page;
+  const requestOriginPage = navigation.page;
   const requestId = crypto.randomUUID();
   apiWorkspaceSending = true;
   apiWorkspaceActiveRequestId = requestId;
@@ -2134,8 +2130,8 @@ async function sendApiWorkspaceMessage(): Promise<void> {
       attachments: [],
     });
     const stillViewingOrigin =
-      page === requestOriginPage &&
-      page === "api_workspace" &&
+      navigation.page === requestOriginPage &&
+      navigation.page === "api_workspace" &&
       (apiWorkspaceDetail?.session.id ?? null) === previousDetailId;
     apiWorkspaceSessions = await api.listApiWorkspaceSessions(100);
     if (stillViewingOrigin) {
@@ -2178,7 +2174,7 @@ async function sendApiWorkspaceMessage(): Promise<void> {
     apiWorkspaceSending = false;
     apiWorkspaceActiveRequestId = null;
     apiWorkspacePendingMessage = null;
-    if (page === "api_workspace" && !browserLifecycleController.signal.aborted) {
+    if (navigation.page === "api_workspace" && !browserLifecycleController.signal.aborted) {
       render();
       browserLifecycleController.setTimeout(
         () =>
@@ -2192,134 +2188,131 @@ async function sendApiWorkspaceMessage(): Promise<void> {
 }
 
 async function navigateTo(nextPage: Page): Promise<void> {
-  modal.reset();
-  const request = navigation.begin(nextPage);
-  navigationPendingPage = nextPage;
-  page = nextPage;
-  render({ preserveForm: true });
-
-  try {
-    if (nextPage === "logs") {
-      const logs = await api.listIssueLogs(500);
-      if (navigation.isCurrent(request)) issueLogs = logs;
-      return;
-    }
-    if (nextPage === "openai") {
-      const profiles = await api.listOpenAiProfiles();
-      if (navigation.isCurrent(request)) {
-        openAiProfiles = profiles;
-        if (!creatingOpenAiProfile) {
-          selectedOpenAiProfileId =
-            selectedOpenAiProfileId ??
-            profiles.active_profile_id ??
-            profiles.profiles[0]?.id ??
-            null;
-        }
-      }
-      return;
-    }
-    if (nextPage === "api_workspace") {
-      await loadApiWorkspace();
-      return;
-    }
-    if (!state?.data.database_configured) return;
-    if (nextPage === "release") {
-      releaseAcceptanceRuns = await api.listReleaseAcceptanceRuns(50);
-      const selectedId = selectedReleaseAcceptanceRun?.id ?? releaseAcceptanceRuns[0]?.id ?? null;
-      selectedReleaseAcceptanceRun = selectedId ? await api.readReleaseAcceptanceRun(selectedId) : null;
-      return;
-    }
-
-    if (nextPage === "players") {
-      const result = await fetchPlayerCatalog(
-        playerQuery,
-        selectedPlayer,
-        playerListPage === null,
-      );
-      if (navigation.isCurrent(request)) applyPlayerCatalog(result);
-    } else if (nextPage === "teams" || nextPage === "lineup_presets") {
-      const preferredPresetTeamId = nextPage === "lineup_presets"
-        ? selectedTeam?.team.id ?? workspaceState.module("lineup_presets").active_tab_id
-        : null;
-      const [catalog, coaches, formations] = await Promise.all([
-        fetchTeamCatalog(teamQuery, selectedTeam, teamListPage === null),
-        api.listCoaches({ search: null, active_only: false, limit: 500 }),
-        api.listFormations(true),
-      ]);
-      const restoredPresetTeam = preferredPresetTeamId
-        && catalog.list.items.some((item) => item.id === preferredPresetTeamId)
-        && catalog.selected?.team.id !== preferredPresetTeamId
-          ? await api.readTeam(preferredPresetTeamId)
-          : catalog.selected;
-      const result = { ...catalog, selected: restoredPresetTeam };
-      const [lineupHistory, presets] = result.selected
-        ? await Promise.all([
-            api.listTeamMatchLineups(result.selected.team.id, 100),
-            api.listTeamLineupPresets(result.selected.team.id, true),
-          ])
-        : [[], [] as TeamLineupPresetRecord[]];
-      if (navigation.isCurrent(request)) {
-        applyTeamCatalog(result);
-        coachList = coaches;
-        formationCatalog = formations;
-        selectedTeamLineupHistory = lineupHistory;
-        selectedTeamLineupPresets = presets;
-        if (nextPage === "lineup_presets" && result.selected) {
-          workspaceState.patchModule("lineup_presets", { active_tab_id: result.selected.team.id });
-        }
-      }
-    } else if (nextPage === "lineups") {
-      const result = await fetchLineups();
-      if (navigation.isCurrent(request)) applyLineups(result);
-    } else if (nextPage === "prediction") {
-      const references =
-        playerReferences ?? (await api.playerCatalogReferenceData());
-      const matchId =
-        selectedP4MatchId &&
-        references.managed_matches.some((item) => item.id === selectedP4MatchId)
-          ? selectedP4MatchId
-          : (references.upcoming_matches[0]?.id ??
-            references.managed_matches[0]?.id ??
-            null);
-      const workspace = matchId
-        ? await api.readP4MatchWorkspace(matchId)
-        : null;
-      const taskId =
-        p4TaskWorkspace &&
-        workspace?.tasks.some((task) => task.id === p4TaskWorkspace?.task.id)
-          ? p4TaskWorkspace.task.id
-          : (workspace?.tasks[0]?.id ?? null);
-      const taskWorkspace = taskId
-        ? await api.readP4TaskWorkspace(taskId)
-        : null;
-      if (navigation.isCurrent(request)) {
-        playerReferences = references;
-        selectedP4MatchId = matchId;
-        p4MatchWorkspace = workspace;
-        p4TaskWorkspace = taskWorkspace;
-      }
-    } else if (nextPage === "review") {
-      const result = await fetchReviewCenter(selectedReviewMatchId);
-      if (navigation.isCurrent(request)) applyReviewCenter(result);
-    } else if (nextPage === "analytics") {
-      const result = await fetchAnalysisCenter();
-      if (navigation.isCurrent(request)) applyAnalysisCenter(result);
-    }
-  } catch (error) {
-    if (!navigation.isCurrent(request)) return;
-    throw error;
-  } finally {
-    if (navigation.complete(request)) {
-      navigationPendingPage = null;
+  await navigation.navigate(nextPage, loadNavigationPage, {
+    started() {
+      modal.reset();
       render({ preserveForm: true });
+    },
+    settled() { render({ preserveForm: true }); },
+  });
+}
+
+async function loadNavigationPage(request: NavigationRequest): Promise<void> {
+  const nextPage = request.page;
+  if (nextPage === "logs") {
+    const logs = await api.listIssueLogs(500);
+    if (navigation.isCurrent(request)) issueLogs = logs;
+    return;
+  }
+  if (nextPage === "openai") {
+    const profiles = await api.listOpenAiProfiles();
+    if (navigation.isCurrent(request)) {
+      openAiProfiles = profiles;
+      if (!creatingOpenAiProfile) {
+        selectedOpenAiProfileId =
+          selectedOpenAiProfileId ??
+          profiles.active_profile_id ??
+          profiles.profiles[0]?.id ??
+          null;
+      }
     }
+    return;
+  }
+  if (nextPage === "api_workspace") {
+    await loadApiWorkspace(undefined, request.isCurrent);
+    return;
+  }
+  if (!state?.data.database_configured) return;
+  if (nextPage === "release") {
+    const runs = await api.listReleaseAcceptanceRuns(50);
+    if (!navigation.isCurrent(request)) return;
+    const selectedId = selectedReleaseAcceptanceRun?.id ?? runs[0]?.id ?? null;
+    const selected = selectedId ? await api.readReleaseAcceptanceRun(selectedId) : null;
+    request.commit(() => { releaseAcceptanceRuns = runs; selectedReleaseAcceptanceRun = selected; });
+    return;
+  }
+
+  if (nextPage === "players") {
+    const result = await fetchPlayerCatalog(
+      playerQuery,
+      selectedPlayer,
+      playerListPage === null,
+    );
+    if (navigation.isCurrent(request)) applyPlayerCatalog(result);
+  } else if (nextPage === "teams" || nextPage === "lineup_presets") {
+    const preferredPresetTeamId = nextPage === "lineup_presets"
+      ? selectedTeam?.team.id ?? workspaceState.module("lineup_presets").active_tab_id
+      : null;
+    const [catalog, coaches, formations] = await Promise.all([
+      fetchTeamCatalog(teamQuery, selectedTeam, teamListPage === null),
+      api.listCoaches({ search: null, active_only: false, limit: 500 }),
+      api.listFormations(true),
+    ]);
+    const restoredPresetTeam = preferredPresetTeamId
+      && catalog.list.items.some((item) => item.id === preferredPresetTeamId)
+      && catalog.selected?.team.id !== preferredPresetTeamId
+        ? await api.readTeam(preferredPresetTeamId)
+        : catalog.selected;
+    const result = { ...catalog, selected: restoredPresetTeam };
+    const [lineupHistory, presets] = result.selected
+      ? await Promise.all([
+          api.listTeamMatchLineups(result.selected.team.id, 100),
+          api.listTeamLineupPresets(result.selected.team.id, true),
+        ])
+      : [[], [] as TeamLineupPresetRecord[]];
+    if (navigation.isCurrent(request)) {
+      applyTeamCatalog(result);
+      coachList = coaches;
+      formationCatalog = formations;
+      selectedTeamLineupHistory = lineupHistory;
+      selectedTeamLineupPresets = presets;
+      if (nextPage === "lineup_presets" && result.selected) {
+        workspaceState.patchModule("lineup_presets", { active_tab_id: result.selected.team.id });
+      }
+    }
+  } else if (nextPage === "lineups") {
+    const result = await fetchLineups();
+    if (navigation.isCurrent(request)) applyLineups(result);
+  } else if (nextPage === "prediction") {
+    const references =
+      playerReferences ?? (await api.playerCatalogReferenceData());
+    const matchId =
+      selectedP4MatchId &&
+      references.managed_matches.some((item) => item.id === selectedP4MatchId)
+        ? selectedP4MatchId
+        : (references.upcoming_matches[0]?.id ??
+          references.managed_matches[0]?.id ??
+          null);
+    const workspace = matchId
+      ? await api.readP4MatchWorkspace(matchId)
+      : null;
+    const taskId =
+      p4TaskWorkspace &&
+      workspace?.tasks.some((task) => task.id === p4TaskWorkspace?.task.id)
+        ? p4TaskWorkspace.task.id
+        : (workspace?.tasks[0]?.id ?? null);
+    const taskWorkspace = taskId
+      ? await api.readP4TaskWorkspace(taskId)
+      : null;
+    if (navigation.isCurrent(request)) {
+      playerReferences = references;
+      selectedP4MatchId = matchId;
+      p4MatchWorkspace = workspace;
+      p4TaskWorkspace = taskWorkspace;
+    }
+  } else if (nextPage === "review") {
+    const result = await fetchReviewCenter(selectedReviewMatchId);
+    if (navigation.isCurrent(request)) applyReviewCenter(result);
+  } else if (nextPage === "analytics") {
+    const result = await fetchAnalysisCenter();
+    if (navigation.isCurrent(request)) applyAnalysisCenter(result);
   }
 }
 
 async function refreshBootstrapAndCatalog(): Promise<void> {
   state = await api.bootstrap();
   await loadPlayerCatalog(true);
-  if (teamListPage !== null || page === "teams" || page === "lineup_presets") await loadTeamCatalog(true);
+  if (teamListPage !== null || navigation.page === "teams" || navigation.page === "lineup_presets") await loadTeamCatalog(true);
 }
 
 async function searchTeamOptions(): Promise<void> {
@@ -3121,8 +3114,8 @@ async function confirmForceDeleteTeam(): Promise<void> {
   persistWorkspaceSelection("teams");
   persistWorkspaceSelection("players");
 
-  if (page === "teams" && nextTeamId) await openAvailableWorkspaceTab("teams", nextTeamId);
-  else if (page === "players" && nextPlayerId) await openAvailableWorkspaceTab("players", nextPlayerId);
+  if (navigation.page === "teams" && nextTeamId) await openAvailableWorkspaceTab("teams", nextTeamId);
+  else if (navigation.page === "players" && nextPlayerId) await openAvailableWorkspaceTab("players", nextPlayerId);
   else render();
 
   showHtmlModal("球队及全部资料已强制删除", "事务已提交", forceDeleteResultSummary(result));
@@ -3949,9 +3942,8 @@ async function openMissingPredictionLineup(
   };
   selectedManagedMatchId = chain.match_record.id;
   selectedMatchLineupChain = chain;
+  workflowNavigation.set({ page: "prediction", section: workspaceState.module("prediction").active_section ?? "formal" });
   workflowContinuation = {
-    returnPage: "prediction",
-    returnSection: workspaceState.module("prediction").active_section ?? "formal",
     reason: `补齐${chain.match_record.home_team_name}与${chain.match_record.away_team_name}双方阵容`,
     matchId: chain.match_record.id,
     snapshotType: chain.snapshot_type as LineupSnapshotType,
@@ -4013,6 +4005,7 @@ async function continueLineupPrediction(): Promise<void> {
   const chain = selectedMatchLineupChain;
   if (!chain?.ready_for_model) throw new Error("双方阵容尚未通过模型门禁");
   workflowContinuation = null;
+  workflowNavigation.clear();
   selectedP4MatchId = chain.match_record.id;
   selectedPredictionSnapshot = chain.snapshot_type as LineupSnapshotType;
   workspaceState.patchModule("prediction", { active_section: "formal" });
@@ -5699,7 +5692,7 @@ async function autoLoadLineupPlayers(teamId: string): Promise<void> {
   const traceId = recordUiOperation(
     "ui_action",
     "action:auto-load-lineup-players",
-    { page, teamId, teamName },
+    { page: navigation.page, teamId, teamName },
   );
   try {
     const count = await runBusy(() => loadLineupPlayersForTeam(teamId));
@@ -5716,9 +5709,9 @@ async function autoLoadLineupPlayers(teamId: string): Promise<void> {
       "action:auto-load-lineup-players",
       error,
       traceId,
-      { page, teamId, teamName },
+      { page: navigation.page, teamId, teamName },
     );
-    recordClientIssue(error, `${pageTitle(page)} / 自动加载球队名单`);
+    recordClientIssue(error, `${pageTitle(navigation.page)} / 自动加载球队名单`);
     toast(userFacingError(error), "error");
   }
 }
@@ -5870,7 +5863,7 @@ async function createLineup(): Promise<void> {
   });
   lineupBuilderPlayers = [];
   lineupPlayerCandidates = [];
-  if (page === "review" && selectedReviewMatchId) {
+  if (navigation.page === "review" && selectedReviewMatchId) {
     await loadReviewLineups(selectedReviewMatchId);
     lineupBuilderForm = {
       ...lineupBuilderForm,
@@ -6202,7 +6195,7 @@ async function decideAbilityCandidate(
     selectedMatchReview = await api.readMatchReview(
       selectedMatchReview.summary.id,
     );
-  if (page === "analytics") await loadAnalysisCenter();
+  if (navigation.page === "analytics") await loadAnalysisCenter();
   state = await api.bootstrap();
   render();
   toast(
@@ -6896,12 +6889,13 @@ async function handleAction(
       break;
     case "workflow-cancel":
       workflowContinuation = null;
+      workflowNavigation.clear();
       render({ preserveForm: true });
       break;
     case "select-workspace-section": {
       const sectionId = button.dataset.sectionId;
       if (!sectionId) break;
-      workspaceState.patchModule(page, { active_section: sectionId });
+      workspaceState.patchModule(navigation.page, { active_section: sectionId });
       render({ preserveForm: true });
       break;
     }
@@ -8089,15 +8083,16 @@ document.addEventListener("click", (event) => {
   if (selectRulesDirectoryLevel(target)) return;
   const pageButton = target.closest<HTMLElement>("[data-page]");
   if (pageButton?.dataset.page) {
-    const targetPage = pageButton.dataset.page as Page;
+    const targetPage = pageButton.dataset.page;
+    if (!isRoute(targetPage) || targetPage === navigation.page) return;
     if (targetPage === "players") prepareDirectPlayerDirectoryEntry();
     const navigationTraceId = recordUiOperation("navigation", `page:${targetPage}`, {
-      fromPage: page,
+      fromPage: navigation.page,
       toPage: targetPage,
     });
     void navigateTo(targetPage).catch((error: unknown) => {
       recordUiOperationFailure(`page:${targetPage}`, error, navigationTraceId, {
-        fromPage: page,
+        fromPage: navigation.page,
         toPage: targetPage,
       });
       recordClientIssue(error, `打开页面：${pageTitle(targetPage)}`);
@@ -8109,12 +8104,12 @@ document.addEventListener("click", (event) => {
   if (!actionButton?.dataset.action) return;
   const action = actionButton.dataset.action;
   const actionTraceId = recordUiOperation("ui_action", `action:${action}`, {
-    page,
+    page: navigation.page,
     dataset: { ...actionButton.dataset },
   });
   void handleAction(action, actionButton).catch((error: unknown) => {
-    recordUiOperationFailure(`action:${action}`, error, actionTraceId, { page });
-    recordClientIssue(error, `${pageTitle(page)} / ${action}`);
+    recordUiOperationFailure(`action:${action}`, error, actionTraceId, { page: navigation.page });
+    recordClientIssue(error, `${pageTitle(navigation.page)} / ${action}`);
     toast(userFacingError(error), "error");
   });
 }, { signal: browserLifecycleController.signal });
@@ -8598,7 +8593,9 @@ export function createBrowserApplicationModule(
     browserLifecycleController.destroy();
     bootstrapRequests.destroy();
     openAiExampleRequests.destroy();
-    navigation.cancel();
+    navigation.destroy();
+    modal.reset();
+    workflowNavigation.clear();
     workspaceState.stop();
     lineupPlayerLoadSequence += 1;
     pairedLineupLoadSequence.home += 1;

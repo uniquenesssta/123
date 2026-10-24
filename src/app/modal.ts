@@ -1,3 +1,4 @@
+import { RouteHistory } from "./router";
 import { escapeHtml, formatPercent } from "../components/format";
 
 const visualLabels: Record<string, string> = {
@@ -120,11 +121,10 @@ interface WorkspacePanelEntry {
 }
 
 export class ModalController {
-  private readonly history: WorkspacePanelEntry[] = [];
-  private historyIndex = -1;
+  private readonly history = new RouteHistory<WorkspacePanelEntry>();
 
   private currentEntry(): WorkspacePanelEntry | null {
-    return this.historyIndex >= 0 ? (this.history[this.historyIndex] ?? null) : null;
+    return this.history.current;
   }
 
   private controlKey(control: HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement, index: number): string {
@@ -143,7 +143,12 @@ export class ModalController {
       selectedValues: control instanceof HTMLSelectElement && control.multiple
         ? Array.from(control.selectedOptions).map((option) => option.value)
         : null,
-    }));
+    })).filter((state, index) => {
+      const control = controls[index];
+      return !(control instanceof HTMLInputElement && ["password", "file"].includes(control.type))
+        && !/(api[-_]?key|password|secret|credential|database[-_]?url|attachment|file[-_]?content)/i.test(`${state.key} ${control.name}`)
+        && !control.closest('[data-workspace-persist="false"]');
+    });
     entry.bodyScrollTop = root.querySelector<HTMLElement>(".workspace-detail-body")?.scrollTop ?? 0;
     const active = document.activeElement;
     const activeIndex = active instanceof HTMLInputElement || active instanceof HTMLSelectElement || active instanceof HTMLTextAreaElement
@@ -175,8 +180,8 @@ export class ModalController {
   }
 
   private syncHistoryButtons(): void {
-    const canBack = this.historyIndex >= 0;
-    const canForward = this.historyIndex + 1 < this.history.length;
+    const canBack = this.history.canBack;
+    const canForward = this.history.canForward;
     document.querySelectorAll<HTMLButtonElement>("[data-action='workspace-history-back']")
       .forEach((button) => { button.disabled = !canBack; });
     document.querySelectorAll<HTMLButtonElement>("[data-action='workspace-history-forward']")
@@ -220,13 +225,7 @@ export class ModalController {
 
   private push(entry: WorkspacePanelEntry): void {
     this.captureCurrentState();
-    if (this.historyIndex < 0) {
-      this.history.splice(0, this.history.length);
-    } else {
-      this.history.splice(this.historyIndex + 1);
-    }
     this.history.push(entry);
-    this.historyIndex = this.history.length - 1;
     this.renderCurrent();
   }
 
@@ -234,27 +233,30 @@ export class ModalController {
     this.renderCurrent();
   }
 
+  capture(): void {
+    this.captureCurrentState();
+  }
+
   close(): void {
     this.captureCurrentState();
-    this.historyIndex = -1;
+    this.history.close();
     this.renderCurrent();
   }
 
   reset(): void {
-    this.history.splice(0, this.history.length);
-    this.historyIndex = -1;
+    this.history.reset();
     this.renderCurrent();
   }
 
   back(): void {
     this.captureCurrentState();
-    if (this.historyIndex >= 0) this.historyIndex -= 1;
+    this.history.back();
     this.renderCurrent();
   }
 
   forward(): void {
     this.captureCurrentState();
-    if (this.historyIndex + 1 < this.history.length) this.historyIndex += 1;
+    this.history.forward();
     this.renderCurrent();
   }
 

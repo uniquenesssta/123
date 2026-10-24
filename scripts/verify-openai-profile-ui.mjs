@@ -26,7 +26,7 @@ const frontend = read("src/pages/openai.ts");
 const client = read("src/api/client.ts");
 const main = read("src/main.ts");
 const shell = read("src/app/shell.ts");
-const navigation = read("src/app/navigation.ts");
+const navigation = read("src/app/router/routeRegistry.ts");
 const commandRegistry = read("src-tauri/src/bootstrap/command_registry.rs");
 const desktopState = read("src-tauri/src/bootstrap/state.rs");
 const commands = [...new Set(Object.values(JSON.parse(read("architecture/command-contract.json")).command_groups.find(group => group.module === "ai_workspace").command_definition_files))].map(read).join("\n");

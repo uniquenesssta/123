@@ -7,7 +7,7 @@
 
 ## 当前前置状态（2026-10-24）
 
-R12-01 DONE（f460fbf/run40061447839）。R12-02生命周期基础设施已实施VERIFYING：唯一挂载/事件/异步/释放scope接通真实启动与工作区，24项行为测试及本地完整前端/17视口、类型、架构和保护指纹通过；自身完整Windows打包/启动/日志尚待验。03～19 BLOCKED，R12 IN_PROGRESS，唯一rewrite/r12-frontend-foundation-ui-system。[当前索引](../modular-rewrite/R12-frontend-foundation-ui-system/README.md)与[02记录](../modular-rewrite/R12-frontend-foundation-ui-system/R12-02-生命周期基础设施.md)。
+R12-01～02 DONE；用户2026-10-24确认02通过并授权03。03 Router与Navigation已实施VERIFYING：7模块/17路由、切换租约、右侧详情历史与返回位置统一，实际页面加载过期保护和详情重绘恢复接通；04～19 BLOCKED，R12 IN_PROGRESS，唯一rewrite/r12-frontend-foundation-ui-system。03自身完整Windows验收待结果，不轮询CI。[当前索引](../modular-rewrite/R12-frontend-foundation-ui-system/README.md)与[03记录](../modular-rewrite/R12-frontend-foundation-ui-system/R12-03-router-and-navigation.md)。
 
 ## 1. 阶段目标
 
@@ -489,7 +489,7 @@ src/bootstrap/registerApplicationModules.ts
 
 ## R12-02 生命周期基础设施
 
-状态：`VERIFYING`（生命周期已接通，24项行为测试及本地前端/17视口通过；自身完整Windows待验，见02记录）
+状态：`DONE`（2026-10-24用户确认02通过；4b5b107 / Windows run40100079645，本轮不重复查询）
 
 ### 1. 目标
 
@@ -627,7 +627,7 @@ src/app/lifecycle/lifecycleError.ts
 
 ## R12-03 Router 与 Navigation
 
-状态：`BLOCKED`（仅当上一任务与本任务前置门禁通过后改为 `READY`）
+状态：`VERIFYING`（2026-10-24用户授权开始；本地实现及验证见03记录，自身完整Windows待验）
 
 ### 1. 目标
 

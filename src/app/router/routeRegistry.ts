@@ -1,35 +1,5 @@
-import type { AppIcon } from "../components/icons";
-import type { Page } from "../types";
-
-export interface NavigationRequest<PageKey> {
-  readonly sequence: number;
-  readonly page: PageKey;
-}
-
-export type PrimaryNavigationKey =
-  | "home"
-  | "matches"
-  | "resources"
-  | "model"
-  | "analysis"
-  | "ai"
-  | "management";
-
-export interface SecondaryNavigationItem {
-  readonly page: Page;
-  readonly label: string;
-  readonly description: string;
-  readonly icon: AppIcon;
-}
-
-export interface PrimaryNavigationModule {
-  readonly key: PrimaryNavigationKey;
-  readonly label: string;
-  readonly description: string;
-  readonly icon: AppIcon;
-  readonly default_page: Page;
-  readonly items: readonly SecondaryNavigationItem[];
-}
+import type { Page } from "../../types";
+import type { PrimaryNavigationModule, SecondaryNavigationItem } from "./route";
 
 /**
  * One global business level and one contextual function level.
@@ -118,56 +88,41 @@ export const PRIMARY_NAVIGATION: readonly PrimaryNavigationModule[] = [
   },
 ] as const;
 
-const PAGE_TO_MODULE = new Map<Page, PrimaryNavigationModule>();
-const PAGE_TO_ITEM = new Map<Page, SecondaryNavigationItem>();
-for (const module of PRIMARY_NAVIGATION) {
-  for (const item of module.items) {
-    if (PAGE_TO_MODULE.has(item.page)) {
-      throw new Error(`页面 ${item.page} 被重复分配到一级菜单`);
+
+class RouteRegistry {
+  private readonly modules = new Map<Page, PrimaryNavigationModule>();
+  private readonly items = new Map<Page, SecondaryNavigationItem>();
+
+  constructor() {
+    for (const module of PRIMARY_NAVIGATION) {
+      for (const item of module.items) {
+        if (this.modules.has(item.page)) throw new Error(`页面 ${item.page} 被重复分配到一级菜单`);
+        this.modules.set(item.page, module);
+        this.items.set(item.page, Object.freeze(item));
+      }
+      if (!module.items.some(item => item.page === module.default_page)) throw new Error(`模块 ${module.key} 的默认页不属于本模块`);
+      Object.freeze(module.items);
+      Object.freeze(module);
     }
-    PAGE_TO_MODULE.set(item.page, module);
-    PAGE_TO_ITEM.set(item.page, item);
+    Object.freeze(PRIMARY_NAVIGATION);
+  }
+
+  has(page: string): page is Page { return this.items.has(page as Page); }
+
+  module(page: Page): PrimaryNavigationModule {
+    const module = this.modules.get(page);
+    if (!module) throw new Error(`页面 ${page} 未配置一级菜单`);
+    return module;
+  }
+
+  item(page: Page): SecondaryNavigationItem {
+    const item = this.items.get(page);
+    if (!item) throw new Error(`页面 ${page} 未配置二级菜单`);
+    return item;
   }
 }
 
-export function navigationModuleForPage(page: Page): PrimaryNavigationModule {
-  const module = PAGE_TO_MODULE.get(page);
-  if (!module) throw new Error(`页面 ${page} 未配置一级菜单`);
-  return module;
-}
-
-export function navigationItemForPage(page: Page): SecondaryNavigationItem {
-  const item = PAGE_TO_ITEM.get(page);
-  if (!item) throw new Error(`页面 ${page} 未配置二级菜单`);
-  return item;
-}
-
-/**
- * Tracks the latest page navigation so slow responses from an older page
- * cannot overwrite the state of the page the user is currently viewing.
- */
-export class NavigationCoordinator<PageKey> {
-  private sequence = 0;
-  private active: NavigationRequest<PageKey> | null = null;
-
-  begin(page: PageKey): NavigationRequest<PageKey> {
-    const request = { sequence: ++this.sequence, page } as const;
-    this.active = request;
-    return request;
-  }
-
-  isCurrent(request: NavigationRequest<PageKey>): boolean {
-    return this.active?.sequence === request.sequence;
-  }
-
-  complete(request: NavigationRequest<PageKey>): boolean {
-    if (!this.isCurrent(request)) return false;
-    this.active = null;
-    return true;
-  }
-
-  cancel(): void {
-    this.sequence += 1;
-    this.active = null;
-  }
-}
+export const routeRegistry = new RouteRegistry();
+export const isRoute = (page: string): page is Page => routeRegistry.has(page);
+export const navigationModuleForPage = (page: Page): PrimaryNavigationModule => routeRegistry.module(page);
+export const navigationItemForPage = (page: Page): SecondaryNavigationItem => routeRegistry.item(page);

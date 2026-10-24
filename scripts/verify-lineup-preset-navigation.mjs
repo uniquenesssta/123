@@ -7,7 +7,7 @@ const read = (path) => readFileSync(join(root, path), "utf8");
 const failures = [];
 const check = (condition, message) => { if (!condition) failures.push(message); };
 
-const navigation = read("src/app/navigation.ts");
+const navigation = read("src/app/router/routeRegistry.ts");
 const types = read("src/types.ts");
 const main = read("src/main.ts");
 const page = read("src/pages/lineupPresets.ts");

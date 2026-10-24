@@ -11,7 +11,7 @@ const requireTrue = (condition, message) => { if (!condition) failures.push(mess
 const contract = json("contracts/workspace-ui-contract.json");
 const pkg = json("package.json");
 const shell = text("src/app/shell.ts");
-const navigation = text("src/app/navigation.ts");
+const navigation = text("src/app/router/routeRegistry.ts");
 const state = text("src/app/viewState.ts");
 const main = text("src/main.ts");
 const styles = `${text("src/styles/layout.css")}

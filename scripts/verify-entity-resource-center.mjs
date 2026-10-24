@@ -9,7 +9,7 @@ const check = (condition, message) => { if (!condition) failures.push(message); 
 
 const main = read("src/main.ts");
 const shell = read("src/app/shell.ts");
-const navigation = read("src/app/navigation.ts");
+const navigation = read("src/app/router/routeRegistry.ts");
 const teams = read("src/pages/teams.ts");
 const players = read("src/pages/players.ts");
 const lineups = read("src/pages/lineups.ts");

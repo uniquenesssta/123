@@ -43,7 +43,7 @@ const client = text("src/api/client.ts");
 const page = text("src/pages/apiWorkspace.ts");
 const main = text("src/main.ts");
 const shell = text("src/app/shell.ts");
-const navigation = text("src/app/navigation.ts");
+const navigation = text("src/app/router/routeRegistry.ts");
 const readme = text("README.md");
 
 assert(v1.contract_id === "football.api-workspace-contract.v1", "历史v1契约ID被破坏");
