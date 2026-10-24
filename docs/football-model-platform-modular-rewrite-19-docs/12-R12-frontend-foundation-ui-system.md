@@ -5,6 +5,10 @@
 > 后续阶段：`R13`  
 > 本文档是唯一执行依据之一；必须与 `00-总体架构与前23节.md` 同时适用。
 
+## 当前前置状态（2026-10-24）
+
+R11代码/节点与Windows Automated出口DONE，精确ed11637 / run39996999630完整SUCCESS，[完成记录](../modular-rewrite/R11-tauri-commands/R11-stage-completion.md)。按现有序列R12-01 READY，02～19 BLOCKED；R12尚未实施，继续约束以[当前索引](../modular-rewrite/R12-frontend-foundation-ui-system/README.md)为准。
+
 ## 1. 阶段目标
 
 - 建立可长期扩展的前端基础设施、Shell、设计系统、Patterns、Accessibility 和样式边界。
@@ -348,7 +352,7 @@ R12 硬门禁：任何 feature 重写不得在 Foundation 未通过时开始。
 
 ## R12-01 Bootstrap 组合根
 
-状态：`BLOCKED`（仅当上一任务与本任务前置门禁通过后改为 `READY`）
+状态：`READY`（R11阶段出口完成；按既有任务序列进入下一首项）
 
 ### 1. 目标
 

@@ -892,3 +892,6 @@ R11-09已收尾DONE：精确44f2047 / [Windows run39986012998](https://github.co
 
 
 R11-10已锁定唯一命令注册入口与171个实际命令文件，现有守卫能拦截注册表混入实现、重复handler、组合根绕过与命令重新聚合。生产Rust/真实服务/公共契约不变，静态与隔离检查通过，自身完整Windows待验；详[10记录](docs/modular-rewrite/R11-tauri-commands/R11-10-command-registry-收敛.md)。R11阶段尚未完成，R12未开始。
+
+
+R11已收尾DONE：171命令归入12职责目录，唯一注册边界收敛；最终ed11637 / [Windows run39996999630](https://github.com/uniquenesssta/123/actions/runs/39996999630)完整SUCCESS，前端/17视口、Rust测试、Windows打包/启动/日志通过。[阶段完成记录](docs/modular-rewrite/R11-tauri-commands/R11-stage-completion.md)汇总真实清单和待验；下一项R12-01 READY（R11仅10项）。最终新库/Full/私有固定回归等真实待验未关闭。
