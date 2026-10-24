@@ -150,7 +150,7 @@ async function verifyLifecycleBehavior() {
   };
   const { MountHandle, EventScope, AsyncScope, DisposableScope, LifecycleError } = load("src/app/lifecycle/index.ts");
   const { ApplicationHandle } = load("src/bootstrap/applicationHandle.ts");
-  const { WorkspaceStateStore } = load("src/app/viewState.ts");
+  const { WorkspaceCoordinator: WorkspaceStateStore } = load("src/app/workspace/index.ts");
   const { AppSession, SessionPersistence, SESSION_THEME_KEY } = load("src/app/session/index.ts");
   const deferred = () => { let resolve, reject; const promise = new Promise((a, b) => { resolve = a; reject = b; }); return { promise, resolve, reject }; };
   const test = async (name, run) => {
@@ -396,7 +396,7 @@ async function verifyLifecycleBehavior() {
     scope.listen(target, "already-aborted", () => {}, { signal: external.signal }); scope.destroy();
     assert.deepEqual(calls, [["capture", true], ["capture", true]]);
   });
-  const originals = Object.fromEntries(["setTimeout", "clearTimeout", "setInterval", "clearInterval", "requestAnimationFrame", "cancelAnimationFrame", "window"].map(k => [k, Object.getOwnPropertyDescriptor(globalThis, k)]));
+  const originals = Object.fromEntries(["setTimeout", "clearTimeout", "setInterval", "clearInterval", "requestAnimationFrame", "cancelAnimationFrame", "window", "HTMLElement"].map(k => [k, Object.getOwnPropertyDescriptor(globalThis, k)]));
   const scheduled = new Map(); let nextId = 0;
   try {
     for (const [set, clear] of [["setTimeout", "clearTimeout"], ["setInterval", "clearInterval"], ["requestAnimationFrame", "cancelAnimationFrame"]]) {
@@ -404,6 +404,7 @@ async function verifyLifecycleBehavior() {
       globalThis[clear] = id => { scheduled.delete(id); };
     }
     globalThis.window = { matchMedia: () => ({ matches: false }) };
+    globalThis.HTMLElement = class HTMLElement {};
     await test("all timer types cancelled, queued callbacks inert after destroy", async () => {
       const scope = new EventScope(); let count = 0;
       scope.setTimeout(() => count++, 1); scope.setInterval(() => count++, 1); scope.requestAnimationFrame(() => count++);

@@ -7,7 +7,7 @@
 
 ## 当前前置状态（2026-10-25）
 
-R12-01～05 DONE；05精确c880d04/run40121131372已核对Windows全部步骤/完整日志/产物SHA-256与startup报告。06 Warning Center已实施VERIFYING：统一告警入口、分组/未读/弹窗与通知/任务生命周期，91步骤前端、136项告警交互及原912 Shell/17视口通过。07～19 BLOCKED，R12 IN_PROGRESS，唯一rewrite/r12-frontend-foundation-ui-system。06自身Windows待验；不轮询CI，交接核对精确提交结果。详[06记录](../modular-rewrite/R12-frontend-foundation-ui-system/R12-06-warning-center.md)。
+`IN_PROGRESS`。01～06 DONE；06精确793eea9/run40127756204及下载产物/启动日志核验通过。用户2026-10-25明确要求“开始”，07 Workspace已实施VERIFYING，08～19 BLOCKED。沿唯一rewrite/r12-frontend-foundation-ui-system。07自身Windows待验；不轮询CI，交接时核对精确提交证据。详[07记录](../modular-rewrite/R12-frontend-foundation-ui-system/R12-07-workspace.md)。
 
 ## 1. 阶段目标
 
@@ -1045,7 +1045,7 @@ src/app/shell/content-region/
 
 ## R12-06 Warning Center
 
-状态：`VERIFYING`。用户2026-10-25授权；05自身CI已核验。实现及本地结果详[R12-06记录](../modular-rewrite/R12-frontend-foundation-ui-system/R12-06-warning-center.md)，06自身完整Windows待验。
+状态：`DONE`。06精确793eea9/run40127756204、全部步骤/日志及产物摘要和startup报告核对通过。详[R12-06记录](../modular-rewrite/R12-frontend-foundation-ui-system/R12-06-warning-center.md)。
 
 ### 1. 目标
 
@@ -1181,7 +1181,7 @@ src/app/warnings/warning-dto/
 
 ## R12-07 Workspace
 
-状态：`BLOCKED`（仅当上一任务与本任务前置门禁通过后改为 `READY`）
+状态：`VERIFYING`。06自身完整Windows已核验，用户2026-10-25明确要求开始07；基线793eea9，沿当前R12分支。实现和验证详[R12-07记录](../modular-rewrite/R12-frontend-foundation-ui-system/R12-07-workspace.md)，07自身Windows待验，08～19 BLOCKED。
 
 ### 1. 目标
 

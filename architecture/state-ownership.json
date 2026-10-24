@@ -113,10 +113,10 @@
     },
     {
       "id": "browser.workspace",
-      "owner": "src/app/viewState.ts::WorkspaceStateStore",
+      "owner": "src/app/workspace/workspaceState.ts::WorkspaceState",
       "scope": "browser-window+persistent",
       "writers": [
-        "WorkspaceStateStore methods"
+        "WorkspaceCoordinator methods through WorkspaceState"
       ],
       "forbidden": [
         "src/pages/**",

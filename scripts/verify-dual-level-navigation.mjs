@@ -12,7 +12,7 @@ const check = (condition, message) => { if (!condition) failures.push(message); 
 
 const navigation = read("src/app/router/routeRegistry.ts");
 const shell = JSON.parse(read("contracts/global-visual-system-contract.json")).shell_source_entries.map(read).join("\n");
-const viewState = read("src/app/viewState.ts");
+const viewState = read("src/app/workspace/workspaceVersion.ts");
 const types = read("src/types.ts");
 const layout = ["src/app/shell/application-shell/applicationShell.css","src/app/shell/sidebar/sidebar.css","src/app/shell/topbar/topbar.css","src/app/shell/page-frame/pageFrame.css","src/app/shell/content-region/contentRegion.css"].map(read).join("\n");
 const entityStyles = read("src/styles/entityCenter.css") + read("src/app/shell/application-shell/applicationShell.css");

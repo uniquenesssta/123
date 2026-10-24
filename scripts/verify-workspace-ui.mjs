@@ -1,18 +1,20 @@
 import { readFileSync, existsSync } from "node:fs";
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
+import { verifyWorkspaceBehavior } from "./workspace/verifyWorkspaceBehavior.mjs";
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const outer = resolve(root, "..");
 const text = (path) => readFileSync(join(root, path), "utf8");
 const json = (path) => JSON.parse(text(path));
 const failures = [];
+try { await verifyWorkspaceBehavior(root); } catch (error) { failures.push(`R12-07 Workspace behavior: ${error.stack ?? error}`); }
 const requireTrue = (condition, message) => { if (!condition) failures.push(message); };
 const contract = json("contracts/workspace-ui-contract.json");
 const pkg = json("package.json");
 const shell = JSON.parse(text("contracts/global-visual-system-contract.json")).shell_source_entries.map(text).join("\n");
 const navigation = text("src/app/router/routeRegistry.ts");
-const state = text("src/app/viewState.ts");
+const state = ["workspaceState", "workspaceVersion", "workspaceRecovery", "workspaceCoordinator"].map(name => text(`src/app/workspace/${name}.ts`)).join("\n");
 const main = text("src/main.ts");
 const styles = `${text("src/styles/layout.css")}
 ${text("src/styles/app.css")}
@@ -44,7 +46,8 @@ requireTrue(shell.includes("primary-rail") && shell.includes("secondary-sidebar"
 requireTrue(shell.includes('aria-label="一级菜单"') && shell.includes("activeModule.items.map"), "一级菜单与上下文二级菜单未同时常驻");
 requireTrue(main.includes('app.querySelector<HTMLElement>(".page-container") ?? app') && !main.includes("workspaceState.restore(page, app)"), "工作区状态恢复必须限定在页面内容区，禁止改写全局导航折叠状态");
 requireTrue(state.includes('details:not([data-workspace-persist="false"])'), "工作区详情状态未排除全局导航折叠组件");
-requireTrue(state.includes("WorkspaceStateStore") && state.includes("schema_version: 1"), "缺少版本化WorkspaceStateStore");
+requireTrue(state.includes("WorkspaceCoordinator") && state.includes("schema_version: 1"), "缺少版本化WorkspaceCoordinator");
+requireTrue(!existsSync(join(root, "src/app/viewState.ts")) && main.includes('from "./app/workspace"'), "工作区必须切换唯一新入口且移除旧状态所有者");
 requireTrue(state.includes("selected_object_ids") && state.includes("panel_widths") && state.includes("internal_scrolls") && state.includes("active_section"), "工作区状态字段不完整");
 for (const key of contract.forbidden_state) requireTrue(backend.includes(key) || state.includes(key.replaceAll("_", "[-_]?")) || state.includes("FORBIDDEN_CONTROL_PATTERN"), `缺少敏感字段保护：${key}`);
 requireTrue(backend.includes("MAX_WORKSPACE_STATE_BYTES") && backend.includes("write_atomic"), "后端状态文件缺少上限或原子写入");

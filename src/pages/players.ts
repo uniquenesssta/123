@@ -4,7 +4,7 @@ import { icon } from "../components/icons";
 import { taskContextRibbon, taskPageHeader } from "../components/taskWorkspace";
 import { workspaceAnchorNavigation, workspaceSectionNavigation } from "../components/workspace";
 import { ageFromBirthDate, availabilityLabel, detailPlayerName, displayPlayerName, initials, playerStatusLabel, positionLabel, preferredFootLabel } from "../components/footballText";
-import type { WorkspaceLayoutMode, WorkspaceTabState } from "../app/viewState";
+import type { WorkspaceLayoutMode, WorkspaceTabState } from "../app/workspace";
 import type {
   BootstrapResponse,
   PlayerCatalogReferenceData,

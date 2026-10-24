@@ -2,7 +2,7 @@
 
 ## 当前阶段状态
 
-`IN_PROGRESS`。01～05 DONE；05精确c880d04/run40121131372与产物/日志核对通过。06 Warning Center已实施VERIFYING：统一入口、分组/未读、弹窗及通知/任务生命周期。07～19 BLOCKED，唯一rewrite/r12-frontend-foundation-ui-system。06自身完整Windows待验；不轮询CI，交接时核对精确提交证据。
+`IN_PROGRESS`。01～06 DONE；06精确793eea9/run40127756204及下载产物/启动日志核验通过。用户2026-10-25明确要求“开始”，07 Workspace已实施VERIFYING，08～19 BLOCKED。沿唯一rewrite/r12-frontend-foundation-ui-system。07自身Windows待验；不轮询CI，交接时核对精确提交证据。
 
 ## 依据与设计边界
 
@@ -17,8 +17,8 @@
 | R12-03 | [Router 与 Navigation](R12-03-router-and-navigation.md) | DONE · 自身Windows完整SUCCESS |
 | R12-04 | [Session](R12-04-session.md) | DONE · 用户确认Windows通过 |
 | R12-05 | [Application Shell](R12-05-application-shell.md) | DONE · 自身Windows完整SUCCESS |
-| R12-06 | [Warning Center](R12-06-warning-center.md) | VERIFYING · 本地91步骤/136告警/原912 Shell/17视口通过，自身Windows待验 |
-| R12-07 | Workspace | BLOCKED |
+| R12-06 | [Warning Center](R12-06-warning-center.md) | DONE · 自身Windows完整SUCCESS，run40127756204 |
+| R12-07 | [Workspace](R12-07-workspace.md) | VERIFYING · 实施完成，本地91步骤完整前端、16项状态/竞态测试、12组1,104项Shell/工作区检查、136告警和17截图通过；自身Windows待验 |
 | R12-08 | Tauri Transport | BLOCKED |
 | R12-09 | Files、Storage、Diagnostics、Clipboard 与 Timing | BLOCKED |
 | R12-10 | Design Tokens | BLOCKED |

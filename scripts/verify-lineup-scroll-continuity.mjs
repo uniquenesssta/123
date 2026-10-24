@@ -14,7 +14,7 @@ const failures = [];
 const check = (condition, message) => { if (!condition) failures.push(message); };
 
 const lineups = read("src/pages/lineups.ts");
-const viewState = read("src/app/viewState.ts");
+const viewState = read("src/app/workspace/workspaceRecovery.ts");
 
 for (const key of [
   "lineups-builder",
@@ -45,7 +45,7 @@ if (!browser) throw new Error("未找到 Chromium、Chrome 或 Edge，无法验�
 // Execute the actual extracted dependencies in the existing browser fixture, not a second implementation.
 const source = [
   ...["lifecycleError", "eventScope", "asyncScope"].map(name => read(`src/app/lifecycle/${name}.ts`)),
-  viewState,
+  ...["workspaceVersion", "workspaceState", "workspacePersistence", "workspaceRecovery", "workspaceCoordinator"].map(name => read(`src/app/workspace/${name}.ts`)),
 ].join("\n").replace(/^import\s+.*?from\s+["'][^"']+["'];?\s*$/gm, "").replaceAll("export ", "");
 const javascript = ts.transpileModule(source, {
   compilerOptions: {
@@ -64,7 +64,7 @@ const adapter={
   async save(document){this.document=document},
   async clear(){this.document={schema_version:1,global:{sidebar_collapsed:false,ui_revision:4},modules:{}};return this.document},
 };
-const store=new WorkspaceStateStore(adapter);
+const store=new WorkspaceCoordinator(adapter);
 const host=document.querySelector('#host');
 const markup=()=>'<div id="root"><section class="viewport" data-workspace-scroll-key="lineups-builder"><div class="content">阵容编辑内容</div></section></div>';
 (async()=>{

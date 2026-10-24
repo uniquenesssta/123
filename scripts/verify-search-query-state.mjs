@@ -11,7 +11,7 @@ const players = read("src/pages/players.ts");
 const teams = read("src/pages/teams.ts");
 const presets = read("src/pages/lineupPresets.ts");
 const main = read("src/main.ts");
-const viewState = read("src/app/viewState.ts");
+const viewState = read("src/app/workspace/workspaceRecovery.ts");
 
 requireTrue(
   players.includes('data-workspace-panel="players-filter" data-workspace-persist="false"'),
@@ -36,7 +36,7 @@ requireTrue(
   "阵容预设球队搜索仍可能被旧工作区控件快照覆盖",
 );
 requireTrue(
-  viewState.includes("control.closest('[data-workspace-persist=\"false\"]')"),
+  viewState.includes("element.closest('[data-workspace-persist=\"false\"]')") && viewState.includes("excluded(control)"),
   "工作区状态恢复没有尊重受控查询控件的持久化边界",
 );
 requireTrue(

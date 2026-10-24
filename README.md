@@ -1,8 +1,12 @@
 # 足球模型平台公开外壳
 
-## R12-06 Warning Center（2026-10-25，VERIFYING）
+## R12-07 Workspace（2026-10-25，VERIFYING）
 
-05已按精确Windows结果收尾。06接通统一顶栏告警入口、日期分组、未读徽标与弹窗；连接错误和持续错误进入唯一会话告警记录。通知采用单槽、去重及悬停/焦点暂停，关闭提示保留任务、输入和业务门禁；任务提示与ARIA同步。已补齐Figma明暗组合稿，清理旧反馈DOM/样式，并复用原生弹窗焦点机制。91步骤前端、136项告警交互、原912项Shell和17视口通过；自身Windows待验，07～19 BLOCKED。详[06记录](docs/modular-rewrite/R12-frontend-foundation-ui-system/R12-06-warning-center.md)。不轮询CI；交接时核对精确提交的一次性验收证据。
+06自身Windows验收已核对并收尾。07将工作区收敛到唯一`app/workspace`，分离状态、版本、串行持久化与DOM恢复；读取失败保留原文件，修复重叠保存/清空竞态并接通输入事件自动保存。沿既有Figma外壳和工作区设计，重启、输入、滚动与焦点检查已通过；91步骤完整前端、16项状态/竞态测试、12组1,104项Shell/工作区检查、136告警和17截图通过；自身Windows待验，08～19 BLOCKED。详[07记录](docs/modular-rewrite/R12-frontend-foundation-ui-system/R12-07-workspace.md)。
+
+## R12-06 Warning Center（2026-10-25，DONE）
+
+05已按精确Windows结果收尾。06接通统一顶栏告警入口、日期分组、未读徽标与弹窗；连接错误和持续错误进入唯一会话告警记录。通知采用单槽、去重及悬停/焦点暂停，关闭提示保留任务、输入和业务门禁；任务提示与ARIA同步。已补齐Figma明暗组合稿，清理旧反馈DOM/样式，并复用原生弹窗焦点机制。91步骤前端、136项告警交互、原912项Shell和17视口通过；自身精确793eea9/run40127756204的Windows、产物摘要与启动日志核对通过。07另按本次授权实施。详[06记录](docs/modular-rewrite/R12-frontend-foundation-ui-system/R12-06-warning-center.md)。不轮询CI；交接时核对精确提交的一次性验收证据。
 
 ## R12-05 Application Shell（2026-10-25，DONE）
 

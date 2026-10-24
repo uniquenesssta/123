@@ -1,8 +1,12 @@
 # Testing
 
-## R12-06 Warning Center（2026-10-25，VERIFYING）
+## R12-07 Workspace（2026-10-25，VERIFYING）
 
-新增verify-warning-center.mjs并接入原前端门禁；沿既有Chromium/CDP工具验证生产模块，没有新增依赖、runner或workflow。91步骤前端通过，含136项实际告警交互、原912项Shell及17截图视口；状态合并/日期/脱敏/任务门禁与真实3200ms计时、原生键盘/指针/滚轮、焦点、长列表、生命周期均验证。完整证据和环境边界见[06记录](modular-rewrite/R12-frontend-foundation-ui-system/R12-06-warning-center.md)。06自身Rust Clippy/tests、打包/实际客户端启动/日志由原Windows流水线独立验收，当前VERIFYING。
+沿原verify-workspace-ui入口新增生产模块行为检查；沿原Shell浏览器夹具验证真正的DOM恢复、重启、输入事件自动保存、敏感控件排除和停止清理。原24生命周期/18会话/21路由及截图基线保持。91步骤完整前端及16项状态/并发测试、12组1,104项Shell/工作区、136告警和17截图通过；07自身Windows CI提交后独立核验，不轮询。详[07记录](modular-rewrite/R12-frontend-foundation-ui-system/R12-07-workspace.md)。
+
+## R12-06 Warning Center（2026-10-25，DONE）
+
+新增verify-warning-center.mjs并接入原前端门禁；沿既有Chromium/CDP工具验证生产模块，没有新增依赖、runner或workflow。91步骤前端通过，含136项实际告警交互、原912项Shell及17截图视口；状态合并/日期/脱敏/任务门禁与真实3200ms计时、原生键盘/指针/滚轮、焦点、长列表、生命周期均验证。完整证据和环境边界见[06记录](modular-rewrite/R12-frontend-foundation-ui-system/R12-06-warning-center.md)。06自身精确793eea9/run40127756204的Rust Clippy/tests、打包/实际启动/日志已独立核对通过；下载产物摘要与startup报告一致，详06记录。
 
 ## R12-05 Shell验证（2026-10-25，DONE）
 

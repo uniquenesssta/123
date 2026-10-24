@@ -1,6 +1,6 @@
 import { escapeHtml } from "./format";
 import { icon } from "./icons";
-import type { WorkspaceLayoutMode, WorkspaceTabState } from "../app/viewState";
+import type { WorkspaceLayoutMode, WorkspaceTabState } from "../app/workspace";
 
 export interface WorkspaceSectionItem {
   readonly id: string;

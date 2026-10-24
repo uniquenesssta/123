@@ -2,7 +2,8 @@ import { ApplicationShellController, renderShell } from "../index";
 import { AppSession, SessionPersistence } from "../../session";
 import { Router, PRIMARY_NAVIGATION, type NavigationRequest } from "../../router";
 import { ModalController } from "../../modal";
-import { WorkspaceStateStore } from "../../viewState";
+import { WorkspaceCoordinator } from "../../workspace";
+import { verifyWorkspaceRecovery } from "../../workspace/__tests__/workspaceBrowserFixture";
 import type { BootstrapResponse, Page, Theme } from "../../../types";
 
 /** Browser fixture injects data adapters only; all Shell/route/session/workspace code is real. */
@@ -13,13 +14,14 @@ export async function installShellFixture(theme: Theme, collapsed: boolean): Pro
     if (!condition) throw new Error(message);
     checks.push(message);
   }
+  await verifyWorkspaceRecovery(root, expect);
   const frames = () => new Promise<void>(resolve => requestAnimationFrame(() => requestAnimationFrame(() => resolve())));
   const summary = { data: { database_configured: true, app_version: "0.23.0", recent_runs: [] } } as unknown as BootstrapResponse;
   const preferences = new Map<string, string>([["football-model-platform.theme", theme]]);
   const session = new AppSession({ loadBootstrap: async () => summary, loadRecentRuns: async () => [], applyTheme(value) { document.documentElement.dataset.theme = value; } },
     new SessionPersistence(() => ({ getItem: key => preferences.get(key) ?? null, setItem(key, value) { preferences.set(key, value); } })));
   await session.start();
-  const workspace = new WorkspaceStateStore<Page>({ read: async () => ({ schema_version: 1, global: { sidebar_collapsed: false, ui_revision: 5 }, modules: {} }), save: async () => {}, clear: async () => ({ schema_version: 1, global: { sidebar_collapsed: false, ui_revision: 5 }, modules: {} }) });
+  const workspace = new WorkspaceCoordinator<Page>({ read: async () => ({ schema_version: 1, global: { sidebar_collapsed: false, ui_revision: 5 }, modules: {} }), save: async () => {}, clear: async () => ({ schema_version: 1, global: { sidebar_collapsed: false, ui_revision: 5 }, modules: {} }) });
   await workspace.initialize();
   const router = new Router();
   const modal = new ModalController();

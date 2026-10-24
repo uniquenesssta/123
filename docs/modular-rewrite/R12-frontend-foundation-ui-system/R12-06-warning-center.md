@@ -1,6 +1,10 @@
 # R12-06 Warning Center
 
-状态：`VERIFYING`。2026-10-25用户授权“05ci通过，开始06”。05精确c880d04/run40121131372的全部步骤、job日志、产物SHA-256及startup报告已核对通过；详[05收尾](R12-05-application-shell.md)。06基线c880d04952285e2ac05282a82b50d1a3f1642e9e，继续唯一rewrite/r12-frontend-foundation-ui-system。07～19 BLOCKED，R12整体IN_PROGRESS。
+状态：`DONE`。06已按自身精确Windows验收完成收尾；详下。实施基线c880d04952285e2ac05282a82b50d1a3f1642e9e；沿唯一rewrite/r12-frontend-foundation-ui-system。07按本次用户授权开始，R12整体IN_PROGRESS。
+
+## Windows验收收尾（2026-10-25）
+
+06精确提交`793eea904a82072fb828f3023ccff8ac705d99ec`的[Windows run40127756204](https://github.com/uniquenesssta/123/actions/runs/40127756204)、job120972736636、attempt1全部SUCCESS。已一次性核对提交/分支、全部步骤、完整job日志及下载产物；artifact12574033620未过期，ZIP15,880,420字节，SHA-256 `8a22e453ec79d06cd95ef27315624b3ddf4f9243555fe027fafd8ddb9bdbd994`与API摘要一致。前端/136告警/原912 Shell/17截图、Rust fmt/Clippy/workspace tests、release/MSI/NSIS、实际客户端启动与日志通过。报告`windows-acceptance-20261024-200046.json`为startup PASS：7条有效记录、0无效行、0运行错误；会话`45a742de-0f91-4150-a892-46e57c4f22fb`内bootstrap、read_workspace_state、save_workspace_state三组trace均开始/完成配对。原ZIP在仓库上一级`R12-06-windows-evidence.zip`。startup不是Windows Full或真实PG最终环境验收；原待验继续保留。
 
 ## 设计与实施范围
 
@@ -49,9 +53,9 @@ Windows本机，Node24.16.0/npm11.13.0、TypeScript5.8.3/Vite7.3.6、Rust1.88.0�
 
 ## 尚待验收与回退
 
-06自身Rust Clippy/workspace tests、release/MSI/NSIS、实际客户端启动及运行日志配对交由原Windows自动流水线；提交后不轮询，不把05结果继承为06通过。真实PG/历史保护四项/并发回滚/有效XLSX/Windows Full/私有P4/P7固定回归等最终封包新库待验继续保留；ignored、mock、公开stub与startup不算这些PASS。当前仅会话告警历史，不虚构跨重启持久化；持久问题仍由既有IssueLog负责。完整组件矩阵、异步危险业务弹窗和全部A11y属于后续节点。
+06自身Rust Clippy/workspace tests、release/MSI/NSIS、实际客户端启动及运行日志配对已由上述精确Windows运行核对通过；没有继承05结果。真实PG/历史保护四项/并发回滚/有效XLSX/Windows Full/私有P4/P7固定回归等最终封包新库待验继续保留；ignored、mock、公开stub与startup不算这些PASS。当前仅会话告警历史，不虚构跨重启持久化；持久问题仍由既有IssueLog负责。完整组件矩阵、异步危险业务弹窗和全部A11y属于后续节点。
 
-回退点c880d04，采用Git受控回退06提交，无数据库或持久格式迁移。06完整Windows证据未核对前保持VERIFYING，不进入07。
+回退点c880d04，采用Git受控回退06提交，无数据库或持久格式迁移。06完整Windows证据已核对；07另按本次用户明确授权执行。
 
 ## 实际文件清单
 

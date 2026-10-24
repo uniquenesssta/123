@@ -35,7 +35,7 @@ import { AsyncScope, EventScope, MountHandle } from "./app/lifecycle";
 import { Router, NavigationContext, isRoute, type NavigationRequest } from "./app/router";
 import { ApplicationShellController, pageTitle, renderShell } from "./app/shell";
 import { WarningCenterController } from "./app/warnings";
-import { WorkspaceStateStore, type WorkspaceLayoutMode, type WorkspaceTabState } from "./app/viewState";
+import { WorkspaceCoordinator, type WorkspaceLayoutMode, type WorkspaceTabState } from "./app/workspace";
 import { matchReviewWorkflowAllows } from "./app/matchReviewWorkflow";
 import {
   fetchAnalysisCenter,
@@ -427,10 +427,19 @@ let selectedApiWorkspaceContextEntityLabel: string | null = null;
 let apiWorkspaceSessionSearch = "";
 let apiWorkspaceIncludeContext = false;
 let apiWorkspaceActiveRequestId: string | null = null;
-const workspaceState = new WorkspaceStateStore<Page>({
+const workspaceState = new WorkspaceCoordinator<Page>({
   read: () => api.readWorkspaceState(),
   save: (document) => api.saveWorkspaceState(document),
   clear: () => api.clearWorkspaceState(),
+}, {
+  onError({ operation, error }) {
+    recordClientIssue(error, `工作区 / ${operation === "read" ? "读取状态" : operation === "clear" ? "清除状态" : "保存状态"}`);
+    warningCenter?.record({
+      key: `workspace:${operation}`, source: "工作区", severity: "warning", target: "logs",
+      title: operation === "read" ? "工作区恢复失败" : operation === "clear" ? "工作区未能清除" : "工作区尚未保存",
+      message: operation === "read" ? "原状态文件已保留，本次暂用临时工作区。请查看问题日志，修复后重新启动。" : "当前操作未完成，本次工作区仍保留。请查看问题日志后重试。",
+    });
+  },
 });
 const modal = new ModalController();
 let shellController: ApplicationShellController | null = null;
@@ -1431,7 +1440,8 @@ async function executeDatabaseReset(): Promise<void> {
   }
   closeModal();
   await runBusy(() => api.resetDatabase(confirmation));
-  await api.clearWorkspaceState();
+  await workspaceState.clearAll();
+  workspaceState.stop();
   window.localStorage.removeItem(TEAM_QUERY_KEY);
   window.localStorage.removeItem(PLAYER_QUERY_KEY);
   window.localStorage.removeItem(PLAYER_NAV_CONTEXT_KEY);
@@ -8549,7 +8559,7 @@ window.addEventListener("beforeunload", () => {
     const currentPageRoot = app.querySelector<HTMLElement>(".page-container") ?? app;
     workspaceState.capture(renderedPage, currentPageRoot, true);
   }
-  void workspaceState.flush();
+  void workspaceState.flush().catch(error => recordClientIssue(error, "工作区 / 退出保存"));
 }, { signal: browserLifecycleController.signal });
 
 export interface BrowserApplicationModule {
@@ -8587,6 +8597,7 @@ export function createBrowserApplicationModule(
     async start() {
       warningCenter?.start();
       shellController?.start();
+      workspaceState.start(root, () => renderedPage, () => app.querySelector<HTMLElement>(".page-container"));
       bindSearchableSelectDiagnostics(browserLifecycleController.signal);
       render();
       try {
@@ -8597,15 +8608,15 @@ export function createBrowserApplicationModule(
       }
     },
     async destroy() {
-      if (renderedPage) {
-        const currentPageRoot = app.querySelector<HTMLElement>(".page-container") ?? app;
-        workspaceState.capture(renderedPage, currentPageRoot, true);
-      }
       try { await workspaceState.destroy(); } finally { await session.destroy(); }
     },
   });
 
   function stopResources(): void {
+    if (renderedPage) {
+      const currentPageRoot = app.querySelector<HTMLElement>(".page-container") ?? app;
+      workspaceState.capture(renderedPage, currentPageRoot, true);
+    }
     warningCenter?.destroy();
     shellController?.destroy();
     browserLifecycleController.destroy();

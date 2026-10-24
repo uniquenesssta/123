@@ -90,7 +90,8 @@ requireText(client, 'invoke("reset_database", { confirmation })', "前端 API �
 requireText(page, 'data-action="request-reset-database"', "数据库页危险按钮");
 requireText(main, "requestDatabaseReset", "输入数据库名称确认弹窗");
 requireText(main, 'data-action="execute-database-reset"', "最终清空按钮");
-requireText(main, "api.clearWorkspaceState()", "清空后移除失效工作区引用");
+requireText(main, "clear: () => api.clearWorkspaceState()", "唯一工作区清理adapter");
+requireText(main, "await workspaceState.clearAll();\n  workspaceState.stop();", "清空后串行移除失效工作区引用并停止退出快照回写");
 requireText(main, "window.location.reload()", "清空后重启界面状态");
 
 const databaseRoot = "src-tauri/src/commands/database";
