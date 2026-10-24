@@ -1,8 +1,8 @@
 # 足球模型平台公开外壳
 
-## R12-03 Router 与 Navigation（2026-10-24，VERIFYING）
+## R12-03 Router 与 Navigation（2026-10-24，DONE）
 
-用户确认02通过，已推进03：7模块/17路由注册、当前页与切换租约、右侧详情历史、返回位置各有唯一职责；真实页面加载接入过期保护，主题重绘保留详情输入/滚动/焦点，敏感控件不进历史快照。没有新增依赖或验证入口。实际范围、验证与剩余待验见[03记录](docs/modular-rewrite/R12-frontend-foundation-ui-system/R12-03-router-and-navigation.md)和[R12索引](docs/modular-rewrite/R12-frontend-foundation-ui-system/README.md)。01～02 DONE，03 VERIFYING，04～19 BLOCKED；03完整Windows打包/启动/日志待自身结果，不轮询CI。
+03精确`7f67940`的[Windows run40103980479](https://github.com/uniquenesssta/123/actions/runs/40103980479)完整成功：前端/17视口、24生命周期/21路由行为、Rust、打包、启动与日志通过，下载产物哈希及报告已核对。01～03 DONE；用户要求收尾03开始04，Session现READY，05～19 BLOCKED。详[03记录](docs/modular-rewrite/R12-frontend-foundation-ui-system/R12-03-router-and-navigation.md)和[R12索引](docs/modular-rewrite/R12-frontend-foundation-ui-system/README.md)。遵守不轮询CI；真实PG/XLSX/Full/私有固定回归等最终环境待验继续保留。
 
 当前版本 **0.23.0**。本仓库是平台、数据库、数据准备、路由、工作台与外部模型调用入口的公开版本；真实 P4/P7 预测引擎、参数、Profile、固定比赛、私有研究提示词及模型专用固定回归资产不随仓库分发。
 

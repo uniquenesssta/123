@@ -1,5 +1,9 @@
 # Testing
 
+## R12-03 Windows收尾（2026-10-24）
+
+精确7f67940/run40103980479/job120901723538完整SUCCESS，全部步骤与日志、artifact12565230054已核对；14,063,089字节ZIP的SHA-256为`d144993efb654c5c3b49a157efb68973cc74383870bc615d4b33ee723554bef2`。startup报告7有效runtime记录、无错误，bootstrap与工作区读写三操作配对；前端/17视口、24生命周期/21路由行为、Rust测试/Clippy、release/MSI/NSIS/应用启动通过。03 DONE，04READY。仅一次性收尾读取，不轮询、不重复同源码Windows。详情与环境待验见[03完成记录](modular-rewrite/R12-frontend-foundation-ui-system/R12-03-router-and-navigation.md)。
+
 ## R12-03 路由与详情历史验证（2026-10-24，VERIFYING）
 
 用户确认02通过并要求开始03；本轮不重新查询02的CI或轮询03。原`verify-dual-level-navigation.mjs`新增21项真实模块/页面加载行为测试，覆盖路由集合、切换竞态、过期成功/错误、销毁、重入、详情边界/分支及返回位置。原`verify-inline-workspace-and-resource-scroll.mjs`装配真实ModalController/RouteHistory/format模块，在Windows浏览器验证详情A/B/基础页、普通输入/checkbox/多选、滚动/焦点、主题重绘、敏感控件排除和清栈；新增夹具产物保留，不新增清理动作。

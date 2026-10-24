@@ -1,6 +1,6 @@
 # R12-03 Router 与 Navigation
 
-状态：`VERIFYING`。用户2026-10-24确认“02通过 开始03”，基线为02交付`4b5b107aad3415749adbc818bb2c818c38b2da29`；沿唯一`rewrite/r12-frontend-foundation-ui-system`。01～02 DONE，04～19 BLOCKED，R12 IN_PROGRESS。03自身完整Windows Rust/打包/应用启动/日志待原CI结果；遵守用户“不轮询”要求，提交后不持续查询，不自动开始04。
+状态：`DONE`（精确7f67940 / Windows run40103980479完整SUCCESS，收尾证据见末节）。用户2026-10-24确认“02通过 开始03”，基线为02交付`4b5b107aad3415749adbc818bb2c818c38b2da29`；沿唯一`rewrite/r12-frontend-foundation-ui-system`。01～02 DONE，04～19 BLOCKED，R12 IN_PROGRESS。03自身完整Windows Rust/打包/应用启动/日志待原CI结果；遵守用户“不轮询”要求，提交后不持续查询，不自动开始04。
 
 ## 实际实现与所有权
 
@@ -93,3 +93,11 @@ Context7查询标准AbortSignal/Promise取消语义，确认调用方必须主�
 ## 回退与后续
 
 按03原子提交受控回退到基线4b5b107；没有数据库或持久格式迁移。本节点代码、本地验证及记录已完成，发布后由既有Windows流水线验收03精确提交。遵守用户要求不轮询，不创建自动监控；用户返回结果后再收口03。04未实施，R12阶段完成记录未创建。
+
+## 精确Windows验收收尾（2026-10-24）
+
+用户要求“收尾03开始04”，本轮一次性读取已完成结果及其证据，没有等待循环或CI轮询。精确提交`7f67940e2438cfd962ef3b8e3167640ab06c4c46`、源码树`7c38ebe233e19ba4f71a7bfc6354db15485a70be`、原分支匹配[run40103980479](https://github.com/uniquenesssta/123/actions/runs/40103980479)；job`120901723538`全部12步骤SUCCESS，2026-10-24 23:16:02北京时间完成。完整日志确认24生命周期/21路由行为、前端/17视口、Rustfmt/locked Clippy/workspace tests、release、MSI、NSIS、启动与日志检查通过；Desktop58/Application230/Persistence259/Gateway112unit+41contract保持。
+
+artifact`12565230054`为14,063,089字节，下载ZIP的SHA-256与GitHub digest均为`d144993efb654c5c3b49a157efb68973cc74383870bc615d4b33ee723554bef2`，读取时未过期。本机保留仓库上一级`R12-03-windows-evidence.zip`。已读验收报告`logs/windows-acceptance-20261024-144738.json`：startup profile/status pass；runtime session`94eca8fb-e102-448c-96a4-0f8e98cf9812`共7条有效记录、0坏行、无runtime_errors，bootstrap/read_workspace_state/save_workspace_state三操作完成配对。下载首次被沙箱本机网络权限阻断，授权重试同一产物后哈希一致；这不是CI失败。
+
+03 DONE，04 Session READY。此前待验/未开始04措辞保留实施历史，当前状态由阶段索引维护。本次5份文档[skip ci]收尾，不重跑同源码完整Windows。startup报告不代表真实PG/XLSX/Full/私有模型固定回归通过；这些最终环境待验保持。

@@ -7,7 +7,7 @@
 
 ## 当前前置状态（2026-10-24）
 
-R12-01～02 DONE；用户2026-10-24确认02通过并授权03。03 Router与Navigation已实施VERIFYING：7模块/17路由、切换租约、右侧详情历史与返回位置统一，实际页面加载过期保护和详情重绘恢复接通；04～19 BLOCKED，R12 IN_PROGRESS，唯一rewrite/r12-frontend-foundation-ui-system。03自身完整Windows验收待结果，不轮询CI。[当前索引](../modular-rewrite/R12-frontend-foundation-ui-system/README.md)与[03记录](../modular-rewrite/R12-frontend-foundation-ui-system/R12-03-router-and-navigation.md)。
+R12-01～03 DONE；03精确7f67940/run40103980479完整Windows、日志及下载产物验证通过。用户授权04 Session，现READY，05～19 BLOCKED，R12 IN_PROGRESS，唯一rewrite/r12-frontend-foundation-ui-system。收尾只读取一次，不轮询CI。[当前索引](../modular-rewrite/R12-frontend-foundation-ui-system/README.md)与[03完成记录](../modular-rewrite/R12-frontend-foundation-ui-system/R12-03-router-and-navigation.md)。
 
 ## 1. 阶段目标
 
@@ -627,7 +627,7 @@ src/app/lifecycle/lifecycleError.ts
 
 ## R12-03 Router 与 Navigation
 
-状态：`VERIFYING`（2026-10-24用户授权开始；本地实现及验证见03记录，自身完整Windows待验）
+状态：`DONE`（精确7f67940 / Windows run40103980479完整SUCCESS，详03记录）
 
 ### 1. 目标
 
@@ -767,7 +767,7 @@ src/app/router/routeHistory.ts
 
 ## R12-04 Session
 
-状态：`BLOCKED`（仅当上一任务与本任务前置门禁通过后改为 `READY`）
+状态：`READY`（03自身完整Windows与记录已通过，用户授权开始）
 
 ### 1. 目标
 

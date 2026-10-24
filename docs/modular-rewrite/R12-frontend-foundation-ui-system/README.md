@@ -2,7 +2,7 @@
 
 ## 当前阶段状态
 
-`IN_PROGRESS`。01～02 DONE；用户2026-10-24确认02通过并授权03。03 Router与Navigation已实施VERIFYING：唯一注册/路由切换/详情历史/返回位置，真实加载竞态与详情重绘恢复已接通。04～19 BLOCKED，唯一`rewrite/r12-frontend-foundation-ui-system`。03自身完整Windows验收待结果；遵守用户要求不轮询CI。
+`IN_PROGRESS`。01～03 DONE；03精确7f67940/run40103980479的全部Windows步骤、日志和下载产物校验通过。用户授权04 Session，现READY，05～19 BLOCKED，唯一`rewrite/r12-frontend-foundation-ui-system`。不轮询CI。
 
 ## 依据与设计边界
 
@@ -14,8 +14,8 @@
 |---|---|---|
 | R12-01 | [Bootstrap 组合根](R12-01-bootstrap-组合根.md) | DONE · 自身Windows完整SUCCESS |
 | R12-02 | [生命周期基础设施](R12-02-生命周期基础设施.md) | DONE · 用户确认Windows通过 |
-| R12-03 | [Router 与 Navigation](R12-03-router-and-navigation.md) | VERIFYING · 自身完整Windows待验 |
-| R12-04 | Session | BLOCKED |
+| R12-03 | [Router 与 Navigation](R12-03-router-and-navigation.md) | DONE · 自身Windows完整SUCCESS |
+| R12-04 | Session | READY |
 | R12-05 | Application Shell | BLOCKED |
 | R12-06 | Warning Center | BLOCKED |
 | R12-07 | Workspace | BLOCKED |
