@@ -18,7 +18,7 @@ const privatePathPatterns = [
   /^docs\/P[47]_INTEGRATION\.md$/i,
 ];
 const requiredMarkers = [
-  "README.md", "ALL_AI_CODE.md", "AI_PROJECT_RULES.md", ".gitignore",
+  "README.md", "AGENTS.md", ".gitignore",
   "package.json", "package-lock.json", "Cargo.toml", "Cargo.lock",
   "crates/model-api/src/lib.rs", "crates/model-stub/src/lib.rs",
   "contracts/model-provider-boundary-contract.json",

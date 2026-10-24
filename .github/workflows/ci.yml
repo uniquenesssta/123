@@ -6,6 +6,8 @@ on:
       - main
       - "new-*"
       - "rewrite/**"
+    paths-ignore:
+      - "**.md"
   pull_request:
   workflow_dispatch:
 
