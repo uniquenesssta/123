@@ -1,0 +1,10 @@
+/* R12-10 FIP motion; shared design snapshot 2026-10-25. See R12-10-figma-tokens.json. */
+:root {
+  --fip-motion-progress-duration: 1200ms;
+  --fip-motion-progress-easing: ease-in-out;
+  --fip-motion-progress-iterations: infinite;
+  --fip-motion-progress-direction: alternate;
+}
+@media (prefers-reduced-motion: reduce) {
+  :root { --fip-motion-progress-duration: 0ms; }
+}

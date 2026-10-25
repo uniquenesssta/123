@@ -1,0 +1,62 @@
+/* R12-10 FIP spacing; shared design snapshot 2026-10-25. See R12-10-figma-tokens.json. */
+:root {
+  --fip-space-2xs: var(--fip-spacing-2xs);
+  --fip-space-xs: var(--fip-spacing-xs);
+  --fip-space-sm: var(--fip-spacing-sm);
+  --fip-space-md: var(--fip-spacing-md);
+  --fip-space-lg: var(--fip-spacing-lg);
+  --fip-space-xl: var(--fip-spacing-xl);
+}
+
+:root {
+  --fip-accordion-item-gap: 7px; /* VariableID:318:5161 accordion/item-gap */
+  --fip-disclosure-trigger-padding-y: 11px; /* VariableID:318:5160 disclosure/trigger-padding-y */
+  --fip-layout-dialog-body-padding-y: 11px; /* VariableID:275:2214 layout/dialog/body-padding-y */
+  --fip-layout-dialog-header-padding-y: 9px; /* VariableID:275:2213 layout/dialog/header-padding-y */
+  --fip-layout-empty-state-padding-compact: 9px; /* VariableID:336:6508 layout/empty-state/padding-compact */
+  --fip-layout-empty-state-padding-default: 12px; /* VariableID:336:6509 layout/empty-state/padding-default */
+  --fip-layout-feedback-padding-x: 10px; /* VariableID:297:3992 layout/feedback/padding-x */
+  --fip-layout-menu-gap: 5px; /* VariableID:248:1706 layout/menu/gap */
+  --fip-layout-menu-item-padding-x: 11px; /* VariableID:248:1707 layout/menu/item-padding-x */
+  --fip-layout-menu-item-padding-y: 10px; /* VariableID:248:1708 layout/menu/item-padding-y */
+  --fip-layout-menu-note-padding-x: 6px; /* VariableID:248:1709 layout/menu/note-padding-x */
+  --fip-layout-page-padding-x: 14px; /* VariableID:95:9 layout/page/padding-x */
+  --fip-layout-page-padding-y: 10px; /* VariableID:95:10 layout/page/padding-y */
+  --fip-layout-panel-padding: 12px; /* VariableID:95:11 layout/panel/padding */
+  --fip-layout-table-cell-padding-x: 9px; /* VariableID:226:1091 layout/table-cell/padding-x */
+  --fip-layout-task-activity-gap: 9px; /* VariableID:297:3997 layout/task-activity/gap */
+  --fip-layout-task-activity-padding-x: 13px; /* VariableID:297:3995 layout/task-activity/padding-x */
+  --fip-layout-task-activity-padding-y: 10px; /* VariableID:297:3996 layout/task-activity/padding-y */
+  --fip-spacing-2xs: 2px; /* VariableID:18:43 spacing/2xs */
+  --fip-spacing-lg: 16px; /* VariableID:18:47 spacing/lg */
+  --fip-spacing-md: 12px; /* VariableID:18:46 spacing/md */
+  --fip-spacing-sm: 8px; /* VariableID:18:45 spacing/sm */
+  --fip-spacing-xl: 20px; /* VariableID:18:48 spacing/xl */
+  --fip-spacing-xs: 4px; /* VariableID:18:44 spacing/xs */
+  --fip-switch-track-padding: 2px; /* VariableID:178:566 switch/track-padding */
+  --fip-tabs-item-padding-x: 10px; /* VariableID:204:610 tabs/item-padding-x */
+}
+
+:root, [data-fip-control-scale="32"] {
+  --fip-combobox-option-padding-x: 8px; /* VariableID:161:515 combobox/option-padding-x */
+  --fip-control-gap: 6px; /* VariableID:46:5 control/gap */
+  --fip-control-padding-x: 12px; /* VariableID:46:4 control/padding-x */
+  --fip-segmented-container-padding: 2px; /* VariableID:198:600 segmented/container-padding */
+  --fip-segmented-item-padding-x: 8px; /* VariableID:204:611 segmented/item-padding-x */
+}
+
+[data-fip-control-scale="40"] {
+  --fip-combobox-option-padding-x: 10px; /* VariableID:161:515 combobox/option-padding-x */
+  --fip-control-gap: 8px; /* VariableID:46:5 control/gap */
+  --fip-control-padding-x: 14px; /* VariableID:46:4 control/padding-x */
+  --fip-segmented-container-padding: 3px; /* VariableID:198:600 segmented/container-padding */
+  --fip-segmented-item-padding-x: 12px; /* VariableID:204:611 segmented/item-padding-x */
+}
+
+[data-fip-control-scale="48"] {
+  --fip-combobox-option-padding-x: 12px; /* VariableID:161:515 combobox/option-padding-x */
+  --fip-control-gap: 8px; /* VariableID:46:5 control/gap */
+  --fip-control-padding-x: 16px; /* VariableID:46:4 control/padding-x */
+  --fip-segmented-container-padding: 4px; /* VariableID:198:600 segmented/container-padding */
+  --fip-segmented-item-padding-x: 14px; /* VariableID:204:611 segmented/item-padding-x */
+}

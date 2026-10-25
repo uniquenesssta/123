@@ -1,8 +1,12 @@
 # 足球模型平台公开外壳
 
-## R12-09 Platform 能力（2026-10-25，VERIFYING）
+## R12-10 Design Tokens（2026-10-25，VERIFYING）
 
-08自身Windows验收、产物摘要和启动日志已核对收尾。09将原生文件选择、偏好存储、有界脱敏摘要、剪贴板、时钟/防抖/请求序列迁入各自平台目录，接通原调用方，保留存储键/格式、对话框选项和业务命令。新增25项生产平台行为检查，91步骤完整前端回归通过；09自身Windows待验，10～19 BLOCKED。详[09记录](docs/modular-rewrite/R12-frontend-foundation-ui-system/R12-09-files-storage-diagnostics-clipboard-and-timing.md)。
+09自身Windows验收、产物摘要和启动日志已核对收尾。10在原FIP目录按10类职责补齐193个设计变量、13个文字样式和6个阴影样式，保留明暗/尺寸/色调模式，Shell与反馈控件接入唯一CSS入口。1,344项原生计算值、91步骤完整前端、1,104项Shell/工作区、136项告警及17视口通过；自身Windows待验，11～19 BLOCKED。详[10记录](docs/modular-rewrite/R12-frontend-foundation-ui-system/R12-10-design-tokens.md)。
+
+## R12-09 Platform 能力（2026-10-25，DONE）
+
+08自身Windows验收、产物摘要和启动日志已核对收尾。09将原生文件选择、偏好存储、有界脱敏摘要、剪贴板、时钟/防抖/请求序列迁入各自平台目录，接通原调用方，保留存储键/格式、对话框选项和业务命令。新增25项生产平台行为检查，91步骤完整前端回归通过；09自身精确98dc43e/run40145377194的Windows、产物摘要和startup日志核对通过；10按本次用户授权实施。详[09记录](docs/modular-rewrite/R12-frontend-foundation-ui-system/R12-09-files-storage-diagnostics-clipboard-and-timing.md)。
 
 ## R12-08 Tauri Transport（2026-10-25，DONE）
 

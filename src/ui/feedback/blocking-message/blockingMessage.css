@@ -1,8 +1,8 @@
 .application-shell .shell-load-failed { display: grid; place-items: center; }
-.application-shell .ui-blocking-message { display: flex; flex-direction: column; gap: 12px; width: 480px; max-width: 100%; padding: 12px; border: 1px solid var(--fip-border-strong); border-radius: 5px; background: var(--fip-surface); }
+.application-shell .ui-blocking-message { display: flex; flex-direction: column; gap: 12px; width: 480px; max-width: 100%; padding: 12px; border: var(--fip-border-width) solid var(--fip-border-strong); border-radius: var(--fip-radius-sm); background: var(--fip-surface); }
 .application-shell .blocking-message-content { display: flex; align-items: flex-start; gap: 8px; width: 100%; }
 .application-shell .blocking-message-content > .ui-icon-slot { color: var(--fip-danger); }
 .application-shell .blocking-message-content > div { display: flex; flex-direction: column; flex: 1; min-width: 0; gap: 4px; }
-.application-shell .blocking-message-content h2 { margin: 0; color: var(--fip-strong); font-size: 14px; font-weight: 600; line-height: 20px; }
-.application-shell .blocking-message-content p { margin: 0; color: var(--fip-text); font-size: 12px; font-weight: 400; line-height: 18px; overflow-wrap: anywhere; }
+.application-shell .blocking-message-content h2 { margin: 0; color: var(--fip-strong); font-size: var(--fip-type-section-title-size); font-weight: var(--fip-type-section-title-weight); line-height: var(--fip-type-section-title-line-height); }
+.application-shell .blocking-message-content p { margin: 0; color: var(--fip-text); font-size: var(--fip-type-body-size); font-weight: var(--fip-type-body-weight); line-height: var(--fip-type-body-line-height); overflow-wrap: anywhere; }
 .application-shell .blocking-message-actions { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 8px; width: 100%; }

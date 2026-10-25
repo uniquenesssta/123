@@ -1,3 +1,4 @@
+import { readStylesheet } from "./tokens/tokenStyles.mjs";
 import assert from "node:assert/strict";
 import { readFileSync, writeFileSync, existsSync, mkdirSync, copyFileSync, readdirSync, mkdtempSync } from "node:fs";
 import { resolve, dirname, relative, join } from "node:path";
@@ -97,7 +98,7 @@ function bundle(file) {
 const entry = "src/app/warnings/__tests__/warningBrowserFixture.ts";
 bundle(entry);
 const browserBundle = `const modules=${JSON.stringify(modules)};const cache={};function load(id){if(cache[id])return cache[id];const record=modules[id],exports={};cache[id]=exports;new Function('exports','require',record.output)(exports,s=>load(record.imports[s]));return exports;}`;
-const styles = [...main.matchAll(/^import "(\.\/[^"\n]+\.css)";/gm)].map(match => match[1].replace("./", "src/")).map(file => read(file).replace(/url\("([^"\n]+\.svg)"\)/g, (_match, asset) => {
+const styles = [...main.matchAll(/^import "(\.\/[^"\n]+\.css)";/gm)].map(match => match[1].replace("./", "src/")).map(file => readStylesheet(root, file).replace(/url\("([^"\n]+\.svg)"\)/g, (_match, asset) => {
   const bytes = readFileSync(resolve(root, dirname(file), asset));
   assert.ok(bytes.length > 0, `empty local icon asset ${asset}`);
   return `url("data:image/svg+xml;base64,${bytes.toString("base64")}")`;

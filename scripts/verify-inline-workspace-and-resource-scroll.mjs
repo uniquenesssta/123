@@ -1,3 +1,4 @@
+import { readStylesheet } from "./tokens/tokenStyles.mjs";
 import fs from "node:fs";
 import path from "node:path";
 import process from "node:process";
@@ -135,7 +136,7 @@ const entry = "src/app/shell/__tests__/shellBrowserFixture.ts";
 bundle(entry);
 const shellBundle = `const shellModules=${JSON.stringify(modules)};const shellCache={};function shellRequire(id){if(shellCache[id])return shellCache[id];const record=shellModules[id],exports={};shellCache[id]=exports;new Function('exports','require',record.output)(exports,s=>shellRequire(record.imports[s]));return exports;}`;
 const mainStyles = [...main.matchAll(/^import "(\.\/[^"\n]+\.css)";/gm)].map(match => match[1].replace("./", "src/"));
-const shellStyles = mainStyles.map(file => read(file).replace(/url\("([^"\n]+\.svg)"\)/g, (_match, asset) => {
+const shellStyles = mainStyles.map(file => readStylesheet(root, file).replace(/url\("([^"\n]+\.svg)"\)/g, (_match, asset) => {
   const bytes = fs.readFileSync(path.resolve(root, path.dirname(file), asset));
   return `url("data:image/svg+xml;base64,${bytes.toString("base64")}")`;
 })).join("\n");

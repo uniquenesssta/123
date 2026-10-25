@@ -1,0 +1,12 @@
+/* R12-10 FIP breakpoint; shared design snapshot 2026-10-25. See R12-10-figma-tokens.json. */
+:root {
+  --fip-viewport-shell-min-width: 960px;
+  --fip-viewport-shell-min-height: 600px;
+  --fip-breakpoint-legacy-wide: 1280px;
+  --fip-breakpoint-legacy-medium: 980px;
+  --fip-breakpoint-legacy-compact: 760px;
+  --fip-breakpoint-legacy-small: 560px;
+  --fip-breakpoint-legacy-large-width: 1680px;
+  --fip-breakpoint-legacy-large-height: 900px;
+}
+/* Existing Feature media query literals stay in place; var() is not valid in media conditions. */

@@ -1,0 +1,104 @@
+/* R12-10 FIP typography; shared design snapshot 2026-10-25. See R12-10-figma-tokens.json. */
+:root {
+  --fip-type-page-title-family: Inter, "Segoe UI", "Microsoft YaHei", sans-serif;
+  --fip-type-page-title-size: 21px;
+  --fip-type-page-title-weight: 600;
+  --fip-type-page-title-line-height: 28px;
+  --fip-type-page-title-letter-spacing: -0.2px;
+}
+
+:root {
+  --fip-type-section-title-family: Inter, "Segoe UI", "Microsoft YaHei", sans-serif;
+  --fip-type-section-title-size: 14px;
+  --fip-type-section-title-weight: 600;
+  --fip-type-section-title-line-height: 20px;
+  --fip-type-section-title-letter-spacing: 0px;
+}
+
+:root {
+  --fip-type-body-family: Inter, "Segoe UI", "Microsoft YaHei", sans-serif;
+  --fip-type-body-size: 12px;
+  --fip-type-body-weight: 400;
+  --fip-type-body-line-height: 18px;
+  --fip-type-body-letter-spacing: 0px;
+}
+
+:root {
+  --fip-type-label-family: Inter, "Segoe UI", "Microsoft YaHei", sans-serif;
+  --fip-type-label-size: 11px;
+  --fip-type-label-weight: 500;
+  --fip-type-label-line-height: 16px;
+  --fip-type-label-letter-spacing: 0.1px;
+}
+
+:root {
+  --fip-type-caption-family: Inter, "Segoe UI", "Microsoft YaHei", sans-serif;
+  --fip-type-caption-size: 10px;
+  --fip-type-caption-weight: 500;
+  --fip-type-caption-line-height: 14px;
+  --fip-type-caption-letter-spacing: 0.2px;
+}
+
+:root {
+  --fip-type-data-metric-family: Inter, "Segoe UI", "Microsoft YaHei", sans-serif;
+  --fip-type-data-metric-size: 20px;
+  --fip-type-data-metric-weight: 600;
+  --fip-type-data-metric-line-height: 24px;
+  --fip-type-data-metric-letter-spacing: -0.2px;
+}
+
+:root {
+  --fip-type-data-value-family: Inter, "Segoe UI", "Microsoft YaHei", sans-serif;
+  --fip-type-data-value-size: 12px;
+  --fip-type-data-value-weight: 500;
+  --fip-type-data-value-line-height: 16px;
+  --fip-type-data-value-letter-spacing: 0px;
+}
+
+:root {
+  --fip-type-data-table-family: Inter, "Segoe UI", "Microsoft YaHei", sans-serif;
+  --fip-type-data-table-size: 11px;
+  --fip-type-data-table-weight: 400;
+  --fip-type-data-table-line-height: 16px;
+  --fip-type-data-table-letter-spacing: 0px;
+}
+
+:root {
+  --fip-type-technical-code-family: "Cascadia Mono", Consolas, monospace;
+  --fip-type-technical-code-size: 11px;
+  --fip-type-technical-code-weight: 400;
+  --fip-type-technical-code-line-height: 17px;
+  --fip-type-technical-code-letter-spacing: 0px;
+}
+
+:root {
+  --fip-type-technical-label-family: "Cascadia Mono", Consolas, monospace;
+  --fip-type-technical-label-size: 10px;
+  --fip-type-technical-label-weight: 600;
+  --fip-type-technical-label-line-height: 14px;
+  --fip-type-technical-label-letter-spacing: 0.1px;
+}
+
+:root {
+  --fip-type-avatar-compact-family: Inter, "Segoe UI", "Microsoft YaHei", sans-serif;
+  --fip-type-avatar-compact-size: 11px;
+  --fip-type-avatar-compact-weight: 800;
+  --fip-type-avatar-compact-line-height: 16px;
+  --fip-type-avatar-compact-letter-spacing: 0em;
+}
+
+:root {
+  --fip-type-avatar-default-family: Inter, "Segoe UI", "Microsoft YaHei", sans-serif;
+  --fip-type-avatar-default-size: 12px;
+  --fip-type-avatar-default-weight: 800;
+  --fip-type-avatar-default-line-height: 16px;
+  --fip-type-avatar-default-letter-spacing: 0em;
+}
+
+:root {
+  --fip-type-avatar-large-family: Inter, "Segoe UI", "Microsoft YaHei", sans-serif;
+  --fip-type-avatar-large-size: 22px;
+  --fip-type-avatar-large-weight: 900;
+  --fip-type-avatar-large-line-height: 28px;
+  --fip-type-avatar-large-letter-spacing: 0em;
+}

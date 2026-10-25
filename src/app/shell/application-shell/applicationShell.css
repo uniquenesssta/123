@@ -8,8 +8,8 @@ html:has(.application-shell) { scrollbar-gutter: auto; }
   display: grid;
   grid-template-columns: var(--shell-primary-rail-width) var(--active-secondary-sidebar-width) minmax(0, 1fr);
   height: 100dvh;
-  min-height: 600px;
-  min-width: 960px;
+  min-height: var(--fip-viewport-shell-min-height);
+  min-width: var(--fip-viewport-shell-min-width);
   overflow: hidden;
   color: var(--fip-text);
   background: var(--fip-canvas);

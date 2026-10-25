@@ -71,6 +71,14 @@
         "public_entry": "src/platform/timing/index.ts"
       }
     },
+    "design_tokens": {
+      "owner": "src/ui/tokens/index.css",
+      "source_record": "docs/modular-rewrite/R12-frontend-foundation-ui-system/R12-10-figma-tokens.json",
+      "variable_count": 193,
+      "text_style_count": 13,
+      "effect_style_count": 6,
+      "scope": "FIP foundation; legacy Feature palettes and media-query behavior retain existing stage contracts"
+    },
     "shared": {
       "app": "src/app",
       "components": "src/components",

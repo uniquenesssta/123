@@ -1,3 +1,4 @@
+import { readStylesheet } from "./tokens/tokenStyles.mjs";
 import { createHash } from "node:crypto";
 import { existsSync, readFileSync } from "node:fs";
 import { dirname, join, resolve } from "node:path";
@@ -61,7 +62,7 @@ const teamsPage = text("src/pages/teams.ts");
 const playersPage = text("src/pages/players.ts");
 const types = text("src/types.ts");
 const styles = text("src/styles/components.css");
-const entityStyles = text("src/styles/entityCenter.css") + text("src/ui/tokens/dimensions.css") + text("src/app/shell/application-shell/applicationShell.css");
+const entityStyles = text("src/styles/entityCenter.css") + readStylesheet(root, "src/ui/tokens/index.css") + text("src/app/shell/application-shell/applicationShell.css");
 const readme = text("README.md");
 
 assert(contract.contract_id === "football.team-player-management-contract.v1", "球队与球员管理契约ID错误");

@@ -1,8 +1,12 @@
 # Testing
 
-## R12-09 Platform（2026-10-25，VERIFYING）
+## R12-10 Design Tokens（2026-10-25，VERIFYING）
 
-复用原运行诊断入口，新增25项生产模块检查：九种原API文件对话框、目录/取消/错误、偏好键/旧格式/损坏/拒绝/配额、显式版本迁移及失败保留、脱敏/有界/循环/getter、剪贴板权限与Unicode、时钟、防抖/停止/重入和独立请求序列。原Transport24项及类型、完整架构与Rust fmt已通过，91步骤完整前端、1,104项Shell/工作区、136项告警及17视口通过；首次受限浏览器启动exit13，原告警浏览器在授权运行环境136项复查通过，没有改阈值或跳过步骤。09自身Windows待提交后独立验证，不轮询。详[09记录](modular-rewrite/R12-frontend-foundation-ui-system/R12-09-files-storage-diagnostics-clipboard-and-timing.md)。
+沿原全局视觉入口增加193变量/13文字样式/6阴影与1,344项实际CSS计算断言，检查明暗主题、三种控件/图标尺寸、八种图标色调、单位/别名和文字/阴影几何。CSS递归导入读取仅适配原验证器；未改原阈值或PNG基线。91步骤完整前端、原1,104项Shell/工作区、136项告警及17视口、完整架构和Rust fmt通过；10自身Windows CI待提交后验证，不轮询。详[10记录](modular-rewrite/R12-frontend-foundation-ui-system/R12-10-design-tokens.md)。
+
+## R12-09 Platform（2026-10-25，DONE）
+
+复用原运行诊断入口，新增25项生产模块检查：九种原API文件对话框、目录/取消/错误、偏好键/旧格式/损坏/拒绝/配额、显式版本迁移及失败保留、脱敏/有界/循环/getter、剪贴板权限与Unicode、时钟、防抖/停止/重入和独立请求序列。原Transport24项及类型、完整架构与Rust fmt已通过，91步骤完整前端、1,104项Shell/工作区、136项告警及17视口通过；首次受限浏览器启动exit13，原告警浏览器在授权运行环境136项复查通过，没有改阈值或跳过步骤。09自身精确98dc43e/run40145377194的Windows、下载产物摘要及startup日志已独立核验通过，不轮询。详[09记录](modular-rewrite/R12-frontend-foundation-ui-system/R12-09-files-storage-diagnostics-clipboard-and-timing.md)。
 
 ## R12-08 Tauri Transport（2026-10-25，DONE）
 

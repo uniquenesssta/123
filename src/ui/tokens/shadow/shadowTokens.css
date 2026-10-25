@@ -1,0 +1,36 @@
+/* R12-10 FIP shadow; shared design snapshot 2026-10-25. See R12-10-figma-tokens.json. */
+:root {
+  --fip-elevation-subtle-light: 0px 1px 2px 0px rgb(0 0 0 / 0.05);
+}
+
+:root {
+  --fip-elevation-float-light: 0px 8px 24px -4px rgb(0 0 0 / 0.12), 0px 2px 6px -1px rgb(0 0 0 / 0.06);
+}
+
+:root {
+  --fip-elevation-subtle-dark: 0px 1px 2px 0px rgb(0 0 0 / 0.34999999);
+}
+
+:root {
+  --fip-elevation-float-dark: 0px 10px 28px -5px rgb(0 0 0 / 0.44999999), 0px 2px 8px -1px rgb(0 0 0 / 0.25);
+}
+
+:root {
+  --fip-elevation-dialog-light: 0px 10px 24px 0px rgb(34 50 72 / 0.045);
+}
+
+:root {
+  --fip-elevation-dialog-dark: 0px 12px 28px 0px rgb(0 0 0 / 0.25999999);
+}
+
+:root, :root[data-theme="light"] {
+  --fip-feedback-shadow: var(--fip-elevation-subtle-light);
+  --fip-dialog-shadow: var(--fip-elevation-dialog-light);
+  --fip-float-shadow: var(--fip-elevation-float-light);
+}
+
+:root[data-theme="dark"] {
+  --fip-feedback-shadow: var(--fip-elevation-subtle-dark);
+  --fip-dialog-shadow: var(--fip-elevation-dialog-dark);
+  --fip-float-shadow: var(--fip-elevation-float-dark);
+}

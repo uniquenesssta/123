@@ -1,0 +1,21 @@
+/* R12-10 FIP radius; shared design snapshot 2026-10-25. See R12-10-figma-tokens.json. */
+:root {
+  --fip-radius-avatar: 8px; /* VariableID:355:6756 radius/avatar */
+  --fip-radius-full: 999px; /* VariableID:336:6505 radius/full */
+  --fip-radius-lg: 9px; /* VariableID:18:51 radius/lg */
+  --fip-radius-md: 7px; /* VariableID:18:50 radius/md */
+  --fip-radius-menu: 11px; /* VariableID:248:1710 radius/menu */
+  --fip-radius-sm: 5px; /* VariableID:18:49 radius/sm */
+}
+
+:root, [data-fip-control-scale="32"] {
+  --fip-control-radius: 7px; /* VariableID:46:6 control/radius */
+}
+
+[data-fip-control-scale="40"] {
+  --fip-control-radius: 7px; /* VariableID:46:6 control/radius */
+}
+
+[data-fip-control-scale="48"] {
+  --fip-control-radius: 9px; /* VariableID:46:6 control/radius */
+}

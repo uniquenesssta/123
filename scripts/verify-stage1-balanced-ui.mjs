@@ -1,3 +1,4 @@
+import { readStylesheet } from "./tokens/tokenStyles.mjs";
 import fs from "node:fs";
 
 const read = (path) => fs.readFileSync(new URL(`../${path}`, import.meta.url), "utf8");
@@ -5,7 +6,7 @@ const failures = [];
 const requireTrue = (condition, message) => { if (!condition) failures.push(message); };
 
 const layout = read("src/styles/layout.css");
-const entityStyles = read("src/styles/entityCenter.css") + read("src/ui/tokens/dimensions.css") + read("src/app/shell/application-shell/applicationShell.css");
+const entityStyles = read("src/styles/entityCenter.css") + readStylesheet(process.cwd(), "src/ui/tokens/index.css") + read("src/app/shell/application-shell/applicationShell.css");
 const styles = read("src/styles/app.css");
 const shell = JSON.parse(read("contracts/global-visual-system-contract.json")).shell_source_entries.map(read).join("\n");
 const navigation = read("src/app/router/routeRegistry.ts");

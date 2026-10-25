@@ -1,0 +1,4622 @@
+{
+  "fileKey": "PN0Whgu6HLWIHx4Mv6aHfu",
+  "designCommit": "40109ceec8372391a7680e7e86c1265fda06ab3d",
+  "nodeId": "23:4",
+  "collections": [
+    {
+      "id": "VariableCollectionId:17:2",
+      "name": "FIP Primitives",
+      "defaultModeId": "17:0",
+      "modes": [
+        {
+          "name": "Value",
+          "modeId": "17:0"
+        }
+      ]
+    },
+    {
+      "id": "VariableCollectionId:17:3",
+      "name": "FIP Color",
+      "defaultModeId": "17:1",
+      "modes": [
+        {
+          "name": "Light",
+          "modeId": "17:1"
+        },
+        {
+          "name": "Dark",
+          "modeId": "17:2"
+        }
+      ]
+    },
+    {
+      "id": "VariableCollectionId:17:4",
+      "name": "FIP Size",
+      "defaultModeId": "17:3",
+      "modes": [
+        {
+          "name": "Value",
+          "modeId": "17:3"
+        }
+      ]
+    },
+    {
+      "id": "VariableCollectionId:35:2",
+      "name": "FIP Icon Scale",
+      "defaultModeId": "35:0",
+      "modes": [
+        {
+          "name": "24",
+          "modeId": "35:0"
+        },
+        {
+          "name": "20",
+          "modeId": "35:1"
+        },
+        {
+          "name": "16",
+          "modeId": "35:2"
+        }
+      ]
+    },
+    {
+      "id": "VariableCollectionId:46:2",
+      "name": "FIP Control Scale",
+      "defaultModeId": "46:0",
+      "modes": [
+        {
+          "name": "32",
+          "modeId": "46:0"
+        },
+        {
+          "name": "40",
+          "modeId": "46:1"
+        },
+        {
+          "name": "48",
+          "modeId": "46:2"
+        }
+      ]
+    },
+    {
+      "id": "VariableCollectionId:50:206",
+      "name": "FIP Icon Tone",
+      "defaultModeId": "50:0",
+      "modes": [
+        {
+          "name": "Default",
+          "modeId": "50:0"
+        },
+        {
+          "name": "Secondary",
+          "modeId": "50:1"
+        },
+        {
+          "name": "Active",
+          "modeId": "50:2"
+        },
+        {
+          "name": "On Accent",
+          "modeId": "50:3"
+        },
+        {
+          "name": "Success",
+          "modeId": "50:4"
+        },
+        {
+          "name": "Warning",
+          "modeId": "50:5"
+        },
+        {
+          "name": "Danger",
+          "modeId": "50:6"
+        },
+        {
+          "name": "Info",
+          "modeId": "50:7"
+        }
+      ]
+    }
+  ],
+  "variables": [
+    {
+      "id": "VariableID:318:5161",
+      "name": "accordion/item-gap",
+      "collectionId": "VariableCollectionId:17:4",
+      "type": "FLOAT",
+      "values": {
+        "17:3": 7
+      },
+      "scopes": [
+        "GAP"
+      ],
+      "codeSyntax": {
+        "WEB": "var(--ui-accordion-item-gap)"
+      },
+      "css": "--fip-accordion-item-gap",
+      "file": "src/ui/tokens/spacing/spacingTokens.css",
+      "unit": "px"
+    },
+    {
+      "id": "VariableID:18:35",
+      "name": "alpha/dark-accent-soft",
+      "collectionId": "VariableCollectionId:17:2",
+      "type": "COLOR",
+      "values": {
+        "17:0": {
+          "r": 0.4313725531101227,
+          "g": 0.6235294342041016,
+          "b": 1,
+          "a": 0.12156862765550613
+        }
+      },
+      "scopes": [],
+      "codeSyntax": {
+        "WEB": "var(--primitive-alpha-dark-accent-soft)"
+      },
+      "css": "--fip-primitive-alpha-dark-accent-soft",
+      "file": "src/ui/tokens/color/colorTokens.css"
+    },
+    {
+      "id": "VariableID:18:31",
+      "name": "alpha/dark-border",
+      "collectionId": "VariableCollectionId:17:2",
+      "type": "COLOR",
+      "values": {
+        "17:0": {
+          "r": 1,
+          "g": 1,
+          "b": 1,
+          "a": 0.08627451211214066
+        }
+      },
+      "scopes": [],
+      "codeSyntax": {
+        "WEB": "var(--primitive-alpha-dark-border)"
+      },
+      "css": "--fip-primitive-alpha-dark-border",
+      "file": "src/ui/tokens/color/colorTokens.css"
+    },
+    {
+      "id": "VariableID:18:32",
+      "name": "alpha/dark-border-strong",
+      "collectionId": "VariableCollectionId:17:2",
+      "type": "COLOR",
+      "values": {
+        "17:0": {
+          "r": 1,
+          "g": 1,
+          "b": 1,
+          "a": 0.1411764770746231
+        }
+      },
+      "scopes": [],
+      "codeSyntax": {
+        "WEB": "var(--primitive-alpha-dark-border-strong)"
+      },
+      "css": "--fip-primitive-alpha-dark-border-strong",
+      "file": "src/ui/tokens/color/colorTokens.css"
+    },
+    {
+      "id": "VariableID:96:4",
+      "name": "alpha/dark-busy-overlay",
+      "collectionId": "VariableCollectionId:17:2",
+      "type": "COLOR",
+      "values": {
+        "17:0": {
+          "r": 0.01568627543747425,
+          "g": 0.03529411926865578,
+          "b": 0.05098039284348488,
+          "a": 0.6800000071525574
+        }
+      },
+      "scopes": [],
+      "codeSyntax": {
+        "WEB": "var(--primitive-alpha-dark-busy-overlay)"
+      },
+      "css": "--fip-primitive-alpha-dark-busy-overlay",
+      "file": "src/ui/tokens/color/colorTokens.css"
+    },
+    {
+      "id": "VariableID:97:7",
+      "name": "alpha/dark-danger-disabled",
+      "collectionId": "VariableCollectionId:17:2",
+      "type": "COLOR",
+      "values": {
+        "17:0": {
+          "r": 0.9450980424880981,
+          "g": 0.4745098054409027,
+          "b": 0.5098039507865906,
+          "a": 0.3199999928474426
+        }
+      },
+      "scopes": [],
+      "codeSyntax": {
+        "WEB": "var(--primitive-alpha-dark-danger-disabled)"
+      },
+      "css": "--fip-primitive-alpha-dark-danger-disabled",
+      "file": "src/ui/tokens/color/colorTokens.css"
+    },
+    {
+      "id": "VariableID:20:17",
+      "name": "alpha/dark-danger-soft",
+      "collectionId": "VariableCollectionId:17:2",
+      "type": "COLOR",
+      "values": {
+        "17:0": {
+          "r": 0.9450980424880981,
+          "g": 0.4745098054409027,
+          "b": 0.5098039507865906,
+          "a": 0.12156862765550613
+        }
+      },
+      "scopes": [],
+      "codeSyntax": {
+        "WEB": "var(--primitive-alpha-dark-danger-soft)"
+      },
+      "css": "--fip-primitive-alpha-dark-danger-soft",
+      "file": "src/ui/tokens/color/colorTokens.css"
+    },
+    {
+      "id": "VariableID:96:2",
+      "name": "alpha/dark-modal-overlay",
+      "collectionId": "VariableCollectionId:17:2",
+      "type": "COLOR",
+      "values": {
+        "17:0": {
+          "r": 0.007843137718737125,
+          "g": 0.027450980618596077,
+          "b": 0.03921568766236305,
+          "a": 0.8199999928474426
+        }
+      },
+      "scopes": [],
+      "codeSyntax": {
+        "WEB": "var(--primitive-alpha-dark-modal-overlay)"
+      },
+      "css": "--fip-primitive-alpha-dark-modal-overlay",
+      "file": "src/ui/tokens/color/colorTokens.css"
+    },
+    {
+      "id": "VariableID:20:13",
+      "name": "alpha/dark-success-soft",
+      "collectionId": "VariableCollectionId:17:2",
+      "type": "COLOR",
+      "values": {
+        "17:0": {
+          "r": 0.3450980484485626,
+          "g": 0.8117647171020508,
+          "b": 0.6509804129600525,
+          "a": 0.12156862765550613
+        }
+      },
+      "scopes": [],
+      "codeSyntax": {
+        "WEB": "var(--primitive-alpha-dark-success-soft)"
+      },
+      "css": "--fip-primitive-alpha-dark-success-soft",
+      "file": "src/ui/tokens/color/colorTokens.css"
+    },
+    {
+      "id": "VariableID:20:15",
+      "name": "alpha/dark-warning-soft",
+      "collectionId": "VariableCollectionId:17:2",
+      "type": "COLOR",
+      "values": {
+        "17:0": {
+          "r": 0.9058823585510254,
+          "g": 0.7019608020782471,
+          "b": 0.3607843220233917,
+          "a": 0.12156862765550613
+        }
+      },
+      "scopes": [],
+      "codeSyntax": {
+        "WEB": "var(--primitive-alpha-dark-warning-soft)"
+      },
+      "css": "--fip-primitive-alpha-dark-warning-soft",
+      "file": "src/ui/tokens/color/colorTokens.css"
+    },
+    {
+      "id": "VariableID:18:36",
+      "name": "alpha/light-accent-soft",
+      "collectionId": "VariableCollectionId:17:2",
+      "type": "COLOR",
+      "values": {
+        "17:0": {
+          "r": 0.2078431397676468,
+          "g": 0.4274509847164154,
+          "b": 0.9529411792755127,
+          "a": 0.09019608050584793
+        }
+      },
+      "scopes": [],
+      "codeSyntax": {
+        "WEB": "var(--primitive-alpha-light-accent-soft)"
+      },
+      "css": "--fip-primitive-alpha-light-accent-soft",
+      "file": "src/ui/tokens/color/colorTokens.css"
+    },
+    {
+      "id": "VariableID:18:33",
+      "name": "alpha/light-border",
+      "collectionId": "VariableCollectionId:17:2",
+      "type": "COLOR",
+      "values": {
+        "17:0": {
+          "r": 0.11764705926179886,
+          "g": 0.1764705926179886,
+          "b": 0.25882354378700256,
+          "a": 0.10588235408067703
+        }
+      },
+      "scopes": [],
+      "codeSyntax": {
+        "WEB": "var(--primitive-alpha-light-border)"
+      },
+      "css": "--fip-primitive-alpha-light-border",
+      "file": "src/ui/tokens/color/colorTokens.css"
+    },
+    {
+      "id": "VariableID:18:34",
+      "name": "alpha/light-border-strong",
+      "collectionId": "VariableCollectionId:17:2",
+      "type": "COLOR",
+      "values": {
+        "17:0": {
+          "r": 0.11764705926179886,
+          "g": 0.1764705926179886,
+          "b": 0.25882354378700256,
+          "a": 0.16862745583057404
+        }
+      },
+      "scopes": [],
+      "codeSyntax": {
+        "WEB": "var(--primitive-alpha-light-border-strong)"
+      },
+      "css": "--fip-primitive-alpha-light-border-strong",
+      "file": "src/ui/tokens/color/colorTokens.css"
+    },
+    {
+      "id": "VariableID:96:5",
+      "name": "alpha/light-busy-overlay",
+      "collectionId": "VariableCollectionId:17:2",
+      "type": "COLOR",
+      "values": {
+        "17:0": {
+          "r": 0.9215686321258545,
+          "g": 0.9490196108818054,
+          "b": 0.9607843160629272,
+          "a": 0.7200000286102295
+        }
+      },
+      "scopes": [],
+      "codeSyntax": {
+        "WEB": "var(--primitive-alpha-light-busy-overlay)"
+      },
+      "css": "--fip-primitive-alpha-light-busy-overlay",
+      "file": "src/ui/tokens/color/colorTokens.css"
+    },
+    {
+      "id": "VariableID:97:6",
+      "name": "alpha/light-danger-disabled",
+      "collectionId": "VariableCollectionId:17:2",
+      "type": "COLOR",
+      "values": {
+        "17:0": {
+          "r": 0.7843137383460999,
+          "g": 0.3019607961177826,
+          "b": 0.3490196168422699,
+          "a": 0.3199999928474426
+        }
+      },
+      "scopes": [],
+      "codeSyntax": {
+        "WEB": "var(--primitive-alpha-light-danger-disabled)"
+      },
+      "css": "--fip-primitive-alpha-light-danger-disabled",
+      "file": "src/ui/tokens/color/colorTokens.css"
+    },
+    {
+      "id": "VariableID:20:16",
+      "name": "alpha/light-danger-soft",
+      "collectionId": "VariableCollectionId:17:2",
+      "type": "COLOR",
+      "values": {
+        "17:0": {
+          "r": 0.7843137383460999,
+          "g": 0.3019607961177826,
+          "b": 0.3490196168422699,
+          "a": 0.09019608050584793
+        }
+      },
+      "scopes": [],
+      "codeSyntax": {
+        "WEB": "var(--primitive-alpha-light-danger-soft)"
+      },
+      "css": "--fip-primitive-alpha-light-danger-soft",
+      "file": "src/ui/tokens/color/colorTokens.css"
+    },
+    {
+      "id": "VariableID:96:3",
+      "name": "alpha/light-modal-overlay",
+      "collectionId": "VariableCollectionId:17:2",
+      "type": "COLOR",
+      "values": {
+        "17:0": {
+          "r": 0.09803921729326248,
+          "g": 0.15294118225574493,
+          "b": 0.18431372940540314,
+          "a": 0.46000000834465027
+        }
+      },
+      "scopes": [],
+      "codeSyntax": {
+        "WEB": "var(--primitive-alpha-light-modal-overlay)"
+      },
+      "css": "--fip-primitive-alpha-light-modal-overlay",
+      "file": "src/ui/tokens/color/colorTokens.css"
+    },
+    {
+      "id": "VariableID:20:12",
+      "name": "alpha/light-success-soft",
+      "collectionId": "VariableCollectionId:17:2",
+      "type": "COLOR",
+      "values": {
+        "17:0": {
+          "r": 0.08627451211214066,
+          "g": 0.545098066329956,
+          "b": 0.4117647111415863,
+          "a": 0.09019608050584793
+        }
+      },
+      "scopes": [],
+      "codeSyntax": {
+        "WEB": "var(--primitive-alpha-light-success-soft)"
+      },
+      "css": "--fip-primitive-alpha-light-success-soft",
+      "file": "src/ui/tokens/color/colorTokens.css"
+    },
+    {
+      "id": "VariableID:20:14",
+      "name": "alpha/light-warning-soft",
+      "collectionId": "VariableCollectionId:17:2",
+      "type": "COLOR",
+      "values": {
+        "17:0": {
+          "r": 0.7176470756530762,
+          "g": 0.4745098054409027,
+          "b": 0.12156862765550613,
+          "a": 0.09019608050584793
+        }
+      },
+      "scopes": [],
+      "codeSyntax": {
+        "WEB": "var(--primitive-alpha-light-warning-soft)"
+      },
+      "css": "--fip-primitive-alpha-light-warning-soft",
+      "file": "src/ui/tokens/color/colorTokens.css"
+    },
+    {
+      "id": "VariableID:355:6753",
+      "name": "avatar/size-compact",
+      "collectionId": "VariableCollectionId:17:4",
+      "type": "FLOAT",
+      "values": {
+        "17:3": 34
+      },
+      "scopes": [
+        "WIDTH_HEIGHT"
+      ],
+      "codeSyntax": {
+        "WEB": "var(--ui-avatar-size-compact)"
+      },
+      "css": "--fip-avatar-size-compact",
+      "file": "src/ui/tokens/size/sizeTokens.css",
+      "unit": "px"
+    },
+    {
+      "id": "VariableID:355:6754",
+      "name": "avatar/size-default",
+      "collectionId": "VariableCollectionId:17:4",
+      "type": "FLOAT",
+      "values": {
+        "17:3": 38
+      },
+      "scopes": [
+        "WIDTH_HEIGHT"
+      ],
+      "codeSyntax": {
+        "WEB": "var(--ui-avatar-size-default)"
+      },
+      "css": "--fip-avatar-size-default",
+      "file": "src/ui/tokens/size/sizeTokens.css",
+      "unit": "px"
+    },
+    {
+      "id": "VariableID:355:6755",
+      "name": "avatar/size-large",
+      "collectionId": "VariableCollectionId:17:4",
+      "type": "FLOAT",
+      "values": {
+        "17:3": 54
+      },
+      "scopes": [
+        "WIDTH_HEIGHT"
+      ],
+      "codeSyntax": {
+        "WEB": "var(--ui-avatar-size-large)"
+      },
+      "css": "--fip-avatar-size-large",
+      "file": "src/ui/tokens/size/sizeTokens.css",
+      "unit": "px"
+    },
+    {
+      "id": "VariableID:18:20",
+      "name": "blue/dark-active",
+      "collectionId": "VariableCollectionId:17:2",
+      "type": "COLOR",
+      "values": {
+        "17:0": {
+          "r": 0.4313725531101227,
+          "g": 0.6235294342041016,
+          "b": 1,
+          "a": 1
+        }
+      },
+      "scopes": [],
+      "codeSyntax": {
+        "WEB": "var(--primitive-blue-dark-active)"
+      },
+      "css": "--fip-primitive-blue-dark-active",
+      "file": "src/ui/tokens/color/colorTokens.css"
+    },
+    {
+      "id": "VariableID:18:21",
+      "name": "blue/dark-hover",
+      "collectionId": "VariableCollectionId:17:2",
+      "type": "COLOR",
+      "values": {
+        "17:0": {
+          "r": 0.5411764979362488,
+          "g": 0.6980392336845398,
+          "b": 1,
+          "a": 1
+        }
+      },
+      "scopes": [],
+      "codeSyntax": {
+        "WEB": "var(--primitive-blue-dark-hover)"
+      },
+      "css": "--fip-primitive-blue-dark-hover",
+      "file": "src/ui/tokens/color/colorTokens.css"
+    },
+    {
+      "id": "VariableID:18:24",
+      "name": "blue/dark-ink",
+      "collectionId": "VariableCollectionId:17:2",
+      "type": "COLOR",
+      "values": {
+        "17:0": {
+          "r": 0.027450980618596077,
+          "g": 0.0784313753247261,
+          "b": 0.14901961386203766,
+          "a": 1
+        }
+      },
+      "scopes": [],
+      "codeSyntax": {
+        "WEB": "var(--primitive-blue-dark-ink)"
+      },
+      "css": "--fip-primitive-blue-dark-ink",
+      "file": "src/ui/tokens/color/colorTokens.css"
+    },
+    {
+      "id": "VariableID:47:3",
+      "name": "blue/dark-pressed",
+      "collectionId": "VariableCollectionId:17:2",
+      "type": "COLOR",
+      "values": {
+        "17:0": {
+          "r": 0.3607843220233917,
+          "g": 0.5490196347236633,
+          "b": 0.9019607901573181,
+          "a": 1
+        }
+      },
+      "scopes": [],
+      "codeSyntax": {
+        "WEB": "var(--blue-dark-pressed)"
+      },
+      "css": "--fip-primitive-blue-dark-pressed",
+      "file": "src/ui/tokens/color/colorTokens.css"
+    },
+    {
+      "id": "VariableID:18:22",
+      "name": "blue/light-active",
+      "collectionId": "VariableCollectionId:17:2",
+      "type": "COLOR",
+      "values": {
+        "17:0": {
+          "r": 0.2078431397676468,
+          "g": 0.4274509847164154,
+          "b": 0.9529411792755127,
+          "a": 1
+        }
+      },
+      "scopes": [],
+      "codeSyntax": {
+        "WEB": "var(--primitive-blue-light-active)"
+      },
+      "css": "--fip-primitive-blue-light-active",
+      "file": "src/ui/tokens/color/colorTokens.css"
+    },
+    {
+      "id": "VariableID:18:23",
+      "name": "blue/light-hover",
+      "collectionId": "VariableCollectionId:17:2",
+      "type": "COLOR",
+      "values": {
+        "17:0": {
+          "r": 0.1568627506494522,
+          "g": 0.35686275362968445,
+          "b": 0.843137264251709,
+          "a": 1
+        }
+      },
+      "scopes": [],
+      "codeSyntax": {
+        "WEB": "var(--primitive-blue-light-hover)"
+      },
+      "css": "--fip-primitive-blue-light-hover",
+      "file": "src/ui/tokens/color/colorTokens.css"
+    },
+    {
+      "id": "VariableID:47:2",
+      "name": "blue/light-pressed",
+      "collectionId": "VariableCollectionId:17:2",
+      "type": "COLOR",
+      "values": {
+        "17:0": {
+          "r": 0.08627451211214066,
+          "g": 0.24705882370471954,
+          "b": 0.7176470756530762,
+          "a": 1
+        }
+      },
+      "scopes": [],
+      "codeSyntax": {
+        "WEB": "var(--blue-light-pressed)"
+      },
+      "css": "--fip-primitive-blue-light-pressed",
+      "file": "src/ui/tokens/color/colorTokens.css"
+    },
+    {
+      "id": "VariableID:20:10",
+      "name": "color/action/accent",
+      "collectionId": "VariableCollectionId:17:3",
+      "type": "COLOR",
+      "values": {
+        "17:1": {
+          "type": "VARIABLE_ALIAS",
+          "id": "VariableID:18:22"
+        },
+        "17:2": {
+          "type": "VARIABLE_ALIAS",
+          "id": "VariableID:18:20"
+        }
+      },
+      "scopes": [
+        "FRAME_FILL",
+        "SHAPE_FILL",
+        "STROKE_COLOR"
+      ],
+      "codeSyntax": {
+        "WEB": "var(--ui-accent)"
+      },
+      "css": "--fip-color-action-accent",
+      "file": "src/ui/tokens/color/colorTokens.css"
+    },
+    {
+      "id": "VariableID:20:11",
+      "name": "color/action/accent-hover",
+      "collectionId": "VariableCollectionId:17:3",
+      "type": "COLOR",
+      "values": {
+        "17:1": {
+          "type": "VARIABLE_ALIAS",
+          "id": "VariableID:18:23"
+        },
+        "17:2": {
+          "type": "VARIABLE_ALIAS",
+          "id": "VariableID:18:21"
+        }
+      },
+      "scopes": [
+        "FRAME_FILL",
+        "SHAPE_FILL",
+        "STROKE_COLOR"
+      ],
+      "codeSyntax": {
+        "WEB": "var(--ui-accent-hover)"
+      },
+      "css": "--fip-color-action-accent-hover",
+      "file": "src/ui/tokens/color/colorTokens.css"
+    },
+    {
+      "id": "VariableID:47:4",
+      "name": "color/action/accent-pressed",
+      "collectionId": "VariableCollectionId:17:3",
+      "type": "COLOR",
+      "values": {
+        "17:1": {
+          "type": "VARIABLE_ALIAS",
+          "id": "VariableID:47:2"
+        },
+        "17:2": {
+          "type": "VARIABLE_ALIAS",
+          "id": "VariableID:47:3"
+        }
+      },
+      "scopes": [
+        "FRAME_FILL",
+        "SHAPE_FILL",
+        "STROKE_COLOR"
+      ],
+      "codeSyntax": {
+        "WEB": "var(--color-action-accent-pressed)"
+      },
+      "css": "--fip-color-action-accent-pressed",
+      "file": "src/ui/tokens/color/colorTokens.css"
+    },
+    {
+      "id": "VariableID:20:18",
+      "name": "color/action/accent-soft",
+      "collectionId": "VariableCollectionId:17:3",
+      "type": "COLOR",
+      "values": {
+        "17:1": {
+          "type": "VARIABLE_ALIAS",
+          "id": "VariableID:18:36"
+        },
+        "17:2": {
+          "type": "VARIABLE_ALIAS",
+          "id": "VariableID:18:35"
+        }
+      },
+      "scopes": [
+        "FRAME_FILL",
+        "SHAPE_FILL"
+      ],
+      "codeSyntax": {
+        "WEB": "var(--ui-accent-soft)"
+      },
+      "css": "--fip-color-action-accent-soft",
+      "file": "src/ui/tokens/color/colorTokens.css"
+    },
+    {
+      "id": "VariableID:97:8",
+      "name": "color/action/danger",
+      "collectionId": "VariableCollectionId:17:3",
+      "type": "COLOR",
+      "values": {
+        "17:1": {
+          "type": "VARIABLE_ALIAS",
+          "id": "VariableID:18:30"
+        },
+        "17:2": {
+          "type": "VARIABLE_ALIAS",
+          "id": "VariableID:18:29"
+        }
+      },
+      "scopes": [
+        "FRAME_FILL",
+        "SHAPE_FILL",
+        "STROKE_COLOR"
+      ],
+      "codeSyntax": {
+        "WEB": "var(--ui-danger)"
+      },
+      "css": "--fip-color-action-danger",
+      "file": "src/ui/tokens/color/colorTokens.css"
+    },
+    {
+      "id": "VariableID:97:11",
+      "name": "color/action/danger-disabled",
+      "collectionId": "VariableCollectionId:17:3",
+      "type": "COLOR",
+      "values": {
+        "17:1": {
+          "type": "VARIABLE_ALIAS",
+          "id": "VariableID:97:6"
+        },
+        "17:2": {
+          "type": "VARIABLE_ALIAS",
+          "id": "VariableID:97:7"
+        }
+      },
+      "scopes": [
+        "FRAME_FILL",
+        "SHAPE_FILL",
+        "STROKE_COLOR"
+      ],
+      "codeSyntax": {
+        "WEB": "var(--ui-danger-disabled)"
+      },
+      "css": "--fip-color-action-danger-disabled",
+      "file": "src/ui/tokens/color/colorTokens.css"
+    },
+    {
+      "id": "VariableID:97:9",
+      "name": "color/action/danger-hover",
+      "collectionId": "VariableCollectionId:17:3",
+      "type": "COLOR",
+      "values": {
+        "17:1": {
+          "type": "VARIABLE_ALIAS",
+          "id": "VariableID:97:2"
+        },
+        "17:2": {
+          "type": "VARIABLE_ALIAS",
+          "id": "VariableID:97:4"
+        }
+      },
+      "scopes": [
+        "FRAME_FILL",
+        "SHAPE_FILL",
+        "STROKE_COLOR"
+      ],
+      "codeSyntax": {
+        "WEB": "var(--ui-danger-hover)"
+      },
+      "css": "--fip-color-action-danger-hover",
+      "file": "src/ui/tokens/color/colorTokens.css"
+    },
+    {
+      "id": "VariableID:97:10",
+      "name": "color/action/danger-pressed",
+      "collectionId": "VariableCollectionId:17:3",
+      "type": "COLOR",
+      "values": {
+        "17:1": {
+          "type": "VARIABLE_ALIAS",
+          "id": "VariableID:97:3"
+        },
+        "17:2": {
+          "type": "VARIABLE_ALIAS",
+          "id": "VariableID:97:5"
+        }
+      },
+      "scopes": [
+        "FRAME_FILL",
+        "SHAPE_FILL",
+        "STROKE_COLOR"
+      ],
+      "codeSyntax": {
+        "WEB": "var(--ui-danger-pressed)"
+      },
+      "css": "--fip-color-action-danger-pressed",
+      "file": "src/ui/tokens/color/colorTokens.css"
+    },
+    {
+      "id": "VariableID:19:2",
+      "name": "color/bg/canvas",
+      "collectionId": "VariableCollectionId:17:3",
+      "type": "COLOR",
+      "values": {
+        "17:1": {
+          "type": "VARIABLE_ALIAS",
+          "id": "VariableID:18:12"
+        },
+        "17:2": {
+          "type": "VARIABLE_ALIAS",
+          "id": "VariableID:18:4"
+        }
+      },
+      "scopes": [
+        "FRAME_FILL",
+        "SHAPE_FILL"
+      ],
+      "codeSyntax": {
+        "WEB": "var(--ui-canvas)"
+      },
+      "css": "--fip-color-bg-canvas",
+      "file": "src/ui/tokens/color/colorTokens.css"
+    },
+    {
+      "id": "VariableID:19:4",
+      "name": "color/bg/raised",
+      "collectionId": "VariableCollectionId:17:3",
+      "type": "COLOR",
+      "values": {
+        "17:1": {
+          "type": "VARIABLE_ALIAS",
+          "id": "VariableID:18:14"
+        },
+        "17:2": {
+          "type": "VARIABLE_ALIAS",
+          "id": "VariableID:18:6"
+        }
+      },
+      "scopes": [
+        "FRAME_FILL",
+        "SHAPE_FILL"
+      ],
+      "codeSyntax": {
+        "WEB": "var(--ui-surface-raised)"
+      },
+      "css": "--fip-color-bg-raised",
+      "file": "src/ui/tokens/color/colorTokens.css"
+    },
+    {
+      "id": "VariableID:19:5",
+      "name": "color/bg/subtle",
+      "collectionId": "VariableCollectionId:17:3",
+      "type": "COLOR",
+      "values": {
+        "17:1": {
+          "type": "VARIABLE_ALIAS",
+          "id": "VariableID:18:15"
+        },
+        "17:2": {
+          "type": "VARIABLE_ALIAS",
+          "id": "VariableID:18:7"
+        }
+      },
+      "scopes": [
+        "FRAME_FILL",
+        "SHAPE_FILL"
+      ],
+      "codeSyntax": {
+        "WEB": "var(--ui-surface-subtle)"
+      },
+      "css": "--fip-color-bg-subtle",
+      "file": "src/ui/tokens/color/colorTokens.css"
+    },
+    {
+      "id": "VariableID:19:3",
+      "name": "color/bg/surface",
+      "collectionId": "VariableCollectionId:17:3",
+      "type": "COLOR",
+      "values": {
+        "17:1": {
+          "type": "VARIABLE_ALIAS",
+          "id": "VariableID:18:13"
+        },
+        "17:2": {
+          "type": "VARIABLE_ALIAS",
+          "id": "VariableID:18:5"
+        }
+      },
+      "scopes": [
+        "FRAME_FILL",
+        "SHAPE_FILL"
+      ],
+      "codeSyntax": {
+        "WEB": "var(--ui-surface)"
+      },
+      "css": "--fip-color-bg-surface",
+      "file": "src/ui/tokens/color/colorTokens.css"
+    },
+    {
+      "id": "VariableID:47:9",
+      "name": "color/border/danger",
+      "collectionId": "VariableCollectionId:17:3",
+      "type": "COLOR",
+      "values": {
+        "17:1": {
+          "type": "VARIABLE_ALIAS",
+          "id": "VariableID:18:30"
+        },
+        "17:2": {
+          "type": "VARIABLE_ALIAS",
+          "id": "VariableID:18:29"
+        }
+      },
+      "scopes": [
+        "STROKE_COLOR"
+      ],
+      "codeSyntax": {
+        "WEB": "var(--color-border-danger)"
+      },
+      "css": "--fip-color-border-danger",
+      "file": "src/ui/tokens/color/colorTokens.css"
+    },
+    {
+      "id": "VariableID:19:10",
+      "name": "color/border/default",
+      "collectionId": "VariableCollectionId:17:3",
+      "type": "COLOR",
+      "values": {
+        "17:1": {
+          "type": "VARIABLE_ALIAS",
+          "id": "VariableID:18:33"
+        },
+        "17:2": {
+          "type": "VARIABLE_ALIAS",
+          "id": "VariableID:18:31"
+        }
+      },
+      "scopes": [
+        "STROKE_COLOR"
+      ],
+      "codeSyntax": {
+        "WEB": "var(--ui-border)"
+      },
+      "css": "--fip-color-border-default",
+      "file": "src/ui/tokens/color/colorTokens.css"
+    },
+    {
+      "id": "VariableID:47:8",
+      "name": "color/border/focus",
+      "collectionId": "VariableCollectionId:17:3",
+      "type": "COLOR",
+      "values": {
+        "17:1": {
+          "type": "VARIABLE_ALIAS",
+          "id": "VariableID:18:22"
+        },
+        "17:2": {
+          "type": "VARIABLE_ALIAS",
+          "id": "VariableID:18:20"
+        }
+      },
+      "scopes": [
+        "STROKE_COLOR"
+      ],
+      "codeSyntax": {
+        "WEB": "var(--color-border-focus)"
+      },
+      "css": "--fip-color-border-focus",
+      "file": "src/ui/tokens/color/colorTokens.css"
+    },
+    {
+      "id": "VariableID:301:4042",
+      "name": "color/border/focus-on-accent",
+      "collectionId": "VariableCollectionId:17:3",
+      "type": "COLOR",
+      "values": {
+        "17:1": {
+          "type": "VARIABLE_ALIAS",
+          "id": "VariableID:18:17"
+        },
+        "17:2": {
+          "type": "VARIABLE_ALIAS",
+          "id": "VariableID:18:9"
+        }
+      },
+      "scopes": [
+        "STROKE_COLOR"
+      ],
+      "codeSyntax": {
+        "WEB": "var(--ui-focus-on-accent)"
+      },
+      "css": "--fip-color-border-focus-on-accent",
+      "file": "src/ui/tokens/color/colorTokens.css"
+    },
+    {
+      "id": "VariableID:19:11",
+      "name": "color/border/strong",
+      "collectionId": "VariableCollectionId:17:3",
+      "type": "COLOR",
+      "values": {
+        "17:1": {
+          "type": "VARIABLE_ALIAS",
+          "id": "VariableID:18:34"
+        },
+        "17:2": {
+          "type": "VARIABLE_ALIAS",
+          "id": "VariableID:18:32"
+        }
+      },
+      "scopes": [
+        "STROKE_COLOR"
+      ],
+      "codeSyntax": {
+        "WEB": "var(--ui-border-strong)"
+      },
+      "css": "--fip-color-border-strong",
+      "file": "src/ui/tokens/color/colorTokens.css"
+    },
+    {
+      "id": "VariableID:47:10",
+      "name": "color/control/disabled-surface",
+      "collectionId": "VariableCollectionId:17:3",
+      "type": "COLOR",
+      "values": {
+        "17:1": {
+          "type": "VARIABLE_ALIAS",
+          "id": "VariableID:18:15"
+        },
+        "17:2": {
+          "type": "VARIABLE_ALIAS",
+          "id": "VariableID:18:7"
+        }
+      },
+      "scopes": [
+        "FRAME_FILL",
+        "SHAPE_FILL"
+      ],
+      "codeSyntax": {
+        "WEB": "var(--color-control-disabled-surface)"
+      },
+      "css": "--fip-color-control-disabled-surface",
+      "file": "src/ui/tokens/color/colorTokens.css"
+    },
+    {
+      "id": "VariableID:20:22",
+      "name": "color/feedback/danger-surface",
+      "collectionId": "VariableCollectionId:17:3",
+      "type": "COLOR",
+      "values": {
+        "17:1": {
+          "type": "VARIABLE_ALIAS",
+          "id": "VariableID:20:16"
+        },
+        "17:2": {
+          "type": "VARIABLE_ALIAS",
+          "id": "VariableID:20:17"
+        }
+      },
+      "scopes": [
+        "FRAME_FILL",
+        "SHAPE_FILL"
+      ],
+      "codeSyntax": {
+        "WEB": "var(--ui-danger-soft)"
+      },
+      "css": "--fip-color-feedback-danger-surface",
+      "file": "src/ui/tokens/color/colorTokens.css"
+    },
+    {
+      "id": "VariableID:20:19",
+      "name": "color/feedback/info-surface",
+      "collectionId": "VariableCollectionId:17:3",
+      "type": "COLOR",
+      "values": {
+        "17:1": {
+          "type": "VARIABLE_ALIAS",
+          "id": "VariableID:18:36"
+        },
+        "17:2": {
+          "type": "VARIABLE_ALIAS",
+          "id": "VariableID:18:35"
+        }
+      },
+      "scopes": [
+        "FRAME_FILL",
+        "SHAPE_FILL"
+      ],
+      "codeSyntax": {
+        "WEB": "var(--ui-info-soft)"
+      },
+      "css": "--fip-color-feedback-info-surface",
+      "file": "src/ui/tokens/color/colorTokens.css"
+    },
+    {
+      "id": "VariableID:20:20",
+      "name": "color/feedback/success-surface",
+      "collectionId": "VariableCollectionId:17:3",
+      "type": "COLOR",
+      "values": {
+        "17:1": {
+          "type": "VARIABLE_ALIAS",
+          "id": "VariableID:20:12"
+        },
+        "17:2": {
+          "type": "VARIABLE_ALIAS",
+          "id": "VariableID:20:13"
+        }
+      },
+      "scopes": [
+        "FRAME_FILL",
+        "SHAPE_FILL"
+      ],
+      "codeSyntax": {
+        "WEB": "var(--ui-success-soft)"
+      },
+      "css": "--fip-color-feedback-success-surface",
+      "file": "src/ui/tokens/color/colorTokens.css"
+    },
+    {
+      "id": "VariableID:20:21",
+      "name": "color/feedback/warning-surface",
+      "collectionId": "VariableCollectionId:17:3",
+      "type": "COLOR",
+      "values": {
+        "17:1": {
+          "type": "VARIABLE_ALIAS",
+          "id": "VariableID:20:14"
+        },
+        "17:2": {
+          "type": "VARIABLE_ALIAS",
+          "id": "VariableID:20:15"
+        }
+      },
+      "scopes": [
+        "FRAME_FILL",
+        "SHAPE_FILL"
+      ],
+      "codeSyntax": {
+        "WEB": "var(--ui-warning-soft)"
+      },
+      "css": "--fip-color-feedback-warning-surface",
+      "file": "src/ui/tokens/color/colorTokens.css"
+    },
+    {
+      "id": "VariableID:20:4",
+      "name": "color/icon/active",
+      "collectionId": "VariableCollectionId:17:3",
+      "type": "COLOR",
+      "values": {
+        "17:1": {
+          "type": "VARIABLE_ALIAS",
+          "id": "VariableID:18:22"
+        },
+        "17:2": {
+          "type": "VARIABLE_ALIAS",
+          "id": "VariableID:18:20"
+        }
+      },
+      "scopes": [
+        "SHAPE_FILL",
+        "STROKE_COLOR"
+      ],
+      "codeSyntax": {
+        "WEB": "var(--ui-accent)"
+      },
+      "css": "--fip-color-icon-active",
+      "file": "src/ui/tokens/color/colorTokens.css"
+    },
+    {
+      "id": "VariableID:20:8",
+      "name": "color/icon/danger",
+      "collectionId": "VariableCollectionId:17:3",
+      "type": "COLOR",
+      "values": {
+        "17:1": {
+          "type": "VARIABLE_ALIAS",
+          "id": "VariableID:18:30"
+        },
+        "17:2": {
+          "type": "VARIABLE_ALIAS",
+          "id": "VariableID:18:29"
+        }
+      },
+      "scopes": [
+        "SHAPE_FILL",
+        "STROKE_COLOR"
+      ],
+      "codeSyntax": {
+        "WEB": "var(--ui-danger)"
+      },
+      "css": "--fip-color-icon-danger",
+      "file": "src/ui/tokens/color/colorTokens.css"
+    },
+    {
+      "id": "VariableID:20:2",
+      "name": "color/icon/default",
+      "collectionId": "VariableCollectionId:17:3",
+      "type": "COLOR",
+      "values": {
+        "17:1": {
+          "type": "VARIABLE_ALIAS",
+          "id": "VariableID:18:16"
+        },
+        "17:2": {
+          "type": "VARIABLE_ALIAS",
+          "id": "VariableID:18:8"
+        }
+      },
+      "scopes": [
+        "SHAPE_FILL",
+        "STROKE_COLOR"
+      ],
+      "codeSyntax": {
+        "WEB": "var(--ui-text)"
+      },
+      "css": "--fip-color-icon-default",
+      "file": "src/ui/tokens/color/colorTokens.css"
+    },
+    {
+      "id": "VariableID:20:9",
+      "name": "color/icon/info",
+      "collectionId": "VariableCollectionId:17:3",
+      "type": "COLOR",
+      "values": {
+        "17:1": {
+          "type": "VARIABLE_ALIAS",
+          "id": "VariableID:18:22"
+        },
+        "17:2": {
+          "type": "VARIABLE_ALIAS",
+          "id": "VariableID:18:20"
+        }
+      },
+      "scopes": [
+        "SHAPE_FILL",
+        "STROKE_COLOR"
+      ],
+      "codeSyntax": {
+        "WEB": "var(--ui-accent)"
+      },
+      "css": "--fip-color-icon-info",
+      "file": "src/ui/tokens/color/colorTokens.css"
+    },
+    {
+      "id": "VariableID:20:5",
+      "name": "color/icon/on-accent",
+      "collectionId": "VariableCollectionId:17:3",
+      "type": "COLOR",
+      "values": {
+        "17:1": {
+          "type": "VARIABLE_ALIAS",
+          "id": "VariableID:18:2"
+        },
+        "17:2": {
+          "type": "VARIABLE_ALIAS",
+          "id": "VariableID:18:24"
+        }
+      },
+      "scopes": [
+        "SHAPE_FILL",
+        "STROKE_COLOR"
+      ],
+      "codeSyntax": {
+        "WEB": "var(--ui-accent-ink)"
+      },
+      "css": "--fip-color-icon-on-accent",
+      "file": "src/ui/tokens/color/colorTokens.css"
+    },
+    {
+      "id": "VariableID:20:3",
+      "name": "color/icon/secondary",
+      "collectionId": "VariableCollectionId:17:3",
+      "type": "COLOR",
+      "values": {
+        "17:1": {
+          "type": "VARIABLE_ALIAS",
+          "id": "VariableID:18:18"
+        },
+        "17:2": {
+          "type": "VARIABLE_ALIAS",
+          "id": "VariableID:18:10"
+        }
+      },
+      "scopes": [
+        "SHAPE_FILL",
+        "STROKE_COLOR"
+      ],
+      "codeSyntax": {
+        "WEB": "var(--ui-muted)"
+      },
+      "css": "--fip-color-icon-secondary",
+      "file": "src/ui/tokens/color/colorTokens.css"
+    },
+    {
+      "id": "VariableID:20:6",
+      "name": "color/icon/success",
+      "collectionId": "VariableCollectionId:17:3",
+      "type": "COLOR",
+      "values": {
+        "17:1": {
+          "type": "VARIABLE_ALIAS",
+          "id": "VariableID:18:26"
+        },
+        "17:2": {
+          "type": "VARIABLE_ALIAS",
+          "id": "VariableID:18:25"
+        }
+      },
+      "scopes": [
+        "SHAPE_FILL",
+        "STROKE_COLOR"
+      ],
+      "codeSyntax": {
+        "WEB": "var(--ui-success)"
+      },
+      "css": "--fip-color-icon-success",
+      "file": "src/ui/tokens/color/colorTokens.css"
+    },
+    {
+      "id": "VariableID:20:7",
+      "name": "color/icon/warning",
+      "collectionId": "VariableCollectionId:17:3",
+      "type": "COLOR",
+      "values": {
+        "17:1": {
+          "type": "VARIABLE_ALIAS",
+          "id": "VariableID:18:28"
+        },
+        "17:2": {
+          "type": "VARIABLE_ALIAS",
+          "id": "VariableID:18:27"
+        }
+      },
+      "scopes": [
+        "SHAPE_FILL",
+        "STROKE_COLOR"
+      ],
+      "codeSyntax": {
+        "WEB": "var(--ui-warning)"
+      },
+      "css": "--fip-color-icon-warning",
+      "file": "src/ui/tokens/color/colorTokens.css"
+    },
+    {
+      "id": "VariableID:96:7",
+      "name": "color/overlay/busy",
+      "collectionId": "VariableCollectionId:17:3",
+      "type": "COLOR",
+      "values": {
+        "17:1": {
+          "type": "VARIABLE_ALIAS",
+          "id": "VariableID:96:5"
+        },
+        "17:2": {
+          "type": "VARIABLE_ALIAS",
+          "id": "VariableID:96:4"
+        }
+      },
+      "scopes": [
+        "FRAME_FILL",
+        "SHAPE_FILL"
+      ],
+      "codeSyntax": {
+        "WEB": "var(--busy-overlay)"
+      },
+      "css": "--fip-color-overlay-busy",
+      "file": "src/ui/tokens/color/colorTokens.css"
+    },
+    {
+      "id": "VariableID:96:6",
+      "name": "color/overlay/modal",
+      "collectionId": "VariableCollectionId:17:3",
+      "type": "COLOR",
+      "values": {
+        "17:1": {
+          "type": "VARIABLE_ALIAS",
+          "id": "VariableID:96:3"
+        },
+        "17:2": {
+          "type": "VARIABLE_ALIAS",
+          "id": "VariableID:96:2"
+        }
+      },
+      "scopes": [
+        "FRAME_FILL",
+        "SHAPE_FILL"
+      ],
+      "codeSyntax": {
+        "WEB": "var(--modal-overlay)"
+      },
+      "css": "--fip-color-overlay-modal",
+      "file": "src/ui/tokens/color/colorTokens.css"
+    },
+    {
+      "id": "VariableID:355:6757",
+      "name": "color/text/avatar",
+      "collectionId": "VariableCollectionId:17:3",
+      "type": "COLOR",
+      "values": {
+        "17:1": {
+          "type": "VARIABLE_ALIAS",
+          "id": "VariableID:18:23"
+        },
+        "17:2": {
+          "type": "VARIABLE_ALIAS",
+          "id": "VariableID:18:20"
+        }
+      },
+      "scopes": [
+        "TEXT_FILL"
+      ],
+      "codeSyntax": {
+        "WEB": "var(--ui-avatar-text)"
+      },
+      "css": "--fip-color-text-avatar",
+      "file": "src/ui/tokens/color/colorTokens.css"
+    },
+    {
+      "id": "VariableID:47:7",
+      "name": "color/text/danger",
+      "collectionId": "VariableCollectionId:17:3",
+      "type": "COLOR",
+      "values": {
+        "17:1": {
+          "type": "VARIABLE_ALIAS",
+          "id": "VariableID:18:30"
+        },
+        "17:2": {
+          "type": "VARIABLE_ALIAS",
+          "id": "VariableID:18:29"
+        }
+      },
+      "scopes": [
+        "TEXT_FILL"
+      ],
+      "codeSyntax": {
+        "WEB": "var(--color-text-danger)"
+      },
+      "css": "--fip-color-text-danger",
+      "file": "src/ui/tokens/color/colorTokens.css"
+    },
+    {
+      "id": "VariableID:47:6",
+      "name": "color/text/disabled",
+      "collectionId": "VariableCollectionId:17:3",
+      "type": "COLOR",
+      "values": {
+        "17:1": {
+          "type": "VARIABLE_ALIAS",
+          "id": "VariableID:18:19"
+        },
+        "17:2": {
+          "type": "VARIABLE_ALIAS",
+          "id": "VariableID:18:11"
+        }
+      },
+      "scopes": [
+        "TEXT_FILL"
+      ],
+      "codeSyntax": {
+        "WEB": "var(--color-text-disabled)"
+      },
+      "css": "--fip-color-text-disabled",
+      "file": "src/ui/tokens/color/colorTokens.css"
+    },
+    {
+      "id": "VariableID:65:478",
+      "name": "color/text/info",
+      "collectionId": "VariableCollectionId:17:3",
+      "type": "COLOR",
+      "values": {
+        "17:1": {
+          "type": "VARIABLE_ALIAS",
+          "id": "VariableID:18:22"
+        },
+        "17:2": {
+          "type": "VARIABLE_ALIAS",
+          "id": "VariableID:18:20"
+        }
+      },
+      "scopes": [
+        "TEXT_FILL"
+      ],
+      "codeSyntax": {
+        "WEB": "var(--color-text-info)"
+      },
+      "css": "--fip-color-text-info",
+      "file": "src/ui/tokens/color/colorTokens.css"
+    },
+    {
+      "id": "VariableID:47:5",
+      "name": "color/text/on-accent",
+      "collectionId": "VariableCollectionId:17:3",
+      "type": "COLOR",
+      "values": {
+        "17:1": {
+          "type": "VARIABLE_ALIAS",
+          "id": "VariableID:18:2"
+        },
+        "17:2": {
+          "type": "VARIABLE_ALIAS",
+          "id": "VariableID:18:24"
+        }
+      },
+      "scopes": [
+        "TEXT_FILL"
+      ],
+      "codeSyntax": {
+        "WEB": "var(--color-text-on-accent)"
+      },
+      "css": "--fip-color-text-on-accent",
+      "file": "src/ui/tokens/color/colorTokens.css"
+    },
+    {
+      "id": "VariableID:19:6",
+      "name": "color/text/primary",
+      "collectionId": "VariableCollectionId:17:3",
+      "type": "COLOR",
+      "values": {
+        "17:1": {
+          "type": "VARIABLE_ALIAS",
+          "id": "VariableID:18:16"
+        },
+        "17:2": {
+          "type": "VARIABLE_ALIAS",
+          "id": "VariableID:18:8"
+        }
+      },
+      "scopes": [
+        "TEXT_FILL"
+      ],
+      "codeSyntax": {
+        "WEB": "var(--ui-text)"
+      },
+      "css": "--fip-color-text-primary",
+      "file": "src/ui/tokens/color/colorTokens.css"
+    },
+    {
+      "id": "VariableID:19:8",
+      "name": "color/text/secondary",
+      "collectionId": "VariableCollectionId:17:3",
+      "type": "COLOR",
+      "values": {
+        "17:1": {
+          "type": "VARIABLE_ALIAS",
+          "id": "VariableID:18:18"
+        },
+        "17:2": {
+          "type": "VARIABLE_ALIAS",
+          "id": "VariableID:18:10"
+        }
+      },
+      "scopes": [
+        "TEXT_FILL"
+      ],
+      "codeSyntax": {
+        "WEB": "var(--ui-muted)"
+      },
+      "css": "--fip-color-text-secondary",
+      "file": "src/ui/tokens/color/colorTokens.css"
+    },
+    {
+      "id": "VariableID:19:7",
+      "name": "color/text/strong",
+      "collectionId": "VariableCollectionId:17:3",
+      "type": "COLOR",
+      "values": {
+        "17:1": {
+          "type": "VARIABLE_ALIAS",
+          "id": "VariableID:18:17"
+        },
+        "17:2": {
+          "type": "VARIABLE_ALIAS",
+          "id": "VariableID:18:9"
+        }
+      },
+      "scopes": [
+        "TEXT_FILL"
+      ],
+      "codeSyntax": {
+        "WEB": "var(--ui-text-strong)"
+      },
+      "css": "--fip-color-text-strong",
+      "file": "src/ui/tokens/color/colorTokens.css"
+    },
+    {
+      "id": "VariableID:65:479",
+      "name": "color/text/success",
+      "collectionId": "VariableCollectionId:17:3",
+      "type": "COLOR",
+      "values": {
+        "17:1": {
+          "type": "VARIABLE_ALIAS",
+          "id": "VariableID:18:26"
+        },
+        "17:2": {
+          "type": "VARIABLE_ALIAS",
+          "id": "VariableID:18:25"
+        }
+      },
+      "scopes": [
+        "TEXT_FILL"
+      ],
+      "codeSyntax": {
+        "WEB": "var(--color-text-success)"
+      },
+      "css": "--fip-color-text-success",
+      "file": "src/ui/tokens/color/colorTokens.css"
+    },
+    {
+      "id": "VariableID:19:9",
+      "name": "color/text/tertiary",
+      "collectionId": "VariableCollectionId:17:3",
+      "type": "COLOR",
+      "values": {
+        "17:1": {
+          "type": "VARIABLE_ALIAS",
+          "id": "VariableID:18:19"
+        },
+        "17:2": {
+          "type": "VARIABLE_ALIAS",
+          "id": "VariableID:18:11"
+        }
+      },
+      "scopes": [
+        "TEXT_FILL"
+      ],
+      "codeSyntax": {
+        "WEB": "var(--ui-faint)"
+      },
+      "css": "--fip-color-text-tertiary",
+      "file": "src/ui/tokens/color/colorTokens.css"
+    },
+    {
+      "id": "VariableID:65:480",
+      "name": "color/text/warning",
+      "collectionId": "VariableCollectionId:17:3",
+      "type": "COLOR",
+      "values": {
+        "17:1": {
+          "type": "VARIABLE_ALIAS",
+          "id": "VariableID:18:28"
+        },
+        "17:2": {
+          "type": "VARIABLE_ALIAS",
+          "id": "VariableID:18:27"
+        }
+      },
+      "scopes": [
+        "TEXT_FILL"
+      ],
+      "codeSyntax": {
+        "WEB": "var(--color-text-warning)"
+      },
+      "css": "--fip-color-text-warning",
+      "file": "src/ui/tokens/color/colorTokens.css"
+    },
+    {
+      "id": "VariableID:161:514",
+      "name": "combobox/option-height",
+      "collectionId": "VariableCollectionId:46:2",
+      "type": "FLOAT",
+      "values": {
+        "46:0": 32,
+        "46:1": 36,
+        "46:2": 40
+      },
+      "scopes": [
+        "WIDTH_HEIGHT"
+      ],
+      "codeSyntax": {
+        "WEB": "var(--searchable-select-option-height)"
+      },
+      "css": "--fip-combobox-option-height",
+      "file": "src/ui/tokens/size/sizeTokens.css",
+      "unit": "px"
+    },
+    {
+      "id": "VariableID:161:515",
+      "name": "combobox/option-padding-x",
+      "collectionId": "VariableCollectionId:46:2",
+      "type": "FLOAT",
+      "values": {
+        "46:0": 8,
+        "46:1": 10,
+        "46:2": 12
+      },
+      "scopes": [
+        "GAP"
+      ],
+      "codeSyntax": {
+        "WEB": "var(--searchable-select-option-padding-x)"
+      },
+      "css": "--fip-combobox-option-padding-x",
+      "file": "src/ui/tokens/spacing/spacingTokens.css",
+      "unit": "px"
+    },
+    {
+      "id": "VariableID:46:10",
+      "name": "control/disabled-opacity",
+      "collectionId": "VariableCollectionId:46:2",
+      "type": "FLOAT",
+      "values": {
+        "46:0": 0.41999998688697815,
+        "46:1": 0.41999998688697815,
+        "46:2": 0.41999998688697815
+      },
+      "scopes": [
+        "OPACITY"
+      ],
+      "codeSyntax": {
+        "WEB": "var(--control-disabled-opacity)"
+      },
+      "css": "--fip-control-disabled-opacity",
+      "file": "src/ui/tokens/size/sizeTokens.css",
+      "unit": "number"
+    },
+    {
+      "id": "VariableID:55:35",
+      "name": "control/focus-stroke",
+      "collectionId": "VariableCollectionId:46:2",
+      "type": "FLOAT",
+      "values": {
+        "46:0": 2,
+        "46:1": 2,
+        "46:2": 2
+      },
+      "scopes": [
+        "STROKE_FLOAT"
+      ],
+      "codeSyntax": {
+        "WEB": "var(--control-focus-stroke)"
+      },
+      "css": "--fip-control-focus-stroke",
+      "file": "src/ui/tokens/border/borderTokens.css",
+      "unit": "px"
+    },
+    {
+      "id": "VariableID:46:7",
+      "name": "control/font-size",
+      "collectionId": "VariableCollectionId:46:2",
+      "type": "FLOAT",
+      "values": {
+        "46:0": 13,
+        "46:1": 14,
+        "46:2": 15
+      },
+      "scopes": [
+        "FONT_SIZE"
+      ],
+      "codeSyntax": {
+        "WEB": "var(--control-font-size)"
+      },
+      "css": "--fip-control-font-size",
+      "file": "src/ui/tokens/size/sizeTokens.css",
+      "unit": "px"
+    },
+    {
+      "id": "VariableID:46:5",
+      "name": "control/gap",
+      "collectionId": "VariableCollectionId:46:2",
+      "type": "FLOAT",
+      "values": {
+        "46:0": 6,
+        "46:1": 8,
+        "46:2": 8
+      },
+      "scopes": [
+        "GAP"
+      ],
+      "codeSyntax": {
+        "WEB": "var(--control-gap)"
+      },
+      "css": "--fip-control-gap",
+      "file": "src/ui/tokens/spacing/spacingTokens.css",
+      "unit": "px"
+    },
+    {
+      "id": "VariableID:46:3",
+      "name": "control/height",
+      "collectionId": "VariableCollectionId:46:2",
+      "type": "FLOAT",
+      "values": {
+        "46:0": 32,
+        "46:1": 40,
+        "46:2": 48
+      },
+      "scopes": [
+        "WIDTH_HEIGHT"
+      ],
+      "codeSyntax": {
+        "WEB": "var(--control-height)"
+      },
+      "css": "--fip-control-height",
+      "file": "src/ui/tokens/size/sizeTokens.css",
+      "unit": "px"
+    },
+    {
+      "id": "VariableID:46:9",
+      "name": "control/icon-size",
+      "collectionId": "VariableCollectionId:46:2",
+      "type": "FLOAT",
+      "values": {
+        "46:0": 16,
+        "46:1": 16,
+        "46:2": 20
+      },
+      "scopes": [
+        "WIDTH_HEIGHT"
+      ],
+      "codeSyntax": {
+        "WEB": "var(--control-icon-size)"
+      },
+      "css": "--fip-control-icon-size",
+      "file": "src/ui/tokens/size/sizeTokens.css",
+      "unit": "px"
+    },
+    {
+      "id": "VariableID:46:8",
+      "name": "control/line-height",
+      "collectionId": "VariableCollectionId:46:2",
+      "type": "FLOAT",
+      "values": {
+        "46:0": 16,
+        "46:1": 18,
+        "46:2": 20
+      },
+      "scopes": [
+        "LINE_HEIGHT"
+      ],
+      "codeSyntax": {
+        "WEB": "var(--control-line-height)"
+      },
+      "css": "--fip-control-line-height",
+      "file": "src/ui/tokens/size/sizeTokens.css",
+      "unit": "px"
+    },
+    {
+      "id": "VariableID:46:4",
+      "name": "control/padding-x",
+      "collectionId": "VariableCollectionId:46:2",
+      "type": "FLOAT",
+      "values": {
+        "46:0": 12,
+        "46:1": 14,
+        "46:2": 16
+      },
+      "scopes": [
+        "GAP"
+      ],
+      "codeSyntax": {
+        "WEB": "var(--control-padding-x)"
+      },
+      "css": "--fip-control-padding-x",
+      "file": "src/ui/tokens/spacing/spacingTokens.css",
+      "unit": "px"
+    },
+    {
+      "id": "VariableID:46:6",
+      "name": "control/radius",
+      "collectionId": "VariableCollectionId:46:2",
+      "type": "FLOAT",
+      "values": {
+        "46:0": 7,
+        "46:1": 7,
+        "46:2": 9
+      },
+      "scopes": [
+        "CORNER_RADIUS"
+      ],
+      "codeSyntax": {
+        "WEB": "var(--control-radius)"
+      },
+      "css": "--fip-control-radius",
+      "file": "src/ui/tokens/radius/radiusTokens.css",
+      "unit": "px"
+    },
+    {
+      "id": "VariableID:46:11",
+      "name": "control/stroke",
+      "collectionId": "VariableCollectionId:46:2",
+      "type": "FLOAT",
+      "values": {
+        "46:0": 1,
+        "46:1": 1,
+        "46:2": 1
+      },
+      "scopes": [
+        "STROKE_FLOAT"
+      ],
+      "codeSyntax": {
+        "WEB": "var(--control-stroke)"
+      },
+      "css": "--fip-control-stroke",
+      "file": "src/ui/tokens/border/borderTokens.css",
+      "unit": "px"
+    },
+    {
+      "id": "VariableID:18:4",
+      "name": "dark/canvas",
+      "collectionId": "VariableCollectionId:17:2",
+      "type": "COLOR",
+      "values": {
+        "17:0": {
+          "r": 0.04313725605607033,
+          "g": 0.06666667014360428,
+          "b": 0.0941176488995552,
+          "a": 1
+        }
+      },
+      "scopes": [],
+      "codeSyntax": {
+        "WEB": "var(--primitive-dark-canvas)"
+      },
+      "css": "--fip-primitive-dark-canvas",
+      "file": "src/ui/tokens/color/colorTokens.css"
+    },
+    {
+      "id": "VariableID:18:6",
+      "name": "dark/raised",
+      "collectionId": "VariableCollectionId:17:2",
+      "type": "COLOR",
+      "values": {
+        "17:0": {
+          "r": 0.08235294371843338,
+          "g": 0.12156862765550613,
+          "b": 0.16470588743686676,
+          "a": 1
+        }
+      },
+      "scopes": [],
+      "codeSyntax": {
+        "WEB": "var(--primitive-dark-raised)"
+      },
+      "css": "--fip-primitive-dark-raised",
+      "file": "src/ui/tokens/color/colorTokens.css"
+    },
+    {
+      "id": "VariableID:18:7",
+      "name": "dark/subtle",
+      "collectionId": "VariableCollectionId:17:2",
+      "type": "COLOR",
+      "values": {
+        "17:0": {
+          "r": 0.054901961237192154,
+          "g": 0.09019608050584793,
+          "b": 0.125490203499794,
+          "a": 1
+        }
+      },
+      "scopes": [],
+      "codeSyntax": {
+        "WEB": "var(--primitive-dark-subtle)"
+      },
+      "css": "--fip-primitive-dark-subtle",
+      "file": "src/ui/tokens/color/colorTokens.css"
+    },
+    {
+      "id": "VariableID:18:5",
+      "name": "dark/surface",
+      "collectionId": "VariableCollectionId:17:2",
+      "type": "COLOR",
+      "values": {
+        "17:0": {
+          "r": 0.06666667014360428,
+          "g": 0.09803921729326248,
+          "b": 0.13725490868091583,
+          "a": 1
+        }
+      },
+      "scopes": [],
+      "codeSyntax": {
+        "WEB": "var(--primitive-dark-surface)"
+      },
+      "css": "--fip-primitive-dark-surface",
+      "file": "src/ui/tokens/color/colorTokens.css"
+    },
+    {
+      "id": "VariableID:18:8",
+      "name": "dark/text",
+      "collectionId": "VariableCollectionId:17:2",
+      "type": "COLOR",
+      "values": {
+        "17:0": {
+          "r": 0.929411768913269,
+          "g": 0.9490196108818054,
+          "b": 0.9686274528503418,
+          "a": 1
+        }
+      },
+      "scopes": [],
+      "codeSyntax": {
+        "WEB": "var(--primitive-dark-text)"
+      },
+      "css": "--fip-primitive-dark-text",
+      "file": "src/ui/tokens/color/colorTokens.css"
+    },
+    {
+      "id": "VariableID:18:11",
+      "name": "dark/text-faint",
+      "collectionId": "VariableCollectionId:17:2",
+      "type": "COLOR",
+      "values": {
+        "17:0": {
+          "r": 0.4313725531101227,
+          "g": 0.48235294222831726,
+          "b": 0.5254902243614197,
+          "a": 1
+        }
+      },
+      "scopes": [],
+      "codeSyntax": {
+        "WEB": "var(--primitive-dark-text-faint)"
+      },
+      "css": "--fip-primitive-dark-text-faint",
+      "file": "src/ui/tokens/color/colorTokens.css"
+    },
+    {
+      "id": "VariableID:18:10",
+      "name": "dark/text-muted",
+      "collectionId": "VariableCollectionId:17:2",
+      "type": "COLOR",
+      "values": {
+        "17:0": {
+          "r": 0.5882353186607361,
+          "g": 0.6392157077789307,
+          "b": 0.6823529601097107,
+          "a": 1
+        }
+      },
+      "scopes": [],
+      "codeSyntax": {
+        "WEB": "var(--primitive-dark-text-muted)"
+      },
+      "css": "--fip-primitive-dark-text-muted",
+      "file": "src/ui/tokens/color/colorTokens.css"
+    },
+    {
+      "id": "VariableID:18:9",
+      "name": "dark/text-strong",
+      "collectionId": "VariableCollectionId:17:2",
+      "type": "COLOR",
+      "values": {
+        "17:0": {
+          "r": 1,
+          "g": 1,
+          "b": 1,
+          "a": 1
+        }
+      },
+      "scopes": [],
+      "codeSyntax": {
+        "WEB": "var(--primitive-dark-text-strong)"
+      },
+      "css": "--fip-primitive-dark-text-strong",
+      "file": "src/ui/tokens/color/colorTokens.css"
+    },
+    {
+      "id": "VariableID:318:5159",
+      "name": "disclosure/trigger-min-height",
+      "collectionId": "VariableCollectionId:17:4",
+      "type": "FLOAT",
+      "values": {
+        "17:3": 34
+      },
+      "scopes": [
+        "WIDTH_HEIGHT"
+      ],
+      "codeSyntax": {
+        "WEB": "var(--ui-disclosure-trigger-min-height)"
+      },
+      "css": "--fip-disclosure-trigger-min-height",
+      "file": "src/ui/tokens/size/sizeTokens.css",
+      "unit": "px"
+    },
+    {
+      "id": "VariableID:318:5160",
+      "name": "disclosure/trigger-padding-y",
+      "collectionId": "VariableCollectionId:17:4",
+      "type": "FLOAT",
+      "values": {
+        "17:3": 11
+      },
+      "scopes": [
+        "GAP"
+      ],
+      "codeSyntax": {
+        "WEB": "var(--ui-disclosure-trigger-padding-y)"
+      },
+      "css": "--fip-disclosure-trigger-padding-y",
+      "file": "src/ui/tokens/spacing/spacingTokens.css",
+      "unit": "px"
+    },
+    {
+      "id": "VariableID:50:207",
+      "name": "icon/color",
+      "collectionId": "VariableCollectionId:50:206",
+      "type": "COLOR",
+      "values": {
+        "50:0": {
+          "type": "VARIABLE_ALIAS",
+          "id": "VariableID:20:2"
+        },
+        "50:1": {
+          "type": "VARIABLE_ALIAS",
+          "id": "VariableID:20:3"
+        },
+        "50:2": {
+          "type": "VARIABLE_ALIAS",
+          "id": "VariableID:20:4"
+        },
+        "50:3": {
+          "type": "VARIABLE_ALIAS",
+          "id": "VariableID:20:5"
+        },
+        "50:4": {
+          "type": "VARIABLE_ALIAS",
+          "id": "VariableID:20:6"
+        },
+        "50:5": {
+          "type": "VARIABLE_ALIAS",
+          "id": "VariableID:20:7"
+        },
+        "50:6": {
+          "type": "VARIABLE_ALIAS",
+          "id": "VariableID:20:8"
+        },
+        "50:7": {
+          "type": "VARIABLE_ALIAS",
+          "id": "VariableID:20:9"
+        }
+      },
+      "scopes": [
+        "SHAPE_FILL",
+        "STROKE_COLOR"
+      ],
+      "codeSyntax": {
+        "WEB": "var(--icon-color)"
+      },
+      "css": "--fip-icon-tone-color",
+      "file": "src/ui/tokens/color/colorTokens.css"
+    },
+    {
+      "id": "VariableID:18:37",
+      "name": "icon/grid",
+      "collectionId": "VariableCollectionId:17:4",
+      "type": "FLOAT",
+      "values": {
+        "17:3": 24
+      },
+      "scopes": [
+        "WIDTH_HEIGHT"
+      ],
+      "codeSyntax": {
+        "WEB": "var(--icon-grid)"
+      },
+      "css": "--fip-icon-grid",
+      "file": "src/ui/tokens/size/sizeTokens.css",
+      "unit": "px"
+    },
+    {
+      "id": "VariableID:18:38",
+      "name": "icon/optical-area",
+      "collectionId": "VariableCollectionId:17:4",
+      "type": "FLOAT",
+      "values": {
+        "17:3": 20
+      },
+      "scopes": [
+        "WIDTH_HEIGHT"
+      ],
+      "codeSyntax": {
+        "WEB": "var(--icon-optical-area)"
+      },
+      "css": "--fip-icon-optical-area",
+      "file": "src/ui/tokens/size/sizeTokens.css",
+      "unit": "px"
+    },
+    {
+      "id": "VariableID:35:4",
+      "name": "icon/optical-area",
+      "collectionId": "VariableCollectionId:35:2",
+      "type": "FLOAT",
+      "values": {
+        "35:0": 20,
+        "35:1": 16.66670036315918,
+        "35:2": 13.33329963684082
+      },
+      "scopes": [
+        "WIDTH_HEIGHT"
+      ],
+      "codeSyntax": {
+        "WEB": "var(--icon-optical-area-scaled)"
+      },
+      "css": "--fip-icon-scale-optical-area",
+      "file": "src/ui/tokens/size/sizeTokens.css",
+      "unit": "px"
+    },
+    {
+      "id": "VariableID:35:3",
+      "name": "icon/size",
+      "collectionId": "VariableCollectionId:35:2",
+      "type": "FLOAT",
+      "values": {
+        "35:0": 24,
+        "35:1": 20,
+        "35:2": 16
+      },
+      "scopes": [
+        "WIDTH_HEIGHT"
+      ],
+      "codeSyntax": {
+        "WEB": "var(--icon-size)"
+      },
+      "css": "--fip-icon-scale-size",
+      "file": "src/ui/tokens/size/sizeTokens.css",
+      "unit": "px"
+    },
+    {
+      "id": "VariableID:18:41",
+      "name": "icon/size/lg",
+      "collectionId": "VariableCollectionId:17:4",
+      "type": "FLOAT",
+      "values": {
+        "17:3": 24
+      },
+      "scopes": [
+        "WIDTH_HEIGHT"
+      ],
+      "codeSyntax": {
+        "WEB": "var(--icon-size-lg)"
+      },
+      "css": "--fip-icon-size-lg",
+      "file": "src/ui/tokens/size/sizeTokens.css",
+      "unit": "px"
+    },
+    {
+      "id": "VariableID:18:40",
+      "name": "icon/size/md",
+      "collectionId": "VariableCollectionId:17:4",
+      "type": "FLOAT",
+      "values": {
+        "17:3": 20
+      },
+      "scopes": [
+        "WIDTH_HEIGHT"
+      ],
+      "codeSyntax": {
+        "WEB": "var(--icon-size-md)"
+      },
+      "css": "--fip-icon-size-md",
+      "file": "src/ui/tokens/size/sizeTokens.css",
+      "unit": "px"
+    },
+    {
+      "id": "VariableID:18:39",
+      "name": "icon/size/sm",
+      "collectionId": "VariableCollectionId:17:4",
+      "type": "FLOAT",
+      "values": {
+        "17:3": 16
+      },
+      "scopes": [
+        "WIDTH_HEIGHT"
+      ],
+      "codeSyntax": {
+        "WEB": "var(--icon-size-sm)"
+      },
+      "css": "--fip-icon-size-sm",
+      "file": "src/ui/tokens/size/sizeTokens.css",
+      "unit": "px"
+    },
+    {
+      "id": "VariableID:18:42",
+      "name": "icon/stroke",
+      "collectionId": "VariableCollectionId:17:4",
+      "type": "FLOAT",
+      "values": {
+        "17:3": 1.75
+      },
+      "scopes": [
+        "STROKE_FLOAT"
+      ],
+      "codeSyntax": {
+        "WEB": "var(--icon-stroke)"
+      },
+      "css": "--fip-icon-stroke",
+      "file": "src/ui/tokens/border/borderTokens.css",
+      "unit": "px"
+    },
+    {
+      "id": "VariableID:35:5",
+      "name": "icon/stroke",
+      "collectionId": "VariableCollectionId:35:2",
+      "type": "FLOAT",
+      "values": {
+        "35:0": 1.75,
+        "35:1": 1.5,
+        "35:2": 1.25
+      },
+      "scopes": [
+        "STROKE_FLOAT"
+      ],
+      "codeSyntax": {
+        "WEB": "var(--icon-stroke-scaled)"
+      },
+      "css": "--fip-icon-scale-stroke",
+      "file": "src/ui/tokens/border/borderTokens.css",
+      "unit": "px"
+    },
+    {
+      "id": "VariableID:275:2214",
+      "name": "layout/dialog/body-padding-y",
+      "collectionId": "VariableCollectionId:17:4",
+      "type": "FLOAT",
+      "values": {
+        "17:3": 11
+      },
+      "scopes": [
+        "GAP"
+      ],
+      "codeSyntax": {
+        "WEB": "var(--ui-dialog-body-padding-y)"
+      },
+      "css": "--fip-layout-dialog-body-padding-y",
+      "file": "src/ui/tokens/spacing/spacingTokens.css",
+      "unit": "px"
+    },
+    {
+      "id": "VariableID:275:2212",
+      "name": "layout/dialog/header-min-height",
+      "collectionId": "VariableCollectionId:17:4",
+      "type": "FLOAT",
+      "values": {
+        "17:3": 46
+      },
+      "scopes": [
+        "WIDTH_HEIGHT"
+      ],
+      "codeSyntax": {
+        "WEB": "var(--ui-dialog-header-min-height)"
+      },
+      "css": "--fip-layout-dialog-header-min-height",
+      "file": "src/ui/tokens/size/sizeTokens.css",
+      "unit": "px"
+    },
+    {
+      "id": "VariableID:275:2213",
+      "name": "layout/dialog/header-padding-y",
+      "collectionId": "VariableCollectionId:17:4",
+      "type": "FLOAT",
+      "values": {
+        "17:3": 9
+      },
+      "scopes": [
+        "GAP"
+      ],
+      "codeSyntax": {
+        "WEB": "var(--ui-dialog-header-padding-y)"
+      },
+      "css": "--fip-layout-dialog-header-padding-y",
+      "file": "src/ui/tokens/spacing/spacingTokens.css",
+      "unit": "px"
+    },
+    {
+      "id": "VariableID:275:2210",
+      "name": "layout/dialog/width-compact",
+      "collectionId": "VariableCollectionId:17:4",
+      "type": "FLOAT",
+      "values": {
+        "17:3": 480
+      },
+      "scopes": [
+        "WIDTH_HEIGHT"
+      ],
+      "codeSyntax": {
+        "WEB": "var(--ui-dialog-width-compact)"
+      },
+      "css": "--fip-layout-dialog-width-compact",
+      "file": "src/ui/tokens/size/sizeTokens.css",
+      "unit": "px"
+    },
+    {
+      "id": "VariableID:275:2211",
+      "name": "layout/dialog/width-wide",
+      "collectionId": "VariableCollectionId:17:4",
+      "type": "FLOAT",
+      "values": {
+        "17:3": 640
+      },
+      "scopes": [
+        "WIDTH_HEIGHT"
+      ],
+      "codeSyntax": {
+        "WEB": "var(--ui-dialog-width-wide)"
+      },
+      "css": "--fip-layout-dialog-width-wide",
+      "file": "src/ui/tokens/size/sizeTokens.css",
+      "unit": "px"
+    },
+    {
+      "id": "VariableID:95:5",
+      "name": "layout/directory/width",
+      "collectionId": "VariableCollectionId:17:4",
+      "type": "FLOAT",
+      "values": {
+        "17:3": 248
+      },
+      "scopes": [
+        "WIDTH_HEIGHT"
+      ],
+      "codeSyntax": {
+        "WEB": "var(--entity-directory-width)"
+      },
+      "css": "--fip-layout-directory-width",
+      "file": "src/ui/tokens/size/sizeTokens.css",
+      "unit": "px"
+    },
+    {
+      "id": "VariableID:336:6506",
+      "name": "layout/empty-state/min-height-compact",
+      "collectionId": "VariableCollectionId:17:4",
+      "type": "FLOAT",
+      "values": {
+        "17:3": 54
+      },
+      "scopes": [
+        "WIDTH_HEIGHT"
+      ],
+      "codeSyntax": {
+        "WEB": "var(--ui-empty-state-min-height-compact)"
+      },
+      "css": "--fip-layout-empty-state-min-height-compact",
+      "file": "src/ui/tokens/size/sizeTokens.css",
+      "unit": "px"
+    },
+    {
+      "id": "VariableID:336:6507",
+      "name": "layout/empty-state/min-height-default",
+      "collectionId": "VariableCollectionId:17:4",
+      "type": "FLOAT",
+      "values": {
+        "17:3": 72
+      },
+      "scopes": [
+        "WIDTH_HEIGHT"
+      ],
+      "codeSyntax": {
+        "WEB": "var(--ui-empty-state-min-height-default)"
+      },
+      "css": "--fip-layout-empty-state-min-height-default",
+      "file": "src/ui/tokens/size/sizeTokens.css",
+      "unit": "px"
+    },
+    {
+      "id": "VariableID:336:6508",
+      "name": "layout/empty-state/padding-compact",
+      "collectionId": "VariableCollectionId:17:4",
+      "type": "FLOAT",
+      "values": {
+        "17:3": 9
+      },
+      "scopes": [
+        "GAP"
+      ],
+      "codeSyntax": {
+        "WEB": "var(--ui-empty-state-padding-compact)"
+      },
+      "css": "--fip-layout-empty-state-padding-compact",
+      "file": "src/ui/tokens/spacing/spacingTokens.css",
+      "unit": "px"
+    },
+    {
+      "id": "VariableID:336:6509",
+      "name": "layout/empty-state/padding-default",
+      "collectionId": "VariableCollectionId:17:4",
+      "type": "FLOAT",
+      "values": {
+        "17:3": 12
+      },
+      "scopes": [
+        "GAP"
+      ],
+      "codeSyntax": {
+        "WEB": "var(--ui-empty-state-padding-default)"
+      },
+      "css": "--fip-layout-empty-state-padding-default",
+      "file": "src/ui/tokens/spacing/spacingTokens.css",
+      "unit": "px"
+    },
+    {
+      "id": "VariableID:297:3993",
+      "name": "layout/feedback/blocking-width",
+      "collectionId": "VariableCollectionId:17:4",
+      "type": "FLOAT",
+      "values": {
+        "17:3": 480
+      },
+      "scopes": [
+        "WIDTH_HEIGHT"
+      ],
+      "codeSyntax": {
+        "WEB": "var(--ui-blocking-message-width)"
+      },
+      "css": "--fip-layout-feedback-blocking-width",
+      "file": "src/ui/tokens/size/sizeTokens.css",
+      "unit": "px"
+    },
+    {
+      "id": "VariableID:297:3992",
+      "name": "layout/feedback/padding-x",
+      "collectionId": "VariableCollectionId:17:4",
+      "type": "FLOAT",
+      "values": {
+        "17:3": 10
+      },
+      "scopes": [
+        "GAP"
+      ],
+      "codeSyntax": {
+        "WEB": "var(--ui-feedback-padding-x)"
+      },
+      "css": "--fip-layout-feedback-padding-x",
+      "file": "src/ui/tokens/spacing/spacingTokens.css",
+      "unit": "px"
+    },
+    {
+      "id": "VariableID:297:3991",
+      "name": "layout/feedback/toast-max-width",
+      "collectionId": "VariableCollectionId:17:4",
+      "type": "FLOAT",
+      "values": {
+        "17:3": 380
+      },
+      "scopes": [
+        "WIDTH_HEIGHT"
+      ],
+      "codeSyntax": {
+        "WEB": "var(--ui-toast-max-width)"
+      },
+      "css": "--fip-layout-feedback-toast-max-width",
+      "file": "src/ui/tokens/size/sizeTokens.css",
+      "unit": "px"
+    },
+    {
+      "id": "VariableID:95:6",
+      "name": "layout/inspector/entity-width",
+      "collectionId": "VariableCollectionId:17:4",
+      "type": "FLOAT",
+      "values": {
+        "17:3": 300
+      },
+      "scopes": [
+        "WIDTH_HEIGHT"
+      ],
+      "codeSyntax": {
+        "WEB": "var(--entity-inspector-width)"
+      },
+      "css": "--fip-layout-inspector-entity-width",
+      "file": "src/ui/tokens/size/sizeTokens.css",
+      "unit": "px"
+    },
+    {
+      "id": "VariableID:95:7",
+      "name": "layout/inspector/workspace-width",
+      "collectionId": "VariableCollectionId:17:4",
+      "type": "FLOAT",
+      "values": {
+        "17:3": 360
+      },
+      "scopes": [
+        "WIDTH_HEIGHT"
+      ],
+      "codeSyntax": {
+        "WEB": "var(--workspace-inspector-width)"
+      },
+      "css": "--fip-layout-inspector-workspace-width",
+      "file": "src/ui/tokens/size/sizeTokens.css",
+      "unit": "px"
+    },
+    {
+      "id": "VariableID:248:1706",
+      "name": "layout/menu/gap",
+      "collectionId": "VariableCollectionId:17:4",
+      "type": "FLOAT",
+      "values": {
+        "17:3": 5
+      },
+      "scopes": [
+        "GAP"
+      ],
+      "codeSyntax": {
+        "WEB": "var(--ui-menu-gap)"
+      },
+      "css": "--fip-layout-menu-gap",
+      "file": "src/ui/tokens/spacing/spacingTokens.css",
+      "unit": "px"
+    },
+    {
+      "id": "VariableID:248:1707",
+      "name": "layout/menu/item-padding-x",
+      "collectionId": "VariableCollectionId:17:4",
+      "type": "FLOAT",
+      "values": {
+        "17:3": 11
+      },
+      "scopes": [
+        "GAP"
+      ],
+      "codeSyntax": {
+        "WEB": "var(--ui-menu-item-padding-x)"
+      },
+      "css": "--fip-layout-menu-item-padding-x",
+      "file": "src/ui/tokens/spacing/spacingTokens.css",
+      "unit": "px"
+    },
+    {
+      "id": "VariableID:248:1708",
+      "name": "layout/menu/item-padding-y",
+      "collectionId": "VariableCollectionId:17:4",
+      "type": "FLOAT",
+      "values": {
+        "17:3": 10
+      },
+      "scopes": [
+        "GAP"
+      ],
+      "codeSyntax": {
+        "WEB": "var(--ui-menu-item-padding-y)"
+      },
+      "css": "--fip-layout-menu-item-padding-y",
+      "file": "src/ui/tokens/spacing/spacingTokens.css",
+      "unit": "px"
+    },
+    {
+      "id": "VariableID:248:1709",
+      "name": "layout/menu/note-padding-x",
+      "collectionId": "VariableCollectionId:17:4",
+      "type": "FLOAT",
+      "values": {
+        "17:3": 6
+      },
+      "scopes": [
+        "GAP"
+      ],
+      "codeSyntax": {
+        "WEB": "var(--ui-menu-note-padding-x)"
+      },
+      "css": "--fip-layout-menu-note-padding-x",
+      "file": "src/ui/tokens/spacing/spacingTokens.css",
+      "unit": "px"
+    },
+    {
+      "id": "VariableID:248:1705",
+      "name": "layout/menu/width",
+      "collectionId": "VariableCollectionId:17:4",
+      "type": "FLOAT",
+      "values": {
+        "17:3": 240
+      },
+      "scopes": [
+        "WIDTH_HEIGHT"
+      ],
+      "codeSyntax": {
+        "WEB": "var(--ui-menu-width)"
+      },
+      "css": "--fip-layout-menu-width",
+      "file": "src/ui/tokens/size/sizeTokens.css",
+      "unit": "px"
+    },
+    {
+      "id": "VariableID:95:3",
+      "name": "layout/nav/primary-width",
+      "collectionId": "VariableCollectionId:17:4",
+      "type": "FLOAT",
+      "values": {
+        "17:3": 60
+      },
+      "scopes": [
+        "WIDTH_HEIGHT"
+      ],
+      "codeSyntax": {
+        "WEB": "var(--shell-primary-rail-width)"
+      },
+      "css": "--fip-layout-nav-primary-width",
+      "file": "src/ui/tokens/size/sizeTokens.css",
+      "unit": "px"
+    },
+    {
+      "id": "VariableID:95:4",
+      "name": "layout/nav/secondary-width",
+      "collectionId": "VariableCollectionId:17:4",
+      "type": "FLOAT",
+      "values": {
+        "17:3": 154
+      },
+      "scopes": [
+        "WIDTH_HEIGHT"
+      ],
+      "codeSyntax": {
+        "WEB": "var(--shell-secondary-sidebar-width)"
+      },
+      "css": "--fip-layout-nav-secondary-width",
+      "file": "src/ui/tokens/size/sizeTokens.css",
+      "unit": "px"
+    },
+    {
+      "id": "VariableID:95:9",
+      "name": "layout/page/padding-x",
+      "collectionId": "VariableCollectionId:17:4",
+      "type": "FLOAT",
+      "values": {
+        "17:3": 14
+      },
+      "scopes": [
+        "GAP"
+      ],
+      "codeSyntax": {
+        "WEB": "var(--ui-page-padding-x)"
+      },
+      "css": "--fip-layout-page-padding-x",
+      "file": "src/ui/tokens/spacing/spacingTokens.css",
+      "unit": "px"
+    },
+    {
+      "id": "VariableID:95:10",
+      "name": "layout/page/padding-y",
+      "collectionId": "VariableCollectionId:17:4",
+      "type": "FLOAT",
+      "values": {
+        "17:3": 10
+      },
+      "scopes": [
+        "GAP"
+      ],
+      "codeSyntax": {
+        "WEB": "var(--ui-page-padding-y)"
+      },
+      "css": "--fip-layout-page-padding-y",
+      "file": "src/ui/tokens/spacing/spacingTokens.css",
+      "unit": "px"
+    },
+    {
+      "id": "VariableID:226:1092",
+      "name": "layout/pagination/control-height",
+      "collectionId": "VariableCollectionId:17:4",
+      "type": "FLOAT",
+      "values": {
+        "17:3": 27
+      },
+      "scopes": [
+        "WIDTH_HEIGHT"
+      ],
+      "codeSyntax": {
+        "WEB": "var(--ui-control-height-sm)"
+      },
+      "css": "--fip-layout-pagination-control-height",
+      "file": "src/ui/tokens/size/sizeTokens.css",
+      "unit": "px"
+    },
+    {
+      "id": "VariableID:95:11",
+      "name": "layout/panel/padding",
+      "collectionId": "VariableCollectionId:17:4",
+      "type": "FLOAT",
+      "values": {
+        "17:3": 12
+      },
+      "scopes": [
+        "GAP"
+      ],
+      "codeSyntax": {
+        "WEB": "var(--ui-panel-padding)"
+      },
+      "css": "--fip-layout-panel-padding",
+      "file": "src/ui/tokens/spacing/spacingTokens.css",
+      "unit": "px"
+    },
+    {
+      "id": "VariableID:226:1091",
+      "name": "layout/table-cell/padding-x",
+      "collectionId": "VariableCollectionId:17:4",
+      "type": "FLOAT",
+      "values": {
+        "17:3": 9
+      },
+      "scopes": [
+        "GAP"
+      ],
+      "codeSyntax": {
+        "WEB": "var(--ui-table-cell-padding-x)"
+      },
+      "css": "--fip-layout-table-cell-padding-x",
+      "file": "src/ui/tokens/spacing/spacingTokens.css",
+      "unit": "px"
+    },
+    {
+      "id": "VariableID:226:1090",
+      "name": "layout/table-header/height",
+      "collectionId": "VariableCollectionId:17:4",
+      "type": "FLOAT",
+      "values": {
+        "17:3": 34
+      },
+      "scopes": [
+        "WIDTH_HEIGHT"
+      ],
+      "codeSyntax": {
+        "WEB": "var(--ui-table-header-height)"
+      },
+      "css": "--fip-layout-table-header-height",
+      "file": "src/ui/tokens/size/sizeTokens.css",
+      "unit": "px"
+    },
+    {
+      "id": "VariableID:95:8",
+      "name": "layout/table-row/height",
+      "collectionId": "VariableCollectionId:17:4",
+      "type": "FLOAT",
+      "values": {
+        "17:3": 36
+      },
+      "scopes": [
+        "WIDTH_HEIGHT"
+      ],
+      "codeSyntax": {
+        "WEB": "var(--ui-table-row-height)"
+      },
+      "css": "--fip-layout-table-row-height",
+      "file": "src/ui/tokens/size/sizeTokens.css",
+      "unit": "px"
+    },
+    {
+      "id": "VariableID:297:3997",
+      "name": "layout/task-activity/gap",
+      "collectionId": "VariableCollectionId:17:4",
+      "type": "FLOAT",
+      "values": {
+        "17:3": 9
+      },
+      "scopes": [
+        "GAP"
+      ],
+      "codeSyntax": {
+        "WEB": "var(--ui-task-activity-gap)"
+      },
+      "css": "--fip-layout-task-activity-gap",
+      "file": "src/ui/tokens/spacing/spacingTokens.css",
+      "unit": "px"
+    },
+    {
+      "id": "VariableID:297:3994",
+      "name": "layout/task-activity/min-width",
+      "collectionId": "VariableCollectionId:17:4",
+      "type": "FLOAT",
+      "values": {
+        "17:3": 140
+      },
+      "scopes": [
+        "WIDTH_HEIGHT"
+      ],
+      "codeSyntax": {
+        "WEB": "var(--ui-task-activity-min-width)"
+      },
+      "css": "--fip-layout-task-activity-min-width",
+      "file": "src/ui/tokens/size/sizeTokens.css",
+      "unit": "px"
+    },
+    {
+      "id": "VariableID:297:3995",
+      "name": "layout/task-activity/padding-x",
+      "collectionId": "VariableCollectionId:17:4",
+      "type": "FLOAT",
+      "values": {
+        "17:3": 13
+      },
+      "scopes": [
+        "GAP"
+      ],
+      "codeSyntax": {
+        "WEB": "var(--ui-task-activity-padding-x)"
+      },
+      "css": "--fip-layout-task-activity-padding-x",
+      "file": "src/ui/tokens/spacing/spacingTokens.css",
+      "unit": "px"
+    },
+    {
+      "id": "VariableID:297:3996",
+      "name": "layout/task-activity/padding-y",
+      "collectionId": "VariableCollectionId:17:4",
+      "type": "FLOAT",
+      "values": {
+        "17:3": 10
+      },
+      "scopes": [
+        "GAP"
+      ],
+      "codeSyntax": {
+        "WEB": "var(--ui-task-activity-padding-y)"
+      },
+      "css": "--fip-layout-task-activity-padding-y",
+      "file": "src/ui/tokens/spacing/spacingTokens.css",
+      "unit": "px"
+    },
+    {
+      "id": "VariableID:424:16192",
+      "name": "layout/timeline/time-width",
+      "collectionId": "VariableCollectionId:17:4",
+      "type": "FLOAT",
+      "values": {
+        "17:3": 64
+      },
+      "scopes": [
+        "WIDTH_HEIGHT"
+      ],
+      "codeSyntax": {
+        "WEB": "var(--ui-timeline-time-width)"
+      },
+      "css": "--fip-layout-timeline-time-width",
+      "file": "src/ui/tokens/size/sizeTokens.css",
+      "unit": "px"
+    },
+    {
+      "id": "VariableID:95:2",
+      "name": "layout/topbar/height",
+      "collectionId": "VariableCollectionId:17:4",
+      "type": "FLOAT",
+      "values": {
+        "17:3": 44
+      },
+      "scopes": [
+        "WIDTH_HEIGHT"
+      ],
+      "codeSyntax": {
+        "WEB": "var(--ui-topbar-height)"
+      },
+      "css": "--fip-layout-topbar-height",
+      "file": "src/ui/tokens/size/sizeTokens.css",
+      "unit": "px"
+    },
+    {
+      "id": "VariableID:424:16191",
+      "name": "layout/workflow/rail-width",
+      "collectionId": "VariableCollectionId:17:4",
+      "type": "FLOAT",
+      "values": {
+        "17:3": 320
+      },
+      "scopes": [
+        "WIDTH_HEIGHT"
+      ],
+      "codeSyntax": {
+        "WEB": "var(--ui-workflow-rail-width)"
+      },
+      "css": "--fip-layout-workflow-rail-width",
+      "file": "src/ui/tokens/size/sizeTokens.css",
+      "unit": "px"
+    },
+    {
+      "id": "VariableID:18:12",
+      "name": "light/canvas",
+      "collectionId": "VariableCollectionId:17:2",
+      "type": "COLOR",
+      "values": {
+        "17:0": {
+          "r": 0.9647058844566345,
+          "g": 0.9686274528503418,
+          "b": 0.9764705896377563,
+          "a": 1
+        }
+      },
+      "scopes": [],
+      "codeSyntax": {
+        "WEB": "var(--primitive-light-canvas)"
+      },
+      "css": "--fip-primitive-light-canvas",
+      "file": "src/ui/tokens/color/colorTokens.css"
+    },
+    {
+      "id": "VariableID:18:14",
+      "name": "light/raised",
+      "collectionId": "VariableCollectionId:17:2",
+      "type": "COLOR",
+      "values": {
+        "17:0": {
+          "r": 0.9607843160629272,
+          "g": 0.9647058844566345,
+          "b": 0.9725490212440491,
+          "a": 1
+        }
+      },
+      "scopes": [],
+      "codeSyntax": {
+        "WEB": "var(--primitive-light-raised)"
+      },
+      "css": "--fip-primitive-light-raised",
+      "file": "src/ui/tokens/color/colorTokens.css"
+    },
+    {
+      "id": "VariableID:18:15",
+      "name": "light/subtle",
+      "collectionId": "VariableCollectionId:17:2",
+      "type": "COLOR",
+      "values": {
+        "17:0": {
+          "r": 0.9725490212440491,
+          "g": 0.9764705896377563,
+          "b": 0.9843137264251709,
+          "a": 1
+        }
+      },
+      "scopes": [],
+      "codeSyntax": {
+        "WEB": "var(--primitive-light-subtle)"
+      },
+      "css": "--fip-primitive-light-subtle",
+      "file": "src/ui/tokens/color/colorTokens.css"
+    },
+    {
+      "id": "VariableID:18:13",
+      "name": "light/surface",
+      "collectionId": "VariableCollectionId:17:2",
+      "type": "COLOR",
+      "values": {
+        "17:0": {
+          "r": 1,
+          "g": 1,
+          "b": 1,
+          "a": 1
+        }
+      },
+      "scopes": [],
+      "codeSyntax": {
+        "WEB": "var(--primitive-light-surface)"
+      },
+      "css": "--fip-primitive-light-surface",
+      "file": "src/ui/tokens/color/colorTokens.css"
+    },
+    {
+      "id": "VariableID:18:16",
+      "name": "light/text",
+      "collectionId": "VariableCollectionId:17:2",
+      "type": "COLOR",
+      "values": {
+        "17:0": {
+          "r": 0.1882352977991104,
+          "g": 0.21960784494876862,
+          "b": 0.27450981736183167,
+          "a": 1
+        }
+      },
+      "scopes": [],
+      "codeSyntax": {
+        "WEB": "var(--primitive-light-text)"
+      },
+      "css": "--fip-primitive-light-text",
+      "file": "src/ui/tokens/color/colorTokens.css"
+    },
+    {
+      "id": "VariableID:18:19",
+      "name": "light/text-faint",
+      "collectionId": "VariableCollectionId:17:2",
+      "type": "COLOR",
+      "values": {
+        "17:0": {
+          "r": 0.5411764979362488,
+          "g": 0.5960784554481506,
+          "b": 0.6666666865348816,
+          "a": 1
+        }
+      },
+      "scopes": [],
+      "codeSyntax": {
+        "WEB": "var(--primitive-light-text-faint)"
+      },
+      "css": "--fip-primitive-light-text-faint",
+      "file": "src/ui/tokens/color/colorTokens.css"
+    },
+    {
+      "id": "VariableID:18:18",
+      "name": "light/text-muted",
+      "collectionId": "VariableCollectionId:17:2",
+      "type": "COLOR",
+      "values": {
+        "17:0": {
+          "r": 0.40784314274787903,
+          "g": 0.45098039507865906,
+          "b": 0.5254902243614197,
+          "a": 1
+        }
+      },
+      "scopes": [],
+      "codeSyntax": {
+        "WEB": "var(--primitive-light-text-muted)"
+      },
+      "css": "--fip-primitive-light-text-muted",
+      "file": "src/ui/tokens/color/colorTokens.css"
+    },
+    {
+      "id": "VariableID:18:17",
+      "name": "light/text-strong",
+      "collectionId": "VariableCollectionId:17:2",
+      "type": "COLOR",
+      "values": {
+        "17:0": {
+          "r": 0.08235294371843338,
+          "g": 0.10588235408067703,
+          "b": 0.14901961386203766,
+          "a": 1
+        }
+      },
+      "scopes": [],
+      "codeSyntax": {
+        "WEB": "var(--primitive-light-text-strong)"
+      },
+      "css": "--fip-primitive-light-text-strong",
+      "file": "src/ui/tokens/color/colorTokens.css"
+    },
+    {
+      "id": "VariableID:18:3",
+      "name": "neutral/black",
+      "collectionId": "VariableCollectionId:17:2",
+      "type": "COLOR",
+      "values": {
+        "17:0": {
+          "r": 0,
+          "g": 0,
+          "b": 0,
+          "a": 1
+        }
+      },
+      "scopes": [],
+      "codeSyntax": {
+        "WEB": "var(--primitive-neutral-black)"
+      },
+      "css": "--fip-primitive-neutral-black",
+      "file": "src/ui/tokens/color/colorTokens.css"
+    },
+    {
+      "id": "VariableID:18:2",
+      "name": "neutral/white",
+      "collectionId": "VariableCollectionId:17:2",
+      "type": "COLOR",
+      "values": {
+        "17:0": {
+          "r": 1,
+          "g": 1,
+          "b": 1,
+          "a": 1
+        }
+      },
+      "scopes": [],
+      "codeSyntax": {
+        "WEB": "var(--primitive-neutral-white)"
+      },
+      "css": "--fip-primitive-neutral-white",
+      "file": "src/ui/tokens/color/colorTokens.css"
+    },
+    {
+      "id": "VariableID:336:6498",
+      "name": "progress/min-width",
+      "collectionId": "VariableCollectionId:17:4",
+      "type": "FLOAT",
+      "values": {
+        "17:3": 120
+      },
+      "scopes": [
+        "WIDTH_HEIGHT"
+      ],
+      "codeSyntax": {
+        "WEB": "var(--ui-progress-min-width)"
+      },
+      "css": "--fip-progress-min-width",
+      "file": "src/ui/tokens/size/sizeTokens.css",
+      "unit": "px"
+    },
+    {
+      "id": "VariableID:336:6499",
+      "name": "progress/track-height-compact",
+      "collectionId": "VariableCollectionId:17:4",
+      "type": "FLOAT",
+      "values": {
+        "17:3": 2
+      },
+      "scopes": [
+        "WIDTH_HEIGHT"
+      ],
+      "codeSyntax": {
+        "WEB": "var(--ui-progress-track-height-compact)"
+      },
+      "css": "--fip-progress-track-height-compact",
+      "file": "src/ui/tokens/size/sizeTokens.css",
+      "unit": "px"
+    },
+    {
+      "id": "VariableID:336:6500",
+      "name": "progress/track-height-default",
+      "collectionId": "VariableCollectionId:17:4",
+      "type": "FLOAT",
+      "values": {
+        "17:3": 4
+      },
+      "scopes": [
+        "WIDTH_HEIGHT"
+      ],
+      "codeSyntax": {
+        "WEB": "var(--ui-progress-track-height-default)"
+      },
+      "css": "--fip-progress-track-height-default",
+      "file": "src/ui/tokens/size/sizeTokens.css",
+      "unit": "px"
+    },
+    {
+      "id": "VariableID:355:6756",
+      "name": "radius/avatar",
+      "collectionId": "VariableCollectionId:17:4",
+      "type": "FLOAT",
+      "values": {
+        "17:3": 8
+      },
+      "scopes": [
+        "CORNER_RADIUS"
+      ],
+      "codeSyntax": {
+        "WEB": "var(--ui-radius-avatar)"
+      },
+      "css": "--fip-radius-avatar",
+      "file": "src/ui/tokens/radius/radiusTokens.css",
+      "unit": "px"
+    },
+    {
+      "id": "VariableID:336:6505",
+      "name": "radius/full",
+      "collectionId": "VariableCollectionId:17:4",
+      "type": "FLOAT",
+      "values": {
+        "17:3": 999
+      },
+      "scopes": [
+        "CORNER_RADIUS"
+      ],
+      "codeSyntax": {
+        "WEB": "var(--radius-full)"
+      },
+      "css": "--fip-radius-full",
+      "file": "src/ui/tokens/radius/radiusTokens.css",
+      "unit": "px"
+    },
+    {
+      "id": "VariableID:18:51",
+      "name": "radius/lg",
+      "collectionId": "VariableCollectionId:17:4",
+      "type": "FLOAT",
+      "values": {
+        "17:3": 9
+      },
+      "scopes": [
+        "CORNER_RADIUS"
+      ],
+      "codeSyntax": {
+        "WEB": "var(--radius-lg)"
+      },
+      "css": "--fip-radius-lg",
+      "file": "src/ui/tokens/radius/radiusTokens.css",
+      "unit": "px"
+    },
+    {
+      "id": "VariableID:18:50",
+      "name": "radius/md",
+      "collectionId": "VariableCollectionId:17:4",
+      "type": "FLOAT",
+      "values": {
+        "17:3": 7
+      },
+      "scopes": [
+        "CORNER_RADIUS"
+      ],
+      "codeSyntax": {
+        "WEB": "var(--radius-md)"
+      },
+      "css": "--fip-radius-md",
+      "file": "src/ui/tokens/radius/radiusTokens.css",
+      "unit": "px"
+    },
+    {
+      "id": "VariableID:248:1710",
+      "name": "radius/menu",
+      "collectionId": "VariableCollectionId:17:4",
+      "type": "FLOAT",
+      "values": {
+        "17:3": 11
+      },
+      "scopes": [
+        "CORNER_RADIUS"
+      ],
+      "codeSyntax": {
+        "WEB": "var(--ui-menu-radius)"
+      },
+      "css": "--fip-radius-menu",
+      "file": "src/ui/tokens/radius/radiusTokens.css",
+      "unit": "px"
+    },
+    {
+      "id": "VariableID:18:49",
+      "name": "radius/sm",
+      "collectionId": "VariableCollectionId:17:4",
+      "type": "FLOAT",
+      "values": {
+        "17:3": 5
+      },
+      "scopes": [
+        "CORNER_RADIUS"
+      ],
+      "codeSyntax": {
+        "WEB": "var(--radius-sm)"
+      },
+      "css": "--fip-radius-sm",
+      "file": "src/ui/tokens/radius/radiusTokens.css",
+      "unit": "px"
+    },
+    {
+      "id": "VariableID:198:600",
+      "name": "segmented/container-padding",
+      "collectionId": "VariableCollectionId:46:2",
+      "type": "FLOAT",
+      "values": {
+        "46:0": 2,
+        "46:1": 3,
+        "46:2": 4
+      },
+      "scopes": [
+        "GAP"
+      ],
+      "codeSyntax": {
+        "WEB": "var(--segmented-control-padding)"
+      },
+      "css": "--fip-segmented-container-padding",
+      "file": "src/ui/tokens/spacing/spacingTokens.css",
+      "unit": "px"
+    },
+    {
+      "id": "VariableID:213:1133",
+      "name": "segmented/item-height",
+      "collectionId": "VariableCollectionId:46:2",
+      "type": "FLOAT",
+      "values": {
+        "46:0": 28,
+        "46:1": 34,
+        "46:2": 40
+      },
+      "scopes": [
+        "WIDTH_HEIGHT"
+      ],
+      "codeSyntax": {
+        "WEB": "var(--segmented-item-height)"
+      },
+      "css": "--fip-segmented-item-height",
+      "file": "src/ui/tokens/size/sizeTokens.css",
+      "unit": "px"
+    },
+    {
+      "id": "VariableID:198:599",
+      "name": "segmented/item-min-width",
+      "collectionId": "VariableCollectionId:17:4",
+      "type": "FLOAT",
+      "values": {
+        "17:3": 72
+      },
+      "scopes": [
+        "WIDTH_HEIGHT"
+      ],
+      "codeSyntax": {
+        "WEB": "var(--segmented-item-min-width)"
+      },
+      "css": "--fip-segmented-item-min-width",
+      "file": "src/ui/tokens/size/sizeTokens.css",
+      "unit": "px"
+    },
+    {
+      "id": "VariableID:204:611",
+      "name": "segmented/item-padding-x",
+      "collectionId": "VariableCollectionId:46:2",
+      "type": "FLOAT",
+      "values": {
+        "46:0": 8,
+        "46:1": 12,
+        "46:2": 14
+      },
+      "scopes": [
+        "GAP"
+      ],
+      "codeSyntax": {
+        "WEB": "var(--segmented-item-padding-x)"
+      },
+      "css": "--fip-segmented-item-padding-x",
+      "file": "src/ui/tokens/spacing/spacingTokens.css",
+      "unit": "px"
+    },
+    {
+      "id": "VariableID:336:6503",
+      "name": "skeleton/block-height-compact",
+      "collectionId": "VariableCollectionId:17:4",
+      "type": "FLOAT",
+      "values": {
+        "17:3": 48
+      },
+      "scopes": [
+        "WIDTH_HEIGHT"
+      ],
+      "codeSyntax": {
+        "WEB": "var(--ui-skeleton-block-height-compact)"
+      },
+      "css": "--fip-skeleton-block-height-compact",
+      "file": "src/ui/tokens/size/sizeTokens.css",
+      "unit": "px"
+    },
+    {
+      "id": "VariableID:336:6504",
+      "name": "skeleton/block-height-default",
+      "collectionId": "VariableCollectionId:17:4",
+      "type": "FLOAT",
+      "values": {
+        "17:3": 72
+      },
+      "scopes": [
+        "WIDTH_HEIGHT"
+      ],
+      "codeSyntax": {
+        "WEB": "var(--ui-skeleton-block-height-default)"
+      },
+      "css": "--fip-skeleton-block-height-default",
+      "file": "src/ui/tokens/size/sizeTokens.css",
+      "unit": "px"
+    },
+    {
+      "id": "VariableID:336:6501",
+      "name": "skeleton/text-height-compact",
+      "collectionId": "VariableCollectionId:17:4",
+      "type": "FLOAT",
+      "values": {
+        "17:3": 8
+      },
+      "scopes": [
+        "WIDTH_HEIGHT"
+      ],
+      "codeSyntax": {
+        "WEB": "var(--ui-skeleton-text-height-compact)"
+      },
+      "css": "--fip-skeleton-text-height-compact",
+      "file": "src/ui/tokens/size/sizeTokens.css",
+      "unit": "px"
+    },
+    {
+      "id": "VariableID:336:6502",
+      "name": "skeleton/text-height-default",
+      "collectionId": "VariableCollectionId:17:4",
+      "type": "FLOAT",
+      "values": {
+        "17:3": 12
+      },
+      "scopes": [
+        "WIDTH_HEIGHT"
+      ],
+      "codeSyntax": {
+        "WEB": "var(--ui-skeleton-text-height-default)"
+      },
+      "css": "--fip-skeleton-text-height-default",
+      "file": "src/ui/tokens/size/sizeTokens.css",
+      "unit": "px"
+    },
+    {
+      "id": "VariableID:18:43",
+      "name": "spacing/2xs",
+      "collectionId": "VariableCollectionId:17:4",
+      "type": "FLOAT",
+      "values": {
+        "17:3": 2
+      },
+      "scopes": [
+        "GAP"
+      ],
+      "codeSyntax": {
+        "WEB": "var(--space-2xs)"
+      },
+      "css": "--fip-spacing-2xs",
+      "file": "src/ui/tokens/spacing/spacingTokens.css",
+      "unit": "px"
+    },
+    {
+      "id": "VariableID:18:47",
+      "name": "spacing/lg",
+      "collectionId": "VariableCollectionId:17:4",
+      "type": "FLOAT",
+      "values": {
+        "17:3": 16
+      },
+      "scopes": [
+        "GAP"
+      ],
+      "codeSyntax": {
+        "WEB": "var(--space-lg)"
+      },
+      "css": "--fip-spacing-lg",
+      "file": "src/ui/tokens/spacing/spacingTokens.css",
+      "unit": "px"
+    },
+    {
+      "id": "VariableID:18:46",
+      "name": "spacing/md",
+      "collectionId": "VariableCollectionId:17:4",
+      "type": "FLOAT",
+      "values": {
+        "17:3": 12
+      },
+      "scopes": [
+        "GAP"
+      ],
+      "codeSyntax": {
+        "WEB": "var(--space-md)"
+      },
+      "css": "--fip-spacing-md",
+      "file": "src/ui/tokens/spacing/spacingTokens.css",
+      "unit": "px"
+    },
+    {
+      "id": "VariableID:18:45",
+      "name": "spacing/sm",
+      "collectionId": "VariableCollectionId:17:4",
+      "type": "FLOAT",
+      "values": {
+        "17:3": 8
+      },
+      "scopes": [
+        "GAP"
+      ],
+      "codeSyntax": {
+        "WEB": "var(--space-sm)"
+      },
+      "css": "--fip-spacing-sm",
+      "file": "src/ui/tokens/spacing/spacingTokens.css",
+      "unit": "px"
+    },
+    {
+      "id": "VariableID:18:48",
+      "name": "spacing/xl",
+      "collectionId": "VariableCollectionId:17:4",
+      "type": "FLOAT",
+      "values": {
+        "17:3": 20
+      },
+      "scopes": [
+        "GAP"
+      ],
+      "codeSyntax": {
+        "WEB": "var(--space-xl)"
+      },
+      "css": "--fip-spacing-xl",
+      "file": "src/ui/tokens/spacing/spacingTokens.css",
+      "unit": "px"
+    },
+    {
+      "id": "VariableID:18:44",
+      "name": "spacing/xs",
+      "collectionId": "VariableCollectionId:17:4",
+      "type": "FLOAT",
+      "values": {
+        "17:3": 4
+      },
+      "scopes": [
+        "GAP"
+      ],
+      "codeSyntax": {
+        "WEB": "var(--space-xs)"
+      },
+      "css": "--fip-spacing-xs",
+      "file": "src/ui/tokens/spacing/spacingTokens.css",
+      "unit": "px"
+    },
+    {
+      "id": "VariableID:18:29",
+      "name": "state/danger-dark",
+      "collectionId": "VariableCollectionId:17:2",
+      "type": "COLOR",
+      "values": {
+        "17:0": {
+          "r": 0.9450980424880981,
+          "g": 0.4745098054409027,
+          "b": 0.5098039507865906,
+          "a": 1
+        }
+      },
+      "scopes": [],
+      "codeSyntax": {
+        "WEB": "var(--primitive-state-danger-dark)"
+      },
+      "css": "--fip-primitive-state-danger-dark",
+      "file": "src/ui/tokens/color/colorTokens.css"
+    },
+    {
+      "id": "VariableID:97:4",
+      "name": "state/danger-dark-hover",
+      "collectionId": "VariableCollectionId:17:2",
+      "type": "COLOR",
+      "values": {
+        "17:0": {
+          "r": 1,
+          "g": 0.572549045085907,
+          "b": 0.6039215922355652,
+          "a": 1
+        }
+      },
+      "scopes": [],
+      "codeSyntax": {
+        "WEB": "var(--primitive-state-danger-dark-hover)"
+      },
+      "css": "--fip-primitive-state-danger-dark-hover",
+      "file": "src/ui/tokens/color/colorTokens.css"
+    },
+    {
+      "id": "VariableID:97:5",
+      "name": "state/danger-dark-pressed",
+      "collectionId": "VariableCollectionId:17:2",
+      "type": "COLOR",
+      "values": {
+        "17:0": {
+          "r": 0.8470588326454163,
+          "g": 0.3921568691730499,
+          "b": 0.4313725531101227,
+          "a": 1
+        }
+      },
+      "scopes": [],
+      "codeSyntax": {
+        "WEB": "var(--primitive-state-danger-dark-pressed)"
+      },
+      "css": "--fip-primitive-state-danger-dark-pressed",
+      "file": "src/ui/tokens/color/colorTokens.css"
+    },
+    {
+      "id": "VariableID:18:30",
+      "name": "state/danger-light",
+      "collectionId": "VariableCollectionId:17:2",
+      "type": "COLOR",
+      "values": {
+        "17:0": {
+          "r": 0.7843137383460999,
+          "g": 0.3019607961177826,
+          "b": 0.3490196168422699,
+          "a": 1
+        }
+      },
+      "scopes": [],
+      "codeSyntax": {
+        "WEB": "var(--primitive-state-danger-light)"
+      },
+      "css": "--fip-primitive-state-danger-light",
+      "file": "src/ui/tokens/color/colorTokens.css"
+    },
+    {
+      "id": "VariableID:97:2",
+      "name": "state/danger-light-hover",
+      "collectionId": "VariableCollectionId:17:2",
+      "type": "COLOR",
+      "values": {
+        "17:0": {
+          "r": 0.7019608020782471,
+          "g": 0.24705882370471954,
+          "b": 0.29411765933036804,
+          "a": 1
+        }
+      },
+      "scopes": [],
+      "codeSyntax": {
+        "WEB": "var(--primitive-state-danger-light-hover)"
+      },
+      "css": "--fip-primitive-state-danger-light-hover",
+      "file": "src/ui/tokens/color/colorTokens.css"
+    },
+    {
+      "id": "VariableID:97:3",
+      "name": "state/danger-light-pressed",
+      "collectionId": "VariableCollectionId:17:2",
+      "type": "COLOR",
+      "values": {
+        "17:0": {
+          "r": 0.5882353186607361,
+          "g": 0.20392157137393951,
+          "b": 0.24705882370471954,
+          "a": 1
+        }
+      },
+      "scopes": [],
+      "codeSyntax": {
+        "WEB": "var(--primitive-state-danger-light-pressed)"
+      },
+      "css": "--fip-primitive-state-danger-light-pressed",
+      "file": "src/ui/tokens/color/colorTokens.css"
+    },
+    {
+      "id": "VariableID:18:25",
+      "name": "state/success-dark",
+      "collectionId": "VariableCollectionId:17:2",
+      "type": "COLOR",
+      "values": {
+        "17:0": {
+          "r": 0.3450980484485626,
+          "g": 0.8117647171020508,
+          "b": 0.6509804129600525,
+          "a": 1
+        }
+      },
+      "scopes": [],
+      "codeSyntax": {
+        "WEB": "var(--primitive-state-success-dark)"
+      },
+      "css": "--fip-primitive-state-success-dark",
+      "file": "src/ui/tokens/color/colorTokens.css"
+    },
+    {
+      "id": "VariableID:18:26",
+      "name": "state/success-light",
+      "collectionId": "VariableCollectionId:17:2",
+      "type": "COLOR",
+      "values": {
+        "17:0": {
+          "r": 0.08627451211214066,
+          "g": 0.545098066329956,
+          "b": 0.4117647111415863,
+          "a": 1
+        }
+      },
+      "scopes": [],
+      "codeSyntax": {
+        "WEB": "var(--primitive-state-success-light)"
+      },
+      "css": "--fip-primitive-state-success-light",
+      "file": "src/ui/tokens/color/colorTokens.css"
+    },
+    {
+      "id": "VariableID:18:27",
+      "name": "state/warning-dark",
+      "collectionId": "VariableCollectionId:17:2",
+      "type": "COLOR",
+      "values": {
+        "17:0": {
+          "r": 0.9058823585510254,
+          "g": 0.7019608020782471,
+          "b": 0.3607843220233917,
+          "a": 1
+        }
+      },
+      "scopes": [],
+      "codeSyntax": {
+        "WEB": "var(--primitive-state-warning-dark)"
+      },
+      "css": "--fip-primitive-state-warning-dark",
+      "file": "src/ui/tokens/color/colorTokens.css"
+    },
+    {
+      "id": "VariableID:18:28",
+      "name": "state/warning-light",
+      "collectionId": "VariableCollectionId:17:2",
+      "type": "COLOR",
+      "values": {
+        "17:0": {
+          "r": 0.7176470756530762,
+          "g": 0.4745098054409027,
+          "b": 0.12156862765550613,
+          "a": 1
+        }
+      },
+      "scopes": [],
+      "codeSyntax": {
+        "WEB": "var(--primitive-state-warning-light)"
+      },
+      "css": "--fip-primitive-state-warning-light",
+      "file": "src/ui/tokens/color/colorTokens.css"
+    },
+    {
+      "id": "VariableID:178:567",
+      "name": "switch/min-width",
+      "collectionId": "VariableCollectionId:17:4",
+      "type": "FLOAT",
+      "values": {
+        "17:3": 120
+      },
+      "scopes": [
+        "WIDTH_HEIGHT"
+      ],
+      "codeSyntax": {
+        "WEB": "var(--switch-min-width)"
+      },
+      "css": "--fip-switch-min-width",
+      "file": "src/ui/tokens/size/sizeTokens.css",
+      "unit": "px"
+    },
+    {
+      "id": "VariableID:178:565",
+      "name": "switch/thumb-size",
+      "collectionId": "VariableCollectionId:17:4",
+      "type": "FLOAT",
+      "values": {
+        "17:3": 16
+      },
+      "scopes": [
+        "WIDTH_HEIGHT"
+      ],
+      "codeSyntax": {
+        "WEB": "var(--switch-thumb-size)"
+      },
+      "css": "--fip-switch-thumb-size",
+      "file": "src/ui/tokens/size/sizeTokens.css",
+      "unit": "px"
+    },
+    {
+      "id": "VariableID:178:564",
+      "name": "switch/track-height",
+      "collectionId": "VariableCollectionId:17:4",
+      "type": "FLOAT",
+      "values": {
+        "17:3": 20
+      },
+      "scopes": [
+        "WIDTH_HEIGHT"
+      ],
+      "codeSyntax": {
+        "WEB": "var(--switch-track-height)"
+      },
+      "css": "--fip-switch-track-height",
+      "file": "src/ui/tokens/size/sizeTokens.css",
+      "unit": "px"
+    },
+    {
+      "id": "VariableID:178:566",
+      "name": "switch/track-padding",
+      "collectionId": "VariableCollectionId:17:4",
+      "type": "FLOAT",
+      "values": {
+        "17:3": 2
+      },
+      "scopes": [
+        "GAP"
+      ],
+      "codeSyntax": {
+        "WEB": "var(--switch-track-padding)"
+      },
+      "css": "--fip-switch-track-padding",
+      "file": "src/ui/tokens/spacing/spacingTokens.css",
+      "unit": "px"
+    },
+    {
+      "id": "VariableID:178:563",
+      "name": "switch/track-width",
+      "collectionId": "VariableCollectionId:17:4",
+      "type": "FLOAT",
+      "values": {
+        "17:3": 36
+      },
+      "scopes": [
+        "WIDTH_HEIGHT"
+      ],
+      "codeSyntax": {
+        "WEB": "var(--switch-track-width)"
+      },
+      "css": "--fip-switch-track-width",
+      "file": "src/ui/tokens/size/sizeTokens.css",
+      "unit": "px"
+    },
+    {
+      "id": "VariableID:198:597",
+      "name": "tabs/close-hit-area",
+      "collectionId": "VariableCollectionId:17:4",
+      "type": "FLOAT",
+      "values": {
+        "17:3": 24
+      },
+      "scopes": [
+        "WIDTH_HEIGHT"
+      ],
+      "codeSyntax": {
+        "WEB": "var(--tabs-close-hit-area)"
+      },
+      "css": "--fip-tabs-close-hit-area",
+      "file": "src/ui/tokens/size/sizeTokens.css",
+      "unit": "px"
+    },
+    {
+      "id": "VariableID:198:598",
+      "name": "tabs/indicator-height",
+      "collectionId": "VariableCollectionId:17:4",
+      "type": "FLOAT",
+      "values": {
+        "17:3": 2
+      },
+      "scopes": [
+        "WIDTH_HEIGHT"
+      ],
+      "codeSyntax": {
+        "WEB": "var(--tabs-indicator-height)"
+      },
+      "css": "--fip-tabs-indicator-height",
+      "file": "src/ui/tokens/size/sizeTokens.css",
+      "unit": "px"
+    },
+    {
+      "id": "VariableID:198:596",
+      "name": "tabs/item-max-width",
+      "collectionId": "VariableCollectionId:17:4",
+      "type": "FLOAT",
+      "values": {
+        "17:3": 200
+      },
+      "scopes": [
+        "WIDTH_HEIGHT"
+      ],
+      "codeSyntax": {
+        "WEB": "var(--tabs-item-max-width)"
+      },
+      "css": "--fip-tabs-item-max-width",
+      "file": "src/ui/tokens/size/sizeTokens.css",
+      "unit": "px"
+    },
+    {
+      "id": "VariableID:198:595",
+      "name": "tabs/item-min-width",
+      "collectionId": "VariableCollectionId:17:4",
+      "type": "FLOAT",
+      "values": {
+        "17:3": 88
+      },
+      "scopes": [
+        "WIDTH_HEIGHT"
+      ],
+      "codeSyntax": {
+        "WEB": "var(--tabs-item-min-width)"
+      },
+      "css": "--fip-tabs-item-min-width",
+      "file": "src/ui/tokens/size/sizeTokens.css",
+      "unit": "px"
+    },
+    {
+      "id": "VariableID:204:610",
+      "name": "tabs/item-padding-x",
+      "collectionId": "VariableCollectionId:17:4",
+      "type": "FLOAT",
+      "values": {
+        "17:3": 10
+      },
+      "scopes": [
+        "GAP"
+      ],
+      "codeSyntax": {
+        "WEB": "var(--tabs-item-padding-x)"
+      },
+      "css": "--fip-tabs-item-padding-x",
+      "file": "src/ui/tokens/spacing/spacingTokens.css",
+      "unit": "px"
+    }
+  ],
+  "texts": [
+    {
+      "id": "S:3012363595789a839d0ee109b716e0c4536379ac,",
+      "name": "FIP/Page Title",
+      "fontName": {
+        "family": "Inter",
+        "style": "Semi Bold",
+        "variationSettings": {
+          "wght": 600,
+          "slnt": 0
+        }
+      },
+      "fontSize": 21,
+      "lineHeight": {
+        "unit": "PIXELS",
+        "value": 28
+      },
+      "letterSpacing": {
+        "unit": "PIXELS",
+        "value": -0.20000000298023224
+      },
+      "paragraphSpacing": 0,
+      "textCase": "ORIGINAL",
+      "textDecoration": "NONE",
+      "css": "--fip-type-page-title"
+    },
+    {
+      "id": "S:4b8de0087f79e20f330cd91443d5f15418321f03,",
+      "name": "FIP/Section Title",
+      "fontName": {
+        "family": "Inter",
+        "style": "Semi Bold",
+        "variationSettings": {
+          "wght": 600,
+          "slnt": 0
+        }
+      },
+      "fontSize": 14,
+      "lineHeight": {
+        "unit": "PIXELS",
+        "value": 20
+      },
+      "letterSpacing": {
+        "unit": "PIXELS",
+        "value": 0
+      },
+      "paragraphSpacing": 0,
+      "textCase": "ORIGINAL",
+      "textDecoration": "NONE",
+      "css": "--fip-type-section-title"
+    },
+    {
+      "id": "S:e42f4ca507f3390ba7f7f6bdd398326d9e852b0c,",
+      "name": "FIP/Body",
+      "fontName": {
+        "family": "Inter",
+        "style": "Regular",
+        "variationSettings": {
+          "wght": 400,
+          "slnt": 0
+        }
+      },
+      "fontSize": 12,
+      "lineHeight": {
+        "unit": "PIXELS",
+        "value": 18
+      },
+      "letterSpacing": {
+        "unit": "PIXELS",
+        "value": 0
+      },
+      "paragraphSpacing": 0,
+      "textCase": "ORIGINAL",
+      "textDecoration": "NONE",
+      "css": "--fip-type-body"
+    },
+    {
+      "id": "S:ab482e4d95dd96f35cd1432ca125e12c429792f0,",
+      "name": "FIP/Label",
+      "fontName": {
+        "family": "Inter",
+        "style": "Medium",
+        "variationSettings": {
+          "wght": 500,
+          "slnt": 0
+        }
+      },
+      "fontSize": 11,
+      "lineHeight": {
+        "unit": "PIXELS",
+        "value": 16
+      },
+      "letterSpacing": {
+        "unit": "PIXELS",
+        "value": 0.10000000149011612
+      },
+      "paragraphSpacing": 0,
+      "textCase": "ORIGINAL",
+      "textDecoration": "NONE",
+      "css": "--fip-type-label"
+    },
+    {
+      "id": "S:65dd4049a4f15081d87e10e9d84ccbe271755357,",
+      "name": "FIP/Caption",
+      "fontName": {
+        "family": "Inter",
+        "style": "Medium",
+        "variationSettings": {
+          "wght": 500,
+          "slnt": 0
+        }
+      },
+      "fontSize": 10,
+      "lineHeight": {
+        "unit": "PIXELS",
+        "value": 14
+      },
+      "letterSpacing": {
+        "unit": "PIXELS",
+        "value": 0.20000000298023224
+      },
+      "paragraphSpacing": 0,
+      "textCase": "ORIGINAL",
+      "textDecoration": "NONE",
+      "css": "--fip-type-caption"
+    },
+    {
+      "id": "S:b1aec1946253febd06f32d41e2ed98c30ab2a110,",
+      "name": "FIP/Data/Metric",
+      "fontName": {
+        "family": "Inter",
+        "style": "Semi Bold",
+        "variationSettings": {
+          "wght": 600,
+          "slnt": 0
+        }
+      },
+      "fontSize": 20,
+      "lineHeight": {
+        "unit": "PIXELS",
+        "value": 24
+      },
+      "letterSpacing": {
+        "unit": "PIXELS",
+        "value": -0.20000000298023224
+      },
+      "paragraphSpacing": 0,
+      "textCase": "ORIGINAL",
+      "textDecoration": "NONE",
+      "css": "--fip-type-data-metric"
+    },
+    {
+      "id": "S:2c5079f86251cec2cdeaf53b4a7c7ddf5e6beadd,",
+      "name": "FIP/Data/Value",
+      "fontName": {
+        "family": "Inter",
+        "style": "Medium",
+        "variationSettings": {
+          "wght": 500,
+          "slnt": 0
+        }
+      },
+      "fontSize": 12,
+      "lineHeight": {
+        "unit": "PIXELS",
+        "value": 16
+      },
+      "letterSpacing": {
+        "unit": "PIXELS",
+        "value": 0
+      },
+      "paragraphSpacing": 0,
+      "textCase": "ORIGINAL",
+      "textDecoration": "NONE",
+      "css": "--fip-type-data-value"
+    },
+    {
+      "id": "S:d57c2965cadbb03f04eddb40b216f03a250392c0,",
+      "name": "FIP/Data/Table",
+      "fontName": {
+        "family": "Inter",
+        "style": "Regular",
+        "variationSettings": {
+          "wght": 400,
+          "slnt": 0
+        }
+      },
+      "fontSize": 11,
+      "lineHeight": {
+        "unit": "PIXELS",
+        "value": 16
+      },
+      "letterSpacing": {
+        "unit": "PIXELS",
+        "value": 0
+      },
+      "paragraphSpacing": 0,
+      "textCase": "ORIGINAL",
+      "textDecoration": "NONE",
+      "css": "--fip-type-data-table"
+    },
+    {
+      "id": "S:4c3672e04e1d45f7dadb92be7160b3e97aed588a,",
+      "name": "FIP/Technical/Code",
+      "fontName": {
+        "family": "Cascadia Mono",
+        "style": "Regular",
+        "variationSettings": {
+          "wght": 400
+        }
+      },
+      "fontSize": 11,
+      "lineHeight": {
+        "unit": "PIXELS",
+        "value": 17
+      },
+      "letterSpacing": {
+        "unit": "PIXELS",
+        "value": 0
+      },
+      "paragraphSpacing": 0,
+      "textCase": "ORIGINAL",
+      "textDecoration": "NONE",
+      "css": "--fip-type-technical-code"
+    },
+    {
+      "id": "S:5520710a58f884a71af9c4f22d9528eba93ea39f,",
+      "name": "FIP/Technical/Label",
+      "fontName": {
+        "family": "Cascadia Mono",
+        "style": "SemiBold",
+        "variationSettings": {
+          "wght": 600
+        }
+      },
+      "fontSize": 10,
+      "lineHeight": {
+        "unit": "PIXELS",
+        "value": 14
+      },
+      "letterSpacing": {
+        "unit": "PIXELS",
+        "value": 0.10000000149011612
+      },
+      "paragraphSpacing": 0,
+      "textCase": "ORIGINAL",
+      "textDecoration": "NONE",
+      "css": "--fip-type-technical-label"
+    },
+    {
+      "id": "S:386d11f4c1c0e5813bada13beaa045ff0ade7243,",
+      "name": "FIP/Avatar/Compact",
+      "fontName": {
+        "family": "Inter",
+        "style": "Extra Bold",
+        "variationSettings": {
+          "wght": 800,
+          "slnt": 0
+        }
+      },
+      "fontSize": 11,
+      "lineHeight": {
+        "unit": "PIXELS",
+        "value": 16
+      },
+      "letterSpacing": {
+        "unit": "PERCENT",
+        "value": 0
+      },
+      "paragraphSpacing": 0,
+      "textCase": "ORIGINAL",
+      "textDecoration": "NONE",
+      "css": "--fip-type-avatar-compact"
+    },
+    {
+      "id": "S:b9ab74a387faa7ce28e554b6cbed537d7cb4c3db,",
+      "name": "FIP/Avatar/Default",
+      "fontName": {
+        "family": "Inter",
+        "style": "Extra Bold",
+        "variationSettings": {
+          "wght": 800,
+          "slnt": 0
+        }
+      },
+      "fontSize": 12,
+      "lineHeight": {
+        "unit": "PIXELS",
+        "value": 16
+      },
+      "letterSpacing": {
+        "unit": "PERCENT",
+        "value": 0
+      },
+      "paragraphSpacing": 0,
+      "textCase": "ORIGINAL",
+      "textDecoration": "NONE",
+      "css": "--fip-type-avatar-default"
+    },
+    {
+      "id": "S:4e9838d4825a7a1c835b908453f91fd56bd1aaac,",
+      "name": "FIP/Avatar/Large",
+      "fontName": {
+        "family": "Inter",
+        "style": "Black",
+        "variationSettings": {
+          "wght": 900,
+          "slnt": 0
+        }
+      },
+      "fontSize": 22,
+      "lineHeight": {
+        "unit": "PIXELS",
+        "value": 28
+      },
+      "letterSpacing": {
+        "unit": "PERCENT",
+        "value": 0
+      },
+      "paragraphSpacing": 0,
+      "textCase": "ORIGINAL",
+      "textDecoration": "NONE",
+      "css": "--fip-type-avatar-large"
+    }
+  ],
+  "effects": [
+    {
+      "id": "S:dfc687196b7ffc49fb0a7b42374b860a70568240,",
+      "name": "FIP/Elevation/Subtle/Light",
+      "effects": [
+        {
+          "type": "DROP_SHADOW",
+          "visible": true,
+          "radius": 2,
+          "boundVariables": {},
+          "color": {
+            "r": 0,
+            "g": 0,
+            "b": 0,
+            "a": 0.05000000074505806
+          },
+          "offset": {
+            "x": 0,
+            "y": 1
+          },
+          "spread": 0,
+          "blendMode": "NORMAL",
+          "showShadowBehindNode": true
+        }
+      ],
+      "css": "--fip-elevation-subtle-light"
+    },
+    {
+      "id": "S:8a40d505ac4f46d2a2c1bfd7c7dafe4b64ef28b9,",
+      "name": "FIP/Elevation/Float/Light",
+      "effects": [
+        {
+          "type": "DROP_SHADOW",
+          "visible": true,
+          "radius": 24,
+          "boundVariables": {},
+          "color": {
+            "r": 0,
+            "g": 0,
+            "b": 0,
+            "a": 0.11999999731779099
+          },
+          "offset": {
+            "x": 0,
+            "y": 8
+          },
+          "spread": -4,
+          "blendMode": "NORMAL",
+          "showShadowBehindNode": true
+        },
+        {
+          "type": "DROP_SHADOW",
+          "visible": true,
+          "radius": 6,
+          "boundVariables": {},
+          "color": {
+            "r": 0,
+            "g": 0,
+            "b": 0,
+            "a": 0.05999999865889549
+          },
+          "offset": {
+            "x": 0,
+            "y": 2
+          },
+          "spread": -1,
+          "blendMode": "NORMAL",
+          "showShadowBehindNode": true
+        }
+      ],
+      "css": "--fip-elevation-float-light"
+    },
+    {
+      "id": "S:6a5a20e1940dd0144f1dbe6a58fbe76e313c4fdb,",
+      "name": "FIP/Elevation/Subtle/Dark",
+      "effects": [
+        {
+          "type": "DROP_SHADOW",
+          "visible": true,
+          "radius": 2,
+          "boundVariables": {},
+          "color": {
+            "r": 0,
+            "g": 0,
+            "b": 0,
+            "a": 0.3499999940395355
+          },
+          "offset": {
+            "x": 0,
+            "y": 1
+          },
+          "spread": 0,
+          "blendMode": "NORMAL",
+          "showShadowBehindNode": true
+        }
+      ],
+      "css": "--fip-elevation-subtle-dark"
+    },
+    {
+      "id": "S:1735951a9727acd88eb1e7ef0e9290c95a71b735,",
+      "name": "FIP/Elevation/Float/Dark",
+      "effects": [
+        {
+          "type": "DROP_SHADOW",
+          "visible": true,
+          "radius": 28,
+          "boundVariables": {},
+          "color": {
+            "r": 0,
+            "g": 0,
+            "b": 0,
+            "a": 0.44999998807907104
+          },
+          "offset": {
+            "x": 0,
+            "y": 10
+          },
+          "spread": -5,
+          "blendMode": "NORMAL",
+          "showShadowBehindNode": true
+        },
+        {
+          "type": "DROP_SHADOW",
+          "visible": true,
+          "radius": 8,
+          "boundVariables": {},
+          "color": {
+            "r": 0,
+            "g": 0,
+            "b": 0,
+            "a": 0.25
+          },
+          "offset": {
+            "x": 0,
+            "y": 2
+          },
+          "spread": -1,
+          "blendMode": "NORMAL",
+          "showShadowBehindNode": true
+        }
+      ],
+      "css": "--fip-elevation-float-dark"
+    },
+    {
+      "id": "S:f3fdd50cae221eac265bed3e9ad85427784b3563,",
+      "name": "FIP/Elevation/Dialog/Light",
+      "effects": [
+        {
+          "type": "DROP_SHADOW",
+          "visible": true,
+          "radius": 24,
+          "boundVariables": {},
+          "color": {
+            "r": 0.13333334028720856,
+            "g": 0.19607843458652496,
+            "b": 0.2823529541492462,
+            "a": 0.04500000178813934
+          },
+          "offset": {
+            "x": 0,
+            "y": 10
+          },
+          "spread": 0,
+          "blendMode": "NORMAL",
+          "showShadowBehindNode": false
+        }
+      ],
+      "css": "--fip-elevation-dialog-light"
+    },
+    {
+      "id": "S:3d867eeafb12e9a6ff85a325e7e4a76eb487dd32,",
+      "name": "FIP/Elevation/Dialog/Dark",
+      "effects": [
+        {
+          "type": "DROP_SHADOW",
+          "visible": true,
+          "radius": 28,
+          "boundVariables": {},
+          "color": {
+            "r": 0,
+            "g": 0,
+            "b": 0,
+            "a": 0.25999999046325684
+          },
+          "offset": {
+            "x": 0,
+            "y": 12
+          },
+          "spread": 0,
+          "blendMode": "NORMAL",
+          "showShadowBehindNode": true
+        }
+      ],
+      "css": "--fip-elevation-dialog-dark"
+    }
+  ],
+  "implementationContracts": {
+    "motion": {
+      "progressDurationMs": 1200,
+      "progressEasing": "ease-in-out",
+      "progressIterations": "infinite",
+      "progressDirection": "alternate",
+      "reducedMotion": "none",
+      "source": "src/app/shell/content-region/contentRegion.css@98dc43e"
+    },
+    "layers": {
+      "topbar": 1,
+      "progress": 2,
+      "feedback": 80,
+      "modal": "native dialog top layer",
+      "source": [
+        "src/app/shell/topbar/topbar.css@98dc43e",
+        "src/app/shell/content-region/contentRegion.css@98dc43e",
+        "src/app/warnings/warning-center/warningCenter.css@98dc43e"
+      ]
+    },
+    "breakpoints": {
+      "shellMinWidth": 960,
+      "shellMinHeight": 600,
+      "legacyMaxWidths": [
+        1280,
+        980,
+        760,
+        560
+      ],
+      "legacyLargeDesktopWidth": 1680,
+      "legacyLargeDesktopHeight": 900,
+      "source": [
+        "src/app/shell/application-shell/applicationShell.css@98dc43e",
+        "contracts/global-visual-system-contract.json@98dc43e"
+      ],
+      "note": "Runtime compatibility constraints; not invented Figma variables. CSS custom properties cannot be used in native media query conditions."
+    }
+  },
+  "mappingPolicy": "FIP-prefixed names preserve the existing Shell API and isolate accepted Figma foundations from legacy Feature CSS. Original WEB codeSyntax is retained as provenance, not used to overwrite legacy selectors. JSON is read-only extraction evidence; CSS files are the sole runtime definitions."
+}

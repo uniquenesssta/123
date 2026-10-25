@@ -1,6 +1,10 @@
 # R12-09 Files、Storage、Diagnostics、Clipboard 与 Timing
 
-状态：`VERIFYING`。基线`c16f2c07419b5f637f0e2694e983360ff7c31747`；唯一分支`rewrite/r12-frontend-foundation-ui-system`。用户2026-10-25授权“08ci已通过 开始09”。01～08 DONE，10～19 BLOCKED，不轮询CI，不开始10。
+状态：`DONE`。本节点精确`98dc43e`的Windows结果和产物已核验，10按用户本次授权另行实施。以下保留09实施时事实。
+
+## 09 Windows验收收尾（2026-10-25）
+
+09精确提交`98dc43eef5c34fcf7d15bb6201290a710b6f0a37`的[Windows run40145377194](https://github.com/uniquenesssta/123/actions/runs/40145377194)、job121025458733、attempt1全部SUCCESS。2026-10-25交接时一次性核对head/分支、全部步骤、完整308,815字符job日志与下载产物，没有轮询。artifact12580543223未过期，ZIP15,883,914字节，SHA-256 `dec87ab81e3410641b600ef7ff3dbff845ec3ba9f3ce38101f3033d2adc48132`与API摘要及上传日志一致。91步骤前端、25项Platform/24项Transport、1,104项Shell/工作区、136项告警及17视口、Rust fmt/Clippy/workspace tests、release/MSI/NSIS、真实启动与日志通过。报告`windows-acceptance-20261025-000735.json`为startup PASS：7条有效记录、0无效行和运行错误；会话`48cd1943-b96a-44e2-aae8-f69fdaea7be8`内bootstrap/read_workspace_state/save_workspace_state三组trace开始/完成逐项配对。MSI8,384,512字节、NSIS5,915,087字节；ZIP在仓库上一级`R12-09-windows-evidence.zip`。startup不替代Windows Full/真实PG最终验收，原待验继续保留。
 
 ## 前置核验与范围
 
@@ -46,7 +50,7 @@
 
 ## 待验、限制与回退
 
-09自身Rust Clippy/workspace tests、Windows release/MSI/NSIS、实际启动和日志配对待本节点提交后原CI验证；08通过不算09通过。实际OS文件对话框/剪贴板权限和业务导入导出完整链路需Windows交互环境核验，注入native边界测试不算真实OS交互PASS。真实PG/XLSX/历史保护四项/不可变账本并发回滚/Windows Full/私有P4/P7固定回归沿已有最终封包新库安排保留待验。
+09原安排的Rust Clippy/workspace tests、Windows release/MSI/NSIS、实际启动和日志配对已由自身精确CI通过，见上方收尾。实际OS文件对话框/剪贴板权限和业务导入导出完整链路需Windows交互环境核验，注入native边界测试不算真实OS交互PASS。真实PG/XLSX/历史保护四项/不可变账本并发回滚/Windows Full/私有P4/P7固定回归沿已有最终封包新库安排保留待验。
 
 回退点c16f2c0；用受控Git回退本节点。原偏好未转换格式，无新增持久Schema。原Vite主chunk超500kB提示保持。10尚未开始。
 

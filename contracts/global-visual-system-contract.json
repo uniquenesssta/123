@@ -127,7 +127,7 @@
     "principle": "slightly-larger-on-2k-without-losing-density"
   },
   "shell_style_entries": [
-    "src/ui/tokens/dimensions.css",
+    "src/ui/tokens/index.css",
     "src/app/shell/application-shell/applicationShell.css",
     "src/app/shell/sidebar/sidebar.css",
     "src/app/shell/topbar/topbar.css",

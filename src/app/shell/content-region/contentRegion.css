@@ -1,6 +1,6 @@
 .application-shell .page-container { flex: 1 1 0; width: 100%; max-width: none; min-width: 0; min-height: 0; margin: 0; padding: 16px; overflow: auto; overscroll-behavior: contain; }
-.application-shell .page-load-progress { position: absolute; left: 0; right: 0; top: var(--fip-topbar-height); height: 2px; margin: 0; border-radius: 999px; overflow: hidden; background: var(--fip-accent-soft); pointer-events: none; z-index: 2; }
-.application-shell .page-load-progress::after { content: ""; position: absolute; left: 0; width: 37.5%; height: 100%; border-radius: inherit; background: var(--fip-accent); animation: shell-progress 1.2s ease-in-out infinite alternate; }
+.application-shell .page-load-progress { position: absolute; left: 0; right: 0; top: var(--fip-topbar-height); height: 2px; margin: 0; border-radius: 999px; overflow: hidden; background: var(--fip-accent-soft); pointer-events: none; z-index: var(--fip-layer-progress); }
+.application-shell .page-load-progress::after { content: ""; position: absolute; left: 0; width: 37.5%; height: 100%; border-radius: inherit; background: var(--fip-accent); animation: shell-progress var(--fip-motion-progress-duration) var(--fip-motion-progress-easing) var(--fip-motion-progress-iterations) var(--fip-motion-progress-direction); }
 .application-shell .main-content.workspace-panel-open > .page-container { display: none !important; }
 .application-shell .main-content.workspace-panel-open > .workspace-panel-root { display: block; flex: 1 1 0; height: auto; min-height: 0; padding: 16px; overflow: hidden; }
 @keyframes shell-progress { to { transform: translateX(166.6667%); } }

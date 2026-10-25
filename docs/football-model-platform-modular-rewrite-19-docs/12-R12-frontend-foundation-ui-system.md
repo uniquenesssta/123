@@ -7,7 +7,7 @@
 
 ## 当前前置状态（2026-10-25）
 
-`IN_PROGRESS`。01～08 DONE；08精确c16f2c0/run40137847917的全部步骤、产物摘要和启动日志核对通过。用户2026-10-25授权“08ci已通过 开始09”，09 Files/Storage/Diagnostics/Clipboard/Timing已实施，正在VERIFYING，10～19 BLOCKED。沿唯一rewrite/r12-frontend-foundation-ui-system。09自身Windows待提交后独立验收；不轮询CI。详[09记录](../modular-rewrite/R12-frontend-foundation-ui-system/R12-09-files-storage-diagnostics-clipboard-and-timing.md)。
+`IN_PROGRESS`。01～09 DONE；09精确98dc43e/run40145377194的全部步骤、产物摘要和启动日志核对通过。用户2026-10-25授权“收尾09开始10”，10 Design Tokens已实施VERIFYING；11～19 BLOCKED。沿唯一rewrite/r12-frontend-foundation-ui-system。10自身Windows待提交后独立验收；不轮询CI。详[10记录](../modular-rewrite/R12-frontend-foundation-ui-system/R12-10-design-tokens.md)。
 
 ## 1. 阶段目标
 
@@ -270,7 +270,7 @@ app/shell/content-region/
 
 ### R12-10 Design Tokens
 
-05已在唯一目标目录先落地Shell必需的颜色/尺寸子集，详05记录；本节点仍BLOCKED，后续在同一实现补齐，不另建token副本。
+05已在唯一目标目录先落地Shell必需的颜色/尺寸子集，详05记录；本节点当前VERIFYING，已在同一实现补齐，不另建token副本。
 
 分别建立颜色、字体、间距、尺寸、圆角、边框、阴影、动效、层级和断点 token。禁止在 feature CSS 中新增无法解释的魔法值。
 
@@ -1458,7 +1458,7 @@ src/platform/tauri/commandName.ts
 
 ## R12-09 Files、Storage、Diagnostics、Clipboard 与 Timing
 
-状态：`VERIFYING`（08自身精确Windows证据核验通过，09已按用户授权实施；自身Windows待验）
+状态：`DONE`（09自身精确98dc43e/run40145377194及产物/启动日志通过）
 
 ### 1. 目标
 
@@ -1596,7 +1596,7 @@ src/platform/timing/
 
 ## R12-10 Design Tokens
 
-状态：`BLOCKED`（仅当上一任务与本任务前置门禁通过后改为 `READY`）
+状态：`VERIFYING`（09自身精确Windows证据核验通过，10已按用户授权实施；自身Windows待验）
 
 ### 1. 目标
 

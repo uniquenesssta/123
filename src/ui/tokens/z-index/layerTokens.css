@@ -1,0 +1,7 @@
+/* R12-10 FIP z-index; shared design snapshot 2026-10-25. See R12-10-figma-tokens.json. */
+:root {
+  --fip-layer-topbar: 1;
+  --fip-layer-progress: 2;
+  --fip-layer-feedback: 80;
+}
+/* Native modal dialogs remain in the browser top layer; no z-index pretends to replace it. */

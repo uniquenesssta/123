@@ -1,0 +1,35 @@
+/* R12-10 FIP border; shared design snapshot 2026-10-25. See R12-10-figma-tokens.json. */
+:root {
+  --fip-icon-stroke: 1.75px; /* VariableID:18:42 icon/stroke */
+}
+
+:root, [data-fip-icon-scale="24"] {
+  --fip-icon-scale-stroke: 1.75px; /* VariableID:35:5 icon/stroke */
+}
+
+[data-fip-icon-scale="20"] {
+  --fip-icon-scale-stroke: 1.5px; /* VariableID:35:5 icon/stroke */
+}
+
+[data-fip-icon-scale="16"] {
+  --fip-icon-scale-stroke: 1.25px; /* VariableID:35:5 icon/stroke */
+}
+
+:root, [data-fip-control-scale="32"] {
+  --fip-control-focus-stroke: 2px; /* VariableID:55:35 control/focus-stroke */
+  --fip-control-stroke: 1px; /* VariableID:46:11 control/stroke */
+}
+
+[data-fip-control-scale="40"] {
+  --fip-control-focus-stroke: 2px; /* VariableID:55:35 control/focus-stroke */
+  --fip-control-stroke: 1px; /* VariableID:46:11 control/stroke */
+}
+
+[data-fip-control-scale="48"] {
+  --fip-control-focus-stroke: 2px; /* VariableID:55:35 control/focus-stroke */
+  --fip-control-stroke: 1px; /* VariableID:46:11 control/stroke */
+}
+
+:root, [data-fip-control-scale] {
+  --fip-border-width: var(--fip-control-stroke);
+}

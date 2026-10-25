@@ -7,12 +7,12 @@
   min-height: 0;
   min-width: 0;
   height: 100%;
-  border-right: 1px solid var(--fip-border);
+  border-right: var(--fip-border-width) solid var(--fip-border);
   box-shadow: none;
 }
 .application-shell .primary-rail { grid-column: 1; width: var(--shell-primary-rail-width); padding: 0; background: var(--fip-surface); }
 .application-shell .primary-brand { flex: 0 0 44px; height: 44px; display: grid; place-items: center; margin: 0; border: 0; }
-.application-shell .primary-brand > span { display: grid; place-items: center; width: 32px; height: 32px; border-radius: var(--fip-radius-md); background: var(--fip-accent-soft); color: var(--fip-strong); font-size: 11px; font-weight: 500; line-height: 16px; letter-spacing: .1px; }
+.application-shell .primary-brand > span { display: grid; place-items: center; width: 32px; height: 32px; border-radius: var(--fip-radius-md); background: var(--fip-accent-soft); color: var(--fip-strong); font-size: var(--fip-type-label-size); font-weight: var(--fip-type-label-weight); line-height: var(--fip-type-label-line-height); letter-spacing: var(--fip-type-label-letter-spacing); }
 .application-shell .primary-navigation { display: flex; flex-direction: column; flex-shrink: 0; gap: var(--fip-space-xs); padding: 8px 3px 4px 4px; overflow: hidden; }
 .application-shell .primary-nav-item,
 .application-shell .primary-theme-control {
@@ -21,17 +21,17 @@
   background: transparent; color: var(--fip-text); box-shadow: none; transform: none; transition: none;
 }
 .application-shell .primary-nav-item b,
-.application-shell .primary-theme-control b { display: block; width: 100%; max-width: none; overflow: hidden; font-size: 10px; font-weight: 500; line-height: 14px; letter-spacing: .2px; white-space: nowrap; text-overflow: ellipsis; color: inherit; }
+.application-shell .primary-theme-control b { display: block; width: 100%; max-width: none; overflow: hidden; font-size: var(--fip-type-caption-size); font-weight: var(--fip-type-label-weight); line-height: var(--fip-type-caption-line-height); letter-spacing: var(--fip-type-caption-letter-spacing); white-space: nowrap; text-overflow: ellipsis; color: inherit; }
 .application-shell .primary-theme-footer { flex-shrink: 0; padding: 8px 3px 8px 4px; }
 .application-shell .primary-rail-spacer,
 .application-shell .secondary-sidebar-spacer { flex: 1 1 auto; min-height: 0; }
 .application-shell .secondary-sidebar { grid-column: 2; width: var(--shell-secondary-sidebar-width); overflow: hidden; padding: 0; background: var(--fip-canvas); }
 .application-shell .secondary-sidebar-header { display: flex; flex: 0 0 44px; align-items: center; gap: 4px; width: 100%; min-width: 0; min-height: 44px; height: 44px; padding: 0 8px; border: 0; }
-.application-shell .secondary-sidebar-header > span { flex: 1; min-width: 0; overflow: hidden; font-size: 14px; font-weight: 600; line-height: 20px; color: var(--fip-strong); white-space: nowrap; text-overflow: ellipsis; }
-.application-shell .secondary-module-description { flex-shrink: 0; margin: 0; padding: 8px; font-size: 10px; font-weight: 500; line-height: 14px; letter-spacing: .2px; color: var(--fip-text); }
+.application-shell .secondary-sidebar-header > span { flex: 1; min-width: 0; overflow: hidden; font-size: var(--fip-type-section-title-size); font-weight: var(--fip-type-section-title-weight); line-height: var(--fip-type-section-title-line-height); color: var(--fip-strong); white-space: nowrap; text-overflow: ellipsis; }
+.application-shell .secondary-module-description { flex-shrink: 0; margin: 0; padding: 8px; font-size: var(--fip-type-caption-size); font-weight: var(--fip-type-label-weight); line-height: var(--fip-type-caption-line-height); letter-spacing: var(--fip-type-caption-letter-spacing); color: var(--fip-text); }
 .application-shell .secondary-navigation { display: flex; flex-direction: column; flex: 0 1 auto; min-width: 0; min-height: 0; gap: 4px; padding: 0 7px 0 8px; overflow-y: auto; overscroll-behavior: contain; }
 .application-shell .secondary-nav-item { position: relative; display: flex; flex: 0 0 40px; align-items: center; gap: 8px; width: 138px; min-height: 40px; height: 40px; padding: 8px; border: 0; border-radius: var(--fip-radius-md); color: var(--fip-text); background: transparent; box-shadow: none; transform: none; transition: none; text-align: left; }
-.application-shell .secondary-nav-item b { min-width: 0; overflow: hidden; font-size: 11px; font-weight: 500; line-height: 16px; letter-spacing: .1px; white-space: nowrap; text-overflow: ellipsis; }
+.application-shell .secondary-nav-item b { min-width: 0; overflow: hidden; font-size: var(--fip-type-label-size); font-weight: var(--fip-type-label-weight); line-height: var(--fip-type-label-line-height); letter-spacing: var(--fip-type-label-letter-spacing); white-space: nowrap; text-overflow: ellipsis; }
 .application-shell .primary-nav-item:hover:not(:disabled),
 .application-shell .primary-theme-control:hover:not(:disabled),
 .application-shell .secondary-nav-item:hover:not(:disabled) { background: var(--fip-subtle); }
@@ -51,5 +51,5 @@
 .application-shell .secondary-nav-item:focus-visible { outline: 1px solid var(--fip-accent); outline-offset: -1px; }
 .application-shell .primary-nav-item:disabled,
 .application-shell .secondary-nav-item:disabled { opacity: var(--fip-disabled-opacity); }
-.application-shell .secondary-sidebar-footer { display: flex; flex-direction: column; flex-shrink: 0; align-items: flex-start; min-width: 0; gap: 8px; padding: 8px; border-top: 1px solid var(--fip-border); background: transparent; }
-.application-shell .secondary-sidebar-footer small { margin: 0; font-size: 10px; font-weight: 500; line-height: 14px; letter-spacing: .2px; color: var(--fip-text); }
+.application-shell .secondary-sidebar-footer { display: flex; flex-direction: column; flex-shrink: 0; align-items: flex-start; min-width: 0; gap: 8px; padding: 8px; border-top: var(--fip-border-width) solid var(--fip-border); background: transparent; }
+.application-shell .secondary-sidebar-footer small { margin: 0; font-size: var(--fip-type-caption-size); font-weight: var(--fip-type-label-weight); line-height: var(--fip-type-caption-line-height); letter-spacing: var(--fip-type-caption-letter-spacing); color: var(--fip-text); }

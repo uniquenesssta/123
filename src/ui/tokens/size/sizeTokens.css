@@ -1,0 +1,105 @@
+/* R12-10 FIP size; shared design snapshot 2026-10-25. See R12-10-figma-tokens.json. */
+:root {
+  --fip-avatar-size-compact: 34px; /* VariableID:355:6753 avatar/size-compact */
+  --fip-avatar-size-default: 38px; /* VariableID:355:6754 avatar/size-default */
+  --fip-avatar-size-large: 54px; /* VariableID:355:6755 avatar/size-large */
+  --fip-disclosure-trigger-min-height: 34px; /* VariableID:318:5159 disclosure/trigger-min-height */
+  --fip-icon-grid: 24px; /* VariableID:18:37 icon/grid */
+  --fip-icon-optical-area: 20px; /* VariableID:18:38 icon/optical-area */
+  --fip-icon-size-lg: 24px; /* VariableID:18:41 icon/size/lg */
+  --fip-icon-size-md: 20px; /* VariableID:18:40 icon/size/md */
+  --fip-icon-size-sm: 16px; /* VariableID:18:39 icon/size/sm */
+  --fip-layout-dialog-header-min-height: 46px; /* VariableID:275:2212 layout/dialog/header-min-height */
+  --fip-layout-dialog-width-compact: 480px; /* VariableID:275:2210 layout/dialog/width-compact */
+  --fip-layout-dialog-width-wide: 640px; /* VariableID:275:2211 layout/dialog/width-wide */
+  --fip-layout-directory-width: 248px; /* VariableID:95:5 layout/directory/width */
+  --fip-layout-empty-state-min-height-compact: 54px; /* VariableID:336:6506 layout/empty-state/min-height-compact */
+  --fip-layout-empty-state-min-height-default: 72px; /* VariableID:336:6507 layout/empty-state/min-height-default */
+  --fip-layout-feedback-blocking-width: 480px; /* VariableID:297:3993 layout/feedback/blocking-width */
+  --fip-layout-feedback-toast-max-width: 380px; /* VariableID:297:3991 layout/feedback/toast-max-width */
+  --fip-layout-inspector-entity-width: 300px; /* VariableID:95:6 layout/inspector/entity-width */
+  --fip-layout-inspector-workspace-width: 360px; /* VariableID:95:7 layout/inspector/workspace-width */
+  --fip-layout-menu-width: 240px; /* VariableID:248:1705 layout/menu/width */
+  --fip-layout-nav-primary-width: 60px; /* VariableID:95:3 layout/nav/primary-width */
+  --fip-layout-nav-secondary-width: 154px; /* VariableID:95:4 layout/nav/secondary-width */
+  --fip-layout-pagination-control-height: 27px; /* VariableID:226:1092 layout/pagination/control-height */
+  --fip-layout-table-header-height: 34px; /* VariableID:226:1090 layout/table-header/height */
+  --fip-layout-table-row-height: 36px; /* VariableID:95:8 layout/table-row/height */
+  --fip-layout-task-activity-min-width: 140px; /* VariableID:297:3994 layout/task-activity/min-width */
+  --fip-layout-timeline-time-width: 64px; /* VariableID:424:16192 layout/timeline/time-width */
+  --fip-layout-topbar-height: 44px; /* VariableID:95:2 layout/topbar/height */
+  --fip-layout-workflow-rail-width: 320px; /* VariableID:424:16191 layout/workflow/rail-width */
+  --fip-progress-min-width: 120px; /* VariableID:336:6498 progress/min-width */
+  --fip-progress-track-height-compact: 2px; /* VariableID:336:6499 progress/track-height-compact */
+  --fip-progress-track-height-default: 4px; /* VariableID:336:6500 progress/track-height-default */
+  --fip-segmented-item-min-width: 72px; /* VariableID:198:599 segmented/item-min-width */
+  --fip-skeleton-block-height-compact: 48px; /* VariableID:336:6503 skeleton/block-height-compact */
+  --fip-skeleton-block-height-default: 72px; /* VariableID:336:6504 skeleton/block-height-default */
+  --fip-skeleton-text-height-compact: 8px; /* VariableID:336:6501 skeleton/text-height-compact */
+  --fip-skeleton-text-height-default: 12px; /* VariableID:336:6502 skeleton/text-height-default */
+  --fip-switch-min-width: 120px; /* VariableID:178:567 switch/min-width */
+  --fip-switch-thumb-size: 16px; /* VariableID:178:565 switch/thumb-size */
+  --fip-switch-track-height: 20px; /* VariableID:178:564 switch/track-height */
+  --fip-switch-track-width: 36px; /* VariableID:178:563 switch/track-width */
+  --fip-tabs-close-hit-area: 24px; /* VariableID:198:597 tabs/close-hit-area */
+  --fip-tabs-indicator-height: 2px; /* VariableID:198:598 tabs/indicator-height */
+  --fip-tabs-item-max-width: 200px; /* VariableID:198:596 tabs/item-max-width */
+  --fip-tabs-item-min-width: 88px; /* VariableID:198:595 tabs/item-min-width */
+}
+
+:root, [data-fip-icon-scale="24"] {
+  --fip-icon-scale-optical-area: 20px; /* VariableID:35:4 icon/optical-area */
+  --fip-icon-scale-size: 24px; /* VariableID:35:3 icon/size */
+}
+
+[data-fip-icon-scale="20"] {
+  --fip-icon-scale-optical-area: 16.66670036px; /* VariableID:35:4 icon/optical-area */
+  --fip-icon-scale-size: 20px; /* VariableID:35:3 icon/size */
+}
+
+[data-fip-icon-scale="16"] {
+  --fip-icon-scale-optical-area: 13.33329964px; /* VariableID:35:4 icon/optical-area */
+  --fip-icon-scale-size: 16px; /* VariableID:35:3 icon/size */
+}
+
+:root, [data-fip-control-scale="32"] {
+  --fip-combobox-option-height: 32px; /* VariableID:161:514 combobox/option-height */
+  --fip-control-disabled-opacity: 0.41999999; /* VariableID:46:10 control/disabled-opacity */
+  --fip-control-font-size: 13px; /* VariableID:46:7 control/font-size */
+  --fip-control-height: 32px; /* VariableID:46:3 control/height */
+  --fip-control-icon-size: 16px; /* VariableID:46:9 control/icon-size */
+  --fip-control-line-height: 16px; /* VariableID:46:8 control/line-height */
+  --fip-segmented-item-height: 28px; /* VariableID:213:1133 segmented/item-height */
+}
+
+[data-fip-control-scale="40"] {
+  --fip-combobox-option-height: 36px; /* VariableID:161:514 combobox/option-height */
+  --fip-control-disabled-opacity: 0.41999999; /* VariableID:46:10 control/disabled-opacity */
+  --fip-control-font-size: 14px; /* VariableID:46:7 control/font-size */
+  --fip-control-height: 40px; /* VariableID:46:3 control/height */
+  --fip-control-icon-size: 16px; /* VariableID:46:9 control/icon-size */
+  --fip-control-line-height: 18px; /* VariableID:46:8 control/line-height */
+  --fip-segmented-item-height: 34px; /* VariableID:213:1133 segmented/item-height */
+}
+
+[data-fip-control-scale="48"] {
+  --fip-combobox-option-height: 40px; /* VariableID:161:514 combobox/option-height */
+  --fip-control-disabled-opacity: 0.41999999; /* VariableID:46:10 control/disabled-opacity */
+  --fip-control-font-size: 15px; /* VariableID:46:7 control/font-size */
+  --fip-control-height: 48px; /* VariableID:46:3 control/height */
+  --fip-control-icon-size: 20px; /* VariableID:46:9 control/icon-size */
+  --fip-control-line-height: 20px; /* VariableID:46:8 control/line-height */
+  --fip-segmented-item-height: 40px; /* VariableID:213:1133 segmented/item-height */
+}
+
+:root {
+  --shell-primary-rail-width: var(--fip-layout-nav-primary-width);
+  --shell-secondary-sidebar-width: var(--fip-layout-nav-secondary-width);
+  --shell-sidebar-expanded: calc(var(--shell-primary-rail-width) + var(--shell-secondary-sidebar-width));
+  --shell-sidebar-collapsed: var(--shell-primary-rail-width);
+  --fip-topbar-height: var(--fip-layout-topbar-height);
+}
+:root, [data-fip-control-scale] {
+  --fip-action-size: var(--fip-control-height);
+  --fip-disabled-opacity: var(--fip-control-disabled-opacity);
+}

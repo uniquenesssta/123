@@ -1,15 +1,15 @@
-.ui-confirmation-dialog { width: 480px; max-width: calc(100vw - 32px); max-height: calc(100dvh - 32px); margin: auto; padding: 0; overflow: auto; border: 1px solid var(--fip-border-strong); border-radius: 9px; background: var(--fip-surface); color: var(--fip-text); box-shadow: var(--fip-dialog-shadow); font-family: inherit; }
+.ui-confirmation-dialog { width: var(--fip-layout-dialog-width-compact); max-width: calc(100vw - 32px); max-height: calc(100dvh - 32px); margin: auto; padding: 0; overflow: auto; border: var(--fip-border-width) solid var(--fip-border-strong); border-radius: var(--fip-radius-lg); background: var(--fip-surface); color: var(--fip-text); box-shadow: var(--fip-dialog-shadow); font-family: inherit; }
 .ui-confirmation-dialog::backdrop { background: var(--fip-modal-overlay); }
-.confirmation-dialog-header { display: flex; align-items: center; gap: 8px; min-height: 46px; padding: 9px 12px; border-bottom: 1px solid var(--fip-border); }
+.confirmation-dialog-header { display: flex; align-items: center; gap: 8px; min-height: 46px; padding: 9px 12px; border-bottom: var(--fip-border-width) solid var(--fip-border); }
 .confirmation-dialog-header > .ui-icon-slot { color: var(--fip-danger); }
 .confirmation-dialog-header > div { display: flex; flex-direction: column; flex: 1; min-width: 0; gap: 2px; }
-.confirmation-dialog-header h2 { margin: 0; color: var(--fip-strong); font-size: 14px; font-weight: 600; line-height: 20px; overflow-wrap: anywhere; }
-.confirmation-dialog-header small { color: var(--fip-muted); font-size: 10px; font-weight: 500; line-height: 14px; letter-spacing: .2px; }
+.confirmation-dialog-header h2 { margin: 0; color: var(--fip-strong); font-size: var(--fip-type-section-title-size); font-weight: var(--fip-type-section-title-weight); line-height: var(--fip-type-section-title-line-height); overflow-wrap: anywhere; }
+.confirmation-dialog-header small { color: var(--fip-muted); font-size: var(--fip-type-caption-size); font-weight: var(--fip-type-label-weight); line-height: var(--fip-type-caption-line-height); letter-spacing: var(--fip-type-caption-letter-spacing); }
 .confirmation-dialog-body { display: flex; flex-direction: column; gap: 12px; padding: 11px 12px; }
-.confirmation-dialog-body p { margin: 0; font-size: 12px; font-weight: 400; line-height: 18px; overflow-wrap: anywhere; }
-.confirmation-dialog-facts { display: flex; flex-direction: column; gap: 8px; margin: 0; padding: 8px 12px; border: 1px solid var(--fip-border); border-radius: 5px; background: var(--fip-subtle); }
+.confirmation-dialog-body p { margin: 0; font-size: var(--fip-type-body-size); font-weight: var(--fip-type-body-weight); line-height: var(--fip-type-body-line-height); overflow-wrap: anywhere; }
+.confirmation-dialog-facts { display: flex; flex-direction: column; gap: 8px; margin: 0; padding: 8px 12px; border: var(--fip-border-width) solid var(--fip-border); border-radius: var(--fip-radius-sm); background: var(--fip-subtle); }
 .confirmation-dialog-facts > div { display: flex; align-items: flex-start; gap: 8px; }
-.confirmation-dialog-facts dt { flex: 0 0 100px; color: var(--fip-muted); font-size: 11px; font-weight: 500; line-height: 16px; letter-spacing: .1px; }
-.confirmation-dialog-facts dd { flex: 1; min-width: 0; margin: 0; color: var(--fip-strong); font-size: 12px; line-height: 18px; overflow-wrap: anywhere; }
-.confirmation-dialog-actions { display: flex; align-items: center; justify-content: flex-end; gap: 8px; padding: 8px 12px; border-top: 1px solid var(--fip-border); background: var(--fip-raised); }
+.confirmation-dialog-facts dt { flex: 0 0 100px; color: var(--fip-muted); font-size: var(--fip-type-label-size); font-weight: var(--fip-type-label-weight); line-height: var(--fip-type-label-line-height); letter-spacing: var(--fip-type-label-letter-spacing); }
+.confirmation-dialog-facts dd { flex: 1; min-width: 0; margin: 0; color: var(--fip-strong); font-size: var(--fip-type-body-size); line-height: var(--fip-type-body-line-height); overflow-wrap: anywhere; }
+.confirmation-dialog-actions { display: flex; align-items: center; justify-content: flex-end; gap: 8px; padding: 8px 12px; border-top: var(--fip-border-width) solid var(--fip-border); background: var(--fip-raised); }
 .confirmation-dialog-actions [autofocus]:focus { outline: 1px solid var(--fip-accent); outline-offset: -1px; }

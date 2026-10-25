@@ -1,0 +1,11 @@
+/* Sole FIP token entry. Category files own values; no feature selectors or state. */
+@import "./color/colorTokens.css";
+@import "./typography/typographyTokens.css";
+@import "./spacing/spacingTokens.css";
+@import "./size/sizeTokens.css";
+@import "./radius/radiusTokens.css";
+@import "./border/borderTokens.css";
+@import "./shadow/shadowTokens.css";
+@import "./motion/motionTokens.css";
+@import "./z-index/layerTokens.css";
+@import "./breakpoint/breakpointTokens.css";
