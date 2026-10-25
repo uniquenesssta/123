@@ -23,7 +23,7 @@ for (const message of ["请先在赛后复盘中完成至少一场正式结算",
 for (const selector of [".analysis-chain-map", ".analysis-chain-step", ".analysis-step-lock", ".analysis-step-guide"]) {
   requireTrue(styles.includes(selector), `分析链路缺少样式：${selector}`);
 }
-requireTrue(main.includes("ANALYSIS_PACKAGE_ID_KEY") && main.includes("localStorage.setItem(ANALYSIS_PACKAGE_ID_KEY"), "分析包链路状态未持久保存");
+requireTrue(main.includes("ANALYSIS_PACKAGE_ID_KEY") && main.includes("localPreferences.setItem(ANALYSIS_PACKAGE_ID_KEY"), "分析包链路状态未持久保存");
 
 if (failures.length) {
   console.error("分析与历史链路验证失败：");

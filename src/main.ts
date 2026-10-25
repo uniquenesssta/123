@@ -36,6 +36,9 @@ import { Router, NavigationContext, isRoute, type NavigationRequest } from "./ap
 import { ApplicationShellController, pageTitle, renderShell } from "./app/shell";
 import { WarningCenterController } from "./app/warnings";
 import { stopTauriTransport } from "./platform/tauri";
+import { localPreferences, sessionPreferences, preferenceKey } from "./platform/storage";
+import { clipboard } from "./platform/clipboard";
+import { DebouncedTask, RequestSequence } from "./platform/timing";
 import { WorkspaceCoordinator, type WorkspaceLayoutMode, type WorkspaceTabState } from "./app/workspace";
 import { matchReviewWorkflowAllows } from "./app/matchReviewWorkflow";
 import {
@@ -182,25 +185,13 @@ import type {
 const browserLifecycleController = new EventScope();
 const openAiExampleRequests = new AsyncScope();
 
-const DATABASE_RESET_COMPLETE_KEY = "football-model-platform.database-reset-complete";
-const ANALYSIS_PACKAGE_ID_KEY = "football-model-platform.last-analysis-package-id";
-const TEAM_QUERY_KEY = "football-model-platform.team-query";
-const PLAYER_QUERY_KEY = "football-model-platform.player-query";
-const PLAYER_NAV_CONTEXT_KEY = "football-model-platform.player-navigation-context";
-function readStoredObject<T>(key: string): Partial<T> | null {
-  try {
-    const raw = window.localStorage.getItem(key);
-    if (!raw) return null;
-    const value = JSON.parse(raw);
-    return value && typeof value === "object" && !Array.isArray(value) ? value as Partial<T> : null;
-  } catch {
-    try { window.localStorage.removeItem(key); } catch { /* Preference storage may be unavailable. */ }
-    return null;
-  }
-}
-
+const DATABASE_RESET_COMPLETE_KEY = preferenceKey("database-reset-complete");
+const ANALYSIS_PACKAGE_ID_KEY = preferenceKey("last-analysis-package-id");
+const TEAM_QUERY_KEY = preferenceKey("team-query");
+const PLAYER_QUERY_KEY = preferenceKey("player-query");
+const PLAYER_NAV_CONTEXT_KEY = preferenceKey("player-navigation-context");
 function initialTeamQuery(): TeamListQuery {
-  const stored = readStoredObject<TeamListQuery>(TEAM_QUERY_KEY);
+  const stored = localPreferences.readObject<TeamListQuery>(TEAM_QUERY_KEY);
   return {
     search: typeof stored?.search === "string" ? stored.search : null,
     country_code: typeof stored?.country_code === "string" ? stored.country_code : null,
@@ -213,7 +204,7 @@ function initialTeamQuery(): TeamListQuery {
 }
 
 function initialPlayerQuery(): PlayerListQuery {
-  const stored = readStoredObject<PlayerListQuery>(PLAYER_QUERY_KEY);
+  const stored = localPreferences.readObject<PlayerListQuery>(PLAYER_QUERY_KEY);
   return {
     search: typeof stored?.search === "string" ? stored.search : null,
     team_id: typeof stored?.team_id === "string" ? stored.team_id : null,
@@ -227,7 +218,7 @@ function initialPlayerQuery(): PlayerListQuery {
 }
 
 function readPlayerNavigationContext(): PlayerNavigationContext | null {
-  const stored = readStoredObject<PlayerNavigationContext>(PLAYER_NAV_CONTEXT_KEY);
+  const stored = localPreferences.readObject<PlayerNavigationContext>(PLAYER_NAV_CONTEXT_KEY);
   const source = stored?.source === "match_lineup" ? "match_lineup" : stored?.source === "team_roster" ? "team_roster" : null;
   if (!source || typeof stored?.team_id !== "string" || typeof stored.team_name !== "string") return null;
   const originPage = stored.origin_page === "lineups" ? "lineups" : "teams";
@@ -246,18 +237,18 @@ function readPlayerNavigationContext(): PlayerNavigationContext | null {
 
 function persistTeamQuery(): void {
   const { cursor_name: _cursorName, cursor_id: _cursorId, ...stable } = teamQuery;
-  window.localStorage.setItem(TEAM_QUERY_KEY, JSON.stringify(stable));
+  localPreferences.writeJson(TEAM_QUERY_KEY, stable);
 }
 
 function persistPlayerQuery(): void {
   const { cursor_name: _cursorName, cursor_id: _cursorId, ...stable } = playerQuery;
-  window.localStorage.setItem(PLAYER_QUERY_KEY, JSON.stringify(stable));
+  localPreferences.writeJson(PLAYER_QUERY_KEY, stable);
 }
 
 function setPlayerNavigationContext(context: PlayerNavigationContext | null): void {
   playerNavigationContext = context;
-  if (context) window.localStorage.setItem(PLAYER_NAV_CONTEXT_KEY, JSON.stringify(context));
-  else window.localStorage.removeItem(PLAYER_NAV_CONTEXT_KEY);
+  if (context) localPreferences.writeJson(PLAYER_NAV_CONTEXT_KEY, context);
+  else localPreferences.removeItem(PLAYER_NAV_CONTEXT_KEY);
 }
 
 function prepareDirectPlayerDirectoryEntry(): void {
@@ -339,11 +330,11 @@ let aiAnalysisResponsePreview: AiAnalysisResponsePreview | null = null;
 let aiAnalysisResponsePath: string | null = null;
 let aiAnalysisSuggestions: AiAnalysisSuggestionRecord[] = [];
 let analysisAbilityCandidates: AbilityUpdateCandidateRecord[] = [];
-let lastAiAnalysisPackageId: string | null = window.localStorage.getItem(ANALYSIS_PACKAGE_ID_KEY);
+let lastAiAnalysisPackageId: string | null = localPreferences.getItem(ANALYSIS_PACKAGE_ID_KEY);
 let pendingRulePackage: RulePackageDraft | null = null;
 let lineupPlayerCandidates: PlayerListItem[] = [];
 let lineupBuilderPlayers: LineupBuilderPlayer[] = [];
-let lineupPlayerLoadSequence = 0;
+const lineupPlayerLoadSequence = new RequestSequence();
 let lineupBuilderForm: LineupBuilderFormState = {
   match_id: "",
   team_id: "",
@@ -383,7 +374,7 @@ let pairedLineupBuilder: PairedLineupBuilderState = {
   home: emptyPairedLineupSide(),
   away: emptyPairedLineupSide(),
 };
-let pairedLineupLoadSequence: Record<LineupSide, number> = { home: 0, away: 0 };
+const pairedLineupLoadSequence: Record<LineupSide, RequestSequence> = { home: new RequestSequence(), away: new RequestSequence() };
 let selectedManagedMatchId: string | null = null;
 
 interface WorkflowContinuation {
@@ -401,7 +392,7 @@ let issueLogs: IssueLogEntry[] = [];
 let openAiProfiles: OpenAiProfilesState | null = null;
 let selectedOpenAiProfileId: string | null = null;
 let creatingOpenAiProfile = false;
-let openAiApiExampleTimer: number | null = null;
+const openAiApiExampleTimer = new DebouncedTask(browserLifecycleController);
 let openAiApiExampleLastParsed = "";
 let selectedP4MatchId: string | null = null;
 let selectedPredictionSnapshot: LineupSnapshotType = "T-N";
@@ -1443,10 +1434,10 @@ async function executeDatabaseReset(): Promise<void> {
   await runBusy(() => api.resetDatabase(confirmation));
   await workspaceState.clearAll();
   workspaceState.stop();
-  window.localStorage.removeItem(TEAM_QUERY_KEY);
-  window.localStorage.removeItem(PLAYER_QUERY_KEY);
-  window.localStorage.removeItem(PLAYER_NAV_CONTEXT_KEY);
-  window.sessionStorage.setItem(DATABASE_RESET_COMPLETE_KEY, "1");
+  localPreferences.removeItem(TEAM_QUERY_KEY);
+  localPreferences.removeItem(PLAYER_QUERY_KEY);
+  localPreferences.removeItem(PLAYER_NAV_CONTEXT_KEY);
+  sessionPreferences.setItem(DATABASE_RESET_COMPLETE_KEY, "1");
   window.location.reload();
 }
 
@@ -4254,8 +4245,8 @@ function resetPairedBuilderForMatch(matchId: string, preserveCommon = true): voi
   const defaultCaptured = localDateTimeInputValue(
     new Date(Math.min(now, kickoff - 1_000)).toISOString(),
   );
-  pairedLineupLoadSequence.home += 1;
-  pairedLineupLoadSequence.away += 1;
+  pairedLineupLoadSequence.home.invalidate();
+  pairedLineupLoadSequence.away.invalidate();
   pairedLineupBuilder = {
     match_id: match.id,
     lineup_type: preserveCommon ? pairedLineupBuilder.lineup_type : "expected",
@@ -4374,7 +4365,7 @@ function capturePairedLineupFromDom(): void {
 async function loadPairedLineupSide(side: LineupSide): Promise<number> {
   const current = pairedSide(side);
   if (!current.team_id) throw new Error(`${side === "home" ? "主队" : "客队"}尚未确定`);
-  const requestSequence = ++pairedLineupLoadSequence[side];
+  const requestSequence = pairedLineupLoadSequence[side].next();
   const teamId = current.team_id;
   const [result, presets] = await Promise.all([
     api.listPlayers({
@@ -4390,7 +4381,7 @@ async function loadPairedLineupSide(side: LineupSide): Promise<number> {
     api.listTeamLineupPresets(teamId, false),
   ]);
   if (
-    requestSequence !== pairedLineupLoadSequence[side] ||
+    !pairedLineupLoadSequence[side].isCurrent(requestSequence) ||
     pairedSide(side).team_id !== teamId
   ) {
     return 0;
@@ -5682,7 +5673,7 @@ function captureLineupBuilderFromDom(): void {
 }
 
 async function loadLineupPlayersForTeam(teamId: string): Promise<number> {
-  const requestSequence = ++lineupPlayerLoadSequence;
+  const requestSequence = lineupPlayerLoadSequence.next();
   const result = await api.listPlayers({
     search: null,
     team_id: teamId,
@@ -5694,7 +5685,7 @@ async function loadLineupPlayersForTeam(teamId: string): Promise<number> {
     cursor_id: null,
   });
   if (
-    requestSequence !== lineupPlayerLoadSequence ||
+    !lineupPlayerLoadSequence.isCurrent(requestSequence) ||
     lineupBuilderForm.team_id !== teamId
   ) {
     return 0;
@@ -6504,7 +6495,7 @@ async function exportAiAnalysisPackage(): Promise<void> {
   if (!outputPath) return;
   const summary = await runBusy(() => api.exportAiAnalysisPackage(outputPath));
   lastAiAnalysisPackageId = summary.package_id;
-  window.localStorage.setItem(ANALYSIS_PACKAGE_ID_KEY, summary.package_id);
+  localPreferences.setItem(ANALYSIS_PACKAGE_ID_KEY, summary.package_id);
   render();
   toast(
     `智能分析资料已导出，包含 ${summary.sample_size} 个评估样本`,
@@ -6726,10 +6717,7 @@ async function parseOpenAiApiExampleNow(): Promise<boolean> {
 
 function scheduleOpenAiApiExampleParse(): void {
   openAiExampleRequests.invalidate();
-  if (openAiApiExampleTimer !== null)
-    browserLifecycleController.clearTimeout(openAiApiExampleTimer);
-  openAiApiExampleTimer = browserLifecycleController.setTimeout(() => {
-    openAiApiExampleTimer = null;
+  openAiApiExampleTimer.schedule(() => {
     void parseOpenAiApiExampleNow();
   }, 320);
 }
@@ -6763,10 +6751,7 @@ async function saveOpenAiProfile(showSuccess = true): Promise<string> {
       .querySelector<HTMLTextAreaElement>("#openai-api-example")
       ?.value.trim() ?? "";
   if (example && example !== openAiApiExampleLastParsed) {
-    if (openAiApiExampleTimer !== null) {
-      browserLifecycleController.clearTimeout(openAiApiExampleTimer);
-      openAiApiExampleTimer = null;
-    }
+    openAiApiExampleTimer.cancel();
     const parsed = await parseOpenAiApiExampleNow();
     if (!parsed) throw new Error("API Example尚未通过解析，无法保存配置");
   }
@@ -7063,7 +7048,7 @@ async function handleAction(
         (item) => item.id === messageId,
       )?.content;
       if (!content) break;
-      await navigator.clipboard.writeText(content);
+      await clipboard.writeText(content);
       toast("AI 回答已复制", "success");
       break;
     }
@@ -8499,7 +8484,7 @@ document.addEventListener("change", (event) => {
     };
     lineupBuilderPlayers = [];
     lineupPlayerCandidates = [];
-    lineupPlayerLoadSequence += 1;
+    lineupPlayerLoadSequence.invalidate();
     const teamId = lineupBuilderForm.team_id;
     render();
     if (teamId) void autoLoadLineupPlayers(teamId);
@@ -8516,7 +8501,7 @@ document.addEventListener("change", (event) => {
     ) {
       lineupBuilderPlayers = [];
       lineupPlayerCandidates = [];
-      lineupPlayerLoadSequence += 1;
+      lineupPlayerLoadSequence.invalidate();
       const teamId = lineupBuilderForm.team_id;
       render();
       if (teamId) void autoLoadLineupPlayers(teamId);
@@ -8549,8 +8534,8 @@ async function initializeApplication(): Promise<void> {
   await session.start();
   if (browserLifecycleController.signal.aborted) return;
   render();
-  if (window.sessionStorage.getItem(DATABASE_RESET_COMPLETE_KEY) === "1") {
-    window.sessionStorage.removeItem(DATABASE_RESET_COMPLETE_KEY);
+  if (sessionPreferences.getItem(DATABASE_RESET_COMPLETE_KEY) === "1") {
+    sessionPreferences.removeItem(DATABASE_RESET_COMPLETE_KEY);
     toast("数据库已彻底清空并重建为空白状态", "success");
   }
 }
@@ -8628,10 +8613,10 @@ export function createBrowserApplicationModule(
     modal.reset();
     workflowNavigation.clear();
     workspaceState.stop();
-    lineupPlayerLoadSequence += 1;
-    pairedLineupLoadSequence.home += 1;
-    pairedLineupLoadSequence.away += 1;
-    openAiApiExampleTimer = null;
+    lineupPlayerLoadSequence.invalidate();
+    pairedLineupLoadSequence.home.invalidate();
+    pairedLineupLoadSequence.away.invalidate();
+    openAiApiExampleTimer.destroy();
   }
 
   return { name: "browser-application", start: () => lifecycle.start(), destroy: () => lifecycle.destroy(), stop: () => lifecycle.stop() };

@@ -56,6 +56,8 @@ const browser = resolveChromiumExecutable();
 if (!browser) throw new Error("未找到Chromium、Chrome或Edge，无法验证详情历史输入与滚动");
 const source = [
   read("src/components/format.ts"), read("src/app/router/routeHistory.ts"), modal,
+  read("src/platform/timing/requestSequence.ts"),
+  ...["storageKey", "preferenceStore"].map(name => read(`src/platform/storage/${name}.ts`)),
   ...["lifecycleError", "asyncScope", "mountHandle"].map(name => read(`src/app/lifecycle/${name}.ts`)),
   ...["sessionPersistence", "themeState", "bootstrapState", "appSessionState", "appSession"].map(name => read(`src/app/session/${name}.ts`)),
 ]

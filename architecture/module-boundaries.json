@@ -44,10 +44,32 @@
         "src/platform/tauri/invokeResponse.ts",
         "src/platform/tauri/invokeError.ts",
         "src/platform/tauri/invokeTrace.ts",
-        "src/platform/tauri/traceSummary.ts",
         "src/platform/tauri/cancellationRegistry.ts",
         "src/platform/tauri/commandName.ts"
       ]
+    },
+    "platform": {
+      "files": {
+        "owner": "src/platform/files/fileDialogAdapter.ts",
+        "public_entry": "src/platform/files/index.ts",
+        "external": "@tauri-apps/plugin-dialog"
+      },
+      "storage": {
+        "owner": "src/platform/storage/preferenceStore.ts",
+        "public_entry": "src/platform/storage/index.ts"
+      },
+      "diagnostics": {
+        "owner": "src/platform/diagnostics/logSummary.ts",
+        "public_entry": "src/platform/diagnostics/index.ts"
+      },
+      "clipboard": {
+        "owner": "src/platform/clipboard/clipboardAdapter.ts",
+        "public_entry": "src/platform/clipboard/index.ts"
+      },
+      "timing": {
+        "owner": "src/platform/timing/debouncedTask.ts",
+        "public_entry": "src/platform/timing/index.ts"
+      }
     },
     "shared": {
       "app": "src/app",

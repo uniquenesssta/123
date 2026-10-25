@@ -1,4 +1,5 @@
 import { LifecycleError } from "./lifecycleError";
+import { RequestSequence } from "../../platform/timing";
 
 export interface AsyncRequest {
   readonly id: number;
@@ -10,7 +11,7 @@ export interface AsyncRequest {
 
 /** One latest-wins channel; separate owners must use separate scopes. */
 export class AsyncScope {
-  private sequence = 0;
+  private readonly sequence = new RequestSequence();
   private active: AbortController | null = null;
   private closed = false;
 
@@ -18,7 +19,7 @@ export class AsyncScope {
     if (this.closed) throw new LifecycleError();
     const previous = this.active;
     const controller = new AbortController();
-    const id = ++this.sequence;
+    const id = this.sequence.next();
     this.active = controller;
     previous?.abort();
     const isCurrent = () => !this.closed && this.active === controller && !controller.signal.aborted;

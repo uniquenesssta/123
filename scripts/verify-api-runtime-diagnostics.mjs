@@ -2,10 +2,12 @@ import { readFileSync } from "node:fs";
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { isVersionAtLeast } from "./version.mjs";
+import { verifyPlatformBehavior } from "./platform/verifyPlatformBehavior.mjs";
 import { verifyTransportBehavior } from "./tauri/verifyTransportBehavior.mjs";
 import { readTransportSources } from "./tauri/transportSources.mjs";
 const root = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const failures = [];
+try { await verifyPlatformBehavior(root); } catch (error) { failures.push(`R12-09 Platform: ${error.stack ?? error}`); }
 try { await verifyTransportBehavior(root); } catch (error) { failures.push(`R12-08 Transport: ${error.stack ?? error}`); }
 const assert = (condition, message) => { if (!condition) failures.push(message); };
 const text = (path) => readFileSync(join(root, path), "utf8");

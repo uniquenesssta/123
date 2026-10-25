@@ -1,4 +1,5 @@
 import { EventScope } from "../../../app/lifecycle";
+import { monotonicTime } from "../../../platform/timing";
 import { toastView, type ToastPresentation } from "./toastView";
 
 export interface TimedToast extends ToastPresentation { readonly id: number; readonly autoDismiss: boolean; }
@@ -59,13 +60,13 @@ export class ToastController {
   private clearTimer(): void { if (this.timer !== null) this.events.clearTimeout(this.timer); this.timer = null; }
   private pause(): void {
     if (this.timer === null) return;
-    this.remaining = Math.max(0, this.remaining - (performance.now() - this.scheduledAt));
+    this.remaining = Math.max(0, this.remaining - (monotonicTime() - this.scheduledAt));
     this.clearTimer();
   }
   private resume(): void {
     if (this.events.signal.aborted || this.timer !== null || this.hovered || this.focused || this.identity === null || !this.autoDismiss) return;
     const identity = this.identity;
-    this.scheduledAt = performance.now();
+    this.scheduledAt = monotonicTime();
     this.timer = this.events.setTimeout(() => { this.timer = null; this.remaining = 0; this.dismiss(identity); }, this.remaining);
   }
   destroy(): void { this.events.destroy(); this.timer = null; this.identity = null; this.host.replaceChildren(); this.announce.textContent = ""; }

@@ -10,5 +10,7 @@ export function readTransportSources(root) {
   for (const file of entries) {
     if (file !== "src/api/client.ts" && !/^src\/platform\/tauri\/[A-Za-z]+\.ts$/.test(file)) throw new Error(`Invalid transport source: ${file}`);
   }
-  return entries.map(file => ({ file, text: readFileSync(resolve(root, file), "utf8").replaceAll("\r\n", "\n") }));
+  const diagnosticOwner = contract.frontend.platform?.diagnostics?.owner;
+  if (diagnosticOwner !== "src/platform/diagnostics/logSummary.ts") throw new Error("Missing platform diagnostics owner");
+  return [...entries, diagnosticOwner].map(file => ({ file, text: readFileSync(resolve(root, file), "utf8").replaceAll("\r\n", "\n") }));
 }

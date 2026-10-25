@@ -26,6 +26,32 @@
   },
   "states": [
     {
+      "id": "browser.debounce",
+      "owner": "src/platform/timing/debouncedTask.ts::DebouncedTask",
+      "scope": "one caller-owned timer; existing EventScope owns native timer release",
+      "writers": [
+        "DebouncedTask methods"
+      ],
+      "forbidden": [
+        "src/pages/**",
+        "src/api/**"
+      ],
+      "transition": null
+    },
+    {
+      "id": "browser.request-sequence",
+      "owner": "src/platform/timing/requestSequence.ts::RequestSequence",
+      "scope": "per caller and channel; no global shared sequence",
+      "writers": [
+        "RequestSequence methods"
+      ],
+      "forbidden": [
+        "src/pages/**",
+        "src/api/**"
+      ],
+      "transition": null
+    },
+    {
       "id": "browser.invoke-requests",
       "owner": "src/platform/tauri/cancellationRegistry.ts::CancellationRegistry",
       "scope": "browser application transport; pending native result leases and AbortSignal registrations",
@@ -162,10 +188,10 @@
     },
     {
       "id": "browser.local-preferences",
-      "owner": "src/main.ts localStorage keys",
-      "scope": "browser-profile",
+      "owner": "src/platform/storage/preferenceStore.ts::PreferenceStore",
+      "scope": "browser-profile; application callers own preference keys and domain normalization",
       "writers": [
-        "src/main.ts"
+        "PreferenceStore methods via main and SessionPersistence"
       ],
       "forbidden": [
         "src/pages/**",
@@ -396,6 +422,6 @@
       "transition": null
     }
   ],
-  "count": 29,
+  "count": 31,
   "last_updated_task": "R3-02"
 }

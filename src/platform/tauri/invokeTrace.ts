@@ -1,7 +1,8 @@
 import type { IssueLogDraft } from "../../types";
 import type { CommandName } from "./commandName";
 import { invokeErrorMessage } from "./invokeError";
-import { summarizeLogValue, redactLogText } from "./traceSummary";
+import { summarizeLogValue, redactLogText } from "../diagnostics";
+import { wallTime, monotonicTime } from "../timing";
 import { summarizeResult } from "./invokeResponse";
 
 export type RuntimeOperationPhase = "started" | "completed" | "failed" | "ui_action" | "navigation" | "diagnostic";
@@ -9,7 +10,7 @@ interface RuntimeOperationDraft { phase: RuntimeOperationPhase; operation: strin
 export interface TraceAdapter { runtime(draft: Record<string, unknown>): Promise<unknown>; issue(draft: IssueLogDraft): Promise<unknown> }
 
 export function createTraceId(prefix: string): string {
-  const random = typeof crypto !== "undefined" && typeof crypto.randomUUID === "function" ? crypto.randomUUID() : `${Date.now()}-${Math.random().toString(16).slice(2)}`;
+  const random = typeof crypto !== "undefined" && typeof crypto.randomUUID === "function" ? crypto.randomUUID() : `${wallTime()}-${Math.random().toString(16).slice(2)}`;
   return `${prefix}-${random}`;
 }
 
@@ -45,7 +46,7 @@ export class InvokeTrace {
 class InvokeTraceLifecycle {
   private terminal = false;
   private queue = Promise.resolve();
-  private readonly startedAt = performance.now();
+  private readonly startedAt = monotonicTime();
   constructor(private readonly trace: InvokeTrace, private readonly command: CommandName, private readonly id: string) {}
   started(args?: Record<string, unknown>): Promise<void> { return this.write("started", { args: args ?? null }); }
   completed(result: unknown): Promise<void> { return this.end("completed", { result: summarizeResult(result) }); }
@@ -56,7 +57,7 @@ class InvokeTraceLifecycle {
     return this.write(phase, context);
   }
   private write(phase: "started" | "completed" | "failed", context: unknown): Promise<void> {
-    const durationMs = phase === "started" ? null : Math.max(0, Math.round(performance.now() - this.startedAt));
+    const durationMs = phase === "started" ? null : Math.max(0, Math.round(monotonicTime() - this.startedAt));
     this.queue = this.queue.then(() => this.trace.record({ phase, operation: this.command, traceId: this.id, durationMs, context }));
     return this.queue;
   }

@@ -1,8 +1,12 @@
 # 足球模型平台公开外壳
 
-## R12-08 Tauri Transport（2026-10-25，VERIFYING）
+## R12-09 Platform 能力（2026-10-25，VERIFYING）
 
-07自身Windows验收已核对并收尾。08将Tauri命令调用、错误、追踪、响应和本地取消收敛到唯一`platform/tauri`；171个命令及原API方法签名/参数/返回保持，退出先完成工作区保存再停止请求。24项生产模块测试与命令/类型门禁通过；91步骤完整前端、1,104项Shell/工作区、136项告警与17截图通过，自身Windows待验，09～19 BLOCKED。详[08记录](docs/modular-rewrite/R12-frontend-foundation-ui-system/R12-08-tauri-transport.md)。
+08自身Windows验收、产物摘要和启动日志已核对收尾。09将原生文件选择、偏好存储、有界脱敏摘要、剪贴板、时钟/防抖/请求序列迁入各自平台目录，接通原调用方，保留存储键/格式、对话框选项和业务命令。新增25项生产平台行为检查，91步骤完整前端回归通过；09自身Windows待验，10～19 BLOCKED。详[09记录](docs/modular-rewrite/R12-frontend-foundation-ui-system/R12-09-files-storage-diagnostics-clipboard-and-timing.md)。
+
+## R12-08 Tauri Transport（2026-10-25，DONE）
+
+07自身Windows验收已核对并收尾。08将Tauri命令调用、错误、追踪、响应和本地取消收敛到唯一`platform/tauri`；171个命令及原API方法签名/参数/返回保持，退出先完成工作区保存再停止请求。24项生产模块测试与命令/类型门禁通过；91步骤完整前端、1,104项Shell/工作区、136项告警与17截图通过，自身精确c16f2c0/run40137847917的Windows、产物与启动日志核对通过，09按本次用户授权实施。详[08记录](docs/modular-rewrite/R12-frontend-foundation-ui-system/R12-08-tauri-transport.md)。
 
 ## R12-07 Workspace（2026-10-25，DONE）
 

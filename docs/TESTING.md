@@ -1,8 +1,12 @@
 # Testing
 
-## R12-08 Tauri Transport（2026-10-25，VERIFYING）
+## R12-09 Platform（2026-10-25，VERIFYING）
 
-沿原运行诊断入口增加24项生产Transport测试，检查请求/响应、错误、追踪、取消、迟到结果、监听清理及原API门面；两套原命令检查器追随实际owner，171命令和冻结契约不变，SDK导入收紧为唯一adapter。91步骤完整前端、1,104项Shell/工作区、136项告警与17截图通过；08自身Windows CI待提交后独立核验，不轮询。详[08记录](modular-rewrite/R12-frontend-foundation-ui-system/R12-08-tauri-transport.md)。
+复用原运行诊断入口，新增25项生产模块检查：九种原API文件对话框、目录/取消/错误、偏好键/旧格式/损坏/拒绝/配额、显式版本迁移及失败保留、脱敏/有界/循环/getter、剪贴板权限与Unicode、时钟、防抖/停止/重入和独立请求序列。原Transport24项及类型、完整架构与Rust fmt已通过，91步骤完整前端、1,104项Shell/工作区、136项告警及17视口通过；首次受限浏览器启动exit13，原告警浏览器在授权运行环境136项复查通过，没有改阈值或跳过步骤。09自身Windows待提交后独立验证，不轮询。详[09记录](modular-rewrite/R12-frontend-foundation-ui-system/R12-09-files-storage-diagnostics-clipboard-and-timing.md)。
+
+## R12-08 Tauri Transport（2026-10-25，DONE）
+
+沿原运行诊断入口增加24项生产Transport测试，检查请求/响应、错误、追踪、取消、迟到结果、监听清理及原API门面；两套原命令检查器追随实际owner，171命令和冻结契约不变，SDK导入收紧为唯一adapter。91步骤完整前端、1,104项Shell/工作区、136项告警与17截图通过；08自身精确c16f2c0/run40137847917的Windows CI、下载产物摘要和startup日志已独立核验通过，不轮询。详[08记录](modular-rewrite/R12-frontend-foundation-ui-system/R12-08-tauri-transport.md)。
 
 ## R12-07 Workspace（2026-10-25，DONE）
 

@@ -44,6 +44,7 @@ if (!browser) throw new Error("未找到 Chromium、Chrome 或 Edge，无法验�
 
 // Execute the actual extracted dependencies in the existing browser fixture, not a second implementation.
 const source = [
+  ...["requestSequence", "debouncedTask"].map(name => read(`src/platform/timing/${name}.ts`)),
   ...["lifecycleError", "eventScope", "asyncScope"].map(name => read(`src/app/lifecycle/${name}.ts`)),
   ...["workspaceVersion", "workspaceState", "workspacePersistence", "workspaceRecovery", "workspaceCoordinator"].map(name => read(`src/app/workspace/${name}.ts`)),
 ].join("\n").replace(/^import\s+.*?from\s+["'][^"']+["'];?\s*$/gm, "").replaceAll("export ", "");

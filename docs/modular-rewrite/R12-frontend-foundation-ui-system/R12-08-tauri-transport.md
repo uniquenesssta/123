@@ -1,6 +1,10 @@
 # R12-08 Tauri Transport
 
-状态：`VERIFYING`。2026-10-25用户授权“07通过，开始08”。07精确b0b26d6/run40134011943及全部步骤、完整日志、产物摘要与startup报告已独立核验，详[07收尾](R12-07-workspace.md)。本节点基线`b0b26d6bbe8c99041eb284bc1811fd48ed7fbcfe`，沿唯一`rewrite/r12-frontend-foundation-ui-system`。09～19 BLOCKED，R12整体IN_PROGRESS；08自身Windows待提交后独立验收，不轮询。
+状态：`DONE`。本节点精确`c16f2c0`的Windows结果与产物已核验，09按用户本次授权另行实施。以下保留08实施时职责与验证记录，09对日志摘要的迁移详[09记录](R12-09-files-storage-diagnostics-clipboard-and-timing.md)。
+
+## 08 Windows验收收尾（2026-10-25）
+
+08精确提交`c16f2c07419b5f637f0e2694e983360ff7c31747`的[Windows run40137847917](https://github.com/uniquenesssta/123/actions/runs/40137847917)、job121003070447、attempt1全部SUCCESS。2026-10-25交接时一次性核对head/分支、每个步骤、完整308,239字符job日志与下载产物，没有轮询。artifact12578236452未过期，ZIP15,874,690字节，SHA-256 `c3a01fcba21572f180010352b4866f202c7127d1cc7fadfb1adbefe7ee3b05bc`与API摘要及上传日志一致。原91步骤前端/24项Transport/1,104项Shell/工作区、136项告警/17视口、Rust fmt/Clippy/workspace tests、release/MSI/NSIS与真实启动均通过。报告`windows-acceptance-20261024-221745.json`为startup PASS：7条有效记录、0无效行、0运行错误；会话`308155e9-e864-40a5-81d3-f33a6e8778c6`内bootstrap、read_workspace_state、save_workspace_state三组trace开始/完成逐项配对。MSI8,384,512字节，NSIS5,916,019字节；ZIP保留在仓库上一级`R12-08-windows-evidence.zip`。startup不替代Windows Full/真实PG最终验收，原待验项继续保留。
 
 ## 范围与依据
 
@@ -58,7 +62,7 @@ API门面改走公开出口，原四个日志/错误识别函数以原名称再�
 
 ## 待验与回退
 
-08自身Rust Clippy/workspace tests、release/MSI/NSIS、实际客户端启动与运行日志配对交由原Windows CI独立验证；未用07结果替代08通过，当前保持VERIFYING。真实API/凭据/完整会话取消UI端到端及真实PG/XLSX/历史保护四项/不可变账本并发回滚/Windows Full/私有P4/P7固定回归等按已有最终封包新库安排保留待验；ignored、公开stub、注入adapter及startup不代表这些PASS。
+08原安排的Rust Clippy/workspace tests、release/MSI/NSIS、实际启动与日志配对现已由自身精确CI通过，见上方收尾。真实API/凭据/完整会话取消UI端到端及真实PG/XLSX/历史保护四项/不可变账本并发回滚/Windows Full/私有P4/P7固定回归等按已有最终封包新库安排保留待验；ignored、公开stub、注入adapter及startup不代表这些PASS。
 
 回退点b0b26d6，使用受控Git回退本节点，无数据库/持久格式迁移。未开始09；Vite既有主chunk超过500kB警告保持，没有放宽阈值。
 

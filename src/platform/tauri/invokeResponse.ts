@@ -1,5 +1,5 @@
 import type { InvokeRequestLease } from "./cancellationRegistry";
-import { summarizeLogValue } from "./traceSummary";
+import { summarizeLogValue } from "../diagnostics";
 
 /** Native results keep their original value and identity; only delivery eligibility is checked. */
 export function deliverInvokeResponse<T>(request: InvokeRequestLease, value: unknown): T {

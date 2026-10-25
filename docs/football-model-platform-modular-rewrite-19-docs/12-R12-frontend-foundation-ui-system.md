@@ -7,7 +7,7 @@
 
 ## 当前前置状态（2026-10-25）
 
-`IN_PROGRESS`。01～07 DONE；07精确b0b26d6/run40134011943及全部步骤、产物摘要/启动日志核验通过。用户2026-10-25授权“07通过，开始08”，08 Tauri Transport已实施VERIFYING，09～19 BLOCKED。沿唯一rewrite/r12-frontend-foundation-ui-system。08自身Windows待验；不轮询CI，交接时核对精确提交证据。详[08记录](../modular-rewrite/R12-frontend-foundation-ui-system/R12-08-tauri-transport.md)。
+`IN_PROGRESS`。01～08 DONE；08精确c16f2c0/run40137847917的全部步骤、产物摘要和启动日志核对通过。用户2026-10-25授权“08ci已通过 开始09”，09 Files/Storage/Diagnostics/Clipboard/Timing已实施，正在VERIFYING，10～19 BLOCKED。沿唯一rewrite/r12-frontend-foundation-ui-system。09自身Windows待提交后独立验收；不轮询CI。详[09记录](../modular-rewrite/R12-frontend-foundation-ui-system/R12-09-files-storage-diagnostics-clipboard-and-timing.md)。
 
 ## 1. 阶段目标
 
@@ -1458,7 +1458,7 @@ src/platform/tauri/commandName.ts
 
 ## R12-09 Files、Storage、Diagnostics、Clipboard 与 Timing
 
-状态：`BLOCKED`（仅当上一任务与本任务前置门禁通过后改为 `READY`）
+状态：`VERIFYING`（08自身精确Windows证据核验通过，09已按用户授权实施；自身Windows待验）
 
 ### 1. 目标
 

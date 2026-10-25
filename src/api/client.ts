@@ -1,6 +1,6 @@
 import { invoke } from "../platform/tauri";
 export { recordUiOperation, recordUiOperationFailure, recordFrontendDiagnostic, issueWasLogged } from "../platform/tauri";
-import { open, save } from "@tauri-apps/plugin-dialog";
+import { openFile, saveFile } from "../platform/files";
 import type {
   BootstrapResponse,
   CompetitionBindingDraft,
@@ -181,11 +181,10 @@ export const api = {
   chooseIssueLogExportFile: async (
     defaultPath: string,
   ): Promise<string | null> => {
-    const selected = await save({
+    return saveFile({
       defaultPath,
       filters: [{ name: "问题日志报告", extensions: ["txt"] }],
     });
-    return typeof selected === "string" ? selected : null;
   },
   exportIssueLogs: (outputPath: string): Promise<void> =>
     invoke("export_issue_logs", { outputPath }),
@@ -380,30 +379,25 @@ export const api = {
   updatePlayer: (playerId: string, draft: PlayerDraft): Promise<PlayerRecord> =>
     invoke("update_player", { playerId, draft }),
   chooseExcelImportFile: async (): Promise<string | null> => {
-    const selected = await open({
-      multiple: false,
-      directory: false,
+    return openFile({
       filters: [{ name: "Excel 工作簿", extensions: ["xlsx"] }],
     });
-    return typeof selected === "string" ? selected : null;
   },
   chooseExcelExportFile: async (
     defaultPath: string,
   ): Promise<string | null> => {
-    const selected = await save({
+    return saveFile({
       defaultPath,
       filters: [{ name: "Excel 工作簿", extensions: ["xlsx"] }],
     });
-    return typeof selected === "string" ? selected : null;
   },
   chooseJsonExportFile: async (
     defaultPath: string,
   ): Promise<string | null> => {
-    const selected = await save({
+    return saveFile({
       defaultPath,
       filters: [{ name: "JSON 文件", extensions: ["json"] }],
     });
-    return typeof selected === "string" ? selected : null;
   },
   exportTeamPackageTemplate: (
     outputPath: string,
@@ -476,19 +470,15 @@ export const api = {
   ): Promise<SpreadsheetImportCommitResult> =>
     invoke("commit_team_monthly_import", { batchId }),
   chooseZipImportFile: async (): Promise<string | null> => {
-    const selected = await open({
-      multiple: false,
-      directory: false,
+    return openFile({
       filters: [{ name: "AI 比赛交换包", extensions: ["zip"] }],
     });
-    return typeof selected === "string" ? selected : null;
   },
   chooseZipExportFile: async (defaultPath: string): Promise<string | null> => {
-    const selected = await save({
+    return saveFile({
       defaultPath,
       filters: [{ name: "AI 比赛交换包", extensions: ["zip"] }],
     });
-    return typeof selected === "string" ? selected : null;
   },
   addPlayerDynamicTag: (
     draft: PlayerDynamicTagDraft,
@@ -618,19 +608,15 @@ export const api = {
   chooseAiAnalysisExportFile: async (
     defaultPath: string,
   ): Promise<string | null> => {
-    const selected = await save({
+    return saveFile({
       defaultPath,
       filters: [{ name: "AI 分析包", extensions: ["zip"] }],
     });
-    return typeof selected === "string" ? selected : null;
   },
   chooseAiAnalysisResponseFile: async (): Promise<string | null> => {
-    const selected = await open({
-      multiple: false,
-      directory: false,
+    return openFile({
       filters: [{ name: "AI 分析回包", extensions: ["zip"] }],
     });
-    return typeof selected === "string" ? selected : null;
   },
   exportAiAnalysisPackage: (
     outputPath: string,
@@ -757,11 +743,10 @@ export const api = {
   chooseAiAnalysisResponseTemplateFile: async (
     defaultPath: string,
   ): Promise<string | null> => {
-    const selected = await save({
+    return saveFile({
       defaultPath,
       filters: [{ name: "AI 分析回包模板", extensions: ["zip"] }],
     });
-    return typeof selected === "string" ? selected : null;
   },
   exportAiAnalysisResponseTemplate: (
     outputPath: string,

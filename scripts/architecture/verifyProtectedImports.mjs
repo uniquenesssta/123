@@ -14,6 +14,15 @@ import { VerificationReport } from "./lib/report.mjs";
 const report = new VerificationReport("受保护导入验证");
 const contract = readJson("architecture/module-boundaries.json");
 const transportOwner = normalizePath(contract.frontend?.transport?.owner ?? "");
+const platform = contract.frontend?.platform ?? {};
+const fileDialogOwner = normalizePath(platform.files?.owner ?? "");
+const storageOwner = normalizePath(platform.storage?.owner ?? "");
+const clipboardOwner = normalizePath(platform.clipboard?.owner ?? "");
+for (const capability of ["files", "storage", "diagnostics", "clipboard", "timing"]) {
+  const entry = platform[capability];
+  report.check(entry?.public_entry === `src/platform/${capability}/index.ts`, `平台能力公开出口未登记：${capability}`);
+  report.check(typeof entry?.owner === "string" && entry.owner.startsWith(`src/platform/${capability}/`), `平台能力唯一 owner 未登记：${capability}`);
+}
 const persistenceRoot = normalizePath(contract.rust?.rules?.sqlx_owner ?? "crates/persistence-postgres").split("/src/")[0];
 const tauriRoot = normalizePath(contract.rust?.rules?.tauri_owner ?? "src-tauri");
 const applicationPersistenceOwner = normalizePath(
@@ -45,7 +54,12 @@ function containsProtectedRustReference(source) {
 const frontendFiles = listFiles(["src"], { extensions: [".ts", ".tsx", ".js", ".jsx", ".mjs", ".cjs"] });
 for (const importer of frontendFiles) {
   const source = readFileSync(join(repositoryRoot, importer), "utf8").replaceAll("\r\n", "\n");
+  if (!importer.includes("/__tests__/")) {
+    if (/\b(?:localStorage|sessionStorage)\s*\./.test(source) || /\bwindow\.(?:localStorage|sessionStorage)\b/.test(source)) report.check(importer === storageOwner, `${importer} 不得绕过偏好存储 adapter`);
+    if (/\bnavigator\.clipboard\b/.test(source)) report.check(importer === clipboardOwner, `${importer} 不得绕过剪贴板 adapter`);
+  }
   for (const specifier of parseJavaScriptImports(source)) {
+    if (isPackageImport(specifier, "@tauri-apps/plugin-dialog")) report.check(importer === fileDialogOwner, `${importer} 不得绕过原生文件选择 adapter`);
     if (isPackageImport(specifier, "@tauri-apps/api/core")) {
       const allowed = importer === transportOwner;
       report.check(allowed, `${importer} 不得直接导入 @tauri-apps/api/core`);
@@ -53,6 +67,7 @@ for (const importer of frontendFiles) {
 
     const resolved = resolveRelativeImport(importer, specifier);
     if (resolved) {
+      if (importer.startsWith("src/platform/")) report.check(resolved.startsWith("src/platform/") || resolved === "src/types.ts", `${importer} 平台能力不得反向依赖应用或业务：${specifier}`);
       report.check(!matchesPathPattern(resolved, "src-tauri/**"), `${importer} 不得导入 src-tauri：${specifier}`);
       report.check(!matchesPathPattern(resolved, "crates/**"), `${importer} 不得导入 crates：${specifier}`);
       report.check(!matchesPathPattern(resolved, "migrations/**"), `${importer} 不得导入 migrations：${specifier}`);
