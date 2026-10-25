@@ -1,6 +1,6 @@
 # R12-10 Design Tokens
 
-状态：`VERIFYING`。基线`98dc43eef5c34fcf7d15bb6201290a710b6f0a37`；唯一分支`rewrite/r12-frontend-foundation-ui-system`。用户2026-10-25授权“收尾09开始10”。01～09 DONE，11～19 BLOCKED；不轮询CI，不开始11。
+状态：`DONE`。基线`98dc43eef5c34fcf7d15bb6201290a710b6f0a37`，交付提交`e3dcf5dba39969eb11b1628248dd2fbe076261c7`；自身Windows完整验收和下载证据已核验，用户已授权11。
 
 ## 前置核验
 
@@ -62,7 +62,7 @@ Motion、Z-index、Breakpoint不是193项中的新Figma变量。快照implementa
 
 ## 待验、回退与下一项
 
-10自身Windows Rust Clippy/workspace tests、release/MSI/NSIS、真实启动和日志配对待本节点提交后原CI独立核验；09通过不替代10通过，当前保持VERIFYING。真实PG/XLSX/历史保护四项/不可变账本并发回滚/Windows Full/私有P4/P7固定回归等沿最终封包新库安排保留待验。原型、注入adapter、token计算和startup均不替代这些业务验收。
+10实施时待验的自身Windows Rust Clippy/workspace tests、release/MSI/NSIS、真实启动和日志配对现已按文末精确e3dcf5d/run40174915845证据核验通过，状态DONE。真实PG/XLSX/历史保护四项/不可变账本并发回滚/Windows Full/私有P4/P7固定回归等沿最终封包新库安排保留待验。原型、注入adapter、token计算和startup均不替代这些业务验收。
 
 回退基线98dc43e，使用受控Git回退本节点；无数据库或现有存储迁移。11尚未开始。
 
@@ -124,3 +124,7 @@ Motion、Z-index、Breakpoint不是193项中的新Figma变量。快照implementa
 ### 纯移动/重命名
 
 无。
+
+## 自身Windows验收完成（2026-10-25）
+
+10精确提交`e3dcf5dba39969eb11b1628248dd2fbe076261c7`的[Windows run40174915845](https://github.com/uniquenesssta/123/actions/runs/40174915845)、job121113413620、attempt1全部SUCCESS。交接时按精确head/分支一次性读取全部步骤、完整309,077字符日志和artifact12592069389。下载ZIP15,872,541字节，SHA-256 `e15c8aab2e83d74206ef154c7176f5f17d9305f2ca394236a92b0efc10152181`与API及上传日志一致。前端91步骤（CI中验证和打包各跑一遍）、1,344项token、1,104项Shell/工作区、136项告警、17视口、Rust fmt/Clippy/工作区测试、release/MSI/NSIS、实际启动和日志通过。45组Rust结果均ok/0 failed；ignored环境用例仍为ignored，未冒充真实PG。报告`windows-acceptance-20261025-080139.json`为startup PASS：7有效条目、0无效行、0运行错误；会话`e7b74741-0968-4584-9bbd-ae36d991f4e1`内read_workspace_state/save_workspace_state/bootstrap三组trace逐一配对。MSI8,388,608字节、NSIS5,916,969字节。ZIP位于仓库上一级`R12-10-windows-evidence.zip`。没有轮询。startup不替代Windows Full/PG/XLSX/私有固定回归。

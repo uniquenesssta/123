@@ -1,0 +1,20 @@
+.ui-radio { display: inline-flex; position: relative; align-items: center; gap: var(--fip-space-sm); min-height: 20px; color: var(--fip-color-text-primary); font: 14px/18px var(--fip-type-body-family); cursor: pointer; }
+.ui-radio > input { appearance: none; position: absolute; left: 0; top: 0; width: 20px; height: 20px; margin: 0; opacity: 0; cursor: inherit; }
+.ui-radio-mark { display: block; flex: none; width: 20px; height: 20px; pointer-events: none; }
+.ui-radio-mark > span { display: none; }
+.ui-radio:not(:hover) > input:enabled:not(:checked) + .ui-radio-mark [data-radio-state="default"] { display: block; }
+.ui-radio:hover > input:enabled:not(:checked) + .ui-radio-mark [data-radio-state="hover"] { display: block; }
+.ui-radio > input:enabled:checked + .ui-radio-mark [data-radio-state="selected"] { display: block; }
+.ui-radio > input:disabled:not(:checked) + .ui-radio-mark [data-radio-state="disabled"] { display: block; }
+.ui-radio > input:disabled:checked + .ui-radio-mark [data-radio-state="disabled-selected"] { display: block; }
+.ui-radio-mark [id="Ring"] > rect:first-of-type { fill: var(--fip-color-bg-surface); }
+.ui-radio-mark [id="Ring"] > rect[stroke] { stroke: var(--fip-color-border-default); stroke-opacity: 1; }
+.ui-radio-label { font: inherit; color: inherit; }
+.ui-radio-mark :is([data-radio-state="hover"],[data-radio-state="selected"]) [id="Ring"] > rect[stroke] { stroke: var(--fip-color-action-accent); }
+.ui-radio-mark [id="Dot"] { fill: var(--fip-color-action-accent); }
+.ui-radio-mark [data-radio-state="hover"] [id="Ring"] > rect:first-of-type { fill: var(--fip-color-action-accent-soft); fill-opacity: 1; }
+.ui-radio-mark [data-radio-state^="disabled"] [id="Ring"] > rect:first-of-type { fill: var(--fip-color-control-disabled-surface); }
+.ui-radio-mark [data-radio-state^="disabled"] [id="Dot"] { fill: var(--fip-color-text-disabled); stroke: none; }
+.ui-radio:has(input:disabled) { color: var(--fip-color-text-disabled); cursor: default; }
+.ui-radio > input:focus-visible + .ui-radio-mark { border-radius: var(--fip-radius-full); outline: var(--fip-control-focus-stroke) solid var(--fip-color-border-focus); outline-offset: 2px; }
+@media (forced-colors: active) { .ui-radio-mark [id="Ring"] > rect[stroke] { stroke: ButtonText; } .ui-radio-mark [id="Dot"] { fill: Highlight; } }

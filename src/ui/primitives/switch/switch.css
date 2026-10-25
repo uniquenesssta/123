@@ -1,0 +1,34 @@
+.ui-switch { display: inline-flex; box-sizing: border-box; position: relative; align-items: flex-start; gap: var(--fip-space-sm); min-width: var(--fip-switch-min-width); max-width: 100%; padding: var(--fip-switch-track-padding) 0; color: var(--fip-color-text-primary); cursor: pointer; }
+.ui-switch > input { appearance: none; position: absolute; left: 0; top: var(--fip-switch-track-padding); width: 40px; height: 24px; margin: 0; opacity: 0; cursor: inherit; }
+.ui-switch-control { display: flex; flex: none; align-items: center; justify-content: center; width: 40px; height: 24px; pointer-events: none; }
+.ui-switch-control > span { display: none; align-items: center; justify-content: center; }
+.ui-switch:not(:hover):not(:active) > input:enabled:not(:focus-visible):not(:checked) + .ui-switch-control [data-switch-state="off-default"] { display: flex; }
+.ui-switch:hover:not(:active) > input:enabled:not(:focus-visible):not(:checked) + .ui-switch-control [data-switch-state="off-hover"] { display: flex; }
+.ui-switch:active > input:enabled:not(:focus-visible):not(:checked) + .ui-switch-control [data-switch-state="off-pressed"] { display: flex; }
+.ui-switch > input:enabled:focus-visible:not(:checked) + .ui-switch-control [data-switch-state="off-focus"] { display: flex; }
+.ui-switch > input:disabled:not(:checked) + .ui-switch-control [data-switch-state="off-disabled"] { display: flex; }
+.ui-switch:not(:hover):not(:active) > input:enabled:not(:focus-visible):checked + .ui-switch-control [data-switch-state="on-default"] { display: flex; }
+.ui-switch:hover:not(:active) > input:enabled:not(:focus-visible):checked + .ui-switch-control [data-switch-state="on-hover"] { display: flex; }
+.ui-switch:active > input:enabled:not(:focus-visible):checked + .ui-switch-control [data-switch-state="on-pressed"] { display: flex; }
+.ui-switch > input:enabled:focus-visible:checked + .ui-switch-control [data-switch-state="on-focus"] { display: flex; }
+.ui-switch > input:disabled:checked + .ui-switch-control [data-switch-state="on-disabled"] { display: flex; }
+/* Only semantic paints change; all track/thumb/focus geometry is the exact local export. */
+.ui-switch-control [fill="#F8F9FB"] { fill: var(--fip-color-control-disabled-surface); }
+.ui-switch-control :is([data-switch-state="off-default"],[data-switch-state="off-focus"]) [fill="#F8F9FB"] { fill: var(--fip-color-bg-subtle); }
+.ui-switch-control [fill="#356DF3"] { fill: var(--fip-color-action-accent); }
+.ui-switch-control [fill="#285BD7"] { fill: var(--fip-color-action-accent-hover); }
+.ui-switch-control [fill="#163FB7"] { fill: var(--fip-color-action-accent-pressed); }
+.ui-switch-control [fill="#303846"] { fill: var(--fip-color-text-primary); }
+.ui-switch-control [fill="#8A98AA"] { fill: var(--fip-color-text-disabled); }
+.ui-switch-control [fill="#1E2D42"] { fill: var(--fip-color-border-default); fill-opacity: 1; }
+.ui-switch-control [fill="white"]:not(mask rect) { fill: var(--fip-color-text-on-accent); }
+.ui-switch-control [data-switch-state^="off-"] [id="Thumb"] { fill: var(--fip-color-text-primary); }
+.ui-switch-control [data-switch-state="off-pressed"] [id="Thumb"] { fill: var(--fip-color-action-accent-pressed); }
+.ui-switch-control :is([data-switch-state="off-hover"],[data-switch-state="off-pressed"]) [fill-opacity] { fill: var(--fip-color-action-accent-soft); fill-opacity: 1; }
+/* Preserve the accepted source's disabled thumb opacity (0.0042), rather than reapplying a second opacity. */
+.ui-switch-control [data-switch-state$="disabled"] [id="Thumb"] { fill: var(--fip-color-text-primary); }
+.ui-switch-content { display: flex; flex: 1; flex-direction: column; gap: var(--fip-switch-track-padding); min-width: 0; color: inherit; overflow-wrap: anywhere; }
+.ui-switch-content strong { font: 500 12px/18px var(--fip-type-body-family); color: inherit; }
+.ui-switch-content small { font: 400 11px/16px var(--fip-type-body-family); color: var(--fip-color-text-secondary); }
+.ui-switch:has(input:disabled), .ui-switch:has(input:disabled) small { color: var(--fip-color-text-disabled); cursor: default; }
+@media (forced-colors: active) { .ui-switch-control svg { forced-color-adjust: none; } .ui-switch-control [id="Thumb"] { fill: ButtonText; } .ui-switch > input:focus-visible + .ui-switch-control { outline: 2px solid Highlight; border-radius: var(--fip-radius-full); } }

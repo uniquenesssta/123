@@ -1,0 +1,5 @@
+.ui-number-input { display: inline-flex; align-items: center; gap: var(--fip-control-gap); height: var(--fip-control-height); padding-left: var(--fip-control-padding-x); padding-right: var(--fip-space-xs); }
+.ui-number-input-control { appearance: textfield; -moz-appearance: textfield; }
+.ui-number-input-control::-webkit-inner-spin-button, .ui-number-input-control::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
+.ui-number-stepper { display: inline-flex; flex: none; align-items: center; gap: var(--fip-space-xs); height: var(--fip-control-height); }
+.ui-number-unit { flex: none; color: var(--fip-color-text-secondary); font-size: 13px; }

@@ -1,0 +1,22 @@
+.ui-select { display: flex; flex-direction: column; gap: var(--fip-space-xs); position: relative; min-width: 0; }
+/* The historical reduced-motion rule assigns a nonzero transition duration to *.
+   Position/width are measurements, not animated states, and must update in one layout. */
+.ui-select, .ui-select-options { transition-property: none; }
+.ui-select-native { position: absolute; width: 1px; height: 1px; margin: -1px; clip-path: inset(50%); overflow: hidden; opacity: 0; pointer-events: none; }
+.ui-select-trigger { display: inline-flex; align-items: center; gap: var(--fip-control-gap); height: var(--fip-control-height); min-height: var(--fip-control-height); padding: 0 var(--fip-control-padding-x); text-align: left; cursor: pointer; }
+.ui-select-trigger:hover:enabled:not([aria-expanded="true"]) { background: var(--fip-color-bg-raised); border-color: var(--fip-color-border-strong); }
+.ui-select-value { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.ui-select-value[data-placeholder="true"] { color: var(--fip-color-text-secondary); }
+.ui-select-trigger:disabled .ui-select-value { color: var(--fip-color-text-disabled); }
+.ui-select-trigger > .ui-icon-slot { color: var(--fip-color-icon-secondary); }
+.ui-select-trigger[aria-expanded="true"] > .ui-icon-slot { transform: rotate(180deg); color: var(--fip-color-action-accent); }
+.ui-select-options { display: flex; position: fixed; box-sizing: border-box; max-height: min(288px, 40vh); overflow: auto; flex-direction: column; gap: var(--fip-space-2xs); padding: var(--fip-space-xs); border: var(--fip-control-stroke) solid var(--fip-color-border-default); border-radius: var(--fip-radius-md); background: var(--fip-color-bg-surface); z-index: var(--fip-layer-feedback); }
+.ui-select-options[hidden] { display: none; }
+.ui-select-option { display: flex; align-items: center; flex: none; box-sizing: border-box; gap: var(--fip-space-sm); min-height: 36px; padding: 0 10px; border-radius: var(--fip-radius-sm); color: var(--fip-color-text-primary); font: 400 14px/18px var(--fip-type-body-family); cursor: pointer; }
+.ui-select-option > span:first-child { flex: 1; min-width: 0; overflow-wrap: anywhere; }
+.ui-select-option > .ui-icon-check { visibility: hidden; color: var(--fip-color-action-accent); }
+.ui-select-option[aria-selected="true"] { background: var(--fip-color-action-accent-soft); }
+.ui-select-option[aria-selected="true"] > .ui-icon-check { visibility: visible; }
+.ui-select-option:not([aria-disabled="true"]):is(:hover,[data-active]) { background: var(--fip-color-action-accent-soft); outline: 1px solid var(--fip-color-border-focus); outline-offset: -1px; }
+.ui-select-option[aria-disabled="true"] { color: var(--fip-color-text-disabled); cursor: default; }
+@media (forced-colors: active) { .ui-select-option[aria-selected="true"] { outline: 1px solid Highlight; } .ui-select-option[aria-disabled="true"] { color: GrayText; } }

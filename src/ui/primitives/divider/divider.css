@@ -1,0 +1,2 @@
+.ui-divider { box-sizing: border-box; width: 100%; height: var(--fip-control-stroke); margin: var(--fip-space-xs) 0; border: 0; background: var(--fip-color-border-default); }
+@media (forced-colors: active) { .ui-divider { background: CanvasText; } }

@@ -1,0 +1,14 @@
+/* Shared control anatomy from Text Field 57:313, Number 144:437 and Select 63:158.
+   Controls use their actual 13/14px typography, rather than the denser Shell body style. */
+.ui-text-input, .ui-number-input, .ui-text-area, .ui-select-trigger {
+  box-sizing: border-box; min-width: 0; width: 100%; border: var(--fip-control-stroke) solid var(--fip-color-border-default); border-radius: var(--fip-radius-md);
+  background: var(--fip-color-bg-surface); color: var(--fip-color-text-primary); font-family: var(--fip-type-body-family); font-size: 14px; line-height: 18px; font-weight: 400; box-shadow: none; transform: none;
+}
+.ui-text-input:has(input:focus-visible), .ui-number-input:has(input:focus-visible), .ui-text-area:focus-visible, .ui-select-trigger:focus-visible, .ui-select-trigger[aria-expanded="true"] { border-color: var(--fip-color-border-focus); outline: var(--fip-control-stroke) solid var(--fip-color-border-focus); outline-offset: -2px; }
+.ui-text-input:has(input[aria-invalid="true"]), .ui-number-input:has(input[aria-invalid="true"]), .ui-text-area[aria-invalid="true"], .ui-select-trigger[aria-invalid="true"] { border-color: var(--fip-color-border-danger); }
+.ui-text-input:has(input:disabled), .ui-number-input:has(input:disabled), .ui-text-area:disabled, .ui-select-trigger:disabled { background: var(--fip-color-control-disabled-surface); color: var(--fip-color-text-disabled); opacity: 1; cursor: default; }
+.ui-text-input-control, .ui-number-input-control { box-sizing: border-box; flex: 1; min-width: 0; width: 0; height: 100%; min-height: 0; margin: 0; padding: 0; border: 0; outline: none !important; background: transparent; color: inherit; font: inherit; box-shadow: none; }
+.ui-text-input-control::placeholder, .ui-text-area::placeholder { color: var(--fip-color-text-secondary); opacity: 1; }
+.ui-text-input-control:disabled::placeholder, .ui-text-area:disabled::placeholder { color: var(--fip-color-text-disabled); }
+.ui-text-input-control:disabled, .ui-number-input-control:disabled { background: transparent; color: var(--fip-color-text-disabled); opacity: 1; }
+@media (forced-colors: active) { .ui-text-input, .ui-number-input, .ui-text-area, .ui-select-trigger { border-color: ButtonText; } .ui-text-input:has(input:focus-visible), .ui-number-input:has(input:focus-visible), .ui-text-area:focus-visible, .ui-select-trigger:focus-visible { outline: 2px solid Highlight; } }

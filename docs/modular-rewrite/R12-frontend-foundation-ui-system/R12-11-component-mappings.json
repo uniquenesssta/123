@@ -1,0 +1,1159 @@
+{
+  "schema": "football.r12.ui-primitives.design-mapping.v1",
+  "fileKey": "PN0Whgu6HLWIHx4Mv6aHfu",
+  "designCommit": "40109ceec8372391a7680e7e86c1265fda06ab3d",
+  "page": {
+    "id": "3:3",
+    "name": "02 · Controls"
+  },
+  "codeBaseline": "e3dcf5dba39969eb11b1628248dd2fbe076261c7",
+  "readOnly": true,
+  "codeConnectPublished": false,
+  "tokenSource": "R12-10-figma-tokens.json",
+  "components": [
+    {
+      "directory": "button",
+      "view": "buttonView",
+      "css": "src/ui/primitives/button/button.css",
+      "publicEntry": "src/ui/primitives/button/index.ts",
+      "figmaNodes": [
+        "51:414",
+        "52:2",
+        "52:255",
+        "119:209",
+        "128:343"
+      ],
+      "mount": "mountButton"
+    },
+    {
+      "directory": "icon-button",
+      "view": "iconButtonView",
+      "css": "src/ui/primitives/icon-button/iconButton.css",
+      "publicEntry": "src/ui/primitives/icon-button/index.ts",
+      "figmaNodes": [
+        "123:209"
+      ]
+    },
+    {
+      "directory": "text-input",
+      "view": "textInputView",
+      "css": "src/ui/primitives/text-input/textInput.css",
+      "publicEntry": "src/ui/primitives/text-input/index.ts",
+      "figmaNodes": [
+        "57:313"
+      ],
+      "mount": "mountTextInput"
+    },
+    {
+      "directory": "number-input",
+      "view": "numberInputView",
+      "css": "src/ui/primitives/number-input/numberInput.css",
+      "publicEntry": "src/ui/primitives/number-input/index.ts",
+      "figmaNodes": [
+        "144:437"
+      ],
+      "mount": "mountNumberInput"
+    },
+    {
+      "directory": "text-area",
+      "view": "textAreaView",
+      "css": "src/ui/primitives/text-area/textArea.css",
+      "publicEntry": "src/ui/primitives/text-area/index.ts",
+      "figmaNodes": [
+        "143:410"
+      ]
+    },
+    {
+      "directory": "checkbox",
+      "view": "checkboxView",
+      "css": "src/ui/primitives/checkbox/checkbox.css",
+      "publicEntry": "src/ui/primitives/checkbox/index.ts",
+      "figmaNodes": [
+        "59:329"
+      ],
+      "mount": "mountCheckbox"
+    },
+    {
+      "directory": "radio",
+      "view": "radioView",
+      "css": "src/ui/primitives/radio/radio.css",
+      "publicEntry": "src/ui/primitives/radio/index.ts",
+      "figmaNodes": [
+        "60:333"
+      ]
+    },
+    {
+      "directory": "switch",
+      "view": "switchView",
+      "css": "src/ui/primitives/switch/switch.css",
+      "publicEntry": "src/ui/primitives/switch/index.ts",
+      "figmaNodes": [
+        "183:563",
+        "186:583"
+      ]
+    },
+    {
+      "directory": "select",
+      "view": "selectView",
+      "css": "src/ui/primitives/select/select.css",
+      "publicEntry": "src/ui/primitives/select/index.ts",
+      "figmaNodes": [
+        "63:158"
+      ],
+      "mount": "mountSelect"
+    },
+    {
+      "directory": "badge",
+      "view": "badgeView",
+      "css": "src/ui/primitives/badge/badge.css",
+      "publicEntry": "src/ui/primitives/badge/index.ts",
+      "figmaNodes": [
+        "66:410"
+      ]
+    },
+    {
+      "directory": "divider",
+      "view": "dividerView",
+      "css": "src/ui/primitives/divider/divider.css",
+      "publicEntry": "src/ui/primitives/divider/index.ts",
+      "figmaNodes": [
+        "255:1762"
+      ]
+    },
+    {
+      "directory": "tooltip",
+      "view": "tooltipView",
+      "css": "src/ui/primitives/tooltip/tooltip.css",
+      "publicEntry": "src/ui/primitives/tooltip/index.ts",
+      "figmaNodes": [
+        "123:209"
+      ],
+      "mount": "mountTooltip"
+    },
+    {
+      "directory": "spinner",
+      "view": "spinnerView",
+      "css": "src/ui/primitives/spinner/spinner.css",
+      "publicEntry": "src/ui/primitives/spinner/index.ts",
+      "figmaNodes": [
+        "126:294"
+      ]
+    },
+    {
+      "directory": "skeleton",
+      "view": "skeletonView",
+      "css": "src/ui/primitives/skeleton/skeleton.css",
+      "publicEntry": "src/ui/primitives/skeleton/index.ts",
+      "figmaNodes": [
+        "341:6504",
+        "342:6572"
+      ]
+    }
+  ],
+  "sourceRecords": [
+    "FIGMA_COMPONENT_RECORD.md",
+    "FIGMA_BUTTON_COMPONENTS.md",
+    "FIGMA_EXTENDED_FIELDS.md",
+    "FIGMA_SWITCH_TOGGLE.md",
+    "FIGMA_PROGRESS_SKELETON_EMPTY_STATE.md",
+    "FIGMA_SEARCHABLE_COMBOBOX.md"
+  ],
+  "decisions": {
+    "tooltip": "Native platform title from Button/Icon contract; owned offscreen aria-describedby text supplements assistive access. No custom visual tooltip master exists.",
+    "divider": "Approved Menu Separator's horizontal 1px semantic divider and 4px vertical breathing room; no new separator visual.",
+    "fieldBoundary": "Controls implement Figma control slots with label/helper visibility off. Form field label/hint/error/validation composition remains R12-12.",
+    "select": "Non-searchable single-choice native form value; custom accepted option surface/keyboard. Searchable Combobox remains separate, no business query state.",
+    "motion": "Spinner 800ms linear infinite; reduced motion none. Skeleton stays static, matching accepted source.",
+    "fonts": "Existing Inter/Windows fallbacks only, no font downloads. Computed family declaration does not establish a device has Inter installed.",
+    "disabledSwitchThumb": "Actual accepted Figma node opacity is 0.00419999985, preserved by unmodified SVG export; do not substitute token 0.42 or apply another opacity.",
+    "plus": "Original 24.875px export root remains unchanged; its 24px wrapper and -0.875px offset scale to 16/20/24. Other exact icons keep the established mask slot."
+  },
+  "geometryAndPaintBindingSubset": [
+    {
+      "id": "181:566",
+      "name": "Checked=Off, State=Default",
+      "type": "COMPONENT",
+      "width": 40,
+      "height": 24,
+      "opacity": 1,
+      "fills": [],
+      "strokes": [],
+      "children": [
+        {
+          "id": "181:567",
+          "name": "Track",
+          "type": "FRAME",
+          "width": 36,
+          "height": 20,
+          "opacity": 1,
+          "fills": [
+            {
+              "variable": "VariableID:19:5",
+              "opacity": 1
+            }
+          ],
+          "strokes": [
+            {
+              "variable": "VariableID:19:10",
+              "opacity": 0.10588235408067703
+            }
+          ],
+          "children": [
+            {
+              "id": "181:568",
+              "name": "Thumb",
+              "type": "ELLIPSE",
+              "width": 16,
+              "height": 16,
+              "opacity": 1,
+              "fills": [
+                {
+                  "variable": "VariableID:20:2",
+                  "opacity": 1
+                }
+              ],
+              "strokes": []
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "181:569",
+      "name": "Checked=Off, State=Hover",
+      "type": "COMPONENT",
+      "width": 40,
+      "height": 24,
+      "opacity": 1,
+      "fills": [],
+      "strokes": [],
+      "children": [
+        {
+          "id": "181:570",
+          "name": "Track",
+          "type": "FRAME",
+          "width": 36,
+          "height": 20,
+          "opacity": 1,
+          "fills": [
+            {
+              "variable": "VariableID:20:18",
+              "opacity": 0.09019608050584793
+            }
+          ],
+          "strokes": [
+            {
+              "variable": "VariableID:47:8",
+              "opacity": 1
+            }
+          ],
+          "children": [
+            {
+              "id": "181:571",
+              "name": "Thumb",
+              "type": "ELLIPSE",
+              "width": 16,
+              "height": 16,
+              "opacity": 1,
+              "fills": [
+                {
+                  "variable": "VariableID:20:2",
+                  "opacity": 1
+                }
+              ],
+              "strokes": []
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "181:572",
+      "name": "Checked=Off, State=Pressed",
+      "type": "COMPONENT",
+      "width": 40,
+      "height": 24,
+      "opacity": 1,
+      "fills": [],
+      "strokes": [],
+      "children": [
+        {
+          "id": "181:573",
+          "name": "Track",
+          "type": "FRAME",
+          "width": 36,
+          "height": 20,
+          "opacity": 1,
+          "fills": [
+            {
+              "variable": "VariableID:20:18",
+              "opacity": 0.09019608050584793
+            }
+          ],
+          "strokes": [
+            {
+              "variable": "VariableID:47:4",
+              "opacity": 1
+            }
+          ],
+          "children": [
+            {
+              "id": "181:574",
+              "name": "Thumb",
+              "type": "ELLIPSE",
+              "width": 16,
+              "height": 16,
+              "opacity": 1,
+              "fills": [
+                {
+                  "variable": "VariableID:47:4",
+                  "opacity": 1
+                }
+              ],
+              "strokes": []
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "181:575",
+      "name": "Checked=Off, State=Focus",
+      "type": "COMPONENT",
+      "width": 40,
+      "height": 24,
+      "opacity": 1,
+      "fills": [],
+      "strokes": [],
+      "children": [
+        {
+          "id": "181:576",
+          "name": "Track",
+          "type": "FRAME",
+          "width": 36,
+          "height": 20,
+          "opacity": 1,
+          "fills": [
+            {
+              "variable": "VariableID:19:5",
+              "opacity": 1
+            }
+          ],
+          "strokes": [
+            {
+              "variable": "VariableID:47:8",
+              "opacity": 1
+            }
+          ],
+          "children": [
+            {
+              "id": "181:577",
+              "name": "Thumb",
+              "type": "ELLIPSE",
+              "width": 16,
+              "height": 16,
+              "opacity": 1,
+              "fills": [
+                {
+                  "variable": "VariableID:20:2",
+                  "opacity": 1
+                }
+              ],
+              "strokes": []
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "181:578",
+      "name": "Checked=Off, State=Disabled",
+      "type": "COMPONENT",
+      "width": 40,
+      "height": 24,
+      "opacity": 1,
+      "fills": [],
+      "strokes": [],
+      "children": [
+        {
+          "id": "181:579",
+          "name": "Track",
+          "type": "FRAME",
+          "width": 36,
+          "height": 20,
+          "opacity": 1,
+          "fills": [
+            {
+              "variable": "VariableID:47:10",
+              "opacity": 1
+            }
+          ],
+          "strokes": [
+            {
+              "variable": "VariableID:19:10",
+              "opacity": 0.10588235408067703
+            }
+          ],
+          "children": [
+            {
+              "id": "181:580",
+              "name": "Thumb",
+              "type": "ELLIPSE",
+              "width": 16,
+              "height": 16,
+              "opacity": 0.00419999985024333,
+              "fills": [
+                {
+                  "variable": "VariableID:20:2",
+                  "opacity": 1
+                }
+              ],
+              "strokes": []
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "182:564",
+      "name": "Checked=On, State=Default",
+      "type": "COMPONENT",
+      "width": 40,
+      "height": 24,
+      "opacity": 1,
+      "fills": [],
+      "strokes": [],
+      "children": [
+        {
+          "id": "182:565",
+          "name": "Track",
+          "type": "FRAME",
+          "width": 36,
+          "height": 20,
+          "opacity": 1,
+          "fills": [
+            {
+              "variable": "VariableID:20:10",
+              "opacity": 1
+            }
+          ],
+          "strokes": [],
+          "children": [
+            {
+              "id": "182:566",
+              "name": "Thumb",
+              "type": "ELLIPSE",
+              "width": 16,
+              "height": 16,
+              "opacity": 1,
+              "fills": [
+                {
+                  "variable": "VariableID:20:5",
+                  "opacity": 1
+                }
+              ],
+              "strokes": []
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "182:567",
+      "name": "Checked=On, State=Hover",
+      "type": "COMPONENT",
+      "width": 40,
+      "height": 24,
+      "opacity": 1,
+      "fills": [],
+      "strokes": [],
+      "children": [
+        {
+          "id": "182:568",
+          "name": "Track",
+          "type": "FRAME",
+          "width": 36,
+          "height": 20,
+          "opacity": 1,
+          "fills": [
+            {
+              "variable": "VariableID:20:11",
+              "opacity": 1
+            }
+          ],
+          "strokes": [],
+          "children": [
+            {
+              "id": "182:569",
+              "name": "Thumb",
+              "type": "ELLIPSE",
+              "width": 16,
+              "height": 16,
+              "opacity": 1,
+              "fills": [
+                {
+                  "variable": "VariableID:20:5",
+                  "opacity": 1
+                }
+              ],
+              "strokes": []
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "182:570",
+      "name": "Checked=On, State=Pressed",
+      "type": "COMPONENT",
+      "width": 40,
+      "height": 24,
+      "opacity": 1,
+      "fills": [],
+      "strokes": [],
+      "children": [
+        {
+          "id": "182:571",
+          "name": "Track",
+          "type": "FRAME",
+          "width": 36,
+          "height": 20,
+          "opacity": 1,
+          "fills": [
+            {
+              "variable": "VariableID:47:4",
+              "opacity": 1
+            }
+          ],
+          "strokes": [],
+          "children": [
+            {
+              "id": "182:572",
+              "name": "Thumb",
+              "type": "ELLIPSE",
+              "width": 16,
+              "height": 16,
+              "opacity": 1,
+              "fills": [
+                {
+                  "variable": "VariableID:20:5",
+                  "opacity": 1
+                }
+              ],
+              "strokes": []
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "182:573",
+      "name": "Checked=On, State=Focus",
+      "type": "COMPONENT",
+      "width": 40,
+      "height": 24,
+      "opacity": 1,
+      "fills": [],
+      "strokes": [],
+      "children": [
+        {
+          "id": "182:574",
+          "name": "Track",
+          "type": "FRAME",
+          "width": 36,
+          "height": 20,
+          "opacity": 1,
+          "fills": [
+            {
+              "variable": "VariableID:20:10",
+              "opacity": 1
+            }
+          ],
+          "strokes": [
+            {
+              "variable": "VariableID:47:8",
+              "opacity": 1
+            }
+          ],
+          "children": [
+            {
+              "id": "182:575",
+              "name": "Thumb",
+              "type": "ELLIPSE",
+              "width": 16,
+              "height": 16,
+              "opacity": 1,
+              "fills": [
+                {
+                  "variable": "VariableID:20:5",
+                  "opacity": 1
+                }
+              ],
+              "strokes": []
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "182:576",
+      "name": "Checked=On, State=Disabled",
+      "type": "COMPONENT",
+      "width": 40,
+      "height": 24,
+      "opacity": 1,
+      "fills": [],
+      "strokes": [],
+      "children": [
+        {
+          "id": "182:577",
+          "name": "Track",
+          "type": "FRAME",
+          "width": 36,
+          "height": 20,
+          "opacity": 1,
+          "fills": [
+            {
+              "variable": "VariableID:47:10",
+              "opacity": 1
+            }
+          ],
+          "strokes": [
+            {
+              "variable": "VariableID:19:10",
+              "opacity": 0.10588235408067703
+            }
+          ],
+          "children": [
+            {
+              "id": "182:578",
+              "name": "Thumb",
+              "type": "ELLIPSE",
+              "width": 16,
+              "height": 16,
+              "opacity": 0.00419999985024333,
+              "fills": [
+                {
+                  "variable": "VariableID:20:2",
+                  "opacity": 1
+                }
+              ],
+              "strokes": []
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "60:113",
+      "name": "State=Unchecked",
+      "type": "COMPONENT",
+      "width": 73,
+      "height": 20,
+      "opacity": 1,
+      "fills": [],
+      "strokes": [],
+      "children": [
+        {
+          "id": "60:114",
+          "name": "Ring",
+          "type": "FRAME",
+          "width": 20,
+          "height": 20,
+          "opacity": 1,
+          "fills": [
+            {
+              "variable": "VariableID:19:3",
+              "opacity": 1
+            }
+          ],
+          "strokes": [
+            {
+              "variable": "VariableID:19:10",
+              "opacity": 0.10588235408067703
+            }
+          ],
+          "children": [
+            {
+              "id": "60:115",
+              "name": "Dot",
+              "type": "ELLIPSE",
+              "width": 8,
+              "height": 8,
+              "opacity": 1,
+              "fills": [
+                {
+                  "variable": "VariableID:20:10",
+                  "opacity": 1
+                }
+              ],
+              "strokes": []
+            }
+          ]
+        },
+        {
+          "id": "60:116",
+          "name": "Label",
+          "type": "TEXT",
+          "width": 45,
+          "height": 18,
+          "opacity": 1,
+          "fills": [
+            {
+              "variable": "VariableID:19:6",
+              "opacity": 1
+            }
+          ],
+          "strokes": []
+        }
+      ]
+    },
+    {
+      "id": "60:117",
+      "name": "State=Hover",
+      "type": "COMPONENT",
+      "width": 73,
+      "height": 20,
+      "opacity": 1,
+      "fills": [],
+      "strokes": [],
+      "children": [
+        {
+          "id": "60:118",
+          "name": "Ring",
+          "type": "FRAME",
+          "width": 20,
+          "height": 20,
+          "opacity": 1,
+          "fills": [
+            {
+              "variable": "VariableID:20:18",
+              "opacity": 0.09019608050584793
+            }
+          ],
+          "strokes": [
+            {
+              "variable": "VariableID:47:8",
+              "opacity": 1
+            }
+          ],
+          "children": [
+            {
+              "id": "60:119",
+              "name": "Dot",
+              "type": "ELLIPSE",
+              "width": 8,
+              "height": 8,
+              "opacity": 1,
+              "fills": [
+                {
+                  "variable": "VariableID:20:10",
+                  "opacity": 1
+                }
+              ],
+              "strokes": []
+            }
+          ]
+        },
+        {
+          "id": "60:120",
+          "name": "Label",
+          "type": "TEXT",
+          "width": 45,
+          "height": 18,
+          "opacity": 1,
+          "fills": [
+            {
+              "variable": "VariableID:19:6",
+              "opacity": 1
+            }
+          ],
+          "strokes": []
+        }
+      ]
+    },
+    {
+      "id": "60:121",
+      "name": "State=Selected",
+      "type": "COMPONENT",
+      "width": 73,
+      "height": 20,
+      "opacity": 1,
+      "fills": [],
+      "strokes": [],
+      "children": [
+        {
+          "id": "60:122",
+          "name": "Ring",
+          "type": "FRAME",
+          "width": 20,
+          "height": 20,
+          "opacity": 1,
+          "fills": [
+            {
+              "variable": "VariableID:19:3",
+              "opacity": 1
+            }
+          ],
+          "strokes": [
+            {
+              "variable": "VariableID:47:8",
+              "opacity": 1
+            }
+          ],
+          "children": [
+            {
+              "id": "60:123",
+              "name": "Dot",
+              "type": "ELLIPSE",
+              "width": 8,
+              "height": 8,
+              "opacity": 1,
+              "fills": [
+                {
+                  "variable": "VariableID:20:10",
+                  "opacity": 1
+                }
+              ],
+              "strokes": []
+            }
+          ]
+        },
+        {
+          "id": "60:124",
+          "name": "Label",
+          "type": "TEXT",
+          "width": 45,
+          "height": 18,
+          "opacity": 1,
+          "fills": [
+            {
+              "variable": "VariableID:19:6",
+              "opacity": 1
+            }
+          ],
+          "strokes": []
+        }
+      ]
+    },
+    {
+      "id": "60:125",
+      "name": "State=Disabled Unchecked",
+      "type": "COMPONENT",
+      "width": 73,
+      "height": 20,
+      "opacity": 1,
+      "fills": [],
+      "strokes": [],
+      "children": [
+        {
+          "id": "60:126",
+          "name": "Ring",
+          "type": "FRAME",
+          "width": 20,
+          "height": 20,
+          "opacity": 1,
+          "fills": [
+            {
+              "variable": "VariableID:47:10",
+              "opacity": 1
+            }
+          ],
+          "strokes": [
+            {
+              "variable": "VariableID:19:10",
+              "opacity": 0.10588235408067703
+            }
+          ],
+          "children": [
+            {
+              "id": "60:127",
+              "name": "Dot",
+              "type": "ELLIPSE",
+              "width": 8,
+              "height": 8,
+              "opacity": 1,
+              "fills": [
+                {
+                  "variable": "VariableID:20:10",
+                  "opacity": 1
+                }
+              ],
+              "strokes": []
+            }
+          ]
+        },
+        {
+          "id": "60:128",
+          "name": "Label",
+          "type": "TEXT",
+          "width": 45,
+          "height": 18,
+          "opacity": 1,
+          "fills": [
+            {
+              "variable": "VariableID:47:6",
+              "opacity": 1
+            }
+          ],
+          "strokes": []
+        }
+      ]
+    },
+    {
+      "id": "60:129",
+      "name": "State=Disabled Selected",
+      "type": "COMPONENT",
+      "width": 73,
+      "height": 20,
+      "opacity": 1,
+      "fills": [],
+      "strokes": [],
+      "children": [
+        {
+          "id": "60:130",
+          "name": "Ring",
+          "type": "FRAME",
+          "width": 20,
+          "height": 20,
+          "opacity": 1,
+          "fills": [
+            {
+              "variable": "VariableID:47:10",
+              "opacity": 1
+            }
+          ],
+          "strokes": [
+            {
+              "variable": "VariableID:19:10",
+              "opacity": 0.10588235408067703
+            }
+          ],
+          "children": [
+            {
+              "id": "60:131",
+              "name": "Dot",
+              "type": "ELLIPSE",
+              "width": 8,
+              "height": 8,
+              "opacity": 1,
+              "fills": [
+                {
+                  "variable": "VariableID:47:6",
+                  "opacity": 1
+                }
+              ],
+              "strokes": []
+            }
+          ]
+        },
+        {
+          "id": "60:132",
+          "name": "Label",
+          "type": "TEXT",
+          "width": 45,
+          "height": 18,
+          "opacity": 1,
+          "fills": [
+            {
+              "variable": "VariableID:47:6",
+              "opacity": 1
+            }
+          ],
+          "strokes": []
+        }
+      ]
+    }
+  ],
+  "assets": [
+    {
+      "path": "src/assets/controls/radio-default.svg",
+      "sourceNode": "60:114",
+      "width": 20,
+      "height": 20,
+      "bytes": 343,
+      "sha256": "854d531b7c2f11f652700481564f5a03a324749012557beb6a063cc725d1ae4d",
+      "reused": false
+    },
+    {
+      "path": "src/assets/controls/radio-disabled-selected.svg",
+      "sourceNode": "60:130",
+      "width": 20,
+      "height": 20,
+      "bytes": 401,
+      "sha256": "6e90adb66cd26a81ad5db4f39fe09de29b49ce382d7544e6618856d72d0e348d",
+      "reused": false
+    },
+    {
+      "path": "src/assets/controls/radio-disabled.svg",
+      "sourceNode": "60:126",
+      "width": 20,
+      "height": 20,
+      "bytes": 345,
+      "sha256": "e62a7a11715aa9ba3572362f61f18736630dd62853c610b722d9b1bccb26b6ad",
+      "reused": false
+    },
+    {
+      "path": "src/assets/controls/radio-hover.svg",
+      "sourceNode": "60:118",
+      "width": 20,
+      "height": 20,
+      "bytes": 361,
+      "sha256": "9e2bb1f4bc85fb5779ccb5aa59e71e9f3c05dff77c413b60ed7aa93e4ac22d0d",
+      "reused": false
+    },
+    {
+      "path": "src/assets/controls/radio-selected.svg",
+      "sourceNode": "60:122",
+      "width": 20,
+      "height": 20,
+      "bytes": 395,
+      "sha256": "3944f80fa73f24ffbe216f87029b9ca356adbda7693d126003a01ef7f2a53e02",
+      "reused": false
+    },
+    {
+      "path": "src/assets/controls/spinner-20.svg",
+      "sourceNode": "126:282",
+      "width": 21.5,
+      "height": 21.5,
+      "bytes": 533,
+      "sha256": "3d31f09da817e567bca795af7b98b71228300d02e95f2473ad69091e172be006",
+      "reused": false
+    },
+    {
+      "path": "src/assets/controls/spinner-24.svg",
+      "sourceNode": "126:288",
+      "width": 25.75,
+      "height": 25.75,
+      "bytes": 549,
+      "sha256": "14537fba3edb8e0810b4e5bf90b5e0ad3c026a3ac96506a06b58e3c9fb312ba1",
+      "reused": false
+    },
+    {
+      "path": "src/assets/controls/switch-off-default.svg",
+      "sourceNode": "181:567",
+      "width": 36,
+      "height": 20,
+      "bytes": 1036,
+      "sha256": "3fe49ca3b9134a07619f2b144d93bcd9a3a19431224b2dee48c9e992172620b8",
+      "reused": false
+    },
+    {
+      "path": "src/assets/controls/switch-off-disabled.svg",
+      "sourceNode": "181:579",
+      "width": 36,
+      "height": 20,
+      "bytes": 1051,
+      "sha256": "e265232a20edadbb061d69d5aa0bd9beda4fcb4af7512eadf051cbd77d8a1c30",
+      "reused": false
+    },
+    {
+      "path": "src/assets/controls/switch-off-focus.svg",
+      "sourceNode": "181:576",
+      "width": 40,
+      "height": 24,
+      "bytes": 1128,
+      "sha256": "5eb3f7bfac4dccacfa3e31b00e80780d75860c087e362d4123cdd3b748c4e57c",
+      "reused": false
+    },
+    {
+      "path": "src/assets/controls/switch-off-hover.svg",
+      "sourceNode": "181:570",
+      "width": 36,
+      "height": 20,
+      "bytes": 1037,
+      "sha256": "9ed19e616ee23f7122c35f31fcc64c68b4bae1edd6d0466f927eb6f27c957ed1",
+      "reused": false
+    },
+    {
+      "path": "src/assets/controls/switch-off-pressed.svg",
+      "sourceNode": "181:573",
+      "width": 36,
+      "height": 20,
+      "bytes": 1037,
+      "sha256": "e49f09117ef2a2477038641f990cdb200e3e5098a8f6a5e8e0e3a02c9d7ed0b8",
+      "reused": false
+    },
+    {
+      "path": "src/assets/controls/switch-on-default.svg",
+      "sourceNode": "182:565",
+      "width": 36,
+      "height": 20,
+      "bytes": 396,
+      "sha256": "52e05599de0da7e6e7623b2089470f53811cb47f58f2563a04388b477a1cd7c5",
+      "reused": false
+    },
+    {
+      "path": "src/assets/controls/switch-on-disabled.svg",
+      "sourceNode": "182:577",
+      "width": 36,
+      "height": 20,
+      "bytes": 1051,
+      "sha256": "3a7d5c320f290c53ead04b9b790eaffdb878dd85f959ac98bf43eea30b045693",
+      "reused": false
+    },
+    {
+      "path": "src/assets/controls/switch-on-focus.svg",
+      "sourceNode": "182:574",
+      "width": 40,
+      "height": 24,
+      "bytes": 1126,
+      "sha256": "5c6829a9c065d62145d6e740952dca712f19df6c7a44bdb39dcc0fd81dded945",
+      "reused": false
+    },
+    {
+      "path": "src/assets/controls/switch-on-hover.svg",
+      "sourceNode": "182:568",
+      "width": 36,
+      "height": 20,
+      "bytes": 396,
+      "sha256": "82e8850d0e42085487329255e7b91cb411db38fb72ed8a8916b30ec57ffbe563",
+      "reused": false
+    },
+    {
+      "path": "src/assets/controls/switch-on-pressed.svg",
+      "sourceNode": "182:571",
+      "width": 36,
+      "height": 20,
+      "bytes": 396,
+      "sha256": "d164dd8cba0affa9d11613207ef4d7f6ee0cba067aeb3097d34a0f838ad4a65f",
+      "reused": false
+    },
+    {
+      "path": "src/assets/icons/plus.svg",
+      "sourceNode": "139:208",
+      "width": 24.875,
+      "height": 24.875,
+      "bytes": 380,
+      "sha256": "a9cc89271db64cc796200849b7b38078dd89d78c6ef5af8a2c8b44782a8cff7d",
+      "reused": false
+    },
+    {
+      "path": "src/assets/icons/minus.svg",
+      "sourceNode": "54:280",
+      "width": 24,
+      "height": 24,
+      "bytes": 327,
+      "sha256": "d0023677d0aa9331ae2c36b93ba484f04cc7305d533c9e1aca73ccdbce4dd4c0",
+      "reused": false
+    },
+    {
+      "path": "src/assets/icons/chevron-down.svg",
+      "sourceNode": "54:260",
+      "width": 24,
+      "height": 24,
+      "bytes": 343,
+      "sha256": "cbef0849c575f617f4784d269e07ad7bba5d3ebcef8df0a27812e1006f425590",
+      "reused": false
+    },
+    {
+      "path": "src/assets/icons/spinner.svg",
+      "sourceNode": "126:276",
+      "width": 17.25,
+      "height": 17.25,
+      "bytes": 540,
+      "sha256": "92f5c7a95cbdbcd3b022240fa2cb83b11615ff9f254f7d9bc0b642d4c1ace4c3",
+      "reused": true
+    }
+  ]
+}

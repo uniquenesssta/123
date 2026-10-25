@@ -1,0 +1,1 @@
+export { badgeView } from "./badgeView";

@@ -1,8 +1,12 @@
 # Testing
 
-## R12-10 Design Tokens（2026-10-25，VERIFYING）
+## R12-11 UI Primitives（2026-10-25，VERIFYING）
 
-沿原全局视觉入口增加193变量/13文字样式/6阴影与1,344项实际CSS计算断言，检查明暗主题、三种控件/图标尺寸、八种图标色调、单位/别名和文字/阴影几何。CSS递归导入读取仅适配原验证器；未改原阈值或PNG基线。91步骤完整前端、原1,104项Shell/工作区、136项告警及17视口、完整架构和Rust fmt通过；10自身Windows CI待提交后验证，不轮询。详[10记录](modular-rewrite/R12-frontend-foundation-ui-system/R12-10-design-tokens.md)。
+沿原global-visual-system入口增加14族控件的真实Windows Chromium检查：两个宽度×Light/Dark，合计868项，覆盖设计几何/原始SVG外沿、主题/错误色、输入与小数步进、Space/箭头/Enter/Escape/Tab、禁用祖先、只读、原生FormData/reset、混合选择、下拉底部翻转、加载宽度、辅助描述和销毁重挂载。截图和结构化结果复制到原`../logs/**`产物位置；没有新增runner/workflow/依赖或改原PNG/阈值。最终91步骤前端、1,104项Shell/工作区、136项告警、17视口、1,344项token、架构与Rust fmt通过。11自身Windows待验，不用10的CI替代；详[11记录](modular-rewrite/R12-frontend-foundation-ui-system/R12-11-ui-primitives.md)。
+
+## R12-10 Design Tokens（2026-10-25，DONE）
+
+沿原全局视觉入口增加193变量/13文字样式/6阴影与1,344项实际CSS计算断言，检查明暗主题、三种控件/图标尺寸、八种图标色调、单位/别名和文字/阴影几何。CSS递归导入读取仅适配原验证器；未改原阈值或PNG基线。91步骤完整前端、原1,104项Shell/工作区、136项告警及17视口、完整架构和Rust fmt通过；10自身精确e3dcf5d/run40174915845全部步骤、ZIP哈希与startup trace已核验通过，不轮询。详[10记录](modular-rewrite/R12-frontend-foundation-ui-system/R12-10-design-tokens.md)。
 
 ## R12-09 Platform（2026-10-25，DONE）
 

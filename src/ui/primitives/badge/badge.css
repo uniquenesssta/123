@@ -1,0 +1,7 @@
+.ui-badge { --badge-ink: var(--fip-color-text-primary); --badge-soft: var(--fip-color-bg-subtle); --badge-border: var(--fip-color-border-default); display: inline-flex; box-sizing: border-box; flex: none; align-items: center; justify-content: center; width: max-content; max-width: 100%; min-height: 24px; padding: 0 var(--fip-space-sm); border: var(--fip-control-stroke) solid transparent; border-radius: 12px; background: var(--badge-soft); color: var(--badge-ink); font: 500 12px/16px var(--fip-type-body-family); overflow-wrap: anywhere; }
+.ui-badge[data-tone="Info"] { --badge-ink: var(--fip-color-text-info); --badge-soft: var(--fip-color-feedback-info-surface); --badge-border: var(--fip-color-action-accent); }
+.ui-badge[data-tone="Success"] { --badge-ink: var(--fip-color-text-success); --badge-soft: var(--fip-color-feedback-success-surface); --badge-border: var(--fip-color-icon-success); }
+.ui-badge[data-tone="Warning"] { --badge-ink: var(--fip-color-text-warning); --badge-soft: var(--fip-color-feedback-warning-surface); --badge-border: var(--fip-color-icon-warning); }
+.ui-badge[data-tone="Danger"] { --badge-ink: var(--fip-color-text-danger); --badge-soft: var(--fip-color-feedback-danger-surface); --badge-border: var(--fip-color-icon-danger); }
+.ui-badge[data-style="Outline"] { background: transparent; border-color: var(--badge-border); }
+@media (forced-colors: active) { .ui-badge { border-color: CanvasText; } }

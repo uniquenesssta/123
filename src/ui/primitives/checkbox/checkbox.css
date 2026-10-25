@@ -1,0 +1,12 @@
+.ui-checkbox { display: inline-flex; position: relative; align-items: center; gap: var(--fip-space-sm); min-height: 20px; color: var(--fip-color-text-primary); font: 14px/18px var(--fip-type-body-family); cursor: pointer; }
+.ui-checkbox > input { appearance: none; position: absolute; left: 0; top: 0; width: 20px; height: 20px; margin: 0; opacity: 0; cursor: inherit; }
+.ui-checkbox-mark { box-sizing: border-box; display: flex; flex: none; align-items: center; justify-content: center; width: 20px; height: 20px; border: var(--fip-control-stroke) solid var(--fip-color-border-default); border-radius: var(--fip-radius-sm); background: var(--fip-color-bg-surface); color: var(--fip-color-text-on-accent); pointer-events: none; }
+.ui-checkbox-mark > span { display: none; height: 16px; }
+.ui-checkbox-label { font: inherit; color: inherit; }
+.ui-checkbox:hover > input:enabled + .ui-checkbox-mark { background: var(--fip-color-action-accent-soft); border-color: var(--fip-color-border-focus); }
+.ui-checkbox > input:is(:checked,:indeterminate) + .ui-checkbox-mark { border-color: transparent; background: var(--fip-color-action-accent); }
+.ui-checkbox > input:checked:not(:indeterminate) + .ui-checkbox-mark > .ui-checkbox-check, .ui-checkbox > input:indeterminate + .ui-checkbox-mark > .ui-checkbox-mixed { display: block; }
+.ui-checkbox > input:disabled + .ui-checkbox-mark { border-color: var(--fip-color-border-default); background: var(--fip-color-control-disabled-surface); color: var(--fip-color-icon-secondary); }
+.ui-checkbox:has(input:disabled) { color: var(--fip-color-text-disabled); cursor: default; }
+.ui-checkbox > input:focus-visible + .ui-checkbox-mark { outline: var(--fip-control-focus-stroke) solid var(--fip-color-border-focus); outline-offset: 2px; }
+@media (forced-colors: active) { .ui-checkbox-mark { border-color: ButtonText; } .ui-checkbox > input:checked + .ui-checkbox-mark { background: Highlight; color: HighlightText; forced-color-adjust: none; } .ui-checkbox > input:disabled + .ui-checkbox-mark { border-color: GrayText; color: GrayText; } }

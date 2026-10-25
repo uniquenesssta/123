@@ -31,11 +31,16 @@
 .ui-icon-reset { --ui-icon-source: url("../../assets/icons/reset.svg"); }
 .ui-icon-alert-circle { --ui-icon-source: url("../../assets/icons/alert-circle.svg"); }
 .ui-icon-close { --ui-icon-source: url("../../assets/icons/close.svg"); }
-.ui-icon-spinner { position: relative; background: transparent; mask: none; animation: fip-spinner .8s linear infinite; }
-.ui-icon-spinner > svg { position: absolute; inset: -3.90625%; width: 107.8125%; height: 107.8125%; }
-.ui-icon-spinner [id="Track"] { stroke: var(--fip-border); stroke-opacity: 1; }
-.ui-icon-spinner [id="Active arc"] { stroke: var(--fip-accent); }
-@keyframes fip-spinner { to { transform: rotate(360deg); } }
-@media (prefers-reduced-motion: reduce) { .ui-icon-spinner { animation: none; } }
 
 .ui-icon-check { --ui-icon-source: url("../../assets/icons/check.svg"); }
+
+.ui-icon-minus { --ui-icon-source: url("../../assets/icons/minus.svg"); }
+.ui-icon-plus { position: relative; background: transparent; mask: none; }
+/* Plus has a 24.875px exported root outside its 24px master. Scale the wrapper,
+   preserving both the root attributes and Figma's -0.875px outside-stroke offset. */
+.ui-icon-plus-master { position: absolute; left: 0; top: 0; width: 24px; height: 24px; transform-origin: left top; }
+.ui-icon-size-16 > .ui-icon-plus-master { transform: scale(0.6666666667); }
+.ui-icon-size-20 > .ui-icon-plus-master { transform: scale(0.8333333333); }
+.ui-icon-plus-master > svg { position: absolute; left: -0.875px; top: -0.875px; max-width: none; }
+.ui-icon-plus-master [id="Vector"] { stroke: currentColor; }
+.ui-icon-chevron-down { --ui-icon-source: url("../../assets/icons/chevron-down.svg"); }

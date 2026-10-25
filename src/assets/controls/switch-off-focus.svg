@@ -1,0 +1,11 @@
+<svg preserveAspectRatio="none" overflow="visible" style="display: block;" width="40" height="24" viewBox="0 0 40 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+<g id="Track">
+<mask id="path-1-outside-1_0_34" maskUnits="userSpaceOnUse" x="0" y="0" width="40" height="24" fill="black">
+<rect fill="white" width="40" height="24"/>
+<path d="M2 11C2 6.02944 6.02944 2 11 2H29C33.9706 2 38 6.02944 38 11V13C38 17.9706 33.9706 22 29 22H11C6.02944 22 2 17.9706 2 13V11Z"/>
+</mask>
+<path d="M2 11C2 6.02944 6.02944 2 11 2H29C33.9706 2 38 6.02944 38 11V13C38 17.9706 33.9706 22 29 22H11C6.02944 22 2 17.9706 2 13V11Z" fill="#F8F9FB"/>
+<path d="M11 2V4H29V2V0H11V2ZM38 11H36V13H38H40V11H38ZM29 22V20H11V22V24H29V22ZM2 13H4V11H2H0V13H2ZM11 22V20C7.13401 20 4 16.866 4 13H2H0C0 19.0751 4.92487 24 11 24V22ZM38 13H36C36 16.866 32.866 20 29 20V22V24C35.0751 24 40 19.0751 40 13H38ZM29 2V4C32.866 4 36 7.13401 36 11H38H40C40 4.92487 35.0751 0 29 0V2ZM11 2V0C4.92487 0 0 4.92487 0 11H2H4C4 7.13401 7.13401 4 11 4V2Z" fill="#356DF3" mask="url(#path-1-outside-1_0_34)"/>
+<circle id="Thumb" cx="12" cy="12" r="8" fill="#303846"/>
+</g>
+</svg>

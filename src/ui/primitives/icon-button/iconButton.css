@@ -1,4 +1,4 @@
-:is(.application-shell, .ui-confirmation-dialog, .warning-center-root) .ui-icon-button {
+.ui-icon-button[data-ui-primitive] {
   display: inline-flex;
   flex: 0 0 var(--fip-action-size);
   align-items: center;
@@ -8,15 +8,17 @@
   min-height: var(--fip-action-size);
   padding: 0;
   border: 0;
-  border-radius: var(--fip-radius-md);
+  border-radius: var(--fip-control-radius);
   background: transparent;
   color: var(--fip-text);
   box-shadow: none;
   transform: none;
   cursor: pointer;
 }
-:is(.application-shell, .ui-confirmation-dialog, .warning-center-root) .ui-icon-button:hover:not(:disabled) { background: var(--fip-raised); }
-:is(.application-shell, .ui-confirmation-dialog, .warning-center-root) .ui-icon-button:active:not(:disabled) { background: var(--fip-accent-soft); }
-:is(.application-shell, .ui-confirmation-dialog, .warning-center-root) .ui-icon-button:disabled { opacity: 1; cursor: default; }
-:is(.application-shell, .ui-confirmation-dialog, .warning-center-root) .ui-icon-button:disabled .ui-icon-slot { opacity: var(--fip-disabled-opacity); }
-:is(.application-shell, .ui-confirmation-dialog, .warning-center-root) .ui-icon-button:focus-visible { outline: 1px solid var(--fip-accent); outline-offset: -1px; }
+.ui-icon-button[data-ui-primitive] { box-sizing: border-box; }
+.ui-icon-button[data-ui-primitive]:hover:enabled { background: var(--fip-raised); }
+.ui-icon-button[data-ui-primitive]:active:enabled { background: var(--fip-accent-soft); color: var(--fip-accent); }
+.ui-icon-button[data-ui-primitive]:disabled { opacity: 1; cursor: default; }
+.ui-icon-button[data-ui-primitive]:disabled .ui-icon-slot { opacity: var(--fip-disabled-opacity); }
+.ui-icon-button[data-ui-primitive]:focus-visible { outline: var(--fip-control-stroke) solid var(--fip-accent); outline-offset: -1px; }
+@media (forced-colors: active) { .ui-icon-button[data-ui-primitive]:focus-visible { outline-color: Highlight; } .ui-icon-button[data-ui-primitive]:disabled { color: GrayText; } }

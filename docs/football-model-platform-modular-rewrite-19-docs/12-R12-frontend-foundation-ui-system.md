@@ -7,7 +7,7 @@
 
 ## 当前前置状态（2026-10-25）
 
-`IN_PROGRESS`。01～09 DONE；09精确98dc43e/run40145377194的全部步骤、产物摘要和启动日志核对通过。用户2026-10-25授权“收尾09开始10”，10 Design Tokens已实施VERIFYING；11～19 BLOCKED。沿唯一rewrite/r12-frontend-foundation-ui-system。10自身Windows待提交后独立验收；不轮询CI。详[10记录](../modular-rewrite/R12-frontend-foundation-ui-system/R12-10-design-tokens.md)。
+`IN_PROGRESS`。01～10 DONE；10精确e3dcf5d/run40174915845的全部步骤、完整日志、产物摘要和启动trace已核验。用户2026-10-25授权“已通过 开始11”，11 UI Primitives已实施VERIFYING；12～19 BLOCKED。沿唯一rewrite/r12-frontend-foundation-ui-system。11自身Windows待提交后独立验收；不轮询CI。详[11记录](../modular-rewrite/R12-frontend-foundation-ui-system/R12-11-ui-primitives.md)。
 
 ## 1. 阶段目标
 
@@ -270,7 +270,7 @@ app/shell/content-region/
 
 ### R12-10 Design Tokens
 
-05已在唯一目标目录先落地Shell必需的颜色/尺寸子集，详05记录；本节点当前VERIFYING，已在同一实现补齐，不另建token副本。
+05已在唯一目标目录先落地Shell必需的颜色/尺寸子集，详05记录；10已在同一实现补齐并通过自身Windows验收DONE，不另建token副本。
 
 分别建立颜色、字体、间距、尺寸、圆角、边框、阴影、动效、层级和断点 token。禁止在 feature CSS 中新增无法解释的魔法值。
 
@@ -1596,7 +1596,7 @@ src/platform/timing/
 
 ## R12-10 Design Tokens
 
-状态：`VERIFYING`（09自身精确Windows证据核验通过，10已按用户授权实施；自身Windows待验）
+状态：`DONE`（精确e3dcf5d/run40174915845自身Windows全部步骤、ZIP摘要与startup日志核验通过）
 
 ### 1. 目标
 
@@ -1739,7 +1739,7 @@ src/ui/tokens/breakpoint/
 
 ## R12-11 UI Primitives
 
-状态：`BLOCKED`（仅当上一任务与本任务前置门禁通过后改为 `READY`）
+状态：`VERIFYING`。10自身精确Windows证据已核验，用户2026-10-25授权11；14类基础控件、868项原生检查与91步骤完整前端通过。11自身Windows待验，12～19 BLOCKED，详[11记录](../modular-rewrite/R12-frontend-foundation-ui-system/R12-11-ui-primitives.md)。
 
 ### 1. 目标
 

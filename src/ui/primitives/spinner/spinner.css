@@ -1,0 +1,16 @@
+.ui-spinner { display: inline-block; flex: none; position: relative; background: transparent; animation: fip-spinner 800ms linear infinite; }
+.ui-spinner-16 { width: 16px; height: 16px; }
+.ui-spinner-20 { width: 20px; height: 20px; }
+.ui-spinner-24 { width: 24px; height: 24px; }
+/* SVG roots retain their exported dimensions, including the outside stroke. */
+.ui-spinner > svg { position: absolute; max-width: none; }
+.ui-spinner-16 > svg { left: -0.625px; top: -0.625px; }
+.ui-spinner-20 > svg { left: -0.75px; top: -0.75px; }
+.ui-spinner-24 > svg { left: -0.875px; top: -0.875px; }
+.ui-spinner [id="Track"] { stroke: var(--fip-color-border-default); stroke-opacity: 1; }
+.ui-spinner [id="Active arc"] { stroke: var(--fip-color-action-accent); }
+.ui-spinner[data-tone="On Accent"] [id="Track"] { stroke: var(--fip-color-icon-on-accent); stroke-opacity: 0.34; }
+.ui-spinner[data-tone="On Accent"] [id="Active arc"] { stroke: var(--fip-color-icon-on-accent); }
+@keyframes fip-spinner { to { transform: rotate(360deg); } }
+@media (prefers-reduced-motion: reduce) { .ui-spinner { animation: none; } }
+@media (forced-colors: active) { .ui-spinner [id="Track"] { stroke: GrayText; } .ui-spinner [id="Active arc"] { stroke: Highlight; } }

@@ -1,13 +1,23 @@
-/* Minimal feedback action32 dependency; the complete primitive matrix remains R12-11. */
-:is(.application-shell, .ui-confirmation-dialog, .warning-center-root) .ui-button { display: inline-flex; align-items: center; justify-content: center; gap: var(--fip-control-gap); min-height: var(--fip-control-height); height: var(--fip-control-height); padding: 0 var(--fip-control-padding-x); border: var(--fip-control-stroke) solid transparent; border-radius: var(--fip-control-radius); font-size: var(--fip-control-font-size); font-weight: 500; line-height: var(--fip-control-line-height); white-space: nowrap; box-shadow: none; transform: none; }
-:is(.application-shell, .ui-confirmation-dialog, .warning-center-root) .ui-button-primary { background: var(--fip-accent); color: var(--fip-on-accent); }
-:is(.application-shell, .ui-confirmation-dialog, .warning-center-root) .ui-button-primary:hover { background: var(--fip-accent-hover); }
-:is(.application-shell, .ui-confirmation-dialog, .warning-center-root) .ui-button-primary:active { background: var(--fip-accent-pressed); }
-:is(.application-shell, .ui-confirmation-dialog, .warning-center-root) .ui-button-danger { background: var(--fip-danger); color: var(--fip-on-accent); }
-:is(.application-shell, .ui-confirmation-dialog, .warning-center-root) .ui-button-danger:hover { background: var(--fip-danger-hover); }
-:is(.application-shell, .ui-confirmation-dialog, .warning-center-root) .ui-button-danger:active { background: var(--fip-danger-pressed); }
-:is(.application-shell, .ui-confirmation-dialog, .warning-center-root) .ui-button { cursor: pointer; }
-:is(.application-shell, .ui-confirmation-dialog, .warning-center-root) .ui-button-secondary { background: var(--fip-surface); color: var(--fip-text); border-color: var(--fip-border); }
-:is(.application-shell, .ui-confirmation-dialog, .warning-center-root) .ui-button-secondary:hover { background: var(--fip-raised); }
-:is(.application-shell, .ui-confirmation-dialog, .warning-center-root) .ui-button-secondary:active { background: var(--fip-accent-soft); }
-:is(.application-shell, .ui-confirmation-dialog, .warning-center-root) .ui-button:focus-visible { outline: 1px solid var(--fip-accent); outline-offset: -1px; }
+.ui-button[data-ui-primitive] { display: inline-flex; box-sizing: border-box; align-items: center; justify-content: center; gap: var(--fip-control-gap); min-height: var(--fip-control-height); height: var(--fip-control-height); padding: 0 var(--fip-control-padding-x); border: var(--fip-control-stroke) solid transparent; border-radius: var(--fip-control-radius); font-family: var(--fip-type-body-family); font-size: var(--fip-control-font-size); font-weight: 500; line-height: var(--fip-control-line-height); white-space: nowrap; box-shadow: none; transform: none; cursor: pointer; }
+.ui-button-primary[data-ui-primitive] { background: var(--fip-accent); color: var(--fip-on-accent); }
+.ui-button-primary[data-ui-primitive]:hover:enabled { background: var(--fip-accent-hover); }
+.ui-button-primary[data-ui-primitive]:active:enabled { background: var(--fip-accent-pressed); }
+.ui-button-secondary[data-ui-primitive] { background: var(--fip-surface); color: var(--fip-text); border-color: var(--fip-border); }
+.ui-button-secondary[data-ui-primitive]:hover:enabled { background: var(--fip-raised); border-color: var(--fip-color-border-strong); }
+.ui-button-secondary[data-ui-primitive]:active:enabled { background: var(--fip-accent-soft); border-color: var(--fip-color-border-focus); }
+.ui-button-ghost[data-ui-primitive] { background: transparent; color: var(--fip-text); }
+.ui-button-ghost[data-ui-primitive]:hover:enabled { background: var(--fip-raised); }
+.ui-button-ghost[data-ui-primitive]:active:enabled { background: var(--fip-accent-soft); }
+.ui-button-danger[data-ui-primitive] { background: var(--fip-danger); color: var(--fip-on-accent); }
+.ui-button-danger[data-ui-primitive]:hover:enabled { background: var(--fip-danger-hover); }
+.ui-button-danger[data-ui-primitive]:active:enabled { background: var(--fip-danger-pressed); }
+.ui-button[data-ui-primitive]:disabled { color: var(--fip-color-text-disabled); opacity: 1; cursor: default; }
+.ui-button-primary[data-ui-primitive]:disabled, .ui-button-secondary[data-ui-primitive]:disabled { background: var(--fip-color-control-disabled-surface); }
+.ui-button-danger[data-ui-primitive]:disabled { background: var(--fip-color-action-danger-disabled); }
+.ui-button[data-ui-primitive][aria-busy="true"] { color: var(--fip-text); }
+.ui-button-primary[data-ui-primitive][aria-busy="true"] { background: var(--fip-accent); color: var(--fip-on-accent); }
+.ui-button-danger[data-ui-primitive][aria-busy="true"] { background: var(--fip-danger); color: var(--fip-on-accent); }
+.ui-button-secondary[data-ui-primitive][aria-busy="true"] { background: var(--fip-surface); }
+.ui-button[data-ui-primitive]:focus-visible { outline: var(--fip-control-stroke) solid var(--fip-color-border-focus); outline-offset: -1px; }
+.ui-button-primary[data-ui-primitive]:focus-visible, .ui-button-danger[data-ui-primitive]:focus-visible { outline-color: var(--fip-color-border-focus-on-accent); }
+@media (forced-colors: active) { .ui-button[data-ui-primitive] { border-color: ButtonText; } .ui-button[data-ui-primitive]:disabled { color: GrayText; border-color: GrayText; } }

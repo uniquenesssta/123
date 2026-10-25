@@ -194,7 +194,30 @@
         "reason": "prediction currently composes the run history page renderer",
         "exit_task": "R14-07"
       }
-    ]
+    ],
+    "ui_primitives": {
+      "owner": "src/ui/primitives",
+      "style_entry": "src/ui/primitives/index.css",
+      "source_record": "docs/modular-rewrite/R12-frontend-foundation-ui-system/R12-11-component-mappings.json",
+      "families": [
+        "button",
+        "icon-button",
+        "text-input",
+        "number-input",
+        "text-area",
+        "checkbox",
+        "radio",
+        "switch",
+        "select",
+        "badge",
+        "divider",
+        "tooltip",
+        "spinner",
+        "skeleton"
+      ],
+      "state": "Only local busy/open/keyboard-active/typeahead/indeterminate projections; native controls own form values; no business or persistent state",
+      "production_dependencies_added": false
+    }
   },
   "rust": {
     "workspace": "Cargo.toml",

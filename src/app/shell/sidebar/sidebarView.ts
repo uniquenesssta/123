@@ -2,7 +2,7 @@ import { escapeHtml } from "../../../components/format";
 import { PRIMARY_NAVIGATION, type PrimaryNavigationModule } from "../../router";
 import { iconSlot } from "../../../ui/icons/iconSlot";
 import { navigationIcon } from "./sidebarIcons";
-import { iconButtonView } from "../../../ui/primitives/icon-button/iconButtonView";
+import { iconButtonView } from "../../../ui/primitives/icon-button";
 import { serviceStatusView } from "../topbar/serviceStatusView";
 import type { ShellOptions } from "../application-shell/applicationShellState";
 
@@ -22,7 +22,7 @@ export function sidebarView(options: ShellOptions, activeModule: PrimaryNavigati
   </aside>
   <aside id="shell-secondary-navigation" class="secondary-sidebar" aria-label="${activeModule.label}二级菜单" data-shell-controls ${options.sidebarCollapsed ? "hidden inert" : ""}>
     <header class="secondary-sidebar-header"><span>${activeModule.label}</span>
-      ${iconButtonView("toggle-global-sidebar", "收起二级菜单", "panel-left", "secondary-collapse-button", 'aria-controls="shell-secondary-navigation" aria-expanded="true"')}
+      ${iconButtonView({ action: "toggle-global-sidebar", label: "收起二级菜单", icon: "panel-left", className: "secondary-collapse-button", attributes: {"aria-controls":"shell-secondary-navigation","aria-expanded":"true"}})}
     </header>
     <p class="secondary-module-description">${activeModule.description}</p>
     <nav class="secondary-navigation" aria-label="${activeModule.label}功能入口">

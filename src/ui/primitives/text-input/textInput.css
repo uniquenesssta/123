@@ -1,0 +1,5 @@
+.ui-text-input { display: inline-flex; align-items: center; gap: var(--fip-control-gap); height: var(--fip-control-height); padding: 0 var(--fip-control-padding-x); color: var(--fip-color-text-primary); }
+.ui-text-input-control::-webkit-search-cancel-button { display: none; }
+.ui-text-input .ui-input-clear { flex: 0 0 24px; width: 24px; height: 24px; min-height: 24px; }
+.ui-text-input .ui-input-clear[hidden] { display: none; }
+.ui-text-input > .ui-icon-slot { color: var(--fip-color-icon-secondary); }

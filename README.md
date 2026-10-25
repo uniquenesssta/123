@@ -1,8 +1,12 @@
 # 足球模型平台公开外壳
 
-## R12-10 Design Tokens（2026-10-25，VERIFYING）
+## R12-11 UI Primitives（2026-10-25，VERIFYING）
 
-09自身Windows验收、产物摘要和启动日志已核对收尾。10在原FIP目录按10类职责补齐193个设计变量、13个文字样式和6个阴影样式，保留明暗/尺寸/色调模式，Shell与反馈控件接入唯一CSS入口。1,344项原生计算值、91步骤完整前端、1,104项Shell/工作区、136项告警及17视口通过；自身Windows待验，11～19 BLOCKED。详[10记录](docs/modular-rewrite/R12-frontend-foundation-ui-system/R12-10-design-tokens.md)。
+10自身精确Windows证据已核验收尾。11在唯一primitives目录完成14类控件及公开出口，现有Shell/反馈/确认按钮统一接入；原生表单值、键盘、禁用/只读、加载宽度、下拉定位和销毁保持明确边界。868项Windows控件检查、91步骤完整前端、架构和Rust fmt通过；11自身Windows待验，12～19 BLOCKED。详[11记录](docs/modular-rewrite/R12-frontend-foundation-ui-system/R12-11-ui-primitives.md)。
+
+## R12-10 Design Tokens（2026-10-25，DONE）
+
+09自身Windows验收、产物摘要和启动日志已核对收尾。10在原FIP目录按10类职责补齐193个设计变量、13个文字样式和6个阴影样式，保留明暗/尺寸/色调模式，Shell与反馈控件接入唯一CSS入口。1,344项原生计算值、91步骤完整前端、1,104项Shell/工作区、136项告警及17视口通过；自身精确e3dcf5d/run40174915845的Windows、下载产物摘要与startup日志已核验，11按本次授权实施。详[10记录](docs/modular-rewrite/R12-frontend-foundation-ui-system/R12-10-design-tokens.md)。
 
 ## R12-09 Platform 能力（2026-10-25，DONE）
 

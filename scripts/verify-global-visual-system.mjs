@@ -1,5 +1,6 @@
 import { readStylesheet } from "./tokens/tokenStyles.mjs";
 import { verifyDesignTokens } from "./tokens/verifyDesignTokens.mjs";
+import { verifyPrimitives } from "./primitives/verifyPrimitives.mjs";
 import { existsSync, readFileSync } from "node:fs";
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -12,6 +13,7 @@ const check = (condition, message) => { if (!condition) failures.push(message); 
 const contract = JSON.parse(read("contracts/global-visual-system-contract.json"));
 const styles = [contract.style_entry, ...contract.shell_style_entries, ...contract.feedback_style_entries].map(file => readStylesheet(root, file)).join("\n");
 await verifyDesignTokens(root);
+await verifyPrimitives(root);
 const main = read("src/main.ts");
 const pkg = JSON.parse(read("package.json"));
 const taskUi = JSON.parse(read("contracts/task-ui-contract.json"));
