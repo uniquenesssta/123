@@ -1,8 +1,12 @@
 # 足球模型平台公开外壳
 
-## R12-11 UI Primitives（2026-10-25，VERIFYING）
+## R12-12 Forms（2026-10-25，VERIFYING）
 
-10自身精确Windows证据已核验收尾。11在唯一primitives目录完成14类控件及公开出口，现有Shell/反馈/确认按钮统一接入；原生表单值、键盘、禁用/只读、加载宽度、下拉定位和销毁保持明确边界。868项Windows控件检查、91步骤完整前端、架构和Rust fmt通过；11自身Windows待验，12～19 BLOCKED。详[11记录](docs/modular-rewrite/R12-frontend-foundation-ui-system/R12-11-ui-primitives.md)。
+11自身Windows证据已独立核验收尾。12完成七类Forms，真实数据库连接字段、名称确认及确认动作区统一复用11控件；字段错误保留原生输入与焦点，摘要定位字段，名称门槛支持大小写敏感trim匹配、输入法边界和生命周期清理，业务/后端二次校验保持。272项Windows浏览器表单检查、91步骤前端、架构、18项保护资产和Rust fmt通过；12自身Windows打包/实际Tauri启动待提交后验收，13～19 BLOCKED。详[12记录](docs/modular-rewrite/R12-frontend-foundation-ui-system/R12-12-forms.md)。
+
+## R12-11 UI Primitives（2026-10-25，DONE）
+
+10自身精确Windows证据已核验收尾。11在唯一primitives目录完成14类控件及公开出口，现有Shell/反馈/确认按钮统一接入；原生表单值、键盘、禁用/只读、加载宽度、下拉定位和销毁保持明确边界。868项Windows控件检查、91步骤完整前端、架构和Rust fmt通过；11精确085097a/run40188280192自身Windows全部步骤、ZIP摘要与startup trace已核验；用户授权12。详[11记录](docs/modular-rewrite/R12-frontend-foundation-ui-system/R12-11-ui-primitives.md)。
 
 ## R12-10 Design Tokens（2026-10-25，DONE）
 

@@ -11,5 +11,5 @@
 .confirmation-dialog-facts > div { display: flex; align-items: flex-start; gap: 8px; }
 .confirmation-dialog-facts dt { flex: 0 0 100px; color: var(--fip-muted); font-size: var(--fip-type-label-size); font-weight: var(--fip-type-label-weight); line-height: var(--fip-type-label-line-height); letter-spacing: var(--fip-type-label-letter-spacing); }
 .confirmation-dialog-facts dd { flex: 1; min-width: 0; margin: 0; color: var(--fip-strong); font-size: var(--fip-type-body-size); line-height: var(--fip-type-body-line-height); overflow-wrap: anywhere; }
-.confirmation-dialog-actions { display: flex; align-items: center; justify-content: flex-end; gap: 8px; padding: 8px 12px; border-top: var(--fip-border-width) solid var(--fip-border); background: var(--fip-raised); }
+.confirmation-dialog-actions { margin: 0; }
 .confirmation-dialog-actions [autofocus]:focus { outline: 1px solid var(--fip-accent); outline-offset: -1px; }

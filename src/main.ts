@@ -10,6 +10,10 @@ import "./styles/workspacePanels.css";
 import "./ui/tokens/index.css";
 import "./ui/icons/iconSlot.css";
 import "./ui/primitives/index.css";
+import "./ui/forms/index.css";
+import { confirmationInputView } from "./ui/forms/confirmation-input";
+import { formActionsView } from "./ui/forms/form-actions";
+import { focusValidationTarget } from "./ui/forms/validation-summary";
 import "./ui/feedback/blocking-message/blockingMessage.css";
 import "./ui/overlays/confirmation-dialog/confirmationDialog.css";
 import "./app/shell/application-shell/applicationShell.css";
@@ -1410,13 +1414,9 @@ function requestDatabaseReset(): void {
         <div class="visual-field"><span>当前数据库</span><strong>${escapeHtml(databaseName)}</strong></div>
         <div class="visual-field"><span>清空后保留</span><strong>数据库本身、结构和本机连接配置</strong></div>
       </div>
-      <div class="database-reset-confirmation">
-        <label for="database-reset-confirmation">输入数据库名称 <code>${escapeHtml(databaseName)}</code> 以继续</label>
-        <input id="database-reset-confirmation" type="text" autocomplete="off" spellcheck="false" data-database-name="${escapeHtml(databaseName)}" />
-        <small>名称必须完全一致。清空期间客户端会暂时断开，完成后自动重新连接并重新启动界面。</small>
-      </div>
+      <div class="database-reset-confirmation">${confirmationInputView({ id: "database-reset-confirmation", confirmButtonId: "database-reset-confirm-button", expected: databaseName, label: `输入数据库名称 ${databaseName} 以继续`, hint: "名称必须完全一致。清空期间客户端会暂时断开，完成后自动重新连接并重新启动界面。", attributes: { "data-database-name": databaseName } })}</div>
     </div>`;
-  const footer = `<button type="button" class="secondary" data-action="close-workspace-detail">取消</button><button type="button" class="primary danger-action" data-action="execute-database-reset" disabled>确认永久清空</button>`;
+  const footer = formActionsView({ cancel: { label: "取消", attributes: { "data-action": "close-workspace-detail" } }, confirm: { label: "确认永久清空", variant: "danger", disabled: true, attributes: { "data-action": "execute-database-reset", id: "database-reset-confirm-button" } } });
   showHtmlModal("彻底清空数据库", "不可撤销的危险操作", body, footer, "database-reset-modal");
   queueMicrotask(() => document.querySelector<HTMLInputElement>("#database-reset-confirmation")?.focus());
 }
@@ -8072,6 +8072,9 @@ document.addEventListener("click", (event) => {
   if (shellController?.hasConfirmation) return;
   if (target.closest("[data-shell-controls]")) return;
   if (target.closest("button:disabled, [inert], [aria-disabled='true']")) return;
+  const summary = target.closest<HTMLElement>("[data-validation-summary]");
+  const formRegion = summary?.closest<HTMLElement>(".inline-setup-panel");
+  if (summary && formRegion && focusValidationTarget(event, summary, formRegion)) return;
   if (!target.closest("#app-context-menu")) closeAppContextMenu();
   if (selectRulesDirectoryLevel(target)) return;
   const pageButton = target.closest<HTMLElement>("[data-page]");
@@ -8127,18 +8130,6 @@ function filterSelectOptions(
 
 document.addEventListener("input", (event) => {
   const target = event.target as HTMLInputElement | HTMLTextAreaElement;
-  if (
-    target.id === "database-reset-confirmation" &&
-    target instanceof HTMLInputElement
-  ) {
-    const button = document.querySelector<HTMLButtonElement>(
-      '[data-action="execute-database-reset"]',
-    );
-    if (button) {
-      button.disabled = target.value.trim() !== (target.dataset.databaseName ?? "");
-    }
-    return;
-  }
   if (target.id === "openai-api-example") {
     scheduleOpenAiApiExampleParse();
     return;

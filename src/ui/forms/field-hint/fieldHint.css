@@ -1,0 +1,2 @@
+.ui-field-hint { margin: 0; color: var(--fip-color-text-secondary); font: 400 12px/16px var(--fip-type-body-family); overflow-wrap: anywhere; }
+.ui-field-hint[data-disabled="true"] { color: var(--fip-color-text-disabled); }

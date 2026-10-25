@@ -1,0 +1,7 @@
+.ui-validation-summary { display: flex; align-items: flex-start; gap: var(--fip-space-sm); padding: 8px var(--fip-layout-feedback-padding-x); border: var(--fip-border-width) solid var(--fip-border); border-radius: var(--fip-radius-sm); background: var(--fip-color-feedback-danger-surface); color: var(--fip-color-text-danger); }
+.ui-validation-summary[hidden] { display: none; }
+.ui-validation-summary > div { flex: 1; min-width: 0; }
+.ui-validation-summary h3 { margin: 0 0 4px; color: var(--fip-strong); font: var(--fip-type-label-weight) var(--fip-type-label-size)/var(--fip-type-label-line-height) var(--fip-type-body-family); letter-spacing: var(--fip-type-label-letter-spacing); }
+.ui-validation-summary ul { margin: 0; padding-left: 18px; }
+.ui-validation-summary a { color: inherit; font: var(--fip-type-body-weight) var(--fip-type-body-size)/var(--fip-type-body-line-height) var(--fip-type-body-family); overflow-wrap: anywhere; text-decoration: underline; }
+.ui-validation-summary:focus-visible, .ui-validation-summary a:focus-visible { outline: 2px solid var(--fip-color-border-focus); outline-offset: 2px; }

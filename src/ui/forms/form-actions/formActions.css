@@ -1,0 +1,4 @@
+.ui-form-actions { display: flex; align-items: center; justify-content: flex-end; flex-wrap: wrap; gap: var(--fip-space-sm); min-width: 0; }
+.ui-form-actions[data-framed="true"] { padding: var(--fip-space-sm) var(--fip-space-md); border-top: var(--fip-border-width) solid var(--fip-border); background: var(--fip-raised); }
+.ui-form-actions .ui-button { max-width: 100%; white-space: normal; }
+.ui-form-actions .ui-button-label { overflow-wrap: anywhere; }

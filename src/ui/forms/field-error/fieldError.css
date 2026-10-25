@@ -1,0 +1,2 @@
+.ui-field-error { display: flex; align-items: flex-start; gap: 6px; margin: 0; color: var(--fip-color-text-danger); font: 400 12px/16px var(--fip-type-body-family); overflow-wrap: anywhere; }
+.ui-field-error > span:last-child { flex: 1; min-width: 0; }

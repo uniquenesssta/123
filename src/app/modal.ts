@@ -1,4 +1,6 @@
 import { RouteHistory } from "./router";
+import { mountConfirmationInput } from "../ui/forms/confirmation-input";
+import { formActionsView } from "../ui/forms/form-actions";
 import { escapeHtml, formatPercent } from "../components/format";
 
 const visualLabels: Record<string, string> = {
@@ -122,6 +124,7 @@ interface WorkspacePanelEntry {
 
 export class ModalController {
   private readonly history = new RouteHistory<WorkspacePanelEntry>();
+  private releaseConfirmationInput: (() => void) | null = null;
 
   private currentEntry(): WorkspacePanelEntry | null {
     return this.history.current;
@@ -189,6 +192,8 @@ export class ModalController {
   }
 
   private renderCurrent(): void {
+    this.releaseConfirmationInput?.();
+    this.releaseConfirmationInput = null;
     const root = document.querySelector<HTMLDivElement>("#modal-root");
     const main = document.querySelector<HTMLElement>(".main-content");
     const page = document.querySelector<HTMLElement>(".page-container");
@@ -220,6 +225,13 @@ export class ModalController {
     </section>`;
     this.syncHistoryButtons();
     this.restoreCurrentState(entry, root);
+    const cleanups: Array<() => void> = [];
+    for (const host of root.querySelectorAll<HTMLElement>("[data-confirmation-button]")) {
+      const confirmation = host.querySelector<HTMLInputElement>("[data-confirmation-expected]");
+      const confirmButton = Array.from(root.querySelectorAll<HTMLButtonElement>("button[id]")).find(button => button.id === host.dataset.confirmationButton);
+      if (confirmation && confirmButton) cleanups.push(mountConfirmationInput(confirmation, confirmButton).destroy);
+    }
+    this.releaseConfirmationInput = () => { for (const cleanup of cleanups) cleanup(); };
     if (!entry.activeControlKey) root.querySelector<HTMLElement>("input, select, textarea, button:not([disabled])")?.focus();
   }
 
@@ -283,7 +295,7 @@ export class ModalController {
     action: () => Promise<void>,
   ): void {
     const body = `<div class="confirm-visual"><div class="confirm-icon">!</div><p>${escapeHtml(description)}</p><div class="visual-grid">${facts.map(([label, value]) => `<div class="visual-field"><span>${escapeHtml(label)}</span><strong>${escapeHtml(value)}</strong></div>`).join("")}</div></div>`;
-    const footer = `<button type="button" class="secondary" data-action="close-workspace-detail">取消</button><button type="button" class="primary danger-action" data-action="confirm-workspace-action">${escapeHtml(confirmLabel)}</button>`;
+    const footer = formActionsView({ cancel: { label: "取消", attributes: { "data-action": "close-workspace-detail" } }, confirm: { label: confirmLabel, variant: "danger", attributes: { "data-action": "confirm-workspace-action" } } });
     this.push({ title, subtitle: "请确认", body, footer, panelClass: "confirmation-workspace", action });
   }
 

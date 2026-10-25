@@ -217,6 +217,22 @@
       ],
       "state": "Only local busy/open/keyboard-active/typeahead/indeterminate projections; native controls own form values; no business or persistent state",
       "production_dependencies_added": false
+    },
+    "ui_forms": {
+      "owner": "src/ui/forms",
+      "style_entry": "src/ui/forms/index.css",
+      "source_record": "docs/modular-rewrite/R12-frontend-foundation-ui-system/R12-12-component-mappings.json",
+      "families": [
+        "form-field",
+        "field-label",
+        "field-hint",
+        "field-error",
+        "validation-summary",
+        "confirmation-input",
+        "form-actions"
+      ],
+      "state": "Only native value and local touched/composition/message projections; domain validation, persistence and commands stay with hosts",
+      "production_dependencies_added": false
     }
   },
   "rust": {

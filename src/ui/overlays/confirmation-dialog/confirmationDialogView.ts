@@ -1,6 +1,6 @@
 import { escapeHtml } from "../../../components/format";
 import { iconSlot } from "../../icons/iconSlot";
-import { buttonView } from "../../primitives/button";
+import { formActionsView } from "../../forms/form-actions";
 import { iconButtonView } from "../../primitives/icon-button";
 import type { ConfirmationDialogRequest } from "./confirmationDialogState";
 
@@ -11,6 +11,6 @@ export function confirmationDialogView(request: ConfirmationDialogRequest): stri
       ${iconButtonView({label:"关闭对话框",icon:"close",attributes:{"data-confirmation-action":"cancel"}})}</header>
     <div class="confirmation-dialog-body"><p id="confirmation-description">${escapeHtml(request.description)}</p>
       <dl class="confirmation-dialog-facts">${request.facts.map(([label, value]) => `<div><dt>${escapeHtml(label)}</dt><dd>${escapeHtml(value)}</dd></div>`).join("")}</dl></div>
-    <footer class="confirmation-dialog-actions">${buttonView({label:"取消",attributes:{"data-confirmation-action":"cancel",autofocus:true}})}${buttonView({label:request.confirmLabel,variant:"danger",attributes:{"data-confirmation-action":"confirm"}})}</footer>
+    <footer class="confirmation-dialog-actions">${formActionsView({framed:true,cancel:{label:"取消",attributes:{"data-confirmation-action":"cancel",autofocus:true}},confirm:{label:request.confirmLabel,variant:"danger",attributes:{"data-confirmation-action":"confirm"}}})}</footer>
   </dialog>`;
 }

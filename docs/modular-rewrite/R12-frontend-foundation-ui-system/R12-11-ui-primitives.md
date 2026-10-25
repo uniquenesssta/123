@@ -1,6 +1,6 @@
 # R12-11 UI Primitives
 
-状态：`VERIFYING`。基线`e3dcf5dba39969eb11b1628248dd2fbe076261c7`；唯一分支`rewrite/r12-frontend-foundation-ui-system`。用户2026-10-25授权“已通过 开始11”。01～10 DONE；11已实现并通过本地Windows检查，自身完整Windows交付门禁待提交后独立核验；12～19 BLOCKED，不轮询。
+状态：`DONE`。基线`e3dcf5dba39969eb11b1628248dd2fbe076261c7`；唯一分支`rewrite/r12-frontend-foundation-ui-system`。11精确提交085097a自身Windows验收已独立通过；用户2026-10-25授权“收尾11开始12”。
 
 ## 前置核验
 
@@ -187,8 +187,13 @@ Vite实际158模块：CSS436.88kB（gzip68.85），main JS610.03kB（gzip172.93�
 
 ## 未执行与后续门禁
 
-11自身Windows CI/安装包/实际Tauri启动与日志待提交后按精确head/run独立核验；不沿用10为11结论，不轮询。真实PG、历史保护/账本并发回滚、真实XLSX、Windows Full、私有模型固定回归和真实API/凭据取消端到端等既有最终环境待验继续保留。本节点没有修改后端/协议/数据库/配置/Feature状态或生产依赖，不宣称这些待验通过。
+11提交时的Windows待验项现已按自身精确085097a/run40188280192独立核验通过，详文末收尾；不轮询。真实PG、历史保护/账本并发回滚、真实XLSX、Windows Full、私有模型固定回归和真实API/凭据取消端到端等既有最终环境待验继续保留。本节点没有修改后端/协议/数据库/配置/Feature状态或生产依赖，不宣称这些待验通过。
 
 ## 回退点
 
-`e3dcf5dba39969eb11b1628248dd2fbe076261c7`为11开始前通过完整Windows的10提交。发布后按独立原子提交revert恢复，不手工复制文件、不保留双实现。11自身完整Windows核验前保持VERIFYING，12不开始。
+`e3dcf5dba39969eb11b1628248dd2fbe076261c7`为11开始前通过完整Windows的10提交。发布后按独立原子提交revert恢复，不手工复制文件、不保留双实现。原门禁要求11自身完整Windows核验前保持VERIFYING；现该核验已完成，12按用户授权开始。
+
+
+## 自身 Windows 验收收尾（2026-10-25）
+
+11精确提交`085097ab2d1264775ac953cf72655c25c3fa35b7`的[run40188280192](https://github.com/uniquenesssta/123/actions/runs/40188280192)、job121153622426、attempt1全部步骤成功。完整日志310,654字符，45组Rust结果均ok/0 failed，环境ignored仍为ignored。前端91步骤在验证与打包各通过一次，868项控件、1,344项token、1,104项Shell/工作区、136项告警和17视口通过；Rust fmt/Clippy/工作区测试、release/MSI/NSIS及启动日志通过。artifact12596479924未过期，ZIP17,315,852字节，下载SHA-256 `0162e0ddbfb10ec2bfd5f3d11076d7812c6d4b6ab9bfc92188d51a980692fe3c`与API摘要及上传日志一致。MSI8,388,608字节、NSIS5,922,297字节。报告`windows-acceptance-20261025-112007.json` startup PASS：7有效条目、0无效行、0运行错误，会话`0a18fbe6-4628-438a-af64-b562ff264271`内read_workspace_state/save_workspace_state/bootstrap三组trace逐一配对。原ZIP与完整日志保留在仓库上一级`R12-11-windows-evidence.zip`、`r12-11-ci-full.log`。一次交接核验，无轮询。startup不替代Windows Full/真实PG/XLSX/私有固定回归。

@@ -2,7 +2,7 @@
 
 ## 当前阶段状态
 
-`IN_PROGRESS`。01～10 DONE；10精确e3dcf5d/run40174915845的全部步骤、完整日志、产物摘要和启动trace已核验。用户2026-10-25授权“已通过 开始11”，11 UI Primitives已实施VERIFYING；12～19 BLOCKED。沿唯一rewrite/r12-frontend-foundation-ui-system。11自身Windows待提交后独立验收；不轮询CI。
+`IN_PROGRESS`。01～11 DONE；11精确085097a/run40188280192的全部步骤、完整日志、ZIP摘要和启动trace已独立核验。用户2026-10-25授权“收尾11开始12”，12 Forms VERIFYING；13～19 BLOCKED。沿唯一rewrite/r12-frontend-foundation-ui-system。不轮询CI。
 
 ## 依据与设计边界
 
@@ -22,8 +22,8 @@
 | R12-08 | [Tauri Transport](R12-08-tauri-transport.md) | DONE · 自身Windows完整SUCCESS，run40137847917 |
 | R12-09 | [Files、Storage、Diagnostics、Clipboard 与 Timing](R12-09-files-storage-diagnostics-clipboard-and-timing.md) | DONE · 自身Windows完整SUCCESS，run40145377194 |
 | R12-10 | [Design Tokens](R12-10-design-tokens.md) | DONE · 自身Windows完整SUCCESS，run40174915845 |
-| R12-11 | [UI Primitives](R12-11-ui-primitives.md) | VERIFYING · 14族/868原生检查、91步骤完整前端通过；自身Windows待验 |
-| R12-12 | Forms | BLOCKED |
+| R12-11 | [UI Primitives](R12-11-ui-primitives.md) | DONE · 自身Windows完整SUCCESS，run40188280192 |
+| R12-12 | [Forms](R12-12-forms.md) | VERIFYING · 七类/272项原生检查、91步骤前端通过；自身Windows待验 |
 | R12-13 | Data Display | BLOCKED |
 | R12-14 | Feedback 与 Overlays | BLOCKED |
 | R12-15 | Navigation 与 Layout | BLOCKED |

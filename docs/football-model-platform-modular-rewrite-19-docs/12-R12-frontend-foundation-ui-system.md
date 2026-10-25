@@ -7,7 +7,7 @@
 
 ## 当前前置状态（2026-10-25）
 
-`IN_PROGRESS`。01～10 DONE；10精确e3dcf5d/run40174915845的全部步骤、完整日志、产物摘要和启动trace已核验。用户2026-10-25授权“已通过 开始11”，11 UI Primitives已实施VERIFYING；12～19 BLOCKED。沿唯一rewrite/r12-frontend-foundation-ui-system。11自身Windows待提交后独立验收；不轮询CI。详[11记录](../modular-rewrite/R12-frontend-foundation-ui-system/R12-11-ui-primitives.md)。
+`IN_PROGRESS`。01～11 DONE；11精确085097a/run40188280192的全部步骤、完整日志、ZIP摘要和启动trace已独立核验。用户2026-10-25授权“收尾11开始12”，12 Forms VERIFYING；13～19 BLOCKED。沿唯一rewrite/r12-frontend-foundation-ui-system。不轮询CI。
 
 ## 1. 阶段目标
 
@@ -1739,7 +1739,7 @@ src/ui/tokens/breakpoint/
 
 ## R12-11 UI Primitives
 
-状态：`VERIFYING`。10自身精确Windows证据已核验，用户2026-10-25授权11；14类基础控件、868项原生检查与91步骤完整前端通过。11自身Windows待验，12～19 BLOCKED，详[11记录](../modular-rewrite/R12-frontend-foundation-ui-system/R12-11-ui-primitives.md)。
+状态：`DONE`。14类基础控件、868项原生检查与91步骤完整前端通过；11自身精确085097a/run40188280192全部步骤、完整日志、ZIP摘要与startup trace已独立核验，详[11记录](../modular-rewrite/R12-frontend-foundation-ui-system/R12-11-ui-primitives.md)。
 
 ### 1. 目标
 
@@ -1886,7 +1886,7 @@ src/ui/primitives/skeleton/
 
 ## R12-12 Forms
 
-状态：`BLOCKED`（仅当上一任务与本任务前置门禁通过后改为 `READY`）
+状态：`VERIFYING`（七类Forms及272项原生检查、91步骤前端已通过；12自身Windows待验）
 
 ### 1. 目标
 

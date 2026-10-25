@@ -1,8 +1,12 @@
 # Testing
 
-## R12-11 UI Primitives（2026-10-25，VERIFYING）
+## R12-12 Forms（2026-10-25，VERIFYING）
 
-沿原global-visual-system入口增加14族控件的真实Windows Chromium检查：两个宽度×Light/Dark，合计868项，覆盖设计几何/原始SVG外沿、主题/错误色、输入与小数步进、Space/箭头/Enter/Escape/Tab、禁用祖先、只读、原生FormData/reset、混合选择、下拉底部翻转、加载宽度、辅助描述和销毁重挂载。截图和结构化结果复制到原`../logs/**`产物位置；没有新增runner/workflow/依赖或改原PNG/阈值。最终91步骤前端、1,104项Shell/工作区、136项告警、17视口、1,344项token、架构与Rust fmt通过。11自身Windows待验，不用10的CI替代；详[11记录](modular-rewrite/R12-frontend-foundation-ui-system/R12-11-ui-primitives.md)。
+沿原global-visual-system入口验证七类Forms：960/1440×Light/Dark共272项，覆盖标签/提示/错误尺寸与引用、真实CDP键盘/中文输入/多行、摘要Enter跳转、禁用祖先、trim/大小写/宿主保护、合成composition事件边界、原生FormData/reset、销毁重挂载与真实ModalController的草稿/前进返回/监听清理。DPR1，输入法事件合成不冒充操作系统真实IME；没有执行真实数据库清空。完整91步骤前端exit0，保留868控件/1344token/1104Shell/136告警/17视口原门禁；架构31 owner、18保护指纹与Rust fmt通过。12自身Windows打包/实际Tauri启动及真实数据库链仍待对应环境。详[12记录](modular-rewrite/R12-frontend-foundation-ui-system/R12-12-forms.md)。
+
+## R12-11 UI Primitives（2026-10-25，DONE）
+
+沿原global-visual-system入口增加14族控件的真实Windows Chromium检查：两个宽度×Light/Dark，合计868项，覆盖设计几何/原始SVG外沿、主题/错误色、输入与小数步进、Space/箭头/Enter/Escape/Tab、禁用祖先、只读、原生FormData/reset、混合选择、下拉底部翻转、加载宽度、辅助描述和销毁重挂载。截图和结构化结果复制到原`../logs/**`产物位置；没有新增runner/workflow/依赖或改原PNG/阈值。最终91步骤前端、1,104项Shell/工作区、136项告警、17视口、1,344项token、架构与Rust fmt通过。11自身精确085097a/run40188280192的全部步骤、下载ZIP摘要与startup trace已核验，不轮询；详[11记录](modular-rewrite/R12-frontend-foundation-ui-system/R12-11-ui-primitives.md)。
 
 ## R12-10 Design Tokens（2026-10-25，DONE）
 

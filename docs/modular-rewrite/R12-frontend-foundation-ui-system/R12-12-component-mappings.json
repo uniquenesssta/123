@@ -1,0 +1,117 @@
+{
+  "schema": "football.r12.forms-mappings.v1",
+  "status": "verified_local_pending_own_windows_ci",
+  "file_key": "PN0Whgu6HLWIHx4Mv6aHfu",
+  "page_id": "3:3",
+  "design_commit": "40109ceec8372391a7680e7e86c1265fda06ab3d",
+  "design_mutated": false,
+  "code_connect_published": false,
+  "base": "085097ab2d1264775ac953cf72655c25c3fa35b7",
+  "components": [
+    {
+      "family": "form-field",
+      "path": "src/ui/forms/form-field",
+      "entry": "src/ui/forms/form-field/index.ts",
+      "nodes": [
+        "57:313"
+      ],
+      "mapping": "implemented from existing high-fidelity node context"
+    },
+    {
+      "family": "field-label",
+      "path": "src/ui/forms/field-label",
+      "entry": "src/ui/forms/field-label/index.ts",
+      "nodes": [
+        "56:47",
+        "57:78"
+      ],
+      "mapping": "implemented from existing high-fidelity node context"
+    },
+    {
+      "family": "field-hint",
+      "path": "src/ui/forms/field-hint",
+      "entry": "src/ui/forms/field-hint/index.ts",
+      "nodes": [
+        "56:86",
+        "57:86"
+      ],
+      "mapping": "implemented from existing high-fidelity node context"
+    },
+    {
+      "family": "field-error",
+      "path": "src/ui/forms/field-error",
+      "entry": "src/ui/forms/field-error/index.ts",
+      "nodes": [
+        "57:63"
+      ],
+      "mapping": "implemented from existing high-fidelity node context"
+    },
+    {
+      "family": "validation-summary",
+      "path": "src/ui/forms/validation-summary",
+      "entry": "src/ui/forms/validation-summary/index.ts",
+      "nodes": [
+        "303:4259"
+      ],
+      "mapping": "composed from accepted Inline Alert with native error-list navigation; no new visual master"
+    },
+    {
+      "family": "confirmation-input",
+      "path": "src/ui/forms/confirmation-input",
+      "entry": "src/ui/forms/confirmation-input/index.ts",
+      "nodes": [
+        "280:3600"
+      ],
+      "mapping": "implemented from existing high-fidelity node context"
+    },
+    {
+      "family": "form-actions",
+      "path": "src/ui/forms/form-actions",
+      "entry": "src/ui/forms/form-actions/index.ts",
+      "nodes": [
+        "278:2630"
+      ],
+      "mapping": "implemented from existing high-fidelity node context"
+    }
+  ],
+  "style_entry": "src/ui/forms/index.css",
+  "tokens": "R12-10-figma-tokens.json",
+  "sources": [
+    "https://github.com/uniquenesssta/123/blob/40109ceec8372391a7680e7e86c1265fda06ab3d/docs/FIGMA_DIALOG.md",
+    "https://github.com/uniquenesssta/123/blob/40109ceec8372391a7680e7e86c1265fda06ab3d/docs/FIGMA_EXTENDED_FIELDS.md"
+  ],
+  "native_contract": "Field values stay native; UI owns local touched/composition/message only. Host supplies validation results and protects commands. trim(value) === expected is case-sensitive. Summary navigates only inside supplied region.",
+  "adopted_callers": [
+    "src/components/databaseSetup.ts",
+    "src/app/modal.ts",
+    "src/main.ts requestDatabaseReset view and summary click delegation only",
+    "src/ui/overlays/confirmation-dialog/confirmationDialogView.ts"
+  ],
+  "retained": "Workspace confirmation remains role=region; async modal/submission redesign belongs14. No backend, API, DTO, schema, model, dependencies or workflows changed.",
+  "assets": [
+    {
+      "path": "src/assets/icons/alert-circle.svg",
+      "sha256": "111afea59f0fe7e8505069fe9e86c55b653eca6e91b53eed52231ced2bfaf14c",
+      "root": "<svg preserveAspectRatio=\"none\" overflow=\"visible\" style=\"display: block;\" width=\"16\" height=\"16\" viewBox=\"0 0 16 16\" fill=\"none\" xmlns=\"http://www.w3.org/2000/svg\">",
+      "slot": "iconSlot 16px; existing exact asset unchanged",
+      "sourceNode": "54:290"
+    },
+    {
+      "path": "src/assets/icons/plus.svg",
+      "sha256": "a9cc89271db64cc796200849b7b38078dd89d78c6ef5af8a2c8b44782a8cff7d",
+      "root": "<svg preserveAspectRatio=\"none\" overflow=\"visible\" style=\"display: block;\" width=\"24.875\" height=\"24.875\" viewBox=\"0 0 24.875 24.875\" fill=\"none\" xmlns=\"http://www.w3.org/2000/svg\">",
+      "slot": "Existing11 exact 24.875px root/24px master; imported by shared iconSlot; no new Plus callsite in Forms",
+      "sourceNode": "139:208"
+    }
+  ],
+  "verification": {
+    "forms": 272,
+    "viewports": "960x1500 and1440x1500 xLight/Dark; DPR1; native Windows Chromium",
+    "frontend_steps": 91,
+    "architecture_state_owners": 31,
+    "protected_files": 18,
+    "rust_fmt": "PASS",
+    "own_windows_package_startup": "pending",
+    "synthetic_scope": "IME composition boundary events are programmatic; actual OS IME not claimed. Live database reset is not executed."
+  }
+}
