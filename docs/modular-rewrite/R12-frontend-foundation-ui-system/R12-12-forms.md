@@ -1,6 +1,6 @@
 # R12-12 Forms
 
-状态：`VERIFYING`。基线`085097ab2d1264775ac953cf72655c25c3fa35b7`，唯一分支`rewrite/r12-frontend-foundation-ui-system`。用户2026-10-25授权“收尾11开始12”；01～11 DONE，13～19 BLOCKED。不轮询CI。
+状态：`DONE`。基线085097a，唯一rewrite/r12-frontend-foundation-ui-system。12自身精确7807534/run40194352653 Windows验收已独立通过；用户2026-10-26授权“收尾12 开始13”。
 
 ## 前置与11收尾
 
@@ -99,6 +99,11 @@
 
 ## 未验与回退
 
-12自身Rust Clippy/工作区测试、Windows打包/MSI/NSIS、实际Tauri启动及日志，需本次提交后精确head/run独立核验；11的成功只作12前置，未当作12结果。真实PG、受保护历史/不可变账本并发回滚、XLSX、Windows Full、私有固定回归及真实API/凭据取消E2E仍按最终环境验收。未执行真实连接/清空，未伪造API或业务结果。
+12提交时的Rust/Windows打包与实际启动待验项现已按自身7807534/run40194352653独立核验通过，详文末收尾。真实PG、受保护历史/不可变账本并发回滚、XLSX、Windows Full、私有固定回归及真实API/凭据取消E2E仍按最终环境验收。未执行真实连接/清空，未伪造API或业务结果。
 
-以已完整验收的085097ab2d1264775ac953cf72655c25c3fa35b7为回退点，发布后通过对应原子提交revert恢复；不手工复制，不留双实现。12自身Windows核验前保持VERIFYING，13不开始。
+以已完整验收的085097ab2d1264775ac953cf72655c25c3fa35b7为回退点，发布后通过对应原子提交revert恢复；不手工复制，不留双实现。原门禁要求12自身Windows核验前保持VERIFYING；现已通过，13按用户授权开始。
+
+
+## 自身Windows验收收尾（2026-10-26）
+
+12精确提交`780753483310ccbc851da34b739007998e6ece46`的[run40194352653](https://github.com/uniquenesssta/123/actions/runs/40194352653)、job121171885561、attempt1全部步骤SUCCESS。读取完整311,854字符日志：45组Rust结果均ok/0 failed，ignored环境用例仍为ignored。前端91步骤验证与打包各通过一次，272 Forms/868 Primitives/1344 Tokens/1104 Shell/136告警/17视口，Rust fmt/Clippy/工作区测试及release/MSI/NSIS通过。artifact12599627358未过期，ZIP17,863,027字节，下载SHA-256 `0afe169b458a79fccef400991b28cce7e92419ea63f5f330844642dc553777fb`与API及上传日志一致。MSI8,392,704字节，NSIS5,922,437字节。报告`windows-acceptance-20261025-124423.json` startup PASS：7有效条目、0无效行、0运行错误；会话`e0caf002-66f2-4e68-8eb8-b6cb6d875f41`内read_workspace_state/save_workspace_state/bootstrap三组trace配对。原ZIP与完整日志在仓库上一级`R12-12-windows-evidence.zip`、`r12-12-ci-full.log`。一次交接核验，无轮询；startup不替代Windows Full/真实PG/XLSX/私有固定回归。

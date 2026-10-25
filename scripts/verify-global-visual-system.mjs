@@ -2,6 +2,7 @@ import { readStylesheet } from "./tokens/tokenStyles.mjs";
 import { verifyDesignTokens } from "./tokens/verifyDesignTokens.mjs";
 import { verifyPrimitives } from "./primitives/verifyPrimitives.mjs";
 import { verifyForms } from "./forms/verifyForms.mjs";
+import { verifyDataDisplay } from "./data-display/verifyDataDisplay.mjs";
 import { existsSync, readFileSync } from "node:fs";
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -16,6 +17,7 @@ const styles = [contract.style_entry, ...contract.shell_style_entries, ...contra
 await verifyDesignTokens(root);
 await verifyPrimitives(root);
 await verifyForms(root);
+await verifyDataDisplay(root);
 const main = read("src/main.ts");
 const pkg = JSON.parse(read("package.json"));
 const taskUi = JSON.parse(read("contracts/task-ui-contract.json"));

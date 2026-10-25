@@ -1,8 +1,12 @@
 # Testing
 
-## R12-12 Forms（2026-10-25，VERIFYING）
+## R12-13 Data Display（2026-10-26，VERIFYING）
 
-沿原global-visual-system入口验证七类Forms：960/1440×Light/Dark共272项，覆盖标签/提示/错误尺寸与引用、真实CDP键盘/中文输入/多行、摘要Enter跳转、禁用祖先、trim/大小写/宿主保护、合成composition事件边界、原生FormData/reset、销毁重挂载与真实ModalController的草稿/前进返回/监听清理。DPR1，输入法事件合成不冒充操作系统真实IME；没有执行真实数据库清空。完整91步骤前端exit0，保留868控件/1344token/1104Shell/136告警/17视口原门禁；架构31 owner、18保护指纹与Rust fmt通过。12自身Windows打包/实际Tauri启动及真实数据库链仍待对应环境。详[12记录](modular-rewrite/R12-frontend-foundation-ui-system/R12-12-forms.md)。
+12自身Windows证据已独立核验并收尾。13在唯一data-display目录完成表格、键值、指标、状态、时间线、进度、空状态与技术文本八类展示，接通真实页面与原始数据投影；事件核验和修订分轴，取消及被替代记录保留，未知进度不伪造百分比。320项Windows浏览器检查、完整91步骤前端、架构、18项保护指纹与Rust fmt通过。54个路径（36新增、18修改），无文件删除；13自身Rust Clippy/工作区测试、打包/MSI/NSIS及实际Tauri启动仍需本批提交后独立验收，14～19 BLOCKED，不轮询CI。详[13记录](modular-rewrite/R12-frontend-foundation-ui-system/R12-13-data-display.md)。
+
+## R12-12 Forms（2026-10-25，DONE）
+
+沿原global-visual-system入口验证七类Forms：960/1440×Light/Dark共272项，覆盖标签/提示/错误尺寸与引用、真实CDP键盘/中文输入/多行、摘要Enter跳转、禁用祖先、trim/大小写/宿主保护、合成composition事件边界、原生FormData/reset、销毁重挂载与真实ModalController的草稿/前进返回/监听清理。DPR1，输入法事件合成不冒充操作系统真实IME；没有执行真实数据库清空。完整91步骤前端exit0，保留868控件/1344token/1104Shell/136告警/17视口原门禁；架构31 owner、18保护指纹与Rust fmt通过。12自身精确7807534/run40194352653打包/启动已核验；真实数据库链仍待最终环境。详[12记录](modular-rewrite/R12-frontend-foundation-ui-system/R12-12-forms.md)。
 
 ## R12-11 UI Primitives（2026-10-25，DONE）
 

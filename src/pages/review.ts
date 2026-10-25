@@ -1,4 +1,5 @@
 import { escapeHtml, formatPercent } from "../components/format";
+import { matchEventTimelineView } from "./review/index";
 import { inlineDatabaseSetup } from "../components/databaseSetup";
 import { lineupCompletionWorkspace } from "../components/lineupBuilder";
 import { taskContextRibbon, taskPageHeader, taskStatusChip } from "../components/taskWorkspace";
@@ -26,59 +27,6 @@ import type {
 
 function num(value: number | null | undefined, digits = 1): string {
   return value === null || value === undefined || !Number.isFinite(value) ? "—" : value.toFixed(digits);
-}
-
-function eventTypeLabel(value: string): string {
-  return ({
-    substitution: "换人",
-    goal: "进球",
-    own_goal: "乌龙球",
-    assist: "助攻",
-    penalty_goal: "点球命中",
-    penalty_missed: "点球罚失",
-    yellow_card: "黄牌",
-    second_yellow_card: "第二张黄牌",
-    red_card: "红牌",
-    injury: "伤退/伤情",
-    var: "VAR",
-    formation_change: "阵型变化",
-    goalkeeper_change: "门将更换",
-    other: "其他事件",
-  } as Record<string, string>)[value] ?? value;
-}
-
-function eventMinute(minute: number, stoppage: number | null): string {
-  return stoppage && stoppage > 0 ? `${minute}+${stoppage}′` : `${minute}′`;
-}
-
-function eventStatusLabel(verification: string, revision: string): string {
-  if (revision === "cancelled") return "已取消";
-  if (revision === "corrected") return "已修订";
-  if (verification === "disputed") return "存在争议";
-  if (verification === "unverified") return "待核验";
-  return "已核验";
-}
-
-function matchEventTimeline(detail: MatchReviewDetail): string {
-  const summary = detail.event_summary;
-  const latestScore = summary.latest_home_score === null || summary.latest_away_score === null
-    ? "未逐事件记录"
-    : `${summary.latest_home_score}-${summary.latest_away_score}`;
-  const timeline = detail.events.length === 0
-    ? `<div class="empty-state compact"><strong>尚未录入结构化比赛事件</strong><span>资料包可记录进球、助攻、牌、换人、伤退、VAR 与阵型变化。</span></div>`
-    : `<div class="match-event-timeline">${detail.events.map((event) => {
-        const score = event.home_score === null || event.away_score === null
-          ? ""
-          : `<b>${event.home_score}-${event.away_score}</b>`;
-        const participants = [event.player_name, event.related_player_name]
-          .filter((value): value is string => Boolean(value))
-          .join(" → ");
-        return `<article class="match-event-row revision-${escapeHtml(event.revision_status)} verification-${escapeHtml(event.verification_status)}">
-          <time>${escapeHtml(eventMinute(event.minute, event.stoppage_minute))}</time>
-          <div><header><strong>${escapeHtml(eventTypeLabel(event.event_type))}</strong>${score}<em>${escapeHtml(eventStatusLabel(event.verification_status, event.revision_status))}</em></header><p>${escapeHtml(participants || event.team_name || "未关联主体")}${event.description ? ` · ${escapeHtml(event.description)}` : ""}</p><small>${escapeHtml(event.team_name ?? "全场事件")} · 可信度 ${formatPercent(event.confidence)} · 序号 ${event.sequence_no}</small></div>
-        </article>`;
-      }).join("")}</div>`;
-  return `<section class="match-event-panel"><header><div><span>结构化比赛事实</span><h3>事件时间线</h3></div><small>${summary.effective_count} 条有效 · ${summary.verified_count} 条已核验</small></header><div class="match-event-summary"><div><span>当前事件</span><strong>${summary.total_count}</strong></div><div><span>取消/争议</span><strong>${summary.cancelled_count}/${summary.disputed_count}</strong></div><div><span>最后事件分钟</span><strong>${summary.last_event_minute ?? "—"}</strong></div><div><span>最后事件后比分</span><strong>${escapeHtml(latestScore)}</strong></div></div>${timeline}</section>`;
 }
 
 function matchLabel(item: ReviewableMatch): string {
@@ -143,7 +91,7 @@ function reviewResult(detail: MatchReviewDetail): string {
         <div><span>待审核候选</span><strong>${pendingCandidates.length}</strong></div>
         <div><span>复盘版本</span><strong>${escapeHtml(detail.summary.review_version)}</strong></div>
       </div>
-      ${matchEventTimeline(detail)}
+      ${matchEventTimelineView(detail)}
       <div class="review-team-cards">${detail.team_reviews.map((team) => `
         <article><header><span>球队复盘</span><h3>${escapeHtml(team.team_name)}</h3></header>
           <dl><div><dt>整体配合度</dt><dd>${num(team.chemistry_score)}</dd></div><div><dt>阵容连续性</dt><dd>${formatPercent(team.lineup_continuity)}</dd></div><div><dt>表现协同性</dt><dd>${formatPercent(team.performance_cohesion)}</dd></div><div><dt>替补强度</dt><dd>${num(team.bench_strength)}</dd></div><div><dt>替补影响</dt><dd>${num(team.substitution_impact)}</dd></div><div><dt>球队兑现率</dt><dd>${formatPercent(team.realization_score)}</dd></div></dl>

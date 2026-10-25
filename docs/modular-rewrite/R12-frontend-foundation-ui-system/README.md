@@ -2,7 +2,7 @@
 
 ## 当前阶段状态
 
-`IN_PROGRESS`。01～11 DONE；11精确085097a/run40188280192的全部步骤、完整日志、ZIP摘要和启动trace已独立核验。用户2026-10-25授权“收尾11开始12”，12 Forms VERIFYING；13～19 BLOCKED。沿唯一rewrite/r12-frontend-foundation-ui-system。不轮询CI。
+`IN_PROGRESS`。01～12 DONE；12精确7807534/run40194352653全部步骤、完整日志、ZIP摘要与startup trace已独立核验。用户2026-10-26授权“收尾12 开始13”，13 Data Display VERIFYING：八类组件、320项原生检查与完整91步骤前端已通过；13自身Windows CI待提交后核验。14～19 BLOCKED。沿唯一rewrite/r12-frontend-foundation-ui-system。不轮询CI。
 
 ## 依据与设计边界
 
@@ -23,8 +23,8 @@
 | R12-09 | [Files、Storage、Diagnostics、Clipboard 与 Timing](R12-09-files-storage-diagnostics-clipboard-and-timing.md) | DONE · 自身Windows完整SUCCESS，run40145377194 |
 | R12-10 | [Design Tokens](R12-10-design-tokens.md) | DONE · 自身Windows完整SUCCESS，run40174915845 |
 | R12-11 | [UI Primitives](R12-11-ui-primitives.md) | DONE · 自身Windows完整SUCCESS，run40188280192 |
-| R12-12 | [Forms](R12-12-forms.md) | VERIFYING · 七类/272项原生检查、91步骤前端通过；自身Windows待验 |
-| R12-13 | Data Display | BLOCKED |
+| R12-12 | [Forms](R12-12-forms.md) | DONE · 自身Windows完整SUCCESS，run40194352653 |
+| R12-13 | [Data Display](R12-13-data-display.md) | VERIFYING · 320项原生检查/91步骤前端PASS；自身Windows待验 |
 | R12-14 | Feedback 与 Overlays | BLOCKED |
 | R12-15 | Navigation 与 Layout | BLOCKED |
 | R12-16 | UI Patterns | BLOCKED |

@@ -1,0 +1,165 @@
+{
+  "schema": "football.r12.data-display-mappings.v1",
+  "status": "verified_local_pending_own_windows_ci",
+  "base": "780753483310ccbc851da34b739007998e6ece46",
+  "file": "PN0Whgu6HLWIHx4Mv6aHfu",
+  "design_commit": "40109ceec8372391a7680e7e86c1265fda06ab3d",
+  "design_mutated": false,
+  "code_connect_published": false,
+  "components": [
+    {
+      "family": "data-table",
+      "path": "src/ui/data-display/data-table",
+      "entry": "src/ui/data-display/data-table/index.ts",
+      "nodes": [
+        "238:1663",
+        "230:1170"
+      ]
+    },
+    {
+      "family": "key-value-list",
+      "path": "src/ui/data-display/key-value-list",
+      "entry": "src/ui/data-display/key-value-list/index.ts",
+      "nodes": [
+        "278:2257"
+      ]
+    },
+    {
+      "family": "stat-card",
+      "path": "src/ui/data-display/stat-card",
+      "entry": "src/ui/data-display/stat-card/index.ts",
+      "nodes": [
+        "410:15370"
+      ]
+    },
+    {
+      "family": "status-badge",
+      "path": "src/ui/data-display/status-badge",
+      "entry": "src/ui/data-display/status-badge/index.ts",
+      "nodes": [
+        "66:410"
+      ]
+    },
+    {
+      "family": "timeline",
+      "path": "src/ui/data-display/timeline",
+      "entry": "src/ui/data-display/timeline/index.ts",
+      "nodes": [
+        "425:16427",
+        "424:16815"
+      ]
+    },
+    {
+      "family": "progress",
+      "path": "src/ui/data-display/progress",
+      "entry": "src/ui/data-display/progress/index.ts",
+      "nodes": [
+        "340:6522"
+      ]
+    },
+    {
+      "family": "empty-state",
+      "path": "src/ui/data-display/empty-state",
+      "entry": "src/ui/data-display/empty-state/index.ts",
+      "nodes": [
+        "343:6571"
+      ]
+    },
+    {
+      "family": "code-block",
+      "path": "src/ui/data-display/code-block",
+      "entry": "src/ui/data-display/code-block/index.ts",
+      "nodes": [
+        "I684:190988;380:1212;412:15458;684:191009;412:15458;684:191544"
+      ]
+    }
+  ],
+  "style_entry": "src/ui/data-display/index.css",
+  "decisions": [
+    "Superseded is a real DTO audit status, preserved as an explicit neutral text badge using existing Badge; no fabricated verification, no score computation.",
+    "Table sort icon exports are12px; original SVG roots preserved and exact12px iconSlot in header.",
+    "Code Block is native escaped pre/code using accepted Logs technical text token11/17; no separate visual master invented.",
+    "Read-only database statistics consume actual BootstrapResponse; no sorting/selection API request added."
+  ],
+  "assets": [
+    {
+      "path": "src/assets/icons/chevron-up.svg",
+      "source_header": "230:1170",
+      "sha256": "b0ea145870c09e6a3fb3763a6ae38552b4d8052659c2274ad363f845c55bf677",
+      "root": "<svg preserveAspectRatio=\"none\" overflow=\"visible\" style=\"display: block;\" width=\"12\" height=\"12\" viewBox=\"0 0 12 12\" fill=\"none\" xmlns=\"http://www.w3.org/2000/svg\">",
+      "effective_slot": "12x12 header iconSlot"
+    },
+    {
+      "path": "src/assets/icons/chevron-sort-down.svg",
+      "source_header": "230:1170",
+      "sha256": "08b36a553b8867d26bca9688f31f3567ae8e1dd2861041ca1d3f7ced0ba7f04a",
+      "root": "<svg preserveAspectRatio=\"none\" overflow=\"visible\" style=\"display: block;\" width=\"12\" height=\"12\" viewBox=\"0 0 12 12\" fill=\"none\" xmlns=\"http://www.w3.org/2000/svg\">",
+      "effective_slot": "12x12 header iconSlot"
+    }
+  ],
+  "production_callers": {
+    "data-table": [
+      "src/pages/database.ts"
+    ],
+    "key-value-list": [
+      "src/app/modal.ts"
+    ],
+    "stat-card": [
+      "src/pages/database.ts",
+      "src/pages/logs.ts"
+    ],
+    "status-badge": [
+      "src/ui/data-display/timeline/timelineView.ts",
+      "src/ui/data-display/data-table/tableCellView.ts"
+    ],
+    "timeline": [
+      "src/pages/review/matchEventTimelineView.ts"
+    ],
+    "progress": [
+      "src/ui/feedback/task-activity/taskActivityView.ts"
+    ],
+    "empty-state": [
+      "src/pages/logs.ts",
+      "src/ui/data-display/timeline/timelineView.ts"
+    ],
+    "code-block": [
+      "src/pages/logs.ts"
+    ]
+  },
+  "verification": {
+    "frontend_steps": 91,
+    "data_display_checks": 320,
+    "checks_per_case": 80,
+    "widths": [
+      960,
+      1440
+    ],
+    "themes": [
+      "Light",
+      "Dark"
+    ],
+    "height": 2100,
+    "dpr": 1,
+    "environment": "Native Windows Chromium via existing CDP screenshot helper",
+    "forms_checks": 272,
+    "primitive_checks": 868,
+    "token_checks": 1344,
+    "shell_workspace_checks": 1104,
+    "warning_checks": 136,
+    "existing_visual_viewports": 17,
+    "protected_assets": 18,
+    "protected_sha256": "d74e0936b60c69f444a498405fed3e704b8db63b81f26b40036f772b4b6eac57",
+    "architecture": "PASS; 31 shared state owners",
+    "rust_fmt": "PASS",
+    "own_windows_ci": "PENDING publication; no polling",
+    "screenshots_reviewed": [
+      "display-960-light.png",
+      "display-1440-dark.png"
+    ],
+    "limits": [
+      "Browser fixtures call production views with explicit test data; this is not a live PostgreSQL/Tauri command round trip.",
+      "No new backend sort/selection or progress estimation; state and requests remain owned by the host.",
+      "No claim for OS IME, screen-reader, all DPI, large-table performance, Windows Full or private regressions."
+    ]
+  }
+}

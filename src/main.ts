@@ -11,6 +11,7 @@ import "./ui/tokens/index.css";
 import "./ui/icons/iconSlot.css";
 import "./ui/primitives/index.css";
 import "./ui/forms/index.css";
+import "./ui/data-display/index.css";
 import { confirmationInputView } from "./ui/forms/confirmation-input";
 import { formActionsView } from "./ui/forms/form-actions";
 import { focusValidationTarget } from "./ui/forms/validation-summary";

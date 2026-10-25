@@ -1,4 +1,7 @@
 import { escapeHtml } from "../components/format";
+import { codeBlockView } from "../ui/data-display/code-block";
+import { emptyStateView } from "../ui/data-display/empty-state";
+import { statCardView } from "../ui/data-display/stat-card";
 import { taskContextRibbon, taskPageHeader } from "../components/taskWorkspace";
 import { workspaceTaskAnchorNavigation } from "../components/workspace";
 import type { IssueLogEntry, IssueSeverity } from "../types";
@@ -106,7 +109,7 @@ function issueCard(entry: IssueLogEntry): string {
         <summary>查看技术详情</summary>
         <div>
           <span>原始错误</span>
-          <p>${escapeHtml(entry.technical_message || entry.user_message || "未记录")}</p>
+          ${codeBlockView({label:"原始错误",text:entry.technical_message || entry.user_message || "未记录"})}
         </div>
       </details>
     </article>`;
@@ -134,10 +137,10 @@ export function logsPage(entries: IssueLogEntry[]): string {
     <div class="core-local-navigation">${navigation}</div>
     <div class="management-module-stage" data-workspace-scroll-key="logs-stage">
     <section id="issue-summary" class="management-section workspace-anchor-target"><div class="metric-grid issue-metrics">
-      <article class="metric-card"><span>独立问题</span><strong>${entries.length}</strong><small>按问题指纹去重</small></article>
-      <article class="metric-card"><span>总发生次数</span><strong>${totalOccurrences}</strong><small>包含重复触发</small></article>
-      <article class="metric-card"><span>已聚合重复</span><strong>${repeated}</strong><small>不会生成重复卡片</small></article>
-      <article class="metric-card"><span>严重问题</span><strong>${critical}</strong><small>${latest ? `最近 ${escapeHtml(formatTime(latest))}` : "暂无记录"}</small></article>
+      ${statCardView({label:"独立问题",value:entries.length,note:"按问题指纹去重"})}
+      ${statCardView({label:"总发生次数",value:totalOccurrences,note:"包含重复触发"})}
+      ${statCardView({label:"已聚合重复",value:repeated,note:"不会生成重复卡片"})}
+      ${statCardView({label:"严重问题",value:critical,note:latest ? `最近 ${formatTime(latest)}` : "暂无记录"})}
     </div></section>
 
     <section id="issue-processing" class="issue-explainer panel compact management-section workspace-anchor-target">
@@ -153,7 +156,7 @@ export function logsPage(entries: IssueLogEntry[]): string {
     <section id="issue-records" class="issue-list management-section workspace-anchor-target">
       ${entries.length > 0
         ? entries.map(issueCard).join("")
-        : `<div class="empty-state panel"><strong>目前没有记录到问题</strong><p>后续发生的启动、界面、后台或数据库问题会自动出现在这里。</p></div>`}
+        : emptyStateView({title:"目前没有记录到问题",description:"后续发生的启动、界面、后台或数据库问题会自动出现在这里。",size:"Default"})}
     </section>
     </div>
   </section>`;

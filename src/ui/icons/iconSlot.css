@@ -44,3 +44,6 @@
 .ui-icon-plus-master > svg { position: absolute; left: -0.875px; top: -0.875px; max-width: none; }
 .ui-icon-plus-master [id="Vector"] { stroke: currentColor; }
 .ui-icon-chevron-down { --ui-icon-source: url("../../assets/icons/chevron-down.svg"); }
+
+.ui-icon-table-sort-up { --ui-icon-source: url("../../assets/icons/chevron-up.svg"); }
+.ui-icon-table-sort-down { --ui-icon-source: url("../../assets/icons/chevron-sort-down.svg"); }

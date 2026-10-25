@@ -514,23 +514,6 @@ button.secondary.quiet { padding: 8px 10px; color: var(--muted); }
 .match-event-summary > div { min-width: 0; display: grid; gap: 3px; padding: 10px 11px; border: 1px solid var(--border); border-radius: 10px; background: var(--surface); }
 .match-event-summary span { color: var(--text-muted); font-size: 10px; }
 .match-event-summary strong { overflow: hidden; color: var(--text-strong); font-size: 15px; text-overflow: ellipsis; white-space: nowrap; }
-.match-event-timeline { display: grid; gap: 7px; }
-.match-event-row { display: grid; grid-template-columns: 58px minmax(0, 1fr); gap: 10px; align-items: start; padding: 10px 11px; border: 1px solid var(--border); border-radius: 11px; background: var(--surface); }
-.match-event-row > time { display: grid; place-items: center; min-height: 32px; border-radius: 9px; background: var(--surface-strong); color: var(--accent); font-size: 12px; font-weight: 800; }
-.match-event-row > div { min-width: 0; display: grid; gap: 3px; }
-.match-event-row header { display: flex; gap: 8px; align-items: center; min-width: 0; }
-.match-event-row header strong { color: var(--text-strong); font-size: 13px; }
-.match-event-row header b { padding: 2px 6px; border-radius: 6px; background: var(--accent-soft); color: var(--accent); font-size: 11px; }
-.match-event-row header em { margin-left: auto; color: var(--success); font-size: 10px; font-style: normal; white-space: nowrap; }
-.match-event-row p { margin: 0; overflow-wrap: anywhere; color: var(--text); font-size: 12px; line-height: 1.45; }
-.match-event-row small { color: var(--text-muted); font-size: 10px; }
-.match-event-row.verification-unverified header em { color: var(--warning); }
-.match-event-row.verification-disputed { border-color: color-mix(in srgb, var(--danger) 38%, var(--border)); }
-.match-event-row.verification-disputed header em { color: var(--danger); }
-.match-event-row.revision-corrected { border-color: color-mix(in srgb, var(--accent) 38%, var(--border)); }
-.match-event-row.revision-cancelled { opacity: .68; background: color-mix(in srgb, var(--surface-strong) 70%, var(--surface)); }
-.match-event-row.revision-cancelled p, .match-event-row.revision-cancelled header strong { text-decoration: line-through; }
-.match-event-row.revision-cancelled header em { color: var(--text-muted); }
 .review-team-cards { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin-bottom: 16px; }
 .review-team-cards article { padding: 15px; border: 1px solid var(--border); border-radius: 14px; background: var(--surface-soft); }
 .review-team-cards header span { color: var(--text-muted); font-size: 11px; }

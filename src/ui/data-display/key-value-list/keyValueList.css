@@ -1,0 +1,4 @@
+.ui-key-value-list { display: flex; flex-direction: column; gap: var(--fip-space-sm); margin: 0; min-width: 0; padding: var(--fip-space-sm) var(--fip-space-md); border: var(--fip-border-width) solid var(--fip-border); border-radius: var(--fip-radius-sm); background: var(--fip-subtle); }
+.ui-key-value-list > div { display: flex; gap: var(--fip-space-sm); align-items: flex-start; min-width: 0; }
+.ui-key-value-list dt { flex: 0 0 100px; color: var(--fip-muted); font: var(--fip-type-label-weight) var(--fip-type-label-size)/var(--fip-type-label-line-height) var(--fip-type-label-family); letter-spacing: var(--fip-type-label-letter-spacing); overflow-wrap: anywhere; }
+.ui-key-value-list dd { flex: 1; min-width: 0; margin: 0; color: var(--fip-strong); font: var(--fip-type-body-weight) var(--fip-type-body-size)/var(--fip-type-body-line-height) var(--fip-type-body-family); overflow-wrap: anywhere; }

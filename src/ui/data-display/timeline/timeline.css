@@ -1,0 +1,21 @@
+.ui-timeline { display: flex; flex-direction: column; gap: var(--fip-space-md); min-width: 0; width: 100%; }
+.ui-timeline > header { display: flex; flex-direction: column; gap: var(--fip-space-xs); }
+.ui-timeline h3 { margin: 0; color: var(--fip-text); font: var(--fip-type-section-title-weight) var(--fip-type-section-title-size)/var(--fip-type-section-title-line-height) var(--fip-type-section-title-family); }
+.ui-timeline > header > p { margin: 0; font: var(--fip-type-caption-weight) var(--fip-type-caption-size)/var(--fip-type-caption-line-height) var(--fip-type-caption-family); letter-spacing: var(--fip-type-caption-letter-spacing); }
+.ui-timeline > ol { display: flex; flex-direction: column; list-style: none; margin: 0; padding: 0; }
+.ui-timeline-item { display: flex; gap: var(--fip-space-sm); min-width: 0; }
+.ui-timeline-time { flex: 0 0 var(--fip-layout-timeline-time-width); color: var(--fip-text); text-align: right; font: 500 12px/16px var(--fip-type-body-family); overflow-wrap: anywhere; }
+.ui-timeline-rail { flex: 0 0 16px; display: flex; flex-direction: column; align-items: center; gap: var(--fip-space-xs); color: var(--fip-muted); }
+.ui-timeline-item[data-verification="Verified"] .ui-timeline-rail { color: var(--fip-success); }
+.ui-timeline-item[data-verification="Disputed"] .ui-timeline-rail { color: var(--fip-warning); }
+.ui-timeline-item[data-revision="Cancelled"] .ui-timeline-rail { color: var(--fip-muted); }
+.ui-timeline-connector { flex: 1; min-height: 1px; width: 1px; background: var(--fip-muted); }
+.ui-timeline-content { display: flex; flex: 1; flex-direction: column; gap: var(--fip-space-xs); min-width: 0; padding-bottom: var(--fip-space-lg); color: var(--fip-text); }
+.ui-timeline-heading { display: flex; align-items: flex-start; gap: var(--fip-space-sm); font: 500 12px/16px var(--fip-type-body-family); }
+.ui-timeline-heading > strong { flex: 1; min-width: 0; font: inherit; overflow-wrap: anywhere; }
+.ui-timeline-score { flex-shrink: 0; white-space: nowrap; }
+.ui-timeline-item[data-revision="Cancelled"] .ui-timeline-heading > strong { text-decoration: line-through; }
+.ui-timeline-statuses { display: flex; flex-wrap: wrap; gap: var(--fip-space-xs); }
+.ui-timeline-statuses .ui-badge { color: var(--fip-text); }
+.ui-timeline .ui-timeline-description { margin: 0; color: var(--fip-text); font: 400 12px/18px var(--fip-type-body-family); overflow-wrap: anywhere; }
+.ui-timeline .ui-timeline-metadata { margin: 0; color: var(--fip-text); font: 500 10px/14px var(--fip-type-body-family); letter-spacing: var(--fip-type-caption-letter-spacing); overflow-wrap: anywhere; }

@@ -7,7 +7,7 @@
 
 ## 当前前置状态（2026-10-25）
 
-`IN_PROGRESS`。01～11 DONE；11精确085097a/run40188280192的全部步骤、完整日志、ZIP摘要和启动trace已独立核验。用户2026-10-25授权“收尾11开始12”，12 Forms VERIFYING；13～19 BLOCKED。沿唯一rewrite/r12-frontend-foundation-ui-system。不轮询CI。
+`IN_PROGRESS`。01～12 DONE；12精确7807534/run40194352653全部步骤、完整日志、ZIP摘要与startup trace已独立核验。用户2026-10-26授权“收尾12 开始13”，13 Data Display VERIFYING：八类组件、320项原生检查与完整91步骤前端已通过；13自身Windows CI待提交后核验。14～19 BLOCKED。沿唯一rewrite/r12-frontend-foundation-ui-system。不轮询CI。
 
 ## 1. 阶段目标
 
@@ -1886,7 +1886,7 @@ src/ui/primitives/skeleton/
 
 ## R12-12 Forms
 
-状态：`VERIFYING`（七类Forms及272项原生检查、91步骤前端已通过；12自身Windows待验）
+状态：`DONE`（12自身精确7807534/run40194352653 Windows证据已独立核验）
 
 ### 1. 目标
 
@@ -2026,7 +2026,7 @@ src/ui/forms/form-actions/
 
 ## R12-13 Data Display
 
-状态：`BLOCKED`（仅当上一任务与本任务前置门禁通过后改为 `READY`）
+状态：`VERIFYING`（八类Data Display、320项原生检查、91步骤前端通过；13自身Windows CI待验）
 
 ### 1. 目标
 

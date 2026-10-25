@@ -233,6 +233,23 @@
       ],
       "state": "Only native value and local touched/composition/message projections; domain validation, persistence and commands stay with hosts",
       "production_dependencies_added": false
+    },
+    "ui_data_display": {
+      "owner": "src/ui/data-display",
+      "style_entry": "src/ui/data-display/index.css",
+      "families": [
+        "data-table",
+        "key-value-list",
+        "stat-card",
+        "status-badge",
+        "timeline",
+        "progress",
+        "empty-state",
+        "code-block"
+      ],
+      "state": "Host owns rows/order/selection/domain statuses/results; only EventScope-owned local event listeners. No I/O or persistent owner.",
+      "production_dependencies_added": false,
+      "source_record": "docs/modular-rewrite/R12-frontend-foundation-ui-system/R12-13-component-mappings.json"
     }
   },
   "rust": {

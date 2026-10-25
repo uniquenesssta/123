@@ -1,4 +1,5 @@
 import { RouteHistory } from "./router";
+import { keyValueListView } from "../ui/data-display/key-value-list";
 import { mountConfirmationInput } from "../ui/forms/confirmation-input";
 import { formActionsView } from "../ui/forms/form-actions";
 import { escapeHtml, formatPercent } from "../components/format";
@@ -92,11 +93,11 @@ function renderVisualValue(value: unknown, key = "value", depth = 0): string {
     const scalarEntries = normal.filter(([, entryValue]) => entryValue === null || ["string", "number", "boolean"].includes(typeof entryValue));
     const sectionEntries = normal.filter(([, entryValue]) => entryValue !== null && !["string", "number", "boolean"].includes(typeof entryValue));
     const scalarHtml = scalarEntries.length > 0
-      ? `<dl class="detail-facts">${scalarEntries.map(([entryKey, entryValue]) => `<div><dt>${escapeHtml(visualLabel(entryKey))}</dt><dd>${renderVisualValue(entryValue, entryKey, depth + 1)}</dd></div>`).join("")}</dl>`
+      ? keyValueListView(scalarEntries.map(([entryKey, entryValue]) => ({ label: visualLabel(entryKey), renderValue: () => renderVisualValue(entryValue, entryKey, depth + 1) })))
       : "";
     const sectionHtml = sectionEntries.map(([entryKey, entryValue]) => `<section class="detail-section"><h3>${escapeHtml(visualLabel(entryKey))}</h3>${renderVisualValue(entryValue, entryKey, depth + 1)}</section>`).join("");
     const technicalHtml = technical.length > 0
-      ? `<details class="technical-details"><summary>技术追踪信息</summary><dl class="detail-facts compact">${technical.map(([entryKey, entryValue]) => `<div><dt>${escapeHtml(visualLabel(entryKey))}</dt><dd>${renderVisualValue(entryValue, entryKey, depth + 1)}</dd></div>`).join("")}</dl></details>`
+      ? `<details class="technical-details"><summary>技术追踪信息</summary>${keyValueListView(technical.map(([entryKey, entryValue]) => ({ label: visualLabel(entryKey), renderValue: () => renderVisualValue(entryValue, entryKey, depth + 1) })))}</details>`
       : "";
     return `<div class="detail-stack ${depth > 0 ? "nested" : ""}">${scalarHtml}${sectionHtml}${technicalHtml}</div>`;
   }

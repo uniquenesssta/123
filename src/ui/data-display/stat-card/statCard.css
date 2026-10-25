@@ -1,0 +1,5 @@
+.ui-stat-card { display: flex; flex-direction: column; gap: var(--fip-space-xs); min-width: 0; padding: var(--fip-layout-panel-padding); border: var(--fip-border-width) solid var(--fip-border); border-radius: var(--fip-radius-md); background: var(--fip-surface); }
+.ui-stat-card p { margin: 0; width: 100%; overflow-wrap: anywhere; }
+.ui-stat-card .ui-stat-label { color: var(--fip-muted); font: var(--fip-type-label-weight) var(--fip-type-label-size)/var(--fip-type-label-line-height) var(--fip-type-label-family); letter-spacing: var(--fip-type-label-letter-spacing); }
+.ui-stat-card .ui-stat-value { color: var(--fip-strong); font: var(--fip-type-data-metric-weight) var(--fip-type-data-metric-size)/var(--fip-type-data-metric-line-height) var(--fip-type-data-metric-family); letter-spacing: var(--fip-type-data-metric-letter-spacing); }
+.ui-stat-card .ui-stat-note { color: var(--fip-color-text-tertiary); font: var(--fip-type-caption-weight) var(--fip-type-caption-size)/var(--fip-type-caption-line-height) var(--fip-type-caption-family); letter-spacing: var(--fip-type-caption-letter-spacing); }

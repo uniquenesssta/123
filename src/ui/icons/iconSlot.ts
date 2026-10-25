@@ -1,6 +1,6 @@
 import plusSource from "../../assets/icons/plus.svg?raw";
 
-export type UiIcon = "dashboard" | "match-center" | "prediction" | "release-acceptance" | "history" | "shield" | "users" | "lineup-preset" | "sheet" | "settings" | "chart" | "chat" | "plug" | "database" | "issue-log" | "info" | "contrast" | "panel-left" | "panel-right" | "arrow-left" | "arrow-right" | "reset" | "alert-circle" | "close" | "check" | "minus" | "plus" | "chevron-down";
+export type UiIcon = "dashboard" | "match-center" | "prediction" | "release-acceptance" | "history" | "shield" | "users" | "lineup-preset" | "sheet" | "settings" | "chart" | "chat" | "plug" | "database" | "issue-log" | "info" | "contrast" | "panel-left" | "panel-right" | "arrow-left" | "arrow-right" | "reset" | "alert-circle" | "close" | "check" | "minus" | "plus" | "chevron-down" | "table-sort-up" | "table-sort-down";
 
 /** Exact downloaded Figma vectors, colored by the shared semantic tone through a mask. */
 export function iconSlot(name: UiIcon, size: 16 | 20 | 24): string {

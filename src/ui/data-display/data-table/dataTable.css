@@ -1,0 +1,33 @@
+.ui-data-table { box-sizing: border-box; max-width: 100%; min-width: 0; width: 100%; overflow: auto; border: var(--fip-border-width) solid var(--fip-border); border-radius: var(--fip-radius-md); background: var(--fip-surface); }
+.ui-data-table:focus-visible { outline: 2px solid var(--fip-accent); outline-offset: 2px; }
+.ui-data-table > table { width: 100%; min-width: 480px; margin: 0; border-collapse: collapse; table-layout: fixed; color: var(--fip-text); font: var(--fip-type-data-table-weight) var(--fip-type-data-table-size)/var(--fip-type-data-table-line-height) var(--fip-type-data-table-family); }
+.ui-data-table caption { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); }
+.ui-data-table th, .ui-data-table td { box-sizing: border-box; padding: 0 var(--fip-layout-table-cell-padding-x); border: 0; border-bottom: var(--fip-border-width) solid var(--fip-border); overflow-wrap: anywhere; vertical-align: middle; text-align: left; font: inherit; }
+.ui-data-table th { height: var(--fip-layout-table-header-height); padding-top: 0; padding-bottom: 0; background: var(--fip-subtle); color: var(--fip-muted); font-weight: 500; }
+.ui-data-table td { height: var(--fip-layout-table-row-height); background: var(--fip-surface); }
+.ui-data-table [data-align="Number"], .ui-data-table [data-align="Action"] { text-align: right; }
+.ui-data-table td[data-align="Number"] { font-weight: 600; line-height: 15px; }
+.ui-data-table tr[data-disabled="false"] td[data-align="Number"], .ui-data-table tr[data-disabled="false"] .ui-table-cell-copy > span { color: var(--fip-strong); }
+.ui-data-table tr[data-selected="true"] td { background: var(--fip-accent-soft); }
+.ui-data-table tr[data-selected="true"] td:first-child { box-shadow: inset 2px 0 var(--fip-accent); }
+.ui-data-table tr[data-disabled="true"] td { background: var(--fip-subtle); color: var(--fip-color-text-disabled); }
+.ui-data-table tbody tr:not([data-disabled="true"]):hover td { background: var(--fip-accent-soft); }
+.ui-data-table .ui-table-sort { display: inline-flex; align-items: center; justify-content: inherit; gap: 4px; max-width: 100%; min-height: 0; margin: 0; padding: 0; border: 0; border-radius: var(--fip-radius-md); background: transparent; box-shadow: none; color: inherit; font: inherit; text-align: inherit; white-space: normal; cursor: pointer; }
+.ui-data-table .ui-table-sort:focus-visible { outline: 2px solid var(--fip-accent); outline-offset: 3px; }
+.ui-data-table .ui-table-sort:disabled { cursor: default; color: var(--fip-color-text-disabled); }
+.ui-table-sort-icon, .ui-table-sort-icon > .ui-icon-slot { display: inline-block; flex-shrink: 0; width: 12px; height: 12px; color: var(--fip-accent); }
+.ui-table-sort:disabled .ui-icon-slot { color: var(--fip-muted); }
+.ui-data-table .ui-table-selection-col { width: 44px; }
+.ui-data-table .ui-table-selection { width: 44px; text-align: center; }
+.ui-table-selection .ui-checkbox-label { display: none; }
+.ui-table-cell-copy { display: inline-flex; flex-direction: column; align-items: inherit; }
+.ui-table-cell-copy > span { font-size: 11px; line-height: 15px; }
+.ui-table-cell-copy[data-cell-type="text"] > span { line-height: 16px; }
+.ui-table-cell-copy[data-cell-type="metadata"] > span { font-weight: 500; }
+.ui-table-cell-copy[data-cell-type="number"] > span { font-weight: 600; }
+.ui-table-cell-copy > small { font-size: 9px; line-height: 12px; font-weight: 400; }
+.ui-data-table tr[data-disabled="false"] .ui-table-cell-copy > small { color: var(--fip-muted); }
+.ui-data-table .ui-table-empty { height: 140px; text-align: center; }
+.ui-table-empty > strong { color: var(--fip-strong); font: 600 13px/18px var(--fip-type-body-family); }
+.ui-table-empty > p { margin: 4px 0 0; color: var(--fip-muted); font: 400 11px/16px var(--fip-type-body-family); }
+.ui-table-loading { display: flex; align-items: center; justify-content: center; gap: 6px; min-height: 28px; border-top: var(--fip-border-width) solid var(--fip-border); background: var(--fip-subtle); color: var(--fip-accent); font: 500 10px/14px var(--fip-type-body-family); }

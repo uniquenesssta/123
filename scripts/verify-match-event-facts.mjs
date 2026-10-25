@@ -25,7 +25,7 @@ const application = read("crates/application/src/use_cases/review/package/shared
 const migration = read("crates/persistence-postgres/migrations/0042_structured_match_event_facts.sql");
 const importFix = read("crates/persistence-postgres/migrations/0043_import_row_team_period_identity.sql");
 const types = read("src/types.ts");
-const page = read("src/pages/review.ts");
+const page = read("src/pages/review.ts") + "\n" + read("src/pages/review/matchEventTimelineView.ts");
 const styles = read("src/styles/app.css");
 const integration = read("crates/persistence-postgres/tests/postgres_integration.rs");
 const forceDelete = [
@@ -108,9 +108,12 @@ check(!integration.includes("SELECT subrecord_key\n        SELECT subrecord_key"
 
 check(types.includes("export interface MatchEventSummary") && types.includes("event_summary: MatchEventSummary"), "前端类型缺少事件摘要");
 check(page.includes("结构化比赛事实") && page.includes("事件时间线") && page.includes("event_summary"), "赛后复盘页面没有显示结构化事件时间线");
-for (const className of [".match-event-panel", ".match-event-summary", ".match-event-timeline", ".match-event-row"]) {
+for (const className of [".match-event-panel", ".match-event-summary"]) {
   check(styles.includes(className), `事件时间线缺少样式 ${className}`);
 }
+
+check(page.includes("timelineView({") && page.includes("[event.verification_status]") && page.includes("[event.revision_status]"), "真实事件必须通过共享Timeline保留独立状态轴");
+check(read("src/ui/data-display/timeline/timeline.css").includes(".ui-timeline-item"), "共享Timeline缺少唯一样式");
 
 check(eventPayload.includes("legacy_event_payload_receives_safe_structured_defaults"), "缺少旧版赛后事件载荷兼容性测试");
 check(integration.includes("structured_match_events_are_queryable_and_revision_aware"), "缺少结构化比赛事件 PostgreSQL 集成测试");
