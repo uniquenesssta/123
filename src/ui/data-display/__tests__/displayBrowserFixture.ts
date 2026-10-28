@@ -29,7 +29,7 @@ export function installDisplayFixture() {
     expect(table.querySelector("caption")?.textContent==="实际记录","table has accessible caption");
     expect(q<HTMLInputElement>("#loaded [data-table-select-all]").indeterminate,"select-all indeterminate native projection");
     expect(Math.abs(q("#loaded thead tr").getBoundingClientRect().height-34)<0.1,"Figma table header 34px");
-    expect(Math.abs(q("#loaded tbody tr").getBoundingClientRect().height-36)<0.1,"Figma table row 36px with metadata/button/badge");
+    expect(Math.abs(q("#loaded tbody tr").getBoundingClientRect().height-36)<0.1,"Figma table row 36px with metadata/button/badge: "+JSON.stringify(Array.from(q("#loaded tbody tr").children).map(cell=>({height:cell.getBoundingClientRect().height,padding:getComputedStyle(cell).padding,copy:cell.querySelector('.ui-table-cell-copy')?.getBoundingClientRect().height,gap:cell.querySelector('.ui-table-cell-copy')?getComputedStyle(cell.querySelector('.ui-table-cell-copy')!).gap:null}))));
     expect(getComputedStyle(q("#loaded td[data-align=Number]")).textAlign==="right","number cell aligns right");
     expect(getComputedStyle(q('#loaded tr[data-table-row="b"] td[data-align=Number]')).fontWeight==="600","plain numeric cell uses Figma semibold typography");
     expect(getComputedStyle(q("#loaded .ui-table-cell-copy > small")).fontWeight==="400","supporting metadata remains regular weight");
@@ -40,7 +40,7 @@ export function installDisplayFixture() {
     expect(Array.from(busy.querySelectorAll<HTMLInputElement|HTMLButtonElement>("input,button")).every(c=>c.disabled),"busy disables all row, select and sort controls");
     expect(q<HTMLTableCellElement>("#empty-table td").colSpan===4,"empty body spans all columns");
     expect(q("#empty-table td").getBoundingClientRect().height===140,"Figma table empty body 140px");
-    expect(getComputedStyle(q(".ui-stat-value")).fontSize==="20px"&&getComputedStyle(q(".ui-stat-value")).lineHeight==="24px","Figma metric 20/24");
+    expect(getComputedStyle(q(".ui-stat-value")).fontSize==="24px"&&getComputedStyle(q(".ui-stat-value")).lineHeight==="30px","approved Figma metric 24/30");
     expect(q(".display-stats").textContent?.includes("零值0"),"zero metric is preserved");
     expect(q(".ui-key-value-list dt").getBoundingClientRect().width===100,"Figma key-value label 100px");
     expect(q(".ui-key-value-list dd").textContent==="皇家社会 <&>","native fact text escaped");

@@ -1,0 +1,27 @@
+<!doctype html><html lang="zh-CN" data-theme="light"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>FIP 布局验收（测试数据）</title><link rel="stylesheet" href="../../src/styles/app.css">
+<link rel="stylesheet" href="../../src/styles/components.css">
+<link rel="stylesheet" href="../../src/styles/layout.css">
+<link rel="stylesheet" href="../../src/styles/entityCenter.css">
+<link rel="stylesheet" href="../../src/styles/taskWorkspace.css">
+<link rel="stylesheet" href="../../src/styles/coreWorkspaces.css">
+<link rel="stylesheet" href="../../src/styles/moduleWorkspaces.css">
+<link rel="stylesheet" href="../../src/styles/visualSystem.css">
+<link rel="stylesheet" href="../../src/styles/workspacePanels.css">
+<link rel="stylesheet" href="../../src/ui/tokens/index.css">
+<link rel="stylesheet" href="../../src/styles/foundation/legacyControls.css">
+<link rel="stylesheet" href="../../src/styles/foundation/workspaceNavigation.css">
+<link rel="stylesheet" href="../../src/ui/icons/iconSlot.css">
+<link rel="stylesheet" href="../../src/ui/primitives/index.css">
+<link rel="stylesheet" href="../../src/ui/forms/index.css">
+<link rel="stylesheet" href="../../src/ui/data-display/index.css">
+<link rel="stylesheet" href="../../src/ui/feedback/blocking-message/blockingMessage.css">
+<link rel="stylesheet" href="../../src/ui/overlays/confirmation-dialog/confirmationDialog.css">
+<link rel="stylesheet" href="../../src/app/shell/application-shell/applicationShell.css">
+<link rel="stylesheet" href="../../src/app/shell/sidebar/sidebar.css">
+<link rel="stylesheet" href="../../src/app/shell/topbar/topbar.css">
+<link rel="stylesheet" href="../../src/app/shell/page-frame/pageFrame.css">
+<link rel="stylesheet" href="../../src/app/shell/content-region/contentRegion.css">
+<link rel="stylesheet" href="../../src/ui/feedback/feedback-content/feedbackContent.css">
+<link rel="stylesheet" href="../../src/ui/feedback/toast/toast.css">
+<link rel="stylesheet" href="../../src/ui/feedback/task-activity/taskActivity.css">
+<link rel="stylesheet" href="../../src/app/warnings/warning-center/warningCenter.css"></head><body><script type="module">import {renderFixture} from "../../scripts/design-refresh/browserFixture.ts";const p=new URLSearchParams(location.search);const screen=["dashboard","teams","profile","team-open","team-closed","lineups","rules"].includes(p.get("screen"))?p.get("screen"):"dashboard";renderFixture(screen,p.get("theme")==="dark"?"dark":"light",p.get("compact")==="true");const note=document.createElement("aside");note.textContent="隔离布局验收 · 合成数据";note.style.cssText="position:fixed;right:12px;bottom:4px;z-index:9999;color:var(--fip-muted);font:11px/16px sans-serif;pointer-events:none";document.body.append(note);</script></body></html>

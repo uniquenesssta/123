@@ -2,28 +2,28 @@
  * Loaded last on purpose: this file normalises the visual language without
  * changing business structure, data flow, routes, or model behaviour.
  */
-:root {
-  --ui-canvas: #0b1118;
-  --ui-surface: #111923;
-  --ui-surface-raised: #151f2a;
-  --ui-surface-subtle: #0e1720;
-  --ui-border: rgba(255, 255, 255, .085);
-  --ui-border-strong: rgba(255, 255, 255, .14);
-  --ui-text: #edf2f7;
-  --ui-text-strong: #ffffff;
-  --ui-text-muted: #96a3ae;
-  --ui-text-faint: #6e7b86;
-  --ui-accent: #6e9fff;
-  --ui-accent-hover: #8ab2ff;
-  --ui-accent-soft: rgba(110, 159, 255, .12);
-  --ui-accent-ink: #071426;
-  --ui-success: #58cfa6;
-  --ui-warning: #e7b35c;
-  --ui-danger: #f17982;
-  --ui-info: #6e9fff;
+:root, :root[data-theme="light"], :root[data-theme="dark"] {
+  --ui-canvas: var(--fip-canvas);
+  --ui-surface: var(--fip-surface);
+  --ui-surface-raised: var(--fip-raised);
+  --ui-surface-subtle: var(--fip-subtle);
+  --ui-border: var(--fip-border);
+  --ui-border-strong: var(--fip-border-strong);
+  --ui-text: var(--fip-text);
+  --ui-text-strong: var(--fip-strong);
+  --ui-text-muted: var(--fip-muted);
+  --ui-text-faint: var(--fip-color-text-tertiary);
+  --ui-accent: var(--fip-accent);
+  --ui-accent-hover: var(--fip-accent-hover);
+  --ui-accent-soft: var(--fip-accent-soft);
+  --ui-accent-ink: var(--fip-on-accent);
+  --ui-success: var(--fip-success);
+  --ui-warning: var(--fip-warning);
+  --ui-danger: var(--fip-color-text-danger);
+  --ui-info: var(--fip-info);
   --ui-radius-xs: 6px;
-  --ui-radius-sm: 8px;
-  --ui-radius-md: 11px;
+  --ui-radius-sm: 7px;
+  --ui-radius-md: 16px;
   --ui-radius-lg: 14px;
   --ui-radius-xl: 18px;
   --ui-control-height: 36px;
@@ -68,24 +68,24 @@
 }
 
 :root[data-theme="light"] {
-  --ui-canvas: #eef3f8;
-  --ui-surface: #ffffff;
-  --ui-surface-raised: #f7f9fc;
-  --ui-surface-subtle: #f3f6f9;
-  --ui-border: rgba(28, 49, 72, .11);
-  --ui-border-strong: rgba(28, 49, 72, .18);
-  --ui-text: #243244;
-  --ui-text-strong: #101c2c;
-  --ui-text-muted: #64758a;
-  --ui-text-faint: #8a98aa;
-  --ui-accent: #356df3;
-  --ui-accent-hover: #285bd7;
-  --ui-accent-soft: rgba(53, 109, 243, .09);
-  --ui-accent-ink: #ffffff;
-  --ui-success: #168b69;
-  --ui-warning: #b7791f;
-  --ui-danger: #c84d59;
-  --ui-info: #356df3;
+  --ui-canvas: var(--fip-canvas);
+  --ui-surface: var(--fip-surface);
+  --ui-surface-raised: var(--fip-raised);
+  --ui-surface-subtle: var(--fip-subtle);
+  --ui-border: var(--fip-border);
+  --ui-border-strong: var(--fip-border-strong);
+  --ui-text: var(--fip-text);
+  --ui-text-strong: var(--fip-strong);
+  --ui-text-muted: var(--fip-muted);
+  --ui-text-faint: var(--fip-color-text-tertiary);
+  --ui-accent: var(--fip-accent);
+  --ui-accent-hover: var(--fip-accent-hover);
+  --ui-accent-soft: var(--fip-accent-soft);
+  --ui-accent-ink: var(--fip-on-accent);
+  --ui-success: var(--fip-success);
+  --ui-warning: var(--fip-warning);
+  --ui-danger: var(--fip-color-text-danger);
+  --ui-info: var(--fip-info);
   --ui-shadow-float: 0 14px 36px rgba(51, 72, 98, .10);
   --ui-shadow-dialog: 0 26px 70px rgba(34, 50, 72, .22);
   --ui-focus-ring: 0 0 0 3px rgba(53, 109, 243, .16);
@@ -102,7 +102,7 @@ body {
   min-width: 320px;
   color: var(--ui-text);
   background: var(--ui-canvas);
-  font-family: Inter, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+  font-family: var(--fip-type-body-family);
   font-size: 13px;
   line-height: 1.45;
   -webkit-font-smoothing: antialiased;
@@ -183,7 +183,7 @@ textarea:focus-visible,
 .entity-page-heading .eyebrow {
   color: var(--ui-accent);
   font-size: 10px;
-  font-weight: 760;
+  font-weight: 700;
   letter-spacing: .08em;
   text-transform: none;
 }
@@ -194,7 +194,7 @@ textarea:focus-visible,
   margin: 0;
   color: var(--ui-text-strong);
   font-size: clamp(24px, 2vw, 31px);
-  font-weight: 720;
+  font-weight: 700;
   line-height: 1.16;
   letter-spacing: -.025em;
 }
@@ -219,7 +219,7 @@ textarea:focus-visible,
   border-radius: 999px;
   background: var(--ui-surface-subtle);
   font-size: 11px;
-  font-weight: 680;
+  font-weight: 500;
 }
 .task-status-chip.tone-accent,
 .task-status-chip.tone-success,
@@ -339,10 +339,10 @@ textarea:focus-visible,
 .inset-panel { border-radius: var(--ui-radius-sm); }
 .panel-heading { gap: 12px; margin-bottom: 14px; }
 .panel-heading h2 { color: var(--ui-text-strong); font-size: 16px; font-weight: 700; }
-.panel-heading h3 { color: var(--ui-text-strong); font-size: 14px; font-weight: 680; }
+.panel-heading h3 { color: var(--ui-text-strong); font-size: 14px; font-weight: 500; }
 .panel-heading span,
 .eyebrow,
-.section-label { color: var(--ui-accent); font-size: 9px; font-weight: 760; letter-spacing: .08em; }
+.section-label { color: var(--ui-accent); font-size: 9px; font-weight: 700; letter-spacing: .08em; }
 .workspace-section-heading,
 .module-section-heading,
 .task-form-heading {
@@ -382,7 +382,7 @@ button.ghost,
   min-height: var(--ui-control-height);
   border-radius: var(--ui-radius-sm);
   font-size: 11px;
-  font-weight: 680;
+  font-weight: 500;
   transition: color .14s ease, border-color .14s ease, background-color .14s ease, transform .14s ease, box-shadow .14s ease;
 }
 button.primary {
@@ -417,7 +417,7 @@ button:disabled:active,
 .field > span,
 .inline-field > span,
 .check-field > span,
-label > span { color: var(--ui-text); font-size: 10px; font-weight: 650; }
+label > span { color: var(--ui-text); font-size: 10px; font-weight: 500; }
 .field input,
 .field select,
 .inline-field select,
@@ -620,7 +620,7 @@ tbody tr:hover { background: var(--soft-hover); }
   --ui-font-size: 12px;
   --ui-font-size-sm: 11px;
   --ui-font-size-xs: 10px;
-  --ui-page-title-size: 21px;
+  --ui-page-title-size: var(--fip-type-page-title-size);
   --ui-section-title-size: 14px;
   --ui-control-height: 32px;
   --ui-control-height-sm: 27px;
@@ -628,13 +628,13 @@ tbody tr:hover { background: var(--soft-hover); }
   --ui-panel-padding: 12px;
   --ui-page-padding-x: 14px;
   --ui-page-padding-y: 10px;
-  --ui-radius-xs: 3px;
-  --ui-radius-sm: 5px;
-  --ui-radius-md: 7px;
+  --ui-radius-xs: 6px;
+  --ui-radius-sm: 7px;
+  --ui-radius-md: 16px;
   --ui-radius-lg: 9px;
   --ui-radius-xl: 12px;
   --ui-page-gap: 10px;
-  --ui-section-gap: 8px;
+  --ui-section-gap: 12px;
   --entity-directory-width: 248px;
   --entity-inspector-width: 300px;
   --entity-radius: 7px;
@@ -642,26 +642,26 @@ tbody tr:hover { background: var(--soft-hover); }
 }
 
 :root[data-theme="light"] {
-  --ui-canvas: #f6f7f9;
-  --ui-surface: #ffffff;
-  --ui-surface-raised: #f5f6f8;
-  --ui-surface-subtle: #f8f9fb;
-  --ui-border: rgba(30, 45, 66, .105);
-  --ui-border-strong: rgba(30, 45, 66, .17);
-  --ui-text: #303846;
-  --ui-text-strong: #151b26;
-  --ui-text-muted: #687386;
-  --ui-text-faint: #929bad;
-  --ui-accent: #326cf4;
-  --ui-accent-hover: #285bd9;
-  --ui-accent-soft: rgba(50, 108, 244, .075);
+  --ui-canvas: var(--fip-canvas);
+  --ui-surface: var(--fip-surface);
+  --ui-surface-raised: var(--fip-raised);
+  --ui-surface-subtle: var(--fip-subtle);
+  --ui-border: var(--fip-border);
+  --ui-border-strong: var(--fip-border-strong);
+  --ui-text: var(--fip-text);
+  --ui-text-strong: var(--fip-strong);
+  --ui-text-muted: var(--fip-muted);
+  --ui-text-faint: var(--fip-color-text-tertiary);
+  --ui-accent: var(--fip-accent);
+  --ui-accent-hover: var(--fip-accent-hover);
+  --ui-accent-soft: var(--fip-accent-soft);
   --soft: rgba(26, 43, 68, .035);
   --soft-hover: rgba(50, 108, 244, .055);
 }
 
 body {
   font-size: var(--ui-font-size);
-  line-height: 1.42;
+  line-height: var(--fip-type-body-line-height);
   background: var(--ui-canvas);
 }
 
@@ -688,7 +688,7 @@ body {
 .balanced-page-heading h1,
 .entity-page-heading h1 {
   font-size: var(--ui-page-title-size);
-  font-weight: 720;
+  font-weight: 700;
   line-height: 1.2;
   letter-spacing: -.018em;
 }
@@ -800,7 +800,7 @@ body {
 .module-section-heading h2,
 .task-form-heading h2 {
   font-size: var(--ui-section-title-size);
-  font-weight: 690;
+  font-weight: 500;
 }
 .panel-heading h3 { font-size: 12px; }
 .panel-heading span,
@@ -860,7 +860,7 @@ button.ghost,
   padding: 0 10px;
   border-radius: 5px;
   font-size: 10px;
-  font-weight: 670;
+  font-weight: 500;
   box-shadow: none;
 }
 button.tiny {
@@ -875,7 +875,7 @@ button.tiny {
 .check-field > span,
 label > span {
   font-size: 10px;
-  font-weight: 620;
+  font-weight: 500;
 }
 .field input,
 .field select,
@@ -921,7 +921,7 @@ td {
 th {
   height: 30px;
   font-size: 9px;
-  font-weight: 690;
+  font-weight: 500;
 }
 tbody tr { min-height: var(--ui-table-row-height); }
 .run-table.header,
@@ -940,13 +940,13 @@ tbody tr { min-height: var(--ui-table-row-height); }
 }
 .entity-page { gap: 8px !important; }
 .entity-page.task-page {
-  grid-template-rows: auto auto 38px minmax(0, 1fr) !important;
+  grid-template-rows: auto auto 32px minmax(0, 1fr) !important;
   gap: 7px !important;
 }
 .entity-page.task-page > .core-local-navigation {
-  height: 38px;
-  min-height: 38px;
-  max-height: 38px;
+  height: 32px;
+  min-height: 32px;
+  max-height: 32px;
   align-self: start;
 }
 .entity-page.task-page > .core-workspace-stage {
@@ -1143,7 +1143,7 @@ tbody tr { min-height: var(--ui-table-row-height); }
 .analysis-step-summary > div > span {
   color: var(--ui-accent);
   font-size: 9px;
-  font-weight: 750;
+  font-weight: 700;
   white-space: nowrap;
 }
 .analysis-step-summary > div > strong {
@@ -1244,7 +1244,7 @@ tbody tr { min-height: var(--ui-table-row-height); }
     --ui-font-size: 13px;
     --ui-font-size-sm: 12px;
     --ui-font-size-xs: 11px;
-    --ui-page-title-size: 22px;
+    --ui-page-title-size: var(--fip-type-page-title-size);
     --ui-section-title-size: 15px;
     --ui-control-height: 34px;
     --ui-control-height-sm: 29px;
@@ -1262,7 +1262,7 @@ tbody tr { min-height: var(--ui-table-row-height); }
   .task-page-header p,
   .workspace-section-heading p,
   .module-section-heading p,
-  .task-form-heading p { font-size: 11px; line-height: 1.42; }
+  .task-form-heading p { font-size: 11px; line-height: var(--fip-type-body-line-height); }
   .task-context-item span { font-size: 9px; }
   .task-context-item strong { font-size: 12px; }
   .task-context-item small { font-size: 10px; }

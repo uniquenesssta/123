@@ -21,14 +21,14 @@
   background: transparent; color: var(--fip-text); box-shadow: none; transform: none; transition: none;
 }
 .application-shell .primary-nav-item b,
-.application-shell .primary-theme-control b { display: block; width: 100%; max-width: none; overflow: hidden; font-size: var(--fip-type-caption-size); font-weight: var(--fip-type-label-weight); line-height: var(--fip-type-caption-line-height); letter-spacing: var(--fip-type-caption-letter-spacing); white-space: nowrap; text-overflow: ellipsis; color: inherit; }
+.application-shell .primary-theme-control b { display: block; width: 100%; max-width: none; overflow: hidden; font-size: var(--fip-type-navigation-size); font-weight: var(--fip-type-label-weight); line-height: var(--fip-type-navigation-line-height); letter-spacing: var(--fip-type-navigation-letter-spacing); white-space: nowrap; text-overflow: ellipsis; color: inherit; }
 .application-shell .primary-theme-footer { flex-shrink: 0; padding: 8px 3px 8px 4px; }
 .application-shell .primary-rail-spacer,
 .application-shell .secondary-sidebar-spacer { flex: 1 1 auto; min-height: 0; }
-.application-shell .secondary-sidebar { grid-column: 2; width: var(--shell-secondary-sidebar-width); overflow: hidden; padding: 0; background: var(--fip-canvas); }
+.application-shell .secondary-sidebar { grid-column: 2; width: var(--shell-secondary-sidebar-width); overflow: hidden; padding: 0; background: var(--fip-surface); }
 .application-shell .secondary-sidebar-header { display: flex; flex: 0 0 44px; align-items: center; gap: 4px; width: 100%; min-width: 0; min-height: 44px; height: 44px; padding: 0 8px; border: 0; }
 .application-shell .secondary-sidebar-header > span { flex: 1; min-width: 0; overflow: hidden; font-size: var(--fip-type-section-title-size); font-weight: var(--fip-type-section-title-weight); line-height: var(--fip-type-section-title-line-height); color: var(--fip-strong); white-space: nowrap; text-overflow: ellipsis; }
-.application-shell .secondary-module-description { flex-shrink: 0; margin: 0; padding: 8px; font-size: var(--fip-type-caption-size); font-weight: var(--fip-type-label-weight); line-height: var(--fip-type-caption-line-height); letter-spacing: var(--fip-type-caption-letter-spacing); color: var(--fip-text); }
+.application-shell .secondary-module-description { flex-shrink: 0; margin: 0; padding: 8px; font-size: var(--fip-type-navigation-size); font-weight: var(--fip-type-label-weight); line-height: var(--fip-type-navigation-line-height); letter-spacing: var(--fip-type-navigation-letter-spacing); color: var(--fip-text); }
 .application-shell .secondary-navigation { display: flex; flex-direction: column; flex: 0 1 auto; min-width: 0; min-height: 0; gap: 4px; padding: 0 7px 0 8px; overflow-y: auto; overscroll-behavior: contain; }
 .application-shell .secondary-nav-item { position: relative; display: flex; flex: 0 0 40px; align-items: center; gap: 8px; width: 138px; min-height: 40px; height: 40px; padding: 8px; border: 0; border-radius: var(--fip-radius-md); color: var(--fip-text); background: transparent; box-shadow: none; transform: none; transition: none; text-align: left; }
 .application-shell .secondary-nav-item b { min-width: 0; overflow: hidden; font-size: var(--fip-type-label-size); font-weight: var(--fip-type-label-weight); line-height: var(--fip-type-label-line-height); letter-spacing: var(--fip-type-label-letter-spacing); white-space: nowrap; text-overflow: ellipsis; }
@@ -38,9 +38,9 @@
 .application-shell .primary-nav-item.active,
 .application-shell .secondary-nav-item.active { color: var(--fip-strong); background: var(--fip-accent-soft); }
 .application-shell .primary-nav-item.active .ui-icon-slot,
-.application-shell .secondary-nav-item.active .ui-icon-slot { color: var(--fip-accent); }
+.application-shell .secondary-nav-item.active .ui-icon-slot { color: var(--fip-brand); }
 .application-shell .primary-nav-item.active::before,
-.application-shell .secondary-nav-item.active::before { content: ""; position: absolute; left: 0; top: calc(50% - 8px); width: 2px; height: 16px; background: var(--fip-accent); }
+.application-shell .secondary-nav-item.active::before { content: ""; position: absolute; left: 0; top: calc(50% - 8px); width: 2px; height: 16px; background: var(--fip-brand); }
 .application-shell .primary-nav-item.active:hover:not(:disabled),
 .application-shell .secondary-nav-item.active:hover:not(:disabled) { background: var(--fip-accent-soft); box-shadow: inset 0 0 0 1px var(--fip-border); }
 .application-shell .primary-nav-item:active:not(:disabled),
@@ -48,8 +48,8 @@
 .application-shell .secondary-nav-item:active:not(:disabled) { background: var(--fip-accent-soft); box-shadow: inset 0 0 0 1px var(--fip-border); }
 .application-shell .primary-nav-item:focus-visible,
 .application-shell .primary-theme-control:focus-visible,
-.application-shell .secondary-nav-item:focus-visible { outline: 1px solid var(--fip-accent); outline-offset: -1px; }
+.application-shell .secondary-nav-item:focus-visible { outline: 1px solid var(--fip-brand); outline-offset: -1px; }
 .application-shell .primary-nav-item:disabled,
 .application-shell .secondary-nav-item:disabled { opacity: var(--fip-disabled-opacity); }
 .application-shell .secondary-sidebar-footer { display: flex; flex-direction: column; flex-shrink: 0; align-items: flex-start; min-width: 0; gap: 8px; padding: 8px; border-top: var(--fip-border-width) solid var(--fip-border); background: transparent; }
-.application-shell .secondary-sidebar-footer small { margin: 0; font-size: var(--fip-type-caption-size); font-weight: var(--fip-type-label-weight); line-height: var(--fip-type-caption-line-height); letter-spacing: var(--fip-type-caption-letter-spacing); color: var(--fip-text); }
+.application-shell .secondary-sidebar-footer small { margin: 0; font-size: var(--fip-type-navigation-size); font-weight: var(--fip-type-label-weight); line-height: var(--fip-type-navigation-line-height); letter-spacing: var(--fip-type-navigation-letter-spacing); color: var(--fip-text); }

@@ -10,11 +10,11 @@ const analytics = read("src/pages/analytics.ts");
 const contract = JSON.parse(read("contracts/task-ui-contract.json"));
 
 check(
-  /\.entity-page\.task-page\s*\{[^}]*grid-template-rows:\s*auto\s+auto\s+38px\s+minmax\(0,\s*1fr\)/s.test(visual),
+  /\.entity-page\.task-page\s*\{[^}]*grid-template-rows:\s*auto\s+auto\s+32px\s+minmax\(0,\s*1fr\)/s.test(visual),
   "球队/球员页面没有为标题、上下文、任务栏和内容区保留四个独立网格行",
 );
 check(
-  /\.entity-page\.task-page\s*>\s*\.core-local-navigation\s*\{[^}]*height:\s*38px[^}]*max-height:\s*38px/s.test(visual),
+  /\.entity-page\.task-page\s*>\s*\.core-local-navigation\s*\{[^}]*height:\s*32px[^}]*max-height:\s*32px/s.test(visual),
   "球队/球员页内任务栏缺少固定高度，仍可能被内容撑高",
 );
 check(

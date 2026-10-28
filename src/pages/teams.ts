@@ -1,3 +1,4 @@
+import "./teams/teamWorkspace.css";
 import { escapeHtml, formatPercent } from "../components/format";
 import { inlineDatabaseSetup } from "../components/databaseSetup";
 import { icon } from "../components/icons";
@@ -229,7 +230,21 @@ function detailPanel(
     ? lineupHistory.map((item) => `<button class="history-row history-button" data-action="open-lineup" data-lineup-id="${escapeHtml(item.lineup.id)}"><strong>${item.venue_side === "home" ? "主" : "客"} vs ${escapeHtml(item.opponent_team_name)}</strong><span>${escapeHtml(item.lineup.snapshot_type)} · ${escapeHtml(item.lineup.lineup_type)}</span><span>${escapeHtml(new Date(item.kickoff_time).toLocaleString())}</span><b>${item.lineup.model_eligible ? "模型可用" : escapeHtml(item.lineup.model_validation_status)}</b></button>`).join("")
     : '<div class="empty-state compact"><strong>暂无比赛阵容版本</strong></div>';
 
-  return `<section id="team-profile-overview" class="panel team-detail-panel workspace-anchor-target">
+  return `<section id="team-profile-body" class="team-detail-panel">
+    <div class="team-profile-layout"><aside class="team-profile-directory"><h3>档案目录</h3>
+    ${workspaceAnchorNavigation("球队档案", [
+      { id: "team-profile-overview", label: "概览" },
+      { id: "team-profile-identity", label: "基础身份" },
+      { id: "team-profile-tactics", label: "档案与战术" },
+      { id: "team-profile-formations", label: "阵型概率" },
+      { id: "team-profile-coaches", label: "教练任期" },
+      { id: "team-profile-players", label: "球员履历" },
+      { id: "team-profile-presets", label: "阵容预设" },
+      { id: "team-profile-lineups", label: "阵容历史" },
+      { id: "team-profile-recent", label: "阵容与赛程" },
+    ])}
+    </aside><div class="profile-section-stack">
+    <details id="team-profile-overview" class="editor-details workspace-anchor-target"><summary>球队概览与能力</summary>
     <div class="team-detail-hero">
       <div><span>${escapeHtml(teamTypeLabels[profile?.team_type ?? "club"] ?? "球队")}</span><h2>${escapeHtml(team.canonical_name)}</h2><p>${escapeHtml(profile?.city ?? team.country_code ?? "国家/城市待补全")} · ${escapeHtml(profile?.stadium ?? "主场待补全")}</p></div>
       <div class="detail-actions"><button class="secondary" data-action="open-team-api-workspace" data-team-id="${escapeHtml(team.id)}">进入 AI 问答</button><button class="ghost danger-quiet" data-action="request-force-delete-team" data-team-id="${escapeHtml(team.id)}" title="永久删除球队及其关联球员、教练、比赛、评分、导入和 P4 历史">强制删除全部资料</button></div>
@@ -250,18 +265,7 @@ function detailPanel(
         .join("")}
     </div>
 
-    ${workspaceAnchorNavigation("球队档案", [
-      { id: "team-profile-overview", label: "概览" },
-      { id: "team-profile-identity", label: "基础身份" },
-      { id: "team-profile-tactics", label: "档案与战术" },
-      { id: "team-profile-formations", label: "阵型概率" },
-      { id: "team-profile-coaches", label: "教练任期" },
-      { id: "team-profile-players", label: "球员履历" },
-      { id: "team-profile-presets", label: "阵容预设" },
-      { id: "team-profile-lineups", label: "阵容历史" },
-      { id: "team-profile-recent", label: "阵容与赛程" },
-    ])}
-    <div class="profile-section-stack">
+    </details>
     <details id="team-profile-identity" class="editor-details workspace-anchor-target" open><summary>球队基础身份</summary>
       <div class="compact-form three-column">
         <label class="field"><span>正式名称</span><input id="team-canonical-name" value="${escapeHtml(team.canonical_name)}"></label>
@@ -365,7 +369,7 @@ function detailPanel(
       </section>
       <section class="subpanel"><div class="panel-heading"><div><span>比赛历史</span><h3>最近 ${detail.recent_matches.length} 场</h3></div></div><div class="team-match-list">${recent}</div></section>
     </div>
-    </div>
+    </div></div>
   </section>`;
 }
 
@@ -586,7 +590,7 @@ export function teamsPage(
     { label: "目录结果", value: `${teamPage?.items.length ?? 0} 支球队`, note: `第 ${pageNumber} 页 · ${activeFilterCount} 项筛选` },
     { label: "当前阵容", value: selectedTeam ? `${selectedTeam.squad.length} 名球员` : "等待球队", note: selectedTeam ? `${rosterUnavailable} 人需要关注` : "选择球队后保持目录与阵容同屏", tone: rosterUnavailable > 0 ? "warning" : selectedTeam ? "success" : "neutral" },
   ]);
-  const teamDirectoryPanel = `<aside class="entity-directory panel master-pane" data-workspace-panel="teams-directory" data-workspace-persist="false">
+  const teamDirectoryPanel = `<div class="team-catalogue-layout"><aside class="entity-directory panel master-pane" data-workspace-panel="teams-directory" data-workspace-persist="false">
         <div class="entity-directory-header"><div><span>球队目录</span><strong>${teamPage?.items.length ?? 0} 支当前结果</strong></div><button class="icon-button" data-action="refresh-team-catalog" title="刷新球队">${icon("refresh")}</button></div>
         <label class="entity-search">${icon("search")}<input id="team-search" value="${escapeHtml(query.search ?? "")}" placeholder="支持中英文球队名称或别名的部分匹配"><button data-action="search-teams">搜索</button></label>
         <section class="entity-filter-groups compact">
@@ -596,9 +600,10 @@ export function teamsPage(
         </section>
         <div class="entity-active-filters"><b>${activeFilterCount} 项筛选</b>${activeFilterSummary}</div>
         <div class="entity-filter-actions directory-actions"><button class="primary" data-action="search-teams">应用筛选</button><button class="secondary" data-action="clear-team-filters">清除</button></div>
+      </aside><section class="team-catalogue-results"><h2>当前 ${teamPage?.items.length ?? 0} 支球队 · 第 ${pageNumber} 页</h2>
         <div class="entity-directory-list" data-workspace-scroll-key="teams-directory-list">${teamDirectoryItems(teamPage, selectedTeam?.team.id ?? null, selectedIds)}</div>
         <footer class="entity-directory-footer"><button class="secondary tiny" data-action="previous-team-page" ${pageNumber <= 1 ? "disabled" : ""}>上一页</button><span>第 ${pageNumber} 页</span><button class="secondary tiny" data-action="next-team-page" ${teamPage?.has_more ? "" : "disabled"}>下一页</button></footer>
-      </aside>`;
+      </section></div>`;
   const teamDetailFilterPanel = selectedTeam ? `<aside class="entity-filter-panel panel team-detail-filter master-pane" data-workspace-panel="teams-filter" data-workspace-persist="false">
         <div class="entity-directory-header"><div><span>筛选器</span><strong>${activeFilterCount ? `${activeFilterCount} 项已应用` : "全部球队"}</strong></div><button class="icon-button" data-action="refresh-team-catalog" title="刷新球队">${icon("refresh")}</button></div>
         <label class="entity-search">${icon("search")}<input id="team-search" value="${escapeHtml(query.search ?? "")}" placeholder="支持中英文球队名称或别名的部分匹配"><button data-action="search-teams-from-detail">搜索</button></label>
@@ -626,7 +631,7 @@ export function teamsPage(
     ? directoryStage
     : teamTaskWorkspace(section, selectedTeam, coaches, formations, lineupHistory, lineupPresets, packagePreview);
   return `<section class="entity-page entity-page-teams task-page core-workspace-page core-team-workspace">
-    ${taskPageHeader({ eyebrow: "球队中心", title: "球队与阵容资源中心", description: "目录、完整档案、资料工作包和新增资料都在当前页面完成；档案内部继续按身份、战术、教练、预设和历史分层。", status: { label: section === "profile" ? "正在编辑完整档案" : selectedTeam ? "球队上下文已就绪" : "等待选择球队", tone: section === "profile" || selectedTeam ? "success" : "neutral" }, actions: pageActions })}
+    ${taskPageHeader({ eyebrow: "球队中心", title: selectedTeam ? `${selectedTeam.team.canonical_name} · ${section === "profile" ? "完整档案" : "球队阵容"}` : "球队与阵容资源中心", description: "目录、完整档案、资料工作包和新增资料保持同一页面上下文。", status: { label: section === "profile" ? "正在编辑完整档案" : selectedTeam ? "球队上下文已就绪" : "等待选择球队", tone: section === "profile" || selectedTeam ? "success" : "neutral" }, actions: pageActions })}
     ${contextRibbon}
     <div class="core-local-navigation">${sectionNav}</div>
     <div class="core-workspace-stage">${activeWorkspace}</div>

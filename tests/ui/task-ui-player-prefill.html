@@ -10,7 +10,7 @@
   <link rel="stylesheet" href="../../src/styles/entityCenter.css">
   <link rel="stylesheet" href="../../src/styles/taskWorkspace.css">
   <link rel="stylesheet" href="../../src/styles/visualSystem.css">
-  <style>
+  <link rel="stylesheet" href="../../src/ui/tokens/index.css"><link rel="stylesheet" href="../../src/styles/foundation/legacyControls.css"><link rel="stylesheet" href="../../src/styles/foundation/workspaceNavigation.css"><style>
     * { animation: none !important; transition: none !important; }
     body { min-width: 0; overflow: hidden; background: var(--bg); }
     .fixture-shell { height: 100vh; display: grid; grid-template-columns: 180px minmax(0,1fr); }
@@ -34,7 +34,10 @@
     .fixture-facts span, .fixture-facts strong { display: block; }
     .fixture-facts span { color: var(--muted); font-size: 9px; }
     .fixture-facts strong { margin-top: 3px; font-size: 12px; }
-  </style>
+
+/* Stage B fixtures have three scaffold rows; production Core pages have four. */
+.fixture-page.entity-page.task-page, .fixture-content > .entity-page.task-page { grid-template-rows: auto auto minmax(0,1fr) !important; }
+</style>
 </head>
 <body>
   <div class="fixture-shell">

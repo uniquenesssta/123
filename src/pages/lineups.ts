@@ -1,3 +1,4 @@
+import "./lineups/lineupWorkspace.css";
 import { escapeHtml } from "../components/format";
 import { availabilityLabel, displayPlayerName, positionLabel } from "../components/footballText";
 import { inlineDatabaseSetup } from "../components/databaseSetup";
@@ -312,7 +313,7 @@ function positionSelectOptions(
   return `<option value="">自动</option>${(references?.positions ?? [])
     .map(
       (item) =>
-        `<option value="${escapeHtml(item.code)}" ${item.code === selected ? "selected" : ""}>${escapeHtml(item.code)} · ${escapeHtml(item.name)}</option>`,
+        `<option value="${escapeHtml(item.code)}" label="${escapeHtml(item.code)}" title="${escapeHtml(item.name)}" data-search="${escapeHtml(item.code)} ${escapeHtml(item.name)}" ${item.code === selected ? "selected" : ""}>${escapeHtml(item.code)} · ${escapeHtml(item.name)}</option>`,
     )
     .join("")}`;
 }
@@ -327,8 +328,7 @@ function compactLineupRows(
   }
   return `<div class="balanced-lineup-list">${selected
     .map(
-      (item, index) => `<article class="balanced-lineup-row" data-lineup-builder-row data-lineup-side="${side}" data-player-id="${escapeHtml(item.player_id)}">
-        <span class="lineup-order">${index + 1}</span>
+      (item) => `<article class="balanced-lineup-row" data-lineup-builder-row data-lineup-side="${side}" data-player-id="${escapeHtml(item.player_id)}">
         <div class="balanced-lineup-player"><strong>${escapeHtml(item.player_name)}</strong><small>${item.player_secondary_name ? `${escapeHtml(item.player_secondary_name)} · ` : ""}${escapeHtml(availabilityLabel(item.availability_status))}</small></div>
         <select class="balanced-lineup-role" data-lineup-field="is_starter" aria-label="身份"><option value="true" ${item.is_starter ? "selected" : ""}>首发</option><option value="false" ${!item.is_starter ? "selected" : ""}>替补</option></select>
         <select class="balanced-lineup-position" data-lineup-field="position_code" aria-label="位置">${positionSelectOptions(references, item.position_code)}</select>
@@ -434,7 +434,7 @@ function pairedBuilderView(
       const readinessMessage = submitReady
         ? "双方均已满足 11 名首发，可以一次提交。"
         : `还需补齐：${builder.home.team_name || "主队"} ${Math.max(0, 11 - homeStarters)} 名首发；${builder.away.team_name || "客队"} ${Math.max(0, 11 - awayStarters)} 名首发。`;
-      return `<div class="paired-lineup-board">${lineupSideCard("home", builder, references, coaches, presets.home)}<div class="paired-lineup-vs"><span>VS</span><small>同场提交</small></div>${lineupSideCard("away", builder, references, coaches, presets.away)}</div><div id="lineup-builder-submit" class="lineup-submit-readiness workspace-anchor-target ${submitReady ? "ready" : "blocked"}"><strong>${submitReady ? "阵容可以提交" : "阵容尚未完整"}</strong><span>${escapeHtml(readinessMessage)}</span></div><div class="workflow-actions"><button class="secondary" data-action="inspect-paired-lineup-chain">检查双方链路</button><button class="primary large" data-action="create-lineup-pair" ${submitReady ? "" : "disabled"}>同时提交双方阵容</button></div>`;
+      return `<div class="paired-lineup-board">${lineupSideCard("home", builder, references, coaches, presets.home)}${lineupSideCard("away", builder, references, coaches, presets.away)}</div><div id="lineup-builder-submit" class="lineup-submit-readiness workspace-anchor-target ${submitReady ? "ready" : "blocked"}"><strong>${submitReady ? "阵容可以提交" : "阵容尚未完整"}</strong><span>${escapeHtml(readinessMessage)}</span></div><div class="workflow-actions"><button class="secondary" data-action="inspect-paired-lineup-chain">检查双方链路</button><button class="primary large" data-action="create-lineup-pair" ${submitReady ? "" : "disabled"}>同时提交双方阵容</button></div>`;
     })() : `<div class="empty-state"><strong>先选择比赛</strong><span>选择后会同时加载主队和客队名单。</span></div>`}
   </section>`;
 }
@@ -484,7 +484,7 @@ export function lineupsPage(
     { label: "模型输入门禁", value: chainReady ? "双方输入已就绪" : lineupChain ? "存在阻断项" : "尚未检查", note: chainReady ? "可以进入正式推演" : lineupChain?.blocking_issues[0] ?? "完成阵容后检查链路", tone: chainReady ? "success" : lineupChain ? "warning" : "neutral" },
   ]);
   return `<section class="task-page core-workspace-page core-match-workspace">
-  ${taskPageHeader({ eyebrow: "比赛中心", title: "比赛、阵容与模型输入", description: "一级和二级导航负责定位业务，比赛创建、双方阵容、模型链路与历史在当前页面内完成。", status: { label: chainReady ? "模型输入已就绪" : selectedMatch ? "比赛上下文已载入" : "等待选择比赛", tone: chainReady ? "success" : selectedMatch ? "accent" : "neutral" }, actions: `<button class="secondary" data-action="refresh-lineups">${icon("refresh")}<span>刷新</span></button>` })}
+  ${taskPageHeader({ eyebrow: "比赛中心", title: "比赛、阵容与模型输入", description: "比赛创建、双方阵容、模型输入与版本记录，在同一工作区完成。", status: { label: chainReady ? "模型输入已就绪" : selectedMatch ? "比赛上下文已载入" : "等待选择比赛", tone: chainReady ? "success" : selectedMatch ? "accent" : "neutral" }, actions: `<button class="secondary" data-action="refresh-lineups">${icon("refresh")}<span>刷新</span></button>` })}
   ${contextRibbon}
   <div class="core-local-navigation">${sectionNav}</div>
   <div class="core-workspace-stage"><section class="balanced-workspace lineups-balanced-workspace master-detail-workspace">

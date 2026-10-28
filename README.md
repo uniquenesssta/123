@@ -1,5 +1,9 @@
 # 足球模型平台公开外壳
 
+## 已批准 Figma 重新接入（2026-10-28）
+
+按用户确认的最新画布更新已有前端：共享明暗颜色、随包字体及字重层级统一；首页、双方阵容、球队目录/档案/速览和赛事目录采用当前排布与滚动边界，原有数据、表单、历史和业务门禁继续接通。本次不推进暂停的 R12-14～19。用户随后授权本批提交到既有分支，后续本地开发改用 `O:\Project\FOODBALL\123 r3`；CI 单独验收，不轮询。验证范围、截图与 Windows 原生窗口验收限制见[接入记录](docs/modular-rewrite/R12-frontend-foundation-ui-system/approved-design-integration-20261028.md)。
+
 ## R12-13 Data Display（2026-10-26，VERIFYING）
 
 12自身Windows证据已独立核验并收尾。13在唯一data-display目录完成表格、键值、指标、状态、时间线、进度、空状态与技术文本八类展示，接通真实页面与原始数据投影；事件核验和修订分轴，取消及被替代记录保留，未知进度不伪造百分比。320项Windows浏览器检查、完整91步骤前端、架构、18项保护指纹与Rust fmt通过。54个路径（36新增、18修改），无文件删除；13自身Rust Clippy/工作区测试、打包/MSI/NSIS及实际Tauri启动仍需本批提交后独立验收，14～19 BLOCKED，不轮询CI。详[13记录](docs/modular-rewrite/R12-frontend-foundation-ui-system/R12-13-data-display.md)。

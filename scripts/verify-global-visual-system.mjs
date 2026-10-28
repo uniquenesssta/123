@@ -13,7 +13,7 @@ const failures = [];
 const check = (condition, message) => { if (!condition) failures.push(message); };
 
 const contract = JSON.parse(read("contracts/global-visual-system-contract.json"));
-const styles = [contract.style_entry, ...contract.shell_style_entries, ...contract.feedback_style_entries].map(file => readStylesheet(root, file)).join("\n");
+const styles = [contract.style_entry, ...contract.foundation_style_entries, ...contract.shell_style_entries, ...contract.feedback_style_entries].map(file => readStylesheet(root, file)).join("\n");
 await verifyDesignTokens(root);
 await verifyPrimitives(root);
 await verifyForms(root);
@@ -23,7 +23,7 @@ const pkg = JSON.parse(read("package.json"));
 const taskUi = JSON.parse(read("contracts/task-ui-contract.json"));
 
 check(contract.contract_id === "football.global-visual-system.v1", "全局视觉契约 ID 错误");
-check(contract.contract_version === "1.3.0", "全局视觉契约版本错误");
+check(contract.contract_version === "1.4.0", "全局视觉契约版本错误");
 check(existsSync(join(root, contract.style_entry)), "缺少全局视觉样式入口");
 for (const entry of contract.feedback_style_entries) check(main.includes(`import "./${entry.replace(/^src\//, "")}";`), `反馈样式未接入真实入口：${entry}`);
 check(
@@ -48,7 +48,7 @@ check(styles.includes("font-variant-numeric: tabular-nums"), "指标数字缺少
 check(styles.includes("position: sticky") && styles.includes("th {"), "数据表头缺少固定阅读规则");
 check(styles.includes("button:disabled") && styles.includes('[aria-disabled="true"]'), "禁用态没有同时覆盖原生和 ARIA 语义");
 const density = contract.density_profile;
-check(density?.desktop_reference === "high-density-admin", "高密度后台参考类型错误");
+check(density?.desktop_reference === "approved-figma-2026-10-28", "当前 Figma 设计来源错误");
 const densityExpectations = {
   "--shell-primary-rail-width": `${density.primary_rail_width}px`,
   "--shell-secondary-sidebar-width": `${density.secondary_sidebar_width}px`,

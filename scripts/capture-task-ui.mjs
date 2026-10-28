@@ -24,6 +24,10 @@ for (const item of contract.screenshot_cases) {
     outputPath,
     width: item.width,
     height: item.height,
+    async exercise(cdp) {
+      const result = await cdp.send("Runtime.evaluate", { expression: "(()=>{const page=document.querySelector('.entity-page.task-page:not(.core-workspace-page)');if(!page)return true;const content=page.lastElementChild;return content.getBoundingClientRect().height>innerHeight*.4;})()", returnByValue: true });
+      if (result.result.value !== true) throw new Error(`${item.name}: fixture content collapsed; refusing to write a baseline`);
+    },
   });
   console.log(`已生成 ${path.relative(root, outputPath)} (${item.width}x${item.height})`);
 }

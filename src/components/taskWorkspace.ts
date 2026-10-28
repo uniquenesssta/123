@@ -35,7 +35,7 @@ export function taskPageHeader(options: TaskPageHeaderOptions): string {
   const trailing = [options.status ? taskStatusChip(options.status) : "", options.actions ?? ""]
     .filter(Boolean)
     .join("");
-  return `<header class="task-page-header"><div class="task-page-heading"><p class="eyebrow">${escapeHtml(options.eyebrow)}</p><h1>${escapeHtml(options.title)}</h1><p>${escapeHtml(options.description)}</p></div>${trailing ? `<div class="task-page-actions">${trailing}</div>` : ""}</header>`;
+  return `<header class="task-page-header"><div class="task-page-heading"><h1>${escapeHtml(options.title)}</h1><p>${escapeHtml(options.description)}</p></div>${trailing ? `<div class="task-page-actions">${trailing}</div>` : ""}</header>`;
 }
 
 export function taskContextRibbon(items: readonly TaskContextItem[]): string {

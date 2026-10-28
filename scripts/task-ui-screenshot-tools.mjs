@@ -5,6 +5,8 @@ import zlib from "node:zlib";
 import http from "node:http";
 import { randomBytes } from "node:crypto";
 import { spawn } from "node:child_process";
+import { fileURLToPath } from "node:url";
+import { readStylesheet } from "./tokens/tokenStyles.mjs";
 
 function existingFile(candidates) {
   return candidates.find((candidate) => candidate && fs.existsSync(candidate)) ?? null;
@@ -73,7 +75,8 @@ function inlineFixtureStyles(htmlPath) {
   let html = fs.readFileSync(htmlPath, "utf8");
   html = html.replace(/<link\s+rel=["']stylesheet["']\s+href=["']([^"']+)["']\s*\/?>/gi, (_match, href) => {
     const stylesheetPath = path.resolve(path.dirname(htmlPath), href);
-    const css = fs.readFileSync(stylesheetPath, "utf8");
+    const root = path.resolve(fileURLToPath(new URL("..", import.meta.url)));
+    const css = readStylesheet(root, path.relative(root, stylesheetPath));
     return `<style data-inline-source="${href.replaceAll('"', "&quot;")}">${css}</style>`;
   });
   return html;
@@ -234,6 +237,10 @@ export async function captureHtmlScreenshot({ browser, htmlPath, outputPath, wid
       const frameTree = await cdp.send("Page.getFrameTree");
       await cdp.send("Page.setDocumentContent", { frameId: frameTree.frameTree.frame.id, html: inlineFixtureStyles(htmlPath) });
       await cdp.send("Runtime.evaluate", { expression: "document.fonts ? document.fonts.ready.then(() => true) : true", awaitPromise: true, returnByValue: true });
+      if (fs.readFileSync(htmlPath, "utf8").includes("src/ui/tokens/index.css")) {
+        const delivery = await cdp.send("Runtime.evaluate", { expression: "({canvas:getComputedStyle(document.documentElement).getPropertyValue('--fip-color-bg-canvas').trim(),fonts:[...document.fonts].map(f=>({family:f.family,status:f.status}))})", returnByValue: true });
+        if (!delivery.result.value.canvas || delivery.result.value.fonts.some(font => font.status === "error")) throw new Error("Fixture design tokens or bundled fonts did not load");
+      }
       await sleep(180);
       if (exercise) exerciseResult = await exercise(cdp);
       const screenshot = await cdp.send("Page.captureScreenshot", { format: "png", fromSurface: true, captureBeyondViewport: false });

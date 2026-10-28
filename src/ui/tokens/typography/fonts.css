@@ -1,0 +1,15 @@
+/* Offline UI fonts: SIL Open Font License. Sources and licenses ship beside each face. */
+@font-face {
+  font-family: "Noto Sans SC";
+  src: url("../../../assets/fonts/NotoSansSC-Variable.ttf") format("truetype");
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Inter";
+  src: url("../../../assets/fonts/Inter-Variable.ttf") format("truetype");
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+}

@@ -40,7 +40,7 @@ export async function installShellFixture(theme: Theme, collapsed: boolean): Pro
     const focus = actionController.captureFocus();
     modal.capture();
     if (painted) workspace.capture(painted, pageRoot(), true);
-    root.innerHTML = renderShell({ state: session.bootstrap!, page: router.page, theme: session.theme, content: `<section class="shell-test-content"><h1>${router.page}</h1><label>工作区草稿 <input id="shell-draft" value="初始输入"></label><div style="height:1600px"></div></section>`, navigationPending: router.pendingPage === router.page, navigationFailed: controller.navigationFailed, sidebarCollapsed: workspace.sidebarCollapsed() });
+    root.innerHTML = renderShell({ state: session.bootstrap!, page: router.page, theme: session.theme, content: `<section class="shell-test-content"><h1>${router.page}</h1><label>工作区草稿 <input id="shell-draft" value="初始输入"></label><div style="height:calc(100vh + 1600px)"></div></section>`, navigationPending: router.pendingPage === router.page, navigationFailed: controller.navigationFailed, sidebarCollapsed: workspace.sidebarCollapsed() });
     modal.restore();
     painted = router.page;
     workspace.restore(router.page, pageRoot());
@@ -165,8 +165,8 @@ export async function installShellFixture(theme: Theme, collapsed: boolean): Pro
   workspace.setSidebarCollapsed(collapsed);
   if (session.theme !== theme) session.toggleTheme();
   const request = router.begin("dashboard"); router.complete(request); modal.reset(); painted = null; paint(); await frames();
-  expect(getComputedStyle(query(".primary-rail")).backgroundColor === (theme === "dark" ? "rgb(17, 25, 35)" : "rgb(255, 255, 255)"), "resolved surface theme");
-  expect(getComputedStyle(query(".secondary-sidebar")).backgroundColor === (theme === "dark" ? "rgb(11, 17, 24)" : "rgb(246, 247, 249)"), "resolved canvas theme");
+  expect(getComputedStyle(query(".primary-rail")).backgroundColor === (theme === "dark" ? "rgb(31, 33, 44)" : "rgb(255, 255, 255)"), "resolved surface theme");
+  expect(getComputedStyle(query(".secondary-sidebar")).backgroundColor === (theme === "dark" ? "rgb(31, 33, 44)" : "rgb(255, 255, 255)"), "secondary navigation uses approved surface theme");
   const icons = Array.from(root.querySelectorAll<HTMLElement>(".ui-icon-slot"));
   expect(icons.every(icon => getComputedStyle(icon).maskImage.startsWith('url("data:image/svg+xml;base64,')), "exact local vector assets resolved");
   const keyboardController = new ApplicationShellController(root, actions, operations);

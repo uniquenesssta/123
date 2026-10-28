@@ -1,5 +1,6 @@
 /* Sole FIP token entry. Category files own values; no feature selectors or state. */
 @import "./color/colorTokens.css";
+@import "./typography/fonts.css";
 @import "./typography/typographyTokens.css";
 @import "./spacing/spacingTokens.css";
 @import "./size/sizeTokens.css";

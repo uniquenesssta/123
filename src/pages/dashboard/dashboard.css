@@ -1,0 +1,40 @@
+.application-shell[data-current-page="dashboard"] .page-container { display: flex; flex-direction: column; gap: 12px; }
+.application-shell[data-current-page="dashboard"] .simple-heading { display: flex; align-items: center; justify-content: space-between; min-height: 0; margin: 0; padding: 0; border: 0; border-radius: 0; background: transparent; box-shadow: none; overflow: visible; }
+.application-shell[data-current-page="dashboard"] .simple-heading::before, .application-shell[data-current-page="dashboard"] .simple-heading::after { display: none; }
+.application-shell[data-current-page="dashboard"] .simple-heading h1 { font: 700 26px/34px var(--fip-type-page-title-family); margin: 0; }
+.application-shell[data-current-page="dashboard"] .simple-heading p { font: 400 12px/18px var(--fip-type-body-family); }
+.application-shell[data-current-page="dashboard"] .quick-actions { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 12px; margin: 0; }
+.application-shell[data-current-page="dashboard"] .dashboard-action { grid-column: span 2; display: flex; align-items: center; min-width: 0; min-height: 92px; gap: 12px; padding: 16px; border: 0; border-radius: 16px; color: var(--fip-text); background: var(--fip-surface); box-shadow: var(--fip-panel-shadow); text-align: left; }
+.application-shell[data-current-page="dashboard"] .dashboard-action:nth-child(-n+2) { grid-column: span 3; }
+.application-shell[data-current-page="dashboard"] .dashboard-action-featured { min-height: 108px; background: linear-gradient(120deg, var(--fip-gradient-start), var(--fip-gradient-end)); color: white; }
+.dashboard-action .action-icon { display: inline-flex; align-items: center; justify-content: center; flex: 0 0 38px; width: 38px; height: 38px; border: 0; border-radius: 10px; background: var(--fip-subtle); color: var(--fip-text); }
+.dashboard-action-featured .action-icon { color: white; background: rgb(255 255 255 / .13); }
+.dashboard-action > div { display: grid; gap: 4px; min-width: 0; flex: 1; }
+.dashboard-action strong { font: 700 14px/20px var(--fip-type-section-title-family); color: inherit; }
+.dashboard-action small { font: 400 12px/18px var(--fip-type-body-family); color: var(--fip-muted); }
+.dashboard-action-featured small { color: #e5e0f3; }
+.dashboard-action > b { display: inline-flex; align-items: center; gap: 8px; margin: 0; font: 500 12px/18px var(--fip-type-label-family); color: inherit; white-space: nowrap; }
+.dashboard-action::before { display: none; }
+.dashboard-action:hover:enabled { transform: translateY(-1px); box-shadow: var(--fip-float-shadow); }
+.application-shell[data-current-page="dashboard"] .compact-metrics { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; margin: 0; border: 0; background: transparent; }
+.application-shell .dashboard-metric { display: flex; flex-direction: column; align-items: flex-start; gap: 2px; min-height: 96px; padding: 12px; border: 0; border-radius: 16px; background: var(--fip-info-soft); }
+.application-shell .dashboard-metric.tone-success { background: var(--fip-success-soft); }
+.application-shell .dashboard-metric.tone-warning { background: var(--fip-warning-soft); }
+.application-shell .dashboard-metric.tone-brand { background: var(--fip-accent-soft); }
+.application-shell .dashboard-metric.tone-success :is(span,strong) { color: var(--fip-success); }
+.application-shell .dashboard-metric.tone-warning :is(span,strong) { color: var(--fip-warning); }
+.application-shell .dashboard-metric.tone-brand :is(span,strong) { color: var(--fip-brand); }
+.application-shell .dashboard-metric strong { font: 600 28px/34px Inter, "Noto Sans SC", sans-serif; }
+.application-shell .dashboard-metric:first-child strong { font: 700 22px/30px var(--fip-type-metric-text-family); }
+.application-shell[data-current-page="dashboard"] .disclosure-panel { margin: 0; padding: 0; border-radius: 12px; }
+.application-shell[data-current-page="dashboard"] .disclosure-panel > summary { display: flex; align-items: center; justify-content: space-between; min-height: 40px; padding: 8px 12px; background: transparent; }
+.application-shell[data-current-page="dashboard"] .disclosure-panel > summary > div { display: flex; align-items: center; gap: 6px; font: 500 12px/18px var(--fip-type-label-family); }
+.application-shell[data-current-page="dashboard"] .disclosure-panel > summary :is(span,strong,b) { font: inherit; color: var(--fip-text); }
+.application-shell[data-current-page="dashboard"] .disclosure-content { padding: 12px; }
+@media (max-width: 1100px) { .dashboard-action { flex-wrap: wrap; } .dashboard-action > b { margin-left: 50px; } }
+@media (prefers-reduced-motion: reduce) { .dashboard-action:hover:enabled { transform: none; } }
+
+.dashboard-action[data-page="lineups"] .action-icon, .dashboard-action[data-page="players"] .action-icon { background: var(--fip-info-soft); color: var(--fip-info); }
+.dashboard-action[data-page="review"] .action-icon { background: var(--fip-success-soft); color: var(--fip-success); }
+.dashboard-action[data-page="analytics"] .action-icon { background: var(--fip-accent-soft); color: var(--fip-brand); }
+.dashboard-action-featured > b { padding: 6px 10px; border-radius: 7px; background: white; color: var(--fip-primitive-expressive-light-violet); }

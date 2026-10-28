@@ -39,9 +39,9 @@ requireTrue(teams.includes("team-directory-only") && teams.includes("team-detail
 requireTrue(teams.includes('data-action="return-team-directory"'), "球队详情缺少返回球队目录入口");
 requireTrue(main.includes('case "return-team-directory"'), "返回球队目录按钮未接入状态清理链");
 requireTrue(entityCss.includes(".core-workspace-stage > .entity-browser") && entityCss.includes("height: 100%"), "球队/球员主工作区未获得明确可滚动高度");
-requireTrue(entityCss.includes(".entity-table-wrap") && entityCss.includes("overflow: auto !important"), "球队/球员表格未强制启用内部滚动");
+requireTrue(entityCss.includes(".entity-table-wrap") && /overflow:\s*auto(?:\s*!important)?\s*;/.test(entityCss), "球队/球员表格缺少内部滚动");
 requireTrue(entityCss.includes(".player-table-wrap") && entityCss.includes("scrollbar-gutter: stable"), "球员名单未锁定独立滚动与稳定滚动条");
-requireTrue(entityCss.includes(".team-directory-only") && entityCss.includes("grid-template-columns: minmax(0, 1fr) !important"), "球队目录未切换为独立全宽列表");
+requireTrue(/\.team-directory-only\s*\{[^}]*grid-template-columns:\s*minmax\(0,\s*1fr\)/s.test(entityCss), "球队目录未切换为独立全宽列表");
 requireTrue(entityCss.includes('.app-shell[data-current-page="teams"] .team-detail-workspace.inspector-collapsed') && entityCss.includes("grid-column: 1 / -1"), "选中球队后主名单未恢复为全宽工作区");
 
 requireTrue(runtimeLog.includes('"operation_started" | "operation_completed" | "operation_failed"'), "运行日志仍可能压缩命令开始/完成/失败配对");

@@ -1,6 +1,6 @@
 {
   "contract_id": "football.global-visual-system.v1",
-  "contract_version": "1.3.0",
+  "contract_version": "1.4.0",
   "style_entry": "src/styles/visualSystem.css",
   "required_tokens": [
     "--ui-canvas",
@@ -94,12 +94,12 @@
     "minimum_control_height": 30
   },
   "density_profile": {
-    "desktop_reference": "high-density-admin",
+    "desktop_reference": "approved-figma-2026-10-28",
     "primary_rail_width": 60,
     "secondary_sidebar_width": 154,
     "topbar_height": 44,
     "body_font_size": 12,
-    "page_title_size": 21,
+    "page_title_size": 26,
     "section_title_size": 14,
     "control_height": 32,
     "table_row_height": 36,
@@ -119,7 +119,7 @@
     "body_font_size": 13,
     "small_font_size": 12,
     "extra_small_font_size": 11,
-    "page_title_size": 22,
+    "page_title_size": 26,
     "section_title_size": 15,
     "control_height": 34,
     "small_control_height": 29,
@@ -147,5 +147,9 @@
     "src/app/shell/page-frame/pageFrameView.ts",
     "src/app/shell/content-region/contentRegionView.ts",
     "src/ui/primitives/icon-button/iconButtonView.ts"
+  ],
+  "foundation_style_entries": [
+    "src/styles/foundation/legacyControls.css",
+    "src/styles/foundation/workspaceNavigation.css"
   ]
 }

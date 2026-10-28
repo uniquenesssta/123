@@ -6,6 +6,8 @@
 
 ## 依据与设计边界
 
+2026-10-28 用户确认最新版 Figma 后，已有接入进行独立视觉刷新，详[重新接入记录](approved-design-integration-20261028.md)。本次实时设计令牌优先于历史 10～13 快照；保留原阶段状态，不把视觉刷新记作 14～19 实施完成。
+
 [R12任务书](../../football-model-platform-modular-rewrite-19-docs/12-R12-frontend-foundation-ui-system.md)及[总纲订正](../../football-model-platform-modular-rewrite-19-docs/00-总体架构与前23节.md)。沿现有TypeScript/DOM/CSS与真实命令/数据链；R12-01无独立视觉画板，不改业务页面。涉及视觉时须核ui-design-system分支最新accepted设计，原型PASS不代替真实运行时。只Windows动态，复用现有验证，不新增持续runner/workflow/DB专项设施。
 
 ## 任务状态

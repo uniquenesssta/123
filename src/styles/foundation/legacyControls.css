@@ -1,0 +1,53 @@
+/* Shared control adapter for the existing feature templates. Behavior remains in their owners. */
+body { font: var(--fip-type-body-weight) var(--fip-type-body-size)/var(--fip-type-body-line-height) var(--fip-type-body-family); }
+button.primary, button.secondary, button.ghost, button.danger, button.quiet, .file-button {
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+  min-height: 32px; padding: 0 12px; border-radius: 7px;
+  font-family: var(--fip-type-control-family); font-size: var(--fip-type-control-size);
+  font-weight: var(--fip-type-control-weight); line-height: 18px; white-space: nowrap;
+  box-shadow: none; transform: none;
+}
+button.primary { color: var(--fip-on-accent); background: var(--fip-accent); border-color: transparent; }
+button.primary:hover:enabled { background: var(--fip-accent-hover); transform: none; filter: none; }
+button.primary:active:enabled { background: var(--fip-accent-pressed); }
+button.secondary { color: var(--fip-text); background: var(--fip-surface); border-color: var(--fip-border); }
+button.secondary:hover:enabled { background: var(--fip-raised); border-color: var(--fip-border-strong); }
+button.ghost, button.quiet { color: var(--fip-text); background: transparent; }
+button.ghost:hover:enabled, button.quiet:hover:enabled { background: var(--fip-raised); }
+button.danger { color: var(--fip-on-accent); background: var(--fip-danger); }
+button.ghost.danger, button.danger-quiet { color: var(--fip-color-text-danger); background: transparent; }
+button:disabled { cursor: default; transform: none; }
+button.primary:disabled, button.secondary:disabled { color: var(--fip-color-text-disabled); background: var(--fip-color-control-disabled-surface); }
+button.tiny { min-height: 32px; padding: 0 10px; font-size: 13px; }
+.icon-button { display: inline-flex; align-items: center; justify-content: center; min-height: 32px; width: 32px; padding: 0; border-radius: 7px; }
+.field { min-width: 0; gap: 6px; margin-bottom: 0; }
+.field > span, .inline-field > span, .field > label { font: 500 12px/18px var(--fip-type-label-family); color: var(--fip-text); }
+.field input, .field select, .inline-field select, .entity-filter-field input, .entity-filter-field select, textarea, .searchable-select-trigger {
+  min-width: 0; min-height: 40px; padding: 8px 12px; border: 1px solid var(--fip-border);
+  border-radius: 7px; background: var(--fip-surface); color: var(--fip-text);
+  font: 400 13px/20px var(--fip-type-input-family);
+}
+input::placeholder, textarea::placeholder { color: var(--fip-muted); opacity: 1; }
+input, textarea { caret-color: var(--fip-brand); }
+.field-note { color: var(--fip-muted); font: 400 11px/16px var(--fip-type-meta-family); }
+.button-row, .entity-filter-actions, .toolbar-actions { align-items: center; gap: 8px; }
+.field-row, .editor-grid, .form-grid, .two-column, .three-column { gap: 12px; }
+.panel, details.panel { padding: 12px; border: 0; border-radius: 16px; background: var(--fip-surface); box-shadow: var(--fip-panel-shadow); }
+.panel.compact { padding: 12px; }
+.panel-heading h2, .workspace-section-heading h2, .module-section-heading h2, .task-form-heading h2 { font: 700 14px/20px var(--fip-type-section-title-family); }
+.page-heading h1, .page-intro h1, .task-page-heading h1, .entity-page-header h1, .balanced-page-heading h1 {
+  margin: 0; color: var(--fip-strong); font: 700 26px/34px var(--fip-type-page-title-family); letter-spacing: 0;
+}
+.page-heading p, .page-intro p, .task-page-heading > p, .entity-page-header p { margin: 4px 0 0; font: 400 12px/18px var(--fip-type-body-family); color: var(--fip-muted); }
+.task-page-header, .page-heading, .entity-page-header { margin: 0; padding: 0; gap: 12px; }
+.task-context-ribbon { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; padding: 0; border: 0; background: transparent; box-shadow: none; }
+.application-shell .task-context-item { flex: 0 1 auto; min-height: 0; padding: 0; border: 0; background: transparent; }
+.application-shell .task-context-item > div { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; }
+.application-shell .task-context-item strong { font: 500 12px/18px var(--fip-type-label-family); }
+.application-shell .task-context-item small, .application-shell .task-context-item span { font: 400 11px/16px var(--fip-type-meta-family); color: var(--fip-muted); }
+.metric-grid, .compact-metrics { gap: 8px; border: 0; background: transparent; overflow: visible; }
+.metric-card, .compact-metrics > div { padding: 12px; border: 0; border-radius: 16px; background: var(--fip-info-soft); }
+.metric-card span, .compact-metrics span { font: 500 12px/18px var(--fip-type-label-family); color: var(--fip-info); }
+.metric-card strong, .compact-metrics strong { margin: 2px 0; font: 600 24px/30px Inter, "Noto Sans SC", sans-serif; color: var(--fip-info); }
+.metric-card small, .compact-metrics small { font: 400 11px/16px var(--fip-type-meta-family); color: var(--fip-muted); }
+@media (max-width: 1100px) { .task-page-heading h1, .page-heading h1 { font-size: 22px; line-height: 30px; } }

@@ -7,11 +7,11 @@ import { resolveChromiumExecutable, captureHtmlScreenshot } from "../task-ui-scr
 
 /** Compare actual CSS delivery with the read-only Figma snapshot, including native computed values. */
 export async function verifyDesignTokens(root) {
-  const record = JSON.parse(readFileSync(resolve(root, "docs/modular-rewrite/R12-frontend-foundation-ui-system/R12-10-figma-tokens.json"), "utf8"));
+  const record = JSON.parse(readFileSync(resolve(root, "docs/modular-rewrite/R12-frontend-foundation-ui-system/approved-design-tokens-20261028.json"), "utf8"));
   assert.equal(record.fileKey, "PN0Whgu6HLWIHx4Mv6aHfu");
-  assert.equal(record.designCommit, "40109ceec8372391a7680e7e86c1265fda06ab3d");
-  assert.equal(record.variables.length, 193); assert.equal(record.collections.length, 6); assert.equal(record.texts.length, 13); assert.equal(record.effects.length, 6);
-  assert.equal(new Set(record.variables.map(v => v.id)).size, 193); assert.equal(new Set(record.variables.map(v => v.css)).size, 193);
+  assert.equal(record.designSnapshot, "approved-live-2026-10-28");
+  assert.equal(record.variables.length, 237); assert.equal(record.collections.length, 6); assert.equal(record.texts.length, 25); assert.equal(record.effects.length, 6);
+  assert.equal(new Set(record.variables.map(v => v.id)).size, 237); assert.equal(new Set(record.variables.map(v => v.css)).size, 237);
   const byId = new Map(record.variables.map(v => [v.id, v])), collections = new Map(record.collections.map(c => [c.id, c]));
   for (const v of record.variables) {
     assert.match(v.css, /^--(?:fip-|shell-)/); assert.ok(v.file.startsWith("src/ui/tokens/"));
@@ -43,7 +43,7 @@ export async function verifyDesignTokens(root) {
     } });
     assert.equal(result.failures.length, 0, result.failures.join("\n")); assertions += result.assertions;
   }
-  console.log(`R12-10 Design Tokens: 193 variables / 13 text styles / 6 effects; ${assertions} native computed-value checks PASS; evidence retained: ${directory}`);
+  console.log(`Approved design refresh: 237 variables / 25 text styles / 6 effects; ${assertions} native computed-value checks PASS; evidence retained: ${directory}`);
 }
 
 function browserChecks(record, theme) {

@@ -77,7 +77,7 @@ function fuzzyScore(query: string, candidate: string): number | null {
 }
 
 function selectedLabel(select: HTMLSelectElement): string {
-  return select.selectedOptions[0]?.textContent?.trim() ?? "";
+  return select.selectedOptions[0]?.label.trim() ?? "";
 }
 
 function clipDiagnosticText(value: string, maximum = 240): string {

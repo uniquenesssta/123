@@ -24,12 +24,14 @@
 }
 
 :root, :root[data-theme="light"] {
+  --fip-panel-shadow: 0px 3px 12px rgb(20 20 38 / 0.06);
   --fip-feedback-shadow: var(--fip-elevation-subtle-light);
   --fip-dialog-shadow: var(--fip-elevation-dialog-light);
   --fip-float-shadow: var(--fip-elevation-float-light);
 }
 
 :root[data-theme="dark"] {
+  --fip-panel-shadow: 0px 3px 12px rgb(0 0 0 / 0.2);
   --fip-feedback-shadow: var(--fip-elevation-subtle-dark);
   --fip-dialog-shadow: var(--fip-elevation-dialog-dark);
   --fip-float-shadow: var(--fip-elevation-float-dark);

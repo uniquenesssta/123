@@ -38,6 +38,7 @@ const nodeChecks = [
   "verify-core-workspace-hierarchy.mjs",
   "verify-extended-workspace-hierarchy.mjs",
   "verify-global-visual-system.mjs",
+  "design-refresh/verifyApprovedDesign.mjs",
   "verify-reported-layout-regressions.mjs",
   "verify-windows-acceptance.mjs",
   "verify-openai-profile-ui.mjs",

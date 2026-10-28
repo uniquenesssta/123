@@ -1,4 +1,5 @@
 import "./styles/app.css";
+import { clearRulesCatalogueFilters } from "./pages/rules/catalogueFilters";
 import "./styles/components.css";
 import "./styles/layout.css";
 import "./styles/entityCenter.css";
@@ -8,6 +9,8 @@ import "./styles/moduleWorkspaces.css";
 import "./styles/visualSystem.css";
 import "./styles/workspacePanels.css";
 import "./ui/tokens/index.css";
+import "./styles/foundation/legacyControls.css";
+import "./styles/foundation/workspaceNavigation.css";
 import "./ui/icons/iconSlot.css";
 import "./ui/primitives/index.css";
 import "./ui/forms/index.css";
@@ -7194,6 +7197,9 @@ async function handleAction(
       break;
     case "create-competition":
       await createCompetition();
+      break;
+    case "clear-rules-catalogue-filters":
+      clearRulesCatalogueFilters(filterRulesCompetitionCatalogue);
       break;
     case "show-competition-path":
       showCompetitionPath(button.dataset.competitionId ?? "");

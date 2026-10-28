@@ -7,7 +7,13 @@ export function readStylesheet(root, file, stack = []) {
   const location = relative(root, target).replaceAll("\\", "/");
   if (!location.startsWith("src/") || location.includes("../") || !location.endsWith(".css")) throw new Error(`Invalid stylesheet: ${file}`);
   if (stack.includes(target)) throw new Error(`Cyclic stylesheet import: ${file}`);
-  return readFileSync(target, "utf8").replaceAll("\r\n", "\n").replace(/@import\s+"([^"\n]+)"\s*;/g, (_match, specifier) => {
+  return readFileSync(target, "utf8").replaceAll("\r\n", "\n").replace(/url\("([^"\n]+\.(?:ttf|woff2|svg))"\)/g, (_match, specifier) => {
+    const asset = resolve(dirname(target), specifier);
+    const bytes = readFileSync(asset);
+    if (!bytes.length) throw new Error(`Empty font: ${asset}`);
+    const mime = specifier.endsWith("svg") ? "image/svg+xml" : specifier.endsWith("woff2") ? "font/woff2" : "font/ttf";
+    return `url("data:${mime};base64,${bytes.toString("base64")}")`;
+  }).replace(/@import\s+"([^"\n]+)"\s*;/g, (_match, specifier) => {
     const imported = relative(root, resolve(dirname(target), specifier));
     return readStylesheet(root, imported, [...stack, target]);
   });

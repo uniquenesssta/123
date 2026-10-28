@@ -40,7 +40,7 @@ export function installWarningFixture(theme: "light" | "dark") {
   const headings = Array.from(document.querySelectorAll(".warning-date-group h3"), node => node.textContent);
   expect(headings.includes("今天") && headings.includes("昨天"), "dialog groups local calendar days");
   expect(document.querySelector("dialog")!.getBoundingClientRect().width === 640, "accepted wide dialog geometry");
-  expect(getComputedStyle(document.querySelector("dialog")!).backgroundColor === (theme === "dark" ? "rgb(17, 25, 35)" : "rgb(255, 255, 255)"), "resolved Light/Dark surface");
+  expect(getComputedStyle(document.querySelector("dialog")!).backgroundColor === (theme === "dark" ? "rgb(31, 33, 44)" : "rgb(255, 255, 255)"), "resolved approved Light/Dark surface");
   button("read-all-warnings").click();
   expect(controller.unreadCount === 0 && button("read-all-warnings").disabled, "mark read updates badge and disables duplicate action");
   button("close-warning-center").click();

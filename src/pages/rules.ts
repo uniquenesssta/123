@@ -1,3 +1,4 @@
+import "./rules/rulesCatalogue.css";
 import { competitionKindLabel, competitionKindOptions, stageKindOptions } from "../components/competition";
 import { escapeHtml } from "../components/format";
 import { inlineDatabaseSetup } from "../components/databaseSetup";
@@ -109,40 +110,35 @@ function competitionCatalogue(state: BootstrapResponse): string {
     const route = binding ? `${direct ? "赛事专属" : "类型默认"}：${binding.rule_package_name}` : "尚未绑定规则";
     const searchText = `${item.name} ${item.code} ${item.country_code ?? ""} ${region} ${competitionKindLabel(item.competition_kind)} ${metadataText(item, "official_name")}`.toLowerCase();
     const seasonPattern = metadataText(item, "season_pattern");
-    return `<tr data-rules-competition-row data-scope="${scope}" data-region="${escapeHtml(region)}" data-kind="${escapeHtml(item.competition_kind)}" data-search="${escapeHtml(searchText)}">
-      <td><strong>${escapeHtml(item.name)}</strong><small>${escapeHtml(item.code)}</small></td>
-      <td>${escapeHtml(scopeLabel(scope))}</td>
-      <td>${escapeHtml(region)}</td>
-      <td>${escapeHtml(competitionKindLabel(item.competition_kind))}</td>
-      <td><span class="rules-route-text">${escapeHtml(route)}</span>${seasonPattern ? `<small>${escapeHtml(seasonPattern === "cross_year" ? "跨年赛季" : seasonPattern === "calendar" ? "自然年赛季" : "锦标赛赛季")}</small>` : ""}</td>
-      <td><div class="rules-row-actions"><button class="secondary tiny" data-action="show-competition-path" data-competition-id="${escapeHtml(item.id)}">规则路径</button><button class="ghost tiny danger-quiet" data-action="request-delete-competition" data-competition-id="${escapeHtml(item.id)}" data-competition-name="${escapeHtml(item.name)}">删除</button></div></td>
-    </tr>`;
+    return `<article class="rules-competition-card" data-rules-competition-row data-scope="${scope}" data-region="${escapeHtml(region)}" data-kind="${escapeHtml(item.competition_kind)}" data-search="${escapeHtml(searchText)}">
+      <header><strong>${escapeHtml(item.name)}</strong><small>${escapeHtml(item.code)} · ${escapeHtml(scopeLabel(scope))} · ${escapeHtml(region)} · ${escapeHtml(competitionKindLabel(item.competition_kind))}</small></header>
+      <p class="rules-route-text">${escapeHtml(route)}${seasonPattern ? ` · ${escapeHtml(seasonPattern === "cross_year" ? "跨年赛季" : seasonPattern === "calendar" ? "自然年赛季" : "锦标赛赛季")}` : ""}</p>
+      <div class="rules-row-actions"><button class="secondary" data-action="show-competition-path" data-competition-id="${escapeHtml(item.id)}">规则路径</button><button class="ghost danger-quiet" data-action="request-delete-competition" data-competition-id="${escapeHtml(item.id)}" data-competition-name="${escapeHtml(item.name)}">删除</button></div>
+    </article>`;
   }).join("");
 
   return `<div class="rules-directory" data-rules-directory>
     <div class="rules-directory-toolbar">
       <label class="rules-search"><span>搜索赛事</span><input id="rules-competition-search" type="search" placeholder="赛事、国家、地区或代码"></label>
       <label class="rules-kind-filter"><span>赛制</span><select id="rules-competition-kind"><option value="">全部赛制</option>${competitionKindOptions(null)}</select></label>
+      <button class="secondary rules-clear" data-action="clear-rules-catalogue-filters">清除</button>
       <span class="rules-visible-count"><b id="rules-visible-count">${competitions.length}</b> / ${competitions.length} 项</span>
     </div>
     <div class="rules-directory-grid">
       <nav class="rules-scope-list" aria-label="赛事一级分类">
-        <strong>1级 · 参赛体系</strong>
+        <strong>参赛体系</strong>
         <button class="active" type="button" data-rules-scope="">全部赛事 <span>${competitions.length}</span></button>
         ${(["national", "club", "other"] as CompetitionScope[]).map((scope) => `<button type="button" data-rules-scope="${scope}">${scopeLabel(scope)} <span>${competitions.filter((item) => competitionScope(item) === scope).length}</span></button>`).join("")}
       </nav>
       <nav class="rules-region-list" aria-label="赛事二级分类">
-        <strong>2级 · 地区 / 足联</strong>
+        <strong>地区 / 足联</strong>
         <button class="active" type="button" data-rules-region="" data-region-scopes="national,club,other">全部地区 <span>${competitions.length}</span></button>
         ${regions.map((region) => `<button type="button" data-rules-region="${escapeHtml(region)}" data-region-scopes="${escapeHtml(Array.from(regionScopeMap.get(region) ?? []).join(","))}">${escapeHtml(region)} <span>${competitions.filter((item) => regionLabel(item) === region).length}</span></button>`).join("")}
       </nav>
       <div class="rules-competition-pane">
-        <div class="rules-pane-heading"><div><strong>3级 · 具体赛事</strong><span>选择赛事后查看规则路径或维护目录</span></div></div>
+        <div class="rules-pane-heading"><div><strong>具体赛事</strong><span>选择赛事后查看规则路径或维护目录</span></div></div>
         <div class="rules-table-scroll">
-          <table class="rules-competition-table">
-            <thead><tr><th>赛事</th><th>体系</th><th>地区</th><th>赛制</th><th>自动规则</th><th>操作</th></tr></thead>
-            <tbody>${rows}</tbody>
-          </table>
+          <div class="rules-competition-cards">${rows}</div>
           <div id="rules-empty-filter" class="empty-state compact" hidden><strong>没有匹配赛事</strong><span>调整一级、二级分类或搜索条件。</span></div>
         </div>
       </div>
@@ -192,7 +188,7 @@ export function rulesPage(
     ${taskPageHeader({
       eyebrow: "赛事设置",
       title: "赛事目录与自动模型规则",
-      description: "一级和二级导航只负责到达本页；赛事目录、层级结构、模型路由与规则包都在当前页面完成。",
+      description: "目录、赛事层级、路由绑定与规则包分别维护；本页不执行模型。",
       status: { label: connected ? `${state.data.competitions.length} 项赛事 · ${p4ProductionPackages.length} 个 P4 生产规则` : "等待数据库", tone: connected ? "success" : "warning" },
       actions: '<button class="secondary" data-page="prediction">进入赛事推演</button>',
     })}
@@ -206,9 +202,8 @@ export function rulesPage(
     <div class="module-workspace-stage" data-workspace-scroll-key="rules-stage">
       <section class="workspace-module-view ${section === "catalog" ? "active" : ""}" data-workspace-section="catalog">
         <div class="module-section-stack">
-          <div class="module-section-heading"><div><span>赛事目录</span><h2>按参赛体系、地区与具体赛事查找</h2><p>目录面板内部滚动；选择赛事后可查看实际规则路径或删除自定义赛事。</p></div></div>
           ${connected ? "" : inlineDatabaseSetup("连接数据服务以管理赛事和规则", "连接成功后可创建赛事、赛季、阶段、轮次和模型绑定。", state.connection_error)}
-          <section class="panel rules-directory-panel"><div class="panel-heading"><div><span>赛事目录</span><h2>三级筛选与紧凑列表</h2></div><span class="field-note">第 4 级及更深操作在当前列表和详情中完成</span></div>${competitionCatalogue(state)}</section>
+          <section class="panel rules-directory-panel"><div class="panel-heading"><div><h2>赛事筛选与目录</h2><p class="field-note">按体系、地区和赛制筛选；规则路径是目录级说明。</p></div></div>${competitionCatalogue(state)}</section>
           <section class="rules-route-strip"><strong>自动路由顺序</strong><span>本场覆盖 → 阶段 → 赛季 → 具体赛事 → 赛事类型默认</span><button class="secondary tiny" data-action="select-workspace-section" data-section-id="routing">维护路由</button></section>
         </div>
       </section>

@@ -1,0 +1,26 @@
+.application-shell .paired-lineup-board { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 12px; align-items: start; }
+.application-shell .paired-lineup-vs { display: none; }
+.application-shell .paired-lineup-side.balanced { grid-template-columns: minmax(0,1fr); min-width: 0; padding: 12px; gap: 8px; border: 0; border-radius: 16px; background: var(--fip-surface); box-shadow: var(--fip-panel-shadow); }
+.application-shell .paired-lineup-side.balanced > * { min-width: 0; }
+.application-shell .paired-lineup-side .lineup-preset-quickbar { grid-template-columns: minmax(100px,.6fr) minmax(0,1fr); gap: 8px; padding: 8px; }
+.application-shell .paired-lineup-side .lineup-preset-quickbar-actions { grid-column: 1 / -1; justify-content: flex-start; gap: 8px; }
+.application-shell .balanced-lineup-list { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+.application-shell .balanced-lineup-row { display: grid; grid-template-columns: minmax(0,1fr) 80px 88px 56px 32px; align-items: center; gap: 8px; min-width: 0; min-height: 44px; padding: 0; border: 0; background: transparent; }
+.application-shell .balanced-lineup-player { min-width: 0; display: flex; align-items: center; gap: 6px; }
+.application-shell .balanced-lineup-player strong { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font: 500 12px/18px var(--fip-type-body-family); }
+.application-shell .balanced-lineup-player small { display: none; }
+.application-shell .balanced-lineup-row > select { min-width: 0; width: 100%; height: 40px; padding: 8px 10px; border: 1px solid var(--fip-border); border-radius: 7px; background: var(--fip-surface); color: var(--fip-muted); font: 400 13px/20px var(--fip-type-input-family); white-space: nowrap; }
+.application-shell .balanced-lineup-row > button { min-height: 32px; padding: 0; }
+.application-shell .balanced-lineup-row .searchable-select-control { height: 40px; min-height: 40px; grid-template-columns: minmax(0,1fr) 24px; border-radius: 7px; background: var(--fip-surface); }
+.application-shell .balanced-lineup-row .searchable-select-input { height: 38px; padding: 0 8px !important; font: 400 13px/20px var(--fip-type-input-family); }
+.application-shell .paired-lineup-side .field .searchable-select-control { min-height: 40px; border-radius: 7px; background: var(--fip-surface); }
+.application-shell .balanced-lineup-add { display: grid; grid-template-columns: repeat(2,130px) minmax(0,1fr); align-items: end; gap: 8px; }
+.application-shell .balanced-lineup-add > .field:first-child { grid-column: 1 / -1; }
+.application-shell .balanced-lineup-add > button { min-height: 40px; justify-self: start; }
+.application-shell .balanced-lineup-heading { display: flex; align-items: center; justify-content: space-between; gap: 8px; min-height: 32px; }
+.application-shell .balanced-lineup-heading strong { font: 700 14px/20px var(--fip-type-section-title-family); }
+.application-shell .balanced-lineup-heading span { font: 400 11px/16px var(--fip-type-meta-family); }
+.application-shell .paired-lineup-header { align-items: center; }
+.application-shell .paired-lineup-side.balanced .field span { font: 500 12px/18px var(--fip-type-label-family); }
+.application-shell .paired-lineup-side.balanced .field :is(input,select) { min-height: 40px; padding: 8px 12px; font: 400 13px/20px var(--fip-type-input-family); }
+@media (max-width: 1100px) { .application-shell .balanced-lineup-row { grid-template-columns: minmax(0,1fr) 72px 80px 48px 28px; gap: 6px; } }
