@@ -1,6 +1,6 @@
 import type { ShellActions } from "../application-shell/applicationShellState";
 
-const actions = new Set(["toggle-global-sidebar", "workspace-history-back", "workspace-history-forward", "reset-current-workspace"]);
+const actions = new Set(["open-command-menu", "toggle-global-sidebar", "workspace-history-back", "workspace-history-forward", "reset-current-workspace"]);
 
 export class TopbarController {
   constructor(private readonly callbacks: ShellActions) {}

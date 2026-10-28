@@ -15,19 +15,14 @@ import "./ui/icons/iconSlot.css";
 import "./ui/primitives/index.css";
 import "./ui/forms/index.css";
 import "./ui/data-display/index.css";
-import { confirmationInputView } from "./ui/forms/confirmation-input";
-import { formActionsView } from "./ui/forms/form-actions";
+import "./ui/feedback/index.css";
+import "./ui/overlays/index.css";
 import { focusValidationTarget } from "./ui/forms/validation-summary";
-import "./ui/feedback/blocking-message/blockingMessage.css";
-import "./ui/overlays/confirmation-dialog/confirmationDialog.css";
 import "./app/shell/application-shell/applicationShell.css";
 import "./app/shell/sidebar/sidebar.css";
 import "./app/shell/topbar/topbar.css";
 import "./app/shell/page-frame/pageFrame.css";
 import "./app/shell/content-region/contentRegion.css";
-import "./ui/feedback/feedback-content/feedbackContent.css";
-import "./ui/feedback/toast/toast.css";
-import "./ui/feedback/task-activity/taskActivity.css";
 import "./app/warnings/warning-center/warningCenter.css";
 import {
   api,
@@ -35,10 +30,12 @@ import {
   recordUiOperation,
   recordUiOperationFailure,
 } from "./api/client";
-import { ModalController } from "./app/modal";
+import { ModalController, type ModalConfirmationOptions } from "./app/modal";
+import { ContextMenuAdapter } from "./app/context-menu";
+import { CommandMenuController } from "./ui/overlays/command-menu";
 import { AppSession } from "./app/session";
 import { AsyncScope, EventScope, MountHandle } from "./app/lifecycle";
-import { Router, NavigationContext, isRoute, type NavigationRequest } from "./app/router";
+import { Router, NavigationContext, isRoute, PRIMARY_NAVIGATION, type NavigationRequest } from "./app/router";
 import { ApplicationShellController, pageTitle, renderShell } from "./app/shell";
 import { WarningCenterController } from "./app/warnings";
 import { stopTauriTransport } from "./platform/tauri";
@@ -439,7 +436,17 @@ const workspaceState = new WorkspaceCoordinator<Page>({
     });
   },
 });
-const modal = new ModalController();
+const modal = new ModalController(error => { recordClientIssue(error, "确认操作");return userFacingError(error); });
+const contextMenu = new ContextMenuAdapter();
+const commandMenu = new CommandMenuController(document,error => { recordClientIssue(error,"快速导航");return userFacingError(error); });
+function openCommandMenu(): void {
+  contextMenu.close();
+  commandMenu.open(PRIMARY_NAVIGATION.flatMap(module => module.items.map(item => ({id:item.page,label:item.label,description:item.description,keywords:module.label+" "+item.page,run:async()=>{
+    if(item.page===navigation.page)return;
+    if(item.page==="players")prepareDirectPlayerDirectoryEntry();
+    await navigateTo(item.page);
+  }}))));
+}
 let shellController: ApplicationShellController | null = null;
 let warningCenter: WarningCenterController | null = null;
 let renderedPage: Page | null = null;
@@ -966,8 +973,9 @@ function showConfirmation(
   facts: Array<[string, string]>,
   confirmLabel: string,
   action: () => Promise<void>,
+  options: ModalConfirmationOptions = {},
 ): void {
-  modal.confirm(title, description, facts, confirmLabel, action);
+  modal.confirm(title, description, facts, confirmLabel, action, options);
 }
 
 function routeSourceLabel(source: RouteDecision["source"]): string {
@@ -1410,19 +1418,7 @@ async function connectDatabase(): Promise<void> {
 function requestDatabaseReset(): void {
   const databaseName = session.bootstrap?.data.database_health?.database_name;
   if (!databaseName) throw new Error("当前未连接数据库，无法执行彻底清空");
-  const body = `
-    <div class="confirm-visual">
-      <div class="confirm-icon">!</div>
-      <p>此操作会删除当前数据库中的全部应用数据，并从迁移文件重新建立空白结构。球队、球员、比赛、阵容、推演、P4 快照、导入记录、AI 会话、任务、审核和审计数据都无法恢复。</p>
-      <div class="visual-grid">
-        <div class="visual-field"><span>当前数据库</span><strong>${escapeHtml(databaseName)}</strong></div>
-        <div class="visual-field"><span>清空后保留</span><strong>数据库本身、结构和本机连接配置</strong></div>
-      </div>
-      <div class="database-reset-confirmation">${confirmationInputView({ id: "database-reset-confirmation", confirmButtonId: "database-reset-confirm-button", expected: databaseName, label: `输入数据库名称 ${databaseName} 以继续`, hint: "名称必须完全一致。清空期间客户端会暂时断开，完成后自动重新连接并重新启动界面。", attributes: { "data-database-name": databaseName } })}</div>
-    </div>`;
-  const footer = formActionsView({ cancel: { label: "取消", attributes: { "data-action": "close-workspace-detail" } }, confirm: { label: "确认永久清空", variant: "danger", disabled: true, attributes: { "data-action": "execute-database-reset", id: "database-reset-confirm-button" } } });
-  showHtmlModal("彻底清空数据库", "不可撤销的危险操作", body, footer, "database-reset-modal");
-  queueMicrotask(() => document.querySelector<HTMLInputElement>("#database-reset-confirmation")?.focus());
+  modal.confirm("彻底清空数据库","此操作会删除当前数据库中的全部应用数据，并从迁移文件重新建立空白结构。球队、球员、比赛、阵容、推演、P4 快照、导入记录、AI 会话、任务、审核和审计数据都无法恢复。",[["当前数据库",databaseName],["清空后保留","数据库本身、结构和本机连接配置"]],"确认永久清空",executeDatabaseReset,{tone:"danger",typed:{id:"database-reset-confirmation",confirmButtonId:"database-reset-confirm-button",expected:databaseName,label:`输入数据库名称 ${databaseName} 以继续`,hint:"名称必须完全一致。清空期间客户端会暂时断开，完成后自动重新连接并重新启动界面。",attributes:{"data-database-name":databaseName}}});
 }
 
 async function executeDatabaseReset(): Promise<void> {
@@ -5549,6 +5545,7 @@ function requestHideRunHistory(runId: string, runLabel: string): void {
       render();
       toast("推演记录已从历史列表移除", "success");
     },
+    { tone: "neutral" },
   );
 }
 
@@ -7143,11 +7140,14 @@ async function handleAction(
       await refresh();
       toast("数据库连接配置已清除", "success");
       break;
+    case "open-command-menu":
+      openCommandMenu();
+      break;
     case "request-reset-database":
       requestDatabaseReset();
       break;
     case "execute-database-reset":
-      await executeDatabaseReset();
+      await modal.runPendingAction();
       break;
     case "dry-run":
       await dryRun();
@@ -7937,32 +7937,8 @@ async function handleAction(
   }
 }
 
-function closeAppContextMenu(): void {
-  document.querySelector("#app-context-menu")?.remove();
-}
-
-function showAppContextMenu(event: MouseEvent, target: HTMLElement): void {
-  closeAppContextMenu();
-  const kind = target.dataset.contextKind;
-  if (kind !== "run" && kind !== "match" && kind !== "lineup") return;
-  event.preventDefault();
-  const menu = document.createElement("div");
-  menu.id = "app-context-menu";
-  menu.className = "app-context-menu";
-  menu.setAttribute("role", "menu");
-  if (kind === "run") {
-    menu.innerHTML = `<button type="button" role="menuitem" data-action="request-hide-run-history" data-run-id="${escapeHtml(target.dataset.runId ?? "")}" data-run-label="${escapeHtml(target.dataset.runLabel ?? "未命名推演")}">从历史列表删除</button><small>底层运行、快照和收敛数据保留</small>`;
-  } else if (kind === "lineup") {
-    menu.innerHTML = `<button type="button" class="danger-action" role="menuitem" data-action="request-remove-lineup-history" data-lineup-id="${escapeHtml(target.dataset.lineupId ?? "")}" data-lineup-label="${escapeHtml(target.dataset.lineupLabel ?? "未命名阵容")}">删除或归档阵容版本</button><small>已引用版本保留模型血缘，未引用版本永久删除</small>`;
-  } else {
-    menu.innerHTML = `<button type="button" class="danger-action" role="menuitem" data-action="request-delete-match" data-match-id="${escapeHtml(target.dataset.matchId ?? "")}" data-match-label="${escapeHtml(target.dataset.matchLabel ?? "未命名比赛")}">删除比赛</button><small>将同时删除该比赛的阵容和复盘数据</small>`;
-  }
-  document.body.append(menu);
-  const rect = menu.getBoundingClientRect();
-  menu.style.left = `${Math.max(8, Math.min(event.clientX, window.innerWidth - rect.width - 8))}px`;
-  menu.style.top = `${Math.max(8, Math.min(event.clientY, window.innerHeight - rect.height - 8))}px`;
-  menu.querySelector<HTMLElement>("button")?.focus();
-}
+function closeAppContextMenu(): void { contextMenu.close(); }
+function showAppContextMenu(event: MouseEvent,target: HTMLElement): void { contextMenu.open(event,target); }
 
 document.addEventListener("contextmenu", (event) => {
   const target = (event.target as HTMLElement).closest<HTMLElement>("[data-context-kind]");
@@ -7971,10 +7947,7 @@ document.addEventListener("contextmenu", (event) => {
 }, { signal: browserLifecycleController.signal });
 
 document.addEventListener("keydown", (event) => {
-  if (event.key === "Escape") {
-    closeAppContextMenu();
-    return;
-  }
+  if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === "k" && !event.isComposing) { event.preventDefault();openCommandMenu();return; }
   if (event.key !== "Enter" || !(event.target instanceof HTMLInputElement)) return;
   const action =
     event.target.id === "team-search"
@@ -7987,7 +7960,6 @@ document.addEventListener("keydown", (event) => {
   document.querySelector<HTMLButtonElement>(`[data-action="${action}"]`)?.click();
 }, { signal: browserLifecycleController.signal });
 
-document.addEventListener("scroll", closeAppContextMenu, { capture: true, signal: browserLifecycleController.signal });
 
 function filterRulesCompetitionCatalogue(): void {
   const directory = document.querySelector<HTMLElement>("[data-rules-directory]");
@@ -8607,6 +8579,8 @@ export function createBrowserApplicationModule(
     openAiExampleRequests.destroy();
     navigation.destroy();
     modal.reset();
+    contextMenu.destroy();
+    commandMenu.destroy();
     workflowNavigation.clear();
     workspaceState.stop();
     lineupPlayerLoadSequence.invalidate();

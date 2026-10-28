@@ -1,0 +1,10 @@
+.ui-command-menu .ui-dialog-body { padding: 12px; gap: 8px; }
+.ui-command-results { display: flex; flex-direction: column; gap: 8px; }
+.ui-command-results > button { display: flex; align-items: center; gap: 8px; flex: 0 0 auto; padding: 10px 11px; min-height: 55px; border: 0; border-radius: var(--fip-control-radius); background: transparent; color: var(--fip-text); text-align: start; font-family: inherit; cursor: pointer; }
+.ui-command-results > button > .ui-command-copy { align-items: flex-start; display: flex; flex-direction: column; gap: 3px; flex: 1; min-width: 0; }
+.ui-command-results strong { font-size: 12px; line-height: 18px; font-weight: 500; overflow-wrap: anywhere; }
+.ui-command-results small { font-size: 11px; line-height: 16px; font-weight: 400; color: var(--fip-muted); overflow-wrap: anywhere; }
+.ui-command-results > button[aria-selected="true"], .ui-command-results > button:hover:not(:disabled) { background: var(--fip-accent-soft); }
+.ui-command-results > button:disabled { color: var(--fip-muted); cursor: not-allowed; }
+.ui-command-empty { margin: 0; padding: 8px 10px; border-radius: var(--fip-radius-surface); background: var(--fip-surface); color: var(--fip-muted); font-size: 11px; line-height: 16px; }
+[data-command-results] { min-height: 0; }

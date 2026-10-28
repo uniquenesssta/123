@@ -110,19 +110,33 @@
       "transition": null
     },
     {
-      "id": "browser.shell-reset-confirmation",
+      "id": "browser.confirmation-request",
       "owner": "src/ui/overlays/confirmation-dialog/confirmationDialogState.ts::ConfirmationDialogState",
-      "scope": "local UI reset confirmation; never a detail history entry or persisted workspace state",
-      "writers": ["ConfirmationDialogController.show", "ConfirmationDialogController.dismiss"],
-      "forbidden": ["src/pages/**", "src/app/session/**", "src/api/**"],
+      "scope": "transient confirmation request, typed draft, busy/error/review gate and completion epoch; never detail history or persisted workspace",
+      "writers": [
+        "ConfirmationDialogController.show",
+        "ConfirmationDialogController.dismiss"
+      ],
+      "forbidden": [
+        "src/pages/**",
+        "src/app/session/**",
+        "src/api/**"
+      ],
       "transition": null
     },
     {
       "id": "browser.shell-navigation-failure",
       "owner": "src/app/shell/content-region/contentRegionState.ts::ContentRegionState",
       "scope": "application shell lifecycle; transient read-failure presentation only",
-      "writers": ["ApplicationShellController.clearNavigationFailure", "ApplicationShellController.showNavigationFailure"],
-      "forbidden": ["src/pages/**", "src/app/session/**", "src/api/**"],
+      "writers": [
+        "ApplicationShellController.clearNavigationFailure",
+        "ApplicationShellController.showNavigationFailure"
+      ],
+      "forbidden": [
+        "src/pages/**",
+        "src/app/session/**",
+        "src/api/**"
+      ],
       "transition": null
     },
     {
@@ -169,8 +183,13 @@
       "id": "browser.navigation-return",
       "owner": "src/app/router/navigationContext.ts::NavigationContext",
       "scope": "browser-window",
-      "writers": ["NavigationContext methods"],
-      "forbidden": ["src/pages/**", "src/api/**"],
+      "writers": [
+        "NavigationContext methods"
+      ],
+      "forbidden": [
+        "src/pages/**",
+        "src/api/**"
+      ],
       "transition": null
     },
     {
@@ -203,24 +222,42 @@
       "id": "browser.session",
       "owner": "src/app/session/appSessionState.ts::AppSessionState",
       "scope": "browser-window",
-      "writers": ["AppSession via AppSessionState methods"],
-      "forbidden": ["src/pages/**", "src/components/**", "src/api/**"],
+      "writers": [
+        "AppSession via AppSessionState methods"
+      ],
+      "forbidden": [
+        "src/pages/**",
+        "src/components/**",
+        "src/api/**"
+      ],
       "transition": null
     },
     {
       "id": "browser.bootstrap-summary",
       "owner": "src/app/session/bootstrapState.ts::BootstrapState",
       "scope": "browser-window",
-      "writers": ["AppSession via BootstrapState methods"],
-      "forbidden": ["src/pages/**", "src/main.ts", "src/api/**"],
+      "writers": [
+        "AppSession via BootstrapState methods"
+      ],
+      "forbidden": [
+        "src/pages/**",
+        "src/main.ts",
+        "src/api/**"
+      ],
       "transition": null
     },
     {
       "id": "browser.theme",
       "owner": "src/app/session/themeState.ts::ThemeState",
       "scope": "browser-window+theme-preference",
-      "writers": ["AppSession via ThemeState methods"],
-      "forbidden": ["src/pages/**", "src/main.ts", "src/api/**"],
+      "writers": [
+        "AppSession via ThemeState methods"
+      ],
+      "forbidden": [
+        "src/pages/**",
+        "src/main.ts",
+        "src/api/**"
+      ],
       "transition": null
     },
     {
@@ -420,8 +457,34 @@
         "crates/research-gateway/src/transport/**"
       ],
       "transition": null
+    },
+    {
+      "id": "browser.popover",
+      "owner": "src/ui/overlays/popover/popoverController.ts::PopoverController",
+      "scope": "local menu focus, placement and disposable listeners",
+      "writers": [
+        "local controller methods"
+      ],
+      "forbidden": [
+        "src/pages/**",
+        "src/api/**"
+      ],
+      "transition": null
+    },
+    {
+      "id": "browser.command-menu",
+      "owner": "src/ui/overlays/command-menu/commandMenuController.ts::CommandMenuController",
+      "scope": "local search, selection, pending command and completion epoch",
+      "writers": [
+        "local controller methods"
+      ],
+      "forbidden": [
+        "src/pages/**",
+        "src/api/**"
+      ],
+      "transition": null
     }
   ],
-  "count": 31,
-  "last_updated_task": "R3-02"
+  "count": 33,
+  "last_updated_task": "R12-14"
 }

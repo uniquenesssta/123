@@ -14,7 +14,7 @@ const readRustTree = (directory) => {
 const failures = [];
 const requireTrue = (condition, message) => { if (!condition) failures.push(message); };
 
-const modal = read("src/app/modal.ts");
+const modal = read("src/app/modal/workspacePanelController.ts");
 const main = read("src/main.ts");
 const runs = read("src/pages/runs.ts");
 const lineups = read("src/pages/lineups.ts");
@@ -66,7 +66,7 @@ requireTrue(postgresIntegration.includes("集成测试删除未引用当前版�
 requireTrue(lineups.includes('data-context-kind="match"') && lineups.includes('data-action="request-delete-match"'), "已创建比赛缺少可见删除和右键删除入口");
 requireTrue(matchDeletion.includes("protected_count") && matchDeletion.includes("P4研究、冻结或正式赛后结算"), "比赛删除未保护不可变P4/赛后血缘");
 requireTrue(matchDeletion.includes("UPDATE ai_workspace.sessions SET match_id = NULL"), "比赛删除未解除AI会话的可空比赛引用");
-requireTrue(main.includes('kind !== "run" && kind !== "match" && kind !== "lineup"') && main.includes("showAppContextMenu"), "应用右键菜单未覆盖推演、比赛和阵容历史");
+requireTrue(main.includes("contextMenu.open(event,target)") && main.includes("showAppContextMenu") && ["request-hide-run-history","request-remove-lineup-history","request-delete-match"].every(action => read("src/app/context-menu/contextMenuAdapter.ts").includes(action)), "应用右键菜单未覆盖推演、比赛和阵容历史");
 
 for (const id of ["new-match-competition-scope", "new-match-competition-region", "new-match-competition"]) {
   requireTrue(lineups.includes(id), `赛事三级菜单缺失：${id}`);

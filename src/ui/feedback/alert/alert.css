@@ -1,0 +1,7 @@
+.ui-alert { padding: 8px 10px; border: 0; border-radius: var(--fip-radius-surface); background: var(--fip-info-soft); color: var(--fip-text); min-width: 0; }
+.ui-alert[data-tone="success"] { background: var(--fip-success-soft); }
+.ui-alert[data-tone="warning"] { background: var(--fip-warning-soft); }
+.ui-alert[data-tone="danger"] { background: var(--fip-danger-soft); }
+.ui-alert-row { display: flex; align-items: flex-start; gap: 8px; }
+.ui-alert-row > .ui-feedback-content { flex: 1; }
+.ui-alert-actions { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 8px; margin-top: 8px; }

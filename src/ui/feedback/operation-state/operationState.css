@@ -1,0 +1,1 @@
+.ui-operation-loading { display: flex; align-items: center; gap: 8px; min-width: 0; padding: 8px 10px; color: var(--fip-text); font-size: var(--fip-type-body-size); line-height: var(--fip-type-body-line-height); overflow-wrap: anywhere; }

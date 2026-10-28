@@ -1,0 +1,18 @@
+.ui-dialog { box-sizing: border-box; width: 480px; max-width: calc(100% - 24px); max-height: calc(100dvh - 24px); margin: auto; padding: 0; border: 0; border-radius: var(--fip-radius-panel); background: var(--fip-surface); color: var(--fip-text); box-shadow: var(--fip-modal-shadow); font-family: inherit; overflow: hidden; }
+.ui-dialog[data-dialog-width="640"] { width: 640px; }
+.ui-dialog[open] { display: flex; flex-direction: column; }
+.ui-dialog::backdrop { background: var(--fip-modal-overlay); }
+.ui-dialog-header { display: flex; flex: 0 0 auto; align-items: center; gap: 8px; padding: 9px 12px; min-height: 62px; box-sizing: border-box; }
+.ui-dialog-header > div { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+.ui-dialog-header h2 { margin: 0; color: var(--fip-strong); font-size: var(--fip-type-feature-size); font-weight: var(--fip-type-feature-weight); line-height: var(--fip-type-feature-line-height); overflow-wrap: anywhere; }
+.ui-dialog-header p { margin: 0; color: var(--fip-muted); font-size: var(--fip-type-caption-size); font-weight: 400; line-height: 16px; overflow-wrap: anywhere; }
+.ui-dialog-body { flex: 1 1 auto; min-height: 0; overflow: auto; overscroll-behavior: contain; display: flex; flex-direction: column; gap: 12px; padding: 11px 12px; }
+.ui-dialog-actions { display: flex; flex: 0 0 auto; flex-wrap: wrap; align-items: center; justify-content: flex-end; gap: 8px; padding: 8px 12px; }
+.ui-dialog-actions > [hidden] { display: none; }
+.ui-dialog-actions .ui-form-actions { padding: 0; background: none; border: 0; width: 100%; }
+.ui-dialog-actions .ui-button { max-width: 100%; height: auto; min-height: 32px; white-space: normal; }
+@media (prefers-reduced-motion: no-preference) { .ui-dialog[open] { animation: ui-overlay-reveal 160ms cubic-bezier(.16,1,.3,1); } @keyframes ui-overlay-reveal { from { clip-path: inset(0 0 5% round 16px); } to { clip-path: inset(0 round 16px); } } }
+
+
+.ui-dialog:focus-visible { outline: 1px solid var(--fip-accent); outline-offset: 2px; }
+.ui-dialog-body > .ui-text-input { flex: 0 0 auto; }

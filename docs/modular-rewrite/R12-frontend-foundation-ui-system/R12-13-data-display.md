@@ -1,6 +1,6 @@
 # R12-13 Data Display
 
-状态：`VERIFYING`。基线`780753483310ccbc851da34b739007998e6ece46`；唯一rewrite/r12-frontend-foundation-ui-system。八类Data Display及本地检查通过，13自身Windows待验，14～19 BLOCKED。
+状态：`DONE`（2026-10-28收尾）。基线`780753483310ccbc851da34b739007998e6ece46`；唯一rewrite/r12-frontend-foundation-ui-system。13精确dac0e9c的Windows run40218221375、ZIP摘要、Rust、打包与startup报告已核验；详文末收尾。14由用户另行授权，15～19仍BLOCKED。以下验收前描述保留为实施历史。
 
 ## 前置核验
 
@@ -118,3 +118,8 @@ main.ts 除唯一 CSS import 外与基线完全一致；ModalController、visual
 移动/重命名：无。删除文件：无。
 
 所有代码拟以本批同一可回退提交发布。发布前保留基线 `780753483310ccbc851da34b739007998e6ece46`；发布后需要回退时对该原子提交执行审阅后的 git revert，不手工拷贝旧文件、不批量删除目录。13自身Windows成功前不进入14；按用户要求不轮询CI。
+
+
+## 自身 Windows 验收收尾（2026-10-28）
+
+精确提交 `dac0e9cca8006ceabdbe24f845da84c6710a0723` 的 [run40218221375](https://github.com/uniquenesssta/123/actions/runs/40218221375) 及 Windows job121243891804 全部步骤 SUCCESS。artifact12609027463 的远端与本地 ZIP 摘要一致：`e24a76588b76b4d092c651e7700188845e29ac61b997b26896b1d2c1e5dbb39a`，18,989,664 bytes。完整日志确认 Rust 工作区、MSI/NSIS 打包通过；ZIP 内 startup report 为 pass、无 runtime_errors，完成 bootstrap/read_workspace_state/save_workspace_state。13 改为 DONE，不能把 startup profile 说成 Windows Full 或真实业务端到端通过。用户随后授权 14；不轮询 CI。

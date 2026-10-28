@@ -1,0 +1,1 @@
+export { inlineMessageView } from "./inlineMessageView";

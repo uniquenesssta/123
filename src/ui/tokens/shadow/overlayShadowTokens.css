@@ -1,0 +1,7 @@
+/* Live Modal/Toast/Menu Light styles; Dark reuses approved FIP effects. */
+:root, :root[data-theme="light"] {
+  --fip-modal-shadow: 0 8px 32px rgb(20.4 20.4 38.25 / .16);
+  --fip-toast-shadow: 0 4px 16px rgb(20.4 20.4 38.25 / .10);
+  --fip-menu-shadow: 0 4px 16px rgb(20.4 20.4 38.25 / .12);
+}
+:root[data-theme="dark"] { --fip-modal-shadow: var(--fip-elevation-dialog-dark); --fip-toast-shadow: var(--fip-elevation-subtle-dark); --fip-menu-shadow: var(--fip-elevation-subtle-dark); }

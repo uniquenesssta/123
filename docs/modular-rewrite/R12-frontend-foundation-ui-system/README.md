@@ -2,7 +2,7 @@
 
 ## 当前阶段状态
 
-`IN_PROGRESS`。01～12 DONE；12精确7807534/run40194352653全部步骤、完整日志、ZIP摘要与startup trace已独立核验。用户2026-10-26授权“收尾12 开始13”，13 Data Display VERIFYING：八类组件、320项原生检查与完整91步骤前端已通过；13自身Windows CI待提交后核验。14～19 BLOCKED。沿唯一rewrite/r12-frontend-foundation-ui-system。不轮询CI。
+`IN_PROGRESS`。01～13 DONE；13 精确 dac0e9c / Windows run40218221375 全部步骤成功，证据 ZIP 的 SHA-256、打包与 startup 报告已独立核验。用户 2026-10-28 授权推进 R12-14：Feedback 与 Overlays 已实现，VERIFYING；342项专项、Rust检查/测试和独立修复复审通过，完整92步前端门禁通过，本批公开发布/CI待验。15～19 BLOCKED。沿唯一 rewrite/r12-frontend-foundation-ui-system，工作目录 O:/Project/FOODBALL/123 r3。不轮询 CI。
 
 ## 依据与设计边界
 
@@ -26,8 +26,8 @@
 | R12-10 | [Design Tokens](R12-10-design-tokens.md) | DONE · 自身Windows完整SUCCESS，run40174915845 |
 | R12-11 | [UI Primitives](R12-11-ui-primitives.md) | DONE · 自身Windows完整SUCCESS，run40188280192 |
 | R12-12 | [Forms](R12-12-forms.md) | DONE · 自身Windows完整SUCCESS，run40194352653 |
-| R12-13 | [Data Display](R12-13-data-display.md) | VERIFYING · 320项原生检查/91步骤前端PASS；自身Windows待验 |
-| R12-14 | Feedback 与 Overlays | BLOCKED |
+| R12-13 | [Data Display](R12-13-data-display.md) | DONE · 自身 Windows 完整 SUCCESS，run40218221375 |
+| R12-14 | [Feedback 与 Overlays](R12-14-feedback-and-overlays.md) | VERIFYING · 已实现，342项专项通过，自身Windows CI待验 |
 | R12-15 | Navigation 与 Layout | BLOCKED |
 | R12-16 | UI Patterns | BLOCKED |
 | R12-17 | Accessibility、Icons 与 Assets | BLOCKED |

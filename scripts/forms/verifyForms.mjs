@@ -39,7 +39,7 @@ export async function verifyForms(root) {
   for(const dir of families){const files=readdirSync(resolve(root,"src/ui/forms",dir));const index=read('src/ui/forms/'+dir+'/index.ts');assert.ok(index.trim().split('\n').every(line=>/^export (?:type )?\{.*\} from /.test(line)),"re-export only: "+dir);for(const file of files.filter(f=>f.endsWith('.ts')))assert.ok(!/\bfetch\(|\binvoke\(|localStorage|sessionStorage|from ["'][^"']*(?:api\/|platform\/)/.test(read('src/ui/forms/'+dir+'/'+file)),"Forms must not own I/O: "+file);}
   assert.ok(!main.includes('button.disabled = target.value.trim()'),'old duplicate name gate removed');
   assert.ok(main.includes('confirmation !== expected')&&main.includes('api.resetDatabase(confirmation)'),'host/backend guard remains');
-  assert.ok(read('src/app/modal.ts').includes('this.releaseConfirmationInput?.()'),'workspace disposes local control lifecycle');
+  assert.ok(read('src/app/modal/workspacePanelController.ts').includes('this.releaseConfirmationInput?.()'),'workspace disposes local control lifecycle');
   const browser=resolveChromiumExecutable();assert.ok(browser,"Native Windows Chromium required");
   const directory=mkdtempSync(join(tmpdir(),"football-r12-forms-")),results=[];
   for(const width of [960,1440])for(const theme of ["light","dark"]){

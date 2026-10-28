@@ -135,9 +135,8 @@
     "src/app/shell/content-region/contentRegion.css"
   ],
   "feedback_style_entries": [
-    "src/ui/feedback/feedback-content/feedbackContent.css",
-    "src/ui/feedback/toast/toast.css",
-    "src/ui/feedback/task-activity/taskActivity.css",
+    "src/ui/feedback/index.css",
+    "src/ui/overlays/index.css",
     "src/app/warnings/warning-center/warningCenter.css"
   ],
   "shell_source_entries": [

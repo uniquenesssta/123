@@ -7,7 +7,7 @@
 
 ## 当前前置状态（2026-10-25）
 
-`IN_PROGRESS`。01～12 DONE；12精确7807534/run40194352653全部步骤、完整日志、ZIP摘要与startup trace已独立核验。用户2026-10-26授权“收尾12 开始13”，13 Data Display VERIFYING：八类组件、320项原生检查与完整91步骤前端已通过；13自身Windows CI待提交后核验。14～19 BLOCKED。沿唯一rewrite/r12-frontend-foundation-ui-system。不轮询CI。
+`IN_PROGRESS`。01～13 DONE；13 精确 dac0e9c / Windows run40218221375 全部步骤、ZIP 摘要与 startup 报告已核验。用户授权 R12-14，Feedback 与 Overlays VERIFYING；15～19 BLOCKED。同一 rewrite/r12-frontend-foundation-ui-system 分支，工作目录 O:/Project/FOODBALL/123 r3，不轮询 CI。
 
 ## 1. 阶段目标
 
@@ -2167,7 +2167,7 @@ src/ui/data-display/code-block/
 
 ## R12-14 Feedback 与 Overlays
 
-状态：`BLOCKED`（仅当上一任务与本任务前置门禁通过后改为 `READY`）
+状态：`VERIFYING`（Figma与代码已实现，本地验收及自身公开发布/CI分别记录；见14实施记录）
 
 ### 1. 目标
 

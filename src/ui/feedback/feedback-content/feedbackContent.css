@@ -1,6 +1,6 @@
 .ui-feedback-content { display: flex; align-items: flex-start; gap: 8px; min-width: 0; color: var(--fip-text); }
 .ui-feedback-copy { display: flex; flex: 1; flex-direction: column; min-width: 0; gap: 4px; overflow-wrap: anywhere; }
-.ui-feedback-copy strong { margin: 0; color: var(--fip-strong); font-size: var(--fip-type-label-size); font-weight: var(--fip-type-label-weight); line-height: var(--fip-type-label-line-height); letter-spacing: var(--fip-type-label-letter-spacing); }
+.ui-feedback-copy strong { margin: 0; color: var(--fip-strong); font-size: var(--fip-type-section-title-size); font-weight: var(--fip-type-section-title-weight); line-height: var(--fip-type-section-title-line-height); letter-spacing: var(--fip-type-label-letter-spacing); }
 .ui-feedback-copy p { margin: 0; color: var(--fip-text); font-size: var(--fip-type-body-size); font-weight: var(--fip-type-body-weight); line-height: var(--fip-type-body-line-height); white-space: pre-wrap; }
 .ui-feedback-info > .ui-icon-slot { color: var(--fip-info); }
 .ui-feedback-success > .ui-icon-slot { color: var(--fip-success); }

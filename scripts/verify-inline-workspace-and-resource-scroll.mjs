@@ -13,7 +13,7 @@ const requireTrue = (condition, message) => {
   if (!condition) throw new Error(message);
 };
 
-const modal = read("src/app/modal.ts");
+const modal = read("src/app/modal/workspacePanelController.ts");
 const shell = JSON.parse(read("contracts/global-visual-system-contract.json")).shell_source_entries.map(read).join("\n");
 const main = read("src/main.ts");
 const teams = read("src/pages/teams.ts");
@@ -56,7 +56,7 @@ requireTrue(modal.includes("new RouteHistory<WorkspacePanelEntry>()") && !modal.
 const browser = resolveChromiumExecutable();
 if (!browser) throw new Error("未找到Chromium、Chrome或Edge，无法验证详情历史输入与滚动");
 const source = [
-  read("src/components/format.ts"), read("src/app/router/routeHistory.ts"), modal,
+  read("src/components/format.ts"), read("src/app/router/routeHistory.ts"), read("src/app/modal/visualRecordView.ts"), read("src/app/modal/workspacePanelTypes.ts"), modal,
   read("src/platform/timing/requestSequence.ts"),
   ...["storageKey", "preferenceStore"].map(name => read(`src/platform/storage/${name}.ts`)),
   ...["lifecycleError", "asyncScope", "mountHandle"].map(name => read(`src/app/lifecycle/${name}.ts`)),
@@ -71,7 +71,7 @@ body{margin:0;font:14px system-ui}.test-marker{position:fixed;left:0;top:0;width
 const host=document.querySelector('#host');
 const shell=()=>'<main class="main-content"><button data-action="workspace-history-back" disabled>返回</button><button data-action="workspace-history-forward" disabled>前进</button><div class="page-container">基础页面</div><div id="modal-root"></div></main>';
 const markup=()=>'<div class="content"><input id="draft"><input id="checked" type="checkbox"><select id="multi" multiple><option value="a">A</option><option value="b">B</option></select><input id="password" type="password"><input id="api-key"><input id="private-draft" data-workspace-persist="false"><input id="file" type="file"></div>';
-const controller=new ModalController();
+const controller=new WorkspacePanelController();
 const preferences=new Map([[SESSION_THEME_KEY,'dark']]);
 const session=new AppSession({loadBootstrap:async()=>({data:{recent_runs:[]}}),loadRecentRuns:async()=>[],applyTheme(theme){document.documentElement.dataset.theme=theme;document.documentElement.style.colorScheme=theme;}},new SessionPersistence(()=>({getItem:key=>preferences.get(key)??null,setItem(key,value){preferences.set(key,value)}})));
 const expect=(ok,message)=>{if(!ok)throw new Error(message)};

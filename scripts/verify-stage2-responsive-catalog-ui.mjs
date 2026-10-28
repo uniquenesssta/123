@@ -10,7 +10,7 @@ const lineups = read("src/pages/lineups.ts");
 const main = read("src/main.ts");
 const styles = read("src/styles/app.css");
 const layout = read("src/styles/layout.css") + read("src/app/shell/content-region/contentRegion.css");
-const modal = read("src/app/modal.ts");
+const modal = read("src/app/modal/workspacePanelController.ts");
 const loaders = read("src/controllers/pageLoaders.ts");
 
 const catalogCount = (migration.match(/'catalog_version', '2026\.07-stage2'/g) ?? []).length;

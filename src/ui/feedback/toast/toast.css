@@ -1,4 +1,4 @@
-.ui-toast { width: var(--fip-layout-feedback-toast-max-width); max-width: 100%; padding: 8px 10px; border: var(--fip-border-width) solid var(--fip-border-strong); border-radius: var(--fip-radius-sm); background: var(--fip-raised); color: var(--fip-text); box-shadow: var(--fip-feedback-shadow); pointer-events: auto; }
+.ui-toast { width: var(--fip-layout-feedback-toast-max-width); max-width: 100%; padding: 8px 10px; border: 0; border-radius: var(--fip-radius-surface); background: var(--fip-raised); color: var(--fip-text); box-shadow: var(--fip-toast-shadow); pointer-events: auto; }
 .ui-toast-row { display: flex; align-items: flex-start; gap: 8px; }
 .ui-toast-alignment { display: flex; flex: 1; align-items: center; min-width: 0; min-height: 32px; }
 .ui-toast-actions { display: flex; justify-content: flex-end; gap: 8px; margin-top: 8px; }
