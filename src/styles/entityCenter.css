@@ -862,10 +862,10 @@ body { overflow-x: hidden; }
 .directory-foot-actions { display: flex; align-items: center; gap: 6px; }
 
 /* 0.23.0 · Stage E1 follow-up: readable team directory actions. */
-.app-shell[data-current-page="teams"] .entity-browser {
+.app-shell[data-current-page="teams"] .entity-browser:not(.team-directory-only) {
   grid-template-columns: minmax(300px, 320px) minmax(560px, 1fr) minmax(300px, 340px);
 }
-.app-shell[data-current-page="teams"] .entity-browser.inspector-collapsed {
+.app-shell[data-current-page="teams"] .entity-browser:not(.team-directory-only).inspector-collapsed {
   grid-template-columns: minmax(300px, 320px) minmax(560px, 1fr);
 }
 .team-directory-foot {
@@ -908,16 +908,16 @@ body { overflow-x: hidden; }
   background: color-mix(in srgb, var(--accent) 12%, var(--panel));
 }
 @media (max-width: 1480px) and (min-width: 1101px) {
-  .app-shell[data-current-page="teams"] .entity-browser {
+  .app-shell[data-current-page="teams"] .entity-browser:not(.team-directory-only) {
     grid-template-columns: minmax(280px, 300px) minmax(480px, 1fr);
   }
-  .app-shell[data-current-page="teams"] .entity-browser.inspector-collapsed {
+  .app-shell[data-current-page="teams"] .entity-browser:not(.team-directory-only).inspector-collapsed {
     grid-template-columns: minmax(280px, 300px) minmax(480px, 1fr);
   }
 }
 @media (max-width: 1100px) {
-  .app-shell[data-current-page="teams"] .entity-browser,
-  .app-shell[data-current-page="teams"] .entity-browser.inspector-collapsed {
+  .app-shell[data-current-page="teams"] .entity-browser:not(.team-directory-only),
+  .app-shell[data-current-page="teams"] .entity-browser:not(.team-directory-only).inspector-collapsed {
     grid-template-columns: minmax(0, 1fr);
   }
 }
@@ -1078,12 +1078,6 @@ body { overflow-x: hidden; }
 /* Player pagination keeps the current rows visible and only marks the footer as loading. */
 .player-browser .entity-main[aria-busy="true"] {
   cursor: progress;
-}
-.player-browser .entity-main[aria-busy="true"] .entity-main-footer::before {
-  content: "正在加载下一页…";
-  margin-right: auto;
-  color: var(--accent);
-  font-weight: 600;
 }
 .player-browser .entity-main[aria-busy="true"] .player-table-wrap {
   pointer-events: none;

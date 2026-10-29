@@ -1,7 +1,8 @@
 import { escapeHtml } from "../components/format";
 import { inlineDatabaseSetup } from "../components/databaseSetup";
 import { icon } from "../components/icons";
-import { workspacePaneToggle, workspaceSectionNavigation } from "../components/workspace";
+import { workspaceSectionNavigation } from "../ui/navigation";
+import { workspacePaneToggle } from "../ui/layout";
 import { taskContextRibbon, taskPageHeader } from "../components/taskWorkspace";
 import type {
   ApiWorkspaceMessageRecord,

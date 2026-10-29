@@ -1,8 +1,11 @@
+import "./players/playerWorkspace.css";
+import { paginationView } from "../ui/navigation";
 import { escapeHtml, formatPercent } from "../components/format";
 import { inlineDatabaseSetup } from "../components/databaseSetup";
 import { icon } from "../components/icons";
 import { taskContextRibbon, taskPageHeader } from "../components/taskWorkspace";
-import { workspaceAnchorNavigation, workspaceSectionNavigation } from "../components/workspace";
+import { workspaceAnchorNavigation, workspaceSectionNavigation } from "../ui/navigation";
+
 import { ageFromBirthDate, availabilityLabel, detailPlayerName, displayPlayerName, initials, playerStatusLabel, positionLabel, preferredFootLabel } from "../components/footballText";
 import type { WorkspaceLayoutMode, WorkspaceTabState } from "../app/workspace";
 import type {
@@ -547,7 +550,7 @@ export function playersPage(
       <main class="entity-main panel detail-pane" data-workspace-scroll-key="players-main">
         <div class="player-list-toolbar"><label class="entity-search wide" data-workspace-persist="false">${icon("search")}<input id="player-search" value="${escapeHtml(query.search ?? "")}" placeholder="支持中文名、原名或别名的部分匹配"><button data-action="search-players">搜索</button></label><div class="entity-list-actions"><span>${query.search ? `搜索“${escapeHtml(query.search)}” · ` : ""}${playerPage?.items.length ?? 0} 条当前结果</span><button class="secondary" data-action="toggle-workspace-pane" data-pane="inspector" ${selectedPlayer ? "" : "disabled"}>球员速览</button></div></div>
         <div class="entity-table-wrap player-table-wrap"><table class="entity-data-table player-directory-table"><thead><tr><th><label class="entity-table-check"><input id="player-select-all" type="checkbox"><span></span></label></th><th>球员</th><th>位置</th><th>当前球队</th><th>年龄</th><th>能力</th><th>状态</th><th>操作</th></tr></thead><tbody>${playerTableRows(playerPage, selectedPlayer?.player.id ?? null, selectedPlayerIds)}</tbody></table></div>
-        <footer class="entity-main-footer"><span>${selectedCount ? `已选择 ${selectedCount} 名球员` : "点击球员查看右侧速览"}</span><div><button class="secondary tiny" data-action="previous-player-page" ${pageNumber <= 1 ? "disabled" : ""}>上一页</button><b>第 ${pageNumber} 页</b><button class="secondary tiny" data-action="next-player-page" ${playerPage?.has_more ? "" : "disabled"}>下一页</button></div></footer>
+        <footer class="entity-main-footer"><span>${selectedCount ? `已选择 ${selectedCount} 名球员` : "点击球员查看右侧速览"}</span>${paginationView({page:pageNumber,summary:playerPage?`本页 ${playerPage.items.length} 条结果`:"尚未载入",hasMore:playerPage?.has_more??false,previousAction:"previous-player-page",nextAction:"next-player-page",label:"球员目录分页"})}</footer>
       </main>
       <aside class="entity-inspector panel inspector-pane" data-workspace-panel="players-inspector"><button class="entity-inspector-close icon-button" data-action="toggle-workspace-pane" data-pane="inspector" aria-label="关闭速览">×</button>${selectedPlayer ? playerQuickInspector(selectedPlayer) : `<div class="entity-inspector-empty"><span class="empty-orbit">${icon("shield")}</span><strong>选择一名球员</strong><span>速览不会离开当前名单。</span></div>`}</aside>
     </section>${selectedCount ? `<div class="entity-selection-bar"><strong>已选 ${selectedCount} 名球员</strong><span>可批量打开、归档或删除空对象</span><button class="secondary" data-action="open-selected-players">打开</button><button class="secondary" data-action="bulk-archive-players">归档</button><button class="danger" data-action="bulk-delete-players">批量删除空对象</button></div>` : ""}`;

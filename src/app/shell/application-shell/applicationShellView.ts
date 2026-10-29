@@ -1,3 +1,4 @@
+import { applicationFrameView } from "../../../ui/layout";
 import { navigationItemForPage, navigationModuleForPage } from "../../router";
 import type { Page } from "../../../types";
 import { sidebarView } from "../sidebar/sidebarView";
@@ -9,10 +10,5 @@ export function pageTitle(page: Page): string { return navigationItemForPage(pag
 
 export function renderShell(options: ShellOptions): string {
   const activeModule = navigationModuleForPage(options.page);
-  return `<div class="app-shell dual-navigation application-shell ${options.sidebarCollapsed ? "sidebar-collapsed secondary-collapsed" : ""} ${workspacePages.has(options.page) ? "workspace-page" : ""}"
-    data-current-page="${options.page}" data-current-module="${activeModule.key}">
-    ${sidebarView(options, activeModule)}
-    ${pageFrameView(options, topbarView(options, activeModule))}
-  </div>
-  <div data-confirmation-host></div>`;
+  return applicationFrameView({navigation:sidebarView(options,activeModule),main:pageFrameView(options,topbarView(options,activeModule)),collapsed:options.sidebarCollapsed,workspace:workspacePages.has(options.page),page:options.page,module:activeModule.key});
 }

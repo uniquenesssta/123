@@ -1,7 +1,8 @@
 import { escapeHtml } from "../components/format";
 import { icon } from "../components/icons";
 import { inlineDatabaseSetup } from "../components/databaseSetup";
-import { workspacePaneToggle, workspaceSectionNavigation } from "../components/workspace";
+import { workspaceSectionNavigation } from "../ui/navigation";
+import { workspacePaneToggle } from "../ui/layout";
 import type { BootstrapResponse, SpreadsheetImportPreview } from "../types";
 
 function summary(preview: SpreadsheetImportPreview | null): string {

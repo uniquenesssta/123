@@ -1,0 +1,20 @@
+.ui-tabs { display:flex; align-items:center; gap:var(--fip-space-xs); min-width:0; max-width:100%; overflow-x:auto; overscroll-behavior:contain; }
+.ui-tab { display:flex; align-items:center; flex:0 0 auto; min-width:var(--fip-tabs-item-min-width); max-width:var(--fip-tabs-item-max-width); height:var(--fip-control-height); padding:0 12px; border-radius:var(--fip-radius-md); background:var(--fip-surface); position:relative; border:1px solid var(--fip-border); }
+.ui-tab [role="tab"] { display:flex; align-items:center; justify-content:center; flex:1 1 0; min-width:0; height:100%; padding:0; border:0; background:transparent; color:var(--fip-text); font:var(--fip-type-label-weight) 13px/var(--fip-type-label-line-height) var(--fip-type-body-family); box-shadow:none; }
+.ui-tab [role="tab"] span { overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.ui-tab.active { background:var(--fip-accent); border-color:var(--fip-accent); }
+.ui-tab.active [role="tab"] { color:var(--fip-on-accent); }
+.ui-tab.active::after { content:""; position:absolute; height:var(--fip-tabs-indicator-height); bottom:0; left:0; right:0; background:var(--fip-brand); }
+.ui-tab:not(.active):has([role="tab"]:hover:not(:disabled)) { background:var(--fip-subtle); }
+.ui-tab [role="tab"]:active:not(:disabled) { color:var(--fip-brand); }
+.ui-tab-close { display:grid; place-items:center; flex:0 0 var(--fip-tabs-close-hit-area); width:var(--fip-tabs-close-hit-area); height:var(--fip-tabs-close-hit-area); min-height:0; padding:0; margin-left:var(--fip-space-xs); border:0; border-radius:var(--fip-radius-md); background:transparent; color:var(--fip-text); box-shadow:none; }
+.ui-tab-close:hover:not(:disabled),.ui-tab-close:active:not(:disabled) { background:var(--fip-danger-soft); color:var(--fip-danger); }
+.ui-tabs button:focus-visible { outline:none; }
+.ui-tab:has(button:focus-visible) { outline:1px solid var(--fip-brand); outline-offset:-1px; }
+.ui-tabs button:disabled { opacity:var(--fip-disabled-opacity); cursor:default; }
+
+.ui-tab.active .ui-tab-close { color:var(--fip-on-accent); }
+.ui-tab.active:has([role="tab"]:hover:not(:disabled)) { background:var(--fip-accent-hover); }
+.ui-tab.active:has(button:focus-visible) { outline-color:var(--fip-on-accent); }
+
+.ui-tab.active [role="tab"]:active:not(:disabled) { color:var(--fip-on-accent); }

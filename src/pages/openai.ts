@@ -1,6 +1,7 @@
 import { escapeHtml } from "../components/format";
 import { taskContextRibbon, taskPageHeader } from "../components/taskWorkspace";
-import { workspaceTaskAnchorNavigation } from "../components/workspace";
+import { workspaceTaskAnchorNavigation } from "../ui/navigation";
+
 import type {
   OpenAiApiProtocol,
   OpenAiProfileSummary,

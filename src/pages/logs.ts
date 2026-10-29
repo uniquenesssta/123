@@ -3,7 +3,8 @@ import { codeBlockView } from "../ui/data-display/code-block";
 import { emptyStateView } from "../ui/data-display/empty-state";
 import { statCardView } from "../ui/data-display/stat-card";
 import { taskContextRibbon, taskPageHeader } from "../components/taskWorkspace";
-import { workspaceTaskAnchorNavigation } from "../components/workspace";
+import { workspaceTaskAnchorNavigation } from "../ui/navigation";
+
 import type { IssueLogEntry, IssueSeverity } from "../types";
 
 function formatTime(value: string): string {

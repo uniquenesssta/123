@@ -1,7 +1,8 @@
 import { escapeHtml, formatBytes, formatPercent } from "../components/format";
 import { inlineDatabaseSetup } from "../components/databaseSetup";
 import { taskContextRibbon, taskPageHeader } from "../components/taskWorkspace";
-import { workspaceTaskAnchorNavigation } from "../components/workspace";
+import { workspaceTaskAnchorNavigation } from "../ui/navigation";
+
 import type {
   AbilityUpdateCandidateRecord,
   AiAnalysisResponsePreview,

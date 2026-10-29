@@ -1,8 +1,14 @@
 # 足球模型平台公开外壳
 
-## R12-14 Feedback 与 Overlays（2026-10-28，VERIFYING）
+## R12-15 Navigation 与 Layout（2026-10-29，VERIFYING）
 
-13 自身 Windows 证据已核验收尾；14 已按批准 Figma 接入统一反馈、异步/名称确认、告警抽屉、真实右键菜单和页面快速导航，保留原业务保护与详情草稿。342项 Windows 浏览器专项、Rust fmt/Clippy/工作区测试与独立修复复审通过；3e335ec2已发布，其CI在Database Service架构检查失败，Windows自动验收未执行；本地修复将迁移来源与清单修改任务分离，完整架构与93步前端重新验收通过，新CI待验，详[CI修复记录](docs/modular-rewrite/R12-frontend-foundation-ui-system/R12-14-ci-fix-state-provenance.md)。15～19未实施，不轮询CI。工作目录 O:/Project/FOODBALL/123 r3；TEMP/TMP使用O:/Project/FOODBALL/Temp。详[14实施记录](docs/modular-rewrite/R12-frontend-foundation-ui-system/R12-14-feedback-and-overlays.md)。
+14修复提交5886a439cc301a7fa315c1a8adf7b3b33c0b1d87：Windows run40863418461 / job123412066355 全步骤成功；artifact12894043614，ZIP SHA-256 2c06b3c06ffd25530680029b45fd3efaa69a3afec7d3241c00904abe59da4a5e。MSI 17,969,152 bytes、NSIS 15,605,981 bytes；startup profile pass，7条有效日志、0错误，bootstrap/read_workspace_state/save_workspace_state完成。startup不等于Full业务链路。2026-10-29独立核验，不轮询。
+
+15按已批准Figma收敛通用导航与布局，修正目录宽度/高度和筛选滚动；348项新组件、64视图1480项页面检查、完整93步前端/构建、Rust748项及Windows startup通过，独立UI复审SHIP。保留路由、工作区、异步和领域唯一owner；本批CI/打包尚待公开推送后验收；详[15实施记录](docs/modular-rewrite/R12-frontend-foundation-ui-system/R12-15-navigation-and-layout.md)。
+
+## R12-14 Feedback 与 Overlays（2026-10-29收尾 DONE）
+
+14的Feedback/Overlays及来源修复已收尾：5886a439精确Windows run40863418461全部步骤成功；下载产物哈希一致，MSI/NSIS和startup报告通过。Full业务链路未验证。见[14记录](docs/modular-rewrite/R12-frontend-foundation-ui-system/R12-14-feedback-and-overlays.md)与[CI来源修复](docs/modular-rewrite/R12-frontend-foundation-ui-system/R12-14-ci-fix-state-provenance.md)。用户已授权推进15；16～19未实施。
 
 ## 已批准 Figma 重新接入（2026-10-28）
 

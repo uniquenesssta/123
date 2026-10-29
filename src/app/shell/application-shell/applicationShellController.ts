@@ -1,3 +1,4 @@
+import { NavigationKeyboardController } from "../../../ui/navigation";
 import { EventScope } from "../../lifecycle";
 import { SidebarController } from "../sidebar/sidebarController";
 import { TopbarController } from "../topbar/topbarController";
@@ -10,6 +11,7 @@ import { ConfirmationDialogController } from "../../../ui/overlays/confirmation-
 export class ApplicationShellController {
   private events: EventScope | null = null;
   private closed = false;
+  private readonly navigationKeyboard: NavigationKeyboardController;
   private readonly sidebar: SidebarController;
   private readonly topbar: TopbarController;
   private readonly frame: PageFrameController;
@@ -17,6 +19,7 @@ export class ApplicationShellController {
   private readonly confirmation: ConfirmationDialogController;
 
   constructor(private readonly root: HTMLElement, private readonly actions: ShellActions, private readonly operations: ShellOperations) {
+    this.navigationKeyboard = new NavigationKeyboardController(root);
     this.sidebar = new SidebarController(actions);
     this.topbar = new TopbarController(actions);
     this.frame = new PageFrameController(root);
@@ -27,6 +30,7 @@ export class ApplicationShellController {
   start(): void {
     if (this.closed || this.events) return;
     this.events = new EventScope();
+    this.navigationKeyboard.start();
     this.events.listen(this.root, "click", event => {
       if (this.confirmation.handleClick(event)) { event.stopPropagation(); return; }
       if (this.confirmation.active) { event.stopPropagation(); return; }
@@ -80,6 +84,7 @@ export class ApplicationShellController {
     if (this.closed) return;
     this.closed = true;
     this.confirmation.destroy();
+    this.navigationKeyboard.destroy();
     this.events?.destroy();
     this.events = null;
   }

@@ -1,0 +1,107 @@
+{
+  "task": "R12-15",
+  "file_key": "PN0Whgu6HLWIHx4Mv6aHfu",
+  "session_id": "e513978c-2c0d-4c26-a342-7bfcbd24f647",
+  "authority": "approved Figma 2026-10-28 expressive refresh; current live node properties and screenshots checked 2026-10-29",
+  "new_variables": [],
+  "new_styles": [],
+  "new_figma_nodes": [],
+  "components": [
+    {
+      "name": "PC App Shell",
+      "node": "380:1366",
+      "context": "380:1086",
+      "code": "src/ui/layout/application-frame/applicationFrameView.ts",
+      "consumers": [
+        "src/app/shell/application-shell/applicationShellView.ts"
+      ]
+    },
+    {
+      "name": "Shell Primary/Secondary Navigation",
+      "nodes": [
+        "374:183",
+        "374:321",
+        "376:855",
+        "377:1511"
+      ],
+      "code": "src/ui/navigation/sidebar/sidebarView.ts",
+      "consumer": "src/app/shell/sidebar/sidebarView.ts"
+    },
+    {
+      "name": "Shell Topbar/History",
+      "nodes": [
+        "378:1109",
+        "375:217"
+      ],
+      "code": "src/ui/navigation/topbar/topbarView.ts",
+      "consumer": "src/app/shell/topbar/topbarView.ts"
+    },
+    {
+      "name": "Tabs",
+      "nodes": [
+        "209:690",
+        "213:940"
+      ],
+      "context": "213:706",
+      "code": "src/ui/navigation/tabs/tabsView.ts",
+      "sizes": [
+        32,
+        40
+      ],
+      "live_business_mount": "not mounted by current approved Teams/Players screen; reusable contract tested, future pattern composition not claimed"
+    },
+    {
+      "name": "Segmented Control",
+      "nodes": [
+        "214:996",
+        "216:1036"
+      ],
+      "code": "src/ui/navigation/segmented-control/segmentedControlView.ts",
+      "sizes": [
+        32,
+        40
+      ],
+      "live_business_mount": "reusable contract tested; current approved object pages do not expose legacy compare/cards controls"
+    },
+    {
+      "name": "Pagination",
+      "node": "241:1477",
+      "context": "241:1427",
+      "code": "src/ui/navigation/pagination/paginationView.ts",
+      "local_update": "src/ui/navigation/pagination/paginationController.ts",
+      "consumers": [
+        "src/pages/teams.ts",
+        "src/pages/players.ts",
+        "src/main.ts setPlayerPageLoading/refreshPlayerPageDom"
+      ],
+      "facts": "page and has_more from host cursor chain; no fabricated total or production data"
+    },
+    {
+      "name": "Workspace section and anchor navigation",
+      "code": "src/ui/navigation/section-navigation/sectionNavigationView.ts",
+      "facts": "same approved production markup and current-page semantics, now with manual arrow/Home/End focus"
+    }
+  ],
+  "notes": [
+    "No new Figma masters or tokens needed; reused current approved assets.",
+    "Repository mapping only; not a published Figma Code Connect registration.",
+    "Standalone component resilience at360px; desktop shell contract minimum960x600, native Tauri minimum1080x700 unchanged.",
+    "Tabs current live node padding12 and font13px Medium explicitly override historical tabs/item-padding-x10; no shared token value changed.",
+    "Selected keyboard-focus ring uses existing on-action semantic, synchronized in the two Figma Focus variants.",
+    "Current Screens and latest user centering instruction win over historical Pagination primitive right-aligned controls: shared controls remain centered with real summary."
+  ],
+  "modified_figma_nodes": [
+    {
+      "id": "206:654",
+      "name": "Tabs32 Selected Focus",
+      "property": "strokes.color",
+      "variable": "VariableID:47:5"
+    },
+    {
+      "id": "208:682",
+      "name": "Tabs40 Selected Focus",
+      "property": "strokes.color",
+      "variable": "VariableID:47:5"
+    }
+  ]
+}

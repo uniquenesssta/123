@@ -1,6 +1,6 @@
 # R12-14 CI修复：状态迁移来源与清单最后修改任务
 
-日期：2026-10-29。状态：VERIFYING。沿原分支 rewrite/r12-frontend-foundation-ui-system，修复基线3e335ec217eaad902f44e2989cde46d3a457b767；不进入15，不轮询新CI。
+日期：2026-10-29。状态：DONE（5886a439精确CI/产物已核验；以下失败与修复过程为历史记录）。沿原分支 rewrite/r12-frontend-foundation-ui-system，修复基线3e335ec217eaad902f44e2989cde46d3a457b767；不进入15，不轮询新CI。
 
 ## 精确失败与影响
 
@@ -45,3 +45,9 @@
 ## 最终本地验证
 
 完整架构入口与93步前端均exit0，保留原门禁和Vite分块提示。5个可执行/契约文件的SHA-256从验收开始至提交前一致；本次验收后只补充Markdown结果，未再次修改机器契约。实际修复CI结果仍待本提交发布后验收，不冒称Windows打包/完整链路通过。
+
+
+## 发布后独立验收（2026-10-29）
+
+5886a439cc301a7fa315c1a8adf7b3b33c0b1d87：Windows run40863418461 / job123412066355 全步骤成功；artifact12894043614，ZIP SHA-256 2c06b3c06ffd25530680029b45fd3efaa69a3afec7d3241c00904abe59da4a5e。MSI 17,969,152 bytes、NSIS 15,605,981 bytes；startup profile pass，7条有效日志、0错误，bootstrap/read_workspace_state/save_workspace_state完成。startup不等于Full业务链路。2026-10-29独立核验，不轮询。
+本修复与14均DONE；15由用户另行授权开始。原失败记录保留以供追溯。

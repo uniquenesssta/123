@@ -485,8 +485,23 @@
         "src/api/**"
       ],
       "transition": null
+    },
+    {
+      "id": "browser.navigation-keyboard-lifecycle",
+      "owner": "src/ui/navigation/keyboard/navigationKeyboardController.ts::NavigationKeyboardController",
+      "scope": "host DOM lifetime; keyboard listeners only, never route, cursor, selected object or persisted workspace",
+      "writers": [
+        "NavigationKeyboardController.start",
+        "NavigationKeyboardController.destroy"
+      ],
+      "forbidden": [
+        "src/pages/**",
+        "src/api/**",
+        "src/platform/**"
+      ],
+      "transition": null
     }
   ],
-  "count": 33,
-  "last_updated_task": "R12-14"
+  "count": 34,
+  "last_updated_task": "R12-15"
 }

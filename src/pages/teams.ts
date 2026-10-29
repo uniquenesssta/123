@@ -1,9 +1,11 @@
+import { paginationView } from "../ui/navigation";
 import "./teams/teamWorkspace.css";
 import { escapeHtml, formatPercent } from "../components/format";
 import { inlineDatabaseSetup } from "../components/databaseSetup";
 import { icon } from "../components/icons";
 import { taskContextRibbon, taskPageHeader } from "../components/taskWorkspace";
-import { workspaceAnchorNavigation, workspaceSectionNavigation } from "../components/workspace";
+import { workspaceAnchorNavigation, workspaceSectionNavigation } from "../ui/navigation";
+
 import { ageFromBirthDate, availabilityLabel, detailPlayerName, displayPlayerName, initials, positionLabel, preferredFootLabel, teamTypeLabel } from "../components/footballText";
 import type { WorkspaceLayoutMode, WorkspaceTabState } from "../app/workspace";
 import type {
@@ -242,7 +244,7 @@ function detailPanel(
       { id: "team-profile-presets", label: "阵容预设" },
       { id: "team-profile-lineups", label: "阵容历史" },
       { id: "team-profile-recent", label: "阵容与赛程" },
-    ])}
+    ], "vertical")}
     </aside><div class="profile-section-stack">
     <details id="team-profile-overview" class="editor-details workspace-anchor-target"><summary>球队概览与能力</summary>
     <div class="team-detail-hero">
@@ -602,7 +604,7 @@ export function teamsPage(
         <div class="entity-filter-actions directory-actions"><button class="primary" data-action="search-teams">应用筛选</button><button class="secondary" data-action="clear-team-filters">清除</button></div>
       </aside><section class="team-catalogue-results"><h2>当前 ${teamPage?.items.length ?? 0} 支球队 · 第 ${pageNumber} 页</h2>
         <div class="entity-directory-list" data-workspace-scroll-key="teams-directory-list">${teamDirectoryItems(teamPage, selectedTeam?.team.id ?? null, selectedIds)}</div>
-        <footer class="entity-directory-footer"><button class="secondary tiny" data-action="previous-team-page" ${pageNumber <= 1 ? "disabled" : ""}>上一页</button><span>第 ${pageNumber} 页</span><button class="secondary tiny" data-action="next-team-page" ${teamPage?.has_more ? "" : "disabled"}>下一页</button></footer>
+        <footer class="entity-directory-footer">${paginationView({page:pageNumber,summary:teamPage?`本页 ${teamPage.items.length} 条结果`:"尚未载入",hasMore:teamPage?.has_more??false,previousAction:"previous-team-page",nextAction:"next-team-page",label:"球队目录分页"})}</footer>
       </section></div>`;
   const teamDetailFilterPanel = selectedTeam ? `<aside class="entity-filter-panel panel team-detail-filter master-pane" data-workspace-panel="teams-filter" data-workspace-persist="false">
         <div class="entity-directory-header"><div><span>筛选器</span><strong>${activeFilterCount ? `${activeFilterCount} 项已应用` : "全部球队"}</strong></div><button class="icon-button" data-action="refresh-team-catalog" title="刷新球队">${icon("refresh")}</button></div>

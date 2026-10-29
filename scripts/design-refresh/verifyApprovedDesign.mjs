@@ -11,7 +11,7 @@ const directory=mkdtempSync(join(tmpdir(),"football-approved-design-"));
 const {css,script}=productionFixture(root),htmlPath=join(directory,"production-views.html");
 writeFileSync(htmlPath,`<!doctype html><html lang="zh-CN" data-theme="light"><head><meta charset="utf-8"><style>${css}</style></head><body><script>${script.replace(/<\/script/gi,"<\\/script")}</script></body></html>`);
 const results=[],browser=resolveChromiumExecutable();assert.ok(browser,"Windows Chromium required");
-const allScreens=["dashboard","teams","lineups","rules","profile","team-open","team-closed"];
+const allScreens=["dashboard","teams","lineups","rules","profile","team-open","team-closed","players"];
 const screenArgument=process.argv.find(argument=>argument.startsWith('--screens='));
 const screens=screenArgument?[...new Set(screenArgument.slice('--screens='.length).split(','))]:allScreens;
 assert.ok(screens.length&&screens.every(screen=>allScreens.includes(screen)),"Select known production screens for a focused rerun");
@@ -20,7 +20,19 @@ for(const [width,height] of [[1440,900],[960,720],[1280,720],[1920,1080]]) for(c
   const result=await captureHtmlScreenshot({browser,htmlPath,outputPath:join(directory,`${name}.png`),width,height,async exercise(cdp){
     const response=await cdp.send("Runtime.evaluate",{expression:`(async()=>{try{renderFixture(${JSON.stringify(screen)},${JSON.stringify(theme)},${width<1100});await document.fonts.ready;await new Promise(r=>requestAnimationFrame(()=>requestAnimationFrame(r)));return (${checks.toString()})(${JSON.stringify(screen)});}catch(e){return {failures:[e.stack],assertions:0};}})()`,awaitPromise:true,returnByValue:true});
     if(response.exceptionDetails) return {failures:[response.exceptionDetails.text],assertions:0};
-    return response.result.value;
+    const state=response.result.value;
+    if(screen==="players"&&!state.failures.length){
+      const ev=async expression=>{const r=await cdp.send("Runtime.evaluate",{expression,awaitPromise:true,returnByValue:true});if(r.exceptionDetails)throw Error(r.exceptionDetails.exception?.description??r.exceptionDetails.text);return r.result.value;};
+      await ev('document.querySelector("[data-action=next-player-page]").focus()');
+      await cdp.send("Input.dispatchKeyEvent",{type:"keyDown",key:"ArrowRight",code:"ArrowRight",windowsVirtualKeyCode:39,nativeVirtualKeyCode:39});
+      await cdp.send("Input.dispatchKeyEvent",{type:"keyUp",key:"ArrowRight",code:"ArrowRight",windowsVirtualKeyCode:39,nativeVirtualKeyCode:39});
+      state.paginationFocus=await ev('(()=>{const before=document.activeElement.dataset.action;const rows=[...document.querySelectorAll(".player-directory-table tbody tr")];setFixturePlayerLoading(true);const footer=document.querySelector(".entity-main-footer"),during=document.activeElement.hasAttribute("data-pagination-current"),status=footer.querySelectorAll("[role=status]:not([hidden])").length,legacy=getComputedStyle(footer,"::before").content,retained=rows.every(r=>r.isConnected);return {before,during,status,legacy,retained,rowCount:rows.length,text:footer.textContent}})()');
+      const shot=await cdp.send("Page.captureScreenshot",{format:"png",captureBeyondViewport:false});writeFileSync(join(directory,name+"-busy.png"),Buffer.from(shot.data,"base64"));
+      state.paginationFocus.after=await ev('setFixturePlayerLoading(false);document.activeElement.hasAttribute("data-pagination-current")');
+      const f=state.paginationFocus;
+      for(const [ok,message]of [[f.before==="next-player-page","real next button focused"],[f.during&&f.after,"real local loading retains named pagination focus"],[f.status===1&&(f.legacy==="none"||f.legacy==='""'),"exactly one loading status"],[f.rowCount>0&&f.retained,"nonempty player rows retained while busy"],[!f.text.includes("正在加载下一页"),"busy text covers either paging direction"]]){state.assertions++;if(!ok)state.failures.push(message);}
+    }
+    return state;
   }});
   results.push({name,...result});console.log(`${name}: ${result.assertions} checks; ${result.failures.length} failures`);
 }
@@ -49,6 +61,7 @@ function checks(screen) {
     check(style(q(".dashboard-metric:nth-child(2) strong")).fontSize==="28px","numeric metrics use approved 28px hierarchy");
   }
   if(screen==="teams") {
+    check(near(rect(q(".team-catalogue-layout")).width,rect(q(".team-directory-only")).width),"single directory frame fills its available width");
     const cards=[...document.querySelectorAll(".team-catalogue-results .entity-directory-item")];
     check(cards.length===4&&near(rect(cards[0]).top,rect(cards[1]).top)&&rect(cards[2]).top>rect(cards[0]).top,"directory is a two-column fluid grid");
     check(near(rect(q(".team-catalogue-layout > aside")).width,248),"fixed 248px filters");
@@ -60,6 +73,19 @@ function checks(screen) {
     const footer=rect(q(".team-catalogue-results footer")),prev=rect(q('[data-action="previous-team-page"]')),next=rect(q('[data-action="next-team-page"]'));
     check(near((prev.left+next.right)/2,(footer.left+footer.right)/2),"pagination group centered");
     const box=rect(q(".entity-select-check")),open=rect(q(".entity-directory-open"));check(near(box.top+box.height/2,open.top+open.height/2),"selection vertically centered with identity");
+  }
+  if(screen==="players") {
+    const pager=q(".ui-pagination"),prev=q('[data-action="previous-player-page"]'),next=q('[data-action="next-player-page"]');
+    check(pager&&prev.disabled&&!next.disabled,"real player pagination boundary");
+    const browser=q(".player-browser"),table=q(".player-table-wrap");
+    check([...document.querySelectorAll(".player-browser .entity-filter-group")].every(e=>rect(e).width>=160),"player filter groups retain readable single-column width");
+    check(rect(browser).height>innerHeight*.35,"player directory fills usable workspace height");
+    check(rect(table).height>120,"player table has readable independent scroll height");
+    check(document.querySelectorAll(".player-directory-table tbody tr").length>=18,"nonempty boundary player rows reach real renderer");
+    check(table.scrollHeight>table.clientHeight,"long player list scrolls inside its table");
+    check(rect(q(".entity-main-footer")).bottom<=rect(q(".entity-main")).bottom+1,"player footer remains inside its workspace");
+    check(rect(pager).bottom<=rect(q(".entity-main")).bottom+1&&rect(pager).top>=rect(q(".entity-main")).top,"all player pagination controls remain visible inside frame");
+    check(near((rect(prev).left+rect(next).right)/2,(rect(pager).left+rect(pager).right)/2),"player pagination controls centered");
   }
   if(screen==="rules") {
     const left=q(".rules-scope-list"),scroller=q(".rules-table-scroll"),scopeTop=rect(left).top;

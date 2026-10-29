@@ -2,7 +2,8 @@ import { escapeHtml, formatBytes } from "../components/format";
 import { statCardView } from "../ui/data-display/stat-card";
 import { dataTableView } from "../ui/data-display/data-table";
 import { taskContextRibbon, taskPageHeader } from "../components/taskWorkspace";
-import { workspaceTaskAnchorNavigation } from "../components/workspace";
+import { workspaceTaskAnchorNavigation } from "../ui/navigation";
+
 import type { BootstrapResponse } from "../types";
 
 export function databasePage(state: BootstrapResponse): string {

@@ -8,7 +8,7 @@ const failures = [];
 const check = (condition, message) => { if (!condition) failures.push(message); };
 
 const main = read("src/main.ts");
-const workspace = read("src/components/workspace.ts");
+const workspace = read("src/ui/navigation/section-navigation/sectionNavigationView.ts") + read("src/ui/navigation/section-navigation/sectionNavigationTypes.ts");
 const styles = read("src/styles/coreWorkspaces.css");
 const lineups = read("src/pages/lineups.ts");
 const prediction = read("src/pages/prediction.ts");

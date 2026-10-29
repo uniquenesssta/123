@@ -62,7 +62,7 @@ const teamsPage = text("src/pages/teams.ts");
 const playersPage = text("src/pages/players.ts");
 const types = text("src/types.ts");
 const styles = text("src/styles/components.css");
-const entityStyles = text("src/styles/entityCenter.css") + readStylesheet(root, "src/ui/tokens/index.css") + text("src/app/shell/application-shell/applicationShell.css");
+const entityStyles = text("src/styles/entityCenter.css") + readStylesheet(root, "src/ui/tokens/index.css") + text("src/ui/layout/application-frame/applicationFrame.css");
 const readme = text("README.md");
 
 assert(contract.contract_id === "football.team-player-management-contract.v1", "球队与球员管理契约ID错误");

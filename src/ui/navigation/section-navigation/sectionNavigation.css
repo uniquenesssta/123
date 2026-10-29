@@ -1,0 +1,25 @@
+/* Shared default matches the approved compact action navigation, including standalone use. */
+.workspace-section-nav[data-ui-navigation] { display:flex; align-items:center; gap:var(--fip-space-sm); min-width:0; max-width:100%; overflow-x:auto; overscroll-behavior:contain; }
+.workspace-section-nav[data-ui-navigation] > button { display:inline-flex; align-items:center; justify-content:center; flex:0 0 auto; width:auto; min-width:0; height:32px; min-height:32px; grid-template-columns:none; gap:var(--fip-space-sm); padding:0 12px; border:1px solid var(--fip-border); border-radius:var(--fip-radius-md); color:var(--fip-text); background:var(--fip-surface); box-shadow:none; }
+.workspace-section-nav[data-ui-navigation] .workspace-section-copy { display:block; min-width:0; width:auto; }
+.workspace-section-nav[data-ui-navigation] .workspace-section-copy strong { font:500 13px/18px var(--fip-type-control-family); white-space:nowrap; color:inherit; }
+.workspace-section-nav[data-ui-navigation] > button.active { color:var(--fip-on-accent); background:var(--fip-accent); border-color:transparent; }
+.workspace-section-nav[data-ui-navigation] > button::after { display:none; }
+.workspace-section-nav[data-ui-navigation] > button:focus-visible { outline:1px solid var(--fip-brand); outline-offset:-1px; }
+.core-local-navigation { min-height: 32px; padding: 0; border: 0; border-radius: 0; background: transparent; }
+.core-local-navigation .workspace-section-nav, .module-local-navigation .workspace-section-nav { display: flex; align-items: center; gap: 8px; }
+.core-local-navigation .workspace-section-nav-item, .module-local-navigation .workspace-section-nav-item {
+  display: inline-flex; align-items: center; justify-content: center; width: auto; min-width: 0;
+  min-height: 32px; padding: 0 12px; gap: 8px; border: 1px solid var(--fip-border); border-radius: 7px;
+  color: var(--fip-text); background: var(--fip-surface); box-shadow: none;
+}
+.core-local-navigation .workspace-section-nav-item + .workspace-section-nav-item { border-left: 1px solid var(--fip-border); }
+.core-local-navigation .workspace-section-nav-item.active, .module-local-navigation .workspace-section-nav-item.active { color: var(--fip-on-accent); border-color: transparent; background: var(--fip-accent); }
+.core-local-navigation .workspace-section-nav-item::after { display: none; }
+.core-local-navigation .workspace-section-copy strong, .module-local-navigation .workspace-section-copy strong { font: 500 13px/18px var(--fip-type-control-family) !important; }
+.workspace-section-nav-item > b { font: 400 11px/16px var(--fip-type-meta-family); color: inherit; background: transparent; }
+.core-workspace-page, .module-workspace-page { gap: 8px; }
+
+.workspace-section-nav[data-ui-navigation] > button.active:focus-visible { outline-color:var(--fip-on-accent); }
+.workspace-anchor-nav[data-ui-navigation="vertical"] { display:block; }
+.workspace-anchor-nav[data-ui-navigation="vertical"] > div { display:flex; flex-direction:column; align-items:stretch; gap:var(--fip-space-sm); }

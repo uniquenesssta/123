@@ -22,12 +22,15 @@ export function productionFixture(root) {
   };
   const entry="scripts/design-refresh/browserFixture.ts";bundle(entry);
   const files=[...read("src/main.ts").matchAll(/^import "(\.\/[^"\n]+\.css)";/gm)].map(m=>m[1].replace("./","src/"));
-  for(const page of ["dashboard","teams","lineups","rules"]) files.push(`src/pages/${page}/${({dashboard:"dashboard",teams:"teamWorkspace",lineups:"lineupWorkspace",rules:"rulesCatalogue"})[page]}.css`);
+  for(const page of ["dashboard","teams","players","lineups","rules"]) files.push(`src/pages/${page}/${({dashboard:"dashboard",teams:"teamWorkspace",players:"playerWorkspace",lineups:"lineupWorkspace",rules:"rulesCatalogue"})[page]}.css`);
   const css=files.map(file=>readStylesheet(root,file).replace(/url\("([^"\n]+\.svg)"\)/g,(_m,asset)=>`url("data:image/svg+xml;base64,${readFileSync(resolve(root,dirname(file),asset)).toString("base64")}")`)).join("\n");
   const runtime=`const modules=${JSON.stringify(modules)};const cache={};function load(id){if(cache[id])return cache[id];const r=modules[id],exports={};cache[id]=exports;new Function('exports','require',r.output)(exports,s=>load(r.imports[s]));return exports;}`;
   const main=read("src/main.ts");
   const filterSource=main.slice(main.indexOf("function filterRulesCompetitionCatalogue()"),main.indexOf("function selectRulesDirectoryLevel("));
   if(!filterSource.startsWith("function filterRulesCompetitionCatalogue")) throw Error("Production competition filter missing");
   const filter=ts.transpileModule(filterSource,{compilerOptions:{target:ts.ScriptTarget.ES2022}}).outputText;
-  return {css,script:`${runtime}\n${filter}\nwindow.renderFixture=load(${JSON.stringify(entry)}).renderFixture;window.clearRulesCatalogueFilters=load(${JSON.stringify(entry)}).clearRulesCatalogueFilters;`};
+  const playerLoadingSource=main.slice(main.indexOf("function setPlayerPageLoading("),main.indexOf("async function loadPlayerPage("));
+  if(!playerLoadingSource.startsWith("function setPlayerPageLoading"))throw Error("Production local player loading helper missing");
+  const playerLoading=ts.transpileModule(playerLoadingSource,{compilerOptions:{target:ts.ScriptTarget.ES2022}}).outputText;
+  return {css,script:`${runtime}\n${filter}\nconst updatePaginationView=load("src/ui/navigation/index.ts").updatePaginationView;let playerPageLoading=false;const playerCursorHistory=[];let playerListPage=load(${JSON.stringify(entry)}).fixturePlayerPage;${playerLoading}\nwindow.setFixturePlayerLoading=setPlayerPageLoading;window.renderFixture=load(${JSON.stringify(entry)}).renderFixture;window.clearRulesCatalogueFilters=load(${JSON.stringify(entry)}).clearRulesCatalogueFilters;`};
 }

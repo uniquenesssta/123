@@ -2,7 +2,7 @@
 
 ## 当前阶段状态
 
-`IN_PROGRESS`。01～13 DONE；13 精确 dac0e9c / Windows run40218221375 全部步骤成功，证据 ZIP 的 SHA-256、打包与 startup 报告已独立核验。用户 2026-10-28 授权推进 R12-14：Feedback 与 Overlays 已实现，VERIFYING；342项专项、Rust检查/测试和独立修复复审通过，3e335ec2自身CI架构失败，Windows自动验收未执行；[状态来源修复](R12-14-ci-fix-state-provenance.md)已实施，完整架构与93步前端通过，新CI待验。15～19 BLOCKED。沿唯一 rewrite/r12-frontend-foundation-ui-system，工作目录 O:/Project/FOODBALL/123 r3。不轮询 CI。
+`IN_PROGRESS`。01～14 DONE；5886a439cc301a7fa315c1a8adf7b3b33c0b1d87：Windows run40863418461 / job123412066355 全步骤成功；artifact12894043614，ZIP SHA-256 2c06b3c06ffd25530680029b45fd3efaa69a3afec7d3241c00904abe59da4a5e。MSI 17,969,152 bytes、NSIS 15,605,981 bytes；startup profile pass，7条有效日志、0错误，bootstrap/read_workspace_state/save_workspace_state完成。startup不等于Full业务链路。2026-10-29独立核验，不轮询。15 VERIFYING；16～19 BLOCKED。工作目录 O:/Project/FOODBALL/123 r3。
 
 ## 依据与设计边界
 
@@ -27,8 +27,8 @@
 | R12-11 | [UI Primitives](R12-11-ui-primitives.md) | DONE · 自身Windows完整SUCCESS，run40188280192 |
 | R12-12 | [Forms](R12-12-forms.md) | DONE · 自身Windows完整SUCCESS，run40194352653 |
 | R12-13 | [Data Display](R12-13-data-display.md) | DONE · 自身 Windows 完整 SUCCESS，run40218221375 |
-| R12-14 | [Feedback 与 Overlays](R12-14-feedback-and-overlays.md) | VERIFYING · 3e335ec2自身CI架构失败，来源修复本地验收通过，新CI待验 |
-| R12-15 | Navigation 与 Layout | BLOCKED |
+| R12-14 | [Feedback 与 Overlays](R12-14-feedback-and-overlays.md) | DONE · 5886a439精确CI、打包、startup核验通过 |
+| R12-15 | [Navigation 与 Layout](R12-15-navigation-and-layout.md) | VERIFYING · 93步前端/构建、Rust、startup及独立复审通过；精确CI待发布后验收 |
 | R12-16 | UI Patterns | BLOCKED |
 | R12-17 | Accessibility、Icons 与 Assets | BLOCKED |
 | R12-18 | 样式入口与边界 | BLOCKED |

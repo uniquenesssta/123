@@ -1,3 +1,4 @@
+import { updatePaginationView } from "./ui/navigation";
 import "./styles/app.css";
 import { clearRulesCatalogueFilters } from "./pages/rules/catalogueFilters";
 import "./styles/components.css";
@@ -10,19 +11,15 @@ import "./styles/visualSystem.css";
 import "./styles/workspacePanels.css";
 import "./ui/tokens/index.css";
 import "./styles/foundation/legacyControls.css";
-import "./styles/foundation/workspaceNavigation.css";
 import "./ui/icons/iconSlot.css";
 import "./ui/primitives/index.css";
 import "./ui/forms/index.css";
 import "./ui/data-display/index.css";
 import "./ui/feedback/index.css";
 import "./ui/overlays/index.css";
+import "./ui/navigation/index.css";
+import "./ui/layout/index.css";
 import { focusValidationTarget } from "./ui/forms/validation-summary";
-import "./app/shell/application-shell/applicationShell.css";
-import "./app/shell/sidebar/sidebar.css";
-import "./app/shell/topbar/topbar.css";
-import "./app/shell/page-frame/pageFrame.css";
-import "./app/shell/content-region/contentRegion.css";
 import "./app/warnings/warning-center/warningCenter.css";
 import {
   api,
@@ -1795,17 +1792,8 @@ function setPlayerPageLoading(active: boolean): void {
   );
   if (!main) return;
   main.setAttribute("aria-busy", String(active));
-  main.querySelectorAll<HTMLButtonElement>(
-    '[data-action="previous-player-page"], [data-action="next-player-page"]',
-  ).forEach((button) => {
-    if (active) {
-      button.dataset.paginationDisabled = String(button.disabled);
-      button.disabled = true;
-      return;
-    }
-    button.disabled = button.dataset.paginationDisabled === "true";
-    delete button.dataset.paginationDisabled;
-  });
+  const pagination=main.querySelector<HTMLElement>(".ui-pagination");
+  if(pagination)updatePaginationView(pagination,{page:playerCursorHistory.length+1,hasMore:playerListPage?.has_more??false,busy:active,summary:playerListPage?`本页 ${playerListPage.items.length} 条结果`:"尚未载入"});
 }
 
 async function loadPlayerPage(
@@ -1836,14 +1824,14 @@ function refreshPlayerPageDom(): boolean {
   const footer = document.querySelector<HTMLElement>(
     ".entity-page-players .entity-main-footer",
   );
-  const pageLabel = footer?.querySelector<HTMLElement>("div > b") ?? null;
+  const pagination = footer?.querySelector<HTMLElement>(".ui-pagination") ?? null;
   const previousButton = footer?.querySelector<HTMLButtonElement>(
     '[data-action="previous-player-page"]',
   ) ?? null;
   const nextButton = footer?.querySelector<HTMLButtonElement>(
     '[data-action="next-player-page"]',
   ) ?? null;
-  if (!tbody || !resultCount || !footer || !pageLabel || !previousButton || !nextButton) {
+  if (!tbody || !resultCount || !footer || !pagination || !previousButton || !nextButton) {
     return false;
   }
 
@@ -1853,9 +1841,7 @@ function refreshPlayerPageDom(): boolean {
     selectedPlayerIds,
   );
   resultCount.textContent = `${playerListPage.items.length} 条当前结果`;
-  pageLabel.textContent = `第 ${playerCursorHistory.length + 1} 页`;
-  previousButton.disabled = playerCursorHistory.length === 0;
-  nextButton.disabled = !playerListPage.has_more;
+  updatePaginationView(pagination,{page:playerCursorHistory.length+1,hasMore:playerListPage.has_more,busy:playerPageLoading,summary:`本页 ${playerListPage.items.length} 条结果`});
   const selectAll = document.querySelector<HTMLInputElement>("#player-select-all");
   if (selectAll) selectAll.checked = false;
 

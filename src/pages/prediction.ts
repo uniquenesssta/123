@@ -1,7 +1,8 @@
 import { competitionKindOptions } from "../components/competition";
 import { escapeHtml } from "../components/format";
 import { inlineDatabaseSetup } from "../components/databaseSetup";
-import { workspaceAnchorNavigation, workspaceSectionNavigation } from "../components/workspace";
+import { workspaceAnchorNavigation, workspaceSectionNavigation } from "../ui/navigation";
+
 import { taskContextRibbon, taskPageHeader } from "../components/taskWorkspace";
 import { runHistoryMarkup } from "./runs";
 import { p4WorkbenchMarkup } from "./p4Workbench";

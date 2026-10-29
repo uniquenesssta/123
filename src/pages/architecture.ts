@@ -1,5 +1,6 @@
 import { taskContextRibbon, taskPageHeader } from "../components/taskWorkspace";
-import { workspaceTaskAnchorNavigation } from "../components/workspace";
+import { workspaceTaskAnchorNavigation } from "../ui/navigation";
+
 
 export function architecturePage(): string {
   const navigation = workspaceTaskAnchorNavigation([

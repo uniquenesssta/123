@@ -17,7 +17,7 @@ const modal = read("src/app/modal/workspacePanelController.ts");
 const shell = JSON.parse(read("contracts/global-visual-system-contract.json")).shell_source_entries.map(read).join("\n");
 const main = read("src/main.ts");
 const teams = read("src/pages/teams.ts");
-const panelCss = read("src/styles/workspacePanels.css") + read("src/app/shell/content-region/contentRegion.css");
+const panelCss = read("src/styles/workspacePanels.css") + read("src/ui/layout/content-region/contentRegion.css");
 const entityCss = read("src/styles/entityCenter.css");
 const runtimeLog = read("src-tauri/src/runtime_log.rs");
 
@@ -30,8 +30,8 @@ requireTrue(modal.includes("restore(): void") && main.includes("modal.restore();
 const shellController = read("src/app/shell/application-shell/applicationShellController.ts");
 requireTrue(main.includes("shellController?.handleAction(action)") && shellController.includes('case "workspace-history-back"') && shellController.includes('case "workspace-history-forward"'), "返回/前进按钮未接入唯一Shell事件链");
 requireTrue(/async function navigateTo[\s\S]*?navigation\.navigate\(nextPage,[\s\S]*?started\(\)\s*\{\s*modal\.reset\(\);/.test(main), "跨二级页面导航未在切换开始清理旧右侧工作区历史");
-requireTrue(shell.includes('iconButtonView({ action: "workspace-history-back"') && shell.includes('iconButtonView({ action: "workspace-history-forward"'), "顶部栏未提供返回/前进按钮");
-requireTrue(read("src/app/shell/page-frame/pageFrameView.ts").includes("${contentRegionView(options.content, options.navigationPending, options.navigationFailed)}</main>") && read("src/app/shell/content-region/contentRegionView.ts").includes('id="modal-root"'), "右侧工作区根节点未放在主内容区域内");
+requireTrue(shell.includes('action: "workspace-history-back"') && shell.includes('iconButtonView({ action: "workspace-history-forward"'), "顶部栏未提供返回/前进按钮");
+requireTrue(read("src/app/shell/page-frame/pageFrameView.ts").includes("mainFrameView(topbar, contentRegionView(options.content, options.navigationPending, options.navigationFailed))") && read("src/ui/layout/content-region/contentRegionView.ts").includes('id="modal-root"'), "右侧工作区根节点未放在主内容区域内");
 requireTrue(panelCss.includes(".main-content.workspace-panel-open > .page-container") && panelCss.includes("display: none !important"), "打开右侧工作区时未替换原页面内容");
 requireTrue(panelCss.includes(".workspace-detail-body") && panelCss.includes("overflow: auto"), "右侧完整工作区内容不可滚动");
 

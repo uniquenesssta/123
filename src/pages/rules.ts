@@ -3,7 +3,8 @@ import { competitionKindLabel, competitionKindOptions, stageKindOptions } from "
 import { escapeHtml } from "../components/format";
 import { inlineDatabaseSetup } from "../components/databaseSetup";
 import { taskContextRibbon, taskPageHeader } from "../components/taskWorkspace";
-import { workspaceSectionNavigation, workspaceTaskAnchorNavigation } from "../components/workspace";
+import { workspaceSectionNavigation, workspaceTaskAnchorNavigation } from "../ui/navigation";
+
 import type { BootstrapResponse, CompetitionRecord, RulePackageDraft } from "../types";
 
 type CompetitionScope = "national" | "club" | "other";

@@ -14,8 +14,8 @@ const navigation = read("src/app/router/routeRegistry.ts");
 const shell = JSON.parse(read("contracts/global-visual-system-contract.json")).shell_source_entries.map(read).join("\n");
 const viewState = read("src/app/workspace/workspaceVersion.ts");
 const types = read("src/types.ts");
-const layout = ["src/app/shell/application-shell/applicationShell.css","src/app/shell/sidebar/sidebar.css","src/app/shell/topbar/topbar.css","src/app/shell/page-frame/pageFrame.css","src/app/shell/content-region/contentRegion.css"].map(read).join("\n");
-const entityStyles = read("src/styles/entityCenter.css") + read("src/app/shell/application-shell/applicationShell.css");
+const layout = ["src/ui/layout/application-frame/applicationFrame.css","src/ui/navigation/sidebar/sidebar.css","src/ui/navigation/topbar/topbar.css","src/ui/layout/page-frame/pageFrame.css","src/ui/layout/content-region/contentRegion.css"].map(read).join("\n");
+const entityStyles = read("src/styles/entityCenter.css") + read("src/ui/layout/application-frame/applicationFrame.css");
 const contract = JSON.parse(read("contracts/workspace-ui-contract.json"));
 
 const pageUnion = types.match(/export type Page\s*=([\s\S]*?);/)?.[1] ?? "";
@@ -37,9 +37,9 @@ check(unknownPages.length === 0, `二级菜单包含未知页面：${unknownPage
 
 check(shell.includes('class="primary-rail"') && shell.includes('class="secondary-sidebar"'), "Shell未渲染固定一级栏和上下文二级栏");
 check(shell.includes('aria-label="一级菜单"') && shell.includes('data-current-module='), "Shell缺少一级菜单语义或当前模块标识");
-check(shell.includes("activeModule.items.map") && shell.includes('aria-current="page"'), "二级菜单未按当前一级模块渲染或缺少活动页语义");
+check(shell.includes("activeModule.items.map") && shell.includes('level === "primary" ? "true" : "page"'), "二级菜单未按当前一级模块渲染或缺少活动页语义");
 check(shell.includes("secondary-reveal-button") && shell.includes("secondary-collapse-button"), "二级菜单缺少收起与恢复入口");
-check(shell.includes("${activeModule.label} / ${activeTitle}"), "顶部面包屑未显示一级/二级层级");
+check(shell.includes('activeModule.label+" / "+navigationItemForPage(options.page).label'), "顶部面包屑未显示一级/二级层级");
 check(!shell.includes("nav-management"), "旧管理折叠菜单仍残留在Shell");
 
 check(layout.includes(".primary-rail") && layout.includes(".secondary-sidebar") && layout.includes(".secondary-nav-item"), "双层导航视觉样式不完整");

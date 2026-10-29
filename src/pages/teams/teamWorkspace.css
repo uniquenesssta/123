@@ -1,5 +1,5 @@
 .application-shell .entity-page-teams { height: 100%; min-height: 0; grid-template-rows: auto auto 32px minmax(0,1fr); }
-.application-shell .team-directory-only { height: 100%; min-height: 0; grid-template-rows: minmax(0,1fr); overflow: hidden; }
+.application-shell .team-directory-only { grid-template-columns: minmax(0,1fr); height: 100%; min-height: 0; grid-template-rows: minmax(0,1fr); overflow: hidden; }
 .application-shell .team-catalogue-layout { display: grid; grid-template-columns: 248px minmax(0,1fr); gap: 12px; width: 100%; min-height: 0; height: 100%; }
 .application-shell .team-catalogue-layout > .entity-directory { display: flex; flex-direction: column; align-items: stretch; gap: 8px; padding: 12px; min-width: 0; min-height: 0; overflow: auto; border: 0; border-radius: 16px; background: var(--fip-surface); }
 .application-shell :is(.team-catalogue-layout,.team-detail-workspace) .entity-directory-header { min-height: 60px; padding: 0; border: 0; }
@@ -33,7 +33,7 @@
 .application-shell .team-catalogue-results .entity-select-check input { width: 20px; height: 20px; margin: 0; accent-color: var(--fip-accent); }
 .application-shell .team-catalogue-results .entity-directory-open { min-width: 0; width: 100%; min-height: 54px; padding: 8px; border: 0; border-radius: 7px; background: transparent; }
 .application-shell .team-catalogue-results .entity-directory-foot { grid-column: 1/-1; margin: 0; padding: 0; }
-.application-shell .team-catalogue-results .entity-directory-footer { display: flex; align-items: center; justify-content: center; gap: 8px; padding: 0; border: 0; background: transparent; }
+.application-shell .team-catalogue-results .entity-directory-footer { width: 100%; min-width: 0; align-self: stretch; flex-shrink: 0; display: flex; align-items: center; justify-content: center; gap: 8px; padding: 0; border: 0; background: transparent; }
 .application-shell .team-detail-workspace { height: 100%; grid-template-rows: minmax(0,1fr); gap: 12px; }
 .application-shell .team-detail-workspace > .entity-inspector { display: block !important; position: relative; inset: auto; z-index: auto; width: 100%; min-width: 0; height: 100%; transform: none; box-shadow: var(--fip-panel-shadow); }
 .application-shell .team-detail-workspace.inspector-collapsed > .entity-inspector { display: none !important; }

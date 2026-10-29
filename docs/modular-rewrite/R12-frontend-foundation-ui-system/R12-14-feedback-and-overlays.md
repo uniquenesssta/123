@@ -1,6 +1,6 @@
 # R12-14 Feedback 与 Overlays
 
-状态：VERIFYING（本地实现完成，发布批次的 Windows 打包/启动 CI 待提交后单独验收）。2026-10-28 用户授权，在最新 UI 刷新基线 518700f59a7de451afbe9655b91abe8776a32adb 上实施。沿 rewrite/r12-frontend-foundation-ui-system，工作目录 O:/Project/FOODBALL/123 r3。15～19 未实施，不轮询 CI。
+状态：DONE。5886a439cc301a7fa315c1a8adf7b3b33c0b1d87：Windows run40863418461 / job123412066355 全步骤成功；artifact12894043614，ZIP SHA-256 2c06b3c06ffd25530680029b45fd3efaa69a3afec7d3241c00904abe59da4a5e。MSI 17,969,152 bytes、NSIS 15,605,981 bytes；startup profile pass，7条有效日志、0错误，bootstrap/read_workspace_state/save_workspace_state完成。startup不等于Full业务链路。2026-10-29独立核验，不轮询。 用户授权开始15；16～19未实施。
 
 ## 前置与范围
 
@@ -161,3 +161,8 @@ Impeccable 按已有批准系统扩展，CLI 上下文启动失败后使用人�
 3e335ec2的run40734621493在Database Service架构检查失败，后续Windows验收/打包未执行。上一轮92步通过之后修改了机器状态契约，故“最终冻结全量通过”不能作为该提交完整通过的证据。修复将数据库owner的R3-02迁移来源与last_updated_task分开，保留原保护并补正反例；详[CI修复记录](R12-14-ci-fix-state-provenance.md)。14维持VERIFYING，15未开始，不轮询新CI。
 
 CI修复已完成完整架构及93步前端重验（342项浮层检查），相关可执行/契约指纹在验收期间保持不变；机器契约修改后没有沿用此前验证结论。修复提交自身Windows CI/MSI/NSIS仍待验。
+
+
+## 2026-10-29最终收尾
+
+本页以上“待验/VERIFYING/15未开始”属于此前时间点的记录；当前状态以页首及本节为准。修复5886a439的run40863418461、job123412066355、artifact12894043614及SHA-256已独立核验，Windows全部步骤成功，MSI/NSIS和7条startup日志pass。14 DONE，用户随后授权15。Full业务链路仍未验证。

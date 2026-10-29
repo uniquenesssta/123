@@ -127,12 +127,8 @@
     "principle": "slightly-larger-on-2k-without-losing-density"
   },
   "shell_style_entries": [
-    "src/ui/tokens/index.css",
-    "src/app/shell/application-shell/applicationShell.css",
-    "src/app/shell/sidebar/sidebar.css",
-    "src/app/shell/topbar/topbar.css",
-    "src/app/shell/page-frame/pageFrame.css",
-    "src/app/shell/content-region/contentRegion.css"
+    "src/ui/layout/index.css",
+    "src/ui/navigation/index.css"
   ],
   "feedback_style_entries": [
     "src/ui/feedback/index.css",
@@ -145,10 +141,15 @@
     "src/app/shell/topbar/topbarView.ts",
     "src/app/shell/page-frame/pageFrameView.ts",
     "src/app/shell/content-region/contentRegionView.ts",
-    "src/ui/primitives/icon-button/iconButtonView.ts"
+    "src/ui/primitives/icon-button/iconButtonView.ts",
+    "src/ui/navigation/sidebar/sidebarView.ts",
+    "src/ui/navigation/sidebar/navigationItemView.ts",
+    "src/ui/navigation/topbar/topbarView.ts",
+    "src/ui/layout/application-frame/applicationFrameView.ts",
+    "src/ui/layout/page-frame/pageFrameView.ts",
+    "src/ui/layout/content-region/contentRegionView.ts"
   ],
   "foundation_style_entries": [
-    "src/styles/foundation/legacyControls.css",
-    "src/styles/foundation/workspaceNavigation.css"
+    "src/styles/foundation/legacyControls.css"
   ]
 }

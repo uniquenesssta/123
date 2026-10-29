@@ -1,0 +1,3 @@
+# Navigation and Layout verification
+
+verifyNavigationLayout.mjs runs the actual exported UI in Windows Chromium at360/960/1440 and both themes. Native keyboard activation, associated panels, disabled skip, busy pagination, destroy, dimensions, alignment, escaping, valid page bounds and source ownership are checked. Fixture host data are explicitly synthetic; real Teams/Players pagination uses backend has_more. Existing Shell fixtures separately cover960/1440/2560, both themes and expanded/collapsed navigation, restoration and async leases. Registered once in the existing global/full gate; no CI runner added.

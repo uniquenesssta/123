@@ -1,0 +1,7 @@
+.ui-segmented { display:inline-flex; align-items:center; gap:0; padding:var(--fip-segmented-container-padding); height:var(--fip-control-height); max-width:100%; min-width:0; border-radius:var(--fip-radius-md); background:var(--fip-subtle); overflow-x:auto; }
+.ui-segmented button { display:inline-flex; align-items:center; justify-content:center; gap:var(--fip-space-xs); flex:0 0 auto; min-width:var(--fip-segmented-item-min-width); height:var(--fip-segmented-item-height); min-height:var(--fip-segmented-item-height); padding:0 var(--fip-segmented-item-padding-x); border:0; border-radius:var(--fip-radius-md); color:var(--fip-text); background:transparent; box-shadow:none; font:var(--fip-type-label-weight) var(--fip-type-label-size)/var(--fip-type-label-line-height) var(--fip-type-body-family); white-space:nowrap; }
+.ui-segmented button[aria-pressed="true"] { background:var(--fip-accent-soft); color:var(--fip-strong); }
+.ui-segmented button:hover:not(:disabled) { background:var(--fip-accent-soft); }
+.ui-segmented button:active:not(:disabled) { background:var(--fip-accent); color:var(--fip-on-accent); }
+.ui-segmented button:focus-visible { outline:1px solid var(--fip-brand); outline-offset:-1px; }
+.ui-segmented button:disabled { opacity:var(--fip-disabled-opacity); cursor:default; }

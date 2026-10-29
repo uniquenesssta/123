@@ -6,7 +6,7 @@ const failures = [];
 const requireTrue = (condition, message) => { if (!condition) failures.push(message); };
 
 const layout = read("src/styles/layout.css");
-const entityStyles = read("src/styles/entityCenter.css") + readStylesheet(process.cwd(), "src/ui/tokens/index.css") + read("src/app/shell/application-shell/applicationShell.css");
+const entityStyles = read("src/styles/entityCenter.css") + readStylesheet(process.cwd(), "src/ui/tokens/index.css") + read("src/ui/layout/application-frame/applicationFrame.css");
 const styles = read("src/styles/app.css");
 const shell = JSON.parse(read("contracts/global-visual-system-contract.json")).shell_source_entries.map(read).join("\n");
 const navigation = read("src/app/router/routeRegistry.ts");

@@ -24,7 +24,7 @@ const playerDirectoryMapper = read("crates/persistence-postgres/src/adapters/cat
 const teamSquadPersistence = read("crates/persistence-postgres/src/adapters/catalog/teams/detail/read_squad.rs");
 const teamSquadMapper = read("crates/persistence-postgres/src/adapters/catalog/teams/detail/squad_mapper.rs");
 const teamRecordMapper = read("crates/persistence-postgres/src/adapters/catalog/teams/detail/record_mapper.rs");
-const css = read("src/styles/entityCenter.css") + readStylesheet(root, "src/ui/tokens/index.css") + read("src/app/shell/application-shell/applicationShell.css");
+const css = read("src/styles/entityCenter.css") + readStylesheet(root, "src/ui/tokens/index.css") + read("src/ui/layout/application-frame/applicationFrame.css");
 
 check(main.indexOf('import "./styles/entityCenter.css";') > main.indexOf('import "./styles/layout.css";'), "资源中心样式必须最后加载，避免旧阶段样式反向覆盖");
 check(shell.includes("primary-rail") && shell.includes("secondary-sidebar") && navigation.includes('key: "management"'), "管理一级模块及上下文二级菜单必须常驻");

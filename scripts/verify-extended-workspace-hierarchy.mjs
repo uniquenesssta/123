@@ -9,7 +9,7 @@ const check = (condition, message) => { if (!condition) failures.push(message); 
 
 const main = read("src/main.ts");
 const shell = JSON.parse(read("contracts/global-visual-system-contract.json")).shell_source_entries.map(read).join("\n");
-const workspace = read("src/components/workspace.ts");
+const workspace = read("src/ui/navigation/section-navigation/sectionNavigationView.ts");
 const rules = read("src/pages/rules.ts");
 const release = read("src/pages/release.ts");
 const analytics = read("src/pages/analytics.ts");
