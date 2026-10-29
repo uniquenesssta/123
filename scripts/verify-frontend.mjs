@@ -16,6 +16,7 @@ const nodeChecks = [
   "verify-application-composition.mjs",
   "verify-application-ports.mjs",
   "verify-database-service.mjs",
+  "architecture/verifyDatabaseStateMetadata.mjs",
   "verify-competition-rules-service.mjs",
   "verify-teams-players-service.mjs",
   "verify-player-directory-detail.mjs",

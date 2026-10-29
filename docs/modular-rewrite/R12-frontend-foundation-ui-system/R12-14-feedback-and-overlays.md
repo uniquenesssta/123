@@ -154,3 +154,10 @@ Impeccable 按已有批准系统扩展，CLI 上下文启动失败后使用人�
 ## 最终冻结收尾
 
 完整92步前端门禁exit0：O:/Project/FOODBALL/Temp/r12-14-frontend-frozen.log。该次实际342项浮层检查和48张截图位于O:/Project/FOODBALL/logs/r12-14-overlays-1793195596412/，与独立审查使用的截图同源；documenter独立核验360 Light Popover截图SHA-256一致。静态检查、构建、自动测试与实际startup结果分别如上，MSI/NSIS、精确提交CI与Full仍待验。保留原有Vite大于500kB分块提示，没有调高阈值或关闭检查。
+
+
+## 2026-10-29 CI失败订正与修复
+
+3e335ec2的run40734621493在Database Service架构检查失败，后续Windows验收/打包未执行。上一轮92步通过之后修改了机器状态契约，故“最终冻结全量通过”不能作为该提交完整通过的证据。修复将数据库owner的R3-02迁移来源与last_updated_task分开，保留原保护并补正反例；详[CI修复记录](R12-14-ci-fix-state-provenance.md)。14维持VERIFYING，15未开始，不轮询新CI。
+
+CI修复已完成完整架构及93步前端重验（342项浮层检查），相关可执行/契约指纹在验收期间保持不变；机器契约修改后没有沿用此前验证结论。修复提交自身Windows CI/MSI/NSIS仍待验。

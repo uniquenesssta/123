@@ -1148,3 +1148,8 @@ GitHub Actions日志有Node.js20强制切至24、punycode和url.parse弃用提�
 ## R12-14 Feedback 与 Overlays（2026-10-28）
 
 统一UI的真实模块测试接入原 verify-global-visual-system / verify:frontend。运行 node scripts/verify-overlays.mjs：3宽度×2主题，原生Windows焦点/输入/滚动与异步生命周期；结果342项PASS，48张截图。Rust fmt、Clippy、工作区测试及Tauri开发构建通过；ignored的真实PG/私有回归不算PASS。隔离配置的真实Tauri startup通过，窗口采集/点击受工具限制；本批MSI/NSIS、CI与Full另验。详[R12-14记录](modular-rewrite/R12-frontend-foundation-ui-system/R12-14-feedback-and-overlays.md)。过程级TEMP/TMP使用项目Temp，先加载O:/Project/FOODBALL/project-temp.ps1。
+
+
+## R12-14 状态来源回归（2026-10-29）
+
+原3e335ec2在架构检查失败，Windows自动验收未执行。scripts/architecture/verifyDatabaseStateMetadata.mjs以真实Database Service验证器验证2正例/4反例，覆盖后续任务修改清单及迁移来源/owner缺失或回退。入口已接入verify:architecture和完整前端，不冻结未来last_updated_task。详[R12-14 CI修复记录](modular-rewrite/R12-frontend-foundation-ui-system/R12-14-ci-fix-state-provenance.md)。

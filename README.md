@@ -2,7 +2,7 @@
 
 ## R12-14 Feedback 与 Overlays（2026-10-28，VERIFYING）
 
-13 自身 Windows 证据已核验收尾；14 已按批准 Figma 接入统一反馈、异步/名称确认、告警抽屉、真实右键菜单和页面快速导航，保留原业务保护与详情草稿。342项 Windows 浏览器专项、Rust fmt/Clippy/工作区测试与独立修复复审通过；完整92步前端门禁通过；本批公开发布和 Windows 打包/CI待单独验收。15～19未实施，不轮询CI。工作目录 O:/Project/FOODBALL/123 r3；TEMP/TMP使用O:/Project/FOODBALL/Temp。详[14实施记录](docs/modular-rewrite/R12-frontend-foundation-ui-system/R12-14-feedback-and-overlays.md)。
+13 自身 Windows 证据已核验收尾；14 已按批准 Figma 接入统一反馈、异步/名称确认、告警抽屉、真实右键菜单和页面快速导航，保留原业务保护与详情草稿。342项 Windows 浏览器专项、Rust fmt/Clippy/工作区测试与独立修复复审通过；3e335ec2已发布，其CI在Database Service架构检查失败，Windows自动验收未执行；本地修复将迁移来源与清单修改任务分离，完整架构与93步前端重新验收通过，新CI待验，详[CI修复记录](docs/modular-rewrite/R12-frontend-foundation-ui-system/R12-14-ci-fix-state-provenance.md)。15～19未实施，不轮询CI。工作目录 O:/Project/FOODBALL/123 r3；TEMP/TMP使用O:/Project/FOODBALL/Temp。详[14实施记录](docs/modular-rewrite/R12-frontend-foundation-ui-system/R12-14-feedback-and-overlays.md)。
 
 ## 已批准 Figma 重新接入（2026-10-28）
 

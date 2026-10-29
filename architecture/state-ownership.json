@@ -22,7 +22,8 @@
     "scope": "lifetime boundary",
     "writers": "allowed mutation boundary",
     "forbidden": "locations that must not create duplicate ownership",
-    "transition": "planned target; not current owner"
+    "transition": "planned target; not current owner",
+    "migration_task": "task that established this current state owner; independent of the last manifest edit"
   },
   "states": [
     {
@@ -285,7 +286,8 @@
         "src/**",
         "crates/domain/**"
       ],
-      "transition": null
+      "transition": null,
+      "migration_task": "R3-02"
     },
     {
       "id": "application.p4-worker",

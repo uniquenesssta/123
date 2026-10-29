@@ -125,7 +125,7 @@ check(
   activeDatabaseState?.owner === "crates/application/src/services/database/service.rs::DatabaseService.session",
   "application.active-database 状态所有者未切换到 DatabaseService.session",
 );
-check(stateOwnership.last_updated_task === "R3-02", "状态所有权契约未登记 R3-02 更新");
+check(activeDatabaseState?.migration_task === "R3-02", "application.active-database 未登记 R3-02 归属迁移来源");
 check(pkg.scripts?.["verify:database-service"] === "node scripts/verify-database-service.mjs", "package.json 缺少 Database Service 验证入口");
 check(pkg.scripts?.["verify:architecture"]?.includes("verify-database-service.mjs"), "verify:architecture 未接入 Database Service 门禁");
 
