@@ -1,6 +1,6 @@
 # R13-03 赛事层级、规则包与路由
 
-状态：**VERIFYING（CI失败已定位修复，待修复提交自身CI/产物验收）**。原代码 `12ba495c583ea25fd32b508aa68cceea9407f9d0` 的 [run41110961979](https://github.com/uniquenesssta/123/actions/runs/41110961979) / job124252955643 已确认为 **completed / failure**，head/分支均匹配。失败在前端依赖安装前的架构门禁：新增运行期行为测试需要 TypeScript；Windows 自动验收被跳过，0 个产物，不能收尾。用户本轮“收尾03开始04”授权继续修复与核验；原04已按任务书并入03，本轮逐项核对，05未启动。
+状态：**VERIFYING（修复版CI运行中，未完成收尾）**。原代码 `12ba495c583ea25fd32b508aa68cceea9407f9d0` 的 [run41110961979](https://github.com/uniquenesssta/123/actions/runs/41110961979) / job124252955643 已确认为 **completed / failure**，head/分支均匹配。失败在前端依赖安装前的架构门禁：新增运行期行为测试需要 TypeScript；Windows 自动验收被跳过，0 个产物，不能收尾。用户本轮“收尾03开始04”授权继续修复与核验；原04已按任务书并入03，本轮逐项核对，05未启动。
 
 依据：[阶段任务书](../../football-model-platform-modular-rewrite-19-docs/13-R13-core-ui-features.md)、[执行约定](../remaining-execution-contract.md)、[前期遗留账本](../prior-stage-baseline-20261030.md) BA-01/BA-14。保持用户批准的 R12 视觉与页面入口，不修改 R12 任务书、索引或完成记录。
 
@@ -69,9 +69,9 @@
 
 回退点为 `6f40a742`。未推送时可审阅后逐项恢复本批路径；推送后使用单独 revert 提交，不覆盖远端历史，不批量删除文件或目录。当前只交付 03（含原04），05 待本批收尾及用户授权。
 
-## 本次推送与后续收尾入口
+## 首次推送时的历史快照（已由下节更新）
 
-代码批次为 `12ba495c583ea25fd32b508aa68cceea9407f9d0`，已推送 `origin/rewrite/r13-core-ui-features`。单次查询获得 run41110961979，状态运行中。未下载本批产物，也未用02的产物替代03。后续收尾只核此精确代码的最终运行、证据包摘要、MSI/NSIS和startup；完成前保持 VERIFYING，不启动05。此后状态记录提交只修改文档，不改变受测代码。
+首次代码批次 `12ba495c583ea25fd32b508aa68cceea9407f9d0` 推送后，查询 run41110961979 当时为运行中；本轮续接已确认其最终失败（见当前状态及下节）。该旧快照不作为当前CI结论。没有下载该失败运行的产物，也未用02产物替代03。后续收尾改为核最新修复提交的精确CI、证据摘要、MSI/NSIS和startup，不重复查询旧运行。
 
 ## 2026-10-31 CI入口修复与原04核对
 
@@ -79,7 +79,7 @@
 
 本次只调整四个现有验证入口：三个 Competition/Route 守卫退出运行期导入与调用，原断言不改；`verify-browser-bootstrap.mjs` 在现有依赖安装后的前端门禁中执行原31项（10层级/13绑定与包/8路由），任何一项失败仍使门禁失败。未删除测试、修改生产代码、降低断言、添加依赖或修改CI工作流，96步入口数量保持。
 
-复现与修复证据：从 `1bd4f393` 导出独立副本，确认 `require.resolve("typescript")` 为 MODULE_NOT_FOUND；原完整 `npm run verify:architecture` 重现相同错误。只同步这四个修复脚本后，保持 TypeScript 缺席，完整架构门禁通过。原工程新前端入口的31项生产行为通过；完整96步复验正在运行，完成后追加结果。
+复现与修复证据：从 `1bd4f393` 导出独立副本，确认 `require.resolve("typescript")` 为 MODULE_NOT_FOUND；原完整 `npm run verify:architecture` 重现相同错误。只同步这四个修复脚本后，保持 TypeScript 缺席，完整架构门禁通过。原工程新前端入口的31项生产行为通过；修复提交的完整96步前端复验（含全部31项生产行为、类型和构建）已通过，退出码0。
 
 日志：`O:/Project/FOODBALL/tmp/r13-03-ci-clean-before.log`（预期失败）、`r13-03-ci-clean-after.log`（通过）、`r13-03-ci-fix-frontend.log`（本轮完整门禁）。独立副本为测试产物，进程TEMP/TMP仍在项目tmp；未清理或删除任何目录。
 
@@ -93,3 +93,12 @@
 | 最终验收边界 | 本轮CI失败修复后仍需精确新提交的CI、MSI/NSIS/证据摘要/startup；真实PG/Full仍BA-14/R17-06。原04不得先于合并主交付标DONE |
 
 当前结论：原04已实现并核对，随03共同VERIFYING；下一主交付为05，本轮没有将“开始04”擅自当作05实施授权。
+
+本轮修复提交：`b5b23c469df5f9050dc66ac1c4c5d11f888a5b26`，已推送既有R13分支。修复仅四个验证入口及四份既有记录，无文件删除；原31项行为断言完全未改。生产源码、架构清单、后端、依赖与workflow相对12ba495c无差异，原28项Windows浏览器和原生startup证据在该相同生产树范围继续适用，本轮不冒称重新执行这些专项。当前完整前端复验96步已通过；修复提交CI状态见以下精确查询。
+
+### 修复提交的精确验收状态
+
+- 代码：`b5b23c469df5f9050dc66ac1c4c5d11f888a5b26`，已推送。
+- 本轮完整前端：`node scripts/verify-frontend.mjs` 退出0；日志实际96个 `[verify]` 步骤，含原31项行为全部执行通过、TypeScript、Vite build。日志 `O:/Project/FOODBALL/tmp/r13-03-ci-fix-frontend.log`。
+- CI只查询一次：[run41116421113](https://github.com/uniquenesssta/123/actions/runs/41116421113)，精确head/分支/push匹配，查询时 **in_progress / conclusion=null**。不轮询，不把运行中记作通过。
+- 未下载该运行产物，MSI/NSIS/包内startup仍须此精确修复提交完成后核验。因此03与并入的04共同保持VERIFYING；真实PG/Full沿用既定最终新库边界，05未启动。

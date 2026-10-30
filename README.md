@@ -2,7 +2,7 @@
 
 ## R13-03/04 赛事层级、规则与路由（2026-10-31，VERIFYING）
 
-原代码12ba495c的CI失败在依赖安装前加载TypeScript。现保留全部31项行为，移到安装依赖后的原前端门禁；无依赖源码副本已复现并验证完整架构门禁修复。完整96步正在复验，修复提交CI/安装包待验。04已按任务书并入03，本轮核对规则包、绑定和路由义务，不重复实施；真实PG/Full仍BA-14/R17-06待验，05未启动。详[03/04记录](docs/modular-rewrite/R13-core-ui-features/R13-03-competition-rules-and-routing.md)。
+原代码12ba495c的CI失败在依赖安装前加载TypeScript。现保留全部31项行为，移到安装依赖后的原前端门禁；无依赖源码副本已复现并验证完整架构门禁修复。修复提交b5b23c46已推送，完整96步复验通过；[新CI run41116421113](https://github.com/uniquenesssta/123/actions/runs/41116421113)单次查询运行中，自身CI/安装包尚待验收，不轮询。04已按任务书并入03，本轮核对规则包、绑定和路由义务，不重复实施；真实PG/Full仍BA-14/R17-06待验，05未启动。详[03/04记录](docs/modular-rewrite/R13-core-ui-features/R13-03-competition-rules-and-routing.md)。
 
 ## R13-02 数据库连接与危险操作（2026-10-31收尾 DONE）
 
