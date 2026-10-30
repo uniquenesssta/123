@@ -250,6 +250,20 @@
       "state": "Host owns rows/order/selection/domain statuses/results; only EventScope-owned local event listeners. No I/O or persistent owner.",
       "production_dependencies_added": false,
       "source_record": "docs/modular-rewrite/R12-frontend-foundation-ui-system/R12-13-component-mappings.json"
+    },
+    "ui_patterns": {
+      "owner": "src/ui/patterns",
+      "public_entry": "src/ui/patterns/index.ts",
+      "families": [
+        "entity-directory",
+        "entity-detail",
+        "workbench",
+        "async-boundary",
+        "destructive-action",
+        "file-workflow"
+      ],
+      "state": "Only transient confirmation host and listener lifecycle; confirmation request state remains with ConfirmationDialogState. No Feature state, repository or I/O.",
+      "production_dependencies_added": false
     }
   },
   "rust": {
@@ -501,5 +515,5 @@
     "commands": 171
   },
   "transitional_edges": [],
-  "last_updated_task": "R7-04"
+  "last_updated_task": "R12-16"
 }

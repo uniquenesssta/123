@@ -500,8 +500,26 @@
         "src/platform/**"
       ],
       "transition": null
+    },
+    {
+      "id": "browser.destructive-action-host",
+      "owner": "src/ui/patterns/destructive-action/destructiveActionController.ts::DestructiveActionController",
+      "scope": "transient native confirmation DOM host and EventScope listeners; no copied pending request or persisted state",
+      "writers": [
+        "DestructiveActionController.show",
+        "DestructiveActionController.destroy"
+      ],
+      "readers": [
+        "ModalController"
+      ],
+      "transition": null,
+      "forbidden": [
+        "src/pages/**",
+        "src/api/**",
+        "src/platform/**"
+      ]
     }
   ],
-  "count": 34,
-  "last_updated_task": "R12-15"
+  "count": 35,
+  "last_updated_task": "R12-16"
 }

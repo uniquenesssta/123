@@ -1,3 +1,5 @@
+import { renderResourceMarkup } from "./patterns/renderResourceMarkup.mjs";
+import {fileURLToPath} from "node:url";
 import fs from "node:fs";
 
 function read(path) {
@@ -34,7 +36,9 @@ requireTrue(css.includes('.player-browser .entity-main[aria-busy="true"]'), "球
 
 requireTrue(teams.includes("teamDetailFilterPanel"), "球队详情未恢复独立筛选器");
 requireTrue(teams.includes("search-teams-from-detail") && teams.includes("clear-team-filters-from-detail"), "球队详情筛选器未接入目录返回链");
-requireTrue(teams.includes("${teamDetailFilterPanel}${teamDetailPanel}${teamInspectorPanel}"), "球队详情筛选器未放在主名单左侧");
+const rendered=renderResourceMarkup(fileURLToPath(new URL("..",import.meta.url)),"teams","directory",null,true);
+const filterIndex=rendered.indexOf('class="entity-filter-panel panel team-detail-filter'),listIndex=rendered.indexOf('<main class="entity-main panel detail-pane"'),inspectorIndex=rendered.indexOf('<aside class="entity-inspector panel inspector-pane"');
+requireTrue(filterIndex>=0 && listIndex>filterIndex && inspectorIndex>listIndex, "球队详情筛选器未放在主名单左侧");
 requireTrue(main.includes('case "search-teams-from-detail"') && main.includes("searchTeams(true)"), "球队详情筛选未在应用后返回结果目录");
 requireTrue(main.includes('case "clear-team-filters-from-detail"') && main.includes("clearTeamFilters(true)"), "球队详情清除筛选未返回完整目录");
 requireTrue(css.includes('grid-template-columns: minmax(220px, 248px) minmax(0, 1fr)'), "球队详情筛选器和主名单未形成稳定双列布局");

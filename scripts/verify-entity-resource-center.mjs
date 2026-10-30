@@ -1,3 +1,4 @@
+import { renderResourceMarkup } from "./patterns/renderResourceMarkup.mjs";
 import { readStylesheet } from "./tokens/tokenStyles.mjs";
 import { readFileSync } from "node:fs";
 import { dirname, join, resolve } from "node:path";
@@ -32,9 +33,11 @@ check(css.includes("--shell-sidebar-expanded") && css.includes("--shell-sidebar-
 check(css.includes(".application-shell.secondary-collapsed"), "二级菜单折叠状态样式缺失");
 
 for (const source of [teams, players]) {
-  check(source.includes("workspaceSectionNavigation") && source.includes("core-local-navigation"), "球队/球员资源中心缺少固定三级任务导航");
+  const rendered=renderResourceMarkup(root,source===teams?"teams":"players");
+  const detailMarkup=renderResourceMarkup(root,source===teams?"teams":"players","profile");
+  check(source.includes("workspaceSectionNavigation") && rendered.includes("core-local-navigation"), "球队/球员资源中心缺少固定三级任务导航");
   check(!source.includes("entity-mode-switch"), "球队/球员资源中心仍保留重复的旧模式切换入口");
-  check(source.includes("entity-task-workspace"), "复杂编辑任务必须在主工作区直接展开");
+  check(detailMarkup.includes("entity-task-workspace"), "复杂编辑任务必须在主工作区直接展开");
   check(source.includes("entity-inspector"), "资源中心缺少不离开列表的速览检查器");
 }
 check(teams.includes("entity-directory-list") && teams.includes("entity-data-table roster-table"), "球队中心缺少球队目录与阵容主表");

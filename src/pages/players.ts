@@ -1,9 +1,10 @@
+import { entityDirectoryView, entityDetailView, workbenchView, fileWorkflowView } from "../ui/patterns";
 import "./players/playerWorkspace.css";
 import { paginationView } from "../ui/navigation";
 import { escapeHtml, formatPercent } from "../components/format";
 import { inlineDatabaseSetup } from "../components/databaseSetup";
 import { icon } from "../components/icons";
-import { taskContextRibbon, taskPageHeader } from "../components/taskWorkspace";
+import { taskContextRibbon, taskPageHeader } from "../ui/patterns/workbench";
 import { workspaceAnchorNavigation, workspaceSectionNavigation } from "../ui/navigation";
 
 import { ageFromBirthDate, availabilityLabel, detailPlayerName, displayPlayerName, initials, playerStatusLabel, positionLabel, preferredFootLabel } from "../components/footballText";
@@ -71,16 +72,14 @@ function spreadsheetPanel(preview: SpreadsheetImportPreview | null): string {
   const counts = preview?.counts;
   const blocking = (counts?.conflict ?? 0) + (counts?.error ?? 0);
   const rows = preview?.rows.slice(0, 80) ?? [];
-  return `<section class="panel spreadsheet-panel">
-    <div class="panel-heading"><div><span>球员月度工作包</span><h2>身份、履历、位置、状态与能力观察</h2></div></div>
+  return fileWorkflowView({className:"",heading:`
+    <div class="panel-heading"><div><span>球员月度工作包</span><h2>身份、履历、位置、状态与能力观察</h2></div></div>`,entry:`
     <div class="spreadsheet-actions">
       <article><strong>空白模板</strong><span>包含说明、参考字典、数据缺口和月度维护字段。</span><button class="secondary" data-action="export-player-template">导出模板</button></article>
       <article><strong>月度数据包</strong><span>导出球员、名称、履历、位置、可用性、能力观察和动态标签。</span><button class="secondary" data-action="export-player-data">导出现有数据</button></article>
       <article><strong>导入并预检</strong><span>仅接受球员月度或球员目录工作包；球队月度文件会被识别并阻止误导入。</span><label class="field"><span>导入模式</span><select id="spreadsheet-import-mode"><option value="add_and_update">新增并更新</option><option value="add_only">仅新增</option></select></label><button class="primary" data-action="preview-player-import">选择球员文件并预检</button><button class="ghost" data-page="workbooks">查看全部工作包入口</button></article>
     </div>
-    ${
-      preview
-        ? `<div class="spreadsheet-preview">
+`,preview:preview ? `<div class="spreadsheet-preview">
       <div class="preview-summary">
         <div><span>文件</span><strong>${escapeHtml(preview.source_file_name)}</strong></div>
         <div class="preview-count add"><span>待新增</span><strong>${counts?.ready_add ?? 0}</strong></div>
@@ -93,10 +92,7 @@ function spreadsheetPanel(preview: SpreadsheetImportPreview | null): string {
       <div class="spreadsheet-table-wrap"><table class="spreadsheet-table"><thead><tr><th>工作表</th><th>行</th><th>类型</th><th>状态</th><th>说明</th></tr></thead><tbody>${rows.map((row) => `<tr class="status-${escapeHtml(row.status)}"><td>${escapeHtml(row.sheet_name)}</td><td>${row.row_number}</td><td>${escapeHtml(spreadsheetEntityLabel(row.entity_type))}</td><td>${escapeHtml(spreadsheetStatusLabel(row.status))}</td><td>${escapeHtml(row.message ?? "")}${row.conflict_candidates.length ? `<div class="candidate-list">${row.conflict_candidates.map((candidate) => `<button class="candidate-choice" data-action="resolve-import-conflict" data-row-id="${escapeHtml(row.id)}" data-entity-id="${escapeHtml(candidate.entity_id)}"><strong>${escapeHtml(candidate.display_name)}</strong>${candidate.detail ? `<small>${escapeHtml(candidate.detail)}</small>` : ""}</button>`).join("")}<button class="candidate-skip" data-action="skip-import-conflict" data-row-id="${escapeHtml(row.id)}">跳过这一行</button></div>` : ""}</td></tr>`).join("")}</tbody></table></div>
       ${preview.rows.length > rows.length ? `<p class="field-note">仅显示前 ${rows.length} 行，完整结果保存在导入批次中。</p>` : ""}
       <div class="button-row"><button class="primary" data-action="commit-player-import" ${blocking > 0 || (counts?.ready_add ?? 0) + (counts?.ready_update ?? 0) + (counts?.ready_end_previous ?? 0) === 0 ? "disabled" : ""}>确认写入数据库</button><button class="secondary" data-action="show-import-preview-json">查看完整预检结果</button>${blocking > 0 ? `<span class="blocking-note">冲突可在上方直接选择正确记录；格式错误需修正表格后重新预检。</span>` : ""}</div>
-    </div>`
-        : `<div class="empty-inline">尚未选择球员月度工作簿。导入前会显示新增、更新、冲突和错误明细。</div>`
-    }
-  </section>`;
+    </div>` : null,empty:`<div class="empty-inline">尚未选择球员月度工作簿。导入前会显示新增、更新、冲突和错误明细。</div>`});
 }
 
 function options(
@@ -494,7 +490,7 @@ function playerTaskWorkspace(
     : section === "profile" && navigationContext?.origin_page === "lineups"
       ? `<button class="secondary" data-action="return-to-lineup-workspace" data-return-section="${escapeHtml(navigationContext.return_section ?? "chain")}">返回比赛阵容</button>`
       : `<button class="secondary" data-action="select-workspace-section" data-section-id="directory">返回球员目录</button>`;
-  return `<section class="entity-task-workspace"><header><div><span>球队与人员</span><h2>${escapeHtml(title)}</h2></div>${returnAction}</header><div class="entity-task-body">${content}</div></section>`;
+  return entityDetailView({title,context:"球队与人员",actions:returnAction,content});
 }
 
 export function playersPage(
@@ -535,7 +531,7 @@ export function playersPage(
     { label: "当前球员", value: selectedPlayer ? detailPlayerName(selectedPlayer).primary : "尚未选择", note: selectedPlayer ? `${selectedPlayer.team_periods[0]?.team_name ?? "暂无球队"} · 完整档案按需打开` : "单击名单显示速览，主动打开完整档案", tone: selectedPlayer ? "success" : "neutral" },
     { label: "名单结果", value: `${playerPage?.items.length ?? 0} 名球员`, note: `第 ${pageNumber} 页 · ${activeFilterCount} 项筛选` },
   ]);
-  const directoryWorkspace = `<section class="entity-browser player-browser master-detail-workspace ${inspectorCollapsed ? "inspector-collapsed" : "inspector-open"}" data-entity-browser="players">
+  const directoryWorkspace = entityDirectoryView({entity:"players",className:"player-browser",content:`
       <aside class="entity-filter-panel panel master-pane" data-workspace-panel="players-filter" data-workspace-persist="false">
         <div class="entity-directory-header"><div><span>筛选器</span><strong>${activeFilterCount ? `${activeFilterCount} 项已应用` : "全部球员"}</strong></div><button class="icon-button" data-action="refresh-player-catalog" title="刷新球员">${icon("refresh")}</button></div>
         <section class="entity-filter-groups">
@@ -552,15 +548,10 @@ export function playersPage(
         <div class="entity-table-wrap player-table-wrap"><table class="entity-data-table player-directory-table"><thead><tr><th><label class="entity-table-check"><input id="player-select-all" type="checkbox"><span></span></label></th><th>球员</th><th>位置</th><th>当前球队</th><th>年龄</th><th>能力</th><th>状态</th><th>操作</th></tr></thead><tbody>${playerTableRows(playerPage, selectedPlayer?.player.id ?? null, selectedPlayerIds)}</tbody></table></div>
         <footer class="entity-main-footer"><span>${selectedCount ? `已选择 ${selectedCount} 名球员` : "点击球员查看右侧速览"}</span>${paginationView({page:pageNumber,summary:playerPage?`本页 ${playerPage.items.length} 条结果`:"尚未载入",hasMore:playerPage?.has_more??false,previousAction:"previous-player-page",nextAction:"next-player-page",label:"球员目录分页"})}</footer>
       </main>
-      <aside class="entity-inspector panel inspector-pane" data-workspace-panel="players-inspector"><button class="entity-inspector-close icon-button" data-action="toggle-workspace-pane" data-pane="inspector" aria-label="关闭速览">×</button>${selectedPlayer ? playerQuickInspector(selectedPlayer) : `<div class="entity-inspector-empty"><span class="empty-orbit">${icon("shield")}</span><strong>选择一名球员</strong><span>速览不会离开当前名单。</span></div>`}</aside>
-    </section>${selectedCount ? `<div class="entity-selection-bar"><strong>已选 ${selectedCount} 名球员</strong><span>可批量打开、归档或删除空对象</span><button class="secondary" data-action="open-selected-players">打开</button><button class="secondary" data-action="bulk-archive-players">归档</button><button class="danger" data-action="bulk-delete-players">批量删除空对象</button></div>` : ""}`;
+      `,inspector:{collapsed:inspectorCollapsed,content:`<aside class="entity-inspector panel inspector-pane" data-workspace-panel="players-inspector"><button class="entity-inspector-close icon-button" data-action="toggle-workspace-pane" data-pane="inspector" aria-label="关闭速览">×</button>${selectedPlayer ? playerQuickInspector(selectedPlayer) : `<div class="entity-inspector-empty"><span class="empty-orbit">${icon("shield")}</span><strong>选择一名球员</strong><span>速览不会离开当前名单。</span></div>`}</aside>
+    `},selection:selectedCount ? `<div class="entity-selection-bar"><strong>已选 ${selectedCount} 名球员</strong><span>可批量打开、归档或删除空对象</span><button class="secondary" data-action="open-selected-players">打开</button><button class="secondary" data-action="bulk-archive-players">归档</button><button class="danger" data-action="bulk-delete-players">批量删除空对象</button></div>` : ""});
   const activeWorkspace = section === "directory"
     ? directoryWorkspace
     : playerTaskWorkspace(section, state, references, selectedPlayer, spreadsheetPreview, navigationContext);
-  return `<section class="entity-page entity-page-players task-page core-workspace-page core-player-workspace">
-    ${taskPageHeader({ eyebrow: "球员中心", title: "球员浏览与管理", description: "目录、完整档案、工作包和新增球员保持在同一页面；档案内部按基础资料、位置角色、履历、状态和能力继续分层。", status: { label: section === "profile" ? "正在编辑完整档案" : sourceContext ? "球队筛选已带入" : selectedPlayer ? "球员速览已就绪" : "等待选择球员", tone: section === "profile" || sourceContext || selectedPlayer ? "success" : "neutral" }, actions: pageActions })}
-    ${contextRibbon}
-    <div class="core-local-navigation">${sectionNav}</div>
-    <div class="core-workspace-stage">${activeWorkspace}</div>
-  </section>`;
+  return workbenchView({className: "entity-page entity-page-players task-page core-workspace-page core-player-workspace", heading: taskPageHeader({ eyebrow: "球员中心", title: "球员浏览与管理", description: "目录、完整档案、工作包和新增球员保持在同一页面；档案内部按基础资料、位置角色、履历、状态和能力继续分层。", status: { label: section === "profile" ? "正在编辑完整档案" : sourceContext ? "球队筛选已带入" : selectedPlayer ? "球员速览已就绪" : "等待选择球员", tone: section === "profile" || sourceContext || selectedPlayer ? "success" : "neutral" }, actions: pageActions }), context: contextRibbon, navigation: sectionNav, content: activeWorkspace});
 }

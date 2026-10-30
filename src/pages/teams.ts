@@ -1,9 +1,10 @@
+import { entityDirectoryView, entityDetailView, workbenchView, fileWorkflowView } from "../ui/patterns";
 import { paginationView } from "../ui/navigation";
 import "./teams/teamWorkspace.css";
 import { escapeHtml, formatPercent } from "../components/format";
 import { inlineDatabaseSetup } from "../components/databaseSetup";
 import { icon } from "../components/icons";
-import { taskContextRibbon, taskPageHeader } from "../components/taskWorkspace";
+import { taskContextRibbon, taskPageHeader } from "../ui/patterns/workbench";
 import { workspaceAnchorNavigation, workspaceSectionNavigation } from "../ui/navigation";
 
 import { ageFromBirthDate, availabilityLabel, detailPlayerName, displayPlayerName, initials, positionLabel, preferredFootLabel, teamTypeLabel } from "../components/footballText";
@@ -407,8 +408,8 @@ function teamPackagePanel(preview: TeamPackageImportPreview | null): string {
   const coverage = preview?.coverage;
   const p4Ready = Boolean(coverage && coverage.blockers.length === 0 && coverage.readiness_score >= 70 && blocking === 0);
   const readinessClass = p4Ready ? "ready" : coverage ? "warning" : "idle";
-  return `<section class="panel spreadsheet-panel team-package-panel">
-    <div class="panel-heading"><div><span>统一导入入口</span><h2>球队完整资料包 → P4 输入链路</h2><p>一份 Excel 同时承载球队、球队多语言名称、全部球员、球员多语言名称、基础能力、动态评分、教练历史和阵型分布。</p></div></div>
+  return fileWorkflowView({className:"team-package-panel",heading:`
+    <div class="panel-heading"><div><span>统一导入入口</span><h2>球队完整资料包 → P4 输入链路</h2><p>一份 Excel 同时承载球队、球队多语言名称、全部球员、球员多语言名称、基础能力、动态评分、教练历史和阵型分布。</p></div></div>`,entry:`
     <div class="team-package-entry-grid">
       <article class="team-package-primary-action">
         <span class="package-step">主要操作</span>
@@ -425,7 +426,7 @@ function teamPackagePanel(preview: TeamPackageImportPreview | null): string {
         <button class="ghost" data-page="workbooks">打开球队月度工作包</button>
       </article>
     </div>
-    ${preview && coverage ? `<div class="team-package-readiness ${readinessClass}">
+`,preview:preview && coverage ? `<div class="team-package-readiness ${readinessClass}">
       <div class="readiness-score"><span>P4 输入就绪度</span><strong>${coverage.readiness_score}</strong><small>/ 100</small></div>
       <div class="readiness-state"><b>${p4Ready ? "数据结构已达到 P4 输入门槛" : "仍有缺口或预检阻断"}</b><span>${escapeHtml(preview.source_file_name)}</span></div>
       <div class="readiness-metrics">
@@ -445,8 +446,7 @@ function teamPackagePanel(preview: TeamPackageImportPreview | null): string {
     <div class="preview-summary"><div><span>待处理总数</span><strong>${ready}</strong></div><div class="preview-count add"><span>球队链新增</span><strong>${teamCounts?.ready_add ?? 0}</strong></div><div class="preview-count update"><span>球员链新增</span><strong>${playerCounts?.ready_add ?? 0}</strong></div><div class="preview-count conflict"><span>冲突</span><strong>${(teamCounts?.conflict ?? 0) + (playerCounts?.conflict ?? 0)}</strong></div><div class="preview-count error"><span>错误</span><strong>${(teamCounts?.error ?? 0) + (playerCounts?.error ?? 0)}</strong></div></div>
     <div class="spreadsheet-table-wrap"><table class="spreadsheet-table"><thead><tr><th>链路</th><th>工作表</th><th>行</th><th>类型</th><th>状态</th><th>说明</th></tr></thead><tbody>${rows.map(({ scope, row }) => `<tr class="status-${escapeHtml(row.status)}"><td>${scope === "team" ? "球队/教练" : "球员/评分"}</td><td>${escapeHtml(row.sheet_name)}</td><td>${row.row_number}</td><td>${escapeHtml(row.entity_type)}</td><td>${escapeHtml(statusLabel[row.status] ?? row.status)}</td><td>${escapeHtml(row.message ?? "")}${row.conflict_candidates.length ? `<div class="candidate-list">${row.conflict_candidates.map((candidate) => `<button class="candidate-choice" data-action="resolve-team-package-conflict" data-package-scope="${scope}" data-row-id="${escapeHtml(row.id)}" data-entity-id="${escapeHtml(candidate.entity_id)}"><strong>${escapeHtml(candidate.display_name)}</strong>${candidate.detail ? `<small>${escapeHtml(candidate.detail)}</small>` : ""}</button>`).join("")}<button class="candidate-skip" data-action="skip-team-package-conflict" data-package-scope="${scope}" data-row-id="${escapeHtml(row.id)}">跳过这一行</button></div>` : ""}</td></tr>`).join("")}</tbody></table></div>
     <div class="button-row"><button class="primary" data-action="commit-team-package-import" ${blocking > 0 || ready === 0 || coverage.blockers.length > 0 ? "disabled" : ""}>确认导入完整资料包</button><button class="secondary" data-action="show-team-package-preview-json">查看完整预检</button><button class="secondary" data-action="export-team-package-preview-json">导出完整预检 JSON</button>${blocking > 0 ? `<span class="blocking-note">仍有 ${blocking} 条冲突或错误；冲突可直接选择，格式错误需修正 Excel 后重新预检。</span>` : ""}</div>
-    ` : `<div class="empty-state team-package-empty"><strong>尚未导入球队完整资料包</strong><p>优先选择已经整理好的 Excel。预检不会写入数据库，并会先检查 P4 所需的球队、阵容、能力、动态评分、教练与阵型覆盖情况。</p></div>`}
-  </section>`;
+    ` : null,empty:`<div class="empty-state team-package-empty"><strong>尚未导入球队完整资料包</strong><p>优先选择已经整理好的 Excel。预检不会写入数据库，并会先检查 P4 所需的球队、阵容、能力、动态评分、教练与阵型覆盖情况。</p></div>`});
 }
 
 
@@ -543,7 +543,7 @@ function teamTaskWorkspace(
     title = "新增球队或教练";
     content = `<section class="task-form-grid"><section class="subpanel"><div class="task-form-heading"><span>球队</span><h3>创建基础球队身份</h3></div><label class="field"><span>球队正式名称</span><input id="new-team-name"></label><label class="field"><span>国家或地区</span><input id="new-team-country"></label><button class="primary" data-action="create-team">创建球队</button></section><section class="subpanel"><div class="task-form-heading"><span>教练</span><h3>创建教练身份</h3></div><label class="field"><span>教练姓名</span><input id="new-coach-name"></label><label class="field"><span>国籍</span><input id="new-coach-nationality"></label><button class="primary" data-action="create-coach">创建教练</button></section></section>`;
   }
-  return `<section class="entity-task-workspace"><header><div><span>球队与人员</span><h2>${escapeHtml(title)}</h2></div><button class="secondary" data-action="select-workspace-section" data-section-id="directory">返回球队目录</button></header><div class="entity-task-body">${content}</div></section>`;
+  return entityDetailView({title,context:"球队与人员",actions:`<button class="secondary" data-action="select-workspace-section" data-section-id="directory">返回球队目录</button>`,content});
 }
 
 export function teamsPage(
@@ -625,17 +625,12 @@ export function teamsPage(
       </main>` : "";
   const teamInspectorPanel = selectedTeam ? `<aside class="entity-inspector panel inspector-pane" data-workspace-panel="teams-inspector"><button class="entity-inspector-close icon-button" data-action="toggle-workspace-pane" data-pane="inspector" aria-label="关闭速览">×</button>${selectedRosterPlayer ? playerInspector(selectedRosterPlayer) : teamInspector(selectedTeam)}</aside>` : "";
   const directoryWorkspace = selectedTeam
-    ? `<section class="entity-browser master-detail-workspace team-detail-workspace ${inspectorCollapsed ? "inspector-collapsed" : "inspector-open"}" data-entity-browser="teams">${teamDetailFilterPanel}${teamDetailPanel}${teamInspectorPanel}</section>`
-    : `<section class="entity-browser master-detail-workspace team-directory-only" data-entity-browser="teams">${teamDirectoryPanel}</section>`;
+    ? entityDirectoryView({entity:"teams",className:"team-detail-workspace",content:teamDetailFilterPanel+teamDetailPanel,inspector:{content:teamInspectorPanel,collapsed:inspectorCollapsed}})
+    : entityDirectoryView({entity:"teams",className:"team-directory-only",content:teamDirectoryPanel});
   const selectionBar = selectedCount && !selectedTeam ? `<div class="entity-selection-bar"><strong>已选 ${selectedCount} 支球队</strong><span>仅无任何业务或历史引用的球队可永久删除</span><button class="secondary" data-action="open-selected-teams">打开</button><button class="secondary" data-action="bulk-archive-teams">归档</button><button class="danger" data-action="bulk-delete-teams">永久删除（无引用）</button></div>` : "";
   const directoryStage = `${directoryWorkspace}${selectionBar}`;
   const activeWorkspace = section === "directory"
     ? directoryStage
     : teamTaskWorkspace(section, selectedTeam, coaches, formations, lineupHistory, lineupPresets, packagePreview);
-  return `<section class="entity-page entity-page-teams task-page core-workspace-page core-team-workspace">
-    ${taskPageHeader({ eyebrow: "球队中心", title: selectedTeam ? `${selectedTeam.team.canonical_name} · ${section === "profile" ? "完整档案" : "球队阵容"}` : "球队与阵容资源中心", description: "目录、完整档案、资料工作包和新增资料保持同一页面上下文。", status: { label: section === "profile" ? "正在编辑完整档案" : selectedTeam ? "球队上下文已就绪" : "等待选择球队", tone: section === "profile" || selectedTeam ? "success" : "neutral" }, actions: pageActions })}
-    ${contextRibbon}
-    <div class="core-local-navigation">${sectionNav}</div>
-    <div class="core-workspace-stage">${activeWorkspace}</div>
-  </section>`;
+  return workbenchView({className: "entity-page entity-page-teams task-page core-workspace-page core-team-workspace", heading: taskPageHeader({ eyebrow: "球队中心", title: selectedTeam ? `${selectedTeam.team.canonical_name} · ${section === "profile" ? "完整档案" : "球队阵容"}` : "球队与阵容资源中心", description: "目录、完整档案、资料工作包和新增资料保持同一页面上下文。", status: { label: section === "profile" ? "正在编辑完整档案" : selectedTeam ? "球队上下文已就绪" : "等待选择球队", tone: section === "profile" || selectedTeam ? "success" : "neutral" }, actions: pageActions }), context: contextRibbon, navigation: sectionNav, content: activeWorkspace});
 }

@@ -28,8 +28,8 @@
 | R12-12 | [Forms](R12-12-forms.md) | DONE · 自身Windows完整SUCCESS，run40194352653 |
 | R12-13 | [Data Display](R12-13-data-display.md) | DONE · 自身 Windows 完整 SUCCESS，run40218221375 |
 | R12-14 | [Feedback 与 Overlays](R12-14-feedback-and-overlays.md) | DONE · 5886a439精确CI、打包、startup核验通过 |
-| R12-15 | [Navigation 与 Layout](R12-15-navigation-and-layout.md) | VERIFYING · 93步前端/构建、Rust、startup及独立复审通过；精确CI待发布后验收 |
-| R12-16 | UI Patterns | BLOCKED |
+| R12-15 | [Navigation 与 Layout](R12-15-navigation-and-layout.md) | DONE · bd9172ad精确CI、打包、startup核验通过 |
+| R12-16 | [UI Patterns](R12-16-ui-patterns.md) | VERIFYING · 六类真实接入、94步前端/Rust/startup通过；独立UI复审SHIP，独立文档审计完成，本批CI待发布后验收 |
 | R12-17 | Accessibility、Icons 与 Assets | BLOCKED |
 | R12-18 | 样式入口与边界 | BLOCKED |
 | R12-19 | Foundation 测试 | BLOCKED |

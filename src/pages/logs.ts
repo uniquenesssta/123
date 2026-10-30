@@ -2,7 +2,7 @@ import { escapeHtml } from "../components/format";
 import { codeBlockView } from "../ui/data-display/code-block";
 import { emptyStateView } from "../ui/data-display/empty-state";
 import { statCardView } from "../ui/data-display/stat-card";
-import { taskContextRibbon, taskPageHeader } from "../components/taskWorkspace";
+import { taskContextRibbon, taskPageHeader } from "../ui/patterns/workbench";
 import { workspaceTaskAnchorNavigation } from "../ui/navigation";
 
 import type { IssueLogEntry, IssueSeverity } from "../types";

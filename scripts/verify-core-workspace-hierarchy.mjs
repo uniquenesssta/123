@@ -1,3 +1,4 @@
+import { renderResourceMarkup } from "./patterns/renderResourceMarkup.mjs";
 import { readFileSync } from "node:fs";
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -28,8 +29,9 @@ for (const [name, source, rootClass] of [
   ["球员中心", players, "core-player-workspace"],
 ]) {
   check(source.includes("core-workspace-page") && source.includes(rootClass), `${name}未接入统一核心工作区骨架`);
-  check(source.includes('class="core-local-navigation"'), `${name}缺少固定三级导航容器`);
-  check(source.includes('class="core-workspace-stage"'), `${name}缺少独立任务内容区`);
+  const rendered = source === teams ? renderResourceMarkup(root,"teams") : source === players ? renderResourceMarkup(root,"players") : source;
+  check(rendered.includes('class="core-local-navigation"'), `${name}缺少固定三级导航容器`);
+  check(rendered.includes('class="core-workspace-stage"'), `${name}缺少独立任务内容区`);
 }
 
 check(lineups.includes('workspaceAnchorNavigation("比赛编辑"') && lineups.includes('workspaceAnchorNavigation("双方阵容"'), "比赛中心未将编辑和阵容深层步骤收拢为页内导航");

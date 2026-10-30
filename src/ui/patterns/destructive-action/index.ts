@@ -1,0 +1,1 @@
+export { DestructiveActionController } from "./destructiveActionController";

@@ -1,0 +1,94 @@
+{
+  "task": "R12-16",
+  "file_key": "PN0Whgu6HLWIHx4Mv6aHfu",
+  "session_id": "92118bd2-a0c4-42d1-9418-0039553900fe",
+  "baseline": "bd9172ad767fc7ad6c574d0d025875d3c26e6309",
+  "authority": "Latest user-approved Screens, expressive refresh and existing live component contracts. Preserve approved geometry, fonts, colors and actions.",
+  "new_variables": [],
+  "new_styles": [],
+  "new_assets": [],
+  "new_figma_nodes": [],
+  "visual_changes": "None: migrate existing composition and transient confirmation lifecycle; reuse approved DOM classes, tokens and exact local icon assets.",
+  "components": [
+    {
+      "pattern": "entity-directory",
+      "contexts": [
+        "527:54630"
+      ],
+      "code": "src/ui/patterns/entity-directory/entityDirectoryView.ts",
+      "consumers": [
+        "src/pages/teams.ts",
+        "src/pages/players.ts"
+      ],
+      "contract": "Host owns filters, actual results, cursor, selection and inspector choice; pattern owns the shared directory frame and selection-bar location."
+    },
+    {
+      "pattern": "entity-detail",
+      "contexts": [
+        "527:57101"
+      ],
+      "code": "src/ui/patterns/entity-detail/entityDetailView.ts",
+      "consumers": [
+        "src/pages/teams.ts",
+        "src/pages/players.ts"
+      ],
+      "contract": "Named entity heading, real return action and editor body; no entity data or writes in the pattern."
+    },
+    {
+      "pattern": "workbench",
+      "contexts": [
+        "404:14589",
+        "527:54630",
+        "527:57101"
+      ],
+      "code": "src/ui/patterns/workbench/workbenchView.ts",
+      "consumers": [
+        "src/pages/teams.ts",
+        "src/pages/players.ts",
+        "all 14 existing task-heading/context page consumers"
+      ],
+      "contract": "Single heading, context, fixed local navigation, flexible task region; existing styles unchanged."
+    },
+    {
+      "pattern": "async-boundary",
+      "contexts": [
+        "387:11012"
+      ],
+      "code": "src/ui/patterns/async-boundary/asyncBoundaryView.ts",
+      "consumers": [
+        "src/app/shell/content-region/contentRegionView.ts"
+      ],
+      "contract": "Retain content during read loading, workspace inert/aria-busy, host retry and diagnostics on failure; no request owner or replay of writes."
+    },
+    {
+      "pattern": "destructive-action",
+      "contexts": [
+        "1134:6850"
+      ],
+      "code": "src/ui/patterns/destructive-action/destructiveActionController.ts",
+      "consumers": [
+        "src/app/modal/modalCoordinator.ts"
+      ],
+      "contract": "Reuse R12-14 native confirmation, typed gate, busy lock, uncertain-outcome review and late-completion epoch. Only host/listeners move from ModalController."
+    },
+    {
+      "pattern": "file-workflow",
+      "contexts": [
+        "527:54630",
+        "527:57101"
+      ],
+      "code": "src/ui/patterns/file-workflow/fileWorkflowView.ts",
+      "consumers": [
+        "src/pages/teams.ts::teamPackagePanel",
+        "src/pages/players.ts::spreadsheetPanel"
+      ],
+      "contract": "Existing file workflow entry/review/empty composition; domain readiness and conflict rules, native picker, preview and commits remain at actual existing owners.",
+      "visual_authority_limit": "Full Screens index transport failed; file workflow keeps incumbent approved implementation without introducing new visual properties. No claim of new file-flow Figma design or prototype acceptance."
+    }
+  ],
+  "limitations": [
+    "Not published Code Connect; repository mapping only.",
+    "Figma index/use_figma read transport interruption did not mutate canvas.",
+    "Impeccable engine 0.1.17 unavailable in read-only cache: no CLI detector/build-phase pass claimed."
+  ]
+}

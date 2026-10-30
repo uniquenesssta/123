@@ -1,10 +1,14 @@
 # 足球模型平台公开外壳
 
-## R12-15 Navigation 与 Layout（2026-10-29，VERIFYING）
+## R12-16 UI Patterns（2026-10-30，VERIFYING）
+
+15精确bd9172ad的CI、产物摘要、MSI/NSIS与startup已独立核验收尾。16完成六类交互结构的真实接入，保留批准的Figma视觉、数据和写入门槛；94步前端/构建、234项新浏览器检查、64视图1480项页面检查、Rust748项与实际Windows startup通过；独立UI复审SHIP，独立文档审计完成，尚未发布本批CI/安装包。详[16记录](docs/modular-rewrite/R12-frontend-foundation-ui-system/R12-16-ui-patterns.md)。17～19未实施。
+
+## R12-15 Navigation 与 Layout（2026-10-30收尾 DONE）
 
 14修复提交5886a439cc301a7fa315c1a8adf7b3b33c0b1d87：Windows run40863418461 / job123412066355 全步骤成功；artifact12894043614，ZIP SHA-256 2c06b3c06ffd25530680029b45fd3efaa69a3afec7d3241c00904abe59da4a5e。MSI 17,969,152 bytes、NSIS 15,605,981 bytes；startup profile pass，7条有效日志、0错误，bootstrap/read_workspace_state/save_workspace_state完成。startup不等于Full业务链路。2026-10-29独立核验，不轮询。
 
-15按已批准Figma收敛通用导航与布局，修正目录宽度/高度和筛选滚动；348项新组件、64视图1480项页面检查、完整93步前端/构建、Rust748项及Windows startup通过，独立UI复审SHIP。保留路由、工作区、异步和领域唯一owner；本批CI/打包尚待公开推送后验收；详[15实施记录](docs/modular-rewrite/R12-frontend-foundation-ui-system/R12-15-navigation-and-layout.md)。
+15按已批准Figma收敛通用导航与布局，修正目录宽度/高度和筛选滚动；348项新组件、64视图1480项页面检查、完整93步前端/构建、Rust748项及Windows startup通过，独立UI复审SHIP。保留路由、工作区、异步和领域唯一owner；本批精确Windows run40896297611、产物摘要、MSI/NSIS和startup已于2026-10-30核验通过；详[15实施记录](docs/modular-rewrite/R12-frontend-foundation-ui-system/R12-15-navigation-and-layout.md)。
 
 ## R12-14 Feedback 与 Overlays（2026-10-29收尾 DONE）
 

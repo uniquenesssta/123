@@ -2,7 +2,7 @@ import { escapeHtml, formatPercent } from "../components/format";
 import { matchEventTimelineView } from "./review/index";
 import { inlineDatabaseSetup } from "../components/databaseSetup";
 import { lineupCompletionWorkspace } from "../components/lineupBuilder";
-import { taskContextRibbon, taskPageHeader, taskStatusChip } from "../components/taskWorkspace";
+import { taskContextRibbon, taskPageHeader, taskStatusChip } from "../ui/patterns/workbench";
 import {
   matchReviewWorkflowAllows,
   matchReviewWorkflowBlocker,

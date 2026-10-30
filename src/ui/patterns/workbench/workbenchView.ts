@@ -1,4 +1,4 @@
-import { escapeHtml } from "./format";
+import { escapeHtml } from "../../../components/format";
 
 export type TaskTone = "neutral" | "accent" | "success" | "warning" | "danger";
 
@@ -41,4 +41,16 @@ export function taskPageHeader(options: TaskPageHeaderOptions): string {
 export function taskContextRibbon(items: readonly TaskContextItem[]): string {
   if (!items.length) return "";
   return `<section class="task-context-ribbon" aria-label="当前任务上下文">${items.map((item) => `<article class="task-context-item ${toneClass(item.tone)} "><div><span>${escapeHtml(item.label)}</span><strong>${escapeHtml(item.value)}</strong>${item.note ? `<small>${escapeHtml(item.note)}</small>` : ""}</div>${item.actions ? `<div class="task-context-actions">${item.actions}</div>` : ""}</article>`).join("")}</section>`;
+}
+
+/** Composes page context, local navigation and the independently scrolling task region. */
+export interface WorkbenchOptions {
+  readonly className: string;
+  readonly heading: string;
+  readonly context?: string;
+  readonly navigation: string;
+  readonly content: string;
+}
+export function workbenchView(options: WorkbenchOptions): string {
+  return `<section class="${escapeHtml(options.className)}" data-ui-pattern="workbench">${options.heading}${options.context ?? ""}<div class="core-local-navigation">${options.navigation}</div><div class="core-workspace-stage">${options.content}</div></section>`;
 }

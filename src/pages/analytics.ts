@@ -1,6 +1,6 @@
 import { escapeHtml, formatBytes, formatPercent } from "../components/format";
 import { inlineDatabaseSetup } from "../components/databaseSetup";
-import { taskContextRibbon, taskPageHeader } from "../components/taskWorkspace";
+import { taskContextRibbon, taskPageHeader } from "../ui/patterns/workbench";
 import { workspaceTaskAnchorNavigation } from "../ui/navigation";
 
 import type {

@@ -3,7 +3,7 @@ import { icon } from "../components/icons";
 import { inlineDatabaseSetup } from "../components/databaseSetup";
 import { workspaceSectionNavigation } from "../ui/navigation";
 import { workspacePaneToggle } from "../ui/layout";
-import { taskContextRibbon, taskPageHeader } from "../components/taskWorkspace";
+import { taskContextRibbon, taskPageHeader } from "../ui/patterns/workbench";
 import type {
   BootstrapResponse,
   ReleaseAcceptanceCheck,

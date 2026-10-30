@@ -5,7 +5,7 @@ import { inlineDatabaseSetup } from "../components/databaseSetup";
 import { icon } from "../components/icons";
 import { workspaceAnchorNavigation, workspaceSectionNavigation } from "../ui/navigation";
 
-import { taskContextRibbon, taskPageHeader } from "../components/taskWorkspace";
+import { taskContextRibbon, taskPageHeader } from "../ui/patterns/workbench";
 import type {
   BootstrapResponse,
   CoachListItem,

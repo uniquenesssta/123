@@ -1,5 +1,5 @@
 import { escapeHtml } from "../components/format";
-import { taskContextRibbon, taskPageHeader } from "../components/taskWorkspace";
+import { taskContextRibbon, taskPageHeader } from "../ui/patterns/workbench";
 import { workspaceTaskAnchorNavigation } from "../ui/navigation";
 
 import type {

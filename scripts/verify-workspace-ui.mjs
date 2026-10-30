@@ -1,3 +1,4 @@
+import { renderResourceMarkup } from "./patterns/renderResourceMarkup.mjs";
 import { readFileSync, existsSync } from "node:fs";
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -58,8 +59,8 @@ for (const command of contract.commands) {
 }
 requireTrue(main.includes("openSelectedWorkspaceObjects") && main.includes("setWorkspaceMode") && main.includes("resetCurrentWorkspace"), "主控制器缺少多选、模式或重置链");
 requireTrue(main.includes("select-workspace-section") && main.includes("active_section: sectionId"), "主控制器缺少左侧模块切换状态链");
-requireTrue(teams.includes("entity-browser") && teams.includes("entity-directory-list") && teams.includes("entity-data-table roster-table") && teams.includes("entity-selection-bar") && teams.includes("永久删除（无引用）"), "球队资源浏览工作区不完整");
-requireTrue(players.includes("entity-browser player-browser") && players.includes("player-directory-table") && players.includes("entity-selection-bar") && players.includes("批量删除空对象"), "球员资源浏览工作区不完整");
+requireTrue(renderResourceMarkup(root,"teams").includes("entity-browser") && teams.includes("entity-directory-list") && teams.includes("entity-data-table roster-table") && teams.includes("entity-selection-bar") && teams.includes("永久删除（无引用）"), "球队资源浏览工作区不完整");
+requireTrue(/class="entity-browser [^"]*player-browser/.test(renderResourceMarkup(root,"players")) && players.includes("player-directory-table") && players.includes("entity-selection-bar") && players.includes("批量删除空对象"), "球员资源浏览工作区不完整");
 requireTrue(lineups.includes("balanced-workspace") && lineups.includes("workspaceSectionNavigation") && lineups.includes("data-workspace-section") && lineups.includes("比赛、阵容与模型输入") && lineups.includes("balanced-lineup-add"), "比赛中心平衡布局、固定模块切换或阵容链路缺失");
 requireTrue(workbooks.includes("workspaceSectionNavigation") && workbooks.includes("球队月度") && workbooks.includes("球员月度") && workbooks.includes("比赛与阵容") && workbooks.includes("workbook-flow"), "Excel工作包固定模块切换入口不完整");
 requireTrue(ai.includes("module-workspace-page ai-module-workspace") && ai.includes("workspaceSectionNavigation") && ai.includes("ai-chat-layout") && ai.includes("ai-history-layout") && ai.includes("会话检查器"), "AI问答页内任务工作区不完整");

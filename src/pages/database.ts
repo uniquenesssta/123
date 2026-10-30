@@ -1,7 +1,7 @@
 import { escapeHtml, formatBytes } from "../components/format";
 import { statCardView } from "../ui/data-display/stat-card";
 import { dataTableView } from "../ui/data-display/data-table";
-import { taskContextRibbon, taskPageHeader } from "../components/taskWorkspace";
+import { taskContextRibbon, taskPageHeader } from "../ui/patterns/workbench";
 import { workspaceTaskAnchorNavigation } from "../ui/navigation";
 
 import type { BootstrapResponse } from "../types";

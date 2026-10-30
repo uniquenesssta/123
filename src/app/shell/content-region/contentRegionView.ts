@@ -1,5 +1,4 @@
-import { blockingMessageView } from "../../../ui/feedback/blocking-message/blockingMessageView";
-import { workspaceRegionView } from "../../../ui/layout";
+import { asyncBoundaryView } from "../../../ui/patterns/async-boundary";
 export function contentRegionView(content:string,pending:boolean,failed=false):string {
- return workspaceRegionView(failed?blockingMessageView("retry-shell-page","shell-open-logs"):content,pending,failed);
+ return asyncBoundaryView({content,pending,failed,retryAction:"retry-shell-page",logsAction:"shell-open-logs"});
 }

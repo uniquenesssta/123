@@ -2,7 +2,7 @@ import "./rules/rulesCatalogue.css";
 import { competitionKindLabel, competitionKindOptions, stageKindOptions } from "../components/competition";
 import { escapeHtml } from "../components/format";
 import { inlineDatabaseSetup } from "../components/databaseSetup";
-import { taskContextRibbon, taskPageHeader } from "../components/taskWorkspace";
+import { taskContextRibbon, taskPageHeader } from "../ui/patterns/workbench";
 import { workspaceSectionNavigation, workspaceTaskAnchorNavigation } from "../ui/navigation";
 
 import type { BootstrapResponse, CompetitionRecord, RulePackageDraft } from "../types";

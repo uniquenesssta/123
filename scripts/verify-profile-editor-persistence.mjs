@@ -1,3 +1,4 @@
+import { renderResourceMarkup } from "./patterns/renderResourceMarkup.mjs";
 import { readFileSync } from "node:fs";
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -18,7 +19,7 @@ const teams = read("src/pages/teams.ts");
 const css = read("src/styles/entityCenter.css");
 
 for (const source of [players, teams]) {
-  check(source.includes("entity-task-workspace"), "球队/球员完整档案必须在主工作区直接展开");
+  check(renderResourceMarkup(root,source===teams?"teams":"players","profile").includes("entity-task-workspace"), "球队/球员完整档案必须在主工作区直接展开");
   check(!source.includes("entity-task-backdrop") && !source.includes("entity-task-drawer"), "球队/球员页面仍包含侧边抽屉完整档案");
 }
 check(!css.includes(".entity-task-backdrop") && !css.includes(".entity-task-drawer"), "旧完整档案遮罩或侧边抽屉样式仍残留");

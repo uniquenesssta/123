@@ -1,6 +1,10 @@
 # R12-15 Navigation 与 Layout
 
-状态：VERIFYING。本地实现、独立UI修复审查、完整门禁与构建完成；本批公开推送、精确提交的Windows打包/CI待单独验收。2026-10-29用户授权“已通过收尾14开始15”。基线5886a439cc301a7fa315c1a8adf7b3b33c0b1d87；同一rewrite/r12-frontend-foundation-ui-system分支，O:/Project/FOODBALL/123 r3。16～19未实施。
+状态：DONE。本地实现、独立复审、完整门禁、精确提交CI/打包/startup验收完成。2026-10-29用户授权“已通过收尾14开始15”。基线5886a439cc301a7fa315c1a8adf7b3b33c0b1d87；同一rewrite/r12-frontend-foundation-ui-system分支，O:/Project/FOODBALL/123 r3。15完成后用户另行授权16；17～19未实施。
+
+## 15自身最终验收
+
+2026-10-30收尾：bd9172ad767fc7ad6c574d0d025875d3c26e6309 的 Windows run40896297611 / job123526193561 全步骤success；artifact12911330330，48,801,140 bytes；下载ZIP SHA-256 629dba382314413789e71e9d71d2ae25a92099d67409efe06e4ba557f064d5da与GitHub摘要一致。MSI17,969,152 bytes、NSIS15,606,527 bytes；startup pass，7条有效日志、0无效、0错误，bootstrap/read_workspace_state/save_workspace_state完成。startup不等于Full业务链路。证据 O:/Project/FOODBALL/Temp/r12-15-bd9172ad-evidence.zip；只核验完成结果，没有轮询。
 
 ## 14前置验收与回退点
 
@@ -50,9 +54,9 @@
 | Rust自动测试 | cargo test --locked --offline --workspace | 748通过、0失败、39保留跳过；r12-15-rust-test.log |
 | 完整前端+构建 | node scripts/verify-frontend.mjs | 最终93步exit0，包含TypeScript与Vite构建；r12-15-frontend-release-candidate.log。348项专项、1104项Shell与64视图/1480项实际模板检查均PASS，17份旧截图基线保留；前轮失败未作为PASS |
 | 实际Windows应用 | 隔离标识com.footballmatchmodel.platform.r1215validation的Tauri开发程序+实际123 r3 Vite；启动后分析真实日志 | startup PASS，5条有效记录，bootstrap/read_workspace_state完成、0错误；Temp/r12-15-native-verified/startup-report.json |
-| 本批Windows打包与CI | 未推送本批 | 未执行；不以14结果替代15，不轮询 |
+| 本批Windows打包与CI | bd9172ad精确run40896297611/job123526193561及artifact12911330330 | 全步骤success；下载哈希、MSI/NSIS与startup已核验，见本记录最终验收；不轮询 |
 
-实际startup不是原生窗口逐页交互验收，也不是Full数据库/模型业务链路；真实PostgreSQL与私有模型回归39项仍未验证。既有Vite分块提示保留，不调高阈值、不关闭检查。完整门禁与构建已经完成，81项最终非Markdown来源哈希在完整验收开始至结束保持不变。发布后仍保持VERIFYING直至精确CI验收。
+实际startup不是原生窗口逐页交互验收，也不是Full数据库/模型业务链路；真实PostgreSQL与私有模型回归39项仍未验证。既有Vite分块提示保留，不调高阈值、不关闭检查。完整门禁与构建已经完成，81项最终非Markdown来源哈希在完整验收开始至结束保持不变。2026-10-29发布时曾保持VERIFYING；2026-10-30精确CI验收通过后收尾为DONE。
 
 所有开发/验证脚本先加载O:/Project/FOODBALL/project-temp.ps1，进程级TEMP/TMP指向O:/Project/FOODBALL/Temp。旧脚本递归清理通过retain-test-artifacts.cjs替换为保留产物，仅改变清理行为，不改变断言；没有递归删除。临时Vite和隔离验证进程只停止本任务创建的实例。
 
@@ -162,6 +166,6 @@
 - src/styles/foundation/workspaceNavigation.css
 
 
-## 最终交付证据（2026-10-29）
+## 本地交付证据（2026-10-29推送前历史记录）
 
-完整93步前端exit0；最终类型/构建、模块/状态/保护资产门禁全部保留。新组件348、Shell1104、64视图1480项检查通过；Vite构建245模块，main JS640.70kB（gzip183.44kB），保留500kB提示。最终Windows startup为5条有效记录、0无效行、0错误，独立运行目录O:/Project/FOODBALL/Temp/r12-15-native-verified。Impeccable reviewer最终SHIP，documenter审计无阻塞性冲突；报告位于本任务visualizations目录的r12-15-review.md与r12-15-design-documentation-audit.md。文档仅随后补结果，没有再改机器来源。尚未公开推送本批，未称15的CI、安装包或Full业务链路通过。
+完整93步前端exit0；最终类型/构建、模块/状态/保护资产门禁全部保留。新组件348、Shell1104、64视图1480项检查通过；Vite构建245模块，main JS640.70kB（gzip183.44kB），保留500kB提示。最终Windows startup为5条有效记录、0无效行、0错误，独立运行目录O:/Project/FOODBALL/Temp/r12-15-native-verified。Impeccable reviewer最终SHIP，documenter审计无阻塞性冲突；报告位于本任务visualizations目录的r12-15-review.md与r12-15-design-documentation-audit.md。文档仅随后补结果，没有再改机器来源。该本地验收时间点尚未推送。随后bd9172ad已经公开推送，其精确CI/安装包/startup于2026-10-30独立验收通过，见本记录开头；Full业务链路仍未验证。

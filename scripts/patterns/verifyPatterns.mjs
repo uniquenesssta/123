@@ -1,0 +1,55 @@
+import {renderResourceMarkup} from "./renderResourceMarkup.mjs";
+import assert from "node:assert/strict";
+import {readFileSync,writeFileSync,mkdirSync,readdirSync,copyFileSync,mkdtempSync,existsSync} from "node:fs";
+import {resolve,join} from "node:path";
+import {tmpdir} from "node:os";
+import {fileURLToPath} from "node:url";
+import {readStylesheet} from "../tokens/tokenStyles.mjs";
+import {resolveChromiumExecutable,captureHtmlScreenshot} from "../task-ui-screenshot-tools.mjs";
+import {browserBundle} from "../overlays/browserBundle.mjs";
+const root=resolve(fileURLToPath(new URL("../..",import.meta.url))),read=f=>readFileSync(resolve(root,f),"utf8");
+// Drive actual Teams/Players file renderers with explicit synthetic preview facts.
+let fileCases=0;
+const counts=(ready=1,conflict=0,error=0)=>({ready_add:ready,ready_update:0,ready_end_previous:0,conflict,error});
+const preview=(count)=>({source_file_name:"<测试资料>.xlsx",counts:count,rows:[]});
+const packagePreview=(count,blockers=[])=>({source_file_name:"<完整资料>.xlsx",team_preview:preview(count),player_preview:null,coverage:{readiness_score:80,blockers,warnings:[],team_count:1,player_count:22,coach_count:1,formation_usage_count:1,player_ability_count:22,player_dynamic_tag_count:0,player_role_count:22}});
+const disabled=(html,action)=>{const tag=html.match(new RegExp('<button\\b[^>]*data-action="'+action+'"[^>]*>'))?.[0];assert.ok(tag,"actual commit action retained "+action);return /\bdisabled(?:[\s=>])/.test(tag);};
+for(const page of ["teams","players"]){
+ const action=page==="teams"?"commit-team-package-import":"commit-player-import",make=page==="teams"?packagePreview:preview;
+ const empty=renderResourceMarkup(root,page,"workbook");assert.ok(empty.includes('data-file-phase="unselected"')&&!empty.includes('data-action="'+action+'"'));fileCases++;
+ for(const [c,blocked]of [[counts(),false],[counts(0),true],[counts(1,1),true],[counts(1,0,1),true]]){const html=renderResourceMarkup(root,page,"workbook",make(c));assert.equal(disabled(html,action),blocked,page+" actual preview gate "+JSON.stringify(c));assert.ok(html.includes('data-file-phase="review"'));fileCases++;}
+ if(page==="teams"){assert.ok(disabled(renderResourceMarkup(root,page,"workbook",packagePreview(counts(),["未提供完整阵容"])),action));fileCases++;}
+}
+console.log("R12-16 actual file-workflow render: "+fileCases+" selection/conflict/error/readiness cases PASS");
+const folders=["entity-directory","entity-detail","workbench","async-boundary","destructive-action","file-workflow"];
+for(const folder of folders){assert.ok(existsSync(resolve(root,"src/ui/patterns/"+folder+"/index.ts")),"required public owner: "+folder);}
+const walk=dir=>readdirSync(resolve(root,dir),{withFileTypes:true}).flatMap(f=>f.name==="__tests__"?[]:f.isDirectory()?walk(dir+"/"+f.name):[dir+"/"+f.name]);
+for(const file of walk("src/ui/patterns").filter(f=>f.endsWith(".ts"))){const text=read(file);assert.ok(!/\bfetch\(|\binvoke\(|localStorage|sessionStorage|from ["'][^"']*(?:api\/|pages\/|repository|features\/)/.test(text),"pattern cannot read business state/I/O: "+file);if(file.endsWith("/index.ts"))assert.ok(!/function |class /.test(text),"exports only: "+file);}
+assert.ok(!existsSync(resolve(root,"src/components/taskWorkspace.ts")),"old shared composition owner retired");
+for(const page of ["teams","players"]){const text=read("src/pages/"+page+".ts");for(const name of ["entityDirectoryView","entityDetailView","workbenchView","fileWorkflowView"])assert.ok(text.includes(name+"("),"real consumer "+page+": "+name);}
+assert.ok(read("src/app/shell/content-region/contentRegionView.ts").includes("asyncBoundaryView("));assert.ok(read("src/app/modal/modalCoordinator.ts").includes("new DestructiveActionController()"));
+const main=read("src/main.ts"),css=[...main.matchAll(/^import "(\.\/[^"\n]+\.css)";/gm)].map(m=>readStylesheet(root,m[1].replace("./","src/"))).join("\n");
+const entry="src/ui/patterns/__tests__/patternsBrowserFixture.ts",bundle=browserBundle(root,entry),directory=mkdtempSync(join(tmpdir(),"football-r12-patterns-")),results=[];
+console.log("R12-16 pattern evidence: "+directory);
+const browser=resolveChromiumExecutable();assert.ok(browser,"native Windows Chromium required");
+for(const [width,height]of [[360,720],[960,600],[1440,900]])for(const theme of ["light","dark"]){
+ const name="patterns-"+width+"-"+theme,htmlPath=join(directory,name+".html");
+ writeFileSync(htmlPath,'<!doctype html><html lang="zh-CN" data-theme="'+theme+'"><head><meta charset="utf-8"><style>'+css+' html,body{height:auto;overflow:auto}body{margin:0;padding:12px;background:var(--fip-canvas);color:var(--fip-text);font-family:var(--fip-type-body-family)}#patterns-root{min-width:0}.pattern-test-workbench{display:grid;gap:12px;min-width:0}.pattern-test-workbench .core-workspace-stage{display:grid;gap:12px}.pattern-test-workbench .task-page-header{flex-wrap:wrap}.test-directory{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}.test-directory>*{min-width:0}.test-directory input{width:100%;box-sizing:border-box}.entity-task-workspace,.spreadsheet-panel,.test-directory>*{padding:12px;border-radius:12px;background:var(--fip-surface)}.entity-task-workspace>header{display:flex;align-items:center;gap:8px;flex-wrap:wrap}.entity-task-workspace h2{overflow-wrap:anywhere}h2{font:700 14px/20px var(--fip-type-section-title-family);margin:0 0 8px}#patterns-root button{min-height:32px}#patterns-root input{max-width:100%}@media(max-width:600px){.test-directory{grid-template-columns:1fr}}</style></head><body><div id="patterns-root"></div><script>'+bundle.replaceAll('</script','<\/script')+';try{window.f=load('+JSON.stringify(entry)+').installPatternsFixture()}catch(e){window.fixtureError=String(e.stack)}</script></body></html>');
+ const result=await captureHtmlScreenshot({browser,htmlPath,outputPath:join(directory,name+".png"),width,height,async exercise(cdp){
+  await cdp.send("Page.bringToFront");
+  const ev=async expression=>{const r=await cdp.send("Runtime.evaluate",{expression,awaitPromise:true,returnByValue:true});if(r.exceptionDetails)throw Error(r.exceptionDetails.exception?.description??r.exceptionDetails.text);return r.result?.value;};
+  const click=async selector=>{const p=await ev('(()=>{const e=f.q('+JSON.stringify(selector)+');e.scrollIntoView({block:"center"});const r=e.getBoundingClientRect();return{x:r.x+r.width/2,y:r.y+r.height/2}})()');await cdp.send("Input.dispatchMouseEvent",{type:"mousePressed",...p,button:"left",clickCount:1});await cdp.send("Input.dispatchMouseEvent",{type:"mouseReleased",...p,button:"left",clickCount:1});};
+  const key=async(key,code,vk)=>{await cdp.send("Input.dispatchKeyEvent",{type:"keyDown",key,code,windowsVirtualKeyCode:vk,nativeVirtualKeyCode:vk,text:key==="Enter"?"\r":undefined});await cdp.send("Input.dispatchKeyEvent",{type:"keyUp",key,code,windowsVirtualKeyCode:vk,nativeVirtualKeyCode:vk});};
+  const enterName=async()=>{await ev('f.q("#pattern-confirm-name").focus()');await cdp.send("Input.insertText",{text:"示例对象A"});};
+  assert.ok(!await ev("window.fixtureError"),await ev("window.fixtureError"));await ev('f.structure();f.open();f.expect(document.querySelectorAll("dialog[open]").length===1,"one transient native dialog");f.expect(document.activeElement.dataset.confirmationAction==="cancel","safe cancel receives initial focus");f.expect(f.q("#pattern-confirm-submit").disabled,"typed gate initially blocks execution")');
+  await key("Escape","Escape",27);await ev('f.expect(!f.controller.active&&f.calls===0,"native Escape cancels without invoking action");f.expect(document.activeElement.id==="open-confirm","cancel returns focus to original trigger");f.open("deferred")');
+  await enterName();await ev('f.expect(!f.q("#pattern-confirm-submit").disabled,"native text entry opens exact-name gate")');await click("#pattern-confirm-submit");await ev('f.expect(f.controller.busy&&f.calls===1,"one real host callback starts");f.controller.submit();f.controller.dismiss();f.expect(f.calls===1&&f.controller.active,"busy blocks duplicate submission and dismissal")');await key("Escape","Escape",27);await ev('f.expect(f.controller.active,"native Escape cannot dismiss pending write")');
+  const busy=await cdp.send("Page.captureScreenshot",{format:"png",captureBeyondViewport:false});writeFileSync(join(directory,name+"-busy.png"),Buffer.from(busy.data,"base64"));
+  await ev('f.settle();new Promise(r=>setTimeout(r,0))');await ev('f.expect(!f.controller.active&&!document.querySelector("dialog[open]"),"successful action closes transient dialog");f.expect(document.activeElement.id==="open-confirm"&&f.draft==="保留筛选草稿","completion restores focus without changing directory draft");f.open("failure")');
+  await enterName();await click("#pattern-confirm-submit");await ev('new Promise(r=>setTimeout(r,0))');await ev('f.expect(f.controller.active&&!f.controller.busy&&f.calls===2,"failed action keeps recovery visible");f.expect(f.q("#pattern-confirm-submit").disabled,"uncertain destructive outcome blocks blind replay");f.expect(f.q("[data-confirmation-feedback]").textContent.includes("写入结果未知"),"host error is preserved");f.controller.submit();f.expect(f.calls===2,"blocked review cannot replay callback")');
+  const error=await cdp.send("Page.captureScreenshot",{format:"png",captureBeyondViewport:false});writeFileSync(join(directory,name+"-error.png"),Buffer.from(error.data,"base64"));
+  await click('[data-confirmation-action="cancel"]');await ev('f.open("deferred")');await enterName();await click("#pattern-confirm-submit");await ev('f.expect(f.calls===3,"new request explicitly started after review");f.controller.destroy();f.expect(!document.querySelector("[data-ui-pattern=destructive-action]"),"destroy removes only its own host and listeners");f.settle();new Promise(r=>setTimeout(r,0))');await ev('f.expect(!f.controller.active&&!document.querySelector("dialog[open]"),"late completion cannot reopen destroyed UI");f.open();f.expect(document.querySelectorAll("[data-ui-pattern=destructive-action]").length===1,"controller can mount once after reset");f.controller.dismiss();f.controller.destroy();scrollTo(0,0)');
+  return await ev('({checks:f.checks,nativeWindows:navigator.userAgent.includes("Windows"),viewport:{width:innerWidth,height:innerHeight},theme:document.documentElement.dataset.theme})');
+ }});assert.ok(result.nativeWindows);results.push({name,...result});writeFileSync(join(directory,"patterns-results.json"),JSON.stringify(results,null,2));console.log(name+": "+result.checks.length+" native checks PASS");
+}
+const evidence=resolve(root,"..","logs","r12-16-patterns-"+Date.now());mkdirSync(evidence,{recursive:true});for(const f of readdirSync(directory).filter(f=>f.endsWith(".png")||f.endsWith("-results.json")))copyFileSync(join(directory,f),join(evidence,f));console.log("R12-16 Patterns: "+results.reduce((n,r)=>n+r.checks.length,0)+" native checks PASS; evidence: "+evidence);

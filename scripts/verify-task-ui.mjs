@@ -1,3 +1,4 @@
+import { renderResourceMarkup } from "./patterns/renderResourceMarkup.mjs";
 import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
@@ -10,13 +11,13 @@ const check = (condition, message) => { if (!condition) failures.push(message); 
 
 const contract = json("contracts/task-ui-contract.json");
 const styles = read("src/styles/taskWorkspace.css");
-const components = read("src/components/taskWorkspace.ts");
+const components = read("src/ui/patterns/workbench/workbenchView.ts");
 const main = read("src/main.ts");
 const legacyStyles = read("src/styles/components.css");
 
 check(contract.contract_id === "football.task-ui-contract.v1", "阶段 B UI 契约 ID 错误");
 check(contract.contract_version === "1.5.0", "阶段 B UI 契约版本错误");
-check(fs.existsSync(path.join(root, "src/components/taskWorkspace.ts")), "缺少任务型页面共享组件");
+check(fs.existsSync(path.join(root, "src/ui/patterns/workbench/workbenchView.ts")), "缺少任务型页面共享组件");
 check(fs.existsSync(path.join(root, "src/styles/taskWorkspace.css")), "缺少任务型页面共享样式");
 check(components.includes("export function taskPageHeader") && components.includes("export function taskContextRibbon"), "共享页面标题或上下文条组件缺失");
 
@@ -29,7 +30,7 @@ for (const pageName of contract.core_pages) {
 }
 for (const pageName of contract.master_detail_pages) {
   const page = read(`src/pages/${pageName}.ts`);
-  check(page.includes("master-detail-workspace"), `${pageName} 页面没有接入统一主从详情语义`);
+  check((["teams","players"].includes(pageName) ? renderResourceMarkup(root,pageName) : page).includes("master-detail-workspace"), `${pageName} 页面没有接入统一主从详情语义`);
 }
 
 const players = read("src/pages/players.ts");
