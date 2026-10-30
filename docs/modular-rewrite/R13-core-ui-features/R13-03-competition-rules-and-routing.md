@@ -1,6 +1,6 @@
 # R13-03 赛事层级、规则包与路由
 
-状态：**VERIFYING**。2026-10-31，用户“收尾02开始03”授权；覆盖原 R13-03 Competitions 与 R13-04 Rules。02 已按 `d167e948` 精确 Windows CI、下载产物、双 bundle 和 startup 收尾，收尾提交 `6f40a742`。03 本地实现与适用验证已完成，提交后仅核查自身精确代码 CI 一次，不轮询；尚未完成自身 CI/安装包验收，不提前标 DONE。05 未启动。
+状态：**VERIFYING**。2026-10-31，用户“收尾02开始03”授权；覆盖原 R13-03 Competitions 与 R13-04 Rules。02 已按 `d167e948` 精确 Windows CI、下载产物、双 bundle 和 startup 收尾，收尾提交 `6f40a742`。03 代码 `12ba495c583ea25fd32b508aa68cceea9407f9d0` 已提交并推送。自身 CI 仅查询一次：[Public Platform CI run41110961979](https://github.com/uniquenesssta/123/actions/runs/41110961979)，精确 head/分支/event=push 均匹配，查询时 **in_progress / conclusion=null**。尚不能判定通过，未轮询；自身 CI/安装包验收未完成，不提前标 DONE。05 未启动。
 
 依据：[阶段任务书](../../football-model-platform-modular-rewrite-19-docs/13-R13-core-ui-features.md)、[执行约定](../remaining-execution-contract.md)、[前期遗留账本](../prior-stage-baseline-20261030.md) BA-01/BA-14。保持用户批准的 R12 视觉与页面入口，不修改 R12 任务书、索引或完成记录。
 
@@ -68,3 +68,7 @@
 - **BA-14 / R17-06**：真实 PG 赛事层级写入/引用停用保护/规则注册与绑定持久化/路由结果、最终专用新库、Full、有效 XLSX 和私有 P4/P7 固定回归逐项承接；此处不关闭。
 
 回退点为 `6f40a742`。未推送时可审阅后逐项恢复本批路径；推送后使用单独 revert 提交，不覆盖远端历史，不批量删除文件或目录。当前只交付 03（含原04），05 待本批收尾及用户授权。
+
+## 本次推送与后续收尾入口
+
+代码批次为 `12ba495c583ea25fd32b508aa68cceea9407f9d0`，已推送 `origin/rewrite/r13-core-ui-features`。单次查询获得 run41110961979，状态运行中。未下载本批产物，也未用02的产物替代03。后续收尾只核此精确代码的最终运行、证据包摘要、MSI/NSIS和startup；完成前保持 VERIFYING，不启动05。此后状态记录提交只修改文档，不改变受测代码。

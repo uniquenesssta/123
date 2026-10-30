@@ -8,7 +8,7 @@
 | --- | --- | --- |
 | R13-01 首页/架构只读接入 | DONE：9cdd1f9b精确CI/证据摘要/MSI/NSIS/startup核验通过 | [实施记录](R13-01-read-only-entry-pilot.md)，原R13-01/R13-10合并验收 |
 | R13-02 数据库连接/危险操作 | DONE | [实施记录](R13-02-database-connection-and-reset.md)：96步前端、15行为/21浏览器/原生startup及d167e948精确CI/产物已核验 |
-| R13-03 赛事层级/规则/路由 | VERIFYING | [实施记录](R13-03-competition-rules-and-routing.md)：含原04；31项生产行为、28项Windows浏览器、96步前端及原生startup通过，自身CI/产物待验 |
+| R13-03 赛事层级/规则/路由 | VERIFYING | [实施记录](R13-03-competition-rules-and-routing.md)：含原04；31项生产行为、28项Windows浏览器、96步前端及原生startup通过，12ba495c已推送；run41110961979单次查询运行中，CI/产物待验 |
 | R13-05 球队/档案/资料包 | BLOCKED | 未启动 |
 | R13-06 球员/履历/观察 | BLOCKED | 未启动 |
 | R13-07 预设/双方阵容 | BLOCKED | 原07/08，BA-03删除保护风险须按本批条件处理 |
