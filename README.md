@@ -1,8 +1,12 @@
 # 足球模型平台公开外壳
 
+## R13-03 赛事层级、规则与路由（2026-10-31，VERIFYING）
+
+02已按精确CI/下载产物/双bundle/startup收尾，提交6f40a742。03（含原04）接通两个实际Feature及原规则页面，修复级联身份、乱序文件读取、失败草稿和隐藏路由预览；后端仍唯一决定规则有效性与执行路由。31项生产行为、28项Windows真实入口检查、96步前端及桌面startup通过；自身CI/安装包待推送后单独核验，不轮询。详[03记录](docs/modular-rewrite/R13-core-ui-features/R13-03-competition-rules-and-routing.md)。真实PG/Full等仍BA-14/R17-06待验，05未开始。
+
 ## R13-02 数据库连接与危险操作（2026-10-31收尾 DONE）
 
-连接/断开使用同一串行工作流，重置确认绑定当前摘要身份；失败或未知结果不清工作区、不自动重试，临时凭据用后释放，未知统计不补0。96步前端、15项生产行为、21项Windows浏览器及原生startup通过；d167e948精确Windows CI、证据摘要、MSI/NSIS及startup已核验通过。详[02记录](docs/modular-rewrite/R13-core-ui-features/R13-02-database-connection-and-reset.md)。03已获授权，按任务书继续推进。
+连接/断开使用同一串行工作流，重置确认绑定当前摘要身份；失败或未知结果不清工作区、不自动重试，临时凭据用后释放，未知统计不补0。96步前端、15项生产行为、21项Windows浏览器及原生startup通过；d167e948精确Windows CI、证据摘要、MSI/NSIS及startup已核验通过。详[02记录](docs/modular-rewrite/R13-core-ui-features/R13-02-database-connection-and-reset.md)。03当前结果见本页及阶段索引。
 
 ## R13-01 首页与架构只读接入（2026-10-31收尾 DONE）
 

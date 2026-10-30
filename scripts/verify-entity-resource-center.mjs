@@ -19,7 +19,8 @@ const navigation = read("src/app/router/routeRegistry.ts");
 const teams = read("src/pages/teams.ts");
 const players = read("src/pages/players.ts");
 const lineups = read("src/pages/lineups.ts");
-const rules = read("src/pages/rules.ts");
+const rules = ["src/features/rules/rulesView.ts", "src/features/rules/bindingView.ts", "src/features/competitions/catalogueView.ts", "src/features/competitions/competitionView.ts"].map(read).join("\n");
+const catalogueFilters = read("src/features/competitions/catalogueFilters.ts");
 const competition = read("src/components/competition.ts");
 const footballText = read("src/components/footballText.ts");
 const types = read("src/types.ts");
@@ -65,7 +66,7 @@ check(css.includes(".match-list-item") && css.includes("min-height: 74px"), "比
 
 check(competition.includes("selected: CompetitionKind | null"), "赛事赛制选项不支持无默认选择");
 check(rules.includes("competitionKindOptions(null)"), "赛事目录仍可能隐藏选中联赛过滤");
-check(main.includes("const baseMatches = (row: HTMLElement)") && main.includes("button.disabled = value !== \"\" && count === 0"), "赛事目录计数与结果未使用同一筛选口径");
+check(catalogueFilters.includes("const baseMatches = (row: HTMLElement)") && catalogueFilters.includes("button.disabled = value !== \"\" && count === 0"), "赛事目录计数与结果未使用同一筛选口径");
 check(css.includes(".rules-scope-list button.active") && css.includes(".rules-region-list button.active"), "赛事一级/二级目录缺少精细选中态");
 
 check(footballText.includes('GK: "门将"') && footballText.includes('ST: "前锋"') && footballText.includes("positionLabel"), "球员位置中文映射不完整");

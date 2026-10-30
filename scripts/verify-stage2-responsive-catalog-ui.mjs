@@ -8,7 +8,7 @@ const failures = [];
 const requireTrue = (condition, message) => { if (!condition) failures.push(message); };
 
 const migration = read("crates/persistence-postgres/migrations/0037_comprehensive_competition_catalog.sql");
-const rules = read("src/pages/rules.ts");
+const rules = ["src/features/rules/rulesView.ts", "src/features/rules/bindingView.ts", "src/features/competitions/catalogueView.ts", "src/features/competitions/competitionView.ts"].map(read).join("\n");
 const lineups = read("src/pages/lineups.ts");
 const main = read("src/main.ts");
 const styles = read("src/styles/app.css");

@@ -164,8 +164,9 @@
         "route": "review"
       },
       "rules": {
-        "owner": "src/pages/rules.ts",
-        "route": "rules"
+        "owner": "src/features/rules/rulesView.ts",
+        "route": "rules",
+        "public_entry": "src/features/rules/index.ts"
       },
       "runs": {
         "owner": "src/pages/runs.ts",
@@ -178,6 +179,11 @@
       "workbooks": {
         "owner": "src/pages/workbooks.ts",
         "route": "workbooks"
+      },
+      "competitions": {
+        "owner": "src/features/competitions/competitionView.ts",
+        "route": null,
+        "public_entry": "src/features/competitions/index.ts"
       }
     },
     "transitional_imports": [
@@ -529,7 +535,7 @@
     }
   ],
   "counts": {
-    "frontend_features": 18,
+    "frontend_features": 19,
     "workspace_members": 11,
     "ports": 4,
     "postgres_adapters": 38,
@@ -537,5 +543,5 @@
     "commands": 171
   },
   "transitional_edges": [],
-  "last_updated_task": "R12-18"
+  "last_updated_task": "R13-03"
 }

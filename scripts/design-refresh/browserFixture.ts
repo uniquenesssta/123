@@ -3,12 +3,12 @@ import { NavigationKeyboardController } from "../../src/ui/navigation";
 import { dashboardPage } from "../../src/features/dashboard";
 import { teamsPage } from "../../src/pages/teams";
 import { lineupsPage } from "../../src/pages/lineups";
-import { rulesPage } from "../../src/pages/rules";
+import { rulesPage } from "../../src/features/rules";
 import { renderShell } from "../../src/app/shell/application-shell/applicationShellView";
 import { enhanceSearchableSelects } from "../../src/components/searchableSelect";
 import { state, catalogue, detail, references, builder, match, playerCatalogue } from "./fixtureData";
 import type { Page, Theme } from "../../src/types";
-export { clearRulesCatalogueFilters } from "../../src/pages/rules/catalogueFilters";
+export { clearRulesCatalogueFilters, filterRulesCompetitionCatalogue } from "../../src/features/competitions";
 
 let navigationKeyboard: NavigationKeyboardController | null = null;
 

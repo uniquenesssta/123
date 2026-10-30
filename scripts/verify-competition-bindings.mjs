@@ -1,3 +1,4 @@
+import { verifyCompetitionRulesWorkflow } from "./features/verifyCompetitionRulesWorkflow.mjs";
 import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
@@ -112,3 +113,5 @@ if (failures.length) {
   process.exit(1);
 }
 console.log("R5-04 Competition Bindings verified: Binding persistence remains unique, R5-05 route/context and R5-06 model identity now reside in their approved owners.");
+
+await verifyCompetitionRulesWorkflow(root, "bindings");

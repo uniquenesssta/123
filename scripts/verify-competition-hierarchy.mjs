@@ -1,3 +1,4 @@
+import { verifyCompetitionRulesWorkflow } from "./features/verifyCompetitionRulesWorkflow.mjs";
 import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
@@ -111,3 +112,5 @@ if (failures.length) {
   process.exit(1);
 }
 console.log("R5-02 Competition Hierarchy verified: seasons/stages/rounds remain unique typed owners, legacy competitions.rs is removed, and R5-05 context resolution is owned by route_resolution/context.");
+
+await verifyCompetitionRulesWorkflow(root, "hierarchy");

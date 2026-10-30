@@ -1,7 +1,7 @@
 import "./styles/index.css";
 import { KeyboardShortcutController, motionScrollBehavior } from "./ui/accessibility";
 import { updatePaginationView } from "./ui/navigation";
-import { clearRulesCatalogueFilters } from "./pages/rules/catalogueFilters";
+import { CompetitionFeature, clearRulesCatalogueFilters, filterRulesCompetitionCatalogue, selectRulesDirectoryLevel } from "./features/competitions";
 import { focusValidationTarget } from "./ui/forms/validation-summary";
 import {
   api,
@@ -36,7 +36,6 @@ import {
   type TeamCatalogLoadResult,
   type ReviewCenterLoadResult,
 } from "./controllers/pageLoaders";
-import { competitionKindLabel } from "./components/competition";
 import { escapeHtml, formatPercent } from "./components/format";
 import { displayPlayerName, positionLabel } from "./components/footballText";
 import { enhanceSearchableSelects, refreshSearchableSelects } from "./components/searchableSelect";
@@ -46,7 +45,7 @@ import { analyticsPage } from "./pages/analytics";
 import { dashboardPage } from "./features/dashboard";
 import { databasePage, DatabaseFeature } from "./features/database";
 import { predictionPage } from "./pages/prediction";
-import { rulesPage } from "./pages/rules";
+import { rulesPage, RulesFeature, routeDetailBody, routeCard } from "./features/rules";
 import { runsPage } from "./pages/runs";
 import { playerTableRows, playersPage } from "./pages/players";
 import { teamsPage } from "./pages/teams";
@@ -59,8 +58,6 @@ import { apiWorkspacePage } from "./pages/apiWorkspace";
 import { reviewPage } from "./pages/review";
 import { releasePage } from "./pages/release";
 import type {
-  CompetitionBindingDraft,
-  CompetitionDraft,
   CompetitionKind,
   DataProviderDraft,
   ExternalEntityIdDraft,
@@ -99,10 +96,6 @@ import type {
   PredictionModelFamily,
   RouteDecision,
   RoutePreviewCommand,
-  RoundDraft,
-  RulePackageDraft,
-  SeasonDraft,
-  StageDraft,
   TeamDraft,
   TeamDetail,
   TeamListPage,
@@ -285,6 +278,34 @@ const databaseFeature = new DatabaseFeature({
     window.location.reload();
   },
 });
+const rulesFeature = new RulesFeature({
+  snapshot: () => session.bootstrap,
+  registerRulePackage: draft => api.registerRulePackage(draft),
+  createBinding: draft => api.createCompetitionBinding(draft),
+  previewRoute: command => api.previewRoute(command),
+  refresh: () => session.refresh(),
+  busy: operation => runBusy(operation),
+  render: () => render({ preserveForm: true }),
+  active: () => !browserLifecycleController.signal.aborted && navigation.page === "rules",
+  notify: message => toast(message, "success"),
+});
+const competitionFeature = new CompetitionFeature({
+  snapshot: () => session.bootstrap,
+  createCompetition: draft => api.createCompetition(draft),
+  createSeason: draft => api.createSeason(draft),
+  createStage: draft => api.createStage(draft),
+  createRound: draft => api.createRound(draft),
+  deleteCompetition: id => api.deleteCompetition(id),
+  refresh: () => session.refresh(),
+  busy: operation => runBusy(operation),
+  render: () => render({ preserveForm: true }),
+  active: () => !browserLifecycleController.signal.aborted && navigation.page === "rules",
+  invalidateRoutes: () => rulesFeature.invalidatePreview(),
+  notify: message => toast(message, "success"),
+  confirm: (...args) => modal.confirm(...args),
+  showPath: body => showHtmlModal("赛事规则与模型路径", "目录级说明", body),
+});
+
 const navigation = new Router();
 const workflowNavigation = new NavigationContext();
 let lastPredictionResult: unknown = null;
@@ -333,7 +354,6 @@ let aiAnalysisResponsePath: string | null = null;
 let aiAnalysisSuggestions: AiAnalysisSuggestionRecord[] = [];
 let analysisAbilityCandidates: AbilityUpdateCandidateRecord[] = [];
 let lastAiAnalysisPackageId: string | null = localPreferences.getItem(ANALYSIS_PACKAGE_ID_KEY);
-let pendingRulePackage: RulePackageDraft | null = null;
 let lineupPlayerCandidates: PlayerListItem[] = [];
 let lineupBuilderPlayers: LineupBuilderPlayer[] = [];
 const lineupPlayerLoadSequence = new RequestSequence();
@@ -507,6 +527,7 @@ async function returnToWorkflow(): Promise<void> {
 
 function render(options: RenderOptions = {}): void {
   if (browserLifecycleController.signal.aborted) return;
+  rulesFeature.invalidatePreview();
   const shellFocus = shellController?.captureFocus() ?? null;
   modal.capture();
   if (options.preserveForm === true && renderedPage === "lineups") {
@@ -535,7 +556,7 @@ function render(options: RenderOptions = {}): void {
       break;
     case "rules": {
       const workspace = workspaceState.module("rules");
-      content = rulesPage(session.bootstrap, pendingRulePackage, workspace.active_section ?? "catalog");
+      content = rulesPage(session.bootstrap, rulesFeature.packages.pending, workspace.active_section ?? "catalog", rulesFeature.packages.reading);
       break;
     }
     case "players": {
@@ -707,6 +728,7 @@ function render(options: RenderOptions = {}): void {
   renderedPage = navigation.page;
   const currentPageRoot = app.querySelector<HTMLElement>(".page-container") ?? app;
   workspaceState.restore(navigation.page, currentPageRoot);
+  rulesFeature.syncHierarchy(currentPageRoot);
   shellController?.restoreFocus(shellFocus);
   if (navigation.page === "lineups") {
   queueMicrotask(() => {
@@ -722,11 +744,6 @@ function render(options: RenderOptions = {}): void {
     refreshSearchableSelects(currentPageRoot);
   });
 }
-}
-
-async function refresh(): Promise<void> {
-  if (browserLifecycleController.signal.aborted) return;
-  if (await session.refresh()) render();
 }
 
 function appendWorkspaceTab(targetPage: "teams" | "players", tab: WorkspaceTabState): void {
@@ -1331,41 +1348,17 @@ function showPredictionDetail(title: string, payload: unknown): void {
   );
 }
 
-function routeDetailBody(route: RouteDecision): string {
-  return `<div class="route-detail">
-    <div class="route-detail-summary"><span>系统判定</span><h3>${escapeHtml(route.package_display_name)}</h3><p>${escapeHtml(routeSourceLabel(route.source))}，用于${escapeHtml(competitionKindLabel(route.competition_profile.competition_kind))}。</p></div>
-    <div class="model-basis-flow route-basis-flow">
-      <div><span>1 · 识别赛事</span><strong>${escapeHtml(competitionKindLabel(route.competition_profile.competition_kind))}</strong></div><i>→</i>
-      <div><span>2 · 匹配层级</span><strong>${escapeHtml(routeSourceLabel(route.source))}</strong></div><i>→</i>
-      <div><span>3 · 选择规则</span><strong>${escapeHtml(route.package_display_name)}</strong></div><i>→</i>
-      <div><span>4 · 运行模型</span><strong>${escapeHtml(modelDisplayName(route.model_id))}</strong></div>
-    </div>
-    <dl class="detail-facts route-readable-facts"><div><dt>模型版本</dt><dd>${escapeHtml(route.model_version)}</dd></div><div><dt>参数版本</dt><dd>${escapeHtml(route.parameter_version)}</dd></div><div><dt>规则包版本</dt><dd>${escapeHtml(route.package_version)}</dd></div><div><dt>最终判定</dt><dd>可直接开始推演</dd></div></dl>
-    <details class="technical-details"><summary>技术追踪信息</summary><dl class="detail-facts compact"><div><dt>规则包编号</dt><dd>${escapeHtml(route.rule_package_id)}</dd></div><div><dt>绑定编号</dt><dd>${escapeHtml(route.binding_id ?? "默认匹配")}</dd></div><div><dt>模型版本编号</dt><dd>${escapeHtml(route.model_version_id)}</dd></div><div><dt>参数集编号</dt><dd>${escapeHtml(route.parameter_set_id)}</dd></div></dl></details>
-  </div>`;
-}
-
 function showRouteDetail(route: RouteDecision): void {
-  showHtmlModal("赛事规则与模型判定", "清晰模型链路", routeDetailBody(route));
-}
-
-function routeCard(route: RouteDecision): string {
-  return `
-    <div class="route-card">
-      <div class="route-card-main"><span>${escapeHtml(routeSourceLabel(route.source))}</span><strong>${escapeHtml(route.package_display_name)}</strong><small>规则包版本 ${escapeHtml(route.package_version)}</small></div>
-      <div class="route-chain"><div><span>赛事类型</span><b>${escapeHtml(competitionKindLabel(route.competition_profile.competition_kind))}</b></div><div><span>匹配方式</span><b>${escapeHtml(routeSourceLabel(route.source))}</b></div><div><span>模型</span><b>${escapeHtml(modelDisplayName(route.model_id))}</b></div><div><span>参数版本</span><b>${escapeHtml(route.parameter_version)}</b></div></div>
-      <button class="secondary" data-action="show-route-json">查看完整判定</button>
-    </div>`;
+  showHtmlModal("赛事规则与模型判定", "清晰模型链路", routeDetailBody(route, { source: routeSourceLabel(route.source), model: modelDisplayName(route.model_id) }));
 }
 
 function showRouteDecision(route: RouteDecision): void {
-  lastPredictionResult = route;
   const target = document.querySelector<HTMLElement>("#route-preview");
   if (!target) {
     showRouteDetail(route);
     return;
   }
-  target.innerHTML = `<div class="panel-heading"><div><span>模型已确定</span><h2>模型选择说明</h2></div></div>${routeCard(route)}`;
+  target.innerHTML = `<div class="panel-heading"><div><span>模型已确定</span><h2>模型选择说明</h2></div></div>${routeCard(route, { source: routeSourceLabel(route.source), model: modelDisplayName(route.model_id) })}`;
 }
 
 type PredictionResultMode = "formal" | "shadow" | "temporary";
@@ -1463,9 +1456,11 @@ async function previewRoute(): Promise<void> {
     kickoff_time: matchKickoff(),
     ...routeSelection(),
   };
-  const result = await runBusy(() => api.previewRoute(command));
-  showRouteDecision(result);
-  toast("模型路由解析完成", "success");
+  const routeRoot = document.querySelector("#competition-id");
+  const formIdentity = () => JSON.stringify([...app.querySelectorAll<HTMLInputElement | HTMLSelectElement>("#competition-id, #season-id, #stage-id, #competition-kind, #simulation-model-family, #simple-kickoff")].map(input => [input.id, input.value]));
+  const identity = formIdentity(), page = navigation.page;
+  const result = await rulesFeature.resolve(command, () => routeRoot?.isConnected === true && navigation.page === page && formIdentity() === identity);
+  if (result) { showRouteDetail(result); toast("模型路由预览完成；正式运行仍会重新判定", "success"); }
 }
 
 async function executePrediction(): Promise<void> {
@@ -1486,176 +1481,6 @@ async function dryRun(): Promise<void> {
   const result = await runBusy(() => api.dryRunDefaultFixture());
   showPredictionResult(result, "temporary");
   toast("模型自检通过", "success");
-}
-
-async function createCompetition(): Promise<void> {
-  const draft: CompetitionDraft = {
-    code: "",
-    name: value("competition-name").trim(),
-    country_code: nullableValue("competition-country"),
-    timezone: value("competition-timezone").trim(),
-    competition_kind: value("new-competition-kind") as CompetitionKind,
-    metadata: {},
-  };
-  await runBusy(() => api.createCompetition(draft));
-  await refresh();
-  await navigateTo("rules");
-  toast("赛事已创建", "success");
-}
-
-function showCompetitionPath(competitionId: string): void {
-  if (!session.bootstrap) return;
-  const competition = session.bootstrap.data.competitions.find(
-    (item) => item.id === competitionId,
-  );
-  if (!competition) throw new Error("赛事不存在");
-  const exactBindings = session.bootstrap.data.competition_bindings
-    .filter((item) => item.is_active && item.competition_id === competitionId)
-    .sort((left, right) => right.priority - left.priority);
-  const defaultBindings = session.bootstrap.data.competition_bindings
-    .filter(
-      (item) =>
-        item.is_active &&
-        !item.competition_id &&
-        item.competition_kind === competition.competition_kind,
-    )
-    .sort((left, right) => right.priority - left.priority);
-  const selectedBinding = exactBindings[0] ?? defaultBindings[0] ?? null;
-  const selectedPackage = selectedBinding
-    ? (session.bootstrap.data.rule_packages.find(
-        (item) => item.id === selectedBinding.rule_package_id,
-      ) ?? null)
-    : (session.bootstrap.data.rule_packages
-        .filter(
-          (item) =>
-            item.competition_kind === competition.competition_kind &&
-            item.status === "active",
-        )
-        .sort((left, right) => right.priority - left.priority)[0] ?? null);
-  const sourceLabel =
-    exactBindings.length > 0
-      ? "具体赛事绑定"
-      : defaultBindings.length > 0
-        ? "赛事类型默认绑定"
-        : selectedPackage
-          ? "规则包类型默认"
-          : "未匹配";
-  const selectedModel =
-    selectedPackage?.model_id ?? selectedBinding?.model_id ?? "未匹配";
-  const body = `<div class="route-detail">
-    <div class="route-detail-summary"><span>赛事规则路径</span><h3>${escapeHtml(competition.name)}</h3><p>系统按比赛所属赛事、赛季和阶段自动匹配，当前优先使用“${escapeHtml(sourceLabel)}”。</p></div>
-    <div class="model-basis-flow route-basis-flow">
-      <div><span>1 · 识别赛事</span><strong>${escapeHtml(competitionKindLabel(competition.competition_kind))}</strong><small>${escapeHtml(String(competition.metadata?.region ?? competition.country_code ?? "未分类"))}</small></div><i>→</i>
-      <div><span>2 · 匹配范围</span><strong>${escapeHtml(sourceLabel)}</strong><small>具体比赛上下文会自动优先</small></div><i>→</i>
-      <div><span>3 · 使用规则</span><strong>${escapeHtml(selectedPackage?.display_name ?? selectedBinding?.rule_package_name ?? "尚未配置")}</strong><small>${escapeHtml(selectedPackage?.version ?? "需要配置规则")}</small></div><i>→</i>
-      <div><span>4 · 运行模型</span><strong>${escapeHtml(modelDisplayName(selectedModel))}</strong><small>${escapeHtml(selectedPackage ? `${selectedPackage.model_version} · 参数 ${selectedPackage.parameter_version}` : "暂无可执行路径")}</small></div>
-    </div>
-    <section class="prediction-detail-section"><div class="section-heading"><div><span>备用规则</span><h3>同类规则匹配顺序</h3></div><small>系统自动处理，不需要手工选择优先级</small></div>${[...exactBindings, ...defaultBindings].length ? `<div class="route-option-list">${[...exactBindings, ...defaultBindings].map((binding, index) => `<article><span>${index + 1}</span><div><strong>${escapeHtml(binding.rule_package_name)}</strong><small>${binding.competition_id ? "只用于当前赛事" : `用于全部${escapeHtml(competitionKindLabel(competition.competition_kind))}`}</small></div><b>${binding.id === selectedBinding?.id ? "当前采用" : "候选"}</b></article>`).join("")}</div>` : `<div class="empty-state compact"><strong>当前没有赛事绑定</strong><span>系统会尝试使用同类型已激活规则包。</span></div>`}</section>
-    <details class="technical-details"><summary>技术追踪信息</summary><dl class="detail-facts compact"><div><dt>赛事编号</dt><dd>${escapeHtml(competition.id)}</dd></div><div><dt>规则包编号</dt><dd>${escapeHtml(selectedPackage?.id ?? selectedBinding?.rule_package_id ?? "未匹配")}</dd></div><div><dt>模型标识</dt><dd>${escapeHtml(selectedModel)}</dd></div></dl></details>
-  </div>`;
-  showHtmlModal("赛事规则与模型路径", "可视化路由", body);
-}
-
-function requestDeleteCompetition(
-  competitionId: string,
-  competitionName: string,
-): void {
-  showConfirmation(
-    "删除赛事",
-    "赛事将从目录和自动路由中隐藏，已有比赛、推演和复盘历史会保留，避免破坏历史数据。",
-    [
-      ["赛事", competitionName],
-      ["处理方式", "停用赛事并停用赛事级绑定"],
-    ],
-    "确认删除",
-    async () => {
-      await runBusy(() => api.deleteCompetition(competitionId));
-      await refresh();
-      await navigateTo("rules");
-      toast("赛事已删除，历史数据仍然保留", "success");
-    },
-  );
-}
-
-async function createSeason(): Promise<void> {
-  const competitionId = nullableValue("season-competition-id");
-  if (!competitionId) throw new Error("请选择赛季所属赛事");
-  const draft: SeasonDraft = {
-    competition_id: competitionId,
-    name: value("season-name").trim(),
-    starts_on: nullableValue("season-starts-on"),
-    ends_on: nullableValue("season-ends-on"),
-    status: value("season-status") as SeasonDraft["status"],
-    metadata: {},
-  };
-  await runBusy(() => api.createSeason(draft));
-  await refresh();
-  await navigateTo("rules");
-  toast("赛季已创建", "success");
-}
-
-async function createStage(): Promise<void> {
-  const seasonId = nullableValue("stage-season-id");
-  if (!seasonId) throw new Error("请选择阶段所属赛季");
-  const draft: StageDraft = {
-    season_id: seasonId,
-    code: "",
-    name: value("stage-name").trim(),
-    stage_kind: value("stage-kind") as CompetitionKind,
-    sequence_no: Number(value("stage-sequence")),
-    rules: {},
-  };
-  await runBusy(() => api.createStage(draft));
-  await refresh();
-  await navigateTo("rules");
-  toast("赛事阶段已创建", "success");
-}
-
-async function createRound(): Promise<void> {
-  const stageId = nullableValue("round-stage-id");
-  if (!stageId) throw new Error("请选择轮次所属阶段");
-  const draft: RoundDraft = {
-    stage_id: stageId,
-    code: "",
-    name: value("round-name").trim(),
-    sequence_no: Number(value("round-sequence")),
-    starts_at: null,
-    ends_at: null,
-  };
-  await runBusy(() => api.createRound(draft));
-  await refresh();
-  await navigateTo("rules");
-  toast("比赛轮次已创建", "success");
-}
-
-async function registerRulePackage(): Promise<void> {
-  if (!pendingRulePackage) throw new Error("请先选择规则包文件");
-  await runBusy(() => api.registerRulePackage(pendingRulePackage!));
-  pendingRulePackage = null;
-  await refresh();
-  await navigateTo("rules");
-  toast("规则包已校验并注册", "success");
-}
-
-async function createBinding(): Promise<void> {
-  const competitionId = nullableValue("binding-competition-id");
-  const packageId = nullableValue("binding-rule-package-id");
-  if (!competitionId || !packageId) throw new Error("请选择赛事和规则包");
-  const draft: CompetitionBindingDraft = {
-    binding_name: nullableValue("binding-name"),
-    competition_id: competitionId,
-    season_id: nullableValue("binding-season-id"),
-    stage_id: nullableValue("binding-stage-id"),
-    competition_kind: null,
-    rule_package_id: packageId,
-    priority: Number(value("binding-priority")),
-    valid_from: null,
-    valid_to: null,
-  };
-  await runBusy(() => api.createCompetitionBinding(draft));
-  await refresh();
-  await navigateTo("rules");
-  toast("赛事专属路由已建立", "success");
 }
 
 function checked(id: string): boolean {
@@ -7149,41 +6974,37 @@ async function handleAction(
         showModal("P4 冻结快照", p4TaskWorkspace.snapshot);
       break;
     case "create-competition":
-      await createCompetition();
+      await competitionFeature.createCompetition(app);
       break;
     case "clear-rules-catalogue-filters":
       clearRulesCatalogueFilters(filterRulesCompetitionCatalogue);
       break;
     case "show-competition-path":
-      showCompetitionPath(button.dataset.competitionId ?? "");
+      competitionFeature.showPath(button.dataset.competitionId ?? "");
       break;
     case "request-delete-competition":
-      requestDeleteCompetition(
-        button.dataset.competitionId ?? "",
-        button.dataset.competitionName ?? "未命名赛事",
-      );
+      competitionFeature.requestDelete(button.dataset.competitionId ?? "");
       break;
     case "create-season":
-      await createSeason();
+      await competitionFeature.createSeason(app);
       break;
     case "create-stage":
-      await createStage();
+      await competitionFeature.createStage(app);
       break;
     case "create-round":
-      await createRound();
+      await competitionFeature.createRound(app);
       break;
     case "register-rule-package":
-      await registerRulePackage();
+      await rulesFeature.registerPackage();
       break;
     case "clear-rule-package":
-      pendingRulePackage = null;
-      render();
+      rulesFeature.clearPackage();
       break;
     case "show-pending-rule-package":
-      if (pendingRulePackage) showModal("规则包只读详情", pendingRulePackage);
+      if (rulesFeature.packages.pending) showModal("规则包只读详情", rulesFeature.packages.pending);
       break;
     case "create-binding":
-      await createBinding();
+      await rulesFeature.createBinding(app);
       break;
     case "refresh-player-catalog":
       await runBusy(() => loadPlayerCatalog(true));
@@ -7863,6 +7684,7 @@ async function handleAction(
       );
       break;
     case "show-route-json": {
+      if (rulesFeature.route) { showRouteDetail(rulesFeature.route); break; }
       if (lastPredictionResult === null) break;
       const root = objectValue(lastPredictionResult);
       const route =
@@ -7912,91 +7734,6 @@ document.addEventListener("keydown", (event) => {
   document.querySelector<HTMLButtonElement>(`[data-action="${action}"]`)?.click();
 }, { signal: browserLifecycleController.signal });
 
-
-function filterRulesCompetitionCatalogue(): void {
-  const directory = document.querySelector<HTMLElement>("[data-rules-directory]");
-  if (!directory) return;
-  const query = (document.querySelector<HTMLInputElement>("#rules-competition-search")?.value ?? "").trim().toLowerCase();
-  const kind = document.querySelector<HTMLSelectElement>("#rules-competition-kind")?.value ?? "";
-  const rows = Array.from(directory.querySelectorAll<HTMLElement>("[data-rules-competition-row]"));
-  const baseMatches = (row: HTMLElement): boolean =>
-    (!kind || row.dataset.kind === kind) &&
-    (!query || (row.dataset.search ?? "").includes(query));
-
-  let scope = directory.querySelector<HTMLElement>("[data-rules-scope].active")?.dataset.rulesScope ?? "";
-  const scopeButtons = Array.from(directory.querySelectorAll<HTMLButtonElement>("[data-rules-scope]"));
-  for (const button of scopeButtons) {
-    const value = button.dataset.rulesScope ?? "";
-    const count = rows.filter((row) => baseMatches(row) && (!value || row.dataset.scope === value)).length;
-    const badge = button.querySelector<HTMLElement>("span");
-    if (badge) badge.textContent = String(count);
-    button.disabled = value !== "" && count === 0;
-  }
-  const activeScopeButton = scopeButtons.find((button) => button.dataset.rulesScope === scope);
-  if (!activeScopeButton || activeScopeButton.disabled) {
-    scope = "";
-    scopeButtons.forEach((button) => button.classList.toggle("active", (button.dataset.rulesScope ?? "") === ""));
-  }
-
-  let region = directory.querySelector<HTMLElement>("[data-rules-region].active")?.dataset.rulesRegion ?? "";
-  const regionButtons = Array.from(directory.querySelectorAll<HTMLButtonElement>("[data-rules-region]"));
-  for (const button of regionButtons) {
-    const value = button.dataset.rulesRegion ?? "";
-    const count = rows.filter((row) =>
-      baseMatches(row) &&
-      (!scope || row.dataset.scope === scope) &&
-      (!value || row.dataset.region === value),
-    ).length;
-    const badge = button.querySelector<HTMLElement>("span");
-    if (badge) badge.textContent = String(count);
-    button.disabled = value !== "" && count === 0;
-    button.hidden = button.disabled;
-  }
-  const activeRegionButton = regionButtons.find((button) => button.dataset.rulesRegion === region);
-  if (!activeRegionButton || activeRegionButton.disabled || activeRegionButton.hidden) {
-    region = "";
-    regionButtons.forEach((button) => button.classList.toggle("active", (button.dataset.rulesRegion ?? "") === ""));
-  }
-
-  let visible = 0;
-  for (const row of rows) {
-    const matches =
-      baseMatches(row) &&
-      (!scope || row.dataset.scope === scope) &&
-      (!region || row.dataset.region === region);
-    row.hidden = !matches;
-    if (matches) visible += 1;
-  }
-  const count = directory.querySelector<HTMLElement>("#rules-visible-count");
-  if (count) count.textContent = String(visible);
-  const empty = directory.querySelector<HTMLElement>("#rules-empty-filter");
-  if (empty) empty.hidden = visible !== 0;
-}
-
-function selectRulesDirectoryLevel(target: HTMLElement): boolean {
-  const scopeButton = target.closest<HTMLElement>("[data-rules-scope]");
-  const regionButton = target.closest<HTMLElement>("[data-rules-region]");
-  const directory = target.closest<HTMLElement>("[data-rules-directory]");
-  if (!directory || (!scopeButton && !regionButton)) return false;
-  if (scopeButton) {
-    directory.querySelectorAll<HTMLElement>("[data-rules-scope]").forEach((item) => item.classList.toggle("active", item === scopeButton));
-    const scope = scopeButton.dataset.rulesScope ?? "";
-    let firstVisibleRegion: HTMLElement | null = null;
-    directory.querySelectorAll<HTMLElement>("[data-rules-region]").forEach((item) => {
-      const scopes = (item.dataset.regionScopes ?? "").split(",").filter(Boolean);
-      const available = !scope || !item.dataset.rulesRegion || scopes.includes(scope);
-      item.hidden = !available;
-      if (available && !firstVisibleRegion) firstVisibleRegion = item;
-      item.classList.remove("active");
-    });
-    const allRegion = directory.querySelector<HTMLElement>('[data-rules-region=""]');
-    (allRegion && !allRegion.hidden ? allRegion : firstVisibleRegion)?.classList.add("active");
-  } else if (regionButton) {
-    directory.querySelectorAll<HTMLElement>("[data-rules-region]").forEach((item) => item.classList.toggle("active", item === regionButton));
-  }
-  filterRulesCompetitionCatalogue();
-  return true;
-}
 
 document.addEventListener("click", (event) => {
   const target = event.target as HTMLElement;
@@ -8061,6 +7798,7 @@ function filterSelectOptions(
 
 document.addEventListener("input", (event) => {
   const target = event.target as HTMLInputElement | HTMLTextAreaElement;
+  if (["competition-id", "season-id", "stage-id", "competition-kind", "simulation-model-family", "simple-kickoff"].includes(target.id) || target.id.startsWith("binding-")) rulesFeature.invalidatePreview();
   if (target.id === "openai-api-example") {
     scheduleOpenAiApiExampleParse();
     return;
@@ -8091,6 +7829,7 @@ document.addEventListener("input", (event) => {
 
 document.addEventListener("change", (event) => {
   const target = event.target as HTMLInputElement | HTMLSelectElement;
+  if (["competition-id", "season-id", "stage-id", "competition-kind", "simulation-model-family", "simple-kickoff"].includes(target.id) || target.id.startsWith("binding-")) rulesFeature.invalidatePreview();
   if (
     target instanceof HTMLInputElement &&
     target.classList.contains("player-select-checkbox")
@@ -8205,32 +7944,10 @@ document.addEventListener("change", (event) => {
   }
   if (target.id === "rule-package-file" && target instanceof HTMLInputElement) {
     const file = target.files?.[0];
-    if (!file) return;
-    void file
-      .text()
-      .then((text) => {
-        const parsed: unknown = JSON.parse(text);
-        if (!parsed || typeof parsed !== "object" || Array.isArray(parsed))
-          throw new Error("规则包文件格式无效");
-        const candidate = parsed as RulePackageDraft;
-        if (
-          !candidate.display_name ||
-          !candidate.package_key ||
-          !candidate.version ||
-          !candidate.routing ||
-          !candidate.competition_profile
-        ) {
-          throw new Error("规则包缺少名称、版本、赛事 Profile 或模型路由");
-        }
-        pendingRulePackage = candidate;
-        render();
-        toast("规则包已读取，请核对摘要后注册", "success");
-      })
-      .catch((error: unknown) => {
-        pendingRulePackage = null;
-        recordClientIssue(error, "赛事设置 / 读取规则包文件");
-        toast(userFacingError(error), "error");
-      });
+    if (file) void rulesFeature.readPackage(file).catch((error: unknown) => {
+      recordClientIssue(error, "赛事设置 / 读取规则包文件");
+      toast(userFacingError(error), "error");
+    });
     return;
   }
   if (target.id === "new-match-kickoff" && target instanceof HTMLInputElement) {
@@ -8297,11 +8014,12 @@ document.addEventListener("change", (event) => {
     const kindSelect =
       document.querySelector<HTMLSelectElement>("#competition-kind");
     if (kind && kindSelect) kindSelect.value = kind;
-    filterSelectOptions("season-id", "competitionId", target.value || null);
-    filterSelectOptions("stage-id", "competitionId", target.value || null);
+    rulesFeature.syncHierarchy(app, target.id);
+    refreshSearchableSelects(app);
   }
   if (target.id === "season-id") {
-    filterSelectOptions("stage-id", "seasonId", target.value || null);
+    rulesFeature.syncHierarchy(app, target.id);
+    refreshSearchableSelects(app);
   }
   if (target.id === "stage-id") {
     const kind = target.selectedOptions[0]?.dataset.kind;
@@ -8309,20 +8027,10 @@ document.addEventListener("change", (event) => {
       document.querySelector<HTMLSelectElement>("#competition-kind");
     if (kind && kindSelect) kindSelect.value = kind;
   }
-  if (target.id === "binding-competition-id") {
-    filterSelectOptions(
-      "binding-season-id",
-      "competitionId",
-      target.value || null,
-    );
-    filterSelectOptions(
-      "binding-stage-id",
-      "competitionId",
-      target.value || null,
-    );
-  }
-  if (target.id === "binding-season-id") {
-    filterSelectOptions("binding-stage-id", "seasonId", target.value || null);
+  if (target.id.startsWith("binding-")) {
+    rulesFeature.invalidatePreview();
+    rulesFeature.syncHierarchy(app, target.id);
+    refreshSearchableSelects(app);
   }
   if (target.id === "new-match-competition-scope") {
     updateCompetitionHierarchy("scope");
@@ -8529,6 +8237,7 @@ export function createBrowserApplicationModule(
     shellController?.destroy();
     browserLifecycleController.destroy();
     databaseFeature.stop();
+    rulesFeature.stop();
     session.stop();
     openAiExampleRequests.destroy();
     navigation.destroy();

@@ -27,9 +27,7 @@ export function productionFixture(root) {
   const css=readStylesheet(root,"src/styles/index.css");
   const runtime=`const modules=${JSON.stringify(modules)};const cache={};function load(id){if(cache[id])return cache[id];const r=modules[id],exports={};cache[id]=exports;new Function('exports','require',r.output)(exports,s=>load(r.imports[s]));return exports;}`;
   const main=read("src/main.ts");
-  const filterSource=main.slice(main.indexOf("function filterRulesCompetitionCatalogue()"),main.indexOf("function selectRulesDirectoryLevel("));
-  if(!filterSource.startsWith("function filterRulesCompetitionCatalogue")) throw Error("Production competition filter missing");
-  const filter=ts.transpileModule(filterSource,{compilerOptions:{target:ts.ScriptTarget.ES2022}}).outputText;
+  const filter = `const filterRulesCompetitionCatalogue=load("scripts/design-refresh/browserFixture.ts").filterRulesCompetitionCatalogue;`;
   const playerLoadingSource=main.slice(main.indexOf("function setPlayerPageLoading("),main.indexOf("async function loadPlayerPage("));
   if(!playerLoadingSource.startsWith("function setPlayerPageLoading"))throw Error("Production local player loading helper missing");
   const playerLoading=ts.transpileModule(playerLoadingSource,{compilerOptions:{target:ts.ScriptTarget.ES2022}}).outputText;

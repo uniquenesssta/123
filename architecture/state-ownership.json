@@ -578,8 +578,36 @@
       ],
       "transition": null,
       "migration_task": "R13-02"
+    },
+    {
+      "id": "browser.rules-workflow",
+      "owner": "src/features/rules/rulesWorkflow.ts::RulesWorkflow",
+      "scope": "transient binding writes and route preview identity; Bootstrap remains Session owned and controls remain Workspace owned",
+      "writers": [
+        "RulesWorkflow methods"
+      ],
+      "forbidden": [
+        "src/pages/**",
+        "src/app/session/**"
+      ],
+      "transition": null,
+      "migration_task": "R13-03"
+    },
+    {
+      "id": "browser.rule-package-import",
+      "owner": "src/features/rules/rulePackageImport.ts::RulePackageImport",
+      "scope": "one transient selected rule package file, read revision and detached draft; no persisted copy",
+      "writers": [
+        "RulePackageImport methods"
+      ],
+      "forbidden": [
+        "src/pages/**",
+        "src/app/session/**"
+      ],
+      "transition": null,
+      "migration_task": "R13-03"
     }
   ],
-  "count": 39,
-  "last_updated_task": "R12-17"
+  "count": 41,
+  "last_updated_task": "R13-03"
 }
