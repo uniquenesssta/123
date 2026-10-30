@@ -1,4 +1,3 @@
-import { verifyCompetitionRulesWorkflow } from "./features/verifyCompetitionRulesWorkflow.mjs";
 import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
@@ -118,5 +117,3 @@ if (failures.length) {
   process.exit(1);
 }
 console.log("R5-05 Route Resolution verified: context and route reads retain their unique typed persistence owners, and the approved R5-06 model identity owner has replaced legacy routing.rs.");
-
-await verifyCompetitionRulesWorkflow(root, "route");

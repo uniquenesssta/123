@@ -1,6 +1,6 @@
 # R13-03 赛事层级、规则包与路由
 
-状态：**VERIFYING**。2026-10-31，用户“收尾02开始03”授权；覆盖原 R13-03 Competitions 与 R13-04 Rules。02 已按 `d167e948` 精确 Windows CI、下载产物、双 bundle 和 startup 收尾，收尾提交 `6f40a742`。03 代码 `12ba495c583ea25fd32b508aa68cceea9407f9d0` 已提交并推送。自身 CI 仅查询一次：[Public Platform CI run41110961979](https://github.com/uniquenesssta/123/actions/runs/41110961979)，精确 head/分支/event=push 均匹配，查询时 **in_progress / conclusion=null**。尚不能判定通过，未轮询；自身 CI/安装包验收未完成，不提前标 DONE。05 未启动。
+状态：**VERIFYING（CI失败已定位修复，待修复提交自身CI/产物验收）**。原代码 `12ba495c583ea25fd32b508aa68cceea9407f9d0` 的 [run41110961979](https://github.com/uniquenesssta/123/actions/runs/41110961979) / job124252955643 已确认为 **completed / failure**，head/分支均匹配。失败在前端依赖安装前的架构门禁：新增运行期行为测试需要 TypeScript；Windows 自动验收被跳过，0 个产物，不能收尾。用户本轮“收尾03开始04”授权继续修复与核验；原04已按任务书并入03，本轮逐项核对，05未启动。
 
 依据：[阶段任务书](../../football-model-platform-modular-rewrite-19-docs/13-R13-core-ui-features.md)、[执行约定](../remaining-execution-contract.md)、[前期遗留账本](../prior-stage-baseline-20261030.md) BA-01/BA-14。保持用户批准的 R12 视觉与页面入口，不修改 R12 任务书、索引或完成记录。
 
@@ -42,7 +42,7 @@
 | 验证类别 | 本轮结果/范围 |
 | --- | --- |
 | 静态与边界 | 完整 `npm run verify:architecture` 通过；最终 routeView 移交后再次通过模块边界/状态 owner。原命令、受控资产等完整前端门禁均保留，未关闭或降低任何检查 |
-| 自动生产行为 | 原 hierarchy/bindings/route-resolution 三个入口接入 `scripts/features/verifyCompetitionRulesWorkflow.mjs`；最终 **10 + 13 + 8 = 31** 项通过，实际加载生产类，只有 API/Session/DOM 边界使用夹具 |
+| 自动生产行为 | 现由安装依赖后的原 `verify-browser-bootstrap.mjs` 入口执行 `scripts/features/verifyCompetitionRulesWorkflow.mjs` 的全部三组；hierarchy/bindings/route-resolution 原静态断言保持；最终 **10 + 13 + 8 = 31** 项通过，实际加载生产类，只有 API/Session/DOM 边界使用夹具 |
 | 类型/生产构建 | 完整 **96 步**前端验收通过。最后规则包默认字段兼容与路由展示移交后，再跑 31 项行为、受影响边界、TypeScript 和 Vite build，均通过；其他未变检查沿用本轮完整结果。保留既有 JS chunk 大小提示 |
 | Windows 实际浏览器 | 最终生产入口 bootstrap/main/Router/Session/Feature 的 **28 项**检查通过；只替换 Tauri 外部返回，不替换页面或工作流。涵盖四种创建、层级切换、绑定拒绝草稿、删除取消/拒绝、文件乱序/格式/注册失败恢复、预览过期与保存新绑定后重新预览；0 未捕获错误 |
 | Windows 原生构建/运行 | `cargo build --locked -p football-match-model-desktop` 通过；最终当前 Vite 生产入口的桌面开发版实际启动，startup PASS，**5 条记录 / bootstrap、read_workspace_state / 0 错误** |
@@ -72,3 +72,24 @@
 ## 本次推送与后续收尾入口
 
 代码批次为 `12ba495c583ea25fd32b508aa68cceea9407f9d0`，已推送 `origin/rewrite/r13-core-ui-features`。单次查询获得 run41110961979，状态运行中。未下载本批产物，也未用02的产物替代03。后续收尾只核此精确代码的最终运行、证据包摘要、MSI/NSIS和startup；完成前保持 VERIFYING，不启动05。此后状态记录提交只修改文档，不改变受测代码。
+
+## 2026-10-31 CI入口修复与原04核对
+
+前一轮本机门禁通过，但本机父目录已有 TypeScript，未覆盖 CI 的全新依赖状态。这是本批测试接线引入的问题，不是环境偶发错误。CI 顺序为：架构静态门禁 → Windows Automated 中的 setup → 前端运行期/构建。将运行期测试挂在三个架构链守卫末尾，导致未安装 TypeScript 时加载失败。
+
+本次只调整四个现有验证入口：三个 Competition/Route 守卫退出运行期导入与调用，原断言不改；`verify-browser-bootstrap.mjs` 在现有依赖安装后的前端门禁中执行原31项（10层级/13绑定与包/8路由），任何一项失败仍使门禁失败。未删除测试、修改生产代码、降低断言、添加依赖或修改CI工作流，96步入口数量保持。
+
+复现与修复证据：从 `1bd4f393` 导出独立副本，确认 `require.resolve("typescript")` 为 MODULE_NOT_FOUND；原完整 `npm run verify:architecture` 重现相同错误。只同步这四个修复脚本后，保持 TypeScript 缺席，完整架构门禁通过。原工程新前端入口的31项生产行为通过；完整96步复验正在运行，完成后追加结果。
+
+日志：`O:/Project/FOODBALL/tmp/r13-03-ci-clean-before.log`（预期失败）、`r13-03-ci-clean-after.log`（通过）、`r13-03-ci-fix-frontend.log`（本轮完整门禁）。独立副本为测试产物，进程TEMP/TMP仍在项目tmp；未清理或删除任何目录。
+
+| 原R13-04义务 | 已核对的实际路径和证据 |
+| --- | --- |
+| 规则包文件/草稿/校验 | `RulePackageImport` + `RulesFeature.readPackage/registerPackage` → 原 `api.registerRulePackage`；最后文件有效、形状预检、后端默认字段/合法性、失败草稿保留与A注册不清B，原行为及28项浏览器证据覆盖 |
+| 绑定与目录 | `bindingView` + `RulesFeature.createBinding` + `RulesWorkflow.saveBinding` → 原 `createCompetitionBinding`；真实ID/作用范围/优先级 DTO 保留，无虚构更新命令 |
+| 路由与父级变化 | `RulesWorkflow.resolve` + `hierarchyContext` + `routeView`；Session/DOM/代次失效，后端结果唯一，旧结果不能授权执行；V1/V3及公开视图转义检查覆盖 |
+| 失败与危险操作 | 后端拒绝不刷新成虚假成功，取消不写入，当前Session确认保护；V2及注册/绑定失败恢复检查覆盖 |
+| UI组合与唯一owner | 原rules导航和四页签组合两个Feature，Workspace/Session/Modal公共owner保留，R12视觉不变；原04不重复创建新模块或新任务编号 |
+| 最终验收边界 | 本轮CI失败修复后仍需精确新提交的CI、MSI/NSIS/证据摘要/startup；真实PG/Full仍BA-14/R17-06。原04不得先于合并主交付标DONE |
+
+当前结论：原04已实现并核对，随03共同VERIFYING；下一主交付为05，本轮没有将“开始04”擅自当作05实施授权。
