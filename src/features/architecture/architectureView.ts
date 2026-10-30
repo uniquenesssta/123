@@ -1,5 +1,5 @@
-import { taskContextRibbon, taskPageHeader } from "../ui/patterns/workbench";
-import { workspaceTaskAnchorNavigation } from "../ui/navigation";
+import { taskContextRibbon, taskPageHeader } from "../../ui/patterns/workbench";
+import { workspaceTaskAnchorNavigation } from "../../ui/navigation";
 
 
 export function architecturePage(): string {

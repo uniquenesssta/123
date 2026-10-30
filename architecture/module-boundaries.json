@@ -113,12 +113,14 @@
         "route": "api_workspace"
       },
       "architecture": {
-        "owner": "src/pages/architecture.ts",
-        "route": "architecture"
+        "owner": "src/features/architecture/architectureView.ts",
+        "route": "architecture",
+        "public_entry": "src/features/architecture/index.ts"
       },
       "dashboard": {
-        "owner": "src/pages/dashboard.ts",
-        "route": "dashboard"
+        "owner": "src/features/dashboard/dashboardView.ts",
+        "route": "dashboard",
+        "public_entry": "src/features/dashboard/index.ts"
       },
       "database": {
         "owner": "src/pages/database.ts",

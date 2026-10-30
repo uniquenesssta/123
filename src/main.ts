@@ -41,9 +41,9 @@ import { escapeHtml, formatPercent } from "./components/format";
 import { displayPlayerName, positionLabel } from "./components/footballText";
 import { enhanceSearchableSelects, refreshSearchableSelects } from "./components/searchableSelect";
 import { bindSearchableSelectDiagnostics } from "./diagnostics/searchableSelectDiagnostics";
-import { architecturePage } from "./pages/architecture";
+import { architecturePage } from "./features/architecture";
 import { analyticsPage } from "./pages/analytics";
-import { dashboardPage } from "./pages/dashboard";
+import { dashboardPage } from "./features/dashboard";
 import { databasePage } from "./pages/database";
 import { predictionPage } from "./pages/prediction";
 import { rulesPage } from "./pages/rules";
@@ -2178,6 +2178,8 @@ async function navigateTo(nextPage: Page): Promise<void> {
 
 async function loadNavigationPage(request: NavigationRequest): Promise<void> {
   const nextPage = request.page;
+  // Read-only Features consume Session/current static explanation; no page-owned loading state.
+  if (nextPage === "dashboard" || nextPage === "architecture") return;
   if (nextPage === "logs") {
     const logs = await api.listIssueLogs(500);
     if (navigation.isCurrent(request)) issueLogs = logs;

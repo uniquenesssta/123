@@ -1,5 +1,9 @@
 # 足球模型平台公开外壳
 
+## R13-01 首页与架构只读接入（VERIFYING）
+
+两个只读页面接入Feature公开入口，首页统计由当前Session摘要投影，快捷入口沿原Router；9种原HTML对比完全一致。96步前端、7项新行为、18项Windows浏览器生产运行和当前桌面开发版startup通过；本提交CI/MSI/NSIS另验，不轮询。详[实施记录](docs/modular-rewrite/R13-core-ui-features/R13-01-read-only-entry-pilot.md)与[阶段索引](docs/modular-rewrite/R13-core-ui-features/README.md)。R13-02尚未启动。
+
 ## 后续任务书订正（2026-10-30）
 
 按当前代码与软件要求修订总纲中后续执行要求及R13～R18：原67项能力完整映射到24个交付批次，按职责复用/迁移/修复，测试随批交付，最终真实环境验收保留。排除UI改版；用户已明确R12结束，本轮不调整R12任务书或索引，R13开发尚未启动。详[审计与任务去向](docs/modular-rewrite/task-plan-review-20261030.md)。

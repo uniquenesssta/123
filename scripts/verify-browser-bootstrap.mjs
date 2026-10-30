@@ -129,6 +129,7 @@ for (const path of requiredFiles) {
 // R12-02 executes production modules in this existing verification entry. No runner or dependency added.
 let lifecycleCases = 0;
 let sessionCases = 0;
+let readOnlyFeatureCases = 0;
 async function verifyLifecycleBehavior() {
   const ts = createRequire(import.meta.url)("typescript");
   const cache = new Map();
@@ -143,6 +144,7 @@ async function verifyLifecycleBehavior() {
     const require = specifier => {
       assert.ok(specifier.startsWith("."), `Production lifecycle dependency must be local: ${specifier}`);
       const target = resolve(file, "..", specifier);
+      if (specifier.endsWith(".svg?raw")) return { default: read(target.replace(/\?raw$/, "")) };
       return load(existsSync(`${target}.ts`) ? `${target}.ts` : `${target}/index.ts`);
     };
     new Function("exports", "require", output)(exports, require);
@@ -169,6 +171,90 @@ async function verifyLifecycleBehavior() {
     const session = new AppSession({ loadBootstrap: options.loadBootstrap ?? (async () => bootstrap("initial")), loadRecentRuns: options.loadRecentRuns ?? (async () => [{ id: "recent" }]), applyTheme: theme => themes.push(theme) }, persistence);
     return { session, values, writes, themes };
   };
+  // R13-01: execute the actual read-only Features against Session-owned snapshots.
+  const { dashboardPage } = load("src/features/dashboard/index.ts");
+  const { architecturePage } = load("src/features/architecture/index.ts");
+  const { projectDashboard } = load("src/features/dashboard/dashboardProjection.ts");
+  const { isRoute } = load("src/app/router/index.ts");
+  const { state: layoutState } = load("scripts/design-refresh/fixtureData.ts");
+  const dashboardFixture = () => ({ ...structuredClone(layoutState), connection_error: null, config_path: "database.json", runtime_log_path: "runtime.jsonl" });
+  const featureTest = async (name, run) => {
+    try { await run(); readOnlyFeatureCases++; }
+    catch (error) { failures.push(`R13-01 ${name}: ${error.stack ?? error}`); }
+  };
+  await featureTest("unconfigured and failed connection keep setup and unknown statistics", () => {
+    for (const error of [null, "connection unavailable <unsafe>"]) {
+      const input = dashboardFixture();
+      Object.assign(input.data, { database_configured: false, stats: null, database_health: null });
+      input.connection_error = error;
+      const before = JSON.stringify(input), html = dashboardPage(input), view = projectDashboard(input);
+      assert.equal(view.databaseConfigured, false);
+      assert.equal(view.metrics[0].value, "未连接");
+      assert.deepEqual(view.metrics.slice(1).map(item => item.value), ["—", "—", "—"]);
+      assert.ok(html.includes('data-action="connect-database"') && html.includes("请先连接数据库"));
+      if (error) { assert.equal(view.connectionError, error); assert.ok(html.includes("上次连接未成功") && !html.includes(error)); }
+      assert.equal(JSON.stringify(input), before);
+    }
+  });
+  await featureTest("real supplied zeros and estimates remain distinct from missing data", () => {
+    const input = dashboardFixture();
+    Object.assign(input.data.stats, { players: 0, matches: 0, model_runs: 0, large_counts_are_estimates: false });
+    assert.deepEqual(projectDashboard(input).metrics.slice(1).map(item => item.value), ["0", "0", "0"]);
+    input.data.stats.large_counts_are_estimates = true;
+    assert.equal(projectDashboard(input).metrics[1].value, "约 0");
+    assert.ok(dashboardPage(input).includes("运行正常"));
+    assert.ok(!dashboardPage(input).includes('data-action="connect-database"'));
+  });
+  await featureTest("Session refresh supplies the next projection without a second summary owner", async () => {
+    let supplied = dashboardFixture();
+    supplied.data.stats.players = 19;
+    const { session } = sessionFixture({ loadBootstrap: async () => supplied });
+    await session.start();
+    const first = session.bootstrap;
+    assert.equal(projectDashboard(first).metrics[1].value, "约 19");
+    supplied = dashboardFixture(); supplied.data.stats.players = 27;
+    await session.refresh();
+    assert.equal(projectDashboard(session.bootstrap).metrics[1].value, "约 27");
+    assert.equal(projectDashboard(first).metrics[1].value, "约 19");
+    assert.ok(Object.isFrozen(first.data));
+    await session.destroy();
+  });
+  await featureTest("late old refresh cannot restore old dashboard data", async () => {
+    const old = deferred(), fresh = dashboardFixture(); fresh.data.stats.players = 37;
+    const loads = [];
+    const { session } = sessionFixture({ loadBootstrap: () => loads.length ? loads.shift() : Promise.resolve(dashboardFixture()) });
+    await session.start();
+    loads.push(old.promise, Promise.resolve(fresh));
+    const oldRefresh = session.refresh(), newRefresh = session.refresh();
+    await newRefresh;
+    old.resolve(dashboardFixture()); await oldRefresh;
+    assert.equal(projectDashboard(session.bootstrap).metrics[1].value, "约 37");
+    await session.destroy();
+  });
+  await featureTest("five shortcut intents remain valid Router routes after repeated rendering", () => {
+    const expected = ["lineups", "prediction", "review", "analytics", "players"];
+    for (let visit = 0; visit < 3; visit++) {
+      const targets = [...dashboardPage(dashboardFixture()).matchAll(/data-page="([^"]+)"/g)].map(match => match[1]);
+      assert.deepEqual(targets, expected);
+      assert.ok(targets.every(isRoute));
+    }
+  });
+  await featureTest("model registration is supplied data and escaped, never a synthetic model", () => {
+    const input = dashboardFixture();
+    input.data.models = [{ display_name: "<model>", model_id: "m&1", engine_version: "1", supported_competitions: ["league"] }];
+    const html = dashboardPage(input);
+    assert.ok(html.includes("&lt;model&gt;") && html.includes("m&amp;1") && !html.includes("<model>"));
+    input.data.models = [];
+    assert.ok(!dashboardPage(input).includes('class="model-card"'));
+  });
+  await featureTest("architecture is deterministic read-only explanation with valid anchors", () => {
+    const html = architecturePage();
+    assert.equal(architecturePage(), html);
+    assert.ok(html.includes("只读说明"));
+    assert.ok(!/data-action="(?:save|delete|update|reset|register)/.test(html));
+    for (const anchor of ["architecture-flow", "architecture-principles", "architecture-modules"]) assert.ok(html.includes(`id="${anchor}"`));
+  });
+
   await sessionTest("legacy theme key and raw value survive restart", async () => {
     const { session, values, themes } = sessionFixture({ theme: "dark" });
     assert.equal(SESSION_THEME_KEY, "football-model-platform.theme"); assert.equal(session.theme, "dark"); assert.deepEqual(themes, ["dark"]);
@@ -465,4 +551,4 @@ if (failures.length > 0) {
   for (const failure of failures) console.error(`- ${failure}`);
   process.exit(1);
 }
-console.log(`浏览器组合根验证通过：唯一入口、模块注册和生命周期边界；${lifecycleCases}项真实生命周期行为、${sessionCases}项真实会话行为测试通过。`);
+console.log(`浏览器组合根验证通过：唯一入口、模块注册和生命周期边界；${lifecycleCases}项真实生命周期行为、${sessionCases}项真实会话行为及${readOnlyFeatureCases}项只读Feature行为测试通过。`);
