@@ -1,0 +1,37 @@
+
+
+/* Resource-center operational scrolling: roster/player tables own the vertical wheel. */
+.team-detail-workspace,
+.player-browser,
+.team-detail-workspace > .entity-main,
+.player-browser > .entity-main,
+.team-detail-workspace .entity-table-section,
+.player-browser .entity-table-wrap {
+  min-height: 0;
+  max-height: 100%;
+}
+.team-detail-workspace .entity-table-wrap,
+.player-browser .player-table-wrap {
+  height: 100%;
+  max-height: 100%;
+  overflow-x: auto;
+  overflow-y: scroll;
+  overscroll-behavior: contain;
+  touch-action: pan-x pan-y;
+  scrollbar-width: thin;
+  scrollbar-color: color-mix(in srgb, var(--muted) 48%, transparent) transparent;
+}
+.team-detail-workspace .entity-table-wrap::-webkit-scrollbar,
+.player-browser .player-table-wrap::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+.team-detail-workspace .entity-table-wrap::-webkit-scrollbar-thumb,
+.player-browser .player-table-wrap::-webkit-scrollbar-thumb {
+  border: 2px solid transparent;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--muted) 42%, transparent);
+  background-clip: padding-box;
+}
+.team-detail-workspace .entity-table-wrap::-webkit-scrollbar-track,
+.player-browser .player-table-wrap::-webkit-scrollbar-track { background: transparent; }

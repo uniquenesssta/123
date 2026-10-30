@@ -1,0 +1,283 @@
+
+
+/* ==========================================================================
+   ENTITY CENTER VISUAL OVERHAUL
+   Pure presentation overrides for team/player resource browsing.
+   ========================================================================== */
+
+.app-shell[data-current-page="teams"] .page-container,
+.app-shell[data-current-page="players"] .page-container {
+  height: calc(100dvh - var(--ui-topbar-height, 62px));
+  padding: 15px 17px 17px;
+  background: transparent;
+}
+
+.entity-page { gap: 11px; }
+.entity-page-header {
+  min-height: 58px;
+  align-items: center;
+  padding: 0 2px 11px;
+  border-bottom: 1px solid var(--line);
+}
+.entity-page-header h1 { font-size: clamp(21px, 1.55vw, 27px); }
+.entity-page-header p { font-size: 10px; }
+.entity-page-header .eyebrow { font-size: 9px; }
+.entity-page-actions { gap: 7px; }
+.entity-mode-switch {
+  padding: 2px;
+  border-color: var(--border);
+  border-radius: 8px;
+  background: var(--surface-soft);
+}
+.entity-mode-switch button {
+  min-height: 30px;
+  padding: 5px 12px;
+  border-radius: 6px;
+  font-size: 10px;
+}
+.entity-mode-switch button.active {
+  color: var(--text-strong);
+  background: var(--accent-soft);
+  box-shadow: none;
+}
+
+.entity-browser {
+  grid-template-columns: minmax(246px, 276px) minmax(560px, 1fr) minmax(300px, 340px);
+  gap: 10px;
+}
+.entity-browser.inspector-collapsed { grid-template-columns: minmax(246px, 276px) minmax(560px, 1fr); }
+.entity-browser > .panel {
+  border-color: var(--border);
+  border-radius: var(--ui-radius-md, 10px);
+  background: var(--panel);
+  box-shadow: none;
+}
+.entity-directory-header {
+  min-height: 55px;
+  padding: 11px 12px;
+  border-bottom-color: var(--line);
+  background: var(--surface-soft);
+}
+.entity-directory-header span { color: var(--muted-2); font-size: 9px; }
+.entity-directory-header strong { color: var(--text-strong); font-size: 12px; }
+.entity-search {
+  min-height: 36px;
+  margin: 9px 9px 7px;
+  padding-left: 9px;
+  border-color: var(--border);
+  border-radius: 7px;
+  background: var(--input);
+}
+.entity-search input { height: 34px; font-size: 10px; }
+.entity-search button {
+  height: 28px;
+  border-radius: 5px;
+  color: var(--accent);
+  background: var(--accent-soft);
+  font-size: 9px;
+}
+.entity-filter-row { gap: 7px; padding: 0 9px 8px; }
+.entity-filter-field > span { color: var(--muted-2); font-size: 9px; }
+.entity-filter-field select { min-height: 34px; font-size: 10px; }
+
+.entity-directory-list,
+.entity-directory-table,
+.player-directory-table { padding: 3px 6px 6px; }
+.entity-directory-item,
+.entity-directory-open,
+.player-directory-table .entity-directory-item {
+  min-height: 47px;
+  margin: 2px 0;
+  padding: 7px 8px;
+  border: 1px solid transparent;
+  border-radius: 7px;
+  color: var(--text);
+  background: transparent;
+}
+.entity-directory-item:hover,
+.entity-directory-open:hover { background: var(--soft); }
+.entity-directory-item.active,
+.entity-directory-item.selected,
+.entity-directory-open.active,
+.entity-directory-open.selected {
+  border-color: color-mix(in srgb, var(--accent) 30%, var(--border));
+  background: var(--accent-soft);
+  box-shadow: inset 2px 0 0 var(--accent);
+}
+.entity-avatar,
+.team-avatar,
+.player-avatar {
+  border-color: color-mix(in srgb, var(--accent) 28%, var(--border));
+  border-radius: 8px;
+  color: var(--accent);
+  background: var(--accent-soft);
+}
+.entity-directory-copy strong { color: var(--text-strong); font-size: 11px; }
+.entity-directory-copy span,
+.entity-directory-copy small { color: var(--muted); font-size: 9px; }
+.entity-directory-metrics { color: var(--muted-2); font-size: 9px; }
+.entity-directory-foot,
+.entity-directory-footer {
+  min-height: 43px;
+  padding: 8px 10px;
+  border-top-color: var(--line);
+  background: var(--surface-soft);
+}
+
+.entity-main { background: var(--panel); }
+.entity-table-toolbar,
+.entity-resource-header,
+.team-resource-header {
+  min-height: 56px;
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--line);
+  background: var(--surface-soft);
+}
+.entity-table-toolbar h2,
+.entity-resource-title h2,
+.team-resource-title h2 { color: var(--text-strong); font-size: 14px; }
+.entity-table-toolbar p,
+.entity-resource-title p,
+.team-resource-title p { color: var(--muted); font-size: 9px; }
+.entity-resource-actions,
+.entity-list-actions { gap: 6px; }
+.entity-selection-bar {
+  min-height: 38px;
+  padding: 7px 11px;
+  border-bottom-color: var(--line);
+  color: var(--text);
+  background: color-mix(in srgb, var(--accent) 7%, var(--surface-soft));
+}
+.entity-data-table,
+.player-directory-table,
+.roster-table { font-size: 10px; }
+.entity-data-table thead,
+.player-directory-table thead,
+.roster-table thead {
+  position: sticky;
+  top: 0;
+  z-index: 3;
+  color: var(--muted-2);
+  background: var(--surface-soft);
+}
+.entity-data-table th,
+.player-directory-table th,
+.roster-table th {
+  height: 34px;
+  padding: 7px 9px;
+  border-bottom-color: var(--border);
+  font-size: 9px;
+  font-weight: 750;
+}
+.entity-data-table td,
+.player-directory-table td,
+.roster-table td {
+  height: 45px;
+  padding: 7px 9px;
+  border-bottom-color: var(--line);
+}
+.entity-data-table tbody tr:hover,
+.player-directory-table tbody tr:hover,
+.roster-table tbody tr:hover { background: var(--soft-hover); }
+.entity-data-table tbody tr.selected,
+.player-directory-table tbody tr.selected { background: var(--accent-soft); box-shadow: inset 2px 0 0 var(--accent); }
+.table-main-text,
+.entity-table-person strong { color: var(--text-strong); font-size: 11px; }
+.table-subtext,
+.entity-table-person small { color: var(--muted); font-size: 9px; }
+.rating-value { color: var(--accent); font-variant-numeric: tabular-nums; }
+.position-chip,
+.status-chip,
+.muted-chip {
+  min-height: 22px;
+  padding: 3px 6px;
+  border: 1px solid var(--border);
+  border-radius: 5px;
+  font-size: 9px;
+  background: var(--surface-soft);
+}
+
+.entity-inspector {
+  border-left: 0;
+  background: var(--panel);
+}
+.entity-inspector-content { padding: 0; }
+.inspector-identity,
+.team-detail-hero,
+.player-profile-hero {
+  padding: 14px;
+  border-bottom: 1px solid var(--line);
+  background:
+    linear-gradient(135deg, color-mix(in srgb, var(--accent) 8%, var(--surface-soft)), var(--surface-soft));
+}
+.inspector-identity h2,
+.team-detail-hero h2,
+.player-profile-hero h2 { color: var(--text-strong); font-size: 18px; }
+.inspector-description { color: var(--muted); font-size: 10px; }
+.inspector-actions,
+.detail-actions { gap: 6px; }
+.inspector-section {
+  padding: 12px 14px;
+  border-bottom-color: var(--line);
+}
+.inspector-section-title { margin-bottom: 9px; color: var(--text-strong); font-size: 11px; }
+.inspector-facts { gap: 7px; }
+.inspector-facts > div,
+.inspector-score-row,
+.team-rating-grid > div,
+.player-profile-summary > div {
+  border-color: var(--border);
+  border-radius: 7px;
+  background: var(--surface-soft);
+}
+.inspector-facts span,
+.inspector-score-row span,
+.team-rating-grid span,
+.player-profile-summary span { color: var(--muted-2); font-size: 8px; }
+.inspector-facts strong,
+.inspector-score-row strong,
+.team-rating-grid strong,
+.player-profile-summary strong { color: var(--text-strong); font-size: 11px; }
+.inspector-score-row strong,
+.team-rating-grid strong { color: var(--accent); font-variant-numeric: tabular-nums; }
+
+.entity-filter-groups { gap: 7px; padding: 7px 9px 0; }
+.entity-filter-group {
+  padding: 8px;
+  border-color: var(--border);
+  border-radius: 7px;
+  background: var(--surface-soft);
+}
+.entity-filter-group > header strong { color: var(--text-strong); font-size: 10px; }
+.entity-filter-group > header small { color: var(--muted-2); font-size: 8px; }
+.entity-active-filters {
+  margin: 7px 9px 0;
+  padding: 7px;
+  border-color: var(--border);
+  border-radius: 7px;
+  background: var(--surface-soft);
+}
+.entity-active-filters span { border-radius: 5px; color: var(--accent); background: var(--accent-soft); }
+
+.entity-task-workspace {
+  border-color: var(--border-strong);
+  background: var(--panel);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, .08);
+}
+.entity-task-body { background: var(--bg); }
+
+.player-source-prefill {
+  border-color: color-mix(in srgb, var(--accent) 28%, var(--border));
+  background: color-mix(in srgb, var(--accent) 6%, var(--panel));
+}
+
+@media (max-width: 1380px) {
+  .entity-browser { grid-template-columns: 244px minmax(520px, 1fr) 310px; }
+}
+@media (max-width: 1180px) {
+  .entity-browser,
+  .entity-browser.inspector-collapsed { grid-template-columns: 232px minmax(500px, 1fr); }
+  .entity-browser > .entity-inspector { display: none; }
+}
+
+.directory-foot-actions { display: flex; align-items: center; gap: 6px; }

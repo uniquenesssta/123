@@ -1,0 +1,64 @@
+
+
+/* Excel 数据交换 */
+.spreadsheet-panel { margin-bottom: 18px; }
+.spreadsheet-actions { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; padding: 16px; }
+.spreadsheet-actions article { display: flex; flex-direction: column; gap: 8px; min-height: 150px; padding: 15px; border: 1px solid var(--border); border-radius: 14px; background: var(--surface-soft); }
+.spreadsheet-actions article strong { font-size: 14px; }
+.spreadsheet-actions article > span { color: var(--text-muted); font-size: 12px; line-height: 1.55; flex: 1; }
+.spreadsheet-actions article .field { margin: 2px 0; }
+.spreadsheet-preview { border-top: 1px solid var(--border); padding: 16px; }
+.preview-summary { display: grid; grid-template-columns: minmax(220px, 2fr) repeat(5, minmax(84px, .7fr)); gap: 8px; margin-bottom: 14px; }
+.preview-summary > div { padding: 11px 12px; border: 1px solid var(--border); border-radius: 10px; background: var(--surface-soft); }
+.preview-summary span { display: block; color: var(--text-muted); font-size: 11px; margin-bottom: 4px; }
+.preview-summary strong { font-size: 14px; word-break: break-word; }
+.preview-count.add strong { color: var(--success); }
+.preview-count.update strong { color: var(--accent); }
+.preview-count.conflict strong, .preview-count.error strong { color: var(--danger); }
+.spreadsheet-table-wrap { max-height: 360px; overflow: auto; border: 1px solid var(--border); border-radius: 12px; }
+.spreadsheet-table { width: 100%; border-collapse: collapse; font-size: 12px; }
+.spreadsheet-table th { position: sticky; top: 0; z-index: 1; padding: 9px 10px; background: var(--surface-strong); color: var(--text-muted); text-align: left; }
+.spreadsheet-table td { padding: 9px 10px; border-top: 1px solid var(--border); vertical-align: top; }
+.spreadsheet-table .status-conflict td, .spreadsheet-table .status-error td { background: color-mix(in srgb, var(--danger) 8%, transparent); }
+.candidate-list { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 6px; }
+.candidate-list span { padding: 3px 6px; border-radius: 6px; background: var(--surface-strong); color: var(--text-muted); }
+.blocking-note { color: var(--danger); font-size: 12px; align-self: center; }
+.empty-inline { margin: 0 16px 16px; padding: 14px; border: 1px dashed var(--border); border-radius: 10px; color: var(--text-muted); font-size: 12px; text-align: center; }
+@media (max-width: 1180px) {
+  .spreadsheet-actions { grid-template-columns: 1fr; }
+  .preview-summary { grid-template-columns: repeat(3, 1fr); }
+  .preview-summary > div:first-child { grid-column: 1 / -1; }
+}
+
+.candidate-list {
+  display: grid;
+  gap: 6px;
+  margin-top: 8px;
+}
+.candidate-choice,
+.candidate-skip {
+  width: 100%;
+  border: 1px solid var(--border-color);
+  border-radius: 9px;
+  background: var(--surface-soft);
+  color: var(--text-primary);
+  padding: 8px 10px;
+  text-align: left;
+  cursor: pointer;
+}
+.candidate-choice:hover {
+  border-color: var(--accent);
+  background: var(--accent-soft);
+}
+.candidate-choice strong,
+.candidate-choice small {
+  display: block;
+}
+.candidate-choice small {
+  margin-top: 2px;
+  color: var(--text-secondary);
+}
+.candidate-skip {
+  color: var(--text-secondary);
+  text-align: center;
+}

@@ -1,0 +1,25 @@
+
+
+/* 0.23.0 · P4 production selector and non-overlapping workspace navigation */
+.app-shell.workspace-page .balanced-section-tabs {
+  position: static;
+  top: auto;
+  z-index: auto;
+  flex: 0 0 auto;
+  width: 100%;
+  margin: 0;
+  overflow-x: auto;
+  overflow-y: hidden;
+  background: var(--panel);
+  backdrop-filter: none;
+}
+
+.app-shell.workspace-page .balanced-section-tabs .workspace-section-nav button,
+.app-shell.workspace-page .balanced-section-tabs .workspace-section-item {
+  min-height: 46px;
+  padding: 8px 13px;
+}
+
+.app-shell.workspace-page .balanced-workspace {
+  grid-template-rows: auto minmax(0, 1fr);
+}

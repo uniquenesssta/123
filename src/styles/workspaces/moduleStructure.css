@@ -1,0 +1,137 @@
+/* Stage 3: model, analysis, AI, and management pages use the same in-page hierarchy. */
+.module-workspace-page {
+  min-height: 0;
+  flex: 1 1 auto;
+  display: grid;
+  grid-template-rows: auto auto auto minmax(0, 1fr);
+  gap: 10px;
+  overflow: hidden;
+}
+
+.module-workspace-page > .task-page-header,
+.module-workspace-page > .task-context-ribbon,
+.module-workspace-page > .core-local-navigation {
+  min-width: 0;
+}
+
+.module-workspace-stage {
+  min-width: 0;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.module-workspace-stage > .workspace-module-view {
+  min-width: 0;
+  height: 100%;
+  min-height: 0;
+  display: none;
+  overflow: auto;
+  padding: 2px 2px 22px;
+  scrollbar-gutter: stable;
+}
+
+.module-workspace-stage > .workspace-module-view.active { display: block; }
+
+.workspace-task-anchor-nav { min-width: max-content; }
+.workspace-task-anchor-nav .workspace-section-nav-item { cursor: pointer; }
+.workspace-task-anchor-nav .workspace-section-nav-item.active::after { background: var(--accent); }
+
+.module-section-stack {
+  min-width: 0;
+  display: grid;
+  gap: 12px;
+}
+
+.module-section-heading {
+  min-width: 0;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 18px;
+  padding: 4px 2px 12px;
+  border-bottom: 1px solid var(--line);
+}
+.module-section-heading > div { min-width: 0; display: grid; gap: 4px; }
+.module-section-heading span { color: var(--accent); font-size: 10px; font-weight: 800; letter-spacing: .05em; }
+.module-section-heading h2 { margin: 0; color: var(--text-strong); font-size: 20px; }
+.module-section-heading p { max-width: 900px; margin: 0; color: var(--muted); font-size: 12px; line-height: 1.5; }
+
+.model-rules-workspace .rules-directory-panel,
+.model-rules-workspace .rules-admin-panel,
+.model-rules-workspace .disclosure-panel { margin: 0; }
+.model-rules-workspace .rules-route-strip { margin: 0; }
+.model-rules-workspace .workspace-anchor-target { scroll-margin-top: 58px; }
+
+.release-core-layout {
+  --workspace-inspector-width: 286px;
+  height: 100%;
+  min-height: 0;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) var(--workspace-inspector-width);
+  gap: 10px;
+  overflow: hidden;
+}
+.release-core-layout.inspector-collapsed { grid-template-columns: minmax(0, 1fr) 0; gap: 0; }
+.release-core-main { min-width: 0; min-height: 0; overflow: auto; padding: 2px 2px 22px; scrollbar-gutter: stable; }
+.release-core-main > .workspace-module-view { display: none; }
+.release-core-main > .workspace-module-view.active { display: block; }
+.release-core-layout > .workspace-inspector { min-width: 0; height: 100%; overflow: auto; }
+.release-core-layout.inspector-collapsed > .workspace-inspector { display: none; }
+
+.analysis-module-workspace .analysis-chain-map { margin: 0; }
+.analysis-module-workspace .analysis-chain-step { margin: 0; }
+.analysis-module-workspace .analysis-advanced { margin-top: 12px; }
+
+.ai-module-stage {
+  min-height: 0;
+  overflow: hidden;
+}
+.ai-chat-layout {
+  --workspace-inspector-width: 286px;
+  height: 100%;
+  min-height: 0;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) var(--workspace-inspector-width);
+  gap: 10px;
+  overflow: hidden;
+}
+.ai-chat-layout.inspector-collapsed { grid-template-columns: minmax(0, 1fr); }
+.ai-chat-layout.inspector-collapsed > .workspace-inspector { display: none; }
+.ai-chat-main { min-width: 0; min-height: 0; display: grid; grid-template-rows: auto minmax(0, 1fr); gap: 10px; overflow: hidden; }
+.ai-chat-main > .api-context-panel { margin: 0; }
+.ai-chat-main > .api-chat-panel { min-height: 0; margin: 0; }
+.ai-history-layout { height: 100%; min-height: 0; display: grid; grid-template-columns: minmax(280px, 380px) minmax(0, 1fr); gap: 10px; overflow: hidden; }
+.ai-history-layout > .api-session-sidebar,
+.ai-history-layout > .api-history-preview { min-height: 0; overflow: auto; }
+.ai-history-preview { padding: 18px; }
+.ai-history-preview .api-conversation { max-height: none; }
+
+.openai-module-stage,
+.management-module-stage {
+  min-height: 0;
+  overflow: auto;
+  padding: 2px 2px 22px;
+  scrollbar-gutter: stable;
+}
+.openai-module-stage .openai-workbench { margin-top: 0; }
+.management-section { scroll-margin-top: 58px; }
+
+@media (max-width: 1180px) {
+  .release-core-layout { --workspace-inspector-width: 252px; }
+  .ai-chat-layout { --workspace-inspector-width: 252px; }
+  .ai-history-layout { grid-template-columns: minmax(250px, 330px) minmax(0, 1fr); }
+}
+
+@media (max-width: 900px) {
+  .module-workspace-page { grid-template-rows: auto auto auto auto; overflow: visible; }
+  .module-workspace-stage,
+  .module-workspace-stage > .workspace-module-view,
+  .openai-module-stage,
+  .management-module-stage { height: auto; overflow: visible; }
+  .release-core-layout,
+  .ai-chat-layout,
+  .ai-history-layout { height: auto; grid-template-columns: 1fr; overflow: visible; }
+  .release-core-layout > .workspace-inspector,
+  .ai-chat-layout > .workspace-inspector { display: none; }
+  .ai-chat-main { display: grid; grid-template-rows: auto auto; overflow: visible; }
+}

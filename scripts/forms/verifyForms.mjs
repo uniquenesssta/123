@@ -1,5 +1,9 @@
+import {productionStyleFiles} from "../styles/styleGraph.mjs";
+import {readProjectSource} from "../styles/projectSource.mjs";
+import {fileURLToPath as stylesheetFilePath} from "node:url";
+const stylesheetRoot=stylesheetFilePath(new URL("../../",import.meta.url));
 import assert from "node:assert/strict";
-import { readFileSync, writeFileSync, existsSync, mkdtempSync, mkdirSync, copyFileSync, readdirSync } from "node:fs";
+import { writeFileSync, existsSync, mkdtempSync, mkdirSync, copyFileSync, readdirSync } from "node:fs";
 import { resolve, relative, dirname, join } from "node:path";
 import { tmpdir } from "node:os";
 import { createRequire } from "node:module";
@@ -7,7 +11,7 @@ import { readStylesheet } from "../tokens/tokenStyles.mjs";
 import { resolveChromiumExecutable, captureHtmlScreenshot } from "../task-ui-screenshot-tools.mjs";
 
 export async function verifyForms(root) {
-  const read = file => readFileSync(resolve(root, file), "utf8");
+  const read = file => readProjectSource(stylesheetRoot,resolve(root, file), "utf8");
   const ts = createRequire(import.meta.url)("typescript"), modules = {};
   const bundle = file => {
     if (modules[file]) return;
@@ -17,7 +21,7 @@ export async function verifyForms(root) {
       assert.ok(specifier.startsWith("."), `Primitives must not acquire external runtime dependencies: ${specifier}`);
       const base = resolve(root, dirname(file), specifier);
       if (specifier.endsWith(".svg?raw")) {
-        const target = relative(root, base).replaceAll("\\", "/"), svg = readFileSync(base.replace(/\?raw$/, ""), "utf8");
+        const target = relative(root, base).replaceAll("\\", "/"), svg = readProjectSource(stylesheetRoot,base.replace(/\?raw$/, ""), "utf8");
         assert.match(svg, /<svg\b[^>]*\bwidth="[\d.]+"[^>]*\bheight="[\d.]+"/);
         assert.ok(!/<(?:script|foreignObject)\b|\bon[a-z]+\s*=|(?:href|src)=["']https?:/i.test(svg), `Nonlocal or active SVG metadata: ${target}`);
         modules[file].imports[specifier] = target; modules[target] = { output: `exports.default=${JSON.stringify(svg)}`, imports: {} }; continue;
@@ -30,9 +34,9 @@ export async function verifyForms(root) {
   const entry = "src/ui/forms/__tests__/formsBrowserFixture.ts"; bundle(entry);
   const runtime = "const modules="+JSON.stringify(modules)+";const cache={};function load(id){if(cache[id])return cache[id];const record=modules[id],exports={};cache[id]=exports;new Function('exports','require',record.output)(exports,s=>load(record.imports[s]));return exports;}";
   const main=read("src/main.ts");
-  assert.equal((main.match(/import "\.\/ui\/forms\/index.css";/g)??[]).length,1,"Sole Forms CSS entry");
+  assert.equal(productionStyleFiles(root).filter(file=>file==="src/ui/forms/index.css").length,1,"Sole Forms CSS entry");
   const css=readStylesheet(root,"src/ui/forms/index.css");
-  const styles=[...main.matchAll(/^import "(\.\/[^"\n]+\.css)";/gm)].map(m=>m[1].replace("./","src/")).map(file=>readStylesheet(root,file).replace(/url\("([^"\n]+\.svg)"\)/g,(_m,asset)=>'url("data:image/svg+xml;base64,'+readFileSync(resolve(root,dirname(file),asset)).toString("base64")+'")')).join("\n");
+  const styles=[...main.matchAll(/^import "(\.\/[^"\n]+\.css)";/gm)].map(m=>m[1].replace("./","src/")).map(file=>readStylesheet(root,file).replace(/url\("([^"\n]+\.svg)"\)/g,(_m,asset)=>'url("data:image/svg+xml;base64,'+readProjectSource(stylesheetRoot,resolve(root,dirname(file),asset)).toString("base64")+'")')).join("\n");
   const defined=new Set([...styles.matchAll(/(--[a-z0-9-]+)\s*:/g)].map(m=>m[1]));
   for(const [,name]of css.matchAll(/var\((--[a-z0-9-]+)/g))assert.ok(defined.has(name),"Unresolved Forms token: "+name);
   const families=["form-field","field-label","field-hint","field-error","validation-summary","confirmation-input","form-actions"];

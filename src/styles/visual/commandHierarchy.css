@@ -1,0 +1,78 @@
+
+
+/* Controls and command hierarchy. */
+button.primary,
+button.secondary,
+button.ghost,
+.file-button,
+.icon-button {
+  min-height: var(--ui-control-height);
+  border-radius: var(--ui-radius-sm);
+  font-size: 11px;
+  font-weight: 500;
+  transition: color .14s ease, border-color .14s ease, background-color .14s ease, transform .14s ease, box-shadow .14s ease;
+}
+button.primary {
+  border: 1px solid var(--ui-accent);
+  color: var(--ui-accent-ink);
+  background: var(--ui-accent);
+  box-shadow: 0 5px 12px color-mix(in srgb, var(--ui-accent) 18%, transparent);
+}
+button.primary:hover { border-color: var(--ui-accent-hover); background: var(--ui-accent-hover); }
+button.secondary,
+.file-button {
+  border: 1px solid var(--ui-border-strong);
+  color: var(--ui-text);
+  background: var(--ui-surface);
+}
+button.secondary:hover,
+.file-button:hover { color: var(--ui-text-strong); border-color: color-mix(in srgb, var(--ui-accent) 40%, var(--ui-border)); background: var(--soft-hover); }
+button.ghost { color: var(--ui-text-muted); background: transparent; }
+button.ghost:hover { color: var(--ui-text-strong); border-color: var(--ui-border); background: var(--soft-hover); }
+button.primary:active,
+button.secondary:active,
+button.ghost:active,
+.file-button:active,
+.icon-button:active { transform: translateY(1px); box-shadow: none; }
+button.tiny { min-height: var(--ui-control-height-sm); padding: 5px 8px; font-size: 10px; }
+button:disabled,
+[aria-disabled="true"] { opacity: .42; cursor: not-allowed; box-shadow: none; }
+button:disabled:active,
+[aria-disabled="true"]:active { transform: none; }
+
+.field { gap: 6px; margin-bottom: 12px; }
+.field > span,
+.inline-field > span,
+.check-field > span,
+label > span { color: var(--ui-text); font-size: 10px; font-weight: 500; }
+.field input,
+.field select,
+.inline-field select,
+textarea,
+.searchable-select-trigger,
+.searchable-select-input {
+  min-height: var(--ui-control-height);
+  border: 1px solid var(--ui-border-strong);
+  border-radius: var(--ui-radius-sm);
+  color: var(--ui-text);
+  background: var(--ui-surface-subtle);
+}
+.field input,
+.field select,
+.inline-field select { padding: 8px 10px; }
+textarea { padding: 10px 11px; line-height: 1.55; }
+.field input:hover,
+.field select:hover,
+.inline-field select:hover,
+textarea:hover { border-color: color-mix(in srgb, var(--ui-accent) 28%, var(--ui-border-strong)); }
+.field input:focus,
+.field select:focus,
+.inline-field select:focus,
+textarea:focus,
+.searchable-select-input:focus {
+  border-color: var(--ui-accent);
+  box-shadow: var(--ui-focus-ring);
+}
+.field input::placeholder,
+textarea::placeholder { color: var(--ui-text-faint); }
+.field-note { color: var(--ui-text-faint); font-size: 10px; line-height: 1.45; }

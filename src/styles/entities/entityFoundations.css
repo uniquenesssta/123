@@ -1,0 +1,10 @@
+/* 0.24.0 · unified commercial shell and large catalogue resource center */
+:root {
+  --entity-directory-width: 286px;
+  --entity-inspector-width: 342px;
+  --entity-radius: 14px;
+  --entity-control-height: 40px;
+}
+
+html, body, #app { min-width: 0; }
+body { overflow-x: hidden; }

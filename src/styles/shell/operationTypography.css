@@ -1,0 +1,15 @@
+
+
+/* Final readability floor for desktop operation. */
+.app-shell.workspace-page input,
+.app-shell.workspace-page select,
+.app-shell.workspace-page textarea,
+.app-shell.workspace-page button { font-size: 14px; }
+.app-shell.workspace-page .field > span,
+.app-shell.workspace-page .check-field,
+.app-shell.workspace-page .field-note,
+.app-shell.workspace-page .workspace-inspector p,
+.app-shell.workspace-page .inspector-list { font-size: 13px; }
+.workspace-section-copy strong { font-size: 15px; }
+.workspace-section-copy small { font-size: 12px; }
+.nav-item b { font-size: 14px; }

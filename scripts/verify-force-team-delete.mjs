@@ -1,6 +1,9 @@
+import {readProjectSource} from "./styles/projectSource.mjs";
+import {fileURLToPath as stylesheetFilePath} from "node:url";
+const stylesheetRoot=stylesheetFilePath(new URL("../",import.meta.url));
 import fs from "node:fs";
 
-const read = (path) => fs.readFileSync(new URL(`../${path}`, import.meta.url), "utf8");
+const read = (path) => readProjectSource(stylesheetRoot,new URL(`../${path}`, import.meta.url), "utf8");
 const failures = [];
 const requireTrue = (condition, message) => { if (!condition) failures.push(message); };
 
@@ -27,7 +30,7 @@ const types = read("src/types.ts");
 const main = read("src/main.ts");
 const teams = read("src/pages/teams.ts");
 const styles = read("src/styles/app.css");
-const readme = fs.readFileSync(new URL("../README.md", import.meta.url), "utf8");
+const readme = readProjectSource(stylesheetRoot,new URL("../README.md", import.meta.url), "utf8");
 
 requireTrue(migration.includes("platform.force_purge_enabled"), "强制清除迁移缺少事务本地开关");
 requireTrue(migration.includes("current_setting('football.force_purge', true)"), "强制清除开关不是事务可读设置");

@@ -2,7 +2,6 @@ import { escapeHtml, formatBytes } from "../components/format";
 import { inlineDatabaseSetup } from "../components/databaseSetup";
 import type { BootstrapResponse } from "../types";
 import { iconSlot, type UiIcon } from "../ui/icons/iconSlot";
-import "./dashboard/dashboard.css";
 
 function metric(label: string, value: string, note: string, tone: string): string {
   return `<article class="metric-card dashboard-metric tone-${tone}"><span>${escapeHtml(label)}</span><strong>${escapeHtml(value)}</strong><small>${escapeHtml(note)}</small></article>`;

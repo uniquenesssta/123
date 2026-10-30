@@ -1,5 +1,9 @@
+import {productionStyleFiles} from "../styles/styleGraph.mjs";
+import {readProjectSource} from "../styles/projectSource.mjs";
+import {fileURLToPath as stylesheetFilePath} from "node:url";
+const stylesheetRoot=stylesheetFilePath(new URL("../../",import.meta.url));
 import assert from "node:assert/strict";
-import {readFileSync,writeFileSync,mkdirSync,readdirSync,copyFileSync,mkdtempSync} from "node:fs";
+import { writeFileSync, mkdirSync, readdirSync, copyFileSync, mkdtempSync } from "node:fs";
 import {resolve,dirname,join} from "node:path";
 import {tmpdir} from "node:os";
 import {readStylesheet} from "../tokens/tokenStyles.mjs";
@@ -7,10 +11,10 @@ import {resolveChromiumExecutable,captureHtmlScreenshot} from "../task-ui-screen
 import {browserBundle} from "./browserBundle.mjs";
 
 export async function verifyOverlays(root) {
- const read=f=>readFileSync(resolve(root,f),"utf8"),main=read("src/main.ts"),entry="src/ui/overlays/__tests__/overlaysBrowserFixture.ts";
+ const read=f=>readProjectSource(stylesheetRoot,resolve(root,f),"utf8"),main=read("src/main.ts"),entry="src/ui/overlays/__tests__/overlaysBrowserFixture.ts";
  const bundle=browserBundle(root,entry);
- const css=[...main.matchAll(/^import "(\.\/[^"\n]+\.css)";/gm)].map(m=>m[1].replace("./","src/")).map(f=>readStylesheet(root,f).replace(/url\("([^"\n]+\.svg)"\)/g,(_m,a)=>'url("data:image/svg+xml;base64,'+readFileSync(resolve(root,dirname(f),a)).toString("base64")+'")')).join("\n");
- assert.equal((main.match(/import "\.\/ui\/feedback\/index.css"/g)??[]).length,1);assert.equal((main.match(/import "\.\/ui\/overlays\/index.css"/g)??[]).length,1);
+ const css=[...main.matchAll(/^import "(\.\/[^"\n]+\.css)";/gm)].map(m=>m[1].replace("./","src/")).map(f=>readStylesheet(root,f).replace(/url\("([^"\n]+\.svg)"\)/g,(_m,a)=>'url("data:image/svg+xml;base64,'+readProjectSource(stylesheetRoot,resolve(root,dirname(f),a)).toString("base64")+'")')).join("\n");
+ assert.equal(productionStyleFiles(root).filter(file=>file==="src/ui/feedback/index.css").length,1);assert.equal(productionStyleFiles(root).filter(file=>file==="src/ui/overlays/index.css").length,1);
  assert.ok(main.includes('commandMenu.open(PRIMARY_NAVIGATION')&&main.includes('await navigateTo(item.page)'),"real navigation commands");
  assert.ok(main.includes('"确认永久清空",executeDatabaseReset')&&main.includes('confirmation !== expected')&&main.includes('api.resetDatabase(confirmation)'),"typed confirmation preserves host/backend gate");
  assert.ok(!read('src/app/modal/workspacePanelController.ts').includes('confirm('),"workspace history does not own confirmation requests");

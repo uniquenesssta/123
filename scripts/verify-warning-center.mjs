@@ -1,6 +1,9 @@
+import {readProjectSource} from "./styles/projectSource.mjs";
+import {fileURLToPath as stylesheetFilePath} from "node:url";
+const stylesheetRoot=stylesheetFilePath(new URL("../",import.meta.url));
 import { readStylesheet } from "./tokens/tokenStyles.mjs";
 import assert from "node:assert/strict";
-import { readFileSync, writeFileSync, existsSync, mkdirSync, copyFileSync, readdirSync, mkdtempSync } from "node:fs";
+import { writeFileSync, existsSync, mkdirSync, copyFileSync, readdirSync, mkdtempSync } from "node:fs";
 import { resolve, dirname, relative, join } from "node:path";
 import { tmpdir } from "node:os";
 import { createRequire } from "node:module";
@@ -10,7 +13,7 @@ import { resolveChromiumExecutable, captureHtmlScreenshot } from "./task-ui-scre
 const root = resolve(import.meta.dirname, "..");
 const require = createRequire(import.meta.url);
 const ts = require("typescript");
-const read = file => readFileSync(resolve(root, file), "utf8");
+const read = file => readProjectSource(stylesheetRoot,resolve(root, file), "utf8");
 const source = ["warning-dto/warningDto", "warning-store/warningStore"].map(file => read(`src/app/warnings/${file}.ts`)).join("\n")
   .replace(/^import .*?from ["'][^"']+["'];?\s*$/gm, "").replaceAll("export ", "");
 const runtime = ts.transpileModule(source + "\nglobalThis.warningModules = { WarningStore, safeWarningText, warningDateGroups };", { compilerOptions: { target: ts.ScriptTarget.ES2022, module: ts.ModuleKind.None } }).outputText;
@@ -88,7 +91,7 @@ function bundle(file) {
     if (specifier.endsWith(".svg?raw")) {
       const target = relative(root, base).replaceAll("\\", "/");
       modules[file].imports[specifier] = target;
-      modules[target] = { output: `exports.default=${JSON.stringify(readFileSync(base.replace(/\?raw$/, ""), "utf8"))}`, imports: {} };
+      modules[target] = { output: `exports.default=${JSON.stringify(readProjectSource(stylesheetRoot,base.replace(/\?raw$/, ""), "utf8"))}`, imports: {} };
       continue;
     }
     const target = relative(root, existsSync(`${base}.ts`) ? `${base}.ts` : join(base, "index.ts")).replaceAll("\\", "/");
@@ -99,7 +102,7 @@ const entry = "src/app/warnings/__tests__/warningBrowserFixture.ts";
 bundle(entry);
 const browserBundle = `const modules=${JSON.stringify(modules)};const cache={};function load(id){if(cache[id])return cache[id];const record=modules[id],exports={};cache[id]=exports;new Function('exports','require',record.output)(exports,s=>load(record.imports[s]));return exports;}`;
 const styles = [...main.matchAll(/^import "(\.\/[^"\n]+\.css)";/gm)].map(match => match[1].replace("./", "src/")).map(file => readStylesheet(root, file).replace(/url\("([^"\n]+\.svg)"\)/g, (_match, asset) => {
-  const bytes = readFileSync(resolve(root, dirname(file), asset));
+  const bytes = readProjectSource(stylesheetRoot,resolve(root, dirname(file), asset));
   assert.ok(bytes.length > 0, `empty local icon asset ${asset}`);
   return `url("data:image/svg+xml;base64,${bytes.toString("base64")}")`;
 })).join("\n");

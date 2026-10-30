@@ -1,0 +1,54 @@
+
+
+/* 0.23.0 · phase 2 adaptive viewport and scroll governance */
+html,
+body,
+#app {
+  min-height: 100%;
+  height: 100%;
+}
+
+.sidebar {
+  overflow-x: hidden;
+  overflow-y: auto;
+  overscroll-behavior-y: contain;
+  scrollbar-gutter: stable;
+}
+
+.sidebar .nav-primary {
+  flex: 0 0 auto;
+}
+
+.sidebar .sidebar-spacer {
+  flex: 1 0 8px;
+}
+
+.workspace-shell,
+.workspace-content,
+.workspace-module-view,
+.workspace-module-view.active,
+.workspace-main,
+.balanced-workspace-main {
+  min-width: 0;
+  min-height: 0;
+}
+
+@media (min-width: 1700px) {
+  :root { --balanced-rail-width: 82px; }
+  .sidebar .nav-item b { max-width: 68px; font-size: 10px; }
+  .sidebar .nav-item .nav-svg { width: 19px; height: 19px; }
+}
+
+@media (max-height: 820px) {
+  .sidebar { padding-block: 6px; }
+  .sidebar .brand { min-height: 42px; padding-bottom: 5px; }
+  .sidebar .nav-primary { margin-top: 4px; gap: 4px; }
+  .sidebar .nav-item,
+  .sidebar .nav-item.compact { min-height: 44px; }
+  .sidebar .theme-toggle { min-height: 34px; margin-block: 3px; }
+  .sidebar .sidebar-footer { padding-top: 5px; }
+}
+
+@media (max-width: 920px) {
+  :root { --balanced-rail-width: 70px; }
+}

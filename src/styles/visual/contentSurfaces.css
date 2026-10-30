@@ -1,0 +1,60 @@
+
+
+/* Panels, sections and master-detail surfaces. */
+.panel,
+.subpanel,
+.inset-panel,
+.disclosure-panel,
+.editor-details,
+.workspace-main,
+.workspace-inspector,
+.module-sidebar,
+.balanced-workspace-main,
+.workspace-module-view,
+.review-command-center {
+  border-color: var(--ui-border);
+  background: var(--ui-surface);
+  box-shadow: none;
+}
+.panel {
+  padding: 16px;
+  border-radius: var(--ui-radius-md);
+}
+.panel.compact { padding: 12px 14px; }
+.subpanel,
+.inset-panel { border-radius: var(--ui-radius-sm); }
+.panel-heading { gap: 12px; margin-bottom: 14px; }
+.panel-heading h2 { color: var(--ui-text-strong); font-size: 16px; font-weight: 700; }
+.panel-heading h3 { color: var(--ui-text-strong); font-size: 14px; font-weight: 500; }
+.panel-heading span,
+.eyebrow,
+.section-label { color: var(--ui-accent); font-size: 9px; font-weight: 700; letter-spacing: .08em; }
+.workspace-section-heading,
+.module-section-heading,
+.task-form-heading {
+  padding-bottom: 11px;
+  border-bottom-color: var(--ui-border);
+}
+.workspace-section-heading h2,
+.module-section-heading h2,
+.task-form-heading h2 { font-size: 16px; font-weight: 700; }
+.workspace-section-heading p,
+.module-section-heading p,
+.task-form-heading p { color: var(--ui-text-muted); font-size: 11px; line-height: 1.5; }
+
+.metric-grid,
+.compact-metrics,
+.inspector-kpis { gap: 8px; }
+.metric-card,
+.compact-metrics > div,
+.inspector-kpis > div,
+.team-rating-grid > div,
+.player-profile-summary > div {
+  border-color: var(--ui-border);
+  border-radius: var(--ui-radius-sm);
+  background: var(--ui-surface-subtle);
+}
+.metric-card { padding: 13px; }
+.metric-card span { font-size: 10px; }
+.metric-card strong { margin: 6px 0 3px; color: var(--ui-text-strong); font-size: 19px; font-variant-numeric: tabular-nums; }
+.metric-card small { font-size: 9px; }

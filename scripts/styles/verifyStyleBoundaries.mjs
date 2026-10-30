@@ -1,0 +1,27 @@
+import assert from "node:assert/strict";
+import {readFileSync} from "node:fs";
+import {resolve,relative} from "node:path";
+import {fileURLToPath} from "node:url";
+import postcss from "postcss";
+import {inspectStyleGraph,runtimeCssImports,sourceFiles,findCssImports} from "./styleGraph.mjs";
+import {verifyFeatureSheet} from "./styleSelectors.mjs";
+const root=resolve(fileURLToPath(new URL("../..",import.meta.url))),read=p=>readFileSync(resolve(root,p),"utf8"),contract=JSON.parse(read("contracts/style-boundaries.json"));
+assert.deepEqual(runtimeCssImports(root),[{file:"src/main.ts",specifier:"./styles/index.css"}],"one actual runtime CSS entry");const graph=inspectStyleGraph(root,contract.entry),entry=graph.sheets.get(contract.entry);
+assert.ok(entry.nodes.every(n=>n.type==="comment"||(n.type==="atrule"&&n.name==="import")),"index.css only composes imports");
+assert.deepEqual(entry.nodes.filter(n=>n.type==="atrule").map(n=>resolve(root,"src/styles",n.params.slice(1,-1))).map(p=>relative(root,p).replaceAll("\\","/")),contract.entries,"approved cascade order");
+for(const file of ["src/styles/reset.css","src/styles/base.css","src/styles/app-shell.css","src/styles/patterns.css"])assert.ok(graph.files.includes(file),"required style owner: "+file);
+for(const source of new Set(contract.composition_modules.map(m=>m.source))){const ast=graph.sheets.get(source);assert.ok(ast.nodes.every(n=>n.type==="comment"||(n.type==="atrule"&&n.name==="import")),"composition has duplicate declarations: "+source);}
+assert.deepEqual(sourceFiles(resolve(root,"src"),".css").map(file=>relative(root,file).replaceAll("\\","/")).sort(),graph.files.toSorted(),"every local stylesheet has one reachable owner");
+const featureFiles=sourceFiles(resolve(root,"src"),".css").map(file=>relative(root,file).replaceAll("\\","/")).filter(file=>!contract.shared_roots.some(prefix=>file.startsWith(prefix))).sort();assert.deepEqual(featureFiles,contract.features.map(f=>f.file).toSorted(),"new feature CSS requires an explicit owner");
+let selectors=0;for(const feature of contract.features)selectors+=verifyFeatureSheet(graph.sheets.get(feature.file),feature);
+const feature={page:"teams",file:"negative-fixture.css"},gate=':where(.application-shell[data-current-page="teams"])';
+for(const selector of ['.ui-button',gate+' .inside, .outside',gate+' + .outside',gate+'.extra ~ .outside','.application-shell[data-current-page="players"] .inside',':is('+gate+',body) .inside'])assert.throws(()=>verifyFeatureSheet(postcss.parse(selector+'{color:red}'),feature),undefined,"must reject: "+selector);
+assert.throws(()=>verifyFeatureSheet(postcss.parse('@font-face{font-family:test;src:url(x)}'+gate+' .inside{color:red}'),feature));verifyFeatureSheet(postcss.parse('@media(min-width:1px){'+gate+' .inside:is(.one,.two)>span{color:red}}'),feature);
+for(const source of ['import sheet from "./feature.module.css";','import("./feature.css");','export {default} from "./feature.css";'])assert.ok(findCssImports("src/feature.ts",source)[0]?.kind,"non-bare stylesheet import must be detected");
+const fake=new Map(),target=p=>resolve(root,p);const checkGraph=(file,text,extra)=>{fake.clear();fake.set(target(file),text);for(const [key,value]of Object.entries(extra??{}))fake.set(target(key),value);return inspectStyleGraph(root,file,path=>{if(!fake.has(path))throw Error("Missing fixture CSS "+path);return fake.get(path);});};
+assert.throws(()=>checkGraph('src/test.css','@import "https://example.com/x.css";'));
+assert.throws(()=>checkGraph('src/test.css','@import "../package.json";'));
+assert.throws(()=>checkGraph('src/test.css','@import "./test.css";'));
+assert.throws(()=>checkGraph('src/test.css','@import "./one.css";@import "./one.css";',{'src/one.css':'button{color:red}'}));
+assert.throws(()=>checkGraph('src/test.css','button{color:red}@import "./one.css";',{'src/one.css':'button{color:blue}'}));
+console.log('R12-18 style boundaries PASS: '+graph.files.length+' unique CSS files, '+selectors+' confined feature selectors, 15 forbidden-escape/import/graph mutations rejected; one runtime entry and preserved cascade.');

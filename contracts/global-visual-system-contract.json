@@ -150,6 +150,6 @@
     "src/ui/layout/content-region/contentRegionView.ts"
   ],
   "foundation_style_entries": [
-    "src/styles/foundation/legacyControls.css"
+    "src/styles/foundation/templateControls.css"
   ]
 }

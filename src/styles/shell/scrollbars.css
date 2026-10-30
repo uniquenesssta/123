@@ -1,0 +1,41 @@
+
+
+/* Scrolling remains available through wheel, touch and keyboard, but bars stay visually hidden. */
+.sidebar,
+.app-shell.workspace-page .balanced-section-tabs,
+.app-shell.workspace-page .balanced-workspace-tabs,
+.app-shell.workspace-page .balanced-workspace-main > .workspace-module-view.active,
+.app-shell.workspace-page .balanced-workspace-main .match-list,
+.app-shell.workspace-page .balanced-workspace-main .match-browser-detail,
+.app-shell.workspace-page .balanced-lineup-list,
+.app-shell.workspace-page .balanced-run-table-shell,
+.app-shell.workspace-page .balanced-table-scroll,
+.app-shell.workspace-page .chain-version-list,
+.app-shell.workspace-page .binding-catalogue,
+.app-shell.workspace-page .compact-binding-catalogue,
+.app-shell.workspace-page .rules-table-scroll,
+.app-shell.workspace-page .rules-scope-list,
+.app-shell.workspace-page .rules-region-list {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.sidebar::-webkit-scrollbar,
+.app-shell.workspace-page .balanced-section-tabs::-webkit-scrollbar,
+.app-shell.workspace-page .balanced-workspace-tabs::-webkit-scrollbar,
+.app-shell.workspace-page .balanced-workspace-main > .workspace-module-view.active::-webkit-scrollbar,
+.app-shell.workspace-page .balanced-workspace-main .match-list::-webkit-scrollbar,
+.app-shell.workspace-page .balanced-workspace-main .match-browser-detail::-webkit-scrollbar,
+.app-shell.workspace-page .balanced-lineup-list::-webkit-scrollbar,
+.app-shell.workspace-page .balanced-run-table-shell::-webkit-scrollbar,
+.app-shell.workspace-page .balanced-table-scroll::-webkit-scrollbar,
+.app-shell.workspace-page .chain-version-list::-webkit-scrollbar,
+.app-shell.workspace-page .binding-catalogue::-webkit-scrollbar,
+.app-shell.workspace-page .compact-binding-catalogue::-webkit-scrollbar,
+.app-shell.workspace-page .rules-table-scroll::-webkit-scrollbar,
+.app-shell.workspace-page .rules-scope-list::-webkit-scrollbar,
+.app-shell.workspace-page .rules-region-list::-webkit-scrollbar {
+  display: none;
+  width: 0;
+  height: 0;
+}

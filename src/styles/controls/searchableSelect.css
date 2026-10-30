@@ -1,0 +1,121 @@
+
+
+/* Searchable hierarchy select: native value remains authoritative while the input provides fuzzy matching. */
+.searchable-select {
+  position: relative;
+  width: 100%;
+  min-width: 0;
+}
+.searchable-select-native {
+  position: absolute !important;
+  width: 1px !important;
+  height: 1px !important;
+  margin: -1px !important;
+  padding: 0 !important;
+  overflow: hidden !important;
+  clip: rect(0 0 0 0) !important;
+  white-space: nowrap !important;
+  border: 0 !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+}
+.searchable-select-control {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 34px;
+  align-items: stretch;
+  min-height: var(--control-height, 38px);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--input);
+  overflow: hidden;
+  transition: border-color .14s ease, box-shadow .14s ease, background .14s ease;
+}
+.searchable-select:hover .searchable-select-control {
+  border-color: color-mix(in srgb, var(--accent) 35%, var(--line));
+}
+.searchable-select.open .searchable-select-control,
+.searchable-select:focus-within .searchable-select-control {
+  border-color: color-mix(in srgb, var(--accent) 62%, transparent);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 10%, transparent);
+}
+.searchable-select-input {
+  width: 100%;
+  min-width: 0;
+  min-height: 36px !important;
+  padding: 8px 10px !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  color: var(--text) !important;
+  box-shadow: none !important;
+  outline: none !important;
+  text-overflow: ellipsis;
+}
+.searchable-select-input::placeholder { color: var(--muted); }
+.searchable-select-toggle {
+  display: grid;
+  place-items: center;
+  min-width: 34px;
+  min-height: 36px;
+  padding: 0;
+  border: 0;
+  border-left: 1px solid color-mix(in srgb, var(--line) 72%, transparent);
+  border-radius: 0;
+  background: transparent;
+  color: var(--muted);
+  font-size: 15px;
+  line-height: 1;
+}
+.searchable-select-toggle:hover { background: var(--soft-hover); color: var(--text); }
+.searchable-select.open .searchable-select-toggle { color: var(--accent); transform: rotate(180deg); }
+.searchable-select-listbox {
+  position: absolute;
+  z-index: 180;
+  top: calc(100% + 6px);
+  left: 0;
+  right: 0;
+  max-height: min(330px, 48vh);
+  overflow: auto;
+  padding: 5px;
+  border: 1px solid color-mix(in srgb, var(--line) 88%, transparent);
+  border-radius: 11px;
+  background: var(--panel);
+  box-shadow: 0 18px 48px rgba(15, 23, 42, .18);
+}
+.searchable-select-listbox[hidden] { display: none; }
+.searchable-select-option {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 18px;
+  align-items: center;
+  width: 100%;
+  min-height: 34px;
+  padding: 7px 9px;
+  border: 0;
+  border-radius: 7px;
+  background: transparent;
+  color: var(--text);
+  text-align: left;
+}
+.searchable-select-option span {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.searchable-select-option b { color: var(--accent); text-align: center; }
+.searchable-select-option:hover,
+.searchable-select-option.active { background: var(--soft-hover); }
+.searchable-select-option[aria-selected="true"] { color: var(--accent); font-weight: 650; }
+.searchable-select-empty {
+  padding: 18px 10px;
+  color: var(--muted);
+  font-size: 11px;
+  text-align: center;
+}
+.searchable-select.disabled { opacity: .62; }
+.searchable-select.disabled .searchable-select-control { cursor: not-allowed; background: var(--soft); }
+.searchable-select.disabled .searchable-select-input,
+.searchable-select.disabled .searchable-select-toggle { cursor: not-allowed; }
+@media (max-width: 900px) {
+  .searchable-select-listbox { max-height: 280px; }
+}

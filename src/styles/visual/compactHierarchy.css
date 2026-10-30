@@ -1,0 +1,119 @@
+
+
+/* The shell uses the smallest stable dimensions that still preserve clear targets. */
+
+/* Compact page hierarchy: title, status, task context and page tabs fit in one viewport. */
+.task-page-header,
+.page-heading,
+.balanced-page-heading,
+.entity-page-heading {
+  gap: 12px;
+  padding: 0 0 8px;
+}
+.task-page-heading { gap: 2px; }
+.task-page-heading .eyebrow,
+.page-heading .eyebrow,
+.balanced-page-heading .eyebrow,
+.entity-page-heading .eyebrow {
+  font-size: 9px;
+  letter-spacing: .06em;
+}
+.task-page-heading h1,
+.page-heading h1,
+.balanced-page-heading h1,
+.entity-page-heading h1 {
+  font-size: var(--ui-page-title-size);
+  font-weight: 700;
+  line-height: 1.2;
+  letter-spacing: -.018em;
+}
+.task-page-heading > p:last-child,
+.page-heading p,
+.balanced-page-heading p,
+.entity-page-heading p {
+  max-width: 980px;
+  font-size: 11px;
+  line-height: 1.4;
+}
+.task-page-actions,
+.button-row,
+.toolbar { gap: 6px; }
+.task-status-chip,
+.status-pill,
+.section-status-pill,
+.balanced-context-pill {
+  min-height: 25px;
+  padding: 3px 7px;
+  border-radius: 999px;
+  font-size: 9px;
+}
+
+.task-context-ribbon {
+  border-radius: 6px;
+}
+.task-context-item {
+  min-height: 46px;
+  padding: 7px 9px;
+  border-left-width: 2px;
+}
+.task-context-item span { font-size: 8px; }
+.task-context-item strong { font-size: 11px; line-height: 1.25; }
+.task-context-item small { margin-top: 1px; font-size: 9px; line-height: 1.25; }
+
+.core-local-navigation,
+.module-local-navigation {
+  min-height: 38px;
+  padding: 0 4px;
+  border-radius: 6px;
+}
+.core-local-navigation .workspace-section-nav-item,
+.module-local-navigation .workspace-section-nav-item,
+.workspace-section-nav-item {
+  min-width: 106px;
+  min-height: 36px;
+  grid-template-columns: 19px minmax(0, 1fr) auto;
+  gap: 6px;
+  padding: 5px 9px;
+}
+.workspace-section-index,
+.core-local-navigation .workspace-section-index {
+  width: 18px;
+  height: 18px;
+  border-radius: 4px;
+  font-size: 8px;
+}
+.workspace-section-copy { gap: 0; }
+.workspace-section-copy strong,
+.core-local-navigation .workspace-section-copy strong {
+  font-size: 11px !important;
+  line-height: 1.15;
+}
+.workspace-section-copy small,
+.core-local-navigation .workspace-section-copy small,
+.module-local-navigation .workspace-section-copy small { display: none; }
+.core-local-navigation .workspace-section-nav-item > b,
+.module-local-navigation .workspace-section-nav-item > b {
+  padding: 2px 4px;
+  font-size: 8px;
+}
+
+.workspace-anchor-nav,
+.workspace-task-anchor-nav {
+  top: 4px;
+  min-height: 34px;
+  gap: 6px;
+  padding: 3px 5px;
+  margin-bottom: 8px;
+  border-radius: 5px;
+  box-shadow: none;
+  backdrop-filter: none;
+}
+.workspace-anchor-label { font-size: 9px; }
+.workspace-anchor-nav button,
+.workspace-task-anchor-nav button {
+  min-height: 26px;
+  padding: 3px 7px;
+  border-radius: 4px;
+  font-size: 9px;
+}
+.workspace-anchor-target { scroll-margin-top: 44px; }

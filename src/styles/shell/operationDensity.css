@@ -1,0 +1,56 @@
+
+
+/* Raise actual operational typography instead of only enlarging page headings. */
+body {
+  font-size: clamp(16px, .92vw, 18px);
+}
+
+.sidebar .nav-item b {
+  font-size: clamp(12px, .72vw, 14px);
+  line-height: 1.25;
+}
+
+.app-shell.workspace-page .balanced-section-tabs strong,
+.app-shell.workspace-page .balanced-workspace-tabs strong,
+.app-shell.workspace-page .workspace-section-copy strong {
+  font-size: clamp(15px, .88vw, 17px);
+}
+
+.app-shell.workspace-page .workspace-section-index,
+.app-shell.workspace-page .workspace-section-badge {
+  font-size: 13px;
+}
+
+.app-shell.workspace-page .balanced-workspace-main .field > span,
+.app-shell.workspace-page .balanced-workspace-main .hierarchy-level > span,
+.app-shell.workspace-page .balanced-workspace-main .balanced-lineup-heading span,
+.app-shell.workspace-page .balanced-workspace-main .field-note,
+.app-shell.workspace-page .balanced-workspace-main label {
+  font-size: 14px;
+  line-height: 1.45;
+}
+
+.app-shell.workspace-page .balanced-workspace-main input,
+.app-shell.workspace-page .balanced-workspace-main select,
+.app-shell.workspace-page .balanced-workspace-main textarea,
+.app-shell.workspace-page .balanced-workspace-main button {
+  font-size: 15px;
+}
+
+.app-shell.workspace-page .balanced-workspace-main .match-list-open strong,
+.app-shell.workspace-page .balanced-workspace-main .balanced-lineup-player strong,
+.app-shell.workspace-page .balanced-workspace-main .balanced-data-table td strong,
+.app-shell.workspace-page .balanced-workspace-main .team-directory-table td strong,
+.app-shell.workspace-page .balanced-workspace-main .balanced-model-facts strong {
+  font-size: 15px;
+}
+
+.app-shell.workspace-page .balanced-workspace-main .match-list-open span,
+.app-shell.workspace-page .balanced-workspace-main .match-list-open small,
+.app-shell.workspace-page .balanced-workspace-main .balanced-lineup-player small,
+.app-shell.workspace-page .balanced-workspace-main .balanced-data-table td small,
+.app-shell.workspace-page .balanced-workspace-main .team-directory-table td small,
+.app-shell.workspace-page .balanced-workspace-main .balanced-model-facts span,
+.app-shell.workspace-page .balanced-workspace-main .scoreline-threshold-note {
+  font-size: 13px;
+}

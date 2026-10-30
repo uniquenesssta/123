@@ -1,0 +1,26 @@
+/* Sole production stylesheet entry. Preserve the accepted cascade order. */
+@import "app.css";
+@import "components.css";
+@import "layout.css";
+@import "entityCenter.css";
+@import "taskWorkspace.css";
+@import "coreWorkspaces.css";
+@import "moduleWorkspaces.css";
+@import "visualSystem.css";
+@import "workspacePanels.css";
+@import "../ui/tokens/index.css";
+@import "foundation/templateControls.css";
+@import "../ui/icons/iconSlot.css";
+@import "../ui/primitives/index.css";
+@import "../ui/forms/index.css";
+@import "../ui/data-display/index.css";
+@import "../ui/feedback/index.css";
+@import "../ui/overlays/index.css";
+@import "../ui/navigation/index.css";
+@import "../ui/layout/index.css";
+@import "../app/warnings/warning-center/warningCenter.css";
+@import "../pages/dashboard/dashboard.css";
+@import "../pages/teams/teamWorkspace.css";
+@import "../pages/players/playerWorkspace.css";
+@import "../pages/lineups/lineupWorkspace.css";
+@import "../pages/rules/rulesCatalogue.css";

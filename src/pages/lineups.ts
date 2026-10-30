@@ -1,4 +1,3 @@
-import "./lineups/lineupWorkspace.css";
 import { escapeHtml } from "../components/format";
 import { availabilityLabel, displayPlayerName, positionLabel } from "../components/footballText";
 import { inlineDatabaseSetup } from "../components/databaseSetup";

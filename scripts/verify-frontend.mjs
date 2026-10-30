@@ -7,6 +7,7 @@ import { spawnNodePackageCli } from "./process/node-package-cli.mjs";
 const root = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const nodeChecks = [
   "architecture/verifyModuleBoundaries.mjs",
+  "styles/verifyStyleBoundaries.mjs",
   "architecture/verifyStateOwnership.mjs",
   "architecture/verifyProtectedImports.mjs",
   "verify-domain-type-inventory.mjs",

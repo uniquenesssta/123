@@ -11,7 +11,7 @@ export function installWarningFixture(theme: "light" | "dark") {
   const button = (action: string) => document.querySelector<HTMLButtonElement>(`[data-action="${action}"]`)!;
   const paint = () => {
     root.innerHTML = renderShell({ state: { data: { database_configured: true, app_version: "0.23.0" } }, theme, page: "dashboard", sidebarCollapsed: false, navigationPending: false,
-      content: '<section style="height:1600px"><input id="warning-draft" value="尚未保存的输入"><button id="business-gate" disabled>受业务门禁保护</button><p>独立页面滚动区域</p></section>' });
+      content: '<section style="min-height:1600px"><input id="warning-draft" value="尚未保存的输入"><button id="business-gate" disabled>受业务门禁保护</button><p>独立页面滚动区域</p></section>' });
     controller.restore();
   };
   paint(); controller.start(); controller.start();
@@ -32,6 +32,7 @@ export function installWarningFixture(theme: "light" | "dark") {
   const draft = document.querySelector<HTMLInputElement>("#warning-draft")!;
   const page = document.querySelector<HTMLElement>(".page-container")!;
   draft.value = "保留真实工作区输入"; draft.focus({ preventScroll: true }); page.scrollTop = 217;
+  expect(page.scrollTop === 217, "full production CSS preserves the deliberately tall scroll fixture");
   controller.notify("<script>window.injected=true</script>", "danger", "验收");
   expect(!document.querySelector(".ui-toast script") && !(window as Window & { injected?: boolean }).injected, "warning/notice HTML is escaped");
   expect(document.activeElement === draft, "notice never steals focus");

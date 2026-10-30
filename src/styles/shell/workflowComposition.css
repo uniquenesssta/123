@@ -1,0 +1,44 @@
+
+
+/* Refined workflow-specific layout */
+.heading-actions { display: flex; align-items: center; gap: 8px; }
+.heading-actions button { display: inline-flex; align-items: center; justify-content: center; gap: 7px; }
+.heading-actions .app-icon { width: 15px; height: 15px; }
+.icon-button.active { color: var(--accent); border-color: color-mix(in srgb, var(--accent) 34%, var(--line)); background: color-mix(in srgb, var(--accent) 9%, var(--soft)); }
+.workspace-anchor-nav a { display: grid; grid-template-columns: 26px 1fr; align-items: center; gap: 7px; }
+.workspace-anchor-nav a b { color: var(--accent); font-size: 9px; font-weight: 750; }
+.workspace-anchor-nav a span { min-width: 0; }
+.module-sidebar-summary { display: grid; gap: 3px; margin-top: 12px; padding: 12px; border: 1px solid var(--line); border-radius: 9px; background: var(--soft); }
+.module-sidebar-summary span, .module-sidebar-summary small { color: var(--muted-2); font-size: 9px; }
+.module-sidebar-summary strong { font-size: 20px; line-height: 1; }
+.api-session-sidebar .module-search { margin-bottom: 10px; }
+.api-session-list { min-height: 180px; overflow: auto; }
+.workbook-card { display: grid; gap: 14px; }
+.workbook-card-header { display: grid; grid-template-columns: 38px minmax(0, 1fr) auto; gap: 12px; align-items: start; }
+.workbook-card-header > div { min-width: 0; }
+.workbook-card-header > div > span { color: var(--accent); font-size: 9px; font-weight: 750; letter-spacing: .1em; }
+.workbook-card-header h2 { margin: 4px 0 5px; font-size: 17px; }
+.workbook-card-header p { margin: 0; color: var(--muted); font-size: 10px; }
+.workbook-index { width: 38px; height: 38px; display: grid; place-items: center; border: 1px solid color-mix(in srgb, var(--accent) 28%, var(--line)); border-radius: 10px; color: var(--accent); background: color-mix(in srgb, var(--accent) 7%, var(--soft)); font-size: 11px; font-weight: 800; }
+.workbook-state { padding: 5px 8px; border: 1px solid var(--line); border-radius: 999px; color: var(--muted); font-size: 9px; }
+.workbook-state.ready { color: var(--accent); border-color: color-mix(in srgb, var(--accent) 28%, var(--line)); }
+.workbook-state.blocked { color: var(--danger); border-color: color-mix(in srgb, var(--danger) 28%, var(--line)); }
+.workbook-flow { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+.workbook-flow article { min-width: 0; display: flex; flex-direction: column; gap: 7px; padding: 12px; border: 1px solid var(--line); border-radius: 9px; background: var(--soft); }
+.workbook-flow article > span { color: var(--accent); font-size: 8px; font-weight: 750; letter-spacing: .08em; }
+.workbook-flow article > strong { font-size: 12px; }
+.workbook-flow article > p { min-height: 30px; margin: 0; color: var(--muted); font-size: 9px; line-height: 1.5; }
+.workbook-flow article > .field { margin: 0; }
+.workbook-flow article > button, .workbook-flow article > .button-row { margin-top: auto; }
+.workbook-empty { display: grid; gap: 2px; padding: 10px 12px; border: 1px dashed var(--line); border-radius: 9px; }
+.workbook-empty span { font-size: 10px; font-weight: 650; }
+.workbook-empty small { color: var(--muted-2); font-size: 9px; }
+@media (max-width: 1080px) {
+  .workbook-flow { grid-template-columns: 1fr; }
+  .workbook-flow article > p { min-height: 0; }
+}
+@media (max-width: 720px) {
+  .heading-actions { flex-wrap: wrap; justify-content: flex-end; }
+  .workbook-card-header { grid-template-columns: 34px minmax(0, 1fr); }
+  .workbook-state { grid-column: 2; justify-self: start; }
+}

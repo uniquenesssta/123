@@ -1,0 +1,130 @@
+
+
+/* Competition catalogue: clear hierarchy and readable density. */
+.rules-directory-toolbar { min-height: 64px; padding: 10px 12px; gap: 10px; }
+.rules-directory-grid { grid-template-columns: 190px 230px minmax(620px,1fr); }
+.rules-scope-list,
+.rules-region-list {
+  align-content: start;
+  grid-auto-rows: max-content;
+  padding: 10px 8px;
+  background: color-mix(in srgb,var(--soft) 56%,var(--panel));
+}
+.rules-scope-list > strong,
+.rules-region-list > strong { padding: 4px 8px 9px; color: var(--muted); font-size: 11px; letter-spacing: .05em; }
+.rules-scope-list button,
+.rules-region-list button { min-height: 38px; display: grid; grid-template-columns: minmax(0,1fr) auto; align-items: center; gap: 8px; margin: 2px 0; padding: 7px 9px; border: 1px solid transparent; border-radius: 9px; text-align: left; font-size: 12px; }
+.rules-scope-list button span,
+.rules-region-list button span { min-width: 27px; padding: 3px 6px; border-radius: 999px; color: var(--muted); background: var(--panel); text-align: center; font-size: 10px; }
+.rules-scope-list button.active,
+.rules-region-list button.active { border-color: color-mix(in srgb,var(--accent) 25%,var(--line)); color: var(--accent); background: color-mix(in srgb,var(--accent) 8%,var(--panel)); box-shadow: inset 3px 0 0 var(--accent); }
+.rules-scope-list button[disabled],
+.rules-region-list button[disabled] { opacity: .42; cursor: not-allowed; }
+.rules-pane-heading { min-height: 55px; padding: 10px 14px; }
+.rules-pane-heading strong { font-size: 13px; }
+.rules-pane-heading span { font-size: 11px; }
+.rules-competition-table th { height: 40px; font-size: 11px; }
+.rules-competition-table td { height: 55px; padding: 9px 11px; font-size: 12px; }
+.rules-competition-table td strong { font-size: 13px; }
+.rules-competition-table td small { font-size: 10px; }
+
+@media (max-width: 1480px) {
+  :root { --entity-directory-width: 260px; --entity-inspector-width: 320px; }
+  .entity-browser { grid-template-columns: var(--entity-directory-width) minmax(480px,1fr); }
+  .entity-browser > .entity-inspector {
+    display: block;
+    position: fixed;
+    top: 60px;
+    right: 0;
+    bottom: 0;
+    z-index: 80;
+    width: min(var(--entity-inspector-width), calc(100vw - var(--active-sidebar-width)));
+    border-radius: 14px 0 0 14px;
+    box-shadow: -16px 0 46px rgba(15,23,42,.20);
+    transform: translateX(0);
+    transition: transform .18s ease;
+  }
+  .entity-browser.inspector-collapsed > .entity-inspector { transform: translateX(105%); pointer-events: none; }
+  .rules-directory-grid { grid-template-columns: 170px 205px minmax(560px,1fr); }
+}
+
+@media (max-width: 1100px) {
+  :root { --entity-directory-width: 100%; }
+  .app-shell[data-current-page="teams"] .page-container,
+  .app-shell[data-current-page="players"] .page-container { overflow-y: auto; }
+  .entity-page { height: auto; min-height: calc(100dvh - 100px); grid-template-rows: auto auto; }
+  .entity-browser,
+  .entity-browser.inspector-collapsed { grid-template-columns: minmax(0,1fr); grid-template-rows: auto minmax(620px,1fr); overflow: visible; }
+  .entity-directory,
+  .entity-filter-panel { min-height: auto; }
+  .entity-directory { grid-template-rows: auto auto auto auto auto; }
+  .entity-directory-list { display: grid; grid-auto-flow: column; grid-auto-columns: minmax(220px, 260px); gap: 6px; overflow-x: auto; overflow-y: hidden; padding: 7px; }
+  .entity-directory-item { margin: 0; }
+  .entity-directory-footer { justify-content: flex-end; }
+  .entity-filter-panel { grid-template-columns: repeat(4,minmax(0,1fr)); grid-template-rows: auto auto auto; gap: 0; padding: 0 0 12px; }
+  .entity-filter-panel .entity-directory-header { grid-column: 1 / -1; }
+  .entity-filter-field { padding-top: 10px; }
+  .entity-filter-actions { align-self: end; padding-top: 10px; }
+  .filter-guidance { display: none; }
+  .team-resource-stats { grid-template-columns: repeat(2,minmax(0,1fr)); }
+  .team-resource-stats > div:nth-child(2) { border-right: 0; }
+  .team-resource-stats > div:nth-child(-n+2) { border-bottom: 1px solid var(--line); }
+  .rules-directory-grid { grid-template-columns: 1fr; height: auto; }
+  .rules-scope-list,
+  .rules-region-list { display: flex; gap: 5px; overflow-x: auto; border-right: 0; border-bottom: 1px solid var(--line); }
+  .rules-scope-list > strong,
+  .rules-region-list > strong { flex: 0 0 auto; align-self: center; }
+  .rules-scope-list button,
+  .rules-region-list button { flex: 0 0 auto; min-width: max-content; }
+}
+
+@media (max-width: 820px) {
+  .entity-page-header { align-items: flex-start; flex-direction: column; gap: 10px; }
+  .entity-page-actions { width: 100%; justify-content: flex-start; }
+  .entity-browser,
+  .entity-browser.inspector-collapsed { grid-template-rows: auto minmax(540px,1fr); }
+  .entity-filter-panel { grid-template-columns: repeat(2,minmax(0,1fr)); }
+  .entity-filter-actions { grid-column: 1 / -1; }
+  .team-resource-header { align-items: flex-start; flex-direction: column; }
+  .team-resource-actions { width: 100%; justify-content: flex-start; }
+  .entity-data-table { min-width: 590px; }
+  .player-directory-table { min-width: 690px; }
+  .player-directory-table th:nth-child(5), .player-directory-table td:nth-child(5), .player-directory-table th:nth-child(6), .player-directory-table td:nth-child(6) { display: none; }
+  .entity-task-workspace > header { align-items: flex-start; flex-direction: column; }
+  .task-form-grid { grid-template-columns: 1fr; }
+}
+
+@media (max-width: 620px) {
+  .app-shell[data-current-page="teams"] .page-container,
+  .app-shell[data-current-page="players"] .page-container { padding: 12px 10px 16px; }
+  .entity-page-header h1 { font-size: 23px; }
+  .entity-page-header p { display: none; }
+  .entity-page-actions > button.secondary { display: none; }
+  .entity-mode-switch { flex: 1 1 auto; }
+  .entity-mode-switch button { flex: 1 1 50%; }
+  .entity-browser,
+  .entity-browser.inspector-collapsed { gap: 10px; }
+  .entity-directory-list { grid-auto-columns: minmax(205px, 82vw); }
+  .entity-filter-panel { grid-template-columns: 1fr; }
+  .entity-filter-actions { grid-column: auto; }
+  .team-resource-stats { grid-template-columns: 1fr 1fr; }
+  .team-resource-stats > div { padding: 10px; }
+  .team-resource-actions .secondary:first-child { display: none; }
+  .entity-table-toolbar,
+  .player-list-toolbar { align-items: stretch; flex-direction: column; }
+  .entity-search.wide { width: 100%; }
+  .entity-list-actions { justify-content: space-between; }
+  .entity-data-table { min-width: 520px; }
+  .roster-table th:nth-child(3), .roster-table td:nth-child(3), .roster-table th:nth-child(5), .roster-table td:nth-child(5) { display: none; }
+  .player-directory-table { min-width: 560px; }
+  .player-directory-table th:nth-child(4), .player-directory-table td:nth-child(4), .player-directory-table th:nth-child(7), .player-directory-table td:nth-child(7) { display: none; }
+  .entity-browser > .entity-inspector { width: calc(100vw - var(--active-sidebar-width)); }
+  .entity-selection-bar { left: calc(var(--active-sidebar-width) + 8px); right: 8px; bottom: 8px; flex-wrap: wrap; transform: none; }
+  .entity-selection-bar span { display: none; }
+  .rules-directory-toolbar { grid-template-columns: 1fr; }
+  .rules-visible-count { grid-column: auto; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .entity-browser > .entity-inspector { transition: none; }
+}

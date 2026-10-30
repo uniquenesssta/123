@@ -1,0 +1,68 @@
+
+
+/* Flat, low-noise content surfaces. */
+.panel {
+  padding: var(--ui-panel-padding);
+  border-radius: var(--ui-radius-md);
+}
+.panel.compact { padding: 9px 10px; }
+.subpanel,
+.inset-panel,
+.editor-details,
+.disclosure-panel { border-radius: var(--ui-radius-sm); }
+.panel-heading { gap: 8px; margin-bottom: 9px; }
+.panel-heading.padded { padding: 11px 12px 0; }
+.panel-heading h2,
+.workspace-section-heading h2,
+.module-section-heading h2,
+.task-form-heading h2 {
+  font-size: var(--ui-section-title-size);
+  font-weight: 500;
+}
+.panel-heading h3 { font-size: 12px; }
+.panel-heading span,
+.eyebrow,
+.section-label { font-size: 8px; letter-spacing: .06em; }
+.workspace-section-heading,
+.module-section-heading,
+.task-form-heading {
+  min-height: 0;
+  margin-bottom: 7px;
+  padding: 7px 9px;
+}
+.workspace-section-heading p,
+.module-section-heading p,
+.task-form-heading p { font-size: 10px; line-height: 1.35; }
+
+.metric-grid,
+.compact-metrics,
+.inspector-kpis {
+  gap: 1px;
+  overflow: hidden;
+  border: 1px solid var(--ui-border);
+  border-radius: 6px;
+  background: var(--ui-border);
+}
+.metric-card,
+.compact-metrics > div,
+.inspector-kpis > div,
+.team-rating-grid > div,
+.player-profile-summary > div {
+  padding: 9px 10px;
+  border: 0;
+  border-radius: 0;
+  background: var(--ui-surface);
+}
+.metric-card span,
+.compact-metrics span,
+.inspector-kpis span { font-size: 9px; }
+.metric-card strong,
+.compact-metrics strong,
+.inspector-kpis strong {
+  margin: 3px 0 1px;
+  font-size: 16px;
+  line-height: 1.2;
+}
+.metric-card small,
+.compact-metrics small,
+.inspector-kpis small { font-size: 8px; }

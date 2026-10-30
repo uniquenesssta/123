@@ -1,0 +1,95 @@
+
+
+/* 0.23.0 · large-desktop readability tuning
+ * On 2K-class workspaces the dense layout is preserved, while text and
+ * interaction baselines increase by one restrained step for easier reading.
+ */
+@media (min-width: 1680px) and (min-height: 900px) {
+  :root {
+    --ui-font-size: 13px;
+    --ui-font-size-sm: 12px;
+    --ui-font-size-xs: 11px;
+    --ui-page-title-size: var(--fip-type-page-title-size);
+    --ui-section-title-size: 15px;
+    --ui-control-height: 34px;
+    --ui-control-height-sm: 29px;
+    --ui-table-row-height: 38px;
+    --entity-control-height: 34px;
+  }
+
+  body { line-height: 1.45; }
+
+  .task-page-header .eyebrow,
+  .workspace-section-copy small,
+  .workspace-anchor-label,
+  .panel-heading span,
+  .section-label { font-size: 9px; }
+  .task-page-header p,
+  .workspace-section-heading p,
+  .module-section-heading p,
+  .task-form-heading p { font-size: 11px; line-height: var(--fip-type-body-line-height); }
+  .task-context-item span { font-size: 9px; }
+  .task-context-item strong { font-size: 12px; }
+  .task-context-item small { font-size: 10px; }
+  .workspace-section-copy strong { font-size: 13px; }
+
+  .workspace-section-nav-item,
+  .workspace-anchor-nav button,
+  .workspace-task-anchor-nav button { font-size: 10px; }
+  .panel-heading h3 { font-size: 13px; }
+
+  .metric-card span,
+  .compact-metrics span,
+  .inspector-kpis span { font-size: 10px; }
+  .metric-card strong,
+  .compact-metrics strong,
+  .inspector-kpis strong { font-size: 17px; }
+  .metric-card small,
+  .compact-metrics small,
+  .inspector-kpis small { font-size: 9px; }
+
+  button.primary,
+  button.secondary,
+  button.ghost,
+  .file-button,
+  .icon-button { font-size: 11px; }
+  button.tiny { font-size: 10px; }
+  .field > span,
+  .inline-field > span,
+  .check-field > span,
+  label > span { font-size: 11px; }
+  .field input,
+  .field select,
+  .inline-field select,
+  textarea,
+  .searchable-select-trigger,
+  .searchable-select-input { font-size: 12px; }
+  .field-note { font-size: 10px; line-height: 1.4; }
+
+  table,
+  .run-table.row,
+  .lineup-table.row { font-size: 12px; }
+  th,
+  .run-table.header,
+  .lineup-table.header { font-size: 10px; }
+  .detail-list dt,
+  .detail-list dd { font-size: 11px; }
+
+  .entity-directory-header strong,
+  .entity-task-workspace > header h2,
+  .core-workspace-page .entity-task-workspace > header h2 { font-size: 14px; }
+  .team-resource-stats strong { font-size: 14px; }
+  .inspector-identity h2 { font-size: 17px; }
+  .inspector-score-row strong { font-size: 16px; }
+
+  .empty-state strong,
+  .visual-empty strong,
+  .workspace-tabs-empty strong { font-size: 12px; }
+  .empty-state p,
+  .empty-state span,
+  .visual-empty p { font-size: 10px; }
+  .alert,
+  .blocking-note,
+  .package-message,
+  .modal h2 { font-size: 15px; }
+}

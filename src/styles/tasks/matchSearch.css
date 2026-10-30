@@ -1,0 +1,132 @@
+
+
+/* 0.23.0 · Stage E1: searchable controls and compact match/lineup workspaces. */
+.searchable-select.compact .searchable-select-control,
+.searchable-select.inline .searchable-select-control {
+  min-height: 29px;
+  border-radius: 7px;
+}
+.searchable-select.compact .searchable-select-input,
+.searchable-select.inline .searchable-select-input {
+  min-height: 27px !important;
+  padding: 4px 6px !important;
+  font-size: 10px !important;
+}
+.searchable-select.compact .searchable-select-toggle,
+.searchable-select.inline .searchable-select-toggle {
+  min-width: 26px;
+  min-height: 27px;
+  font-size: 12px;
+}
+.searchable-select.inline .searchable-select-control {
+  grid-template-columns: minmax(0, 1fr) 26px;
+}
+.searchable-select.inline .searchable-select-listbox {
+  width: max(100%, 190px);
+  right: auto;
+}
+.searchable-select-listbox {
+  z-index: 320;
+}
+
+.app-shell.workspace-page .balanced-workspace-main .match-browser-layout {
+  grid-template-columns: minmax(220px, 280px) minmax(0, 1fr);
+  align-items: start;
+}
+.app-shell.workspace-page .balanced-workspace-main .match-browser-sidebar {
+  align-content: start;
+}
+.app-shell.workspace-page .balanced-workspace-main .match-browser-sidebar.compact-directory {
+  align-self: start;
+  height: auto;
+  max-height: calc(100dvh - 250px);
+  grid-template-rows: auto auto auto auto;
+}
+.app-shell.workspace-page .balanced-workspace-main .match-list {
+  align-content: start;
+  grid-auto-rows: max-content;
+}
+.app-shell.workspace-page .balanced-workspace-main .match-browser-sidebar.compact-directory .match-list {
+  max-height: min(420px, calc(100dvh - 390px));
+}
+
+.app-shell.workspace-page .paired-lineup-board {
+  align-items: start;
+}
+.app-shell.workspace-page .paired-lineup-side {
+  align-content: start;
+}
+.app-shell.workspace-page .balanced-lineup-list {
+  height: auto !important;
+  min-height: 0 !important;
+  max-height: clamp(260px, calc(100dvh - 500px), 620px) !important;
+  align-content: start;
+  grid-auto-rows: max-content;
+}
+.app-shell.workspace-page .paired-lineup-side > .empty-state.compact {
+  min-height: 110px;
+  place-content: center;
+}
+
+.model-selection-guide {
+  display: grid;
+  grid-template-columns: minmax(220px, 1.25fr) repeat(3, minmax(180px, 1fr));
+  gap: 8px;
+  padding: 10px;
+  border: 1px solid var(--line);
+  border-radius: 11px;
+  background: var(--surface-soft);
+}
+.model-selection-guide > div {
+  min-width: 0;
+  display: grid;
+  align-content: start;
+  gap: 3px;
+  padding: 9px 10px;
+  border: 1px solid color-mix(in srgb, var(--line) 82%, transparent);
+  border-radius: 9px;
+  background: var(--panel);
+}
+.model-selection-guide span,
+.model-selection-guide small {
+  color: var(--muted);
+  font-size: 10px;
+  line-height: 1.45;
+}
+.model-selection-guide strong {
+  color: var(--text-strong);
+  font-size: 12px;
+}
+.model-guide-current {
+  position: relative;
+  border-left: 3px solid var(--accent) !important;
+}
+.model-guide-current b {
+  justify-self: start;
+  margin-top: 3px;
+  padding: 3px 7px;
+  border-radius: 999px;
+  color: var(--accent);
+  background: var(--accent-soft);
+  font-size: 9px;
+}
+.model-selection-guide.warning .model-guide-current {
+  border-left-color: var(--warning) !important;
+}
+.model-selection-guide.warning .model-guide-current b {
+  color: var(--warning);
+  background: color-mix(in srgb, var(--warning) 12%, transparent);
+}
+
+@media (max-width: 1180px) {
+  .model-selection-guide { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (max-width: 980px) {
+  .app-shell.workspace-page .balanced-workspace-main .match-browser-layout { grid-template-columns: 1fr; }
+  .app-shell.workspace-page .balanced-workspace-main .match-browser-sidebar.compact-directory {
+    max-height: none;
+  }
+}
+@media (max-width: 720px) {
+  .model-selection-guide { grid-template-columns: 1fr; }
+}

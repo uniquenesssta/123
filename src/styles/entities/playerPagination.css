@@ -1,0 +1,33 @@
+
+
+/* Player pagination keeps the current rows visible and only marks the footer as loading. */
+.player-browser .entity-main[aria-busy="true"] {
+  cursor: progress;
+}
+.player-browser .entity-main[aria-busy="true"] .player-table-wrap {
+  pointer-events: none;
+}
+
+@media (max-width: 1280px) {
+  .app-shell[data-current-page="teams"] .team-detail-workspace,
+  .app-shell[data-current-page="teams"] .team-detail-workspace.inspector-collapsed {
+    grid-template-columns: minmax(210px, 232px) minmax(0, 1fr);
+  }
+  .app-shell[data-current-page="teams"] .team-detail-workspace > .entity-inspector {
+    display: none;
+  }
+}
+
+@media (max-width: 820px) {
+  .app-shell[data-current-page="teams"] .team-detail-workspace,
+  .app-shell[data-current-page="teams"] .team-detail-workspace.inspector-collapsed {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .app-shell[data-current-page="teams"] .team-detail-workspace.inspector-collapsed > .entity-main,
+  .app-shell[data-current-page="teams"] .team-detail-workspace > .entity-main {
+    grid-column: 1;
+  }
+  .team-detail-filter {
+    max-height: 360px;
+  }
+}

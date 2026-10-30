@@ -1,0 +1,55 @@
+
+
+/* 0.23.0 · QianNiu-inspired high-density desktop information system
+ * The reference is used only for information density, typography hierarchy,
+ * spacing rhythm and stable data layout. Brand styling and business visuals
+ * remain native to the football platform.
+ */
+:root {
+  --ui-font-size: 12px;
+  --ui-font-size-sm: 11px;
+  --ui-font-size-xs: 10px;
+  --ui-page-title-size: var(--fip-type-page-title-size);
+  --ui-section-title-size: 14px;
+  --ui-control-height: 32px;
+  --ui-control-height-sm: 27px;
+  --ui-table-row-height: 36px;
+  --ui-panel-padding: 12px;
+  --ui-page-padding-x: 14px;
+  --ui-page-padding-y: 10px;
+  --ui-radius-xs: 6px;
+  --ui-radius-sm: 7px;
+  --ui-radius-md: 16px;
+  --ui-radius-lg: 9px;
+  --ui-radius-xl: 12px;
+  --ui-page-gap: 10px;
+  --ui-section-gap: 12px;
+  --entity-directory-width: 248px;
+  --entity-inspector-width: 300px;
+  --entity-radius: 7px;
+  --entity-control-height: 32px;
+}
+
+:root[data-theme="light"] {
+  --ui-canvas: var(--fip-canvas);
+  --ui-surface: var(--fip-surface);
+  --ui-surface-raised: var(--fip-raised);
+  --ui-surface-subtle: var(--fip-subtle);
+  --ui-border: var(--fip-border);
+  --ui-border-strong: var(--fip-border-strong);
+  --ui-text: var(--fip-text);
+  --ui-text-strong: var(--fip-strong);
+  --ui-text-muted: var(--fip-muted);
+  --ui-text-faint: var(--fip-color-text-tertiary);
+  --ui-accent: var(--fip-accent);
+  --ui-accent-hover: var(--fip-accent-hover);
+  --ui-accent-soft: var(--fip-accent-soft);
+  --soft: rgba(26, 43, 68, .035);
+  --soft-hover: rgba(50, 108, 244, .055);
+}
+
+body {
+  font-size: var(--ui-font-size);
+  line-height: var(--fip-type-body-line-height);
+  background: var(--ui-canvas);
+}

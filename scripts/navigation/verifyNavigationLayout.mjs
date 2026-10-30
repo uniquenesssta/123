@@ -1,12 +1,16 @@
+import {productionStyleFiles} from "../styles/styleGraph.mjs";
+import {readProjectSource} from "../styles/projectSource.mjs";
+import {fileURLToPath as stylesheetFilePath} from "node:url";
+const stylesheetRoot=stylesheetFilePath(new URL("../../",import.meta.url));
 import assert from "node:assert/strict";
-import {readFileSync,writeFileSync,mkdirSync,readdirSync,copyFileSync,mkdtempSync} from "node:fs";
+import { writeFileSync, mkdirSync, readdirSync, copyFileSync, mkdtempSync } from "node:fs";
 import {resolve,join,dirname} from "node:path";
 import {tmpdir} from "node:os";
 import {readStylesheet} from "../tokens/tokenStyles.mjs";
 import {resolveChromiumExecutable,captureHtmlScreenshot} from "../task-ui-screenshot-tools.mjs";
 import {browserBundle} from "../overlays/browserBundle.mjs";
 export async function verifyNavigationLayout(root){
- const read=f=>readFileSync(resolve(root,f),"utf8"),main=read("src/main.ts"),entry="src/ui/navigation/__tests__/navigationBrowserFixture.ts";
+ const read=f=>readProjectSource(stylesheetRoot,resolve(root,f),"utf8"),main=read("src/main.ts"),entry="src/ui/navigation/__tests__/navigationBrowserFixture.ts";
  const css=[...main.matchAll(/^import "(\.\/[^"\n]+\.css)";/gm)].map(m=>m[1].replace("./","src/")).map(f=>readStylesheet(root,f)).join("\n");
  const defined=new Set([...css.matchAll(/(--[a-z0-9-]+)\s*:/g)].map(m=>m[1]));
  for(const source of [readStylesheet(root,"src/ui/navigation/index.css"),readStylesheet(root,"src/ui/layout/index.css")])for(const [,token]of source.matchAll(/var\((--[a-z0-9-]+)/g))assert.ok(defined.has(token),"undefined token "+token);
@@ -14,7 +18,7 @@ export async function verifyNavigationLayout(root){
  for(const [p,v]of [["src/pages/teams.ts","teamPage?.has_more??false"],["src/pages/players.ts","playerPage?.has_more??false"]])assert.ok(read(p).includes("paginationView(")&&read(p).includes(v),"real pagination caller "+p);
  assert.ok(read("src/main.ts").includes("if(pagination)updatePaginationView(pagination,")&&read("src/main.ts").includes("updatePaginationView(pagination,{page:playerCursorHistory.length+1"),"real player loading and local DOM refresh use the shared owner");
  assert.ok(read("src/app/shell/application-shell/applicationShellController.ts").includes("this.navigationKeyboard.destroy()"));
- assert.equal((main.match(/import "\.\/ui\/navigation\/index.css"/g)??[]).length,1);assert.equal((main.match(/import "\.\/ui\/layout\/index.css"/g)??[]).length,1);
+ assert.equal(productionStyleFiles(root).filter(file=>file==="src/ui/navigation/index.css").length,1);assert.equal(productionStyleFiles(root).filter(file=>file==="src/ui/layout/index.css").length,1);
  const browser=resolveChromiumExecutable();assert.ok(browser,"native Windows Chromium required");const directory=mkdtempSync(join(tmpdir(),"football-r12-navigation-")),results=[],bundle=browserBundle(root,entry);
  console.log("R12-15 browser evidence: "+directory);
  for(const [width,height]of [[360,720],[960,600],[1440,900]])for(const theme of ["light","dark"]){

@@ -1,12 +1,15 @@
+import {readProjectSource} from "./styles/projectSource.mjs";
+import {fileURLToPath as stylesheetFilePath} from "node:url";
+const stylesheetRoot=stylesheetFilePath(new URL("../",import.meta.url));
 import { renderResourceMarkup } from "./patterns/renderResourceMarkup.mjs";
-import { readFileSync, existsSync } from "node:fs";
+import { existsSync } from "node:fs";
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { verifyWorkspaceBehavior } from "./workspace/verifyWorkspaceBehavior.mjs";
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const outer = resolve(root, "..");
-const text = (path) => readFileSync(join(root, path), "utf8");
+const text = (path) => readProjectSource(stylesheetRoot,join(root, path), "utf8");
 const json = (path) => JSON.parse(text(path));
 const failures = [];
 try { await verifyWorkspaceBehavior(root); } catch (error) { failures.push(`R12-07 Workspace behavior: ${error.stack ?? error}`); }
@@ -33,7 +36,7 @@ const backend = text("src-tauri/src/workspace_state.rs");
 const commands = ["read_workspace_state", "save_workspace_state", "clear_workspace_state"].map(name => text(`src-tauri/src/commands/platform/${name}.rs`)).join("\n");
 const registry = text("src-tauri/src/bootstrap/command_registry.rs");
 const client = text("src/api/client.ts");
-const readme = readFileSync(join(root, "README.md"), "utf8");
+const readme = readProjectSource(stylesheetRoot,join(root, "README.md"), "utf8");
 
 requireTrue(contract.contract_id === "football.workspace-ui-contract.v1", "阶段6契约ID错误");
 requireTrue(contract.contract_version === "1.3.0" && contract.ui_revision === 5, "双层全局导航契约未同步");

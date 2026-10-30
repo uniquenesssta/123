@@ -1,5 +1,9 @@
+import {productionStyleFiles,inspectStyleGraph} from "../styles/styleGraph.mjs";
+import {readProjectSource} from "../styles/projectSource.mjs";
+import {fileURLToPath as stylesheetFilePath} from "node:url";
+const stylesheetRoot=stylesheetFilePath(new URL("../../",import.meta.url));
 import assert from "node:assert/strict";
-import { readFileSync, mkdtempSync, writeFileSync } from "node:fs";
+import { mkdtempSync, writeFileSync } from "node:fs";
 import { resolve, join } from "node:path";
 import { tmpdir } from "node:os";
 import { readStylesheet } from "./tokenStyles.mjs";
@@ -7,7 +11,7 @@ import { resolveChromiumExecutable, captureHtmlScreenshot } from "../task-ui-scr
 
 /** Compare actual CSS delivery with the read-only Figma snapshot, including native computed values. */
 export async function verifyDesignTokens(root) {
-  const record = JSON.parse(readFileSync(resolve(root, "docs/modular-rewrite/R12-frontend-foundation-ui-system/approved-design-tokens-20261028.json"), "utf8"));
+  const record = JSON.parse(readProjectSource(stylesheetRoot,resolve(root, "docs/modular-rewrite/R12-frontend-foundation-ui-system/approved-design-tokens-20261028.json"), "utf8"));
   assert.equal(record.fileKey, "PN0Whgu6HLWIHx4Mv6aHfu");
   assert.equal(record.designSnapshot, "approved-live-2026-10-28");
   assert.equal(record.variables.length, 237); assert.equal(record.collections.length, 6); assert.equal(record.texts.length, 25); assert.equal(record.effects.length, 6);
@@ -21,14 +25,14 @@ export async function verifyDesignTokens(root) {
       while (value?.type === "VARIABLE_ALIAS") { assert.ok(!seen.has(value.id), "Cyclic Figma alias"); seen.add(value.id); const target = byId.get(value.id); assert.ok(target, "Missing Figma alias target"); const collection = collections.get(target.collectionId); value = target.values[collection.defaultModeId]; }
     }
   }
-  const entry = "src/ui/tokens/index.css", css = readStylesheet(root, entry);
+  const entry = "src/ui/tokens/index.css", css = readStylesheet(root, entry), styleGraph = inspectStyleGraph(root);
   const declarations = [...css.matchAll(/(--[a-z0-9-]+)\s*:\s*([^;{}]+);/g)];
   const names = new Set(declarations.map(m => m[1]));
   for (const v of record.variables) assert.ok(names.has(v.css), `Missing production token ${v.css}`);
   for (const [, , value] of declarations) for (const [, reference] of value.matchAll(/var\((--[a-z0-9-]+)\)/g)) assert.ok(names.has(reference), `Unresolved CSS alias ${reference}`);
-  for (const category of ["color", "typography", "spacing", "size", "radius", "border", "shadow", "motion", "z-index", "breakpoint"]) assert.ok(readFileSync(resolve(root, entry), "utf8").includes(`./${category}/`), `Missing token category ${category}`);
+  for (const category of ["color", "typography", "spacing", "size", "radius", "border", "shadow", "motion", "z-index", "breakpoint"]) assert.ok(styleGraph.sheets.get(entry).nodes.some(node=>node.type==="atrule"&&node.name==="import"&&node.params.includes(`./${category}/`)), `Missing token category ${category}`);
   assert.ok(!/--ui-(?:canvas|surface|text|accent)\s*:/.test(css), "R12 tokens must not override legacy Feature palette");
-  const main = readFileSync(resolve(root, "src/main.ts"), "utf8"); assert.equal((main.match(/import "\.\/ui\/tokens\//g) ?? []).length, 1); assert.ok(main.includes('import "./ui/tokens/index.css";'));
+  const main = readProjectSource(stylesheetRoot,resolve(root, "src/main.ts"), "utf8"); assert.equal(productionStyleFiles(root).filter(file=>file==="src/ui/tokens/index.css").length,1);
   const browser = resolveChromiumExecutable(); assert.ok(browser, "Windows Chromium is required for token mode verification");
   const directory = mkdtempSync(join(tmpdir(), "football-r12-tokens-"));
   const htmlPath = join(directory, "tokens.html");

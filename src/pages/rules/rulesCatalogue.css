@@ -1,45 +1,45 @@
 .application-shell[data-current-page="rules"] .page-container { overflow: hidden; }
-.model-rules-workspace { height: 100%; min-height: 0; }
-.model-rules-workspace [data-workspace-section="catalog"].active { display: flex; flex-direction: column; overflow: hidden; padding: 0; }
-.model-rules-workspace [data-workspace-section="catalog"] > .module-section-stack { display: flex; flex-direction: column; flex: 1; min-height: 0; gap: 8px; }
-.model-rules-workspace [data-workspace-section="catalog"] .module-section-heading { flex: 0 0 auto; padding: 0; border: 0; }
-.model-rules-workspace .rules-directory-panel { display: flex; flex-direction: column; flex: 1; min-height: 0; padding: 12px; background: transparent; box-shadow: none; }
-.model-rules-workspace .rules-directory-panel > .panel-heading { flex: 0 0 auto; margin: 0 0 8px; }
-.model-rules-workspace .rules-route-strip { flex: 0 0 auto; }
-.application-shell .model-rules-workspace > .task-context-ribbon { display: grid; grid-template-columns: repeat(4,minmax(0,1fr)); gap: 8px; }
-.application-shell .model-rules-workspace > .task-context-ribbon .task-context-item { min-width: 0; padding: 12px; border: 0; border-radius: 16px; background: var(--fip-info-soft); }
-.application-shell .model-rules-workspace > .task-context-ribbon .task-context-item > div { display: flex; flex-direction: column; align-items: flex-start; gap: 2px; }
-.application-shell .model-rules-workspace > .task-context-ribbon strong { font: 600 24px/30px Inter, "Noto Sans SC", sans-serif; color: var(--fip-info); }
-.application-shell .model-rules-workspace > .task-context-ribbon span { font: 500 12px/18px var(--fip-type-label-family); color: var(--fip-info); }
-.application-shell .model-rules-workspace > .task-context-ribbon small { font: 400 11px/16px var(--fip-type-meta-family); }
-.model-rules-workspace [data-workspace-section="catalog"].active { border: 0; border-radius: 0; background: transparent; box-shadow: none; }
-.model-rules-workspace .rules-directory-panel > .panel-heading h2 { font: 700 14px/20px var(--fip-type-section-title-family); }
-.model-rules-workspace .rules-directory-panel > .panel-heading p { margin: 4px 0 0; }
-.rules-directory { display: flex; flex-direction: column; min-height: 0; height: 100%; gap: 8px; overflow: hidden; }
-.rules-directory-toolbar { flex: 0 0 auto; display: flex; align-items: flex-end; gap: 8px; min-height: 0 !important; padding: 0 !important; }
-.rules-directory-toolbar label { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
-.rules-search { flex: 0 1 330px; }
-.rules-kind-filter { flex: 0 1 180px; }
-.rules-directory-toolbar :is(input,select) { height: 40px; min-width: 0; padding: 8px 12px; border: 1px solid var(--fip-border); border-radius: 7px; background: var(--fip-surface); color: var(--fip-text); font: 400 13px/20px var(--fip-type-input-family); }
-.rules-visible-count { align-self: center; font: 400 11px/16px var(--fip-type-meta-family); }
-.application-shell .rules-clear { height: 40px; }
-.rules-directory-grid { flex: 1; display: grid; grid-template-columns: 138px 130px minmax(0,1fr) !important; gap: 8px; min-width: 0; min-height: 0; overflow: hidden; }
-.rules-scope-list, .rules-region-list { display: flex; flex-direction: column; gap: 8px; min-width: 0; min-height: 0; overflow: auto; padding: 0; border: 0; background: transparent; }
-.rules-scope-list > strong, .rules-region-list > strong { padding: 0; font: 500 12px/20px var(--fip-type-label-family); flex: 0 0 auto; letter-spacing: 0; }
-.rules-scope-list > button, .rules-region-list > button { display: flex; align-items: center; justify-content: space-between; flex: 0 0 32px; width: 100%; min-width: 0; min-height: 32px; padding: 0 10px; gap: 6px; border: 1px solid var(--fip-border); border-radius: 7px; background: var(--fip-surface); color: var(--fip-text); font: 500 13px/18px var(--fip-type-control-family); }
-.rules-scope-list > button.active, .rules-region-list > button.active { background: var(--fip-accent); color: var(--fip-on-accent); border-color: transparent; box-shadow: none; }
-.rules-scope-list > button span, .rules-region-list > button span { min-width: 0; padding: 0; background: transparent; font: 400 11px/16px var(--fip-type-meta-family); color: inherit; }
-.rules-competition-pane { display: flex; flex-direction: column; min-width: 0; min-height: 0; padding: 0; border: 0; background: transparent; overflow: hidden; }
-.rules-pane-heading { flex: 0 0 auto; min-height: 20px !important; margin-bottom: 8px; padding: 0 !important; }
-.rules-pane-heading strong { font: 500 12px/20px var(--fip-type-label-family); }
-.rules-pane-heading span { font: 400 11px/16px var(--fip-type-meta-family); }
-.rules-table-scroll { flex: 1; min-height: 0; overflow: auto; overscroll-behavior: contain; }
-.rules-competition-cards { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); align-content: start; gap: 8px; padding: 0 0 8px; }
-.rules-competition-card { display: flex; flex-direction: column; gap: 6px; min-width: 0; min-height: 128px; padding: 12px; border-radius: 16px; background: var(--fip-surface); box-shadow: var(--fip-panel-shadow); }
-.rules-competition-card[hidden] { display: none; }
-.rules-competition-card header { display: grid; gap: 2px; min-width: 0; }
-.rules-competition-card strong { font: 700 14px/20px var(--fip-type-section-title-family); overflow-wrap: anywhere; }
-.rules-competition-card small { font: 400 11px/16px var(--fip-type-meta-family); color: var(--fip-muted); }
-.rules-competition-card p { margin: 0; font: 400 12px/18px var(--fip-type-body-family); overflow-wrap: anywhere; }
-.rules-row-actions { display: flex; align-items: center; gap: 8px; margin-top: auto; }
-@media (max-width: 1100px) { .rules-directory-grid { grid-template-columns: 130px 122px minmax(0,1fr) !important; } }
+:where(.application-shell[data-current-page="rules"]) .model-rules-workspace { height: 100%; min-height: 0; }
+:where(.application-shell[data-current-page="rules"]) .model-rules-workspace [data-workspace-section="catalog"].active { display: flex; flex-direction: column; overflow: hidden; padding: 0; }
+:where(.application-shell[data-current-page="rules"]) .model-rules-workspace [data-workspace-section="catalog"] > .module-section-stack { display: flex; flex-direction: column; flex: 1; min-height: 0; gap: 8px; }
+:where(.application-shell[data-current-page="rules"]) .model-rules-workspace [data-workspace-section="catalog"] .module-section-heading { flex: 0 0 auto; padding: 0; border: 0; }
+:where(.application-shell[data-current-page="rules"]) .model-rules-workspace .rules-directory-panel { display: flex; flex-direction: column; flex: 1; min-height: 0; padding: 12px; background: transparent; box-shadow: none; }
+:where(.application-shell[data-current-page="rules"]) .model-rules-workspace .rules-directory-panel > .panel-heading { flex: 0 0 auto; margin: 0 0 8px; }
+:where(.application-shell[data-current-page="rules"]) .model-rules-workspace .rules-route-strip { flex: 0 0 auto; }
+.application-shell:where([data-current-page="rules"]) .model-rules-workspace > .task-context-ribbon { display: grid; grid-template-columns: repeat(4,minmax(0,1fr)); gap: 8px; }
+.application-shell:where([data-current-page="rules"]) .model-rules-workspace > .task-context-ribbon .task-context-item { min-width: 0; padding: 12px; border: 0; border-radius: 16px; background: var(--fip-info-soft); }
+.application-shell:where([data-current-page="rules"]) .model-rules-workspace > .task-context-ribbon .task-context-item > div { display: flex; flex-direction: column; align-items: flex-start; gap: 2px; }
+.application-shell:where([data-current-page="rules"]) .model-rules-workspace > .task-context-ribbon strong { font: 600 24px/30px Inter, "Noto Sans SC", sans-serif; color: var(--fip-info); }
+.application-shell:where([data-current-page="rules"]) .model-rules-workspace > .task-context-ribbon span { font: 500 12px/18px var(--fip-type-label-family); color: var(--fip-info); }
+.application-shell:where([data-current-page="rules"]) .model-rules-workspace > .task-context-ribbon small { font: 400 11px/16px var(--fip-type-meta-family); }
+:where(.application-shell[data-current-page="rules"]) .model-rules-workspace [data-workspace-section="catalog"].active { border: 0; border-radius: 0; background: transparent; box-shadow: none; }
+:where(.application-shell[data-current-page="rules"]) .model-rules-workspace .rules-directory-panel > .panel-heading h2 { font: 700 14px/20px var(--fip-type-section-title-family); }
+:where(.application-shell[data-current-page="rules"]) .model-rules-workspace .rules-directory-panel > .panel-heading p { margin: 4px 0 0; }
+:where(.application-shell[data-current-page="rules"]) .rules-directory { display: flex; flex-direction: column; min-height: 0; height: 100%; gap: 8px; overflow: hidden; }
+:where(.application-shell[data-current-page="rules"]) .rules-directory-toolbar { flex: 0 0 auto; display: flex; align-items: flex-end; gap: 8px; min-height: 0 !important; padding: 0 !important; }
+:where(.application-shell[data-current-page="rules"]) .rules-directory-toolbar label { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+:where(.application-shell[data-current-page="rules"]) .rules-search { flex: 0 1 330px; }
+:where(.application-shell[data-current-page="rules"]) .rules-kind-filter { flex: 0 1 180px; }
+:where(.application-shell[data-current-page="rules"]) .rules-directory-toolbar :is(input,select) { height: 40px; min-width: 0; padding: 8px 12px; border: 1px solid var(--fip-border); border-radius: 7px; background: var(--fip-surface); color: var(--fip-text); font: 400 13px/20px var(--fip-type-input-family); }
+:where(.application-shell[data-current-page="rules"]) .rules-visible-count { align-self: center; font: 400 11px/16px var(--fip-type-meta-family); }
+.application-shell:where([data-current-page="rules"]) .rules-clear { height: 40px; }
+:where(.application-shell[data-current-page="rules"]) .rules-directory-grid { flex: 1; display: grid; grid-template-columns: 138px 130px minmax(0,1fr) !important; gap: 8px; min-width: 0; min-height: 0; overflow: hidden; }
+:where(.application-shell[data-current-page="rules"]) .rules-scope-list, :where(.application-shell[data-current-page="rules"]) .rules-region-list { display: flex; flex-direction: column; gap: 8px; min-width: 0; min-height: 0; overflow: auto; padding: 0; border: 0; background: transparent; }
+:where(.application-shell[data-current-page="rules"]) .rules-scope-list > strong, :where(.application-shell[data-current-page="rules"]) .rules-region-list > strong { padding: 0; font: 500 12px/20px var(--fip-type-label-family); flex: 0 0 auto; letter-spacing: 0; }
+:where(.application-shell[data-current-page="rules"]) .rules-scope-list > button, :where(.application-shell[data-current-page="rules"]) .rules-region-list > button { display: flex; align-items: center; justify-content: space-between; flex: 0 0 32px; width: 100%; min-width: 0; min-height: 32px; padding: 0 10px; gap: 6px; border: 1px solid var(--fip-border); border-radius: 7px; background: var(--fip-surface); color: var(--fip-text); font: 500 13px/18px var(--fip-type-control-family); }
+:where(.application-shell[data-current-page="rules"]) .rules-scope-list > button.active, :where(.application-shell[data-current-page="rules"]) .rules-region-list > button.active { background: var(--fip-accent); color: var(--fip-on-accent); border-color: transparent; box-shadow: none; }
+:where(.application-shell[data-current-page="rules"]) .rules-scope-list > button span, :where(.application-shell[data-current-page="rules"]) .rules-region-list > button span { min-width: 0; padding: 0; background: transparent; font: 400 11px/16px var(--fip-type-meta-family); color: inherit; }
+:where(.application-shell[data-current-page="rules"]) .rules-competition-pane { display: flex; flex-direction: column; min-width: 0; min-height: 0; padding: 0; border: 0; background: transparent; overflow: hidden; }
+:where(.application-shell[data-current-page="rules"]) .rules-pane-heading { flex: 0 0 auto; min-height: 20px !important; margin-bottom: 8px; padding: 0 !important; }
+:where(.application-shell[data-current-page="rules"]) .rules-pane-heading strong { font: 500 12px/20px var(--fip-type-label-family); }
+:where(.application-shell[data-current-page="rules"]) .rules-pane-heading span { font: 400 11px/16px var(--fip-type-meta-family); }
+:where(.application-shell[data-current-page="rules"]) .rules-table-scroll { flex: 1; min-height: 0; overflow: auto; overscroll-behavior: contain; }
+:where(.application-shell[data-current-page="rules"]) .rules-competition-cards { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); align-content: start; gap: 8px; padding: 0 0 8px; }
+:where(.application-shell[data-current-page="rules"]) .rules-competition-card { display: flex; flex-direction: column; gap: 6px; min-width: 0; min-height: 128px; padding: 12px; border-radius: 16px; background: var(--fip-surface); box-shadow: var(--fip-panel-shadow); }
+:where(.application-shell[data-current-page="rules"]) .rules-competition-card[hidden] { display: none; }
+:where(.application-shell[data-current-page="rules"]) .rules-competition-card header { display: grid; gap: 2px; min-width: 0; }
+:where(.application-shell[data-current-page="rules"]) .rules-competition-card strong { font: 700 14px/20px var(--fip-type-section-title-family); overflow-wrap: anywhere; }
+:where(.application-shell[data-current-page="rules"]) .rules-competition-card small { font: 400 11px/16px var(--fip-type-meta-family); color: var(--fip-muted); }
+:where(.application-shell[data-current-page="rules"]) .rules-competition-card p { margin: 0; font: 400 12px/18px var(--fip-type-body-family); overflow-wrap: anywhere; }
+:where(.application-shell[data-current-page="rules"]) .rules-row-actions { display: flex; align-items: center; gap: 8px; margin-top: auto; }
+@media (max-width: 1100px) { :where(.application-shell[data-current-page="rules"]) .rules-directory-grid { grid-template-columns: 130px 122px minmax(0,1fr) !important; } }

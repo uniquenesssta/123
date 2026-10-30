@@ -1,0 +1,22 @@
+
+
+/* H 前置阶段 3：阵型目录与概率 */
+.formation-count-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: 10px;
+  margin: 14px 0;
+}
+.formation-probability-list { display: grid; gap: 8px; margin: 12px 0; }
+.formation-probability-row {
+  display: grid;
+  grid-template-columns: minmax(80px, 1fr) repeat(3, minmax(90px, auto));
+  gap: 12px;
+  align-items: center;
+  padding: 10px 12px;
+  border: 1px solid var(--border-subtle);
+  border-radius: 10px;
+}
+@media (max-width: 900px) {
+  .formation-probability-row { grid-template-columns: 1fr 1fr; }
+}

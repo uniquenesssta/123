@@ -1,0 +1,91 @@
+
+
+/* Resource centers and task workspaces are kept inside one viewport. */
+.app-shell[data-current-page="teams"] .page-container,
+.app-shell[data-current-page="players"] .page-container {
+  height: calc(100dvh - 44px);
+  padding: 9px 11px 11px !important;
+}
+.entity-page { gap: 8px !important; }
+.entity-page.task-page {
+  grid-template-rows: auto auto 32px minmax(0, 1fr) !important;
+  gap: 7px !important;
+}
+.entity-page.task-page > .core-local-navigation {
+  height: 32px;
+  min-height: 32px;
+  max-height: 32px;
+  align-self: start;
+}
+.entity-page.task-page > .core-workspace-stage {
+  height: 100%;
+  min-height: 0;
+  overflow: hidden;
+}
+.entity-page.task-page .task-page-header {
+  min-height: 48px;
+  padding: 0 0 7px;
+}
+.entity-browser,
+.master-detail-workspace,
+.match-browser-layout,
+.ai-history-layout { gap: 8px; }
+.entity-browser > .panel,
+.entity-task-workspace,
+.workspace-main,
+.workspace-inspector,
+.balanced-workspace-main,
+.module-sidebar,
+.workspace-module-view { border-radius: 7px; }
+.entity-directory-header,
+.entity-task-workspace > header,
+.core-workspace-page .entity-task-workspace > header {
+  min-height: 44px;
+  padding: 7px 9px;
+}
+.entity-directory-header strong,
+.entity-task-workspace > header h2,
+.core-workspace-page .entity-task-workspace > header h2 { font-size: 13px; }
+.entity-task-body,
+.core-workspace-page .entity-task-body { padding: 8px; }
+.entity-directory-open {
+  min-height: 46px;
+  grid-template-columns: 29px minmax(0, 1fr) auto;
+  gap: 7px;
+  padding: 6px 7px;
+}
+.entity-avatar.large,
+.entity-avatar.xlarge {
+  width: 38px;
+  height: 38px;
+  border-radius: 7px;
+  font-size: 12px;
+}
+.entity-table-toolbar,
+.player-list-toolbar,
+.team-resource-header {
+  min-height: 46px;
+  gap: 8px;
+  padding: 7px 9px;
+}
+.team-resource-stats > div { padding: 7px 9px; }
+.team-resource-stats strong { font-size: 13px; }
+.entity-inspector-content { padding: 10px; }
+.inspector-identity { gap: 8px; padding-right: 25px; }
+.inspector-identity h2 { font-size: 16px; }
+.inspector-facts > div,
+.inspector-score-row > div { padding: 8px; border-radius: 5px; }
+.inspector-score-row strong { font-size: 15px; }
+.entity-inspector-empty { min-height: 150px; padding: 16px; }
+.match-list-item { min-height: 54px !important; margin: 2px 0 !important; border-radius: 6px !important; }
+.match-list-open { min-height: 52px !important; padding: 6px 7px !important; }
+.rules-directory-toolbar { min-height: 46px !important; padding: 7px 8px !important; }
+.rules-pane-heading { min-height: 43px !important; padding: 7px 9px !important; }
+
+.core-workspace-page,
+.module-workspace-page { gap: 7px; }
+.core-workspace-page .task-context-ribbon { gap: 1px; }
+.core-workspace-page .task-context-item { min-height: 42px; padding: 6px 8px; }
+.core-workspace-page .workspace-section-heading { min-height: 42px; margin-bottom: 6px; padding: 7px 9px; }
+.profile-section-stack { gap: 7px; }
+.profile-section-stack > .editor-details > summary { min-height: 34px; }

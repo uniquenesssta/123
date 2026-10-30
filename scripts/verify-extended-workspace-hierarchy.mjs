@@ -1,9 +1,13 @@
-import { existsSync, readFileSync } from "node:fs";
+import {productionStyleFiles} from "./styles/styleGraph.mjs";
+import {readProjectSource} from "./styles/projectSource.mjs";
+import {fileURLToPath as stylesheetFilePath} from "node:url";
+const stylesheetRoot=stylesheetFilePath(new URL("../",import.meta.url));
+import { existsSync } from "node:fs";
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), "..");
-const read = (path) => readFileSync(join(root, path), "utf8");
+const read = (path) => readProjectSource(stylesheetRoot,join(root, path), "utf8");
 const failures = [];
 const check = (condition, message) => { if (!condition) failures.push(message); };
 
@@ -23,7 +27,7 @@ const pkg = JSON.parse(read("package.json"));
 const taskUiContract = JSON.parse(read("contracts/task-ui-contract.json"));
 
 check(
-  main.indexOf('import "./styles/moduleWorkspaces.css";') > main.indexOf('import "./styles/coreWorkspaces.css";'),
+  productionStyleFiles(root).indexOf("src/styles/moduleWorkspaces.css") > productionStyleFiles(root).indexOf("src/styles/coreWorkspaces.css"),
   "扩展工作区样式必须在核心工作区样式之后加载",
 );
 check(

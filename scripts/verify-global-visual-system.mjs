@@ -1,3 +1,7 @@
+import {productionStyleFiles} from "./styles/styleGraph.mjs";
+import {readProjectSource} from "./styles/projectSource.mjs";
+import {fileURLToPath as stylesheetFilePath} from "node:url";
+const stylesheetRoot=stylesheetFilePath(new URL("../",import.meta.url));
 import { verifyNavigationLayout } from "./navigation/verifyNavigationLayout.mjs";
 import { readStylesheet } from "./tokens/tokenStyles.mjs";
 import { verifyDesignTokens } from "./tokens/verifyDesignTokens.mjs";
@@ -5,12 +9,12 @@ import { verifyPrimitives } from "./primitives/verifyPrimitives.mjs";
 import { verifyForms } from "./forms/verifyForms.mjs";
 import { verifyOverlays } from "./overlays/verifyOverlays.mjs";
 import { verifyDataDisplay } from "./data-display/verifyDataDisplay.mjs";
-import { existsSync, readFileSync } from "node:fs";
+import { existsSync } from "node:fs";
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), "..");
-const read = (relative) => readFileSync(join(root, relative), "utf8");
+const read = (relative) => readProjectSource(stylesheetRoot,join(root, relative), "utf8");
 const failures = [];
 const check = (condition, message) => { if (!condition) failures.push(message); };
 
@@ -29,9 +33,9 @@ const taskUi = JSON.parse(read("contracts/task-ui-contract.json"));
 check(contract.contract_id === "football.global-visual-system.v1", "全局视觉契约 ID 错误");
 check(contract.contract_version === "1.4.0", "全局视觉契约版本错误");
 check(existsSync(join(root, contract.style_entry)), "缺少全局视觉样式入口");
-for (const entry of contract.feedback_style_entries) check(main.includes(`import "./${entry.replace(/^src\//, "")}";`), `反馈样式未接入真实入口：${entry}`);
+for (const entry of contract.feedback_style_entries) check(productionStyleFiles(root).includes(entry), `反馈样式未接入真实入口：${entry}`);
 check(
-  main.lastIndexOf('import "./styles/visualSystem.css";') > main.lastIndexOf('import "./styles/moduleWorkspaces.css";'),
+  productionStyleFiles(root).indexOf("src/styles/visualSystem.css") > productionStyleFiles(root).indexOf("src/styles/moduleWorkspaces.css"),
   "全局视觉样式必须最后加载，避免被历史页面样式覆盖",
 );
 

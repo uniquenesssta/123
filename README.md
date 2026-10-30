@@ -1,8 +1,12 @@
 # 足球模型平台公开外壳
 
-## R12-17 Accessibility、Icons 与 Assets（2026-10-30，VERIFYING）
+## R12-18 样式入口与边界（2026-10-30，VERIFYING）
 
-16精确fa77c8d7的CI、产物摘要、MSI/NSIS与startup已独立核验收尾。17接通六项无障碍能力、37项统一图标和59份受控本地资产；保留批准的字体、字重、配色、布局及真实业务owner。1,950项Windows浏览器专项、59份资源摘要、Rust格式/Clippy/748项测试及隔离Windows startup已通过；最终95步前端门禁通过、Impeccable32路径检测0项发现、独立复审ship及设计文档审计完成，详见[17记录](docs/modular-rewrite/R12-frontend-foundation-ui-system/R12-17-accessibility-icons-and-assets.md)。按用户后续推送长期授权交付；本批自身CI/安装包推送后另验，不轮询；18～19未实施。
+17精确CI、产物与startup已收尾；18迁移单一生产CSS入口、具名样式职责与页面作用域，保留最新批准视觉。181份CSS单一可达、222受限选择器与15负向检查通过；64组36,682,704项计算样式值0差异、17截图0像素差、Rust与实际Windows startup通过；最终96步门禁已通过，独立复审两项修复均resolved（ship），独立设计文档审计完成，详[18记录](docs/modular-rewrite/R12-frontend-foundation-ui-system/R12-18-样式入口-and-边界.md)。19未实施。
+
+## R12-17 Accessibility、Icons 与 Assets（2026-10-30收尾 DONE）
+
+16精确fa77c8d7的CI、产物摘要、MSI/NSIS与startup已独立核验收尾。17接通六项无障碍能力、37项统一图标和59份受控本地资产；保留批准的字体、字重、配色、布局及真实业务owner。1,950项Windows浏览器专项、59份资源摘要、Rust格式/Clippy/748项测试及隔离Windows startup已通过；最终95步前端门禁通过、Impeccable32路径检测0项发现、独立复审ship及设计文档审计完成，详见[17记录](docs/modular-rewrite/R12-frontend-foundation-ui-system/R12-17-accessibility-icons-and-assets.md)。按用户后续推送长期授权交付；本批a4ce5177精确Windows run41017231141、下载产物摘要、MSI/NSIS和startup已独立核验；18随后授权推进，19未实施。
 
 ## R12-16 UI Patterns（2026-10-30收尾 DONE）
 

@@ -1,8 +1,11 @@
+import {readProjectSource} from "./styles/projectSource.mjs";
+import {fileURLToPath as stylesheetFilePath} from "node:url";
+const stylesheetRoot=stylesheetFilePath(new URL("../",import.meta.url));
 import fs from "node:fs";
 import path from "node:path";
 
 const root = path.resolve(import.meta.dirname, "..");
-const read = (file) => fs.readFileSync(path.join(root, file), "utf8");
+const read = (file) => readProjectSource(stylesheetRoot,path.join(root, file), "utf8");
 const check = (condition, message) => {
   if (!condition) throw new Error(message);
 };

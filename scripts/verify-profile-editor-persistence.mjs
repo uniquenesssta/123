@@ -1,10 +1,13 @@
+import {readProjectSource} from "./styles/projectSource.mjs";
+import {fileURLToPath as stylesheetFilePath} from "node:url";
+const stylesheetRoot=stylesheetFilePath(new URL("../",import.meta.url));
 import { renderResourceMarkup } from "./patterns/renderResourceMarkup.mjs";
-import { readFileSync } from "node:fs";
+
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), "..");
-const read = (path) => readFileSync(join(root, path), "utf8");
+const read = (path) => readProjectSource(stylesheetRoot,join(root, path), "utf8");
 const failures = [];
 const check = (condition, message) => { if (!condition) failures.push(message); };
 const between = (source, start, end) => {

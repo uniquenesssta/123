@@ -1,0 +1,146 @@
+
+
+/* Match, competition and paired-lineup workflow */
+.hierarchy-selector {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+  margin: 12px 0 16px;
+  padding: 14px;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: var(--panel-2);
+}
+.hierarchy-selector .hierarchy-level {
+  position: relative;
+  margin: 0;
+  padding: 12px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--panel);
+}
+.hierarchy-selector .hierarchy-level > span {
+  display: block;
+  margin-bottom: 8px;
+  color: var(--accent);
+  font-weight: 700;
+}
+.hierarchy-selector select { width: 100%; }
+.hierarchy-selector option:disabled { color: var(--muted); }
+
+.match-browser-layout {
+  display: grid;
+  grid-template-columns: minmax(280px, 340px) minmax(0, 1fr);
+  gap: 14px;
+  align-items: start;
+}
+.match-browser-sidebar {
+  position: sticky;
+  top: 12px;
+  display: grid;
+  gap: 12px;
+  max-height: calc(100vh - 110px);
+  overflow: hidden;
+  padding: 14px;
+}
+.match-list {
+  display: grid;
+  gap: 8px;
+  min-height: 120px;
+  overflow: auto;
+  padding-right: 4px;
+}
+.match-list-item {
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 34px;
+  gap: 6px;
+  align-items: stretch;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--panel);
+  overflow: hidden;
+}
+.match-list-item.active {
+  border-color: color-mix(in srgb, var(--accent) 60%, var(--line));
+  box-shadow: inset 3px 0 0 var(--accent);
+  background: var(--accent-soft);
+}
+.match-list-open {
+  display: grid;
+  gap: 5px;
+  min-width: 0;
+  padding: 12px;
+  border: 0;
+  color: inherit;
+  background: transparent;
+  text-align: left;
+}
+.match-list-open span,
+.match-list-open small { color: var(--muted); }
+.match-list-open strong { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.match-list-open i { color: var(--accent); font-style: normal; }
+.match-list-delete {
+  width: 30px !important;
+  height: 30px !important;
+  align-self: center;
+  justify-self: center;
+  opacity: .72;
+}
+.match-list-item:hover .match-list-delete,
+.match-list-item:focus-within .match-list-delete { opacity: 1; }
+.match-browser-detail { min-width: 0; padding: 16px; }
+.match-editor { display: grid; gap: 14px; }
+.match-context-form { padding: 16px; }
+.match-sides-grid { display: grid; grid-template-columns: minmax(0, 1fr) 54px minmax(0, 1fr); gap: 12px; align-items: center; }
+.match-versus { color: var(--accent); font-weight: 800; text-align: center; }
+.team-select-card { padding: 14px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel-2); }
+
+.paired-lineup-workflow { display: grid; gap: 16px; padding: 16px; }
+.paired-lineup-common { display: grid; gap: 12px; }
+.paired-lineup-board {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 54px minmax(0, 1fr);
+  gap: 12px;
+  align-items: stretch;
+}
+.paired-lineup-vs { display: grid; place-items: center; align-content: center; gap: 4px; color: var(--accent); }
+.paired-lineup-vs span { font-weight: 850; }
+.paired-lineup-vs small { color: var(--muted); writing-mode: vertical-rl; }
+.paired-lineup-side {
+  display: grid;
+  gap: 12px;
+  min-width: 0;
+  padding: 14px;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: var(--panel-2);
+}
+.paired-lineup-side.home { box-shadow: inset 3px 0 0 var(--accent); }
+.paired-lineup-side.away { box-shadow: inset -3px 0 0 var(--accent); }
+.paired-lineup-header { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.paired-lineup-header span { color: var(--accent); font-size: 10px; font-weight: 700; }
+.paired-lineup-header h2 { margin: 3px 0 0; }
+.lineup-count { display: grid; text-align: right; }
+.lineup-count strong { color: var(--text-strong); font-size: 22px; }
+.lineup-count span { color: var(--muted); font-size: 10px; }
+.formation-hierarchy { margin: 0; padding: 10px; }
+.formation-hierarchy .hierarchy-level { padding: 9px; }
+.lineup-team-metadata { margin: 0; }
+.paired-lineup-columns {
+  display: grid;
+  grid-template-columns: minmax(230px, .9fr) minmax(260px, 1.1fr);
+  gap: 10px;
+  min-height: 420px;
+}
+.paired-lineup-columns > section {
+  min-width: 0;
+  overflow: hidden;
+  padding: 10px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--panel);
+}
+.paired-lineup-columns .lineup-candidate-list,
+.paired-lineup-columns .lineup-selected-list { max-height: 540px; overflow: auto; }
+.inline-assist { display: flex; justify-content: flex-end; }

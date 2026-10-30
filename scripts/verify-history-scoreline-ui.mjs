@@ -1,12 +1,15 @@
+import {readProjectSource} from "./styles/projectSource.mjs";
+import {fileURLToPath as stylesheetFilePath} from "node:url";
+const stylesheetRoot=stylesheetFilePath(new URL("../",import.meta.url));
 import fs from "node:fs";
 
-const read = (path) => fs.readFileSync(new URL(`../${path}`, import.meta.url), "utf8");
+const read = (path) => readProjectSource(stylesheetRoot,new URL(`../${path}`, import.meta.url), "utf8");
 const readRustTree = (directory) => {
   const visit = (directoryUrl) => fs.readdirSync(directoryUrl, { withFileTypes: true })
     .map((entry) => {
       const entryUrl = new URL(`${entry.name}${entry.isDirectory() ? "/" : ""}`, directoryUrl);
       if (entry.isDirectory()) return visit(entryUrl);
-      return entry.name.endsWith(".rs") ? fs.readFileSync(entryUrl, "utf8") : "";
+      return entry.name.endsWith(".rs") ? readProjectSource(stylesheetRoot,entryUrl, "utf8") : "";
     })
     .join("\n");
   return visit(new URL(`../${directory}/`, import.meta.url));

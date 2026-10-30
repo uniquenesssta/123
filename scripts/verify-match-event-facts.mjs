@@ -1,9 +1,12 @@
+import {readProjectSource} from "./styles/projectSource.mjs";
+import {fileURLToPath as stylesheetFilePath} from "node:url";
+const stylesheetRoot=stylesheetFilePath(new URL("../",import.meta.url));
 import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
-const read = (relative) => fs.readFileSync(path.join(root, relative), "utf8");
+const read = (relative) => readProjectSource(stylesheetRoot,path.join(root, relative), "utf8");
 const contract = JSON.parse(read("contracts/match-event-facts-contract.json"));
 const failures = [];
 const check = (condition, message) => { if (!condition) failures.push(message); };

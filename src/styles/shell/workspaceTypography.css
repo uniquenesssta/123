@@ -1,0 +1,127 @@
+
+
+/* Restore readable control and navigation typography inside every workspace. */
+.app-shell.workspace-page .panel-heading > div > span,
+.app-shell.workspace-page .workbook-card-header > div > span,
+.app-shell.workspace-page .disclosure-panel > summary div span {
+  font-size: 11px;
+}
+
+.app-shell.workspace-page .panel-heading h2,
+.app-shell.workspace-page .panel-heading h3 {
+  font-size: 17px;
+}
+
+.app-shell.workspace-page .field > span,
+.app-shell.workspace-page .check-field,
+.app-shell.workspace-page .field-note,
+.app-shell.workspace-page .module-list-meta,
+.app-shell.workspace-page .module-pagination small,
+.app-shell.workspace-page .workspace-inspector p,
+.app-shell.workspace-page .inspector-list,
+.app-shell.workspace-page .workbook-card-header p,
+.app-shell.workspace-page .workbook-flow article > p {
+  font-size: 12px;
+}
+
+.app-shell.workspace-page input,
+.app-shell.workspace-page select,
+.app-shell.workspace-page textarea,
+.app-shell.workspace-page button {
+  font-size: 13px;
+}
+
+.app-shell.workspace-page .module-object-list .team-row strong,
+.app-shell.workspace-page .module-object-list .player-row strong,
+.app-shell.workspace-page .workspace-tab-main span,
+.app-shell.workspace-page .workbook-flow article > strong {
+  font-size: 13px;
+}
+
+.app-shell.workspace-page .module-object-list .team-row small,
+.app-shell.workspace-page .module-object-list .player-row small,
+.app-shell.workspace-page .workspace-tabs-empty small,
+.app-shell.workspace-page .inspector-kpis span,
+.app-shell.workspace-page .module-sidebar-summary span,
+.app-shell.workspace-page .module-sidebar-summary small {
+  font-size: 11px;
+}
+
+.app-shell.workspace-page .module-sidebar .panel-heading h2 {
+  font-size: 18px;
+}
+
+.app-shell.workspace-page .module-sidebar .panel-heading span {
+  font-size: 11px;
+}
+
+.app-shell.workspace-page .module-sidebar-summary strong {
+  font-size: 24px;
+}
+
+.app-shell.workspace-page .workspace-tabs-empty span,
+.app-shell.workspace-page .selection-commandbar strong,
+.app-shell.workspace-page .workbook-empty span {
+  font-size: 13px;
+}
+
+.app-shell.workspace-page .workspace-layout-controls button span,
+.app-shell.workspace-page .workbook-state,
+.app-shell.workspace-page .workbook-empty small,
+.app-shell.workspace-page .workbook-flow article > span {
+  font-size: 11px;
+}
+
+.app-shell.workspace-page .workbook-card-header h2 {
+  font-size: 20px;
+}
+
+.app-shell.workspace-page .workbook-flow article {
+  padding: 16px;
+}
+
+.app-shell.workspace-page .workbook-flow article > p {
+  min-height: 38px;
+}
+
+.app-shell.workspace-page .module-sidebar-summary {
+  margin-top: auto;
+  padding: 14px;
+}
+
+.app-shell.workspace-page .workspace-toolbar {
+  position: sticky;
+  top: 0;
+}
+
+@media (max-width: 1100px) {
+  :root { --module-sidebar-width: 270px; }
+  .workspace-section-copy small { display: none; }
+}
+
+@media (max-width: 900px) {
+  .app-shell.workspace-page .page-container {
+    overflow: auto;
+  }
+  .app-shell.workspace-page .workspace-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    overflow: visible;
+  }
+  .app-shell.workspace-page .module-sidebar {
+    position: relative;
+    top: auto;
+    left: auto;
+    width: auto;
+    height: auto;
+    max-height: none;
+    box-shadow: none;
+  }
+  .app-shell.workspace-page .workspace-main {
+    height: auto;
+    overflow: visible;
+  }
+  .workspace-section-nav {
+    grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+  }
+}

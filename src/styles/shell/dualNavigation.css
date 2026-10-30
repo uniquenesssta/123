@@ -1,0 +1,15 @@
+
+
+
+/* 0.23.0 · phase 1 dual-level global navigation */
+
+.primary-rail-spacer {
+  flex: 1 1 auto;
+  min-height: 12px;
+}
+
+@media (max-width: 1100px) {
+}
+
+@media (max-width: 820px) {
+}

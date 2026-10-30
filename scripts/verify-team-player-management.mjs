@@ -1,6 +1,9 @@
+import {readProjectSource} from "./styles/projectSource.mjs";
+import {fileURLToPath as stylesheetFilePath} from "node:url";
+const stylesheetRoot=stylesheetFilePath(new URL("../",import.meta.url));
 import { readStylesheet } from "./tokens/tokenStyles.mjs";
 import { createHash } from "node:crypto";
-import { existsSync, readFileSync } from "node:fs";
+import { existsSync } from "node:fs";
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { isVersionAtLeast } from "./version.mjs";
@@ -9,7 +12,7 @@ const root = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const outerRoot = resolve(root, "..");
 const failures = [];
 const assert = (condition, message) => { if (!condition) failures.push(message); };
-const text = (path) => readFileSync(join(root, path), "utf8").replace(/\r\n?/g, "\n");
+const text = (path) => readProjectSource(stylesheetRoot,join(root, path), "utf8").replace(/\r\n?/g, "\n");
 const json = (path) => JSON.parse(text(path));
 const hash = (path) => createHash("sha256").update(text(path), "utf8").digest("hex");
 

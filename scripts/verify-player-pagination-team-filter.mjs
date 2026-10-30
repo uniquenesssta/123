@@ -1,9 +1,12 @@
+import {readProjectSource} from "./styles/projectSource.mjs";
+import {fileURLToPath as stylesheetFilePath} from "node:url";
+const stylesheetRoot=stylesheetFilePath(new URL("../",import.meta.url));
 import { renderResourceMarkup } from "./patterns/renderResourceMarkup.mjs";
 import {fileURLToPath} from "node:url";
 import fs from "node:fs";
 
 function read(path) {
-  return fs.readFileSync(new URL(`../${path}`, import.meta.url), "utf8");
+  return readProjectSource(stylesheetRoot,new URL(`../${path}`, import.meta.url), "utf8");
 }
 function requireTrue(value, message) {
   if (!value) throw new Error(message);

@@ -1,0 +1,88 @@
+
+
+/* 0.23.0 · stage 2 scroll ownership and readability correction */
+.app-shell.workspace-page .balanced-workspace {
+  flex: 1 1 auto;
+  width: 100%;
+  min-height: 0;
+  grid-template-rows: auto minmax(0, 1fr);
+  overflow: hidden;
+}
+
+.app-shell.workspace-page .balanced-workspace-main {
+  min-width: 0;
+  min-height: 0;
+  height: 100%;
+  overflow: hidden;
+}
+
+.app-shell.workspace-page .balanced-workspace-main > .workspace-module-view.active {
+  height: 100%;
+  min-height: 0;
+  overflow-x: hidden;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-gutter: stable;
+  padding-right: 8px;
+}
+
+.app-shell.workspace-page .balanced-workspace-main > .workspace-module-view[data-workspace-section="matches"].active {
+  overflow: hidden;
+  padding-right: 0;
+}
+
+.app-shell.workspace-page .balanced-workspace-main .match-browser-layout {
+  height: 100%;
+  min-height: 0;
+  align-items: stretch;
+  overflow: hidden;
+}
+
+.app-shell.workspace-page .balanced-workspace-main .match-browser-sidebar {
+  position: relative;
+  top: auto;
+  height: 100%;
+  min-height: 0;
+  max-height: none;
+  grid-template-rows: auto auto minmax(0, 1fr) auto;
+}
+
+.app-shell.workspace-page .balanced-workspace-main .match-list {
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-gutter: stable;
+}
+
+.app-shell.workspace-page .balanced-workspace-main .match-browser-detail {
+  height: 100%;
+  min-height: 0;
+  overflow-x: hidden;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-gutter: stable;
+  padding-right: 18px;
+}
+
+.app-shell.workspace-page .balanced-workspace-main > .workspace-module-view.active,
+.app-shell.workspace-page .balanced-workspace-main .match-list,
+.app-shell.workspace-page .balanced-workspace-main .match-browser-detail {
+  scrollbar-width: auto;
+  scrollbar-color: color-mix(in srgb, var(--muted) 48%, transparent) transparent;
+}
+
+.app-shell.workspace-page .balanced-workspace-main > .workspace-module-view.active::-webkit-scrollbar,
+.app-shell.workspace-page .balanced-workspace-main .match-list::-webkit-scrollbar,
+.app-shell.workspace-page .balanced-workspace-main .match-browser-detail::-webkit-scrollbar {
+  width: 11px;
+  height: 11px;
+}
+
+.app-shell.workspace-page .balanced-workspace-main > .workspace-module-view.active::-webkit-scrollbar-thumb,
+.app-shell.workspace-page .balanced-workspace-main .match-list::-webkit-scrollbar-thumb,
+.app-shell.workspace-page .balanced-workspace-main .match-browser-detail::-webkit-scrollbar-thumb {
+  border: 3px solid transparent;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--muted) 48%, transparent);
+  background-clip: padding-box;
+}

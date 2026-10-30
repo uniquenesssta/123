@@ -1,27 +1,8 @@
+import "./styles/index.css";
 import { KeyboardShortcutController, motionScrollBehavior } from "./ui/accessibility";
 import { updatePaginationView } from "./ui/navigation";
-import "./styles/app.css";
 import { clearRulesCatalogueFilters } from "./pages/rules/catalogueFilters";
-import "./styles/components.css";
-import "./styles/layout.css";
-import "./styles/entityCenter.css";
-import "./styles/taskWorkspace.css";
-import "./styles/coreWorkspaces.css";
-import "./styles/moduleWorkspaces.css";
-import "./styles/visualSystem.css";
-import "./styles/workspacePanels.css";
-import "./ui/tokens/index.css";
-import "./styles/foundation/legacyControls.css";
-import "./ui/icons/iconSlot.css";
-import "./ui/primitives/index.css";
-import "./ui/forms/index.css";
-import "./ui/data-display/index.css";
-import "./ui/feedback/index.css";
-import "./ui/overlays/index.css";
-import "./ui/navigation/index.css";
-import "./ui/layout/index.css";
 import { focusValidationTarget } from "./ui/forms/validation-summary";
-import "./app/warnings/warning-center/warningCenter.css";
 import {
   api,
   issueWasLogged,

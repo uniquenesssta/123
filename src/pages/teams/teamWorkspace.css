@@ -1,91 +1,91 @@
-.application-shell .entity-page-teams { height: 100%; min-height: 0; grid-template-rows: auto auto 32px minmax(0,1fr); }
-.application-shell .team-directory-only { grid-template-columns: minmax(0,1fr); height: 100%; min-height: 0; grid-template-rows: minmax(0,1fr); overflow: hidden; }
-.application-shell .team-catalogue-layout { display: grid; grid-template-columns: 248px minmax(0,1fr); gap: 12px; width: 100%; min-height: 0; height: 100%; }
-.application-shell .team-catalogue-layout > .entity-directory { display: flex; flex-direction: column; align-items: stretch; gap: 8px; padding: 12px; min-width: 0; min-height: 0; overflow: auto; border: 0; border-radius: 16px; background: var(--fip-surface); }
-.application-shell :is(.team-catalogue-layout,.team-detail-workspace) .entity-directory-header { min-height: 60px; padding: 0; border: 0; }
-.application-shell :is(.team-catalogue-layout,.team-detail-workspace) .entity-search { display: flex; align-items: center; gap: 8px; min-height: 40px; margin: 0; padding: 0; border: 0; overflow: visible; }
-.application-shell :is(.team-catalogue-layout,.team-detail-workspace) .entity-search > svg { display: none; }
-.application-shell :is(.team-catalogue-layout,.team-detail-workspace) .entity-search input { width: 0; min-width: 0; flex: 1; height: 32px; padding: 0 10px; border: 1px solid var(--fip-border); border-radius: 7px; background: var(--fip-surface); font: 400 13px/20px var(--fip-type-input-family); }
-.application-shell :is(.team-catalogue-layout,.team-detail-workspace) .entity-search button { min-height: 40px; padding: 0 12px; border: 1px solid var(--fip-border); border-radius: 7px; background: var(--fip-surface); font: 500 13px/18px var(--fip-type-control-family); }
-.application-shell :is(.team-catalogue-layout,.team-detail-workspace) .entity-filter-groups { display: grid; grid-template-columns: minmax(0,1fr); grid-template-rows: none; gap: 8px; padding: 0; overflow: visible; }
-.application-shell :is(.team-catalogue-layout,.team-detail-workspace) .entity-filter-group { width: 100%; min-width: 0; padding: 0; margin: 0; border: 0; background: transparent; }
-.application-shell :is(.team-catalogue-layout,.team-detail-workspace) .entity-filter-group > header { display: none; }
-.application-shell :is(.team-catalogue-layout,.team-detail-workspace) .entity-filter-field { display: flex; flex-direction: column; gap: 6px; }
-.application-shell :is(.team-catalogue-layout,.team-detail-workspace) .entity-filter-field > span { font: 500 12px/18px var(--fip-type-label-family); }
-.application-shell :is(.team-catalogue-layout,.team-detail-workspace) .entity-filter-field :is(input,select) { height: 40px; }
-.application-shell :is(.team-catalogue-layout,.team-detail-workspace) .entity-filter-field .searchable-select-control { height: 40px; min-height: 40px; border-radius: 7px; background: var(--fip-surface); }
-.application-shell :is(.team-catalogue-layout,.team-detail-workspace) .entity-active-filters, .application-shell :is(.team-catalogue-layout,.team-detail-workspace) .entity-filter-actions { margin: 0; padding: 0; }
-.application-shell :is(.team-catalogue-layout,.team-detail-workspace) .entity-active-filters { display: flex; flex-wrap: wrap; gap: 6px; min-height: 0; height: auto; }
-.application-shell :is(.team-catalogue-layout,.team-detail-workspace) .entity-toggle { min-height: 20px; padding: 0; border: 0; align-items: center; }
-.application-shell :is(.team-catalogue-layout,.team-detail-workspace) .entity-toggle span { min-width: 0; white-space: normal; }
-.application-shell :is(.team-catalogue-layout,.team-detail-workspace) .entity-toggle small { display: none; }
-.application-shell .team-catalogue-results { display: flex; flex-direction: column; gap: 8px; min-width: 0; min-height: 0; }
-.application-shell .team-catalogue-results > h2 { margin: 0; font: 700 14px/20px var(--fip-type-section-title-family); }
-.application-shell .team-directory-only .team-catalogue-results .entity-directory-list { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); align-content: start; grid-auto-flow: row; grid-auto-columns: auto; gap: 12px; flex: 1; min-height: 0; padding: 0 !important; overflow: auto; }
-.application-shell .team-catalogue-results .entity-directory-item { display: grid; grid-template-columns: 20px minmax(0,1fr); gap: 8px; min-width: 0; margin: 0; padding: 12px; border: 0; border-radius: 16px; background: var(--fip-surface); box-shadow: var(--fip-panel-shadow); }
-.application-shell .team-catalogue-results .entity-directory-item { min-height: 142px; }
-.application-shell .team-catalogue-results .entity-directory-copy > strong { font: 700 14px/20px var(--fip-type-section-title-family); }
-.application-shell .team-catalogue-results .entity-directory-copy > small, .application-shell .team-directory-coach { font: 400 11px/16px var(--fip-type-meta-family); }
-.application-shell :is(.team-catalogue-layout,.team-detail-workspace) .entity-directory-header span { font: 400 11px/16px var(--fip-type-meta-family); }
-.application-shell :is(.team-catalogue-layout,.team-detail-workspace) .entity-directory-header strong { font: 700 14px/20px var(--fip-type-section-title-family); }
-.application-shell :is(.team-catalogue-layout,.team-detail-workspace) .entity-toggle strong { font: 500 12px/18px var(--fip-type-label-family); }
-.application-shell .team-catalogue-results .entity-select-check { align-self: center; position: static; display: flex; align-items: center; justify-content: center; width: 20px; height: 20px; margin: 0; }
-.application-shell .team-catalogue-results .entity-select-check input { width: 20px; height: 20px; margin: 0; accent-color: var(--fip-accent); }
-.application-shell .team-catalogue-results .entity-directory-open { min-width: 0; width: 100%; min-height: 54px; padding: 8px; border: 0; border-radius: 7px; background: transparent; }
-.application-shell .team-catalogue-results .entity-directory-foot { grid-column: 1/-1; margin: 0; padding: 0; }
-.application-shell .team-catalogue-results .entity-directory-footer { width: 100%; min-width: 0; align-self: stretch; flex-shrink: 0; display: flex; align-items: center; justify-content: center; gap: 8px; padding: 0; border: 0; background: transparent; }
-.application-shell .team-detail-workspace { height: 100%; grid-template-rows: minmax(0,1fr); gap: 12px; }
-.application-shell .team-detail-workspace > .entity-inspector { display: block !important; position: relative; inset: auto; z-index: auto; width: 100%; min-width: 0; height: 100%; transform: none; box-shadow: var(--fip-panel-shadow); }
-.application-shell .team-detail-workspace.inspector-collapsed > .entity-inspector { display: none !important; }
-.application-shell .team-detail-workspace.inspector-open { grid-template-columns: 248px minmax(0,1fr) 300px !important; }
-.application-shell .team-detail-workspace.inspector-collapsed { grid-template-columns: 248px minmax(0,1fr) !important; }
-.application-shell .team-detail-workspace .team-resource-stats { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 8px; border: 0; background: transparent; }
-.application-shell .team-detail-workspace .team-resource-stats > div { min-width: 0; padding: 12px; border-radius: 16px; background: var(--fip-info-soft); }
-.application-shell .team-resource-stats strong { font: 600 24px/30px Inter, "Noto Sans SC", sans-serif; color: var(--fip-info); }
-.application-shell .team-resource-stats span { font: 500 12px/18px var(--fip-type-label-family); color: var(--fip-info); }
-.application-shell .team-resource-stats small { font: 400 11px/16px var(--fip-type-meta-family); }
-.application-shell .team-detail-panel { padding: 0; border: 0; background: transparent; box-shadow: none; }
-.team-profile-layout { display: grid; grid-template-columns: 248px minmax(0,1fr); align-items: start; gap: 12px; }
-.team-profile-directory { position: sticky; top: 0; display: flex; flex-direction: column; gap: 8px; padding: 12px; border-radius: 16px; background: var(--fip-surface); box-shadow: var(--fip-panel-shadow); }
-.team-profile-directory h3 { margin: 0; font: 700 14px/20px var(--fip-type-section-title-family); }
-.team-profile-directory .workspace-anchor-nav { position: static; display: block; min-height: 0; margin: 0; padding: 0; border: 0; border-radius: 0; background: transparent; backdrop-filter: none; overflow: visible; }
-.team-profile-directory .workspace-anchor-label { display: none; }
-.team-profile-directory .workspace-anchor-nav > div { display: flex; flex-direction: column; align-items: stretch; gap: 8px; min-width: 0; width: 100%; }
-.team-profile-directory .workspace-anchor-nav button { display: flex; align-items: center; justify-content: flex-start; min-height: 32px; width: 100%; padding: 0 12px; border: 1px solid var(--fip-border); border-radius: 7px; color: var(--fip-text); background: var(--fip-surface); text-align: left; font: 500 13px/18px var(--fip-type-control-family); }
-.team-profile-layout .profile-section-stack { min-width: 0; gap: 12px; }
-.team-profile-layout .editor-details { padding: 12px; border: 0; border-radius: 16px; background: var(--fip-surface); box-shadow: var(--fip-panel-shadow); }
-.team-profile-layout .compact-form { display: grid; gap: 12px; align-items: start; }
-.team-profile-layout .compact-form.three-column { grid-template-columns: repeat(3,minmax(0,1fr)); }
-@media (max-width: 1100px) { .application-shell .team-detail-workspace.inspector-open { grid-template-columns: 210px minmax(0,1fr) 260px !important; } .application-shell .team-detail-workspace.inspector-collapsed { grid-template-columns: 210px minmax(0,1fr) !important; } }
+.application-shell:where([data-current-page="teams"]) .entity-page-teams { height: 100%; min-height: 0; grid-template-rows: auto auto 32px minmax(0,1fr); }
+.application-shell:where([data-current-page="teams"]) .team-directory-only { grid-template-columns: minmax(0,1fr); height: 100%; min-height: 0; grid-template-rows: minmax(0,1fr); overflow: hidden; }
+.application-shell:where([data-current-page="teams"]) .team-catalogue-layout { display: grid; grid-template-columns: 248px minmax(0,1fr); gap: 12px; width: 100%; min-height: 0; height: 100%; }
+.application-shell:where([data-current-page="teams"]) .team-catalogue-layout > .entity-directory { display: flex; flex-direction: column; align-items: stretch; gap: 8px; padding: 12px; min-width: 0; min-height: 0; overflow: auto; border: 0; border-radius: 16px; background: var(--fip-surface); }
+.application-shell:where([data-current-page="teams"]) :is(.team-catalogue-layout,.team-detail-workspace) .entity-directory-header { min-height: 60px; padding: 0; border: 0; }
+.application-shell:where([data-current-page="teams"]) :is(.team-catalogue-layout,.team-detail-workspace) .entity-search { display: flex; align-items: center; gap: 8px; min-height: 40px; margin: 0; padding: 0; border: 0; overflow: visible; }
+.application-shell:where([data-current-page="teams"]) :is(.team-catalogue-layout,.team-detail-workspace) .entity-search > svg { display: none; }
+.application-shell:where([data-current-page="teams"]) :is(.team-catalogue-layout,.team-detail-workspace) .entity-search input { width: 0; min-width: 0; flex: 1; height: 32px; padding: 0 10px; border: 1px solid var(--fip-border); border-radius: 7px; background: var(--fip-surface); font: 400 13px/20px var(--fip-type-input-family); }
+.application-shell:where([data-current-page="teams"]) :is(.team-catalogue-layout,.team-detail-workspace) .entity-search button { min-height: 40px; padding: 0 12px; border: 1px solid var(--fip-border); border-radius: 7px; background: var(--fip-surface); font: 500 13px/18px var(--fip-type-control-family); }
+.application-shell:where([data-current-page="teams"]) :is(.team-catalogue-layout,.team-detail-workspace) .entity-filter-groups { display: grid; grid-template-columns: minmax(0,1fr); grid-template-rows: none; gap: 8px; padding: 0; overflow: visible; }
+.application-shell:where([data-current-page="teams"]) :is(.team-catalogue-layout,.team-detail-workspace) .entity-filter-group { width: 100%; min-width: 0; padding: 0; margin: 0; border: 0; background: transparent; }
+.application-shell:where([data-current-page="teams"]) :is(.team-catalogue-layout,.team-detail-workspace) .entity-filter-group > header { display: none; }
+.application-shell:where([data-current-page="teams"]) :is(.team-catalogue-layout,.team-detail-workspace) .entity-filter-field { display: flex; flex-direction: column; gap: 6px; }
+.application-shell:where([data-current-page="teams"]) :is(.team-catalogue-layout,.team-detail-workspace) .entity-filter-field > span { font: 500 12px/18px var(--fip-type-label-family); }
+.application-shell:where([data-current-page="teams"]) :is(.team-catalogue-layout,.team-detail-workspace) .entity-filter-field :is(input,select) { height: 40px; }
+.application-shell:where([data-current-page="teams"]) :is(.team-catalogue-layout,.team-detail-workspace) .entity-filter-field .searchable-select-control { height: 40px; min-height: 40px; border-radius: 7px; background: var(--fip-surface); }
+.application-shell:where([data-current-page="teams"]) :is(.team-catalogue-layout,.team-detail-workspace) .entity-active-filters, .application-shell:where([data-current-page="teams"]) :is(.team-catalogue-layout,.team-detail-workspace) .entity-filter-actions { margin: 0; padding: 0; }
+.application-shell:where([data-current-page="teams"]) :is(.team-catalogue-layout,.team-detail-workspace) .entity-active-filters { display: flex; flex-wrap: wrap; gap: 6px; min-height: 0; height: auto; }
+.application-shell:where([data-current-page="teams"]) :is(.team-catalogue-layout,.team-detail-workspace) .entity-toggle { min-height: 20px; padding: 0; border: 0; align-items: center; }
+.application-shell:where([data-current-page="teams"]) :is(.team-catalogue-layout,.team-detail-workspace) .entity-toggle span { min-width: 0; white-space: normal; }
+.application-shell:where([data-current-page="teams"]) :is(.team-catalogue-layout,.team-detail-workspace) .entity-toggle small { display: none; }
+.application-shell:where([data-current-page="teams"]) .team-catalogue-results { display: flex; flex-direction: column; gap: 8px; min-width: 0; min-height: 0; }
+.application-shell:where([data-current-page="teams"]) .team-catalogue-results > h2 { margin: 0; font: 700 14px/20px var(--fip-type-section-title-family); }
+.application-shell:where([data-current-page="teams"]) .team-directory-only .team-catalogue-results .entity-directory-list { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); align-content: start; grid-auto-flow: row; grid-auto-columns: auto; gap: 12px; flex: 1; min-height: 0; padding: 0 !important; overflow: auto; }
+.application-shell:where([data-current-page="teams"]) .team-catalogue-results .entity-directory-item { display: grid; grid-template-columns: 20px minmax(0,1fr); gap: 8px; min-width: 0; margin: 0; padding: 12px; border: 0; border-radius: 16px; background: var(--fip-surface); box-shadow: var(--fip-panel-shadow); }
+.application-shell:where([data-current-page="teams"]) .team-catalogue-results .entity-directory-item { min-height: 142px; }
+.application-shell:where([data-current-page="teams"]) .team-catalogue-results .entity-directory-copy > strong { font: 700 14px/20px var(--fip-type-section-title-family); }
+.application-shell:where([data-current-page="teams"]) .team-catalogue-results .entity-directory-copy > small, .application-shell:where([data-current-page="teams"]) .team-directory-coach { font: 400 11px/16px var(--fip-type-meta-family); }
+.application-shell:where([data-current-page="teams"]) :is(.team-catalogue-layout,.team-detail-workspace) .entity-directory-header span { font: 400 11px/16px var(--fip-type-meta-family); }
+.application-shell:where([data-current-page="teams"]) :is(.team-catalogue-layout,.team-detail-workspace) .entity-directory-header strong { font: 700 14px/20px var(--fip-type-section-title-family); }
+.application-shell:where([data-current-page="teams"]) :is(.team-catalogue-layout,.team-detail-workspace) .entity-toggle strong { font: 500 12px/18px var(--fip-type-label-family); }
+.application-shell:where([data-current-page="teams"]) .team-catalogue-results .entity-select-check { align-self: center; position: static; display: flex; align-items: center; justify-content: center; width: 20px; height: 20px; margin: 0; }
+.application-shell:where([data-current-page="teams"]) .team-catalogue-results .entity-select-check input { width: 20px; height: 20px; margin: 0; accent-color: var(--fip-accent); }
+.application-shell:where([data-current-page="teams"]) .team-catalogue-results .entity-directory-open { min-width: 0; width: 100%; min-height: 54px; padding: 8px; border: 0; border-radius: 7px; background: transparent; }
+.application-shell:where([data-current-page="teams"]) .team-catalogue-results .entity-directory-foot { grid-column: 1/-1; margin: 0; padding: 0; }
+.application-shell:where([data-current-page="teams"]) .team-catalogue-results .entity-directory-footer { width: 100%; min-width: 0; align-self: stretch; flex-shrink: 0; display: flex; align-items: center; justify-content: center; gap: 8px; padding: 0; border: 0; background: transparent; }
+.application-shell:where([data-current-page="teams"]) .team-detail-workspace { height: 100%; grid-template-rows: minmax(0,1fr); gap: 12px; }
+.application-shell:where([data-current-page="teams"]) .team-detail-workspace > .entity-inspector { display: block !important; position: relative; inset: auto; z-index: auto; width: 100%; min-width: 0; height: 100%; transform: none; box-shadow: var(--fip-panel-shadow); }
+.application-shell:where([data-current-page="teams"]) .team-detail-workspace.inspector-collapsed > .entity-inspector { display: none !important; }
+.application-shell:where([data-current-page="teams"]) .team-detail-workspace.inspector-open { grid-template-columns: 248px minmax(0,1fr) 300px !important; }
+.application-shell:where([data-current-page="teams"]) .team-detail-workspace.inspector-collapsed { grid-template-columns: 248px minmax(0,1fr) !important; }
+.application-shell:where([data-current-page="teams"]) .team-detail-workspace .team-resource-stats { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 8px; border: 0; background: transparent; }
+.application-shell:where([data-current-page="teams"]) .team-detail-workspace .team-resource-stats > div { min-width: 0; padding: 12px; border-radius: 16px; background: var(--fip-info-soft); }
+.application-shell:where([data-current-page="teams"]) .team-resource-stats strong { font: 600 24px/30px Inter, "Noto Sans SC", sans-serif; color: var(--fip-info); }
+.application-shell:where([data-current-page="teams"]) .team-resource-stats span { font: 500 12px/18px var(--fip-type-label-family); color: var(--fip-info); }
+.application-shell:where([data-current-page="teams"]) .team-resource-stats small { font: 400 11px/16px var(--fip-type-meta-family); }
+.application-shell:where([data-current-page="teams"]) .team-detail-panel { padding: 0; border: 0; background: transparent; box-shadow: none; }
+:where(.application-shell[data-current-page="teams"]) .team-profile-layout { display: grid; grid-template-columns: 248px minmax(0,1fr); align-items: start; gap: 12px; }
+:where(.application-shell[data-current-page="teams"]) .team-profile-directory { position: sticky; top: 0; display: flex; flex-direction: column; gap: 8px; padding: 12px; border-radius: 16px; background: var(--fip-surface); box-shadow: var(--fip-panel-shadow); }
+:where(.application-shell[data-current-page="teams"]) .team-profile-directory h3 { margin: 0; font: 700 14px/20px var(--fip-type-section-title-family); }
+:where(.application-shell[data-current-page="teams"]) .team-profile-directory .workspace-anchor-nav { position: static; display: block; min-height: 0; margin: 0; padding: 0; border: 0; border-radius: 0; background: transparent; backdrop-filter: none; overflow: visible; }
+:where(.application-shell[data-current-page="teams"]) .team-profile-directory .workspace-anchor-label { display: none; }
+:where(.application-shell[data-current-page="teams"]) .team-profile-directory .workspace-anchor-nav > div { display: flex; flex-direction: column; align-items: stretch; gap: 8px; min-width: 0; width: 100%; }
+:where(.application-shell[data-current-page="teams"]) .team-profile-directory .workspace-anchor-nav button { display: flex; align-items: center; justify-content: flex-start; min-height: 32px; width: 100%; padding: 0 12px; border: 1px solid var(--fip-border); border-radius: 7px; color: var(--fip-text); background: var(--fip-surface); text-align: left; font: 500 13px/18px var(--fip-type-control-family); }
+:where(.application-shell[data-current-page="teams"]) .team-profile-layout .profile-section-stack { min-width: 0; gap: 12px; }
+:where(.application-shell[data-current-page="teams"]) .team-profile-layout .editor-details { padding: 12px; border: 0; border-radius: 16px; background: var(--fip-surface); box-shadow: var(--fip-panel-shadow); }
+:where(.application-shell[data-current-page="teams"]) .team-profile-layout .compact-form { display: grid; gap: 12px; align-items: start; }
+:where(.application-shell[data-current-page="teams"]) .team-profile-layout .compact-form.three-column { grid-template-columns: repeat(3,minmax(0,1fr)); }
+@media (max-width: 1100px) { .application-shell:where([data-current-page="teams"]) .team-detail-workspace.inspector-open { grid-template-columns: 210px minmax(0,1fr) 260px !important; } .application-shell:where([data-current-page="teams"]) .team-detail-workspace.inspector-collapsed { grid-template-columns: 210px minmax(0,1fr) !important; } }
 
-.application-shell .team-detail-filter { display: flex; flex-direction: column; align-items: stretch; gap: 8px; padding: 12px; min-width: 0; }
-.application-shell .team-detail-filter > *, .application-shell .team-catalogue-layout > .entity-directory > * { flex-shrink: 0; }
-.application-shell .team-detail-filter .entity-directory-header { min-height: 48px; }
-.application-shell .team-detail-filter .entity-toggle { height: 20px; min-height: 20px; }
-.application-shell .team-detail-filter-note { margin: 0; padding: 8px; font: 400 11px/16px var(--fip-type-meta-family); }
-.application-shell .team-detail-workspace .roster-table { width: 100%; min-width: 0; table-layout: fixed; }
-.application-shell .team-detail-workspace .roster-table :is(th,td) { min-width: 0; padding: 6px 8px; white-space: normal; overflow-wrap: anywhere; }
-.application-shell .team-detail-workspace .roster-table :is(th,td):first-child { width: 34%; }
-.application-shell .team-detail-workspace .roster-table :is(th,td):last-child { width: 72px; }
-.application-shell .team-detail-workspace .roster-table :is(.position-chip,.status-chip) { max-width: 100%; white-space: normal; overflow-wrap: anywhere; }
-.application-shell .team-detail-workspace .roster-table .table-row-actions { min-width: 0; width: 100%; }
-.application-shell .team-detail-workspace .roster-table .table-row-action { min-width: 0; width: 100%; max-width: 100%; min-height: 32px; padding: 4px; white-space: normal; overflow-wrap: anywhere; font: 500 11px/16px var(--fip-type-control-family); }
-.application-shell .team-detail-workspace .roster-table .entity-table-person strong { font: 500 12px/18px var(--fip-type-body-family); }
-.application-shell .team-detail-workspace .roster-table .entity-table-person small { font: 400 11px/16px var(--fip-type-meta-family); }
-.application-shell .team-detail-workspace .roster-table th { font: 500 11px/16px var(--fip-type-meta-family); }
-.application-shell .team-detail-workspace .roster-table td { font: 400 12px/18px var(--fip-type-body-family); }
-.application-shell .team-detail-filter .entity-filter-actions { display: flex; flex-direction: column; align-items: stretch; gap: 8px; }
-.application-shell .team-detail-filter .entity-filter-actions button { width: 100%; }
-.application-shell .team-resource-header { display: flex; flex-direction: column; align-items: stretch; gap: 12px; padding: 12px; }
-.application-shell .team-resource-title { display: flex; align-items: center; gap: 8px; min-width: 0; }
-.application-shell .team-resource-title > div { min-width: 0; flex: 1; }
-.application-shell .team-resource-title h2 { margin: 0; font: 700 18px/26px var(--fip-type-feature-family); white-space: normal; word-break: keep-all; overflow-wrap: anywhere; }
-.application-shell .team-resource-title p, .application-shell .team-resource-title > div > span { font: 400 11px/16px var(--fip-type-meta-family); }
-.application-shell .team-resource-actions { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; }
-.team-profile-layout #team-profile-overview:not([open]) { display: none; }
+.application-shell:where([data-current-page="teams"]) .team-detail-filter { display: flex; flex-direction: column; align-items: stretch; gap: 8px; padding: 12px; min-width: 0; }
+.application-shell:where([data-current-page="teams"]) .team-detail-filter > *, .application-shell:where([data-current-page="teams"]) .team-catalogue-layout > .entity-directory > * { flex-shrink: 0; }
+.application-shell:where([data-current-page="teams"]) .team-detail-filter .entity-directory-header { min-height: 48px; }
+.application-shell:where([data-current-page="teams"]) .team-detail-filter .entity-toggle { height: 20px; min-height: 20px; }
+.application-shell:where([data-current-page="teams"]) .team-detail-filter-note { margin: 0; padding: 8px; font: 400 11px/16px var(--fip-type-meta-family); }
+.application-shell:where([data-current-page="teams"]) .team-detail-workspace .roster-table { width: 100%; min-width: 0; table-layout: fixed; }
+.application-shell:where([data-current-page="teams"]) .team-detail-workspace .roster-table :is(th,td) { min-width: 0; padding: 6px 8px; white-space: normal; overflow-wrap: anywhere; }
+.application-shell:where([data-current-page="teams"]) .team-detail-workspace .roster-table :is(th,td):first-child { width: 34%; }
+.application-shell:where([data-current-page="teams"]) .team-detail-workspace .roster-table :is(th,td):last-child { width: 72px; }
+.application-shell:where([data-current-page="teams"]) .team-detail-workspace .roster-table :is(.position-chip,.status-chip) { max-width: 100%; white-space: normal; overflow-wrap: anywhere; }
+.application-shell:where([data-current-page="teams"]) .team-detail-workspace .roster-table .table-row-actions { min-width: 0; width: 100%; }
+.application-shell:where([data-current-page="teams"]) .team-detail-workspace .roster-table .table-row-action { min-width: 0; width: 100%; max-width: 100%; min-height: 32px; padding: 4px; white-space: normal; overflow-wrap: anywhere; font: 500 11px/16px var(--fip-type-control-family); }
+.application-shell:where([data-current-page="teams"]) .team-detail-workspace .roster-table .entity-table-person strong { font: 500 12px/18px var(--fip-type-body-family); }
+.application-shell:where([data-current-page="teams"]) .team-detail-workspace .roster-table .entity-table-person small { font: 400 11px/16px var(--fip-type-meta-family); }
+.application-shell:where([data-current-page="teams"]) .team-detail-workspace .roster-table th { font: 500 11px/16px var(--fip-type-meta-family); }
+.application-shell:where([data-current-page="teams"]) .team-detail-workspace .roster-table td { font: 400 12px/18px var(--fip-type-body-family); }
+.application-shell:where([data-current-page="teams"]) .team-detail-filter .entity-filter-actions { display: flex; flex-direction: column; align-items: stretch; gap: 8px; }
+.application-shell:where([data-current-page="teams"]) .team-detail-filter .entity-filter-actions button { width: 100%; }
+.application-shell:where([data-current-page="teams"]) .team-resource-header { display: flex; flex-direction: column; align-items: stretch; gap: 12px; padding: 12px; }
+.application-shell:where([data-current-page="teams"]) .team-resource-title { display: flex; align-items: center; gap: 8px; min-width: 0; }
+.application-shell:where([data-current-page="teams"]) .team-resource-title > div { min-width: 0; flex: 1; }
+.application-shell:where([data-current-page="teams"]) .team-resource-title h2 { margin: 0; font: 700 18px/26px var(--fip-type-feature-family); white-space: normal; word-break: keep-all; overflow-wrap: anywhere; }
+.application-shell:where([data-current-page="teams"]) .team-resource-title p, .application-shell:where([data-current-page="teams"]) .team-resource-title > div > span { font: 400 11px/16px var(--fip-type-meta-family); }
+.application-shell:where([data-current-page="teams"]) .team-resource-actions { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; }
+:where(.application-shell[data-current-page="teams"]) .team-profile-layout #team-profile-overview:not([open]) { display: none; }
 @media (max-width: 1100px) {
-  .application-shell .team-detail-workspace .roster-table :is(th,td) { padding: 6px 4px; }
-  .application-shell .team-detail-workspace .roster-table :is(th,td):last-child { width: 64px; }
-  .application-shell .team-detail-workspace .roster-table .entity-table-person { gap: 4px; }
-  .application-shell .team-detail-workspace .roster-table .entity-avatar { width: 24px; height: 24px; }
+  .application-shell:where([data-current-page="teams"]) .team-detail-workspace .roster-table :is(th,td) { padding: 6px 4px; }
+  .application-shell:where([data-current-page="teams"]) .team-detail-workspace .roster-table :is(th,td):last-child { width: 64px; }
+  .application-shell:where([data-current-page="teams"]) .team-detail-workspace .roster-table .entity-table-person { gap: 4px; }
+  .application-shell:where([data-current-page="teams"]) .team-detail-workspace .roster-table .entity-avatar { width: 24px; height: 24px; }
 }

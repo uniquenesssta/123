@@ -1,6 +1,6 @@
 # R12-17 Accessibility、Icons、Assets
 
-状态：VERIFYING。用户2026-10-30授权“收尾16开始17”，并明确后续已授权范围内验证通过直接提交推送，不逐批确认。既有rewrite/r12-frontend-foundation-ui-system分支，O:/Project/FOODBALL/123 r3；基线fa77c8d73126f56282801f4e3b306ded6f008d5d。18～19未实施。本批自身CI/MSI/NSIS尚待推送后独立验收，不轮询，不提前记为DONE。
+状态：DONE。用户2026-10-30授权“收尾16开始17”，并明确后续已授权范围内验证通过直接提交推送，不逐批确认。既有rewrite/r12-frontend-foundation-ui-system分支，O:/Project/FOODBALL/123 r3；基线fa77c8d73126f56282801f4e3b306ded6f008d5d。用户随后授权18，19未实施。17自身精确CI/MSI/NSIS、产物摘要与startup已于2026-10-30独立核验，不轮询。
 
 ## 16前置验收与收尾
 
@@ -29,7 +29,7 @@
 | Rust | cargo fmt --all -- --check；cargo clippy --workspace --all-targets --locked --offline -- -D warnings；cargo test --workspace --locked --offline | 通过；748 passed、39 ignored、0 failed；fmt/Clippy以本次独立终端执行exit0为证，test日志O:/Project/FOODBALL/logs/r12-17-rust-final.log仅覆盖cargo test；ignored不作实际PG/外部环境通过 |
 | Windows实际运行 | 隔离标识com.footballmatchmodel.platform.r1217validation，build.devUrl1421，独立cargo target；真实Vite /src/bootstrap/main.ts | startup PASS；7有效、0无效、0错误；bootstrap/read_workspace_state/save_workspace_state；O:/Project/FOODBALL/Temp/r12-17-native-verified/startup-report.json |
 | 视觉与独立复审 | Impeccable，实际截图与fresh finish reviewer | fresh finish reviewer结论ship（五部分完整，无必改项）；普通扩展沿用R12-16映射、approved-design-integration-20261028.md及当前tokens/代码；仓库无PRODUCT/DESIGN，不新建第二套设计系统 |
-| 本批公开CI/安装包 | 推送后精确SHA独立验收 | 待验；没有轮询、没有以16的CI替代17 |
+| 本批公开CI/安装包 | 推送后精确SHA独立验收 | a4ce5177精确run41017231141/job123936218536/artifact12962007254全步骤success；ZIP摘要及MSI/NSIS和startup核验通过；不轮询 |
 
 专项最终截图与accessibility-results.json在O:/Project/FOODBALL/logs/r12-17-accessibility-1793341313662；另一次完整门禁专项在r12-17-accessibility-1793341527075；冻结版最终专项目录O:/Project/FOODBALL/logs/r12-17-accessibility-1793342087800，结果见最终前端日志。独立复审报告C:/Users/uniqu/.codex/visualizations/2026/10/24/01a16c6c-7941-7f71-9469-0ff856e39e3a/r12-17-finish-review.md（ship，覆盖本批冻结源码与指定截图，不等于阶段DONE）。覆盖：原生Tab/ShiftTab、正tabindex、checked radio、disabled fieldset、hidden/inert/visibility/aria-hidden焦点返回、嵌套菜单Tab/Escape、模态快捷键隔离、一次绑定和销毁、LiveRegion重复/过期/销毁、原生media切换、所有实际按钮AX名称、图标尺寸及明暗笔画。合成composition/229事件只证明快捷键guard，不代表完整真实输入法操作；AX树不代表NVDA/Narrator人工语音验收。
 
@@ -112,3 +112,7 @@
 ### 移动/重命名
 
 无；src/components/icons.ts职责由src/ui/icons/appIconView.ts和iconRegistry.ts承接，原25项公开名称保持。
+
+## 2026-10-30 精确Windows验收收尾
+
+a4ce5177c95e70df5bda5c082de641228e0263e6，run41017231141/job123936218536全步骤success；artifact12962007254，52,285,163 bytes，下载ZIP SHA-256 d2fc3196eb0d044f42c98fea74454f300d93babdf1689a8ee348dcb5a9f53058与GitHub摘要一致。MSI17,973,248 bytes、NSIS15,610,491 bytes；logs/windows-acceptance-20261030-070007.json：startup pass，7有效、0无效、0错误；bootstrap/read_workspace_state/save_workspace_state完成。startup不等于Full业务。下载包O:/Project/FOODBALL/Temp/r12-17-a4ce5177-evidence.zip。只读取完成结果、不轮询。17 DONE，18按用户本轮授权推进，19未实施。

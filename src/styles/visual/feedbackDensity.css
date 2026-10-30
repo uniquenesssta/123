@@ -1,0 +1,75 @@
+
+
+/* Feedback stays visible without consuming a large portion of the workspace. */
+.empty-state,
+.visual-empty,
+.workspace-tabs-empty,
+.workbook-empty {
+  min-height: 72px;
+  padding: 12px;
+  border-radius: 6px;
+}
+.empty-state.compact { min-height: 54px; padding: 9px; }
+.empty-state strong,
+.visual-empty strong,
+.workspace-tabs-empty strong { font-size: 11px; }
+.empty-state p,
+.empty-state span,
+.visual-empty p { font-size: 9px; }
+.alert,
+.blocking-note,
+.package-message { padding: 8px 10px; margin-bottom: 9px; border-radius: 5px; font-size: 10px; }
+.modal-backdrop { padding: 12px; }
+.modal {
+  width: min(960px, calc(100vw - 24px));
+  max-height: min(94vh, 900px);
+  border-radius: 9px;
+}
+.modal header { min-height: 46px; padding: 9px 12px; }
+.modal h2 { font-size: 14px; }
+.modal-body { padding: 11px 12px; }
+.modal footer { padding: 8px 12px; }
+
+@media (max-width: 1280px) {
+  :root {
+    --entity-directory-width: 224px;
+    --entity-inspector-width: 276px;
+  }
+}
+
+@media (max-width: 980px) {
+  .task-page-heading h1,
+  .page-heading h1,
+  .balanced-page-heading h1,
+  .entity-page-heading h1 { font-size: 19px; }
+}
+
+@media (max-width: 760px) {
+  .task-page-header,
+  .page-heading,
+  .balanced-page-heading,
+  .entity-page-heading { gap: 8px; }
+  .task-context-ribbon { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .metric-grid,
+  .compact-metrics,
+  .inspector-kpis { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+@media (max-width: 560px) {
+  .task-context-ribbon,
+  .metric-grid,
+  .compact-metrics,
+  .inspector-kpis { grid-template-columns: 1fr; }
+  .task-page-heading h1,
+  .page-heading h1,
+  .balanced-page-heading h1,
+  .entity-page-heading h1 { font-size: 18px; }
+}
+
+@media (forced-colors: active) {
+  .metric-grid,
+  .compact-metrics,
+  .inspector-kpis,
+  .table-wrap,
+  .panel { border: 1px solid CanvasText; }
+}

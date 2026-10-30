@@ -1,0 +1,29 @@
+
+
+/* Prediction result: large modal and every non-zero scoreline */
+.modal.prediction-result-modal {
+  width: min(1480px, calc(100vw - 24px));
+  max-height: calc(100vh - 24px);
+}
+.modal.prediction-result-modal .modal-body { padding: 20px; }
+.scoreline-exhaustive-section { min-height: 220px; }
+.scoreline-exhaustive-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 8px;
+}
+.scoreline-exhaustive-row {
+  display: grid;
+  grid-template-columns: 28px 48px minmax(68px, 1fr);
+  gap: 8px;
+  align-items: center;
+  min-width: 0;
+  padding: 9px 10px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--panel);
+}
+.scoreline-exhaustive-row > span { display: grid; place-items: center; width: 24px; height: 24px; border-radius: 50%; color: var(--muted); background: var(--soft); font-size: 10px; }
+.scoreline-exhaustive-row strong { color: var(--text-strong); }
+.scoreline-exhaustive-row em { color: var(--accent); font-style: normal; font-weight: 700; text-align: right; }
+.scoreline-exhaustive-row small { grid-column: 2 / -1; color: var(--muted); text-align: right; }

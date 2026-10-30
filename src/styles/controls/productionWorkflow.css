@@ -1,0 +1,47 @@
+
+
+/* P4 formal workflow: one consistent, always-visible interaction hierarchy. */
+.three-column-form {
+  display: grid;
+  grid-template-columns: minmax(320px, 1.4fr) repeat(2, minmax(220px, 1fr));
+  gap: 14px;
+  align-items: start;
+}
+.prediction-secondary-controls {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(180px, auto);
+  gap: 14px;
+  align-items: end;
+  margin-top: 14px;
+  padding-top: 14px;
+  border-top: 1px solid var(--line);
+}
+.prediction-secondary-controls .action-field {
+  align-content: end;
+}
+.preparation-panel,
+.optional-match-fields {
+  display: grid;
+  gap: 14px;
+}
+.optional-match-fields {
+  margin-top: 14px;
+  padding: 16px;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: var(--soft);
+}
+.p4-workbench-picker,
+.p4-plan-row,
+.prediction-control-actions {
+  align-items: end;
+}
+@media (max-width: 1180px) {
+  .three-column-form { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .prediction-match-field { grid-column: 1 / -1; }
+}
+@media (max-width: 760px) {
+  .three-column-form,
+  .prediction-secondary-controls { grid-template-columns: 1fr; }
+  .prediction-match-field { grid-column: auto; }
+}

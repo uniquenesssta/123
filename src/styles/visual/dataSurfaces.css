@@ -1,0 +1,33 @@
+
+
+/* Tables and dense data surfaces. */
+.table-wrap,
+.spreadsheet-table-wrap,
+.player-table-wrap,
+.team-directory-table,
+.balanced-data-table {
+  border: 1px solid var(--ui-border);
+  border-radius: var(--ui-radius-md);
+  background: var(--ui-surface);
+  overflow: auto;
+}
+table { border-collapse: separate; border-spacing: 0; }
+th {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  color: var(--ui-text-muted);
+  background: var(--ui-surface-raised);
+  font-size: 10px;
+  font-weight: 700;
+}
+th,
+td { border-bottom-color: var(--ui-border); }
+tbody tr { transition: background-color .12s ease; }
+tbody tr:hover { background: var(--soft-hover); }
+.run-table.header,
+.lineup-table.header { color: var(--ui-text-muted); background: var(--ui-surface-raised); }
+.run-table.row,
+.lineup-table.row { border-bottom-color: var(--ui-border); }
+.run-table.row:hover,
+.lineup-table.row:hover { background: var(--soft-hover); }

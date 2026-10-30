@@ -1,0 +1,9 @@
+
+
+/* Global navigation readability */
+.brand-copy strong { font-size: 14px; }
+.brand-copy span { font-size: 11px; }
+.nav-caption { font-size: 10px; }
+.nav-item b { font-size: 13px; }
+.nav-more > summary { font-size: 12px; }
+.theme-toggle b, .sidebar-footer strong { font-size: 12px; }

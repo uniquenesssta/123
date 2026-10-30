@@ -1,0 +1,53 @@
+
+
+/* Compatible API Example live parser. */
+.protocol-pill {
+  padding: 6px 9px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  color: var(--muted);
+  background: var(--soft);
+  font-size: 10px;
+  white-space: nowrap;
+}
+.protocol-pill.formal {
+  color: var(--accent);
+  border-color: color-mix(in srgb, var(--accent) 32%, transparent);
+  background: color-mix(in srgb, var(--accent) 8%, transparent);
+}
+.protocol-pill.test-only {
+  color: #d6a74f;
+  border-color: color-mix(in srgb, #d6a74f 34%, var(--line));
+  background: color-mix(in srgb, #d6a74f 9%, transparent);
+}
+.api-example-section textarea {
+  width: 100%;
+  min-height: 230px;
+  resize: vertical;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 13px 14px;
+  color: var(--text);
+  background: var(--input);
+  font: 11px/1.65 ui-monospace, SFMono-Regular, Consolas, "Liberation Mono", monospace;
+  tab-size: 2;
+}
+.api-example-section textarea:focus {
+  outline: none;
+  border-color: color-mix(in srgb, var(--accent) 58%, var(--line));
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 10%, transparent);
+}
+.api-example-status {
+  margin-top: 12px;
+  padding: 12px 14px;
+  border: 1px solid var(--line);
+  border-radius: 11px;
+  background: var(--soft);
+}
+.api-example-status strong,
+.api-example-status span { display: block; }
+.api-example-status strong { color: var(--text-strong); font-size: 12px; }
+.api-example-status span { margin-top: 4px; color: var(--muted); font-size: 11px; line-height: 1.55; }
+.api-example-status.parsing { border-color: color-mix(in srgb, #d6a74f 34%, var(--line)); }
+.api-example-status.success { border-color: color-mix(in srgb, var(--accent) 34%, var(--line)); background: color-mix(in srgb, var(--accent) 5%, var(--panel)); }
+.api-example-status.error { border-color: color-mix(in srgb, var(--danger) 34%, var(--line)); background: var(--danger-soft); }

@@ -1,0 +1,99 @@
+
+
+/* 接入点 G：单场研究工作台 */
+
+.p4-workbench-picker {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  margin-bottom: 16px;
+}
+
+.p4-workbench-picker .field {
+  margin: 0;
+}
+.p4-workbench { display: grid; gap: 20px; overflow: hidden; }
+.p4-workbench .panel-heading > div > p { margin: 8px 0 0; color: var(--muted); }
+.p4-match-context,
+.p4-task-title,
+.p4-conflict-heading { display: flex; align-items: flex-start; justify-content: space-between; gap: 18px; }
+.p4-match-context { padding: 18px; border: 1px solid var(--line); border-radius: 16px; background: color-mix(in srgb, var(--panel) 84%, var(--accent) 4%); }
+.p4-match-context span,
+.p4-task-title span,
+.p4-conflict-heading span { color: var(--muted); font-size: 12px; }
+.p4-match-context h3,
+.p4-task-title h3,
+.p4-conflict-heading h4 { margin: 5px 0; color: var(--text-strong); }
+.p4-match-context p,
+.p4-task-title p,
+.p4-conflict-card p,
+.p4-snapshot-summary p { margin: 0; color: var(--muted); line-height: 1.65; }
+.p4-plan-row { display: grid; grid-template-columns: minmax(260px, 1fr) auto; align-items: end; gap: 16px; }
+.p4-plan-row button { min-height: 44px; }
+.p4-horizon-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; }
+.p4-horizon-card { position: relative; display: grid; gap: 7px; min-width: 0; padding: 16px; text-align: left; border: 1px solid var(--line); border-radius: 15px; background: color-mix(in srgb, var(--panel) 92%, transparent); color: var(--text); cursor: pointer; }
+.p4-horizon-card:hover,
+.p4-horizon-card.active { border-color: color-mix(in srgb, var(--accent) 50%, var(--line)); background: color-mix(in srgb, var(--panel) 88%, var(--accent) 8%); transform: translateY(-1px); }
+.p4-horizon-card > span { color: var(--accent); font-weight: 800; }
+.p4-horizon-card > strong { color: var(--text-strong); font-size: 15px; }
+.p4-horizon-card > small { color: var(--muted); line-height: 1.45; }
+.p4-horizon-card .status-pill { justify-self: start; margin-top: 2px; padding: 5px 8px; font-style: normal; }
+.p4-task-empty { min-height: 150px; }
+.p4-task-detail { display: grid; gap: 18px; padding-top: 4px; }
+.p4-task-title { padding: 19px; border-radius: 16px; border: 1px solid var(--line); background: color-mix(in srgb, var(--panel) 94%, transparent); }
+.p4-readiness-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+.p4-workbench .alert { display: grid; gap: 5px; }
+.p4-workbench .alert.success { border-color: color-mix(in srgb, var(--accent) 35%, var(--line)); }
+.p4-workbench-section { margin: 0; padding: 18px; border: 1px solid var(--line); border-radius: 16px; background: color-mix(in srgb, var(--panel) 94%, transparent); }
+details.p4-workbench-section > summary { display: flex; align-items: center; justify-content: space-between; gap: 14px; cursor: pointer; list-style: none; }
+details.p4-workbench-section > summary::-webkit-details-marker { display: none; }
+details.p4-workbench-section > summary span { display: block; color: var(--muted); font-size: 12px; }
+details.p4-workbench-section > summary strong { display: block; margin-top: 4px; color: var(--text-strong); }
+details.p4-workbench-section > summary b { color: var(--muted); font-size: 12px; }
+details.p4-workbench-section[open] > summary { margin-bottom: 16px; }
+.p4-conflict-list { display: grid; gap: 14px; }
+.p4-conflict-card { display: grid; gap: 14px; padding: 16px; border: 1px solid color-mix(in srgb, var(--danger) 28%, var(--line)); border-radius: 14px; background: color-mix(in srgb, var(--danger) 4%, transparent); }
+.p4-conflict-card.resolved { border-color: color-mix(in srgb, var(--accent) 26%, var(--line)); background: color-mix(in srgb, var(--accent) 4%, transparent); }
+.p4-evidence-list { display: grid; gap: 9px; }
+.p4-evidence-choice { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 11px; align-items: start; padding: 12px; border: 1px solid var(--line); border-radius: 12px; cursor: pointer; background: color-mix(in srgb, var(--panel) 94%, transparent); }
+.p4-evidence-choice:hover { border-color: color-mix(in srgb, var(--accent) 38%, var(--line)); }
+.p4-evidence-choice.disabled { cursor: default; opacity: .78; }
+.p4-evidence-choice input { margin-top: 4px; }
+.p4-evidence-body { display: grid; gap: 5px; min-width: 0; }
+.p4-evidence-body > span,
+.p4-evidence-body small { color: var(--muted); overflow-wrap: anywhere; }
+.p4-evidence-body a { color: var(--accent); }
+.p4-evidence-heading { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.p4-evidence-heading b { color: var(--text-strong); overflow-wrap: anywhere; }
+.p4-evidence-heading em { color: var(--muted); font-size: 11px; font-style: normal; white-space: nowrap; }
+.p4-table td { vertical-align: top; min-width: 120px; }
+.p4-table td:first-child { min-width: 180px; }
+.p4-table td:last-child { min-width: 260px; white-space: normal; line-height: 1.55; }
+.p4-table td small { display: block; margin-top: 5px; color: var(--muted); }
+.p4-table a { color: var(--accent); overflow-wrap: anywhere; }
+.p4-event-timeline { display: grid; gap: 0; margin: 0; padding: 0; list-style: none; }
+.p4-event-timeline li { position: relative; display: grid; grid-template-columns: 155px minmax(180px, .7fr) minmax(240px, 1.3fr); gap: 16px; padding: 13px 0 13px 18px; border-left: 1px solid var(--line); }
+.p4-event-timeline li::before { content: ""; position: absolute; left: -5px; top: 20px; width: 9px; height: 9px; border-radius: 50%; background: var(--accent); }
+.p4-event-timeline li > span { color: var(--muted); font-size: 12px; }
+.p4-event-timeline li > b { color: var(--text-strong); }
+.p4-event-timeline li > p { margin: 0; color: var(--muted); line-height: 1.5; }
+.p4-snapshot-summary { display: grid; gap: 8px; }
+
+@media (max-width: 1100px) {
+  .p4-horizon-grid,
+  .p4-readiness-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .p4-event-timeline li { grid-template-columns: 140px 1fr; }
+  .p4-event-timeline li > p { grid-column: 2; }
+}
+
+@media (max-width: 720px) {
+  .p4-match-context,
+  .p4-task-title,
+  .p4-conflict-heading,
+  .p4-evidence-heading { flex-direction: column; }
+  .p4-plan-row,
+  .p4-horizon-grid,
+  .p4-readiness-grid { grid-template-columns: 1fr; }
+  .p4-plan-row button { width: 100%; }
+  .p4-event-timeline li { grid-template-columns: 1fr; }
+  .p4-event-timeline li > p { grid-column: 1; }
+}

@@ -1,0 +1,13 @@
+
+
+/* Team detail regression fix: selected team owns the full workspace width when the inspector is closed. */
+.app-shell[data-current-page="teams"] .team-detail-workspace {
+  grid-template-columns: minmax(0, 1fr) minmax(300px, var(--entity-inspector-width));
+}
+.app-shell[data-current-page="teams"] .team-detail-workspace.inspector-collapsed {
+  grid-template-columns: minmax(0, 1fr);
+}
+.app-shell[data-current-page="teams"] .team-detail-workspace.inspector-collapsed > .entity-main {
+  grid-column: 1 / -1;
+  width: 100%;
+}

@@ -1,0 +1,230 @@
+
+
+/* 0.19.0 · stage 6 visual and interaction refinement */
+:root {
+  --bg: #0b1016;
+  --bg-glow: #0b1016;
+  --sidebar: rgba(11, 16, 22, .98);
+  --panel: #111820;
+  --panel-2: #151e27;
+  --panel-gradient: #111820;
+  --input: #0c131a;
+  --text: #e5ebf0;
+  --text-strong: #f7fafc;
+  --muted: #8997a4;
+  --muted-2: #687682;
+  --line: rgba(255, 255, 255, .075);
+  --soft: rgba(255, 255, 255, .038);
+  --soft-hover: rgba(95, 209, 168, .065);
+  --accent: #5fd1a8;
+  --accent-2: #47b98f;
+  --accent-ink: #061b14;
+  --danger: #f1777f;
+  --danger-soft: rgba(241, 119, 127, .075);
+  --shadow: none;
+}
+
+:root[data-theme="light"] {
+  --bg: #f3f5f7;
+  --bg-glow: #f3f5f7;
+  --sidebar: rgba(248, 250, 251, .98);
+  --panel: #ffffff;
+  --panel-2: #f7f9fa;
+  --panel-gradient: #ffffff;
+  --input: #f8fafb;
+  --text: #26323a;
+  --text-strong: #101820;
+  --muted: #687680;
+  --muted-2: #88939b;
+  --line: rgba(20, 40, 52, .105);
+  --soft: rgba(26, 58, 70, .04);
+  --soft-hover: rgba(24, 145, 108, .07);
+  --accent: #168b69;
+  --accent-2: #0f7457;
+  --accent-ink: #f5fffb;
+  --danger: #c34d57;
+  --danger-soft: rgba(195, 77, 87, .07);
+}
+
+body {
+  background: var(--bg);
+  font-size: 13px;
+  line-height: 1.45;
+}
+
+.page-heading {
+  align-items: center;
+  margin-bottom: 18px;
+}
+.page-heading h1,
+.simple-heading h1 {
+  margin: 3px 0 6px;
+  font-size: clamp(24px, 2.2vw, 30px);
+  line-height: 1.12;
+  letter-spacing: -.025em;
+}
+.page-heading p,
+.simple-heading p {
+  max-width: 760px;
+  font-size: 12px;
+  line-height: 1.55;
+}
+.eyebrow,
+.panel-heading span {
+  font-size: 9px;
+  letter-spacing: .12em;
+}
+
+.panel {
+  padding: 16px;
+  border-radius: 12px;
+  background: var(--panel);
+  box-shadow: none;
+}
+.panel.compact { padding: 12px 14px; }
+.panel-heading { gap: 12px; margin-bottom: 14px; }
+.panel-heading.padded { padding: 16px 16px 0; }
+.panel-heading h2 { margin-top: 3px; font-size: 15px; letter-spacing: -.01em; }
+.panel-heading h3 { margin: 3px 0 0; font-size: 14px; }
+.subpanel { padding: 14px; border-radius: 10px; }
+
+button.primary,
+button.secondary,
+button.ghost {
+  min-height: 36px;
+  padding: 8px 12px;
+  border-radius: 8px;
+  font-size: 11px;
+}
+button.primary { font-weight: 750; }
+button.ghost {
+  border: 1px solid transparent;
+  color: var(--muted);
+  background: transparent;
+}
+button.ghost:hover { color: var(--text-strong); border-color: var(--line); background: var(--soft); }
+button.tiny { min-height: 28px; padding: 5px 8px; font-size: 9px; }
+button:focus-visible,
+a:focus-visible,
+summary:focus-visible {
+  outline: 2px solid color-mix(in srgb, var(--accent) 70%, transparent);
+  outline-offset: 2px;
+}
+
+.field { gap: 6px; margin-bottom: 12px; }
+.field span,
+.inline-field span { font-size: 10px; }
+.field input,
+.field select,
+.inline-field select,
+textarea {
+  min-height: 38px;
+  border-radius: 8px;
+}
+.field input,
+.field select { padding: 9px 10px; }
+textarea { padding: 10px 11px; }
+.field input:focus,
+textarea:focus,
+select:focus {
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent) 10%, transparent);
+}
+.field-note { font-size: 9px; }
+.check-field { padding-top: 0; font-size: 10px; }
+
+.metric-grid { gap: 10px; margin-bottom: 14px; }
+.metric-card { padding: 14px; border-radius: 10px; background: var(--panel); }
+.metric-card span { font-size: 10px; }
+.metric-card strong { margin: 8px 0 5px; font-size: 19px; }
+.metric-card small { font-size: 9px; }
+
+.quick-actions {
+  grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+  gap: 10px;
+  margin-bottom: 14px;
+}
+.action-card {
+  min-height: 108px;
+  grid-template-columns: 38px 1fr;
+  gap: 10px;
+  padding: 14px;
+  border-radius: 11px;
+  background: var(--panel);
+}
+.action-card:hover { transform: none; }
+.action-card .action-icon { width: 38px; height: 38px; border-radius: 10px; }
+.action-card strong { font-size: 13px; }
+.action-card small { margin-top: 5px; font-size: 10px; }
+.action-card > b { font-size: 9px; }
+
+.disclosure-panel { border-radius: 11px; }
+.disclosure-panel > summary { padding: 14px 16px; }
+.disclosure-panel > summary div span { font-size: 9px; }
+.disclosure-panel > summary div strong { font-size: 12px; }
+.disclosure-content { padding: 14px 16px 16px; }
+.editor-details {
+  margin-top: 8px;
+  padding: 0;
+  border-radius: 9px;
+  background: transparent;
+  overflow: hidden;
+}
+.editor-details summary {
+  padding: 11px 12px;
+  color: var(--text);
+  background: var(--soft);
+  font-size: 11px;
+  font-weight: 650;
+}
+.editor-details[open] summary { margin-bottom: 0; border-bottom: 1px solid var(--line); }
+.editor-details > :not(summary) { margin-left: 12px; margin-right: 12px; }
+.editor-details > .compact-form { margin-top: 12px; }
+.editor-details > button { margin-bottom: 12px; }
+
+.empty-state { min-height: 92px; padding: 20px; }
+.empty-state.compact { min-height: 70px; }
+.empty-state strong { font-size: 12px; }
+.empty-state p,
+.empty-state span { margin: 0; font-size: 10px; }
+
+.tag-row { gap: 5px; }
+.tag-row span,
+.tag { padding: 4px 7px; border-radius: 6px; font-size: 9px; }
+.alert { padding: 11px 13px; margin-bottom: 14px; border-radius: 9px; }
+.status-pill { padding: 6px 9px; font-size: 10px; }
+.modal { border-radius: 13px; }
+.modal header { padding: 14px 16px; }
+.modal pre { padding: 16px; font-size: 11px; }
+
+.team-detail-panel,
+.player-detail-panel { gap: 14px; min-height: 0; }
+.team-detail-hero {
+  align-items: center;
+  padding: 2px 0 14px;
+}
+.team-detail-hero h2 { font-size: 22px; }
+.team-rating-grid { gap: 7px; }
+.team-rating-grid > div { padding: 10px; border-radius: 9px; }
+.team-rating-grid span { font-size: 9px; }
+.team-rating-grid strong { font-size: 17px; }
+.team-detail-grid { gap: 10px; }
+.player-profile-summary { border-radius: 9px; }
+.player-profile-summary div { padding: 10px; }
+.player-profile-summary span { font-size: 9px; }
+.player-profile-summary strong,
+.player-profile-summary code { margin-top: 4px; font-size: 10px; }
+.squad-group { border-radius: 9px; }
+.squad-group h4 { padding: 8px 10px; font-size: 10px; }
+.squad-player { padding: 8px 10px; }
+.squad-player strong { font-size: 10px; }
+.squad-player small { font-size: 9px; }
+.team-match-row { padding: 8px 0; }
+.history-row { min-height: 44px; padding-block: 8px; font-size: 10px; }
+
+.table-panel { border-radius: 11px; }
+.run-table.row,
+.lineup-table.row { padding-block: 11px; }
+
+@media (max-width: 1180px) {
+  .page-heading { align-items: flex-start; }
+}

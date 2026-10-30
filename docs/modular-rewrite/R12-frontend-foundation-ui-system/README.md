@@ -2,7 +2,7 @@
 
 ## 当前阶段状态
 
-`IN_PROGRESS`。01～16 DONE；16精确fa77c8d73126f56282801f4e3b306ded6f008d5d的Windows run41000941767 / job123884917625全步骤成功；artifact12955471415、下载ZIP SHA-256 98d90a8931d732fece52fda0955284cdd873947959881b8e6b5fad4f9e87db49一致，MSI/NSIS与startup核验通过。17 VERIFYING，本地95步门禁、Rust、Windows startup与独立复审ship完成；17自身推送后的CI/安装包另验，不轮询。18～19 BLOCKED。工作目录 O:/Project/FOODBALL/123 r3。
+`IN_PROGRESS`。01～17 DONE；17精确a4ce5177的Windows run41017231141 / job123936218536全步骤成功，产物12962007254摘要、MSI/NSIS及startup已核验。18 VERIFYING，单一CSS入口、边界及64组合等价验证已完成，最终96步前端已通过，独立复审修复项resolved/ship，独立设计文档审计完成；19 BLOCKED。工作目录 O:/Project/FOODBALL/123 r3。
 
 ## 依据与设计边界
 
@@ -30,8 +30,8 @@
 | R12-14 | [Feedback 与 Overlays](R12-14-feedback-and-overlays.md) | DONE · 5886a439精确CI、打包、startup核验通过 |
 | R12-15 | [Navigation 与 Layout](R12-15-navigation-and-layout.md) | DONE · bd9172ad精确CI、打包、startup核验通过 |
 | R12-16 | [UI Patterns](R12-16-ui-patterns.md) | DONE · fa77c8d7精确CI、产物摘要、打包与startup核验通过 |
-| R12-17 | [Accessibility、Icons 与 Assets](R12-17-accessibility-icons-and-assets.md) | VERIFYING · 六项无障碍职责、37图标与59受控资产已接入；自身CI待验 |
-| R12-18 | 样式入口与边界 | BLOCKED |
+| R12-17 | [Accessibility、Icons 与 Assets](R12-17-accessibility-icons-and-assets.md) | DONE · a4ce5177精确CI、产物摘要、MSI/NSIS及startup核验通过 |
+| R12-18 | [样式入口与边界](R12-18-样式入口-and-边界.md) | VERIFYING · 181 CSS/222作用域/15负向门禁通过；自身CI待验 |
 | R12-19 | Foundation 测试 | BLOCKED |
 
 真实PG/历史保护四项/不可变账本并发回滚/XLSX/Windows Full/私有固定回归与继承删除风险仍最终新库待验；08真实API/凭据/会话取消UI端到端同样待环境，ignored/公开stub/静态不算这些PASS。

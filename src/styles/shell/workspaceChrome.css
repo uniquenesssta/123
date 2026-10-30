@@ -1,0 +1,96 @@
+
+
+/* Dashboard composition is owned by pages/dashboard/dashboard.css. */
+/* Existing workspace pages: tighten their chrome while leaving all behaviour intact. */
+.app-shell.workspace-page .page-container { max-width: none; }
+.app-shell.workspace-page .balanced-page-heading {
+  min-height: 64px;
+  padding: 0 2px 13px;
+  border-bottom: 1px solid var(--line);
+}
+.app-shell.workspace-page .balanced-workspace,
+.app-shell.workspace-page .workspace-grid {
+  gap: 11px;
+}
+.app-shell.workspace-page .balanced-section-tabs,
+.app-shell.workspace-page .module-sidebar {
+  border-color: var(--border);
+  border-radius: var(--ui-radius-md);
+  background: var(--panel);
+  box-shadow: none;
+}
+.app-shell.workspace-page .balanced-section-tabs button,
+.app-shell.workspace-page .balanced-workspace-tabs button {
+  border-radius: 7px;
+}
+.app-shell.workspace-page .balanced-section-tabs button.active,
+.app-shell.workspace-page .balanced-workspace-tabs button.active {
+  color: var(--text-strong);
+  background: var(--accent-soft);
+  box-shadow: inset 2px 0 0 var(--accent);
+}
+.app-shell.workspace-page .balanced-workspace-main,
+.app-shell.workspace-page .workspace-module-view {
+  border-color: var(--border);
+  border-radius: var(--ui-radius-md);
+  background: var(--panel);
+}
+.app-shell.workspace-page .workspace-section-heading {
+  border-bottom-color: var(--line);
+  background: var(--surface-soft);
+}
+.app-shell.workspace-page .balanced-workspace-main .field > span,
+.app-shell.workspace-page .balanced-workspace-main .hierarchy-level > span,
+.app-shell.workspace-page .balanced-workspace-main .balanced-lineup-heading span,
+.app-shell.workspace-page .balanced-workspace-main .field-note,
+.app-shell.workspace-page .balanced-workspace-main label {
+  font-size: 10px;
+}
+.app-shell.workspace-page .balanced-workspace-main input,
+.app-shell.workspace-page .balanced-workspace-main select,
+.app-shell.workspace-page .balanced-workspace-main textarea,
+.app-shell.workspace-page .balanced-workspace-main button {
+  font-size: 11px;
+}
+.app-shell.workspace-page .balanced-workspace-main .match-list-open strong,
+.app-shell.workspace-page .balanced-workspace-main .balanced-lineup-player strong,
+.app-shell.workspace-page .balanced-workspace-main .balanced-data-table td strong,
+.app-shell.workspace-page .balanced-workspace-main .team-directory-table td strong,
+.app-shell.workspace-page .balanced-workspace-main .balanced-model-facts strong {
+  font-size: 12px;
+}
+.app-shell.workspace-page .balanced-workspace-main .match-list-open span,
+.app-shell.workspace-page .balanced-workspace-main .match-list-open small,
+.app-shell.workspace-page .balanced-workspace-main .balanced-lineup-player small,
+.app-shell.workspace-page .balanced-workspace-main .balanced-data-table td small,
+.app-shell.workspace-page .balanced-workspace-main .team-directory-table td small,
+.app-shell.workspace-page .balanced-workspace-main .balanced-model-facts span,
+.app-shell.workspace-page .balanced-workspace-main .scoreline-threshold-note {
+  font-size: 10px;
+}
+
+.modal-backdrop { background: var(--modal-overlay); backdrop-filter: blur(7px); }
+.modal {
+  border-color: var(--border-strong);
+  border-radius: var(--ui-radius-lg);
+  background: var(--panel);
+  box-shadow: 0 30px 90px rgba(0,0,0,.42);
+}
+
+@media (max-width: 1380px) {
+  .app-shell[data-current-page="dashboard"] .quick-actions { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+}
+@media (max-width: 1180px) {
+  :root { --ui-sidebar-expanded: 224px; }
+  .app-shell[data-current-page="dashboard"] .quick-actions { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (max-width: 1040px) {
+  :root { --ui-sidebar-expanded: 204px; }
+  .app-shell[data-current-page="dashboard"] .metric-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .app-shell[data-current-page="dashboard"] .metric-card:nth-child(2) { border-right: 0; }
+  .app-shell[data-current-page="dashboard"] .metric-card:nth-child(-n+2) { border-bottom: 1px solid var(--line); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sidebar, button, .action-card { transition: none; }
+}

@@ -1,0 +1,149 @@
+
+
+/* 0.19.0 · stage 6 UX refinement */
+:root {
+  --global-sidebar-width: 228px;
+  --module-sidebar-width: 304px;
+  --workspace-inspector-width: 360px;
+}
+
+.app-shell.sidebar-collapsed { --active-sidebar-width: 72px; }
+
+.sidebar {
+  width: var(--active-sidebar-width);
+  padding: 16px 12px 14px;
+  border-right: 1px solid var(--line);
+  background: var(--sidebar);
+  transition: width .18s ease;
+}
+
+.brand {
+  min-height: 52px;
+  gap: 10px;
+  padding: 4px 6px 16px;
+  border-bottom: 1px solid var(--line);
+}
+
+.brand-mark {
+  position: relative;
+  flex: 0 0 34px;
+  width: 34px;
+  height: 34px;
+  border-radius: 10px;
+  background: color-mix(in srgb, var(--accent) 14%, var(--panel));
+  border: 1px solid color-mix(in srgb, var(--accent) 34%, var(--line));
+}
+
+.brand-mark::before,
+.brand-mark::after,
+.brand-mark span {
+  content: "";
+  position: absolute;
+  border-radius: 50%;
+  background: var(--accent);
+}
+
+.brand-mark::before { width: 7px; height: 7px; left: 7px; top: 13px; }
+.brand-mark::after { width: 7px; height: 7px; right: 7px; top: 13px; }
+.brand-mark span { width: 5px; height: 5px; left: 14px; top: 7px; }
+
+.brand-copy { min-width: 0; }
+.brand-copy strong { font-size: 13px; letter-spacing: -.01em; }
+.brand-copy span { margin-top: 3px; font-size: 10px; }
+
+.icon-button {
+  width: 34px;
+  height: 34px;
+  display: inline-grid;
+  place-items: center;
+  flex: 0 0 auto;
+  padding: 0;
+  border: 1px solid var(--line);
+  border-radius: 9px;
+  color: var(--muted);
+  background: transparent;
+}
+
+.icon-button:hover {
+  color: var(--text-strong);
+  border-color: color-mix(in srgb, var(--accent) 28%, var(--line));
+  background: var(--soft-hover);
+}
+
+.app-icon,
+.nav-svg {
+  width: 17px;
+  height: 17px;
+  display: block;
+}
+
+.sidebar-collapse-button {
+  margin-left: auto;
+}
+
+.nav-primary { gap: 3px; margin-top: 14px; }
+.nav-caption { padding: 0 10px 7px; font-size: 9px; letter-spacing: .14em; }
+
+.nav-item {
+  min-height: 38px;
+  gap: 10px;
+  padding: 8px 10px;
+  border-radius: 9px;
+  color: var(--muted);
+}
+
+.nav-item b { font-size: 12px; font-weight: 650; }
+.nav-item .nav-svg { flex: 0 0 17px; }
+.nav-item:hover { color: var(--text-strong); background: var(--soft); }
+.nav-item.active {
+  color: var(--text-strong);
+  background: color-mix(in srgb, var(--accent) 10%, var(--soft));
+  box-shadow: inset 2px 0 0 var(--accent);
+}
+.nav-item.active .nav-svg { color: var(--accent); }
+.nav-item.compact { min-height: 36px; padding: 7px 10px; }
+
+.nav-more { margin-top: 10px; padding-top: 10px; }
+.nav-more > summary {
+  min-height: 34px;
+  padding: 7px 10px;
+  font-size: 11px;
+}
+.nav-more > summary::after { display: none; }
+.nav-more > summary span:last-child { transition: transform .16s ease; }
+.nav-more[open] > summary span:last-child { transform: rotate(180deg); }
+.nav-more nav { gap: 3px; }
+
+.theme-toggle {
+  min-height: 38px;
+  margin: 12px 0 6px;
+  padding: 8px 10px;
+  border-radius: 9px;
+  background: transparent;
+}
+.theme-toggle b { font-size: 11px; font-weight: 600; }
+.theme-swatch {
+  width: 17px;
+  height: 17px;
+  border: 1px solid var(--line);
+  border-radius: 50%;
+  background: linear-gradient(90deg, var(--text-strong) 50%, var(--panel) 50%);
+}
+
+.sidebar-footer { padding: 12px 8px 4px; }
+.sidebar-footer strong { font-size: 11px; }
+.sidebar-footer small { font-size: 10px; }
+
+.sidebar-collapsed .brand-copy,
+.sidebar-collapsed .nav-item b,
+.sidebar-collapsed .nav-caption,
+.sidebar-collapsed .nav-more > summary span:first-child,
+.sidebar-collapsed .theme-toggle b,
+.sidebar-collapsed .sidebar-footer > div { display: none; }
+.sidebar-collapsed .brand { justify-content: center; padding-inline: 0; }
+.sidebar-collapsed .sidebar-collapse-button { position: absolute; right: -17px; top: 20px; background: var(--panel); }
+.sidebar-collapsed .nav-item,
+.sidebar-collapsed .theme-toggle { justify-content: center; padding-inline: 8px; }
+.sidebar-collapsed .nav-more > summary { justify-content: center; }
+.sidebar-collapsed .nav-more > summary span:last-child { display: block; }
+.sidebar-collapsed .sidebar-footer { justify-content: center; }

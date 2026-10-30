@@ -1,6 +1,9 @@
+import {readProjectSource} from "./styles/projectSource.mjs";
+import {fileURLToPath as stylesheetFilePath} from "node:url";
+const stylesheetRoot=stylesheetFilePath(new URL("../",import.meta.url));
 import fs from "node:fs";
 
-const read = (path) => fs.readFileSync(new URL(`../${path}`, import.meta.url), "utf8");
+const read = (path) => readProjectSource(stylesheetRoot,new URL(`../${path}`, import.meta.url), "utf8");
 const failures = [];
 const requireTrue = (condition, message) => { if (!condition) failures.push(message); };
 
@@ -25,7 +28,7 @@ const shell = JSON.parse(read("contracts/global-visual-system-contract.json")).s
 const navigation = read("src/app/router/routeRegistry.ts");
 const main = read("src/main.ts");
 const styles = read("src/styles/app.css");
-const readme = fs.readFileSync(new URL("../README.md", import.meta.url), "utf8");
+const readme = readProjectSource(stylesheetRoot,new URL("../README.md", import.meta.url), "utf8");
 
 requireTrue(domain.includes('TEAM_PACKAGE_FORMAT: &str = "football.team-package.v1"'), "缺少球队完整资料包稳定格式版本");
 requireTrue(domain.includes("TeamPackageCoverage") && domain.includes("TeamPackageImportPreview") && domain.includes("TeamPackageCommitResult"), "领域层缺少统一资料包预检或提交类型");

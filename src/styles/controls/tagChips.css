@@ -1,0 +1,7 @@
+.tag-chip-grid { display: flex; flex-wrap: wrap; gap: 10px; margin: 10px 0 18px; }
+.dynamic-tag-chip { min-width: 180px; padding: 12px 14px; border: 1px solid var(--line); border-radius: 12px; background: var(--soft); }
+.dynamic-tag-chip strong, .dynamic-tag-chip span, .dynamic-tag-chip small { display: block; }
+.dynamic-tag-chip span { margin-top: 5px; color: var(--text); font-size: 12px; }
+.dynamic-tag-chip small { margin-top: 4px; color: var(--muted); }
+.match-exchange-panel { margin-bottom: 18px; }
+.button-row { display: flex; gap: 8px; flex-wrap: wrap; }

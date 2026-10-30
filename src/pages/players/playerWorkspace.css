@@ -1,13 +1,13 @@
 /* The directory consumes its workspace slot; filter and table each own their scrolling. */
-.application-shell .entity-page-players { height:100%; min-height:0; grid-template-rows:auto auto 32px minmax(0,1fr); }
-.application-shell .core-player-workspace > .core-workspace-stage { height:100%; min-height:0; overflow:hidden; }
-.application-shell .core-player-workspace .player-browser { grid-template-rows:minmax(0,1fr); height:100%; min-height:0; max-height:100%; overflow:hidden; }
-.application-shell .player-browser > .entity-filter-panel { height:100%; min-height:0; overflow:auto; overscroll-behavior:contain; }
-.application-shell .player-browser > .entity-main { display:grid; height:100%; min-height:0; overflow:hidden; grid-template-rows:auto minmax(0,1fr) auto; }
-.application-shell .player-browser .player-table-wrap { height:auto; min-height:0; max-height:100%; overflow:auto; overscroll-behavior:contain; }
-.application-shell .player-browser .entity-main-footer { display:grid; grid-template-columns:minmax(0,1fr); height:auto; gap:0; padding:0; }
-.application-shell .player-browser .entity-main-footer > span { padding:4px 12px 0; font:400 11px/16px var(--fip-type-meta-family); }
+.application-shell:where([data-current-page="players"]) .entity-page-players { height:100%; min-height:0; grid-template-rows:auto auto 32px minmax(0,1fr); }
+.application-shell:where([data-current-page="players"]) .core-player-workspace > .core-workspace-stage { height:100%; min-height:0; overflow:hidden; }
+.application-shell:where([data-current-page="players"]) .core-player-workspace .player-browser { grid-template-rows:minmax(0,1fr); height:100%; min-height:0; max-height:100%; overflow:hidden; }
+.application-shell:where([data-current-page="players"]) .player-browser > .entity-filter-panel { height:100%; min-height:0; overflow:auto; overscroll-behavior:contain; }
+.application-shell:where([data-current-page="players"]) .player-browser > .entity-main { display:grid; height:100%; min-height:0; overflow:hidden; grid-template-rows:auto minmax(0,1fr) auto; }
+.application-shell:where([data-current-page="players"]) .player-browser .player-table-wrap { height:auto; min-height:0; max-height:100%; overflow:auto; overscroll-behavior:contain; }
+.application-shell:where([data-current-page="players"]) .player-browser .entity-main-footer { display:grid; grid-template-columns:minmax(0,1fr); height:auto; gap:0; padding:0; }
+.application-shell:where([data-current-page="players"]) .player-browser .entity-main-footer > span { padding:4px 12px 0; font:400 11px/16px var(--fip-type-meta-family); }
 
-.application-shell .player-browser > .entity-filter-panel { grid-template-columns:minmax(0,1fr); grid-template-rows:auto minmax(0,1fr) auto auto; overflow:hidden; }
-.application-shell .player-browser .entity-filter-groups { display:flex; flex-direction:column; align-items:stretch; gap:8px; min-height:0; overflow:auto; overscroll-behavior:contain; }
-.application-shell .player-browser .entity-filter-group { flex:0 0 auto; width:100%; min-width:0; }
+.application-shell:where([data-current-page="players"]) .player-browser > .entity-filter-panel { grid-template-columns:minmax(0,1fr); grid-template-rows:auto minmax(0,1fr) auto auto; overflow:hidden; }
+.application-shell:where([data-current-page="players"]) .player-browser .entity-filter-groups { display:flex; flex-direction:column; align-items:stretch; gap:8px; min-height:0; overflow:auto; overscroll-behavior:contain; }
+.application-shell:where([data-current-page="players"]) .player-browser .entity-filter-group { flex:0 0 auto; width:100%; min-width:0; }

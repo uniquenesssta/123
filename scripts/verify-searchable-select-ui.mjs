@@ -1,3 +1,6 @@
+import {readProjectSource} from "./styles/projectSource.mjs";
+import {fileURLToPath as stylesheetFilePath} from "node:url";
+const stylesheetRoot=stylesheetFilePath(new URL("../",import.meta.url));
 import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
@@ -12,8 +15,7 @@ const root = path.resolve(import.meta.dirname, "..");
 const browser = resolveChromiumExecutable();
 if (!browser) throw new Error("未找到 Chromium、Chrome 或 Edge，无法验证可搜索下拉框交互");
 
-const source = fs
-  .readFileSync(path.join(root, "src/components/searchableSelect.ts"), "utf8")
+const source = readProjectSource(stylesheetRoot,path.join(root, "src/components/searchableSelect.ts"), "utf8")
   .replaceAll("export function", "function");
 const javascript = ts.transpileModule(source, {
   compilerOptions: {
@@ -22,7 +24,7 @@ const javascript = ts.transpileModule(source, {
     strict: true,
   },
 }).outputText;
-const componentCss = fs.readFileSync(path.join(root, "src/styles/components.css"), "utf8");
+const componentCss = readProjectSource(stylesheetRoot,path.join(root, "src/styles/components.css"), "utf8");
 const searchableCss = componentCss.slice(componentCss.indexOf("/* Searchable hierarchy select"));
 const html = `<!doctype html><html><head><meta charset="utf-8"><style>
 :root{--control-height:38px;--line:#cbd5e1;--input:#fff;--panel:#fff;--text:#0f172a;--muted:#64748b;--accent:#2563eb;--soft:#f1f5f9;--soft-hover:#eff6ff}

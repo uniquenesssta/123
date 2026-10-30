@@ -1,11 +1,15 @@
+import {productionStyleFiles} from "./styles/styleGraph.mjs";
+import {readProjectSource} from "./styles/projectSource.mjs";
+import {fileURLToPath as stylesheetFilePath} from "node:url";
+const stylesheetRoot=stylesheetFilePath(new URL("../",import.meta.url));
 import { renderResourceMarkup } from "./patterns/renderResourceMarkup.mjs";
 import { readStylesheet } from "./tokens/tokenStyles.mjs";
-import { readFileSync } from "node:fs";
+
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), "..");
-const read = (path) => readFileSync(join(root, path), "utf8");
+const read = (path) => readProjectSource(stylesheetRoot,join(root, path), "utf8");
 const failures = [];
 const check = (condition, message) => { if (!condition) failures.push(message); };
 
@@ -27,7 +31,7 @@ const teamSquadMapper = read("crates/persistence-postgres/src/adapters/catalog/t
 const teamRecordMapper = read("crates/persistence-postgres/src/adapters/catalog/teams/detail/record_mapper.rs");
 const css = read("src/styles/entityCenter.css") + readStylesheet(root, "src/ui/tokens/index.css") + read("src/ui/layout/application-frame/applicationFrame.css");
 
-check(main.indexOf('import "./styles/entityCenter.css";') > main.indexOf('import "./styles/layout.css";'), "资源中心样式必须最后加载，避免旧阶段样式反向覆盖");
+check(productionStyleFiles(root).indexOf("src/styles/entityCenter.css") > productionStyleFiles(root).indexOf("src/styles/layout.css"), "资源中心样式必须最后加载，避免旧阶段样式反向覆盖");
 check(shell.includes("primary-rail") && shell.includes("secondary-sidebar") && navigation.includes('key: "management"'), "管理一级模块及上下文二级菜单必须常驻");
 check(css.includes("--shell-sidebar-expanded") && css.includes("--shell-sidebar-collapsed"), "双层全局导航缺少展开/折叠双常驻宽度");
 check(css.includes(".application-shell.secondary-collapsed"), "二级菜单折叠状态样式缺失");

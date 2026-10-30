@@ -1,10 +1,14 @@
+import {productionStyleFiles} from "./styles/styleGraph.mjs";
+import {readProjectSource} from "./styles/projectSource.mjs";
+import {fileURLToPath as stylesheetFilePath} from "node:url";
+const stylesheetRoot=stylesheetFilePath(new URL("../",import.meta.url));
 import { renderResourceMarkup } from "./patterns/renderResourceMarkup.mjs";
-import { readFileSync } from "node:fs";
+
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), "..");
-const read = (path) => readFileSync(join(root, path), "utf8");
+const read = (path) => readProjectSource(stylesheetRoot,join(root, path), "utf8");
 const failures = [];
 const check = (condition, message) => { if (!condition) failures.push(message); };
 
@@ -17,7 +21,7 @@ const teams = read("src/pages/teams.ts");
 const players = read("src/pages/players.ts");
 const pkg = JSON.parse(read("package.json"));
 
-check(main.indexOf('import "./styles/coreWorkspaces.css";') > main.indexOf('import "./styles/taskWorkspace.css";'), "核心工作区样式必须最后加载，避免旧布局覆盖新层级");
+check(productionStyleFiles(root).indexOf("src/styles/coreWorkspaces.css") > productionStyleFiles(root).indexOf("src/styles/taskWorkspace.css"), "核心工作区样式必须最后加载，避免旧布局覆盖新层级");
 check(workspace.includes("export interface WorkspaceAnchorItem") && workspace.includes("workspaceAnchorNavigation"), "缺少统一页内锚点导航组件");
 check(workspace.includes("readonly disabled?: boolean") && workspace.includes('disabled aria-disabled="true"'), "三级入口缺少不可用状态语义");
 check(main.includes('case "jump-workspace-anchor"') && main.includes("target instanceof HTMLDetailsElement") && main.includes("target.scrollIntoView"), "页内深层导航缺少自动展开与定位链路");

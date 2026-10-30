@@ -1,0 +1,62 @@
+
+
+/* 0.23.0 · Stage E1 follow-up: readable team directory actions. */
+.app-shell[data-current-page="teams"] .entity-browser:not(.team-directory-only) {
+  grid-template-columns: minmax(300px, 320px) minmax(560px, 1fr) minmax(300px, 340px);
+}
+.app-shell[data-current-page="teams"] .entity-browser:not(.team-directory-only).inspector-collapsed {
+  grid-template-columns: minmax(300px, 320px) minmax(560px, 1fr);
+}
+.team-directory-foot {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 8px;
+  min-height: 38px;
+  padding: 6px 9px 8px 56px;
+  background: transparent;
+}
+.team-directory-coach {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.team-directory-foot .directory-foot-actions {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-width: max-content;
+}
+.team-directory-profile-action {
+  min-width: 52px;
+  min-height: 26px;
+  padding: 3px 8px;
+  border: 1px solid color-mix(in srgb, var(--accent) 26%, var(--line));
+  border-radius: 7px;
+  color: var(--accent);
+  background: color-mix(in srgb, var(--accent) 7%, var(--panel));
+  font-size: 10px;
+  font-weight: 700;
+  line-height: 1;
+  white-space: nowrap;
+  writing-mode: horizontal-tb;
+}
+.team-directory-profile-action:hover {
+  border-color: color-mix(in srgb, var(--accent) 48%, var(--line));
+  background: color-mix(in srgb, var(--accent) 12%, var(--panel));
+}
+@media (max-width: 1480px) and (min-width: 1101px) {
+  .app-shell[data-current-page="teams"] .entity-browser:not(.team-directory-only) {
+    grid-template-columns: minmax(280px, 300px) minmax(480px, 1fr);
+  }
+  .app-shell[data-current-page="teams"] .entity-browser:not(.team-directory-only).inspector-collapsed {
+    grid-template-columns: minmax(280px, 300px) minmax(480px, 1fr);
+  }
+}
+@media (max-width: 1100px) {
+  .app-shell[data-current-page="teams"] .entity-browser:not(.team-directory-only),
+  .app-shell[data-current-page="teams"] .entity-browser:not(.team-directory-only).inspector-collapsed {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}

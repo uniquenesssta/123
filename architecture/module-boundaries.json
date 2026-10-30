@@ -277,6 +277,12 @@
       "asset_owner": "src/ui/assets",
       "controlled_assets": 59,
       "registered_icons": 37
+    },
+    "ui_styles": {
+      "owner": "src/styles/index.css",
+      "scope": "One production CSS composition graph; named reset/base/shell/pattern owners and route-confined feature styles, no feature state",
+      "contract": "contracts/style-boundaries.json",
+      "guard": "scripts/styles/verifyStyleBoundaries.mjs"
     }
   },
   "rust": {
@@ -528,5 +534,5 @@
     "commands": 171
   },
   "transitional_edges": [],
-  "last_updated_task": "R12-17"
+  "last_updated_task": "R12-18"
 }

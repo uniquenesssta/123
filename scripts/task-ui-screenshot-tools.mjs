@@ -1,3 +1,6 @@
+import {readProjectSource} from "./styles/projectSource.mjs";
+import {fileURLToPath as stylesheetFilePath} from "node:url";
+const stylesheetRoot=stylesheetFilePath(new URL("../",import.meta.url));
 import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
@@ -36,7 +39,7 @@ async function readDevToolsPort(portFile, browserStderr) {
   let lastError = null;
   for (let attempt = 0; attempt < 150; attempt += 1) {
     try {
-      const [portText] = fs.readFileSync(portFile, "utf8").trim().split(/\s+/);
+      const [portText] = readProjectSource(stylesheetRoot,portFile, "utf8").trim().split(/\s+/);
       const port = Number(portText);
       if (Number.isInteger(port) && port > 0) return port;
       lastError = new Error(`调试端口内容无效：${portText || "empty"}`);
@@ -72,7 +75,7 @@ function requestJson({ port, path: requestPath, method = "GET" }) {
 }
 
 function inlineFixtureStyles(htmlPath) {
-  let html = fs.readFileSync(htmlPath, "utf8");
+  let html = readProjectSource(stylesheetRoot,htmlPath, "utf8");
   html = html.replace(/<link\s+rel=["']stylesheet["']\s+href=["']([^"']+)["']\s*\/?>/gi, (_match, href) => {
     const stylesheetPath = path.resolve(path.dirname(htmlPath), href);
     const root = path.resolve(fileURLToPath(new URL("..", import.meta.url)));
@@ -237,7 +240,7 @@ export async function captureHtmlScreenshot({ browser, htmlPath, outputPath, wid
       const frameTree = await cdp.send("Page.getFrameTree");
       await cdp.send("Page.setDocumentContent", { frameId: frameTree.frameTree.frame.id, html: inlineFixtureStyles(htmlPath) });
       await cdp.send("Runtime.evaluate", { expression: "document.fonts ? document.fonts.ready.then(() => true) : true", awaitPromise: true, returnByValue: true });
-      if (fs.readFileSync(htmlPath, "utf8").includes("src/ui/tokens/index.css")) {
+      if (readProjectSource(stylesheetRoot,htmlPath, "utf8").includes("src/ui/tokens/index.css")) {
         const delivery = await cdp.send("Runtime.evaluate", { expression: "({canvas:getComputedStyle(document.documentElement).getPropertyValue('--fip-color-bg-canvas').trim(),fonts:[...document.fonts].map(f=>({family:f.family,status:f.status}))})", returnByValue: true });
         if (!delivery.result.value.canvas || delivery.result.value.fonts.some(font => font.status === "error")) throw new Error("Fixture design tokens or bundled fonts did not load");
       }
@@ -270,7 +273,7 @@ function paeth(a, b, c) {
 }
 
 export function decodePng(filePath) {
-  const data = fs.readFileSync(filePath);
+  const data = readProjectSource(stylesheetRoot,filePath);
   const signature = Buffer.from([137, 80, 78, 71, 13, 10, 26, 10]);
   if (!data.subarray(0, 8).equals(signature)) throw new Error(`${filePath} 不是 PNG 文件`);
   let offset = 8;

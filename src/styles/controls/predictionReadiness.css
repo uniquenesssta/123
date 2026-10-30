@@ -1,0 +1,78 @@
+
+
+/* D1：正式推演统一数据完整度门禁与输入审计。 */
+.prediction-readiness-panel {
+  display: grid;
+  gap: 14px;
+  margin-top: 16px;
+  border-color: color-mix(in srgb, var(--line) 78%, var(--accent) 22%);
+}
+.prediction-readiness-panel.formal-ready { border-color: color-mix(in srgb, var(--success) 48%, var(--line)); }
+.prediction-readiness-panel.ready-with-warnings,
+.prediction-readiness-panel.shadow-only { border-color: color-mix(in srgb, var(--warning) 52%, var(--line)); }
+.prediction-readiness-panel.blocked { border-color: color-mix(in srgb, var(--danger) 50%, var(--line)); }
+.prediction-readiness-heading {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 18px;
+}
+.prediction-readiness-heading h2 { margin: 3px 0 4px; }
+.prediction-readiness-heading p { margin: 0; color: var(--muted); font-size: 12px; }
+.prediction-readiness-score {
+  display: grid;
+  grid-template-columns: auto auto;
+  align-items: baseline;
+  justify-content: end;
+  column-gap: 4px;
+  min-width: 138px;
+  text-align: right;
+}
+.prediction-readiness-score strong { color: var(--text-strong); font-size: 36px; line-height: 1; }
+.prediction-readiness-score > span { color: var(--muted); font-size: 12px; }
+.prediction-readiness-score b { grid-column: 1 / -1; margin-top: 5px; color: var(--accent); font-size: 11px; }
+.prediction-readiness-checks {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+}
+.prediction-readiness-check {
+  min-width: 0;
+  padding: 11px 12px;
+  border: 1px solid var(--line);
+  border-radius: 11px;
+  background: var(--soft);
+}
+.prediction-readiness-check > div { display: flex; justify-content: space-between; gap: 10px; }
+.prediction-readiness-check > div span { color: var(--text-strong); font-size: 11px; font-weight: 750; }
+.prediction-readiness-check > div b { color: var(--muted); font-size: 10px; }
+.prediction-readiness-check > strong { display: inline-block; margin-top: 8px; font-size: 10px; }
+.prediction-readiness-check.passed > strong { color: var(--success); }
+.prediction-readiness-check.warning > strong { color: var(--warning); }
+.prediction-readiness-check.blocked > strong { color: var(--danger); }
+.prediction-readiness-check p { margin: 5px 0 0; color: var(--muted); font-size: 11px; line-height: 1.4; }
+.prediction-readiness-check small { display: block; margin-top: 6px; color: var(--text); font-size: 10px; line-height: 1.4; }
+.prediction-audit-strip {
+  display: grid;
+  grid-template-columns: minmax(210px, 1.2fr) minmax(170px, .8fr) minmax(170px, .8fr);
+  gap: 8px;
+}
+.prediction-audit-strip > div { min-width: 0; padding: 10px 12px; border: 1px solid var(--line); border-radius: 10px; background: var(--panel); }
+.prediction-audit-strip span { display: block; color: var(--muted); font-size: 10px; }
+.prediction-audit-strip strong,
+.prediction-audit-strip code { display: block; overflow: hidden; margin-top: 4px; color: var(--text-strong); font-size: 11px; text-overflow: ellipsis; white-space: nowrap; }
+@media (max-width: 1180px) {
+  .prediction-readiness-checks { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (max-width: 760px) {
+  .prediction-readiness-heading { flex-direction: column; }
+  .prediction-readiness-score { justify-content: start; text-align: left; }
+  .prediction-readiness-checks,
+  .prediction-audit-strip { grid-template-columns: 1fr; }
+}
+.run-input-audit { margin-top: 4px; font-size: 9px; font-weight: 700; }
+.run-input-audit.passed { color: var(--success); }
+.run-input-audit.warning { color: var(--warning); }
+.run-input-audit.blocked { color: var(--danger); }
+.run-input-audit.neutral { color: var(--muted); }
+.prediction-technical dd { max-width: 520px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }

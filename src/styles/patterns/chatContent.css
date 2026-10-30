@@ -1,0 +1,26 @@
+
+
+/* H pre-stage 1: plain-text AI chat refinements */
+.api-session-row { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 6px; align-items: center; }
+.api-session-row.selected .api-session-card { border-color: var(--accent); background: var(--accent-soft); }
+.api-session-row > .danger-quiet { opacity: .68; }
+.api-session-row:hover > .danger-quiet, .api-session-row.selected > .danger-quiet { opacity: 1; }
+.api-context-toggle { display: flex; gap: 11px; align-items: flex-start; margin-top: 14px; padding: 12px 14px; border: 1px solid var(--border); border-radius: 12px; background: var(--surface-soft); cursor: pointer; }
+.api-context-toggle > input { margin-top: 3px; }
+.api-context-toggle > span { display: grid; gap: 3px; }
+.api-context-toggle small { color: var(--muted); }
+.api-local-progress > div { min-width: 0; }
+.api-local-progress > button { margin-left: auto; }
+.api-message > header { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; }
+.api-message > header > div { min-width: 0; display: grid; gap: 3px; }
+.api-legacy-audit { margin-top: 4px; padding-top: 10px; border-top: 1px solid var(--border); }
+.api-legacy-audit summary { cursor: pointer; color: var(--muted); font-size: 12px; }
+.api-legacy-audit > div { margin-top: 8px; padding: 10px 12px; border-radius: 9px; background: var(--surface-soft); color: var(--muted); font-size: 12px; line-height: 1.55; }
+.api-legacy-audit p { margin: 0; }
+.api-legacy-audit p + p { margin-top: 5px; }
+@media (max-width: 720px) {
+  .api-session-row { grid-template-columns: minmax(0, 1fr); }
+  .api-session-row > .danger-quiet { justify-self: end; }
+  .api-local-progress { align-items: flex-start; flex-wrap: wrap; }
+  .api-local-progress > button { width: 100%; margin-left: 28px; }
+}

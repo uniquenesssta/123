@@ -1,4 +1,3 @@
-import "./rules/rulesCatalogue.css";
 import { competitionKindLabel, competitionKindOptions, stageKindOptions } from "../components/competition";
 import { escapeHtml } from "../components/format";
 import { inlineDatabaseSetup } from "../components/databaseSetup";

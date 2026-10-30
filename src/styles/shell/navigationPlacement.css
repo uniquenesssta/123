@@ -1,0 +1,21 @@
+
+
+/* Keep the navigation on the left at every desktop-app viewport width. */
+@media (max-width: 860px) {
+  :root { --sidebar-width: 184px; }
+  .sidebar { padding-inline: 12px; }
+  .brand { padding-inline: 6px; }
+  .brand span { display: none; }
+  .nav-item { padding-inline: 9px; }
+}
+
+@media (max-width: 620px) {
+  :root { --sidebar-width: 164px; }
+  .brand-mark { flex-basis: 34px; width: 34px; height: 34px; }
+  .brand strong { font-size: 12px; }
+  .nav-item b { font-size: 12px; }
+  .theme-toggle b,
+  .sidebar-footer > div { display: none; }
+  .theme-toggle { justify-content: center; }
+  .sidebar-footer { justify-content: center; }
+}

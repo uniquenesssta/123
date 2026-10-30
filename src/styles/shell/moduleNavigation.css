@@ -1,0 +1,203 @@
+
+
+/* 0.19.1 · fixed module navigator and task-focused workspace */
+:root {
+  --module-sidebar-width: 300px;
+  --workspace-readable-size: 13px;
+}
+
+.app-shell.workspace-page,
+.app-shell.workspace-page .main-content {
+  height: 100vh;
+  overflow: hidden;
+}
+
+.app-shell.workspace-page .page-container {
+  height: calc(100vh - 60px);
+  max-width: none;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  padding-bottom: 24px;
+}
+
+.app-shell.workspace-page .entity-page-heading {
+  flex: 0 0 auto;
+  margin-bottom: 18px;
+}
+
+.app-shell.workspace-page .workspace-grid {
+  flex: 1 1 auto;
+  min-height: 0;
+  grid-template-columns: var(--module-sidebar-width) minmax(0, 1fr);
+  align-items: stretch;
+  overflow: hidden;
+}
+
+.app-shell.workspace-page .module-sidebar {
+  position: relative;
+  top: auto;
+  height: 100%;
+  min-height: 0;
+  max-height: none;
+  padding: 18px;
+  overflow: hidden;
+  border-radius: 16px;
+}
+
+.app-shell.workspace-page .module-sidebar > .workspace-pane-toggle {
+  display: none;
+}
+
+.app-shell.workspace-page .workspace-main {
+  height: 100%;
+  min-height: 0;
+  align-content: start;
+  overflow-x: hidden;
+  overflow-y: auto;
+  padding: 0 6px 18px 0;
+  scrollbar-gutter: stable;
+}
+
+.app-shell.workspace-page .module-object-list,
+.app-shell.workspace-page .api-session-list {
+  flex: 1 1 auto;
+  min-height: 0;
+}
+
+.workspace-module-view {
+  display: none;
+  min-width: 0;
+  gap: 16px;
+  align-content: start;
+}
+
+.workspace-module-view.active {
+  display: grid;
+}
+
+.workspace-section-heading {
+  min-height: 84px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  padding: 18px 20px;
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  background: var(--panel);
+}
+
+.workspace-section-heading > div:first-child {
+  min-width: 0;
+}
+
+.workspace-section-heading span {
+  color: var(--accent);
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: .08em;
+}
+
+.workspace-section-heading h2 {
+  margin: 5px 0 4px;
+  color: var(--text-strong);
+  font-size: 21px;
+  line-height: 1.25;
+}
+
+.workspace-section-heading p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.55;
+}
+
+.section-status-pill {
+  flex: 0 0 auto;
+  padding: 8px 11px;
+  border: 1px solid color-mix(in srgb, var(--accent) 30%, var(--line));
+  border-radius: 999px;
+  color: var(--accent);
+  background: color-mix(in srgb, var(--accent) 8%, var(--soft));
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.workspace-section-nav {
+  display: grid;
+  gap: 7px;
+}
+
+.workspace-section-nav-item {
+  width: 100%;
+  min-height: 66px;
+  display: grid;
+  grid-template-columns: 34px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 11px;
+  border: 1px solid transparent;
+  border-radius: 11px;
+  color: var(--muted);
+  background: transparent;
+  text-align: left;
+}
+
+.workspace-section-nav-item:hover {
+  color: var(--text-strong);
+  border-color: var(--line);
+  background: var(--soft);
+}
+
+.workspace-section-nav-item.active {
+  color: var(--text-strong);
+  border-color: color-mix(in srgb, var(--accent) 34%, var(--line));
+  background: color-mix(in srgb, var(--accent) 9%, var(--soft));
+  box-shadow: inset 3px 0 0 var(--accent);
+}
+
+.workspace-section-index {
+  width: 32px;
+  height: 32px;
+  display: grid;
+  place-items: center;
+  border: 1px solid var(--line);
+  border-radius: 9px;
+  color: var(--accent);
+  background: var(--panel);
+  font-size: 11px;
+  font-weight: 800;
+}
+
+.workspace-section-copy {
+  min-width: 0;
+  display: grid;
+  gap: 3px;
+}
+
+.workspace-section-copy strong {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: inherit;
+  font-size: 14px;
+  font-weight: 720;
+}
+
+.workspace-section-copy small {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--muted-2);
+  font-size: 11px;
+}
+
+.workspace-section-nav-item > b {
+  padding: 4px 7px;
+  border-radius: 999px;
+  color: var(--muted);
+  background: var(--panel);
+  font-size: 10px;
+  font-weight: 700;
+}

@@ -1,0 +1,607 @@
+{
+  "id": "football.style-boundaries.v1",
+  "entry": "src/styles/index.css",
+  "runtime_import": "src/main.ts",
+  "entries": [
+    "src/styles/app.css",
+    "src/styles/components.css",
+    "src/styles/layout.css",
+    "src/styles/entityCenter.css",
+    "src/styles/taskWorkspace.css",
+    "src/styles/coreWorkspaces.css",
+    "src/styles/moduleWorkspaces.css",
+    "src/styles/visualSystem.css",
+    "src/styles/workspacePanels.css",
+    "src/ui/tokens/index.css",
+    "src/styles/foundation/templateControls.css",
+    "src/ui/icons/iconSlot.css",
+    "src/ui/primitives/index.css",
+    "src/ui/forms/index.css",
+    "src/ui/data-display/index.css",
+    "src/ui/feedback/index.css",
+    "src/ui/overlays/index.css",
+    "src/ui/navigation/index.css",
+    "src/ui/layout/index.css",
+    "src/app/warnings/warning-center/warningCenter.css",
+    "src/pages/dashboard/dashboard.css",
+    "src/pages/teams/teamWorkspace.css",
+    "src/pages/players/playerWorkspace.css",
+    "src/pages/lineups/lineupWorkspace.css",
+    "src/pages/rules/rulesCatalogue.css"
+  ],
+  "features": [
+    {
+      "page": "dashboard",
+      "file": "src/pages/dashboard/dashboard.css",
+      "root": ".application-shell[data-current-page=\"dashboard\"]"
+    },
+    {
+      "page": "teams",
+      "file": "src/pages/teams/teamWorkspace.css",
+      "root": ".application-shell[data-current-page=\"teams\"]"
+    },
+    {
+      "page": "players",
+      "file": "src/pages/players/playerWorkspace.css",
+      "root": ".application-shell[data-current-page=\"players\"]"
+    },
+    {
+      "page": "lineups",
+      "file": "src/pages/lineups/lineupWorkspace.css",
+      "root": ".application-shell[data-current-page=\"lineups\"]"
+    },
+    {
+      "page": "rules",
+      "file": "src/pages/rules/rulesCatalogue.css",
+      "root": ".application-shell[data-current-page=\"rules\"]"
+    }
+  ],
+  "composition_modules": [
+    {
+      "source": "src/styles/app.css",
+      "file": "src/styles/patterns.css",
+      "purpose": "patterns",
+      "order": 0
+    },
+    {
+      "source": "src/styles/app.css",
+      "file": "src/styles/patterns/playerManagement.css",
+      "purpose": "playerManagement",
+      "order": 1
+    },
+    {
+      "source": "src/styles/app.css",
+      "file": "src/styles/patterns/taskHierarchy.css",
+      "purpose": "taskHierarchy",
+      "order": 2
+    },
+    {
+      "source": "src/styles/app.css",
+      "file": "src/styles/patterns/workbookExchange.css",
+      "purpose": "workbookExchange",
+      "order": 3
+    },
+    {
+      "source": "src/styles/app.css",
+      "file": "src/styles/patterns/postmatchReview.css",
+      "purpose": "postmatchReview",
+      "order": 4
+    },
+    {
+      "source": "src/styles/app.css",
+      "file": "src/styles/patterns/analysisCenter.css",
+      "purpose": "analysisCenter",
+      "order": 5
+    },
+    {
+      "source": "src/styles/app.css",
+      "file": "src/styles/patterns/detailDialogs.css",
+      "purpose": "detailDialogs",
+      "order": 6
+    },
+    {
+      "source": "src/styles/app.css",
+      "file": "src/styles/patterns/adaptiveComposition.css",
+      "purpose": "adaptiveComposition",
+      "order": 7
+    },
+    {
+      "source": "src/styles/app.css",
+      "file": "src/styles/patterns/narrowDesktop.css",
+      "purpose": "narrowDesktop",
+      "order": 8
+    },
+    {
+      "source": "src/styles/app.css",
+      "file": "src/styles/patterns/evidenceDetails.css",
+      "purpose": "evidenceDetails",
+      "order": 9
+    },
+    {
+      "source": "src/styles/app.css",
+      "file": "src/styles/patterns/apiCollaboration.css",
+      "purpose": "apiCollaboration",
+      "order": 10
+    },
+    {
+      "source": "src/styles/app.css",
+      "file": "src/styles/patterns/chatContent.css",
+      "purpose": "chatContent",
+      "order": 11
+    },
+    {
+      "source": "src/styles/app.css",
+      "file": "src/styles/patterns/interactionRefinement.css",
+      "purpose": "interactionRefinement",
+      "order": 12
+    },
+    {
+      "source": "src/styles/app.css",
+      "file": "src/styles/patterns/teamPackageImport.css",
+      "purpose": "teamPackageImport",
+      "order": 13
+    },
+    {
+      "source": "src/styles/app.css",
+      "file": "src/styles/patterns/pairedMatchWorkflow.css",
+      "purpose": "pairedMatchWorkflow",
+      "order": 14
+    },
+    {
+      "source": "src/styles/app.css",
+      "file": "src/styles/patterns/predictionResults.css",
+      "purpose": "predictionResults",
+      "order": 15
+    },
+    {
+      "source": "src/styles/app.css",
+      "file": "src/styles/patterns/contextMenu.css",
+      "purpose": "contextMenu",
+      "order": 16
+    },
+    {
+      "source": "src/styles/app.css",
+      "file": "src/styles/patterns/balancedComposition.css",
+      "purpose": "balancedComposition",
+      "order": 17
+    },
+    {
+      "source": "src/styles/app.css",
+      "file": "src/styles/patterns/readableCatalogue.css",
+      "purpose": "readableCatalogue",
+      "order": 18
+    },
+    {
+      "source": "src/styles/app.css",
+      "file": "src/styles/patterns/analysisHistory.css",
+      "purpose": "analysisHistory",
+      "order": 19
+    },
+    {
+      "source": "src/styles/components.css",
+      "file": "src/styles/controls/tagChips.css",
+      "purpose": "tagChips",
+      "order": 0
+    },
+    {
+      "source": "src/styles/components.css",
+      "file": "src/styles/controls/catalogueAndLineups.css",
+      "purpose": "catalogueAndLineups",
+      "order": 1
+    },
+    {
+      "source": "src/styles/components.css",
+      "file": "src/styles/controls/issueTracking.css",
+      "purpose": "issueTracking",
+      "order": 2
+    },
+    {
+      "source": "src/styles/components.css",
+      "file": "src/styles/controls/providerProfiles.css",
+      "purpose": "providerProfiles",
+      "order": 3
+    },
+    {
+      "source": "src/styles/components.css",
+      "file": "src/styles/controls/apiExampleParser.css",
+      "purpose": "apiExampleParser",
+      "order": 4
+    },
+    {
+      "source": "src/styles/components.css",
+      "file": "src/styles/controls/matchResearch.css",
+      "purpose": "matchResearch",
+      "order": 5
+    },
+    {
+      "source": "src/styles/components.css",
+      "file": "src/styles/controls/entityManagement.css",
+      "purpose": "entityManagement",
+      "order": 6
+    },
+    {
+      "source": "src/styles/components.css",
+      "file": "src/styles/controls/formationCatalogue.css",
+      "purpose": "formationCatalogue",
+      "order": 7
+    },
+    {
+      "source": "src/styles/components.css",
+      "file": "src/styles/controls/productionWorkflow.css",
+      "purpose": "productionWorkflow",
+      "order": 8
+    },
+    {
+      "source": "src/styles/components.css",
+      "file": "src/styles/controls/matchCenter.css",
+      "purpose": "matchCenter",
+      "order": 9
+    },
+    {
+      "source": "src/styles/components.css",
+      "file": "src/styles/controls/predictionReadiness.css",
+      "purpose": "predictionReadiness",
+      "order": 10
+    },
+    {
+      "source": "src/styles/components.css",
+      "file": "src/styles/controls/searchableSelect.css",
+      "purpose": "searchableSelect",
+      "order": 11
+    },
+    {
+      "source": "src/styles/components.css",
+      "file": "src/styles/controls/lineupPresets.css",
+      "purpose": "lineupPresets",
+      "order": 12
+    },
+    {
+      "source": "src/styles/layout.css",
+      "file": "src/styles/shell/sidebarSizing.css",
+      "purpose": "sidebarSizing",
+      "order": 0
+    },
+    {
+      "source": "src/styles/layout.css",
+      "file": "src/styles/app-shell.css",
+      "purpose": "applicationNavigation",
+      "order": 1
+    },
+    {
+      "source": "src/styles/layout.css",
+      "file": "src/styles/shell/navigationPlacement.css",
+      "purpose": "navigationPlacement",
+      "order": 2
+    },
+    {
+      "source": "src/styles/layout.css",
+      "file": "src/styles/shell/workspaceComposition.css",
+      "purpose": "workspaceComposition",
+      "order": 3
+    },
+    {
+      "source": "src/styles/layout.css",
+      "file": "src/styles/shell/masterDetail.css",
+      "purpose": "masterDetail",
+      "order": 4
+    },
+    {
+      "source": "src/styles/layout.css",
+      "file": "src/styles/shell/workflowComposition.css",
+      "purpose": "workflowComposition",
+      "order": 5
+    },
+    {
+      "source": "src/styles/layout.css",
+      "file": "src/styles/shell/moduleNavigation.css",
+      "purpose": "moduleNavigation",
+      "order": 6
+    },
+    {
+      "source": "src/styles/layout.css",
+      "file": "src/styles/shell/workspaceTypography.css",
+      "purpose": "workspaceTypography",
+      "order": 7
+    },
+    {
+      "source": "src/styles/layout.css",
+      "file": "src/styles/shell/navigationTypography.css",
+      "purpose": "navigationTypography",
+      "order": 8
+    },
+    {
+      "source": "src/styles/layout.css",
+      "file": "src/styles/shell/operationTypography.css",
+      "purpose": "operationTypography",
+      "order": 9
+    },
+    {
+      "source": "src/styles/layout.css",
+      "file": "src/styles/shell/releaseWorkspace.css",
+      "purpose": "releaseWorkspace",
+      "order": 10
+    },
+    {
+      "source": "src/styles/layout.css",
+      "file": "src/styles/shell/balancedShell.css",
+      "purpose": "balancedShell",
+      "order": 11
+    },
+    {
+      "source": "src/styles/layout.css",
+      "file": "src/styles/shell/viewportGovernance.css",
+      "purpose": "viewportGovernance",
+      "order": 12
+    },
+    {
+      "source": "src/styles/layout.css",
+      "file": "src/styles/shell/scrollOwnership.css",
+      "purpose": "scrollOwnership",
+      "order": 13
+    },
+    {
+      "source": "src/styles/layout.css",
+      "file": "src/styles/shell/readableLabels.css",
+      "purpose": "readableLabels",
+      "order": 14
+    },
+    {
+      "source": "src/styles/layout.css",
+      "file": "src/styles/shell/modelSelector.css",
+      "purpose": "modelSelector",
+      "order": 15
+    },
+    {
+      "source": "src/styles/layout.css",
+      "file": "src/styles/shell/scrollbars.css",
+      "purpose": "scrollbars",
+      "order": 16
+    },
+    {
+      "source": "src/styles/layout.css",
+      "file": "src/styles/shell/operationDensity.css",
+      "purpose": "operationDensity",
+      "order": 17
+    },
+    {
+      "source": "src/styles/layout.css",
+      "file": "src/styles/shell/workspaceAppearance.css",
+      "purpose": "workspaceAppearance",
+      "order": 18
+    },
+    {
+      "source": "src/styles/layout.css",
+      "file": "src/styles/shell/workspaceChrome.css",
+      "purpose": "workspaceChrome",
+      "order": 19
+    },
+    {
+      "source": "src/styles/layout.css",
+      "file": "src/styles/shell/dualNavigation.css",
+      "purpose": "dualNavigation",
+      "order": 20
+    },
+    {
+      "source": "src/styles/entityCenter.css",
+      "file": "src/styles/entities/entityFoundations.css",
+      "purpose": "entityFoundations",
+      "order": 0
+    },
+    {
+      "source": "src/styles/entityCenter.css",
+      "file": "src/styles/entities/resourceDirectory.css",
+      "purpose": "resourceDirectory",
+      "order": 1
+    },
+    {
+      "source": "src/styles/entityCenter.css",
+      "file": "src/styles/entities/matchDirectory.css",
+      "purpose": "matchDirectory",
+      "order": 2
+    },
+    {
+      "source": "src/styles/entityCenter.css",
+      "file": "src/styles/entities/competitionCatalogue.css",
+      "purpose": "competitionCatalogue",
+      "order": 3
+    },
+    {
+      "source": "src/styles/entityCenter.css",
+      "file": "src/styles/entities/catalogueFilters.css",
+      "purpose": "catalogueFilters",
+      "order": 4
+    },
+    {
+      "source": "src/styles/entityCenter.css",
+      "file": "src/styles/entities/resourceAppearance.css",
+      "purpose": "resourceAppearance",
+      "order": 5
+    },
+    {
+      "source": "src/styles/entityCenter.css",
+      "file": "src/styles/entities/teamActions.css",
+      "purpose": "teamActions",
+      "order": 6
+    },
+    {
+      "source": "src/styles/entityCenter.css",
+      "file": "src/styles/entities/selectedTeam.css",
+      "purpose": "selectedTeam",
+      "order": 7
+    },
+    {
+      "source": "src/styles/entityCenter.css",
+      "file": "src/styles/entities/resourceScroll.css",
+      "purpose": "resourceScroll",
+      "order": 8
+    },
+    {
+      "source": "src/styles/entityCenter.css",
+      "file": "src/styles/entities/inspectorWidth.css",
+      "purpose": "inspectorWidth",
+      "order": 9
+    },
+    {
+      "source": "src/styles/entityCenter.css",
+      "file": "src/styles/entities/teamFilter.css",
+      "purpose": "teamFilter",
+      "order": 10
+    },
+    {
+      "source": "src/styles/entityCenter.css",
+      "file": "src/styles/entities/playerPagination.css",
+      "purpose": "playerPagination",
+      "order": 11
+    },
+    {
+      "source": "src/styles/taskWorkspace.css",
+      "file": "src/styles/tasks/taskStructure.css",
+      "purpose": "taskStructure",
+      "order": 0
+    },
+    {
+      "source": "src/styles/taskWorkspace.css",
+      "file": "src/styles/tasks/reviewRail.css",
+      "purpose": "reviewRail",
+      "order": 1
+    },
+    {
+      "source": "src/styles/taskWorkspace.css",
+      "file": "src/styles/tasks/controlDensity.css",
+      "purpose": "controlDensity",
+      "order": 2
+    },
+    {
+      "source": "src/styles/taskWorkspace.css",
+      "file": "src/styles/tasks/workspaceIntegration.css",
+      "purpose": "workspaceIntegration",
+      "order": 3
+    },
+    {
+      "source": "src/styles/taskWorkspace.css",
+      "file": "src/styles/tasks/matchSearch.css",
+      "purpose": "matchSearch",
+      "order": 4
+    },
+    {
+      "source": "src/styles/taskWorkspace.css",
+      "file": "src/styles/tasks/lineupReadiness.css",
+      "purpose": "lineupReadiness",
+      "order": 5
+    },
+    {
+      "source": "src/styles/moduleWorkspaces.css",
+      "file": "src/styles/workspaces/moduleStructure.css",
+      "purpose": "moduleStructure",
+      "order": 0
+    },
+    {
+      "source": "src/styles/moduleWorkspaces.css",
+      "file": "src/styles/workspaces/presetWorkspace.css",
+      "purpose": "presetWorkspace",
+      "order": 1
+    },
+    {
+      "source": "src/styles/visualSystem.css",
+      "file": "src/styles/visual/paletteAliases.css",
+      "purpose": "paletteAliases",
+      "order": 0
+    },
+    {
+      "source": "src/styles/visualSystem.css",
+      "file": "src/styles/visual/pageHierarchy.css",
+      "purpose": "pageHierarchy",
+      "order": 1
+    },
+    {
+      "source": "src/styles/visualSystem.css",
+      "file": "src/styles/visual/contentSurfaces.css",
+      "purpose": "contentSurfaces",
+      "order": 2
+    },
+    {
+      "source": "src/styles/visualSystem.css",
+      "file": "src/styles/visual/commandHierarchy.css",
+      "purpose": "commandHierarchy",
+      "order": 3
+    },
+    {
+      "source": "src/styles/visualSystem.css",
+      "file": "src/styles/visual/dataSurfaces.css",
+      "purpose": "dataSurfaces",
+      "order": 4
+    },
+    {
+      "source": "src/styles/visualSystem.css",
+      "file": "src/styles/visual/stateFeedback.css",
+      "purpose": "stateFeedback",
+      "order": 5
+    },
+    {
+      "source": "src/styles/visualSystem.css",
+      "file": "src/styles/visual/interactionSafety.css",
+      "purpose": "interactionSafety",
+      "order": 6
+    },
+    {
+      "source": "src/styles/visualSystem.css",
+      "file": "src/styles/visual/densityTokens.css",
+      "purpose": "densityTokens",
+      "order": 7
+    },
+    {
+      "source": "src/styles/visualSystem.css",
+      "file": "src/styles/visual/compactHierarchy.css",
+      "purpose": "compactHierarchy",
+      "order": 8
+    },
+    {
+      "source": "src/styles/visualSystem.css",
+      "file": "src/styles/visual/flatSurfaces.css",
+      "purpose": "flatSurfaces",
+      "order": 9
+    },
+    {
+      "source": "src/styles/visualSystem.css",
+      "file": "src/styles/visual/formBaseline.css",
+      "purpose": "formBaseline",
+      "order": 10
+    },
+    {
+      "source": "src/styles/visualSystem.css",
+      "file": "src/styles/visual/tableDensity.css",
+      "purpose": "tableDensity",
+      "order": 11
+    },
+    {
+      "source": "src/styles/visualSystem.css",
+      "file": "src/styles/visual/resourceViewport.css",
+      "purpose": "resourceViewport",
+      "order": 12
+    },
+    {
+      "source": "src/styles/visualSystem.css",
+      "file": "src/styles/visual/feedbackDensity.css",
+      "purpose": "feedbackDensity",
+      "order": 13
+    },
+    {
+      "source": "src/styles/visualSystem.css",
+      "file": "src/styles/visual/reportedLayouts.css",
+      "purpose": "reportedLayouts",
+      "order": 14
+    },
+    {
+      "source": "src/styles/visualSystem.css",
+      "file": "src/styles/visual/desktopReadability.css",
+      "purpose": "desktopReadability",
+      "order": 15
+    }
+  ],
+  "shared_roots": [
+    "src/styles/",
+    "src/ui/",
+    "src/app/warnings/warning-center/"
+  ],
+  "policy": "One production CSS graph, no duplicate/cyclic/remote imports, every feature selector constrained to its declared route root without adding specificity; shared style declarations retain original cascade order."
+}

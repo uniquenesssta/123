@@ -1,0 +1,52 @@
+
+
+/* 0.23.0 · Stage E1 follow-up: stable lineup search, bilingual names and submit readiness. */
+.balanced-lineup-add .searchable-select {
+  min-width: 0;
+}
+.balanced-lineup-add .searchable-select-control {
+  width: 100%;
+  min-width: 0;
+}
+.balanced-lineup-add .searchable-select-input {
+  min-width: 0;
+  text-overflow: ellipsis;
+}
+.balanced-lineup-add .searchable-select-listbox {
+  max-height: min(360px, 52dvh);
+}
+.balanced-lineup-player {
+  min-width: 0;
+}
+.balanced-lineup-player strong,
+.balanced-lineup-player small {
+  display: block;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.lineup-submit-readiness {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 8px 12px;
+  align-items: center;
+  margin-top: 12px;
+  padding: 10px 12px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--surface-soft, var(--soft));
+}
+.lineup-submit-readiness strong { white-space: nowrap; }
+.lineup-submit-readiness span { color: var(--muted); line-height: 1.45; }
+.lineup-submit-readiness.ready {
+  border-color: color-mix(in srgb, var(--success) 38%, var(--line));
+  background: color-mix(in srgb, var(--success) 7%, var(--panel));
+}
+.lineup-submit-readiness.blocked {
+  border-color: color-mix(in srgb, var(--warning) 36%, var(--line));
+  background: color-mix(in srgb, var(--warning) 6%, var(--panel));
+}
+@media (max-width: 760px) {
+  .lineup-submit-readiness { grid-template-columns: 1fr; }
+}

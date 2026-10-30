@@ -1,5 +1,4 @@
 import { entityDirectoryView, entityDetailView, workbenchView, fileWorkflowView } from "../ui/patterns";
-import "./players/playerWorkspace.css";
 import { paginationView } from "../ui/navigation";
 import { escapeHtml, formatPercent } from "../components/format";
 import { inlineDatabaseSetup } from "../components/databaseSetup";

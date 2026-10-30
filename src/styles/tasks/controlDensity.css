@@ -1,0 +1,37 @@
+
+
+/* Shared control density: large enough for readability without wasting vertical space. */
+.task-page-header button,
+.task-context-ribbon button,
+.review-command-center button,
+.master-detail-workspace button,
+.master-detail-workspace input,
+.master-detail-workspace select {
+  min-height: var(--task-control-height);
+}
+
+@media (max-width: 1180px) {
+  :root { --task-rail-width: 286px; }
+  .task-context-ribbon { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+@media (max-width: 900px) {
+  .task-page-header { align-items: stretch; flex-direction: column; gap: 12px; }
+  .task-page-actions { justify-content: flex-start; }
+  .review-command-center { grid-template-columns: 1fr; }
+  .review-stage-rail { grid-template-columns: repeat(3, minmax(0, 1fr)); border-right: 0; border-bottom: 1px solid var(--line); }
+  .review-stage-rail-header { grid-column: 1 / -1; }
+  .review-stage-button { grid-template-columns: 28px minmax(0, 1fr); }
+  .review-stage-button em { display: none; }
+}
+
+@media (max-width: 680px) {
+  .task-context-ribbon { grid-template-columns: 1fr; }
+  .task-context-item { align-items: stretch; flex-direction: column; }
+  .task-context-actions { flex-wrap: wrap; }
+  .review-stage-rail { grid-template-columns: 1fr; }
+  .review-stage-workspace > header { flex-direction: column; }
+  .review-stage-facts { grid-template-columns: 1fr; }
+  .review-workflow-meta { grid-template-columns: 1fr; }
+  .review-workflow-meta > div + div { border-left: 0; border-top: 1px solid var(--line); }
+}

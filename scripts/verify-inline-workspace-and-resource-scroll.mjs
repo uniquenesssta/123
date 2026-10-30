@@ -1,3 +1,6 @@
+import {readProjectSource} from "./styles/projectSource.mjs";
+import {fileURLToPath as stylesheetFilePath} from "node:url";
+const stylesheetRoot=stylesheetFilePath(new URL("../",import.meta.url));
 import { readStylesheet } from "./tokens/tokenStyles.mjs";
 import fs from "node:fs";
 import path from "node:path";
@@ -8,7 +11,7 @@ import { captureHtmlScreenshot, decodePng, resolveChromiumExecutable } from "./t
 
 const root = process.cwd();
 const read = (file) =>
-  fs.readFileSync(path.join(root, file), "utf8").replace(/\r\n?/g, "\n");
+  readProjectSource(stylesheetRoot,path.join(root, file), "utf8").replace(/\r\n?/g, "\n");
 const requireTrue = (condition, message) => {
   if (!condition) throw new Error(message);
 };
@@ -124,7 +127,7 @@ function bundle(file) {
     if (specifier.endsWith(".svg?raw")) {
       const target = path.relative(root, base).replaceAll("\\", "/");
       modules[file].imports[specifier] = target;
-      modules[target] = { output: `exports.default=${JSON.stringify(fs.readFileSync(base.replace(/\?raw$/, ""), "utf8"))}`, imports: {} };
+      modules[target] = { output: `exports.default=${JSON.stringify(readProjectSource(stylesheetRoot,base.replace(/\?raw$/, ""), "utf8"))}`, imports: {} };
       continue;
     }
     const target = path.relative(root, fs.existsSync(`${base}.ts`) ? `${base}.ts` : path.join(base, "index.ts")).replaceAll("\\", "/");
@@ -137,7 +140,7 @@ bundle(entry);
 const shellBundle = `const shellModules=${JSON.stringify(modules)};const shellCache={};function shellRequire(id){if(shellCache[id])return shellCache[id];const record=shellModules[id],exports={};shellCache[id]=exports;new Function('exports','require',record.output)(exports,s=>shellRequire(record.imports[s]));return exports;}`;
 const mainStyles = [...main.matchAll(/^import "(\.\/[^"\n]+\.css)";/gm)].map(match => match[1].replace("./", "src/"));
 const shellStyles = mainStyles.map(file => readStylesheet(root, file).replace(/url\("([^"\n]+\.svg)"\)/g, (_match, asset) => {
-  const bytes = fs.readFileSync(path.resolve(root, path.dirname(file), asset));
+  const bytes = readProjectSource(stylesheetRoot,path.resolve(root, path.dirname(file), asset));
   return `url("data:image/svg+xml;base64,${bytes.toString("base64")}")`;
 })).join("\n");
 const shellResults = [];

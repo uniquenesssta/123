@@ -1,0 +1,101 @@
+
+
+/* Keep operational text readable instead of using compressed 8–12 px labels. */
+body {
+  font-size: clamp(15px, .82vw, 17px);
+}
+
+.app-shell.workspace-page .balanced-page-heading h1 {
+  font-size: clamp(30px, 2vw, 38px);
+}
+
+.app-shell.workspace-page .balanced-page-heading p,
+.app-shell.workspace-page .workspace-section-heading p {
+  font-size: 14px;
+  line-height: 1.55;
+}
+
+.app-shell.workspace-page .balanced-context-pill,
+.app-shell.workspace-page .section-status-pill {
+  font-size: 13px;
+}
+
+.app-shell.workspace-page .balanced-section-tabs strong,
+.app-shell.workspace-page .balanced-workspace-tabs strong,
+.app-shell.workspace-page .workspace-section-copy strong {
+  font-size: 15px;
+}
+
+.app-shell.workspace-page .balanced-section-tabs small,
+.app-shell.workspace-page .balanced-workspace-tabs small,
+.app-shell.workspace-page .workspace-section-copy small {
+  font-size: 13px;
+}
+
+.app-shell.workspace-page .balanced-workspace-main .panel-heading h2,
+.app-shell.workspace-page .balanced-workspace-main .panel-heading h3,
+.app-shell.workspace-page .balanced-workspace-main .workspace-section-heading h2 {
+  font-size: 20px;
+}
+
+.app-shell.workspace-page .balanced-workspace-main .panel-heading > div > span,
+.app-shell.workspace-page .balanced-workspace-main .workspace-section-heading > div > span,
+.app-shell.workspace-page .balanced-workspace-main .field > span,
+.app-shell.workspace-page .balanced-workspace-main .hierarchy-level > span,
+.app-shell.workspace-page .balanced-workspace-main .balanced-lineup-heading span,
+.app-shell.workspace-page .balanced-workspace-main .field-note {
+  font-size: 13px;
+}
+
+.app-shell.workspace-page .balanced-workspace-main input,
+.app-shell.workspace-page .balanced-workspace-main select,
+.app-shell.workspace-page .balanced-workspace-main textarea,
+.app-shell.workspace-page .balanced-workspace-main button {
+  font-size: 14px;
+}
+
+.app-shell.workspace-page .balanced-workspace-main .match-list-open strong,
+.app-shell.workspace-page .balanced-workspace-main .balanced-lineup-player strong,
+.app-shell.workspace-page .balanced-workspace-main .balanced-data-table td strong,
+.app-shell.workspace-page .balanced-workspace-main .team-directory-table td strong,
+.app-shell.workspace-page .balanced-workspace-main .balanced-model-facts strong {
+  font-size: 14px;
+}
+
+.app-shell.workspace-page .balanced-workspace-main .match-list-open span,
+.app-shell.workspace-page .balanced-workspace-main .match-list-open small,
+.app-shell.workspace-page .balanced-workspace-main .balanced-lineup-player small,
+.app-shell.workspace-page .balanced-workspace-main .balanced-data-table td small,
+.app-shell.workspace-page .balanced-workspace-main .team-directory-table td small,
+.app-shell.workspace-page .balanced-workspace-main .balanced-model-facts span,
+.app-shell.workspace-page .balanced-workspace-main .scoreline-threshold-note {
+  font-size: 12px;
+}
+
+.app-shell.workspace-page .balanced-workspace-main .balanced-lineup-role,
+.app-shell.workspace-page .balanced-workspace-main .balanced-lineup-position,
+.app-shell.workspace-page .balanced-workspace-main .balanced-lineup-settings {
+  font-size: 13px;
+}
+
+@media (max-width: 980px) {
+  .app-shell.workspace-page .balanced-workspace-main > .workspace-module-view[data-workspace-section="matches"].active {
+    overflow-y: auto;
+    padding-right: 8px;
+  }
+
+  .app-shell.workspace-page .balanced-workspace-main .match-browser-layout {
+    height: auto;
+    overflow: visible;
+  }
+
+  .app-shell.workspace-page .balanced-workspace-main .match-browser-sidebar,
+  .app-shell.workspace-page .balanced-workspace-main .match-browser-detail {
+    height: auto;
+    overflow: visible;
+  }
+
+  .app-shell.workspace-page .balanced-workspace-main .match-list {
+    max-height: 360px;
+  }
+}
