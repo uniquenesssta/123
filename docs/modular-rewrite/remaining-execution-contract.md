@@ -8,6 +8,10 @@
 
 当前 `src/main.ts` 仍承担页面业务分派；`src/bootstrap/registerApplicationModules.ts` 注册单个 `browser-application`，再调用 `createBrowserApplicationModule`。`ApplicationModule`/`MountHandle` 是已有应用生命周期接口，不是已经完成的逐页面Feature挂载接口。R13-01先完成小范围接入试点，采用符合现有Router和页面生命周期的最小公开接口；禁止假定所有页面都能直接注册为全局模块，或借此重做R12启动架构。
 
+## R13启动前的前期遗留核对
+
+先读取[已完成的R1～R12基线核对与16项承接账本](prior-stage-baseline-20261030.md)，核对其受测提交与当前差异。各批执行卡已绑定具体BA编号；发现的阻塞问题先处理，再继续依赖工作，不能把已知缺陷统一留给R16/R17。仅原已批准的真实新库/外部验证可逐项延期，最迟R17-06关闭。当前基线静态通过不等于全软件已验收，也不自动启动R13。
+
 ## 每批开始前的清单
 
 1. 读取对应任务书、前批交接及当前源码，记录分支、基线SHA、工作区已有修改、前置项证据和本批原ID。发现用户修改时保留，不覆盖或回退其内容。
