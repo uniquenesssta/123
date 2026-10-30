@@ -70,3 +70,7 @@ R13-01-V3：实际架构View确定性只读、原锚点/历史原则与原HTML�
 本批基线f0770665；回退应对本批明确提交审阅后revert，同时恢复两个入口、实际消费者和owner清单，不能只恢复旧页面产生双实现。源码/文档回退不恢复已清理的本机依赖缓存或任何数据库状态。
 
 下一步：核验本提交精确Windows CI、artifact摘要及MSI/NSIS/startup；完成后再按用户指令推进R13-02。原R13-10合并验收不另造DONE节点，整阶段保持IN_PROGRESS，BA账本中的真实环境事项继续带入后续。
+
+## 推送后一次性CI核对
+
+代码提交：9cdd1f9ba2320acd32cfce25e748faa8f79654b2，已推送rewrite/r13-core-ui-features。一次性查询确认 [Windows CI run41085494919](https://github.com/uniquenesssta/123/actions/runs/41085494919) 对应同一SHA和分支，当前in_progress、conclusion=null。未轮询，不能标记CI/安装包通过。此后本记录的纯Markdown提交不改变受测源码；后续核验仍以该精确代码SHA为准。
