@@ -12,6 +12,10 @@
 
 本阶段聚焦业务归属、真实流程与可靠性；本轮规划排除 UI 视觉改版、功能删减、模型改写和不相关后端重构。保留搜索/分页/焦点/滚动/草稿/主题/工作区恢复等现有用户行为。
 
+## 执行卡使用前提
+
+本阶段逐批执行下方详细卡，并同时读取[执行约定与验证命令](../modular-rewrite/remaining-execution-contract.md)。源码锚点来自 `0b1132bd265adbd7d689c5345986c412fffb3ba4`；执行时先核对差异，迁移后的准确路径以已完成前批记录为准。计划中的职责名是目标，不表示文件已存在。
+
 ## 状态与依赖
 
 当前全部为 **BLOCKED / 计划未实施**。进入条件为 R13 已按适用出口完成及用户授权；不因本次改写自动 READY。下表顺序是默认交付顺序，必要时在已授权阶段内按真实依赖拆出更小批次并说明原因，不以任务数量或文件数为目标。
@@ -50,6 +54,58 @@
 
 **完成依据：** 本节业务断言逐条有生产调用路径与验证证据；原有功能均有保留映射；涉及持久化的真实未验项按执行规则登记，不能以模拟结果抵销。失败修复后复验受影响范围，提交前核对实际 diff 与回退点。
 
+
+### 源码锚点与调用盘点
+
+`src/pages/prediction.ts`、`src/types.ts`、`src/api/client.ts`。代表性现存函数：`selectedStoredPredictionCommand`（main.ts:3870）、`checkPredictionLineupChain`（main.ts:3946）、`calculatePredictionMatch`（main.ts:4024）、`runShadowPredictionMatch`（main.ts:4004）、`predictionViewData`（main.ts:1051）、`showPredictionResult`（main.ts:1353）。这些是入口锚点，不是穷尽迁移清单；还需盘点对应事件分支、辅助函数与全部调用方。
+
+上述函数直接调用的现有 API：`inspectMatchPredictionReadiness`、`readMatchLineupChain`、`executePredictionFromMatch`、`executeShadowPredictionFromMatch`；间接调用须沿当前调用图补齐。参数、返回、错误码及 wire 命令从实际 client 和 command-contract 对照，不按名称猜测。
+
+### 目标归属与数据流
+
+prediction/context 拥有比赛/快照/模型选择；readiness 拥有与输入身份绑定的审计；formal/shadow 各有工作流，result只读。
+
+稳定上下文→指纹就绪审计→对应运行入口→后端结果→运行记录。输入变化同步废弃旧许可，提交时再次核对当前输入。
+
+### 原子实施顺序
+
+1. 子步骤A：迁上下文/恢复与输入投影，保留原日期时区、T-N/T-1h等快照语义；冻结现有API与模型选择约束。
+2. 子步骤B：迁就绪审计和阻断理由，使所有相关输入变化失效旧结果；用可控延迟测试验证后再继续。
+3. 子步骤C：分别迁正式和影子执行，复用当前传输；测试重复点击、取消/未知结果及身份检查。
+4. 子步骤D：迁结果投影/矩阵/详情与历史导航，联验A至D；不得前端重算概率或把影子结果变为正式。
+
+每一步先确认入口可用与受影响断言，失败停在本步修复。批次内可以保留独立可回退提交，但未覆盖的合并验收项仍待验；不得为了交付批次合并而只做最后一次检查。
+
+### 可操作验收场景
+
+- **R14-01-V1**：审计A成功后改阵容/模型/快照→按钮不能沿用A许可；A迟到审计不使B就绪。
+- **R14-01-V2**：连续点击运行→仅一次有效提交；请求超时→显示未知或失败按现有协议，先查运行身份再重试。
+- **R14-01-V3**：影子结果到达正式结果视图→仍带真实类型；SHADOW_ONLY被正式入口拒绝。
+- **R14-01-V4**：后端字段缺失→保留未知标记，不补概率/比分；切比赛后旧结果不冒充新比赛结果。
+
+每个场景记录前置数据/身份、触发动作或延迟安排、预期状态/写入次数、实际结果、证据位置及验证层级。可控延迟/失败测试只模拟外部边界，必须运行真实工作流；持久化结论需要真实库读回。
+
+### 现有检查入口与交付停止条件
+
+以下命令从项目根目录执行，每条立即核对退出码；它们是现有守卫起点，不代表已经覆盖上述全部行为。实现时检查脚本实际断言，缺失场景补入现有测试/fixture并接入原验证入口，不创建同名空检查。
+
+```powershell
+node scripts/verify-prediction-service.mjs
+if ($LASTEXITCODE -ne 0) { throw 'R14-01: verify-prediction-service failed' }
+node scripts/verify-model-run-identity.mjs
+if ($LASTEXITCODE -ne 0) { throw 'R14-01: verify-model-run-identity failed' }
+node scripts/verify-match-lineup-chain.mjs
+if ($LASTEXITCODE -ne 0) { throw 'R14-01: verify-match-lineup-chain failed' }
+node scripts/verify-history-scoreline-ui.mjs
+if ($LASTEXITCODE -ne 0) { throw 'R14-01: verify-history-scoreline-ui failed' }
+node scripts/verify-public-model-boundary.mjs
+if ($LASTEXITCODE -ne 0) { throw 'R14-01: verify-public-model-boundary failed' }
+```
+
+同时执行[共享验证门禁](../modular-rewrite/remaining-execution-contract.md)。任一业务场景失败、命令/Schema/保护资产非预期变化、仍存在双状态owner或无法说明的写入结果，均阻止该批交付。缺外部环境只按既定待验规则登记；R17-06和R18不得再延期必需真实验收。
+
+**回退与交接：** 在修改前记录本批基线提交和用户已有修改；按执行约定的代码/数据双层回退处理。交接必须列出本批实际新owner、原函数/事件/类型去向、复用接口、逐项场景证据和剩余环境项。主交付以及所覆盖原ID只有满足各自义务才可记完成。
+
 ## R14-06 P4 研究证据与冻结
 
 覆盖原节点：R14-06。
@@ -59,6 +115,53 @@
 **业务验收：** 冲突未解决时不绕过冻结门禁；同一输入的操作幂等；迟到任务不覆盖当前对象；已冻结快照和不可变账本不可改写。私有模型材料不进入公开仓库。
 
 **完成依据：** 本节业务断言逐条有生产调用路径与验证证据；原有功能均有保留映射；涉及持久化的真实未验项按执行规则登记，不能以模拟结果抵销。失败修复后复验受影响范围，提交前核对实际 diff 与回退点。
+
+
+### 源码锚点与调用盘点
+
+`src/pages/p4Workbench.ts`、`src/api/client.ts`、`src/types.ts`。代表性现存函数：`loadP4MatchWorkspace`（main.ts:1947）、`planP4Horizons`（main.ts:4072）、`openP4Task`（main.ts:4089）、`resolveP4Conflict`（main.ts:4101）、`refreshP4Workbench`（main.ts:4095）。这些是入口锚点，不是穷尽迁移清单；还需盘点对应事件分支、辅助函数与全部调用方。
+
+上述函数直接调用的现有 API：`readP4MatchWorkspace`、`readP4TaskWorkspace`、`planP4Horizons`、`resolveP4Conflict`；间接调用须沿当前调用图补齐。参数、返回、错误码及 wire 命令从实际 client 和 command-contract 对照，不按名称猜测。
+
+### 目标归属与数据流
+
+prediction/p4-research 持有当前match/task选择及查询，证据/冲突/冻结动作独立；不可变证据和任务终态由后端决定。
+
+比赛→任务→证据及冲突→明确解决→后端冻结许可/结果；仅以DTO投影，不推断已冻结。
+
+### 原子实施顺序
+
+1. 盘点工作台命令和capability/引用/时点字段，确认UI与后端冻结职责。
+2. 迁查询及任务选择并绑定match/task ID，再迁冲突解决与刷新。
+3. 所有写入继续使用后端状态校验，保留来源/时间审计；冻结显示不能用本地布尔值伪造。
+4. 验证重复操作与迟到响应后切换唯一入口，保留私有资产边界。
+
+每一步先确认入口可用与受影响断言，失败停在本步修复。批次内可以保留独立可回退提交，但未覆盖的合并验收项仍待验；不得为了交付批次合并而只做最后一次检查。
+
+### 可操作验收场景
+
+- **R14-06-V1**：A任务慢读后选B→不显示A证据为B；未知来源不补造。
+- **R14-06-V2**：冲突未解决或许可已失效→冻结被拒绝；失败保留待处理冲突。
+- **R14-06-V3**：同一解决动作重试→实际账本幂等且历史不可改；需真实PG证明而非只看按钮。
+
+每个场景记录前置数据/身份、触发动作或延迟安排、预期状态/写入次数、实际结果、证据位置及验证层级。可控延迟/失败测试只模拟外部边界，必须运行真实工作流；持久化结论需要真实库读回。
+
+### 现有检查入口与交付停止条件
+
+以下命令从项目根目录执行，每条立即核对退出码；它们是现有守卫起点，不代表已经覆盖上述全部行为。实现时检查脚本实际断言，缺失场景补入现有测试/fixture并接入原验证入口，不创建同名空检查。
+
+```powershell
+node scripts/verify-research-service.mjs
+if ($LASTEXITCODE -ne 0) { throw 'R14-06: verify-research-service failed' }
+node scripts/verify-r3-06-p4-freeze.mjs
+if ($LASTEXITCODE -ne 0) { throw 'R14-06: verify-r3-06-p4-freeze failed' }
+node scripts/verify-public-model-boundary.mjs
+if ($LASTEXITCODE -ne 0) { throw 'R14-06: verify-public-model-boundary failed' }
+```
+
+同时执行[共享验证门禁](../modular-rewrite/remaining-execution-contract.md)。任一业务场景失败、命令/Schema/保护资产非预期变化、仍存在双状态owner或无法说明的写入结果，均阻止该批交付。缺外部环境只按既定待验规则登记；R17-06和R18不得再延期必需真实验收。
+
+**回退与交接：** 在修改前记录本批基线提交和用户已有修改；按执行约定的代码/数据双层回退处理。交接必须列出本批实际新owner、原函数/事件/类型去向、复用接口、逐项场景证据和剩余环境项。主交付以及所覆盖原ID只有满足各自义务才可记完成。
 
 ## R14-07 运行记录与血缘
 
@@ -70,6 +173,53 @@
 
 **完成依据：** 本节业务断言逐条有生产调用路径与验证证据；原有功能均有保留映射；涉及持久化的真实未验项按执行规则登记，不能以模拟结果抵销。失败修复后复验受影响范围，提交前核对实际 diff 与回退点。
 
+
+### 源码锚点与调用盘点
+
+`src/pages/runs.ts`、`src/api/client.ts`、`src/types.ts`。代表性现存函数：`requestHideRunHistory`（main.ts:5501）、`showPredictionDetail`（main.ts:1304）、`predictionDetailBody`（main.ts:1251）。这些是入口锚点，不是穷尽迁移清单；还需盘点对应事件分支、辅助函数与全部调用方。
+
+上述函数直接调用的现有 API：`hideModelRunHistory`；间接调用须沿当前调用图补齐。参数、返回、错误码及 wire 命令从实际 client 和 command-contract 对照，不按名称猜测。
+
+### 目标归属与数据流
+
+runs 拥有目录/选择/详情加载；结果只读呈现复用prediction的公开只读接口或具名共享投影；隐藏动作单独归属。
+
+run ID→真实存储结果/输入审计→展示；隐藏→后端可见性修改→刷新，不改变原推演血缘。
+
+### 原子实施顺序
+
+1. 核对列表来自Session还是独立查询，选唯一缓存owner，冻结详情/隐藏API与未知值行为。
+2. 迁目录选择和详情读取，绑定请求与run ID；复用矩阵展示避免两个结果算法。
+3. 迁隐藏确认与刷新，再接回来源导航。
+4. 检查历史读取不触发推演，切换入口后撤出重复详情逻辑。
+
+每一步先确认入口可用与受影响断言，失败停在本步修复。批次内可以保留独立可回退提交，但未覆盖的合并验收项仍待验；不得为了交付批次合并而只做最后一次检查。
+
+### 可操作验收场景
+
+- **R14-07-V1**：快速选run A/B→A迟到不覆盖B；B读取失败不复用A内容。
+- **R14-07-V2**：隐藏run→列表按真实结果更新；数据库中输入快照/引用/报告仍可追溯。
+- **R14-07-V3**：历史中空比分/概率→仍未知；查看历史不授予当前比赛执行许可。
+
+每个场景记录前置数据/身份、触发动作或延迟安排、预期状态/写入次数、实际结果、证据位置及验证层级。可控延迟/失败测试只模拟外部边界，必须运行真实工作流；持久化结论需要真实库读回。
+
+### 现有检查入口与交付停止条件
+
+以下命令从项目根目录执行，每条立即核对退出码；它们是现有守卫起点，不代表已经覆盖上述全部行为。实现时检查脚本实际断言，缺失场景补入现有测试/fixture并接入原验证入口，不创建同名空检查。
+
+```powershell
+node scripts/verify-history-scoreline-ui.mjs
+if ($LASTEXITCODE -ne 0) { throw 'R14-07: verify-history-scoreline-ui failed' }
+node scripts/verify-model-run-identity.mjs
+if ($LASTEXITCODE -ne 0) { throw 'R14-07: verify-model-run-identity failed' }
+node scripts/verify-analysis-history-workflow.mjs
+if ($LASTEXITCODE -ne 0) { throw 'R14-07: verify-analysis-history-workflow failed' }
+```
+
+同时执行[共享验证门禁](../modular-rewrite/remaining-execution-contract.md)。任一业务场景失败、命令/Schema/保护资产非预期变化、仍存在双状态owner或无法说明的写入结果，均阻止该批交付。缺外部环境只按既定待验规则登记；R17-06和R18不得再延期必需真实验收。
+
+**回退与交接：** 在修改前记录本批基线提交和用户已有修改；按执行约定的代码/数据双层回退处理。交接必须列出本批实际新owner、原函数/事件/类型去向、复用接口、逐项场景证据和剩余环境项。主交付以及所覆盖原ID只有满足各自义务才可记完成。
+
 ## R14-08 复盘选择、事实与包提交
 
 覆盖原节点：R14-08、R14-09、R14-10、R14-11。
@@ -79,6 +229,56 @@
 **业务验收：** 每一步按后端许可执行；确认后比赛 ID/包 SHA/输入身份变化须重新预检；事实提交成功而后续失败时可核验恢复，不重复事实；不把生成复盘当作已结算；与 R13 工作簿联验。
 
 **完成依据：** 本节业务断言逐条有生产调用路径与验证证据；原有功能均有保留映射；涉及持久化的真实未验项按执行规则登记，不能以模拟结果抵销。失败修复后复验受影响范围，提交前核对实际 diff 与回退点。
+
+
+### 源码锚点与调用盘点
+
+`src/pages/review.ts`、`src/pages/review/matchEventTimelineView.ts`、`src/app/matchReviewWorkflow.ts`。代表性现存函数：`loadSelectedReviewMatch`（main.ts:5895）、`refreshMatchReviewPackageWorkflow`（main.ts:5931）、`previewMatchReviewPackage`（main.ts:5953）、`confirmMatchReviewPackage`（main.ts:5970）、`commitMatchReviewPackageFacts`（main.ts:5998）、`generateMatchReviewFromPackage`（main.ts:6023）、`generateMatchReview`（main.ts:6097）。这些是入口锚点，不是穷尽迁移清单；还需盘点对应事件分支、辅助函数与全部调用方。
+
+上述函数直接调用的现有 API：`readMatchReview`、`readMatchReviewPackageWorkflow`、`chooseExcelImportFile`、`previewMatchReviewPackage`、`confirmMatchReviewPackage`、`commitMatchReviewPackageFacts`、`generateMatchReviewFromPackage`、`generateMatchReview`；间接调用须沿当前调用图补齐。参数、返回、错误码及 wire 命令从实际 client 和 command-contract 对照，不按名称猜测。
+
+### 目标归属与数据流
+
+review selection持有比赛身份，workflow投影后端九步capability，facts持有赛果/实际阵容/观察草稿，package持有文件身份/预检/确认；results只读。
+
+match选择→后端许可→真实facts/package预检→明确确认→事实提交→包/复盘生成→结果；每一步不隐含下一步成功。
+
+### 原子实施顺序
+
+1. 子步骤A：迁比赛选择与九步投影，直接复用matchReviewWorkflow helper，不复制状态机。
+2. 子步骤B：迁赛果/阵容/球员观察和事件事实编辑，核对实际match ID与输入版本。
+3. 子步骤C：迁导出/预览/确认/事实提交/包提交，绑定SHA与对象，故障可恢复；复用R13工作簿接口。
+4. 子步骤D：迁复盘结果与候选展示，按后端许可联验全部步骤，特别处理事实已提交后生成失败。
+
+每一步先确认入口可用与受影响断言，失败停在本步修复。批次内可以保留独立可回退提交，但未覆盖的合并验收项仍待验；不得为了交付批次合并而只做最后一次检查。
+
+### 可操作验收场景
+
+- **R14-08-V1**：确认包A后替换文件或比赛→确认失效，不能提交旧身份。
+- **R14-08-V2**：事实写入成功后生成失败→重进读取当前工作流，只恢复允许的步骤，不能重复事实或谎报完成。
+- **R14-08-V3**：许可拒绝、重复点确认、并发修改→后端拒绝准确投影且输入保留；不能本地跳步骤。
+- **R14-08-V4**：生成复盘成功→仅表示复盘成功，不自动表示赛后结算/能力候选已应用。
+
+每个场景记录前置数据/身份、触发动作或延迟安排、预期状态/写入次数、实际结果、证据位置及验证层级。可控延迟/失败测试只模拟外部边界，必须运行真实工作流；持久化结论需要真实库读回。
+
+### 现有检查入口与交付停止条件
+
+以下命令从项目根目录执行，每条立即核对退出码；它们是现有守卫起点，不代表已经覆盖上述全部行为。实现时检查脚本实际断言，缺失场景补入现有测试/fixture并接入原验证入口，不创建同名空检查。
+
+```powershell
+node scripts/verify-match-review-package.mjs
+if ($LASTEXITCODE -ne 0) { throw 'R14-08: verify-match-review-package failed' }
+node scripts/verify-match-event-facts.mjs
+if ($LASTEXITCODE -ne 0) { throw 'R14-08: verify-match-event-facts failed' }
+node scripts/verify-review-service.mjs
+if ($LASTEXITCODE -ne 0) { throw 'R14-08: verify-review-service failed' }
+node scripts/verify-analysis-history-workflow.mjs
+if ($LASTEXITCODE -ne 0) { throw 'R14-08: verify-analysis-history-workflow failed' }
+```
+
+同时执行[共享验证门禁](../modular-rewrite/remaining-execution-contract.md)。任一业务场景失败、命令/Schema/保护资产非预期变化、仍存在双状态owner或无法说明的写入结果，均阻止该批交付。缺外部环境只按既定待验规则登记；R17-06和R18不得再延期必需真实验收。
+
+**回退与交接：** 在修改前记录本批基线提交和用户已有修改；按执行约定的代码/数据双层回退处理。交接必须列出本批实际新owner、原函数/事件/类型去向、复用接口、逐项场景证据和剩余环境项。主交付以及所覆盖原ID只有满足各自义务才可记完成。
 
 ## R14-12 赛后结算与监控
 
@@ -90,6 +290,53 @@
 
 **完成依据：** 本节业务断言逐条有生产调用路径与验证证据；原有功能均有保留映射；涉及持久化的真实未验项按执行规则登记，不能以模拟结果抵销。失败修复后复验受影响范围，提交前核对实际 diff 与回退点。
 
+
+### 源码锚点与调用盘点
+
+`src/pages/analytics.ts`、`src/pages/review.ts`、`src/types.ts`。代表性现存函数：`inspectPostmatchReadiness`（main.ts:6224）、`settlePostmatchReview`（main.ts:6230）、`refreshPostmatchMonitoring`（main.ts:6257）、`prepareEvidenceDecision`（main.ts:6271）、`submitEvidenceDecision`（main.ts:6282）。这些是入口锚点，不是穷尽迁移清单；还需盘点对应事件分支、辅助函数与全部调用方。
+
+上述函数直接调用的现有 API：`postmatchSettlementReadiness`、`settlePostmatchReview`、`postmatchOverview`、`refreshPostmatchMonitoring`、`decideEvidenceScoringItem`；间接调用须沿当前调用图补齐。参数、返回、错误码及 wire 命令从实际 client 和 command-contract 对照，不按名称猜测。
+
+### 目标归属与数据流
+
+postmatch 拥有结算选择/准入、评分草稿及监控查询；review/analytics页面通过其公开接口组合，后端账本唯一。
+
+review ID→结算就绪→明确确认→后端事务→结算读回；证据评分/监控各自查询，不能由页面推算账本终态。
+
+### 原子实施顺序
+
+1. 确定复盘页与分析页的共同赛后调用，建立一个postmatch owner。
+2. 迁就绪/结算与确认，再迁证据评分和监控读取。
+3. 处理结果未知和重复提交，沿用后端幂等键及错误分类。
+4. 联验结算状态与分析刷新，退出两页重复状态。
+
+每一步先确认入口可用与受影响断言，失败停在本步修复。批次内可以保留独立可回退提交，但未覆盖的合并验收项仍待验；不得为了交付批次合并而只做最后一次检查。
+
+### 可操作验收场景
+
+- **R14-12-V1**：未就绪或许可过期→无有效结算；允许后结算读回与账本一致。
+- **R14-12-V2**：响应丢失后再进入→查询实际结算，不盲目再写；重复请求不重复记分。
+- **R14-12-V3**：切换结算A/B→评分草稿不能写入另一结算，慢监控结果不覆盖新对象。
+
+每个场景记录前置数据/身份、触发动作或延迟安排、预期状态/写入次数、实际结果、证据位置及验证层级。可控延迟/失败测试只模拟外部边界，必须运行真实工作流；持久化结论需要真实库读回。
+
+### 现有检查入口与交付停止条件
+
+以下命令从项目根目录执行，每条立即核对退出码；它们是现有守卫起点，不代表已经覆盖上述全部行为。实现时检查脚本实际断言，缺失场景补入现有测试/fixture并接入原验证入口，不创建同名空检查。
+
+```powershell
+node scripts/verify-postmatch-settlement.mjs
+if ($LASTEXITCODE -ne 0) { throw 'R14-12: verify-postmatch-settlement failed' }
+node scripts/verify-postmatch-service.mjs
+if ($LASTEXITCODE -ne 0) { throw 'R14-12: verify-postmatch-service failed' }
+node scripts/verify-review-service.mjs
+if ($LASTEXITCODE -ne 0) { throw 'R14-12: verify-review-service failed' }
+```
+
+同时执行[共享验证门禁](../modular-rewrite/remaining-execution-contract.md)。任一业务场景失败、命令/Schema/保护资产非预期变化、仍存在双状态owner或无法说明的写入结果，均阻止该批交付。缺外部环境只按既定待验规则登记；R17-06和R18不得再延期必需真实验收。
+
+**回退与交接：** 在修改前记录本批基线提交和用户已有修改；按执行约定的代码/数据双层回退处理。交接必须列出本批实际新owner、原函数/事件/类型去向、复用接口、逐项场景证据和剩余环境项。主交付以及所覆盖原ID只有满足各自义务才可记完成。
+
 ## R14-13 分析查询、长任务与建议包
 
 覆盖原节点：R14-13、R14-14、R14-15。
@@ -99,6 +346,53 @@
 **业务验收：** 任务 ID/分区/输入上下文绑定；取消或切页后的迟到结果不串线；导入只产生预览和候选；全局快照不授予具体分区许可；失败和未知结果可区分。
 
 **完成依据：** 本节业务断言逐条有生产调用路径与验证证据；原有功能均有保留映射；涉及持久化的真实未验项按执行规则登记，不能以模拟结果抵销。失败修复后复验受影响范围，提交前核对实际 diff 与回退点。
+
+
+### 源码锚点与调用盘点
+
+`src/pages/analytics.ts`、`src/controllers/pageLoaders.ts`、`src/api/client.ts`。代表性现存函数：`loadAnalysisCenter`（main.ts:1938）、`enqueueAnalysisTask`（main.ts:6208）、`exportAiAnalysisPackage`（main.ts:6459）、`previewAiAnalysisResponse`（main.ts:6506）、`importAiAnalysisResponse`（main.ts:6523）、`decideAiSuggestion`（main.ts:6538）。这些是入口锚点，不是穷尽迁移清单；还需盘点对应事件分支、辅助函数与全部调用方。
+
+上述函数直接调用的现有 API：`enqueueAnalysisJob`、`chooseAiAnalysisExportFile`、`exportAiAnalysisPackage`、`chooseAiAnalysisResponseFile`、`previewAiAnalysisResponse`、`importAiAnalysisResponse`、`decideAiAnalysisSuggestion`；间接调用须沿当前调用图补齐。参数、返回、错误码及 wire 命令从实际 client 和 command-contract 对照，不按名称猜测。
+
+### 目标归属与数据流
+
+analytics 的只读总览、jobs及packages/suggestions分别拥有查询与状态；每个任务/响应包绑定具体分区和对象。
+
+分区输入→后台job→查询真实状态→结果投影；分析包导出→响应预检→候选建议→显式决策，不自动变更生产参数。
+
+### 原子实施顺序
+
+1. 盘点总览字段、任务动作、包与建议接口，区分全局摘要和具体分区授权。
+2. 迁总览查询与任务生命周期，使用实际job ID，保留当前取消语义。
+3. 迁包预览/导入和建议队列，核对身份/Schema/文件指纹及冲突。
+4. 联验跨页恢复和未知任务状态，前端不重新计算校准/漂移/模型比较。
+
+每一步先确认入口可用与受影响断言，失败停在本步修复。批次内可以保留独立可回退提交，但未覆盖的合并验收项仍待验；不得为了交付批次合并而只做最后一次检查。
+
+### 可操作验收场景
+
+- **R14-13-V1**：启动分区A任务后切B→A结果留在A，不赋给B；全局ready不代替B许可。
+- **R14-13-V2**：取消请求已发送但job仍运行→不能伪造cancelled；终态以实际状态为准。
+- **R14-13-V3**：导入响应仅生成预览/建议，重复导入按契约幂等；坏包/跨比赛包拒绝且不写生产候选。
+
+每个场景记录前置数据/身份、触发动作或延迟安排、预期状态/写入次数、实际结果、证据位置及验证层级。可控延迟/失败测试只模拟外部边界，必须运行真实工作流；持久化结论需要真实库读回。
+
+### 现有检查入口与交付停止条件
+
+以下命令从项目根目录执行，每条立即核对退出码；它们是现有守卫起点，不代表已经覆盖上述全部行为。实现时检查脚本实际断言，缺失场景补入现有测试/fixture并接入原验证入口，不创建同名空检查。
+
+```powershell
+node scripts/verify-analytics-service.mjs
+if ($LASTEXITCODE -ne 0) { throw 'R14-13: verify-analytics-service failed' }
+node scripts/verify-analysis-history-workflow.mjs
+if ($LASTEXITCODE -ne 0) { throw 'R14-13: verify-analysis-history-workflow failed' }
+node scripts/verify-api-workspace-research-control.mjs
+if ($LASTEXITCODE -ne 0) { throw 'R14-13: verify-api-workspace-research-control failed' }
+```
+
+同时执行[共享验证门禁](../modular-rewrite/remaining-execution-contract.md)。任一业务场景失败、命令/Schema/保护资产非预期变化、仍存在双状态owner或无法说明的写入结果，均阻止该批交付。缺外部环境只按既定待验规则登记；R17-06和R18不得再延期必需真实验收。
+
+**回退与交接：** 在修改前记录本批基线提交和用户已有修改；按执行约定的代码/数据双层回退处理。交接必须列出本批实际新owner、原函数/事件/类型去向、复用接口、逐项场景证据和剩余环境项。主交付以及所覆盖原ID只有满足各自义务才可记完成。
 
 ## R14-16 能力与参数候选决策
 
@@ -110,6 +404,53 @@
 
 **完成依据：** 本节业务断言逐条有生产调用路径与验证证据；原有功能均有保留映射；涉及持久化的真实未验项按执行规则登记，不能以模拟结果抵销。失败修复后复验受影响范围，提交前核对实际 diff 与回退点。
 
+
+### 源码锚点与调用盘点
+
+`src/pages/analytics.ts`、`src/types.ts`、`contracts/parameter-lifecycle-contract.json`。代表性现存函数：`decideAbilityCandidate`（main.ts:6160）、`generateParameterTuning`（main.ts:6302）、`checkParameterLifecycleReadiness`（main.ts:6345）、`runParameterShadowValidation`（main.ts:6365）、`promoteParameterCandidate`（main.ts:6383）、`rollbackParameterCandidate`（main.ts:6414）。这些是入口锚点，不是穷尽迁移清单；还需盘点对应事件分支、辅助函数与全部调用方。
+
+上述函数直接调用的现有 API：`decideAbilityCandidate`、`readMatchReview`、`generateParameterTuningCandidate`、`listParameterTuningCandidates`、`parameterLifecycleReadiness`、`runParameterShadowValidation`、`promoteParameterCandidate`、`rollbackParameterCandidate`；间接调用须沿当前调用图补齐。参数、返回、错误码及 wire 命令从实际 client 和 command-contract 对照，不按名称猜测。
+
+### 目标归属与数据流
+
+analytics/candidates 中能力候选与参数候选分开，影子验证、晋升、回滚具名工作流；后端拥有许可和生产版本。
+
+候选身份/快照→就绪检查→影子验证→人工决策→后端晋升/回滚→历史读回。建议接受不是晋升许可。
+
+### 原子实施顺序
+
+1. 冻结候选状态、影子产物、晋升/回滚请求及版本校验字段，读取现有生命周期契约。
+2. 迁只读队列与候选详情，再迁人工接受和影子验证，保持能力候选与参数候选互不混用。
+3. 迁晋升与回滚确认，绑定实际版本/快照及后端许可，不构造新参数值。
+4. 用失败/冲突验证阻止部分成功，核对审计与历史；保护资产一旦变化停止交付。
+
+每一步先确认入口可用与受影响断言，失败停在本步修复。批次内可以保留独立可回退提交，但未覆盖的合并验收项仍待验；不得为了交付批次合并而只做最后一次检查。
+
+### 可操作验收场景
+
+- **R14-16-V1**：验证通过后候选或基线版本变化→旧验证不能用于晋升，必须重新准入。
+- **R14-16-V2**：双击晋升或另一操作者已晋升→按后端版本/幂等结果投影，不本地强行成功。
+- **R14-16-V3**：回滚失败→不得显示旧版本已恢复；私有模型固定回归未实跑不得标通过。
+
+每个场景记录前置数据/身份、触发动作或延迟安排、预期状态/写入次数、实际结果、证据位置及验证层级。可控延迟/失败测试只模拟外部边界，必须运行真实工作流；持久化结论需要真实库读回。
+
+### 现有检查入口与交付停止条件
+
+以下命令从项目根目录执行，每条立即核对退出码；它们是现有守卫起点，不代表已经覆盖上述全部行为。实现时检查脚本实际断言，缺失场景补入现有测试/fixture并接入原验证入口，不创建同名空检查。
+
+```powershell
+node scripts/verify-parameter-lifecycle.mjs
+if ($LASTEXITCODE -ne 0) { throw 'R14-16: verify-parameter-lifecycle failed' }
+node scripts/verify-analytics-service.mjs
+if ($LASTEXITCODE -ne 0) { throw 'R14-16: verify-analytics-service failed' }
+node scripts/verify-protected-assets-deterministic.mjs
+if ($LASTEXITCODE -ne 0) { throw 'R14-16: verify-protected-assets-deterministic failed' }
+```
+
+同时执行[共享验证门禁](../modular-rewrite/remaining-execution-contract.md)。任一业务场景失败、命令/Schema/保护资产非预期变化、仍存在双状态owner或无法说明的写入结果，均阻止该批交付。缺外部环境只按既定待验规则登记；R17-06和R18不得再延期必需真实验收。
+
+**回退与交接：** 在修改前记录本批基线提交和用户已有修改；按执行约定的代码/数据双层回退处理。交接必须列出本批实际新owner、原函数/事件/类型去向、复用接口、逐项场景证据和剩余环境项。主交付以及所覆盖原ID只有满足各自义务才可记完成。
+
 ## R14-17 应用内验收与报告
 
 覆盖原节点：R14-17。
@@ -119,6 +460,53 @@
 **业务验收：** 报告内容与真实结果一致且不可变；公开模型不可用如实显示；历史不可授予本次通过；执行失败不能报告成功；与最终 R18 发布证据分清职责。
 
 **完成依据：** 本节业务断言逐条有生产调用路径与验证证据；原有功能均有保留映射；涉及持久化的真实未验项按执行规则登记，不能以模拟结果抵销。失败修复后复验受影响范围，提交前核对实际 diff 与回退点。
+
+
+### 源码锚点与调用盘点
+
+`src/pages/release.ts`、`src/api/client.ts`、`contracts/windows-acceptance-contract.json`。代表性现存函数：`refreshReleaseAcceptance`（main.ts:6808）、`runReleaseAcceptance`（main.ts:6826）、`openReleaseAcceptanceRun`（main.ts:6841）。这些是入口锚点，不是穷尽迁移清单；还需盘点对应事件分支、辅助函数与全部调用方。
+
+上述函数直接调用的现有 API：`listReleaseAcceptanceRuns`、`readReleaseAcceptanceRun`、`runReleaseAcceptance`；间接调用须沿当前调用图补齐。参数、返回、错误码及 wire 命令从实际 client 和 command-contract 对照，不按名称猜测。
+
+### 目标归属与数据流
+
+release feature拥有表单草稿、当前验收请求、不可变历史与详情；后端release服务生成报告，不让页面发布Git。
+
+显式验收请求→真实服务→分类检查结果/不可变报告→查询历史；每份报告保留自己的输入和环境标识。
+
+### 原子实施顺序
+
+1. 盘点表单字段、历史列表和报告DTO，对照后端release命令，不新增前端计算门禁。
+2. 迁执行、读取和列表状态，并绑定请求/报告ID。
+3. 区分完整成功、失败、环境缺失和公开模型不可用，防止历史报告污染新执行。
+4. 核对导出/查看只读，接回现有页面及日志；最终软件发布仍由R18负责。
+
+每一步先确认入口可用与受影响断言，失败停在本步修复。批次内可以保留独立可回退提交，但未覆盖的合并验收项仍待验；不得为了交付批次合并而只做最后一次检查。
+
+### 可操作验收场景
+
+- **R14-17-V1**：历史成功后发起失败验收→当前结果必须失败，不沿用历史绿色状态。
+- **R14-17-V2**：公开引擎不可用→报告真实限制，不填模拟通过。
+- **R14-17-V3**：查看/导出已有报告→内容不可改；完成应用内报告不产生Git标签或自动发布。
+
+每个场景记录前置数据/身份、触发动作或延迟安排、预期状态/写入次数、实际结果、证据位置及验证层级。可控延迟/失败测试只模拟外部边界，必须运行真实工作流；持久化结论需要真实库读回。
+
+### 现有检查入口与交付停止条件
+
+以下命令从项目根目录执行，每条立即核对退出码；它们是现有守卫起点，不代表已经覆盖上述全部行为。实现时检查脚本实际断言，缺失场景补入现有测试/fixture并接入原验证入口，不创建同名空检查。
+
+```powershell
+node scripts/verify-release-service.mjs
+if ($LASTEXITCODE -ne 0) { throw 'R14-17: verify-release-service failed' }
+node scripts/verify-release-acceptance.mjs
+if ($LASTEXITCODE -ne 0) { throw 'R14-17: verify-release-acceptance failed' }
+node scripts/verify-release-readiness.mjs
+if ($LASTEXITCODE -ne 0) { throw 'R14-17: verify-release-readiness failed' }
+```
+
+同时执行[共享验证门禁](../modular-rewrite/remaining-execution-contract.md)。任一业务场景失败、命令/Schema/保护资产非预期变化、仍存在双状态owner或无法说明的写入结果，均阻止该批交付。缺外部环境只按既定待验规则登记；R17-06和R18不得再延期必需真实验收。
+
+**回退与交接：** 在修改前记录本批基线提交和用户已有修改；按执行约定的代码/数据双层回退处理。交接必须列出本批实际新owner、原函数/事件/类型去向、复用接口、逐项场景证据和剩余环境项。主交付以及所覆盖原ID只有满足各自义务才可记完成。
 
 ## 原节点去向（完整覆盖）
 

@@ -12,6 +12,10 @@
 
 本阶段聚焦实际清单、证据闭合与交付可靠性；本轮规划排除 UI 视觉改版、功能删减、模型改写和不相关后端重构。保留搜索/分页/焦点/滚动/草稿/主题/工作区恢复等现有用户行为。
 
+## 执行卡使用前提
+
+本阶段逐批执行下方详细卡，并同时读取[执行约定与验证命令](../modular-rewrite/remaining-execution-contract.md)。源码锚点来自 `0b1132bd265adbd7d689c5345986c412fffb3ba4`；执行时先核对差异，迁移后的准确路径以已完成前批记录为准。计划中的职责名是目标，不表示文件已存在。
+
 ## 状态与依赖
 
 当前全部为 **BLOCKED / 计划未实施**。进入条件为 R15 已按适用出口完成及用户授权；不因本次改写自动 READY。下表顺序是默认交付顺序，必要时在已授权阶段内按真实依赖拆出更小批次并说明原因，不以任务数量或文件数为目标。
@@ -44,6 +48,55 @@
 
 **完成依据：** 本节每项检查都有准确对象、执行方式、结果与证据位置；报告生成不等于被审计软件通过。未执行项和阻塞明确列出；仅发现实际缺口时修改实现并重验，纯文档或证据整理不重复编造模块、接口或测试。
 
+
+### 源码锚点与调用盘点
+
+`src/main.ts`、`src/api/client.ts`、`src/types.ts`、`architecture/module-boundaries.json`。本批为审计/验收/发布，读取上述实际入口，不虚构待迁移业务函数。
+
+接口核对采用当前架构清单、现有入口参数和目标业务契约；不凭本执行卡新增 API。
+
+### 目标归属与数据流
+
+本批只拥有清理清单与已证实遗漏的修复；各业务owner在R13～R15确定，不新增第二套迁移层。
+
+实际导入/注册/动态路径→职责与替代证据→逐项判断保留/退出→验证消费者→最终清单。
+
+### 原子实施顺序
+
+1. 按main/client/types/pages/components/controllers/CSS/Rust/临时适配逐类列出剩余项；先标有调用方的生产职责。
+2. 对每个候选读取静态导入、动态import、注册表、字符串资源路径及测试消费者，不以命名或行数下结论。
+3. 只修真实漏迁或重复实现；必须退出文件时遵守逐个明确路径规则，不编写批量删除脚本。
+4. 更新依赖/状态清单和守卫，检查API和DTO消费者全部转向唯一owner；未替代项保持可用并报告。
+
+每一步先确认入口可用与受影响断言，失败停在本步修复。批次内可以保留独立可回退提交，但未覆盖的合并验收项仍待验；不得为了交付批次合并而只做最后一次检查。
+
+### 可操作验收场景
+
+- **R16-01-V1**：看似无人导入但被注册表/动态资源引用→保留并登记，禁止误删。
+- **R16-01-V2**：一个旧API仍有生产调用方→本项不能宣称已退出；先迁调用并验证再处理。
+- **R16-01-V3**：旧路径消失但出现同内容转发壳/类型副本→判未收敛；正确公共出口不视为冗余。
+
+每个场景记录前置数据/身份、触发动作或延迟安排、预期状态/写入次数、实际结果、证据位置及验证层级。可控延迟/失败测试只模拟外部边界，必须运行真实工作流；持久化结论需要真实库读回。
+
+### 现有检查入口与交付停止条件
+
+以下命令从项目根目录执行，每条立即核对退出码；它们是现有守卫起点，不代表已经覆盖上述全部行为。实现时检查脚本实际断言，缺失场景补入现有测试/fixture并接入原验证入口，不创建同名空检查。
+
+```powershell
+node scripts/architecture/verifyModuleBoundaries.mjs
+if ($LASTEXITCODE -ne 0) { throw 'R16-01: architecture/verifyModuleBoundaries failed' }
+node scripts/architecture/verifyStateOwnership.mjs
+if ($LASTEXITCODE -ne 0) { throw 'R16-01: architecture/verifyStateOwnership failed' }
+node scripts/styles/verifyStyleBoundaries.mjs
+if ($LASTEXITCODE -ne 0) { throw 'R16-01: styles/verifyStyleBoundaries failed' }
+node scripts/verify-command-contract.mjs
+if ($LASTEXITCODE -ne 0) { throw 'R16-01: verify-command-contract failed' }
+```
+
+同时执行[共享验证门禁](../modular-rewrite/remaining-execution-contract.md)。任一业务场景失败、命令/Schema/保护资产非预期变化、仍存在双状态owner或无法说明的写入结果，均阻止该批交付。缺外部环境只按既定待验规则登记；R17-06和R18不得再延期必需真实验收。
+
+**回退与交接：** 在修改前记录本批基线提交和用户已有修改；按执行约定的代码/数据双层回退处理。交接必须列出本批实际新owner、原函数/事件/类型去向、复用接口、逐项场景证据和剩余环境项。主交付以及所覆盖原ID只有满足各自义务才可记完成。
+
 ## R16-09 死代码、依赖与职责复核
 
 覆盖原节点：R16-09、R16-10。
@@ -53,6 +106,55 @@
 **业务验收：** 架构扫描、命令契约、受影响测试和构建通过；代码无消费者不等于资产可删除，反射/注册/动态路径均核对；生产功能仍完整；生成可供 R18 按最终提交复核的清单。
 
 **完成依据：** 本节每项检查都有准确对象、执行方式、结果与证据位置；报告生成不等于被审计软件通过。未执行项和阻塞明确列出；仅发现实际缺口时修改实现并重验，纯文档或证据整理不重复编造模块、接口或测试。
+
+
+### 源码锚点与调用盘点
+
+`architecture/module-boundaries.json`、`architecture/state-ownership.json`、`scripts/architecture/verifyModuleBoundaries.mjs`、`scripts/architecture/lib/imports.mjs`。本批为审计/验收/发布，读取上述实际入口，不虚构待迁移业务函数。
+
+接口核对采用当前架构清单、现有入口参数和目标业务契约；不凭本执行卡新增 API。
+
+### 目标归属与数据流
+
+现有架构清单拥有职责/依赖规则；审计记录只索引证据，不成为新的运行时配置。
+
+实际代码图→循环/逆向/未使用检查→人工核对动态边→修复真实缺口→复验。
+
+### 原子实施顺序
+
+1. 由现有扫描器建立TS/Rust图，确认扫描范围包含迁入features和新契约位置。
+2. 逐项处理循环、跨域内部导入、重复状态/DTO和死导入，区分公共re-export与空壳。
+3. 对复杂剩余文件写一句职责及状态/副作用边界；不能靠格式化或改名证明职责改善。
+4. 生成R18可引用的准确提交、扫描范围、例外与修复结果，并验证代码功能未被清理掉。
+
+每一步先确认入口可用与受影响断言，失败停在本步修复。批次内可以保留独立可回退提交，但未覆盖的合并验收项仍待验；不得为了交付批次合并而只做最后一次检查。
+
+### 可操作验收场景
+
+- **R16-09-V1**：临时引入禁止依赖的隔离负向样例→现有守卫必须失败，不能修改生产树或弱化规则。
+- **R16-09-V2**：对未解析动态路径→人工列明真实消费者，不报告“零依赖”掩盖未知。
+- **R16-09-V3**：清理前后命令集合/参数/DTO一致，代表关键用户操作仍可到达真实后端。
+
+每个场景记录前置数据/身份、触发动作或延迟安排、预期状态/写入次数、实际结果、证据位置及验证层级。可控延迟/失败测试只模拟外部边界，必须运行真实工作流；持久化结论需要真实库读回。
+
+### 现有检查入口与交付停止条件
+
+以下命令从项目根目录执行，每条立即核对退出码；它们是现有守卫起点，不代表已经覆盖上述全部行为。实现时检查脚本实际断言，缺失场景补入现有测试/fixture并接入原验证入口，不创建同名空检查。
+
+```powershell
+node scripts/architecture/verifyModuleBoundaries.mjs
+if ($LASTEXITCODE -ne 0) { throw 'R16-09: architecture/verifyModuleBoundaries failed' }
+node scripts/architecture/verifyStateOwnership.mjs
+if ($LASTEXITCODE -ne 0) { throw 'R16-09: architecture/verifyStateOwnership failed' }
+node scripts/architecture/verifyProtectedImports.mjs
+if ($LASTEXITCODE -ne 0) { throw 'R16-09: architecture/verifyProtectedImports failed' }
+node scripts/verify-domain-type-inventory.mjs
+if ($LASTEXITCODE -ne 0) { throw 'R16-09: verify-domain-type-inventory failed' }
+```
+
+同时执行[共享验证门禁](../modular-rewrite/remaining-execution-contract.md)。任一业务场景失败、命令/Schema/保护资产非预期变化、仍存在双状态owner或无法说明的写入结果，均阻止该批交付。缺外部环境只按既定待验规则登记；R17-06和R18不得再延期必需真实验收。
+
+**回退与交接：** 在修改前记录本批基线提交和用户已有修改；按执行约定的代码/数据双层回退处理。交接必须列出本批实际新owner、原函数/事件/类型去向、复用接口、逐项场景证据和剩余环境项。主交付以及所覆盖原ID只有满足各自义务才可记完成。
 
 ## 原节点去向（完整覆盖）
 

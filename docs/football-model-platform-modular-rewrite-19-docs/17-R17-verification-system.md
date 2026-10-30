@@ -12,6 +12,10 @@ R12 已有基础设施行为/浏览器测试，R13～R15 每批同步更新测�
 
 本阶段聚焦实际清单、证据闭合与交付可靠性；本轮规划排除 UI 视觉改版、功能删减、模型改写和不相关后端重构。保留搜索/分页/焦点/滚动/草稿/主题/工作区恢复等现有用户行为。
 
+## 执行卡使用前提
+
+本阶段逐批执行下方详细卡，并同时读取[执行约定与验证命令](../modular-rewrite/remaining-execution-contract.md)。源码锚点来自 `0b1132bd265adbd7d689c5345986c412fffb3ba4`；执行时先核对差异，迁移后的准确路径以已完成前批记录为准。计划中的职责名是目标，不表示文件已存在。
+
 ## 状态与依赖
 
 当前全部为 **BLOCKED / 计划未实施**。进入条件为 R16 已按适用出口完成及用户授权；不因本次改写自动 READY。下表顺序是默认交付顺序，必要时在已授权阶段内按真实依赖拆出更小批次并说明原因，不以任务数量或文件数为目标。
@@ -44,6 +48,55 @@ R12 已有基础设施行为/浏览器测试，R13～R15 每批同步更新测�
 
 **完成依据：** 本节每项检查都有准确对象、执行方式、结果与证据位置；报告生成不等于被审计软件通过。未执行项和阻塞明确列出；仅发现实际缺口时修改实现并重验，纯文档或证据整理不重复编造模块、接口或测试。
 
+
+### 源码锚点与调用盘点
+
+`scripts/verify-frontend.mjs`、`package.json`、`scripts/verify-command-contract.mjs`、`scripts/verify_command_contract.mjs`、`.github/workflows/ci.yml`。本批为审计/验收/发布，读取上述实际入口，不虚构待迁移业务函数。
+
+接口核对采用当前架构清单、现有入口参数和目标业务契约；不凭本执行卡新增 API。
+
+### 目标归属与数据流
+
+现有npm与Windows验收入口负责执行，测试各自负责断言；覆盖矩阵索引生产路径，不引入新的测试框架。
+
+功能风险→生产函数/命令→真实行为测试→现有runner→退出码与报告→覆盖结论。
+
+### 原子实施顺序
+
+1. 对前端、契约、Rust、fixture、命令、构建和Windows Automated逐项建立执行矩阵，区分静态与行为证据。
+2. 查每个迁移后脚本是否仍读旧源码或只断言字符串；按实际接口补行为断言，不删除历史保护检查。
+3. 在隔离测试中验证失败能传到顶层退出码；合并重复检查前证明断言覆盖等价，两个命令脚本不能仅凭名字相似删。
+4. 执行统一门禁，记录工具版本/受测树/产物；UI基准只有经审阅确认才更新，已批准外观不得借测试迁移改变。
+
+每一步先确认入口可用与受影响断言，失败停在本步修复。批次内可以保留独立可回退提交，但未覆盖的合并验收项仍待验；不得为了交付批次合并而只做最后一次检查。
+
+### 可操作验收场景
+
+- **R17-01-V1**：子检查故意失败的隔离试验→顶层入口失败，不能catch后继续报PASS。
+- **R17-01-V2**：守卫读不到旧路径→更新为真实新owner，而非跳过整项；新增范围实际被执行。
+- **R17-01-V3**：截图通过但业务只使用Mock→覆盖矩阵仍列真实链路待验；不能合并成“全部测试通过”。
+
+每个场景记录前置数据/身份、触发动作或延迟安排、预期状态/写入次数、实际结果、证据位置及验证层级。可控延迟/失败测试只模拟外部边界，必须运行真实工作流；持久化结论需要真实库读回。
+
+### 现有检查入口与交付停止条件
+
+以下命令从项目根目录执行，每条立即核对退出码；它们是现有守卫起点，不代表已经覆盖上述全部行为。实现时检查脚本实际断言，缺失场景补入现有测试/fixture并接入原验证入口，不创建同名空检查。
+
+```powershell
+node scripts/verify-node-process-compatibility.mjs
+if ($LASTEXITCODE -ne 0) { throw 'R17-01: verify-node-process-compatibility failed' }
+node scripts/verify-command-contract.mjs
+if ($LASTEXITCODE -ne 0) { throw 'R17-01: verify-command-contract failed' }
+node scripts/verify-windows-acceptance.mjs
+if ($LASTEXITCODE -ne 0) { throw 'R17-01: verify-windows-acceptance failed' }
+node scripts/verify-protected-assets-deterministic.mjs
+if ($LASTEXITCODE -ne 0) { throw 'R17-01: verify-protected-assets-deterministic failed' }
+```
+
+同时执行[共享验证门禁](../modular-rewrite/remaining-execution-contract.md)。任一业务场景失败、命令/Schema/保护资产非预期变化、仍存在双状态owner或无法说明的写入结果，均阻止该批交付。缺外部环境只按既定待验规则登记；R17-06和R18不得再延期必需真实验收。
+
+**回退与交接：** 在修改前记录本批基线提交和用户已有修改；按执行约定的代码/数据双层回退处理。交接必须列出本批实际新owner、原函数/事件/类型去向、复用接口、逐项场景证据和剩余环境项。主交付以及所覆盖原ID只有满足各自义务才可记完成。
+
 ## R17-06 最终新库与 Windows Full 真实闭环
 
 覆盖原节点：R17-06、R17-10。
@@ -53,6 +106,53 @@ R12 已有基础设施行为/浏览器测试，R13～R15 每批同步更新测�
 **业务验收：** 每项有测试库/资产标识、准确提交、执行命令或操作、真实结果和证据；ignored 计待验，stub/Mock/启动不能抵销；继承 model.runs/0041 风险有明确验证结论；全链路从录入→阵容→推演→复盘→结算→分析/决策→报告可追溯。缺环境记 BLOCKED，不得宣布完整验收或发布。
 
 **完成依据：** 本节每项检查都有准确对象、执行方式、结果与证据位置；报告生成不等于被审计软件通过。未执行项和阻塞明确列出；仅发现实际缺口时修改实现并重验，纯文档或证据整理不重复编造模块、接口或测试。
+
+
+### 源码锚点与调用盘点
+
+`scripts/windows-acceptance.ps1`、`contracts/windows-acceptance-contract.json`、`crates/persistence-postgres/tests/postgres_integration.rs`、`crates/persistence-postgres/tests/match_catalog_repository_contract.rs`。本批为审计/验收/发布，读取上述实际入口，不虚构待迁移业务函数。
+
+接口核对采用当前架构清单、现有入口参数和目标业务契约；不凭本执行卡新增 API。
+
+### 目标归属与数据流
+
+验收操作人/runner负责证据；专用测试库、合法样例、私有引擎和凭据保持原系统owner；报告不能修改业务结果。
+
+环境预检→授权新测试库→真实导入/阵容/推演/复盘/结算/分析/报告→持久化与审计读回→Full报告；各链路有同一对象身份。
+
+### 原子实施顺序
+
+1. 先完成执行约定中的环境清单和目录布局核对；不可打印数据库密码或擅用生产库。建立全部待验项与目标测试的映射。
+2. 运行现有PG targets及Windows Full，按实际脚本检查哪些target被覆盖；其他必要repository契约按明确target补跑，不把未调用的ignored项算通过。
+3. 按Full提示完成真实操作，再单独核对并发/回滚、历史保护、不可变账本、XLSX冲突、API/凭据/取消及私有固定回归。
+4. 对比数据库读回、业务报告与本次runtime日志；记录所有失败、未执行和环境阻塞，未闭合不得进入正式发布。
+
+每一步先确认入口可用与受影响断言，失败停在本步修复。批次内可以保留独立可回退提交，但未覆盖的合并验收项仍待验；不得为了交付批次合并而只做最后一次检查。
+
+### 可操作验收场景
+
+- **R17-06-V1**：非测试库名/缺凭据/缺私有模型/缺有效XLSX→预检阻塞对应项，禁止用公开stub或空表替代。
+- **R17-06-V2**：写入后客户端断开再开→读回实际结果与账本；重复提交不重复落库，事务失败无部分写入。
+- **R17-06-V3**：Full报告通过但某个待验target未执行→仍未完成；只有startup日志不能抵销Full。
+
+每个场景记录前置数据/身份、触发动作或延迟安排、预期状态/写入次数、实际结果、证据位置及验证层级。可控延迟/失败测试只模拟外部边界，必须运行真实工作流；持久化结论需要真实库读回。
+
+### 现有检查入口与交付停止条件
+
+以下命令从项目根目录执行，每条立即核对退出码；它们是现有守卫起点，不代表已经覆盖上述全部行为。实现时检查脚本实际断言，缺失场景补入现有测试/fixture并接入原验证入口，不创建同名空检查。
+
+```powershell
+node scripts/verify-windows-acceptance.mjs
+if ($LASTEXITCODE -ne 0) { throw 'R17-06: verify-windows-acceptance failed' }
+node scripts/verify-database-migration-compatibility.mjs
+if ($LASTEXITCODE -ne 0) { throw 'R17-06: verify-database-migration-compatibility failed' }
+node scripts/verify-public-model-boundary.mjs
+if ($LASTEXITCODE -ne 0) { throw 'R17-06: verify-public-model-boundary failed' }
+```
+
+同时执行[共享验证门禁](../modular-rewrite/remaining-execution-contract.md)。任一业务场景失败、命令/Schema/保护资产非预期变化、仍存在双状态owner或无法说明的写入结果，均阻止该批交付。缺外部环境只按既定待验规则登记；R17-06和R18不得再延期必需真实验收。
+
+**回退与交接：** 在修改前记录本批基线提交和用户已有修改；按执行约定的代码/数据双层回退处理。交接必须列出本批实际新owner、原函数/事件/类型去向、复用接口、逐项场景证据和剩余环境项。主交付以及所覆盖原ID只有满足各自义务才可记完成。
 
 ## 原节点去向（完整覆盖）
 

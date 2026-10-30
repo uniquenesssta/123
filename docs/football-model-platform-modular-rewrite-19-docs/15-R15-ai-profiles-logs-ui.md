@@ -12,6 +12,10 @@
 
 本阶段聚焦业务归属、真实流程与可靠性；本轮规划排除 UI 视觉改版、功能删减、模型改写和不相关后端重构。保留搜索/分页/焦点/滚动/草稿/主题/工作区恢复等现有用户行为。
 
+## 执行卡使用前提
+
+本阶段逐批执行下方详细卡，并同时读取[执行约定与验证命令](../modular-rewrite/remaining-execution-contract.md)。源码锚点来自 `0b1132bd265adbd7d689c5345986c412fffb3ba4`；执行时先核对差异，迁移后的准确路径以已完成前批记录为准。计划中的职责名是目标，不表示文件已存在。
+
 ## 状态与依赖
 
 当前全部为 **BLOCKED / 计划未实施**。进入条件为 R14 已按适用出口完成及用户授权；不因本次改写自动 READY。下表顺序是默认交付顺序，必要时在已授权阶段内按真实依赖拆出更小批次并说明原因，不以任务数量或文件数为目标。
@@ -45,6 +49,56 @@
 
 **完成依据：** 本节业务断言逐条有生产调用路径与验证证据；原有功能均有保留映射；涉及持久化的真实未验项按执行规则登记，不能以模拟结果抵销。失败修复后复验受影响范围，提交前核对实际 diff 与回退点。
 
+
+### 源码锚点与调用盘点
+
+`src/pages/apiWorkspace.ts`、`src/main.ts`、`src/platform/tauri/index.ts`。代表性现存函数：`loadApiWorkspace`（main.ts:1976）、`sendApiWorkspaceMessage`（main.ts:2054）、`openTeamApiWorkspace`（main.ts:3235）、`openPlayerApiWorkspace`（main.ts:3254）。这些是入口锚点，不是穷尽迁移清单；还需盘点对应事件分支、辅助函数与全部调用方。
+
+上述函数直接调用的现有 API：`listOpenAiProfiles`、`listApiWorkspacePresets`、`listApiWorkspaceSessions`、`playerCatalogReferenceData`、`readApiWorkspaceSession`、`sendApiWorkspaceMessage`、`readTeam`、`readPlayer`；间接调用须沿当前调用图补齐。参数、返回、错误码及 wire 命令从实际 client 和 command-contract 对照，不按名称猜测。
+
+### 目标归属与数据流
+
+ai-workspace 的session选择、每会话draft、每request pending分别具名；发送锁按既有产品语义，request→originSession绑定直到终态。
+
+目录选择→身份受控读取→草稿输入→显式发送→pending→响应/失败/取消→原会话结果。每次await后写状态前重新检查身份和生命周期。
+
+### 原子实施顺序
+
+1. 子步骤A：迁目录/详情读取与草稿存储，补快速选择和读取失败测试；不能假设现有全局draft已按会话隔离。
+2. 子步骤B：迁发送/pending/错误恢复，保持已有发送锁；记录发送瞬间的来源、内容、profile和上下文。
+3. 子步骤C：迁取消与迟到响应处理，区分本地过期丢弃和后端真实取消，不用destroy宣称后端已停止。
+4. 子步骤D：接只读上下文、归档和跨页导航，验证B草稿不被A完成/取消清空；退出全局AI状态及事件分支。
+
+每一步先确认入口可用与受影响断言，失败停在本步修复。批次内可以保留独立可回退提交，但未覆盖的合并验收项仍待验；不得为了交付批次合并而只做最后一次检查。
+
+### 可操作验收场景
+
+- **R15-01-V1**：A发送后进入B并输入草稿，A成功/失败/取消→B草稿和选择保持，A消息归A且不强制跳回。
+- **R15-01-V2**：A/B/C详情乱序返回→仅当前选择能写详情；当前读取失败不显示另一会话。
+- **R15-01-V3**：A返回后等待列表刷新时切B→刷新完成仍重新判身份，不能用await之前缓存判断覆盖B。
+- **R15-01-V4**：取消一个request→其他会话不受影响；超时未知先读回，不自动重发；聊天无工具/schema和隐式数据库写操作。
+
+每个场景记录前置数据/身份、触发动作或延迟安排、预期状态/写入次数、实际结果、证据位置及验证层级。可控延迟/失败测试只模拟外部边界，必须运行真实工作流；持久化结论需要真实库读回。
+
+### 现有检查入口与交付停止条件
+
+以下命令从项目根目录执行，每条立即核对退出码；它们是现有守卫起点，不代表已经覆盖上述全部行为。实现时检查脚本实际断言，缺失场景补入现有测试/fixture并接入原验证入口，不创建同名空检查。
+
+```powershell
+node scripts/verify-api-workspace.mjs
+if ($LASTEXITCODE -ne 0) { throw 'R15-01: verify-api-workspace failed' }
+node scripts/verify-api-workspace-research-control.mjs
+if ($LASTEXITCODE -ne 0) { throw 'R15-01: verify-api-workspace-research-control failed' }
+node scripts/verify-ai-workspace-service.mjs
+if ($LASTEXITCODE -ne 0) { throw 'R15-01: verify-ai-workspace-service failed' }
+node scripts/verify-api-compatible-transport.mjs
+if ($LASTEXITCODE -ne 0) { throw 'R15-01: verify-api-compatible-transport failed' }
+```
+
+同时执行[共享验证门禁](../modular-rewrite/remaining-execution-contract.md)。任一业务场景失败、命令/Schema/保护资产非预期变化、仍存在双状态owner或无法说明的写入结果，均阻止该批交付。缺外部环境只按既定待验规则登记；R17-06和R18不得再延期必需真实验收。
+
+**回退与交接：** 在修改前记录本批基线提交和用户已有修改；按执行约定的代码/数据双层回退处理。交接必须列出本批实际新owner、原函数/事件/类型去向、复用接口、逐项场景证据和剩余环境项。主交付以及所覆盖原ID只有满足各自义务才可记完成。
+
 ## R15-07 配置、示例解析、凭据与连接测试
 
 覆盖原节点：R15-07、R15-08、R15-09、R15-10、R15-11。
@@ -55,6 +109,56 @@
 
 **完成依据：** 本节业务断言逐条有生产调用路径与验证证据；原有功能均有保留映射；涉及持久化的真实未验项按执行规则登记，不能以模拟结果抵销。失败修复后复验受影响范围，提交前核对实际 diff 与回退点。
 
+
+### 源码锚点与调用盘点
+
+`src/pages/openai.ts`、`src/main.ts`、`src/app/lifecycle/asyncScope.ts`。代表性现存函数：`parseOpenAiApiExampleNow`（main.ts:6650）、`applyOpenAiApiExample`（main.ts:6623）、`saveOpenAiProfile`（main.ts:6716）、`testOpenAiProfile`（main.ts:6737）、`activateOpenAiProfile`（main.ts:6750）、`requestClearOpenAiKey`（main.ts:6785）。这些是入口锚点，不是穷尽迁移清单；还需盘点对应事件分支、辅助函数与全部调用方。
+
+上述函数直接调用的现有 API：`parseOpenAiApiExample`、`saveOpenAiProfile`、`testOpenAiProfile`、`setActiveOpenAiProfile`、`clearOpenAiProfileKey`；间接调用须沿当前调用图补齐。参数、返回、错误码及 wire 命令从实际 client 和 command-contract 对照，不按名称猜测。
+
+### 目标归属与数据流
+
+openai-profiles 目录/选择、编辑草稿、示例解析预览、凭据动作和测试请求分开；凭据由原Windows/后端存储管理。
+
+示例文本→解析候选→显式应用草稿→显式保存；凭据动作独立；连接测试绑定profile及测试时版本，不能充当保存或启用。
+
+### 原子实施顺序
+
+1. 核对当前解析与应用触发，保留协议/端点/model/超时语义，确认显式应用边界是否已落实。
+2. 迁配置草稿/目录和保存启用，再迁解析请求身份；不得解析成功就静默覆盖正式配置。
+3. 迁凭据写入/替换/清除与独立连接测试，清除确认绑定当前profile，敏感输入及时释放。
+4. 联验更换配置、关闭编辑和迟到解析/测试结果，保存失败保留安全草稿并退出main对应函数。
+
+每一步先确认入口可用与受影响断言，失败停在本步修复。批次内可以保留独立可回退提交，但未覆盖的合并验收项仍待验；不得为了交付批次合并而只做最后一次检查。
+
+### 可操作验收场景
+
+- **R15-07-V1**：输入示例A后改为B或关闭编辑→A迟到解析不能回填；应用候选仍需明确动作。
+- **R15-07-V2**：保存失败→不能显示已启用；有密钥但连接测试失败→状态分别表达。
+- **R15-07-V3**：确认清除A凭据时切到B→不允许误清B；截图、草稿恢复、日志和错误正文无密钥。
+- **R15-07-V4**：历史会话引用缺失配置→明确不可用，不自动绑定另一个配置继续发送。
+
+每个场景记录前置数据/身份、触发动作或延迟安排、预期状态/写入次数、实际结果、证据位置及验证层级。可控延迟/失败测试只模拟外部边界，必须运行真实工作流；持久化结论需要真实库读回。
+
+### 现有检查入口与交付停止条件
+
+以下命令从项目根目录执行，每条立即核对退出码；它们是现有守卫起点，不代表已经覆盖上述全部行为。实现时检查脚本实际断言，缺失场景补入现有测试/fixture并接入原验证入口，不创建同名空检查。
+
+```powershell
+node scripts/verify-openai-profile-ui.mjs
+if ($LASTEXITCODE -ne 0) { throw 'R15-07: verify-openai-profile-ui failed' }
+node scripts/verify-profile-editor-persistence.mjs
+if ($LASTEXITCODE -ne 0) { throw 'R15-07: verify-profile-editor-persistence failed' }
+node scripts/verify-api-compatible-transport.mjs
+if ($LASTEXITCODE -ne 0) { throw 'R15-07: verify-api-compatible-transport failed' }
+node scripts/verify-api-runtime-diagnostics.mjs
+if ($LASTEXITCODE -ne 0) { throw 'R15-07: verify-api-runtime-diagnostics failed' }
+```
+
+同时执行[共享验证门禁](../modular-rewrite/remaining-execution-contract.md)。任一业务场景失败、命令/Schema/保护资产非预期变化、仍存在双状态owner或无法说明的写入结果，均阻止该批交付。缺外部环境只按既定待验规则登记；R17-06和R18不得再延期必需真实验收。
+
+**回退与交接：** 在修改前记录本批基线提交和用户已有修改；按执行约定的代码/数据双层回退处理。交接必须列出本批实际新owner、原函数/事件/类型去向、复用接口、逐项场景证据和剩余环境项。主交付以及所覆盖原ID只有满足各自义务才可记完成。
+
 ## R15-12 问题日志与诊断关联
 
 覆盖原节点：R15-12、R15-13。
@@ -64,6 +168,53 @@
 **业务验收：** 重复错误受控且可追溯；导出脱敏，清除需确认；正文/凭据不泄漏；普通 UI 错误与请求错误不重复记账；真实 API/Windows 凭据/会话持久化/取消单列环境验收。
 
 **完成依据：** 本节业务断言逐条有生产调用路径与验证证据；原有功能均有保留映射；涉及持久化的真实未验项按执行规则登记，不能以模拟结果抵销。失败修复后复验受影响范围，提交前核对实际 diff 与回退点。
+
+
+### 源码锚点与调用盘点
+
+`src/pages/logs.ts`、`src/platform/diagnostics/index.ts`、`src/platform/tauri/index.ts`。代表性现存函数：`loadIssueLogs`（main.ts:1943）、`recordClientIssue`（main.ts:891）、`userFacingError`（main.ts:866）、`technicalErrorMessage`（main.ts:881）。这些是入口锚点，不是穷尽迁移清单；还需盘点对应事件分支、辅助函数与全部调用方。
+
+上述函数直接调用的现有 API：`listIssueLogs`；间接调用须沿当前调用图补齐。参数、返回、错误码及 wire 命令从实际 client 和 command-contract 对照，不按名称猜测。
+
+### 目标归属与数据流
+
+logs feature持有筛选/详情/导出/清除请求；全局错误记录、trace、脱敏和去重仍归现有Platform及WarningCenter。
+
+UI/transport错误→唯一记录入口→问题列表→详情/脱敏导出；清除只影响明确的日志集合，不清任务/草稿。
+
+### 原子实施顺序
+
+1. 区分通用错误上报与页面查询职责，盘点export/clear动作和原重日志抑制机制。
+2. 迁日志目录、过滤、详情与动作，继续调用既有脱敏/关联ID工具，不复制一套summary。
+3. 核对前后端trace关联与重复错误限流；导出前也做同一脱敏边界。
+4. 验证清除确认、导出取消/写失败和跨页刷新，保留问题中心与任务状态独立。
+
+每一步先确认入口可用与受影响断言，失败停在本步修复。批次内可以保留独立可回退提交，但未覆盖的合并验收项仍待验；不得为了交付批次合并而只做最后一次检查。
+
+### 可操作验收场景
+
+- **R15-12-V1**：一次transport失败经过UI catch→可追溯但不重复刷屏；重复错误按既有策略合并。
+- **R15-12-V2**：日志含敏感URL/凭据样例→列表、详情、导出都不泄漏；测试样例不得用真实密钥。
+- **R15-12-V3**：取消清除→日志不变；确认清除→不影响后台任务、会话草稿或错误根因状态。
+
+每个场景记录前置数据/身份、触发动作或延迟安排、预期状态/写入次数、实际结果、证据位置及验证层级。可控延迟/失败测试只模拟外部边界，必须运行真实工作流；持久化结论需要真实库读回。
+
+### 现有检查入口与交付停止条件
+
+以下命令从项目根目录执行，每条立即核对退出码；它们是现有守卫起点，不代表已经覆盖上述全部行为。实现时检查脚本实际断言，缺失场景补入现有测试/fixture并接入原验证入口，不创建同名空检查。
+
+```powershell
+node scripts/verify-api-runtime-diagnostics.mjs
+if ($LASTEXITCODE -ne 0) { throw 'R15-12: verify-api-runtime-diagnostics failed' }
+node scripts/verify-warning-center.mjs
+if ($LASTEXITCODE -ne 0) { throw 'R15-12: verify-warning-center failed' }
+node scripts/verify-api-workspace.mjs
+if ($LASTEXITCODE -ne 0) { throw 'R15-12: verify-api-workspace failed' }
+```
+
+同时执行[共享验证门禁](../modular-rewrite/remaining-execution-contract.md)。任一业务场景失败、命令/Schema/保护资产非预期变化、仍存在双状态owner或无法说明的写入结果，均阻止该批交付。缺外部环境只按既定待验规则登记；R17-06和R18不得再延期必需真实验收。
+
+**回退与交接：** 在修改前记录本批基线提交和用户已有修改；按执行约定的代码/数据双层回退处理。交接必须列出本批实际新owner、原函数/事件/类型去向、复用接口、逐项场景证据和剩余环境项。主交付以及所覆盖原ID只有满足各自义务才可记完成。
 
 ## 原节点去向（完整覆盖）
 
