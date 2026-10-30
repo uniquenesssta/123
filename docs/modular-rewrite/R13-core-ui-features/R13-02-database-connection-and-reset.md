@@ -1,6 +1,6 @@
 # R13-02 数据库连接与危险操作
 
-状态：**VERIFYING**。用户已授权R13-02，并补充要求先收尾01；01已核对精确9cdd1f9b的Windows CI、产物和startup，于beecbf22正式收尾后才实施02。本批分支 `rewrite/r13-core-ui-features`，起点 `beecbf22`，实施前工作区干净。03及后续未启动。
+状态：**DONE（2026-10-31收尾）**。用户已授权R13-02，并补充要求先收尾01；01已核对精确9cdd1f9b的Windows CI、产物和startup，于beecbf22正式收尾后才实施02。本批分支 `rewrite/r13-core-ui-features`，起点 `beecbf22`，实施前工作区干净。03及后续未启动。
 
 ## 职责与真实调用链
 
@@ -62,3 +62,17 @@ R13-02-V3：测试/浏览器重置响应丢失时不清本地引用，实际rese
 ## 推送后一次性CI核对
 
 代码提交d167e948cb39bbaff0c95c88b5a6c23d8c0f4530已推送既定R13分支；[Windows run41098940648](https://github.com/uniquenesssta/123/actions/runs/41098940648) head_sha/head_branch与本批一致。一次查询时in_progress、conclusion=null，未轮询，不标CI或安装包通过。其后纯文档提交不改变软件受测树，后续核验以d167e948为准。
+
+
+## 2026-10-31 正式收尾
+
+run41098940648和job124211928625均completed/success，精确head_sha为d167e948cb39bbaff0c95c88b5a6c23d8c0f4530，分支rewrite/r13-core-ui-features；run更新时间2026-10-30T18:15:15Z（北京时间2026-10-31 02:15:15）。作业步骤列表仍返回旧in_progress/pending快照，因此不把该列表冒称全步骤success；完整日志已逐项确认前端、15行为、Rust fmt/Clippy/tests、release双bundle及startup成功，且产物/报告与run总状态相互印证。未轮询。
+
+artifact13001455633，52,288,909 bytes，未过期；下载ZIP摘要与GitHub及上传日志一致：`70a21b78c54ef11a854184fff4628d70f3d1e1554674a327f5ddf375a31f4085`。证据目录O:/Project/FOODBALL/tmp/r13-02-ci-41098940648/extracted。
+
+| 产物 | 大小 | SHA-256与格式 |
+| --- | --- | --- |
+| MSI x64 zh-CN | 17,977,344 bytes | `081916a7d078f784ee1a74205c008330d6f4f2bae66b5fd4d854360c6ff3ea44`；Compound MSI头正确 |
+| NSIS x64 setup | 15,608,796 bytes | `319e1cd4974afb76be966577227db8c776b835353b617b4d0b0ffde2a21e13b0`；MZ头正确 |
+
+包内logs/windows-acceptance-20261030-172830.json：profile=startup、status=pass，7条记录，bootstrap/read_workspace_state/save_workspace_state三项完成；无runtime_errors或missing_required_groups。不把打包/启动结果扩大为额外本机安装或真实新库重置/Full通过。02正式DONE；03（合并原04）已获用户授权，按执行卡推进。此前VERIFYING/待CI文字为历史，以本节和顶部为准。
