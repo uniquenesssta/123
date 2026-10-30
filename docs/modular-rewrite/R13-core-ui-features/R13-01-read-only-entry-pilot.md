@@ -2,7 +2,7 @@
 
 ## 状态、基线与范围
 
-状态：**VERIFYING**。本地实现、96步前端门禁、Windows浏览器生产运行与原生开发版startup已通过；本提交Windows CI及MSI/NSIS产物待推送后单独核验，不轮询。未放行R13-02。
+状态：**DONE（2026-10-31收尾）**。精确代码9cdd1f9b的Windows CI、下载证据包摘要、MSI/NSIS及包内startup报告已核验通过；覆盖原R13-01/R13-10。完整PG/API/Full等原延期不计为本批通过。
 
 本批覆盖原R13-01和R13-10，沿同一记录验收；阶段分支 `rewrite/r13-core-ui-features`，起点 `f0770665babac94ba9f98bebdb7eb9b2367c0f32`。开发前工作区干净。R12按用户确认结束，本批不修改其任务书或索引。
 
@@ -74,3 +74,19 @@ R13-01-V3：实际架构View确定性只读、原锚点/历史原则与原HTML�
 ## 推送后一次性CI核对
 
 代码提交：9cdd1f9ba2320acd32cfce25e748faa8f79654b2，已推送rewrite/r13-core-ui-features。一次性查询确认 [Windows CI run41085494919](https://github.com/uniquenesssta/123/actions/runs/41085494919) 对应同一SHA和分支，当前in_progress、conclusion=null。未轮询，不能标记CI/安装包通过。此后本记录的纯Markdown提交不改变受测源码；后续核验仍以该精确代码SHA为准。
+
+
+## 2026-10-31 正式收尾核验
+
+[Windows run41085494919](https://github.com/uniquenesssta/123/actions/runs/41085494919) / job124165444411全步骤completed/success，对应代码 `9cdd1f9ba2320acd32cfce25e748faa8f79654b2`、分支rewrite/r13-core-ui-features。完整日志确认架构、前端/类型/构建、Rust fmt/Clippy/workspace tests、Windows release构建及两种bundle通过；ignored PG保持未验，不能按已执行计数。后续ea054d4f仅Markdown，没有改变受测软件树。
+
+artifact12994712478未过期，52,293,359 bytes；本地下载ZIP SHA-256与GitHub及上传日志三方一致：`0efdba480ff8a16ee9f6a199a9031caf705b581dbeb5d6c49bf9ce0025482b98`。首次gh下载停滞，停止本任务对应下载进程，改用连接器同一产物地址成功，未重跑或轮询CI。
+
+| 产物 | 大小 | 本地SHA-256 / 检查 |
+| --- | --- | --- |
+| MSI x64 zh-CN | 17,973,248 bytes | `e4e48e3fdc4fd766179ef60c7859ba6bb3d9cdf07ba5b1d0c7bf34f5ba4f9e47`；Compound MSI文件头正确 |
+| NSIS x64 setup | 15,609,436 bytes | `ccdfea7508128eb6efd535609e27b33e59dbeb46739ac5cccc355936d532ed76`；MZ文件头正确 |
+
+证据目录 `O:/Project/FOODBALL/tmp/r13-01-ci-41085494919/connector-extracted`。包内 `logs/windows-acceptance-20261030-155833.json`：profile=startup、status=pass，7条记录，bootstrap/read_workspace_state/save_workspace_state三项完成，runtime_errors和missing_required_groups均空。只证明本提交Automated/打包/启动出口，未把其当成Full或额外本机安装操作。
+
+01正式DONE，原10随本批完成；用户已授权开始02，本次先收尾01，不改R12、不重跑同软件门禁；02仍须按自身执行卡实现及验证。上面的VERIFYING/待验段落为当时历史，以本节和顶部当前状态为准。
