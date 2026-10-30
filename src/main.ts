@@ -1,3 +1,4 @@
+import { KeyboardShortcutController, motionScrollBehavior } from "./ui/accessibility";
 import { updatePaginationView } from "./ui/navigation";
 import "./styles/app.css";
 import { clearRulesCatalogueFilters } from "./pages/rules/catalogueFilters";
@@ -436,6 +437,7 @@ const workspaceState = new WorkspaceCoordinator<Page>({
 const modal = new ModalController(error => { recordClientIssue(error, "确认操作");return userFacingError(error); });
 const contextMenu = new ContextMenuAdapter();
 const commandMenu = new CommandMenuController(document,error => { recordClientIssue(error,"快速导航");return userFacingError(error); });
+const globalShortcuts = new KeyboardShortcutController(document,[{key:"k",run:openCommandMenu,allowInEditable:true}]);
 function openCommandMenu(): void {
   contextMenu.close();
   commandMenu.open(PRIMARY_NAVIGATION.flatMap(module => module.items.map(item => ({id:item.page,label:item.label,description:item.description,keywords:module.label+" "+item.page,run:async()=>{
@@ -2097,7 +2099,7 @@ async function sendApiWorkspaceMessage(): Promise<void> {
     () =>
       document
         .querySelector("#api-workspace-conversation")
-        ?.scrollTo({ top: 999999, behavior: "smooth" }),
+        ?.scrollTo({ top: 999999, behavior: motionScrollBehavior("smooth") }),
     0,
   );
 
@@ -6896,7 +6898,7 @@ async function handleAction(
       if (target instanceof HTMLDetailsElement) target.open = true;
       const nav = button.closest<HTMLElement>(".workspace-anchor-nav, .workspace-task-anchor-nav");
       nav?.querySelectorAll<HTMLElement>("button[data-anchor-id]").forEach((item) => item.classList.toggle("active", item === button));
-      target.scrollIntoView({ behavior: "smooth", block: "start" });
+      target.scrollIntoView({ behavior: motionScrollBehavior("smooth"), block: "start" });
       break;
     }
     case "select-review-workflow-step": {
@@ -7933,7 +7935,6 @@ document.addEventListener("contextmenu", (event) => {
 }, { signal: browserLifecycleController.signal });
 
 document.addEventListener("keydown", (event) => {
-  if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === "k" && !event.isComposing) { event.preventDefault();openCommandMenu();return; }
   if (event.key !== "Enter" || !(event.target instanceof HTMLInputElement)) return;
   const action =
     event.target.id === "team-search"
@@ -8537,6 +8538,7 @@ export function createBrowserApplicationModule(
     async start() {
       warningCenter?.start();
       shellController?.start();
+      globalShortcuts.start();
       workspaceState.start(root, () => renderedPage, () => app.querySelector<HTMLElement>(".page-container"));
       bindSearchableSelectDiagnostics(browserLifecycleController.signal);
       render();
@@ -8566,6 +8568,7 @@ export function createBrowserApplicationModule(
     navigation.destroy();
     modal.reset();
     contextMenu.destroy();
+    globalShortcuts.destroy();
     commandMenu.destroy();
     workflowNavigation.clear();
     workspaceState.stop();

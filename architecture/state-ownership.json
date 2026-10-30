@@ -518,8 +518,54 @@
         "src/api/**",
         "src/platform/**"
       ]
+    },
+    {
+      "id": "browser.accessibility-lifecycle",
+      "owner": "src/ui/accessibility/keyboardShortcut.ts::KeyboardShortcutController",
+      "scope": "Host document lifetime; shortcut listener and disposal only, never routing or feature state",
+      "writers": [
+        "KeyboardShortcutController.start",
+        "KeyboardShortcutController.destroy"
+      ],
+      "forbidden": [
+        "src/pages/**",
+        "src/api/**",
+        "src/platform/**"
+      ],
+      "transition": null
+    },
+    {
+      "id": "browser.live-region",
+      "owner": "src/ui/accessibility/liveRegion.ts::LiveRegion",
+      "scope": "Local live text projection and delayed repetition timer; notice identity and content remain with WarningStore",
+      "writers": [
+        "LiveRegion.announce",
+        "LiveRegion.destroy"
+      ],
+      "forbidden": [
+        "src/pages/**",
+        "src/api/**",
+        "src/platform/**"
+      ],
+      "transition": null
+    },
+    {
+      "id": "browser.focus-return",
+      "owner": "src/ui/accessibility/focusManager.ts::FocusManager",
+      "scope": "One transient DOM return target per overlay; no persisted form values or competing workspace snapshots",
+      "writers": [
+        "FocusManager.capture",
+        "FocusManager.restore",
+        "FocusManager.clear"
+      ],
+      "forbidden": [
+        "src/pages/**",
+        "src/api/**",
+        "src/platform/**"
+      ],
+      "transition": null
     }
   ],
-  "count": 35,
-  "last_updated_task": "R12-16"
+  "count": 38,
+  "last_updated_task": "R12-17"
 }

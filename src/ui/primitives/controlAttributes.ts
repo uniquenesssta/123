@@ -1,3 +1,4 @@
+import { requireAccessibleName } from "../accessibility";
 import { escapeHtml } from "../../components/format";
 
 export type PrimitiveAttributes = Partial<Record<`data-${string}` | `aria-${string}` | "id" | "name" | "form" | "autofocus" | "role" | "hidden", string | boolean | number>>;
@@ -13,6 +14,5 @@ export function primitiveAttributes(attributes: PrimitiveAttributes = {}): strin
 }
 
 export function primitiveName(label: string): string {
-  if (!label.trim()) throw new Error("A primitive requires an accessible name");
-  return escapeHtml(label);
+  return escapeHtml(requireAccessibleName(label));
 }

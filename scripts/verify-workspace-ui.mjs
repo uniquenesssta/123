@@ -71,7 +71,7 @@ requireTrue(styles.includes(".workspace-grid") && styles.includes(".workspace-se
 requireTrue(state.includes("ui_revision: 5") && state.includes("active_section: null") && state.includes("inspector_collapsed: true"), "双层导航工作区状态迁移或默认抽屉状态缺失");
 requireTrue(styles.includes(".selection-commandbar") && styles.includes(".workspace-inspector") && styles.includes(".balanced-data-table") && styles.includes("overflow-y: auto"), "上下文批量操作、按需检查器或高密度列表滚动样式缺失");
 requireTrue(!styles.includes("resize: horizontal"), "模块边栏不得保留原生横向拖拽");
-requireTrue(existsSync(join(root, "src/components/icons.ts")), "缺少统一SVG图标组件");
+requireTrue(existsSync(join(root, "src/ui/icons/iconRegistry.ts")) && existsSync(join(root,"src/ui/icons/appIconView.ts")), "缺少统一SVG图标组件及实际应用入口");
 requireTrue(existsSync(join(root, "src/ui/navigation/section-navigation/sectionNavigationView.ts")), "缺少工作区共享组件");
 
 if (failures.length) {

@@ -1,0 +1,172 @@
+{
+  "task": "R12-17",
+  "file_key": "PN0Whgu6HLWIHx4Mv6aHfu",
+  "session_id": "4cafbf1f-cd99-458b-b8de-f0a586be8e81",
+  "baseline": "fa77c8d73126f56282801f4e3b306ded6f008d5d",
+  "authority": "Latest user-approved Screens, fonts, typography hierarchy and theme tokens; existing Figma icon masters. Operate mode; extend and harden without replacing the visual world.",
+  "new_variables": [],
+  "new_styles": [],
+  "new_figma_nodes": [],
+  "new_dependencies": [],
+  "icon_slot": {
+    "node_id": "37:44",
+    "entry": "src/ui/icons/iconSlot.ts",
+    "registry": "src/ui/icons/iconRegistry.ts",
+    "sizes": [
+      16,
+      20,
+      24
+    ],
+    "registered_icons": 37,
+    "source_compatible_app_names": 25,
+    "old_path": "src/components/icons.ts",
+    "replacement": "src/ui/icons/appIconView.ts",
+    "outside_stroke_roots": {
+      "plus": 24.875,
+      "calendar": 24.875
+    },
+    "contract": "Preserve unmodified SVG paths and root dimensions. Plus and Calendar retain original root in a scaled 24px wrapper with -0.875px offset. All Calendar strokes inherit currentColor in both themes."
+  },
+  "new_assets": [
+    {
+      "node_id": "54:208",
+      "id": "icons/search.svg",
+      "path": "src/assets/icons/search.svg",
+      "kind": "vector",
+      "bytes": 566,
+      "sha256": "7b7c184a1dcdcc196bf675a8aa039c4d1b976c1b898752ec85586751c5e20b2e",
+      "width": 24,
+      "height": 24
+    },
+    {
+      "node_id": "88:643",
+      "id": "icons/refresh.svg",
+      "path": "src/assets/icons/refresh.svg",
+      "kind": "vector",
+      "bytes": 945,
+      "sha256": "50d7ba08bfe94100c007ad9b5372ac4c7919e73204c7490d8268b3f8285c4a3c",
+      "width": 24,
+      "height": 24
+    },
+    {
+      "node_id": "88:684",
+      "id": "icons/compare.svg",
+      "path": "src/assets/icons/compare.svg",
+      "kind": "vector",
+      "bytes": 670,
+      "sha256": "2ed2416f78ad0a8d8abeaf56bc57798a182ea3d5d1004c77a98b6550e189336d",
+      "width": 24,
+      "height": 24
+    },
+    {
+      "node_id": "88:706",
+      "id": "icons/cards.svg",
+      "path": "src/assets/icons/cards.svg",
+      "kind": "vector",
+      "bytes": 1143,
+      "sha256": "a2760549eb47d700dbbeb812ac30a0254a3c6d3d6fc77cde686a26b7b24eadcb",
+      "width": 24,
+      "height": 24
+    },
+    {
+      "node_id": "88:727",
+      "id": "icons/detail.svg",
+      "path": "src/assets/icons/detail.svg",
+      "kind": "vector",
+      "bytes": 338,
+      "sha256": "cfa72d1e6784d8c499313c2e81094dacbc48f5c5946c66d51ef1d62fbadef08b",
+      "width": 24,
+      "height": 24
+    },
+    {
+      "node_id": "88:747",
+      "id": "icons/more.svg",
+      "path": "src/assets/icons/more.svg",
+      "kind": "vector",
+      "bytes": 884,
+      "sha256": "a6fd1096f84bf946efe8533a981a1d583d6465d757d954f96b2443a958950dad",
+      "width": 24,
+      "height": 24
+    },
+    {
+      "node_id": "139:212",
+      "id": "icons/calendar.svg",
+      "path": "src/assets/icons/calendar.svg",
+      "kind": "vector",
+      "bytes": 713,
+      "sha256": "644670b35473349b1cd25f508839bcc0f78a8647df228e4241d99eb4222cc296",
+      "width": 24.875,
+      "height": 24.875
+    }
+  ],
+  "controlled_assets": {
+    "entry": "src/ui/assets/index.ts",
+    "manifest": "src/ui/assets/assetManifest.ts",
+    "total": 59,
+    "vectors": 55,
+    "fonts": 2,
+    "licenses": 2,
+    "contract": "Allowlisted local metadata. Vite source imports own loading; no remote requests or file I/O in the registry. Hashes, lengths, root dimensions and complete catalog tested."
+  },
+  "accessibility": [
+    {
+      "module": "focusManager",
+      "entry": "src/ui/accessibility/focusManager.ts",
+      "consumers": [
+        "src/ui/overlays/dialog/dialogController.ts",
+        "src/app/shell/page-frame/pageFrameController.ts",
+        "src/app/workspace/workspaceRecovery.ts"
+      ],
+      "contract": "Live focus eligibility, hidden/inert/disabled/visibility/modal checks. One transient overlay return target; Workspace remains sole persisted focus owner."
+    },
+    {
+      "module": "focusTrap",
+      "entry": "src/ui/accessibility/focusTrap.ts",
+      "consumers": [
+        "src/ui/overlays/dialog/dialogController.ts"
+      ],
+      "contract": "Live Tab/ShiftTab cycle, native disabled fieldsets, radio groups, tabindex order and nested popover ownership."
+    },
+    {
+      "module": "keyboardShortcut",
+      "entry": "src/ui/accessibility/keyboardShortcut.ts",
+      "consumers": [
+        "src/main.ts"
+      ],
+      "contract": "One EventScope-backed actual Ctrl/Meta K owner, native input/modal policy and IME/repeat/Alt guards; lifecycle start/destroy only."
+    },
+    {
+      "module": "liveRegion",
+      "entry": "src/ui/accessibility/liveRegion.ts",
+      "consumers": [
+        "src/ui/feedback/toast/toastController.ts"
+      ],
+      "contract": "Plain-text polite atomic notices including repeats; stale timer cancellation and destroy. WarningStore retains notice state."
+    },
+    {
+      "module": "reducedMotion",
+      "entry": "src/ui/accessibility/reducedMotion.ts",
+      "consumers": [
+        "src/main.ts"
+      ],
+      "contract": "Read live native media preference for actual AI conversation and workspace anchor scrolling; CSS motion tokens unchanged."
+    },
+    {
+      "module": "accessibleName",
+      "entry": "src/ui/accessibility/accessibleName.ts",
+      "consumers": [
+        "src/ui/primitives/controlAttributes.ts",
+        "src/ui/forms/field-label/fieldLabelView.ts",
+        "src/ui/overlays/dialog/dialogView.ts"
+      ],
+      "contract": "Require nonblank author-provided names; preserve text and escape at the rendering boundary."
+    }
+  ],
+  "limitations": [
+    "Native Windows Chromium AX tree is not a manual NVDA/Narrator speech test.",
+    "IME guard events exercise composition/229 predicates; not a full physical input-method session.",
+    "startup profile does not prove Full football business flows.",
+    "Initial context/detect attempts failed because engine/cache/network were unavailable. After the user restored the proxy, the official 0.1.17 engine checksum matched EDB62BFF4EE48DC59B6B34F5788B9052FF0EFC73019A4E4FC3B1067A4EBF94EE; engine-probe succeeded and detect scanned 32 changed production TS/CSS paths with exit 0 and [] findings. Context was not rerun. Independent review and screenshots remain separate evidence.",
+    "R12-18 and R12-19 are not implemented."
+  ]
+}

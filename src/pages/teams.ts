@@ -3,7 +3,7 @@ import { paginationView } from "../ui/navigation";
 import "./teams/teamWorkspace.css";
 import { escapeHtml, formatPercent } from "../components/format";
 import { inlineDatabaseSetup } from "../components/databaseSetup";
-import { icon } from "../components/icons";
+import { icon } from "../ui/icons";
 import { taskContextRibbon, taskPageHeader } from "../ui/patterns/workbench";
 import { workspaceAnchorNavigation, workspaceSectionNavigation } from "../ui/navigation";
 

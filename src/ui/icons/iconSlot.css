@@ -47,3 +47,16 @@
 
 .ui-icon-table-sort-up { --ui-icon-source: url("../../assets/icons/chevron-up.svg"); }
 .ui-icon-table-sort-down { --ui-icon-source: url("../../assets/icons/chevron-sort-down.svg"); }
+
+.ui-icon-search { --ui-icon-source: url("../../assets/icons/search.svg"); }
+.ui-icon-refresh { --ui-icon-source: url("../../assets/icons/refresh.svg"); }
+.ui-icon-compare { --ui-icon-source: url("../../assets/icons/compare.svg"); }
+.ui-icon-cards { --ui-icon-source: url("../../assets/icons/cards.svg"); }
+.ui-icon-detail { --ui-icon-source: url("../../assets/icons/detail.svg"); }
+.ui-icon-more { --ui-icon-source: url("../../assets/icons/more.svg"); }
+.ui-icon-calendar { position: relative; background: transparent; mask: none; }
+.ui-icon-calendar-master { position: absolute; left: 0; top: 0; width: 24px; height: 24px; transform-origin: left top; }
+.ui-icon-size-16 > .ui-icon-calendar-master { transform: scale(0.6666666667); }
+.ui-icon-size-20 > .ui-icon-calendar-master { transform: scale(0.8333333333); }
+.ui-icon-calendar-master > svg { position: absolute; left: -0.875px; top: -0.875px; max-width: none; }
+.ui-icon-calendar-master [stroke] { stroke: currentColor; }

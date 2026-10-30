@@ -264,6 +264,19 @@
       ],
       "state": "Only transient confirmation host and listener lifecycle; confirmation request state remains with ConfirmationDialogState. No Feature state, repository or I/O.",
       "production_dependencies_added": false
+    },
+    "ui_accessibility": {
+      "owner": "src/ui/accessibility",
+      "public_entry": "src/ui/accessibility/index.ts",
+      "scope": "Shared DOM focus policy, local overlay return targets, disposable keyboard and live notice behavior, reduced-motion projection and author-provided name validation; no business state or I/O"
+    },
+    "ui_icons": {
+      "owner": "src/ui/icons",
+      "public_entry": "src/ui/icons/index.ts",
+      "registry": "src/ui/icons/iconRegistry.ts",
+      "asset_owner": "src/ui/assets",
+      "controlled_assets": 59,
+      "registered_icons": 37
     }
   },
   "rust": {
@@ -515,5 +528,5 @@
     "commands": 171
   },
   "transitional_edges": [],
-  "last_updated_task": "R12-16"
+  "last_updated_task": "R12-17"
 }

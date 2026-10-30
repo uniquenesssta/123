@@ -1,3 +1,4 @@
+import { focusElement } from "../../../ui/accessibility";
 /** Preserve native shell focus across replacement of the view; page drafts stay in Workspace. */
 export class PageFrameController {
   constructor(private readonly root: HTMLElement) {}
@@ -13,6 +14,6 @@ export class PageFrameController {
     const [kind, value] = key.split(":");
     const attribute = kind === "action" ? "data-action" : kind === "module" ? "data-primary-module" : "data-page";
     const button = Array.from(this.root.querySelectorAll<HTMLButtonElement>("[data-shell-controls] button")).find(item => item.getAttribute(attribute) === value && !item.closest("[hidden], [inert]"));
-    button?.focus({ preventScroll: true });
+    focusElement(button);
   }
 }

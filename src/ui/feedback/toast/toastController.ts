@@ -1,3 +1,4 @@
+import { LiveRegion } from "../../accessibility";
 import { EventScope } from "../../../app/lifecycle";
 import { monotonicTime } from "../../../platform/timing";
 import { toastView, type ToastPresentation } from "./toastView";
@@ -8,6 +9,7 @@ export interface TimedToast extends ToastPresentation { readonly id: number; rea
 export class ToastController {
   private readonly events = new EventScope();
   private identity: number | null = null;
+  private readonly liveRegion: LiveRegion;
   private timer: number | null = null;
   private remaining = 0;
   private scheduledAt = 0;
@@ -15,7 +17,8 @@ export class ToastController {
   private focused = false;
   private autoDismiss = false;
 
-  constructor(private readonly host: HTMLElement, private readonly announce: HTMLElement, private readonly dismiss: (id: number) => void, private readonly action: () => void, private readonly fallbackFocus: () => HTMLElement | null) {
+  constructor(private readonly host: HTMLElement, announce: HTMLElement, private readonly dismiss: (id: number) => void, private readonly action: () => void, private readonly fallbackFocus: () => HTMLElement | null) {
+    this.liveRegion=new LiveRegion(announce);
     this.events.listen(host, "pointerover", () => { this.hovered = true; this.pause(); });
     this.events.listen(host, "pointerout", event => {
       if (event instanceof PointerEvent && event.relatedTarget instanceof Node && host.contains(event.relatedTarget)) return;
@@ -47,7 +50,7 @@ export class ToastController {
     this.autoDismiss = notice?.autoDismiss ?? false;
     this.host.innerHTML = notice ? toastView(notice) : "";
     this.host.hidden = !notice;
-    this.announce.textContent = notice?.message ?? "";
+    this.liveRegion.announce(notice?.message ?? "");
     this.hovered = !!notice && this.host.matches(":hover");
     this.focused = false;
     if (focused) {
@@ -69,5 +72,5 @@ export class ToastController {
     this.scheduledAt = monotonicTime();
     this.timer = this.events.setTimeout(() => { this.timer = null; this.remaining = 0; this.dismiss(identity); }, this.remaining);
   }
-  destroy(): void { this.events.destroy(); this.timer = null; this.identity = null; this.host.replaceChildren(); this.announce.textContent = ""; }
+  destroy(): void { this.events.destroy(); this.timer = null; this.identity = null; this.host.replaceChildren(); this.liveRegion.destroy(); }
 }

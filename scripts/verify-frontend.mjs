@@ -84,6 +84,7 @@ const nodeChecks = [
   "verify-stage-a-architecture.mjs",
   "verify-task-ui.mjs",
   "patterns/verifyPatterns.mjs",
+  "accessibility/verifyAccessibility.mjs",
   "verify-task-ui-screenshots.mjs",
   "verify-profile-editor-persistence.mjs",
   "verify-match-event-facts.mjs",

@@ -1,16 +1,17 @@
+import { FocusManager, focusElement, trapFocus } from "../../accessibility";
 export interface DialogPolicy { canDismiss?: () => boolean; dismissOnBackdrop?: boolean }
 /** Owns modality and focus only. Request state and the close decision remain with callers. */
 export class DialogController {
   private dialog: HTMLDialogElement|null=null;
-  private returnFocus: HTMLElement|null=null;
-  constructor(private readonly root: HTMLElement, private readonly fallback: ()=>HTMLElement|null, private readonly onCancel: ()=>void, private readonly policy: DialogPolicy={}) {}
+  private readonly focus: FocusManager;
+  constructor(root: HTMLElement, private readonly fallback: ()=>HTMLElement|null, private readonly onCancel: ()=>void, private readonly policy: DialogPolicy={}) { this.focus=new FocusManager(root.ownerDocument); }
   get element(): HTMLDialogElement|null { return this.dialog; }
   restore(host: HTMLElement,markup: string): void {
     if(this.dialog?.isConnected&&this.dialog.open)return;
-    if(!this.dialog){const active=this.root.ownerDocument.activeElement;this.returnFocus=active instanceof HTMLElement?active:null;}
+    if(!this.dialog)this.focus.capture();
     this.dialog?.close();host.innerHTML=markup;this.dialog=host.querySelector<HTMLDialogElement>("dialog");
     if(!this.dialog)throw new Error("Dialog markup requires a native dialog");
-    this.dialog.showModal();(this.dialog.querySelector<HTMLElement>("[autofocus]")??this.dialog).focus({preventScroll:true});
+    this.dialog.showModal();focusElement(this.dialog.querySelector<HTMLElement>("[autofocus]")??this.dialog);
   }
   handleCancel(event: Event): boolean {
     if(event.target!==this.dialog||!this.dialog?.open)return false;
@@ -29,17 +30,11 @@ export class DialogController {
       // Native cancel fires after keydown, including when dismissal is locked by a request.
       return true;
     }
-    if(event.key!=="Tab")return false;
-    const controls=Array.from(this.dialog.querySelectorAll<HTMLElement>('button, a[href], input, select, textarea, [tabindex]')).filter(n=>n.tabIndex>=0&&!n.matches(":disabled")&&!n.closest("[hidden], [inert]")&&n.getClientRects().length>0);
-    const first=controls[0],last=controls.at(-1),active=this.root.ownerDocument.activeElement;
-    if(!first){event.preventDefault();this.dialog.focus();}
-    else if(!this.dialog.contains(active)||(event.shiftKey&&(active===first||active===this.dialog))){event.preventDefault();last?.focus();}
-    else if(!event.shiftKey&&(active===last||active===this.dialog)){event.preventDefault();first.focus();}
-    return true;
+    return trapFocus(event,this.dialog);
   }
+
   close(restoreFocus=true): void {
     this.dialog?.close();this.dialog?.remove();this.dialog=null;
-    const target=this.returnFocus?.isConnected&&!this.returnFocus.closest('[inert],[hidden]')?this.returnFocus:this.fallback();this.returnFocus=null;
-    if(restoreFocus)target?.focus({preventScroll:true});
+    if(restoreFocus)this.focus.restore(this.fallback);else this.focus.clear();
   }
 }

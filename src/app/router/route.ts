@@ -1,4 +1,4 @@
-import type { AppIcon } from "../../components/icons";
+import type { AppIcon } from "../../ui/icons";
 import type { Page } from "../../types";
 
 export type Route = Page;

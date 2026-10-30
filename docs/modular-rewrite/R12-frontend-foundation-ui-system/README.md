@@ -2,7 +2,7 @@
 
 ## 当前阶段状态
 
-`IN_PROGRESS`。01～14 DONE；5886a439cc301a7fa315c1a8adf7b3b33c0b1d87：Windows run40863418461 / job123412066355 全步骤成功；artifact12894043614，ZIP SHA-256 2c06b3c06ffd25530680029b45fd3efaa69a3afec7d3241c00904abe59da4a5e。MSI 17,969,152 bytes、NSIS 15,605,981 bytes；startup profile pass，7条有效日志、0错误，bootstrap/read_workspace_state/save_workspace_state完成。startup不等于Full业务链路。2026-10-29独立核验，不轮询。15 VERIFYING；16～19 BLOCKED。工作目录 O:/Project/FOODBALL/123 r3。
+`IN_PROGRESS`。01～16 DONE；16精确fa77c8d73126f56282801f4e3b306ded6f008d5d的Windows run41000941767 / job123884917625全步骤成功；artifact12955471415、下载ZIP SHA-256 98d90a8931d732fece52fda0955284cdd873947959881b8e6b5fad4f9e87db49一致，MSI/NSIS与startup核验通过。17 VERIFYING，本地95步门禁、Rust、Windows startup与独立复审ship完成；17自身推送后的CI/安装包另验，不轮询。18～19 BLOCKED。工作目录 O:/Project/FOODBALL/123 r3。
 
 ## 依据与设计边界
 
@@ -29,8 +29,8 @@
 | R12-13 | [Data Display](R12-13-data-display.md) | DONE · 自身 Windows 完整 SUCCESS，run40218221375 |
 | R12-14 | [Feedback 与 Overlays](R12-14-feedback-and-overlays.md) | DONE · 5886a439精确CI、打包、startup核验通过 |
 | R12-15 | [Navigation 与 Layout](R12-15-navigation-and-layout.md) | DONE · bd9172ad精确CI、打包、startup核验通过 |
-| R12-16 | [UI Patterns](R12-16-ui-patterns.md) | VERIFYING · 六类真实接入、94步前端/Rust/startup通过；独立UI复审SHIP，独立文档审计完成，本批CI待发布后验收 |
-| R12-17 | Accessibility、Icons 与 Assets | BLOCKED |
+| R12-16 | [UI Patterns](R12-16-ui-patterns.md) | DONE · fa77c8d7精确CI、产物摘要、打包与startup核验通过 |
+| R12-17 | [Accessibility、Icons 与 Assets](R12-17-accessibility-icons-and-assets.md) | VERIFYING · 六项无障碍职责、37图标与59受控资产已接入；自身CI待验 |
 | R12-18 | 样式入口与边界 | BLOCKED |
 | R12-19 | Foundation 测试 | BLOCKED |
 

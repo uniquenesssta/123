@@ -1,0 +1,8 @@
+<svg preserveAspectRatio="none" overflow="visible" style="display: block;" width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+<g id="Icon/Layout/Cards">
+<path id="Vector" d="M4 4H9C9.55228 4 10 4.44772 10 5V10C10 10.5523 9.55228 11 9 11H4C3.44772 11 3 10.5523 3 10V5C3 4.44772 3.44772 4 4 4Z" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" stroke="#1C1D26"/>
+<path id="Vector_2" d="M15 4H20C20.5523 4 21 4.44772 21 5V10C21 10.5523 20.5523 11 20 11H15C14.4477 11 14 10.5523 14 10V5C14 4.44772 14.4477 4 15 4Z" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" stroke="#1C1D26"/>
+<path id="Vector_3" d="M4 15H9C9.55228 15 10 15.4477 10 16V19C10 19.5523 9.55228 20 9 20H4C3.44772 20 3 19.5523 3 19V16C3 15.4477 3.44772 15 4 15Z" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" stroke="#1C1D26"/>
+<path id="Vector_4" d="M15 15H20C20.5523 15 21 15.4477 21 16V19C21 19.5523 20.5523 20 20 20H15C14.4477 20 14 19.5523 14 19V16C14 15.4477 14.4477 15 15 15Z" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" stroke="#1C1D26"/>
+</g>
+</svg>

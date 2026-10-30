@@ -1,8 +1,12 @@
 # 足球模型平台公开外壳
 
-## R12-16 UI Patterns（2026-10-30，VERIFYING）
+## R12-17 Accessibility、Icons 与 Assets（2026-10-30，VERIFYING）
 
-15精确bd9172ad的CI、产物摘要、MSI/NSIS与startup已独立核验收尾。16完成六类交互结构的真实接入，保留批准的Figma视觉、数据和写入门槛；94步前端/构建、234项新浏览器检查、64视图1480项页面检查、Rust748项与实际Windows startup通过；独立UI复审SHIP，独立文档审计完成，尚未发布本批CI/安装包。详[16记录](docs/modular-rewrite/R12-frontend-foundation-ui-system/R12-16-ui-patterns.md)。17～19未实施。
+16精确fa77c8d7的CI、产物摘要、MSI/NSIS与startup已独立核验收尾。17接通六项无障碍能力、37项统一图标和59份受控本地资产；保留批准的字体、字重、配色、布局及真实业务owner。1,950项Windows浏览器专项、59份资源摘要、Rust格式/Clippy/748项测试及隔离Windows startup已通过；最终95步前端门禁通过、Impeccable32路径检测0项发现、独立复审ship及设计文档审计完成，详见[17记录](docs/modular-rewrite/R12-frontend-foundation-ui-system/R12-17-accessibility-icons-and-assets.md)。按用户后续推送长期授权交付；本批自身CI/安装包推送后另验，不轮询；18～19未实施。
+
+## R12-16 UI Patterns（2026-10-30收尾 DONE）
+
+15精确bd9172ad的CI、产物摘要、MSI/NSIS与startup已独立核验收尾。16完成六类交互结构的真实接入，保留批准的Figma视觉、数据和写入门槛；94步前端/构建、234项新浏览器检查、64视图1480项页面检查、Rust748项与实际Windows startup通过；独立UI复审SHIP，独立文档审计完成，本批精确Windows run41000941767、MSI/NSIS、产物摘要及startup已独立核验通过。详[16记录](docs/modular-rewrite/R12-frontend-foundation-ui-system/R12-16-ui-patterns.md)。17随后按用户授权推进，18～19未实施。
 
 ## R12-15 Navigation 与 Layout（2026-10-30收尾 DONE）
 

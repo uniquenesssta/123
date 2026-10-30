@@ -1,6 +1,10 @@
 # R12-16 UI Patterns
 
-状态：VERIFYING。本地六类Pattern及真实调用完成；完整门禁、构建与实际Windows startup通过；独立UI复审SHIP；独立文档审计完成。本批尚未公开推送，精确CI、MSI/NSIS在发布后另验，不轮询。用户2026-10-30授权“收尾15开始16”；基线bd9172ad767fc7ad6c574d0d025875d3c26e6309，既有rewrite/r12-frontend-foundation-ui-system分支，O:/Project/FOODBALL/123 r3。17～19未实施。
+状态：DONE。本地六类Pattern及真实调用完成；完整门禁、构建与实际Windows startup通过；独立UI复审SHIP；独立文档审计完成。本批已公开推送，其精确CI、MSI/NSIS与startup已独立核验通过，不轮询。用户2026-10-30授权“收尾15开始16”；基线bd9172ad767fc7ad6c574d0d025875d3c26e6309，既有rewrite/r12-frontend-foundation-ui-system分支，O:/Project/FOODBALL/123 r3。17随后按用户授权实施，18～19未实施。
+
+## 16自身精确CI最终验收
+
+2026-10-30独立收尾：fa77c8d73126f56282801f4e3b306ded6f008d5d的Windows run41000941767 / job123884917625全步骤success；artifact12955471415，50,607,082 bytes，下载ZIP SHA-256 98d90a8931d732fece52fda0955284cdd873947959881b8e6b5fad4f9e87db49与GitHub摘要一致。MSI17,969,152 bytes、NSIS15,606,556 bytes；startup pass，7条有效、0无效、0错误，bootstrap/read_workspace_state/save_workspace_state完成。startup不等于Full业务；只核验完成结果，不轮询。证据O:/Project/FOODBALL/Temp/r12-16-fa77c8d7-evidence.zip。
 
 ## 15前置验收与回退基线
 
@@ -41,7 +45,7 @@
 | Rust自动测试 | cargo test --locked --offline --workspace；Temp/r12-16-rust-test.log | 748 passed、0 failed、39 ignored；ignored不算真实PG/私有回归通过 |
 | 实际Windows应用 | cargo build --locked --offline --package football-match-model-desktop；隔离标识com.footballmatchmodel.platform.r1216validation，真实123 r3 Vite/bootstrap入口 | startup PASS；7条有效、0无效、0错误；bootstrap/read_workspace_state/save_workspace_state；Temp/r12-16-native-verified/startup-report.json |
 | 工作包补充浏览器复核 | Temp/r12-16-workbooks/results.json；真实页面与Shell、明确标注的合成预检输入 | 16个初始视图及8个内部滚动视图共24状态PASS；下部提交可见、外层scrollTop=0、冲突提交禁用并保留2候选；合成记录明确标注 |
-| 本批精确CI/安装包 | 本地提交尚未公开推送 | 未执行；发布后单独验收；不以15结果替代16，不轮询 |
+| 本批精确CI/安装包 | fa77c8d7精确run41000941767/job123884917625/artifact12955471415 | 全步骤success；产物摘要与MSI/NSIS、startup核验通过；不轮询 |
 
 最终完整前端新Pattern证据：O:/Project/FOODBALL/logs/r12-16-patterns-1793327188911；真实页面截图：O:/Project/FOODBALL/Temp/football-approved-design-VuSeHm；最终Navigation/Layout证据：O:/Project/FOODBALL/logs/r12-15-navigation-1793327014416。独立Impeccable finish reviewer结论SHIP，仅覆盖本批结构迁移；报告C:/Users/uniqu/.codex/visualizations/2026/10/24/01a16c6c-7941-7f71-9469-0ff856e39e3a/r12-16-review.md，含五项必需章节。另独立执行基线bd9172ad与当前页面构造器64组合比较，仅归一化新增Pattern标记/类顺序/空白，动作、文本、表单、结构与数据属性不忽略，0差异。独立documenter核对现有设计资料、真实调用、最终清单及原始验证日志，未发现阻塞性设计文档冲突；报告C:/Users/uniqu/.codex/visualizations/2026/10/24/01a16c6c-7941-7f71-9469-0ff856e39e3a/r12-16-design-documentation-audit.md。没有创建第二套PRODUCT/DESIGN或改写已有批准快照。
 
@@ -56,7 +60,7 @@
 
 ## 文件清单、状态与回退
 
-最终暂存按git diff --cached --name-status --find-renames核对：46项Git变更（17新增、28修改、1次职责迁移，R073；原workbench共享实现迁入并扩展），对应47个前后路径；没有额外删除。以下为实际清单。阶段保持VERIFYING直至本批精确CI/安装包验收；17～19不推进。按原子提交git revert恢复本批迁移，不手工复制旧实现、不批量删除目录；此前可回退基线bd9172ad已独立验收。
+最终暂存按git diff --cached --name-status --find-renames核对：46项Git变更（17新增、28修改、1次职责迁移，R073；原workbench共享实现迁入并扩展），对应47个前后路径；没有额外删除。以下为实际清单。2026-10-30精确CI/安装包验收通过后16收尾DONE；用户随后授权17，18～19未实施。按原子提交git revert恢复本批迁移，不手工复制旧实现、不批量删除目录；此前可回退基线bd9172ad已独立验收。
 
 
 ### 新增（17项）

@@ -1,6 +1,6 @@
 import { escapeHtml } from "../components/format";
 import { inlineDatabaseSetup } from "../components/databaseSetup";
-import { icon } from "../components/icons";
+import { icon } from "../ui/icons";
 import { workspaceSectionNavigation } from "../ui/navigation";
 import { workspacePaneToggle } from "../ui/layout";
 import { taskContextRibbon, taskPageHeader } from "../ui/patterns/workbench";

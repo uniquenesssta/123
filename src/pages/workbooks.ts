@@ -1,5 +1,5 @@
 import { escapeHtml } from "../components/format";
-import { icon } from "../components/icons";
+import { icon } from "../ui/icons";
 import { inlineDatabaseSetup } from "../components/databaseSetup";
 import { workspaceSectionNavigation } from "../ui/navigation";
 import { workspacePaneToggle } from "../ui/layout";

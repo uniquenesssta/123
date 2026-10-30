@@ -1,3 +1,4 @@
+import { focusElement } from "../../ui/accessibility";
 import { EventScope } from "../lifecycle";
 import { FORBIDDEN_CONTROL_PATTERN } from "./workspaceVersion";
 import type { WorkspaceControlSnapshot, WorkspaceModuleState } from "./workspaceState";
@@ -106,7 +107,7 @@ export class WorkspaceRecovery {
       // A Shell/dialog action focused after render owns focus; delayed restoration must not steal it.
       if (active && active !== document.body && active !== document.documentElement && !root.contains(active)) return;
       const focus = snapshot.active_element_id ? root.querySelector<HTMLElement>(`#${CSS.escape(snapshot.active_element_id)}`) : null;
-      if (focus && safeFocus(focus) && !focus.closest('[hidden], [inert], [aria-hidden="true"]') && !focus.matches(":disabled")) focus.focus({ preventScroll: true });
+      if (focus && safeFocus(focus) && !focus.closest('[hidden], [inert], [aria-hidden="true"]') && !focus.matches(":disabled")) focusElement(focus);
     });
   }
   invalidate(): void {
