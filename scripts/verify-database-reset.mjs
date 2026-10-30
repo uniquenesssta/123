@@ -1,3 +1,4 @@
+import { verifyDatabaseWorkflow } from "./features/verifyDatabaseWorkflow.mjs";
 import { readFileSync, existsSync } from "node:fs";
 import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -19,7 +20,9 @@ const lifecycleReset = read("crates/application/src/use_cases/application_facade
 const p4Facade = read("crates/application/src/services/p4_orchestration/facade.rs");
 const tauri = read("src-tauri/src/bootstrap/command_registry.rs");
 const client = read("src/api/client.ts");
-const page = read("src/pages/database.ts");
+const page = read("src/features/database/databaseView.ts");
+const databaseFeature = read("src/features/database/databaseFeature.ts");
+const databaseWorkflow = read("src/features/database/databaseWorkflow.ts");
 const main = read("src/main.ts");
 
 function requireText(source, token, label) {
@@ -88,14 +91,14 @@ requireText(tauri, "commands::reset_database", "Tauri 命令注册");
 
 requireText(client, 'invoke("reset_database", { confirmation })', "前端 API 调用");
 requireText(page, 'data-action="request-reset-database"', "数据库页危险按钮");
-requireText(main, "requestDatabaseReset", "输入数据库名称确认弹窗");
-requireText(main, '"确认永久清空",executeDatabaseReset', "确认弹窗绑定原清空动作");
+requireText(main, "databaseFeature.requestReset(document)", "输入数据库名称确认弹窗");
+requireText(databaseFeature, '"确认永久清空", async () =>', "确认弹窗绑定原清空动作");
 requireText(read("src/ui/overlays/confirmation-dialog/confirmationDialogView.ts"), "confirmationInputView(", "唯一强确认输入组件");
-requireText(main, 'id:"database-reset-confirmation"', "真实数据库名称强确认配置");
-requireText(main, 'confirmation !== expected', "业务执行前仍独立校验名称");
+requireText(databaseFeature, 'id: "database-reset-confirmation"', "真实数据库名称强确认配置");
+requireText(databaseWorkflow, 'confirmation !== expected', "业务执行前仍独立校验名称");
 requireText(read("src/app/modal/workspacePanelController.ts"), "mountConfirmationInput(confirmation, confirmButton).destroy", "确认输入随工作区生命周期销毁");
 requireText(main, "clear: () => api.clearWorkspaceState()", "唯一工作区清理adapter");
-requireText(main, "await workspaceState.clearAll();\n  workspaceState.stop();", "清空后串行移除失效工作区引用并停止退出快照回写");
+requireText(main, "await workspaceState.clearAll();\n    workspaceState.stop();", "清空后串行移除失效工作区引用并停止退出快照回写");
 requireText(main, "window.location.reload()", "清空后重启界面状态");
 
 const databaseRoot = "src-tauri/src/commands/database";
@@ -166,3 +169,5 @@ if (/RuntimeLogStore::discover|set_var\(|set_current_dir\(/.test(tests)) throw n
 requireText(read("src-tauri/src/runtime_log.rs"), "#[cfg(test)]\npub(crate) mod tests", "日志fixture只在测试编译中可见");
 
 console.log("数据库编译修复与彻底清空契约通过：记录映射、后端重建、强确认、自动重连和前端状态重置均已锁定。");
+
+await verifyDatabaseWorkflow(root);

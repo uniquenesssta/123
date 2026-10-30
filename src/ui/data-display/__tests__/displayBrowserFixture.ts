@@ -6,7 +6,7 @@ import { timelineView, type TimelineItem } from "../timeline";
 import { progressView } from "../progress";
 import { emptyStateView } from "../empty-state";
 import { codeBlockView } from "../code-block";
-import { databasePage } from "../../../pages/database";
+import { databasePage } from "../../../features/database";
 import { logsPage } from "../../../pages/logs";
 import { matchEventTimelineView } from "../../../pages/review/index";
 import { ModalController } from "../../../app/modal";

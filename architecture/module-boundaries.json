@@ -123,8 +123,9 @@
         "public_entry": "src/features/dashboard/index.ts"
       },
       "database": {
-        "owner": "src/pages/database.ts",
-        "route": "database"
+        "owner": "src/features/database/databaseView.ts",
+        "route": "database",
+        "public_entry": "src/features/database/index.ts"
       },
       "lineup-presets": {
         "owner": "src/pages/lineupPresets.ts",

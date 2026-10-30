@@ -44,7 +44,7 @@ import { bindSearchableSelectDiagnostics } from "./diagnostics/searchableSelectD
 import { architecturePage } from "./features/architecture";
 import { analyticsPage } from "./pages/analytics";
 import { dashboardPage } from "./features/dashboard";
-import { databasePage } from "./pages/database";
+import { databasePage, DatabaseFeature } from "./features/database";
 import { predictionPage } from "./pages/prediction";
 import { rulesPage } from "./pages/rules";
 import { runsPage } from "./pages/runs";
@@ -62,7 +62,6 @@ import type {
   CompetitionBindingDraft,
   CompetitionDraft,
   CompetitionKind,
-  DatabaseOptions,
   DataProviderDraft,
   ExternalEntityIdDraft,
   LineupDraft,
@@ -263,6 +262,27 @@ const session = new AppSession({
   applyTheme(theme) {
     document.documentElement.dataset.theme = theme;
     document.documentElement.style.colorScheme = theme;
+  },
+});
+const databaseFeature = new DatabaseFeature({
+  snapshot: () => session.bootstrap,
+  configure: options => api.configureDatabase(options),
+  disconnect: () => api.disconnectDatabase(),
+  reset: confirmation => api.resetDatabase(confirmation),
+  refresh: () => session.refresh(),
+  busy: operation => runBusy(operation),
+  render: () => render(),
+  notify: message => toast(message, "success"),
+  confirm: (...args) => modal.confirm(...args),
+  invalidateConfirmation: () => modal.close(),
+  async completeReset() {
+    await workspaceState.clearAll();
+    workspaceState.stop();
+    localPreferences.removeItem(TEAM_QUERY_KEY);
+    localPreferences.removeItem(PLAYER_QUERY_KEY);
+    localPreferences.removeItem(PLAYER_NAV_CONTEXT_KEY);
+    sessionPreferences.setItem(DATABASE_RESET_COMPLETE_KEY, "1");
+    window.location.reload();
   },
 });
 const navigation = new Router();
@@ -1381,42 +1401,6 @@ function showPredictionResult(
     </div>
     <div class="inline-market-grid"><div><span>双方都进球</span><strong>${data.btts === null ? "—" : formatPercent(data.btts)}</strong></div><div><span>大于 2.5 球</span><strong>${data.over25 === null ? "—" : formatPercent(data.over25)}</strong></div><div><span>主队预计进球</span><strong>${data.homeLambda === null ? "—" : data.homeLambda.toFixed(2)}</strong></div><div><span>客队预计进球</span><strong>${data.awayLambda === null ? "—" : data.awayLambda.toFixed(2)}</strong></div></div>
     <div class="prediction-result-footer"><div><span>使用规则</span><strong>${escapeHtml(data.rulePackage)}</strong><small>${escapeHtml(data.routeSource)} · ${escapeHtml(data.snapshotType)}</small></div><div><span>计算耗时</span><strong>${data.durationMs === null ? "—" : `${data.durationMs} 毫秒`}</strong></div></div>`;
-}
-
-async function connectDatabase(): Promise<void> {
-  const options: DatabaseOptions = {
-    connection_url: value("database-url").trim(),
-    max_connections: Number(value("max-connections")),
-    connect_timeout_seconds: Number(value("connect-timeout")),
-  };
-  if (!options.connection_url) throw new Error("请输入数据库连接地址");
-  await runBusy(() => api.configureDatabase(options));
-  await refresh();
-  toast("数据服务已连接，本页功能已恢复", "success");
-}
-
-function requestDatabaseReset(): void {
-  const databaseName = session.bootstrap?.data.database_health?.database_name;
-  if (!databaseName) throw new Error("当前未连接数据库，无法执行彻底清空");
-  modal.confirm("彻底清空数据库","此操作会删除当前数据库中的全部应用数据，并从迁移文件重新建立空白结构。球队、球员、比赛、阵容、推演、P4 快照、导入记录、AI 会话、任务、审核和审计数据都无法恢复。",[["当前数据库",databaseName],["清空后保留","数据库本身、结构和本机连接配置"]],"确认永久清空",executeDatabaseReset,{tone:"danger",typed:{id:"database-reset-confirmation",confirmButtonId:"database-reset-confirm-button",expected:databaseName,label:`输入数据库名称 ${databaseName} 以继续`,hint:"名称必须完全一致。清空期间客户端会暂时断开，完成后自动重新连接并重新启动界面。",attributes:{"data-database-name":databaseName}}});
-}
-
-async function executeDatabaseReset(): Promise<void> {
-  const input = document.querySelector<HTMLInputElement>("#database-reset-confirmation");
-  const expected = input?.dataset.databaseName ?? "";
-  const confirmation = input?.value.trim() ?? "";
-  if (!expected || confirmation !== expected) {
-    throw new Error("数据库名称不匹配，已拒绝清空");
-  }
-  closeModal();
-  await runBusy(() => api.resetDatabase(confirmation));
-  await workspaceState.clearAll();
-  workspaceState.stop();
-  localPreferences.removeItem(TEAM_QUERY_KEY);
-  localPreferences.removeItem(PLAYER_QUERY_KEY);
-  localPreferences.removeItem(PLAYER_NAV_CONTEXT_KEY);
-  sessionPreferences.setItem(DATABASE_RESET_COMPLETE_KEY, "1");
-  window.location.reload();
 }
 
 function syncSimpleMatchInput(): Record<string, unknown> {
@@ -7104,18 +7088,16 @@ async function handleAction(
       );
       break;
     case "connect-database":
-      await connectDatabase();
+      await databaseFeature.connect(app);
       break;
     case "disconnect-database":
-      await runBusy(() => api.disconnectDatabase());
-      await refresh();
-      toast("数据库连接配置已清除", "success");
+      await databaseFeature.disconnect();
       break;
     case "open-command-menu":
       openCommandMenu();
       break;
     case "request-reset-database":
-      requestDatabaseReset();
+      databaseFeature.requestReset(document);
       break;
     case "execute-database-reset":
       await modal.runPendingAction();
@@ -8546,6 +8528,7 @@ export function createBrowserApplicationModule(
     warningCenter?.destroy();
     shellController?.destroy();
     browserLifecycleController.destroy();
+    databaseFeature.stop();
     session.stop();
     openAiExampleRequests.destroy();
     navigation.destroy();

@@ -564,8 +564,22 @@
         "src/platform/**"
       ],
       "transition": null
+    },
+    {
+      "id": "browser.database-workflow",
+      "owner": "src/features/database/databaseWorkflow.ts::DatabaseWorkflow",
+      "scope": "one application database connection mutation queue, reset confirmation and lifecycle",
+      "writers": [
+        "DatabaseWorkflow methods"
+      ],
+      "forbidden": [
+        "src/pages/**",
+        "src/app/session/**"
+      ],
+      "transition": null,
+      "migration_task": "R13-02"
     }
   ],
-  "count": 38,
+  "count": 39,
   "last_updated_task": "R12-17"
 }
