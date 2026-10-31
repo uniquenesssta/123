@@ -133,7 +133,8 @@
       },
       "lineups": {
         "owner": "src/pages/lineups.ts",
-        "route": "lineups"
+        "route": "lineups",
+        "public_entry": "src/features/lineups/index.ts"
       },
       "logs": {
         "owner": "src/pages/logs.ts",

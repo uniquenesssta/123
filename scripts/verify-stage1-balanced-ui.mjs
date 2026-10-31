@@ -3,6 +3,7 @@ import {fileURLToPath as stylesheetFilePath} from "node:url";
 const stylesheetRoot=stylesheetFilePath(new URL("../",import.meta.url));
 import { readStylesheet } from "./tokens/tokenStyles.mjs";
 import fs from "node:fs";
+import { readLineupWorkflowSources } from "./features/lineupSources.mjs";
 
 const read = (path) => readProjectSource(stylesheetRoot,new URL(`../${path}`, import.meta.url), "utf8");
 const failures = [];
@@ -18,6 +19,7 @@ const prediction = read("src/pages/prediction.ts");
 const runs = read("src/pages/runs.ts");
 const teams = ["src/features/teams/teamPresentation.ts","src/features/teams/profileView.ts","src/features/teams/packageView.ts","src/features/teams/teamsView.ts"].map(read).join("\n");
 const main = read("src/main.ts");
+const lineupWorkflow = readLineupWorkflowSources(stylesheetRoot);
 
 requireTrue(entityStyles.includes("--shell-sidebar-expanded") && entityStyles.includes(".application-shell.secondary-collapsed"), "双层全局导航没有展开与折叠常驻结构");
 requireTrue(shell.includes("primary-rail") && shell.includes("secondary-sidebar") && navigation.includes('key: "management"'), "一级、二级菜单或管理模块结构缺失");
@@ -30,7 +32,7 @@ for (const label of ["比赛", "阵容类型", "数据窗口", "记录时间", "
 }
 requireTrue(styles.includes(".balanced-lineup-row") && styles.includes("overflow-x: hidden"), "阵容列表仍可能产生横向滚动");
 requireTrue(lineups.includes("open-lineup-player-settings") && main.includes("savePairedLineupPlayerSettings"), "阵容高级字段已隐藏但没有可访问的球员设置入口");
-requireTrue(main.includes("lineup-player-expected-minutes") && main.includes("lineup-player-starting-probability"), "球员分钟与首发概率设置链路缺失");
+requireTrue(lineupWorkflow.includes("lineup-player-expected-minutes") && lineupWorkflow.includes("lineup-player-starting-probability"), "球员分钟与首发概率设置链路缺失");
 
 requireTrue(prediction.includes("taskPageHeader") && prediction.includes("taskContextRibbon") && prediction.includes("core-local-navigation") && prediction.includes("master-detail-workspace"), "正式推演页没有接入任务型平衡布局");
 for (const label of ["P4/P7 的入口、路由与数据准备链已保留", "外部提供器规则入口", "数据窗口", "参数版本", "正式运行与重新校准分开管理"]) {

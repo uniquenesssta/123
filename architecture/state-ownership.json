@@ -718,8 +718,60 @@
       ],
       "transition": null,
       "migration_task": "R13-06"
+    },
+    {
+      "id": "browser.lineups-drafts",
+      "owner": "src/features/lineups/lineupState.ts::createLineupState",
+      "scope": "比赛、双方/单边草稿、名单请求序号和链路，同一Feature上下文消费",
+      "writers": [
+        "对应Feature动作；组合根只通过公开state/actions接线"
+      ],
+      "forbidden": [
+        "src/pages/**"
+      ],
+      "transition": null,
+      "migration_task": "R13-07"
+    },
+    {
+      "id": "browser.lineups-submission",
+      "owner": "src/features/lineups/pairedActions.ts::createPairedActions",
+      "scope": "一次双方提交、未知结果保护、球员设置票据和链路请求身份",
+      "writers": [
+        "对应Feature动作；组合根只通过公开state/actions接线"
+      ],
+      "forbidden": [
+        "src/pages/**"
+      ],
+      "transition": null,
+      "migration_task": "R13-07"
+    },
+    {
+      "id": "browser.lineup-preset-application",
+      "owner": "src/features/lineups/presetApplication.ts::createPresetApplication",
+      "scope": "预设预览/确认票据与side、比赛、草稿和版本绑定",
+      "writers": [
+        "对应Feature动作；组合根只通过公开state/actions接线"
+      ],
+      "forbidden": [
+        "src/pages/**"
+      ],
+      "transition": null,
+      "migration_task": "R13-07"
+    },
+    {
+      "id": "browser.match-imports",
+      "owner": "src/features/lineups/matchImports.ts::MatchImports",
+      "scope": "比赛及AI包共用批次/hash/mode/上下文代次/一次提交锁与结果未知保护",
+      "writers": [
+        "对应Feature动作；组合根只通过公开state/actions接线"
+      ],
+      "forbidden": [
+        "src/pages/**"
+      ],
+      "transition": null,
+      "migration_task": "R13-07"
     }
   ],
-  "count": 49,
-  "last_updated_task": "R13-06"
+  "count": 53,
+  "last_updated_task": "R13-07"
 }

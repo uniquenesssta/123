@@ -1,3 +1,4 @@
+import { readLineupWorkflowSources } from "./features/lineupSources.mjs";
 import {readProjectSource} from "./styles/projectSource.mjs";
 import {fileURLToPath as stylesheetFilePath} from "node:url";
 const stylesheetRoot=stylesheetFilePath(new URL("../",import.meta.url));
@@ -11,6 +12,7 @@ const migration = read("crates/persistence-postgres/migrations/0037_comprehensiv
 const rules = ["src/features/rules/rulesView.ts", "src/features/rules/bindingView.ts", "src/features/competitions/catalogueView.ts", "src/features/competitions/competitionView.ts"].map(read).join("\n");
 const lineups = read("src/pages/lineups.ts");
 const main = read("src/main.ts");
+const lineupWorkflow = readLineupWorkflowSources(stylesheetRoot);
 const styles = read("src/styles/app.css");
 const layout = read("src/styles/layout.css") + read("src/ui/layout/content-region/contentRegion.css");
 const modal = read("src/app/modal/workspacePanelController.ts");
@@ -43,7 +45,7 @@ for (const marker of ["data-rules-scope", "data-rules-region", "data-rules-compe
 }
 requireTrue(main.includes("filterRulesCompetitionCatalogue") && main.includes("selectRulesDirectoryLevel"), "赛事三级目录缺少前端筛选控制器");
 requireTrue(lineups.includes("competitionRegionOrder") && lineups.includes("全球 / FIFA") && lineups.includes("大洋洲 / OFC") && lineups.includes("国家队与俱乐部赛事严格分开"), "新建比赛的赛事地区/足联菜单或国家队/俱乐部隔离缺失");
-requireTrue(main.includes("competition.metadata?.scope") && main.includes("inferCompetitionTeamScope"), "比赛球队范围没有优先读取赛事目录元数据");
+requireTrue(lineupWorkflow.includes("competition.metadata?.scope") && lineupWorkflow.includes("inferCompetitionTeamScope"), "比赛球队范围没有优先读取赛事目录元数据");
 
 requireTrue(layout.includes(".app-shell.workspace-page .balanced-workspace {") && layout.includes("grid-template-rows: auto minmax(0, 1fr);") && layout.includes("flex: 1 1 auto;"), "平衡工作区没有取得页面剩余高度");
 requireTrue(layout.includes(".app-shell.workspace-page .balanced-workspace-main > .workspace-module-view.active") && layout.includes("overflow-y: auto;") && layout.includes("scrollbar-gutter: stable;"), "平衡工作区活动内容没有独立纵向滚动");

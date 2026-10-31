@@ -166,7 +166,7 @@ assert.equal(source.statements.filter(node => ts.isFunctionDeclaration(node) && 
 const loaderJs = ts.transpileModule(functions, { compilerOptions: { target: ts.ScriptTarget.ES2022, module: ts.ModuleKind.None } }).outputText;
 const { TeamsFeature } = loadTeamsProduction(root)("src/features/teams/index.ts");
 const { PlayersFeature }=loadTeamsProduction(root)("src/features/players/index.ts");
-function loaderContext() {
+function loaderContext(retainedTeam = null) {
   const applied = [], router = new Router();
   const context = {
     navigation: router, browserLifecycleController: { signal: { aborted: false } }, session: { bootstrap: { data: { database_configured: true } } },
@@ -177,7 +177,7 @@ function loaderContext() {
     api: {},
   };
   for (const name of ["applyPlayerCatalog", "applyTeamCatalog", "applyLineups", "applyReviewCenter", "applyAnalysisCenter"]) context[name] = () => applied.push(name);
-  context.teamsFeature = new TeamsFeature({ api: context.api, initialQuery: null, snapshot: () => context.session.bootstrap, page: () => router.page, activeTab: () => null, publishOptions: () => applied.push("options"), persistQuery: () => applied.push("teamQuery"), setPresetTab: () => applied.push("presetTab") });
+  context.teamsFeature = new TeamsFeature({ api: context.api, initialQuery: null, snapshot: () => context.session.bootstrap, page: () => router.page, activeTab: () => retainedTeam, publishOptions: () => applied.push("options"), persistQuery: () => applied.push("teamQuery"), setPresetTab: () => applied.push("presetTab") });
   context.playersFeature=new PlayersFeature({api:context.api,initialQuery:null,initialSource:null,snapshot:()=>context.session.bootstrap,page:()=>router.page,persistQuery:()=>applied.push("playerQuery"),persistSource:()=>{},root:()=>({}),busy:fn=>fn()});
   runInNewContext(loaderJs, context);
   return { context, router, applied };
@@ -230,7 +230,7 @@ await test("actual AI workspace loader guards each await including session detai
 });
 await test("actual teams and prediction loaders cannot apply stale multi-step results", async () => {
   for (const page of ["teams", "lineup_presets", "prediction"]) {
-    const { context, router, applied } = loaderContext(), final = deferred(), finalStarted = deferred();
+    const { context, router, applied } = loaderContext(page === "lineup_presets" ? "team" : null), final = deferred(), finalStarted = deferred();
     context.api.listTeams = async () => ({ items: [{ id: "team" }] }); context.api.readTeam = async () => ({ team: { id: "team" } });
     context.api.listCoaches = async () => []; context.api.listFormations = async () => [];
     context.api.listTeamMatchLineups = () => { finalStarted.resolve(); return final.promise; }; context.api.listTeamLineupPresets = async () => [];

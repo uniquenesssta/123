@@ -1,3 +1,5 @@
+import {fileURLToPath} from "node:url";
+import { readLineupWorkflowSources } from "./features/lineupSources.mjs";
 import crypto from "node:crypto";
 import fs from "node:fs";
 import { isVersionAtLeast } from "./version.mjs";
@@ -24,7 +26,7 @@ const client = read("src/api/client.ts");
 const lineupsPage = read("src/pages/lineups.ts");
 const pageLoaders = read("src/controllers/pageLoaders.ts");
 const teamsPage = ["src/features/teams/teamPresentation.ts","src/features/teams/profileView.ts","src/features/teams/packageView.ts","src/features/teams/teamsView.ts"].map(read).join("\n");
-const main = read("src/main.ts");
+const main = readLineupWorkflowSources(fileURLToPath(new URL("..", import.meta.url)));
 const integrationTests = read("crates/persistence-postgres/tests/postgres_integration.rs");
 const pkg = JSON.parse(read("package.json"));
 const hash = crypto.createHash("sha256").update(contractText, "utf8").digest("hex");
@@ -85,8 +87,8 @@ requireTrue(lineupsPage.includes('value="T-N"') && lineupsPage.includes("任意�
 requireTrue(lineupsPage.includes("continue-lineup-prediction"), "阵容链就绪后缺少返回正式推演入口");
 requireTrue(main.includes("readSelectedPredictionLineupChain") && main.includes("openMissingPredictionLineup"), "正式推演缺少阵容预检与修复路由");
 requireTrue(main.includes("loadBothPairedLineupSides") && main.includes("createPairedLineups"), "正式推演阻断未进入双方阵容闭环");
-requireTrue(main.includes("!pairedLineupLoadSequence[side].isCurrent(requestSequence)") && main.includes("pairedSide(side).team_id !== teamId"), "双方球队名单异步加载缺少过期响应隔离");
-requireTrue(main.includes("data_window_start_time") && main.includes("记录时间不能晚于窗口截止"), "时间窗口记录前端门禁缺失");
+requireTrue(main.includes("!c.state.pairedLineupLoadSequence[side].isCurrent(requestSequence)") && main.includes("pairedSide(side).team_id !== teamId"), "双方球队名单异步加载缺少过期响应隔离");
+requireTrue(main.includes("data_window_start_time") && main.includes("记录时间不在所选数据窗口内"), "时间窗口记录前端门禁缺失");
 requireTrue(lineupsPage.includes("主队和客队相对编排") && lineupsPage.includes("一次提交"), "阵容编排仍不是主客队相对输入");
 requireTrue(main.includes('workspaceState.patchModule("prediction", { active_section: "formal" })'), "双方阵容就绪后未闭环返回正式推演");
 requireTrue(integrationTests.includes("match_lineup_chain_versions_model_selection_and_freeze_gate_are_consistent"), "阶段5 PostgreSQL端到端测试缺失");

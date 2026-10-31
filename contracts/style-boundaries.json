@@ -27,7 +27,8 @@
     "src/pages/teams/teamWorkspace.css",
     "src/pages/players/playerWorkspace.css",
     "src/pages/lineups/lineupWorkspace.css",
-    "src/pages/rules/rulesCatalogue.css"
+    "src/pages/rules/rulesCatalogue.css",
+    "src/styles/workspaces/presetEditor.css"
   ],
   "features": [
     {

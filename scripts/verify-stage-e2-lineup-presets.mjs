@@ -1,3 +1,4 @@
+import { readLineupWorkflowSources } from "./features/lineupSources.mjs";
 import {readProjectSource} from "./styles/projectSource.mjs";
 import {fileURLToPath as stylesheetFilePath} from "node:url";
 const stylesheetRoot=stylesheetFilePath(new URL("../",import.meta.url));
@@ -18,7 +19,7 @@ const commands = [...new Set(Object.values(JSON.parse(read("architecture/command
 const commandRegistry = read("src-tauri/src/bootstrap/command_registry.rs");
 const api = read("src/api/client.ts");
 const types = read("src/types.ts");
-const main = read("src/main.ts");
+const main = readLineupWorkflowSources(stylesheetRoot);
 const teams = ["src/features/teams/teamPresentation.ts","src/features/teams/profileView.ts","src/features/teams/packageView.ts","src/features/teams/teamsView.ts"].map(read).join("\n");
 const lineups = read("src/pages/lineups.ts");
 const searchable = read("src/components/searchableSelect.ts");

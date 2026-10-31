@@ -24,3 +24,4 @@
 @import "../pages/players/playerWorkspace.css";
 @import "../pages/lineups/lineupWorkspace.css";
 @import "../pages/rules/rulesCatalogue.css";
+@import "./workspaces/presetEditor.css";

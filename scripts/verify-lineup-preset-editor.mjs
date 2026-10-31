@@ -1,3 +1,4 @@
+import { readLineupWorkflowSources } from "./features/lineupSources.mjs";
 import {readProjectSource} from "./styles/projectSource.mjs";
 import {fileURLToPath as stylesheetFilePath} from "node:url";
 const stylesheetRoot=stylesheetFilePath(new URL("../",import.meta.url));
@@ -10,9 +11,10 @@ const read = (path) => readProjectSource(stylesheetRoot,join(root, path), "utf8"
 const failures = [];
 const check = (condition, message) => { if (!condition) failures.push(message); };
 
-const main = read("src/main.ts");
+const main = readLineupWorkflowSources(stylesheetRoot);
 const css = read("src/styles/components.css");
 const workspaceCss = read("src/styles/workspacePanels.css");
+const approvedEditorCss = read("src/styles/workspaces/presetEditor.css");
 const footballText = read("src/components/footballText.ts");
 const pkg = JSON.parse(read("package.json"));
 
@@ -45,6 +47,7 @@ for (const token of [
   ".preset-editor-validation",
 ]) check(css.includes(token), `阵容预设布局缺少：${token}`);
 check(workspaceCss.includes(".workspace-detail-page.lineup-preset-modal .workspace-detail-body") && workspaceCss.includes("overflow: hidden"), "右侧完整工作区未锁定为内部列表滚动");
+check(approvedEditorCss.includes('.preset-editor-scroll') && approvedEditorCss.includes('overflow: auto') && approvedEditorCss.includes('34px minmax(140px,180fr) 104px 112px minmax(200px,690fr) 52px'), "批准编辑器缺少独立整表滚动与六列共享对齐规则");
 for (const code of ["LDM", "RDM", "LAM", "RAM", "LST", "RST"]) check(footballText.includes(`${code}:`), `中文位置映射缺少 ${code}`);
 
 check(pkg.scripts["verify:lineup-preset-editor"] === "node scripts/verify-lineup-preset-editor.mjs", "package.json缺少阵容预设编辑器专项命令");

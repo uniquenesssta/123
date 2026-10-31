@@ -24,3 +24,38 @@
 .application-shell:where([data-current-page="lineups"]) .paired-lineup-side.balanced .field span { font: 500 12px/18px var(--fip-type-label-family); }
 .application-shell:where([data-current-page="lineups"]) .paired-lineup-side.balanced .field :is(input,select) { min-height: 40px; padding: 8px 12px; font: 400 13px/20px var(--fip-type-input-family); }
 @media (max-width: 1100px) { .application-shell:where([data-current-page="lineups"]) .balanced-lineup-row { grid-template-columns: minmax(0,1fr) 72px 80px 48px 28px; gap: 6px; } }
+
+/* Approved S02 466:4436: compact detail, independent panes and shared 40px fields. */
+.application-shell:where([data-current-page="lineups"]).workspace-page .core-match-workspace .match-browser-layout { grid-template-columns: var(--fip-layout-directory-width) minmax(0,1fr); gap: 8px; }
+.application-shell:where([data-current-page="lineups"]).workspace-page .core-match-workspace .match-browser-detail { padding: 0; background: transparent; }
+.application-shell:where([data-current-page="lineups"]).workspace-page .core-match-workspace .match-editor { display: grid; gap: 8px; }
+.application-shell:where([data-current-page="lineups"]).workspace-page .core-match-workspace .match-editor-heading { display: grid; gap: 8px; padding: 0; border: 0; background: transparent; }
+.application-shell:where([data-current-page="lineups"]).workspace-page .core-match-workspace .match-editor-heading h2 { margin: 0; font: 700 14px/20px var(--fip-type-section-title-family); }
+.application-shell:where([data-current-page="lineups"]).workspace-page .core-match-workspace .match-context-form { margin: 0; padding: 12px; gap: 8px; }
+.application-shell:where([data-current-page="lineups"]).workspace-page .core-match-workspace .match-detail-heading { min-height: 60px; }
+.application-shell:where([data-current-page="lineups"]).workspace-page .core-match-workspace .match-detail-heading h3 { margin: 0; font: 700 14px/20px var(--fip-type-section-title-family); }
+.application-shell:where([data-current-page="lineups"]).workspace-page .core-match-workspace .match-detail-heading p { margin: 2px 0 0; color: var(--fip-muted); font: 400 12px/18px var(--fip-type-body-family); }
+.application-shell:where([data-current-page="lineups"]).workspace-page .core-match-workspace .match-editor-step { margin: 0; font: 700 14px/20px var(--fip-type-section-title-family); }
+.application-shell:where([data-current-page="lineups"]).workspace-page .core-match-workspace .match-context-form .hierarchy-selector { gap: 12px; margin: 0; padding: 0; border: 0; background: transparent; }
+.application-shell:where([data-current-page="lineups"]).workspace-page .core-match-workspace .match-context-form .hierarchy-level { margin: 0; padding: 0; border: 0; background: transparent; }
+.application-shell:where([data-current-page="lineups"]).workspace-page .core-match-workspace .match-context-form .hierarchy-level > span { margin: 0; color: var(--fip-text); font-weight: 500; }
+.application-shell:where([data-current-page="lineups"]).workspace-page .core-match-workspace .match-context-form .match-sides-grid { grid-template-columns: repeat(2,minmax(0,1fr)); gap: 12px; }
+.application-shell:where([data-current-page="lineups"]).workspace-page .core-match-workspace .match-context-form .team-select-card { padding: 0; border: 0; background: transparent; }
+.application-shell:where([data-current-page="lineups"]).workspace-page .core-match-workspace #match-editor-status { grid-template-columns: repeat(2,minmax(0,1fr)); }
+.application-shell:where([data-current-page="lineups"]).workspace-page .core-match-workspace #match-editor-status .field-wide { grid-column: auto; }
+.application-shell:where([data-current-page="lineups"]).workspace-page .core-match-workspace .match-context-form .field { gap: 6px; }
+.application-shell:where([data-current-page="lineups"]).workspace-page .core-match-workspace .match-context-form .field > span { font: 500 13px/18px var(--fip-type-label-family); }
+.application-shell:where([data-current-page="lineups"]).workspace-page .core-match-workspace .match-context-form :is(input,select) { font: 400 13px/20px var(--fip-type-input-family); }
+.application-shell:where([data-current-page="lineups"]).workspace-page .core-match-workspace .match-browser-sidebar .panel-heading h2 { font: 700 14px/20px var(--fip-type-section-title-family); }
+@media (max-width:760px) { .application-shell:where([data-current-page="lineups"]).workspace-page .core-match-workspace .match-browser-layout { grid-template-columns: 1fr; } }
+
+.application-shell:where([data-current-page="lineups"]).workspace-page .core-match-workspace :is(.balanced-workspace,.balanced-workspace-main) { background: var(--fip-canvas); }
+
+.application-shell:where([data-current-page="lineups"]).workspace-page .core-match-workspace .match-browser-sidebar.compact-directory { height: 100%; max-height: none; align-self: stretch; grid-template-rows: auto auto minmax(0,1fr) auto; }
+.application-shell:where([data-current-page="lineups"]).workspace-page .core-match-workspace .match-detail-actions { display: grid; justify-content: start; gap: 8px; margin: 0; }
+.application-shell:where([data-current-page="lineups"]).workspace-page .core-match-workspace .match-detail-actions > button { justify-self: start; }
+.application-shell:where([data-current-page="lineups"]) .page-container { height: calc(100dvh - var(--fip-topbar-height)); overflow: hidden; }
+.application-shell:where([data-current-page="lineups"]) .core-match-workspace { height: 100%; min-height: 0; }
+.application-shell:where([data-current-page="lineups"]).workspace-page .core-match-workspace .match-browser-layout { height: 100%; min-height: 0; align-items: stretch; overflow: hidden; }
+.application-shell:where([data-current-page="lineups"]).workspace-page .core-match-workspace .workspace-module-view[data-workspace-section="matches"].active { height: 100%; overflow: hidden; padding-right: 0; }
+.application-shell:where([data-current-page="lineups"]).workspace-page .core-match-workspace .match-browser-detail { height: 100%; overflow: auto; overscroll-behavior: contain; }

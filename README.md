@@ -1,10 +1,14 @@
 # 足球模型平台公开外壳
 
+## R13-07 预设与双方阵容（2026-10-31 VERIFYING）
+
+76个旧入口函数迁入Lineups Feature，MatchImports由比赛页和工作簿共用；修复跨比赛旧响应/确认、双边提交快照、预设副本隔离及model run引用的比赛删除保护。按批准S02/S08补紧凑详情、预设空态/目录/六列编辑器。29项新生产行为与132项完整挂载检查通过，最终完整96步前端（类型/构建）通过；Rust/Windows构建、原生只读运行通过，本批CI与安装包尚待验。详[07实施记录](docs/modular-rewrite/R13-core-ui-features/R13-07-presets-and-paired-lineups.md)。本批收尾后下一项R13-UI01，再R13-09；原08已并入07，不重开R12。
+
 ## 接入审计后的后续计划（2026-10-31）
 
 根据最新Figma、当前生产实现和原R13～R15任务逐项对照，更新R13～R18任务书、总纲和验收合同。17页均有生产入口；10页存在局部设计差异、7页待同状态/完整挂载验证，不再把已有页面当作从零接入。已完成业务保持DONE，剩余设计单列R13-UI01（6页）；其余补差随对应业务批次交付。原67项义务保持，交付组织由24批调整为25批，其中5批业务已完成、20批待完成。
 
-详[17页/40项接入处置表](docs/modular-rewrite/ui-integration-disposition-20261031.md)、[R13执行任务书](docs/football-model-platform-modular-rewrite-19-docs/13-R13-core-ui-features.md)及[共享验收合同](docs/modular-rewrite/remaining-execution-contract.md)。R12保持结束，R13-07仍PAUSED；UI01为PLANNED，本次没有恢复开发。此次只变更12份Markdown，验证文档引用、数量、状态/依赖与Git差异，不产生新的构建、测试、Windows或Full结果。以下记录按历史时间保留，状态以本段和阶段索引为准。
+详[17页/40项接入处置表](docs/modular-rewrite/ui-integration-disposition-20261031.md)、[R13执行任务书](docs/football-model-platform-modular-rewrite-19-docs/13-R13-core-ui-features.md)及[共享验收合同](docs/modular-rewrite/remaining-execution-contract.md)。该审计时曾暂停07；用户后续明确恢复，当前以本页07记录和阶段索引为准。UI01仍为PLANNED，R12保持结束。此次只变更12份Markdown，验证文档引用、数量、状态/依赖与Git差异，不产生新的构建、测试、Windows或Full结果。以下记录按历史时间保留，状态以本页最新交付及阶段索引为准。
 
 ## R13-06 球员目录、履历与观察（2026-10-31收尾 DONE）
 

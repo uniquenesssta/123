@@ -1,41 +1,43 @@
 import {
-  api,
-  issueWasLogged,
-  recordUiOperation,
-  recordUiOperationFailure,
+api,
+issueWasLogged,
+recordUiOperation,
+recordUiOperationFailure,
 } from "./api/client";
 import { ContextMenuAdapter } from "./app/context-menu";
-import { AsyncScope, EventScope, MountHandle } from "./app/lifecycle";
+import { AsyncScope,EventScope,MountHandle } from "./app/lifecycle";
 import { matchReviewWorkflowAllows } from "./app/matchReviewWorkflow";
-import { ModalController, type ModalConfirmationOptions } from "./app/modal";
-import { NavigationContext, PRIMARY_NAVIGATION, Router, isRoute, type NavigationRequest } from "./app/router";
+import { ModalController,type ModalConfirmationOptions } from "./app/modal";
+import { NavigationContext,PRIMARY_NAVIGATION,Router,isRoute,type NavigationRequest } from "./app/router";
 import { AppSession } from "./app/session";
-import { ApplicationShellController, pageTitle, renderShell } from "./app/shell";
+import { ApplicationShellController,pageTitle,renderShell } from "./app/shell";
 import { WarningCenterController } from "./app/warnings";
-import { WorkspaceCoordinator, type WorkspaceLayoutMode, type WorkspaceTabState } from "./app/workspace";
+import { WorkspaceCoordinator,type WorkspaceLayoutMode,type WorkspaceTabState } from "./app/workspace";
 import { bulkArchiveSummary } from "./components/entityDeletion";
-import { displayPlayerName, positionLabel } from "./components/footballText";
-import { escapeHtml, formatPercent } from "./components/format";
-import { enhanceSearchableSelects, refreshSearchableSelects } from "./components/searchableSelect";
+import { escapeHtml,formatPercent } from "./components/format";
+import { enhanceSearchableSelects,refreshSearchableSelects } from "./components/searchableSelect";
 import {
-  fetchAnalysisCenter,
-  fetchLineups,
+fetchAnalysisCenter,
+fetchLineups,
 
-  fetchReviewCenter,
-  fetchReviewLineups,
-  type AnalysisCenterLoadResult,
-  type LineupsLoadResult,
+fetchReviewCenter,
+fetchReviewLineups,
+type AnalysisCenterLoadResult,
+type LineupsLoadResult,
 
-  type ReviewCenterLoadResult,
+type ReviewCenterLoadResult,
 } from "./controllers/pageLoaders";
 import { bindSearchableSelectDiagnostics } from "./diagnostics/searchableSelectDiagnostics";
 import { architecturePage } from "./features/architecture";
-import { CompetitionFeature, clearRulesCatalogueFilters, filterRulesCompetitionCatalogue, selectRulesDirectoryLevel } from "./features/competitions";
+import { CompetitionFeature,clearRulesCatalogueFilters,filterRulesCompetitionCatalogue,selectRulesDirectoryLevel } from "./features/competitions";
 import { dashboardPage } from "./features/dashboard";
-import { DatabaseFeature, databasePage } from "./features/database";
-import { PlayersFeature, playersPage } from "./features/players";
-import { RulesFeature, routeCard, routeDetailBody, rulesPage } from "./features/rules";
-import { TeamsFeature, teamsPage } from "./features/teams";
+import { DatabaseFeature,databasePage } from "./features/database";
+import { createLineupsFeature } from "./features/lineups";
+import type { LineupSide } from "./features/lineups/lineupContext";
+import { emptyPairedLineupSide } from "./features/lineups/lineupState";
+import { PlayersFeature,playersPage } from "./features/players";
+import { RulesFeature,routeCard,routeDetailBody,rulesPage } from "./features/rules";
+import { TeamsFeature,teamsPage } from "./features/teams";
 import { analyticsPage } from "./pages/analytics";
 import { apiWorkspacePage } from "./pages/apiWorkspace";
 import { lineupPresetsPage } from "./pages/lineupPresets";
@@ -48,82 +50,68 @@ import { reviewPage } from "./pages/review";
 import { runsPage } from "./pages/runs";
 import { workbooksPage } from "./pages/workbooks";
 import { clipboard } from "./platform/clipboard";
-import { localPreferences, preferenceKey, sessionPreferences } from "./platform/storage";
+import { localPreferences,preferenceKey,sessionPreferences } from "./platform/storage";
 import { stopTauriTransport } from "./platform/tauri";
-import { DebouncedTask, RequestSequence } from "./platform/timing";
+import { DebouncedTask } from "./platform/timing";
 import "./styles/index.css";
 import type {
-  AbilityUpdateCandidateRecord,
-  AiAnalysisResponsePreview,
-  AiAnalysisSuggestionRecord,
-  AnalyticsOverview,
-  ApiWorkspacePreset,
-  ApiWorkspaceSessionDetail,
-  ApiWorkspaceSessionRecord,
-  BackgroundJob,
-  CoachListItem,
-  CompetitionKind,
-  EnqueueJobDraft,
-  EvidenceScoringDecisionDraft,
-  FormationRecord,
-  IssueLogEntry,
-  IssueSeverity,
-  LineupBuilderFormState,
-  LineupBuilderPlayer,
-  LineupDraft,
-  LineupPairDraft,
-  LineupPlayerDraft,
-  LineupRecord,
-  LineupSnapshotType,
-  MatchDraft,
-  MatchLineupChain,
-  MatchPredictionReadiness,
-  MatchRecord,
-  MatchReviewDetail,
-  MatchReviewDraft,
-  MatchReviewPackagePreview,
-  MatchReviewPackageWorkflowRecord,
-  MatchReviewSummary,
-  OpenAiApiExampleParseResult,
-  OpenAiApiProtocol,
-  OpenAiProfileDraft,
-  OpenAiProfilesState,
-  P4MatchWorkspace,
-  P4TaskWorkspace,
-  Page,
-  PairedLineupBuilderState,
-  ParameterLifecycleReadinessRequest,
-  ParameterPromotionRequest,
-  ParameterRollbackRequest,
-  ParameterTuningCandidateRecord,
-  ParameterTuningDecisionDraft,
-  ParameterTuningDraft,
-  PlayerListItem,
-  PlayerListQuery,
-  PlayerMatchObservationDraft,
-  PlayerNavigationContext,
-  PostmatchMonitoringRequest,
-  PostmatchOverview,
-  PostmatchSettlementRecord,
-  PredictionCommand,
-  PredictionExecution,
-  PredictionModelFamily,
-  ReleaseAcceptanceRequest,
-  ReleaseAcceptanceRun,
-  ReleaseAcceptanceRunSummary,
-  ResolveP4ConflictCommand,
-  ReviewableMatch,
-  RouteDecision,
-  RoutePreviewCommand,
-  SpreadsheetImportMode,
-  SpreadsheetImportPreview,
-  TeamLineupPresetApplicationPreview,
-  TeamLineupPresetDraft,
-  TeamLineupPresetMemberDraft,
-  TeamLineupPresetRecord,
-  TeamListQuery
+AbilityUpdateCandidateRecord,
+AiAnalysisResponsePreview,
+AiAnalysisSuggestionRecord,
+AnalyticsOverview,
+ApiWorkspacePreset,
+ApiWorkspaceSessionDetail,
+ApiWorkspaceSessionRecord,
+BackgroundJob,
+CoachListItem,
+CompetitionKind,
+EnqueueJobDraft,
+EvidenceScoringDecisionDraft,
+FormationRecord,
+IssueLogEntry,
+IssueSeverity,
+LineupRecord,
+LineupSnapshotType,
+MatchLineupChain,
+MatchPredictionReadiness,
+MatchRecord,
+MatchReviewDetail,
+MatchReviewDraft,
+MatchReviewPackagePreview,
+MatchReviewPackageWorkflowRecord,
+MatchReviewSummary,
+OpenAiApiExampleParseResult,
+OpenAiApiProtocol,
+OpenAiProfileDraft,
+OpenAiProfilesState,
+P4MatchWorkspace,
+P4TaskWorkspace,
+Page,
+ParameterLifecycleReadinessRequest,
+ParameterPromotionRequest,
+ParameterRollbackRequest,
+ParameterTuningCandidateRecord,
+ParameterTuningDecisionDraft,
+ParameterTuningDraft,
+PlayerListQuery,
+PlayerMatchObservationDraft,
+PlayerNavigationContext,
+PostmatchMonitoringRequest,
+PostmatchOverview,
+PostmatchSettlementRecord,
+PredictionCommand,
+PredictionExecution,
+PredictionModelFamily,
+ReleaseAcceptanceRequest,
+ReleaseAcceptanceRun,
+ReleaseAcceptanceRunSummary,
+ResolveP4ConflictCommand,
+ReviewableMatch,
+RouteDecision,
+RoutePreviewCommand,
+TeamListQuery
 } from "./types";
-import { KeyboardShortcutController, motionScrollBehavior } from "./ui/accessibility";
+import { KeyboardShortcutController,motionScrollBehavior } from "./ui/accessibility";
 import { focusValidationTarget } from "./ui/forms/validation-summary";
 import { CommandMenuController } from "./ui/overlays/command-menu";
 
@@ -234,7 +222,7 @@ const teamsFeature = new TeamsFeature({
   },
   async afterForceDelete(result) {
     const page = navigation.page, activeId = removeWorkspaceObjects("teams", [result.team_id]);
-    removeWorkspaceObjects("players", result.deleted_player_ids); playersFeature.imports.clear(); matchSpreadsheetPreview = null;
+    removeWorkspaceObjects("players", result.deleted_player_ids); playersFeature.imports.clear(); lineupsFeature.imports.clear();
     const revision = teamsFeature.catalog.revision;
     await session.refresh(); if (page !== navigation.page || revision !== teamsFeature.catalog.revision) return false;
     if (!await teamsFeature.catalog.load({ resetCursor: true, retainId: activeId, isCurrent: () => navigation.page === page })) return false;
@@ -267,17 +255,9 @@ const playersFeature = new PlayersFeature({
 const navigation = new Router();
 const workflowNavigation = new NavigationContext();
 let lastPredictionResult: unknown = null;
-let pairedLineupPresets: Record<"home" | "away", TeamLineupPresetRecord[]> = {
-  home: [],
-  away: [],
-};
 let coachList: CoachListItem[] = [];
 let formationCatalog: FormationRecord[] = [];
-
-let lineupRecords: LineupRecord[] = [];
-let selectedMatchLineupChain: MatchLineupChain | null = null;
 let selectedPredictionReadiness: MatchPredictionReadiness | null = null;
-let matchSpreadsheetPreview: SpreadsheetImportPreview | null = null;
 let reviewableMatches: ReviewableMatch[] = [];
 let recentMatchReviews: MatchReviewSummary[] = [];
 let selectedReviewMatchId: string | null = null;
@@ -293,50 +273,40 @@ let aiAnalysisResponsePath: string | null = null;
 let aiAnalysisSuggestions: AiAnalysisSuggestionRecord[] = [];
 let analysisAbilityCandidates: AbilityUpdateCandidateRecord[] = [];
 let lastAiAnalysisPackageId: string | null = localPreferences.getItem(ANALYSIS_PACKAGE_ID_KEY);
-let lineupPlayerCandidates: PlayerListItem[] = [];
-let lineupBuilderPlayers: LineupBuilderPlayer[] = [];
-const lineupPlayerLoadSequence = new RequestSequence();
-let lineupBuilderForm: LineupBuilderFormState = {
-  match_id: "",
-  team_id: "",
-  lineup_type: "expected",
-  snapshot_type: "T-N",
-  formation_id: "4737da75-7c7b-52f5-acf5-ea9bfa809c48",
-  formation: "4-2-3-1",
-  coach_id: "",
-  source_urls: "",
-  captured_at: "",
-  quality_score: 0.8,
-};
-type LineupSide = "home" | "away";
 
-const DEFAULT_FORMATION_ID = "4737da75-7c7b-52f5-acf5-ea9bfa809c48";
-const DEFAULT_FORMATION_CODE = "4-2-3-1";
-
-function emptyPairedLineupSide(): PairedLineupBuilderState[LineupSide] {
-  return {
-    team_id: "",
-    team_name: "",
-    formation_id: DEFAULT_FORMATION_ID,
-    formation: DEFAULT_FORMATION_CODE,
-    coach_id: "",
-    quality_score: 0.8,
-    players: [],
-    candidates: [],
-  };
-}
-
-let pairedLineupBuilder: PairedLineupBuilderState = {
-  match_id: "",
-  lineup_type: "expected",
-  snapshot_type: "T-N",
-  captured_at: "",
-  source_urls: "",
-  home: emptyPairedLineupSide(),
-  away: emptyPairedLineupSide(),
-};
-const pairedLineupLoadSequence: Record<LineupSide, RequestSequence> = { home: new RequestSequence(), away: new RequestSequence() };
-let selectedManagedMatchId: string | null = null;
+const lineupsFeature = createLineupsFeature({
+recordUiOperation,recordUiOperationFailure,pageTitle,
+get references(){return playersFeature.catalog.references;},
+setReferences:value=>playersFeature.catalog.setReferences(value),
+get coachList(){return coachList;}, set coachList(v){coachList=v;},
+localDateTimeInputValue:(...args)=>localDateTimeInputValue(...args),
+api,files:api,
+render:(...args)=>render(...args),
+get formationCatalog(){return formationCatalog;}, set formationCatalog(v){formationCatalog=v;},
+toast:(...args)=>toast(...args),
+get teamDetail(){return teamsFeature.catalog.detail;},get teamPresets(){return teamsFeature.catalog.presets;},setTeamPresets:(id,presets)=>teamsFeature.catalog.setPresets(id,presets),refreshTeam:async()=>{await teamsFeature.catalog.refreshSelected();},
+showHtmlModal:(...args)=>showHtmlModal(...args),
+value:(...args)=>value(...args),
+nullableValue:(...args)=>nullableValue(...args),
+nullableNumber:(...args)=>nullableNumber(...args),
+checked:(...args)=>checked(...args),
+runBusy:(...args)=>runBusy(...args),
+showConfirmation:(...args)=>showConfirmation(...args),
+closeModal:(...args)=>closeModal(...args),
+localDateTimeToIso:(...args)=>localDateTimeToIso(...args),
+get lastPredictionResult(){return lastPredictionResult;}, set lastPredictionResult(v){lastPredictionResult=v;},
+get workspaceState(){ return workspaceState; },
+session,
+filterSelectOptions:(...args)=>filterSelectOptions(...args),
+get app(){ return app; },
+refreshBootstrapAndCatalog:(...args)=>refreshBootstrapAndCatalog(...args),
+navigation,
+recordClientIssue:(...args)=>recordClientIssue(...args),
+userFacingError:(...args)=>userFacingError(...args),
+get selectedReviewMatchId(){return selectedReviewMatchId;}, set selectedReviewMatchId(v){selectedReviewMatchId=v;},
+loadReviewLineups:(...args)=>loadReviewLineups(...args),
+missingLineupTeam:(...args)=>missingLineupTeam(...args)
+});
 
 interface WorkflowContinuation {
   readonly reason: string;
@@ -429,8 +399,8 @@ async function startWorkflowCompletion(button: HTMLElement): Promise<void> {
   workflowNavigation.set({ page: navigation.page, section: workflowSection(navigation.page) });
   workflowContinuation = {
     reason: button.dataset.returnReason ?? "补齐缺失资料后返回",
-    matchId: pairedLineupBuilder.match_id || selectedManagedMatchId,
-    snapshotType: pairedLineupBuilder.snapshot_type,
+    matchId: lineupsFeature.state.pairedLineupBuilder.match_id || lineupsFeature.state.selectedManagedMatchId,
+    snapshotType: lineupsFeature.state.pairedLineupBuilder.snapshot_type,
   };
   const targetSection = button.dataset.targetSection ?? null;
   if (targetSection) workspaceState.patchModule(targetPage, { active_section: targetSection });
@@ -448,18 +418,18 @@ async function returnToWorkflow(): Promise<void> {
     });
   }
   if (continuation.matchId) {
-    selectedManagedMatchId = continuation.matchId;
+    lineupsFeature.state.selectedManagedMatchId = continuation.matchId;
     selectedP4MatchId = continuation.matchId;
-    pairedLineupBuilder = {
-      ...pairedLineupBuilder,
+    lineupsFeature.state.pairedLineupBuilder = {
+      ...lineupsFeature.state.pairedLineupBuilder,
       match_id: continuation.matchId,
-      snapshot_type: continuation.snapshotType ?? pairedLineupBuilder.snapshot_type,
+      snapshot_type: continuation.snapshotType ?? lineupsFeature.state.pairedLineupBuilder.snapshot_type,
     };
   }
   await navigateTo(returnTarget.page);
   if (returnTarget.page === "lineups" && continuation.matchId) {
-    resetPairedBuilderForMatch(continuation.matchId, false);
-    await loadBothPairedLineupSides();
+    lineupsFeature.actions.resetPairedBuilderForMatch(continuation.matchId, false);
+    await lineupsFeature.actions.loadBothPairedLineupSides();
     render({ preserveForm: true });
   }
 }
@@ -472,10 +442,10 @@ function render(options: RenderOptions = {}): void {
   playersFeature.drafts.capture(app);
   modal.capture();
   if (options.preserveForm === true && renderedPage === "lineups") {
-    capturePairedLineupFromDom();
+    lineupsFeature.actions.capturePairedLineupFromDom();
   }
   if (options.preserveForm === true && renderedPage === "review") {
-    captureLineupFormFromDom();
+    lineupsFeature.actions.captureLineupFormFromDom();
   }
   if (!session.bootstrap) {
     app.innerHTML = `<div class="boot-screen"><div class="spinner"></div><strong>正在启动平台</strong></div>`;
@@ -527,7 +497,7 @@ function render(options: RenderOptions = {}): void {
     }
     case "workbooks": {
       const workspace = workspaceState.module("workbooks");
-      content = workbooksPage(session.bootstrap, teamsFeature.imports.monthly, playersFeature.imports.preview, matchSpreadsheetPreview, workspace.module_sidebar_collapsed, workspace.inspector_collapsed, workspace.active_section ?? "team");
+      content = workbooksPage(session.bootstrap, teamsFeature.imports.monthly, playersFeature.imports.preview, lineupsFeature.imports.preview, workspace.module_sidebar_collapsed, workspace.inspector_collapsed, workspace.active_section ?? "team");
       break;
     }
     case "lineups": {
@@ -535,13 +505,13 @@ function render(options: RenderOptions = {}): void {
       content = lineupsPage(
         session.bootstrap,
         playersFeature.catalog.references,
-        lineupRecords,
-        matchSpreadsheetPreview,
-        pairedLineupBuilder,
-        pairedLineupPresets,
+        lineupsFeature.state.lineupRecords,
+        lineupsFeature.imports.preview,
+        lineupsFeature.state.pairedLineupBuilder,
+        lineupsFeature.state.pairedLineupPresets,
         coachList,
-        selectedMatchLineupChain,
-        selectedManagedMatchId,
+        lineupsFeature.state.selectedMatchLineupChain,
+        lineupsFeature.state.selectedManagedMatchId,
         workspace.module_sidebar_collapsed,
         workspace.inspector_collapsed,
         workspace.active_section ?? "matches",
@@ -556,7 +526,7 @@ function render(options: RenderOptions = {}): void {
         selectedP4MatchId,
         p4MatchWorkspace,
         p4TaskWorkspace,
-        selectedMatchLineupChain,
+        lineupsFeature.state.selectedMatchLineupChain,
         selectedPredictionReadiness,
         selectedPredictionSnapshot,
         selectedPredictionModelFamily,
@@ -580,9 +550,9 @@ function render(options: RenderOptions = {}): void {
         selectedReviewSettlement,
         recentMatchReviews,
         playersFeature.catalog.references,
-        lineupPlayerCandidates,
-        lineupBuilderPlayers,
-        lineupBuilderForm,
+        lineupsFeature.state.lineupPlayerCandidates,
+        lineupsFeature.state.lineupBuilderPlayers,
+        lineupsFeature.state.lineupBuilderForm,
         Number.isInteger(storedStep) && storedStep >= 1 && storedStep <= 9 ? storedStep : null,
       );
       break;
@@ -677,11 +647,11 @@ function render(options: RenderOptions = {}): void {
   queueMicrotask(() => {
     const matchCompetition = currentPageRoot.querySelector<HTMLSelectElement>("#new-match-competition");
     if (matchCompetition) {
-      updateCompetitionHierarchy("init");
-      autoSelectMatchSeason();
-      filterMatchTeamOptions();
-      updateFormationHierarchy("home", "init");
-      updateFormationHierarchy("away", "init");
+      lineupsFeature.actions.updateCompetitionHierarchy("init");
+      lineupsFeature.actions.autoSelectMatchSeason();
+      lineupsFeature.actions.filterMatchTeamOptions();
+      lineupsFeature.actions.updateFormationHierarchy("home", "init");
+      lineupsFeature.actions.updateFormationHierarchy("away", "init");
     }
     enhanceSearchableSelects(currentPageRoot);
     refreshSearchableSelects(currentPageRoot);
@@ -1452,21 +1422,21 @@ function localDateTimeInputValue(raw: string): string {
 
 function applyLineups(result: LineupsLoadResult): void {
   playersFeature.catalog.setReferences(result.references);
-  lineupRecords = result.records;
+  lineupsFeature.state.lineupRecords = result.records;
   coachList = result.coaches;
   const matches = result.references.managed_matches;
-  if (selectedManagedMatchId && !matches.some((item) => item.id === selectedManagedMatchId)) {
-    selectedManagedMatchId = null;
+  if (lineupsFeature.state.selectedManagedMatchId && !matches.some((item) => item.id === lineupsFeature.state.selectedManagedMatchId)) {
+    lineupsFeature.state.selectedManagedMatchId = null;
   }
-  if (pairedLineupBuilder.match_id && !matches.some((item) => item.id === pairedLineupBuilder.match_id)) {
-    pairedLineupBuilder = {
-      ...pairedLineupBuilder,
+  if (lineupsFeature.state.pairedLineupBuilder.match_id && !matches.some((item) => item.id === lineupsFeature.state.pairedLineupBuilder.match_id)) {
+    lineupsFeature.state.pairedLineupBuilder = {
+      ...lineupsFeature.state.pairedLineupBuilder,
       match_id: "",
       home: emptyPairedLineupSide(),
       away: emptyPairedLineupSide(),
     };
   }
-  selectedManagedMatchId ??= matches[0]?.id ?? null;
+  lineupsFeature.state.selectedManagedMatchId ??= matches[0]?.id ?? null;
 }
 
 async function loadLineups(): Promise<void> {
@@ -1957,7 +1927,7 @@ async function createLineupPlayerQuick(): Promise<void> {
       });
     }
     await refreshBootstrapAndCatalog();
-    lineupBuilderForm = { ...lineupBuilderForm, team_id: teamId };
+    lineupsFeature.state.lineupBuilderForm = { ...lineupsFeature.state.lineupBuilderForm, team_id: teamId };
     const list = await api.listPlayers({
       search: null,
       team_id: teamId,
@@ -1968,53 +1938,14 @@ async function createLineupPlayerQuick(): Promise<void> {
       cursor_name: null,
       cursor_id: null,
     });
-    lineupPlayerCandidates = list.items;
+    lineupsFeature.state.lineupPlayerCandidates = list.items;
   });
   render();
   toast("球员已创建并加入球队，可继续编辑阵容", "success");
 }
 
-function selectedExchangeMatchId(): string {
-  const matchId = nullableValue("exchange-match-id");
-  if (!matchId) throw new Error("请先选择比赛");
-  return matchId;
-}
-
-async function exportMatchTemplate(): Promise<void> {
-  const outputPath = await api.chooseExcelExportFile("比赛与阵容输入模板.xlsx");
-  if (!outputPath) return;
-  const result = await runBusy(() => api.exportMatchLineupTemplate(outputPath));
-  toast(`比赛模板已导出：${result.output_path}`, "success");
-}
-
-async function exportMatchData(): Promise<void> {
-  const matchId = selectedExchangeMatchId();
-  const outputPath = await api.chooseExcelExportFile("比赛与阵容导出.xlsx");
-  if (!outputPath) return;
-  const result = await runBusy(() =>
-    api.exportMatchLineupData(outputPath, matchId),
-  );
-  toast(
-    `已导出 ${result.lineup_count} 份阵容和 ${result.player_count} 名球员`,
-    "success",
-  );
-}
-
-async function exportAiMatchPackage(): Promise<void> {
-  const matchId = selectedExchangeMatchId();
-  const outputPath = await api.chooseZipExportFile("比赛推演分析包.zip");
-  if (!outputPath) return;
-  const result = await runBusy(() =>
-    api.exportAiMatchPackage(outputPath, matchId),
-  );
-  toast(
-    `智能分析资料已导出，包含 ${result.player_count} 名球员信息`,
-    "success",
-  );
-}
-
 async function calculateStoredMatch(): Promise<void> {
-  const matchId = selectedExchangeMatchId();
+  const matchId = lineupsFeature.actions.selectedExchangeMatchId();
   const result = await runBusy(() =>
     api.executePredictionFromMatch({
       match_id: matchId,
@@ -2087,7 +2018,7 @@ async function readSelectedPredictionLineupChain(): Promise<MatchLineupChain> {
   selectedP4MatchId = matchId;
   selectedPredictionSnapshot = snapshotType;
   const chain = await api.readMatchLineupChain(matchId, snapshotType);
-  selectedMatchLineupChain = chain;
+  lineupsFeature.state.selectedMatchLineupChain = chain;
   return chain;
 }
 
@@ -2105,7 +2036,7 @@ async function openMissingPredictionLineup(
   chain: MatchLineupChain,
 ): Promise<void> {
   const target = missingLineupTeam(chain);
-  pairedLineupBuilder = {
+  lineupsFeature.state.pairedLineupBuilder = {
     match_id: chain.match_record.id,
     lineup_type: "expected",
     snapshot_type: chain.snapshot_type as LineupSnapshotType,
@@ -2115,17 +2046,17 @@ async function openMissingPredictionLineup(
       ...emptyPairedLineupSide(),
       team_id: chain.home.team_id,
       team_name: chain.home.team_name,
-      coach_id: preferredCoachForTeam(chain.home.team_id),
+      coach_id: lineupsFeature.actions.preferredCoachForTeam(chain.home.team_id),
     },
     away: {
       ...emptyPairedLineupSide(),
       team_id: chain.away.team_id,
       team_name: chain.away.team_name,
-      coach_id: preferredCoachForTeam(chain.away.team_id),
+      coach_id: lineupsFeature.actions.preferredCoachForTeam(chain.away.team_id),
     },
   };
-  selectedManagedMatchId = chain.match_record.id;
-  selectedMatchLineupChain = chain;
+  lineupsFeature.state.selectedManagedMatchId = chain.match_record.id;
+  lineupsFeature.state.selectedMatchLineupChain = chain;
   workflowNavigation.set({ page: "prediction", section: workspaceState.module("prediction").active_section ?? "formal" });
   workflowContinuation = {
     reason: `补齐${chain.match_record.home_team_name}与${chain.match_record.away_team_name}双方阵容`,
@@ -2137,7 +2068,7 @@ async function openMissingPredictionLineup(
     controls: {},
   });
   await navigateTo("lineups");
-  const [homeCount, awayCount] = await runBusy(loadBothPairedLineupSides);
+  const [homeCount, awayCount] = await runBusy(lineupsFeature.actions.loadBothPairedLineupSides);
   render({ preserveForm: true });
   toast(
     `已进入双方阵容编排：${chain.home.team_name} ${homeCount} 人，${chain.away.team_name} ${awayCount} 人`,
@@ -2161,7 +2092,7 @@ async function checkPredictionLineupChain(): Promise<void> {
     return { readiness, chain };
   });
   selectedPredictionReadiness = outcome.readiness;
-  selectedMatchLineupChain = outcome.chain;
+  lineupsFeature.state.selectedMatchLineupChain = outcome.chain;
   render({ preserveForm: true });
   toast(
     outcome.readiness.can_run_formal
@@ -2173,9 +2104,9 @@ async function checkPredictionLineupChain(): Promise<void> {
 
 async function preparePredictionLineups(): Promise<void> {
   const chain =
-    selectedMatchLineupChain?.match_record.id === selectedPredictionMatchId() &&
-    selectedMatchLineupChain.snapshot_type === selectedPredictionSnapshotType()
-      ? selectedMatchLineupChain
+    lineupsFeature.state.selectedMatchLineupChain?.match_record.id === selectedPredictionMatchId() &&
+    lineupsFeature.state.selectedMatchLineupChain.snapshot_type === selectedPredictionSnapshotType()
+      ? lineupsFeature.state.selectedMatchLineupChain
       : await runBusy(readSelectedPredictionLineupChain);
   if (chain.ready_for_model) {
     render({ preserveForm: true });
@@ -2186,7 +2117,7 @@ async function preparePredictionLineups(): Promise<void> {
 }
 
 async function continueLineupPrediction(): Promise<void> {
-  const chain = selectedMatchLineupChain;
+  const chain = lineupsFeature.state.selectedMatchLineupChain;
   if (!chain?.ready_for_model) throw new Error("双方阵容尚未通过模型门禁");
   workflowContinuation = null;
   workflowNavigation.clear();
@@ -2247,7 +2178,7 @@ async function calculatePredictionMatch(): Promise<void> {
     return { readiness, chain, result };
   });
   selectedPredictionReadiness = outcome.readiness;
-  selectedMatchLineupChain = outcome.chain;
+  lineupsFeature.state.selectedMatchLineupChain = outcome.chain;
   if (!outcome.result) {
     render({ preserveForm: true });
     if (outcome.chain && !outcome.chain.ready_for_model) {
@@ -2333,1376 +2264,6 @@ async function resolveP4Conflict(
   );
 }
 
-async function previewMatchImport(aiPackage: boolean): Promise<void> {
-  const inputPath = aiPackage
-    ? await api.chooseZipImportFile()
-    : await api.chooseExcelImportFile();
-  if (!inputPath) return;
-  const mode = value("match-import-mode") as SpreadsheetImportMode;
-  matchSpreadsheetPreview = await runBusy(() =>
-    aiPackage
-      ? api.previewAiMatchPackage(inputPath, mode)
-      : api.previewMatchLineupImport(inputPath, mode),
-  );
-  render();
-  const blocking =
-    matchSpreadsheetPreview.counts.conflict +
-    matchSpreadsheetPreview.counts.error;
-  toast(
-    blocking > 0 ? `预检完成：${blocking} 条需要处理` : "比赛与阵容预检通过",
-    blocking > 0 ? "error" : "success",
-  );
-}
-
-async function resolveMatchImportConflict(
-  rowId: string,
-  entityId: string | null,
-  skip: boolean,
-): Promise<void> {
-  if (!matchSpreadsheetPreview) throw new Error("没有比赛导入预检批次");
-  matchSpreadsheetPreview = await runBusy(() =>
-    api.resolveMatchLineupImportConflict(matchSpreadsheetPreview!.batch_id, {
-      row_id: rowId,
-      selected_entity_id: entityId,
-      skip,
-    }),
-  );
-  render();
-}
-
-async function commitMatchImport(): Promise<void> {
-  if (!matchSpreadsheetPreview) throw new Error("没有比赛导入预检批次");
-  const result = await runBusy(() =>
-    api.commitMatchLineupImport(matchSpreadsheetPreview!.batch_id),
-  );
-  matchSpreadsheetPreview = await api.readMatchLineupImportPreview(
-    result.batch_id,
-  );
-  await refreshBootstrapAndCatalog();
-  lineupRecords = await api.listLineups(null, 100);
-  render();
-  toast(
-    `比赛与阵容导入完成：新增 ${result.inserted_count}，更新 ${result.updated_count}`,
-    "success",
-  );
-}
-
-function pairedSide(side: LineupSide): PairedLineupBuilderState[LineupSide] {
-  return pairedLineupBuilder[side];
-}
-
-function selectedManagedMatch(matchId = pairedLineupBuilder.match_id): MatchRecord | null {
-  return (
-    playersFeature.catalog.references?.managed_matches.find((match) => match.id === matchId) ??
-    playersFeature.catalog.references?.upcoming_matches.find((match) => match.id === matchId) ??
-    null
-  );
-}
-
-function preferredCoachForTeam(teamId: string): string {
-  const candidates = coachList.filter((coach) => coach.current_team_id === teamId);
-  return (
-    candidates.find((coach) => coach.current_role === "head_coach") ??
-    candidates.find((coach) => coach.current_role === "interim_head_coach") ??
-    candidates.find((coach) => coach.current_role === "caretaker") ??
-    candidates[0]
-  )?.id ?? "";
-}
-
-function resetPairedBuilderForMatch(matchId: string, preserveCommon = true): void {
-  const match = selectedManagedMatch(matchId);
-  if (!match) throw new Error("比赛不存在或尚未加载");
-  const now = Date.now();
-  const kickoff = new Date(match.kickoff_time).getTime();
-  const defaultCaptured = localDateTimeInputValue(
-    new Date(Math.min(now, kickoff - 1_000)).toISOString(),
-  );
-  pairedLineupLoadSequence.home.invalidate();
-  pairedLineupLoadSequence.away.invalidate();
-  pairedLineupBuilder = {
-    match_id: match.id,
-    lineup_type: preserveCommon ? pairedLineupBuilder.lineup_type : "expected",
-    snapshot_type: preserveCommon ? pairedLineupBuilder.snapshot_type : "T-N",
-    captured_at: preserveCommon && pairedLineupBuilder.captured_at
-      ? pairedLineupBuilder.captured_at
-      : defaultCaptured,
-    source_urls: preserveCommon ? pairedLineupBuilder.source_urls : "",
-    home: {
-      ...emptyPairedLineupSide(),
-      team_id: match.home_team_id,
-      team_name: match.home_team_name,
-      coach_id: preferredCoachForTeam(match.home_team_id),
-    },
-    away: {
-      ...emptyPairedLineupSide(),
-      team_id: match.away_team_id,
-      team_name: match.away_team_name,
-      coach_id: preferredCoachForTeam(match.away_team_id),
-    },
-  };
-  pairedLineupPresets = { home: [], away: [] };
-  selectedManagedMatchId = match.id;
-  selectedMatchLineupChain = null;
-}
-
-function capturePairedSideFromDom(side: LineupSide): void {
-  const current = pairedSide(side);
-  const formationSelect = document.querySelector<HTMLSelectElement>(
-    `#paired-${side}-formation-id`,
-  );
-  const formationInput = document.querySelector<HTMLInputElement>(
-    `#paired-${side}-formation`,
-  );
-  const coach = document.querySelector<HTMLSelectElement>(`#paired-${side}-coach`);
-  const quality = document.querySelector<HTMLInputElement>(`#paired-${side}-quality`);
-  const rows = Array.from(
-    document.querySelectorAll<HTMLElement>(
-      `[data-lineup-builder-row][data-lineup-side="${side}"]`,
-    ),
-  );
-  const players = rows.length === 0
-    ? current.players
-    : rows.map((row) => {
-        const playerId = row.dataset.playerId ?? "";
-        const existing = current.players.find((item) => item.player_id === playerId);
-        if (!existing) throw new Error(`${current.team_name || "球队"}阵容状态丢失，请重新加载名单`);
-        const read = (field: string): string =>
-          row.querySelector<HTMLInputElement | HTMLSelectElement>(
-            `[data-lineup-field="${field}"]`,
-          )?.value ?? "";
-        const minutes = read("expected_minutes").trim();
-        const shirt = read("shirt_number").trim();
-        const benchOrder = read("bench_order").trim();
-        const startingProbability = read("starting_probability").trim();
-        const membershipOverride = row.querySelector<HTMLInputElement>(
-          '[data-lineup-field="membership_override"]',
-        )?.checked ?? false;
-        const positionCode = read("position_code") || null;
-        const currentRole = read("role_code") || null;
-        const candidate = current.candidates.find((item) => item.id === playerId);
-        const previousDefaultRole = candidate
-          ? defaultRoleForPlayer(candidate, existing.position_code)
-          : null;
-        const nextDefaultRole = candidate
-          ? defaultRoleForPlayer(candidate, positionCode)
-          : null;
-        const roleCode = !currentRole || currentRole === previousDefaultRole
-          ? nextDefaultRole
-          : currentRole;
-        return {
-          ...existing,
-          is_starter: read("is_starter") === "true",
-          position_code: positionCode,
-          role_code: roleCode,
-          expected_minutes: minutes ? Number(minutes) : null,
-          shirt_number: shirt ? Number(shirt) : null,
-          bench_order: benchOrder ? Number(benchOrder) : null,
-          starting_probability: startingProbability ? Number(startingProbability) : null,
-          membership_override: membershipOverride,
-        };
-      });
-  const selectedFormation = formationSelect?.selectedOptions[0];
-  pairedLineupBuilder = {
-    ...pairedLineupBuilder,
-    [side]: {
-      ...current,
-      formation_id: formationSelect?.value ?? current.formation_id,
-      formation: selectedFormation?.dataset.code ?? formationInput?.value ?? current.formation,
-      coach_id: coach?.value ?? current.coach_id,
-      quality_score: Number(quality?.value || current.quality_score),
-      players,
-    },
-  };
-}
-
-function capturePairedLineupFromDom(): void {
-  const match = document.querySelector<HTMLSelectElement>("#paired-lineup-match");
-  if (!match) return;
-  const lineupType = document.querySelector<HTMLSelectElement>("#paired-lineup-type");
-  const snapshot = document.querySelector<HTMLSelectElement>("#paired-lineup-snapshot");
-  const captured = document.querySelector<HTMLInputElement>("#paired-lineup-captured-at");
-  const sourceUrls = document.querySelector<HTMLInputElement>("#paired-lineup-source-urls");
-  pairedLineupBuilder = {
-    ...pairedLineupBuilder,
-    match_id: match.value || pairedLineupBuilder.match_id,
-    lineup_type: (lineupType?.value ?? pairedLineupBuilder.lineup_type) as PairedLineupBuilderState["lineup_type"],
-    snapshot_type: (snapshot?.value ?? pairedLineupBuilder.snapshot_type) as LineupSnapshotType,
-    captured_at: captured?.value ?? pairedLineupBuilder.captured_at,
-    source_urls: sourceUrls?.value ?? pairedLineupBuilder.source_urls,
-  };
-  capturePairedSideFromDom("home");
-  capturePairedSideFromDom("away");
-}
-
-async function loadPairedLineupSide(side: LineupSide): Promise<number> {
-  const current = pairedSide(side);
-  if (!current.team_id) throw new Error(`${side === "home" ? "主队" : "客队"}尚未确定`);
-  const requestSequence = pairedLineupLoadSequence[side].next();
-  const teamId = current.team_id;
-  const [result, presets] = await Promise.all([
-    api.listPlayers({
-      search: null,
-      team_id: teamId,
-      position_code: null,
-      availability_status: null,
-      player_status: "active",
-      limit: 200,
-      cursor_name: null,
-      cursor_id: null,
-    }),
-    api.listTeamLineupPresets(teamId, false),
-  ]);
-  if (
-    !pairedLineupLoadSequence[side].isCurrent(requestSequence) ||
-    pairedSide(side).team_id !== teamId
-  ) {
-    return 0;
-  }
-  const selected = pairedSide(side).players.filter((item) =>
-    result.items.some((candidate) => candidate.id === item.player_id),
-  );
-  pairedLineupPresets = { ...pairedLineupPresets, [side]: presets };
-  pairedLineupBuilder = {
-    ...pairedLineupBuilder,
-    [side]: {
-      ...pairedSide(side),
-      coach_id: pairedSide(side).coach_id || preferredCoachForTeam(teamId),
-      candidates: result.items,
-      players: selected,
-    },
-  };
-  return result.items.length;
-}
-
-async function loadBothPairedLineupSides(): Promise<[number, number]> {
-  if (!pairedLineupBuilder.match_id) throw new Error("请先选择比赛");
-  return Promise.all([
-    loadPairedLineupSide("home"),
-    loadPairedLineupSide("away"),
-  ]);
-}
-
-function defaultRoleForPlayer(
-  player: PlayerListItem,
-  positionCode: string | null,
-): string | null {
-  const code = positionCode || player.primary_position_code;
-  if (code && player.position_role_map?.[code]) return player.position_role_map[code];
-  return player.primary_role_code;
-}
-
-function addPairedLineupPlayer(
-  side: LineupSide,
-  playerId: string,
-  starter: boolean,
-  positionCode: string | null = null,
-): void {
-  capturePairedLineupFromDom();
-  const current = pairedSide(side);
-  if (current.players.some((item) => item.player_id === playerId)) return;
-  const player = current.candidates.find((item) => item.id === playerId);
-  if (!player) throw new Error(`${current.team_name}名单中不存在该球员`);
-  if (starter && current.players.filter((item) => item.is_starter).length >= 11) {
-    throw new Error(`${current.team_name}首发人数不能超过 11 人`);
-  }
-  const playerName = displayPlayerName(player);
-  const next: LineupBuilderPlayer = {
-    player_id: player.id,
-    player_name: playerName.primary,
-    player_secondary_name: playerName.secondary,
-    position_code: positionCode || player.primary_position_code,
-    role_code: defaultRoleForPlayer(player, positionCode),
-    is_starter: starter,
-    expected_minutes: starter ? 90 : 20,
-    shirt_number: null,
-    bench_order: starter ? null : current.players.filter((item) => !item.is_starter).length + 1,
-    starting_probability: starter ? 1 : 0,
-    membership_override: false,
-    availability_status: player.availability_status,
-  };
-  pairedLineupBuilder = {
-    ...pairedLineupBuilder,
-    [side]: { ...current, players: [...current.players, next] },
-  };
-  render();
-}
-
-function addSelectedPairedLineupPlayer(side: LineupSide): void {
-  const playerSelect = document.querySelector<HTMLSelectElement>(`#paired-${side}-candidate`);
-  const roleSelect = document.querySelector<HTMLSelectElement>(`#paired-${side}-candidate-role`);
-  const positionSelect = document.querySelector<HTMLSelectElement>(`#paired-${side}-candidate-position`);
-  const playerId = playerSelect?.value ?? "";
-  if (!playerId) throw new Error("请先选择球员");
-  addPairedLineupPlayer(
-    side,
-    playerId,
-    (roleSelect?.value ?? "starter") === "starter",
-    positionSelect?.value || null,
-  );
-}
-
-function presetMemberDraftFromBuilder(
-  player: LineupBuilderPlayer,
-  index: number,
-): TeamLineupPresetMemberDraft {
-  return {
-    player_id: player.player_id,
-    position_code: player.position_code,
-    role_code: player.role_code,
-    is_starter: player.is_starter,
-    shirt_number: player.shirt_number,
-    expected_minutes: player.expected_minutes,
-    sequence_no: index + 1,
-    bench_order: player.is_starter ? null : player.bench_order,
-    is_captain: false,
-    metadata: {},
-  };
-}
-
-function presetContextLabel(value: string): string {
-  return ({
-    general: "通用",
-    league: "联赛常规",
-    cup: "杯赛轮换",
-    attacking: "进攻方案",
-    defensive: "防守方案",
-    rotation: "轮换方案",
-    temporary: "临时方案",
-  } as Record<string, string>)[value] ?? value;
-}
-
-const TACTICAL_ROLE_OPTIONS: Readonly<Record<string, readonly string[]>> = {
-  GK: ["门线型门将", "出击型门将", "清道夫门将"],
-  CB: ["盯人中卫", "出球中卫", "拖后中卫"],
-  FB: ["防守型边后卫", "进攻型边后卫", "内收边后卫"],
-  WB: ["翼卫", "进攻型翼卫", "防守型翼卫"],
-  DM: ["单后腰", "防守型后腰", "组织型后腰", "抢球型中场"],
-  CM: ["全能中场", "组织核心", "控球中场", "抢球型中场"],
-  AM: ["前场组织核心", "组织核心", "影锋", "边路组织者"],
-  W: ["边锋", "内切边锋", "边路组织者"],
-  SS: ["影锋", "前场组织核心", "第二前锋"],
-  ST: ["抢点中锋", "支点中锋", "全能前锋", "伪九号", "反击前锋"],
-};
-
-function formationSlotCodes(formationId: string | null): string[] {
-  if (!formationId) return [];
-  const formation = formationCatalog.find((item) => item.id === formationId);
-  if (!formation || !Array.isArray(formation.slot_definition)) return [];
-  return [...new Set(formation.slot_definition.filter((item): item is string => typeof item === "string" && item.trim().length > 0).map((item) => item.trim().toUpperCase()))];
-}
-
-function positionGroupKey(positionCode: string | null): keyof typeof TACTICAL_ROLE_OPTIONS {
-  const code = (positionCode ?? "").trim().toUpperCase();
-  if (code === "GK") return "GK";
-  if (["CB", "LCB", "RCB", "SW"].includes(code)) return "CB";
-  if (["LB", "RB"].includes(code)) return "FB";
-  if (["LWB", "RWB"].includes(code)) return "WB";
-  if (["DM", "CDM", "LDM", "RDM"].includes(code)) return "DM";
-  if (["CM", "LCM", "RCM", "LM", "RM"].includes(code)) return "CM";
-  if (["AM", "CAM", "LAM", "RAM"].includes(code)) return "AM";
-  if (["LW", "RW", "LF", "RF"].includes(code)) return "W";
-  if (code === "SS") return "SS";
-  return "ST";
-}
-
-function tacticalRoleOptions(
-  positionCode: string | null,
-  inheritedRole: string | null,
-  explicitRole: string | null,
-): string {
-  const roles = new Set<string>();
-  if (positionCode?.trim()) {
-    for (const role of TACTICAL_ROLE_OPTIONS[positionGroupKey(positionCode)] ?? []) roles.add(role);
-  }
-  if (inheritedRole?.trim()) roles.add(inheritedRole.trim());
-  if (explicitRole?.trim()) roles.add(explicitRole.trim());
-  const inheritLabel = inheritedRole?.trim()
-    ? `自动继承：${inheritedRole.trim()}`
-    : "自动继承球员资料角色";
-  return `<option value="" ${explicitRole ? "" : "selected"}>${escapeHtml(inheritLabel)}</option>${[...roles].map((role) => `<option value="${escapeHtml(role)}" ${role === explicitRole ? "selected" : ""}>${escapeHtml(role)}</option>`).join("")}`;
-}
-
-function positionOptionGroups(
-  formationId: string | null,
-  selected: string | null,
-): string {
-  const formationSlots = formationSlotCodes(formationId);
-  const regularPositions = playersFeature.catalog.references?.positions ?? [];
-  const known = new Set<string>();
-  const renderOption = (code: string, label: string): string => {
-    const normalized = code.trim().toUpperCase();
-    if (!normalized || known.has(normalized)) return "";
-    known.add(normalized);
-    return `<option value="${escapeHtml(normalized)}" ${normalized === selected?.trim().toUpperCase() ? "selected" : ""}>${escapeHtml(label)}（${escapeHtml(normalized)}）</option>`;
-  };
-  const slotOptions = formationSlots.map((code) => renderOption(code, positionLabel(code))).join("");
-  const regularOptions = regularPositions.map((item) => renderOption(item.code, item.name || positionLabel(item.code))).join("");
-  const selectedCode = selected?.trim().toUpperCase() ?? "";
-  const currentOption = selectedCode && !known.has(selectedCode)
-    ? `<optgroup label="当前保存值">${renderOption(selectedCode, positionLabel(selectedCode))}</optgroup>`
-    : "";
-  return `<option value="">请选择战术位置</option>${slotOptions ? `<optgroup label="当前阵型槽位">${slotOptions}</optgroup>` : ""}${regularOptions ? `<optgroup label="常规位置">${regularOptions}</optgroup>` : ""}${currentOption}`;
-}
-
-function teamLineupPresetMemberRows(
-  preset: TeamLineupPresetRecord | null,
-): string {
-  if (!teamsFeature.catalog.detail) return "";
-  const existing = new Map(preset?.members.map((member) => [member.player_id, member]) ?? []);
-  return teamsFeature.catalog.detail.squad.map((player, index) => {
-    const member = existing.get(player.player_id);
-    const enabled = Boolean(member) || (!preset && index < 18);
-    const starter = member?.is_starter ?? (!preset && index < 11);
-    const selectedPosition = member?.position_code ?? player.position_code ?? null;
-    const inheritedRole = member?.role_origin === "player_position_default"
-      ? member.role_code
-      : player.role_code;
-    const explicitRole = member?.role_origin === "lineup_override"
-      ? member.role_code
-      : null;
-    return `<article class="preset-member-row ${enabled ? "" : "excluded"} ${starter ? "starter" : "substitute"}" data-preset-player-id="${escapeHtml(player.player_id)}" data-player-default-position="${escapeHtml(player.position_code ?? "")}" data-player-inherited-role="${escapeHtml(inheritedRole ?? "")}">
-      <label class="preset-member-toggle"><input class="preset-member-enabled" type="checkbox" ${enabled ? "checked" : ""}><span><strong>${escapeHtml(player.player_name)}</strong><small>${escapeHtml(positionLabel(player.position_code))} · #${player.squad_number ?? "—"}</small></span></label>
-      <select class="preset-member-role" data-native-select aria-label="出场身份" ${enabled ? "" : "disabled"}><option value="starter" ${starter ? "selected" : ""}>首发</option><option value="substitute" ${starter ? "" : "selected"}>替补</option></select>
-      <select class="preset-member-position" data-native-select aria-label="战术位置" ${enabled ? "" : "disabled"}>${positionOptionGroups(preset?.formation_id ?? null, selectedPosition)}</select>
-      <select class="preset-member-tactical-role" data-native-select aria-label="战术角色" ${enabled ? "" : "disabled"}>${tacticalRoleOptions(selectedPosition, inheritedRole, explicitRole)}</select>
-      <label class="preset-member-captain"><input type="radio" name="preset-captain" value="${escapeHtml(player.player_id)}" ${member?.is_captain ? "checked" : ""} ${enabled ? "" : "disabled"}>队长</label>
-    </article>`;
-  }).join("");
-}
-function lineupPresetManagerBody(
-  teamId: string,
-  teamName: string,
-  presets: TeamLineupPresetRecord[],
-): string {
-  const active = presets.filter((preset) => preset.status === "active");
-  const archived = presets.filter((preset) => preset.status === "archived");
-  const canEdit = teamsFeature.catalog.detail?.team.id === teamId;
-  const rows = presets.length
-    ? presets.map((preset) => `<article class="lineup-preset-manager-row ${preset.status}">
-        <div><span>${preset.status === "active" ? (preset.is_default ? "默认 · 使用中" : "使用中") : "已归档"}</span><strong>${escapeHtml(preset.name)}</strong><small>${escapeHtml(preset.formation_code ?? "阵型未设置")} · 首发 ${preset.starter_count} · 共 ${preset.member_count} 人 · v${preset.version}</small></div>
-        <div class="lineup-preset-manager-actions">${canEdit && preset.status === "active" ? `<button class="secondary tiny" data-action="open-team-lineup-preset-editor" data-preset-id="${escapeHtml(preset.id)}">编辑</button>` : ""}<button class="ghost tiny danger" data-action="request-delete-team-lineup-preset" data-preset-id="${escapeHtml(preset.id)}" data-preset-name="${escapeHtml(preset.name)}" data-team-id="${escapeHtml(teamId)}" data-team-name="${escapeHtml(teamName)}" data-preset-status="${escapeHtml(preset.status)}" data-member-count="${preset.member_count}">永久删除</button></div>
-      </article>`).join("")
-    : `<div class="empty-state compact"><strong>暂无阵容预设</strong><p>当前球队没有活动或已归档预设。</p></div>`;
-  return `<div class="lineup-preset-manager">
-    <div class="lineup-preset-manager-summary"><div><span>活动预设</span><strong>${active.length}</strong></div><div><span>已归档</span><strong>${archived.length}</strong></div><div><span>合计</span><strong>${presets.length}</strong></div></div>
-    <div class="blocking-note warning">永久删除会同时删除该预设的首发与替补成员，无法恢复；不会删除球队、球员或比赛阵容。</div>
-    <div class="lineup-preset-manager-list">${rows}</div>
-  </div>`;
-}
-
-async function openTeamLineupPresetManager(teamId: string, teamName: string): Promise<void> {
-  if (!teamId) throw new Error("缺少球队 ID，无法管理阵容预设");
-  const presets = await runBusy(() => api.listTeamLineupPresets(teamId, true));
-  teamsFeature.catalog.setPresets(teamId, presets);
-  showHtmlModal(
-    "预设阵容管理",
-    teamName || "球队阵容预设",
-    lineupPresetManagerBody(teamId, teamName, presets),
-    `<button class="secondary" data-action="close-workspace-detail">关闭</button>${teamsFeature.catalog.detail?.team.id === teamId ? '<button class="primary" data-action="open-team-lineup-preset-editor">新建阵容预设</button>' : ""}`,
-    "lineup-preset-manager-modal",
-  );
-}
-
-async function openLineupPresetManagerForSide(side: LineupSide): Promise<void> {
-  const current = pairedSide(side);
-  if (!current.team_id) throw new Error(`${side === "home" ? "主队" : "客队"}尚未确定`);
-  await openTeamLineupPresetManager(current.team_id, current.team_name);
-}
-
-async function refreshTeamLineupPresetCaches(teamId: string): Promise<void> {
-  const [allPresets, activePresets] = await Promise.all([
-    api.listTeamLineupPresets(teamId, true),
-    api.listTeamLineupPresets(teamId, false),
-  ]);
-  teamsFeature.catalog.setPresets(teamId, allPresets);
-  if (pairedSide("home").team_id === teamId) {
-    pairedLineupPresets = { ...pairedLineupPresets, home: activePresets };
-  }
-  if (pairedSide("away").team_id === teamId) {
-    pairedLineupPresets = { ...pairedLineupPresets, away: activePresets };
-  }
-}
-
-function requestDeleteTeamLineupPreset(
-  presetId: string,
-  presetName: string,
-  teamId: string,
-  teamName: string,
-  status: string,
-  memberCount: number,
-): void {
-  showConfirmation(
-    "永久删除阵容预设",
-    "该操作无法恢复。只删除此预设及其成员，不影响球队、球员、比赛阵容和历史快照。",
-    [
-      ["球队", teamName],
-      ["预设", presetName],
-      ["状态", status === "archived" ? "已归档" : "活动"],
-      ["预设成员", `${memberCount} 人`],
-    ],
-    "确认永久删除",
-    async () => {
-      await runBusy(() => api.deleteTeamLineupPreset(presetId));
-      await refreshTeamLineupPresetCaches(teamId);
-      render({ preserveForm: true });
-      toast("阵容预设已永久删除", "success");
-      await openTeamLineupPresetManager(teamId, teamName);
-    },
-  );
-}
-
-function openTeamLineupPresetEditor(presetId: string | null = null): void {
-  if (!teamsFeature.catalog.detail) throw new Error("请先选择球队");
-  const preset = presetId
-    ? teamsFeature.catalog.presets.find((item) => item.id === presetId) ?? null
-    : null;
-  if (presetId && !preset) throw new Error("阵容预设不存在或尚未加载");
-  const teamCoaches = coachList.filter((coach) => coach.current_team_id === teamsFeature.catalog.detail!.team.id);
-  const body = `<div class="lineup-preset-editor">
-    <div class="form-grid three-column clean-form">
-      <label class="field"><span>预设名称</span><input id="lineup-preset-name" value="${escapeHtml(preset?.name ?? "")}" placeholder="例如：联赛主力阵容"></label>
-      <label class="field"><span>阵型</span><select id="lineup-preset-formation"><option value="">未设置</option>${formationCatalog.map((formation) => `<option value="${escapeHtml(formation.id)}" ${formation.id === preset?.formation_id ? "selected" : ""}>${escapeHtml(formation.code)} · ${escapeHtml(formation.name)}</option>`).join("")}</select></label>
-      <label class="field"><span>教练</span><select id="lineup-preset-coach"><option value="">不绑定</option>${teamCoaches.map((coach) => `<option value="${escapeHtml(coach.id)}" ${coach.id === preset?.coach_id ? "selected" : ""}>${escapeHtml(coach.canonical_name)} · ${escapeHtml(coach.current_role ?? "教练")}</option>`).join("")}</select></label>
-      <label class="field"><span>适用场景</span><select id="lineup-preset-context">${["general","league","cup","attacking","defensive","rotation","temporary"].map((context) => `<option value="${context}" ${context === (preset?.usage_context ?? "general") ? "selected" : ""}>${presetContextLabel(context)}</option>`).join("")}</select></label>
-      <label class="field"><span>使用概率（0–1）</span><input id="lineup-preset-probability" type="number" min="0" max="1" step="0.01" value="${preset?.usage_probability ?? ""}"></label>
-      <label class="check-row"><input id="lineup-preset-default" type="checkbox" ${preset?.is_default ? "checked" : ""}><span><strong>设为默认方案</strong><small>同一球队只能有一个默认预设</small></span></label>
-      <label class="field span-3"><span>备注</span><textarea id="lineup-preset-notes" rows="2">${escapeHtml(preset?.notes ?? "")}</textarea></label>
-    </div>
-    <div class="preset-member-editor-heading"><div><strong>出场人员</strong><span>首发必须覆盖当前阵型的 11 个战术位置；战术角色可直接选择或自动继承球员资料。</span></div><div class="preset-member-editor-actions"><span id="lineup-preset-member-summary">正在检查阵容</span><button class="secondary compact" data-action="auto-assign-preset-formation">按阵型自动分配</button></div></div>
-    <div class="preset-member-table-head" aria-hidden="true"><span>球员</span><span>身份</span><span>战术位置</span><span>战术角色</span><span>队长</span></div>
-    <div id="lineup-preset-validation-note" class="preset-editor-validation"></div>
-    <div class="preset-member-list">${teamLineupPresetMemberRows(preset)}</div>
-  </div>`;
-  const footer = `<button class="secondary" data-action="close-workspace-detail">取消</button><button class="primary" data-action="save-team-lineup-preset" data-preset-id="${escapeHtml(preset?.id ?? "")}">保存阵容预设</button>`;
-  showHtmlModal(
-    preset ? `编辑：${preset.name}` : "新建阵容预设",
-    teamsFeature.catalog.detail.team.canonical_name,
-    body,
-    footer,
-    "lineup-preset-modal",
-  );
-  queueMicrotask(() => {
-    const workspaceRoot = document.querySelector(".workspace-panel-root") ?? document;
-    enhanceSearchableSelects(workspaceRoot);
-    const memberList = document.querySelector<HTMLElement>(".preset-member-list");
-    if (memberList) memberList.scrollTop = 0;
-    syncPresetEditorRows();
-    updatePresetEditorSummary();
-  });
-}
-
-function presetPositionCompatibility(playerPosition: string, slot: string): number {
-  const player = playerPosition.trim().toUpperCase();
-  const target = slot.trim().toUpperCase();
-  if (!player) return 0;
-  if (player === target) return 100;
-  const aliases: Record<string, readonly string[]> = {
-    GK: ["GK"],
-    CB: ["CB", "LCB", "RCB", "SW"],
-    LB: ["LB", "LWB"],
-    RB: ["RB", "RWB"],
-    LWB: ["LWB", "LB", "LM"],
-    RWB: ["RWB", "RB", "RM"],
-    DM: ["DM", "CDM", "LDM", "RDM", "CM"],
-    CDM: ["DM", "CDM", "LDM", "RDM"],
-    CM: ["CM", "LCM", "RCM", "DM", "AM"],
-    AM: ["AM", "CAM", "LAM", "RAM", "CM", "SS"],
-    CAM: ["CAM", "AM", "LAM", "RAM", "SS"],
-    LM: ["LM", "LW", "LWB", "LCM"],
-    RM: ["RM", "RW", "RWB", "RCM"],
-    LW: ["LW", "LM", "LAM", "LF"],
-    RW: ["RW", "RM", "RAM", "RF"],
-    SS: ["SS", "AM", "CAM", "CF", "ST"],
-    CF: ["CF", "ST", "SS", "LST", "RST"],
-    ST: ["ST", "CF", "LST", "RST", "SS"],
-  };
-  const playerAliases = aliases[player] ?? [player];
-  const targetBase = target.replace(/^[LR](?=(CB|DM|CM|AM|ST)$)/, "");
-  if (playerAliases.includes(target)) return 90;
-  if (playerAliases.includes(targetBase)) return 82;
-  if (positionGroupKey(player) === positionGroupKey(target)) return 60;
-  return 10;
-}
-
-function setNativeSelectOptions(
-  select: HTMLSelectElement,
-  optionsHtml: string,
-  preferredValue: string | null,
-): void {
-  select.innerHTML = optionsHtml;
-  if (preferredValue && Array.from(select.options).some((option) => option.value === preferredValue)) {
-    select.value = preferredValue;
-  }
-}
-
-function refreshPresetTacticalRoleSelect(row: HTMLElement): void {
-  const positionSelect = row.querySelector<HTMLSelectElement>(".preset-member-position");
-  const roleSelect = row.querySelector<HTMLSelectElement>(".preset-member-tactical-role");
-  if (!positionSelect || !roleSelect) return;
-  const current = roleSelect.value || null;
-  const inherited = row.dataset.playerInheritedRole || null;
-  setNativeSelectOptions(
-    roleSelect,
-    tacticalRoleOptions(positionSelect.value || null, inherited, current),
-    current,
-  );
-}
-
-function syncPresetMemberRowState(row: HTMLElement): void {
-  const enabled = row.querySelector<HTMLInputElement>(".preset-member-enabled")?.checked ?? false;
-  const role = row.querySelector<HTMLSelectElement>(".preset-member-role")?.value ?? "substitute";
-  row.classList.toggle("excluded", !enabled);
-  row.classList.toggle("starter", enabled && role === "starter");
-  row.classList.toggle("substitute", enabled && role !== "starter");
-  row.querySelectorAll<HTMLInputElement | HTMLSelectElement>("select, input[type='radio']").forEach((control) => {
-    control.disabled = !enabled;
-  });
-  const captain = row.querySelector<HTMLInputElement>(".preset-member-captain input");
-  if (!enabled && captain) captain.checked = false;
-}
-
-function syncPresetEditorRows(): void {
-  document.querySelectorAll<HTMLElement>("[data-preset-player-id]").forEach((row) => {
-    syncPresetMemberRowState(row);
-    refreshPresetTacticalRoleSelect(row);
-  });
-}
-
-function presetEditorFormationId(): string | null {
-  return document.querySelector<HTMLSelectElement>("#lineup-preset-formation")?.value || null;
-}
-
-function refreshPresetPositionOptions(autoAssign = false): void {
-  const formationId = presetEditorFormationId();
-  const rows = Array.from(document.querySelectorAll<HTMLElement>("[data-preset-player-id]"));
-  for (const row of rows) {
-    const select = row.querySelector<HTMLSelectElement>(".preset-member-position");
-    if (!select) continue;
-    const current = select.value || row.dataset.playerDefaultPosition || null;
-    setNativeSelectOptions(select, positionOptionGroups(formationId, current), current);
-  }
-  if (autoAssign) assignPresetFormationSlots(false);
-  rows.forEach(refreshPresetTacticalRoleSelect);
-  updatePresetEditorSummary();
-}
-
-function assignPresetFormationSlots(showFeedback = true): void {
-  const formationId = presetEditorFormationId();
-  const slots = formationSlotCodes(formationId);
-  if (slots.length !== 11) {
-    if (showFeedback) toast("请先选择一个包含 11 个战术位置的标准阵型", "error");
-    return;
-  }
-  const starterRows = Array.from(document.querySelectorAll<HTMLElement>("[data-preset-player-id]"))
-    .filter((row) => row.querySelector<HTMLInputElement>(".preset-member-enabled")?.checked)
-    .filter((row) => row.querySelector<HTMLSelectElement>(".preset-member-role")?.value === "starter");
-  if (starterRows.length !== 11) {
-    if (showFeedback) toast(`自动分配需要恰好 11 名首发，当前为 ${starterRows.length} 名`, "error");
-    return;
-  }
-  const availableRows = new Set(starterRows);
-  for (const slot of slots) {
-    const best = [...availableRows].sort((left, right) => {
-      const leftScore = presetPositionCompatibility(left.dataset.playerDefaultPosition ?? "", slot);
-      const rightScore = presetPositionCompatibility(right.dataset.playerDefaultPosition ?? "", slot);
-      return rightScore - leftScore;
-    })[0];
-    if (!best) continue;
-    availableRows.delete(best);
-    const select = best.querySelector<HTMLSelectElement>(".preset-member-position");
-    if (select) {
-      setNativeSelectOptions(select, positionOptionGroups(formationId, slot), slot);
-      select.value = slot;
-      refreshPresetTacticalRoleSelect(best);
-    }
-  }
-  updatePresetEditorSummary();
-  if (showFeedback) toast("已按阵型和球员登记位置完成首发槽位分配", "success");
-}
-
-function updatePresetEditorSummary(): void {
-  const rows = Array.from(document.querySelectorAll<HTMLElement>("[data-preset-player-id]"));
-  const enabled = rows.filter((row) => row.querySelector<HTMLInputElement>(".preset-member-enabled")?.checked);
-  const starters = enabled.filter((row) => row.querySelector<HTMLSelectElement>(".preset-member-role")?.value === "starter");
-  const substitutes = enabled.length - starters.length;
-  const starterPositions = starters.map((row) => row.querySelector<HTMLSelectElement>(".preset-member-position")?.value ?? "").filter(Boolean);
-  const duplicatePositions = starterPositions.filter((value, index, values) => values.indexOf(value) !== index);
-  const formationSlots = formationSlotCodes(presetEditorFormationId());
-  const missingSlots = formationSlots.filter((slot) => !starterPositions.includes(slot));
-  const missingPositionCount = starters.length - starterPositions.length;
-  const ready = starters.length === 11
-    && missingPositionCount === 0
-    && duplicatePositions.length === 0
-    && (formationSlots.length === 0 || missingSlots.length === 0);
-  const summary = document.querySelector<HTMLElement>("#lineup-preset-member-summary");
-  if (summary) {
-    summary.textContent = `已选 ${enabled.length} 人 · 首发 ${starters.length}/11 · 替补 ${substitutes}`;
-    summary.classList.toggle("ready", ready);
-    summary.classList.toggle("warning", !ready);
-  }
-  const note = document.querySelector<HTMLElement>("#lineup-preset-validation-note");
-  if (!note) return;
-  const issues: string[] = [];
-  if (starters.length !== 11) issues.push(`首发应为 11 人，当前 ${starters.length} 人`);
-  if (missingPositionCount > 0) issues.push(`${missingPositionCount} 名首发尚未选择战术位置`);
-  if (duplicatePositions.length > 0) issues.push(`首发战术位置重复：${[...new Set(duplicatePositions)].join("、")}`);
-  if (formationSlots.length > 0 && missingSlots.length > 0) issues.push(`阵型槽位未覆盖：${missingSlots.join("、")}`);
-  note.classList.toggle("ready", issues.length === 0);
-  note.classList.toggle("warning", issues.length > 0);
-  note.textContent = issues.length ? issues.join("；") : "阵容结构有效，可以保存。";
-}
-
-function validateTeamLineupPresetDraft(draft: TeamLineupPresetDraft): void {
-  if (!draft.name) throw new Error("请输入预设名称");
-  if (draft.members.length < 11) throw new Error("阵容预设至少需要 11 名球员");
-  const starters = draft.members.filter((member) => member.is_starter);
-  if (starters.length !== 11) throw new Error(`首发必须恰好为 11 人，当前为 ${starters.length} 人`);
-  const missingPositions = starters.filter((member) => !member.position_code);
-  if (missingPositions.length > 0) throw new Error(`仍有 ${missingPositions.length} 名首发未选择战术位置`);
-  const positions = starters.map((member) => member.position_code as string);
-  const duplicates = positions.filter((value, index) => positions.indexOf(value) !== index);
-  if (duplicates.length > 0) throw new Error(`首发战术位置不能重复：${[...new Set(duplicates)].join("、")}`);
-  const slots = formationSlotCodes(draft.formation_id);
-  if (slots.length > 0) {
-    const missing = slots.filter((slot) => !positions.includes(slot));
-    const unexpected = positions.filter((position) => !slots.includes(position));
-    if (missing.length || unexpected.length) {
-      throw new Error(`首发位置必须完整匹配当前阵型。缺少：${missing.join("、") || "无"}；不属于阵型：${unexpected.join("、") || "无"}`);
-    }
-  }
-  if (draft.usage_probability !== null && (draft.usage_probability < 0 || draft.usage_probability > 1)) {
-    throw new Error("使用概率必须位于 0 到 1 之间");
-  }
-}
-
-function collectTeamLineupPresetDraft(presetId: string | null): TeamLineupPresetDraft {
-  if (!teamsFeature.catalog.detail) throw new Error("请先选择球队");
-  const rows = Array.from(document.querySelectorAll<HTMLElement>("[data-preset-player-id]"));
-  const members = rows.flatMap((row, index): TeamLineupPresetMemberDraft[] => {
-    const enabled = row.querySelector<HTMLInputElement>(".preset-member-enabled")?.checked ?? false;
-    if (!enabled) return [];
-    const playerId = row.dataset.presetPlayerId ?? "";
-    const role = row.querySelector<HTMLSelectElement>(".preset-member-role")?.value ?? "substitute";
-    const position = row.querySelector<HTMLSelectElement>(".preset-member-position")?.value.trim() || null;
-    const tacticalRole = row.querySelector<HTMLSelectElement>(".preset-member-tactical-role")?.value.trim() || null;
-    const captain = row.querySelector<HTMLInputElement>(".preset-member-captain input")?.checked ?? false;
-    return [{
-      player_id: playerId,
-      position_code: position,
-      role_code: tacticalRole,
-      is_starter: role === "starter",
-      shirt_number: teamsFeature.catalog.detail!.squad.find((item) => item.player_id === playerId)?.squad_number ?? null,
-      expected_minutes: role === "starter" ? 90 : 20,
-      sequence_no: index + 1,
-      bench_order: role === "starter" ? null : index + 1,
-      is_captain: captain,
-      metadata: {},
-    }];
-  });
-  return {
-    id: presetId,
-    team_id: teamsFeature.catalog.detail.team.id,
-    name: value("lineup-preset-name").trim(),
-    formation_id: nullableValue("lineup-preset-formation"),
-    coach_id: nullableValue("lineup-preset-coach"),
-    usage_context: value("lineup-preset-context"),
-    usage_probability: nullableNumber("lineup-preset-probability"),
-    is_default: checked("lineup-preset-default"),
-    source_lineup_id: null,
-    notes: nullableValue("lineup-preset-notes"),
-    members,
-  };
-}
-
-async function saveTeamLineupPreset(presetId: string | null): Promise<void> {
-  const draft = collectTeamLineupPresetDraft(presetId);
-  validateTeamLineupPresetDraft(draft);
-  await runBusy(() => api.saveTeamLineupPreset(draft));
-  closeModal();
-  await teamsFeature.catalog.refreshSelected();
-  render();
-  toast(presetId ? "阵容预设已更新" : "阵容预设已保存", "success");
-}
-
-function openDuplicateLineupPreset(presetId: string, sourceName: string): void {
-  const body = `<label class="field"><span>新预设名称</span><input id="duplicate-lineup-preset-name" value="${escapeHtml(`${sourceName} - 副本`)}"></label>`;
-  const footer = `<button class="secondary" data-action="close-workspace-detail">取消</button><button class="primary" data-action="confirm-duplicate-lineup-preset" data-preset-id="${escapeHtml(presetId)}">创建副本</button>`;
-  showHtmlModal("复制阵容预设", sourceName, body, footer, "duplicate-lineup-preset-modal");
-}
-
-async function duplicateLineupPreset(presetId: string): Promise<void> {
-  const name = value("duplicate-lineup-preset-name").trim();
-  if (!name) throw new Error("请输入新预设名称");
-  await runBusy(() => api.duplicateTeamLineupPreset(presetId, name));
-  closeModal();
-  await teamsFeature.catalog.refreshSelected();
-  render();
-  toast("阵容预设副本已创建", "success");
-}
-
-function requestArchiveLineupPreset(presetId: string, name: string): void {
-  showConfirmation(
-    "归档阵容预设",
-    "归档后不会出现在比赛快速套用列表中，历史数据仍保留。",
-    [["预设", name]],
-    "确认归档",
-    async () => {
-      await runBusy(() => api.archiveTeamLineupPreset(presetId));
-      await teamsFeature.catalog.refreshSelected();
-      render();
-      toast("阵容预设已归档", "success");
-    },
-  );
-}
-
-function openSaveCurrentLineupPreset(side: LineupSide): void {
-  capturePairedLineupFromDom();
-  const current = pairedSide(side);
-  const starterCount = current.players.filter((player) => player.is_starter).length;
-  if (starterCount !== 11) throw new Error(`当前阵容必须恰好有 11 名首发，当前为 ${starterCount} 名`);
-  const body = `<div class="form-grid two-column clean-form">
-    <label class="field"><span>预设名称</span><input id="quick-lineup-preset-name" value="${escapeHtml(`${current.team_name} 常用阵容`)}"></label>
-    <label class="field"><span>适用场景</span><select id="quick-lineup-preset-context">${["general","league","cup","attacking","defensive","rotation","temporary"].map((context) => `<option value="${context}">${presetContextLabel(context)}</option>`).join("")}</select></label>
-    <label class="field"><span>使用概率（0–1）</span><input id="quick-lineup-preset-probability" type="number" min="0" max="1" step="0.01"></label>
-    <label class="check-row"><input id="quick-lineup-preset-default" type="checkbox"><span><strong>设为默认方案</strong><small>替换该球队现有默认预设</small></span></label>
-    <label class="field span-2"><span>备注</span><textarea id="quick-lineup-preset-notes" rows="2">从 ${selectedManagedMatch()?.home_team_name ?? "比赛"} vs ${selectedManagedMatch()?.away_team_name ?? ""} 的本次阵容保存</textarea></label>
-  </div>`;
-  const footer = `<button class="secondary" data-action="close-workspace-detail">取消</button><button class="primary" data-action="confirm-save-current-lineup-preset" data-lineup-side="${side}">保存预设</button>`;
-  showHtmlModal("保存当前阵容为预设", current.team_name, body, footer, "quick-lineup-preset-modal");
-  queueMicrotask(() => enhanceSearchableSelects(document.querySelector("#modal-root") ?? document));
-}
-
-async function saveCurrentLineupAsPreset(side: LineupSide): Promise<void> {
-  capturePairedLineupFromDom();
-  const current = pairedSide(side);
-  const draft: TeamLineupPresetDraft = {
-    id: null,
-    team_id: current.team_id,
-    name: value("quick-lineup-preset-name").trim(),
-    formation_id: current.formation_id || null,
-    coach_id: current.coach_id || null,
-    usage_context: value("quick-lineup-preset-context"),
-    usage_probability: nullableNumber("quick-lineup-preset-probability"),
-    is_default: checked("quick-lineup-preset-default"),
-    source_lineup_id: null,
-    notes: nullableValue("quick-lineup-preset-notes"),
-    members: current.players.map(presetMemberDraftFromBuilder),
-  };
-  await runBusy(() => api.saveTeamLineupPreset(draft));
-  pairedLineupPresets = {
-    ...pairedLineupPresets,
-    [side]: await api.listTeamLineupPresets(current.team_id, false),
-  };
-  closeModal();
-  render({ preserveForm: true });
-  toast("当前阵容已保存为球队预设", "success");
-}
-
-async function previewApplyLineupPreset(side: LineupSide): Promise<void> {
-  capturePairedLineupFromDom();
-  const presetId = nullableValue(`paired-${side}-preset`);
-  if (!presetId) throw new Error("请先选择阵容预设");
-  const preview = await runBusy(() => api.previewTeamLineupPresetApplication(presetId));
-  const current = pairedSide(side);
-  const overwriteWarning = current.players.length
-    ? `<div class="blocking-note warning">当前已编辑 ${current.players.length} 名球员，套用后将替换这一侧的当前草稿。</div>`
-    : "";
-  const body = `<div class="lineup-preset-preview">
-    <div class="lineup-preset-preview-summary"><div><span>预设</span><strong>${escapeHtml(preview.preset.name)}</strong></div><div><span>阵型</span><strong>${escapeHtml(preview.preset.formation_code ?? "未设置")}</strong></div><div><span>人员</span><strong>首发 ${preview.preset.starter_count} · 共 ${preview.preset.member_count} 人</strong></div></div>
-    ${overwriteWarning}
-    <div class="lineup-preset-issues">
-      ${preview.blockers.map((item) => `<div class="lineup-preset-issue blocker">${escapeHtml(item)}</div>`).join("")}
-      ${preview.warnings.map((item) => `<div class="lineup-preset-issue warning">${escapeHtml(item)}</div>`).join("")}
-    </div>
-    ${preview.blockers.length === 0 && preview.warnings.length === 0 ? `<div class="success-note">当前预设成员均仍属于该球队，没有明确伤停阻断。</div>` : ""}
-    <div class="lineup-preset-preview-members">${preview.preset.members.map((member, index) => `<article class="lineup-preset-preview-member"><span>${index + 1}</span><div><strong>${escapeHtml(member.player_name)}${member.alternate_name ? `（${escapeHtml(member.alternate_name)}）` : ""}</strong><small>${member.is_starter ? "首发" : "替补"} · ${escapeHtml(member.position_code ?? "位置待补")} · ${escapeHtml(member.role_code ?? "角色待补")} · ${member.role_origin === "player_position_default" ? `资料继承${member.role_source_position_code ? `（${escapeHtml(member.role_source_position_code)}）` : ""}` : member.role_origin === "lineup_override" ? "预设覆盖" : "角色缺失"}</small></div><b>${escapeHtml(member.availability_status ?? "unknown")}</b></article>`).join("")}</div>
-  </div>`;
-  const footer = `<button class="secondary" data-action="close-workspace-detail">取消</button><button class="primary" data-action="confirm-apply-lineup-preset" data-lineup-side="${side}" data-preset-id="${escapeHtml(presetId)}" ${preview.can_apply ? "" : "disabled"}>确认套用</button>`;
-  showHtmlModal("阵容预设套用预检", current.team_name, body, footer, "lineup-preset-preview-modal");
-}
-
-async function applyLineupPreset(side: LineupSide, presetId: string): Promise<void> {
-  const preview: TeamLineupPresetApplicationPreview = await runBusy(() =>
-    api.previewTeamLineupPresetApplication(presetId),
-  );
-  if (!preview.can_apply) throw new Error(preview.blockers.join("；") || "阵容预设当前不可用");
-  const current = pairedSide(side);
-  if (preview.preset.team_id !== current.team_id) throw new Error("阵容预设与当前球队不一致");
-  const players: LineupBuilderPlayer[] = preview.preset.members.map((member) => ({
-    player_id: member.player_id,
-    player_name: member.player_name,
-    player_secondary_name: member.alternate_name,
-    position_code: member.position_code,
-    role_code: member.role_code,
-    is_starter: member.is_starter,
-    expected_minutes: member.expected_minutes ?? (member.is_starter ? 90 : 20),
-    shirt_number: member.shirt_number,
-    bench_order: member.is_starter ? null : member.bench_order,
-    starting_probability: member.is_starter ? 1 : 0,
-    membership_override: false,
-    availability_status: member.availability_status,
-  }));
-  pairedLineupBuilder = {
-    ...pairedLineupBuilder,
-    [side]: {
-      ...current,
-      formation_id: preview.preset.formation_id ?? current.formation_id,
-      formation: preview.preset.formation_code ?? current.formation,
-      coach_id: preview.preset.coach_id ?? current.coach_id,
-      players,
-    },
-  };
-  closeModal();
-  render();
-  toast(`已套用“${preview.preset.name}”，本场阵容可继续独立调整`, "success");
-}
-
-function openPairedLineupPlayerSettings(side: LineupSide, playerId: string): void {
-  capturePairedLineupFromDom();
-  const player = pairedSide(side).players.find((item) => item.player_id === playerId);
-  if (!player) throw new Error("当前阵容中不存在该球员");
-  const expectedMinutes = player.expected_minutes ?? (player.is_starter ? 90 : 20);
-  const startingProbability = player.starting_probability ?? (player.is_starter ? 1 : 0);
-  const candidate = pairedSide(side).candidates.find((item) => item.id === playerId);
-  const inheritedRole = candidate
-    ? defaultRoleForPlayer(candidate, player.position_code)
-    : null;
-  const roleSourceNote = inheritedRole && player.role_code === inheritedRole
-    ? `当前继承球员位置档案：${inheritedRole}`
-    : inheritedRole
-      ? `位置档案默认：${inheritedRole}；填写不同内容将作为本场覆盖`
-      : "当前位置档案没有默认角色，可在球员中心或此处补充";
-  const body = `<div class="form-grid compact lineup-player-settings-form">
-    <label class="field"><span>角色与职责</span><input id="lineup-player-role-code" value="${escapeHtml(player.role_code ?? inheritedRole ?? "")}" placeholder="例如：组织核心、单后腰"><small>${escapeHtml(roleSourceNote)}</small></label>
-    <label class="field"><span>预计分钟</span><input id="lineup-player-expected-minutes" type="number" min="0" max="130" value="${expectedMinutes}"></label>
-    <label class="field"><span>首发概率（0–1）</span><input id="lineup-player-starting-probability" type="number" min="0" max="1" step="0.01" value="${startingProbability}"></label>
-    <label class="field"><span>替补顺序</span><input id="lineup-player-bench-order" type="number" min="1" value="${player.bench_order ?? ""}" ${player.is_starter ? "disabled" : ""}></label>
-    <label class="field"><span>球衣号码</span><input id="lineup-player-shirt-number" type="number" min="1" max="99" value="${player.shirt_number ?? ""}"></label>
-    <label class="check-row"><input id="lineup-player-membership-override" type="checkbox" ${player.membership_override ? "checked" : ""}><span><strong>允许履历例外</strong><small>仅在球员关系资料尚未补齐、但来源已核验时使用。</small></span></label>
-  </div>`;
-  const footer = `<button type="button" class="secondary" data-action="close-workspace-detail">取消</button><button type="button" class="primary" data-action="save-lineup-player-settings" data-lineup-side="${side}" data-player-id="${escapeHtml(playerId)}">保存球员设置</button>`;
-  showHtmlModal(player.player_name, side === "home" ? "主队球员高级设置" : "客队球员高级设置", body, footer, "lineup-player-settings-modal");
-}
-
-function savePairedLineupPlayerSettings(side: LineupSide, playerId: string): void {
-  const roleCode = nullableValue("lineup-player-role-code");
-  const expectedMinutes = nullableNumber("lineup-player-expected-minutes");
-  const startingProbability = nullableNumber("lineup-player-starting-probability");
-  const benchOrder = nullableNumber("lineup-player-bench-order");
-  const shirtNumber = nullableNumber("lineup-player-shirt-number");
-  if (expectedMinutes !== null && (expectedMinutes < 0 || expectedMinutes > 130)) {
-    throw new Error("预计分钟必须在 0 到 130 之间");
-  }
-  if (startingProbability !== null && (startingProbability < 0 || startingProbability > 1)) {
-    throw new Error("首发概率必须在 0 到 1 之间");
-  }
-  if (benchOrder !== null && benchOrder < 1) throw new Error("替补顺序必须大于 0");
-  if (shirtNumber !== null && (shirtNumber < 1 || shirtNumber > 99)) {
-    throw new Error("球衣号码必须在 1 到 99 之间");
-  }
-  const membershipOverride = document.querySelector<HTMLInputElement>("#lineup-player-membership-override")?.checked ?? false;
-  const current = pairedSide(side);
-  const exists = current.players.some((item) => item.player_id === playerId);
-  if (!exists) throw new Error("当前阵容中不存在该球员");
-  pairedLineupBuilder = {
-    ...pairedLineupBuilder,
-    [side]: {
-      ...current,
-      players: current.players.map((item) => item.player_id === playerId
-        ? {
-            ...item,
-            role_code: roleCode,
-            expected_minutes: expectedMinutes,
-            starting_probability: startingProbability,
-            bench_order: item.is_starter ? null : benchOrder,
-            shirt_number: shirtNumber,
-            membership_override: membershipOverride,
-          }
-        : item),
-    },
-  };
-  closeModal();
-  render({ preserveForm: true });
-  toast("球员高级设置已保存", "success");
-}
-
-function removePairedLineupPlayer(side: LineupSide, playerId: string): void {
-  capturePairedLineupFromDom();
-  const current = pairedSide(side);
-  pairedLineupBuilder = {
-    ...pairedLineupBuilder,
-    [side]: {
-      ...current,
-      players: current.players.filter((item) => item.player_id !== playerId),
-    },
-  };
-  render();
-}
-
-function clearPairedLineupSide(side: LineupSide): void {
-  capturePairedLineupFromDom();
-  pairedLineupBuilder = {
-    ...pairedLineupBuilder,
-    [side]: { ...pairedSide(side), players: [] },
-  };
-  render();
-}
-
-function lineupPlayersDraft(players: LineupBuilderPlayer[]): LineupPlayerDraft[] {
-  return players.map((item, index) => ({
-    player_id: item.player_id,
-    position_code: item.position_code,
-    role_code: item.role_code,
-    is_starter: item.is_starter,
-    shirt_number: item.shirt_number,
-    expected_minutes: item.expected_minutes,
-    actual_minutes: null,
-    sequence_no: index + 1,
-    bench_order: item.is_starter ? null : item.bench_order,
-    availability_status: item.availability_status,
-    starting_probability: item.starting_probability,
-    membership_override: item.membership_override,
-    source_urls: [],
-    metadata: {},
-  }));
-}
-
-function buildPairedLineupDraft(
-  side: LineupSide,
-  capturedAt: string,
-): LineupDraft {
-  const current = pairedSide(side);
-  const starterCount = current.players.filter((item) => item.is_starter).length;
-  if (starterCount !== 11) {
-    throw new Error(`${current.team_name}必须恰好 11 名首发，当前为 ${starterCount} 名`);
-  }
-  if (current.players.length < 11) {
-    throw new Error(`${current.team_name}阵容人数不足 11 人`);
-  }
-  return {
-    match_id: pairedLineupBuilder.match_id,
-    team_id: current.team_id,
-    lineup_type: pairedLineupBuilder.lineup_type,
-    snapshot_type: pairedLineupBuilder.snapshot_type,
-    formation: current.formation.trim() || null,
-    formation_id: current.formation_id || null,
-    coach_id: current.coach_id || null,
-    captured_at: capturedAt,
-    source_document_id: null,
-    source_urls: pairedLineupBuilder.source_urls
-      .split(/[;\n,]/)
-      .map((item) => item.trim())
-      .filter(Boolean),
-    quality_score: current.quality_score,
-    metadata: { entry_mode: "paired_visual_builder", team_side: side },
-    players: lineupPlayersDraft(current.players),
-  };
-}
-
-async function createPairedLineups(): Promise<void> {
-  capturePairedLineupFromDom();
-  const match = selectedManagedMatch();
-  if (!match) throw new Error("请选择比赛");
-  const capturedAt = localDateTimeToIso(
-    pairedLineupBuilder.captured_at || null,
-    pairedLineupBuilder.snapshot_type === "T-N",
-  );
-  if (!capturedAt) throw new Error("请填写双方阵容的记录时间");
-  const chain = await api.readMatchLineupChain(
-    match.id,
-    pairedLineupBuilder.snapshot_type,
-  );
-  const capturedTime = new Date(capturedAt).getTime();
-  const cutoffTime = new Date(chain.data_cutoff_time).getTime();
-  const windowStart = chain.data_window_start_time
-    ? new Date(chain.data_window_start_time).getTime()
-    : null;
-  if (capturedTime > cutoffTime) {
-    throw new Error(`记录时间不能晚于窗口截止 ${new Date(chain.data_cutoff_time).toLocaleString()}`);
-  }
-  if (windowStart !== null && capturedTime < windowStart) {
-    throw new Error(`${pairedLineupBuilder.snapshot_type} 只能使用 ${new Date(chain.data_window_start_time ?? "").toLocaleString()} 之后的数据`);
-  }
-  if (
-    pairedLineupBuilder.lineup_type !== "actual" &&
-    capturedTime >= new Date(match.kickoff_time).getTime()
-  ) {
-    throw new Error("预计或确认阵容的记录时间必须早于开球时间");
-  }
-  const pair: LineupPairDraft = {
-    home: buildPairedLineupDraft("home", capturedAt),
-    away: buildPairedLineupDraft("away", capturedAt),
-  };
-  await runBusy(async () => {
-    const created = await api.createLineupPair(pair);
-    lineupRecords = await api.listLineups(null, 100);
-    selectedMatchLineupChain = await api.readMatchLineupChain(
-      match.id,
-      pairedLineupBuilder.snapshot_type,
-    );
-    lastPredictionResult = created;
-  });
-  workspaceState.patchModule("lineups", { active_section: "chain" });
-  render({ preserveForm: true });
-  toast(`${match.home_team_name}与${match.away_team_name}阵容已同时提交`, "success");
-}
-
-async function inspectPairedLineupChain(): Promise<void> {
-  capturePairedLineupFromDom();
-  if (!pairedLineupBuilder.match_id) throw new Error("请选择比赛");
-  selectedMatchLineupChain = await runBusy(() =>
-    api.readMatchLineupChain(
-      pairedLineupBuilder.match_id,
-      pairedLineupBuilder.snapshot_type,
-    ),
-  );
-  workspaceState.patchModule("lineups", { active_section: "chain" });
-  render({ preserveForm: true });
-}
-
-function inferCompetitionTeamScope(competitionId: string | null): "national" | "club" | "all" {
-  const competition = session.bootstrap?.data.competitions.find((item) => item.id === competitionId);
-  if (!competition) return "all";
-  const explicitScope = typeof competition.metadata?.scope === "string" ? competition.metadata.scope.toLowerCase() : "";
-  if (explicitScope === "national" || explicitScope === "club") return explicitScope;
-  const text = `${competition.name} ${competition.code}`.toLowerCase();
-  if (/world cup|世界杯|euro|欧洲杯|nations|国家联赛|international|qualif|预选|copa america|美洲杯|asian cup|亚洲杯|afcon|非洲杯|gold cup|金杯|national/.test(text)) return "national";
-  if (/league|联赛|cup|杯|champions|libertadores|俱乐部|superliga|premier|bundesliga|serie|liga|ligue/.test(text)) return "club";
-  return "all";
-}
-
-function autoSelectMatchSeason(): void {
-  const competitionId = nullableValue("new-match-competition");
-  const season = document.querySelector<HTMLSelectElement>("#new-match-season");
-  const kickoffRaw = nullableValue("new-match-kickoff");
-  if (!competitionId || !season) return;
-  const kickoffDate = kickoffRaw ? kickoffRaw.slice(0, 10) : null;
-  const candidates = Array.from(season.options).filter((option) =>
-    option.value && option.dataset.competitionId === competitionId,
-  );
-  const matched = kickoffDate
-    ? candidates.find((option) => {
-        const starts = option.dataset.startsOn || null;
-        const ends = option.dataset.endsOn || null;
-        return (!starts || starts <= kickoffDate) && (!ends || ends >= kickoffDate);
-      })
-    : null;
-  if (!season.value || season.selectedOptions[0]?.hidden) {
-    season.value = matched?.value ?? candidates[0]?.value ?? "";
-  }
-}
-
-function updateCompetitionHierarchy(source: "scope" | "region" | "competition" | "init" = "init"): void {
-  const scope = document.querySelector<HTMLSelectElement>("#new-match-competition-scope");
-  const region = document.querySelector<HTMLSelectElement>("#new-match-competition-region");
-  const competition = document.querySelector<HTMLSelectElement>("#new-match-competition");
-  if (!scope || !region || !competition) return;
-
-  const competitionOptions = Array.from(competition.options).filter((option) => option.value);
-  const selectedScope = scope.value;
-  if (source === "scope") {
-    region.value = "";
-    competition.value = "";
-  } else if (source === "region") {
-    competition.value = "";
-  }
-
-  const allowedRegions = new Set(
-    competitionOptions
-      .filter((option) => !selectedScope || option.dataset.scope === selectedScope)
-      .map((option) => option.dataset.region ?? ""),
-  );
-  for (const option of Array.from(region.options)) {
-    if (!option.value) continue;
-    const allowed = allowedRegions.has(option.value);
-    option.hidden = !allowed;
-    option.disabled = !allowed;
-  }
-  if (region.selectedOptions[0]?.disabled) region.value = "";
-
-  region.disabled = !selectedScope;
-  const regionPlaceholder = region.options[0];
-  if (regionPlaceholder) regionPlaceholder.textContent = selectedScope ? "选择地区或足联" : "先选择参赛体系";
-
-  const selectedRegion = region.value;
-  competition.disabled = !selectedScope || !selectedRegion;
-  const competitionPlaceholder = competition.options[0];
-  if (competitionPlaceholder) competitionPlaceholder.textContent = selectedRegion ? "选择具体赛事" : "先选择地区或足联";
-  for (const option of competitionOptions) {
-    const allowed =
-      (!selectedScope || option.dataset.scope === selectedScope) &&
-      (!selectedRegion || option.dataset.region === selectedRegion);
-    option.hidden = !allowed;
-    option.disabled = !allowed;
-  }
-  if (competition.selectedOptions[0]?.disabled) competition.value = "";
-
-  if (source !== "competition") {
-    filterSelectOptions("new-match-season", "competitionId", competition.value || null);
-    filterSelectOptions("new-match-stage", "competitionId", competition.value || null);
-    autoSelectMatchSeason();
-    filterMatchTeamOptions();
-  }
-  refreshSearchableSelects(app);
-}
-
-function updateFormationHierarchy(
-  side: LineupSide,
-  source: "level1" | "level2" | "formation" | "init" = "init",
-): void {
-  const level1 = document.querySelector<HTMLSelectElement>(`#paired-${side}-formation-level1`);
-  const level2 = document.querySelector<HTMLSelectElement>(`#paired-${side}-formation-level2`);
-  const formation = document.querySelector<HTMLSelectElement>(`#paired-${side}-formation-id`);
-  const hiddenCode = document.querySelector<HTMLInputElement>(`#paired-${side}-formation`);
-  if (!level1 || !level2 || !formation) return;
-
-  if (source === "level1") {
-    level2.value = "";
-    formation.value = "";
-  } else if (source === "level2") {
-    formation.value = "";
-  }
-
-  for (const option of Array.from(level2.options)) {
-    if (!option.value) continue;
-    const allowed = !level1.value || option.dataset.level1 === level1.value;
-    option.hidden = !allowed;
-    option.disabled = !allowed;
-  }
-  if (level2.selectedOptions[0]?.disabled) level2.value = "";
-
-  for (const option of Array.from(formation.options)) {
-    if (!option.value) continue;
-    const allowed =
-      (!level1.value || option.dataset.level1 === level1.value) &&
-      (!level2.value || option.dataset.level2 === level2.value);
-    option.hidden = !allowed;
-    option.disabled = !allowed;
-  }
-  if (formation.selectedOptions[0]?.disabled) formation.value = "";
-  const selected = formation.selectedOptions[0];
-  if (hiddenCode && selected?.value) hiddenCode.value = selected.dataset.code ?? "";
-  if (source !== "init") {
-    capturePairedLineupFromDom();
-    selectedMatchLineupChain = null;
-  }
-}
-
-function filterMatchTeamOptions(): void {
-  const competitionId = nullableValue("new-match-competition");
-  const seasonId = nullableValue("new-match-season");
-  const scopeSelect = document.querySelector<HTMLSelectElement>("#new-match-team-scope");
-  const requested = scopeSelect?.value ?? "auto";
-  const scope = requested === "auto" ? inferCompetitionTeamScope(competitionId) : requested;
-  const registered = new Set(
-    (playersFeature.catalog.references?.season_team_memberships ?? [])
-      .filter((item) => item.season_id === seasonId && ["registered", "guest"].includes(item.registration_status))
-      .map((item) => item.team_id),
-  );
-  const restrictMembership = Boolean(seasonId && registered.size > 0);
-  for (const selectId of ["new-match-home-team", "new-match-away-team"]) {
-    const select = document.querySelector<HTMLSelectElement>(`#${selectId}`);
-    if (!select) continue;
-    for (const option of Array.from(select.options)) {
-      if (!option.value) {
-        option.hidden = false;
-        continue;
-      }
-      const typeMatches = scope === "all" || option.dataset.teamType === scope;
-      const memberMatches = !restrictMembership || registered.has(option.value);
-      option.hidden = !option.selected && !(typeMatches && memberMatches);
-    }
-    if (select.selectedOptions[0]?.hidden) select.value = "";
-  }
-  const note = document.querySelector<HTMLElement>("#match-team-filter-note");
-  if (note) {
-    note.textContent = restrictMembership
-      ? `当前赛季已注册 ${registered.size} 支球队，主客队仅从注册名单选择。`
-      : scope === "national"
-        ? "当前赛事按国家队体系筛选。"
-        : scope === "club"
-          ? "当前赛事按俱乐部体系筛选。"
-          : "当前赛事未限定球队体系。";
-  }
-}
-
-function filterManagedMatchList(search: string): void {
-  const normalized = search.trim().toLowerCase();
-  for (const item of Array.from(document.querySelectorAll<HTMLElement>(".match-list-item"))) {
-    item.hidden = normalized.length > 0 && !(item.textContent ?? "").toLowerCase().includes(normalized);
-  }
-}
-
-async function createMatch(): Promise<void> {
-  autoSelectMatchSeason();
-  const competitionId = nullableValue("new-match-competition");
-  const seasonId = nullableValue("new-match-season");
-  const homeTeamId = nullableValue("new-match-home-team");
-  const awayTeamId = nullableValue("new-match-away-team");
-  const kickoff = localDateTimeToIso(nullableValue("new-match-kickoff"));
-  if (!competitionId) throw new Error("请先选择赛事；缺少赛事时可跳转赛事设置补充后返回");
-  if (!homeTeamId || !awayTeamId || !kickoff) {
-    throw new Error("请选择主客队并填写开球时间");
-  }
-  if (homeTeamId === awayTeamId) throw new Error("主队和客队不能相同");
-  const existingExternalKey = nullableValue("managed-match-external-key");
-  const draft: MatchDraft = {
-    external_key: existingExternalKey ?? `manual:${competitionId}:${homeTeamId}:${awayTeamId}:${kickoff}`,
-    competition_id: competitionId,
-    season_id: seasonId,
-    stage_id: nullableValue("new-match-stage"),
-    round_id: nullableValue("new-match-round"),
-    home_team_id: homeTeamId,
-    away_team_id: awayTeamId,
-    kickoff_time: kickoff,
-    status: value("new-match-status") as MatchDraft["status"],
-    venue: nullableValue("new-match-venue"),
-    metadata: { entry_mode: "match_center_hierarchy" },
-  };
-  const created = await runBusy(async () => {
-    const saved = await api.createMatch(draft);
-    await session.refresh();
-    playersFeature.catalog.setReferences(await api.playerCatalogReferenceData());
-    lineupRecords = await api.listLineups(null, 100);
-    return saved;
-  });
-  selectedManagedMatchId = created.id;
-  render({ preserveForm: true });
-  toast(existingExternalKey ? "比赛修改已保存" : "比赛已创建", "success");
-}
-
-function requestRemoveLineupHistory(lineupId: string, lineupLabel: string): void {
-  if (!lineupId) throw new Error("缺少阵容版本编号");
-  showConfirmation(
-    "删除阵容历史",
-    "未被正式推演、快照或球员贡献引用的版本会永久删除；已被引用的版本会归档并从历史列表隐藏，模型血缘继续保留。",
-    [
-      ["阵容", lineupLabel],
-      ["活动版本", "删除后自动恢复上一有效版本（如存在）"],
-    ],
-    "确认处理阵容版本",
-    async () => {
-      const result = await runBusy(() =>
-        api.removeLineupHistory(lineupId, "用户从阵容历史删除"),
-      );
-      lineupRecords = await api.listLineups(null, 100);
-      if (pairedLineupBuilder.match_id) {
-        selectedMatchLineupChain = await api.readMatchLineupChain(
-          pairedLineupBuilder.match_id,
-          pairedLineupBuilder.snapshot_type,
-        );
-      }
-      render();
-      toast(
-        result.removal_mode === "deleted"
-          ? "未引用阵容版本已永久删除"
-          : "已引用阵容版本已归档并隐藏",
-        "success",
-      );
-    },
-  );
-}
-
 function requestHideRunHistory(runId: string, runLabel: string): void {
   if (!runId) throw new Error("缺少推演记录编号");
   showConfirmation(
@@ -3723,372 +2284,6 @@ function requestHideRunHistory(runId: string, runLabel: string): void {
   );
 }
 
-function requestDeleteMatch(matchId: string, matchLabel: string): void {
-  showConfirmation(
-    "删除比赛",
-    "未进入P4研究、冻结或正式赛后结算的比赛可以永久删除；阵容、赛果和普通复盘会一并删除，模型运行与快照保留但解除比赛关联。已有不可变P4血缘时系统会拒绝删除。",
-    [
-      ["比赛", matchLabel],
-      ["保护", "P4研究、冻结或正式赛后结算存在时禁止永久删除"],
-      ["保留", "普通模型运行和特征快照保留为历史记录"],
-    ],
-    "永久删除比赛",
-    async () => {
-      await runBusy(() => api.deleteMatch(matchId));
-      lineupBuilderForm = { ...lineupBuilderForm, match_id: "", team_id: "" };
-      lineupBuilderPlayers = [];
-      if (pairedLineupBuilder.match_id === matchId) {
-        pairedLineupBuilder = {
-          ...pairedLineupBuilder,
-          match_id: "",
-          home: emptyPairedLineupSide(),
-          away: emptyPairedLineupSide(),
-        };
-      }
-      if (selectedManagedMatchId === matchId) selectedManagedMatchId = null;
-      await refreshBootstrapAndCatalog();
-      lineupRecords = await api.listLineups(null, 100);
-      render();
-      toast("比赛及关联阵容已删除", "success");
-    },
-  );
-}
-
-interface CaptureLineupFormOptions {
-  readonly allowBlankIdentity?: boolean;
-}
-
-function captureLineupFormFromDom(
-  options: CaptureLineupFormOptions = {},
-): void {
-  const match = document.querySelector<HTMLSelectElement>("#new-lineup-match");
-  const team = document.querySelector<HTMLSelectElement>("#new-lineup-team");
-  const type = document.querySelector<HTMLSelectElement>("#new-lineup-type");
-  const snapshot = document.querySelector<HTMLSelectElement>("#new-lineup-snapshot");
-  const coach = document.querySelector<HTMLSelectElement | HTMLInputElement>("#new-lineup-coach");
-  const sourceUrls = document.querySelector<HTMLInputElement>("#new-lineup-source-urls");
-  const formation = document.querySelector<HTMLInputElement>("#new-lineup-formation");
-  const formationSelect = document.querySelector<HTMLSelectElement>("#new-lineup-formation-id");
-  const captured = document.querySelector<HTMLInputElement>(
-    "#new-lineup-captured-at",
-  );
-  const quality = document.querySelector<HTMLInputElement>(
-    "#new-lineup-quality",
-  );
-  if (!match || !team || !type || !snapshot || !formation || !captured || !quality) return;
-  const selectedFormation = formationSelect?.selectedOptions[0];
-  const formationCode = selectedFormation?.dataset.code ?? formation.value;
-  const preserveIdentity = options.allowBlankIdentity !== true;
-  const matchId =
-    match.value || (preserveIdentity ? lineupBuilderForm.match_id : "");
-  const teamId =
-    team.value || (preserveIdentity ? lineupBuilderForm.team_id : "");
-  lineupBuilderForm = {
-    match_id: matchId,
-    team_id: teamId,
-    lineup_type: type.value as LineupBuilderFormState["lineup_type"],
-    snapshot_type: snapshot.value as LineupBuilderFormState["snapshot_type"],
-    formation_id: formationSelect?.value ?? "",
-    formation: formationCode,
-    coach_id: coach?.value ?? "",
-    source_urls: sourceUrls?.value ?? "",
-    captured_at: captured.value,
-    quality_score: Number(quality.value || 0.8),
-  };
-}
-
-function captureLineupBuilderFromDom(): void {
-  const rows = Array.from(
-    document.querySelectorAll<HTMLElement>("[data-lineup-builder-row]:not([data-lineup-side])"),
-  );
-  if (rows.length === 0) return;
-  lineupBuilderPlayers = rows.map((row) => {
-    const playerId = row.dataset.playerId ?? "";
-    const existing = lineupBuilderPlayers.find(
-      (item) => item.player_id === playerId,
-    );
-    if (!existing) throw new Error("阵容球员状态丢失，请重新加载球队名单");
-    const read = (field: string): string =>
-      row.querySelector<HTMLInputElement | HTMLSelectElement>(
-        `[data-lineup-field="${field}"]`,
-      )?.value ?? "";
-    const minutes = read("expected_minutes").trim();
-    const shirt = read("shirt_number").trim();
-    const benchOrder = read("bench_order").trim();
-    const startingProbability = read("starting_probability").trim();
-    const membershipOverride = row.querySelector<HTMLInputElement>(
-      '[data-lineup-field="membership_override"]',
-    )?.checked ?? false;
-    const positionCode = read("position_code") || null;
-    const currentRole = read("role_code") || null;
-    const candidate = lineupPlayerCandidates.find((item) => item.id === playerId);
-    const previousDefaultRole = candidate
-      ? defaultRoleForPlayer(candidate, existing.position_code)
-      : null;
-    const nextDefaultRole = candidate
-      ? defaultRoleForPlayer(candidate, positionCode)
-      : null;
-    const roleCode = !currentRole || currentRole === previousDefaultRole
-      ? nextDefaultRole
-      : currentRole;
-    return {
-      ...existing,
-      is_starter: read("is_starter") === "true",
-      position_code: positionCode,
-      role_code: roleCode,
-      expected_minutes: minutes ? Number(minutes) : null,
-      shirt_number: shirt ? Number(shirt) : null,
-      bench_order: benchOrder ? Number(benchOrder) : null,
-      starting_probability: startingProbability ? Number(startingProbability) : null,
-      membership_override: membershipOverride,
-    };
-  });
-}
-
-async function loadLineupPlayersForTeam(teamId: string): Promise<number> {
-  const requestSequence = lineupPlayerLoadSequence.next();
-  const result = await api.listPlayers({
-    search: null,
-    team_id: teamId,
-    position_code: null,
-    availability_status: null,
-    player_status: "active",
-    limit: 200,
-    cursor_name: null,
-    cursor_id: null,
-  });
-  if (
-    !lineupPlayerLoadSequence.isCurrent(requestSequence) ||
-    lineupBuilderForm.team_id !== teamId
-  ) {
-    return 0;
-  }
-  lineupPlayerCandidates = result.items;
-  lineupBuilderPlayers = lineupBuilderPlayers.filter((item) =>
-    result.items.some((candidate) => candidate.id === item.player_id),
-  );
-  return result.items.length;
-}
-
-async function autoLoadLineupPlayers(teamId: string): Promise<void> {
-  const teamName =
-    playersFeature.catalog.references?.teams.find((team) => team.id === teamId)?.canonical_name ??
-    "所选球队";
-  const traceId = recordUiOperation(
-    "ui_action",
-    "action:auto-load-lineup-players",
-    { page: navigation.page, teamId, teamName },
-  );
-  try {
-    const count = await runBusy(() => loadLineupPlayersForTeam(teamId));
-    if (lineupBuilderForm.team_id !== teamId) return;
-    render();
-    toast(
-      count > 0
-        ? `${teamName}已自动加载 ${count} 名球员`
-        : `${teamName}已完成查询，但没有找到有效球员`,
-      count > 0 ? "success" : "normal",
-    );
-  } catch (error) {
-    recordUiOperationFailure(
-      "action:auto-load-lineup-players",
-      error,
-      traceId,
-      { page: navigation.page, teamId, teamName },
-    );
-    recordClientIssue(error, `${pageTitle(navigation.page)} / 自动加载球队名单`);
-    toast(userFacingError(error), "error");
-  }
-}
-
-async function loadLineupPlayers(): Promise<void> {
-  captureLineupFormFromDom();
-  const teamId = lineupBuilderForm.team_id || null;
-  if (!teamId) throw new Error("请先选择球队");
-  captureLineupBuilderFromDom();
-  const count = await runBusy(() => loadLineupPlayersForTeam(teamId));
-  render();
-  toast(`已加载 ${count} 名球员`, "success");
-}
-
-function addLineupPlayer(playerId: string, starter: boolean): void {
-  captureLineupFormFromDom();
-  captureLineupBuilderFromDom();
-  if (lineupBuilderPlayers.some((item) => item.player_id === playerId)) return;
-  const player = lineupPlayerCandidates.find((item) => item.id === playerId);
-  if (!player) throw new Error("球员不在当前球队名单中");
-  if (
-    starter &&
-    lineupBuilderPlayers.filter((item) => item.is_starter).length >= 11
-  ) {
-    throw new Error("首发人数不能超过 11 人");
-  }
-  const playerName = displayPlayerName(player);
-  lineupBuilderPlayers.push({
-    player_id: player.id,
-    player_name: playerName.primary,
-    player_secondary_name: playerName.secondary,
-    position_code: player.primary_position_code,
-    role_code: defaultRoleForPlayer(player, player.primary_position_code),
-    is_starter: starter,
-    expected_minutes: starter ? 90 : 20,
-    shirt_number: null,
-    bench_order: starter ? null : lineupBuilderPlayers.filter((item) => !item.is_starter).length + 1,
-    starting_probability: starter ? 1 : 0,
-    membership_override: false,
-    availability_status: player.availability_status,
-  });
-  render();
-}
-
-function removeLineupPlayer(playerId: string): void {
-  captureLineupFormFromDom();
-  captureLineupBuilderFromDom();
-  lineupBuilderPlayers = lineupBuilderPlayers.filter(
-    (item) => item.player_id !== playerId,
-  );
-  render();
-}
-
-async function inspectLineupChain(): Promise<void> {
-  captureLineupFormFromDom();
-  if (!lineupBuilderForm.match_id) throw new Error("请选择比赛");
-  selectedMatchLineupChain = await runBusy(() =>
-    api.readMatchLineupChain(lineupBuilderForm.match_id, lineupBuilderForm.snapshot_type),
-  );
-  render();
-}
-
-async function createLineup(): Promise<void> {
-  captureLineupFormFromDom();
-  captureLineupBuilderFromDom();
-  const matchId = lineupBuilderForm.match_id || null;
-  const teamId = lineupBuilderForm.team_id || null;
-  if (!matchId || !teamId) throw new Error("请选择比赛和参赛队");
-  if (lineupBuilderPlayers.length === 0)
-    throw new Error("请先从球队名单加入球员");
-  const starterCount = lineupBuilderPlayers.filter(
-    (item) => item.is_starter,
-  ).length;
-  if (starterCount !== 11) throw new Error(`正式阵容必须恰好 11 名首发，当前为 ${starterCount} 名`);
-  const capturedAt = localDateTimeToIso(
-    lineupBuilderForm.captured_at || null,
-    lineupBuilderForm.snapshot_type === "T-N",
-  );
-  if (!capturedAt) {
-    throw new Error("固定时点阵容必须填写不晚于模型截止时间的历史记录时间");
-  }
-  const activeChain =
-    selectedMatchLineupChain?.match_record.id === matchId &&
-    selectedMatchLineupChain.snapshot_type === lineupBuilderForm.snapshot_type
-      ? selectedMatchLineupChain
-      : null;
-  if (
-    activeChain &&
-    new Date(capturedAt).getTime() >
-      new Date(activeChain.data_cutoff_time).getTime()
-  ) {
-    throw new Error(
-      `${lineupBuilderForm.snapshot_type} 阵容记录时间不能晚于模型截止时间 ${new Date(activeChain.data_cutoff_time).toLocaleString()}`,
-    );
-  }
-  const selectedMatch =
-    playersFeature.catalog.references?.managed_matches.find((match) => match.id === matchId) ??
-    playersFeature.catalog.references?.upcoming_matches.find((match) => match.id === matchId);
-  if (
-    selectedMatch &&
-    lineupBuilderForm.lineup_type !== "actual" &&
-    new Date(capturedAt).getTime() >=
-      new Date(selectedMatch.kickoff_time).getTime()
-  ) {
-    throw new Error("预计或确认阵容的记录时间必须早于开球时间");
-  }
-  const players: LineupPlayerDraft[] = lineupBuilderPlayers.map(
-    (item, index) => ({
-      player_id: item.player_id,
-      position_code: item.position_code,
-      role_code: item.role_code,
-      is_starter: item.is_starter,
-      shirt_number: item.shirt_number,
-      expected_minutes: item.expected_minutes,
-      actual_minutes: null,
-      sequence_no: index + 1,
-      bench_order: item.is_starter ? null : item.bench_order,
-      availability_status: item.availability_status,
-      starting_probability: item.starting_probability,
-      membership_override: item.membership_override,
-      source_urls: [],
-      metadata: {},
-    }),
-  );
-  const draft: LineupDraft = {
-    match_id: matchId,
-    team_id: teamId,
-    lineup_type: lineupBuilderForm.lineup_type,
-    snapshot_type: lineupBuilderForm.snapshot_type,
-    formation: lineupBuilderForm.formation.trim() || null,
-    formation_id: lineupBuilderForm.formation_id || null,
-    coach_id: lineupBuilderForm.coach_id || null,
-    captured_at: capturedAt,
-    source_document_id: null,
-    source_urls: lineupBuilderForm.source_urls.split(/[;\n,]/).map((item) => item.trim()).filter(Boolean),
-    quality_score: lineupBuilderForm.quality_score,
-    metadata: { entry_mode: "visual_builder" },
-    players,
-  };
-  const snapshotType = lineupBuilderForm.snapshot_type;
-  await runBusy(async () => {
-    const created = await api.createLineup(draft);
-    lineupRecords = await api.listLineups(null, 100);
-    selectedMatchLineupChain = await api.readMatchLineupChain(
-      matchId,
-      snapshotType,
-    );
-    lastPredictionResult = created;
-  });
-  lineupBuilderPlayers = [];
-  lineupPlayerCandidates = [];
-  if (navigation.page === "review" && selectedReviewMatchId) {
-    await loadReviewLineups(selectedReviewMatchId);
-    lineupBuilderForm = {
-      ...lineupBuilderForm,
-      match_id: selectedReviewMatchId,
-      team_id: "",
-      lineup_type: "actual",
-    };
-    render();
-    toast("阵容已保存，可继续补录另一队或生成复盘", "success");
-    return;
-  }
-  const chain = selectedMatchLineupChain;
-  if (!chain) throw new Error("阵容已保存，但未能读取模型链路");
-  if (chain.ready_for_model) {
-    workspaceState.patchModule("lineups", { active_section: "chain" });
-    render();
-    toast("双方阵容已保存并通过门禁，可以返回正式推演", "success");
-    return;
-  }
-  const target = missingLineupTeam(chain);
-  lineupBuilderForm = {
-    ...lineupBuilderForm,
-    match_id: matchId,
-    team_id: target.team_id,
-    lineup_type: "expected",
-    snapshot_type: snapshotType,
-    captured_at: localDateTimeInputValue(chain.data_cutoff_time),
-  };
-  const count = await runBusy(() => loadLineupPlayersForTeam(target.team_id));
-  workspaceState.patchModule("lineups", {
-    active_section: "builder",
-    controls: {},
-  });
-  render();
-  toast(
-    `当前阵容已保存；继续补齐${target.team_side === "home" ? "主队" : "客队"}${target.team_name}（已加载 ${count} 名球员）`,
-    "success",
-  );
-}
-
 function numberFromReviewRow(row: HTMLElement, field: string): number {
   const input = row.querySelector<HTMLInputElement>(`[data-field="${field}"]`);
   if (!input || input.value.trim() === "") return 0;
@@ -4106,7 +2301,7 @@ async function loadSelectedReviewMatch(): Promise<void> {
   selectedReviewMatchId = matchId;
   selectedMatchReview = null;
   matchReviewPackagePreview = null;
-  lineupBuilderForm = {
+  lineupsFeature.state.lineupBuilderForm = {
     match_id: matchId,
     team_id: "",
     lineup_type: "actual",
@@ -4118,8 +2313,8 @@ async function loadSelectedReviewMatch(): Promise<void> {
     captured_at: "",
     quality_score: 0.9,
   };
-  lineupBuilderPlayers = [];
-  lineupPlayerCandidates = [];
+  lineupsFeature.state.lineupBuilderPlayers = [];
+  lineupsFeature.state.lineupPlayerCandidates = [];
   await runBusy(async () => {
     const result = await fetchReviewCenter(matchId);
     applyReviewCenter(result);
@@ -5408,6 +3603,9 @@ async function handleAction(
       await runBusy(() => teamsFeature.load(true));
       render();
       break;
+    case "show-lineup-preset-rules":
+      showHtmlModal("预设套用规则", "本场副本与球队预设独立", "<p>先选择比赛与球队，预览最新名单、阵型与角色。确认仅替换目标一侧草稿；比赛或草稿变化后需重新预览。双方阵容仍需各11名首发并通过独立保存与模型准入检查。</p>");
+      break;
     case "refresh-lineup-preset-page":
       await refreshLineupPresetPage();
       break;
@@ -5663,102 +3861,104 @@ async function handleAction(
       await playersFeature.editor.calculatePlayerContribution(button.dataset.playerId ?? "");
       break;
     case "export-match-template":
-      await exportMatchTemplate();
+      await lineupsFeature.actions.exportMatchTemplate();
       break;
     case "export-match-data":
-      await exportMatchData();
+      await lineupsFeature.actions.exportMatchData();
       break;
     case "export-ai-match-package":
-      await exportAiMatchPackage();
+      await lineupsFeature.actions.exportAiMatchPackage();
       break;
     case "calculate-stored-match":
       await calculateStoredMatch();
       break;
     case "preview-match-import":
-      await previewMatchImport(false);
+      await lineupsFeature.actions.previewMatchImport(false);
       break;
     case "preview-ai-match-import":
-      await previewMatchImport(true);
+      await lineupsFeature.actions.previewMatchImport(true);
       break;
     case "resolve-match-import-conflict":
-      await resolveMatchImportConflict(
+      await lineupsFeature.actions.resolveMatchImportConflict(
         button.dataset.rowId ?? "",
         button.dataset.entityId ?? null,
         false,
       );
       break;
     case "skip-match-import-conflict":
-      await resolveMatchImportConflict(button.dataset.rowId ?? "", null, true);
+      await lineupsFeature.actions.resolveMatchImportConflict(button.dataset.rowId ?? "", null, true);
       break;
     case "commit-match-import":
-      await commitMatchImport();
+      await lineupsFeature.actions.commitMatchImport();
       break;
     case "show-match-import-json":
-      if (matchSpreadsheetPreview)
-        showModal("比赛与阵容导入预检", matchSpreadsheetPreview);
+      if (lineupsFeature.imports.preview) {
+        await lineupsFeature.imports.readback();
+        if(lineupsFeature.imports.preview)showModal("比赛与阵容导入预检", lineupsFeature.imports.preview);
+      }
       break;
     case "select-managed-match": {
       const matchId = button.dataset.matchId ?? "";
-      selectedManagedMatchId = matchId || null;
+      lineupsFeature.state.selectedManagedMatchId = matchId || null;
       render({ preserveForm: true });
       queueMicrotask(() => {
-        autoSelectMatchSeason();
-        filterMatchTeamOptions();
+        lineupsFeature.actions.autoSelectMatchSeason();
+        lineupsFeature.actions.filterMatchTeamOptions();
       });
       break;
     }
     case "new-managed-match":
-      selectedManagedMatchId = null;
+      lineupsFeature.state.selectedManagedMatchId = null;
       render({ preserveForm: true });
       break;
     case "open-match-lineups": {
       const matchId = button.dataset.matchId ?? "";
-      resetPairedBuilderForMatch(matchId, false);
+      lineupsFeature.actions.resetPairedBuilderForMatch(matchId, false);
       workspaceState.patchModule("lineups", { active_section: "builder" });
-      await runBusy(loadBothPairedLineupSides);
+      await runBusy(lineupsFeature.actions.loadBothPairedLineupSides);
       render({ preserveForm: true });
       break;
     }
     case "open-match-prediction": {
       const matchId = button.dataset.matchId ?? "";
       selectedP4MatchId = matchId;
-      selectedPredictionSnapshot = pairedLineupBuilder.match_id === matchId
-        ? pairedLineupBuilder.snapshot_type
+      selectedPredictionSnapshot = lineupsFeature.state.pairedLineupBuilder.match_id === matchId
+        ? lineupsFeature.state.pairedLineupBuilder.snapshot_type
         : "T-N";
       workspaceState.patchModule("prediction", { active_section: "formal" });
       await navigateTo("prediction");
       break;
     }
     case "create-match":
-      await createMatch();
+      await lineupsFeature.actions.createMatch();
       break;
     case "request-delete-match":
-      requestDeleteMatch(
+      lineupsFeature.actions.requestDeleteMatch(
         button.dataset.matchId ?? "",
         button.dataset.matchLabel ?? "未命名比赛",
       );
       break;
     case "reload-paired-lineup-side": {
       const side = button.dataset.lineupSide as LineupSide;
-      const count = await runBusy(() => loadPairedLineupSide(side));
+      const count = await runBusy(() => lineupsFeature.actions.loadPairedLineupSide(side));
       render();
-      toast(`${pairedSide(side).team_name}已加载 ${count} 名球员`, count > 0 ? "success" : "normal");
+      toast(`${lineupsFeature.actions.pairedSide(side).team_name}已加载 ${count} 名球员`, count > 0 ? "success" : "normal");
       break;
     }
     case "clear-paired-lineup-side":
-      clearPairedLineupSide(button.dataset.lineupSide as LineupSide);
+      lineupsFeature.actions.clearPairedLineupSide(button.dataset.lineupSide as LineupSide);
       break;
     case "open-team-lineup-preset-manager":
-      await openTeamLineupPresetManager(
+      await lineupsFeature.actions.openTeamLineupPresetManager(
         button.dataset.teamId ?? teamsFeature.catalog.detail?.team.id ?? "",
         button.dataset.teamName ?? teamsFeature.catalog.detail?.team.canonical_name ?? "球队",
       );
       break;
     case "open-lineup-preset-manager":
-      await openLineupPresetManagerForSide(button.dataset.lineupSide as LineupSide);
+      await lineupsFeature.actions.openLineupPresetManagerForSide(button.dataset.lineupSide as LineupSide);
       break;
     case "request-delete-team-lineup-preset":
-      requestDeleteTeamLineupPreset(
+      lineupsFeature.actions.requestDeleteTeamLineupPreset(
         button.dataset.presetId ?? "",
         button.dataset.presetName ?? "阵容预设",
         button.dataset.teamId ?? "",
@@ -5768,64 +3968,64 @@ async function handleAction(
       );
       break;
     case "open-team-lineup-preset-editor":
-      openTeamLineupPresetEditor(button.dataset.presetId || null);
+      lineupsFeature.actions.openTeamLineupPresetEditor(button.dataset.presetId || null);
       break;
     case "auto-assign-preset-formation":
-      assignPresetFormationSlots();
+      lineupsFeature.actions.assignPresetFormationSlots();
       break;
     case "save-team-lineup-preset":
-      await saveTeamLineupPreset(button.dataset.presetId || null);
+      await lineupsFeature.actions.saveTeamLineupPreset(button.dataset.presetId || null);
       break;
     case "duplicate-team-lineup-preset":
-      openDuplicateLineupPreset(
+      lineupsFeature.actions.openDuplicateLineupPreset(
         button.dataset.presetId ?? "",
         button.dataset.presetName ?? "阵容预设",
       );
       break;
     case "confirm-duplicate-lineup-preset":
-      await duplicateLineupPreset(button.dataset.presetId ?? "");
+      await lineupsFeature.actions.duplicateLineupPreset(button.dataset.presetId ?? "");
       break;
     case "archive-team-lineup-preset":
-      requestArchiveLineupPreset(
+      lineupsFeature.actions.requestArchiveLineupPreset(
         button.dataset.presetId ?? "",
         button.dataset.presetName ?? "阵容预设",
       );
       break;
     case "save-current-lineup-as-preset":
-      openSaveCurrentLineupPreset(button.dataset.lineupSide as LineupSide);
+      lineupsFeature.actions.openSaveCurrentLineupPreset(button.dataset.lineupSide as LineupSide);
       break;
     case "confirm-save-current-lineup-preset":
-      await saveCurrentLineupAsPreset(button.dataset.lineupSide as LineupSide);
+      await lineupsFeature.actions.saveCurrentLineupAsPreset(button.dataset.lineupSide as LineupSide);
       break;
     case "preview-apply-lineup-preset":
-      await previewApplyLineupPreset(button.dataset.lineupSide as LineupSide);
+      await lineupsFeature.actions.previewApplyLineupPreset(button.dataset.lineupSide as LineupSide);
       break;
     case "confirm-apply-lineup-preset":
-      await applyLineupPreset(
+      await lineupsFeature.actions.applyLineupPreset(
         button.dataset.lineupSide as LineupSide,
         button.dataset.presetId ?? "",
       );
       break;
     case "create-lineup-pair":
-      await createPairedLineups();
+      await lineupsFeature.actions.createPairedLineups();
       break;
     case "inspect-paired-lineup-chain":
-      await inspectPairedLineupChain();
+      await lineupsFeature.actions.inspectPairedLineupChain();
       break;
     case "load-lineup-players":
-      await loadLineupPlayers();
+      await lineupsFeature.actions.loadLineupPlayers();
       break;
     case "add-selected-lineup-player":
-      addSelectedPairedLineupPlayer(button.dataset.lineupSide as LineupSide);
+      lineupsFeature.actions.addSelectedPairedLineupPlayer(button.dataset.lineupSide as LineupSide);
       break;
     case "open-lineup-player-settings":
-      openPairedLineupPlayerSettings(
+      lineupsFeature.actions.openPairedLineupPlayerSettings(
         button.dataset.lineupSide as LineupSide,
         button.dataset.playerId ?? "",
       );
       break;
     case "save-lineup-player-settings":
-      savePairedLineupPlayerSettings(
+      lineupsFeature.actions.savePairedLineupPlayerSettings(
         button.dataset.lineupSide as LineupSide,
         button.dataset.playerId ?? "",
       );
@@ -5833,13 +4033,13 @@ async function handleAction(
     case "add-lineup-player": {
       const side = button.dataset.lineupSide as LineupSide | undefined;
       if (side) {
-        addPairedLineupPlayer(
+        lineupsFeature.actions.addPairedLineupPlayer(
           side,
           button.dataset.playerId ?? "",
           button.dataset.role === "starter",
         );
       } else {
-        addLineupPlayer(
+        lineupsFeature.actions.addLineupPlayer(
           button.dataset.playerId ?? "",
           button.dataset.role === "starter",
         );
@@ -5848,20 +4048,20 @@ async function handleAction(
     }
     case "remove-lineup-player": {
       const side = button.dataset.lineupSide as LineupSide | undefined;
-      if (side) removePairedLineupPlayer(side, button.dataset.playerId ?? "");
-      else removeLineupPlayer(button.dataset.playerId ?? "");
+      if (side) lineupsFeature.actions.removePairedLineupPlayer(side, button.dataset.playerId ?? "");
+      else lineupsFeature.actions.removeLineupPlayer(button.dataset.playerId ?? "");
       break;
     }
     case "clear-lineup-builder":
-      captureLineupFormFromDom();
-      lineupBuilderPlayers = [];
+      lineupsFeature.actions.captureLineupFormFromDom();
+      lineupsFeature.state.lineupBuilderPlayers = [];
       render();
       break;
     case "inspect-lineup-chain":
-      await inspectLineupChain();
+      await lineupsFeature.actions.inspectLineupChain();
       break;
     case "create-lineup":
-      await createLineup();
+      await lineupsFeature.actions.createLineup();
       break;
     case "refresh-lineups":
       await runBusy(loadLineups);
@@ -6055,7 +4255,7 @@ async function handleAction(
       render();
       break;
     case "request-remove-lineup-history":
-      requestRemoveLineupHistory(
+      lineupsFeature.actions.requestRemoveLineupHistory(
         button.dataset.lineupId ?? "",
         button.dataset.lineupLabel ?? "未命名阵容",
       );
@@ -6209,7 +4409,7 @@ document.addEventListener("input", (event) => {
     return;
   }
   if (target.id === "managed-match-search" && target instanceof HTMLInputElement) {
-    filterManagedMatchList(target.value);
+    lineupsFeature.actions.filterManagedMatchList(target.value);
     return;
   }
   if (target.id === "rules-competition-search" && target instanceof HTMLInputElement) {
@@ -6303,28 +4503,28 @@ document.addEventListener("change", (event) => {
   }
   if (target instanceof HTMLInputElement && target.classList.contains("preset-member-enabled")) {
     const row = target.closest<HTMLElement>("[data-preset-player-id]");
-    if (row) syncPresetMemberRowState(row);
-    updatePresetEditorSummary();
+    if (row) lineupsFeature.actions.syncPresetMemberRowState(row);
+    lineupsFeature.actions.updatePresetEditorSummary();
     return;
   }
   if (target instanceof HTMLSelectElement && target.id === "lineup-preset-formation") {
-    refreshPresetPositionOptions(true);
+    lineupsFeature.actions.refreshPresetPositionOptions(true);
     return;
   }
   if (target instanceof HTMLSelectElement && target.classList.contains("preset-member-role")) {
     const row = target.closest<HTMLElement>("[data-preset-player-id]");
-    if (row) syncPresetMemberRowState(row);
-    updatePresetEditorSummary();
+    if (row) lineupsFeature.actions.syncPresetMemberRowState(row);
+    lineupsFeature.actions.updatePresetEditorSummary();
     return;
   }
   if (target instanceof HTMLSelectElement && target.classList.contains("preset-member-position")) {
     const row = target.closest<HTMLElement>("[data-preset-player-id]");
-    if (row) refreshPresetTacticalRoleSelect(row);
-    updatePresetEditorSummary();
+    if (row) lineupsFeature.actions.refreshPresetTacticalRoleSelect(row);
+    lineupsFeature.actions.updatePresetEditorSummary();
     return;
   }
   if (target instanceof HTMLSelectElement && target.classList.contains("preset-member-tactical-role")) {
-    updatePresetEditorSummary();
+    lineupsFeature.actions.updatePresetEditorSummary();
     return;
   }
   if (target.id === "rule-package-file" && target instanceof HTMLInputElement) {
@@ -6336,8 +4536,8 @@ document.addEventListener("change", (event) => {
     return;
   }
   if (target.id === "new-match-kickoff" && target instanceof HTMLInputElement) {
-    autoSelectMatchSeason();
-    filterMatchTeamOptions();
+    lineupsFeature.actions.autoSelectMatchSeason();
+    lineupsFeature.actions.filterMatchTeamOptions();
     return;
   }
   if (!(target instanceof HTMLSelectElement)) return;
@@ -6354,7 +4554,7 @@ document.addEventListener("change", (event) => {
     const matchId = target.value;
     if (!matchId) return;
     selectedP4MatchId = matchId;
-    selectedMatchLineupChain = null;
+    lineupsFeature.state.selectedMatchLineupChain = null;
     selectedPredictionReadiness = null;
     void runBusy(() => loadP4MatchWorkspace(matchId))
       .then(() => {
@@ -6368,14 +4568,14 @@ document.addEventListener("change", (event) => {
   }
   if (target.id === "prediction-stored-snapshot") {
     selectedPredictionSnapshot = target.value as LineupSnapshotType;
-    selectedMatchLineupChain = null;
+    lineupsFeature.state.selectedMatchLineupChain = null;
     selectedPredictionReadiness = null;
     render({ preserveForm: true });
     return;
   }
   if (target.id === "prediction-model-family") {
     selectedPredictionModelFamily = target.value as PredictionModelFamily;
-    selectedMatchLineupChain = null;
+    lineupsFeature.state.selectedMatchLineupChain = null;
     selectedPredictionReadiness = null;
     render({ preserveForm: true });
     return;
@@ -6423,15 +4623,15 @@ document.addEventListener("change", (event) => {
     refreshSearchableSelects(app);
   }
   if (target.id === "new-match-competition-scope") {
-    updateCompetitionHierarchy("scope");
+    lineupsFeature.actions.updateCompetitionHierarchy("scope");
     return;
   }
   if (target.id === "new-match-competition-region") {
-    updateCompetitionHierarchy("region");
+    lineupsFeature.actions.updateCompetitionHierarchy("region");
     return;
   }
   if (target.id === "new-match-competition") {
-    updateCompetitionHierarchy("competition");
+    lineupsFeature.actions.updateCompetitionHierarchy("competition");
     filterSelectOptions(
       "new-match-season",
       "competitionId",
@@ -6444,13 +4644,13 @@ document.addEventListener("change", (event) => {
     );
     const scope = document.querySelector<HTMLSelectElement>("#new-match-team-scope");
     if (scope?.value === "auto") scope.value = "auto";
-    autoSelectMatchSeason();
-    filterMatchTeamOptions();
+    lineupsFeature.actions.autoSelectMatchSeason();
+    lineupsFeature.actions.filterMatchTeamOptions();
     return;
   }
   if (target.id === "new-match-season") {
     filterSelectOptions("new-match-stage", "seasonId", target.value || null);
-    filterMatchTeamOptions();
+    lineupsFeature.actions.filterMatchTeamOptions();
     return;
   }
   if (target.id === "new-match-stage") {
@@ -6458,25 +4658,25 @@ document.addEventListener("change", (event) => {
     return;
   }
   if (target.id === "new-match-team-scope") {
-    filterMatchTeamOptions();
+    lineupsFeature.actions.filterMatchTeamOptions();
     return;
   }
   if (target.id === "paired-home-formation-level1" || target.id === "paired-away-formation-level1") {
-    updateFormationHierarchy(target.id.includes("home") ? "home" : "away", "level1");
+    lineupsFeature.actions.updateFormationHierarchy(target.id.includes("home") ? "home" : "away", "level1");
     return;
   }
   if (target.id === "paired-home-formation-level2" || target.id === "paired-away-formation-level2") {
-    updateFormationHierarchy(target.id.includes("home") ? "home" : "away", "level2");
+    lineupsFeature.actions.updateFormationHierarchy(target.id.includes("home") ? "home" : "away", "level2");
     return;
   }
   if (target.id === "paired-home-formation-id" || target.id === "paired-away-formation-id") {
-    updateFormationHierarchy(target.id.includes("home") ? "home" : "away", "formation");
+    lineupsFeature.actions.updateFormationHierarchy(target.id.includes("home") ? "home" : "away", "formation");
     return;
   }
   if (target.id === "paired-lineup-match") {
     if (!target.value) return;
-    resetPairedBuilderForMatch(target.value, true);
-    void runBusy(loadBothPairedLineupSides)
+    lineupsFeature.actions.resetPairedBuilderForMatch(target.value, true);
+    void runBusy(lineupsFeature.actions.loadBothPairedLineupSides)
       .then(([homeCount, awayCount]) => {
         render();
         toast(`双方名单已加载：主队 ${homeCount} 人，客队 ${awayCount} 人`, "success");
@@ -6488,41 +4688,41 @@ document.addEventListener("change", (event) => {
     return;
   }
   if (["paired-lineup-type", "paired-lineup-snapshot", "paired-home-coach", "paired-away-coach", "paired-home-quality", "paired-away-quality"].includes(target.id)) {
-    capturePairedLineupFromDom();
-    selectedMatchLineupChain = null;
+    lineupsFeature.actions.capturePairedLineupFromDom();
+    lineupsFeature.state.selectedMatchLineupChain = null;
     return;
   }
   if (target.id === "new-lineup-match") {
     const selected = target.selectedOptions[0];
-    captureLineupFormFromDom({ allowBlankIdentity: true });
-    lineupBuilderForm = {
-      ...lineupBuilderForm,
+    lineupsFeature.actions.captureLineupFormFromDom({ allowBlankIdentity: true });
+    lineupsFeature.state.lineupBuilderForm = {
+      ...lineupsFeature.state.lineupBuilderForm,
       match_id: target.value,
       team_id: selected?.dataset.homeTeam ?? "",
     };
-    lineupBuilderPlayers = [];
-    lineupPlayerCandidates = [];
-    lineupPlayerLoadSequence.invalidate();
-    const teamId = lineupBuilderForm.team_id;
+    lineupsFeature.state.lineupBuilderPlayers = [];
+    lineupsFeature.state.lineupPlayerCandidates = [];
+    lineupsFeature.state.lineupPlayerLoadSequence.invalidate();
+    const teamId = lineupsFeature.state.lineupBuilderForm.team_id;
     render();
-    if (teamId) void autoLoadLineupPlayers(teamId);
+    if (teamId) void lineupsFeature.actions.autoLoadLineupPlayers(teamId);
     return;
   }
   if (["new-lineup-team", "new-lineup-type", "new-lineup-snapshot", "new-lineup-formation-id", "new-lineup-coach"].includes(target.id)) {
-    const previousTeam = lineupBuilderForm.team_id;
-    captureLineupFormFromDom({
+    const previousTeam = lineupsFeature.state.lineupBuilderForm.team_id;
+    lineupsFeature.actions.captureLineupFormFromDom({
       allowBlankIdentity: target.id === "new-lineup-team",
     });
     if (
       target.id === "new-lineup-team" &&
-      previousTeam !== lineupBuilderForm.team_id
+      previousTeam !== lineupsFeature.state.lineupBuilderForm.team_id
     ) {
-      lineupBuilderPlayers = [];
-      lineupPlayerCandidates = [];
-      lineupPlayerLoadSequence.invalidate();
-      const teamId = lineupBuilderForm.team_id;
+      lineupsFeature.state.lineupBuilderPlayers = [];
+      lineupsFeature.state.lineupPlayerCandidates = [];
+      lineupsFeature.state.lineupPlayerLoadSequence.invalidate();
+      const teamId = lineupsFeature.state.lineupBuilderForm.team_id;
       render();
-      if (teamId) void autoLoadLineupPlayers(teamId);
+      if (teamId) void lineupsFeature.actions.autoLoadLineupPlayers(teamId);
       return;
     }
   }
@@ -6639,9 +4839,7 @@ export function createBrowserApplicationModule(
     commandMenu.destroy();
     workflowNavigation.clear();
     workspaceState.stop();
-    lineupPlayerLoadSequence.invalidate();
-    pairedLineupLoadSequence.home.invalidate();
-    pairedLineupLoadSequence.away.invalidate();
+    lineupsFeature.stop();
     openAiApiExampleTimer.destroy();
   }
 

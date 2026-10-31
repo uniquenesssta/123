@@ -73,7 +73,7 @@ export class TeamCatalog {
     try { const result = await this.readDetail(id); if (!current()) return false; this.publishDetail(result); return true; }
     catch (error) { if (!current()) return false; throw error; }
   }
-  async load(options: { resetCursor?: boolean; query?: TeamListQuery; history?: Pick<TeamListQuery, "cursor_name" | "cursor_id">[]; retainId?: string | null; isCurrent?: () => boolean } = {}): Promise<boolean> {
+  async load(options: { resetCursor?: boolean; query?: TeamListQuery; history?: Pick<TeamListQuery, "cursor_name" | "cursor_id">[]; retainId?: string | null; selectFirst?: boolean; isCurrent?: () => boolean } = {}): Promise<boolean> {
     this.contextRevision++;
     const proposed = { ...(options.query ?? this.currentQuery), ...(options.resetCursor ? { cursor_name: null, cursor_id: null } : {}) };
     const retained = options.retainId !== undefined ? options.retainId : this.currentDetail?.team.id;
@@ -81,7 +81,7 @@ export class TeamCatalog {
     try {
       const [list, coaches, formations] = await Promise.all([this.ports.api.listTeams(proposed), this.ports.api.listCoaches({ search: null, active_only: false, limit: 500 }), this.ports.api.listFormations(false)]);
       if (!current()) return false;
-      const id = retained ?? list.items[0]?.id;
+      const id = retained ?? (options.selectFirst === false ? null : list.items[0]?.id);
       const detail = id ? await this.readDetail(id) : null;
       if (!current()) return false;
       this.currentPage = teamSnapshot(list); this.currentQuery = proposed;

@@ -473,3 +473,57 @@ async fn verify_deletion(database: &TestDatabase, match_id: Uuid, external_key: 
     .expect("删除审计数");
     assert_eq!(audit_count, 1, "成功删除只写一次审计");
 }
+
+#[tokio::test]
+#[ignore = "需要授权专用 PostgreSQL 测试库；不可变模型运行及其fixture保留供审计"]
+async fn match_deletion_preserves_model_run_identity() {
+    let database = TestDatabase::connect().await;
+    let home = database.team("ModelHome").await;
+    let away = database.team("ModelAway").await;
+    let fixture = draft(home, away, Utc::now() + Duration::days(1), &database.token);
+    let match_record = database
+        .store
+        .create_match(&fixture)
+        .await
+        .expect("创建受测比赛");
+    let definition_id = Uuid::new_v4();
+    let version_id = Uuid::new_v4();
+    let parameter_id = Uuid::new_v4();
+    let run_id = Uuid::new_v4();
+    sqlx::query("INSERT INTO model.definitions (id, model_key, display_name) VALUES ($1,$2,'R13 match deletion contract')")
+        .bind(definition_id).bind(format!("r13-delete-{}", database.token)).execute(&database.pool).await.expect("创建测试模型定义");
+    sqlx::query("INSERT INTO model.versions (id, model_id, version, engine_version, input_schema_version, output_schema_version) VALUES ($1,$2,'1.0.0','contract','contract-input','contract-output')")
+        .bind(version_id).bind(definition_id).execute(&database.pool).await.expect("创建测试模型版本");
+    sqlx::query("INSERT INTO model.parameter_sets (id,model_version_id,parameter_version,name,definition,definition_sha256) VALUES ($1,$2,'p1','R13 contract','{}'::jsonb,$3)")
+        .bind(parameter_id).bind(version_id).bind("c".repeat(64)).execute(&database.pool).await.expect("创建测试参数");
+    sqlx::query("INSERT INTO model.runs (id,match_id,match_key,model_version_id,parameter_set_id,snapshot_type,route_reason,status,input_payload,input_sha256,input_audit_version,input_readiness_level,input_readiness_score,input_manifest,input_manifest_sha256,completed_at) VALUES ($1,$2,$3,$4,$5,'T-1h','{}'::jsonb,'succeeded','{}'::jsonb,$6,'prematch-input-audit-v1','formal_ready',100,'{}'::jsonb,$7,now())")
+        .bind(run_id).bind(match_record.id).bind(&match_record.external_key).bind(version_id).bind(parameter_id).bind("a".repeat(64)).bind("b".repeat(64))
+        .execute(&database.pool).await.expect("创建真实模型运行引用");
+    let error = database
+        .store
+        .delete_match(match_record.id)
+        .await
+        .expect_err("模型引用必须拒绝比赛删除");
+    assert!(
+        error.to_string().contains("模型运行"),
+        "必须返回明确保护语义：{error}"
+    );
+    let retained: Option<Uuid> = sqlx::query_scalar("SELECT match_id FROM model.runs WHERE id=$1")
+        .bind(run_id)
+        .fetch_one(&database.pool)
+        .await
+        .expect("读回模型身份");
+    assert_eq!(retained, Some(match_record.id));
+    assert!(database.store.read_match(match_record.id).await.is_ok());
+    let audit: i64 = sqlx::query_scalar(
+        "SELECT count(*) FROM audit.events WHERE event_type='match_deleted' AND entity_id=$1",
+    )
+    .bind(match_record.id.to_string())
+    .fetch_one(&database.pool)
+    .await
+    .expect("读回拒绝后的审计");
+    assert_eq!(audit, 0, "保护拒绝不得产生删除成功审计");
+    // Immutable runs and their linked test records intentionally remain; never disable protection for cleanup.
+    database.pool.close().await;
+    database.store.close().await;
+}

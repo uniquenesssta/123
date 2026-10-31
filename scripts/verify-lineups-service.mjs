@@ -1,3 +1,4 @@
+import { readLineupWorkflowSources } from "./features/lineupSources.mjs";
 import { existsSync, readFileSync, readdirSync } from "node:fs";
 import { dirname, join, relative, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -169,8 +170,9 @@ for (const token of ["starter_count != 11", "unique_players.len() != draft.membe
 check(presetRead.includes("ORDER BY is_default DESC, status, updated_at DESC, lower(name), id") && presetRead.includes("LIMIT 200") && presetRead.includes("period.team_id=preset.team_id") && presetRead.includes("role_source_position_code") && presetRead.includes("position.valid_from <= current_date"), "预设列表上限/稳定顺序/成员和角色读取语义缺失");
 for (const method of ["save_team_lineup_preset", "list_team_lineup_presets", "preview_team_lineup_preset_application", "duplicate_team_lineup_preset", "archive_team_lineup_preset", "delete_team_lineup_preset"]) check(adapter.includes(`PersistenceStore::${method}(self,`), `LineupPresetPort 未显式分派：${method}`);
 check(presetValidation.includes("fetch_one(&mut **tx)") && !presetValidation.includes("self.pool") && !presetValidation.includes(".begin()") && !presetValidation.includes(".commit()"), "成员校验不得离开保存事务");
-const mainSource = read("src/main.ts");
-const applyPreset = mainSource.slice(mainSource.indexOf("async function applyLineupPreset("), mainSource.indexOf("function openPairedLineupPlayerSettings("));
+const mainSource = readLineupWorkflowSources(root);
+const presetSource=read("src/features/lineups/presetApplication.ts");
+const applyPreset=presetSource.slice(presetSource.indexOf("async function applyLineupPreset("));
 check(applyPreset.includes("api.previewTeamLineupPresetApplication(presetId)") && applyPreset.includes("if (!preview.can_apply)") && applyPreset.includes("preview.preset.team_id !== current.team_id") && applyPreset.includes("[side]: {") && applyPreset.includes("...current,"), "套用必须复检并校验所选主客侧，只替换这一侧草稿");
 check(!/api\.(?:createLineup|createLineupPair|saveTeamLineupPreset)/.test(applyPreset) && mainSource.includes("api.createLineupPair("), "预设套用不能隐式写正式阵容，必须保留显式双方提交");
 for (const token of ["合法预设可以预览", "重复预览保留原预设及角色来源", "预览不得写正式阵容、球员或审计", "预览不得修改预设版本或时间", "客队成员不得保存到主队预设", "过期成员阻止套用", "归档预设阻止套用", "删除活动与归档预设级联清理成员"]) check(pairIntegration.includes(token), `既有数据库用例缺少：${token}`);

@@ -19,9 +19,9 @@
 
 .match-browser-layout {
   display: grid;
-  grid-template-columns: minmax(250px, 320px) minmax(0, 1fr);
-  gap: 16px;
-  align-items: start;
+  grid-template-columns: var(--fip-layout-directory-width) minmax(0, 1fr);
+  gap: 8px;
+  align-items: stretch;
 }
 .match-browser-sidebar {
   position: sticky;
@@ -55,7 +55,7 @@
 .match-list-item i { color: var(--accent); font-style: normal; font-weight: 750; }
 .match-browser-detail { min-width: 0; }
 .match-editor { display: grid; gap: 14px; }
-.match-context-form { display: grid; gap: 18px; }
+.match-context-form { display: grid; gap: 8px; }
 .step-title { display: flex; gap: 10px; align-items: center; }
 .step-title > span {
   display: grid;

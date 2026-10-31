@@ -1,8 +1,8 @@
 # R13 基础数据与编排业务模块化：执行索引
 
-阶段状态：**PAUSED（用户暂停开发，规划已订正）**。分支 `rewrite/r13-core-ui-features`，起点 `f0770665`。01、02、03（含04）、05、06及原10随01的业务交付保持DONE；07保持PAUSED，09未启动。新增UI01为PLANNED，承接已交付6页的剩余设计义务；默认后续UI01→07→09，当前不启动任何开发。R12保持结束。
+阶段状态：**IN_PROGRESS；R13-07 VERIFYING**。分支 `rewrite/r13-core-ui-features`，起点f0770665；01、02、03（含04）、05、06及原10保持DONE。用户最新明确启动07，覆盖原07/08，详[07实施记录](R13-07-presets-and-paired-lineups.md)。UI01独立PLANNED，09未启动；本批正式收尾后下一项UI01，再09。R12保持结束。
 
-最新规划：[17页/40项接入处置表](../ui-integration-disposition-20261031.md)。以下表格为当前状态；表后按时间追加的记录为历史，旧“07已授权开始”不覆盖后续暂停指令。
+最新规划：[17页/40项接入处置表](../ui-integration-disposition-20261031.md)。以下表格为当前状态；表后按时间追加的记录为历史，暂停及恢复均按用户最新指令，本次已明确恢复07。
 
 依据：[阶段任务书](../../football-model-platform-modular-rewrite-19-docs/13-R13-core-ui-features.md)、[执行约定](../remaining-execution-contract.md)、[前期遗留项基线](../prior-stage-baseline-20261030.md)。
 
@@ -15,8 +15,8 @@
 | R13-05 球队/档案/资料包 | DONE | [实施记录](R13-05-team-catalog-profile-and-package.md)：42行为/26浏览器/16原HTML对比/原生目录读取通过；96步前端及受影响复验通过，精确run41172800714及双bundle/startup已验；承接BA-05/07 |
 | R13-06 球员/履历/观察 | DONE | [实施记录](R13-06-player-catalog-history-and-observations.md)：30行为/26浏览器/16原HTML/原生目录读取通过，完整96步前端及3683b7f3精确CI/双bundle/startup已收尾；承接BA-05/07 |
 | R13-UI01 已交付6页设计补差 | PLANNED / 未启动 | 见阶段任务书UI01卡；不重开01～06业务DONE |
-| R13-07 预设/双方阵容 | PAUSED | 原07/08，BA-03删除保护风险须按本批条件处理 |
-| R13-09 工作簿 | BLOCKED | 未启动；真实文件/账本按BA-04/07承接 |
+| R13-07 预设/双方阵容 | VERIFYING | [实施记录](R13-07-presets-and-paired-lineups.md)；原07/08及BA-03生产拒绝已处理，本批自身CI/双bundle/startup待验 |
+| R13-09 工作簿 | PLANNED | 未启动；真实文件/账本按BA-04/07承接 |
 
 R13-01已将两个实际View迁至各自Feature公开入口，首页投影独立，Session/Router/Workspace唯一owner保持；原HTML精确比较一致。96步前端、7项新生产模块行为、18项Windows浏览器生产运行及Windows原生startup通过。Rust源码/依赖不变，完整Rust测试复用已有同树证据，本批仅实际重建桌面开发版。
 
@@ -47,3 +47,5 @@ R13-03历史快照：赛事目录/层级与规则/绑定/路由分别归属两�
 2026-10-31收尾06：精确3683b7f3/run41183380347/job124485219358全成功，artifact13036202935下载摘要、双bundle及startup已验；原外部待验保留。07已授权，先处理BA-03受保护比赛删除，再迁原07/08完整流程；09未启动。
 
 2026-10-31接入审计后订正：任务书与共享验收合同已更新，17页全部有生产入口；10页有局部布局/内容差异，7页待同状态/完整挂载核验，不代表整页缺失。UI01仅为既有设计义务的补差组织，未实施；07保持暂停。真实外部待验继续沿BA账本，完成的业务记录不改写。
+
+2026-10-31用户明确恢复07：本批含原08，共用阵容/预设及MatchImports owner；正式收尾后的下一项UI01，再09。不提前核销自身CI或必需真实外部账本。

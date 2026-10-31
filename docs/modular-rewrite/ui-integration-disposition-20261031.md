@@ -2,7 +2,7 @@
 
 ## 适用结论与授权边界
 
-用户已授权将本轮审计落实到后续任务书。本文件是17页接入差异和原40个UI业务节点的唯一处置表；与[共享执行约定](remaining-execution-contract.md)、R13～R18执行卡共同生效，取代10/30计划中“保持当前外观即可”及“页面设计尚未开始”的过时判断。R12保持结束，R13-01～06及原10随01的业务交付保持DONE。**R13-07当前PAUSED；本次只改规划，不恢复开发或宣称差异已修。**
+用户已授权将本轮审计落实到后续任务书。本文件是17页接入差异和原40个UI业务节点的唯一处置表；与[共享执行约定](remaining-execution-contract.md)、R13～R18执行卡共同生效，取代10/30计划中“保持当前外观即可”及“页面设计尚未开始”的过时判断。R12保持结束，R13-01～06及原10随01的业务交付保持DONE。**用户最新已恢复R13-07；当前VERIFYING，实施证据见[07记录](R13-core-ui-features/R13-07-presets-and-paired-lineups.md)。其余任务不因本次实施自动启动。**
 
 代码核对基线：`6e1361210ad4b9fd9f6dd969fad112397e84f6ff`，分支 `rewrite/r13-core-ui-features`。原任务书追溯提交 `4420fd48`；设计记录 `ui-design-system@40109ceec8372391a7680e7e86c1265fda06ab3d`；实时画布为10/31读取的 [Figma文件](https://www.figma.com/design/PN0Whgu6HLWIHx4Mv6aHfu)，Screens页3:5。旧Git设计快照不是实时像素；实施时再次核对最新**已批准**记录，WIP不能覆盖批准版。
 
@@ -15,18 +15,18 @@
 
 ## 17页差异、责任与关闭依据
 
-状态均为本轮审计结果，**全部差异/待验项当前OPEN**。后续在责任批次实施记录填写实际Frame、受测提交、状态、结果及证据，再回写本表关闭引用；不整组打勾。下表源文件路径相对仓库根。
+表中原判定保留为10/31审计基线；S02/S08的本批差异及受测状态已补实施证据，状态VERIFYING，详07记录；其余项OPEN，不能整页全状态自动核销。后续在责任批次实施记录填写实际Frame、受测提交、状态、结果及证据，再回写本表关闭引用；不整组打勾。下表源文件路径相对仓库根。
 
 | 编号/页面 | Figma主Frame | 生产入口 | 当前判定 | 剩余事项 | 接入验收owner |
 |---|---|---|---|---|---|
 | S01 首页 | [453:2](https://www.figma.com/design/PN0Whgu6HLWIHx4Mv6aHfu?node-id=453-2) | `src/features/dashboard/index.ts` | 已接入但待验 | 主视觉渐变、2+3快捷卡片和四色统计已接入；当前首行卡片高度、文字尺度/链接色与实时画布不同，需同数据逐项核准。 | R13-UI01 |
-| S02 比赛与阵容 | [466:4436](https://www.figma.com/design/PN0Whgu6HLWIHx4Mv6aHfu?node-id=466-4436) | `src/pages/lineups.ts` | 确实未接入（局部） | Matches默认页仍为多层标题/嵌套分区；设计的紧凑比赛详情表单未整体落地。双方阵容此前已专项接入，不能把本页其他状态一并认作通过。 | R13-07 |
+| S02 比赛与阵容 | [466:4436](https://www.figma.com/design/PN0Whgu6HLWIHx4Mv6aHfu?node-id=466-4436) | `src/pages/lineups.ts` | 确实未接入（局部） | 原多层标题/嵌套差异已按466:4436修正；实际完整挂载及四尺寸目录/详情已验，双边预览/副本隔离通过；自身CI待验，见07记录，不把受测状态扩张成全状态。 | R13-07 |
 | S03 赛事推演 | [487:22278](https://www.figma.com/design/PN0Whgu6HLWIHx4Mv6aHfu?node-id=487-22278) | `src/pages/prediction.ts` | 确实未接入（局部） | 正式推演仍为大块嵌套设置/说明卡；设计把Provider警告、设置、准入、输入审计及底部动作明确分区。当前默认截图首屏主要被设置占据。 | R14-01（正式/影子）与 R14-06（P4） |
 | S04 赛后复盘 | [505:33973](https://www.figma.com/design/PN0Whgu6HLWIHx4Mv6aHfu?node-id=505-33973) | `src/pages/review.ts` | 已接入但待验 | 九步流程与工作区已实现；本次代码为空比赛态，Figma为Loaded，不能用内容数量或锁定步骤差异判断缺功能。须补相同Loaded/确认/结算状态。 | R14-08（复盘）与 R14-12（结算） |
 | S05 推演记录 | [516:48546](https://www.figma.com/design/PN0Whgu6HLWIHx4Mv6aHfu?node-id=516-48546) | `src/pages/runs.ts` | 已接入但待验 | 生产列表/详情/隐藏入口存在；代码截图空列表，Figma六条记录。数据列、审计色块、详情和隐藏后的血缘需匹配同状态验收。 | R14-07 |
 | S06 球队 | [527:54630](https://www.figma.com/design/PN0Whgu6HLWIHx4Mv6aHfu?node-id=527-54630) | `src/features/teams/index.ts` | 已接入但待验 | 固定筛选栏、两列卡片、底部分页已落地；当前卡片使用完整度条和右侧档案动作，Figma使用文字完整度及下方完整档案按钮。应记录差异，不以HTML前后等价声称设计一致。 | R13-UI01 |
 | S07 球员 | [550:69407](https://www.figma.com/design/PN0Whgu6HLWIHx4Mv6aHfu?node-id=550-69407) | `src/features/players/index.ts` | 已接入但待验 | 筛选+名单+分页已接入；当前筛选分组卡片、表格头部及档案按钮与设计不同。18行与6行、姓名/能力值差别属于夹具数据，不算缺陷。 | R13-UI01 |
-| S08 阵容预设 | [570:86212](https://www.figma.com/design/PN0Whgu6HLWIHx4Mv6aHfu?node-id=570-86212) | `src/pages/lineupPresets.ts` | 确实未接入（局部） | 未选择态为整块居中空态；Figma为顶部具名面板+紧凑空态，左栏宽度与工具栏套用规则/球队中心入口也不同。 | R13-07 |
+| S08 阵容预设 | [570:86212](https://www.figma.com/design/PN0Whgu6HLWIHx4Mv6aHfu?node-id=570-86212) | `src/pages/lineupPresets.ts` | 确实未接入（局部） | 原空态/目录/工具栏差异已按批准Frame补齐；编辑器资料/六列成员与独立滚动、预览和失败状态已有完整挂载证据；自身CI待验，见07记录，未整页全状态核销。 | R13-07 |
 | S09 Excel工作包 | [579:102496](https://www.figma.com/design/PN0Whgu6HLWIHx4Mv6aHfu?node-id=579-102496) | `src/pages/workbooks.ts` | 确实未接入（局部） | Figma左侧竖排分类及底部确认区，当前左栏横排分类、第三列内确认；左栏比例和三步面板组成不同。 | R13-09 |
 | S10 赛事与规则 | [589:112453](https://www.figma.com/design/PN0Whgu6HLWIHx4Mv6aHfu?node-id=589-112453) | `src/features/rules/index.ts` | 已接入但待验 | 固定体系/地区栏和具体赛事两列网格已落地；标题动作/搜索工具栏/底部路由说明有差异。同数据滚动、结构/路由/规则包状态需逐项核验。 | R13-UI01 |
 | S11 应用内验收 | [597:123771](https://www.figma.com/design/PN0Whgu6HLWIHx4Mv6aHfu?node-id=597-123771) | `src/pages/release.ts` | 确实未接入（局部） | 生产有六分区和验收表单；Figma顶部四张报告指标未按同样布局出现。当前仍使用“固定P4 fixture”文案，设计已强调公开外壳/外部运行时，不应误导能力。 | R14-17 |

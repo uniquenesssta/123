@@ -48,8 +48,8 @@ export class TeamsFeature {
   }
   async load(resetCursor = false): Promise<boolean> { const page = this.ports.page(); return this.catalog.load({ resetCursor, isCurrent: () => this.ports.page() === page }); }
   async loadForRoute(page: "teams" | "lineup_presets", isCurrent: () => boolean): Promise<void> {
-    const retainId = this.catalog.detail?.team.id ?? this.ports.activeTab(page);
-    if (await this.catalog.load({ resetCursor: this.catalog.list === null, retainId, isCurrent }) && page === "lineup_presets" && this.catalog.detail && isCurrent()) this.ports.setPresetTab(this.catalog.detail.team.id);
+    const retainId = page === "lineup_presets" ? this.ports.activeTab(page) : this.catalog.detail?.team.id ?? this.ports.activeTab(page);
+    if (await this.catalog.load({ resetCursor: this.catalog.list === null, retainId, selectFirst: page !== "lineup_presets", isCurrent }) && page === "lineup_presets" && this.catalog.detail && isCurrent()) this.ports.setPresetTab(this.catalog.detail.team.id);
   }
   async open(teamId: string, section: "directory" | "profile" = "directory", activate = false): Promise<boolean> {
     const page = this.ports.page(); this.drafts.capture(this.ports.root()); this.imports.clear(); this.deletion.cancelForce();

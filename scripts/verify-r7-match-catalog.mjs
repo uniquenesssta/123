@@ -60,4 +60,7 @@ requireTrue(packageJson.scripts?.["verify:architecture"]?.includes("verify-r7-ma
 requireTrue(databaseRunner.includes('"match_catalog_repository_contract"') && windowsAcceptance.includes('"match_catalog_repository_contract"'), "现有数据库基线与 Windows Full 遗漏 R7-01 契约");
 requireTrue(contract.includes("PgConnectOptions") && contract.includes("get_database()") && contract.includes("current_database()") && contract.includes("cleanup_fixtures"), "R7-01 契约缺少测试库前检或 fixture 清理");
 
+const deletion=read("crates/persistence-postgres/src/adapters/matches/catalog/delete.rs");
+requireTrue(deletion.includes("SELECT count(*) FROM model.runs WHERE match_id = $1"),"比赛删除未预先保护模型运行引用");
+requireTrue(!deletion.includes("UPDATE model.runs SET match_id = NULL"),"比赛删除仍试图改写不可变模型历史");
 console.log("R7-01 Match Catalog ownership verification passed.");

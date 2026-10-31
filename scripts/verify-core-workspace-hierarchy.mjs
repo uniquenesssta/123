@@ -38,7 +38,7 @@ for (const [name, source, rootClass] of [
   check(rendered.includes('class="core-workspace-stage"'), `${name}缺少独立任务内容区`);
 }
 
-check(lineups.includes('workspaceAnchorNavigation("比赛编辑"') && lineups.includes('workspaceAnchorNavigation("双方阵容"'), "比赛中心未将编辑和阵容深层步骤收拢为页内导航");
+check(lineups.includes('class="match-detail-heading"') && lineups.includes('id="match-editor-competition"') && lineups.includes('id="match-editor-teams"') && lineups.includes('id="match-editor-actions"') && lineups.includes('workspaceAnchorNavigation("双方阵容"'), "比赛中心缺少批准的紧凑详情区、稳定步骤定位或双方阵容深层导航");
 for (const id of ["match-editor-competition", "match-editor-teams", "match-editor-status", "match-editor-actions", "lineup-builder-context", "lineup-builder-submit"]) {
   check(lineups.includes(`id="${id}"`), `比赛中心缺少页内定位目标：${id}`);
 }

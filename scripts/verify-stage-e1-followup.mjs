@@ -1,3 +1,4 @@
+import { readLineupWorkflowSources } from "./features/lineupSources.mjs";
 import {readProjectSource} from "./styles/projectSource.mjs";
 import {fileURLToPath as stylesheetFilePath} from "node:url";
 const stylesheetRoot=stylesheetFilePath(new URL("../",import.meta.url));
@@ -13,6 +14,7 @@ const contract = JSON.parse(read("contracts/stage-e1-followup-contract.json"));
 const searchable = read("src/components/searchableSelect.ts");
 const lineups = read("src/pages/lineups.ts");
 const main = read("src/main.ts");
+const lineupWorkflow = readLineupWorkflowSources(stylesheetRoot);
 const players = ["src/features/players/playerPresentation.ts","src/features/players/playerProfileView.ts","src/features/players/playerWorkbookView.ts","src/features/players/playerDirectoryView.ts"].map(read).join("\n");
 const teams = ["src/features/teams/teamPresentation.ts","src/features/teams/profileView.ts","src/features/teams/packageView.ts","src/features/teams/teamsView.ts"].map(read).join("\n");
 const taskCss = read("src/styles/taskWorkspace.css");
@@ -35,7 +37,7 @@ check(!searchable.includes("input.select()"), "搜索词恢复后仍可能因全
 check(searchable.includes("if (startFreshQuery) {") && searchable.includes('input.value = "";'), "空值提示没有在开始搜索时清空");
 check(lineups.includes("displayPlayerName(item)") && lineups.includes("item.localized_name") && lineups.includes("item.alternate_name") && lineups.includes("item.canonical_name"), "阵容候选没有中英文显示与检索");
 check(lineups.includes('data-search="${escapeHtml(searchText)}"'), "阵容候选没有写入双语模糊检索索引");
-check(lineups.includes("player_secondary_name") && main.includes("player_secondary_name: playerName.secondary"), "已选阵容没有保留双语姓名");
+check(lineups.includes("player_secondary_name") && lineupWorkflow.includes("player_secondary_name: playerName.secondary"), "已选阵容没有保留双语姓名");
 check(lineups.includes('data-action="create-lineup-pair" ${submitReady ? "" : "disabled"}'), "双方首发未完整时仍允许提交");
 check(lineups.includes("还需补齐") && taskCss.includes(".lineup-submit-readiness"), "双方阵容缺少可见补齐提示");
 check(lineups.includes('data-team-id="${escapeHtml(team.team_id)}"') && lineups.includes('data-return-section="chain"'), "阵容球员跳转没有携带球队与返回上下文");

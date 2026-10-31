@@ -1,3 +1,4 @@
+import { readLineupWorkflowSources } from "./features/lineupSources.mjs";
 import fs from "node:fs";
 import path from "node:path";
 
@@ -6,7 +7,7 @@ const read = (file) => fs.readFileSync(path.join(root, file), "utf8");
 const failures = [];
 const check = (condition, message) => { if (!condition) failures.push(message); };
 const requireTokens = (file, tokens, label = file) => {
-  const content = file.startsWith("src/features/teams/") ? ["src/features/teams/profileView.ts", "src/features/teams/packageView.ts", "src/features/teams/teamsView.ts"].map(read).join("\n") : read(file);
+  const content = file === "src/main.ts" ? readLineupWorkflowSources(root) : file.startsWith("src/features/teams/") ? ["src/features/teams/profileView.ts", "src/features/teams/packageView.ts", "src/features/teams/teamsView.ts"].map(read).join("\n") : read(file);
   for (const token of tokens) check(content.includes(token), `${label} 缺少：${token}`);
   return content;
 };
