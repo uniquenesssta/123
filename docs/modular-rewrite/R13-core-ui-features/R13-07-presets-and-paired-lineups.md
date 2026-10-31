@@ -1,6 +1,6 @@
 # R13-07 预设与双方阵容闭环
 
-状态：**VERIFYING：本地实现完成；最终完整96步前端门禁已通过，自身CI/双bundle/包内startup待验**。覆盖原R13-07/R13-08；没有单独未实施的08。分支 `rewrite/r13-core-ui-features`，实施基线 `f59d12f6a8270e65a8d2bd166d6c1f206c09b962`，开始时工作区干净。用户明确“开始R13-07”，恢复本批；未启动UI01/09，不重开R12或已DONE的01～06。
+状态：**DONE：精确代码CI、双bundle及包内startup已核验收尾**。覆盖原R13-07/R13-08；没有单独未实施的08。分支 `rewrite/r13-core-ui-features`，实施基线 `f59d12f6a8270e65a8d2bd166d6c1f206c09b962`，开始时工作区干净。用户明确“开始R13-07”，恢复本批；未启动UI01/09，不重开R12或已DONE的01～06。
 
 ## 交付与保留映射
 
@@ -68,7 +68,7 @@ Impeccable技能及layout/craft-floor已使用，手动检查实际截图、密�
 | Rust | `npm run verify:rust`退出0；fmt/Clippy、748 passed、40 ignored；`O:/Project/FOODBALL/logs/r13-07-rust.log` |
 | Windows原生构建 | `cargo build --locked --manifest-path src-tauri/Cargo.toml`退出0；`O:/Project/FOODBALL/logs/r13-07-native-build.log` |
 | Windows实际运行 | 真实当前配置+原生IPC，比赛和预设目录读取；4项通过、32条日志、0 errors；无fixture、无业务写入；证据 `O:/Project/FOODBALL/tmp/r13-07-native-read-VIF2Tg`，startup-report.json为PASS |
-| 自身CI/安装包 | 推送后核对精确SHA一次；尚未核验本批MSI/NSIS/包内startup，保持VERIFYING |
+| 自身CI/安装包 | 855d830b/run41211916572/job124568508883全成功；artifact13047682283摘要、MSI/NSIS及startup/pass已核验，见正式收尾 |
 | 真实DB/XLSX/Full | 不通过模拟核销：BA-02/03/04/06/07按原账本R13-09/R17-06收口；Full、私有固定回归、正式推演/结算/API凭据仍须各自真实证据 |
 
 测试进程TEMP/TMP为 `O:/Project/FOODBALL/tmp`。保留最终证据和依赖；测试profile的递归清理被外置retain-test-artifacts.cjs拦截而保留，未跳过验证。无用中间产物按明确清单交用户手动清理；不执行批量或递归删除，不触碰用户Temp。最终清单在同一项目临时目录保存，避免重复写入可复用依赖。
@@ -86,3 +86,14 @@ Impeccable技能及layout/craft-floor已使用，手动检查实际截图、密�
 代码提交 `855d830b77ba6b6eb9c2e080009aa50cbea3efdb` 已推送，62路径（22新增、40修改、0删除）。最终完整96步退出0，29项生产行为及132项完整挂载通过；286处本地文档链接核验有效。精确[CI run41211916572](https://github.com/uniquenesssta/123/actions/runs/41211916572)仅查询一次：push事件，head_sha精确等于855d830b，status=in_progress、conclusion=null。本批仍VERIFYING，未验自身双bundle/包内startup，不轮询、不取消其他运行。
 
 此CI交接为后续Markdown补记，不改变上述受测代码；ci.yml的push paths-ignore排除Markdown。本次手动清理清单含302个明确中间产物/profile/一次性辅助项，未执行批量删除；最终证据、依赖和原生复现助手保留。正式收尾后下一项R13-UI01，再R13-09，08已并入07。
+
+## 正式收尾与UI01启动
+
+用户授权“收尾07开始R13-UI01”后，一次核对精确855d830b/run41211916572/job124568508883：所有步骤completed/success，2026-10-31T15:22:23Z完成。本批正式DONE；此前VERIFYING段落保留为历史。
+
+- artifact13047682283：52,323,930 bytes，SHA256 `32ad1aa78b01f0a090e0afe2798d9707dce03d287f5b8bee5b9536fed128e998`，与GitHub digest一致。CLI下载超时后通过GitHub集成取得同一产物并校验，没有重复查询CI。
+- MSI：17,989,632 bytes，OLE头正确，SHA256 `89b5a77567730c3a4f0ea78d57257f96cfb14c6d767561fcc0274e7e678b506e`。
+- NSIS：15,626,860 bytes，MZ头正确，SHA256 `5d056b53c784c230ed24a475a7c9bf9c447502c29248ea5da8144aa16ee3959d`。
+- 包内windows-acceptance-20261031-145041.json：startup/pass，7条日志、bootstrap/read_workspace_state/save_workspace_state，0错误/0缺失；不等于Full。
+
+证据：`O:/Project/FOODBALL/tmp/r13-07-ci-41211916572/extracted`。BA-03等真实外部项继续原R17-06账本。原08已包含；**接下来R13-UI01六页设计补差，已获本轮启动授权；其后R13-09，尚未启动。**

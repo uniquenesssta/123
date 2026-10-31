@@ -1,8 +1,12 @@
 # 足球模型平台公开外壳
 
-## R13-07 预设与双方阵容（2026-10-31 VERIFYING）
+## R13-UI01 六页批准设计补差（执行中）
 
-76个旧入口函数迁入Lineups Feature，MatchImports由比赛页和工作簿共用；修复跨比赛旧响应/确认、双边提交快照、预设副本隔离及model run引用的比赛删除保护。按批准S02/S08补紧凑详情、预设空态/目录/六列编辑器。29项新生产行为与132项完整挂载检查通过，最终完整96步前端（类型/构建）通过；Rust/Windows构建、原生只读运行通过，本批CI与安装包尚待验。详[07实施记录](docs/modular-rewrite/R13-core-ui-features/R13-07-presets-and-paired-lineups.md)。本批收尾后下一项R13-UI01，再R13-09；原08已并入07，不重开R12。
+R13-07的精确855d830b/run41211916572及产物摘要、双bundle和startup已核验收尾。现按用户授权推进首页、球队、球员、赛事规则、数据库与架构六页的同状态设计补差，复用既有业务owner；详[UI01记录](docs/modular-rewrite/R13-core-ui-features/R13-UI01-approved-screen-deltas.md)。UI01完成后下一项R13-09，未提前启动。
+
+## R13-07 预设与双方阵容（2026-10-31 DONE）
+
+76个旧入口函数迁入Lineups Feature，MatchImports由比赛页和工作簿共用；修复跨比赛旧响应/确认、双边提交快照、预设副本隔离及model run引用的比赛删除保护。按批准S02/S08补紧凑详情、预设空态/目录/六列编辑器。29项新生产行为与132项完整挂载检查通过，最终完整96步前端（类型/构建）通过；Rust/Windows构建、原生只读运行通过，本批精确CI/双bundle/包内startup已验收。详[07实施记录](docs/modular-rewrite/R13-core-ui-features/R13-07-presets-and-paired-lineups.md)。本批收尾后下一项R13-UI01，再R13-09；原08已并入07，不重开R12。
 
 ## 接入审计后的后续计划（2026-10-31）
 
