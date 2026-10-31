@@ -1,6 +1,6 @@
 # R13 基础数据与编排业务模块化：执行索引
 
-阶段状态：**IN_PROGRESS**。分支 `rewrite/r13-core-ui-features`，起点 `f0770665`。01、02已收尾；03及并入的04已按修复提交b5b23c46精确CI/下载证据/双bundle/startup共同DONE。用户已授权05，本地实现与门禁完成，当前VERIFYING；06及其后未启动。R12保持结束。
+阶段状态：**IN_PROGRESS**。分支 `rewrite/r13-core-ui-features`，起点 `f0770665`。01、02已收尾；03及并入的04已按修复提交b5b23c46精确CI/下载证据/双bundle/startup共同DONE。05精确CI/产物/双bundle/startup已收尾DONE；06已授权IN_PROGRESS，07及其后未启动。R12保持结束。
 
 依据：[阶段任务书](../../football-model-platform-modular-rewrite-19-docs/13-R13-core-ui-features.md)、[执行约定](../remaining-execution-contract.md)、[前期遗留项基线](../prior-stage-baseline-20261030.md)。
 
@@ -10,8 +10,8 @@
 | R13-02 数据库连接/危险操作 | DONE | [实施记录](R13-02-database-connection-and-reset.md)：96步前端、15行为/21浏览器/原生startup及d167e948精确CI/产物已核验 |
 | R13-03 赛事层级/规则/路由 | DONE | [实施与收尾](R13-03-competition-rules-and-routing.md)：b5b23c46精确run41116421113、artifact13009230984、双bundle/startup已核验 |
 | R13-04 规则包/绑定/路由 | 并入03 / DONE | 独立义务映射及同一精确CI验收完成，详03记录 |
-| R13-05 球队/档案/资料包 | VERIFYING | [实施记录](R13-05-team-catalog-profile-and-package.md)：42行为/26浏览器/16原HTML对比/原生目录读取通过；96步前端及受影响复验通过，自身CI/包待验；承接BA-05/07 |
-| R13-06 球员/履历/观察 | BLOCKED | 未启动 |
+| R13-05 球队/档案/资料包 | DONE | [实施记录](R13-05-team-catalog-profile-and-package.md)：42行为/26浏览器/16原HTML对比/原生目录读取通过；96步前端及受影响复验通过，精确run41172800714及双bundle/startup已验；承接BA-05/07 |
+| R13-06 球员/履历/观察 | IN_PROGRESS | 用户已授权；承接BA-05/07，盘点实际全流程 |
 | R13-07 预设/双方阵容 | BLOCKED | 原07/08，BA-03删除保护风险须按本批条件处理 |
 | R13-09 工作簿 | BLOCKED | 未启动；真实文件/账本按BA-04/07承接 |
 
@@ -36,3 +36,5 @@ R13-03历史快照：赛事目录/层级与规则/绑定/路由分别归属两�
 2026-10-31 R13-05：Teams四个状态owner及完整原流程接线已实施，45个owner；42项新行为、26项Windows浏览器、16种HTML精确比较及原生当前配置目录读取通过。当前目录无可打开对象，真实详情/写入与BA-05/07仍按既定R17-06；96步前端及受影响复验通过，本批精确CI/安装包尚待验，不能标DONE。06未启动。
 
 05代码587b6752已推送，精确run41172800714单次查询为in_progress/conclusion=null；自身双bundle/包内startup尚未验收，保持VERIFYING。无依赖源码副本最终架构门禁通过；详05记录。
+
+2026-10-31正式收尾05：587b6752/run41172800714/job124454158700全成功；artifact13032811710下载摘要一致、双bundle/startup已独立验收。06已授权开始，原待验账本保留；此前VERIFYING文字为历史快照。

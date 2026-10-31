@@ -1,6 +1,6 @@
 # R13-05 球队目录、档案与资料包
 
-状态：**VERIFYING**，2026-10-31。本批仅覆盖原R13-05；03及并入的04已按精确b5b23c46/run41116421113正式收尾，收尾文档提交5c0bd02f。本批代码基线5c0bd02f，初始工作区干净，实施中没有用户未提交修改；06未启动，R12保持结束。
+状态：**DONE**，2026-10-31。本批仅覆盖原R13-05；03及并入的04已按精确b5b23c46/run41116421113正式收尾，收尾文档提交5c0bd02f。本批代码基线5c0bd02f，初始工作区干净，实施中没有用户未提交修改；06未启动，R12保持结束。
 
 依据：阶段任务书R13-05、remaining-execution-contract、前期基线BA-05/BA-07。源码锚点核对后，实际迁移全部球队状态/动作与视图，不只迁移任务书代表函数。提交推送沿用用户长期授权；自身CI精确提交单次查询、不轮询。
 
@@ -94,3 +94,14 @@
 - 当前未下载本批产物，MSI/NSIS及包内startup仍待此精确运行完成后验收；05保持VERIFYING，06未启动。
 - 本机Node24.16.0；CI配置Node22/Windows2025。已对无TypeScript、无node_modules的安装前源码环境补验；不将本机环境等同于CI环境。
 - 本次仅补三份Markdown记录；现有workflow对push已配置paths-ignore: **.md，因此此次文档提交不应触发另一份代码CI；未更改workflow。
+
+## 2026-10-31 正式收尾
+
+用户“收尾05开始06”后独立核验587b6752e00ca0aaa56601b27ba1a222081e4597：run41172800714/job124454158700与全部返回步骤completed/success，2026-10-31T06:16:26Z（北京时间14:16:26）完成。42项球队行为及Windows前端、Rust、release打包与startup链在同一运行完成。
+
+- artifact13032811710，52,313,426 bytes，未过期；下载ZIP SHA256 2d89ef905be35a1d4df5d0021e9cec9d053ae81c34f568be7fbd9d7d1cb88882，与API digest和上传日志一致。
+- MSI 17,981,440 bytes，OLE头D0-CF-11-E0-A1-B1-1A-E1，SHA256 99bdcfc442c783e25f032ab569057d9c9f125a6207643a00d67578c2fea5f83a。
+- NSIS 15,620,116 bytes，MZ头正确，SHA256 b954f2215f5a6a771d2b8dea5997fb8707f51284b90cff57c76b092a64f4d5cc。
+- 包内logs/windows-acceptance-20261031-053058.json为startup/pass，7记录、bootstrap/read_workspace_state/save_workspace_state、0错误/0缺失。日志泛称“全链路”不改变报告实际profile，未冒称Full。
+
+解包证据O:/Project/FOODBALL/tmp/r13-05-ci-41172800714/extracted。本次单次结果核验，无轮询。05正式DONE；BA-05/07真实PG/有效XLSX/Full/私有模型仍按既定R17-06承接，不能以本次startup抵销。06现获授权，07未启动。此前VERIFYING段为历史快照，以本收尾结论为准。
