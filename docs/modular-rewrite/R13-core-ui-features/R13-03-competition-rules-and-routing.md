@@ -1,6 +1,6 @@
 # R13-03 赛事层级、规则包与路由
 
-状态：**VERIFYING（修复版CI运行中，未完成收尾）**。原代码 `12ba495c583ea25fd32b508aa68cceea9407f9d0` 的 [run41110961979](https://github.com/uniquenesssta/123/actions/runs/41110961979) / job124252955643 已确认为 **completed / failure**，head/分支均匹配。失败在前端依赖安装前的架构门禁：新增运行期行为测试需要 TypeScript；Windows 自动验收被跳过，0 个产物，不能收尾。用户本轮“收尾03开始04”授权继续修复与核验；原04已按任务书并入03，本轮逐项核对，05未启动。
+状态：**DONE（03及并入的04，Automated/精确CI/产物/startup已收尾）**。原代码 `12ba495c583ea25fd32b508aa68cceea9407f9d0` 的 [run41110961979](https://github.com/uniquenesssta/123/actions/runs/41110961979) / job124252955643 已确认为 **completed / failure**，head/分支均匹配。失败在前端依赖安装前的架构门禁：新增运行期行为测试需要 TypeScript；Windows 自动验收被跳过，0 个产物，不能收尾。用户本轮“收尾03开始04”授权继续修复与核验；原04已按任务书并入03，本轮逐项核对，05未启动。
 
 依据：[阶段任务书](../../football-model-platform-modular-rewrite-19-docs/13-R13-core-ui-features.md)、[执行约定](../remaining-execution-contract.md)、[前期遗留账本](../prior-stage-baseline-20261030.md) BA-01/BA-14。保持用户批准的 R12 视觉与页面入口，不修改 R12 任务书、索引或完成记录。
 
@@ -102,3 +102,15 @@
 - 本轮完整前端：`node scripts/verify-frontend.mjs` 退出0；日志实际96个 `[verify]` 步骤，含原31项行为全部执行通过、TypeScript、Vite build。日志 `O:/Project/FOODBALL/tmp/r13-03-ci-fix-frontend.log`。
 - CI只查询一次：[run41116421113](https://github.com/uniquenesssta/123/actions/runs/41116421113)，精确head/分支/push匹配，查询时 **in_progress / conclusion=null**。不轮询，不把运行中记作通过。
 - 未下载该运行产物，MSI/NSIS/包内startup仍须此精确修复提交完成后核验。因此03与并入的04共同保持VERIFYING；真实PG/Full沿用既定最终新库边界，05未启动。
+
+## 2026-10-31 正式收尾：03与原04
+
+用户“收尾04开始05”后对最新修复提交独立核验：`b5b23c469df5f9050dc66ac1c4c5d11f888a5b26`，run41116421113 / job124271718878均completed/success，返回的全部步骤success；精确head/分支/push匹配。完成时间2026-10-30T20:19:01Z（北京时间2026-10-31 04:19:01）。原12ba495c失败记录保留，不冒充成功。
+
+- artifact13009230984，52,302,782 bytes，未过期；ZIP SHA256 `98ad26907b41e953371a6213559acca94772c7230e6df666e4650438016fea65`，与API digest、上传日志及本地下载一致。
+- MSI 17,977,344 bytes，OLE文件头正确；SHA256 `85983648bb8ca0a3114341a450a694fd3a04532c8fe3f7be7f2cb9d85e250a58`。
+- NSIS 15,615,555 bytes，MZ文件头正确；SHA256 `9dd53c828536785783daaae5f6584c1193f23b2aec86961a4c8a48ea0e7d33e3`。
+- 包内 `logs/windows-acceptance-20261030-193736.json`：startup/pass，7条记录，bootstrap/read_workspace_state/save_workspace_state，0错误、0缺失。
+- CI日志确认31项行为全部执行、完整前端、Rust检查/测试、Windows release双bundle及startup链完成；不是使用02产物替代03。
+
+下载解包证据：`O:/Project/FOODBALL/tmp/r13-03-ci-41116421113/extracted`。本批不轮询；原04与主03共同DONE。真实PG引用/规则写入/路由读回、Full和私有模型仍按既定BA-14/R17-06待验，不宣称这些已通过。用户现授权05，后续仅进入球队批次，不启动06。

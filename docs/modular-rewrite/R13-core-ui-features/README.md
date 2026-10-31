@@ -1,6 +1,6 @@
 # R13 基础数据与编排业务模块化：执行索引
 
-阶段状态：**IN_PROGRESS**。分支 `rewrite/r13-core-ui-features`，起点 `f0770665`。用户已授权R13-01及后续R13-02；01覆盖原R13-10并已收尾，02已完成精确CI/产物/startup收尾，03原CI失败已修复推送，修复版完整96步通过，等待自身CI/产物验收，原04已实现并完成映射核对，其他批次尚未启动。R12按用户确认保持结束。
+阶段状态：**IN_PROGRESS**。分支 `rewrite/r13-core-ui-features`，起点 `f0770665`。01、02已收尾；03及并入的04已按修复提交b5b23c46精确CI/下载证据/双bundle/startup共同DONE。用户已授权05，当前IN_PROGRESS；06及其后未启动。R12保持结束。
 
 依据：[阶段任务书](../../football-model-platform-modular-rewrite-19-docs/13-R13-core-ui-features.md)、[执行约定](../remaining-execution-contract.md)、[前期遗留项基线](../prior-stage-baseline-20261030.md)。
 
@@ -8,9 +8,9 @@
 | --- | --- | --- |
 | R13-01 首页/架构只读接入 | DONE：9cdd1f9b精确CI/证据摘要/MSI/NSIS/startup核验通过 | [实施记录](R13-01-read-only-entry-pilot.md)，原R13-01/R13-10合并验收 |
 | R13-02 数据库连接/危险操作 | DONE | [实施记录](R13-02-database-connection-and-reset.md)：96步前端、15行为/21浏览器/原生startup及d167e948精确CI/产物已核验 |
-| R13-03 赛事层级/规则/路由 | VERIFYING | [实施记录](R13-03-competition-rules-and-routing.md)：含原04；31项生产行为、28项Windows浏览器、96步前端及原生startup通过，原run41110961979失败已复现修复；b5b23c46完整96步通过，新run41116421113单次查询运行中，CI/产物待验 |
-| R13-04 规则包/绑定/路由 | 并入03 / VERIFYING | 实现和独立义务已核对，复用[同一记录](R13-03-competition-rules-and-routing.md)；不重复实施，随03完成CI收尾 |
-| R13-05 球队/档案/资料包 | BLOCKED | 未启动 |
+| R13-03 赛事层级/规则/路由 | DONE | [实施与收尾](R13-03-competition-rules-and-routing.md)：b5b23c46精确run41116421113、artifact13009230984、双bundle/startup已核验 |
+| R13-04 规则包/绑定/路由 | 并入03 / DONE | 独立义务映射及同一精确CI验收完成，详03记录 |
+| R13-05 球队/档案/资料包 | IN_PROGRESS | 用户已授权；基线8ee45f15，承接BA-05/07，盘点和实施中 |
 | R13-06 球员/履历/观察 | BLOCKED | 未启动 |
 | R13-07 预设/双方阵容 | BLOCKED | 原07/08，BA-03删除保护风险须按本批条件处理 |
 | R13-09 工作簿 | BLOCKED | 未启动；真实文件/账本按BA-04/07承接 |
@@ -30,3 +30,5 @@ R13-03：赛事目录/层级与规则/绑定/路由分别归属两个实际Featu
 2026-10-31补修：03原精确CI失败在安装依赖前加载TypeScript；三组共31项行为现归已安装依赖的原前端组合根门禁，无依赖完整架构副本修复前失败/修复后通过。04按既有合并卡逐项核对，仍随03共同VERIFYING；不得把旧CI记为成功。
 
 修复提交b5b23c46已推送；96步前端复验全部通过，31项行为未减少。新run41116421113精确head匹配、单次查询运行中，包与startup尚待验收；03/04不得标DONE。
+
+2026-10-31共同收尾：03/04精确修复提交的run/job全部SUCCESS，证据摘要一致，MSI/NSIS与startup 7记录/3操作/0错误通过。05已授权开始；此前VERIFYING段落为历史快照，当前状态以表格和收尾记录为准。

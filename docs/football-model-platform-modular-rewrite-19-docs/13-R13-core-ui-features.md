@@ -23,7 +23,7 @@
 
 ## 状态与依赖
 
-当前R13-01 **DONE**，覆盖原R13-10，精确CI/产物/startup已收尾；R13-02 **DONE**（d167e948精确CI/产物/startup已核验）；R13-03已完成实现及本地适用验证，当前 **VERIFYING**（覆盖原04；原精确CI失败已修复，b5b23c46完整96步通过、新run41116421113单次查询运行中，CI/产物待验；原04义务已逐项核对）。其余批次 **BLOCKED / 未实施**。R12已由用户确认结束；当前结果与证据见[阶段执行索引](../modular-rewrite/R13-core-ui-features/README.md)。下表顺序是默认交付顺序，必要时在已授权阶段内按真实依赖拆出更小批次并说明原因，不以任务数量或文件数为目标。
+当前R13-01、02 **DONE**；R13-03与并入的04 **DONE**（b5b23c46精确run41116421113/证据/双bundle/startup已收尾）。R13-05已获用户授权，当前 **IN_PROGRESS**。06及其后 **BLOCKED / 未实施**。R12已由用户确认结束；当前结果与证据见[阶段执行索引](../modular-rewrite/R13-core-ui-features/README.md)。下表顺序是默认交付顺序，必要时在已授权阶段内按真实依赖拆出更小批次并说明原因，不以任务数量或文件数为目标。
 
 | 主交付 ID | 交付批次 | 前置 |
 |---|---|---|
@@ -507,7 +507,7 @@ if ($LASTEXITCODE -ne 0) { throw 'R13-09: verify-match-review-package failed' }
 | R13-01 Dashboard | R13-01 | 主交付 |
 | R13-02 Database | R13-02 | 主交付 |
 | R13-03 Competitions | R13-03 | 主交付 |
-| R13-04 Rules | R13-03 | 合并验收项（非 DONE） |
+| R13-04 Rules | R13-03 | 合并验收项，已与03共同DONE |
 | R13-05 Teams | R13-05 | 主交付 |
 | R13-06 Players | R13-06 | 主交付 |
 | R13-07 Lineup Presets | R13-07 | 主交付 |
