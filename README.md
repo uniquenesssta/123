@@ -1,5 +1,11 @@
 # 足球模型平台公开外壳
 
+## 接入审计后的后续计划（2026-10-31）
+
+根据最新Figma、当前生产实现和原R13～R15任务逐项对照，更新R13～R18任务书、总纲和验收合同。17页均有生产入口；10页存在局部设计差异、7页待同状态/完整挂载验证，不再把已有页面当作从零接入。已完成业务保持DONE，剩余设计单列R13-UI01（6页）；其余补差随对应业务批次交付。原67项义务保持，交付组织由24批调整为25批，其中5批业务已完成、20批待完成。
+
+详[17页/40项接入处置表](docs/modular-rewrite/ui-integration-disposition-20261031.md)、[R13执行任务书](docs/football-model-platform-modular-rewrite-19-docs/13-R13-core-ui-features.md)及[共享验收合同](docs/modular-rewrite/remaining-execution-contract.md)。R12保持结束，R13-07仍PAUSED；UI01为PLANNED，本次没有恢复开发。此次只变更12份Markdown，验证文档引用、数量、状态/依赖与Git差异，不产生新的构建、测试、Windows或Full结果。以下记录按历史时间保留，状态以本段和阶段索引为准。
+
 ## R13-06 球员目录、履历与观察（2026-10-31收尾 DONE）
 
 目录/来源、档案草稿、工作簿和删除确认已收敛到实际Players Feature，伤停、能力与动态标签独立提交；修复同页通用入口残留来源和导入部分失败误报。30项生产行为、26项Windows浏览器、16种原HTML及原生真实目录读取通过；完整96步前端、类型和构建通过；3683b7f3精确[CI run41183380347](https://github.com/uniquenesssta/123/actions/runs/41183380347)、下载摘要、双bundle及startup已核验收尾。详[06记录](docs/modular-rewrite/R13-core-ui-features/R13-06-player-catalog-history-and-observations.md)。BA-05/07、Full等沿既定R17-06承接；07现已授权开始。
