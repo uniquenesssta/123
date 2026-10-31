@@ -1,6 +1,6 @@
 # R13 基础数据与编排业务模块化：执行索引
 
-阶段状态：**IN_PROGRESS**。分支 `rewrite/r13-core-ui-features`，起点 `f0770665`。01、02已收尾；03及并入的04已按修复提交b5b23c46精确CI/下载证据/双bundle/startup共同DONE。05精确CI/产物/双bundle/startup已收尾DONE；06本地实现与门禁完成，当前VERIFYING，07及其后未启动。R12保持结束。
+阶段状态：**IN_PROGRESS**。分支 `rewrite/r13-core-ui-features`，起点 `f0770665`。01、02已收尾；03及并入的04已按修复提交b5b23c46精确CI/下载证据/双bundle/startup共同DONE。05精确CI/产物/双bundle/startup已收尾DONE；06精确CI/双bundle/startup已收尾DONE；07已授权IN_PROGRESS，09未启动。R12保持结束。
 
 依据：[阶段任务书](../../football-model-platform-modular-rewrite-19-docs/13-R13-core-ui-features.md)、[执行约定](../remaining-execution-contract.md)、[前期遗留项基线](../prior-stage-baseline-20261030.md)。
 
@@ -11,8 +11,8 @@
 | R13-03 赛事层级/规则/路由 | DONE | [实施与收尾](R13-03-competition-rules-and-routing.md)：b5b23c46精确run41116421113、artifact13009230984、双bundle/startup已核验 |
 | R13-04 规则包/绑定/路由 | 并入03 / DONE | 独立义务映射及同一精确CI验收完成，详03记录 |
 | R13-05 球队/档案/资料包 | DONE | [实施记录](R13-05-team-catalog-profile-and-package.md)：42行为/26浏览器/16原HTML对比/原生目录读取通过；96步前端及受影响复验通过，精确run41172800714及双bundle/startup已验；承接BA-05/07 |
-| R13-06 球员/履历/观察 | VERIFYING | [实施记录](R13-06-player-catalog-history-and-observations.md)：30行为/26浏览器/16原HTML/原生目录读取通过，完整96步前端通过，自身CI/包待验；承接BA-05/07 |
-| R13-07 预设/双方阵容 | BLOCKED | 原07/08，BA-03删除保护风险须按本批条件处理 |
+| R13-06 球员/履历/观察 | DONE | [实施记录](R13-06-player-catalog-history-and-observations.md)：30行为/26浏览器/16原HTML/原生目录读取通过，完整96步前端通过，自身CI/包待验；承接BA-05/07 |
+| R13-07 预设/双方阵容 | IN_PROGRESS | 原07/08，BA-03删除保护风险须按本批条件处理 |
 | R13-09 工作簿 | BLOCKED | 未启动；真实文件/账本按BA-04/07承接 |
 
 R13-01已将两个实际View迁至各自Feature公开入口，首页投影独立，Session/Router/Workspace唯一owner保持；原HTML精确比较一致。96步前端、7项新生产模块行为、18项Windows浏览器生产运行及Windows原生startup通过。Rust源码/依赖不变，完整Rust测试复用已有同树证据，本批仅实际重建桌面开发版。
@@ -40,3 +40,5 @@ R13-03历史快照：赛事目录/层级与规则/绑定/路由分别归属两�
 2026-10-31正式收尾05：587b6752/run41172800714/job124454158700全成功；artifact13032811710下载摘要一致、双bundle/startup已独立验收。06已授权开始，原待验账本保留；此前VERIFYING文字为历史快照。
 
 06代码3683b7f3已推送，精确run41183380347单次查询运行中；完整96步/30行为/26浏览器/16种HTML及原生目录/startup通过，等待自身双bundle/包内startup。临时旧产物已移tmp/old/r13-06-20261031并有manifest，本次用户手动删除；依赖和最终证据保留。
+
+2026-10-31收尾06：精确3683b7f3/run41183380347/job124485219358全成功，artifact13036202935下载摘要、双bundle及startup已验；原外部待验保留。07已授权，先处理BA-03受保护比赛删除，再迁原07/08完整流程；09未启动。

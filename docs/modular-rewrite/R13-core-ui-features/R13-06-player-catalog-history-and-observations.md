@@ -1,6 +1,6 @@
 # R13-06 球员目录、履历与观察
 
-状态：**VERIFYING**，2026-10-31。仅覆盖原R13-06，代码基线3e930a5a；初始工作区干净。05按精确587b6752/run41172800714/下载摘要/双bundle/startup正式DONE；07未启动，R12保持结束。
+状态：**DONE**，2026-10-31。仅覆盖原R13-06，代码基线3e930a5a；初始工作区干净。05按精确587b6752/run41172800714/下载摘要/双bundle/startup正式DONE；07未启动，R12保持结束。
 
 依据：阶段任务书、remaining-execution-contract及BA-05/BA-07。沿既有rewrite/r13-core-ui-features分支，推送沿用户长期授权，不轮询CI。任务聚焦现存功能的唯一owner、真实接线与已证实缺陷，保留批准视觉。
 
@@ -94,3 +94,14 @@
 保留O:/Project/FOODBALL/tmp/r13-06-frontend-verified.log、r13-06-behavior-final.log、r13-06-build-final.log、r13-06-architecture.log、最终浏览器和原生结果/截图/startup报告；最终复现工具移动到O:/Project/FOODBALL/tmp/r13-06-evidence-tools。node_modules、Rust目标缓存、05精确CI证据、真实Windows配置和其他用户文件保持。失败中间物的位置以manifest的source→destination对应表追溯。
 
 用户已另行授权后续项目临时目录按核对清单逐文件清理；本次只移动，由用户手动删除old。不宣称移动已释放磁盘空间。上述后续授权已写入执行约定，没有改系统TEMP/TMP。
+
+## 2026-10-31 正式收尾
+
+用户授权收尾06开始07后，精确3683b7f30576704ba2c77a58f25606525390642a/run41183380347/job124485219358与全部返回步骤completed/success；2026-10-31T08:41:54Z（北京时间16:41:54）完成。30项球员行为、完整前端/Rust/release及startup在同一运行完成。
+
+- artifact13036202935，52,306,225 bytes，未过期。下载ZIP SHA256 59284444b102cd70692d2967182c0178dabeeabfb923b5618a4e1d3e78c11b71，与API和上传日志一致。
+- MSI 17,981,440 bytes，OLE头正确，SHA256 a80c33c0283e512133ddd8286e30cf290c074a914586303a2b930cee4f503c4c。
+- NSIS 15,622,125 bytes，MZ头正确，SHA256 00d839f7d9b8448f27731c9bd1ac438975d40c9bb8772bceaa3ea12e101c0c83。
+- 包内logs/windows-acceptance-20261031-080956.json为startup/pass，7条记录、bootstrap/read_workspace_state/save_workspace_state，0错误/0缺失。startup不等于Full。
+
+本次单次结果验收、不轮询。解包证据O:/Project/FOODBALL/tmp/r13-06-ci-41183380347/extracted。06正式DONE，BA-05/07及Full/有效XLSX/私有模型仍按既定R17-06承接。07现已授权，覆盖原07/08；09未启动。此前VERIFYING段落保留为历史，以本收尾结论为准。

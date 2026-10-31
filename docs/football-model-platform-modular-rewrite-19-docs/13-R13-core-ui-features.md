@@ -23,7 +23,7 @@
 
 ## 状态与依赖
 
-当前R13-01、02 **DONE**；R13-03与并入的04 **DONE**（b5b23c46精确run41116421113/证据/双bundle/startup已收尾）。R13-05精确587b6752 CI/产物/双bundle/startup已收尾 **DONE**。R13-06本地实现与96步前端、30行为等完成，当前 **VERIFYING**（自身精确CI/包待验）；07及其后 **BLOCKED / 未实施**。R12已由用户确认结束；当前结果与证据见[阶段执行索引](../modular-rewrite/R13-core-ui-features/README.md)。下表顺序是默认交付顺序，必要时在已授权阶段内按真实依赖拆出更小批次并说明原因，不以任务数量或文件数为目标。
+当前R13-01、02 **DONE**；R13-03与并入的04 **DONE**（b5b23c46精确run41116421113/证据/双bundle/startup已收尾）。R13-05精确587b6752 CI/产物/双bundle/startup已收尾 **DONE**。R13-06精确3683b7f3 CI/产物/双bundle/startup已收尾 **DONE**；07已获用户授权，当前 **IN_PROGRESS**，09未实施。R12已由用户确认结束；当前结果与证据见[阶段执行索引](../modular-rewrite/R13-core-ui-features/README.md)。下表顺序是默认交付顺序，必要时在已授权阶段内按真实依赖拆出更小批次并说明原因，不以任务数量或文件数为目标。
 
 | 主交付 ID | 交付批次 | 前置 |
 |---|---|---|
