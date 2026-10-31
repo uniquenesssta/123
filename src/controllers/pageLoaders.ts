@@ -11,20 +11,10 @@ import type {
   MatchReviewSummary,
   ParameterTuningCandidateRecord,
   PlayerCatalogReferenceData,
-  PlayerDetail,
-  PlayerListPage,
-  PlayerListQuery,
   PostmatchOverview,
   PostmatchSettlementRecord,
   ReviewableMatch
 } from "../types";
-
-export interface PlayerCatalogLoadResult {
-  readonly references: PlayerCatalogReferenceData;
-  readonly list: PlayerListPage;
-  readonly query: PlayerListQuery;
-  readonly selected: PlayerDetail | null;
-}
 
 
 export interface LineupsLoadResult {
@@ -50,28 +40,6 @@ export interface AnalysisCenterLoadResult {
   readonly abilityCandidates: AbilityUpdateCandidateRecord[];
   readonly tuningCandidates: ParameterTuningCandidateRecord[];
   readonly postmatch: PostmatchOverview;
-}
-
-export async function fetchPlayerCatalog(
-  query: PlayerListQuery,
-  selectedPlayer: PlayerDetail | null,
-  resetCursor: boolean,
-  cachedReferences: PlayerCatalogReferenceData | null = null,
-): Promise<PlayerCatalogLoadResult> {
-  const effectiveQuery: PlayerListQuery = resetCursor
-    ? { ...query, cursor_name: null, cursor_id: null }
-    : { ...query };
-  const [references, list] = await Promise.all([
-    cachedReferences
-      ? Promise.resolve(cachedReferences)
-      : api.playerCatalogReferenceData(),
-    api.listPlayers(effectiveQuery),
-  ]);
-  const selectedPlayerId = selectedPlayer?.player.id ?? null;
-  const selected = selectedPlayerId && list.items.some((item) => item.id === selectedPlayerId)
-    ? selectedPlayer
-    : null;
-  return { references, list, query: effectiveQuery, selected };
 }
 
 export async function fetchLineups(): Promise<LineupsLoadResult> {

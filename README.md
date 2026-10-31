@@ -1,5 +1,9 @@
 # 足球模型平台公开外壳
 
+## R13-06 球员目录、履历与观察（2026-10-31 VERIFYING）
+
+目录/来源、档案草稿、工作簿和删除确认已收敛到实际Players Feature，伤停、能力与动态标签独立提交；修复同页通用入口残留来源和导入部分失败误报。30项生产行为、26项Windows浏览器、16种原HTML及原生真实目录读取通过；完整96步前端、类型和构建通过，自身CI/包待验。详[06记录](docs/modular-rewrite/R13-core-ui-features/R13-06-player-catalog-history-and-observations.md)。BA-05/07、Full等沿既定R17-06承接；07未启动。
+
 ## R13-05 球队、档案与资料包（2026-10-31收尾 DONE）
 
 球队目录/详情、档案草稿、导入批次和删除确认已收敛为四个具名owner，保留原全部流程与批准UI。42项生产行为、26项Windows浏览器、16种原HTML对比及原生真实目录读取通过；96步前端及最终受影响复验通过；代码587b6752精确[CI run41172800714](https://github.com/uniquenesssta/123/actions/runs/41172800714)、产物摘要、双bundle与startup已核验收尾。详[05记录](docs/modular-rewrite/R13-core-ui-features/R13-05-team-catalog-profile-and-package.md)。真实有效XLSX/PG删除、Full和私有模型仍按既定R17-06承接；06现已授权开始。

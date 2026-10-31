@@ -26,7 +26,7 @@ ${text("src/styles/entityCenter.css")}
 ${text("src/styles/moduleWorkspaces.css")}
 ${text("src/ui/feedback/task-activity/taskActivity.css")}`;
 const teams = ["src/features/teams/teamPresentation.ts","src/features/teams/profileView.ts","src/features/teams/packageView.ts","src/features/teams/teamsView.ts"].map(text).join("\n");
-const players = text("src/pages/players.ts");
+const players = ["src/features/players/playerPresentation.ts","src/features/players/playerProfileView.ts","src/features/players/playerWorkbookView.ts","src/features/players/playerDirectoryView.ts"].map(text).join("\n");
 const lineups = text("src/pages/lineups.ts");
 const workbooks = text("src/pages/workbooks.ts");
 const ai = text("src/pages/apiWorkspace.ts");

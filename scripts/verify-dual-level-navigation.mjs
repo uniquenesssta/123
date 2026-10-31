@@ -165,6 +165,7 @@ const functions = source.statements.filter(node => ts.isFunctionDeclaration(node
 assert.equal(source.statements.filter(node => ts.isFunctionDeclaration(node) && ["loadNavigationPage", "loadApiWorkspace"].includes(node.name?.text)).length, 2);
 const loaderJs = ts.transpileModule(functions, { compilerOptions: { target: ts.ScriptTarget.ES2022, module: ts.ModuleKind.None } }).outputText;
 const { TeamsFeature } = loadTeamsProduction(root)("src/features/teams/index.ts");
+const { PlayersFeature }=loadTeamsProduction(root)("src/features/players/index.ts");
 function loaderContext() {
   const applied = [], router = new Router();
   const context = {
@@ -177,12 +178,13 @@ function loaderContext() {
   };
   for (const name of ["applyPlayerCatalog", "applyTeamCatalog", "applyLineups", "applyReviewCenter", "applyAnalysisCenter"]) context[name] = () => applied.push(name);
   context.teamsFeature = new TeamsFeature({ api: context.api, initialQuery: null, snapshot: () => context.session.bootstrap, page: () => router.page, activeTab: () => null, publishOptions: () => applied.push("options"), persistQuery: () => applied.push("teamQuery"), setPresetTab: () => applied.push("presetTab") });
+  context.playersFeature=new PlayersFeature({api:context.api,initialQuery:null,initialSource:null,snapshot:()=>context.session.bootstrap,page:()=>router.page,persistQuery:()=>applied.push("playerQuery"),persistSource:()=>{},root:()=>({}),busy:fn=>fn()});
   runInNewContext(loaderJs, context);
   return { context, router, applied };
 }
 for (const [page, operation, apply] of [
   ["logs", "listIssueLogs", "issueLogs"], ["openai", "listOpenAiProfiles", "openAiProfiles"],
-  ["players", "fetchPlayerCatalog", "applyPlayerCatalog"], ["lineups", "fetchLineups", "applyLineups"],
+  ["lineups", "fetchLineups", "applyLineups"],
   ["review", "fetchReviewCenter", "applyReviewCenter"], ["analytics", "fetchAnalysisCenter", "applyAnalysisCenter"],
 ]) {
   await test(`actual ${page} loader rejects stale data and accepts current data`, async () => {
@@ -197,6 +199,7 @@ for (const [page, operation, apply] of [
     }
   });
 }
+await test("actual players loader rejects stale data and publishes only current identity",async()=>{for(const stale of [true,false]){const {context,router}=loaderContext(),task=deferred();context.api.playerCatalogReferenceData=async()=>({teams:[]});context.api.listPlayers=()=>task.promise;const pending=context.loadNavigationPage(router.begin("players"));if(stale)router.begin("dashboard");task.resolve({items:[],has_more:false});await pending;assert.equal(context.playersFeature.catalog.list!==null,!stale);router.destroy();}});
 await test("actual release loader is atomic across both awaits", async () => {
   for (const stage of ["list", "detail", "current"]) {
     const { context, router } = loaderContext(), list = deferred(), detail = deferred(), detailStarted = deferred(); let reads = 0;

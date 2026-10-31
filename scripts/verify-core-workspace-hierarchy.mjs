@@ -18,7 +18,7 @@ const styles = read("src/styles/coreWorkspaces.css");
 const lineups = read("src/pages/lineups.ts");
 const prediction = read("src/pages/prediction.ts");
 const teams = ["src/features/teams/teamPresentation.ts","src/features/teams/profileView.ts","src/features/teams/packageView.ts","src/features/teams/teamsView.ts"].map(read).join("\n");
-const players = read("src/pages/players.ts");
+const players = ["src/features/players/playerPresentation.ts","src/features/players/playerProfileView.ts","src/features/players/playerWorkbookView.ts","src/features/players/playerDirectoryView.ts"].map(read).join("\n");
 const pkg = JSON.parse(read("package.json"));
 
 check(productionStyleFiles(root).indexOf("src/styles/coreWorkspaces.css") > productionStyleFiles(root).indexOf("src/styles/taskWorkspace.css"), "核心工作区样式必须最后加载，避免旧布局覆盖新层级");

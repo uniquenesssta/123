@@ -1,3 +1,4 @@
+import { verifyPlayersWorkflow } from "./features/verifyPlayersWorkflow.mjs";
 import { verifyTeamsWorkflow } from "./features/verifyTeamsWorkflow.mjs";
 import { verifyCompetitionRulesWorkflow } from "./features/verifyCompetitionRulesWorkflow.mjs";
 import { existsSync, readFileSync, readdirSync } from "node:fs";
@@ -559,6 +560,8 @@ try {
   failures.push(`R13-03 赛事/规则生产行为验证无法执行：${error.stack ?? error}`);
 }
 
+let playerCases=0;
+try {playerCases=await verifyPlayersWorkflow(root);}catch(error){failures.push(`R13-06 球员生产行为验证无法执行：${error.stack??error}`);}
 let teamCases = 0;
 try { teamCases = await verifyTeamsWorkflow(root); } catch (error) { failures.push(`R13-05 球队生产行为验证无法执行：${error.stack ?? error}`); }
 
@@ -567,4 +570,4 @@ if (failures.length > 0) {
   for (const failure of failures) console.error(`- ${failure}`);
   process.exit(1);
 }
-console.log(`浏览器组合根验证通过：唯一入口、模块注册和生命周期边界；${lifecycleCases}项真实生命周期行为、${sessionCases}项真实会话行为及${readOnlyFeatureCases}项只读Feature行为及${competitionRulesCases}项赛事/规则生产行为及${teamCases}项球队生产行为测试通过。`);
+console.log(`浏览器组合根验证通过：唯一入口、模块注册和生命周期边界；${lifecycleCases}项真实生命周期行为、${sessionCases}项真实会话行为及${readOnlyFeatureCases}项只读Feature行为及${competitionRulesCases}项赛事/规则生产行为及${teamCases}项球队生产行为及${playerCases}项球员生产行为测试通过。`);

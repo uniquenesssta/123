@@ -23,13 +23,10 @@ export function productionFixture(root) {
       else bundle(target);
     }
   };
-  const entry="scripts/design-refresh/browserFixture.ts";bundle(entry);
+  const entry="scripts/design-refresh/browserFixture.ts";bundle(entry);bundle("src/features/players/playerDirectoryDom.ts");
   const css=readStylesheet(root,"src/styles/index.css");
   const runtime=`const modules=${JSON.stringify(modules)};const cache={};function load(id){if(cache[id])return cache[id];const r=modules[id],exports={};cache[id]=exports;new Function('exports','require',r.output)(exports,s=>load(r.imports[s]));return exports;}`;
   const main=read("src/main.ts");
   const filter = `const filterRulesCompetitionCatalogue=load("scripts/design-refresh/browserFixture.ts").filterRulesCompetitionCatalogue;`;
-  const playerLoadingSource=main.slice(main.indexOf("function setPlayerPageLoading("),main.indexOf("async function loadPlayerPage("));
-  if(!playerLoadingSource.startsWith("function setPlayerPageLoading"))throw Error("Production local player loading helper missing");
-  const playerLoading=ts.transpileModule(playerLoadingSource,{compilerOptions:{target:ts.ScriptTarget.ES2022}}).outputText;
-  return {css,script:`${runtime}\n${filter}\nconst updatePaginationView=load("src/ui/navigation/index.ts").updatePaginationView;let playerPageLoading=false;const playerCursorHistory=[];let playerListPage=load(${JSON.stringify(entry)}).fixturePlayerPage;${playerLoading}\nwindow.setFixturePlayerLoading=setPlayerPageLoading;window.renderFixture=load(${JSON.stringify(entry)}).renderFixture;window.clearRulesCatalogueFilters=load(${JSON.stringify(entry)}).clearRulesCatalogueFilters;`};
+  return {css,script:`${runtime}\n${filter}\nwindow.setFixturePlayerLoading=active=>load("src/features/players/playerDirectoryDom.ts").setPlayerPageLoading({page:"players",list:load(${JSON.stringify(entry)}).fixturePlayerPage,pageNumber:1},active);window.renderFixture=load(${JSON.stringify(entry)}).renderFixture;window.clearRulesCatalogueFilters=load(${JSON.stringify(entry)}).clearRulesCatalogueFilters;`};
 }

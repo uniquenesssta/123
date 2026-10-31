@@ -13,19 +13,19 @@ import { AppSession } from "./app/session";
 import { ApplicationShellController, pageTitle, renderShell } from "./app/shell";
 import { WarningCenterController } from "./app/warnings";
 import { WorkspaceCoordinator, type WorkspaceLayoutMode, type WorkspaceTabState } from "./app/workspace";
-import { bulkArchiveSummary, bulkDeleteSummary } from "./components/entityDeletion";
+import { bulkArchiveSummary } from "./components/entityDeletion";
 import { displayPlayerName, positionLabel } from "./components/footballText";
 import { escapeHtml, formatPercent } from "./components/format";
 import { enhanceSearchableSelects, refreshSearchableSelects } from "./components/searchableSelect";
 import {
   fetchAnalysisCenter,
   fetchLineups,
-  fetchPlayerCatalog,
+
   fetchReviewCenter,
   fetchReviewLineups,
   type AnalysisCenterLoadResult,
   type LineupsLoadResult,
-  type PlayerCatalogLoadResult,
+
   type ReviewCenterLoadResult,
 } from "./controllers/pageLoaders";
 import { bindSearchableSelectDiagnostics } from "./diagnostics/searchableSelectDiagnostics";
@@ -33,6 +33,7 @@ import { architecturePage } from "./features/architecture";
 import { CompetitionFeature, clearRulesCatalogueFilters, filterRulesCompetitionCatalogue, selectRulesDirectoryLevel } from "./features/competitions";
 import { dashboardPage } from "./features/dashboard";
 import { DatabaseFeature, databasePage } from "./features/database";
+import { PlayersFeature, playersPage } from "./features/players";
 import { RulesFeature, routeCard, routeDetailBody, rulesPage } from "./features/rules";
 import { TeamsFeature, teamsPage } from "./features/teams";
 import { analyticsPage } from "./pages/analytics";
@@ -41,7 +42,6 @@ import { lineupPresetsPage } from "./pages/lineupPresets";
 import { lineupsPage } from "./pages/lineups";
 import { logsPage } from "./pages/logs";
 import { openAiPage } from "./pages/openai";
-import { playerTableRows, playersPage } from "./pages/players";
 import { predictionPage } from "./pages/prediction";
 import { releasePage } from "./pages/release";
 import { reviewPage } from "./pages/review";
@@ -63,10 +63,8 @@ import type {
   BackgroundJob,
   CoachListItem,
   CompetitionKind,
-  DataProviderDraft,
   EnqueueJobDraft,
   EvidenceScoringDecisionDraft,
-  ExternalEntityIdDraft,
   FormationRecord,
   IssueLogEntry,
   IssueSeverity,
@@ -100,21 +98,10 @@ import type {
   ParameterTuningCandidateRecord,
   ParameterTuningDecisionDraft,
   ParameterTuningDraft,
-  PlayerAbilityObservationDraft,
-  PlayerAvailabilityDraft,
-  PlayerCatalogReferenceData,
-  PlayerDetail,
-  PlayerDraft,
-  PlayerDynamicTagDraft,
   PlayerListItem,
-  PlayerListPage,
   PlayerListQuery,
-  PlayerMatchContributionRequest,
   PlayerMatchObservationDraft,
-  PlayerNameDraft,
   PlayerNavigationContext,
-  PlayerPositionDraft,
-  PlayerTeamPeriodDraft,
   PostmatchMonitoringRequest,
   PostmatchOverview,
   PostmatchSettlementRecord,
@@ -138,7 +125,6 @@ import type {
 } from "./types";
 import { KeyboardShortcutController, motionScrollBehavior } from "./ui/accessibility";
 import { focusValidationTarget } from "./ui/forms/validation-summary";
-import { updatePaginationView } from "./ui/navigation";
 import { CommandMenuController } from "./ui/overlays/command-menu";
 
 const browserLifecycleController = new EventScope();
@@ -149,70 +135,6 @@ const ANALYSIS_PACKAGE_ID_KEY = preferenceKey("last-analysis-package-id");
 const TEAM_QUERY_KEY = preferenceKey("team-query");
 const PLAYER_QUERY_KEY = preferenceKey("player-query");
 const PLAYER_NAV_CONTEXT_KEY = preferenceKey("player-navigation-context");
-function initialPlayerQuery(): PlayerListQuery {
-  const stored = localPreferences.readObject<PlayerListQuery>(PLAYER_QUERY_KEY);
-  return {
-    search: typeof stored?.search === "string" ? stored.search : null,
-    team_id: typeof stored?.team_id === "string" ? stored.team_id : null,
-    position_code: typeof stored?.position_code === "string" ? stored.position_code : null,
-    availability_status: typeof stored?.availability_status === "string" ? stored.availability_status as PlayerListQuery["availability_status"] : null,
-    player_status: typeof stored?.player_status === "string" ? stored.player_status as PlayerListQuery["player_status"] : "active",
-    limit: typeof stored?.limit === "number" && stored.limit > 0 ? stored.limit : 50,
-    cursor_name: null,
-    cursor_id: null,
-  };
-}
-
-function readPlayerNavigationContext(): PlayerNavigationContext | null {
-  const stored = localPreferences.readObject<PlayerNavigationContext>(PLAYER_NAV_CONTEXT_KEY);
-  const source = stored?.source === "match_lineup" ? "match_lineup" : stored?.source === "team_roster" ? "team_roster" : null;
-  if (!source || typeof stored?.team_id !== "string" || typeof stored.team_name !== "string") return null;
-  const originPage = stored.origin_page === "lineups" ? "lineups" : "teams";
-  const now = new Date().toISOString();
-  return {
-    source,
-    team_id: stored.team_id,
-    team_name: stored.team_name,
-    player_id: typeof stored.player_id === "string" ? stored.player_id : null,
-    origin_page: originPage,
-    return_section: stored.return_section === "builder" || stored.return_section === "chain" ? stored.return_section : null,
-    created_at: typeof stored.created_at === "string" ? stored.created_at : now,
-    updated_at: typeof stored.updated_at === "string" ? stored.updated_at : now,
-  };
-}
-
-function persistPlayerQuery(): void {
-  const { cursor_name: _cursorName, cursor_id: _cursorId, ...stable } = playerQuery;
-  localPreferences.writeJson(PLAYER_QUERY_KEY, stable);
-}
-
-function setPlayerNavigationContext(context: PlayerNavigationContext | null): void {
-  playerNavigationContext = context;
-  if (context) localPreferences.writeJson(PLAYER_NAV_CONTEXT_KEY, context);
-  else localPreferences.removeItem(PLAYER_NAV_CONTEXT_KEY);
-}
-
-function prepareDirectPlayerDirectoryEntry(): void {
-  const sourceTeamId = playerNavigationContext?.team_id ?? null;
-  if (!sourceTeamId) return;
-
-  playerCursorHistory = [];
-  if (playerQuery.team_id === sourceTeamId) {
-    playerQuery = {
-      ...playerQuery,
-      team_id: null,
-      cursor_name: null,
-      cursor_id: null,
-    };
-    persistPlayerQuery();
-  }
-  setPlayerNavigationContext(null);
-  selectedPlayer = null;
-  workspaceState.patchModule("players", {
-    active_section: "directory",
-    inspector_collapsed: true,
-  });
-}
 
 let app: HTMLDivElement;
 
@@ -283,9 +205,9 @@ const teamsFeature = new TeamsFeature({
   persistQuery: query => localPreferences.writeJson(TEAM_QUERY_KEY, query),
   publishOptions(coaches, formations) { coachList = coaches; formationCatalog = formations; },
   publishCoaches: coaches => { coachList = coaches; },
-  refreshPlayerReferences: async () => { const snapshot = session.bootstrap; const references = await api.playerCatalogReferenceData(); if (snapshot === session.bootstrap) playerReferences = references; },
+  refreshPlayerReferences: async () => { const snapshot = session.bootstrap; const references = await api.playerCatalogReferenceData(); if (snapshot === session.bootstrap) playersFeature.catalog.setReferences(references); },
   refreshAll: () => refreshBootstrapAndCatalog(),
-  clearPlayerInspector: () => { selectedPlayer = null; },
+  clearPlayerInspector: () => { playersFeature.catalog.adopt(null); },
   render: () => render({ preserveForm: true }),
   notify: (message, kind) => toast(message, kind),
   setSection(section, inspectorCollapsed) { workspaceState.patchModule("teams", { active_section: section, ...(inspectorCollapsed !== undefined ? { inspector_collapsed: inspectorCollapsed } : {}), ...(section === "directory" && !teamsFeature.catalog.detail ? { active_tab_id: null } : {}) }); },
@@ -303,7 +225,7 @@ const teamsFeature = new TeamsFeature({
     if (!await teamsFeature.catalog.load({ resetCursor: true, retainId: activeId, isCurrent: () => navigation.page === page })) return false;
     const current = teamsFeature.catalog.capture(), references = await api.playerCatalogReferenceData();
     if (!current() || page !== navigation.page) return false;
-    playerReferences = references; persistWorkspaceSelection("teams"); render({ preserveForm: true }); return true;
+    playersFeature.catalog.setReferences(references); persistWorkspaceSelection("teams"); render({ preserveForm: true }); return true;
   },
   async removeMissing(ids) {
     const page = navigation.page, activeId = removeWorkspaceObjects("teams", ids), revision = teamsFeature.catalog.revision;
@@ -312,14 +234,12 @@ const teamsFeature = new TeamsFeature({
   },
   async afterForceDelete(result) {
     const page = navigation.page, activeId = removeWorkspaceObjects("teams", [result.team_id]);
-    removeWorkspaceObjects("players", result.deleted_player_ids); spreadsheetPreview = null; matchSpreadsheetPreview = null;
+    removeWorkspaceObjects("players", result.deleted_player_ids); playersFeature.imports.clear(); matchSpreadsheetPreview = null;
     const revision = teamsFeature.catalog.revision;
     await session.refresh(); if (page !== navigation.page || revision !== teamsFeature.catalog.revision) return false;
     if (!await teamsFeature.catalog.load({ resetCursor: true, retainId: activeId, isCurrent: () => navigation.page === page })) return false;
     const current = teamsFeature.catalog.capture();
-    const players = await fetchPlayerCatalog({ ...playerQuery }, selectedPlayer, true, null);
-    if (!current() || page !== navigation.page) return false;
-    applyPlayerCatalog(players);
+    if (!await playersFeature.load(true, () => current() && page === navigation.page)) return false;
     persistWorkspaceSelection("teams"); persistWorkspaceSelection("players"); render({ preserveForm: true }); return true;
   },
   async afterArchive(result) {
@@ -328,33 +248,35 @@ const teamsFeature = new TeamsFeature({
     if (!await teamsFeature.catalog.load({ resetCursor: true, retainId: activeId, isCurrent: () => navigation.page === page })) return;
     const current = teamsFeature.catalog.capture(), references = await api.playerCatalogReferenceData();
     if (!current() || page !== navigation.page) return;
-    playerReferences = references; persistWorkspaceSelection("teams"); render({ preserveForm: true });
+    playersFeature.catalog.setReferences(references); persistWorkspaceSelection("teams"); render({ preserveForm: true });
     showHtmlModal("球队批量归档结果", "保留历史关系", bulkArchiveSummary(result, "支球队"));
   },
+});
+
+
+const playersFeature = new PlayersFeature({
+ api,initialQuery:localPreferences.readObject<PlayerListQuery>(PLAYER_QUERY_KEY),initialSource:localPreferences.readObject<PlayerNavigationContext>(PLAYER_NAV_CONTEXT_KEY),snapshot:()=>session.bootstrap,page:()=>navigation.page,root:()=>app,
+ busy:operation=>runBusy(operation),persistQuery:query=>localPreferences.writeJson(PLAYER_QUERY_KEY,query),persistSource:source=>{if(source)localPreferences.writeJson(PLAYER_NAV_CONTEXT_KEY,source);else localPreferences.removeItem(PLAYER_NAV_CONTEXT_KEY);},
+ render:()=>render({preserveForm:true}),notify:(message,kind)=>toast(message,kind),section:(active_section,inspector_collapsed)=>workspaceState.patchModule("players",{active_section,...(inspector_collapsed!==undefined?{inspector_collapsed}:{})}),appendTab:(id,label)=>appendWorkspaceTab("players",{id,label}),refreshAll:()=>refreshBootstrapAndCatalog(),confirm:(...args)=>modal.confirm(...args),showHtml:(...args)=>showHtmlModal(...args),showResult:(title,result)=>showModal(title,result),
+ async afterMutation(ids){const page=navigation.page,active=removeWorkspaceObjects("players",ids),revision=playersFeature.catalog.revision;await session.refresh();if(page!==navigation.page||revision!==playersFeature.catalog.revision)return false;
+ if(!await playersFeature.load(true,()=>page===navigation.page))return false;const current=playersFeature.catalog.capture();
+ if(teamsFeature.catalog.list!==null){await teamsFeature.load(true);if(!current()||page!==navigation.page)return false;}
+ persistWorkspaceSelection("players");if(active&&playersFeature.catalog.detail?.player.id===active)appendWorkspaceTab("players",{id:active,label:playersFeature.catalog.detail.player.canonical_name});render({preserveForm:true});return true;}
 });
 
 const navigation = new Router();
 const workflowNavigation = new NavigationContext();
 let lastPredictionResult: unknown = null;
-let playerReferences: PlayerCatalogReferenceData | null = null;
-let playerListPage: PlayerListPage | null = null;
-let selectedPlayer: PlayerDetail | null = null;
-let selectedPlayerIds = new Set<string>();
 let pairedLineupPresets: Record<"home" | "away", TeamLineupPresetRecord[]> = {
   home: [],
   away: [],
 };
-let playerCursorHistory: Array<{ cursor_name: string | null; cursor_id: string | null }> = [];
-let playerPageLoading = false;
 let coachList: CoachListItem[] = [];
 let formationCatalog: FormationRecord[] = [];
-let playerQuery: PlayerListQuery = initialPlayerQuery();
-let playerNavigationContext: PlayerNavigationContext | null = readPlayerNavigationContext();
-if (playerNavigationContext) playerQuery.team_id = playerNavigationContext.team_id;
+
 let lineupRecords: LineupRecord[] = [];
 let selectedMatchLineupChain: MatchLineupChain | null = null;
 let selectedPredictionReadiness: MatchPredictionReadiness | null = null;
-let spreadsheetPreview: SpreadsheetImportPreview | null = null;
 let matchSpreadsheetPreview: SpreadsheetImportPreview | null = null;
 let reviewableMatches: ReviewableMatch[] = [];
 let recentMatchReviews: MatchReviewSummary[] = [];
@@ -480,7 +402,7 @@ function openCommandMenu(): void {
   contextMenu.close();
   commandMenu.open(PRIMARY_NAVIGATION.flatMap(module => module.items.map(item => ({id:item.page,label:item.label,description:item.description,keywords:module.label+" "+item.page,run:async()=>{
     if(item.page===navigation.page)return;
-    if(item.page==="players")prepareDirectPlayerDirectoryEntry();
+    if(item.page==="players")playersFeature.directEntry();
     await navigateTo(item.page);
   }}))));
 }
@@ -547,6 +469,7 @@ function render(options: RenderOptions = {}): void {
   rulesFeature.invalidatePreview();
   const shellFocus = shellController?.captureFocus() ?? null;
   teamsFeature.drafts.capture(app);
+  playersFeature.drafts.capture(app);
   modal.capture();
   if (options.preserveForm === true && renderedPage === "lineups") {
     capturePairedLineupFromDom();
@@ -580,16 +503,16 @@ function render(options: RenderOptions = {}): void {
     case "players": {
       const workspace = workspaceState.module("players");
       content = playersPage(
-        session.bootstrap, playerReferences, playerListPage, selectedPlayer, playerQuery, spreadsheetPreview, selectedPlayerIds,
+        session.bootstrap, playersFeature.catalog.references, playersFeature.catalog.list, playersFeature.catalog.detail, playersFeature.catalog.query, playersFeature.imports.preview, playersFeature.catalog.selectedIds,
         workspace.tabs, workspace.active_tab_id, workspace.layout_mode, workspace.module_sidebar_collapsed, workspace.inspector_collapsed,
-        workspace.active_section ?? "directory", playerCursorHistory.length + 1, playerNavigationContext,
+        workspace.active_section ?? "directory", playersFeature.catalog.pageNumber, playersFeature.catalog.source,
       );
       break;
     }
     case "teams": {
       const workspace = workspaceState.module("teams");
       content = teamsPage(
-        session.bootstrap, teamsFeature.catalog.list, teamsFeature.catalog.detail, selectedPlayer, teamsFeature.catalog.query, teamsFeature.catalog.selectedIds, coachList, formationCatalog,
+        session.bootstrap, teamsFeature.catalog.list, teamsFeature.catalog.detail, playersFeature.catalog.detail, teamsFeature.catalog.query, teamsFeature.catalog.selectedIds, coachList, formationCatalog,
         teamsFeature.imports.package, teamsFeature.catalog.lineups, teamsFeature.catalog.presets, workspace.tabs, workspace.active_tab_id,
         workspace.layout_mode, workspace.module_sidebar_collapsed, workspace.inspector_collapsed,
         workspace.active_section ?? "directory", teamsFeature.catalog.pageNumber,
@@ -604,14 +527,14 @@ function render(options: RenderOptions = {}): void {
     }
     case "workbooks": {
       const workspace = workspaceState.module("workbooks");
-      content = workbooksPage(session.bootstrap, teamsFeature.imports.monthly, spreadsheetPreview, matchSpreadsheetPreview, workspace.module_sidebar_collapsed, workspace.inspector_collapsed, workspace.active_section ?? "team");
+      content = workbooksPage(session.bootstrap, teamsFeature.imports.monthly, playersFeature.imports.preview, matchSpreadsheetPreview, workspace.module_sidebar_collapsed, workspace.inspector_collapsed, workspace.active_section ?? "team");
       break;
     }
     case "lineups": {
       const workspace = workspaceState.module("lineups");
       content = lineupsPage(
         session.bootstrap,
-        playerReferences,
+        playersFeature.catalog.references,
         lineupRecords,
         matchSpreadsheetPreview,
         pairedLineupBuilder,
@@ -629,7 +552,7 @@ function render(options: RenderOptions = {}): void {
       const workspace = workspaceState.module("prediction");
       content = predictionPage(
         session.bootstrap,
-        playerReferences,
+        playersFeature.catalog.references,
         selectedP4MatchId,
         p4MatchWorkspace,
         p4TaskWorkspace,
@@ -656,7 +579,7 @@ function render(options: RenderOptions = {}): void {
         matchReviewPackageWorkflow,
         selectedReviewSettlement,
         recentMatchReviews,
-        playerReferences,
+        playersFeature.catalog.references,
         lineupPlayerCandidates,
         lineupBuilderPlayers,
         lineupBuilderForm,
@@ -748,6 +671,7 @@ function render(options: RenderOptions = {}): void {
   workspaceState.restore(navigation.page, currentPageRoot);
   rulesFeature.syncHierarchy(currentPageRoot);
   teamsFeature.drafts.restore(currentPageRoot, session.bootstrap);
+  playersFeature.drafts.restore(currentPageRoot, session.bootstrap);
   shellController?.restoreFocus(shellFocus);
   if (navigation.page === "lineups") {
   queueMicrotask(() => {
@@ -773,7 +697,7 @@ function appendWorkspaceTab(targetPage: "teams" | "players", tab: WorkspaceTabSt
 }
 
 function persistWorkspaceSelection(targetPage: "teams" | "players"): void {
-  const ids = targetPage === "teams" ? [...teamsFeature.catalog.selectedIds] : [...selectedPlayerIds];
+  const ids = targetPage === "teams" ? [...teamsFeature.catalog.selectedIds] : [...playersFeature.catalog.selectedIds];
   workspaceState.patchModule(targetPage, { selected_object_ids: ids });
 }
 
@@ -797,8 +721,8 @@ function removeWorkspaceObjects(
   if (targetPage === "teams") {
     teamsFeature.catalog.remove(removed);
   } else {
-    for (const id of removed) selectedPlayerIds.delete(id);
-    if (selectedPlayer && removed.has(selectedPlayer.player.id)) selectedPlayer = null;
+    for (const id of removed) playersFeature.catalog.toggleSelection(id, false);
+    if (playersFeature.catalog.detail && removed.has(playersFeature.catalog.detail.player.id)) playersFeature.catalog.adopt(null);
   }
   return activeId;
 }
@@ -825,7 +749,7 @@ async function openAvailableWorkspaceTab(
   for (const candidate of candidates) {
     try {
       if (targetPage === "teams") await teamsFeature.open(candidate);
-      else await openPlayer(candidate);
+      else await playersFeature.openDirectory(candidate);
       return;
     } catch (error) {
       if (!isMissingWorkspaceObjectError(targetPage, error)) throw error;
@@ -835,7 +759,7 @@ async function openAvailableWorkspaceTab(
   if (targetPage === "teams") {
     teamsFeature.catalog.clearDetail();
   } else {
-    selectedPlayer = null;
+    playersFeature.catalog.adopt(null);
   }
   render({ preserveForm: true });
 }
@@ -843,7 +767,7 @@ async function openAvailableWorkspaceTab(
 async function activateWorkspaceTab(targetPage: "teams" | "players", objectId: string): Promise<void> {
   workspaceState.patchModule(targetPage, { active_tab_id: objectId });
   if (targetPage === "teams") await teamsFeature.open(objectId);
-  else await openPlayer(objectId);
+  else await playersFeature.openDirectory(objectId);
 }
 
 async function closeWorkspaceTab(targetPage: "teams" | "players", objectId: string): Promise<void> {
@@ -858,8 +782,8 @@ async function closeWorkspaceTab(targetPage: "teams" | "players", objectId: stri
 }
 
 async function openSelectedWorkspaceObjects(targetPage: "teams" | "players"): Promise<void> {
-  const ids = targetPage === "teams" ? [...teamsFeature.catalog.selectedIds] : [...selectedPlayerIds];
-  const items = targetPage === "teams" ? (teamsFeature.catalog.list?.items ?? []) : (playerListPage?.items ?? []);
+  const ids = targetPage === "teams" ? [...teamsFeature.catalog.selectedIds] : [...playersFeature.catalog.selectedIds];
+  const items = targetPage === "teams" ? (teamsFeature.catalog.list?.items ?? []) : (playersFeature.catalog.list?.items ?? []);
   for (const id of ids.slice(-6)) {
     const item = items.find((candidate) => candidate.id === id);
     appendWorkspaceTab(targetPage, { id, label: item?.canonical_name ?? id });
@@ -867,7 +791,7 @@ async function openSelectedWorkspaceObjects(targetPage: "teams" | "players"): Pr
   const active = ids.at(-1);
   if (!active) return;
   if (targetPage === "teams") await teamsFeature.open(active);
-  else await openPlayer(active);
+  else await playersFeature.openDirectory(active);
 }
 
 function setWorkspaceMode(targetPage: "teams" | "players", mode: WorkspaceLayoutMode): void {
@@ -896,8 +820,8 @@ function resetCurrentWorkspace(): void {
 function resetWorkspaceContents(): void {
   modal.reset();
   workspaceState.clear(navigation.page);
-  if (navigation.page === "teams") { teamsFeature.reset(); selectedPlayer = null; }
-  if (navigation.page === "players") { selectedPlayerIds.clear(); selectedPlayer = null; playerCursorHistory = []; }
+  if (navigation.page === "teams") { teamsFeature.reset(); playersFeature.catalog.adopt(null); }
+  if (navigation.page === "players") playersFeature.reset();
   if (navigation.page === "lineup_presets") { teamsFeature.reset(); }
   // Do not capture the discarded DOM back into the just-cleared workspace.
   renderedPage = null;
@@ -1509,38 +1433,6 @@ function nullableNumber(id: string): number | null {
   return parsed;
 }
 
-function isChineseName(languageCode: string | null, name: string): boolean {
-  const language = languageCode?.toLowerCase() ?? "";
-  return ["zh-cn", "zh-hans", "zh"].includes(language) || /[一-龥]/u.test(name);
-}
-
-function currentPlayerLocalizedName(detail: PlayerDetail | null): string {
-  if (!detail) return "";
-  const records = detail.names.filter((item) => {
-    const name = typeof item.name === "string" ? item.name : "";
-    const language = typeof item.language_code === "string" ? item.language_code : null;
-    return isChineseName(language, name);
-  });
-  records.sort((left, right) => {
-    const languageRank = (record: Record<string, unknown>) => {
-      const language = typeof record.language_code === "string" ? record.language_code.toLowerCase() : "";
-      return ["zh-cn", "zh-hans", "zh"].includes(language) ? 1 : 0;
-    };
-    const byLanguage = languageRank(right) - languageRank(left);
-    if (byLanguage !== 0) return byLanguage;
-    const leftFrom = typeof left.valid_from === "string" ? left.valid_from : "";
-    const rightFrom = typeof right.valid_from === "string" ? right.valid_from : "";
-    const leftId = typeof left.id === "string" ? left.id : "";
-    const rightId = typeof right.id === "string" ? right.id : "";
-    return rightFrom.localeCompare(leftFrom) || rightId.localeCompare(leftId);
-  });
-  return typeof records[0]?.name === "string" ? records[0].name.trim() : "";
-}
-
-function todayDate(): string {
-  return new Date().toISOString().slice(0, 10);
-}
-
 function localDateTimeToIso(
   raw: string | null,
   fallbackNow = false,
@@ -1558,115 +1450,8 @@ function localDateTimeInputValue(raw: string): string {
   return local.toISOString().slice(0, 16);
 }
 
-function applyPlayerCatalog(result: PlayerCatalogLoadResult): void {
-  playerReferences = result.references;
-  playerListPage = result.list;
-  playerQuery = result.query;
-  selectedPlayer = result.selected;
-}
-
-async function loadPlayerCatalog(resetCursor: boolean): Promise<void> {
-  if (!session.bootstrap?.data.database_configured) return;
-  applyPlayerCatalog(
-    await fetchPlayerCatalog(
-      playerQuery,
-      selectedPlayer,
-      resetCursor,
-      resetCursor ? null : playerReferences,
-    ),
-  );
-}
-
-function setPlayerPageLoading(active: boolean): void {
-  playerPageLoading = active;
-  const main = document.querySelector<HTMLElement>(
-    '.app-shell[data-current-page="players"] .player-browser .entity-main',
-  );
-  if (!main) return;
-  main.setAttribute("aria-busy", String(active));
-  const pagination=main.querySelector<HTMLElement>(".ui-pagination");
-  if(pagination)updatePaginationView(pagination,{page:playerCursorHistory.length+1,hasMore:playerListPage?.has_more??false,busy:active,summary:playerListPage?`本页 ${playerListPage.items.length} 条结果`:"尚未载入"});
-}
-
-async function loadPlayerPage(
-  nextQuery: PlayerListQuery,
-): Promise<PlayerCatalogLoadResult | null> {
-  if (!session.bootstrap?.data.database_configured || playerPageLoading) return null;
-  setPlayerPageLoading(true);
-  try {
-    return await fetchPlayerCatalog(
-      nextQuery,
-      selectedPlayer,
-      false,
-      playerReferences,
-    );
-  } finally {
-    setPlayerPageLoading(false);
-  }
-}
-
-function refreshPlayerPageDom(): boolean {
-  if (navigation.page !== "players" || !playerListPage) return false;
-  const tbody = document.querySelector<HTMLTableSectionElement>(
-    ".entity-page-players .player-directory-table tbody",
-  );
-  const resultCount = document.querySelector<HTMLElement>(
-    ".entity-page-players .player-list-toolbar .entity-list-actions > span",
-  );
-  const footer = document.querySelector<HTMLElement>(
-    ".entity-page-players .entity-main-footer",
-  );
-  const pagination = footer?.querySelector<HTMLElement>(".ui-pagination") ?? null;
-  const previousButton = footer?.querySelector<HTMLButtonElement>(
-    '[data-action="previous-player-page"]',
-  ) ?? null;
-  const nextButton = footer?.querySelector<HTMLButtonElement>(
-    '[data-action="next-player-page"]',
-  ) ?? null;
-  if (!tbody || !resultCount || !footer || !pagination || !previousButton || !nextButton) {
-    return false;
-  }
-
-  tbody.innerHTML = playerTableRows(
-    playerListPage,
-    selectedPlayer?.player.id ?? null,
-    selectedPlayerIds,
-  );
-  resultCount.textContent = `${playerListPage.items.length} 条当前结果`;
-  updatePaginationView(pagination,{page:playerCursorHistory.length+1,hasMore:playerListPage.has_more,busy:playerPageLoading,summary:`本页 ${playerListPage.items.length} 条结果`});
-  const selectAll = document.querySelector<HTMLInputElement>("#player-select-all");
-  if (selectAll) selectAll.checked = false;
-
-  const ribbonItems = document.querySelectorAll<HTMLElement>(
-    ".entity-page-players .task-context-ribbon .task-context-item",
-  );
-  const resultRibbon = ribbonItems.item(1);
-  const ribbonValue = resultRibbon?.querySelector<HTMLElement>("strong") ?? null;
-  const ribbonNote = resultRibbon?.querySelector<HTMLElement>("small") ?? null;
-  if (ribbonValue) ribbonValue.textContent = `${playerListPage.items.length} 名球员`;
-  if (ribbonNote) {
-    const activeFilterCount = [
-      playerQuery.team_id,
-      playerQuery.position_code,
-      playerQuery.availability_status,
-      playerQuery.player_status,
-    ].filter(Boolean).length;
-    ribbonNote.textContent = `第 ${playerCursorHistory.length + 1} 页 · ${activeFilterCount} 项筛选`;
-  }
-
-  const sectionBadge = document.querySelector<HTMLElement>(
-    '.entity-page-players [data-action="select-workspace-section"][data-section-id="directory"] .workspace-section-badge',
-  );
-  if (sectionBadge) sectionBadge.textContent = String(playerListPage.items.length);
-
-  document.querySelector<HTMLElement>(
-    ".entity-page-players .player-table-wrap",
-  )?.scrollTo({ top: 0, behavior: "auto" });
-  return true;
-}
-
 function applyLineups(result: LineupsLoadResult): void {
-  playerReferences = result.references;
+  playersFeature.catalog.setReferences(result.references);
   lineupRecords = result.records;
   coachList = result.coaches;
   const matches = result.references.managed_matches;
@@ -1744,8 +1529,8 @@ async function loadP4MatchWorkspace(
 async function refreshP4Workspace(): Promise<void> {
   const matchId =
     selectedP4MatchId ??
-    playerReferences?.upcoming_matches[0]?.id ??
-    playerReferences?.managed_matches[0]?.id ??
+    playersFeature.catalog.references?.upcoming_matches[0]?.id ??
+    playersFeature.catalog.references?.managed_matches[0]?.id ??
     null;
   if (!matchId) {
     p4MatchWorkspace = null;
@@ -1996,12 +1781,7 @@ async function loadNavigationPage(request: NavigationRequest): Promise<void> {
   }
 
   if (nextPage === "players") {
-    const result = await fetchPlayerCatalog(
-      playerQuery,
-      selectedPlayer,
-      playerListPage === null,
-    );
-    if (navigation.isCurrent(request)) applyPlayerCatalog(result);
+    await playersFeature.load(playersFeature.catalog.list === null, () => navigation.isCurrent(request));
   } else if (nextPage === "teams" || nextPage === "lineup_presets") {
     await teamsFeature.loadForRoute(nextPage, () => navigation.isCurrent(request));
   } else if (nextPage === "lineups") {
@@ -2009,7 +1789,7 @@ async function loadNavigationPage(request: NavigationRequest): Promise<void> {
     if (navigation.isCurrent(request)) applyLineups(result);
   } else if (nextPage === "prediction") {
     const references =
-      playerReferences ?? (await api.playerCatalogReferenceData());
+      playersFeature.catalog.references ?? (await api.playerCatalogReferenceData());
     const matchId =
       selectedP4MatchId &&
       references.managed_matches.some((item) => item.id === selectedP4MatchId)
@@ -2029,7 +1809,7 @@ async function loadNavigationPage(request: NavigationRequest): Promise<void> {
       ? await api.readP4TaskWorkspace(taskId)
       : null;
     if (navigation.isCurrent(request)) {
-      playerReferences = references;
+      playersFeature.catalog.setReferences(references);
       selectedP4MatchId = matchId;
       p4MatchWorkspace = workspace;
       p4TaskWorkspace = taskWorkspace;
@@ -2045,123 +1825,13 @@ async function loadNavigationPage(request: NavigationRequest): Promise<void> {
 
 async function refreshBootstrapAndCatalog(): Promise<void> {
   await session.refresh();
-  await loadPlayerCatalog(true);
+  await playersFeature.load(true);
   if (teamsFeature.catalog.list !== null || navigation.page === "teams" || navigation.page === "lineup_presets") await teamsFeature.load(true);
-}
-
-async function searchTeamOptions(): Promise<void> {
-  const search = nullableValue("team-option-search");
-  const teams = await runBusy(() => api.listTeamOptions(search, 200));
-  if (!playerReferences)
-    playerReferences = await api.playerCatalogReferenceData();
-  playerReferences = { ...playerReferences, teams };
-  render();
-  toast(`已加载 ${teams.length} 支球队选项`, "success");
-}
-
-async function searchPlayers(): Promise<void> {
-  playerCursorHistory = [];
-  const selectedTeamId = nullableValue("player-filter-team");
-  playerQuery = {
-    ...playerQuery,
-    search: nullableValue("player-search"),
-    team_id: selectedTeamId,
-    position_code: nullableValue("player-filter-position"),
-    availability_status: nullableValue(
-      "player-filter-availability",
-    ) as PlayerListQuery["availability_status"],
-    player_status: nullableValue(
-      "player-filter-status",
-    ) as PlayerListQuery["player_status"],
-    cursor_name: null,
-    cursor_id: null,
-  };
-  if (playerNavigationContext && playerNavigationContext.team_id !== selectedTeamId) {
-    setPlayerNavigationContext(null);
-  }
-  persistPlayerQuery();
-  await runBusy(() => loadPlayerCatalog(false));
-  if (selectedPlayer && !playerListPage?.items.some((item) => item.id === selectedPlayer?.player.id)) {
-    selectedPlayer = null;
-    workspaceState.patchModule("players", { inspector_collapsed: true });
-  }
-  render();
-}
-
-async function clearPlayerFilters(): Promise<void> {
-  playerCursorHistory = [];
-  playerQuery = {
-    search: null,
-    team_id: null,
-    position_code: null,
-    availability_status: null,
-    player_status: null,
-    limit: playerQuery.limit,
-    cursor_name: null,
-    cursor_id: null,
-  };
-  setPlayerNavigationContext(null);
-  persistPlayerQuery();
-  await runBusy(() => loadPlayerCatalog(false));
-  if (selectedPlayer && !playerListPage?.items.some((item) => item.id === selectedPlayer?.player.id)) {
-    selectedPlayer = null;
-    workspaceState.patchModule("players", { inspector_collapsed: true });
-  }
-  render();
-}
-
-async function nextPlayerPage(): Promise<void> {
-  if (
-    playerPageLoading
-    || !playerListPage?.has_more
-    || !playerListPage.next_cursor_name
-    || !playerListPage.next_cursor_id
-  ) return;
-  const previousCursor = {
-    cursor_name: playerQuery.cursor_name,
-    cursor_id: playerQuery.cursor_id,
-  };
-  const nextQuery: PlayerListQuery = {
-    ...playerQuery,
-    cursor_name: playerListPage.next_cursor_name,
-    cursor_id: playerListPage.next_cursor_id,
-  };
-  const result = await loadPlayerPage(nextQuery);
-  if (!result) return;
-  playerCursorHistory.push(previousCursor);
-  applyPlayerCatalog({ ...result, selected: selectedPlayer });
-  if (!refreshPlayerPageDom()) render({ preserveForm: true });
-}
-
-async function previousPlayerPage(): Promise<void> {
-  if (playerPageLoading) return;
-  const previous = playerCursorHistory.at(-1);
-  if (!previous) return;
-  const previousQuery: PlayerListQuery = { ...playerQuery, ...previous };
-  const result = await loadPlayerPage(previousQuery);
-  if (!result) return;
-  playerCursorHistory.pop();
-  applyPlayerCatalog({ ...result, selected: selectedPlayer });
-  if (!refreshPlayerPageDom()) render({ preserveForm: true });
-}
-
-async function openPlayer(playerId: string): Promise<void> {
-  selectedPlayer = await runBusy(() => api.readPlayer(playerId));
-  appendWorkspaceTab("players", { id: playerId, label: selectedPlayer.player.canonical_name });
-  workspaceState.patchModule("players", { active_section: "directory", inspector_collapsed: false });
-  render();
-}
-
-async function openPlayerProfile(playerId: string): Promise<void> {
-  selectedPlayer = await runBusy(() => api.readPlayer(playerId));
-  appendWorkspaceTab("players", { id: playerId, label: selectedPlayer.player.canonical_name });
-  workspaceState.patchModule("players", { active_section: "profile", inspector_collapsed: true });
-  render();
 }
 
 async function previewPlayerFromTeam(playerId: string): Promise<void> {
   const source = await teamsFeature.readPlayerFromTeam(playerId); if (!source || !source.current()) return;
-  selectedPlayer = source.player; workspaceState.patchModule("teams", { inspector_collapsed: false }); render({ preserveForm: true });
+  playersFeature.catalog.adopt(source.player); workspaceState.patchModule("teams", { inspector_collapsed: false }); render({ preserveForm: true });
 }
 
 async function refreshLineupPresetPage(): Promise<void> {
@@ -2170,166 +1840,38 @@ async function refreshLineupPresetPage(): Promise<void> {
   render({ preserveForm: true });
 }
 
-async function bulkArchiveEntities(
-  entityType: "team" | "player",
-): Promise<void> {
-  if (entityType === "team") { await teamsFeature.archive(); return; }
-  const ids = Array.from(selectedPlayerIds);
-  if (ids.length === 0) throw new Error("请先选择要归档的对象");
-  const result = await runBusy(() =>
-    api.bulkArchiveEntities(entityType, ids),
-  );
-  const removedIds = [...result.archived_ids, ...result.already_archived_ids];
-  const activeId = removeWorkspaceObjects("players", removedIds);
-  await session.refresh();
-  await loadPlayerCatalog(true);
-  playerReferences = await api.playerCatalogReferenceData();
-  persistWorkspaceSelection("players");
-  if (activeId) await openAvailableWorkspaceTab("players", activeId);
-  else render();
-  showHtmlModal(
-    "球员批量归档结果",
-    "保留历史关系",
-    bulkArchiveSummary(result, "名球员"),
-  );
-}
-
-function requestBulkDeletePlayers(): void {
-  const ids = Array.from(selectedPlayerIds);
-  if (ids.length === 0) throw new Error("请先选择球员");
-  showConfirmation(
-    "批量删除球员",
-    "将逐个执行安全删除；存在不可删除关联的球员会被保留并显示原因。",
-    [
-      ["已选择", `${ids.length} 名球员`],
-      ["处理方式", "逐条事务、保留失败项"],
-    ],
-    "确认批量删除",
-    async () => {
-      const result = await runBusy(() => api.bulkDeletePlayers(ids));
-      const activeId = removeWorkspaceObjects("players", result.deleted_ids);
-      await refreshBootstrapAndCatalog();
-      persistWorkspaceSelection("players");
-      if (activeId) await openAvailableWorkspaceTab("players", activeId);
-      else render();
-      showHtmlModal(
-        "球员批量删除结果",
-        "安全删除",
-        bulkDeleteSummary(result, "名球员"),
-      );
-    },
-  );
-}
+async function bulkArchiveEntities(entityType: "team" | "player"): Promise<void> { if(entityType === "team") await teamsFeature.archive(); else await playersFeature.archive(); }
 
 async function openPlayerFromTeam(playerId: string): Promise<void> {
-  const source = await teamsFeature.readPlayerFromTeam(playerId); if (!source || !source.current()) return;
-  const teamId = source.teamId, teamName = source.teamName;
-  playerCursorHistory = [];
-  playerQuery = {
-    search: null,
-    team_id: teamId,
-    position_code: null,
-    availability_status: null,
-    player_status: "active",
-    limit: playerQuery.limit,
-    cursor_name: null,
-    cursor_id: null,
-  };
-  const now = new Date().toISOString();
-  setPlayerNavigationContext({
-    source: "team_roster",
-    team_id: teamId,
-    team_name: teamName,
-    player_id: playerId,
-    origin_page: "teams",
-    return_section: null,
-    created_at: now,
-    updated_at: now,
-  });
-  playerQuery.player_status = null;
-  persistPlayerQuery();
-  selectedPlayer = source.player;
-  workspaceState.patchModule("players", { active_section: "directory", inspector_collapsed: false });
-  await navigateTo("players");
+  const source=await teamsFeature.readPlayerFromTeam(playerId); if(!source||!source.current())return;
+  const now=new Date().toISOString();playersFeature.enterSource({source:"team_roster",team_id:source.teamId,team_name:source.teamName,player_id:playerId,origin_page:"teams",return_section:null,created_at:now,updated_at:now},source.player);
+
+  workspaceState.patchModule("players", { active_section: "directory", inspector_collapsed: false });await navigateTo("players");
 }
 
 async function openPlayerProfileFromTeam(playerId: string): Promise<void> {
-  const source = await teamsFeature.readPlayerFromTeam(playerId); if (!source || !source.current()) return;
-  const teamId = source.teamId, teamName = source.teamName;
-  playerCursorHistory = [];
-  playerQuery = {
-    search: null,
-    team_id: teamId,
-    position_code: null,
-    availability_status: null,
-    player_status: null,
-    limit: playerQuery.limit,
-    cursor_name: null,
-    cursor_id: null,
-  };
-  const now = new Date().toISOString();
-  setPlayerNavigationContext({
-    source: "team_roster",
-    team_id: teamId,
-    team_name: teamName,
-    player_id: playerId,
-    origin_page: "teams",
-    return_section: null,
-    created_at: now,
-    updated_at: now,
-  });
-  persistPlayerQuery();
-  selectedPlayer = source.player;
-  appendWorkspaceTab("players", { id: playerId, label: selectedPlayer.player.canonical_name });
-  workspaceState.patchModule("players", { active_section: "profile", inspector_collapsed: true });
-  await navigateTo("players");
+  const source=await teamsFeature.readPlayerFromTeam(playerId); if(!source||!source.current())return;
+  const now=new Date().toISOString();playersFeature.enterSource({source:"team_roster",team_id:source.teamId,team_name:source.teamName,player_id:playerId,origin_page:"teams",return_section:null,created_at:now,updated_at:now},source.player);
+  appendWorkspaceTab("players", {id:playerId,label:source.player.player.canonical_name});
+  workspaceState.patchModule("players", { active_section: "profile", inspector_collapsed: true });await navigateTo("players");
 }
 
 
 async function returnToSourceTeamProfile(teamId: string): Promise<void> {
-  const sourceTeamId = teamId || playerNavigationContext?.team_id;
+  const sourceTeamId = teamId || playersFeature.catalog.source?.team_id;
   if (!sourceTeamId) { workspaceState.patchModule("players", { active_section: "directory", inspector_collapsed: false }); render(); return; }
   await teamsFeature.open(sourceTeamId, "profile", true);
 }
 
-async function openPlayerFromLineup(
-  playerId: string,
-  teamId: string,
-  teamName: string,
-  returnSection: "builder" | "chain" = "chain",
-): Promise<void> {
-  if (!playerId) throw new Error("阵容球员身份缺失，请刷新后重试");
-  if (!teamId) throw new Error("阵容球队身份缺失，请重新检查阵容链路");
-  playerCursorHistory = [];
-  playerQuery = {
-    search: null,
-    team_id: teamId,
-    position_code: null,
-    availability_status: null,
-    player_status: null,
-    limit: playerQuery.limit,
-    cursor_name: null,
-    cursor_id: null,
-  };
-  const now = new Date().toISOString();
-  setPlayerNavigationContext({
-    source: "match_lineup",
-    team_id: teamId,
-    team_name: teamName || "来源球队",
-    player_id: playerId,
-    origin_page: "lineups",
-    return_section: returnSection,
-    created_at: now,
-    updated_at: now,
-  });
-  persistPlayerQuery();
-  selectedPlayer = await runBusy(() => api.readPlayer(playerId));
-  workspaceState.patchModule("players", { active_section: "profile", inspector_collapsed: true });
-  await navigateTo("players");
+async function openPlayerFromLineup(playerId:string,teamId:string,teamName:string,returnSection:"builder"|"chain"="chain"):Promise<void>{
+ if(!playerId||!teamId)throw new Error("阵容球员或球队身份缺失，请刷新后重试");const page=navigation.page;
+ if(!await playersFeature.catalog.open(playerId,()=>page===navigation.page)||!playersFeature.catalog.detail)return;
+ const now=new Date().toISOString();playersFeature.enterSource({source:"match_lineup",team_id:teamId,team_name:teamName||"来源球队",player_id:playerId,origin_page:"lineups",return_section:returnSection,created_at:now,updated_at:now},playersFeature.catalog.detail);
+ workspaceState.patchModule("players",{active_section:"profile",inspector_collapsed:true});await navigateTo("players");
 }
 
 async function returnToLineupWorkspace(section: "builder" | "chain"): Promise<void> {
-  setPlayerNavigationContext(null);
+  playersFeature.catalog.setSource(null);
   workspaceState.patchModule("lineups", { active_section: section });
   await navigateTo("lineups");
 }
@@ -2357,10 +1899,13 @@ async function openTeamApiWorkspace(teamId: string | null): Promise<void> {
 }
 
 async function openPlayerApiWorkspace(playerId: string): Promise<void> {
+  const current=playersFeature.catalog.capture(),page=navigation.page;
   const detail =
-    selectedPlayer?.player.id === playerId
-      ? selectedPlayer
+    playersFeature.catalog.detail?.player.id === playerId
+      ? playersFeature.catalog.detail
       : await api.readPlayer(playerId);
+  if(!current()||page!==navigation.page)return;
+  if(detail.player.id!==playerId)throw new Error("球员上下文响应身份不匹配");
   selectedApiWorkspacePresetKey = "player_profile_completion";
   selectedApiWorkspaceMatchId = null;
   selectedApiWorkspaceContextEntityType = "player";
@@ -2370,50 +1915,6 @@ async function openPlayerApiWorkspace(playerId: string): Promise<void> {
   apiWorkspaceDraftMessage = `请基于客户端附加的只读资料，概括球员“${detail.player.canonical_name}”当前已知信息、明显缺口和下一步应通过球员月度 Excel 核验的字段。不要联网，不要生成文件，不要提出数据库写入操作。`;
   workspaceState.clear("api_workspace");
   await navigateTo("api_workspace");
-}
-
-async function reloadSelectedPlayer(): Promise<void> {
-  if (!selectedPlayer) return;
-  selectedPlayer = await api.readPlayer(selectedPlayer.player.id);
-  playerListPage = await api.listPlayers(playerQuery);
-}
-
-async function createProvider(): Promise<void> {
-  const providerName = value("new-provider-name").trim();
-  if (!providerName) throw new Error("请输入数据源名称");
-  const draft: DataProviderDraft = {
-    code: `provider-${Date.now()}`,
-    name: providerName,
-    provider_type: "football_data",
-    base_url: nullableValue("new-provider-url"),
-    metadata: { entry_mode: "desktop" },
-  };
-  await runBusy(async () => {
-    await api.createDataProvider(draft);
-    playerReferences = await api.playerCatalogReferenceData();
-  });
-  render();
-  toast("数据源已保存", "success");
-}
-
-async function createPlayer(): Promise<void> {
-  const height = nullableNumber("new-player-height");
-  const draft: PlayerDraft = {
-    canonical_name: value("new-player-name").trim(),
-    date_of_birth: nullableValue("new-player-birth"),
-    nationality_code: nullableValue("new-player-nationality"),
-    preferred_foot: value("new-player-foot") as PlayerDraft["preferred_foot"],
-    height_cm: height,
-    status: "active",
-    metadata: {},
-  };
-  await runBusy(async () => {
-    const created = await api.createPlayer(draft);
-    await refreshBootstrapAndCatalog();
-    selectedPlayer = await api.readPlayer(created.id);
-  });
-  render();
-  toast("球员已创建并加入目录", "success");
 }
 
 async function createLineupPlayerQuick(): Promise<void> {
@@ -2471,342 +1972,6 @@ async function createLineupPlayerQuick(): Promise<void> {
   });
   render();
   toast("球员已创建并加入球队，可继续编辑阵容", "success");
-}
-
-async function requestDeletePlayer(
-  playerId: string,
-  playerName: string,
-): Promise<void> {
-  const check = await runBusy(() =>
-    api.checkEntityDeletion("player", playerId),
-  );
-  if (!check.can_permanently_delete) {
-    const references = check.references
-      .filter((item) => item.count > 0)
-      .map((item) => `<li>${escapeHtml(item.relation)}：${item.count}</li>`)
-      .join("");
-    showHtmlModal(
-      "球员不能永久删除",
-      "请改用归档",
-      `<div class="route-detail"><div class="route-detail-summary"><span>历史保护</span><h3>${escapeHtml(playerName)}</h3><p>${escapeHtml(check.reason)}</p></div><section class="prediction-detail-section"><h3>引用统计</h3>${references ? `<ul>${references}</ul>` : "<p>存在受保护引用。</p>"}</section></div>`,
-    );
-    return;
-  }
-  showConfirmation(
-    "永久删除空球员",
-    "该球员尚未进入正式履历、阵容、观察或复盘链路；删除后仅保留审计记录。",
-    [
-      ["球员", playerName],
-      ["引用检查", "未发现历史引用"],
-    ],
-    "永久删除球员",
-    async () => {
-      await runBusy(() => api.deletePlayer(playerId));
-      selectedPlayer = null;
-      await refreshBootstrapAndCatalog();
-      render();
-      toast("空球员对象已永久删除", "success");
-    },
-  );
-}
-
-async function updatePlayer(playerId: string): Promise<void> {
-  const height = nullableNumber("edit-player-height");
-  const localizedName = value("edit-player-localized-name").trim();
-  const previousLocalizedName = currentPlayerLocalizedName(selectedPlayer);
-  const draft: PlayerDraft = {
-    canonical_name: value("edit-player-name").trim(),
-    date_of_birth: nullableValue("edit-player-birth"),
-    nationality_code: nullableValue("edit-player-nationality"),
-    preferred_foot: value("edit-player-foot") as PlayerDraft["preferred_foot"],
-    height_cm: height,
-    status: value("edit-player-status") as PlayerDraft["status"],
-    metadata: { entry_mode: "manual_edit" },
-  };
-  await runBusy(async () => {
-    await api.updatePlayer(playerId, draft);
-    if (localizedName && localizedName !== previousLocalizedName) {
-      await api.addPlayerName({
-        player_id: playerId,
-        name: localizedName,
-        language_code: "zh-CN",
-        is_primary: false,
-        valid_from: todayDate(),
-        valid_to: null,
-      });
-    }
-    await reloadSelectedPlayer();
-    playerListPage = await api.listPlayers({
-      ...playerQuery,
-      cursor_name: null,
-      cursor_id: null,
-    });
-  });
-  workspaceState.patchModule("players", { active_section: "profile" });
-  render();
-  toast("球员基础资料已更新并重新载入", "success");
-}
-
-async function exportPlayerTemplate(): Promise<void> {
-  const outputPath = await api.chooseExcelExportFile("球员月度更新模板.xlsx");
-  if (!outputPath) return;
-  const result = await runBusy(() =>
-    api.exportPlayerCatalogTemplate(outputPath),
-  );
-  toast(`模板已导出：${result.output_path}`, "success");
-}
-
-async function exportPlayerData(): Promise<void> {
-  const outputPath = await api.chooseExcelExportFile("球员月度更新.xlsx");
-  if (!outputPath) return;
-  const result = await runBusy(() => api.exportPlayerCatalogData(outputPath));
-  toast(
-    `已导出 ${result.player_count} 名球员和 ${result.team_count} 支球队`,
-    "success",
-  );
-}
-
-async function previewPlayerImport(): Promise<void> {
-  const inputPath = await api.chooseExcelImportFile();
-  if (!inputPath) return;
-  const mode = value("spreadsheet-import-mode") as SpreadsheetImportMode;
-  spreadsheetPreview = await runBusy(() =>
-    api.previewPlayerCatalogImport(inputPath, mode),
-  );
-  render();
-  const blocking =
-    spreadsheetPreview.counts.conflict + spreadsheetPreview.counts.error;
-  toast(
-    blocking > 0
-      ? `预检完成：发现 ${blocking} 条需要修正`
-      : "预检通过，可以确认导入",
-    blocking > 0 ? "error" : "success",
-  );
-}
-
-async function resolvePlayerImportConflict(
-  rowId: string,
-  selectedEntityId: string | null,
-  skip: boolean,
-): Promise<void> {
-  if (!spreadsheetPreview) throw new Error("没有可处理的表格检查结果");
-  spreadsheetPreview = await runBusy(() =>
-    api.resolvePlayerCatalogImportConflict(spreadsheetPreview!.batch_id, {
-      row_id: rowId,
-      selected_entity_id: selectedEntityId,
-      skip,
-    }),
-  );
-  render();
-  toast(skip ? "该行已标记跳过" : "冲突关联已确认", "success");
-}
-
-async function commitPlayerImport(): Promise<void> {
-  if (!spreadsheetPreview) throw new Error("没有可提交的表格检查结果");
-  const result = await runBusy(() =>
-    api.commitPlayerCatalogImport(spreadsheetPreview!.batch_id),
-  );
-  spreadsheetPreview = await api.readPlayerCatalogImportPreview(
-    result.batch_id,
-  );
-  await refreshBootstrapAndCatalog();
-  render();
-  toast(
-    `导入完成：新增 ${result.inserted_count}，更新 ${result.updated_count}，结束旧记录 ${result.ended_previous_count}`,
-    "success",
-  );
-}
-
-async function addPlayerName(playerId: string): Promise<void> {
-  const name = value("player-alias-name").trim();
-  const languageCode = nullableValue("player-alias-language");
-  if (!name) throw new Error("请输入需要保存的球员名称");
-  if (!languageCode) throw new Error("请选择名称语言");
-  const draft: PlayerNameDraft = {
-    player_id: playerId,
-    name,
-    language_code: languageCode,
-    is_primary: checked("player-alias-primary"),
-    valid_from: todayDate(),
-    valid_to: null,
-  };
-  await runBusy(async () => {
-    await api.addPlayerName(draft);
-    await reloadSelectedPlayer();
-  });
-  workspaceState.patchModule("players", { active_section: "profile" });
-  render();
-  toast("球员名称已保存并持续显示", "success");
-}
-
-async function assignPlayerPosition(playerId: string): Promise<void> {
-  const draft: PlayerPositionDraft = {
-    player_id: playerId,
-    position_code: value("player-position-code"),
-    proficiency: Number(value("player-position-proficiency")),
-    default_role_code: nullableValue("player-position-default-role"),
-    is_primary: checked("player-position-primary"),
-    valid_from: null,
-    valid_to: null,
-    source_document_id: null,
-  };
-  await runBusy(async () => {
-    await api.assignPlayerPosition(draft);
-    await reloadSelectedPlayer();
-  });
-  render();
-  toast("球员位置已记录", "success");
-}
-
-async function addPlayerTeamPeriod(playerId: string): Promise<void> {
-  const teamId = nullableValue("player-team-id");
-  const validFrom = nullableValue("player-team-valid-from");
-  if (!teamId || !validFrom) throw new Error("请选择球队并填写效力开始日期");
-  const squadNumber = nullableNumber("player-squad-number");
-  const draft: PlayerTeamPeriodDraft = {
-    player_id: playerId,
-    team_id: teamId,
-    season_id: null,
-    squad_number: squadNumber,
-    valid_from: validFrom,
-    valid_to: nullableValue("player-team-valid-to"),
-    registration_status: value("player-registration-status"),
-    source_document_id: null,
-  };
-  await runBusy(async () => {
-    await api.addPlayerTeamPeriod(draft);
-    await reloadSelectedPlayer();
-  });
-  render();
-  toast("球员效力时间线已更新", "success");
-}
-
-async function addPlayerAvailability(playerId: string): Promise<void> {
-  const validFrom = localDateTimeToIso(
-    nullableValue("player-availability-from"),
-    true,
-  );
-  if (!validFrom) throw new Error("可用性生效时间无效");
-  const draft: PlayerAvailabilityDraft = {
-    player_id: playerId,
-    team_id: nullableValue("player-team-id"),
-    competition_id: null,
-    status: value(
-      "player-availability-status",
-    ) as PlayerAvailabilityDraft["status"],
-    reason: nullableValue("player-availability-reason"),
-    confidence: Number(value("player-availability-confidence")),
-    valid_from: validFrom,
-    valid_to: localDateTimeToIso(nullableValue("player-availability-to")),
-    source_document_id: null,
-    metadata: {},
-  };
-  await runBusy(async () => {
-    await api.addPlayerAvailability(draft);
-    await reloadSelectedPlayer();
-  });
-  render();
-  toast("球员可用性已记录", "success");
-}
-
-async function addPlayerAbility(playerId: string): Promise<void> {
-  const observedAt = localDateTimeToIso(
-    nullableValue("player-ability-observed-at"),
-    true,
-  );
-  if (!observedAt) throw new Error("能力观察时间无效");
-  const draft: PlayerAbilityObservationDraft = {
-    player_id: playerId,
-    dimension_code: value("player-ability-dimension"),
-    context_type: "general",
-    context_id: null,
-    value: Number(value("player-ability-value")),
-    confidence: Number(value("player-ability-confidence")),
-    sample_size: Number(value("player-ability-sample-size")),
-    observed_at: observedAt,
-    effective_from: observedAt,
-    effective_to: null,
-    calculation_version: "manual.v1",
-    source_document_id: null,
-    metadata: { entry_mode: "manual" },
-  };
-  await runBusy(async () => {
-    await api.addPlayerAbilityObservation(draft);
-    await reloadSelectedPlayer();
-  });
-  render();
-  toast("能力观察已写入，当前能力投影已更新", "success");
-}
-
-async function addPlayerExternalId(playerId: string): Promise<void> {
-  const providerId = nullableValue("player-provider-id");
-  if (!providerId) throw new Error("请先创建并选择数据源");
-  const draft: ExternalEntityIdDraft = {
-    provider_id: providerId,
-    entity_type: "player",
-    entity_id: playerId,
-    external_id: value("player-external-id").trim(),
-    metadata: {},
-  };
-  await runBusy(async () => {
-    await api.addExternalEntityId(draft);
-    await reloadSelectedPlayer();
-  });
-  render();
-  toast("外部球员 ID 已绑定", "success");
-}
-
-async function addPlayerDynamicTag(playerId: string): Promise<void> {
-  const now = new Date();
-  const validFrom =
-    localDateTimeToIso(nullableValue("player-dynamic-tag-from")) ??
-    now.toISOString();
-  const validTo =
-    localDateTimeToIso(nullableValue("player-dynamic-tag-to")) ??
-    new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000).toISOString();
-  const draft: PlayerDynamicTagDraft = {
-    player_id: playerId,
-    tag_code: value("player-dynamic-tag-code"),
-    value: Number(value("player-dynamic-tag-value")),
-    label: nullableValue("player-dynamic-tag-label"),
-    confidence: Number(value("player-dynamic-tag-confidence")),
-    observed_at: now.toISOString(),
-    valid_from: validFrom,
-    valid_to: validTo,
-    competition_id: nullableValue("player-dynamic-tag-competition"),
-    position_code: nullableValue("player-dynamic-tag-position"),
-    opponent_team_id: null,
-    sample_size: 1,
-    source_type: "manual",
-    calculation_version: "manual.v1",
-    source_document_id: null,
-    metadata: {},
-  };
-  await runBusy(async () => {
-    await api.addPlayerDynamicTag(draft);
-    await reloadSelectedPlayer();
-  });
-  render();
-  toast("动态标签已保存，并将在失效时间后自动退出计算", "success");
-}
-
-async function calculatePlayerContribution(playerId: string): Promise<void> {
-  const request: PlayerMatchContributionRequest = {
-    player_id: playerId,
-    match_id: null,
-    competition_id: nullableValue("player-dynamic-tag-competition"),
-    position_code: nullableValue("player-dynamic-tag-position"),
-    role_code: null,
-    role_origin: null,
-    role_source_position_code: null,
-    opponent_team_id: null,
-    as_of: new Date().toISOString(),
-    expected_minutes: null,
-  };
-  const result = await runBusy(() =>
-    api.calculatePlayerMatchContribution(request),
-  );
-  showModal("球员当前有效贡献", result);
 }
 
 function selectedExchangeMatchId(): string {
@@ -2873,7 +2038,7 @@ function selectedPredictionMatchId(): string {
 
 function storedMatchRouteCommand(matchId: string): RoutePreviewCommand {
   const match = (
-    playerReferences?.managed_matches ?? playerReferences?.upcoming_matches ?? []
+    playersFeature.catalog.references?.managed_matches ?? playersFeature.catalog.references?.upcoming_matches ?? []
   ).find((item) => item.id === matchId);
   if (!match) throw new Error("所选比赛不存在，请刷新比赛列表");
   const stage = match.stage_id
@@ -3228,8 +2393,8 @@ function pairedSide(side: LineupSide): PairedLineupBuilderState[LineupSide] {
 
 function selectedManagedMatch(matchId = pairedLineupBuilder.match_id): MatchRecord | null {
   return (
-    playerReferences?.managed_matches.find((match) => match.id === matchId) ??
-    playerReferences?.upcoming_matches.find((match) => match.id === matchId) ??
+    playersFeature.catalog.references?.managed_matches.find((match) => match.id === matchId) ??
+    playersFeature.catalog.references?.upcoming_matches.find((match) => match.id === matchId) ??
     null
   );
 }
@@ -3562,7 +2727,7 @@ function positionOptionGroups(
   selected: string | null,
 ): string {
   const formationSlots = formationSlotCodes(formationId);
-  const regularPositions = playerReferences?.positions ?? [];
+  const regularPositions = playersFeature.catalog.references?.positions ?? [];
   const known = new Set<string>();
   const renderOption = (code: string, label: string): string => {
     const normalized = code.trim().toUpperCase();
@@ -4430,7 +3595,7 @@ function filterMatchTeamOptions(): void {
   const requested = scopeSelect?.value ?? "auto";
   const scope = requested === "auto" ? inferCompetitionTeamScope(competitionId) : requested;
   const registered = new Set(
-    (playerReferences?.season_team_memberships ?? [])
+    (playersFeature.catalog.references?.season_team_memberships ?? [])
       .filter((item) => item.season_id === seasonId && ["registered", "guest"].includes(item.registration_status))
       .map((item) => item.team_id),
   );
@@ -4497,7 +3662,7 @@ async function createMatch(): Promise<void> {
   const created = await runBusy(async () => {
     const saved = await api.createMatch(draft);
     await session.refresh();
-    playerReferences = await api.playerCatalogReferenceData();
+    playersFeature.catalog.setReferences(await api.playerCatalogReferenceData());
     lineupRecords = await api.listLineups(null, 100);
     return saved;
   });
@@ -4707,7 +3872,7 @@ async function loadLineupPlayersForTeam(teamId: string): Promise<number> {
 
 async function autoLoadLineupPlayers(teamId: string): Promise<void> {
   const teamName =
-    playerReferences?.teams.find((team) => team.id === teamId)?.canonical_name ??
+    playersFeature.catalog.references?.teams.find((team) => team.id === teamId)?.canonical_name ??
     "所选球队";
   const traceId = recordUiOperation(
     "ui_action",
@@ -4828,8 +3993,8 @@ async function createLineup(): Promise<void> {
     );
   }
   const selectedMatch =
-    playerReferences?.managed_matches.find((match) => match.id === matchId) ??
-    playerReferences?.upcoming_matches.find((match) => match.id === matchId);
+    playersFeature.catalog.references?.managed_matches.find((match) => match.id === matchId) ??
+    playersFeature.catalog.references?.upcoming_matches.find((match) => match.id === matchId);
   if (
     selectedMatch &&
     lineupBuilderForm.lineup_type !== "actual" &&
@@ -6236,7 +5401,7 @@ async function handleAction(
       await rulesFeature.createBinding(app);
       break;
     case "refresh-player-catalog":
-      await runBusy(() => loadPlayerCatalog(true));
+      await runBusy(() => playersFeature.load(true));
       render();
       break;
     case "refresh-team-catalog":
@@ -6369,7 +5534,7 @@ async function handleAction(
       await teamsFeature.confirmForceDeleteTeam();
       break;
     case "bulk-delete-players":
-      requestBulkDeletePlayers();
+      playersFeature.requestBulkDelete();
       break;
     case "preview-player-from-team":
       await previewPlayerFromTeam(button.dataset.playerId ?? "");
@@ -6401,101 +5566,101 @@ async function handleAction(
       await openPlayerApiWorkspace(button.dataset.playerId ?? "");
       break;
     case "search-team-options":
-      await searchTeamOptions();
+      await playersFeature.searchTeamOptions();
       break;
     case "search-players":
-      await searchPlayers();
+      await playersFeature.search();
       break;
     case "clear-player-filters":
-      await clearPlayerFilters();
+      await playersFeature.clearFilters();
       break;
     case "next-player-page":
-      await nextPlayerPage();
+      await playersFeature.next();
       break;
     case "previous-player-page":
-      await previousPlayerPage();
+      await playersFeature.previous();
       break;
     case "open-player":
-      await openPlayer(button.dataset.playerId ?? "");
+      await playersFeature.openDirectory(button.dataset.playerId ?? "");
       break;
     case "open-player-profile":
-      await openPlayerProfile(button.dataset.playerId ?? "");
+      await playersFeature.openProfile(button.dataset.playerId ?? "");
       break;
     case "open-team-profile":
       await teamsFeature.openProfile(button.dataset.teamId ?? "");
       break;
     case "show-player-json":
-      if (selectedPlayer) showModal("球员完整档案", selectedPlayer);
+      if (playersFeature.catalog.detail) showModal("球员完整档案", playersFeature.catalog.detail);
       break;
     case "create-team":
       await teamsFeature.create();
       break;
     case "create-provider":
-      await createProvider();
+      await playersFeature.editor.createProvider();
       break;
     case "create-player":
-      await createPlayer();
+      await playersFeature.editor.createPlayer();
       break;
     case "create-lineup-player":
       await createLineupPlayerQuick();
       break;
     case "update-player":
-      await updatePlayer(button.dataset.playerId ?? "");
+      await playersFeature.editor.updatePlayer(button.dataset.playerId ?? "");
       break;
     case "request-delete-player":
-      await requestDeletePlayer(
+      await playersFeature.requestDelete(
         button.dataset.playerId ?? "",
         button.dataset.playerName ?? "未命名球员",
       );
       break;
     case "export-player-template":
-      await exportPlayerTemplate();
+      await playersFeature.exportTemplate();
       break;
     case "export-player-data":
-      await exportPlayerData();
+      await playersFeature.exportData();
       break;
     case "preview-player-import":
-      await previewPlayerImport();
+      await playersFeature.previewImport();
       break;
     case "resolve-import-conflict":
-      await resolvePlayerImportConflict(
+      await playersFeature.resolveImport(
         button.dataset.rowId ?? "",
         button.dataset.entityId ?? null,
         false,
       );
       break;
     case "skip-import-conflict":
-      await resolvePlayerImportConflict(button.dataset.rowId ?? "", null, true);
+      await playersFeature.resolveImport(button.dataset.rowId ?? "", null, true);
       break;
     case "commit-player-import":
-      await commitPlayerImport();
+      await playersFeature.commitImport();
       break;
     case "show-import-preview-json":
-      if (spreadsheetPreview) showModal("表格导入检查结果", spreadsheetPreview);
+      if (playersFeature.imports.preview) showModal("表格导入检查结果", playersFeature.imports.preview);
       break;
     case "add-player-name":
-      await addPlayerName(button.dataset.playerId ?? "");
+      await playersFeature.editor.addPlayerName(button.dataset.playerId ?? "");
       break;
     case "assign-player-position":
-      await assignPlayerPosition(button.dataset.playerId ?? "");
+      await playersFeature.editor.assignPlayerPosition(button.dataset.playerId ?? "");
       break;
     case "add-player-team-period":
-      await addPlayerTeamPeriod(button.dataset.playerId ?? "");
+      await playersFeature.editor.addPlayerTeamPeriod(button.dataset.playerId ?? "");
       break;
     case "add-player-availability":
-      await addPlayerAvailability(button.dataset.playerId ?? "");
+      await playersFeature.editor.addPlayerAvailability(button.dataset.playerId ?? "");
       break;
     case "add-player-ability":
-      await addPlayerAbility(button.dataset.playerId ?? "");
+      await playersFeature.editor.addPlayerAbility(button.dataset.playerId ?? "");
       break;
     case "add-player-external-id":
-      await addPlayerExternalId(button.dataset.playerId ?? "");
+      await playersFeature.editor.addPlayerExternalId(button.dataset.playerId ?? "");
       break;
     case "add-player-dynamic-tag":
-      await addPlayerDynamicTag(button.dataset.playerId ?? "");
+      await playersFeature.editor.addPlayerDynamicTag(button.dataset.playerId ?? "");
       break;
     case "calculate-player-contribution":
-      await calculatePlayerContribution(button.dataset.playerId ?? "");
+      await playersFeature.editor.calculatePlayerContribution(button.dataset.playerId ?? "");
       break;
     case "export-match-template":
       await exportMatchTemplate();
@@ -6982,8 +6147,8 @@ document.addEventListener("click", (event) => {
 }, { signal: browserLifecycleController.signal });
 
 function activatePage(targetPage: Page): void {
-  if (targetPage === navigation.page) return;
-  if (targetPage === "players") prepareDirectPlayerDirectoryEntry();
+  const resetPlayerSource = targetPage === "players" && playersFeature.directEntry();
+  if (targetPage === navigation.page && !resetPlayerSource) return;
   const navigationTraceId = recordUiOperation("navigation", `page:${targetPage}`, { fromPage: navigation.page, toPage: targetPage });
   void navigateTo(targetPage).catch((error: unknown) => {
     recordUiOperationFailure(`page:${targetPage}`, error, navigationTraceId, { fromPage: navigation.page, toPage: targetPage });
@@ -7062,17 +6227,17 @@ document.addEventListener("change", (event) => {
     const playerId = target.dataset.playerId;
     if (playerId)
       target.checked
-        ? selectedPlayerIds.add(playerId)
-        : selectedPlayerIds.delete(playerId);
+        ? playersFeature.catalog.toggleSelection(playerId, true)
+        : playersFeature.catalog.toggleSelection(playerId, false);
     persistWorkspaceSelection("players");
     render({ preserveForm: true });
     return;
   }
   if (target instanceof HTMLInputElement && target.id === "player-select-all") {
-    for (const item of playerListPage?.items ?? [])
+    for (const item of playersFeature.catalog.list?.items ?? [])
       target.checked
-        ? selectedPlayerIds.add(item.id)
-        : selectedPlayerIds.delete(item.id);
+        ? playersFeature.catalog.toggleSelection(item.id, true)
+        : playersFeature.catalog.toggleSelection(item.id, false);
     persistWorkspaceSelection("players");
     render({ preserveForm: true });
     return;
@@ -7176,6 +6341,7 @@ document.addEventListener("change", (event) => {
     return;
   }
   if (!(target instanceof HTMLSelectElement)) return;
+  if (target.id === "spreadsheet-import-mode") { playersFeature.changeImportMode(); return; }
   if (target.id === "team-package-import-mode" || target.id === "team-spreadsheet-import-mode") {
     teamsFeature.changeImportMode(target.id === "team-package-import-mode" ? "package" : "monthly");
     return;
@@ -7382,7 +6548,7 @@ async function initializeApplication(): Promise<void> {
   await workspaceState.initialize();
   if (browserLifecycleController.signal.aborted) return;
   teamsFeature.catalog.replaceSelection(workspaceState.module("teams").selected_object_ids);
-  selectedPlayerIds = new Set(workspaceState.module("players").selected_object_ids);
+  playersFeature.catalog.replaceSelection(new Set(workspaceState.module("players").selected_object_ids));
   await session.start();
   if (browserLifecycleController.signal.aborted) return;
   render();
@@ -7463,6 +6629,7 @@ export function createBrowserApplicationModule(
     databaseFeature.stop();
     rulesFeature.stop();
     teamsFeature.stop();
+  playersFeature.stop();
     session.stop();
     openAiExampleRequests.destroy();
     navigation.destroy();

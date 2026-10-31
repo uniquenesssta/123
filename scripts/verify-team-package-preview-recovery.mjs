@@ -10,7 +10,7 @@ const exchange = ["preview", "conflict", "commit", "export", "identity", "valida
 const domain = read("crates/domain/src/player/status.rs");
 const migration = read("crates/persistence-postgres/migrations/0044_team_package_preview_recovery.sql");
 const types = read("src/types.ts");
-const players = read("src/pages/players.ts");
+const players = ["src/features/players/playerPresentation.ts","src/features/players/playerProfileView.ts","src/features/players/playerWorkbookView.ts","src/features/players/playerDirectoryView.ts"].map(read).join("\n");
 const packageWriter = read("crates/spreadsheet-io/src/team_package.rs");
 
 check(exchange.includes('"public_roster_initialization"') && exchange.includes('"calculation".to_string()'), "公开名单初始化来源未归一为 calculation");

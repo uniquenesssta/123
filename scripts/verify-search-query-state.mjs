@@ -7,10 +7,11 @@ const requireTrue = (condition, message) => {
   if (!condition) throw new Error(message);
 };
 
-const players = read("src/pages/players.ts");
+const players = ["src/features/players/playerPresentation.ts","src/features/players/playerProfileView.ts","src/features/players/playerWorkbookView.ts","src/features/players/playerDirectoryView.ts"].map(read).join("\n");
 const teams = ["src/features/teams/teamPresentation.ts","src/features/teams/profileView.ts","src/features/teams/packageView.ts","src/features/teams/teamsView.ts"].map(read).join("\n");
 const presets = read("src/pages/lineupPresets.ts");
 const main = read("src/main.ts");
+const playerFeature=read("src/features/players/playersFeature.ts"),playerCatalog=read("src/features/players/playerCatalog.ts");
 const viewState = read("src/app/workspace/workspaceRecovery.ts");
 
 requireTrue(
@@ -40,8 +41,7 @@ requireTrue(
   "工作区状态恢复没有尊重受控查询控件的持久化边界",
 );
 requireTrue(
-  main.includes('search: nullableValue("player-search")')
-    && main.indexOf('search: nullableValue("player-search")') < main.indexOf('await runBusy(() => loadPlayerCatalog(false))'),
+  playerFeature.includes('search: field("player-search")') && playerFeature.indexOf('search: field("player-search")') < playerFeature.indexOf("this.catalog.search(query") && playerCatalog.includes("this.queryValue = query") && main.includes("playersFeature.search()"),
   "球员搜索词没有在请求前提交到查询状态",
 );
 requireTrue(

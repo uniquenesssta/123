@@ -13,7 +13,7 @@ const contract = JSON.parse(read("contracts/stage-e1-followup-contract.json"));
 const searchable = read("src/components/searchableSelect.ts");
 const lineups = read("src/pages/lineups.ts");
 const main = read("src/main.ts");
-const players = read("src/pages/players.ts");
+const players = ["src/features/players/playerPresentation.ts","src/features/players/playerProfileView.ts","src/features/players/playerWorkbookView.ts","src/features/players/playerDirectoryView.ts"].map(read).join("\n");
 const teams = ["src/features/teams/teamPresentation.ts","src/features/teams/profileView.ts","src/features/teams/packageView.ts","src/features/teams/teamsView.ts"].map(read).join("\n");
 const taskCss = read("src/styles/taskWorkspace.css");
 const entityCss = read("src/styles/entityCenter.css");
@@ -39,7 +39,7 @@ check(lineups.includes("player_secondary_name") && main.includes("player_seconda
 check(lineups.includes('data-action="create-lineup-pair" ${submitReady ? "" : "disabled"}'), "双方首发未完整时仍允许提交");
 check(lineups.includes("还需补齐") && taskCss.includes(".lineup-submit-readiness"), "双方阵容缺少可见补齐提示");
 check(lineups.includes('data-team-id="${escapeHtml(team.team_id)}"') && lineups.includes('data-return-section="chain"'), "阵容球员跳转没有携带球队与返回上下文");
-check(main.includes("async function openPlayerFromLineup") && main.includes('source: "match_lineup"'), "阵容球员仍依赖球队中心当前选择");
+check(main.includes("async function openPlayerFromLineup") && main.replace(/\s/g,"").includes('source:"match_lineup"'), "阵容球员仍依赖球队中心当前选择");
 check(main.includes("async function returnToLineupWorkspace") && players.includes("return-to-lineup-workspace"), "球员档案缺少返回阵容链路");
 check(types.includes('source: "team_roster" | "match_lineup"') && types.includes('origin_page: "teams" | "lineups"'), "球员导航上下文未覆盖阵容入口");
 check(teams.includes("team-directory-profile-action") && teams.includes("team-directory-coach"), "球队目录卡片仍使用易挤压的旧操作排布");

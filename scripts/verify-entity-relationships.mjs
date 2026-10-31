@@ -62,7 +62,7 @@ const client = text("src/api/client.ts");
 const main = text("src/main.ts");
 const teamEditor = text("src/features/teams/teamEditor.ts");
 const teamsPage = ["src/features/teams/teamPresentation.ts","src/features/teams/profileView.ts","src/features/teams/packageView.ts","src/features/teams/teamsView.ts"].map(text).join("\n");
-const playersPage = text("src/pages/players.ts");
+const playersPage = ["src/features/players/playerPresentation.ts","src/features/players/playerProfileView.ts","src/features/players/playerWorkbookView.ts","src/features/players/playerDirectoryView.ts"].map(text).join("\n");
 const types = text("src/types.ts");
 const readme = text("README.md");
 
@@ -167,8 +167,8 @@ assert(teamsPage.includes("由当前教练任期自动生成"), "主教练字段
 assert(teamsPage.includes("bulk-archive-teams"), "球队中心缺少批量归档");
 assert(playersPage.includes("history-list\">${teamHistory}"), "球员中心缺少完整球队履历显示");
 assert(playersPage.includes("bulk-archive-players"), "球员中心缺少批量归档");
-assert(main.includes("api.checkEntityDeletion(\"player\""), "球员永久删除前未执行引用检查");
-assert(main.includes("api.bulkArchiveEntities"), "前端未接通批量归档服务");
+assert(text("src/features/players/playerDeletion.ts").includes("api.checkEntityDeletion(\"player\""), "球员永久删除前未执行引用检查");
+assert(text("src/features/players/playerDeletion.ts").includes("api.bulkArchiveEntities") && main.includes("playersFeature.archive()"), "前端未接通批量归档服务");
 assert(main.includes("teamsFeature.editor.coachPeriod(") && teamEditor.includes("api.addTeamCoachPeriod(draft)"), "前端未接通教练任期保存");
 assert(main.includes("teamsFeature.editor.profile(") && teamEditor.includes("head_coach: this.ports.catalog.detail?.profile?.head_coach ?? null"), "球队档案保存可能覆盖主教练投影");
 

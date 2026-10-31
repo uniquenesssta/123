@@ -1,6 +1,6 @@
 # R13 基础数据与编排业务模块化：执行索引
 
-阶段状态：**IN_PROGRESS**。分支 `rewrite/r13-core-ui-features`，起点 `f0770665`。01、02已收尾；03及并入的04已按修复提交b5b23c46精确CI/下载证据/双bundle/startup共同DONE。05精确CI/产物/双bundle/startup已收尾DONE；06已授权IN_PROGRESS，07及其后未启动。R12保持结束。
+阶段状态：**IN_PROGRESS**。分支 `rewrite/r13-core-ui-features`，起点 `f0770665`。01、02已收尾；03及并入的04已按修复提交b5b23c46精确CI/下载证据/双bundle/startup共同DONE。05精确CI/产物/双bundle/startup已收尾DONE；06本地实现与门禁完成，当前VERIFYING，07及其后未启动。R12保持结束。
 
 依据：[阶段任务书](../../football-model-platform-modular-rewrite-19-docs/13-R13-core-ui-features.md)、[执行约定](../remaining-execution-contract.md)、[前期遗留项基线](../prior-stage-baseline-20261030.md)。
 
@@ -11,7 +11,7 @@
 | R13-03 赛事层级/规则/路由 | DONE | [实施与收尾](R13-03-competition-rules-and-routing.md)：b5b23c46精确run41116421113、artifact13009230984、双bundle/startup已核验 |
 | R13-04 规则包/绑定/路由 | 并入03 / DONE | 独立义务映射及同一精确CI验收完成，详03记录 |
 | R13-05 球队/档案/资料包 | DONE | [实施记录](R13-05-team-catalog-profile-and-package.md)：42行为/26浏览器/16原HTML对比/原生目录读取通过；96步前端及受影响复验通过，精确run41172800714及双bundle/startup已验；承接BA-05/07 |
-| R13-06 球员/履历/观察 | IN_PROGRESS | 用户已授权；承接BA-05/07，盘点实际全流程 |
+| R13-06 球员/履历/观察 | VERIFYING | [实施记录](R13-06-player-catalog-history-and-observations.md)：30行为/26浏览器/16原HTML/原生目录读取通过，完整96步前端通过，自身CI/包待验；承接BA-05/07 |
 | R13-07 预设/双方阵容 | BLOCKED | 原07/08，BA-03删除保护风险须按本批条件处理 |
 | R13-09 工作簿 | BLOCKED | 未启动；真实文件/账本按BA-04/07承接 |
 

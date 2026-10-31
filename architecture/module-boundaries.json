@@ -148,8 +148,9 @@
         "route": null
       },
       "players": {
-        "owner": "src/pages/players.ts",
-        "route": "players"
+        "owner": "src/features/players/playerDirectoryView.ts",
+        "route": "players",
+        "public_entry": "src/features/players/index.ts"
       },
       "prediction": {
         "owner": "src/pages/prediction.ts",

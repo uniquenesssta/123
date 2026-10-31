@@ -25,6 +25,7 @@ export async function verifyTeamMutationPorts(root) {
       const read = () => { started(); return gate; };
       const catalog = { get revision(){return revision;}, load:async()=>true, capture(){const version=revision,state=snapshot;return()=>version===revision&&state===snapshot;} };
       const context = { navigation:{page:"teams"}, teamsFeature:{catalog}, session:{refresh:async()=>{snapshot={};}}, api:{playerCatalogReferenceData:read}, fetchPlayerCatalog:read, applyPlayerCatalog:()=>{applied++;}, playerQuery:{}, selectedPlayer:null, playerReferences:"before", spreadsheetPreview:"before", matchSpreadsheetPreview:"before", removeWorkspaceObjects:()=>null, persistWorkspaceSelection:()=>{}, render:()=>{rendered++;}, showHtmlModal:()=>{modal++;}, bulkArchiveSummary:()=>"summary" };
+      context.playersFeature={catalog:{setReferences:value=>{context.playerReferences=value;},imports:{clear:()=>{}},adopt:()=>{}},imports:{clear:()=>{}},load:async(_reset,isCurrent)=>{await read();if(!isCurrent())return false;applied++;return true;}};
       runInNewContext(code, context);
       const result = { deleted_ids:["a"], deleted_player_ids:[], team_id:"a", archived_ids:["a"], already_archived_ids:[] };
       const task=context.adapter[method](result,[]); await entered;

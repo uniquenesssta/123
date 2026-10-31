@@ -17,8 +17,9 @@ const between = (source, start, end) => {
 };
 
 const main = read("src/main.ts");
+const playerEditor=read("src/features/players/playerEditor.ts"), compact=s=>s.replace(/\s/g,"");
 const teamEditor = read("src/features/teams/teamEditor.ts");
-const players = read("src/pages/players.ts");
+const players = ["src/features/players/playerPresentation.ts","src/features/players/playerProfileView.ts","src/features/players/playerWorkbookView.ts","src/features/players/playerDirectoryView.ts"].map(read).join("\n");
 const teams = ["src/features/teams/teamPresentation.ts","src/features/teams/profileView.ts","src/features/teams/packageView.ts","src/features/teams/teamsView.ts"].map(read).join("\n");
 const css = read("src/styles/entityCenter.css");
 
@@ -34,11 +35,11 @@ check(teams.includes('id="team-localized-name"') && teams.includes("currentLocal
 check(players.includes("playerNameHistory(detail)"), "球员已保存名称历史未持续显示");
 check(teams.includes('class="tag-row">${aliases}'), "球队已保存名称未持续显示");
 
-const updatePlayer = between(main, "async function updatePlayer", "async function exportPlayerTemplate");
-check(updatePlayer.includes('value("edit-player-localized-name").trim()'), "保存球员时没有读取中文姓名");
-check(updatePlayer.includes("if (localizedName && localizedName !== previousLocalizedName)"), "空白或未变化中文姓名仍可能新增记录");
-check(updatePlayer.includes('language_code: "zh-CN"') && updatePlayer.includes("valid_from: todayDate()"), "球员中文姓名没有按明确语言和生效日保存");
-check(updatePlayer.includes("await reloadSelectedPlayer()") && updatePlayer.includes('active_section: "profile"'), "保存球员后没有重新读取数据库并留在完整档案");
+const updatePlayer = between(playerEditor, "async updatePlayer", "async addPlayerName");
+check(updatePlayer.includes('value(root,"edit-player-localized-name").trim()'), "保存球员时没有读取中文姓名");
+check(compact(updatePlayer).includes("if(localizedName&&localizedName!==previousLocalizedName)"), "空白或未变化中文姓名仍可能新增记录");
+check(compact(updatePlayer).includes('language_code:"zh-CN"') && compact(updatePlayer).includes("valid_from:todayDate()"), "球员中文姓名没有按明确语言和生效日保存");
+check(playerEditor.includes("this.ports.catalog.refreshDetail(id)") && updatePlayer.includes("this.write(") && main.includes("render({preserveForm:true})"), "保存球员后没有重新读取数据库并留在完整档案");
 
 const updateTeam = between(teamEditor, "async update(", "async addName(");
 check(updateTeam.includes('teamValue(root, "team-localized-name")') && teamEditor.includes("return field.value.trim()"), "保存球队时没有读取中文名称");
@@ -46,7 +47,7 @@ check(updateTeam.includes("if (localizedName && localizedName !== previous)"), "
 check(updateTeam.includes('language_code: "zh-CN"') && updateTeam.includes("valid_from: todayDate()"), "球队中文名称没有按明确语言和生效日保存");
 check(teamEditor.includes("await this.ports.catalog.refreshDetail(teamId)") && teamEditor.includes("this.ports.render()") && main.includes("render({ preserveForm: true })"), "保存球队后没有重新读取数据库并留在完整档案");
 
-const addPlayerName = between(main, "async function addPlayerName", "async function assignPlayerPosition");
+const addPlayerName = between(playerEditor, "async addPlayerName", "async assignPlayerPosition");
 const addTeamName = between(teamEditor, "async addName(", "async profile(");
 for (const [source, label] of [[addPlayerName, "球员"], [addTeamName, "球队"]]) {
   check((source === addTeamName ? source.includes("!name || !language") : source.includes('throw new Error("请选择名称语言")')), `${label}新增名称仍允许无语言记录`);

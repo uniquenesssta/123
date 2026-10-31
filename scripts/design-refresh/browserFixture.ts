@@ -1,4 +1,4 @@
-import { playersPage } from "../../src/pages/players";
+import { playersPage } from "../../src/features/players";
 import { NavigationKeyboardController } from "../../src/ui/navigation";
 import { dashboardPage } from "../../src/features/dashboard";
 import { teamsPage } from "../../src/features/teams";

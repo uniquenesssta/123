@@ -19,22 +19,17 @@ function body(source, name) {
 }
 
 const main = read("src/main.ts");
-const loaders = read("src/controllers/pageLoaders.ts");
+const catalog=read("src/features/players/playerCatalog.ts"),feature=read("src/features/players/playersFeature.ts"),dom=read("src/features/players/playerDirectoryDom.ts");
 const teams = ["src/features/teams/teamPresentation.ts","src/features/teams/profileView.ts","src/features/teams/packageView.ts","src/features/teams/teamsView.ts"].map(read).join("\n");
 const css = read("src/styles/entityCenter.css");
 
-requireTrue(loaders.includes("cachedReferences: PlayerCatalogReferenceData | null = null"), "球员目录加载器未支持复用参考数据");
-requireTrue(loaders.includes("cachedReferences") && loaders.includes("Promise.resolve(cachedReferences)"), "翻页仍会重复加载球员参考目录");
-
-const nextPage = body(main, "nextPlayerPage");
-const previousPage = body(main, "previousPlayerPage");
-for (const [label, source] of [["下一页", nextPage], ["上一页", previousPage]]) {
-  requireTrue(source.includes("loadPlayerPage"), `${label}未使用无闪烁分页加载链`);
-  requireTrue(!source.includes("runBusy"), `${label}仍触发全屏忙碌遮罩`);
-  requireTrue(source.includes("render({ preserveForm: true })"), `${label}未保留当前筛选与滚动上下文`);
-}
-requireTrue(main.includes("playerPageLoading") && main.includes("setPlayerPageLoading"), "球员分页缺少并发保护和局部加载状态");
-requireTrue(main.includes("refreshPlayerPageDom") && main.includes("playerTableRows"), "球员分页仍依赖整页重绘，未切换为表格局部更新");
+requireTrue(catalog.includes("cachedReferences?: boolean") && catalog.includes("options.cachedReferences && this.referencesValue"), "翻页未复用参考目录");
+for(const name of ["next","previous"]){const start=catalog.indexOf("  "+name+"("),end=catalog.indexOf(name==="next"?"\n  previous(":"\n  async refreshDetail(",start+3),method=catalog.slice(start,end<0?catalog.length:end);requireTrue(method.includes("this.loading"),name+"缺少并发门禁");}
+requireTrue(catalog.includes("cachedReferences: true") && catalog.includes("this.history.slice(0, -1)"),"分页未使用原缓存/游标历史");
+const paginate=feature.slice(feature.indexOf("  async paginate("),feature.indexOf("  changeImportMode("));
+requireTrue(paginate.includes("this.catalog[direction]") && !paginate.includes("this.ports.busy"),"分页仍触发全屏忙碌或未接真实catalog");
+requireTrue(paginate.includes("refreshPlayerPageDom") && paginate.includes("setPlayerPageLoading") && main.includes("render({preserveForm:true})"),"未保留局部更新/表单回退");
+requireTrue(dom.includes("playerTableRows(") && dom.includes("tbody.innerHTML") && dom.includes("aria-busy"),"真实分页DOM更新与局部加载状态失联");
 requireTrue(css.includes('.player-browser .entity-main[aria-busy="true"]'), "球员分页缺少局部加载样式");
 
 requireTrue(teams.includes("teamDetailFilterPanel"), "球队详情未恢复独立筛选器");

@@ -662,8 +662,64 @@
       ],
       "transition": null,
       "migration_task": "R13-05"
+    },
+    {
+      "id": "browser.player-catalog",
+      "owner": "src/features/players/playerCatalog.ts::PlayerCatalog",
+      "scope": "directory identity query cursors selection references and stable source context",
+      "writers": [
+        "PlayerCatalog methods"
+      ],
+      "forbidden": [
+        "src/pages/**",
+        "src/app/session/**"
+      ],
+      "transition": null,
+      "migration_task": "R13-06"
+    },
+    {
+      "id": "browser.player-drafts",
+      "owner": "src/features/players/playerDrafts.ts::PlayerDrafts",
+      "scope": "independent transient player form drafts per Session and player id",
+      "writers": [
+        "PlayerDrafts methods"
+      ],
+      "forbidden": [
+        "src/pages/**",
+        "src/app/session/**"
+      ],
+      "transition": null,
+      "migration_task": "R13-06"
+    },
+    {
+      "id": "browser.player-imports",
+      "owner": "src/features/players/playerImports.ts::PlayerImports",
+      "scope": "player workbook batch hash mode and recovery lifecycle",
+      "writers": [
+        "PlayerImports methods"
+      ],
+      "forbidden": [
+        "src/pages/**",
+        "src/app/session/**"
+      ],
+      "transition": null,
+      "migration_task": "R13-06"
+    },
+    {
+      "id": "browser.player-deletion",
+      "owner": "src/features/players/playerDeletion.ts::PlayerDeletion",
+      "scope": "single-use stable player deletion and archive confirmation",
+      "writers": [
+        "PlayerDeletion methods"
+      ],
+      "forbidden": [
+        "src/pages/**",
+        "src/app/session/**"
+      ],
+      "transition": null,
+      "migration_task": "R13-06"
     }
   ],
-  "count": 45,
-  "last_updated_task": "R13-05"
+  "count": 49,
+  "last_updated_task": "R13-06"
 }

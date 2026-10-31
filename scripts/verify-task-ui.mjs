@@ -25,18 +25,18 @@ check(fs.existsSync(path.join(root, "src/styles/taskWorkspace.css")), "缺少任
 check(components.includes("export function taskPageHeader") && components.includes("export function taskContextRibbon"), "共享页面标题或上下文条组件缺失");
 
 for (const pageName of contract.core_pages) {
-  const page = (pageName === "teams" ? ["src/features/teams/teamPresentation.ts","src/features/teams/profileView.ts","src/features/teams/packageView.ts","src/features/teams/teamsView.ts"].map(read).join("\n") : read(`src/pages/${pageName}.ts`));
+  const page = (pageName === "teams" ? ["src/features/teams/teamPresentation.ts","src/features/teams/profileView.ts","src/features/teams/packageView.ts","src/features/teams/teamsView.ts"].map(read).join("\n") : pageName === "players" ? ["src/features/players/playerPresentation.ts","src/features/players/playerProfileView.ts","src/features/players/playerWorkbookView.ts","src/features/players/playerDirectoryView.ts"].map(read).join("\n") : read(`src/pages/${pageName}.ts`));
   for (const component of contract.shared_components) {
     check(page.includes(component), `${pageName} 页面没有接入 ${component}`);
   }
   check(!page.includes("page-heading simple-heading"), `${pageName} 的未连接或空状态仍使用旧页面标题`);
 }
 for (const pageName of contract.master_detail_pages) {
-  const page = (pageName === "teams" ? ["src/features/teams/teamPresentation.ts","src/features/teams/profileView.ts","src/features/teams/packageView.ts","src/features/teams/teamsView.ts"].map(read).join("\n") : read(`src/pages/${pageName}.ts`));
+  const page = (pageName === "teams" ? ["src/features/teams/teamPresentation.ts","src/features/teams/profileView.ts","src/features/teams/packageView.ts","src/features/teams/teamsView.ts"].map(read).join("\n") : pageName === "players" ? ["src/features/players/playerPresentation.ts","src/features/players/playerProfileView.ts","src/features/players/playerWorkbookView.ts","src/features/players/playerDirectoryView.ts"].map(read).join("\n") : read(`src/pages/${pageName}.ts`));
   check((["teams","players"].includes(pageName) ? renderResourceMarkup(root,pageName) : page).includes("master-detail-workspace"), `${pageName} 页面没有接入统一主从详情语义`);
 }
 
-const players = read("src/pages/players.ts");
+const players = ["src/features/players/playerPresentation.ts","src/features/players/playerProfileView.ts","src/features/players/playerWorkbookView.ts","src/features/players/playerDirectoryView.ts"].map(read).join("\n");
 check(contract.player_team_prefill?.mode === "prefill" && contract.player_team_prefill?.filter_editable === true && contract.player_team_prefill?.clear_all_removes_prefill === true, "球员球队上下文契约没有定义为可编辑预选");
 check(players.includes("球队筛选已带入") && players.includes("从球队页带入") && players.includes("已自动选中，可直接修改或清除"), "球员页缺少可见的球队预选语义");
 check(!players.includes("当前来源球队已锁定") && !players.includes("解除来源球队"), "球员页仍残留来源球队锁定语义");

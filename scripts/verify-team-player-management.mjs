@@ -62,7 +62,7 @@ const shell = JSON.parse(text("contracts/global-visual-system-contract.json")).s
 const navigation = text("src/app/router/routeRegistry.ts");
 const main = text("src/main.ts");
 const teamsPage = ["src/features/teams/teamPresentation.ts","src/features/teams/profileView.ts","src/features/teams/packageView.ts","src/features/teams/teamsView.ts"].map(text).join("\n");
-const playersPage = text("src/pages/players.ts");
+const playersPage = ["src/features/players/playerPresentation.ts","src/features/players/playerProfileView.ts","src/features/players/playerWorkbookView.ts","src/features/players/playerDirectoryView.ts"].map(text).join("\n");
 const types = text("src/types.ts");
 const styles = text("src/styles/components.css");
 const entityStyles = text("src/styles/entityCenter.css") + readStylesheet(root, "src/ui/tokens/index.css") + text("src/ui/layout/application-frame/applicationFrame.css");
@@ -86,6 +86,12 @@ assert(readme.includes("## 0.14.0 变更记录"), "根README缺少0.14.0变更�
 assert(readme.includes("## 0.15.0 变更记录"), "根README缺少0.15.0变更记录");
 
 for (const artifact of contract.artifacts) {
+  if (artifact === "src/pages/players.ts") {
+    assert(!existsSync(join(root, artifact)), "旧球员View仍为第二实现");
+    for (const owner of ["src/features/players/playerPresentation.ts","src/features/players/playerProfileView.ts","src/features/players/playerWorkbookView.ts","src/features/players/playerDirectoryView.ts","src/features/players/index.ts","src/features/players/playerCatalog.ts","src/features/players/playerEditor.ts","src/features/players/playerImports.ts","src/features/players/playerDeletion.ts"]) assert(existsSync(join(root, owner)), `球员实际职责缺失：${owner}`);
+    assert(main.includes('from "./features/players"'), "主组合根没有使用球员公开出口");
+    continue;
+  }
   if (artifact === "src/pages/teams.ts") {
     assert(!existsSync(join(root, artifact)), "旧球队View仍为第二实现");
     for (const owner of ["src/features/teams/index.ts", "src/features/teams/teamsView.ts", "src/features/teams/profileView.ts", "src/features/teams/packageView.ts", "src/features/teams/teamCatalog.ts", "src/features/teams/teamImports.ts", "src/features/teams/teamEditor.ts", "src/features/teams/teamDeletion.ts"]) assert(existsSync(join(root, owner)), `球队实际职责缺失：${owner}`);

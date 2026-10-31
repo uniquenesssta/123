@@ -6,7 +6,8 @@ const read = (path) => readProjectSource(stylesheetRoot,new URL(`../${path}`, im
 const failures = [];
 const check = (ok, message) => { if (!ok) failures.push(message); };
 const main = read("src/main.ts");
-const page = read("src/pages/players.ts");
+const catalog = read("src/features/players/playerCatalog.ts"), feature=read("src/features/players/playersFeature.ts"), compact=s=>s.replace(/\s/g,"");
+const page = ["src/features/players/playerPresentation.ts","src/features/players/playerProfileView.ts","src/features/players/playerWorkbookView.ts","src/features/players/playerDirectoryView.ts"].map(read).join("\n");
 const teams = read("src/features/teams/teamCatalog.ts");
 const types = read("src/types.ts");
 const styles = read("src/styles/entityCenter.css");
@@ -20,37 +21,28 @@ check(!types.includes("locked: boolean"), "来源球队仍被建模为真实锁�
 for (const key of ["TEAM_QUERY_KEY", "PLAYER_QUERY_KEY", "PLAYER_NAV_CONTEXT_KEY"]) {
   check(main.includes(key), `缺少持久化键 ${key}`);
 }
-check(main.includes("initialQuery: localPreferences.readObject<TeamListQuery>(TEAM_QUERY_KEY)") && teams.includes("normalizeTeamQuery(initial)") && main.includes("initialPlayerQuery()"), "球队/球员筛选未从持久状态恢复");
-check(main.includes("if (playerNavigationContext) playerQuery.team_id = playerNavigationContext.team_id"), "应用重启后没有恢复从球队页带入的预选球队");
-check(main.includes("setPlayerNavigationContext") && main.includes("persistPlayerQuery"), "球员来源上下文未持久保存");
-
-const directDirectoryEntry = between(main, "function prepareDirectPlayerDirectoryEntry", "const appRoot");
-check(directDirectoryEntry.includes("if (!sourceTeamId) return"), "直接进入球员目录时不应清除普通用户筛选上下文");
-check(directDirectoryEntry.includes("playerQuery.team_id === sourceTeamId") && directDirectoryEntry.includes("team_id: null"), "直接进入全部球员时没有清除球队页带入的球队预选");
-check(directDirectoryEntry.includes("setPlayerNavigationContext(null)"), "直接进入全部球员时没有清除球队来源上下文");
-check(directDirectoryEntry.includes('active_section: "directory"') && directDirectoryEntry.includes("selectedPlayer = null"), "直接进入全部球员时没有恢复目录模式或清除来源球员选择");
-check(main.includes('if (targetPage === "players") prepareDirectPlayerDirectoryEntry();'), "左侧或通用球员入口没有切换为全部球员目录");
-
-const openFromTeam = between(main, "async function openPlayerFromTeam", "async function openPlayerProfileFromTeam");
-check(openFromTeam.includes("team_id: teamId") && !openFromTeam.includes("locked:"), "从球队进入球员页时没有只带入球队筛选，或仍写入锁定状态");
-check(openFromTeam.includes('active_section: "directory"') && !openFromTeam.includes('active_section: "profile"'), "球队跳转仍直接进入完整球员档案，而不是目录");
-check(!openFromTeam.includes("appendWorkspaceTab"), "球队跳转仍自动打开完整档案标签");
-check(openFromTeam.includes("await teamsFeature.readPlayerFromTeam(playerId)") && openFromTeam.includes("!source.current()") && openFromTeam.includes("selectedPlayer = source.player") && openFromTeam.includes("inspector_collapsed: false"), "普通球队跳转未在目录中保持来源球员速览");
-const directProfile = between(main, "async function openPlayerProfileFromTeam", "async function openTeamApiWorkspace");
-
-const lineupEntry = between(main, "async function openPlayerFromLineup", "async function returnToLineupWorkspace");
-check(lineupEntry.includes('source: "match_lineup"') && lineupEntry.includes('origin_page: "lineups"'), "阵容球员入口没有独立来源上下文");
-check(lineupEntry.includes('active_section: "profile"') && lineupEntry.includes("team_id: teamId"), "阵容球员入口没有直达完整档案或携带球队身份");
-check(page.includes("return-to-lineup-workspace") && page.includes("返回比赛阵容"), "阵容来源球员档案没有返回阵容入口");
-check(directProfile.includes('active_section: "profile"') && directProfile.includes("appendWorkspaceTab"), "显式完整档案动作没有直接进入球员主工作区");
-
-const searchPlayers = between(main, "async function searchPlayers", "async function clearPlayerFilters");
-check(searchPlayers.includes("team_id: selectedTeamId"), "应用筛选没有采用用户当前选择的球队");
-check(searchPlayers.includes("playerNavigationContext.team_id !== selectedTeamId") && searchPlayers.includes("setPlayerNavigationContext(null)"), "用户更换或清空球队筛选后仍残留旧来源提示");
-check(!searchPlayers.includes("lockedTeamId") && !searchPlayers.includes("?? sourceTeamId"), "应用筛选仍会强制回退到来源球队");
-
-const clearFilters = between(main, "async function clearPlayerFilters", "async function nextPlayerPage");
-check(clearFilters.includes("team_id: null") && clearFilters.includes("setPlayerNavigationContext(null)"), "清除全部没有清除球队筛选与来源提示");
+check(compact(main).includes("initialQuery:localPreferences.readObject<PlayerListQuery>(PLAYER_QUERY_KEY)") && catalog.includes("normalizePlayerQuery(query)"), "球员筛选未从持久状态恢复");
+check(catalog.includes("if (this.sourceValue) this.queryValue.team_id = this.sourceValue.team_id"), "应用重启没有恢复来源球队预选");
+check(compact(main).includes("persistSource:source=>") && compact(main).includes("localPreferences.writeJson(PLAYER_NAV_CONTEXT_KEY,source)") && compact(main).includes("persistQuery:query=>localPreferences.writeJson(PLAYER_QUERY_KEY,query)"), "来源上下文或查询没有接通原持久键");
+const directDirectoryEntry=between(catalog,"  directEntry()", "  async open(");
+check(directDirectoryEntry.includes("if (!teamId) return false"), "通用球员入口不应清除普通用户筛选");
+check(directDirectoryEntry.includes("this.queryValue.team_id === teamId") && directDirectoryEntry.includes("team_id: null"), "通用入口没有清除来源预选");
+check(directDirectoryEntry.includes("this.setSource(null)") && directDirectoryEntry.includes("this.adopt(null)"), "通用入口没有清除来源和旧详情");
+check(compact(feature).includes('this.ports.section("directory",true)') && main.includes('playersFeature.directEntry()'), "通用入口未恢复目录或未接线");
+const openFromTeam=between(main,"async function openPlayerFromTeam", "async function openPlayerProfileFromTeam");
+check(compact(openFromTeam).includes("team_id:source.teamId") && !openFromTeam.includes("locked:"), "球队来源未携带稳定球队身份");
+check(openFromTeam.includes('active_section: "directory"') && !openFromTeam.includes("appendWorkspaceTab"), "球队普通入口应进入目录而非完整档案");
+check(compact(openFromTeam).includes("awaitteamsFeature.readPlayerFromTeam(playerId)") && openFromTeam.includes("!source.current()") && openFromTeam.includes("playersFeature.enterSource(") && openFromTeam.includes("source.player") && openFromTeam.includes("inspector_collapsed: false"), "普通来源入口未使用守卫后的速览响应");
+const directProfile=between(main,"async function openPlayerProfileFromTeam", "async function openTeamApiWorkspace");
+check(directProfile.includes('active_section: "profile"') && directProfile.includes("appendWorkspaceTab"), "显式完整档案入口失联");
+const lineupEntry=between(main,"async function openPlayerFromLineup", "async function returnToLineupWorkspace");
+check(compact(lineupEntry).includes('source:"match_lineup"') && compact(lineupEntry).includes('origin_page:"lineups"') && compact(lineupEntry).includes('team_id:teamId') && compact(lineupEntry).includes('active_section:"profile"'), "阵容入口未保留独立来源/稳定身份/完整档案");
+check(page.includes("return-to-lineup-workspace") && page.includes("返回比赛阵容"), "缺少返回阵容入口");
+const searchPlayers=between(feature,"  async search()", "  async clearFilters()");
+check(searchPlayers.includes('team_id: field("player-filter-team")') && main.includes("playersFeature.search()"), "筛选未使用用户当前球队选择");
+check(catalog.includes("this.sourceValue.team_id !== query.team_id") && catalog.includes("this.setSource(null)"), "更换球队后未清除旧来源");
+check(!searchPlayers.includes("lockedTeamId") && !searchPlayers.includes("?? sourceTeamId"), "筛选仍被强制回退到来源球队");
+check(compact(feature).includes("this.catalog.setSource(null)") && feature.includes("normalizePlayerQuery(null)"), "清除全部未清来源/球队过滤");
 check(!main.includes("beginChangePlayerSourceTeam") && !main.includes('case "change-player-source-team"'), "仍保留多余的更换来源球队锁定流程");
 check(!main.includes("clearPlayerSourceContext") && !main.includes('case "clear-player-source-context"'), "仍保留多余的解除来源球队锁定流程");
 

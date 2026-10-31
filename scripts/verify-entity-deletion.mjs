@@ -62,7 +62,7 @@ requireTrue(main.includes("teamsFeature.requestDelete()") && teamDeletion.includ
 requireTrue(teamDeletion.includes("api.bulkDeleteTeams(ids)") && teamDeletion.includes("this.consumed.has(ticket)"), "后端删除调用仍包含受保护球队");
 requireTrue(teamFeature.includes("teamDeletionCheckSummary") && teamFeature.includes("请使用归档"), "球队受保护原因未在前端解释");
 requireTrue(main.includes('removeWorkspaceObjects("teams", [...missing, ...result.deleted_ids])') && main.includes('persistWorkspaceSelection("teams")'), "球队删除结果未同步清理实际删除标签和持久选择");
-requireTrue(main.includes("const removedIds = [...result.archived_ids, ...result.already_archived_ids]"), "球队归档后未清理当前活跃工作区标签");
+requireTrue(main.includes('removeWorkspaceObjects("teams", [...result.archived_ids, ...result.already_archived_ids])') && teamFeature.includes("this.ports.afterArchive(result)"), "球队归档后未清理当前活跃工作区标签");
 requireTrue(teamFeature.includes("!check.exists") && main.includes('removeWorkspaceObjects("teams", ids)'), "已不存在球队未从陈旧工作区清理");
 requireTrue(teams.includes('data-action="bulk-delete-teams"') && teams.includes("永久删除（无引用）") && teams.includes("仅无任何业务或历史引用"), "球队删除按钮仍未明确无引用限制");
 

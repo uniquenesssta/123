@@ -22,7 +22,7 @@ const teamOptionList = read("crates/persistence-postgres/src/adapters/catalog/te
 const referenceDirectoryRead = read("crates/persistence-postgres/src/adapters/catalog/references/directory/read.rs");
 const coachDirectoryList = read("crates/persistence-postgres/src/adapters/catalog/coaches/directory/list.rs");
 const persistenceLib = read("crates/persistence-postgres/src/lib.rs");
-const playerPage = read("src/pages/players.ts");
+const playerPage = ["src/features/players/playerPresentation.ts","src/features/players/playerProfileView.ts","src/features/players/playerWorkbookView.ts","src/features/players/playerDirectoryView.ts"].map(read).join("\n");
 const teamPage = ["src/features/teams/teamPresentation.ts","src/features/teams/profileView.ts","src/features/teams/packageView.ts","src/features/teams/teamsView.ts"].map(read).join("\n");
 const presetPage = read("src/pages/lineupPresets.ts");
 

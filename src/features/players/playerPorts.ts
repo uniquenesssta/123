@@ -1,0 +1,30 @@
+import type * as T from "../../types";
+export interface PlayerApi {
+listTeamOptions(search: string | null, limit?: number): Promise<T.TeamOption[]>;
+readPlayer(playerId: string): Promise<T.PlayerDetail>;
+listPlayers(query: T.PlayerListQuery): Promise<T.PlayerListPage>;
+playerCatalogReferenceData(): Promise<T.PlayerCatalogReferenceData>;
+checkEntityDeletion(entityType: T.EntityReferenceType, entityId: string): Promise<T.EntityDeletionCheck>;
+deletePlayer(playerId: string): Promise<void>;
+bulkDeletePlayers(playerIds: string[]): Promise<T.BulkDeleteResult>;
+bulkArchiveEntities(entityType: T.EntityReferenceType, entityIds: string[]): Promise<T.BulkArchiveResult>;
+createPlayer(draft: T.PlayerDraft): Promise<T.PlayerRecord>;
+createDataProvider(draft: T.DataProviderDraft): Promise<T.DataProviderRecord>;
+chooseExcelExportFile(defaultPath: string): Promise<string | null>;
+chooseExcelImportFile(): Promise<string | null>;
+exportPlayerCatalogTemplate(outputPath: string): Promise<T.SpreadsheetExportSummary>;
+exportPlayerCatalogData(outputPath: string): Promise<T.SpreadsheetExportSummary>;
+previewPlayerCatalogImport(inputPath: string, mode: T.SpreadsheetImportMode): Promise<T.SpreadsheetImportPreview>;
+readPlayerCatalogImportPreview(batchId: string): Promise<T.SpreadsheetImportPreview>;
+resolvePlayerCatalogImportConflict(batchId: string, resolution: T.SpreadsheetImportResolution): Promise<T.SpreadsheetImportPreview>;
+commitPlayerCatalogImport(batchId: string): Promise<T.SpreadsheetImportCommitResult>;
+updatePlayer(playerId: string, draft: T.PlayerDraft): Promise<T.PlayerRecord>;
+addPlayerName(draft: T.PlayerNameDraft): Promise<Record<string, unknown>>;
+assignPlayerPosition(draft: T.PlayerPositionDraft): Promise<Record<string, unknown>>;
+addPlayerTeamPeriod(draft: T.PlayerTeamPeriodDraft): Promise<Record<string, unknown>>;
+addPlayerAvailability(draft: T.PlayerAvailabilityDraft): Promise<Record<string, unknown>>;
+addPlayerAbilityObservation(draft: T.PlayerAbilityObservationDraft): Promise<Record<string, unknown>>;
+addExternalEntityId(draft: T.ExternalEntityIdDraft): Promise<Record<string, unknown>>;
+addPlayerDynamicTag(draft: T.PlayerDynamicTagDraft): Promise<T.PlayerDynamicTagRecord>;
+calculatePlayerMatchContribution(request: T.PlayerMatchContributionRequest): Promise<T.PlayerMatchContribution>;
+}

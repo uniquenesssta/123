@@ -25,7 +25,7 @@ const commands = [...new Set(Object.values(JSON.parse(read("architecture/command
 const registry = read("src-tauri/src/bootstrap/command_registry.rs");
 const client = read("src/api/client.ts");
 const teams = ["src/features/teams/teamPresentation.ts","src/features/teams/profileView.ts","src/features/teams/packageView.ts","src/features/teams/teamsView.ts"].map(read).join("\n");
-const players = read("src/pages/players.ts");
+const players = ["src/features/players/playerPresentation.ts","src/features/players/playerProfileView.ts","src/features/players/playerWorkbookView.ts","src/features/players/playerDirectoryView.ts"].map(read).join("\n");
 const main = read("src/main.ts");
 const teamFeature = read("src/features/teams/teamsFeature.ts");
 const teamImports = read("src/features/teams/teamImports.ts");
@@ -103,8 +103,8 @@ requireTrue(!persistence.includes("DELETE FROM feature.team_ability_observations
 requireTrue(legacyPersistence.includes("PLAYER_MONTHLY_FORMAT") && application.includes("read_player_monthly_workbook"), "球员月度与旧模板兼容链缺失");
 requireTrue(teams.includes("球队完整资料包") && main.includes("teamsFeature.previewPackage()") && teamImports.includes("api.previewTeamPackageImport(path, mode)"), "球队完整资料包统一导入界面缺失");
 requireTrue(main.includes("teamsFeature.previewMonthly()") && teamImports.includes("api.previewTeamMonthlyImport(path, mode)") && client.includes("preview_team_monthly_import"), "旧球队月度工作簿兼容链缺失");
-requireTrue(players.includes("球员月度工作包") && main.includes("球员月度更新.xlsx"), "球员月度工作包界面缺失");
-requireTrue(main.includes("ended_previous_count"), "导入完成结果未显示结束旧记录数量");
+requireTrue(players.includes("球员月度工作包") && read("src/features/players/playersFeature.ts").includes("球员月度更新.xlsx"), "球员月度工作包界面缺失");
+requireTrue(read("src/features/players/playersFeature.ts").includes("ended_previous_count"), "导入完成结果未显示结束旧记录数量");
 
 // R7-13：月度只读聚合/缺口实际职责，导入继续复用原唯一共享链。
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)),"..");
