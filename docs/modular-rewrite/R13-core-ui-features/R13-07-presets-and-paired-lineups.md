@@ -80,3 +80,9 @@ Impeccable技能及layout/craft-floor已使用，手动检查实际截图、密�
 本批CI、双bundle和startup未核实前不记DONE。正式收尾后下一项 **R13-UI01（已交付6页设计补差）**，再到 **R13-09（工作簿）**；R13-08已包含在本批，不单独重做。后续每批/阶段完成时，交接和回复都必须明确下一编号、主题及待满足的前置，不自动启动未授权任务。
 
 最终完整挂载证据：`O:/Project/FOODBALL/tmp/r13-07-browser-MDho9G`（result.json、比赛/编辑器/预设多尺寸明暗截图）；最终原生证据 `O:/Project/FOODBALL/tmp/r13-07-native-read-VIF2Tg`。本地来源与日志摘要清单：`O:/Project/FOODBALL/tmp/r13-07-final-manifest.json`；手动清理清单：`O:/Project/FOODBALL/tmp/r13-07-cleanup-manifest.json`。
+
+## 精确提交与CI交接
+
+代码提交 `855d830b77ba6b6eb9c2e080009aa50cbea3efdb` 已推送，62路径（22新增、40修改、0删除）。最终完整96步退出0，29项生产行为及132项完整挂载通过；286处本地文档链接核验有效。精确[CI run41211916572](https://github.com/uniquenesssta/123/actions/runs/41211916572)仅查询一次：push事件，head_sha精确等于855d830b，status=in_progress、conclusion=null。本批仍VERIFYING，未验自身双bundle/包内startup，不轮询、不取消其他运行。
+
+此CI交接为后续Markdown补记，不改变上述受测代码；ci.yml的push paths-ignore排除Markdown。本次手动清理清单含302个明确中间产物/profile/一次性辅助项，未执行批量删除；最终证据、依赖和原生复现助手保留。正式收尾后下一项R13-UI01，再R13-09，08已并入07。
