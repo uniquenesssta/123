@@ -173,8 +173,9 @@
         "route": "runs"
       },
       "teams": {
-        "owner": "src/pages/teams.ts",
-        "route": "teams"
+        "owner": "src/features/teams/teamsView.ts",
+        "route": "teams",
+        "public_entry": "src/features/teams/index.ts"
       },
       "workbooks": {
         "owner": "src/pages/workbooks.ts",
@@ -543,5 +544,5 @@
     "commands": 171
   },
   "transitional_edges": [],
-  "last_updated_task": "R13-03"
+  "last_updated_task": "R13-05"
 }

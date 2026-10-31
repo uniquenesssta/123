@@ -60,7 +60,8 @@ const commands = [...new Set(Object.values(catalogDefinitionFiles))].map(text).j
 const registry = text("src-tauri/src/bootstrap/command_registry.rs");
 const client = text("src/api/client.ts");
 const main = text("src/main.ts");
-const teamsPage = text("src/pages/teams.ts");
+const teamEditor = text("src/features/teams/teamEditor.ts");
+const teamsPage = ["src/features/teams/teamPresentation.ts","src/features/teams/profileView.ts","src/features/teams/packageView.ts","src/features/teams/teamsView.ts"].map(text).join("\n");
 const playersPage = text("src/pages/players.ts");
 const types = text("src/types.ts");
 const readme = text("README.md");
@@ -168,8 +169,8 @@ assert(playersPage.includes("history-list\">${teamHistory}"), "球员中心缺�
 assert(playersPage.includes("bulk-archive-players"), "球员中心缺少批量归档");
 assert(main.includes("api.checkEntityDeletion(\"player\""), "球员永久删除前未执行引用检查");
 assert(main.includes("api.bulkArchiveEntities"), "前端未接通批量归档服务");
-assert(main.includes("addTeamCoachPeriod"), "前端未接通教练任期保存");
-assert(main.includes("head_coach: selectedTeam?.profile?.head_coach ?? null"), "球队档案保存可能覆盖主教练投影");
+assert(main.includes("teamsFeature.editor.coachPeriod(") && teamEditor.includes("api.addTeamCoachPeriod(draft)"), "前端未接通教练任期保存");
+assert(main.includes("teamsFeature.editor.profile(") && teamEditor.includes("head_coach: this.ports.catalog.detail?.profile?.head_coach ?? null"), "球队档案保存可能覆盖主教练投影");
 
 assert(contract.coach_model.history_preserved === true, "契约未锁定教练历史保留");
 assert(contract.coach_model.current_head_coach_is_projection === true, "契约未锁定主教练投影");

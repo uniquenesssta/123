@@ -14,9 +14,10 @@ const failures = [];
 const check = (condition, message) => { if (!condition) failures.push(message); };
 
 const main = read("src/main.ts");
+const teamCatalog = read("src/features/teams/teamCatalog.ts");
 const shell = JSON.parse(read("contracts/global-visual-system-contract.json")).shell_source_entries.map(read).join("\n");
 const navigation = read("src/app/router/routeRegistry.ts");
-const teams = read("src/pages/teams.ts");
+const teams = ["src/features/teams/teamPresentation.ts","src/features/teams/profileView.ts","src/features/teams/packageView.ts","src/features/teams/teamsView.ts"].map(read).join("\n");
 const players = read("src/pages/players.ts");
 const lineups = read("src/pages/lineups.ts");
 const rules = ["src/features/rules/rulesView.ts", "src/features/rules/bindingView.ts", "src/features/competitions/catalogueView.ts", "src/features/competitions/competitionView.ts"].map(read).join("\n");
@@ -49,7 +50,7 @@ check(teams.includes("entity-directory-list") && teams.includes("entity-data-tab
 check(players.includes("player-directory-table") && players.includes("clear-player-filters"), "球员中心缺少高密度名单或筛选复位");
 check(teams.includes("previous-team-page") && teams.includes("next-team-page"), "球队目录缺少双向游标分页");
 check(players.includes("previous-player-page") && players.includes("next-player-page"), "球员目录缺少双向游标分页");
-check(main.includes("teamCursorHistory") && main.includes("playerCursorHistory"), "主控制器缺少游标历史，无法返回上一页");
+check(main.includes("teamsFeature.catalog.pageNumber") && teamCatalog.includes("this.history.slice(0, -1)") && main.includes("playerCursorHistory"), "主控制器缺少游标历史，无法返回上一页");
 check(main.includes("previewPlayerFromTeam") && main.includes('active_section: "directory"'), "球队阵容点击不得破坏主目录浏览状态");
 
 for (const breakpoint of ["1480px", "1100px", "820px", "620px"]) {

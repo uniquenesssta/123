@@ -1,160 +1,145 @@
-import "./styles/index.css";
-import { KeyboardShortcutController, motionScrollBehavior } from "./ui/accessibility";
-import { updatePaginationView } from "./ui/navigation";
-import { CompetitionFeature, clearRulesCatalogueFilters, filterRulesCompetitionCatalogue, selectRulesDirectoryLevel } from "./features/competitions";
-import { focusValidationTarget } from "./ui/forms/validation-summary";
 import {
   api,
   issueWasLogged,
   recordUiOperation,
   recordUiOperationFailure,
 } from "./api/client";
-import { ModalController, type ModalConfirmationOptions } from "./app/modal";
 import { ContextMenuAdapter } from "./app/context-menu";
-import { CommandMenuController } from "./ui/overlays/command-menu";
-import { AppSession } from "./app/session";
 import { AsyncScope, EventScope, MountHandle } from "./app/lifecycle";
-import { Router, NavigationContext, isRoute, PRIMARY_NAVIGATION, type NavigationRequest } from "./app/router";
+import { matchReviewWorkflowAllows } from "./app/matchReviewWorkflow";
+import { ModalController, type ModalConfirmationOptions } from "./app/modal";
+import { NavigationContext, PRIMARY_NAVIGATION, Router, isRoute, type NavigationRequest } from "./app/router";
+import { AppSession } from "./app/session";
 import { ApplicationShellController, pageTitle, renderShell } from "./app/shell";
 import { WarningCenterController } from "./app/warnings";
-import { stopTauriTransport } from "./platform/tauri";
-import { localPreferences, sessionPreferences, preferenceKey } from "./platform/storage";
-import { clipboard } from "./platform/clipboard";
-import { DebouncedTask, RequestSequence } from "./platform/timing";
 import { WorkspaceCoordinator, type WorkspaceLayoutMode, type WorkspaceTabState } from "./app/workspace";
-import { matchReviewWorkflowAllows } from "./app/matchReviewWorkflow";
+import { bulkArchiveSummary, bulkDeleteSummary } from "./components/entityDeletion";
+import { displayPlayerName, positionLabel } from "./components/footballText";
+import { escapeHtml, formatPercent } from "./components/format";
+import { enhanceSearchableSelects, refreshSearchableSelects } from "./components/searchableSelect";
 import {
   fetchAnalysisCenter,
   fetchLineups,
   fetchPlayerCatalog,
-  fetchTeamCatalog,
   fetchReviewCenter,
   fetchReviewLineups,
   type AnalysisCenterLoadResult,
   type LineupsLoadResult,
   type PlayerCatalogLoadResult,
-  type TeamCatalogLoadResult,
   type ReviewCenterLoadResult,
 } from "./controllers/pageLoaders";
-import { escapeHtml, formatPercent } from "./components/format";
-import { displayPlayerName, positionLabel } from "./components/footballText";
-import { enhanceSearchableSelects, refreshSearchableSelects } from "./components/searchableSelect";
 import { bindSearchableSelectDiagnostics } from "./diagnostics/searchableSelectDiagnostics";
 import { architecturePage } from "./features/architecture";
-import { analyticsPage } from "./pages/analytics";
+import { CompetitionFeature, clearRulesCatalogueFilters, filterRulesCompetitionCatalogue, selectRulesDirectoryLevel } from "./features/competitions";
 import { dashboardPage } from "./features/dashboard";
-import { databasePage, DatabaseFeature } from "./features/database";
-import { predictionPage } from "./pages/prediction";
-import { rulesPage, RulesFeature, routeDetailBody, routeCard } from "./features/rules";
-import { runsPage } from "./pages/runs";
-import { playerTableRows, playersPage } from "./pages/players";
-import { teamsPage } from "./pages/teams";
+import { DatabaseFeature, databasePage } from "./features/database";
+import { RulesFeature, routeCard, routeDetailBody, rulesPage } from "./features/rules";
+import { TeamsFeature, teamsPage } from "./features/teams";
+import { analyticsPage } from "./pages/analytics";
+import { apiWorkspacePage } from "./pages/apiWorkspace";
 import { lineupPresetsPage } from "./pages/lineupPresets";
-import { workbooksPage } from "./pages/workbooks";
 import { lineupsPage } from "./pages/lineups";
 import { logsPage } from "./pages/logs";
 import { openAiPage } from "./pages/openai";
-import { apiWorkspacePage } from "./pages/apiWorkspace";
-import { reviewPage } from "./pages/review";
+import { playerTableRows, playersPage } from "./pages/players";
+import { predictionPage } from "./pages/prediction";
 import { releasePage } from "./pages/release";
+import { reviewPage } from "./pages/review";
+import { runsPage } from "./pages/runs";
+import { workbooksPage } from "./pages/workbooks";
+import { clipboard } from "./platform/clipboard";
+import { localPreferences, preferenceKey, sessionPreferences } from "./platform/storage";
+import { stopTauriTransport } from "./platform/tauri";
+import { DebouncedTask, RequestSequence } from "./platform/timing";
+import "./styles/index.css";
 import type {
+  AbilityUpdateCandidateRecord,
+  AiAnalysisResponsePreview,
+  AiAnalysisSuggestionRecord,
+  AnalyticsOverview,
+  ApiWorkspacePreset,
+  ApiWorkspaceSessionDetail,
+  ApiWorkspaceSessionRecord,
+  BackgroundJob,
+  CoachListItem,
   CompetitionKind,
   DataProviderDraft,
+  EnqueueJobDraft,
+  EvidenceScoringDecisionDraft,
   ExternalEntityIdDraft,
+  FormationRecord,
+  IssueLogEntry,
+  IssueSeverity,
+  LineupBuilderFormState,
+  LineupBuilderPlayer,
   LineupDraft,
   LineupPairDraft,
   LineupPlayerDraft,
   LineupRecord,
+  LineupSnapshotType,
   MatchDraft,
   MatchLineupChain,
   MatchPredictionReadiness,
   MatchRecord,
   MatchReviewDetail,
   MatchReviewDraft,
-  MatchReviewSummary,
   MatchReviewPackagePreview,
   MatchReviewPackageWorkflowRecord,
-  PostmatchSettlementRecord,
-  PlayerMatchObservationDraft,
-  ReviewableMatch,
-  Page,
-  PlayerAbilityObservationDraft,
-  PlayerAvailabilityDraft,
-  PlayerCatalogReferenceData,
-  PlayerDetail,
-  PlayerDraft,
-  PlayerDynamicTagDraft,
-  PlayerMatchContributionRequest,
-  PlayerListPage,
-  PlayerListQuery,
-  PlayerNavigationContext,
-  PlayerNameDraft,
-  PlayerPositionDraft,
-  PlayerTeamPeriodDraft,
-  PredictionCommand,
-  PredictionExecution,
-  PredictionModelFamily,
-  RouteDecision,
-  RoutePreviewCommand,
-  TeamDraft,
-  TeamDetail,
-  TeamListPage,
-  TeamListQuery,
-  TeamMatchLineupHistoryItem,
-  TeamLineupPresetApplicationPreview,
-  TeamLineupPresetDraft,
-  TeamLineupPresetMemberDraft,
-  TeamLineupPresetRecord,
-  TeamProfileDraft,
-  BulkDeleteResult,
-  TeamForceDeletePreview,
-  TeamForceDeleteResult,
-  EntityDeletionCheck,
-  BulkArchiveResult,
-  CoachDraft,
-  CoachListItem,
-  TeamCoachPeriodDraft,
-  FormationRecord,
-  FormationUsageDistributionDraft,
-  SpreadsheetImportMode,
-  SpreadsheetImportPreview,
-  TeamPackageImportPreview,
-  AnalyticsOverview,
-  BackgroundJob,
-  AiAnalysisResponsePreview,
-  AiAnalysisSuggestionRecord,
-  AbilityUpdateCandidateRecord,
-  EnqueueJobDraft,
-  LineupBuilderPlayer,
-  LineupBuilderFormState,
-  LineupSnapshotType,
-  PairedLineupBuilderState,
-  PlayerListItem,
-  ParameterTuningCandidateRecord,
-  ParameterTuningDraft,
-  ParameterTuningDecisionDraft,
-  ParameterLifecycleReadinessRequest,
-  PostmatchOverview,
-  PostmatchMonitoringRequest,
-  EvidenceScoringDecisionDraft,
-  ParameterPromotionRequest,
-  ParameterRollbackRequest,
-  IssueLogEntry,
-  IssueSeverity,
+  MatchReviewSummary,
   OpenAiApiExampleParseResult,
   OpenAiApiProtocol,
   OpenAiProfileDraft,
   OpenAiProfilesState,
   P4MatchWorkspace,
   P4TaskWorkspace,
-  ApiWorkspacePreset,
-  ApiWorkspaceSessionDetail,
-  ApiWorkspaceSessionRecord,
-  ResolveP4ConflictCommand,
+  Page,
+  PairedLineupBuilderState,
+  ParameterLifecycleReadinessRequest,
+  ParameterPromotionRequest,
+  ParameterRollbackRequest,
+  ParameterTuningCandidateRecord,
+  ParameterTuningDecisionDraft,
+  ParameterTuningDraft,
+  PlayerAbilityObservationDraft,
+  PlayerAvailabilityDraft,
+  PlayerCatalogReferenceData,
+  PlayerDetail,
+  PlayerDraft,
+  PlayerDynamicTagDraft,
+  PlayerListItem,
+  PlayerListPage,
+  PlayerListQuery,
+  PlayerMatchContributionRequest,
+  PlayerMatchObservationDraft,
+  PlayerNameDraft,
+  PlayerNavigationContext,
+  PlayerPositionDraft,
+  PlayerTeamPeriodDraft,
+  PostmatchMonitoringRequest,
+  PostmatchOverview,
+  PostmatchSettlementRecord,
+  PredictionCommand,
+  PredictionExecution,
+  PredictionModelFamily,
   ReleaseAcceptanceRequest,
   ReleaseAcceptanceRun,
   ReleaseAcceptanceRunSummary,
+  ResolveP4ConflictCommand,
+  ReviewableMatch,
+  RouteDecision,
+  RoutePreviewCommand,
+  SpreadsheetImportMode,
+  SpreadsheetImportPreview,
+  TeamLineupPresetApplicationPreview,
+  TeamLineupPresetDraft,
+  TeamLineupPresetMemberDraft,
+  TeamLineupPresetRecord,
+  TeamListQuery
 } from "./types";
+import { KeyboardShortcutController, motionScrollBehavior } from "./ui/accessibility";
+import { focusValidationTarget } from "./ui/forms/validation-summary";
+import { updatePaginationView } from "./ui/navigation";
+import { CommandMenuController } from "./ui/overlays/command-menu";
 
 const browserLifecycleController = new EventScope();
 const openAiExampleRequests = new AsyncScope();
@@ -164,19 +149,6 @@ const ANALYSIS_PACKAGE_ID_KEY = preferenceKey("last-analysis-package-id");
 const TEAM_QUERY_KEY = preferenceKey("team-query");
 const PLAYER_QUERY_KEY = preferenceKey("player-query");
 const PLAYER_NAV_CONTEXT_KEY = preferenceKey("player-navigation-context");
-function initialTeamQuery(): TeamListQuery {
-  const stored = localPreferences.readObject<TeamListQuery>(TEAM_QUERY_KEY);
-  return {
-    search: typeof stored?.search === "string" ? stored.search : null,
-    country_code: typeof stored?.country_code === "string" ? stored.country_code : null,
-    team_type: typeof stored?.team_type === "string" ? stored.team_type as TeamListQuery["team_type"] : null,
-    active_only: typeof stored?.active_only === "boolean" ? stored.active_only : true,
-    limit: typeof stored?.limit === "number" && stored.limit > 0 ? stored.limit : 50,
-    cursor_name: null,
-    cursor_id: null,
-  };
-}
-
 function initialPlayerQuery(): PlayerListQuery {
   const stored = localPreferences.readObject<PlayerListQuery>(PLAYER_QUERY_KEY);
   return {
@@ -207,11 +179,6 @@ function readPlayerNavigationContext(): PlayerNavigationContext | null {
     created_at: typeof stored.created_at === "string" ? stored.created_at : now,
     updated_at: typeof stored.updated_at === "string" ? stored.updated_at : now,
   };
-}
-
-function persistTeamQuery(): void {
-  const { cursor_name: _cursorName, cursor_id: _cursorId, ...stable } = teamQuery;
-  localPreferences.writeJson(TEAM_QUERY_KEY, stable);
 }
 
 function persistPlayerQuery(): void {
@@ -306,6 +273,66 @@ const competitionFeature = new CompetitionFeature({
   showPath: body => showHtmlModal("赛事规则与模型路径", "目录级说明", body),
 });
 
+const teamsFeature = new TeamsFeature({
+  api,
+  initialQuery: localPreferences.readObject<TeamListQuery>(TEAM_QUERY_KEY),
+  snapshot: () => session.bootstrap,
+  page: () => navigation.page,
+  root: () => app,
+  busy: operation => runBusy(operation),
+  persistQuery: query => localPreferences.writeJson(TEAM_QUERY_KEY, query),
+  publishOptions(coaches, formations) { coachList = coaches; formationCatalog = formations; },
+  publishCoaches: coaches => { coachList = coaches; },
+  refreshPlayerReferences: async () => { const snapshot = session.bootstrap; const references = await api.playerCatalogReferenceData(); if (snapshot === session.bootstrap) playerReferences = references; },
+  refreshAll: () => refreshBootstrapAndCatalog(),
+  clearPlayerInspector: () => { selectedPlayer = null; },
+  render: () => render({ preserveForm: true }),
+  notify: (message, kind) => toast(message, kind),
+  setSection(section, inspectorCollapsed) { workspaceState.patchModule("teams", { active_section: section, ...(inspectorCollapsed !== undefined ? { inspector_collapsed: inspectorCollapsed } : {}), ...(section === "directory" && !teamsFeature.catalog.detail ? { active_tab_id: null } : {}) }); },
+  appendTab: (id, label) => appendWorkspaceTab("teams", { id, label }),
+  activeTab: page => workspaceState.module(page).active_tab_id,
+  setPresetTab: id => workspaceState.patchModule("lineup_presets", { active_tab_id: id }),
+  navigateTeams: () => navigateTo("teams"),
+  confirm: (...args) => modal.confirm(...args),
+  showHtml: (...args) => showHtmlModal(...args),
+  closePanel: () => closeModal(),
+  async afterDelete(result, missing) {
+    const page = navigation.page, activeId = removeWorkspaceObjects("teams", [...missing, ...result.deleted_ids]), revision = teamsFeature.catalog.revision;
+    await session.refresh();
+    if (page !== navigation.page || revision !== teamsFeature.catalog.revision) return false;
+    if (!await teamsFeature.catalog.load({ resetCursor: true, retainId: activeId, isCurrent: () => navigation.page === page })) return false;
+    const current = teamsFeature.catalog.capture(), references = await api.playerCatalogReferenceData();
+    if (!current() || page !== navigation.page) return false;
+    playerReferences = references; persistWorkspaceSelection("teams"); render({ preserveForm: true }); return true;
+  },
+  async removeMissing(ids) {
+    const page = navigation.page, activeId = removeWorkspaceObjects("teams", ids), revision = teamsFeature.catalog.revision;
+    await session.refresh(); if (page !== navigation.page || revision !== teamsFeature.catalog.revision) return;
+    if (await teamsFeature.catalog.load({ resetCursor: true, retainId: activeId, isCurrent: () => navigation.page === page })) { persistWorkspaceSelection("teams"); render({ preserveForm: true }); }
+  },
+  async afterForceDelete(result) {
+    const page = navigation.page, activeId = removeWorkspaceObjects("teams", [result.team_id]);
+    removeWorkspaceObjects("players", result.deleted_player_ids); spreadsheetPreview = null; matchSpreadsheetPreview = null;
+    const revision = teamsFeature.catalog.revision;
+    await session.refresh(); if (page !== navigation.page || revision !== teamsFeature.catalog.revision) return false;
+    if (!await teamsFeature.catalog.load({ resetCursor: true, retainId: activeId, isCurrent: () => navigation.page === page })) return false;
+    const current = teamsFeature.catalog.capture();
+    const players = await fetchPlayerCatalog({ ...playerQuery }, selectedPlayer, true, null);
+    if (!current() || page !== navigation.page) return false;
+    applyPlayerCatalog(players);
+    persistWorkspaceSelection("teams"); persistWorkspaceSelection("players"); render({ preserveForm: true }); return true;
+  },
+  async afterArchive(result) {
+    const page = navigation.page, activeId = removeWorkspaceObjects("teams", [...result.archived_ids, ...result.already_archived_ids]), revision = teamsFeature.catalog.revision;
+    await session.refresh(); if (page !== navigation.page || revision !== teamsFeature.catalog.revision) return;
+    if (!await teamsFeature.catalog.load({ resetCursor: true, retainId: activeId, isCurrent: () => navigation.page === page })) return;
+    const current = teamsFeature.catalog.capture(), references = await api.playerCatalogReferenceData();
+    if (!current() || page !== navigation.page) return;
+    playerReferences = references; persistWorkspaceSelection("teams"); render({ preserveForm: true });
+    showHtmlModal("球队批量归档结果", "保留历史关系", bulkArchiveSummary(result, "支球队"));
+  },
+});
+
 const navigation = new Router();
 const workflowNavigation = new NavigationContext();
 let lastPredictionResult: unknown = null;
@@ -313,21 +340,14 @@ let playerReferences: PlayerCatalogReferenceData | null = null;
 let playerListPage: PlayerListPage | null = null;
 let selectedPlayer: PlayerDetail | null = null;
 let selectedPlayerIds = new Set<string>();
-let teamListPage: TeamListPage | null = null;
-let selectedTeam: TeamDetail | null = null;
-let selectedTeamLineupHistory: TeamMatchLineupHistoryItem[] = [];
-let selectedTeamLineupPresets: TeamLineupPresetRecord[] = [];
 let pairedLineupPresets: Record<"home" | "away", TeamLineupPresetRecord[]> = {
   home: [],
   away: [],
 };
-let selectedTeamIds = new Set<string>();
-let teamCursorHistory: Array<{ cursor_name: string | null; cursor_id: string | null }> = [];
 let playerCursorHistory: Array<{ cursor_name: string | null; cursor_id: string | null }> = [];
 let playerPageLoading = false;
 let coachList: CoachListItem[] = [];
 let formationCatalog: FormationRecord[] = [];
-let teamQuery: TeamListQuery = initialTeamQuery();
 let playerQuery: PlayerListQuery = initialPlayerQuery();
 let playerNavigationContext: PlayerNavigationContext | null = readPlayerNavigationContext();
 if (playerNavigationContext) playerQuery.team_id = playerNavigationContext.team_id;
@@ -335,9 +355,6 @@ let lineupRecords: LineupRecord[] = [];
 let selectedMatchLineupChain: MatchLineupChain | null = null;
 let selectedPredictionReadiness: MatchPredictionReadiness | null = null;
 let spreadsheetPreview: SpreadsheetImportPreview | null = null;
-let teamSpreadsheetPreview: SpreadsheetImportPreview | null = null;
-let teamPackagePreview: TeamPackageImportPreview | null = null;
-let pendingTeamForceDelete: TeamForceDeletePreview | null = null;
 let matchSpreadsheetPreview: SpreadsheetImportPreview | null = null;
 let reviewableMatches: ReviewableMatch[] = [];
 let recentMatchReviews: MatchReviewSummary[] = [];
@@ -529,6 +546,7 @@ function render(options: RenderOptions = {}): void {
   if (browserLifecycleController.signal.aborted) return;
   rulesFeature.invalidatePreview();
   const shellFocus = shellController?.captureFocus() ?? null;
+  teamsFeature.drafts.capture(app);
   modal.capture();
   if (options.preserveForm === true && renderedPage === "lineups") {
     capturePairedLineupFromDom();
@@ -571,22 +589,22 @@ function render(options: RenderOptions = {}): void {
     case "teams": {
       const workspace = workspaceState.module("teams");
       content = teamsPage(
-        session.bootstrap, teamListPage, selectedTeam, selectedPlayer, teamQuery, selectedTeamIds, coachList, formationCatalog,
-        teamPackagePreview, selectedTeamLineupHistory, selectedTeamLineupPresets, workspace.tabs, workspace.active_tab_id,
+        session.bootstrap, teamsFeature.catalog.list, teamsFeature.catalog.detail, selectedPlayer, teamsFeature.catalog.query, teamsFeature.catalog.selectedIds, coachList, formationCatalog,
+        teamsFeature.imports.package, teamsFeature.catalog.lineups, teamsFeature.catalog.presets, workspace.tabs, workspace.active_tab_id,
         workspace.layout_mode, workspace.module_sidebar_collapsed, workspace.inspector_collapsed,
-        workspace.active_section ?? "directory", teamCursorHistory.length + 1,
+        workspace.active_section ?? "directory", teamsFeature.catalog.pageNumber,
       );
       break;
     }
     case "lineup_presets": {
       content = lineupPresetsPage(
-        session.bootstrap, teamListPage, selectedTeam, selectedTeamLineupPresets, teamQuery, teamCursorHistory.length + 1,
+        session.bootstrap, teamsFeature.catalog.list, teamsFeature.catalog.detail, teamsFeature.catalog.presets, teamsFeature.catalog.query, teamsFeature.catalog.pageNumber,
       );
       break;
     }
     case "workbooks": {
       const workspace = workspaceState.module("workbooks");
-      content = workbooksPage(session.bootstrap, teamSpreadsheetPreview, spreadsheetPreview, matchSpreadsheetPreview, workspace.module_sidebar_collapsed, workspace.inspector_collapsed, workspace.active_section ?? "team");
+      content = workbooksPage(session.bootstrap, teamsFeature.imports.monthly, spreadsheetPreview, matchSpreadsheetPreview, workspace.module_sidebar_collapsed, workspace.inspector_collapsed, workspace.active_section ?? "team");
       break;
     }
     case "lineups": {
@@ -729,6 +747,7 @@ function render(options: RenderOptions = {}): void {
   const currentPageRoot = app.querySelector<HTMLElement>(".page-container") ?? app;
   workspaceState.restore(navigation.page, currentPageRoot);
   rulesFeature.syncHierarchy(currentPageRoot);
+  teamsFeature.drafts.restore(currentPageRoot, session.bootstrap);
   shellController?.restoreFocus(shellFocus);
   if (navigation.page === "lineups") {
   queueMicrotask(() => {
@@ -754,7 +773,7 @@ function appendWorkspaceTab(targetPage: "teams" | "players", tab: WorkspaceTabSt
 }
 
 function persistWorkspaceSelection(targetPage: "teams" | "players"): void {
-  const ids = targetPage === "teams" ? [...selectedTeamIds] : [...selectedPlayerIds];
+  const ids = targetPage === "teams" ? [...teamsFeature.catalog.selectedIds] : [...selectedPlayerIds];
   workspaceState.patchModule(targetPage, { selected_object_ids: ids });
 }
 
@@ -776,12 +795,7 @@ function removeWorkspaceObjects(
     selected_object_ids: selectedIds,
   });
   if (targetPage === "teams") {
-    for (const id of removed) selectedTeamIds.delete(id);
-    if (selectedTeam && removed.has(selectedTeam.team.id)) {
-      selectedTeam = null;
-      selectedTeamLineupHistory = [];
-      selectedTeamLineupPresets = [];
-    }
+    teamsFeature.catalog.remove(removed);
   } else {
     for (const id of removed) selectedPlayerIds.delete(id);
     if (selectedPlayer && removed.has(selectedPlayer.player.id)) selectedPlayer = null;
@@ -810,7 +824,7 @@ async function openAvailableWorkspaceTab(
   ].filter((id, index, values): id is string => Boolean(id) && values.indexOf(id) === index);
   for (const candidate of candidates) {
     try {
-      if (targetPage === "teams") await openTeam(candidate);
+      if (targetPage === "teams") await teamsFeature.open(candidate);
       else await openPlayer(candidate);
       return;
     } catch (error) {
@@ -819,9 +833,7 @@ async function openAvailableWorkspaceTab(
     }
   }
   if (targetPage === "teams") {
-    selectedTeam = null;
-    selectedTeamLineupHistory = [];
-    selectedTeamLineupPresets = [];
+    teamsFeature.catalog.clearDetail();
   } else {
     selectedPlayer = null;
   }
@@ -830,7 +842,7 @@ async function openAvailableWorkspaceTab(
 
 async function activateWorkspaceTab(targetPage: "teams" | "players", objectId: string): Promise<void> {
   workspaceState.patchModule(targetPage, { active_tab_id: objectId });
-  if (targetPage === "teams") await openTeam(objectId);
+  if (targetPage === "teams") await teamsFeature.open(objectId);
   else await openPlayer(objectId);
 }
 
@@ -846,15 +858,15 @@ async function closeWorkspaceTab(targetPage: "teams" | "players", objectId: stri
 }
 
 async function openSelectedWorkspaceObjects(targetPage: "teams" | "players"): Promise<void> {
-  const ids = targetPage === "teams" ? [...selectedTeamIds] : [...selectedPlayerIds];
-  const items = targetPage === "teams" ? (teamListPage?.items ?? []) : (playerListPage?.items ?? []);
+  const ids = targetPage === "teams" ? [...teamsFeature.catalog.selectedIds] : [...selectedPlayerIds];
+  const items = targetPage === "teams" ? (teamsFeature.catalog.list?.items ?? []) : (playerListPage?.items ?? []);
   for (const id of ids.slice(-6)) {
     const item = items.find((candidate) => candidate.id === id);
     appendWorkspaceTab(targetPage, { id, label: item?.canonical_name ?? id });
   }
   const active = ids.at(-1);
   if (!active) return;
-  if (targetPage === "teams") await openTeam(active);
+  if (targetPage === "teams") await teamsFeature.open(active);
   else await openPlayer(active);
 }
 
@@ -884,9 +896,9 @@ function resetCurrentWorkspace(): void {
 function resetWorkspaceContents(): void {
   modal.reset();
   workspaceState.clear(navigation.page);
-  if (navigation.page === "teams") { selectedTeamIds.clear(); selectedTeam = null; selectedPlayer = null; selectedTeamLineupHistory = []; selectedTeamLineupPresets = []; teamCursorHistory = []; }
+  if (navigation.page === "teams") { teamsFeature.reset(); selectedPlayer = null; }
   if (navigation.page === "players") { selectedPlayerIds.clear(); selectedPlayer = null; playerCursorHistory = []; }
-  if (navigation.page === "lineup_presets") { selectedTeam = null; selectedTeamLineupPresets = []; selectedTeamLineupHistory = []; teamCursorHistory = []; }
+  if (navigation.page === "lineup_presets") { teamsFeature.reset(); }
   // Do not capture the discarded DOM back into the just-cleared workspace.
   renderedPage = null;
   render();
@@ -1525,18 +1537,6 @@ function currentPlayerLocalizedName(detail: PlayerDetail | null): string {
   return typeof records[0]?.name === "string" ? records[0].name.trim() : "";
 }
 
-function currentTeamLocalizedName(detail: TeamDetail | null): string {
-  if (!detail) return "";
-  const records = detail.names.filter((item) => isChineseName(item.language_code, item.name));
-  records.sort((left, right) => {
-    const languageRank = (language: string | null) => ["zh-cn", "zh-hans", "zh"].includes(language?.toLowerCase() ?? "") ? 1 : 0;
-    const byLanguage = languageRank(right.language_code) - languageRank(left.language_code);
-    if (byLanguage !== 0) return byLanguage;
-    return (right.valid_from ?? "").localeCompare(left.valid_from ?? "") || right.id.localeCompare(left.id);
-  });
-  return records[0]?.name.trim() ?? "";
-}
-
 function todayDate(): string {
   return new Date().toISOString().slice(0, 10);
 }
@@ -1663,33 +1663,6 @@ function refreshPlayerPageDom(): boolean {
     ".entity-page-players .player-table-wrap",
   )?.scrollTo({ top: 0, behavior: "auto" });
   return true;
-}
-
-function applyTeamCatalog(result: TeamCatalogLoadResult): void {
-  teamListPage = result.list;
-  teamQuery = result.query;
-  selectedTeam = result.selected;
-}
-
-async function loadTeamCatalog(resetCursor: boolean): Promise<void> {
-  if (!session.bootstrap?.data.database_configured) return;
-  const [catalog, coaches, formations] = await Promise.all([
-    fetchTeamCatalog(teamQuery, selectedTeam, resetCursor),
-    api.listCoaches({ search: null, active_only: false, limit: 500 }),
-    api.listFormations(false),
-  ]);
-  applyTeamCatalog(catalog);
-  if (selectedTeam) {
-    [selectedTeamLineupHistory, selectedTeamLineupPresets] = await Promise.all([
-      api.listTeamMatchLineups(selectedTeam.team.id, 100),
-      api.listTeamLineupPresets(selectedTeam.team.id, true),
-    ]);
-  } else {
-    selectedTeamLineupHistory = [];
-    selectedTeamLineupPresets = [];
-  }
-  coachList = coaches;
-  formationCatalog = formations;
 }
 
 function applyLineups(result: LineupsLoadResult): void {
@@ -2030,36 +2003,7 @@ async function loadNavigationPage(request: NavigationRequest): Promise<void> {
     );
     if (navigation.isCurrent(request)) applyPlayerCatalog(result);
   } else if (nextPage === "teams" || nextPage === "lineup_presets") {
-    const preferredPresetTeamId = nextPage === "lineup_presets"
-      ? selectedTeam?.team.id ?? workspaceState.module("lineup_presets").active_tab_id
-      : null;
-    const [catalog, coaches, formations] = await Promise.all([
-      fetchTeamCatalog(teamQuery, selectedTeam, teamListPage === null),
-      api.listCoaches({ search: null, active_only: false, limit: 500 }),
-      api.listFormations(true),
-    ]);
-    const restoredPresetTeam = preferredPresetTeamId
-      && catalog.list.items.some((item) => item.id === preferredPresetTeamId)
-      && catalog.selected?.team.id !== preferredPresetTeamId
-        ? await api.readTeam(preferredPresetTeamId)
-        : catalog.selected;
-    const result = { ...catalog, selected: restoredPresetTeam };
-    const [lineupHistory, presets] = result.selected
-      ? await Promise.all([
-          api.listTeamMatchLineups(result.selected.team.id, 100),
-          api.listTeamLineupPresets(result.selected.team.id, true),
-        ])
-      : [[], [] as TeamLineupPresetRecord[]];
-    if (navigation.isCurrent(request)) {
-      applyTeamCatalog(result);
-      coachList = coaches;
-      formationCatalog = formations;
-      selectedTeamLineupHistory = lineupHistory;
-      selectedTeamLineupPresets = presets;
-      if (nextPage === "lineup_presets" && result.selected) {
-        workspaceState.patchModule("lineup_presets", { active_tab_id: result.selected.team.id });
-      }
-    }
+    await teamsFeature.loadForRoute(nextPage, () => navigation.isCurrent(request));
   } else if (nextPage === "lineups") {
     const result = await fetchLineups();
     if (navigation.isCurrent(request)) applyLineups(result);
@@ -2102,7 +2046,7 @@ async function loadNavigationPage(request: NavigationRequest): Promise<void> {
 async function refreshBootstrapAndCatalog(): Promise<void> {
   await session.refresh();
   await loadPlayerCatalog(true);
-  if (teamListPage !== null || navigation.page === "teams" || navigation.page === "lineup_presets") await loadTeamCatalog(true);
+  if (teamsFeature.catalog.list !== null || navigation.page === "teams" || navigation.page === "lineup_presets") await teamsFeature.load(true);
 }
 
 async function searchTeamOptions(): Promise<void> {
@@ -2216,464 +2160,38 @@ async function openPlayerProfile(playerId: string): Promise<void> {
 }
 
 async function previewPlayerFromTeam(playerId: string): Promise<void> {
-  selectedPlayer = await runBusy(() => api.readPlayer(playerId));
-  workspaceState.patchModule("teams", { inspector_collapsed: false });
-  render();
-}
-
-async function searchTeams(returnToDirectory = false): Promise<void> {
-  teamCursorHistory = [];
-  teamQuery = {
-    ...teamQuery,
-    search: nullableValue("team-search"),
-    country_code: nullableValue("team-filter-country"),
-    team_type: nullableValue("team-filter-type") as TeamListQuery["team_type"],
-    active_only: checked("team-filter-active"),
-    cursor_name: null,
-    cursor_id: null,
-  };
-  persistTeamQuery();
-  await runBusy(() => loadTeamCatalog(false));
-  if (
-    returnToDirectory
-    || (selectedTeam && !teamListPage?.items.some((item) => item.id === selectedTeam?.team.id))
-  ) {
-    selectedTeam = null;
-    selectedTeamLineupHistory = [];
-    selectedTeamLineupPresets = [];
-    selectedPlayer = null;
-    workspaceState.patchModule("teams", {
-      active_tab_id: null,
-      active_section: "directory",
-    });
-  }
-  render({ preserveForm: true });
-}
-
-async function clearTeamFilters(returnToDirectory = false): Promise<void> {
-  teamCursorHistory = [];
-  teamQuery = {
-    ...teamQuery,
-    search: null,
-    country_code: null,
-    team_type: null,
-    active_only: true,
-    cursor_name: null,
-    cursor_id: null,
-  };
-  persistTeamQuery();
-  await runBusy(() => loadTeamCatalog(false));
-  if (returnToDirectory) {
-    selectedTeam = null;
-    selectedTeamLineupHistory = [];
-    selectedTeamLineupPresets = [];
-    selectedPlayer = null;
-    workspaceState.patchModule("teams", {
-      active_tab_id: null,
-      active_section: "directory",
-    });
-  }
-  render({ preserveForm: true });
-}
-
-async function nextTeamPage(): Promise<void> {
-  if (!teamListPage?.has_more || !teamListPage.next_cursor_name || !teamListPage.next_cursor_id) return;
-  teamCursorHistory.push({ cursor_name: teamQuery.cursor_name, cursor_id: teamQuery.cursor_id });
-  teamQuery = { ...teamQuery, cursor_name: teamListPage.next_cursor_name, cursor_id: teamListPage.next_cursor_id };
-  await runBusy(() => loadTeamCatalog(false));
-  render();
-}
-
-async function previousTeamPage(): Promise<void> {
-  const previous = teamCursorHistory.pop();
-  if (!previous) return;
-  teamQuery = { ...teamQuery, ...previous };
-  await runBusy(() => loadTeamCatalog(false));
-  render();
-}
-
-async function openTeam(teamId: string): Promise<void> {
-  const [detail, lineupHistory, presets] = await runBusy(() =>
-    Promise.all([
-      api.readTeam(teamId),
-      api.listTeamMatchLineups(teamId, 100),
-      api.listTeamLineupPresets(teamId, true),
-    ]),
-  );
-  selectedTeam = detail;
-  selectedPlayer = null;
-  selectedTeamLineupHistory = lineupHistory;
-  selectedTeamLineupPresets = presets;
-  appendWorkspaceTab("teams", { id: teamId, label: detail.team.canonical_name });
-  workspaceState.patchModule("teams", { active_section: "directory" });
-  render();
-}
-
-async function selectLineupPresetTeam(teamId: string): Promise<void> {
-  const [detail, presets] = await runBusy(() =>
-    Promise.all([
-      api.readTeam(teamId),
-      api.listTeamLineupPresets(teamId, true),
-    ]),
-  );
-  selectedTeam = detail;
-  selectedPlayer = null;
-  selectedTeamLineupPresets = presets;
-  selectedTeamLineupHistory = [];
-  workspaceState.patchModule("lineup_presets", { active_tab_id: teamId });
-  render({ preserveForm: true });
+  const source = await teamsFeature.readPlayerFromTeam(playerId); if (!source || !source.current()) return;
+  selectedPlayer = source.player; workspaceState.patchModule("teams", { inspector_collapsed: false }); render({ preserveForm: true });
 }
 
 async function refreshLineupPresetPage(): Promise<void> {
-  await runBusy(() => loadTeamCatalog(false));
-  if (selectedTeam) workspaceState.patchModule("lineup_presets", { active_tab_id: selectedTeam.team.id });
+  await runBusy(() => teamsFeature.load(false));
+  if (teamsFeature.catalog.detail) workspaceState.patchModule("lineup_presets", { active_tab_id: teamsFeature.catalog.detail.team.id });
   render({ preserveForm: true });
-}
-
-async function openTeamProfile(teamId: string): Promise<void> {
-  const [detail, lineupHistory, presets] = await runBusy(() =>
-    Promise.all([
-      api.readTeam(teamId),
-      api.listTeamMatchLineups(teamId, 100),
-      api.listTeamLineupPresets(teamId, true),
-    ]),
-  );
-  selectedTeam = detail;
-  selectedPlayer = null;
-  selectedTeamLineupHistory = lineupHistory;
-  selectedTeamLineupPresets = presets;
-  appendWorkspaceTab("teams", { id: teamId, label: detail.team.canonical_name });
-  workspaceState.patchModule("teams", { active_section: "profile", inspector_collapsed: true });
-  render();
-}
-
-async function reloadSelectedTeam(): Promise<void> {
-  if (!selectedTeam) return;
-  const teamId = selectedTeam.team.id;
-  [selectedTeam, selectedTeamLineupHistory, selectedTeamLineupPresets, teamListPage] = await Promise.all([
-    api.readTeam(teamId),
-    api.listTeamMatchLineups(teamId, 100),
-    api.listTeamLineupPresets(teamId, true),
-    api.listTeams(teamQuery),
-  ]);
-}
-
-async function exportTeamPackageTemplate(): Promise<void> {
-  const outputPath = await api.chooseExcelExportFile("球队完整资料包.xlsx");
-  if (!outputPath) return;
-  const result = await runBusy(() => api.exportTeamPackageTemplate(outputPath));
-  toast(`标准资料包已导出：${result.output_path}`, "success");
-}
-
-async function previewTeamPackageImport(): Promise<void> {
-  const inputPath = await api.chooseExcelImportFile();
-  if (!inputPath) return;
-  const mode = value("team-package-import-mode") as SpreadsheetImportMode;
-  teamPackagePreview = await runBusy(() =>
-    api.previewTeamPackageImport(inputPath, mode),
-  );
-  render();
-  const teamCounts = teamPackagePreview.team_preview?.counts;
-  const playerCounts = teamPackagePreview.player_preview?.counts;
-  const blocking =
-    (teamCounts?.conflict ?? 0) +
-    (teamCounts?.error ?? 0) +
-    (playerCounts?.conflict ?? 0) +
-    (playerCounts?.error ?? 0) +
-    teamPackagePreview.coverage.blockers.length;
-  toast(
-    blocking > 0
-      ? `统一预检完成：仍有 ${blocking} 项需要处理`
-      : `统一预检通过，P4 就绪度 ${teamPackagePreview.coverage.readiness_score}/100`,
-    blocking > 0 ? "error" : "success",
-  );
-}
-
-function teamPackagePreviewExportName(sourceFileName: string): string {
-  const base = sourceFileName.replace(/\.xlsx$/i, "").trim() || "球队完整资料包";
-  const safe = base.replace(/[<>:\"/\\|?*\u0000-\u001f]+/g, "_");
-  return `${safe}-完整预检.json`;
-}
-
-async function exportTeamPackagePreviewJson(): Promise<void> {
-  if (!teamPackagePreview) throw new Error("没有可导出的球队完整资料包预检结果");
-  const outputPath = await api.chooseJsonExportFile(
-    teamPackagePreviewExportName(teamPackagePreview.source_file_name),
-  );
-  if (!outputPath) return;
-  const result = await runBusy(() =>
-    api.exportTeamPackagePreviewJson(outputPath, teamPackagePreview!),
-  );
-  toast(
-    `完整预检 JSON 已导出：${result.output_path}（${result.exported_row_count} 条记录）`,
-    "success",
-  );
-}
-
-async function resolveTeamPackageConflict(
-  scope: "team" | "player",
-  rowId: string,
-  selectedEntityId: string | null,
-  skip: boolean,
-): Promise<void> {
-  if (!teamPackagePreview) throw new Error("没有可处理的球队完整资料包预检结果");
-  if (scope === "team") {
-    const batchId = teamPackagePreview.team_preview?.batch_id;
-    if (!batchId) throw new Error("资料包中没有球队链预检批次");
-    teamPackagePreview.team_preview = await runBusy(() =>
-      api.resolveTeamMonthlyImportConflict(batchId, {
-        row_id: rowId,
-        selected_entity_id: selectedEntityId,
-        skip,
-      }),
-    );
-  } else {
-    const batchId = teamPackagePreview.player_preview?.batch_id;
-    if (!batchId) throw new Error("资料包中没有球员链预检批次");
-    teamPackagePreview.player_preview = await runBusy(() =>
-      api.resolvePlayerCatalogImportConflict(batchId, {
-        row_id: rowId,
-        selected_entity_id: selectedEntityId,
-        skip,
-      }),
-    );
-  }
-  render();
-  toast(skip ? "该行已标记跳过" : "冲突关联已确认", "success");
-}
-
-async function commitTeamPackageImport(): Promise<void> {
-  if (!teamPackagePreview) throw new Error("没有可提交的球队完整资料包预检结果");
-  const result = await runBusy(() =>
-    api.commitTeamPackageImport({
-      team_batch_id: teamPackagePreview?.team_preview?.batch_id ?? null,
-      player_batch_id: teamPackagePreview?.player_preview?.batch_id ?? null,
-    }),
-  );
-  teamPackagePreview = null;
-  await refreshBootstrapAndCatalog();
-  render();
-  toast(
-    `完整资料包导入完成：新增 ${result.inserted_count}，更新 ${result.updated_count}，结束旧记录 ${result.ended_previous_count}`,
-    result.error_count > 0 ? "error" : "success",
-  );
-}
-
-async function exportTeamTemplate(): Promise<void> {
-  const outputPath = await api.chooseExcelExportFile("球队月度更新模板.xlsx");
-  if (!outputPath) return;
-  const result = await runBusy(() => api.exportTeamMonthlyTemplate(outputPath));
-  toast(`模板已导出：${result.output_path}`, "success");
-}
-
-async function exportTeamData(): Promise<void> {
-  const outputPath = await api.chooseExcelExportFile("球队月度更新.xlsx");
-  if (!outputPath) return;
-  const result = await runBusy(() => api.exportTeamMonthlyData(outputPath));
-  toast(`已导出 ${result.team_count} 支球队，关联 ${result.related_row_count} 行`, "success");
-}
-
-async function previewTeamImport(): Promise<void> {
-  const inputPath = await api.chooseExcelImportFile();
-  if (!inputPath) return;
-  const mode = value("team-spreadsheet-import-mode") as SpreadsheetImportMode;
-  teamSpreadsheetPreview = await runBusy(() =>
-    api.previewTeamMonthlyImport(inputPath, mode),
-  );
-  render();
-  const blocking =
-    teamSpreadsheetPreview.counts.conflict + teamSpreadsheetPreview.counts.error;
-  toast(
-    blocking > 0
-      ? `预检完成：发现 ${blocking} 条需要处理`
-      : "球队月度工作簿预检通过",
-    blocking > 0 ? "error" : "success",
-  );
-}
-
-async function resolveTeamImportConflict(
-  rowId: string,
-  selectedEntityId: string | null,
-  skip: boolean,
-): Promise<void> {
-  if (!teamSpreadsheetPreview) throw new Error("没有可处理的球队工作簿预检结果");
-  teamSpreadsheetPreview = await runBusy(() =>
-    api.resolveTeamMonthlyImportConflict(teamSpreadsheetPreview!.batch_id, {
-      row_id: rowId,
-      selected_entity_id: selectedEntityId,
-      skip,
-    }),
-  );
-  render();
-  toast(skip ? "该行已标记跳过" : "冲突关联已确认", "success");
-}
-
-async function commitTeamImport(): Promise<void> {
-  if (!teamSpreadsheetPreview) throw new Error("没有可提交的球队工作簿预检结果");
-  const result = await runBusy(() =>
-    api.commitTeamMonthlyImport(teamSpreadsheetPreview!.batch_id),
-  );
-  teamSpreadsheetPreview = await api.readTeamMonthlyImportPreview(result.batch_id);
-  await refreshBootstrapAndCatalog();
-  render();
-  toast(
-    `导入完成：新增 ${result.inserted_count}，更新 ${result.updated_count}，结束旧记录 ${result.ended_previous_count}`,
-    "success",
-  );
-}
-
-async function updateTeam(teamId: string): Promise<void> {
-  const localizedName = value("team-localized-name").trim();
-  const previousLocalizedName = currentTeamLocalizedName(selectedTeam);
-  await runBusy(async () => {
-    await api.updateTeam(teamId, {
-      canonical_name: value("team-canonical-name").trim(),
-      country_code: nullableValue("team-country-code"),
-      metadata: { entry_mode: "manual_team_center" },
-    });
-    if (localizedName && localizedName !== previousLocalizedName) {
-      await api.addTeamName({
-        team_id: teamId,
-        name: localizedName,
-        language_code: "zh-CN",
-        valid_from: todayDate(),
-        valid_to: null,
-      });
-    }
-    await reloadSelectedTeam();
-    playerReferences = await api.playerCatalogReferenceData();
-  });
-  workspaceState.patchModule("teams", { active_section: "profile" });
-  render();
-  toast("球队基础身份已更新并重新载入", "success");
-}
-
-async function addTeamName(teamId: string): Promise<void> {
-  const name = value("team-alias-name").trim();
-  const languageCode = nullableValue("team-alias-language");
-  if (!name) throw new Error("请输入需要保存的球队名称");
-  if (!languageCode) throw new Error("请选择名称语言");
-  await runBusy(async () => {
-    await api.addTeamName({
-      team_id: teamId,
-      name,
-      language_code: languageCode,
-      valid_from: todayDate(),
-      valid_to: null,
-    });
-    await reloadSelectedTeam();
-  });
-  workspaceState.patchModule("teams", { active_section: "profile" });
-  render();
-  toast("球队名称已保存并持续显示", "success");
-}
-
-async function saveTeamProfile(teamId: string): Promise<void> {
-  const draft: TeamProfileDraft = {
-    short_name: nullableValue("team-short-name"),
-    team_type: value("team-profile-type") as TeamProfileDraft["team_type"],
-    founded_year: nullableNumber("team-founded-year"),
-    city: nullableValue("team-city"),
-    stadium: nullableValue("team-stadium"),
-    head_coach: selectedTeam?.profile?.head_coach ?? null,
-    default_formation: nullableValue("team-default-formation"),
-    tactical_style: value(
-      "team-tactical-style",
-    ) as TeamProfileDraft["tactical_style"],
-    attack_rating: nullableNumber("team-attack-rating"),
-    midfield_rating: nullableNumber("team-midfield-rating"),
-    defence_rating: nullableNumber("team-defence-rating"),
-    goalkeeper_rating: nullableNumber("team-goalkeeper-rating"),
-    reputation: nullableNumber("team-reputation"),
-    data_confidence: Number(value("team-profile-confidence")),
-    notes: nullableValue("team-profile-notes"),
-    metadata: {
-      source: "manual_team_center",
-      organization_model: "identity_roster_tactics_ratings_history",
-    },
-  };
-  await runBusy(async () => {
-    await api.upsertTeamProfile(teamId, draft);
-    await reloadSelectedTeam();
-  });
-  render();
-  toast("球队档案与战术资料已保存", "success");
-}
-
-async function saveFormationUsage(teamId: string): Promise<void> {
-  const scopeType = value("formation-scope-type") as FormationUsageDistributionDraft["scope_type"];
-  const coachId = nullableValue("formation-coach-id");
-  if (scopeType === "team_coach" && !coachId) throw new Error("球队 + 教练作用域必须选择教练");
-  const entries = Array.from(document.querySelectorAll<HTMLInputElement>(".formation-usage-count"))
-    .map((input) => ({ formation_id: input.dataset.formationId ?? "", usage_count: Number(input.value || 0) }))
-    .filter((entry) => entry.formation_id && entry.usage_count > 0);
-  const draft: FormationUsageDistributionDraft = {
-    scope_type: scopeType,
-    team_id: teamId,
-    coach_id: scopeType === "team_coach" ? coachId : null,
-    competition_id: null,
-    window_preset: value("formation-window-preset") as FormationUsageDistributionDraft["window_preset"],
-    window_start: nullableValue("formation-window-start"),
-    window_end: nullableValue("formation-window-end"),
-    observed_matches: Number(value("formation-observed-matches")),
-    confidence: Number(value("formation-confidence")),
-    alpha: Number(value("formation-alpha")),
-    source_document_id: null,
-    metadata: { source: "manual_team_center" },
-    entries,
-  };
-  await runBusy(async () => {
-    await api.saveFormationUsageDistribution(draft);
-    await reloadSelectedTeam();
-  });
-  render();
-  toast("阵型观察已保存并归一化", "success");
-}
-
-function bulkArchiveSummary(
-  result: BulkArchiveResult,
-  entityLabel: string,
-): string {
-  const failed = result.failed.length
-    ? `<ul>${result.failed.map((item) => `<li><strong>${escapeHtml(item.label)}</strong>：${escapeHtml(item.reason)}</li>`).join("")}</ul>`
-    : "<p>没有归档失败的记录。</p>";
-  return `<div class="route-detail"><div class="route-detail-summary"><span>批量归档结果</span><h3>新归档 ${result.archived_ids.length}，已归档 ${result.already_archived_ids.length} / ${result.requested_count} ${entityLabel}</h3><p>归档只改变活动状态，不删除履历、比赛、阵容、观察或审计记录。</p></div><section class="prediction-detail-section"><h3>失败记录</h3>${failed}</section></div>`;
 }
 
 async function bulkArchiveEntities(
   entityType: "team" | "player",
 ): Promise<void> {
-  const ids = Array.from(
-    entityType === "team" ? selectedTeamIds : selectedPlayerIds,
-  );
+  if (entityType === "team") { await teamsFeature.archive(); return; }
+  const ids = Array.from(selectedPlayerIds);
   if (ids.length === 0) throw new Error("请先选择要归档的对象");
   const result = await runBusy(() =>
     api.bulkArchiveEntities(entityType, ids),
   );
   const removedIds = [...result.archived_ids, ...result.already_archived_ids];
-  const activeId = removeWorkspaceObjects(entityType === "team" ? "teams" : "players", removedIds);
+  const activeId = removeWorkspaceObjects("players", removedIds);
   await session.refresh();
-  if (entityType === "team") await loadTeamCatalog(true);
-  else await loadPlayerCatalog(true);
+  await loadPlayerCatalog(true);
   playerReferences = await api.playerCatalogReferenceData();
-  persistWorkspaceSelection(entityType === "team" ? "teams" : "players");
-  if (activeId) await openAvailableWorkspaceTab(entityType === "team" ? "teams" : "players", activeId);
+  persistWorkspaceSelection("players");
+  if (activeId) await openAvailableWorkspaceTab("players", activeId);
   else render();
   showHtmlModal(
-    entityType === "team" ? "球队批量归档结果" : "球员批量归档结果",
+    "球员批量归档结果",
     "保留历史关系",
-    bulkArchiveSummary(result, entityType === "team" ? "支球队" : "名球员"),
+    bulkArchiveSummary(result, "名球员"),
   );
-}
-
-function bulkDeleteSummary(
-  result: BulkDeleteResult,
-  entityLabel: string,
-): string {
-  const blocked = result.blocked.length
-    ? `<ul>${result.blocked.map((item) => `<li><strong>${escapeHtml(item.label)}</strong>：${escapeHtml(item.reason)}</li>`).join("")}</ul>`
-    : "<p>没有被拦截的记录。</p>";
-  return `<div class="route-detail"><div class="route-detail-summary"><span>批量删除结果</span><h3>已删除 ${result.deleted_ids.length} / ${result.requested_count} ${entityLabel}</h3><p>未删除的记录会保留原数据，不会出现半删除关联。</p></div><section class="prediction-detail-section"><h3>拦截记录</h3>${blocked}</section></div>`;
 }
 
 function requestBulkDeletePlayers(): void {
@@ -2703,218 +2221,9 @@ function requestBulkDeletePlayers(): void {
   );
 }
 
-const TEAM_REFERENCE_LABELS: Record<string, string> = {
-  matches: "比赛",
-  lineups: "正式阵容",
-  team_lineup_presets: "球队阵容预设",
-  player_team_periods: "球员效力履历",
-  team_coach_periods: "教练任期",
-  team_season_memberships: "赛季注册",
-  player_availability: "球员可用性",
-  formation_usage: "阵型使用观察",
-  team_tactical_observations: "球队战术观察",
-  team_ability_observations: "球队能力观察",
-  substitutions: "换人记录",
-  dynamic_tag_opponents: "对手动态标签",
-  team_match_reviews: "球队赛后复盘",
-  player_match_reviews: "球员赛后复盘",
-  player_match_observations: "球员赛后观察",
-};
-
-function teamDeletionCheckSummary(checks: EntityDeletionCheck[]): string {
-  if (checks.length === 0) return "<p>没有需要说明的受保护球队。</p>";
-  return `<ul>${checks.map((check) => {
-    const references = check.references
-      .filter((item) => item.count > 0)
-      .map((item) => `${TEAM_REFERENCE_LABELS[item.relation] ?? item.relation} ${item.count}`)
-      .join("、");
-    const detail = references || check.reason;
-    return `<li><strong>${escapeHtml(check.label)}</strong>：${escapeHtml(detail)}</li>`;
-  }).join("")}</ul>`;
-}
-
-async function requestBulkDeleteTeams(): Promise<void> {
-  const ids = Array.from(selectedTeamIds);
-  if (ids.length === 0) throw new Error("请先选择球队");
-
-  const checks = await runBusy(() =>
-    Promise.all(ids.map((id) => api.checkEntityDeletion("team", id))),
-  );
-  const missingIds = checks
-    .filter((check) => !check.exists)
-    .map((check) => check.entity_id);
-  const deletableIds = checks
-    .filter((check) => check.exists && check.can_permanently_delete)
-    .map((check) => check.entity_id);
-  const protectedChecks = checks.filter(
-    (check) => check.exists && !check.can_permanently_delete,
-  );
-
-  let activeId = removeWorkspaceObjects("teams", missingIds);
-  if (missingIds.length > 0) {
-    await session.refresh();
-    await loadTeamCatalog(true);
-    playerReferences = await api.playerCatalogReferenceData();
-    persistWorkspaceSelection("teams");
-    if (activeId) await openAvailableWorkspaceTab("teams", activeId);
-    else render();
-  }
-
-  if (deletableIds.length === 0) {
-    const missingNotice = missingIds.length
-      ? `<p>另有 ${missingIds.length} 个对象已不存在，已从标签页和选择中清除。</p>`
-      : "";
-    showHtmlModal(
-      "所选球队不能永久删除",
-      "请使用归档",
-      `<div class="route-detail"><div class="route-detail-summary"><span>永久删除预检</span><h3>没有可永久删除的球队</h3><p>完整资料包导入后形成的球员效力、教练任期、阵型与评分观察都属于历史或业务引用。为保证 P4 输入可追溯，这些球队只能归档，不能连同关系记录一起删除。</p>${missingNotice}</div><section class="prediction-detail-section"><h3>引用明细</h3>${teamDeletionCheckSummary(protectedChecks)}</section></div>`,
-    );
-    return;
-  }
-
-  showConfirmation(
-    "永久删除无引用球队",
-    "只会删除没有任何业务或历史引用的空球队。存在球员履历、教练任期、阵型、评分观察、比赛或复盘的球队会被保留；不再级联删除这些资料。",
-    [
-      ["原选择", `${ids.length} 支球队`],
-      ["可永久删除", `${deletableIds.length} 支球队`],
-      ["受保护", `${protectedChecks.length} 支球队，请使用归档`],
-    ],
-    "确认永久删除无引用球队",
-    async () => {
-      const result = await runBusy(() => api.bulkDeleteTeams(deletableIds));
-      activeId = removeWorkspaceObjects("teams", result.deleted_ids);
-      await session.refresh();
-      await loadTeamCatalog(true);
-      playerReferences = await api.playerCatalogReferenceData();
-      persistWorkspaceSelection("teams");
-      if (activeId) await openAvailableWorkspaceTab("teams", activeId);
-      else render();
-      const combinedResult: BulkDeleteResult = {
-        requested_count: ids.length,
-        deleted_ids: result.deleted_ids,
-        blocked: [
-          ...protectedChecks.map((check) => ({
-            id: check.entity_id,
-            label: check.label,
-            reason: check.reason,
-          })),
-          ...result.blocked,
-        ],
-      };
-      showHtmlModal(
-        "球队永久删除结果",
-        combinedResult.blocked.length ? "受引用球队已保留" : "删除完成",
-        bulkDeleteSummary(combinedResult, "支球队"),
-      );
-    },
-  );
-}
-
-
-const TEAM_FORCE_DELETE_LABELS: Record<string, string> = {
-  teams: "球队主体",
-  matches: "相关比赛",
-  players: "关联球员主体",
-  coaches: "关联教练主体",
-  feature_snapshots: "P4 输入快照",
-  model_runs: "模型运行",
-  research_runs: "研究运行",
-  p4_freeze_tasks: "P4 冻结任务",
-  postmatch_settlements: "赛后结算",
-  match_reviews: "比赛复盘",
-  ability_update_candidates: "能力更新候选",
-  import_batches: "导入批次",
-  team_lineup_presets: "球队阵容预设",
-  team_lineup_preset_members: "阵容预设成员",
-  player_team_periods: "球员效力关系",
-  player_ability_observations: "球员能力观察",
-  player_dynamic_tags: "球员动态评分/标签",
-  formation_usage_observations: "阵型使用记录",
-  team_tactical_observations: "球队战术观察",
-  team_ability_observations: "球队能力观察",
-};
-
-function forceDeleteReferenceRows(preview: TeamForceDeletePreview): string {
-  if (preview.references.length === 0) return "<p>未发现额外关联记录。</p>";
-  return `<div class="force-delete-impact-grid">${preview.references
-    .map(
-      (item) =>
-        `<div><span>${escapeHtml(TEAM_FORCE_DELETE_LABELS[item.relation] ?? item.relation)}</span><strong>${item.count}</strong></div>`,
-    )
-    .join("")}</div>`;
-}
-
-async function requestForceDeleteTeam(teamId: string): Promise<void> {
-  if (!teamId) throw new Error("缺少球队 ID");
-  const preview = await runBusy(() => api.previewForceDeleteTeam(teamId));
-  pendingTeamForceDelete = preview;
-  showHtmlModal(
-    `强制删除：${preview.label}`,
-    "最高危险等级",
-    `<div class="force-delete-warning">
-      <strong>这不是归档，也不是普通删除。</strong>
-      <p>${escapeHtml(preview.warning)}</p>
-      <p>删除成功后，可使用相同球队代码和新版 Excel 重新导入，不会继续读取本次清除的球队、球员、教练、评分、阵型、比赛或 P4 记录。</p>
-    </div>
-    <section class="prediction-detail-section"><h3>预计清除范围 · ${preview.total_rows} 条</h3>${forceDeleteReferenceRows(preview)}</section>
-    <label class="field force-delete-confirmation"><span>请输入完整球队名称确认</span><input id="force-delete-team-confirmation" autocomplete="off" placeholder="${escapeHtml(preview.confirmation_text)}"><small>必须完全输入：${escapeHtml(preview.confirmation_text)}</small></label>`,
-    `<button type="button" class="secondary" data-action="close-workspace-detail">取消</button><button type="button" class="primary danger-action" data-action="confirm-force-delete-team">确认强制删除全部资料</button>`,
-  );
-  document.querySelector<HTMLInputElement>("#force-delete-team-confirmation")?.focus();
-}
-
-function forceDeleteResultSummary(result: TeamForceDeleteResult): string {
-  const counts = Object.entries(result.deleted_counts)
-    .filter(([, count]) => count > 0)
-    .map(
-      ([key, count]) =>
-        `<div><span>${escapeHtml(TEAM_FORCE_DELETE_LABELS[key] ?? key)}</span><strong>${count}</strong></div>`,
-    )
-    .join("");
-  return `<div class="route-detail"><div class="route-detail-summary"><span>强制清除完成</span><h3>${escapeHtml(result.label)} 已从当前数据库中移除</h3><p>相关球队、球员、教练、比赛、评分、动态状态、导入批次及直接关联的 P4 历史已在同一事务内清除。</p></div><section class="prediction-detail-section"><h3>清除结果</h3><div class="force-delete-impact-grid">${counts || "<p>没有额外记录。</p>"}</div></section></div>`;
-}
-
-async function confirmForceDeleteTeam(): Promise<void> {
-  const preview = pendingTeamForceDelete;
-  if (!preview) throw new Error("强制删除预检已失效，请重新打开");
-  const confirmation = value("force-delete-team-confirmation").trim();
-  if (confirmation !== preview.confirmation_text) {
-    throw new Error(`确认文字不匹配，请完整输入：${preview.confirmation_text}`);
-  }
-
-  const result = await runBusy(() =>
-    api.forceDeleteTeam({
-      team_id: preview.team_id,
-      confirmation_text: confirmation,
-    }),
-  );
-  pendingTeamForceDelete = null;
-  closeModal();
-
-  const nextTeamId = removeWorkspaceObjects("teams", [result.team_id]);
-  const nextPlayerId = removeWorkspaceObjects("players", result.deleted_player_ids);
-  teamPackagePreview = null;
-  teamSpreadsheetPreview = null;
-  spreadsheetPreview = null;
-  matchSpreadsheetPreview = null;
-  await session.refresh();
-  await Promise.all([loadTeamCatalog(true), loadPlayerCatalog(true)]);
-  playerReferences = await api.playerCatalogReferenceData();
-  persistWorkspaceSelection("teams");
-  persistWorkspaceSelection("players");
-
-  if (navigation.page === "teams" && nextTeamId) await openAvailableWorkspaceTab("teams", nextTeamId);
-  else if (navigation.page === "players" && nextPlayerId) await openAvailableWorkspaceTab("players", nextPlayerId);
-  else render();
-
-  showHtmlModal("球队及全部资料已强制删除", "事务已提交", forceDeleteResultSummary(result));
-}
-
 async function openPlayerFromTeam(playerId: string): Promise<void> {
-  if (!selectedTeam) throw new Error("请先选择球队，再从阵容进入球员档案");
-  const teamId = selectedTeam.team.id;
-  const teamName = selectedTeam.team.canonical_name;
+  const source = await teamsFeature.readPlayerFromTeam(playerId); if (!source || !source.current()) return;
+  const teamId = source.teamId, teamName = source.teamName;
   playerCursorHistory = [];
   playerQuery = {
     search: null,
@@ -2939,15 +2248,14 @@ async function openPlayerFromTeam(playerId: string): Promise<void> {
   });
   playerQuery.player_status = null;
   persistPlayerQuery();
-  selectedPlayer = await runBusy(() => api.readPlayer(playerId));
+  selectedPlayer = source.player;
   workspaceState.patchModule("players", { active_section: "directory", inspector_collapsed: false });
   await navigateTo("players");
 }
 
 async function openPlayerProfileFromTeam(playerId: string): Promise<void> {
-  if (!selectedTeam) throw new Error("请先选择球队，再打开球员完整档案");
-  const teamId = selectedTeam.team.id;
-  const teamName = selectedTeam.team.canonical_name;
+  const source = await teamsFeature.readPlayerFromTeam(playerId); if (!source || !source.current()) return;
+  const teamId = source.teamId, teamName = source.teamName;
   playerCursorHistory = [];
   playerQuery = {
     search: null,
@@ -2971,7 +2279,7 @@ async function openPlayerProfileFromTeam(playerId: string): Promise<void> {
     updated_at: now,
   });
   persistPlayerQuery();
-  selectedPlayer = await runBusy(() => api.readPlayer(playerId));
+  selectedPlayer = source.player;
   appendWorkspaceTab("players", { id: playerId, label: selectedPlayer.player.canonical_name });
   workspaceState.patchModule("players", { active_section: "profile", inspector_collapsed: true });
   await navigateTo("players");
@@ -2980,25 +2288,8 @@ async function openPlayerProfileFromTeam(playerId: string): Promise<void> {
 
 async function returnToSourceTeamProfile(teamId: string): Promise<void> {
   const sourceTeamId = teamId || playerNavigationContext?.team_id;
-  if (!sourceTeamId) {
-    workspaceState.patchModule("players", { active_section: "directory", inspector_collapsed: false });
-    render();
-    return;
-  }
-  const [detail, lineupHistory, presets] = await runBusy(() =>
-    Promise.all([
-      api.readTeam(sourceTeamId),
-      api.listTeamMatchLineups(sourceTeamId, 100),
-      api.listTeamLineupPresets(sourceTeamId, true),
-    ]),
-  );
-  selectedTeam = detail;
-  selectedPlayer = null;
-  selectedTeamLineupHistory = lineupHistory;
-  selectedTeamLineupPresets = presets;
-  appendWorkspaceTab("teams", { id: sourceTeamId, label: detail.team.canonical_name });
-  workspaceState.patchModule("teams", { active_section: "profile", inspector_collapsed: true });
-  await navigateTo("teams");
+  if (!sourceTeamId) { workspaceState.patchModule("players", { active_section: "directory", inspector_collapsed: false }); render(); return; }
+  await teamsFeature.open(sourceTeamId, "profile", true);
 }
 
 async function openPlayerFromLineup(
@@ -3044,11 +2335,14 @@ async function returnToLineupWorkspace(section: "builder" | "chain"): Promise<vo
 }
 
 async function openTeamApiWorkspace(teamId: string | null): Promise<void> {
+  const current = teamsFeature.catalog.capture(), originPage = navigation.page;
   const team = teamId
-    ? selectedTeam?.team.id === teamId
-      ? selectedTeam
+    ? teamsFeature.catalog.detail?.team.id === teamId
+      ? teamsFeature.catalog.detail
       : await api.readTeam(teamId)
     : null;
+  if (!current() || navigation.page !== originPage) return;
+  if (team && teamId && team.team.id !== teamId) throw new Error("球队来源身份不匹配");
   selectedApiWorkspacePresetKey = "team_profile_completion";
   selectedApiWorkspaceMatchId = null;
   selectedApiWorkspaceContextEntityType = team ? "team" : null;
@@ -3082,71 +2376,6 @@ async function reloadSelectedPlayer(): Promise<void> {
   if (!selectedPlayer) return;
   selectedPlayer = await api.readPlayer(selectedPlayer.player.id);
   playerListPage = await api.listPlayers(playerQuery);
-}
-
-async function createTeam(): Promise<void> {
-  const draft: TeamDraft = {
-    canonical_name: value("new-team-name").trim(),
-    country_code: nullableValue("new-team-country"),
-    metadata: {},
-  };
-  await runBusy(async () => {
-    await api.createTeam(draft);
-    await refreshBootstrapAndCatalog();
-  });
-  render();
-  toast("球队已创建", "success");
-}
-
-async function createCoach(): Promise<void> {
-  const canonicalName = value("new-coach-name").trim();
-  if (!canonicalName) throw new Error("请输入教练正式姓名");
-  const draft: CoachDraft = {
-    canonical_name: canonicalName,
-    nationality_code: nullableValue("new-coach-nationality"),
-    status: "active",
-    metadata: { entry_mode: "manual_team_center" },
-  };
-  const created = await runBusy(() => api.createCoach(draft));
-  coachList = await api.listCoaches({
-    search: null,
-    active_only: false,
-    limit: 500,
-  });
-  render();
-  toast(`教练“${created.canonical_name}”已创建`, "success");
-}
-
-async function addTeamCoachPeriod(teamId: string): Promise<void> {
-  const coachId = nullableValue("team-coach-id");
-  const validFrom = nullableValue("team-coach-valid-from");
-  if (!coachId) throw new Error("请选择教练");
-  if (!validFrom) throw new Error("请选择任期开始日期");
-  const role = value("team-coach-role") as TeamCoachPeriodDraft["role"];
-  const draft: TeamCoachPeriodDraft = {
-    team_id: teamId,
-    coach_id: coachId,
-    role,
-    valid_from: validFrom,
-    valid_to: nullableValue("team-coach-valid-to"),
-    is_interim: checked("team-coach-interim") ||
-      role === "interim_head_coach" || role === "caretaker",
-    confidence: Number(value("team-coach-confidence")),
-    source_document_id: null,
-    end_previous: checked("team-coach-end-previous"),
-    metadata: { entry_mode: "manual_team_center" },
-  };
-  await runBusy(async () => {
-    await api.addTeamCoachPeriod(draft);
-    await reloadSelectedTeam();
-    coachList = await api.listCoaches({
-      search: null,
-      active_only: false,
-      limit: 500,
-    });
-  });
-  render();
-  toast("教练任期已保存，主教练投影已刷新", "success");
 }
 
 async function createProvider(): Promise<void> {
@@ -4353,9 +3582,9 @@ function positionOptionGroups(
 function teamLineupPresetMemberRows(
   preset: TeamLineupPresetRecord | null,
 ): string {
-  if (!selectedTeam) return "";
+  if (!teamsFeature.catalog.detail) return "";
   const existing = new Map(preset?.members.map((member) => [member.player_id, member]) ?? []);
-  return selectedTeam.squad.map((player, index) => {
+  return teamsFeature.catalog.detail.squad.map((player, index) => {
     const member = existing.get(player.player_id);
     const enabled = Boolean(member) || (!preset && index < 18);
     const starter = member?.is_starter ?? (!preset && index < 11);
@@ -4382,7 +3611,7 @@ function lineupPresetManagerBody(
 ): string {
   const active = presets.filter((preset) => preset.status === "active");
   const archived = presets.filter((preset) => preset.status === "archived");
-  const canEdit = selectedTeam?.team.id === teamId;
+  const canEdit = teamsFeature.catalog.detail?.team.id === teamId;
   const rows = presets.length
     ? presets.map((preset) => `<article class="lineup-preset-manager-row ${preset.status}">
         <div><span>${preset.status === "active" ? (preset.is_default ? "默认 · 使用中" : "使用中") : "已归档"}</span><strong>${escapeHtml(preset.name)}</strong><small>${escapeHtml(preset.formation_code ?? "阵型未设置")} · 首发 ${preset.starter_count} · 共 ${preset.member_count} 人 · v${preset.version}</small></div>
@@ -4399,12 +3628,12 @@ function lineupPresetManagerBody(
 async function openTeamLineupPresetManager(teamId: string, teamName: string): Promise<void> {
   if (!teamId) throw new Error("缺少球队 ID，无法管理阵容预设");
   const presets = await runBusy(() => api.listTeamLineupPresets(teamId, true));
-  if (selectedTeam?.team.id === teamId) selectedTeamLineupPresets = presets;
+  teamsFeature.catalog.setPresets(teamId, presets);
   showHtmlModal(
     "预设阵容管理",
     teamName || "球队阵容预设",
     lineupPresetManagerBody(teamId, teamName, presets),
-    `<button class="secondary" data-action="close-workspace-detail">关闭</button>${selectedTeam?.team.id === teamId ? '<button class="primary" data-action="open-team-lineup-preset-editor">新建阵容预设</button>' : ""}`,
+    `<button class="secondary" data-action="close-workspace-detail">关闭</button>${teamsFeature.catalog.detail?.team.id === teamId ? '<button class="primary" data-action="open-team-lineup-preset-editor">新建阵容预设</button>' : ""}`,
     "lineup-preset-manager-modal",
   );
 }
@@ -4420,7 +3649,7 @@ async function refreshTeamLineupPresetCaches(teamId: string): Promise<void> {
     api.listTeamLineupPresets(teamId, true),
     api.listTeamLineupPresets(teamId, false),
   ]);
-  if (selectedTeam?.team.id === teamId) selectedTeamLineupPresets = allPresets;
+  teamsFeature.catalog.setPresets(teamId, allPresets);
   if (pairedSide("home").team_id === teamId) {
     pairedLineupPresets = { ...pairedLineupPresets, home: activePresets };
   }
@@ -4458,12 +3687,12 @@ function requestDeleteTeamLineupPreset(
 }
 
 function openTeamLineupPresetEditor(presetId: string | null = null): void {
-  if (!selectedTeam) throw new Error("请先选择球队");
+  if (!teamsFeature.catalog.detail) throw new Error("请先选择球队");
   const preset = presetId
-    ? selectedTeamLineupPresets.find((item) => item.id === presetId) ?? null
+    ? teamsFeature.catalog.presets.find((item) => item.id === presetId) ?? null
     : null;
   if (presetId && !preset) throw new Error("阵容预设不存在或尚未加载");
-  const teamCoaches = coachList.filter((coach) => coach.current_team_id === selectedTeam!.team.id);
+  const teamCoaches = coachList.filter((coach) => coach.current_team_id === teamsFeature.catalog.detail!.team.id);
   const body = `<div class="lineup-preset-editor">
     <div class="form-grid three-column clean-form">
       <label class="field"><span>预设名称</span><input id="lineup-preset-name" value="${escapeHtml(preset?.name ?? "")}" placeholder="例如：联赛主力阵容"></label>
@@ -4482,7 +3711,7 @@ function openTeamLineupPresetEditor(presetId: string | null = null): void {
   const footer = `<button class="secondary" data-action="close-workspace-detail">取消</button><button class="primary" data-action="save-team-lineup-preset" data-preset-id="${escapeHtml(preset?.id ?? "")}">保存阵容预设</button>`;
   showHtmlModal(
     preset ? `编辑：${preset.name}` : "新建阵容预设",
-    selectedTeam.team.canonical_name,
+    teamsFeature.catalog.detail.team.canonical_name,
     body,
     footer,
     "lineup-preset-modal",
@@ -4682,7 +3911,7 @@ function validateTeamLineupPresetDraft(draft: TeamLineupPresetDraft): void {
 }
 
 function collectTeamLineupPresetDraft(presetId: string | null): TeamLineupPresetDraft {
-  if (!selectedTeam) throw new Error("请先选择球队");
+  if (!teamsFeature.catalog.detail) throw new Error("请先选择球队");
   const rows = Array.from(document.querySelectorAll<HTMLElement>("[data-preset-player-id]"));
   const members = rows.flatMap((row, index): TeamLineupPresetMemberDraft[] => {
     const enabled = row.querySelector<HTMLInputElement>(".preset-member-enabled")?.checked ?? false;
@@ -4697,7 +3926,7 @@ function collectTeamLineupPresetDraft(presetId: string | null): TeamLineupPreset
       position_code: position,
       role_code: tacticalRole,
       is_starter: role === "starter",
-      shirt_number: selectedTeam!.squad.find((item) => item.player_id === playerId)?.squad_number ?? null,
+      shirt_number: teamsFeature.catalog.detail!.squad.find((item) => item.player_id === playerId)?.squad_number ?? null,
       expected_minutes: role === "starter" ? 90 : 20,
       sequence_no: index + 1,
       bench_order: role === "starter" ? null : index + 1,
@@ -4707,7 +3936,7 @@ function collectTeamLineupPresetDraft(presetId: string | null): TeamLineupPreset
   });
   return {
     id: presetId,
-    team_id: selectedTeam.team.id,
+    team_id: teamsFeature.catalog.detail.team.id,
     name: value("lineup-preset-name").trim(),
     formation_id: nullableValue("lineup-preset-formation"),
     coach_id: nullableValue("lineup-preset-coach"),
@@ -4725,7 +3954,7 @@ async function saveTeamLineupPreset(presetId: string | null): Promise<void> {
   validateTeamLineupPresetDraft(draft);
   await runBusy(() => api.saveTeamLineupPreset(draft));
   closeModal();
-  await reloadSelectedTeam();
+  await teamsFeature.catalog.refreshSelected();
   render();
   toast(presetId ? "阵容预设已更新" : "阵容预设已保存", "success");
 }
@@ -4741,7 +3970,7 @@ async function duplicateLineupPreset(presetId: string): Promise<void> {
   if (!name) throw new Error("请输入新预设名称");
   await runBusy(() => api.duplicateTeamLineupPreset(presetId, name));
   closeModal();
-  await reloadSelectedTeam();
+  await teamsFeature.catalog.refreshSelected();
   render();
   toast("阵容预设副本已创建", "success");
 }
@@ -4754,7 +3983,7 @@ function requestArchiveLineupPreset(presetId: string, name: string): void {
     "确认归档",
     async () => {
       await runBusy(() => api.archiveTeamLineupPreset(presetId));
-      await reloadSelectedTeam();
+      await teamsFeature.catalog.refreshSelected();
       render();
       toast("阵容预设已归档", "success");
     },
@@ -7011,64 +6240,59 @@ async function handleAction(
       render();
       break;
     case "refresh-team-catalog":
-      await runBusy(() => loadTeamCatalog(true));
+      await runBusy(() => teamsFeature.load(true));
       render();
       break;
     case "refresh-lineup-preset-page":
       await refreshLineupPresetPage();
       break;
     case "select-lineup-preset-team":
-      await selectLineupPresetTeam(button.dataset.teamId ?? "");
+      await teamsFeature.selectPresetTeam(button.dataset.teamId ?? "");
       break;
     case "search-teams":
-      await searchTeams();
+      await teamsFeature.search();
       break;
     case "search-teams-from-detail":
-      await searchTeams(true);
+      await teamsFeature.search(true);
       break;
     case "clear-team-filters":
-      await clearTeamFilters();
+      await teamsFeature.clearFilters();
       break;
     case "clear-team-filters-from-detail":
-      await clearTeamFilters(true);
+      await teamsFeature.clearFilters(true);
       break;
     case "next-team-page":
-      await nextTeamPage();
+      await teamsFeature.next();
       break;
     case "previous-team-page":
-      await previousTeamPage();
+      await teamsFeature.previous();
       break;
     case "open-team":
-      await openTeam(button.dataset.teamId ?? "");
+      await teamsFeature.open(button.dataset.teamId ?? "");
       break;
     case "return-team-directory":
-      selectedTeam = null;
-      selectedPlayer = null;
-      selectedTeamLineupHistory = [];
-      selectedTeamLineupPresets = [];
-      workspaceState.patchModule("teams", { active_tab_id: null, active_section: "directory" });
-      render({ preserveForm: true });
+      teamsFeature.directory();
       break;
     case "update-team":
-      await updateTeam(button.dataset.teamId ?? "");
+      await teamsFeature.editor.update(button.dataset.teamId ?? "");
       break;
     case "add-team-name":
-      await addTeamName(button.dataset.teamId ?? "");
+      await teamsFeature.editor.addName(button.dataset.teamId ?? "");
       break;
     case "save-team-profile":
-      await saveTeamProfile(button.dataset.teamId ?? "");
+      await teamsFeature.editor.profile(button.dataset.teamId ?? "");
       break;
     case "save-formation-usage":
-      await saveFormationUsage(button.dataset.teamId ?? "");
+      await teamsFeature.editor.formation(button.dataset.teamId ?? "");
       break;
     case "export-team-package-template":
-      await exportTeamPackageTemplate();
+      await teamsFeature.exportFile("package-template");
       break;
     case "preview-team-package-import":
-      await previewTeamPackageImport();
+      await teamsFeature.previewPackage();
       break;
     case "resolve-team-package-conflict":
-      await resolveTeamPackageConflict(
+      await teamsFeature.resolvePackage(
         button.dataset.packageScope === "player" ? "player" : "team",
         button.dataset.rowId ?? "",
         button.dataset.entityId ?? null,
@@ -7076,7 +6300,7 @@ async function handleAction(
       );
       break;
     case "skip-team-package-conflict":
-      await resolveTeamPackageConflict(
+      await teamsFeature.resolvePackage(
         button.dataset.packageScope === "player" ? "player" : "team",
         button.dataset.rowId ?? "",
         null,
@@ -7084,50 +6308,50 @@ async function handleAction(
       );
       break;
     case "commit-team-package-import":
-      await commitTeamPackageImport();
+      await teamsFeature.commitPackage();
       break;
     case "show-team-package-preview-json":
-      if (teamPackagePreview)
+      if (teamsFeature.imports.package)
         showModal(
           "球队完整资料包预检结果",
-          teamPackagePreview,
+          teamsFeature.imports.package,
           `<button type="button" class="secondary" data-action="close-workspace-detail">关闭</button><button type="button" class="primary" data-action="export-team-package-preview-json">导出完整预检 JSON</button>`,
         );
       break;
     case "export-team-package-preview-json":
-      await exportTeamPackagePreviewJson();
+      await teamsFeature.exportPackagePreview();
       break;
     case "export-team-template":
-      await exportTeamTemplate();
+      await teamsFeature.exportFile("monthly-template");
       break;
     case "export-team-data":
-      await exportTeamData();
+      await teamsFeature.exportFile("monthly-data");
       break;
     case "preview-team-import":
-      await previewTeamImport();
+      await teamsFeature.previewMonthly();
       break;
     case "resolve-team-import-conflict":
-      await resolveTeamImportConflict(
+      await teamsFeature.resolveMonthly(
         button.dataset.rowId ?? "",
         button.dataset.entityId ?? null,
         false,
       );
       break;
     case "skip-team-import-conflict":
-      await resolveTeamImportConflict(button.dataset.rowId ?? "", null, true);
+      await teamsFeature.resolveMonthly(button.dataset.rowId ?? "", null, true);
       break;
     case "commit-team-import":
-      await commitTeamImport();
+      await teamsFeature.commitMonthly();
       break;
     case "show-team-import-preview-json":
-      if (teamSpreadsheetPreview)
-        showModal("球队月度工作簿预检结果", teamSpreadsheetPreview);
+      if (teamsFeature.imports.monthly)
+        showModal("球队月度工作簿预检结果", teamsFeature.imports.monthly);
       break;
     case "create-coach":
-      await createCoach();
+      await teamsFeature.editor.createCoach();
       break;
     case "add-team-coach-period":
-      await addTeamCoachPeriod(button.dataset.teamId ?? "");
+      await teamsFeature.editor.coachPeriod(button.dataset.teamId ?? "");
       break;
     case "bulk-archive-teams":
       await bulkArchiveEntities("team");
@@ -7136,13 +6360,13 @@ async function handleAction(
       await bulkArchiveEntities("player");
       break;
     case "bulk-delete-teams":
-      await requestBulkDeleteTeams();
+      await teamsFeature.requestDelete();
       break;
     case "request-force-delete-team":
-      await requestForceDeleteTeam(button.dataset.teamId ?? "");
+      await teamsFeature.requestForceDeleteTeam(button.dataset.teamId ?? "");
       break;
     case "confirm-force-delete-team":
-      await confirmForceDeleteTeam();
+      await teamsFeature.confirmForceDeleteTeam();
       break;
     case "bulk-delete-players":
       requestBulkDeletePlayers();
@@ -7198,13 +6422,13 @@ async function handleAction(
       await openPlayerProfile(button.dataset.playerId ?? "");
       break;
     case "open-team-profile":
-      await openTeamProfile(button.dataset.teamId ?? "");
+      await teamsFeature.openProfile(button.dataset.teamId ?? "");
       break;
     case "show-player-json":
       if (selectedPlayer) showModal("球员完整档案", selectedPlayer);
       break;
     case "create-team":
-      await createTeam();
+      await teamsFeature.create();
       break;
     case "create-provider":
       await createProvider();
@@ -7361,8 +6585,8 @@ async function handleAction(
       break;
     case "open-team-lineup-preset-manager":
       await openTeamLineupPresetManager(
-        button.dataset.teamId ?? selectedTeam?.team.id ?? "",
-        button.dataset.teamName ?? selectedTeam?.team.canonical_name ?? "球队",
+        button.dataset.teamId ?? teamsFeature.catalog.detail?.team.id ?? "",
+        button.dataset.teamName ?? teamsFeature.catalog.detail?.team.canonical_name ?? "球队",
       );
       break;
     case "open-lineup-preset-manager":
@@ -7707,6 +6931,7 @@ async function handleAction(
       await modal.runPendingAction();
       break;
     case "close-workspace-detail":
+      teamsFeature.deletion.cancelForce();
       closeModal();
       break;
   }
@@ -7858,18 +7083,13 @@ document.addEventListener("change", (event) => {
   ) {
     const teamId = target.dataset.teamId;
     if (teamId)
-      target.checked
-        ? selectedTeamIds.add(teamId)
-        : selectedTeamIds.delete(teamId);
+      teamsFeature.catalog.toggleSelection(teamId, target.checked);
     persistWorkspaceSelection("teams");
     render({ preserveForm: true });
     return;
   }
   if (target instanceof HTMLInputElement && target.id === "team-select-all") {
-    for (const item of teamListPage?.items ?? [])
-      target.checked
-        ? selectedTeamIds.add(item.id)
-        : selectedTeamIds.delete(item.id);
+    teamsFeature.catalog.selectPage(target.checked);
     persistWorkspaceSelection("teams");
     render({ preserveForm: true });
     return;
@@ -7956,6 +7176,10 @@ document.addEventListener("change", (event) => {
     return;
   }
   if (!(target instanceof HTMLSelectElement)) return;
+  if (target.id === "team-package-import-mode" || target.id === "team-spreadsheet-import-mode") {
+    teamsFeature.changeImportMode(target.id === "team-package-import-mode" ? "package" : "monthly");
+    return;
+  }
   if (target.id === "rules-competition-kind") {
     filterRulesCompetitionCatalogue();
     return;
@@ -8157,7 +7381,7 @@ window.addEventListener("unhandledrejection", (event) => {
 async function initializeApplication(): Promise<void> {
   await workspaceState.initialize();
   if (browserLifecycleController.signal.aborted) return;
-  selectedTeamIds = new Set(workspaceState.module("teams").selected_object_ids);
+  teamsFeature.catalog.replaceSelection(workspaceState.module("teams").selected_object_ids);
   selectedPlayerIds = new Set(workspaceState.module("players").selected_object_ids);
   await session.start();
   if (browserLifecycleController.signal.aborted) return;
@@ -8238,6 +7462,7 @@ export function createBrowserApplicationModule(
     browserLifecycleController.destroy();
     databaseFeature.stop();
     rulesFeature.stop();
+    teamsFeature.stop();
     session.stop();
     openAiExampleRequests.destroy();
     navigation.destroy();

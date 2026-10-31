@@ -16,7 +16,7 @@ const navigation = read("src/app/router/routeRegistry.ts");
 const lineups = read("src/pages/lineups.ts");
 const prediction = read("src/pages/prediction.ts");
 const runs = read("src/pages/runs.ts");
-const teams = read("src/pages/teams.ts");
+const teams = ["src/features/teams/teamPresentation.ts","src/features/teams/profileView.ts","src/features/teams/packageView.ts","src/features/teams/teamsView.ts"].map(read).join("\n");
 const main = read("src/main.ts");
 
 requireTrue(entityStyles.includes("--shell-sidebar-expanded") && entityStyles.includes(".application-shell.secondary-collapsed"), "双层全局导航没有展开与折叠常驻结构");

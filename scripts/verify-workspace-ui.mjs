@@ -25,7 +25,7 @@ ${text("src/styles/app.css")}
 ${text("src/styles/entityCenter.css")}
 ${text("src/styles/moduleWorkspaces.css")}
 ${text("src/ui/feedback/task-activity/taskActivity.css")}`;
-const teams = text("src/pages/teams.ts");
+const teams = ["src/features/teams/teamPresentation.ts","src/features/teams/profileView.ts","src/features/teams/packageView.ts","src/features/teams/teamsView.ts"].map(text).join("\n");
 const players = text("src/pages/players.ts");
 const lineups = text("src/pages/lineups.ts");
 const workbooks = text("src/pages/workbooks.ts");

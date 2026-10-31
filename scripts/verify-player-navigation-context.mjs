@@ -7,6 +7,7 @@ const failures = [];
 const check = (ok, message) => { if (!ok) failures.push(message); };
 const main = read("src/main.ts");
 const page = read("src/pages/players.ts");
+const teams = read("src/features/teams/teamCatalog.ts");
 const types = read("src/types.ts");
 const styles = read("src/styles/entityCenter.css");
 const between = (source, start, end) => source.slice(source.indexOf(start), source.indexOf(end, source.indexOf(start)));
@@ -19,7 +20,7 @@ check(!types.includes("locked: boolean"), "来源球队仍被建模为真实锁�
 for (const key of ["TEAM_QUERY_KEY", "PLAYER_QUERY_KEY", "PLAYER_NAV_CONTEXT_KEY"]) {
   check(main.includes(key), `缺少持久化键 ${key}`);
 }
-check(main.includes("initialTeamQuery()") && main.includes("initialPlayerQuery()"), "球队/球员筛选未从持久状态恢复");
+check(main.includes("initialQuery: localPreferences.readObject<TeamListQuery>(TEAM_QUERY_KEY)") && teams.includes("normalizeTeamQuery(initial)") && main.includes("initialPlayerQuery()"), "球队/球员筛选未从持久状态恢复");
 check(main.includes("if (playerNavigationContext) playerQuery.team_id = playerNavigationContext.team_id"), "应用重启后没有恢复从球队页带入的预选球队");
 check(main.includes("setPlayerNavigationContext") && main.includes("persistPlayerQuery"), "球员来源上下文未持久保存");
 
@@ -34,7 +35,7 @@ const openFromTeam = between(main, "async function openPlayerFromTeam", "async f
 check(openFromTeam.includes("team_id: teamId") && !openFromTeam.includes("locked:"), "从球队进入球员页时没有只带入球队筛选，或仍写入锁定状态");
 check(openFromTeam.includes('active_section: "directory"') && !openFromTeam.includes('active_section: "profile"'), "球队跳转仍直接进入完整球员档案，而不是目录");
 check(!openFromTeam.includes("appendWorkspaceTab"), "球队跳转仍自动打开完整档案标签");
-check(openFromTeam.includes("selectedPlayer = await") && openFromTeam.includes("inspector_collapsed: false"), "普通球队跳转未在目录中保持来源球员速览");
+check(openFromTeam.includes("await teamsFeature.readPlayerFromTeam(playerId)") && openFromTeam.includes("!source.current()") && openFromTeam.includes("selectedPlayer = source.player") && openFromTeam.includes("inspector_collapsed: false"), "普通球队跳转未在目录中保持来源球员速览");
 const directProfile = between(main, "async function openPlayerProfileFromTeam", "async function openTeamApiWorkspace");
 
 const lineupEntry = between(main, "async function openPlayerFromLineup", "async function returnToLineupWorkspace");

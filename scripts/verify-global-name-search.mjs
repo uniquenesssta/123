@@ -23,7 +23,7 @@ const referenceDirectoryRead = read("crates/persistence-postgres/src/adapters/ca
 const coachDirectoryList = read("crates/persistence-postgres/src/adapters/catalog/coaches/directory/list.rs");
 const persistenceLib = read("crates/persistence-postgres/src/lib.rs");
 const playerPage = read("src/pages/players.ts");
-const teamPage = read("src/pages/teams.ts");
+const teamPage = ["src/features/teams/teamPresentation.ts","src/features/teams/profileView.ts","src/features/teams/packageView.ts","src/features/teams/teamsView.ts"].map(read).join("\n");
 const presetPage = read("src/pages/lineupPresets.ts");
 
 requireTrue(contract.contract_id === "football.global-name-search.v1", "全局名称搜索契约编号错误");

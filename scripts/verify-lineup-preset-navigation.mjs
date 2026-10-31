@@ -14,6 +14,7 @@ const navigation = read("src/app/router/routeRegistry.ts");
 const types = read("src/types.ts");
 const main = read("src/main.ts");
 const page = read("src/pages/lineupPresets.ts");
+const teams = read("src/features/teams/teamsFeature.ts");
 const styles = read("src/styles/moduleWorkspaces.css");
 const contract = JSON.parse(read("contracts/workspace-ui-contract.json"));
 const pkg = JSON.parse(read("package.json"));
@@ -22,8 +23,8 @@ check(types.includes('| "lineup_presets"'), "页面类型缺少阵容预设入�
 check(navigation.includes('page: "lineup_presets"') && navigation.includes('label: "阵容预设"'), "资源二级菜单缺少阵容预设");
 check(main.includes('case "lineup_presets"') && main.includes("lineupPresetsPage("), "主路由未渲染阵容预设页面");
 check(main.includes('nextPage === "teams" || nextPage === "lineup_presets"'), "阵容预设页面未加载球队目录");
-check(main.includes("selectLineupPresetTeam") && main.includes('case "select-lineup-preset-team"'), "阵容预设缺少球队选择链路");
-check(main.includes('workspaceState.module("lineup_presets").active_tab_id') && main.includes('workspaceState.patchModule("lineup_presets", { active_tab_id:'), "阵容预设未保存或恢复当前球队");
+check(main.includes("teamsFeature.selectPresetTeam(") && teams.includes("async selectPresetTeam(") && teams.includes("this.ports.setPresetTab(teamId)") && main.includes('case "select-lineup-preset-team"'), "阵容预设缺少球队选择链路");
+check(main.includes("activeTab: page => workspaceState.module(page).active_tab_id") && main.includes('workspaceState.patchModule("lineup_presets", { active_tab_id:') && teams.includes("this.ports.activeTab(page)") && teams.includes("this.ports.setPresetTab(this.catalog.detail.team.id)"), "阵容预设未保存或恢复当前球队");
 check(main.includes("coachList = coaches") && main.includes("formationCatalog = formations"), "阵容预设编辑器未加载教练与阵型目录");
 check(page.includes("球队阵容预设") && page.includes("lineup-preset-workspace"), "阵容预设页面骨架缺失");
 check(page.includes('data-action="open-team-lineup-preset-editor"'), "阵容预设页面缺少新建或编辑入口");

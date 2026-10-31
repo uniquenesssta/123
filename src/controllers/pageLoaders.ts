@@ -2,24 +2,21 @@ import { api } from "../api/client";
 import type {
   AbilityUpdateCandidateRecord,
   AiAnalysisSuggestionRecord,
-  CoachListItem,
   AnalyticsOverview,
   BackgroundJob,
+  CoachListItem,
   LineupRecord,
-  MatchReviewSummary,
   MatchReviewPackagePreview,
   MatchReviewPackageWorkflowRecord,
+  MatchReviewSummary,
   ParameterTuningCandidateRecord,
-  PostmatchOverview,
-  PostmatchSettlementRecord,
   PlayerCatalogReferenceData,
   PlayerDetail,
   PlayerListPage,
   PlayerListQuery,
-  ReviewableMatch,
-  TeamDetail,
-  TeamListPage,
-  TeamListQuery,
+  PostmatchOverview,
+  PostmatchSettlementRecord,
+  ReviewableMatch
 } from "../types";
 
 export interface PlayerCatalogLoadResult {
@@ -30,30 +27,6 @@ export interface PlayerCatalogLoadResult {
 }
 
 
-export interface TeamCatalogLoadResult {
-  readonly list: TeamListPage;
-  readonly query: TeamListQuery;
-  readonly selected: TeamDetail | null;
-}
-
-export async function fetchTeamCatalog(
-  query: TeamListQuery,
-  selectedTeam: TeamDetail | null,
-  resetCursor: boolean,
-): Promise<TeamCatalogLoadResult> {
-  const effectiveQuery: TeamListQuery = resetCursor
-    ? { ...query, cursor_name: null, cursor_id: null }
-    : { ...query };
-  const list = await api.listTeams(effectiveQuery);
-  const selectedTeamId = selectedTeam?.team.id ?? null;
-  let selected = selectedTeamId && list.items.some((item) => item.id === selectedTeamId)
-    ? selectedTeam
-    : null;
-  if (!selected && list.items[0]) {
-    selected = await api.readTeam(list.items[0].id);
-  }
-  return { list, query: effectiveQuery, selected };
-}
 export interface LineupsLoadResult {
   readonly references: PlayerCatalogReferenceData;
   readonly records: LineupRecord[];

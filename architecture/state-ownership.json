@@ -606,8 +606,64 @@
       ],
       "transition": null,
       "migration_task": "R13-03"
+    },
+    {
+      "id": "browser.team-catalog",
+      "owner": "src/features/teams/teamCatalog.ts::TeamCatalog",
+      "scope": "team directory, detail, cursor and stable selected ids; no second Bootstrap",
+      "writers": [
+        "TeamCatalog methods"
+      ],
+      "forbidden": [
+        "src/pages/**",
+        "src/app/session/**"
+      ],
+      "transition": null,
+      "migration_task": "R13-05"
+    },
+    {
+      "id": "browser.team-drafts",
+      "owner": "src/features/teams/teamDrafts.ts::TeamDrafts",
+      "scope": "transient profile controls scoped by Session and team id; Workspace retains tabs/layout",
+      "writers": [
+        "TeamDrafts methods"
+      ],
+      "forbidden": [
+        "src/pages/**",
+        "src/app/session/**"
+      ],
+      "transition": null,
+      "migration_task": "R13-05"
+    },
+    {
+      "id": "browser.team-imports",
+      "owner": "src/features/teams/teamImports.ts::TeamImports",
+      "scope": "package and monthly staging preview identity, resolution and commit lifecycle",
+      "writers": [
+        "TeamImports methods"
+      ],
+      "forbidden": [
+        "src/pages/**",
+        "src/app/session/**"
+      ],
+      "transition": null,
+      "migration_task": "R13-05"
+    },
+    {
+      "id": "browser.team-deletion",
+      "owner": "src/features/teams/teamDeletion.ts::TeamDeletion",
+      "scope": "backend deletion preflight and one-use current-team confirmation",
+      "writers": [
+        "TeamDeletion methods"
+      ],
+      "forbidden": [
+        "src/pages/**",
+        "src/app/session/**"
+      ],
+      "transition": null,
+      "migration_task": "R13-05"
     }
   ],
-  "count": 41,
-  "last_updated_task": "R13-03"
+  "count": 45,
+  "last_updated_task": "R13-05"
 }

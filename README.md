@@ -1,5 +1,9 @@
 # 足球模型平台公开外壳
 
+## R13-05 球队、档案与资料包（2026-10-31 VERIFYING）
+
+球队目录/详情、档案草稿、导入批次和删除确认已收敛为四个具名owner，保留原全部流程与批准UI。42项生产行为、26项Windows浏览器、16种原HTML对比及原生真实目录读取通过；96步前端及最终受影响复验通过，自身CI/安装包尚待验。详[05记录](docs/modular-rewrite/R13-core-ui-features/R13-05-team-catalog-profile-and-package.md)。真实有效XLSX/PG删除、Full和私有模型仍按既定R17-06承接；06未启动。
+
 ## R13-03/04 赛事层级、规则与路由（2026-10-31收尾 DONE）
 
 修复提交b5b23c46的精确[CI run41116421113](https://github.com/uniquenesssta/123/actions/runs/41116421113)、下载证据摘要、MSI/NSIS和包内startup均已核验。31项行为与96步前端门禁通过；04已按合并计划共同收尾。详[03/04记录](docs/modular-rewrite/R13-core-ui-features/R13-03-competition-rules-and-routing.md)。用户已授权05，开始球队目录/档案/资料包模块化；真实PG/Full等仍按既定最终新库安排待验，06未启动。

@@ -22,11 +22,13 @@ const commands = [...new Set(Object.values(JSON.parse(read("architecture/command
 const registry = read("src-tauri/src/bootstrap/command_registry.rs");
 const client = read("src/api/client.ts");
 const types = read("src/types.ts");
-const teams = read("src/pages/teams.ts");
+const teams = ["src/features/teams/teamPresentation.ts","src/features/teams/profileView.ts","src/features/teams/packageView.ts","src/features/teams/teamsView.ts"].map(read).join("\n");
 const players = read("src/pages/players.ts");
 const shell = JSON.parse(read("contracts/global-visual-system-contract.json")).shell_source_entries.map(read).join("\n");
 const navigation = read("src/app/router/routeRegistry.ts");
 const main = read("src/main.ts");
+const teamFeature = read("src/features/teams/teamsFeature.ts");
+const teamImports = read("src/features/teams/teamImports.ts");
 const styles = read("src/styles/app.css");
 const readme = readProjectSource(stylesheetRoot,new URL("../README.md", import.meta.url), "utf8");
 
@@ -65,9 +67,9 @@ requireTrue(types.includes("TeamPackageImportPreview") && types.includes("TeamPa
 requireTrue(navigation.includes('key: "resources"') && navigation.includes('page: "teams"') && navigation.includes('label: "球队中心"') && navigation.includes('page: "players"') && navigation.includes('label: "球员中心"'), "球队与球员未统一归入资源一级模块");
 requireTrue(teams.includes("统一导入入口") && teams.includes("P4 输入就绪度") && teams.includes("preview-team-package-import"), "球队与人员前端缺少导入优先工作区");
 requireTrue(players.includes("球队与人员") && players.includes("球员浏览与管理") && players.includes("core-player-workspace") && players.includes("球员工作包"), "球员目录未纳入统一资源中心");
-requireTrue(main.includes("previewTeamPackageImport") && main.includes("resolveTeamPackageConflict") && main.includes("commitTeamPackageImport"), "主控制器缺少资料包预检、冲突和提交链");
+requireTrue(main.includes("teamsFeature.previewPackage()") && main.includes("teamsFeature.resolvePackage(") && main.includes("teamsFeature.commitPackage()") && teamImports.includes("api.commitTeamPackageImport("), "主控制器缺少资料包预检、冲突和提交链");
 requireTrue(application.includes("TEAM_PACKAGE_PREVIEW_EXPORT_FORMAT") && application.includes("serde_json::to_vec_pretty") && application.includes("exported_row_count"), "完整预检 JSON 导出未保留全部预检记录或稳定格式");
-requireTrue(teams.includes("导出完整预检 JSON") && main.includes("exportTeamPackagePreviewJson") && client.includes("chooseJsonExportFile"), "完整预检页面缺少 JSON 导出入口");
+requireTrue(teams.includes("导出完整预检 JSON") && main.includes("teamsFeature.exportPackagePreview()") && teamImports.includes("api.exportTeamPackagePreviewJson(path, preview)") && client.includes("chooseJsonExportFile"), "完整预检页面缺少 JSON 导出入口");
 requireTrue(styles.includes(".team-package-entry-grid") && styles.includes(".team-package-readiness"), "统一资料包前端缺少专用响应式样式");
 requireTrue(readme.includes("球队完整资料包") && readme.includes("P4 输入就绪度"), "README未记录本次统一资料包增强");
 requireTrue(readme.includes("1248") && readme.includes("俱乐部关系增量补录"), "README未记录世界杯球员俱乐部关系补录");

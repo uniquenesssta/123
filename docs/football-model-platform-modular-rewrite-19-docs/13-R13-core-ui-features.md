@@ -23,7 +23,7 @@
 
 ## 状态与依赖
 
-当前R13-01、02 **DONE**；R13-03与并入的04 **DONE**（b5b23c46精确run41116421113/证据/双bundle/startup已收尾）。R13-05已获用户授权，当前 **IN_PROGRESS**。06及其后 **BLOCKED / 未实施**。R12已由用户确认结束；当前结果与证据见[阶段执行索引](../modular-rewrite/R13-core-ui-features/README.md)。下表顺序是默认交付顺序，必要时在已授权阶段内按真实依赖拆出更小批次并说明原因，不以任务数量或文件数为目标。
+当前R13-01、02 **DONE**；R13-03与并入的04 **DONE**（b5b23c46精确run41116421113/证据/双bundle/startup已收尾）。R13-05已获用户授权，当前 **VERIFYING**（本地96步及42项球队行为等通过，自身精确CI/包待验）。06及其后 **BLOCKED / 未实施**。R12已由用户确认结束；当前结果与证据见[阶段执行索引](../modular-rewrite/R13-core-ui-features/README.md)。下表顺序是默认交付顺序，必要时在已授权阶段内按真实依赖拆出更小批次并说明原因，不以任务数量或文件数为目标。
 
 | 主交付 ID | 交付批次 | 前置 |
 |---|---|---|
@@ -244,6 +244,8 @@ if ($LASTEXITCODE -ne 0) { throw 'R13-03: verify-competition-rules-service faile
 ### R1～R12遗留项承接
 
 读取[前期遗留项基线核对](../modular-rewrite/prior-stage-baseline-20261030.md)：**BA-05、BA-07**。按基线报告区分本批必须处理的风险与已批准的真实环境待验；前者未解决不得交付，后者逐项保留承接和证据，不能只标记“已检查”。
+
+实施进度：[05记录](../modular-rewrite/R13-core-ui-features/R13-05-team-catalog-profile-and-package.md)。本批四个状态owner和全部原入口已迁入实际Teams Feature，本地96步前端、最终42项生产行为、Windows浏览器/原生读取及类型构建通过；自身CI/安装包尚待核验，当前VERIFYING，06不提前启动。
 
 **必要变更与边界：** 收拢球队目录/身份/名称/档案/名单/教练任期/阵型使用/阵容历史/编辑/删除/资料包状态和动作。读取、编辑草稿、删除预检及包预览分别拥有状态；复用现有公共控件。
 

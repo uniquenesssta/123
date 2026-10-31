@@ -17,7 +17,7 @@ const workspace = read("src/ui/navigation/section-navigation/sectionNavigationVi
 const styles = read("src/styles/coreWorkspaces.css");
 const lineups = read("src/pages/lineups.ts");
 const prediction = read("src/pages/prediction.ts");
-const teams = read("src/pages/teams.ts");
+const teams = ["src/features/teams/teamPresentation.ts","src/features/teams/profileView.ts","src/features/teams/packageView.ts","src/features/teams/teamsView.ts"].map(read).join("\n");
 const players = read("src/pages/players.ts");
 const pkg = JSON.parse(read("package.json"));
 

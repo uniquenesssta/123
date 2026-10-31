@@ -1,3 +1,4 @@
+import { loadTeamsProduction } from "./features/loadTeamsProduction.mjs";
 import {readProjectSource} from "./styles/projectSource.mjs";
 import {fileURLToPath as stylesheetFilePath} from "node:url";
 const stylesheetRoot=stylesheetFilePath(new URL("../",import.meta.url));
@@ -163,6 +164,7 @@ const source = ts.createSourceFile("main.ts", main, ts.ScriptTarget.Latest, true
 const functions = source.statements.filter(node => ts.isFunctionDeclaration(node) && ["loadNavigationPage", "loadApiWorkspace"].includes(node.name?.text)).map(node => node.getText(source)).join("\n");
 assert.equal(source.statements.filter(node => ts.isFunctionDeclaration(node) && ["loadNavigationPage", "loadApiWorkspace"].includes(node.name?.text)).length, 2);
 const loaderJs = ts.transpileModule(functions, { compilerOptions: { target: ts.ScriptTarget.ES2022, module: ts.ModuleKind.None } }).outputText;
+const { TeamsFeature } = loadTeamsProduction(root)("src/features/teams/index.ts");
 function loaderContext() {
   const applied = [], router = new Router();
   const context = {
@@ -174,6 +176,7 @@ function loaderContext() {
     api: {},
   };
   for (const name of ["applyPlayerCatalog", "applyTeamCatalog", "applyLineups", "applyReviewCenter", "applyAnalysisCenter"]) context[name] = () => applied.push(name);
+  context.teamsFeature = new TeamsFeature({ api: context.api, initialQuery: null, snapshot: () => context.session.bootstrap, page: () => router.page, activeTab: () => null, publishOptions: () => applied.push("options"), persistQuery: () => applied.push("teamQuery"), setPresetTab: () => applied.push("presetTab") });
   runInNewContext(loaderJs, context);
   return { context, router, applied };
 }
@@ -225,7 +228,7 @@ await test("actual AI workspace loader guards each await including session detai
 await test("actual teams and prediction loaders cannot apply stale multi-step results", async () => {
   for (const page of ["teams", "lineup_presets", "prediction"]) {
     const { context, router, applied } = loaderContext(), final = deferred(), finalStarted = deferred();
-    context.fetchTeamCatalog = async () => ({ list: { items: [] }, selected: { team: { id: "team" } } });
+    context.api.listTeams = async () => ({ items: [{ id: "team" }] }); context.api.readTeam = async () => ({ team: { id: "team" } });
     context.api.listCoaches = async () => []; context.api.listFormations = async () => [];
     context.api.listTeamMatchLineups = () => { finalStarted.resolve(); return final.promise; }; context.api.listTeamLineupPresets = async () => [];
     context.api.playerCatalogReferenceData = async () => ({ managed_matches: [{ id: "match" }], upcoming_matches: [] });

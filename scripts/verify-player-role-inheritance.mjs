@@ -6,7 +6,7 @@ const read = (file) => fs.readFileSync(path.join(root, file), "utf8");
 const failures = [];
 const check = (condition, message) => { if (!condition) failures.push(message); };
 const requireTokens = (file, tokens, label = file) => {
-  const content = read(file);
+  const content = file.startsWith("src/features/teams/") ? ["src/features/teams/profileView.ts", "src/features/teams/packageView.ts", "src/features/teams/teamsView.ts"].map(read).join("\n") : read(file);
   for (const token of tokens) check(content.includes(token), `${label} 缺少：${token}`);
   return content;
 };
@@ -122,7 +122,7 @@ for (const [file, tokens, label] of [
   ["crates/spreadsheet-io/src/match_workbook.rs", ["primary_role_code", "仅覆盖本场"], "比赛工作簿"],
   ["crates/persistence-postgres/src/adapters/workbooks/player_catalog/commit.rs", ["default_role_code", "spreadsheet_clear_fields"], "Excel 提交"],
   ["src/pages/players.ts", ["默认战术角色", "player-position-default-role"], "球员档案 UI"],
-  ["src/pages/teams.ts", ["默认角色", "role_code"], "球队名单 UI"],
+  ["src/features/teams/profileView.ts", ["默认角色", "role_code"], "球队名单 UI"],
   ["src/main.ts", ["defaultRoleForPlayer", "position_role_map?.[code]", "player_position_default", "lineup_override", "role_source_position_code"], "阵容编辑 UI"],
   ["src/types.ts", ["role_source_position_code?: string | null", "tactical_role_source_position_code"], "前端角色类型"],
   ["src/pages/review.ts", ["role_source_position_code", "资料继承"], "复盘角色来源 UI"],

@@ -8,7 +8,7 @@ const requireTrue = (condition, message) => {
 };
 
 const players = read("src/pages/players.ts");
-const teams = read("src/pages/teams.ts");
+const teams = ["src/features/teams/teamPresentation.ts","src/features/teams/profileView.ts","src/features/teams/packageView.ts","src/features/teams/teamsView.ts"].map(read).join("\n");
 const presets = read("src/pages/lineupPresets.ts");
 const main = read("src/main.ts");
 const viewState = read("src/app/workspace/workspaceRecovery.ts");

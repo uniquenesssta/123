@@ -28,7 +28,9 @@ const registry = read("src-tauri/src/bootstrap/command_registry.rs");
 const client = read("src/api/client.ts");
 const types = read("src/types.ts");
 const main = read("src/main.ts");
-const teams = read("src/pages/teams.ts");
+const teamDeletion = read("src/features/teams/teamDeletion.ts");
+const teamFeature = read("src/features/teams/teamsFeature.ts");
+const teams = ["src/features/teams/teamPresentation.ts","src/features/teams/profileView.ts","src/features/teams/packageView.ts","src/features/teams/teamsView.ts"].map(read).join("\n");
 const styles = read("src/styles/app.css");
 const readme = readProjectSource(stylesheetRoot,new URL("../README.md", import.meta.url), "utf8");
 
@@ -103,7 +105,7 @@ for (const [label, source] of [["预检", previewCommand], ["执行", executeCom
 requireTrue(application.includes("preview_force_delete_team") && application.includes("force_delete_team"), "应用服务未接入强制清除");
 requireTrue(teams.includes('data-action="request-force-delete-team"') && teams.includes("强制删除全部资料"), "球队详情缺少强制清除按钮");
 requireTrue(main.includes("requestForceDeleteTeam") && main.includes("confirmForceDeleteTeam"), "前端缺少强制清除预检与确认流程");
-requireTrue(main.includes("force-delete-team-confirmation") && main.includes("confirmation !== preview.confirmation_text"), "前端没有严格校验完整球队名称");
+requireTrue(teamFeature.includes("force-delete-team-confirmation") && teamDeletion.includes("confirmation !== preview.confirmation_text") && teamDeletion.includes("this.pending = null"), "前端没有严格校验完整球队名称");
 requireTrue(main.includes('removeWorkspaceObjects("teams", [result.team_id])') && main.includes('removeWorkspaceObjects("players", result.deleted_player_ids)'), "强制清除后未同步移除球队和球员工作区对象");
 requireTrue(styles.includes(".force-delete-warning") && styles.includes(".force-delete-impact-grid"), "强制清除对话框缺少危险提示样式");
 requireTrue(readme.includes("强制删除全部资料") && readme.includes("football.force_purge"), "README未记录强制清除能力和安全边界");

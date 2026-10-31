@@ -24,9 +24,11 @@ const application = read("crates/application/src/use_cases/exchange/preview_play
 const commands = [...new Set(Object.values(JSON.parse(read("architecture/command-contract.json")).command_groups.find(group => group.module === "exchange").command_definition_files))].map(read).join("\n");
 const registry = read("src-tauri/src/bootstrap/command_registry.rs");
 const client = read("src/api/client.ts");
-const teams = read("src/pages/teams.ts");
+const teams = ["src/features/teams/teamPresentation.ts","src/features/teams/profileView.ts","src/features/teams/packageView.ts","src/features/teams/teamsView.ts"].map(read).join("\n");
 const players = read("src/pages/players.ts");
 const main = read("src/main.ts");
+const teamFeature = read("src/features/teams/teamsFeature.ts");
+const teamImports = read("src/features/teams/teamImports.ts");
 const pkg = JSON.parse(read("package.json"));
 const hash = crypto.createHash("sha256").update(contractText, "utf8").digest("hex");
 
@@ -99,8 +101,8 @@ requireTrue(
 requireTrue(!persistence.includes("DELETE FROM feature.team_tactical_observations"), "战术观察不得无痕覆盖");
 requireTrue(!persistence.includes("DELETE FROM feature.team_ability_observations"), "球队能力观察不得无痕覆盖");
 requireTrue(legacyPersistence.includes("PLAYER_MONTHLY_FORMAT") && application.includes("read_player_monthly_workbook"), "球员月度与旧模板兼容链缺失");
-requireTrue(teams.includes("球队完整资料包") && main.includes("previewTeamPackageImport"), "球队完整资料包统一导入界面缺失");
-requireTrue(main.includes("previewTeamImport") && client.includes("preview_team_monthly_import"), "旧球队月度工作簿兼容链缺失");
+requireTrue(teams.includes("球队完整资料包") && main.includes("teamsFeature.previewPackage()") && teamImports.includes("api.previewTeamPackageImport(path, mode)"), "球队完整资料包统一导入界面缺失");
+requireTrue(main.includes("teamsFeature.previewMonthly()") && teamImports.includes("api.previewTeamMonthlyImport(path, mode)") && client.includes("preview_team_monthly_import"), "旧球队月度工作簿兼容链缺失");
 requireTrue(players.includes("球员月度工作包") && main.includes("球员月度更新.xlsx"), "球员月度工作包界面缺失");
 requireTrue(main.includes("ended_previous_count"), "导入完成结果未显示结束旧记录数量");
 

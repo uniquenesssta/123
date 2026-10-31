@@ -19,7 +19,8 @@ const requireTrue = (condition, message) => {
 const modal = read("src/app/modal/workspacePanelController.ts");
 const shell = JSON.parse(read("contracts/global-visual-system-contract.json")).shell_source_entries.map(read).join("\n");
 const main = read("src/main.ts");
-const teams = read("src/pages/teams.ts");
+const teamCatalog = read("src/features/teams/teamCatalog.ts");
+const teams = ["src/features/teams/teamPresentation.ts","src/features/teams/profileView.ts","src/features/teams/packageView.ts","src/features/teams/teamsView.ts"].map(read).join("\n");
 const panelCss = read("src/styles/workspacePanels.css") + read("src/ui/layout/content-region/contentRegion.css");
 const entityCss = read("src/styles/entityCenter.css");
 const runtimeLog = read("src-tauri/src/runtime_log.rs");
@@ -49,7 +50,7 @@ requireTrue(entityCss.includes('.app-shell[data-current-page="teams"] .team-deta
 
 requireTrue(runtimeLog.includes('"operation_started" | "operation_completed" | "operation_failed"'), "运行日志仍可能压缩命令开始/完成/失败配对");
 requireTrue(runtimeLog.includes("operation_lifecycle_events_keep_trace_pairs"), "运行日志缺少链路配对回归测试");
-requireTrue(main.includes("api.listFormations(false),"), "球队目录未统一加载完整阵型目录");
+requireTrue(teamCatalog.includes("api.listFormations(false)") && main.includes("formationCatalog = formations"), "球队目录未统一加载完整阵型目录");
 requireTrue(!main.includes("formationCatalog = await api.listFormations(false);"), "导入完成后仍存在重复且可能悬挂的阵型目录请求");
 
 requireTrue(main.indexOf("modal.capture();") < main.indexOf("app.innerHTML = renderShell("), "主题或Shell重绘前没有捕获当前详情草稿");

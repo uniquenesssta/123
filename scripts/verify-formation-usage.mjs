@@ -24,7 +24,7 @@ const lineupMapping = read("crates/persistence-postgres/src/adapters/lineups/his
 const commands = [...new Set(Object.values(JSON.parse(read("architecture/command-contract.json")).command_groups.find(group => group.module === "lineups").command_definition_files))].map(read).join("\n");
 const registry = read("src-tauri/src/bootstrap/command_registry.rs");
 const client = read("src/api/client.ts");
-const teams = read("src/pages/teams.ts");
+const teams = ["src/features/teams/teamPresentation.ts","src/features/teams/profileView.ts","src/features/teams/packageView.ts","src/features/teams/teamsView.ts"].map(read).join("\n");
 const lineups = read("src/pages/lineups.ts");
 const main = read("src/main.ts");
 const pkg = JSON.parse(read("package.json"));

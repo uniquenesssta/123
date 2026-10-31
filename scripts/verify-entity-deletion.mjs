@@ -19,8 +19,10 @@ const entityPersistence = [
   text("crates/persistence-postgres/src/adapters/catalog/deletion/archive/write.rs"),
 ].join("\n");
 const main = text("src/main.ts");
+const teamDeletion = text("src/features/teams/teamDeletion.ts");
+const teamFeature = text("src/features/teams/teamsFeature.ts");
 const client = text("src/api/client.ts") + "\n" + text("src/platform/tauri/invokeResponse.ts");
-const teams = text("src/pages/teams.ts");
+const teams = ["src/features/teams/teamPresentation.ts","src/features/teams/profileView.ts","src/features/teams/packageView.ts","src/features/teams/teamsView.ts"].map(text).join("\n");
 const readme = readFileSync(join(root, "README.md"), "utf8");
 
 for (const relation of [
@@ -56,12 +58,12 @@ for (const protectedTable of [
 }
 
 requireTrue(main.includes("function removeWorkspaceObjects") && main.includes("function isMissingWorkspaceObjectError") && main.includes("openAvailableWorkspaceTab"), "前端缺少陈旧标签清理与自动恢复");
-requireTrue(main.includes('api.checkEntityDeletion("team", id)') && main.includes("const deletableIds = checks"), "球队永久删除前未逐项执行预检");
-requireTrue(main.includes("api.bulkDeleteTeams(deletableIds)"), "后端删除调用仍包含受保护球队");
-requireTrue(main.includes("teamDeletionCheckSummary") && main.includes("请使用归档"), "球队受保护原因未在前端解释");
-requireTrue(main.includes('removeWorkspaceObjects("teams", result.deleted_ids)') && main.includes('persistWorkspaceSelection("teams")'), "球队删除结果未同步清理实际删除标签和持久选择");
+requireTrue(main.includes("teamsFeature.requestDelete()") && teamDeletion.includes('api.checkEntityDeletion("team", id)') && teamDeletion.includes("check.exists && check.can_permanently_delete"), "球队永久删除前未逐项执行预检");
+requireTrue(teamDeletion.includes("api.bulkDeleteTeams(ids)") && teamDeletion.includes("this.consumed.has(ticket)"), "后端删除调用仍包含受保护球队");
+requireTrue(teamFeature.includes("teamDeletionCheckSummary") && teamFeature.includes("请使用归档"), "球队受保护原因未在前端解释");
+requireTrue(main.includes('removeWorkspaceObjects("teams", [...missing, ...result.deleted_ids])') && main.includes('persistWorkspaceSelection("teams")'), "球队删除结果未同步清理实际删除标签和持久选择");
 requireTrue(main.includes("const removedIds = [...result.archived_ids, ...result.already_archived_ids]"), "球队归档后未清理当前活跃工作区标签");
-requireTrue(main.includes("const missingIds = checks") && main.includes('removeWorkspaceObjects("teams", missingIds)'), "已不存在球队未从陈旧工作区清理");
+requireTrue(teamFeature.includes("!check.exists") && main.includes('removeWorkspaceObjects("teams", ids)'), "已不存在球队未从陈旧工作区清理");
 requireTrue(teams.includes('data-action="bulk-delete-teams"') && teams.includes("永久删除（无引用）") && teams.includes("仅无任何业务或历史引用"), "球队删除按钮仍未明确无引用限制");
 
 requireTrue(client.includes("Array.isArray(childValue)") && client.includes("summary[key] = summarizeLogValue(childValue, key, 1)"), "运行日志仍不能记录删除结果数量、ID和拦截摘要");
