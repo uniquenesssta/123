@@ -86,3 +86,11 @@
 最终补核：导入模式改变只使对应package/monthly预检及待返回请求失效，保留另一工作流；真实浏览器重新预检恢复路径通过。最终42项生产行为、26项浏览器及TypeScript/Vite复验通过；无依赖副本确认TypeScript MODULE_NOT_FOUND且完整verify:architecture退出0。副本及日志位于C:/Users/uniqu/.codex/visualizations/2026/10/24/01a16c6c-7941-7f71-9469-0ff856e39e3a/r13-05-ci-no-deps-iYdQFa/。
 
 当前暂存56个路径：19新增、36修改、仅1个旧视图路径被具名实现替代退出；后端/历史契约/依赖/workflow无差异。
+
+## 精确代码提交与单次CI查询
+
+- 代码提交587b6752e00ca0aaa56601b27ba1a222081e4597，已推送rewrite/r13-core-ui-features。受测源码树784d0b33e36006b2b89c557ac2327aef8e09b491；无TypeScript副本最终架构门禁退出0，日志architecture-no-deps-final.log。
+- 仅查询一次：[Public Platform CI run41172800714](https://github.com/uniquenesssta/123/actions/runs/41172800714)，head/分支/push事件精确匹配，状态in_progress，conclusion=null。创建时间2026-10-31T05:29:37Z（北京时间13:29:37）。没有再次查询、轮询或使用03/04绿色记录抵销。
+- 当前未下载本批产物，MSI/NSIS及包内startup仍待此精确运行完成后验收；05保持VERIFYING，06未启动。
+- 本机Node24.16.0；CI配置Node22/Windows2025。已对无TypeScript、无node_modules的安装前源码环境补验；不将本机环境等同于CI环境。
+- 本次仅补三份Markdown记录；现有workflow对push已配置paths-ignore: **.md，因此此次文档提交不应触发另一份代码CI；未更改workflow。
