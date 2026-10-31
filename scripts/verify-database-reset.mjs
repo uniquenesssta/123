@@ -20,7 +20,7 @@ const lifecycleReset = read("crates/application/src/use_cases/application_facade
 const p4Facade = read("crates/application/src/services/p4_orchestration/facade.rs");
 const tauri = read("src-tauri/src/bootstrap/command_registry.rs");
 const client = read("src/api/client.ts");
-const page = read("src/features/database/databaseView.ts");
+const page = ["databaseView.ts", "databasePanels.ts"].map(file => read("src/features/database/" + file)).join("\n");
 const databaseFeature = read("src/features/database/databaseFeature.ts");
 const databaseWorkflow = read("src/features/database/databaseWorkflow.ts");
 const main = read("src/main.ts");

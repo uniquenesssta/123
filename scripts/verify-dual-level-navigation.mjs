@@ -230,7 +230,7 @@ await test("actual AI workspace loader guards each await including session detai
 });
 await test("actual teams and prediction loaders cannot apply stale multi-step results", async () => {
   for (const page of ["teams", "lineup_presets", "prediction"]) {
-    const { context, router, applied } = loaderContext(page === "lineup_presets" ? "team" : null), final = deferred(), finalStarted = deferred();
+    const { context, router, applied } = loaderContext(page === "prediction" ? null : "team"), final = deferred(), finalStarted = deferred();
     context.api.listTeams = async () => ({ items: [{ id: "team" }] }); context.api.readTeam = async () => ({ team: { id: "team" } });
     context.api.listCoaches = async () => []; context.api.listFormations = async () => [];
     context.api.listTeamMatchLineups = () => { finalStarted.resolve(); return final.promise; }; context.api.listTeamLineupPresets = async () => [];

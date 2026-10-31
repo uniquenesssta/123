@@ -1,6 +1,6 @@
 # R13 基础数据与编排业务模块化：执行索引
 
-阶段状态：**IN_PROGRESS；R13-UI01执行中**。分支 `rewrite/r13-core-ui-features`，起点f0770665；01、02、03（含04）、05、06及原10保持DONE。用户最新明确启动07，覆盖原07/08，详[07实施记录](R13-07-presets-and-paired-lineups.md)。07已核验精确CI/双bundle/startup并DONE；UI01按用户最新指令执行中，09未启动。UI01收尾后下一项09。R12保持结束。
+阶段状态：**IN_PROGRESS；R13-UI01本地验收通过、VERIFYING**。分支 `rewrite/r13-core-ui-features`，起点f0770665；01、02、03（含04）、05、06及原10保持DONE。用户最新明确启动07，覆盖原07/08，详[07实施记录](R13-07-presets-and-paired-lineups.md)。07已核验精确CI/双bundle/startup并DONE；UI01本地96步/80设计场景/126挂载/原生startup通过，等待自身CI/产物，09未启动。UI01收尾后下一项09。R12保持结束。
 
 最新规划：[17页/40项接入处置表](../ui-integration-disposition-20261031.md)。以下表格为当前状态；表后按时间追加的记录为历史，暂停及恢复均按用户最新指令，本次已明确恢复07。
 
@@ -14,7 +14,7 @@
 | R13-04 规则包/绑定/路由 | 并入03 / DONE | 独立义务映射及同一精确CI验收完成，详03记录 |
 | R13-05 球队/档案/资料包 | DONE | [实施记录](R13-05-team-catalog-profile-and-package.md)：42行为/26浏览器/16原HTML对比/原生目录读取通过；96步前端及受影响复验通过，精确run41172800714及双bundle/startup已验；承接BA-05/07 |
 | R13-06 球员/履历/观察 | DONE | [实施记录](R13-06-player-catalog-history-and-observations.md)：30行为/26浏览器/16原HTML/原生目录读取通过，完整96步前端及3683b7f3精确CI/双bundle/startup已收尾；承接BA-05/07 |
-| R13-UI01 已交付6页设计补差 | IN_PROGRESS | [实施记录](R13-UI01-approved-screen-deltas.md)；六页批准设计补差，不重开已DONE业务 |
+| R13-UI01 已交付6页设计补差 | VERIFYING：本地通过，待精确CI/产物 | [实施记录](R13-UI01-approved-screen-deltas.md)；六页批准设计补差，不重开已DONE业务 |
 | R13-07 预设/双方阵容 | DONE | [实施记录](R13-07-presets-and-paired-lineups.md)；855d830b精确run41211916572/双bundle/startup已核验 |
 | R13-09 工作簿 | PLANNED | 未启动；真实文件/账本按BA-04/07承接 |
 

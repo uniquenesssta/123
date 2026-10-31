@@ -44,6 +44,11 @@ export async function verifyWorkspaceRecovery(host: HTMLElement, expect: (condit
   delete root.dataset.workspaceCapture;
   paint(); recovered.restore("teams", root); host.querySelector<HTMLButtonElement>("#workspace-outside")!.focus(); await frames();
   expect(document.activeElement?.id === "workspace-outside", "workspace deferred focus cannot steal focus from an external action");
+  paint(); field("workspace-draft").focus();
+  recovered.restore("teams", root); recovered.restoreFocus("teams", root, "workspace-check"); await frames();
+  expect(document.activeElement === field("workspace-check"), "explicit directory focus supersedes pending recovery in the same lifecycle owner");
+  recovered.restoreFocus("teams", root, "workspace-password"); await frames();
+  expect(document.activeElement === field("workspace-check") && recovered.module("teams").active_element_id !== "workspace-password", "explicit return focus cannot restore or persist sensitive control focus");
   recovered.patchModule("players", { internal_scrolls: { page: { top: 83, left: 0 } }, active_element_id: null });
   root.scrollTop = 0; recovered.restore("teams", root); recovered.restore("players", root); await frames();
   expect(root.scrollTop === 83, "workspace latest restore invalidates the earlier layout frame");

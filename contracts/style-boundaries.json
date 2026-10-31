@@ -28,7 +28,9 @@
     "src/pages/players/playerWorkspace.css",
     "src/pages/lineups/lineupWorkspace.css",
     "src/pages/rules/rulesCatalogue.css",
-    "src/styles/workspaces/presetEditor.css"
+    "src/styles/workspaces/presetEditor.css",
+    "src/pages/database/databaseWorkspace.css",
+    "src/pages/architecture/architectureWorkspace.css"
   ],
   "features": [
     {
@@ -55,6 +57,16 @@
       "page": "rules",
       "file": "src/pages/rules/rulesCatalogue.css",
       "root": ".application-shell[data-current-page=\"rules\"]"
+    },
+    {
+      "page": "database",
+      "file": "src/pages/database/databaseWorkspace.css",
+      "root": ".application-shell[data-current-page=\"database\"]"
+    },
+    {
+      "page": "architecture",
+      "file": "src/pages/architecture/architectureWorkspace.css",
+      "root": ".application-shell[data-current-page=\"architecture\"]"
     }
   ],
   "composition_modules": [

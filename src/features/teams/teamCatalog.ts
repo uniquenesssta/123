@@ -92,14 +92,14 @@ export class TeamCatalog {
       return true;
     } catch (error) { if (!current()) return false; throw error; }
   }
-  search(query: TeamListQuery): Promise<boolean> { return this.load({ query: { ...query, cursor_name: null, cursor_id: null }, history: [], retainId: null }); }
+  search(query: TeamListQuery): Promise<boolean> { return this.load({ query: { ...query, cursor_name: null, cursor_id: null }, history: [], retainId: null, selectFirst: false }); }
   next(): Promise<boolean> {
     const page = this.currentPage; if (!page?.has_more || !page.next_cursor_name || !page.next_cursor_id) return Promise.resolve(false);
-    return this.load({ query: { ...this.currentQuery, cursor_name: page.next_cursor_name, cursor_id: page.next_cursor_id }, history: [...this.history, { cursor_name: this.currentQuery.cursor_name, cursor_id: this.currentQuery.cursor_id }], retainId: null });
+    return this.load({ query: { ...this.currentQuery, cursor_name: page.next_cursor_name, cursor_id: page.next_cursor_id }, history: [...this.history, { cursor_name: this.currentQuery.cursor_name, cursor_id: this.currentQuery.cursor_id }], retainId: null, selectFirst: false });
   }
   previous(): Promise<boolean> {
     const cursor = this.history.at(-1); if (!cursor) return Promise.resolve(false);
-    return this.load({ query: { ...this.currentQuery, ...cursor }, history: this.history.slice(0, -1), retainId: null });
+    return this.load({ query: { ...this.currentQuery, ...cursor }, history: this.history.slice(0, -1), retainId: null, selectFirst: false });
   }
   refreshSelected(): Promise<boolean> { return this.currentDetail ? this.refreshDetail(this.currentDetail.team.id) : Promise.resolve(false); }
   async refreshDetail(id: string): Promise<boolean> {

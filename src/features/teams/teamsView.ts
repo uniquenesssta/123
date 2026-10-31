@@ -31,34 +31,33 @@ function teamDirectoryItems(
   if (!page) return `<div class="entity-directory-empty"><strong>正在载入球队</strong><span>目录准备完成后会显示在这里。</span></div>`;
   if (page.items.length === 0) return `<div class="entity-directory-empty"><strong>没有匹配球队</strong><span>调整搜索词或筛选条件。</span></div>`;
   return page.items.map((team) => {
-    const completion = Math.max(0, Math.min(100, Math.round((team.profile_confidence ?? 0) * 55 + Math.min(team.current_player_count / 26, 1) * 30 + (team.current_coach_name ? 15 : 0))));
+    const completion = team.profile_confidence == null ? null : Math.max(0, Math.min(100, Math.round((team.profile_confidence ?? 0) * 55 + Math.min(team.current_player_count / 26, 1) * 30 + (team.current_coach_name ? 15 : 0))));
     return `<article class="entity-directory-item ${team.id === selectedTeamId ? "active" : ""}" data-team-id="${escapeHtml(team.id)}">
       <label class="entity-select-check" title="加入批量操作"><input type="checkbox" class="team-select-checkbox" data-team-id="${escapeHtml(team.id)}" ${selectedIds.has(team.id) ? "checked" : ""}><span></span></label>
-      <button class="entity-directory-open" data-action="open-team" data-team-id="${escapeHtml(team.id)}">
+      <button id="team-directory-${escapeHtml(team.id)}" class="entity-directory-open" data-action="open-team" data-team-id="${escapeHtml(team.id)}">
         <span class="entity-avatar team-avatar">${escapeHtml(initials(team.canonical_name))}</span>
         <span class="entity-directory-copy"><strong>${escapeHtml(team.canonical_name)}</strong><small>${escapeHtml(teamTypeLabel(team.team_type))} · ${escapeHtml(team.country_code ?? "地区未设置")}</small></span>
-        <span class="entity-directory-metrics"><b>${team.current_player_count}</b><small>球员</small></span>
+        <span class="entity-directory-metrics">${team.current_player_count}人</span>
       </button>
-      <div class="entity-directory-foot team-directory-foot"><span class="team-directory-coach" title="${escapeHtml(team.current_coach_name ?? "教练待补")}">${escapeHtml(team.current_coach_name ?? "教练待补")}</span><div class="directory-foot-actions"><span class="completion-chip"><i style="--completion:${completion}%"></i>${completion}%</span><button class="team-directory-profile-action" data-action="open-team-profile" data-team-id="${escapeHtml(team.id)}">档案</button></div></div>
+      <div class="entity-directory-foot team-directory-foot"><span class="team-directory-coach" title="${escapeHtml(team.current_coach_name ?? "教练待补")}">${escapeHtml(team.current_coach_name ?? "教练待补")} · 完整度 ${completion === null ? "未计算" : `${completion}%`}</span><button class="team-directory-profile-action secondary" data-action="open-team-profile" data-team-id="${escapeHtml(team.id)}">打开 ${escapeHtml(team.canonical_name)} 档案</button></div>
     </article>`;
   }).join("");
 }
 
 function teamRosterRows(detail: TeamDetail, selectedPlayerId: string | null): string {
   if (detail.squad.length === 0) {
-    return `<tr><td colspan="6"><div class="entity-table-empty"><strong>当前没有有效阵容</strong><span>可通过完整资料包或球员履历补充。</span></div></td></tr>`;
+    return `<tr><td colspan="5"><div class="entity-table-empty"><strong>当前没有有效阵容</strong><span>可通过完整资料包或球员履历补充。</span></div></td></tr>`;
   }
   return detail.squad.map((player) => {
     const name = displayPlayerName(player);
     const availability = availabilityLabel(player.availability_status);
     const statusTone = player.availability_status && ["unavailable", "injured", "suspended", "doubtful"].includes(player.availability_status) ? "warning" : "positive";
     return `<tr class="${selectedPlayerId === player.player_id ? "active" : ""}" data-player-id="${escapeHtml(player.player_id)}">
-      <td><button class="entity-table-person" data-action="preview-player-from-team" data-player-id="${escapeHtml(player.player_id)}"><span class="entity-avatar player-avatar">${escapeHtml(initials(name.primary))}</span><span><strong>${escapeHtml(name.primary)}</strong>${name.secondary ? `<small>${escapeHtml(name.secondary)}</small>` : `<small>球员资料</small>`}</span></button></td>
+      <td><button class="entity-table-person" data-action="preview-player-from-team" data-player-id="${escapeHtml(player.player_id)}"><span><strong>${escapeHtml(name.primary)}</strong>${name.secondary ? `<small>${escapeHtml(name.secondary)}</small>` : `<small>球员资料</small>`}</span></button></td>
       <td><span class="position-chip">${escapeHtml(positionLabel(player.position_code))}</span>${player.role_code ? `<small class="table-cell-note">${escapeHtml(player.role_code)}</small>` : ""}</td>
       <td>${player.squad_number ?? "—"}</td>
       <td><span class="status-chip ${statusTone}">${escapeHtml(availability)}</span></td>
       <td><strong class="rating-value">${player.ability_average === null ? "—" : player.ability_average.toFixed(1)}</strong></td>
-      <td><div class="table-row-actions"><button class="table-row-action primary-link" data-action="open-player-profile-from-team" data-player-id="${escapeHtml(player.player_id)}">完整档案</button></div></td>
     </tr>`;
   }).join("");
 }
@@ -87,7 +86,7 @@ function teamInspector(detail: TeamDetail): string {
   const latestMatches = detail.recent_matches.slice(0, 4);
   return `<div class="entity-inspector-content">
     <div class="inspector-identity"><span class="entity-avatar team-avatar large">${escapeHtml(initials(detail.team.canonical_name))}</span><div><span>球队速览</span><h2>${escapeHtml(detail.team.canonical_name)}</h2><p>${escapeHtml(teamTypeLabel(profile?.team_type))} · ${escapeHtml(detail.team.country_code ?? "地区未设置")}</p></div></div>
-    <div class="inspector-facts three"><div><span>球员</span><strong>${detail.squad.length}</strong></div><div><span>阵型</span><strong>${escapeHtml(profile?.default_formation ?? "未设置")}</strong></div><div><span>可信度</span><strong>${formatPercent(profile?.data_confidence ?? 0)}</strong></div></div>
+    <div class="inspector-facts three"><div><span>球员</span><strong>${detail.squad.length}</strong></div><div><span>阵型</span><strong>${escapeHtml(profile?.default_formation ?? "未设置")}</strong></div><div><span>可信度</span><strong>${profile?.data_confidence == null ? "—" : formatPercent(profile.data_confidence)}</strong></div></div>
     <dl class="inspector-description"><div><dt>主教练</dt><dd>${escapeHtml(detail.coach_periods[0]?.coach_name ?? profile?.head_coach ?? "待补")}</dd></div><div><dt>主场</dt><dd>${escapeHtml(profile?.stadium ?? "未设置")}</dd></div><div><dt>战术风格</dt><dd>${escapeHtml(tacticalStyleLabels[profile?.tactical_style ?? "balanced"] ?? "未设置")}</dd></div><div><dt>阵型观察</dt><dd>${detail.formation_usage.length} 组</dd></div></dl>
     <div class="inspector-section"><div class="inspector-section-title"><strong>近期比赛</strong><span>${latestMatches.length} 场</span></div>${latestMatches.length ? `<div class="inspector-match-list">${latestMatches.map((match) => `<div><span>${escapeHtml(new Date(match.kickoff_time).toLocaleDateString("zh-CN"))}</span><strong>${match.venue_side === "home" ? "主" : "客"} vs ${escapeHtml(match.opponent_team_name)}</strong><b>${match.goals_for === null ? "未赛" : `${match.goals_for}:${match.goals_against}`}</b></div>`).join("")}</div>` : `<p class="inspector-muted">暂无近期比赛记录</p>`}</div>
     <div class="inspector-actions"><button class="primary" data-action="open-team-profile" data-team-id="${escapeHtml(detail.team.id)}">打开完整球队档案</button><button class="secondary" data-action="open-team-api-workspace" data-team-id="${escapeHtml(detail.team.id)}">AI 问答</button></div>
@@ -153,7 +152,7 @@ export function teamsPage(
     query.country_code ? `地区：${query.country_code}` : null,
     query.active_only ? "状态：仅活跃" : "状态：包含停用",
   ].filter(Boolean).map((item) => `<span>${escapeHtml(String(item))}</span>`).join("");
-  const pageActions = `<button class="secondary" data-action="refresh-team-catalog">${icon("refresh")}<span>刷新目录</span></button>${selectedTeam ? `<button class="primary" data-action="open-team-profile" data-team-id="${escapeHtml(selectedTeam.team.id)}">打开完整档案</button>` : `<button class="primary" data-action="select-workspace-section" data-section-id="create">新增球队</button>`}`;
+  const pageActions = `<button class="secondary" data-action="refresh-team-catalog">刷新目录</button>`;
   const sectionNav = workspaceSectionNavigation([
     { id: "directory", index: "01", label: "球队目录", description: "筛选、浏览和阵容速览", badge: `${teamPage?.items.length ?? 0}` },
     { id: "profile", index: "02", label: "完整档案", description: selectedTeam ? selectedTeam.team.canonical_name : "选择球队后开放", disabled: !selectedTeam },
@@ -192,9 +191,9 @@ export function teamsPage(
         <div class="team-detail-filter-note"><span>当前球队</span><strong>${escapeHtml(selectedTeam.team.canonical_name)}</strong><small>筛选条件应用后返回球队目录；当前详情不会作为重复目录项显示。</small></div>
       </aside>` : "";
   const teamDetailPanel = selectedTeam ? `<main class="entity-main panel detail-pane" data-workspace-scroll-key="teams-main">
-        <header class="team-resource-header"><div class="team-resource-title"><span class="entity-avatar team-avatar xlarge">${escapeHtml(initials(selectedTeam.team.canonical_name))}</span><div><span>${escapeHtml(teamTypeLabel(profile?.team_type))}</span><h2>${escapeHtml(selectedTeam.team.canonical_name)}</h2><p>${escapeHtml(selectedTeam.team.country_code ?? "地区未设置")} · ${escapeHtml(profile?.city ?? "城市未设置")}</p></div></div><div class="team-resource-actions"><button class="secondary" data-action="return-team-directory">返回球队目录</button><button class="secondary" data-action="toggle-workspace-pane" data-pane="inspector">球队速览</button><button class="secondary" data-action="open-team-lineup-preset-manager" data-team-id="${escapeHtml(selectedTeam.team.id)}" data-team-name="${escapeHtml(selectedTeam.team.canonical_name)}">阵容预设</button><button class="secondary" data-action="open-team-profile" data-team-id="${escapeHtml(selectedTeam.team.id)}">完整档案</button><button class="primary" data-action="open-team-api-workspace" data-team-id="${escapeHtml(selectedTeam.team.id)}">AI 问答</button></div></header>
-        <div class="team-resource-stats"><div><span>当前球员</span><strong>${selectedTeam.squad.length}</strong><small>${rosterUnavailable} 人需关注</small></div><div><span>主教练</span><strong>${escapeHtml(selectedTeam.coach_periods[0]?.coach_name ?? profile?.head_coach ?? "待补")}</strong><small>${escapeHtml(selectedTeam.coach_periods[0]?.role ?? "未登记任期")}</small></div><div><span>默认阵型</span><strong>${escapeHtml(profile?.default_formation ?? "未设置")}</strong><small>${escapeHtml(tacticalStyleLabels[profile?.tactical_style ?? "balanced"] ?? "战术待补")}</small></div><div><span>数据可信度</span><strong>${formatPercent(profile?.data_confidence ?? 0)}</strong><small>${profile?.updated_at ? `更新于 ${escapeHtml(new Date(profile.updated_at).toLocaleDateString("zh-CN"))}` : "资料待完善"}</small></div></div>
-        <section class="entity-table-section"><div class="entity-table-toolbar"><div><span>当前阵容</span><h3>球员名单</h3></div><div class="entity-table-summary"><span>${selectedTeam.squad.length} 人</span><span>${rosterUnavailable} 人异常</span></div></div><div class="entity-table-wrap"><table class="entity-data-table roster-table"><thead><tr><th>球员</th><th>位置</th><th>号码</th><th>状态</th><th>能力</th><th></th></tr></thead><tbody>${teamRosterRows(selectedTeam, selectedPlayerId)}</tbody></table></div></section>
+        <header class="team-resource-header"><div class="team-resource-title"><div><span>${escapeHtml(teamTypeLabel(profile?.team_type))}</span><h2>${escapeHtml(selectedTeam.team.canonical_name)}</h2><p>${escapeHtml(selectedTeam.team.country_code ?? "地区未设置")} · ${escapeHtml(profile?.city ?? "城市未设置")}</p></div></div><div class="team-resource-actions"><button class="secondary" data-action="return-team-directory">返回球队目录</button><button class="secondary" data-action="toggle-workspace-pane" data-pane="inspector">球队速览</button><button class="secondary" data-action="open-team-lineup-preset-manager" data-team-id="${escapeHtml(selectedTeam.team.id)}" data-team-name="${escapeHtml(selectedTeam.team.canonical_name)}">阵容预设</button><button class="secondary" data-action="open-team-profile" data-team-id="${escapeHtml(selectedTeam.team.id)}">完整档案</button><button class="primary" data-action="open-team-api-workspace" data-team-id="${escapeHtml(selectedTeam.team.id)}">AI 问答</button></div></header>
+        <div class="team-resource-stats"><div><span>当前球员</span><strong>${selectedTeam.squad.length}</strong><small>${rosterUnavailable} 人需关注</small></div><div><span>主教练</span><strong>${escapeHtml(selectedTeam.coach_periods[0]?.coach_name ?? profile?.head_coach ?? "待补")}</strong><small>${escapeHtml(selectedTeam.coach_periods[0]?.role ?? "未登记任期")}</small></div><div><span>默认阵型</span><strong>${escapeHtml(profile?.default_formation ?? "未设置")}</strong><small>${escapeHtml(tacticalStyleLabels[profile?.tactical_style ?? "balanced"] ?? "战术待补")}</small></div><div><span>数据可信度</span><strong>${profile?.data_confidence == null ? "—" : formatPercent(profile.data_confidence)}</strong><small>资料可信度不等于模型执行许可</small></div></div>
+        <section class="entity-table-section"><div class="entity-table-toolbar"><div><span>当前阵容</span><h3>球员名单</h3></div><div class="entity-table-summary"><span>${selectedTeam.squad.length} 人</span><span>${rosterUnavailable} 人异常</span></div></div><div class="entity-table-wrap"><table class="entity-data-table roster-table"><thead><tr><th>球员</th><th>位置</th><th>号码</th><th>状态</th><th>能力</th></tr></thead><tbody>${teamRosterRows(selectedTeam, selectedPlayerId)}</tbody></table></div></section>
       </main>` : "";
   const teamInspectorPanel = selectedTeam ? `<aside class="entity-inspector panel inspector-pane" data-workspace-panel="teams-inspector"><button class="entity-inspector-close icon-button" data-action="toggle-workspace-pane" data-pane="inspector" aria-label="关闭速览">×</button>${selectedRosterPlayer ? playerInspector(selectedRosterPlayer) : teamInspector(selectedTeam)}</aside>` : "";
   const directoryWorkspace = selectedTeam
@@ -205,5 +204,5 @@ export function teamsPage(
   const activeWorkspace = section === "directory"
     ? directoryStage
     : teamTaskWorkspace(section, selectedTeam, coaches, formations, lineupHistory, lineupPresets, packagePreview);
-  return workbenchView({className: "entity-page entity-page-teams task-page core-workspace-page core-team-workspace", heading: taskPageHeader({ eyebrow: "球队中心", title: selectedTeam ? `${selectedTeam.team.canonical_name} · ${section === "profile" ? "完整档案" : "球队阵容"}` : "球队与阵容资源中心", description: "目录、完整档案、资料工作包和新增资料保持同一页面上下文。", status: { label: section === "profile" ? "正在编辑完整档案" : selectedTeam ? "球队上下文已就绪" : "等待选择球队", tone: section === "profile" || selectedTeam ? "success" : "neutral" }, actions: pageActions }), context: contextRibbon, navigation: sectionNav, content: activeWorkspace});
+  return workbenchView({className: "entity-page entity-page-teams task-page core-workspace-page core-team-workspace", heading: taskPageHeader({ eyebrow: "球队中心", title: selectedTeam ? `${selectedTeam.team.canonical_name} · ${section === "profile" ? "完整档案" : "球队阵容"}` : "球队与阵容资源中心", description: "目录、完整档案、资料工作包和新增资料保持同一页面上下文。", status: { label: section === "profile" ? "正在编辑完整档案" : selectedTeam ? "球队上下文已就绪" : "等待选择球队", tone: section === "profile" || selectedTeam ? "success" : "neutral" }, actions: "" }), context: contextRibbon, navigation: sectionNav + pageActions, content: activeWorkspace});
 }

@@ -4,3 +4,5 @@ export { competitionStructure } from "./competitionView";
 export { hierarchyOptions } from "./hierarchyOptions";
 export { assertHierarchy, reconcileHierarchy, syncHierarchyControls } from "./hierarchyContext";
 export { clearRulesCatalogueFilters, filterRulesCompetitionCatalogue, selectRulesDirectoryLevel } from "./catalogueFilters";
+
+export { fitCatalogueRegions, selectCatalogueRegion } from "./catalogueRegionLayout";

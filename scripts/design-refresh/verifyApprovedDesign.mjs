@@ -3,6 +3,7 @@ import { writeFileSync, mkdtempSync } from "node:fs";
 import { resolve, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { tmpdir } from "node:os";
+import { verifyMountedDesign } from "./verifyMountedDesign.mjs";
 import { productionFixture } from "./productionFixture.mjs";
 import { captureHtmlScreenshot, resolveChromiumExecutable } from "../task-ui-screenshot-tools.mjs";
 
@@ -11,13 +12,15 @@ const directory=mkdtempSync(join(tmpdir(),"football-approved-design-"));
 const {css,script}=productionFixture(root),htmlPath=join(directory,"production-views.html");
 writeFileSync(htmlPath,`<!doctype html><html lang="zh-CN" data-theme="light"><head><meta charset="utf-8"><style>${css}</style></head><body><script>${script.replace(/<\/script/gi,"<\\/script")}</script></body></html>`);
 const results=[],browser=resolveChromiumExecutable();assert.ok(browser,"Windows Chromium required");
-const allScreens=["dashboard","teams","lineups","rules","profile","team-open","team-closed","players"];
+const allScreens=["dashboard","teams","lineups","rules","profile","team-open","team-closed","players","database","architecture"];
 const screenArgument=process.argv.find(argument=>argument.startsWith('--screens='));
 const screens=screenArgument?[...new Set(screenArgument.slice('--screens='.length).split(','))]:allScreens;
 assert.ok(screens.length&&screens.every(screen=>allScreens.includes(screen)),"Select known production screens for a focused rerun");
+await captureHtmlScreenshot({browser,htmlPath,outputPath:join(directory,"isolated-last.png"),width:1440,height:900,async exercise(cdp){
 for(const [width,height] of [[1440,900],[960,720],[1280,720],[1920,1080]]) for(const theme of ["light","dark"]) for(const screen of screens) {
   const name=`${screen}-${width}-${theme}`;
-  const result=await captureHtmlScreenshot({browser,htmlPath,outputPath:join(directory,`${name}.png`),width,height,async exercise(cdp){
+  await cdp.send("Emulation.setDeviceMetricsOverride",{width,height,deviceScaleFactor:1,mobile:false});
+  const result=await (async()=>{
     const response=await cdp.send("Runtime.evaluate",{expression:`(async()=>{try{renderFixture(${JSON.stringify(screen)},${JSON.stringify(theme)},${width<1100});await document.fonts.ready;await new Promise(r=>requestAnimationFrame(()=>requestAnimationFrame(r)));return (${checks.toString()})(${JSON.stringify(screen)});}catch(e){return {failures:[e.stack],assertions:0};}})()`,awaitPromise:true,returnByValue:true});
     if(response.exceptionDetails) return {failures:[response.exceptionDetails.text],assertions:0};
     const state=response.result.value;
@@ -33,13 +36,16 @@ for(const [width,height] of [[1440,900],[960,720],[1280,720],[1920,1080]]) for(c
       for(const [ok,message]of [[f.before==="next-player-page","real next button focused"],[f.during&&f.after,"real local loading retains named pagination focus"],[f.status===1&&(f.legacy==="none"||f.legacy==='""'),"exactly one loading status"],[f.rowCount>0&&f.retained,"nonempty player rows retained while busy"],[!f.text.includes("正在加载下一页"),"busy text covers either paging direction"]]){state.assertions++;if(!ok)state.failures.push(message);}
     }
     return state;
-  }});
+  })();
+  const shot=await cdp.send("Page.captureScreenshot",{format:"png",captureBeyondViewport:false});writeFileSync(join(directory,`${name}.png`),Buffer.from(shot.data,"base64"));
   results.push({name,...result});console.log(`${name}: ${result.assertions} checks; ${result.failures.length} failures`);
 }
+return results; }});
 writeFileSync(join(directory,"results.json"),JSON.stringify(results,null,2));
 const failures=results.flatMap(r=>r.failures.map(f=>`${r.name}: ${f}`));
 console.log(`Approved design integration evidence: ${directory}`);
 assert.equal(failures.length,0,failures.join("\n"));
+if(!screenArgument) await verifyMountedDesign(root,join(directory,"mounted"));
 console.log(`Approved design integration PASS: ${results.length} views, ${results.reduce((n,r)=>n+r.assertions,0)} checks`);
 
 function checks(screen) {
@@ -125,7 +131,7 @@ function checks(screen) {
   }
   if(screen.startsWith("team-")) {
     const main=q(".team-detail-workspace > .entity-main"),layout=q(".team-detail-workspace");
-    check(style(layout).gridTemplateColumns.split(" ").length===(screen==="team-open"?3:2),"inspector removes its grid track on close");
+    check(style(layout).gridTemplateColumns.split(" ").length===(screen==="team-open"&&innerWidth>1180?3:2),"inspector removes its grid track on close");
     check(rect(main).width>200,"team center retains useful width");
     check(rect(main).height>innerHeight/2,"team detail fills available viewport height");
     const groups=q(".team-detail-filter .entity-filter-groups"),summary=q(".team-detail-filter .entity-active-filters");
@@ -133,8 +139,19 @@ function checks(screen) {
     check(q(".roster-table").scrollWidth<=q(".entity-table-wrap").clientWidth+1,"roster table adapts to center column");
     check(q('.roster-table').querySelectorAll('tr[data-player-id]').length===6,"roster layout exercises populated bilingual and long-name rows");
     check([...q('.roster-table').querySelectorAll('td :is(button,.position-chip,.status-chip)')].every(e=>rect(e).right<=rect(e.closest('td')).right+1),"populated roster actions and statuses stay within their cells");
-    check(style(q('.roster-table .entity-table-person strong')).fontSize==='12px'&&style(q('.roster-table .entity-table-person small')).fontSize==='11px',"roster identity and secondary names use the approved readable hierarchy");
-    if(screen==="team-open") { const inspector=rect(q(".entity-inspector"));check(inspector.left>=rect(main).right&&inspector.right<=innerWidth+1,"inspector occupies its own fluid column without covering center"); }
+    check(style(q('.roster-table .entity-table-person strong')).fontSize==='13px'&&style(q('.roster-table .entity-table-person small')).fontSize==='11px',"roster identity and secondary names use the approved readable hierarchy");
+    if(screen==="team-open") { const inspector=rect(q(".entity-inspector"));check((innerWidth<=1180||inspector.left>=rect(main).right)&&inspector.right<=innerWidth+1,"inspector occupies its own fluid column without covering center"); }
+  }
+  if(screen==="database") {
+    check(document.querySelectorAll('.database-metrics .ui-stat-card').length===4,"four actual service metrics");
+    check(document.querySelectorAll('[data-navigation-panel]:not([hidden])').length===1,"one database task panel visible");
+    check(q('#database-danger').hidden&&q('#database-connection').hidden,"overview isolates connection and danger");
+    check(q('.database-boundary').textContent.includes('已连接不等于所有业务已就绪'),"service capability boundary explicit");
+  }
+  if(screen==="architecture") {
+    check(document.querySelectorAll('.architecture-flow > article').length===4,"four responsibility layers");
+    check(q('.architecture-capability').textContent.includes('外部运行时未捆绑'),"interface does not imply installed runtime");
+    check(document.querySelectorAll('[data-navigation-panel]:not([hidden])').length===1,"one architecture panel visible");
   }
   return {failures,assertions};
 }

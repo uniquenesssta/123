@@ -25,3 +25,5 @@
 @import "../pages/lineups/lineupWorkspace.css";
 @import "../pages/rules/rulesCatalogue.css";
 @import "./workspaces/presetEditor.css";
+@import "../pages/database/databaseWorkspace.css";
+@import "../pages/architecture/architectureWorkspace.css";

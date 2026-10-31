@@ -81,13 +81,13 @@ check(openai.includes("workspaceTaskAnchorNavigation") && openai.includes("opena
 check(openai.includes("支持多个 OpenAI-compatible 配置档案"), "兼容 API 原有产品说明被意外删除");
 
 for (const id of ["database-overview", "database-connection", "database-statistics", "database-danger"]) {
-  check(database.includes(`{ id: "${id}"`) && database.includes(`id="${id}"`), `数据库页缺少任务定位目标：${id}`);
+  check(database.includes(`id:"${id}"`) && database.includes('id="${panel.id}"') && database.includes("data-navigation-panel"), `数据库页缺少任务定位目标：${id}`);
 }
 for (const id of ["issue-summary", "issue-processing", "issue-records"]) {
   check(logs.includes(`{ id: "${id}"`) && logs.includes(`id="${id}"`), `问题日志页缺少任务定位目标：${id}`);
 }
 for (const id of ["architecture-flow", "architecture-principles", "architecture-modules"]) {
-  check(architecture.includes(`{ id: "${id}"`) && architecture.includes(`id="${id}"`), `系统说明页缺少任务定位目标：${id}`);
+  check(architecture.includes(`id:"${id}"`) && architecture.includes('id="${panel.id}"') && architecture.includes("data-navigation-panel"), `系统说明页缺少任务定位目标：${id}`);
 }
 for (const [name, source] of [["数据库", database], ["问题日志", logs], ["系统说明", architecture]]) {
   check(source.includes("module-workspace-page management-module-workspace"), `${name}未接入管理模块统一工作区`);

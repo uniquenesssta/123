@@ -68,6 +68,11 @@ export class WorkspaceCoordinator<PageKey extends string> {
     const patch = this.recovery.capture(root, this.state.module(page), includeControls);
     if (patch) this.patchModule(page, patch);
   }
+  /** Explicit directory returns supersede pending recovery through the same lifecycle owner. */
+  restoreFocus(page: PageKey, root: ParentNode, elementId: string): void {
+    if (this.closed) return;
+    this.recovery.restore(root, { ...this.state.module(page), active_element_id: elementId });
+  }
   restore(page: PageKey, root: ParentNode): void {
     if (!this.closed) this.recovery.restore(root, this.state.module(page));
   }

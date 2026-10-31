@@ -56,7 +56,7 @@ export function rulesPage(
       title: "赛事目录与自动模型规则",
       description: "目录、赛事层级、路由绑定与规则包分别维护；本页不执行模型。",
       status: { label: connected ? `${state.data.competitions.length} 项赛事 · ${p4ProductionPackages.length} 个 P4 生产规则` : "等待数据库", tone: connected ? "success" : "warning" },
-      actions: '<button class="secondary" data-page="prediction">进入赛事推演</button>',
+      actions: '<button class="secondary" data-action="refresh-service-state">刷新</button><button class="secondary" data-page="prediction">进入赛事推演</button><button class="secondary" data-action="select-workspace-section" data-section-id="routing">路由优先级</button>',
     })}
     ${taskContextRibbon([
       { label: "赛事目录", value: `${state.data.competitions.length} 项`, note: `${state.data.seasons.length} 个赛季 · ${state.data.stages.length} 个阶段`, tone: connected ? "accent" : "neutral" },
@@ -70,7 +70,6 @@ export function rulesPage(
         <div class="module-section-stack">
           ${connected ? "" : inlineDatabaseSetup("连接数据服务以管理赛事和规则", "连接成功后可创建赛事、赛季、阶段、轮次和模型绑定。", state.connection_error)}
           <section class="panel rules-directory-panel"><div class="panel-heading"><div><h2>赛事筛选与目录</h2><p class="field-note">按体系、地区和赛制筛选；规则路径是目录级说明。</p></div></div>${competitionCatalogue(state)}</section>
-          <section class="rules-route-strip"><strong>自动路由顺序</strong><span>本场覆盖 → 阶段 → 赛季 → 具体赛事 → 赛事类型默认</span><button class="secondary tiny" data-action="select-workspace-section" data-section-id="routing">维护路由</button></section>
         </div>
       </section>
 

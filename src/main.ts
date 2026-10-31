@@ -28,10 +28,11 @@ type LineupsLoadResult,
 type ReviewCenterLoadResult,
 } from "./controllers/pageLoaders";
 import { bindSearchableSelectDiagnostics } from "./diagnostics/searchableSelectDiagnostics";
+import { activateSectionPanel } from "./ui/navigation";
 import { architecturePage } from "./features/architecture";
-import { CompetitionFeature,clearRulesCatalogueFilters,filterRulesCompetitionCatalogue,selectRulesDirectoryLevel } from "./features/competitions";
+import { CompetitionFeature,fitCatalogueRegions,selectCatalogueRegion,clearRulesCatalogueFilters,filterRulesCompetitionCatalogue,selectRulesDirectoryLevel } from "./features/competitions";
 import { dashboardPage } from "./features/dashboard";
-import { DatabaseFeature,databasePage } from "./features/database";
+import { DatabaseFeature,databasePage,databaseTechnical } from "./features/database";
 import { createLineupsFeature } from "./features/lineups";
 import type { LineupSide } from "./features/lineups/lineupContext";
 import { emptyPairedLineupSide } from "./features/lineups/lineupState";
@@ -463,7 +464,7 @@ function render(options: RenderOptions = {}): void {
       content = dashboardPage(session.bootstrap);
       break;
     case "database":
-      content = databasePage(session.bootstrap);
+      content = databasePage(session.bootstrap, workspaceState.module("database").active_section);
       break;
     case "rules": {
       const workspace = workspaceState.module("rules");
@@ -621,7 +622,7 @@ function render(options: RenderOptions = {}): void {
       break;
     }
     case "architecture":
-      content = architecturePage();
+      content = architecturePage(workspaceState.module("architecture").active_section);
       break;
   }
   content = renderWorkflowContinuationBanner() + content;
@@ -640,6 +641,7 @@ function render(options: RenderOptions = {}): void {
   const currentPageRoot = app.querySelector<HTMLElement>(".page-container") ?? app;
   workspaceState.restore(navigation.page, currentPageRoot);
   rulesFeature.syncHierarchy(currentPageRoot);
+  if (navigation.page === "rules") fitCatalogueRegions(currentPageRoot);
   teamsFeature.drafts.restore(currentPageRoot, session.bootstrap);
   playersFeature.drafts.restore(currentPageRoot, session.bootstrap);
   shellController?.restoreFocus(shellFocus);
@@ -3267,15 +3269,40 @@ async function handleAction(
     case "select-workspace-section": {
       const sectionId = button.dataset.sectionId;
       if (!sectionId) break;
+      if (sectionId === "directory" && navigation.page === "teams") {
+        const id = teamsFeature.catalog.detail?.team.id ?? null;
+        teamsFeature.directory(); if (id) workspaceState.restoreFocus("teams", app.querySelector(".page-container") ?? app, `team-directory-${id}`); break;
+      }
       workspaceState.patchModule(navigation.page, { active_section: sectionId });
       render({ preserveForm: true });
+      if (sectionId === "directory" && navigation.page === "players" && playersFeature.catalog.detail) workspaceState.restoreFocus("players", app.querySelector(".page-container") ?? app, `player-directory-${playersFeature.catalog.detail.player.id}`);
       break;
     }
+    case "refresh-service-state":
+      await runBusy(() => session.refresh());
+      render({ preserveForm: true });
+      break;
+    case "show-database-technical":
+      if (session.bootstrap) showHtmlModal("技术连接信息", "凭据已脱敏，不显示密码。", databaseTechnical(session.bootstrap));
+      break;
+    case "show-database-scope":
+      showModal("数据服务使用边界", "已连接不等于所有业务已就绪。连接与保存可能执行迁移与内置资料注册；清除连接不删除业务数据。危险重置须核对当前数据库身份并输入名称确认，无法撤销。统计、模型提供器与业务许可分别校验。");
+      break;
+    case "show-architecture-scope":
+      showModal("架构说明范围", "本页说明职责、历史和路由原则，不代表实时健康、模型可执行性或发布验收结果。连接状态、输入条件、提供器与许可由对应业务流程校验。");
+      break;
+    case "show-model-runtime-boundary":
+      showModal("模型接口与运行能力", "统一接口与规则登记不等于已安装模型运行时。当前公共仓库不捆绑外部模型运行时，实际执行前仍须验证提供器、模型许可和本次输入条件。");
+      break;
     case "jump-workspace-anchor": {
       const anchorId = button.dataset.anchorId;
       if (!anchorId) break;
       const target = document.getElementById(anchorId);
       if (!target) break;
+      if (activateSectionPanel(app, anchorId)) {
+        workspaceState.patchModule(navigation.page, { active_section: anchorId });
+        break;
+      }
       if (target instanceof HTMLDetailsElement) target.open = true;
       const nav = button.closest<HTMLElement>(".workspace-anchor-nav, .workspace-task-anchor-nav");
       nav?.querySelectorAll<HTMLElement>("button[data-anchor-id]").forEach((item) => item.classList.toggle("active", item === button));
@@ -3633,9 +3660,11 @@ async function handleAction(
     case "open-team":
       await teamsFeature.open(button.dataset.teamId ?? "");
       break;
-    case "return-team-directory":
-      teamsFeature.directory();
+    case "return-team-directory": {
+      const id = teamsFeature.catalog.detail?.team.id ?? null;
+      teamsFeature.directory(); if (id) workspaceState.restoreFocus("teams", app.querySelector(".page-container") ?? app, `team-directory-${id}`);
       break;
+    }
     case "update-team":
       await teamsFeature.editor.update(button.dataset.teamId ?? "");
       break;
@@ -4546,6 +4575,11 @@ document.addEventListener("change", (event) => {
     teamsFeature.changeImportMode(target.id === "team-package-import-mode" ? "package" : "monthly");
     return;
   }
+  if (target.matches("[data-rules-region-select]")) {
+    selectCatalogueRegion(target);
+    filterRulesCompetitionCatalogue();
+    return;
+  }
   if (target.id === "rules-competition-kind") {
     filterRulesCompetitionCatalogue();
     return;
@@ -4845,3 +4879,5 @@ export function createBrowserApplicationModule(
 
   return { name: "browser-application", start: () => lifecycle.start(), destroy: () => lifecycle.destroy(), stop: () => lifecycle.stop() };
 }
+
+window.addEventListener("resize", () => fitCatalogueRegions(app), { signal: browserLifecycleController.signal });

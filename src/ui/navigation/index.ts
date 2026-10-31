@@ -5,6 +5,7 @@ export type { SidebarOptions } from "./sidebar/sidebarView";
 export { navigationTopbarView } from "./topbar/topbarView";
 export type { TopbarOptions } from "./topbar/topbarView";
 export { NavigationKeyboardController } from "./keyboard/navigationKeyboardController";
+export { activateSectionPanel } from "./section-navigation/sectionPanelController";
 export { workspaceSectionNavigation, workspaceTaskAnchorNavigation, workspaceAnchorNavigation } from "./section-navigation/sectionNavigationView";
 export type { WorkspaceSectionItem, WorkspaceAnchorItem } from "./section-navigation/sectionNavigationTypes";
 export { tabsView } from "./tabs/tabsView";

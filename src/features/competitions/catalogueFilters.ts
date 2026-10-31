@@ -1,3 +1,4 @@
+import { fitCatalogueRegions } from "./catalogueRegionLayout";
 import { refreshSearchableSelects } from "../../components/searchableSelect";
 
 /** Reset catalogue UI filters without changing records, bindings or the current workspace. */
@@ -72,6 +73,7 @@ export function filterRulesCompetitionCatalogue(): void {
   if (count) count.textContent = String(visible);
   const empty = directory.querySelector<HTMLElement>("#rules-empty-filter");
   if (empty) empty.hidden = visible !== 0;
+  fitCatalogueRegions(directory);
 }
 
 export function selectRulesDirectoryLevel(target: HTMLElement): boolean {

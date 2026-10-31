@@ -1,12 +1,12 @@
-.application-shell[data-current-page="dashboard"] .page-container { display: flex; flex-direction: column; gap: 12px; }
+.application-shell[data-current-page="dashboard"] .page-container { display: flex; flex-direction: column; gap: 16px; }
 .application-shell[data-current-page="dashboard"] .simple-heading { display: flex; align-items: center; justify-content: space-between; min-height: 0; margin: 0; padding: 0; border: 0; border-radius: 0; background: transparent; box-shadow: none; overflow: visible; }
 .application-shell[data-current-page="dashboard"] .simple-heading::before, .application-shell[data-current-page="dashboard"] .simple-heading::after { display: none; }
 .application-shell[data-current-page="dashboard"] .simple-heading h1 { font: 700 26px/34px var(--fip-type-page-title-family); margin: 0; }
 .application-shell[data-current-page="dashboard"] .simple-heading p { font: 400 12px/18px var(--fip-type-body-family); }
 .application-shell[data-current-page="dashboard"] .quick-actions { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 12px; margin: 0; }
-.application-shell[data-current-page="dashboard"] .dashboard-action { grid-column: span 2; display: flex; align-items: center; min-width: 0; min-height: 92px; gap: 12px; padding: 16px; border: 0; border-radius: 16px; color: var(--fip-text); background: var(--fip-surface); box-shadow: var(--fip-panel-shadow); text-align: left; }
-.application-shell[data-current-page="dashboard"] .dashboard-action:nth-child(-n+2) { grid-column: span 3; }
-.application-shell[data-current-page="dashboard"] .dashboard-action-featured { min-height: 108px; background: linear-gradient(120deg, var(--fip-gradient-start), var(--fip-gradient-end)); color: white; }
+.application-shell[data-current-page="dashboard"] .dashboard-action { grid-column: span 2; display: flex; align-items: center; min-width: 0; min-height: 96px; gap: 12px; padding: 16px; border: 0; border-radius: 16px; color: var(--fip-text); background: var(--fip-surface); box-shadow: var(--fip-panel-shadow); text-align: left; }
+.application-shell[data-current-page="dashboard"] .dashboard-action:nth-child(-n+2) { grid-column: span 3; min-height: 132px; }
+.application-shell[data-current-page="dashboard"] .dashboard-action-featured { min-height: 132px; background: linear-gradient(120deg, var(--fip-gradient-start), var(--fip-gradient-end)); color: white; }
 :where(.application-shell[data-current-page="dashboard"]) .dashboard-action .action-icon { display: inline-flex; align-items: center; justify-content: center; flex: 0 0 38px; width: 38px; height: 38px; border: 0; border-radius: 10px; background: var(--fip-subtle); color: var(--fip-text); }
 :where(.application-shell[data-current-page="dashboard"]) .dashboard-action-featured .action-icon { color: white; background: rgb(255 255 255 / .13); }
 :where(.application-shell[data-current-page="dashboard"]) .dashboard-action > div { display: grid; gap: 4px; min-width: 0; flex: 1; }
@@ -16,8 +16,8 @@
 :where(.application-shell[data-current-page="dashboard"]) .dashboard-action > b { display: inline-flex; align-items: center; gap: 8px; margin: 0; font: 500 12px/18px var(--fip-type-label-family); color: inherit; white-space: nowrap; }
 :where(.application-shell[data-current-page="dashboard"]) .dashboard-action::before { display: none; }
 :where(.application-shell[data-current-page="dashboard"]) .dashboard-action:hover:enabled { transform: translateY(-1px); box-shadow: var(--fip-float-shadow); }
-.application-shell[data-current-page="dashboard"] .compact-metrics { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; margin: 0; border: 0; background: transparent; }
-.application-shell:where([data-current-page="dashboard"]) .dashboard-metric { display: flex; flex-direction: column; align-items: flex-start; gap: 2px; min-height: 96px; padding: 12px; border: 0; border-radius: 16px; background: var(--fip-info-soft); }
+.application-shell[data-current-page="dashboard"] .compact-metrics { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; margin: 0; border: 0; background: transparent; }
+.application-shell:where([data-current-page="dashboard"]) .dashboard-metric { display: flex; flex-direction: column; align-items: flex-start; gap: 2px; min-height: 104px; padding: 12px; border: 0; border-radius: 16px; background: var(--fip-info-soft); }
 .application-shell:where([data-current-page="dashboard"]) .dashboard-metric.tone-success { background: var(--fip-success-soft); }
 .application-shell:where([data-current-page="dashboard"]) .dashboard-metric.tone-warning { background: var(--fip-warning-soft); }
 .application-shell:where([data-current-page="dashboard"]) .dashboard-metric.tone-brand { background: var(--fip-accent-soft); }
@@ -38,3 +38,11 @@
 :where(.application-shell[data-current-page="dashboard"]) .dashboard-action[data-page="review"] .action-icon { background: var(--fip-success-soft); color: var(--fip-success); }
 :where(.application-shell[data-current-page="dashboard"]) .dashboard-action[data-page="analytics"] .action-icon { background: var(--fip-accent-soft); color: var(--fip-brand); }
 :where(.application-shell[data-current-page="dashboard"]) .dashboard-action-featured > b { padding: 6px 10px; border-radius: 7px; background: white; color: var(--fip-primitive-expressive-light-violet); }
+
+.application-shell:where([data-current-page="dashboard"]) .dashboard-action:nth-child(-n+2) strong { font:700 18px/26px var(--fip-type-feature-family); }
+.application-shell:where([data-current-page="dashboard"]) .dashboard-action:is([data-page="lineups"],[data-page="players"]) > b { color:var(--fip-info); }
+.application-shell:where([data-current-page="dashboard"]) .dashboard-action[data-page="review"] > b { color:var(--fip-success); }
+.application-shell:where([data-current-page="dashboard"]) .dashboard-action[data-page="analytics"] > b { color:var(--fip-brand); }
+.application-shell:where([data-current-page="dashboard"]) .dashboard-metric .metric-attention { color:var(--fip-warning); }
+
+.application-shell[data-current-page="dashboard"] .dashboard-metric strong { margin:0; }

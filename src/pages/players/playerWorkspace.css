@@ -1,13 +1,77 @@
 /* The directory consumes its workspace slot; filter and table each own their scrolling. */
-.application-shell:where([data-current-page="players"]) .entity-page-players { height:100%; min-height:0; grid-template-rows:auto auto 32px minmax(0,1fr); }
-.application-shell:where([data-current-page="players"]) .core-player-workspace > .core-workspace-stage { height:100%; min-height:0; overflow:hidden; }
-.application-shell:where([data-current-page="players"]) .core-player-workspace .player-browser { grid-template-rows:minmax(0,1fr); height:100%; min-height:0; max-height:100%; overflow:hidden; }
-.application-shell:where([data-current-page="players"]) .player-browser > .entity-filter-panel { height:100%; min-height:0; overflow:auto; overscroll-behavior:contain; }
-.application-shell:where([data-current-page="players"]) .player-browser > .entity-main { display:grid; height:100%; min-height:0; overflow:hidden; grid-template-rows:auto minmax(0,1fr) auto; }
-.application-shell:where([data-current-page="players"]) .player-browser .player-table-wrap { height:auto; min-height:0; max-height:100%; overflow:auto; overscroll-behavior:contain; }
-.application-shell:where([data-current-page="players"]) .player-browser .entity-main-footer { display:grid; grid-template-columns:minmax(0,1fr); height:auto; gap:0; padding:0; }
-.application-shell:where([data-current-page="players"]) .player-browser .entity-main-footer > span { padding:4px 12px 0; font:400 11px/16px var(--fip-type-meta-family); }
+.application-shell[data-current-page="players"] .entity-page-players { height:100%; min-height:0; grid-template-rows:auto auto 32px minmax(0,1fr); }
+.application-shell[data-current-page="players"] .core-player-workspace > .core-workspace-stage { height:100%; min-height:0; overflow:hidden; }
+.application-shell[data-current-page="players"] .core-player-workspace .player-browser { grid-template-rows:minmax(0,1fr); height:100%; min-height:0; max-height:100%; overflow:hidden; }
+.application-shell[data-current-page="players"] .player-browser > .entity-filter-panel { height:100%; min-height:0; overflow:auto; overscroll-behavior:contain; }
+.application-shell[data-current-page="players"] .player-browser > .entity-main { display:grid; height:100%; min-height:0; overflow:hidden; grid-template-rows:auto auto auto minmax(0,1fr) auto; }
+.application-shell[data-current-page="players"] .player-browser .player-table-wrap { height:auto; min-height:0; max-height:100%; overflow:auto; overscroll-behavior:contain; }
+.application-shell[data-current-page="players"] .player-browser .entity-main-footer { display:grid; grid-template-columns:minmax(0,1fr); height:auto; gap:0; padding:0; }
+.application-shell[data-current-page="players"] .player-browser .entity-main-footer > span { padding:4px 12px 0; font:400 11px/16px var(--fip-type-meta-family); }
 
-.application-shell:where([data-current-page="players"]) .player-browser > .entity-filter-panel { grid-template-columns:minmax(0,1fr); grid-template-rows:auto minmax(0,1fr) auto auto; overflow:hidden; }
-.application-shell:where([data-current-page="players"]) .player-browser .entity-filter-groups { display:flex; flex-direction:column; align-items:stretch; gap:8px; min-height:0; overflow:auto; overscroll-behavior:contain; }
-.application-shell:where([data-current-page="players"]) .player-browser .entity-filter-group { flex:0 0 auto; width:100%; min-width:0; }
+.application-shell[data-current-page="players"] .player-browser > .entity-filter-panel { grid-template-columns:minmax(0,1fr); grid-template-rows:auto minmax(0,1fr) auto auto; overflow:hidden; }
+.application-shell[data-current-page="players"] .player-browser .entity-filter-groups { display:flex; flex-direction:column; align-items:stretch; gap:8px; min-height:0; overflow:auto; overscroll-behavior:contain; }
+.application-shell[data-current-page="players"] .player-browser .entity-filter-group { flex:0 0 auto; width:100%; min-width:0; }
+
+.application-shell[data-current-page="players"] .player-browser { column-gap:8px; }
+.application-shell[data-current-page="players"] .player-browser .entity-directory-header { display:flex; align-items:center; min-height:60px; padding:0; border:0; }
+.application-shell[data-current-page="players"] .entity-directory-header strong { font:700 14px/20px var(--fip-type-section-title-family); }
+.application-shell[data-current-page="players"] .entity-directory-header small { display:block; color:var(--fip-muted); font:400 12px/18px var(--fip-type-body-family); }
+.application-shell[data-current-page="players"] .player-browser .entity-filter-groups { justify-content:flex-start; gap:12px; padding:0; }
+.application-shell[data-current-page="players"] .player-browser .entity-filter-group { padding:0; border:0; background:transparent; }
+.application-shell[data-current-page="players"] .player-browser .entity-filter-field { display:flex; flex-direction:column; gap:6px; }
+.application-shell[data-current-page="players"] .player-browser .entity-filter-field > span { font:500 12px/18px var(--fip-type-label-family); }
+.application-shell[data-current-page="players"] .player-browser .entity-filter-field :is(select,.searchable-select-control) { height:40px; min-height:40px; }
+.application-shell[data-current-page="players"] .player-list-heading { min-height:60px; display:flex; flex-direction:column; justify-content:center; gap:4px; }
+.application-shell[data-current-page="players"] .player-list-heading h2 { margin:0; font:700 14px/20px var(--fip-type-section-title-family); }
+.application-shell[data-current-page="players"] .player-list-heading p, .application-shell[data-current-page="players"] .player-result-count { margin:0; color:var(--fip-muted); font:400 12px/18px var(--fip-type-body-family); }
+.application-shell[data-current-page="players"] .player-list-toolbar { justify-content:flex-start; flex-wrap:nowrap; gap:8px; padding:0; margin:0; border:0; }
+.application-shell[data-current-page="players"] .player-list-toolbar .entity-search { flex:0 1 420px; min-width:0; }
+.application-shell[data-current-page="players"] .entity-list-actions { flex:0 0 auto; }
+.application-shell[data-current-page="players"] .player-directory-table { width:100%; min-width:0; table-layout:fixed; }
+.application-shell[data-current-page="players"] .player-directory-table :is(th,td) { padding:8px 6px; min-width:0; white-space:normal; overflow-wrap:anywhere; }
+.application-shell[data-current-page="players"] .player-directory-table :is(th,td):first-child { width:28px; }
+.application-shell[data-current-page="players"] .player-directory-table :is(th,td):nth-child(2) { width:25%; }
+.application-shell[data-current-page="players"] .player-directory-table :is(th,td):nth-child(4) { width:16%; }
+.application-shell[data-current-page="players"] .player-directory-table :is(th,td):nth-child(5) { width:44px; }
+.application-shell[data-current-page="players"] .player-directory-table :is(th,td):last-child { width:56px; }
+.application-shell[data-current-page="players"] .player-directory-table tbody tr { height:64px; }
+.application-shell[data-current-page="players"] .player-directory-table .entity-table-person { gap:8px; min-width:0; width:100%; }
+.application-shell[data-current-page="players"] .player-directory-table .entity-table-person > span:last-child { min-width:0; }
+.application-shell[data-current-page="players"] .player-directory-table .entity-table-person strong { font:500 12px/18px var(--fip-type-body-family); overflow-wrap:anywhere; }
+.application-shell[data-current-page="players"] .player-directory-table .table-row-action { min-height:32px; padding:4px 8px; font:500 12px/18px var(--fip-type-control-family); }
+
+.application-shell[data-current-page="players"] .player-browser { grid-template-columns:248px minmax(0,1fr); gap:8px; }
+.application-shell[data-current-page="players"] .player-browser.inspector-open { grid-template-columns:248px minmax(0,1fr) 300px; }
+.application-shell[data-current-page="players"] .player-browser > .panel { padding:12px; border:0; border-radius:16px; box-shadow:var(--fip-panel-shadow); }
+.application-shell[data-current-page="players"] .player-list-toolbar { min-height:40px; }
+.application-shell[data-current-page="players"] .player-list-toolbar .entity-search { height:40px; border:0; background:transparent; overflow:visible; }
+.application-shell[data-current-page="players"] .player-list-toolbar .entity-search input { flex:1; min-width:0; height:32px; padding:0 10px; border:1px solid var(--fip-border); border-radius:7px; }
+.application-shell[data-current-page="players"] .player-list-toolbar .entity-search > svg { display:none; }
+.application-shell[data-current-page="players"] .player-list-toolbar .entity-search button { min-height:40px; border:1px solid var(--fip-border); border-radius:7px; background:var(--fip-surface); color:var(--fip-text); }
+.application-shell[data-current-page="players"] .player-table-wrap { padding:0; border:0; }
+.application-shell[data-current-page="players"] .player-directory-table :is(th,td):first-child { width:28px; padding:4px; }
+.application-shell[data-current-page="players"] .player-directory-table thead tr { height:36px; }
+.application-shell[data-current-page="players"] .player-directory-table th { padding:8px 6px; font:500 11px/16px var(--fip-type-meta-family); text-align:left; }
+.application-shell[data-current-page="players"] .player-directory-table .entity-table-person { padding:0; background:transparent; }
+
+.application-shell[data-current-page="players"] .task-page-header { margin:0; padding:0; border:0; min-height:0; }
+.application-shell[data-current-page="players"] .task-context-ribbon { min-height:24px; align-items:center; padding:0; gap:8px; }
+.application-shell[data-current-page="players"] .task-context-item { padding:0; background:transparent; border:0; }
+.application-shell[data-current-page="players"] .task-context-item > div { display:flex; align-items:center; gap:6px; }
+.application-shell[data-current-page="players"] .task-context-item :is(span,strong,small) { font:400 11px/16px var(--fip-type-meta-family); }
+.application-shell[data-current-page="players"] .core-local-navigation { gap:8px; padding:0; margin:0; background:transparent; border:0; border-radius:0; }
+.application-shell[data-current-page="players"] .core-local-navigation > nav { flex:0 1 auto; width:auto; }
+
+.application-shell[data-current-page="players"] .player-browser .entity-filter-groups { gap:8px; }
+.application-shell[data-current-page="players"] .player-browser .entity-filter-field > span { font:500 13px/18px var(--fip-type-label-family); }
+.application-shell[data-current-page="players"] .player-list-toolbar .entity-search { flex-basis:360px; }
+.application-shell[data-current-page="players"] .player-directory-table th { font:500 12px/18px var(--fip-type-label-family); }
+.application-shell[data-current-page="players"] .player-directory-table .entity-table-person strong { font:500 13px/18px var(--fip-type-body-family); }
+.application-shell[data-current-page="players"] .player-browser > .entity-inspector { position:static; width:auto; height:100%; transform:none; }
+@media (max-width:1180px) {
+  .application-shell[data-current-page="players"] .player-browser.inspector-open { grid-template-columns:248px minmax(0,1fr); }
+  .application-shell[data-current-page="players"] .player-browser.inspector-open > .entity-inspector { position:fixed; top:44px; right:0; bottom:0; width:300px; height:auto; z-index:30; }
+}
+
+.application-shell[data-current-page="players"] .player-browser.inspector-open > .entity-inspector { display:block; }
+.application-shell[data-current-page="players"] .player-browser.inspector-collapsed > .entity-inspector { display:none; }

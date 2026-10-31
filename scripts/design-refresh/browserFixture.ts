@@ -1,3 +1,5 @@
+import { databasePage } from "../../src/features/database";
+import { architecturePage } from "../../src/features/architecture";
 import { playersPage } from "../../src/features/players";
 import { NavigationKeyboardController } from "../../src/ui/navigation";
 import { dashboardPage } from "../../src/features/dashboard";
@@ -19,7 +21,7 @@ export function renderFixture(screen: string, theme: Theme, collapsed: boolean):
     ? teamsPage(state, catalogue, selected, null, {active_only:true}, new Set(), [], [], null, [], [], [], null, "detail", false, screen !== "team-open", screen === "profile" ? "profile" : "directory")
     : page === "players" ? playersPage(state,references,playerCatalogue,null,{},null,new Set(),[],null,"detail",false,true,"directory")
     : page === "lineups" ? lineupsPage(state, references, [], null, builder, {home:[],away:[]}, [], null, match.id, false, false, "builder")
-    : rulesPage(state, null, "catalog");
+    : page === "database" ? databasePage(state) : page === "architecture" ? architecturePage() : rulesPage(state, null, "catalog");
   document.documentElement.dataset.theme = theme;
   document.body.innerHTML = renderShell({state,page,theme,content,sidebarCollapsed:collapsed});
   enhanceSearchableSelects(document.body);

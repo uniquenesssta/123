@@ -1,0 +1,33 @@
+/* Approved S15 page composition; business state belongs to DatabaseFeature / Session. */
+.application-shell:where([data-current-page="database"]) .page-container { overflow:hidden; }
+.application-shell:where([data-current-page="database"]) .management-module-workspace { height:100%; min-height:0; grid-template-rows:auto auto minmax(0,1fr); gap:12px; }
+.application-shell:where([data-current-page="database"]) .core-local-navigation { display:flex; align-items:center; flex-wrap:wrap; gap:8px; }
+.application-shell:where([data-current-page="database"]) .workspace-task-anchor-nav { flex:0 1 auto; width:auto; margin:0; }
+.application-shell:where([data-current-page="database"]) .management-module-stage { padding:0 0 12px; scrollbar-gutter:auto; }
+.application-shell:where([data-current-page="database"]) [data-navigation-panel] { display:flex; flex-direction:column; gap:12px; min-width:0; margin:0; }
+.application-shell:where([data-current-page="database"]) [data-navigation-panel][hidden] { display:none; }
+.application-shell:where([data-current-page="database"]) .panel { min-width:0; margin:0; padding:12px; border:0; border-radius:16px; background:var(--fip-surface); box-shadow:var(--fip-panel-shadow); }
+.application-shell:where([data-current-page="database"]) .panel h2 { margin:0 0 6px; color:var(--fip-text); font:700 14px/20px var(--fip-type-section-title-family); }
+.application-shell:where([data-current-page="database"]) .panel p { margin:0 0 12px; color:var(--fip-muted); font:400 12px/18px var(--fip-type-body-family); overflow-wrap:anywhere; }
+.application-shell:where([data-current-page="database"]) .panel p:last-child { margin-bottom:0; }
+.application-shell:where([data-current-page="database"]) .button-row { flex-wrap:wrap; gap:8px; margin:0; }
+.application-shell:where([data-current-page="database"]) .database-identity-facts { padding-top:8px; border-top:1px solid var(--fip-border); font:400 12px/18px var(--fip-type-body-family); overflow-wrap:anywhere; }
+.application-shell:where([data-current-page="database"]) .database-metrics { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:12px; }
+.application-shell:where([data-current-page="database"]) .database-metrics .ui-stat-card { min-height:96px; padding:12px; border:0; border-radius:16px; background:var(--fip-info-soft); box-shadow:var(--fip-panel-shadow); }
+.application-shell:where([data-current-page="database"]) .database-metrics .ui-stat-card :is(.ui-stat-label,.ui-stat-value) { color:var(--fip-info); }
+.application-shell:where([data-current-page="database"]) .database-metrics .ui-stat-card:nth-child(3) { background:var(--fip-accent-soft); }
+.application-shell:where([data-current-page="database"]) .database-metrics .ui-stat-card:nth-child(3) :is(.ui-stat-label,.ui-stat-value) { color:var(--fip-brand); }
+.application-shell:where([data-current-page="database"]) .database-metrics .ui-stat-value { font:600 24px/30px var(--fip-type-metric-text-family); }
+.application-shell:where([data-current-page="database"]) .database-boundary > p + p { padding-top:8px; border-top:1px solid var(--fip-border); color:var(--fip-text); }
+.application-shell:where([data-current-page="database"]) .database-connection-layout { display:grid; grid-template-columns:minmax(0,1fr) 336px; gap:12px; }
+.application-shell:where([data-current-page="database"]) .database-connection-layout .field { margin-bottom:12px; }
+.application-shell:where([data-current-page="database"]) .database-panel-actions { display:flex; align-items:center; flex-wrap:wrap; gap:8px; padding:12px; background:var(--fip-surface); border-radius:12px; }
+.application-shell:where([data-current-page="database"]) .database-danger-zone { display:block; }
+.application-shell:where([data-current-page="database"]) .database-danger-zone h2 { color:var(--fip-danger); }
+@media (max-width:1100px) { .application-shell:where([data-current-page="database"]) .database-connection-layout { grid-template-columns:minmax(0,1fr) minmax(240px,.65fr); } }
+
+.application-shell[data-current-page="database"] .task-page-header { min-height:0; margin:0; padding:0; border:0; }
+.application-shell[data-current-page="database"] .core-local-navigation { min-height:32px; padding:0; border:0; border-radius:0; background:transparent; overflow:visible; }
+.application-shell[data-current-page="database"] .workspace-task-anchor-nav { border:0; padding:0; border-radius:0; background:transparent; }
+
+.application-shell[data-current-page="database"] .workspace-task-anchor-nav :is(button,span,strong) { transition:none; }

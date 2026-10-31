@@ -108,7 +108,7 @@ export function competitionCatalogue(state: BootstrapResponse): string {
         ${(["national", "club", "other"] as CompetitionScope[]).map((scope) => `<button type="button" data-rules-scope="${scope}">${scopeLabel(scope)} <span>${competitions.filter((item) => competitionScope(item) === scope).length}</span></button>`).join("")}
       </nav>
       <nav class="rules-region-list" aria-label="赛事二级分类">
-        <strong>地区 / 足联</strong>
+        <strong>地区 / 足联</strong><select data-rules-region-select data-native-select aria-label="地区 / 足联" hidden><option value="">全部地区</option>${regions.map(region => `<option value="${escapeHtml(region)}">${escapeHtml(region)}</option>`).join("")}</select>
         <button class="active" type="button" data-rules-region="" data-region-scopes="national,club,other">全部地区 <span>${competitions.length}</span></button>
         ${regions.map((region) => `<button type="button" data-rules-region="${escapeHtml(region)}" data-region-scopes="${escapeHtml(Array.from(regionScopeMap.get(region) ?? []).join(","))}">${escapeHtml(region)} <span>${competitions.filter((item) => competitionRegionLabel(item) === region).length}</span></button>`).join("")}
       </nav>
