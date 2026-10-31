@@ -57,3 +57,12 @@
 
 
 UI01-V1～V5对照：V1由80个实际View组合与六页1440完整截图及独立复审覆盖；V2由四尺寸/两主题、960侧栏开关/抽屉、长名称和20地区覆盖；V3验证球队已应用筛选/选择/原卡片焦点及球员第2页/筛选/多选/对象焦点，并保留原Feature；V4由15项DatabaseWorkflow、挂载失败/未知/未配置/强确认及原生只读运行分别覆盖；V5由真实Session指标、公开运行时契约说明与原型专用按钮排除覆盖。
+
+
+## 提交与精确CI交接
+
+代码提交`5613bdcde344ba3c9fc99da8e3a9791b30bbcf3f`已推送到`rewrite/r13-core-ui-features`；42路径（10新增、32修改、无文件删除）。07收尾文档提交`ac586e3d`同批推送。199个本地文档链接核验有效，最终证据168文件摘要及代码文件清单保存在上述本地证据目录。
+
+仅查询一次[本批CI run41228822906](https://github.com/uniquenesssta/123/actions/runs/41228822906)：push事件、分支与head_sha精确匹配5613bdcd，查询时`in_progress`、`conclusion=null`。**未通过验收的项目是本批CI/双安装包及包内startup，不能把07或本地startup作为本批CI通过。** 不轮询、不取消其他运行。
+
+后续收尾只核该代码SHA的完成状态、成功job、artifact摘要、MSI/NSIS与包内startup，成功后才记UI01 DONE，再由用户启动R13-09。当前后续文档交接提交仅修改Markdown，不是另一次UI代码CI；代码验收始终锚定5613bdcd。
