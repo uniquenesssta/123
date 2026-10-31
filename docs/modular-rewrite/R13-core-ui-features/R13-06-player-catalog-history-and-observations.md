@@ -80,3 +80,17 @@
 ## 本批交付状态
 
 本地实现及所有本地必需门禁已完成，当前VERIFYING；代码推送后只按自身精确SHA核对一次CI，双bundle/包内startup等待精确运行结果。未把05的绿色CI或本机startup当成本批打包通过。07未启动。
+
+## 精确代码提交与CI交接
+
+代码3683b7f30576704ba2c77a58f25606525390642a，已推送既有R13分支，源码树aa36c749f2016870b0bb9e8bec73d9385a076437。50路径：16新增、33修改、仅1个旧players.ts路径退出。最终完整96步退出0；30项球员行为、26项Windows浏览器、16种HTML等价、真实原生目录及startup报告通过。
+
+自身[Public Platform CI run41183380347](https://github.com/uniquenesssta/123/actions/runs/41183380347)只查询一次：精确head/分支/push匹配，in_progress/conclusion=null。自身MSI/NSIS/包内startup尚未验收，06保持VERIFYING；不得以05证据替代。未轮询，07未启动。
+
+## 本次old临时产物交接
+
+按用户本次手动删除要求完成明确路径移动：O:/Project/FOODBALL/tmp/old/r13-06-20261031/manifest.json。首轮2269项移入待删区，其中2201个是captureHtmlScreenshot产生且已无活跃进程的临时Chromium profile，其最终PNG本就在独立证据目录。其余为本轮被最终结果替代的失败/中间日志、失败fixture、迁移前对照和一次性生成稿；目录边界逐项核对，无递归删除、无覆盖、无移动失败或活跃进程遗漏。记录脚本随后自身归档，最终项数以manifest为准。
+
+保留O:/Project/FOODBALL/tmp/r13-06-frontend-verified.log、r13-06-behavior-final.log、r13-06-build-final.log、r13-06-architecture.log、最终浏览器和原生结果/截图/startup报告；最终复现工具移动到O:/Project/FOODBALL/tmp/r13-06-evidence-tools。node_modules、Rust目标缓存、05精确CI证据、真实Windows配置和其他用户文件保持。失败中间物的位置以manifest的source→destination对应表追溯。
+
+用户已另行授权后续项目临时目录按核对清单逐文件清理；本次只移动，由用户手动删除old。不宣称移动已释放磁盘空间。上述后续授权已写入执行约定，没有改系统TEMP/TMP。
