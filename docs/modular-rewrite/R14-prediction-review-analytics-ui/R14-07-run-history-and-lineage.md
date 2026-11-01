@@ -48,3 +48,13 @@
 代码回退点8e2d444b。本批无迁移、无模型算法/私有资产变化，不因回退代码改写用户数据。公开推送后单次核精确07代码SHA，CI/官方摘要/双包/包内startup未验收前保持VERIFYING。下一项 **R14-08 复盘选择、事实与包提交**，未启动。
 
 最终局部变更（公开历史入口通知和新源码排版）后重跑26项生产状态测试、55项S05挂载及40项S03挂载，TypeScript、架构/样式/状态/命令/类型清单及受影响静态检查再次PASS。最终Vite先把旧dist单项归入tmp/old，再在不存在旧dist时构建，避免递归删除；构建产物与完整前端末尾的JS/CSS内容指纹一致。
+
+## 公开交付与单次CI核对
+
+代码提交 `da42c74902ad9d9f39a27e450dd526fb7acad241` 已推送到原R14分支，共34个路径：11新增、22修改，仅退出已被实际调用替代的src/pages/runs.ts。未删除底层模型运行或业务数据。
+
+只查询一次该精确SHA、R14分支、push事件及Public Platform CI，匹配 [CI 41310468919](https://github.com/uniquenesssta/123/actions/runs/41310468919)，当次in_progress，conclusion为空。未轮询PR/CI，未把06或文档提交的CI当作07代码CI。07官方摘要、MSI/NSIS及包内startup未验收，本批保持VERIFYING。
+
+临时归档清单temporary-artifact-manifest.json：89个本批明确目录按清单移动；必要完整设计证据在logs/frontend-design，其他归档在O:/Project/FOODBALL/tmp/old/r14-07-generated。旧dist与最初漏配TEMP的产物分别有明确路径；没有将移动称为删除，没有执行批量删除。遵守最新AGENTS禁止批量删除的限制。
+
+下一项R14-08复盘选择、事实与包提交，尚未启动。待07精确CI/官方产物验收后再按用户授权进入。
