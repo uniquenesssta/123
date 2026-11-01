@@ -1,3 +1,4 @@
+import {verifyPredictionBrowser} from "../features/verifyPredictionBrowser.mjs";
 import { verifyWorkbooksBrowser } from "../features/verifyWorkbooksBrowser.mjs";
 import assert from "node:assert/strict";
 import { writeFileSync, mkdtempSync } from "node:fs";
@@ -156,3 +157,5 @@ function checks(screen) {
   }
   return {failures,assertions};
 }
+
+await verifyPredictionBrowser(root,join(directory,"prediction-mounted"));

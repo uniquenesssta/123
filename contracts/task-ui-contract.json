@@ -154,5 +154,17 @@
     "formation_auto_assignment": true,
     "starter_slot_validation": "exact_11_unique_slots",
     "member_list_scroll": "internal_stable"
+  },
+  "approved_page_layouts": {
+    "prediction": {
+      "authority": "S03 FormalUnchecked 487:22278 / R14-01",
+      "shared_components": {
+        "taskPageHeader": "prediction-page-heading",
+        "taskContextRibbon": "prediction-context-summary"
+      },
+      "task_stage_class": "core-workspace-stage",
+      "viewport_class": "prediction-viewport",
+      "pinned_action_class": "prediction-execution-bar"
+    }
   }
 }

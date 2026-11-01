@@ -783,8 +783,36 @@
       ],
       "transition": null,
       "migration_task": "R13-09"
+    },
+    {
+      "id": "feature.prediction-context",
+      "owner": "src/features/prediction/predictionContext.ts::PredictionContext",
+      "scope": "formal match, model, rule and snapshot selection; research selection uses this same stable match context",
+      "writers": [
+        "PredictionContext methods"
+      ],
+      "forbidden": [
+        "src/pages/**",
+        "src/api/**"
+      ],
+      "transition": null,
+      "migration_task": "R14-01"
+    },
+    {
+      "id": "feature.prediction-execution",
+      "owner": "src/features/prediction/predictionFeature.ts::PredictionFeature",
+      "scope": "current eligibility, formal/shadow operation, readonly result and scoped recovery receipt; no model algorithms or duplicate server ledger",
+      "writers": [
+        "PredictionFeature methods"
+      ],
+      "forbidden": [
+        "src/pages/**",
+        "src/api/**"
+      ],
+      "transition": null,
+      "migration_task": "R14-01"
     }
   ],
-  "count": 54,
-  "last_updated_task": "R13-09"
+  "count": 56,
+  "last_updated_task": "R14-01"
 }

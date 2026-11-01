@@ -15,10 +15,11 @@ const styles = read("src/styles/app.css");
 const shell = JSON.parse(read("contracts/global-visual-system-contract.json")).shell_source_entries.map(read).join("\n");
 const navigation = read("src/app/router/routeRegistry.ts");
 const lineups = read("src/pages/lineups.ts");
-const prediction = read("src/pages/prediction.ts");
+const prediction = read("src/pages/prediction.ts") + read("src/features/prediction/formalPredictionView.ts");
 const runs = read("src/pages/runs.ts");
 const teams = ["src/features/teams/teamPresentation.ts","src/features/teams/profileView.ts","src/features/teams/packageView.ts","src/features/teams/teamsView.ts"].map(read).join("\n");
 const main = read("src/main.ts");
+const predictionResult=read("src/features/prediction/predictionResultView.ts");
 const lineupWorkflow = readLineupWorkflowSources(stylesheetRoot);
 
 requireTrue(entityStyles.includes("--shell-sidebar-expanded") && entityStyles.includes(".application-shell.secondary-collapsed"), "双层全局导航没有展开与折叠常驻结构");
@@ -34,8 +35,8 @@ requireTrue(styles.includes(".balanced-lineup-row") && styles.includes("overflow
 requireTrue(lineups.includes("open-lineup-player-settings") && main.includes("savePairedLineupPlayerSettings"), "阵容高级字段已隐藏但没有可访问的球员设置入口");
 requireTrue(lineupWorkflow.includes("lineup-player-expected-minutes") && lineupWorkflow.includes("lineup-player-starting-probability"), "球员分钟与首发概率设置链路缺失");
 
-requireTrue(prediction.includes("taskPageHeader") && prediction.includes("taskContextRibbon") && prediction.includes("core-local-navigation") && prediction.includes("master-detail-workspace"), "正式推演页没有接入任务型平衡布局");
-for (const label of ["P4/P7 的入口、路由与数据准备链已保留", "外部提供器规则入口", "数据窗口", "参数版本", "正式运行与重新校准分开管理"]) {
+requireTrue(["prediction-page-heading", "prediction-context-summary", "core-local-navigation", "core-workspace-stage", "prediction-viewport", "prediction-execution-bar"].every(name=>prediction.includes(name)), "正式推演页没有接入任务型平衡布局");
+for (const label of ["数据准备和路由可用", "外部提供器规则入口", "数据窗口", "参数版本", "正式运行与重新校准分开管理"]) {
   requireTrue(prediction.includes(label), `正式推演主界面缺少必要信息：${label}`);
 }
 requireTrue(!prediction.includes("P4 Golden Master固定回归规则"), "正式推演页面仍直接暴露 Golden Master 回归资产");
@@ -44,7 +45,7 @@ requireTrue(runs.includes("balanced-data-table") && runs.includes("模型 / 规�
 requireTrue(teams.includes("entity-directory-list") && teams.includes("entity-data-table roster-table") && teams.includes("当前阵容"), "球队资源中心没有接入目录与高密度阵容表格");
 requireTrue(styles.includes(".balanced-data-table") && entityStyles.includes(".entity-data-table") && entityStyles.includes(".entity-directory-list"), "历史或球队高密度表格样式缺失");
 
-requireTrue(main.includes("item.probability >= 0.001") && styles.includes(".threshold-scroll"), "推演比分没有采用 0.1% 阈值和固定滚动区");
+requireTrue(predictionResult.includes("item.probability >= 0.001") && styles.includes(".threshold-scroll"), "推演比分没有采用 0.1% 阈值和固定滚动区");
 requireTrue(!main.includes('data-action="show-route-json">高级矩阵与技术信息在详细设置中查看'), "比分阈值说明错误复用了路由详情动作");
 requireTrue(main.includes("request-remove-lineup-history") && main.includes("request-hide-run-history"), "阵容或推演历史删除交互没有接入");
 

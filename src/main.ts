@@ -1,3 +1,4 @@
+import {PredictionFeature,predictionRecovery,predictionPage,inlinePredictionResult,predictionDetailBody,routeSourceLabel,modelDisplayName,syncPredictionControls,syncPredictionSelectIcons} from "./features/prediction";
 import {
 api,
 issueWasLogged,
@@ -14,7 +15,7 @@ import { ApplicationShellController,pageTitle,renderShell } from "./app/shell";
 import { WarningCenterController } from "./app/warnings";
 import { WorkspaceCoordinator,type WorkspaceLayoutMode,type WorkspaceTabState } from "./app/workspace";
 import { bulkArchiveSummary } from "./components/entityDeletion";
-import { escapeHtml,formatPercent } from "./components/format";
+import { escapeHtml } from "./components/format";
 import { enhanceSearchableSelects,refreshSearchableSelects } from "./components/searchableSelect";
 import {
 fetchAnalysisCenter,
@@ -37,7 +38,7 @@ import { createLineupsFeature } from "./features/lineups";
 import type { LineupSide } from "./features/lineups/lineupContext";
 import { emptyPairedLineupSide } from "./features/lineups/lineupState";
 import { PlayersFeature,playersPage } from "./features/players";
-import { RulesFeature,routeCard,routeDetailBody,rulesPage } from "./features/rules";
+import { RulesFeature,routeDetailBody,rulesPage } from "./features/rules";
 import { TeamsFeature,teamsPage } from "./features/teams";
 import { analyticsPage } from "./pages/analytics";
 import { apiWorkspacePage } from "./pages/apiWorkspace";
@@ -45,7 +46,6 @@ import { lineupPresetsPage } from "./pages/lineupPresets";
 import { lineupsPage } from "./pages/lineups";
 import { logsPage } from "./pages/logs";
 import { openAiPage } from "./pages/openai";
-import { predictionPage } from "./pages/prediction";
 import { releasePage } from "./pages/release";
 import { reviewPage } from "./pages/review";
 import { runsPage } from "./pages/runs";
@@ -75,7 +75,6 @@ IssueSeverity,
 LineupRecord,
 LineupSnapshotType,
 MatchLineupChain,
-MatchPredictionReadiness,
 MatchRecord,
 MatchReviewDetail,
 MatchReviewDraft,
@@ -264,10 +263,8 @@ const playersFeature = new PlayersFeature({
 
 const navigation = new Router();
 const workflowNavigation = new NavigationContext();
-let lastPredictionResult: unknown = null;
 let coachList: CoachListItem[] = [];
 let formationCatalog: FormationRecord[] = [];
-let selectedPredictionReadiness: MatchPredictionReadiness | null = null;
 let reviewableMatches: ReviewableMatch[] = [];
 let recentMatchReviews: MatchReviewSummary[] = [];
 let selectedReviewMatchId: string | null = null;
@@ -308,7 +305,7 @@ runBusy:(...args)=>runBusy(...args),
 showConfirmation:(...args)=>showConfirmation(...args),
 closeModal:(...args)=>closeModal(...args),
 localDateTimeToIso:(...args)=>localDateTimeToIso(...args),
-get lastPredictionResult(){return lastPredictionResult;}, set lastPredictionResult(v){lastPredictionResult=v;},
+get lastPredictionResult(){return predictionFeature.lastResult;}, set lastPredictionResult(v){predictionFeature.lastResult=v;},
 get workspaceState(){ return workspaceState; },
 session,
 filterSelectOptions:(...args)=>filterSelectOptions(...args),
@@ -344,6 +341,14 @@ function captureImportView():()=>boolean {
   return ()=>page===navigation.page && section===workspaceState.module(page).active_section && current();
 }
 
+const predictionFeature=new PredictionFeature({
+  api,scope:()=>captureImportData(),
+  view:()=>{const page=navigation.page,section=workspaceState.module(page).active_section;return()=>page===navigation.page&&section===workspaceState.module(page).active_section&&!browserLifecycleController.signal.aborted;},
+  changed:()=>{if(renderedPage==="prediction"&&session.bootstrap)render({preserveForm:true});},
+  busy:operation=>runBusy(operation),
+  recovery:predictionRecovery(localPreferences,preferenceKey("prediction-run-recovery"),()=>session.bootstrap),
+});
+
 interface WorkflowContinuation {
   readonly reason: string;
   readonly matchId: string | null;
@@ -361,9 +366,6 @@ let selectedOpenAiProfileId: string | null = null;
 let creatingOpenAiProfile = false;
 const openAiApiExampleTimer = new DebouncedTask(browserLifecycleController);
 let openAiApiExampleLastParsed = "";
-let selectedP4MatchId: string | null = null;
-let selectedPredictionSnapshot: LineupSnapshotType = "T-N";
-let selectedPredictionModelFamily: PredictionModelFamily = "p4";
 let p4MatchWorkspace: P4MatchWorkspace | null = null;
 let p4TaskWorkspace: P4TaskWorkspace | null = null;
 let apiWorkspacePresets: ApiWorkspacePreset[] = [];
@@ -455,7 +457,7 @@ async function returnToWorkflow(): Promise<void> {
   }
   if (continuation.matchId) {
     lineupsFeature.state.selectedManagedMatchId = continuation.matchId;
-    selectedP4MatchId = continuation.matchId;
+    predictionFeature.context.matchId = continuation.matchId;
     lineupsFeature.state.pairedLineupBuilder = {
       ...lineupsFeature.state.pairedLineupBuilder,
       match_id: continuation.matchId,
@@ -559,16 +561,17 @@ function render(options: RenderOptions = {}): void {
       content = predictionPage(
         session.bootstrap,
         playersFeature.catalog.references,
-        selectedP4MatchId,
+        predictionFeature.context.matchId,
         p4MatchWorkspace,
         p4TaskWorkspace,
         lineupsFeature.state.selectedMatchLineupChain,
-        selectedPredictionReadiness,
-        selectedPredictionSnapshot,
-        selectedPredictionModelFamily,
+        predictionFeature.readiness,
+        predictionFeature.context.snapshot,
+        predictionFeature.context.model,
         workspace.module_sidebar_collapsed,
         workspace.inspector_collapsed,
         workspace.active_section ?? "formal",
+        predictionFeature.view,
       );
       break;
     }
@@ -675,6 +678,11 @@ function render(options: RenderOptions = {}): void {
   renderedPage = navigation.page;
   const currentPageRoot = app.querySelector<HTMLElement>(".page-container") ?? app;
   workspaceState.restore(navigation.page, currentPageRoot);
+  if(navigation.page==="prediction"){
+    syncPredictionControls(currentPageRoot,predictionFeature.context.command);
+    enhanceSearchableSelects(currentPageRoot);
+    syncPredictionSelectIcons(currentPageRoot);
+  }
   rulesFeature.syncHierarchy(currentPageRoot);
   if (navigation.page === "rules") fitCatalogueRegions(currentPageRoot);
   teamsFeature.drafts.restore(currentPageRoot, session.bootstrap);
@@ -938,347 +946,10 @@ function showConfirmation(
   modal.confirm(title, description, facts, confirmLabel, action, options);
 }
 
-function routeSourceLabel(source: RouteDecision["source"]): string {
-  const labels: Record<RouteDecision["source"], string> = {
-    explicit_rule_package: "本场规则包覆盖",
-    stage_binding: "赛事阶段绑定",
-    season_binding: "赛季绑定",
-    competition_binding: "具体赛事绑定",
-    competition_kind_default: "赛事类型默认",
-  };
-  return labels[source];
-}
-
-function modelDisplayName(modelId: string): string {
-  const labels: Record<string, string> = {
-    p4: "P4 通用低比分概率模型",
-    p4_league: "P4 联赛低比分概率模型",
-    p4_group_stage: "P4 小组赛低比分概率模型",
-    p4_knockout_90: "P4 单回合淘汰赛模型",
-    p4_knockout_two_leg_90: "P4 两回合淘汰赛模型",
-    p4_friendly: "P4 友谊赛低比分概率模型",
-    p7: "P7 通用函数曲线模型",
-    p7_league: "P7 联赛 90 分钟模型",
-    p7_group_stage: "P7 小组赛 90 分钟模型",
-    p7_knockout_90: "P7 单回合淘汰赛 90 分钟模型",
-    p7_knockout_two_leg_90: "P7 两回合淘汰赛 90 分钟模型",
-    p7_friendly: "P7 友谊赛 90 分钟模型",
-  };
-  return labels[modelId] ?? modelId;
-}
-
-interface ScorelineView {
-  score: string;
-  probability: number;
-  cumulativeProbability: number | null;
-  rank: number;
-}
-
-interface PredictionViewData {
-  homeTeam: string;
-  awayTeam: string;
-  homeWin: number;
-  draw: number;
-  awayWin: number;
-  btts: number | null;
-  over25: number | null;
-  homeLambda: number | null;
-  awayLambda: number | null;
-  homeCleanSheet: number | null;
-  awayCleanSheet: number | null;
-  scorelines: ScorelineView[];
-  modelId: string;
-  modelVersion: string;
-  parameterVersion: string;
-  rulePackage: string;
-  rulePackageVersion: string;
-  routeSource: string;
-  snapshotType: string;
-  runId: string;
-  durationMs: number | null;
-  createdAt: string | null;
-  audit: Record<string, unknown>;
-  inputAudit: Record<string, unknown>;
-}
-
 function objectValue(value: unknown): Record<string, unknown> {
   return value && typeof value === "object" && !Array.isArray(value)
     ? (value as Record<string, unknown>)
     : {};
-}
-
-function stringValueFrom(
-  record: Record<string, unknown>,
-  key: string,
-  fallback = "",
-): string {
-  const candidate = record[key];
-  return typeof candidate === "string" && candidate.trim().length > 0
-    ? candidate
-    : fallback;
-}
-
-function numberValueFrom(
-  record: Record<string, unknown>,
-  key: string,
-): number | null {
-  const candidate = record[key];
-  return typeof candidate === "number" && Number.isFinite(candidate)
-    ? candidate
-    : null;
-}
-
-function predictionViewData(payload: unknown): PredictionViewData {
-  const root = objectValue(payload);
-  const rootOutput = objectValue(root.output);
-  const wrappedOutput =
-    Object.keys(objectValue(rootOutput.identity)).length > 0 ? rootOutput : {};
-  const directOutput =
-    Object.keys(objectValue(root.identity)).length > 0 &&
-    Object.keys(objectValue(root.payload)).length > 0
-      ? root
-      : {};
-  const modelPayload =
-    Object.keys(wrappedOutput).length > 0
-      ? objectValue(wrappedOutput.payload)
-      : Object.keys(directOutput).length > 0
-        ? objectValue(directOutput.payload)
-        : rootOutput;
-  const summary =
-    Object.keys(wrappedOutput).length > 0
-      ? objectValue(wrappedOutput.summary)
-      : objectValue(root.summary);
-  const identity =
-    Object.keys(wrappedOutput).length > 0
-      ? objectValue(wrappedOutput.identity)
-      : Object.keys(directOutput).length > 0
-        ? objectValue(directOutput.identity)
-        : root;
-  const input = objectValue(root.input);
-  const inputHome = objectValue(input.team_a);
-  const inputAway = objectValue(input.team_b);
-  const route = objectValue(root.route);
-  const rawScorelines = Array.isArray(modelPayload.scorelines)
-    ? modelPayload.scorelines
-    : [];
-  const scorelines = rawScorelines
-    .map((item, index): ScorelineView | null => {
-      const row = objectValue(item);
-      const probability = numberValueFrom(row, "probability");
-      if (probability === null) return null;
-      const goalsA = numberValueFrom(row, "goals_a");
-      const goalsB = numberValueFrom(row, "goals_b");
-      const score = stringValueFrom(
-        row,
-        "score",
-        goalsA !== null && goalsB !== null ? `${goalsA}-${goalsB}` : "—",
-      );
-      const rank = numberValueFrom(row, "rank") ?? index + 1;
-      return {
-        score,
-        probability,
-        cumulativeProbability: numberValueFrom(row, "cumulative_probability"),
-        rank,
-      };
-    })
-    .filter((item): item is ScorelineView => item !== null)
-    .sort(
-      (left, right) =>
-        left.rank - right.rank || right.probability - left.probability,
-    );
-  const routeSource = stringValueFrom(route, "source");
-  const rulePackage = stringValueFrom(
-    route,
-    "package_display_name",
-    stringValueFrom(root, "rule_package_name", "系统默认规则"),
-  );
-  const audit =
-    Object.keys(wrappedOutput).length > 0
-      ? objectValue(wrappedOutput.explanation)
-      : objectValue(root.explanation);
-  const rawInputAudit = objectValue(root.input_audit);
-  const inputAudit: Record<string, unknown> = {
-    audit_version: stringValueFrom(rawInputAudit, "audit_version", "未记录"),
-    readiness_level: stringValueFrom(rawInputAudit, "readiness_level", "not_assessed"),
-    readiness_score: numberValueFrom(rawInputAudit, "readiness_score"),
-    input_manifest_sha256: stringValueFrom(
-      rawInputAudit,
-      "input_manifest_sha256",
-      stringValueFrom(rawInputAudit, "manifest_sha256", ""),
-    ),
-    input_sha256: stringValueFrom(
-      rawInputAudit,
-      "input_sha256",
-      stringValueFrom(root, "input_sha256", ""),
-    ),
-  };
-
-  return {
-    homeTeam: stringValueFrom(
-      modelPayload,
-      "team_a",
-      stringValueFrom(inputHome, "name", "主队"),
-    ),
-    awayTeam: stringValueFrom(
-      modelPayload,
-      "team_b",
-      stringValueFrom(inputAway, "name", "客队"),
-    ),
-    homeWin:
-      numberValueFrom(summary, "home_win") ??
-      numberValueFrom(modelPayload, "a_win") ??
-      0,
-    draw:
-      numberValueFrom(summary, "draw") ??
-      numberValueFrom(modelPayload, "draw") ??
-      0,
-    awayWin:
-      numberValueFrom(summary, "away_win") ??
-      numberValueFrom(modelPayload, "b_win") ??
-      0,
-    btts:
-      numberValueFrom(summary, "btts") ?? numberValueFrom(modelPayload, "btts"),
-    over25:
-      numberValueFrom(summary, "over_2_5") ??
-      numberValueFrom(modelPayload, "over_2_5"),
-    homeLambda: numberValueFrom(modelPayload, "lambda_a"),
-    awayLambda: numberValueFrom(modelPayload, "lambda_b"),
-    homeCleanSheet: numberValueFrom(modelPayload, "clean_sheet_a"),
-    awayCleanSheet: numberValueFrom(modelPayload, "clean_sheet_b"),
-    scorelines,
-    modelId: stringValueFrom(
-      identity,
-      "model_id",
-      stringValueFrom(root, "model_key", "模型"),
-    ),
-    modelVersion: stringValueFrom(
-      identity,
-      "model_version",
-      stringValueFrom(root, "model_version", "—"),
-    ),
-    parameterVersion: stringValueFrom(
-      identity,
-      "parameter_version",
-      stringValueFrom(root, "parameter_version", "—"),
-    ),
-    rulePackage,
-    rulePackageVersion: stringValueFrom(
-      route,
-      "package_version",
-      stringValueFrom(root, "rule_package_version", "—"),
-    ),
-    routeSource:
-      routeSource &&
-      [
-        "explicit_rule_package",
-        "stage_binding",
-        "season_binding",
-        "competition_binding",
-        "competition_kind_default",
-      ].includes(routeSource)
-        ? routeSourceLabel(routeSource as RouteDecision["source"])
-        : "系统自动匹配",
-    snapshotType: stringValueFrom(root, "snapshot_type", "—"),
-    runId: stringValueFrom(root, "execution_mode") === "shadow"
-      ? "影子推演（未写入数据库）"
-      : stringValueFrom(
-          root,
-          "run_id",
-          stringValueFrom(root, "id", "未写入数据库"),
-        ),
-    durationMs: numberValueFrom(root, "duration_ms"),
-    createdAt: stringValueFrom(root, "created_at") || null,
-    audit,
-    inputAudit,
-  };
-}
-
-function probabilityMeter(
-  label: string,
-  value: number,
-  emphasized = false,
-): string {
-  const percent = Math.max(0, Math.min(100, value * 100));
-  return `<div class="probability-meter ${emphasized ? "emphasized" : ""}"><div><span>${escapeHtml(label)}</span><strong>${formatPercent(value)}</strong></div><i><b style="width:${percent.toFixed(2)}%"></b></i></div>`;
-}
-
-function predictionTechnicalDetails(data: PredictionViewData): string {
-  const readinessLevel = stringValueFrom(data.inputAudit, "readiness_level", "not_assessed");
-  const readinessScore = numberValueFrom(data.inputAudit, "readiness_score");
-  const manifestSha = stringValueFrom(data.inputAudit, "input_manifest_sha256", "未记录");
-  const inputSha = stringValueFrom(data.inputAudit, "input_sha256", "未记录");
-  const readinessLabel = readinessLevel === "formal_ready"
-    ? "正式就绪"
-    : readinessLevel === "ready_with_warnings"
-      ? "带警告"
-      : readinessLevel === "shadow_only"
-        ? "仅影子"
-        : readinessLevel === "blocked"
-          ? "已阻断"
-          : "未评估";
-  return `<details class="technical-details prediction-technical"><summary>技术追踪与输入审计</summary><dl class="detail-facts compact">
-    <div><dt>运行编号</dt><dd>${escapeHtml(data.runId)}</dd></div>
-    <div><dt>模型版本</dt><dd>${escapeHtml(data.modelVersion)}</dd></div>
-    <div><dt>参数版本</dt><dd>${escapeHtml(data.parameterVersion)}</dd></div>
-    <div><dt>规则包版本</dt><dd>${escapeHtml(data.rulePackageVersion)}</dd></div>
-    <div><dt>输入完整度</dt><dd>${escapeHtml(readinessLabel)}${readinessScore === null ? "" : ` · ${readinessScore}/100`}</dd></div>
-    <div><dt>输入清单指纹</dt><dd title="${escapeHtml(manifestSha)}">${escapeHtml(manifestSha)}</dd></div>
-    <div><dt>完整输入 SHA256</dt><dd title="${escapeHtml(inputSha)}">${escapeHtml(inputSha)}</dd></div>
-    <div><dt>审计版本</dt><dd>${escapeHtml(stringValueFrom(data.inputAudit, "audit_version", "未记录"))}</dd></div>
-  </dl></details>`;
-}
-
-function predictionDetailBody(payload: unknown): string {
-  const data = predictionViewData(payload);
-  const topScore = data.scorelines[0] ?? null;
-  const scoreParts = topScore?.score.split("-") ?? ["—", "—"];
-  const outcomeMax = Math.max(data.homeWin, data.draw, data.awayWin);
-  const auditStatus = stringValueFrom(
-    data.audit,
-    "probability_sum_status",
-    "PASS",
-  );
-  const coverageStatus = stringValueFrom(data.audit, "coverage_status", "PASS");
-  return `<div class="prediction-detail">
-    <section class="prediction-detail-hero">
-      <div class="prediction-detail-team"><span>主队</span><strong>${escapeHtml(data.homeTeam)}</strong><small>${data.homeLambda === null ? "预计进球暂无" : `预计进球 ${data.homeLambda.toFixed(2)}`}</small></div>
-      <div class="prediction-detail-score"><span>最可能比分</span><div><b>${escapeHtml(scoreParts[0] ?? "—")}</b><i>:</i><b>${escapeHtml(scoreParts[1] ?? "—")}</b></div><small>${topScore ? `单一比分概率 ${formatPercent(topScore.probability)}，并非确定赛果` : "暂无比分矩阵"}</small></div>
-      <div class="prediction-detail-team away"><span>客队</span><strong>${escapeHtml(data.awayTeam)}</strong><small>${data.awayLambda === null ? "预计进球暂无" : `预计进球 ${data.awayLambda.toFixed(2)}`}</small></div>
-    </section>
-    <section class="prediction-detail-section"><div class="section-heading"><div><span>90 分钟结果</span><h3>胜平负概率</h3></div><small>概率越高，条形越长</small></div><div class="outcome-meter-grid">
-      ${probabilityMeter("主胜", data.homeWin, data.homeWin === outcomeMax)}
-      ${probabilityMeter("平局", data.draw, data.draw === outcomeMax)}
-      ${probabilityMeter("客胜", data.awayWin, data.awayWin === outcomeMax)}
-    </div></section>
-    <section class="prediction-detail-section"><div class="section-heading"><div><span>常用判断</span><h3>进球相关概率</h3></div></div><div class="prediction-market-grid">
-      <div><span>双方都进球</span><strong>${data.btts === null ? "—" : formatPercent(data.btts)}</strong></div>
-      <div><span>总进球大于 2.5</span><strong>${data.over25 === null ? "—" : formatPercent(data.over25)}</strong></div>
-      <div><span>${escapeHtml(data.homeTeam)} 零封</span><strong>${data.homeCleanSheet === null ? "—" : formatPercent(data.homeCleanSheet)}</strong></div>
-      <div><span>${escapeHtml(data.awayTeam)} 零封</span><strong>${data.awayCleanSheet === null ? "—" : formatPercent(data.awayCleanSheet)}</strong></div>
-    </div></section>
-    <section class="prediction-detail-section scoreline-exhaustive-section"><div class="section-heading"><div><span>比分分布</span><h3>概率不低于 0.1% 的比分</h3></div><small>显示 ${data.scorelines.filter((item) => item.probability >= 0.001).length} 项；更低概率结果归入矩阵尾部</small></div>
-      ${
-        data.scorelines.length === 0
-          ? `<div class="empty-state compact"><strong>暂无比分数据</strong></div>`
-          : `<div class="scoreline-exhaustive-grid threshold-scroll">${data.scorelines
-              .filter((item) => item.probability >= 0.001)
-              .map(
-                (item) =>
-                  `<div class="scoreline-exhaustive-row"><span>${item.rank}</span><strong>${escapeHtml(item.score)}</strong><i><b style="width:${Math.min(100, item.probability / Math.max(data.scorelines[0]?.probability ?? item.probability, 0.000001) * 100).toFixed(2)}%"></b></i><em>${formatPercent(item.probability)}</em><small>${item.cumulativeProbability === null ? "" : `累计 ${formatPercent(item.cumulativeProbability)}`}</small></div>`,
-              )
-              .join("")}</div>`
-      }
-      <div class="scoreline-threshold-note"><span>默认阈值：0.1%</span><span>完整矩阵、模型血缘与技术信息在详细设置中查看</span></div>
-    </section>
-    <section class="prediction-detail-section model-basis-section"><div class="section-heading"><div><span>模型依据</span><h3>本次推演使用的链路</h3></div></div><div class="model-basis-flow">
-      <div><span>匹配方式</span><strong>${escapeHtml(data.routeSource)}</strong></div><i>→</i>
-      <div><span>规则</span><strong>${escapeHtml(data.rulePackage)}</strong></div><i>→</i>
-      <div><span>模型</span><strong>${escapeHtml(modelDisplayName(data.modelId))}</strong></div><i>→</i>
-      <div><span>数据时点</span><strong>${escapeHtml(data.snapshotType)}</strong></div>
-    </div></section>
-    <section class="prediction-quality-strip"><div><span>概率合计检查</span><strong>${auditStatus === "PASS" ? "通过" : "需要检查"}</strong></div><div><span>比分矩阵覆盖</span><strong>${coverageStatus === "PASS" ? "通过" : "需要检查"}</strong></div><div><span>计算耗时</span><strong>${data.durationMs === null ? "—" : `${data.durationMs} 毫秒`}</strong></div><div><span>完成时间</span><strong>${data.createdAt ? new Date(data.createdAt).toLocaleString() : "本次运行"}</strong></div></section>
-    ${predictionTechnicalDetails(data)}
-  </div>`;
 }
 
 function showPredictionDetail(title: string, payload: unknown): void {
@@ -1295,48 +966,13 @@ function showRouteDetail(route: RouteDecision): void {
   showHtmlModal("赛事规则与模型判定", "清晰模型链路", routeDetailBody(route, { source: routeSourceLabel(route.source), model: modelDisplayName(route.model_id) }));
 }
 
-function showRouteDecision(route: RouteDecision): void {
-  const target = document.querySelector<HTMLElement>("#route-preview");
-  if (!target) {
-    showRouteDetail(route);
-    return;
-  }
-  target.innerHTML = `<div class="panel-heading"><div><span>模型已确定</span><h2>模型选择说明</h2></div></div>${routeCard(route, { source: routeSourceLabel(route.source), model: modelDisplayName(route.model_id) })}`;
-}
-
 type PredictionResultMode = "formal" | "shadow" | "temporary";
 
-function showPredictionResult(
-  execution: PredictionExecution | Record<string, unknown>,
-  mode: PredictionResultMode,
-): void {
-  const presentedExecution = {
-    ...(execution as Record<string, unknown>),
-    execution_mode: mode,
-  };
-  lastPredictionResult = presentedExecution;
-  const target = document.querySelector<HTMLElement>("#prediction-result");
-  const modeLabel = mode === "formal" ? "正式推演" : mode === "shadow" ? "影子推演" : "临时演练";
-  if (!target) {
-    showPredictionDetail(`${modeLabel}结果`, presentedExecution);
-    return;
-  }
-  const data = predictionViewData(execution);
-  const topScore = data.scorelines[0] ?? null;
-  const scoreParts = topScore?.score.split("-") ?? ["—", "—"];
-  const outcomeMax = Math.max(data.homeWin, data.draw, data.awayWin);
-  target.innerHTML = `
-    <div class="panel-heading prediction-result-heading"><div><span>${modeLabel}完成</span><h2>${escapeHtml(data.homeTeam)} vs ${escapeHtml(data.awayTeam)}</h2>${mode === "shadow" ? '<small>本次结果仅供影子评估，不写入正式推演历史。</small>' : ""}</div><button class="secondary" data-action="show-last-result">查看完整结果</button></div>
-    <div class="inline-prediction-hero">
-      <div class="inline-score"><span>最可能比分</span><strong><b>${escapeHtml(scoreParts[0] ?? "—")}</b><i>:</i><b>${escapeHtml(scoreParts[1] ?? "—")}</b></strong><small>${topScore ? `${formatPercent(topScore.probability)} · 单一比分并非确定结果` : "暂无比分矩阵"}</small></div>
-      <div class="inline-outcomes">
-        ${probabilityMeter("主胜", data.homeWin, data.homeWin === outcomeMax)}
-        ${probabilityMeter("平局", data.draw, data.draw === outcomeMax)}
-        ${probabilityMeter("客胜", data.awayWin, data.awayWin === outcomeMax)}
-      </div>
-    </div>
-    <div class="inline-market-grid"><div><span>双方都进球</span><strong>${data.btts === null ? "—" : formatPercent(data.btts)}</strong></div><div><span>大于 2.5 球</span><strong>${data.over25 === null ? "—" : formatPercent(data.over25)}</strong></div><div><span>主队预计进球</span><strong>${data.homeLambda === null ? "—" : data.homeLambda.toFixed(2)}</strong></div><div><span>客队预计进球</span><strong>${data.awayLambda === null ? "—" : data.awayLambda.toFixed(2)}</strong></div></div>
-    <div class="prediction-result-footer"><div><span>使用规则</span><strong>${escapeHtml(data.rulePackage)}</strong><small>${escapeHtml(data.routeSource)} · ${escapeHtml(data.snapshotType)}</small></div><div><span>计算耗时</span><strong>${data.durationMs === null ? "—" : `${data.durationMs} 毫秒`}</strong></div></div>`;
+function showPredictionResult(execution:PredictionExecution|Record<string,unknown>,mode:PredictionResultMode):void {
+  predictionFeature.present(execution,mode);
+  const target=document.querySelector<HTMLElement>("#prediction-result");
+  if(target)target.innerHTML=inlinePredictionResult(predictionFeature.lastResult,mode);
+  else showPredictionDetail(mode==="shadow"?"影子推演结果":mode==="formal"?"正式推演结果":"临时演练结果",predictionFeature.lastResult);
 }
 
 function syncSimpleMatchInput(): Record<string, unknown> {
@@ -1412,17 +1048,23 @@ async function executePrediction(): Promise<void> {
     snapshot_type: value("snapshot-type"),
     ...routeSelection(),
   };
+  const current = predictionFeature.capturePresentation(), scope = captureImportData();
+  const inputs = () => JSON.stringify([...app.querySelectorAll<HTMLInputElement | HTMLSelectElement>('[data-workspace-section="simulation"] input, [data-workspace-section="simulation"] select')].map(input => [input.id, input.value]));
+  const identity = inputs();
   const result = await runBusy(() => api.executePrediction(command));
-  if (session.bootstrap) await session.refreshRecentRuns();
+  if (!scope() || !current() || inputs() !== identity) return;
+  await session.refreshRecentRuns();
+  if (!scope() || !current() || inputs() !== identity) return;
   render();
-  showRouteDecision(result.route);
-  showPredictionResult(result, "formal");
+  showPredictionDetail("正式推演结果", { ...result, execution_mode: "formal" });
   toast("推演完成，规则选择和结果已保存到数据库", "success");
 }
 
 async function dryRun(): Promise<void> {
+  const current = predictionFeature.capturePresentation();
   const result = await runBusy(() => api.dryRunDefaultFixture());
-  showPredictionResult(result, "temporary");
+  if (!current()) return;
+  showPredictionDetail("模型自检结果", { ...result, execution_mode: "temporary" });
   toast("模型自检通过", "success");
 }
 
@@ -1522,20 +1164,23 @@ async function loadP4MatchWorkspace(
   matchId: string,
   preferredTaskId: string | null = null,
 ): Promise<void> {
-  selectedP4MatchId = matchId;
+  predictionFeature.context.matchId = matchId;
+  const current=predictionFeature.context.capture(),page=navigation.page;
   const workspace = await api.readP4MatchWorkspace(matchId);
+  if(!current()||page!==navigation.page)return;
   p4MatchWorkspace = workspace;
   const taskId =
     preferredTaskId &&
     workspace.tasks.some((task) => task.id === preferredTaskId)
       ? preferredTaskId
       : (workspace.tasks[0]?.id ?? null);
-  p4TaskWorkspace = taskId ? await api.readP4TaskWorkspace(taskId) : null;
+  const taskWorkspace=taskId?await api.readP4TaskWorkspace(taskId):null;
+  if(current()&&page===navigation.page)p4TaskWorkspace=taskWorkspace;
 }
 
 async function refreshP4Workspace(): Promise<void> {
   const matchId =
-    selectedP4MatchId ??
+    predictionFeature.context.matchId ??
     playersFeature.catalog.references?.upcoming_matches[0]?.id ??
     playersFeature.catalog.references?.managed_matches[0]?.id ??
     null;
@@ -1733,6 +1378,7 @@ async function sendApiWorkspaceMessage(): Promise<void> {
 
 async function navigateTo(nextPage: Page): Promise<void> {
   workbooksFeature.changedCategory();
+  predictionFeature.navigationChanged();
   await navigation.navigate(nextPage, async request => {
     try {
       await loadNavigationPage(request);
@@ -1803,9 +1449,9 @@ async function loadNavigationPage(request: NavigationRequest): Promise<void> {
     const references =
       playersFeature.catalog.references ?? (await api.playerCatalogReferenceData());
     const matchId =
-      selectedP4MatchId &&
-      references.managed_matches.some((item) => item.id === selectedP4MatchId)
-        ? selectedP4MatchId
+      predictionFeature.context.matchId &&
+      references.managed_matches.some((item) => item.id === predictionFeature.context.matchId)
+        ? predictionFeature.context.matchId
         : (references.upcoming_matches[0]?.id ??
           references.managed_matches[0]?.id ??
           null);
@@ -1822,7 +1468,11 @@ async function loadNavigationPage(request: NavigationRequest): Promise<void> {
       : null;
     if (navigation.isCurrent(request)) {
       playersFeature.catalog.setReferences(references);
-      selectedP4MatchId = matchId;
+      const saved=workspaceState.module("prediction").controls;
+      const model=saved["prediction-model-family"]?.value;
+      const snapshot=saved["prediction-stored-snapshot"]?.value;
+      const rule=saved["explicit-rule-package-id"]?.value;
+      predictionFeature.initializeContext({match_id:matchId??"",model_family:model&&session.bootstrap?.data.models.some(m=>m.model_id===model)?model as PredictionModelFamily:predictionFeature.context.model,snapshot_type:snapshot&&["T-N","T-24h","T-6h","T-1h"].includes(snapshot)?snapshot:predictionFeature.context.snapshot,explicit_rule_package_id:rule&&session.bootstrap?.data.rule_packages.some(r=>r.id===rule&&r.status==="active")?rule:null});
       p4MatchWorkspace = workspace;
       p4TaskWorkspace = taskWorkspace;
     }
@@ -1986,21 +1636,14 @@ async function createLineupPlayerQuick(): Promise<void> {
   toast("球员已创建并加入球队，可继续编辑阵容", "success");
 }
 
-async function calculateStoredMatch(): Promise<void> {
-  const matchId = lineupsFeature.actions.selectedExchangeMatchId();
-  const result = await runBusy(() =>
-    api.executePredictionFromMatch({
-      match_id: matchId,
-      snapshot_type: value("stored-match-snapshot"),
-      explicit_rule_package_id: null,
-      model_family: selectedPredictionModelFamily,
-    }),
-  );
-  lastPredictionResult = result;
-  if (session.bootstrap) await session.refreshRecentRuns();
-  render();
-  showPredictionDetail("比赛推演结果", result);
-  toast("已使用数据库中的比赛、阵容和动态标签完成推演", "success");
+async function calculateStoredMatch():Promise<void>{
+  predictionFeature.context.update({match_id:lineupsFeature.actions.selectedExchangeMatchId(),snapshot_type:value("stored-match-snapshot"),explicit_rule_package_id:null});
+  const current=predictionFeature.capturePresentation(),scope=captureImportData();
+  if(!await predictionFeature.execute("formal"))return;
+  const result=predictionFeature.lastResult;
+  if(session.bootstrap)await session.refreshRecentRuns();
+  if(!current()||!scope()||predictionFeature.lastResult!==result)return;
+  render({preserveForm:true});showPredictionDetail("比赛推演结果",result);
 }
 
 function selectedPredictionMatchId(): string {
@@ -2028,41 +1671,21 @@ function storedMatchRouteCommand(matchId: string): RoutePreviewCommand {
     competition_kind:
       stage?.stage_kind ?? competition?.competition_kind ?? "custom",
     explicit_rule_package_id: nullableValue("explicit-rule-package-id"),
-    model_family: selectedPredictionModelFamily,
+    model_family: predictionFeature.context.model,
   };
 }
 
-async function previewStoredRoute(): Promise<void> {
-  const matchId = selectedPredictionMatchId();
-  const route = await runBusy(() =>
-    api.previewRoute(storedMatchRouteCommand(matchId)),
-  );
-  showRouteDecision(route);
-  toast("模型判定完成", "success");
+async function previewStoredRoute():Promise<void>{
+  const matchId=selectedPredictionMatchId(),command=storedMatchRouteCommand(matchId);
+  const route=await predictionFeature.inspectRoute(()=>api.previewRoute(command));
+  if(route)toast("模型判定完成","success");
 }
 
 function selectedPredictionSnapshotType(): LineupSnapshotType {
-  return value("prediction-stored-snapshot") as LineupSnapshotType;
+  return predictionFeature.context.snapshot;
 }
 
-function selectedStoredPredictionCommand(): import("./types").StoredMatchPredictionCommand {
-  return {
-    match_id: selectedPredictionMatchId(),
-    snapshot_type: selectedPredictionSnapshotType(),
-    explicit_rule_package_id: nullableValue("explicit-rule-package-id"),
-    model_family: selectedPredictionModelFamily,
-  };
-}
-
-async function readSelectedPredictionLineupChain(): Promise<MatchLineupChain> {
-  const matchId = selectedPredictionMatchId();
-  const snapshotType = selectedPredictionSnapshotType();
-  selectedP4MatchId = matchId;
-  selectedPredictionSnapshot = snapshotType;
-  const chain = await api.readMatchLineupChain(matchId, snapshotType);
-  lineupsFeature.state.selectedMatchLineupChain = chain;
-  return chain;
-}
+async function readSelectedPredictionLineupChain():Promise<MatchLineupChain>{return predictionFeature.readChain();}
 
 function missingLineupTeam(chain: MatchLineupChain) {
   const teams = [chain.home, chain.away];
@@ -2121,38 +1744,19 @@ async function openMissingPredictionLineup(
   }
 }
 
-async function checkPredictionLineupChain(): Promise<void> {
-  const command = selectedStoredPredictionCommand();
-  const outcome = await runBusy(async () => {
-    const readiness = await api.inspectMatchPredictionReadiness(command);
-    let chain: MatchLineupChain | null = null;
-    try {
-      chain = await api.readMatchLineupChain(command.match_id, command.snapshot_type);
-    } catch {
-      chain = null;
-    }
-    return { readiness, chain };
-  });
-  selectedPredictionReadiness = outcome.readiness;
-  lineupsFeature.state.selectedMatchLineupChain = outcome.chain;
-  render({ preserveForm: true });
-  toast(
-    outcome.readiness.can_run_formal
-      ? `赛前完整度 ${outcome.readiness.score}/100，已允许正式推演`
-      : `${outcome.readiness.level === "shadow_only" ? "仅允许影子推演" : "正式推演被阻断"}：${outcome.readiness.score}/100`,
-    outcome.readiness.can_run_formal ? "success" : "normal",
-  );
+async function checkPredictionLineupChain():Promise<void>{
+  if(await predictionFeature.check())toast(predictionFeature.readiness?.can_run_formal?"当前输入允许正式推演":predictionFeature.readiness?.can_run_shadow?"当前输入仅允许影子推演":"当前输入存在阻断","normal");
 }
 
 async function preparePredictionLineups(): Promise<void> {
   const chain =
-    lineupsFeature.state.selectedMatchLineupChain?.match_record.id === selectedPredictionMatchId() &&
-    lineupsFeature.state.selectedMatchLineupChain.snapshot_type === selectedPredictionSnapshotType()
-      ? lineupsFeature.state.selectedMatchLineupChain
+    predictionFeature.chain?.match_record.id === selectedPredictionMatchId() &&
+    predictionFeature.chain.snapshot_type === selectedPredictionSnapshotType()
+      ? predictionFeature.chain
       : await runBusy(readSelectedPredictionLineupChain);
   if (chain.ready_for_model) {
     render({ preserveForm: true });
-    toast("双方阵容已经就绪，可以直接正式推演", "success");
+    showModal("当前双方阵容",chain);
     return;
   }
   await openMissingPredictionLineup(chain);
@@ -2163,92 +1767,30 @@ async function continueLineupPrediction(): Promise<void> {
   if (!chain?.ready_for_model) throw new Error("双方阵容尚未通过模型门禁");
   workflowContinuation = null;
   workflowNavigation.clear();
-  selectedP4MatchId = chain.match_record.id;
-  selectedPredictionSnapshot = chain.snapshot_type as LineupSnapshotType;
+  predictionFeature.context.matchId = chain.match_record.id;
+  predictionFeature.context.snapshot = chain.snapshot_type as LineupSnapshotType;
   workspaceState.patchModule("prediction", { active_section: "formal" });
   await navigateTo("prediction");
   render({ preserveForm: true });
   toast("双方阵容已就绪，可以开始正式推演", "success");
 }
 
-function showPredictionReadinessModal(readiness: MatchPredictionReadiness): void {
-  const shadowAction = readiness.can_run_shadow && !readiness.can_run_formal
-    ? '<button type="button" class="primary" data-action="run-shadow-prediction-match">运行影子推演</button>'
-    : "";
-  const footer = `<button type="button" class="secondary" data-action="close-workspace-detail">关闭</button>${shadowAction}`;
-  showModal("赛前数据完整度门禁", readiness, footer);
-}
-
-async function runShadowPredictionMatch(): Promise<void> {
-  const explicitRulePackageId = nullableValue("explicit-rule-package-id");
-  const command = {
-    ...selectedStoredPredictionCommand(),
-    explicit_rule_package_id: explicitRulePackageId,
-  };
+async function runShadowPredictionMatch():Promise<void>{
   closeModal();
-  selectedP4MatchId = command.match_id;
-  selectedPredictionSnapshot = command.snapshot_type as LineupSnapshotType;
-  const result = await runBusy(() => api.executeShadowPredictionFromMatch(command));
-  lastPredictionResult = result;
-  render();
-  showRouteDecision(result.route);
-  showPredictionResult(result, "shadow");
-  toast(
-    `影子推演完成，输入指纹 ${result.input_audit?.input_manifest_sha256.slice(0, 12) ?? "已生成"}；结果未写入正式历史`,
-    "success",
-  );
+  if(await predictionFeature.execute("shadow")){render({preserveForm:true});showPredictionResult(predictionFeature.lastResult as Record<string,unknown>,"shadow");toast("影子推演完成；未写入正式历史","success");}
 }
 
-async function calculatePredictionMatch(): Promise<void> {
-  const explicitRulePackageId = nullableValue("explicit-rule-package-id");
-  const command = {
-    ...selectedStoredPredictionCommand(),
-    explicit_rule_package_id: explicitRulePackageId,
-  };
-  selectedP4MatchId = command.match_id;
-  selectedPredictionSnapshot = command.snapshot_type as LineupSnapshotType;
-  const outcome = await runBusy(async () => {
-    const readiness = await api.inspectMatchPredictionReadiness(command);
-    let chain: MatchLineupChain | null = null;
-    try {
-      chain = await api.readMatchLineupChain(command.match_id, command.snapshot_type);
-    } catch {
-      chain = null;
-    }
-    if (!readiness.can_run_formal) return { readiness, chain, result: null };
-    const result = await api.executePredictionFromMatch(command);
-    return { readiness, chain, result };
-  });
-  selectedPredictionReadiness = outcome.readiness;
-  lineupsFeature.state.selectedMatchLineupChain = outcome.chain;
-  if (!outcome.result) {
-    render({ preserveForm: true });
-    if (outcome.chain && !outcome.chain.ready_for_model) {
-      await openMissingPredictionLineup(outcome.chain);
-      return;
-    }
-    showPredictionReadinessModal(outcome.readiness);
-    toast(
-      outcome.readiness.level === "shadow_only"
-        ? "当前数据只允许影子推演，可在弹窗或完整度面板中直接运行"
-        : "赛前数据完整度门禁未通过",
-      "normal",
-    );
-    return;
-  }
-  lastPredictionResult = outcome.result;
-  if (session.bootstrap) await session.refreshRecentRuns();
-  render();
-  showRouteDecision(outcome.result.route);
-  showPredictionResult(outcome.result, "formal");
-  toast(
-    `正式推演完成，输入指纹 ${outcome.result.input_audit?.input_manifest_sha256.slice(0, 12) ?? "已保存"}`,
-    "success",
-  );
+async function calculatePredictionMatch():Promise<void>{
+  const current=predictionFeature.capturePresentation(),scope=captureImportData();
+  if(!await predictionFeature.execute("formal"))return;
+  const result=predictionFeature.lastResult;
+  if(session.bootstrap)await session.refreshRecentRuns();
+  if(!current()||!scope()||predictionFeature.lastResult!==result)return;
+  render({preserveForm:true});showPredictionResult(result as Record<string,unknown>,"formal");toast("正式推演及原运行读回完成","success");
 }
 
 async function planP4Horizons(): Promise<void> {
-  const matchId = selectedP4MatchId;
+  const matchId = predictionFeature.context.matchId;
   if (!matchId) throw new Error("请先在单场研究工作台选择比赛");
   const rulePackageId = nullableValue("p4-plan-rule-package");
   if (!rulePackageId) throw new Error("请选择已启用的 P4 正式规则包");
@@ -2297,8 +1839,8 @@ async function resolveP4Conflict(
     note,
   };
   p4TaskWorkspace = await runBusy(() => api.resolveP4Conflict(command));
-  if (selectedP4MatchId)
-    p4MatchWorkspace = await api.readP4MatchWorkspace(selectedP4MatchId);
+  if (predictionFeature.context.matchId)
+    p4MatchWorkspace = await api.readP4MatchWorkspace(predictionFeature.context.matchId);
   render();
   toast(
     acceptUnknown ? "已追加“接受未知”决策" : "已追加证据选择决策",
@@ -3310,6 +2852,7 @@ async function handleAction(
       const sectionId = button.dataset.sectionId;
       if (!sectionId) break;
       if (navigation.page === "workbooks") workbooksFeature.changedCategory();
+      if (navigation.page === "prediction") predictionFeature.viewChanged();
       if (sectionId === "directory" && navigation.page === "teams") {
         const id = teamsFeature.catalog.detail?.team.id ?? null;
         teamsFeature.directory(); if (id) workspaceState.restoreFocus("teams", app.querySelector(".page-container") ?? app, `team-directory-${id}`); break;
@@ -3348,6 +2891,12 @@ async function handleAction(
       const nav = button.closest<HTMLElement>(".workspace-anchor-nav, .workspace-task-anchor-nav");
       nav?.querySelectorAll<HTMLElement>("button[data-anchor-id]").forEach((item) => item.classList.toggle("active", item === button));
       target.scrollIntoView({ behavior: motionScrollBehavior("smooth"), block: "start" });
+      const anchorMenu = button.closest<HTMLDetailsElement>("details[data-workspace-anchor-menu]");
+      if (anchorMenu) {
+        anchorMenu.open = false;
+        target.tabIndex = -1;
+        target.focus({ preventScroll: true });
+      }
       break;
     }
     case "select-review-workflow-step": {
@@ -3596,6 +3145,32 @@ async function handleAction(
     case "preview-stored-route":
       await previewStoredRoute();
       break;
+    case "show-prediction-readiness":
+      if(predictionFeature.readiness)showModal("当前输入完整度检查",predictionFeature.readiness);
+      break;
+    case "prediction-readback":
+      await predictionFeature.readback();break;
+    case "prediction-open-candidate": {
+      const record=predictionFeature.candidates.find(r=>r.id===button.dataset.runId);
+      if(record)showPredictionDetail("相关运行记录（尚未认定原请求成功）",{...record,execution_mode:"formal"});
+      break;
+    }
+    case "prediction-adopt-candidate": {
+      const id=button.dataset.runId??"",receipt=predictionFeature.receipt,record=predictionFeature.candidates.find(r=>r.id===id);
+      if(!receipt||!record)throw Error("原请求或候选运行已失效");
+      const identity=JSON.stringify(receipt),audit=objectValue(record.input_audit);
+      showConfirmation("采用已核对的运行","只采用真实已有结果，不发送运行请求；请核对原请求与实际运行的身份。",[["原比赛",receipt.command.match_id],["窗口",receipt.command.snapshot_type],["原指纹",receipt.manifest],["运行 ID",id],["实际指纹",String(audit.manifest_sha256??"未记录")]],"采用已有结果",async()=>{
+        if(JSON.stringify(predictionFeature.receipt)!==identity)throw Error("原请求已变化，请重新核查");
+        await predictionFeature.adoptExisting(id);
+      });break;
+    }
+    case "prediction-retry-shadow": {
+      const identity=JSON.stringify(predictionFeature.receipt);
+      showConfirmation("重新检查影子请求","影子请求不写入正式历史。此动作只解除原只读请求的未知状态，随后必须重新检查当前影子准入。",[],"重新检查",async()=>{
+        if(JSON.stringify(predictionFeature.receipt)!==identity)throw Error("原请求已变化");
+        predictionFeature.retryReadonlyShadow();
+      });break;
+    }
     case "calculate-prediction-match":
       await calculatePredictionMatch();
       break;
@@ -4003,8 +3578,8 @@ async function handleAction(
     }
     case "open-match-prediction": {
       const matchId = button.dataset.matchId ?? "";
-      selectedP4MatchId = matchId;
-      selectedPredictionSnapshot = lineupsFeature.state.pairedLineupBuilder.match_id === matchId
+      predictionFeature.context.matchId = matchId;
+      predictionFeature.context.snapshot = lineupsFeature.state.pairedLineupBuilder.match_id === matchId
         ? lineupsFeature.state.pairedLineupBuilder.snapshot_type
         : "T-N";
       workspaceState.patchModule("prediction", { active_section: "formal" });
@@ -4355,9 +3930,10 @@ async function handleAction(
       );
       break;
     case "show-route-json": {
+      if(navigation.page==="prediction"&&workspaceState.module("prediction").active_section==="formal"&&predictionFeature.view.route){showRouteDetail(predictionFeature.view.route);break;}
       if (rulesFeature.route) { showRouteDetail(rulesFeature.route); break; }
-      if (lastPredictionResult === null) break;
-      const root = objectValue(lastPredictionResult);
+      if (predictionFeature.lastResult === null) break;
+      const root = objectValue(predictionFeature.lastResult);
       const route =
         Object.keys(objectValue(root.route)).length > 0
           ? objectValue(root.route)
@@ -4371,8 +3947,8 @@ async function handleAction(
       break;
     }
     case "show-last-result":
-      if (lastPredictionResult !== null)
-        showPredictionDetail("推演完整结果", lastPredictionResult);
+      if (predictionFeature.lastResult !== null)
+        showPredictionDetail("推演完整结果", predictionFeature.lastResult);
       break;
     case "confirm-workspace-action":
       await modal.runPendingAction();
@@ -4647,9 +4223,8 @@ document.addEventListener("change", (event) => {
   if (target.id === "prediction-match-id") {
     const matchId = target.value;
     if (!matchId) return;
-    selectedP4MatchId = matchId;
+    predictionFeature.context.matchId = matchId;
     lineupsFeature.state.selectedMatchLineupChain = null;
-    selectedPredictionReadiness = null;
     void runBusy(() => loadP4MatchWorkspace(matchId))
       .then(() => {
         render({ preserveForm: true });
@@ -4661,21 +4236,19 @@ document.addEventListener("change", (event) => {
     return;
   }
   if (target.id === "prediction-stored-snapshot") {
-    selectedPredictionSnapshot = target.value as LineupSnapshotType;
+    predictionFeature.context.snapshot = target.value as LineupSnapshotType;
     lineupsFeature.state.selectedMatchLineupChain = null;
-    selectedPredictionReadiness = null;
     render({ preserveForm: true });
     return;
   }
   if (target.id === "prediction-model-family") {
-    selectedPredictionModelFamily = target.value as PredictionModelFamily;
+    predictionFeature.context.model = target.value as PredictionModelFamily;
     lineupsFeature.state.selectedMatchLineupChain = null;
-    selectedPredictionReadiness = null;
     render({ preserveForm: true });
     return;
   }
   if (target.id === "explicit-rule-package-id") {
-    selectedPredictionReadiness = null;
+    predictionFeature.context.update({explicit_rule_package_id:target.value||null});
     render({ preserveForm: true });
     return;
   }

@@ -20,7 +20,7 @@ const check = (condition, message) => {
 const contract = JSON.parse(read("contracts/stage-e1-ui-contract.json"));
 const component = read("src/components/searchableSelect.ts");
 const lineups = read("src/pages/lineups.ts");
-const prediction = read("src/pages/prediction.ts");
+const prediction = read("src/pages/prediction.ts") + read("src/features/prediction/formalPredictionView.ts");
 const css = read("src/styles/taskWorkspace.css");
 
 check(contract.format_version === "football.stage-e1-ui-contract.v1", "阶段 E1 UI 契约版本错误");

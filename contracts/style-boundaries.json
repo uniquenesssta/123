@@ -31,7 +31,8 @@
     "src/styles/workspaces/presetEditor.css",
     "src/pages/database/databaseWorkspace.css",
     "src/pages/architecture/architectureWorkspace.css",
-    "src/pages/workbooks/workbookWorkspace.css"
+    "src/pages/workbooks/workbookWorkspace.css",
+    "src/pages/prediction/predictionWorkspace.css"
   ],
   "features": [
     {
@@ -73,6 +74,11 @@
       "page": "workbooks",
       "file": "src/pages/workbooks/workbookWorkspace.css",
       "root": ".application-shell[data-current-page=\"workbooks\"]"
+    },
+    {
+      "page": "prediction",
+      "file": "src/pages/prediction/predictionWorkspace.css",
+      "root": ".application-shell[data-current-page=\"prediction\"]"
     }
   ],
   "composition_modules": [

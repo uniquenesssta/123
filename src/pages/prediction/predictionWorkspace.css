@@ -1,0 +1,65 @@
+.application-shell:where([data-current-page="prediction"]) .page-container { height:100%; min-height:0; overflow:hidden; padding:10px 14px; display:flex; flex-direction:column; }
+.application-shell:where([data-current-page="prediction"]) .prediction-workspace { height:100%; min-height:0; display:flex; flex-direction:column; gap:12px; }
+.application-shell:where([data-current-page="prediction"]) .prediction-page-heading { flex:none; min-height:56px; display:flex; flex-direction:column; gap:4px; }
+.application-shell:where([data-current-page="prediction"]) .prediction-page-heading h1 { margin:0; font:700 24px/32px var(--fip-type-section-title-family); color:var(--fip-text); }
+.application-shell:where([data-current-page="prediction"]) .prediction-page-heading p { margin:0; font:400 12px/18px var(--fip-type-body-family); color:var(--fip-muted); }
+.application-shell:where([data-current-page="prediction"]) .prediction-context-summary { flex:none; margin:0; font:400 11px/16px var(--fip-type-caption-family); overflow-wrap:anywhere; }
+.application-shell:where([data-current-page="prediction"]) .prediction-section-nav { flex:none; display:flex; align-items:center; gap:8px; flex-wrap:wrap; }
+.application-shell:where([data-current-page="prediction"]) .prediction-viewport { flex:1; min-height:0; overflow:auto; overscroll-behavior:contain; scrollbar-gutter:stable; }
+.application-shell:where([data-current-page="prediction"]) .prediction-formal-view { display:flex; flex-direction:column; gap:12px; min-width:0; }
+.application-shell:where([data-current-page="prediction"]) .prediction-workspace .panel { min-width:0; margin:0; padding:12px; border:0; border-radius:16px; background:var(--fip-surface); box-shadow:var(--fip-panel-shadow); }
+.application-shell:where([data-current-page="prediction"]) .prediction-workspace .panel header { display:flex; flex-direction:column; min-height:60px; gap:2px; margin-bottom:8px; }
+.application-shell:where([data-current-page="prediction"]) .prediction-workspace .panel h2 { margin:0; font:700 14px/20px var(--fip-type-section-title-family); color:var(--fip-text); }
+.application-shell:where([data-current-page="prediction"]) .prediction-workspace .panel p { margin:0; font:400 12px/18px var(--fip-type-body-family); overflow-wrap:anywhere; }
+.application-shell:where([data-current-page="prediction"]) .prediction-workspace .panel header p { color:var(--fip-muted); }
+.application-shell:where([data-current-page="prediction"]) .prediction-fields { border:0; padding:0; margin:0; min-width:0; display:flex; flex-direction:column; gap:8px; }
+.application-shell:where([data-current-page="prediction"]) .prediction-selectors { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:12px; align-items:start; }
+.application-shell:where([data-current-page="prediction"]) .prediction-routing-selectors { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:12px; align-items:start; }
+.application-shell:where([data-current-page="prediction"]) .prediction-workspace .field { min-width:0; margin:0; display:flex; flex-direction:column; gap:6px; }
+.application-shell:where([data-current-page="prediction"]) .prediction-workspace .field > span { font:500 13px/18px var(--fip-type-control-family); }
+.application-shell:where([data-current-page="prediction"]) .prediction-workspace .field select { min-height:40px; font:400 13px/20px var(--fip-type-input-family); }
+.application-shell:where([data-current-page="prediction"]) .prediction-workspace .button-row { display:flex; flex-wrap:wrap; align-items:center; gap:8px; margin:0; }
+.application-shell:where([data-current-page="prediction"]) .prediction-model-guide { font:400 11px/16px var(--fip-type-caption-family); }
+.application-shell:where([data-current-page="prediction"]) .prediction-model-guide > summary { cursor:pointer; }
+.application-shell:where([data-current-page="prediction"]) .prediction-gate { display:flex; flex-direction:column; gap:8px; }
+.application-shell:where([data-current-page="prediction"]) .prediction-gate > header { margin-bottom:0; }
+.application-shell:where([data-current-page="prediction"]) .prediction-gate > strong { font:700 14px/20px var(--fip-type-section-title-family); }
+.application-shell:where([data-current-page="prediction"]) .prediction-audit p,
+.application-shell:where([data-current-page="prediction"]) .prediction-recovery code { font:400 11px/16px var(--fip-type-caption-family); overflow-wrap:anywhere; word-break:break-all; }
+.application-shell:where([data-current-page="prediction"]) .prediction-outputs { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:12px; }
+.application-shell:where([data-current-page="prediction"]) .prediction-execution-bar { flex:none; background:var(--fip-surface); padding:12px; display:flex; flex-direction:column; gap:8px; }
+.application-shell:where([data-current-page="prediction"]) .prediction-execution-bar p { margin:0; font:400 11px/16px var(--fip-type-caption-family); }
+.application-shell:where([data-current-page="prediction"]) .prediction-execution-bar .button-row { display:flex; align-items:center; flex-wrap:wrap; gap:8px; }
+.application-shell:where([data-current-page="prediction"]) .prediction-check-details { font:400 12px/18px var(--fip-type-body-family); }
+.application-shell:where([data-current-page="prediction"]) .prediction-check-details dl { display:grid; gap:8px; }
+.application-shell:where([data-current-page="prediction"]) .prediction-check-details dl > div { display:grid; grid-template-columns:minmax(100px,1fr) minmax(0,3fr); gap:12px; }
+.application-shell:where([data-current-page="prediction"]) .prediction-check-details dd { margin:0; }
+.application-shell:where([data-current-page="prediction"]) .prediction-recovery { display:flex; flex-direction:column; gap:8px; }
+.application-shell:where([data-current-page="prediction"]) .prediction-recovery article { padding-top:12px; border-top:1px solid var(--fip-border); display:flex; flex-direction:column; gap:8px; }
+@media(max-width:1100px) {
+ .application-shell:where([data-current-page="prediction"]) .prediction-selectors,
+ .application-shell:where([data-current-page="prediction"]) .prediction-routing-selectors,
+ .application-shell:where([data-current-page="prediction"]) .prediction-outputs { grid-template-columns:minmax(0,1fr); }
+}
+
+.application-shell:where([data-current-page="prediction"]) .prediction-fields .searchable-select-control { min-height:40px; border-radius:7px; background:var(--fip-surface); border-color:var(--fip-border); grid-template-columns:minmax(0,1fr) 40px; }
+.application-shell:where([data-current-page="prediction"]) .prediction-fields .searchable-select-input { min-height:38px !important; padding:8px 14px !important; font:400 13px/20px var(--fip-type-input-family); }
+.application-shell:where([data-current-page="prediction"]) .prediction-fields .searchable-select-toggle { min-height:38px; min-width:40px; border:0; background:transparent; color:var(--fip-muted); }
+.application-shell:where([data-current-page="prediction"]) .prediction-fields .searchable-select-toggle .ui-icon-slot { width:16px; height:16px; }
+
+.application-shell:where([data-current-page="prediction"]) .prediction-workspace > .core-local-navigation { flex:none; min-height:32px; margin:0; padding:0; border:0; background:none; overflow:visible; }
+.application-shell:where([data-current-page="prediction"]) .prediction-workspace > .core-workspace-stage { flex:1; min-height:0; display:flex; overflow:hidden; }
+.application-shell:where([data-current-page="prediction"]) .prediction-locations { position:relative; font:500 12px/18px var(--fip-type-control-family); }
+.application-shell:where([data-current-page="prediction"]) .prediction-locations > summary { min-height:32px; display:flex; align-items:center; padding:6px 12px; border:1px solid var(--fip-border); border-radius:7px; cursor:pointer; list-style:none; }
+.application-shell:where([data-current-page="prediction"]) .prediction-locations > summary:focus-visible { outline:2px solid var(--fip-primary); outline-offset:2px; }
+.application-shell:where([data-current-page="prediction"]) .prediction-locations .workspace-anchor-nav { position:absolute; bottom:40px; left:0; z-index:20; width:200px; max-width:calc(100vw - 32px); display:flex; flex-direction:column; align-items:stretch; gap:8px; padding:8px; margin:0; border:1px solid var(--fip-border); border-radius:12px; background:var(--fip-surface); box-shadow:var(--fip-panel-shadow); }
+.application-shell:where([data-current-page="prediction"]) .prediction-locations .workspace-anchor-nav button { width:100%; min-height:32px; }
+
+.application-shell:where([data-current-page="prediction"]) .prediction-outputs .route-chain { grid-template-columns:repeat(2,minmax(0,1fr)); }
+.application-shell:where([data-current-page="prediction"]) .prediction-outputs .route-chain > div { min-width:0; flex-direction:column; gap:4px; align-items:flex-start; padding:8px 12px; }
+.application-shell:where([data-current-page="prediction"]) .prediction-outputs .route-chain b { text-align:left; font:500 13px/18px var(--fip-type-body-family); }
+
+.application-shell:where([data-current-page="prediction"]) .prediction-result-summary { display:flex; flex-direction:column; align-items:flex-start; gap:8px; }
+.application-shell:where([data-current-page="prediction"]) .prediction-result-summary .prediction-result-identity { font:400 11px/16px var(--fip-type-caption-family); overflow-wrap:anywhere; }
+.application-shell:where([data-current-page="prediction"]) .prediction-result-probabilities { font:700 14px/20px var(--fip-type-section-title-family); }
+.application-shell:where([data-current-page="prediction"]) .prediction-result-score p { font:400 12px/18px var(--fip-type-body-family); }

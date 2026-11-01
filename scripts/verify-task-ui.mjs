@@ -27,13 +27,19 @@ check(components.includes("export function taskPageHeader") && components.includ
 for (const pageName of contract.core_pages) {
   const page = (pageName === "teams" ? ["src/features/teams/teamPresentation.ts","src/features/teams/profileView.ts","src/features/teams/packageView.ts","src/features/teams/teamsView.ts"].map(read).join("\n") : pageName === "players" ? ["src/features/players/playerPresentation.ts","src/features/players/playerProfileView.ts","src/features/players/playerWorkbookView.ts","src/features/players/playerDirectoryView.ts"].map(read).join("\n") : read(`src/pages/${pageName}.ts`));
   for (const component of contract.shared_components) {
-    check(page.includes(component), `${pageName} 页面没有接入 ${component}`);
+    const approved = contract.approved_page_layouts?.[pageName];
+    const implementation = approved?.shared_components?.[component] ?? component;
+    check(page.includes(implementation), `${pageName} 页面没有接入 ${component} / ${implementation}`);
+    if(approved) check(approved.authority && page.includes(approved.viewport_class), `${pageName} 缺少已批准布局依据或独立滚动区`);
   }
   check(!page.includes("page-heading simple-heading"), `${pageName} 的未连接或空状态仍使用旧页面标题`);
 }
 for (const pageName of contract.master_detail_pages) {
   const page = (pageName === "teams" ? ["src/features/teams/teamPresentation.ts","src/features/teams/profileView.ts","src/features/teams/packageView.ts","src/features/teams/teamsView.ts"].map(read).join("\n") : pageName === "players" ? ["src/features/players/playerPresentation.ts","src/features/players/playerProfileView.ts","src/features/players/playerWorkbookView.ts","src/features/players/playerDirectoryView.ts"].map(read).join("\n") : read(`src/pages/${pageName}.ts`));
-  check((["teams","players"].includes(pageName) ? renderResourceMarkup(root,pageName) : page).includes("master-detail-workspace"), `${pageName} 页面没有接入统一主从详情语义`);
+  const approved=contract.approved_page_layouts?.[pageName];
+  const rendered=["teams","players"].includes(pageName)?renderResourceMarkup(root,pageName):page;
+  check(rendered.includes(approved?.task_stage_class??"master-detail-workspace"), `${pageName} 页面没有接入独立任务区语义`);
+  if(approved) check(read("src/features/prediction/formalPredictionView.ts").includes(approved.pinned_action_class), `${pageName} 缺少固定动作区`);
 }
 
 const players = ["src/features/players/playerPresentation.ts","src/features/players/playerProfileView.ts","src/features/players/playerWorkbookView.ts","src/features/players/playerDirectoryView.ts"].map(read).join("\n");

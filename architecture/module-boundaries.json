@@ -155,7 +155,8 @@
       },
       "prediction": {
         "owner": "src/pages/prediction.ts",
-        "route": "prediction"
+        "route": "prediction",
+        "public_entry": "src/features/prediction/index.ts"
       },
       "release": {
         "owner": "src/pages/release.ts",
@@ -547,5 +548,5 @@
     "commands": 171
   },
   "transitional_edges": [],
-  "last_updated_task": "R13-05"
+  "last_updated_task": "R14-01"
 }

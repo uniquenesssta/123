@@ -19,6 +19,7 @@ const requireTrue = (condition, message) => { if (!condition) failures.push(mess
 
 const modal = read("src/app/modal/workspacePanelController.ts");
 const main = read("src/main.ts");
+const predictionResult=read("src/features/prediction/predictionResultView.ts");
 const runs = read("src/pages/runs.ts");
 const lineups = read("src/pages/lineups.ts");
 const styles = read("src/styles/app.css");
@@ -47,9 +48,9 @@ const postgresIntegration = read("crates/persistence-postgres/tests/postgres_int
 
 requireTrue(modal.includes("panelClass") && main.includes('"prediction-result-modal"'), "推演结果右侧工作区没有独立样式类");
 requireTrue(workspacePanels.includes(".workspace-detail-page.prediction-result-modal") && styles.includes("threshold-scroll"), "推演结果右侧工作区或固定高度滚动比分框样式缺失");
-requireTrue(main.includes("item.probability >= 0.001") && main.includes("概率不低于 0.1% 的比分"), "比分列表没有按 0.1% 阈值过滤");
-requireTrue(!main.includes(".slice(0, 5)"), "比分列表仍被固定截断为前五项");
-requireTrue(main.includes("cumulativeProbability") && main.includes("累计"), "比分列表缺少累计概率");
+requireTrue(predictionResult.includes("item.probability >= 0.001") && predictionResult.includes("概率不低于 0.1% 的比分"), "比分列表没有按 0.1% 阈值过滤");
+requireTrue(!predictionResult.includes(".slice(0, 5)"), "比分列表仍被固定截断为前五项");
+requireTrue(predictionResult.includes("cumulativeProbability") && predictionResult.includes("累计"), "比分列表缺少累计概率");
 
 requireTrue(runHistoryMigration.includes("history_hidden_at") && runHistoryMigration.includes("history_hidden_reason"), "推演历史软删除迁移缺失");
 requireTrue(modelPersistence.includes("hide_run_from_history") && modelPersistence.includes("history_hidden_at IS NULL"), "推演历史软删除持久化链缺失");
