@@ -22,7 +22,7 @@
   "review": {
     "step_count": 9,
     "rail_class": "review-stage-rail",
-    "workspace_class": "review-stage-workspace",
+    "workspace_class": "review-task-panel",
     "selection_action": "select-review-workflow-step"
   },
   "responsive_breakpoints": [
@@ -165,6 +165,15 @@
       "task_stage_class": "core-workspace-stage",
       "viewport_class": "prediction-viewport",
       "pinned_action_class": "prediction-execution-bar"
+    },
+    "review": {
+      "authority": "S04 Loaded 505:33973 / ManualEntry 505:35051 / R14-08",
+      "shared_components": {
+        "taskPageHeader": "review-page-heading",
+        "taskContextRibbon": "review-context"
+      },
+      "viewport_class": "review-workspace-viewport",
+      "pinned_action_class": "review-manual-submit"
     }
   }
 }

@@ -839,8 +839,36 @@
       ],
       "transition": null,
       "migration_task": "R14-07"
+    },
+    {
+      "id": "feature.review-workflow",
+      "owner": "src/features/review/reviewFeature.ts::ReviewFeature",
+      "scope": "review directory and selected object, actual lineups, workflow readbacks, request leases and per-database/match narrow recovery; backend owns capabilities",
+      "writers": [
+        "ReviewFeature methods"
+      ],
+      "forbidden": [
+        "src/pages/**",
+        "src/api/**"
+      ],
+      "transition": null,
+      "migration_task": "R14-08"
+    },
+    {
+      "id": "feature.review-facts",
+      "owner": "src/features/review/reviewFacts.ts::ReviewFacts",
+      "scope": "raw manual facts, confirmation fields and expanded metrics by database and match; excludes generic Workspace controls",
+      "writers": [
+        "ReviewFacts.capture"
+      ],
+      "forbidden": [
+        "src/pages/**",
+        "src/api/**"
+      ],
+      "transition": null,
+      "migration_task": "R14-08"
     }
   ],
-  "count": 58,
-  "last_updated_task": "R14-07"
+  "count": 60,
+  "last_updated_task": "R14-08"
 }

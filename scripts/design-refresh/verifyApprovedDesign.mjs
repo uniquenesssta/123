@@ -1,3 +1,4 @@
+import {verifyReviewBrowser} from "../features/verifyReviewBrowser.mjs";
 import {verifyMountedReadiness} from "./verifyMountedReadiness.mjs";
 import {verifyRunsBrowser} from "../features/verifyRunsBrowser.mjs";
 import {verifyResearchBrowser} from "../features/verifyResearchBrowser.mjs";
@@ -166,4 +167,5 @@ await verifyPredictionBrowser(root,join(directory,"prediction-mounted"));
 
 await verifyResearchBrowser(root,join(directory,"research-mounted"));
 
+await verifyReviewBrowser(root,join(directory,"review-mounted"));
 await verifyRunsBrowser(root,join(directory,"runs-mounted"));

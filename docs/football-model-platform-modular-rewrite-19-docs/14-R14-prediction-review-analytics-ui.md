@@ -20,7 +20,7 @@
 
 ## 状态与依赖
 
-当前 **R14-01 DONE（自身精确CI/官方摘要/双包/startup已验收），R14-06 DONE（精确CI/官方摘要/双包/startup已验收），R14-07 DONE（修复后精确CI/官方摘要/双包/startup已验收），其后批次PLANNED、未启动**。R13适用出口已完成且用户已授权01；分支rewrite/r14-prediction-review-analytics-ui，基线3d9363fe。代码866ba003已推送，自身CI41285690142及产物已核验通过。见[执行索引](../modular-rewrite/R14-prediction-review-analytics-ui/README.md)。下表顺序是默认交付顺序，必要时在已授权阶段内按真实依赖拆出更小批次并说明原因，不以任务数量或文件数为目标。
+当前 **R14-01 DONE（自身精确CI/官方摘要/双包/startup已验收），R14-06 DONE（精确CI/官方摘要/双包/startup已验收），R14-07 DONE（修复后精确CI/官方摘要/双包/startup已验收），R14-08 VERIFYING（本地适用验证完成，待自身精确CI/官方产物），R14-12及以后PLANNED、未启动**。R13适用出口已完成且用户已授权01；分支rewrite/r14-prediction-review-analytics-ui，基线3d9363fe。代码866ba003已推送，自身CI41285690142及产物已核验通过。见[执行索引](../modular-rewrite/R14-prediction-review-analytics-ui/README.md)。下表顺序是默认交付顺序，必要时在已授权阶段内按真实依赖拆出更小批次并说明原因，不以任务数量或文件数为目标。
 
 | 主交付 ID | 交付批次 | 前置 |
 |---|---|---|
@@ -275,7 +275,7 @@ if ($LASTEXITCODE -ne 0) { throw 'R14-07: verify-analysis-history-workflow faile
 
 ### 源码锚点与调用盘点
 
-`src/pages/review.ts`、`src/pages/review/matchEventTimelineView.ts`、`src/app/matchReviewWorkflow.ts`。代表性现存函数：`loadSelectedReviewMatch`（main.ts:5895）、`refreshMatchReviewPackageWorkflow`（main.ts:5931）、`previewMatchReviewPackage`（main.ts:5953）、`confirmMatchReviewPackage`（main.ts:5970）、`commitMatchReviewPackageFacts`（main.ts:5998）、`generateMatchReviewFromPackage`（main.ts:6023）、`generateMatchReview`（main.ts:6097）。这些是入口锚点，不是穷尽迁移清单；还需盘点对应事件分支、辅助函数与全部调用方。
+当前真实归属：`src/features/review/index.ts`、`reviewFeature.ts`、`reviewQueries.ts`、`reviewRecovery.ts`、`reviewFacts.ts`、`reviewPage.ts`、`reviewWorkflowView.ts`、`reviewManualView.ts`、`reviewResultView.ts`、`matchEventTimelineView.ts`及`reviewControls.ts`。旧page与事件导出路径已由实际调用替代退出，pageLoaders重复加载器退出；main只连接现有确认/导航/阵容补录。完整功能去向、同状态设计、33项业务和55项页面检查及真实Windows验证见[08记录](../modular-rewrite/R14-prediction-review-analytics-ui/R14-08-review-facts-and-package.md)。这些是入口锚点，不是穷尽清单；后续按当前符号和调用图，不照抄历史行号。
 
 上述函数直接调用的现有 API：`readMatchReview`、`readMatchReviewPackageWorkflow`、`chooseExcelImportFile`、`previewMatchReviewPackage`、`confirmMatchReviewPackage`、`commitMatchReviewPackageFacts`、`generateMatchReviewFromPackage`、`generateMatchReview`；间接调用须沿当前调用图补齐。参数、返回、错误码及 wire 命令从实际 client 和 command-contract 对照，不按名称猜测。
 

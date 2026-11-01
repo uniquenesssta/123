@@ -25,7 +25,7 @@ check(fs.existsSync(path.join(root, "src/styles/taskWorkspace.css")), "缺少任
 check(components.includes("export function taskPageHeader") && components.includes("export function taskContextRibbon"), "共享页面标题或上下文条组件缺失");
 
 for (const pageName of contract.core_pages) {
-  const page = (pageName === "teams" ? ["src/features/teams/teamPresentation.ts","src/features/teams/profileView.ts","src/features/teams/packageView.ts","src/features/teams/teamsView.ts"].map(read).join("\n") : pageName === "players" ? ["src/features/players/playerPresentation.ts","src/features/players/playerProfileView.ts","src/features/players/playerWorkbookView.ts","src/features/players/playerDirectoryView.ts"].map(read).join("\n") : read(`src/pages/${pageName}.ts`));
+  const page = (pageName === "teams" ? ["src/features/teams/teamPresentation.ts","src/features/teams/profileView.ts","src/features/teams/packageView.ts","src/features/teams/teamsView.ts"].map(read).join("\n") : pageName === "players" ? ["src/features/players/playerPresentation.ts","src/features/players/playerProfileView.ts","src/features/players/playerWorkbookView.ts","src/features/players/playerDirectoryView.ts"].map(read).join("\n") : pageName==="review" ? ["reviewPage.ts","reviewWorkflowView.ts","reviewSteps.ts","reviewManualView.ts","reviewResultView.ts"].map(file=>read("src/features/review/"+file)).join("\n") : read(`src/pages/${pageName}.ts`));
   for (const component of contract.shared_components) {
     const approved = contract.approved_page_layouts?.[pageName];
     const implementation = approved?.shared_components?.[component] ?? component;
@@ -47,7 +47,8 @@ check(contract.player_team_prefill?.mode === "prefill" && contract.player_team_p
 check(players.includes("球队筛选已带入") && players.includes("从球队页带入") && players.includes("已自动选中，可直接修改或清除"), "球员页缺少可见的球队预选语义");
 check(!players.includes("当前来源球队已锁定") && !players.includes("解除来源球队"), "球员页仍残留来源球队锁定语义");
 
-const review = read("src/pages/review.ts");
+const review = [read("src/features/review/reviewPage.ts"),read("src/features/review/reviewWorkflowView.ts"),read("src/features/review/reviewSteps.ts"),read("src/features/review/reviewManualView.ts"),read("src/features/review/reviewResultView.ts")].join("\n");
+const reviewStyles=read("src/features/review/review.css");
 check(review.includes(contract.review.rail_class) && review.includes(contract.review.workspace_class), "赛后复盘缺少固定步骤轨道或当前步骤工作区");
 check(review.includes(`data-action=\"${contract.review.selection_action}\"`), "赛后复盘缺少步骤选择动作");
 for (let step = 1; step <= contract.review.step_count; step += 1) {
@@ -66,8 +67,8 @@ for (const breakpoint of contract.responsive_breakpoints) {
   check(styles.includes(`@media (max-width: ${breakpoint}px)`), `阶段 B 缺少 ${breakpoint}px 响应式断点`);
 }
 check(styles.includes("--task-control-height") && styles.includes("--task-rail-width") && styles.includes("--task-gap-5"), "阶段 B 密度与尺寸令牌不完整");
-check(styles.includes("grid-template-columns: minmax(270px, var(--task-rail-width)) minmax(0, 1fr)"), "九步复盘没有采用轨道与任务区双栏结构");
-check(styles.includes("grid-template-columns: 1fr") && styles.includes(".review-stage-facts { grid-template-columns: 1fr; }"), "窄屏单栏降级规则缺失");
+check(reviewStyles.includes("flex:0 0 280px") && reviewStyles.includes(".review-workspace-viewport") && reviewStyles.includes("gap:12px"), "九步轨道和唯一任务视口必须遵守批准尺寸与间隔");
+check(reviewStyles.includes("@container (max-width:1050px)") && reviewStyles.includes(".review-stage-facts {grid-template-columns:1fr;}"), "窄屏任务事实必须按容器降为单列");
 
 for (const item of contract.screenshot_cases) {
   check(fs.existsSync(path.join(root, "tests/ui", item.fixture)), `缺少截图用例：${item.fixture}`);

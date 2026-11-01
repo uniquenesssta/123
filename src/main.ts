@@ -22,12 +22,12 @@ import {
 fetchAnalysisCenter,
 fetchLineups,
 
-fetchReviewCenter,
-fetchReviewLineups,
+
+
 type AnalysisCenterLoadResult,
 type LineupsLoadResult,
 
-type ReviewCenterLoadResult,
+
 } from "./controllers/pageLoaders";
 import { bindSearchableSelectDiagnostics } from "./diagnostics/searchableSelectDiagnostics";
 import { activateSectionPanel } from "./ui/navigation";
@@ -48,7 +48,7 @@ import { lineupsPage } from "./pages/lineups";
 import { logsPage } from "./pages/logs";
 import { openAiPage } from "./pages/openai";
 import { releasePage } from "./pages/release";
-import { reviewPage } from "./pages/review";
+import {ReviewFeature,ReviewFacts,ReviewControls,reviewRecovery,reviewDatabaseIdentity,reviewPage,type ReviewIntent} from "./features/review";
 import {RunsFeature,runRecovery,runsPage,runTechnicalBody} from "./features/runs";
 import { WorkbooksFeature,workbooksPage } from "./features/workbooks";
 import { importRecovery } from "./app/imports/importRecovery";
@@ -73,15 +73,9 @@ EvidenceScoringDecisionDraft,
 FormationRecord,
 IssueLogEntry,
 IssueSeverity,
-LineupRecord,
 LineupSnapshotType,
 MatchLineupChain,
 MatchRecord,
-MatchReviewDetail,
-MatchReviewDraft,
-MatchReviewPackagePreview,
-MatchReviewPackageWorkflowRecord,
-MatchReviewSummary,
 OpenAiApiExampleParseResult,
 OpenAiApiProtocol,
 OpenAiProfileDraft,
@@ -94,18 +88,15 @@ ParameterTuningCandidateRecord,
 ParameterTuningDecisionDraft,
 ParameterTuningDraft,
 PlayerListQuery,
-PlayerMatchObservationDraft,
 PlayerNavigationContext,
 PostmatchMonitoringRequest,
 PostmatchOverview,
-PostmatchSettlementRecord,
 PredictionCommand,
 PredictionExecution,
 PredictionModelFamily,
 ReleaseAcceptanceRequest,
 ReleaseAcceptanceRun,
 ReleaseAcceptanceRunSummary,
-ReviewableMatch,
 RouteDecision,
 RoutePreviewCommand,
 TeamListQuery
@@ -263,14 +254,13 @@ const navigation = new Router();
 const workflowNavigation = new NavigationContext();
 let coachList: CoachListItem[] = [];
 let formationCatalog: FormationRecord[] = [];
-let reviewableMatches: ReviewableMatch[] = [];
-let recentMatchReviews: MatchReviewSummary[] = [];
-let selectedReviewMatchId: string | null = null;
-let reviewLineups: LineupRecord[] = [];
-let selectedMatchReview: MatchReviewDetail | null = null;
-let matchReviewPackagePreview: MatchReviewPackagePreview | null = null;
-let matchReviewPackageWorkflow: MatchReviewPackageWorkflowRecord | null = null;
-let selectedReviewSettlement: PostmatchSettlementRecord | null = null;
+const reviewFeature=new ReviewFeature({
+ api,scope:()=>session.captureDatabase(),view:()=>{const page=navigation.page;return()=>page===navigation.page&&!browserLifecycleController.signal.aborted;},
+ changed:()=>{if(renderedPage==="review"&&session.bootstrap&&!browserLifecycleController.signal.aborted)render({preserveForm:true});},
+ recovery:reviewRecovery(localPreferences,preferenceKey("review-request-recovery"),()=>session.bootstrap),snapshot:()=>session.bootstrap,formatError:userFacingError,
+});
+const reviewControls=new ReviewControls();
+const reviewFacts=new ReviewFacts(localPreferences,preferenceKey("review-facts"),()=>reviewDatabaseIdentity(session.bootstrap));
 let analyticsOverview: AnalyticsOverview | null = null;
 let analysisJobs: BackgroundJob[] = [];
 let aiAnalysisResponsePreview: AiAnalysisResponsePreview | null = null;
@@ -312,8 +302,8 @@ refreshBootstrapAndCatalog:(...args)=>refreshBootstrapAndCatalog(...args),
 navigation,
 recordClientIssue:(...args)=>recordClientIssue(...args),
 userFacingError:(...args)=>userFacingError(...args),
-get selectedReviewMatchId(){return selectedReviewMatchId;}, set selectedReviewMatchId(v){selectedReviewMatchId=v;},
-loadReviewLineups:(...args)=>loadReviewLineups(...args),
+get selectedReviewMatchId(){return reviewFeature.state.selectedMatchId;},
+loadReviewLineups:(id)=>reviewFeature.refreshLineups(id),
 missingLineupTeam:(...args)=>missingLineupTeam(...args)
 });
 
@@ -487,6 +477,7 @@ function render(options: RenderOptions = {}): void {
   const shellFocus = shellController?.captureFocus() ?? null;
   teamsFeature.drafts.capture(app);
   playersFeature.drafts.capture(app);
+  if(renderedPage==="review")reviewFacts.capture(app,reviewFeature.state.selectedMatchId);
   modal.capture();
   if (options.preserveForm === true && renderedPage === "lineups") {
     lineupsFeature.actions.capturePairedLineupFromDom();
@@ -587,24 +578,7 @@ function render(options: RenderOptions = {}): void {
       break;
     }
     case "review": {
-      const workspace = workspaceState.module("review");
-      const storedStep = Number((workspace.active_section ?? "").replace("step-", ""));
-      content = reviewPage(
-        session.bootstrap,
-        reviewableMatches,
-        selectedReviewMatchId,
-        reviewLineups,
-        selectedMatchReview,
-        matchReviewPackagePreview,
-        matchReviewPackageWorkflow,
-        selectedReviewSettlement,
-        recentMatchReviews,
-        playersFeature.catalog.references,
-        lineupsFeature.state.lineupPlayerCandidates,
-        lineupsFeature.state.lineupBuilderPlayers,
-        lineupsFeature.state.lineupBuilderForm,
-        Number.isInteger(storedStep) && storedStep >= 1 && storedStep <= 9 ? storedStep : null,
-      );
+      content=reviewPage(session.bootstrap,reviewFeature,reviewFacts,workspaceState.module("review").active_section,{references:playersFeature.catalog.references,players:lineupsFeature.state.lineupPlayerCandidates,builderPlayers:lineupsFeature.state.lineupBuilderPlayers,builderForm:lineupsFeature.state.lineupBuilderForm});
       break;
     }
     case "analytics":
@@ -675,6 +649,7 @@ function render(options: RenderOptions = {}): void {
       break;
   }
   content = renderWorkflowContinuationBanner() + content;
+  reviewControls.destroy();
   app.innerHTML = renderShell({
     state: session.bootstrap,
     page: navigation.page,
@@ -689,6 +664,7 @@ function render(options: RenderOptions = {}): void {
   renderedPage = navigation.page;
   const currentPageRoot = app.querySelector<HTMLElement>(".page-container") ?? app;
   workspaceState.restore(navigation.page, currentPageRoot);
+  if(navigation.page==="review")reviewControls.mount(currentPageRoot);
   if(navigation.page==="prediction"){
     syncPredictionControls(currentPageRoot,predictionFeature.context.command);
     enhanceSearchableSelects(currentPageRoot);
@@ -1134,25 +1110,6 @@ async function loadLineups(): Promise<void> {
   applyLineups(await fetchLineups());
 }
 
-async function loadReviewLineups(matchId: string): Promise<void> {
-  reviewLineups = await fetchReviewLineups(matchId);
-}
-
-function applyReviewCenter(result: ReviewCenterLoadResult): void {
-  reviewableMatches = result.matches;
-  recentMatchReviews = result.reviews;
-  selectedReviewMatchId = result.selectedMatchId;
-  reviewLineups = result.lineups;
-  matchReviewPackageWorkflow = result.workflow;
-  matchReviewPackagePreview = result.preview;
-  selectedReviewSettlement = result.settlement;
-}
-
-async function loadReviewCenter(): Promise<void> {
-  if (!session.bootstrap?.data.database_configured) return;
-  applyReviewCenter(await fetchReviewCenter(selectedReviewMatchId));
-}
-
 function applyAnalysisCenter(result: AnalysisCenterLoadResult): void {
   analyticsOverview = result.overview;
   analysisJobs = result.jobs;
@@ -1359,6 +1316,7 @@ async function navigateTo(nextPage: Page): Promise<void> {
   workbooksFeature.changedCategory();
   predictionFeature.navigationChanged();
   runsFeature.navigationChanged();
+  reviewFeature.navigationChanged();
   await navigation.navigate(nextPage, async request => {
     try {
       await loadNavigationPage(request);
@@ -1448,8 +1406,7 @@ async function loadNavigationPage(request: NavigationRequest): Promise<void> {
   } else if (nextPage === "runs") {
     await runsFeature.refresh();
   } else if (nextPage === "review") {
-    const result = await fetchReviewCenter(selectedReviewMatchId);
-    if (navigation.isCurrent(request)) applyReviewCenter(result);
+    await reviewFeature.load();
   } else if (nextPage === "analytics") {
     const result = await fetchAnalysisCenter();
     if (navigation.isCurrent(request)) applyAnalysisCenter(result);
@@ -1783,283 +1740,46 @@ async function openHistoryRun(runId:string):Promise<void> {
   if(await runsFeature.open(runId))document.querySelector<HTMLElement>("#runs-title")?.focus({preventScroll:true});
 }
 
-function numberFromReviewRow(row: HTMLElement, field: string): number {
-  const input = row.querySelector<HTMLInputElement>(`[data-field="${field}"]`);
-  if (!input || input.value.trim() === "") return 0;
-  const parsed = Number(input.value);
-  if (!Number.isFinite(parsed)) throw new Error(`${field} 必须是有效数字`);
-  return parsed;
+async function loadSelectedReviewMatch():Promise<void> {
+ const id=reviewFeature.state.choiceId;if(!id)throw Error("请先选择需要复盘的比赛");
+ reviewFacts.capture(app,reviewFeature.state.selectedMatchId);
+ lineupsFeature.state.lineupBuilderForm={...lineupsFeature.state.lineupBuilderForm,match_id:id,team_id:"",lineup_type:"actual",formation_id:"",formation:"",coach_id:"",source_urls:"",captured_at:""};
+ lineupsFeature.state.lineupBuilderPlayers=[];lineupsFeature.state.lineupPlayerCandidates=[];
+ reviewFeature.viewChanged();workspaceState.patchModule("review",{active_section:null});
+ await reviewFeature.select(id);
 }
-
-async function loadSelectedReviewMatch(): Promise<void> {
-  const matchId = nullableValue("review-match-id");
-  if (!matchId) {
-    toast("当前没有可载入的复盘比赛", "normal");
-    return;
-  }
-  selectedReviewMatchId = matchId;
-  selectedMatchReview = null;
-  matchReviewPackagePreview = null;
-  lineupsFeature.state.lineupBuilderForm = {
-    match_id: matchId,
-    team_id: "",
-    lineup_type: "actual",
-    snapshot_type: "T-1h",
-    formation_id: "4737da75-7c7b-52f5-acf5-ea9bfa809c48",
-    formation: "4-2-3-1",
-    coach_id: "",
-    source_urls: "",
-    captured_at: "",
-    quality_score: 0.9,
-  };
-  lineupsFeature.state.lineupBuilderPlayers = [];
-  lineupsFeature.state.lineupPlayerCandidates = [];
-  await runBusy(async () => {
-    const result = await fetchReviewCenter(matchId);
-    applyReviewCenter(result);
-    const existing = result.matches.find(
-      (item) => item.match_record.id === matchId,
-    )?.latest_review;
-    if (existing) selectedMatchReview = await api.readMatchReview(existing.id);
-  });
-  render();
+function exportMatchReviewPackage():Promise<boolean>|void {
+ if(!reviewFeature.state.workflow)return reviewFeature.file("export");
+ const current=reviewFeature.captureConfirmation(),version=reviewFeature.version,workflow=reviewFeature.state.workflow;
+ showConfirmation("重新导出赛后复盘资料包","新一轮导出会替代当前包工作流。此前预检和人工确认不能用于新文件；已写入事实不会由此撤回。",[["比赛",workflow.match_key],["当前资料包",workflow.package_id],["原文件 SHA256",workflow.import_sha256??workflow.export_sha256??"未记录"]],"重新导出",async()=>{if(!current()||version!==reviewFeature.version)throw Error("原确认已失效，请重新核对当前资料包");await reviewFeature.file("export");},{tone:"neutral"});
 }
-
-
-
-async function refreshMatchReviewPackageWorkflow(): Promise<void> {
-  matchReviewPackageWorkflow = selectedReviewMatchId
-    ? await api.readMatchReviewPackageWorkflow(selectedReviewMatchId)
-    : null;
-  matchReviewPackagePreview = matchReviewPackageWorkflow?.preview ?? null;
+function requestReviewWrite(kind:ReviewIntent["kind"],candidateId?:string,decision?:"accept"|"reject"):void {
+ reviewFacts.capture(app,reviewFeature.state.selectedMatchId);
+ const match=reviewFeature.selected;if(!match)throw Error("请先载入当前比赛");
+ const fields=reviewFacts.values(match,reviewFeature.state.lineups,reviewFeature.state.detail).fields;
+ const intent=reviewFeature.prepare(kind,{confirmedBy:fields.confirmedBy.trim()||null,note:kind==="candidate"?(decision==="accept"?"桌面端人工接受":"桌面端人工拒绝"):fields.confirmationNote.trim()||null,draft:kind==="manual"?reviewFacts.parse(match,reviewFeature.state.lineups,reviewFeature.state.detail):null,candidateId:candidateId??null,decision:decision??null});
+ const capture=reviewFeature.captureConfirmation(),draftVersion=reviewFacts.version,current=()=>capture()&&draftVersion===reviewFacts.version;
+ const labels={confirm:["人工确认本轮资料包","确认仅冻结本轮导入，后端会复查原文件 SHA256；不会立即写入事实。","确认本轮资料包"],facts:["写入真实赛后事实","写入实际阵容、正式赛果、结构化事件及球员观察；生成复盘需单独执行。","写入真实赛后事实"],generate:["生成正式复盘","只使用已写入事实生成本轮复盘；不会自动结算或应用能力候选。","生成正式复盘"],manual:["生成手工复盘","按本场实际阵容和已录入事实生成复盘；空白不补0，已有结构化事件与换人保留。","生成复盘"],candidate:[decision==="accept"?"接受能力更新候选":"拒绝能力更新候选",decision==="accept"?"此操作将应用当前候选，写入正式能力历史。":"只拒绝当前候选，不修改其他待审核项。",decision==="accept"?"确认接受":"确认拒绝"]};
+ const [title,description,label]=labels[kind],workflow=reviewFeature.state.workflow;
+ const facts:[string,string][]=[["比赛",match.match_record.home_team_name+" vs "+match.match_record.away_team_name],["比赛 ID",intent.matchId]];
+ if(kind==="manual")facts.push(["复盘版本",intent.draft!.review_version!],["90分钟比分",intent.draft!.result.home_goals_90+"-"+intent.draft!.result.away_goals_90],["球员观察",String(intent.draft!.player_observations.length)]);
+ else if(kind==="candidate")facts.push(["复盘",reviewFeature.state.detail!.summary.id],["候选",candidateId!]);
+ else facts.push(["资料包",workflow?.package_id??"未记录"],["原文件 SHA256",workflow?.import_sha256??workflow?.export_sha256??"未记录"]);
+ showConfirmation(title,description,facts,label,async()=>{await reviewFeature.submit(intent,current);},{tone:"neutral"});
 }
-
-async function exportMatchReviewPackage(): Promise<void> {
-  if (!selectedReviewMatchId) throw new Error("请先选择并载入需要复盘的比赛");
-  const selected = reviewableMatches.find((item) => item.match_record.id === selectedReviewMatchId);
-  if (!selected) throw new Error("当前比赛已不在可复盘列表中，请刷新后重试");
-  const safeName = `${selected.match_record.home_team_name}_vs_${selected.match_record.away_team_name}`.replace(/[\/:*?"<>|]/g, "-");
-  const outputPath = await api.chooseExcelExportFile(`赛后复盘资料包_${safeName}.xlsx`);
-  if (!outputPath) return;
-  const summary = await runBusy(() => api.exportMatchReviewPackage(outputPath, selectedReviewMatchId!));
-  matchReviewPackagePreview = null;
-  await refreshMatchReviewPackageWorkflow();
-  render();
-  toast(`赛后复盘资料包已导出：${summary.player_count} 名球员`, "success");
-  showModal("赛后复盘资料包已导出", summary);
-}
-
-async function previewMatchReviewPackage(): Promise<void> {
-  if (!selectedReviewMatchId) throw new Error("请先选择并载入需要复盘的比赛");
-  if (!matchReviewWorkflowAllows(matchReviewPackageWorkflow, "preview_import")) {
-    throw new Error("请先导出本轮赛后复盘资料包，再选择填写后的文件预检");
-  }
-  const inputPath = await api.chooseExcelImportFile();
-  if (!inputPath) return;
-  matchReviewPackagePreview = await runBusy(() => api.previewMatchReviewPackage(inputPath, selectedReviewMatchId));
-  await refreshMatchReviewPackageWorkflow();
-  render();
-  const blocking = matchReviewPackagePreview.errors.length;
-  toast(
-    blocking ? `赛后复盘资料包有 ${blocking} 条阻断错误` : "赛后复盘资料包预检通过",
-    blocking ? "error" : "success",
-  );
-}
-
-function confirmMatchReviewPackage(): void {
-  const preview = matchReviewPackagePreview;
-  const workflow = matchReviewPackageWorkflow;
-  if (!preview?.ready || preview.errors.length || !matchReviewWorkflowAllows(workflow, "confirm_import")) {
-    throw new Error("本轮资料包预检尚未通过，不能人工确认");
-  }
-  showConfirmation(
-    "人工确认赛后复盘资料包",
-    "后端会重新读取文件、核对本轮 package_id 与 SHA256。确认只冻结本次导入，不会立即写入赛后事实。",
-    [
-      ["比赛", `${preview.home_team_name} vs ${preview.away_team_name}`],
-      ["资料包", preview.package_id],
-      ["结构化事件", `${preview.events.length} 条`],
-      ["阻断错误", `${preview.errors.length} 条`],
-    ],
-    "确认本轮资料包",
-    async () => {
-      matchReviewPackageWorkflow = await runBusy(() => api.confirmMatchReviewPackage({
-        package_id: preview.package_id,
-        confirmed_by: nullableValue("review-package-confirmed-by"),
-        confirmation_note: nullableValue("review-package-confirmation-note"),
-      }));
-      render();
-      toast("资料包已人工确认；下一步写入真实赛后事实", "success");
-    },
-  );
-}
-
-function commitMatchReviewPackageFacts(): void {
-  const workflow = matchReviewPackageWorkflow;
-  if (!workflow || !matchReviewWorkflowAllows(workflow, "commit_facts")) {
-    throw new Error("资料包尚未人工确认，不能写入赛后事实");
-  }
-  showConfirmation(
-    "写入真实赛后事实",
-    "将写入实际阵容、正式赛果、换人、结构化比赛事件和球员观察。赛前预计/确认阵容与模型快照不会被覆盖。",
-    [
-      ["比赛", workflow.match_key],
-      ["资料包", workflow.package_id],
-      ["文件校验", workflow.import_sha256?.slice(0, 16) ?? "未记录"],
-    ],
-    "写入真实赛后事实",
-    async () => {
-      const result = await runBusy(() => api.commitMatchReviewPackageFacts(workflow.package_id));
-      matchReviewPackageWorkflow = result.workflow;
-      if (selectedReviewMatchId) await loadReviewLineups(selectedReviewMatchId);
-      render();
-      showModal("真实赛后事实已写入", result);
-      toast("真实赛后事实已写入；下一步生成正式复盘", "success");
-    },
-  );
-}
-
-async function generateMatchReviewFromPackage(): Promise<void> {
-  const workflow = matchReviewPackageWorkflow;
-  if (!workflow || !matchReviewWorkflowAllows(workflow, "generate_review")) {
-    throw new Error("真实赛后事实尚未写入，不能生成正式复盘");
-  }
-  const result = await runBusy(() => api.generateMatchReviewFromPackage(workflow.package_id));
-  selectedMatchReview = result.review;
-  matchReviewPackageWorkflow = result.workflow;
-  selectedReviewMatchId = result.review.summary.match_id;
-  await loadReviewCenter();
-  render();
-  toast("正式复盘已生成；下一步检查正式结算门禁", "success");
-}
-
-function collectPlayerReviewObservations(): PlayerMatchObservationDraft[] {
-  const rows = Array.from(
-    document.querySelectorAll<HTMLElement>("[data-review-player]"),
-  );
-  if (rows.length === 0) throw new Error("没有可用于复盘的阵容球员");
-  return rows.map((row) => {
-    const playerId = row.dataset.playerId;
-    const teamId = row.dataset.teamId;
-    if (!playerId || !teamId)
-      throw new Error("球员复盘信息不完整：缺少球员或球队");
-    const minutes = numberFromReviewRow(row, "minutes");
-    const ratingInput = row.querySelector<HTMLInputElement>(
-      '[data-field="rating"]',
-    );
-    const rating = ratingInput?.value.trim() ? Number(ratingInput.value) : null;
-    if (minutes > 0 && (rating === null || !Number.isFinite(rating))) {
-      throw new Error(`请为出场球员填写 0–10 评分`);
-    }
-    if (rating !== null && (rating < 0 || rating > 10)) {
-      throw new Error("球员评分必须位于 0–10");
-    }
-    return {
-      player_id: playerId,
-      team_id: teamId,
-      position_code: row.dataset.positionCode || null,
-      role_code: row.dataset.roleCode || null,
-      started: row.dataset.started === "true",
-      minutes_played: minutes,
-      performance_score: null,
-      input_confidence: minutes > 0 ? 0.9 : 0.6,
-      metrics: {
-        goals: numberFromReviewRow(row, "goals"),
-        assists: numberFromReviewRow(row, "assists"),
-        expected_goals: numberFromReviewRow(row, "expected_goals"),
-        expected_assists: numberFromReviewRow(row, "expected_assists"),
-        shots: numberFromReviewRow(row, "shots"),
-        shots_on_target: numberFromReviewRow(row, "shots_on_target"),
-        key_passes: numberFromReviewRow(row, "key_passes"),
-        progressive_actions: numberFromReviewRow(row, "progressive_actions"),
-        tackles: numberFromReviewRow(row, "tackles"),
-        interceptions: numberFromReviewRow(row, "interceptions"),
-        clearances: numberFromReviewRow(row, "clearances"),
-        blocks: numberFromReviewRow(row, "blocks"),
-        duels_won: numberFromReviewRow(row, "duels_won"),
-        duels_total: numberFromReviewRow(row, "duels_total"),
-        fouls: numberFromReviewRow(row, "fouls"),
-        yellow_cards: numberFromReviewRow(row, "yellow_cards"),
-        red_cards: numberFromReviewRow(row, "red_cards"),
-        errors_leading_to_shot: numberFromReviewRow(
-          row,
-          "errors_leading_to_shot",
-        ),
-        provider_rating: rating,
-        extra: {},
-      },
-      source_document_id: null,
-    };
-  });
-}
-
-async function generateMatchReview(): Promise<void> {
-  if (!selectedReviewMatchId) throw new Error("请先选择比赛并载入阵容");
-  const selected = reviewableMatches.find(
-    (item) => item.match_record.id === selectedReviewMatchId,
-  );
-  if (!selected) throw new Error("所选比赛已经不在待复盘列表中");
-  if (reviewLineups.length < 2)
-    throw new Error("主客队阵容不完整，请先保存两队阵容");
-  const playerObservations = collectPlayerReviewObservations();
-  const finalizedAt = localDateTimeToIso(
-    nullableValue("review-finalized-at"),
-    true,
-  );
-  if (!finalizedAt) throw new Error("赛果确认时间无效");
-  const substitutions = playerObservations
-    .filter((player) => !player.started && player.minutes_played > 0)
-    .map((player) => ({
-      team_id: player.team_id,
-      player_out_id: null,
-      player_in_id: player.player_id,
-      minute: Math.max(0, 90 - Math.min(90, player.minutes_played)),
-      period: "normal_time",
-      reason: "由实际出场分钟推断",
-      source_document_id: null,
-      metadata: { inferred: true },
-    }));
-  const draft: MatchReviewDraft = {
-    match_id: selectedReviewMatchId,
-    review_version: nullableValue("review-version"),
-    data_coverage: Number(value("review-data-coverage")),
-    source_run_id: null,
-    result: {
-      match_id: selectedReviewMatchId,
-      home_goals_90: Number(value("review-home-goals")),
-      away_goals_90: Number(value("review-away-goals")),
-      home_goals_extra_time: null,
-      away_goals_extra_time: null,
-      home_penalties: null,
-      away_penalties: null,
-      finalized_at: finalizedAt,
-      source_document_id: null,
-      metadata: { entry_mode: "desktop_review" },
-    },
-    substitutions,
-    events: [],
-    player_observations: playerObservations,
-    notes: nullableValue("review-notes"),
-  };
-  selectedMatchReview = await runBusy(() => api.generateMatchReview(draft));
-  await loadReviewCenter();
-  render();
-  toast("赛后复盘已生成，能力变化进入待审核候选", "success");
-}
-
-async function openMatchReview(reviewId: string): Promise<void> {
-  if (!reviewId) throw new Error("未找到需要处理的复盘记录");
-  selectedMatchReview = await runBusy(() => api.readMatchReview(reviewId));
-  selectedReviewMatchId = selectedMatchReview.summary.match_id;
-  matchReviewPackagePreview = null;
-  applyReviewCenter(await fetchReviewCenter(selectedReviewMatchId));
-  render();
+function syncReviewManualValidation():void {
+ reviewFacts.capture(app,reviewFeature.state.selectedMatchId);
+ const result=reviewFacts.validate(reviewFeature.selected,reviewFeature.state.lineups,reviewFeature.state.detail),allowed=reviewFeature.allows("manual");
+ const message=app.querySelector<HTMLElement>("#review-manual-validation"),submit=app.querySelector<HTMLButtonElement>('[data-action="generate-match-review"]');
+ if(message)message.textContent=result.error??(!allowed?"当前请求或资料包状态尚不允许人工生成。":"所需事实已录入；确认后生成本次人工复盘。");
+ if(submit)submit.disabled=!!result.error||!allowed;
 }
 
 async function decideAbilityCandidate(
   candidateId: string,
   decision: "accept" | "reject",
 ): Promise<void> {
+  if(navigation.page==="review"){requestReviewWrite("candidate",candidateId,decision);return;}
   if (!candidateId) throw new Error("未找到需要处理的能力建议");
   await runBusy(() =>
     api.decideAbilityCandidate({
@@ -2070,10 +1790,7 @@ async function decideAbilityCandidate(
         decision === "accept" ? "桌面端人工接受" : "桌面端人工拒绝",
     }),
   );
-  if (selectedMatchReview)
-    selectedMatchReview = await api.readMatchReview(
-      selectedMatchReview.summary.id,
-    );
+
   if (navigation.page === "analytics") await loadAnalysisCenter();
   await session.refresh();
   render();
@@ -2122,30 +1839,38 @@ async function enqueueAnalysisTask(
 
 async function inspectPostmatchReadiness(reviewId: string): Promise<void> {
   if (!reviewId) throw new Error("复盘记录不存在");
+  const current=reviewFeature.capture();
   const readiness = await runBusy(() => api.postmatchSettlementReadiness(reviewId));
+  if(!current())return;
   showModal("接入点 H 结算门禁", readiness);
 }
 
 function settlePostmatchReview(reviewId: string): void {
   if (!reviewId) throw new Error("复盘记录不存在");
-  const review = recentMatchReviews.find((item) => item.id === reviewId);
+  const current=reviewFeature.captureConfirmation(),database=session.captureDatabase();
+  const review = reviewFeature.state.reviews.find((item) => item.id === reviewId);
   showConfirmation(
     "创建正式赛后结算",
     "结算将冻结赛果、成功推演、赛事 Profile、模型与参数版本，并为快照证据建立人工评分队列。结算账本不可覆盖。",
     [
       ["比赛", review ? `${review.home_team_name} vs ${review.away_team_name}` : "当前复盘"],
-      ["复盘版本", review?.review_version ?? selectedMatchReview?.summary.review_version ?? "未记录"],
+      ["复盘版本", review?.review_version ?? reviewFeature.state.detail?.summary.review_version ?? "未记录"],
       ["自动改参", "禁止"],
     ],
     "确认正式结算",
     async () => {
+      if(!current()||reviewFeature.state.detail?.summary.id!==reviewId)throw Error("当前复盘已变化，请重新核对结算对象");
       const settlement = await runBusy(() => api.settlePostmatchReview({
         match_review_id: reviewId,
         settled_by: null,
         settlement_note: "用户在赛后复盘页确认正式结算",
       }));
-      postmatchOverview = await api.postmatchOverview(100);
-      await loadReviewCenter();
+      if(!current())return;
+      reviewFeature.adoptSettlement(settlement);
+      const overview = await api.postmatchOverview(100);
+      if(!current())return;
+      postmatchOverview=overview;
+      if(!await reviewFeature.load()||!database()||navigation.page!=="review"||reviewFeature.state.selectedMatchId!==settlement.match_id)return;
       render();
       showModal("正式赛后结算", settlement);
       toast("正式结算已创建，证据已进入人工评分队列", "success");
@@ -2815,9 +2540,28 @@ async function handleAction(
       }
       break;
     }
+    case "review-adopt-file": {
+      const current=reviewFeature.captureConfirmation(),version=reviewFeature.version,w=reviewFeature.state.workflow;
+      if(!w)throw Error("请先刷新当前登记文件");
+      showConfirmation("核对当前登记文件","只采用当前登记状态；原请求仍不能据此认定为成功，不会重发或写入事实。",[["比赛",w.match_key],["资料包",w.package_id],["文件",w.import_path??w.export_path],["SHA256",w.import_sha256??w.export_sha256??"未记录"]],"采用当前登记状态",async()=>{await reviewFeature.adoptCurrentFile(version,current);},{tone:"neutral"});break;
+    }
+    case "review-open-analytics":
+      if(!matchReviewWorkflowAllows(reviewFeature.state.workflow,"open_analytics"))throw Error("后端尚未允许进入分析");
+      await navigateTo("analytics");break;
+    case "review-view": {
+      const view=button.dataset.reviewView;if(!view||!["workflow","manual","results","history"].includes(view))break;
+      reviewFacts.capture(app,reviewFeature.state.selectedMatchId);reviewFeature.viewChanged();
+      workspaceState.patchModule("review",{active_section:view});render({preserveForm:true});break;
+    }
+    case "toggle-review-metrics": {
+      const row=button.closest<HTMLElement>("[data-review-player]"),details=row?.querySelector("details");if(!details)break;
+      details.open=!details.open;button.setAttribute("aria-expanded",String(details.open));reviewFacts.capture(app,reviewFeature.state.selectedMatchId);break;
+    }
     case "select-review-workflow-step": {
       const step = Number(button.dataset.reviewStep);
       if (!Number.isInteger(step) || step < 1 || step > 9) break;
+      reviewFacts.capture(app,reviewFeature.state.selectedMatchId);
+      reviewFeature.viewChanged();
       workspaceState.patchModule("review", { active_section: `step-${step}` });
       render({ preserveForm: true });
       break;
@@ -3643,8 +3387,7 @@ async function handleAction(
       render();
       break;
     case "refresh-review":
-      await runBusy(loadReviewCenter);
-      render();
+      await reviewFeature.load();
       break;
     case "load-review-match":
       await loadSelectedReviewMatch();
@@ -3653,25 +3396,28 @@ async function handleAction(
       await exportMatchReviewPackage();
       break;
     case "preview-match-review-package":
-      await previewMatchReviewPackage();
+      await reviewFeature.file("preview");
       break;
     case "confirm-match-review-package":
-      confirmMatchReviewPackage();
+      requestReviewWrite("confirm");
       break;
     case "commit-match-review-package-facts":
-      commitMatchReviewPackageFacts();
+      requestReviewWrite("facts");
       break;
     case "generate-match-review-from-package":
-      await generateMatchReviewFromPackage();
+      requestReviewWrite("generate");
       break;
     case "show-match-review-package-json":
-      if (matchReviewPackagePreview) showModal("赛后复盘资料包预检", matchReviewPackagePreview);
+      if (reviewFeature.preview) showModal("赛后复盘资料包预检", reviewFeature.preview);
       break;
     case "generate-match-review":
-      await generateMatchReview();
+      requestReviewWrite("manual");
       break;
     case "open-match-review":
-      await openMatchReview(button.dataset.reviewId ?? "");
+      reviewFacts.capture(app,reviewFeature.state.selectedMatchId);
+      reviewFeature.viewChanged();
+      workspaceState.patchModule("review",{active_section:"results"});
+      await reviewFeature.openReview(button.dataset.reviewId ?? "");
       break;
     case "decide-ability-candidate":
       await decideAbilityCandidate(
@@ -3680,7 +3426,7 @@ async function handleAction(
       );
       break;
     case "show-review-json":
-      if (selectedMatchReview) showModal("复盘完整详情", selectedMatchReview);
+      if (reviewFeature.state.detail) showModal("复盘完整详情", reviewFeature.state.detail);
       break;
     case "inspect-postmatch-readiness":
       await inspectPostmatchReadiness(button.dataset.reviewId ?? "");
@@ -3690,7 +3436,7 @@ async function handleAction(
       break;
     case "show-candidate-json": {
       const candidate =
-        selectedMatchReview?.ability_candidates.find(
+        reviewFeature.state.detail?.ability_candidates.find(
           (item) => item.id === button.dataset.candidateId,
         ) ??
         analysisAbilityCandidates.find(
@@ -3973,6 +3719,7 @@ function filterSelectOptions(
 
 document.addEventListener("input", (event) => {
   const target = event.target as HTMLInputElement | HTMLTextAreaElement;
+  if(navigation.page==="review"&&(target.matches("[data-review-fact]")||target.closest("[data-review-player]")))syncReviewManualValidation();
   if (target.id?.startsWith("p4-conflict-note-")||target.id?.startsWith("p4-evidence-")) researchFeature.draftChanged();
   if (["competition-id", "season-id", "stage-id", "competition-kind", "simulation-model-family", "simple-kickoff"].includes(target.id) || target.id.startsWith("binding-")) rulesFeature.invalidatePreview();
   if (target.id === "openai-api-example") {
@@ -4005,6 +3752,8 @@ document.addEventListener("input", (event) => {
 
 document.addEventListener("change", (event) => {
   const target = event.target as HTMLInputElement | HTMLSelectElement;
+  if(navigation.page==="review"&&target instanceof HTMLSelectElement&&target.closest("[data-review-picker]")){reviewFacts.capture(app,reviewFeature.state.selectedMatchId);reviewFeature.choose(target.value||null);return;}
+  if(navigation.page==="review"&&(target.matches("[data-review-fact]")||target.closest("[data-review-player]")))syncReviewManualValidation();
   if (target.id?.startsWith("p4-conflict-note-")||target.id?.startsWith("p4-evidence-")) researchFeature.draftChanged();
   if (["competition-id", "season-id", "stage-id", "competition-kind", "simulation-model-family", "simple-kickoff"].includes(target.id) || target.id.startsWith("binding-")) rulesFeature.invalidatePreview();
   if (
@@ -4426,6 +4175,7 @@ export function createBrowserApplicationModule(
     rulesFeature.stop();
     teamsFeature.stop();
   playersFeature.stop();
+    reviewControls.destroy();
     session.stop();
     openAiExampleRequests.destroy();
     navigation.destroy();

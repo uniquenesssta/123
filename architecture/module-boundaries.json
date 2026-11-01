@@ -159,8 +159,9 @@
         "route": "release"
       },
       "review": {
-        "owner": "src/pages/review.ts",
-        "route": "review"
+        "owner": "src/features/review/reviewPage.ts",
+        "route": "review",
+        "public_entry": "src/features/review/index.ts"
       },
       "rules": {
         "owner": "src/features/rules/rulesView.ts",
@@ -528,5 +529,5 @@
     "commands": 171
   },
   "transitional_edges": [],
-  "last_updated_task": "R14-01"
+  "last_updated_task": "R14-08"
 }

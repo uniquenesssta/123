@@ -6,14 +6,9 @@ import type {
   BackgroundJob,
   CoachListItem,
   LineupRecord,
-  MatchReviewPackagePreview,
-  MatchReviewPackageWorkflowRecord,
-  MatchReviewSummary,
   ParameterTuningCandidateRecord,
   PlayerCatalogReferenceData,
   PostmatchOverview,
-  PostmatchSettlementRecord,
-  ReviewableMatch
 } from "../types";
 
 
@@ -21,16 +16,6 @@ export interface LineupsLoadResult {
   readonly references: PlayerCatalogReferenceData;
   readonly records: LineupRecord[];
   readonly coaches: CoachListItem[];
-}
-
-export interface ReviewCenterLoadResult {
-  readonly matches: ReviewableMatch[];
-  readonly reviews: MatchReviewSummary[];
-  readonly selectedMatchId: string | null;
-  readonly lineups: LineupRecord[];
-  readonly workflow: MatchReviewPackageWorkflowRecord | null;
-  readonly preview: MatchReviewPackagePreview | null;
-  readonly settlement: PostmatchSettlementRecord | null;
 }
 
 export interface AnalysisCenterLoadResult {
@@ -49,47 +34,6 @@ export async function fetchLineups(): Promise<LineupsLoadResult> {
     api.listCoaches({ search: null, active_only: false, limit: 500 }),
   ]);
   return { references, records, coaches };
-}
-
-export async function fetchReviewLineups(matchId: string): Promise<LineupRecord[]> {
-  const summaries = await api.listLineups(matchId, 30);
-  const active = summaries.filter((lineup) => lineup.status === "active");
-  const rank: Record<LineupRecord["lineup_type"], number> = { actual: 0, confirmed: 1, expected: 2 };
-  const selected = new Map<string, LineupRecord>();
-  for (const lineup of active.sort((left, right) => rank[left.lineup_type] - rank[right.lineup_type])) {
-    if (!selected.has(lineup.team_id)) selected.set(lineup.team_id, lineup);
-  }
-  return Promise.all(Array.from(selected.values()).map((lineup) => api.readLineup(lineup.id)));
-}
-
-export async function fetchReviewCenter(selectedReviewMatchId: string | null): Promise<ReviewCenterLoadResult> {
-  const [matches, reviews] = await Promise.all([
-    api.listReviewableMatches(100),
-    api.listMatchReviews(100),
-  ]);
-  const selectedMatchId = selectedReviewMatchId
-    && matches.some((item) => item.match_record.id === selectedReviewMatchId)
-    ? selectedReviewMatchId
-    : matches[0]?.match_record.id ?? null;
-  const [lineups, workflow, settlements] = selectedMatchId
-    ? await Promise.all([
-        fetchReviewLineups(selectedMatchId),
-        api.readMatchReviewPackageWorkflow(selectedMatchId),
-        api.listPostmatchSettlements(100),
-      ])
-    : [[], null, [] as PostmatchSettlementRecord[]];
-  const settlement = selectedMatchId
-    ? settlements.find((item) => item.match_id === selectedMatchId) ?? null
-    : null;
-  return {
-    matches,
-    reviews,
-    selectedMatchId,
-    lineups,
-    workflow,
-    preview: workflow?.preview ?? null,
-    settlement,
-  };
 }
 
 export async function fetchAnalysisCenter(): Promise<AnalysisCenterLoadResult> {

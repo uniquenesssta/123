@@ -8,7 +8,7 @@ import { emptyStateView } from "../empty-state";
 import { codeBlockView } from "../code-block";
 import { databasePage } from "../../../features/database";
 import { logsPage } from "../../../pages/logs";
-import { matchEventTimelineView } from "../../../pages/review/index";
+import { matchEventTimelineView } from "../../../features/review";
 import { ModalController } from "../../../app/modal";
 import type { BootstrapResponse, IssueLogEntry, MatchReviewDetail } from "../../../types";
 

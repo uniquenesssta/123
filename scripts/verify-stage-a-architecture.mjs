@@ -29,7 +29,7 @@ const persistence = read("crates/persistence-postgres/src/adapters/review/packag
 const commands = [...new Set(Object.values(JSON.parse(read("architecture/command-contract.json")).command_groups.find(group => group.module === "postmatch").command_definition_files))].map(read).join("\n");
 const apiClient = read("src/api/client.ts");
 const types = read("src/types.ts");
-const page = read("src/pages/review.ts");
+const page = [read("src/features/review/reviewPage.ts"),read("src/features/review/reviewWorkflowView.ts"),read("src/features/review/reviewSteps.ts"),read("src/features/review/reviewManualView.ts"),read("src/features/review/reviewResultView.ts")].join("\n");
 const main = read("src/main.ts");
 const frontendWorkflowHelpers = read("src/app/matchReviewWorkflow.ts");
 const integration = read("crates/persistence-postgres/tests/postgres_integration.rs");
@@ -65,7 +65,8 @@ for (const action of ["PreviewImport", "ConfirmImport", "CommitFacts", "Generate
 }
 check(postmatchApplication.includes("MatchReviewPackageWorkflowAction::SettleReview"), "正式结算没有复用统一工作流门禁");
 check(!page.includes("function workflowStateRank"), "前端仍保留状态排名表");
-const frontendWorkflow = `${page}\n${main}`;
+const feature=read("src/features/review/reviewFeature.ts");
+const frontendWorkflow = `${page}\n${main}\n${feature}`;
 check(!/(?:matchReviewPackageWorkflow|activeWorkflow|workflow)\?*\.status\s*(?:===|!==|==|!=)/.test(frontendWorkflow), "前端仍根据工作流状态字符串决定业务权限");
 check(main.includes("matchReviewWorkflowAllows"), "前端事件处理没有复用工作流能力助手");
 check(frontendWorkflowHelpers.includes("allowed_actions.includes(action)") && frontendWorkflowHelpers.includes("completed_steps.includes(step)") && frontendWorkflowHelpers.includes("blocking_reasons.find"), "前端工作流能力助手没有只消费后端能力 DTO");
@@ -73,7 +74,7 @@ for (const field of ["completed_steps", "allowed_actions", "blocking_reasons"]) 
   check(frontendWorkflowHelpers.includes(field), `前端能力助手没有消费后端字段 ${field}`);
 }
 check(page.includes("next_action"), "复盘页面没有消费后端字段 next_action");
-check(page.includes("业务权限由后端工作流统一返回"), "界面未说明后端状态权威边界");
+check(feature.includes("matchReviewWorkflowAllows") && feature.includes("matchReviewWorkflowCompleted") && !feature.includes("workflowStateRank"), "复盘模块必须只消费后端动作和完成步骤");
 
 for (const query of contract.operations.queries) {
   check(commands.includes(`pub async fn ${query}(`), `Tauri 查询入口缺少 ${query}`);

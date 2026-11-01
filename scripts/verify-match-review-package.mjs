@@ -51,9 +51,9 @@ const migration = read("crates/persistence-postgres/migrations/0040_match_review
 const commands = [...new Set(Object.values(JSON.parse(read("architecture/command-contract.json")).command_groups.find(group => group.module === "postmatch").command_definition_files))].map(read).join("\n");
 const commandRegistry = read("src-tauri/src/bootstrap/command_registry.rs");
 const main = read("src/main.ts");
-const page = read("src/pages/review.ts");
+const page = [read("src/features/review/reviewPage.ts"),read("src/features/review/reviewWorkflowView.ts"),read("src/features/review/reviewSteps.ts"),read("src/features/review/reviewManualView.ts"),read("src/features/review/reviewResultView.ts")].join("\n");
 const api = read("src/api/client.ts");
-const loader = read("src/controllers/pageLoaders.ts");
+const loader = read("src/features/review/reviewFeature.ts") + "\n" + read("src/features/review/reviewQueries.ts");
 
 check(workbook.includes('let format_version = required_text(&metadata, "format_version")?.to_string();'), "赛后复盘资料包 format_version 必须转换为 String，避免 Rust E0308");
 for (const token of ["football.match-review-package.v1", "MatchReviewPackagePreview", "MatchReviewPackageWorkflowRecord", "MatchReviewPackageConfirmationRequest", "MatchReviewPackageComparison", "MatchReviewPackageIdentityCheck"]) check(domain.includes(token), `领域契约缺少 ${token}`);
@@ -113,17 +113,17 @@ for (const token of ["AND status='preview_valid'", "WHERE package_id=$1 AND stat
 for (const test of ["revalidated_preview_checks_each_identity_and_blocker", "combined_commit_preserves_readiness_and_strict_identity_guards", "confirmation_metadata_preserves_existing_values_and_normalizes_non_objects", "confirmation_blank_note_preserves_notes_and_empty_existing_note_is_replaced", "confirmation_rejects_invalid_state_readiness_and_missing_path_before_io", "generate_review_preserves_order_confirmation_and_returned_ids", "generate_review_stops_at_failed_dependency_or_domain_guard", "active_workflow_preserves_some_none_and_port_failure_without_writes"]) check(workflowTests.includes(`fn ${test}(`), `缺少原 Application target 工作流边界测试：${test}`);
 
 for (const method of ["exportMatchReviewPackage", "previewMatchReviewPackage", "readMatchReviewPackageWorkflow", "confirmMatchReviewPackage", "commitMatchReviewPackageFacts", "generateMatchReviewFromPackage"]) check(api.includes(`${method}:`), `前端 API 缺少 ${method}`);
-for (const action of ["export-match-review-package", "preview-match-review-package", "confirm-match-review-package", "commit-match-review-package-facts", "generate-match-review-from-package", "inspect-postmatch-readiness", "settle-postmatch-review"]) check(main.includes(`case "${action}"`) && page.includes(`data-action="${action}"`), `赛后复盘链路缺少动作 ${action}`);
+for (const action of ["export-match-review-package", "preview-match-review-package", "confirm-match-review-package", "commit-match-review-package-facts", "generate-match-review-from-package", "inspect-postmatch-readiness", "settle-postmatch-review"]) check(main.includes(`case "${action}"`) && page.includes(`'${action}'`), `赛后复盘链路缺少动作 ${action}`);
 for (const label of ["选择比赛", "导出赛后复盘资料包", "在外部补充真实比赛事实和球员量化数据", "导入并预检", "人工确认", "写入真实赛后事实", "生成正式复盘", "正式结算", "进入分析与历史"]) check(page.includes(label), `复盘页缺少固定链路阶段：${label}`);
 for (const label of ["本步用途", "完成条件", "阻塞原因", "下一步动作"]) check(page.includes(label), `复盘步骤缺少可见说明：${label}`);
 for (const label of ["赛前值", "当前数据库值", "准备导入值", "身份匹配情况"]) check(page.includes(label), `复盘预检缺少可见对照：${label}`);
-check(page.includes("reviewPackageWorkspace(selected, packageWorkflow, packagePreview, detail, settlement, activeWorkflowStep)"), "完整链路未在无比赛/未初始化状态下固定渲染");
-check(page.includes("review-stage-rail") && page.includes("review-stage-workspace") && page.includes("select-review-workflow-step"), "九步链路未采用固定步骤轨道与当前步骤工作区");
+check(page.replace(/\s+/g,"").includes("reviewWorkflowView(feature,facts,step)") && page.replace(/\s+/g,"").includes("reviewRail(feature,step)"), "无比赛时仍应固定渲染九步及当前任务");
+check(page.includes("review-stage-rail") && page.includes("review-task-panel") && page.includes("select-review-workflow-step"), "九步链路未采用固定步骤轨道与当前步骤工作区");
 check(!page.includes("selected ? reviewPackageWorkspace"), "赛后复盘链路仍会在未选择比赛时被整体隐藏");
 check(page.includes("赛前预计/确认阵容与模型快照不会被覆盖") || page.includes("不覆盖赛前快照"), "复盘页未明确赛前快照不可覆盖");
 check(loader.includes("readMatchReviewPackageWorkflow") && loader.includes("listPostmatchSettlements"), "复盘页加载器未恢复持久化工作流和结算状态");
-check(domain.includes("pub preview: Option<MatchReviewPackagePreview>") && persistence.includes("workflow.preview_payload") && loader.includes("preview: workflow?.preview ?? null") && main.includes("matchReviewPackagePreview = result.preview"), "页面重启后未恢复本轮持久化预检结果");
-check(loader.includes(": matches[0]?.match_record.id ?? null;"), "进入赛后复盘页时必须自动选择第一场可复盘比赛");
+check(domain.includes("pub preview: Option<MatchReviewPackagePreview>") && persistence.includes("workflow.preview_payload") && loader.replace(/\s+/g,"").includes("getpreview(){returnthis.state.workflow?.preview??null;}") && main.includes("reviewFeature.preview"), "页面重启后未恢复本轮持久化预检结果");
+check(loader.replace(/\s+/g,"").includes("choiceId:null,selectedMatchId:null") && !loader.includes("this.data.matches[0]"), "通用入口必须等待明确选择，不能将第一场隐式变成写入对象");
 
 if (failures.length) {
   console.error("赛后复盘资料包链路验证失败：");

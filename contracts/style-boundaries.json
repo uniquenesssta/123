@@ -34,7 +34,8 @@
     "src/pages/workbooks/workbookWorkspace.css",
     "src/pages/prediction/predictionWorkspace.css",
     "src/features/prediction/research/research.css",
-    "src/features/runs/runs.css"
+    "src/features/runs/runs.css",
+    "src/features/review/review.css"
   ],
   "features": [
     {
@@ -91,6 +92,11 @@
       "page": "runs",
       "file": "src/features/runs/runs.css",
       "root": ".application-shell[data-current-page=\"runs\"]"
+    },
+    {
+      "page": "review",
+      "file": "src/features/review/review.css",
+      "root": ".application-shell[data-current-page=\"review\"]"
     }
   ],
   "composition_modules": [

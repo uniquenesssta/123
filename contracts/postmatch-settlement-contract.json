@@ -59,7 +59,7 @@
     "crates/persistence-postgres/src/parameter_lifecycle.rs",
     "src-tauri/src/commands/postmatch.rs",
     "src/api/client.ts",
-    "src/pages/review.ts",
+    "src/features/review/reviewPage.ts",
     "src/pages/analytics.ts",
     "src/main.ts"
   ],

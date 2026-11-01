@@ -126,7 +126,7 @@ for (const [file, tokens, label] of [
   ["src/features/teams/profileView.ts", ["默认角色", "role_code"], "球队名单 UI"],
   ["src/main.ts", ["defaultRoleForPlayer", "position_role_map?.[code]", "player_position_default", "lineup_override", "role_source_position_code"], "阵容编辑 UI"],
   ["src/types.ts", ["role_source_position_code?: string | null", "tactical_role_source_position_code"], "前端角色类型"],
-  ["src/pages/review.ts", ["role_source_position_code", "资料继承"], "复盘角色来源 UI"],
+  ["src/features/review/reviewManualView.ts", ["role_source_position_code", "资料继承"], "复盘角色来源 UI"],
 ]) requireTokens(file, tokens, label);
 
 const predictionReadiness = read("crates/application/src/use_cases/prediction/readiness/lineups.rs");
