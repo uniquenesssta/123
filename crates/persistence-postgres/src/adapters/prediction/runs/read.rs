@@ -116,7 +116,8 @@ impl PostgresStore {
                 r.input_readiness_score, r.input_manifest, r.input_manifest_sha256,
                 r.feature_snapshot_id,
                 snapshot.snapshot_fingerprint AS feature_snapshot_fingerprint,
-                r.duration_ms, r.created_at, r.completed_at
+                r.duration_ms, r.created_at, r.completed_at,
+                r.history_hidden_at, r.history_hidden_reason
             FROM model.runs r
             LEFT JOIN feature.snapshots snapshot ON snapshot.id = r.feature_snapshot_id
             WHERE r.id = $1
@@ -156,6 +157,8 @@ impl PostgresStore {
             "duration_ms": row.try_get::<Option<i64>, _>("duration_ms")?,
             "created_at": row.try_get::<DateTime<Utc>, _>("created_at")?,
             "completed_at": row.try_get::<Option<DateTime<Utc>>, _>("completed_at")?,
+            "history_hidden_at": row.try_get::<Option<DateTime<Utc>>, _>("history_hidden_at")?,
+            "history_hidden_reason": row.try_get::<Option<String>, _>("history_hidden_reason")?,
         }))
     }
 }

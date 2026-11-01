@@ -58,8 +58,8 @@ function predictionTechnicalDetails(data: PredictionViewData): string {
   </dl></details>`;
 }
 
-export function predictionDetailBody(payload: unknown): string {
-  const data = predictionViewData(payload);
+export function predictionDetailBody(payload: unknown, options:{stored?:boolean}={}): string {
+  const data = predictionViewData(payload,options);
   const topScore = data.scorelines[0] ?? null;
   const scoreParts = topScore?.score.split("-") ?? ["—", "—"];
   const outcomeMax = Math.max(...[data.homeWin,data.draw,data.awayWin].filter((x):x is number=>x!==null));
@@ -106,7 +106,7 @@ export function predictionDetailBody(payload: unknown): string {
       <div><span>模型</span><strong>${escapeHtml(modelDisplayName(data.modelId))}</strong></div><i>→</i>
       <div><span>数据时点</span><strong>${escapeHtml(data.snapshotType)}</strong></div>
     </div></section>
-    <section class="prediction-quality-strip"><div><span>概率合计检查</span><strong>${auditStatus === "PASS" ? "通过" : "需要检查"}</strong></div><div><span>比分矩阵覆盖</span><strong>${coverageStatus === "PASS" ? "通过" : "需要检查"}</strong></div><div><span>计算耗时</span><strong>${data.durationMs === null ? "—" : `${data.durationMs} 毫秒`}</strong></div><div><span>完成时间</span><strong>${data.createdAt ? new Date(data.createdAt).toLocaleString() : "本次运行"}</strong></div></section>
+    <section class="prediction-quality-strip"><div><span>概率合计检查</span><strong>${auditStatus === "PASS" ? "通过" : "需要检查"}</strong></div><div><span>比分矩阵覆盖</span><strong>${coverageStatus === "PASS" ? "通过" : "需要检查"}</strong></div><div><span>计算耗时</span><strong>${data.durationMs === null ? "—" : `${data.durationMs} 毫秒`}</strong></div><div><span>完成时间</span><strong>${data.createdAt ? new Date(data.createdAt).toLocaleString() : options.stored?"完成时间未记录":"本次运行"}</strong></div></section>
     ${predictionTechnicalDetails(data)}
   </div>`;
 }

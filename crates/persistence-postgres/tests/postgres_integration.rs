@@ -269,13 +269,46 @@ async fn prediction_input_audit_fields_are_persisted_and_immutable() {
     .await;
     assert!(mutation.is_err(), "输入载荷必须受不可变触发器保护");
 
-    sqlx::query(
-        "UPDATE model.runs SET history_hidden_at = now(), history_hidden_reason = 'integration' WHERE id = $1",
-    )
-    .bind(run_id)
-    .execute(&database.pool)
-    .await
-    .expect("非输入身份字段仍允许更新");
+    let before_hide = database
+        .store
+        .read_run(run_id)
+        .await
+        .expect("读取隐藏前原运行");
+    assert!(before_hide["history_hidden_at"].is_null());
+    database
+        .store
+        .hide_run_from_history(run_id, Some("integration"))
+        .await
+        .expect("通过实际入口隐藏历史运行");
+    let after_hide = database
+        .store
+        .read_run(run_id)
+        .await
+        .expect("隐藏后仍可按ID读取原运行");
+    assert!(after_hide["history_hidden_at"].is_string());
+    assert_eq!(after_hide["history_hidden_reason"], "integration");
+    for field in [
+        "id",
+        "model_key",
+        "model_version",
+        "parameter_version",
+        "input_sha256",
+        "input",
+        "input_audit",
+        "output",
+        "summary",
+    ] {
+        assert_eq!(
+            before_hide[field], after_hide[field],
+            "隐藏不得改写原运行血缘或内容: {field}"
+        );
+    }
+    let visible = database
+        .store
+        .list_recent_runs(100)
+        .await
+        .expect("读取隐藏后的可见目录");
+    assert!(!visible.iter().any(|row| row.id == run_id));
 
     sqlx::query("DELETE FROM model.runs WHERE id = $1")
         .bind(run_id)

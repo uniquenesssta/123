@@ -16,7 +16,7 @@ const shell = JSON.parse(read("contracts/global-visual-system-contract.json")).s
 const navigation = read("src/app/router/routeRegistry.ts");
 const lineups = read("src/pages/lineups.ts");
 const prediction = read("src/pages/prediction.ts") + read("src/features/prediction/formalPredictionView.ts");
-const runs = read("src/pages/runs.ts");
+const runs = read("src/features/runs/runHistoryView.ts")+read("src/features/runs/runWorkspaceView.ts");
 const teams = ["src/features/teams/teamPresentation.ts","src/features/teams/profileView.ts","src/features/teams/packageView.ts","src/features/teams/teamsView.ts"].map(read).join("\n");
 const main = read("src/main.ts");
 const predictionResult=read("src/features/prediction/predictionResultView.ts");
@@ -41,7 +41,7 @@ for (const label of ["数据准备和路由可用", "外部提供器规则入口
 }
 requireTrue(!prediction.includes("P4 Golden Master固定回归规则"), "正式推演页面仍直接暴露 Golden Master 回归资产");
 
-requireTrue(runs.includes("balanced-data-table") && runs.includes("模型 / 规则") && runs.includes("胜平负"), "推演历史没有接入必要信息表格");
+requireTrue(runs.includes("balanced-data-table") && runs.includes("模型 / 规则") && runs.includes("胜 / 平 / 负"), "推演历史没有接入必要信息表格");
 requireTrue(teams.includes("entity-directory-list") && teams.includes("entity-data-table roster-table") && teams.includes("当前阵容"), "球队资源中心没有接入目录与高密度阵容表格");
 requireTrue(styles.includes(".balanced-data-table") && entityStyles.includes(".entity-data-table") && entityStyles.includes(".entity-directory-list"), "历史或球队高密度表格样式缺失");
 

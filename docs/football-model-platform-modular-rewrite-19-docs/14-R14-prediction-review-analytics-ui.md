@@ -20,7 +20,7 @@
 
 ## 状态与依赖
 
-当前 **R14-01 DONE（自身精确CI/官方摘要/双包/startup已验收），R14-06 DONE（精确CI/官方摘要/双包/startup已验收），其后批次PLANNED、未启动**。R13适用出口已完成且用户已授权01；分支rewrite/r14-prediction-review-analytics-ui，基线3d9363fe。代码866ba003已推送，自身CI41285690142及产物已核验通过。见[执行索引](../modular-rewrite/R14-prediction-review-analytics-ui/README.md)。下表顺序是默认交付顺序，必要时在已授权阶段内按真实依赖拆出更小批次并说明原因，不以任务数量或文件数为目标。
+当前 **R14-01 DONE（自身精确CI/官方摘要/双包/startup已验收），R14-06 DONE（精确CI/官方摘要/双包/startup已验收），R14-07 VERIFYING（本地通过，精确CI/双包待验），其后批次PLANNED、未启动**。R13适用出口已完成且用户已授权01；分支rewrite/r14-prediction-review-analytics-ui，基线3d9363fe。代码866ba003已推送，自身CI41285690142及产物已核验通过。见[执行索引](../modular-rewrite/R14-prediction-review-analytics-ui/README.md)。下表顺序是默认交付顺序，必要时在已授权阶段内按真实依赖拆出更小批次并说明原因，不以任务数量或文件数为目标。
 
 | 主交付 ID | 交付批次 | 前置 |
 |---|---|---|
@@ -208,7 +208,7 @@ if ($LASTEXITCODE -ne 0) { throw 'R14-06: verify-public-model-boundary failed' }
 
 ### 源码锚点与调用盘点
 
-`src/pages/runs.ts`、`src/api/client.ts`、`src/types.ts`。代表性现存函数：`requestHideRunHistory`（main.ts:5501）、`showPredictionDetail`（main.ts:1304）、`predictionDetailBody`（main.ts:1251）。这些是入口锚点，不是穷尽迁移清单；还需盘点对应事件分支、辅助函数与全部调用方。
+R14-07当前归属：`src/features/runs/index.ts`、`runsFeature.ts`、`runRecovery.ts`、`runWorkspaceView.ts`、`runHistoryView.ts`；`src/pages/runs.ts`已由实际调用替代退出。根入口仅保留确认/导航转发，共享完整结果使用Prediction公开只读接口。API仍在`src/api/client.ts`，Session保持最近运行唯一缓存。实施与分层验证见[07记录](../modular-rewrite/R14-prediction-review-analytics-ui/R14-07-run-history-and-lineage.md)。这些是入口锚点，不是穷尽迁移清单；还需盘点对应事件分支、辅助函数与全部调用方。
 
 上述函数直接调用的现有 API：`hideModelRunHistory`；间接调用须沿当前调用图补齐。参数、返回、错误码及 wire 命令从实际 client 和 command-contract 对照，不按名称猜测。
 

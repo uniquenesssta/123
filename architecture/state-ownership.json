@@ -825,8 +825,22 @@
       ],
       "transition": null,
       "migration_task": "R14-06"
+    },
+    {
+      "id": "feature.runs-workflow",
+      "owner": "src/features/runs/runsFeature.ts::RunsFeature",
+      "scope": "run selection, list/detail request states and per-run visibility recovery; AppSession/BootstrapState remain sole directory cache owner",
+      "writers": [
+        "RunsFeature methods"
+      ],
+      "forbidden": [
+        "src/pages/**",
+        "src/api/**"
+      ],
+      "transition": null,
+      "migration_task": "R14-07"
     }
   ],
-  "count": 57,
-  "last_updated_task": "R14-06"
+  "count": 58,
+  "last_updated_task": "R14-07"
 }

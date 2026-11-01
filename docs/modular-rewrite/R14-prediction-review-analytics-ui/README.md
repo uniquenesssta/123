@@ -6,7 +6,7 @@
 | --- | --- | --- |
 | R14-01 输入、准入与推演执行（原01～05） | DONE | [实施记录](R14-01-context-readiness-and-execution.md) |
 | R14-06 P4研究证据与冻结 | DONE | [实施记录](R14-06-research-evidence-and-freeze.md) |
-| R14-07 运行记录与血缘 | PLANNED | 等待06 |
+| R14-07 运行记录与血缘 | VERIFYING | [实施记录](R14-07-run-history-and-lineage.md) |
 | R14-08 复盘选择、事实与包提交 | PLANNED | 等待07 |
 | R14-12 赛后结算与监控 | PLANNED | 等待08 |
 | R14-13 分析查询、长任务与建议包 | PLANNED | 等待12 |
@@ -18,3 +18,5 @@ R14-06适用出口已正式验收DONE；用户已授权下一项R14-07运行记�
 R14-01代码`866ba003`已推送；自身[CI 41285690142](https://github.com/uniquenesssta/123/actions/runs/41285690142)已按精确提交及官方产物核验success，双安装包/包内startup通过，不轮询。
 
 R14-06代码`5171f779`已推送；自身[CI 41297701399](https://github.com/uniquenesssta/123/actions/runs/41297701399)已精确核验success；官方摘要、双包/包内startup均通过。代码CI以5171f779为准，不使用文档交接提交替代。
+
+R14-07本地适用验证通过，CI/官方产物待精确提交验收；下一项R14-08复盘选择、事实与包提交，尚未启动。BA-08真实库与私有成功链仍按已批准R17-06承接。

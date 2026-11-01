@@ -8,3 +8,4 @@ export {syncPredictionControls,syncPredictionSelectIcons} from "./formalPredicti
 export {ResearchFeature} from "./research/researchFeature";
 export {researchRecovery} from "./research/researchRecovery";
 export {researchSnapshotView} from "./research/researchSnapshotView";
+export {predictionViewData} from "./predictionProjection";

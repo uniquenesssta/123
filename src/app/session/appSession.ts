@@ -64,7 +64,8 @@ export class AppSession {
     this.recentRunRequests.invalidate();
     this.bootstrapTask = this.bootstrapRequests.run(() => this.adapters.loadBootstrap(), result => {
       const current = this.bootstrap;
-      const snapshot = recentRevision !== this.recentCommitRevision && current
+      const sameDatabase = current?.data.database_configured === result.data.database_configured && current?.data.database_url === result.data.database_url;
+      const snapshot = recentRevision !== this.recentCommitRevision && current && sameDatabase
         ? { ...result, data: { ...result.data, recent_runs: current.data.recent_runs } }
         : result;
       this.bootstrapState.replace(snapshot);
@@ -72,12 +73,26 @@ export class AppSession {
     return this.bootstrapTask;
   }
 
+  captureDatabase():()=>boolean {
+    const current=this.bootstrapState.captureDatabase(),configured=this.bootstrap?.data.database_configured===true;
+    return()=>configured&&current()&&!this.lifecycle.signal.aborted;
+  }
+
+  confirmRunHidden(runId:string):void {
+    if(!this.bootstrap||!runId)return;
+    this.recentRunRequests.invalidate();
+    this.bootstrapState.setRecentRuns(this.bootstrap.data.recent_runs.filter(row=>row.id!==runId));
+    this.recentCommitRevision++;
+  }
+
   refreshRecentRuns(): Promise<boolean> {
     if (this.lifecycle.signal.aborted || !this.bootstrap) return Promise.resolve(false);
+    const current=this.bootstrapState.captureDatabase();
     return this.recentRunRequests.run(() => this.adapters.loadRecentRuns(), rows => {
+      if(!current())return;
       this.bootstrapState.setRecentRuns(rows);
       this.recentCommitRevision++;
-    });
+    }).then(applied=>applied&&current());
   }
 
   toggleTheme(): Theme {

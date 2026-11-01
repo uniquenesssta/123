@@ -49,7 +49,7 @@ import { logsPage } from "./pages/logs";
 import { openAiPage } from "./pages/openai";
 import { releasePage } from "./pages/release";
 import { reviewPage } from "./pages/review";
-import { runsPage } from "./pages/runs";
+import {RunsFeature,runRecovery,runsPage,runTechnicalBody} from "./features/runs";
 import { WorkbooksFeature,workbooksPage } from "./features/workbooks";
 import { importRecovery } from "./app/imports/importRecovery";
 import { clipboard } from "./platform/clipboard";
@@ -353,6 +353,13 @@ const researchFeature=new ResearchFeature({
   recovery:researchRecovery(localPreferences,preferenceKey("prediction-research-recovery"),()=>session.bootstrap),
 });
 
+const runsFeature=new RunsFeature({
+  api,source:{snapshot:()=>session.bootstrap,refresh:()=>session.refreshRecentRuns(),capture:()=>session.captureDatabase(),hidden:id=>session.confirmRunHidden(id)},
+  view:()=>{const page=navigation.page;return()=>page===navigation.page&&!browserLifecycleController.signal.aborted;},
+  changed:()=>{if((renderedPage==="runs"||renderedPage==="prediction")&&session.bootstrap&&!browserLifecycleController.signal.aborted)render({preserveForm:true});},
+  formatError:userFacingError,recovery:runRecovery(localPreferences,preferenceKey("run-history-recovery"),()=>session.bootstrap),
+});
+
 interface WorkflowContinuation {
   readonly reason: string;
   readonly matchId: string | null;
@@ -575,6 +582,7 @@ function render(options: RenderOptions = {}): void {
         workspace.active_section ?? "formal",
         predictionFeature.view,
         researchFeature.view,
+        runsFeature.view,
       );
       break;
     }
@@ -614,7 +622,7 @@ function render(options: RenderOptions = {}): void {
       );
       break;
     case "runs":
-      content = runsPage(session.bootstrap);
+      content = runsPage(session.bootstrap,runsFeature.view);
       break;
     case "logs":
       content = logsPage(issueLogs);
@@ -1350,6 +1358,7 @@ async function sendApiWorkspaceMessage(): Promise<void> {
 async function navigateTo(nextPage: Page): Promise<void> {
   workbooksFeature.changedCategory();
   predictionFeature.navigationChanged();
+  runsFeature.navigationChanged();
   await navigation.navigate(nextPage, async request => {
     try {
       await loadNavigationPage(request);
@@ -1436,6 +1445,8 @@ async function loadNavigationPage(request: NavigationRequest): Promise<void> {
       await researchFeature.load(matchId);
       if (!navigation.isCurrent(request)) return;
     }
+  } else if (nextPage === "runs") {
+    await runsFeature.refresh();
   } else if (nextPage === "review") {
     const result = await fetchReviewCenter(selectedReviewMatchId);
     if (navigation.isCurrent(request)) applyReviewCenter(result);
@@ -1759,24 +1770,17 @@ function resolveP4Conflict(conflictId:string,acceptUnknown:boolean):void {
     "确认追加",async()=>{await researchFeature.decide(intent,current);},{tone:"neutral"});
 }
 
-function requestHideRunHistory(runId: string, runLabel: string): void {
-  if (!runId) throw new Error("缺少推演记录编号");
-  showConfirmation(
-    "从历史列表删除",
-    "该操作只隐藏历史列表中的记录，不删除模型运行、概率矩阵、快照、复盘或收敛血缘。",
-    [
-      ["推演", runLabel],
-      ["底层数据", "完整保留，可继续用于审计、复盘与收敛"],
-    ],
-    "确认从列表删除",
-    async () => {
-      await runBusy(() => api.hideModelRunHistory(runId, "用户从历史列表删除"));
-      if (session.bootstrap) await session.refreshRecentRuns();
-      render();
-      toast("推演记录已从历史列表移除", "success");
-    },
-    { tone: "neutral" },
-  );
+function requestHideRunHistory(runId:string,_runLabel:string):void {
+  const intent=runsFeature.prepareHide(runId),current=runsFeature.captureView();
+  showConfirmation("从历史列表移除","该操作只隐藏列表中的记录，不删除模型运行、概率矩阵、快照、复盘或收敛血缘。",
+    [["推演",intent.label],["运行 ID",intent.runId],["底层数据","完整保留，可继续用于审计、复盘与收敛"]],"确认移除",async()=>{await runsFeature.hide(intent,current);},{tone:"neutral"});
+}
+
+async function openHistoryRun(runId:string):Promise<void> {
+  if(navigation.page!=="runs"){
+    const pending=navigateTo("runs"),current=runsFeature.captureView();await pending;if(!current())return;
+  }
+  if(await runsFeature.open(runId))document.querySelector<HTMLElement>("#runs-title")?.focus({preventScroll:true});
 }
 
 function numberFromReviewRow(row: HTMLElement, field: string): number {
@@ -3821,10 +3825,22 @@ async function handleAction(
       );
       break;
     case "refresh-runs":
-      if (!session.bootstrap) return;
-      await runBusy(() => session.refreshRecentRuns());
-      render();
+      await runsFeature.refresh();
       break;
+    case "runs-back": {
+      const id=runsFeature.selectedId;runsFeature.back();
+      if(id)workspaceState.restoreFocus("runs",app.querySelector(".page-container")??app,`run-open-${id}`);
+      break;
+    }
+    case "runs-retry-detail":
+      await openHistoryRun(button.dataset.runId??runsFeature.selectedId??"");
+      break;
+    case "runs-technical": {
+      const doc=runsFeature.detail;
+      if(!doc||runsFeature.selectedId!==button.dataset.runId)throw Error("当前记录已变化，请重新打开技术追踪");
+      showHtmlModal("运行技术追踪","只读 · 原运行结果、矩阵与血缘",runTechnicalBody(doc),"","prediction-result-modal");
+      break;
+    }
     case "request-remove-lineup-history":
       lineupsFeature.actions.requestRemoveLineupHistory(
         button.dataset.lineupId ?? "",
@@ -3838,10 +3854,7 @@ async function handleAction(
       );
       break;
     case "open-run":
-      showPredictionDetail(
-        "历史推演结果",
-        await runBusy(() => api.readRun(button.dataset.runId ?? "")),
-      );
+      await openHistoryRun(button.dataset.runId??"");
       break;
     case "show-route-json": {
       if(navigation.page==="prediction"&&workspaceState.module("prediction").active_section==="formal"&&predictionFeature.view.route){showRouteDetail(predictionFeature.view.route);break;}

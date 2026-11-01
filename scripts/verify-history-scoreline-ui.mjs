@@ -20,7 +20,7 @@ const requireTrue = (condition, message) => { if (!condition) failures.push(mess
 const modal = read("src/app/modal/workspacePanelController.ts");
 const main = read("src/main.ts");
 const predictionResult=read("src/features/prediction/predictionResultView.ts");
-const runs = read("src/pages/runs.ts");
+const runs = read("src/features/runs/runHistoryView.ts")+read("src/features/runs/runWorkspaceView.ts");
 const lineups = read("src/pages/lineups.ts");
 const styles = read("src/styles/app.css");
 const workspacePanels = read("src/styles/workspacePanels.css");

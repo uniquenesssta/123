@@ -61,7 +61,7 @@ function numberValueFrom(
     : null;
 }
 
-export function predictionViewData(payload: unknown): PredictionViewData {
+export function predictionViewData(payload: unknown, options:{stored?:boolean}={}): PredictionViewData {
   const root = objectValue(payload);
   const rootOutput = objectValue(root.output);
   const wrappedOutput =
@@ -123,7 +123,7 @@ export function predictionViewData(payload: unknown): PredictionViewData {
   const rulePackage = stringValueFrom(
     route,
     "package_display_name",
-    stringValueFrom(root, "rule_package_name", "系统默认规则"),
+    stringValueFrom(root, "rule_package_name", options.stored?"规则未记录":"系统默认规则"),
   );
   const audit =
     Object.keys(wrappedOutput).length > 0
@@ -179,7 +179,7 @@ export function predictionViewData(payload: unknown): PredictionViewData {
     modelId: stringValueFrom(
       identity,
       "model_id",
-      stringValueFrom(root, "model_key", "模型"),
+      stringValueFrom(root, "model_key", options.stored?"模型未记录":"模型"),
     ),
     modelVersion: stringValueFrom(
       identity,
@@ -207,14 +207,14 @@ export function predictionViewData(payload: unknown): PredictionViewData {
         "competition_kind_default",
       ].includes(routeSource)
         ? routeSourceLabel(routeSource as RouteDecision["source"])
-        : "系统自动匹配",
+        : options.stored?"路由未记录":"系统自动匹配",
     snapshotType: stringValueFrom(root, "snapshot_type", "—"),
     runId: stringValueFrom(root, "execution_mode") === "shadow"
       ? "影子推演（未写入数据库）"
       : stringValueFrom(
           root,
           "run_id",
-          stringValueFrom(root, "id", "未写入数据库"),
+          stringValueFrom(root, "id", options.stored?"运行ID未记录":"未写入数据库"),
         ),
     durationMs: numberValueFrom(root, "duration_ms"),
     createdAt: stringValueFrom(root, "created_at") || null,

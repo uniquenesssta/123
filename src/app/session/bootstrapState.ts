@@ -16,13 +16,19 @@ function detachedSnapshot(value: BootstrapResponse): BootstrapResponse {
 /** Sole summary owner. Existing view DTO signatures borrow a detached, deeply frozen snapshot. */
 export class BootstrapState {
   private value: BootstrapResponse | null = null;
+  private databaseRevision = 0;
   get snapshot(): BootstrapResponse | null { return this.value; }
-  replace(value: BootstrapResponse): void { this.value = detachedSnapshot(value); }
+  replace(value: BootstrapResponse): void {
+    const identity=(s:BootstrapResponse|null)=>JSON.stringify([s?.data.database_configured??false,s?.data.database_url??null]);
+    if(identity(this.value)!==identity(value))this.databaseRevision++;
+    this.value = detachedSnapshot(value);
+  }
+  captureDatabase():()=>boolean {const revision=this.databaseRevision;return()=>revision===this.databaseRevision;}
 
   setRecentRuns(recentRuns: ModelRunListItem[]): void {
     if (!this.value) return;
     this.replace({ ...this.value, data: { ...this.value.data, recent_runs: recentRuns } });
   }
 
-  clear(): void { this.value = null; }
+  clear(): void { this.databaseRevision++;this.value = null; }
 }

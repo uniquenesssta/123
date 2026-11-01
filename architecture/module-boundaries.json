@@ -168,8 +168,9 @@
         "public_entry": "src/features/rules/index.ts"
       },
       "runs": {
-        "owner": "src/pages/runs.ts",
-        "route": "runs"
+        "owner": "src/features/runs/runWorkspaceView.ts",
+        "route": "runs",
+        "public_entry": "src/features/runs/index.ts"
       },
       "teams": {
         "owner": "src/features/teams/teamsView.ts",
@@ -187,16 +188,7 @@
         "public_entry": "src/features/competitions/index.ts"
       }
     },
-    "transitional_imports": [
-      {
-        "from_feature": "prediction",
-        "importer": "src/pages/prediction.ts",
-        "to_feature": "runs",
-        "target": "src/pages/runs.ts",
-        "reason": "prediction currently composes the run history page renderer",
-        "exit_task": "R14-07"
-      }
-    ],
+    "transitional_imports": [],
     "ui_primitives": {
       "owner": "src/ui/primitives",
       "style_entry": "src/ui/primitives/index.css",

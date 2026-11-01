@@ -1,3 +1,4 @@
+import {verifyRunsBrowser} from "../features/verifyRunsBrowser.mjs";
 import {verifyResearchBrowser} from "../features/verifyResearchBrowser.mjs";
 import {verifyPredictionBrowser} from "../features/verifyPredictionBrowser.mjs";
 import { verifyWorkbooksBrowser } from "../features/verifyWorkbooksBrowser.mjs";
@@ -162,3 +163,5 @@ function checks(screen) {
 await verifyPredictionBrowser(root,join(directory,"prediction-mounted"));
 
 await verifyResearchBrowser(root,join(directory,"research-mounted"));
+
+await verifyRunsBrowser(root,join(directory,"runs-mounted"));
