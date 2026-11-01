@@ -1,0 +1,12 @@
+import {escapeHtml,formatPercent} from "../../../components/format";
+import {formatTime,formatValue} from "./researchPresentation";
+const record=(value:unknown):Record<string,unknown>=>value&&typeof value==="object"&&!Array.isArray(value)?value as Record<string,unknown>:{};
+const records=(value:unknown):Record<string,unknown>[]=>Array.isArray(value)?value.map(record):[];
+const text=(value:unknown)=>escapeHtml(formatValue(value));
+/** Readonly projection of the actual immutable bundle; no model or probability calculations. */
+export function researchSnapshotView(bundle:Record<string,unknown>):string {
+  const snapshot=record(bundle.snapshot),features=records(bundle.features),probabilities=records(bundle.probabilities);
+  const probability=(value:unknown)=>typeof value==="number"&&Number.isFinite(value)?formatPercent(value):"未知";
+  const fields=[["研究任务 / 比赛",snapshot.match_key],["窗口",snapshot.horizon],["数据截止",formatTime(typeof snapshot.data_cutoff_at==="string"?snapshot.data_cutoff_at:null)],["冻结时间",formatTime(typeof snapshot.frozen_at==="string"?snapshot.frozen_at:null)],["快照指纹",snapshot.snapshot_fingerprint],["快照 ID",snapshot.id]];
+  return `<div class="p4-workbench p4-frozen-detail"><section class="panel"><header><h2>冻结快照 · 只读</h2><p>人工决策仅追加；原始来源证据保持不变。</p></header><dl>${fields.map(([label,value])=>`<div><dt>${label}</dt><dd>${text(value)}</dd></div>`).join("")}</dl></section><section class="panel"><header><h2>冻结字段</h2><p>保留冻结值、验证状态和证据引用。</p></header><div class="table-wrap"><table class="p4-table"><thead><tr><th>字段</th><th>值</th><th>验证状态</th><th>证据引用</th></tr></thead><tbody>${features.map(f=>`<tr><td>${text(f.field_key)}</td><td>${text(f.value)}</td><td>${text(f.verification_state)}</td><td>${text(f.evidence_ids)}</td></tr>`).join("")||'<tr><td colspan="4">没有返回冻结字段，不补造输入。</td></tr>'}</tbody></table></div></section><section class="panel"><header><h2>概率链</h2><p>仅展示对应快照实际返回的结果。</p></header>${probabilities.length?`<div class="table-wrap"><table class="p4-table"><thead><tr><th>链 / 矩阵指纹</th><th>主胜</th><th>平局</th><th>客胜</th></tr></thead><tbody>${probabilities.map(p=>`<tr><td>${text(p.chain_key)}<small>${text(p.matrix_sha256)}</small></td><td>${probability(p.home_win)}</td><td>${probability(p.draw)}</td><td>${probability(p.away_win)}</td></tr>`).join("")}</tbody></table></div>`:'<p>外部概率链尚未返回，不填造结果。</p>'}</section><details class="panel"><summary>原始冻结输入及完整记录</summary><pre>${escapeHtml(JSON.stringify(bundle,null,2))}</pre></details></div>`;
+}

@@ -20,7 +20,7 @@
 
 ## 状态与依赖
 
-当前 **R14-01 DONE（自身精确CI/官方摘要/双包/startup已验收），其余批次PLANNED、未启动**。R13适用出口已完成且用户已授权01；分支rewrite/r14-prediction-review-analytics-ui，基线3d9363fe。代码866ba003已推送，自身CI41285690142及产物已核验通过。见[执行索引](../modular-rewrite/R14-prediction-review-analytics-ui/README.md)。下表顺序是默认交付顺序，必要时在已授权阶段内按真实依赖拆出更小批次并说明原因，不以任务数量或文件数为目标。
+当前 **R14-01 DONE（自身精确CI/官方摘要/双包/startup已验收），R14-06 VERIFYING（本地适用检查通过，本批CI/双包待验），其后批次PLANNED、未启动**。R13适用出口已完成且用户已授权01；分支rewrite/r14-prediction-review-analytics-ui，基线3d9363fe。代码866ba003已推送，自身CI41285690142及产物已核验通过。见[执行索引](../modular-rewrite/R14-prediction-review-analytics-ui/README.md)。下表顺序是默认交付顺序，必要时在已授权阶段内按真实依赖拆出更小批次并说明原因，不以任务数量或文件数为目标。
 
 | 主交付 ID | 交付批次 | 前置 |
 |---|---|---|
@@ -141,13 +141,13 @@ if ($LASTEXITCODE -ne 0) { throw 'R14-01: verify-public-model-boundary failed' }
 
 ### 源码锚点与调用盘点
 
-`src/pages/p4Workbench.ts`、`src/api/client.ts`、`src/types.ts`。代表性现存函数：`loadP4MatchWorkspace`（main.ts:1947）、`planP4Horizons`（main.ts:4072）、`openP4Task`（main.ts:4089）、`resolveP4Conflict`（main.ts:4101）、`refreshP4Workbench`（main.ts:4095）。这些是入口锚点，不是穷尽迁移清单；还需盘点对应事件分支、辅助函数与全部调用方。
+当前生产所有者为 `src/features/prediction/research/` 中 ResearchFeature、researchDecision、researchRecovery、researchView、researchPresentation、researchSnapshotView；`src/pages/p4Workbench.ts` 已替代退出，根入口退出研究工作区变量和业务实现。ResearchFeature.load/openTask/plan/prepareDecision/decide/recover/snapshot接通原查询、计划、确认、恢复及只读快照；main.resolveP4Conflict仅负责DOM取值和共享确认装配。
 
 上述函数直接调用的现有 API：`readP4MatchWorkspace`、`readP4TaskWorkspace`、`planP4Horizons`、`resolveP4Conflict`；间接调用须沿当前调用图补齐。参数、返回、错误码及 wire 命令从实际 client 和 command-contract 对照，不按名称猜测。
 
 ### 目标归属与数据流
 
-prediction/p4-research 持有当前match/task选择及查询，证据/冲突/冻结动作独立；不可变证据和任务终态由后端决定。
+共享 PredictionContext 仍为唯一比赛选择 owner；prediction/research 持有研究任务选择、查询和操作恢复，证据/冲突/冻结状态按后端实际记录投影。不可变证据和任务终态由后端决定。
 
 比赛→任务→证据及冲突→明确解决→后端冻结许可/结果；仅以DTO投影，不推断已冻结。
 

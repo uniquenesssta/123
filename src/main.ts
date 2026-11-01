@@ -1,3 +1,4 @@
+import { ResearchFeature, researchRecovery, researchSnapshotView } from "./features/prediction";
 import {PredictionFeature,predictionRecovery,predictionPage,inlinePredictionResult,predictionDetailBody,routeSourceLabel,modelDisplayName,syncPredictionControls,syncPredictionSelectIcons} from "./features/prediction";
 import {
 api,
@@ -85,8 +86,6 @@ OpenAiApiExampleParseResult,
 OpenAiApiProtocol,
 OpenAiProfileDraft,
 OpenAiProfilesState,
-P4MatchWorkspace,
-P4TaskWorkspace,
 Page,
 ParameterLifecycleReadinessRequest,
 ParameterPromotionRequest,
@@ -106,7 +105,6 @@ PredictionModelFamily,
 ReleaseAcceptanceRequest,
 ReleaseAcceptanceRun,
 ReleaseAcceptanceRunSummary,
-ResolveP4ConflictCommand,
 ReviewableMatch,
 RouteDecision,
 RoutePreviewCommand,
@@ -349,6 +347,12 @@ const predictionFeature=new PredictionFeature({
   recovery:predictionRecovery(localPreferences,preferenceKey("prediction-run-recovery"),()=>session.bootstrap),
 });
 
+const researchFeature=new ResearchFeature({
+  api,context:predictionFeature.context,scope:()=>{const summary=session.bootstrap,current=captureImportData();return()=>current()&&summary===session.bootstrap;},view:()=>predictionFeature.capturePresentation(),
+  changed:()=>{if(renderedPage==="prediction"&&session.bootstrap)render({preserveForm:true});},
+  recovery:researchRecovery(localPreferences,preferenceKey("prediction-research-recovery"),()=>session.bootstrap),
+});
+
 interface WorkflowContinuation {
   readonly reason: string;
   readonly matchId: string | null;
@@ -366,8 +370,6 @@ let selectedOpenAiProfileId: string | null = null;
 let creatingOpenAiProfile = false;
 const openAiApiExampleTimer = new DebouncedTask(browserLifecycleController);
 let openAiApiExampleLastParsed = "";
-let p4MatchWorkspace: P4MatchWorkspace | null = null;
-let p4TaskWorkspace: P4TaskWorkspace | null = null;
 let apiWorkspacePresets: ApiWorkspacePreset[] = [];
 let apiWorkspaceSessions: ApiWorkspaceSessionRecord[] = [];
 let apiWorkspaceDetail: ApiWorkspaceSessionDetail | null = null;
@@ -562,8 +564,8 @@ function render(options: RenderOptions = {}): void {
         session.bootstrap,
         playersFeature.catalog.references,
         predictionFeature.context.matchId,
-        p4MatchWorkspace,
-        p4TaskWorkspace,
+        researchFeature.matchWorkspace,
+        researchFeature.taskWorkspace,
         lineupsFeature.state.selectedMatchLineupChain,
         predictionFeature.readiness,
         predictionFeature.context.snapshot,
@@ -572,6 +574,7 @@ function render(options: RenderOptions = {}): void {
         workspace.inspector_collapsed,
         workspace.active_section ?? "formal",
         predictionFeature.view,
+        researchFeature.view,
       );
       break;
     }
@@ -1160,38 +1163,6 @@ async function loadIssueLogs(): Promise<void> {
   issueLogs = await api.listIssueLogs(500);
 }
 
-async function loadP4MatchWorkspace(
-  matchId: string,
-  preferredTaskId: string | null = null,
-): Promise<void> {
-  predictionFeature.context.matchId = matchId;
-  const current=predictionFeature.context.capture(),page=navigation.page;
-  const workspace = await api.readP4MatchWorkspace(matchId);
-  if(!current()||page!==navigation.page)return;
-  p4MatchWorkspace = workspace;
-  const taskId =
-    preferredTaskId &&
-    workspace.tasks.some((task) => task.id === preferredTaskId)
-      ? preferredTaskId
-      : (workspace.tasks[0]?.id ?? null);
-  const taskWorkspace=taskId?await api.readP4TaskWorkspace(taskId):null;
-  if(current()&&page===navigation.page)p4TaskWorkspace=taskWorkspace;
-}
-
-async function refreshP4Workspace(): Promise<void> {
-  const matchId =
-    predictionFeature.context.matchId ??
-    playersFeature.catalog.references?.upcoming_matches[0]?.id ??
-    playersFeature.catalog.references?.managed_matches[0]?.id ??
-    null;
-  if (!matchId) {
-    p4MatchWorkspace = null;
-    p4TaskWorkspace = null;
-    return;
-  }
-  await loadP4MatchWorkspace(matchId, p4TaskWorkspace?.task.id ?? null);
-}
-
 async function loadApiWorkspace(
   selectedSessionId: string | null = apiWorkspaceDetail?.session.id ?? null,
   isCurrent: () => boolean = () => !browserLifecycleController.signal.aborted,
@@ -1455,26 +1426,15 @@ async function loadNavigationPage(request: NavigationRequest): Promise<void> {
         : (references.upcoming_matches[0]?.id ??
           references.managed_matches[0]?.id ??
           null);
-    const workspace = matchId
-      ? await api.readP4MatchWorkspace(matchId)
-      : null;
-    const taskId =
-      p4TaskWorkspace &&
-      workspace?.tasks.some((task) => task.id === p4TaskWorkspace?.task.id)
-        ? p4TaskWorkspace.task.id
-        : (workspace?.tasks[0]?.id ?? null);
-    const taskWorkspace = taskId
-      ? await api.readP4TaskWorkspace(taskId)
-      : null;
     if (navigation.isCurrent(request)) {
       playersFeature.catalog.setReferences(references);
-      const saved=workspaceState.module("prediction").controls;
+      const saved=workspaceState.module("prediction").controls??{};
       const model=saved["prediction-model-family"]?.value;
       const snapshot=saved["prediction-stored-snapshot"]?.value;
       const rule=saved["explicit-rule-package-id"]?.value;
       predictionFeature.initializeContext({match_id:matchId??"",model_family:model&&session.bootstrap?.data.models.some(m=>m.model_id===model)?model as PredictionModelFamily:predictionFeature.context.model,snapshot_type:snapshot&&["T-N","T-24h","T-6h","T-1h"].includes(snapshot)?snapshot:predictionFeature.context.snapshot,explicit_rule_package_id:rule&&session.bootstrap?.data.rule_packages.some(r=>r.id===rule&&r.status==="active")?rule:null});
-      p4MatchWorkspace = workspace;
-      p4TaskWorkspace = taskWorkspace;
+      await researchFeature.load(matchId);
+      if (!navigation.isCurrent(request)) return;
     }
   } else if (nextPage === "review") {
     const result = await fetchReviewCenter(selectedReviewMatchId);
@@ -1789,63 +1749,14 @@ async function calculatePredictionMatch():Promise<void>{
   render({preserveForm:true});showPredictionResult(result as Record<string,unknown>,"formal");toast("正式推演及原运行读回完成","success");
 }
 
-async function planP4Horizons(): Promise<void> {
-  const matchId = predictionFeature.context.matchId;
-  if (!matchId) throw new Error("请先在单场研究工作台选择比赛");
-  const rulePackageId = nullableValue("p4-plan-rule-package");
-  if (!rulePackageId) throw new Error("请选择已启用的 P4 正式规则包");
-  await runBusy(() =>
-    api.planP4Horizons({
-      match_id: matchId,
-      explicit_rule_package_id: rulePackageId,
-      requested_fact_keys: [],
-    }),
-  );
-  await loadP4MatchWorkspace(matchId, p4TaskWorkspace?.task.id ?? null);
-  render();
-  toast("三个计划窗口已建立并完成幂等校验", "success");
-}
-
-async function openP4Task(taskId: string): Promise<void> {
-  if (!taskId) throw new Error("缺少冻结任务 ID");
-  p4TaskWorkspace = await runBusy(() => api.readP4TaskWorkspace(taskId));
-  render({ preserveForm: true });
-}
-
-async function refreshP4Workbench(): Promise<void> {
-  await runBusy(refreshP4Workspace);
-  render({ preserveForm: true });
-  toast("单场研究工作台已刷新", "success");
-}
-
-async function resolveP4Conflict(
-  conflictId: string,
-  acceptUnknown: boolean,
-): Promise<void> {
-  const taskId = p4TaskWorkspace?.task.id;
-  if (!taskId) throw new Error("请先选择一个计划窗口任务");
-  if (!conflictId) throw new Error("缺少冲突 ID");
-  const selected = document.querySelector<HTMLInputElement>(
-    `input[name="p4-conflict-${conflictId}"]:checked`,
-  );
-  if (!acceptUnknown && !selected?.value)
-    throw new Error("请选择要采用的证据来源");
-  const note = nullableValue(`p4-conflict-note-${conflictId}`);
-  const command: ResolveP4ConflictCommand = {
-    task_id: taskId,
-    conflict_id: conflictId,
-    decision_kind: acceptUnknown ? "accept_unknown" : "select_evidence",
-    selected_evidence_ids: acceptUnknown ? [] : [selected!.value],
-    note,
-  };
-  p4TaskWorkspace = await runBusy(() => api.resolveP4Conflict(command));
-  if (predictionFeature.context.matchId)
-    p4MatchWorkspace = await api.readP4MatchWorkspace(predictionFeature.context.matchId);
-  render();
-  toast(
-    acceptUnknown ? "已追加“接受未知”决策" : "已追加证据选择决策",
-    "success",
-  );
+function resolveP4Conflict(conflictId:string,acceptUnknown:boolean):void {
+  const selection=()=>document.querySelector<HTMLInputElement>(`input[name="p4-conflict-${CSS.escape(conflictId)}"]:checked`)?.value??null;
+  const note=()=>nullableValue(`p4-conflict-note-${conflictId}`);
+  const intent=researchFeature.prepareDecision(conflictId,acceptUnknown,selection(),note());
+  const current=researchFeature.captureDraft();
+  showConfirmation("确认冲突处理","确认后重新核验任务版本、证据和截止时间；条件变化时需重新确认。",
+    [["比赛",researchFeature.matchWorkspace?.match_key??intent.matchId],["原任务",intent.taskId],["处理",acceptUnknown?"接受当前未知":intent.command.selected_evidence_ids.join("、")],["说明",intent.command.note??"未填写"]],
+    "确认追加",async()=>{await researchFeature.decide(intent,current);},{tone:"neutral"});
 }
 
 function requestHideRunHistory(runId: string, runLabel: string): void {
@@ -2859,6 +2770,7 @@ async function handleAction(
       }
       workspaceState.patchModule(navigation.page, { active_section: sectionId });
       render({ preserveForm: true });
+      if (navigation.page === "prediction" && sectionId === "p4") await researchFeature.load(predictionFeature.context.matchId);
       if (sectionId === "directory" && navigation.page === "players" && playersFeature.catalog.detail) workspaceState.restoreFocus("players", app.querySelector(".page-container") ?? app, `player-directory-${playersFeature.catalog.detail.player.id}`);
       break;
     }
@@ -3187,13 +3099,13 @@ async function handleAction(
       await continueLineupPrediction();
       break;
     case "plan-p4-horizons":
-      await planP4Horizons();
+      await researchFeature.plan(nullableValue("p4-plan-rule-package")??"");
       break;
     case "refresh-p4-workbench":
-      await refreshP4Workbench();
+      await researchFeature.load(predictionFeature.context.matchId);
       break;
     case "open-p4-task":
-      await openP4Task(button.dataset.taskId ?? "");
+      await researchFeature.openTask(button.dataset.taskId ?? "");
       break;
     case "resolve-p4-conflict-select":
       await resolveP4Conflict(button.dataset.conflictId ?? "", false);
@@ -3201,9 +3113,11 @@ async function handleAction(
     case "resolve-p4-conflict-unknown":
       await resolveP4Conflict(button.dataset.conflictId ?? "", true);
       break;
+    case "recover-p4-research":
+      await researchFeature.recover();
+      break;
     case "show-p4-snapshot":
-      if (p4TaskWorkspace?.snapshot)
-        showModal("P4 冻结快照", p4TaskWorkspace.snapshot);
+      showHtmlModal("P4 冻结快照","只读 · 实际冻结结果",researchSnapshotView(researchFeature.snapshot()));
       break;
     case "create-competition":
       await competitionFeature.createCompetition(app);
@@ -4046,6 +3960,7 @@ function filterSelectOptions(
 
 document.addEventListener("input", (event) => {
   const target = event.target as HTMLInputElement | HTMLTextAreaElement;
+  if (target.id?.startsWith("p4-conflict-note-")||target.id?.startsWith("p4-evidence-")) researchFeature.draftChanged();
   if (["competition-id", "season-id", "stage-id", "competition-kind", "simulation-model-family", "simple-kickoff"].includes(target.id) || target.id.startsWith("binding-")) rulesFeature.invalidatePreview();
   if (target.id === "openai-api-example") {
     scheduleOpenAiApiExampleParse();
@@ -4077,6 +3992,7 @@ document.addEventListener("input", (event) => {
 
 document.addEventListener("change", (event) => {
   const target = event.target as HTMLInputElement | HTMLSelectElement;
+  if (target.id?.startsWith("p4-conflict-note-")||target.id?.startsWith("p4-evidence-")) researchFeature.draftChanged();
   if (["competition-id", "season-id", "stage-id", "competition-kind", "simulation-model-family", "simple-kickoff"].includes(target.id) || target.id.startsWith("binding-")) rulesFeature.invalidatePreview();
   if (
     target instanceof HTMLInputElement &&
@@ -4225,7 +4141,7 @@ document.addEventListener("change", (event) => {
     if (!matchId) return;
     predictionFeature.context.matchId = matchId;
     lineupsFeature.state.selectedMatchLineupChain = null;
-    void runBusy(() => loadP4MatchWorkspace(matchId))
+    void runBusy(() => researchFeature.load(matchId))
       .then(() => {
         render({ preserveForm: true });
       })
@@ -4255,7 +4171,7 @@ document.addEventListener("change", (event) => {
   if (target.id === "p4-workbench-match-id") {
     const matchId = target.value;
     if (!matchId) return;
-    void runBusy(() => loadP4MatchWorkspace(matchId))
+    void runBusy(() => researchFeature.load(matchId))
       .then(() => {
         render({ preserveForm: true });
       })

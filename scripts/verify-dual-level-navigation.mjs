@@ -167,12 +167,13 @@ const loaderJs = ts.transpileModule(functions, { compilerOptions: { target: ts.S
 const { TeamsFeature } = loadTeamsProduction(root)("src/features/teams/index.ts");
 const { PlayersFeature }=loadTeamsProduction(root)("src/features/players/index.ts");
 const { PredictionFeature }=loadTeamsProduction(root)("src/features/prediction/predictionFeature.ts");
+const {ResearchFeature}=loadTeamsProduction(root)("src/features/prediction/research/researchFeature.ts");
 function loaderContext(retainedTeam = null) {
   const applied = [], router = new Router();
   const context = {
     navigation: router, browserLifecycleController: { signal: { aborted: false } }, session: { bootstrap: { data: { database_configured: true } } },
     issueLogs: "before", releaseAcceptanceRuns: "before", selectedReleaseAcceptanceRun: null, openAiProfiles: "before", creatingOpenAiProfile: false, selectedOpenAiProfileId: null,
-    playerQuery: {}, selectedPlayer: null, playerListPage: null, teamQuery: {}, selectedTeam: null, teamListPage: null, playerReferences: null, p4TaskWorkspace: null,
+    playerQuery: {}, selectedPlayer: null, playerListPage: null, teamQuery: {}, selectedTeam: null, teamListPage: null, playerReferences: null,
     selectedReviewMatchId: null, apiWorkspaceDetail: null, apiWorkspacePresets: "before", selectedApiWorkspaceProfileId: "", selectedApiWorkspacePresetKey: "", selectedApiWorkspaceMatchId: null,
     workspaceState: { module: () => ({}), patchModule: () => applied.push("patch") },
     api: {},
@@ -181,6 +182,7 @@ function loaderContext(retainedTeam = null) {
   context.teamsFeature = new TeamsFeature({ api: context.api, initialQuery: null, snapshot: () => context.session.bootstrap, page: () => router.page, activeTab: () => retainedTeam, publishOptions: () => applied.push("options"), persistQuery: () => applied.push("teamQuery"), setPresetTab: () => applied.push("presetTab") });
   context.playersFeature=new PlayersFeature({api:context.api,initialQuery:null,initialSource:null,snapshot:()=>context.session.bootstrap,page:()=>router.page,persistQuery:()=>applied.push("playerQuery"),persistSource:()=>{},root:()=>({}),busy:fn=>fn()});
   context.predictionFeature=new PredictionFeature({api:context.api,recovery:{read:()=>null,save:()=>{},clear:()=>{}},scope:()=>()=>true,view:()=>()=>true,changed:()=>{},busy:fn=>fn()});
+  context.researchFeature=new ResearchFeature({api:context.api,context:context.predictionFeature.context,recovery:{read:()=>null,save:()=>{},clear:()=>{}},scope:()=>()=>true,view:()=>{const page=router.page;return()=>router.page===page;},changed:()=>{}});
   runInNewContext(loaderJs, context);
   return { context, router, applied };
 }

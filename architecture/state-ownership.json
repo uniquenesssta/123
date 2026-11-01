@@ -811,8 +811,22 @@
       ],
       "transition": null,
       "migration_task": "R14-01"
+    },
+    {
+      "id": "feature.prediction-research",
+      "owner": "src/features/prediction/research/researchFeature.ts::ResearchFeature",
+      "scope": "research queries, task selection, versioned conflict intent and scoped operation recovery; shared PredictionContext remains sole match owner",
+      "writers": [
+        "ResearchFeature methods"
+      ],
+      "forbidden": [
+        "src/pages/**",
+        "src/api/**"
+      ],
+      "transition": null,
+      "migration_task": "R14-06"
     }
   ],
-  "count": 56,
-  "last_updated_task": "R14-01"
+  "count": 57,
+  "last_updated_task": "R14-06"
 }

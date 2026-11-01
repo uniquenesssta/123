@@ -9,12 +9,12 @@ const check = (condition, message) => { if (!condition) failures.push(message); 
 
 const port = read("crates/application/src/ports/prediction/mod.rs");
 const adapter = read("crates/application/src/composition/adapters/prediction.rs");
-const useCase = read("crates/application/src/use_cases/prediction/execute_p4_freeze/mod.rs");
-const projection = read("crates/application/src/use_cases/prediction/execute_p4_freeze/snapshot_projection.rs");
+const useCase = read("crates/application/src/use_cases/prediction/execute_p4_freeze/mod.rs")+read("crates/application/src/use_cases/prediction/execute_p4_freeze/workflow.rs");
+const projection = read("crates/application/src/use_cases/prediction/execute_p4_freeze/features.rs")+read("crates/application/src/use_cases/prediction/execute_p4_freeze/probabilities.rs");
 const service = read("crates/application/src/services/prediction/service.rs");
 const facade = read("crates/application/src/services/prediction/facade.rs");
 const orchestrationFacade = read("crates/application/src/services/p4_orchestration/facade.rs");
-const orchestrationUseCase = read("crates/application/src/use_cases/p4_orchestration/process_next.rs");
+const orchestrationUseCase = read("crates/application/src/use_cases/p4_orchestration/process_next.rs")+read("crates/application/src/use_cases/p4_orchestration/dispatch.rs");
 
 for (const token of ["P4FreezeExecutionPort", "find_frozen_snapshot_id", "routed_facts", "freeze_snapshot"]) {
   check(port.includes(token), `Prediction freeze Port 缺少：${token}`);

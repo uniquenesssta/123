@@ -1,0 +1,44 @@
+.application-shell:where([data-current-page="prediction"]) .p4-workbench { display:flex; flex-direction:column; gap:12px; min-width:0; overflow:visible; }
+.application-shell:where([data-current-page="prediction"]) .p4-workbench .panel { display:flex; flex-direction:column; gap:8px; min-width:0; }
+.application-shell:where([data-current-page="prediction"]) .p4-workbench .panel > header { margin:0; }
+.application-shell:where([data-current-page="prediction"]) .p4-plan-fields { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:12px; align-items:start; }
+.application-shell:where([data-current-page="prediction"]) .p4-workbench .field input { min-height:40px; font:400 13px/20px var(--fip-type-input-family); }
+.application-shell:where([data-current-page="prediction"]) .p4-plan-caption,
+.application-shell:where([data-current-page="prediction"]) .p4-workbench .field small { font:400 11px/16px var(--fip-type-caption-family); color:var(--fip-muted); }
+.application-shell:where([data-current-page="prediction"]) .p4-horizon-grid { display:flex; gap:8px; flex-wrap:wrap; }
+.application-shell:where([data-current-page="prediction"]) .p4-horizon-grid > button { min-height:32px; padding:6px 12px; }
+.application-shell:where([data-current-page="prediction"]) .p4-task-detail { display:flex; flex-direction:column; gap:12px; padding:0; }
+.application-shell:where([data-current-page="prediction"]) .p4-readiness-grid { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:12px; }
+.application-shell:where([data-current-page="prediction"]) .p4-metric { display:flex; flex-direction:column; gap:4px; min-height:100px; min-width:0; border-radius:16px; padding:12px; background:var(--fip-info-soft); color:var(--fip-info); }
+.application-shell:where([data-current-page="prediction"]) .p4-metric > span { font:500 12px/18px var(--fip-type-label-family); }
+.application-shell:where([data-current-page="prediction"]) .p4-metric > strong { font:600 28px/34px var(--fip-type-metric-number-family); }
+.application-shell:where([data-current-page="prediction"]) .p4-metric > small { font:400 11px/16px var(--fip-type-caption-family); }
+.application-shell:where([data-current-page="prediction"]) .p4-metric-blocked { background:var(--fip-danger-soft); color:var(--fip-danger); }
+.application-shell:where([data-current-page="prediction"]) .p4-task-times { display:flex; flex-wrap:wrap; gap:8px 16px; font:400 11px/16px var(--fip-type-caption-family); color:var(--fip-muted); }
+.application-shell:where([data-current-page="prediction"]) .p4-conflict-list { display:flex; flex-direction:column; gap:12px; }
+.application-shell:where([data-current-page="prediction"]) .p4-conflict-card,
+.application-shell:where([data-current-page="prediction"]) .p4-conflict-card.resolved { display:flex; flex-direction:column; gap:8px; padding:0; border:0; border-radius:0; background:transparent; }
+.application-shell:where([data-current-page="prediction"]) .p4-conflict-heading { align-items:center; gap:8px; }
+.application-shell:where([data-current-page="prediction"]) .p4-conflict-heading h3 { margin:0; font:500 12px/18px var(--fip-type-label-family); overflow-wrap:anywhere; }
+.application-shell:where([data-current-page="prediction"]) .p4-table { width:100%; table-layout:fixed; border-collapse:collapse; font:400 12px/18px var(--fip-type-body-family); }
+.application-shell:where([data-current-page="prediction"]) .p4-table th,
+.application-shell:where([data-current-page="prediction"]) .p4-table td,
+.application-shell:where([data-current-page="prediction"]) .p4-table td:last-child { height:36px; min-width:0; padding:8px; vertical-align:middle; text-align:left; white-space:normal; overflow-wrap:anywhere; border-bottom:1px solid var(--fip-border); }
+.application-shell:where([data-current-page="prediction"]) .p4-table th { font-weight:500; background:var(--fip-color-bg-raised); }
+.application-shell:where([data-current-page="prediction"]) .p4-table td small { display:block; margin:2px 0 0; font:400 11px/16px var(--fip-type-caption-family); color:var(--fip-muted); }
+.application-shell:where([data-current-page="prediction"]) .p4-evidence-choice { display:flex; align-items:center; gap:8px; padding:0; min-height:20px; background:transparent; border:0; }
+.application-shell:where([data-current-page="prediction"]) .p4-evidence-choice input { flex:none; margin:0; }
+.application-shell:where([data-current-page="prediction"]) .p4-all-evidence > summary { font:500 12px/18px var(--fip-type-label-family); min-height:32px; }
+.application-shell:where([data-current-page="prediction"]) .p4-recovery code { font:400 11px/16px var(--fip-type-caption-family); overflow-wrap:anywhere; }
+.application-shell:where([data-current-page="prediction"]) .prediction-viewport > [data-workspace-section="p4"] > .workspace-section-heading { display:none; }
+@media (max-width:760px) {
+  .application-shell:where([data-current-page="prediction"]) .p4-plan-fields { grid-template-columns:minmax(0,1fr); }
+  .application-shell:where([data-current-page="prediction"]) .p4-readiness-grid { grid-template-columns:repeat(2,minmax(0,1fr)); }
+}
+
+.application-shell:where([data-current-page="prediction"]) .p4-frozen-detail .panel { padding:12px; border:0; border-radius:16px; background:var(--fip-surface); }
+.application-shell:where([data-current-page="prediction"]) .p4-frozen-detail h2 { margin:0; font:700 14px/20px var(--fip-type-section-title-family); }
+.application-shell:where([data-current-page="prediction"]) .p4-frozen-detail dl { display:grid; gap:8px; margin:0; }
+.application-shell:where([data-current-page="prediction"]) .p4-frozen-detail dl > div { display:grid; grid-template-columns:minmax(100px,1fr) minmax(0,3fr); align-items:center; gap:12px; }
+.application-shell:where([data-current-page="prediction"]) .p4-frozen-detail dd { margin:0; overflow-wrap:anywhere; }
+.application-shell:where([data-current-page="prediction"]) .p4-frozen-detail pre { white-space:pre-wrap; overflow-wrap:anywhere; }

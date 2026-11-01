@@ -1,3 +1,4 @@
+import {verifyResearchBrowser} from "../features/verifyResearchBrowser.mjs";
 import {verifyPredictionBrowser} from "../features/verifyPredictionBrowser.mjs";
 import { verifyWorkbooksBrowser } from "../features/verifyWorkbooksBrowser.mjs";
 import assert from "node:assert/strict";
@@ -159,3 +160,5 @@ function checks(screen) {
 }
 
 await verifyPredictionBrowser(root,join(directory,"prediction-mounted"));
+
+await verifyResearchBrowser(root,join(directory,"research-mounted"));

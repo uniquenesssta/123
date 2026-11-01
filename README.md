@@ -1,8 +1,12 @@
 # 足球模型平台公开外壳
 
+## R14-06 P4研究证据与冻结（VERIFYING）
+
+研究任务、证据、冲突与只读快照已归入现有推演模块；补齐确认版本失效、未知请求查回和实际冻结身份核验。19项生产行为、26项研究挂载、完整96步及Windows原生startup通过，Impeccable源码检测0项；本批CI/双包/包内startup待精确验收，真实P4/PG外部项沿BA账本承接。见[06记录](docs/modular-rewrite/R14-prediction-review-analytics-ui/R14-06-research-evidence-and-freeze.md)。下一项R14-07运行记录与血缘。
+
 ## R14-01 输入、准入与推演执行（DONE）
 
-R13-09已按精确提交、官方产物摘要、双安装包和startup正式收尾。R14-01已接通批准S03的设置、门禁、实际输入审计、紧凑结果与固定底栏，收敛正式/影子状态，阻断重复发送和跨比赛旧结果，补齐未知请求查回及明确确认。27项生产行为、40项完整挂载及Windows原生/启动验证通过；完整96步前端、最终类型/构建通过；自身CI/包状态见[实施记录](docs/modular-rewrite/R14-prediction-review-analytics-ui/R14-01-context-readiness-and-execution.md)。代码`866ba003`已推送，自身[CI 41285690142](https://github.com/uniquenesssta/123/actions/runs/41285690142)及官方摘要、双安装包/包内startup已核验通过，正式DONE；BA-08/13真实外部验证仍由R17-06承接。下一项R14-06，未启动。
+R13-09已按精确提交、官方产物摘要、双安装包和startup正式收尾。R14-01已接通批准S03的设置、门禁、实际输入审计、紧凑结果与固定底栏，收敛正式/影子状态，阻断重复发送和跨比赛旧结果，补齐未知请求查回及明确确认。27项生产行为、40项完整挂载及Windows原生/启动验证通过；完整96步前端、最终类型/构建通过；自身CI/包状态见[实施记录](docs/modular-rewrite/R14-prediction-review-analytics-ui/R14-01-context-readiness-and-execution.md)。代码`866ba003`已推送，自身[CI 41285690142](https://github.com/uniquenesssta/123/actions/runs/41285690142)及官方摘要、双安装包/包内startup已核验通过，正式DONE；BA-08/13真实外部验证仍由R17-06承接。用户已授权开始 R14-06；当前实施与验证见[06记录](docs/modular-rewrite/R14-prediction-review-analytics-ui/R14-06-research-evidence-and-freeze.md)，下一项 R14-07。
 
 ## R13-09 工作簿（DONE）
 

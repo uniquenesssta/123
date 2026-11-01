@@ -144,10 +144,6 @@
         "owner": "src/pages/openai.ts",
         "route": "openai"
       },
-      "p4-workbench": {
-        "owner": "src/pages/p4Workbench.ts",
-        "route": null
-      },
       "players": {
         "owner": "src/features/players/playerDirectoryView.ts",
         "route": "players",
@@ -192,14 +188,6 @@
       }
     },
     "transitional_imports": [
-      {
-        "from_feature": "prediction",
-        "importer": "src/pages/prediction.ts",
-        "to_feature": "p4-workbench",
-        "target": "src/pages/p4Workbench.ts",
-        "reason": "prediction currently composes the P4 research workbench page renderer",
-        "exit_task": "R14-06"
-      },
       {
         "from_feature": "prediction",
         "importer": "src/pages/prediction.ts",
@@ -540,7 +528,7 @@
     }
   ],
   "counts": {
-    "frontend_features": 19,
+    "frontend_features": 18,
     "workspace_members": 11,
     "ports": 4,
     "postgres_adapters": 38,

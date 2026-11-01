@@ -1,3 +1,4 @@
+import {verifyResearchWorkflow} from "./features/verifyResearchWorkflow.mjs";
 import {verifyPredictionWorkflow} from "./features/verifyPredictionWorkflow.mjs";
 import { verifyWorkbooksWorkflow } from "./features/verifyWorkbooksWorkflow.mjs";
 import { verifyMatchImports } from "./features/verifyMatchImports.mjs";
@@ -566,7 +567,7 @@ try {
 }
 
 let playerCases=0;
-try {await verifyPredictionWorkflow(root);await verifyWorkbooksWorkflow(root);await verifyLineupsWorkflow(root); await verifyMatchImports(root);}catch(error){failures.push(`R13-07 阵容生产行为验证无法执行：${error.stack??error}`);}
+try {await verifyResearchWorkflow(root);await verifyPredictionWorkflow(root);await verifyWorkbooksWorkflow(root);await verifyLineupsWorkflow(root); await verifyMatchImports(root);}catch(error){failures.push(`R13-07 阵容生产行为验证无法执行：${error.stack??error}`);}
 try {playerCases=await verifyPlayersWorkflow(root);}catch(error){failures.push(`R13-06 球员生产行为验证无法执行：${error.stack??error}`);}
 let teamCases = 0;
 try { teamCases = await verifyTeamsWorkflow(root); } catch (error) { failures.push(`R13-05 球队生产行为验证无法执行：${error.stack ?? error}`); }

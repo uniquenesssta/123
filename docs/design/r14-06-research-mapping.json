@@ -1,0 +1,33 @@
+{
+  "task": "R14-06",
+  "fileKey": "PN0Whgu6HLWIHx4Mv6aHfu",
+  "scope": "Existing S03 research section; shared match owner and real backend DTOs",
+  "screens": {
+    "windows": "490:23601",
+    "conflict": "490:23650",
+    "resolved": "490:23699",
+    "readonly": "490:23748",
+    "frozen": "490:23797",
+    "empty": "490:23846",
+    "dark": "490:24238",
+    "compact": "490:24287",
+    "accepted_unknown": "498:31928",
+    "snapshot_reference": "495:31745",
+    "decision_recovery_supplement": "1166:376800"
+  },
+  "production": [
+    "src/features/prediction/research/researchFeature.ts",
+    "src/features/prediction/research/researchView.ts",
+    "src/features/prediction/research/researchSnapshotView.ts",
+    "src/features/prediction/research/research.css"
+  ],
+  "layout": {
+    "single_scroll_owner": ".prediction-viewport",
+    "gap_px": 12,
+    "control_gap_px": 8,
+    "metric_number": "Inter 28/600/34",
+    "section_title": "Noto Sans SC 14/700/20"
+  },
+  "evidence": "O:/Project/FOODBALL/logs/r14-06-20261101",
+  "external_success_verified": false
+}
