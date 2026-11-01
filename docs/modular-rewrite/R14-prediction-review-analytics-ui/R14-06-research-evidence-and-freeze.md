@@ -64,3 +64,11 @@ TEMP/TMP 使用既有 `O:/Project/FOODBALL/project-temp.ps1` 配置到 `O:/Proje
 代码回退点为本批基线39b16555；不回写用户数据，不修改后端账本、数据库、私有资产或R12完成状态。本批CI/双包/包内startup尚未验收前保持VERIFYING。
 
 下一项：**R14-07 运行记录与血缘**，待06适用出口验收后由用户启动。
+
+## 2026-11-01 推送交接
+
+代码 `5171f779fc487def6445f69f5d1cc4a7343f60c0` 已推送到本批R14分支。28路径：12新增、15修改，仅退出已由研究视图/投影替代的 `src/pages/p4Workbench.ts` 一个旧路径；没有额外删除。
+
+仅单次查询该精确SHA、R14分支及push事件，匹配 [Public Platform CI 41297701399](https://github.com/uniquenesssta/123/actions/runs/41297701399)；当次 `in_progress`，conclusion为空。未轮询PR/CI，没有把01的CI或后续文档提交当作06代码CI。06的MSI/NSIS、官方摘要和包内startup尚未下载验收，本批保持VERIFYING。
+
+`ci-once.json` 保存原响应，`local-verification.json`保存本地分层证据与摘要；102项已完成临时产物已按清单归档，另将本批一次性staging目录单项归档old，均不删除。必要最终截图、原生日志、验证结果、实际源码、干净dist及可复用依赖保留。下一项仍为 **R14-07 运行记录与血缘**。

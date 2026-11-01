@@ -2,7 +2,7 @@
 
 ## R14-06 P4研究证据与冻结（VERIFYING）
 
-研究任务、证据、冲突与只读快照已归入现有推演模块；补齐确认版本失效、未知请求查回和实际冻结身份核验。19项生产行为、26项研究挂载、完整96步及Windows原生startup通过，Impeccable源码检测0项；本批CI/双包/包内startup待精确验收，真实P4/PG外部项沿BA账本承接。见[06记录](docs/modular-rewrite/R14-prediction-review-analytics-ui/R14-06-research-evidence-and-freeze.md)。下一项R14-07运行记录与血缘。
+研究任务、证据、冲突与只读快照已归入现有推演模块；补齐确认版本失效、未知请求查回和实际冻结身份核验。19项生产行为、26项研究挂载、完整96步及Windows原生startup通过，Impeccable源码检测0项；代码`5171f779`已推送；自身[CI 41297701399](https://github.com/uniquenesssta/123/actions/runs/41297701399)单次核对为in_progress，双包/包内startup待验，真实P4/PG外部项沿BA账本承接。见[06记录](docs/modular-rewrite/R14-prediction-review-analytics-ui/R14-06-research-evidence-and-freeze.md)。下一项R14-07运行记录与血缘。
 
 ## R14-01 输入、准入与推演执行（DONE）
 
