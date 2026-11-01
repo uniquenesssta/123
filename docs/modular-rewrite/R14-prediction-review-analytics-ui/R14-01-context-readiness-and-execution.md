@@ -1,6 +1,6 @@
 # R14-01 输入、准入与推演执行
 
-状态：VERIFYING。本地实现和适用验证通过；自身精确 CI、安装包和包内 startup 尚待推送后核验，不能先记 DONE。覆盖原 R14-01～05，下一批 R14-06 未启动。
+状态：DONE。本地实现和适用验证通过；2026-11-01已按精确代码提交核验自身CI、官方产物摘要、双安装包和包内startup。覆盖原 R14-01～05，下一批 R14-06 未启动。
 
 分支 `rewrite/r14-prediction-review-analytics-ui`，起点 `3d9363fe`。开始时工作区干净；用户已持续授权提交推送，不重复申请、不轮询 PR/CI。R13-09 的 `f5cc82a7` / run `41274320064`、官方摘要、MSI/NSIS 和包内 startup 已验收，收尾提交为 `3d9363fe`。R12 保持 DONE。
 
@@ -78,3 +78,13 @@ API 保留原名和参数：`inspectMatchPredictionReadiness`、`readMatchLineup
 仅单次查询该精确SHA的push事件：[Public Platform CI run 41285690142](https://github.com/uniquenesssta/123/actions/runs/41285690142)。创建于2026-11-01 15:39:57（北京时间）；当次状态in_progress、conclusion为空。未轮询PR/CI，未把已启动说成通过，尚未下载或验收本批MSI/NSIS及包内startup；本批保持VERIFYING。后续收尾须从该代码SHA核对CI和产物，不能使用文档交接提交代替代码CI。
 
 `ci-once.json`保存单次响应，`handoff.json`及`final-hashes.json`保存本地交接和证据摘要。另将本批一次性staging目录移入 `O:/Project/FOODBALL/old/r14-01-20261101-staging`，不删除文件；最终证据、生产测试及可复用依赖保留。下一项仍为R14-06，尚未启动。
+
+## 2026-11-01 正式收尾
+
+精确代码866ba00399b5e8930530df75e71e1609ab47a61f、push事件、R14分支均匹配run41285690142；Windows job124786409864及全部步骤success。官方artifact13076386754共52,351,483字节，ZIP SHA256 c8eb308c5eec839d0aea1cd64c01246415b9a23f1c0b6519c6f6ffdda5326313，下载后整体匹配。传输慢时续传原有字节，最终仍以官方整体摘要验真；没有重复查询CI。
+
+- MSI：18,001,920字节，OLE头有效，SHA256 eb41d20bae4d6c214a121bcfdc1e353533e53fdd2933d18339e11fec055b1ac4。
+- NSIS：15,637,958字节，MZ头有效，SHA256 cc0b6288d0acd2a1a98cc26b09934f7fd7bda802b417338410b32f7d48e49076。
+- 包内windows-acceptance-20261101-074047.json：startup PASS，7条有效日志，bootstrap/read_workspace_state/save_workspace_state，0运行错误、0缺失必需组。未据此声称Full或本地重新安装。
+
+证据：O:/Project/FOODBALL/logs/r14-01-ci-41285690142/acceptance.json。R14-01适用出口正式DONE；BA-08/13真实外部验证仍按原批准R17-06承接。用户已授权下一项R14-06。
