@@ -74,3 +74,7 @@
 证据：O:/Project/FOODBALL/logs/r14-07-ci-fix-20261101。TEMP/TMP继续指向项目tmp，按清单归档临时产物，遵守最新禁止批量删除规则，不使用项目根old。
 
 本次基线7619598510de5dc505c1ee55a1982bf03ee243e6；本机Node24.16.0，首轮CI为Node22.23.4，新CI结果仍须按实际精确SHA验收，不能把本地通过等同CI通过。
+
+修复代码 `f38b52dd6d930a7a2bc0182ee45bdc3d7c24370b` 已推送（6路径：2新增、4修改，无删除）。单次按该SHA、原R14分支及push事件核查 [CI 41314470020](https://github.com/uniquenesssta/123/actions/runs/41314470020)，当次in_progress，conclusion为空。未重新轮询首轮失败运行，未将文档提交或其他任务CI混用。本轮CI、官方双包/摘要/包内startup尚未验收，R14-07保持VERIFYING。
+
+本轮temporary-artifact-manifest.json记录88个明确目录移动（含一次性staging）；必要证据保留logs，其他归档到O:/Project/FOODBALL/tmp/old/r14-07-ci-fix-20261101，无批量删除。下一项仍为R14-08，未启动。
