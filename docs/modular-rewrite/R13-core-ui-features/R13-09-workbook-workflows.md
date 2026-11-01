@@ -88,3 +88,11 @@ Match 的直接 IPC 不经过前端操作记录器，不能冒称原 UI 日志�
 代码回退点为 `4ff08d7f`（仅已验收 UI01 收尾与 09 启动记录）；如需撤销，审阅后针对本批提交 revert。Git 回退不能恢复真实数据库；本批未修改 Schema 或执行业务数据写入。
 
 下一项为 **R14-01 输入、准入与推演执行**（覆盖原 R14-01～05）。须先完成本批精确 CI、安装包与 startup 收尾并取得启动授权；不自动进入下一阶段。
+
+## 精确提交与一次 CI 核对
+
+代码提交 `f5cc82a7445a92d0410b8c6730e7c916d5c97c41` 已推送到原分支，34 个路径（9 新增、25 修改、0 文件删除）。此前 UI01 收尾提交 `4ff08d7f` 同时推送。
+
+仅查询一次本提交的 push CI：[run41274320064](https://github.com/uniquenesssta/123/actions/runs/41274320064)，head_sha 精确匹配，`status=in_progress`、`conclusion=null`，2026-11-01T04:45:34Z 启动。此快照不代表通过；自身 MSI/NSIS 和包内 startup 尚未验收，保持 VERIFYING。不轮询、不查询 PR、不取消其他运行。
+
+本段是 Markdown 交接补记，不改变受测代码；既有 CI 的 push paths-ignore 排除 Markdown。最终来源/日志摘要在 `final-manifest.json`，本地引用 201 项有效，临时项可逆归档见 `cleanup-manifest.json`。下一项仍为 R14-01，未自动启动。
