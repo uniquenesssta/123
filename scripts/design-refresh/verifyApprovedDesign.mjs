@@ -1,3 +1,4 @@
+import {verifyMountedApplication} from "./verifyMountedApplication.mjs";
 import {verifyReviewBrowser} from "../features/verifyReviewBrowser.mjs";
 import {verifyMountedReadiness} from "./verifyMountedReadiness.mjs";
 import {verifyRunsBrowser} from "../features/verifyRunsBrowser.mjs";
@@ -16,6 +17,7 @@ import { captureHtmlScreenshot, resolveChromiumExecutable } from "../task-ui-scr
 await verifyMountedReadiness();
 const root=resolve(fileURLToPath(new URL("../..",import.meta.url)));
 const directory=mkdtempSync(join(tmpdir(),"football-approved-design-"));
+await verifyMountedApplication(root,join(directory,"mounted-startup"));
 const {css,script}=productionFixture(root),htmlPath=join(directory,"production-views.html");
 writeFileSync(htmlPath,`<!doctype html><html lang="zh-CN" data-theme="light"><head><meta charset="utf-8"><style>${css}</style></head><body><script>${script.replace(/<\/script/gi,"<\\/script")}</script></body></html>`);
 const results=[],browser=resolveChromiumExecutable();assert.ok(browser,"Windows Chromium required");

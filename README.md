@@ -1,5 +1,8 @@
 # 足球模型平台公开外壳
 
+## R14-08 复盘事实与包提交（VERIFYING）
+
+初次代码`c07b798c`的自身[CI 41330631667](https://github.com/uniquenesssta/123/actions/runs/41330631667)在共享浏览器夹具的冷启动阶段失败，尚未进入复盘断言。夹具现使用本次真实应用生产构建，每组仍独立挂载；原30秒期限与业务检查保留。匹配CI的Node22完整96步、5项启动反证及六组357项挂载通过；修复提交自身CI/官方包待验。原因、证据与外部未验边界见[08记录](docs/modular-rewrite/R14-prediction-review-analytics-ui/R14-08-review-facts-and-package.md)。下一项R14-12，尚未启动。
 ## R14-06 P4研究证据与冻结（DONE）
 
 研究任务、证据、冲突与只读快照已归入现有推演模块；补齐确认版本失效、未知请求查回和实际冻结身份核验。19项生产行为、26项研究挂载、完整96步及Windows原生startup通过，Impeccable源码检测0项；代码`5171f779`已推送；自身[CI 41297701399](https://github.com/uniquenesssta/123/actions/runs/41297701399)已核验success，官方摘要、双包/包内startup均通过，真实P4/PG外部项沿BA账本承接。见[06记录](docs/modular-rewrite/R14-prediction-review-analytics-ui/R14-06-research-evidence-and-freeze.md)。下一项R14-07运行记录与血缘。

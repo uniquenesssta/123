@@ -1,32 +1,34 @@
 import {waitForMountedApplication,reportMountedFailure} from "./mountedReadiness.mjs";
 import fs from "node:fs";
 import path from "node:path";
-import { createRequire } from "node:module";
-import { pathToFileURL } from "node:url";
+import {startMountedApplication} from "./mountedApplication.mjs";
+
 import { captureHtmlScreenshot, resolveChromiumExecutable } from "../task-ui-screenshot-tools.mjs";
 import { loadTeamsProduction } from "../features/loadTeamsProduction.mjs";
 
-/** Mount the real application; only the native transport is a synthetic test boundary. */
-export async function mountedFixture(root, directory, exercise, extraBoundary="") {
-  fs.mkdirSync(directory, {recursive:true});
-  const require=createRequire(path.join(root,"package.json"));
-  const {createServer}=await import(pathToFileURL(require.resolve("vite")));
-  const server=await createServer({root,configFile:false,server:{host:"127.0.0.1",port:15328,strictPort:true},clearScreen:false});
+export function mountedBoundarySource(root,extraBoundary="") {
   const fixtures=loadTeamsProduction(root)("scripts/design-refresh/fixtureData.ts");
   const base=fs.readFileSync(path.join(root,"scripts/features/lineups-browser/boundary.js"),"utf8");
   const boundary=fs.readFileSync(new URL("./mountedBoundary.js",import.meta.url),"utf8");
+  return "window.__fixtures="+JSON.stringify(fixtures)+";"+base+boundary+extraBoundary;
+}
+/** Mount the real application; only the native transport is a synthetic test boundary. */
+export async function mountedFixture(root, directory, exercise, extraBoundary="") {
+  fs.mkdirSync(directory, {recursive:true});
+  const server=await startMountedApplication(root);
   const htmlPath=path.join(directory,"blank.html");fs.writeFileSync(htmlPath,"<!doctype html><html></html>");
-  await server.listen();
+
   try {
     return await captureHtmlScreenshot({browser:resolveChromiumExecutable(),htmlPath,outputPath:path.join(directory,"last.png"),width:1440,height:900,async exercise(cdp){
       try {
-      await cdp.send("Page.addScriptToEvaluateOnNewDocument",{source:"window.__fixtures="+JSON.stringify(fixtures)+";"+base+boundary+extraBoundary});
-      const navigation=await cdp.send("Page.navigate",{url:"http://127.0.0.1:15328"});
+      await cdp.send("Page.addScriptToEvaluateOnNewDocument",{source:mountedBoundarySource(root,extraBoundary)});
+      const navigation=await cdp.send("Page.navigate",{url:server.origin});
       if(navigation.errorText)throw Error("Mounted navigation failed: "+navigation.errorText);
       await cdp.send("Page.bringToFront");
       await cdp.send("Emulation.setFocusEmulationEnabled",{enabled:true});
       const evaluate=async expression=>{const value=await cdp.send("Runtime.evaluate",{expression,awaitPromise:true,returnByValue:true});if(value.exceptionDetails){const detail=await cdp.send("Runtime.evaluate",{expression:"JSON.stringify({body:document.body.innerText,calls:window.__calls,errors:window.__errors})",returnByValue:true});fs.writeFileSync(path.join(directory,"failure.json"),detail.result.value);throw Error(value.exceptionDetails.exception?.description??value.exceptionDetails.text);}return value.result.value;};
-      await waitForMountedApplication(cdp);
+      const startup=await waitForMountedApplication(cdp);
+      fs.writeFileSync(path.join(directory,"application-startup.json"),JSON.stringify({application:server.application,...startup},null,2));
       const screenshot=async name=>{
         await cdp.send("Page.bringToFront");
         let timer;
