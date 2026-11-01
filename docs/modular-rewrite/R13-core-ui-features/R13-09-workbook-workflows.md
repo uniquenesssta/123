@@ -1,6 +1,6 @@
 # R13-09 工作簿导出、预检与提交
 
-状态：**VERIFYING**。本地实现及受影响验证已完成；自身精确提交的 CI、双安装包和包内 startup 尚待推送后验收，当前不能标记 DONE。分支 `rewrite/r13-core-ui-features`；修改基线 `5ee217c2d808e4a835067f0b5de4124b1ab3d2f6`，初始工作区干净。UI01 的精确 CI/产物已独立核验并正式 DONE，收尾提交 `4ff08d7f`。沿用用户提交推送长期授权，不轮询 PR 或 CI，不重开 R12。
+状态：**DONE**。本地实现与验证、精确提交CI、双安装包和包内startup均已验收；此前VERIFYING为历史快照，真实外部待验继续原BA账本。分支 `rewrite/r13-core-ui-features`；修改基线 `5ee217c2d808e4a835067f0b5de4124b1ab3d2f6`，初始工作区干净。UI01 的精确 CI/产物已独立核验并正式 DONE，收尾提交 `4ff08d7f`。沿用用户提交推送长期授权，不轮询 PR 或 CI，不重开 R12。
 
 ## 范围与唯一归属
 
@@ -96,3 +96,15 @@ Match 的直接 IPC 不经过前端操作记录器，不能冒称原 UI 日志�
 仅查询一次本提交的 push CI：[run41274320064](https://github.com/uniquenesssta/123/actions/runs/41274320064)，head_sha 精确匹配，`status=in_progress`、`conclusion=null`，2026-11-01T04:45:34Z 启动。此快照不代表通过；自身 MSI/NSIS 和包内 startup 尚未验收，保持 VERIFYING。不轮询、不查询 PR、不取消其他运行。
 
 本段是 Markdown 交接补记，不改变受测代码；既有 CI 的 push paths-ignore 排除 Markdown。最终来源/日志摘要在 `final-manifest.json`，本地引用 201 项有效，临时项可逆归档见 `cleanup-manifest.json`。下一项仍为 R14-01，未自动启动。
+
+## 正式收尾与R14启动
+
+2026-11-01用户授权收尾后，独立核对精确f5cc82a7/run41274320064/job124753287247：push事件、原分支、head_sha匹配，全部步骤SUCCESS，2026-11-01T05:28:02Z完成（北京时间13:28:02），没有轮询PR/CI。
+
+artifact13070519398为52,345,222 bytes，下载SHA256与官方digest一致：`1bacf77a754f15d38e6864c6311576164a3bdf7617d53d1131b39afe6061b7c7`。
+
+- MSI：17,997,824 bytes，OLE头有效，SHA256 `bd3f95b37e444bf11ab87a8149476904f333d570eff77fc94be0d7e722d3ec1e`。
+- NSIS：15,636,421 bytes，MZ头有效，SHA256 `d76860a84ad0ee3c3127f15f49f6f0e33eb9a06ba04337f407a326b726d0c837`。
+- 包内windows-acceptance-20261101-044710.json为startup/pass：7条有效日志，bootstrap/read_workspace_state/save_workspace_state完成，0错误、0缺失；不是Full或本地重新安装证明。
+
+证据根 `O:/Project/FOODBALL/logs/r13-09-ci-41274320064`，acceptance.json保存身份、摘要和报告。09正式DONE，R13适用阶段出口完成；真实外部BA账本继续原批准R17-06安排。用户已授权 **R14-01输入、准入与推演执行（原01～05）**。
