@@ -1,6 +1,6 @@
 # R14-06 P4 研究证据与冻结
 
-状态：VERIFYING。本地实现与适用验证完成，等待本批精确代码 CI、官方产物摘要、MSI/NSIS 及包内 startup 验收。用户授权收尾01并开始06；沿用持续提交推送授权，不轮询 PR/CI。
+状态：DONE。本地适用验证、精确代码CI、官方产物摘要、MSI/NSIS及包内startup均已验收。用户授权收尾01并开始06；沿用持续提交推送授权，不轮询 PR/CI。
 
 分支 `rewrite/r14-prediction-review-analytics-ui`，基线 `39b16555162aed0c619dfdbbbdba0b804479d10e`，开始时工作区干净。R14-01 的 `866ba003` / run `41285690142` 已独立核验官方摘要、双包和 startup，收尾提交为上述基线；不再用01的CI代替06。
 
@@ -72,3 +72,13 @@ TEMP/TMP 使用既有 `O:/Project/FOODBALL/project-temp.ps1` 配置到 `O:/Proje
 仅单次查询该精确SHA、R14分支及push事件，匹配 [Public Platform CI 41297701399](https://github.com/uniquenesssta/123/actions/runs/41297701399)；当次 `in_progress`，conclusion为空。未轮询PR/CI，没有把01的CI或后续文档提交当作06代码CI。06的MSI/NSIS、官方摘要和包内startup尚未下载验收，本批保持VERIFYING。
 
 `ci-once.json` 保存原响应，`local-verification.json`保存本地分层证据与摘要；102项已完成临时产物已按清单归档，另将本批一次性staging目录单项归档old，均不删除。必要最终截图、原生日志、验证结果、实际源码、干净dist及可复用依赖保留。下一项仍为 **R14-07 运行记录与血缘**。
+
+## 2026-11-01 正式收尾
+
+代码5171f779、R14分支、push事件与run41297701399精确匹配；Windows job124821946104所有步骤success。官方artifact13081061987，52,331,600字节，ZIP SHA256 c7ecc769416f532653c7293b5ed2bf4aee831b9b6bb994d40d3560a6ef8abdf2，整体下载摘要一致。没有轮询PR/CI。
+
+- MSI：18,001,920字节，OLE头有效，SHA256 2131929d9d23e220161b708efd27892125ab6a1d5e9ffece69569624ccaf3f25。
+- NSIS：15,641,787字节，MZ头有效，SHA256 313e270a3aaae5d1f4c173ad7cfa0f3827018bf893f436bd297f9db0d63f4204。
+- 包内windows-acceptance-20261101-103044.json：startup PASS，7条有效记录，bootstrap/read_workspace_state/save_workspace_state；0运行错误、0无效行、0缺失必需组。未据此声称Full或本地重新安装。
+
+证据：O:/Project/FOODBALL/logs/r14-06-ci-41297701399/acceptance.json。06适用出口正式DONE；BA-02/08/13真实外部项仍按原批准R17-06承接。用户已授权开始R14-07运行记录与血缘。后续临时归档与清理的唯一目录为O:/Project/FOODBALL/tmp/old，沿用户最新纠正，不使用上级old。
