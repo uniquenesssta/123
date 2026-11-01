@@ -58,3 +58,19 @@
 临时归档清单temporary-artifact-manifest.json：89个本批明确目录按清单移动；必要完整设计证据在logs/frontend-design，其他归档在O:/Project/FOODBALL/tmp/old/r14-07-generated。旧dist与最初漏配TEMP的产物分别有明确路径；没有将移动称为删除，没有执行批量删除。遵守最新AGENTS禁止批量删除的限制。
 
 下一项R14-08复盘选择、事实与包提交，尚未启动。待07精确CI/官方产物验收后再按用户授权进入。
+
+## 首轮CI失败与启动验收修复
+
+用户反馈未通过后，读取07代码da42c749对应的CI41310468919/job124859578853。实际失败是Windows automated acceptance中的运行记录浏览器首次首页就绪等待（mountedFixture原固定15秒），尚未进入S05业务断言；不是06或文档提交的CI。错误为页体为空的Error/check超时。官方失败产物13084419904（7,715,498字节，SHA256 2a33e9122769ee510cd3967ed08cfcfe848d30fb8fc786bf4bb54a33fb4af2a3）已下载校验；其中没有该临时浏览器目录的failure.json，不能据此声称已取得CI当时的页面或CPU诊断。
+
+在真实main/Shell和同一S05 QA传输边界下，对入口模块注入18秒延迟：原验收器复现相同空白Error/check失败（18,175ms，包含关闭服务器的等待）；修复后同样延迟正常挂载真实dashboard并完成bootstrap（21,503ms）。这是受控延迟复现，不冒充CI机器的实测启动耗时。
+
+修复归属scripts/design-refresh：mountedReadiness负责有界就绪等待与失败证据，mountedFixture继续负责真实应用挂载和导航，verifyMountedReadiness负责6项就绪/致命错误/模块错误/错误页面/文档上下文切换/协议错误检查。就绪仍必须同时满足真实dashboard和quick-actions，无致命或脚本错误；最多30秒，只对预期的导航上下文替换继续等待。Page.navigate返回失败立即拒绝。没有删除、跳过或弱化任何S05业务断言，也不通过自动重跑整个套件制造通过。
+
+所有挂载失败会保存页面状态、已完成资源时间、调用的命令名称（排除参数与凭据）和截图；CI下另存到项目父目录logs，匹配现有workflow上传路径。用故意损坏的真实入口验证：4,095ms内明确拒绝，业务回调不执行，JSON/PNG实际进入CI上传目录。此前暂存目录未上传的取证缺口已补齐。
+
+本次改动是验收设施，无UI设计、业务、后端、数据库或依赖改动。原07的Rust/Windows原生证据按相同业务树保留，不冒称本次重新运行或CI已通过。本轮完整96步前端门禁exit0（frontend.log），包括新增6项启动门禁、26项Runs生产流程、55项S05、40项S03、26项研究及55项S09挂载检查；TypeScript和Vite均通过。Vite产物内容指纹与原07相同，保留既有大分块提示，未调高阈值。修复提交及新CI另补记。07保持VERIFYING，R14-08未启动。
+
+证据：O:/Project/FOODBALL/logs/r14-07-ci-fix-20261101。TEMP/TMP继续指向项目tmp，按清单归档临时产物，遵守最新禁止批量删除规则，不使用项目根old。
+
+本次基线7619598510de5dc505c1ee55a1982bf03ee243e6；本机Node24.16.0，首轮CI为Node22.23.4，新CI结果仍须按实际精确SHA验收，不能把本地通过等同CI通过。

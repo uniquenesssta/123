@@ -1,3 +1,4 @@
+import {verifyMountedReadiness} from "./verifyMountedReadiness.mjs";
 import {verifyRunsBrowser} from "../features/verifyRunsBrowser.mjs";
 import {verifyResearchBrowser} from "../features/verifyResearchBrowser.mjs";
 import {verifyPredictionBrowser} from "../features/verifyPredictionBrowser.mjs";
@@ -11,6 +12,7 @@ import { verifyMountedDesign } from "./verifyMountedDesign.mjs";
 import { productionFixture } from "./productionFixture.mjs";
 import { captureHtmlScreenshot, resolveChromiumExecutable } from "../task-ui-screenshot-tools.mjs";
 
+await verifyMountedReadiness();
 const root=resolve(fileURLToPath(new URL("../..",import.meta.url)));
 const directory=mkdtempSync(join(tmpdir(),"football-approved-design-"));
 const {css,script}=productionFixture(root),htmlPath=join(directory,"production-views.html");

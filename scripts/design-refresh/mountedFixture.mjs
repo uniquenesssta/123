@@ -1,3 +1,4 @@
+import {waitForMountedApplication,reportMountedFailure} from "./mountedReadiness.mjs";
 import fs from "node:fs";
 import path from "node:path";
 import { createRequire } from "node:module";
@@ -18,12 +19,14 @@ export async function mountedFixture(root, directory, exercise, extraBoundary=""
   await server.listen();
   try {
     return await captureHtmlScreenshot({browser:resolveChromiumExecutable(),htmlPath,outputPath:path.join(directory,"last.png"),width:1440,height:900,async exercise(cdp){
+      try {
       await cdp.send("Page.addScriptToEvaluateOnNewDocument",{source:"window.__fixtures="+JSON.stringify(fixtures)+";"+base+boundary+extraBoundary});
-      await cdp.send("Page.navigate",{url:"http://127.0.0.1:15328"});
+      const navigation=await cdp.send("Page.navigate",{url:"http://127.0.0.1:15328"});
+      if(navigation.errorText)throw Error("Mounted navigation failed: "+navigation.errorText);
       await cdp.send("Page.bringToFront");
       await cdp.send("Emulation.setFocusEmulationEnabled",{enabled:true});
       const evaluate=async expression=>{const value=await cdp.send("Runtime.evaluate",{expression,awaitPromise:true,returnByValue:true});if(value.exceptionDetails){const detail=await cdp.send("Runtime.evaluate",{expression:"JSON.stringify({body:document.body.innerText,calls:window.__calls,errors:window.__errors})",returnByValue:true});fs.writeFileSync(path.join(directory,"failure.json"),detail.result.value);throw Error(value.exceptionDetails.exception?.description??value.exceptionDetails.text);}return value.result.value;};
-      await evaluate('new Promise((resolve,reject)=>{const end=Date.now()+15000;const check=()=>document.querySelector(".quick-actions")?resolve(true):Date.now()>end?reject(Error(document.body.innerText)):setTimeout(check,30);check();})');
+      await waitForMountedApplication(cdp);
       const screenshot=async name=>{
         await cdp.send("Page.bringToFront");
         let timer;
@@ -33,7 +36,11 @@ export async function mountedFixture(root, directory, exercise, extraBoundary=""
         } finally {clearTimeout(timer);}
       };
       const route=async page=>evaluate('(async()=>{const page='+JSON.stringify(page)+',module={dashboard:"home",runs:"matches",prediction:"matches",lineups:"matches",workbooks:"resources",teams:"resources",players:"resources",rules:"model",database:"management",architecture:"management"}[page],rail=document.querySelector("[data-primary-module="+module+"]");if(!rail)throw Error("Missing module "+module);const collapsed=document.querySelector(".secondary-sidebar").hidden;if(collapsed){Array.from(document.querySelectorAll("[data-action=toggle-global-sidebar]")).find(e=>!e.closest("[hidden],[inert]")).click();await new Promise(r=>setTimeout(r,100));}document.querySelector("[data-primary-module="+module+"]").click();await new Promise(r=>setTimeout(r,200));const link=document.querySelector(".secondary-sidebar [data-page="+page+"]");if(link)link.click();await new Promise((resolve,reject)=>{const end=Date.now()+10000;const ready=()=>document.querySelector(".application-shell")?.dataset.currentPage===page&&!document.querySelector(".page-container[inert]")?resolve():Date.now()>end?reject(Error("Route did not settle: "+page)):setTimeout(ready,30);ready();});await new Promise(r=>setTimeout(r,200));if(collapsed)Array.from(document.querySelectorAll("[data-action=toggle-global-sidebar]")).find(e=>!e.closest("[hidden],[inert]")).click();await document.fonts.ready;return {page:document.querySelector(".application-shell").dataset.currentPage,title:document.querySelector("h1")?.textContent};})()');
-      return exercise({cdp,evaluate,screenshot,route});
+      return await exercise({cdp,evaluate,screenshot,route});
+      } catch(error) {
+        await reportMountedFailure(cdp,{root,directory,error});
+        throw error;
+      }
     }});
   } finally { await server.close(); }
 }
