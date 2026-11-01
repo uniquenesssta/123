@@ -49,7 +49,8 @@ import { predictionPage } from "./pages/prediction";
 import { releasePage } from "./pages/release";
 import { reviewPage } from "./pages/review";
 import { runsPage } from "./pages/runs";
-import { workbooksPage } from "./pages/workbooks";
+import { WorkbooksFeature,workbooksPage } from "./features/workbooks";
+import { importRecovery } from "./app/imports/importRecovery";
 import { clipboard } from "./platform/clipboard";
 import { localPreferences,preferenceKey,sessionPreferences } from "./platform/storage";
 import { stopTauriTransport } from "./platform/tauri";
@@ -185,6 +186,10 @@ const competitionFeature = new CompetitionFeature({
 });
 
 const teamsFeature = new TeamsFeature({
+  importRecovery: importRecovery(localPreferences,preferenceKey("team-import-recovery"),()=>session.bootstrap),
+  captureImportView: ()=>captureImportView(),
+  captureImportData: ()=>captureImportData(),
+
   api,
   initialQuery: localPreferences.readObject<TeamListQuery>(TEAM_QUERY_KEY),
   snapshot: () => session.bootstrap,
@@ -244,6 +249,10 @@ const teamsFeature = new TeamsFeature({
 
 
 const playersFeature = new PlayersFeature({
+  importRecovery: importRecovery(localPreferences,preferenceKey("player-import-recovery"),()=>session.bootstrap),
+  captureImportView: ()=>captureImportView(),
+  captureImportData: ()=>captureImportData(),
+
  api,initialQuery:localPreferences.readObject<PlayerListQuery>(PLAYER_QUERY_KEY),initialSource:localPreferences.readObject<PlayerNavigationContext>(PLAYER_NAV_CONTEXT_KEY),snapshot:()=>session.bootstrap,page:()=>navigation.page,root:()=>app,
  busy:operation=>runBusy(operation),persistQuery:query=>localPreferences.writeJson(PLAYER_QUERY_KEY,query),persistSource:source=>{if(source)localPreferences.writeJson(PLAYER_NAV_CONTEXT_KEY,source);else localPreferences.removeItem(PLAYER_NAV_CONTEXT_KEY);},
  render:()=>render({preserveForm:true}),notify:(message,kind)=>toast(message,kind),section:(active_section,inspector_collapsed)=>workspaceState.patchModule("players",{active_section,...(inspector_collapsed!==undefined?{inspector_collapsed}:{})}),appendTab:(id,label)=>appendWorkspaceTab("players",{id,label}),refreshAll:()=>refreshBootstrapAndCatalog(),confirm:(...args)=>modal.confirm(...args),showHtml:(...args)=>showHtmlModal(...args),showResult:(title,result)=>showModal(title,result),
@@ -276,6 +285,10 @@ let analysisAbilityCandidates: AbilityUpdateCandidateRecord[] = [];
 let lastAiAnalysisPackageId: string | null = localPreferences.getItem(ANALYSIS_PACKAGE_ID_KEY);
 
 const lineupsFeature = createLineupsFeature({
+  captureImportView: ()=>captureImportView(),
+  captureImportData: ()=>captureImportData(),
+  importRecovery: importRecovery(localPreferences,preferenceKey("match-import-recovery"),()=>session.bootstrap),
+
 recordUiOperation,recordUiOperationFailure,pageTitle,
 get references(){return playersFeature.catalog.references;},
 setReferences:value=>playersFeature.catalog.setReferences(value),
@@ -308,6 +321,28 @@ get selectedReviewMatchId(){return selectedReviewMatchId;}, set selectedReviewMa
 loadReviewLineups:(...args)=>loadReviewLineups(...args),
 missingLineupTeam:(...args)=>missingLineupTeam(...args)
 });
+
+const workbooksFeature = new WorkbooksFeature({
+  targets: {
+    team: {label:"球队月度",batch:teamsFeature.imports.monthlyBatch,preview:()=>teamsFeature.previewMonthly(),commit:ticket=>teamsFeature.commitMonthly(ticket),exportFile:template=>teamsFeature.exportFile(template?"monthly-template":"monthly-data")},
+    player: {label:"球员月度",batch:playersFeature.imports,preview:()=>playersFeature.previewImport(),commit:ticket=>playersFeature.commitImport(ticket),exportFile:template=>playersFeature.exportFile(template)},
+    match: {label:"比赛与阵容",batch:lineupsFeature.imports,preview:()=>lineupsFeature.actions.previewMatchImport(false),commit:ticket=>lineupsFeature.actions.commitMatchImport(ticket),exportFile:template=>template?lineupsFeature.actions.exportMatchTemplate():lineupsFeature.actions.exportMatchData(),exportContext:()=>{
+      const id=nullableValue("exchange-match-id"),match=playersFeature.catalog.references?.managed_matches.find(item=>item.id===id);
+      if(!match)throw new Error("请先选择当前列表中的比赛");
+      return {facts:[["比赛",match.home_team_name+" vs "+match.away_team_name],["比赛 ID",match.id]],current:()=>nullableValue("exchange-match-id")===id&&!!playersFeature.catalog.references?.managed_matches.some(item=>item.id===id)};
+    }},
+  },
+  page:()=>navigation.page,section:()=>workspaceState.module("workbooks").active_section,
+  render:()=>render({preserveForm:true}),confirm:(title,description,facts,label,action)=>showConfirmation(title,description,facts,label,action,{tone:"neutral"}),
+});
+function captureImportData():()=>boolean {
+  const target=session.bootstrap?.data.database_url;
+  return ()=>!!target && session.bootstrap?.data.database_configured===true && target===session.bootstrap.data.database_url && session.state.phase!=="stopped";
+}
+function captureImportView():()=>boolean {
+  const page=navigation.page,section=workspaceState.module(page).active_section,current=workbooksFeature.capture();
+  return ()=>page===navigation.page && section===workspaceState.module(page).active_section && current();
+}
 
 interface WorkflowContinuation {
   readonly reason: string;
@@ -498,7 +533,7 @@ function render(options: RenderOptions = {}): void {
     }
     case "workbooks": {
       const workspace = workspaceState.module("workbooks");
-      content = workbooksPage(session.bootstrap, teamsFeature.imports.monthly, playersFeature.imports.preview, lineupsFeature.imports.preview, workspace.module_sidebar_collapsed, workspace.inspector_collapsed, workspace.active_section ?? "team");
+      content = workbooksPage(session.bootstrap, teamsFeature.imports.monthly, playersFeature.imports.preview, lineupsFeature.imports.preview, workspace.module_sidebar_collapsed, workspace.inspector_collapsed, workspace.active_section ?? "team",workbooksFeature.state,playersFeature.catalog.references?.managed_matches??[],workspace.selected_object_ids[0]??"");
       break;
     }
     case "lineups": {
@@ -1697,6 +1732,7 @@ async function sendApiWorkspaceMessage(): Promise<void> {
 }
 
 async function navigateTo(nextPage: Page): Promise<void> {
+  workbooksFeature.changedCategory();
   await navigation.navigate(nextPage, async request => {
     try {
       await loadNavigationPage(request);
@@ -1717,6 +1753,10 @@ async function navigateTo(nextPage: Page): Promise<void> {
 
 async function loadNavigationPage(request: NavigationRequest): Promise<void> {
   const nextPage = request.page;
+  if (nextPage === "workbooks") {
+    if (session.bootstrap?.data.database_configured) await playersFeature.catalog.refreshReferences();
+    return;
+  }
   // Read-only Features consume Session/current static explanation; no page-owned loading state.
   if (nextPage === "dashboard" || nextPage === "architecture") return;
   if (nextPage === "logs") {
@@ -3269,6 +3309,7 @@ async function handleAction(
     case "select-workspace-section": {
       const sectionId = button.dataset.sectionId;
       if (!sectionId) break;
+      if (navigation.page === "workbooks") workbooksFeature.changedCategory();
       if (sectionId === "directory" && navigation.page === "teams") {
         const id = teamsFeature.catalog.detail?.team.id ?? null;
         teamsFeature.directory(); if (id) workspaceState.restoreFocus("teams", app.querySelector(".page-container") ?? app, `team-directory-${id}`); break;
@@ -3718,6 +3759,18 @@ async function handleAction(
       break;
     case "export-team-data":
       await teamsFeature.exportFile("monthly-data");
+      break;
+    case "workbook-commit":
+      workbooksFeature.requestCommit();
+      break;
+    case "workbook-readback":
+      await workbooksFeature.readback();
+      break;
+    case "workbook-export-template":
+      workbooksFeature.requestExport(true);
+      break;
+    case "workbook-export-data":
+      workbooksFeature.requestExport(false);
       break;
     case "preview-team-import":
       await teamsFeature.previewMonthly();
@@ -4570,6 +4623,13 @@ document.addEventListener("change", (event) => {
     return;
   }
   if (!(target instanceof HTMLSelectElement)) return;
+  if(navigation.page==="workbooks"&&target.id==="exchange-match-id"){
+    workspaceState.patchModule("workbooks",{selected_object_ids:target.value?[target.value]:[]});
+    workspaceState.capture("workbooks",app.querySelector(".page-container")??app,true);
+    return;
+  }
+  if (navigation.page === "workbooks" && ["match-import-mode","spreadsheet-import-mode","team-spreadsheet-import-mode"].includes(target.id)) workspaceState.capture("workbooks",app.querySelector(".page-container")??app,true);
+  if (target.id === "match-import-mode") { lineupsFeature.imports.setMode(target.value as import("./types").SpreadsheetImportMode); render({preserveForm:true}); return; }
   if (target.id === "spreadsheet-import-mode") { playersFeature.changeImportMode(); return; }
   if (target.id === "team-package-import-mode" || target.id === "team-spreadsheet-import-mode") {
     teamsFeature.changeImportMode(target.id === "team-package-import-mode" ? "package" : "monthly");

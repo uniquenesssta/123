@@ -1,3 +1,4 @@
+import { verifyWorkbooksBrowser } from "../features/verifyWorkbooksBrowser.mjs";
 import assert from "node:assert/strict";
 import { writeFileSync, mkdtempSync } from "node:fs";
 import { resolve, join } from "node:path";
@@ -45,7 +46,7 @@ writeFileSync(join(directory,"results.json"),JSON.stringify(results,null,2));
 const failures=results.flatMap(r=>r.failures.map(f=>`${r.name}: ${f}`));
 console.log(`Approved design integration evidence: ${directory}`);
 assert.equal(failures.length,0,failures.join("\n"));
-if(!screenArgument) await verifyMountedDesign(root,join(directory,"mounted"));
+if(!screenArgument) { await verifyMountedDesign(root,join(directory,"mounted"));await verifyWorkbooksBrowser(root,join(directory,"workbooks")); }
 console.log(`Approved design integration PASS: ${results.length} views, ${results.reduce((n,r)=>n+r.assertions,0)} checks`);
 
 function checks(screen) {

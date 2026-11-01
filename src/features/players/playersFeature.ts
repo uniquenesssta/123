@@ -1,3 +1,4 @@
+import type { ImportRecovery } from "../../app/imports/spreadsheetBatch";
 import type { ModalController } from "../../app/modal";
 import { bulkArchiveSummary, bulkDeleteSummary } from "../../components/entityDeletion";
 import { escapeHtml } from "../../components/format";
@@ -12,6 +13,7 @@ import type { PlayerApi } from "./playerPorts";
 
 export interface PlayersPorts {
   api: PlayerApi; initialQuery: Partial<PlayerListQuery> | null; initialSource: Partial<PlayerNavigationContext> | null;
+  importRecovery?: ImportRecovery; captureImportView?(): () => boolean; captureImportData?(): () => boolean;
   snapshot(): BootstrapResponse | null; page(): Page; root(): ParentNode;
   busy<T>(operation: () => Promise<T>): Promise<T>; persistQuery(query: Omit<PlayerListQuery, "cursor_name" | "cursor_id">): void; persistSource(source: PlayerNavigationContext | null): void;
   render(): void; notify(message: string, kind?: "normal" | "success" | "error"): void;
@@ -21,13 +23,13 @@ export interface PlayersPorts {
 }
 export class PlayersFeature {
   readonly catalog: PlayerCatalog; readonly drafts = new PlayerDrafts(); readonly editor: PlayerEditor; readonly imports: PlayerImports; readonly deletion: PlayerDeletion;
-  constructor(private readonly ports: PlayersPorts) { this.catalog = new PlayerCatalog(ports, ports.initialQuery, ports.initialSource); this.editor = new PlayerEditor({ ...ports, catalog: this.catalog, drafts: this.drafts, refreshAfterCreate: () => ports.afterMutation([]) }); this.imports = new PlayerImports({ ...ports, capture: () => this.catalog.capture() }); this.deletion = new PlayerDeletion({ ...ports, catalog: this.catalog }); }
+  constructor(private readonly ports: PlayersPorts) { this.catalog = new PlayerCatalog(ports, ports.initialQuery, ports.initialSource); this.editor = new PlayerEditor({ ...ports, catalog: this.catalog, drafts: this.drafts, refreshAfterCreate: () => ports.afterMutation([]) }); this.imports = new PlayerImports({ ...ports, capture: () => ports.captureImportData?.() ?? this.catalog.capture(), captureView: ports.captureImportView, recovery: ports.importRecovery, changed: () => ports.render() }); this.deletion = new PlayerDeletion({ ...ports, catalog: this.catalog }); }
   next(): Promise<void> { return this.paginate("next"); }
   previous(): Promise<void> { return this.paginate("previous"); }
   openDirectory(id: string): Promise<void> { return this.open(id, false); }
   openProfile(id: string): Promise<void> { return this.open(id, true); }
-  exportTemplate(): Promise<void> { return this.exportFile(true); }
-  exportData(): Promise<void> { return this.exportFile(false); }
+  exportTemplate(): Promise<boolean> { return this.exportFile(true); }
+  exportData(): Promise<boolean> { return this.exportFile(false); }
   async load(resetCursor = false, isCurrent: () => boolean = () => true): Promise<boolean> { return this.catalog.load({ resetCursor, isCurrent }); }
   directEntry(): boolean { const changed=this.catalog.directEntry(); if (changed) { this.imports.clear(); this.ports.section("directory", true); } return changed; }
   async open(id: string, profile = false): Promise<void> {
@@ -49,11 +51,11 @@ export class PlayersFeature {
     try { if (!await task || page !== this.ports.page()) return; if (!refreshPlayerPageDom(this.domState())) this.ports.render(); }
     finally { if (page === this.ports.page()) setPlayerPageLoading(this.domState(), this.catalog.busy); }
   }
-  changeImportMode(): void { this.imports.clear(); this.ports.render(); }
+  changeImportMode(): void { this.imports.setMode(this.ports.root().querySelector<HTMLSelectElement>("#spreadsheet-import-mode")?.value as SpreadsheetImportMode); this.ports.render(); }
   async previewImport(): Promise<void> { const mode = this.ports.root().querySelector<HTMLSelectElement>("#spreadsheet-import-mode")?.value as SpreadsheetImportMode; if (!await this.imports.read(mode)) return; const preview = this.imports.preview; if (!preview) return; this.ports.render(); const blocking = preview.counts.conflict + preview.counts.error; this.ports.notify(blocking ? `预检完成：发现 ${blocking} 条需要修正` : "预检通过，可以确认导入", blocking ? "error" : "success"); }
   async resolveImport(rowId: string, selectedEntityId: string | null, skip: boolean): Promise<void> { if (await this.imports.resolve({ row_id: rowId, selected_entity_id: selectedEntityId, skip })) { this.ports.render(); this.ports.notify(skip ? "该行已标记跳过" : "冲突关联已确认", "success"); } }
-  async commitImport(): Promise<void> { const outcome = await this.imports.commit(); if (!outcome) return; if (!outcome.current) { this.ports.notify("原球员批次提交已返回；当前上下文已变化，请核对原批次"); return; } const result = outcome.result; if (!result.error_count) await this.ports.refreshAll(); this.ports.render(); this.ports.notify(`${result.error_count ? "部分处理，仍有失败项" : "导入完成"}：新增 ${result.inserted_count}，更新 ${result.updated_count}，结束旧记录 ${result.ended_previous_count}，错误 ${result.error_count}`, result.error_count ? "error" : "success"); }
-  async exportFile(template: boolean): Promise<void> { const path = await this.ports.api.chooseExcelExportFile(template ? "球员月度更新模板.xlsx" : "球员月度更新.xlsx"); if (!path) return; const result = await this.ports.busy(() => template ? this.ports.api.exportPlayerCatalogTemplate(path) : this.ports.api.exportPlayerCatalogData(path)); this.ports.notify(template ? `模板已导出：${result.output_path}` : `已导出 ${result.player_count} 名球员和 ${result.team_count} 支球队`, "success"); }
+  async commitImport(ticket?: import("../../app/imports/spreadsheetBatch").ImportTicket): Promise<void> { const outcome = await this.imports.commit(ticket); if (!outcome) return; if (!outcome.current) { this.ports.notify("原球员批次提交已返回；当前上下文已变化，请核对原批次"); return; } const result = outcome.result; if (!result.error_count) await this.ports.refreshAll(); this.ports.render(); this.ports.notify(`${result.error_count ? "部分处理，仍有失败项" : "导入完成"}：新增 ${result.inserted_count}，更新 ${result.updated_count}，结束旧记录 ${result.ended_previous_count}，错误 ${result.error_count}`, result.error_count ? "error" : "success"); }
+  async exportFile(template: boolean): Promise<boolean> { const current=this.ports.captureImportData?.()??this.catalog.capture(),view=this.ports.captureImportView?.()??(()=>true); const path = await this.ports.api.chooseExcelExportFile(template ? "球员月度更新模板.xlsx" : "球员月度更新.xlsx"); if (!path || !current() || !view()) return false; const result = await this.ports.busy(() => template ? this.ports.api.exportPlayerCatalogTemplate(path) : this.ports.api.exportPlayerCatalogData(path)); if(!current()||!view())return false; this.ports.notify(template ? `模板已导出：${result.output_path}` : `已导出 ${result.player_count} 名球员和 ${result.team_count} 支球队`, "success"); return true; }
   requestBulkDelete(): void { const ticket = this.deletion.prepareBulk(); this.ports.confirm("批量删除球员", "将逐个执行安全删除；存在不可删除关联的球员会被保留并显示原因。", [["已选择", `${ticket.ids.length} 名球员`], ["处理方式", "逐条事务、保留失败项"]], "确认批量删除", async () => { const outcome = await this.deletion.bulk(ticket); if (!outcome.current) { this.ports.notify("原球员删除已返回；当前对象已变化，请核对原结果"); return; } if (await this.ports.afterMutation(outcome.result.deleted_ids)) this.ports.showHtml("球员批量删除结果", outcome.result.blocked.length ? "部分对象受保护，已保留" : "安全删除", bulkDeleteSummary(outcome.result, "名球员")); }); }
   async requestDelete(id: string, name: string): Promise<void> { const ticket = await this.deletion.prepareSingle(id); if (!ticket?.check) return; const check = ticket.check;
     if (!check.exists || !check.can_permanently_delete) { const references = check.references.filter(item => item.count > 0).map(item => `<li>${escapeHtml(item.relation)}：${item.count}</li>`).join(""); this.ports.showHtml("球员不能永久删除", "请改用归档", `<div class="route-detail"><div class="route-detail-summary"><span>历史保护</span><h3>${escapeHtml(name)}</h3><p>${escapeHtml(check.reason)}</p></div><section class="prediction-detail-section"><h3>引用统计</h3>${references ? `<ul>${references}</ul>` : "<p>存在受保护引用。</p>"}</section></div>`); return; }

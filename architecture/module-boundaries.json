@@ -181,7 +181,8 @@
       },
       "workbooks": {
         "owner": "src/pages/workbooks.ts",
-        "route": "workbooks"
+        "route": "workbooks",
+        "public_entry": "src/features/workbooks/index.ts"
       },
       "competitions": {
         "owner": "src/features/competitions/competitionView.ts",

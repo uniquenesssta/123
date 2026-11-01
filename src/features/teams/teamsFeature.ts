@@ -1,3 +1,4 @@
+import type { ImportRecovery } from "../../app/imports/spreadsheetBatch";
 import type { ModalController } from "../../app/modal";
 import type { BootstrapResponse, BulkArchiveResult, BulkDeleteResult, CoachListItem, FormationRecord, Page, TeamForceDeleteResult, TeamListQuery } from "../../types";
 import { TeamCatalog, normalizeTeamQuery } from "./teamCatalog";
@@ -10,6 +11,7 @@ import type { TeamApi } from "./teamPorts";
 
 export interface TeamsFeaturePorts {
   api: TeamApi; initialQuery: Partial<TeamListQuery> | null;
+  importRecovery?: ImportRecovery; captureImportView?(): () => boolean; captureImportData?(): () => boolean;
   snapshot(): BootstrapResponse | null; page(): Page; root(): ParentNode;
   busy<T>(operation: () => Promise<T>): Promise<T>;
   persistQuery(query: Omit<TeamListQuery, "cursor_name" | "cursor_id">): void;
@@ -42,7 +44,7 @@ export class TeamsFeature {
   readonly editor: TeamEditor;
   constructor(private readonly ports: TeamsFeaturePorts) {
     this.catalog = new TeamCatalog(ports, ports.initialQuery);
-    this.imports = new TeamImports({ ...ports, capture: () => this.catalog.capture() });
+    this.imports = new TeamImports({ ...ports, capture: () => ports.captureImportData?.() ?? this.catalog.capture(), captureView: ports.captureImportView, recovery: ports.importRecovery, changed: () => ports.render() });
     this.deletion = new TeamDeletion({ ...ports, catalog: this.catalog });
     this.editor = new TeamEditor({ ...ports, catalog: this.catalog, drafts: this.drafts });
   }
@@ -99,7 +101,7 @@ export class TeamsFeature {
     await this.ports.busy(() => this.ports.api.createTeam(draft));
     if (!current()) return; await this.ports.refreshAll(); this.ports.render(); this.ports.notify("球队已创建", "success");
   }
-  changeImportMode(kind: "package" | "monthly"): void { if (kind === "package") this.imports.clearPackage(); else this.imports.clearMonthly(); this.ports.render(); }
+  changeImportMode(kind: "package" | "monthly"): void { if (kind === "package") this.imports.clearPackage(); else this.imports.monthlyBatch.setMode(teamValue(this.ports.root(), "team-spreadsheet-import-mode") as import("../../types").SpreadsheetImportMode); this.ports.render(); }
   async previewPackage(): Promise<void> {
     const mode = teamValue(this.ports.root(), "team-package-import-mode") as "add_and_update" | "add_only";
     if (!await this.imports.previewPackage(mode)) return;
@@ -125,18 +127,21 @@ export class TeamsFeature {
     const blocking = preview.counts.conflict + preview.counts.error; this.ports.render(); this.ports.notify(blocking ? `预检完成：发现 ${blocking} 条需要处理` : "球队月度工作簿预检通过", blocking ? "error" : "success");
   }
   async resolveMonthly(rowId: string, selectedEntityId: string | null, skip: boolean): Promise<void> { if (await this.imports.resolveMonthly({ row_id: rowId, selected_entity_id: selectedEntityId, skip })) { this.ports.render(); this.ports.notify(skip ? "该行已标记跳过" : "冲突关联已确认", "success"); } }
-  async commitMonthly(): Promise<void> {
-    const outcome = await this.imports.commitMonthly(); if (!outcome) return;
+  async commitMonthly(ticket?: import("../../app/imports/spreadsheetBatch").ImportTicket): Promise<void> {
+    const outcome = await this.imports.commitMonthly(ticket); if (!outcome) return;
     if (!outcome.current) { this.ports.notify("原月度批次提交已返回；当前上下文已切换，请刷新核对"); return; }
     const result = outcome.result;
     if (result.error_count === 0) await this.ports.refreshAll();
     this.ports.render();
     this.ports.notify(`月度批次${result.error_count ? "部分处理" : "导入完成"}：新增 ${result.inserted_count}，更新 ${result.updated_count}，结束旧记录 ${result.ended_previous_count}`, result.error_count ? "error" : "success");
   }
-  async exportFile(kind: "package-template" | "monthly-template" | "monthly-data"): Promise<void> {
-    const path = await this.ports.api.chooseExcelExportFile(kind === "package-template" ? "球队完整资料包.xlsx" : kind === "monthly-template" ? "球队月度更新模板.xlsx" : "球队月度更新.xlsx"); if (!path) return;
+  async exportFile(kind: "package-template" | "monthly-template" | "monthly-data"): Promise<boolean> {
+    const current=this.ports.captureImportData?.()??this.catalog.capture(),view=this.ports.captureImportView?.()??(()=>true);
+    const path = await this.ports.api.chooseExcelExportFile(kind === "package-template" ? "球队完整资料包.xlsx" : kind === "monthly-template" ? "球队月度更新模板.xlsx" : "球队月度更新.xlsx"); if (!path || !current() || !view()) return false;
     const result = await this.ports.busy<{ output_path: string }>(() => kind === "package-template" ? this.ports.api.exportTeamPackageTemplate(path) : kind === "monthly-template" ? this.ports.api.exportTeamMonthlyTemplate(path) : this.ports.api.exportTeamMonthlyData(path));
+    if (!current() || !view()) return false;
     this.ports.notify(kind === "package-template" ? `标准资料包已导出：${result.output_path}` : kind === "monthly-template" ? `模板已导出：${result.output_path}` : `已导出 ${"team_count" in result ? result.team_count : "—"} 支球队，关联 ${"related_row_count" in result ? result.related_row_count : "—"} 行`, "success");
+    return true;
   }
   async requestDelete(): Promise<void> {
     const ticket = await this.deletion.prepareNormal(); if (!ticket) return;

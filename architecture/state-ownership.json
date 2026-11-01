@@ -638,7 +638,7 @@
     {
       "id": "browser.team-imports",
       "owner": "src/features/teams/teamImports.ts::TeamImports",
-      "scope": "package and monthly staging preview identity, resolution and commit lifecycle",
+      "scope": "package and monthly staging preview identity, resolution and commit lifecycle；各领域持有唯一SpreadsheetBatch实例，窄恢复引用仅用于重新读回，不形成客户端账本",
       "writers": [
         "TeamImports methods"
       ],
@@ -694,7 +694,7 @@
     {
       "id": "browser.player-imports",
       "owner": "src/features/players/playerImports.ts::PlayerImports",
-      "scope": "player workbook batch hash mode and recovery lifecycle",
+      "scope": "player workbook batch hash mode and recovery lifecycle；各领域持有唯一SpreadsheetBatch实例，窄恢复引用仅用于重新读回，不形成客户端账本",
       "writers": [
         "PlayerImports methods"
       ],
@@ -761,7 +761,7 @@
     {
       "id": "browser.match-imports",
       "owner": "src/features/lineups/matchImports.ts::MatchImports",
-      "scope": "比赛及AI包共用批次/hash/mode/上下文代次/一次提交锁与结果未知保护",
+      "scope": "比赛及AI包共用批次/hash/mode/上下文代次/一次提交锁与结果未知保护；各领域持有唯一SpreadsheetBatch实例，窄恢复引用仅用于重新读回，不形成客户端账本",
       "writers": [
         "对应Feature动作；组合根只通过公开state/actions接线"
       ],
@@ -770,8 +770,21 @@
       ],
       "transition": null,
       "migration_task": "R13-07"
+    },
+    {
+      "id": "browser.workbooks",
+      "owner": "src/features/workbooks/workbooksFeature.ts::WorkbooksFeature",
+      "scope": "仅类别呈现代次与导出交互，不持有领域预检/批次/账本",
+      "writers": [
+        "WorkbooksFeature methods"
+      ],
+      "forbidden": [
+        "src/pages/**"
+      ],
+      "transition": null,
+      "migration_task": "R13-09"
     }
   ],
-  "count": 53,
-  "last_updated_task": "R13-07"
+  "count": 54,
+  "last_updated_task": "R13-09"
 }

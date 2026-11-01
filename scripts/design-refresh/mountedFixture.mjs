@@ -6,7 +6,7 @@ import { captureHtmlScreenshot, resolveChromiumExecutable } from "../task-ui-scr
 import { loadTeamsProduction } from "../features/loadTeamsProduction.mjs";
 
 /** Mount the real application; only the native transport is a synthetic test boundary. */
-export async function mountedFixture(root, directory, exercise) {
+export async function mountedFixture(root, directory, exercise, extraBoundary="") {
   fs.mkdirSync(directory, {recursive:true});
   const require=createRequire(path.join(root,"package.json"));
   const {createServer}=await import(pathToFileURL(require.resolve("vite")));
@@ -18,7 +18,7 @@ export async function mountedFixture(root, directory, exercise) {
   await server.listen();
   try {
     return await captureHtmlScreenshot({browser:resolveChromiumExecutable(),htmlPath,outputPath:path.join(directory,"last.png"),width:1440,height:900,async exercise(cdp){
-      await cdp.send("Page.addScriptToEvaluateOnNewDocument",{source:"window.__fixtures="+JSON.stringify(fixtures)+";"+base+boundary});
+      await cdp.send("Page.addScriptToEvaluateOnNewDocument",{source:"window.__fixtures="+JSON.stringify(fixtures)+";"+base+boundary+extraBoundary});
       await cdp.send("Page.navigate",{url:"http://127.0.0.1:15328"});
       await cdp.send("Page.bringToFront");
       await cdp.send("Emulation.setFocusEmulationEnabled",{enabled:true});
@@ -32,7 +32,7 @@ export async function mountedFixture(root, directory, exercise) {
           fs.writeFileSync(path.join(directory,name+".png"),Buffer.from(shot.data,"base64"));
         } finally {clearTimeout(timer);}
       };
-      const route=async page=>evaluate('(async()=>{const page='+JSON.stringify(page)+',module={dashboard:"home",teams:"resources",players:"resources",rules:"model",database:"management",architecture:"management"}[page],rail=document.querySelector("[data-primary-module="+module+"]");if(!rail)throw Error("Missing module "+module);const collapsed=document.querySelector(".secondary-sidebar").hidden;if(collapsed){Array.from(document.querySelectorAll("[data-action=toggle-global-sidebar]")).find(e=>!e.closest("[hidden],[inert]")).click();await new Promise(r=>setTimeout(r,100));}document.querySelector("[data-primary-module="+module+"]").click();await new Promise(r=>setTimeout(r,200));const link=document.querySelector(".secondary-sidebar [data-page="+page+"]");if(link)link.click();await new Promise((resolve,reject)=>{const end=Date.now()+10000;const ready=()=>document.querySelector(".application-shell")?.dataset.currentPage===page&&!document.querySelector(".page-container[inert]")?resolve():Date.now()>end?reject(Error("Route did not settle: "+page)):setTimeout(ready,30);ready();});await new Promise(r=>setTimeout(r,200));if(collapsed)Array.from(document.querySelectorAll("[data-action=toggle-global-sidebar]")).find(e=>!e.closest("[hidden],[inert]")).click();await document.fonts.ready;return {page:document.querySelector(".application-shell").dataset.currentPage,title:document.querySelector("h1")?.textContent};})()');
+      const route=async page=>evaluate('(async()=>{const page='+JSON.stringify(page)+',module={dashboard:"home",workbooks:"resources",teams:"resources",players:"resources",rules:"model",database:"management",architecture:"management"}[page],rail=document.querySelector("[data-primary-module="+module+"]");if(!rail)throw Error("Missing module "+module);const collapsed=document.querySelector(".secondary-sidebar").hidden;if(collapsed){Array.from(document.querySelectorAll("[data-action=toggle-global-sidebar]")).find(e=>!e.closest("[hidden],[inert]")).click();await new Promise(r=>setTimeout(r,100));}document.querySelector("[data-primary-module="+module+"]").click();await new Promise(r=>setTimeout(r,200));const link=document.querySelector(".secondary-sidebar [data-page="+page+"]");if(link)link.click();await new Promise((resolve,reject)=>{const end=Date.now()+10000;const ready=()=>document.querySelector(".application-shell")?.dataset.currentPage===page&&!document.querySelector(".page-container[inert]")?resolve():Date.now()>end?reject(Error("Route did not settle: "+page)):setTimeout(ready,30);ready();});await new Promise(r=>setTimeout(r,200));if(collapsed)Array.from(document.querySelectorAll("[data-action=toggle-global-sidebar]")).find(e=>!e.closest("[hidden],[inert]")).click();await document.fonts.ready;return {page:document.querySelector(".application-shell").dataset.currentPage,title:document.querySelector("h1")?.textContent};})()');
       return exercise({cdp,evaluate,screenshot,route});
     }});
   } finally { await server.close(); }

@@ -30,7 +30,8 @@
     "src/pages/rules/rulesCatalogue.css",
     "src/styles/workspaces/presetEditor.css",
     "src/pages/database/databaseWorkspace.css",
-    "src/pages/architecture/architectureWorkspace.css"
+    "src/pages/architecture/architectureWorkspace.css",
+    "src/pages/workbooks/workbookWorkspace.css"
   ],
   "features": [
     {
@@ -67,6 +68,11 @@
       "page": "architecture",
       "file": "src/pages/architecture/architectureWorkspace.css",
       "root": ".application-shell[data-current-page=\"architecture\"]"
+    },
+    {
+      "page": "workbooks",
+      "file": "src/pages/workbooks/workbookWorkspace.css",
+      "root": ".application-shell[data-current-page=\"workbooks\"]"
     }
   ],
   "composition_modules": [

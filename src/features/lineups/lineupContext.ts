@@ -1,3 +1,4 @@
+import type { ImportRecovery } from "../../app/imports/spreadsheetBatch";
 import type { createMatchExchange } from "./matchExchange";
 import type * as T from "../../types";
 import type { LineupApi, LineupFiles } from "./lineupPorts";
@@ -21,6 +22,9 @@ interface RenderOptions {
     readonly preserveForm?: boolean;
 }
 export interface LineupPorts {
+    importRecovery?: ImportRecovery;
+    captureImportView?(): () => boolean;
+    captureImportData?(): () => boolean;
     recordUiOperation: (kind: "ui_action", operation: string, metadata: Record<string, unknown>) => string;
     recordUiOperationFailure: (operation: string, error: unknown, traceId: string, metadata: Record<string, unknown>) => void;
     pageTitle: typeof pageTitle;

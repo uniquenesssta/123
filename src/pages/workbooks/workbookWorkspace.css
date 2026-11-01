@@ -1,0 +1,60 @@
+.application-shell:where([data-current-page="workbooks"]) .page-container { overflow:hidden; }
+.application-shell:where([data-current-page="workbooks"]) .workbooks-module-workspace { height:100%; min-height:0; display:grid; grid-template-rows:auto auto minmax(0,1fr); gap:8px; }
+.application-shell:where([data-current-page="workbooks"]) .page-heading { margin:0; min-height:56px; }
+.application-shell:where([data-current-page="workbooks"]) .workbook-page-actions { display:flex; flex-wrap:wrap; align-items:center; gap:8px; }
+.application-shell:where([data-current-page="workbooks"]) .workbooks-workspace { height:100%; min-height:0; grid-template-columns:220px minmax(0,1fr) 320px; gap:8px; position:relative; }
+.application-shell:where([data-current-page="workbooks"]) .workbooks-workspace.inspector-collapsed { grid-template-columns:220px minmax(0,1fr); }
+.application-shell:where([data-current-page="workbooks"]) .panel { padding:12px; margin:0; min-width:0; border:0; border-radius:16px; background:var(--fip-surface); box-shadow:var(--fip-panel-shadow); }
+.application-shell:where([data-current-page="workbooks"]) .panel h2 { margin:0; font:700 14px/20px var(--fip-type-section-title-family); color:var(--fip-text); overflow-wrap:anywhere; }
+.application-shell:where([data-current-page="workbooks"]) .panel p { margin:0; font:400 12px/18px var(--fip-type-body-family); color:var(--fip-text); overflow-wrap:anywhere; }
+.application-shell:where([data-current-page="workbooks"]) .panel header { min-height:60px; display:flex; flex-direction:column; gap:2px; margin-bottom:8px; }
+.application-shell:where([data-current-page="workbooks"]) .panel header p { color:var(--fip-muted); }
+.application-shell:where([data-current-page="workbooks"]) .module-sidebar { width:auto; height:100%; min-height:0; display:flex; flex-direction:column; align-items:stretch; gap:8px; overflow:hidden; }
+.application-shell:where([data-current-page="workbooks"]) .module-sidebar header { flex:none; margin:0; }
+.application-shell:where([data-current-page="workbooks"]) .module-sidebar > strong { font:700 14px/20px var(--fip-type-section-title-family); }
+.application-shell:where([data-current-page="workbooks"]) .workbook-category-nav { display:flex; flex-direction:column; gap:8px; margin:0; }
+.application-shell:where([data-current-page="workbooks"]) .workbook-category-nav button { width:100%; min-height:32px; display:flex; align-items:center; justify-content:center; padding:0 12px; border-radius:7px; font:500 13px/18px var(--fip-type-control-family); }
+.application-shell:where([data-current-page="workbooks"]) .workspace-main { height:100%; min-width:0; min-height:0; display:grid; grid-template-rows:minmax(0,1fr) auto; gap:8px; overflow:hidden; }
+.application-shell:where([data-current-page="workbooks"]) .workbook-content-scroll { min-width:0; min-height:0; overflow:auto; scrollbar-gutter:stable; }
+.application-shell:where([data-current-page="workbooks"]) .workspace-module-view.active { display:flex; flex-direction:column; gap:12px; padding:0; }
+.application-shell:where([data-current-page="workbooks"]) .workbook-scope { min-height:110px; }
+.application-shell:where([data-current-page="workbooks"]) .workbook-steps .workbook-flow { padding:0; margin:0; border:0; background:transparent; display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); align-items:start; gap:8px; }
+.application-shell:where([data-current-page="workbooks"]) .workbook-steps .workbook-flow article { display:flex; flex-direction:column; align-items:flex-start; gap:8px; min-width:0; padding:0; border:0; border-radius:0; background:transparent; }
+.application-shell:where([data-current-page="workbooks"]) .workbook-steps .workbook-flow h3 { margin:0; font:700 14px/20px var(--fip-type-section-title-family); }
+.application-shell:where([data-current-page="workbooks"]) .workbook-steps .workbook-flow article > p { min-height:0; font:400 12px/18px var(--fip-type-body-family); }
+.application-shell:where([data-current-page="workbooks"]) .workbook-steps .workbook-flow article > button { margin:0; align-self:flex-start; }
+.application-shell:where([data-current-page="workbooks"]) .workbook-steps .workbook-flow .field { width:100%; margin:0; display:grid; gap:6px; }
+.application-shell:where([data-current-page="workbooks"]) .workbook-steps .workbook-flow small { max-width:100%; overflow-wrap:anywhere; font:400 11px/16px var(--fip-type-caption-family); }
+.application-shell:where([data-current-page="workbooks"]) .workbook-state-message { font:400 12px/18px var(--fip-type-body-family); margin-bottom:8px; }
+.application-shell:where([data-current-page="workbooks"]) .workbook-counts { font:700 14px/20px var(--fip-type-section-title-family); margin-bottom:8px; }
+.application-shell:where([data-current-page="workbooks"]) .workbook-table-wrap { overflow-x:auto; min-width:0; }
+.application-shell:where([data-current-page="workbooks"]) .workbook-table { width:100%; table-layout:fixed; border-collapse:collapse; margin:0 0 8px; }
+.application-shell:where([data-current-page="workbooks"]) .workbook-table th { height:36px; padding:6px 9px; text-align:left; background:var(--fip-surface-subtle); font:500 12px/18px var(--fip-type-body-family); }
+.application-shell:where([data-current-page="workbooks"]) .workbook-table td { height:56px; padding:8px 9px; vertical-align:middle; overflow-wrap:anywhere; font:500 12px/18px var(--fip-type-body-family); }
+.application-shell:where([data-current-page="workbooks"]) .workbook-table th,
+.application-shell:where([data-current-page="workbooks"]) .workbook-table td { border-bottom:1px solid var(--fip-border); }
+.application-shell:where([data-current-page="workbooks"]) .workbook-sheet-col { width:17%; }
+.application-shell:where([data-current-page="workbooks"]) .workbook-row-col { width:6%; }
+.application-shell:where([data-current-page="workbooks"]) .workbook-object-col { width:20%; }
+.application-shell:where([data-current-page="workbooks"]) .workbook-status-col { width:17%; }
+.application-shell:where([data-current-page="workbooks"]) .workbook-commit-bar { min-height:40px; display:flex; align-items:center; flex-wrap:wrap; gap:8px; }
+.application-shell:where([data-current-page="workbooks"]) .workbook-commit-bar > span { font:400 11px/16px var(--fip-type-caption-family); color:var(--fip-text); overflow-wrap:anywhere; }
+.application-shell:where([data-current-page="workbooks"]) .workspace-inspector { min-height:0; overflow:auto; }
+.application-shell:where([data-current-page="workbooks"]) .workbooks-workspace.inspector-collapsed > .workspace-inspector { display:none; }
+@media (max-width:1180px) {
+  .application-shell:where([data-current-page="workbooks"]) .workbooks-workspace { grid-template-columns:220px minmax(0,1fr); }
+  .application-shell:where([data-current-page="workbooks"]) .workspace-inspector { position:absolute; right:0; top:0; bottom:0; width:min(320px,100%); z-index:5; }
+}
+@media (max-width:1050px) {
+  .application-shell:where([data-current-page="workbooks"]) .workbook-steps .workbook-flow { grid-template-columns:1fr; gap:16px; }
+  .application-shell:where([data-current-page="workbooks"]) .workbook-steps .workbook-flow article { width:100%; }
+  .application-shell:where([data-current-page="workbooks"]) .workbook-steps .workbook-flow .field { max-width:100%; }
+}
+
+
+.application-shell:where([data-current-page="workbooks"]) .workbook-mode-control { position:relative; display:block; width:100%; min-width:0; }
+.application-shell:where([data-current-page="workbooks"]) .workbook-mode-control select { appearance:none; width:100%; padding-right:38px; }
+.application-shell:where([data-current-page="workbooks"]) .workbook-mode-control > .ui-icon-slot { position:absolute; right:14px; top:50%; transform:translateY(-50%); pointer-events:none; color:var(--fip-muted); }
+
+.application-shell:where([data-current-page="workbooks"]) .workbook-preview p.workbook-counts { font:700 14px/20px var(--fip-type-section-title-family); margin-bottom:8px; }
+.application-shell:where([data-current-page="workbooks"]) .workbook-preview p.field-note { font:400 11px/16px var(--fip-type-meta-family); color:var(--fip-muted); }

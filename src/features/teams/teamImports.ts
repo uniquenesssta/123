@@ -1,34 +1,32 @@
 import type { SpreadsheetImportMode, SpreadsheetImportPreview, SpreadsheetImportResolution, TeamPackageImportPreview } from "../../types";
 import type { TeamApi } from "./teamPorts";
 import { teamSnapshot } from "./teamSnapshot";
+import { SpreadsheetBatch, type ImportRecovery, type ImportTicket } from "../../app/imports/spreadsheetBatch";
 
-interface ImportPorts { api: TeamApi; capture(): () => boolean; busy<T>(operation: () => Promise<T>): Promise<T> }
+interface ImportPorts { api: TeamApi; capture(): () => boolean; captureView?(): () => boolean; changed?(): void; recovery?: ImportRecovery; busy<T>(operation: () => Promise<T>): Promise<T> }
 
 /** Owns package and monthly batch identities. R13-09 consumes this same owner. No client-side ledger. */
 export class TeamImports {
   private packageValue: TeamPackageImportPreview | null = null;
-  private monthlyValue: SpreadsheetImportPreview | null = null;
+  readonly monthlyBatch: SpreadsheetBatch;
   private packageContext = () => false;
-  private monthlyContext = () => false;
   private packageSequence = 0;
-  private monthlySequence = 0;
   private packageBusy: number | null = null;
-  private monthlyBusy: number | null = null;
-  constructor(private readonly ports: ImportPorts) {}
+  constructor(private readonly ports: ImportPorts) {
+    this.monthlyBatch = new SpreadsheetBatch({ ...ports, label:"球队月度", choose:()=>ports.api.chooseExcelImportFile(),
+      preview:(path, mode)=>ports.api.previewTeamMonthlyImport(path, mode),
+      resolve:(id, resolution)=>ports.api.resolveTeamMonthlyImportConflict(id, resolution),
+      commit:id=>ports.api.commitTeamMonthlyImport(id), read:id=>ports.api.readTeamMonthlyImportPreview(id) });
+  }
   get package(): TeamPackageImportPreview | null { return this.packageContext() ? this.packageValue : null; }
-  get monthly(): SpreadsheetImportPreview | null { return this.monthlyContext() ? this.monthlyValue : null; }
+  get monthly(): SpreadsheetImportPreview | null { return this.monthlyBatch.preview; }
   clearPackage(): void { this.packageSequence++; this.packageValue = null; }
-  clearMonthly(): void { this.monthlySequence++; this.monthlyValue = null; }
+  clearMonthly(): void { this.monthlyBatch.clear(); }
   clear(): void { this.clearPackage(); this.clearMonthly(); }
   private packageTicket() {
     const value = this.package, revision = this.packageSequence;
     if (!value) throw new Error("球队资料包预检已失效，请重新选择文件预检");
     return { value, revision, current: () => this.packageSequence === revision && this.package === value };
-  }
-  private monthlyTicket() {
-    const value = this.monthly, revision = this.monthlySequence;
-    if (!value) throw new Error("球队月度预检已失效，请重新选择文件预检");
-    return { value, revision, current: () => this.monthlySequence === revision && this.monthly === value };
   }
   async previewPackage(mode: SpreadsheetImportMode): Promise<boolean> {
     const revision = ++this.packageSequence, context = this.ports.capture(); this.packageValue = null; this.packageContext = context;
@@ -40,16 +38,7 @@ export class TeamImports {
       if (!current()) return false; this.packageValue = teamSnapshot(result); return true;
     } catch (error) { if (!current()) return false; throw error; }
   }
-  async previewMonthly(mode: SpreadsheetImportMode): Promise<boolean> {
-    const revision = ++this.monthlySequence, context = this.ports.capture(); this.monthlyValue = null; this.monthlyContext = context;
-    const current = () => revision === this.monthlySequence && context();
-    try {
-      const path = await this.ports.api.chooseExcelImportFile();
-      if (!current() || !path) return false;
-      const result = await this.ports.api.previewTeamMonthlyImport(path, mode);
-      if (!current()) return false; this.monthlyValue = teamSnapshot(result); return true;
-    } catch (error) { if (!current()) return false; throw error; }
-  }
+  previewMonthly(mode: SpreadsheetImportMode): Promise<boolean> { return this.monthlyBatch.load(mode); }
   private verifyBatch(expected: SpreadsheetImportPreview, actual: SpreadsheetImportPreview): void {
     if (expected.batch_id !== actual.batch_id || expected.source_sha256 !== actual.source_sha256 || expected.import_mode !== actual.import_mode) throw new Error("预检批次或文件摘要已变化，拒绝回填其他资料包结果");
   }
@@ -65,16 +54,7 @@ export class TeamImports {
     } catch (error) { if (!ticket.current()) return false; throw error; }
     finally { if (this.packageBusy === ticket.revision) this.packageBusy = null; }
   }
-  async resolveMonthly(resolution: SpreadsheetImportResolution): Promise<boolean> {
-    const ticket = this.monthlyTicket();
-    if (this.monthlyBusy === ticket.revision) throw new Error("当前月度批次正在处理，请等待完成");
-    this.monthlyBusy = ticket.revision;
-    try {
-      const result = await this.ports.busy(() => this.ports.api.resolveTeamMonthlyImportConflict(ticket.value.batch_id, structuredClone(resolution)));
-      if (!ticket.current()) return false; this.verifyBatch(ticket.value, result); this.monthlyValue = teamSnapshot(result); return true;
-    } catch (error) { if (!ticket.current()) return false; throw error; }
-    finally { if (this.monthlyBusy === ticket.revision) this.monthlyBusy = null; }
-  }
+  resolveMonthly(resolution: SpreadsheetImportResolution): Promise<boolean> { return this.monthlyBatch.resolve(resolution); }
   async commitPackage() {
     const ticket = this.packageTicket();
     if (this.packageBusy === ticket.revision) throw new Error("当前资料包正在处理，请等待完成");
@@ -106,26 +86,7 @@ export class TeamImports {
     }
     finally { if (this.packageBusy === ticket.revision) this.packageBusy = null; }
   }
-  async commitMonthly() {
-    const ticket = this.monthlyTicket();
-    if (this.monthlyBusy === ticket.revision) throw new Error("当前月度批次正在处理，请等待完成");
-    this.monthlyBusy = ticket.revision;
-    let commitReturned = false;
-    try {
-      const result = await this.ports.busy(() => this.ports.api.commitTeamMonthlyImport(ticket.value.batch_id));
-      commitReturned = true;
-      if (!ticket.current()) return { result, current: false };
-      if (result.batch_id !== ticket.value.batch_id) throw new Error("提交结果批次不匹配，请核查原预检批次");
-      const refreshed = await this.ports.api.readTeamMonthlyImportPreview(result.batch_id);
-      if (!ticket.current()) return { result, current: false };
-      this.verifyBatch(ticket.value, refreshed); this.monthlyValue = teamSnapshot(refreshed); return { result, current: true };
-    } catch (error) {
-      if (!ticket.current()) return null;
-      if (commitReturned) throw new Error(`提交已返回，但批次读回未能核实；请先核对原批次，勿直接重复提交：${error instanceof Error ? error.message : String(error)}`, { cause: error });
-      throw error;
-    }
-    finally { if (this.monthlyBusy === ticket.revision) this.monthlyBusy = null; }
-  }
+  commitMonthly(ticket?: ImportTicket) { return this.monthlyBatch.commit(ticket); }
   async exportPackage() {
     const ticket = this.packageTicket(), preview = structuredClone(ticket.value);
     const base = preview.source_file_name.replace(/\.xlsx$/i, "").trim() || "球队完整资料包";

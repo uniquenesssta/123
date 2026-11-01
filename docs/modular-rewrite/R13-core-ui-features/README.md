@@ -1,6 +1,6 @@
 # R13 基础数据与编排业务模块化：执行索引
 
-阶段状态：**IN_PROGRESS；R13-UI01 DONE，R13-09 IN_PROGRESS**。分支 `rewrite/r13-core-ui-features`，起点f0770665；01、02、03（含04）、05、06及原10保持DONE。用户最新明确启动07，覆盖原07/08，详[07实施记录](R13-07-presets-and-paired-lineups.md)。07与UI01均已核验自身精确CI/双bundle/startup并DONE；用户已授权R13-09，当前开始工作簿剩余编排与批准S09设计补差。R12保持结束。
+阶段状态：**IN_PROGRESS；R13-UI01 DONE，R13-09 VERIFYING**。分支 `rewrite/r13-core-ui-features`，起点f0770665；01、02、03（含04）、05、06及原10保持DONE。用户最新明确启动07，覆盖原07/08，详[07实施记录](R13-07-presets-and-paired-lineups.md)。07与UI01均已核验自身精确CI/双bundle/startup并DONE；用户已授权R13-09，工作簿剩余编排与批准S09设计补差已实现且本地验证通过，等待自身精确CI/安装包验收。R12保持结束。
 
 最新规划：[17页/40项接入处置表](../ui-integration-disposition-20261031.md)。以下表格为当前状态；表后按时间追加的记录为历史，暂停及恢复均按用户最新指令，本次已明确恢复07。
 
@@ -16,7 +16,7 @@
 | R13-06 球员/履历/观察 | DONE | [实施记录](R13-06-player-catalog-history-and-observations.md)：30行为/26浏览器/16原HTML/原生目录读取通过，完整96步前端及3683b7f3精确CI/双bundle/startup已收尾；承接BA-05/07 |
 | R13-UI01 已交付6页设计补差 | DONE：5613bdcd/run41228822906及摘要/双bundle/startup核验通过 | [实施记录](R13-UI01-approved-screen-deltas.md)；六页批准设计补差，不重开已DONE业务 |
 | R13-07 预设/双方阵容 | DONE | [实施记录](R13-07-presets-and-paired-lineups.md)；855d830b精确run41211916572/双bundle/startup已核验 |
-| R13-09 工作簿 | IN_PROGRESS | [实施记录](R13-09-workbook-workflows.md)；复用原Team/Player/Match owner；真实文件/账本按BA-04/07承接 |
+| R13-09 工作簿 | VERIFYING | [实施记录](R13-09-workbook-workflows.md)；复用原Team/Player/Match owner；真实文件/账本按BA-04/07承接 |
 
 R13-01已将两个实际View迁至各自Feature公开入口，首页投影独立，Session/Router/Workspace唯一owner保持；原HTML精确比较一致。96步前端、7项新生产模块行为、18项Windows浏览器生产运行及Windows原生startup通过。Rust源码/依赖不变，完整Rust测试复用已有同树证据，本批仅实际重建桌面开发版。
 
@@ -53,3 +53,5 @@ R13-03历史快照：赛事目录/层级与规则/绑定/路由分别归属两�
 用户最新授权收尾07并启动UI01：07精确CI/产物摘要/双bundle/startup已收尾，UI01执行中；下一项R13-09。
 
 2026-11-01：UI01精确5613bdcd/run41228822906/job124618520571 SUCCESS，artifact13053338926官方摘要及MSI/NSIS/startup独立核验通过，正式DONE。用户已启动R13-09，下一交付为工作簿，不重开R12或前批业务。
+
+2026-11-01 R13-09：复用三领域唯一批次，接通S09及文件/模式/类别/比赛目标确认、原批次恢复；完整96步后，最终受影响24行为/55挂载、类型/构建通过，原生三模板实际生成。自身CI/双bundle/startup待验，不标DONE、不轮询；真实外部账本保留。下一项R14-01（输入、准入与推演执行），未启动。
