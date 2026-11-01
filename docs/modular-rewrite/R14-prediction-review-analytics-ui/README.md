@@ -6,7 +6,7 @@
 | --- | --- | --- |
 | R14-01 输入、准入与推演执行（原01～05） | DONE | [实施记录](R14-01-context-readiness-and-execution.md) |
 | R14-06 P4研究证据与冻结 | DONE | [实施记录](R14-06-research-evidence-and-freeze.md) |
-| R14-07 运行记录与血缘 | VERIFYING | [实施记录](R14-07-run-history-and-lineage.md) |
+| R14-07 运行记录与血缘 | DONE | [实施记录](R14-07-run-history-and-lineage.md) |
 | R14-08 复盘选择、事实与包提交 | PLANNED | 等待07 |
 | R14-12 赛后结算与监控 | PLANNED | 等待08 |
 | R14-13 分析查询、长任务与建议包 | PLANNED | 等待12 |
@@ -24,3 +24,5 @@ R14-07本地适用验证通过，CI/官方产物待精确提交验收；下一�
 07首轮代码da42c749的[CI 41310468919](https://github.com/uniquenesssta/123/actions/runs/41310468919)最终failure；已定位首页启动等待并完成受控复现和验收设施修复，完整复验/新CI待验。07保持VERIFYING，最新证据见07记录，不轮询PR/CI。
 
 07启动验收修复f38b52dd已推送，完整96步复验通过；自身[CI 41314470020](https://github.com/uniquenesssta/123/actions/runs/41314470020)单次核查为in_progress。07保持VERIFYING，官方包尚未验收，下一项08未启动。
+
+07已正式收尾DONE：f38b52dd自身CI41314470020 success，官方digest/双安装包/包内startup验收通过。用户授权下一项R14-08，开始前沿用同一R14分支和干净工作区；详细证据见07记录。

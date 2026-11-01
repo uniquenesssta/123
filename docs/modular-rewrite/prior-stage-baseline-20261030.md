@@ -54,7 +54,7 @@ R12按用户最新明确纠正保持已结束。本核对不修改R1～R12任务
 | BA-12 / 继承边界与真实环境待验 | R10记录跨Port事务、供应商逐组autocommit、文件先写后元数据、重复影子报告后续更新；九步复盘/结算幂等、候选人工门禁、隔离和不可变报告未获新库实证 | R14-08/12/13/16/17逐域检查，部分失败必须可追溯并可恢复，不前端拼接全成功；R17-06验证实际账本、时间切分、生产绑定/回滚及不可变触发器，R18拒绝未闭合报告 |
 | BA-13 / 真实环境待验 | 公开保护资产静态一致；检查器明确私有P4/P7资产缺席，不具备私有Golden Master通过证据 | R14-01/06/08/16保持私有ModelProvider与公开unavailable边界；R17-06取得授权资产并运行原固定回归，缺失则阻塞最终验收；不以公开stub/模拟概率替代 |
 | BA-14 / 真实环境待验 | R1以来Full/用户Windows实机与当前候选验证不可由startup替代；两个既有数据库runner仅默认调match_catalog与postgres_integration，不覆盖所有20个现存target文件 | R17-01建立实际target/操作矩阵，R17-06执行专用新库、完整客户端链与额外必要contracts，R18-01核对最终MSI/NSIS来源及安装运行；不得把文件数量当执行数量或自动回车替代Full操作 |
-| BA-15 / 两条登记过渡边均实际退出，07交付待验 | R14-06研究归属Prediction；R14-07将Runs选择/详情/隐藏归入独立Runs Feature，Session保持唯一目录缓存；prediction通过真实公开接口消费历史，不再导入pages/runs。18 Feature实际调用图验证，前端transitional_imports为零，无例外扩张。不是只删除清单 | 07本地与交付证据见[R14-07记录](R14-prediction-review-analytics-ui/R14-07-run-history-and-lineage.md)；07精确CI/包待验，R16-09仍需复核实际图与登记一致 |
+| BA-15 / 两条登记过渡边均实际退出，07已验收 | R14-06研究归属Prediction；R14-07将Runs选择/详情/隐藏归入独立Runs Feature，Session保持唯一目录缓存；prediction通过真实公开接口消费历史，不再导入pages/runs。18 Feature实际调用图验证，前端transitional_imports为零，无例外扩张。不是只删除清单 | 07本地与交付证据见[R14-07记录](R14-prediction-review-analytics-ui/R14-07-run-history-and-lineage.md)；07修复代码f38b52dd精确CI41314470020、官方摘要/双包/startup已验收，R16-09仍需复核实际图与登记一致 |
 | BA-16 / 状态解释已明确，最终证据待核 | R12用户确认结束优先于保留索引中的旧快照；旧记录不提供当前最终候选的全量证明，也不据此要求重做R12-19 | R13-01沿用户最新状态开始前置核对；R17-01维护现有基础设施断言，R18-01验证精确最终候选。需要追溯旧证据时单次核精确提交，不轮询、不冒称未查的CI已通过 |
 
 ### BA-02四项必须分别关闭

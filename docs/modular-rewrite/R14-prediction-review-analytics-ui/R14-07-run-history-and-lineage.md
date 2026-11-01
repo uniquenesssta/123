@@ -1,6 +1,6 @@
 # R14-07 运行记录与血缘
 
-状态：VERIFYING。本地适用验证完成，精确07提交的CI/官方摘要/双包/包内startup待验收。用户授权收尾06并开始07，持续推送授权有效，不轮询PR/CI。
+状态：DONE。07修复代码的精确CI、官方摘要、双安装包和包内startup已核验通过。用户授权收尾06并开始07，持续推送授权有效，不轮询PR/CI。
 
 分支 `rewrite/r14-prediction-review-analytics-ui`，基线 `8e2d444ba4ab0cd6f596776d0a72afc5446dd64a`，开始时工作区干净。06代码5171f779、精确CI41297701399、官方摘要、MSI/NSIS和包内startup已独立验收DONE，不用06证据替代07。
 
@@ -78,3 +78,11 @@
 修复代码 `f38b52dd6d930a7a2bc0182ee45bdc3d7c24370b` 已推送（6路径：2新增、4修改，无删除）。单次按该SHA、原R14分支及push事件核查 [CI 41314470020](https://github.com/uniquenesssta/123/actions/runs/41314470020)，当次in_progress，conclusion为空。未重新轮询首轮失败运行，未将文档提交或其他任务CI混用。本轮CI、官方双包/摘要/包内startup尚未验收，R14-07保持VERIFYING。
 
 本轮temporary-artifact-manifest.json记录88个明确目录移动（含一次性staging）；必要证据保留logs，其他归档到O:/Project/FOODBALL/tmp/old/r14-07-ci-fix-20261101，无批量删除。下一项仍为R14-08，未启动。
+
+## 正式收尾
+
+修复代码f38b52dd6d930a7a2bc0182ee45bdc3d7c24370b自身CI41314470020/job124871488684最终success，全部步骤通过；按R14分支、精确head_sha及官方artifact13087384560核对，不混用文档提交或首轮失败运行。官方ZIP 52,366,817字节，SHA256 7785efc1ec7ea9bdbff6380a52be603f12805a6a547025e52adf45ca46bb29d9，下载与官方digest一致。
+
+MSI 18,006,016字节、OLE头有效，SHA256 e390851a77f924facef45e7be493ef8bd9571ec39acf7430077a2f389af6f7c1；NSIS 15,646,695字节、MZ头有效，SHA256 b044a97ee12ef62916516b2d6b00f67be6cb382c73928f2482057ffd07d3dd4c。包内windows-acceptance-20261101-140718.json为startup/pass，7条有效记录、0无效行、0运行错误，bootstrap/read_workspace_state/save_workspace_state均完成。未冒称本地重新安装或Full。
+
+证据O:/Project/FOODBALL/logs/r14-07-ci-41314470020/acceptance.json和官方ZIP。07适用出口DONE，原批准BA-08真实完整链仍由R17-06承接。用户已授权下一项R14-08复盘选择、事实与包提交；本次不实施14-12结算。
