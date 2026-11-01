@@ -1,6 +1,6 @@
 # R13-UI01 六页批准设计补差
 
-状态：**VERIFYING：本地验收通过，等待本批精确CI与安装产物核验**。分支 `rewrite/r13-core-ui-features`，实施基线 `ac586e3d`（07收尾文档），代码继承 `855d830b`。07保持DONE；不重开R12或01～07，不启动09。用户已持续授权本分支提交推送。
+状态：**DONE：本地验收及精确CI、双安装产物和包内startup均已核验**。分支 `rewrite/r13-core-ui-features`，实施基线 `ac586e3d`（07收尾文档），代码继承 `855d830b`。07保持DONE；不重开R12或01～07，不启动09。用户已持续授权本分支提交推送。
 
 ## 设计依据与边界
 
@@ -66,3 +66,11 @@ UI01-V1～V5对照：V1由80个实际View组合与六页1440完整截图及独�
 仅查询一次[本批CI run41228822906](https://github.com/uniquenesssta/123/actions/runs/41228822906)：push事件、分支与head_sha精确匹配5613bdcd，查询时`in_progress`、`conclusion=null`。**未通过验收的项目是本批CI/双安装包及包内startup，不能把07或本地startup作为本批CI通过。** 不轮询、不取消其他运行。
 
 后续收尾只核该代码SHA的完成状态、成功job、artifact摘要、MSI/NSIS与包内startup，成功后才记UI01 DONE，再由用户启动R13-09。当前后续文档交接提交仅修改Markdown，不是另一次UI代码CI；代码验收始终锚定5613bdcd。
+
+## 2026-11-01 正式收尾
+
+用户明确要求收尾UI01并开始09。单次核验精确代码5613bdcde344ba3c9fc99da8e3a9791b30bbcf3f的[run41228822906](https://github.com/uniquenesssta/123/actions/runs/41228822906)与job124618520571，push/分支/head全部匹配，run及全部job步骤SUCCESS；完成于北京时间2026-11-01 03:02:16。未查询PR、未轮询、未取消或重跑。
+
+artifact13053338926（52,337,622字节）下载SHA256与官方digest一致：9ceed2f12c95e01f381f57b1e43f605744c7ce6035406d82cc4202fd91e26362。MSI 17,993,728字节，OLE头正确，SHA256 811f6287ade41a61119ed6ef2b2f7eda9d0304835206452e0b675c5ae8531ce0；NSIS 15,632,017字节，MZ头正确，SHA256 aa99fbb842a20754d5e764967b1d37c55600bc5ea6c19e954ab53ae612d66585。包内windows-acceptance-20261031-182034.json为startup/pass，7条记录、bootstrap/read_workspace_state/save_workspace_state三类完成、0错误/0必需缺失；不等于Full或本机重新安装。
+
+证据保留于O:/Project/FOODBALL/logs/r13-ui01-ci-41228822906，acceptance.json记录来源、包摘要及原始startup。本批正式DONE；原BA外部待验不变。此前VERIFYING段落保留为历史交接，不再代表当前状态。下一项R13-09已获用户明确启动授权。

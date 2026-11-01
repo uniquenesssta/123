@@ -1,8 +1,12 @@
 # 足球模型平台公开外壳
 
-## R13-UI01 六页批准设计补差（本地通过，VERIFYING）
+## R13-09 工作簿（实施中）
 
-R13-07的精确855d830b/run41211916572及产物摘要、双bundle和startup已核验收尾。首页、球队、球员、赛事规则、数据库与架构六页已按批准设计补差，保留真实业务owner。完整96步、80设计场景/1648检查、126项完整挂载、Windows原生15项/40日志及startup通过；本批CI/双bundle仍待单独核验，保持VERIFYING。详[UI01记录](docs/modular-rewrite/R13-core-ui-features/R13-UI01-approved-screen-deltas.md)。UI01完成后下一项R13-09，未提前启动。
+UI01已正式DONE：5613bdcd/run41228822906及官方产物摘要、MSI/NSIS和包内startup均核验通过。已授权开始09，复用现有领域导入owner，完成S09批准设计和类型/文件/模式/批次确认隔离。详[09记录](docs/modular-rewrite/R13-core-ui-features/R13-09-workbook-workflows.md)。
+
+## R13-UI01 六页批准设计补差（DONE）
+
+R13-07的精确855d830b/run41211916572及产物摘要、双bundle和startup已核验收尾。首页、球队、球员、赛事规则、数据库与架构六页已按批准设计补差，保留真实业务owner。完整96步、80设计场景/1648检查、126项完整挂载、Windows原生15项/40日志及startup通过；本批精确CI/双bundle和包内startup已核验，正式DONE。详[UI01记录](docs/modular-rewrite/R13-core-ui-features/R13-UI01-approved-screen-deltas.md)。R13-09已获用户启动授权。
 
 ## R13-07 预设与双方阵容（2026-10-31 DONE）
 
