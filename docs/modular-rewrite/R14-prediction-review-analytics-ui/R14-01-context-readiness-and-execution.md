@@ -70,3 +70,11 @@ API 保留原名和参数：`inspectMatchPredictionReadiness`、`readMatchLineup
 进程 TEMP/TMP 使用 `O:/Project/FOODBALL/tmp`，经既有 project-temp.ps1 配置。必要日志、最终截图、原生证据与依赖保留；本批可确认无用的浏览器 profile／一次性辅助文件按明确清单归档到 old，未批量或递归删除。已按pre/final清单将129个退出的浏览器profile移至 `O:/Project/FOODBALL/old/r14-01-20261101-browser-profiles`，另9项初验/旧失败产物移至同级prior-attempts目录。清单为temporary-cleanup-{pre,final}-{manifest,result}.json及supporting-cleanup.json。全部为归档移动、删除数0。
 
 回退点为本批起点 `3d9363fe`；变更限定于前端推演职责与相关验证／记录，不覆盖用户数据、不改数据库或私有资产。自身 CI／双安装包／包内 startup 尚未核验前保持 VERIFYING，不提前交付 R14-06。下一项：**R14-06 P4研究证据与冻结**。
+
+## 2026-11-01 推送交接
+
+代码提交 `866ba00399b5e8930530df75e71e1609ab47a61f` 已推送到本节所列R14分支：34路径，15新增、19修改、0删除，工作区已核对。完整96步exit 0；27行为、40挂载、最终类型/Vite构建及提交后Windows原生startup通过，受测源码归属对应此提交。
+
+仅单次查询该精确SHA的push事件：[Public Platform CI run 41285690142](https://github.com/uniquenesssta/123/actions/runs/41285690142)。创建于2026-11-01 15:39:57（北京时间）；当次状态in_progress、conclusion为空。未轮询PR/CI，未把已启动说成通过，尚未下载或验收本批MSI/NSIS及包内startup；本批保持VERIFYING。后续收尾须从该代码SHA核对CI和产物，不能使用文档交接提交代替代码CI。
+
+`ci-once.json`保存单次响应，`handoff.json`及`final-hashes.json`保存本地交接和证据摘要。另将本批一次性staging目录移入 `O:/Project/FOODBALL/old/r14-01-20261101-staging`，不删除文件；最终证据、生产测试及可复用依赖保留。下一项仍为R14-06，尚未启动。

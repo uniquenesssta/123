@@ -20,7 +20,7 @@
 
 ## 状态与依赖
 
-当前 **R14-01 VERIFYING（本地实现完成，自身CI/包待验），其余批次PLANNED、未启动**。R13适用出口已完成且用户已授权01；分支rewrite/r14-prediction-review-analytics-ui，基线3d9363fe。见[执行索引](../modular-rewrite/R14-prediction-review-analytics-ui/README.md)。下表顺序是默认交付顺序，必要时在已授权阶段内按真实依赖拆出更小批次并说明原因，不以任务数量或文件数为目标。
+当前 **R14-01 VERIFYING（本地实现完成，自身CI/包待验），其余批次PLANNED、未启动**。R13适用出口已完成且用户已授权01；分支rewrite/r14-prediction-review-analytics-ui，基线3d9363fe。代码866ba003已推送，自身CI41285690142单次核对进行中、未计通过。见[执行索引](../modular-rewrite/R14-prediction-review-analytics-ui/README.md)。下表顺序是默认交付顺序，必要时在已授权阶段内按真实依赖拆出更小批次并说明原因，不以任务数量或文件数为目标。
 
 | 主交付 ID | 交付批次 | 前置 |
 |---|---|---|

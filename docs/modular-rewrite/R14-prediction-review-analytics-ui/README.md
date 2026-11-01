@@ -14,3 +14,5 @@
 | R14-17 应用内验收与报告 | PLANNED | 等待16 |
 
 下一项为R14-06，不自动启动。
+
+R14-01代码`866ba003`已推送；自身[CI 41285690142](https://github.com/uniquenesssta/123/actions/runs/41285690142)单次核对为in_progress，双安装包/包内startup待验，不轮询。
