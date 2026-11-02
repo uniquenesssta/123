@@ -1,6 +1,6 @@
 # R14-13 分析查询、长任务与建议包
 
-状态：VERIFYING（实现及本地适用验证完成，13自身CI/官方安装包待推送后按精确SHA验收）。用户授权“收尾12开始13”，覆盖原13～15；后续主交付R14-16未启动。开始基线fd9b32dd924b6b7b6255d8f2816c624bb5611f0f，12精确CI/官方包已验收，收尾文档本地提交24e39945。沿用rewrite/r14-prediction-review-analytics-ui，R12保持DONE。
+状态：DONE（自身精确CI、官方摘要、双安装包和包内startup已核验）。用户授权“收尾12开始13”，覆盖原13～15；后续主交付R14-16未启动。开始基线fd9b32dd924b6b7b6255d8f2816c624bb5611f0f，12精确CI/官方包已验收，收尾文档本地提交24e39945。沿用rewrite/r14-prediction-review-analytics-ui，R12保持DONE。
 
 ## 实际范围和唯一归属
 
@@ -55,3 +55,13 @@ Windows实际诊断全流程15项及startup（74条、0无效、0运行错误）
 BA-12实际不可变账本/跨Port事务/并发/完整有样本分析与真实回包链仍按批准安排由R17-06关闭；本批受控外部测试及空样本原生检查不能抵销Full或私有P4成功。文件先写后审计失败可能留文件，UI保留“未核实”并提示核对原文件/记录，不虚构回滚。
 
 回退参考fd9b32dd/24e39945，但代码回退不撤销真实任务/快照/已写建议。TEMP/TMP为O:/Project/FOODBALL/tmp；每次成功推送后实际逐文件清空唯一tmp/old，不跟随重解析目标，保留必要证据与可复用工具。后续R14-16，未启动。
+
+## 正式收尾（2026-11-03）
+
+65e11ddc242f2ec4f24ea82faeed8c0f9970e32b的CI41402896621 / job125138395598在原R14分支、push、ci.yml下success，已一次性核对。官方artifact13124247175 ZIP 52440688字节，SHA256 b308aec2b7a21ee1f618eee72b7d3eca9182c6339d9ab36472761fb38516a720，下载摘要与官方digest一致。
+
+足球赛事模型平台_0.23.0_x64_zh-CN.msi：18051072字节，SHA256 7bfae3649c50e9c10d7cca17e135e205d15735d93f9a4d1db0cd3dc9f42294d4，文件头格式有效（非数字签名验证）。
+
+足球赛事模型平台_0.23.0_x64-setup.exe：15682483字节，SHA256 36d63bbe4e654e7657eee7439e7998a56116189828e0bd5d8773fd81e5b4a29c，文件头格式有效（非数字签名验证）。
+
+包内startup/pass：7条日志、0无效、0运行错误，bootstrap/read_workspace_state/save_workspace_state完成；不冒称本地重装或Full。证据O:/Project/FOODBALL/logs/r14-13-ci-41402896621/acceptance.json。上次推送后tmp/old已实际清空65683文件、38170空目录及2链接，独立复查0项。BA-12/私有模型外部验收继续由R17-06承接。下一主交付R14-16已获用户授权。

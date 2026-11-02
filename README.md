@@ -1,8 +1,8 @@
 # 足球模型平台公开外壳
 
-## R14-13 分析查询、长任务与建议包（VERIFYING）
+## R14-13 分析查询、长任务与建议包（DONE）
 
-已按最新S12接入四指标、横向步骤和单一滚动区，查询、任务、文件与人工决定归入Analytics Feature；修复并发分析读取其他快照、导入确认后文件被替换和跨库来源混用。完整96步前端及最终差异复验、753项Rust测试、48项分析挂载、15项Windows原生实际诊断及最终9项只读验证通过；13自身CI/官方双包待按新提交验收，不轮询。真实有样本/事务链按BA-12承接，详[13记录](docs/modular-rewrite/R14-prediction-review-analytics-ui/R14-13-analysis-jobs-and-packages.md)。下一主交付R14-16，未启动。
+已按最新S12接入四指标、横向步骤和单一滚动区，查询、任务、文件与人工决定归入Analytics Feature；修复并发分析读取其他快照、导入确认后文件被替换和跨库来源混用。完整96步前端及最终差异复验、753项Rust测试、48项分析挂载、15项Windows原生实际诊断及最终9项只读验证通过；13自身CI41402896621及官方摘要/双包/startup已核验，不轮询。真实有样本/事务链按BA-12承接，详[13记录](docs/modular-rewrite/R14-prediction-review-analytics-ui/R14-13-analysis-jobs-and-packages.md)。下一主交付R14-16，未启动。
 
 ## R14-12 赛后结算与监控（DONE）
 

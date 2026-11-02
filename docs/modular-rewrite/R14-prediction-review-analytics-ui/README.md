@@ -1,6 +1,6 @@
 # R14 推演、复盘与分析界面
 
-当前R14-12已按自身fd9b32dd/CI41375966354、官方摘要、双包和startup正式DONE。用户授权的R14-13已完成实现及本地适用验证，状态VERIFYING；13自身CI与安装包按新提交另验，不轮询。沿用rewrite/r14-prediction-review-analytics-ui，R12保持DONE。
+当前R14-12已按自身fd9b32dd/CI41375966354、官方摘要、双包和startup正式DONE。用户授权的R14-13已完成实现及本地适用验证，13自身CI41402896621及官方摘要、双包、startup已核验DONE；16已获授权，IN_PROGRESS，不轮询。沿用rewrite/r14-prediction-review-analytics-ui，R12保持DONE。
 
 | 主交付 | 状态 | 记录 |
 | --- | --- | --- |
@@ -9,8 +9,8 @@
 | R14-07 运行记录与血缘 | DONE | [实施记录](R14-07-run-history-and-lineage.md) |
 | R14-08 复盘选择、事实与包提交（原08～11） | DONE | [实施记录](R14-08-review-facts-and-package.md) |
 | R14-12 赛后结算与监控 | DONE | [实施记录](R14-12-postmatch-settlement-and-monitoring.md) |
-| R14-13 分析查询、长任务与建议包（原13～15） | VERIFYING | [实施记录](R14-13-analysis-jobs-and-packages.md) |
-| R14-16 能力与参数候选决策 | PLANNED | 等待13正式收尾及用户启动指令 |
+| R14-13 分析查询、长任务与建议包（原13～15） | DONE | [实施记录](R14-13-analysis-jobs-and-packages.md) |
+| R14-16 能力与参数候选决策 | IN_PROGRESS | 用户授权“收尾13开始16” |
 | R14-17 应用内验收与报告 | PLANNED | 等待16 |
 
 01代码866ba003/CI41285690142、06代码5171f779/CI41297701399、07修复代码f38b52dd/CI41314470020、08修复代码40c2df90/CI41350740759及12代码fd9b32dd/CI41375966354均已按精确提交核验success、官方摘要、双安装包和包内startup。08初次c07b798c在共享夹具冷启动失败，修复与原始证据见08记录，不核销失败历史。
