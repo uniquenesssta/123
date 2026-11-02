@@ -1,3 +1,4 @@
+import {verifyPostmatchBrowser} from "../features/verifyPostmatchBrowser.mjs";
 import {verifyMountedApplication} from "./verifyMountedApplication.mjs";
 import {verifyReviewBrowser} from "../features/verifyReviewBrowser.mjs";
 import {verifyMountedReadiness} from "./verifyMountedReadiness.mjs";
@@ -171,3 +172,5 @@ await verifyResearchBrowser(root,join(directory,"research-mounted"));
 
 await verifyReviewBrowser(root,join(directory,"review-mounted"));
 await verifyRunsBrowser(root,join(directory,"runs-mounted"));
+
+await verifyPostmatchBrowser(root,join(directory,"postmatch-mounted"));

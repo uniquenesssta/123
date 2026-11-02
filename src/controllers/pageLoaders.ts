@@ -8,7 +8,6 @@ import type {
   LineupRecord,
   ParameterTuningCandidateRecord,
   PlayerCatalogReferenceData,
-  PostmatchOverview,
 } from "../types";
 
 
@@ -24,7 +23,6 @@ export interface AnalysisCenterLoadResult {
   readonly suggestions: AiAnalysisSuggestionRecord[];
   readonly abilityCandidates: AbilityUpdateCandidateRecord[];
   readonly tuningCandidates: ParameterTuningCandidateRecord[];
-  readonly postmatch: PostmatchOverview;
 }
 
 export async function fetchLineups(): Promise<LineupsLoadResult> {
@@ -37,13 +35,12 @@ export async function fetchLineups(): Promise<LineupsLoadResult> {
 }
 
 export async function fetchAnalysisCenter(): Promise<AnalysisCenterLoadResult> {
-  const [overview, jobs, suggestions, abilityCandidates, tuningCandidates, postmatch] = await Promise.all([
+  const [overview, jobs, suggestions, abilityCandidates, tuningCandidates] = await Promise.all([
     api.analyticsOverview(),
     api.listBackgroundJobs(100),
     api.listAiAnalysisSuggestions(null, 500),
     api.listAbilityCandidates("pending", 500, null),
     api.listParameterTuningCandidates(100),
-    api.postmatchOverview(100),
   ]);
-  return { overview, jobs, suggestions, abilityCandidates, tuningCandidates, postmatch };
+  return { overview, jobs, suggestions, abilityCandidates, tuningCandidates };
 }

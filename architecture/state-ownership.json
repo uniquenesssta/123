@@ -867,8 +867,22 @@
       ],
       "transition": null,
       "migration_task": "R14-08"
+    },
+    {
+      "id": "feature.postmatch-workflow",
+      "owner": "src/features/postmatch/postmatchFeature.ts::PostmatchFeature",
+      "scope": "postmatch reads, exact review settlement and evidence/monitoring workflows; backend owns immutable ledgers, scoring and partition policy",
+      "writers": [
+        "PostmatchFeature and its composed SettlementWorkflow/EvidenceWorkflow/MonitoringWorkflow"
+      ],
+      "forbidden": [
+        "src/pages/**",
+        "src/api/**"
+      ],
+      "transition": null,
+      "migration_task": "R14-12"
     }
   ],
-  "count": 60,
-  "last_updated_task": "R14-08"
+  "count": 61,
+  "last_updated_task": "R14-12"
 }

@@ -14,7 +14,7 @@ const styles = read("src/styles/app.css");
 for (const label of ["形成历史样本", "运行完整分析", "通过质量门禁", "受控校准"]) {
   requireTrue(page.includes(label), `分析与历史缺少链路阶段：${label}`);
 }
-for (const condition of ["postmatch.settlement_count > 0", "overview?.generated_at", "quality?.critical", "pendingReviewCount === 0"]) {
+for (const condition of ["(postmatch?.settlement_count ?? 0) > 0", "overview?.generated_at", "quality?.critical", "pendingReviewCount === 0"]) {
   requireTrue(page.includes(condition), `分析链路缺少完成条件：${condition}`);
 }
 for (const guard of ["analysisHistoryReady", "fullAnalysisReady", "analysisQualityReady", "analysisReviewGateReady"]) {

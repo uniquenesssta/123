@@ -117,11 +117,11 @@ for (const action of ["export-match-review-package", "preview-match-review-packa
 for (const label of ["选择比赛", "导出赛后复盘资料包", "在外部补充真实比赛事实和球员量化数据", "导入并预检", "人工确认", "写入真实赛后事实", "生成正式复盘", "正式结算", "进入分析与历史"]) check(page.includes(label), `复盘页缺少固定链路阶段：${label}`);
 for (const label of ["本步用途", "完成条件", "阻塞原因", "下一步动作"]) check(page.includes(label), `复盘步骤缺少可见说明：${label}`);
 for (const label of ["赛前值", "当前数据库值", "准备导入值", "身份匹配情况"]) check(page.includes(label), `复盘预检缺少可见对照：${label}`);
-check(page.replace(/\s+/g,"").includes("reviewWorkflowView(feature,facts,step)") && page.replace(/\s+/g,"").includes("reviewRail(feature,step)"), "无比赛时仍应固定渲染九步及当前任务");
+check(page.replace(/\s+/g,"").includes("reviewWorkflowView(feature,facts,step,postmatch)") && page.replace(/\s+/g,"").includes("reviewRail(feature,step)"), "无比赛时仍应固定渲染九步及当前任务");
 check(page.includes("review-stage-rail") && page.includes("review-task-panel") && page.includes("select-review-workflow-step"), "九步链路未采用固定步骤轨道与当前步骤工作区");
 check(!page.includes("selected ? reviewPackageWorkspace"), "赛后复盘链路仍会在未选择比赛时被整体隐藏");
 check(page.includes("赛前预计/确认阵容与模型快照不会被覆盖") || page.includes("不覆盖赛前快照"), "复盘页未明确赛前快照不可覆盖");
-check(loader.includes("readMatchReviewPackageWorkflow") && loader.includes("listPostmatchSettlements"), "复盘页加载器未恢复持久化工作流和结算状态");
+check(loader.includes("readMatchReviewPackageWorkflow") && loader.includes("this.ports.postmatch.load(settlementTarget(detail),current)") && read("src/features/postmatch/settlementWorkflow.ts").includes("this.runtime.api.listPostmatchSettlements(500)"), "复盘页加载器未恢复持久化工作流和结算状态");
 check(domain.includes("pub preview: Option<MatchReviewPackagePreview>") && persistence.includes("workflow.preview_payload") && loader.replace(/\s+/g,"").includes("getpreview(){returnthis.state.workflow?.preview??null;}") && main.includes("reviewFeature.preview"), "页面重启后未恢复本轮持久化预检结果");
 check(loader.replace(/\s+/g,"").includes("choiceId:null,selectedMatchId:null") && !loader.includes("this.data.matches[0]"), "通用入口必须等待明确选择，不能将第一场隐式变成写入对象");
 

@@ -1,8 +1,9 @@
+import {settlementTarget} from '../postmatch/index';
 import type { MatchReviewDetail, MatchReviewPackageWorkflowAction, PostmatchSettlementRecord } from '../../types';
 import { matchReviewWorkflowAllows, matchReviewWorkflowCompleted } from '../../app/matchReviewWorkflow';
 import { readReviewLineups, validateReview, validateWorkflow, workflowVersion } from './reviewQueries';
 import type { ReviewIntent, ReviewOperation, ReviewPorts, ReviewReceipt, ReviewState } from './reviewPorts';
-const initial = (): ReviewState => ({ matches: [], reviews: [], choiceId: null, selectedMatchId: null, lineups: [], detail: null, workflow: null, settlement: null, loading: false, listLoading: false, loaded: false, error: null, notice: null });
+const initial = (): ReviewState => ({ matches: [], reviews: [], choiceId: null, selectedMatchId: null, lineups: [], detail: null, workflow: null, loading: false, listLoading: false, loaded: false, error: null, notice: null });
 const action: Partial<Record<ReviewOperation, MatchReviewPackageWorkflowAction>> = { export: 'export_package', preview: 'preview_import', confirm: 'confirm_import', facts: 'commit_facts', generate: 'generate_review' };
 const timestamp = (value: unknown) => typeof value === 'string' && Number.isFinite(Date.parse(value));
 /** Review owns its directory, selected object and readbacks. Backend alone grants workflow capability. */
@@ -74,7 +75,7 @@ export class ReviewFeature {
         this.enterScope();
         this.selectionRevision++;
         this.detailRevision++;
-        Object.assign(this.data, { choiceId: id, selectedMatchId: id, lineups: [], detail: null, workflow: null, settlement: null, error: null, notice: null, loading: false });
+        Object.assign(this.data, { choiceId: id, selectedMatchId: id, lineups: [], detail: null, workflow: null, error: null, notice: null, loading: false });
     }
     choose(id: string | null): void { this.setSelection(null); this.data.choiceId = id; this.changed(); }
     async select(id: string, reviewId?: string): Promise<boolean> {
@@ -87,7 +88,7 @@ export class ReviewFeature {
         this.data.loading = true;
         this.changed();
         try {
-            const [lineups, workflow, settlements] = await Promise.all([readReviewLineups(this.ports.api, id), this.ports.api.readMatchReviewPackageWorkflow(id), this.ports.api.listPostmatchSettlements(100)]);
+            const [lineups, workflow] = await Promise.all([readReviewLineups(this.ports.api, id), this.ports.api.readMatchReviewPackageWorkflow(id)]);
             if (!current() || serial !== this.detailRevision)
                 return false;
             validateWorkflow(workflow, id);
@@ -97,7 +98,9 @@ export class ReviewFeature {
                 return false;
             if (detail)
                 validateReview(detail, actualReviewId!, id);
-            Object.assign(this.data, { lineups, workflow, detail, settlement: settlements.find(item => item.match_id === id) ?? null });
+            if(detail)await this.ports.postmatch.load(settlementTarget(detail),current);
+            if(!current()||serial!==this.detailRevision)return false;
+            Object.assign(this.data, { lineups, workflow, detail });
             return true;
         }
         catch (error) {
@@ -428,8 +431,7 @@ export class ReviewFeature {
         this.data.notice = '已明确采用当前数据库登记的文件状态；未将原文件请求认定为成功，也未重发或写入事实。';
         this.changed();
     }
-    adoptSettlement(settlement: PostmatchSettlementRecord): void { if (settlement.match_id === this.state.selectedMatchId)
-        this.data.settlement = settlement; }
+    get settlement():PostmatchSettlementRecord|null {return this.ports.postmatch.recordFor(this.state.detail?.summary.id??null,this.state.selectedMatchId);}
     adoptDetail(detail: MatchReviewDetail): void { if (detail.summary.match_id === this.state.selectedMatchId)
         this.data.detail = detail; }
 }

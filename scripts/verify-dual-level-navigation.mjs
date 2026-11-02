@@ -161,14 +161,15 @@ await test("return context contains only location and is consumed once", () => {
 // Compile only the named real feature loading functions; inject I/O, never a copied loader.
 const main = read("src/main.ts");
 const source = ts.createSourceFile("main.ts", main, ts.ScriptTarget.Latest, true);
-const functions = source.statements.filter(node => ts.isFunctionDeclaration(node) && ["loadNavigationPage", "loadApiWorkspace"].includes(node.name?.text)).map(node => node.getText(source)).join("\n");
-assert.equal(source.statements.filter(node => ts.isFunctionDeclaration(node) && ["loadNavigationPage", "loadApiWorkspace"].includes(node.name?.text)).length, 2);
+const functions = source.statements.filter(node => ts.isFunctionDeclaration(node) && ["loadNavigationPage", "loadApiWorkspace", "loadAnalysisCenter"].includes(node.name?.text)).map(node => node.getText(source)).join("\n");
+assert.equal(source.statements.filter(node => ts.isFunctionDeclaration(node) && ["loadNavigationPage", "loadApiWorkspace", "loadAnalysisCenter"].includes(node.name?.text)).length, 3);
 const loaderJs = ts.transpileModule(functions, { compilerOptions: { target: ts.ScriptTarget.ES2022, module: ts.ModuleKind.None } }).outputText;
 const { TeamsFeature } = loadTeamsProduction(root)("src/features/teams/index.ts");
 const { PlayersFeature }=loadTeamsProduction(root)("src/features/players/index.ts");
 const { PredictionFeature }=loadTeamsProduction(root)("src/features/prediction/predictionFeature.ts");
 const {ResearchFeature}=loadTeamsProduction(root)("src/features/prediction/research/researchFeature.ts");
 const {ReviewFeature}=loadTeamsProduction(root)("src/features/review/reviewFeature.ts");
+const {PostmatchFeature}=loadTeamsProduction(root)("src/features/postmatch/index.ts");
 function loaderContext(retainedTeam = null) {
   const applied = [], router = new Router();
   const context = {
@@ -184,7 +185,9 @@ function loaderContext(retainedTeam = null) {
   context.playersFeature=new PlayersFeature({api:context.api,initialQuery:null,initialSource:null,snapshot:()=>context.session.bootstrap,page:()=>router.page,persistQuery:()=>applied.push("playerQuery"),persistSource:()=>{},root:()=>({}),busy:fn=>fn()});
   context.predictionFeature=new PredictionFeature({api:context.api,recovery:{read:()=>null,save:()=>{},clear:()=>{}},scope:()=>()=>true,view:()=>()=>true,changed:()=>{},busy:fn=>fn()});
   context.researchFeature=new ResearchFeature({api:context.api,context:context.predictionFeature.context,recovery:{read:()=>null,save:()=>{},clear:()=>{}},scope:()=>()=>true,view:()=>{const page=router.page;return()=>router.page===page;},changed:()=>{}});
-  context.reviewFeature=new ReviewFeature({api:context.api,scope:()=>()=>true,view:()=>{const page=router.page;return()=>router.page===page;},changed:()=>{},recovery:{read:()=>null,save:()=>{},clear:()=>{}},snapshot:()=>context.session.bootstrap,formatError:String});
+  context.api.postmatchOverview=async()=>({settlement_count:0,pending_evidence_count:0,scored_evidence_count:0,settlements:[],evidence_queue:[],provider_scores:[],drift_runs:[]});
+  context.postmatchFeature=new PostmatchFeature({api:context.api,recovery:{capture:()=>({read:()=>null,save:()=>{},clear:()=>{}})},scope:()=>()=>true,view:()=>{const page=router.page;return()=>router.page===page;},changed:()=>{},formatError:String});
+  context.reviewFeature=new ReviewFeature({postmatch:context.postmatchFeature.settlement,api:context.api,scope:()=>()=>true,view:()=>{const page=router.page;return()=>router.page===page;},changed:()=>{},recovery:{read:()=>null,save:()=>{},clear:()=>{}},snapshot:()=>context.session.bootstrap,formatError:String});
   runInNewContext(loaderJs, context);
   return { context, router, applied };
 }

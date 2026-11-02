@@ -18,6 +18,9 @@ const feature={page:"teams",file:"negative-fixture.css"},gate=':where(.applicati
 for(const selector of ['.ui-button',gate+' .inside, .outside',gate+' + .outside',gate+'.extra ~ .outside','.application-shell[data-current-page="players"] .inside',':is('+gate+',body) .inside'])assert.throws(()=>verifyFeatureSheet(postcss.parse(selector+'{color:red}'),feature),undefined,"must reject: "+selector);
 assert.throws(()=>verifyFeatureSheet(postcss.parse('@font-face{font-family:test;src:url(x)}'+gate+' .inside{color:red}'),feature));verifyFeatureSheet(postcss.parse('@media(min-width:1px){'+gate+' .inside:is(.one,.two)>span{color:red}}'),feature);
 for(const source of ['import sheet from "./feature.module.css";','import("./feature.css");','export {default} from "./feature.css";'])assert.ok(findCssImports("src/feature.ts",source)[0]?.kind,"non-bare stylesheet import must be detected");
+const sharedPostmatch={page:'analytics',pages:['review','analytics'],file:'postmatch-fixture.css'};
+verifyFeatureSheet(postcss.parse('.application-shell:where([data-current-page="review"]) .postmatch-panel,.application-shell:where([data-current-page="analytics"]) .postmatch-panel{color:red}'),sharedPostmatch);
+assert.throws(()=>verifyFeatureSheet(postcss.parse('.application-shell:where([data-current-page="teams"]) .postmatch-panel{color:red}'),sharedPostmatch),undefined,'shared postmatch region still refuses any undeclared page');
 const fake=new Map(),target=p=>resolve(root,p);const checkGraph=(file,text,extra)=>{fake.clear();fake.set(target(file),text);for(const [key,value]of Object.entries(extra??{}))fake.set(target(key),value);return inspectStyleGraph(root,file,path=>{if(!fake.has(path))throw Error("Missing fixture CSS "+path);return fake.get(path);});};
 assert.throws(()=>checkGraph('src/test.css','@import "https://example.com/x.css";'));
 assert.throws(()=>checkGraph('src/test.css','@import "../package.json";'));

@@ -1,3 +1,4 @@
+import {PostmatchFeature,postmatchRecovery,settlementTarget,PostmatchActions,PostmatchControls} from "./features/postmatch";
 import { ResearchFeature, researchRecovery, researchSnapshotView } from "./features/prediction";
 import {PredictionFeature,predictionRecovery,predictionPage,inlinePredictionResult,predictionDetailBody,routeSourceLabel,modelDisplayName,syncPredictionControls,syncPredictionSelectIcons} from "./features/prediction";
 import {
@@ -69,7 +70,6 @@ BackgroundJob,
 CoachListItem,
 CompetitionKind,
 EnqueueJobDraft,
-EvidenceScoringDecisionDraft,
 FormationRecord,
 IssueLogEntry,
 IssueSeverity,
@@ -89,8 +89,6 @@ ParameterTuningDecisionDraft,
 ParameterTuningDraft,
 PlayerListQuery,
 PlayerNavigationContext,
-PostmatchMonitoringRequest,
-PostmatchOverview,
 PredictionCommand,
 PredictionExecution,
 PredictionModelFamily,
@@ -254,13 +252,25 @@ const navigation = new Router();
 const workflowNavigation = new NavigationContext();
 let coachList: CoachListItem[] = [];
 let formationCatalog: FormationRecord[] = [];
-const reviewFeature=new ReviewFeature({
+const postmatchFeature=new PostmatchFeature({
+ api,scope:()=>session.captureDatabase(),view:()=>{const page=navigation.page;return()=>page===navigation.page&&!browserLifecycleController.signal.aborted;},
+ recovery:postmatchRecovery(localPreferences,preferenceKey("postmatch-request-recovery"),()=>reviewDatabaseIdentity(session.bootstrap)),formatError:userFacingError,
+ changed:()=>{if((renderedPage==="review"||renderedPage==="analytics")&&session.bootstrap&&!browserLifecycleController.signal.aborted)render({preserveForm:true});},
+});
+const postmatchControls=new PostmatchControls();
+const reviewFeature=new ReviewFeature({postmatch:postmatchFeature.settlement,
  api,scope:()=>session.captureDatabase(),view:()=>{const page=navigation.page;return()=>page===navigation.page&&!browserLifecycleController.signal.aborted;},
  changed:()=>{if(renderedPage==="review"&&session.bootstrap&&!browserLifecycleController.signal.aborted)render({preserveForm:true});},
  recovery:reviewRecovery(localPreferences,preferenceKey("review-request-recovery"),()=>session.bootstrap),snapshot:()=>session.bootstrap,formatError:userFacingError,
 });
 const reviewControls=new ReviewControls();
 const reviewFacts=new ReviewFacts(localPreferences,preferenceKey("review-facts"),()=>reviewDatabaseIdentity(session.bootstrap));
+const postmatchActions=new PostmatchActions(postmatchFeature,{
+ review(id){const detail=reviewFeature.state.detail;if(!detail||id&&id!==detail.summary.id)throw Error("请先载入并核对指定复盘");const current=reviewFeature.captureConfirmation(),version=reviewFeature.version;return {target:settlementTarget(detail),current:()=>current()&&version===reviewFeature.version&&reviewFeature.state.detail?.summary.id===detail.summary.id};},
+ openSettlement(){reviewFeature.viewChanged();workspaceState.patchModule("review",{active_section:"step-8"});render({preserveForm:true});},
+ async refreshReview(){await reviewFeature.load();},
+ confirm:(...args)=>showConfirmation(...args,{tone:"neutral"}),showHtml:(...args)=>showHtmlModal(...args),showResult:(title,value)=>showModal(title,value),close:()=>closeModal(),notify:message=>toast(message,"success"),
+});
 let analyticsOverview: AnalyticsOverview | null = null;
 let analysisJobs: BackgroundJob[] = [];
 let aiAnalysisResponsePreview: AiAnalysisResponsePreview | null = null;
@@ -358,7 +368,7 @@ interface WorkflowContinuation {
 
 let workflowContinuation: WorkflowContinuation | null = null;
 let parameterTuningCandidates: ParameterTuningCandidateRecord[] = [];
-let postmatchOverview: PostmatchOverview = { settlement_count: 0, pending_evidence_count: 0, scored_evidence_count: 0, settlements: [], evidence_queue: [], provider_scores: [], drift_runs: [] };
+
 let releaseAcceptanceRuns: ReleaseAcceptanceRunSummary[] = [];
 let selectedReleaseAcceptanceRun: ReleaseAcceptanceRun | null = null;
 let issueLogs: IssueLogEntry[] = [];
@@ -578,7 +588,7 @@ function render(options: RenderOptions = {}): void {
       break;
     }
     case "review": {
-      content=reviewPage(session.bootstrap,reviewFeature,reviewFacts,workspaceState.module("review").active_section,{references:playersFeature.catalog.references,players:lineupsFeature.state.lineupPlayerCandidates,builderPlayers:lineupsFeature.state.lineupBuilderPlayers,builderForm:lineupsFeature.state.lineupBuilderForm});
+      content=reviewPage(session.bootstrap,reviewFeature,reviewFacts,workspaceState.module("review").active_section,{references:playersFeature.catalog.references,players:lineupsFeature.state.lineupPlayerCandidates,builderPlayers:lineupsFeature.state.lineupBuilderPlayers,builderForm:lineupsFeature.state.lineupBuilderForm},postmatchFeature);
       break;
     }
     case "analytics":
@@ -591,7 +601,7 @@ function render(options: RenderOptions = {}): void {
         analysisAbilityCandidates,
         session.bootstrap.data.competitions,
         parameterTuningCandidates,
-        postmatchOverview,
+        postmatchFeature,
         lastAiAnalysisPackageId,
       );
       break;
@@ -649,7 +659,7 @@ function render(options: RenderOptions = {}): void {
       break;
   }
   content = renderWorkflowContinuationBanner() + content;
-  reviewControls.destroy();
+  reviewControls.destroy();postmatchControls.destroy();
   app.innerHTML = renderShell({
     state: session.bootstrap,
     page: navigation.page,
@@ -659,12 +669,13 @@ function render(options: RenderOptions = {}): void {
     navigationFailed: shellController?.navigationFailed ?? false,
     sidebarCollapsed: workspaceState.sidebarCollapsed(),
   });
-  modal.restore();
+  modal.restore();postmatchActions.sync();
   warningCenter?.observeConnection(session.bootstrap.connection_error);
   renderedPage = navigation.page;
   const currentPageRoot = app.querySelector<HTMLElement>(".page-container") ?? app;
   workspaceState.restore(navigation.page, currentPageRoot);
   if(navigation.page==="review")reviewControls.mount(currentPageRoot);
+  if(navigation.page==="review"||navigation.page==="analytics")postmatchControls.mount(currentPageRoot);
   if(navigation.page==="prediction"){
     syncPredictionControls(currentPageRoot,predictionFeature.context.command);
     enhanceSearchableSelects(currentPageRoot);
@@ -1116,12 +1127,13 @@ function applyAnalysisCenter(result: AnalysisCenterLoadResult): void {
   aiAnalysisSuggestions = result.suggestions;
   analysisAbilityCandidates = result.abilityCandidates;
   parameterTuningCandidates = result.tuningCandidates;
-  postmatchOverview = result.postmatch;
 }
 
 async function loadAnalysisCenter(): Promise<void> {
   if (!session.bootstrap?.data.database_configured) return;
-  applyAnalysisCenter(await fetchAnalysisCenter());
+  const current=postmatchFeature.capture(false);
+  const [result]=await Promise.all([fetchAnalysisCenter(),postmatchFeature.refresh()]);
+  if(current())applyAnalysisCenter(result);
 }
 
 async function loadIssueLogs(): Promise<void> {
@@ -1317,6 +1329,7 @@ async function navigateTo(nextPage: Page): Promise<void> {
   predictionFeature.navigationChanged();
   runsFeature.navigationChanged();
   reviewFeature.navigationChanged();
+  postmatchFeature.navigationChanged();
   await navigation.navigate(nextPage, async request => {
     try {
       await loadNavigationPage(request);
@@ -1408,8 +1421,7 @@ async function loadNavigationPage(request: NavigationRequest): Promise<void> {
   } else if (nextPage === "review") {
     await reviewFeature.load();
   } else if (nextPage === "analytics") {
-    const result = await fetchAnalysisCenter();
-    if (navigation.isCurrent(request)) applyAnalysisCenter(result);
+    await loadAnalysisCenter();
   }
 }
 
@@ -1801,7 +1813,7 @@ async function decideAbilityCandidate(
 }
 
 function analysisHistoryReady(): boolean {
-  return postmatchOverview.settlement_count > 0;
+  return (postmatchFeature.overview?.settlement_count ?? 0) > 0;
 }
 
 function fullAnalysisReady(): boolean {
@@ -1835,87 +1847,6 @@ async function enqueueAnalysisTask(
   await loadAnalysisCenter();
   render();
   toast("后台任务已加入队列", "success");
-}
-
-async function inspectPostmatchReadiness(reviewId: string): Promise<void> {
-  if (!reviewId) throw new Error("复盘记录不存在");
-  const current=reviewFeature.capture();
-  const readiness = await runBusy(() => api.postmatchSettlementReadiness(reviewId));
-  if(!current())return;
-  showModal("接入点 H 结算门禁", readiness);
-}
-
-function settlePostmatchReview(reviewId: string): void {
-  if (!reviewId) throw new Error("复盘记录不存在");
-  const current=reviewFeature.captureConfirmation(),database=session.captureDatabase();
-  const review = reviewFeature.state.reviews.find((item) => item.id === reviewId);
-  showConfirmation(
-    "创建正式赛后结算",
-    "结算将冻结赛果、成功推演、赛事 Profile、模型与参数版本，并为快照证据建立人工评分队列。结算账本不可覆盖。",
-    [
-      ["比赛", review ? `${review.home_team_name} vs ${review.away_team_name}` : "当前复盘"],
-      ["复盘版本", review?.review_version ?? reviewFeature.state.detail?.summary.review_version ?? "未记录"],
-      ["自动改参", "禁止"],
-    ],
-    "确认正式结算",
-    async () => {
-      if(!current()||reviewFeature.state.detail?.summary.id!==reviewId)throw Error("当前复盘已变化，请重新核对结算对象");
-      const settlement = await runBusy(() => api.settlePostmatchReview({
-        match_review_id: reviewId,
-        settled_by: null,
-        settlement_note: "用户在赛后复盘页确认正式结算",
-      }));
-      if(!current())return;
-      reviewFeature.adoptSettlement(settlement);
-      const overview = await api.postmatchOverview(100);
-      if(!current())return;
-      postmatchOverview=overview;
-      if(!await reviewFeature.load()||!database()||navigation.page!=="review"||reviewFeature.state.selectedMatchId!==settlement.match_id)return;
-      render();
-      showModal("正式赛后结算", settlement);
-      toast("正式结算已创建，证据已进入人工评分队列", "success");
-    },
-  );
-}
-
-async function refreshPostmatchMonitoring(): Promise<void> {
-  const competitionId = value("postmatch-competition-id");
-  if (!competitionId) throw new Error("请选择需要监控的具体赛事");
-  const request: PostmatchMonitoringRequest = {
-    competition_id: competitionId,
-    horizon: value("postmatch-horizon"),
-    baseline_size: Number(value("postmatch-baseline-size")),
-    current_size: Number(value("postmatch-current-size")),
-  };
-  postmatchOverview = await runBusy(() => api.refreshPostmatchMonitoring(request));
-  render();
-  toast("接入点 H 正式分区监控已刷新", "success");
-}
-
-function prepareEvidenceDecision(itemId: string): void {
-  const item = postmatchOverview.evidence_queue.find((value) => value.id === itemId);
-  if (!item) throw new Error("证据评分项不存在");
-  showHtmlModal(
-    "人工判定证据",
-    `${item.provider_name ?? "未绑定供应商"} · ${item.field_key}`,
-    `<div class="form-grid"><label class="field"><span>赛后核验结论</span><select id="evidence-verdict"><option value="correct">正确</option><option value="partial">部分正确</option><option value="incorrect">错误</option><option value="not_verifiable">无法验证</option></select></label><label class="field"><span>判定说明</span><textarea id="evidence-decision-note" rows="4" placeholder="写明依据、对照结果和无法验证原因，至少 8 个字符"></textarea></label></div>`,
-    `<button class="secondary" data-action="close-workspace-detail">取消</button><button class="primary" data-action="submit-evidence-decision" data-evidence-item-id="${escapeHtml(itemId)}">保存不可变判定</button>`,
-  );
-}
-
-async function submitEvidenceDecision(itemId: string): Promise<void> {
-  const draft: EvidenceScoringDecisionDraft = {
-    item_id: itemId,
-    verdict: value("evidence-verdict") as EvidenceScoringDecisionDraft["verdict"],
-    decided_by: null,
-    decision_note: value("evidence-decision-note").trim(),
-  };
-  const item = await runBusy(() => api.decideEvidenceScoringItem(draft));
-  postmatchOverview = await api.postmatchOverview(100);
-  closeModal();
-  render();
-  showModal("证据判定记录", item);
-  toast("证据判定已写入不可变账本", "success");
 }
 
 async function refreshAnalysisPage(): Promise<void> {
@@ -3429,10 +3360,10 @@ async function handleAction(
       if (reviewFeature.state.detail) showModal("复盘完整详情", reviewFeature.state.detail);
       break;
     case "inspect-postmatch-readiness":
-      await inspectPostmatchReadiness(button.dataset.reviewId ?? "");
+      await postmatchActions.inspect(button.dataset.reviewId ?? "");
       break;
     case "settle-postmatch-review":
-      settlePostmatchReview(button.dataset.reviewId ?? "");
+      postmatchActions.settle(button.dataset.reviewId ?? "");
       break;
     case "show-candidate-json": {
       const candidate =
@@ -3445,17 +3376,25 @@ async function handleAction(
       if (candidate) showModal("能力更新证据", candidate);
       break;
     }
+    case "resume-postmatch-settlement":postmatchActions.settle(button.dataset.reviewId??"",true);break;
+    case "recover-postmatch-settlement":await postmatchActions.recoverSettlement();break;
+    case "recover-postmatch-monitoring":await postmatchFeature.monitoring.recover();break;
+    case "refresh-postmatch-overview":await postmatchFeature.refresh();break;
+    case "postmatch-open-review":await navigateTo("review");break;
+    case "postmatch-evidence-verdict":postmatchActions.evidenceVerdict(button.dataset.evidenceItemId??"",button.dataset.verdict as import("./types").EvidenceVerdict);break;
+    case "recover-evidence-decision":await postmatchActions.recoverEvidence(button.dataset.evidenceItemId??"");break;
+    case "show-postmatch-evidence":postmatchActions.showEvidence(button.dataset.evidenceItemId??"");break;
     case "refresh-analysis-page":
       await refreshAnalysisPage();
       break;
     case "refresh-postmatch-monitoring":
-      await refreshPostmatchMonitoring();
+      postmatchActions.monitor();
       break;
     case "prepare-evidence-decision":
-      prepareEvidenceDecision(button.dataset.evidenceItemId ?? "");
+      postmatchActions.evidenceChoice(button.dataset.evidenceItemId ?? "");
       break;
     case "submit-evidence-decision":
-      await submitEvidenceDecision(button.dataset.evidenceItemId ?? "");
+      await postmatchActions.submitEvidence(button.dataset.evidenceItemId ?? "",button.dataset.postmatchConfirm ?? "");
       break;
     case "generate-parameter-tuning":
       if (!analysisReviewGateReady()) throw new Error("请先通过数据质量门禁并处理全部待审核建议");
@@ -3719,6 +3658,8 @@ function filterSelectOptions(
 
 document.addEventListener("input", (event) => {
   const target = event.target as HTMLInputElement | HTMLTextAreaElement;
+  if(target.dataset.postmatchNote)postmatchActions.captureNote(target.value,target.dataset.postmatchNote);
+  if(target instanceof HTMLInputElement&&target.dataset.postmatchField)postmatchFeature.monitoring.update(target.dataset.postmatchField as import("./features/postmatch").MonitorFieldKey,target.value);
   if(navigation.page==="review"&&(target.matches("[data-review-fact]")||target.closest("[data-review-player]")))syncReviewManualValidation();
   if (target.id?.startsWith("p4-conflict-note-")||target.id?.startsWith("p4-evidence-")) researchFeature.draftChanged();
   if (["competition-id", "season-id", "stage-id", "competition-kind", "simulation-model-family", "simple-kickoff"].includes(target.id) || target.id.startsWith("binding-")) rulesFeature.invalidatePreview();
@@ -3752,6 +3693,7 @@ document.addEventListener("input", (event) => {
 
 document.addEventListener("change", (event) => {
   const target = event.target as HTMLInputElement | HTMLSelectElement;
+  if(target.dataset.postmatchField){if(target.dataset.postmatchField==="settlement")postmatchFeature.selectSettlement(target.value==="__all__"?"":target.value);else postmatchFeature.monitoring.update(target.dataset.postmatchField as import("./features/postmatch").MonitorFieldKey,target.value);return;}
   if(navigation.page==="review"&&target instanceof HTMLSelectElement&&target.closest("[data-review-picker]")){reviewFacts.capture(app,reviewFeature.state.selectedMatchId);reviewFeature.choose(target.value||null);return;}
   if(navigation.page==="review"&&(target.matches("[data-review-fact]")||target.closest("[data-review-player]")))syncReviewManualValidation();
   if (target.id?.startsWith("p4-conflict-note-")||target.id?.startsWith("p4-evidence-")) researchFeature.draftChanged();
@@ -4175,7 +4117,7 @@ export function createBrowserApplicationModule(
     rulesFeature.stop();
     teamsFeature.stop();
   playersFeature.stop();
-    reviewControls.destroy();
+    reviewControls.destroy();postmatchControls.destroy();
     session.stop();
     openAiExampleRequests.destroy();
     navigation.destroy();

@@ -3,6 +3,7 @@ import { inlineDatabaseSetup } from "../components/databaseSetup";
 import { taskContextRibbon, taskPageHeader } from "../ui/patterns/workbench";
 import { workspaceTaskAnchorNavigation } from "../ui/navigation";
 
+import {postmatchPanel,type PostmatchFeature} from "../features/postmatch/index";
 import type {
   AbilityUpdateCandidateRecord,
   AiAnalysisResponsePreview,
@@ -11,7 +12,6 @@ import type {
   BackgroundJob,
   CompetitionRecord,
   ParameterTuningCandidateRecord,
-  PostmatchOverview,
   BootstrapResponse,
 } from "../types";
 
@@ -153,24 +153,6 @@ function tuningPanel(candidates: ParameterTuningCandidateRecord[], competitions:
 }
 
 
-function postmatchPanel(postmatch: PostmatchOverview, competitions: CompetitionRecord[]): string {
-  const pending = postmatch.evidence_queue.filter((item) => item.status === "pending").slice(0, 20);
-  const latestDrift = postmatch.drift_runs[0] ?? null;
-  const latestScores = postmatch.provider_scores.slice(0, 12);
-  return `<section class="panel postmatch-workbench"><div class="panel-heading"><div><span>接入点 H · 赛后闭环</span><h2>正式结算、证据评分与漂移监控</h2></div><span class="status-pill online">已启用</span></div>
-    <div class="metric-grid compact-metrics">
-      ${metric("正式结算", `${postmatch.settlement_count}`, "仅成功推演 + 冻结快照 + 最终复盘")}
-      ${metric("待判定证据", `${postmatch.pending_evidence_count}`, "需要人工核对真实赛后结果")}
-      ${metric("已评分证据", `${postmatch.scored_evidence_count}`, "不可验证项不会伪造正确率")}
-      ${metric("最新漂移", latestDrift?.status ?? "未计算", latestDrift ? `${latestDrift.competition_name} · ${snapshotLabel(latestDrift.horizon)}` : "选择赛事后运行正式分区监控")}
-    </div>
-    <div class="notice-card"><strong>统计隔离</strong><span>所有 H 指标严格绑定模型版本 × 赛事 Profile × 参数版本 × 冻结时点；不会跨赛事或跨时点合并。</span></div>
-    <div class="form-grid four-column clean-form"><label class="field"><span>监控赛事</span><select id="postmatch-competition-id"><option value="">请选择赛事</option>${competitions.map((item) => `<option value="${escapeHtml(item.id)}">${escapeHtml(item.name)}</option>`).join("")}</select></label><label class="field"><span>数据窗口</span><select id="postmatch-horizon"><option value="T-N">T-N · 任意赛前时间</option><option value="T-24h">T-24h · 24 小时窗口</option><option value="T-6h">T-6h · 6 小时窗口</option><option value="T-1h" selected>T-1h · 1 小时窗口</option></select></label><label class="field"><span>基线窗口</span><input id="postmatch-baseline-size" type="number" min="5" value="100"></label><label class="field"><span>当前窗口</span><input id="postmatch-current-size" type="number" min="5" value="50"></label></div>
-    <div class="button-row"><button class="primary" data-action="refresh-postmatch-monitoring">刷新 H 正式监控</button><button class="secondary" data-action="refresh-analysis-page">刷新全部数据</button></div>
-    <div class="two-column analysis-columns"><div><div class="subheading"><div><span>证据队列</span><h3>待人工判定</h3></div><small>${pending.length} 项显示中</small></div>${pending.length === 0 ? `<div class="empty-state compact"><strong>没有待判定证据</strong><span>完成正式结算后，冻结快照关联的真实证据会自动进入这里。</span></div>` : `<div class="suggestion-list">${pending.map((item) => `<article class="suggestion-card"><div><span>${escapeHtml(item.provider_name ?? "未绑定供应商")} · ${escapeHtml(item.field_key)} · 时效 ${formatPercent(item.timeliness_score)}</span><strong>${escapeHtml(item.source_title ?? item.source_domain ?? "未命名证据")}</strong><p>${escapeHtml(item.verification_state)} · ${escapeHtml(item.source_tier)}</p></div><button class="primary tiny" data-action="prepare-evidence-decision" data-evidence-item-id="${escapeHtml(item.id)}">人工判定</button></article>`).join("")}</div>`}</div><div><div class="subheading"><div><span>供应商评分</span><h3>最新不可变快照</h3></div></div>${latestScores.length === 0 ? `<div class="empty-state compact"><strong>暂无供应商评分</strong><span>证据完成判定并运行 H 监控后生成。</span></div>` : `<div class="table-wrap"><table><thead><tr><th>供应商</th><th>样本</th><th>准确</th><th>及时</th><th>可靠</th><th>综合</th></tr></thead><tbody>${latestScores.map((item) => `<tr><td>${escapeHtml(item.provider_name)}</td><td>${item.sample_size}</td><td>${formatPercent(item.accuracy_mean)}</td><td>${formatPercent(item.timeliness_mean)}</td><td>${formatPercent(item.reliability_mean)}</td><td><strong>${formatPercent(item.weighted_score)}</strong></td></tr>`).join("")}</tbody></table></div>`}</div></div>
-  </section>`;
-}
-
 function abilityCandidatesPanel(candidates: AbilityUpdateCandidateRecord[]): string {
   if (candidates.length === 0) return `<div class="empty-state compact"><strong>暂无待审核能力候选</strong><span>赛后复盘或智能分析建议会先进入这里，不会直接覆盖球员能力。</span></div>`;
   return `<div class="suggestion-list">${candidates.slice(0, 50).map((item) => `<article class="suggestion-card"><div><span>${escapeHtml(item.dimension_name)} · 可信度 ${formatPercent(item.confidence)}</span><strong>${escapeHtml(item.player_name)}：${item.current_value === null ? "未设置" : item.current_value.toFixed(2)} → ${item.proposed_value.toFixed(2)}</strong><p>样本 ${item.sample_size} · ${escapeHtml(item.calculation_version)}</p></div><div class="button-row compact"><button class="primary tiny" data-action="decide-ability-candidate" data-candidate-id="${escapeHtml(item.id)}" data-decision="accept">写入能力历史</button><button class="secondary tiny" data-action="decide-ability-candidate" data-candidate-id="${escapeHtml(item.id)}" data-decision="reject">拒绝</button><button class="ghost tiny" data-action="show-candidate-json" data-candidate-id="${escapeHtml(item.id)}">证据</button></div></article>`).join("")}</div>`;
@@ -221,18 +203,19 @@ export function analyticsPage(
   abilityCandidates: AbilityUpdateCandidateRecord[],
   competitions: CompetitionRecord[],
   tuningCandidates: ParameterTuningCandidateRecord[],
-  postmatch: PostmatchOverview,
+  postmatchFeature: PostmatchFeature,
   lastAnalysisPackageId: string | null,
 ): string {
   if (!state.data.database_configured) {
     return `<section class="task-empty-workspace">${taskPageHeader({ eyebrow: "分析与历史", title: "从赛后历史到模型校准的受控链路", description: "连接成功后按“历史样本 → 完整分析 → 质量门禁 → 受控校准”的顺序引导操作。", status: { label: "等待数据库", tone: "warning" } })}${taskContextRibbon([{ label: "当前状态", value: "数据库未连接", note: "连接后自动加载结算样本、模型表现和质量门禁", tone: "warning" }])}${inlineDatabaseSetup("连接数据服务以运行分析", "连接成功后本页会自动加载正式结算、模型表现、数据质量和待审核建议。", state.connection_error)}</section>`;
   }
 
+  const postmatch=postmatchFeature.overview;
   const quality = overview?.data_quality;
   const queryWarnings = overview?.query_performance.tables.filter((item) => item.severity !== "stable") ?? [];
   const fullJob = latestAnalysisJob(jobs, "full_analysis_refresh");
   const fullJobRunning = fullJob?.status === "queued" || fullJob?.status === "running";
-  const historyReady = postmatch.settlement_count > 0;
+  const historyReady = (postmatch?.settlement_count ?? 0) > 0;
   const analysisReady = historyReady && Boolean(overview?.generated_at) && (overview?.sample_size ?? 0) > 0;
   const qualityScanned = analysisReady && Boolean(quality?.scan_id);
   const qualityReady = qualityScanned && (quality?.critical ?? 0) === 0;
@@ -244,7 +227,7 @@ export function analyticsPage(
   const activeStep = !historyReady ? 1 : !analysisReady ? 2 : !reviewGateReady ? 3 : 4;
 
   const contextRibbon = taskContextRibbon([
-    { label: "正式结算样本", value: `${postmatch.settlement_count} 场`, note: `${postmatch.pending_evidence_count} 条证据待判定`, tone: historyReady ? "accent" : "neutral" },
+    { label: "正式结算样本", value: `${postmatch?.settlement_count ?? "—"} 场`, note: `${postmatch?.pending_evidence_count ?? "—"} 条证据待判定`, tone: historyReady ? "accent" : "neutral" },
     { label: "完整分析", value: analysisReady ? `${overview?.sample_size ?? 0} 个有效样本` : "尚未完成", note: overview?.generated_at ? `生成于 ${overview.generated_at}` : "先形成正式结算样本", tone: analysisReady ? "success" : historyReady ? "warning" : "neutral" },
     { label: "质量门禁", value: qualityReady ? "严重问题已清零" : `${quality?.critical ?? 0} 条严重问题`, note: `${pendingReviewCount} 项建议或能力候选待审核`, tone: qualityReady ? "success" : analysisReady ? "warning" : "neutral" },
     { label: "参数生命周期", value: lifecycleCompleted ? "已有人工晋升版本" : "尚未完成晋升", note: reviewGateReady ? "可以生成受控候选" : "先通过质量与人工审核门禁", tone: lifecycleCompleted ? "success" : reviewGateReady ? "accent" : "neutral" },
@@ -263,8 +246,8 @@ export function analyticsPage(
     <details id="analysis-history-step" class="analysis-chain-step workspace-anchor-target ${chainStateClass(historyReady, true)}" ${activeStep === 1 ? "open" : ""}>
       ${analysisStepSummary(1, "第一步 · 历史样本", "形成历史样本并创建正式结算", "真实赛果、成功推演、阵容与证据形成不可变历史样本。", historyReady, true, "需要建立样本")}
       <div class="analysis-step-content">
-      <div class="analysis-step-guide"><article><span>本步输入</span><strong>真实赛果、成功推演、阵容与证据</strong><p>先到“赛后复盘”选择已结束比赛，填写赛果并完成正式结算。</p></article><article><span>完成标准</span><strong>至少 1 条正式结算</strong><p>当前已有 ${postmatch.settlement_count} 条结算，待判定证据 ${postmatch.pending_evidence_count} 条。</p></article><div class="analysis-step-actions"><button class="primary" data-page="review">前往赛后复盘</button><button class="secondary" data-action="refresh-postmatch-monitoring" ${historyReady ? "" : "disabled"}>刷新结算监控</button></div></div>
-      ${postmatchPanel(postmatch, competitions)}
+      <div class="analysis-step-guide"><article><span>本步输入</span><strong>真实赛果、成功推演、阵容与证据</strong><p>先到“赛后复盘”选择已结束比赛，填写赛果并完成正式结算。</p></article><article><span>完成标准</span><strong>至少 1 条正式结算</strong><p>当前已有 ${postmatch?.settlement_count ?? "—"} 条结算，待判定证据 ${postmatch?.pending_evidence_count ?? "—"} 条。</p></article><div class="analysis-step-actions"><button class="primary" data-page="review">前往赛后复盘</button></div></div>
+      ${postmatchPanel(postmatchFeature, competitions)}
       </div>
     </details>
 
@@ -272,7 +255,7 @@ export function analyticsPage(
       ${analysisStepSummary(2, "第二步 · 完整分析", "计算模型表现、校准分桶与近期漂移", "只读取已冻结的正式历史，不会自动修改模型或参数。", analysisReady, historyReady, fullJobRunning ? "分析运行中" : "可以运行")}
       <div class="analysis-step-content">
       ${historyReady ? `
-        <div class="analysis-step-guide"><article><span>本步输入</span><strong>${postmatch.settlement_count} 条正式结算</strong><p>系统会按模型、参数版本、赛事 Profile 和数据时点分组，禁止混合样本。</p></article><article><span>完成标准</span><strong>生成时间与有效样本均存在</strong><p>${overview?.generated_at ? `最近生成：${escapeHtml(overview.generated_at)}` : "尚未生成分析结果"}；当前有效样本 ${overview?.sample_size ?? 0}。</p></article><div class="analysis-step-actions"><button class="primary" data-action="run-full-analysis" ${fullJobRunning ? "disabled" : ""}>${fullJobRunning ? "完整分析运行中" : analysisReady ? "重新运行完整分析" : "运行完整分析"}</button><button class="secondary" data-action="refresh-analysis-jobs">刷新任务</button></div></div>
+        <div class="analysis-step-guide"><article><span>本步输入</span><strong>${postmatch?.settlement_count ?? "—"} 条正式结算</strong><p>系统会按模型、参数版本、赛事 Profile 和数据时点分组，禁止混合样本。</p></article><article><span>完成标准</span><strong>生成时间与有效样本均存在</strong><p>${overview?.generated_at ? `最近生成：${escapeHtml(overview.generated_at)}` : "尚未生成分析结果"}；当前有效样本 ${overview?.sample_size ?? 0}。</p></article><div class="analysis-step-actions"><button class="primary" data-action="run-full-analysis" ${fullJobRunning ? "disabled" : ""}>${fullJobRunning ? "完整分析运行中" : analysisReady ? "重新运行完整分析" : "运行完整分析"}</button><button class="secondary" data-action="refresh-analysis-jobs">刷新任务</button></div></div>
         <section class="metric-grid compact-metrics analysis-step-metrics">
           ${metric("有效样本", `${overview?.sample_size ?? 0}`, "带正式复盘和成功推演")}
           ${metric("结果概率误差", value(overview?.average_log_loss ?? null), "越低代表结果概率越准确")}

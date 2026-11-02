@@ -187,6 +187,11 @@
         "owner": "src/features/competitions/competitionView.ts",
         "route": null,
         "public_entry": "src/features/competitions/index.ts"
+      },
+      "postmatch": {
+        "owner": "src/features/postmatch/postmatchFeature.ts",
+        "route": null,
+        "public_entry": "src/features/postmatch/index.ts"
       }
     },
     "transitional_imports": [],
@@ -521,7 +526,7 @@
     }
   ],
   "counts": {
-    "frontend_features": 18,
+    "frontend_features": 19,
     "workspace_members": 11,
     "ports": 4,
     "postgres_adapters": 38,

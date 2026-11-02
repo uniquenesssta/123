@@ -1,4 +1,4 @@
-import type { BootstrapResponse, LineupRecord, ReviewableMatch, MatchReviewSummary, MatchReviewDetail, MatchReviewDraft, MatchReviewPackageWorkflowRecord, MatchReviewPackagePreview, MatchReviewPackageSummary, MatchReviewPackageConfirmationRequest, MatchReviewPackageFactsCommitResult, MatchReviewPackageReviewResult, PostmatchSettlementRecord, AbilityCandidateDecisionDraft, AbilityUpdateCandidateRecord } from '../../types';
+import type { BootstrapResponse, LineupRecord, ReviewableMatch, MatchReviewSummary, MatchReviewDetail, MatchReviewDraft, MatchReviewPackageWorkflowRecord, MatchReviewPackagePreview, MatchReviewPackageSummary, MatchReviewPackageConfirmationRequest, MatchReviewPackageFactsCommitResult, MatchReviewPackageReviewResult, AbilityCandidateDecisionDraft, AbilityUpdateCandidateRecord } from '../../types';
 export interface ReviewApi {
     listReviewableMatches(limit: number): Promise<ReviewableMatch[]>;
     listMatchReviews(limit: number): Promise<MatchReviewSummary[]>;
@@ -6,7 +6,6 @@ export interface ReviewApi {
     readLineup(id: string): Promise<LineupRecord>;
     readMatchReview(id: string): Promise<MatchReviewDetail>;
     readMatchReviewPackageWorkflow(matchId: string): Promise<MatchReviewPackageWorkflowRecord | null>;
-    listPostmatchSettlements(limit: number): Promise<PostmatchSettlementRecord[]>;
     chooseExcelImportFile(): Promise<string | null>;
     chooseExcelExportFile(name: string): Promise<string | null>;
     exportMatchReviewPackage(path: string, matchId: string): Promise<MatchReviewPackageSummary>;
@@ -37,6 +36,7 @@ export interface ReviewRecovery {
     clear(matchId: string): void;
 }
 export interface ReviewPorts {
+    postmatch: import("../postmatch/index").SettlementWorkflow;
     api: ReviewApi;
     scope(): () => boolean;
     view(): () => boolean;
@@ -53,7 +53,6 @@ export interface ReviewState {
     lineups: LineupRecord[];
     detail: MatchReviewDetail | null;
     workflow: MatchReviewPackageWorkflowRecord | null;
-    settlement: PostmatchSettlementRecord | null;
     loading: boolean;
     listLoading: boolean;
     loaded: boolean;

@@ -1,0 +1,11 @@
+import {escapeHtml as html} from '../../components/format';
+export {html};
+import {buttonView} from '../../ui/primitives/button';
+import {selectView} from '../../ui/primitives/select';
+import {inlineMessageView} from '../../ui/feedback/inline-message';
+export const button=(label:string,action:string,disabled=false,primary=false,attributes:Record<string,string>={})=>buttonView({label,disabled,variant:primary?'primary':'secondary',attributes:{'data-action':action,...attributes}});
+export const message=(title:string,body:string,tone:'info'|'warning'|'danger'|'success'='warning')=>inlineMessageView({title,message:body,tone,live:true});
+export const percent=(n:unknown)=>typeof n==='number'&&Number.isFinite(n)?new Intl.NumberFormat('zh-CN',{style:'percent',maximumFractionDigits:1}).format(n):'—';
+export const panel=(title:string,description:string,body:string,kind:string)=>`<section class="postmatch-panel" data-postmatch-panel="${kind}"><header><h2>${html(title)}</h2><p>${html(description)}</p></header><div class="postmatch-panel-body">${body}</div></section>`;
+export const field=(label:string,body:string)=>`<label class="postmatch-field"><span>${label}</span><span class="postmatch-control">${body}</span></label>`;
+export const select=(label:string,id:string,key:string,value:string,options:Array<{value:string;label:string}>,placeholder?:string)=>selectView({id,label,value,options,placeholder,attributes:{'data-postmatch-field':key,'data-native-select':'true'}});

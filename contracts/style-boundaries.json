@@ -35,7 +35,8 @@
     "src/pages/prediction/predictionWorkspace.css",
     "src/features/prediction/research/research.css",
     "src/features/runs/runs.css",
-    "src/features/review/review.css"
+    "src/features/review/review.css",
+    "src/features/postmatch/postmatch.css"
   ],
   "features": [
     {
@@ -97,6 +98,15 @@
       "page": "review",
       "file": "src/features/review/review.css",
       "root": ".application-shell[data-current-page=\"review\"]"
+    },
+    {
+      "page": "analytics",
+      "pages": [
+        "review",
+        "analytics"
+      ],
+      "file": "src/features/postmatch/postmatch.css",
+      "purpose": "Postmatch settlement and monitoring region shared only by review and analytics"
     }
   ],
   "composition_modules": [

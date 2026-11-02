@@ -39,7 +39,7 @@ export function workflowStepStateLabel(state: WorkflowStepState): string {
     return ({ done: "已完成", current: "当前", locked: "锁定", blocked: "阻断" } as const)[state];
 }
 export function reviewSteps(feature: ReviewFeature): WorkflowStepView[] {
-    const selected = feature.selected, workflow = feature.state.workflow, preview = feature.preview, detail = feature.state.detail, settlement = feature.state.settlement;
+    const selected = feature.selected, workflow = feature.state.workflow, preview = feature.preview, detail = feature.state.detail, settlement = feature.settlement;
     const matchId = selected?.match_record.id ?? null;
     const activeWorkflow = workflow?.match_id === matchId ? workflow : null;
     const activePreview = preview?.match_id === matchId ? preview : null;
