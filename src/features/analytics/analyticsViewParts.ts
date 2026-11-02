@@ -1,0 +1,15 @@
+import {escapeHtml as html,formatBytes,formatPercent} from '../../components/format';
+import {buttonView} from '../../ui/primitives/button';
+import {badgeView} from '../../ui/primitives/badge';
+import {statCardView} from '../../ui/data-display/stat-card';
+import {dataTableView,type TableCell} from '../../ui/data-display/data-table';
+import {emptyStateView} from '../../ui/data-display/empty-state';
+import {inlineMessageView} from '../../ui/feedback/inline-message';
+export {html,formatBytes,formatPercent,badgeView};
+export const action=(label:string,name:string,disabled=false,primary=false,attributes:Record<string,string>={})=>buttonView({label,variant:primary?'primary':'secondary',disabled,attributes:{'data-action':name,...attributes}});
+export const panel=(title:string,description:string,body:string,id='')=>`<section class="analytics-panel" ${id?`data-analysis-panel="${html(id)}"`:''}><header><h2>${html(title)}</h2><p>${html(description)}</p></header><div class="analytics-panel-body">${body}</div></section>`;
+export const metric=(label:string,value:string|number|null,note:string)=>statCardView({label,value,note});
+export const empty=(title:string,description:string)=>emptyStateView({title,description});
+export const message=(title:string,description:string)=>inlineMessageView({title,message:description,tone:'warning',live:true});
+export const number=(value:number|null|undefined,digits=4)=>typeof value==='number'&&Number.isFinite(value)?value.toFixed(digits):'—';
+export const table=(label:string,columns:readonly string[],rows:TableCell[][])=>dataTableView({label,columns:columns.map((label,i)=>({key:String(i),label})),rows:rows.map((cells,i)=>({id:String(i),cells:Object.fromEntries(cells.map((cell,j)=>[String(j),cell]))})),emptyTitle:'尚无对应记录'});

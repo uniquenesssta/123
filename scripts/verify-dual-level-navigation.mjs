@@ -1,3 +1,4 @@
+import {analyticsFixture} from './features/analyticsFixtures.mjs';
 import { loadTeamsProduction } from "./features/loadTeamsProduction.mjs";
 import {readProjectSource} from "./styles/projectSource.mjs";
 import {fileURLToPath as stylesheetFilePath} from "node:url";
@@ -180,13 +181,15 @@ function loaderContext(retainedTeam = null) {
     workspaceState: { module: () => ({}), patchModule: () => applied.push("patch") },
     api: {},
   };
-  for (const name of ["applyPlayerCatalog", "applyTeamCatalog", "applyLineups", "applyReviewCenter", "applyAnalysisCenter"]) context[name] = () => applied.push(name);
+  for (const name of ["applyPlayerCatalog", "applyTeamCatalog", "applyLineups", "applyReviewCenter"]) context[name] = () => applied.push(name);
   context.teamsFeature = new TeamsFeature({ api: context.api, initialQuery: null, snapshot: () => context.session.bootstrap, page: () => router.page, activeTab: () => retainedTeam, publishOptions: () => applied.push("options"), persistQuery: () => applied.push("teamQuery"), setPresetTab: () => applied.push("presetTab") });
   context.playersFeature=new PlayersFeature({api:context.api,initialQuery:null,initialSource:null,snapshot:()=>context.session.bootstrap,page:()=>router.page,persistQuery:()=>applied.push("playerQuery"),persistSource:()=>{},root:()=>({}),busy:fn=>fn()});
   context.predictionFeature=new PredictionFeature({api:context.api,recovery:{read:()=>null,save:()=>{},clear:()=>{}},scope:()=>()=>true,view:()=>()=>true,changed:()=>{},busy:fn=>fn()});
   context.researchFeature=new ResearchFeature({api:context.api,context:context.predictionFeature.context,recovery:{read:()=>null,save:()=>{},clear:()=>{}},scope:()=>()=>true,view:()=>{const page=router.page;return()=>router.page===page;},changed:()=>{}});
   context.api.postmatchOverview=async()=>({settlement_count:0,pending_evidence_count:0,scored_evidence_count:0,settlements:[],evidence_queue:[],provider_scores:[],drift_runs:[]});
   context.postmatchFeature=new PostmatchFeature({api:context.api,recovery:{capture:()=>({read:()=>null,save:()=>{},clear:()=>{}})},scope:()=>()=>true,view:()=>{const page=router.page;return()=>router.page===page;},changed:()=>{},formatError:String});
+  const analyticsModule=loadTeamsProduction(root)("src/features/analytics/index.ts"),analytics=analyticsFixture(analyticsModule.AnalyticsFeature,analyticsModule.analyticsStorage);
+  analytics.ports.view=()=>{const page=router.page;return()=>router.page===page;};Object.assign(context.api,analytics.api);context.analyticsFeature=new analyticsModule.AnalyticsFeature({...analytics.ports,api:context.api});
   context.reviewFeature=new ReviewFeature({postmatch:context.postmatchFeature.settlement,api:context.api,scope:()=>()=>true,view:()=>{const page=router.page;return()=>router.page===page;},changed:()=>{},recovery:{read:()=>null,save:()=>{},clear:()=>{}},snapshot:()=>context.session.bootstrap,formatError:String});
   runInNewContext(loaderJs, context);
   return { context, router, applied };
@@ -194,7 +197,7 @@ function loaderContext(retainedTeam = null) {
 for (const [page, operation, apply] of [
   ["logs", "listIssueLogs", "issueLogs"], ["openai", "listOpenAiProfiles", "openAiProfiles"],
   ["lineups", "fetchLineups", "applyLineups"],
-  ["analytics", "fetchAnalysisCenter", "applyAnalysisCenter"],
+
 ]) {
   await test(`actual ${page} loader rejects stale data and accepts current data`, async () => {
     for (const stale of [true, false]) {
@@ -208,6 +211,7 @@ for (const [page, operation, apply] of [
     }
   });
 }
+await test("actual analytics loader rejects stale data and keeps current source identity",async()=>{for(const stale of [true,false]){const {context,router}=loaderContext(),task=deferred();context.api.analyticsOverview=()=>task.promise;const pending=context.loadNavigationPage(router.begin("analytics"));if(stale)router.begin("dashboard");task.resolve(analyticsFixture(loadTeamsProduction(root)("src/features/analytics/index.ts").AnalyticsFeature,loadTeamsProduction(root)("src/features/analytics/index.ts").analyticsStorage).overview());await pending;assert.equal(context.analyticsFeature.overview!==null,!stale);router.destroy();}});
 await test("actual review module loading rejects stale data and publishes current identity",async()=>{for(const stale of [true,false]){const {context,router}=loaderContext(),task=deferred();context.api.listReviewableMatches=()=>task.promise;context.api.listMatchReviews=async()=>[];const pending=context.loadNavigationPage(router.begin("review"));if(stale)router.begin("dashboard");task.resolve([{match_record:{id:"original-match"}}]);await pending;assert.equal(context.reviewFeature.state.matches.length,stale?0:1);assert.equal(context.reviewFeature.state.selectedMatchId,null);router.destroy();}});
 await test("actual players loader rejects stale data and publishes only current identity",async()=>{for(const stale of [true,false]){const {context,router}=loaderContext(),task=deferred();context.api.playerCatalogReferenceData=async()=>({teams:[]});context.api.listPlayers=()=>task.promise;const pending=context.loadNavigationPage(router.begin("players"));if(stale)router.begin("dashboard");task.resolve({items:[],has_more:false});await pending;assert.equal(context.playersFeature.catalog.list!==null,!stale);router.destroy();}});
 await test("actual release loader is atomic across both awaits", async () => {

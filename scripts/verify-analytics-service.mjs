@@ -144,12 +144,12 @@ const compact = (text) => text.replace(/\s+/g, "");
 const occurrences = (text, token) => text.split(token).length - 1;
 check(read(`${useCaseRoot}/mod.rs`).includes("pub(crate) mod calculation;") &&
   !read(`${useCaseRoot}/mod.rs`).includes("mod analytics_overview;"), "Calculation 未登记唯一 App owner");
-check(service.includes("analytics::calculation::analytics_overview(port).await") &&
+check(service.includes("analytics::calculation::analytics_overview(port, snapshot_id).await") &&
   !service.includes("analytics::analytics_overview"), "总览实际 Service 未切换 Calculation");
 check(occurrences(execution, "refresh_analytics(port, &request).await?") === 2 &&
   !execution.includes("port.refresh("), "两条实际 worker 刷新必须经过 Calculation");
 check(occurrences(calculationRefresh, "port.refresh(request).await?") === 1 &&
-  occurrences(calculationOverview, "port.overview().await?") === 1, "Calculation 原 Port 单次边界改变");
+  occurrences(calculationOverview, "port.overview(snapshot_id).await?") === 1, "Calculation 原 Port 单次边界改变");
 for (const file of [`${calculationRoot}/mod.rs`, `${pgCalculation}/mod.rs`, "crates/persistence-postgres/src/adapters/analytics/mod.rs"]) {
   check(!/\bfn\b|\bimpl\b|\blet\b/.test(read(file)), `Calculation 出口承载业务：${file}`);
 }
@@ -164,7 +164,7 @@ const sequence = ["self.load_evaluation_samples(request).await?", "calculate_ana
   "self.pool.begin().await?", "samples.chunks(500)", "analysis_windows(request, &samples, calculation.generated_at)",
   "serde_json::to_value(&calculation)?", "INSERT INTO analytics.analysis_snapshots", "for bucket in &calculation.calibration",
   "for finding in &calculation.drift", "sample_group_ids(&samples)", "for comparison in &calculation.comparisons",
-  "write_audit_event(", "tx.commit().await?", "self.analytics_overview().await"];
+  "write_audit_event(", "tx.commit().await?", "self.read_analysis_snapshot_overview(Some(snapshot_id))"];
 let previous = -1;
 for (const token of sequence) {
   const index = repository.indexOf(token);
@@ -198,8 +198,11 @@ for (const token of ["request.window_start.or_else(||samples.iter().map(|item|it
   "(sample.model_version_id,sample.parameter_set_id)", ".collect()"])
   check(normalizedProjection.includes(token), `原窗口/分组投影规则缺失：${token}`);
 check(!/\.sort|\.dedup|\.entry\(|\.or_insert/.test(projection), "计算投影不得改样本顺序或重复组覆盖政策");
-check(pgRead.includes("SELECT summary FROM analytics.analysis_snapshots ORDER BY created_at DESC, id DESC LIMIT 1") &&
-  compact(pgRead).includes(".map(serde_json::from_value).transpose()?;letquality=self.latest_data_quality_summary(100).await?;letquery_performance=self.latest_query_performance().await?;"), "总览解码与诊断读取先后改变");
+check(pgRead.includes("SELECT id,competition_id,window_start,window_end,summary FROM analytics.analysis_snapshots WHERE ($1::uuid IS NULL OR id=$1) ORDER BY created_at DESC,id DESC LIMIT 1") &&
+  pgRead.includes(".bind(snapshot_id)") && pgRead.indexOf("serde_json::from_value(summary)?") < pgRead.indexOf("let quality = self.latest_data_quality_summary(100).await?") &&
+  pgRead.indexOf("let quality = self.latest_data_quality_summary(100).await?") < pgRead.indexOf("let query = self.latest_query_performance().await?"), "总览原排序、精确ID绑定、解码与诊断读取顺序改变");
+check(pgRead.includes("snapshot_id.is_some() && row.is_none()")&&pgRead.includes("overview.source_snapshot = source"),"显式原快照缺失不得退回其他最新结果，且来源必须返回");
+check(repository.includes('summary["request"] = serde_json::to_value(request)?'),"原请求范围必须与同一分析快照一起保存");
 for (const [dir, names] of [
   [calculationRoot, ["refresh_preserves_every_request_field_and_full_overview", "refresh_preserves_default_unbounded_request_without_extra_calls",
     "overview_keeps_snapshot_diagnostics_and_does_not_refresh", "refresh_propagates_all_port_errors_without_retry_or_followup_read", "overview_propagates_all_port_errors_without_refresh_or_retry"]],
@@ -569,6 +572,12 @@ check(frontendVerifier.includes('"verify-analytics-service.mjs"'), "前端聚合
   "rollback_parameter_candidate": "rollback_parameter_candidate(request)",
   "list_parameter_promotion_decisions": "list_parameter_promotion_decisions(parse_uuid(&candidate_id, \"候选 ID\")?)"
 };
+  // R14-13 three additive optional arguments: None must retain the exact original R11-07 service call and error mapping.
+  const checkedOptional={
+    analytics_overview:{argument:'snapshot_id',type:'uuid::Uuid',checked:'analytics_snapshot(id)',binding:'id'},
+    export_ai_analysis_package:{argument:'expected_snapshot_id',type:'uuid::Uuid',checked:'export_ai_analysis_package_checked(output_path, expected)',binding:'expected'},
+    import_ai_analysis_response:{argument:'expected_preview',type:'football_domain::AiAnalysisResponsePreview',checked:'import_ai_analysis_response_checked(input_path, expected)',binding:'expected'},
+  };
   const isAsync = {
   "analytics_overview": true,
   "decide_data_quality_finding": true,
@@ -618,20 +627,29 @@ check(frontendVerifier.includes('"verify-analytics-service.mjs"'), "前端聚合
       const file = files[name];
       const source = read(file);
       const signature = source.match(new RegExp(`pub (?:async )?fn ${name}\\([\\s\\S]*?\\{`))?.[0].slice(0, -1) ?? "";
-      check(signatureTokens(signature) === signatureTokens(signatures[name]), `R11-07 原参数/返回/async签名漂移：${name}`);
+      const optional=checkedOptional[name];
+      const expectedSignature=optional?signatures[name].replace('\n) ->','\n    '+optional.argument+': Option<'+optional.type+'>,\n) ->'):signatures[name];
+      check(signatureTokens(signature) === signatureTokens(expectedSignature), `R11-07 原参数/返回/async签名漂移：${name}`);
       check(group?.command_definition_files?.[name] === file, `R11-07 定义owner漂移：${name}`);
       check((source.match(/#\[tauri::command\]/g) ?? []).length === 1 && source.includes("bootstrap::AppState"), `R11-07 必须借用原State且每文件唯一命令：${name}`);
       const body = source.slice(source.indexOf("{", source.indexOf(`fn ${name}`)) + 1, source.lastIndexOf("}"));
-      const expected = name === "list_background_jobs"
+      const expected = optional
+        ? 'let result = match '+optional.argument+' { Some('+optional.binding+') => { state.service.'+optional.checked+'.await } None => state.service.'+calls[name]+'.await, }; result.map_err(|error| error.to_string())'
+        : name === "list_background_jobs"
         ? "let jobs = state.service.list_background_jobs(limit).await.map_err(|error| error.to_string())?; record_failed_background_jobs(&state.issue_log, &jobs); Ok(jobs)"
         : `${validations[name]} state.service.${calls[name]}${isAsync[name] ? ".await" : ""}.map_err(|error| error.to_string())`;
-      check(tokens(body) === tokens(expected), `R11-07 薄传输必须保留原UUID/参数/顺序/错误/日志投影：${name}`);
+      const actualBody=name==='analytics_overview'?body.replace('Some(id) => state.service.analytics_snapshot(id).await,','Some(id) => { state.service.analytics_snapshot(id).await }'):body;
+      check(tokens(actualBody) === tokens(expected), `R11-07 薄传输必须保留原UUID/参数/顺序/错误/日志投影：${name}`);
       if (expected.includes("parse_uuid")) check(source.includes("commands::parse_uuid"), `R11-07 UUID校验必须沿原唯一helper：${name}`);
       if (name === "list_background_jobs") check(source.includes("use crate::commands::record_failed_background_jobs;"), "R11-07 后台任务必须沿原共享失败投影owner，不能新增日志实现或丢失问题投影");
       for (const forbidden of ["sqlx::", "football_persistence_postgres", "PostgresStore", "PgPool", "std::fs", "std::io", "tokio::spawn", "ApplicationService::new", "Mutex<", "static ", "macro_rules!", ".unwrap()", ".expect("]) check(!source.includes(forbidden), `R11-07 命令越过原业务/状态/文件/worker边界：${name}/${forbidden}`);
     }
   }
 }
+// Verify legacy facade compatibility and the guarded Use Cases, in addition to every original command obligation above.
+check(facade.includes('self.analytics.overview(&session, None).await')&&facade.includes('self.analytics.overview(&session, Some(snapshot_id)).await'), '原总览和精确快照门面必须分开');
+check(appExports.includes('expected_snapshot_id: Option<Uuid>')&&appExports.indexOf('分析快照已变化')<appExports.indexOf('let summary = write_analysis_package'), '受控导出必须在写文件之前拒绝变更快照');
+check(appResponse.includes('expected: Option<AiAnalysisResponsePreview>')&&appResponse.indexOf('serde_json::to_value')<appResponse.indexOf('port.import_ai_response'), '受控导入必须在Port写入之前核对完整已确认预检');
 // R11-07 transport contract END
 
 if (failures.length) {

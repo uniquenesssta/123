@@ -33,3 +33,5 @@
 @import "../features/runs/runs.css";
 @import "../features/review/review.css";
 @import "../features/postmatch/postmatch.css";
+
+@import "../features/analytics/analytics.css";

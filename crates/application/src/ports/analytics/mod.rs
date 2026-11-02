@@ -18,7 +18,7 @@ use uuid::Uuid;
 
 #[async_trait]
 pub trait AnalyticsPort: Send + Sync {
-    async fn overview(&self) -> PortResult<AnalyticsOverview>;
+    async fn overview(&self, snapshot_id: Option<Uuid>) -> PortResult<AnalyticsOverview>;
     async fn refresh(&self, request: &AnalyticsRefreshRequest) -> PortResult<AnalyticsOverview>;
     async fn run_data_quality_scan(&self) -> PortResult<DataQualitySummary>;
     async fn decide_data_quality(

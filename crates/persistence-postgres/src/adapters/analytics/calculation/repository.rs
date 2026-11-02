@@ -69,7 +69,8 @@ impl PostgresStore {
             metric_window_start,
             metric_window_end,
         } = analysis_windows(request, &samples, calculation.generated_at);
-        let summary = serde_json::to_value(&calculation)?;
+        let mut summary = serde_json::to_value(&calculation)?;
+        summary["request"] = serde_json::to_value(request)?;
         sqlx::query(
             "INSERT INTO analytics.analysis_snapshots (id, competition_id, window_start, window_end, sample_size, summary, calculation_version, created_at) VALUES ($1,$2,$3,$4,$5,$6,$7,$8)",
         )
@@ -144,6 +145,7 @@ impl PostgresStore {
         )
         .await?;
         tx.commit().await?;
-        self.analytics_overview().await
+        self.read_analysis_snapshot_overview(Some(snapshot_id))
+            .await
     }
 }

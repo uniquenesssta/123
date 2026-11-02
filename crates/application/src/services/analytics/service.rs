@@ -29,11 +29,15 @@ impl AnalyticsService {
         analytics::jobs::worker::spawn(port);
     }
 
-    pub(crate) async fn overview<P>(&self, port: &P) -> ApplicationResult<AnalyticsOverview>
+    pub(crate) async fn overview<P>(
+        &self,
+        port: &P,
+        snapshot_id: Option<Uuid>,
+    ) -> ApplicationResult<AnalyticsOverview>
     where
         P: AnalyticsPort + ?Sized,
     {
-        analytics::calculation::analytics_overview(port).await
+        analytics::calculation::analytics_overview(port, snapshot_id).await
     }
 
     pub(crate) async fn enqueue_job<P>(
@@ -103,11 +107,13 @@ impl AnalyticsService {
         &self,
         port: &P,
         output_path: String,
+        expected_snapshot_id: Option<uuid::Uuid>,
     ) -> ApplicationResult<AiAnalysisPackageSummary>
     where
         P: AnalyticsPort + ?Sized,
     {
-        analytics::ai_package::export_ai_analysis_package(port, output_path).await
+        analytics::ai_package::export_ai_analysis_package(port, output_path, expected_snapshot_id)
+            .await
     }
 
     pub(crate) fn preview_ai_response(
@@ -121,11 +127,12 @@ impl AnalyticsService {
         &self,
         port: &P,
         input_path: String,
+        expected: Option<AiAnalysisResponsePreview>,
     ) -> ApplicationResult<Vec<AiAnalysisSuggestionRecord>>
     where
         P: AnalyticsPort + ?Sized,
     {
-        analytics::ai_package::import_ai_analysis_response(port, input_path).await
+        analytics::ai_package::import_ai_analysis_response(port, input_path, expected).await
     }
 
     pub(crate) async fn list_ai_suggestions<P>(

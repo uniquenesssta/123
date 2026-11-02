@@ -39,6 +39,7 @@ pub enum AnalyticsJobResult {
     DataQuality(DataQualitySummary),
     QueryPerformance(QueryPerformanceSummary),
     FullAnalysisRefresh {
+        source_snapshot: Option<football_domain::AnalyticsSnapshotIdentity>,
         sample_size: u64,
         expected_calibration_error: Option<f64>,
         quality_findings: i64,
@@ -53,16 +54,23 @@ impl AnalyticsJobResult {
             Self::DataQuality(value) => serde_json::to_value(value),
             Self::QueryPerformance(value) => serde_json::to_value(value),
             Self::FullAnalysisRefresh {
+                source_snapshot,
                 sample_size,
                 expected_calibration_error,
                 quality_findings,
                 database_size_bytes,
-            } => Ok(json!({
-                "sample_size": sample_size,
-                "expected_calibration_error": expected_calibration_error,
-                "quality_findings": quality_findings,
-                "database_size_bytes": database_size_bytes,
-            })),
+            } => {
+                let mut result = json!({
+                    "sample_size": sample_size,
+                    "expected_calibration_error": expected_calibration_error,
+                    "quality_findings": quality_findings,
+                    "database_size_bytes": database_size_bytes,
+                });
+                if let Some(source) = source_snapshot {
+                    result["source_snapshot"] = serde_json::to_value(source)?;
+                }
+                Ok(result)
+            }
         }
     }
 }

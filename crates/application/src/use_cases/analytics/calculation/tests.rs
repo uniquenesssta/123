@@ -36,6 +36,7 @@ fn response() -> Value {
 struct Fixture {
     calls: Mutex<Vec<&'static str>>,
     request: Mutex<Option<AnalyticsRefreshRequest>>,
+    snapshot_id: Mutex<Option<Uuid>>,
     error: Option<PortError>,
 }
 impl Fixture {
@@ -43,6 +44,7 @@ impl Fixture {
         Self {
             calls: Mutex::new(Vec::new()),
             request: Mutex::new(None),
+            snapshot_id: Mutex::new(None),
             error: None,
         }
     }
@@ -55,8 +57,9 @@ impl Fixture {
 }
 #[async_trait]
 impl AnalyticsPort for Fixture {
-    async fn overview(&self) -> PortResult<AnalyticsOverview> {
+    async fn overview(&self, snapshot_id: Option<Uuid>) -> PortResult<AnalyticsOverview> {
         self.calls.lock().unwrap().push("overview");
+        *self.snapshot_id.lock().unwrap() = snapshot_id;
         self.result()
     }
     async fn refresh(&self, request: &AnalyticsRefreshRequest) -> PortResult<AnalyticsOverview> {
@@ -140,7 +143,7 @@ async fn refresh_preserves_default_unbounded_request_without_extra_calls() {
 async fn overview_keeps_snapshot_diagnostics_and_does_not_refresh() {
     let fixture = Fixture::new();
     assert_eq!(
-        serde_json::to_value(analytics_overview(&fixture).await.unwrap()).unwrap(),
+        serde_json::to_value(analytics_overview(&fixture, None).await.unwrap()).unwrap(),
         response()
     );
     assert_eq!(*fixture.calls.lock().unwrap(), ["overview"]);
@@ -179,9 +182,19 @@ async fn overview_propagates_all_port_errors_without_refresh_or_retry() {
         let mut fixture = Fixture::new();
         fixture.error = Some(PortError::new(kind, "original overview failure"));
         assert!(
-            matches!(analytics_overview(&fixture).await.unwrap_err(), ApplicationError::Port(error) if error.kind == kind && error.message == "original overview failure")
+            matches!(analytics_overview(&fixture, None).await.unwrap_err(), ApplicationError::Port(error) if error.kind == kind && error.message == "original overview failure")
         );
         assert_eq!(*fixture.calls.lock().unwrap(), ["overview"]);
         assert!(fixture.request.lock().unwrap().is_none());
     }
+}
+
+#[tokio::test]
+async fn overview_forwards_original_snapshot_id_without_latest_fallback() {
+    let fixture = Fixture::new();
+    let id = Uuid::from_u128(123);
+    let overview = analytics_overview(&fixture, Some(id)).await.unwrap();
+    assert_eq!(*fixture.snapshot_id.lock().unwrap(), Some(id));
+    assert_eq!(*fixture.calls.lock().unwrap(), ["overview"]);
+    assert_eq!(serde_json::to_value(overview).unwrap(), response());
 }

@@ -1,3 +1,4 @@
+import {AnalyticsFeature,AnalyticsActions,analyticsStorage} from "./features/analytics";
 import {PostmatchFeature,postmatchRecovery,settlementTarget,PostmatchActions,PostmatchControls} from "./features/postmatch";
 import { ResearchFeature, researchRecovery, researchSnapshotView } from "./features/prediction";
 import {PredictionFeature,predictionRecovery,predictionPage,inlinePredictionResult,predictionDetailBody,routeSourceLabel,modelDisplayName,syncPredictionControls,syncPredictionSelectIcons} from "./features/prediction";
@@ -20,12 +21,12 @@ import { bulkArchiveSummary } from "./components/entityDeletion";
 import { escapeHtml } from "./components/format";
 import { enhanceSearchableSelects,refreshSearchableSelects } from "./components/searchableSelect";
 import {
-fetchAnalysisCenter,
+
 fetchLineups,
 
 
 
-type AnalysisCenterLoadResult,
+
 type LineupsLoadResult,
 
 
@@ -59,17 +60,11 @@ import { stopTauriTransport } from "./platform/tauri";
 import { DebouncedTask } from "./platform/timing";
 import "./styles/index.css";
 import type {
-AbilityUpdateCandidateRecord,
-AiAnalysisResponsePreview,
-AiAnalysisSuggestionRecord,
-AnalyticsOverview,
 ApiWorkspacePreset,
 ApiWorkspaceSessionDetail,
 ApiWorkspaceSessionRecord,
-BackgroundJob,
 CoachListItem,
 CompetitionKind,
-EnqueueJobDraft,
 FormationRecord,
 IssueLogEntry,
 IssueSeverity,
@@ -84,7 +79,6 @@ Page,
 ParameterLifecycleReadinessRequest,
 ParameterPromotionRequest,
 ParameterRollbackRequest,
-ParameterTuningCandidateRecord,
 ParameterTuningDecisionDraft,
 ParameterTuningDraft,
 PlayerListQuery,
@@ -107,7 +101,6 @@ const browserLifecycleController = new EventScope();
 const openAiExampleRequests = new AsyncScope();
 
 const DATABASE_RESET_COMPLETE_KEY = preferenceKey("database-reset-complete");
-const ANALYSIS_PACKAGE_ID_KEY = preferenceKey("last-analysis-package-id");
 const TEAM_QUERY_KEY = preferenceKey("team-query");
 const PLAYER_QUERY_KEY = preferenceKey("player-query");
 const PLAYER_NAV_CONTEXT_KEY = preferenceKey("player-navigation-context");
@@ -258,6 +251,14 @@ const postmatchFeature=new PostmatchFeature({
  changed:()=>{if((renderedPage==="review"||renderedPage==="analytics")&&session.bootstrap&&!browserLifecycleController.signal.aborted)render({preserveForm:true});},
 });
 const postmatchControls=new PostmatchControls();
+const analyticsFeature=new AnalyticsFeature({
+ api,scope:()=>session.captureDatabase(),view:()=>{const page=navigation.page;return()=>page===navigation.page&&!browserLifecycleController.signal.aborted;},
+ storage:analyticsStorage(localPreferences,preferenceKey("analytics-request-state"),()=>reviewDatabaseIdentity(session.bootstrap)),formatError:userFacingError,
+ historyCount:()=>postmatchFeature.overview?.settlement_count??null,initialStep:()=>workspaceState.module("analytics").active_section,
+ saveStep:step=>workspaceState.patchModule("analytics",{active_section:"analysis-"+step+"-step"}),
+ changed:()=>{if(renderedPage==="analytics"&&session.bootstrap&&!browserLifecycleController.signal.aborted)render({preserveForm:true});},
+});
+const analyticsActions=new AnalyticsActions(analyticsFeature,{confirm:(...args)=>showConfirmation(...args,{tone:"neutral"}),show:(title,value)=>showModal(title,value),notify:message=>toast(message,"success")});
 const reviewFeature=new ReviewFeature({postmatch:postmatchFeature.settlement,
  api,scope:()=>session.captureDatabase(),view:()=>{const page=navigation.page;return()=>page===navigation.page&&!browserLifecycleController.signal.aborted;},
  changed:()=>{if(renderedPage==="review"&&session.bootstrap&&!browserLifecycleController.signal.aborted)render({preserveForm:true});},
@@ -271,13 +272,6 @@ const postmatchActions=new PostmatchActions(postmatchFeature,{
  async refreshReview(){await reviewFeature.load();},
  confirm:(...args)=>showConfirmation(...args,{tone:"neutral"}),showHtml:(...args)=>showHtmlModal(...args),showResult:(title,value)=>showModal(title,value),close:()=>closeModal(),notify:message=>toast(message,"success"),
 });
-let analyticsOverview: AnalyticsOverview | null = null;
-let analysisJobs: BackgroundJob[] = [];
-let aiAnalysisResponsePreview: AiAnalysisResponsePreview | null = null;
-let aiAnalysisResponsePath: string | null = null;
-let aiAnalysisSuggestions: AiAnalysisSuggestionRecord[] = [];
-let analysisAbilityCandidates: AbilityUpdateCandidateRecord[] = [];
-let lastAiAnalysisPackageId: string | null = localPreferences.getItem(ANALYSIS_PACKAGE_ID_KEY);
 
 const lineupsFeature = createLineupsFeature({
   captureImportView: ()=>captureImportView(),
@@ -367,7 +361,6 @@ interface WorkflowContinuation {
 }
 
 let workflowContinuation: WorkflowContinuation | null = null;
-let parameterTuningCandidates: ParameterTuningCandidateRecord[] = [];
 
 let releaseAcceptanceRuns: ReleaseAcceptanceRunSummary[] = [];
 let selectedReleaseAcceptanceRun: ReleaseAcceptanceRun | null = null;
@@ -592,18 +585,7 @@ function render(options: RenderOptions = {}): void {
       break;
     }
     case "analytics":
-      content = analyticsPage(
-        session.bootstrap,
-        analyticsOverview,
-        analysisJobs,
-        aiAnalysisResponsePreview,
-        aiAnalysisSuggestions,
-        analysisAbilityCandidates,
-        session.bootstrap.data.competitions,
-        parameterTuningCandidates,
-        postmatchFeature,
-        lastAiAnalysisPackageId,
-      );
+      content = analyticsPage(session.bootstrap,analyticsFeature,postmatchFeature);
       break;
     case "runs":
       content = runsPage(session.bootstrap,runsFeature.view);
@@ -1120,21 +1102,8 @@ async function loadLineups(): Promise<void> {
   if (!session.bootstrap?.data.database_configured) return;
   applyLineups(await fetchLineups());
 }
+async function loadAnalysisCenter():Promise<void>{if(session.bootstrap?.data.database_configured)await Promise.all([analyticsFeature.refresh(),postmatchFeature.refresh()]);}
 
-function applyAnalysisCenter(result: AnalysisCenterLoadResult): void {
-  analyticsOverview = result.overview;
-  analysisJobs = result.jobs;
-  aiAnalysisSuggestions = result.suggestions;
-  analysisAbilityCandidates = result.abilityCandidates;
-  parameterTuningCandidates = result.tuningCandidates;
-}
-
-async function loadAnalysisCenter(): Promise<void> {
-  if (!session.bootstrap?.data.database_configured) return;
-  const current=postmatchFeature.capture(false);
-  const [result]=await Promise.all([fetchAnalysisCenter(),postmatchFeature.refresh()]);
-  if(current())applyAnalysisCenter(result);
-}
 
 async function loadIssueLogs(): Promise<void> {
   issueLogs = await api.listIssueLogs(500);
@@ -1329,7 +1298,7 @@ async function navigateTo(nextPage: Page): Promise<void> {
   predictionFeature.navigationChanged();
   runsFeature.navigationChanged();
   reviewFeature.navigationChanged();
-  postmatchFeature.navigationChanged();
+  postmatchFeature.navigationChanged();analyticsFeature.navigationChanged();
   await navigation.navigate(nextPage, async request => {
     try {
       await loadNavigationPage(request);
@@ -1812,48 +1781,6 @@ async function decideAbilityCandidate(
   );
 }
 
-function analysisHistoryReady(): boolean {
-  return (postmatchFeature.overview?.settlement_count ?? 0) > 0;
-}
-
-function fullAnalysisReady(): boolean {
-  return analysisHistoryReady()
-    && Boolean(analyticsOverview?.generated_at)
-    && (analyticsOverview?.sample_size ?? 0) > 0;
-}
-
-function analysisQualityReady(): boolean {
-  return fullAnalysisReady()
-    && Boolean(analyticsOverview?.data_quality.scan_id)
-    && (analyticsOverview?.data_quality.critical ?? 0) === 0;
-}
-
-function analysisReviewGateReady(): boolean {
-  const pendingSuggestions = aiAnalysisSuggestions.filter((item) => item.status === "pending").length;
-  return analysisQualityReady() && pendingSuggestions + analysisAbilityCandidates.length === 0;
-}
-
-async function enqueueAnalysisTask(
-  jobType: EnqueueJobDraft["job_type"],
-): Promise<void> {
-  const draft: EnqueueJobDraft = {
-    job_type: jobType,
-    payload: {},
-    idempotency_key: `${jobType}-${new Date().toISOString().slice(0, 16)}`,
-    priority: jobType === "full_analysis_refresh" ? 10 : 0,
-    max_attempts: 3,
-  };
-  await runBusy(() => api.enqueueAnalysisJob(draft));
-  await loadAnalysisCenter();
-  render();
-  toast("后台任务已加入队列", "success");
-}
-
-async function refreshAnalysisPage(): Promise<void> {
-  await runBusy(loadAnalysisCenter);
-  render();
-}
-
 async function generateParameterTuning(): Promise<void> {
   const draft: ParameterTuningDraft = {
     competition_id: nullableValue("tuning-competition-id"),
@@ -1869,7 +1796,7 @@ async function generateParameterTuning(): Promise<void> {
   const candidate = await runBusy(() =>
     api.generateParameterTuningCandidate(draft),
   );
-  parameterTuningCandidates = await api.listParameterTuningCandidates(100);
+  await analyticsFeature.refresh();
   render();
   showModal("参数候选诊断", candidate);
   toast("已生成单模块参数候选，正式模型未被修改", "success");
@@ -1887,7 +1814,7 @@ async function decideParameterTuning(
       decision === "accept_for_backtest" ? "进入回测队列" : "人工拒绝",
   };
   await runBusy(() => api.decideParameterTuningCandidate(draft));
-  parameterTuningCandidates = await api.listParameterTuningCandidates(100);
+  await analyticsFeature.refresh();
   render();
   toast(
     decision === "accept_for_backtest"
@@ -1922,7 +1849,7 @@ async function runParameterShadowValidation(candidateId: string): Promise<void> 
   const record = await runBusy(() =>
     api.runParameterShadowValidation({ candidate_id: candidateId }),
   );
-  parameterTuningCandidates = await api.listParameterTuningCandidates(100);
+  await analyticsFeature.refresh();
   render();
   showModal("阶段 I 影子验证", record);
   toast(
@@ -1937,7 +1864,7 @@ async function runParameterShadowValidation(candidateId: string): Promise<void> 
 
 function promoteParameterCandidate(candidateId: string): void {
   if (!candidateId) throw new Error("参数候选不存在");
-  const candidate = parameterTuningCandidates.find(
+  const candidate = analyticsFeature.state.tuningCandidates.find(
     (item) => item.id === candidateId,
   );
   showConfirmation(
@@ -1958,7 +1885,7 @@ function promoteParameterCandidate(candidateId: string): void {
       const decision = await runBusy(() =>
         api.promoteParameterCandidate(request),
       );
-      parameterTuningCandidates = await api.listParameterTuningCandidates(100);
+      await analyticsFeature.refresh();
       render();
       showModal("人工晋升记录", decision);
       toast("候选已人工晋升，可按绑定快照回滚", "success");
@@ -1968,7 +1895,7 @@ function promoteParameterCandidate(candidateId: string): void {
 
 function rollbackParameterCandidate(candidateId: string): void {
   if (!candidateId) throw new Error("参数候选不存在");
-  const candidate = parameterTuningCandidates.find(
+  const candidate = analyticsFeature.state.tuningCandidates.find(
     (item) => item.id === candidateId,
   );
   showConfirmation(
@@ -1989,7 +1916,7 @@ function rollbackParameterCandidate(candidateId: string): void {
       const decision = await runBusy(() =>
         api.rollbackParameterCandidate(request),
       );
-      parameterTuningCandidates = await api.listParameterTuningCandidates(100);
+      await analyticsFeature.refresh();
       render();
       showModal("回滚记录", decision);
       toast("候选晋升已按原绑定快照回滚", "success");
@@ -2009,111 +1936,6 @@ async function showParameterLifecycleHistory(candidateId: string): Promise<void>
     shadow_validations: validations,
     promotion_and_rollback_decisions: decisions,
   });
-}
-
-async function exportAiAnalysisPackage(): Promise<void> {
-  const outputPath = await api.chooseAiAnalysisExportFile(
-    `足球模型智能分析资料_${new Date().toISOString().slice(0, 10)}.zip`,
-  );
-  if (!outputPath) return;
-  const summary = await runBusy(() => api.exportAiAnalysisPackage(outputPath));
-  lastAiAnalysisPackageId = summary.package_id;
-  localPreferences.setItem(ANALYSIS_PACKAGE_ID_KEY, summary.package_id);
-  render();
-  toast(
-    `智能分析资料已导出，包含 ${summary.sample_size} 个评估样本`,
-    "success",
-  );
-}
-
-async function exportAiAnalysisResponseTemplate(): Promise<void> {
-  const outputPath = await api.chooseAiAnalysisResponseTemplateFile(
-    `足球模型建议填写模板_${new Date().toISOString().slice(0, 10)}.zip`,
-  );
-  if (!outputPath) return;
-  await runBusy(() =>
-    api.exportAiAnalysisResponseTemplate(outputPath, lastAiAnalysisPackageId),
-  );
-  toast("建议填写模板已生成", "success");
-}
-
-async function decideDataQualityFinding(
-  findingId: string,
-  decision: "resolve" | "ignore",
-): Promise<void> {
-  if (!findingId) throw new Error("未找到需要处理的数据质量问题");
-  await runBusy(() =>
-    api.decideDataQualityFinding({
-      finding_id: findingId,
-      decision,
-      resolution_note:
-        decision === "resolve" ? "桌面端确认已处理" : "桌面端人工忽略",
-    }),
-  );
-  await loadAnalysisCenter();
-  render();
-  toast(
-    decision === "resolve" ? "已标记为处理完成" : "已忽略该提示",
-    "success",
-  );
-}
-
-async function previewAiAnalysisResponse(): Promise<void> {
-  const inputPath = await api.chooseAiAnalysisResponseFile();
-  if (!inputPath) return;
-  aiAnalysisResponsePath = inputPath;
-  aiAnalysisResponsePreview = await runBusy(() =>
-    api.previewAiAnalysisResponse(inputPath),
-  );
-  render();
-  const blocking = aiAnalysisResponsePreview.blocking_errors.length;
-  toast(
-    blocking > 0
-      ? `建议文件存在 ${blocking} 个必须先处理的问题`
-      : "建议文件检查通过",
-    blocking > 0 ? "error" : "success",
-  );
-}
-
-async function importAiAnalysisResponse(): Promise<void> {
-  if (!aiAnalysisResponsePath || !aiAnalysisResponsePreview)
-    throw new Error("没有已检查的智能分析建议文件");
-  if (aiAnalysisResponsePreview.blocking_errors.length > 0)
-    throw new Error("智能分析建议文件仍有必须先处理的问题");
-  aiAnalysisSuggestions = await runBusy(() =>
-    api.importAiAnalysisResponse(aiAnalysisResponsePath!),
-  );
-  aiAnalysisResponsePreview = null;
-  aiAnalysisResponsePath = null;
-  await loadAnalysisCenter();
-  render();
-  toast("智能分析建议已进入审核区，没有自动修改正式数据", "success");
-}
-
-async function decideAiSuggestion(
-  suggestionId: string,
-  decision: "accept" | "reject",
-): Promise<void> {
-  const suggestion = aiAnalysisSuggestions.find(
-    (item) => item.id === suggestionId,
-  );
-  if (!suggestion) throw new Error("智能分析建议不存在");
-  await runBusy(() =>
-    api.decideAiAnalysisSuggestion({
-      suggestion_id: suggestionId,
-      decision,
-      decided_by: "local_user",
-      decision_note:
-        decision === "accept" ? "桌面端人工接受" : "桌面端人工拒绝",
-    }),
-  );
-  await loadAnalysisCenter();
-  await session.refresh();
-  render();
-  toast(
-    decision === "accept" ? "建议已接受并按受控流程处理" : "建议已拒绝",
-    "success",
-  );
 }
 
 function openAiProfileDraftFromForm(): OpenAiProfileDraft {
@@ -3370,7 +3192,7 @@ async function handleAction(
         reviewFeature.state.detail?.ability_candidates.find(
           (item) => item.id === button.dataset.candidateId,
         ) ??
-        analysisAbilityCandidates.find(
+        analyticsFeature.state.abilityCandidates.find(
           (item) => item.id === button.dataset.candidateId,
         );
       if (candidate) showModal("能力更新证据", candidate);
@@ -3385,7 +3207,7 @@ async function handleAction(
     case "recover-evidence-decision":await postmatchActions.recoverEvidence(button.dataset.evidenceItemId??"");break;
     case "show-postmatch-evidence":postmatchActions.showEvidence(button.dataset.evidenceItemId??"");break;
     case "refresh-analysis-page":
-      await refreshAnalysisPage();
+      await loadAnalysisCenter();
       break;
     case "refresh-postmatch-monitoring":
       postmatchActions.monitor();
@@ -3397,7 +3219,7 @@ async function handleAction(
       await postmatchActions.submitEvidence(button.dataset.evidenceItemId ?? "",button.dataset.postmatchConfirm ?? "");
       break;
     case "generate-parameter-tuning":
-      if (!analysisReviewGateReady()) throw new Error("请先通过数据质量门禁并处理全部待审核建议");
+      if (!analyticsFeature.gates.review) throw new Error("请先通过数据质量门禁并处理全部待审核建议");
       await generateParameterTuning();
       break;
     case "check-parameter-lifecycle-readiness":
@@ -3424,85 +3246,42 @@ async function handleAction(
       );
       break;
     case "show-parameter-tuning": {
-      const candidate = parameterTuningCandidates.find(
+      const candidate = analyticsFeature.state.tuningCandidates.find(
         (item) => item.id === button.dataset.candidateId,
       );
       if (candidate) showModal("参数候选诊断", candidate);
       break;
     }
-    case "run-full-analysis":
-      if (!analysisHistoryReady()) throw new Error("请先在赛后复盘中完成至少一场正式结算");
-      await enqueueAnalysisTask("full_analysis_refresh");
-      break;
-    case "run-quality-scan":
-      if (!fullAnalysisReady()) throw new Error("请先完成包含有效样本的完整分析");
-      await enqueueAnalysisTask("data_quality_scan");
-      break;
-    case "refresh-analysis-jobs":
-      await refreshAnalysisPage();
-      break;
-    case "cancel-analysis-job":
-      await runBusy(() => api.cancelBackgroundJob(button.dataset.jobId ?? ""));
-      await loadAnalysisCenter();
-      render();
-      toast("已请求取消任务", "success");
-      break;
-    case "retry-analysis-job":
-      await runBusy(() => api.retryBackgroundJob(button.dataset.jobId ?? ""));
-      await loadAnalysisCenter();
-      render();
-      toast("任务已重新排队", "success");
-      break;
-    case "show-job-json": {
-      const job = analysisJobs.find((item) => item.id === button.dataset.jobId);
-      if (job) showModal("后台任务详情", job);
-      break;
-    }
-    case "export-ai-analysis-package":
-      if (!analysisQualityReady()) throw new Error("请先完成数据质量扫描并清除全部严重问题");
-      await exportAiAnalysisPackage();
-      break;
-    case "export-ai-response-template":
-      if (!lastAiAnalysisPackageId) throw new Error("请先导出本轮智能分析资料包");
-      await exportAiAnalysisResponseTemplate();
-      break;
-    case "preview-ai-analysis-response":
-      if (!lastAiAnalysisPackageId) throw new Error("请先导出分析资料并生成对应建议模板");
-      await previewAiAnalysisResponse();
-      break;
-    case "import-ai-analysis-response":
-      await importAiAnalysisResponse();
-      break;
-    case "show-ai-response-json":
-      if (aiAnalysisResponsePreview)
-        showModal("分析建议检查结果", aiAnalysisResponsePreview);
-      break;
-    case "decide-ai-suggestion":
-      await decideAiSuggestion(
-        button.dataset.suggestionId ?? "",
-        button.dataset.decision === "accept" ? "accept" : "reject",
-      );
-      break;
-    case "show-ai-suggestion-json": {
-      const suggestion = aiAnalysisSuggestions.find(
-        (item) => item.id === button.dataset.suggestionId,
-      );
-      if (suggestion) showModal("智能分析建议依据", suggestion);
-      break;
-    }
-    case "decide-quality-finding":
-      await decideDataQualityFinding(
-        button.dataset.findingId ?? "",
-        button.dataset.decision === "ignore" ? "ignore" : "resolve",
-      );
-      break;
-    case "show-quality-json": {
-      const finding = analyticsOverview?.data_quality.findings.find(
-        (item) => item.id === button.dataset.findingId,
-      );
-      if (finding) showModal("数据质量详情", finding);
-      break;
-    }
+    case "analysis-step":analyticsFeature.setStep(button.dataset.analyticsStep as import("./features/analytics").AnalysisStep);break;
+    case "run-full-analysis":analyticsActions.enqueue("full_analysis_refresh");break;
+    case "run-model-analysis":analyticsActions.enqueue("refresh_analytics");break;
+    case "run-quality-scan":analyticsActions.enqueue("data_quality_scan");break;
+    case "run-query-performance-scan":analyticsActions.enqueue("query_performance_scan");break;
+    case "refresh-analysis-jobs":await analyticsFeature.refresh();break;
+    case "cancel-analysis-job":analyticsActions.job(button.dataset.jobId??"","cancel");break;
+    case "retry-analysis-job":analyticsActions.job(button.dataset.jobId??"","retry");break;
+    case "recover-analysis-job":await analyticsFeature.jobs.recover(button.dataset.jobId??"");break;
+    case "recover-analysis-enqueue":analyticsActions.recoverEnqueue();break;
+    case "select-analysis-job":await analyticsFeature.selectJob(button.dataset.jobId||null);break;
+    case "show-job-json":analyticsActions.showJob(button.dataset.jobId??"");break;
+    case "analysis-jobs":analyticsFeature.setStep("model");app.querySelector("[data-analysis-panel=jobs]")?.scrollIntoView({block:"start"});break;
+    case "analysis-model":analyticsFeature.setStep("model");break;
+    case "analysis-quality":analyticsFeature.setStep("quality");break;
+    case "analysis-exchange":analyticsFeature.setStep("exchange");break;
+    case "analysis-advanced":analyticsFeature.setStep("advanced");break;
+    case "show-analysis-scope":analyticsActions.showScope();break;
+    case "show-analysis-quality":showModal("分析质量来源",{source:analyticsFeature.overview?.source_snapshot,quality:analyticsFeature.overview?.data_quality,gates:analyticsFeature.gates});break;
+    case "export-ai-analysis-package":analyticsActions.exportPackage();break;
+    case "export-ai-response-template":analyticsActions.template();break;
+    case "preview-ai-analysis-response":await analyticsFeature.exchange.chooseResponse();break;
+    case "import-ai-analysis-response":analyticsActions.importResponse();break;
+    case "recover-analysis-import":await analyticsFeature.exchange.recoverImport(button.dataset.receiptKey);break;
+    case "show-ai-response-json":showModal("分析建议检查结果",analyticsFeature.exchange.state.preview);break;
+    case "decide-ai-suggestion":analyticsActions.suggestion(button.dataset.suggestionId??"",button.dataset.decision as "accept"|"reject");break;
+    case "recover-analysis-decision":await analyticsFeature.reviews.recover(button.dataset.id??"");break;
+    case "show-ai-suggestion-json":showModal("智能分析建议依据",analyticsFeature.state.suggestions.find(r=>r.id===button.dataset.suggestionId));break;
+    case "decide-quality-finding":analyticsActions.quality(button.dataset.findingId??"",button.dataset.decision as "resolve"|"ignore");break;
+    case "show-quality-json":showModal("数据质量详情",analyticsFeature.overview?.data_quality.findings.find(r=>r.id===button.dataset.findingId));break;
     case "open-lineup":
       showModal(
         "阵容详情",

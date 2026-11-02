@@ -1,12 +1,7 @@
 import { api } from "../api/client";
 import type {
-  AbilityUpdateCandidateRecord,
-  AiAnalysisSuggestionRecord,
-  AnalyticsOverview,
-  BackgroundJob,
   CoachListItem,
   LineupRecord,
-  ParameterTuningCandidateRecord,
   PlayerCatalogReferenceData,
 } from "../types";
 
@@ -17,14 +12,6 @@ export interface LineupsLoadResult {
   readonly coaches: CoachListItem[];
 }
 
-export interface AnalysisCenterLoadResult {
-  readonly overview: AnalyticsOverview;
-  readonly jobs: BackgroundJob[];
-  readonly suggestions: AiAnalysisSuggestionRecord[];
-  readonly abilityCandidates: AbilityUpdateCandidateRecord[];
-  readonly tuningCandidates: ParameterTuningCandidateRecord[];
-}
-
 export async function fetchLineups(): Promise<LineupsLoadResult> {
   const [references, records, coaches] = await Promise.all([
     api.playerCatalogReferenceData(),
@@ -32,15 +19,4 @@ export async function fetchLineups(): Promise<LineupsLoadResult> {
     api.listCoaches({ search: null, active_only: false, limit: 500 }),
   ]);
   return { references, records, coaches };
-}
-
-export async function fetchAnalysisCenter(): Promise<AnalysisCenterLoadResult> {
-  const [overview, jobs, suggestions, abilityCandidates, tuningCandidates] = await Promise.all([
-    api.analyticsOverview(),
-    api.listBackgroundJobs(100),
-    api.listAiAnalysisSuggestions(null, 500),
-    api.listAbilityCandidates("pending", 500, null),
-    api.listParameterTuningCandidates(100),
-  ]);
-  return { overview, jobs, suggestions, abilityCandidates, tuningCandidates };
 }

@@ -1,3 +1,4 @@
+import {verifyAnalyticsHierarchy} from './features/verifyAnalyticsHierarchy.mjs';
 import {readProjectSource} from "./styles/projectSource.mjs";
 import {fileURLToPath as stylesheetFilePath} from "node:url";
 const stylesheetRoot=stylesheetFilePath(new URL("../",import.meta.url));
@@ -24,12 +25,11 @@ check(
   /\.rules-scope-list,\s*\n\.rules-region-list\s*\{[^}]*align-content:\s*start[^}]*grid-auto-rows:\s*max-content/s.test(entity),
   "赛事一级分类没有与地区列表采用相同的顶部紧凑纵向排列",
 );
-for (const id of ["analysis-history-step", "analysis-model-step", "analysis-quality-step", "analysis-lifecycle-step"]) {
-  check(analytics.includes(`<details id="${id}"`), `分析页阶段 ${id} 没有改为可折叠的单阶段工作区`);
-}
-check(analytics.includes("const activeStep ="), "分析页没有根据链路状态只展开当前阶段");
+// Latest approved S12 uses horizontal steps: retain all original reachability, active-stage and gate obligations via real rendering (29 assertions), with no accordion-specific source shape.
+await verifyAnalyticsHierarchy(stylesheetRoot);
+
 check(!analytics.includes('<section class="analysis-chain-map"'), "分析页仍重复显示第二套四阶段流程图");
-check(visual.includes(".analysis-step-summary") && visual.includes(".analysis-step-content"), "分析页缺少折叠摘要与内容区样式");
+const analysisStyles=read("src/features/analytics/analytics.css");check(analysisStyles.includes(".analytics-workflow")&&analysisStyles.includes(".analytics-viewport.workspace-module-view.active")&&analysisStyles.includes("grid-template-rows:auto auto auto auto auto minmax(0,1fr)"),"分析页缺少批准的横向步骤与剩余高度独立视口样式");
 
 const screenshotNames = new Set(contract.screenshot_cases.map((item) => item.name));
 for (const name of [

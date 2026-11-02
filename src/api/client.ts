@@ -595,8 +595,8 @@ export const api = {
     draft: AbilityCandidateDecisionDraft,
   ): Promise<AbilityUpdateCandidateRecord> =>
     invoke("decide_ability_candidate", { draft }),
-  analyticsOverview: (): Promise<AnalyticsOverview> =>
-    invoke("analytics_overview"),
+  analyticsOverview: (snapshotId: string | null = null): Promise<AnalyticsOverview> =>
+    invoke("analytics_overview", { snapshotId }),
   enqueueAnalysisJob: (draft: EnqueueJobDraft): Promise<BackgroundJob> =>
     invoke("enqueue_analysis_job", { draft }),
   listBackgroundJobs: (limit = 100): Promise<BackgroundJob[]> =>
@@ -620,16 +620,18 @@ export const api = {
   },
   exportAiAnalysisPackage: (
     outputPath: string,
+    expectedSnapshotId: string | null = null,
   ): Promise<AiAnalysisPackageSummary> =>
-    invoke("export_ai_analysis_package", { outputPath }),
+    invoke("export_ai_analysis_package", { outputPath, expectedSnapshotId }),
   previewAiAnalysisResponse: (
     inputPath: string,
   ): Promise<AiAnalysisResponsePreview> =>
     invoke("preview_ai_analysis_response", { inputPath }),
   importAiAnalysisResponse: (
     inputPath: string,
+    expectedPreview: AiAnalysisResponsePreview | null = null,
   ): Promise<AiAnalysisSuggestionRecord[]> =>
-    invoke("import_ai_analysis_response", { inputPath }),
+    invoke("import_ai_analysis_response", { inputPath, expectedPreview }),
   listAiAnalysisSuggestions: (
     status: string | null,
     limit = 500,

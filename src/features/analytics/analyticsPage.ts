@@ -1,0 +1,34 @@
+import type {BootstrapResponse} from '../../types';
+import type {PostmatchFeature} from '../postmatch/index';
+import {postmatchPanel} from '../postmatch/index';
+import {inlineDatabaseSetup} from '../../components/databaseSetup';
+import {taskPageHeader} from '../../ui/patterns/workbench';
+import {iconSlot} from '../../ui/icons/iconSlot';
+import type {AnalyticsFeature} from './analyticsFeature';
+import type {AnalysisStep} from './analyticsPorts';
+import {action,badgeView,html,message,metric,panel,empty} from './analyticsViewParts';
+import {analyticsModelView,analyticsAdvancedView} from './analyticsModelView';
+import {analyticsQualityView} from './analyticsQualityView';
+import {analyticsExchangeView} from './analyticsExchangeView';
+import {tuningPanel} from './analyticsLifecycleView';
+export function analyticsPage(state:BootstrapResponse,feature:AnalyticsFeature,postmatch:PostmatchFeature):string {
+ const heading=taskPageHeader({eyebrow:'',title:'从赛后历史到模型校准',description:'历史样本 → 完整分析 → 质量与审核 → 受控校准；查看步骤不改变执行门禁。'});
+ if(!state.data.database_configured)return `<section class="analytics-page">${heading}${inlineDatabaseSetup('连接数据服务以运行分析','连接后读取正式结算、分析快照、质量扫描和待审建议。',state.connection_error)}</section>`;
+ const data=feature.state,gates=feature.gates,overview=feature.overview,quality=overview?.data_quality,step=feature.step;
+ const pending=data.suggestions.length+data.abilityCandidates.length,source=overview?.source_snapshot;
+ const metrics=`<div class="analytics-metrics">${metric('正式结算',postmatch.overview?.settlement_count??null,'与有效样本分开')}${metric('完整分析',overview?.generated_at?overview.sample_size+' 个样本':null,'快照来源独立核实')}${metric('质量与审核',gates.quality?(pending?pending+' 项候选待审':'无待审候选'):quality?.scan_id?(quality.critical+' 个严重问题'):'—',gates.scanCurrent?'扫描与当前快照时点已核实':'扫描身份或时点待核实')}${metric('受控校准','未授权','仍需精确分区与人工决定')}</div>`;
+ const active=step==='exchange'?'quality':step==='advanced'?'model':step;
+ const stages:Array<{id:AnalysisStep;title:string;note:string;complete:boolean;enabled:boolean}>=[{id:'history',title:'历史样本',note:'正式结算已存在',complete:gates.history,enabled:true},{id:'model',title:'完整分析',note:'生成时间与有效样本',complete:gates.analysis,enabled:gates.history},{id:'quality',title:'质量与审核',note:'扫描与待审记录分开',complete:gates.review,enabled:gates.analysis},{id:'lifecycle',title:'受控校准',note:'精确分区与人工决策',complete:false,enabled:gates.review}];
+ const workflow=`<nav class="analytics-workflow" aria-label="分析步骤">${stages.map((s,i)=>`<button type="button" class="analytics-step" id="analytics-step-${s.id}" data-action="analysis-step" data-analytics-step="${s.id}" data-active="${active===s.id}" ${active===s.id?'aria-current="step"':''} title="${s.title} · ${s.note}"><span class="analytics-step-marker">${s.complete?iconSlot('check',16):String(i+1).padStart(2,'0')}</span><span class="analytics-step-copy"><strong>${s.title}</strong><small>${s.note}</small></span>${badgeView(s.complete?'已完成':s.enabled?'可查看':'未解锁',s.complete?'Success':'Neutral','Outline')}</button>`).join('')}</nav>`;
+ let body='';
+ if(step==='history')body=postmatchPanel(postmatch,state.data.competitions);
+ if(step==='model')body=analyticsModelView(feature);
+ if(step==='quality')body=analyticsQualityView(feature);
+ if(step==='exchange')body=analyticsExchangeView(feature);
+ if(step==='advanced')body=analyticsAdvancedView(feature);
+ if(step==='lifecycle')body=gates.review?tuningPanel(data.tuningCandidates,state.data.competitions):panel('04 · 受控校准','本页指标不提供精确分区的参数执行许可。',`${empty('先核对质量与人工审核','候选、影子验证、晋升和回滚分别处理；全局计数不作为H/I许可。')}<div class="analytics-actions">${action('检查阶段 I 门禁','check-parameter-lifecycle-readiness')}${action('返回质量与审核','analysis-quality')}</div>`,'lifecycle');
+ const receipts=feature.pendingReceipts;
+ const recovery=receipts.length?panel('原操作结果待核实','以下记录按当前数据库保存。目录未出现原对象不能证明未写入，不自动重发。',receipts.map(r=>'<div class="analytics-actions"><span>'+html(r.kind==='enqueue'?'原入队请求':r.kind==='job'?'任务 '+r.job.id:r.kind==='import'?'回包 '+r.preview.manifest.response_id:'决定 '+r.id)+'</span>'+action('核对原操作',r.kind==='enqueue'?'recover-analysis-enqueue':r.kind==='job'?'recover-analysis-job':r.kind==='import'?'recover-analysis-import':'recover-analysis-decision',false,false,r.kind==='job'?{'data-job-id':r.job.id}:r.kind==='import'?{'data-receipt-key':r.key}:r.kind==='suggestion'||r.kind==='quality'?{'data-id':r.id}:{})+'</div>').join(''),'recovery'):'';
+ const scope=feature.selectedJobId?'原任务 '+feature.selectedJobId:(source?'最近快照 '+source.id:'尚未取得带来源的分析快照');
+ return `<section class="module-workspace-page analysis-module-workspace analytics-page" data-workspace-persist="false">${heading}<p class="analytics-scope">${html(scope)} · ${source?.competition_id?'赛事 '+html(source.competition_id):source?'全库来源':'范围待核实'}；H/I 门禁独立核对。</p><div class="analytics-actions">${action('刷新链路','refresh-analysis-page',data.loading)}${action('任务状态','analysis-jobs')}${action('范围说明','show-analysis-scope')}</div>${metrics}${workflow}<div class="module-workspace-stage analytics-stage"><div class="workspace-module-view active analytics-viewport" data-workspace-scroll-key="analytics-stage" tabindex="0" aria-label="分析内容"><div class="analytics-body" id="analysis-${step}-step">${data.loading?message('正在读取分析目录','保留上次来源，未返回的数据不补零。'):''}${data.error?message('分析刷新未完成',data.error):''}${recovery}${body}</div></div></div></section>`;
+}

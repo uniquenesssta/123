@@ -174,6 +174,14 @@
       },
       "viewport_class": "review-workspace-viewport",
       "pinned_action_class": "review-manual-submit"
+    },
+    "analytics": {
+      "authority": "S12 History 608:135680 / ModelResults instance I608:151916;380:1212;412:15458;608:152896 / Quality612:144602 / Exchange612:148687 / R14-13",
+      "shared_components": {
+        "taskPageHeader": "taskPageHeader",
+        "taskContextRibbon": "analytics-scope"
+      },
+      "viewport_class": "analytics-viewport"
     }
   }
 }

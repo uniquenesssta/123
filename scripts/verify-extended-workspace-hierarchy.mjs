@@ -1,3 +1,4 @@
+import {verifyAnalyticsHierarchy} from './features/verifyAnalyticsHierarchy.mjs';
 import {productionStyleFiles} from "./styles/styleGraph.mjs";
 import {readProjectSource} from "./styles/projectSource.mjs";
 import {fileURLToPath as stylesheetFilePath} from "node:url";
@@ -16,7 +17,7 @@ const shell = JSON.parse(read("contracts/global-visual-system-contract.json")).s
 const workspace = read("src/ui/navigation/section-navigation/sectionNavigationView.ts");
 const rules = ["src/features/rules/rulesView.ts", "src/features/rules/bindingView.ts", "src/features/competitions/catalogueView.ts", "src/features/competitions/competitionView.ts"].map(read).join("\n");
 const release = read("src/pages/release.ts");
-const analytics = read("src/pages/analytics.ts");
+
 const apiWorkspace = read("src/pages/apiWorkspace.ts");
 const openai = read("src/pages/openai.ts");
 const database = read("src/features/database/databaseView.ts");
@@ -60,11 +61,7 @@ for (const [id, label] of [["overview", "发布总览"], ["chain", "全链路"],
 check(release.includes('class="release-core-layout'), "发布验收缺少主工作区与检查器布局");
 check(!release.includes('<aside class="panel module-sidebar"'), "发布验收仍保留重复的页面级左侧目录");
 
-for (const [id, label] of [["analysis-history-step", "历史样本"], ["analysis-model-step", "完整分析"], ["analysis-quality-step", "质量门禁"], ["analysis-lifecycle-step", "受控校准"]]) {
-  check(analytics.includes(`{ id: "${id}"`) && analytics.includes(`label: "${label}"`), `分析链缺少任务：${label}`);
-  check(analytics.includes(`id="${id}"`) && analytics.includes("workspace-anchor-target"), `分析链缺少定位目标：${id}`);
-}
-check(analytics.includes("historyReady") && analytics.includes("analysisReady") && analytics.includes("reviewGateReady") && analytics.includes("lifecycleCompleted"), "分析链依赖状态未完整保留");
+await verifyAnalyticsHierarchy(root);
 
 for (const [id, label] of [["chat", "对话工作台"], ["history", "会话历史"]]) {
   check(apiWorkspace.includes(`id: "${id}"`) && apiWorkspace.includes(`label: "${label}"`), `AI 问答缺少任务：${label}`);

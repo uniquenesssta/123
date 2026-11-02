@@ -9,7 +9,7 @@ export async function verifyPostmatchBrowser(root,directory){
   const click=s=>evaluate(`(async()=>{const node=document.querySelector(${JSON.stringify(s)});if(!node)throw Error('Missing '+${JSON.stringify(s)});node.focus();node.click();await new Promise(r=>setTimeout(r,180));})()`);
   const confirm=()=>click('[data-confirmation-action="confirm"]'),cancel=()=>click('[data-confirmation-action="cancel"]');
   const select=async(id,value)=>{await click('#'+id);await click('#'+id+'-options .ui-select-option[data-value="'+value+'"]');};
-  const history=()=>evaluate('(()=>{const d=document.querySelector("#analysis-history-step");if(!d.open)d.querySelector("summary").click();})()');
+  const history=()=>evaluate('(()=>{document.querySelector("[data-analytics-step=history]").click();})()');
   await route('review');await select('review-match-id','a');await click('[data-action="load-review-match"]');await click('[data-review-step="8"]');
   await check('generated review alone does not authorize settlement','document.querySelector("[data-action=settle-postmatch-review]").disabled&&window.__pm.writes.length===0');
   await click('[data-action="inspect-postmatch-readiness"]');

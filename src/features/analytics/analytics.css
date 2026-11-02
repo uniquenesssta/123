@@ -1,0 +1,36 @@
+.application-shell:where([data-current-page="analytics"]) .analytics-page{flex:1;height:100%;min-height:0;min-width:0;display:grid;grid-template-rows:auto auto auto auto auto minmax(0,1fr);gap:var(--fip-space-sm);overflow:hidden;font:400 12px/18px var(--fip-type-body-family);color:var(--fip-text)}
+.application-shell:where([data-current-page="analytics"]) .analytics-page>.task-page-header{margin:0;min-height:56px;padding:0}
+.application-shell:where([data-current-page="analytics"]) .analytics-page h1{margin:0;font:700 26px/34px var(--fip-type-page-title-family)}
+.application-shell:where([data-current-page="analytics"]) .analytics-page :is(h2,h3){margin:0;font:700 14px/20px var(--fip-type-body-family)}
+.application-shell:where([data-current-page="analytics"]) .analytics-page p{margin:0;overflow-wrap:anywhere}
+.application-shell:where([data-current-page="analytics"]) .analytics-scope{color:var(--fip-muted)}
+.application-shell:where([data-current-page="analytics"]) .analytics-metrics{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:var(--fip-space-sm);min-width:0}
+.application-shell:where([data-current-page="analytics"]) .analytics-metrics>.ui-stat-card{min-height:96px;border:0;border-radius:var(--fip-radius-panel);background:var(--fip-info-soft)}
+.application-shell:where([data-current-page="analytics"]) .analytics-metrics :is(.ui-stat-label,.ui-stat-value){color:var(--fip-info)}
+.application-shell:where([data-current-page="analytics"]) .analytics-actions{display:flex;align-items:center;flex-wrap:wrap;gap:var(--fip-space-sm);min-width:0}
+.application-shell:where([data-current-page="analytics"]) .analytics-workflow{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:var(--fip-space-sm)}
+.application-shell:where([data-current-page="analytics"]) .analytics-step{display:grid;grid-template-columns:28px minmax(0,1fr) auto;align-items:center;gap:var(--fip-space-sm);min-width:0;min-height:58px;margin:0;padding:8px 10px;border:1px solid var(--fip-border);border-radius:var(--fip-radius-md);background:var(--fip-surface);color:var(--fip-text);text-align:start;cursor:pointer}
+.application-shell:where([data-current-page="analytics"]) .analytics-step[data-active="true"]{border-inline-start-color:var(--fip-text);background:var(--fip-color-bg-subtle)}
+.application-shell:where([data-current-page="analytics"]) .analytics-step-marker{width:28px;height:28px;display:flex;align-items:center;justify-content:center;border-radius:var(--fip-radius-full);background:var(--fip-color-bg-subtle);font:500 12px/18px var(--fip-type-body-family)}
+.application-shell:where([data-current-page="analytics"]) .analytics-step[data-active="true"] .analytics-step-marker{background:var(--fip-text);color:var(--fip-surface)}
+.application-shell:where([data-current-page="analytics"]) .analytics-step-copy{display:flex;flex-direction:column;min-width:0;gap:2px}
+.application-shell:where([data-current-page="analytics"]) .analytics-step-copy strong{font-size:12px;font-weight:700;line-height:18px}
+.application-shell:where([data-current-page="analytics"]) .analytics-step-copy small{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:11px;line-height:16px;color:var(--fip-muted)}
+.application-shell:where([data-current-page="analytics"]) .analytics-stage{min-height:0;overflow:hidden}
+.application-shell:where([data-current-page="analytics"]) .analytics-stage>.analytics-viewport.workspace-module-view.active{display:block;height:100%;min-height:0;overflow:auto;padding:0 2px 12px;scrollbar-gutter:stable}
+.application-shell:where([data-current-page="analytics"]) .analytics-body{display:flex;flex-direction:column;gap:var(--fip-space-sm);min-width:0}
+.application-shell:where([data-current-page="analytics"]) .analytics-panel{display:flex;flex-direction:column;gap:var(--fip-space-sm);min-width:0;padding:var(--fip-layout-panel-padding);border:0;border-radius:var(--fip-radius-panel);background:var(--fip-surface);box-shadow:var(--fip-panel-shadow)}
+.application-shell:where([data-current-page="analytics"]) .analytics-panel>header{display:flex;flex-direction:column;gap:2px;min-width:0}
+.application-shell:where([data-current-page="analytics"]) .analytics-panel>header p{color:var(--fip-muted)}
+.application-shell:where([data-current-page="analytics"]) .analytics-panel-body{display:flex;flex-direction:column;gap:var(--fip-space-sm);min-width:0}
+.application-shell:where([data-current-page="analytics"]) :is(.analytics-job,.analytics-suggestion,.analytics-finding){display:flex;flex-direction:column;gap:var(--fip-space-sm);min-width:0;padding-block:var(--fip-space-sm)}
+.application-shell:where([data-current-page="analytics"]) .analytics-job>div:first-child{display:flex;align-items:center;justify-content:space-between;gap:var(--fip-space-sm);min-width:0}
+.application-shell:where([data-current-page="analytics"]) :is(.analytics-job+.analytics-job,.analytics-suggestion+.analytics-suggestion,.analytics-finding+.analytics-finding){border-top:1px solid var(--fip-border)}
+.application-shell:where([data-current-page="analytics"]) .analytics-job[data-selected="true"]{background:var(--fip-color-bg-subtle)}
+.application-shell:where([data-current-page="analytics"]) .analytics-panel :is(.ui-data-table th,.ui-data-table td){font-size:12px;line-height:18px;font-weight:500;vertical-align:middle;overflow-wrap:anywhere}
+.application-shell:where([data-current-page="analytics"]) .analytics-panel .ui-data-table th{height:34px}
+.application-shell:where([data-current-page="analytics"]) .analytics-panel .ui-data-table td{height:36px}
+@media(max-width:1050px){.application-shell:where([data-current-page="analytics"]) .analytics-step{grid-template-columns:24px minmax(0,1fr);gap:6px;padding:8px}.application-shell:where([data-current-page="analytics"]) .analytics-step>.ui-badge{grid-column:2;justify-self:start}.application-shell:where([data-current-page="analytics"]) .analytics-step{min-height:76px}}
+@media(max-width:700px){.application-shell:where([data-current-page="analytics"]) :is(.analytics-metrics,.analytics-workflow){grid-template-columns:repeat(2,minmax(0,1fr))}.application-shell:where([data-current-page="analytics"]) .analytics-metrics>.ui-stat-card{min-height:84px}}
+
+.application-shell:where([data-current-page="analytics"]) .analytics-job h3{min-width:0;overflow-wrap:anywhere}

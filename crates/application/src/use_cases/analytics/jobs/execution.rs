@@ -106,6 +106,7 @@ where
             }
             let query = port.capture_query_performance().await?;
             Ok(AnalyticsJobResult::FullAnalysisRefresh {
+                source_snapshot: overview.source_snapshot.clone(),
                 sample_size: overview.sample_size,
                 expected_calibration_error: overview.expected_calibration_error,
                 quality_findings: quality.open_total,

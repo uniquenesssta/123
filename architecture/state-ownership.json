@@ -881,8 +881,22 @@
       ],
       "transition": null,
       "migration_task": "R14-12"
+    },
+    {
+      "id": "feature.analytics-workflow",
+      "owner": "src/features/analytics/analyticsFeature.ts::AnalyticsFeature",
+      "scope": "analysis snapshot provenance and query; job ID and request lifecycle; database-bound files, pending suggestions and quality decisions; backend owns algorithms and ledgers",
+      "writers": [
+        "AnalyticsFeature with AnalyticsQuery/AnalyticsJobs/AnalyticsExchange/AnalyticsReviews"
+      ],
+      "forbidden": [
+        "src/pages/**",
+        "src/api/**"
+      ],
+      "transition": null,
+      "migration_task": "R14-13"
     }
   ],
-  "count": 61,
-  "last_updated_task": "R14-12"
+  "count": 62,
+  "last_updated_task": "R14-13"
 }

@@ -18,8 +18,8 @@ use uuid::Uuid;
 
 #[async_trait]
 impl AnalyticsPort for PersistenceStore {
-    async fn overview(&self) -> PortResult<AnalyticsOverview> {
-        self.analytics_overview()
+    async fn overview(&self, snapshot_id: Option<Uuid>) -> PortResult<AnalyticsOverview> {
+        self.read_analysis_snapshot_overview(snapshot_id)
             .await
             .map_err(map_persistence_error)
     }

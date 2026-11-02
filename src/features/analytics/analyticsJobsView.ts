@@ -1,0 +1,14 @@
+import type {AnalyticsFeature} from './analyticsFeature';
+import {analysisJobTypes} from './analyticsJobs';
+import {progressView} from '../../ui/data-display/progress';
+import {action,badgeView,empty,html,message,panel} from './analyticsViewParts';
+export const jobTypeLabel=(type:string)=>({refresh_analytics:'模型评估',full_analysis_refresh:'完整分析',data_quality_scan:'数据质量检查',query_performance_scan:'数据库性能检查'}[type]??type);
+export function analyticsJobsView(feature:AnalyticsFeature):string {
+ const rows=feature.state.jobs.filter(j=>analysisJobTypes.includes(j.job_type)),state=feature.jobs.state;
+ const pending=state.enqueuePending?message('原入队请求待核实','使用原幂等键核对；不会创建另一个任务。')+action('核对原入队请求','recover-analysis-enqueue',state.busy):'';
+ return panel('分析任务','取消请求不是终态；手动刷新读取实际状态。已有分析快照独立保留，不按任务失败自动回滚。',`${state.error?message('任务操作未完成',state.error):''}${pending}<div class="analytics-actions">${action('刷新任务','refresh-analysis-jobs',feature.state.loading)}${feature.selectedJobId?action('返回最新快照','select-analysis-job'):''}</div>${rows.length?rows.map(job=>{
+  const unknown=feature.jobs.pending(job.id),status=job.status==='running'&&job.cancellation_requested?'取消已请求':({queued:'排队中',running:'运行中',succeeded:'已完成',failed:'失败',cancelled:'已取消'}[job.status]);
+  return `<article class="analytics-job" data-analysis-job="${html(job.id)}" data-selected="${feature.selectedJobId===job.id}"><div><h3>${html(jobTypeLabel(job.job_type))} · ${html(job.id)}</h3>${badgeView(status,job.status==='failed'?'Danger':job.status==='succeeded'?'Success':'Neutral','Outline')}</div><p>${html(typeof job.payload.competition_id==='string'?'赛事 '+job.payload.competition_id:'全库范围')} · 尝试 ${job.attempts}/${job.max_attempts} · ${html(job.updated_at)}</p>${progressView({label:jobTypeLabel(job.job_type)+'进度',value:job.progress})}<p>进度 ${numberProgress(job.progress)} · ${job.cancellation_requested?'取消请求已记录，尚未终止时仍显示实际运行状态。':'任务状态与有效样本分别核对。'}</p>${job.error_message?message('任务错误',job.error_message):''}${unknown?message('原任务操作待核实','按原任务ID查回，不盲目取消或重试。'):''}<div class="analytics-actions">${action('查看本任务结果','select-analysis-job',false,false,{'data-job-id':job.id})}${action('请求取消','cancel-analysis-job',state.busy||!!unknown||!['queued','running'].includes(job.status)||job.cancellation_requested,false,{'data-job-id':job.id})}${action('重试任务','retry-analysis-job',state.busy||!!unknown||!['failed','cancelled'].includes(job.status)||job.attempts>=job.max_attempts,false,{'data-job-id':job.id})}${unknown?action('核对原任务','recover-analysis-job',state.busy,false,{'data-job-id':job.id}):''}${action('任务详情','show-job-json',false,false,{'data-job-id':job.id})}</div></article>`;
+ }).join(''):empty('暂无分析任务','运行分析后按任务ID查看进度和最终状态。')}`,'jobs');
+}
+const numberProgress=(progress:number)=>new Intl.NumberFormat('zh-CN',{maximumFractionDigits:1}).format(progress)+'%';

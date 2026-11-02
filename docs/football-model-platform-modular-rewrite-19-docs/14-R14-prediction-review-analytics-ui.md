@@ -20,7 +20,7 @@
 
 ## 状态与依赖
 
-当前 **R14-01 DONE（自身精确CI/官方摘要/双包/startup已验收），R14-06 DONE（精确CI/官方摘要/双包/startup已验收），R14-07 DONE（修复后精确CI/官方摘要/双包/startup已验收），R14-08 DONE（修复代码40c2df90自身CI41350740759/官方摘要/双包/startup已验收），R14-12 DONE（自身fd9b32dd/CI41375966354/官方摘要/双包/startup已验收），R14-13 IN_PROGRESS（用户明确授权），R14-16及以后PLANNED、未启动**。R13适用出口已完成且用户已授权01；分支rewrite/r14-prediction-review-analytics-ui，基线3d9363fe。代码866ba003已推送，自身CI41285690142及产物已核验通过。见[执行索引](../modular-rewrite/R14-prediction-review-analytics-ui/README.md)。下表顺序是默认交付顺序，必要时在已授权阶段内按真实依赖拆出更小批次并说明原因，不以任务数量或文件数为目标。
+当前 **R14-01 DONE（自身精确CI/官方摘要/双包/startup已验收），R14-06 DONE（精确CI/官方摘要/双包/startup已验收），R14-07 DONE（修复后精确CI/官方摘要/双包/startup已验收），R14-08 DONE（修复代码40c2df90自身CI41350740759/官方摘要/双包/startup已验收），R14-12 DONE（自身fd9b32dd/CI41375966354/官方摘要/双包/startup已验收），R14-13 VERIFYING（实现/本地适用验证完成，自身CI/官方包待验），R14-16及以后PLANNED、未启动**。R13适用出口已完成且用户已授权01；分支rewrite/r14-prediction-review-analytics-ui，基线3d9363fe。代码866ba003已推送，自身CI41285690142及产物已核验通过。见[执行索引](../modular-rewrite/R14-prediction-review-analytics-ui/README.md)。下表顺序是默认交付顺序，必要时在已授权阶段内按真实依赖拆出更小批次并说明原因，不以任务数量或文件数为目标。
 
 | 主交付 ID | 交付批次 | 前置 |
 |---|---|---|
@@ -394,7 +394,7 @@ if ($LASTEXITCODE -ne 0) { throw 'R14-12: verify-review-service failed' }
 ### 审计后的实际交付范围
 
 - **直接复用并核销重复建设：** S12分析查询、四类任务、取消/重试、包/建议API和H证据；不重建分析引擎或任务队列。
-- **本批必须完成：** 将纵向折叠工作台与批准的顶部指标/横向步骤/内容区逐项协调接入，保留必要信息；分离任务终态、总览快照与精确范围许可；接受建议只进入待审候选。
+- **本批必须完成：** 将纵向折叠工作台与批准的顶部指标/横向步骤/内容区逐项协调接入，保留必要信息；分离任务终态、总览快照与精确范围许可；接受建议按实际类型只登记审核结果或生成待审能力候选，不直接改参。
 - **增量验收：** R14-13-D1：同history/analysis/quality状态、同样本范围对照，步骤/指标不因全局快照误解锁。D2：任务取消/失败/切页返回、包冲突与重复决定均有真实生产路径断言；本批骨架供14-16复用。
 
 覆盖原节点：R14-13、R14-14、R14-15。
@@ -455,6 +455,8 @@ if ($LASTEXITCODE -ne 0) { throw 'R14-13: verify-api-workspace-research-control 
 同时执行[共享验证门禁](../modular-rewrite/remaining-execution-contract.md)。任一业务场景失败、命令/Schema/保护资产非预期变化、仍存在双状态owner或无法说明的写入结果，均阻止该批交付。缺外部环境只按既定待验规则登记；R17-06和R18不得再延期必需真实验收。
 
 **回退与交接：** 在修改前记录本批基线提交和用户已有修改；按执行约定的代码/数据双层回退处理。交接必须列出本批实际新owner、原函数/事件/类型去向、复用接口、逐项场景证据和剩余环境项。主交付以及所覆盖原ID只有满足各自义务才可记完成。
+
+R14-13实施及本地适用验收已完成，当前VERIFYING；见[13实施记录](../modular-rewrite/R14-prediction-review-analytics-ui/R14-13-analysis-jobs-and-packages.md)。原快照与预检缺陷通过原命令的可选保护参数修复，None旧调用保留；不把原子事务或文件效果的未验证部分写成Full。下一主交付R14-16未启动。
 
 ## R14-16 能力与参数候选决策
 

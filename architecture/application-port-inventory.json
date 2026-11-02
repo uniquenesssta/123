@@ -23,7 +23,7 @@
       "crates/application/src/ports/system/mod.rs",
       "crates/application/src/ports/team/mod.rs"
     ],
-    "portSourceSha256": "a155a2f7e071bf7204d347db0599348b2da274fc4533171dfd9487cf6fcd44ff",
+    "portSourceSha256": "81e1c9b992a12b078356556230511a084a1f5c3eccacade0f43b38e04ce24bf8",
     "publicPortTraitCount": 43,
     "applicationRustFileCount": 422,
     "directConcretePersistenceImports": [
@@ -39,8 +39,8 @@
     "existingJsonBoundaries": [
       {
         "owner": "crates/application/src/ports/analytics/contracts.rs",
-        "sourceSha256": "ef0b05d4d2b73ad8d69a8ecbeb0646d2b31c9f1e6347f5399c03039ecac5c17f",
-        "reason": "R3-08 typed wrappers retain private JSON conversion; no raw Value in Analytics Port methods."
+        "sourceSha256": "bf2864d930eb7e17f2345da40ab9ef4c14860bdd34425e23cd22b1b7e425ebe6",
+        "reason": "R3-08 typed wrappers retain private JSON conversion; no raw Value in Analytics Port methods. R14-13 adds optional typed source_snapshot to FullAnalysisRefresh while preserving legacy JSON when absent; no new raw Value Port method."
       },
       {
         "owner": "crates/application/src/ports/review/package.rs",

@@ -20,6 +20,7 @@ use uuid::Uuid;
 
 fn response() -> Value {
     json!({
+        "source_snapshot": {"id":Uuid::from_u128(8),"competition_id":null,"window_start":null,"window_end":null,"request":{"competition_id":null,"window_start":null,"window_end":null,"bucket_count":10,"baseline_size":100,"current_size":50}},
         "generated_at": "2026-10-13T00:00:00.123456789Z", "calculation_version": "original-version",
         "sample_size": 17, "average_log_loss": 0.3, "average_brier": 0.2,
         "average_scoreline_nll": null, "expected_calibration_error": 0.125,
@@ -122,7 +123,7 @@ impl AnalyticsPort for Fixture {
         self.note("decide", serde_json::to_value(draft).unwrap())?;
         Ok(suggestion())
     }
-    async fn overview(&self) -> PortResult<AnalyticsOverview> {
+    async fn overview(&self, _snapshot_id: Option<Uuid>) -> PortResult<AnalyticsOverview> {
         panic!("unexpected separate overview read")
     }
     async fn refresh(&self, _request: &AnalyticsRefreshRequest) -> PortResult<AnalyticsOverview> {
@@ -184,7 +185,7 @@ async fn import_forwards_same_file_preview_warnings_and_unfiltered_port_result()
     export_ai_analysis_response_template(path.clone(), Some(Uuid::from_u128(99))).unwrap();
     let preview = preview_ai_analysis_response(path.clone()).unwrap();
     let fixture = Fixture::new();
-    let result = import_ai_analysis_response(&fixture, path.clone())
+    let result = import_ai_analysis_response(&fixture, path.clone(), None)
         .await
         .unwrap();
     assert_eq!(fixture.names(), ["import"]);
@@ -209,7 +210,7 @@ async fn missing_or_invalid_zip_fails_before_import_port() {
         ));
         let fixture = Fixture::new();
         assert!(matches!(
-            import_ai_analysis_response(&fixture, path)
+            import_ai_analysis_response(&fixture, path, None)
                 .await
                 .unwrap_err(),
             ApplicationError::AnalysisPackage(_)
@@ -225,7 +226,7 @@ async fn export_writes_package_then_records_exact_summary_with_repeatable_conten
     for name in ["first.zip", "second.zip"] {
         let fixture = Fixture::new();
         let path = directory.path().join(name).to_string_lossy().to_string();
-        let summary = export_ai_analysis_package(&fixture, path.clone())
+        let summary = export_ai_analysis_package(&fixture, path.clone(), None)
             .await
             .unwrap();
         assert_eq!(fixture.names(), ["build", "record"]);
@@ -252,7 +253,7 @@ async fn data_read_errors_preserve_kind_and_stop_before_creating_file() {
         fixture.error_kind = kind;
         let path = directory.path().join("analysis.zip");
         assert!(
-            matches!(export_ai_analysis_package(&fixture, path.to_string_lossy().to_string()).await.unwrap_err(), ApplicationError::Port(error) if error.kind == kind && error.message == "injected build")
+            matches!(export_ai_analysis_package(&fixture, path.to_string_lossy().to_string(), None).await.unwrap_err(), ApplicationError::Port(error) if error.kind == kind && error.message == "injected build")
         );
         assert_eq!(fixture.names(), ["build"]);
         assert!(!path.exists());
@@ -269,7 +270,7 @@ async fn file_write_failures_keep_original_error_boundary_and_skip_export_record
     ));
     let fixture = Fixture::new();
     assert!(matches!(
-        export_ai_analysis_package(&fixture, path)
+        export_ai_analysis_package(&fixture, path, None)
             .await
             .unwrap_err(),
         ApplicationError::AnalysisPackage(_)
@@ -286,7 +287,7 @@ async fn metadata_errors_leave_original_written_package_and_propagate_all_port_k
         fixture.error_kind = kind;
         let path = directory.path().join("analysis.zip");
         assert!(
-            matches!(export_ai_analysis_package(&fixture, path.to_string_lossy().to_string()).await.unwrap_err(), ApplicationError::Port(error) if error.kind == kind && error.message == "injected record")
+            matches!(export_ai_analysis_package(&fixture, path.to_string_lossy().to_string(), None).await.unwrap_err(), ApplicationError::Port(error) if error.kind == kind && error.message == "injected record")
         );
         assert_eq!(fixture.names(), ["build", "record"]);
         assert!(path.is_file());
@@ -308,7 +309,7 @@ async fn import_port_errors_keep_kind_without_extra_writes_or_retry() {
         fixture.fail_at = Some("import");
         fixture.error_kind = kind;
         assert!(
-            matches!(import_ai_analysis_response(&fixture, path.clone()).await.unwrap_err(), ApplicationError::Port(error) if error.kind == kind && error.message == "injected import")
+            matches!(import_ai_analysis_response(&fixture, path.clone(), None).await.unwrap_err(), ApplicationError::Port(error) if error.kind == kind && error.message == "injected import")
         );
         assert_eq!(fixture.names(), ["import"]);
     }
@@ -384,4 +385,82 @@ async fn suggestion_control_errors_preserve_all_port_kinds_without_other_actions
             assert_eq!(fixture.names(), [method]);
         }
     }
+}
+
+#[tokio::test]
+async fn confirmed_import_rejects_file_replaced_after_preview_before_any_port_write() {
+    let directory = tempfile::tempdir().unwrap();
+    let path = directory
+        .path()
+        .join("response.zip")
+        .to_string_lossy()
+        .to_string();
+    export_ai_analysis_response_template(path.clone(), Some(Uuid::from_u128(99))).unwrap();
+    let expected = preview_ai_analysis_response(path.clone()).unwrap();
+    export_ai_analysis_response_template(path.clone(), Some(Uuid::from_u128(100))).unwrap();
+    let fixture = Fixture::new();
+    assert!(matches!(
+        import_ai_analysis_response(&fixture, path, Some(expected))
+            .await
+            .unwrap_err(),
+        ApplicationError::Validation(_)
+    ));
+    assert!(fixture.calls().is_empty());
+}
+
+#[tokio::test]
+async fn checked_import_forwards_the_same_confirmed_semantic_preview() {
+    let directory = tempfile::tempdir().unwrap();
+    let path = directory
+        .path()
+        .join("response.zip")
+        .to_string_lossy()
+        .to_string();
+    export_ai_analysis_response_template(path.clone(), Some(Uuid::from_u128(99))).unwrap();
+    let expected = preview_ai_analysis_response(path.clone()).unwrap();
+    let fixture = Fixture::new();
+    import_ai_analysis_response(&fixture, path, Some(expected.clone()))
+        .await
+        .unwrap();
+    assert_eq!(fixture.names(), ["import"]);
+    assert_eq!(
+        fixture.calls()[0]["data"]["preview"],
+        serde_json::to_value(expected).unwrap()
+    );
+}
+
+#[tokio::test]
+async fn checked_export_refuses_changed_snapshot_before_creating_file_or_audit() {
+    let directory = tempfile::tempdir().unwrap();
+    let path = directory
+        .path()
+        .join("package.zip")
+        .to_string_lossy()
+        .to_string();
+    let fixture = Fixture::new();
+    assert!(matches!(
+        export_ai_analysis_package(&fixture, path.clone(), Some(Uuid::from_u128(9)))
+            .await
+            .unwrap_err(),
+        ApplicationError::Validation(_)
+    ));
+    assert!(!std::path::Path::new(&path).exists());
+    assert_eq!(fixture.names(), ["build"]);
+}
+
+#[tokio::test]
+async fn checked_export_writes_real_zip_only_for_confirmed_snapshot() {
+    let directory = tempfile::tempdir().unwrap();
+    let path = directory
+        .path()
+        .join("package.zip")
+        .to_string_lossy()
+        .to_string();
+    let fixture = Fixture::new();
+    let summary = export_ai_analysis_package(&fixture, path.clone(), Some(Uuid::from_u128(8)))
+        .await
+        .unwrap();
+    assert_eq!(summary.output_path, path);
+    assert!(std::path::Path::new(&path).is_file());
+    assert_eq!(fixture.names(), ["build", "record"]);
 }

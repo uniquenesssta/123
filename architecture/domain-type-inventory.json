@@ -23,18 +23,18 @@
     "currentPublicExportPolicy": "explicit re-export only",
     "targetPublicExportPolicy": "explicit re-export only"
   },
-  "sourceDigest": "217241ac243726a5ab6805a7f169e222b97e78c7c971749a5904714af673ebdd",
-  "rustUsageDigest": "0cb248c7fa4c66b3dfc3940fade3cf239b74e8690106cc2a36a55d71f60acc5c",
+  "sourceDigest": "59c4afdee81775b4b083c3eba2166dfd2f2c82da03883ca96059720cd9def398",
+  "rustUsageDigest": "a0c87a0d5464cfcfe44d2081262b18b84e6f107e7e01d1c033e98a5812811ac3",
   "summary": {
-    "typeCount": 365,
-    "publicCompatibilityTypeCount": 365,
+    "typeCount": 366,
+    "publicCompatibilityTypeCount": 366,
     "internalTypeCount": 0,
     "domainSourceFileCount": 129,
     "scannedRustFileCount": 1494,
-    "databaseMappedTypeCount": 301,
+    "databaseMappedTypeCount": 302,
     "byTargetModule": {
       "ai_workspace": 16,
-      "analytics": 39,
+      "analytics": 40,
       "coach": 9,
       "competition": 14,
       "exchange": 54,
@@ -57,7 +57,7 @@
       "R2-04": 19,
       "R2-05": 75,
       "R2-06": 59,
-      "R2-07": 118
+      "R2-07": 119
     }
   },
   "types": [
@@ -905,6 +905,7 @@
         "crates/persistence-postgres/src/adapters/analytics/analysis_package/imports.rs",
         "crates/persistence-postgres/src/adapters/analytics/analysis_package/policy.rs",
         "crates/persistence-postgres/src/adapters/analytics/analysis_package/tests.rs",
+        "src-tauri/src/commands/analytics/ai_package/import_ai_analysis_response.rs",
         "src-tauri/src/commands/analytics/ai_package/preview_ai_analysis_response.rs"
       ],
       "databaseMappings": [
@@ -1653,13 +1654,11 @@
       "externalCallers": [
         "crates/analytics-engine/src/lib.rs",
         "crates/persistence-postgres/src/adapters/analytics/calculation/projection.rs",
-        "crates/persistence-postgres/src/adapters/analytics/calculation/read.rs",
         "crates/persistence-postgres/src/adapters/analytics/calculation/tests.rs",
         "crates/persistence-postgres/src/adapters/postmatch/drift_monitoring/calculation.rs"
       ],
       "databaseMappings": [
         "crates/persistence-postgres/src/adapters/analytics/calculation/projection.rs",
-        "crates/persistence-postgres/src/adapters/analytics/calculation/read.rs",
         "crates/persistence-postgres/src/adapters/analytics/calculation/tests.rs",
         "crates/persistence-postgres/src/adapters/postmatch/drift_monitoring/calculation.rs"
       ]
@@ -1670,7 +1669,7 @@
       "visibility": "public",
       "currentPath": "crates/domain/src/analytics/calculation.rs",
       "currentModule": "football_domain::calculation",
-      "sourceLine": 131,
+      "sourceLine": 141,
       "derives": [
         "Clone",
         "Debug",
@@ -1687,6 +1686,12 @@
         "untagged": false
       },
       "members": [
+        {
+          "name": "source_snapshot",
+          "serdeAttributes": [
+            "#[serde(default, skip_serializing_if = \"Option::is_none\")]"
+          ]
+        },
         {
           "name": "generated_at",
           "serdeAttributes": []
@@ -1736,7 +1741,7 @@
           "serdeAttributes": []
         }
       ],
-      "declarationSha256": "57ed171fa093d249d0737fd63b6b8c48851764de8babaf3c563a405e45cc811c",
+      "declarationSha256": "b265c1982f80e6d8a49092320b2c93cb8f0999a6adab3dd4cb4c81b0870d808e",
       "targetModule": "analytics",
       "targetTask": "R2-07",
       "targetPath": "crates/domain/src/analytics/",
@@ -1869,6 +1874,74 @@
         "crates/persistence-postgres/src/adapters/analytics/calculation/repository.rs",
         "crates/persistence-postgres/src/adapters/analytics/calculation/samples.rs",
         "crates/persistence-postgres/src/adapters/analytics/calculation/tests.rs"
+      ]
+    },
+    {
+      "typeName": "AnalyticsSnapshotIdentity",
+      "kind": "struct",
+      "visibility": "public",
+      "currentPath": "crates/domain/src/analytics/calculation.rs",
+      "currentModule": "football_domain::calculation",
+      "sourceLine": 131,
+      "derives": [
+        "Clone",
+        "Debug",
+        "Deserialize",
+        "Serialize"
+      ],
+      "serde": {
+        "attributes": [],
+        "rename": null,
+        "renameAll": null,
+        "tag": null,
+        "content": null,
+        "transparent": false,
+        "untagged": false
+      },
+      "members": [
+        {
+          "name": "id",
+          "serdeAttributes": []
+        },
+        {
+          "name": "competition_id",
+          "serdeAttributes": []
+        },
+        {
+          "name": "window_start",
+          "serdeAttributes": []
+        },
+        {
+          "name": "window_end",
+          "serdeAttributes": []
+        },
+        {
+          "name": "request",
+          "serdeAttributes": [
+            "#[serde(default)]"
+          ]
+        }
+      ],
+      "declarationSha256": "92d90ae8f993fd6ceb0ab4d1f94ae15a66ffeb3ca887f2c49e1fe40b6beaaa1b",
+      "targetModule": "analytics",
+      "targetTask": "R2-07",
+      "targetPath": "crates/domain/src/analytics/",
+      "serializationName": "AnalyticsSnapshotIdentity",
+      "publicCompatibilityType": true,
+      "compatibilityLevel": "root_public_compatibility",
+      "currentRootExport": "explicit_reexport",
+      "targetRootExport": "explicit_reexport",
+      "databaseMapping": "referenced_by_postgres_adapter",
+      "domainCallers": [
+        "crates/domain/src/analytics/calculation.rs",
+        "crates/domain/src/lib.rs"
+      ],
+      "externalCallers": [
+        "crates/application/src/ports/analytics/contracts.rs",
+        "crates/persistence-postgres/src/adapters/analytics/calculation/read.rs"
+      ],
+      "databaseMappings": [
+        "crates/persistence-postgres/src/adapters/analytics/calculation/read.rs"
       ]
     },
     {

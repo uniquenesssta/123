@@ -1,36 +1,13 @@
-import {readProjectSource} from "./styles/projectSource.mjs";
-import {fileURLToPath as stylesheetFilePath} from "node:url";
-const stylesheetRoot=stylesheetFilePath(new URL("../",import.meta.url));
-import fs from "node:fs";
-
-const read = (path) => readProjectSource(stylesheetRoot,new URL(`../${path}`, import.meta.url), "utf8");
-const failures = [];
-const requireTrue = (condition, message) => { if (!condition) failures.push(message); };
-
-const page = read("src/pages/analytics.ts");
-const main = read("src/main.ts");
-const styles = read("src/styles/app.css");
-
-for (const label of ["形成历史样本", "运行完整分析", "通过质量门禁", "受控校准"]) {
-  requireTrue(page.includes(label), `分析与历史缺少链路阶段：${label}`);
-}
-for (const condition of ["(postmatch?.settlement_count ?? 0) > 0", "overview?.generated_at", "quality?.critical", "pendingReviewCount === 0"]) {
-  requireTrue(page.includes(condition), `分析链路缺少完成条件：${condition}`);
-}
-for (const guard of ["analysisHistoryReady", "fullAnalysisReady", "analysisQualityReady", "analysisReviewGateReady"]) {
-  requireTrue(main.includes(`function ${guard}`), `主控制器缺少链路门禁：${guard}`);
-}
-for (const message of ["请先在赛后复盘中完成至少一场正式结算", "请先完成包含有效样本的完整分析", "请先完成数据质量扫描并清除全部严重问题", "请先通过数据质量门禁并处理全部待审核建议"]) {
-  requireTrue(main.includes(message), `事件入口缺少前置条件保护：${message}`);
-}
-for (const selector of [".analysis-chain-map", ".analysis-chain-step", ".analysis-step-lock", ".analysis-step-guide"]) {
-  requireTrue(styles.includes(selector), `分析链路缺少样式：${selector}`);
-}
-requireTrue(main.includes("ANALYSIS_PACKAGE_ID_KEY") && main.includes("localPreferences.setItem(ANALYSIS_PACKAGE_ID_KEY"), "分析包链路状态未持久保存");
-
-if (failures.length) {
-  console.error("分析与历史链路验证失败：");
-  failures.forEach((failure) => console.error(`- ${failure}`));
-  process.exit(1);
-}
-console.log("分析与历史链路验证通过：历史样本、完整分析、质量门禁、人工审核和受控校准按前置条件顺序执行。 ");
+import fs from 'node:fs';import assert from 'node:assert/strict';import {fileURLToPath} from 'node:url';import {verifyAnalyticsWorkflow} from './features/verifyAnalyticsWorkflow.mjs';
+const root=fileURLToPath(new URL('../',import.meta.url)),read=p=>fs.readFileSync(new URL('../'+p,import.meta.url),'utf8');
+const page=read('src/features/analytics/analyticsPage.ts'),feature=read('src/features/analytics/analyticsFeature.ts'),main=read('src/main.ts'),jobs=read('src/features/analytics/analyticsJobs.ts'),exchange=read('src/features/analytics/analyticsExchange.ts');
+for(const stage of ['history','model','quality','lifecycle'])assert.ok(page.includes("id:'"+stage+"'"),'Missing ordered stage '+stage);
+for(const condition of ['history>0','overview.sample_size>0','quality?.critical===0','state.suggestions.length+state.abilityCandidates.length===0','scanCurrent','globalSnapshot(overview)'])assert.ok(feature.includes(condition),'Missing real gate '+condition);
+assert.ok(!/analyticsFeature\.state\.\w+\s*=/.test(main),'Main must not bypass the sole Analytics query writer');
+assert.ok(main.includes('new AnalyticsFeature(')&&main.includes('if (!analyticsFeature.gates.review)'),'Production event chain must use one owner');
+for(const message of ['请先在赛后复盘中完成至少一场正式结算','请先完成包含有效样本的完整分析'])assert.ok(jobs.includes(message));assert.ok(exchange.includes('请先完成数据质量扫描并清除全部严重问题'));
+assert.ok(read('src/features/analytics/analyticsStorage.ts').includes('data[db]')&&!main.includes('ANALYSIS_PACKAGE_ID_KEY'),'Export source and recovery must be database scoped');
+assert.ok(!/function (?:analysisHistoryReady|fullAnalysisReady|analysisQualityReady|analysisReviewGateReady)/.test(main),'No duplicate gate owner');
+const sql=read('crates/persistence-postgres/src/adapters/analytics/calculation/read.rs'),refresh=read('crates/persistence-postgres/src/adapters/analytics/calculation/repository.rs');
+assert.ok(/id\s*=\s*\$1/.test(sql)&&sql.includes('.bind(snapshot_id)'),'Exact snapshot query must bind original ID');assert.ok(refresh.includes('Some(snapshot_id)'),'Refresh must return its own inserted snapshot');
+await verifyAnalyticsWorkflow(root);console.log('Analysis chain gates, exact snapshot read and durable recovery verification passed.');

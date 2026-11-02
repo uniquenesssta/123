@@ -20,7 +20,15 @@ impl ApplicationService {
 
     pub async fn analytics_overview(&self) -> ApplicationResult<AnalyticsOverview> {
         let session = self.analytics_session().await?;
-        self.analytics.overview(&session).await
+        self.analytics.overview(&session, None).await
+    }
+
+    pub async fn analytics_snapshot(
+        &self,
+        snapshot_id: Uuid,
+    ) -> ApplicationResult<AnalyticsOverview> {
+        let session = self.analytics_session().await?;
+        self.analytics.overview(&session, Some(snapshot_id)).await
     }
 
     pub async fn enqueue_analysis_job(
@@ -69,7 +77,7 @@ impl ApplicationService {
     ) -> ApplicationResult<AiAnalysisPackageSummary> {
         let session = self.analytics_session().await?;
         self.analytics
-            .export_ai_package(&session, output_path)
+            .export_ai_package(&session, output_path, None)
             .await
     }
 
@@ -86,7 +94,29 @@ impl ApplicationService {
     ) -> ApplicationResult<Vec<AiAnalysisSuggestionRecord>> {
         let session = self.analytics_session().await?;
         self.analytics
-            .import_ai_response(&session, input_path)
+            .import_ai_response(&session, input_path, None)
+            .await
+    }
+
+    pub async fn import_ai_analysis_response_checked(
+        &self,
+        input_path: String,
+        expected: AiAnalysisResponsePreview,
+    ) -> ApplicationResult<Vec<AiAnalysisSuggestionRecord>> {
+        let session = self.analytics_session().await?;
+        self.analytics
+            .import_ai_response(&session, input_path, Some(expected))
+            .await
+    }
+
+    pub async fn export_ai_analysis_package_checked(
+        &self,
+        output_path: String,
+        expected_snapshot_id: uuid::Uuid,
+    ) -> ApplicationResult<AiAnalysisPackageSummary> {
+        let session = self.analytics_session().await?;
+        self.analytics
+            .export_ai_package(&session, output_path, Some(expected_snapshot_id))
             .await
     }
 

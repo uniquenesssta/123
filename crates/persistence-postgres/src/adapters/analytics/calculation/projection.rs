@@ -61,6 +61,7 @@ pub(super) fn overview_from_calculation(
 ) -> AnalyticsOverview {
     if let Some(calculation) = calculation {
         AnalyticsOverview {
+            source_snapshot: None,
             generated_at: Some(calculation.generated_at),
             calculation_version: calculation.calculation_version,
             sample_size: calculation.sample_size,
@@ -76,6 +77,7 @@ pub(super) fn overview_from_calculation(
         }
     } else {
         AnalyticsOverview {
+            source_snapshot: None,
             generated_at: None,
             calculation_version: ANALYTICS_CALCULATION_VERSION.to_string(),
             sample_size: 0,

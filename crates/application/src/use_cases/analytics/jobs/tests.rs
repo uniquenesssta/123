@@ -120,7 +120,7 @@ impl Fixture {
 }
 #[async_trait]
 impl AnalyticsPort for Fixture {
-    async fn overview(&self) -> PortResult<AnalyticsOverview> {
+    async fn overview(&self, _snapshot_id: Option<Uuid>) -> PortResult<AnalyticsOverview> {
         panic!("worker must use refresh result")
     }
     async fn refresh(&self, request: &AnalyticsRefreshRequest) -> PortResult<AnalyticsOverview> {

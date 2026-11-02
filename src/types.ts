@@ -2077,7 +2077,15 @@ export interface QueryPerformanceSummary {
   tables: QueryPerformanceFinding[];
 }
 
+export interface AnalyticsSnapshotIdentity {
+  id: string;
+  competition_id: string | null;
+  window_start: string | null;
+  window_end: string | null;
+  request: {competition_id: string | null;window_start: string | null;window_end: string | null;bucket_count: number;baseline_size: number;current_size: number} | null;
+}
 export interface AnalyticsOverview {
+  source_snapshot?: AnalyticsSnapshotIdentity | null;
   generated_at: string | null;
   calculation_version: string;
   sample_size: number;

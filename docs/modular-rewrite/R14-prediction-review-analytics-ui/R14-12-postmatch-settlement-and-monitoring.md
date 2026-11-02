@@ -74,7 +74,7 @@ BA-12真实账本幂等/并发、评分事务和跨Port部分成功仍按原批�
 
 代码fd9b32dd924b6b7b6255d8f2816c624bb5611f0f的自身[CI 41375966354](https://github.com/uniquenesssta/123/actions/runs/41375966354)、Windows job125056153130完成success，按R14分支、push事件、ci.yml与head_sha精确核对。只读取已完成结果，未轮询。
 
-官方artifact13112358800：ZIP 52396223字节，SHA256 ed2e54881926f742f5b12cd722310a4e8a025e5a734b5a9b152aed05534e4888，与官方digest一致。足球赛事模型平台_0.23.0_x64_zh-CN.msi：18022400字节，签名有效，SHA256 43f4749cc5d4ba9eac43e835a055652251a6b3fa6016d4bd96d6f5a34d3b9eef；足球赛事模型平台_0.23.0_x64-setup.exe：15661110字节，签名有效，SHA256 3a9670b8e945dcfa82088dc8168ed541eb40c1ccfe081e16457f13f81b59c36e。
+官方artifact13112358800：ZIP 52396223字节，SHA256 ed2e54881926f742f5b12cd722310a4e8a025e5a734b5a9b152aed05534e4888，与官方digest一致。足球赛事模型平台_0.23.0_x64_zh-CN.msi：18022400字节，文件头格式有效（非数字签名验证），SHA256 43f4749cc5d4ba9eac43e835a055652251a6b3fa6016d4bd96d6f5a34d3b9eef；足球赛事模型平台_0.23.0_x64-setup.exe：15661110字节，文件头格式有效（非数字签名验证），SHA256 3a9670b8e945dcfa82088dc8168ed541eb40c1ccfe081e16457f13f81b59c36e。
 
 包内windows-acceptance-20261102-020839.json为startup/pass，7条日志、0无效、0运行错误，bootstrap/read_workspace_state/save_workspace_state完成。这是官方包内启动证据，不冒称本地重装或Full。完整来源及摘要见 O:/Project/FOODBALL/logs/r14-12-ci-41375966354/acceptance.json。
 

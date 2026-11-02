@@ -128,7 +128,19 @@ pub struct AnalyticsCalculation {
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct AnalyticsSnapshotIdentity {
+    pub id: Uuid,
+    pub competition_id: Option<Uuid>,
+    pub window_start: Option<DateTime<Utc>>,
+    pub window_end: Option<DateTime<Utc>>,
+    #[serde(default)]
+    pub request: Option<AnalyticsRefreshRequest>,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct AnalyticsOverview {
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub source_snapshot: Option<AnalyticsSnapshotIdentity>,
     pub generated_at: Option<DateTime<Utc>>,
     pub calculation_version: String,
     pub sample_size: u64,

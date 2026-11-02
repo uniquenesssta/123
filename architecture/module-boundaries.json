@@ -105,8 +105,9 @@
     },
     "features": {
       "analytics": {
-        "owner": "src/pages/analytics.ts",
-        "route": "analytics"
+        "owner": "src/features/analytics/analyticsFeature.ts",
+        "route": "analytics",
+        "public_entry": "src/features/analytics/index.ts"
       },
       "api-workspace": {
         "owner": "src/pages/apiWorkspace.ts",
