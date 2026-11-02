@@ -1,6 +1,6 @@
 # R14-08 复盘选择、事实与包提交
 
-状态：VERIFYING。初次代码 c07b798c 的 CI 41330631667 已核实失败；共享浏览器启动链修复及 Node 22.23.4 完整96步复验通过，修复提交自身 CI、官方安装包与包内 startup 待推送后验收，不轮询。2026-11-01 开始，11-02 完成本地收尾，日志沿用 `O:/Project/FOODBALL/logs/r14-08-20261101`。
+状态：DONE。修复代码40c2df90自身CI41350740759、官方摘要、双安装包与包内startup已逐项核实通过；初次失败及修复证据保留，不将Automated写成Full。2026-11-01 开始，11-02 完成本地收尾，日志沿用 `O:/Project/FOODBALL/logs/r14-08-20261101`。
 
 用户授权“收尾07开始08”，并已长期批准提交推送。分支 `rewrite/r14-prediction-review-analytics-ui`；起点 `f0899a5ed4379d4a6fe9ef74b6d8bea725b346bb`，开始时工作区干净。07 已按修复代码 `f38b52dd` 的 CI `41314470020`、官方 digest、MSI/NSIS 与包内 startup 正式收尾；本批不再查询07或重开R12。08覆盖原08/09/10/11；下一主交付是 **R14-12 赛后结算与监控**，尚未启动。
 
@@ -67,3 +67,13 @@ BA-02/07/12/13真实新库/持久化、多Port原子性及并发、私有模型�
 - **反证与回归：** 保持30秒就绪门禁及全部原断言。新增5项检查覆盖同进程构建共享、旧开发源码链受阻时白屏、禁用缓存后的真实生产应用冷启动、构建脚本受阻仍失败、恢复后重新就绪；另有原6项就绪/错误/上下文/期限检查。六组最终启动证据均进入真实bootstrap，源码开发请求为0，应用构建身份一致。
 - **分层验证：** 使用经官方SHASUMS256核实的项目内 Node `22.23.4`，与失败CI版本一致。`frontend-node22.log` 完整96步、TypeScript和最终生产构建退出0；原80视图/1648设计检查、126整页挂载、55工作簿、40推演、26研究、55复盘、55运行记录全部通过（六组挂载共357项）。此前定向复盘55项与新增启动5项也已通过。`src`、Rust、生产清单/锁文件均未改；没有重跑或新增声称Windows原生、真实PG/Full验证，原08空目录原生证据与外部待验边界继续保留。
 - **证据与交付：** `O:/Project/FOODBALL/logs/r14-08-ci-fix-20261102` 保留原始CI失败产物、摘要、匹配Node身份、完整日志、逐组结果/截图和 `validation-summary.json`；修复提交推送后仅核对自身精确CI一次，正式包未验前保持VERIFYING。下一主交付仍是R14-12，尚未启动。
+
+## 正式收尾（2026-11-02）
+
+修复代码 `40c2df90a8b986952aa98a9c32a621652a91f66c` 的自身 [CI 41350740759](https://github.com/uniquenesssta/123/actions/runs/41350740759)、Windows job `124980134805` 已完成success，全部步骤成功。按精确head_sha、R14分支、push事件与 `.github/workflows/ci.yml` 核对；没有轮询，也没有混用初次失败或文档提交的运行。
+
+官方artifact `13102382561`，ZIP 52,373,701字节，SHA256 `b56c367fc1d67eb8d1eaa051990744e95a8646eba16e91f63e3abebf5133367a` 与官方digest一致。MSI 18,014,208字节、OLE头有效、SHA256 `730c420dfd3793d20d66152a8e3bbec652d5c1b9da158b5394b992cdacad2e87`；NSIS 15,654,988字节、MZ头有效、SHA256 `92fe86be5b75e6e24cf7d23d2b75568b836e0d5166176454d66867953a531200`。
+
+官方 `windows-acceptance-20261101-211309.json` 为startup/pass：7条有效日志、0无效行、0运行错误，bootstrap/read_workspace_state/save_workspace_state完成；这是CI包内启动证据，不冒称本地重新安装或真实Full。正式证据在 `O:/Project/FOODBALL/logs/r14-08-ci-41350740759/acceptance.json` 与官方ZIP。
+
+08适用出口DONE；BA-02/07/12/13真实新库/多Port事务/私有模型等原待验边界继续由R17-06逐项承接。用户已授权下一项R14-12赛后结算与监控。08最后推送后的 `tmp/old` 已实际清空，独立复查0项，报告见 `O:/Project/FOODBALL/logs/r14-08-ci-fix-20261102/old-cleanup.json`。
