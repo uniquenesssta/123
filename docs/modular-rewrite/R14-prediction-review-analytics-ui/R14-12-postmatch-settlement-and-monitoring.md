@@ -1,6 +1,6 @@
 # R14-12 赛后结算与监控
 
-状态：VERIFYING（本地实现与适用验证通过，等待本批自身CI和官方产物验收）。用户已授权“收尾08开始 R14-12”。开始基线 `c40296f514c2152dd76b6147e6638cd44a703234`，分支 `rewrite/r14-prediction-review-analytics-ui`；工作区开始干净。08已按修复代码40c2df90自身CI41350740759、官方artifact13102382561摘要、MSI/NSIS及包内startup正式DONE，详08记录。本批只覆盖原R14-12，下一主交付为R14-13分析查询、长任务与建议包，尚未启动。
+状态：DONE（自身精确CI、官方摘要、双安装包及包内startup已核验）。用户已授权“收尾08开始 R14-12”。开始基线 `c40296f514c2152dd76b6147e6638cd44a703234`，分支 `rewrite/r14-prediction-review-analytics-ui`；工作区开始干净。08已按修复代码40c2df90自身CI41350740759、官方artifact13102382561摘要、MSI/NSIS及包内startup正式DONE，详08记录。本批只覆盖原R14-12，下一主交付为R14-13分析查询、长任务与建议包，尚未启动。
 
 ## 实际范围与唯一归属
 
@@ -52,7 +52,7 @@ Impeccable context首次默认缓存下载失败，按技能回退直接读取�
 - **Windows原生：** 最终dist配合未变Rust的现有debug客户端，真实Tauri、无QA注入，native-delivery-final/report.json的10项通过。界面与真实overview/settlement/evidence命令的0条记录一致，只读刷新、实际赛事确认与取消、九步复盘、事实账本前后未变化均通过。本次没有执行正式结算/评分/刷新写命令，不宣称真实事务、私有P4或Full成功。初轮原生脚本误用role选择器找dialog导致失败，已按实际dialog修正，失败日志保留在native-first.log。
 - **startup：** startup-delivery-final.json为pass，40条有效日志、0无效、0运行错误、14种完成操作，启动/工作区载入与保存通过。不能代替Full。
 - **检测和视觉：** 项目保留的Impeccable0.1.17源码检测为[]、退出0；最终截图人工复核。context默认路径首次下载失败已如实保留，未阻止使用已有引擎或改变FIP方向。
-- **Rust/安装包：** 对08修复代码40c2df90的crates/src-tauri/Cargo.toml/Cargo.lock差异为空；本批不重复声称新Rust测试已执行。复用原生binary摘要和基础证据见validation-summary.json。新的自身CI和官方双包/startup只有推送后才能核验，当前保持VERIFYING。
+- **Rust/安装包：** 对08修复代码40c2df90的crates/src-tauri/Cargo.toml/Cargo.lock差异为空；本批不重复声称新Rust测试已执行。复用原生binary摘要和基础证据见validation-summary.json。自身CI和官方双包/startup现已在下方正式收尾中核验，原本地阶段日志继续保留。
 
 首轮S12边界缺少真实DTO的comparisons数组引起路由失败、完整检查发现样式归属遗漏及导航测试未编译新真实加载函数，均修复后复验；没有缩短业务路径、延长期限或取消检查。首轮/中间日志继续保留。
 
@@ -69,3 +69,13 @@ Impeccable context首次默认缓存下载失败，按技能回退直接读取�
 BA-12真实账本幂等/并发、评分事务和跨Port部分成功仍按原批准安排由R17-06关闭。受控边界能证明前端调用、确认和状态隔离，不能抵销真实PG/私有提供器证据；本批不以模拟正式结算冒充真实Full。
 
 回退参照本批基线，仅回退代码不能撤销已发生的正式结算/评分/监控报告。未知写入必须核对原账本，不清除恢复引用制造回滚。TEMP/TMP为 `O:/Project/FOODBALL/tmp`，必要证据在 `O:/Project/FOODBALL/logs/r14-12-20261102`。按用户最新长期授权，每次成功推送后清空唯一 `tmp/old`；保留工具/依赖缓存和必要日志，逐文件处理，不跟随重解析链接。
+
+## 正式收尾（2026-11-02）
+
+代码fd9b32dd924b6b7b6255d8f2816c624bb5611f0f的自身[CI 41375966354](https://github.com/uniquenesssta/123/actions/runs/41375966354)、Windows job125056153130完成success，按R14分支、push事件、ci.yml与head_sha精确核对。只读取已完成结果，未轮询。
+
+官方artifact13112358800：ZIP 52396223字节，SHA256 ed2e54881926f742f5b12cd722310a4e8a025e5a734b5a9b152aed05534e4888，与官方digest一致。足球赛事模型平台_0.23.0_x64_zh-CN.msi：18022400字节，签名有效，SHA256 43f4749cc5d4ba9eac43e835a055652251a6b3fa6016d4bd96d6f5a34d3b9eef；足球赛事模型平台_0.23.0_x64-setup.exe：15661110字节，签名有效，SHA256 3a9670b8e945dcfa82088dc8168ed541eb40c1ccfe081e16457f13f81b59c36e。
+
+包内windows-acceptance-20261102-020839.json为startup/pass，7条日志、0无效、0运行错误，bootstrap/read_workspace_state/save_workspace_state完成。这是官方包内启动证据，不冒称本地重装或Full。完整来源及摘要见 O:/Project/FOODBALL/logs/r14-12-ci-41375966354/acceptance.json。
+
+12适用出口DONE，BA-12真实事务/私有P4仍由R17-06承接。上次推送后的tmp/old已实际清理44304文件、25490空目录和2个链接，独立复查0项，日志r14-12-20261102/old-cleanup.json。用户已授权下一主交付R14-13（覆盖原13～15），不提前启动16。

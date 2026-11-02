@@ -1,8 +1,8 @@
 # 足球模型平台公开外壳
 
-## R14-12 赛后结算与监控（VERIFYING）
+## R14-12 赛后结算与监控（DONE）
 
-结算、人工证据判定与H监控已归入Postmatch Feature，保留真实后端账本、门禁和原请求恢复；修复跨对象响应、未知请求补写及矮窗口裁切。39项新行为、74项页面操作、完整96步和最终差异复验、Windows原生10项及startup通过；自身CI/官方包尚待推送后核验，BA-12真实事务仍由R17-06承接。详[12记录](docs/modular-rewrite/R14-prediction-review-analytics-ui/R14-12-postmatch-settlement-and-monitoring.md)。下一主交付R14-13，尚未启动。
+结算、人工证据判定与H监控已归入Postmatch Feature，保留真实后端账本、门禁和原请求恢复；修复跨对象响应、未知请求补写及矮窗口裁切。39项新行为、74项页面操作、完整96步和最终差异复验、Windows原生10项及startup通过；自身fd9b32dd的[CI 41375966354](https://github.com/uniquenesssta/123/actions/runs/41375966354)、官方摘要、双包及startup已核验；BA-12真实事务仍由R17-06承接。详[12记录](docs/modular-rewrite/R14-prediction-review-analytics-ui/R14-12-postmatch-settlement-and-monitoring.md)。用户已授权开始R14-13分析查询、长任务与建议包；下一主交付R14-16，尚未启动。
 
 ## R14-08 复盘事实与包提交（DONE）
 
