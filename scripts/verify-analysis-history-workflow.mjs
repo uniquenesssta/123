@@ -4,10 +4,11 @@ const page=read('src/features/analytics/analyticsPage.ts'),feature=read('src/fea
 for(const stage of ['history','model','quality','lifecycle'])assert.ok(page.includes("id:'"+stage+"'"),'Missing ordered stage '+stage);
 for(const condition of ['history>0','overview.sample_size>0','quality?.critical===0','state.suggestions.length+state.abilityCandidates.length===0','scanCurrent','globalSnapshot(overview)'])assert.ok(feature.includes(condition),'Missing real gate '+condition);
 assert.ok(!/analyticsFeature\.state\.\w+\s*=/.test(main),'Main must not bypass the sole Analytics query writer');
-assert.ok(main.includes('new AnalyticsFeature(')&&main.includes('if (!analyticsFeature.gates.review)'),'Production event chain must use one owner');
+assert.ok(main.includes('new AnalyticsFeature(')&&read('src/features/analytics/candidates/parameterLifecycle.ts').includes('ready_for_promotion'),'Production event chain must use one owner');
 for(const message of ['请先在赛后复盘中完成至少一场正式结算','请先完成包含有效样本的完整分析'])assert.ok(jobs.includes(message));assert.ok(exchange.includes('请先完成数据质量扫描并清除全部严重问题'));
 assert.ok(read('src/features/analytics/analyticsStorage.ts').includes('data[db]')&&!main.includes('ANALYSIS_PACKAGE_ID_KEY'),'Export source and recovery must be database scoped');
 assert.ok(!/function (?:analysisHistoryReady|fullAnalysisReady|analysisQualityReady|analysisReviewGateReady)/.test(main),'No duplicate gate owner');
 const sql=read('crates/persistence-postgres/src/adapters/analytics/calculation/read.rs'),refresh=read('crates/persistence-postgres/src/adapters/analytics/calculation/repository.rs');
 assert.ok(/id\s*=\s*\$1/.test(sql)&&sql.includes('.bind(snapshot_id)'),'Exact snapshot query must bind original ID');assert.ok(refresh.includes('Some(snapshot_id)'),'Refresh must return its own inserted snapshot');
+assert.ok(!/function (?:decideAbilityCandidate|generateParameterTuning|decideParameterTuning|runParameterShadowValidation|promoteParameterCandidate|rollbackParameterCandidate)/.test(main),'No old candidate mutation owner remains in main');
 await verifyAnalyticsWorkflow(root);console.log('Analysis chain gates, exact snapshot read and durable recovery verification passed.');

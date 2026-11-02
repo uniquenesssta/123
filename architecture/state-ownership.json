@@ -895,8 +895,22 @@
       ],
       "transition": null,
       "migration_task": "R14-13"
+    },
+    {
+      "id": "feature.candidate-workflow",
+      "owner": "src/features/analytics/candidates/candidateFeature.ts::CandidateFeature",
+      "scope": "database-bound candidate drafts, exact candidate intents, ability and parameter decisions, shadow/promotion/rollback readback and durable unknown receipts; backend owns versions and transactions",
+      "writers": [
+        "CandidateFeature with CandidateContext, AbilityDecisions and ParameterLifecycle"
+      ],
+      "forbidden": [
+        "src/pages/**",
+        "src/api/**"
+      ],
+      "transition": null,
+      "migration_task": "R14-16"
     }
   ],
-  "count": 62,
-  "last_updated_task": "R14-13"
+  "count": 63,
+  "last_updated_task": "R14-16"
 }

@@ -1,7 +1,8 @@
+import type {CandidateApi,CandidateDraftState,CandidateReceipt} from './candidates/candidatePorts';
 import type {AbilityUpdateCandidateRecord,AiAnalysisPackageSummary,AiAnalysisResponsePreview,AiAnalysisSuggestionRecord,AiSuggestionDecisionDraft,AnalyticsOverview,BackgroundJob,DataQualityDecisionDraft,DataQualityFinding,EnqueueJobDraft,ParameterTuningCandidateRecord} from '../../types';
 export interface AnalysisRequest {competition_id:string|null;window_start:string|null;window_end:string|null;bucket_count:number;baseline_size:number;current_size:number}
 export type AnalysisStep='history'|'model'|'quality'|'lifecycle'|'exchange'|'advanced';
-export interface AnalyticsApi {
+export interface AnalyticsApi extends CandidateApi {
   analyticsOverview(snapshotId?:string|null):Promise<AnalyticsOverview>;
   listBackgroundJobs(limit:number):Promise<BackgroundJob[]>;
   enqueueAnalysisJob(draft:EnqueueJobDraft):Promise<BackgroundJob>;
@@ -21,13 +22,13 @@ export interface AnalyticsApi {
   decideDataQualityFinding(draft:DataQualityDecisionDraft):Promise<DataQualityFinding>;
 }
 export interface AnalysisExport {summary:AiAnalysisPackageSummary;snapshotId:string}
-export type AnalysisReceipt=
+export type AnalysisReceipt=CandidateReceipt
  |{kind:'enqueue';key:string;draft:EnqueueJobDraft;startedAt:string}
  |{kind:'job';key:string;operation:'cancel'|'retry';job:BackgroundJob;startedAt:string}
  |{kind:'import';key:string;path:string;preview:AiAnalysisResponsePreview;startedAt:string}
  |{kind:'suggestion';key:string;id:string;responseId:string;decision:'accept'|'reject';startedAt:string}
  |{kind:'quality';key:string;id:string;scanId:string;decision:'resolve'|'ignore';startedAt:string};
-export interface AnalyticsStorageScope {read(key:string):AnalysisReceipt|null;receipts():AnalysisReceipt[];save(receipt:AnalysisReceipt):void;clear(key:string):void;exported():AnalysisExport|null;saveExport(value:AnalysisExport):void}
+export interface AnalyticsStorageScope {candidateDraft():CandidateDraftState;saveCandidateDraft(value:CandidateDraftState):void;read(key:string):AnalysisReceipt|null;receipts():AnalysisReceipt[];save(receipt:AnalysisReceipt):void;clear(key:string):void;exported():AnalysisExport|null;saveExport(value:AnalysisExport):void}
 export interface AnalyticsStorage {capture():AnalyticsStorageScope}
 export interface AnalyticsPorts {
  api:AnalyticsApi;storage:AnalyticsStorage;scope():()=>boolean;view():()=>boolean;changed():void;formatError(e:unknown):string;
@@ -37,5 +38,6 @@ export interface AnalyticsRuntime extends AnalyticsPorts {
  enter():void;current(interaction?:boolean):()=>boolean;interactionChanged():void;
  refresh():Promise<boolean>;overview():AnalyticsOverview|null;jobs():readonly BackgroundJob[];
  suggestions():readonly AiAnalysisSuggestionRecord[];qualityReady():boolean;analysisReady():boolean;historyReady():boolean;
+ candidates():readonly ParameterTuningCandidateRecord[];abilities():readonly AbilityUpdateCandidateRecord[];
  request():AnalysisRequest;
 }

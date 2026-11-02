@@ -1,8 +1,9 @@
+import {initialCandidateDraft} from './candidates/candidatePorts';import type {CandidateDraftState} from './candidates/candidatePorts';
 import type {PreferenceStore} from '../../platform/storage';
 import type {AnalysisExport,AnalysisReceipt,AnalyticsStorage} from './analyticsPorts';
 /** Only durable recovery references and acknowledged exports are stored, separately for each database. */
 export function analyticsStorage(store:PreferenceStore,key:string,database:()=>string|null):AnalyticsStorage {
- type Data=Record<string,{receipts:Record<string,AnalysisReceipt>;exported:AnalysisExport|null}>;
+ type Data=Record<string,{receipts:Record<string,AnalysisReceipt>;exported:AnalysisExport|null;candidateDraft?:CandidateDraftState}>;
  return {capture(){
   const db=database(),all=()=>store.readObject<Data>(key)??{};
   const update=(fn:(entry:Data[string])=>void)=>{
@@ -10,6 +11,8 @@ export function analyticsStorage(store:PreferenceStore,key:string,database:()=>s
    const data=all(),entry=data[db]??{receipts:{},exported:null};fn(entry);store.writeJson(key,{...data,[db]:entry});
   };
   return {
+   candidateDraft:()=>structuredClone((db?all()[db]?.candidateDraft:null)??initialCandidateDraft()),
+   saveCandidateDraft:value=>update(entry=>{entry.candidateDraft=structuredClone(value);}),
    read:id=>{const r=db?all()[db]?.receipts[id]:null;return r?.key===id?structuredClone(r):null;},
    receipts:()=>db?structuredClone(Object.values(all()[db]?.receipts??{})):[],
    save:receipt=>update(entry=>{entry.receipts[receipt.key]=structuredClone(receipt);}),

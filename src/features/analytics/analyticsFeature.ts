@@ -1,3 +1,4 @@
+import {CandidateFeature} from './candidates/candidateFeature';
 import type {AnalyticsPorts,AnalyticsRuntime,AnalysisStep} from './analyticsPorts';
 import {analysisRequest,globalSnapshot,matchingJobOverview,timestampIdentity} from './analyticsIdentity';
 import {AnalyticsQuery} from './analyticsQuery';
@@ -8,16 +9,17 @@ import {AnalyticsReviews} from './analyticsReviews';
 export class AnalyticsFeature {
  private valid=()=>false;private navigationRevision=0;private interactionRevision=0;
  private stage:AnalysisStep='history';private jobId:string|null=null;
+ readonly candidates:CandidateFeature;
  readonly query:AnalyticsQuery;readonly jobs:AnalyticsJobs;readonly exchange:AnalyticsExchange;readonly reviews:AnalyticsReviews;
  constructor(private readonly ports:AnalyticsPorts){
-  const runtime:AnalyticsRuntime={...ports,enter:()=>this.enter(),current:i=>this.capture(i),interactionChanged:()=>this.interactionChanged(),refresh:()=>this.refresh(),overview:()=>this.overview,jobs:()=>this.state.jobs,suggestions:()=>this.state.suggestions,qualityReady:()=>this.gates.quality,analysisReady:()=>this.gates.analysis,historyReady:()=>this.gates.history,request:()=>this.request};
-  this.query=new AnalyticsQuery(runtime);this.jobs=new AnalyticsJobs(runtime);this.exchange=new AnalyticsExchange(runtime);this.reviews=new AnalyticsReviews(runtime);
+  const runtime:AnalyticsRuntime={...ports,enter:()=>this.enter(),current:i=>this.capture(i),interactionChanged:()=>this.interactionChanged(),refresh:()=>this.refresh(),overview:()=>this.overview,jobs:()=>this.state.jobs,suggestions:()=>this.state.suggestions,qualityReady:()=>this.gates.quality,analysisReady:()=>this.gates.analysis,historyReady:()=>this.gates.history,request:()=>this.request,candidates:()=>this.state.tuningCandidates,abilities:()=>this.state.abilityCandidates};
+  this.candidates=new CandidateFeature(runtime);this.query=new AnalyticsQuery(runtime);this.jobs=new AnalyticsJobs(runtime);this.exchange=new AnalyticsExchange(runtime);this.reviews=new AnalyticsReviews(runtime);
  }
  private enter(){
   if(this.valid())return;this.valid=this.ports.scope();this.interactionRevision++;this.jobId=null;
   const requested=this.ports.initialStep()?.replace(/^analysis-|\-step$/g,'');
   this.stage=['history','model','quality','lifecycle','exchange','advanced'].includes(requested??'')?requested as AnalysisStep:'history';
-  this.query.reset();this.jobs.reset();this.exchange.reset();this.reviews.reset();
+  this.query.reset();this.jobs.reset();this.exchange.reset();this.reviews.reset();this.candidates.reset();
  }
  get state(){this.enter();return this.query.state;}
  get step(){this.enter();return this.stage;}

@@ -21,6 +21,6 @@ export async function verifyAnalyticsHierarchy(root){
  x.latest=x.overview();x.latest.data_quality.critical=1;await x.feature.refresh();assert.equal(x.feature.gates.quality,false);count++;
  x.latest=x.overview();x.suggestions.push(x.suggestion());await x.feature.refresh();assert.equal(x.feature.gates.review,false);count++;
  x.suggestions=[];x.latest=x.overview('qa-scoped','qa-competition');await x.feature.refresh();assert.equal(x.feature.gates.quality,false);assert.equal(x.feature.gates.review,false);count+=2;
- x.feature.setStep('lifecycle');assert.ok(analyticsPage(state,x.feature,postmatch.feature).includes('检查阶段 I 门禁'),'Lifecycle remains independently gated, never marked completed by global summary');count++;
+ x.feature.setStep('lifecycle');assert.ok(analyticsPage(state,x.feature,postmatch.feature).includes('data-action="check-parameter-lifecycle-readiness"'),'Lifecycle remains independently gated, never marked completed by global summary');count++;
  console.log('Executable Analytics hierarchy and original chain obligations passed: '+count);return count;
 }

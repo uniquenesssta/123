@@ -1,12 +1,16 @@
 # 足球模型平台公开外壳
 
+## R14-16 能力与参数候选决策（VERIFYING）
+
+能力与参数候选已分别归属，接通精确分区门禁、影子验证、人工晋升/回滚及原请求恢复；修复旧版本确认、跨库迟到响应和未知操作重复写入风险。完整96步前端及最终差异复验、36项候选行为、34项Windows页面、13项原生读取与startup通过；Rust源码未变，复用13同源码成功证据。16自身CI和官方包待按新提交验收，不轮询。真实有样本候选写入/绑定事务及私有P4固定回归仍由R17-06承接，详[16记录](docs/modular-rewrite/R14-prediction-review-analytics-ui/R14-16-candidate-decisions-and-lifecycle.md)。下一项R14-17应用内验收与报告，未启动。
+
 ## R14-13 分析查询、长任务与建议包（DONE）
 
-已按最新S12接入四指标、横向步骤和单一滚动区，查询、任务、文件与人工决定归入Analytics Feature；修复并发分析读取其他快照、导入确认后文件被替换和跨库来源混用。完整96步前端及最终差异复验、753项Rust测试、48项分析挂载、15项Windows原生实际诊断及最终9项只读验证通过；13自身CI41402896621及官方摘要/双包/startup已核验，不轮询。真实有样本/事务链按BA-12承接，详[13记录](docs/modular-rewrite/R14-prediction-review-analytics-ui/R14-13-analysis-jobs-and-packages.md)。下一主交付R14-16，未启动。
+已按最新S12接入四指标、横向步骤和单一滚动区，查询、任务、文件与人工决定归入Analytics Feature；修复并发分析读取其他快照、导入确认后文件被替换和跨库来源混用。完整96步前端及最终差异复验、753项Rust测试、48项分析挂载、15项Windows原生实际诊断及最终9项只读验证通过；13自身CI41402896621及官方摘要/双包/startup已核验，不轮询。真实有样本/事务链按BA-12承接，详[13记录](docs/modular-rewrite/R14-prediction-review-analytics-ui/R14-13-analysis-jobs-and-packages.md)。后续16已实施，当前状态见上文。
 
 ## R14-12 赛后结算与监控（DONE）
 
-结算、人工证据判定与H监控已归入Postmatch Feature，保留真实后端账本、门禁和原请求恢复；修复跨对象响应、未知请求补写及矮窗口裁切。39项新行为、74项页面操作、完整96步和最终差异复验、Windows原生10项及startup通过；自身fd9b32dd的[CI 41375966354](https://github.com/uniquenesssta/123/actions/runs/41375966354)、官方摘要、双包及startup已核验；BA-12真实事务仍由R17-06承接。详[12记录](docs/modular-rewrite/R14-prediction-review-analytics-ui/R14-12-postmatch-settlement-and-monitoring.md)。用户已授权开始R14-13分析查询、长任务与建议包；下一主交付R14-16，尚未启动。
+结算、人工证据判定与H监控已归入Postmatch Feature，保留真实后端账本、门禁和原请求恢复；修复跨对象响应、未知请求补写及矮窗口裁切。39项新行为、74项页面操作、完整96步和最终差异复验、Windows原生10项及startup通过；自身fd9b32dd的[CI 41375966354](https://github.com/uniquenesssta/123/actions/runs/41375966354)、官方摘要、双包及startup已核验；BA-12真实事务仍由R17-06承接。详[12记录](docs/modular-rewrite/R14-prediction-review-analytics-ui/R14-12-postmatch-settlement-and-monitoring.md)。用户已授权开始R14-13分析查询、长任务与建议包；后续16已实施，当前状态见上文。
 
 ## R14-08 复盘事实与包提交（DONE）
 

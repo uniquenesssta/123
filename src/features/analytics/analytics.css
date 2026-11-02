@@ -34,3 +34,9 @@
 @media(max-width:700px){.application-shell:where([data-current-page="analytics"]) :is(.analytics-metrics,.analytics-workflow){grid-template-columns:repeat(2,minmax(0,1fr))}.application-shell:where([data-current-page="analytics"]) .analytics-metrics>.ui-stat-card{min-height:84px}}
 
 .application-shell:where([data-current-page="analytics"]) .analytics-job h3{min-width:0;overflow-wrap:anywhere}
+
+.application-shell:where([data-current-page="analytics"]) .candidate-workbench{display:flex;flex-direction:column;gap:var(--fip-space-sm);min-width:0}
+.application-shell:where([data-current-page="analytics"]) .candidate-fields{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:var(--fip-space-sm);align-items:start}
+.application-shell:where([data-current-page="analytics"]) .candidate-workbench :is(h2,p){overflow-wrap:anywhere}
+.application-shell:where([data-current-page="analytics"]) .candidate-readiness{display:flex;flex-direction:column;gap:var(--fip-space-sm)}
+@media(max-width:850px){.application-shell:where([data-current-page="analytics"]) .candidate-fields{grid-template-columns:repeat(2,minmax(0,1fr))}}

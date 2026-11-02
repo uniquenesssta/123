@@ -1,3 +1,4 @@
+import {verifyCandidatesWorkflow} from './features/verifyCandidatesWorkflow.mjs';import {fileURLToPath} from 'node:url';
 import fs from "node:fs";
 import { isVersionAtLeast } from "./version.mjs";
 
@@ -51,3 +52,5 @@ for (const command of contract.commands) {
 }
 
 console.log("参数生命周期验证通过：公开提供器边界、人工晋升、不可变账本和回滚链路完整。");
+
+await verifyCandidatesWorkflow(fileURLToPath(new URL("../",import.meta.url)));

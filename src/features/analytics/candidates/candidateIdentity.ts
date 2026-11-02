@@ -1,0 +1,9 @@
+import type {AbilityUpdateCandidateRecord,ParameterTuningCandidateRecord,ParameterLifecycleReadiness} from '../../../types';
+import {identity} from '../analyticsIdentity';
+export const abilitySource=(r:AbilityUpdateCandidateRecord)=>({id:r.id,player_id:r.player_id,dimension_code:r.dimension_code,current_value:r.current_value,proposed_value:r.proposed_value,calculation_version:r.calculation_version,match_review_id:r.match_review_id});
+export const parameterSource=(r:ParameterTuningCandidateRecord)=>({id:r.id,competition_id:r.competition_id,competition_profile_id:r.competition_profile_id,partition_key:r.partition_key,snapshot_type:r.snapshot_type,baseline_model_version_id:r.baseline_model_version_id,baseline_parameter_set_id:r.baseline_parameter_set_id,candidate_model_version_id:r.candidate_model_version_id,candidate_parameter_set_id:r.candidate_parameter_set_id,candidate_definition_sha256:r.candidate_definition_sha256});
+export const same=(a:unknown,b:unknown)=>identity(a)===identity(b);
+export function minimumSamples(row:ParameterTuningCandidateRecord):number {const n=row.constraints.minimum_sample_size;return typeof n==='number'&&Number.isSafeInteger(n)&&n>=0?n:50;}
+export function matchingReadiness(row:ParameterTuningCandidateRecord,gate:ParameterLifecycleReadiness,target:'baseline'|'candidate'='baseline'):boolean {
+ return !!row.competition_id&&!!row.competition_profile_id&&!!row.partition_key&&gate.competition_id===row.competition_id&&gate.competition_profile_id===row.competition_profile_id&&gate.snapshot_type===row.snapshot_type&&(target==='candidate'||gate.partition_key===row.partition_key)&&gate.active_model_version_id===(target==='baseline'?row.baseline_model_version_id:row.candidate_model_version_id)&&gate.active_parameter_set_id===(target==='baseline'?row.baseline_parameter_set_id:row.candidate_parameter_set_id)&&!!gate.active_model_version_id&&!!gate.active_parameter_set_id;
+}

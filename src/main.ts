@@ -1,3 +1,4 @@
+import {CandidateActions} from "./features/analytics/candidates/candidateActions";import {CandidateControls} from "./features/analytics/candidates/candidateControls";
 import {AnalyticsFeature,AnalyticsActions,analyticsStorage} from "./features/analytics";
 import {PostmatchFeature,postmatchRecovery,settlementTarget,PostmatchActions,PostmatchControls} from "./features/postmatch";
 import { ResearchFeature, researchRecovery, researchSnapshotView } from "./features/prediction";
@@ -76,11 +77,6 @@ OpenAiApiProtocol,
 OpenAiProfileDraft,
 OpenAiProfilesState,
 Page,
-ParameterLifecycleReadinessRequest,
-ParameterPromotionRequest,
-ParameterRollbackRequest,
-ParameterTuningDecisionDraft,
-ParameterTuningDraft,
 PlayerListQuery,
 PlayerNavigationContext,
 PredictionCommand,
@@ -259,6 +255,8 @@ const analyticsFeature=new AnalyticsFeature({
  changed:()=>{if(renderedPage==="analytics"&&session.bootstrap&&!browserLifecycleController.signal.aborted)render({preserveForm:true});},
 });
 const analyticsActions=new AnalyticsActions(analyticsFeature,{confirm:(...args)=>showConfirmation(...args,{tone:"neutral"}),show:(title,value)=>showModal(title,value),notify:message=>toast(message,"success")});
+const candidateControls=new CandidateControls();
+const candidateActions=new CandidateActions(analyticsFeature.candidates,{confirm:(...args)=>showConfirmation(...args,{tone:"neutral"}),show:(...args)=>showModal(...args),notify:(message,kind)=>toast(message,kind??"success")});
 const reviewFeature=new ReviewFeature({postmatch:postmatchFeature.settlement,
  api,scope:()=>session.captureDatabase(),view:()=>{const page=navigation.page;return()=>page===navigation.page&&!browserLifecycleController.signal.aborted;},
  changed:()=>{if(renderedPage==="review"&&session.bootstrap&&!browserLifecycleController.signal.aborted)render({preserveForm:true});},
@@ -641,7 +639,7 @@ function render(options: RenderOptions = {}): void {
       break;
   }
   content = renderWorkflowContinuationBanner() + content;
-  reviewControls.destroy();postmatchControls.destroy();
+  reviewControls.destroy();postmatchControls.destroy();candidateControls.destroy();
   app.innerHTML = renderShell({
     state: session.bootstrap,
     page: navigation.page,
@@ -656,6 +654,7 @@ function render(options: RenderOptions = {}): void {
   renderedPage = navigation.page;
   const currentPageRoot = app.querySelector<HTMLElement>(".page-container") ?? app;
   workspaceState.restore(navigation.page, currentPageRoot);
+  if(navigation.page==="analytics")candidateControls.mount(currentPageRoot);
   if(navigation.page==="review")reviewControls.mount(currentPageRoot);
   if(navigation.page==="review"||navigation.page==="analytics")postmatchControls.mount(currentPageRoot);
   if(navigation.page==="prediction"){
@@ -1754,188 +1753,6 @@ function syncReviewManualValidation():void {
  const message=app.querySelector<HTMLElement>("#review-manual-validation"),submit=app.querySelector<HTMLButtonElement>('[data-action="generate-match-review"]');
  if(message)message.textContent=result.error??(!allowed?"当前请求或资料包状态尚不允许人工生成。":"所需事实已录入；确认后生成本次人工复盘。");
  if(submit)submit.disabled=!!result.error||!allowed;
-}
-
-async function decideAbilityCandidate(
-  candidateId: string,
-  decision: "accept" | "reject",
-): Promise<void> {
-  if(navigation.page==="review"){requestReviewWrite("candidate",candidateId,decision);return;}
-  if (!candidateId) throw new Error("未找到需要处理的能力建议");
-  await runBusy(() =>
-    api.decideAbilityCandidate({
-      candidate_id: candidateId,
-      decision,
-      decided_by: "local_user",
-      decision_note:
-        decision === "accept" ? "桌面端人工接受" : "桌面端人工拒绝",
-    }),
-  );
-
-  if (navigation.page === "analytics") await loadAnalysisCenter();
-  await session.refresh();
-  render();
-  toast(
-    decision === "accept" ? "候选已接受并写入能力历史" : "候选已拒绝",
-    "success",
-  );
-}
-
-async function generateParameterTuning(): Promise<void> {
-  const draft: ParameterTuningDraft = {
-    competition_id: nullableValue("tuning-competition-id"),
-    snapshot_type: value(
-      "tuning-snapshot-type",
-    ) as ParameterTuningDraft["snapshot_type"],
-    target_module: value(
-      "tuning-module",
-    ) as ParameterTuningDraft["target_module"],
-    minimum_sample_size: Number(value("tuning-min-sample")),
-    max_relative_change: Number(value("tuning-max-change")),
-  };
-  const candidate = await runBusy(() =>
-    api.generateParameterTuningCandidate(draft),
-  );
-  await analyticsFeature.refresh();
-  render();
-  showModal("参数候选诊断", candidate);
-  toast("已生成单模块参数候选，正式模型未被修改", "success");
-}
-
-async function decideParameterTuning(
-  candidateId: string,
-  decision: ParameterTuningDecisionDraft["decision"],
-): Promise<void> {
-  if (!candidateId) throw new Error("参数候选不存在");
-  const draft: ParameterTuningDecisionDraft = {
-    candidate_id: candidateId,
-    decision,
-    decision_note:
-      decision === "accept_for_backtest" ? "进入回测队列" : "人工拒绝",
-  };
-  await runBusy(() => api.decideParameterTuningCandidate(draft));
-  await analyticsFeature.refresh();
-  render();
-  toast(
-    decision === "accept_for_backtest"
-      ? "候选已进入回测队列，不会自动上线"
-      : "候选已拒绝",
-    "success",
-  );
-}
-
-async function checkParameterLifecycleReadiness(): Promise<void> {
-  const request: ParameterLifecycleReadinessRequest = {
-    competition_id: nullableValue("tuning-competition-id"),
-    snapshot_type: value(
-      "tuning-snapshot-type",
-    ) as ParameterLifecycleReadinessRequest["snapshot_type"],
-    minimum_sample_size: Number(value("tuning-min-sample")),
-  };
-  const readiness = await runBusy(() =>
-    api.parameterLifecycleReadiness(request),
-  );
-  showModal("阶段 I 门禁检查", readiness);
-  toast(
-    readiness.ready_for_shadow_validation
-      ? "阶段 I 影子验证门禁已满足"
-      : "阶段 I 仍被前置条件阻断",
-    readiness.ready_for_shadow_validation ? "success" : "normal",
-  );
-}
-
-async function runParameterShadowValidation(candidateId: string): Promise<void> {
-  if (!candidateId) throw new Error("参数候选不存在");
-  const record = await runBusy(() =>
-    api.runParameterShadowValidation({ candidate_id: candidateId }),
-  );
-  await analyticsFeature.refresh();
-  render();
-  showModal("阶段 I 影子验证", record);
-  toast(
-    record.status === "passed"
-      ? "影子验证通过，仍需人工晋升"
-      : record.status === "blocked"
-        ? "影子验证被接入点 H 门禁阻断"
-        : "影子验证未通过，正式模型保持不变",
-    record.status === "passed" ? "success" : "normal",
-  );
-}
-
-function promoteParameterCandidate(candidateId: string): void {
-  if (!candidateId) throw new Error("参数候选不存在");
-  const candidate = analyticsFeature.state.tuningCandidates.find(
-    (item) => item.id === candidateId,
-  );
-  showConfirmation(
-    "人工晋升参数候选",
-    "该操作会把当前赛事活动绑定切换到候选模型与参数版本。系统不会自动执行此操作。",
-    [
-      ["赛事", candidate?.competition_name ?? "未识别"],
-      ["分区", candidate?.partition_key ?? "未记录"],
-      ["候选版本", candidate?.candidate_parameter_version ?? "未记录"],
-    ],
-    "确认人工晋升",
-    async () => {
-      const request: ParameterPromotionRequest = {
-        candidate_id: candidateId,
-        decided_by: null,
-        decision_note: "用户在分析中心确认全部影子门禁通过并人工晋升",
-      };
-      const decision = await runBusy(() =>
-        api.promoteParameterCandidate(request),
-      );
-      await analyticsFeature.refresh();
-      render();
-      showModal("人工晋升记录", decision);
-      toast("候选已人工晋升，可按绑定快照回滚", "success");
-    },
-  );
-}
-
-function rollbackParameterCandidate(candidateId: string): void {
-  if (!candidateId) throw new Error("参数候选不存在");
-  const candidate = analyticsFeature.state.tuningCandidates.find(
-    (item) => item.id === candidateId,
-  );
-  showConfirmation(
-    "回滚参数候选",
-    "回滚只恢复本次晋升记录中的原绑定；若绑定已被其他版本修改，系统会拒绝覆盖。",
-    [
-      ["赛事", candidate?.competition_name ?? "未识别"],
-      ["当前候选", candidate?.candidate_parameter_version ?? "未记录"],
-      ["回滚目标", candidate?.parameter_version ?? "未记录"],
-    ],
-    "确认回滚",
-    async () => {
-      const request: ParameterRollbackRequest = {
-        candidate_id: candidateId,
-        decided_by: null,
-        decision_note: "用户在分析中心确认按晋升绑定快照回滚",
-      };
-      const decision = await runBusy(() =>
-        api.rollbackParameterCandidate(request),
-      );
-      await analyticsFeature.refresh();
-      render();
-      showModal("回滚记录", decision);
-      toast("候选晋升已按原绑定快照回滚", "success");
-    },
-  );
-}
-
-async function showParameterLifecycleHistory(candidateId: string): Promise<void> {
-  if (!candidateId) throw new Error("参数候选不存在");
-  const [validations, decisions] = await runBusy(() =>
-    Promise.all([
-      api.listParameterShadowValidations(candidateId),
-      api.listParameterPromotionDecisions(candidateId),
-    ]),
-  );
-  showModal("阶段 I 生命周期记录", {
-    shadow_validations: validations,
-    promotion_and_rollback_decisions: decisions,
-  });
 }
 
 function openAiProfileDraftFromForm(): OpenAiProfileDraft {
@@ -3172,12 +2989,7 @@ async function handleAction(
       workspaceState.patchModule("review",{active_section:"results"});
       await reviewFeature.openReview(button.dataset.reviewId ?? "");
       break;
-    case "decide-ability-candidate":
-      await decideAbilityCandidate(
-        button.dataset.candidateId ?? "",
-        button.dataset.decision === "accept" ? "accept" : "reject",
-      );
-      break;
+    case "decide-ability-candidate":if(navigation.page==="review")requestReviewWrite("candidate",button.dataset.candidateId??"",button.dataset.decision==="accept"?"accept":"reject");else candidateActions.ability(button.dataset.candidateId??"",button.dataset.decision==="accept"?"accept":"reject");break;
     case "show-review-json":
       if (reviewFeature.state.detail) showModal("复盘完整详情", reviewFeature.state.detail);
       break;
@@ -3188,6 +3000,7 @@ async function handleAction(
       postmatchActions.settle(button.dataset.reviewId ?? "");
       break;
     case "show-candidate-json": {
+      if(navigation.page==="analytics"){candidateActions.abilityDiagnostic(button.dataset.candidateId??"");break;}
       const candidate =
         reviewFeature.state.detail?.ability_candidates.find(
           (item) => item.id === button.dataset.candidateId,
@@ -3218,40 +3031,17 @@ async function handleAction(
     case "submit-evidence-decision":
       await postmatchActions.submitEvidence(button.dataset.evidenceItemId ?? "",button.dataset.postmatchConfirm ?? "");
       break;
-    case "generate-parameter-tuning":
-      if (!analyticsFeature.gates.review) throw new Error("请先通过数据质量门禁并处理全部待审核建议");
-      await generateParameterTuning();
-      break;
-    case "check-parameter-lifecycle-readiness":
-      await checkParameterLifecycleReadiness();
-      break;
-    case "run-parameter-shadow-validation":
-      await runParameterShadowValidation(button.dataset.candidateId ?? "");
-      break;
-    case "promote-parameter-candidate":
-      promoteParameterCandidate(button.dataset.candidateId ?? "");
-      break;
-    case "rollback-parameter-candidate":
-      rollbackParameterCandidate(button.dataset.candidateId ?? "");
-      break;
-    case "show-parameter-lifecycle-history":
-      await showParameterLifecycleHistory(button.dataset.candidateId ?? "");
-      break;
-    case "decide-parameter-tuning":
-      await decideParameterTuning(
-        button.dataset.candidateId ?? "",
-        button.dataset.decision === "accept_for_backtest"
-          ? "accept_for_backtest"
-          : "reject",
-      );
-      break;
-    case "show-parameter-tuning": {
-      const candidate = analyticsFeature.state.tuningCandidates.find(
-        (item) => item.id === button.dataset.candidateId,
-      );
-      if (candidate) showModal("参数候选诊断", candidate);
-      break;
-    }
+    case "generate-parameter-tuning":candidateActions.provider();break;
+    case "candidate-provider-boundary":candidateActions.provider();break;
+    case "check-parameter-lifecycle-readiness":await analyticsFeature.candidates.context.inspect();break;
+    case "run-parameter-shadow-validation":candidateActions.parameter(button.dataset.candidateId??"","shadow");break;
+    case "promote-parameter-candidate":candidateActions.parameter(button.dataset.candidateId??"","promote");break;
+    case "rollback-parameter-candidate":candidateActions.parameter(button.dataset.candidateId??"","rollback");break;
+    case "show-parameter-lifecycle-history":await candidateActions.history(button.dataset.candidateId??"");break;
+    case "decide-parameter-tuning":candidateActions.parameter(button.dataset.candidateId??"",button.dataset.decision==="reject"?"reject":"accept_for_backtest");break;
+    case "reject-parameter-candidate":candidateActions.parameter(button.dataset.candidateId??"","reject");break;
+    case "show-parameter-tuning":candidateActions.diagnostic(button.dataset.candidateId??"");break;
+    case "recover-candidate-operation":await analyticsFeature.candidates.recover(button.dataset.candidateId??"");break;
     case "analysis-step":analyticsFeature.setStep(button.dataset.analyticsStep as import("./features/analytics").AnalysisStep);break;
     case "run-full-analysis":analyticsActions.enqueue("full_analysis_refresh");break;
     case "run-model-analysis":analyticsActions.enqueue("refresh_analytics");break;
@@ -3436,6 +3226,9 @@ function filterSelectOptions(
 }
 
 document.addEventListener("input", (event) => {
+  const candidateTarget=event.target as HTMLInputElement|HTMLSelectElement;
+  if(navigation.page==="analytics"&&candidateTarget.dataset.candidateNote){analyticsFeature.candidates.context.note(candidateTarget.dataset.candidateNote,candidateTarget.value);return;}
+
   const target = event.target as HTMLInputElement | HTMLTextAreaElement;
   if(target.dataset.postmatchNote)postmatchActions.captureNote(target.value,target.dataset.postmatchNote);
   if(target instanceof HTMLInputElement&&target.dataset.postmatchField)postmatchFeature.monitoring.update(target.dataset.postmatchField as import("./features/postmatch").MonitorFieldKey,target.value);
@@ -3471,6 +3264,9 @@ document.addEventListener("input", (event) => {
 }, { signal: browserLifecycleController.signal });
 
 document.addEventListener("change", (event) => {
+  const candidateTarget=event.target as HTMLInputElement|HTMLSelectElement;
+  if(navigation.page==="analytics"&&candidateTarget.dataset.candidateNote){analyticsFeature.candidates.context.note(candidateTarget.dataset.candidateNote,candidateTarget.value);return;}
+  if(navigation.page==="analytics"&&candidateTarget.dataset.candidateField){analyticsFeature.candidates.context.update(candidateTarget.dataset.candidateField,candidateTarget.value);render({preserveForm:true});return;}
   const target = event.target as HTMLInputElement | HTMLSelectElement;
   if(target.dataset.postmatchField){if(target.dataset.postmatchField==="settlement")postmatchFeature.selectSettlement(target.value==="__all__"?"":target.value);else postmatchFeature.monitoring.update(target.dataset.postmatchField as import("./features/postmatch").MonitorFieldKey,target.value);return;}
   if(navigation.page==="review"&&target instanceof HTMLSelectElement&&target.closest("[data-review-picker]")){reviewFacts.capture(app,reviewFeature.state.selectedMatchId);reviewFeature.choose(target.value||null);return;}
@@ -3896,7 +3692,7 @@ export function createBrowserApplicationModule(
     rulesFeature.stop();
     teamsFeature.stop();
   playersFeature.stop();
-    reviewControls.destroy();postmatchControls.destroy();
+    reviewControls.destroy();postmatchControls.destroy();candidateControls.destroy();
     session.stop();
     openAiExampleRequests.destroy();
     navigation.destroy();

@@ -1,3 +1,4 @@
+import {verifyCandidatesBrowser} from "../features/verifyCandidatesBrowser.mjs";
 import {verifyAnalyticsBrowser} from "../features/verifyAnalyticsBrowser.mjs";
 import {verifyPostmatchBrowser} from "../features/verifyPostmatchBrowser.mjs";
 import {verifyMountedApplication} from "./verifyMountedApplication.mjs";
@@ -176,3 +177,4 @@ await verifyRunsBrowser(root,join(directory,"runs-mounted"));
 
 await verifyPostmatchBrowser(root,join(directory,"postmatch-mounted"));
 await verifyAnalyticsBrowser(root,join(directory,"analytics-mounted"));
+await verifyCandidatesBrowser(root,join(directory,"candidates-mounted"));
