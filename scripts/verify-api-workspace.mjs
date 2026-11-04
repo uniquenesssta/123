@@ -1,3 +1,4 @@
+import {verifyAiWorkspaceWorkflow} from "./features/verifyAiWorkspaceWorkflow.mjs";
 import { createHash } from "node:crypto";
 import { existsSync, readFileSync } from "node:fs";
 import { dirname, join, resolve } from "node:path";
@@ -40,7 +41,9 @@ const applicationExport = text("crates/application/src/lib.rs");
 const requestState = json("architecture/state-ownership.json").states.find(state => state.id === "tauri.api-requests");
 const registry = text("src-tauri/src/bootstrap/command_registry.rs");
 const client = text("src/api/client.ts");
-const page = text("src/pages/apiWorkspace.ts");
+await verifyAiWorkspaceWorkflow(root);
+const owner=["aiWorkspaceFeature","aiWorkspaceState","aiWorkspaceRequests","aiWorkspaceArchive"].map(name=>text(`src/features/ai-workspace/${name}.ts`)).join("\n");
+const page = ["aiWorkspacePage","aiWorkspaceMessages"].map(name=>text(`src/features/ai-workspace/${name}.ts`)).join("\n");
 const main = text("src/main.ts");
 const shell = JSON.parse(text("contracts/global-visual-system-contract.json")).shell_source_entries.map(text).join("\n");
 const navigation = text("src/app/router/routeRegistry.ts");
@@ -75,6 +78,10 @@ for (const artifact of v3.artifacts) {
     }
   } else if (artifact === "src-tauri/src/commands/api_workspace.rs") {
     for (const owner of ["src-tauri/src/commands/ai_workspace/mod.rs", ...Object.values(json("architecture/command-contract.json").command_groups.find(group => group.module === "ai_workspace").command_definition_files)]) assert(existsSync(join(root, owner)), `AI问答命令迁移后制品不存在：${owner}`);
+  } else if (artifact === "src/pages/apiWorkspace.ts") {
+    const feature=json("architecture/module-boundaries.json").frontend.features["api-workspace"];
+    assert(feature.owner === "src/features/ai-workspace/aiWorkspaceFeature.ts" && feature.public_entry === "src/features/ai-workspace/index.ts", "AI问答迁移后唯一owner未登记");
+    for(const name of ["aiWorkspaceFeature","aiWorkspaceState","aiWorkspaceQuery","aiWorkspaceRequests","aiWorkspaceArchive","aiWorkspaceStorage","aiWorkspaceActions","aiWorkspacePage","aiWorkspaceMessages","aiWorkspaceControls","index"]) assert(existsSync(join(root,`src/features/ai-workspace/${name}.ts`)),`AI问答迁移后制品不存在：${name}`);
   } else {
     assert(existsSync(join(root, artifact)), `AI问答v3制品不存在：${artifact}`);
   }
@@ -154,10 +161,10 @@ for (const required of ["搜索会话", "取消请求", "复制回答", "附加�
 for (const forbidden of ["choose-api-workspace-attachments", "apply-api-workspace-operation", "reject-api-workspace-operation", "export-api-workspace-file", "Token用量", "来源链接"]) {
   assert(!page.includes(forbidden), `AI问答常用页面仍暴露旧功能：${forbidden}`);
 }
-assert(main.includes("apiWorkspaceSessionSearch"), "会话搜索状态未接入");
-assert(main.includes("apiWorkspaceDraftMessage"), "未发送草稿未保留");
-assert(main.includes("cancelApiWorkspaceRequest"), "前端未接通取消请求");
-assert(main.includes("archiveApiWorkspaceSession"), "前端未接通会话归档");
+assert(main.includes("aiWorkspaceActions.input") && owner.includes("search="), "会话搜索状态未接入");
+assert(owner.includes("drafts") && owner.includes("message"), "未发送草稿未保留");
+assert(owner.includes("cancelApiWorkspaceRequest(id)"), "前端未接通取消请求");
+assert(owner.includes("archiveApiWorkspaceSession(id)"), "前端未接通会话归档");
 assert(v3.compatibility.historical_proposals_preserved === true, "历史提案必须保留");
 assert(v3.compatibility.historical_generated_files_preserved === true, "历史生成文件必须保留");
 assert(v3.compatibility.formal_p4_research_unchanged === true, "P4正式研究边界必须保持");

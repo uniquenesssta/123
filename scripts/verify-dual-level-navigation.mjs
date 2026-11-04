@@ -163,8 +163,8 @@ await test("return context contains only location and is consumed once", () => {
 // Compile only the named real feature loading functions; inject I/O, never a copied loader.
 const main = read("src/main.ts");
 const source = ts.createSourceFile("main.ts", main, ts.ScriptTarget.Latest, true);
-const functions = source.statements.filter(node => ts.isFunctionDeclaration(node) && ["loadNavigationPage", "loadApiWorkspace", "loadAnalysisCenter"].includes(node.name?.text)).map(node => node.getText(source)).join("\n");
-assert.equal(source.statements.filter(node => ts.isFunctionDeclaration(node) && ["loadNavigationPage", "loadApiWorkspace", "loadAnalysisCenter"].includes(node.name?.text)).length, 3);
+const functions = source.statements.filter(node => ts.isFunctionDeclaration(node) && ["loadNavigationPage", "loadAnalysisCenter"].includes(node.name?.text)).map(node => node.getText(source)).join("\n");
+assert.equal(source.statements.filter(node => ts.isFunctionDeclaration(node) && ["loadNavigationPage", "loadAnalysisCenter"].includes(node.name?.text)).length, 2);
 const loaderJs = ts.transpileModule(functions, { compilerOptions: { target: ts.ScriptTarget.ES2022, module: ts.ModuleKind.None } }).outputText;
 const { TeamsFeature } = loadTeamsProduction(root)("src/features/teams/index.ts");
 const { PlayersFeature }=loadTeamsProduction(root)("src/features/players/index.ts");
@@ -219,23 +219,8 @@ await test("actual players loader rejects stale data and publishes only current 
 await test("actual release loader and explicit history detail guard each await",async()=>{
  for(const stage of ["list","detail","current"]){const {context,router}=loaderContext(),list=deferred(),detail=deferred();let reads=0;const row=releaseReport("qa-nav");context.api.listReleaseAcceptanceRuns=()=>list.promise;context.api.readReleaseAcceptanceRun=()=>{reads++;return detail.promise;};const loading=context.loadNavigationPage(router.begin("release"));if(stage==="list")router.begin("dashboard");list.resolve([row]);await loading;if(stage==="list"){assert.equal(context.releaseFeature.state.loaded,false);assert.equal(reads,0);}else{const selecting=context.releaseFeature.select(row.id);if(stage==="detail")router.begin("dashboard");detail.resolve(row);await selecting;assert.equal(reads,1);assert.equal(context.releaseFeature.state.selected?.id??null,stage==="current"?row.id:null);}router.destroy();}
 });
-await test("actual AI workspace loader guards each await including session detail", async () => {
-  for (const stage of ["profiles", "sessions", "detail", "current"]) {
-    const { context, router } = loaderContext(), profiles = deferred(), sessions = deferred(), detail = deferred(), sessionsStarted = deferred(), detailStarted = deferred();
-    context.apiWorkspaceDetail = { session: { id: "session" } };
-    context.api.listOpenAiProfiles = () => profiles.promise; context.api.listApiWorkspacePresets = async () => [{ key: "plain_chat" }];
-    context.api.listApiWorkspaceSessions = () => { sessionsStarted.resolve(); return sessions.promise; }; context.api.playerCatalogReferenceData = async () => ({ managed_matches: [] });
-    context.api.readApiWorkspaceSession = () => { detailStarted.resolve(); return detail.promise; };
-    const pending = context.loadNavigationPage(router.begin("api_workspace"));
-    if (stage === "profiles") router.begin("dashboard"); profiles.resolve({ profiles: [] });
-    if (stage !== "profiles") await sessionsStarted.promise;
-    if (stage === "sessions") router.begin("dashboard"); sessions.resolve([{ id: "session" }]);
-    if (stage === "detail" || stage === "current") await detailStarted.promise;
-    if (stage === "detail") router.begin("dashboard"); detail.resolve({ session: { id: "new", metadata: {} } }); await pending;
-    assert.equal(context.apiWorkspaceDetail.session.id, stage === "current" ? "new" : "session");
-    assert.equal(context.apiWorkspaceSessions === undefined, stage !== "current");
-    if (stage === "profiles") assert.equal(context.openAiProfiles, "before"); router.destroy();
-  }
+await test("actual AI workspace loader guards profiles catalog selection and each await",async()=>{
+ for(const stage of ["profiles","sessions","detail","current"]){const {context,router}=loaderContext(),profiles=deferred(),sessions=deferred(),detail=deferred(),started=deferred(),reading=deferred();const {AiWorkspaceFeature}=loadTeamsProduction(root)("src/features/ai-workspace/aiWorkspaceFeature.ts");Object.assign(context.api,{listOpenAiProfiles:()=>profiles.promise,listApiWorkspacePresets:async()=>[{key:"plain_chat"}],listApiWorkspaceSessions:()=>{started.resolve();return sessions.promise;},playerCatalogReferenceData:async()=>({managed_matches:[]}),readApiWorkspaceSession:()=>{reading.resolve();return detail.promise;}});context.aiWorkspaceFeature=new AiWorkspaceFeature({api:context.api,scope:()=>()=>true,view:()=>{const page=router.page;return()=>page===router.page;},storage:{capture:()=>({read:()=>({selected:"session:A",drafts:{},receipt:null,archives:{}}),save:()=>{}})},changed:()=>{},formatError:String});context.workspaceState.module=()=>({controls:{}});const task=context.loadNavigationPage(router.begin("api_workspace"));if(stage==="profiles")router.begin("dashboard");profiles.resolve({profiles:[],active_profile_id:null});if(stage!=="profiles")await started.promise;if(stage==="sessions")router.begin("dashboard");sessions.resolve([{id:"A"}]);if(stage==="detail"||stage==="current")await reading.promise;if(stage==="detail")router.begin("dashboard");detail.resolve({session:{id:"A",metadata:{},profile_id:"p",preset_key:"plain_chat",match_id:null},messages:[],operations:[],files:[]});await task;assert.equal(context.aiWorkspaceFeature.state.detail?.session.id??null,stage==="current"?"A":null);if(stage==="profiles")assert.equal(context.aiWorkspaceFeature.state.profiles,null);router.destroy();}
 });
 await test("actual teams and prediction loaders cannot apply stale multi-step results", async () => {
   for (const page of ["teams", "lineup_presets", "prediction"]) {

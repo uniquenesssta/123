@@ -1,6 +1,6 @@
 # R14-17 应用内验收与报告
 
-状态：VERIFYING（实现及本地适用验证完成；自身CI/官方包待按本批推送另验）。用户授权“收尾16开始17”，基线349dcda9c021a9ab839d14e346dfa2a3ad9aeccb，沿用rewrite/r14-prediction-review-analytics-ui；开始时工作区干净。16自身CI41489495436、官方artifact13165974429摘要、MSI/NSIS与startup已正式核验DONE。这里只实施17；下一主交付R15-01“会话、草稿与请求全生命周期”，未启动。
+状态：DONE（2026-11-04已核验本批精确CI/官方包/startup；原外部边界保留）。用户授权“收尾16开始17”，基线349dcda9c021a9ab839d14e346dfa2a3ad9aeccb，沿用rewrite/r14-prediction-review-analytics-ui；开始时工作区干净。16自身CI41489495436、官方artifact13165974429摘要、MSI/NSIS与startup已正式核验DONE。这里只实施17；下一主交付R15-01“会话、草稿与请求全生命周期”，未启动。
 
 ## 已核对的责任与实际边界
 
@@ -55,3 +55,7 @@ native-startup-final.json为最后只读会话startup/pass：5条日志、2完�
 ### 接下来
 
 17自身CI/官方安装包按新提交另验，禁止轮询或拿16结果代替。R14仍待本批正式出口；下一主交付 **R15-01 会话、草稿与请求全生命周期**，未启动，需R14出口及用户启动授权。BA-12其余新库/事务/有样本全链和私有固定回归保留原R17-06承接。本批回退只撤代码，不能撤销已创建的不可变报告。
+
+## 2026-11-04 正式收尾
+
+提交be02451a962549c4ff23d4a6c27fdfe5376c57d8，自身push CI41835857983、job126594452224 success；官方artifact13328354678，ZIP SHA256 e976cc78a655e86303f540225d324a8b7d968742b20941ac738f92abe4c8e733匹配官方digest。MSI/NSIS格式有效，包内startup PASS（7记录、0无效行/运行错误）。详情见[R14阶段完成记录](R14-stage-completion.md)，证据O:/Project/FOODBALL/logs/r14-17-ci-41835857983/acceptance.json。无数字签名/本地安装/Full主张。用户已明确启动R15-01，阶段分支从此提交建立；旧交付时的“未启动”仅为当时状态。

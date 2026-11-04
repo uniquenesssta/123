@@ -45,7 +45,7 @@ import { PlayersFeature,playersPage } from "./features/players";
 import { RulesFeature,routeDetailBody,rulesPage } from "./features/rules";
 import { TeamsFeature,teamsPage } from "./features/teams";
 import { analyticsPage } from "./pages/analytics";
-import { apiWorkspacePage } from "./pages/apiWorkspace";
+import {AiWorkspaceFeature,AiWorkspaceActions,AiWorkspaceControls,aiWorkspaceStorage,aiWorkspacePage} from "./features/ai-workspace";
 import { lineupPresetsPage } from "./pages/lineupPresets";
 import { lineupsPage } from "./pages/lineups";
 import { logsPage } from "./pages/logs";
@@ -63,9 +63,6 @@ import { stopTauriTransport } from "./platform/tauri";
 import { DebouncedTask } from "./platform/timing";
 import "./styles/index.css";
 import type {
-ApiWorkspacePreset,
-ApiWorkspaceSessionDetail,
-ApiWorkspaceSessionRecord,
 CoachListItem,
 CompetitionKind,
 FormationRecord,
@@ -73,7 +70,6 @@ IssueLogEntry,
 IssueSeverity,
 LineupSnapshotType,
 MatchLineupChain,
-MatchRecord,
 OpenAiApiExampleParseResult,
 OpenAiApiProtocol,
 OpenAiProfileDraft,
@@ -259,6 +255,10 @@ const candidateControls=new CandidateControls();
 const candidateActions=new CandidateActions(analyticsFeature.candidates,{confirm:(...args)=>showConfirmation(...args,{tone:"neutral"}),show:(...args)=>showModal(...args),notify:(message,kind)=>toast(message,kind??"success")});
 const releaseFeature=new ReleaseFeature({api,scope:()=>session.captureDatabase(),view:()=>{const page=navigation.page;return()=>page===navigation.page&&!browserLifecycleController.signal.aborted;},storage:releaseStorage(localPreferences,preferenceKey("release-request-state"),()=>reviewDatabaseIdentity(session.bootstrap)),formatError:userFacingError,changed:()=>{if(renderedPage==="release"&&session.bootstrap&&!browserLifecycleController.signal.aborted)render({preserveForm:true});}});
 const releaseControls=new ReleaseControls();
+const aiWorkspaceFeature=new AiWorkspaceFeature({api,scope:()=>session.captureDatabase(),view:()=>{const page=navigation.page;return()=>page===navigation.page&&!browserLifecycleController.signal.aborted;},storage:aiWorkspaceStorage(localPreferences,preferenceKey("api-workspace-state"),()=>reviewDatabaseIdentity(session.bootstrap)),formatError:userFacingError,changed:()=>{if(renderedPage==="api_workspace"&&session.bootstrap&&!browserLifecycleController.signal.aborted)render({preserveForm:true});}});
+const aiWorkspaceControls=new AiWorkspaceControls();
+const aiWorkspaceActions=new AiWorkspaceActions(aiWorkspaceFeature,{confirm:(title,description,facts,label,run)=>showConfirmation(title,description,facts.map(([a,b])=>[a,b]),label,run),show:(title,message)=>showModal(title,message),copy:value=>clipboard.writeText(value),notify:message=>toast(message,"success"),section:active_section=>workspaceState.patchModule("api_workspace",{active_section}),render:()=>render({preserveForm:true}),navigate:()=>navigateTo("api_workspace"),source:{readTeam:id=>api.readTeam(id),readPlayer:id=>api.readPlayer(id),team:()=>teamsFeature.catalog.detail,player:()=>playersFeature.catalog.detail,captureTeam:()=>{const current=teamsFeature.catalog.capture(),page=navigation.page;return()=>current()&&navigation.page===page;},capturePlayer:()=>{const current=playersFeature.catalog.capture(),page=navigation.page;return()=>current()&&navigation.page===page;}}});
+
 const releaseDetails=new ReleaseDetails();
 const releaseActions=new ReleaseActions(releaseFeature,{confirm:(...args)=>showConfirmation(...args,{tone:"neutral"}),show:(...args)=>releaseDetails.show(...args),notify:(text,tone)=>toast(text,tone)});
 const reviewFeature=new ReviewFeature({postmatch:postmatchFeature.settlement,
@@ -371,26 +371,6 @@ let selectedOpenAiProfileId: string | null = null;
 let creatingOpenAiProfile = false;
 const openAiApiExampleTimer = new DebouncedTask(browserLifecycleController);
 let openAiApiExampleLastParsed = "";
-let apiWorkspacePresets: ApiWorkspacePreset[] = [];
-let apiWorkspaceSessions: ApiWorkspaceSessionRecord[] = [];
-let apiWorkspaceDetail: ApiWorkspaceSessionDetail | null = null;
-let apiWorkspaceMatches: MatchRecord[] = [];
-let selectedApiWorkspacePresetKey = "plain_chat";
-let selectedApiWorkspaceProfileId = "";
-let selectedApiWorkspaceMatchId: string | null = null;
-let apiWorkspaceDraftMessage = "";
-let apiWorkspaceSending = false;
-let apiWorkspacePendingMessage: {
-  content: string;
-  started_at: string;
-  session_id: string | null;
-} | null = null;
-let selectedApiWorkspaceContextEntityType: "team" | "player" | null = null;
-let selectedApiWorkspaceContextEntityId: string | null = null;
-let selectedApiWorkspaceContextEntityLabel: string | null = null;
-let apiWorkspaceSessionSearch = "";
-let apiWorkspaceIncludeContext = false;
-let apiWorkspaceActiveRequestId: string | null = null;
 const workspaceState = new WorkspaceCoordinator<Page>({
   read: () => api.readWorkspaceState(),
   save: (document) => api.saveWorkspaceState(document),
@@ -479,6 +459,7 @@ function render(options: RenderOptions = {}): void {
   if (browserLifecycleController.signal.aborted) return;
   rulesFeature.invalidatePreview();
   const shellFocus = shellController?.captureFocus() ?? null;
+  if(renderedPage==="api_workspace")aiWorkspaceControls.capture(app);
   teamsFeature.drafts.capture(app);
   playersFeature.drafts.capture(app);
   if(renderedPage==="review")reviewFacts.capture(app,reviewFeature.state.selectedMatchId);
@@ -602,28 +583,7 @@ function render(options: RenderOptions = {}): void {
       );
       break;
     case "api_workspace":
-      content = apiWorkspacePage(
-        session.bootstrap,
-        apiWorkspacePresets,
-        apiWorkspaceSessions,
-        apiWorkspaceDetail,
-        openAiProfiles,
-        apiWorkspaceMatches,
-        selectedApiWorkspacePresetKey,
-        selectedApiWorkspaceProfileId,
-        selectedApiWorkspaceMatchId,
-        apiWorkspaceDraftMessage,
-        apiWorkspaceSending,
-        apiWorkspacePendingMessage,
-        selectedApiWorkspaceContextEntityType,
-        selectedApiWorkspaceContextEntityLabel,
-        apiWorkspaceSessionSearch,
-        apiWorkspaceIncludeContext,
-        apiWorkspaceActiveRequestId,
-        workspaceState.module("api_workspace").module_sidebar_collapsed,
-        workspaceState.module("api_workspace").inspector_collapsed,
-        workspaceState.module("api_workspace").active_section ?? "chat",
-      );
+      content = aiWorkspacePage(session.bootstrap,aiWorkspaceFeature,workspaceState.module("api_workspace").active_section ?? "chat",workspaceState.module("api_workspace").inspector_collapsed);
       break;
     case "release": {
       const workspace = workspaceState.module("release");
@@ -649,6 +609,7 @@ function render(options: RenderOptions = {}): void {
   warningCenter?.observeConnection(session.bootstrap.connection_error);
   renderedPage = navigation.page;
   const currentPageRoot = app.querySelector<HTMLElement>(".page-container") ?? app;
+  if(navigation.page==="api_workspace")currentPageRoot.dataset.workspaceCapture="suspended";
   workspaceState.restore(navigation.page, currentPageRoot);
   if(navigation.page==="analytics")candidateControls.mount(currentPageRoot);
   if(navigation.page==="release")releaseControls.mount(currentPageRoot);
@@ -659,6 +620,7 @@ function render(options: RenderOptions = {}): void {
     enhanceSearchableSelects(currentPageRoot);
     syncPredictionSelectIcons(currentPageRoot);
   }
+  if(navigation.page==="api_workspace")aiWorkspaceControls.restore(currentPageRoot);
   rulesFeature.syncHierarchy(currentPageRoot);
   if (navigation.page === "rules") fitCatalogueRegions(currentPageRoot);
   teamsFeature.drafts.restore(currentPageRoot, session.bootstrap);
@@ -1105,191 +1067,8 @@ async function loadIssueLogs(): Promise<void> {
   issueLogs = await api.listIssueLogs(500);
 }
 
-async function loadApiWorkspace(
-  selectedSessionId: string | null = apiWorkspaceDetail?.session.id ?? null,
-  isCurrent: () => boolean = () => !browserLifecycleController.signal.aborted,
-): Promise<void> {
-  const [profiles, presets] = await Promise.all([
-    api.listOpenAiProfiles(),
-    api.listApiWorkspacePresets(),
-  ]);
-  if (!isCurrent()) return;
-  openAiProfiles = profiles;
-  apiWorkspacePresets = presets;
-  selectedApiWorkspaceProfileId =
-    selectedApiWorkspaceProfileId ||
-    profiles.active_profile_id ||
-    profiles.profiles.find(
-      (item) => item.has_api_key && item.api_protocol === "responses",
-    )?.id ||
-    "";
-  if (
-    !selectedApiWorkspacePresetKey ||
-    !presets.some((item) => item.key === selectedApiWorkspacePresetKey)
-  ) {
-    selectedApiWorkspacePresetKey =
-      presets.find((item) => item.key === "plain_chat")?.key ??
-      presets[0]?.key ??
-      "plain_chat";
-  }
-  if (!session.bootstrap?.data.database_configured) {
-    apiWorkspaceSessions = [];
-    apiWorkspaceDetail = null;
-    return;
-  }
-  const [sessions, references] = await Promise.all([
-    api.listApiWorkspaceSessions(100),
-    api.playerCatalogReferenceData(),
-  ]);
-  if (!isCurrent()) return;
-  const sessionId =
-    selectedSessionId && sessions.some((item) => item.id === selectedSessionId)
-      ? selectedSessionId
-      : null;
-  const detail = sessionId
-    ? await api.readApiWorkspaceSession(sessionId)
-    : null;
-  if (!isCurrent()) return;
-  apiWorkspaceSessions = sessions;
-  apiWorkspaceMatches = references.managed_matches;
-  apiWorkspaceDetail = detail;
-  if (apiWorkspaceDetail) {
-    selectedApiWorkspaceProfileId = apiWorkspaceDetail.session.profile_id;
-    selectedApiWorkspacePresetKey = apiWorkspaceDetail.session.preset_key;
-    selectedApiWorkspaceMatchId = apiWorkspaceDetail.session.match_id;
-    const metadata = apiWorkspaceDetail.session.metadata;
-    selectedApiWorkspaceContextEntityType =
-      metadata.context_entity_type === "team" ||
-      metadata.context_entity_type === "player"
-        ? metadata.context_entity_type
-        : null;
-    selectedApiWorkspaceContextEntityId =
-      typeof metadata.context_entity_id === "string"
-        ? metadata.context_entity_id
-        : null;
-    selectedApiWorkspaceContextEntityLabel =
-      typeof metadata.context_entity_label === "string"
-        ? metadata.context_entity_label
-        : null;
-    apiWorkspaceIncludeContext = Boolean(
-      apiWorkspaceDetail.session.match_id ||
-      selectedApiWorkspaceContextEntityId,
-    );
-  } else if (
-    selectedApiWorkspaceMatchId &&
-    !apiWorkspaceMatches.some((item) => item.id === selectedApiWorkspaceMatchId)
-  ) {
-    selectedApiWorkspaceMatchId = null;
-  }
-}
-
-async function sendApiWorkspaceMessage(): Promise<void> {
-  if (apiWorkspaceSending) throw new Error("当前 AI 问答消息仍在处理中");
-  const textarea = document.querySelector<HTMLTextAreaElement>(
-    "#api-workspace-message",
-  );
-  const message = textarea?.value.trim() ?? "";
-  const profileId = value("api-workspace-profile").trim();
-  const presetKey = value("api-workspace-preset").trim();
-  const matchId = nullableValue("api-workspace-match");
-  if (!message) throw new Error("请输入问题");
-  if (!profileId) throw new Error("请选择可用的兼容 API 配置");
-
-  const requestStartedAt = new Date().toISOString();
-  const previousDetailId = apiWorkspaceDetail?.session.id ?? null;
-  const requestOriginPage = navigation.page;
-  const requestId = crypto.randomUUID();
-  apiWorkspaceSending = true;
-  apiWorkspaceActiveRequestId = requestId;
-  apiWorkspacePendingMessage = {
-    content: message,
-    started_at: requestStartedAt,
-    session_id: previousDetailId,
-  };
-  apiWorkspaceDraftMessage = "";
-  render();
-  browserLifecycleController.setTimeout(
-    () =>
-      document
-        .querySelector("#api-workspace-conversation")
-        ?.scrollTo({ top: 999999, behavior: motionScrollBehavior("smooth") }),
-    0,
-  );
-
-  try {
-    const detail = await api.sendApiWorkspaceMessage({
-      session_id: previousDetailId,
-      profile_id: profileId,
-      preset_key: presetKey,
-      title: null,
-      match_id: matchId,
-      context_entity_type: selectedApiWorkspaceContextEntityType,
-      context_entity_id: selectedApiWorkspaceContextEntityId,
-      context_entity_label: selectedApiWorkspaceContextEntityLabel,
-      include_context: apiWorkspaceIncludeContext,
-      request_id: requestId,
-      message,
-      attachments: [],
-    });
-    const stillViewingOrigin =
-      navigation.page === requestOriginPage &&
-      navigation.page === "api_workspace" &&
-      (apiWorkspaceDetail?.session.id ?? null) === previousDetailId;
-    apiWorkspaceSessions = await api.listApiWorkspaceSessions(100);
-    if (stillViewingOrigin) {
-      apiWorkspaceDetail = detail;
-      selectedApiWorkspaceProfileId = detail.session.profile_id;
-      selectedApiWorkspacePresetKey = detail.session.preset_key;
-      selectedApiWorkspaceMatchId = detail.session.match_id;
-      const metadata = detail.session.metadata;
-      selectedApiWorkspaceContextEntityType =
-        metadata.context_entity_type === "team" ||
-        metadata.context_entity_type === "player"
-          ? metadata.context_entity_type
-          : null;
-      selectedApiWorkspaceContextEntityId =
-        typeof metadata.context_entity_id === "string"
-          ? metadata.context_entity_id
-          : null;
-      selectedApiWorkspaceContextEntityLabel =
-        typeof metadata.context_entity_label === "string"
-          ? metadata.context_entity_label
-          : null;
-      toast("AI 回答已保存到当前会话", "success");
-    } else {
-      toast(`AI 回答已完成并保存到会话：${detail.session.title}`, "success");
-    }
-  } catch (error) {
-    apiWorkspaceSessions = await api
-      .listApiWorkspaceSessions(100)
-      .catch(() => apiWorkspaceSessions);
-    const messageText = userFacingError(error);
-    if (
-      messageText.includes("取消") ||
-      messageText.toLocaleLowerCase().includes("cancel")
-    ) {
-      toast("当前 AI 请求已取消", "success");
-      return;
-    }
-    throw error;
-  } finally {
-    apiWorkspaceSending = false;
-    apiWorkspaceActiveRequestId = null;
-    apiWorkspacePendingMessage = null;
-    if (navigation.page === "api_workspace" && !browserLifecycleController.signal.aborted) {
-      render();
-      browserLifecycleController.setTimeout(
-        () =>
-          document
-            .querySelector("#api-workspace-conversation")
-            ?.scrollTo({ top: 999999 }),
-        0,
-      );
-    }
-  }
-}
-
 async function navigateTo(nextPage: Page): Promise<void> {
+  aiWorkspaceFeature.navigationChanged();
   workbooksFeature.changedCategory();
   predictionFeature.navigationChanged();
   runsFeature.navigationChanged();
@@ -1341,7 +1120,8 @@ async function loadNavigationPage(request: NavigationRequest): Promise<void> {
     return;
   }
   if (nextPage === "api_workspace") {
-    await loadApiWorkspace(undefined, request.isCurrent);
+    aiWorkspaceFeature.restoreLegacyDraft(workspaceState.module("api_workspace").controls["api-workspace-message"]?.value);
+    await aiWorkspaceFeature.load(request.isCurrent);
     return;
   }
   if (!session.bootstrap?.data.database_configured) return;
@@ -1434,47 +1214,6 @@ async function returnToLineupWorkspace(section: "builder" | "chain"): Promise<vo
   playersFeature.catalog.setSource(null);
   workspaceState.patchModule("lineups", { active_section: section });
   await navigateTo("lineups");
-}
-
-async function openTeamApiWorkspace(teamId: string | null): Promise<void> {
-  const current = teamsFeature.catalog.capture(), originPage = navigation.page;
-  const team = teamId
-    ? teamsFeature.catalog.detail?.team.id === teamId
-      ? teamsFeature.catalog.detail
-      : await api.readTeam(teamId)
-    : null;
-  if (!current() || navigation.page !== originPage) return;
-  if (team && teamId && team.team.id !== teamId) throw new Error("球队来源身份不匹配");
-  selectedApiWorkspacePresetKey = "team_profile_completion";
-  selectedApiWorkspaceMatchId = null;
-  selectedApiWorkspaceContextEntityType = team ? "team" : null;
-  selectedApiWorkspaceContextEntityId = team?.team.id ?? null;
-  selectedApiWorkspaceContextEntityLabel = team?.team.canonical_name ?? null;
-  apiWorkspaceIncludeContext = Boolean(team);
-  apiWorkspaceDraftMessage = team
-    ? `请基于客户端附加的只读资料，概括“${team.team.canonical_name}”当前已知信息、明显缺口和下一步应通过球队月度 Excel 核验的字段。不要联网，不要生成文件，不要提出数据库写入操作。`
-    : "请说明球队资料月度维护时应优先核验哪些字段，以及如何区分缺失、过期和冲突数据。";
-  workspaceState.clear("api_workspace");
-  await navigateTo("api_workspace");
-}
-
-async function openPlayerApiWorkspace(playerId: string): Promise<void> {
-  const current=playersFeature.catalog.capture(),page=navigation.page;
-  const detail =
-    playersFeature.catalog.detail?.player.id === playerId
-      ? playersFeature.catalog.detail
-      : await api.readPlayer(playerId);
-  if(!current()||page!==navigation.page)return;
-  if(detail.player.id!==playerId)throw new Error("球员上下文响应身份不匹配");
-  selectedApiWorkspacePresetKey = "player_profile_completion";
-  selectedApiWorkspaceMatchId = null;
-  selectedApiWorkspaceContextEntityType = "player";
-  selectedApiWorkspaceContextEntityId = detail.player.id;
-  selectedApiWorkspaceContextEntityLabel = detail.player.canonical_name;
-  apiWorkspaceIncludeContext = true;
-  apiWorkspaceDraftMessage = `请基于客户端附加的只读资料，概括球员“${detail.player.canonical_name}”当前已知信息、明显缺口和下一步应通过球员月度 Excel 核验的字段。不要联网，不要生成文件，不要提出数据库写入操作。`;
-  workspaceState.clear("api_workspace");
-  await navigateTo("api_workspace");
 }
 
 async function createLineupPlayerQuick(): Promise<void> {
@@ -1995,6 +1734,7 @@ async function handleAction(
 ): Promise<void> {
   const shellAction = shellController?.handleAction(action);
   if (shellAction === true || (shellAction && await shellAction)) return;
+  if (action.includes("api-workspace") && await aiWorkspaceActions.handle(button)) return;
   switch (action) {
     case "toggle-workspace-pane":
       toggleWorkspacePane(button.dataset.pane === "inspector" ? "inspector" : "module-sidebar");
@@ -2118,109 +1858,6 @@ async function handleAction(
       break;
     case "set-players-workspace-mode":
       setWorkspaceMode("players", (button.dataset.mode ?? "detail") as WorkspaceLayoutMode);
-      break;
-    case "new-api-workspace-session":
-      workspaceState.patchModule("api_workspace", { active_section: "chat" });
-      apiWorkspaceDetail = null;
-      selectedApiWorkspacePresetKey = "plain_chat";
-      selectedApiWorkspaceMatchId = null;
-      selectedApiWorkspaceContextEntityType = null;
-      selectedApiWorkspaceContextEntityId = null;
-      selectedApiWorkspaceContextEntityLabel = null;
-      apiWorkspaceIncludeContext = false;
-      apiWorkspaceDraftMessage = "";
-      render();
-      break;
-    case "refresh-api-workspace":
-      await loadApiWorkspace();
-      render();
-      toast("AI 问答已刷新", "success");
-      break;
-    case "select-api-workspace-session": {
-      const sessionId = button.dataset.sessionId;
-      if (!sessionId) break;
-      apiWorkspaceDetail = await api.readApiWorkspaceSession(sessionId);
-      selectedApiWorkspaceProfileId = apiWorkspaceDetail.session.profile_id;
-      selectedApiWorkspacePresetKey = apiWorkspaceDetail.session.preset_key;
-      selectedApiWorkspaceMatchId = apiWorkspaceDetail.session.match_id;
-      const metadata = apiWorkspaceDetail.session.metadata;
-      selectedApiWorkspaceContextEntityType =
-        metadata.context_entity_type === "team" ||
-        metadata.context_entity_type === "player"
-          ? metadata.context_entity_type
-          : null;
-      selectedApiWorkspaceContextEntityId =
-        typeof metadata.context_entity_id === "string"
-          ? metadata.context_entity_id
-          : null;
-      selectedApiWorkspaceContextEntityLabel =
-        typeof metadata.context_entity_label === "string"
-          ? metadata.context_entity_label
-          : null;
-      apiWorkspaceIncludeContext = Boolean(
-        selectedApiWorkspaceMatchId || selectedApiWorkspaceContextEntityId,
-      );
-      workspaceState.patchModule("api_workspace", { active_section: "chat" });
-      render();
-      break;
-    }
-    case "archive-api-workspace-session": {
-      const sessionId = button.dataset.sessionId;
-      if (!sessionId) break;
-      const sessionTitle = button.dataset.sessionTitle ?? "当前会话";
-      showConfirmation(
-        "删除 AI 问答会话",
-        "会话将从常用列表归档。历史消息、旧提案和历史生成文件不会被物理删除，仍保留审计数据。",
-        [["会话", sessionTitle]],
-        "确认删除",
-        async () => {
-          await api.archiveApiWorkspaceSession(sessionId);
-          if (apiWorkspaceDetail?.session.id === sessionId)
-            apiWorkspaceDetail = null;
-          apiWorkspaceSessions = await api.listApiWorkspaceSessions(100);
-          render();
-          toast("AI 问答会话已归档", "success");
-        },
-      );
-      break;
-    }
-    case "use-api-workspace-prompt": {
-      const textarea = document.querySelector<HTMLTextAreaElement>(
-        "#api-workspace-message",
-      );
-      if (textarea) {
-        textarea.value = button.dataset.prompt ?? "";
-        apiWorkspaceDraftMessage = textarea.value;
-        textarea.focus();
-      }
-      break;
-    }
-    case "clear-api-workspace-draft":
-      apiWorkspaceDraftMessage = "";
-      render();
-      break;
-    case "copy-api-workspace-message": {
-      const messageId = button.dataset.messageId;
-      const content = apiWorkspaceDetail?.messages.find(
-        (item) => item.id === messageId,
-      )?.content;
-      if (!content) break;
-      await clipboard.writeText(content);
-      toast("AI 回答已复制", "success");
-      break;
-    }
-    case "cancel-api-workspace-request": {
-      const requestId = button.dataset.requestId ?? apiWorkspaceActiveRequestId;
-      if (!requestId) break;
-      const cancelled = await api.cancelApiWorkspaceRequest(requestId);
-      toast(
-        cancelled ? "已请求取消当前 AI 问答" : "请求已结束，无需取消",
-        "success",
-      );
-      break;
-    }
-    case "send-api-workspace-message":
-      await sendApiWorkspaceMessage();
       break;
     case "new-openai-profile":
       creatingOpenAiProfile = true;
@@ -2589,10 +2226,10 @@ async function handleAction(
       await returnToLineupWorkspace(button.dataset.returnSection === "builder" ? "builder" : "chain");
       break;
     case "open-team-api-workspace":
-      await openTeamApiWorkspace(button.dataset.teamId ?? null);
+      await aiWorkspaceActions.openTeam(button.dataset.teamId ?? null);
       break;
     case "open-player-api-workspace":
-      await openPlayerApiWorkspace(button.dataset.playerId ?? "");
+      await aiWorkspaceActions.openPlayer(button.dataset.playerId ?? "");
       break;
     case "search-team-options":
       await playersFeature.searchTeamOptions();
@@ -3182,21 +2819,7 @@ document.addEventListener("input", (event) => {
     scheduleOpenAiApiExampleParse();
     return;
   }
-  if (
-    target.id === "api-workspace-message" &&
-    target instanceof HTMLTextAreaElement
-  ) {
-    apiWorkspaceDraftMessage = target.value;
-    return;
-  }
-  if (
-    target.id === "api-workspace-session-search" &&
-    target instanceof HTMLInputElement
-  ) {
-    apiWorkspaceSessionSearch = target.value;
-    render({ preserveForm: true });
-    return;
-  }
+  if(navigation.page==="api_workspace"&&aiWorkspaceActions.input(target))return;
   if (target.id === "managed-match-search" && target instanceof HTMLInputElement) {
     lineupsFeature.actions.filterManagedMatchList(target.value);
     return;
@@ -3260,44 +2883,7 @@ document.addEventListener("change", (event) => {
     void parseOpenAiApiExampleNow();
     return;
   }
-  if (
-    target.id === "api-workspace-preset" &&
-    target instanceof HTMLSelectElement
-  ) {
-    selectedApiWorkspacePresetKey = target.value;
-    const preset = apiWorkspacePresets.find(
-      (item) => item.key === target.value,
-    );
-    if (preset?.requires_match && !selectedApiWorkspaceMatchId) {
-      selectedApiWorkspaceMatchId = apiWorkspaceMatches[0]?.id ?? null;
-    }
-    render({ preserveForm: true });
-    return;
-  }
-  if (
-    target.id === "api-workspace-profile" &&
-    target instanceof HTMLSelectElement
-  ) {
-    selectedApiWorkspaceProfileId = target.value;
-    return;
-  }
-  if (
-    target.id === "api-workspace-match" &&
-    target instanceof HTMLSelectElement
-  ) {
-    selectedApiWorkspaceMatchId = target.value || null;
-    if (!selectedApiWorkspaceMatchId && !selectedApiWorkspaceContextEntityId)
-      apiWorkspaceIncludeContext = false;
-    render({ preserveForm: true });
-    return;
-  }
-  if (
-    target.id === "api-workspace-include-context" &&
-    target instanceof HTMLInputElement
-  ) {
-    apiWorkspaceIncludeContext = target.checked;
-    return;
-  }
+  if(navigation.page==="api_workspace"&&aiWorkspaceActions.change(target))return;
   if (target instanceof HTMLInputElement && target.classList.contains("preset-member-enabled")) {
     const row = target.closest<HTMLElement>("[data-preset-player-id]");
     if (row) lineupsFeature.actions.syncPresetMemberRowState(row);
@@ -3639,6 +3225,7 @@ export function createBrowserApplicationModule(
     reviewControls.destroy();postmatchControls.destroy();candidateControls.destroy();releaseControls.destroy();
     session.stop();
     openAiExampleRequests.destroy();
+    aiWorkspaceFeature.stop();aiWorkspaceControls.stop();
     navigation.destroy();
     modal.reset();releaseDetails.destroy();
     contextMenu.destroy();

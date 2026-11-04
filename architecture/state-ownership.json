@@ -923,8 +923,22 @@
       ],
       "transition": null,
       "migration_task": "R14-17"
+    },
+    {
+      "id": "feature.ai-workspace",
+      "owner": "src/features/ai-workspace/aiWorkspaceFeature.ts::AiWorkspaceFeature",
+      "scope": "database scope, per-session drafts, one global request lock and original request/archive recovery",
+      "writers": [
+        "src/features/ai-workspace/**"
+      ],
+      "forbidden": [
+        "src/pages/**",
+        "src/main.ts AI state globals"
+      ],
+      "transition": null,
+      "migration_task": "R15-01"
     }
   ],
-  "count": 64,
-  "last_updated_task": "R14-17"
+  "count": 65,
+  "last_updated_task": "R15-01"
 }

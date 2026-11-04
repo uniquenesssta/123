@@ -33,7 +33,7 @@ const openFromTeam=between(main,"async function openPlayerFromTeam", "async func
 check(compact(openFromTeam).includes("team_id:source.teamId") && !openFromTeam.includes("locked:"), "球队来源未携带稳定球队身份");
 check(openFromTeam.includes('active_section: "directory"') && !openFromTeam.includes("appendWorkspaceTab"), "球队普通入口应进入目录而非完整档案");
 check(compact(openFromTeam).includes("awaitteamsFeature.readPlayerFromTeam(playerId)") && openFromTeam.includes("!source.current()") && openFromTeam.includes("playersFeature.enterSource(") && openFromTeam.includes("source.player") && openFromTeam.includes("inspector_collapsed: false"), "普通来源入口未使用守卫后的速览响应");
-const directProfile=between(main,"async function openPlayerProfileFromTeam", "async function openTeamApiWorkspace");
+const directProfile=between(main,"async function openPlayerProfileFromTeam", "async function createLineupPlayerQuick");
 check(directProfile.includes('active_section: "profile"') && directProfile.includes("appendWorkspaceTab"), "显式完整档案入口失联");
 const lineupEntry=between(main,"async function openPlayerFromLineup", "async function returnToLineupWorkspace");
 check(compact(lineupEntry).includes('source:"match_lineup"') && compact(lineupEntry).includes('origin_page:"lineups"') && compact(lineupEntry).includes('team_id:teamId') && compact(lineupEntry).includes('active_section:"profile"'), "阵容入口未保留独立来源/稳定身份/完整档案");

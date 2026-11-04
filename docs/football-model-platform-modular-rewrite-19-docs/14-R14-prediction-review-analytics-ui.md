@@ -20,7 +20,7 @@
 
 ## 状态与依赖
 
-当前 **R14-01 DONE（自身精确CI/官方摘要/双包/startup已验收），R14-06 DONE（精确CI/官方摘要/双包/startup已验收），R14-07 DONE（修复后精确CI/官方摘要/双包/startup已验收），R14-08 DONE（修复代码40c2df90自身CI41350740759/官方摘要/双包/startup已验收），R14-12 DONE（自身fd9b32dd/CI41375966354/官方摘要/双包/startup已验收），R14-13 DONE（自身CI41402896621/官方摘要/双包/startup已验收），R14-16 DONE（自身CI41489495436/官方摘要/双包/startup已验收），R14-17 VERIFYING（实现及本地适用验证完成，自身CI/包另验）**。R13适用出口已完成且用户已授权01；分支rewrite/r14-prediction-review-analytics-ui，基线3d9363fe。代码866ba003已推送，自身CI41285690142及产物已核验通过。见[执行索引](../modular-rewrite/R14-prediction-review-analytics-ui/README.md)。下表顺序是默认交付顺序，必要时在已授权阶段内按真实依赖拆出更小批次并说明原因，不以任务数量或文件数为目标。
+当前 **R14-01 DONE（自身精确CI/官方摘要/双包/startup已验收），R14-06 DONE（精确CI/官方摘要/双包/startup已验收），R14-07 DONE（修复后精确CI/官方摘要/双包/startup已验收），R14-08 DONE（修复代码40c2df90自身CI41350740759/官方摘要/双包/startup已验收），R14-12 DONE（自身fd9b32dd/CI41375966354/官方摘要/双包/startup已验收），R14-13 DONE（自身CI41402896621/官方摘要/双包/startup已验收），R14-16 DONE（自身CI41489495436/官方摘要/双包/startup已验收），R14-17 DONE（be02451a自身CI41835857983/官方摘要/双包/startup已验收）**。R13适用出口已完成且用户已授权01；分支rewrite/r14-prediction-review-analytics-ui，基线3d9363fe。代码866ba003已推送，自身CI41285690142及产物已核验通过。见[执行索引](../modular-rewrite/R14-prediction-review-analytics-ui/README.md)。下表顺序是默认交付顺序，必要时在已授权阶段内按真实依赖拆出更小批次并说明原因，不以任务数量或文件数为目标。
 
 | 主交付 ID | 交付批次 | 前置 |
 |---|---|---|

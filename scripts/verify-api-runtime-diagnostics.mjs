@@ -20,7 +20,7 @@ const operationCommand = [text("src-tauri/src/commands/platform/runtime_operatio
 const client = [text("src/api/client.ts"), ...readTransportSources(root).map(entry => entry.text)].join("\n");
 const main = text("src/main.ts");
 const commands = [...new Set(Object.values(JSON.parse(text("architecture/command-contract.json")).command_groups.find(group => group.module === "ai_workspace").command_definition_files))].map(text).join("\n") + "\n" + ["src-tauri/src/commands/ai_workspace/send/validation.rs", "src-tauri/src/commands/ai_workspace/send/workflow.rs", "src-tauri/src/commands/ai_workspace/send/session.rs", "src-tauri/src/commands/ai_workspace/send/gateway.rs", "src-tauri/src/commands/ai_workspace/send/response.rs", "src-tauri/src/commands/ai_workspace/send/content.rs", "src-tauri/src/commands/ai_workspace/send/metadata.rs", "src-tauri/src/commands/ai_workspace/send/request.rs"].map(text).join("\n");
-const page = text("src/pages/apiWorkspace.ts");
+const page = ["aiWorkspacePage","aiWorkspaceMessages"].map(name=>text(`src/features/ai-workspace/${name}.ts`)).join("\n");
 const desktop = [text("src-tauri/src/bootstrap/command_registry.rs"), text("src-tauri/src/bootstrap/state.rs")].join("\n");
 const send = ["src-tauri/src/commands/ai_workspace/send/command.rs", "src-tauri/src/commands/ai_workspace/send/validation.rs", "src-tauri/src/commands/ai_workspace/send/workflow.rs", "src-tauri/src/commands/ai_workspace/send/session.rs", "src-tauri/src/commands/ai_workspace/send/gateway.rs", "src-tauri/src/commands/ai_workspace/send/response.rs", "src-tauri/src/commands/ai_workspace/send/content.rs", "src-tauri/src/commands/ai_workspace/send/metadata.rs", "src-tauri/src/commands/ai_workspace/send/request.rs"].map(text).join("\n");
 const diagnosticsRoot = "crates/research-gateway/src/diagnostics";
@@ -80,7 +80,7 @@ assert(client.includes("recordUiOperationFailure") && main.includes('recordUiOpe
 for (const event of ["request_started", "request_completed", "request_failed", "request_cancelled"]) assert(send.includes(`"${event}"`), `AI问答日志缺少${event}`);
 for (const field of ["protocol", "endpoint", "status", "latency_ms", "message_chars", "response_chars"]) assert(send.includes(`"${field}"`), `AI问答日志缺少${field}`);
 assert(!send.includes('"request_payload"') && !send.includes('"raw_response"') && !send.includes('"schema"') && !send.includes('"prompt"'), "AI问答根日志不得记录请求正文、原始响应或Schema");
-assert(page.includes("state.runtime_log_path"), "AI问答页面未显示运行日志路径");
+assert(page.includes("bootstrap.runtime_log_path"), "AI问答页面未显示运行日志路径");
 assert(contract.runtime_log.directory === ".\\logs" && contract.runtime_log.preferred_location === "runtime_root/.\\logs" && contract.runtime_log.container_name_independent === true && contract.runtime_log.new_file_per_launch === true, "契约未锁定动态运行根目录下的.\\logs和每次启动新文件");
 assert(contract.runtime_log.duplicate_events_summarized === true && contract.runtime_log.error_events_never_deduplicated === true && contract.runtime_log.operation_lifecycle_events_never_deduplicated === true, "契约未锁定重复摘要、错误完整记录或操作生命周期完整配对");
 assert(contract.runtime_log.prompt_body_recorded === false, "契约不得允许记录问题正文");

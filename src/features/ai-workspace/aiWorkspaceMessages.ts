@@ -1,0 +1,9 @@
+import {escapeHtml as html} from '../../components/format';
+import {buttonView} from '../../ui/primitives/button';
+import {emptyStateView} from '../../ui/data-display/empty-state';
+import type {ApiWorkspaceSessionDetail,ApiWorkspaceMessageRecord} from '../../types';
+export const aiAction=(label:string,action:string,disabled=false,primary=false,attributes:Record<string,string>={})=>buttonView({label,variant:primary?'primary':'secondary',disabled,attributes:{'data-action':action,...attributes}});
+export function aiMessage(message:ApiWorkspaceMessageRecord,detail:ApiWorkspaceSessionDetail){const operations=detail.operations.filter(x=>x.message_id===message.id),files=detail.files.filter(x=>x.message_id===message.id),legacy=operations.length||files.length||message.structured_payload?.legacy!==false&&Object.keys(message.structured_payload??{}).length>0&&message.structured_payload?.mode!=='plain_text';
+ return `<article class="api-message ${message.role}" data-message-id="${html(message.id)}"><header><div><span>${message.role==='user'?'你':'AI'}</span><small>${html(detail.session.id)} · ${html(new Date(message.created_at).toLocaleString('zh-CN',{hour12:false}))}${message.model_id?' · '+html(message.model_id):''}</small></div>${message.role==='assistant'?aiAction('复制回答','copy-api-workspace-message',false,false,{'data-message-id':message.id}):''}</header><div class="api-message-content">${html(message.content)}</div>${message.attachments.length?`<div class="api-message-attachments">${message.attachments.map(a=>`<span>${html(a.name)} · ${html(a.content_sha256)} · ${a.original_size_bytes} bytes（发送时记录，只读）</span>`).join('')}</div>`:''}${legacy?`<details class="api-legacy-audit"><summary>历史结构化记录（只读）</summary><p>旧提案 ${operations.length} 条，历史文件 ${files.length} 个。保留审计，不执行提案或生成文件。</p></details>`:''}</article>`;
+}
+export const aiEmpty=()=>emptyStateView({title:'从一个明确问题开始',description:'普通文本问答。资料维护请使用 Excel 工作包。'});

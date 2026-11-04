@@ -110,8 +110,9 @@
         "public_entry": "src/features/analytics/index.ts"
       },
       "api-workspace": {
-        "owner": "src/pages/apiWorkspace.ts",
-        "route": "api_workspace"
+        "owner": "src/features/ai-workspace/aiWorkspaceFeature.ts",
+        "route": "api_workspace",
+        "public_entry": "src/features/ai-workspace/index.ts"
       },
       "architecture": {
         "owner": "src/features/architecture/architectureView.ts",

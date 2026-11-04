@@ -1,3 +1,4 @@
+import {verifyAiWorkspaceHierarchy} from "./features/verifyAiWorkspaceHierarchy.mjs";
 import {verifyReleaseHierarchy} from "./features/verifyReleaseHierarchy.mjs";
 import {verifyAnalyticsHierarchy} from './features/verifyAnalyticsHierarchy.mjs';
 import {productionStyleFiles} from "./styles/styleGraph.mjs";
@@ -19,7 +20,7 @@ const workspace = read("src/ui/navigation/section-navigation/sectionNavigationVi
 const rules = ["src/features/rules/rulesView.ts", "src/features/rules/bindingView.ts", "src/features/competitions/catalogueView.ts", "src/features/competitions/competitionView.ts"].map(read).join("\n");
 
 
-const apiWorkspace = read("src/pages/apiWorkspace.ts");
+const apiWorkspace = ["aiWorkspacePage","aiWorkspaceMessages"].map(name=>read(`src/features/ai-workspace/${name}.ts`)).join("\n");
 const openai = read("src/pages/openai.ts");
 const database = read("src/features/database/databaseView.ts");
 const logs = read("src/pages/logs.ts");
@@ -59,13 +60,7 @@ await verifyReleaseHierarchy(root);
 
 await verifyAnalyticsHierarchy(root);
 
-for (const [id, label] of [["chat", "对话工作台"], ["history", "会话历史"]]) {
-  check(apiWorkspace.includes(`id: "${id}"`) && apiWorkspace.includes(`label: "${label}"`), `AI 问答缺少任务：${label}`);
-  check(apiWorkspace.includes(`data-workspace-section="${id}"`), `AI 问答任务 ${id} 未接入页面内容区`);
-}
-check(main.includes('active_section ?? "chat"'), "AI 问答未恢复默认对话任务");
-check((main.match(/patchModule\("api_workspace", \{ active_section: "chat" \}\)/g) ?? []).length >= 2, "新建或选择历史会话后未统一返回对话工作台");
-check(apiWorkspace.includes('data-action="select-workspace-section" data-section-id="chat"'), "历史预览缺少继续对话入口");
+await verifyAiWorkspaceHierarchy(root);
 
 for (const id of ["openai-profile-list-section", "openai-request-settings", "openai-model-settings", "openai-test-security"]) {
   check(openai.includes(`{ id: "${id}"`) && openai.includes(`id="${id}"`), `兼容 API 缺少任务定位目标：${id}`);
