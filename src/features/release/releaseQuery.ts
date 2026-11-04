@@ -1,0 +1,14 @@
+import type {ReleaseAcceptanceRun,ReleaseAcceptanceRunSummary} from '../../types';
+import type {ReleasePorts} from './releasePorts';
+import {assertReleaseReport,sameReleaseReport} from './releaseReport';
+export class ReleaseQuery {
+ private listRevision=0;private selectionRevision=0;private reports=new Map<string,ReleaseAcceptanceRun>();
+ readonly state:{runs:ReleaseAcceptanceRunSummary[];loaded:boolean;loading:boolean;listError:string|null;selected:ReleaseAcceptanceRun|null;selectedId:string|null;detailLoading:boolean;detailError:string|null}={runs:[],loaded:false,loading:false,listError:null,selected:null,selectedId:null,detailLoading:false,detailError:null};
+ constructor(private ports:ReleasePorts,private current:()=>()=>boolean){}
+ reset(){this.listRevision++;this.selectionRevision++;this.reports.clear();Object.assign(this.state,{runs:[],loaded:false,loading:false,listError:null,selected:null,selectedId:null,detailLoading:false,detailError:null});}
+ get selection(){return this.selectionRevision;}
+ remember(run:ReleaseAcceptanceRun){assertReleaseReport(run);const prior=this.reports.get(run.id);if(prior&&!sameReleaseReport(prior,run))throw Error('不可变历史报告发生变化，停止显示该版本');this.reports.set(run.id,structuredClone(run));}
+ async list():Promise<boolean>{const current=this.current(),sequence=++this.listRevision;this.state.loading=true;this.state.listError=null;this.ports.changed();try{const runs=await this.ports.api.listReleaseAcceptanceRuns(50);if(!current()||sequence!==this.listRevision)return false;if(!Array.isArray(runs))throw Error('验收目录尚未核实');this.state.runs=structuredClone(runs);this.state.loaded=true;return true;}catch(error){if(current()&&sequence===this.listRevision)this.state.listError=this.ports.formatError(error);return false;}finally{if(current()&&sequence===this.listRevision){this.state.loading=false;this.ports.changed();}}}
+ async select(id:string):Promise<boolean>{const current=this.current(),sequence=++this.selectionRevision;Object.assign(this.state,{selected:null,selectedId:id,detailLoading:true,detailError:null});this.ports.changed();try{const report=await this.ports.api.readReleaseAcceptanceRun(id);if(!current()||sequence!==this.selectionRevision)return false;assertReleaseReport(report,id);const listed=this.state.runs.find(row=>row.id===id);if(listed&&listed.report_sha256!==report.report_sha256)throw Error('报告指纹与原目录不一致');this.remember(report);this.state.selected=structuredClone(report);return true;}catch(error){if(current()&&sequence===this.selectionRevision)this.state.detailError=this.ports.formatError(error);return false;}finally{if(current()&&sequence===this.selectionRevision){this.state.detailLoading=false;this.ports.changed();}}}
+ publish(run:ReleaseAcceptanceRun,selection:number){this.remember(run);if(selection===this.selectionRevision){this.state.selected=structuredClone(run);this.state.selectedId=run.id;this.state.detailError=null;}}
+}

@@ -1,0 +1,14 @@
+import {escapeHtml as html} from '../../components/format';
+import {buttonView} from '../../ui/primitives/button';
+import {badgeView} from '../../ui/primitives/badge';
+import {emptyStateView} from '../../ui/data-display/empty-state';
+import {statCardView} from '../../ui/data-display/stat-card';
+import {inlineMessageView} from '../../ui/feedback/inline-message';
+export {html,badgeView};
+export const action=(label:string,name:string,disabled=false,primary=false,attrs:Record<string,string>={})=>buttonView({label,disabled,variant:primary?'primary':'secondary',attributes:{'data-action':name,...attrs}});
+export const panel=(title:string,description:string,body:string)=>`<section class="release-panel"><header><h2>${html(title)}</h2>${description?`<p>${html(description)}</p>`:''}</header><div class="release-panel-body">${body}</div></section>`;
+export const metric=(label:string,value:string|number|null,note:string)=>statCardView({label,value,note});
+export const empty=(title:string,description:string)=>emptyStateView({title,description});
+export const message=(title:string,description:string)=>inlineMessageView({title,message:description,tone:'warning',live:true});
+export const statusLabel=(status:string)=>({pass:'通过',warning:'警告',blocked:'阻断'}[status]??'未取得');
+export const statusBadge=(status:string)=>badgeView(statusLabel(status),status==='pass'?'Success':status==='warning'?'Warning':status==='blocked'?'Danger':'Neutral','Outline');

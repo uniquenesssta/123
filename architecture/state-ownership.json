@@ -909,8 +909,22 @@
       ],
       "transition": null,
       "migration_task": "R14-16"
+    },
+    {
+      "id": "feature.release-workflow",
+      "owner": "src/features/release/releaseFeature.ts::ReleaseFeature",
+      "scope": "database-bound acceptance drafts, original requests, immutable report queries and unknown-outcome recovery; backend owns checks and ledger writes",
+      "writers": [
+        "ReleaseFeature with ReleaseQuery and releaseStorage"
+      ],
+      "forbidden": [
+        "src/pages/**",
+        "src/api/**"
+      ],
+      "transition": null,
+      "migration_task": "R14-17"
     }
   ],
-  "count": 63,
-  "last_updated_task": "R14-16"
+  "count": 64,
+  "last_updated_task": "R14-17"
 }

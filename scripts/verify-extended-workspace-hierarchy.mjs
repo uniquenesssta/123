@@ -1,3 +1,4 @@
+import {verifyReleaseHierarchy} from "./features/verifyReleaseHierarchy.mjs";
 import {verifyAnalyticsHierarchy} from './features/verifyAnalyticsHierarchy.mjs';
 import {productionStyleFiles} from "./styles/styleGraph.mjs";
 import {readProjectSource} from "./styles/projectSource.mjs";
@@ -16,7 +17,7 @@ const main = read("src/main.ts");
 const shell = JSON.parse(read("contracts/global-visual-system-contract.json")).shell_source_entries.map(read).join("\n");
 const workspace = read("src/ui/navigation/section-navigation/sectionNavigationView.ts");
 const rules = ["src/features/rules/rulesView.ts", "src/features/rules/bindingView.ts", "src/features/competitions/catalogueView.ts", "src/features/competitions/competitionView.ts"].map(read).join("\n");
-const release = read("src/pages/release.ts");
+
 
 const apiWorkspace = read("src/pages/apiWorkspace.ts");
 const openai = read("src/pages/openai.ts");
@@ -54,12 +55,7 @@ for (const id of ["rules-custom-competition", "rules-season-structure"]) {
 }
 check(rules.includes("module-workspace-page model-rules-workspace"), "规则页未接入扩展工作区骨架");
 
-for (const [id, label] of [["overview", "发布总览"], ["chain", "全链路"], ["performance", "性能"], ["security", "安全"], ["cost", "成本"], ["history", "历史报告"]]) {
-  check(release.includes(`id: "${id}"`) && release.includes(`label: "${label}"`), `发布验收缺少任务：${label}`);
-  check(release.includes(`data-workspace-section="${id}"`), `发布验收任务 ${id} 未接入页面内容区`);
-}
-check(release.includes('class="release-core-layout'), "发布验收缺少主工作区与检查器布局");
-check(!release.includes('<aside class="panel module-sidebar"'), "发布验收仍保留重复的页面级左侧目录");
+await verifyReleaseHierarchy(root);
 
 await verifyAnalyticsHierarchy(root);
 

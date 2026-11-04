@@ -50,7 +50,9 @@ import { lineupPresetsPage } from "./pages/lineupPresets";
 import { lineupsPage } from "./pages/lineups";
 import { logsPage } from "./pages/logs";
 import { openAiPage } from "./pages/openai";
-import { releasePage } from "./pages/release";
+import {ReleaseDetails} from "./features/release/releaseDetails";
+import {ReleaseControls} from "./features/release/releaseControls";
+import {ReleaseFeature,ReleaseActions,releaseStorage,releaseFeaturePage} from "./features/release";
 import {ReviewFeature,ReviewFacts,ReviewControls,reviewRecovery,reviewDatabaseIdentity,reviewPage,type ReviewIntent} from "./features/review";
 import {RunsFeature,runRecovery,runsPage,runTechnicalBody} from "./features/runs";
 import { WorkbooksFeature,workbooksPage } from "./features/workbooks";
@@ -82,9 +84,7 @@ PlayerNavigationContext,
 PredictionCommand,
 PredictionExecution,
 PredictionModelFamily,
-ReleaseAcceptanceRequest,
-ReleaseAcceptanceRun,
-ReleaseAcceptanceRunSummary,
+
 RouteDecision,
 RoutePreviewCommand,
 TeamListQuery
@@ -257,6 +257,10 @@ const analyticsFeature=new AnalyticsFeature({
 const analyticsActions=new AnalyticsActions(analyticsFeature,{confirm:(...args)=>showConfirmation(...args,{tone:"neutral"}),show:(title,value)=>showModal(title,value),notify:message=>toast(message,"success")});
 const candidateControls=new CandidateControls();
 const candidateActions=new CandidateActions(analyticsFeature.candidates,{confirm:(...args)=>showConfirmation(...args,{tone:"neutral"}),show:(...args)=>showModal(...args),notify:(message,kind)=>toast(message,kind??"success")});
+const releaseFeature=new ReleaseFeature({api,scope:()=>session.captureDatabase(),view:()=>{const page=navigation.page;return()=>page===navigation.page&&!browserLifecycleController.signal.aborted;},storage:releaseStorage(localPreferences,preferenceKey("release-request-state"),()=>reviewDatabaseIdentity(session.bootstrap)),formatError:userFacingError,changed:()=>{if(renderedPage==="release"&&session.bootstrap&&!browserLifecycleController.signal.aborted)render({preserveForm:true});}});
+const releaseControls=new ReleaseControls();
+const releaseDetails=new ReleaseDetails();
+const releaseActions=new ReleaseActions(releaseFeature,{confirm:(...args)=>showConfirmation(...args,{tone:"neutral"}),show:(...args)=>releaseDetails.show(...args),notify:(text,tone)=>toast(text,tone)});
 const reviewFeature=new ReviewFeature({postmatch:postmatchFeature.settlement,
  api,scope:()=>session.captureDatabase(),view:()=>{const page=navigation.page;return()=>page===navigation.page&&!browserLifecycleController.signal.aborted;},
  changed:()=>{if(renderedPage==="review"&&session.bootstrap&&!browserLifecycleController.signal.aborted)render({preserveForm:true});},
@@ -360,8 +364,7 @@ interface WorkflowContinuation {
 
 let workflowContinuation: WorkflowContinuation | null = null;
 
-let releaseAcceptanceRuns: ReleaseAcceptanceRunSummary[] = [];
-let selectedReleaseAcceptanceRun: ReleaseAcceptanceRun | null = null;
+
 let issueLogs: IssueLogEntry[] = [];
 let openAiProfiles: OpenAiProfilesState | null = null;
 let selectedOpenAiProfileId: string | null = null;
@@ -624,14 +627,7 @@ function render(options: RenderOptions = {}): void {
       break;
     case "release": {
       const workspace = workspaceState.module("release");
-      content = releasePage(
-        session.bootstrap,
-        releaseAcceptanceRuns,
-        selectedReleaseAcceptanceRun,
-        workspace.module_sidebar_collapsed,
-        workspace.inspector_collapsed,
-        workspace.active_section ?? "overview",
-      );
+      content = releaseFeaturePage(session.bootstrap,releaseFeature,workspace.active_section??"overview",workspace.inspector_collapsed);
       break;
     }
     case "architecture":
@@ -639,7 +635,7 @@ function render(options: RenderOptions = {}): void {
       break;
   }
   content = renderWorkflowContinuationBanner() + content;
-  reviewControls.destroy();postmatchControls.destroy();candidateControls.destroy();
+  reviewControls.destroy();postmatchControls.destroy();candidateControls.destroy();releaseControls.destroy();
   app.innerHTML = renderShell({
     state: session.bootstrap,
     page: navigation.page,
@@ -655,6 +651,7 @@ function render(options: RenderOptions = {}): void {
   const currentPageRoot = app.querySelector<HTMLElement>(".page-container") ?? app;
   workspaceState.restore(navigation.page, currentPageRoot);
   if(navigation.page==="analytics")candidateControls.mount(currentPageRoot);
+  if(navigation.page==="release")releaseControls.mount(currentPageRoot);
   if(navigation.page==="review")reviewControls.mount(currentPageRoot);
   if(navigation.page==="review"||navigation.page==="analytics")postmatchControls.mount(currentPageRoot);
   if(navigation.page==="prediction"){
@@ -812,7 +809,7 @@ function resetCurrentWorkspace(): void {
 }
 
 function resetWorkspaceContents(): void {
-  modal.reset();
+  modal.reset();releaseDetails.destroy();
   workspaceState.clear(navigation.page);
   if (navigation.page === "teams") { teamsFeature.reset(); playersFeature.catalog.adopt(null); }
   if (navigation.page === "players") playersFeature.reset();
@@ -1297,7 +1294,7 @@ async function navigateTo(nextPage: Page): Promise<void> {
   predictionFeature.navigationChanged();
   runsFeature.navigationChanged();
   reviewFeature.navigationChanged();
-  postmatchFeature.navigationChanged();analyticsFeature.navigationChanged();
+  postmatchFeature.navigationChanged();analyticsFeature.navigationChanged();releaseFeature.navigationChanged();
   await navigation.navigate(nextPage, async request => {
     try {
       await loadNavigationPage(request);
@@ -1308,7 +1305,7 @@ async function navigateTo(nextPage: Page): Promise<void> {
     }
   }, {
     started() {
-      modal.reset();
+      modal.reset();releaseDetails.destroy();
       shellController?.clearNavigationFailure();
       render({ preserveForm: true });
     },
@@ -1348,14 +1345,7 @@ async function loadNavigationPage(request: NavigationRequest): Promise<void> {
     return;
   }
   if (!session.bootstrap?.data.database_configured) return;
-  if (nextPage === "release") {
-    const runs = await api.listReleaseAcceptanceRuns(50);
-    if (!navigation.isCurrent(request)) return;
-    const selectedId = selectedReleaseAcceptanceRun?.id ?? runs[0]?.id ?? null;
-    const selected = selectedId ? await api.readReleaseAcceptanceRun(selectedId) : null;
-    request.commit(() => { releaseAcceptanceRuns = runs; selectedReleaseAcceptanceRun = selected; });
-    return;
-  }
+  if (nextPage === "release") {await releaseFeature.refresh();return;}
 
   if (nextPage === "players") {
     await playersFeature.load(playersFeature.catalog.list === null, () => navigation.isCurrent(request));
@@ -1999,44 +1989,6 @@ function requestClearOpenAiKey(): void {
   );
 }
 
-async function refreshReleaseAcceptance(): Promise<void> {
-  releaseAcceptanceRuns = await runBusy(() => api.listReleaseAcceptanceRuns(50));
-  if (selectedReleaseAcceptanceRun) {
-    selectedReleaseAcceptanceRun = await runBusy(() => api.readReleaseAcceptanceRun(selectedReleaseAcceptanceRun!.id));
-  } else if (releaseAcceptanceRuns[0]) {
-    selectedReleaseAcceptanceRun = await runBusy(() => api.readReleaseAcceptanceRun(releaseAcceptanceRuns[0].id));
-  }
-  render();
-}
-
-function optionalNumber(id: string): number | null {
-  const raw = value(id).trim();
-  if (!raw) return null;
-  const parsed = Number(raw);
-  if (!Number.isFinite(parsed) || parsed < 0) throw new Error(`${id.includes("daily") ? "单日" : "周期"}成本预算必须为非负数`);
-  return parsed;
-}
-
-async function runReleaseAcceptance(): Promise<void> {
-  const request: ReleaseAcceptanceRequest = {
-    performance_window_days: Math.max(1, Math.min(365, Number(value("release-performance-window") || "30"))),
-    cost_window_days: Math.max(1, Math.min(365, Number(value("release-cost-window") || "30"))),
-    daily_cost_budget_usd: optionalNumber("release-daily-budget"),
-    monthly_cost_budget_usd: optionalNumber("release-monthly-budget"),
-    requested_by: nullableValue("release-requested-by"),
-  };
-  selectedReleaseAcceptanceRun = await runBusy(() => api.runReleaseAcceptance(request));
-  releaseAcceptanceRuns = await api.listReleaseAcceptanceRuns(50);
-  workspaceState.patchModule("release", { active_section: "overview" });
-  render();
-  toast(selectedReleaseAcceptanceRun.overall_status === "blocked" ? "验收完成：存在发布阻断项" : "发布验收已完成并写入不可变账本", selectedReleaseAcceptanceRun.overall_status === "blocked" ? "error" : "success");
-}
-
-async function openReleaseAcceptanceRun(runId: string): Promise<void> {
-  selectedReleaseAcceptanceRun = await runBusy(() => api.readReleaseAcceptanceRun(runId));
-  render();
-}
-
 async function handleAction(
   action: string,
   button: HTMLElement,
@@ -2136,23 +2088,13 @@ async function handleAction(
       render({ preserveForm: true });
       break;
     }
-    case "run-release-acceptance":
-      await runReleaseAcceptance();
-      break;
-    case "refresh-release-acceptance":
-      await refreshReleaseAcceptance();
-      break;
-    case "open-release-acceptance-run":
-      await openReleaseAcceptanceRun(button.dataset.runId ?? "");
-      break;
-    case "show-release-check-evidence": {
-      const item = selectedReleaseAcceptanceRun?.checks.find((check) => check.id === button.dataset.checkId);
-      if (item) showModal(`验收证据 · ${item.title}`, item.evidence);
-      break;
-    }
-    case "show-release-acceptance-json":
-      if (selectedReleaseAcceptanceRun) showModal("接入点 J 完整验收报告", selectedReleaseAcceptanceRun);
-      break;
+    case "run-release-acceptance":releaseActions.run();break;
+    case "refresh-release-acceptance":await releaseFeature.refresh();break;
+    case "open-release-acceptance-run":workspaceState.patchModule("release",{active_section:"overview"});await releaseFeature.select(button.dataset.runId??"");break;
+    case "recover-release-acceptance":await releaseFeature.recover();break;
+    case "show-release-check-evidence":releaseActions.evidence(button.dataset.checkId??"",button.dataset.runId);break;
+    case "show-release-acceptance-json":releaseActions.report(button.dataset.runId);break;
+    case "release-scope":releaseActions.scope();break;
     case "open-selected-teams":
       await openSelectedWorkspaceObjects("teams");
       break;
@@ -3226,6 +3168,7 @@ function filterSelectOptions(
 }
 
 document.addEventListener("input", (event) => {
+  const releaseTarget=event.target as HTMLInputElement;if(navigation.page==="release"&&releaseTarget.dataset.releaseField){releaseFeature.update(releaseTarget.dataset.releaseField,releaseTarget.value);return;}
   const candidateTarget=event.target as HTMLInputElement|HTMLSelectElement;
   if(navigation.page==="analytics"&&candidateTarget.dataset.candidateNote){analyticsFeature.candidates.context.note(candidateTarget.dataset.candidateNote,candidateTarget.value);return;}
 
@@ -3264,6 +3207,7 @@ document.addEventListener("input", (event) => {
 }, { signal: browserLifecycleController.signal });
 
 document.addEventListener("change", (event) => {
+  const releaseTarget=event.target as HTMLInputElement;if(navigation.page==="release"&&releaseTarget.dataset.releaseField){releaseFeature.update(releaseTarget.dataset.releaseField,releaseTarget.value);render({preserveForm:true});return;}
   const candidateTarget=event.target as HTMLInputElement|HTMLSelectElement;
   if(navigation.page==="analytics"&&candidateTarget.dataset.candidateNote){analyticsFeature.candidates.context.note(candidateTarget.dataset.candidateNote,candidateTarget.value);return;}
   if(navigation.page==="analytics"&&candidateTarget.dataset.candidateField){analyticsFeature.candidates.context.update(candidateTarget.dataset.candidateField,candidateTarget.value);render({preserveForm:true});return;}
@@ -3692,11 +3636,11 @@ export function createBrowserApplicationModule(
     rulesFeature.stop();
     teamsFeature.stop();
   playersFeature.stop();
-    reviewControls.destroy();postmatchControls.destroy();candidateControls.destroy();
+    reviewControls.destroy();postmatchControls.destroy();candidateControls.destroy();releaseControls.destroy();
     session.stop();
     openAiExampleRequests.destroy();
     navigation.destroy();
-    modal.reset();
+    modal.reset();releaseDetails.destroy();
     contextMenu.destroy();
     globalShortcuts.destroy();
     commandMenu.destroy();

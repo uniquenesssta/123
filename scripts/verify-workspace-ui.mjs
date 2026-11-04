@@ -1,3 +1,4 @@
+import {verifyReleaseHierarchy} from "./features/verifyReleaseHierarchy.mjs";
 import {readProjectSource} from "./styles/projectSource.mjs";
 import {fileURLToPath as stylesheetFilePath} from "node:url";
 const stylesheetRoot=stylesheetFilePath(new URL("../",import.meta.url));
@@ -31,7 +32,7 @@ const lineups = text("src/pages/lineups.ts");
 const workbooks = text("src/pages/workbooks.ts");
 const ai = text("src/pages/apiWorkspace.ts");
 const prediction = text("src/pages/prediction.ts") + text("src/features/prediction/formalPredictionView.ts");
-const release = text("src/pages/release.ts");
+const release = text("src/features/release/releasePage.ts");
 const backend = text("src-tauri/src/workspace_state.rs");
 const commands = ["read_workspace_state", "save_workspace_state", "clear_workspace_state"].map(name => text(`src-tauri/src/commands/platform/${name}.rs`)).join("\n");
 const registry = text("src-tauri/src/bootstrap/command_registry.rs");
@@ -68,7 +69,7 @@ requireTrue(lineups.includes("balanced-workspace") && lineups.includes("workspac
 requireTrue(workbooks.includes("workbook-category-nav") && workbooks.includes("workbook-commit-bar") && workbooks.includes("球队月度") && workbooks.includes("球员月度") && workbooks.includes("比赛与阵容") && workbooks.includes("workbook-flow"), "Excel工作包固定模块切换入口不完整");
 requireTrue(ai.includes("module-workspace-page ai-module-workspace") && ai.includes("workspaceSectionNavigation") && ai.includes("ai-chat-layout") && ai.includes("ai-history-layout") && ai.includes("会话检查器"), "AI问答页内任务工作区不完整");
 requireTrue(prediction.includes("prediction-workspace") && prediction.includes("prediction-section-nav") && prediction.includes("prediction-viewport") && prediction.includes("prediction-execution-bar") && prediction.includes("workspace-module-view") && prediction.includes("外部提供器规则入口") && prediction.includes("参数版本"), "赛事推演未统一平衡信息密度排布逻辑");
-requireTrue(release.includes("workspaceSectionNavigation") && release.includes("不可变发布验收记录"), "发布验收工作区不完整");
+await verifyReleaseHierarchy(root);
 requireTrue(!teams.includes('workspacePaneToggle("module-sidebar"') && !players.includes('workspacePaneToggle("module-sidebar"') && !lineups.includes('workspacePaneToggle("module-sidebar"') && !workbooks.includes('workspacePaneToggle("module-sidebar"') && !ai.includes('workspacePaneToggle("module-sidebar"') && !prediction.includes('workspacePaneToggle("module-sidebar"') && !release.includes('workspacePaneToggle("module-sidebar"'), "桌面模块左栏不得继续提供收起入口");
 requireTrue(styles.includes(".workspace-grid") && styles.includes(".workspace-section-nav") && styles.includes(".workspace-module-view.active") && styles.includes(".balanced-workspace") && styles.includes(".balanced-section-tabs") && styles.includes(".ui-task-activity"), "工作区固定导航、平衡模块切换或局部异步样式不完整");
 requireTrue(state.includes("ui_revision: 5") && state.includes("active_section: null") && state.includes("inspector_collapsed: true"), "双层导航工作区状态迁移或默认抽屉状态缺失");

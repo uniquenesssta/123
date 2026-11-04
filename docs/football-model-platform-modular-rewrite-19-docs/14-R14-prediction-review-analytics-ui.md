@@ -20,7 +20,7 @@
 
 ## 状态与依赖
 
-当前 **R14-01 DONE（自身精确CI/官方摘要/双包/startup已验收），R14-06 DONE（精确CI/官方摘要/双包/startup已验收），R14-07 DONE（修复后精确CI/官方摘要/双包/startup已验收），R14-08 DONE（修复代码40c2df90自身CI41350740759/官方摘要/双包/startup已验收），R14-12 DONE（自身fd9b32dd/CI41375966354/官方摘要/双包/startup已验收），R14-13 DONE（自身CI41402896621/官方摘要/双包/startup已验收），R14-16 VERIFYING（本地适用验证完成，自身CI/官方包待验），R14-17及以后PLANNED、未启动**。R13适用出口已完成且用户已授权01；分支rewrite/r14-prediction-review-analytics-ui，基线3d9363fe。代码866ba003已推送，自身CI41285690142及产物已核验通过。见[执行索引](../modular-rewrite/R14-prediction-review-analytics-ui/README.md)。下表顺序是默认交付顺序，必要时在已授权阶段内按真实依赖拆出更小批次并说明原因，不以任务数量或文件数为目标。
+当前 **R14-01 DONE（自身精确CI/官方摘要/双包/startup已验收），R14-06 DONE（精确CI/官方摘要/双包/startup已验收），R14-07 DONE（修复后精确CI/官方摘要/双包/startup已验收），R14-08 DONE（修复代码40c2df90自身CI41350740759/官方摘要/双包/startup已验收），R14-12 DONE（自身fd9b32dd/CI41375966354/官方摘要/双包/startup已验收），R14-13 DONE（自身CI41402896621/官方摘要/双包/startup已验收），R14-16 DONE（自身CI41489495436/官方摘要/双包/startup已验收），R14-17 VERIFYING（实现及本地适用验证完成，自身CI/包另验）**。R13适用出口已完成且用户已授权01；分支rewrite/r14-prediction-review-analytics-ui，基线3d9363fe。代码866ba003已推送，自身CI41285690142及产物已核验通过。见[执行索引](../modular-rewrite/R14-prediction-review-analytics-ui/README.md)。下表顺序是默认交付顺序，必要时在已授权阶段内按真实依赖拆出更小批次并说明原因，不以任务数量或文件数为目标。
 
 | 主交付 ID | 交付批次 | 前置 |
 |---|---|---|
@@ -460,7 +460,7 @@ R14-13实施及本地适用验收已完成，自身CI与官方包已核验DONE�
 
 ## R14-16 能力与参数候选决策
 
-当前VERIFYING；36项候选行为/34项完整挂载、完整96步及最终差异复验、13项Windows原生读取与startup通过。自身CI/包另验；实际归属、逐项证据及BA-12/13边界见[16实施记录](../modular-rewrite/R14-prediction-review-analytics-ui/R14-16-candidate-decisions-and-lifecycle.md)。
+自身CI41489495436和官方双包已核验DONE；36项候选行为/34项完整挂载、完整96步及最终差异复验、13项Windows原生读取与startup通过。自身CI/包已正式收尾；实际归属、逐项证据及BA-12/13边界见[16实施记录](../modular-rewrite/R14-prediction-review-analytics-ui/R14-16-candidate-decisions-and-lifecycle.md)。
 
 ### 审计后的实际交付范围
 
@@ -528,6 +528,8 @@ if ($LASTEXITCODE -ne 0) { throw 'R14-16: verify-protected-assets-deterministic 
 **回退与交接：** 在修改前记录本批基线提交和用户已有修改；按执行约定的代码/数据双层回退处理。交接必须列出本批实际新owner、原函数/事件/类型去向、复用接口、逐项场景证据和剩余环境项。主交付以及所覆盖原ID只有满足各自义务才可记完成。
 
 ## R14-17 应用内验收与报告
+
+当前VERIFYING，见[17实施记录](../modular-rewrite/R14-prediction-review-analytics-ui/R14-17-acceptance-and-reports.md)。25项行为、37项页面、完整96步及差异复验、Windows原报告/重启恢复14项和只读精度8项通过；自身CI/包待验。当前配置库缺B契约是实际报告阻断，不以界面通过抵销；本批无第二次实际报告写入。
 
 ### 审计后的实际交付范围
 

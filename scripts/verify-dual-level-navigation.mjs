@@ -1,3 +1,4 @@
+import {releaseFixture,releaseReport} from "./features/releaseFixtures.mjs";
 import {analyticsFixture} from './features/analyticsFixtures.mjs';
 import { loadTeamsProduction } from "./features/loadTeamsProduction.mjs";
 import {readProjectSource} from "./styles/projectSource.mjs";
@@ -188,6 +189,7 @@ function loaderContext(retainedTeam = null) {
   context.researchFeature=new ResearchFeature({api:context.api,context:context.predictionFeature.context,recovery:{read:()=>null,save:()=>{},clear:()=>{}},scope:()=>()=>true,view:()=>{const page=router.page;return()=>router.page===page;},changed:()=>{}});
   context.api.postmatchOverview=async()=>({settlement_count:0,pending_evidence_count:0,scored_evidence_count:0,settlements:[],evidence_queue:[],provider_scores:[],drift_runs:[]});
   context.postmatchFeature=new PostmatchFeature({api:context.api,recovery:{capture:()=>({read:()=>null,save:()=>{},clear:()=>{}})},scope:()=>()=>true,view:()=>{const page=router.page;return()=>router.page===page;},changed:()=>{},formatError:String});
+  const releaseModule=loadTeamsProduction(root)("src/features/release/index.ts"),release=releaseFixture(releaseModule.ReleaseFeature,releaseModule.releaseStorage);Object.assign(context.api,release.api);context.releaseFeature=new releaseModule.ReleaseFeature({...release.ports,api:context.api,view:()=>{const page=router.page;return()=>router.page===page;}});
   const analyticsModule=loadTeamsProduction(root)("src/features/analytics/index.ts"),analytics=analyticsFixture(analyticsModule.AnalyticsFeature,analyticsModule.analyticsStorage);
   analytics.ports.view=()=>{const page=router.page;return()=>router.page===page;};Object.assign(context.api,analytics.api);context.analyticsFeature=new analyticsModule.AnalyticsFeature({...analytics.ports,api:context.api});
   context.reviewFeature=new ReviewFeature({postmatch:context.postmatchFeature.settlement,api:context.api,scope:()=>()=>true,view:()=>{const page=router.page;return()=>router.page===page;},changed:()=>{},recovery:{read:()=>null,save:()=>{},clear:()=>{}},snapshot:()=>context.session.bootstrap,formatError:String});
@@ -214,15 +216,8 @@ for (const [page, operation, apply] of [
 await test("actual analytics loader rejects stale data and keeps current source identity",async()=>{for(const stale of [true,false]){const {context,router}=loaderContext(),task=deferred();context.api.analyticsOverview=()=>task.promise;const pending=context.loadNavigationPage(router.begin("analytics"));if(stale)router.begin("dashboard");task.resolve(analyticsFixture(loadTeamsProduction(root)("src/features/analytics/index.ts").AnalyticsFeature,loadTeamsProduction(root)("src/features/analytics/index.ts").analyticsStorage).overview());await pending;assert.equal(context.analyticsFeature.overview!==null,!stale);router.destroy();}});
 await test("actual review module loading rejects stale data and publishes current identity",async()=>{for(const stale of [true,false]){const {context,router}=loaderContext(),task=deferred();context.api.listReviewableMatches=()=>task.promise;context.api.listMatchReviews=async()=>[];const pending=context.loadNavigationPage(router.begin("review"));if(stale)router.begin("dashboard");task.resolve([{match_record:{id:"original-match"}}]);await pending;assert.equal(context.reviewFeature.state.matches.length,stale?0:1);assert.equal(context.reviewFeature.state.selectedMatchId,null);router.destroy();}});
 await test("actual players loader rejects stale data and publishes only current identity",async()=>{for(const stale of [true,false]){const {context,router}=loaderContext(),task=deferred();context.api.playerCatalogReferenceData=async()=>({teams:[]});context.api.listPlayers=()=>task.promise;const pending=context.loadNavigationPage(router.begin("players"));if(stale)router.begin("dashboard");task.resolve({items:[],has_more:false});await pending;assert.equal(context.playersFeature.catalog.list!==null,!stale);router.destroy();}});
-await test("actual release loader is atomic across both awaits", async () => {
-  for (const stage of ["list", "detail", "current"]) {
-    const { context, router } = loaderContext(), list = deferred(), detail = deferred(), detailStarted = deferred(); let reads = 0;
-    context.api.listReleaseAcceptanceRuns = () => list.promise; context.api.readReleaseAcceptanceRun = () => { reads++; detailStarted.resolve(); return detail.promise; };
-    const pending = context.loadNavigationPage(router.begin("release")); if (stage === "list") router.begin("dashboard");
-    list.resolve([{ id: "run" }]); if (stage !== "list") await detailStarted.promise;
-    if (stage === "detail") router.begin("dashboard"); detail.resolve({ id: "run" }); await pending;
-    assert.equal(reads, stage === "list" ? 0 : 1); assert.equal(context.releaseAcceptanceRuns === "before", stage !== "current"); router.destroy();
-  }
+await test("actual release loader and explicit history detail guard each await",async()=>{
+ for(const stage of ["list","detail","current"]){const {context,router}=loaderContext(),list=deferred(),detail=deferred();let reads=0;const row=releaseReport("qa-nav");context.api.listReleaseAcceptanceRuns=()=>list.promise;context.api.readReleaseAcceptanceRun=()=>{reads++;return detail.promise;};const loading=context.loadNavigationPage(router.begin("release"));if(stage==="list")router.begin("dashboard");list.resolve([row]);await loading;if(stage==="list"){assert.equal(context.releaseFeature.state.loaded,false);assert.equal(reads,0);}else{const selecting=context.releaseFeature.select(row.id);if(stage==="detail")router.begin("dashboard");detail.resolve(row);await selecting;assert.equal(reads,1);assert.equal(context.releaseFeature.state.selected?.id??null,stage==="current"?row.id:null);}router.destroy();}
 });
 await test("actual AI workspace loader guards each await including session detail", async () => {
   for (const stage of ["profiles", "sessions", "detail", "current"]) {

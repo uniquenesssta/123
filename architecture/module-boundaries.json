@@ -156,8 +156,9 @@
         "public_entry": "src/features/prediction/index.ts"
       },
       "release": {
-        "owner": "src/pages/release.ts",
-        "route": "release"
+        "owner": "src/features/release/releaseFeature.ts",
+        "route": "release",
+        "public_entry": "src/features/release/index.ts"
       },
       "review": {
         "owner": "src/features/review/reviewPage.ts",

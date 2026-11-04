@@ -1,6 +1,6 @@
 # R14-16 能力与参数候选决策
 
-状态：VERIFYING（实现及本地适用验证完成，自身CI/官方安装包待按推送提交单独验收）。用户授权“收尾13开始16”，R14-13精确65e11ddc/CI41402896621、官方artifact13124247175摘要/双包/startup已验收DONE。当前基线9bc9de25，沿用rewrite/r14-prediction-review-analytics-ui，工作区开始干净；只开展16，下一主交付R14-17未启动。
+状态：DONE（自身精确CI/官方摘要/双包/startup已核验）。用户授权“收尾13开始16”，R14-13精确65e11ddc/CI41402896621、官方artifact13124247175摘要/双包/startup已验收DONE。当前基线9bc9de25，沿用rewrite/r14-prediction-review-analytics-ui，工作区开始干净；只开展16，下一主交付R14-17未启动。
 
 ## 实际归属与修复
 
@@ -55,3 +55,13 @@ Analytics/candidates下CandidateFeature组合CandidateContext（范围/人工说
 Rust源码与13精确65e11ddc完全一致（git diff --exit-code核验）；复用其成功CI的753通过/40 ignored、fmt/Clippy。原生可执行SHA256 edc7a9c4fa0d9e091c98f692ba38a65dbe39aae6769347d76af03ff9a460b0e2与13记录相同，本次加载最新dist实测；没有冒称本批重编Rust或完成安装包验收。
 
 最终源文件及构建摘要保存在同证据根validation.json/source-manifest.json；CI按最终提交SHA只查一次，不轮询，不拿13成功代替16。官方新包未验前本批保持VERIFYING；推送与tmp/old实际清理数字写入delivery.json/old-cleanup.json。下一主交付 **R14-17 应用内验收与报告**，尚未启动。BA-12/BA-13最迟R17-06关闭，不能以本次空样本或模拟记录抵销。
+
+## 正式收尾（2026-11-04）
+
+349dcda9c021a9ab839d14e346dfa2a3ad9aeccb / CI41489495436 / job125428452809全success。官方artifact13165974429 ZIP 52439474字节，SHA256 2b290243df1b340b626c3bba36581155a64461956ea87b5af7fe16a4a490bcfa与官方digest一致；双安装包格式头核对有效，非数字签名验证。
+
+足球赛事模型平台_0.23.0_x64_zh-CN.msi：18051072字节，SHA256 2523e69b5d837bf27eab05d6e946cf99f28181c6c220eeec274c03d704cb0a9b
+
+足球赛事模型平台_0.23.0_x64-setup.exe：15683118字节，SHA256 6e988fc8ed70c0ba59abc9b08aea68866e158e7b7de6e2617acd42f7957f464d
+
+包内startup/pass：7条日志、0无效/运行错误，bootstrap/read_workspace_state/save_workspace_state；不冒称本地重装或Full。证据O:/Project/FOODBALL/logs/r14-16-ci-41489495436/acceptance.json。上次推送后tmp/old实际清理62126文件/35200空目录/2链接，独立复查0项。用户授权开始R14-17应用内验收与报告，继续原R14分支。BA-12/13真实有样本和私有固定回归保留R17-06承接。

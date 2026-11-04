@@ -1,3 +1,5 @@
+import {verifyReleaseWorkflow} from "./features/verifyReleaseWorkflow.mjs";
+import {fileURLToPath} from "node:url";
 import crypto from "node:crypto";
 import fs from "node:fs";
 import { isVersionAtLeast } from "./version.mjs";
@@ -41,3 +43,5 @@ for (const command of ["run_release_acceptance", "list_release_acceptance_runs",
 }
 
 console.log("发布验收验证通过：公开壳与外部模型运行时边界已进入发布门禁。");
+
+await verifyReleaseWorkflow(fileURLToPath(new URL("../",import.meta.url)));

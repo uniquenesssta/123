@@ -36,139 +36,36 @@
   font-size: 11px;
   line-height: 1.55;
 }
-.release-run-panel {
-  display: grid;
-  gap: 18px;
-  padding: 20px;
-}
-.release-scoreboard {
-  display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 10px;
-}
-.release-scoreboard article {
-  min-width: 0;
-  display: grid;
-  gap: 5px;
-  padding: 16px;
-  border: 1px solid var(--line);
-  border-radius: 13px;
-  background: var(--panel);
-}
-.release-scoreboard article > span,
-.release-scoreboard article > small {
-  color: var(--muted);
-  font-size: 11px;
-}
-.release-scoreboard article > strong {
-  overflow: hidden;
-  color: var(--text-strong);
-  font-size: 23px;
-  line-height: 1.2;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-.release-scoreboard article.success {
-  border-color: color-mix(in srgb, var(--accent) 32%, var(--line));
-  background: color-mix(in srgb, var(--accent) 7%, var(--panel));
-}
-.release-scoreboard article.warning {
-  border-color: color-mix(in srgb, #d6a74f 42%, var(--line));
-  background: color-mix(in srgb, #d6a74f 7%, var(--panel));
-}
-.release-scoreboard article.danger {
-  border-color: color-mix(in srgb, var(--danger) 38%, var(--line));
-  background: color-mix(in srgb, var(--danger) 7%, var(--panel));
-}
-.release-check-list,
-.release-history-list {
-  display: grid;
-  gap: 9px;
-}
-.release-check {
-  min-width: 0;
-  display: grid;
-  grid-template-columns: 74px minmax(0, 1fr) auto;
-  align-items: center;
-  gap: 14px;
-  padding: 14px 15px;
-  border: 1px solid var(--line);
-  border-radius: 13px;
-  background: var(--panel);
-}
-.release-check.success { border-left: 3px solid var(--accent); }
-.release-check.warning { border-left: 3px solid #d6a74f; }
-.release-check.danger { border-left: 3px solid var(--danger); }
-.release-check-status {
-  display: grid;
-  gap: 5px;
-}
-.release-check-status span {
-  color: var(--muted-2);
-  font-size: 11px;
-  font-variant-numeric: tabular-nums;
-}
-.release-check-status b {
-  color: var(--text-strong);
-  font-size: 12px;
-}
-.release-check-copy {
-  min-width: 0;
-}
-.release-check-copy > span {
-  color: var(--accent);
-  font-size: 10px;
-  font-weight: 750;
-  letter-spacing: .08em;
-}
-.release-check-copy h3 {
-  margin: 5px 0 4px;
-  color: var(--text-strong);
-  font-size: 15px;
-}
-.release-check-copy p {
-  margin: 0;
-  color: var(--muted);
-  font-size: 12px;
-  line-height: 1.55;
-}
-.release-check .blocking-note {
-  margin-top: 9px;
-}
-.release-history-list .history-button {
-  width: 100%;
-  grid-template-columns: minmax(180px, 1fr) minmax(150px, auto) minmax(170px, auto) auto;
-  text-align: left;
-}
-.release-history-list .history-button.active {
-  border-color: color-mix(in srgb, var(--accent) 34%, var(--line));
-  background: color-mix(in srgb, var(--accent) 7%, var(--panel));
-  box-shadow: inset 3px 0 0 var(--accent);
-}
-.release-workspace .workspace-inspector pre {
-  max-height: 44vh;
-  margin: 0;
-  padding: 12px;
-  overflow: auto;
-  border: 1px solid var(--line);
-  border-radius: 10px;
-  color: var(--text);
-  background: var(--input);
-  font-size: 11px;
-  line-height: 1.5;
-  white-space: pre-wrap;
-  overflow-wrap: anywhere;
-}
-
-@media (max-width: 1120px) {
-  .release-scoreboard { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-  .release-history-list .history-button { grid-template-columns: minmax(0, 1fr) auto; }
-  .release-history-list .history-button span:nth-of-type(2) { grid-column: 1 / -1; }
-}
-
-@media (max-width: 720px) {
-  .release-scoreboard { grid-template-columns: 1fr; }
-  .release-check { grid-template-columns: 58px minmax(0, 1fr); }
-  .release-check > button { grid-column: 2; justify-self: start; }
-  .release-history-list .history-button { grid-template-columns: 1fr; }
-}
+.application-shell:where([data-current-page="release"]) .release-page{flex:1;height:100%;min-height:0;min-width:0;display:grid;grid-template-rows:auto auto auto auto auto minmax(0,1fr);gap:var(--fip-space-sm);overflow:hidden;color:var(--fip-text);font:400 12px/18px var(--fip-type-body-family)}
+.application-shell:where([data-current-page="release"]) .release-page>.task-page-header{margin:0;min-height:56px;padding:0}
+.application-shell:where([data-current-page="release"]) .release-page h1{margin:0;font:700 26px/34px var(--fip-type-page-title-family)}
+.application-shell:where([data-current-page="release"]) .release-page :is(h2,h3){margin:0;font:700 14px/20px var(--fip-type-body-family)}
+.application-shell:where([data-current-page="release"]) .release-page p{margin:0;overflow-wrap:anywhere}
+.application-shell:where([data-current-page="release"]) :is(.release-actions,.release-tabs){display:flex;align-items:center;flex-wrap:wrap;gap:var(--fip-space-sm);min-width:0}
+.application-shell:where([data-current-page="release"]) .release-metrics{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:var(--fip-space-sm);min-width:0}
+.application-shell:where([data-current-page="release"]) .release-metrics>.ui-stat-card{min-height:96px;border:0;border-radius:var(--fip-radius-panel);background:var(--fip-info-soft)}
+.application-shell:where([data-current-page="release"]) .release-metrics :is(.ui-stat-label,.ui-stat-value){color:var(--fip-info)}
+.application-shell:where([data-current-page="release"]) .release-metrics .ui-stat-value{font-size:22px;line-height:30px;overflow-wrap:anywhere;white-space:normal}
+.application-shell:where([data-current-page="release"]) .release-stage{min-height:0;overflow:hidden;display:grid;grid-template-columns:minmax(0,1fr);gap:var(--fip-space-sm)}
+.application-shell:where([data-current-page="release"]) .release-stage.with-inspector{grid-template-columns:minmax(0,1fr) 360px}
+.application-shell:where([data-current-page="release"]) .release-viewport.workspace-module-view.active{display:block;height:100%;min-height:0;min-width:0;overflow:auto;padding:0 2px 12px;scrollbar-gutter:stable}
+.application-shell:where([data-current-page="release"]) :is(.release-body,.release-panel-body,.release-history){display:flex;flex-direction:column;gap:var(--fip-space-sm);min-width:0}
+.application-shell:where([data-current-page="release"]) .release-panel{display:flex;flex-direction:column;gap:var(--fip-space-sm);min-width:0;padding:var(--fip-layout-panel-padding);border:0;border-radius:var(--fip-radius-panel);background:var(--fip-surface);box-shadow:var(--fip-panel-shadow)}
+.application-shell:where([data-current-page="release"]) .release-panel>header{display:flex;flex-direction:column;gap:2px;min-width:0}
+.application-shell:where([data-current-page="release"]) .release-panel>header p{color:var(--fip-muted)}
+.application-shell:where([data-current-page="release"]) .release-panel:first-child>header{padding-top:18px;min-height:60px}
+.application-shell:where([data-current-page="release"]) .release-request-fields{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:var(--fip-space-sm)}
+.application-shell:where([data-current-page="release"]) .release-inspector{min-height:0;min-width:0;overflow:auto;height:100%}
+.application-shell:where([data-current-page="release"]) .release-hash{overflow-wrap:anywhere}
+.application-shell:where([data-current-page="release"]) .release-facts{margin:0;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:var(--fip-space-sm)}
+.application-shell:where([data-current-page="release"]) .release-facts div{min-width:0}
+.application-shell:where([data-current-page="release"]) .release-facts dt{color:var(--fip-muted)}
+.application-shell:where([data-current-page="release"]) .release-facts dd{margin:0;font-weight:700;overflow-wrap:anywhere}
+@media(max-width:850px){.application-shell:where([data-current-page="release"]) .release-stage.with-inspector{grid-template-columns:minmax(0,1fr) minmax(200px,40%)}.application-shell:where([data-current-page="release"]) .with-inspector .release-request-fields{grid-template-columns:minmax(0,1fr)}}
+.release-report-host .release-report-dialog.ui-dialog{width:680px;height:570px;max-height:calc(100dvh - 24px)}
+.release-report-host .release-report-dialog .ui-dialog-header{min-height:62px}
+.release-report-host .release-report-json{margin:0;white-space:pre-wrap;overflow-wrap:anywhere;color:var(--fip-text);font:400 12px/18px var(--fip-type-body-family)}
+.application-shell:where([data-current-page="release"]) .release-viewport.workspace-module-view.active{background:transparent;border:0;border-radius:0;box-shadow:none}
+.application-shell:where([data-current-page="release"]) .release-body>.ui-empty-state{min-height:72px}
+.release-report-host .release-report-icon{display:flex;align-items:center;justify-content:center;flex:0 0 16px;width:16px;height:16px;color:var(--fip-info)}
+.release-report-host .release-report-dialog .ui-dialog-actions{min-height:48px;border-top:1px solid var(--fip-border);background:var(--fip-color-bg-subtle)}
