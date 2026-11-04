@@ -32,7 +32,7 @@
 | S11 应用内验收 | [597:123771](https://www.figma.com/design/PN0Whgu6HLWIHx4Mv6aHfu?node-id=597-123771) | `src/pages/release.ts` | 确实未接入（局部） | 生产有六分区和验收表单；Figma顶部四张报告指标未按同样布局出现。当前仍使用“固定P4 fixture”文案，设计已强调公开外壳/外部运行时，不应误导能力。 | R14-17 |
 | S12 分析与历史 | [608:135680](https://www.figma.com/design/PN0Whgu6HLWIHx4Mv6aHfu?node-id=608-135680) | `src/pages/analytics.ts` | 确实未接入（局部） | 当前为纵向折叠步骤与步骤内指标；Figma为顶部四指标、横向四步骤及独立内容区。结算数差异是输入数据，布局组成差异可确认。 | R14-13（总览/任务/建议）与 R14-16（候选） |
 | S13 AI问答 | [628:152166](https://www.figma.com/design/PN0Whgu6HLWIHx4Mv6aHfu?node-id=628-152166) | `src/pages/apiWorkspace.ts` | 确实未接入（局部） | 设置/会话/输入已存在；当前设置说明区较高，隔离渲染首屏未露出composer，Figma底部输入常驻。需在完整挂载中验证滚动后再修，不能判定发送功能缺失。 | R15-01 |
-| S14 兼容API配置 | [647:166715](https://www.figma.com/design/PN0Whgu6HLWIHx4Mv6aHfu?node-id=647-166715) | `src/pages/openai.ts` | 确实未接入（局部） | Figma API示例为次级弹窗入口，生产为表单上方11行内联textarea；主表单/底部动作位置及左栏宽度不同。解析能力已经存在且有过期响应防护。 | R15-07 |
+| S14 兼容API配置 | [647:166715](https://www.figma.com/design/PN0Whgu6HLWIHx4Mv6aHfu?node-id=647-166715) | `src/pages/openai.ts` | 确实未接入（局部） | Figma API示例为次级编辑状态入口，生产为表单上方11行内联textarea；主表单/底部动作位置及左栏宽度不同。解析能力已经存在且有过期响应防护。 | R15-07 |
 | S15 数据库 | [673:178191](https://www.figma.com/design/PN0Whgu6HLWIHx4Mv6aHfu?node-id=673-178191) | `src/features/database/index.ts` | 确实未接入（局部） | Figma运行概览为连接身份、四指标和业务边界提示；生产为三统计卡、折叠连接/统计和同屏危险操作。02完成真实连接/危险操作owner不等于此布局已匹配。 | R13-UI01 |
 | S16 问题日志 | [683:186758](https://www.figma.com/design/PN0Whgu6HLWIHx4Mv6aHfu?node-id=683-186758) | `src/pages/logs.ts` | 已接入但待验 | 聚合、导出、清空入口已在生产；本次空日志与Figma有日志态不一致，不能据此认定日志卡未实现。需相同严重/警告/重复/详情状态验证。 | R15-12 |
 | S17 系统架构 | [693:194738](https://www.figma.com/design/PN0Whgu6HLWIHx4Mv6aHfu?node-id=693-194738) | `src/features/architecture/architectureView.ts` | 确实未接入（局部） | 生产有四层职责和历史/路由说明；缺Figma明确的“架构声明不等于运行能力”说明区，历史/模型运行边界仍过于笼统。分区点击行为本次未实测。 | R13-UI01 |
@@ -118,3 +118,5 @@
 本次文档交付只核对链接、引用、17/40/67覆盖、25批数量、状态/owner/依赖一致性及Git diff；不产生新的软件构建、自动行为、原生运行或Full结果。R12文档/历史交付记录、生产代码、测试和CI配置均保持原样。
 
 文档校验结果：12份Markdown；25个唯一交付卡；原67项业务映射与修改前完全一致；40个UI原ID、17页全部有归属；19张剩余执行卡补充具体交付边界，原79个V场景保留并增加UI01的5个场景；271处本地链接及17个生产入口有效，Git差异空白检查通过。没有修改R12记录、源码、测试或CI配置。
+
+2026-11-05执行复核：S14示例是页内次级编辑状态，非输入弹窗；沿批准857af9f记录和实际654:174172/654:177329实现。R15-07同状态补差、真实调用与待验边界见[R15-07记录](R15-ai-profiles-logs-ui/R15-07-profiles-parser-credentials-tests.md)，不据设计预置核销真实凭据/API验收。

@@ -106,4 +106,6 @@ R12按用户最新明确纠正保持已结束。本核对不修改R1～R12任务
 
 R14-17补充实证（2026-11-04）：当前配置库实际J报告bb22381a-99e8-4ccd-80ab-63cc64b21dd9为8通过/4警告/1阻断，阻断是缺B接入契约；BA-12的R17-06新库/连续迁移验收须核对，R18不得核销。真实报告已创建并重启只读查回，UPDATE/DELETE触发器攻击、Full和私有固定回归未执行。具体归属及证据仅见[R14-17记录](R14-prediction-review-analytics-ui/R14-17-acceptance-and-reports.md)。
 
-R15-01补充（2026-11-04）：BA-09原3处前端串线已从生产函数动态复现并修复，30项真实生产工作流模拟边界回归覆盖V1～V4；归属见[R15-01记录](R15-ai-profiles-logs-ui/R15-01-session-draft-request-lifecycle.md)。BA-10已按普通消息先保存、gateway后执行、assistant后追加的源码边界维护unknown/取消/归档恢复，不声称全回滚或请求幂等；真实PG/API/Windows凭据与真实A/B会话仍由BA-10/11的R17-06关闭。
+R15-01补充（2026-11-04）：BA-09原3处前端串线已从生产函数动态复现并修复，31项真实生产工作流模拟边界回归覆盖V1～V4；归属见[R15-01记录](R15-ai-profiles-logs-ui/R15-01-session-draft-request-lifecycle.md)。BA-10已按普通消息先保存、gateway后执行、assistant后追加的源码边界维护unknown/取消/归档恢复，不声称全回滚或请求幂等；真实PG/API/Windows凭据与真实A/B会话仍由BA-10/11的R17-06关闭。
+
+R15-07补充（2026-11-05）：BA-11按真实既有元数据/系统凭据边界维护显式保存、留空保留、替换、移除与删除，未知先核验、不自动重复。前端profile/草稿/测试版本与后端update_test_state原快照共同校验，真实Rust解析/安全草稿Windows复验分列；真实密钥写入/删除故障与计费API测试仍由R17-06关闭，不据夹具核销。实施见[R15-07记录](R15-ai-profiles-logs-ui/R15-07-profiles-parser-credentials-tests.md)。

@@ -11,7 +11,7 @@ const contract = json("contracts/api-workspace-research-control-contract.json");
 const packageJson = json("package.json");
 const owner=["aiWorkspaceFeature","aiWorkspaceState","aiWorkspaceRequests","aiWorkspaceArchive"].map(name=>text(`src/features/ai-workspace/${name}.ts`)).join("\n");
 const page = ["aiWorkspacePage","aiWorkspaceMessages"].map(name=>text(`src/features/ai-workspace/${name}.ts`)).join("\n");
-const settings = text("src/pages/openai.ts");
+const settings = text("src/features/openai-profiles/profileView.ts");
 const main = text("src/main.ts");
 const commands = [...new Set(Object.values(JSON.parse(text("architecture/command-contract.json")).command_groups.find(group => group.module === "ai_workspace").command_definition_files))].map(text).join("\n") + "\n" + ["src-tauri/src/commands/ai_workspace/send/validation.rs", "src-tauri/src/commands/ai_workspace/send/workflow.rs", "src-tauri/src/commands/ai_workspace/send/session.rs", "src-tauri/src/commands/ai_workspace/send/gateway.rs", "src-tauri/src/commands/ai_workspace/send/response.rs", "src-tauri/src/commands/ai_workspace/send/content.rs", "src-tauri/src/commands/ai_workspace/send/metadata.rs", "src-tauri/src/commands/ai_workspace/send/request.rs"].map(text).join("\n");
 const gateway = text("crates/research-gateway/src/client.rs");
@@ -23,7 +23,7 @@ assert(owner.includes("drafts") && owner.includes("message"), "AI草稿状态未
 assert(page.includes("搜索会话") && page.includes("archive-api-workspace-session"), "会话搜索或归档未接通");
 assert(page.includes("附加当前只读上下文"), "缺少只读上下文开关");
 assert(commands.includes("api_workspace_context") && commands.includes("Do not propose writes"), "后端未约束只读上下文");
-assert(settings.includes('id="openai-api-workspace-web-search-mode" type="hidden" value="disabled"'), "AI问答联网能力仍可开启");
+const profileDefaults=text("src/features/openai-profiles/profileDrafts.ts"),profileWrites=text("src/features/openai-profiles/ProfileOperations.ts");assert(profileDefaults.includes("api_workspace_web_search_mode:'disabled'") && profileWrites.includes("api_workspace_web_search_mode:'disabled'") && !settings.includes('data-profile-field="api_workspace_web_search_mode"'), "AI问答联网能力仍可开启；实际保存DTO必须保持disabled");
 assert(!page.includes("api-workspace-token") && !page.includes("max-tool-calls") && !page.includes("tool-choice"), "AI问答页面仍显示Token或工具设置控件");
 assert(gateway.includes("P4正式联网研究仅支持Responses协议"), "P4正式研究隔离被破坏");
 assert(contract.boundaries.formal_p4_research_unchanged === true, "契约未锁定P4边界");

@@ -1,3 +1,4 @@
+import {verifyProfileHierarchy} from "./features/verifyProfileHierarchy.mjs";
 import {verifyAiWorkspaceHierarchy} from "./features/verifyAiWorkspaceHierarchy.mjs";
 import {verifyReleaseHierarchy} from "./features/verifyReleaseHierarchy.mjs";
 import {verifyAnalyticsHierarchy} from './features/verifyAnalyticsHierarchy.mjs';
@@ -21,7 +22,7 @@ const rules = ["src/features/rules/rulesView.ts", "src/features/rules/bindingVie
 
 
 const apiWorkspace = ["aiWorkspacePage","aiWorkspaceMessages"].map(name=>read(`src/features/ai-workspace/${name}.ts`)).join("\n");
-const openai = read("src/pages/openai.ts");
+
 const database = read("src/features/database/databaseView.ts");
 const logs = read("src/pages/logs.ts");
 const architecture = read("src/features/architecture/architectureView.ts");
@@ -62,11 +63,7 @@ await verifyAnalyticsHierarchy(root);
 
 await verifyAiWorkspaceHierarchy(root);
 
-for (const id of ["openai-profile-list-section", "openai-request-settings", "openai-model-settings", "openai-test-security"]) {
-  check(openai.includes(`{ id: "${id}"`) && openai.includes(`id="${id}"`), `兼容 API 缺少任务定位目标：${id}`);
-}
-check(openai.includes("workspaceTaskAnchorNavigation") && openai.includes("openai-module-stage"), "兼容 API 未采用单页编辑与任务导航结构");
-check(openai.includes("支持多个 OpenAI-compatible 配置档案"), "兼容 API 原有产品说明被意外删除");
+await verifyProfileHierarchy(root);
 
 for (const id of ["database-overview", "database-connection", "database-statistics", "database-danger"]) {
   check(database.includes(`id:"${id}"`) && database.includes('id="${panel.id}"') && database.includes("data-navigation-panel"), `数据库页缺少任务定位目标：${id}`);

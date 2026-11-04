@@ -1,3 +1,4 @@
+import {verifyProfileWorkflow} from "./features/verifyProfileWorkflow.mjs";
 import { existsSync, readFileSync } from "node:fs";
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -22,7 +23,9 @@ const schema = json("schemas/openai-profile-ui-contract.schema.json");
 const packageJson = json("package.json");
 const tauri = json("src-tauri/tauri.conf.json");
 const cargo = read("Cargo.toml");
-const frontend = read("src/pages/openai.ts");
+await verifyProfileWorkflow(root);
+const frontend = read("src/features/openai-profiles/profileView.ts");
+const profileOwner=["ProfilesFeature","ProfileExample","ProfileOperations","ProfileControls","ProfileActions"].map(name=>read(`src/features/openai-profiles/${name}.ts`)).join("\n");
 const client = read("src/api/client.ts");
 const main = read("src/main.ts");
 const shell = JSON.parse(read("contracts/global-visual-system-contract.json")).shell_source_entries.map(read).join("\n");
@@ -78,7 +81,7 @@ assert(readme.includes(`版本 **${packageJson.version}**`), "README版本不一
 for (const artifact of contract.artifacts) {
   if (artifact === "src-tauri/src/commands/openai.rs") {
     for (const owner of ["src-tauri/src/commands/ai_workspace/profiles/mod.rs", ...Object.values(json("architecture/command-contract.json").command_groups.find(group => group.module === "ai_workspace").command_definition_files).filter(file => file.startsWith("src-tauri/src/commands/ai_workspace/profiles/"))]) assert(existsSync(join(root, owner)), `缺少迁移后的兼容API命令：${owner}`);
-  } else assert(existsSync(join(root, artifact)), `缺少兼容API配置制品：${artifact}`);
+  } else if(artifact === "src/pages/openai.ts") {assert(moduleContract.frontend.features.openai.owner === "src/features/openai-profiles/ProfilesFeature.ts", "迁移后唯一配置owner未登记");assert(existsSync(join(root,"src/features/openai-profiles/index.ts")),"缺少配置公开出口");} else assert(existsSync(join(root, artifact)), `缺少兼容API配置制品：${artifact}`);
 }
 // R11-08 migrated profile artifacts END
 for (const command of contract.commands) {
@@ -95,8 +98,8 @@ assert(frontend.includes("完整请求端点"), "页面缺少可编辑请求端�
 assert(frontend.includes("API Key"), "页面缺少API Key编辑入口");
 assert(frontend.includes("保存并测试"), "页面缺少连接测试入口");
 assert(frontend.includes("Responses") && frontend.includes("Chat Completions"), "页面缺少双协议选择");
-assert(main.includes("parseOpenAiApiExampleNow"), "前端缺少API Example实时解析流程");
-assert(main.includes("openAiApiExampleTimer"), "API Example解析未使用防抖");
+assert(main.includes("profileActions.handle") && profileOwner.includes("parseOpenAiApiExample(text,protocol)"), "前端缺少API Example实时解析流程");
+assert(profileOwner.includes("new DebouncedTask") && profileOwner.includes("320"), "API Example解析未使用防抖");
 assert(client.includes("parseOpenAiApiExample"), "前端客户端缺少API Example解析命令");
 
 assert(desktopState.includes("openai-profiles.json"), "配置元数据未使用独立本机文件");

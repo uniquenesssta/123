@@ -143,8 +143,9 @@
         "route": "logs"
       },
       "openai": {
-        "owner": "src/pages/openai.ts",
-        "route": "openai"
+        "owner": "src/features/openai-profiles/ProfilesFeature.ts",
+        "route": "openai",
+        "public_entry": "src/features/openai-profiles/index.ts"
       },
       "players": {
         "owner": "src/features/players/playerDirectoryView.ts",
@@ -537,5 +538,5 @@
     "commands": 171
   },
   "transitional_edges": [],
-  "last_updated_task": "R14-08"
+  "last_updated_task": "R15-07"
 }

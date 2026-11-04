@@ -10,7 +10,7 @@ recordUiOperation,
 recordUiOperationFailure,
 } from "./api/client";
 import { ContextMenuAdapter } from "./app/context-menu";
-import { AsyncScope,EventScope,MountHandle } from "./app/lifecycle";
+import { EventScope,MountHandle } from "./app/lifecycle";
 import { matchReviewWorkflowAllows } from "./app/matchReviewWorkflow";
 import { ModalController,type ModalConfirmationOptions } from "./app/modal";
 import { NavigationContext,PRIMARY_NAVIGATION,Router,isRoute,type NavigationRequest } from "./app/router";
@@ -49,7 +49,7 @@ import {AiWorkspaceFeature,AiWorkspaceActions,AiWorkspaceControls,aiWorkspaceSto
 import { lineupPresetsPage } from "./pages/lineupPresets";
 import { lineupsPage } from "./pages/lineups";
 import { logsPage } from "./pages/logs";
-import { openAiPage } from "./pages/openai";
+import {ProfilesFeature,ProfileActions,ProfileControls,profilePage,profileStorage} from "./features/openai-profiles";
 import {ReleaseDetails} from "./features/release/releaseDetails";
 import {ReleaseControls} from "./features/release/releaseControls";
 import {ReleaseFeature,ReleaseActions,releaseStorage,releaseFeaturePage} from "./features/release";
@@ -60,7 +60,6 @@ import { importRecovery } from "./app/imports/importRecovery";
 import { clipboard } from "./platform/clipboard";
 import { localPreferences,preferenceKey,sessionPreferences } from "./platform/storage";
 import { stopTauriTransport } from "./platform/tauri";
-import { DebouncedTask } from "./platform/timing";
 import "./styles/index.css";
 import type {
 CoachListItem,
@@ -70,10 +69,6 @@ IssueLogEntry,
 IssueSeverity,
 LineupSnapshotType,
 MatchLineupChain,
-OpenAiApiExampleParseResult,
-OpenAiApiProtocol,
-OpenAiProfileDraft,
-OpenAiProfilesState,
 Page,
 PlayerListQuery,
 PlayerNavigationContext,
@@ -90,7 +85,6 @@ import { focusValidationTarget } from "./ui/forms/validation-summary";
 import { CommandMenuController } from "./ui/overlays/command-menu";
 
 const browserLifecycleController = new EventScope();
-const openAiExampleRequests = new AsyncScope();
 
 const DATABASE_RESET_COMPLETE_KEY = preferenceKey("database-reset-complete");
 const TEAM_QUERY_KEY = preferenceKey("team-query");
@@ -257,6 +251,9 @@ const releaseFeature=new ReleaseFeature({api,scope:()=>session.captureDatabase()
 const releaseControls=new ReleaseControls();
 const aiWorkspaceFeature=new AiWorkspaceFeature({api,scope:()=>session.captureDatabase(),view:()=>{const page=navigation.page;return()=>page===navigation.page&&!browserLifecycleController.signal.aborted;},storage:aiWorkspaceStorage(localPreferences,preferenceKey("api-workspace-state"),()=>reviewDatabaseIdentity(session.bootstrap)),formatError:userFacingError,changed:()=>{if(renderedPage==="api_workspace"&&session.bootstrap&&!browserLifecycleController.signal.aborted)render({preserveForm:true});}});
 const aiWorkspaceControls=new AiWorkspaceControls();
+const profilesFeature=new ProfilesFeature({api,storage:profileStorage(localPreferences,preferenceKey("openai-profiles-drafts")),view:()=>{const page=navigation.page;return()=>page===navigation.page&&!browserLifecycleController.signal.aborted;},changed:()=>{if(renderedPage==="openai"&&session.bootstrap&&!browserLifecycleController.signal.aborted)render({preserveForm:true});},formatError:userFacingError});
+const profileControls=new ProfileControls(profilesFeature);
+const profileActions=new ProfileActions(profilesFeature,profileControls,{confirm:(...args)=>showConfirmation(...args),show:(...args)=>showModal(...args)});
 const aiWorkspaceActions=new AiWorkspaceActions(aiWorkspaceFeature,{confirm:(title,description,facts,label,run)=>showConfirmation(title,description,facts.map(([a,b])=>[a,b]),label,run),show:(title,message)=>showModal(title,message),copy:value=>clipboard.writeText(value),notify:message=>toast(message,"success"),section:active_section=>workspaceState.patchModule("api_workspace",{active_section}),render:()=>render({preserveForm:true}),navigate:()=>navigateTo("api_workspace"),source:{readTeam:id=>api.readTeam(id),readPlayer:id=>api.readPlayer(id),team:()=>teamsFeature.catalog.detail,player:()=>playersFeature.catalog.detail,captureTeam:()=>{const current=teamsFeature.catalog.capture(),page=navigation.page;return()=>current()&&navigation.page===page;},capturePlayer:()=>{const current=playersFeature.catalog.capture(),page=navigation.page;return()=>current()&&navigation.page===page;}}});
 
 const releaseDetails=new ReleaseDetails();
@@ -366,11 +363,6 @@ let workflowContinuation: WorkflowContinuation | null = null;
 
 
 let issueLogs: IssueLogEntry[] = [];
-let openAiProfiles: OpenAiProfilesState | null = null;
-let selectedOpenAiProfileId: string | null = null;
-let creatingOpenAiProfile = false;
-const openAiApiExampleTimer = new DebouncedTask(browserLifecycleController);
-let openAiApiExampleLastParsed = "";
 const workspaceState = new WorkspaceCoordinator<Page>({
   read: () => api.readWorkspaceState(),
   save: (document) => api.saveWorkspaceState(document),
@@ -460,6 +452,7 @@ function render(options: RenderOptions = {}): void {
   rulesFeature.invalidatePreview();
   const shellFocus = shellController?.captureFocus() ?? null;
   if(renderedPage==="api_workspace")aiWorkspaceControls.capture(app);
+  if(renderedPage==="openai")profileControls.capture(app);
   teamsFeature.drafts.capture(app);
   playersFeature.drafts.capture(app);
   if(renderedPage==="review")reviewFacts.capture(app,reviewFeature.state.selectedMatchId);
@@ -576,11 +569,7 @@ function render(options: RenderOptions = {}): void {
       content = logsPage(issueLogs);
       break;
     case "openai":
-      content = openAiPage(
-        openAiProfiles,
-        selectedOpenAiProfileId,
-        creatingOpenAiProfile,
-      );
+      content = profilePage(profilesFeature);
       break;
     case "api_workspace":
       content = aiWorkspacePage(session.bootstrap,aiWorkspaceFeature,workspaceState.module("api_workspace").active_section ?? "chat",workspaceState.module("api_workspace").inspector_collapsed);
@@ -609,7 +598,7 @@ function render(options: RenderOptions = {}): void {
   warningCenter?.observeConnection(session.bootstrap.connection_error);
   renderedPage = navigation.page;
   const currentPageRoot = app.querySelector<HTMLElement>(".page-container") ?? app;
-  if(navigation.page==="api_workspace")currentPageRoot.dataset.workspaceCapture="suspended";
+  if(navigation.page==="api_workspace"||navigation.page==="openai")currentPageRoot.dataset.workspaceCapture="suspended";
   workspaceState.restore(navigation.page, currentPageRoot);
   if(navigation.page==="analytics")candidateControls.mount(currentPageRoot);
   if(navigation.page==="release")releaseControls.mount(currentPageRoot);
@@ -621,6 +610,7 @@ function render(options: RenderOptions = {}): void {
     syncPredictionSelectIcons(currentPageRoot);
   }
   if(navigation.page==="api_workspace")aiWorkspaceControls.restore(currentPageRoot);
+  if(navigation.page==="openai")profileControls.restore(currentPageRoot);
   rulesFeature.syncHierarchy(currentPageRoot);
   if (navigation.page === "rules") fitCatalogueRegions(currentPageRoot);
   teamsFeature.drafts.restore(currentPageRoot, session.bootstrap);
@@ -1069,6 +1059,7 @@ async function loadIssueLogs(): Promise<void> {
 
 async function navigateTo(nextPage: Page): Promise<void> {
   aiWorkspaceFeature.navigationChanged();
+  profilesFeature.navigationChanged();profileControls.navigationChanged();
   workbooksFeature.changedCategory();
   predictionFeature.navigationChanged();
   runsFeature.navigationChanged();
@@ -1106,18 +1097,8 @@ async function loadNavigationPage(request: NavigationRequest): Promise<void> {
     return;
   }
   if (nextPage === "openai") {
-    const profiles = await api.listOpenAiProfiles();
-    if (navigation.isCurrent(request)) {
-      openAiProfiles = profiles;
-      if (!creatingOpenAiProfile) {
-        selectedOpenAiProfileId =
-          selectedOpenAiProfileId ??
-          profiles.active_profile_id ??
-          profiles.profiles[0]?.id ??
-          null;
-      }
-    }
-    return;
+    const module=workspaceState.module("openai");if(Object.hasOwn(module.controls,"openai-api-example")){const controls={...module.controls};delete controls["openai-api-example"];workspaceState.patchModule("openai",{controls});}
+    await profilesFeature.load(request.isCurrent);return;
   }
   if (nextPage === "api_workspace") {
     aiWorkspaceFeature.restoreLegacyDraft(workspaceState.module("api_workspace").controls["api-workspace-message"]?.value);
@@ -1484,250 +1465,6 @@ function syncReviewManualValidation():void {
  if(submit)submit.disabled=!!result.error||!allowed;
 }
 
-function openAiProfileDraftFromForm(): OpenAiProfileDraft {
-  const profileId = nullableValue("openai-profile-id");
-  const apiKey = nullableValue("openai-api-key");
-  return {
-    id: profileId,
-    name: value("openai-profile-name").trim(),
-    api_key: apiKey,
-    api_base_url: value("openai-api-base-url").trim(),
-    api_protocol: value(
-      "openai-api-protocol",
-    ) as OpenAiProfileDraft["api_protocol"],
-    api_endpoint: value("openai-api-endpoint").trim(),
-    token_limit_field: value(
-      "openai-token-limit-field",
-    ) as OpenAiProfileDraft["token_limit_field"],
-    api_workspace_web_search_mode: value(
-      "openai-api-workspace-web-search-mode",
-    ) as OpenAiProfileDraft["api_workspace_web_search_mode"],
-    api_example_template: nullableValue("openai-api-example"),
-    research_model: value("openai-research-model").trim(),
-    extraction_model: value("openai-extraction-model").trim(),
-    fallback_model: nullableValue("openai-fallback-model"),
-    reasoning_effort: value(
-      "openai-reasoning-effort",
-    ) as OpenAiProfileDraft["reasoning_effort"],
-    timeout_seconds: Number(value("openai-timeout-seconds")),
-    max_retries: Number(value("openai-max-retries")),
-    max_concurrency: Number(value("openai-max-concurrency")),
-    max_output_tokens: Number(value("openai-max-output-tokens")),
-    max_tool_calls: Number(value("openai-max-tool-calls")),
-    search_context_size: value(
-      "openai-search-context-size",
-    ) as OpenAiProfileDraft["search_context_size"],
-  };
-}
-
-function setOpenAiApiExampleStatus(
-  state: "idle" | "parsing" | "success" | "error",
-  title: string,
-  message: string,
-): void {
-  const container = document.querySelector<HTMLDivElement>(
-    "#openai-api-example-status",
-  );
-  if (!container) return;
-  container.className = `api-example-status ${state}`;
-  const strong = container.querySelector<HTMLElement>("strong");
-  const span = container.querySelector<HTMLElement>("span");
-  if (strong) strong.textContent = title;
-  if (span) span.textContent = message;
-}
-
-function setInputValue(id: string, next: string): void {
-  const input = document.querySelector<HTMLInputElement | HTMLSelectElement>(
-    `#${id}`,
-  );
-  if (input) input.value = next;
-}
-
-function applyOpenAiApiExample(result: OpenAiApiExampleParseResult): void {
-  const candidate = result.selected;
-  setInputValue("openai-api-protocol", candidate.protocol);
-  setInputValue("openai-api-endpoint", candidate.endpoint_url);
-  setInputValue("openai-api-base-url", candidate.api_base_url);
-  setInputValue("openai-token-limit-field", candidate.token_limit_field);
-  if (candidate.model_id) {
-    setInputValue("openai-research-model", candidate.model_id);
-    setInputValue("openai-extraction-model", candidate.model_id);
-  }
-  if (candidate.max_output_tokens !== null) {
-    setInputValue(
-      "openai-max-output-tokens",
-      String(candidate.max_output_tokens),
-    );
-  }
-  if (candidate.api_key) setInputValue("openai-api-key", candidate.api_key);
-  const protocol =
-    candidate.protocol === "responses" ? "Responses" : "Chat Completions";
-  const warning = candidate.warnings[0] ?? "已识别请求端点、协议和模型";
-  setOpenAiApiExampleStatus(
-    "success",
-    `已识别 ${protocol} · ${result.candidates.length} 个候选`,
-    `${candidate.endpoint_url}；${warning}`,
-  );
-}
-
-async function parseOpenAiApiExampleNow(): Promise<boolean> {
-  if (browserLifecycleController.signal.aborted) return false;
-  const request = openAiExampleRequests.begin();
-  const textarea = document.querySelector<HTMLTextAreaElement>(
-    "#openai-api-example",
-  );
-  if (!textarea) return true;
-  const example = textarea.value.trim();
-  if (!example) {
-    openAiApiExampleLastParsed = "";
-    setOpenAiApiExampleStatus(
-      "idle",
-      "等待输入",
-      "粘贴或编辑后会自动替换下方协议、端点和模型。",
-    );
-    return true;
-  }
-  const protocol = value("openai-api-protocol") as OpenAiApiProtocol;
-  setOpenAiApiExampleStatus(
-    "parsing",
-    "正在解析",
-    "正在识别 curl、请求体和协议……",
-  );
-  try {
-    const result = await api.parseOpenAiApiExample(example, protocol);
-    if (!request.isCurrent() || textarea !== document.querySelector("#openai-api-example") || textarea.value.trim() !== example) return false;
-    applyOpenAiApiExample(result);
-    openAiApiExampleLastParsed = example;
-    return true;
-  } catch (error: unknown) {
-    if (!request.isCurrent() || textarea !== document.querySelector("#openai-api-example") || textarea.value.trim() !== example) return false;
-    setOpenAiApiExampleStatus("error", "无法解析", userFacingError(error));
-    return false;
-  }
-}
-
-function scheduleOpenAiApiExampleParse(): void {
-  openAiExampleRequests.invalidate();
-  openAiApiExampleTimer.schedule(() => {
-    void parseOpenAiApiExampleNow();
-  }, 320);
-}
-
-async function reloadOpenAiProfiles(
-  preferredProfileId: string | null = null,
-): Promise<void> {
-  openAiProfiles = await api.listOpenAiProfiles();
-  selectedOpenAiProfileId =
-    preferredProfileId ??
-    selectedOpenAiProfileId ??
-    openAiProfiles.active_profile_id ??
-    openAiProfiles.profiles[0]?.id ??
-    null;
-  if (
-    selectedOpenAiProfileId &&
-    !openAiProfiles.profiles.some(
-      (profile) => profile.id === selectedOpenAiProfileId,
-    )
-  ) {
-    selectedOpenAiProfileId =
-      openAiProfiles.active_profile_id ??
-      openAiProfiles.profiles[0]?.id ??
-      null;
-  }
-}
-
-async function saveOpenAiProfile(showSuccess = true): Promise<string> {
-  const example =
-    document
-      .querySelector<HTMLTextAreaElement>("#openai-api-example")
-      ?.value.trim() ?? "";
-  if (example && example !== openAiApiExampleLastParsed) {
-    openAiApiExampleTimer.cancel();
-    const parsed = await parseOpenAiApiExampleNow();
-    if (!parsed) throw new Error("API Example尚未通过解析，无法保存配置");
-  }
-  const saved = await runBusy(() =>
-    api.saveOpenAiProfile(openAiProfileDraftFromForm()),
-  );
-  creatingOpenAiProfile = false;
-  selectedOpenAiProfileId = saved.id;
-  await reloadOpenAiProfiles(saved.id);
-  render();
-  if (showSuccess) toast("兼容 API 配置已安全保存", "success");
-  return saved.id;
-}
-
-async function testOpenAiProfile(): Promise<void> {
-  const profileId = await saveOpenAiProfile(false);
-  const result = await runBusy(() => api.testOpenAiProfile(profileId));
-  await reloadOpenAiProfiles(profileId);
-  render();
-  const protocol =
-    result.protocol === "responses" ? "Responses" : "Chat Completions";
-  toast(
-    `连接成功：${protocol} · ${result.model_id} · ${result.latency_ms} 毫秒`,
-    "success",
-  );
-}
-
-async function activateOpenAiProfile(): Promise<void> {
-  const profileId = await saveOpenAiProfile(false);
-  openAiProfiles = await runBusy(() => api.setActiveOpenAiProfile(profileId));
-  selectedOpenAiProfileId = profileId;
-  render();
-  toast("已切换为当前兼容 API 配置", "success");
-}
-
-function requestDeleteOpenAiProfile(): void {
-  const profile = openAiProfiles?.profiles.find(
-    (item) => item.id === selectedOpenAiProfileId,
-  );
-  if (!profile) throw new Error("没有可删除的兼容 API 配置");
-  showConfirmation(
-    "删除兼容 API 配置",
-    "该操作会同时删除该配置在 Windows 凭据管理器中的 API Key，且无法恢复。其他配置不受影响。",
-    [
-      ["配置名称", profile.name],
-      ["研究模型", profile.research_model],
-      ["当前使用", profile.is_active ? "是" : "否"],
-    ],
-    "确认删除",
-    async () => {
-      openAiProfiles = await runBusy(() => api.deleteOpenAiProfile(profile.id));
-      creatingOpenAiProfile = false;
-      selectedOpenAiProfileId =
-        openAiProfiles.active_profile_id ??
-        openAiProfiles.profiles[0]?.id ??
-        null;
-      render();
-      toast("兼容 API 配置和对应密钥已删除", "success");
-    },
-  );
-}
-
-function requestClearOpenAiKey(): void {
-  const profile = openAiProfiles?.profiles.find(
-    (item) => item.id === selectedOpenAiProfileId,
-  );
-  if (!profile) throw new Error("没有可处理的兼容 API 配置");
-  showConfirmation(
-    "移除 API Key",
-    "仅删除 Windows 凭据管理器中的密钥，配置名称、API 地址和模型参数会保留。",
-    [
-      ["配置名称", profile.name],
-      ["密钥状态", profile.has_api_key ? "已保存" : "未保存"],
-    ],
-    "移除密钥",
-    async () => {
-      openAiProfiles = await runBusy(() =>
-        api.clearOpenAiProfileKey(profile.id),
-      );
-      render();
-      toast("API Key 已从 Windows 凭据管理器移除", "success");
-    },
-  );
-}
-
 async function handleAction(
   action: string,
   button: HTMLElement,
@@ -1735,6 +1472,7 @@ async function handleAction(
   const shellAction = shellController?.handleAction(action);
   if (shellAction === true || (shellAction && await shellAction)) return;
   if (action.includes("api-workspace") && await aiWorkspaceActions.handle(button)) return;
+  if(action.includes("openai")&&await profileActions.handle(button))return;
   switch (action) {
     case "toggle-workspace-pane":
       toggleWorkspacePane(button.dataset.pane === "inspector" ? "inspector" : "module-sidebar");
@@ -1858,39 +1596,6 @@ async function handleAction(
       break;
     case "set-players-workspace-mode":
       setWorkspaceMode("players", (button.dataset.mode ?? "detail") as WorkspaceLayoutMode);
-      break;
-    case "new-openai-profile":
-      creatingOpenAiProfile = true;
-      selectedOpenAiProfileId = null;
-      render();
-      break;
-    case "select-openai-profile":
-      creatingOpenAiProfile = false;
-      selectedOpenAiProfileId = button.dataset.profileId ?? null;
-      render();
-      break;
-    case "toggle-openai-key-visibility": {
-      const input = document.querySelector<HTMLInputElement>("#openai-api-key");
-      if (!input) break;
-      const showing = input.type === "text";
-      input.type = showing ? "password" : "text";
-      button.textContent = showing ? "显示" : "隐藏";
-      break;
-    }
-    case "save-openai-profile":
-      await saveOpenAiProfile();
-      break;
-    case "test-openai-profile":
-      await testOpenAiProfile();
-      break;
-    case "activate-openai-profile":
-      await activateOpenAiProfile();
-      break;
-    case "request-delete-openai-profile":
-      requestDeleteOpenAiProfile();
-      break;
-    case "request-clear-openai-key":
-      requestClearOpenAiKey();
       break;
     case "refresh-issue-logs":
       await runBusy(loadIssueLogs);
@@ -2815,10 +2520,7 @@ document.addEventListener("input", (event) => {
   if(navigation.page==="review"&&(target.matches("[data-review-fact]")||target.closest("[data-review-player]")))syncReviewManualValidation();
   if (target.id?.startsWith("p4-conflict-note-")||target.id?.startsWith("p4-evidence-")) researchFeature.draftChanged();
   if (["competition-id", "season-id", "stage-id", "competition-kind", "simulation-model-family", "simple-kickoff"].includes(target.id) || target.id.startsWith("binding-")) rulesFeature.invalidatePreview();
-  if (target.id === "openai-api-example") {
-    scheduleOpenAiApiExampleParse();
-    return;
-  }
+  if(navigation.page==="openai"&&profileControls.input(target))return;
   if(navigation.page==="api_workspace"&&aiWorkspaceActions.input(target))return;
   if (target.id === "managed-match-search" && target instanceof HTMLInputElement) {
     lineupsFeature.actions.filterManagedMatchList(target.value);
@@ -2879,10 +2581,7 @@ document.addEventListener("change", (event) => {
     render({ preserveForm: true });
     return;
   }
-  if (target.id === "openai-api-protocol") {
-    void parseOpenAiApiExampleNow();
-    return;
-  }
+  if(navigation.page==="openai"&&target instanceof HTMLSelectElement&&profileControls.input(target))return;
   if(navigation.page==="api_workspace"&&aiWorkspaceActions.change(target))return;
   if (target instanceof HTMLInputElement && target.classList.contains("preset-member-enabled")) {
     const row = target.closest<HTMLElement>("[data-preset-player-id]");
@@ -3224,7 +2923,7 @@ export function createBrowserApplicationModule(
   playersFeature.stop();
     reviewControls.destroy();postmatchControls.destroy();candidateControls.destroy();releaseControls.destroy();
     session.stop();
-    openAiExampleRequests.destroy();
+    profilesFeature.stop();profileControls.stop();
     aiWorkspaceFeature.stop();aiWorkspaceControls.stop();
     navigation.destroy();
     modal.reset();releaseDetails.destroy();
@@ -3234,7 +2933,6 @@ export function createBrowserApplicationModule(
     workflowNavigation.clear();
     workspaceState.stop();
     lineupsFeature.stop();
-    openAiApiExampleTimer.destroy();
   }
 
   return { name: "browser-application", start: () => lifecycle.start(), destroy: () => lifecycle.destroy(), stop: () => lifecycle.stop() };

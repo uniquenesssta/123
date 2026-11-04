@@ -1,105 +1,56 @@
-
-
-/* OpenAI profile workbench: Chatbox-style multi-profile editor for one provider. */
-.openai-workbench {
-  display: grid;
-  grid-template-columns: 300px minmax(0, 1fr);
-  gap: 18px;
-  align-items: stretch;
-  margin-bottom: 18px;
-}
-.openai-profile-sidebar,
-.openai-editor { min-height: 650px; }
-.openai-profile-sidebar { display: flex; flex-direction: column; padding: 0; overflow: hidden; }
-.openai-profile-sidebar-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 18px; border-bottom: 1px solid var(--line); }
-.openai-profile-sidebar-head span,
-.openai-profile-sidebar-head strong { display: block; }
-.openai-profile-sidebar-head span { color: var(--muted); font-size: 10px; }
-.openai-profile-sidebar-head strong { margin-top: 4px; color: var(--text-strong); font-size: 14px; }
 .icon-button { width: 34px; height: 34px; display: grid; place-items: center; border: 1px solid var(--line); border-radius: 10px; color: var(--text-strong); background: var(--soft); font-size: 20px; }
 .icon-button:hover { border-color: color-mix(in srgb, var(--accent) 42%, var(--line)); background: var(--soft-hover); }
-.openai-profile-list { flex: 1; display: grid; align-content: start; gap: 8px; padding: 12px; overflow-y: auto; }
-.openai-profile-card { position: relative; width: 100%; min-width: 0; display: grid; grid-template-columns: 36px minmax(0, 1fr) 10px; gap: 10px; align-items: center; padding: 12px; border: 1px solid transparent; border-radius: 12px; color: var(--text); background: transparent; text-align: left; }
-.openai-profile-card:hover { background: var(--soft); }
-.openai-profile-card.selected { border-color: color-mix(in srgb, var(--accent) 38%, var(--line)); background: color-mix(in srgb, var(--accent) 8%, var(--panel)); }
-.openai-provider-logo { width: 36px; height: 36px; display: grid; place-items: center; border-radius: 11px; color: var(--accent-ink); background: var(--accent); font-size: 11px; font-weight: 900; }
-.openai-profile-card strong,
-.openai-profile-card small { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.openai-profile-card strong { color: var(--text-strong); font-size: 13px; }
-.openai-profile-card small { margin-top: 5px; color: var(--muted); font-size: 10px; }
-.profile-state { width: 8px; height: 8px; border-radius: 50%; background: var(--muted-2); }
-.profile-state.success { background: var(--accent); box-shadow: 0 0 0 4px color-mix(in srgb, var(--accent) 13%, transparent); }
-.profile-state.failed { background: var(--danger); box-shadow: 0 0 0 4px var(--danger-soft); }
-.profile-state.no-key { background: #d6a74f; }
-.active-badge { position: absolute; right: 10px; bottom: 5px; color: var(--accent); font-size: 9px; font-weight: 800; }
-.empty-profile-list { min-height: 180px; display: grid; place-content: center; gap: 5px; text-align: center; }
-.empty-profile-list strong { color: var(--text-strong); }
-.empty-profile-list small { color: var(--muted); }
-.openai-profile-sidebar-foot { padding: 14px 16px; border-top: 1px solid var(--line); color: var(--muted-2); line-height: 1.55; }
-.openai-editor { padding: 0; overflow: hidden; }
-.openai-editor-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 20px; padding: 22px 24px; border-bottom: 1px solid var(--line); }
-.openai-editor-head span,
-.openai-editor-head h2 { display: block; }
-.openai-editor-head > div:first-child > span { color: var(--accent); font-size: 10px; font-weight: 800; letter-spacing: .12em; }
-.openai-editor-head h2 { margin: 6px 0 0; color: var(--text-strong); font-size: 21px; }
-.openai-editor-status { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 8px; }
 .connection-state,
 .active-pill { padding: 6px 9px; border: 1px solid var(--line); border-radius: 999px; color: var(--muted); font-size: 10px; }
 .connection-state.success,
 .active-pill { color: var(--accent); border-color: color-mix(in srgb, var(--accent) 32%, transparent); background: color-mix(in srgb, var(--accent) 8%, transparent); }
 .connection-state.failed { color: var(--danger); border-color: color-mix(in srgb, var(--danger) 30%, transparent); background: var(--danger-soft); }
-.openai-editor-section { padding: 22px 24px 6px; border-bottom: 1px solid var(--line); }
 .section-label { display: flex; align-items: baseline; justify-content: space-between; gap: 14px; margin-bottom: 16px; }
 .section-label span { color: var(--text-strong); font-weight: 800; }
 .section-label small { color: var(--muted-2); }
-.openai-key-field small { color: var(--muted-2); line-height: 1.5; }
 .secret-input-wrap { display: grid; grid-template-columns: minmax(0, 1fr) auto; }
 .secret-input-wrap input { border-radius: 10px 0 0 10px; }
 .secret-input-wrap button { min-width: 64px; border: 1px solid var(--line); border-left: 0; border-radius: 0 10px 10px 0; color: var(--muted); background: var(--soft); }
 .secret-input-wrap button:hover { color: var(--text-strong); background: var(--soft-hover); }
-.openai-advanced { border-bottom: 1px solid var(--line); }
-.openai-advanced > summary { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 17px 24px; cursor: pointer; list-style: none; }
-.openai-advanced > summary::-webkit-details-marker { display: none; }
-.openai-advanced > summary span,
-.openai-advanced > summary small { display: block; }
-.openai-advanced > summary span { color: var(--text-strong); font-weight: 700; }
-.openai-advanced > summary small { margin-top: 4px; color: var(--muted); }
-.openai-advanced > summary b { color: var(--muted); font-size: 11px; }
-.openai-advanced[open] > summary b { color: var(--accent); }
-.openai-advanced-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0 14px; padding: 0 24px 8px; }
-.openai-test-summary { display: grid; grid-template-columns: minmax(150px, .7fr) minmax(0, 1.5fr) auto; gap: 16px; align-items: center; margin: 20px 24px 0; padding: 14px 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--soft); }
-.openai-test-summary span,
-.openai-test-summary strong { display: block; }
-.openai-test-summary span { color: var(--muted); font-size: 10px; }
-.openai-test-summary strong { margin-top: 4px; color: var(--text-strong); }
-.openai-test-summary.success { border-color: color-mix(in srgb, var(--accent) 28%, var(--line)); }
-.openai-test-summary.failed { border-color: color-mix(in srgb, var(--danger) 28%, var(--line)); }
-.openai-test-summary p { margin: 0; color: var(--muted); line-height: 1.5; }
-.openai-test-summary small { color: var(--muted-2); white-space: nowrap; }
-.openai-editor-actions { display: flex; justify-content: space-between; gap: 16px; padding: 20px 24px 24px; }
-.openai-editor-actions > div { display: flex; flex-wrap: wrap; gap: 9px; }
-.openai-security-note { display: grid; grid-template-columns: 42px minmax(0, 1fr) minmax(180px, auto); gap: 14px; align-items: center; }
 .security-icon { width: 42px; height: 42px; display: grid; place-items: center; border-radius: 12px; color: var(--accent-ink); background: var(--accent); font-weight: 900; }
-.openai-security-note strong { color: var(--text-strong); }
-.openai-security-note p { margin: 5px 0 0; color: var(--muted); line-height: 1.55; }
-.openai-security-note code { max-width: 340px; color: var(--muted-2); font-size: 10px; overflow-wrap: anywhere; text-align: right; }
-
-@media (max-width: 1120px) {
-  .openai-workbench { grid-template-columns: 250px minmax(0, 1fr); }
-  .openai-advanced-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-  .openai-test-summary { grid-template-columns: 1fr; }
-}
-@media (max-width: 820px) {
-  .openai-workbench { grid-template-columns: 1fr; }
-  .openai-profile-sidebar { min-height: auto; }
-  .openai-profile-list { grid-template-columns: repeat(2, minmax(0, 1fr)); max-height: 260px; }
-  .openai-editor-actions,
-  .openai-security-note { grid-template-columns: 1fr; flex-direction: column; align-items: stretch; }
-  .openai-security-note { display: grid; }
-  .openai-security-note code { max-width: none; text-align: left; }
-}
-@media (max-width: 620px) {
-  .openai-profile-list,
-  .openai-advanced-grid,
-  .openai-editor-section .field-row { grid-template-columns: 1fr; }
-}
+/* S14: approved 248px directory, independent editor viewport and persistent action bar. */
+.openai-module-workspace { display:flex; flex-direction:column; gap:8px; height:100%; min-height:0; min-width:0; overflow:hidden; }
+.profile-page-heading { flex:none; }
+.profile-page-heading h1 { margin:0; color:var(--fip-strong); font-size:26px; line-height:34px; font-weight:700; }
+.profile-page-heading p { margin:4px 0; font-size:12px; line-height:18px; }
+.profile-page-heading small { font-size:11px; line-height:16px; }
+.profile-navigation { display:flex; flex:none; flex-wrap:wrap; gap:8px; align-items:center; }
+.profile-context { flex:none; font-size:11px; line-height:18px; overflow-wrap:anywhere; }
+.openai-module-workspace .openai-module-stage { display:grid; grid-template-columns:248px minmax(0,1fr); gap:12px; flex:1; min-height:0; min-width:0; overflow:hidden; padding:0; scrollbar-gutter:auto; }
+.openai-module-workspace .profile-sidebar,.openai-module-workspace .profile-editor { margin:0; min-width:0; min-height:0; padding:12px; background:var(--fip-surface); border:0; border-radius:var(--fip-radius-md); box-shadow:none; }
+.profile-sidebar { display:flex; flex-direction:column; align-items:stretch; gap:8px; }
+.profile-sidebar header { flex:none; padding-bottom:12px; border-bottom:1px solid var(--fip-border); }
+.profile-sidebar h2,.profile-editor h2 { margin:0; font-size:14px; line-height:20px; font-weight:700; }
+.profile-sidebar small,.profile-editor header small { font-size:11px; line-height:16px; }
+.profile-sidebar > .ui-button { align-self:flex-start; }
+.profile-directory { display:flex; flex-direction:column; gap:12px; flex:1; overflow:auto; min-height:0; }
+.profile-directory article { display:flex; flex-direction:column; gap:4px; min-width:0; }
+.profile-directory .ui-button { width:100%; justify-content:center; height:auto; min-height:32px; }
+.profile-directory .ui-button-label { white-space:normal; overflow-wrap:anywhere; }
+.profile-sidebar footer { flex:none; font-size:11px; line-height:16px; overflow-wrap:anywhere; }
+.profile-editor { display:grid; grid-template-rows:auto minmax(0,1fr) auto; gap:12px; }
+.profile-editor > header { border-bottom:1px solid var(--fip-border); padding-bottom:12px; }
+.profile-editor-viewport { overflow:auto; min-height:0; min-width:0; padding:0 2px; }
+.profile-fields { display:flex; flex-direction:column; gap:12px; min-width:0; }
+.profile-fields p,.profile-fields pre { margin:0; font-size:12px; line-height:18px; white-space:pre-wrap; overflow-wrap:anywhere; }
+.profile-fields > .ui-button { align-self:flex-start; }
+.profile-field-row { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:12px; min-width:0; align-items:start; }
+.profile-fields .ui-field-label { font-size:13px; line-height:18px; font-weight:500; }
+.profile-key-row { display:grid; grid-template-columns:minmax(0,1fr) auto; gap:12px; align-items:end; }
+.profile-key-row > .ui-button { margin-bottom:4px; }
+.profile-editor-actions,.profile-inline-actions { display:flex; flex-wrap:wrap; align-items:center; gap:8px; min-width:0; }
+.profile-editor-actions { padding:0; flex:none; }
+.profile-warning { margin:0 0 8px; font-size:12px; line-height:18px; overflow-wrap:anywhere; color:var(--fip-strong); }
+.profile-warning:empty { display:none; }
+.profile-warning:not(:empty) { padding:8px 10px; background:var(--fip-warning-soft); border-radius:var(--fip-control-radius); }
+.profile-warning .ui-button { margin:4px; }
+.profile-fields dl { display:grid; grid-template-columns:88px minmax(0,1fr); gap:4px 12px; margin:0; font-size:12px; line-height:18px; }
+.profile-fields dd { margin:0; overflow-wrap:anywhere; }
+.profile-fields h3 { margin:0; font-size:14px; line-height:20px; font-weight:700; }
+@media(max-width:1100px) { .openai-module-workspace .openai-module-stage { grid-template-columns:224px minmax(0,1fr); } }
+@media(max-width:720px) { .openai-module-workspace .openai-module-stage { grid-template-columns:176px minmax(0,1fr); } .profile-field-row,.profile-key-row { grid-template-columns:minmax(0,1fr); } }

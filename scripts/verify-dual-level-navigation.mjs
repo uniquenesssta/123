@@ -197,7 +197,7 @@ function loaderContext(retainedTeam = null) {
   return { context, router, applied };
 }
 for (const [page, operation, apply] of [
-  ["logs", "listIssueLogs", "issueLogs"], ["openai", "listOpenAiProfiles", "openAiProfiles"],
+  ["logs", "listIssueLogs", "issueLogs"],
   ["lineups", "fetchLineups", "applyLineups"],
 
 ]) {
@@ -213,6 +213,7 @@ for (const [page, operation, apply] of [
     }
   });
 }
+await test("actual profile loader rejects stale directory and works without business database",async()=>{for(const stale of [true,false]){const {context,router}=loaderContext(),task=deferred(),{ProfilesFeature}=loadTeamsProduction(root)("src/features/openai-profiles/ProfilesFeature.ts");context.api.listOpenAiProfiles=()=>task.promise;context.profilesFeature=new ProfilesFeature({api:context.api,storage:{read:()=>null,save:()=>{}},view:()=>{const p=router.page;return()=>p===router.page;},changed:()=>{},formatError:String});context.workspaceState.module=()=>({controls:{}});context.session.bootstrap.data.database_configured=false;const pending=context.loadNavigationPage(router.begin("openai"));if(stale)router.begin("dashboard");task.resolve({active_profile_id:null,profiles:[],config_path:"fixture"});await pending;assert.equal(context.profilesFeature.state.catalog===null,stale);router.destroy();}});
 await test("actual analytics loader rejects stale data and keeps current source identity",async()=>{for(const stale of [true,false]){const {context,router}=loaderContext(),task=deferred();context.api.analyticsOverview=()=>task.promise;const pending=context.loadNavigationPage(router.begin("analytics"));if(stale)router.begin("dashboard");task.resolve(analyticsFixture(loadTeamsProduction(root)("src/features/analytics/index.ts").AnalyticsFeature,loadTeamsProduction(root)("src/features/analytics/index.ts").analyticsStorage).overview());await pending;assert.equal(context.analyticsFeature.overview!==null,!stale);router.destroy();}});
 await test("actual review module loading rejects stale data and publishes current identity",async()=>{for(const stale of [true,false]){const {context,router}=loaderContext(),task=deferred();context.api.listReviewableMatches=()=>task.promise;context.api.listMatchReviews=async()=>[];const pending=context.loadNavigationPage(router.begin("review"));if(stale)router.begin("dashboard");task.resolve([{match_record:{id:"original-match"}}]);await pending;assert.equal(context.reviewFeature.state.matches.length,stale?0:1);assert.equal(context.reviewFeature.state.selectedMatchId,null);router.destroy();}});
 await test("actual players loader rejects stale data and publishes only current identity",async()=>{for(const stale of [true,false]){const {context,router}=loaderContext(),task=deferred();context.api.playerCatalogReferenceData=async()=>({teams:[]});context.api.listPlayers=()=>task.promise;const pending=context.loadNavigationPage(router.begin("players"));if(stale)router.begin("dashboard");task.resolve({items:[],has_more:false});await pending;assert.equal(context.playersFeature.catalog.list!==null,!stale);router.destroy();}});

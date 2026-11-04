@@ -13,6 +13,9 @@ use std::sync::{Arc, Mutex};
 use uuid::Uuid;
 use zeroize::Zeroize;
 
+#[cfg(test)]
+mod test_freshness;
+
 const STORE_VERSION: u32 = 1;
 const CREDENTIAL_PREFIX: &str = "football-match-model-platform/openai";
 const DEFAULT_CONFIG: &str = include_str!("../resources/research/openai_gateway.json");
@@ -418,6 +421,7 @@ impl OpenAiProfileStore {
             }) => {
                 self.update_test_state(
                     profile_id,
+                    profile.updated_at,
                     "success",
                     Some("连接与模型权限验证通过"),
                     tested_at,
@@ -434,7 +438,13 @@ impl OpenAiProfileStore {
                 })
             }
             Err(error) => {
-                self.update_test_state(profile_id, "failed", Some(&error.user_message), tested_at)?;
+                self.update_test_state(
+                    profile_id,
+                    profile.updated_at,
+                    "failed",
+                    Some(&error.user_message),
+                    tested_at,
+                )?;
                 Err(error.to_string())
             }
         }
@@ -443,6 +453,7 @@ impl OpenAiProfileStore {
     fn update_test_state(
         &self,
         profile_id: Uuid,
+        expected_updated_at: DateTime<Utc>,
         status: &str,
         message: Option<&str>,
         tested_at: DateTime<Utc>,
@@ -453,6 +464,9 @@ impl OpenAiProfileStore {
             .iter_mut()
             .find(|profile| profile.id == profile_id)
             .ok_or_else(|| "兼容 API配置不存在".to_string())?;
+        if profile.updated_at != expected_updated_at {
+            return Err("配置或密钥已变化，本次连接测试结果已过期，请重新测试".to_string());
+        }
         profile.last_test_status = status.to_string();
         profile.last_test_message = message.map(|value| truncate(value, 500));
         profile.last_tested_at = Some(tested_at);

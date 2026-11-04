@@ -937,8 +937,22 @@
       ],
       "transition": null,
       "migration_task": "R15-01"
+    },
+    {
+      "id": "feature.openai-profiles",
+      "owner": "src/features/openai-profiles/ProfilesFeature.ts::ProfilesFeature",
+      "scope": "device-local safe drafts, original profile writes and test revisions; no credentials",
+      "writers": [
+        "src/features/openai-profiles/**"
+      ],
+      "forbidden": [
+        "src/main.ts profile state globals",
+        "src/pages/**"
+      ],
+      "transition": null,
+      "migration_task": "R15-07"
     }
   ],
-  "count": 65,
-  "last_updated_task": "R15-01"
+  "count": 66,
+  "last_updated_task": "R15-07"
 }

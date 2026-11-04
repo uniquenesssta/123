@@ -61,7 +61,7 @@ check(browserApplication.includes("session.start()") && browserApplication.inclu
 check(browserApplication.includes("toggleTheme: () => session.toggleTheme()") && browserApplication.includes("renderPreservingWorkspace: () => render({ preserveForm: true })") && read("src/app/shell/application-shell/applicationShellController.ts").includes('case "toggle-theme":\n        this.operations.toggleTheme();\n        this.operations.renderPreservingWorkspace();'), "R12-04/05 主题切换未通过Shell保持原表单重绘语义");
 check(browserApplication.includes("new EventScope()") && browserApplication.includes("new MountHandle("), "R12-02 真实浏览器模块未使用生命周期基础设施");
 check(!/window\.(?:setTimeout|setInterval)\(/.test(browserApplication), "R12-02 真实浏览器定时器必须归事件scope");
-check(browserApplication.includes("openAiExampleRequests.invalidate()") && browserApplication.includes("request.isCurrent()"), "R12-02 示例解析必须丢弃过期结果");
+const profileParser=read("src/features/openai-profiles/ProfileExample.ts"); check(browserApplication.includes("profileControls.stop()") && profileParser.includes("this.reads.invalidate()") && profileParser.includes("request.isCurrent()") && profileParser.includes("entry.revision===revision") && profileParser.includes("input===document.querySelector"), "R12-02 示例解析必须丢弃过期结果；迁移后仍核对真实请求、DOM及草稿身份");
 check(registerModules.includes("runtime?.stop()") && applicationHandle.includes("module.stop?.()"), "R12-02 销毁请求未即时中断真实模块");
 const diagnostics = read("src/diagnostics/searchableSelectDiagnostics.ts");
 const moduleContract = JSON.parse(read("architecture/module-boundaries.json"));
