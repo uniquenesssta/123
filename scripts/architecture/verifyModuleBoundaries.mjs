@@ -1,3 +1,7 @@
+import ts from "typescript";
+import { verifyCargoDependencies } from "./lib/verifyCargoDependencies.mjs";
+import { frontendRuntimeGraph, runtimeGraphViolations } from "./lib/frontendRuntimeGraph.mjs";
+import { verifyFrontendRuntimeGraph } from "./lib/verifyFrontendRuntimeGraph.mjs";
 import {createFrontendFeatureIndex,inspectFrontendFeatureImport} from "./lib/frontendFeatures.mjs";
 import {verifyFrontendFeatures} from "./lib/verifyFrontendFeatures.mjs";
 import { readFileSync } from "node:fs";
@@ -120,10 +124,22 @@ for (const importer of frontendFiles) {
   }
 }
 
+verifyFrontendRuntimeGraph();
+const config = ts.parseJsonConfigFileContent(readJson("tsconfig.json"), ts.sys, repositoryRoot);
+for (const diagnostic of config.errors) report.violation(ts.flattenDiagnosticMessageText(diagnostic.messageText, " "));
+const runtime = frontendRuntimeGraph(
+  new Map(frontendFiles.map(file => [file, readFileSync(join(repositoryRoot, file), "utf8")])),
+  config.options,
+  resolveRelativeImport,
+);
+for (const violation of runtimeGraphViolations(runtime)) report.violation(violation);
+report.note("前端运行时图：" + runtime.edges.length + " 条值/资源边，" + runtime.dynamic.length + " 条字面量动态加载，" + runtime.unknown.length + " 条未解析加载；类型引用不作为运行时环");
+
 for (const transition of frontendTransitions) {
   report.check(observedFrontendTransitions.has(transitionKey(transition)), `登记的过渡导入未在源码中出现，应删除或修正：${transitionKey(transition)}`);
 }
 
+verifyCargoDependencies();
 const contractCrates = contract.rust?.crates ?? {};
 const workspaceMembers = parseWorkspaceMembers();
 const contractRoots = Object.values(contractCrates).map((item) => normalizePath(item.root)).sort();

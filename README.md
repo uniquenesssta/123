@@ -1,8 +1,12 @@
 # 足球模型平台公开外壳
 
-## R16-01 剩余入口与兼容实现审计（VERIFYING）
+## R16-09 依赖与职责复核（VERIFYING）
 
-修复Feature目录别名漏扫、目录误当模块文件及token/数据库测试登记漂移；保留真实入口、API、类型和共享能力，无生产文件删除。详[R16-01记录](docs/modular-rewrite/R16-legacy-cleanup/R16-01-residual-entries-types-and-compatibility.md)。R15-12自身CI/双包/startup已收尾。本批自身CI/包另验；下一项R16-09，未启动。
+解除推演页与运行记录之间的运行时循环，补原架构值图和Cargo表式/继承依赖漏检；功能、状态、171命令和依赖保留，无文件删除。完整97步前端、最终架构、9负向、18种HTML等价和9项Windows原生通过；Rust同树证据复用。本批自身CI/官方包另验，不轮询。详[09记录](docs/modular-rewrite/R16-legacy-cleanup/R16-09-dependencies-and-responsibilities.md)和[阶段出口](docs/modular-rewrite/R16-legacy-cleanup/R16-stage-exit.md)。下一项：收尾09，然后R17-01；真实环境项仍R17-06。
+
+## R16-01 剩余入口与兼容实现审计（DONE）
+
+修复Feature目录别名漏扫、目录误当模块文件及token/数据库测试登记漂移；保留真实入口、API、类型和共享能力，无生产文件删除。详[R16-01记录](docs/modular-rewrite/R16-legacy-cleanup/R16-01-residual-entries-types-and-compatibility.md)。R15-12自身CI/双包/startup已收尾。自身3baf4ed2/CI42041966141、官方摘要/双包/startup已验收DONE；用户已授权R16-09。
 
 ## R15-12 问题日志与诊断关联（DONE）
 

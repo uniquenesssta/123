@@ -4,7 +4,7 @@ import { inlineDatabaseSetup } from "../components/databaseSetup";
 import { formalPredictionView,predictionExecutionBar } from "../features/prediction/formalPredictionView";
 import type { PredictionFeature } from "../features/prediction/predictionFeature";
 
-import { runHistoryMarkup, type RunsFeature } from "../features/runs/index";
+import type { RunsFeature } from "../features/runs/index";
 import { p4WorkbenchMarkup } from "../features/prediction/research/researchView";
 import type {ResearchFeature} from "../features/prediction/research/researchFeature";
 import type {
@@ -133,6 +133,7 @@ export function predictionPage(
   _moduleSidebarCollapsed: boolean,
   _inspectorCollapsed: boolean,
   activeSection: string,
+  historyMarkup: string,
   workflow?:PredictionFeature["view"],
   research?:ResearchFeature["view"],
   history?:RunsFeature["view"],
@@ -194,6 +195,6 @@ export function predictionPage(
   const contextSummary=`${activeMatch?escapeHtml(activeMatch.home_team_name+" vs "+activeMatch.away_team_name):"尚未选择比赛"} · ${escapeHtml(selectedModelFamily.toUpperCase())} · ${escapeHtml(selectedSnapshot)} · ${activeReadiness?escapeHtml(readinessLevelLabel(activeReadiness.level)):"尚未检查"}`;
   return `<section class="prediction-workspace core-workspace-page core-prediction-workspace"><header class="prediction-page-heading"><h1>P4 / P7 外部模型入口</h1><p>正式数据准备、研究与收敛、历史和临时演练；真实模型由独立 ModelProvider 提供。</p></header>${state.data.database_configured ? "" : inlineDatabaseSetup("连接数据服务以使用正式推演", "临时演练仍可使用；连接成功后可创建比赛、推演并查看记录。", state.connection_error)}
   <p class="prediction-context-summary">${contextSummary}</p><div class="core-local-navigation">${sectionNav}</div>
-  <div class="core-workspace-stage"><main class="prediction-viewport" data-workspace-scroll-key="prediction-main">${section==="formal"?formalView:""}<section class="workspace-module-view ${section === "p4" ? "active" : ""}" data-workspace-section="p4"><div class="workspace-section-heading"><div><span>P4 研究与收敛</span><h2>正式运行与重新校准分开管理</h2><p>正式运行使用已验证参数；新增历史仅用于后续回测、漂移监测与收敛。</p></div></div>${p4WorkbenchMarkup(state.data.database_configured, state.data.rule_packages, references?.managed_matches ?? [], p4Workspace, p4TaskWorkspace, research)}</section><section class="workspace-module-view ${section === "history" ? "active" : ""}" data-workspace-section="history"><div class="workspace-section-heading"><div><span>推演历史</span><h2>最近的正式推演</h2><p>保留比赛、模型、窗口、比分和胜平负；技术血缘按需打开。</p></div><button class="secondary" data-action="refresh-runs" ${history?.listLoading?"disabled":""}>刷新</button></div><section class="panel prediction-history-panel">${history?.listError?`<p role="alert">${escapeHtml(history.listError)}</p>`:""}${history?.pending.length?`<p role="status">${history.pending.length} 条移除请求结果待核实；刷新只查回原记录，不会重复提交。</p>`:""}${runHistoryMarkup(state.data.recent_runs, true,[...(history?.locked??[]),...(history?.pending.map(r=>r.runId)??[])])}</section></section>${simulationView}</main></div>${section==="formal"?predictionExecutionBar(formalOptions):""}
+  <div class="core-workspace-stage"><main class="prediction-viewport" data-workspace-scroll-key="prediction-main">${section==="formal"?formalView:""}<section class="workspace-module-view ${section === "p4" ? "active" : ""}" data-workspace-section="p4"><div class="workspace-section-heading"><div><span>P4 研究与收敛</span><h2>正式运行与重新校准分开管理</h2><p>正式运行使用已验证参数；新增历史仅用于后续回测、漂移监测与收敛。</p></div></div>${p4WorkbenchMarkup(state.data.database_configured, state.data.rule_packages, references?.managed_matches ?? [], p4Workspace, p4TaskWorkspace, research)}</section><section class="workspace-module-view ${section === "history" ? "active" : ""}" data-workspace-section="history"><div class="workspace-section-heading"><div><span>推演历史</span><h2>最近的正式推演</h2><p>保留比赛、模型、窗口、比分和胜平负；技术血缘按需打开。</p></div><button class="secondary" data-action="refresh-runs" ${history?.listLoading?"disabled":""}>刷新</button></div><section class="panel prediction-history-panel">${history?.listError?`<p role="alert">${escapeHtml(history.listError)}</p>`:""}${history?.pending.length?`<p role="status">${history.pending.length} 条移除请求结果待核实；刷新只查回原记录，不会重复提交。</p>`:""}${historyMarkup}</section></section>${simulationView}</main></div>${section==="formal"?predictionExecutionBar(formalOptions):""}
   </section>`;
 }

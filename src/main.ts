@@ -55,7 +55,7 @@ import {ReleaseDetails} from "./features/release/releaseDetails";
 import {ReleaseControls} from "./features/release/releaseControls";
 import {ReleaseFeature,ReleaseActions,releaseStorage,releaseFeaturePage} from "./features/release";
 import {ReviewFeature,ReviewFacts,ReviewControls,reviewRecovery,reviewDatabaseIdentity,reviewPage,type ReviewIntent} from "./features/review";
-import {RunsFeature,runRecovery,runsPage,runTechnicalBody} from "./features/runs";
+import {RunsFeature,runRecovery,runsPage,runTechnicalBody,runHistoryMarkup} from "./features/runs";
 import { WorkbooksFeature,workbooksPage } from "./features/workbooks";
 import { importRecovery } from "./app/imports/importRecovery";
 import { clipboard } from "./platform/clipboard";
@@ -538,6 +538,7 @@ function render(options: RenderOptions = {}): void {
     }
     case "prediction": {
       const workspace = workspaceState.module("prediction");
+      const history = runsFeature.view;
       content = predictionPage(
         session.bootstrap,
         playersFeature.catalog.references,
@@ -551,9 +552,10 @@ function render(options: RenderOptions = {}): void {
         workspace.module_sidebar_collapsed,
         workspace.inspector_collapsed,
         workspace.active_section ?? "formal",
+        runHistoryMarkup(history.rows, true, [...history.locked, ...history.pending.map(receipt => receipt.runId)]),
         predictionFeature.view,
         researchFeature.view,
-        runsFeature.view,
+        history,
       );
       break;
     }

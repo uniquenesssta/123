@@ -20,7 +20,7 @@
 
 ## 状态与依赖
 
-当前 **R16-01 VERIFYING；R16-09 BLOCKED / 未启动**。R15-12自身ed1e892d/CI42006118669、官方双包/startup已验收，用户已授权01；本阶段分支rewrite/r16-legacy-cleanup，基线7e99e236。下表顺序是默认交付顺序，必要时在已授权阶段内按真实依赖拆出更小批次并说明原因，不以任务数量或文件数为目标。
+当前 **R16-01 DONE；R16-09 VERIFYING**。2026-11-06已按精确01 CI42041966141与官方摘要/双包/startup完成收尾，并获用户授权实施09；09本地适用验证已通过，自身CI/包另验。R15-12自身ed1e892d/CI42006118669、官方双包/startup已验收，用户已授权01；本阶段分支rewrite/r16-legacy-cleanup，基线7e99e236。下表顺序是默认交付顺序，必要时在已授权阶段内按真实依赖拆出更小批次并说明原因，不以任务数量或文件数为目标。
 
 | 主交付 ID | 交付批次 | 前置 |
 |---|---|---|
@@ -183,15 +183,15 @@ if ($LASTEXITCODE -ne 0) { throw 'R16-09: verify-domain-type-inventory failed' }
 | 原节点 | 当前主交付 | 处理方式 |
 |---|---|---|
 | R16-01 清理旧 main 业务实现 | R16-01 | 主交付 |
-| R16-02 删除旧 API Client | R16-01 | 合并验收项（非 DONE） |
-| R16-03 删除旧 Types 中心 | R16-01 | 合并验收项（非 DONE） |
-| R16-04 删除旧 Pages | R16-01 | 合并验收项（非 DONE） |
-| R16-05 删除旧 Components 与 Controllers | R16-01 | 合并验收项（非 DONE） |
-| R16-06 清理旧 CSS | R16-01 | 合并验收项（非 DONE） |
-| R16-07 删除旧 Rust 模块 | R16-01 | 合并验收项（非 DONE） |
-| R16-08 删除临时转发与兼容壳 | R16-01 | 合并验收项（非 DONE） |
+| R16-02 删除旧 API Client | R16-01 | 合并验收项（随01 DONE） |
+| R16-03 删除旧 Types 中心 | R16-01 | 合并验收项（随01 DONE） |
+| R16-04 删除旧 Pages | R16-01 | 合并验收项（随01 DONE） |
+| R16-05 删除旧 Components 与 Controllers | R16-01 | 合并验收项（随01 DONE） |
+| R16-06 清理旧 CSS | R16-01 | 合并验收项（随01 DONE） |
+| R16-07 删除旧 Rust 模块 | R16-01 | 合并验收项（随01 DONE） |
+| R16-08 删除临时转发与兼容壳 | R16-01 | 合并验收项（随01 DONE） |
 | R16-09 Dead Code 与 Import 检查 | R16-09 | 主交付 |
-| R16-10 文件职责审计 | R16-09 | 合并验收项（非 DONE） |
+| R16-10 文件职责审计 | R16-09 | 合并验收项（随09 VERIFYING） |
 
 ## 记录位置
 
@@ -206,4 +206,4 @@ if ($LASTEXITCODE -ne 0) { throw 'R16-09: verify-domain-type-inventory failed' }
 - 阶段启动时在既有记录体系建立阶段索引；每批记录覆盖原 ID，阶段结束创建阶段完成记录并附实际 A/M/R/D、契约、验证和回退摘要。记录路径沿用原阶段目录名，历史记录不重写。
 - R17 仅在本阶段出口满足及用户授权后进入 READY。
 
-2026-11-05执行：原01～08逐项保留/修复与消费者证据见[R16-01记录](../modular-rewrite/R16-legacy-cleanup/R16-01-residual-entries-types-and-compatibility.md)。本批没有删除生产文件；修复守卫实际漏扫与登记漂移，自身CI/包待验，下一项R16-09未启动。
+2026-11-05执行：原01～08逐项保留/修复与消费者证据见[R16-01记录](../modular-rewrite/R16-legacy-cleanup/R16-01-residual-entries-types-and-compatibility.md)。本批没有删除生产文件；修复守卫实际漏扫与登记漂移，自身3baf4ed2/CI42041966141与官方双包/startup已核验DONE。2026-11-06用户授权09，当前复核与修复见[09记录](../modular-rewrite/R16-legacy-cleanup/R16-09-dependencies-and-responsibilities.md)，阶段出口保持VERIFYING，下一项收尾09后R17-01。

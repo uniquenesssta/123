@@ -26,49 +26,75 @@ function stripComment(line) {
   return line;
 }
 
-function isDependencySection(section) {
-  return section === "dependencies"
-    || section === "dev-dependencies"
-    || section === "build-dependencies"
-    || section.endsWith(".dependencies")
-    || section.endsWith(".dev-dependencies")
-    || section.endsWith(".build-dependencies");
+function dependencySection(section) {
+  const match = section.match(/^((?:workspace\.|target\.(?:"(?:\\.|[^"])*"|'[^']*'|[A-Za-z0-9_-]+)\.)?(?:dependencies|dev-dependencies|build-dependencies))(?:\.(?:"([^"]+)"|'([^']+)'|([A-Za-z0-9_-]+)))?$/);
+  return match ? { section: match[1], key: match[2] ?? match[3] ?? match[4] ?? null } : null;
 }
 
-export function parseCargoManifest(relativePath) {
-  const content = readText(relativePath);
-  const packageMatch = content.match(/\[package\][\s\S]*?^name\s*=\s*["']([^"']+)["']/m);
-  const dependencies = [];
-  let section = "";
-
+/** Read row, per-dependency table and dotted declarations through one dependency owner. */
+export function parseCargoManifestContent(relativePath, content) {
+  const dependencies = new Map();
+  let section = "", packageName = null;
+  const dependency = (scope, key) => {
+    const identity = scope + "|" + key;
+    if (!dependencies.has(identity)) dependencies.set(identity, { key, packageName: key, path: null, section: scope, workspace: false });
+    return dependencies.get(identity);
+  };
+  const field = (entry, key, value) => {
+    if (key === "workspace") { entry.workspace = value === "true"; return; }
+    if (key !== "package" && key !== "path") return;
+    const literal = value.match(/^(?:"((?:\\.|[^"])*)"|'([^']*)')$/);
+    if (!literal) throw new Error(relativePath + ": dependency " + key + " 必须是字符串");
+    const text = literal[2] ?? JSON.parse('"' + literal[1] + '"');
+    if (key === "package") entry.packageName = text;
+    else entry.path = normalizePath(repositoryPath(resolve(dirname(resolveRepositoryPath(relativePath)), text)));
+  };
   for (const rawLine of content.split("\n")) {
     const line = stripComment(rawLine).trim();
     if (!line) continue;
-    const sectionMatch = line.match(/^\[([^\]]+)\]$/);
-    if (sectionMatch) {
-      section = sectionMatch[1];
+    const header = line.match(/^\[([^\]]+)\]$/);
+    if (header) {
+      section = header[1];
+      if (/^(?:(?:workspace\.)?(?:dependencies|dev-dependencies|build-dependencies)(?:\.|$)|target\..*\.(?:dependencies|dev-dependencies|build-dependencies)(?:\.|$))/.test(section) && !dependencySection(section)) throw new Error(relativePath + ": 无法解析依赖表 " + section);
+      const scope = dependencySection(section);
+      if (scope?.key) dependency(scope.section, scope.key);
       continue;
     }
-    if (!isDependencySection(section)) continue;
-
-    const dependencyMatch = line.match(/^(?:["']([^"']+)["']|([A-Za-z0-9_-]+))\s*=\s*(.+)$/);
-    if (!dependencyMatch) continue;
-    const key = dependencyMatch[1] ?? dependencyMatch[2];
-    const declaration = dependencyMatch[3];
-    const packageName = declaration.match(/\bpackage\s*=\s*["']([^"']+)["']/)?.[1] ?? key;
-    const pathValue = declaration.match(/\bpath\s*=\s*["']([^"']+)["']/)?.[1] ?? null;
-    const resolvedPath = pathValue
-      ? normalizePath(repositoryPath(resolve(dirname(resolveRepositoryPath(relativePath)), pathValue)))
-      : null;
-
-    dependencies.push({ key, packageName, path: resolvedPath, section });
+    if (section === "package") {
+      const name = line.match(/^name\s*=\s*["']([^"']+)["']$/);
+      if (name) packageName = name[1];
+    }
+    const scope = dependencySection(section);
+    if (!scope) continue;
+    const declaration = line.match(/^(?:"([^"]+)"|'([^']+)'|([A-Za-z0-9_-]+))(?:\.(package|path|workspace))?\s*=\s*(.+)$/);
+    if (!declaration) throw new Error(relativePath + ": 无法解析依赖声明 " + line);
+    const key = declaration[1] ?? declaration[2] ?? declaration[3], property = declaration[4], value = declaration[5];
+    const entry = dependency(scope.section, scope.key ?? key);
+    if (scope.key || property) field(entry, property ?? key, value);
+    else if (value.startsWith("{")) {
+      if (!value.endsWith("}")) throw new Error(relativePath + ": 未闭合的依赖行内表 " + key);
+      // Read fields at table boundaries, never package/path text embedded in a quoted feature value.
+      const fields = value.slice(1,-1).match(/(?:"(?:\\.|[^"])*"|'[^']*'|\[[^\]]*\]|[^,])+/g) ?? [];
+      for (const item of fields) {
+        const attribute = item.trim().match(/^(\w+)\s*=\s*(.+)$/);
+        if (attribute) field(entry, attribute[1], attribute[2].trim());
+      }
+    } else if (!/^(?:"(?:\\.|[^"])*"|'[^']*')$/.test(value)) throw new Error(relativePath + ": 无法解析依赖值 " + key);
   }
+  return { path: relativePath, packageName, dependencies: [...dependencies.values()] };
+}
 
-  return {
-    path: relativePath,
-    packageName: packageMatch?.[1] ?? null,
-    dependencies,
-  };
+export function parseCargoManifest(relativePath) {
+  const manifest = parseCargoManifestContent(relativePath, readText(relativePath));
+  if (relativePath === "Cargo.toml" || !manifest.dependencies.some(entry => entry.workspace)) return manifest;
+  const shared = parseCargoManifestContent("Cargo.toml", readText("Cargo.toml")).dependencies;
+  for (const entry of manifest.dependencies.filter(item => item.workspace)) {
+    const inherited = shared.find(item => item.section === "workspace.dependencies" && item.key === entry.key);
+    if (!inherited) throw new Error(relativePath + ": workspace dependency 未登记 " + entry.key);
+    entry.packageName = inherited.packageName;
+    entry.path ??= inherited.path;
+  }
+  return manifest;
 }
 
 export function parseWorkspaceMembers() {
