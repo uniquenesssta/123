@@ -1,8 +1,8 @@
 # 足球模型平台公开外壳
 
-## R15-12 问题日志与诊断关联（VERIFYING）
+## R15-12 问题日志与诊断关联（DONE）
 
-日志读取、详情、导出和清空迁入唯一LogsFeature；接入批准S16，区分空态/读取失败/未知操作，修复落盘失败、敏感信息脱敏与操作追踪丢失。详[R15-12记录](docs/modular-rewrite/R15-ai-profiles-logs-ui/R15-12-logs-diagnostics.md)。07自身42418cb5/CI41887780319、官方双包/startup已正式验收。本批自身CI及官方包另验，不轮询；下一项R16-01，未启动。
+日志读取、详情、导出和清空迁入唯一LogsFeature；接入批准S16，区分空态/读取失败/未知操作，修复落盘失败、敏感信息脱敏与操作追踪丢失。详[R15-12记录](docs/modular-rewrite/R15-ai-profiles-logs-ui/R15-12-logs-diagnostics.md)。07自身42418cb5/CI41887780319、官方双包/startup已正式验收。本批ed1e892d/CI42006118669、官方摘要/双包/startup已正式验收；用户已授权R16-01。
 
 ## R15-01 会话、草稿与请求全生命周期（DONE）
 

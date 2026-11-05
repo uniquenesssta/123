@@ -1,6 +1,6 @@
 # R15-12 问题日志与诊断关联
 
-状态：VERIFYING。用户2026-11-05授权“收尾07开始12”；基线42418cb555de577f50e1b25314e9b66183de4adc，起始工作区干净，继续rewrite/r15-ai-profiles-logs-ui。07自身CI/官方双包/startup已正式收尾。本记录覆盖原12 Logs与13 Diagnostics Bridge；本批自身CI及官方包另验，不轮询。下一项R16-01未启动。
+状态：DONE（自身CI、官方双包与startup已验收；真实外部边界仍保留）。用户2026-11-05授权“收尾07开始12”；基线42418cb555de577f50e1b25314e9b66183de4adc，起始工作区干净，继续rewrite/r15-ai-profiles-logs-ui。07自身CI/官方双包/startup已正式收尾。本记录覆盖原12 Logs与13 Diagnostics Bridge；本批自身CI及官方包另验，不轮询。下一项R16-01未启动。
 
 ## 复用、迁移与唯一归属
 
@@ -62,3 +62,11 @@ Windows GUI验收复用现有lib test target，只有显式FOOTBALL_NATIVE_LOG_A
 最终适用本地门禁：完整96步前端（含类型/构建）、23项生产流程、16项层级、21项原导航、30项完整挂载；Rust格式/严格Clippy、工作区768项测试通过，40项既有外部环境测试未执行；正常Windows构建、隔离原生14项及原startup分析通过。正常EXE清单与原Tauri默认Common Controls v6一致，没有新增requestedExecutionLevel。Impeccable最终detect为0项；现有主bundle大于500kB提示保留，未放宽阈值。
 
 frontend-hygiene-initial保留第二轮完整检查发现的测试模块声明顺序问题，已按原规范把reliability_tests声明移到末尾内联tests之前；守卫未改，最终门禁重新通过。测试声明顺序调整与最后Basic脱敏补齐后，受影响的diagnostics、WarningCenter、日志挂载和Windows原生14项均再次通过；普通构建已恢复默认设置。
+
+## 2026-11-05正式收尾
+
+用户授权“收尾12开始R16-01”后，一次核对精确ed1e892d18bea412f97dc0541cded9edacad3cee、push、rewrite/r15-ai-profiles-logs-ui及ci.yml：[运行42006118669](https://github.com/uniquenesssta/123/actions/runs/42006118669)，job127173177599，全部completed/success。此前VERIFYING与“未开始R16”段落保留历史，不作当前状态。
+
+官方artifact13406729451：ZIP52,489,594字节，SHA256为6b34821e08edb9d60cd4feec036b7c5e1b58edcb15ed1eb9dd5dff618fa04a17，与GitHub digest一致。MSI18079744字节（da24676e4a4fe2fe578f7c2f48558b7b37f931251971c3540c2407c4115e83e8），NSIS15709139字节（bc8e9377a88b0e736aa06fd94398de175627eb73ab690e531c0aef2dfda8218a）；名称、非零长度、OLE/MZ头与摘要均核对。官方runtime按原分析器startup/pass：7条、0非法行、0运行错误。完整官方ZIP、两包、原runtime及acceptance.json保存在O:/Project/FOODBALL/logs/r15-12-ci-42006118669。
+
+没有在本机安装这两个包或验证数字签名，startup不等于Full。BA-10/11仍按原R17-06关闭。R15三个批次适用出口已满足，R16-01已获本轮启动授权；R16-09未启动。
