@@ -11,7 +11,8 @@ import { resolveChromiumExecutable, captureHtmlScreenshot } from "../task-ui-scr
 
 /** Compare actual CSS delivery with the read-only Figma snapshot, including native computed values. */
 export async function verifyDesignTokens(root) {
-  const record = JSON.parse(readProjectSource(stylesheetRoot,resolve(root, "docs/modular-rewrite/R12-frontend-foundation-ui-system/approved-design-tokens-20261028.json"), "utf8"));
+  const metadata = JSON.parse(readProjectSource(stylesheetRoot,resolve(root, "architecture/module-boundaries.json"), "utf8")).frontend.design_tokens;
+  const record = JSON.parse(readProjectSource(stylesheetRoot,resolve(root, metadata.source_record), "utf8"));
   assert.equal(record.fileKey, "PN0Whgu6HLWIHx4Mv6aHfu");
   assert.equal(record.designSnapshot, "approved-live-2026-10-28");
   assert.equal(record.variables.length, 237); assert.equal(record.collections.length, 6); assert.equal(record.texts.length, 25); assert.equal(record.effects.length, 6);

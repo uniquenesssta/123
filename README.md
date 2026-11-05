@@ -1,5 +1,9 @@
 # 足球模型平台公开外壳
 
+## R16-01 剩余入口与兼容实现审计（VERIFYING）
+
+修复Feature目录别名漏扫、目录误当模块文件及token/数据库测试登记漂移；保留真实入口、API、类型和共享能力，无生产文件删除。详[R16-01记录](docs/modular-rewrite/R16-legacy-cleanup/R16-01-residual-entries-types-and-compatibility.md)。R15-12自身CI/双包/startup已收尾。本批自身CI/包另验；下一项R16-09，未启动。
+
 ## R15-12 问题日志与诊断关联（DONE）
 
 日志读取、详情、导出和清空迁入唯一LogsFeature；接入批准S16，区分空态/读取失败/未知操作，修复落盘失败、敏感信息脱敏与操作追踪丢失。详[R15-12记录](docs/modular-rewrite/R15-ai-profiles-logs-ui/R15-12-logs-diagnostics.md)。07自身42418cb5/CI41887780319、官方双包/startup已正式验收。本批ed1e892d/CI42006118669、官方摘要/双包/startup已正式验收；用户已授权R16-01。

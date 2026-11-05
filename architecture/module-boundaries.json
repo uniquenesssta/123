@@ -73,11 +73,11 @@
     },
     "design_tokens": {
       "owner": "src/ui/tokens/index.css",
-      "source_record": "docs/modular-rewrite/R12-frontend-foundation-ui-system/R12-10-figma-tokens.json",
-      "variable_count": 193,
-      "text_style_count": 13,
+      "source_record": "docs/modular-rewrite/R12-frontend-foundation-ui-system/approved-design-tokens-20261028.json",
+      "variable_count": 237,
+      "text_style_count": 25,
       "effect_style_count": 6,
-      "scope": "FIP foundation; legacy Feature palettes and media-query behavior retain existing stage contracts"
+      "scope": "Current approved FIP tokens; sole CSS entry and variable identities retained; historical R12-10 snapshot remains provenance only"
     },
     "shared": {
       "app": "src/app",
@@ -539,5 +539,5 @@
     "commands": 171
   },
   "transitional_edges": [],
-  "last_updated_task": "R15-12"
+  "last_updated_task": "R16-01"
 }

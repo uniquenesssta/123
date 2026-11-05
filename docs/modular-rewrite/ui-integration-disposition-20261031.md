@@ -122,3 +122,5 @@
 2026-11-05执行复核：S14示例是页内次级编辑状态，非输入弹窗；沿批准857af9f记录和实际654:174172/654:177329实现。R15-07同状态补差、真实调用与待验边界见[R15-07记录](R15-ai-profiles-logs-ui/R15-07-profiles-parser-credentials-tests.md)，不据设计预置核销真实凭据/API验收。
 
 2026-11-05 R15-12执行更新：S16沿批准14fba2a4及主683:186758接入唯一logs Feature，核对有日志/严重/警告/重复/详情/聚合/失败/空态/加载及确认/报告快照，实际挂载30项与隔离Windows14项分层记录；设计预置不计真实结果。原src/pages/logs.ts已由src/features/logs/logView.ts接替，以上10/31审计表保留历史基线，不再当当前owner。详[R15-12记录](R15-ai-profiles-logs-ui/R15-12-logs-diagnostics.md)，自身CI/包另验，BA-11真实环境仍待R17-06。
+
+2026-11-05 R16-01复核：以上17页为10/31历史判定，后续R13～R15记录已分别关闭所分配适用义务；本次17路由/渲染/owner及真实外部承接逐项见[R16-01唯一记录](R16-legacy-cleanup/R16-01-residual-entries-types-and-compatibility.md)。不把历史OPEN直接当当前缺页，也不据静态审计宣称整页全状态或真实外部PASS。

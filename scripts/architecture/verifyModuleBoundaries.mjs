@@ -1,3 +1,5 @@
+import {createFrontendFeatureIndex,inspectFrontendFeatureImport} from "./lib/frontendFeatures.mjs";
+import {verifyFrontendFeatures} from "./lib/verifyFrontendFeatures.mjs";
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import { findCycles, loadWorkspaceGraph, parseWorkspaceMembers } from "./lib/cargo.mjs";
@@ -32,6 +34,15 @@ report.check(frontendEntry.target_task === null, "前端组合根已激活时 ta
 const indexHtml = readFileSync(join(repositoryRoot, "index.html"), "utf8").replaceAll("\r\n", "\n");
 report.check(indexHtml.includes(`src="/${frontendEntryOwner}"`), `index.html 未指向前端组合根：${frontendEntryOwner}`);
 
+const designTokens = contract.frontend?.design_tokens ?? {};
+report.check(Boolean(designTokens.source_record) && pathExists(designTokens.source_record), "当前设计token记录不存在");
+if (designTokens.source_record && pathExists(designTokens.source_record)) {
+  const snapshot = readJson(designTokens.source_record);
+  for (const [count, entries] of [["variable_count", "variables"], ["text_style_count", "texts"], ["effect_style_count", "effects"]]) {
+    report.check(Array.isArray(snapshot[entries]) && designTokens[count] === snapshot[entries].length, `设计token登记数量与批准记录不一致：${count}`);
+  }
+}
+
 const features = contract.frontend?.features ?? {};
 const featureEntries = Object.entries(features);
 const featureOwners = new Map();
@@ -44,17 +55,11 @@ for (const [featureName, feature] of featureEntries) {
 }
 report.check(featureEntries.length === contract.counts?.frontend_features, "前端 Feature 数量与 counts.frontend_features 不一致");
 
-const targetFeatureRoot = "src/features";
-function featureForPath(filePath) {
-  const normalized = normalizePath(filePath);
-  const currentOwner = featureOwners.get(normalized);
-  if (currentOwner) return { name: currentOwner, publicEntry: null };
-
-  if (!normalized.startsWith(`${targetFeatureRoot}/`)) return null;
-  const [, , featureName] = normalized.split("/");
-  if (!features[featureName]) return null;
-  const publicEntries = ["index.ts", "index.tsx", "index.js", "index.mjs"].map((entry) => `${targetFeatureRoot}/${featureName}/${entry}`);
-  return { name: featureName, publicEntry: publicEntries.includes(normalized) ? normalized : null };
+verifyFrontendFeatures(features);
+const frontendFeatureIndex = createFrontendFeatureIndex(features);
+const featureForPath = frontendFeatureIndex.identify;
+for (const [name, feature] of featureEntries) {
+  report.check(!feature.public_entry || pathExists(feature.public_entry), `Feature ${name} 公开出口不存在：${feature.public_entry}`);
 }
 
 const frontendTransitions = contract.frontend?.transitional_imports ?? [];
@@ -89,6 +94,7 @@ function isRegisteredFrontendTransition(importer, sourceFeature, targetFeature, 
 const frontendFiles = listFiles(["src"], { extensions: [".ts", ".tsx", ".js", ".jsx", ".mjs", ".cjs"] });
 for (const importer of frontendFiles) {
   const sourceFeature = featureForPath(importer);
+  report.check(!frontendFeatureIndex.isUnregistered(importer), `Feature 源码缺少实际 owner/public root 登记：${importer}`);
   if (!sourceFeature) continue;
   const source = readFileSync(join(repositoryRoot, importer), "utf8").replaceAll("\r\n", "\n");
 
@@ -96,9 +102,10 @@ for (const importer of frontendFiles) {
     const resolvedTarget = resolveRelativeImport(importer, specifier);
     if (!resolvedTarget) continue;
 
-    const targetFeature = featureForPath(resolvedTarget);
+    report.check(!frontendFeatureIndex.isUnregistered(resolvedTarget), `Feature 导入目标未登记：${importer} -> ${resolvedTarget}`);
+    const {targetFeature,privateCrossFeature} = inspectFrontendFeatureImport(frontendFeatureIndex, importer, resolvedTarget);
     if (targetFeature && targetFeature.name !== sourceFeature.name) {
-      if (!targetFeature.publicEntry && !isRegisteredFrontendTransition(importer, sourceFeature.name, targetFeature.name, resolvedTarget)) {
+      if (privateCrossFeature && !isRegisteredFrontendTransition(importer, sourceFeature.name, targetFeature.name, resolvedTarget)) {
         report.violation(`${importer} 直接导入 Feature ${targetFeature.name} 内部文件：${specifier} -> ${resolvedTarget}`);
       }
       continue;

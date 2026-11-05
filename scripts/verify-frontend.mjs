@@ -11,6 +11,7 @@ const nodeChecks = [
   "architecture/verifyStateOwnership.mjs",
   "architecture/verifyProtectedImports.mjs",
   "verify-domain-type-inventory.mjs",
+  "verify_database_baseline.mjs",
   "verify-browser-bootstrap.mjs",
   "verify-warning-center.mjs",
   "verify-tauri-bootstrap.mjs",

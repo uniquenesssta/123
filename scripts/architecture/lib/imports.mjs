@@ -1,3 +1,4 @@
+import { statSync } from "node:fs";
 import { dirname, extname, resolve } from "node:path";
 import {
   normalizePath,
@@ -49,7 +50,7 @@ export function resolveRelativeImport(importer, specifier) {
 
   for (const candidate of candidates) {
     const relativeCandidate = repositoryPath(candidate);
-    if (pathExists(relativeCandidate)) return normalizePath(relativeCandidate);
+    if (pathExists(relativeCandidate) && statSync(candidate).isFile()) return normalizePath(relativeCandidate);
   }
 
   return normalizePath(repositoryPath(unresolved));
