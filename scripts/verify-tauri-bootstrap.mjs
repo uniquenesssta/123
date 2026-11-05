@@ -15,6 +15,7 @@ const expectedFiles = [
   "command_registry.rs",
   "error.rs",
   "mod.rs",
+  "native_log_acceptance.rs",
   "state.rs",
 ];
 const actualFiles = readdirSync(bootstrapRoot, { withFileTypes: true })
@@ -49,7 +50,7 @@ const declaredModules = [...moduleRoot.matchAll(/^mod\s+([a-z_]+);$/gm)]
   .sort();
 check(
   JSON.stringify(declaredModules) ===
-    JSON.stringify(["application", "command_registry", "error", "state"]),
+    JSON.stringify(["application", "command_registry", "error", "native_log_acceptance", "state"]),
   `bootstrap/mod.rs 模块出口不正确：${declaredModules.join(", ")}`,
 );
 check(moduleRoot.includes("pub(crate) use state::AppState;"), "bootstrap 未公开唯一 AppState");
@@ -164,8 +165,8 @@ const platformSignatures = {
   record_issue: "pub fn record_issue(state: State<'_, AppState>, draft: IssueLogDraft) -> Result<IssueLogEntry, String>",
   record_runtime_operation: "pub fn record_runtime_operation(state: State<'_, AppState>, draft: RuntimeOperationDraft) -> Result<(), String>",
   list_issue_logs: "pub async fn list_issue_logs(state: State<'_, AppState>, limit: Option<u32>) -> Result<Vec<IssueLogEntry>, String>",
-  clear_issue_logs: "pub fn clear_issue_logs(state: State<'_, AppState>) -> Result<(), String>",
-  export_issue_logs: "pub fn export_issue_logs(state: State<'_, AppState>, output_path: String) -> Result<(), String>",
+  clear_issue_logs: "pub fn clear_issue_logs(state: State<'_, AppState>, expected_entries: Option<Vec<IssueLogEntry>>) -> Result<(), String>",
+  export_issue_logs: "pub fn export_issue_logs(state: State<'_, AppState>, output_path: String, expected_entries: Option<Vec<IssueLogEntry>>) -> Result<(), String>",
 };
 const signatureTokens = source => source.replace(/,\s*\)/g, ")").replace(/\s+/g, "");
 const platformGroup = commandContract.command_groups.find(group => group.module === "platform");
@@ -230,7 +231,7 @@ for (const file of ["mod.rs", "bootstrap/mod.rs", "runtime_operation/mod.rs"]) c
       builder.invoke_handler(tauri::generate_handler![${expectedCommands.map(name => `commands::${name},`).join("\n")}])
     }`;
   check(sameCode(registry, expectedRegistry), "R11-10 command_registry.rs 只能包含原同步泛型 Builder 注册函数与按原顺序明确列出的171命令，不得混入业务/状态/替代宏路由");
-  check(sameCode(library, `mod bootstrap; mod commands; mod config; mod file_store; mod issue_log; mod openai_profiles; mod runtime_log; mod workspace_state;
+  check(sameCode(library, `mod bootstrap; mod commands; mod config; mod diagnostic_redaction; mod file_store; mod issue_log; mod openai_profiles; mod runtime_log; mod workspace_state;
     #[cfg_attr(mobile, tauri::mobile_entry_point)] pub fn run() { bootstrap::run(); }`), "R11-10 lib.rs 只保留原模块与公开启动委托，不得恢复注册/状态或新增另一入口");
   check(sameCode(application, `use super::{command_registry, error, state};
     pub(crate) fn run() {
@@ -243,7 +244,11 @@ for (const file of ["mod.rs", "bootstrap/mod.rs", "runtime_operation/mod.rs"]) c
     const file = `${directory}/${entry.name}`;
     return entry.isDirectory() ? collect(file) : entry.isFile() && entry.name.endsWith(".rs") ? [file] : [];
   });
-  const desktopSources = collect("src-tauri/src").map(file => ({ file, code: tokens(read(file)).join(" ") }));
+  const nativeAcceptance = read("src-tauri/src/bootstrap/native_log_acceptance.rs");
+  check(moduleRoot.includes("#[cfg(all(test, windows, football_native_log_acceptance))]\nmod native_log_acceptance;"), "Windows GUI验收只能显式启用原lib test target，不能成为生产入口");
+  check(nativeAcceptance.includes("#[ignore") && nativeAcceptance.includes("FOOTBALL_NATIVE_LOG_ACCEPTANCE_ROOT") && nativeAcceptance.includes("command_registry::register(builder)") && !nativeAcceptance.includes("generate_handler!"), "原生验收必须隔离项目QA存储并复用唯一命令表");
+  check((nativeAcceptance.match(/command_registry::register\(/g) ?? []).length === 1, "原生验收只能接入一次原命令表");
+  const desktopSources = collect("src-tauri/src").filter(file => file !== "src-tauri/src/bootstrap/native_log_acceptance.rs").map(file => ({ file, code: tokens(read(file)).join(" ") }));
   const sites = pattern => desktopSources.flatMap(({ file, code }) => [...code.matchAll(pattern)].map(() => file));
   check(JSON.stringify(sites(/\btauri : : generate_handler !/g)) === JSON.stringify(["src-tauri/src/bootstrap/command_registry.rs"]), "R11-10 整个桌面源码只能存在一个 generate_handler! 所有者");
   check(JSON.stringify(sites(/\. invoke_handler \(/g)) === JSON.stringify(["src-tauri/src/bootstrap/command_registry.rs"]), "R11-10 整个桌面源码只能在原注册表安装一次 handler");

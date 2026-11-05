@@ -1,3 +1,4 @@
+import {loadTeamsProduction} from "./features/loadTeamsProduction.mjs";
 import {readProjectSource} from "./styles/projectSource.mjs";
 import {fileURLToPath as stylesheetFilePath} from "node:url";
 const stylesheetRoot=stylesheetFilePath(new URL("../",import.meta.url));
@@ -17,7 +18,7 @@ const read = file => readProjectSource(stylesheetRoot,resolve(root, file), "utf8
 const source = ["warning-dto/warningDto", "warning-store/warningStore"].map(file => read(`src/app/warnings/${file}.ts`)).join("\n")
   .replace(/^import .*?from ["'][^"']+["'];?\s*$/gm, "").replaceAll("export ", "");
 const runtime = ts.transpileModule(source + "\nglobalThis.warningModules = { WarningStore, safeWarningText, warningDateGroups };", { compilerOptions: { target: ts.ScriptTarget.ES2022, module: ts.ModuleKind.None } }).outputText;
-const context = vm.createContext({ Date, Object, Map, Set });
+const context = vm.createContext({ Date, Object, Map, Set, redactLogText:loadTeamsProduction(root)("src/platform/diagnostics/logSummary.ts").redactLogText });
 vm.runInContext(runtime, context);
 const { WarningStore, safeWarningText, warningDateGroups } = context.warningModules;
 let now = new Date("2026-10-24T23:59:00+08:00").getTime();

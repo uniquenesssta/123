@@ -1,3 +1,4 @@
+import {verifyLogsHierarchy} from "./features/verifyLogsHierarchy.mjs";
 import {verifyProfileHierarchy} from "./features/verifyProfileHierarchy.mjs";
 import {verifyAiWorkspaceHierarchy} from "./features/verifyAiWorkspaceHierarchy.mjs";
 import {verifyReleaseHierarchy} from "./features/verifyReleaseHierarchy.mjs";
@@ -24,7 +25,7 @@ const rules = ["src/features/rules/rulesView.ts", "src/features/rules/bindingVie
 const apiWorkspace = ["aiWorkspacePage","aiWorkspaceMessages"].map(name=>read(`src/features/ai-workspace/${name}.ts`)).join("\n");
 
 const database = read("src/features/database/databaseView.ts");
-const logs = read("src/pages/logs.ts");
+const logs = read("src/features/logs/logView.ts");
 const architecture = read("src/features/architecture/architectureView.ts");
 const styles = read("src/styles/moduleWorkspaces.css");
 const pkg = JSON.parse(read("package.json"));
@@ -68,9 +69,7 @@ await verifyProfileHierarchy(root);
 for (const id of ["database-overview", "database-connection", "database-statistics", "database-danger"]) {
   check(database.includes(`id:"${id}"`) && database.includes('id="${panel.id}"') && database.includes("data-navigation-panel"), `数据库页缺少任务定位目标：${id}`);
 }
-for (const id of ["issue-summary", "issue-processing", "issue-records"]) {
-  check(logs.includes(`{ id: "${id}"`) && logs.includes(`id="${id}"`), `问题日志页缺少任务定位目标：${id}`);
-}
+await verifyLogsHierarchy(root);
 for (const id of ["architecture-flow", "architecture-principles", "architecture-modules"]) {
   check(architecture.includes(`id:"${id}"`) && architecture.includes('id="${panel.id}"') && architecture.includes("data-navigation-panel"), `系统说明页缺少任务定位目标：${id}`);
 }

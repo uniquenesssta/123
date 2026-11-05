@@ -22,9 +22,9 @@ export class InvokeTrace {
       await this.adapter.runtime({ phase: draft.phase, operation: draft.operation, trace_id: draft.traceId, duration_ms: draft.durationMs, context: summarizeLogValue(draft.context) });
     } catch { /* Logging is best effort; retain the original command outcome. */ }
   }
-  async issue(command: CommandName, message: string): Promise<void> {
-    if (command === "record_issue" || command === "bootstrap") return;
-    try { await this.adapter.issue({ severity: "error", source: "backend", operation: command, user_message: redactLogText(message), technical_message: redactLogText(message) }); }
+  async issue(command: CommandName, message: string, traceId?:string): Promise<void> {
+    if (["record_issue","bootstrap","list_issue_logs","clear_issue_logs","export_issue_logs"].includes(command)) return;
+    try { await this.adapter.issue({ severity: "error", source: "backend", operation: command, user_message: redactLogText(message), technical_message: redactLogText(message), occurrence_key:traceId??null }); }
     catch { /* Preserve the original error, including when the log sink fails. */ }
   }
   request(command: CommandName, traceId: string): InvokeTraceLifecycle { return new InvokeTraceLifecycle(this, command, traceId); }

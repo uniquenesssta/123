@@ -405,6 +405,8 @@ export interface IssueLogDraft {
 }
 
 export interface IssueLogEntry {
+  /** Existing native trace / job-attempt identities; bounded to the retained window. */
+  occurrence_keys?: string[];
   id: string;
   severity: IssueSeverity;
   source: string;

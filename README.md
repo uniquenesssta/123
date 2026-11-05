@@ -1,12 +1,12 @@
 # 足球模型平台公开外壳
 
-## R15-07 配置、示例解析、凭据与连接测试（VERIFYING）
+## R15-12 问题日志与诊断关联（VERIFYING）
 
-按批准S14接入独立示例编辑、固定动作栏和安全草稿；解析后明确应用，保存/启用/密钥/连接状态分别判断。修复配置切换串线与过期测试写回，未知操作先核验；临时密钥不进入恢复模型。详[R15-07记录](docs/modular-rewrite/R15-ai-profiles-logs-ui/R15-07-profiles-parser-credentials-tests.md)。下一项R15-12，未启动。
+日志读取、详情、导出和清空迁入唯一LogsFeature；接入批准S16，区分空态/读取失败/未知操作，修复落盘失败、敏感信息脱敏与操作追踪丢失。详[R15-12记录](docs/modular-rewrite/R15-ai-profiles-logs-ui/R15-12-logs-diagnostics.md)。07自身42418cb5/CI41887780319、官方双包/startup已正式验收。本批自身CI及官方包另验，不轮询；下一项R16-01，未启动。
 
 ## R15-01 会话、草稿与请求全生命周期（DONE）
 
-接入批准S13常驻输入/独立滚动，按会话保存草稿和搜索，按原请求处理发送、取消、未知核验及归档；修复A/B/C乱序、刷新窗口串线与B草稿丢失。生产行为、完整挂载和Windows实际读取分层验证，真实API/取消/凭据及PG账本仍沿BA-10/11保留，不冒称Full。自身0f65d593/CI41857204136、官方双包/startup已验收，详[R15-01记录](docs/modular-rewrite/R15-ai-profiles-logs-ui/R15-01-session-draft-request-lifecycle.md)。用户已启动R15-07。
+接入批准S13常驻输入/独立滚动，按会话保存草稿和搜索，按原请求处理发送、取消、未知核验及归档；修复A/B/C乱序、刷新窗口串线与B草稿丢失。生产行为、完整挂载和Windows实际读取分层验证，真实API/取消/凭据及PG账本仍沿BA-10/11保留，不冒称Full。自身0f65d593/CI41857204136、官方双包/startup已验收，详[R15-01记录](docs/modular-rewrite/R15-ai-profiles-logs-ui/R15-01-session-draft-request-lifecycle.md)。本阶段最新进度见R15索引。
 
 ## R14-17 应用内验收与报告（DONE）
 

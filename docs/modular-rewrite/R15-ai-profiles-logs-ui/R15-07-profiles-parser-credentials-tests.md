@@ -1,6 +1,6 @@
 # R15-07 配置、示例解析、凭据与连接测试
 
-状态：VERIFYING。2026-11-05用户授权“收尾01开始07”，基线0f65d593664f70c7a0464e27e52f4dfee875d037；起始工作区干净，沿用rewrite/r15-ai-profiles-logs-ui，不新开分支。01自身CI41857204136/官方双包/startup正式DONE；详[01记录](R15-01-session-draft-request-lifecycle.md)。本批自身CI与官方包推送后单次核对，不轮询。下一主交付R15-12，未启动。
+状态：DONE。2026-11-05启动时基线0f65d593664f70c7a0464e27e52f4dfee875d037，起始工作区干净，沿用rewrite/r15-ai-profiles-logs-ui。01与本批07自身CI、官方双包及startup均已正式验收，07精确提交42418cb5/运行41887780319详末节收尾。BA-11真实外部边界保留。用户已授权启动R15-12。
 
 ## 实际归属与保留
 
@@ -60,3 +60,11 @@ BA-11真实用户Windows Credential Manager写入/替换/删除及权限失败/�
 最终补验：沿原隐藏字段语义，实际保存DTO强制api_workspace_web_search_mode=disabled，历史auto不能绕过，已补生产回归。同行密钥输入与32px按钮按实际中心对齐，浏览器核对输入400/标签500字重与几何。最终完整96步前端（23项流程、25项层级、36项挂载）、757项Rust及12项Windows原生/startup结果分别见validation.json；旧函数名与隐藏字段守卫迁移到真实owner/实际DTO，没有放宽禁联网或生命周期规则。
 
 frontend-complete.log保留几何断言失败：原断言比较输入内层与下拉外层的顶边，边框产生1px差异，但实际中心一致。最终改验中心差小于1px，并保留密钥同行中心、控件尺寸和400/500字重断言；完整96步重新运行通过。诊断坐标见layout-probe/geometry.json。
+
+## 2026-11-05正式收尾
+
+用户授权“收尾07开始12”，本次一次性核对42418cb555de577f50e1b25314e9b66183de4adc、rewrite/r15-ai-profiles-logs-ui、push及ci.yml：运行[41887780319](https://github.com/uniquenesssta/123/actions/runs/41887780319)，job126776786668，completed/success。此前文中“未启动12”描述是本批原交付时状态，现已由用户启动12。
+
+官方artifact13355059463，ZIP52,470,175字节，SHA256为9c509ad48ce8d8f919a3b03940b14236b790a5801cb6c44255184aaef2e5b30a，与官方digest一致；MSI18,063,360字节和NSIS15,694,461字节均核对名称、非零长度、文件头与SHA256。逐项值及官方文件保存在O:/Project/FOODBALL/logs/r15-07-ci-41887780319/acceptance.json。官方运行日志按原startup分析器通过：7条、0非法行、0运行错误。
+
+未在本机安装这两个包、未核验签名，不把官方打包或startup当Full。旧delivery已补formalAcceptance。原凭据与计费API未验项仍由BA-11/R17-06关闭。12的CI/安装包须使用12自己的提交，不能复用07结果。

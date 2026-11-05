@@ -177,7 +177,7 @@ export const api = {
     invoke<IssueLogEntry>("record_issue", { draft }),
   listIssueLogs: (limit = 500): Promise<IssueLogEntry[]> =>
     invoke("list_issue_logs", { limit }),
-  clearIssueLogs: (): Promise<void> => invoke("clear_issue_logs"),
+  clearIssueLogs: (expectedEntries?: IssueLogEntry[]): Promise<void> => invoke("clear_issue_logs", { expectedEntries:expectedEntries??null }),
   chooseIssueLogExportFile: async (
     defaultPath: string,
   ): Promise<string | null> => {
@@ -186,8 +186,8 @@ export const api = {
       filters: [{ name: "问题日志报告", extensions: ["txt"] }],
     });
   },
-  exportIssueLogs: (outputPath: string): Promise<void> =>
-    invoke("export_issue_logs", { outputPath }),
+  exportIssueLogs: (outputPath: string,expectedEntries?:IssueLogEntry[]): Promise<void> =>
+    invoke("export_issue_logs", { outputPath,expectedEntries:expectedEntries??null }),
   configureDatabase: (options: DatabaseOptions): Promise<DatabaseHealth> =>
     invoke("configure_database", { options }),
   disconnectDatabase: (): Promise<void> => invoke("disconnect_database"),

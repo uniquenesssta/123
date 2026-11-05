@@ -951,8 +951,22 @@
       ],
       "transition": null,
       "migration_task": "R15-07"
+    },
+    {
+      "id": "feature.logs",
+      "owner": "src/features/logs/LogsFeature.ts::LogsFeature",
+      "scope": "device-local issue snapshots, details and export/clear workflow; diagnostics remain platform-owned",
+      "writers": [
+        "src/features/logs/**"
+      ],
+      "forbidden": [
+        "src/main.ts issueLogs state",
+        "src/pages/**"
+      ],
+      "transition": null,
+      "migration_task": "R15-12"
     }
   ],
-  "count": 66,
-  "last_updated_task": "R15-07"
+  "count": 67,
+  "last_updated_task": "R15-12"
 }

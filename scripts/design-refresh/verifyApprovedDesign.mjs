@@ -1,3 +1,4 @@
+import {verifyLogsBrowser} from "../features/verifyLogsBrowser.mjs";
 import {verifyProfileBrowser} from "../features/verifyProfileBrowser.mjs";
 import {verifyAiWorkspaceBrowser} from "../features/verifyAiWorkspaceBrowser.mjs";
 import {verifyReleaseBrowser} from "../features/verifyReleaseBrowser.mjs";
@@ -186,3 +187,5 @@ await verifyReleaseBrowser(root,join(directory,"release-mounted"));
 await verifyAiWorkspaceBrowser(root,join(directory,"ai-workspace-mounted"));
 
 await verifyProfileBrowser(root,join(directory,"profiles-mounted"));
+
+await verifyLogsBrowser(root,join(directory,"logs-mounted"));

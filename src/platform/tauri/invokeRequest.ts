@@ -29,7 +29,7 @@ export class InvokeTransport {
         const message = invokeErrorMessage(error);
         await trace.failed(error);
         request.assertCurrent();
-        await this.trace.issue(command, message);
+        await this.trace.issue(command, message, request.id);
         request.assertCurrent();
         throw new LoggedInvokeError(message, error);
       }

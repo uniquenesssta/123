@@ -20,7 +20,7 @@
 
 ## 状态与依赖
 
-当前 **R15-01 DONE（0f65d593自身CI41857204136/官方双包/startup已验收）；R15-07 VERIFYING（覆盖原07～11，自身CI/包另验）；R15-12仍BLOCKED / 未实施**。R14适用出口与本批启动授权已核对；后续批次不因此自动启动。下表顺序是默认交付顺序，必要时在已授权阶段内按真实依赖拆出更小批次并说明原因，不以任务数量或文件数为目标。
+当前 **R15-01 DONE（0f65d593自身CI41857204136/官方双包/startup已验收）；R15-07 DONE（42418cb5自身CI41887780319/官方双包/startup已验收）；R15-12 VERIFYING（覆盖原12～13，见实施记录，自身CI/包另验）**。R14适用出口与本批启动授权已核对；后续批次不因此自动启动。下表顺序是默认交付顺序，必要时在已授权阶段内按真实依赖拆出更小批次并说明原因，不以任务数量或文件数为目标。
 
 | 主交付 ID | 交付批次 | 前置 |
 |---|---|---|
@@ -116,7 +116,7 @@ if ($LASTEXITCODE -ne 0) { throw 'R15-01: verify-api-compatible-transport failed
 ### 审计后的实际交付范围
 
 - **直接复用并核销重复建设：** S14设计记录已存在；配置目录/编辑、解析器、保存/删除密钥/激活及测试API已接通。当前解析器的序号+DOM+文本防护直接保留并复验，不再重复修复。
-- **本批必须完成：** 把11行内联API示例改为批准的次级示例编辑状态，主表单/侧栏/底部动作同状态接入；编辑、异步测试回填与profile身份绑定，明确元数据/凭据部分失败。
+- **本批必须完成：** 把11行内联API示例改为批准的页内次级示例编辑状态，主表单/侧栏/底部动作同状态接入；编辑、异步测试回填与profile身份绑定，明确元数据/凭据部分失败。
 - **增量验收：** R15-07-D1：解析中改文本/切配置不覆盖新草稿，关闭示例后焦点回入口。D2：测试A慢后切B，结果只归A；取消/删除密钥不假成功。D3：同已有配置/新建/无密钥/测试中/失败状态验证主动作可见，真实凭据与API分列。
 
 覆盖原节点：R15-07、R15-08、R15-09、R15-10、R15-11。
@@ -253,18 +253,18 @@ if ($LASTEXITCODE -ne 0) { throw 'R15-12: verify-api-workspace failed' }
 | 原节点 | 当前主交付 | 处理方式 |
 |---|---|---|
 | R15-01 AI Session Directory | R15-01 | 主交付 |
-| R15-02 Conversation | R15-01 | 合并验收项（非 DONE） |
-| R15-03 Composer | R15-01 | 合并验收项（非 DONE） |
-| R15-04 Pending Request | R15-01 | 合并验收项（非 DONE） |
-| R15-05 Request Cancellation | R15-01 | 合并验收项（非 DONE） |
-| R15-06 Context Picker | R15-01 | 合并验收项（非 DONE） |
+| R15-02 Conversation | R15-01 | 随01批DONE，逐项证据见01记录 |
+| R15-03 Composer | R15-01 | 随01批DONE，逐项证据见01记录 |
+| R15-04 Pending Request | R15-01 | 随01批DONE，逐项证据见01记录 |
+| R15-05 Request Cancellation | R15-01 | 随01批DONE，逐项证据见01记录 |
+| R15-06 Context Picker | R15-01 | 随01批DONE，逐项证据见01记录 |
 | R15-07 OpenAI Profile Directory | R15-07 | 主交付 |
-| R15-08 OpenAI Profile Editor | R15-07 | 合并验收项（非 DONE） |
-| R15-09 API Example Parser | R15-07 | 合并验收项（非 DONE） |
-| R15-10 Credential Actions | R15-07 | 合并验收项（非 DONE） |
-| R15-11 Profile Test | R15-07 | 合并验收项（非 DONE） |
+| R15-08 OpenAI Profile Editor | R15-07 | 随07批DONE，逐项证据见07记录 |
+| R15-09 API Example Parser | R15-07 | 随07批DONE，逐项证据见07记录 |
+| R15-10 Credential Actions | R15-07 | 随07批DONE，逐项证据见07记录 |
+| R15-11 Profile Test | R15-07 | 随07批DONE，逐项证据见07记录 |
 | R15-12 Logs | R15-12 | 主交付 |
-| R15-13 Diagnostics Bridge | R15-12 | 合并验收项（非 DONE） |
+| R15-13 Diagnostics Bridge | R15-12 | 随12批VERIFYING，自身CI/包待验 |
 
 ## 记录位置
 
@@ -288,7 +288,7 @@ if ($LASTEXITCODE -ne 0) { throw 'R15-12: verify-api-workspace failed' }
 | R15 节点 | Figma 输入 | 本次核对状态 / 接入要求 |
 |---|---|---|
 | R15-01～06 | S13 `api_workspace`：`FIGMA_SCREEN_API_WORKSPACE.md`、`FIGMA_SCREEN_API_WORKSPACE_STATE.json`；通用结构见 `FIGMA_AI_CHAT.md` | 视觉、代表性状态与有限原型已验收；接入真实会话、消息、草稿、请求/取消和只读上下文 |
-| R15-07～11 | S14 `openai`：`FIGMA_SCREEN_OPENAI.md`及 `_STATE.json`；主Frame `647:166715` | 设计记录已存在；补次级解析弹窗、表单/侧栏/动作布局，复用现有解析防过期响应及真实配置API |
+| R15-07～11 | S14 `openai`：`FIGMA_SCREEN_OPENAI.md`及 `_STATE.json`；主Frame `647:166715` | 设计记录已存在；补批准的页内次级示例编辑、表单/侧栏/动作布局，复用现有解析防过期响应及真实配置API |
 | R15-12～13 | S16 `logs`：`FIGMA_SCREEN_LOGS.md`及 `_STATE.json`；主Frame `683:186758` | 设计记录已存在；补同有日志状态验证，保留现有聚合、导出、清空及诊断链 |
 
 S14/S16旧“未开始”判断已撤销；当前有独立设计记录及生产实现，尚缺本批同状态/完整挂载/真实链路证据。记录存在不等于运行验收通过，已有解析器防护不重复开发。
@@ -298,3 +298,5 @@ S13 的预置 A/B/NEW 状态用于说明请求身份和草稿隔离，真实实�
 配置已保存、密钥存在、配置测试通过与某次真实请求成功分别表达；已有会话不能因配置缺失而静默换绑。密钥不进入普通 UI 状态、截图、日志或恢复记录。Windows 验证复用原入口，分别记录代表性 UI/模拟契约结果与真实请求/持久化结果；Figma 设计验收不代表网络、凭据或数据库已经验证。
 
 2026-11-05的S14实际Frame复核：Example654:174172/Chat654:177329是独立页内编辑状态；原卡“次级弹窗”系审计误记。按857af9f35df624e76ec1c83ed2256a92918b9288批准记录及实际Figma实现，不新造弹窗或修改既有设计。保存/删除/清密钥仍复用批准的最终操作确认。
+
+2026-11-05：07已按精确提交及官方产物收尾；用户授权12，完成唯一日志Feature、S16同状态接入、持久化/脱敏/trace及真实Windows导出清空补验。详[R15-12记录](../modular-rewrite/R15-ai-profiles-logs-ui/R15-12-logs-diagnostics.md)和[阶段出口](../modular-rewrite/R15-ai-profiles-logs-ui/R15-stage-exit.md)。12自身CI/包待验，R16-01未启动；BA-10/11仍按R17-06真实环境安排。

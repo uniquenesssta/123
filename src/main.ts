@@ -48,7 +48,8 @@ import { analyticsPage } from "./pages/analytics";
 import {AiWorkspaceFeature,AiWorkspaceActions,AiWorkspaceControls,aiWorkspaceStorage,aiWorkspacePage} from "./features/ai-workspace";
 import { lineupPresetsPage } from "./pages/lineupPresets";
 import { lineupsPage } from "./pages/lineups";
-import { logsPage } from "./pages/logs";
+import {LogsFeature,LogActions,logsPage,logStorage} from "./features/logs";
+import {createClientIssueRecorder,userFacingError} from "./platform/diagnostics";
 import {ProfilesFeature,ProfileActions,ProfileControls,profilePage,profileStorage} from "./features/openai-profiles";
 import {ReleaseDetails} from "./features/release/releaseDetails";
 import {ReleaseControls} from "./features/release/releaseControls";
@@ -65,8 +66,6 @@ import type {
 CoachListItem,
 CompetitionKind,
 FormationRecord,
-IssueLogEntry,
-IssueSeverity,
 LineupSnapshotType,
 MatchLineupChain,
 Page,
@@ -92,6 +91,8 @@ const PLAYER_QUERY_KEY = preferenceKey("player-query");
 const PLAYER_NAV_CONTEXT_KEY = preferenceKey("player-navigation-context");
 
 let app: HTMLDivElement;
+
+const recordClientIssue=createClientIssueRecorder({wasLogged:issueWasLogged,record:draft=>api.recordIssue(draft),critical:(operation,message)=>warningCenter?.record({key:'critical:'+operation,source:'客户端',severity:'critical',title:operation,message,target:'logs'})});
 
 const session = new AppSession({
   loadBootstrap: () => api.bootstrap(),
@@ -362,7 +363,8 @@ interface WorkflowContinuation {
 let workflowContinuation: WorkflowContinuation | null = null;
 
 
-let issueLogs: IssueLogEntry[] = [];
+const logsFeature=new LogsFeature({api,storage:logStorage(localPreferences,preferenceKey("logs-view-recovery")),view:()=>{const page=navigation.page;return()=>page===navigation.page&&!browserLifecycleController.signal.aborted;},busy:runBusy,changed:()=>{if(renderedPage==="logs"&&session.bootstrap&&!browserLifecycleController.signal.aborted)render({preserveForm:true});}});
+const logActions=new LogActions(logsFeature,{confirm:(...args)=>showConfirmation(...args),show:(...args)=>showModal(...args)});
 const workspaceState = new WorkspaceCoordinator<Page>({
   read: () => api.readWorkspaceState(),
   save: (document) => api.saveWorkspaceState(document),
@@ -566,7 +568,7 @@ function render(options: RenderOptions = {}): void {
       content = runsPage(session.bootstrap,runsFeature.view);
       break;
     case "logs":
-      content = logsPage(issueLogs);
+      content = logsPage(logsFeature.state);
       break;
     case "openai":
       content = profilePage(profilesFeature);
@@ -777,54 +779,6 @@ function toast(
   kind: "normal" | "success" | "error" = "normal",
 ): void {
   warningCenter?.notify(message, kind === "error" ? "danger" : kind === "success" ? "success" : "info", "客户端");
-}
-
-function userFacingError(error: unknown): string {
-  const message = error instanceof Error ? error.message : String(error);
-  if (
-    /column .* does not exist|relation .* does not exist|数据库迁移失败/i.test(
-      message,
-    )
-  ) {
-    return "数据库结构版本与客户端不一致。请重启客户端完成自动升级后重试，现有数据不会被删除。";
-  }
-  if (message.startsWith("PostgreSQL 连接或查询失败")) {
-    return "数据库操作失败，请检查数据服务连接状态后重试。";
-  }
-  return message;
-}
-
-function technicalErrorMessage(error: unknown): string {
-  return error instanceof Error ? error.message : String(error);
-}
-
-function isUserGuidanceMessage(message: string): boolean {
-  return /^(请选择|请先|请填写|请输入|请至少|当前没有可|没有可用于|尚未选择)/.test(
-    message.trim(),
-  );
-}
-
-function recordClientIssue(
-  error: unknown,
-  operation: string,
-  severity: IssueSeverity = "error",
-): void {
-  if (severity === "critical") warningCenter?.record({ key: `critical:${operation}`, source: "客户端", severity, title: operation, message: userFacingError(error), target: "logs" });
-  if (issueWasLogged(error)) return;
-  const technicalMessage = technicalErrorMessage(error);
-  if (severity !== "critical" && isUserGuidanceMessage(technicalMessage))
-    return;
-  void api
-    .recordIssue({
-      severity,
-      source: severity === "critical" ? "global" : "frontend",
-      operation,
-      user_message: userFacingError(error),
-      technical_message: technicalMessage,
-    })
-    .catch(() => {
-      // 问题日志不可用时保留原始界面错误，避免二次异常覆盖根因。
-    });
 }
 
 async function runBusy<T>(operation: () => Promise<T>): Promise<T> {
@@ -1053,11 +1007,10 @@ async function loadLineups(): Promise<void> {
 async function loadAnalysisCenter():Promise<void>{if(session.bootstrap?.data.database_configured)await Promise.all([analyticsFeature.refresh(),postmatchFeature.refresh()]);}
 
 
-async function loadIssueLogs(): Promise<void> {
-  issueLogs = await api.listIssueLogs(500);
-}
+
 
 async function navigateTo(nextPage: Page): Promise<void> {
+  logsFeature.navigationChanged();
   aiWorkspaceFeature.navigationChanged();
   profilesFeature.navigationChanged();profileControls.navigationChanged();
   workbooksFeature.changedCategory();
@@ -1092,8 +1045,7 @@ async function loadNavigationPage(request: NavigationRequest): Promise<void> {
   // Read-only Features consume Session/current static explanation; no page-owned loading state.
   if (nextPage === "dashboard" || nextPage === "architecture") return;
   if (nextPage === "logs") {
-    const logs = await api.listIssueLogs(500);
-    if (navigation.isCurrent(request)) issueLogs = logs;
+    await logsFeature.refresh(request.isCurrent);
     return;
   }
   if (nextPage === "openai") {
@@ -1473,6 +1425,7 @@ async function handleAction(
   if (shellAction === true || (shellAction && await shellAction)) return;
   if (action.includes("api-workspace") && await aiWorkspaceActions.handle(button)) return;
   if(action.includes("openai")&&await profileActions.handle(button))return;
+  if((action.includes("issue-")||action.startsWith("set-logs")||action==="issue-log-scope")&&await logActions.handle(button))return;
   switch (action) {
     case "toggle-workspace-pane":
       toggleWorkspacePane(button.dataset.pane === "inspector" ? "inspector" : "module-sidebar");
@@ -1596,41 +1549,6 @@ async function handleAction(
       break;
     case "set-players-workspace-mode":
       setWorkspaceMode("players", (button.dataset.mode ?? "detail") as WorkspaceLayoutMode);
-      break;
-    case "refresh-issue-logs":
-      await runBusy(loadIssueLogs);
-      render();
-      break;
-    case "export-issue-logs": {
-      const outputPath = await api.chooseIssueLogExportFile(
-        "足球赛事模型平台_问题日志报告.txt",
-      );
-      if (!outputPath) break;
-      await runBusy(() => api.exportIssueLogs(outputPath));
-      toast(`问题日志已导出：${outputPath}`, "success");
-      break;
-    }
-    case "request-clear-issue-logs":
-      showConfirmation(
-        "清空问题日志",
-        "清空后无法在客户端恢复。该操作只删除问题日志，不影响比赛、球员、模型和数据库业务数据。",
-        [
-          ["独立问题", String(issueLogs.length)],
-          [
-            "总发生次数",
-            String(
-              issueLogs.reduce((sum, item) => sum + item.occurrence_count, 0),
-            ),
-          ],
-        ],
-        "确认清空",
-        async () => {
-          await runBusy(() => api.clearIssueLogs());
-          issueLogs = [];
-          render();
-          toast("问题日志已清空", "success");
-        },
-      );
       break;
     case "connect-database":
       await databaseFeature.connect(app);
@@ -2475,7 +2393,7 @@ function activatePage(targetPage: Page): void {
   const navigationTraceId = recordUiOperation("navigation", `page:${targetPage}`, { fromPage: navigation.page, toPage: targetPage });
   void navigateTo(targetPage).catch((error: unknown) => {
     recordUiOperationFailure(`page:${targetPage}`, error, navigationTraceId, { fromPage: navigation.page, toPage: targetPage });
-    recordClientIssue(error, `打开页面：${pageTitle(targetPage)}`);
+    recordClientIssue(error, `打开页面：${pageTitle(targetPage)}`,"error",navigationTraceId);
     toast(userFacingError(error), "error");
   });
 }
@@ -2487,7 +2405,7 @@ function dispatchAction(action: string, actionButton: HTMLElement): void {
   });
   void handleAction(action, actionButton).catch((error: unknown) => {
     recordUiOperationFailure(`action:${action}`, error, actionTraceId, { page: navigation.page });
-    recordClientIssue(error, `${pageTitle(navigation.page)} / ${action}`);
+    recordClientIssue(error, `${pageTitle(navigation.page)} / ${action}`,"error",actionTraceId);
     toast(userFacingError(error), "error");
   });
 }
@@ -2923,7 +2841,7 @@ export function createBrowserApplicationModule(
   playersFeature.stop();
     reviewControls.destroy();postmatchControls.destroy();candidateControls.destroy();releaseControls.destroy();
     session.stop();
-    profilesFeature.stop();profileControls.stop();
+    profilesFeature.stop();profileControls.stop();logsFeature.stop();
     aiWorkspaceFeature.stop();aiWorkspaceControls.stop();
     navigation.destroy();
     modal.reset();releaseDetails.destroy();

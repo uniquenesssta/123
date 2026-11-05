@@ -1,6 +1,7 @@
 mod bootstrap;
 mod commands;
 mod config;
+mod diagnostic_redaction;
 mod file_store;
 mod issue_log;
 mod openai_profiles;

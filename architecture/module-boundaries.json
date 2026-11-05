@@ -139,8 +139,9 @@
         "public_entry": "src/features/lineups/index.ts"
       },
       "logs": {
-        "owner": "src/pages/logs.ts",
-        "route": "logs"
+        "owner": "src/features/logs/LogsFeature.ts",
+        "route": "logs",
+        "public_entry": "src/features/logs/index.ts"
       },
       "openai": {
         "owner": "src/features/openai-profiles/ProfilesFeature.ts",
@@ -538,5 +539,5 @@
     "commands": 171
   },
   "transitional_edges": [],
-  "last_updated_task": "R15-07"
+  "last_updated_task": "R15-12"
 }

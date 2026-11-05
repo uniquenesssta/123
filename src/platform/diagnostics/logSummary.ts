@@ -6,10 +6,12 @@ const sensitiveLogKey = (key: string): boolean => /authorization|api[_-]?key|acc
 const contentLogKey = (key: string): boolean => /prompt|message|content|body|schema|api[_-]?example|encrypted[_-]?content/i.test(key);
 
 export function redactLogText(value: string): string {
-  return value.replace(/((?:postgres(?:ql)?|https?):\/\/)[^\s/@]+(?::[^\s/@]*)?@/gi, "$1[REDACTED]@")
-    .replace(/\bBearer\s+[^\s,;"'<>]+/gi, "Bearer [REDACTED]")
+  return value.replace(/((?:postgres(?:ql)?|https?):\/\/[^\s"'<>),;?#]+)[?#][^\s"'<>),;]*/gi, "$1?[REDACTED]").replace(/([\\/]Users[\\/])[^\\/\s"']+/gi,"$1[REDACTED]").replace(/((?:postgres(?:ql)?|https?):\/\/)[^\s/@]+(?::[^\s/@]*)?@/gi, "$1[REDACTED]@")
+    .replace(/((?:prompt|messages|content|body|schema|api[_-]?example|encrypted_content|cookie|set-cookie)["']?\s*[:=]\s*)("(?:\\.|[^"\\])*"|'(?:\\.|[^'\\])*'|[^\r\n]+)/gi,"$1[REDACTED]")
+    .replace(/((?:authorization|proxy-authorization)["']?\s*[:=]\s*["']?)(?:(?:Bearer|Basic)\s+)?(?:\[REDACTED\]|[^\s,;"'}<>]+)/gi,"$1[REDACTED]")
+    .replace(/\b(Bearer|Basic)\s+[^\s,;"'<>]+/gi, "$1 [REDACTED]")
     .replace(/\bsk-[a-z0-9_-]{8,}/gi, "[REDACTED]")
-    .replace(/((?:api[_-]?key|access[_-]?token|refresh[_-]?token|password|secret|credential|token)["']?\s*[:=]\s*["']?)[^\s,;"'}]+/gi, "$1[REDACTED]");
+    .replace(/((?:api[_-]?key|access[_-]?token|refresh[_-]?token|password|secret|credential|token)["']?\s*[:=]\s*)("(?:\\.|[^"\\])*"|'(?:\\.|[^'\\])*'|\[REDACTED\]|[^\s,;"'}\]]+)/gi, "$1[REDACTED]");
 }
 
 /** Bounded, non-throwing log projection; business arguments/results are never mutated. */

@@ -109,7 +109,13 @@ impl RuntimeLogStore {
     ) -> Result<(), String> {
         let normalized_level = normalize_level(level);
         let sanitized_details = sanitize_value(details);
-        let fingerprint = event_fingerprint(normalized_level, subsystem, event, &sanitized_details);
+        let fingerprint = event_fingerprint(
+            normalized_level,
+            subsystem,
+            event,
+            trace_id,
+            &sanitized_details,
+        );
         let now = Utc::now();
         let now_text = now.to_rfc3339_opts(SecondsFormat::Millis, true);
         let now_instant = Instant::now();
@@ -447,11 +453,22 @@ fn should_deduplicate(level: &str, event: &str) -> bool {
         )
 }
 
-fn event_fingerprint(level: &str, subsystem: &str, event: &str, details: &Value) -> u64 {
+fn event_fingerprint(
+    level: &str,
+    subsystem: &str,
+    event: &str,
+    trace_id: Option<&str>,
+    details: &Value,
+) -> u64 {
     let mut hasher = DefaultHasher::new();
     level.hash(&mut hasher);
     subsystem.hash(&mut hasher);
     event.hash(&mut hasher);
+    // Separate issue occurrences must remain traceable before a summary is flushed.
+    // Repeated delivery of the same occurrence still shares its duplicate bucket.
+    if event == "issue_recorded" {
+        trace_id.hash(&mut hasher);
+    }
     let normalized = normalize_for_fingerprint(details);
     serde_json::to_vec(&normalized)
         .unwrap_or_default()
@@ -524,25 +541,10 @@ fn sanitize_value(value: Value) -> Value {
 }
 
 fn sensitive_key(key: &str) -> bool {
-    matches!(
-        key.trim().to_ascii_lowercase().as_str(),
-        "authorization"
-            | "api_key"
-            | "apikey"
-            | "access_token"
-            | "refresh_token"
-            | "password"
-            | "secret"
-            | "credential"
-            | "credentials"
-    )
+    crate::diagnostic_redaction::sensitive_key(key)
 }
-
 fn sanitize_string(value: &str) -> String {
-    let mut output = value.to_string();
-    redact_url_passwords(&mut output, "postgres://");
-    redact_url_passwords(&mut output, "postgresql://");
-    redact_bearer_tokens(&mut output);
+    let output = crate::diagnostic_redaction::redact_text(value);
     let char_count = output.chars().count();
     if char_count > MAX_STRING_CHARS {
         let mut truncated = output.chars().take(MAX_STRING_CHARS).collect::<String>();
@@ -550,43 +552,6 @@ fn sanitize_string(value: &str) -> String {
         truncated
     } else {
         output
-    }
-}
-
-fn redact_url_passwords(output: &mut String, scheme: &str) {
-    let mut search_from = 0usize;
-    while let Some(relative_start) = output[search_from..].find(scheme) {
-        let start = search_from + relative_start + scheme.len();
-        let Some(relative_at) = output[start..].find('@') else {
-            break;
-        };
-        let at = start + relative_at;
-        let Some(relative_colon) = output[start..at].find(':') else {
-            search_from = at + 1;
-            continue;
-        };
-        let password_start = start + relative_colon + 1;
-        output.replace_range(password_start..at, "***");
-        search_from = password_start + 3;
-    }
-}
-
-fn redact_bearer_tokens(output: &mut String) {
-    for prefix in ["Bearer ", "bearer "] {
-        let mut search_from = 0usize;
-        while let Some(relative_start) = output[search_from..].find(prefix) {
-            let token_start = search_from + relative_start + prefix.len();
-            let token_end = output[token_start..]
-                .find(|ch: char| ch.is_whitespace() || matches!(ch, '"' | '\'' | ',' | '}'))
-                .map(|offset| token_start + offset)
-                .unwrap_or(output.len());
-            if token_end > token_start {
-                output.replace_range(token_start..token_end, "[REDACTED]");
-                search_from = token_start + "[REDACTED]".len();
-            } else {
-                break;
-            }
-        }
     }
 }
 
@@ -613,7 +578,7 @@ pub(crate) mod tests {
         }));
         assert_eq!(value["api_key"], "[REDACTED]");
         assert_eq!(value["max_output_tokens"], 1024);
-        assert_eq!(value["database_url"], "postgres://user:***@localhost/db");
+        assert_eq!(value["database_url"], "postgres://[REDACTED]@localhost/db");
         assert_eq!(value["header"], "Bearer [REDACTED]");
     }
 
@@ -673,6 +638,48 @@ pub(crate) mod tests {
         assert_eq!(entries.len(), 3);
         assert_eq!(entries[2]["event"], "duplicate_events_suppressed");
         assert_eq!(entries[2]["details"]["suppressed_count"], 2);
+    }
+
+    #[test]
+    fn issue_occurrences_preserve_each_trace_without_repeating_the_same_attempt() {
+        let directory = tempdir().expect("temp directory");
+        let path = directory.path().join("runtime.jsonl");
+        let store = test_store(path.clone());
+        for trace in ["attempt-a", "attempt-a", "attempt-b", "attempt-c"] {
+            store
+                .record(
+                    "warning",
+                    "issue_log",
+                    "issue_recorded",
+                    Some(trace),
+                    json!({"issue_id": "same-issue", "operation": "same-operation"}),
+                )
+                .expect("record issue occurrence");
+        }
+        let entries = fs::read_to_string(&path)
+            .expect("read active log")
+            .lines()
+            .map(|line| serde_json::from_str::<Value>(line).expect("valid JSONL"))
+            .collect::<Vec<_>>();
+        assert_eq!(entries.len(), 3);
+        for trace in ["attempt-a", "attempt-b", "attempt-c"] {
+            assert_eq!(
+                entries
+                    .iter()
+                    .filter(|entry| entry["trace_id"] == trace)
+                    .count(),
+                1
+            );
+        }
+        drop(store);
+        let entries = fs::read_to_string(path)
+            .expect("read flushed log")
+            .lines()
+            .map(|line| serde_json::from_str::<Value>(line).expect("valid JSONL"))
+            .collect::<Vec<_>>();
+        assert_eq!(entries.len(), 4);
+        assert_eq!(entries[3]["details"]["suppressed_count"], 1);
+        assert_eq!(entries[3]["trace_id"], "attempt-a");
     }
 
     #[test]

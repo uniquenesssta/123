@@ -1,3 +1,4 @@
+import {verifyLogsWorkflow} from "./features/verifyLogsWorkflow.mjs";
 import { readFileSync } from "node:fs";
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -7,6 +8,7 @@ import { verifyTransportBehavior } from "./tauri/verifyTransportBehavior.mjs";
 import { readTransportSources } from "./tauri/transportSources.mjs";
 const root = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const failures = [];
+await verifyLogsWorkflow(root);
 try { await verifyPlatformBehavior(root); } catch (error) { failures.push(`R12-09 Platform: ${error.stack ?? error}`); }
 try { await verifyTransportBehavior(root); } catch (error) { failures.push(`R12-08 Transport: ${error.stack ?? error}`); }
 const assert = (condition, message) => { if (!condition) failures.push(message); };
@@ -15,7 +17,7 @@ const json = (path) => JSON.parse(text(path));
 const slice = (source, start, end) => { const a = source.indexOf(start); const b = source.indexOf(end, a); return a < 0 ? "" : b < 0 ? source.slice(a) : source.slice(a, b); };
 const contract = json("contracts/api-runtime-diagnostics-contract.json");
 const packageJson = json("package.json");
-const runtime = text("src-tauri/src/runtime_log.rs");
+const runtime = text("src-tauri/src/runtime_log.rs")+"\n"+text("src-tauri/src/diagnostic_redaction.rs");
 const operationCommand = [text("src-tauri/src/commands/platform/runtime_operation/command.rs"), text("src-tauri/src/commands/platform/runtime_operation/validation.rs")].join("\n");
 const client = [text("src/api/client.ts"), ...readTransportSources(root).map(entry => entry.text)].join("\n");
 const main = text("src/main.ts");

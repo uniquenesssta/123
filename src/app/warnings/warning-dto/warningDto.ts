@@ -1,3 +1,4 @@
+import {redactLogText} from "../../../platform/diagnostics";
 /** Application warnings are presentation DTOs; they do not replace backend issues or readiness gates. */
 export type WarningSeverity = "warning" | "error" | "critical";
 export type FeedbackTone = "info" | "success" | "warning" | "danger";
@@ -32,11 +33,8 @@ export interface FeedbackNotice {
 
 /** Only a bounded user-facing summary enters the center; never raw credentials or a stack trace. */
 export function safeWarningText(value: string): string {
-  return value
+  return redactLogText(value)
     .replace(/\b(?:postgres(?:ql)?|https?):\/\/[^\s"'<>]+/gi, "[连接地址已隐藏]")
-    .replace(/\bBearer\s+[^\s,;]+/gi, "Bearer [已隐藏]")
-    .replace(/["']?\b(api[-_ ]?key|authorization|password|token|secret)["']?\s*[:=]\s*(?:"[^"]*"|'[^']*'|[^\s,;]+)/gi, "$1=[已隐藏]")
-    .replace(/\bsk-(?:proj-)?[A-Za-z0-9_-]{8,}\b/g, "[API key 已隐藏]")
     .replace(/\r?\n\s*at\s+[^\n]*/g, "")
     .replace(/[\u0000-\u0008\u000b\u000c\u000e-\u001f]/g, "")
     .trim().slice(0, 2000);
