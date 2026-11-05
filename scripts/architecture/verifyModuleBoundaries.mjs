@@ -1,7 +1,5 @@
-import ts from "typescript";
+import { ensureNodeDependencies } from "../ensure-node-dependencies.mjs";
 import { verifyCargoDependencies } from "./lib/verifyCargoDependencies.mjs";
-import { frontendRuntimeGraph, runtimeGraphViolations } from "./lib/frontendRuntimeGraph.mjs";
-import { verifyFrontendRuntimeGraph } from "./lib/verifyFrontendRuntimeGraph.mjs";
 import {createFrontendFeatureIndex,inspectFrontendFeatureImport} from "./lib/frontendFeatures.mjs";
 import {verifyFrontendFeatures} from "./lib/verifyFrontendFeatures.mjs";
 import { readFileSync } from "node:fs";
@@ -18,6 +16,12 @@ import {
   repositoryRoot,
 } from "./lib/repository.mjs";
 import { VerificationReport } from "./lib/report.mjs";
+
+// This gate also runs before Windows acceptance prepares a fresh checkout.
+ensureNodeDependencies();
+const { default: ts } = await import("typescript");
+const { frontendRuntimeGraph, runtimeGraphViolations } = await import("./lib/frontendRuntimeGraph.mjs");
+const { verifyFrontendRuntimeGraph } = await import("./lib/verifyFrontendRuntimeGraph.mjs");
 
 const report = new VerificationReport("模块边界验证");
 const contract = readJson("architecture/module-boundaries.json");

@@ -47,6 +47,16 @@
 
 原宿主硬限定的QA配置目录仍为tmp/r15-12-native-config，只是复用既有隔离测试入口；全部写入都在项目测试目录，不接触用户数据库/日志/凭据。断库拒绝是预期边界，不是成功读出业务记录。Rust/后端/依赖源码与已接受ed1e892d及01一致，复用768项/40 ignored和正式01 CI后端证据；不声称本批重新执行Rust全套或正式安装包验收。大于500kB的既有构建警告保留，未调阈值。
 
+## 0641ef3f 自身CI失败与依赖启动修复
+
+2026-11-06用户报告未通过后单次核对精确0641ef3f/CI42064975063/job127376481447为failure；失败在“Verify R1 architecture boundaries”。新加的TypeScript静态import在项目依赖安装前求值，ERR_MODULE_NOT_FOUND；尚未进入Windows Automated，未产生官方安装包。失败完整日志与片段保存在O:/Project/FOODBALL/logs/r16-09-ci-fix-20261106，不以旧本地通过抵销失败。
+
+原verifyModuleBoundaries现在先调用现有ensureNodeDependencies，再动态加载TypeScript及其两个图模块；依赖准备失败仍直接失败。复用既有锁文件安装、上一级依赖布局及就绪标记，不新增依赖、runner、workflow，不跳过任何架构断言。
+
+在项目tmp建立原CI“项目源码/../node_modules”布局，屏蔽本机更上层TypeScript回退：旧入口退出1复现；修复入口使用真实npm ci --include=dev后完整verify:architecture退出0；再次运行同门禁退出0且就绪标记未变、无重复安装；TypeScript实际为锁定5.8.3。cold-before/cold-fixed/warm-fixed日志及cold-validation.json分别保存。实际123 r3再次执行完整架构通过，见architecture-final.log。
+
+本次只改变验证启动顺序和交接记录，src/Rust/依赖/配置/资源/171命令及状态契约均与0641ef3f无差异。因此复用本记录前述97步前端、18种HTML、完整挂载和9项原生证据，不能将其写成本次重新执行；新修复自身CI/包仍在推送后另验。R16与09继续VERIFYING，下一项仍先收尾09，再R17-01。
+
 ## BA承接、发布和回退
 
 BA-01的最终当前门禁与BA-15的实际图/零过渡边在本批复核；没有新增例外。BA-01～16的其余事实与17页义务沿01记录逐项承接；真实PG、多事务/并发/回滚、XLSX数据库读回、授权API/凭据/取消、私有P4和Windows Full仍由R17-06按原约定验收，现库B契约问题不被核销。原40 ignored不变，不能用本批静态/浏览器证据替代。

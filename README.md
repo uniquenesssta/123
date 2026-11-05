@@ -2,7 +2,7 @@
 
 ## R16-09 依赖与职责复核（VERIFYING）
 
-解除推演页与运行记录之间的运行时循环，补原架构值图和Cargo表式/继承依赖漏检；功能、状态、171命令和依赖保留，无文件删除。完整97步前端、最终架构、9负向、18种HTML等价和9项Windows原生通过；Rust同树证据复用。本批自身CI/官方包另验，不轮询。详[09记录](docs/modular-rewrite/R16-legacy-cleanup/R16-09-dependencies-and-responsibilities.md)和[阶段出口](docs/modular-rewrite/R16-legacy-cleanup/R16-stage-exit.md)。下一项：收尾09，然后R17-01；真实环境项仍R17-06。
+解除推演页与运行记录之间的运行时循环，补原架构值图和Cargo表式/继承依赖漏检；功能、状态、171命令和依赖保留，无文件删除。完整97步前端、最终架构、9负向、18种HTML等价和9项Windows原生通过；Rust同树证据复用。初次0641ef3f/CI42064975063因架构入口先加载未安装的TypeScript失败；已修复依赖准备顺序，真实无依赖副本与复用验证通过。修复自身CI/官方包另验，不轮询。详[09记录](docs/modular-rewrite/R16-legacy-cleanup/R16-09-dependencies-and-responsibilities.md)和[阶段出口](docs/modular-rewrite/R16-legacy-cleanup/R16-stage-exit.md)。下一项：收尾09，然后R17-01；真实环境项仍R17-06。
 
 ## R16-01 剩余入口与兼容实现审计（DONE）
 
