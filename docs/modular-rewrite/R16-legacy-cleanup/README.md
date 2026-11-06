@@ -5,8 +5,8 @@
 | 主交付 | 状态 | 覆盖与证据 |
 | --- | --- | --- |
 | R16-01 剩余入口、类型与兼容实现审计 | DONE | 原01～08；[记录](R16-01-residual-entries-types-and-compatibility.md)，4类守卫/登记缺口已修，官方自身出口关闭 |
-| R16-09 死代码、依赖与职责复核 | VERIFYING | 原09/10；[记录](R16-09-dependencies-and-responsibilities.md)，值环与Cargo漏检已修，本地适用门禁通过；初次0641ef3f/CI42064975063在依赖准备前加载TypeScript失败，已修复并经真实无依赖副本/复用检查验证；修复自身CI/官方包待验 |
+| R16-09 死代码、依赖与职责复核 | DONE | 原09/10；[记录](R16-09-dependencies-and-responsibilities.md)，值环与Cargo漏检已修，本地适用门禁通过；初次0641ef3f/CI42064975063在依赖准备前加载TypeScript失败，已修复并经真实无依赖副本/复用检查验证；修复c1574990/CI42125458762、官方摘要/双包/startup已验收 |
 
 最终机器图、复杂职责和保留决定见09；无额外删除/新runner/依赖/契约变化。完整97步前端、最终架构、9负向、18HTML等价与9项Windows原生通过。Rust同树证据复用，真实PG/私有P4/API/Full及现库B问题仍R17-06，不记通过。
 
-[阶段出口](R16-stage-exit.md)保持VERIFYING，09自身出口核完后才能正式结束R16。下一项：收尾09，然后在用户授权下开始R17-01。
+[阶段出口](R16-stage-exit.md)已按适用范围DONE；真实环境义务仍交R17-06，不称Full。用户本次授权下一项R17-01验证覆盖与执行入口收敛。
