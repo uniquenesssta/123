@@ -1,8 +1,10 @@
 # 足球模型平台公开外壳
 
-## R17-01 验证覆盖与执行入口收敛（VERIFYING）
+## R17-06 真实环境与Windows Full（部分完成，BLOCKED）
 
-R16精确c1574990/CI42125458762、官方摘要/双包/startup已收尾，关闭文档ad743482已推送。01补机器命令守卫进入原前端、完整架构进入verify:all，并在原Node入口验证7类失败链；98步前端和35架构通过。17页/40业务/16 BA及20 PG target逐项映射，Rust同树证据复用，40 PG ignored与真实API/Full仍待R17-06。详[实施记录](docs/modular-rewrite/R17-verification-system/R17-01-verification-coverage-and-entrypoints.md)和[覆盖矩阵](docs/modular-rewrite/R17-verification-system/R17-01-coverage-matrix.md)。自身CI/官方包另验，不轮询；下一项收尾01后R17-06。
+R17-01精确2101ce14的[CI42252996208](https://github.com/uniquenesssta/123/actions/runs/42252996208)、官方摘要、双包和startup已收尾。06在用户批准的临时PostgreSQL18.4新库中，20个目标/40项原ignored真实测试通过；实际XLSX经应用提交并重建连接，读回4队/72球员/864能力、3比赛/12阵容/216明细，重复提交边界通过。修复空摘要历史和缺失惯用脚读取/导出，恢复中文示例路径，保留原文件内容、模型/Schema/UI及全部安全检查。98步前端、35架构和最终Rust门禁通过。
+
+用户明确暂缓真实API/系统凭据；指定123当前也只有公开Stub，完整P4/P7及固定回归资产位置待补。正式链和Windows Full未通过，R17未结束，下一步仍是R17-06，R18保持BLOCKED。自身CI/官方包推送后单独核对，不轮询。详[06记录](docs/modular-rewrite/R17-verification-system/R17-06-real-environment-and-full.md)、[01收尾](docs/modular-rewrite/R17-verification-system/R17-01-verification-coverage-and-entrypoints.md)。
 
 ## R16-09 依赖与职责复核（DONE）
 

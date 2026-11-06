@@ -431,7 +431,20 @@ async fn model_run_identity_repository_contract_is_preserved() {
             .bind(id.to_string()).fetch_one(&database.pool).await.unwrap();
         assert_eq!(audit_count, 1);
     }
+    // The schema permits legacy SQL NULL summaries. Keep the row and missing values;
+    // one such row must not break the entire history list or synthesize probabilities.
+    let missing_summary_id = Uuid::new_v4();
+    sqlx::query("INSERT INTO model.runs (id,match_key,model_version_id,parameter_set_id,snapshot_type,status,input_payload,input_sha256,input_audit_version,input_readiness_level,input_manifest,input_manifest_sha256,completed_at) SELECT $1,$2,model_version_id,parameter_set_id,snapshot_type,status,input_payload,input_sha256,input_audit_version,input_readiness_level,input_manifest,input_manifest_sha256,completed_at FROM model.runs WHERE id=$3")
+        .bind(missing_summary_id).bind(format!("R17-06-NULL-{token}")).bind(first)
+        .execute(&database.pool).await.unwrap();
     let history = database.store.list_recent_runs(500).await.unwrap();
+    assert!(history
+        .iter()
+        .find(|row| row.id == missing_summary_id)
+        .unwrap()
+        .summary
+        .is_null());
+    assert!(database.store.read_run(missing_summary_id).await.unwrap()["summary"].is_null());
     let first_item = history.iter().find(|r| r.id == first).unwrap();
     assert_eq!(first_item.top_scoreline.as_deref(), Some("2-0"));
     assert_eq!(first_item.top_scoreline_probability, Some(0.55));

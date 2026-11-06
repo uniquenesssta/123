@@ -1433,6 +1433,9 @@ pub fn read_workbook_for_api(path: &Path) -> SpreadsheetResult<String> {
 }
 
 #[cfg(test)]
+mod acceptance_examples_tests;
+
+#[cfg(test)]
 mod tests {
     use super::*;
     use football_domain::PlayerCatalogReferenceData;

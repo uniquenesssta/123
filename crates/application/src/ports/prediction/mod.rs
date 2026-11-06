@@ -4,11 +4,26 @@ use chrono::{DateTime, Utc};
 use football_domain::{
     BackgroundJob, P4FreezeReadiness, P4FreezeTaskDraft, P4FreezeTaskEventRecord,
     P4FreezeTaskRecord, P4FreezeTaskTransition, P4MatchWorkspace, P4PlanningMatchContext,
-    P4RoutedFact, P4TaskWorkspace, PredictionSummary, PrematchSnapshotBundle,
-    PrematchSnapshotDraft, PrematchSnapshotRecord, PreparedMatchPredictionInput, RouteDecision,
+    P4RoutedFact, P4TaskWorkspace, PrematchSnapshotBundle, PrematchSnapshotDraft,
+    PrematchSnapshotRecord, PreparedMatchPredictionInput, RouteDecision,
 };
 use football_model_api::{ModelOutput, ModelRequest};
 use uuid::Uuid;
+
+// Historical rows may lack probabilities; model execution still uses strict PredictionSummary.
+#[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+pub struct ModelRunHistorySummary {
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub home_win: Option<f64>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub draw: Option<f64>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub away_win: Option<f64>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub btts: Option<f64>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub over_2_5: Option<f64>,
+}
 
 #[derive(Debug, Clone)]
 pub struct ModelRunHistoryItem {
@@ -23,7 +38,7 @@ pub struct ModelRunHistoryItem {
     pub model_version: String,
     pub parameter_version: String,
     pub rule_package_name: Option<String>,
-    pub summary: PredictionSummary,
+    pub summary: Option<ModelRunHistorySummary>,
     pub top_scoreline: Option<String>,
     pub top_scoreline_probability: Option<f64>,
     pub created_at: DateTime<Utc>,

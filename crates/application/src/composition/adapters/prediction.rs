@@ -2,8 +2,8 @@ use super::super::port_registry::{ModelRunListItem, PersistenceStore};
 use super::map_persistence_error;
 use crate::ports::{
     prediction::{
-        ModelRunHistoryItem, ModelRunPort, P4FreezeExecutionPort, PredictionInputPort,
-        PredictionWorkflowPort, SerializedModelRun,
+        ModelRunHistoryItem, ModelRunHistorySummary, ModelRunPort, P4FreezeExecutionPort,
+        PredictionInputPort, PredictionWorkflowPort, SerializedModelRun,
     },
     PortError, PortErrorKind, PortResult,
 };
@@ -12,8 +12,8 @@ use chrono::{DateTime, Utc};
 use football_domain::{
     P4FreezeReadiness, P4FreezeTaskDraft, P4FreezeTaskEventRecord, P4FreezeTaskRecord,
     P4FreezeTaskTransition, P4MatchWorkspace, P4PlanningMatchContext, P4RoutedFact,
-    P4TaskWorkspace, PredictionSummary, PrematchSnapshotBundle, PrematchSnapshotDraft,
-    PrematchSnapshotRecord, PreparedMatchPredictionInput, RouteDecision,
+    P4TaskWorkspace, PrematchSnapshotBundle, PrematchSnapshotDraft, PrematchSnapshotRecord,
+    PreparedMatchPredictionInput, RouteDecision,
 };
 use football_model_api::{ModelOutput, ModelRequest};
 use uuid::Uuid;
@@ -75,10 +75,7 @@ impl ModelRunPort for PersistenceStore {
             .map_err(map_persistence_error)?
             .into_iter()
             .map(|item| {
-                let summary: PredictionSummary =
-                    serde_json::from_value(item.summary).map_err(|error| {
-                        PortError::new(PortErrorKind::Serialization, error.to_string())
-                    })?;
+                let summary = parse_history_summary(item.summary)?;
                 Ok(ModelRunHistoryItem {
                     id: item.id,
                     match_key: item.match_key,
@@ -289,3 +286,18 @@ impl crate::ports::prediction::P4OrchestrationQueuePort for PersistenceStore {
             .map_err(map_persistence_error)
     }
 }
+
+fn parse_history_summary(value: serde_json::Value) -> PortResult<Option<ModelRunHistorySummary>> {
+    if !value.is_null() && !value.is_object() {
+        return Err(PortError::new(
+            PortErrorKind::Serialization,
+            "运行历史摘要必须是对象或null".to_string(),
+        ));
+    }
+    serde_json::from_value(value)
+        .map_err(|error| PortError::new(PortErrorKind::Serialization, error.to_string()))
+}
+
+#[cfg(test)]
+#[path = "prediction_history_tests.rs"]
+mod history_tests;

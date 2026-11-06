@@ -91,7 +91,9 @@ impl PostgresStore {
                     model_version: row.try_get("model_version")?,
                     parameter_version: row.try_get("parameter_version")?,
                     rule_package_name: row.try_get("rule_package_name")?,
-                    summary: row.try_get("summary")?,
+                    summary: row
+                        .try_get::<Option<Value>, _>("summary")?
+                        .unwrap_or(Value::Null),
                     top_scoreline: row.try_get("top_scoreline")?,
                     top_scoreline_probability: row.try_get("top_scoreline_probability")?,
                     created_at: row.try_get("created_at")?,

@@ -14,7 +14,7 @@ pub(in crate::adapters::catalog::players) fn map_player_record(
         normalized_name: row.normalized_name,
         date_of_birth: row.date_of_birth,
         nationality_code: row.nationality_code,
-        preferred_foot: preferred_foot(&row.preferred_foot)?,
+        preferred_foot: preferred_foot(row.preferred_foot.as_deref().unwrap_or("unknown"))?,
         height_cm: row.height_cm,
         status: player_status(&row.status)?,
         created_at: row.created_at,

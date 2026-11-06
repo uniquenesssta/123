@@ -16,7 +16,7 @@ pub(super) fn map_player_list_item(row: PlayerListRow) -> PersistenceResult<Play
         normalized_name: row.normalized_name,
         date_of_birth: row.date_of_birth,
         nationality_code: row.nationality_code,
-        preferred_foot: preferred_foot(&row.preferred_foot)?,
+        preferred_foot: preferred_foot(row.preferred_foot.as_deref().unwrap_or("unknown"))?,
         status: player_status(&row.status)?,
         current_team_id: row.current_team_id,
         current_team_name: row.current_team_name,

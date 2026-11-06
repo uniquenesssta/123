@@ -23,9 +23,9 @@
       "crates/application/src/ports/system/mod.rs",
       "crates/application/src/ports/team/mod.rs"
     ],
-    "portSourceSha256": "81e1c9b992a12b078356556230511a084a1f5c3eccacade0f43b38e04ce24bf8",
+    "portSourceSha256": "fff6ef5fa757360861cb0637952d4e2c237935b1b53522c9a3da2a23f1dc94cd",
     "publicPortTraitCount": 43,
-    "applicationRustFileCount": 422,
+    "applicationRustFileCount": 424,
     "directConcretePersistenceImports": [
       "crates/application/src/composition/port_registry.rs"
     ]

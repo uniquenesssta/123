@@ -38,7 +38,9 @@ impl PostgresStore {
                 canonical_name: row.try_get("canonical_name")?,
                 date_of_birth: row.try_get("date_of_birth")?,
                 nationality_code: row.try_get("nationality_code")?,
-                preferred_foot: row.try_get("preferred_foot")?,
+                preferred_foot: row
+                    .try_get::<Option<String>, _>("preferred_foot")?
+                    .unwrap_or_default(),
                 height_cm: row.try_get("height_cm")?,
                 status: row.try_get("status")?,
             })

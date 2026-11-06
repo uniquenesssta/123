@@ -256,7 +256,7 @@ export interface ModelRunListItem {
     away_win?: number;
     btts?: number | null;
     over_2_5?: number | null;
-  };
+  } | null;
   top_scoreline: string | null;
   top_scoreline_probability: number | null;
   created_at: string;

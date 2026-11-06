@@ -25,3 +25,7 @@ impl PortRegistry {
             .map_err(map_persistence_error)
     }
 }
+
+#[cfg(test)]
+#[path = "port_registry/workbook_acceptance.rs"]
+mod workbook_acceptance;

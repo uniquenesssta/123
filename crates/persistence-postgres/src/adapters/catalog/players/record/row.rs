@@ -9,7 +9,7 @@ pub(in crate::adapters::catalog::players) struct PlayerRecordRow {
     pub normalized_name: String,
     pub date_of_birth: Option<NaiveDate>,
     pub nationality_code: Option<String>,
-    pub preferred_foot: String,
+    pub preferred_foot: Option<String>,
     pub height_cm: Option<i16>,
     pub status: String,
     pub created_at: DateTime<Utc>,

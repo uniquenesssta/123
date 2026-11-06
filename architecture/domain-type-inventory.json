@@ -24,13 +24,13 @@
     "targetPublicExportPolicy": "explicit re-export only"
   },
   "sourceDigest": "59c4afdee81775b4b083c3eba2166dfd2f2c82da03883ca96059720cd9def398",
-  "rustUsageDigest": "0d0c1e559ebd83998643cfe67a0d88de4c7af9ee78c7d717075e4710f1c95fab",
+  "rustUsageDigest": "e2b040890068b6ba16682390908192e972c81b8a35bc35e7c8e4d039c61fddf9",
   "summary": {
     "typeCount": 366,
     "publicCompatibilityTypeCount": 366,
     "internalTypeCount": 0,
     "domainSourceFileCount": 129,
-    "scannedRustFileCount": 1501,
+    "scannedRustFileCount": 1505,
     "databaseMappedTypeCount": 302,
     "byTargetModule": {
       "ai_workspace": 16,
@@ -5501,7 +5501,8 @@
         "crates/application/src/use_cases/research/fact_pipeline/conflict.rs",
         "crates/application/src/use_cases/research/fact_pipeline/tests.rs",
         "crates/persistence-postgres/src/adapters/p4/fact_pipeline/conflicts.rs",
-        "crates/persistence-postgres/tests/postgres_integration.rs"
+        "crates/persistence-postgres/tests/postgres_integration.rs",
+        "crates/persistence-postgres/tests/postgres_integration/manual_peer.rs"
       ],
       "databaseMappings": [
         "crates/persistence-postgres/src/adapters/p4/fact_pipeline/conflicts.rs"
@@ -7547,7 +7548,8 @@
         "crates/persistence-postgres/src/adapters/p4/evidence_ledger/input.rs",
         "crates/persistence-postgres/src/adapters/p4/evidence_ledger/references.rs",
         "crates/persistence-postgres/src/adapters/p4/evidence_ledger/tests.rs",
-        "crates/persistence-postgres/tests/postgres_integration.rs"
+        "crates/persistence-postgres/tests/postgres_integration.rs",
+        "crates/persistence-postgres/tests/postgres_integration/manual_peer.rs"
       ],
       "databaseMappings": [
         "crates/persistence-postgres/src/adapters/p4/evidence_ledger/claims.rs",
@@ -7727,7 +7729,8 @@
         "crates/persistence-postgres/src/adapters/p4/evidence_ledger/conflicts.rs",
         "crates/persistence-postgres/src/adapters/p4/evidence_ledger/input.rs",
         "crates/persistence-postgres/src/adapters/p4/evidence_ledger/tests.rs",
-        "crates/persistence-postgres/tests/postgres_integration.rs"
+        "crates/persistence-postgres/tests/postgres_integration.rs",
+        "crates/persistence-postgres/tests/postgres_integration/manual_peer.rs"
       ],
       "databaseMappings": [
         "crates/persistence-postgres/src/adapters/p4/evidence_ledger/conflicts.rs",
@@ -7792,7 +7795,8 @@
         "crates/application/src/services/research/service.rs",
         "crates/application/src/use_cases/research/fact_pipeline/tests.rs",
         "crates/application/src/use_cases/research/ledger.rs",
-        "crates/persistence-postgres/src/adapters/p4/evidence_ledger/conflicts.rs"
+        "crates/persistence-postgres/src/adapters/p4/evidence_ledger/conflicts.rs",
+        "crates/persistence-postgres/tests/postgres_integration/manual_peer.rs"
       ],
       "databaseMappings": [
         "crates/persistence-postgres/src/adapters/p4/evidence_ledger/conflicts.rs"
@@ -7914,7 +7918,8 @@
         "crates/application/src/use_cases/research/fact_pipeline/routing.rs",
         "crates/application/src/use_cases/research/fact_pipeline/tests.rs",
         "crates/persistence-postgres/src/adapters/p4/fact_pipeline/routes.rs",
-        "crates/persistence-postgres/tests/postgres_integration.rs"
+        "crates/persistence-postgres/tests/postgres_integration.rs",
+        "crates/persistence-postgres/tests/postgres_integration/manual_peer.rs"
       ],
       "databaseMappings": [
         "crates/persistence-postgres/src/adapters/p4/fact_pipeline/routes.rs"
@@ -15859,7 +15864,8 @@
         "crates/persistence-postgres/src/adapters/p4/horizon/input.rs",
         "crates/persistence-postgres/src/adapters/p4/horizon/row.rs",
         "crates/persistence-postgres/src/p4_records.rs",
-        "crates/persistence-postgres/tests/postgres_integration.rs"
+        "crates/persistence-postgres/tests/postgres_integration.rs",
+        "crates/persistence-postgres/tests/postgres_integration/manual_peer.rs"
       ],
       "databaseMappings": [
         "crates/persistence-postgres/src/adapters/p4/freeze_transaction/input.rs",
@@ -22142,7 +22148,6 @@
         "crates/domain/tests/serde_contracts/module_paths.rs"
       ],
       "externalCallers": [
-        "crates/application/src/composition/adapters/prediction.rs",
         "crates/application/src/model_registry/prediction_model_adapter/tests.rs",
         "crates/application/src/ports/prediction/mod.rs",
         "crates/application/src/use_cases/prediction/tests.rs",
@@ -22227,6 +22232,7 @@
         "crates/persistence-postgres/tests/player_directory_detail_repository_contract.rs",
         "crates/persistence-postgres/tests/player_names_positions_repository_contract.rs",
         "crates/persistence-postgres/tests/player_team_periods_availability_repository_contract.rs",
+        "crates/persistence-postgres/tests/postgres_integration.rs",
         "crates/persistence-postgres/tests/team_force_delete_repository_contract.rs"
       ],
       "databaseMappings": [
@@ -23956,7 +23962,8 @@
         "crates/application/src/use_cases/research/ledger.rs",
         "crates/application/src/use_cases/research/p4_worker/execution.rs",
         "crates/persistence-postgres/src/p4_records.rs",
-        "crates/persistence-postgres/tests/postgres_integration.rs"
+        "crates/persistence-postgres/tests/postgres_integration.rs",
+        "crates/persistence-postgres/tests/postgres_integration/manual_peer.rs"
       ],
       "databaseMappings": [
         "crates/persistence-postgres/src/p4_records.rs"
@@ -24147,7 +24154,8 @@
         "crates/application/src/services/research/service.rs",
         "crates/application/src/use_cases/research/ledger.rs",
         "crates/persistence-postgres/src/adapters/p4/horizon/context.rs",
-        "crates/persistence-postgres/src/p4_records.rs"
+        "crates/persistence-postgres/src/p4_records.rs",
+        "crates/persistence-postgres/tests/postgres_integration/manual_peer.rs"
       ],
       "databaseMappings": [
         "crates/persistence-postgres/src/adapters/p4/horizon/context.rs",
@@ -26984,6 +26992,7 @@
         "crates/persistence-postgres/src/adapters/workbooks/team_package/write.rs",
         "crates/persistence-postgres/tests/entity_matching_references_repository_contract.rs",
         "crates/persistence-postgres/tests/postgres_integration.rs",
+        "crates/spreadsheet-io/src/acceptance_examples_tests.rs",
         "crates/spreadsheet-io/src/lib.rs",
         "crates/spreadsheet-io/src/match_workbook.rs",
         "crates/spreadsheet-io/src/monthly_workbook.rs",
@@ -27459,6 +27468,7 @@
       "externalCallers": [
         "crates/application/src/composition/adapters/exchange/match_lineup.rs",
         "crates/application/src/composition/adapters/exchange/spreadsheet.rs",
+        "crates/application/src/composition/port_registry/workbook_acceptance.rs",
         "crates/application/src/ports/exchange/mod.rs",
         "crates/application/src/services/exchange/facade/match_lineup.rs",
         "crates/application/src/services/exchange/facade/spreadsheet.rs",
@@ -27578,6 +27588,7 @@
       "externalCallers": [
         "crates/application/src/composition/adapters/exchange/match_lineup.rs",
         "crates/application/src/composition/adapters/exchange/spreadsheet.rs",
+        "crates/application/src/composition/port_registry/workbook_acceptance.rs",
         "crates/application/src/ports/exchange/mod.rs",
         "crates/application/src/services/exchange/facade/match_lineup.rs",
         "crates/application/src/services/exchange/facade/spreadsheet.rs",
@@ -27883,6 +27894,7 @@
         "crates/persistence-postgres/src/adapters/workbooks/team_package/preview.rs",
         "crates/persistence-postgres/tests/entity_matching_references_repository_contract.rs",
         "crates/persistence-postgres/tests/postgres_integration.rs",
+        "crates/spreadsheet-io/src/acceptance_examples_tests.rs",
         "crates/spreadsheet-io/src/lib.rs",
         "crates/spreadsheet-io/src/match_workbook.rs",
         "crates/spreadsheet-io/src/monthly_workbook.rs",

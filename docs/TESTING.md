@@ -4,7 +4,9 @@
 
 本次verify:frontend为98步：96个原/增量Node项、TypeScript和Vite；两套命令契约均执行。verify:all先运行35项完整architecture，再执行原release/frontend及Rust。7项失败传播回归进入原Node兼容入口；不新增runner/workflow或改PNG。
 
-[R17-01记录](modular-rewrite/R17-verification-system/R17-01-verification-coverage-and-entrypoints.md)及[覆盖矩阵](modular-rewrite/R17-verification-system/R17-01-coverage-matrix.md)区分17 fixture视口、17生产页具名状态/完整挂载、Windows原生、CI包和真实写入；下方R12等条目保持历史，不是当前阶段状态。当前Rust同树正式CI为768通过/40 PG ignored；20实际PG target中Full脚本仅选2，另18项由R17-06显式执行。忽略、合成full日志或startup均不算真实Full。
+[R17-01记录](modular-rewrite/R17-verification-system/R17-01-verification-coverage-and-entrypoints.md)及[覆盖矩阵](modular-rewrite/R17-verification-system/R17-01-coverage-matrix.md)区分17 fixture视口、17生产页具名状态/完整挂载、Windows原生、CI包和真实写入；下方R12等条目保持历史，不是当前阶段状态。R17-01引用的前置Rust证据为768通过/40 PG ignored；20实际PG target中Full脚本仅选2。R17-06当前显式执行与最终工作区结果见下文。忽略、合成full日志或startup均不算真实Full。
+
+R17-01自身CI42252996208和官方摘要/双包/startup已DONE。[R17-06](modular-rewrite/R17-verification-system/R17-06-real-environment-and-full.md)已在批准隔离库显式执行全部20 PG target/40项，另在原Application lib target执行1项真实工作簿导入与重连读回。当前默认工作区测试773通过/41 ignored，ignored=40个repository测试+1个Application工作簿测试；其显式执行证据分开保留，不能从默认ignored推断通过。没有新增runner、依赖或迁移；真实API/凭据、私有模型及Full仍阻塞阶段出口。
 
 ## R12-13 Data Display（2026-10-26，VERIFYING）
 

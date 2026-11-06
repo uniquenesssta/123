@@ -12,7 +12,7 @@ pub(super) struct PlayerListRow {
     pub normalized_name: String,
     pub date_of_birth: Option<NaiveDate>,
     pub nationality_code: Option<String>,
-    pub preferred_foot: String,
+    pub preferred_foot: Option<String>,
     pub status: String,
     pub current_team_id: Option<Uuid>,
     pub current_team_name: Option<String>,

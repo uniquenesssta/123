@@ -24,6 +24,9 @@ use sqlx::{postgres::PgPoolOptions, PgPool, Row};
 use tokio::sync::Mutex;
 use uuid::Uuid;
 
+#[path = "postgres_integration/manual_peer.rs"]
+mod manual_peer;
+
 static DATABASE_TEST_LOCK: Mutex<()> = Mutex::const_new(());
 const DATABASE_ENV: &str = "FOOTBALL_TEST_DATABASE_URL";
 
@@ -1900,7 +1903,44 @@ async fn monthly_workbooks_preview_commit_clear_and_idempotency_are_consistent()
         ability.metadata["source_urls"],
         json!(["https://example.test/ability"])
     );
+    let unknown_foot_player_id = Uuid::new_v4();
+    sqlx::query("INSERT INTO football.players(id,canonical_name,normalized_name) VALUES($1,$2,$2)")
+        .bind(unknown_foot_player_id)
+        .bind(format!("R17-unrecorded-foot-{token}"))
+        .execute(&database.pool)
+        .await
+        .unwrap();
     let monthly_player_data = database.store.spreadsheet_export_data().await.unwrap();
+    assert_eq!(
+        database
+            .store
+            .read_player(unknown_foot_player_id)
+            .await
+            .unwrap()
+            .player
+            .preferred_foot,
+        football_domain::PreferredFoot::Unknown
+    );
+    assert!(
+        monthly_player_data
+            .players
+            .iter()
+            .find(|row| row.player_id == unknown_foot_player_id)
+            .unwrap()
+            .preferred_foot
+            .is_empty(),
+        "SQL NULL exports as an empty cell, not an invented foot"
+    );
+    assert!(
+        sqlx::query_scalar::<_, bool>(
+            "SELECT preferred_foot IS NULL FROM football.players WHERE id=$1"
+        )
+        .bind(unknown_foot_player_id)
+        .fetch_one(&database.pool)
+        .await
+        .unwrap(),
+        "read-only export preserves stored absence"
+    );
     let exported_player = monthly_player_data
         .players
         .iter()
@@ -2890,13 +2930,14 @@ async fn p4_stage_c_writes_are_idempotent_and_frozen_history_is_immutable() {
         .append_evidence_claim(&other_field)
         .await
         .unwrap();
-    for bad_kind in ["missing", "identity", "duplicates"] {
+    for bad_kind in ["missing", "identity", "duplicates", "already-owned"] {
         let mut bad = conflict_draft.clone();
         bad.conflict_key = format!("conflict:{token}:bad-{bad_kind}");
         bad.evidence_ids = match bad_kind {
             "missing" => vec![claim_a.id, Uuid::new_v4()],
             "identity" => vec![claim_a.id, other_claim.id],
             "duplicates" => vec![claim_a.id, claim_a.id],
+            "already-owned" => vec![claim_a.id, claim_b.id],
             _ => unreachable!(),
         };
         assert!(database.store.create_evidence_conflict(&bad).await.is_err());
@@ -2912,7 +2953,24 @@ async fn p4_stage_c_writes_are_idempotent_and_frozen_history_is_immutable() {
             "failed conflict leaves no header/member/event/audit"
         );
     }
+    // Each evidence claim can belong to only one conflict (the immutable schema contract).
+    // Use fresh claims for the concurrent group; reused claims were rejected above.
+    let mut concurrent_a = claim_a_draft.clone();
+    concurrent_a.idempotency_key = format!("evidence:{token}:concurrent-group-a");
+    let concurrent_a = database
+        .store
+        .append_evidence_claim(&concurrent_a)
+        .await
+        .unwrap();
+    let mut concurrent_b = claim_b_draft.clone();
+    concurrent_b.idempotency_key = format!("evidence:{token}:concurrent-group-b");
+    let concurrent_b = database
+        .store
+        .append_evidence_claim(&concurrent_b)
+        .await
+        .unwrap();
     let mut concurrent_conflict = conflict_draft.clone();
+    concurrent_conflict.evidence_ids = vec![concurrent_a.id, concurrent_b.id];
     concurrent_conflict.conflict_key = format!("conflict:{token}:concurrent");
     let (left, right) = tokio::join!(
         database
@@ -3583,8 +3641,20 @@ async fn p4_stage_c_writes_are_idempotent_and_frozen_history_is_immutable() {
         .append_evidence_route(&blocked_route)
         .await
         .unwrap();
+    let peer = manual_peer::create(
+        &database,
+        manual_peer::Drafts {
+            research: &future_run_draft,
+            claim: &claim_a_draft,
+            conflict: &manual_conflict_draft,
+            evaluation: &manual_evaluation,
+            route: &blocked_route,
+        },
+        &token,
+    )
+    .await;
     let mut manual_tasks = Vec::new();
-    for horizon in [P4Horizon::T24h, P4Horizon::T6h] {
+    for (index, horizon) in [P4Horizon::T24h, P4Horizon::T6h].into_iter().enumerate() {
         let mut draft = horizon_draft.clone();
         draft.match_id = future_match.id;
         draft.match_key = future_match.external_key.clone();
@@ -3593,7 +3663,7 @@ async fn p4_stage_c_writes_are_idempotent_and_frozen_history_is_immutable() {
         draft.data_cutoff_at = horizon.data_cutoff_at(future_match.kickoff_time).unwrap();
         draft.research_due_at = draft.data_cutoff_at - Duration::minutes(15);
         draft.freeze_deadline_at = draft.data_cutoff_at + Duration::minutes(15);
-        draft.trace_id = future_trace;
+        draft.trace_id = if index == 0 { future_trace } else { peer.trace };
         draft.idempotency_key = format!("workbench-manual-task:{token}:{}", horizon.as_str());
         let created = database.store.create_p4_freeze_task(&draft).await.unwrap();
         let mut previous = P4FreezeTaskState::Planned;
@@ -3606,7 +3676,11 @@ async fn p4_stage_c_writes_are_idempotent_and_frozen_history_is_immutable() {
             update.task_id = created.id;
             update.expected_state = previous;
             update.next_state = next;
-            update.research_run_id = Some(future_run.id);
+            update.research_run_id = Some(if index == 0 {
+                future_run.id
+            } else {
+                peer.research.id
+            });
             update.research_job_id = None;
             update.payload = json!({});
             update.reason = "workbench manual fixture".into();
@@ -3690,7 +3764,7 @@ async fn p4_stage_c_writes_are_idempotent_and_frozen_history_is_immutable() {
     let peer_conflict = peer_view
         .conflicts
         .iter()
-        .find(|item| item.id == manual_conflict.id)
+        .find(|item| item.id == peer.conflict.id)
         .unwrap();
     assert!(
         peer_conflict.manual_decision_kind.is_none() && peer_conflict.manual_decision_at.is_none()
@@ -3700,13 +3774,20 @@ async fn p4_stage_c_writes_are_idempotent_and_frozen_history_is_immutable() {
         peer_view
             .routes
             .iter()
-            .find(|item| item.route_key == blocked_route.route_key)
+            .find(|item| item.route_key == peer.route.route_key)
             .unwrap()
             .route_status,
         "blocked_conflict"
     );
     let mut peer_manual = manual.clone();
+    assert!(!peer_view
+        .conflicts
+        .iter()
+        .any(|item| item.id == manual_conflict.id));
     peer_manual.task_id = manual_tasks[1].id;
+    peer_manual.research_run_id = peer.research.id;
+    peer_manual.conflict_id = peer.conflict.id;
+    peer_manual.route_key = peer.route.route_key.clone();
     peer_manual.decision_kind = football_domain::P4ManualConflictDecisionKind::AcceptUnknown;
     peer_manual.selected_evidence_ids.clear();
     peer_manual.selected_value = json!(null);
@@ -3729,8 +3810,8 @@ async fn p4_stage_c_writes_are_idempotent_and_frozen_history_is_immutable() {
         .iter()
         .find(|item| item.id == manual_conflict.id)
         .unwrap();
-    // Event status belongs to the conflict, while the decision overlay belongs to the selected task.
-    assert_eq!(latest_conflict.status, "accepted_unknown");
+    // A decision in a different task context cannot change the original conflict or overlay.
+    assert_eq!(latest_conflict.status, "resolved");
     assert_eq!(
         latest_conflict.manual_decision_kind.as_deref(),
         Some("select_evidence")
@@ -3744,7 +3825,7 @@ async fn p4_stage_c_writes_are_idempotent_and_frozen_history_is_immutable() {
     let accepted_conflict = accepted_view
         .conflicts
         .iter()
-        .find(|item| item.id == manual_conflict.id)
+        .find(|item| item.id == peer.conflict.id)
         .unwrap();
     assert_eq!(
         accepted_conflict.manual_decision_kind.as_deref(),
@@ -4360,7 +4441,13 @@ async fn historical_snapshot_excludes_results_ingested_after_the_cutoff() {
     );
 
     // Both recorded-time guards are inclusive; one database microsecond later is excluded.
-    let cutoff = target_kickoff - Duration::hours(1);
+    // T-1h is a latest-record window, not a fixed reference time. Exercise the
+    // actual persisted replay cutoff returned by production, including microseconds.
+    let cutoff = chrono::DateTime::parse_from_rfc3339(
+        prepared.data_quality["data_cutoff_time"].as_str().unwrap(),
+    )
+    .unwrap()
+    .with_timezone(&Utc);
     sqlx::query(
         "UPDATE football.match_results SET finalized_at = $2, created_at = $2 WHERE match_id = $1",
     )
@@ -5466,6 +5553,9 @@ async fn match_scope_inference_and_lineup_pair_transaction_are_atomic() {
 
     let mut concurrent_workbook = workbook.clone();
     concurrent_workbook.source_sha256 = format!("ledger-concurrent-{token}");
+    // The earlier import owns the original timestamp; this is a distinct version.
+    concurrent_workbook.rows[0].values["captured_at"] =
+        json!((captured_at + Duration::minutes(70)).to_rfc3339());
     let concurrent_preview = database
         .store
         .preview_match_lineup_import(&concurrent_workbook, SpreadsheetImportMode::AddAndUpdate)
@@ -6721,7 +6811,19 @@ async fn wait_for_lineup_lock(
     tokio::time::timeout(std::time::Duration::from_secs(10), async {
         loop {
             let waiting: i64 = sqlx::query_scalar(
-                "SELECT count(*)::bigint FROM pg_stat_activity WHERE $1=ANY(pg_blocking_pids(pid)) AND wait_event_type='Lock' AND ltrim(query) LIKE $2",
+                r#"WITH RECURSIVE blocking_chain(pid, blocker, visited) AS (
+                    SELECT activity.pid, blocked_by.pid, ARRAY[activity.pid, blocked_by.pid]
+                    FROM pg_stat_activity activity
+                    CROSS JOIN LATERAL unnest(pg_blocking_pids(activity.pid)) blocked_by(pid)
+                    UNION ALL
+                    SELECT chain.pid, blocked_by.pid, chain.visited || blocked_by.pid
+                    FROM blocking_chain chain
+                    CROSS JOIN LATERAL unnest(pg_blocking_pids(chain.blocker)) blocked_by(pid)
+                    WHERE NOT blocked_by.pid = ANY(chain.visited)
+                )
+                SELECT count(*)::bigint FROM pg_stat_activity activity
+                WHERE EXISTS (SELECT 1 FROM blocking_chain chain WHERE chain.pid=activity.pid AND chain.blocker=$1)
+                  AND activity.wait_event_type='Lock' AND ltrim(activity.query) LIKE $2"#,
             ).bind(blocker_pid).bind(query_pattern).fetch_one(pool).await.expect("观察真实阵容锁等待");
             if waiting >= expected { return; }
             tokio::time::sleep(std::time::Duration::from_millis(20)).await;

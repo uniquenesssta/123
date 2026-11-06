@@ -116,3 +116,5 @@ R16-01补充（2026-11-05）：BA-01的旧数据库静态清单漏登记R14-07�
 
 
 R17-01承接复核：16 BA全部映射到现有生产/测试与真实接收者，见[R17覆盖矩阵](R17-verification-system/R17-01-coverage-matrix.md)。补机器命令守卫和本地all完整架构入口；常规Cargo中40 ignored全部属于20个PG target，cfg原生宿主另列。现有Full只选2 target，额外18项及BA-02四个函数由R17-06逐项实跑；既有768同树通过、fixture/startup不消除真实阻塞，现库B问题保留。
+
+2026-11-07 R17-06实证更新：01自身2101ce14/CI42252996208和官方包已收尾；原20 PG target/40项及BA-02四项逐名通过，真实XLSX经应用提交并重建连接读回。原历史基线和剩余BA义务保留；用户暂缓API/凭据，指定123当前无私有运行时，正式同对象链/Full仍BLOCKED。具体范围、修复和未验项以[06记录](R17-verification-system/R17-06-real-environment-and-full.md)为准，不整组核销BA或启动R18。

@@ -103,7 +103,7 @@ const workbookLineup = workbook.slice(workbook.indexOf("SpreadsheetEntityType::L
 check(workbookLineup.includes("pair_transaction::lock_match_in_tx(tx, match_id)") && workbookLineup.indexOf("lock_match_in_tx") < workbookLineup.indexOf("let supersedes_lineup_id"), "工作簿修改版本链必须先取得同一父锁");
 check(adapter.includes("PersistenceStore::create_lineup(self, draft)") && adapter.includes("PersistenceStore::create_lineup_pair(self, draft)"), "LineupPort 必须显式分派到既有公开创建入口");
 const pairIntegration = read("crates/persistence-postgres/tests/postgres_integration.rs");
-check(pairIntegration.includes("取消必须发生在主队写入后、客队明细外键等待期间") && pairIntegration.includes("pair、single 与 workbook 必须在写入前等待同一比赛锁") && pairIntegration.includes("pg_blocking_pids(pid)"), "已有 pair 测试缺少真实锁等待、取消和混合写入并发断言");
+check(pairIntegration.includes("取消必须发生在主队写入后、客队明细外键等待期间") && pairIntegration.includes("pair、single 与 workbook 必须在写入前等待同一比赛锁") && pairIntegration.includes("WITH RECURSIVE blocking_chain") && pairIntegration.includes("pg_blocking_pids(activity.pid)") && pairIntegration.includes("pg_blocking_pids(chain.blocker)") && pairIntegration.includes("chain.blocker=$1"), "已有 pair 测试缺少真实锁等待、取消和混合写入并发断言");
 // R7-08：时点规则、模型门禁、读历史与历史变更各自唯一持有职责。
 const lineupBase = "crates/persistence-postgres/src/adapters/lineups";
 const chainBase = `${lineupBase}/chain`;

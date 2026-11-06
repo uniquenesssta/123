@@ -4,7 +4,7 @@
 > 与[总纲](00-总体架构与前23节.md)共同适用；[审计与全量映射](../modular-rewrite/task-plan-review-20261030.md)。
 > 原任务 ID 保留追溯，本阶段改为 2 个可验收交付批次。任务合并不代表功能取消、实现完成或验收通过。
 
-> 最新责任与证据边界见[17页/40项接入处置表](../modular-rewrite/ui-integration-disposition-20261031.md)。R12及已完成业务批次不重开；R13～R16适用出口已正式收尾，用户本次授权R17-01；最新范围/证据见本阶段索引。
+> 最新责任与证据边界见[17页/40项接入处置表](../modular-rewrite/ui-integration-disposition-20261031.md)。R12及已完成业务批次不重开；R13～R16适用出口及R17-01自身CI/包已正式收尾，用户已授权R17-06；最新范围/证据见本阶段索引。
 
 ## 目标、当前依据与范围
 
@@ -20,7 +20,7 @@ R12 已有基础设施行为/浏览器测试，R13～R15 每批同步更新测�
 
 ## 状态与依赖
 
-当前 **R17-01 VERIFYING；R17-06 BLOCKED / 未启动**。R16精确c1574990/CI42125458762与官方摘要/双包/startup已核验，关闭文档ad743482已推送，用户已授权01；当前[实施记录](../modular-rewrite/R17-verification-system/R17-01-verification-coverage-and-entrypoints.md)和[覆盖矩阵](../modular-rewrite/R17-verification-system/R17-01-coverage-matrix.md)明确98步/35架构及17/40/16分配，自身CI/包另验。下表顺序是默认交付顺序，必要时在已授权阶段内按真实依赖拆出更小批次并说明原因，不以任务数量或文件数为目标。
+当前 **R17-01 DONE；R17-06部分实证完成/BLOCKED**。01精确2101ce14/CI42252996208及官方摘要/双包/startup已核验。06的20 PG目标/40项原ignored与真实XLSX应用提交/重连读回已通过，详[真实环境记录](../modular-rewrite/R17-verification-system/R17-06-real-environment-and-full.md)。私有P4/P7资产位置未落实；用户明确暂缓真实API/系统凭据；同对象正式链及Windows Full仍必需，R17不能DONE、R18不能READY。下表顺序是默认交付顺序，必要时在已授权阶段内按真实依赖拆出更小批次并说明原因，不以任务数量或文件数为目标。
 
 | 主交付 ID | 交付批次 | 前置 |
 |---|---|---|
