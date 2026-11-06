@@ -124,3 +124,6 @@
 2026-11-05 R15-12执行更新：S16沿批准14fba2a4及主683:186758接入唯一logs Feature，核对有日志/严重/警告/重复/详情/聚合/失败/空态/加载及确认/报告快照，实际挂载30项与隔离Windows14项分层记录；设计预置不计真实结果。原src/pages/logs.ts已由src/features/logs/logView.ts接替，以上10/31审计表保留历史基线，不再当当前owner。详[R15-12记录](R15-ai-profiles-logs-ui/R15-12-logs-diagnostics.md)，自身CI/包另验，BA-11真实环境仍待R17-06。
 
 2026-11-05 R16-01复核：以上17页为10/31历史判定，后续R13～R15记录已分别关闭所分配适用义务；本次17路由/渲染/owner及真实外部承接逐项见[R16-01唯一记录](R16-legacy-cleanup/R16-01-residual-entries-types-and-compatibility.md)。不把历史OPEN直接当当前缺页，也不据静态审计宣称整页全状态或真实外部PASS。
+
+
+R17-01当前证据索引：原10/31表保持历史；17页当前生产owner、具名状态/四尺寸/明暗范围、原40项业务与真实环境责任见[R17覆盖矩阵](R17-verification-system/R17-01-coverage-matrix.md)。原17视口fixture不计17生产页；没有新UI或PNG变更，也不据映射表关闭R17-06。

@@ -45,7 +45,7 @@
     "verify:release-readiness": "node scripts/verify-release-readiness.mjs",
     "verify:release-package": "node scripts/verify-release-package.mjs",
     "verify:release": "node scripts/ensure-node-dependencies.mjs --install-only && npm run verify:frontend",
-    "verify:all": "npm run verify:release && npm run verify:rust",
+    "verify:all": "npm run verify:architecture && npm run verify:release && npm run verify:rust",
     "verify:parameter-lifecycle": "node scripts/verify-parameter-lifecycle.mjs",
     "verify:postmatch-settlement": "node scripts/verify-postmatch-settlement.mjs",
     "verify:release-acceptance": "node scripts/verify-release-acceptance.mjs",

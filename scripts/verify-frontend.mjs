@@ -78,6 +78,7 @@ const nodeChecks = [
   "verify-database-reset.mjs",
   "verify-database-migration-compatibility.mjs",
   "verify-command-contract.mjs",
+  "verify_command_contract.mjs",
   "verify-entity-resource-center.mjs",
   "verify-team-package-localized-names.mjs",
   "verify-analysis-history-workflow.mjs",

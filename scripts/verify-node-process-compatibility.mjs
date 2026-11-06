@@ -1,7 +1,8 @@
 import { mkdtempSync, mkdirSync, readFileSync, rmSync, symlinkSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { dirname, join } from "node:path";
-import { pathToFileURL } from "node:url";
+import { pathToFileURL, fileURLToPath } from "node:url";
+import { verifyVerificationFailures } from "./process/verifyVerificationFailures.mjs";
 import { isDirectExecution } from "./process/execution-context.mjs";
 import { resolveNodePackageCli, spawnNodePackageCli } from "./process/node-package-cli.mjs";
 
@@ -66,6 +67,7 @@ try {
     missingRejected = true;
   }
   check(missingRejected, "缺失的 Node CLI 未被拒绝");
+  verifyVerificationFailures(fileURLToPath(new URL("../", import.meta.url)), temporary);
 } finally {
   rmSync(temporary, { recursive: true, force: true });
 }

@@ -1,5 +1,11 @@
 # Testing
 
+## R17 当前执行入口
+
+本次verify:frontend为98步：96个原/增量Node项、TypeScript和Vite；两套命令契约均执行。verify:all先运行35项完整architecture，再执行原release/frontend及Rust。7项失败传播回归进入原Node兼容入口；不新增runner/workflow或改PNG。
+
+[R17-01记录](modular-rewrite/R17-verification-system/R17-01-verification-coverage-and-entrypoints.md)及[覆盖矩阵](modular-rewrite/R17-verification-system/R17-01-coverage-matrix.md)区分17 fixture视口、17生产页具名状态/完整挂载、Windows原生、CI包和真实写入；下方R12等条目保持历史，不是当前阶段状态。当前Rust同树正式CI为768通过/40 PG ignored；20实际PG target中Full脚本仅选2，另18项由R17-06显式执行。忽略、合成full日志或startup均不算真实Full。
+
 ## R12-13 Data Display（2026-10-26，VERIFYING）
 
 12自身Windows证据已独立核验并收尾。13在唯一data-display目录完成表格、键值、指标、状态、时间线、进度、空状态与技术文本八类展示，接通真实页面与原始数据投影；事件核验和修订分轴，取消及被替代记录保留，未知进度不伪造百分比。320项Windows浏览器检查、完整91步骤前端、架构、18项保护指纹与Rust fmt通过。54个路径（36新增、18修改），无文件删除；13自身Rust Clippy/工作区测试、打包/MSI/NSIS及实际Tauri启动仍需本批提交后独立验收，14～19 BLOCKED，不轮询CI。详[13记录](modular-rewrite/R12-frontend-foundation-ui-system/R12-13-data-display.md)。

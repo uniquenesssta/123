@@ -1,5 +1,9 @@
 # 足球模型平台公开外壳
 
+## R17-01 验证覆盖与执行入口收敛（VERIFYING）
+
+R16精确c1574990/CI42125458762、官方摘要/双包/startup已收尾，关闭文档ad743482已推送。01补机器命令守卫进入原前端、完整架构进入verify:all，并在原Node入口验证7类失败链；98步前端和35架构通过。17页/40业务/16 BA及20 PG target逐项映射，Rust同树证据复用，40 PG ignored与真实API/Full仍待R17-06。详[实施记录](docs/modular-rewrite/R17-verification-system/R17-01-verification-coverage-and-entrypoints.md)和[覆盖矩阵](docs/modular-rewrite/R17-verification-system/R17-01-coverage-matrix.md)。自身CI/官方包另验，不轮询；下一项收尾01后R17-06。
+
 ## R16-09 依赖与职责复核（DONE）
 
 解除推演页与运行记录之间的运行时循环，补原架构值图和Cargo表式/继承依赖漏检；功能、状态、171命令和依赖保留，无文件删除。完整97步前端、最终架构、9负向、18种HTML等价和9项Windows原生通过；Rust同树证据复用。初次0641ef3f/CI42064975063因架构入口先加载未安装的TypeScript失败；已修复依赖准备顺序，真实无依赖副本与复用验证通过。修复c1574990/CI42125458762、官方摘要/双包/startup已核验DONE。详[09记录](docs/modular-rewrite/R16-legacy-cleanup/R16-09-dependencies-and-responsibilities.md)和[阶段出口](docs/modular-rewrite/R16-legacy-cleanup/R16-stage-exit.md)。用户本次已授权R17-01；真实环境项仍R17-06。
