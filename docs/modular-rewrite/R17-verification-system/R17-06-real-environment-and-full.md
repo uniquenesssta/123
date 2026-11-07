@@ -8,7 +8,7 @@
 
 进程TEMP/TMP使用O:/Project/FOODBALL/tmp，已单独提醒。没有新增生产依赖、runner、workflow、迁移或持久生产数据库；临时编排脚本只在项目证据中留存，不进入仓库或公开凭据。
 
-用户指定O:/Project/FOODBALL/123作为私有P4/P7校验位置。实际该目录当前为f060748所在R14分支，同样只注册PublicModelStub；crates/model-p4、crates/model-p7、私有参数/固定回归资产均未找到，本地各分支的模型路径历史也没有命中。该目录保持未修改，不能当作完整私有环境。用户已明确“暂不运行真实API和凭据测试”，本次没有计费API请求或Windows Credential Manager保存/删除测试。
+用户指定O:/Project/FOODBALL/123作为本地P4/P7校验位置。首次检查时该目录停在f060748/R14；随后按用户要求快进远端并切到已有R17分支e651b423，与123 r3对齐。用户明确本机保存完整P4/P7；不能凭公开分支或下拉框判断本机资产不存在。已在123实际ApplicationService注册表调用P4/P7，并调用原P4演练入口：两者均返回“模型运行时不可用，请接入私有或外部ModelProvider”，12个入口中本次成功预测为0。诊断用原默认请求，只证明当前程序未加载真实引擎，不是模型固定回归或Full。临时诊断源码已逐项移除、原lib字节恢复，工作区干净；原回执在logs/r17-06-20261107/123-actual-runtime-probe.json。用户已明确“暂不运行真实API和凭据测试”，未执行计费API或Windows Credential Manager写入/删除。
 
 ## 确认缺陷与修复
 
@@ -37,7 +37,7 @@
 | 本地完整前端 | 98步退出0，原工作流/完整挂载/浏览器检查与TypeScript/Vite通过 | 含历史NULL/部分摘要不造0概率的原工作流回归、TypeScript和Vite；未更新PNG |
 | 本地完整Rust | 格式、Clippy -D warnings及工作区773项通过；默认41项ignored | 默认ignored仍列出40个PG及新增1个Application XLSX；它们在本次另有显式真实执行证据，不能把默认ignored改报通过 |
 | 架构与保护 | 35项完整架构通过；原保护/迁移/Windows契约及模型边界通过 | 原35项架构、Windows验收契约/迁移兼容/公开模型边界/保护资产检查分列，不代替真实Full |
-| Windows/CI/包 | 01已收尾；06首批bff86e4的精确push CI42272039325成功，官方artifact13533519191摘要匹配、MSI/NSIS包头及原始startup日志通过；本次月度修复的新提交CI仍须单独核对 | 未执行Windows Full、重新安装或数字签名验证；不轮询CI或PR |
+| Windows/CI/包 | 01已收尾；06月度修复e651b423的精确push CI42384401592成功，官方artifact13580480729摘要、双包及原始startup日志已接受；本次Windows验收路径修复的新提交CI仍须单独核对 | 未执行Windows Full、重新安装或数字签名验证；不轮询CI或PR |
 
 真实PG命令统一沿用cargo test --locked -p football-persistence-postgres --test <target> -- --ignored --nocapture --test-threads=1；逐项命令、退出码及原日志SHA见postgres-acceptance.json。Application真实工作簿操作、批次身份及读回见application-workbooks.log和application-workbooks-exit.json。普通Rust测试数与显式真实测试数不相加重复计算。
 
@@ -53,6 +53,18 @@ bff86e4首批Automated证据已正式接受：[CI42272039325](https://github.com
 
 本次Rust fmt/Clippy -D warnings/工作区测试仍为773通过、41默认ignored，真实PG/XLSX显式结果单列；35项架构通过。前端src/scripts/styles与bff86e4相同，沿用其98步前端及官方CI证据，未重复改UI或PNG。QA实例每轮停止，日常库未触及；初次验收副本的路径、默认skip、历史更新误用、空单元格以及未用导入等失败记录均保留，没有计入通过结果。
 
+## 2026-11-08：Windows实际验收入口续接
+
+e651b423自身[CI42384401592](https://github.com/uniquenesssta/123/actions/runs/42384401592)/job128438634683已完成成功，官方artifact13580480729摘要匹配。ZIP 52,493,491字节，SHA256 49f15ceefe5c6a34f9132bae7948ce9f8b582728ed8ff5f3ee0e6c542fd00b74；MSI 18,079,744字节、NSIS 15,711,408字节，原始startup读出7条/0非法/0运行错误，完整回执在O:/Project/FOODBALL/logs/r17-06-ci-42384401592/acceptance.json。本次仅按精确SHA查询一次push，其后读取该完成run的任务与产物；不轮询PR或CI。未执行本地安装或签名验证，此Automated结论不继承给当前脚本修复的新提交。
+
+实际复现本地入口错误：在独立123 r3目录传入ProjectRoot，旧验收器仍拼接“项目源码”，在启动任何阶段前失败。原scripts/windows/acceptance-paths.psm1现在唯一负责源码/项目根解析：独立checkout默认以源码根为运行根，旧“项目源码”打包目录保留外层运行根，显式ProjectRoot优先；缺少验收契约或双重源码根时明确拒绝。CI原布局保持支持。Windows脚本中的路径读取、切换和日志写入改用LiteralPath，覆盖带空格、中文和方括号的目录；原试验还复现了Add-Content通配路径导致日志失败，失败日志单独保留。
+
+同一模块修复release定位的错误退路：只接受项目两种既有客户端文件名，不再把目录中任意最新EXE当作应用。窗口显示行为保持不变；原启动身份、新日志集合、有界重试、数据库安全与Full操作组均保留。
+
+沿原verify-windows-path-contract入口增加20项Windows PowerShell实际行为检查，测试夹具位于scripts/windows/verify-acceptance-paths.ps1，不新增生产runner、package命令、workflow或依赖。原verify-node-process-compatibility失败传播入口保留7项，并增加独立显式目录、默认源码目录、默认旧打包目录3项真实脚本调用；合计10项通过，确保环境/依赖失败码37正确传播，且后续构建或应用不启动。夹具EXE仅用于路径选择，未执行；故障注入证明验收器行为，不证明业务Full成功。
+
+完整98步前端（TypeScript/Vite和原浏览器门禁）通过；最终受影响路径/Windows契约/10项失败传播另行重验通过；35项架构通过。Rust、前端业务和数据库树均未改变，沿用e651b423已接受的773普通Rust/41默认ignored、40项显式PG和真实工作簿证据，不重复跑相同成功场景。本批证据根O:/Project/FOODBALL/logs/r17-06-20261108；进程TEMP/TMP仍在项目tmp，必要证据保留，无用临时产物推送后归入tmp/old并逐文件实际清理。
+
 ## BA账本与场景交接
 
 | BA | 本次实证 | 尚未关闭 |
@@ -63,13 +75,13 @@ bff86e4首批Automated证据已正式接受：[CI42272039325](https://github.com
 | 08 | 运行身份、快照复用、事务故障回滚及任务幂等等原PG断言通过 | 私有正式运行及真实客户端未知响应恢复 |
 | 09～11 | 原受控工作流回归与PG范围分开 | 真实API、用户会话取消、Windows凭据由用户明确暂缓，不报通过 |
 | 12 | 原综合目标内不可变/回滚和工作流持久状态实跑 | 正式复盘→结算→分析/候选→J报告同对象链及B接入契约未获本次完整证明 |
-| 13 | 公开边界保持unavailable，未发现可执行私有资产 | 完整P4/P7及原固定回归资产位置待补；不能以Stub替代 |
+| 13 | 用户确认本机完整模型；当前123的真实注册表调用P4/P7均Unavailable，0成功；临时诊断已恢复 | 当前应用须加载真实ModelProvider，完成私有固定回归及正式同对象链；不能以入口名称或Stub替代 |
 | 14 | 20target逐项及应用真实XLSX补验完成 | Windows Full及最终安装候选证据仍必需 |
 
 V1：初始账号无建库权限、专用库名被既有守卫拒绝、指定路径没有私有运行时分别如实记录；没有擅用日常库或放行Stub。V2：原PG并发/取消/回滚、实际工作簿提交及重建应用读回通过，保留各自边界。V3：01的startup和本次自动证据均没有被记成Full；外部必需项仍阻塞R17阶段出口。
 
 ## 继续条件与回退
 
-下一步仍为R17-06：确认完整私有模型及固定回归资产的准确位置，在匹配当前r3受测业务树的私有环境完成正式链与Windows Full；真实API/系统凭据待用户允许后补验。现有Windows runner的ProjectRoot/项目源码布局和同一对象身份必须先核对；不能在旧123程序上得到结果后套给当前r3。R18保持BLOCKED。
+下一步仍为R17-06：解决当前程序加载真实P4/P7提供器的阻塞，在匹配当前r3受测业务树的本地环境完成固定回归、正式同对象链与Windows Full。Windows入口路径阻塞已修复；API/系统凭据仍按用户要求暂缓。123须与对应受测提交一致；不能沿用旧程序结果。R18保持BLOCKED。
 
 本批源码可回退至2101ce14；无迁移、用户配置或日常数据变更。临时新库保留测试导入数据，实例停止；后续需要重置仍只限该已批准隔离库。成功推送后仅按本批清单将无用临时文件归入O:/Project/FOODBALL/tmp/old，再逐文件实际清理并独立核空；保留证据、受依赖QA目录和稳定依赖缓存。

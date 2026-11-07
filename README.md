@@ -4,7 +4,7 @@
 
 R17-01精确2101ce14的[CI42252996208](https://github.com/uniquenesssta/123/actions/runs/42252996208)、官方摘要、双包和startup已收尾。06在用户批准的临时PostgreSQL18.4新库中，20个目标/40项原ignored真实测试通过；实际XLSX经应用提交并重建连接，读回4队/72球员/864能力、3比赛/12阵容/216明细，重复提交边界通过。修复空摘要历史和缺失惯用脚读取/导出，恢复中文示例路径，保留原文件内容、模型/Schema/UI及全部安全检查。98步前端、35架构和最终Rust门禁通过。
 
-用户明确暂缓真实API/系统凭据；指定123当前也只有公开Stub，完整P4/P7及固定回归资产位置待补。正式链和Windows Full未通过，R17未结束，下一步仍是R17-06，R18保持BLOCKED。首批bff86e4的[CI42272039325](https://github.com/uniquenesssta/123/actions/runs/42272039325)、官方双包及startup已接受；本次补验月度导出回导并修复首次扩展档案写入丢值，新提交CI单独核对，不轮询。详[06记录](docs/modular-rewrite/R17-verification-system/R17-06-real-environment-and-full.md)、[01收尾](docs/modular-rewrite/R17-verification-system/R17-01-verification-coverage-and-entrypoints.md)。
+用户明确暂缓真实API/系统凭据；123已与R17对齐，实际调用P4/P7仍返回运行时不可用；当前程序需接通用户本地完整模型及固定回归资产。正式链和Windows Full未通过，R17未结束，下一步仍是R17-06，R18保持BLOCKED。月度修复e651b423的[CI42384401592](https://github.com/uniquenesssta/123/actions/runs/42384401592)、官方双包及startup已接受。本批修复Windows验收入口对独立目录、旧打包目录及特殊字符路径的识别和错误EXE误选，20项原生路径与10项失败传播检查通过；新提交CI单独核对，不轮询。详[06记录](docs/modular-rewrite/R17-verification-system/R17-06-real-environment-and-full.md)、[01收尾](docs/modular-rewrite/R17-verification-system/R17-01-verification-coverage-and-entrypoints.md)。
 
 ## R16-09 依赖与职责复核（DONE）
 

@@ -79,6 +79,33 @@ cp.spawnSync=function(command,args,options){
   const logName = fs.readdirSync(path.join(acceptance, "logs")).find(name => name.startsWith("windows-acceptance-") && name.endsWith(".txt"));
   const windowsLog = fs.readFileSync(path.join(acceptance, "logs", logName), "utf8");
   check("original Windows runner returns failure and stops before build or app launch", windows.status === 1 && windowsLog.includes("退出码 37") && calls.trim() === "run setup" && !windowsLog.includes("开始：Tauri Windows release"));
+  const standalone = path.join(directory, "source [1] 球队");
+  fs.mkdirSync(path.join(standalone, "contracts"), { recursive: true });
+  fs.copyFileSync(path.join(root, "package.json"), path.join(standalone, "package.json"));
+  fs.copyFileSync(path.join(root, "contracts/windows-acceptance-contract.json"), path.join(standalone, "contracts/windows-acceptance-contract.json"));
+  fs.mkdirSync(path.join(standalone, "scripts/windows"), { recursive: true });
+  for (const relative of ["scripts/windows-acceptance.ps1", "scripts/windows/acceptance-paths.psm1"]) {
+    fs.copyFileSync(path.join(root, relative), path.join(standalone, relative));
+  }
+  const wrappedDefault = path.join(directory, "wrapped-default");
+  const wrappedSource = path.join(wrappedDefault, "项目源码");
+  fs.mkdirSync(wrappedSource, { recursive: true });
+  for (const relative of ["package.json", "contracts/windows-acceptance-contract.json", "scripts/windows-acceptance.ps1", "scripts/windows/acceptance-paths.psm1"]) {
+    fs.mkdirSync(path.dirname(path.join(wrappedSource, relative)), { recursive: true });
+    fs.copyFileSync(path.join(standalone, relative), path.join(wrappedSource, relative));
+  }
+  for (const scenario of [
+    { name: "explicit-flat", script: path.join(root, "scripts/windows-acceptance.ps1"), project: ["-ProjectRoot", standalone], logRoot: standalone },
+    { name: "default-flat", script: path.join(standalone, "scripts/windows-acceptance.ps1"), project: [], logRoot: standalone },
+    { name: "default-wrapped", script: path.join(wrappedSource, "scripts/windows-acceptance.ps1"), project: [], logRoot: wrappedDefault },
+  ]) {
+    const trace = path.join(directory, `${scenario.name}-commands.txt`);
+    const result = run(scenario.name, "powershell.exe", ["-NoProfile", "-ExecutionPolicy", "Bypass", "-File", scenario.script, "-Mode", "Automated", ...scenario.project, "-LogDirectory", scenario.name], { ...psEnv, R17_FAILURE_TRACE: trace });
+    const logs = path.join(scenario.logRoot, scenario.name);
+    const name = fs.existsSync(logs) && fs.readdirSync(logs).find(item => item.startsWith("windows-acceptance-") && item.endsWith(".txt"));
+    const text = name ? fs.readFileSync(path.join(logs, name), "utf8") : "";
+    check(`${scenario.name}: actual runner resolves source and preserves failure code`, result.status === 1 && text.includes("退出码 37") && fs.existsSync(trace) && fs.readFileSync(trace, "utf8").trim() === "run setup" && !text.includes("开始：Tauri Windows release"));
+  }
   fs.writeFileSync(path.join(directory, "results.json"), JSON.stringify({ scope: "runner failure propagation and actual command guards; not software/Full success", results }, null, 2));
   console.log(`R17-01 original verification failures: ${results.length} isolated checks PASS; ${directory}`);
   return results.length;

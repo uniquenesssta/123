@@ -1,4 +1,6 @@
-import { readFileSync } from "node:fs";
+import { spawnSync } from "node:child_process";
+import { mkdtempSync, readFileSync } from "node:fs";
+import { tmpdir } from "node:os";
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -25,7 +27,7 @@ check(
 );
 check(
   runner.includes("$RuntimeLogRoot = Join-Path $ProjectRoot \"logs\"")
-    && runner.includes("Get-ChildItem $RuntimeLogRoot"),
+    && runner.includes("Get-ChildItem -LiteralPath $RuntimeLogRoot"),
   "验收日志目录与应用运行日志目录未保持独立职责",
 );
 check(
@@ -73,6 +75,25 @@ check(
   cargoTargetPreparation.includes("target_root: path.resolve(TARGET_ROOT)"),
   "Cargo 目标目录登记文件未写入绝对 target_root",
 );
+
+check(
+  runner.includes("Resolve-AcceptanceProjectRoot -RunnerDirectory $PSScriptRoot -ProjectRoot $ProjectRoot")
+    && runner.includes("Resolve-AcceptanceSourceRoot -ProjectRoot $ProjectRoot")
+    && !runner.includes('$SourceRoot = Join-Path $ProjectRoot "项目源码"'),
+  "验收入口必须从自身源码目录启动，并显式解析独立 checkout 或 CI 布局",
+);
+const fixtures = mkdtempSync(join(tmpdir(), "football-windows-paths-"));
+const native = spawnSync("powershell.exe", [
+  "-NoProfile", "-ExecutionPolicy", "Bypass", "-File", join(root, "scripts/windows/verify-acceptance-paths.ps1"),
+  "-ModulePath", join(root, "scripts/windows/acceptance-paths.psm1"),
+  "-FixtureRoot", fixtures, "-ActualSourceRoot", root,
+], { encoding: "utf8", windowsHide: true });
+check(native.status === 0, `Windows 路径行为检查失败：${native.stderr || native.stdout || native.error}`);
+if (native.status === 0) {
+  const results = JSON.parse(readFileSync(join(fixtures, "native-path-results.json"), "utf8"));
+  check(results.length === 20 && results.every(result => result.passed), "Windows 路径实测结果缺失或有失败");
+  console.log(native.stdout.trim());
+}
 
 if (failures.length) {
   console.error("Windows 路径契约验证失败：");

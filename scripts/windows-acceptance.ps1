@@ -11,7 +11,7 @@ $ErrorActionPreference = "Stop"
 Set-StrictMode -Version Latest
 
 $PathModulePath = Join-Path $PSScriptRoot "windows\acceptance-paths.psm1"
-if (-not (Test-Path $PathModulePath -PathType Leaf)) {
+if (-not (Test-Path -LiteralPath $PathModulePath -PathType Leaf)) {
   throw "缺少 Windows 验收路径模块：$PathModulePath"
 }
 Import-Module -Name $PathModulePath -Force -ErrorAction Stop
@@ -19,18 +19,14 @@ Import-Module -Name $PathModulePath -Force -ErrorAction Stop
 if ($env:OS -ne "Windows_NT") {
   throw "Windows 全链路验收只能在 Windows 10/11 开发环境执行。"
 }
-if ([string]::IsNullOrWhiteSpace($ProjectRoot)) {
-  $ProjectRoot = (Resolve-Path (Join-Path $PSScriptRoot "..\..")).Path
-} else {
-  $ProjectRoot = (Resolve-Path $ProjectRoot).Path
-}
-$SourceRoot = Join-Path $ProjectRoot "项目源码"
+$ProjectRoot = Resolve-AcceptanceProjectRoot -RunnerDirectory $PSScriptRoot -ProjectRoot $ProjectRoot
+$SourceRoot = Resolve-AcceptanceSourceRoot -ProjectRoot $ProjectRoot
 $ContractPath = Join-Path $SourceRoot "contracts\windows-acceptance-contract.json"
-if (-not (Test-Path (Join-Path $SourceRoot "package.json"))) {
+if (-not (Test-Path -LiteralPath (Join-Path $SourceRoot "package.json"))) {
   throw "无法识别项目源码目录：$SourceRoot"
 }
-if (-not (Test-Path $ContractPath)) { throw "缺少 Windows 验收契约：$ContractPath" }
-$AcceptanceContract = Get-Content -Raw -Encoding UTF8 $ContractPath | ConvertFrom-Json
+if (-not (Test-Path -LiteralPath $ContractPath)) { throw "缺少 Windows 验收契约：$ContractPath" }
+$AcceptanceContract = Get-Content -Raw -Encoding UTF8 -LiteralPath $ContractPath | ConvertFrom-Json
 $LogRoot = Resolve-AcceptanceLogRoot -ProjectRoot $ProjectRoot -LogDirectory $LogDirectory
 $RuntimeLogRoot = Join-Path $ProjectRoot "logs"
 New-Item -ItemType Directory -Force -Path $LogRoot | Out-Null
@@ -44,7 +40,7 @@ $script:AppProcess = $null
 function Write-AcceptanceLog([string]$Message) {
   $line = "[{0}] {1}" -f (Get-Date -Format "yyyy-MM-dd HH:mm:ss"), $Message
   Write-Host $line
-  Add-Content -Path $AcceptanceLog -Value $line -Encoding UTF8
+  Add-Content -LiteralPath $AcceptanceLog -Value $line -Encoding UTF8
 }
 function Parse-Version([string]$Text) {
   $match = [regex]::Match($Text, "(?<version>\d+\.\d+\.\d+)")
@@ -77,7 +73,7 @@ function Assert-TestDatabase([string]$Url) {
   Write-AcceptanceLog "测试数据库安全检查通过：$databaseName（凭据未写入验收日志）"
 }
 function Get-RuntimeLogPaths {
-  return @(Get-ChildItem $RuntimeLogRoot -Filter "football-runtime-*.jsonl" -File -ErrorAction SilentlyContinue |
+  return @(Get-ChildItem -LiteralPath $RuntimeLogRoot -Filter "football-runtime-*.jsonl" -File -ErrorAction SilentlyContinue |
     ForEach-Object { $_.FullName })
 }
 function Wait-NewRuntimeLog([string[]]$ExistingPaths, [int]$TimeoutSeconds = 45) {
@@ -85,7 +81,7 @@ function Wait-NewRuntimeLog([string[]]$ExistingPaths, [int]$TimeoutSeconds = 45)
   while ((Get-Date) -lt $deadline) {
     $script:AppProcess.Refresh()
     if ($script:AppProcess.HasExited) { throw "客户端启动后提前退出，退出码：$($script:AppProcess.ExitCode)" }
-    $candidate = Get-ChildItem $RuntimeLogRoot -Filter "football-runtime-*.jsonl" -File -ErrorAction SilentlyContinue |
+    $candidate = Get-ChildItem -LiteralPath $RuntimeLogRoot -Filter "football-runtime-*.jsonl" -File -ErrorAction SilentlyContinue |
       Where-Object { $_.FullName -notin $ExistingPaths -and $_.Length -gt 0 } |
       Sort-Object LastWriteTime -Descending |
       Select-Object -First 1
@@ -117,7 +113,7 @@ function Start-ReleaseClient([string]$Executable) {
 }
 
 try {
-  Set-Location $SourceRoot
+  Set-Location -LiteralPath $SourceRoot
   Write-AcceptanceLog "Windows 全链路验收开始：模式=$Mode"
   Write-AcceptanceLog "路径契约：验收日志=$LogRoot；运行日志=$RuntimeLogRoot"
   $nodeText = (& node --version)
@@ -174,7 +170,7 @@ try {
   }
   $profile = if ($Mode -eq "Full") { "full" } else { "startup" }
   Invoke-Stage "运行日志覆盖率与错误扫描" "node.exe" @("scripts/analyze-windows-acceptance-log.mjs", "--log", $runtimeLog, "--profile", $profile, "--report", $AcceptanceReport)
-  $finalReport = Get-Content -Raw -Encoding UTF8 $AcceptanceReport | ConvertFrom-Json
+  $finalReport = Get-Content -Raw -Encoding UTF8 -LiteralPath $AcceptanceReport | ConvertFrom-Json
   if ($finalReport.status -eq "warning") {
     Write-AcceptanceLog "Windows 全链路核心门禁通过，但存在建议项。报告：$AcceptanceReport"
   } else {
