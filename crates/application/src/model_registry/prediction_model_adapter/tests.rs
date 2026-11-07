@@ -222,7 +222,8 @@ fn elapsed_milliseconds_truncate_and_saturate_without_overflow() {
 #[test]
 fn default_dry_run_keeps_request_and_omits_supports_and_validation() {
     let (registry, calls, _) = registry_with(crate::model_shell::P4_MODEL_ID, false, None);
-    let output = crate::use_cases::prediction::dry_run_default_fixture::execute(&registry).unwrap();
+    let output =
+        crate::use_cases::prediction::dry_run_default_fixture::execute(&registry, None).unwrap();
     assert_eq!(
         serde_json::to_value(output).unwrap(),
         serde_json::to_value(provider_output()).unwrap()
@@ -242,7 +243,7 @@ fn default_dry_run_keeps_request_and_omits_supports_and_validation() {
         (0, 0, 0)
     );
     assert!(
-        matches!(crate::use_cases::prediction::dry_run_default_fixture::execute(&ModelRegistry::new()),
+        matches!(crate::use_cases::prediction::dry_run_default_fixture::execute(&ModelRegistry::new(), None),
         Err(ApplicationError::ModelNotFound(id)) if id == crate::model_shell::P4_MODEL_ID)
     );
 }

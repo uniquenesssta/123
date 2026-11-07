@@ -1,10 +1,7 @@
 use crate::composition::{database_health_from_snapshot, database_stats_from_statistics};
 use crate::services::prediction::compatibility as prediction_compatibility;
 use crate::use_cases::database::{health, statistics};
-use crate::{
-    default_match, default_rule_package_template, ApplicationResult, ApplicationService,
-    BootstrapData,
-};
+use crate::{ApplicationResult, ApplicationService, BootstrapData};
 
 pub(crate) async fn execute(application: &ApplicationService) -> ApplicationResult<BootstrapData> {
     let active_database = application.database.active_session().await;
@@ -69,7 +66,7 @@ pub(crate) async fn execute(application: &ApplicationService) -> ApplicationResu
         rule_packages,
         competition_bindings,
         recent_runs,
-        default_match: default_match(),
-        default_rule_package: default_rule_package_template(),
+        default_match: application.prediction.default_match(),
+        default_rule_package: application.rules.default_template(),
     })
 }

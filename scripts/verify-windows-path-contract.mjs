@@ -91,7 +91,7 @@ const native = spawnSync("powershell.exe", [
 check(native.status === 0, `Windows 路径行为检查失败：${native.stderr || native.stdout || native.error}`);
 if (native.status === 0) {
   const results = JSON.parse(readFileSync(join(fixtures, "native-path-results.json"), "utf8"));
-  check(results.length === 20 && results.every(result => result.passed), "Windows 路径实测结果缺失或有失败");
+  check(results.length === 22 && results.every(result => result.passed), "Windows 路径实测结果缺失或有失败");
   console.log(native.stdout.trim());
 }
 

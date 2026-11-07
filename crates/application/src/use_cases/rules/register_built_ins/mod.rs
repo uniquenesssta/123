@@ -1,15 +1,19 @@
-use super::package_factory::built_in_rule_packages;
 use crate::{
     model_registry::ModelRegistry,
     ports::rules::{RulePackagePort, RuleRoutingPort},
     ApplicationError, ApplicationResult,
 };
+use football_domain::RulePackageDraft;
 
-pub(crate) async fn execute<P>(registry: &ModelRegistry, port: &P) -> ApplicationResult<()>
+pub(crate) async fn execute<P>(
+    registry: &ModelRegistry,
+    port: &P,
+    drafts: &[RulePackageDraft],
+) -> ApplicationResult<()>
 where
     P: RulePackagePort + RuleRoutingPort + ?Sized,
 {
-    for draft in built_in_rule_packages() {
+    for draft in drafts {
         let model = registry
             .get(&draft.routing.model_id)
             .ok_or_else(|| ApplicationError::ModelNotFound(draft.routing.model_id.clone()))?;
@@ -17,7 +21,7 @@ where
             .validate_parameters(&draft.parameters)
             .map_err(|error| ApplicationError::Model(error.to_string()))?;
         let summary = port
-            .register_rule_package(&model.descriptor(), &draft)
+            .register_rule_package(&model.descriptor(), draft)
             .await?;
         if draft.routing.activate_as_type_default {
             port.ensure_type_default_binding(

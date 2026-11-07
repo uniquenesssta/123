@@ -19,6 +19,7 @@ use uuid::Uuid;
 
 pub(crate) use composition::{DatabaseHealth, DatabaseStats, ModelRunListItem, PersistenceError};
 pub use model_registry::ModelRegistry;
+pub use service::ApplicationModelRuntime;
 pub use service::ApplicationService;
 
 pub use model_shell::{default_match, default_parameters, p4_default_match, p4_default_parameters};

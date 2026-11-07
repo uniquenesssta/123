@@ -7,6 +7,7 @@ use crate::services::{
     prediction::PredictionService, release::ReleaseService, research::ResearchService,
     review::ReviewService, rules::RulesService, teams::TeamService,
 };
+use crate::{ApplicationModelRuntime, ApplicationResult};
 
 pub struct ApplicationService {
     pub(crate) registry: ModelRegistry,
@@ -28,6 +29,19 @@ pub struct ApplicationService {
 }
 
 impl ApplicationService {
+    pub fn with_model_runtime(runtime: ApplicationModelRuntime) -> ApplicationResult<Self> {
+        runtime.validate()?;
+        Ok(Self {
+            registry: runtime.registry,
+            prediction: PredictionService::with_default_request(runtime.default_prediction_request),
+            rules: RulesService::with_runtime_catalog(
+                runtime.startup_rule_packages,
+                runtime.default_rule_package_template,
+            ),
+            ..Self::new()
+        })
+    }
+
     pub fn new() -> Self {
         let parts = ApplicationComposition::new().into_parts();
         Self {

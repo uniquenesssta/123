@@ -12,11 +12,31 @@ use football_domain::{
     CompetitionBindingDraft, CompetitionBindingSummary, RulePackageDraft, RulePackageSummary,
 };
 
-pub(crate) struct RulesService;
+pub(crate) struct RulesService {
+    startup_rule_packages: Vec<RulePackageDraft>,
+    default_template: RulePackageDraft,
+}
 
 impl RulesService {
     pub(crate) fn new() -> Self {
-        Self
+        Self::with_runtime_catalog(
+            crate::use_cases::rules::package_factory::built_in_rule_packages(),
+            crate::default_rule_package_template(),
+        )
+    }
+
+    pub(crate) fn with_runtime_catalog(
+        startup_rule_packages: Vec<RulePackageDraft>,
+        default_template: RulePackageDraft,
+    ) -> Self {
+        Self {
+            startup_rule_packages,
+            default_template,
+        }
+    }
+
+    pub(crate) fn default_template(&self) -> RulePackageDraft {
+        self.default_template.clone()
     }
 
     pub(crate) async fn register_package<P>(
@@ -39,7 +59,7 @@ impl RulesService {
     where
         P: RulePackagePort + RuleRoutingPort + ?Sized,
     {
-        register_built_ins::execute(registry, port).await
+        register_built_ins::execute(registry, port, &self.startup_rule_packages).await
     }
 
     pub(crate) async fn create_binding<P>(

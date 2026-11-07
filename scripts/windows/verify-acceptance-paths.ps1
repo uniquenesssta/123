@@ -17,7 +17,11 @@ function New-Source([string]$Path) {
   return $Path
 }
 function Equal($Actual, $Expected) {
-  if ($Actual -cne $Expected) { throw "Expected [$Expected], received [$Actual]" }
+  $actualPath = [IO.Path]::GetFullPath([string]$Actual)
+  $expectedPath = [IO.Path]::GetFullPath([string]$Expected)
+  if (-not [StringComparer]::OrdinalIgnoreCase.Equals($actualPath, $expectedPath)) {
+    throw "Expected [$expectedPath], received [$actualPath]"
+  }
 }
 function Reject([scriptblock]$Block) {
   $threw = $false
@@ -40,6 +44,8 @@ New-Item -ItemType Directory -Path $partial | Out-Null
 $target = Join-Path $FixtureRoot 'target'
 New-Item -ItemType Directory -Path (Join-Path $target 'release') -Force | Out-Null
 
+Case 'equivalent path spelling compares equally' { Equal (Join-Path $flat '.') $flat }
+Case 'different filesystem paths remain unequal' { Reject { Equal $flat $wrapped } }
 Case 'default standalone root uses runner source directory' { Equal (Resolve-AcceptanceProjectRoot -RunnerDirectory (Join-Path $flat 'scripts')) $flat }
 Case 'default legacy root preserves outer runtime directory' { Equal (Resolve-AcceptanceProjectRoot -RunnerDirectory (Join-Path $legacy 'scripts')) $wrapped }
 Case 'explicit root takes precedence over runner location' { Equal (Resolve-AcceptanceProjectRoot -RunnerDirectory (Join-Path $legacy 'scripts') -ProjectRoot $flat) $flat }

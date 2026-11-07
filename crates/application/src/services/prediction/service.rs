@@ -16,15 +16,32 @@ use football_domain::{
     P4MatchWorkspace, P4TaskWorkspace, PlanP4HorizonsCommand, PrematchSnapshotBundle,
     PrematchSnapshotDraft, PrematchSnapshotRecord, RouteDecision,
 };
-use football_model_api::ModelOutput;
+use football_model_api::{ModelOutput, ModelRequest};
 use serde_json::Value;
 use uuid::Uuid;
 
-pub(crate) struct PredictionService;
+pub(crate) struct PredictionService {
+    default_request: Option<ModelRequest>,
+}
 
 impl PredictionService {
     pub(crate) fn new() -> Self {
-        Self
+        Self {
+            default_request: None,
+        }
+    }
+
+    pub(crate) fn with_default_request(request: ModelRequest) -> Self {
+        Self {
+            default_request: Some(request),
+        }
+    }
+
+    pub(crate) fn default_match(&self) -> serde_json::Value {
+        self.default_request
+            .as_ref()
+            .map(|request| request.input.clone())
+            .unwrap_or_else(crate::default_match)
     }
 
     pub(crate) async fn execute_prediction<P: PredictionAccess + ?Sized>(
@@ -76,7 +93,7 @@ impl PredictionService {
         &self,
         registry: &ModelRegistry,
     ) -> ApplicationResult<ModelOutput> {
-        dry_run_default_fixture::execute(registry)
+        dry_run_default_fixture::execute(registry, self.default_request.as_ref())
     }
 
     pub(crate) async fn list_recent_runs<P: PredictionAccess + ?Sized>(

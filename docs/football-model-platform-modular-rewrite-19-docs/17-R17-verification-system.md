@@ -20,7 +20,7 @@ R12 已有基础设施行为/浏览器测试，R13～R15 每批同步更新测�
 
 ## 状态与依赖
 
-当前 **R17-01 DONE；R17-06部分实证完成/BLOCKED**。01精确2101ce14/CI42252996208及官方摘要/双包/startup已核验。06月度修复e651b423/CI42384401592及官方双包/startup已接受；20 PG目标/40项原ignored与真实XLSX应用提交/重连读回已通过，月度导出/明确更新及首档案丢值修复已补验，新提交CI另验，详[真实环境记录](../modular-rewrite/R17-verification-system/R17-06-real-environment-and-full.md)。当前123实际P4/P7调用返回运行时不可用，需加载用户本地完整提供器；Windows验收入口路径已修复并验证；用户明确暂缓真实API/系统凭据；同对象正式链及Windows Full仍必需，R17不能DONE、R18不能READY。下表顺序是默认交付顺序，必要时在已授权阶段内按真实依赖拆出更小批次并说明原因，不以任务数量或文件数为目标。
+当前 **R17-01 DONE；R17-06部分实证完成/BLOCKED**。01精确2101ce14/CI42252996208及官方摘要/双包/startup已核验。06月度修复e651b423/CI42384401592及官方双包/startup已接受；20 PG目标/40项原ignored与真实XLSX应用提交/重连读回已通过，月度导出/明确更新及首档案丢值修复已补验，新提交CI另验，详[真实环境记录](../modular-rewrite/R17-verification-system/R17-06-real-environment-and-full.md)。已找到并恢复本机私有模型，23项固定回归及当前ApplicationService真实P4/P7落库/历史/重连通过；公开默认桌面仍Unavailable，私有桌面装配和有效时点正式链待验；Windows路径CI误判已修并补22项检查；用户明确暂缓真实API/系统凭据；同对象正式链及Windows Full仍必需，R17不能DONE、R18不能READY。下表顺序是默认交付顺序，必要时在已授权阶段内按真实依赖拆出更小批次并说明原因，不以任务数量或文件数为目标。
 
 | 主交付 ID | 交付批次 | 前置 |
 |---|---|---|
