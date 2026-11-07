@@ -275,8 +275,15 @@ async fn apply_team_update(
         ensure_team_name_alias(tx, team_id, &short_name, None, None, None, metadata).await?;
     }
     sqlx::query(
-        r#"INSERT INTO football.team_profiles (team_id, team_type, data_confidence, metadata, updated_at)
-        VALUES ($1, 'club', 0.5, $2, now())
+        r#"INSERT INTO football.team_profiles (
+            team_id,short_name,team_type,founded_year,city,stadium,data_confidence,notes,metadata,updated_at
+        ) VALUES (
+            $1,CASE WHEN $3 THEN NULL ELSE NULLIF($4,'') END,
+            COALESCE(NULLIF($5,''),'club'),CASE WHEN $6 THEN NULL ELSE $7 END,
+            CASE WHEN $8 THEN NULL ELSE NULLIF($9,'') END,
+            CASE WHEN $10 THEN NULL ELSE NULLIF($11,'') END,
+            COALESCE($12,0.5),CASE WHEN $13 THEN NULL ELSE NULLIF($14,'') END,$2,now()
+        )
         ON CONFLICT (team_id) DO UPDATE SET
             short_name=CASE WHEN $3 THEN NULL ELSE COALESCE(NULLIF($4,''),football.team_profiles.short_name) END,
             team_type=COALESCE(NULLIF($5,''),football.team_profiles.team_type),

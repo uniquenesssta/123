@@ -24,13 +24,13 @@
     "targetPublicExportPolicy": "explicit re-export only"
   },
   "sourceDigest": "59c4afdee81775b4b083c3eba2166dfd2f2c82da03883ca96059720cd9def398",
-  "rustUsageDigest": "e2b040890068b6ba16682390908192e972c81b8a35bc35e7c8e4d039c61fddf9",
+  "rustUsageDigest": "d3b681511f35bb50d32bd58ca1f4e507a554c5fba08b57fc777b314f55ebb254",
   "summary": {
     "typeCount": 366,
     "publicCompatibilityTypeCount": 366,
     "internalTypeCount": 0,
     "domainSourceFileCount": 129,
-    "scannedRustFileCount": 1505,
+    "scannedRustFileCount": 1507,
     "databaseMappedTypeCount": 302,
     "byTargetModule": {
       "ai_workspace": 16,
@@ -26969,6 +26969,8 @@
         "crates/domain/tests/serde_contracts/r2_07_module_paths.rs"
       ],
       "externalCallers": [
+        "crates/application/src/composition/port_registry/workbook_acceptance/fixture.rs",
+        "crates/application/src/composition/port_registry/workbook_acceptance/monthly.rs",
         "crates/application/src/use_cases/exchange/preview_team_package_import/coverage.rs",
         "crates/application/src/use_cases/exchange/preview_team_package_import/package_rows.rs",
         "crates/persistence-postgres/src/adapters/workbooks/batch_ledger/mapping.rs",
@@ -27469,6 +27471,7 @@
         "crates/application/src/composition/adapters/exchange/match_lineup.rs",
         "crates/application/src/composition/adapters/exchange/spreadsheet.rs",
         "crates/application/src/composition/port_registry/workbook_acceptance.rs",
+        "crates/application/src/composition/port_registry/workbook_acceptance/monthly.rs",
         "crates/application/src/ports/exchange/mod.rs",
         "crates/application/src/services/exchange/facade/match_lineup.rs",
         "crates/application/src/services/exchange/facade/spreadsheet.rs",
@@ -27589,6 +27592,7 @@
         "crates/application/src/composition/adapters/exchange/match_lineup.rs",
         "crates/application/src/composition/adapters/exchange/spreadsheet.rs",
         "crates/application/src/composition/port_registry/workbook_acceptance.rs",
+        "crates/application/src/composition/port_registry/workbook_acceptance/fixture.rs",
         "crates/application/src/ports/exchange/mod.rs",
         "crates/application/src/services/exchange/facade/match_lineup.rs",
         "crates/application/src/services/exchange/facade/spreadsheet.rs",
@@ -28679,6 +28683,7 @@
         "crates/domain/tests/serde_contracts/r2_07_module_paths.rs"
       ],
       "externalCallers": [
+        "crates/application/src/composition/port_registry/workbook_acceptance.rs",
         "crates/persistence-postgres/src/adapters/workbooks/batch_ledger/mapping.rs",
         "crates/persistence-postgres/src/adapters/workbooks/batch_ledger/rows.rs",
         "crates/persistence-postgres/src/adapters/workbooks/identity/row.rs",

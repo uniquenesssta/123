@@ -37,9 +37,21 @@
 | 本地完整前端 | 98步退出0，原工作流/完整挂载/浏览器检查与TypeScript/Vite通过 | 含历史NULL/部分摘要不造0概率的原工作流回归、TypeScript和Vite；未更新PNG |
 | 本地完整Rust | 格式、Clippy -D warnings及工作区773项通过；默认41项ignored | 默认ignored仍列出40个PG及新增1个Application XLSX；它们在本次另有显式真实执行证据，不能把默认ignored改报通过 |
 | 架构与保护 | 35项完整架构通过；原保护/迁移/Windows契约及模型边界通过 | 原35项架构、Windows验收契约/迁移兼容/公开模型边界/保护资产检查分列，不代替真实Full |
-| Windows/CI/包 | 01的精确官方CI/包/startup已收尾；06自身CI/包推送后一次性核对 | 本批未执行Windows Full、重新安装或数字签名验证；不轮询CI或PR |
+| Windows/CI/包 | 01已收尾；06首批bff86e4的精确push CI42272039325成功，官方artifact13533519191摘要匹配、MSI/NSIS包头及原始startup日志通过；本次月度修复的新提交CI仍须单独核对 | 未执行Windows Full、重新安装或数字签名验证；不轮询CI或PR |
 
 真实PG命令统一沿用cargo test --locked -p football-persistence-postgres --test <target> -- --ignored --nocapture --test-threads=1；逐项命令、退出码及原日志SHA见postgres-acceptance.json。Application真实工作簿操作、批次身份及读回见application-workbooks.log和application-workbooks-exit.json。普通Rust测试数与显式真实测试数不相加重复计算。
+
+## 本次续接：官方证据与真实月度回导
+
+bff86e4首批Automated证据已正式接受：[CI42272039325](https://github.com/uniquenesssta/123/actions/runs/42272039325)，Windows job128078771173。官方ZIP为52,495,615字节，SHA256 5078037b8e4aa70f088d8fb50e3320a880b1a3c52648c940b3cda28bb7950d88；MSI 18,079,744字节、NSIS 15,709,690字节，原始startup读出7条/0非法/0运行错误。下载、包摘要及重新分析回执保存在O:/Project/FOODBALL/logs/r17-06-ci-42272039325/acceptance.json。没有安装本地包或验证签名。
+
+此前“未找到匹配push CI”的回执源于PR限定的连接器接口，不能据此判定push不存在。本次用GitHub原始push接口按精确SHA查询一次并核验完成任务，原观察保留且标为被纠正；没有轮询。此次月度修复产生的新提交与bff86e4证据分开，不继承其CI通过状态。
+
+在同一Application lib的原真实工作簿场景中增加球队/球员月度导出、预检、提交和重连读回。导出默认skip，原样回导业务更新数为0；QA副本只将球队/球员基础行明确设为update，各改变一个实际字段（简称/身高），保留历史行skip。4支球队、72名球员更新且新增数为0，两项改变跨重连读回一致，原4队/72人/864能力、3比赛/12阵容/216明细数量不变。独立ZIP/单元格比较确认只改变指定action与两个字段，证据见monthly-workbook-comparison.json及monthly-xlsx目录。历史记录仍只允许新增生效记录，未放宽规则。
+
+该场景先复现了真实缺陷：已有球队尚无team_profiles行时，月度update仅插入默认档案，丢失填写的简称等扩展字段。唯一team_package/write所有者现将同一组填写值及clear语义用于首次INSERT和冲突UPDATE，保留原缺失值默认、事务、别名及校验。失败原日志monthly-missing-profile-regression.log保留；修复后原20个PG target/40项及扩展后的Application真实工作簿场景再次通过。未新增Schema、迁移、生产依赖、runner或workflow。
+
+本次Rust fmt/Clippy -D warnings/工作区测试仍为773通过、41默认ignored，真实PG/XLSX显式结果单列；35项架构通过。前端src/scripts/styles与bff86e4相同，沿用其98步前端及官方CI证据，未重复改UI或PNG。QA实例每轮停止，日常库未触及；初次验收副本的路径、默认skip、历史更新误用、空单元格以及未用导入等失败记录均保留，没有计入通过结果。
 
 ## BA账本与场景交接
 
@@ -47,7 +59,7 @@
 | --- | --- | --- |
 | 02 | 四项原综合测试分别通过 | 本项四个数据库回归义务已实证；不连带核销Full |
 | 03～06 | 当前删除/引用/强删/配对/锁等待/取消/原子回滚/12插入1结束等原契约真实执行 | 桌面同对象完整操作仍随Full核对 |
-| 07 | 两份实际XLSX经应用提交并跨连接读回，重复提交边界实跑 | 其余原生文件对话框、月度/复盘包等同状态Full覆盖仍需按原账本确认，不整组核销 |
+| 07 | 两份实际XLSX及球队/球员月度导出回导经应用提交并跨连接读回，重复提交边界实跑 | 其余原生文件对话框、复盘包及桌面同状态Full覆盖仍需按原账本确认，不整组核销 |
 | 08 | 运行身份、快照复用、事务故障回滚及任务幂等等原PG断言通过 | 私有正式运行及真实客户端未知响应恢复 |
 | 09～11 | 原受控工作流回归与PG范围分开 | 真实API、用户会话取消、Windows凭据由用户明确暂缓，不报通过 |
 | 12 | 原综合目标内不可变/回滚和工作流持久状态实跑 | 正式复盘→结算→分析/候选→J报告同对象链及B接入契约未获本次完整证明 |

@@ -6,7 +6,7 @@
 
 [R17-01记录](modular-rewrite/R17-verification-system/R17-01-verification-coverage-and-entrypoints.md)及[覆盖矩阵](modular-rewrite/R17-verification-system/R17-01-coverage-matrix.md)区分17 fixture视口、17生产页具名状态/完整挂载、Windows原生、CI包和真实写入；下方R12等条目保持历史，不是当前阶段状态。R17-01引用的前置Rust证据为768通过/40 PG ignored；20实际PG target中Full脚本仅选2。R17-06当前显式执行与最终工作区结果见下文。忽略、合成full日志或startup均不算真实Full。
 
-R17-01自身CI42252996208和官方摘要/双包/startup已DONE。[R17-06](modular-rewrite/R17-verification-system/R17-06-real-environment-and-full.md)已在批准隔离库显式执行全部20 PG target/40项，另在原Application lib target执行1项真实工作簿导入与重连读回。当前默认工作区测试773通过/41 ignored，ignored=40个repository测试+1个Application工作簿测试；其显式执行证据分开保留，不能从默认ignored推断通过。没有新增runner、依赖或迁移；真实API/凭据、私有模型及Full仍阻塞阶段出口。
+R17-01自身CI42252996208和官方摘要/双包/startup已DONE。[R17-06](modular-rewrite/R17-verification-system/R17-06-real-environment-and-full.md)已在批准隔离库显式执行全部20 PG target/40项，另在原Application lib target执行1项真实工作簿导入与重连读回。当前默认工作区测试773通过/41 ignored，ignored=40个repository测试+1个Application工作簿测试；其显式执行证据分开保留，不能从默认ignored推断通过。同一场景已补球队/球员月度导出→默认skip不更新→明确更新4队/72人→修改字段重连读回，无重复新增；首次球队扩展档案遗漏已复现并修复，20 PG target/40项再次通过。首批bff86e4的CI42272039325和官方双包/startup已接受，新提交CI另验。没有新增runner、依赖或迁移；真实API/凭据、私有模型及Full仍阻塞阶段出口。
 
 ## R12-13 Data Display（2026-10-26，VERIFYING）
 

@@ -5,11 +5,23 @@ use crate::ApplicationService;
 use football_domain::{SpreadsheetImportMode, SpreadsheetImportPreview};
 use std::{path::PathBuf, sync::Arc};
 
+#[path = "workbook_acceptance/fixture.rs"]
+mod fixture;
+#[path = "workbook_acceptance/monthly.rs"]
+mod monthly;
+
 fn require_clean_preview(preview: &SpreadsheetImportPreview) {
     let failures: Vec<_> = preview
         .rows
         .iter()
-        .filter_map(|row| row.message.as_ref())
+        .filter(|row| {
+            matches!(
+                row.status,
+                football_domain::SpreadsheetRowStatus::Error
+                    | football_domain::SpreadsheetRowStatus::Conflict
+            )
+        })
+        .map(|row| (&row.sheet_name, row.row_number, row.message.as_ref()))
         .take(8)
         .collect();
     assert_eq!(
@@ -107,9 +119,40 @@ async fn real_acceptance_workbooks_commit_and_survive_reconnection() {
         .commit_match_lineup_import(matches.batch_id)
         .await
         .is_err());
+    let output = std::env::temp_dir().join("r17-06-monthly-xlsx");
+    assert_eq!(
+        std::env::temp_dir().canonicalize().unwrap(),
+        PathBuf::from(r"O:\Project\FOODBALL\tmp")
+            .canonicalize()
+            .unwrap()
+    );
+    let monthly_batches = monthly::round_trip(&reopened, &output).await;
     reopened.disconnect_database().await;
+    let monthly_reopened = Arc::new(ApplicationService::new());
+    monthly_reopened
+        .connect_database(options.clone())
+        .await
+        .unwrap();
+    assert_eq!(
+        monthly_reopened
+            .read_team_monthly_import_preview(monthly_batches.team_batch)
+            .await
+            .unwrap()
+            .batch_id,
+        monthly_batches.team_batch
+    );
+    assert_eq!(
+        monthly_reopened
+            .read_player_catalog_import_preview(monthly_batches.player_batch)
+            .await
+            .unwrap()
+            .batch_id,
+        monthly_batches.player_batch
+    );
+    monthly_reopened.disconnect_database().await;
 
     let readback = PersistenceStore::connect(&options).await.unwrap();
+    monthly::verify_changes(&readback, &monthly_batches).await;
     let catalog = readback.spreadsheet_export_data().await.unwrap();
     assert_eq!(catalog.teams.len(), 4);
     assert_eq!(catalog.players.len(), 72);
