@@ -107,17 +107,13 @@ if ($LASTEXITCODE -ne 0) { throw 'Rust verification failed' }
 
 ## Windows Full的实际前提
 
-先阅读 `scripts/windows-acceptance.ps1` 和 `contracts/windows-acceptance-contract.json`。当前脚本从 `ProjectRoot\项目源码` 找源码；仓库目录是 `123 r3`，因此不能把 `O:\Project\FOODBALL` 直接当作可用的ProjectRoot。CI的checkout布局与本地不同。
-
-使用已准备并核对的验收目录，确认其中源码SHA和受测内容等于候选；不要为执行命令擅自移动用户项目或虚构目录。下面 `$acceptanceRoot` 是操作人事先赋值的已核实目录变量，不是现成的项目环境配置。没有合适布局时先明确缺口及最小准备办法，再执行；禁止跳过路径检查制造成功。
+先阅读 `scripts/windows-acceptance.ps1`、`scripts/windows/acceptance-paths.psm1` 和 `contracts/windows-acceptance-contract.json`。当前路径解析同时支持独立源码目录与旧版 `ProjectRoot\项目源码` 打包目录；候选必须唯一且包含package.json与验收契约。本地可明确使用 `O:\Project\FOODBALL\123 r3`，不能把含多个checkout的FOODBALL父目录当作源码目录。无需为验收复制或移动整个项目。
 
 ```powershell
-if ([string]::IsNullOrWhiteSpace($acceptanceRoot)) { throw 'Set a verified acceptance root first' }
-$acceptanceSource = Join-Path $acceptanceRoot '项目源码'
-if (-not (Test-Path -LiteralPath (Join-Path $acceptanceSource 'package.json'))) {
-    throw 'Acceptance source layout is missing'
-}
-# 执行前核对该源码的提交及未提交差异，并确认专用测试库已授权。
+$acceptanceRoot = 'O:\Project\FOODBALL\123 r3'
+Import-Module (Join-Path $acceptanceRoot 'scripts\windows\acceptance-paths.psm1') -Force
+$acceptanceSource = Resolve-AcceptanceSourceRoot -ProjectRoot $acceptanceRoot
+# 执行前核对源码提交/差异、私有装配与专用测试库授权；未具备的硬条件不关闭。
 & (Join-Path $acceptanceSource 'scripts\windows-acceptance.ps1') -Mode Full -ProjectRoot $acceptanceRoot
 if ($LASTEXITCODE -ne 0) { throw 'Windows Full acceptance failed' }
 ```
@@ -126,7 +122,7 @@ if ($LASTEXITCODE -ne 0) { throw 'Windows Full acceptance failed' }
 
 现有Full入口调用两个PG target：`match_catalog_repository_contract`（单测试线程）与 `postgres_integration`，并使用ignored测试；**它不自动覆盖所有repository contract target**。从 `crates/persistence-postgres/tests` 及待验账本逐项核对额外target，例如实体删除、球队强制删除和运行身份。按实际存在的测试名执行，不能把目录内测试数量当执行数量。
 
-Full会构建并启动客户端，随后提示人工操作：测试库连接→真实球队/球员及比赛阵容导入→就绪检查和正式P4→运行历史→比分/复盘→分析→应用内验收报告。当前脚本将正式结算提示为可继续执行；本任务书仍要求真实结算专项证据，不能因该提示可选而漏验。必须实际操作完成后再继续脚本；不能自动发送回车代替业务验收。最终对照本次runtime日志、数据库读回和报告的同一批对象身份。
+Full会构建并启动客户端，随后提示人工操作：测试库连接→真实球队/球员及比赛阵容导入→就绪检查和正式P4→运行历史→比分/复盘→分析→应用内验收报告。当前脚本将正式结算提示为可继续执行；本任务书仍要求真实结算专项证据，不能因该提示可选而漏验。必须实际操作完成后再继续脚本；不能自动发送回车代替业务验收。最终对照本次runtime日志、数据库读回和报告的同一批对象身份。正式P4覆盖必须有同会话/同请求的p4启动参数及完成记录；P7、未知模型身份或失败P4不能替代。日志操作覆盖不证明报告overall_status通过，也不证明样例为真实证据。
 
 API会话隔离/取消、Windows凭据、私有固定回归、历史保护与并发回滚等超出上述自动路径的项目仍需专项证据。缺外部环境记阻塞；公开外壳可启动不代表私有模型运行成功。
 

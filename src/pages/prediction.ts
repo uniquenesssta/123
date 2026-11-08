@@ -1,3 +1,4 @@
+import { newestRulePackages } from "../features/rules/index";
 import { competitionKindOptions } from "../components/competition";
 import { escapeHtml } from "../components/format";
 import { inlineDatabaseSetup } from "../components/databaseSetup";
@@ -172,7 +173,7 @@ export function predictionPage(
       && (!selectedExactModel || item.model_id === selectedExactModel)
     ))
     .sort((left, right) => new Date(right.created_at).getTime() - new Date(left.created_at).getTime());
-  const productionPackages = Array.from(new Map(activeModelPackages.map((item) => [item.package_key, item])).values())
+  const productionPackages = newestRulePackages(activeModelPackages)
     .sort((left, right) => Number(right.competition_kind === activeCompetitionKind) - Number(left.competition_kind === activeCompetitionKind) || right.priority - left.priority);
   const defaultProductionPackage = productionPackages.find((item) => item.competition_kind === activeCompetitionKind) ?? productionPackages[0] ?? null;
   const recommendedPackages = productionPackages.filter((item) => item.competition_kind === activeCompetitionKind);

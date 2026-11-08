@@ -1,3 +1,4 @@
+import {verifyRulePackageSelection} from "./rules/verifyRulePackageSelection.mjs";
 import {readProjectSource} from "./styles/projectSource.mjs";
 import {fileURLToPath as stylesheetFilePath} from "node:url";
 const stylesheetRoot=stylesheetFilePath(new URL("../",import.meta.url));
@@ -12,6 +13,7 @@ import {
 } from "./task-ui-screenshot-tools.mjs";
 
 const root = path.resolve(import.meta.dirname, "..");
+verifyRulePackageSelection(root);
 const read = (file) => readProjectSource(stylesheetRoot,path.join(root, file), "utf8");
 const check = (condition, message) => {
   if (!condition) throw new Error(message);

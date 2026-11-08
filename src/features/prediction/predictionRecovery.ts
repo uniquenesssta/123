@@ -15,3 +15,9 @@ export function predictionRecovery(store:PreferenceStore,key:string,snapshot:()=
     clear(){const id=identity(),receipts={...all()};if(id&&receipts[id]){delete receipts[id];if(Object.keys(receipts).length)store.writeJson(key,{receipts});else store.removeItem(key);}}
   };
 }
+
+/** The native adapter rejects these inputs before save_successful_run; no receipt may already have a run ID. */
+export function rejectedNativeModelInput(error: unknown): boolean {
+  const message = error instanceof Error ? error.message : String(error);
+  return /^(?:Error: )?模型执行失败：模型(?:输入|参数)无效：/.test(message);
+}

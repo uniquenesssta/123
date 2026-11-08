@@ -1,3 +1,4 @@
+import { newestRulePackages } from "./rulePackageSelection";
 import { competitionCatalogue, competitionStructure } from "../competitions/index";
 import { bindingWorkspace } from "./bindingView";
 import { competitionKindLabel } from "../../components/competition";
@@ -37,7 +38,7 @@ export function rulesPage(
     .filter((item) => item.status === "active"
       && (item.model_id === "p4" || item.model_id.startsWith("p4_")))
     .sort((left, right) => new Date(right.created_at).getTime() - new Date(left.created_at).getTime());
-  const p4ProductionPackages = Array.from(new Map(activeP4Packages.map((item) => [item.package_key, item])).values())
+  const p4ProductionPackages = newestRulePackages(activeP4Packages)
     .sort((left, right) => right.priority - left.priority || left.display_name.localeCompare(right.display_name, "zh-CN"));
   const packageOptions = p4ProductionPackages.map((item) => `<option value="${escapeHtml(item.id)}">${escapeHtml(item.display_name)} · ${escapeHtml(item.version)}</option>`).join("");
   const p4Bindings = state.data.competition_bindings.filter((binding) => binding.is_active && (binding.model_id === "p4" || binding.model_id.startsWith("p4_")));

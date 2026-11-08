@@ -7,7 +7,7 @@ import { createRequire } from "node:module";
 import { readStylesheet } from "../tokens/tokenStyles.mjs";
 
 /** Bundle actual view owners and the exact production CSS import graph for isolated browser QA. */
-export function productionFixture(root) {
+export function productionFixture(root, additionalEntries = []) {
   const ts=createRequire(import.meta.url)("typescript"), modules={};
   const read=file=>readProjectSource(stylesheetRoot,resolve(root,file),"utf8");
   const bundle=file=>{
@@ -24,6 +24,7 @@ export function productionFixture(root) {
     }
   };
   const entry="scripts/design-refresh/browserFixture.ts";bundle(entry);bundle("src/features/players/playerDirectoryDom.ts");
+  for (const entry of additionalEntries) bundle(entry);
   const css=readStylesheet(root,"src/styles/index.css");
   const runtime=`const modules=${JSON.stringify(modules)};const cache={};function load(id){if(cache[id])return cache[id];const r=modules[id],exports={};cache[id]=exports;new Function('exports','require',r.output)(exports,s=>load(r.imports[s]));return exports;}`;
   const main=read("src/main.ts");

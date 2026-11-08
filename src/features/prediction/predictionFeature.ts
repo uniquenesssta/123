@@ -1,3 +1,4 @@
+import { rejectedNativeModelInput } from "./predictionRecovery";
 import { PredictionContext } from "./predictionContext";
 import { completeRun, findExistingRuns, matchesRun } from "./predictionRunRecovery";
 import type { PredictionMode, PredictionRecovery, RunReceipt } from "./predictionRecovery";
@@ -106,16 +107,18 @@ export class PredictionFeature {
       if(!current())return false;
       this.ports.recovery.clear();this.present(result,mode);this.phaseValue="result";return true;
     }catch(error){
+      const hasRunId=!!this.ports.recovery.read()?.knownRunId;
+      const rejected=!hasRunId&&rejectedNativeModelInput(error);
+      const unavailable=!hasRunId&&String(error).includes("模型运行时不可用：");
       if(!current()){
-        if(scope()&&String(error).includes("模型运行时不可用："))this.ports.recovery.clear();
+        if(scope()&&(unavailable||rejected))this.ports.recovery.clear();
         return false;
       }
       if(scope()){
         this.error=error instanceof Error?error.message:String(error);
         // This native ModelError is raised before save_successful_run; transport errors have no such proof.
-        const unavailable=this.error.includes("模型运行时不可用：");
-        if(unavailable)this.ports.recovery.clear();
-        this.phaseValue=dispatched&&!unavailable?"unknown":unavailable?"unavailable":this.phaseValue==="blocked"?"blocked":"failed";
+        if(unavailable||rejected)this.ports.recovery.clear();
+        this.phaseValue=rejected?"failed":dispatched&&!unavailable?"unknown":unavailable?"unavailable":this.phaseValue==="blocked"?"blocked":"failed";
       }
       throw error;
     }finally{this.locked=false;this.ports.changed();}

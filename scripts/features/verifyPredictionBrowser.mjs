@@ -78,6 +78,10 @@ export async function verifyPredictionBrowser(root,directory){
   await evaluate("window.__prediction.unavailable=true");await inspect();await run();
   await check("provider unavailable never displays a fabricated result","document.querySelector('[data-prediction-phase]').dataset.predictionPhase==='unavailable'&&document.querySelector('#prediction-result').textContent.includes('等待推演结果')");
   await screenshot("provider-unavailable");
+  await evaluate("Object.assign(window.__prediction,{unavailable:false,inputRejection:true})");await inspect();await run();
+  await check("definitive native model input rejection is failed without a recovery lock", "document.querySelector('[data-prediction-phase]').dataset.predictionPhase==='failed'&&!document.querySelector('.prediction-recovery')&&document.querySelector('#prediction-result').textContent.includes('等待推演结果')");
+  await evaluate("window.__prediction.inputRejection=false");
+
   await evaluate("Object.assign(window.__prediction,{unavailable:false,delayRefresh:true})");await inspect();await run();
   await check("history refresh is controllably pending after actual success", "typeof window.__prediction.releaseRefresh==='function'");
   await change("prediction-match-id","layout-match");await evaluate("window.__prediction.releaseRefresh()");

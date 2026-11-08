@@ -103,11 +103,16 @@ try {
     else if (group.any_of) operations.push(group.any_of[0]);
     else if (group.alternatives) operations.push(...group.alternatives[0]);
   }
-  function writeLog(name, selectedOperations, extra = []) {
+  function writeLog(name, selectedOperations, extra = [], family = "p4", startChanges = {}) {
     const path = join(temporary, name);
     const rows = [
       { timestamp_utc: new Date().toISOString(), session_id: "test-session", sequence: 1, level: "info", subsystem: "application", event: "application_started", app_version: "0.23.0", trace_id: null, details: {} },
-      ...selectedOperations.map((operation, index) => ({ timestamp_utc: new Date().toISOString(), session_id: "test-session", sequence: index + 2, level: "info", subsystem: "frontend.operation", event: "operation_completed", app_version: "0.23.0", trace_id: null, details: { operation, duration_ms: 1 } })),
+      ...selectedOperations.map((operation, index) => ({ timestamp_utc: new Date().toISOString(), session_id: "test-session", sequence: index + 2, level: "info", subsystem: "frontend.operation", event: "operation_completed", app_version: "0.23.0", trace_id: operation === "execute_prediction_from_match" ? "prediction-request" : null, details: { operation, duration_ms: 1 } })),
+      ...(selectedOperations.includes("execute_prediction_from_match") ? [{
+        session_id: "test-session", trace_id: "prediction-request", level: "info",
+        event: "operation_started", details: { operation: "execute_prediction_from_match", context: { args: { command: { model_family: family } } } },
+        ...startChanges,
+      }] : []),
       ...extra,
     ];
     writeFileSync(path, rows.map((item) => JSON.stringify(item)).join("\n") + "\n", "utf8");
@@ -121,6 +126,20 @@ try {
     const parsedPassReport = JSON.parse(readFileSync(passReport, "utf8"));
     check(parsedPassReport.status === "warning" || parsedPassReport.status === "pass", "通过报告状态错误");
     for (const required of reportSchema.required) check(Object.hasOwn(parsedPassReport, required), `通过报告缺少Schema字段：${required}`);
+  }
+  for (const [name, family, changes] of [
+    ["p7-only", "p7", {}],
+    ["missing-family", undefined, { details: { operation: "execute_prediction_from_match", context: { args: { command: {} } } } }],
+    ["wrong-trace", "p4", { trace_id: "another-request" }],
+    ["wrong-session", "p4", { session_id: "another-session" }],
+    ["no-start", "p4", { event: "diagnostic" }],
+    ["wrong-operation", "p4", { details: { operation: "inspect_match_prediction_readiness", context: { args: { command: { model_family: "p4" } } } } }],
+  ]) {
+    const log = writeLog(name + ".jsonl", [...new Set(operations)], [], family, changes);
+    const output = join(temporary, name + "-report.json");
+    const result = spawnSync(process.execPath, [analyzerPath, "--log", log, "--profile", "full", "--report", output], { encoding: "utf8" });
+    const report = JSON.parse(readFileSync(output, "utf8"));
+    check(result.status !== 0 && report.missing_required_groups.includes("formal_prediction"), `${name} must not count as completed formal P4`);
   }
   const missingLog = writeLog("missing.jsonl", [...new Set(operations)].slice(1));
   const missing = spawnSync(process.execPath, [analyzerPath, "--log", missingLog, "--profile", "full", "--report", join(temporary, "missing-report.json")], { encoding: "utf8" });
@@ -137,4 +156,4 @@ if (failures.length) {
   failures.forEach((failure) => console.error(`- ${failure}`));
   process.exit(1);
 }
-console.log(`Windows实机全链路验收体系验证通过：${contract.automated_stages.length}个自动阶段、${contract.profiles.full.required_operation_groups.length}组运行链覆盖和三类合成日志反向门禁完整。`);
+console.log(`Windows实机全链路验收体系验证通过：${contract.automated_stages.length}个自动阶段、${contract.profiles.full.required_operation_groups.length}组运行链覆盖和模型身份/请求关联等九类合成日志门禁完整。`);

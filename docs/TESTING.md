@@ -1161,3 +1161,7 @@ GitHub Actions日志有Node.js20强制切至24、punycode和url.parse弃用提�
 ## R12-14 状态来源回归（2026-10-29）
 
 原3e335ec2在架构检查失败，Windows自动验收未执行。scripts/architecture/verifyDatabaseStateMetadata.mjs以真实Database Service验证器验证2正例/4反例，覆盖后续任务修改清单及迁移来源/owner缺失或回退。入口已接入verify:architecture和完整前端，不冻结未来last_updated_task。详[R12-14 CI修复记录](modular-rewrite/R12-frontend-foundation-ui-system/R12-14-ci-fix-state-provenance.md)。
+
+### R17-06 模型身份与原生证据边界（2026-11-09）
+
+Windows Full 的正式P4组要求原始operation_started的model_family=p4，与operation_completed按session_id、trace_id和操作名关联；P7或缺身份/串请求不能抵销。原verify:windows-acceptance合成日志正反向门禁覆盖此规则；startup档案保持原要求。实际私有Windows/P7的同对象链、重启读回、合格P4输入缺口及blocked报告见[R17-06记录](modular-rewrite/R17-verification-system/R17-06-real-environment-and-full.md)。1个隔离QA分析样本与跨会话日志覆盖均不构成真实数据或Windows Full验收；真实API/系统凭据仍暂缓。

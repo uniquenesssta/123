@@ -1,3 +1,4 @@
+import { completedOperationsForGroup } from "./windows/runtime-operation-coverage.mjs";
 import { readFileSync, writeFileSync } from "node:fs";
 import { basename, dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -38,22 +39,24 @@ for (const entry of entries) {
   }
 }
 function evaluateGroup(group) {
+  const groupOperations = completedOperationsForGroup(entries, group, completedOperations);
   const allOf = Array.isArray(group.all_of) ? group.all_of : [];
   const anyOf = Array.isArray(group.any_of) ? group.any_of : [];
   const alternatives = Array.isArray(group.alternatives) ? group.alternatives : [];
-  const allPassed = allOf.every((operation) => completedOperations.has(operation));
-  const anyPassed = anyOf.length === 0 || anyOf.some((operation) => completedOperations.has(operation));
+  const allPassed = allOf.every((operation) => groupOperations.has(operation));
+  const anyPassed = anyOf.length === 0 || anyOf.some((operation) => groupOperations.has(operation));
   const alternativePassed = alternatives.length === 0 || alternatives.some((alternative) =>
-    Array.isArray(alternative) && alternative.every((operation) => completedOperations.has(operation))
+    Array.isArray(alternative) && alternative.every((operation) => groupOperations.has(operation))
   );
   const passed = allPassed && anyPassed && alternativePassed;
   const expectedOperations = new Set([...allOf, ...anyOf, ...alternatives.flat()]);
   const expected = [
+    ...(group.required_model_family ? [`模型：${group.required_model_family}，须同会话、同请求完成`] : []),
     ...(allOf.length ? [`全部：${allOf.join(", ")}`] : []),
     ...(anyOf.length ? [`任一：${anyOf.join(", ")}`] : []),
     ...(alternatives.length ? [`路径：${alternatives.map((item) => item.join(" + ")).join(" 或 ")}`] : []),
   ];
-  return { id: group.id, label: group.label, required: group.required !== false, passed, expected, matched: [...expectedOperations].filter((operation) => completedOperations.has(operation)).sort() };
+  return { id: group.id, label: group.label, required: group.required !== false, passed, expected, matched: [...expectedOperations].filter((operation) => groupOperations.has(operation)).sort() };
 }
 const coverage = profile.required_operation_groups.map(evaluateGroup);
 const forbiddenLevels = new Set(contract.forbidden_runtime_levels ?? ["error", "critical"]);

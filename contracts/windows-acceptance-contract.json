@@ -99,7 +99,8 @@
           "required": true,
           "any_of": [
             "execute_prediction_from_match"
-          ]
+          ],
+          "required_model_family": "p4"
         },
         {
           "id": "prediction_history",

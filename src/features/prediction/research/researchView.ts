@@ -1,3 +1,4 @@
+import { newestRulePackages } from "../../rules/index";
 import {escapeHtml} from "../../../components/format";
 import type {MatchRecord,P4MatchWorkspace,P4TaskWorkspace,P4EvidenceWorkspaceRecord,P4ConflictWorkspaceRecord,RulePackageSummary} from "../../../types";
 import type {ResearchFeature} from "./researchFeature";
@@ -37,7 +38,7 @@ function taskView(workspace:P4TaskWorkspace,ruleLabel:string,locked:boolean):str
 }
 export function p4WorkbenchMarkup(databaseConfigured:boolean,packages:RulePackageSummary[],matches:MatchRecord[],workspace:P4MatchWorkspace|null,selectedTask:P4TaskWorkspace|null,view?:ResearchFeature["view"]):string {
   const active=packages.filter(p=>p.status==="active"&&(p.model_id==="p4"||p.model_id.startsWith("p4_"))).sort((a,b)=>Date.parse(b.created_at)-Date.parse(a.created_at));
-  const available=Array.from(new Map(active.map(p=>[p.package_key,p])).values()).sort((a,b)=>b.priority-a.priority||a.display_name.localeCompare(b.display_name,"zh-CN"));
+  const available=newestRulePackages(active).sort((a,b)=>b.priority-a.priority||a.display_name.localeCompare(b.display_name,"zh-CN"));
   const labels=new Map(packages.map(p=>[p.id,`${p.display_name} · ${p.version}`]));
   const selected=matches.find(m=>m.id===(workspace?.match_id??view?.matchId)),locked=!!view?.busy||!!view?.receipt;
   const canPlan=!!workspace&&selected?.status==="scheduled"&&Date.now()<Date.parse(selected.kickoff_time)&&available.length>0&&!locked&&!view?.loading;
