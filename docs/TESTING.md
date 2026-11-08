@@ -16,6 +16,10 @@ R17-01自身CI42252996208和官方摘要/双包/startup已DONE。[R17-06](modula
 
 真实Windows/Tauri+批准55437 PG的两场QA对象形成真实时点采样，10项最终检查通过；新进程关联QA赛果，采样不新增模型运行；历史比赛、编码QA库冒充real、缺样本和原380场真实比分文件均拒绝。PG已停止，未触碰日常库、真实API或凭据测试。工具已接通，真实冻结样本仍0，正式P4/结算/Full及本批CI/官方安装包分别待验。用法见[初始校准说明](initial-calibration.md)，明细见[06记录](modular-rewrite/R17-verification-system/R17-06-real-environment-and-full.md)。
 
+## R17-06 真实来源资格审核（2026-11-09）
+
+16391f7c的精确CI42520056507/job128851369987成功，官方ZIP52,494,640字节与digest匹配，双包和原startup7条/0错误已接受。此后仅数据/文档变化，复用该树35架构/98前端/777 Rust，不冒充本批重跑。真实380场身份/比分跨源一致、20队无归一碰撞、全部原始文件Git blob/SHA256通过；340场只过先前日期历史数量筛查，不算合格特征。当前季45明确ft、55过去缺明确ft、5非标准score隔离，280未来候选均未填赛果/自动入库。原生产fit对此来源实际返回BLOCKED、退出1且无候选；原startup重新分析通过。默认Profile赛事范围/不可识别维度、历史时点/阵容及原始冻结仍不满足，真实校准和Full不通过；无DB、激活API或凭据读写。见[来源与方案](initial-calibration.md#6-真实来源审核与-profile-口径2026-11-09)及06记录。
+
 ## R12-13 Data Display（2026-10-26，VERIFYING）
 
 12自身Windows证据已独立核验并收尾。13在唯一data-display目录完成表格、键值、指标、状态、时间线、进度、空状态与技术文本八类展示，接通真实页面与原始数据投影；事件核验和修订分轴，取消及被替代记录保留，未知进度不伪造百分比。320项Windows浏览器检查、完整91步骤前端、架构、18项保护指纹与Rust fmt通过。54个路径（36新增、18修改），无文件删除；13自身Rust Clippy/工作区测试、打包/MSI/NSIS及实际Tauri启动仍需本批提交后独立验收，14～19 BLOCKED，不轮询CI。详[13记录](modular-rewrite/R12-frontend-foundation-ui-system/R12-13-data-display.md)。
