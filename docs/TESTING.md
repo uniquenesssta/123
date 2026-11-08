@@ -8,6 +8,14 @@
 
 R17-01自身CI42252996208和官方摘要/双包/startup已DONE。[R17-06](modular-rewrite/R17-verification-system/R17-06-real-environment-and-full.md)已在批准隔离库显式执行全部20 PG target/40项，另在原Application lib target执行1项真实工作簿导入与重连读回。当前默认工作区测试773通过/41 ignored，ignored=40个repository测试+1个Application工作簿测试；其显式执行证据分开保留，不能从默认ignored推断通过。同一场景已补球队/球员月度导出→默认skip不更新→明确更新4队/72人→修改字段重连读回，无重复新增；首次球队扩展档案遗漏已复现并修复，20 PG target/40项再次通过。月度修复e651b423的CI42384401592和官方双包/startup已接受。本批修复Windows独立checkout/旧打包根、特殊字符日志路径及任意EXE误选，原入口20项PowerShell路径行为和10项失败传播检查通过；新提交CI另验。没有新增runner、依赖或迁移；真实API/凭据、私有模型及Full仍阻塞阶段出口。
 
+## R17-06 独立初始 α 工具（2026-11-09，工具通过/真实校准待验）
+
+原35项架构、98步前端及类型/构建、Rust fmt/全部target Clippy/777普通测试通过，41默认ignored不计PG通过。新采样example实际构建；Domain清单仅增加该真实MatchStatus调用方和源摘要，未改检查标准。既有`verify-analytics-service.mjs`引入42项行为检查，含排他写入/摘要/凭据、赛前时点/历史伪装、重复比赛/来源分区、时区等价分割/赛果时间泄漏、数值边界/可识别性/预算、留出退化/无资格晋升及赛果身份追溯。
+
+本机原私有P4的8 unit+10 Golden通过；16场显式合成QA经最终公开CLI/真实私有EXE拟合，12训练/4留出、秩4、QA_ONLY，结果绑定真实程序与每份赛果摘要。原Profile/参数未改，临时workspace/lock已恢复。该模型工具测试不同于真实校准。
+
+真实Windows/Tauri+批准55437 PG的两场QA对象形成真实时点采样，10项最终检查通过；新进程关联QA赛果，采样不新增模型运行；历史比赛、编码QA库冒充real、缺样本和原380场真实比分文件均拒绝。PG已停止，未触碰日常库、真实API或凭据测试。工具已接通，真实冻结样本仍0，正式P4/结算/Full及本批CI/官方安装包分别待验。用法见[初始校准说明](initial-calibration.md)，明细见[06记录](modular-rewrite/R17-verification-system/R17-06-real-environment-and-full.md)。
+
 ## R12-13 Data Display（2026-10-26，VERIFYING）
 
 12自身Windows证据已独立核验并收尾。13在唯一data-display目录完成表格、键值、指标、状态、时间线、进度、空状态与技术文本八类展示，接通真实页面与原始数据投影；事件核验和修订分轴，取消及被替代记录保留，未知进度不伪造百分比。320项Windows浏览器检查、完整91步骤前端、架构、18项保护指纹与Rust fmt通过。54个路径（36新增、18修改），无文件删除；13自身Rust Clippy/工作区测试、打包/MSI/NSIS及实际Tauri启动仍需本批提交后独立验收，14～19 BLOCKED，不轮询CI。详[13记录](modular-rewrite/R12-frontend-foundation-ui-system/R12-13-data-display.md)。

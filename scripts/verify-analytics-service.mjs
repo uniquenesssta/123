@@ -1,3 +1,4 @@
+import {verifyInitialCalibration} from "./calibration/verifyInitialCalibration.mjs";
 import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
@@ -656,4 +657,5 @@ if (failures.length) {
   throw new Error(`Analytics Service 验证失败\n${failures.map((item) => `- ${item}`).join("\n")}`);
 }
 
+verifyInitialCalibration();
 console.log("Analytics Service 验证通过：旧 owner 已删除，21 个公共 Use Case 入口保持兼容，Calculation 及原事务拥有唯一 owner，Jobs启动/领取结算/执行与共享PG队列各唯一，AI Package/Parameter Lifecycle 支持模块边界明确，三个 Port 分属现有组合适配 owner且公共门面保持兼容。");

@@ -24,13 +24,13 @@
     "targetPublicExportPolicy": "explicit re-export only"
   },
   "sourceDigest": "59c4afdee81775b4b083c3eba2166dfd2f2c82da03883ca96059720cd9def398",
-  "rustUsageDigest": "14fc250369c050d863bbe8c031127386e52da9b3d44e429b2c0bb2a0e869257b",
+  "rustUsageDigest": "8ac789d98b4c90acce26dc565595d9d01dbfb50d7e62b66dc65cee95d18c8b58",
   "summary": {
     "typeCount": 366,
     "publicCompatibilityTypeCount": 366,
     "internalTypeCount": 0,
     "domainSourceFileCount": 129,
-    "scannedRustFileCount": 1509,
+    "scannedRustFileCount": 1510,
     "databaseMappedTypeCount": 302,
     "byTargetModule": {
       "ai_workspace": 16,
@@ -14136,6 +14136,7 @@
         "crates/application/src/use_cases/prediction/build_input/mod.rs",
         "crates/application/src/use_cases/prediction/input_manifest/tests.rs",
         "crates/application/src/use_cases/prediction/readiness/tests.rs",
+        "crates/persistence-postgres/examples/capture_initial_calibration.rs",
         "crates/persistence-postgres/src/adapters/catalog/teams/detail/recent_match_mapper.rs",
         "crates/persistence-postgres/src/adapters/matches/catalog/mapping.rs",
         "crates/persistence-postgres/src/adapters/prediction/historical_features/read.rs",
