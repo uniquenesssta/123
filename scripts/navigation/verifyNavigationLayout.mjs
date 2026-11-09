@@ -9,6 +9,28 @@ import {tmpdir} from "node:os";
 import {readStylesheet} from "../tokens/tokenStyles.mjs";
 import {resolveChromiumExecutable,captureHtmlScreenshot} from "../task-ui-screenshot-tools.mjs";
 import {browserBundle} from "../overlays/browserBundle.mjs";
+async function verifyPressGeometry(cdp, ev, selector, groupSelector) {
+ const measure = () => ev(`(() => {
+  const button = f.q(${JSON.stringify(selector)}), group = button.closest(${JSON.stringify(groupSelector)});
+  const {x,y,width,height} = button.getBoundingClientRect();
+  return {x,y,width,height, clientWidth:group.clientWidth, clientHeight:group.clientHeight,
+   overflowY:group.scrollHeight-group.clientHeight, scrollTop:group.scrollTop, pressed:button.matches(":active")};
+ })()`);
+ await ev(`f.q(${JSON.stringify(selector)}).scrollIntoView({block:"center",inline:"nearest"})`);
+ const before = await measure(), {x,y,width,height} = before;
+ const position = { x:x+width/2, y:y+height/2, button:"left", clickCount:1 };
+ await cdp.send("Input.dispatchMouseEvent",{...position,type:"mousePressed"});
+ await ev("new Promise(resolve => setTimeout(resolve, 200))");
+ const pressed = await measure();
+ assert.equal(pressed.pressed, true, selector+" receives native mouse press");
+ assert.deepEqual({...pressed,pressed:false}, before, selector+" does not shift or introduce a scrollbar while pressed");
+ await cdp.send("Input.dispatchMouseEvent",{...position,type:"mouseReleased"});
+ await ev("new Promise(resolve => setTimeout(resolve, 200))");
+ const released = await measure();
+ assert.deepEqual(released, before, selector+" keeps geometry and scroll position after activation");
+ await ev(`f.expect(true, ${JSON.stringify(selector+" stable through native mouse activation")})`);
+}
+
 export async function verifyNavigationLayout(root){
  const read=f=>readProjectSource(stylesheetRoot,resolve(root,f),"utf8"),main=read("src/main.ts"),entry="src/ui/navigation/__tests__/navigationBrowserFixture.ts";
  const css=[...main.matchAll(/^import "(\.\/[^"\n]+\.css)";/gm)].map(m=>m[1].replace("./","src/")).map(f=>readStylesheet(root,f)).join("\n");
@@ -34,6 +56,11 @@ export async function verifyNavigationLayout(root){
    await key("Delete","Delete",46);await ev('f.expect(f.closes===1&&f.activations===1,"Delete delegates only close; no accidental activation");f.q("[data-mode=detail]").focus()');await key("ArrowRight","ArrowRight",39);await key(" ","Space",32);await ev('f.expect(f.mode==="compare","native Space commits display mode");f.expect(f.q("[data-mode=compare]").getAttribute("aria-pressed")==="true","mode selected semantics");f.q("[data-action=next]").focus()');
    await key("Enter","Enter",13);await ev('f.expect(f.page===2,"next advances real host page state");f.expect(f.q("[data-action=next]").disabled&&f.q("[data-action=previous]").disabled,"busy prevents both navigation directions");f.expect(f.q(".ui-pagination").getAttribute("aria-busy")==="true","busy announced");f.expect(document.activeElement===f.q("[data-pagination-current]"),"native Enter loading retains focus inside pagination");f.expect(f.q("[data-pagination-status]").textContent.includes("正在加载结果"),"loading status is direction-neutral");f.settle();f.expect(document.activeElement===f.q("[data-pagination-current]"),"native loading completion retains current-page focus");f.q("[data-action=next]").focus()');await key("Enter","Enter",13);await ev('f.settle();f.expect(f.page===3&&f.q("[data-action=next]").disabled,"last page prevents next without fabricated total");f.q("[data-action=previous]").focus()');await key("Enter","Enter",13);await ev('f.expect(f.page===2,"previous returns actual host page");f.settle();f.q("[data-section-id=directory]").focus()');
    await key("Home","Home",36);await ev('f.assertFocus(document.activeElement);f.q("[data-anchor-id=anchor-one]").focus()');await key("ArrowDown","ArrowDown",40);await ev('f.expect(document.activeElement.dataset.anchorId==="anchor-two","vertical anchor navigation follows visible orientation");f.controller.destroy();f.focusFirst()');await key("ArrowRight","ArrowRight",39);await ev('f.expect(document.activeElement.dataset.object==="one","destroy removes keyboard behavior");f.reset();scrollTo(0,0)');
+   await verifyPressGeometry(cdp, ev, "[data-section-id=create]", ".workspace-section-nav");
+   await ev('f.expect(f.q("[data-section-id=create]").getAttribute("aria-current")==="page","section activates after click")');
+   await verifyPressGeometry(cdp, ev, "[data-object=one]", ".ui-tabs");
+   await verifyPressGeometry(cdp, ev, "[data-mode=compare]", ".ui-segmented");
+   await ev('f.expect(f.mode==="compare","segmented control activates after click");f.reset();scrollTo(0,0)');
    return await ev('({checks:f.checks,nativeWindows:navigator.userAgent.includes("Windows"),viewport:{width:innerWidth,height:innerHeight},theme:document.documentElement.dataset.theme})');
   }});assert.ok(result.nativeWindows);results.push({name,...result});writeFileSync(join(directory,"navigation-results.json"),JSON.stringify(results,null,2));console.log(name+": "+result.checks.length+" native checks PASS");
  }

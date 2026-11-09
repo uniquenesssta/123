@@ -4,3 +4,9 @@
 @import "./segmented-control/segmentedControl.css";
 @import "./pagination/pagination.css";
 @import "./section-navigation/sectionNavigation.css";
+
+/* A pressed navigation button must stay inside its scroll container. */
+[data-ui-navigation] button:active:not(:disabled),
+nav button[data-action="select-workspace-section"]:active:not(:disabled) {
+  transform: none;
+}
