@@ -98,3 +98,20 @@ P4本机适配器使用同一原自动基础λ计算和原full矩阵评分。在
 4. 首选真实赛前观测。若选择事后历史重建，必须独立标记、核验当时可知信息，并另行审定其适用范围；不能改名写成live_pre_match，不能倒填数据库created_at/finalized_at或解除历史拒绝。
 
 本轮只完成真实来源采集/资格审核和方案整理。未改模型公式、参数、Profile、样本资格或拟合门禁，未生成α。原`fit`入口对这些来源文件实际返回BLOCKED且未产生候选；仍需完成上述前置口径，才有条件继续正式P4/结算/Full。R17-06和R18状态保持。
+
+## 7. 联赛研究 Profile 与估计口径（2026-11-09）
+
+英超采用独立的 `epl-2026-27-research-v1`。参考期取已有双源一致的 2015/16 英超全季，380 场 90 分钟赛果共 1,026 球，固定基率为每队场均 1.35 球。它是基于较早赛季的研究起点，2026/27 的适用性需用真实时序留出检验。参考清单、两份来源的摘要、资料实际观察时间、Profile 建立时间和目标时段均随制品保存。基率在建立 Profile 时固定，之后的训练和留出共用这一基线。参考来源为 [StatsBomb](https://github.com/hudl/open-data/blob/master/data/matches/2/27.json) 与 [OpenFootball](https://github.com/openfootball/football.json/blob/master/2015-16/en.1.json)。
+
+`league-profile` 读取已人工或程序逐场核对的参考清单。清单使用 `football.initial-calibration.league-reference.v1`，须包含 `scope`、`profile_id`、`competition_name`、`reference_season`、`target_season`、`target_from`、`target_until`、`observed_at`、至少两份不同的 `source_evidence`（URL 和 SHA256），以及按唯一 ID 标注日期、双方 90 分钟进球及 `cross_checked` 的 `matches`。这些标记来自上游来源审核，命令负责结构和时序校验、求基率和写入带摘要制品。本机已复算真实参考来源，产物位于 `O:/Project/FOODBALL/logs/r17-06-league-profile-20261109`。
+
+```powershell
+. 'O:\Project\FOODBALL\project-temp.ps1'
+node scripts/calibration/cli.mjs league-profile --reference '<已核对的参考清单.json>' --output '<新的联赛研究.profile.json>'
+```
+
+采样沿用第 2 节，`--profile` 传入上述带摘要制品。采样必须匹配联赛类型、赛事名称、目标时段及来源范围，并具备数据库赛季身份。参考资料观察和 Profile 建立时间必须早于或等于特征截止时间。拟合设置额外填入 `target_competition_id` 和 `target_season_id`，与每场采样的数据库身份一致。
+
+研究 Profile 以中性环境作为固定建模参照，原环境系数固定为基线参数的值。拟合器向原私有 P4 核对训练和留出的环境项均为零，随后检验攻、防、主客场三列在训练集上的秩为 3。三项边界和步长按 `attack_alpha`、`defence_alpha`、`venue_alpha` 顺序提供，原 Profile 路径继续使用全维度设置。联赛候选只包含三项估计补丁，环境系数及固定理由单列。训练赛果还须在最早留出特征截止前已知，留出三项评分允许的浮点误差为 `1e-9`。真实研究成功状态为 `RESEARCH_ONLY`，合成验收成功状态为 `QA_ONLY`。真实样本量和数值边界须在首次真实拟合前按目标数据与模型范围审定。
+
+下一项核验首批官方赛程与时区，补齐所选窗口的赛前输入，绑定数据库赛事和赛季并开始真实采样。可用于拟合的赛前冻结样本与赛果配对当前为 0。

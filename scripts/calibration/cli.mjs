@@ -5,6 +5,7 @@ import { readJson, openArtifact, writeArtifact } from './artifacts.mjs';
 import { captureBody, outcomeBody, readCohort } from './dataset.mjs';
 import { oracle } from './provider.mjs';
 import { fitInitial } from './fit.mjs';
+import { leagueProfile, loadCalibrationProfile } from './leagueProfile.mjs';
 const [command, ...args] = process.argv.slice(2), options = {};
 const required = key => {
     if (!options[key])
@@ -17,9 +18,15 @@ try {
             throw Error('参数必须为不重复的 --名称 值');
         options[args[i].slice(2)] = args[i + 1];
     }
-    if (command === 'capture') {
+    if (command === 'league-profile') {
+        const profile = leagueProfile(readJson(required('reference')));
+        const file = path.resolve(required('output'));
+        writeArtifact(file, profile);
+        console.log(JSON.stringify({ status: profile.calibration_status, profile_id: profile.profile_id, file }));
+    }
+    else if (command === 'capture') {
         const parameters = readJson(required('parameters'));
-        parameters.profile = readJson(required('profile'));
+        parameters.profile = loadCalibrationProfile(required('profile'));
         const matchId = required('match'), horizon = required('horizon'), dir = path.resolve(required('directory'));
         if (!fs.statSync(dir).isDirectory())
             throw Error('采样目录不存在');
@@ -52,7 +59,7 @@ try {
             process.exitCode = 2;
     }
     else {
-        console.log('独立初始校准：capture（赛前采样）、outcome（关联真实赛果）、fit（本机提供器拟合）。参数及用法见 docs/initial-calibration.md。');
+        console.log('独立初始校准：league-profile（联赛研究基线）、capture（赛前采样）、outcome（关联真实赛果）、fit（本机提供器拟合）。参数及用法见 docs/initial-calibration.md。');
         if (command && command !== 'help')
             process.exitCode = 2;
     }

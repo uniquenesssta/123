@@ -2,6 +2,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import crypto from 'node:crypto';
 import { digest, instant, openArtifact } from './artifacts.mjs';
+import { leagueResearchPolicy } from './leagueProfile.mjs';
 export function captureBody(produced, parameters, scope, expected, clock = Date.now()) {
     if (!['qa', 'real'].includes(scope))
         throw Error('必须明确声明qa或real来源');
@@ -24,7 +25,9 @@ export function captureBody(produced, parameters, scope, expected, clock = Date.
         throw Error('初始校准必须关联具体赛事');
     if (!['T-N', 'T-24h', 'T-6h', 'T-1h'].includes(p.snapshot_type))
         throw Error('采样窗口无效');
+    const research = leagueResearchPolicy(parameters.profile, m, p.competition_kind, scope, cutoff);
     return {
+        ...(research ? { competition_kind: p.competition_kind } : {}),
         schema: 'football.initial-calibration.capture.v1', capture_id: crypto.randomUUID(), scope, capture_kind: 'live_pre_match', captured_at: produced.captured_at, completed_at: produced.completed_at, match: m, horizon: p.snapshot_type, model_id: 'p4', input, data_quality: p.data_quality, parameters, baseline_sha256: digest(parameters), producer: produced.producer, database_is_test: !!produced.database_is_test
     };
 }
@@ -41,6 +44,8 @@ export function validateCapture(row) {
     const at = instant(c.captured_at, '采样时间'), end = instant(c.completed_at, '采样结束时间'), kickoff = instant(c.match.kickoff_time, '开球时间');
     if (end < at || end >= kickoff || instant(c.input.snapshot?.data_cutoff_time, '特征截止时间') > at || instant(c.input.snapshot?.frozen_at, '冻结时间') !== at)
         throw Error('采样制品违反赛前时间因果关系');
+    leagueResearchPolicy(c.parameters.profile, c.match, c.competition_kind, c.scope,
+        instant(c.input.snapshot?.data_cutoff_time, '特征截止时间'));
     return c;
 }
 export function outcomeBody(capture, result, clock = Date.now()) {
