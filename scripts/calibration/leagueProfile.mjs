@@ -77,7 +77,11 @@ export function leagueProfile(reference, now = new Date().toISOString()) {
 function validSource(value) {
     try {
         const url = new URL(value);
-        return url.protocol === 'https:' && !url.username && !url.password && !url.search && !url.hash;
+        if (url.protocol !== 'https:' || url.username || url.password || url.hash) return false;
+        if (!url.search) return true;
+        // FIKS identifies public season pages by tournament ID.
+        return url.origin === 'https://www.fotball.no' &&
+            url.pathname === '/fotballdata/turnering/hjem/' && /^\?fiksId=[1-9]\d*$/.test(url.search);
     } catch {
         return false;
     }

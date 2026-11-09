@@ -150,4 +150,8 @@ cargo build --locked -p football-persistence-postgres --example import_calibrati
 
 挪超 2026 赛季单独绑定赛事、赛季和球队身份。实际导入挪威足协已结束赛果 207 场、球队 16 支及本场赛程，双方各有 25 场历史、相同主客场各 12 场。重新导入后比分行摘要一致。英超记录作为原研究批次保留。来源快照和数据库读回保存在 `O:/Project/FOODBALL/logs/r17-near-term-match-20261109`。
 
-首测阵容待官方发布。配对完成需要在窗口内冻结合格赛前输入，并在赛后关联官方 90 分钟比分。挪超后续 α 研究使用独立的联赛 Profile 和相应数据，当前合格配对为 0。
+首测前置资料已备齐。足协名录中克里斯蒂安松 28 人、瓦勒伦加 25 人，53 个球员 FIKS ID 和所属已写入独立研究库，重复导入读回一致。所属以实际观察日期作为最早可证时点。名录的位置分组保留在来源记录，本场首发、阵型和具体位置待临场核对。
+
+独立 `eliteserien-2026-research-v1` Profile 使用挪超 2025 赛季 240 场、765 个实际进球，固定每队场均基率为 1.59375。比分逐场核对。其中 2025 年 11 月 22 日瓦勒伦加对克里斯蒂安松按场上 3:3 计入，足协行政比分 3:0 和裁决出处单列。研究 Profile 待本赛季留出检验。[挪威足协 2025 赛果](https://www.fotball.no/fotballdata/turnering/hjem/?fiksId=199603)、[Football-Data 比分档案](https://football-data.co.uk/all_new_data.php)、[足协裁决](https://www.fotball.no/contentassets/b3a68f7e15b14e08962d87f5f3e688ee/nffd-2025-7p.pdf)。
+
+挪超 Profile、名单来源及读回记录见 `O:/Project/FOODBALL/logs/r17-nff-lineup-readiness-20261109`。原入口在窗口开放前实测拒绝采样，真实配对为 0。下一步在 01:00–01:59:59 内核验官方首发与阵型、经原双方阵容事务提交并冻结输入，赛后关联经核验的 90 分钟比分。

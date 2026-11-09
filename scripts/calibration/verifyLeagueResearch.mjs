@@ -24,6 +24,12 @@ export function verifyLeagueResearch() {
     const frozen = '2024-02-02T00:00:00Z';
     const profile = leagueProfile(reference, frozen);
     assert.equal(profile.base_goal_rate, 5 / 4);
+    const nffUrl = 'https://www.fotball.no/fotballdata/turnering/hjem/?fiksId=199603';
+    const withSource = url => ({ ...reference, source_evidence: [{ ...reference.source_evidence[0], url }, reference.source_evidence[1]] });
+    assert.equal(leagueProfile(withSource(nffUrl), frozen).calibration_research.source_evidence[0].url, nffUrl);
+    for (const invalid of [nffUrl + '&token=secret', nffUrl.replace('www.fotball.no', 'example.invalid'), nffUrl.replace('turnering/hjem/', 'kamp/'), nffUrl.replace('fiksId=199603', 'fiksId=zero')]) {
+        assert.throws(() => leagueProfile(withSource(invalid), frozen), /来源/);
+    }
     assert.throws(() => leagueProfile({ ...reference, matches: [reference.matches[0], reference.matches[0]] }, frozen), /重复/);
     assert.throws(() => leagueProfile({ ...reference, observed_at: '2025-12-01T00:00:00Z' }, frozen), /时间/);
     assert.throws(() => leagueProfile({ ...reference, matches: [{ ...reference.matches[0], date: '2025-03-01' }] }, frozen), /早于/);
