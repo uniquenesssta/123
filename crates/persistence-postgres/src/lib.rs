@@ -2,6 +2,7 @@ mod adapters;
 mod analytics;
 mod api_workspace;
 mod audit;
+pub mod calibration_history;
 mod competition_kind;
 mod error;
 mod health;

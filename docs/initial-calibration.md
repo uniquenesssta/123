@@ -125,3 +125,21 @@ node scripts/calibration/cli.mjs league-profile --reference '<已核对的参考
 证据保存在 `O:/Project/FOODBALL/logs/r17-06-first-live-inputs-20261109/first-live-inputs.json`。制品记录了赛果来源、赛程时区、各场采样窗口、联赛研究 Profile 摘要及尚待完成的数据库绑定；原始快照和生成脚本同目录保留。已复算制品摘要、检查全部比赛身份和时间，并实跑 `fit` 确认该目录在没有赛前冻结制品时被拒绝。真实配对仍为 0。
 
 下一项先打通官方赛果在独立研究库的导入，绑定赛事、赛季和稳定的球队身份，实际读回并验证原历史特征接口在截止时间内使用这些数据。正式复盘继续使用原球员表现校验；官方比分导入只承担可核验的历史赛果。真实赛前采样须等到窗口开放，且双方合格阵容进入原输入链后再执行。
+
+## 9. 独立研究库历史赛果导入（2026-11-09）
+
+`import_calibration_history` 读取第 8 节已核对的英超 2026/27 制品，验证摘要、赛季、来源时点和比赛身份，再用一个事务写入赛事、赛季、球队、赛程及历史比分。比分记录关联来源和导入批次。FPL 暂定比分须有逐场正式战报核对。数据库的赛果可知时间取实际来源观察和战报核对时间中较晚者，入库时间用数据库实际时钟。重复导入保留原时间和身份，既有比分或赛程冲突会回滚整批。球队 ID 按本赛季 FPL ID 绑定。
+
+入口限本机 `127.0.0.1:55438/football_r17_research` 的专用低权限账号。使用现有迁移和赛果表，正式复盘、阵容、球员表现及模型冻结记录仍由各自入口维护。Windows 研究实例及受保护连接保存在本机项目 `research/r17-calibration-postgres`，验收结束后停止。复用时由本机证据目录中的 `research-postgres.ps1` 启动并向当前进程注入 `FOOTBALL_CALIBRATION_DATABASE_URL`。
+
+```powershell
+. 'O:\Project\FOODBALL\project-temp.ps1'
+cargo build --locked -p football-persistence-postgres --example import_calibration_history
+& '<import_calibration_history.exe>' init
+& '<import_calibration_history.exe>' import --packet '<已核验的 first-live-inputs.json>'
+& '<import_calibration_history.exe>' inspect --match '<导入返回的比赛 UUID>' --cutoff '<已发生的 RFC3339 赛前截止时间>'
+```
+
+本机导入 100 场赛果、10 场未来赛程、20 支球队，重启后逐场核对 110 条。首场曼城对富勒姆（FPL 108）绑定为 `b7e98ed5-0078-82ab-a511-31d456ea935d`。原历史特征读回在来源核对后、入库前的截止点每队为 0 场，入库后每队 10 场，其中相同主客场各 5 场，联赛基线覆盖 100 场。重复导入新增 0 条。摘要异常、缺战报的暂定比分、既有比分冲突、非研究库连接和未来截止点均被拒绝。验收记录在 `O:/Project/FOODBALL/logs/r17-06-research-history-20261109/verification.json`。
+
+下一项为曼城、富勒姆的官方球员身份、有效所属和正式阵容导入准备。开球时间若有变动，先依据官方公告核对并调整绑定赛程。到实际 T-1h 窗口且双方首发可用时，再通过原输入链采样。真实冻结配对仍为 0。
