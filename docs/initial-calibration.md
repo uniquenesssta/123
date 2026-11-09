@@ -143,3 +143,11 @@ cargo build --locked -p football-persistence-postgres --example import_calibrati
 本机导入 100 场赛果、10 场未来赛程、20 支球队，重启后逐场核对 110 条。首场曼城对富勒姆（FPL 108）绑定为 `b7e98ed5-0078-82ab-a511-31d456ea935d`。原历史特征读回在来源核对后、入库前的截止点每队为 0 场，入库后每队 10 场，其中相同主客场各 5 场，联赛基线覆盖 100 场。重复导入新增 0 条。摘要异常、缺战报的暂定比分、既有比分冲突、非研究库连接和未来截止点均被拒绝。验收记录在 `O:/Project/FOODBALL/logs/r17-06-research-history-20261109/verification.json`。
 
 下一项为曼城、富勒姆的官方球员身份、有效所属和正式阵容导入准备。开球时间若有变动，先依据官方公告核对并调整绑定赛程。到实际 T-1h 窗口且双方首发可用时，再通过原输入链采样。真实冻结配对仍为 0。
+
+## 10. 近期首测改用挪超（2026-11-09）
+
+北京时间 11 月 10 日 02:00，挪超第 26 轮克里斯蒂安松对瓦勒伦加在 Nordmøre stadion 开球。T-1h 采样窗口为 01:00:00–01:59:59。独立研究库中登记的新首测键为 `NFF-ELITESERIEN-2026-8986331`，比赛 UUID 为 `ca281c34-d392-e4fd-06a6-c051c533eb3d`。[挪威足协比赛页](https://www.fotball.no/fotballdata/kamp/?fiksId=8986331)、[改期公告](https://www.fotball.no/turneringer/eliteserien/2026/kristiansund---valerenga-utsatt/)。
+
+挪超 2026 赛季单独绑定赛事、赛季和球队身份。实际导入挪威足协已结束赛果 207 场、球队 16 支及本场赛程，双方各有 25 场历史、相同主客场各 12 场。重新导入后比分行摘要一致。英超记录作为原研究批次保留。来源快照和数据库读回保存在 `O:/Project/FOODBALL/logs/r17-near-term-match-20261109`。
+
+首测阵容待官方发布。配对完成需要在窗口内冻结合格赛前输入，并在赛后关联官方 90 分钟比分。挪超后续 α 研究使用独立的联赛 Profile 和相应数据，当前合格配对为 0。

@@ -51,7 +51,7 @@ export function rulesPage(
   ], section);
   const connected = state.data.database_configured;
 
-  return `<section class="module-workspace-page model-rules-workspace">
+  return `<section class="module-workspace-page model-rules-workspace" data-composed-workspace-sections>
     ${taskPageHeader({
       eyebrow: "赛事设置",
       title: "赛事目录与自动模型规则",

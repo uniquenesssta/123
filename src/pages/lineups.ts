@@ -477,7 +477,7 @@ export function lineupsPage(
     { label: "数据窗口", value: pairedBuilder.snapshot_type, note: `${pairedBuilder.home.players.length + pairedBuilder.away.players.length} 名阵容球员` },
     { label: "模型输入门禁", value: chainReady ? "双方输入已就绪" : lineupChain ? "存在阻断项" : "尚未检查", note: chainReady ? "可以进入正式推演" : lineupChain?.blocking_issues[0] ?? "完成阵容后检查链路", tone: chainReady ? "success" : lineupChain ? "warning" : "neutral" },
   ]);
-  return `<section class="task-page core-workspace-page core-match-workspace">
+  return `<section class="task-page core-workspace-page core-match-workspace" data-composed-workspace-sections>
   ${taskPageHeader({ eyebrow: "比赛中心", title: "比赛、阵容与模型输入", description: "比赛创建、双方阵容、模型输入与版本记录，在同一工作区完成。", status: { label: chainReady ? "模型输入已就绪" : selectedMatch ? "比赛上下文已载入" : "等待选择比赛", tone: chainReady ? "success" : selectedMatch ? "accent" : "neutral" }, actions: `<button class="secondary" data-action="refresh-lineups">${icon("refresh")}<span>刷新</span></button>` })}
   ${contextRibbon}
   <div class="core-local-navigation">${sectionNav}</div>

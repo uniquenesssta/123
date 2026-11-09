@@ -33,7 +33,7 @@ type LineupsLoadResult,
 
 } from "./controllers/pageLoaders";
 import { bindSearchableSelectDiagnostics } from "./diagnostics/searchableSelectDiagnostics";
-import { activateSectionPanel } from "./ui/navigation";
+import { activateSectionPanel, activateWorkspaceSection } from "./ui/navigation";
 import { architecturePage } from "./features/architecture";
 import { CompetitionFeature,fitCatalogueRegions,selectCatalogueRegion,clearRulesCatalogueFilters,filterRulesCompetitionCatalogue,selectRulesDirectoryLevel } from "./features/competitions";
 import { dashboardPage } from "./features/dashboard";
@@ -1446,6 +1446,16 @@ async function handleAction(
     case "select-workspace-section": {
       const sectionId = button.dataset.sectionId;
       if (!sectionId) break;
+
+      if (activateWorkspaceSection(button, sectionId)) {
+        if (navigation.page === "lineups") lineupsFeature.actions.capturePairedLineupFromDom();
+        if (navigation.page === "rules") {
+          rulesFeature.invalidatePreview();
+          if (sectionId === "catalog") fitCatalogueRegions(app);
+        }
+        workspaceState.patchModule(navigation.page, { active_section: sectionId });
+        break;
+      }
       if (navigation.page === "workbooks") workbooksFeature.changedCategory();
       if (navigation.page === "prediction") predictionFeature.viewChanged();
       if (sectionId === "directory" && navigation.page === "teams") {

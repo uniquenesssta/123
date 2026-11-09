@@ -18,3 +18,20 @@ export function activateSectionPanel(root: ParentNode, id: string): boolean {
   }
   return true;
 }
+
+/** Switch already rendered workspace sections without replacing the navigation or draft controls. */
+export function activateWorkspaceSection(trigger: HTMLElement, id: string): boolean {
+  const workspace = trigger.closest("[data-composed-workspace-sections]");
+  if (!workspace) return false;
+  const panels = Array.from(workspace.querySelectorAll<HTMLElement>(".workspace-module-view[data-workspace-section]"));
+  const target = panels.find(panel => panel.dataset.workspaceSection === id);
+  if (!target) return false;
+  for (const panel of panels) panel.classList.toggle("active", panel === target);
+  for (const button of workspace.querySelectorAll<HTMLButtonElement>(".workspace-section-nav button[data-section-id]")) {
+    const active = button.dataset.sectionId === id;
+    button.classList.toggle("active", active);
+    const current = active ? "page" : "false";
+    if (button.getAttribute("aria-current") !== current) button.setAttribute("aria-current", current);
+  }
+  return true;
+}

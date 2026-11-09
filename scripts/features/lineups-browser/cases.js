@@ -1,5 +1,28 @@
 (async()=>{let checks=0;const check=(ok,msg)=>{checks++;if(!ok)throw Error(msg);},q=s=>document.querySelector(s),click=s=>{const el=q(s);check(!!el,'missing '+s);el.click();},wait=()=>new Promise(r=>setTimeout(r,350));
 click('[data-primary-module="matches"]');await wait();check(!!q('.core-match-workspace'),'full main match route missing');check(!!q('#new-match-home-team'),'match editor missing');check(document.documentElement.scrollWidth<=innerWidth,'match page horizontal overflow');
+
+const shell=q('.application-shell'),nav=q('.workspace-section-nav'),matchSearch=q('#managed-match-search');
+matchSearch.value='unsaved match search';
+const workbook=q('[data-action="select-workspace-section"][data-section-id="workbook"]');
+workbook.focus();workbook.click();await new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve)));
+check(q('.application-shell')===shell&&q('.workspace-section-nav')===nav,'switching workbook rebuilt shell or navigation');
+check(document.activeElement===workbook&&workbook.getAttribute('aria-current')==='page','active workbook tab lost focus or selection');
+check(q('[data-workspace-section="workbook"]').classList.contains('active')&&!q('[data-workspace-section="matches"]').classList.contains('active'),'only workbook panel is active');
+workbook.click();check(q('.application-shell')===shell&&document.activeElement===workbook,'clicking current tab remounted navigation');
+click('[data-action="select-workspace-section"][data-section-id="matches"]');
+check(q('#managed-match-search')===matchSearch&&matchSearch.value==='unsaved match search','switching back rebuilt or cleared match controls');
+
+
+click('[data-primary-module="model"]');await wait();
+const rulesShell=q('.application-shell'),rulesNav=q('.workspace-section-nav');
+check(!!q('.model-rules-workspace'),'rules workspace missing');
+click('.workspace-section-nav [data-section-id="packages"]');
+check(q('.application-shell')===rulesShell&&q('.workspace-section-nav')===rulesNav,'rules switch rebuilt shell or navigation');
+check(q('[data-workspace-section="packages"]').classList.contains('active')&&!q('[data-workspace-section="catalog"]').classList.contains('active'),'only rule packages panel is active');
+click('.workspace-section-nav [data-section-id="catalog"]');
+check(q('[data-workspace-section="catalog"]').classList.contains('active'),'rule directory did not reopen');
+click('[data-primary-module="matches"]');await wait();
+
 const home=q('#new-match-home-team');check(home.options.length>1,'real reference options absent');click('[data-action="select-workspace-section"][data-section-id="builder"]');await wait();
 if(!q('#paired-lineup-match')){const tab=[...document.querySelectorAll('[data-action="switch-workspace-section"]')].find(e=>e.dataset.section==='builder');if(tab){tab.click();await wait();}}
 check(!!q('#paired-lineup-match'),'paired builder missing');
